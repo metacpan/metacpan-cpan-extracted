@@ -1,3 +1,9 @@
+0.892   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [test] Avoid Foo, Bar, et al package names, use
+	  Perinci::Access::Schemeless::Test* instead.
+
+
 0.891   2019-07-21  Released-By: PERLANCAR; Urgency: medium
 
 	- [test] Update tests to latest Perinci::Sub::Complete &

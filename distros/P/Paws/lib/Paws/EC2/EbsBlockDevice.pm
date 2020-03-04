@@ -45,6 +45,10 @@ This class has no description
 =head2 DeleteOnTermination => Bool
 
   Indicates whether the EBS volume is deleted on instance termination.
+For more information, see Preserving Amazon EBS Volumes on Instance
+Termination
+(https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html#preserving-volumes-on-termination)
+in the Amazon Elastic Compute Cloud User Guide.
 
 
 =head2 Encrypted => Bool
@@ -62,6 +66,8 @@ In no case can you remove encryption from an encrypted volume.
 Encrypted volumes can only be attached to instances that support Amazon
 EBS encryption. For more information, see Supported Instance Types
 (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html#EBSEncryption_supported_instances).
+
+This parameter is not returned by .
 
 
 =head2 Iops => Int
@@ -124,10 +130,11 @@ be equal to or larger than the snapshot size.
 
 =head2 VolumeType => Str
 
-  The volume type. If you set the type to C<io1>, you must also set the
-B<Iops> property.
+  The volume type. If you set the type to C<io1>, you must also specify
+the B<Iops> parameter. If you set the type to C<gp2>, C<st1>, C<sc1>,
+or C<standard>, you must omit the B<Iops> parameter.
 
-Default: C<standard>
+Default: C<gp2>
 
 
 

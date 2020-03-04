@@ -1,3 +1,6 @@
+Label regexps and have config variables which define exactly which ones are used
+   OR which ones are not used
+
 Add option to Recur: ignore holidays
    then flags like NBD ignore holidays (but count weekends)
 When calculating holidays, use this option by default to simplify

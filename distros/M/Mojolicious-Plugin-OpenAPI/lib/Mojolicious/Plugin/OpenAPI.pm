@@ -7,7 +7,7 @@ use Mojo::JSON;
 use Mojo::Util;
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '2.21';
+our $VERSION = '2.23';
 my $X_RE = qr{^x-};
 
 has route     => sub {undef};
@@ -123,7 +123,7 @@ sub _add_routes {
       if (!$to and $name) {
         $r = $self->route->root->find($name);
         warn "[OpenAPI] Found existing route by name '$name'.\n" if DEBUG and $r;
-        $self->route->add_child($r) if $r;
+        $self->route->add_child($r)                              if $r;
       }
       if (!$r) {
         my $route_path = $self->_openapi_path_to_route_path($http_method, $openapi_path);
@@ -274,6 +274,7 @@ sub _helper_validate {
   # code() can be set by other methods such as $c->openapi->cors_simple()
   return [{message => 'Already rendered.'}] if $c->res->code;
 
+  # TODO: Remove support for $c->validation->output (2020-03-03)
   # Write validated data to $c->validation->output
   my $self    = _self($c);
   my $op_spec = $c->openapi->spec;
@@ -372,7 +373,7 @@ Mojolicious::Plugin::OpenAPI - OpenAPI / Swagger plugin for Mojolicious
     my $c = shift->openapi->valid_input or return;
 
     # Generate some data
-    my $data = {body => $c->validation->param("body")};
+    my $data = {body => $c->req->json};
 
     # Validate the output response and render it to the user agent
     # using a custom "openapi" handler.
@@ -380,7 +381,8 @@ Mojolicious::Plugin::OpenAPI - OpenAPI / Swagger plugin for Mojolicious
   }, "echo";
 
   # Load specification and start web server
-  plugin OpenAPI => {url => "data:///spec.json"};
+  # Use "v3" instead of "v2" for "schema" if you are using OpenAPI v3
+  plugin OpenAPI => {url => "data:///spec.json", schema => "v2"};
   app->start;
 
   __DATA__
@@ -408,20 +410,18 @@ Mojolicious::Plugin::OpenAPI - OpenAPI / Swagger plugin for Mojolicious
     }
   }
 
-See L<Mojolicious::Plugin::OpenAPI::Guides::Tutorial> for a tutorial on how to
+See L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2> or
+L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv3> for tutorials on how to
 write a "full" app with application class and controllers.
 
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::OpenAPI> is L<Mojolicious::Plugin> that add routes and
 input/output validation to your L<Mojolicious> application based on a OpenAPI
-(Swagger) specification.
+(Swagger) specification. This plugin supports both version L<2.0|/schema> and
+L<3.x|/schema>, though 3.x I<might> have some missing features.
 
-Have a look at the L</SEE ALSO> for references to more documentation, or jump
-right to the L<tutorial|Mojolicious::Plugin::OpenAPI::Guides::Tutorial>.
-
-Currently v2 is very well supported, while v3 should be considered
-EXPERIMENTAL.
+Have a look at the L</SEE ALSO> for references to more documentation.
 
 Please report in L<issues|https://github.com/jhthorsen/json-validator/issues>
 or open pull requests to enhance the 3.0 support.
@@ -458,15 +458,8 @@ L<JSON::Validator::Error> objects or empty list on valid input.
 Note that this helper is only for customization. You probably want
 L</openapi.valid_input> in most cases.
 
-Validated input parameters will be copied to
-C<Mojolicious::Controller/validation>, which again can be extracted by the
-"name" in the parameters list from the spec. Example:
-
-  # specification:
-  "parameters": [{"in": "body", "name": "whatever", "schema": {"type": "object"}}],
-
-  # controller
-  my $body = $c->validation->param("whatever");
+IMPORTANT! Integration with C<Mojolicious::Controller/validation> used to be
+supported, but it is now slowly being deprecated.
 
 =head2 openapi.valid_input
 
@@ -581,7 +574,7 @@ plugin.
 
 The name of the "definition" in the spec that will be used for
 L</default_response_codes>. The default value is "DefaultResponse". See
-L<Mojolicious::Plugin::OpenAPI::Guides::Tutorial/"Default response schema">
+L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2/"Default response schema">
 for more details.
 
 =head3 log_level
@@ -620,6 +613,9 @@ C<route> can be specified in case you want to have a protected API. Example:
 
 Can be used to set a different schema, than the default OpenAPI 2.0 spec.
 Example values: "http://swagger.io/v2/schema.json", "v2" or "v3".
+
+See also L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2> and
+L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv3>.
 
 =head3 spec_route_name
 
@@ -665,15 +661,29 @@ the terms of the Artistic License version 2.0.
 
 =over 2
 
-=item * L<Mojolicious::Plugin::OpenAPI::Guides::Tutorial>
+=item * L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2>
+
+Guide for how to use this plugin with OpenAPI version 2.0 spec.
+
+=item * L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv3>
+
+Guide for how to use this plugin with OpenAPI version 3.0 spec.
 
 =item * L<Mojolicious::Plugin::OpenAPI::Cors>
 
+Plugin to add Cross-Origin Resource Sharing (CORS).
+
 =item * L<Mojolicious::Plugin::OpenAPI::Security>
+
+Plugin for handling security definitions in your schema.
 
 =item * L<Mojolicious::Plugin::OpenAPI::SpecRenderer>
 
-=item * L<OpenAPI specification|https://openapis.org/specification>
+Plugin for exposing your spec in human readble or JSON format.
+
+=item * L<https://www.openapis.org/>
+
+Official OpenAPI website.
 
 =back
 

@@ -3,6 +3,7 @@ package Paws::DocDB::DBInstance;
   has AutoMinorVersionUpgrade => (is => 'ro', isa => 'Bool');
   has AvailabilityZone => (is => 'ro', isa => 'Str');
   has BackupRetentionPeriod => (is => 'ro', isa => 'Int');
+  has CACertificateIdentifier => (is => 'ro', isa => 'Str');
   has DBClusterIdentifier => (is => 'ro', isa => 'Str');
   has DBInstanceArn => (is => 'ro', isa => 'Str');
   has DBInstanceClass => (is => 'ro', isa => 'Str');
@@ -55,7 +56,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::DocDB::DBIn
 
 =head1 DESCRIPTION
 
-Detailed information about a DB instance.
+Detailed information about an instance.
 
 =head1 ATTRIBUTES
 
@@ -67,37 +68,42 @@ Detailed information about a DB instance.
 
 =head2 AvailabilityZone => Str
 
-  Specifies the name of the Availability Zone that the DB instance is
+  Specifies the name of the Availability Zone that the instance is
 located in.
 
 
 =head2 BackupRetentionPeriod => Int
 
-  Specifies the number of days for which automatic DB snapshots are
+  Specifies the number of days for which automatic snapshots are
 retained.
+
+
+=head2 CACertificateIdentifier => Str
+
+  The identifier of the CA certificate for this DB instance.
 
 
 =head2 DBClusterIdentifier => Str
 
-  Contains the name of the DB cluster that the DB instance is a member of
-if the DB instance is a member of a DB cluster.
+  Contains the name of the cluster that the instance is a member of if
+the instance is a member of a cluster.
 
 
 =head2 DBInstanceArn => Str
 
-  The Amazon Resource Name (ARN) for the DB instance.
+  The Amazon Resource Name (ARN) for the instance.
 
 
 =head2 DBInstanceClass => Str
 
-  Contains the name of the compute and memory capacity class of the DB
+  Contains the name of the compute and memory capacity class of the
 instance.
 
 
 =head2 DBInstanceIdentifier => Str
 
   Contains a user-provided database identifier. This identifier is the
-unique key that identifies a DB instance.
+unique key that identifies an instance.
 
 
 =head2 DBInstanceStatus => Str
@@ -107,21 +113,21 @@ unique key that identifies a DB instance.
 
 =head2 DbiResourceId => Str
 
-  The AWS Region-unique, immutable identifier for the DB instance. This
+  The AWS Region-unique, immutable identifier for the instance. This
 identifier is found in AWS CloudTrail log entries whenever the AWS KMS
-key for the DB instance is accessed.
+key for the instance is accessed.
 
 
 =head2 DBSubnetGroup => L<Paws::DocDB::DBSubnetGroup>
 
   Specifies information on the subnet group that is associated with the
-DB instance, including the name, description, and subnets in the subnet
+instance, including the name, description, and subnets in the subnet
 group.
 
 
 =head2 EnabledCloudwatchLogsExports => ArrayRef[Str|Undef]
 
-  A list of log types that this DB instance is configured to export to
+  A list of log types that this instance is configured to export to
 Amazon CloudWatch Logs.
 
 
@@ -132,8 +138,7 @@ Amazon CloudWatch Logs.
 
 =head2 Engine => Str
 
-  Provides the name of the database engine to be used for this DB
-instance.
+  Provides the name of the database engine to be used for this instance.
 
 
 =head2 EngineVersion => Str
@@ -143,13 +148,13 @@ instance.
 
 =head2 InstanceCreateTime => Str
 
-  Provides the date and time that the DB instance was created.
+  Provides the date and time that the instance was created.
 
 
 =head2 KmsKeyId => Str
 
   If C<StorageEncrypted> is C<true>, the AWS KMS key identifier for the
-encrypted DB instance.
+encrypted instance.
 
 
 =head2 LatestRestorableTime => Str
@@ -160,7 +165,7 @@ point-in-time restore.
 
 =head2 PendingModifiedValues => L<Paws::DocDB::PendingModifiedValues>
 
-  Specifies that changes to the DB instance are pending. This element is
+  Specifies that changes to the instance are pending. This element is
 included only when changes are pending. Specific changes are identified
 by subelements.
 
@@ -187,11 +192,8 @@ primary instance.
 
 =head2 PubliclyAccessible => Bool
 
-  Specifies the availability options for the DB instance. A value of
-C<true> specifies an internet-facing instance with a publicly
-resolvable DNS name, which resolves to a public IP address. A value of
-C<false> specifies an internal instance with a DNS name that resolves
-to a private IP address.
+  Not supported. Amazon DocumentDB does not currently support public
+endpoints. The value of C<PubliclyAccessible> is always C<false>.
 
 
 =head2 StatusInfos => ArrayRef[L<Paws::DocDB::DBInstanceStatusInfo>]
@@ -202,12 +204,12 @@ this is blank.
 
 =head2 StorageEncrypted => Bool
 
-  Specifies whether the DB instance is encrypted.
+  Specifies whether or not the instance is encrypted.
 
 
 =head2 VpcSecurityGroups => ArrayRef[L<Paws::DocDB::VpcSecurityGroupMembership>]
 
-  Provides a list of VPC security group elements that the DB instance
+  Provides a list of VPC security group elements that the instance
 belongs to.
 
 

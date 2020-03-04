@@ -3,13 +3,15 @@ package JSON::Schema::ToJSON;
 use strict;
 use warnings;
 
+use B;
 use Mojo::Base -base;
 use Cpanel::JSON::XS;
 use String::Random;
 use Hash::Merge qw/ merge /;
 use Data::Fake qw/ Core Names Text Dates /;
+use JSON::Validator::Util qw/ schema_type /;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 has _validator  => sub {
 	$ENV{JSON_VALIDATOR_RECURSION_LIMIT} = shift->max_depth;
@@ -312,7 +314,9 @@ sub _random_object {
 		my ( $method,$sub_schema )
 			= $self->_guess_method( $schema->{properties}{$property} );
 
-		$object->{$property} = $self->$method( $sub_schema );
+		$object->{$property} = $self->can( $method )
+			? $self->$method( $sub_schema )
+			: undef;
 	}
 
 	$self->_depth( $self->_depth - 1 ) if $self->_depth;
@@ -390,12 +394,11 @@ sub _guess_method {
 		warn __PACKAGE__ . " encountered not, see CAVEATS perldoc section";
 	}
 
-	# danger danger! accessing private method from elsewhere. note enum was
-	# removed from _guess_data_type in JSON::Validator
+	# note that enum was removed from _guess_data_type in JSON::Validator
 	# f290618f621a36db8f5010f8b99a42170dac820a so need to check for it here
 	my $schema_type = $schema->{enum}
 		? 'enum'
-		: JSON::Validator::_guess_schema_type( $schema );
+		: schema_type( $schema );
 
 	$schema_type //= 'null';
 
@@ -416,7 +419,7 @@ JSON::Schema::ToJSON - Generate example JSON structures from JSON Schema definit
 
 =head1 VERSION
 
-0.16
+0.17
 
 =head1 SYNOPSIS
 

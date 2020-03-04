@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-ToJSON
 
+0.17  2020-03-02
+        - Bring up to date with recent JSON::Validator changes (#6)
+
 0.16  2019-02-01
         - Use Data::Fake for better string data (GH #4)
 

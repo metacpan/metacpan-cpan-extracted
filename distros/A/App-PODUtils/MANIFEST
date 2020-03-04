@@ -12,6 +12,7 @@ script/dump-pod-structure
 script/elide-pod
 script/poddump
 script/podless
+script/reverse-pod-headings
 script/sort-pod-headings
 t/00-compile.t
 t/author-critic.t

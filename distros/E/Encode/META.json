@@ -4,13 +4,13 @@
       "Dan Kogai <dankogai@dan.co.jp>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Encode",
    "no_index" : {
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0.81_01"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -37,6 +36,11 @@
             "Storable" : "0",
             "parent" : "0.221"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.81_01"
+         }
       }
    },
    "release_status" : "stable",
@@ -45,7 +49,7 @@
          "url" : "https://github.com/dankogai/p5-encode"
       }
    },
-   "version" : "3.02",
+   "version" : "3.03",
    "x_contributors" : [
       "Alex Davies <alex.davies@talktalk.net>",
       "Alex Kapranoff <alex@kapranoff.ru>",
@@ -131,5 +135,5 @@
       "Vincent van Dam <vvandam@sandvine.com>",
       "Yitzchak Scott-Thoennes <sthoenna@efn.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

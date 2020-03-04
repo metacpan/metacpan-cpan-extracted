@@ -83,7 +83,7 @@ eval {
         ),
     );
 };
-like($@, qr/Attribute \(predicate\) does not pass the type constraint /, "predicate MUST match just a prefix");
+like($@, qr/This rule \(.*?\) does not match just prefixes/, "predicate MUST match just a prefix");
 
 done_testing;
 

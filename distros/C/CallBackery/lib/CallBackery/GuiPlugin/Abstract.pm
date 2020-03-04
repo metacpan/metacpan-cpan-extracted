@@ -169,7 +169,9 @@ the log object
 =cut
 
 has log => sub {
-    shift->app->log;
+    my $self = shift;
+    $self->user and $self->controller and return $self->controller->log;
+    $self->app->log;
 };
 
 =head2 args

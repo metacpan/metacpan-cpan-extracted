@@ -1,17 +1,17 @@
 package App::Provision::Foundation;
-$App::Provision::Foundation::VERSION = '0.0402';
-BEGIN {
-  $App::Provision::Foundation::AUTHORITY = 'cpan:GENE';
-}
+$App::Provision::Foundation::VERSION = '0.0403';
+our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 use parent qw( App::Provision::Tiny );
+
 
 sub deps
 {
     my $self = shift;
     return qw( wget unzip );
 }
+
 
 sub condition
 {
@@ -25,6 +25,7 @@ sub condition
 
     return $condition ? 1 : 0;
 }
+
 
 sub meet
 {
@@ -54,7 +55,15 @@ App::Provision::Foundation
 
 =head1 VERSION
 
-version 0.0402
+version 0.0403
+
+=head1 FUNCTIONS
+
+=head2 deps
+
+=head2 condition
+
+=head2 meet
 
 =head1 AUTHOR
 
@@ -62,7 +71,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

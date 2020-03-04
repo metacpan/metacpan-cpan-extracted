@@ -291,6 +291,9 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
     }                                                                   \
     (k) = (v) = NULL;
 
+#define NEW_PI_ATTRIBUTE(k, kl, v, vl)                                  \
+    xh_log_trace4("new PI attr name: [%.*s] value: [%.*s]", kl, k, vl, v);
+
 #define NEW_ATTRIBUTE(k, kl, v, vl) NEW_NODE_ATTRIBUTE(k, kl, v, vl)
 
 #define _NEW_TEXT(s, l)                                                 \
@@ -446,6 +449,14 @@ PPCAT(loop, _FINISH):
     END3(PPCAT(loop, _2), stop)                                         \
     END3(PPCAT(loop, _1), stop)
 
+#define SCAN10(loop, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10)           \
+    SCAN5(PPCAT(loop, _1), c1, c2, c3, c4, c5)                          \
+    SCAN5(PPCAT(loop, _2), c6, c7, c8, c9, c10)
+
+#define END10(loop, stop)                                               \
+    END5(PPCAT(loop, _2), stop)                                         \
+    END5(PPCAT(loop, _1), stop)
+
 #define SEARCH_END_TAG                                                  \
     EXPECT_CHAR("end tag", '>')                                         \
         goto PARSE_CONTENT;                                             \
@@ -551,19 +562,6 @@ PPCAT(loop, _SEARCH_ATTRIBUTE_VALUE):                                   \
     END(PPCAT(loop, _SEARCH_ATTR))                                      \
     goto INVALID_XML;
 
-#define PARSE_XML_DECLARATION                                           \
-    SCAN3(XML_DECL, 'x', 'm', 'l')                                      \
-        DO(XML_DECL_ATTR)                                               \
-            EXPECT_BLANK("blank")                                       \
-                SEARCH_ATTRIBUTES(XML_DECL_ATTR, SEARCH_END_XML_DECLARATION)\
-                goto INVALID_XML;                                       \
-            EXPECT_ANY("wrong character")                               \
-                goto INVALID_XML;                                       \
-        END(XML_DECL_ATTR)                                              \
-        goto INVALID_XML;                                               \
-    END3(XML_DECL, INVALID_XML)                                         \
-    goto INVALID_XML;
-
 #define SEARCH_END_XML_DECLARATION                                      \
     EXPECT_CHAR("end tag", '?')                                         \
         DO(XML_DECL_SEARCH_END_TAG2)                                    \
@@ -572,6 +570,16 @@ PPCAT(loop, _SEARCH_ATTRIBUTE_VALUE):                                   \
             EXPECT_ANY("wrong character")                               \
                 goto INVALID_XML;                                       \
         END(XML_DECL_SEARCH_END_TAG2)                                   \
+        goto INVALID_XML;
+
+#define SEARCH_END_PI                                                   \
+    EXPECT_CHAR("end tag", '?')                                         \
+        DO(PI_SEARCH_END_TAG2)                                          \
+            EXPECT_CHAR("end tag", '>')                                 \
+                goto PARSE_CONTENT;                                     \
+            EXPECT_ANY("wrong character")                               \
+                goto INVALID_XML;                                       \
+        END(PI_SEARCH_END_TAG2)                                         \
         goto INVALID_XML;
 
 #define PARSE_DOCTYPE_END                                               \
@@ -977,15 +985,45 @@ PARSE_CONTENT:
                 EXPECT_CHAR("xml declaration", '?')
                     if (real_depth != 0) goto INVALID_XML;
                     END_OF_TEXT(TEXT_BEFORE_XML_DECL, content, end - content)
+                    SCAN3(XML_DECL, 'x', 'm', 'l')
+                        DO(XML_DECL_ATTR)
+                            EXPECT_BLANK("blank")
 #undef  NEW_ATTRIBUTE
 #define NEW_ATTRIBUTE(k, kl, v, vl) NEW_XML_DECL_ATTRIBUTE(k, kl, v, vl)
 #undef  SEARCH_ATTRIBUTE_VALUE
 #define SEARCH_ATTRIBUTE_VALUE(loop, top_loop, quot) SEARCH_XML_DECL_ATTRIBUTE_VALUE(loop, top_loop, quot)
-                    PARSE_XML_DECLARATION
+                                SEARCH_ATTRIBUTES(XML_DECL_ATTR, SEARCH_END_XML_DECLARATION)
 #undef  NEW_ATTRIBUTE
 #define NEW_ATTRIBUTE(k, kl, v, vl) NEW_NODE_ATTRIBUTE(k, kl, v, vl)
 #undef  SEARCH_ATTRIBUTE_VALUE
 #define SEARCH_ATTRIBUTE_VALUE(loop, top_loop, quot) SEARCH_NODE_ATTRIBUTE_VALUE(loop, top_loop, quot)
+                                goto INVALID_XML;
+                            EXPECT_CHAR("PI", '-')
+                                SCAN10(STYLESHEET_PI, 's', 't', 'y', 'l', 'e', 's', 'h', 'e', 'e', 't')
+                                    DO(STYLESHEET_PI_ATTR)
+                                        EXPECT_BLANK("blank")
+#undef  NEW_ATTRIBUTE
+#define NEW_ATTRIBUTE(k, kl, v, vl) NEW_PI_ATTRIBUTE(k, kl, v, vl)
+#undef  SEARCH_ATTRIBUTE_VALUE
+#define SEARCH_ATTRIBUTE_VALUE(loop, top_loop, quot) SEARCH_XML_DECL_ATTRIBUTE_VALUE(loop, top_loop, quot)
+                                            SEARCH_ATTRIBUTES(STYLESHEET_PI_ATTR, SEARCH_END_PI)
+#undef  NEW_ATTRIBUTE
+#define NEW_ATTRIBUTE(k, kl, v, vl) NEW_NODE_ATTRIBUTE(k, kl, v, vl)
+#undef  SEARCH_ATTRIBUTE_VALUE
+#define SEARCH_ATTRIBUTE_VALUE(loop, top_loop, quot) SEARCH_NODE_ATTRIBUTE_VALUE(loop, top_loop, quot)
+                                            goto INVALID_XML;
+                                    EXPECT_ANY("wrong character")
+                                        goto INVALID_XML;
+                                    END(STYLESHEET_PI_ATTR)
+                                    goto INVALID_XML;
+                                END10(STYLESHEET_PI, INVALID_XML)
+                                goto INVALID_XML;
+                            EXPECT_ANY("wrong character")
+                                goto INVALID_XML;
+                        END(XML_DECL_ATTR)
+                        goto INVALID_XML;
+                    END3(XML_DECL, INVALID_XML)
+                    goto INVALID_XML;
                 EXPECT_CHAR("comment or cdata or doctype", '!')
                     flags &= ~XH_X2H_TEXT_NODE;
                     END_OF_TEXT(TEXT_BEFORE_COMMENT, content, end - content)

@@ -1,9 +1,9 @@
 package Complete::Sah;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-12'; # DATE
+our $DATE = '2020-03-04'; # DATE
 our $DIST = 'Complete-Sah'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -152,6 +152,7 @@ sub complete_from_schema {
             log_trace("[compsah] adding completion from schema's 'examples' clause");
             for my $eg (@{ $cs->{'examples'} }) {
                 if (ref $eg eq 'HASH') {
+                    next unless !exists($eg->{valid}) || $eg->{valid};
                     next unless defined $eg->{value};
                     next if ref $eg->{value};
                     push @$words, $eg->{value};
@@ -163,8 +164,8 @@ sub complete_from_schema {
                     push @$summaries, undef;
                 }
             }
-            $static++;
-            return; # from eval. there should not be any other value
+            #$static++;
+            #return; # from eval. there should not be any other value
         }
         if ($type eq 'any') {
             # because currently Data::Sah::Normalize doesn't recursively
@@ -358,7 +359,7 @@ Complete::Sah - Sah-related completion routines
 
 =head1 VERSION
 
-This document describes version 0.004 of Complete::Sah (from Perl distribution Complete-Sah), released on 2020-02-12.
+This document describes version 0.006 of Complete::Sah (from Perl distribution Complete-Sah), released on 2020-03-04.
 
 =head1 SYNOPSIS
 

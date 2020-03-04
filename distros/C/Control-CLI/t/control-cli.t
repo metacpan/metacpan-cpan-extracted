@@ -238,7 +238,8 @@ if (@ARGV) {
 	}
 	else {
 		$Baudrate = shift(@ARGV) if @ARGV;
-		($Username, $Password) = split(':', shift(@ARGV)) if @ARGV;
+		$Username = shift(@ARGV) if @ARGV;
+		$Password = $2 if $Username =~ s/^([^:\s]+):(\S*)$/$1/;
 	}
 	$Cmd = shift(@ARGV) if @ARGV;
 	$Blocking = @ARGV ? shift(@ARGV) : undef;
@@ -301,9 +302,9 @@ do {{ # Test loop, we keep testing until user satisfied
 		my $complexInput;
 		prompt(\$host, "Provide an IP|hostname to test with (you will be prompted for commands to execute);\n [[username][:password]@]<host|IP> [port]; ENTER to end test]\n : ");
 		if ($host =~ s/^(.+)@//) {
-			($username, $password) = split(':', $1);
+			$username = $1;
+			$password = $2 if $username =~ s/^([^:\s]+):(\S*)$/$1/;
 			undef $username unless length $username;
-			undef $password unless length $password;
 			print "Username = ", $username, "\n" if defined $username;
 			print "Password = ", $password, "\n" if defined $password;
 			$complexInput = 1;

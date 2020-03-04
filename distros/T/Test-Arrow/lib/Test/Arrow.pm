@@ -5,7 +5,7 @@ use Test::Builder::Module;
 use Test::Name::FromLine;
 use Text::MatchedPosition;
 
-our $VERSION = '0.11';
+our $VERSION = '0.16';
 
 our @ISA = qw/Test::Builder::Module/;
 
@@ -19,6 +19,10 @@ sub import {
     $pkg->_import_option_no_strict(\%args);
     $pkg->_import_option_no_warnings(\%args);
     $pkg->_import_option_binary(\%args);
+
+    if (scalar(keys %args) > 0) {
+        die "Wrong option: " . join(", ", keys %args);
+    }
 
     if ($] < 5.014000) {
         require IO::Handle;
@@ -57,7 +61,18 @@ sub _import_option_binary {
 }
 
 sub new {
-    bless {}, shift;
+    my $class = shift;
+    my %args  = @_;
+
+    my $self = bless {
+        no_x => delete $args{'no_x'},
+    }, $class;
+
+    if ($args{plan}) {
+        $self->plan(%{$args{plan}});
+    }
+
+    $self;
 }
 
 sub _tb { __PACKAGE__->builder }
@@ -74,6 +89,43 @@ sub _reset {
 
 sub pass { shift; _tb->ok(PASS, @_) }
 sub fail { shift; _tb->ok(FAIL, @_) }
+
+sub plan {
+    my $self = shift;
+
+    return _tb->plan(@_);
+}
+
+sub _carp {
+    my($file, $line) = ( caller(1) )[ 1, 2 ];
+    return warn @_, " at $file line $line\n";
+}
+
+sub skip {
+    my($self, $why, $how_many) = @_;
+
+    # If the plan is set, and is static, then skip needs a count. If the plan
+    # is 'no_plan' we are fine. As well if plan is undefined then we are
+    # waiting for done_testing.
+    unless (defined $how_many) {
+        my $plan = _tb->has_plan;
+        _carp "skip() needs to know \$how_many tests are in the block"
+            if $plan && $plan =~ m/^\d+$/;
+        $how_many = 1;
+    }
+
+    if(defined $how_many and $how_many =~ /\D/) {
+        _carp "skip() was passed a non-numeric number of tests.  Did you get the arguments backwards?";
+        $how_many = 1;
+    }
+
+    for(1 .. $how_many) {
+        _tb->skip($why);
+    }
+
+    no warnings 'exiting';
+    last SKIP;
+}
 
 sub BAIL_OUT {
     _tb->BAIL_OUT(scalar @_ == 1 ? $_[0] : $_[1]);
@@ -217,6 +269,22 @@ sub explain {
     else {
         $self->diag(_tb->explain(@_));
     }
+
+    $self;
+}
+
+sub x {
+    my $self = shift;
+
+    return $self if $self->{no_x};
+
+    my $hash = {
+        got      => $self->{_got},
+        expected => $self->{_expected},
+        name     => $self->{_name},
+    };
+
+    $self->diag(_tb->explain(@_, $hash));
 
     $self;
 }
@@ -487,7 +555,6 @@ Test::Arrow - Object-Oriented testing library
 
     my $arr = Test::Arrow->new;
 
-    $arr->ok(1);
     $arr->got(1)->ok;
 
     $arr->expect(uc 'foo')->to_be('FOO');
@@ -504,17 +571,6 @@ Test::Arrow - Object-Oriented testing library
     $arr->expected(qr/^ab/)
         ->got('abc')
         ->like;
-
-    # `unlike` shows where a place could have matched if it's failed
-    $arr->name('Unlike Fail example')
-        ->expected(qr/b/)
-        ->got('abc')
-        ->unlike;
-    #   Failed test 'Unlike Fail example'
-    #   at t/unlike.t line 12.
-    #                   'abc'
-    #           matches '(?^:b)'
-    #           matched at line: 1, offset: 2
 
     $arr->warnings(sub { warn 'Bar' })->catch(qr/^Ba/);
     $arr->throw(sub { die 'Baz' })->catch(qr/^Ba/);
@@ -555,6 +611,43 @@ By default, C<Test::Arrow> sets utf8 pragma globally to avoid warnings such as "
 The constructor.
 
     my $arr = Test::Arrow->new;
+
+=over
+
+=item no_x
+
+If you set C<no_x> option the ture value, then the C<x> method doesn't show any message.
+
+=item plan
+
+If you set C<plan> option with hash, then the C<plan> method, it's same as Test::More's one, it will be called in constructor.
+
+    my $arr = Test::Arrow->new(
+        plan => {
+            tests => 2,
+        }
+    );
+
+    $arr->ok(1);
+    $arr->is(1, 1);
+
+If you want to skip all tests,
+
+    my $arr = Test::Arrow->new(
+        plan => {
+            skip_all => 'Reason',
+        }
+    );
+
+Test::More has the import option for test plan, but Test::Arrow doesn't. Below code doesn't work as your intent.
+
+    use Test::Arrow plan => 12;
+
+It should be in constructor option or should be called as straightforward method/function.
+
+    $arr->plan(skip_all => 'Reason');
+
+=back
 
 =head2 SETTERS
 
@@ -615,7 +708,7 @@ More easy,
 
 Similar to C<is> and C<isnt> compare values with C<eq> and C<ne>.
 
-    $arr->expect('FOO')->got(uc 'foo')->is;
+    $arr->expected('FOO')->got(uc 'foo')->is;
 
 =head3 is_num
 
@@ -623,7 +716,7 @@ Similar to C<is> and C<isnt> compare values with C<eq> and C<ne>.
 
 Similar to C<is_num> and C<isnt_num> compare values with C<==> and C<!=>.
 
-    $arr->expect(6)->got( 2 * 3 )->is_num;
+    $arr->expected(6)->got( 2 * 3 )->is_num;
 
 =head3 to_be($got)
 
@@ -637,7 +730,21 @@ The $got will be compare with expected value.
 
 C<like> matches $got value against the $expected regex.
 
-    $arr->expect(qr/b/)->got('abc')->like;
+    $arr->expected(qr/b/)->got('abc')->like;
+
+Works exactly as C<like>, only it checks if $got does not match the expected pattern.
+
+C<unlike> shows where a place could have matched if it's failed like below.
+
+    $arr->name('Unlike Fail example')
+        ->expected(qr/b/)
+        ->got('abc')
+        ->unlike;
+    #   Failed test 'Unlike Fail example'
+    #   at t/unlike.t line 12.
+    #                   'abc'
+    #           matches '(?^:b)'
+    #           matched at line: 1, offset: 2
 
 =head3 can_ok($class, @methods)
 
@@ -704,6 +811,20 @@ C<warning> is an alias of C<warnings>.
 
 Terminates tests.
 
+=head2 CONDITIONAL TESTS
+
+=head3 skip
+
+In order to skip tests like below.
+
+    SKIP: {
+        $arr->skip($why, $how_many) if $condition;
+
+        ...normal testing code goes here...
+    }
+
+Test::Arrow doesn't have C<todo_skip>.
+
 =head2 UTILITIES
 
 You can call below utilities methods even without an instance.
@@ -742,6 +863,20 @@ If you call C<explain> method with arg, then C<explain> method just dumps it.
     # }
     ok 1 - foo
 
+=head3 x($ref)
+
+If you call C<x> method, then the current values (name, expected and got) are dumped with arg.
+
+    $arr->name('x test')->expected('BAR')->got(uc 'bar')->x({ foo => 123 })->is;
+    # {
+    #   'foo' => 123
+    # }
+    # {
+    #   'expected' => 'BAR',
+    #   'got' => 'BAR',
+    #   'name' => 'x test'
+    # }
+
 =head3 done_testing
 
 Declare of done testing.
@@ -766,7 +901,7 @@ Alias of C<done_testing>
 
 =begin html
 
-<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.11-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1582822443"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582822443&branch=master"/></a>
+<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.16-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1583346115"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1583346115&branch=master"/></a>
 
 =end html
 

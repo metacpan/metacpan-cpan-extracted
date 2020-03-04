@@ -21,7 +21,7 @@ unless (defined $Test::Deep::NoTest::NoTest)
 
 our ($Stack, %Compared, $CompareCache, %WrapCache, $Shallow);
 
-our $VERSION = '1.128';
+our $VERSION = '1.130';
 $VERSION =~ tr/_//d;
 
 require Exporter;
@@ -91,7 +91,10 @@ while (my ($pkg, $name) = splice @constructors, 0, 2)
 }
 
 {
-  our @EXPORT_OK = qw( descend render_stack cmp_details deep_diag );
+  our @EXPORT_OK = qw(
+    descend render_stack cmp_details deep_diag
+    true false
+  );
 
   our %EXPORT_TAGS;
   $EXPORT_TAGS{preload} = [];
@@ -130,6 +133,15 @@ while (my ($pkg, $name) = splice @constructors, 0, 2)
 
 sub import {
   my $self = shift;
+
+  my $from_notest = grep {$_ eq '_notest'} @_;
+  if ($from_notest) {
+      @_ = grep {$_ ne '_notest'} @_;
+  } else {
+    require Test::Builder;
+    $Test = Test::Builder->new;
+  }
+
   my @sans_preload = grep {; $_ ne ':preload' } @_;
   if (@_ != @sans_preload) {
     require Test::Deep::All;
@@ -544,9 +556,9 @@ sub subsetof
 
 sub noneof
 {
-        require Test::Deep::Set;
+  require Test::Deep::Set;
 
-        return Test::Deep::Set->new(1, "none", @_);
+  return Test::Deep::Set->new(1, "none", @_);
 }
 
 sub cmp_set
@@ -601,6 +613,16 @@ sub subhashof
   my $val = shift;
 
   return Test::Deep::SubHash->new($val);
+}
+
+sub true
+{
+  bool(1);
+}
+
+sub false
+{
+  bool(0);
 }
 
 sub builder
@@ -1035,14 +1057,14 @@ values supplied must be in array references.
   cmp_deeply(
     $obj,
     listmethods(
-      name => "John",
+      name => [ "John" ],
       ["favourites", "food"] => ["Mapo tofu", "Gongbao chicken"]
     )
   );
 
 is the equivalent of checking that
 
-  $obj->name eq "John"
+  cmp_deeply([$obj->name], ["John"]);
   cmp_deeply([$obj->favourites("food")], ["Mapo tofu", "Gongbao chicken"]);
 
 The methods will be called in the order you supply them.
@@ -1342,15 +1364,19 @@ can usually just use the string() comparison to be more strict. This will
 work fine for almost all situations, however it will not work when <$got_v>
 is an overloaded value who's string and numerical values differ.
 
-=head3 bool
+=head3 bool, true, false
 
   cmp_deeply( $got, bool($value) );
+  cmp_deeply( $got, true );
+  cmp_deeply( $got, false );
 
 C<$value> is anything you like but it's probably best to use 0 or 1
 
 This will check that C<$got_v> and C<$value> have the same truth value, that
 is they will give the same result when used in boolean context, like in an
 C<if()> statement.
+
+B<Note:> C<true> and C<false> are only imported by special request.
 
 =head3 code
 
@@ -1417,7 +1443,7 @@ L</SPECIAL CARE WITH SPECIAL COMPARISONS IN SETS AND BAGS> for details.
 
 This does a set comparison, that is, it compares two arrays but ignores the
 order of the elements and it ignores duplicate elements, but ensures that all
-items in in C<@elements> will be in C<$got> and all items in C<$got> will be
+items in C<@elements> will be in C<$got> and all items in C<$got> will be
 in C<@elements>.
 
 So the following tests will be passes, and will be equivalent:

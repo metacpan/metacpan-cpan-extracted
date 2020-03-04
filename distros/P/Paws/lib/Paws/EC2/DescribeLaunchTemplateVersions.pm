@@ -47,7 +47,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         },
         ...
       ],                           # OPTIONAL
-      LaunchTemplateId   => 'MyString',                # OPTIONAL
+      LaunchTemplateId   => 'MyLaunchTemplateId',      # OPTIONAL
       LaunchTemplateName => 'MyLaunchTemplateName',    # OPTIONAL
       MaxResults         => 1,                         # OPTIONAL
       MaxVersion         => 'MyString',                # OPTIONAL

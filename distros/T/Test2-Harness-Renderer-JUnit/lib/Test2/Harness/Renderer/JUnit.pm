@@ -1,15 +1,21 @@
 package Test2::Harness::Renderer::JUnit;
+
+# Test2::Harness itself requires 5.10.
+use 5.010000;
 use strict;
 use warnings;
 
-our $VERSION = '0.001077';
+our $VERSION = '1.000000';
 
 # This is used frequently during development to determine what different events look like so we can determine how to capture test data.
-#use Data::Dumper; $Data::Dumper::Sortkeys = 1;
+use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
 
 use File::Spec;
+use POSIX ();
 use Storable qw/dclone/;
 use XML::Generator ();
+use Carp           ();
 
 BEGIN { require Test2::Harness::Renderer; our @ISA = ('Test2::Harness::Renderer') }
 use Test2::Harness::Util::HashBase qw{
@@ -46,25 +52,32 @@ sub render_event {
     # We modify the event, which would be bad if there were multiple renderers,
     # so we deep clone it.
     $event = dclone($event);
-    my $f      = $event->{facet_data};
-    my $job    = $f->{harness_job};
-    my $job_id = $event->{'job_id'} or return;
-    my $stamp  = $event->{'stamp'} || die "No time stamp found for event?!?!?!?";
+    my $f       = $event->{facet_data};
+    my $job     = $f->{harness_job};
+    my $job_id  = $f->{'harness'}->{'job_id'} or return;
+    my $job_try = $f->{'harness'}->{'job_try'} // 0;
+    my $stamp   = $event->{'stamp'};
+
+    if ( !defined $stamp ) {
+        $f //= 'unknown facet_data';
+        die "No time stamp found for event '$f' ?!?!?!? ...\n" . "Event:\n" . Dumper($event) . "\n" . Carp::longmess();
+    }
+
+    # Throw out job events if they are for a previous run and we've already started collecting job
+    # information for a successive run.
+    return if $self->{'tests'}->{$job_id} && $job_try < ( $self->{'tests'}->{$job_id}->{'job_try'} // 0 );
 
     # At job launch we need to start collecting a new junit testdata section.
-    # We throw out anything we've collected to date.
+    # We throw out anything we've collected to date on a previous run.
     if ( $f->{'harness_job_launch'} ) {
         my $full_test_name = $job->{'file'};
         my $test_file      = File::Spec->abs2rel($full_test_name);
 
-        # Purge any previous runs of this job if we're seeing a new one starting.
-        foreach my $id ( keys %{ $self->{'tests'} } ) {
-            delete $self->{'tests'}->{$id} if $self->{'tests'}->{$id}->{name} eq $full_test_name;
-        }
-
         $self->{'tests'}->{$job_id} = {
             'name'           => $job->{'file'},
+            'file'           => _squeaky_clean($test_file),
             'job_id'         => $job_id,
+            'job_try'        => $job_try,
             'job_name'       => $f->{'harness_job'}->{'job_name'},
             'testcase'       => [],
             'system-out'     => '',
@@ -76,6 +89,7 @@ sub render_event {
                 'failures' => 0,
                 'tests'    => 0,
                 'name'     => _get_testsuite_name($test_file),
+                'id'       => $job_id,                           # add a UID in the XML output
             },
         };
 
@@ -87,24 +101,36 @@ sub render_event {
     # We have all the data. Print the XML.
     if ( $f->{'harness_job_end'} ) {
         $self->close_open_failure_testcase( $test, -1 );
-        $test->{'stop'} = $event->{'stamp'};
-        $test->{'testsuite'}->{'time'} = $test->{'stop'} - $test->{'start'};
-
-        push @{ $test->{'testcase'} }, $self->xml->testcase( { 'name' => "Tear down.", 'time' => $stamp - $test->{'last_job_start'} }, "" );
+        $test->{'stop'}                     = $event->{'stamp'};
+        $test->{'testsuite'}->{'time'}      = $test->{'stop'} - $test->{'start'};
+        $test->{'testsuite'}->{'timestamp'} = _timestamp( $test->{'start'} );
 
         if ( $f->{'errors'} ) {
-            $test->{'error-msg'} //= '';
+            my $test_error_messages = '';
             foreach my $msg ( @{ $f->{'errors'} } ) {
                 next unless $msg->{'from_harness'};
                 next unless $msg->{'tag'} // '' eq 'REASON';
 
                 if ( $msg->{details} =~ m/^Planned for ([0-9]+) assertions?, but saw ([0-9]+)/ ) {
-                    $test->{'testsuite'}->{'errors'} += $1 - $2;
+                    $test->{'testsuite'}->{'errors'} += abs( $1 - $2 );
                 }
+                next if $msg->{details} =~ m/Test script returned error/;
+                next if $msg->{details} =~ m/Assertion failures were encountered/;
+                next if $msg->{details} =~ m/Subtest failures were encountered/;
 
-                $test->{'error-msg'} .= "$msg->{details}\n";
+                $test_error_messages .= "$msg->{details}\n";
+            }
+            if ($test_error_messages) {
+                push @{ $test->{'testcase'} }, $self->xml->testcase(
+                    { 'name' => "Test Plan Failure", 'time' => $stamp - $test->{'last_job_start'}, 'classname' => $test->{'testsuite'}->{'name'} },
+                    $self->xml->failure($test_error_messages)
+                );
             }
         }
+
+        push @{ $test->{'testcase'} }, $self->xml->testcase(
+            { 'name' => "Tear down.", 'time' => $stamp - $test->{'last_job_start'}, 'classname' => $test->{'testsuite'}->{'name'} },
+        );
 
         return;
     }
@@ -151,10 +177,10 @@ sub render_event {
 
         if ( $f->{'amnesty'} && grep { ( $_->{'tag'} // '' ) eq 'TODO' } @{ $f->{'amnesty'} } ) {    # All TODO Tests
             if ( !$f->{'assert'}->{'pass'} ) {                                                       # Failing TODO
-                push @{ $test->{'testcase'} }, $self->xml->testcase( { 'name' => "$test_string (TODO)", 'time' => $run_time }, "" );
+                push @{ $test->{'testcase'} }, $self->xml->testcase( { 'name' => "$test_string (TODO)", 'time' => $run_time, 'classname' => $test->{'testsuite'}->{'name'} }, "" );
             }
             elsif ( $self->{'allow_passing_todos'} ) {                                               # junit parsers don't like passing TODO tests. Let's just not tell them about it if $ENV{ALLOW_PASSING_TODOS} is set.
-                push @{ $test->{'testcase'} }, $self->xml->testcase( { 'name' => "$test_string (PASSING TODO)", 'time' => $run_time }, "" );
+                push @{ $test->{'testcase'} }, $self->xml->testcase( { 'name' => "$test_string (PASSING TODO)", 'time' => $run_time, 'classname' => $test->{'testsuite'}->{'name'} }, "" );
             }
             else {                                                                                   # Passing TODO (Failure) when not allowed.
 
@@ -165,7 +191,7 @@ sub render_event {
                 my ($todo_message) = map { $_->{'details'} } grep { $_->{'tag'} // '' eq 'TODO' } @{ $f->{'amnesty'} };
 
                 push @{ $test->{'testcase'} }, $self->xml->testcase(
-                    { 'name' => "$test_string (TODO)", 'time' => $run_time },
+                    { 'name' => "$test_string (TODO)", 'time' => $run_time, 'classname' => $test->{'testsuite'}->{'name'} },
                     $self->xml->error(
                         { 'message' => $todo_message, 'type' => "TodoTestSucceeded" },
                         $self->_cdata("ok $test_string")
@@ -175,7 +201,10 @@ sub render_event {
             }
         }
         elsif ( $f->{'assert'}->{'pass'} ) {    # Passing test
-            push @{ $test->{'testcase'} }, $self->xml->testcase( { 'name' => "$test_string", 'time' => $run_time }, "" );
+            push @{ $test->{'testcase'} }, $self->xml->testcase(
+                { 'name' => "$test_string", 'time' => $run_time, 'classname' => $test->{'testsuite'}->{'name'} },
+                ""
+            );
         }
         else {                                  # Failing Test.
             $test->{'testsuite'}->{'failures'}++;
@@ -209,7 +238,7 @@ sub render_event {
 sub finish {
     my $self = shift;
 
-    open( my $fh, '>', $self->{'junit_file'} ) or die("Can't open '$self->{junit_file}' ($!)");
+    open( my $fh, '>:encoding(UTF-8)', $self->{'junit_file'} ) or die("Can't open '$self->{junit_file}' ($!)");
 
     my $xml = $self->xml;
 
@@ -217,19 +246,18 @@ sub finish {
     my $out_method = 'system-out';
     my $err_method = 'system-err';
 
-    print {$fh} $xml->testsuites(
-        map {
-            $xml->testsuite(
-                $_->{'testsuite'},
-                @{ $_->{'testcase'} },
-                $xml->$out_method( $self->_cdata( $_->{$out_method} ) ),
-                $xml->$err_method( $self->_cdata( $_->{$err_method} ) ),
-                $_->{'error-msg'} ? $xml->error( { 'message' => $_->{'error-msg'} } ) : (),
-              )
-          }
-          sort { $a->{'job_name'} <=> $b->{'job_name'} } values %{ $self->{'tests'} }
-    ) . "\n";
+    print {$fh} "<testsuites>\n";
+    my @jobs = sort { $a->{'job_name'} <=> $b->{'job_name'} } values %{ $self->{'tests'} };
+    foreach my $job (@jobs) {
+        print {$fh} $xml->testsuite(
+            $job->{'testsuite'},
+            @{ $job->{'testcase'} },
+            $xml->$out_method( $self->_cdata( $job->{$out_method} ) ),
+            $xml->$err_method( $self->_cdata( $job->{$err_method} ) ),
+        ) . "\n";
+    }
 
+    print {$fh} "</testsuites>\n";
     close $fh;
 
     return;
@@ -253,7 +281,7 @@ sub close_open_failure_testcase {
 
     my $xml = $self->xml;
     push @{ $test->{'testcase'} }, $xml->testcase(
-        { 'name' => "$fail->{test_num} - $fail->{test_name}", 'time' => $fail->{'time'} },
+        { 'name' => "$fail->{test_num} - $fail->{test_name}", 'time' => $fail->{'time'}, 'classname' => $test->{'testsuite'}->{'name'} },
         $xml->failure(
             { 'message' => "not ok $fail->{test_num} - $fail->{test_name}", 'type' => 'TestFailed' },
             $self->_cdata( $fail->{'message'} )
@@ -314,6 +342,11 @@ sub _squeaky_clean {
     return $string;
 }
 
+sub _timestamp {
+    my $time = shift;
+    return POSIX::strftime( '%Y-%m-%dT%H:%M:%S', localtime( int($time) ) );
+}
+
 1;
 
 __END__
@@ -330,7 +363,7 @@ Test2::Harness::Renderer::JUnit - Captures Test2::Harness results and emits a ju
 
 On the command line, with F<yath>:
 
-  JUNIT_TEST_FILE="/tmp/foo.xml" ALLOW_PASSING_TODOS=1 yath test -j18 t/*.t
+  JUNIT_TEST_FILE="/tmp/test-output.xml" ALLOW_PASSING_TODOS=1 yath test --renderer=Formatter --renderer=JUnit -j4 t/*.t
 
 =head1 DESCRIPTION
 
@@ -394,7 +427,7 @@ F<https://github.com/CpanelInc/Test2-Harness-Renderer-JUnit>.
 
 =over 4
 
-=item Todd Rinaldo <lt>toddr@cpanel.netE<gt>
+=item Todd Rinaldo Todd Rinaldo, C<< <toddr at cpanel.net> >>
 
 =back
 
@@ -402,7 +435,7 @@ F<https://github.com/CpanelInc/Test2-Harness-Renderer-JUnit>.
 
 =over 4
 
-=item Todd Rinaldo <lt>toddr@cpan.orgE<gt>
+=item Todd Rinaldo, C<< <toddr at cpanel.net> >>
 
 =back
 

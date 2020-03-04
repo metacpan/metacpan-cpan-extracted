@@ -7,6 +7,35 @@ Home page:    <https://metacpan.org/release/Zydeco>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.514	2020-03-03
+
+ - Allow bare sigils in signature list.
+ - Attributes like :lvalue on methods are now passed through to MooX::Press
+   (though MooX::Press currently does nothing with them).
+
+0.513	2020-03-03
+
+ [ Packaging ]
+ - If it is detected that Variable::Magic is installed, make sure it's
+   up-to-date. (I believe older versions are causing problems with
+   B::Hooks::EndOfScope::XS and causing test fails.)
+
+0.512	2020-03-02
+
+ [ Test Suite ]
+ - Output installed module versions for many dependencies.
+
+0.511	2020-02-28
+
+ [ Packaging ]
+ - Require newer PPR.
+
+ [ Other ]
+ - Added: Abbreviated syntax for defining methods, multi methods, factory
+   methods, coercions, and method modifiers.
+ - Added: Allow comments within type constraints within signatures, but
+   only on Perl 5.16+.
+
 0.510	2020-02-24
 
  [ Documentation ]

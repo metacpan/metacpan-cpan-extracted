@@ -1,18 +1,18 @@
 use v5.14;
 use warnings;
 
-package Datify v0.20.052;
+package Datify v0.20.064;
 # ABSTRACT: Simple stringification of data.
 
 
 use mro      ();        #qw( get_linear_isa );
 use overload ();        #qw( Method Overloaded );
 
-use Carp         ();    #qw( carp croak );
-use List::Util   ();    #qw( reduce sum );
-use LooksLike    ();    #qw( numeric );
-use Scalar::Util ();    #qw( blessed looks_like_number refaddr reftype );
-use String::Tools v0.18.277 ();    #qw( stitch stringify subst );
+use Carp                    ();    #qw( carp croak );
+use List::Util              ();    #qw( reduce sum );
+use LooksLike     v0.20.060 ();    #qw( number numeric representation );
+use Scalar::Util            ();    #qw( blessed refaddr reftype );
+use String::Tools v0.19.045 ();    #qw( stitch stringify subst );
 use Sub::Util      1.40     ();    #qw( subname );
 
 
@@ -457,12 +457,13 @@ sub numify {
 
         return $_;
     }
-    elsif ( Scalar::Util::looks_like_number($_) ) {
-        return
-              $_ ==  'inf'        ? $self->get('infinite')
-            : $_ == '-inf'        ? $self->get('-infinite')
-            : defined( $_ <=> 0 ) ? $_
-            :                       $self->get('nonnumber');
+    elsif ( LooksLike::number($_) ) {
+        return LooksLike::representation(
+            $_,
+            "infinity"  => $self->get('infinite'),
+            "-infinity" => $self->get('-infinite'),
+            "nan"       => $self->get('nonnumber')
+        );
     }
 
     return $self->get('nonnumber');
@@ -511,7 +512,7 @@ sub _scalarify {
             : $ref2 eq 'LVALUE'  ? $self->lvalueify($_)
             : $ref2 eq 'VSTRING' ? $self->vstringify($_)
             : $ref2 eq 'SCALAR'  ? (
-                Scalar::Util::looks_like_number($_)
+                LooksLike::number($_)
                     ? $self->numify($_)
                     : $self->stringify($_)
             )
@@ -711,6 +712,10 @@ sub keyify {
 sub keysort($$);
 BEGIN {
     no warnings 'qw';
+    my $a_cmp__b
+        = $^V >= v5.16.0
+        ? 'CORE::fc($a) cmp CORE::fc($b)'
+        :       'lc($a) cmp lc($b)';
     my $keysort = String::Tools::stitch(qw(
         sub keysort($$) {
             my ( $a, $b ) = @_;
@@ -725,10 +730,6 @@ BEGIN {
             );
         }
     ));
-    my $a_cmp__b
-        = $^V >= v5.16.0
-        ? 'CORE::fc($a) cmp CORE::fc($b)'
-        :       'lc($a) cmp lc($b)';
     $keysort = String::Tools::subst( $keysort, a_cmp__b => $a_cmp__b );
     eval($keysort) or $@ and die $@;
 }
@@ -766,6 +767,9 @@ sub hashkeys {
         }
         @keys = grep { $keyfilter->() } @keys;
     }
+    if ( my $keymap = $self->get('keymap') ) {
+        @keys = map { $self->$keymap($_) } @keys;
+    }
     if ( my $keysort = $self->get('keysort') ) {
         @keys = sort $keysort @keys;
     }
@@ -784,8 +788,9 @@ sub pairify {
     my $self = &self;
     if (1 == @_) {
         my $ref = Scalar::Util::reftype $_[0];
-        if    ( $ref eq 'ARRAY' ) { @_ = @{ +shift } }
-        elsif ( $ref eq 'HASH' )  { @_ = $self->hashkeyvals(shift) }
+        @_  = $ref eq 'ARRAY' ? @{ +shift }
+            : $ref eq 'HASH'  ? $self->hashkeyvals(shift)
+            :                   @_;
     }
     # Use for loop in order to preserve the order of @_,
     # rather than each %{ { @_ } }, which would mix-up the order.
@@ -809,6 +814,7 @@ __PACKAGE__->set(
     # Hash options
     hash_ref         => '{$_}',
     pair             => '$key => $value',
+    keymap           => undef,
     keysort          => \&Datify::keysort,
     keyfilter        => undef,
     keyfilterdefault => 1,
@@ -1114,7 +1120,7 @@ sub _to_encode {
 
     my @ranges = ( $encode->{also} // () );
     foreach my $element (@_) {
-        if ( Scalar::Util::looks_like_number($element) ) {
+        if ( LooksLike::number($element) ) {
             push @encode, $element;
         } elsif ( length($element) == 1 ) {
             # An actual character, lets get the ordinal value and use that
@@ -1737,6 +1743,11 @@ C<SCALAR> entries treat all values according to the boolean evaluation.
 When filtering keys in a hash, if the key is not found in the C<keyfilter>
 C<HASH> or C<ARRAY>, should it pass through or not?
 
+=item I<keymap>          => B<undef>
+
+If you want to remap keys in a hash, assign a reference to some code that
+will be passed the object and the key, and should return the new key.
+
 =item I<keysort>          => B<\&Datify::keysort>
 
 How to sort the keys in a hash.  This has a performance hit,
@@ -2133,7 +2144,7 @@ L<Data::Dumper>
 
 =head1 VERSION
 
-This document describes version v0.20.052 of this module.
+This document describes version v0.20.064 of this module.
 
 =head1 AUTHOR
 
@@ -2141,7 +2152,7 @@ Bob Kleemann <bobk@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2019 by Bob Kleemann.
+This software is Copyright (c) 2014-2020 by Bob Kleemann.
 
 This is free software, licensed under:
 

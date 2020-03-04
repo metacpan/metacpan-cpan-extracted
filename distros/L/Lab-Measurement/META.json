@@ -14,7 +14,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lab-Measurement",
    "prereqs" : {
@@ -136,7 +136,7 @@
       "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "3.691",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "3.692",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

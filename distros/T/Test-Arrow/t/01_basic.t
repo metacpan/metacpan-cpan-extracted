@@ -5,7 +5,7 @@ my $isnt_expected = 'wrong';
 
 Test::Arrow->pass('PASS');
 
-my $arr = Test::Arrow->new;
+my $arr = Test::Arrow->new(no_x => 1);
 
 $arr->pass('PASS2');
 
@@ -48,6 +48,7 @@ $arr->name('expect alias')
     ->is;
 
 $arr->name('expalin test')->expected($expected)->got($got)->explain->is;
+$arr->name('x test')->expected($expected)->got($got)->x({ foo => 123 })->is;
 
 # isnt
 $arr->isnt($got, $isnt_expected);

@@ -43,11 +43,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         },
         ...
       ],                           # OPTIONAL
-      MaxDuration => 1,            # OPTIONAL
-      MaxResults  => 1,            # OPTIONAL
-      MinDuration => 1,            # OPTIONAL
-      NextToken   => 'MyString',   # OPTIONAL
-      OfferingId  => 'MyString',   # OPTIONAL
+      MaxDuration => 1,                 # OPTIONAL
+      MaxResults  => 1,                 # OPTIONAL
+      MinDuration => 1,                 # OPTIONAL
+      NextToken   => 'MyString',        # OPTIONAL
+      OfferingId  => 'MyOfferingId',    # OPTIONAL
       );
 
     # Results:

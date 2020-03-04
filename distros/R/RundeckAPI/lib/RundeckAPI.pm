@@ -46,8 +46,8 @@ our @EXPORT_OK = qw(get post put delete);
 ## CONSTANTS
 #####
 our $TIMEOUT = 10;
-our $VERSION = "1.0";
-
+our $VERSION = "1.1";
+our $REVISION = "b1";
 #####
 ## VARIABLES
 #####
@@ -62,6 +62,7 @@ sub new {
 	my $self = {
 		'url'		=> $args{'url'},
 		'login'		=> $args{'login'},
+		'token'		=> $args{'token'},
 		'password'	=> $args{'password'},
 		'debug'		=> $args{'debug'},
 		'result'	=> undef,
@@ -95,11 +96,32 @@ sub new {
 	$client->addHeader ("Content-Type", 'application/x-www-form-urlencoded');
 	$client->addHeader ("Accept", "application/json");
 	$self->{'client'} = $client;
-	$client->POST(
-		"j_security_check",
-		"j_username=$self->{'login'}" . "&" . "j_password=$self->{'password'}",
-	);
-	$rc = $client->responseCode ();
+
+# if we have a token, use it
+	if (defined $self->{'token'}) {
+		$client->addHeader ("X-Rundeck-Auth-Token", $self->{'token'});
+		$client->GET("/api/11/tokens/$self->{'login'}");
+# check if token match id, just to be sure
+		my $authJSON = $client->responseContent();
+		$rc = $client->responseCode ();
+		if ($rc-$rc%100 == 200) {
+			my $jHash = decode_json ($authJSON);
+			if ($jHash->[0]->{'user'} ne $self->{'login'}) {
+# should this really happen ?
+				$rc = 403;
+			}
+			else {
+				$rc = 403;
+			}
+		}
+	} else {
+# post user/passwd
+		$client->POST(
+			"j_security_check",
+			"j_username=$self->{'login'}" . "&" . "j_password=$self->{'password'}",
+		);
+		$rc = $client->responseCode ();
+	}
 	my %hash = ();
 
 ## Dirty job, but Rundeck doent follow the REST norm, returning 200 even if auth fails
@@ -117,6 +139,7 @@ sub new {
 
 # done, bless object and return it
 	bless ($self, $class);
+	$self->_logD($self);
 	return $self;
 }
 
@@ -270,6 +293,8 @@ RundeckAPI - simplifies authenticate, connect, queries to a Rundeck instance via
 		'url'		=> "https://my.rundeck.instance:4440",
 		'login'		=> "admin",
 		'password'	=> "passwd",
+	# OR token, takes precedence
+		'token'		=> <token as generated with GUI, as an admin>
 		'debug'		=> 1,
  		'proxy'		=> "http://proxy.mycompany.com/",
 	);

@@ -1,6 +1,11 @@
 use 5.014;
 
-use Do;
+use lib 't/lib';
+
+use strict;
+use warnings;
+use routines;
+
 use Test::Auto;
 use Test::More;
 
@@ -23,6 +28,10 @@ Test-Auto Type Constraints
 =description
 
 This package provides type constraints for L<Test::Auto>.
+
+=inherits
+
+Types::Standard
 
 =type Parser
 

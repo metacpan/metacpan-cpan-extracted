@@ -1,15 +1,17 @@
+.perl-version
 Build.PL
 Changes
-INSTALL
 lib/CPANPLUS/Shell/Default/Plugins/Prereqs.pm
+LICENSE
 MANIFEST
+META.json
 META.yml			Module meta-data (added by MakeMaker)
 README
+README.md
 samples/display-prereqs
+t.pl
 t/00-plugin.t
 t/01-core.t
-t/build1/Build.PL
-t/build1/lib/CSDPR_Test.pm
 t/inc1/inc/Module/Install.pm
 t/inc1/inc/Module/Install/Base.pm
 t/inc1/inc/Module/Install/Can.pm
@@ -20,7 +22,6 @@ t/inc1/inc/Module/Install/Win32.pm
 t/inc1/inc/Module/Install/WriteAll.pm
 t/inc1/lib/CSDPR_Test.pm
 t/inc1/Makefile.PL
-t/localperl/.modulebuildrc
 t/mm1/Makefile.PL
 xt/95-prereq.t
 xt/96-kwalitee.t
@@ -28,4 +29,3 @@ xt/97-critic.t
 xt/98-pod.t
 xt/99-podcoverage.t
 xt/perlcriticrc
-META.json

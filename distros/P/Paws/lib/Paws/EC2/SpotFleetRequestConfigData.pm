@@ -17,6 +17,7 @@ package Paws::EC2::SpotFleetRequestConfigData;
   has ReplaceUnhealthyInstances => (is => 'ro', isa => 'Bool', request_name => 'replaceUnhealthyInstances', traits => ['NameInRequest']);
   has SpotMaxTotalPrice => (is => 'ro', isa => 'Str', request_name => 'spotMaxTotalPrice', traits => ['NameInRequest']);
   has SpotPrice => (is => 'ro', isa => 'Str', request_name => 'spotPrice', traits => ['NameInRequest']);
+  has TagSpecifications => (is => 'ro', isa => 'ArrayRef[Paws::EC2::TagSpecification]', request_name => 'TagSpecification', traits => ['NameInRequest']);
   has TargetCapacity => (is => 'ro', isa => 'Int', request_name => 'targetCapacity', traits => ['NameInRequest'], required => 1);
   has TerminateInstancesWithExpiration => (is => 'ro', isa => 'Bool', request_name => 'terminateInstancesWithExpiration', traits => ['NameInRequest']);
   has Type => (is => 'ro', isa => 'Str', request_name => 'type', traits => ['NameInRequest']);
@@ -59,8 +60,19 @@ This class has no description
 
 =head2 AllocationStrategy => Str
 
-  Indicates how to allocate the target capacity across the Spot pools
-specified by the Spot Fleet request. The default is C<lowestPrice>.
+  Indicates how to allocate the target Spot Instance capacity across the
+Spot Instance pools specified by the Spot Fleet request.
+
+If the allocation strategy is C<lowestPrice>, Spot Fleet launches
+instances from the Spot Instance pools with the lowest price. This is
+the default allocation strategy.
+
+If the allocation strategy is C<diversified>, Spot Fleet launches
+instances from all the Spot Instance pools that you specify.
+
+If the allocation strategy is C<capacityOptimized>, Spot Fleet launches
+instances from Spot Instance pools with optimal capacity for the number
+of instances that are launching.
 
 
 =head2 ClientToken => Str
@@ -200,6 +212,17 @@ hasnE<rsquo>t met the target capacity.
 
   The maximum price per unit hour that you are willing to pay for a Spot
 Instance. The default is the On-Demand price.
+
+
+=head2 TagSpecifications => ArrayRef[L<Paws::EC2::TagSpecification>]
+
+  The key-value pair for tagging the Spot Fleet request on creation. The
+value for C<ResourceType> must be C<spot-fleet-request>, otherwise the
+Spot Fleet request fails. To tag instances at launch, specify the tags
+in the launch template
+(https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-launch-templates.html#create-launch-template).
+For information about tagging after launch, see Tagging Your Resources
+(https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-resources).
 
 
 =head2 B<REQUIRED> TargetCapacity => Int

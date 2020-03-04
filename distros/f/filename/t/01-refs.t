@@ -1,6 +1,7 @@
 #! /usr/bin/env perl
 
 use Array::RefElem ();    #qw( hv_store );
+use File::Spec     ();
 use FindBin        ();    #qw( $Bin );
 use Scalar::Util   ();    #qw( blessed );
 
@@ -67,7 +68,7 @@ foreach my $inc (
     # Object
     $noinc,
 ) {
-    note "\@INC now includes ", ref($inc) || $inc;
+    diag "\@INC now includes ", ref($inc) || $inc;
     local @INC = ( ref($inc) ? $inc : ( __PACKAGE__->can($inc) || $inc ) );
     #push @INC, \&looking_for;
 
@@ -161,10 +162,8 @@ foreach my $inc (
     $withinc,
 
 ) {
-    note "\@INC now includes ", ref($inc) || $inc;
+    diag "\@INC now includes ", ref($inc) || $inc;
     local @INC = ( ref($inc) ? $inc : ( __PACKAGE__->can($inc) || $inc ) );
-    #push @INC, \&looking_for;
-    #note "\@INC contains: ", explain(\@INC);
 
     # Tests with good files
     foreach my $pm (qw( good symlink )) {
@@ -340,7 +339,7 @@ sub inc_func_coderef_state {
 # Single value return
 sub inc_func_scalar {
     my ( $sub, $filename ) = @_;
-    my $fullpath = "$FindBin::Bin/$filename";
+    my $fullpath = File::Spec->catfile( $FindBin::Bin, $filename );
     return -r -f $fullpath ? $fullpath : ();
 }
 sub inc_func_scalarref {
@@ -355,7 +354,10 @@ sub inc_func_scalarref {
 sub inc_func_fh {
     my ( $sub, $filename ) = @_;
     my $fh;
-    return open( $fh, "<", "$FindBin::Bin/$filename" ) ? $fh : ();
+    return
+        open( $fh, "<", File::Spec->catfile( $FindBin::Bin, $filename ) )
+        ? $fh
+        : ();
 }
 sub inc_func_coderef {
     my ( $sub, $filename ) = @_;

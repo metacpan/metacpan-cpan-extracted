@@ -27,4 +27,4 @@ resources:
   bugtracker: https://github.com/frank-carnovale/Mojolicious-Plugin-Tables/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/frank-carnovale/Mojolicious-Plugin-Tables.git
-version: 1.03
+version: 1.04

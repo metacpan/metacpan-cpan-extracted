@@ -25,34 +25,34 @@ name: DateTime
 provides:
   DateTime:
     file: lib/DateTime.pm
-    version: '1.51'
+    version: '1.52'
   DateTime::Duration:
     file: lib/DateTime/Duration.pm
-    version: '1.51'
+    version: '1.52'
   DateTime::Helpers:
     file: lib/DateTime/Helpers.pm
-    version: '1.51'
+    version: '1.52'
   DateTime::Infinite:
     file: lib/DateTime/Infinite.pm
-    version: '1.51'
+    version: '1.52'
   DateTime::Infinite::Future:
     file: lib/DateTime/Infinite.pm
-    version: '1.51'
+    version: '1.52'
   DateTime::Infinite::Past:
     file: lib/DateTime/Infinite.pm
-    version: '1.51'
+    version: '1.52'
   DateTime::LeapSecond:
     file: lib/DateTime/LeapSecond.pm
-    version: '1.51'
+    version: '1.52'
   DateTime::PP:
     file: lib/DateTime/PP.pm
-    version: '1.51'
+    version: '1.52'
   DateTime::PPExtra:
     file: lib/DateTime/PPExtra.pm
-    version: '1.51'
+    version: '1.52'
   DateTime::Types:
     file: lib/DateTime/Types.pm
-    version: '1.51'
+    version: '1.52'
 requires:
   Carp: '0'
   DateTime::Locale: '1.06'
@@ -83,10 +83,10 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime.pm/issues
   homepage: http://metacpan.org/release/DateTime
   repository: git://github.com/houseabsolute/DateTime.pm.git
-version: '1.51'
+version: '1.52'
 x_Dist_Zilla:
   perl:
-    version: '5.026002'
+    version: '5.030001'
   plugins:
     -
       class: Dist::Zilla::Plugin::PruneCruft
@@ -155,7 +155,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::VersionFromMainModule
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/VersionFromMainModule'
       version: '0.04'
@@ -202,7 +202,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/MetaProvides::Package'
       version: '2.004003'
@@ -304,8 +304,6 @@ x_Dist_Zilla:
             - "DROLSKY's"
             - DateTime
             - DateTimes
-            - Datetime
-            - Datetimes
             - Domini
             - EEEE
             - EEEEE
@@ -400,7 +398,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 24
       name: '@DROLSKY/DROLSKY::RunExtraTests'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
       name: '@DROLSKY/MojibakeTests'
@@ -470,7 +468,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::Contributors
       name: '@DROLSKY/DROLSKY::Contributors'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -601,7 +599,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::WeaverConfig
       name: '@DROLSKY/DROLSKY::WeaverConfig'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -645,7 +643,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/InstallGuide'
       version: '1.200013'
@@ -660,7 +658,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@DROLSKY/CheckStrictVersion'
@@ -672,7 +670,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/CheckSelfDependency'
       version: '0.011'
@@ -687,7 +685,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::EnsureChangesHasContent
       name: '@DROLSKY/EnsureChangesHasContent'
@@ -703,7 +701,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::TidyAll
       name: '@DROLSKY/DROLSKY::TidyAll'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -762,7 +760,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.51
+          tag: v1.52
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -834,12 +832,12 @@ x_Dist_Zilla:
           make_path: make
           version: '6.012'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.42'
+          version: '0.48'
         Dist::Zilla::Role::TestRunner:
           default_jobs: 24
           version: '6.012'
       name: '@DROLSKY/DROLSKY::MakeMaker'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::lib
       config:
@@ -884,7 +882,7 @@ x_Dist_Zilla:
             - DateTime::Conflicts
           no_forced_deps: 0
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: Test::CheckBreaks
       version: '0.019'
@@ -957,6 +955,7 @@ x_contributors:
   - 'Jason McIntosh <jmac@jmac.org>'
   - 'Joshua Hoblitt <jhoblitt@cpan.org>'
   - 'Karen Etheridge <ether@cpan.org>'
+  - 'Mark Overmeer <mark@overmeer.net>'
   - 'Michael Conrad <mike@nrdvana.net>'
   - 'Michael R. Davis <mrdvt92@users.noreply.github.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
@@ -966,10 +965,11 @@ x_contributors:
   - 'Ovid <curtis_ovid_poe@yahoo.com>'
   - 'Paul Howarth <paul@city-fan.org>'
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
+  - 'philip r brenan <philiprbrenan@gmail.com>'
   - 'Ricardo Signes <rjbs@cpan.org>'
   - 'Richard Bowen <bowen@cpan.org>'
   - 'Ron Hill <rkhill@cpan.org>'
   - 'Sam Kington <github@illuminated.co.uk>'
   - 'viviparous <viviparous@prc>'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.30.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

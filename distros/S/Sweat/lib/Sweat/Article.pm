@@ -33,8 +33,9 @@ has 'url' => (
 our $stripper = HTML::Strip->new;
 our $mw = MediaWiki::API->new;
 
-$mw->{config}->{max_lag} = 2;
+$mw->{config}->{max_lag} = 5;
 $mw->{config}->{max_lag_delay} = 1;
+$mw->{ua}->timeout( 10 );
 our $language;
 
 our %seen_titles;

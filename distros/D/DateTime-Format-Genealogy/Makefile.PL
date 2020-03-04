@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
-use File::Spec 3.4;
 
 WriteMakefile(
 	NAME		=> 'DateTime::Format::Genealogy',
@@ -14,14 +13,17 @@ WriteMakefile(
 	  : ()),
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
+		'Test::CleanNamespaces' => 0,
+		'Test::Carp' => 0,
+		'Test::Deep' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
-		'Test::CleanNamespaces' => 0,
 		'autodie' => 0,
 		'IPC::System::Simple' => 0,
 		'Test::Warn' => 0,
 		'strict' => 0,
 		'warnings' => 0,
+		'WWW::RT::CPAN' => 0
 	},
 	PREREQ_PM => {
 		'namespace::clean' => 0,

@@ -1,10 +1,16 @@
 package Path::Dispatcher::Rule::Dispatch;
-use Any::Moose;
+# ABSTRACT: redispatch
+
+our $VERSION = '1.07';
+
+use Moo;
+use Type::Utils qw(class_type);
+
 extends 'Path::Dispatcher::Rule';
 
 has dispatcher => (
     is       => 'ro',
-    isa      => 'Path::Dispatcher',
+    isa      => class_type("Path::Dispatcher"),
     required => 1,
     handles  => ['rules', 'complete'],
 );
@@ -18,15 +24,23 @@ sub match {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
+no Moo;
 
 1;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Path::Dispatcher::Rule::Dispatch - redispatch
+
+=head1 VERSION
+
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -60,5 +74,20 @@ Rules of this class use another dispatcher to match the path.
 A L<Path::Dispatcher> object. Its matches will be returned by matching this
 rule.
 
-=cut
+=head1 SUPPORT
 
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Dispatcher>
+(or L<bug-Path-Dispatcher@rt.cpan.org|mailto:bug-Path-Dispatcher@rt.cpan.org>).
+
+=head1 AUTHOR
+
+Shawn M Moore, C<< <sartak at bestpractical.com> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Shawn M Moore.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

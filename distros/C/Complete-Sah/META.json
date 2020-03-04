@@ -38,7 +38,7 @@
             "Complete::Util" : "0.608",
             "Data::Sah::Normalize" : "0",
             "Exporter" : "5.57",
-            "Log::ger" : "0.027",
+            "Log::ger" : "0.031",
             "Module::Installed::Tiny" : "0.004",
             "perl" : "5.010001",
             "strict" : "0",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/perlancar/perl-Complete-Sah"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -225,7 +225,7 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
@@ -394,7 +394,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.080"
+                        "version" : "0.081"
                      }
                   ]
                }

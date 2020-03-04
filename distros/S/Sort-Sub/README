@@ -2,8 +2,8 @@ NAME
     Sort::Sub - Collection of sort subroutines
 
 VERSION
-    This document describes version 0.116 of Sort::Sub (from Perl
-    distribution Sort-Sub), released on 2019-12-15.
+    This document describes version 0.118 of Sort::Sub (from Perl
+    distribution Sort-Sub), released on 2020-02-28.
 
 SYNOPSIS
      use Sort::Sub qw($naturally);
@@ -96,13 +96,17 @@ GUIDELINES FOR WRITING A SORT::SUB::* MODULE
 
     The module should also contain a "meta" subroutine which returns a
     metadata DefHash. Known properties (keys) include: "v" (currently at 1),
-    "summary". Other metadata properties will be added in the future.
+    "summary", "compares_record" (bool, if set to true then sorter will be
+    fed records "[$data, $order]" instead of just $data; $order is a number
+    that can be line number of array index; this allows sorter to sort by
+    additional information instead of just the data items). Other metadata
+    properties will be added in the future.
 
 FUNCTIONS
   get_sorter
     Usage:
 
-     my $coderef = Sort::Sub::get_sorter('SPEC');
+     my $coderef = Sort::Sub::get_sorter('SPEC' [ , \%args [ , $with_meta ] ]);
 
     Example:
 
@@ -110,6 +114,12 @@ FUNCTIONS
 
     This is an alternative to using the import interface. This function is
     not imported.
+
+    If $with_meta is set to true, will return this:
+
+     ($sorter, $meta)
+
+    instead of just the $sorter subroutine.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -135,7 +145,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2016, 2015 by
+    This software is copyright (c) 2020, 2019, 2018, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

@@ -1,42 +1,46 @@
 Revision history for Path-Dispatcher
 
-1.06 2015-02-18
+1.07      2020-02-29 20:55:07Z
+        - Switch from Any::Moose to Moo and Types::Standard
+        based on PRs from chresomanci and hashbangperl
+
+1.06    2015-02-18
         Switch packaging system to Dist::Zilla (David Pottage)
             https://github.com/sartak/path-dispatcher/pull/1
             Thanks to the CPAN Pull Request Challenge :)
 
-1.05 Thu Mar 14 2013
+1.05    2013-03-14
         eval q{$'} before regex match when needed to soothe bleadperl
             Thanks Dave Mitchell! http://www.nntp.perl.org/group/perl.perl5.porters/2013/03/msg200156.html
 
-1.04 Thu Sep 1 2011
+1.04    2011-09-01
         Explicitly depend on Test::Fatal (reported by Jérôme Quelin  [rt.cpan.org #70666])
+
         Convert all tests from Test::Exception to Test::Fatal
 
-1.03 Tue Aug 30 2011
+1.03    2011-08-30
         Provisional support for arbitrary payloads, not just code blocks, as results
             See https://github.com/sartak/path-dispatcher/blob/master/t/200-payload.t
         Eventually blocks will be deprecated, but not for a while. Internally blocks are
         rewritten as payloads so if you're doing deep magic with PD you may be exposed to
         that implementation detail.
 
-1.02 Tue Nov 2 2010
+1.02    2010-11-02
         Various improvements to the handling of $match->leftover with undef
 
-1.01 Sun Oct 24 2010
+1.01    2010-10-24
         Skip t/026-named-captures.t if you don't have 5.10.1
 
-        Give matches a ->parent for inspecting an Under prefix rule's
-            captures etc
+        Give matches a ->parent for inspecting an Under prefix rule's captures etc
 
-1.00 Sun Oct 17 2010
+1.00    2010-10-17
         Bump to 1.0 to indicate back compat breakage
 
         Add match->named($key) for pulling out a named capture
 
         Use Try::Tiny to avoid swallowing exceptions (rafl)
 
-0.16 Sun Oct 17 2010
+0.16      2010-10-17
         ** BACKWARDS INCOMPATIBLE CHANGE: Pass the match object into rule
         **    blocks rather than assigning $1, $2, $3. Use ->pos(1), (2), (3),
         **    etc. instead. This cleans up the code a lot and makes
@@ -56,7 +60,7 @@ Revision history for Path-Dispatcher
 
         Plenty other updated documentation
 
-0.15 Tue Mar 16 09:40:40 2010
+0.15      2010-03-16 09:40:40Z
         ** Factored Path-Dispatcher-Declarative into its own distribution
         ** Be sure to update your dependency lists!
 
@@ -76,32 +80,32 @@ Revision history for Path-Dispatcher
 
         A few documentation improvements as usual :)
 
-0.14 Thu Dec 31 13:18:19 2009
+0.14      2009-12-31 13:18:19Z
         Add Path::Dispatcher->complete for tab-completion
 
         Handle delimiters better in Path::Dispatcher::Rule::Tokens
 
         Factor out a _prefix method for rules to simplify their logic
 
-0.13 Sun Aug 9 13:38:19 2009
+0.13      2009-08-09 13:38:19Z
         Add unshift_rule to classes that do Role::Rules
 
         Several distribution improvements
 
-0.12 Fri Apr 17 03:21:05 2009
+0.12      2009-04-17 03:21:05Z
         Fix a bug with undefined capture variables being converted to the
             empty string and throwing warnings (reported by obra)
 
         Give Path::Dispatcher::Rule::Dispatch a "rules" method
 
-0.11 Wed Apr 15 02:47:50 2009
+0.11      2009-04-15 02:47:50Z
         Fix some misnamed keys caused by de-AttributeHelper-ing
 
         Stop using some deprecated Moose features
 
         Doc fixes (Sartak and confound)
 
-0.10 Fri Mar 6 23:40:42 2009
+0.10      2009-03-06 23:40:42Z
         The way you specify token_delimiter and case_sensitive_tokens has
             changed! You now say:
                 use Path::Dispatcher::Declarative -base, -defaults => {
@@ -122,15 +126,15 @@ Revision history for Path-Dispatcher
 
         Many minor fixes (Sartak)
 
-0.09 Mon Feb 9 21:12:18 2009
+0.09      2009-02-09 21:12:18Z
         Avoid using method modifiers since it's potentially another dep.
 
-0.08 Thu Feb 5 12:15:38 2009
+0.08      2009-02-05 12:15:38Z
         Inline uses of MooseX::AttributeHelpers.
 
         Now use "Any::Moose" (basically Squirrel done right)
 
-0.07 Wed Jan 28 01:39:37 2009
+0.07      2009-01-28 01:39:37Z
         Paths are now boxed with the new Path::Dispatcher::Path.
 
         New rule type "Intersection" which matches only when each of its
@@ -150,13 +154,13 @@ Revision history for Path-Dispatcher
         output will be generated. The current maximum value of 10 will dump
         code references.
 
-0.06 Sat Nov 15 21:02:29 2008
+0.06      2008-11-15 21:02:29Z
         New rule type "Empty" which matches only the empty path.
 
         Declarative:
             on '' now matches only the empty path.
 
-0.05 Sat Nov 15 16:36:41 2008
+0.05      2008-11-15 16:36:41Z
         Improve test coverage
         New rule type "Always" which always matches.
 
@@ -179,10 +183,10 @@ Revision history for Path-Dispatcher
             "on '' => sub" as a special case will match all paths
 
 
-0.04 Tue Oct 28 17:56:41 2008
+0.04      2008-10-28 17:56:41Z
         Dist fixes
 
-0.03 Tue Oct 28 17:42:47 2008
+0.03      2008-10-28 17:42:47Z
         "rewrite" rules
         Super dispatchers are GONE! Yay.
         New Rule::Dispatch which just takes some other dispatcher. nothingmuch++
@@ -196,7 +200,7 @@ Revision history for Path-Dispatcher
                 would get their @ISA set!
 
 
-0.02 Mon Oct 20 14:10:12 2008
+0.02      2008-10-20 14:10:12Z
         Documentation!
         Prefix matches
         "under" rules
@@ -216,6 +220,6 @@ Revision history for Path-Dispatcher
             You now must subclass Path::Dispatcher::Declarative
             Allow overriding the token delimiter
 
-0.01 Wed Aug 27 11:04:18 2008
+0.01      2008-08-27 11:04:18Z
         Initial release
 

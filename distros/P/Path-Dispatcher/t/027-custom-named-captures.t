@@ -5,18 +5,19 @@ use Path::Dispatcher;
 
 {
     package My::Rule::NamedEnum;
-    use Any::Moose;
+    use Moo;
+    use Types::Standard qw( Str RegexpRef );
     extends 'Path::Dispatcher::Rule';
 
     has name => (
         is       => 'ro',
-        isa      => 'Str',
+        isa      => Str,
         required => 1,
     );
 
     has regex => (
         is       => 'ro',
-        isa      => 'RegexpRef',
+        isa      => RegexpRef,
         required => 1,
     );
 

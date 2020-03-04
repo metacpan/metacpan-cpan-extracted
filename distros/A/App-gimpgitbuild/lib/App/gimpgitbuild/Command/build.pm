@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::build;
-$App::gimpgitbuild::Command::build::VERSION = '0.6.0';
+$App::gimpgitbuild::Command::build::VERSION = '0.8.0';
 use strict;
 use warnings;
 use 5.014;
@@ -48,6 +48,17 @@ sub _check
 sub _git_build
 {
     my $args = shift;
+    my $id   = $args->{id};
+
+    my $KEY = "GIMPGITBUILD__SKIP_BUILDS_RE";
+    if ( exists $ENV{$KEY} )
+    {
+        my $re = $ENV{$KEY};
+        if ( $id =~ /$re/ )
+        {
+            return;
+        }
+    }
     $args->{branch} //= 'master';
     $args->{tag}    //= 'false';
 
@@ -57,8 +68,13 @@ sub _git_build
         path( $args->{git_co} )->parent->mkpath;
         _do_system( { cmd => [qq#git clone "$args->{url}" "$git_co"#] } );
     }
+
+    # See:
+    # https://github.com/libfuse/libfuse/issues/212
+    # Ubuntu/etc. places it under $prefix/lib/$arch by default.
+    my $UBUNTU_MESON_LIBDIR_OVERRIDE = "-D libdir=lib";
     my $meson1 =
-qq#mkdir -p "build" && cd build && meson --prefix="$args->{prefix}" .. && ninja -j4 && ninja -j4 test && ninja -j4 install#;
+qq#mkdir -p "build" && cd build && meson --prefix="$args->{prefix}" $UBUNTU_MESON_LIBDIR_OVERRIDE .. && ninja -j4 && ninja -j4 test && ninja -j4 install#;
     my $autoconf1 =
 qq#NOCONFIGURE=1 ./autogen.sh && ./configure --prefix="$args->{prefix}" && make -j4 && @{[_check()]} && make install#;
     _do_system(
@@ -96,6 +112,7 @@ sub execute
     my $GNOME_GIT = 'https://gitlab.gnome.org/GNOME';
     _git_build(
         {
+            id        => "babl",
             git_co    => "$base_src_dir/babl/git/babl",
             url       => "$GNOME_GIT/babl",
             prefix    => "$babl_p",
@@ -104,6 +121,7 @@ sub execute
     );
     _git_build(
         {
+            id        => "gegl",
             git_co    => "$base_src_dir/gegl/git/gegl",
             url       => "$GNOME_GIT/gegl",
             prefix    => "$gegl_p",
@@ -112,6 +130,7 @@ sub execute
     );
     _git_build(
         {
+            id        => "libmypaint",
             git_co    => "$base_src_dir/libmypaint/git/libmypaint",
             url       => "https://github.com/mypaint/libmypaint.git",
             prefix    => "$mypaint_p",
@@ -122,6 +141,7 @@ sub execute
     );
     _git_build(
         {
+            id        => "mypaint-brushes",
             git_co    => "$base_src_dir/libmypaint/git/mypaint-brushes",
             url       => "https://github.com/Jehan/mypaint-brushes.git",
             prefix    => "$mypaint_p",
@@ -133,6 +153,7 @@ sub execute
 # autoconf_git_build "$base_src_dir/git/gimp" "$GNOME_GIT"/gimp "$HOME/apps/gimp-devel"
     _git_build(
         {
+            id        => "gimp",
             git_co    => "$base_src_dir/git/gimp",
             url       => "$GNOME_GIT/gimp",
             prefix    => $obj->gimp_p,
@@ -156,7 +177,7 @@ __END__
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

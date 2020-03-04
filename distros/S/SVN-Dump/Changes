@@ -1,5 +1,8 @@
 Revision history for SVN-Dump
 
+0.08 2020-03-02 BOOK
+    - Make SVN::Dump::Reader more liberal in what it accepts for 'fh' - RT #24032
+
 0.07 2020-01-30 BOOK
     [DOCUMENTATION]
     - Fix a code example - RT #130903 (DJERIUS)

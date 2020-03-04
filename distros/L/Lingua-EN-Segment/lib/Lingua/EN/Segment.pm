@@ -4,7 +4,7 @@ use strict;
 use warnings;
 no warnings 'uninitialized';
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -15,7 +15,7 @@ use Memoize;
 
 =head1 NAME
 
-Lingua::EN::Segment - split English-language domain names etc. into words
+Lingua::EN::Segment - Split English-language domain names etc. into words
 
 =head1 SYNOPSIS
 
@@ -175,7 +175,7 @@ sub unigrams {
 
  Out: \%bigrams
 
-As L<unigrams>, but returns a lookup table of "word1 word2" => likelihood
+As L</unigrams>, but returns a lookup table of "word1 word2" => likelihood
 for combinations of words.
 
 =cut

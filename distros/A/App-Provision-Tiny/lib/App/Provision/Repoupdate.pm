@@ -1,11 +1,10 @@
 package App::Provision::Repoupdate;
-$App::Provision::Repoupdate::VERSION = '0.0402';
-BEGIN {
-  $App::Provision::Repoupdate::AUTHORITY = 'cpan:GENE';
-}
+$App::Provision::Repoupdate::VERSION = '0.0403';
+our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 use parent qw( App::Provision::Tiny );
+
 
 sub condition
 {
@@ -16,6 +15,7 @@ sub condition
 
     return 0; # Always update
 }
+
 
 sub meet
 {
@@ -41,7 +41,13 @@ App::Provision::Repoupdate
 
 =head1 VERSION
 
-version 0.0402
+version 0.0403
+
+=head1 FUNCTIONS
+
+=head2 condition
+
+=head2 meet
 
 =head1 AUTHOR
 
@@ -49,7 +55,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

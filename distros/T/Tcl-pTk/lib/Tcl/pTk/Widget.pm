@@ -6,7 +6,7 @@
 
 package Tcl::pTk::Widget;
 
-our ($VERSION) = ('1.02');
+our ($VERSION) = ('1.03');
 
 use IO::Handle; 
 
@@ -2608,7 +2608,7 @@ sub FileMenuItems
 
 ##########################################################################################
 
-# Autoload fo Tcl::pTk::Widget
+# Autoload for Tcl::pTk::Widget
 sub AUTOLOAD {
     my $w = shift;
     my ($method,$package,$wtype) = ($Tcl::pTk::Widget::AUTOLOAD,undef,undef);

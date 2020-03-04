@@ -1,6 +1,6 @@
 package Lab::Instrument::TemperatureDiode;
 #ABSTRACT: ?????
-$Lab::Instrument::TemperatureDiode::VERSION = '3.691';
+$Lab::Instrument::TemperatureDiode::VERSION = '3.692';
 use strict;
 use Math::Complex;
 use Lab::Exception;
@@ -232,11 +232,11 @@ Lab::Instrument::TemperatureDiode - ?????
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2013       Christian Butschkow
             2016       Simon Reinhardt

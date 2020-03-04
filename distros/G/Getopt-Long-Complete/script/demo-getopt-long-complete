@@ -1,9 +1,10 @@
 #!perl
 
-our $DATE = '2020-02-27'; # DATE
-our $VERSION = '0.311'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-28'; # DATE
+our $DIST = 'Getopt-Long-Complete'; # DIST
+our $VERSION = '0.312'; # VERSION
 
-use 5.010;
 use strict;
 use warnings;
 use Complete::Util qw(complete_array_elem);
@@ -58,7 +59,7 @@ my $res = GetOptionsWithCompletion(
 
     'version|v' => sub{
         no warnings;
-        say "test-getopt-long-complete version $main::VERSION";
+        print "test-getopt-long-complete version $main::VERSION\n";
         exit 0;
     },
     'help|h|?' => sub {
@@ -82,7 +83,8 @@ _
     },
 );
 
-#say $res ? "Getopt failed" : "Getopt succeeded";
+#print $res ? "Getopt failed\n" : "Getopt succeeded\n";
+
 # ABSTRACT: Script to demonstrate Getopt::Long::Complete
 # PODNAME: demo-getopt-long-complete
 
@@ -98,7 +100,7 @@ demo-getopt-long-complete - Script to demonstrate Getopt::Long::Complete
 
 =head1 VERSION
 
-This document describes version 0.311 of demo-getopt-long-complete (from Perl distribution Getopt-Long-Complete), released on 2020-02-27.
+This document describes version 0.312 of demo-getopt-long-complete (from Perl distribution Getopt-Long-Complete), released on 2020-02-28.
 
 =head1 SYNOPSIS
 

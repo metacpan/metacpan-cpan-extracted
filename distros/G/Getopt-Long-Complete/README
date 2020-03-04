@@ -3,8 +3,8 @@ NAME
     shell tab completion
 
 VERSION
-    This document describes version 0.311 of Getopt::Long::Complete (from
-    Perl distribution Getopt-Long-Complete), released on 2020-02-27.
+    This document describes version 0.312 of Getopt::Long::Complete (from
+    Perl distribution Getopt-Long-Complete), released on 2020-02-28.
 
 SYNOPSIS
   First example (simple)
@@ -102,29 +102,43 @@ VARIABLES
     effect.
 
   $opt_permute
-    Bool. Default: 1 (or 0 if POSIXLY_CORRECT).
+    Bool. Default: 1 (or 0 if POSIXLY_CORRECT). Not exported.
 
   $opt_pass_through
-    Bool. Default: 0.
+    Bool. Default: 0. Not exported.
 
   $opt_bundling
-    Bool. Default: 1.
+    Bool. Default: 1. Not exported.
+
+  $REQUIRE_ORDER
+    Integer. Constant. Value is 0. Exported by default, to be compatible
+    with Getopt::Long.
+
+  $PERMUTE
+    Integer. Constant. Value is 1. Exported by default, to be compatible
+    with Getopt::Long.
+
+  $RETURN_IN_ORDER
+    Integer. Constant. Value is 2. Exported by default, to be compatible
+    with Getopt::Long.
 
 INCOMPATIBILITIES
-    Although you can use Getopt::Long::Complete (GLC) as a drop-in
-    replacement for Getopt::Long (GL) most of the time, there are some
-    incompatibilities or unsupported features:
+    Getopt::Long::Complete (GLC) provides all the same exports as
+    Getopt::Long (GL), for example "GetOptions" (exported by default),
+    "GetOptionsFromArray", "Configure", etc.
+
+    Aside from GetOptions which has an extra behavior to support completion,
+    all the other routines of GLC behave exactly the same as GL.
+
+    However, there are some incompatibilities or unsupported features:
 
     *   GLC does not allow passing configure options during import
 
-        GLC only supports running under a specific set of modes anyway:
-        "bundling", "no_ignore_case". Other non-default settings have not
-        been tested and probably not supported.
+    *   GLC's GetOptions only supports running under a specific set of
+        modes: "bundling", "no_ignore_case".
 
-    *   Aside from GetOptions, no other GL functions are currently supported
-
-        This include "GetOptionsFromArray", "GetOptionsFromString",
-        "Configure", "HelpMessage", "VersionMessage".
+        Other non-default settings have not been tested and probably not
+        supported.
 
 FUNCTIONS
   GetOptions
@@ -132,9 +146,9 @@ FUNCTIONS
 
      GetOptions([ \%hash, ] @spec)
 
-    Will call Getopt::Long's GetOptions, except when COMP_LINE environment
-    variable is defined, in which case will print completion reply to STDOUT
-    and exit.
+    Exported by default. Will call Getopt::Long's GetOptions, except when
+    COMP_LINE environment variable is defined, in which case will print
+    completion reply to STDOUT and exit.
 
     Note: Will temporarily set Getopt::Long configuration as follow:
     bundling, no_ignore_case, gnu_compat, no_getopt_compat, permute (if
@@ -148,12 +162,27 @@ FUNCTIONS
 
      GetOptionsWithCompletion(\&completion, [ \%hash, ] @spec)
 
-    Just like "GetOptions", except that it accepts an extra first argument
-    "\&completion" containing completion routine for completing option
-    *values* and arguments. This will be passed as "completion" argument to
-    Complete::Getopt::Long's "complete_cli_arg". See that module's
-    documentation on details of what is passed to the routine and what
-    return value is expected from it.
+    Exported on demand. Just like "GetOptions", except that it accepts an
+    extra first argument "\&completion" containing completion routine for
+    completing option *values* and arguments. This will be passed as
+    "completion" argument to Complete::Getopt::Long's "complete_cli_arg".
+    See that module's documentation on details of what is passed to the
+    routine and what return value is expected from it.
+
+  GetOptionsFromArray
+    Exported on demand. Will just call Getopt::Long's version.
+
+  GetOptionsFromString
+    Exported on demand. Will just call Getopt::Long's version.
+
+  Configure
+    Exported on demand. Will just call Getopt::Long's version.
+
+  HelpMessage
+    Exported on demand. Will just call Getopt::Long's version.
+
+  VersionMessage
+    Exported on demand. Will just call Getopt::Long's version.
 
 HOMEPAGE
     Please visit the project's homepage at

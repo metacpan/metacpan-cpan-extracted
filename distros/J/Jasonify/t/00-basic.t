@@ -284,7 +284,7 @@ is( Jasonify->encode( \*STDIO{IO} ),       'null', 'io ref' );
 my $jasonify = do {
     no warnings 'qw';
     join(' ', qw(
-        {"-infinite"   : "\"-Infinity\"",
+        {"-infinite"   : "-Infinity",
          "_cache_hit"  : 1,
          "array_ref"   : "[$_]",
          "beautify"    : null,
@@ -366,16 +366,17 @@ my $jasonify = do {
          "false"            : "false",
          "format"           : "null",
          "hash_ref"         : "{$_}",
-         "infinite"         : "\"Infinity\"",
+         "infinite"         : "Infinity",
          "io"               : "null",
          "json_method"      : "TO_JSON",
          "keyfilter"        : null,
          "keyfilterdefault" : 1,
+         "keymap"           : null,
          "keysort"          : null,
          "list_sep"         : ", ",
          "longstr"          : -1,
          "lvalue"           : "$lvalue",
-         "nonnumber"        : "\"NaN\"",
+         "nonnumber"        : "NaN",
          "null"             : "null",
          "object"           : "$data",
          "overloads"        : ["\"\"", "0+"],

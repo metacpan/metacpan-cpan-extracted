@@ -39,7 +39,7 @@
    "provides" : {
       "Control::CLI" : {
          "file" : "lib/Control/CLI.pm",
-         "version" : "2.07"
+         "version" : "2.08"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.07",
+   "version" : "2.08",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

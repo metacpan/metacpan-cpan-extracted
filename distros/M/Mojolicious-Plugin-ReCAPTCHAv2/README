@@ -1,5 +1,5 @@
 This archive contains the distribution Mojolicious-Plugin-ReCAPTCHAv2,
-version 1.04:
+version 1.05:
 
   use Googles "No CAPTCHA reCAPCTHA" (reCAPTCHA v2) service in Mojolicious apps
 

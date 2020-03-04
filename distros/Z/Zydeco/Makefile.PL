@@ -4,61 +4,66 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"         => "Jazz up your Perl",
-  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
-  "keywords"         => [],
-  "license"          => ["perl_5"],
-  "meta-spec"        => {
-                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                          version => 2,
-                        },
-  "name"             => "Zydeco",
-  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"          => {
-                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                          develop   => { recommends => { "Dist::Inkt" => 0.001 } },
-                          runtime   => {
-                                         recommends => { "Class::XSAccessor" => 0, "MooX::TypeTiny" => 0, "perl" => "5.022000" },
-                                         requires   => {
-                                                         "B::Hooks::EndOfScope" => 0.24,
-                                                         "Devel::StrictMode" => 0,
-                                                         "Exporter::Tiny" => "1.000000",
-                                                         "Import::Into" => 0,
-                                                         "Keyword::Simple" => 0,
-                                                         "MooX::Press" => 0.057,
-                                                         "Path::ScanINC" => 0,
-                                                         "perl" => "5.014000",
-                                                         "PPR" => 0,
-                                                         "Syntax::Keyword::Try" => 0.11,
-                                                       },
-                                       },
-                          test      => {
-                                         requires => { "Test::Fatal" => 0, "Test::More" => 0.96, "Test::Requires" => 0 },
-                                       },
-                        },
-  "provides"         => {
-                          "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => "0.510" },
-                          "Zydeco" => { file => "lib/Zydeco.pm", version => "0.510" },
-                        },
-  "release_status"   => "stable",
-  "resources"        => {
-                          bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Zydeco" },
-                          homepage     => "http://zydeco.toby.ink/",
-                          license      => ["http://dev.perl.org/licenses/"],
-                          repository   => {
-                                            type => "git",
-                                            url  => "git://github.com/tobyink/p5-zydeco.git",
-                                            web  => "https://github.com/tobyink/p5-zydeco",
-                                          },
-                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Zydeco/project",
-                        },
-  "version"          => "0.510",
-  "x_static_install" => 1,
+  "abstract"       => "Jazz up your Perl",
+  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config" => 1,
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"       => [],
+  "license"        => ["perl_5"],
+  "meta-spec"      => {
+                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                        version => 2,
+                      },
+  "name"           => "Zydeco",
+  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"        => {
+                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                        develop   => { recommends => { "Dist::Inkt" => 0.001 } },
+                        runtime   => {
+                                       recommends => { "Class::XSAccessor" => 0, "MooX::TypeTiny" => 0, "perl" => "5.022000" },
+                                       requires   => {
+                                                       "B::Hooks::EndOfScope" => 0.24,
+                                                       "Devel::StrictMode" => 0,
+                                                       "Exporter::Tiny" => "1.000000",
+                                                       "Import::Into" => 0,
+                                                       "Keyword::Simple" => 0,
+                                                       "MooX::Press" => 0.057,
+                                                       "Path::ScanINC" => 0,
+                                                       "perl" => "5.014000",
+                                                       "PPR" => "0.000023",
+                                                       "Syntax::Keyword::Try" => 0.11,
+                                                     },
+                                     },
+                        test      => {
+                                       requires => { "Test::Fatal" => 0, "Test::More" => 0.96, "Test::Requires" => 0 },
+                                     },
+                      },
+  "provides"       => {
+                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.514 },
+                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.514 },
+                      },
+  "release_status" => "stable",
+  "resources"      => {
+                        bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Zydeco" },
+                        homepage     => "http://zydeco.toby.ink/",
+                        license      => ["http://dev.perl.org/licenses/"],
+                        repository   => {
+                                          type => "git",
+                                          url  => "git://github.com/tobyink/p5-zydeco.git",
+                                          web  => "https://github.com/tobyink/p5-zydeco",
+                                        },
+                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Zydeco/project",
+                      },
+  "version"        => 0.514,
 };
 
 my %dynamic_config;
+do {
+if (eval { require Variable::Magic }) {
+	$meta->{prereqs}{runtime}{requires}{'Variable::Magic'} = '0.62';
+}
+
+};
 
 my %WriteMakefileArgs = (
 	ABSTRACT   => $meta->{abstract},

@@ -1,3 +1,10 @@
+0.045   2020-02-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Support sorter with compares_record=1.
+
+        - [ux] Allow dashes in sorter name.
+
+
 0.044   2019-12-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option --key (-k).

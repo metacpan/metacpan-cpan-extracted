@@ -11,7 +11,7 @@ use IO::Socket::INET;
 use Errno qw( EINPROGRESS EWOULDBLOCK );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.07';
+our $VERSION = '2.08';
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
 		prompt	=> [qw(promptClear promptHide promptCredential)],
@@ -63,7 +63,7 @@ my %Default = ( # Hash of default object settings which can be modified on a per
 	poll_obj_error		=> 'ignore',		# Default error mode for poll() method
 	report_query_status	=> 0,			# Default setting of report_query_status for class object
 	prompt		=> '.*[\?\$%#>]\s?$',		# Default prompt used in login() and cmd() methods
-	username_prompt	=> '(?i:user ?name|login)[: ]+$',	# Default username prompt used in login() method
+	username_prompt	=> '(?i:user(?: ?name)?|login)[: ]+$',	# Default username prompt used in login() method
 	password_prompt	=> '(?i)password[: ]+$',	# Default password prompt used in login() method
 	terminal_type	=> 'vt100',			# Default terminal type (for SSH)
 	window_size	=> [],				# Default terminal window size [width, height]
@@ -221,19 +221,8 @@ sub parse_errmode { # Parse a new value for the error mode and return it if vali
 
 sub stripLastLine { # Remove incomplete (not ending with \n) last line, if any from the string ref provided
 	my $dataRef = shift;
-
-	# This function is needed because with Perl ...
-	# 	$$dataRef =~ /(.+)$/
-	# ... will unexpectedly match strings ending with single \n
-
-	if (chomp $$dataRef) { # Yes, string ended with \n
-		$$dataRef .= "\n"; # Re-add it
-		return '';
-	}
-	else { # No, string does not end with \n
-		$$dataRef =~ s/(.*)$//;
-		return $1;
-	}
+	$$dataRef =~ s/(.*)\z//;
+	return defined $1 ? $1 : '';
 }
 
 
@@ -2153,7 +2142,7 @@ sub poll_connect { # Internal method to connect to host (used for both blocking 
 			if ($connect->{callback}) {
 				if ( validCodeRef($connect->{callback}) ) {
 					($ok, my $errmsg) = callCodeRef($connect->{callback}, $self);
-					return $self->poll_return($self->error("$pkgsub: " . defined $errmsg ? $errmsg : "SSH callback refused connection")) unless $ok;
+					return $self->poll_return($self->error("$pkgsub: " . (defined $errmsg ? $errmsg : "SSH callback refused connection"))) unless $ok;
 					return $self->poll_return(0) unless $self->{POLL}{blocking};
 				}
 				else {
@@ -2401,7 +2390,7 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 			next;
 		}
 		if ($self->{POLL}{local_buffer} =~ /$login->{password_prompt}/) { # Handle password prompt
-			unless ($login->{password}) {
+			unless (defined $login->{password}) {
 				unless (defined $login->{prompt_credentials}) {
 					$self->{LOGINSTAGE} = 'password';
 					return $self->poll_return($self->error("$pkgsub: Password required"));
@@ -3704,7 +3693,7 @@ This method is usually not required for SSH, where authentication is part of the
 In the first form only a success/failure value is returned in scalar context, while in the second form, in list context, both the success/failure value is returned as well as any output received from the host device during the login sequence; the latter is either the output itself or a reference to that output, depending on the object setting of return_reference or the argument override provided in this method.
 For this method to succeed the username & password prompts from the remote host must match the default prompts defined for the object or the overrides specified via the optional "username_prompt" & "password_prompt" arguments. By default these regular expressions are set to:
 
-	'(?i:user ?name|login)[: ]+$'
+	'(?i:user(?: ?name)?|login)[: ]+$'
 	'(?i)password[: ]+$'
 
 Following a successful authentication, if a valid CLI prompt is received, the method will return a true (1) value. The expected CLI prompt is either the globally set prompt - see prompt() - or the local override specified with the optional "prompt" argument. By default, the following prompt is expected:
@@ -4347,7 +4336,7 @@ The object CLI prompt match pattern is only used by the login() and cmd() method
 This method sets the login() username prompt match pattern for this object. In the first form the current pattern match string is returned. In the second form a new pattern match string is set and the previous setting returned.
 The default prompt match pattern used is:
 
-	'(?i:user ?name|login)[: ]*$'
+	'(?i:user(?: ?name)?|login)[: ]+$'
 
 
 =item B<password_prompt()> - set the login() password prompt match pattern for this object
@@ -5125,7 +5114,7 @@ A lot of the methods and functionality of this class, as well as some code, is d
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Ludovico Stevens.
+Copyright 2020 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

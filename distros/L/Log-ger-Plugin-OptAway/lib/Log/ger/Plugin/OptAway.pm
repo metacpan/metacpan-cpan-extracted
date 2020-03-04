@@ -1,7 +1,9 @@
 package Log::ger::Plugin::OptAway;
 
-our $DATE = '2018-05-02'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-28'; # DATE
+our $DIST = 'Log-ger-Plugin-OptAway'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 use strict;
 use warnings;
@@ -11,23 +13,34 @@ sub get_hooks {
 
     return {
         after_install_routines => [
-            __PACKAGE__, 99,
-
-            sub {
+            __PACKAGE__, # key
+            99,          # priority (after all the other plugins)
+            sub {        # hook
                 require B::CallChecker;
                 require B::Generate;
 
-                my %args = @_;
+                my %hook_args = @_;
 
                 # we are only relevant when targetting package
-                return [undef] unless ($args{target}||'') eq 'package';
+                return [undef] unless ($hook_args{target}||'') eq 'package';
 
-                for my $r (@{ $args{routines} }) {
+                #use DD; dd \%hook_args;
+                for my $r (@{ $hook_args{routines} }) {
                     my ($code, $name, $lnum, $type) = @$r;
-                    next unless $type =~ /\A(log|is)_/;
-                    my $fullname = "$args{target_arg}\::$name";
-                    #print "D:Current_Level = <$Log::ger::Current_Level>, r->[2] = <$r->[2]>\n";
-                    if ($Log::ger::Current_Level < $r->[2]) {
+                    #print "D:got routine name=$name, lnum=",(defined $lnum ? $lnum : '-'), ", type=$type\n";
+                    next unless $type =~ /\A(logml_|log_|is_)/;
+                    my $is_ml = $type =~ /ml_/;
+                    my $fullname = "$hook_args{target_arg}\::$name";
+
+                    no warnings 'once'; # $Log::ger::Current_Level
+                    my $should_opt_away;
+                    if ($conf{all}) {
+                        $should_opt_away = 1;
+                    } elsif (!$is_ml && $Log::ger::Current_Level < $r->[2]) {
+                        $should_opt_away = 1;
+                    }
+
+                    if ($should_opt_away) {
                         #print "D:no-oping $fullname\n";
                         B::CallChecker::cv_set_call_checker(
                             \&{$fullname},
@@ -42,7 +55,7 @@ sub get_hooks {
 }
 
 1;
-# ABSTRACT: Optimize away higher-level log statements
+# ABSTRACT: Optimize away log statements
 
 __END__
 
@@ -52,11 +65,11 @@ __END__
 
 =head1 NAME
 
-Log::ger::Plugin::OptAway - Optimize away higher-level log statements
+Log::ger::Plugin::OptAway - Optimize away log statements
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -75,6 +88,10 @@ To demonstrate the effect of optimizing away:
  '???';
  -e syntax OK
 
+To optimize away all levels:
+
+ use Log::ger::Plugin 'OptAway', all=>1;
+
 =head1 DESCRIPTION
 
 This plugin replaces logging statements that are higher than the current level
@@ -84,6 +101,9 @@ zero run-time overhead.
 
 By default, since C<$Current_Level> is pre-set at 30 (warn) then C<log_info()>,
 C<log_debug()>, and C<log_trace()> calls will be turned into no-op.
+
+If the configuration L</all> is set to true, however, logger routines for I<all>
+levels will be turned into no-op.
 
 Caveats:
 
@@ -99,13 +119,25 @@ Caveats:
 
 =for Pod::Coverage ^(.+)$
 
+=head1 CONFIGURATION
+
+=head2 all
+
+Boolean. If set to true, will optimize away all levels, including multi-level
+logger routines. This is an easy way to disable all logging.
+
+By default, only levels above the current level (C<$Log::ger::Current_level>)
+will be optimized away.
+
+=head1 SEE ALSO
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,15 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'name' => [
+                                                      'spacegroup'
+                                                    ]
+                                        }, 'OPTiMaDe::Filter::Property' ),
+                                 'P2'
+                               ],
+                 'operator' => '='
+               }, 'OPTiMaDe::Filter::Comparison' );
+== Filter ==
+(spacegroup = "P2")
+== SQL ==
+('spacegroup' = "P2")

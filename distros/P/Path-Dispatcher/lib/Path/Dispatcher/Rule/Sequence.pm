@@ -1,12 +1,17 @@
 package Path::Dispatcher::Rule::Sequence;
-use Any::Moose;
+# ABSTRACT: a sequence of rules
+
+our $VERSION = '1.07';
+
+use Moo;
+use Types::Standard qw(Str);
 
 extends 'Path::Dispatcher::Rule';
 with 'Path::Dispatcher::Role::Rules';
 
 has delimiter => (
     is      => 'ro',
-    isa     => 'Str',
+    isa     => Str,
     default => ' ',
 );
 
@@ -79,15 +84,23 @@ sub untokenize {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
+no Moo;
 
 1;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Path::Dispatcher::Rule::Sequence - a sequence of rules
+
+=head1 VERSION
+
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -105,5 +118,20 @@ a Sequence rule has just a list of other rules.
 
 =head2 delimiter
 
-=cut
+=head1 SUPPORT
 
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Dispatcher>
+(or L<bug-Path-Dispatcher@rt.cpan.org|mailto:bug-Path-Dispatcher@rt.cpan.org>).
+
+=head1 AUTHOR
+
+Shawn M Moore, C<< <sartak at bestpractical.com> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Shawn M Moore.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

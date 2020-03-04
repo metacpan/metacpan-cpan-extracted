@@ -43,9 +43,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         },
         ...
       ],                           # OPTIONAL
-      LaunchTemplateIds => [
-        'MyString', ...            # OPTIONAL
-      ],                           # OPTIONAL
+      LaunchTemplateIds   => [ 'MyLaunchTemplateId', ... ],    # OPTIONAL
       LaunchTemplateNames => [
         'MyLaunchTemplateName', ...    # min: 3, max: 128
       ],                               # OPTIONAL

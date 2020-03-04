@@ -5,6 +5,7 @@ package Paws::IoTEvents::DetectorModelConfiguration;
   has DetectorModelDescription => (is => 'ro', isa => 'Str', request_name => 'detectorModelDescription', traits => ['NameInRequest']);
   has DetectorModelName => (is => 'ro', isa => 'Str', request_name => 'detectorModelName', traits => ['NameInRequest']);
   has DetectorModelVersion => (is => 'ro', isa => 'Str', request_name => 'detectorModelVersion', traits => ['NameInRequest']);
+  has EvaluationMethod => (is => 'ro', isa => 'Str', request_name => 'evaluationMethod', traits => ['NameInRequest']);
   has Key => (is => 'ro', isa => 'Str', request_name => 'key', traits => ['NameInRequest']);
   has LastUpdateTime => (is => 'ro', isa => 'Str', request_name => 'lastUpdateTime', traits => ['NameInRequest']);
   has RoleArn => (is => 'ro', isa => 'Str', request_name => 'roleArn', traits => ['NameInRequest']);
@@ -67,6 +68,12 @@ Information about how the detector model is configured.
 =head2 DetectorModelVersion => Str
 
   The version of the detector model.
+
+
+=head2 EvaluationMethod => Str
+
+  Information about the order in which events are evaluated and how
+actions are executed.
 
 
 =head2 Key => Str

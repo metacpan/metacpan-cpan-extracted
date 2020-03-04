@@ -1,2 +1,53 @@
- * Add relative filename to jobs and harness_job_end
- * Add cwd to the run data
+
+
+*************
+
+Make runner handle timeouts!!!!
+
+*************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ - Is 'batch' used anymore (ack it, it looks like cruft)
+ - Fix all 'runs' in a persistent runner having the same run-id...
+ - Have all output (stderr, stdout, stream, etc) go into a job/output directory. Have the runner timeout tests if the output directory stays the same size too long. This lets the runner do the killing, but the runner does not actually need to parse anything.
+
+
+
+# Yath    - The interface that ties everything together. This is the part that
+#           people interact with. This is also reponsible for display.
+#
+# Harness - runs in front, the part that reads all the output from the tests
+#           that are running and determines if it is passing or failing. Also
+#           has the role of watching things and killing them if it goes wonky.
+#
+# Runner  - does the work of actually executing the tests and making sure their
+#           effects/output/results etc go to the harness (or where the harness
+#           can find them)
+#
+# Run     - A set of jobs to be run
+#
+# Job     - Lives under runner, a single specific job
+
+# Process
+# Yath reads command line args and executes command
+# Command (assume test) does:
+#  * Starts a runner                                    - 'start' command does *just* this
+#  * Defines a run for the runner                       - 'run' command does this and all following ones
+#  * Starts a harness
+#  * Reads events from the harness and renders them
+#  * Reports results
+
+

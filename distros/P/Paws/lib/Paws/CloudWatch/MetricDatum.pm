@@ -96,8 +96,10 @@ milliseconds since Jan 1, 1970 00:00:00 UTC.
 =head2 Unit => Str
 
   When you are using a C<Put> operation, this defines what unit you want
-to use when storing the metric. In a C<Get> operation, this displays
-the unit that is used for the metric.
+to use when storing the metric.
+
+In a C<Get> operation, this displays the unit that is used for the
+metric.
 
 
 =head2 Value => Num
@@ -106,9 +108,8 @@ the unit that is used for the metric.
 
 Although the parameter accepts numbers of type Double, CloudWatch
 rejects values that are either too small or too large. Values must be
-in the range of 8.515920e-109 to 1.174271e+108 (Base 10) or 2e-360 to
-2e360 (Base 2). In addition, special values (for example, NaN,
-+Infinity, -Infinity) are not supported.
+in the range of -2^360 to 2^360. In addition, special values (for
+example, NaN, +Infinity, -Infinity) are not supported.
 
 
 =head2 Values => ArrayRef[Num]
@@ -122,9 +123,8 @@ C<Values> array.
 
 Although the C<Values> array accepts numbers of type C<Double>,
 CloudWatch rejects values that are either too small or too large.
-Values must be in the range of 8.515920e-109 to 1.174271e+108 (Base 10)
-or 2e-360 to 2e360 (Base 2). In addition, special values (for example,
-NaN, +Infinity, -Infinity) are not supported.
+Values must be in the range of -2^360 to 2^360. In addition, special
+values (for example, NaN, +Infinity, -Infinity) are not supported.
 
 
 

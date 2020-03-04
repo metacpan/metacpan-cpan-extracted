@@ -4,6 +4,7 @@ package Paws::AutoScaling::ScalingPolicy;
   has Alarms => (is => 'ro', isa => 'ArrayRef[Paws::AutoScaling::Alarm]');
   has AutoScalingGroupName => (is => 'ro', isa => 'Str');
   has Cooldown => (is => 'ro', isa => 'Int');
+  has Enabled => (is => 'ro', isa => 'Bool');
   has EstimatedInstanceWarmup => (is => 'ro', isa => 'Int');
   has MetricAggregationType => (is => 'ro', isa => 'Str');
   has MinAdjustmentMagnitude => (is => 'ro', isa => 'Int');
@@ -72,6 +73,12 @@ C<ExactCapacity>, and C<PercentChangeInCapacity>.
 before any further dynamic scaling activities can start.
 
 
+=head2 Enabled => Bool
+
+  Indicates whether the policy is enabled (C<true>) or disabled
+(C<false>).
+
+
 =head2 EstimatedInstanceWarmup => Int
 
   The estimated time, in seconds, until a newly launched instance can
@@ -110,8 +117,8 @@ instead.
 
 =head2 PolicyType => Str
 
-  The policy type. The valid values are C<SimpleScaling> and
-C<StepScaling>.
+  The policy type. The valid values are C<SimpleScaling>, C<StepScaling>,
+and C<TargetTrackingScaling>.
 
 
 =head2 ScalingAdjustment => Int

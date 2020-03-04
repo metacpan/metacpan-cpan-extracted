@@ -1,5 +1,5 @@
 package Date::Manip::Base;
-# Copyright (c) 1995-2019 Sullivan Beck.  All rights reserved.
+# Copyright (c) 1995-2020 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -26,7 +26,7 @@ use Encode qw(encode_utf8 from_to find_encoding decode _utf8_off _utf8_on is_utf
 require Date::Manip::Lang::index;
 
 our $VERSION;
-$VERSION='6.79';
+$VERSION='6.81';
 END { undef $VERSION; }
 
 ###############################################################################

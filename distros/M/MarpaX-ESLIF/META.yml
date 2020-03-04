@@ -24,6 +24,7 @@ build_requires:
   open: '0'
   perl: '5.010'
   threads: '0'
+  threads::shared: '0'
   utf8: '0'
 configure_requires:
   Archive::Tar: '0'
@@ -51,7 +52,7 @@ configure_requires:
   perl: '5.006'
   strict: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -71,52 +72,52 @@ no_index:
 provides:
   MarpaX::ESLIF:
     file: lib/MarpaX/ESLIF.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::Event::Type:
     file: lib/MarpaX/ESLIF/Event/Type.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::Grammar:
     file: lib/MarpaX/ESLIF/Grammar.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::Grammar::Properties:
     file: lib/MarpaX/ESLIF/Grammar/Properties.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::Grammar::Rule::Properties:
     file: lib/MarpaX/ESLIF/Grammar/Rule/Properties.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::Grammar::Symbol::Properties:
     file: lib/MarpaX/ESLIF/Grammar/Symbol/Properties.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::JSON:
     file: lib/MarpaX/ESLIF/JSON.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::JSON::Decoder:
     file: lib/MarpaX/ESLIF/JSON/Decoder.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::JSON::Decoder::RecognizerInterface:
     file: lib/MarpaX/ESLIF/JSON/Decoder/RecognizerInterface.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::JSON::Encoder:
     file: lib/MarpaX/ESLIF/JSON/Encoder.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::Logger::Level:
     file: lib/MarpaX/ESLIF/Logger/Level.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::Rule::PropertyBitSet:
     file: lib/MarpaX/ESLIF/Rule/PropertyBitSet.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::String:
     file: lib/MarpaX/ESLIF/String.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::Symbol::EventBitSet:
     file: lib/MarpaX/ESLIF/Symbol/EventBitSet.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::Symbol::PropertyBitSet:
     file: lib/MarpaX/ESLIF/Symbol/PropertyBitSet.pm
-    version: v3.0.30
+    version: v3.0.32
   MarpaX::ESLIF::Symbol::Type:
     file: lib/MarpaX/ESLIF/Symbol/Type.pm
-    version: v3.0.30
+    version: v3.0.32
 requires:
   Carp: '0'
   Encode: '0'
@@ -136,7 +137,8 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-ESLIF
   homepage: https://metacpan.org/release/MarpaX-ESLIF
   repository: git://github.com/jddurand/c-marpaeslif.git
-version: 3.0.30
+version: 3.0.32
 x_authority: cpan:JDDPAUSE
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

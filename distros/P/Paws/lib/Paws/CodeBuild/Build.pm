@@ -3,12 +3,15 @@ package Paws::CodeBuild::Build;
   has Arn => (is => 'ro', isa => 'Str', request_name => 'arn', traits => ['NameInRequest']);
   has Artifacts => (is => 'ro', isa => 'Paws::CodeBuild::BuildArtifacts', request_name => 'artifacts', traits => ['NameInRequest']);
   has BuildComplete => (is => 'ro', isa => 'Bool', request_name => 'buildComplete', traits => ['NameInRequest']);
+  has BuildNumber => (is => 'ro', isa => 'Int', request_name => 'buildNumber', traits => ['NameInRequest']);
   has BuildStatus => (is => 'ro', isa => 'Str', request_name => 'buildStatus', traits => ['NameInRequest']);
   has Cache => (is => 'ro', isa => 'Paws::CodeBuild::ProjectCache', request_name => 'cache', traits => ['NameInRequest']);
   has CurrentPhase => (is => 'ro', isa => 'Str', request_name => 'currentPhase', traits => ['NameInRequest']);
   has EncryptionKey => (is => 'ro', isa => 'Str', request_name => 'encryptionKey', traits => ['NameInRequest']);
   has EndTime => (is => 'ro', isa => 'Str', request_name => 'endTime', traits => ['NameInRequest']);
   has Environment => (is => 'ro', isa => 'Paws::CodeBuild::ProjectEnvironment', request_name => 'environment', traits => ['NameInRequest']);
+  has ExportedEnvironmentVariables => (is => 'ro', isa => 'ArrayRef[Paws::CodeBuild::ExportedEnvironmentVariable]', request_name => 'exportedEnvironmentVariables', traits => ['NameInRequest']);
+  has FileSystemLocations => (is => 'ro', isa => 'ArrayRef[Paws::CodeBuild::ProjectFileSystemLocation]', request_name => 'fileSystemLocations', traits => ['NameInRequest']);
   has Id => (is => 'ro', isa => 'Str', request_name => 'id', traits => ['NameInRequest']);
   has Initiator => (is => 'ro', isa => 'Str', request_name => 'initiator', traits => ['NameInRequest']);
   has Logs => (is => 'ro', isa => 'Paws::CodeBuild::LogsLocation', request_name => 'logs', traits => ['NameInRequest']);
@@ -16,6 +19,7 @@ package Paws::CodeBuild::Build;
   has Phases => (is => 'ro', isa => 'ArrayRef[Paws::CodeBuild::BuildPhase]', request_name => 'phases', traits => ['NameInRequest']);
   has ProjectName => (is => 'ro', isa => 'Str', request_name => 'projectName', traits => ['NameInRequest']);
   has QueuedTimeoutInMinutes => (is => 'ro', isa => 'Int', request_name => 'queuedTimeoutInMinutes', traits => ['NameInRequest']);
+  has ReportArns => (is => 'ro', isa => 'ArrayRef[Str|Undef]', request_name => 'reportArns', traits => ['NameInRequest']);
   has ResolvedSourceVersion => (is => 'ro', isa => 'Str', request_name => 'resolvedSourceVersion', traits => ['NameInRequest']);
   has SecondaryArtifacts => (is => 'ro', isa => 'ArrayRef[Paws::CodeBuild::BuildArtifacts]', request_name => 'secondaryArtifacts', traits => ['NameInRequest']);
   has SecondarySources => (is => 'ro', isa => 'ArrayRef[Paws::CodeBuild::ProjectSource]', request_name => 'secondarySources', traits => ['NameInRequest']);
@@ -74,6 +78,14 @@ Information about a build.
 =head2 BuildComplete => Bool
 
   Whether the build is complete. True if complete; otherwise, false.
+
+
+=head2 BuildNumber => Int
+
+  The number of the build. For each project, the C<buildNumber> of its
+first build is C<1>. The C<buildNumber> of each subsequent build is
+incremented by C<1>. If a build is deleted, the C<buildNumber> of other
+builds does not change.
 
 
 =head2 BuildStatus => Str
@@ -142,6 +154,19 @@ available, the CMK's alias (using the format C<alias/I<alias-name> >).
   Information about the build environment for this build.
 
 
+=head2 ExportedEnvironmentVariables => ArrayRef[L<Paws::CodeBuild::ExportedEnvironmentVariable>]
+
+  A list of exported environment variables for this build.
+
+
+=head2 FileSystemLocations => ArrayRef[L<Paws::CodeBuild::ProjectFileSystemLocation>]
+
+  An array of C<ProjectFileSystemLocation> objects for a CodeBuild build
+project. A C<ProjectFileSystemLocation> object specifies the
+C<identifier>, C<location>, C<mountOptions>, C<mountPoint>, and C<type>
+of a file system created using Amazon Elastic File System.
+
+
 =head2 Id => Str
 
   The unique ID for the build.
@@ -199,6 +224,11 @@ information about any current build phase that is not yet complete.
 out.
 
 
+=head2 ReportArns => ArrayRef[Str|Undef]
+
+  An array of the ARNs associated with this build's reports.
+
+
 =head2 ResolvedSourceVersion => Str
 
   An identifier for the version of this build's source code.
@@ -241,7 +271,7 @@ C<ProjectSourceVersion> must be one of:
 
 =item *
 
-For AWS CodeCommit: the commit ID to use.
+For AWS CodeCommit: the commit ID, branch, or Git tag to use.
 
 =item *
 

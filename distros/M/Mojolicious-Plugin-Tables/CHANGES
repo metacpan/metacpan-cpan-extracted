@@ -1,3 +1,57 @@
+commit d64d4ed106793f854e29b76c2e77844febbdd73e
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Feb 28 17:34:52 2020 +0000
+
+    Build version 1.04
+
+commit 9c3bbbb78dc2c754ea6fb50035d7001c3682095b
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Feb 28 17:28:24 2020 +0000
+
+    handling deploy-to-root
+
+commit 8b1a717d556763ba0290c5425c44de543ca4d572
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sat Feb 22 17:05:47 2020 +0000
+
+    comment only.. more reliable test for forwarded
+
+commit 231aec3171bf5d763e1cb1a3834ba825095d8772
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Thu Dec 19 18:34:01 2019 +0000
+
+    improve distribution instructions
+
+commit 7e4ebd976a1ddc89b8edb07c07fad0d07940f7c4
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Thu Dec 19 18:30:29 2019 +0000
+
+    Build version 1.03
+
+commit b4763d4458b9ac74c3f4c7d8ef8fac4dc08d65cb
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Thu Dec 19 18:26:31 2019 +0000
+
+    setup shipped->base earlier
+
+commit 590ae3059e837f919698778ff7897866248674e8
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Dec 8 23:30:05 2019 +0000
+
+    tweak urls for exception templates
+
+commit 4049bf4e6c301c81b1b83293b809a0c276f49d37
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Dec 8 20:33:15 2019 +0000
+
+    travis: specify Perl 5.28
+
+commit fb7b0635fb4e33f985e78135a8970ea20ffa6835
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Dec 8 20:21:41 2019 +0000
+
+    update CHANGES
+
 commit 5fb4c31ec4513a18094de8bea8d1b99ad39f008b
 Author: Frank Carnovale <frank.carnovale@gmail.com>
 Date:   Sun Dec 8 20:20:37 2019 +0000

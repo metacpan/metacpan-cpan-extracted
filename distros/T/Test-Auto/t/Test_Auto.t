@@ -2,7 +2,10 @@ use 5.014;
 
 use lib 't/lib';
 
-use Do;
+use strict;
+use warnings;
+use routines;
+
 use Test::Auto;
 use Test::More;
 
@@ -47,12 +50,12 @@ This package aims to provide, a standard for documenting Perl 5 software
 projects, a framework writing tests, test automation, and documentation
 generation.
 
-=scenario testauto
+=scenario exports
 
 This package automatically exports the C<testauto> function which uses the
 "current file" as the automated testing source.
 
-=example testauto
+=example exports
 
   use Test::Auto;
   use Test::More;
@@ -83,12 +86,12 @@ routines are properly documented.
 
 =libraries
 
-Data::Object::Library
+Test::Auto::Types
 
 =attributes
 
 file: ro, req, Str
-data: ro, opt, DataObject
+data: ro, opt, Data
 
 =function testauto
 
@@ -97,7 +100,7 @@ object for the test file given.
 
 =signature testauto
 
-testauto(Str $file) : InstanceOf["Test::Auto::Subtests"]
+testauto(Str $file) : Subtests
 
 =example-1 testauto
 
@@ -111,7 +114,7 @@ This method returns a L<Test::Auto::Document> object.
 
 =signature document
 
-document() : InstanceOf["Test::Auto::Document"]
+document() : Document
 
 =example-1 document
 
@@ -125,7 +128,7 @@ This method returns a L<Test::Auto::Parser> object.
 
 =signature parser
 
-parser() : InstanceOf["Test::Auto::Parser"]
+parser() : Parser
 
 =example-1 parser
 
@@ -139,7 +142,7 @@ This method returns a L<Test::Auto::Subtests> object.
 
 =signature subtests
 
-subtests() : InstanceOf["Test::Auto::Subtests"]
+subtests() : Subtests
 
 =example-1 subtests
 
@@ -195,7 +198,7 @@ subtests() : InstanceOf["Test::Auto::Subtests"]
   =type-library $name
   =type-composite $name # [optional]
   =type-parent $name # [optional]
-  =type-coercion $name # [optional]
+  =type-coercion-$number $name # [optional]
   =type-example-$number $name # [repeatable]
 
 The specification is designed to accommodate typical package declarations. It
@@ -589,7 +592,7 @@ $subs->synopsis(fun($tryable) {
   $result;
 });
 
-$subs->scenario('testauto', fun($tryable) {
+$subs->scenario('exports', fun($tryable) {
   ok my $result = $tryable->result, 'result ok';
 
   $result;

@@ -3,9 +3,9 @@ NAME
     case of message
 
 VERSION
-    This document describes version 0.001 of Log::ger::Layout::ConvertCase
+    This document describes version 0.002 of Log::ger::Layout::ConvertCase
     (from Perl distribution Log-ger-Layout-ConvertCase), released on
-    2019-10-27.
+    2019-12-22.
 
 SYNOPSIS
      use Log::ger::Layout ConvertCase => (
@@ -21,6 +21,10 @@ SYNOPSIS
 
 DESCRIPTION
     This is an example layout plugin, mentioned in the Log::ger tutorial.
+
+CONFIGURATION
+  case
+    Str. Required. Either "upper" or "lower".
 
 HOMEPAGE
     Please visit the project's homepage at

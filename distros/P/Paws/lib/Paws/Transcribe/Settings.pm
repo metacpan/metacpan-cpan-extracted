@@ -1,8 +1,12 @@
 package Paws::Transcribe::Settings;
   use Moose;
   has ChannelIdentification => (is => 'ro', isa => 'Bool');
+  has MaxAlternatives => (is => 'ro', isa => 'Int');
   has MaxSpeakerLabels => (is => 'ro', isa => 'Int');
+  has ShowAlternatives => (is => 'ro', isa => 'Bool');
   has ShowSpeakerLabels => (is => 'ro', isa => 'Bool');
+  has VocabularyFilterMethod => (is => 'ro', isa => 'Str');
+  has VocabularyFilterName => (is => 'ro', isa => 'Str');
   has VocabularyName => (is => 'ro', isa => 'Str');
 1;
 
@@ -55,6 +59,13 @@ the same request. If you set both, your request returns a
 C<BadRequestException>.
 
 
+=head2 MaxAlternatives => Int
+
+  The number of alternative transcriptions that the service should
+return. If you specify the C<MaxAlternatives> field, you must set the
+C<ShowAlternatives> field to true.
+
+
 =head2 MaxSpeakerLabels => Int
 
   The maximum number of speakers to identify in the input audio. If there
@@ -62,6 +73,14 @@ are more speakers in the audio than this number, multiple speakers will
 be identified as a single speaker. If you specify the
 C<MaxSpeakerLabels> field, you must set the C<ShowSpeakerLabels> field
 to true.
+
+
+=head2 ShowAlternatives => Bool
+
+  Determines whether the transcription contains alternative
+transcriptions. If you set the C<ShowAlternatives> field to true, you
+must also set the maximum number of alternatives to return in the
+C<MaxAlternatives> field.
 
 
 =head2 ShowSpeakerLabels => Bool
@@ -75,6 +94,21 @@ number of speaker labels C<MaxSpeakerLabels> field.
 You can't set both C<ShowSpeakerLabels> and C<ChannelIdentification> in
 the same request. If you set both, your request returns a
 C<BadRequestException>.
+
+
+=head2 VocabularyFilterMethod => Str
+
+  Set to C<mask> to remove filtered text from the transcript and replace
+it with three asterisks ("***") as placeholder text. Set to C<remove>
+to remove filtered text from the transcript without using placeholder
+text.
+
+
+=head2 VocabularyFilterName => Str
+
+  The name of the vocabulary filter to use when transcribing the audio.
+The filter that you specify must have the same language code as the
+transcription job.
 
 
 =head2 VocabularyName => Str

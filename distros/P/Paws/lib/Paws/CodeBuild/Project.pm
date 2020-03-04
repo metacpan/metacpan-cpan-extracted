@@ -8,6 +8,7 @@ package Paws::CodeBuild::Project;
   has Description => (is => 'ro', isa => 'Str', request_name => 'description', traits => ['NameInRequest']);
   has EncryptionKey => (is => 'ro', isa => 'Str', request_name => 'encryptionKey', traits => ['NameInRequest']);
   has Environment => (is => 'ro', isa => 'Paws::CodeBuild::ProjectEnvironment', request_name => 'environment', traits => ['NameInRequest']);
+  has FileSystemLocations => (is => 'ro', isa => 'ArrayRef[Paws::CodeBuild::ProjectFileSystemLocation]', request_name => 'fileSystemLocations', traits => ['NameInRequest']);
   has LastModified => (is => 'ro', isa => 'Str', request_name => 'lastModified', traits => ['NameInRequest']);
   has LogsConfig => (is => 'ro', isa => 'Paws::CodeBuild::LogsConfig', request_name => 'logsConfig', traits => ['NameInRequest']);
   has Name => (is => 'ro', isa => 'Str', request_name => 'name', traits => ['NameInRequest']);
@@ -104,6 +105,14 @@ available, the CMK's alias (using the format C<alias/I<alias-name> >).
   Information about the build environment for this build project.
 
 
+=head2 FileSystemLocations => ArrayRef[L<Paws::CodeBuild::ProjectFileSystemLocation>]
+
+  An array of C<ProjectFileSystemLocation> objects for a CodeBuild build
+project. A C<ProjectFileSystemLocation> object specifies the
+C<identifier>, C<location>, C<mountOptions>, C<mountPoint>, and C<type>
+of a file system created using Amazon Elastic File System.
+
+
 =head2 LastModified => Str
 
   When the build project's settings were last modified, expressed in Unix
@@ -165,7 +174,7 @@ specified, the latest version is used. If specified, it must be one of:
 
 =item *
 
-For AWS CodeCommit: the commit ID to use.
+For AWS CodeCommit: the commit ID, branch, or Git tag to use.
 
 =item *
 

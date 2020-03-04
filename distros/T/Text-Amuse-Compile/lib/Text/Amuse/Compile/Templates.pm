@@ -852,7 +852,7 @@ sub latex {
 \let\raggedsection\centering
 [% END %]
 
-
+[% IF enable_secondary_footnotes %]
 [% IF safe_options.secondary_footnotes_alpha %]
 \DeclareNewFootnote{B}[alph]
 \MakeSortedPerPage[1]{footnoteB}
@@ -860,6 +860,7 @@ sub latex {
 \DeclareNewFootnote{B}
 \MakeSorted{footnoteB}
 \renewcommand*\thefootnoteB{(\arabic{footnoteB})}
+[% END %]
 [% END %]
 \deffootnote[3em]{0em}{4em}{\textsuperscript{\thefootnotemark}~}
 

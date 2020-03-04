@@ -25,128 +25,145 @@ sub new {
     }, $class;
 }
 
-sub __CREATE_TABLE_stmt {
-    my ( $sf, $sql ) = @_;
-    return sprintf "CREATE TABLE $sql->{table} (%s)", join ', ', map { $_ // '' } @{$sql->{create_table_cols}};
+
+sub __stmt_fold {
+    my ( $sf, $stmt, $term_w, $fold_opt, $values ) = @_;
+    if ( defined $term_w ) {
+        if ( defined $values ) {
+            my $filled = $sf->stmt_placeholder_to_value( $stmt, $values, 0 );
+            if ( defined $filled ) {
+                $stmt = $filled;
+            }
+        }
+        return line_fold( $stmt, $term_w, $fold_opt );
+    }
+    else {
+        return ' ' . $stmt;
+    }
 }
 
-sub __INSERT_INTO_stmt_first_part {
-    my ( $sf, $sql ) = @_;
-    return sprintf "INSERT INTO $sql->{table} (%s)", join ', ', map { $_ // '' } @{$sql->{insert_into_cols}}
-}
 
 sub get_stmt {
     my ( $sf, $sql, $stmt_type, $used_for ) = @_;
-    my $in = $used_for eq 'print' ? ' ' : '';
+    my $term_w;
+    my ( $indent0, $indent1, $indent2 );
+    my $in = '';
+    if ( $used_for eq 'print' ) {
+        $term_w = get_term_width();
+        $term_w++ if $^O ne 'MSWin32' && $^O ne 'cygwin';
+        $in = ' ' x $sf->{o}{G}{base_indent};
+        $indent0 = { init_tab => $in x 0, subseq_tab => $in x 1 };
+        $indent1 = { init_tab => $in x 1, subseq_tab => $in x 2 };
+        $indent2 = { init_tab => $in x 2, subseq_tab => $in x 3 };
+    }
     my $table = $sql->{table};
     my @tmp;
     if ( $stmt_type eq 'Drop_table' ) {
-        @tmp = ( "DROP TABLE $table" );
+        @tmp = ( $sf->__stmt_fold( "DROP TABLE $table", $term_w, $indent0 ) );
     }
     elsif ( $stmt_type eq 'Drop_view' ) {
-        @tmp = ( "DROP VIEW $table" );
+        @tmp = ( $sf->__stmt_fold( "DROP VIEW $table", $term_w, $indent0 ) );
     }
     elsif ( $stmt_type eq 'Create_table' ) {
-        @tmp = ( $sf->__CREATE_TABLE_stmt( $sql ) );
+        my $stmt = sprintf "CREATE TABLE $sql->{table} (%s)", join ', ', map { $_ // '' } @{$sql->{create_table_cols}};
+        @tmp = ( $sf->__stmt_fold( $stmt, $term_w, $indent0 ) );
+        $sf->{i}{occupied_term_height} += $tmp[-1] =~ tr/\n// + 1;
+
     }
     elsif ( $stmt_type eq 'Create_view' ) {
-        @tmp = ( sprintf "CREATE VIEW $table AS " . $sql->{view_select_stmt} );
+        @tmp = ( $sf->__stmt_fold( "CREATE VIEW $table", $term_w, $indent0 ) );
+        push @tmp, $sf->__stmt_fold( "AS " . $sql->{view_select_stmt}, $term_w, $indent1 );
     }
     elsif ( $stmt_type eq 'Select' ) {
-        @tmp = ( "SELECT" . $sql->{distinct_stmt} . $sf->__select_cols( $sql ) );
-        push @tmp, " FROM " . $table;
-        push @tmp, $in . $sql->{where_stmt}    if $sql->{where_stmt};
-        push @tmp, $in . $sql->{group_by_stmt} if $sql->{group_by_stmt};
-        push @tmp, $in . $sql->{having_stmt}   if $sql->{having_stmt};
-        push @tmp, $in . $sql->{order_by_stmt} if $sql->{order_by_stmt};
-        push @tmp, $in . $sql->{limit_stmt}    if $sql->{limit_stmt};
-        push @tmp, $in . $sql->{offset_stmt}   if $sql->{offset_stmt};
+        @tmp = ( $sf->__stmt_fold( "SELECT" . $sql->{distinct_stmt} . $sf->__select_cols( $sql ), $term_w, $indent0 ) );
+        push @tmp, $sf->__stmt_fold( "FROM " . $table,      $term_w, $indent1 );
+        push @tmp, $sf->__stmt_fold( $sql->{where_stmt},    $term_w, $indent2, $sql->{where_args}  ) if $sql->{where_stmt};
+        push @tmp, $sf->__stmt_fold( $sql->{group_by_stmt}, $term_w, $indent2                      ) if $sql->{group_by_stmt};
+        push @tmp, $sf->__stmt_fold( $sql->{having_stmt},   $term_w, $indent2, $sql->{having_args} ) if $sql->{having_stmt};
+        push @tmp, $sf->__stmt_fold( $sql->{order_by_stmt}, $term_w, $indent2                      ) if $sql->{order_by_stmt};
+        push @tmp, $sf->__stmt_fold( $sql->{limit_stmt},    $term_w, $indent2                      ) if $sql->{limit_stmt};
+        push @tmp, $sf->__stmt_fold( $sql->{offset_stmt},   $term_w, $indent2                      ) if $sql->{offset_stmt};
     }
     elsif ( $stmt_type eq 'Delete' ) {
-        @tmp = ( "DELETE FROM " . $table );
-        push @tmp, $in . $sql->{where_stmt} if $sql->{where_stmt};
+        @tmp = ( $sf->__stmt_fold( "DELETE FROM " . $table, $term_w, $indent0 ) );
+        push @tmp, $sf->__stmt_fold( $sql->{where_stmt}, $term_w, $indent1, $sql->{where_args} ) if $sql->{where_stmt};
     }
     elsif ( $stmt_type eq 'Update' ) {
-        @tmp = ( "UPDATE " . $table );
-        push @tmp, $in . $sql->{set_stmt}   if $sql->{set_stmt};
-        push @tmp, $in . $sql->{where_stmt} if $sql->{where_stmt};
+        @tmp = ( $sf->__stmt_fold( "UPDATE " . $table, $term_w, $indent0 ) );
+        push @tmp, $sf->__stmt_fold( $sql->{set_stmt},   $term_w, $indent1, $sql->{set_args} )   if $sql->{set_stmt};
+        push @tmp, $sf->__stmt_fold( $sql->{where_stmt}, $term_w, $indent1, $sql->{where_args} ) if $sql->{where_stmt};
     }
     elsif ( $stmt_type eq 'Insert' ) {
-        @tmp = ( $sf->__INSERT_INTO_stmt_first_part( $sql ) );
+        my $stmt = sprintf "INSERT INTO $sql->{table} (%s)", join ', ', map { $_ // '' } @{$sql->{insert_into_cols}};
+        @tmp = ( $sf->__stmt_fold( $stmt, $term_w, $indent0 ) );
+        $sf->{i}{occupied_term_height} += $tmp[-1] =~ tr/\n// + 1;
         if ( $used_for eq 'prepare' ) {
             push @tmp, sprintf " VALUES(%s)", join( ', ', ( '?' ) x @{$sql->{insert_into_cols}} );
         }
         else {
-            push @tmp, "  VALUES(";
-            my $arg_rows = $sf->insert_into_args_info_format( $sql, ' ' x 4 );
+            push @tmp, $sf->__stmt_fold( "VALUES(", $term_w, $indent1 );
+            $sf->{i}{occupied_term_height} += $tmp[-1] =~ tr/\n// + 1;;
+            $sf->{i}{occupied_term_height} += 2; # ")" and empty row
+            my $arg_rows = $sf->insert_into_args_info_format( $sql, $indent2->{init_tab} );
             push @tmp, @$arg_rows;
-            push @tmp, "  )";
+            push @tmp, $sf->__stmt_fold( ")", $term_w, $indent1 );
         }
     }
     elsif ( $stmt_type eq 'Join' ) {
-        @tmp = map { $in . $_ } split /(?=\s(?:INNER|LEFT|RIGHT|FULL|CROSS)\sJOIN)/, $sql->{stmt};
-        $tmp[0] =~ s/^\s//;
+        my @joins = split /(?=\s(?:INNER|LEFT|RIGHT|FULL|CROSS)\sJOIN)/, $sql->{stmt};
+        @tmp = ( $sf->__stmt_fold( shift @joins, $term_w, $indent0 ) );
+        push @tmp, map { s/^\s//; $sf->__stmt_fold( $_, $term_w, $indent1 ) } @joins;
     }
     elsif ( $stmt_type eq 'Union' ) {
-        @tmp = $used_for eq 'print' ? "SELECT * FROM (" : "(";
+        @tmp = $used_for eq 'print' ? $sf->__stmt_fold( "SELECT * FROM (", $term_w, $indent0 ) : "(";
         my $count = 0;
         for my $ref ( @{$sql->{subselect_data}} ) {
             ++$count;
-            my $str = $in x 2 . "SELECT " . join( ', ', @{$ref->[1]} );
-            $str .= " FROM " . $ref->[0];
+            my $stmt = "SELECT " . join( ', ', @{$ref->[1]} );
+            $stmt .= " FROM " . $ref->[0];
             if ( $count < @{$sql->{subselect_data}} ) {
-                $str .= " UNION ALL ";
+                $stmt .= " UNION ALL ";
             }
-            push @tmp, $str;
+            push @tmp, $sf->__stmt_fold( $stmt, $term_w, $indent1 );
         }
-        push @tmp, ")";
+        push @tmp, $sf->__stmt_fold( ")", $term_w, $indent0 );
     }
     if ( $used_for eq 'prepare' ) {
-        return join '', @tmp;
+        my $prepare_stmt = join '', @tmp;
+        $prepare_stmt =~ s/^\s//;
+        return $prepare_stmt;
     }
     else {
-        return join( "\n", @tmp ) . "\n";
+        my $print_stmt = join( "\n", @tmp ) . "\n";
+        return $print_stmt;
     }
 }
 
 
 sub insert_into_args_info_format {
     my ( $sf, $sql, $indent ) = @_;
-    my $avail_h;
-    if ( defined $sf->{i}{occupied_term_height} ) {
-        my $count = 0;
-        if ( @{$sf->{i}{stmt_types}} ) {
-            my $str = $sf->__INSERT_INTO_stmt_first_part( $sql );
-            if ( $sf->{i}{stmt_types}[0] eq 'Create_table' ) {
-                $str = $sf->__CREATE_TABLE_stmt( $sql ) . "\n" . $str;
-            }
-            $str = line_fold( $str, get_term_width(), { init_tab => '', subseq => ' ' x 4 } );
-            $count = $str =~ tr/\n// + 1;
-        }
-        $avail_h = get_term_height() - $sf->{i}{occupied_term_height} - $count - 3;
-        if ( @{$sql->{insert_into_args}} > $avail_h ) {
-            $avail_h -= 2;
-        }
-    }
-    else {
-        $avail_h = get_term_height() - 14;
-    }
-    if ( $avail_h < 3) {
-        $avail_h = 3;
-    }
-    my $first_part_end = int( $avail_h / 1.5 );
-    my $second_part_begin = $avail_h - $first_part_end;
-    $first_part_end--;
-    $second_part_begin--;
-    my $last_i = $#{$sql->{insert_into_args}};
-    my $tmp = [];
+    my $term_h = get_term_height();
     my $term_w = get_term_width();
-    if ( @{$sql->{insert_into_args}} > $avail_h ) {
-        for my $row ( @{$sql->{insert_into_args}}[ 0 .. $first_part_end ] ) {
+    $term_w++ if $^O ne 'MSWin32' && $^O ne 'cygwin';
+    my $row_count = @{$sql->{insert_into_args}};
+    my $avail_h = $term_h - $sf->{i}{occupied_term_height};
+    if ( $avail_h < 5) {
+        $avail_h = 5;
+    }
+    my $tmp = [];
+    if ( $row_count > $avail_h ) {
+        $avail_h -= 2; # for [...] + [count rows]
+        my $count_part_1 = int( $avail_h / 1.5 );
+        my $count_part_2 = $avail_h - $count_part_1;
+        my $begin_idx_part_1 = 0;
+        my $end___idx_part_1 = $count_part_1 - 1;
+        my $begin_idx_part_2 = $row_count - $count_part_2;
+        my $end___idx_part_2 = $row_count - 1;
+        for my $row ( @{$sql->{insert_into_args}}[ $begin_idx_part_1 .. $end___idx_part_1 ] ) {
             push @$tmp, _prepare_table_row( $row, $indent, $term_w );
         }
         push @$tmp, $indent . '[...]';
-        for my $row ( @{$sql->{insert_into_args}}[ $last_i - $second_part_begin .. $last_i ] ) {
+        for my $row ( @{$sql->{insert_into_args}}[ $begin_idx_part_2 .. $end___idx_part_2 ] ) {
             push @$tmp, _prepare_table_row( $row, $indent, $term_w );
         }
         my $row_count = scalar( @{$sql->{insert_into_args}} );
@@ -164,7 +181,8 @@ sub _prepare_table_row {
     my ( $row, $indent, $term_w ) = @_;
     my $list_sep = ', ';
     no warnings 'uninitialized';
-    return unicode_sprintf( $indent . join( $list_sep, map { s/\n/[NL]/g; $_ } @$row ), $term_w, { add_dots => 1 } );
+    my $row_str = join( $list_sep, map { s/\t/  /g; s/\n/[NL]/g; s/\v/[VWS]/g; $_ } @$row );
+    return unicode_sprintf( $indent . $row_str, $term_w, { add_dots => 1 } );
 }
 
 
@@ -200,24 +218,16 @@ sub __select_cols {
 
 sub print_sql {
     my ( $sf, $sql, $waiting ) = @_;
-    my $str = '';
+    my $stmt = '';
     for my $stmt_type ( @{$sf->{i}{stmt_types}} ) {
-         $str .= $sf->get_stmt( $sql, $stmt_type, 'print' );
+         $stmt .= $sf->get_stmt( $sql, $stmt_type, 'print' );
     }
-    my $filled = $sf->stmt_placeholder_to_value(
-        $str,
-        [ @{$sql->{set_args}||[]}, @{$sql->{where_args}||[]}, @{$sql->{having_args}||[]} ] # join and union: ||[]
-    );
-    if ( defined $filled ) {
-        $str = $filled
-    }
-    $str .= "\n";
-    $str = line_fold( $str, get_term_width(), { init_tab => '', subseq => ' ' x 4 } );
+    $stmt .= "\n";
     if ( defined wantarray ) {
-        return $str;
+        return $stmt;
     }
     print clear_screen();
-    print $str;
+    print $stmt;
     if ( defined $waiting ) {
         print $waiting;
     }
@@ -225,20 +235,20 @@ sub print_sql {
 
 
 sub stmt_placeholder_to_value {
-    my ( $sf, $stmt, $args, $quote ) = @_;
-    if ( ! @$args ) {
+    my ( $sf, $stmt, $values, $quote ) = @_;
+    if ( ! @$values ) {
         return $stmt;
     }
     my $rx_placeholder = qr/(?<=(?:,|\s|\())\?(?=(?:,|\s|\)|$))/;
-    for my $arg ( @$args ) {
-        my $arg_copy;
-        if ( $quote && $arg && ! looks_like_number $arg ) {
-            $arg_copy = $sf->{d}{dbh}->quote( $arg );
+    for my $value ( @$values ) {
+        my $value_copy;
+        if ( $quote && $value && ! looks_like_number $value ) {
+            $value_copy = $sf->{d}{dbh}->quote( $value );
         }
         else {
-            $arg_copy = $arg;
+            $value_copy = $value;
         }
-        $stmt =~ s/$rx_placeholder/$arg_copy/;
+        $stmt =~ s/$rx_placeholder/$value_copy/;
     }
     if ( $stmt =~ $rx_placeholder ) {
         return;

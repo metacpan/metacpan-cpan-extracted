@@ -16,7 +16,12 @@ my $have_p2m = eval "require Pod::Markdown; 1";
 sub ACTION_build {
   my $self = shift;
   my $mod_ver = $self->dist_version;
-  my $libdir = '/usr/local/lib';
+  my $arch = `uname -m`;
+  chomp $arch;
+  my @libdirs = (
+    "/usr/local/lib",
+    "/usr/lib/$arch-linux-gnu",
+  );
   my $liba;
   open my $cf, ">", File::Spec->catfile($self->base_dir,qw/lib Neo4j Bolt Config.pm/) or die $!;
   my $lib = "libneo4j-client.a";
@@ -27,9 +32,12 @@ sub ACTION_build {
       last if -e $liba;
     }
   }
-  unless ($liba =~ m|/|) {
+  for my $libdir (@libdirs) {
+    last if $liba && -e $liba && $liba =~ m|/|;
+    print "Looking for $lib in $libdir\n";
     $liba = File::Spec->catfile($libdir, $lib);
   }
+  die "$lib not found, cannot build Neo4j-Bolt\n" unless -e $liba;
   my $extl = join(" ", @{$self->extra_linker_flags});
   my $extc = join(" ", @{$self->extra_compiler_flags});
   print $cf "package Neo4j::Bolt::Config;\n\$extl = '$extl';\n\$extc = '$extc';\n\$liba='$liba';\n1;\n";

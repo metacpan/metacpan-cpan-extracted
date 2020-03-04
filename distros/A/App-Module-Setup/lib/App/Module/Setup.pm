@@ -4,13 +4,14 @@ package App::Module::Setup;
 
 ### Please use this module via the command line module-setup tool.
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use warnings;
 use strict;
 use File::Find;
 use File::Basename qw( dirname );
 use File::Path qw( mkpath );
+use POSIX qw( strftime );
 
 sub main {
     my $options = shift;
@@ -24,6 +25,7 @@ sub main {
     my $vars =
       { "module.name"     => $mod,	# Foo::Bar
 	"module.version"  => "0.01",
+	"module.summary"  => $options->{summary} || $mod,
 	"module.license"  => $options->{license} || "perl_5",
 	"current.year"    => $options->{year} || 1900 + (localtime)[5],
 	"author.name"     => $options->{author} || (getpwuid($<))[6],
@@ -53,6 +55,15 @@ sub main {
     if ( -d $dir ) {
 	die( "Directory $dir exists. Aborted!\n" );
     }
+
+    for ( $vars->{"author.cpanid"} ) {
+	next unless $_;
+	$vars->{"author.metacpan"} = "https://cpan.metacpan.org/authors/id/" .
+	  uc( join( "/", substr($_,0,1), substr($_,0,2), $_ ) );
+    }
+
+    $vars->{"ts.rpmdate"} = strftime("%a %b %d %Y", localtime);
+    $vars->{"ts.yyyymmdd"} = strftime("%F", localtime);
 
     # Get template names and data.
     my ( $files, $dirs, $data );
@@ -84,6 +95,12 @@ sub main {
 	for my $file ( @$files ) {
 	    if ( $file =~ /^(.*)_Module.pm$/ ) {
 		my $t = $1 . $vars->{"module.filename"};
+		push( @$dirs, dirname($t) );
+		$data->{$t} = delete $data->{$file};
+		$file = $t;
+	    }
+	    elsif ( $file =~ /^(.*)_Module.spec$/ ) {
+		my $t = $1 . "perl-" . $vars->{"module.distname"} . ".spec";
 		push( @$dirs, dirname($t) );
 		$data->{$t} = delete $data->{$file};
 		$file = $t;

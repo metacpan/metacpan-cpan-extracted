@@ -1,0 +1,88 @@
+NAME
+    Sah::Schemas::Collection - Various Sah collection (array/hash) schemas
+
+VERSION
+    This document describes version 0.002 of Sah::Schemas::Collection (from
+    Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+
+SAH SCHEMAS
+    *   aoaoms
+
+        Array of (defined-)array-of-maybe-strings.
+
+    *   aoaos
+
+        Array of (defined-)array-of-(defined-)strings.
+
+    *   aohoms
+
+        Array of (defined-)hash-of-maybe-strings.
+
+    *   aohos
+
+        Array of (defined-)hash-of-(defined-)strings.
+
+    *   aoms
+
+        Array of maybe-strings.
+
+    *   aos
+
+        Array of (defined) strings.
+
+        The elements (strings) of the array must be defined.
+
+    *   hoaoms
+
+        Hash of (defined-)array-of-(maybe-)strings.
+
+    *   hoaos
+
+        Hash of (defined-)array-of-(defined-)strings.
+
+    *   hohoms
+
+        Hash of (defined-)hash-of-maybe-strings.
+
+    *   hohos
+
+        Hash of (defined-)hash-of-(defined-)strings.
+
+    *   homs
+
+        Hash of maybe-strings.
+
+    *   hos
+
+        Hash of (defined) strings.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sah-Schemas-Collection>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sah-Schemas-Collection>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Collectio
+    n>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah - specification
+
+    Data::Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

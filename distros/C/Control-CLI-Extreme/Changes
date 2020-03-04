@@ -38,3 +38,19 @@ Revision history for Control-CLI-Extreme
 	* Updated attribute() to pick up service ports 1/s1,1/s2 on new VSP7400
 	* Method attribute() was not correctly reading BaystackERS sysname if this contained spaces
 	* Updates to ExtremeXOS error patterns
+
+1.03	2020-02-26
+	* Update to XOS y/n confirm prompt pattern
+	* Added support for Extreme Networks Series200 switches
+	* Added support for Extreme Networks Wireless Wing APs and Controllers
+	* Added support for SLX Data Center switches
+	* Attribute 'ports' now reports WLAN9100 ports as 'gig1' & 'gig2' (no longer 1 & 2) which is consistent
+	  with how those ports are configured. Same with newly supported Wing products as 'ge1', 'fe1', etc.
+	* Micro VSP XA1400 platforms now set "is_voss" attribute to true
+	* Initial detection of device now works correctly even if discovery performed in config context mode
+	* BaystackERS is no longer detected from prompt alone as there are now other Extreme family types with a
+	  similar prompt regex
+	* The default for output_record_separator is now Carriage Return ("\r") in this class. This differs from
+	  Control::CLI's default of Carriage Return + Line Feed ("\n"); the change was necessary since SLX, over
+	  the serial port, otherwise does not work properly. The change has no effect on all other Extreme
+	  Networks devices

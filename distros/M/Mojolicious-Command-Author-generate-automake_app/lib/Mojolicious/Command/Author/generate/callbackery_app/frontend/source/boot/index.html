@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <!-- <link rel="icon" type="image/x-icon" href="${resourcePath}${appPath}favicon.ico"> -->
+  <title>${appTitle}</title>
+
+</head>
+<body>
+    <div id="op-loading" style="position: absolute; left: 50%;top: 50%; transform: translate(-50%,-50%); text-align: center;font-family: sans-serif;">
+        <h2>Loading ${appTitle}</h2>
+        <!-- <img style="padding-top: 40px; padding-bottom: 40px;" src="${resourcePath}${appPath}spin.gif">  -->
+        <div id="op-percent"></div>
+    </div>
+    <script>
+    (function(){
+            let splash = document.getElementById('op-loading');
+            let output = document.getElementById('op-percent');
+        window.QOOXDOO_SPLASH_SCREEN = {
+            loadBegin: function(callback) {
+                callback();
+                },
+
+            loadComplete: function(callback) {
+                output = null;
+                splash.remove();
+                splash = null;
+                callback();
+            },
+
+            scriptLoaded: function(options, callback) {
+                let out = 'Loading ' + Math.round(options.numScriptsLoaded/options.numScripts*100) + '% ';
+                output.innerHTML = out;
+                callback();
+            },
+            getSettings: function() {
+                return {
+                    isLoadChunked: true,
+                    loadChunkSize: 1
+                };
+            }
+  };}());
+  </script>
+  ${preBootJs}
+  <script type="text/javascript" src="${appPath}boot.js?release=#VERSION#"></script>
+</body>
+</html>

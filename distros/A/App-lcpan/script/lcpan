@@ -1,16 +1,16 @@
 #!perl
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '1.043'; # VERSION
+our $DATE = '2020-03-04'; # DATE
+our $VERSION = '1.045'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
 use Log::ger; BEGIN { $ENV{LOG_LEVEL} //= 'info' }
 
+use Module::List::Tiny;
 use Perinci::CmdLine::Any;
 use Perinci::CmdLineX::CommonOptions::SelfUpgrade;
-use PERLANCAR::Module::List;
 
 my $prefix = '/App/lcpan/';
 my $mods = do {
@@ -24,7 +24,7 @@ my $mods = do {
             # dist that we're building
             (!defined($ENV{DZIL_NAME}) || $ENV{DZIL_NAME} eq 'App-lcpan');
 
-    PERLANCAR::Module::List::list_modules(
+    Module::List::Tiny::list_modules(
         "App::lcpan::Cmd::", {list_modules=>1});
 };
 my $subcommands = {};
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.043 of lcpan (from Perl distribution App-lcpan), released on 2019-11-29.
+This document describes version 1.045 of lcpan (from Perl distribution App-lcpan), released on 2020-03-04.
 
 =head1 SYNOPSIS
 
@@ -828,6 +828,11 @@ Create/update local CPAN mirror.
 This subcommand first create/update the mirror files by downloading from a
 remote CPAN mirror, then update the index.
 
+
+=head2 B<x-mentions-for-mod>
+
+List distributions which has an x_mentions relationship dependency for specified module.
+
 =head1 OPTIONS
 
 C<*> marks required options.
@@ -919,6 +924,10 @@ you want to pipe the result for more post-processing. In this case you can use
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =item B<--quiet>
 
@@ -3410,7 +3419,7 @@ Select CPAN mirror to download from.
 
 =item B<--skip-index-file-pattern>=I<s@>
 
-Skip a file pattern from being indexed.
+Specify a file pattern to skip from being indexed.
 
 Can be specified multiple times.
 
@@ -3432,6 +3441,30 @@ Skip one or more files from being indexed (JSON-encoded).
 
 See C<--skip-index-file>.
 
+=item B<--skip-sub-indexing-file-pattern>=I<s@>
+
+Specify a file pattern to skip being parsed for subs.
+
+Can be specified multiple times.
+
+=item B<--skip-sub-indexing-file-patterns-json>=I<s>
+
+Skip one or more file patterns from being parsed for subs (JSON-encoded).
+
+See C<--skip-sub-indexing-file-pattern>.
+
+=item B<--skip-sub-indexing-file>=I<s@>
+
+Skip a file from being parsed for subs.
+
+Can be specified multiple times.
+
+=item B<--skip-sub-indexing-files-json>=I<s>
+
+Skip one or more files from being parsed for subs (JSON-encoded).
+
+See C<--skip-sub-indexing-file>.
+
 =item B<-F>=I<s@>
 
 Alias for --skip-index-file.
@@ -3439,6 +3472,16 @@ Alias for --skip-index-file.
 See C<--skip-index-file>.
 
 Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand x-mentions-for-mod
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--module>=I<s>*
 
 =back
 
@@ -4103,8 +4146,15 @@ List of available configuration parameters:
  skip_index_file_patterns (see --skip-index-file-pattern)
  skip_index_files (see --skip-index-file)
  skip_sub_indexing (see --no-skip-sub-indexing)
+ skip_sub_indexing_file_patterns (see --skip-sub-indexing-file-pattern)
+ skip_sub_indexing_files (see --skip-sub-indexing-file)
  update_files (see --no-update-files)
  update_index (see --no-update-index)
+
+=head2 Configuration for subcommand x-mentions-for-mod
+
+ detail (see --detail)
+ module (see --module)
 
 =head1 ENVIRONMENT
 
@@ -4150,7 +4200,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

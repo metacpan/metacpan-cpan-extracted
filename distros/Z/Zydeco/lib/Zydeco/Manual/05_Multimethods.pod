@@ -220,6 +220,12 @@ the same effect.
   my $bob    = MyApp->new_person("Bob", 49);
   my $carol  = MyApp->new_person({ name => "Carol" });
 
+=head2 Abbreviated Syntax
+
+The usual abbreviated syntax will work for multimethods.
+
+  multi method stringify (Undef $value) = 'null';
+
 =head1 KEYWORDS
 
 In this chapter, we looked at the following keyword:

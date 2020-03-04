@@ -1,0 +1,15 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'name' => [
+                                                      '_cod_cell_volume'
+                                                    ]
+                                        }, 'OPTiMaDe::Filter::Property' ),
+                                 '100.0'
+                               ],
+                 'operator' => '<'
+               }, 'OPTiMaDe::Filter::Comparison' );
+== Filter ==
+(_cod_cell_volume < "100.0")
+== SQL ==
+('_cod_cell_volume' < "100.0")

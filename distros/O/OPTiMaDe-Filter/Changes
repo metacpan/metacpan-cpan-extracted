@@ -1,3 +1,7 @@
+0.7.2 2020-03-01
+
+    - Readding tests.
+
 0.7.1 2020-02-25
 
     - Switching from ExtUtils::MakeMaker to Module::Build-based build

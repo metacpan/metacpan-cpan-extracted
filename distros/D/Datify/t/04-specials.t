@@ -40,6 +40,7 @@ my $datify = join(' ', do {
         io               => '*$name{IO}',
         keyfilter        => undef,
         keyfilterdefault => 1,
+        keymap           => undef,
         keysort          => \\&Datify::keysort,
         keywords         => ['undef'],
         list             => '($_)',

@@ -4,7 +4,7 @@ package POE::Component::ElasticSearch::Indexer;
 use strict;
 use warnings;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use Const::Fast;
 use Digest::MD5 qw(md5_hex);
@@ -52,7 +52,7 @@ sub spawn {
         FlushInterval      => 30,
         FlushSize          => 1_000,
         DefaultIndex       => 'logs-%Y.%m.%d',
-        DefaultType        => 'log',
+        DefaultType        => '_doc',
         BatchDir           => '/tmp/es_index_backlog',
         StatsInterval      => 60,
         BacklogInterval    => 60,
@@ -655,7 +655,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -671,7 +671,7 @@ This POE Session is used to index data to an ElasticSearch cluster.
         FlushSize        => 1_000,                   # Default
         LoggingConfig    => undef,                   # Default
         DefaultIndex     => 'logs-%Y.%m.%d',         # Default
-        DefaultType      => 'log',                   # Default
+        DefaultType      => '_doc',                  # Default
         BatchDir         => '/tmp/es_index_backlog', # Default
         BatchDiskSpace   => undef,                   # Default
         StatsHandler     => undef,                   # Default
@@ -778,7 +778,7 @@ C<_index> element.  Defaults to B<logs-%Y.%m.%d>.
 =item B<DefaultType>
 
 Use this C<_type> attribute if the document is missing one.  Defaults to
-B<log>.
+B<_doc> to be compatible with ES 7.x.
 
 =item B<BatchDir>
 

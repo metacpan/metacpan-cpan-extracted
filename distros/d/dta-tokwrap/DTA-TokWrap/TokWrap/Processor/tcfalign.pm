@@ -154,7 +154,7 @@ sub tcfalign {
 
     ##-- sanity check(s)
     if ($len==0 && $text ne '') {
-      $aln->vwarn("tcfalign(): no text characters for token '$_'");
+      $aln->vlog('warn',"tcfalign(): no text characters for token '$_'");
     }
   } continue {
     ++$wi;

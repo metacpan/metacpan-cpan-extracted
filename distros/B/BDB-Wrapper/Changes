@@ -1,7 +1,22 @@
 Revision history for Perl extension BDB::Wrapper.
 
+0.54 Mon Mar/02/2020
+	- Clean up remaining files by test
+
+0.53 Sun Mar/02/2020
+	- Modified cpan url's location
+
+0.52 Sun Mar/02/2020
+	- Enhanced only author's profile
+
+0.51 Sun Mar/02/2020
+	- added necessary modules and description of cds_lock
+
+0.50 Sun Aug/16/2013
+  - By specifying no_lock for new DBB::Wrapper object, you can use transaction without lock, which can be used when you need only read dbh.
+
 0.49 Sun Mar/28/2013
-     	 - added txn=>1 and transaction=>1 options to use /tmp/txn_data directory for transaction's home directory
+  - added txn=>1 and transaction=>1 options to use /tmp/txn_data directory for transaction's home directory
 
 0.48 Tue Jan/22/2013 3:00
 	- Modification of the document for cds_lock

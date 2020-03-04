@@ -1,9 +1,13 @@
-package Path::Dispatcher;
-use Any::Moose;
+package Path::Dispatcher; # git description: 1.04-27-g5a00454
+# ABSTRACT: flexible and extensible dispatch
+
+our $VERSION = '1.07';
+
+use Moo;
 use 5.008001;
 
-our $VERSION = '1.06'; # VERSION
-
+# VERSION
+use Scalar::Util 'blessed';
 use Path::Dispatcher::Rule;
 use Path::Dispatcher::Dispatch;
 use Path::Dispatcher::Path;
@@ -72,15 +76,39 @@ sub _autobox_path {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
+no Moo;
+
+# don't require others to load our subclasses explicitly
+require Path::Dispatcher::Rule::Alternation;
+require Path::Dispatcher::Rule::Always;
+require Path::Dispatcher::Rule::Chain;
+require Path::Dispatcher::Rule::CodeRef;
+require Path::Dispatcher::Rule::Dispatch;
+require Path::Dispatcher::Rule::Empty;
+require Path::Dispatcher::Rule::Enum;
+require Path::Dispatcher::Rule::Eq;
+require Path::Dispatcher::Rule::Intersection;
+require Path::Dispatcher::Rule::Metadata;
+require Path::Dispatcher::Rule::Regex;
+require Path::Dispatcher::Rule::Sequence;
+require Path::Dispatcher::Rule::Tokens;
+require Path::Dispatcher::Rule::Under;
 
 1;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Path::Dispatcher - flexible and extensible dispatch
+
+=head1 VERSION
+
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -194,10 +222,6 @@ intended for tab completion. You can use it with L<Term::ReadLine> like so:
 This API is experimental and subject to change. In particular I think I want to
 return an object that resembles L<Path::Dispatcher::Dispatch>.
 
-=head1 AUTHOR
-
-Shawn M Moore, C<< <sartak at bestpractical.com> >>
-
 =head1 SEE ALSO
 
 =over 4
@@ -222,12 +246,76 @@ Shawn M Moore, C<< <sartak at bestpractical.com> >>
 
 =back
 
-=head1 COPYRIGHT & LICENSE
+=head1 SUPPORT
 
-Copyright 2008-2011 Best Practical Solutions.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Dispatcher>
+(or L<bug-Path-Dispatcher@rt.cpan.org|mailto:bug-Path-Dispatcher@rt.cpan.org>).
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+=head1 AUTHOR
+
+Shawn M Moore, C<< <sartak at bestpractical.com> >>
+
+=head1 CONTRIBUTORS
+
+=for stopwords sartak Shawn M Moore Karen Etheridge robertkrimen Aaron Trevena David Pottage Florian Ragwitz clkao
+
+=over 4
+
+=item *
+
+sartak <sartak@e417ac7c-1bcc-0310-8ffa-8f5827389a85>
+
+=item *
+
+Shawn M Moore <sartak@bestpractical.com>
+
+=item *
+
+Shawn M Moore <sartak@gmail.com>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+robertkrimen <robertkrimen@gmail.com>
+
+=item *
+
+Aaron Trevena <aaron@aarontrevena.co.uk>
+
+=item *
+
+David Pottage <david@chrestomanci.org>
+
+=item *
+
+Shawn M Moore <code@sartak.org>
+
+=item *
+
+Shawn M Moore <shawn.moore@iinteractive.com>
+
+=item *
+
+Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+Shawn M Moore <shawn@bestpractical.com>
+
+=item *
+
+clkao <clkao@e417ac7c-1bcc-0310-8ffa-8f5827389a85>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Shawn M Moore.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -29,7 +29,7 @@ subtest "in clause" => sub {
 subtest "examples clause" => sub {
     my $sch = [str => {'examples'=>['bar',{value=>'baz', summary=>'foo'}]}, {}];
     is_deeply(complete_from_schema(schema=>$sch, word=>''),
-              {words=>[{word=>'bar', summary=>undef},{word=>'baz', summary=>'foo'}], static=>1});
+              {words=>[{word=>'bar', summary=>undef},{word=>'baz', summary=>'foo'}], static=>0});
 };
 
 subtest int => sub {

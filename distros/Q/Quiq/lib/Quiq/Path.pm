@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.175';
+our $VERSION = '1.176';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -708,7 +708,8 @@ sub newlineStr {
 
 =item $name
 
-Grundname der Datei einschließlich Pfad.
+Grundname der Datei. Kann leer (Leerstring oder C<undef>) sein,
+dann besteht der Dateiname nur aus aus der laufenden Nummer.
 
 =item $n
 
@@ -716,7 +717,7 @@ Anzahl der Stellen der laufenden Nummer.
 
 =item $ext
 
-Extension der Datei.
+Extension der Datei. Kann leer (Leerstring oder C<undef>) sein.
 
 =back
 
@@ -756,8 +757,77 @@ sub nextFile {
     my $file = $files[-1] // sprintf '%s-%0*d.%s',$name,$n,0,$ext;
     my ($i) = $file =~ /^\Q$name\E-(\d+).\Q$ext\E/;
     $file = sprintf "%s-%0*d.%s",$name,$n,++$i,$ext;
-
+    
     return $file;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 nextNumber() - Generiere nächste Dateinamen-Nummer
+
+=head4 Synopsis
+
+  $num = $this->nextNumber($dir,$width);
+
+=head4 Arguments
+
+=over 4
+
+=item $dir
+
+Verzeichnis mit nummierten Dateien.
+
+=item $width
+
+Anzahl der Stellen der Nummer.
+
+=back
+
+=head4 Returns
+
+Nummer mit der angegebenen Anzahl Stellen, ggf. mit führenden 0en
+aufgefüllt.
+
+=head4 Description
+
+Ermittele und liefere die nächste Nummer eines Verzeichnisses mit
+nummerierten Dateien. Die Dateinamen haben einen beliebigen
+Aufbau, müssen aber eine Nummer mit genau $width Stellen
+besitzen. Die laufende Nummer NNNN (deren Breite durch den zweiten
+Parameter festgelegt ist) wird anhand der vorhandenen Dateien
+im Verzeichnis $dir ermittelt und um 1 erhöht.
+
+=head4 Example
+
+Es liegt noch keine Datei mit einer dreistelligen Nummer NNN vor:
+
+  $num = Quiq::Path->nextNumber($dir,3);
+  =>
+  001
+
+Die Datei mit der höchsten dreistelligen Nummer NNN enthält 031:
+
+  $num = Quiq::Path->nextNumber($dir,3);
+  =>
+  032
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub nextNumber {
+    my ($this,$dir,$width) = @_;
+
+    my $n = 0;
+    for my $file ($this->glob("$dir/*")) {
+        if ($file =~ /(?:^|\D)(\d{$width})(?:$|\D)/) {
+            if ($1 > $n) {
+                $n = $1+0;
+            }
+        }
+    }
+
+    return sprintf '%0*d',$width,++$n;
 }
 
 # -----------------------------------------------------------------------------
@@ -2744,6 +2814,10 @@ Datei $after ein. Ist $after leer (Leerstring oder undef), werden
 die Pfade an den Anfang gestellt. Alle Angaben I<vor> der
 (Re-)Nummerierung.
 
+=item -start => $n (Default: $step)
+
+Verwende $n als Startwert.
+
 =back
 
 =head4 Description
@@ -2782,9 +2856,11 @@ sub numberPaths {
     # Optionen
 
     my $moveA = undef;
+    my $start = undef;
 
     my $argA = $this->parameters(3,3,\@_,
         -move => \$moveA,
+        -start => \$start,
     );
     my ($pathA,$width,$step) = @$argA;
 
@@ -2838,7 +2914,7 @@ sub numberPaths {
 
     # Nummeriere Dateien mit Endung .tmp
 
-    my $n = $step;
+    my $n = defined $start? $start: $step;
     my @tmpPath;
     for my $path (@$pathA) {
         my ($dir,undef,$base,$ext) = $this->split($path);
@@ -3197,7 +3273,7 @@ sub uid {
 
 =head1 VERSION
 
-1.175
+1.176
 
 =head1 AUTHOR
 

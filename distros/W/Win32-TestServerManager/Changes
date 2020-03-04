@@ -1,5 +1,10 @@
 Revision history for Win32-TestServerManager
 
+0.05 2020/03/01
+  - use 127.0.0.1 to test
+  - drop File::Slurp dependency
+  - cpanfile
+
 0.04 2008/10/19
   - now you can create server with an anonymous subroutine.
 

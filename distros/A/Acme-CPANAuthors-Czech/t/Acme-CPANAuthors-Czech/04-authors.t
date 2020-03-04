@@ -1,9 +1,7 @@
-# Pragmas.
 use strict;
 use utf8;
 use warnings;
 
-# Modules.
 use Acme::CPANAuthors::Czech;
 use Test::More 'tests' => 2;
 use Test::NoWarnings;
@@ -16,6 +14,7 @@ my %right_ret = (
 	'DANPEDER' => 'Daniel Peder',
 	'DOUGLISH' => 'Dalibor Hořínek',
 	'HIHIK' => 'Jiří Václavík',
+	'HOLCAPEK' => 'Jan Holčapek',
 	'HPA' => 'Petr Vraník',
 	'JANPAZ' => 'Jan Pazdziora',
 	'JANPOM' => 'Jan Pomikálek',
@@ -36,12 +35,13 @@ my %right_ret = (
 	'RUR' => 'Rudolf Rosa',
 	'RVASICEK' => 'Roman Vašíček',
 	'SEIDLJAN' => 'Jan Seidl',
-	'SKIM' => 'Michal Špaček',
+	'SKIM' => 'Michal Josef Špaček',
 	'SMRZ' => 'Otakar Smrž',
 	'STRAKA' => 'Milan Straka',
 	'TKR' => 'Tomáš Kraut',
 	'TRIPIE' => 'Tomáš Stýblo',
 	'TYNOVSKY' => 'Miroslav Týnovský',
+	'VARISD' => 'Dušan Variš',
 	'VASEKD' => 'Václav Dovrtěl',
 	'YENYA' => 'Jan "Yenya" Kasprzak',
 	'ZABA' => 'Zdeněk Žabokrtský',

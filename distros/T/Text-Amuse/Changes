@@ -1,5 +1,13 @@
 Revision history for perl module Text::Amuse
 
+1.42 2020-03-02
+
+ - Restore perl 5.10.1 compatibility
+
+1.41 2020-03-01
+
+ - Prefer a named anchor for ToC links GH #58
+
 1.40 2020-02-16
 
  - New markup extension to support alternate versions of headers for

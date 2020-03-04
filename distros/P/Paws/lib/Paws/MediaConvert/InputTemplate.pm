@@ -3,15 +3,18 @@ package Paws::MediaConvert::InputTemplate;
   has AudioSelectorGroups => (is => 'ro', isa => 'Paws::MediaConvert::__mapOfAudioSelectorGroup', request_name => 'audioSelectorGroups', traits => ['NameInRequest']);
   has AudioSelectors => (is => 'ro', isa => 'Paws::MediaConvert::__mapOfAudioSelector', request_name => 'audioSelectors', traits => ['NameInRequest']);
   has CaptionSelectors => (is => 'ro', isa => 'Paws::MediaConvert::__mapOfCaptionSelector', request_name => 'captionSelectors', traits => ['NameInRequest']);
+  has Crop => (is => 'ro', isa => 'Paws::MediaConvert::Rectangle', request_name => 'crop', traits => ['NameInRequest']);
   has DeblockFilter => (is => 'ro', isa => 'Str', request_name => 'deblockFilter', traits => ['NameInRequest']);
   has DenoiseFilter => (is => 'ro', isa => 'Str', request_name => 'denoiseFilter', traits => ['NameInRequest']);
   has FilterEnable => (is => 'ro', isa => 'Str', request_name => 'filterEnable', traits => ['NameInRequest']);
   has FilterStrength => (is => 'ro', isa => 'Int', request_name => 'filterStrength', traits => ['NameInRequest']);
   has ImageInserter => (is => 'ro', isa => 'Paws::MediaConvert::ImageInserter', request_name => 'imageInserter', traits => ['NameInRequest']);
   has InputClippings => (is => 'ro', isa => 'ArrayRef[Paws::MediaConvert::InputClipping]', request_name => 'inputClippings', traits => ['NameInRequest']);
+  has Position => (is => 'ro', isa => 'Paws::MediaConvert::Rectangle', request_name => 'position', traits => ['NameInRequest']);
   has ProgramNumber => (is => 'ro', isa => 'Int', request_name => 'programNumber', traits => ['NameInRequest']);
   has PsiControl => (is => 'ro', isa => 'Str', request_name => 'psiControl', traits => ['NameInRequest']);
   has TimecodeSource => (is => 'ro', isa => 'Str', request_name => 'timecodeSource', traits => ['NameInRequest']);
+  has TimecodeStart => (is => 'ro', isa => 'Str', request_name => 'timecodeStart', traits => ['NameInRequest']);
   has VideoSelector => (is => 'ro', isa => 'Paws::MediaConvert::VideoSelector', request_name => 'videoSelector', traits => ['NameInRequest']);
 1;
 
@@ -69,6 +72,14 @@ from the input that you will use in your outputs. You can use mutiple
 captions selectors per input.
 
 
+=head2 Crop => L<Paws::MediaConvert::Rectangle>
+
+  Use Cropping selection (crop) to specify the video area that the
+service will include in the output video frame. If you specify a value
+here, it will override any value that you specify in the output setting
+Cropping selection (crop).
+
+
 =head2 DeblockFilter => Str
 
   Enable Deblock (InputDeblockFilter) to produce smoother motion in the
@@ -120,6 +131,18 @@ clip, the transcoding service creates the job outputs by stringing the
 clips together in the order you specify them.
 
 
+=head2 Position => L<Paws::MediaConvert::Rectangle>
+
+  Use Selection placement (position) to define the video area in your
+output frame. The area outside of the rectangle that you specify here
+is black. If you specify a value here, it will override any value that
+you specify in the output setting Selection placement (position). If
+you specify a value here, this will override any AFD values in your
+input, even if you set Respond to AFD (RespondToAfd) to Respond
+(RESPOND). If you specify a value here, this will ignore anything that
+you specify for the setting Scaling Behavior (scalingBehavior).
+
+
 =head2 ProgramNumber => Int
 
   Use Program (programNumber) to select a specific program from within a
@@ -138,14 +161,27 @@ PIDs for audio and video. * Use PSI - Scan only PSI data.
 
 =head2 TimecodeSource => Str
 
-  Timecode source under input settings (InputTimecodeSource) only affects
-the behavior of features that apply to a single input at a time, such
-as input clipping and synchronizing some captions formats. Use this
-setting to specify whether the service counts frames by timecodes
-embedded in the video (EMBEDDED) or by starting the first frame at zero
-(ZEROBASED). In both cases, the timecode format is HH:MM:SS:FF or
-HH:MM:SS;FF, where FF is the frame number. Only set this to EMBEDDED if
-your source video has embedded timecodes.
+  Use this Timecode source setting, located under the input settings
+(InputTimecodeSource), to specify how the service counts input video
+frames. This input frame count affects only the behavior of features
+that apply to a single input at a time, such as input clipping and
+synchronizing some captions formats. Choose Embedded (EMBEDDED) to use
+the timecodes in your input video. Choose Start at zero (ZEROBASED) to
+start the first frame at zero. Choose Specified start (SPECIFIEDSTART)
+to start the first frame at the timecode that you specify in the
+setting Start timecode (timecodeStart). If you don't specify a value
+for Timecode source, the service will use Embedded by default. For more
+information about timecodes, see
+https://docs.aws.amazon.com/console/mediaconvert/timecode.
+
+
+=head2 TimecodeStart => Str
+
+  Specify the timecode that you want the service to use for this input's
+initial frame. To use this setting, you must set the Timecode source
+setting, located under the input settings (InputTimecodeSource), to
+Specified start (SPECIFIEDSTART). For more information about timecodes,
+see https://docs.aws.amazon.com/console/mediaconvert/timecode.
 
 
 =head2 VideoSelector => L<Paws::MediaConvert::VideoSelector>

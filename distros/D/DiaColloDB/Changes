@@ -2,9 +2,14 @@
 ##
 ## Change log for perl distribution DiaColloDB
 
+v0.12.015 Wed, 04 Mar 2020 13:11:43 +0100 moocow
+	* fix XS/cof-compile.h (un)signedness bug resulting in bogus indices from union
+	  - un-collocated f1 components from temporary cof.udat were getting counted as i2=4294967295 == (uint32_t)-1
+
 v0.12.014 Wed, 29 Jan 2020 09:40:17 +0100 moocow
 	* yet another attempt to avoid "Attempt to reload XYZ.pm aborted." errors from cpantesters
 	* require 'threads' in Makefile.PL PREREQ_PM, don't try to be clever about loading it at runtime
+	  - unthreaded smokers still try to build, but choke on 'make test' (e.g. http://www.cpantesters.org/cpan/report/ca7d17c4-432a-11ea-99fe-b031dbec7dbf)
 
 v0.12.013 Tue, 28 Jan 2020 08:49:33 +0100 moocow
 	* try to avoid "Attempt to reload XYZ.pm aborted." errors from cpantesters

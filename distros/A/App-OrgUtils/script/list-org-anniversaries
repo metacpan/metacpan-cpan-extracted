@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-02-06'; # DATE
-our $VERSION = '0.472'; # VERSION
+our $DATE = '2020-02-28'; # DATE
+our $VERSION = '0.473'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ list-org-anniversaries - List all anniversaries in Org files
 
 =head1 VERSION
 
-This document describes version 0.472 of list-org-anniversaries (from Perl distribution App-OrgUtils), released on 2020-02-06.
+This document describes version 0.473 of list-org-anniversaries (from Perl distribution App-OrgUtils), released on 2020-02-28.
 
 =head1 SYNOPSIS
 
@@ -146,7 +146,7 @@ REC is the final record that will be returned as final result (can be a string
 or a hash, if 'detail' is enabled), and DUE_DATE is the DateTime object.
 
 
-=item B<--time-zone>=I<timezone>
+=item B<--time-zone>=I<s>
 
 Will be passed to parser's options.
 

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.175';
+our $VERSION = '1.176';
 
 # -----------------------------------------------------------------------------
 
@@ -45,10 +45,10 @@ L<Quiq::Hash>
 
 =head1 DESCRIPTION
 
-Die Klasse stellt Methoden zur Verfügung, um eine Unix-Kommandozeile
-zu konstruieren. Die Klasse ist hilfreich, wenn einzelne Bestandteile
-der Kommandozeile nicht statisch sind, sondern von Variablenwerten
-und Bedingungen abhängen.
+Die Klasse stellt Methoden zur Konstruktion einer Unix-Kommandozeile
+zur Verfügung. Die Klasse ist hilfreich, wenn einzelne Bestandteile
+der Kommandozeile dynamisch sind, also von Bedingungen und
+variablen Werten abhängen.
 
 =head1 METHODS
 
@@ -536,7 +536,7 @@ sub value {
 
 =head1 VERSION
 
-1.175
+1.176
 
 =head1 AUTHOR
 

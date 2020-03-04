@@ -1,8 +1,8 @@
 # vi:sw=2
 use strictures 2;
 
-use Test::More;
-use Test::Exception;
+use Test2::V0 qw( done_testing is like cmp_ok );
+use Test::Trap; # Needed for trap()
 
 my %types;
 BEGIN {
@@ -26,7 +26,8 @@ BEGIN {
       text tinytext mediumtext longtext long
       blob tinyblob mediumblob longblob
     )],
-    # These will be unhandled
+    # These will be unhandled because SQLite doesn't have any column types other
+    # than NULL, INTEGER, REAL, TEXT, and BLOB
     datetime => [qw(
       date
       datetime
@@ -85,13 +86,14 @@ use Test::DBIx::Class qw(:resultsets);
   is $count, 0, "There are no tables loaded at first";
 }
 
-my $continue = lives_ok {
+trap {
   Schema->load_sims(
     {
       ColumnTests => [{}],
     },
   );
-} "load_sims runs to completion";
+};
+my $continue = is $trap->leaveby, 'return', "load_sims runs to completion";
 
 # Don't bother continuing if we didn't succeed in load_sims().
 if ($continue) {

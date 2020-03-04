@@ -1,7 +1,9 @@
 package Business::Tax::ID::PPH21;
 
-our $DATE = '2019-02-10'; # DATE
-our $VERSION = '0.061'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-03'; # DATE
+our $DIST = 'Business-Tax-ID-PPH21'; # DIST
+our $VERSION = '0.062'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,7 +13,7 @@ use Exporter::Rinci qw(import);
 
 our %SPEC;
 
-my $latest_supported_year = 2018;
+my $latest_supported_year = 2019;
 
 our %arg_tp_status = (
     tp_status => {
@@ -360,7 +362,7 @@ Business::Tax::ID::PPH21 - Routines to help calculate Indonesian income tax arti
 
 =head1 VERSION
 
-This document describes version 0.061 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2019-02-10.
+This document describes version 0.062 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2020-03-03.
 
 =head1 SYNOPSIS
 
@@ -437,6 +439,7 @@ his/her non-taxable income.
 
 =item * B<year>* => I<int>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -449,6 +452,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 calc_pph21_op
@@ -492,6 +496,7 @@ his/her non-taxable income.
 
 =item * B<year>* => I<int>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -504,6 +509,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 get_pph21_op_ptkp
@@ -549,6 +555,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<year>* => I<int>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -561,6 +568,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 get_pph21_op_rates
@@ -604,6 +612,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<year>* => I<int>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -641,7 +650,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

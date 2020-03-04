@@ -3,7 +3,7 @@ package DateTime::Format::Strptime;
 use strict;
 use warnings;
 
-our $VERSION = '1.76';
+our $VERSION = '1.77';
 
 use Carp qw( carp croak );
 use DateTime 1.00;
@@ -482,7 +482,7 @@ sub _build_parser {
         $patterns{p} = $patterns{P} = {
             regex => do {
                 my $am_pm = join '|',
-                    map {quotemeta}
+                    map  {quotemeta}
                     sort { ( length $b <=> length $a ) or ( $a cmp $b ) }
                     @{ $self->{locale}->am_pm_abbreviated };
                 qr/$am_pm/i;
@@ -618,7 +618,15 @@ sub _token_re_for {
                 $offset .= '00';
             }
 
-            $args->{time_zone} = DateTime::TimeZone->new( name => $offset );
+            my $tz = try { DateTime::TimeZone->new( name => $offset ) };
+            unless ($tz) {
+                $self->_our_croak(
+                    qq{The time zone name offset that was parsed does not appear to be valid, "$args->{time_zone_offset}"}
+                );
+                return;
+            }
+
+            $args->{time_zone} = $tz;
         }
 
         if ( defined $args->{time_zone_abbreviation} ) {
@@ -970,7 +978,7 @@ DateTime::Format::Strptime - Parse and format strp and strf time patterns
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 
@@ -1370,7 +1378,7 @@ Rick Measham <rickm@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christian Hansen D. Ilmari Mannsåker key-amb Mohammad S Anwar
+=for stopwords Christian Hansen D. Ilmari Mannsåker gregor herrmann key-amb Mohammad S Anwar
 
 =over 4
 
@@ -1384,6 +1392,10 @@ D. Ilmari Mannsåker <ilmari.mannsaker@net-a-porter.com>
 
 =item *
 
+gregor herrmann <gregoa@debian.org>
+
+=item *
+
 key-amb <yasutake.kiyoshi@gmail.com>
 
 =item *
@@ -1394,7 +1406,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 - 2019 by Dave Rolsky.
+This software is Copyright (c) 2015 - 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

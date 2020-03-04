@@ -3,60 +3,23 @@ use Mojo::Base 'Mojolicious::Plugin::Minion::Overview::Backend';
 
 use Mojo::JSON qw(decode_json);
 
-sub children {
 
-}
+=head2 failed_jobs
 
-sub dashboard {
-    my $self = shift;
+Search failed jobs
 
-my $sql = <<SQL;
-SELECT
-    SUM(IF(state = 'finished', 1, 0)) AS `finished`,
-    SUM(IF(state = 'failed', 1, 0)) AS `failed`,
-    SUM(IF(state = 'inactive', 1, 0)) AS `inactive`
-FROM `minion_jobs`
-WHERE
-    `created` >= DATE_ADD(NOW(), INTERVAL -7 DAY)
-    AND `state` IN ('finished', 'failed')
-SQL
-    
-    my $finished = $self->db->query($sql)->hash->{ finished };
-    my $failed = $self->db->query($sql)->hash->{ failed };
-    my $inactive = $self->db->query($sql)->hash->{ inactive };
-
-$sql = <<SQL;
-SELECT
-    COUNT(*) AS `workers`
-FROM `minion_workers`
-SQL
-
-    my $workers = $self->db->query($sql)->hash->{ workers };
-
-    return [
-        {
-            title   => 'Finished jobs past 7 days',
-            count   => $finished,
-        },
-        {
-            title   => 'Failed jobs past 7 days',
-            count   => $failed,
-        },
-        {
-            title   => 'Inactive jobs past 7 days',
-            count   => $inactive,
-        },
-        {
-            title   => 'Active workers',
-            count   => $workers,
-        },
-    ];
-}
+=cut
 
 sub failed_jobs {
     return shift->where('state', 'failed')
         ->jobs();
 }
+
+=head2 job_runtime_metrics
+
+Job runtime metrics
+
+=cut
 
 sub job_runtime_metrics {
     my ($self, $job) = @_;
@@ -79,6 +42,12 @@ SQL
     return $collection;
 }
 
+=head2 job_throughput_metrics
+
+Job throughput metrics
+
+=cut
+
 sub job_throughput_metrics {
     my ($self, $job) = @_;
 
@@ -100,6 +69,12 @@ SQL
 
     return $collection;
 }
+
+=head2 jobs
+
+Search jobs
+
+=cut
 
 sub jobs {
     my $self = shift;
@@ -191,6 +166,64 @@ SQL
     return $response;
 }
 
+=head2 overview
+
+Dashboard overview
+
+=cut
+
+sub overview {
+    my $self = shift;
+
+my $sql = <<SQL;
+SELECT
+    COALESCE(SUM(IF(state = 'finished', 1, 0)), 0) AS `finished`,
+    COALESCE(SUM(IF(state = 'failed', 1, 0)), 0) AS `failed`,
+    COALESCE(SUM(IF(state = 'inactive', 1, 0)), 0) AS `inactive`
+FROM `minion_jobs`
+WHERE
+    `created` >= DATE_ADD(NOW(), INTERVAL -7 DAY)
+    AND `state` IN ('finished', 'failed')
+SQL
+    
+    my $finished = $self->db->query($sql)->hash->{ finished };
+    my $failed = $self->db->query($sql)->hash->{ failed };
+    my $inactive = $self->db->query($sql)->hash->{ inactive };
+
+$sql = <<SQL;
+SELECT
+    COUNT(*) AS `workers`
+FROM `minion_workers`
+SQL
+    
+    my $workers = $self->db->query($sql)->hash->{ workers };
+
+    return [
+        {
+            title   => 'Finished jobs past 7 days',
+            count   => $finished,
+        },
+        {
+            title   => 'Failed jobs past 7 days',
+            count   => $failed,
+        },
+        {
+            title   => 'Inactive jobs past 7 days',
+            count   => $inactive,
+        },
+        {
+            title   => 'Active workers',
+            count   => $workers,
+        },
+    ];
+}
+
+=head2 unique_jobs
+
+Search the list of unique jobs
+
+=cut
+
 sub unique_jobs {
     my $self = shift;
 
@@ -270,6 +303,44 @@ SQL
     $self->clear_query;
 
     return $response;
+}
+
+=head2 workers
+
+Get workers information
+
+=cut
+
+sub workers {
+    my $self = shift;
+
+my $sql = <<SQL;
+SELECT *
+FROM `minion_workers`
+SQL
+
+my $stats_sql = <<SQL;
+SELECT
+    COUNT(*) AS `performed`,
+    COALESCE(SUM(IF(state = 'active', 1, 0)), 0) AS `active`,
+    COALESCE(SUM(IF(state = 'finished', 1, 0)), 0) AS `finished`,
+    COALESCE(SUM(IF(state = 'failed', 1, 0)), 0) AS `failed`
+FROM `minion_jobs`
+INNER JOIN `minion_workers` on `minion_workers`.`id` = `minion_jobs`.`worker`
+WHERE
+    `minion_workers`.`id` = ?
+SQL
+    
+    my $collection = $self->db->query($sql)->hashes;
+
+    $collection->each(sub {
+        my $object = shift;
+
+        $object->{ status } = eval { decode_json($object->{ status }) };
+        $object->{ jobs_stats } = $self->db->query($stats_sql, $object->{ id })->hash;
+    });
+
+    return $collection;
 }
 
 1;

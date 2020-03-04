@@ -144,3 +144,10 @@ Revision history for Control-CLI
 	* Modified poll_return() method to properly handle 'output_result' in the form of a hash reference. Now polled
 	  methods can return a hash reference (previously only scalar, array and array reference were possible).
 	* Changed default username_prompt to: '(?i:user ?name|login)[: ]*$'
+
+2.08	2020-02-26
+	* Changed username prompt to '(?i:user(?: ?name)?|login)[: ]+$' regex so as to also work with a "User:" prompt
+	* Method login() now will accept an empty password, for devices where no password is set but still prompt for
+	  a password on connection
+	* Optimized stripLastLine() to use correct and more efficient regex \z assertion
+	* SSH errors originating from known_hosts verification were not not prepended with the Control::CLI method

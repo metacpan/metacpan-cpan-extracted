@@ -1,5 +1,16 @@
 Revision history for Jasonify.
 
+v0.20.064 2020-03-04
+
+ - Use keymap functionality in Datify to support proper sorting of -Infinity,
+   Infinity, and NaN.
+ - Change representations of -Infinity, Infinity, and NaN to exclude quotes
+   (but the quotes are still there where needed).
+
+v0.20.060 2020-02-29
+
+ - Added LooksLike where it makes sense.
+
 v0.20.052 2020-02-21
 
  - Another fix for long double support.

@@ -18,6 +18,7 @@ sub import {
   # make the stack look like it should for use Test::Deep
   my $pkg = shift;
   unshift(@_, "Test::Deep");
+  push @_, '_notest';
   goto &$import;
 }
 

@@ -6,7 +6,7 @@ Test2::Harness::Renderer::JUnit - Captures Test2::Harness results and emits a ju
 
 On the command line, with `yath`:
 
-    JUNIT_TEST_FILE="/tmp/foo.xml" ALLOW_PASSING_TODOS=1 yath test -j18 t/*.t
+    JUNIT_TEST_FILE="/tmp/test-output.xml" ALLOW_PASSING_TODOS=1 yath test --renderer=Formatter --renderer=JUnit -j4 t/*.t
 
 # DESCRIPTION
 
@@ -64,11 +64,11 @@ The source code repository for Test2-Harness-Renderer-JUnit can be found at
 
 # MAINTAINERS
 
-- Todd Rinaldo &lt;lt>toddr@cpanel.net>
+- Todd Rinaldo Todd Rinaldo, `<toddr at cpanel.net>`
 
 # AUTHORS
 
-- Todd Rinaldo &lt;lt>toddr@cpan.org>
+- Todd Rinaldo, `<toddr at cpanel.net>`
 
 # COPYRIGHT
 

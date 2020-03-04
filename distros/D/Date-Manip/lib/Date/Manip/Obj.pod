@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2019 Sullivan Beck. All rights reserved.
+# Copyright (c) 2008-2020 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -46,9 +46,9 @@ fashion.
 
 =head1 METHODS FOR CREATING OBJECTS
 
-In the examples below, any C<$date> (C<$date>, C<$date1>, C<$date2>, ...) variable
-is a L<Date::Manip::Date> object. Similarly, C<$delta>, C<$recur>, C<$tz>, and
-C<$base> refer to objects in the appropriate class.
+In the examples below, any variable named some variation of C<$date> (C<$date>,
+C<$date1>, C<$date2>, ...) is a L<Date::Manip::Date> object. Similarly, C<$delta>,
+C<$recur>, C<$tz>, and C<$base> refer to objects in the appropriate class.
 
 Any C<$obj> variable refers to an object in any of the classes.
 
@@ -58,28 +58,37 @@ Any C<$obj> variable refers to an object in any of the classes.
 
 There are two ways to use the new method. They are:
 
-   $obj2  = new CLASS ($obj1,$string,[@parse_opts,]\@opts);
-   $obj2  = $obj1->new($string,[@parse_opts,]\@opts)
+   $obj2  = new CLASS ($obj1,$string,@parse_opts,\@opts);
+   $obj2  = $obj1->new($string,@parse_opts,\@opts)
 
 In both cases, all arguments are optional.
 
-Here, CLASS is the class of the new object. For example:
+Both methods are used to create a new object of a given class.  In the
+first case, B<CLASS> is the class of the new object. For example:
 
    $date  = new Date::Manip::Date;
    $delta = new Date::Manip::Delta;
 
-if C<$obj1> is available, the new object will share as much information
-from the old object as possible. The class of the new object may
-be derived from the old object as well.
+In the second method, the class of the new object will be derived from
+the first object.  For example:
+
+   $date1 = new Date::Manip::Date;
+   $date2 = $date1->new();
+
+the class of the second object (C<$date2>) is L<Date::Manip::Date>
+because that is the class of the object (C<$date1>) used to create it.
+
+In both first method (when a C<$obj1> is passed in) and always in the
+second method, the new object will share as much information from the
+old object (C<$obj1>) as possible.
 
 For example, if you call either of these:
 
    $date2 = new Date::Manip::Date $date1;
    $date2 = $date1->new();
 
-the new date object will use the same embedded L<Date::Manip::TZ> object. In
-the second case, the class of the new object (C<$date2>) is L<Date::Manip::Date>
-because that is the class of the original object.
+the new date object will use the same embedded L<Date::Manip::TZ> and
+L<Date::Manip::Base> objects.
 
 When specifying CLASS and including an old object, objects do not need to
 be of the same class.  For example, the following are all valid:
@@ -127,16 +136,14 @@ In other words, the following are equivalent:
    $date = new Date::Manip::Date $base2;
    $date->config(@opts);
 
-It should be noted that the options are applied to the NEW object,
-not the old one. That only matters in one situation:
+It should be noted that the options are applied to the NEW L<Date::Manip::Base>
+object, not the old one.
 
-   $base2 = new Date::Manip::Base $base1,\@opts;
-   $base2 = $base1->new(\@opts);
-
-An optional string (C<$string>) may be passed in only when creating
-a L<Date::Manip::Date>, L<Date::Manip::Delta>, or L<Date::Manip::Recur> object.
-If it is passed in when creating a L<Date::Manip::TZ> or L<Date::Manip::Base>
-object, a warning will be issued, but execution will continue.
+An optional string (C<$string> and parse opts C<@parse_opts>) may be
+passed in only when creating a L<Date::Manip::Date>,
+L<Date::Manip::Delta>, or L<Date::Manip::Recur> object.  If passed in
+when creating a L<Date::Manip::TZ> or L<Date::Manip::Base> object, a
+warning will be issued, but execution will continue.
 
 If the string is included, it will be parsed to give an initial value
 to the object. This will only be done AFTER any options are handled,

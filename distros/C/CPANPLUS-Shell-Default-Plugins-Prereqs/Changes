@@ -1,5 +1,18 @@
 Changes for CPANPLUS::Shell::Default::Plugins::Prereqs
 
+0.12 - Wed Mar  4 09:18:28 EST 2020
+    Fixes bug in tests
+    Adds minimum version of perl to the prereqs
+    Fixes Changes file to adhere to CPAN::Changes spec
+    ** I do not use CPANPLUS anymore. Anyone interested in taking it over is
+    welcome to it. **
+
+0.11 - Fri Aug  8 09:00:25 EDT 2014
+    - Adds minimum version of perl to the prereqs
+    - Fixes Changes file to adhere to CPAN::Changes spec
+    ** I do not use CPANPLUS anymore. I will continue to try to support this
+    module, but anyone interested in taking it over is welcome to it. **
+
 0.10 - Wed Mar  7 18:27:56 EST 2012
     Cleans more tests in the hopes of avoiding false smoker failures.
     Bumps version and runs Perl::Tidy over source.
@@ -7,5 +20,5 @@ Changes for CPANPLUS::Shell::Default::Plugins::Prereqs
 0.09 - Tue Mar  6 08:31:55 EST 2012
     Improves tests to minimize errors reported by smokers.
 
-0.11 - Mon Mar  5 11:57:33 EST 2012
+0.08 - Mon Mar  5 11:57:33 EST 2012
     Fixes failing tests due to Test::Output not capturing output.

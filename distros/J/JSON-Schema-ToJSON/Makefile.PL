@@ -12,9 +12,10 @@ WriteMakefile(
     LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.10.1',
     PREREQ_PM => {
+        'B'                => 0,
         'Cpanel::JSON::XS' => 3.0213,
         'YAML::XS'         => 0,
-        'JSON::Validator'  => 1.08,
+        'JSON::Validator'  => 3.23,
         'String::Random'   => 0.29,
         'Mojolicious'      => '7.15',
         'Hash::Merge'      => 0,

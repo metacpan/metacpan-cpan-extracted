@@ -1,5 +1,12 @@
-Revision history for Sah-Schemas-Collection
+0.002   2020-03-02  Released-By: PERLANCAR; Urgency: medium
 
-0.001   2016-12-09 (PERLANCAR)
+	- Add examples (tests).
+
+        - [incompatible] In aoaos, aohos, hoaos, hohos the strings are now all
+	  required. But now there are new aoms, homs, aoaoms, aohoms, hoaoms,
+	  hohoms schemas where the strings are not required.
+
+
+0.001   2016-12-09  Released-By: PERLANCAR
 
         - First release.

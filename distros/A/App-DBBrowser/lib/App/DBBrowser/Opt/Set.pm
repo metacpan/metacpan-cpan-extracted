@@ -84,21 +84,23 @@ sub _options {
             { name => 'operators',               text => "- Operators",      section => 'G'      },
             { name => '_alias',                  text => "- Alias",          section => 'alias'  },
             { name => '_sql_identifiers',        text => "- Identifiers",    section => 'G'      },
+            { name => '_view_name_prefix',       text => "- View prefix",    section => 'create' },
             { name => '_autoincrement_col_name', text => "- Auto increment", section => 'create' },
             { name => '_data_type_guessing',     text => "- Data types",     section => 'create' },
             { name => 'max_rows',                text => "- Max Rows",       section => 'G'      },
         ],
         group_output => [
-            { name => 'min_col_width',       text => "- Colwidth",        section => 'table' },
-            { name => 'progress_bar',        text => "- ProgressBar",     section => 'table' },
-            { name => 'tab_width',           text => "- Tabwidth",        section => 'table' },
-            { name => '_grid',               text => "- Grid",            section => 'table' },
-            { name => '_color',              text => "- Color",           section => 'table' },
-            { name => '_binary_filter',      text => "- Binary filter",   section => 'table' },
-            { name => '_squash_spaces',      text => "- Squash spaces",   section => 'table' },
-            { name => '_show_table_name',    text => "- Show table name", section => 'G'     },
-            { name => '_set_string',         text => "- Set string",      section => 'table' },
-            { name => '_file_find_warnings', text => "- Warnings",        section => 'G'     },
+            { name => 'min_col_width',       text => "- Colwidth",      section => 'table' },
+            { name => 'progress_bar',        text => "- ProgressBar",   section => 'table' },
+            { name => 'tab_width',           text => "- Tabwidth",      section => 'table' },
+            { name => '_grid',               text => "- Grid",          section => 'table' },
+            { name => '_color',              text => "- Color",         section => 'table' },
+            { name => '_binary_filter',      text => "- Binary filter", section => 'table' },
+            { name => '_squash_spaces',      text => "- Squash spaces", section => 'table' },
+            { name => '_show_table_name',    text => "- Table name",    section => 'G'     },
+            { name => '_base_indent',        text => "- Indentation",   section => 'G'     },
+            { name => '_set_string',         text => "- Set string",    section => 'table' },
+            { name => '_file_find_warnings', text => "- Warnings",      section => 'G'     },
         ],
         group_insert => [
             { name => '_parse_file',        text => "- Parse file",     section => 'insert' },
@@ -255,6 +257,13 @@ sub set_options {
                 my $prompt = 'Choose operators';
                 $sf->__choose_a_subset_wrap( $section, $opt, $sf->{avail_operators}, $prompt );
             }
+            elsif ( $opt eq '_view_name_prefix' ) {
+                my $items = [
+                    { name => 'view_name_prefix', prompt => "View name prefix" },
+                ];
+                my $prompt = 'Set a view name prefix';
+                $sf->__group_readline( $section, $items, $prompt );
+            }
             elsif ( $opt eq '_file_encoding' ) {
                 my $items = [
                     { name => 'file_encoding', prompt => "file_encoding" },
@@ -403,6 +412,13 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
+            elsif ( $opt eq '_base_indent' ) {
+                my $prompt = 'Set the indentation width';
+                my $sub_menu = [
+                    [ 'base_indent', "- Indentation", [ 0, 1, 2, 3, 4 ] ]
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
             elsif ( $opt eq '_file_find_warnings' ) {
                 my $prompt = '"SQLite database search"';
                 my $sub_menu = [
@@ -542,8 +558,9 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq 'add_file_dir' ) {
+            elsif ( $opt eq 'add_file_dir' ) { # special case
                 $sf->__new_dir_search();
+                last GROUP;
             }
             else {
                 die "Unknown option: $opt";

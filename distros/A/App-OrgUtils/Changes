@@ -1,3 +1,8 @@
+0.473   2020-02-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLIs: sort-org-headlines, reverse-org-headlines.
+
+
 0.472   2020-02-06  Released-By: PERLANCAR; Urgency: medium
 
 	- dump-org-structure-tiny: Also dump using Org::Dump instead of

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.238';
+our $VERSION = '2.241';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.238
+Version 2.241
 
 =head1 SYNOPSIS
 
@@ -763,14 +763,6 @@ entry has been chosen.
 
 =item
 
-Concatenate
-
-=item
-
-Truncate
-
-=item
-
 Bit_Length
 
 =item
@@ -779,11 +771,27 @@ Char_Length
 
 =item
 
+Concatenate
+
+=item
+
 Epoch_to_Date
 
 =item
 
 Epoch_to_DateTime
+
+=item
+
+Replace
+
+=item
+
+Round
+
+=item
+
+Truncate
 
 =back
 
@@ -910,6 +918,10 @@ C<SQLite>:
 
 - if the current database has attached databases, the use of qualified table names is enabled automatically.
 
+=head3 View prefix
+
+Enter a string which should be automatically put in front of all view names.
+
 =head3 Auto increment
 
 Setting I<Auto increment> to a value which is not the empty string enables the option to set an auto increment column
@@ -965,6 +977,10 @@ If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and
 =head3 Show table name
 
 If enabled, the table name is displayed in the lower left corner of the terminal behind the page number.
+
+=head3 Indentation
+
+Set the indentation width for the info output.
 
 =head3 Set string
 

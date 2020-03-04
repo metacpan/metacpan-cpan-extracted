@@ -1,4 +1,9 @@
-Revision history for file.
+Revision history for filename.
+
+v0.20.060 2020-02-29
+
+ - Require 5.12, as 5.10 appears to have issues.
+ - Improved tests, which might be able to pass or skip on MSWin32.
 
 v0.20.022 2020-01-22
 

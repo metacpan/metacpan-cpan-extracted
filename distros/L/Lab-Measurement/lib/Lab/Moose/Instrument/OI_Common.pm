@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Common;
-$Lab::Moose::Instrument::OI_Common::VERSION = '3.691';
+$Lab::Moose::Instrument::OI_Common::VERSION = '3.692';
 #ABSTRACT: Role for handling Oxfords Instruments pseudo-SCPI commands
 
 use Moose::Role;
@@ -97,7 +97,7 @@ Lab::Moose::Instrument::OI_Common - Role for handling Oxfords Instruments pseudo
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 DESCRIPTION
 
@@ -133,7 +133,7 @@ Perform set/query with I<SET:*> command and parse return value.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt

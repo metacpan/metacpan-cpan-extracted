@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::KeysightB2901A;
-$Lab::Moose::Instrument::KeysightB2901A::VERSION = '3.691';
+$Lab::Moose::Instrument::KeysightB2901A::VERSION = '3.692';
 #ABSTRACT: Agilent/Keysight B2901A voltage/current sourcemeter.
 
 use 5.010;
@@ -157,7 +157,7 @@ Lab::Moose::Instrument::KeysightB2901A - Agilent/Keysight B2901A voltage/current
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 SYNOPSIS
 
@@ -275,7 +275,7 @@ For XPRESS voltage sweep. Equivalent to C<< set_level(value => $value) >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018-2019  Simon Reinhardt
 

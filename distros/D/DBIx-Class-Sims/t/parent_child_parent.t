@@ -1,8 +1,7 @@
 # vi:sw=2
 use strictures 2;
 
-use Test::More;
-use Test::Deep; # Needed for re() below
+use Test2::V0 qw( done_testing E );
 
 use lib 't/lib';
 
@@ -10,7 +9,6 @@ BEGIN {
   use loader qw(build_schema);
   build_schema([
     Artist => {
-      table => 'artists',
       columns => {
         id => {
           data_type => 'int',
@@ -81,19 +79,31 @@ BEGIN {
 use common qw(sims_test);
 
 sims_test "Specify child->parent->other_child" => {
-  spec => {
-    Album => [
-      {
-        name => 'Wonder Years',
-        artist => {
-          name => 'Superstar',
-          mansions => [
-            { name => 'My Place' },
-          ],
+  spec => [
+    {
+      Album => [
+        {
+          name => 'Wonder Years',
+          artist => {
+            name => 'Superstar',
+            mansions => [
+              { name => 'My Place' },
+            ],
+          },
+        }
+      ],
+    },
+    {
+      # Force Mansion to go first. This exercises the "pending" data structure.
+      # This is required otherwise this test could pass with the "pending" code
+      # commented out, but that's an illusion due to hash-key ordering.
+      toposort => {
+        add_dependencies => {
+          Album => 'Mansion',
         },
-      }
-    ],
-  },
+      },
+    }
+  ],
   expect => {
     Artist => { id => 1, name => 'Superstar' },
     Album => { id => 1, name => 'Wonder Years', artist_id => 1 },
@@ -143,8 +153,8 @@ sims_test "Auto-generate other children of parent by amount" => {
   expect => {
     Artist => { id => 1, name => 'Superstar' },
     Album => [
-      { id => 1, name => re('.+'), artist_id => 1 },
-      { id => 2, name => re('.+'), artist_id => 1 },
+      { id => 1, name => E(), artist_id => 1 },
+      { id => 2, name => E(), artist_id => 1 },
     ],
     Mansion => { id => 1, name => 'My Place', artist_id => 1 },
   },

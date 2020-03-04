@@ -215,7 +215,7 @@ sub set {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $col_sep = ' ';
     $sql->{set_args} = [];
-    $sql->{set_stmt} = " SET";
+    $sql->{set_stmt} = "SET";
     my @bu;
     my @pre = ( undef, $sf->{i}{ok} );
 
@@ -260,7 +260,7 @@ sub where {
     my @cols = @{$sql->{cols}};
     my $AND_OR = '';
     $sql->{where_args} = [];
-    $sql->{where_stmt} = " WHERE";
+    $sql->{where_stmt} = "WHERE";
     my $unclosed = 0;
     my $count = 0;
     my @bu;
@@ -349,7 +349,7 @@ sub group_by {
     my $clause = 'group_by';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    $sql->{group_by_stmt} = " GROUP BY";
+    $sql->{group_by_stmt} = "GROUP BY";
     $sql->{group_by_cols} = [];
     $sql->{select_cols} = [];
     my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
@@ -358,7 +358,7 @@ sub group_by {
     my $choices = [ @pre, @{$sql->{cols}} ];
 
     GROUP_BY: while ( 1 ) {
-        $sql->{group_by_stmt} = " GROUP BY " . join ', ', @{$sql->{group_by_cols}};
+        $sql->{group_by_stmt} = "GROUP BY " . join ', ', @{$sql->{group_by_cols}};
         $ax->print_sql( $sql );
         # Choose
         my @idx = $tc->choose(
@@ -371,7 +371,7 @@ sub group_by {
                 pop @{$sql->{group_by_cols}};
                 next GROUP_BY;
             }
-            $sql->{group_by_stmt} = " GROUP BY " . join ', ', @{$sql->{group_by_cols}};
+            $sql->{group_by_stmt} = "GROUP BY " . join ', ', @{$sql->{group_by_cols}};
             return;
         }
         elsif ( $choices->[$idx[0]] eq $sf->{i}{ok} ) {
@@ -381,7 +381,7 @@ sub group_by {
                 $sql->{group_by_stmt} = '';
             }
             else {
-                $sql->{group_by_stmt} = " GROUP BY " . join ', ', @{$sql->{group_by_cols}};
+                $sql->{group_by_stmt} = "GROUP BY " . join ', ', @{$sql->{group_by_cols}};
             }
             return 1;
         }
@@ -407,7 +407,7 @@ sub having {
     my @pre = ( undef, $sf->{i}{ok} );
     my $AND_OR = '';
     $sql->{having_args} = [];
-    $sql->{having_stmt} = " HAVING";
+    $sql->{having_stmt} = "HAVING";
     my $unclosed = 0;
     my $count = 0;
     my @bu;
@@ -501,7 +501,7 @@ sub order_by {
         @cols = @{$sql->{cols}};
     }
     my $col_sep = ' ';
-    $sql->{order_by_stmt} = " ORDER BY";
+    $sql->{order_by_stmt} = "ORDER BY";
     my @bu;
 
     ORDER_BY: while ( 1 ) {
@@ -584,7 +584,8 @@ sub limit_offset {
         push @bu, [ $sql->{limit_stmt}, $sql->{offset_stmt} ];
         my $digits = 7;
         if ( $choice eq $limit ) {
-            $sql->{limit_stmt} = " LIMIT";
+            #$sql->{limit_stmt} = " LIMIT";
+            $sql->{limit_stmt} = "LIMIT";
             $ax->print_sql( $sql );
             # Choose_a_number
             my $limit = $tu->choose_a_number( $digits,
@@ -598,11 +599,11 @@ sub limit_offset {
         }
         if ( $choice eq $offset ) {
             if ( ! $sql->{limit_stmt} ) {
-                $sql->{limit_stmt} = " LIMIT " . ( $sf->{o}{G}{max_rows} || '9223372036854775807'  ) if $sf->{i}{driver} eq 'SQLite';   # 2 ** 63 - 1
+                $sql->{limit_stmt} = "LIMIT " . ( $sf->{o}{G}{max_rows} || '9223372036854775807'  ) if $sf->{i}{driver} eq 'SQLite';   # 2 ** 63 - 1
                 # MySQL 5.7 Reference Manual - SELECT Syntax - Limit clause: SELECT * FROM tbl LIMIT 95,18446744073709551615;
-                $sql->{limit_stmt} = " LIMIT " . ( $sf->{o}{G}{max_rows} || '18446744073709551615' ) if $sf->{i}{driver} eq 'mysql';    # 2 ** 64 - 1
+                $sql->{limit_stmt} = "LIMIT " . ( $sf->{o}{G}{max_rows} || '18446744073709551615' ) if $sf->{i}{driver} eq 'mysql';    # 2 ** 64 - 1
             }
-            $sql->{offset_stmt} = " OFFSET";
+            $sql->{offset_stmt} = "OFFSET";
             $ax->print_sql( $sql );
             # Choose_a_number
             my $offset = $tu->choose_a_number( $digits,

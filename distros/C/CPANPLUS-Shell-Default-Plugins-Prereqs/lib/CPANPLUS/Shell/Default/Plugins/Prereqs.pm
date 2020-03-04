@@ -1,5 +1,7 @@
 package CPANPLUS::Shell::Default::Plugins::Prereqs;
 
+# ABSTRACT: Plugin for CPANPLUS to automate the installation of prerequisites without installing the module
+
 use strict;
 use warnings;
 use File::Basename qw[basename];
@@ -8,7 +10,7 @@ use CPANPLUS::Internals::Constants;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 sub plugins {
     return ( prereqs => 'install_prereqs', );
@@ -122,9 +124,15 @@ sub install_prereqs_help {
 
 __END__
 
+=pod
+
 =head1 NAME
 
-CPANPLUS::Shell::Default::Plugin::Prereqs - Plugin for CPANPLUS to automate the installation of prerequisites without installing the module
+CPANPLUS::Shell::Default::Plugins::Prereqs - Plugin for CPANPLUS to automate the installation of prerequisites without installing the module
+
+=head1 VERSION
+
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -179,10 +187,6 @@ Returns the short version documentation for the plugin.
 
 C<CPANPLUS>, C<CPANPLUS::Shell::Default::Plugins::HOWTO>
 
-=head1 AUTHOR
-
-Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
-
 =head1 THANKS
 
 Thanks to Jos Boumans for his excellent suggestions to improve both the plugin
@@ -193,12 +197,15 @@ functionality and the quality of the code.
 Add test for MakeMaker and Module::Install based modules. Add test for
 /prereq install. Split C<install_prereqs> into multiple subroutines.
 
+=head1 AUTHOR
+
+Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007-12 by mgrimes
+This software is copyright (c) 2020 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

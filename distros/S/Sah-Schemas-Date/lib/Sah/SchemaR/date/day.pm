@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::day;
 
-our $DATE = '2020-02-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2020-03-03'; # DATE
+our $VERSION = '0.010'; # VERSION
 
-our $rschema = ["int",[{max=>31,min=>1,summary=>"Day of month"}],["int"]];
+our $rschema = ["int",[{examples=>[{data=>"",valid=>0},{data=>1,valid=>1},{data=>31,valid=>1},{data=>32,valid=>0}],max=>31,min=>1,summary=>"Day of month"}],["int"]];
 
 1;
 # ABSTRACT: Day of month
@@ -20,7 +20,7 @@ Sah::SchemaR::date::day - Day of month
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::SchemaR::date::day (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Sah::SchemaR::date::day (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
 
 =head1 DESCRIPTION
 

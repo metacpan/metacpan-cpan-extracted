@@ -7,12 +7,14 @@ package Paws::EC2::ImportImageTask;
   has ImageId => (is => 'ro', isa => 'Str', request_name => 'imageId', traits => ['NameInRequest']);
   has ImportTaskId => (is => 'ro', isa => 'Str', request_name => 'importTaskId', traits => ['NameInRequest']);
   has KmsKeyId => (is => 'ro', isa => 'Str', request_name => 'kmsKeyId', traits => ['NameInRequest']);
+  has LicenseSpecifications => (is => 'ro', isa => 'ArrayRef[Paws::EC2::ImportImageLicenseConfigurationResponse]', request_name => 'licenseSpecifications', traits => ['NameInRequest']);
   has LicenseType => (is => 'ro', isa => 'Str', request_name => 'licenseType', traits => ['NameInRequest']);
   has Platform => (is => 'ro', isa => 'Str', request_name => 'platform', traits => ['NameInRequest']);
   has Progress => (is => 'ro', isa => 'Str', request_name => 'progress', traits => ['NameInRequest']);
   has SnapshotDetails => (is => 'ro', isa => 'ArrayRef[Paws::EC2::SnapshotDetail]', request_name => 'snapshotDetailSet', traits => ['NameInRequest']);
   has Status => (is => 'ro', isa => 'Str', request_name => 'status', traits => ['NameInRequest']);
   has StatusMessage => (is => 'ro', isa => 'Str', request_name => 'statusMessage', traits => ['NameInRequest']);
+  has Tags => (is => 'ro', isa => 'ArrayRef[Paws::EC2::Tag]', request_name => 'tagSet', traits => ['NameInRequest']);
 1;
 
 ### main pod documentation begin ###
@@ -32,7 +34,7 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::EC2::ImportImageTask object:
 
-  $service_obj->Method(Att1 => { Architecture => $value, ..., StatusMessage => $value  });
+  $service_obj->Method(Att1 => { Architecture => $value, ..., Tags => $value  });
 
 =head3 Results returned from an API call
 
@@ -89,6 +91,12 @@ machine.
 master key (CMK) that was used to create the encrypted image.
 
 
+=head2 LicenseSpecifications => ArrayRef[L<Paws::EC2::ImportImageLicenseConfigurationResponse>]
+
+  The ARNs of the license configurations that are associated with the
+import image task.
+
+
 =head2 LicenseType => Str
 
   The license type of the virtual machine.
@@ -117,6 +125,11 @@ master key (CMK) that was used to create the encrypted image.
 =head2 StatusMessage => Str
 
   A descriptive status message for the import image task.
+
+
+=head2 Tags => ArrayRef[L<Paws::EC2::Tag>]
+
+  The tags for the import image task.
 
 
 

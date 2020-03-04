@@ -1,9 +1,9 @@
 package App::PODUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-15'; # DATE
+our $DATE = '2020-02-28'; # DATE
 our $DIST = 'App-PODUtils'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 use 5.010001;
 use strict;
@@ -150,7 +150,7 @@ sub dump_pod_structure {
 }
 
 sub _sort {
-    my ($node, $command, $sorter) = @_;
+    my ($node, $command, $sorter, $sorter_meta) = @_;
 
     my @children = @{ $node->children // [] };
     return unless @children;
@@ -160,21 +160,38 @@ sub _sort {
         next unless $child->can("children");
         my $grandchildren = $child->children;
         next unless $grandchildren && @$grandchildren;
-        _sort($child, $command, $sorter);
+        _sort($child, $command, $sorter, $sorter_meta);
     }
 
     my $has_command_sub = sub {
-        $_->can("command") && $_->command && $_->command eq $command
+        $_->can("command") &&
+            $_->command &&
+            $_->command eq $command
     };
     return unless grep { $has_command_sub->($_) } @children;
 
-    require Sort::SubList;
-    @children = Sort::SubList::sort_sublist(
-        sub { $sorter->($_[0]->content, $_[1]->content) },
-        $has_command_sub,
-        @children);
+    my $child_has_command_sub = sub {
+        $children[$_]->can("command") &&
+            $children[$_]->command &&
+            $children[$_]->command eq $command
+    };
 
-    $node->children(\@children);
+    require Sort::SubList;
+    my @sorted_children =
+        map { $children[$_] }
+        Sort::SubList::sort_sublist(
+            sub {
+                if ($sorter_meta->{compares_record}) {
+                    my $rec0 = [$children[$_[0]]->content, $_[0]];
+                    my $rec1 = [$children[$_[1]]->content, $_[1]];
+                    $sorter->($rec0, $rec1);
+                } else {
+                    $sorter->($children[$_[0]]->content, $children[$_[1]]->content);
+                }
+            },
+            $child_has_command_sub,
+            0..$#children);
+    $node->children(\@sorted_children);
 }
 
 $Sort::Sub::argsopt_sortsub{sort_sub}{cmdline_aliases} = {S=>{}};
@@ -201,13 +218,34 @@ sub sort_pod_headings {
 
     my $sortsub_routine = $args{sort_sub} // 'asciibetically';
     my $sortsub_args    = $args{sort_args} // {};
-    my $sorter = Sort::Sub::get_sorter($sortsub_routine, $sortsub_args);
+    my ($sorter, $sorter_meta) =
+        Sort::Sub::get_sorter($sortsub_routine, $sortsub_args, 'with meta');
 
     my $command = $args{command} // 'head1';
 
     my $doc = _parse_pod($args{pod});
-    _sort($doc, $command, $sorter);
+    _sort($doc, $command, $sorter, $sorter_meta);
     $doc->as_pod_string;
+}
+
+$SPEC{reverse_pod_headings} = {
+    v => 1.1,
+    summary => '',
+    args => {
+        %arg0_pod,
+        command => {
+            schema => ['str*', {
+                match=>qr/\A\w+\z/,
+                #in=>[qw/head1 head2 head3 head4/],
+            }],
+            default => 'head1',
+        },
+    },
+    result_naked => 1,
+};
+sub reverse_pod_headings {
+    my %args = @_;
+    sort_pod_headings(%args, sort_sub=>'record_by_reverse_order');
 }
 
 1;
@@ -225,7 +263,7 @@ App::PODUtils - Command-line utilities related to POD
 
 =head1 VERSION
 
-This document describes version 0.045 of App::PODUtils (from Perl distribution App-PODUtils), released on 2019-12-15.
+This document describes version 0.046 of App::PODUtils (from Perl distribution App-PODUtils), released on 2020-02-28.
 
 =head1 SYNOPSIS
 
@@ -241,6 +279,8 @@ POD:
 =item * L<poddump>
 
 =item * L<podless>
+
+=item * L<reverse-pod-headings>
 
 =item * L<sort-pod-headings>
 
@@ -273,6 +313,7 @@ Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be searched in @IN
 
 "-" means standard input.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -288,11 +329,42 @@ Return value:  (any)
 
 
 
+=head2 reverse_pod_headings
+
+Usage:
+
+ reverse_pod_headings(%args) -> any
+
+.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<command> => I<str> (default: "head1")
+
+=item * B<pod> => I<perl::pod_filename> (default: "-")
+
+Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be searched in @INC.
+
+"-" means standard input.
+
+
+=back
+
+Return value:  (any)
+
+
+
 =head2 sort_pod_headings
 
 Usage:
 
  sort_pod_headings(%args) -> any
+
+.
 
 This function is not exported.
 
@@ -315,6 +387,7 @@ Arguments to pass to the Sort::Sub::* routine.
 =item * B<sort_sub> => I<sortsub::spec>
 
 Name of a Sort::Sub::* module (without the prefix).
+
 
 =back
 
@@ -339,7 +412,7 @@ feature.
 =head1 SEE ALSO
 
 
-L<pomdump>. Similar script, but using Pod::POM as backend to parse POD document into tree.
+L<pomdump>. Perinci::To::POD=HASH(0x560307ca92c0).
 
 L<podsel>.
 
@@ -357,7 +430,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -26,6 +26,6 @@ resources:
   bugtracker: https://github.com/kiwiroy/mojo-transaction-http-role-mechanize/issues
   homepage: https://github.com/kiwiroy/mojo-transaction-http-role-mechanize
   repository: https://github.com/kiwiroy/mojo-transaction-http-role-mechanize.git
-version: '0.04'
+version: '0.05'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

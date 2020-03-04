@@ -1,13 +1,25 @@
 package Sah::Schema::date::month_nums;
 
-our $DATE = '2020-02-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-03'; # DATE
+our $DIST = 'Sah-Schemas-Date'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 our $schema = ['array' => {
     summary => 'Array of month numbers',
     of => ['date::month_num', {}, {}],
     'x.perl.coerce_rules' => ['From_str::comma_sep'],
     'x.completion' => ['date_month_num'],
+    examples => [
+        {data=>'', valid=>1},
+        {data=>0, valid=>0},
+        {data=>1, valid=>1},
+        {data=>[1], valid=>1},
+        {data=>[1,12], valid=>1},
+        {data=>'1,12', valid=>1},
+        {data=>[1,12,13], valid=>0},
+        {data=>'1,12,13', valid=>0},
+    ],
 }, {}];
 
 1;
@@ -26,7 +38,57 @@ Sah::Schema::date::month_nums - Array of month numbers
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::date::month_nums (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Sah::Schema::date::month_nums (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+
+=head1 SYNOPSIS
+
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("date::month_nums*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['date::month_nums*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+
+Sample data:
+
+ ""  # valid
+
+ 0  # INVALID
+
+ 1  # valid
+
+ [1]  # valid
+
+ [1,12]  # valid
+
+ "1,12"  # valid
+
+ [1,12,13]  # INVALID
+
+ "1,12,13"  # INVALID
 
 =head1 HOMEPAGE
 

@@ -1,6 +1,6 @@
 package Tcl::pTk;
 
-our ($VERSION) = ('1.02');
+our ($VERSION) = ('1.03');
 
 use strict;
 use Tcl;
@@ -17,6 +17,8 @@ BEGIN{
  if($^O eq 'cygwin')
   {
    $platform = 'MSWin32'
+   # could still be set to 'unix' once Tcl is loaded
+   # depending on $::tcl_platform(platform)
   }
  else
   {
@@ -68,6 +70,8 @@ if($DEBUG){
         import Sub::Name;
 }
 
+# Variable to indicate whether Tile/Ttk widgets are available
+our ( $_Tile_available ) = ( 0 );
 
 @Tcl::pTk::ISA = qw(Tcl);
 
@@ -250,7 +254,7 @@ B<Perl/Tk compatible syntax:>
 
 B<Tcl::pTk Syntax:>
 
-  $inst->MainLoop;
+  $int->MainLoop;
 
 =head2 Creating and using widgets
 
@@ -822,6 +826,11 @@ sub new {
     # Create background error handling method that is similar to the way perltk does it
     $tkinterp->CreateCommand('bgerror', \&Tcl::pTk::bgerror);
 
+    # correct $platform: if we're on 'cygwin' but tcl/tk is on 'unix', then platform is 'unix':
+    if($^O eq 'cygwin' && $i->GetVar2('tcl_platform','platform') eq 'unix') {
+        $platform = 'unix';
+    }
+
     # RT #127120: Middle-click paste workaround
     # for older Tcl/Tk versions on macOS aqua
     if ($i->Eval('tk windowingsystem') eq 'aqua') {
@@ -862,10 +871,18 @@ sub tkinit {
 sub MainWindow {
     my $interp = Tcl::pTk->new(@_);
 
-    # Load Tile Widgets, if the tcl version is >= 8.5
-    if( $interp->Eval('package vsatisfies [package provide Tk] 8.5') ){
+    # Load Tile Widgets, if using Tcl/Tk 8.5 or higher,
+    # or using Tcl/Tk 8.4 and the Tile package is present
+    if (
+        $interp->Eval('package vsatisfies [package provide Tk] 8.5')
+        or (
+            ($interp->GetVar('tk_version') eq '8.4')
+            and $interp->pkg_require('tile')
+        )
+    ) {
             require Tcl::pTk::Tile;
             Tcl::pTk::Tile::_declareTileWidgets($interp);
+            $_Tile_available = 1;
     }
     
     # Load palette commands, so $interp->invoke can be used with them later, for speed.
@@ -1064,7 +1081,7 @@ sub widget_deletion_watcher {
 }
 
 ###############################################
-#  Overriden delete_ref
+#  Overridden delete_ref
 #  Instead of immediately deleting a scalar or code ref in Tcl-land,
 #   queue the ref to be deleted in an after-idle call.
 #   This is done, rather than deleting immediately, because an immediate delete
@@ -1198,26 +1215,6 @@ sub pkg_require {
     }
     return $preloaded_tk{$id};
 }
-
-sub need_tk {
-    # DEPRECATED: Use pkg_require and call instead.
-    my $int = shift;
-    my $pkg = shift;
-    my $cmd = shift || '';
-    warn "DEPRECATED CALL: need_tk($pkg, $cmd), use pkg_require\n";
-    if ($pkg eq 'ptk-Table') {
-        require Tcl::pTk::Table;
-    }
-    else {
-	# Only require the actual package once
-	my $ver = $int->pkg_require($pkg);
-	return 0 if !defined($ver);
-	$int->Eval($cmd) if $cmd;
-    }
-    return 1;
-}
-
-
 
 # subroutine findINC copied from perlTk/Tk.pm
 sub findINC {
@@ -1449,7 +1446,7 @@ sub bgerror{
 #   own functions here that previously were provided with Tcl.pm <= 1.02
 #############################################################################################
 ###############################################
-#  Overriden delete_widget_refs
+#  Overridden delete_widget_refs
 #  This is implemented in Tcl::pTk.pm because for versions of Tcl.pm > 1.02,
 #  this method is not supported, so we implement it ourselves here.
 sub delete_widget_refs {
@@ -1477,7 +1474,7 @@ sub _delete_ref {
     return $ref;
 }
 ###############################################
-#  Overriden _current_refs_widget
+#  Overridden _current_refs_widget
 #  This is implemented in Tcl::pTk.pm because for versions of Tcl.pm > 1.02,
 #  this method is not supported, so we implement it ourselves here.
 sub _current_refs_widget {$current_widget=shift}

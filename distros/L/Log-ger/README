@@ -2,9 +2,10 @@ NAME
     Log::ger - A lightweight, flexible logging framework
 
 VERSION
-    version 0.029
+    version 0.031
 
 SYNOPSIS
+  Producing logs
     In your module (producer):
 
      package Foo;
@@ -12,19 +13,49 @@ SYNOPSIS
 
      sub foo {
          ...
-         # produce some logs
-         log_error "an error occurred: %03d - %s", $errcode, $errmsg;
+         # produce some logs. no need to configure output or level.
+         log_error "an error occured: %03d - %s", $errcode, $errmsg;
          ...
          log_debug "http response: %s", $http; # automatic dumping of data
      }
      1;
 
+  Consuming logs
+   Choosing an output
     In your application (consumer/listener):
 
      use Foo;
-     use Log::ger::Output 'Screen';
+     use Log::ger::Output 'Screen'; # configure output
+     # level is by default 'warn'
+     foo(); # the error message is shown, but debug message is not.
 
-     foo();
+   Choosing multiple outputs
+    Instead of screen, you can output to multiple outputs (including
+    multiple files):
+
+     use Log::ger::Output 'Composite' => (
+         outputs => {
+             Screen => {},
+             File   => [
+                 {conf=>{path=>'/path/to/app.log'}},
+                 ...
+             ],
+             ...
+         },
+     );
+
+    See Log::ger::Manual::Tutorial::481_Output_Composite for more examples.
+
+   Choosing level
+    One way to set level:
+
+     use Log::ger::Util;
+     Log::ger::Util::set_level('debug'); # be more verbose
+     foo(); # the error message as well as debug message are now shown
+
+    There are better ways, e.g. letting users configure log level via
+    configuration file or command-line option. See
+    Log::ger::Manual::Tutorial::300_Level for more details.
 
 DESCRIPTION
     Log::ger is yet another logging framework with the following features:
@@ -44,14 +75,14 @@ DESCRIPTION
         are provided in separate distributions to be pulled as needed.
 
         Low startup overhead. Only ~0.5-1ms. For comparison, strict
-        ~0.2-0.5ms, warnings ~2ms, Log::Any 0.15 ~2-3ms, Log::Any 1.049
-        ~8-10ms, Log::Log4perl ~35ms. This is measured on a 2014-2015 PC and
-        before doing any output configuration. I strive to make "use
-        Log::ger;" statement to be roughly as light as "use strict;" or "use
-        warnings;" so the impact of adding the statement is really minimal
-        and you can just add logging without much thought to most of your
-        modules. This is important to me because I want logging to be
-        pervasive.
+        ~0.2-0.5ms, warnings ~2ms, Log::Any (v0.15) ~2-3ms, Log::Any
+        (v1.049) ~8-10ms, Log::Log4perl ~35ms. This is measured on a
+        2014-2015 PC and before doing any output configuration. I strive to
+        make "use Log::ger;" statement to be roughly as light as "use
+        strict;" or "use warnings;" so the impact of adding the statement is
+        really minimal and you can just add logging without much thought to
+        most of your modules. This is important to me because I want logging
+        to be pervasive.
 
         To test for yourself, try e.g. with bencher-code:
 

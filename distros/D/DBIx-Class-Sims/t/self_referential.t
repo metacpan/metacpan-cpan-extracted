@@ -1,7 +1,7 @@
 # vi:sw=2
 use strictures 2;
 
-use Test::More;
+use Test2::V0 qw( done_testing );
 
 use lib 't/lib';
 
@@ -9,7 +9,6 @@ BEGIN {
   use loader qw(build_schema);
   build_schema([
     Company => {
-      table => 'companies',
       columns => {
         id => {
           data_type => 'int',
@@ -133,12 +132,12 @@ sims_test "Can force-create a parent on the skipped relationship" => {
   ],
   expect => {
     Company => [
-      { id => 1, parent_id => undef },
-      { id => 2, parent_id => 1 },
+      { id => 1, parent_id => 2 },
+      { id => 2, parent_id => undef },
     ],
   },
   rv => {
-    Company => { id => 2, parent_id => 1 },
+    Company => { id => 1, parent_id => 2 },
   },
 };
 

@@ -1,35 +1,41 @@
-0.006   2018-05-02 (PERLANCAR)
+0.007   2020-02-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Add configuration: all.
+
+
+0.006   2018-05-02  Released-By: PERLANCAR
 
 	- [doc] Update documentation on numeric level of warn (3 -> 30).
 
 
-0.005   2017-08-03 (PERLANCAR)
+0.005   2017-08-03  Released-By: PERLANCAR
 
 	- Also convert the level detection routines (is_*) to constant.
 
 
-0.004   2017-07-11 (PERLANCAR)
+0.004   2017-07-11  Released-By: PERLANCAR
 
 	- Avoid perl undef warning.
 
 
-0.003   2017-06-23 (PERLANCAR)
+0.003   2017-06-23  Released-By: PERLANCAR
 
 	- Adjust to Log::ger 0.005.
 
 
-0.003    2017-06-23 (PERLANCAR) (unreleased)
+0.003    2017-06-23  Released-By: PERLANCAR; Released: no
 
          - Rename dist from Log-ger-OptAway to Log-ger-Plugin-OptAway.
 
          - Adjust to Log::ger 0.005.
 
 
-0.002    2017-06-21 (PERLANCAR)
+0.002    2017-06-21  Released-By: PERLANCAR
 
          - Adjust to Log::ger 0.002.
 
 
-0.001    2017-06-19 (PERLANCAR)
+0.001    2017-06-19  Released-By: PERLANCAR
 
          - First release.
+

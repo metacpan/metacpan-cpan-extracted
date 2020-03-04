@@ -35,6 +35,9 @@ chansen
 drolsky
 errmsg
 formatter
+gregoa
+gregor
+herrmann
 ilmari
 key
 lib

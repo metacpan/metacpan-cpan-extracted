@@ -38,6 +38,7 @@
             "Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_to_path" : "0",
             "Data::Sah::Compiler::perl::TH::hash" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
+            "Data::Sah::Filter::perl::Str::replace_dashes_with_underscores" : "0",
             "File::Slurper::Dash" : "0",
             "Log::ger" : "0.027",
             "Module::Path::More" : "0.32",
@@ -50,7 +51,7 @@
             "Pod::Elide" : "0.003",
             "Sah::Schema::perl::pod_filename" : "0",
             "Sah::Schema::sortsub::spec" : "0",
-            "Sort::Sub" : "0.112",
+            "Sort::Sub" : "0.118",
             "Sort::SubList" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -78,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-App-PODUtils"
       }
    },
-   "version" : "0.045",
+   "version" : "0.046",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -92,6 +93,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript poddump",
+            "version" : "0.421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript reverse-pod-headings",
             "version" : "0.421"
          },
          {
@@ -249,12 +255,12 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.003"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
@@ -423,7 +429,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.06"
+                        "version" : "0.081"
                      }
                   ]
                }
@@ -444,7 +450,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",

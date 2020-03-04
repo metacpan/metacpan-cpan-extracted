@@ -200,9 +200,13 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-=head2 write_png_best( $img(piddle), $lut(piddle), $filename )
+=head2 write_png_best
 
 Like write_png(), but it assumes the best PNG compression (9).
+
+=for example
+
+  write_png_best( $img(piddle), $lut(piddle), $filename )
 
 =cut
 
@@ -215,9 +219,13 @@ sub write_png_best
     return write_png_ex( $img, $lut, $filename, 9 );
 } # End of write_png_best()...
 
-=head2 write_true_png_best( $img(piddle), $filename )
+=head2 write_true_png_best
 
 Like write_true_png(), but it assumes the best PNG compression (9).
+
+=for example
+
+  write_true_png_best( $img(piddle), $filename )
 
 =cut
 
@@ -329,7 +337,7 @@ sub read_true_png
 
 
 
-=head2 my $lut = read_png_lut( $filename )
+=head2 read_png_lut( $filename )
 
 Reads a color LUT from an already-existing palette PNG file.
 

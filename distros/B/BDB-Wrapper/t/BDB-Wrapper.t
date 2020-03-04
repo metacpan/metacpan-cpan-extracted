@@ -25,7 +25,7 @@ $bdbs{$bdb}=1;
 unlink $bdb if -f $bdb;
 my $bdb_home='';
 $bdb_home=$bdbw->get_bdb_home($bdb);
-ok($bdb_home=~ m!^/tmp/bdb_home!);
+ok($bdb_home=~ m!^/tmp/bdbwrapper!);
 
 my $bdbh;
 my $sort_code_ref=sub {lc $_[1] cmp lc $_[0]};
@@ -75,13 +75,19 @@ undef $write_hash_ref;
 my $hash_ref=$bdbw->create_read_hash_ref({'bdb'=>$bdb2});
 ok($hash_ref->{'write'}==1);
 
-my $new_bdbw=new BDB::Wrapper({'ram'=>1});
-my $new_dbh;
-my $test_bdb='test3.bdb';
-$bdbs{$test_bdb}=1;
-ok($new_dbh=$new_bdbw->create_write_dbh($test_bdb));
-ok($new_dbh->db_put('name', $value)==0);
-$new_dbh->db_close();
+if(-d "/dev/shm") {
+	my $new_bdbw=new BDB::Wrapper({'ram'=>1});
+	my $new_dbh;
+	my $test_bdb='test3.bdb';
+	$bdbs{$test_bdb}=1;
+	ok($new_dbh=$new_bdbw->create_write_dbh($test_bdb));
+	ok($new_dbh->db_put('name', $value)==0);
+	$new_dbh->db_close();
+}
+else{
+	ok(1==1);
+	ok(1==1);
+}
 
 my $bdbw3;
 my $no_lock_bdb='no_lock.bdb';
@@ -114,7 +120,7 @@ ok($bdbh->db_close()==0);
 
 my $bdb_dir=File::Spec->rel2abs($bdb);
 $bdb_dir=~ s!\.bdb$!!;
-$bdb_dir='/tmp/bdb_home'.$bdb_dir;
+$bdb_dir='/tmp/bdbwrapper/bdb_home'.$bdb_dir;
 ok($bdbw->get_bdb_home($bdb) eq $bdb_dir);
 
 
@@ -138,6 +144,7 @@ if(-d $bdbw4->get_bdb_home($no_env_bdb)){
 	if($path=~ m!^/tmp!){
 		system('rm -rf '.$path);
 	}
+	unlink $no_env_bdb;
 }
 my $no_env_bdbh=$bdbw4->create_write_dbh({'bdb'=>$no_env_bdb, 'no_env'=>1});
 ok($no_env_bdbh->db_put(1,2)==0);
@@ -176,6 +183,9 @@ foreach my $bdb (keys %bdbs){
 	unlink $bdb;
 }
 
+######
+# From here transaction
+my $rxn_bdbs = { };
 my $transaction_root_dir='/tmp/txn';
 my $txn1;
 my $trbdbw1=new BDB::Wrapper;
@@ -199,3 +209,8 @@ ok($trbdb_home=~ m!^$transaction_root_dir!);
 ok(-d $trbdb_home);
 $trbdbw1->clear_bdb_home({'bdb'=>$trbdb1, 'transaction'=>$transaction_root_dir});
 ok(!(-d $trbdb_home));
+
+unlink $trbdb1;
+if($trbdb_hom=~ m!^(?:/tmp/|/dev/shm)!){
+	system('rm -rf '.$trbdb_hom);
+}

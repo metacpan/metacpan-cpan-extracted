@@ -8,7 +8,7 @@ build_requires:
   Test::Requires: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
@@ -27,10 +27,10 @@ optional_features: {}
 provides:
   MooX::Pression:
     file: lib/MooX/Pression.pm
-    version: '0.510'
+    version: '0.514'
   Zydeco:
     file: lib/Zydeco.pm
-    version: '0.510'
+    version: '0.514'
 recommends:
   Class::XSAccessor: '0'
   MooX::TypeTiny: '0'
@@ -42,7 +42,7 @@ requires:
   Import::Into: '0'
   Keyword::Simple: '0'
   MooX::Press: '0.057'
-  PPR: '0'
+  PPR: '0.000023'
   Path::ScanINC: '0'
   Syntax::Keyword::Try: '0.11'
   perl: '5.014000'
@@ -52,6 +52,5 @@ resources:
   homepage: http://zydeco.toby.ink/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-zydeco.git
-version: '0.510'
+version: '0.514'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1

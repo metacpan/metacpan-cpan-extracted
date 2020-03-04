@@ -2,37 +2,55 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-use vars qw/$DTRACE/;
+our $VERSION = '1.000006';
 
-BEGIN {
-    require Test2::Harness::Util::DepTracer;
-    $DTRACE = Test2::Harness::Util::DepTracer->new;
-}
+use App::Yath::Util qw/find_pfile/;
+use App::Yath::Options;
 
-our $VERSION = '0.001099';
+use Test2::Harness::Run;
+use Test2::Harness::Util::Queue;
+use Test2::Harness::Util::File::JSON;
+use Test2::Harness::IPC;
 
-use File::Spec();
+use Test2::Harness::Util::JSON qw/encode_json decode_json/;
+use Test2::Harness::Util qw/mod2file open_file parse_exit/;
+use Test2::Util::Table qw/table/;
 
-use POSIX ":sys_wait_h";
+use Test2::Harness::Util::IPC qw/run_cmd USE_P_GROUPS/;
+
+use POSIX;
+use File::Spec;
+
 use Time::HiRes qw/sleep/;
 
-use App::Yath::Util qw/find_pfile PFILE_NAME find_yath/;
-use Test2::Harness::Util qw/open_file parse_exit/;
-
-use Test2::Harness::Run::Runner::Persist;
-use Test2::Harness::Util::File::JSON;
+use Carp qw/croak/;
+use File::Path qw/remove_tree/;
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase;
 
+include_options(
+    'App::Yath::Options::Debug',
+    'App::Yath::Options::PreCommand',
+    'App::Yath::Options::Runner',
+    'App::Yath::Options::Workspace',
+    'App::Yath::Options::Persist',
+);
+
+option_group {prefix => 'runner', category => "Persistent Runner Options"} => sub {
+    option quiet => (
+        short       => 'q',
+        type        => 'c',
+        description => "Be very quiet.",
+        default     => 0,
+    );
+};
+
+sub MAX_ATTACH() { 1_048_576 }
+
 sub group { 'persist' }
 
-sub has_jobs    { 1 }
-sub has_runner  { 1 }
-sub has_logger  { 0 }
-sub has_display { 0 }
 sub always_keep_dir { 1 }
-sub manage_runner { 0 }
 
 sub summary { "Start the persistent test runner" }
 sub cli_args { "" }
@@ -53,87 +71,83 @@ file over and over again.
 sub run {
     my $self = shift;
 
-    $self->pre_run();
+    my $settings = $self->settings;
+    my $dir      = $settings->workspace->workdir;
 
-    if (my $exists = find_pfile()) {
-        die "Persistent harness appears to be running, found $exists\n"
+    my $pfile = find_pfile($settings, vivify => 1);
+
+    if (-f $pfile) {
+        remove_tree($dir, {safe => 1, keep_root => 0});
+        die "Persistent harness appears to be running, found $pfile\n";
     }
 
-    my $settings = $self->{+SETTINGS};
-    my $pfile = File::Spec->rel2abs(PFILE_NAME(),$ENV{YATH_PERSISTENCE_DIR}||'./');
+    $self->write_settings_to($dir, 'settings.json');
 
-    my ($exit, $runner, $pid, $stat);
-    my $ok = eval {
-        my $run = $self->make_run_from_settings(finite => 0, keep_dir => 1);
+    my $run_queue = Test2::Harness::Util::Queue->new(file => File::Spec->catfile($dir, 'run_queue.jsonl'));
+    $run_queue->start();
 
-        $runner = Test2::Harness::Run::Runner::Persist->new(
-            dir => $settings->{dir},
-            run => $run,
-            script => find_yath(),
-            dtrace => $DTRACE,
-        );
+    $_->setup($self->settings) for @{$self->settings->harness->plugins};
 
-        my $queue = $runner->queue;
-        $queue->start;
+    my $stderr = File::Spec->catfile($dir, 'error.log');
+    my $stdout = File::Spec->catfile($dir, 'output.log');
 
-        $pid = $runner->spawn(setsid => 1, pfile => $pfile);
+    my $pid = run_cmd(
+        stderr => $stderr,
+        stdout => $stdout,
 
-        1;
-    };
-    my $err = $@;
+        no_set_pgrp => $settings->runner->daemon,
 
-    my $sig = $self->{+SIGNAL};
+        command => [
+            $^X, $settings->harness->script,
+            (map { "-D$_" } @{$settings->harness->dev_libs}),
+            '--no-scan-plugins',    # Do not preload any plugin modules
+            runner           => $dir,
+            monitor_preloads => 1,
+            persist          => $pfile,
+            jobs_todo        => 0,
+        ],
+    );
 
-    print STDERR $err if !$ok && !$sig;
-    print STDERR "Received SIG$sig\n" if $sig;
-
-    print "Waiting for runner...\n";
-
-    my $stdout = open_file($runner->out_log);
-    my $stderr = open_file($runner->err_log);
-
-    my $check = waitpid($pid, WNOHANG);
-    until($runner->ready || $check) {
-        while(my $line = <$stdout>) {
-            print STDOUT $line;
-        }
-        while (my $line = <$stderr>) {
-            print STDERR $line;
-        }
-        sleep 0.02;
-        $check = waitpid($pid, WNOHANG);
-    }
-
-    if ($check != 0) {
-        my $exit = parse_exit($?);
-        print STDERR "\nProblem with runner ($pid), waitpid returned $check, exit value: $exit->{err} Signal: $exit->{sig}\n";
-
-        while( my $line = <$stdout> ) {
-            print STDOUT $line;
-        }
-        while (my $line = <$stderr>) {
-            print STDERR $line;
-        }
-    }
-    else {
+    unless ($settings->runner->quiet) {
         print "\nPersistent runner started!\n";
 
         print "Runner PID: $pid\n";
-        print "Runner dir: $settings->{dir}\n";
-        print "Runner logs:\n";
-        print "  standard output: " . $runner->out_log. "\n";
-        print "  standard  error: " . $runner->err_log. "\n";
-        print "\nUse `yath watch` to monitor the persistent runner\n\n";
-
-        my $data = {
-            pid => $pid,
-            dir => $settings->{dir},
-        };
-
-        Test2::Harness::Util::File::JSON->new(name => $pfile)->write($data);
+        print "Runner dir: $dir\n";
+        print "\nUse `yath watch` to monitor the persistent runner\n\n" if $settings->runner->daemon;
     }
 
-    return $sig ? 255 : ($exit || 0);
+    Test2::Harness::Util::File::JSON->new(name => $pfile)->write({pid => $pid, dir => $dir, version => $VERSION});
+
+    return 0 if $settings->runner->daemon;
+
+    $SIG{TERM} = sub { kill(TERM => $pid) };
+    $SIG{INT}  = sub { kill(INT  => $pid) };
+
+    my $err_fh = open_file($stderr, '<');
+    my $out_fh = open_file($stdout, '<');
+
+    while (1) {
+        my $out = waitpid($pid, WNOHANG);
+        my $wstat = $?;
+
+        my $count = 0;
+        while (my $line = <$out_fh>) {
+            $count++;
+            print STDOUT $line;
+        }
+        while (my $line = <$err_fh>) {
+            $count++;
+            print STDERR $line;
+        }
+
+        sleep(0.02) unless $out || $count;
+
+        next if $out == 0;
+        return 255 if $out < 0;
+
+        my $exit = parse_exit($?);
+        return $exit->{err} || $exit->{sig} || 0;
+    }
 }
 
 1;
@@ -146,342 +160,436 @@ __END__
 
 =head1 NAME
 
-App::Yath::Command::start
+App::Yath::Command::start - Start the persistent test runner
 
 =head1 DESCRIPTION
 
-=head1 SYNOPSIS
+This command is used to start a persistant instance of yath. A persistant
+instance is useful because it allows you to preload modules in advance,
+reducing start time for any tests you decide to run as you work.
 
-=head1 COMMAND LINE USAGE
+A running instance will watch for changes to any preloaded files, and restart
+itself if anything changes. Changed files are blacklisted for subsequent
+reloads so that reloading is not a frequent occurence when editing the same
+file over and over again.
 
 
-    $ yath start [options]
+=head1 USAGE
 
-=head2 Help
+    $ yath [YATH OPTIONS] start [COMMAND OPTIONS]
+
+=head2 YATH OPTIONS
+
+=head3 Developer
+
+=over 4
+
+=item --dev-lib
+
+=item --dev-lib=lib
+
+=item -D
+
+=item -D=lib
+
+=item -Dlib
+
+=item --no-dev-lib
+
+Add paths to @INC before loading ANYTHING. This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
+
+Can be specified multiple times
+
+
+=back
+
+=head3 Environment
+
+=over 4
+
+=item --persist-dir ARG
+
+=item --persist-dir=ARG
+
+=item --no-persist-dir
+
+Where to find persistence files.
+
+
+=item --persist-file ARG
+
+=item --persist-file=ARG
+
+=item --pfile ARG
+
+=item --pfile=ARG
+
+=item --no-persist-file
+
+Where to find the persistence file. The default is /{system-tempdir}/project-yath-persist.json. If no project is specified then it will fall back to the current directory. If the current directory is not writable it will default to /tmp/yath-persist.json which limits you to one persistent runner on your system.
+
+
+=item --project ARG
+
+=item --project=ARG
+
+=item --project-name ARG
+
+=item --project-name=ARG
+
+=item --no-project
+
+This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file. This is necessary for a persistent runner.
+
+
+=back
+
+=head3 Help and Debugging
 
 =over 4
 
 =item --show-opts
 
+=item --no-show-opts
+
 Exit after showing what yath thinks your options mean
 
-=item -h
-
-=item --help
-
-Exit after showing this help message
-
-=item -V
 
 =item --version
 
-Show version information
+=item -V
+
+=item --no-version
+
+Exit after showing a helpful usage message
+
 
 =back
 
-=head2 Harness Options
+=head3 Plugins
 
 =over 4
 
-=item --id ID
+=item --no-scan-plugins
 
-=item --run_id ID
+=item --no-no-scan-plugins
 
-Set a specific run-id
+Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that it loading other modules when it should not.
 
-(Default: a UUID)
 
-=item --no-long
+=item --plugins PLUGIN
 
-Do not run tests with the HARNESS-DURATION-LONG header
+=item --plugins +App::Yath::Plugin::PLUGIN
 
-=item --only-long
+=item --plugins PLUGIN=arg1,arg2,...
 
-only run tests with the HARNESS-DURATION-LONG header
+=item --plugin PLUGIN
 
-=item --shm
+=item --plugin +App::Yath::Plugin::PLUGIN
 
-=item --no-shm
+=item --plugin PLUGIN=arg1,arg2,...
 
-Use shm for tempdir if possible (Default: off)
+=item -pPLUGIN
 
-Do not use shm.
+=item --no-plugins
 
-=item -C
+Load a yath plugin.
 
-=item --clear
+Can be specified multiple times
 
-Clear the work directory if it is not already empty
-
-=item -D
-
-=item --dummy
-
-Dummy run, do not actually execute tests
-
-=item -d path
-
-=item --dir path
-
-=item --workdir path
-
-Set the work directory
-
-(Default: new temp directory)
-
-=item -f name:details
-
-=item --field 'JSON_STRING'
-
-Add custom harness_run_fields
-
-=item -j #
-
-=item --jobs #
-
-=item --job-count #
-
-Set the number of concurrent jobs to run
-
-(Default: 1)
-
-=item -m Module
-
-=item --load Module
-
-=item --load-module Mod
-
-Load a module in each test (after fork)
-
-this option may be given multiple times
-
-=item -M Module
-
-=item --loadim Module
-
-=item --load-import Mod
-
-Load and import module in each test (after fork)
-
-this option may be given multiple times
-
-=item -P Module
-
-=item --preload Module
-
-Preload a module before running tests
-
-this option may be given multiple times
-
-=item -t path/
-
-=item --tmpdir path/
-
-Use a specific temp directory
-
-(Default: use system temp dir)
-
-=item -X foo
-
-=item --exclude-pattern bar
-
-Exclude files that match
-
-May be specified multiple times
-
-matched using `m/$PATTERN/`
-
-=item -x t/bad.t
-
-=item --exclude-file t/bad.t
-
-Exclude a file from testing
-
-May be specified multiple times
-
-=item --durations path
-
-=item --durations url
-
-Point at a json file or url which has a hash of relative test filenames as keys, and 'SHORT', 'MEDIUM', or 'LONG' as values. This will override durations listed in the file headers. An exception will be thrown if the durations file or url does not work.
-
-=item --et SECONDS
-
-=item --event_timeout #
-
-Kill test if no events received in timeout period
-
-(Default: 60 seconds)
-
-This is used to prevent the harness for waiting forever for a hung test. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.
-
-=item --maybe-durations path
-
-=item --maybe-durations url
-
-Same as 'durations' except not fatal if not found. If this and 'durations' are both specified then 'durations' is used as a fallback when this fails. You may specify this option multiple times and the first one that works will be used
-
-=item --no-preload
-
-cancel any preloads listed until now
-
-This can be used to negate preloads specified in .yath.rc or similar
-
-=item --pet SECONDS
-
-=item --post-exit-timeout #
-
-Stop waiting post-exit after the timeout period
-
-(Default: 15 seconds)
-
-Some tests fork and allow the parent to exit before writing all their output. If Test2::Harness detects an incomplete plan after the test exists it will monitor for more events until the timeout period. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.
 
 =back
 
-=head2 Job Options
+=head2 COMMAND OPTIONS
+
+=head3 Help and Debugging
+
+=over 4
+
+=item --dummy
+
+=item -d
+
+=item --no-dummy
+
+Dummy run, do not actually execute anything
+
+Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
+
+
+=item --help
+
+=item -h
+
+=item --no-help
+
+exit after showing help information
+
+
+=item --keep-dirs
+
+=item --keep_dir
+
+=item -k
+
+=item --no-keep-dirs
+
+Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
+
+
+=item --summary
+
+=item --summary=/path/to/summary.json
+
+=item --no-summary
+
+Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extention is added automatically if omitted.
+
+
+=back
+
+=head3 Persistent Runner Options
+
+=over 4
+
+=item --quiet
+
+=item -q
+
+=item --no-quiet
+
+Be very quiet.
+
+Can be specified multiple times
+
+
+=back
+
+=head3 Runner Options
 
 =over 4
 
 =item --blib
 
+=item -b
+
 =item --no-blib
 
-(Default: on) Include 'blib/lib' and 'blib/arch'
+(Default: include if it exists) Include 'blib/lib' and 'blib/arch' in your module path
 
-Do not include 'blib/lib' and 'blib/arch'
-
-=item --input-file file
-
-Use the specified file as standard input to ALL tests
-
-=item --lib
-
-=item --no-lib
-
-(Default: on) Include 'lib' in your module path
-
-Do not include 'lib'
-
-=item --tlib
-
-(Default: off) Include 't/lib' in your module path
-
-=item -E VAR=value
-
-=item --env-var VAR=val
-
-Set an environment variable for each test
-
-(but not the harness)
-
-=item -i "string"
-
-This input string will be used as standard input for ALL tests
-
-See also --input-file
-
-=item -I path/lib
-
-=item --include lib/
-
-Add a directory to your include paths
-
-This can be used multiple times
 
 =item --cover
 
-use Devel::Cover to calculate test coverage
+=item --cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl
 
-This is essentially the same as combining: '--no-fork', and '-MDevel::Cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl' Devel::Cover and preload/fork do not work well together.
+=item --no-cover
 
-=item --fork
+Use Devel::Cover to calculate test coverage. This disables forking. If no args are specified the following are used: -silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl
 
-=item --no-fork
 
-(Default: on) fork to start tests
+=item --daemon
 
-Do not fork to start tests
+=item --no-daemon
 
-Test2::Harness normally forks to start a test. Forking can break some select tests, this option will allow such tests to pass. This is not compatible with the "preload" option. This is also significantly slower. You can also add the "# HARNESS-NO-PRELOAD" comment to the top of the test file to enable this on a per-test basis.
+Start the runner as a daemon (Default: True)
 
-=item --stream
 
-=item --no-stream
+=item --event-timeout SECONDS
 
-=item --TAP
+=item --et SECONDS
 
-=item --tap
+=item --no-event-timeout
 
-Use 'stream' instead of TAP (Default: use stream)
+Kill test if no output is received within timeout period. (Default: 60 seconds). Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis. This prevents a hung test from running forever.
 
-Do not use stream
 
-Use TAP
+=item --include ARG
 
-The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.
+=item --include=ARG
+
+=item -I ARG
+
+=item -I=ARG
+
+=item --no-include
+
+Add a directory to your include paths
+
+Can be specified multiple times
+
+
+=item --job-count ARG
+
+=item --job-count=ARG
+
+=item --jobs ARG
+
+=item --jobs=ARG
+
+=item -j ARG
+
+=item -j=ARG
+
+=item --no-job-count
+
+Set the number of concurrent jobs to run (Default: 1)
+
+Can also be set with the following environment variables: C<YATH_JOB_COUNT>, C<T2_HARNESS_JOB_COUNT>, C<HARNESS_JOB_COUNT>
+
+
+=item --lib
+
+=item -l
+
+=item --no-lib
+
+(Default: include if it exists) Include 'lib' in your module path
+
+
+=item --post-exit-timeout SECONDS
+
+=item --pet SECONDS
+
+=item --no-post-exit-timeout
+
+Stop waiting post-exit after the timeout period. (Default: 15 seconds) Some tests fork and allow the parent to exit before writing all their output. If Test2::Harness detects an incomplete plan after the test exits it will monitor for more events until the timeout period. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.
+
+
+=item --preload-threshold ARG
+
+=item --preload-threshold=ARG
+
+=item --Pt ARG
+
+=item --Pt=ARG
+
+=item -W ARG
+
+=item -W=ARG
+
+=item --no-preload-threshold
+
+Only do preload if at least N tests are going to be run. In some cases a full preload takes longer than simply running the tests, this lets you specify a minimum number of test jobs that will be run for preload to happen. This has no effect for a persistent runner. The default is 0, and it means always preload.
+
+
+=item --preloads ARG
+
+=item --preloads=ARG
+
+=item --preload ARG
+
+=item --preload=ARG
+
+=item -P ARG
+
+=item -P=ARG
+
+=item --no-preloads
+
+Preload a module before running tests
+
+Can be specified multiple times
+
+
+=item --switch ARG
+
+=item --switch=ARG
+
+=item -S ARG
+
+=item -S=ARG
+
+=item --no-switch
+
+Pass the specified switch to perl for each test. This is not compatible with preload.
+
+Can be specified multiple times
+
+
+=item --tlib
+
+=item --no-tlib
+
+(Default: off) Include 't/lib' in your module path
+
 
 =item --unsafe-inc
 
 =item --no-unsafe-inc
 
-(Default: On) put '.' in @INC
-
-Do not put '.' in @INC
-
 perl is removing '.' from @INC as a security concern. This option keeps things from breaking for now.
 
-=item -A
+Can also be set with the following environment variables: C<PERL_USE_UNSAFE_INC>
 
-=item --author-testing
 
-=item --no-author-testing
+=item --use-fork
 
-This will set the AUTHOR_TESTING environment to true
+=item --fork
 
-Many cpan modules have tests that are only run if the AUTHOR_TESTING environment variable is set. This will cause those tests to run.
+=item --no-use-fork
 
-=item -k
+(default: on, except on windows) Normally tests are run by forking, which allows for features like preloading. This will turn off the behavior globally (which is not compatible with preloading). This is slower, it is better to tag misbehaving tests with the '# HARNESS-NO-PRELOAD' coment in their header to disable forking only for those tests.
 
-=item --keep-dir
+Can also be set with the following environment variables: C<!T2_NO_FORK>, C<T2_HARNESS_FORK>, C<!T2_HARNESS_NO_FORK>, C<YATH_FORK>, C<!YATH_NO_FORK>
 
-Do not delete the work directory when done
 
-This is useful if you want to inspect the work directory after the harness is done. The work directory path will be printed at the end.
+=item --use-timeout
 
-=item -S SW
+=item --timeout
 
-=item -S SW=val
+=item --no-use-timeout
 
-=item --switch SW=val
+(default: on) Enable/disable timeouts
 
-Pass the specified switch to perl for each test
-
-This is not compatible with preload.
 
 =back
 
-=head2 Plugins
+=head3 Workspace Options
 
 =over 4
 
-=item -pPlugin
+=item --clear
 
-=item -pPlugin=arg1,arg2,...
+=item -C
 
-=item -p+My::Plugin
+=item --no-clear
 
-=item --plugin Plugin
+Clear the work directory if it is not already empty
 
-Load a plugin
 
-can be specified multiple times
+=item --tmp-dir ARG
 
-=item --no-plugins
+=item --tmp-dir=ARG
 
-cancel any plugins listed until now
+=item --tmpdir ARG
 
-This can be used to negate plugins specified in .yath.rc or similar
+=item --tmpdir=ARG
+
+=item -t ARG
+
+=item -t=ARG
+
+=item --no-tmp-dir
+
+Use a specific temp directory (Default: use system temp dir)
+
+Can also be set with the following environment variables: C<T2_HARNESS_TEMP_DIR>, C<YATH_TEMP_DIR>, C<TMPDIR>, C<TEMPDIR>, C<TMP_DIR>, C<TEMP_DIR>
+
+
+=item --workdir ARG
+
+=item --workdir=ARG
+
+=item -w ARG
+
+=item -w=ARG
+
+=item --no-workdir
+
+Set the work directory (Default: new temp directory)
+
+Can also be set with the following environment variables: C<T2_WORKDIR>, C<YATH_WORKDIR>
+
 
 =back
 
@@ -508,7 +616,7 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2019 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -516,3 +624,4 @@ modify it under the same terms as Perl itself.
 See F<http://dev.perl.org/licenses/>
 
 =cut
+

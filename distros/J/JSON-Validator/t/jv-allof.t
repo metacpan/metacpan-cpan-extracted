@@ -39,4 +39,31 @@ validate_ok 'he110th3re', $schema,
   E('/', '/oneOf/1 String is too long: 10/4.'),
   E('/', '/oneOf/1 String does not match ^[a-z]+$.');
 
+validate_ok 'hello', {type => ['integer', 'boolean']},
+  E('/', 'Expected integer/boolean - got string.');
+
+validate_ok 'hello', {allOf => [{type => ['integer', 'boolean']}]},
+  E('/', '/allOf/0 Expected integer/boolean - got string.');
+
+validate_ok 'hello',
+  {
+  allOf => [
+    {allOf => [{type => 'boolean'}, {type => 'string', maxLength => 2}]},
+    {type  => 'integer'},
+  ],
+  },
+  E('/', '/allOf/0/allOf/0 Expected boolean - got string.'),
+  E('/', '/allOf/0/allOf/1 String is too long: 5/2.'),
+  E('/', '/allOf/1 Expected integer - got string.');
+
+validate_ok {foo => 'not an arrayref'},
+  {
+  allOf => [
+    {type => 'object', properties => {foo => {type => 'array'}}},
+    {type => 'boolean'},
+  ]
+  },
+  E('/foo', '/allOf/0 Expected array - got string.'),
+  E('/',    '/allOf/1 Expected boolean - got object.');
+
 done_testing;

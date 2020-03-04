@@ -129,10 +129,9 @@ if ($build->y_n("Would you like to perform read-only tests on a local database?"
     $build->notes( 'db_pass' =>
 		     $build->prompt("Enter Neo4j password: ","") );
   }
-}
-
-if ($build->notes('db_url')) {
-  $build->notes('ok_add_delete', $build->y_n("Will you allow add/delete tests on your database (cruft added will be removed)"));
+  if ($build->notes('db_url')) {
+    $build->notes('ok_add_delete', $build->y_n("Will you allow add/delete tests on your database (cruft added will be removed)?","y"));
+  }
 }
 
 

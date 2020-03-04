@@ -1,0 +1,40 @@
+---
+abstract: 'Beware empty alternatives, because they always match.'
+author:
+  - 'Thomas R. Wyant, III F<wyant at cpan dot org>'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives:
+    file: lib/Perl/Critic/Policy/RegularExpressions/ProhibitEmptyAlternatives.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  English: '0'
+  PPIx::Regexp: '0.07'
+  Perl::Critic::Exception::Configuration::Option::Policy::ParameterValue: '0'
+  Perl::Critic::Policy: '0'
+  Perl::Critic::Utils: '0'
+  Readonly: '0'
+  base: '0'
+  perl: '5.006001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-RegularExpressions-Alternative
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-Alternative.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

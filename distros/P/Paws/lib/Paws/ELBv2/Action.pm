@@ -3,6 +3,7 @@ package Paws::ELBv2::Action;
   has AuthenticateCognitoConfig => (is => 'ro', isa => 'Paws::ELBv2::AuthenticateCognitoActionConfig');
   has AuthenticateOidcConfig => (is => 'ro', isa => 'Paws::ELBv2::AuthenticateOidcActionConfig');
   has FixedResponseConfig => (is => 'ro', isa => 'Paws::ELBv2::FixedResponseActionConfig');
+  has ForwardConfig => (is => 'ro', isa => 'Paws::ELBv2::ForwardActionConfig');
   has Order => (is => 'ro', isa => 'Int');
   has RedirectConfig => (is => 'ro', isa => 'Paws::ELBv2::RedirectActionConfig');
   has TargetGroupArn => (is => 'ro', isa => 'Str');
@@ -62,12 +63,23 @@ returns a custom HTTP response. Specify only when C<Type> is
 C<fixed-response>.
 
 
+=head2 ForwardConfig => L<Paws::ELBv2::ForwardActionConfig>
+
+  Information for creating an action that distributes requests among one
+or more target groups. For Network Load Balancers, you can specify a
+single target group. Specify only when C<Type> is C<forward>. If you
+specify both C<ForwardConfig> and C<TargetGroupArn>, you can specify
+only one target group using C<ForwardConfig> and it must be the same
+target group specified in C<TargetGroupArn>.
+
+
 =head2 Order => Int
 
   The order for the action. This value is required for rules with
 multiple actions. The action with the lowest value for order is
-performed first. The final action to be performed must be a C<forward>
-or a C<fixed-response> action.
+performed first. The last action to be performed must be one of the
+following types of actions: a C<forward>, C<fixed-response>, or
+C<redirect>.
 
 
 =head2 RedirectConfig => L<Paws::ELBv2::RedirectActionConfig>
@@ -79,13 +91,13 @@ Specify only when C<Type> is C<redirect>.
 =head2 TargetGroupArn => Str
 
   The Amazon Resource Name (ARN) of the target group. Specify only when
-C<Type> is C<forward>.
+C<Type> is C<forward> and you want to route to a single target group.
+To route to one or more target groups, use C<ForwardConfig> instead.
 
 
 =head2 B<REQUIRED> Type => Str
 
-  The type of action. Each rule must include exactly one of the following
-types of actions: C<forward>, C<fixed-response>, or C<redirect>.
+  The type of action.
 
 
 

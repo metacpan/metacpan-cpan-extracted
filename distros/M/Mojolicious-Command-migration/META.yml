@@ -26,4 +26,4 @@ requires:
   SQL::Translator::Diff: '0'
   Test::Simple: '0.44'
   common::sense: '0'
-version: 0.16
+version: 0.17

@@ -17,7 +17,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Sah::Schemas::CPAN",
   "PREREQ_PM" => {
     "Data::Sah::Coerce::perl::To_str::From_str::to_upper" => 0,
-    "Perinci::Sub::XCompletion::lcpan_authorid" => 0
+    "Perinci::Sub::XCompletion::lcpan_authorid" => 0,
+    "Regexp::Pattern::CPAN" => "0.002",
+    "strict" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -25,7 +27,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +40,9 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::Sub::XCompletion::lcpan_authorid" => 0,
-  "Test::More" => 0
+  "Regexp::Pattern::CPAN" => "0.002",
+  "Test::More" => 0,
+  "strict" => 0
 );
 
 

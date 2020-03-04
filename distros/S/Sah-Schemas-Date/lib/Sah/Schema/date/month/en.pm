@@ -1,7 +1,9 @@
 package Sah::Schema::date::month::en;
 
-our $DATE = '2020-02-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-03'; # DATE
+our $DIST = 'Sah-Schemas-Date'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 our $schema = [cistr => {
     summary => 'Month number/name (abbreviated or full, in English)',
@@ -9,6 +11,15 @@ our $schema = [cistr => {
         1..12,
         qw/jan feb mar apr may jun jul aug sep oct nov dec/,
         qw/january february march april june july august september october november december/,
+    ],
+    examples => [
+        {data=>'', valid=>0},
+        {data=>1, valid=>1},
+        {data=>'jan', valid=>1},
+        {data=>'FeB', valid=>1},
+        {data=>'March', valid=>1},
+        {data=>'foo', valid=>0},
+        {data=>13, valid=>0},
     ],
 }, {}];
 
@@ -28,7 +39,55 @@ Sah::Schema::date::month::en - Month number/name (abbreviated or full, in Englis
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Sah::Schema::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+
+=head1 SYNOPSIS
+
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("date::month::en*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['date::month::en*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+
+Sample data:
+
+ ""  # INVALID
+
+ 1  # valid
+
+ "jan"  # valid
+
+ "FeB"  # valid
+
+ "March"  # valid
+
+ "foo"  # INVALID
+
+ 13  # INVALID
 
 =head1 HOMEPAGE
 

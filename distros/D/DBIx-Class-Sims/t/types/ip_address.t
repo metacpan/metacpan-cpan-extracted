@@ -1,27 +1,23 @@
 # vi:sw=2
-use strict;
-use warnings FATAL => 'all';
+use strictures 2;
 
-use Test::More;
+use Test2::V0 qw( done_testing cmp_ok );
 
-use_ok 'DBIx::Class::Sims::Types';
+use lib 't/lib';
+use types qw(types_test);
 
-my $sub = DBIx::Class::Sims::Types->can('ip_address');
-
-my $info = {
-  data_type => 'varchar',
-  sim => { type => 'ip_address' },
-};
-my $expected = qr/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
-for ( 1 .. 1000 ) {
-  my $val = $sub->($info);
-  if ( like( $sub->($info), $expected ) ) {
-    my @parts = split '\.', $val;
+types_test ip_address => {
+  tests => [
+    [ { data_type => 'varchar' }, qr/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, '0.0.0.0' ],
+  ],
+  addl_check => sub {
+    my ($v) = @_;
+    my @parts = split '\.', $v;
     foreach my $part ( @parts ) {
-      cmp_ok( $part, '>=', 1 );
+      cmp_ok( $part, '>=', 0 );
       cmp_ok( $part, '<=', 255 );
     }
   }
-}
+};
 
 done_testing;

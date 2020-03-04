@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 29 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 31 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FilterOrgByHeadlines.pm',
@@ -40,6 +40,8 @@ my @scripts = (
     'script/org-to-html-wordpress',
     'script/org2html',
     'script/org2html-wp',
+    'script/reverse-org-headlines',
+    'script/sort-org-headlines',
     'script/stat-org-document'
 );
 

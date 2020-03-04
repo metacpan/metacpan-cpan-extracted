@@ -24,13 +24,18 @@ requires:
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::code: '0'
+  Data::Sah::Compiler::perl::TH::hash: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::obj: '0'
   Data::Sah::Compiler::perl::TH::re: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
+  Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
+  Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
+  Data::Sah::Filter::perl::Str::replace_dashes_with_underscores: '0'
   DateTime: '0'
   Digest::MD5: '0'
   Exporter: '5.57'
+  File::Slurper::Dash: '0'
   File::Temp: '0'
   Function::Fallback::CoreOrPP: '0'
   Lingua::EN::Numbers::Ordinate: '0'
@@ -40,16 +45,21 @@ requires:
   Org::Document: '0'
   Org::Dump: '0.551'
   Org::Parser: '0.53'
-  Org::Parser::Tiny: '0.003'
+  Org::Parser::Tiny: '0.005'
   Org::To::HTML: '0.18'
   Org::To::HTML::WordPress: '0'
   Path::Tiny: '0'
   Perinci::CmdLine::Any: '0.09'
   Perinci::CmdLine::Lite: '1.820'
   Perinci::Sub::ArgEntity::filename: '0'
-  Perinci::Sub::ArgEntity::timezone: '0'
   Perinci::Sub::Util: '0.46'
+  Sah::Schema::date::tz_name: '0'
+  Sah::Schema::filename: '0'
+  Sah::Schema::posint: '0'
+  Sah::Schema::sortsub::spec: '0'
   Scalar::Util: '0'
+  Sort::Sub: '0.118'
+  Sort::SubList: '0'
   URI::Escape: '0'
   experimental: '0'
   open: '0'
@@ -60,7 +70,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils
   homepage: https://metacpan.org/release/App-OrgUtils
   repository: git://github.com/perlancar/perl-App-OrgUtils.git
-version: '0.472'
+version: '0.473'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -69,6 +79,14 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
       version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript count-org-headlines-fast'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript count-org-todos-fast'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript filter-org-by-headlines'
@@ -83,19 +101,19 @@ x_Dist_Zilla:
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript count-org-headlines-fast'
-      version: '0.421'
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript count-org-todos-fast'
-      version: '0.421'
-    -
-      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript org-to-html'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript org-to-html-wordpress'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript sort-org-headlines'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript reverse-org-headlines'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -215,7 +233,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -351,7 +369,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.07'
+              version: '0.081'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

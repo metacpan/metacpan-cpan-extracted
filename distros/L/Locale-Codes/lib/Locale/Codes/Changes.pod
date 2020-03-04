@@ -24,7 +24,23 @@ changes that you use, feel free to contact me.  Based on my available
 time and the time until the next release is scheduled, I will try to
 do a release any time the standards change.
 
-=head1 VERSION 3.63  (planned 2019-12-01  sbeck)
+=head1 VERSION 3.66  (planned 2020-12-01  sbeck)
+
+=head1 VERSION 3.65  (planned 2020-09-01  sbeck)
+
+=head1 VERSION 3.64  (planned 2020-06-01  sbeck)
+
+=head1 VERSION 3.63  (2020-03-01  sbeck)
+
+=over 5
+
+=item NEW CODE(s)
+
+NOTE: no code changes on 2019-12-01
+
+=item Fixed a retired code
+
+=back
 
 =head1 VERSION 3.62  (2019-08-29  sbeck)
 
@@ -1244,7 +1260,7 @@ Currently maintained by Sullivan Beck (sbeck@cpan.org).
 =head1 COPYRIGHT
 
    Copyright (c) 2001-2010 Neil Bowers
-   Copyright (c) 2010-2019 Sullivan Beck
+   Copyright (c) 2010-2020 Sullivan Beck
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::GuardDuty::
 
 =head1 DESCRIPTION
 
-This class has no description
+Contains other private IP address information of the EC2 instance.
 
 =head1 ATTRIBUTES
 

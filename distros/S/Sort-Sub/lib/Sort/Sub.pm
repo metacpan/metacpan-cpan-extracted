@@ -1,9 +1,9 @@
 package Sort::Sub;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-15'; # DATE
+our $DATE = '2020-02-28'; # DATE
 our $DIST = 'Sort-Sub'; # DIST
-our $VERSION = '0.116'; # VERSION
+our $VERSION = '0.118'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -23,7 +23,7 @@ our %argsopt_sortsub = (
 );
 
 sub get_sorter {
-    my ($spec, $args) = @_;
+    my ($spec, $args, $with_meta) = @_;
 
     my ($is_var, $name, $opts) = $spec =~ $re_spec
         or die "Invalid sorter spec '$spec', please use: ".
@@ -34,7 +34,14 @@ sub get_sorter {
     my $is_ci      = $opts =~ /i/;
     my $gen_sorter = \&{"Sort::Sub::$name\::gen_sorter"};
     my $sorter = $gen_sorter->($is_reverse, $is_ci, $args // {});
-    $sorter;
+    if ($with_meta) {
+        my $meta = {};
+        eval { $meta = &{"Sort::Sub::$name\::meta"}() };
+        warn if $@;
+        return ($sorter, $meta);
+    } else {
+        return $sorter;
+    }
 }
 
 sub import {
@@ -77,7 +84,7 @@ Sort::Sub - Collection of sort subroutines
 
 =head1 VERSION
 
-This document describes version 0.116 of Sort::Sub (from Perl distribution Sort-Sub), released on 2019-12-15.
+This document describes version 0.118 of Sort::Sub (from Perl distribution Sort-Sub), released on 2020-02-28.
 
 =head1 SYNOPSIS
 
@@ -170,8 +177,12 @@ is hashref to pass additional arguments to the C<gen_sorter()> routine. The
 subroutine should return a code reference.
 
 The module should also contain a C<meta> subroutine which returns a metadata
-L<DefHash>. Known properties (keys) include: C<v> (currently at 1), C<summary>.
-Other metadata properties will be added in the future.
+L<DefHash>. Known properties (keys) include: C<v> (currently at 1), C<summary>,
+C<compares_record> (bool, if set to true then sorter will be fed records C<<
+[$data, $order] >> instead of just C<$data>; C<$order> is a number that can be
+line number of array index; this allows sorter to sort by additional information
+instead of just the data items). Other metadata properties will be added in the
+future.
 
 =head1 FUNCTIONS
 
@@ -179,7 +190,7 @@ Other metadata properties will be added in the future.
 
 Usage:
 
- my $coderef = Sort::Sub::get_sorter('SPEC');
+ my $coderef = Sort::Sub::get_sorter('SPEC' [ , \%args [ , $with_meta ] ]);
 
 Example:
 
@@ -187,6 +198,12 @@ Example:
 
 This is an alternative to using the import interface. This function is not
 imported.
+
+If C<$with_meta> is set to true, will return this:
+
+ ($sorter, $meta)
+
+instead of just the C<$sorter> subroutine.
 
 =head1 HOMEPAGE
 
@@ -217,7 +234,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

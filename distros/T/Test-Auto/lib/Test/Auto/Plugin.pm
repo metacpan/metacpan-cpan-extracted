@@ -1,16 +1,21 @@
 package Test::Auto::Plugin;
 
-use Data::Object::Class;
-use Data::Object::ClassHas;
-use Data::Object::Signatures;
+use strict;
+use warnings;
 
-our $VERSION = '0.05'; # VERSION
+use Data::Object::Class;
+use Data::Object::Attributes;
+
+use registry 'Test::Auto::Types';
+use routines;
+
+our $VERSION = '0.07'; # VERSION
 
 # ATTRIBUTES
 
 has subtests => (
   is => 'ro',
-  isa => 'InstanceOf["Test::Auto::Subtests"]',
+  isa => 'Subtests',
   req => 1
 );
 
@@ -71,7 +76,7 @@ plugins.
 
 This package uses type constraints from:
 
-L<Data::Object::Library>
+L<Test::Auto::Types>
 
 =cut
 
@@ -83,9 +88,9 @@ This package has the following attributes:
 
 =head2 subtests
 
-  subtests(InstanceOf["Test::Auto::Subtests"])
+  subtests(Subtests)
 
-This attribute is read-only, accepts C<(InstanceOf["Test::Auto::Subtests"])> values, and is required.
+This attribute is read-only, accepts C<(Subtests)> values, and is required.
 
 =cut
 

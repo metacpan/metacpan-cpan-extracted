@@ -1,0 +1,14 @@
+This directory contains examples for the ProhibitEmptyAlternatives
+Perl-Critic policy. The files are:
+
+README - This file.
+
+empty-alternatives - This is a script that executes the
+    ProhibitEmptyAlternatives policy. It is more or less
+    equivalent to
+    $ perlcritic --single ProhibitEmptyAlternatives
+    but has its own configuration file. Use
+    $ numeric-character-classes --help
+    for the documentation.
+
+# ex: set filetype=text textwidth=72 autoindent :

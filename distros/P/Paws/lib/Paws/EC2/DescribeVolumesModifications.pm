@@ -42,11 +42,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         },
         ...
       ],                           # OPTIONAL
-      MaxResults => 1,             # OPTIONAL
-      NextToken  => 'MyString',    # OPTIONAL
-      VolumeIds  => [
-        'MyString', ...            # OPTIONAL
-      ],                           # OPTIONAL
+      MaxResults => 1,                        # OPTIONAL
+      NextToken  => 'MyString',               # OPTIONAL
+      VolumeIds  => [ 'MyVolumeId', ... ],    # OPTIONAL
     );
 
     # Results:
@@ -73,10 +71,11 @@ C<DryRunOperation>. Otherwise, it is C<UnauthorizedOperation>.
 
 =head2 Filters => ArrayRef[L<Paws::EC2::Filter>]
 
-The filters. Supported filters: C<volume-id>, C<modification-state>,
-C<target-size>, C<target-iops>, C<target-volume-type>,
-C<original-size>, C<original-iops>, C<original-volume-type>,
-C<start-time>.
+The filters. Supported filters: C<volume-id> | C<modification-state> |
+C<target-size> | C<target-iops> | C<target-volume-type> |
+C<original-size> | C<original-iops> | C<original-volume-type> |
+C<start-time> | C<originalMultiAttachEnabled> |
+C<targetMultiAttachEnabled>.
 
 
 

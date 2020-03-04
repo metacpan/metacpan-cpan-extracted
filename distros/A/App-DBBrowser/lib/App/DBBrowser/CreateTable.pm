@@ -38,45 +38,59 @@ sub create_view {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     require App::DBBrowser::Subqueries;
     my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $sql = {};
     $ax->reset_sql( $sql );
     $sf->{i}{stmt_types} = [ 'Create_view' ];
 
-    VIEW_NAME: while ( 1 ) {
-        $sql->{table} = '?';
-        $sql->{view_select_stmt} = '';
+    SELECT_STMT: while ( 1 ) {
+        $sql->{table} = '';
+        $sql->{view_select_stmt} = '?';
         $ax->print_sql( $sql );
-        # Readline
-        my $view = $tf->readline( 'View name: ' );
-        if ( ! length $view ) {
+        my $select_statment = $sq->choose_subquery( $sql );
+        if ( ! defined $select_statment ) {
             return;
         }
-        $sql->{table} = $ax->quote_table( [ undef, $sf->{d}{schema}, $view, 'VIEW' ] );
+        if ( $select_statment =~ s/^([\s(]+)(?=SELECT\s)//i ) {
+            my $count = $1 =~ tr/(//;
+            while ( $count-- ) {
+                $select_statment =~ s/\s*\)\s*\z//;
+            }
+        }
+        $sql->{view_select_stmt} = $select_statment;
+        $ax->print_sql( $sql );
 
-        SELECT_STMT: while ( 1 ) {
-            $sql->{view_select_stmt} = '?';
+        VIEW_NAME: while ( 1 ) {
+            $sql->{table} = '?';
             $ax->print_sql( $sql );
-            my $select_statment = $sq->choose_subquery( $sql );
-            if ( ! defined $select_statment ) {
-                next VIEW_NAME;
-            }
-            if ( $select_statment =~ s/^([\s(]+)(?=SELECT\s)//i ) {
-                my $count = $1 =~ tr/(//;
-                while ( $count-- ) {
-                    $select_statment =~ s/\s*\)\s*\z//;
-                }
-            }
-            $sql->{view_select_stmt} = $select_statment;
-            #$ax->print_sql( $sql );
-            my $ok_create_view = $sf->__create( $sql, 'view' );
-            if ( ! defined $ok_create_view ) {
+            # Readline
+            my $view = $tf->readline( 'View name: ' . $sf->{o}{create}{view_name_prefix} );
+            if ( ! length $view ) {
                 next SELECT_STMT;
             }
-            elsif( ! $ok_create_view ) {
+            $view = $sf->{o}{create}{view_name_prefix} . $view;
+            $sql->{table} = $ax->quote_table( [ undef, $sf->{d}{schema}, $view, 'VIEW' ] );
+            if ( none { $sql->{table} eq $ax->quote_table( $sf->{d}{tables_info}{$_} ) } keys %{$sf->{d}{tables_info}} ) {
+                my $ok_create_view = $sf->__create( $sql, 'view' );
+                if ( ! defined $ok_create_view ) {
+                    next SELECT_STMT;
+                }
+                elsif( ! $ok_create_view ) {
+                    return;
+                }
+                return 1;
+            }
+            $ax->print_sql( $sql );
+            my $prompt = "$sql->{table} already exists.";
+            my $choice = $tc->choose(
+                [ undef, '  New name' ],
+                { %{$sf->{i}{lyt_v}}, prompt => $prompt }
+            );
+            if ( ! defined $choice ) {
                 return;
             }
-            return 1;
+            next VIEW_NAME;
         }
     }
 }
@@ -143,6 +157,11 @@ sub create_table {
                         if ( ! $drop_ok ) {
                             return;
                         }
+                        $sf->{i}{stmt_types} = [ 'Create_table', 'Insert' ];
+                        if ( exists $sf->{i}{ct}{shifted_header} ) {
+                            unshift @{$sql->{insert_into_args}}, delete $sf->{i}{ct}{shifted_header};
+                        }
+                        next SET_COLUMNS;
                     }
                 }
                 my $file_fs = $sf->{i}{gc}{file_fs};
@@ -165,13 +184,13 @@ sub __create {
     my ( $sf, $sql, $type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    $sf->{i}{occupied_term_height} = 4;
+    $sf->{i}{occupied_term_height} = 5;
     $ax->print_sql( $sql );
     my ( $no, $yes ) = ( '- NO', '- YES' );
-    my $prompt = "CREATE $type $sql->{table}";
+    my $prompt = "Create $type $sql->{table}";
     if ( @{$sql->{insert_into_args}} ) {
         my $row_count = @{$sql->{insert_into_args}};
-        $prompt .= "\nINSERT " . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . " row";
+        $prompt .= "\nInsert " . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . " row";
         $prompt .= "s" if @{$sql->{insert_into_args}} > 1;
     }
     # Choose

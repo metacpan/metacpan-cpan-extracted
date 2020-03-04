@@ -9,6 +9,7 @@ Files: Changes
  dist.ini
  doap.ttl
  lib/MooX/Pression.pm
+ t/00begin.t
  t/02synopsis.t
  t/03subclass.t
  t/04requires.t
@@ -59,6 +60,7 @@ License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
  LICENSE
+ Makefile.PL
  examples/mip-087-001.pl
  examples/simple-json-encoder.pl
  t/lib/Local/Example/MoreClasses.pl
@@ -71,10 +73,6 @@ Files: COPYRIGHT
  SIGNATURE
 Copyright: None
 License: public-domain
-
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
 
 Files: examples/bench.pl
 Copyright: This software is copyright (c) 2013, 2020 by Toby Inkster.

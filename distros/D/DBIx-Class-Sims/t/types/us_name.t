@@ -1,20 +1,15 @@
 # vi:sw=2
-use strict;
-use warnings FATAL => 'all';
+use strictures 2;
 
-use Test::More;
+use Test2::V0 qw( done_testing like );
 
-use_ok 'DBIx::Class::Sims::Types';
+use lib 't/lib';
+use types qw(types_test);
 
-my $sub = DBIx::Class::Sims::Types->can('us_name');
-
-my $info = {
-  data_type => 'varchar',
-  sim => { type => 'us_name' },
+types_test us_name => {
+  tests => [
+    [ { data_type => 'varchar'}, qr/^\w+ (?:\w\. )?[\w']+(?: \w+)?(?: .+)?$/, 'Aidan A. Jones Jr' ],
+  ],
 };
-my $expected = qr/^\w+ (?:\w\. )?[\w']+(?: \w+)?(?: .+)?$/;
-for ( 1 .. 1000 ) {
-  like( $sub->($info), $expected );
-}
 
 done_testing;

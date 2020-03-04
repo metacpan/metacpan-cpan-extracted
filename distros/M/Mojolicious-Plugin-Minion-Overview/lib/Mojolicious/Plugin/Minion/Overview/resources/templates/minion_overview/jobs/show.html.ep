@@ -64,7 +64,9 @@
             <div class="col-md-2">
                 <strong>Result</strong>
             </div>
-            <div class="col"><%= $job->info->{ result } %></div>
+            <div class="col">
+                <pre class="prettyprint lang-perl" style="white-space: pre-wrap;"><%= $job->info->{ result } %></pre>
+            </div>
         </div>
     </div>
 </div>
@@ -74,7 +76,7 @@
         <h5>Data</h5>
     </div>
     <div class="card-body code-bg">
-        <%= to_json($job->info->{ args }) %>
+        <pre id="json"><%= to_json($job->info->{ args }) %></pre>
     </div>
 </div>
 
@@ -94,3 +96,17 @@
         % }
     </div>
 % }
+
+% content_for stylesheet => begin
+    %= stylesheet '//cdn.jsdelivr.net/npm/pretty-print-json@0.2/dist/pretty-print-json.css'
+% end
+
+% content_for javascript => begin
+    %= javascript '//cdn.jsdelivr.net/npm/pretty-print-json@0.2/dist/pretty-print-json.min.js'
+    %= javascript '//cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js'
+
+    %= javascript begin
+        const json = document.getElementById('json');
+        json.innerHTML = prettyPrintJson.toHtml(<%== to_json($job->info->{ args }) %>);
+    % end
+% end

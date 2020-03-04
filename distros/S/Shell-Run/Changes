@@ -1,19 +1,29 @@
 Revision history for Shell-Run
+0.10	Sun Mar 1 15:52:31 2020 +0100
+		[feature]
+		consider encoding
+
+0.09	Sun Mar 1 11:34:24 2020 +0100
+		[feature]
+		remove usage of IO::String
+
 0.08	Mon Oct 28 21:13:21 2019 +0100
 		[meta]
-		-added new test to MANIFEST
+		added new test to MANIFEST
 
 0.07	Mon Oct 28 19:13:54 2019 +0100
 		[test]
-		- check if OS has a 'sh' executable
+		check if OS has a 'sh' executable
 	
 0.06	Fri Oct 25 00:00:48 2019 +0200
 		[feature]
 		added procedural interface
+
 		provide command exit status
 
 		[pod]
 		documented procedural interface
+
 		documented return value
 
 		[fix]
@@ -33,6 +43,7 @@ Revision history for Shell-Run
 0.03	Thu Oct 17 19:54:54 2019 +0200
 		[fix]
 		adjusted minimum perl version
+
 		more specific TODO in test
 
 		[pod]

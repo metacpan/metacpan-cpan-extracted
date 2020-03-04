@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
     "script/elide-pod",
     "script/poddump",
     "script/podless",
+    "script/reverse-pod-headings",
     "script/sort-pod-headings"
   ],
   "LICENSE" => "perl",
@@ -29,6 +30,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_to_path" => 0,
     "Data::Sah::Compiler::perl::TH::hash" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
+    "Data::Sah::Filter::perl::Str::replace_dashes_with_underscores" => 0,
     "File::Slurper::Dash" => 0,
     "Log::ger" => "0.027",
     "Module::Path::More" => "0.32",
@@ -41,7 +43,7 @@ my %WriteMakefileArgs = (
     "Pod::Elide" => "0.003",
     "Sah::Schema::perl::pod_filename" => 0,
     "Sah::Schema::sortsub::spec" => 0,
-    "Sort::Sub" => "0.112",
+    "Sort::Sub" => "0.118",
     "Sort::SubList" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -52,7 +54,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.045",
+  "VERSION" => "0.046",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,6 +67,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_to_path" => 0,
   "Data::Sah::Compiler::perl::TH::hash" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
+  "Data::Sah::Filter::perl::Str::replace_dashes_with_underscores" => 0,
   "File::Slurper::Dash" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -80,7 +83,7 @@ my %FallbackPrereqs = (
   "Pod::Elide" => "0.003",
   "Sah::Schema::perl::pod_filename" => 0,
   "Sah::Schema::sortsub::spec" => 0,
-  "Sort::Sub" => "0.112",
+  "Sort::Sub" => "0.118",
   "Sort::SubList" => 0,
   "Test::More" => 0,
   "strict" => 0,

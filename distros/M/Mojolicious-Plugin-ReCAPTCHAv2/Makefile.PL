@@ -16,9 +16,10 @@ my %WriteMakefileArgs = (
   "LICENSE" => "gpl",
   "NAME" => "Mojolicious::Plugin::ReCAPTCHAv2",
   "PREREQ_PM" => {
+    "IO::Socket::SSL" => 0,
     "Mojolicious" => "7.53"
   },
-  "VERSION" => "1.04",
+  "VERSION" => "1.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -26,6 +27,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "IO::Socket::SSL" => 0,
   "Mojolicious" => "7.53"
 );
 

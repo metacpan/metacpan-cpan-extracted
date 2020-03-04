@@ -6,6 +6,7 @@ TARGETS ?= \
 CC       = g++
 LD       = $(CC)
 OFLAGS ?= -O2
+#OFLAGS ?= -ggdb -O0
 CFLAGS ?= -Wall -D_FILE_OFFSET_BITS=64 $(OFLAGS) -fopenmp 
 CXXFLAGS ?= $(CFLAGS)
 LDFLAGS ?= $(CFLAGS)

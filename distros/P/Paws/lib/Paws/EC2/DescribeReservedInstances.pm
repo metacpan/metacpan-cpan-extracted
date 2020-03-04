@@ -42,11 +42,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         },
         ...
       ],                           # OPTIONAL
-      OfferingClass        => 'standard',             # OPTIONAL
-      OfferingType         => 'Heavy Utilization',    # OPTIONAL
-      ReservedInstancesIds => [
-        'MyString', ...                               # OPTIONAL
-      ],                                              # OPTIONAL
+      OfferingClass        => 'standard',                    # OPTIONAL
+      OfferingType         => 'Heavy Utilization',           # OPTIONAL
+      ReservedInstancesIds => [ 'MyReservationId', ... ],    # OPTIONAL
     );
 
     # Results:

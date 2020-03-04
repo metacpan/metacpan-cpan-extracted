@@ -1,5 +1,5 @@
 package Date::Manip::TZ;
-# Copyright (c) 2008-2019 Sullivan Beck. All rights reserved.
+# Copyright (c) 2008-2020 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -25,7 +25,7 @@ use Date::Manip::Base;
 use Data::Dumper;
 
 our $VERSION;
-$VERSION='6.79';
+$VERSION='6.81';
 END { undef $VERSION; }
 
 # To get rid of a 'used only once' warnings.

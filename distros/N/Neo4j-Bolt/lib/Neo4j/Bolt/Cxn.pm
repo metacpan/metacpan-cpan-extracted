@@ -1,6 +1,6 @@
 package Neo4j::Bolt::Cxn;
 BEGIN {
-  our $VERSION = "0.11";
+  our $VERSION = "0.12";
   require Neo4j::Bolt::TypeHandlersC;
   eval 'require Neo4j::Bolt::Config; 1';
 }

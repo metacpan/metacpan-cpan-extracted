@@ -7,7 +7,7 @@ my @calls;
 
 do {
     package MyApp::Dispatcher::Rule::Language;
-    use Any::Moose;
+    use Moo;
     extends 'Path::Dispatcher::Rule::Enum';
 
     has '+enum' => (

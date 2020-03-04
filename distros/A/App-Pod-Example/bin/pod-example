@@ -5,7 +5,7 @@ use warnings;
 
 use App::Pod::Example;
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 # Run.
 App::Pod::Example->new->run;
@@ -100,6 +100,6 @@ L<http://skim.cz>
 
 =head1 VERSION
 
-0.17
+0.18
 
 =cut

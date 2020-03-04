@@ -1,8 +1,10 @@
 package Paws::EMR::ClusterSummary;
   use Moose;
+  has ClusterArn => (is => 'ro', isa => 'Str');
   has Id => (is => 'ro', isa => 'Str');
   has Name => (is => 'ro', isa => 'Str');
   has NormalizedInstanceHours => (is => 'ro', isa => 'Int');
+  has OutpostArn => (is => 'ro', isa => 'Str');
   has Status => (is => 'ro', isa => 'Paws::EMR::ClusterStatus');
 1;
 
@@ -23,20 +25,25 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::EMR::ClusterSummary object:
 
-  $service_obj->Method(Att1 => { Id => $value, ..., Status => $value  });
+  $service_obj->Method(Att1 => { ClusterArn => $value, ..., Status => $value  });
 
 =head3 Results returned from an API call
 
 Use accessors for each attribute. If Att1 is expected to be an Paws::EMR::ClusterSummary object:
 
   $result = $service_obj->Method(...);
-  $result->Att1->Id
+  $result->Att1->ClusterArn
 
 =head1 DESCRIPTION
 
 The summary description of the cluster.
 
 =head1 ATTRIBUTES
+
+
+=head2 ClusterArn => Str
+
+  The Amazon Resource Name of the cluster.
 
 
 =head2 Id => Str
@@ -57,6 +64,12 @@ m1.small instance runs. Larger instances are weighted more, so an EC2
 instance that is roughly four times more expensive would result in the
 normalized instance hours being incremented by four. This result is
 only an approximation and does not reflect the actual billing rate.
+
+
+=head2 OutpostArn => Str
+
+  The Amazon Resource Name (ARN) of the Outpost where the cluster is
+launched.
 
 
 =head2 Status => L<Paws::EMR::ClusterStatus>

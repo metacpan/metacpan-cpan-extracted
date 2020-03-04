@@ -1,5 +1,11 @@
 Revision history for Perl extension Sweat
 
+202002270 2020-02-28T01:54:16Z
+
+    - Adding a simple interactive mode.
+
+    - Better handling of unset configuration options and connectivity problems. Thanks to grai ("sudo-batman") for the bug reports.
+
 202002100 2020-02-10T15:40:59Z
 
     - Adding a "refocus" option that will attempt to refocus back to the window Sweat is running in after it opens a browser window.

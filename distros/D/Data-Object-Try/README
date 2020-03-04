@@ -1,0 +1,419 @@
+NAME
+
+    Data::Object::Try
+
+ABSTRACT
+
+    Try Class for Perl 5
+
+SYNOPSIS
+
+      use strict;
+      use warnings;
+      use routines;
+    
+      use Data::Object::Try;
+    
+      my $try = Data::Object::Try->new;
+    
+      $try->call(fun (@args) {
+        # try something
+    
+        return time;
+      });
+    
+      $try->catch('Example::Exception', fun ($caught) {
+        # caught an exception
+    
+        return;
+      });
+    
+      $try->default(fun ($caught) {
+        # catch the uncaught
+    
+        return;
+      });
+    
+      $try->finally(fun (@args) {
+        # always run after try/catch
+    
+        return;
+      });
+    
+      my @args;
+    
+      my $result = $try->result(@args);
+
+DESCRIPTION
+
+    This package provides an object-oriented interface for performing
+    complex try/catch operations.
+
+ATTRIBUTES
+
+    This package has the following attributes:
+
+ arguments
+
+      arguments(ArrayRef)
+
+    This attribute is read-only, accepts (ArrayRef) values, and is
+    optional.
+
+ invocant
+
+      invocant(Object)
+
+    This attribute is read-only, accepts (Object) values, and is optional.
+
+ on_catch
+
+      on_catch(ArrayRef[CodeRef])
+
+    This attribute is read-write, accepts (ArrayRef[CodeRef]) values, and
+    is optional.
+
+ on_default
+
+      on_default(CodeRef)
+
+    This attribute is read-write, accepts (CodeRef) values, and is
+    optional.
+
+ on_finally
+
+      on_finally(CodeRef)
+
+    This attribute is read-write, accepts (CodeRef) values, and is
+    optional.
+
+ on_try
+
+      on_try(CodeRef)
+
+    This attribute is read-write, accepts (CodeRef) values, and is
+    optional.
+
+METHODS
+
+    This package implements the following methods:
+
+ call
+
+      call(Str | CodeRef $arg) : Object
+
+    The call method takes a method name or coderef, registers it as the
+    tryable routine, and returns the object. When invoked, the callback
+    will received an invocant if one was provided to the constructor, the
+    default arguments if any were provided to the constructor, and whatever
+    arguments were provided by the invocant.
+
+    call example #1
+
+        my $try = Data::Object::Try->new;
+      
+        $try->call(fun (@args) {
+      
+          return [@args];
+        });
+
+ callback
+
+      callback(Str | CodeRef $arg) : CodeRef
+
+    The callback method takes a method name or coderef, and returns a
+    coderef for registration. If a coderef is provided this method is
+    mostly a passthrough.
+
+    callback example #1
+
+        my $try = Data::Object::Try->new;
+      
+        $try->callback(fun (@args) {
+      
+          return [@args];
+        });
+
+    callback example #2
+
+        package Example;
+      
+        use Moo;
+      
+        fun test(@args) {
+      
+          return [@args];
+        }
+      
+        package main;
+      
+        my $try = Data::Object::Try->new(
+          invocant => Example->new
+        );
+      
+        $try->callback('test');
+
+ catch
+
+      catch(Str $isa, Str | CodeRef $arg) : Any
+
+    The catch method takes a package or ref name, and when triggered checks
+    whether the captured exception is of the type specified and if so
+    executes the given callback.
+
+    catch example #1
+
+        my $try = Data::Object::Try->new;
+      
+        $try->call(fun (@args) {
+      
+          die $try;
+        });
+      
+        $try->catch('Data::Object::Try', fun (@args) {
+      
+          return [@args];
+        });
+
+ default
+
+      default(Str | CodeRef $arg) : Object
+
+    The default method takes a method name or coderef and is triggered if
+    no catch conditions match the exception thrown.
+
+    default example #1
+
+        my $try = Data::Object::Try->new;
+      
+        $try->call(fun (@args) {
+      
+          die $try;
+        });
+      
+        $try->default(fun (@args) {
+      
+          return [@args];
+        });
+
+ execute
+
+      execute(CodeRef $arg, Any @args) : Any
+
+    The execute method takes a coderef and executes it with any given
+    arguments. When invoked, the callback will received an invocant if one
+    was provided to the constructor, the default arguments if any were
+    provided to the constructor, and whatever arguments were passed
+    directly to this method.
+
+    execute example #1
+
+        my $try = Data::Object::Try->new(
+          invocant => Example->new,
+          arguments => [1,2,3]
+        );
+      
+        $try->execute(fun (@args) {
+      
+          return [@args];
+        });
+
+ finally
+
+      finally(Str | CodeRef $arg) : Object
+
+    The finally method takes a package or ref name and always executes the
+    callback after a try/catch operation. The return value is ignored. When
+    invoked, the callback will received an invocant if one was provided to
+    the constructor, the default arguments if any were provided to the
+    constructor, and whatever arguments were provided by the invocant.
+
+    finally example #1
+
+        my $try = Data::Object::Try->new(
+          invocant => Example->new,
+          arguments => [1,2,3]
+        );
+      
+        $try->call(fun (@args) {
+      
+          return $try;
+        });
+      
+        $try->finally(fun (@args) {
+      
+          $try->{'$finally'} = [@args];
+        });
+
+ maybe
+
+      maybe() : Object
+
+    The maybe method registers a default catch condition that returns
+    falsy, i.e. an empty string, if an exception is encountered.
+
+    maybe example #1
+
+        my $try = Data::Object::Try->new;
+      
+        $try->call(fun (@args) {
+      
+          die $try;
+        });
+      
+        $try->maybe;
+
+ no_catch
+
+      no_catch() : Object
+
+    The no_catch method removes any configured catch conditions and returns
+    the object.
+
+    no_catch example #1
+
+        my $try = Data::Object::Try->new;
+      
+        $try->call(fun (@args) {
+      
+          die $try;
+        });
+      
+        $try->catch('Data::Object::Try', fun (@args) {
+      
+          return [@args];
+        });
+      
+        $try->no_catch;
+
+ no_default
+
+      no_default() : Object
+
+    The no_default method removes any configured default condition and
+    returns the object.
+
+    no_default example #1
+
+        my $try = Data::Object::Try->new;
+      
+        $try->call(fun (@args) {
+      
+          die $try;
+        });
+      
+        $try->default(fun (@args) {
+      
+          return [@args];
+        });
+      
+        $try->no_default;
+
+ no_finally
+
+      no_finally() : Object
+
+    The no_finally method removes any configured finally condition and
+    returns the object.
+
+    no_finally example #1
+
+        my $try = Data::Object::Try->new(
+          invocant => Example->new,
+          arguments => [1,2,3]
+        );
+      
+        $try->call(fun (@args) {
+      
+          return $try;
+        });
+      
+        $try->finally(fun (@args) {
+      
+          $try->{'$finally'} = [@args];
+        });
+      
+        $try->no_finally;
+
+ no_try
+
+      no_try() : Object
+
+    The no_try method removes any configured try operation and returns the
+    object.
+
+    no_try example #1
+
+        my $try = Data::Object::Try->new;
+      
+        $try->call(fun (@args) {
+      
+          return [@args];
+        });
+      
+        $try->no_try;
+
+ result
+
+      result(Any @args) : Any
+
+    The result method executes the try/catch/default/finally logic and
+    returns either 1) the return value from the successfully tried
+    operation 2) the return value from the successfully matched catch
+    condition if an exception was thrown 3) the return value from the
+    default catch condition if an exception was thrown and no catch
+    condition matched. When invoked, the try and finally callbacks will
+    received an invocant if one was provided to the constructor, the
+    default arguments if any were provided to the constructor, and whatever
+    arguments were passed directly to this method.
+
+    result example #1
+
+        my $try = Data::Object::Try->new;
+      
+        $try->call(fun (@args) {
+      
+          return [@args];
+        });
+      
+        $try->result;
+
+    result example #2
+
+        my $try = Data::Object::Try->new;
+      
+        $try->call(fun (@args) {
+      
+          return [@args];
+        });
+      
+        $try->result(1..5);
+
+AUTHOR
+
+    Al Newkirk, awncorp@cpan.org
+
+LICENSE
+
+    Copyright (C) 2011-2019, Al Newkirk, et al.
+
+    This is free software; you can redistribute it and/or modify it under
+    the terms of the The Apache License, Version 2.0, as elucidated in the
+    "license file"
+    <https://github.com/iamalnewkirk/data-object-try/blob/master/LICENSE>.
+
+PROJECT
+
+    Wiki <https://github.com/iamalnewkirk/data-object-try/wiki>
+
+    Project <https://github.com/iamalnewkirk/data-object-try>
+
+    Initiatives <https://github.com/iamalnewkirk/data-object-try/projects>
+
+    Milestones <https://github.com/iamalnewkirk/data-object-try/milestones>
+
+    Contributing
+    <https://github.com/iamalnewkirk/data-object-try/blob/master/CONTRIBUTE.md>
+
+    Issues <https://github.com/iamalnewkirk/data-object-try/issues>
+

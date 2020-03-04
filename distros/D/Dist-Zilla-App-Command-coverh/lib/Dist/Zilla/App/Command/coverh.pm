@@ -4,8 +4,9 @@ use warnings;
 
 package Dist::Zilla::App::Command::coverh;
 
-our $VERSION = '0.0100'; # VERSION
+our $VERSION = '0.0101';
 # ABSTRACT: Code coverage metrics, with history
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
 
 use Dist::Zilla::App -command;
 
@@ -22,7 +23,7 @@ sub execute {
 
     require File::chdir;
     require Path::Tiny;
-    import Path::Tiny;
+    Path::Tiny->import;
     require File::Temp;
     require DateTime;
     require JSON::MaybeXS;
@@ -86,6 +87,7 @@ sub cover {
 
     $zilla->ensure_built_in($cover_dir);
     $self->zilla->run_tests_in($cover_dir);
+
     $self->log(join ' ' => @cover_command);
 
     {
@@ -129,22 +131,21 @@ Dist::Zilla::App::Command::coverh - Code coverage metrics, with history
 
 
 
-=begin HTML
+=begin html
 
-<p><img src="https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg" alt="Requires Perl 5.10.1+" /> <a href="https://travis-ci.org/Csson/p5-Dist-Zilla-App-Command-coverh"><img src="https://api.travis-ci.org/Csson/p5-Dist-Zilla-App-Command-coverh.svg?branch=master" alt="Travis status" /></a> <img src="https://img.shields.io/badge/coverage-19.1%-red.svg" alt="coverage 19.1%" /></p>
+<p>
+<img src="https://img.shields.io/badge/perl-5.10.1+-blue.svg" alt="Requires Perl 5.10.1+" />
+<a href="https://travis-ci.org/Csson/p5-Dist-Zilla-App-Command-coverh"><img src="https://api.travis-ci.org/Csson/p5-Dist-Zilla-App-Command-coverh.svg?branch=master" alt="Travis status" /></a>
+<a href="http://cpants.cpanauthors.org/release/CSSON/Dist-Zilla-App-Command-coverh-0.0101"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/Dist-Zilla-App-Command-coverh/0.0101" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=Dist-Zilla-App-Command-coverh%200.0101"><img src="http://badgedepot.code301.com/badge/cpantesters/Dist-Zilla-App-Command-coverh/0.0101" alt="CPAN Testers result" /></a>
+<img src="https://img.shields.io/badge/coverage-19.1%-red.svg" alt="coverage 19.1%" />
+</p>
 
-=end HTML
-
-
-=begin markdown
-
-![Requires Perl 5.10.1+](https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg) [![Travis status](https://api.travis-ci.org/Csson/p5-Dist-Zilla-App-Command-coverh.svg?branch=master)](https://travis-ci.org/Csson/p5-Dist-Zilla-App-Command-coverh) ![coverage 19.1%](https://img.shields.io/badge/coverage-19.1%-red.svg)
-
-=end markdown
+=end html
 
 =head1 VERSION
 
-Version 0.0100, released 2016-01-17.
+Version 0.0101, released 2020-02-29.
 
 =head1 SYNOPSIS
 
@@ -192,7 +193,7 @@ L<Devel::Cover>
 
 =head1 ACKNOWLEDGEMENTS
 
-Some parts where borrowed from L<Dist::Zilla::App::Command::cover>.
+Some parts were borrowed from L<Dist::Zilla::App::Command::cover>.
 
 =head1 SOURCE
 

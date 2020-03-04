@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "Complete::Util" => "0.608",
     "Data::Sah::Normalize" => 0,
     "Exporter" => "5.57",
-    "Log::ger" => "0.027",
+    "Log::ger" => "0.031",
     "Module::Installed::Tiny" => "0.004",
     "strict" => 0,
     "warnings" => 0
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +50,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.027",
+  "Log::ger" => "0.031",
   "Module::Installed::Tiny" => "0.004",
   "Sah::Schema::negint" => 0,
   "Sah::Schema::posint" => 0,

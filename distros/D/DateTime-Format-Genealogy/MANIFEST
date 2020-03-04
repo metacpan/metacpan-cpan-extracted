@@ -1,11 +1,23 @@
+Changes
 lib/DateTime/Format/Genealogy.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+README
 README.md
 t/00-load.t
 t/coverage.t
-t/data.t
+t/critic.t
+t/date.t
+t/error.t
+t/links.t
+t/no404s.t
+t/noopentickets.t
+t/pod-cm.t
+t/pod.t
+t/prereq.t
 t/spelling.t
+t/unused.t
+t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

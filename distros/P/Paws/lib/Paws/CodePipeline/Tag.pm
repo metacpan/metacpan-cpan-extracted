@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::CodePipelin
 
 =head1 DESCRIPTION
 
-A tag is a key/value pair that is used to manage the resource.
+A tag is a key-value pair that is used to manage the resource.
 
 =head1 ATTRIBUTES
 

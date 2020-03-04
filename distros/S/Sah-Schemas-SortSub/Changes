@@ -1,3 +1,8 @@
+0.003   2020-02-28  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add prefilter Str::replace_dashes_with_underscores.
+
+
 0.002   2019-12-15  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

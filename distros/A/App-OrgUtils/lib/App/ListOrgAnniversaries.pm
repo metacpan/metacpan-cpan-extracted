@@ -1,7 +1,7 @@
 package App::ListOrgAnniversaries;
 
-our $DATE = '2020-02-06'; # DATE
-our $VERSION = '0.472'; # VERSION
+our $DATE = '2020-02-28'; # DATE
+our $VERSION = '0.473'; # VERSION
 
 use 5.010;
 use strict;
@@ -271,7 +271,7 @@ App::ListOrgAnniversaries - List all anniversaries in Org files
 
 =head1 VERSION
 
-This document describes version 0.472 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2020-02-06.
+This document describes version 0.473 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2020-02-28.
 
 =head1 SYNOPSIS
 
@@ -330,7 +330,7 @@ Only show anniversaries that are due in this number of days.
 
 Field regex that specifies anniversaries.
 
-=item * B<files>* => I<array[str]>
+=item * B<files>* => I<array[filename]>
 
 =item * B<has_tags> => I<array[str]>
 
@@ -354,7 +354,7 @@ If code, sorting code will get [REC, DUE_DATE] as the items to compare, where
 REC is the final record that will be returned as final result (can be a string
 or a hash, if 'detail' is enabled), and DUE_DATE is the DateTime object.
 
-=item * B<time_zone> => I<str>
+=item * B<time_zone> => I<date::tz_name>
 
 Will be passed to parser's options.
 

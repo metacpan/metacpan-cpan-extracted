@@ -7,6 +7,12 @@ This document is automatically generated from the document:
 and that document should be considered the canonical source of change
 related information.
 
+3.63  2020-03-01  sbeck
+  -  NEW CODE(s)
+         NOTE: no code changes on 2019-12-01
+
+  -  Fixed a retired code
+
 3.62  2019-08-29  sbeck
   -  NEW CODE(s)
   -  Fixed tests

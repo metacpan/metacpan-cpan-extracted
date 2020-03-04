@@ -43,7 +43,7 @@
    "provides" : {
       "Acme::BayaC" : {
          "file" : "lib/Acme/BayaC.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "url" : "http://github.com/bayashi/Acme-BayaC"
       }
    },
-   "version" : "0.02",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

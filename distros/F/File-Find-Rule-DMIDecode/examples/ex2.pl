@@ -20,4 +20,4 @@ foreach my $file (File::Find::Rule->dmidecode_handle($handle)->in($dir)) {
 }
 
 # Output like:
-# Usage: qr{[\w\/]+} dir
+# Usage: qr{[\w\/]+} dir handle

@@ -2,10 +2,11 @@ package Test2::Harness::Util::File::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.001099';
+our $VERSION = '1.000006';
 
 use Carp qw/croak/;
-use Fcntl qw/LOCK_EX LOCK_UN SEEK_SET O_APPEND O_CREAT O_SYNC O_WRONLY/;
+use Test2::Harness::Util qw/lock_file unlock_file/;
+use Fcntl qw/SEEK_SET/;
 
 use parent 'Test2::Harness::Util::File';
 use Test2::Harness::Util::HashBase qw/use_write_lock -tail/;
@@ -67,20 +68,21 @@ sub write {
 
     my $name = $self->{+NAME};
 
-    my $mode = O_APPEND | O_CREAT | O_SYNC | O_WRONLY;
+    my $fh;
+    if ($self->{+USE_WRITE_LOCK}) {
+        $fh = lock_file($self->name, '>>');
+    }
+    else {
+        $fh = Test2::Harness::Util::open_file($self->name, '>>');
+    }
 
-    sysopen(my $fh, $self->name, $mode) or die "Could not open file: $!";
+    $fh->autoflush(1);
+    seek($fh,2,0);
+    print {$fh} $self->encode($_) for @_;
 
-    flock($fh, LOCK_EX) or die "Could not lock file '$name': $!"
-        if $self->{+USE_WRITE_LOCK};
+    unlock_file($fh) if $self->{+USE_WRITE_LOCK};
 
-    sysseek($fh,2,0);
-    syswrite($fh, $self->encode($_)) for @_;
-
-    flock($fh, LOCK_UN) or die "Could not unlock file '$name': $!"
-        if $self->{+USE_WRITE_LOCK};
-
-    close($fh) or die "Could not clone file '$name': $!";
+    close($fh) or die "Could not close file '$name': $!";
 
     return @_;
 }
@@ -111,6 +113,67 @@ serves as an output stream.
 
 =head1 DESCRIPTION
 
+Subclass of L<Test2::Harness::File> that streams the contents of a file, even
+if the file is still being written.
+
+=head1 SYNOPSIS
+
+    use Test2::Harness::Util::File::Stream;
+
+    my $stream = Test2::Harness::Util::File::Stream->new(name => 'path/to/file');
+
+    # Read some lines
+    my @lines = $stream->poll;
+
+    ...
+
+    # Read more lines, if any.
+    push @lines => $stream->poll;
+
+=head1 ATTRIBUTES
+
+See L<Test2::Harness::File> for additional attributes.
+
+These can be passed in as construction arguments if desired.
+
+=over 4
+
+=item $bool = $stream->use_write_lock
+
+=item $stream->use_write_lock($bool)
+
+Lock the file for every C<write()> operation.
+
+=item $bool = $stream->tail
+
+Start near the end of the file and only poll for updates appended to it.
+
+=back
+
+=head1 METHODS
+
+See L<Test2::Harness::File> for additional methods.
+
+=over 4
+
+=item @lines = $stream->read()
+
+Read all lines from the beginning. Every time it is called it returns ALL lines.
+
+=item @lines = $stream->poll()
+
+=item @lines = $stream->poll(max => $int)
+
+Poll for lines. This is an iterator, it should not return the same line more
+than once, you can call it multiple times to get any additional lines that have
+been added since the last poll.
+
+=item $stream->write(@content)
+
+Append @content to the file.
+
+=back
+
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
@@ -134,7 +197,7 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2019 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

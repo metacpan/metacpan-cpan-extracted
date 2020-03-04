@@ -303,8 +303,6 @@ struct marpaESLIFValue {
   void                        *marpaESLIFLuaValueContextp;
   genericStack_t               _beforePtrStack;
   genericStack_t              *beforePtrStackp;
-  genericHash_t                _beforePtrHash;
-  genericHash_t               *beforePtrHashp;
   genericHash_t                _afterPtrHash;
   genericHash_t               *afterPtrHashp;
   marpaESLIFRepresentation_t   proxyRepresentationp; /* Proxy representation callback, c.f. json.c for an example */
@@ -416,8 +414,6 @@ struct marpaESLIFRecognizer {
   /* Lexeme input stack is a marpaESLIFValueResult stack */
   genericStack_t               _beforePtrStack;
   genericStack_t              *beforePtrStackp;
-  genericHash_t                _beforePtrHash;
-  genericHash_t               *beforePtrHashp;
   genericHash_t                _afterPtrHash;
   genericHash_t               *afterPtrHashp;
 

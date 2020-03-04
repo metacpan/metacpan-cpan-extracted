@@ -1,5 +1,10 @@
 Revision history for LooksLike.
 
+v0.20.060 2020-02-29
+
+ - Added representation(), which formats infinity and not-a-number
+   consistently.
+
 v0.20.050 2020-02-19
 
  - Updated handling of infinity and not-a-number, to hopefully work with

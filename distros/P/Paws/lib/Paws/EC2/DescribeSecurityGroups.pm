@@ -46,11 +46,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       GroupIds => [
         'MyString', ...            # OPTIONAL
       ],                           # OPTIONAL
-      GroupNames => [
-        'MyString', ...            # OPTIONAL
-      ],                           # OPTIONAL
-      MaxResults => 1,             # OPTIONAL
-      NextToken  => 'MyString',    # OPTIONAL
+      GroupNames => [ 'MySecurityGroupName', ... ],    # OPTIONAL
+      MaxResults => 1,                                 # OPTIONAL
+      NextToken  => 'MyString',                        # OPTIONAL
     );
 
     # Results:

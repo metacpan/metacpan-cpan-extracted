@@ -64,27 +64,21 @@ encryption. The C<KmsKeyId> can be any of the following formats:
 
 =item *
 
-// KMS Key ID
-
-C<"1234abcd-12ab-34cd-56ef-1234567890ab">
+Key ID: C<1234abcd-12ab-34cd-56ef-1234567890ab>
 
 =item *
 
-// Amazon Resource Name (ARN) of a KMS Key
-
-C<"arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab">
-
-=item *
-
-// KMS Key Alias
-
-C<"alias/ExampleAlias">
+Key ARN:
+C<arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab>
 
 =item *
 
-// Amazon Resource Name (ARN) of a KMS Key Alias
+Alias name: C<alias/ExampleAlias>
 
-C<"arn:aws:kms:us-west-2:111122223333:alias/ExampleAlias">
+=item *
+
+Alias name ARN:
+C<arn:aws:kms:us-west-2:111122223333:alias/ExampleAlias>
 
 =back
 
@@ -95,8 +89,8 @@ see KMS-Managed Encryption Keys
 in the I<Amazon Simple Storage Service Developer Guide.>
 
 The KMS key policy must grant permission to the IAM role that you
-specify in your C<CreateTramsformJob> request. For more information,
-see Using Key Policies in AWS KMS
+specify in your CreateModel request. For more information, see Using
+Key Policies in AWS KMS
 (http://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html)
 in the I<AWS Key Management Service Developer Guide>.
 

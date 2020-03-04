@@ -76,7 +76,7 @@ test_complete(
     name        => 'arg value (schema) #3 examples',
     args        => {meta=>$meta},
     comp_line0  => 'CMD --s1c ^',
-    result      => {words=>[{word=>'bar',summary=>undef},{word=>'baz',summary=>'foo'}], static=>1},
+    result      => {words=>[{word=>'bar',summary=>undef},{word=>'baz',summary=>'foo'}], static=>0},
 );
 test_complete(
     name        => 'arg value (spec "completion")',

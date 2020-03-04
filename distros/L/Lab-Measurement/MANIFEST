@@ -294,6 +294,7 @@ lib/Lab/XPRESS/Sweep/Voltage.pm
 lib/Lab/XPRESS/Utilities/Utilities.pm
 lib/Lab/XPRESS/hub.pm
 perltidyrc
+rpm/perl-Lab-Measurement.spec
 t/00-load.t
 t/Analysis/DataAnalysis.t
 t/Analysis/TDS2024TraceData.dat

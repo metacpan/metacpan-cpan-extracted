@@ -10,7 +10,7 @@ use base qw(Exporter);
 use Encode;
 use charnames ':full';
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 our @EXPORT = qw(
   is_valid_string is_dodgy_utf8 is_sane_utf8
@@ -391,5 +391,3 @@ sub _pass
 
 
 1;
-
-

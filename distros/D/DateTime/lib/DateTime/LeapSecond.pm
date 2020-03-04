@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.51';
+our $VERSION = '1.52';
 
 our ( @RD, @LEAP_SECONDS, %RD_LENGTH );
 
@@ -20,10 +20,10 @@ sub _make_utx {
         return $tmp;
     }
     $tmp = "${tab}if (\$val < " . $RD[ $beg + $step ] . ") {\n";
-    $tmp .= _make_utx( $beg,         $beg + $step, $tab . q{    }, $op );
+    $tmp .= _make_utx( $beg, $beg + $step, $tab . q{    }, $op );
     $tmp .= "${tab}}\n";
     $tmp .= "${tab}else {\n";
-    $tmp .= _make_utx( $beg + $step, $end,         $tab . q{    }, $op );
+    $tmp .= _make_utx( $beg + $step, $end, $tab . q{    }, $op );
     $tmp .= "${tab}}\n";
     return $tmp;
 }
@@ -134,7 +134,7 @@ DateTime::LeapSecond - leap seconds table and utilities
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -199,7 +199,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2003 - 2019 by Dave Rolsky.
+This software is Copyright (c) 2003 - 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

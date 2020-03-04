@@ -1,10 +1,12 @@
 package Test::Auto::Plugin::ShortDescription;
 
-use Test::More;
+use strict;
+use warnings;
+use routines;
 
+use Test::More;
 use Data::Object::Class;
-use Data::Object::ClassHas;
-use Data::Object::Signatures;
+use Data::Object::Attributes;
 
 extends 'Test::Auto::Plugin';
 

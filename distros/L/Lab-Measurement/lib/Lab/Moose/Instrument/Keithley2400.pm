@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Keithley2400;
-$Lab::Moose::Instrument::Keithley2400::VERSION = '3.691';
+$Lab::Moose::Instrument::Keithley2400::VERSION = '3.692';
 #ABSTRACT: Keithley 2400 voltage/current sourcemeter.
 
 use 5.010;
@@ -113,7 +113,7 @@ Lab::Moose::Instrument::Keithley2400 - Keithley 2400 voltage/current sourcemeter
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 SYNOPSIS
 
@@ -218,7 +218,7 @@ For XPRESS voltage sweep. Equivalent to C<< set_level(value => $value) >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
 

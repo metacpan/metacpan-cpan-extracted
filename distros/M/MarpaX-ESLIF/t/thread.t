@@ -9,14 +9,20 @@ BEGIN {
     }
 }
 
+use threads;
+use threads::shared;
 use Log::Log4perl qw/:easy/;
 use Log::Any::Adapter;
 use Log::Any qw/$log/;
-use threads;
 use constant { NTHREAD => 3 };
 use Test::More;
 
 my $number_of_tests = 3 + NTHREAD * 5;
+my $nwaitingGoSignal = 0;
+my $go = 0;
+
+share($nwaitingGoSignal);
+share($go);
 
 BEGIN {
     diag("Using " . NTHREAD . " threads");
@@ -27,7 +33,7 @@ BEGIN {
 # Init log
 #
 our $defaultLog4perlConf = '
-log4perl.rootLogger              = INFO, Screen
+log4perl.rootLogger              = TRACE, Screen
 log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr  = 0
 log4perl.appender.Screen.layout  = PatternLayout
@@ -56,23 +62,22 @@ my $eslif_in_main_without_logger = MarpaX::ESLIF->new();
 my $eslif2_in_main_without_logger = MarpaX::ESLIF->new();
 ok($eslif_in_main_without_logger == $eslif2_in_main_without_logger, "Thread 0 - new without logger $eslif_in_main_without_logger == $eslif2_in_main_without_logger");
 
-#
-# We introduce tiny sleeps to make sure threads overlaps
-#
-sub _sleep {
-    my $sleep = 1 + int(rand(2));
-    sleep($sleep);
-}
-
 sub thr_sub {
   my ($input, $expected) = @_;
 
   my $tid = threads->tid();
   Log::Log4perl::MDC->put("tid", $tid);
 
-  $log->trace("Starting");
+  {
+      lock($go);
+      $log->trace("Waiting for go signal");
+      {
+          lock($nwaitingGoSignal);
+          $nwaitingGoSignal++;
+      }
+      cond_wait($go) until $go;
+  }
 
-  _sleep;
 
   $log->tracef("Testing ESLIF creation with logger=%s", "$log");
 
@@ -81,16 +86,12 @@ sub thr_sub {
   ok($eslif == $eslif2, "Thread $tid - new with logger $eslif == new $eslif2");
   ok($eslif == $eslif_in_main, "Thread $tid - new with logger $eslif == main $eslif_in_main");
 
-  _sleep;
-
   $log->trace('Testing ESLIF creation without logger');
 
   my $eslif_without_logger = MarpaX::ESLIF->new();
   my $eslif2_without_logger = MarpaX::ESLIF->new();
   ok($eslif_without_logger == $eslif2_without_logger, "Thread $tid - new without logger $eslif_without_logger == new $eslif2_without_logger");
   ok($eslif_without_logger == $eslif_in_main_without_logger, "Thread $tid - new without logger $eslif_without_logger == main $eslif_in_main_without_logger");
-
-  _sleep;
 
   $log->trace('Testing valuation');
 
@@ -102,15 +103,42 @@ sub thr_sub {
   my $value = $eslifValueInterface->getResult;
   is($value, $expected, "Thread $tid - value $value == expected $expected");
 
-  _sleep;
   $log->trace('Ending');
 }
 
 my $input = '(1+2)*3';
 my $expected = '(1+2)*3';
 my @t = grep { defined } map {
-  threads->create(\&thr_sub, $input, $expected)
+    my $thr = threads->create(\&thr_sub, $input, $expected);
+    $log->warn("threads->create failure, $!") if ! defined($thr);
+    $thr;
 } (1..NTHREAD);
+$log->trace('Number of threads created: ' . scalar(@t));
+
+#
+# Wait for all threads to signal they are ready
+#
+while (1) {
+    my $canExitWhile = 0;
+    {
+        lock($nwaitingGoSignal);
+        if ($nwaitingGoSignal == scalar(@t)) {
+            $canExitWhile = 1;
+        }
+    }
+    last if $canExitWhile;
+    sleep(1);
+}
+
+#
+# Ensure parallelization by waking up all threads
+#
+{
+    lock($go);
+    $go = 1;
+    $log->trace('Broadcasting go signal');
+    cond_broadcast($go);
+}
 
 my $remains = scalar(@t);
 while ($remains) {

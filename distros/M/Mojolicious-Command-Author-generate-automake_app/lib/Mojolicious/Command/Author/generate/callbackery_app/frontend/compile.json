@@ -28,6 +28,7 @@
     {
       "class": "<%= ${class_file} %>.Application",
       "theme": "<%= ${class_file} %>.theme.Theme",
+      "title": "<%= ${class} %>",
       "name": "<%= ${class_file} %>",
       "bootPath": "source/boot"
     }

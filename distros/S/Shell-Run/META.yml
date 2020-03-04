@@ -20,13 +20,13 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Encode: '0'
   Exporter::Tiny: '0.025'
   File::Which: '0'
   IO::Select: '0'
-  IO::String: '0'
   IPC::Open2: '0'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/jo-37/shell-run/issues
   repository: git://github.com/jo-37/shell-run.git
-version: '0.08'
+version: '0.10'

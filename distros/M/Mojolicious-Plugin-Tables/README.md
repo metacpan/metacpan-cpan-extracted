@@ -26,6 +26,8 @@ Building a distribution
 -----------------------
 ```
 # (bump VERSION)
+git log >CHANGES
+# (commit to master)
 perl Makefile.PL
 git rm *Tables*tar.gz
 make test

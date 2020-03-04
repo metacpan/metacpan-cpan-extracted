@@ -1,5 +1,6 @@
 package Paws::CognitoIdp::UserPoolType;
   use Moose;
+  has AccountRecoverySetting => (is => 'ro', isa => 'Paws::CognitoIdp::AccountRecoverySettingType');
   has AdminCreateUserConfig => (is => 'ro', isa => 'Paws::CognitoIdp::AdminCreateUserConfigType');
   has AliasAttributes => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has Arn => (is => 'ro', isa => 'Str');
@@ -26,6 +27,7 @@ package Paws::CognitoIdp::UserPoolType;
   has SmsVerificationMessage => (is => 'ro', isa => 'Str');
   has Status => (is => 'ro', isa => 'Str');
   has UsernameAttributes => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
+  has UsernameConfiguration => (is => 'ro', isa => 'Paws::CognitoIdp::UsernameConfigurationType');
   has UserPoolAddOns => (is => 'ro', isa => 'Paws::CognitoIdp::UserPoolAddOnsType');
   has UserPoolTags => (is => 'ro', isa => 'Paws::CognitoIdp::UserPoolTagsType');
   has VerificationMessageTemplate => (is => 'ro', isa => 'Paws::CognitoIdp::VerificationMessageTemplateType');
@@ -48,20 +50,31 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::CognitoIdp::UserPoolType object:
 
-  $service_obj->Method(Att1 => { AdminCreateUserConfig => $value, ..., VerificationMessageTemplate => $value  });
+  $service_obj->Method(Att1 => { AccountRecoverySetting => $value, ..., VerificationMessageTemplate => $value  });
 
 =head3 Results returned from an API call
 
 Use accessors for each attribute. If Att1 is expected to be an Paws::CognitoIdp::UserPoolType object:
 
   $result = $service_obj->Method(...);
-  $result->Att1->AdminCreateUserConfig
+  $result->Att1->AccountRecoverySetting
 
 =head1 DESCRIPTION
 
 A container for information about the user pool.
 
 =head1 ATTRIBUTES
+
+
+=head2 AccountRecoverySetting => L<Paws::CognitoIdp::AccountRecoverySettingType>
+
+  Use this setting to define which verified available method a user can
+use to recover their password when they call C<ForgotPassword>. It
+allows you to define a preferred method when a user has more than one
+method available. With this setting, SMS does not qualify for a valid
+password recovery mechanism if the user also has SMS MFA enabled. In
+the absence of this setting, Cognito uses the legacy behavior to
+determine the recovery method where SMS is preferred over email.
 
 
 =head2 AdminCreateUserConfig => L<Paws::CognitoIdp::AdminCreateUserConfigType>
@@ -222,6 +235,15 @@ users.
 
   Specifies whether email addresses or phone numbers can be specified as
 usernames when a user signs up.
+
+
+=head2 UsernameConfiguration => L<Paws::CognitoIdp::UsernameConfigurationType>
+
+  You can choose to enable case sensitivity on the username input for the
+selected sign-in option. For example, when this is set to C<False>,
+users will be able to sign in using either "username" or "Username".
+This configuration is immutable once it has been set. For more
+information, see .
 
 
 =head2 UserPoolAddOns => L<Paws::CognitoIdp::UserPoolAddOnsType>

@@ -23,7 +23,7 @@ Paws::S3::UploadPartCopyOutput
 
 =head2 CopyPartResult => L<Paws::S3::CopyPartResult>
 
-
+Container for all response elements.
 
 
 
@@ -42,8 +42,8 @@ Valid values are: C<"requester">
 
 =head2 ServerSideEncryption => Str
 
-The Server-side encryption algorithm used when storing this object in
-S3 (e.g., AES256, aws:kms).
+The server-side encryption algorithm used when storing this object in
+Amazon S3 (for example, AES256, aws:kms).
 
 Valid values are: C<"AES256">, C<"aws:kms">
 
@@ -58,15 +58,16 @@ encryption algorithm used.
 =head2 SSECustomerKeyMD5 => Str
 
 If server-side encryption with a customer-provided encryption key was
-requested, the response will include this header to provide round trip
+requested, the response will include this header to provide round-trip
 message integrity verification of the customer-provided encryption key.
 
 
 
 =head2 SSEKMSKeyId => Str
 
-If present, specifies the ID of the AWS Key Management Service (KMS)
-master encryption key that was used for the object.
+If present, specifies the ID of the AWS Key Management Service (AWS
+KMS) symmetric customer managed customer master key (CMK) that was used
+for the object.
 
 
 

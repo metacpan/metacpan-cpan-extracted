@@ -1,6 +1,6 @@
 package Catmandu::Fix::latex_decode;
 
-our $VERSION = '0.15';
+our $VERSION = '0.18';
 
 use Moo;
 use Catmandu::Sane;
@@ -18,7 +18,8 @@ has opts => (fix_opt => 'collect');
 sub _build_fixer {
     my ($self) = @_;
     my $opts = $self->opts;
-    as_path($self->path)->updater(if_string => sub {latex_decode($_[0], %$opts)});
+    as_path($self->path)
+        ->updater(if_string => sub {latex_decode($_[0], %$opts)});
 }
 
 1;

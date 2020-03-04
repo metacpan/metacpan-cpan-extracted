@@ -36,40 +36,39 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::DocDB::DBSu
 
 =head1 DESCRIPTION
 
-Detailed information about a DB subnet group.
+Detailed information about a subnet group.
 
 =head1 ATTRIBUTES
 
 
 =head2 DBSubnetGroupArn => Str
 
-  The Amazon Resource Identifier (ARN) for the DB subnet group.
+  The Amazon Resource Name (ARN) for the DB subnet group.
 
 
 =head2 DBSubnetGroupDescription => Str
 
-  Provides the description of the DB subnet group.
+  Provides the description of the subnet group.
 
 
 =head2 DBSubnetGroupName => Str
 
-  The name of the DB subnet group.
+  The name of the subnet group.
 
 
 =head2 SubnetGroupStatus => Str
 
-  Provides the status of the DB subnet group.
+  Provides the status of the subnet group.
 
 
 =head2 Subnets => ArrayRef[L<Paws::DocDB::Subnet>]
 
-  Detailed information about one or more subnets within a DB subnet
-group.
+  Detailed information about one or more subnets within a subnet group.
 
 
 =head2 VpcId => Str
 
-  Provides the virtual private cloud (VPC) ID of the DB subnet group.
+  Provides the virtual private cloud (VPC) ID of the subnet group.
 
 
 

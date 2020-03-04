@@ -5,6 +5,8 @@ EXTRA_DIST = compile.js  compile.json  config.json Manifest.json package.json pa
 
 if BUILD_QOOXDOO_APP
 
+CBFILES=$(shell find $(CALLBACKERY_QX) -name '*.js')
+
 all-local: build
 
 .PHONY: source source-watch node_modules build clean
@@ -22,16 +24,17 @@ build: ../public/.built
 clean: node_modules
 	$(NPX) qx clean
 
-../public/.built: $(EXTRA_DIST) Makefile.in
+../public/.built: $(EXTRA_DIST) Makefile.in $(CBFILES)
 	$(MAKE) node_modules
 	CALLBACKERY_QX=$(CALLBACKERY_QX) $(NPX) qx compile --target=build --feedback=false --erase
 	touch $@
 
-compiled/source/.built: $(EXTRA_DIST) Makefile
+compiled/source/.built: $(EXTRA_DIST) Makefile.in $(CBFILES)
 	CALLBACKERY_QX=$(CALLBACKERY_QX) $(NPX) qx compile --feedback=false --erase
 	touch $@
 
 package-lock.json: package.json
 	$(NPM) i
+	touch $@
 
 endif

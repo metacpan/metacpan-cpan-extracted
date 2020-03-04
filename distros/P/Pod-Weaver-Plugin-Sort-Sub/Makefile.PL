@@ -17,9 +17,12 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Pod::Weaver::Plugin::Sort::Sub",
   "PREREQ_PM" => {
+    "Data::Sah" => "0.903",
+    "Markdown::To::POD" => 0,
     "Moose" => 0,
     "Pod::Weaver::Role::AddTextToSection" => "0.06",
     "Pod::Weaver::Role::Section" => 0,
+    "String::PodQuote" => 0,
     "strict" => 0
   },
   "TEST_REQUIRES" => {
@@ -28,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,12 +39,15 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah" => "0.903",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Markdown::To::POD" => 0,
   "Moose" => 0,
   "Pod::Weaver::Role::AddTextToSection" => "0.06",
   "Pod::Weaver::Role::Section" => 0,
+  "String::PodQuote" => 0,
   "Test::More" => 0,
   "strict" => 0
 );

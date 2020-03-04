@@ -1,6 +1,6 @@
 package Lab::Instrument::Keithley2400;
 #ABSTRACT: Keithley 2400 SourceMeter
-$Lab::Instrument::Keithley2400::VERSION = '3.691';
+$Lab::Instrument::Keithley2400::VERSION = '3.692';
 use strict;
 use Lab::Instrument;
 use Lab::Instrument::Source;
@@ -1762,7 +1762,7 @@ Lab::Instrument::Keithley2400 - Keithley 2400 SourceMeter
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 SYNOPSIS
 
@@ -2067,7 +2067,7 @@ Reset the multimeter to its power-on configuration.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2015       Christian Butschkow
             2016       Simon Reinhardt

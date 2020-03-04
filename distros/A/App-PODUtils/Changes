@@ -1,3 +1,11 @@
+0.046   2020-02-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Support Sort::Sub sorters with compares_record=1.
+
+	- Add CLI: reverse-pod-headings (equivalent to "sort-pod-headings -S
+          record_by_reverse_order").
+
+
 0.045   2019-12-15  Released-By: PERLANCAR; Urgency: medium
 
 	- [sort-pod-headings][ux] Add shortcut aliases -S for --sort-sub,

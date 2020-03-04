@@ -6,6 +6,7 @@ package Paws::MediaLive::H264Settings;
   has BufFillPct => (is => 'ro', isa => 'Int', request_name => 'bufFillPct', traits => ['NameInRequest']);
   has BufSize => (is => 'ro', isa => 'Int', request_name => 'bufSize', traits => ['NameInRequest']);
   has ColorMetadata => (is => 'ro', isa => 'Str', request_name => 'colorMetadata', traits => ['NameInRequest']);
+  has ColorSpaceSettings => (is => 'ro', isa => 'Paws::MediaLive::H264ColorSpaceSettings', request_name => 'colorSpaceSettings', traits => ['NameInRequest']);
   has EntropyEncoding => (is => 'ro', isa => 'Str', request_name => 'entropyEncoding', traits => ['NameInRequest']);
   has FixedAfd => (is => 'ro', isa => 'Str', request_name => 'fixedAfd', traits => ['NameInRequest']);
   has FlickerAq => (is => 'ro', isa => 'Str', request_name => 'flickerAq', traits => ['NameInRequest']);
@@ -103,12 +104,17 @@ model).
 
 =head2 BufSize => Int
 
-  Size of buffer (HRD buffer model) in bits/second.
+  Size of buffer (HRD buffer model) in bits.
 
 
 =head2 ColorMetadata => Str
 
   Includes colorspace metadata in the output.
+
+
+=head2 ColorSpaceSettings => L<Paws::MediaLive::H264ColorSpaceSettings>
+
+  Color Space settings
 
 
 =head2 EntropyEncoding => Str
@@ -170,7 +176,9 @@ output segmenting.
 =head2 GopSize => Num
 
   GOP size (keyframe interval) in units of either frames or seconds per
-gopSizeUnits. Must be greater than zero.
+gopSizeUnits. If gopSizeUnits is frames, gopSize must be an integer and
+must be greater than or equal to 1. If gopSizeUnits is seconds, gopSize
+must be greater than 0, but need not be an integer.
 
 
 =head2 GopSizeUnits => Str
@@ -199,13 +207,14 @@ the video.
 
 =head2 MinIInterval => Int
 
-  Only meaningful if sceneChangeDetect is set to enabled. Enforces
-separation between repeated (cadence) I-frames and I-frames inserted by
-Scene Change Detection. If a scene change I-frame is within I-interval
-frames of a cadence I-frame, the GOP is shrunk and/or stretched to the
-scene change I-frame. GOP stretch requires enabling lookahead as well
-as setting I-interval. The normal cadence resumes for the next GOP.
-Note: Maximum GOP stretch = GOP size + Min-I-interval - 1
+  Only meaningful if sceneChangeDetect is set to enabled. Defaults to 5
+if multiplex rate control is used. Enforces separation between repeated
+(cadence) I-frames and I-frames inserted by Scene Change Detection. If
+a scene change I-frame is within I-interval frames of a cadence
+I-frame, the GOP is shrunk and/or stretched to the scene change
+I-frame. GOP stretch requires enabling lookahead as well as setting
+I-interval. The normal cadence resumes for the next GOP. Note: Maximum
+GOP stretch = GOP size + Min-I-interval - 1
 
 
 =head2 NumRefFrames => Int
@@ -258,7 +267,10 @@ depending on the video complexity. Recommended instead of QVBR if you
 want to maintain a specific average bitrate over the duration of the
 channel. CBR: Quality varies, depending on the video complexity.
 Recommended only if you distribute your assets to devices that cannot
-handle variable bitrates.
+handle variable bitrates. Multiplex: This rate control mode is only
+supported (and is required) when the video is being delivered to a
+MediaLive Multiplex in which case the rate control configuration is
+controlled by the properties within the Multiplex Program.
 
 
 =head2 ScanType => Str

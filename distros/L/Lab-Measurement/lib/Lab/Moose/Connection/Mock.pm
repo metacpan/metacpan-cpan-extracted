@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Mock;
-$Lab::Moose::Connection::Mock::VERSION = '3.691';
+$Lab::Moose::Connection::Mock::VERSION = '3.692';
 #ABSTRACT: Mock connection
 
 use 5.010;
@@ -121,7 +121,7 @@ Lab::Moose::Connection::Mock - Mock connection
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 SYNOPSIS
 
@@ -140,7 +140,7 @@ with a real instrument using L<Lab::Instrument::Log>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

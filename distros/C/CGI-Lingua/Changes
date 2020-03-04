@@ -1,5 +1,9 @@
 Revision history for CGI-Lingua
 
+0.62	Wed Mar  4 09:06:06 EST 2020
+	Fix into RT#131607, cause spotted by SREZIC@cpan.org
+	Change timezone to time_zone to be compatible with DateTime
+
 0.61	Mon 27 Jan 15:43:18 EST 2020
 	Added timezone()
 
@@ -124,7 +128,7 @@ Revision history for CGI-Lingua
 	Use mod_geoip as a fall back if it is installed
 	Fixed unitialized variable in test
 	Better handling of automatic build environments
-	
+
 0.38	Sat Jun  2 15:23:40 EDT 2012
 	Fix use of unitialised variable
 	Handle remote address '::1' (IPv6)
@@ -275,4 +279,4 @@ Revision history for CGI-Lingua
 	Added dependencies
 
 0.01    Sun Nov 14 19:01:15 EST 2010
-        First draft
+	First draft

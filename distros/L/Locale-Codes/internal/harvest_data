@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2010-2019 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2010-2020 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -22,7 +22,7 @@ use Text::Iconv;
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.62';
+$VERSION='3.63';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -580,11 +580,15 @@ countries fit on a single page, do it in multiple steps.
 
    sub _read_country_iso {
       while (@$in) {
-         my $name   = shift(@$in);       shift(@$in);
-         shift(@$in);                    shift(@$in);
-         my $alpha2 = lc(shift(@$in));   shift(@$in);
-         my $alpha3 = lc(shift(@$in));   shift(@$in);
+         my $name   = shift(@$in);
+         shift(@$in);
+         my $alpha2 = lc(shift(@$in));
+         my $alpha3 = lc(shift(@$in));
          my $num    = shift(@$in);
+         $name      =~ s/^\s*//;
+         $alpha2    =~ s/^\s*//;
+         $alpha3    =~ s/^\s*//;
+         $num       =~ s/^\s*//;
          $name      =~ s/\(the/\(The/;
          return($alpha2,$alpha3,$num,_country_name($name));
       }
@@ -1716,7 +1720,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.62';
+\$VERSION='3.63';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 

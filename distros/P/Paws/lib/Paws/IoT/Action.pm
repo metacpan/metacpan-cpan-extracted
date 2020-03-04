@@ -6,8 +6,10 @@ package Paws::IoT::Action;
   has DynamoDBv2 => (is => 'ro', isa => 'Paws::IoT::DynamoDBv2Action', request_name => 'dynamoDBv2', traits => ['NameInRequest']);
   has Elasticsearch => (is => 'ro', isa => 'Paws::IoT::ElasticsearchAction', request_name => 'elasticsearch', traits => ['NameInRequest']);
   has Firehose => (is => 'ro', isa => 'Paws::IoT::FirehoseAction', request_name => 'firehose', traits => ['NameInRequest']);
+  has Http => (is => 'ro', isa => 'Paws::IoT::HttpAction', request_name => 'http', traits => ['NameInRequest']);
   has IotAnalytics => (is => 'ro', isa => 'Paws::IoT::IotAnalyticsAction', request_name => 'iotAnalytics', traits => ['NameInRequest']);
   has IotEvents => (is => 'ro', isa => 'Paws::IoT::IotEventsAction', request_name => 'iotEvents', traits => ['NameInRequest']);
+  has IotSiteWise => (is => 'ro', isa => 'Paws::IoT::IotSiteWiseAction', request_name => 'iotSiteWise', traits => ['NameInRequest']);
   has Kinesis => (is => 'ro', isa => 'Paws::IoT::KinesisAction', request_name => 'kinesis', traits => ['NameInRequest']);
   has Lambda => (is => 'ro', isa => 'Paws::IoT::LambdaAction', request_name => 'lambda', traits => ['NameInRequest']);
   has Republish => (is => 'ro', isa => 'Paws::IoT::RepublishAction', request_name => 'republish', traits => ['NameInRequest']);
@@ -83,6 +85,11 @@ payload into a separate DynamoDB column.
   Write to an Amazon Kinesis Firehose stream.
 
 
+=head2 Http => L<Paws::IoT::HttpAction>
+
+  Send data to an HTTPS endpoint.
+
+
 =head2 IotAnalytics => L<Paws::IoT::IotAnalyticsAction>
 
   Sends message data to an AWS IoT Analytics channel.
@@ -91,6 +98,12 @@ payload into a separate DynamoDB column.
 =head2 IotEvents => L<Paws::IoT::IotEventsAction>
 
   Sends an input to an AWS IoT Events detector.
+
+
+=head2 IotSiteWise => L<Paws::IoT::IotSiteWiseAction>
+
+  Sends data from the MQTT message that triggered the rule to AWS IoT
+SiteWise asset properties.
 
 
 =head2 Kinesis => L<Paws::IoT::KinesisAction>

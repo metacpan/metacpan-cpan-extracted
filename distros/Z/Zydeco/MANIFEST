@@ -27,6 +27,7 @@ lib/Zydeco/Manual/07_Delegation.pod
 lib/Zydeco/Manual/08_Privacy.pod
 lib/Zydeco/Manual/09_Parameterizable.pod
 lib/Zydeco/Manual/10_BeyondZydeco.pod
+t/00begin.t
 t/01basic.t
 t/02synopsis.t
 t/03subclass.t

@@ -31,8 +31,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::AppMesh::Ba
 
 =head1 DESCRIPTION
 
-An object representing the backends that a virtual node is expected to
-send outbound traffic to.
+An object that represents the backends that a virtual node is expected
+to send outbound traffic to.
 
 =head1 ATTRIBUTES
 

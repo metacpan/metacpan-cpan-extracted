@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Captcha/reCAPTCHA/V3.pm
+minil.toml
+share/Plack.pl
+share/template.tx
+t/00_compile.t
+META.yml
+MANIFEST

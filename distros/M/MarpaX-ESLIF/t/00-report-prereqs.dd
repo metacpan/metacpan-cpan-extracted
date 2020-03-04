@@ -97,6 +97,7 @@ do { my $x = {
                                    'open' => '0',
                                    'perl' => '5.010',
                                    'threads' => '0',
+                                   'threads::shared' => '0',
                                    'utf8' => '0'
                                  }
                  }

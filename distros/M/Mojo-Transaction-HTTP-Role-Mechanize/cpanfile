@@ -16,3 +16,7 @@ on develop => sub {
   requires 'Devel::Cover::Report::Coveralls' => '0.11';
   requires 'Devel::Cover::Report::Kritika' => '0.05';
 };
+
+if ($ENV{AUTHOR_RELEASE}) {
+  requires 'App::git::ship';
+}

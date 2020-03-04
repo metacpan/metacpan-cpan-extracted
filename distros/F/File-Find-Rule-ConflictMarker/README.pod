@@ -1,0 +1,50 @@
+=encoding utf8
+
+
+This is Perl module B<File::Find::Rule::ConflictMarker>.
+
+=begin html
+
+<a href="https://github.com/bayashi/File-Find-Rule-ConflictMarker/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.02-green?style=flat"></a> <a href="https://github.com/bayashi/File-Find-Rule-ConflictMarker/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/File-Find-Rule-ConflictMarker/actions"><img src="https://github.com/bayashi/File-Find-Rule-ConflictMarker/workflows/master/badge.svg?_t=1583101213"/></a> <a href="https://coveralls.io/r/bayashi/File-Find-Rule-ConflictMarker"><img src="https://coveralls.io/repos/bayashi/File-Find-Rule-ConflictMarker/badge.png?_t=1583101213&branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+File::Find::Rule::ConflictMarker installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan File::Find::Rule::ConflictMarker
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+File::Find::Rule::ConflictMarker documentation is available as in POD. So you can do:
+
+    % perldoc File::Find::Rule::ConflictMarker
+
+
+=head1 REPOSITORY
+
+File::Find::Rule::ConflictMarker is hosted on github
+L<http://github.com/bayashi/File-Find-Rule-ConflictMarker>
+
+
+=head1 LICENSE
+
+C<File::Find::Rule::ConflictMarker> is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0. (Note that, unlike the Artistic License 1.0, version 2.0 is GPL compatible by itself, hence there is no benefit to having an Artistic 2.0 / GPL disjunction.) See the file LICENSE for details.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

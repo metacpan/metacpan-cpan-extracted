@@ -221,6 +221,149 @@ subtest 'table' => sub {
         );
         ok !$t->success, 'Test::Mojo success flag is set to false';
     };
+
+    subtest 'table_has - Subsets of rows and columns' => sub {
+        my $app = Mojolicious->new;
+        $app->routes->get( '/' )->name( 'table_is' );
+        my $t = Test::Mojo->with_roles( '+Moai' )->new( $app );
+
+        check_test(
+            sub {
+                $t->get_ok( '/' )->table_has(
+                    'table#mytable',
+                    [
+                        { User => 'preaction', 'E-mail' => 'doug@example.com' },
+                        { User => 'inara', 'E-mail' => 'cat@example.com' },
+                    ],
+                    'table_has with complete rows/columns (pass)',
+                );
+            },
+            ok => 1,
+            name => 'table_is with complete rows/columns (pass)',
+        );
+        ok $t->success, 'Test::Mojo success flag is set to true';
+
+        check_test(
+            sub {
+                $t->get_ok( '/' )->table_has(
+                    'table#mytable',
+                    [
+                        { User => 'preaction', 'E-mail' => 'doug@example.com' },
+                        { User => 'inara', 'E-mail' => 'dog@example.com' },
+                    ],
+                    'table_has with complete rows/columns (fail)',
+                );
+            },
+            ok => 0,
+            name => 'table_has with complete rows/columns (fail)',
+            diag => qr{
+                Missing:\s*Row\s*with\s*E-mail="dog\@example\.com",\s*User="inara"\s*
+            }xms,
+        );
+        ok !$t->success, 'Test::Mojo success flag is set to false';
+
+        check_test(
+            sub {
+                $t->get_ok( '/' )->table_has(
+                    'table#mytable',
+                    [
+                        { User => 'inara', 'E-mail' => 'cat@example.com' },
+                    ],
+                    'table_has with partial rows/complete columns (pass)',
+                );
+            },
+            ok => 1,
+            name => 'table_is with partial rows/complete columns (pass)',
+        );
+        ok $t->success, 'Test::Mojo success flag is set to true';
+
+        check_test(
+            sub {
+                $t->get_ok( '/' )->table_has(
+                    'table#mytable',
+                    [
+                        { User => 'inara', 'E-mail' => 'dog@example.com' },
+                    ],
+                    'table_has with partial rows/complete columns (fail)',
+                );
+            },
+            ok => 0,
+            name => 'table_has with partial rows/complete columns (fail)',
+            diag => qr{
+                Missing:\s*Row\s*with\s*E-mail="dog\@example\.com",\s*User="inara"
+            }xms,
+        );
+        ok !$t->success, 'Test::Mojo success flag is set to false';
+
+        check_test(
+            sub {
+                $t->get_ok( '/' )->table_has(
+                    'table#mytable',
+                    [
+                        { 'E-mail' => 'doug@example.com' },
+                        { 'E-mail' => 'cat@example.com' },
+                    ],
+                    'table_has with complete rows/partial columns (pass)',
+                );
+            },
+            ok => 1,
+            name => 'table_is with complete rows/partial columns (pass)',
+        );
+        ok $t->success, 'Test::Mojo success flag is set to true';
+
+        check_test(
+            sub {
+                $t->get_ok( '/' )->table_has(
+                    'table#mytable',
+                    [
+                        { 'E-mail' => 'doug@example.com' },
+                        { 'E-mail' => 'dog@example.com' },
+                    ],
+                    'table_has with complete rows/partial columns (fail)',
+                );
+            },
+            ok => 0,
+            name => 'table_has with complete rows/partial columns (fail)',
+            diag => qr{
+                Missing:\s*Row\s*with\s*E-mail="dog\@example\.com"\s*
+            }xms,
+        );
+        ok !$t->success, 'Test::Mojo success flag is set to false';
+
+        check_test(
+            sub {
+                $t->get_ok( '/' )->table_has(
+                    'table#mytable',
+                    [
+                        { 'E-mail' => 'doug@example.com' },
+                    ],
+                    'table_has with partial rows/partial columns (pass)',
+                );
+            },
+            ok => 1,
+            name => 'table_is with partial rows/partial columns (pass)',
+        );
+        ok $t->success, 'Test::Mojo success flag is set to true';
+
+        check_test(
+            sub {
+                $t->get_ok( '/' )->table_has(
+                    'table#mytable',
+                    [
+                        { 'E-mail' => 'dog@example.com' },
+                    ],
+                    'table_has with partial rows/partial columns (fail)',
+                );
+            },
+            ok => 0,
+            name => 'table_has with partial rows/partial columns (fail)',
+            diag => qr{
+                Missing:\s*Row\s*with\s*E-mail="dog\@example\.com"\s*
+            }xms,
+        );
+        ok !$t->success, 'Test::Mojo success flag is set to false';
+
+    };
 };
 
 done_testing;

@@ -1,6 +1,12 @@
 package Mojolicious::Plugin::Minion::Overview::Controller::Metrics::Jobs;
 use Mojo::Base 'Mojolicious::Controller';
 
+=head2 show
+
+Show metrics for a job
+
+=cut
+
 sub show {
     my $self = shift;
     

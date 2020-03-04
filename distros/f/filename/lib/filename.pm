@@ -1,23 +1,22 @@
 
-use v5.10.1;
+use v5.12.0;
 
 use strict;
 use warnings;
 
 use locale;    # localize $!
 
-use Array::RefElem ();  #qw( hv_store );
-
 package filename;
 # ABSTRACT: Perl module to load files at compile-time, without BEGIN blocks.
 
 
-use Carp 1.50    ();
-use File::Spec   ();
-use Scalar::Util ();    #qw( blessed refaddr );
+use Array::RefElem ();    #qw( hv_store );
+use Carp 1.50      ();
+use File::Spec     ();
+use Scalar::Util   ();    #qw( blessed refaddr );
 
 
-our $VERSION = 'v0.20.022'; # VERSION
+our $VERSION = 'v0.20.060'; # VERSION
 
 
 
@@ -248,7 +247,7 @@ feature.
 
 =head1 VERSION
 
-This document describes version v0.20.022 of this module.
+This document describes version v0.20.060 of this module.
 
 =head1 AUTHOR
 

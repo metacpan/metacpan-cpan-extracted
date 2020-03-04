@@ -1,6 +1,6 @@
 package Paws::Config::ResourceValue;
   use Moose;
-  has Value => (is => 'ro', isa => 'Str');
+  has Value => (is => 'ro', isa => 'Str', required => 1);
 1;
 
 ### main pod documentation begin ###
@@ -36,7 +36,7 @@ The dynamic value of the resource.
 =head1 ATTRIBUTES
 
 
-=head2 Value => Str
+=head2 B<REQUIRED> Value => Str
 
   The value is a resource ID.
 

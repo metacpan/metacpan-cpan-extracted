@@ -1,3 +1,19 @@
+0.4.0 2020-03-04 18:23:23 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add action button property config demo (cb 0.30.0)
+
+0.3.7 2020-02-28 14:22:40 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add loader index.html
+
+0.3.6 2020-02-28 14:20:52 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add loader screen
+
+0.3.5 2020-02-28 09:13:42 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - touch package-lock.json for to fix makefile dependency
+
 0.3.4 2020-02-25 16:05:18 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix broken dependency

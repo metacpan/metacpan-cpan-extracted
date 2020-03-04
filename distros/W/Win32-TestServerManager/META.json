@@ -1,0 +1,59 @@
+{
+   "abstract" : "manage simple test servers on Win32",
+   "author" : [
+      "Kenichi Ishigaki <ishigaki@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Win32-TestServerManager",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Win32" : "0",
+            "Win32::Process" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::UseAllModules" : "0"
+         },
+         "suggests" : {
+            "HTTP::Server::Simple::CGI" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::Pod" : "1.18",
+            "Test::Pod::Coverage" : "1.04"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/charsbar/Win32-TestServerManager"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.00"
+}

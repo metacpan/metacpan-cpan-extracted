@@ -55,6 +55,7 @@ t/41-callbacks.t
 t/42-callbacks-multi-pk.t
 t/50-profiling.t
 t/lib/Cache/Memory.pm
+t/lib/DodTestUtil.pm
 t/lib/ErrorTest.pm
 t/lib/PkLess.pm
 t/lib/Wine.pm
@@ -63,7 +64,6 @@ t/lib/both/Recipe.pm
 t/lib/cached/Ingredient.pm
 t/lib/cached/Recipe.pm
 t/lib/cached/User.pm
-t/lib/db-common.pl
 t/lib/multiplexed/Ingredient2Recipe.pm
 t/lib/partitioned/Ingredient.pm
 t/lib/partitioned/Recipe.pm

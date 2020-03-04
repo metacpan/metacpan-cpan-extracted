@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 23;
 use File::Spec::Functions qw/catdir catfile/;
 use File::Temp;
 use Text::Amuse::Compile::Utils qw/write_file read_file/;
@@ -133,3 +133,47 @@ foreach my $alpha (0,1) {
         }
     }
 }
+
+{
+    my $without = <<'MUSE';
+#title test
+#slides yes
+
+Hello [1]
+
+[1] There
+MUSE
+    my %args = (tex => 1,
+                sl_tex => 1,
+                pdf => $ENV{TEST_WITH_LATEX},
+                sl_pdf => $ENV{TEST_WITH_LATEX});
+    my $c = Text::Amuse::Compile->new(%args);
+    my $source = catfile($workingdir, 'no-sec-foot');
+    write_file($source . '.muse', $without);
+    $c->compile($source . '.muse');
+    foreach my $ext ('.tex', '.sl.tex') {
+        my $texbody = read_file($source . $ext);
+        unlike $texbody, qr{\\MakeSorted};
+        diag $texbody;
+        if ($ext eq '.tex') {
+            unlike $texbody, qr{\\usepackage\[fragile\]\{bigfoot\}};
+        }
+        else {
+            # for sl.tex is irrelevant, but template is missing the conditional:
+            like $texbody, qr{\\usepackage\[fragile\]\{bigfoot\}};
+        }
+    }
+    foreach my $ext ('.pdf', '.sl.pdf') {
+        my $output = $source . $ext;
+        if ($args{$ext}) {
+            ok (-f $output, "$ext found in $output")
+        } else {
+          SKIP:
+            {
+                skip "pdf $ext not required", 1 unless $ENV{TEST_WITH_LATEX};
+                ok(-f $output, "$ext found in $output")
+            }
+        }
+    }
+}
+

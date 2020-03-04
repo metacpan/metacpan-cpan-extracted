@@ -37,7 +37,6 @@
             "Complete::Zsh" : "0",
             "Exporter" : "5.57",
             "Getopt::Long" : "2.50",
-            "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -47,7 +46,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.98"
          }
       }
    },
@@ -63,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Getopt-Long-Complete"
       }
    },
-   "version" : "0.311",
+   "version" : "0.312",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

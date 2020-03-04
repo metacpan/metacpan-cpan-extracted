@@ -1,7 +1,32 @@
 Revision history for DBIx::Class::Sims (ordered by revision number).
 
+0.500001 Mar 04 2020 04:00:00 PDT
+   - Ooops. I forgot to update the MANIFEST.
+
+0.500000 Feb 29 2020 17:00:00 PDT
+   - THIS RELEASE CONTAINS MULTIPLE POTENTIALLY-BREAKING BEHAVIOR CHANGES.
+   - Complete revamp of the internal architecture.
+     - Most of the private attributes have been renamed.
+     - Everything is now an object.
+     - Sims-specific wrappers for:
+       - DBIC::Source
+       - DBIC relationship data structure (hashes and CODE)
+   - Retrieving unique rows will raise an error if the row doesn't match the
+     provided spec.
+     - Set `die_on_unique_mismatch => 0` to disable this
+   - Using a type that isn't loaded will raise an error vs a warning.
+   - Relationship constraints are now lazily checked.
+     - If you say there should be 2 children, Sims will wait until all children
+       are created before verifying that the constraint is met
+   - Set `value_not` to constrain possible values for a column
+     - This can be a scalar or an array.
+   - Trace the creation of objects by setting the `object_trace` parameter
+     - Trace the topograph as well, if needed, with `topograph_trace`
+   - Disable all randomization with the `predictable_values` parameter
+
 0.401000 Jun 09 2019 12:30:00 PDT
    - Provide a nice way to print DateTime objects in SIMS_DEBUG mode.
+   - Upgrade Toposort to 0.060000 for `add_dependencies` option
 
 0.400000 May 25 2019 12:30:00 PDT
    - THIS RELEASE CONTAINS A POTENTIALLY BREAKING BEHAVIOR CHANGE.

@@ -1,9 +1,9 @@
 <%
+    my $class = stash( 'class' ) // {};
     my $position = stash( 'position' ) // '';
     my $style = '';
     if ( $position =~ /^fixed(?:-(top|bottom))?$/ ) {
-        my $class = 'is-fixed-' . ( $1 || 'top' );
-        $classes->{navbar} = join ' ', $classes->{navbar}, $class;
+        $class->{navbar} = join ' ', $class->{navbar}, 'is-fixed-' . ( $1 || 'top' );
     }
     # Bulma does not come with a sticky top, so we have our own
     elsif ( $position =~ /^sticky(?:-(top))?$/ ) {
@@ -16,7 +16,7 @@
                     : 'moai-menu-navbar-' . $nav_number . '-collapse'
                     ;
 =%>
-<nav class="navbar <%= $classes->{navbar} %>" id="<%= stash( 'id' ) %>"
+<nav class="navbar <%= $class->{navbar} %>" id="<%= stash( 'id' ) %>"
     style="<%= $style %>"
 >
     <div class="navbar-brand">

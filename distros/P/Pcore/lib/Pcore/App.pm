@@ -1,7 +1,7 @@
 package Pcore::App;
 
 use Pcore -role, -const;
-use Pcore::Service::Nginx;
+use Pcore::API::Nginx;
 use Pcore::HTTP::Server;
 use Pcore::App::Router;
 use Pcore::App::API;
@@ -132,7 +132,7 @@ around run => sub ( $orig, $self ) {
 };
 
 # NGINX
-sub nginx_cfg ($self) {
+sub nginx_params ($self) {
     my $params = {
         name              => lc( ref $self ) =~ s/::/-/smgr,
         data_dir          => $ENV->{DATA_DIR},
@@ -164,17 +164,25 @@ sub nginx_cfg ($self) {
         push $params->{host}->{$host_name}->{location}->@*, $self->{cdn}->get_nginx_cfg if defined $self->{cdn};
     }
 
-    return P->tmpl->( $self->{cfg}->{server}->{ssl} ? 'nginx/host_conf.nginx' : 'nginx/host_conf_no_ssl.nginx', $params );
+    return $params;
 }
 
 sub start_nginx ($self) {
-    $self->{nginx} = Pcore::Service::Nginx->new;
+    my $name = lc( ref $self ) =~ s/::/-/smgr;
 
-    $self->{nginx}->add_vhost( 'vhost', $self->nginx_cfg );    # if !$self->{nginx}->is_vhost_exists('vhost');
+    $self->{nginx} = Pcore::API::Nginx->new;
+
+    $self->{nginx}->add_vhost( $name, $self->nginx_params );    # if !$self->{nginx}->is_vhost_exists('vhost');
+
+    $self->{nginx}->add_load_balancer_vhost( $name, { server_name => $self->{cfg}->{load_balancer}->{server_name} } ) if $self->{cfg}->{load_balancer}->{server_name};
 
     # SIGNUP -> nginx reload
     $SIG->{HUP} = AE::signal HUP => sub {
-        kill 'HUP', $self->{nginx}->proc->pid || 0;
+        Coro::async {
+            $self->{nginx}->reload;
+
+            return;
+        };
 
         return;
     };

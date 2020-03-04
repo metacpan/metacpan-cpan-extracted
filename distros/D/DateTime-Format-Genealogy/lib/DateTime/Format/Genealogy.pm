@@ -1,7 +1,7 @@
 package DateTime::Format::Genealogy;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2018, Nigel Horne
+# Copyright (C) 2018-2020, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -28,11 +28,11 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -55,40 +55,59 @@ sub new {
 
 =head2 parse_datetime($string)
 
-Given a date, runs it through L<Genealogy::Gedcom::Date> to create a L<DateTime> object.
+Given a date,
+runs it through L<Genealogy::Gedcom::Date> to create a L<DateTime> object.
 If a date range is given, return a two element array in array context, or undef in scalar context
+
+Returns undef if the date can't be parsed, is just a year or if it is an appoximate date starting with "c", "ca" or "abt".
+Can be called as a class or object method.
 
 =cut
 
 sub parse_datetime {
 	my $self = shift;
-	$self = $self->new() unless(ref($self));
-
 	my %params;
 
-	if(ref($_[0]) eq 'HASH') {
+	if(!ref($self)) {
+		if(scalar(@_)) {
+			return(__PACKAGE__->new()->parse_datetime(@_));
+		}
+		return(__PACKAGE__->new()->parse_datetime($self));
+	} elsif(ref($self) eq 'HASH') {
+		return(__PACKAGE__->new()->parse_datetime($self));
+	} elsif(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
-	} elsif(scalar(@_) % 2 == 0) {
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: ', __PACKAGE__, '::parse_datetime(date => $date)');
+	} elsif(scalar(@_) && (scalar(@_) % 2 == 0)) {
 		%params = @_;
 	} else {
 		$params{'date'} = shift;
 	}
 
 	if(my $date = $params{'date'}) {
+		# TODO: Needs much more sanity checking
+		if(($date =~ /^bef\s/i) || ($date =~ /^aft\s/i)) {
+			Carp::carp("$date is invalid, need an exact date to create a DateTime");
+			return;
+		}
+		if($date =~ /^31 Nov/) {
+			Carp::carp("$date is invalid, there are only 30 days in November");
+			return;
+		}
 		my $dfn = $self->{'dfn'};
 		if(!defined($dfn)) {
 			$self->{'dfn'} = $dfn = DateTime::Format::Natural->new();
 		}
-		if($date =~ /^\s*(\d{3,4})\s*\-\s*(\d{3,4})\s*$/) {
+		if($date =~ /^\s*(.+\d\d)\s*\-\s*(.+\d\d)\s*$/) {
 			Carp::carp("Changing date '$date' to 'bet $1 and $2'");
 			$date = "bet $1 and $2";
 		}
 		if($date =~ /^bet (.+) and (.+)/i) {
 			if(wantarray) {
 				return $self->parse_datetime($1), $self->parse_datetime($2);
-			} else {
-				return;
 			}
+			return;
 		}
 		if($date !~ /^\d{3,4}$/) {
 			if(($date =~ /^\d/) && (my $d = $self->_date_parser_cached($date))) {
@@ -102,6 +121,8 @@ sub parse_datetime {
 				Carp::croak("Can't parse date '$date'");
 			}
 		}
+	} else {
+		Carp::croak('Usage: parse_datetime(date => $date)');
 	}
 }
 
@@ -114,6 +135,8 @@ sub _date_parser_cached
 
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: _date_parser_cached(date => $date)');
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
 	} else {
@@ -134,6 +157,10 @@ sub _date_parser_cached
 	eval {
 		$d = $date_parser->parse(date => $date);
 	};
+	if(my $error = $date_parser->error()) {
+		Carp::carp("$date: '$error'");
+		return;
+	}
 	if($d && (ref($d) eq 'ARRAY')) {
 		$d = @{$d}[0];
 		$self->{'all_dates'}{$date} = $d;
@@ -168,23 +195,15 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Gedcom>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/DateTime-Format-Gedcom>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/DateTime-Format-Gedcom>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/DateTime-Format-Gedcom/>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Nigel Horne.
+Copyright 2018-2020 Nigel Horne.
 
 This program is released under the following licence: GPL
 

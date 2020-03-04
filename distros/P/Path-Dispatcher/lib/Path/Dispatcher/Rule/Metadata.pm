@@ -1,16 +1,22 @@
 package Path::Dispatcher::Rule::Metadata;
-use Any::Moose;
+# ABSTRACT: match path's metadata
+
+our $VERSION = '1.07';
+
+use Moo;
+use Type::Utils qw(class_type);
+use Types::Standard qw(Str);
 extends 'Path::Dispatcher::Rule';
 
 has field => (
     is       => 'ro',
-    isa      => 'Str',
+    isa      => Str,
     required => 1,
 );
 
 has matcher => (
     is       => 'ro',
-    isa      => 'Path::Dispatcher::Rule',
+    isa      => class_type("Path::Dispatcher::Rule"),
     required => 1,
 );
 
@@ -29,15 +35,23 @@ sub _match {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
+no Moo;
 
 1;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Path::Dispatcher::Rule::Metadata - match path's metadata
+
+=head1 VERSION
+
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -69,5 +83,20 @@ The metadata field/key name.
 
 A L<Path::Dispatcher::Rule> object for matching against the value of the field.
 
-=cut
+=head1 SUPPORT
 
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Dispatcher>
+(or L<bug-Path-Dispatcher@rt.cpan.org|mailto:bug-Path-Dispatcher@rt.cpan.org>).
+
+=head1 AUTHOR
+
+Shawn M Moore, C<< <sartak at bestpractical.com> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Shawn M Moore.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

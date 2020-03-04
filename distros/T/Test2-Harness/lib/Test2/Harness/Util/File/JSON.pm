@@ -2,7 +2,7 @@ package Test2::Harness::Util::File::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '0.001099';
+our $VERSION = '1.000006';
 
 use Carp qw/croak/;
 use Test2::Harness::Util::JSON qw/encode_json decode_json encode_pretty_json/;
@@ -30,6 +30,22 @@ Test2::Harness::Util::File::JSON - Utility class for a JSON file.
 
 =head1 DESCRIPTION
 
+Subclass of L<Test2::Harness::Util::File> which automatically handles
+encoding/decoding JSON data.
+
+=head1 SYNOPSIS
+
+    require Test2::Harness::Util::File::JSON;
+    my $file = Test2::Harness::Util::File::JSON->new(name => '/path/to/file.json');
+
+    $hash = $file->read;
+    # or
+    $$file->write({...});
+
+=head1 SEE ALSO
+
+See the base class L<Test2::Harness::Util::File> for methods.
+
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
@@ -53,7 +69,7 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2019 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

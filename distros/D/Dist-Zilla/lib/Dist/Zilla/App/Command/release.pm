@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command::release 6.012;
+package Dist::Zilla::App::Command::release 6.014;
 # ABSTRACT: release your dist to the CPAN
 
 use Dist::Zilla::App -command;
@@ -22,6 +22,7 @@ sub abstract { 'release your dist' }
 
 sub opt_spec {
   [ 'trial' => 'build a trial release that PAUSE will not index' ],
+  [ 'jobs|j=i' => 'number of parallel test jobs to run' ],
 }
 
 sub execute {
@@ -35,6 +36,7 @@ sub execute {
     $zilla = $self->zilla;
   }
 
+  local $ENV{HARNESS_OPTIONS} = join ':', split(':', $ENV{HARNESS_OPTIONS} // ''), 'j'.$opt->jobs if $opt->jobs;
   $self->zilla->release;
 }
 
@@ -52,7 +54,7 @@ Dist::Zilla::App::Command::release - release your dist to the CPAN
 
 =head1 VERSION
 
-version 6.012
+version 6.014
 
 =head1 SYNOPSIS
 
@@ -71,7 +73,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

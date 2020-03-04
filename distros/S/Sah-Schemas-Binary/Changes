@@ -1,3 +1,11 @@
-0.001   2018-01-01 (PERLANCAR)
+0.002   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak regex: allow empty string & disallow odd number of
+	  hexdigits.
+
+        - Add examples (tests).
+
+
+0.001   2018-01-01  Released-By: PERLANCAR
 
         - First release.

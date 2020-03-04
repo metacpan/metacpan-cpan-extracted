@@ -1,6 +1,11 @@
 package Path::Dispatcher::Rule;
-use Any::Moose;
+# ABSTRACT: predicate and codeblock
 
+our $VERSION = '1.07';
+
+use Moo;
+
+use Types::Standard qw(Bool);
 use Path::Dispatcher::Match;
 
 use constant match_class => "Path::Dispatcher::Match";
@@ -12,17 +17,21 @@ has payload => (
 
 has prefix => (
     is      => 'ro',
-    isa     => 'Bool',
+    isa     => Bool,
     default => 0,
 );
 
 # support for deprecated "block" attribute
 sub block { shift->payload(@_) }
 sub has_block { shift->has_payload(@_) }
-override BUILDARGS => sub {
+around BUILDARGS => sub {
+    my $orig = shift;
     my $self = shift;
-    my $args = super;
-    $args->{payload} ||= delete $args->{block};
+
+    my $args = $self->$orig(@_);
+    $args->{payload} ||= delete $args->{block}
+        if exists $args->{block};
+
     return $args;
 };
 
@@ -77,31 +86,23 @@ sub run {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
-
-# don't require others to load our subclasses explicitly
-require Path::Dispatcher::Rule::Alternation;
-require Path::Dispatcher::Rule::Always;
-require Path::Dispatcher::Rule::Chain;
-require Path::Dispatcher::Rule::CodeRef;
-require Path::Dispatcher::Rule::Dispatch;
-require Path::Dispatcher::Rule::Empty;
-require Path::Dispatcher::Rule::Enum;
-require Path::Dispatcher::Rule::Eq;
-require Path::Dispatcher::Rule::Intersection;
-require Path::Dispatcher::Rule::Metadata;
-require Path::Dispatcher::Rule::Regex;
-require Path::Dispatcher::Rule::Sequence;
-require Path::Dispatcher::Rule::Tokens;
-require Path::Dispatcher::Rule::Under;
+no Moo;
 
 1;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Path::Dispatcher::Rule - predicate and codeblock
+
+=head1 VERSION
+
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -153,5 +154,20 @@ the C<leftover> path if C<prefix> matching was used, etc.
 
 Runs the rule's codeblock. If none is present, it throws an exception.
 
-=cut
+=head1 SUPPORT
 
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Dispatcher>
+(or L<bug-Path-Dispatcher@rt.cpan.org|mailto:bug-Path-Dispatcher@rt.cpan.org>).
+
+=head1 AUTHOR
+
+Shawn M Moore, C<< <sartak at bestpractical.com> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Shawn M Moore.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

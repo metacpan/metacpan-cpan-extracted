@@ -1,11 +1,10 @@
 $VAR1 = {
           'args' => [
                       sub {
-                          package Test::Tdd::Runner;
                           use warnings;
                           no strict;
                           Devel::Peek::Dump('foo');
-                          print STDERR "this one is also fine\n";
+                          print STDERR "this one is fine\n";
                       }
                     ],
           'globals' => {}

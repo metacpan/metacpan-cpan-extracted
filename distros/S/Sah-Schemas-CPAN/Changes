@@ -1,3 +1,12 @@
+0.006   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix regex: add anchoring.
+
+        - Add examples (tests).
+
+	- It's okay to depend on Regexp::Pattern::CPAN.
+
+
 0.005   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update coerce rule names (Data::Sah::Coerce 0.034+).

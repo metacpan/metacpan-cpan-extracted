@@ -42,7 +42,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::GuardDuty::
 
 =head1 DESCRIPTION
 
-This class has no description
+Contains information about the condition.
 
 =head1 ATTRIBUTES
 
@@ -55,7 +55,8 @@ querying for findings.
 
 =head2 Equals => ArrayRef[Str|Undef]
 
-  
+  Represents an B<equal> condition to be applied to a single field when
+querying for findings.
 
 
 =head2 GreaterThan => Int
@@ -114,7 +115,8 @@ querying for findings.
 
 =head2 NotEquals => ArrayRef[Str|Undef]
 
-  
+  Represents an B<not equal> condition to be applied to a single field
+when querying for findings.
 
 
 

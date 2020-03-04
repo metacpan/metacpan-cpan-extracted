@@ -17,6 +17,8 @@ qx.Class.define("callbackery.ui.plugin.Action", {
      */
     construct : function(cfg,buttonClass,layout,getFormData) {
         this.base(arguments, layout);
+        this._buttonMap = {};
+        this._buttonSetMap = {};
         this._populate(cfg,buttonClass,getFormData);
         this.addListener('actionResponse',function(e){
             var data = e.getData();
@@ -53,6 +55,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
         _cfg: null,
         _tableMenu: null,
         _defaultAction: null,
+        _buttonMap: null,
         _populate: function(cfg,buttonClass,getFormData){
             var tm = this._tableMenu =  new qx.ui.menu.Menu;
             cfg.action.forEach(function(btCfg){
@@ -66,6 +69,16 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     case 'cancel':
                     case 'download':
                         button = new buttonClass(this.xtr(btCfg.label));
+                        if (btCfg.key){
+                            this._buttonMap[btCfg.key]=button;
+                        }
+                        if (btCfg.buttonSet) {
+                            button.set(btCfg.buttonSet);
+                            if (btCfg.key){
+                                this._buttonSetMap[btCfg.key]=btCfg.buttonSet;
+                            }
+                        }
+                        
                         if ( btCfg.addToContextMenu ){
                              menuButton = new qx.ui.menu.Button(this.xtr(btCfg.label));
                         }
@@ -227,6 +240,15 @@ qx.Class.define("callbackery.ui.plugin.Action", {
             else {
                 file = new uploadwidget.UploadButton('file', this.xtr(btCfg.label));
             }
+            if (btCfg.key){
+                this._buttonMap[btCfg.key]=file;
+            }
+            if (btCfg.buttonSet) {
+                file.set(btCfg.buttonSet);
+                if (btCfg.key){
+                    this._buttonSetMap[btCfg.key]=btCfg.buttonSet;
+                }
+            }
             form.add(file);
             file.addListener('execute',function(e){
                 var formData = getFormData();
@@ -283,6 +305,12 @@ qx.Class.define("callbackery.ui.plugin.Action", {
 
         getDefaultAction: function(){
             return this._defaultAction;
+        },
+        getButtonMap: function(){
+            return this._buttonMap;
+        },
+        getButtonSetMap: function(){
+            return this._buttonSetMap;
         }
     }
 });

@@ -10,6 +10,8 @@ instance via REST API
         'url'           => "https://my.rundeck.instance:4440",
         'login'         => "admin",
         'password'      => "passwd",
+    # OR token, takes precedence
+        'token'         => <token as generated with GUI, as an admin>
         'debug'         => 1,
         'proxy'         => "http://proxy.mycompany.com/",
     );

@@ -75,8 +75,8 @@ identifier.
 
 =head2 Score => Num
 
-  The level of confidence that Comprehend Medical has in the accuracy of
-the detection.
+  The level of confidence that Amazon Comprehend Medical has in the
+accuracy of the detection.
 
 
 =head2 Text => Str
@@ -86,7 +86,7 @@ the detection.
 
 =head2 Traits => ArrayRef[L<Paws::ComprehendMedical::Trait>]
 
-  Contextual information for the entity
+  Contextual information for the entity.
 
 
 =head2 Type => Str

@@ -2,7 +2,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-# Copyright 2012-2017 Yuriy Ustushenko, all rights reserved.
+# Copyright 2012-2020 Yuriy Ustushenko, all rights reserved.
 #
 # Derived from the module XML::LibXML
 # Copyright 2001-2003 AxKit.com Ltd., 2002-2006 Christian Glahn, 2006-2009 Petr Pajas

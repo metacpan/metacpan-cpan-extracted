@@ -2,3 +2,15 @@ Revision history for Mojolicious-Plugin-Minion-Tasks
 
 0.0.1   2020-02-20
         Initial version
+
+0.0.2   2020-03-02
+        Fix pod coverage
+
+0.0.3   2020-03-02
+        Fix pod coverage for lib/Mojolicious/Plugin/Minion/Overview/Controller/Jobs.pm
+
+0.0.4   2020-03-03
+        Show workers stats on dashboard
+
+0.0.5   2020-03-03
+        Dashboard - refresh every 20 seconds

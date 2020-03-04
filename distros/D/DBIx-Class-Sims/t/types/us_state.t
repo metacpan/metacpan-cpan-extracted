@@ -1,23 +1,18 @@
 # vi:sw=2
-use strict;
-use warnings FATAL => 'all';
+use strictures 2;
 
-use Test::More;
+use Test2::V0 qw( done_testing );
 
-use_ok 'DBIx::Class::Sims::Types';
+use lib 't/lib';
+use types qw(types_test);
 
-my $sub = DBIx::Class::Sims::Types->can('us_state');
-
-my @tests = (
-  [ { data_type => 'varchar'}, qr/^\w\w$/ ],
-  [ { data_type => 'varchar', size => 2 }, qr/^\w\w$/ ],
-  [ { data_type => 'varchar', size => 10 }, qr/^[\w\s]{1,10}$/ ],
-  [ { data_type => 'varchar', size => 12 }, qr/^[\w\s]{1,12}$/ ],
-);
-
-foreach my $test ( @tests ) {
-  $test->[0]{sim} = { type => 'us_state' };
-  like( $sub->($test->[0]), $test->[1] );
-}
+types_test us_state => {
+  tests => [
+    [ { data_type => 'varchar'}, qr/^\w\w$/, 'AL' ],
+    [ { data_type => 'varchar', size => 2 }, qr/^\w\w$/, 'AL' ],
+    [ { data_type => 'varchar', size => 10 }, qr/^[\w\s]{1,10}$/, 'Alabama' ],
+    [ { data_type => 'varchar', size => 12 }, qr/^[\w\s]{1,12}$/, 'Alabama' ],
+  ],
+};
 
 done_testing;

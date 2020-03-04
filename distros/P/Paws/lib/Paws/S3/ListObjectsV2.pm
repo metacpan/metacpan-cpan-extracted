@@ -74,7 +74,16 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/s3/
 
 =head2 B<REQUIRED> Bucket => Str
 
-Name of the bucket to list.
+Bucket name to list.
+
+When using this API with an access point, you must direct requests to
+the access point hostname. The access point hostname takes the form
+I<AccessPointName>-I<AccountId>.s3-accesspoint.I<Region>.amazonaws.com.
+When using this operation using an access point through the AWS SDKs,
+you provide the access point ARN in place of the bucket name. For more
+information about access point ARNs, see Using Access Points
+(https://docs.aws.amazon.com/AmazonS3/latest/dev/using-access-points.html)
+in the I<Amazon Simple Storage Service Developer Guide>.
 
 
 
@@ -82,7 +91,7 @@ Name of the bucket to list.
 
 ContinuationToken indicates Amazon S3 that the list is being continued
 on this bucket with a token. ContinuationToken is obfuscated and is not
-a real key
+a real key.
 
 
 
@@ -102,7 +111,7 @@ Valid values are: C<"url">
 
 The owner field is not present in listV2 by default, if you want to
 return owner field with each key in the result then set the fetch owner
-field to true
+field to true.
 
 
 
@@ -131,7 +140,7 @@ Valid values are: C<"requester">
 
 StartAfter is where you want Amazon S3 to start listing from. Amazon S3
 starts listing after this specified key. StartAfter can be any key in
-the bucket
+the bucket.
 
 
 

@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Jobs;
 use strict;
 use warnings;
 
-our $VERSION = '0.000021';
+our $VERSION = '0.000023';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -41,7 +41,7 @@ sub handle {
         fetch => sub {
             $flush = 1 if $run->complete;
 
-            my @new = $run->jobs(undef, {offset => $offset, order_by => [{-desc => 'fail'}, {-asc => 'job_ord'}]})->all;
+            my @new = $run->jobs(undef, {offset => $offset, order_by => [{-asc => 'retry'}, {-desc => 'fail'}, {-asc => 'job_ord'}]})->all;
             if (@new) {
                 $offset += @new;
                 push @jobs => @new;

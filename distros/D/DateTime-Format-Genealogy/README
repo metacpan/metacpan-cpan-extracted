@@ -1,0 +1,34 @@
+DateTime-Format-Genealogy Version 0.02
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DateTime::Format::Genealogy
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Genealogy
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DateTime-Format-Genealogy
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DateTime-Format-Genealogy
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2018-2020 Nigel Horne
+
+This program is released under the following licence: GPL

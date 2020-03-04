@@ -105,7 +105,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             var rpc = callbackery.data.Server.getInstance();
             var cfg = this._cfg;
             var form = this._form;
-
+            var that = this;
             cfg.form.forEach(function(s){
                 if (!s.key){
                     return;
@@ -137,7 +137,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                             if (message){
                                 control.set({
                                     valid: false,
-                                    invalidMessage: message
+                                    invalidMessage: that.xtr(message)
                                 });
                             }
                             else {

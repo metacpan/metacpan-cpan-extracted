@@ -1,4 +1,4 @@
-package Dist::Zilla 6.012;
+package Dist::Zilla 6.014;
 # ABSTRACT: distribution builder; installer not included!
 
 use Moose 0.92; # role composition fixes
@@ -15,7 +15,7 @@ use Dist::Zilla::Types qw(Path License ReleaseStatus);
 use Log::Dispatchouli 1.100712; # proxy_loggers, quiet_fatal
 use Dist::Zilla::Path;
 use List::Util 1.33 qw(first none);
-use Software::License 0.101370; # meta2_name
+use Software::License 0.103014; # spdx_expression()
 use String::RewritePrefix;
 use Try::Tiny;
 
@@ -595,7 +595,7 @@ sub _build_distmeta {
     $meta = $meta_merge->merge($meta, $_->metadata);
   }
 
-  $meta = $meta_merge->merge($meta, {
+  my %meta_main = (
     'meta-spec' => {
       version => 2,
       url     => 'https://metacpan.org/pod/CPAN::Meta::Spec',
@@ -613,7 +613,12 @@ sub _build_distmeta {
                     . ' version '
                     . ($self->VERSION // '(undef)'),
     x_generated_by_perl => "$^V", # v5.24.0
-  });
+  );
+  if (my $spdx = $self->license->spdx_expression) {
+    $meta_main{x_spdx_expression} = $spdx;
+  }
+
+  $meta = $meta_merge->merge($meta, \%meta_main);
 
   return $meta;
 }
@@ -892,7 +897,7 @@ Dist::Zilla - distribution builder; installer not included!
 
 =head1 VERSION
 
-version 6.012
+version 6.014
 
 =head1 DESCRIPTION
 
@@ -1164,7 +1169,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ævar Arnfjörð Bjarmason Alastair McGowan-Douglas Alceu Rodrigues de Freitas Junior Alexei Znamensky Alex Vandiver ambs Andrew Rodland Andy Jack Apocalypse ben hengst Bernardo Rechea Brian Fraser Caleb Cushing Chase Whitener Chisel Christian Walde Christopher J. Madsen Chris Weyl Cory G Watson csjewell Curtis Brandt Dagfinn Ilmari Mannsåker Damien KRotkine Danijel Tasov Dave O'Neill Rolsky David E. Wheeler Golden H. Adler Steinbrunner Zurborg Davor Cubranic Dimitar Petrov Doug Bell Erik Carlsson Fayland Lam Florian Ragwitz Fred Moyer fREW Schmidt gardnerm Gianni Ceccarelli Graham Barr Knop Ollis Grzegorz Rożniecki Hans Dieter Pearcey Hunter McMillen Ivan Bessarabov Jakob Voss jantore Jérôme Quelin Jesse Luehrs Vincent JJ Merelo John Napiorkowski jonasbn Jonathan C. Otsuka Rockway Scott Duff Yu Karen Etheridge Kent Fredric Leon Timmermans Lucas Theisen Luc St-Louis Marcel Gruenauer Martin McGrath Mary Ehlers Mateu X Matthew Horsfall mauke Michael G. Schwern Jemmeson Mickey Nasriachi Mike Doherty Mohammad S Anwar Moritz Onken Neil Bowers Nickolay Platonov Nick Tonkin nperez Olivier Mengué Paul Cochrane Pedro Melo Philippe Bruhat (BooK) Randy Stauner robertkrimen Rob Hoelz Robin Smidsrød Roy Ivy III Shawn M Moore Smylers Steffen Schwigon Steven Haryanto Tatsuhiko Miyagawa Upasana Shukla Vyacheslav Matjukhin Yanick Champoux Yuval Kogman
+=for stopwords Ævar Arnfjörð Bjarmason Alastair McGowan-Douglas Alceu Rodrigues de Freitas Junior Alexei Znamensky Alex Vandiver ambs Andrew Rodland Andy Jack Apocalypse ben hengst Bernardo Rechea Brian Fraser Caleb Cushing Chase Whitener Chisel Christian Walde Christopher J. Madsen Chris Weyl Cory G Watson csjewell Curtis Brandt Dagfinn Ilmari Mannsåker Damien KRotkine Dan Book Daniel Böhmer Danijel Tasov Dave Lambley O'Neill Rolsky David E. Wheeler Golden H. Adler Steinbrunner Zurborg Davor Cubranic Dimitar Petrov Doug Bell Erik Carlsson Fayland Lam Felix Ostmann Florian Ragwitz Fred Moyer fREW Schmidt gardnerm Gianni Ceccarelli Graham Barr Knop Ollis Grzegorz Rożniecki Hans Dieter Pearcey Hunter McMillen Ivan Bessarabov Jakob Voss jantore Jérôme Quelin Jesse Luehrs Vincent JJ Merelo John Napiorkowski jonasbn Jonathan C. Otsuka Rockway Scott Duff Yu Karen Etheridge Kent Fredric Leon Timmermans Lucas Theisen Luc St-Louis Marcel Gruenauer Martin McGrath Mary Ehlers Mateu X Matthew Horsfall mauke Michael Conrad G. Schwern Jemmeson Mickey Nasriachi Mike Doherty Mohammad S Anwar Moritz Onken Neil Bowers Nickolay Platonov Nick Tonkin nperez Olivier Mengué Paul Cochrane Pedro Melo Philippe Bruhat (BooK) Randy Stauner robertkrimen Rob Hoelz Robin Smidsrød Roy Ivy III Shawn M Moore Shlomi Fish Smylers Steffen Schwigon Steven Haryanto Tatsuhiko Miyagawa Upasana Shukla Vyacheslav Matjukhin Yanick Champoux Yuval Kogman
 
 =over 4
 
@@ -1262,7 +1267,19 @@ Damien KRotkine <dkrotkine@booking.com>
 
 =item *
 
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Daniel Böhmer <post@daniel-boehmer.de>
+
+=item *
+
 Danijel Tasov <dt@korn.shell.la>
+
+=item *
+
+Dave Lambley <dave@lambley.me.uk>
 
 =item *
 
@@ -1302,6 +1319,10 @@ Dimitar Petrov <mitakaa@gmail.com>
 
 =item *
 
+Doug Bell <doug@preaction.me>
+
+=item *
+
 Doug Bell <madcityzen@gmail.com>
 
 =item *
@@ -1311,6 +1332,10 @@ Erik Carlsson <info@code301.com>
 =item *
 
 Fayland Lam <fayland@gmail.com>
+
+=item *
+
+Felix Ostmann <felix.ostmann@gmail.com>
 
 =item *
 
@@ -1458,6 +1483,10 @@ mauke <l.mai@web.de>
 
 =item *
 
+Michael Conrad <mike@nrdvana.net>
+
+=item *
+
 Michael G. Schwern <schwern@pobox.com>
 
 =item *
@@ -1538,6 +1567,10 @@ Shawn M Moore <sartak@gmail.com>
 
 =item *
 
+Shlomi Fish <shlomif@shlomifish.org>
+
+=item *
+
 Smylers <Smylers@stripey.com>
 
 =item *
@@ -1572,7 +1605,7 @@ Yuval Kogman <nothingmuch@woobling.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

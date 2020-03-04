@@ -1,7 +1,7 @@
 use v5.14;
 use warnings;
 
-package Datify::Path v0.20.052;
+package Datify::Path v0.20.064;
 # ABSTRACT: Describe structures like filesystem paths.
 # VERSION
 
@@ -318,7 +318,7 @@ feature.
 
 =head1 VERSION
 
-This document describes version v0.20.052 of this module.
+This document describes version v0.20.064 of this module.
 
 =head1 AUTHOR
 
@@ -326,7 +326,7 @@ Bob Kleemann <bobk@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2019 by Bob Kleemann.
+This software is Copyright (c) 2014-2020 by Bob Kleemann.
 
 This is free software, licensed under:
 

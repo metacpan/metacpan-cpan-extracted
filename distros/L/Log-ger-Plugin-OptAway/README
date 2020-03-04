@@ -1,8 +1,8 @@
 NAME
-    Log::ger::Plugin::OptAway - Optimize away higher-level log statements
+    Log::ger::Plugin::OptAway - Optimize away log statements
 
 VERSION
-    version 0.006
+    version 0.007
 
 SYNOPSIS
      use Log::ger::Plugin->set('OptAway');
@@ -20,6 +20,10 @@ SYNOPSIS
      '???';
      -e syntax OK
 
+    To optimize away all levels:
+
+     use Log::ger::Plugin 'OptAway', all=>1;
+
 DESCRIPTION
     This plugin replaces logging statements that are higher than the current
     level ($Log::ger::Current_Level) into a no-op statement using
@@ -30,6 +34,9 @@ DESCRIPTION
     "log_info()", "log_debug()", and "log_trace()" calls will be turned into
     no-op.
 
+    If the configuration "all" is set to true, however, logger routines for
+    *all* levels will be turned into no-op.
+
     Caveats:
 
     *   must be done at compile-time
@@ -39,11 +46,20 @@ DESCRIPTION
     *   once optimized away, subsequent logger reinitialization at run-time
         won't take effect
 
+CONFIGURATION
+  all
+    Boolean. If set to true, will optimize away all levels, including
+    multi-level logger routines. This is an easy way to disable all logging.
+
+    By default, only levels above the current level
+    ($Log::ger::Current_level) will be optimized away.
+
+SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

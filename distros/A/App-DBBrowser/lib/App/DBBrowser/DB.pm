@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.238';
+our $VERSION = '2.241';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -288,6 +288,18 @@ sub regexp {
     }
 }
 
+
+
+sub bit_length {
+    my ( $sf, $col ) = @_;
+    return "BIT_LENGTH($col)";
+}
+
+sub char_length {
+    my ( $sf, $col ) = @_;
+    return "CHAR_LENGTH($col)";
+}
+
 sub concatenate {
     my ( $sf, $arguments, $sep ) = @_;
     my $arg;
@@ -305,6 +317,13 @@ sub concatenate {
     return join( ' || ', @$arg );
 }
 
+sub epoch_to_date {
+    my ( $sf, $col, $interval ) = @_;
+    return "DATE($col/$interval,'unixepoch','localtime')"  if $sf->get_db_driver eq 'SQLite';
+    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')"      if $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/;
+    return "TO_TIMESTAMP(${col}::bigint/$interval)::date"  if $sf->get_db_driver eq 'Pg';
+}
+
 sub epoch_to_datetime {
     my ( $sf, $col, $interval ) = @_;
     return "DATETIME($col/$interval,'unixepoch','localtime')"   if $sf->get_db_driver eq 'SQLite';
@@ -312,11 +331,14 @@ sub epoch_to_datetime {
     return "TO_TIMESTAMP(${col}::bigint/$interval)::timestamp"  if $sf->get_db_driver eq 'Pg';
 }
 
-sub epoch_to_date {
-    my ( $sf, $col, $interval ) = @_;
-    return "DATE($col/$interval,'unixepoch','localtime')"  if $sf->get_db_driver eq 'SQLite';
-    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')"      if $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/;
-    return "TO_TIMESTAMP(${col}::bigint/$interval)::date"  if $sf->get_db_driver eq 'Pg';
+sub replace {
+    my ( $sf, $col, $string_to_replace, $replacement_string ) = @_;
+    return "REPLACE($col,$string_to_replace,$replacement_string)";
+}
+
+sub round {
+    my ( $sf, $col, $precision ) = @_;
+    return "ROUND($col,$precision)";
 }
 
 sub truncate {
@@ -329,20 +351,7 @@ sub truncate {
     return "TRUNCATE($col,$precision)";
 }
 
-sub round {
-    my ( $sf, $col, $precision ) = @_;
-    return "ROUND($col,$precision)";
-}
 
-sub bit_length {
-    my ( $sf, $col ) = @_;
-    return "BIT_LENGTH($col)";
-}
-
-sub char_length {
-    my ( $sf, $col ) = @_;
-    return "CHAR_LENGTH($col)";
-}
 
 
 
@@ -366,7 +375,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.238
+Version 2.241
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "split English-language domain names etc. into words",
+   "abstract" : "Split English-language domain names etc. into words",
    "author" : [
       "Sam Kington <skington@cpan.org>"
    ],
@@ -44,14 +44,16 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/skington/lingua-en-segment",
+      "bugtracker" : {
+         "web" : "https://github.com/skington/lingua-en-segment/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/skington/lingua-en-segment.git",
+         "url" : "git://github.com/skington/lingua-en-segment.git",
          "web" : "https://github.com/skington/lingua-en-segment"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

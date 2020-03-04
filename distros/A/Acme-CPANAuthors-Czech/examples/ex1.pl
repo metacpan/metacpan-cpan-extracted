@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Acme::CPANAuthors;
 
 # Create object.
@@ -17,4 +15,4 @@ my $count = $authors->count;
 print "Count of Czech CPAN authors: $count\n";
 
 # Output:
-# Count of Czech CPAN authors: 36
+# Count of Czech CPAN authors: 38

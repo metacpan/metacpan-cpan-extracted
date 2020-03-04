@@ -33,8 +33,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::S3::Encrypt
 
 =head1 DESCRIPTION
 
-Describes the server-side encryption that will be applied to the
-restore results.
+Contains the type of server-side encryption used.
 
 =head1 ATTRIBUTES
 
@@ -42,19 +41,23 @@ restore results.
 =head2 B<REQUIRED> EncryptionType => Str
 
   The server-side encryption algorithm used when storing job results in
-Amazon S3 (e.g., AES256, aws:kms).
+Amazon S3 (for example, AES256, aws:kms).
 
 
 =head2 KMSContext => Str
 
-  If the encryption type is aws:kms, this optional value can be used to
-specify the encryption context for the restore results.
+  If the encryption type is C<aws:kms>, this optional value can be used
+to specify the encryption context for the restore results.
 
 
 =head2 KMSKeyId => Str
 
-  If the encryption type is aws:kms, this optional value specifies the
-AWS KMS key ID to use for encryption of job results.
+  If the encryption type is C<aws:kms>, this optional value specifies the
+ID of the symmetric customer managed AWS KMS CMK to use for encryption
+of job results. Amazon S3 only supports symmetric CMKs. For more
+information, see Using Symmetric and Asymmetric Keys
+(https://docs.aws.amazon.com/kms/latest/developerguide/symmetric-asymmetric.html)
+in the I<AWS Key Management Service Developer Guide>.
 
 
 

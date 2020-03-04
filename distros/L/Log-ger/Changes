@@ -1,3 +1,23 @@
+0.031   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow each routine to have its own init args; this allows e.g.
+	  creating multiple sets of logger subroutines that log to
+	  different categories, as implemented in
+	  Log::ger::Plugin::Multisets.
+
+	- Silence 'Redundant argument in sprintf' warning.
+
+	- [doc] Tweak to make module name and version clearer [GH #2].
+
+
+0.030   2020-02-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak Synopsis, at least show how to set level & pick
+	  multiple outputs.
+
+
 0.029   2020-02-18  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

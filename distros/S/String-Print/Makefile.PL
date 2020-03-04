@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '0.93';
+my $version = '0.94';
 
 my %prereq  =
   ( Test::More        => 0.86
@@ -17,9 +17,9 @@ WriteMakefile
   , VERSION   => $version
   , PREREQ_PM => \%prereq
 
-  , AUTHOR    => 'Mark Overmeer'
+  , AUTHOR    => 'Mark Overmeer <markov@cpan.org>'
   , ABSTRACT  => 'printf extensions'
-  , LICENSE   => 'perl'
+  , LICENSE   => 'perl_5'
 
   , META_MERGE =>
       { 'meta-spec' => { version => 2 }
@@ -29,9 +29,9 @@ WriteMakefile
              , url  => 'https://github.com/markov2/perl5-String-Print.git'
              , web  => 'https://github.com/markov2/perl5-String-Print'
              }
+         , homepage => 'http://perl.overmeer.net/CPAN/'
+         , license  => [ 'http://dev.perl.org/licenses/' ]
          }
-      , homepage => 'http://perl.overmeer.net/CPAN/'
-      , license  => [ 'http://dev.perl.org/licenses/' ]
       }
   );
 

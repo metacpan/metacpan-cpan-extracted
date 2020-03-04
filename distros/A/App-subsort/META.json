@@ -33,10 +33,11 @@
             "Complete::Module" : "0",
             "Complete::Sah" : "0",
             "Complete::Sequence" : "0.002",
-            "Complete::Util" : "0.606",
+            "Complete::Util" : "0.608",
             "Getopt::Long::More" : "0.006",
+            "Log::ger" : "0.027",
             "Module::List::Tiny" : "0",
-            "Sort::Sub" : "0.112",
+            "Sort::Sub" : "0.118",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -63,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-App-subsort"
       }
    },
-   "version" : "0.044",
+   "version" : "0.045",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -219,7 +220,7 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
@@ -388,7 +389,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.07"
+                        "version" : "0.081"
                      }
                   ]
                }
@@ -409,7 +410,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",

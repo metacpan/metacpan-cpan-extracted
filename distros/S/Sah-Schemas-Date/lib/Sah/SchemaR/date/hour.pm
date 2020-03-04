@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::hour;
 
-our $DATE = '2020-02-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2020-03-03'; # DATE
+our $VERSION = '0.010'; # VERSION
 
-our $rschema = ["int",[{max=>23,min=>0,summary=>"Hour of day"}],["int"]];
+our $rschema = ["int",[{examples=>[{data=>"",valid=>0},{data=>0,valid=>1},{data=>23,valid=>1},{data=>24,valid=>0}],max=>23,min=>0,summary=>"Hour of day"}],["int"]];
 
 1;
 # ABSTRACT: Hour of day
@@ -20,7 +20,7 @@ Sah::SchemaR::date::hour - Hour of day
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::SchemaR::date::hour (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Sah::SchemaR::date::hour (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
 
 =head1 DESCRIPTION
 

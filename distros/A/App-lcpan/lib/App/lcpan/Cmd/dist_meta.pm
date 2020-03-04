@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::dist_meta;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '1.043'; # VERSION
+our $DATE = '2020-03-04'; # DATE
+our $VERSION = '1.045'; # VERSION
 
 use 5.010;
 use strict;
@@ -53,7 +53,7 @@ App::lcpan::Cmd::dist_meta - Get distribution metadata
 
 =head1 VERSION
 
-This document describes version 1.043 of App::lcpan::Cmd::dist_meta (from Perl distribution App-lcpan), released on 2019-11-29.
+This document describes version 1.045 of App::lcpan::Cmd::dist_meta (from Perl distribution App-lcpan), released on 2020-03-04.
 
 =head1 FUNCTIONS
 
@@ -73,6 +73,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<dist>* => I<perl::distname>
+
 
 =back
 
@@ -109,7 +110,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

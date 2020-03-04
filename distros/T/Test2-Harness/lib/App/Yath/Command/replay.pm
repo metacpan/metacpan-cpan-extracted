@@ -2,24 +2,24 @@ package App::Yath::Command::replay;
 use strict;
 use warnings;
 
-our $VERSION = '0.001099';
+our $VERSION = '1.000006';
 
-use Test2::Util qw/pkg_to_file/;
+use App::Yath::Options;
+require App::Yath::Command::test;
 
-use Test2::Harness::Feeder::JSONL;
-use Test2::Harness::Run;
-use Test2::Harness;
+use parent 'App::Yath::Command';
+use Test2::Harness::Util::HashBase qw/+renderers <final_data <log_file <tests_seen <asserts_seen/;
 
-use parent 'App::Yath::Command::test';
-use Test2::Harness::Util::HashBase;
+include_options(
+    'App::Yath::Options::Debug',
+    'App::Yath::Options::Display',
+    'App::Yath::Options::PreCommand',
+);
+
+
+sub group { 'log' }
 
 sub summary { "Replay a test run from an event log" }
-
-sub group { ' test' }
-
-sub has_runner  { 0 }
-sub has_logger  { 0 }
-sub has_display { 1 }
 
 sub cli_args { "[--] event_log.jsonl[.gz|.bz2] [job1, job2, ...]" }
 
@@ -35,32 +35,58 @@ command accepts.
     EOT
 }
 
-sub handle_list_args {
+sub init {
     my $self = shift;
-    my ($list) = @_;
+    $self->SUPER::init() if $self->can('SUPER::init');
 
-    my $settings = $self->{+SETTINGS};
-
-    my ($log, @jobs) = @$list;
-
-    $settings->{log_file} = $log;
-    $settings->{jobs} = { map { $_ => 1 } @jobs} if @jobs;
-
-    die "You must specify a log file.\n"
-        unless $log;
-
-    die "Invalid log file: '$log'"
-        unless -f $log;
+    $self->{+TESTS_SEEN}   //= 0;
+    $self->{+ASSERTS_SEEN} //= 0;
 }
 
-sub feeder {
+sub run {
     my $self = shift;
 
-    my $settings = $self->{+SETTINGS};
+    my $args      = $self->args;
+    my $settings  = $self->settings;
+    my $renderers = $self->App::Yath::Command::test::renderers;
 
-    my $feeder = Test2::Harness::Feeder::JSONL->new(file => $settings->{log_file});
+    shift @$args if @$args && $args->[0] eq '--';
 
-    return ($feeder);
+    $self->{+LOG_FILE} = shift @$args or die "You must specify a log file";
+    die "'$self->{+LOG_FILE}' is not a valid log file" unless -f $self->{+LOG_FILE};
+    die "'$self->{+LOG_FILE}' does not look like a log file" unless $self->{+LOG_FILE} =~ m/\.jsonl(\.(gz|bz2))?$/;
+
+    my $jobs = @$args ? {map {$_ => 1} @$args} : undef;
+
+    my $stream = Test2::Harness::Util::File::JSONL->new(name => $self->{+LOG_FILE});
+
+    while (1) {
+        my @events = $stream->poll(max => 1000) or last;
+
+        for my $e (@events) {
+            last unless defined $e;
+
+            $self->{+TESTS_SEEN}++   if $e->{facet_data}->{harness_job_launch};
+            $self->{+ASSERTS_SEEN}++ if $e->{facet_data}->{assert};
+
+            if (my $final = $e->{facet_data}->{harness_final}) {
+                $self->{+FINAL_DATA} = $final;
+            }
+            else {
+                next if $jobs && !$jobs->{$e->{job_id}};
+                $_->render_event($e) for @$renderers;
+            }
+        }
+    }
+
+    $_->finish() for @$renderers;
+
+    my $final_data = $self->{+FINAL_DATA} or die "Log did not contain final data!\n";
+
+    $self->App::Yath::Command::test::render_final_data($final_data);
+    $self->App::Yath::Command::test::render_summary($final_data->{pass});
+
+    return $final_data->{pass} ? 0 : 1;
 }
 
 1;
@@ -73,336 +99,148 @@ __END__
 
 =head1 NAME
 
-App::Yath::Command::replay - Command to replay a test run from an event log.
+App::Yath::Command::replay - Replay a test run from an event log
 
 =head1 DESCRIPTION
 
-=head1 SYNOPSIS
+This yath command will re-run the harness against an event log produced by a
+previous test run. The only required argument is the path to the log file,
+which maybe compressed. Any extra arguments are assumed to be job id's. If you
+list any jobs, only listed jobs will be processed.
 
-=head1 COMMAND LINE USAGE
+This command accepts all the same renderer/formatter options that the 'test'
+command accepts.
 
 
-    $ yath replay [options] [--] event_log.jsonl[.gz|.bz2] [job1, job2, ...]
+=head1 USAGE
 
-=head2 Help
+    $ yath [YATH OPTIONS] replay [COMMAND OPTIONS]
+
+=head2 YATH OPTIONS
+
+=head3 Developer
+
+=over 4
+
+=item --dev-lib
+
+=item --dev-lib=lib
+
+=item -D
+
+=item -D=lib
+
+=item -Dlib
+
+=item --no-dev-lib
+
+Add paths to @INC before loading ANYTHING. This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
+
+Can be specified multiple times
+
+
+=back
+
+=head3 Environment
+
+=over 4
+
+=item --persist-dir ARG
+
+=item --persist-dir=ARG
+
+=item --no-persist-dir
+
+Where to find persistence files.
+
+
+=item --persist-file ARG
+
+=item --persist-file=ARG
+
+=item --pfile ARG
+
+=item --pfile=ARG
+
+=item --no-persist-file
+
+Where to find the persistence file. The default is /{system-tempdir}/project-yath-persist.json. If no project is specified then it will fall back to the current directory. If the current directory is not writable it will default to /tmp/yath-persist.json which limits you to one persistent runner on your system.
+
+
+=item --project ARG
+
+=item --project=ARG
+
+=item --project-name ARG
+
+=item --project-name=ARG
+
+=item --no-project
+
+This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file. This is necessary for a persistent runner.
+
+
+=back
+
+=head3 Help and Debugging
 
 =over 4
 
 =item --show-opts
 
+=item --no-show-opts
+
 Exit after showing what yath thinks your options mean
 
-=item -h
-
-=item --help
-
-Exit after showing this help message
-
-=item -V
 
 =item --version
 
-Show version information
+=item -V
+
+=item --no-version
+
+Exit after showing a helpful usage message
+
 
 =back
 
-=head2 Harness Options
+=head3 Plugins
 
 =over 4
 
-=item --id ID
+=item --no-scan-plugins
 
-=item --run_id ID
+=item --no-no-scan-plugins
 
-Set a specific run-id
+Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that it loading other modules when it should not.
 
-(Default: a UUID)
 
-=item --no-long
+=item --plugins PLUGIN
 
-Do not run tests with the HARNESS-DURATION-LONG header
+=item --plugins +App::Yath::Plugin::PLUGIN
 
-=item --only-long
+=item --plugins PLUGIN=arg1,arg2,...
 
-only run tests with the HARNESS-DURATION-LONG header
+=item --plugin PLUGIN
 
-=item -m Module
+=item --plugin +App::Yath::Plugin::PLUGIN
 
-=item --load Module
+=item --plugin PLUGIN=arg1,arg2,...
 
-=item --load-module Mod
+=item -pPLUGIN
 
-Load a module in each test (after fork)
+=item --no-plugins
 
-this option may be given multiple times
+Load a yath plugin.
 
-=item -M Module
+Can be specified multiple times
 
-=item --loadim Module
-
-=item --load-import Mod
-
-Load and import module in each test (after fork)
-
-this option may be given multiple times
-
-=item -X foo
-
-=item --exclude-pattern bar
-
-Exclude files that match
-
-May be specified multiple times
-
-matched using `m/$PATTERN/`
-
-=item -x t/bad.t
-
-=item --exclude-file t/bad.t
-
-Exclude a file from testing
-
-May be specified multiple times
-
-=item --durations path
-
-=item --durations url
-
-Point at a json file or url which has a hash of relative test filenames as keys, and 'SHORT', 'MEDIUM', or 'LONG' as values. This will override durations listed in the file headers. An exception will be thrown if the durations file or url does not work.
-
-=item --et SECONDS
-
-=item --event_timeout #
-
-Kill test if no events received in timeout period
-
-(Default: 60 seconds)
-
-This is used to prevent the harness for waiting forever for a hung test. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.
-
-=item --maybe-durations path
-
-=item --maybe-durations url
-
-Same as 'durations' except not fatal if not found. If this and 'durations' are both specified then 'durations' is used as a fallback when this fails. You may specify this option multiple times and the first one that works will be used
-
-=item --pet SECONDS
-
-=item --post-exit-timeout #
-
-Stop waiting post-exit after the timeout period
-
-(Default: 15 seconds)
-
-Some tests fork and allow the parent to exit before writing all their output. If Test2::Harness detects an incomplete plan after the test exists it will monitor for more events until the timeout period. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.
 
 =back
 
-=head2 Job Options
+=head2 COMMAND OPTIONS
 
-=over 4
-
-=item --blib
-
-=item --no-blib
-
-(Default: on) Include 'blib/lib' and 'blib/arch'
-
-Do not include 'blib/lib' and 'blib/arch'
-
-=item --input-file file
-
-Use the specified file as standard input to ALL tests
-
-=item --lib
-
-=item --no-lib
-
-(Default: on) Include 'lib' in your module path
-
-Do not include 'lib'
-
-=item --no-mem-usage
-
-Disable Test2::Plugin::MemUsage (Loaded by default)
-
-=item --no-uuids
-
-Disable Test2::Plugin::UUID (Loaded by default)
-
-=item --retry-job-count=1
-
-When re-running failed tests, use a different number of parallel jobs. You might do this if your tests are not reliably parallel safe
-
-=item --retry=1
-
-Run any jobs that failed a second time. NOTE: --retry=1 means failing tests will be attempted twice!
-
-=item --slack "#CHANNEL"
-
-=item --slack "@USER"
-
-Send results to a slack channel
-
-Send results to a slack user
-
-=item --slack-fail "#CHANNEL"
-
-=item --slack-fail "@USER"
-
-Send failing results to a slack channel
-
-Send failing results to a slack user
-
-=item --tlib
-
-(Default: off) Include 't/lib' in your module path
-
-=item -E VAR=value
-
-=item --env-var VAR=val
-
-Set an environment variable for each test
-
-(but not the harness)
-
-=item -i "string"
-
-This input string will be used as standard input for ALL tests
-
-See also --input-file
-
-=item -I path/lib
-
-=item --include lib/
-
-Add a directory to your include paths
-
-This can be used multiple times
-
-=item --cover
-
-use Devel::Cover to calculate test coverage
-
-This is essentially the same as combining: '--no-fork', and '-MDevel::Cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl' Devel::Cover and preload/fork do not work well together.
-
-=item --default-at-search xt
-
-Specify the default file/dir search when 'AUTHOR_TESTING' is set. Defaults to './xt'. The default AT search is only used if no files were specified at the command line
-
-=item --default-search t
-
-Specify the default file/dir search. defaults to './t', './t2', and 'test.pl'. The default search is only used if no files were specified at the command line
-
-=item --email foo@example.com
-
-Email the test results (and any log file) to the specified email address(es)
-
-=item --email-from foo@example.com
-
-If any email is sent, this is who it will be from
-
-=item --email-owner
-
-Email the owner of broken tests files upon failure. Add `# HARNESS-META-OWNER foo@example.com` to the top of a test file to give it an owner
-
-=item --fork
-
-=item --no-fork
-
-(Default: on) fork to start tests
-
-Do not fork to start tests
-
-Test2::Harness normally forks to start a test. Forking can break some select tests, this option will allow such tests to pass. This is not compatible with the "preload" option. This is also significantly slower. You can also add the "# HARNESS-NO-PRELOAD" comment to the top of the test file to enable this on a per-test basis.
-
-=item --no-batch-owner-notices
-
-Usually owner failures are sent as a single batch at the end of testing. Toggle this to send failures as they happen.
-
-=item --notify-text "custom"
-
-Add a custom text snippet to email/slack notifications
-
-=item --slack-log
-
-=item --no-slack-log
-
-Off by default, log file will be attached if available
-
-Attach the event log to any slack notifications.
-
-=item --slack-notify
-
-=item --no-slack-notify
-
-On by default if --slack-url is specified
-
-Send slack notifications to the slack channels/users listed in test meta-data when tests fail.
-
-=item --slack-url "URL"
-
-Specify an API endpoint for slack webhook integrations
-
-This should be your slack webhook url.
-
-=item --stream
-
-=item --no-stream
-
-=item --TAP
-
-=item --tap
-
-Use 'stream' instead of TAP (Default: use stream)
-
-Do not use stream
-
-Use TAP
-
-The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.
-
-=item --unsafe-inc
-
-=item --no-unsafe-inc
-
-(Default: On) put '.' in @INC
-
-Do not put '.' in @INC
-
-perl is removing '.' from @INC as a security concern. This option keeps things from breaking for now.
-
-=item -A
-
-=item --author-testing
-
-=item --no-author-testing
-
-This will set the AUTHOR_TESTING environment to true
-
-Many cpan modules have tests that are only run if the AUTHOR_TESTING environment variable is set. This will cause those tests to run.
-
-=item -k
-
-=item --keep-dir
-
-Do not delete the work directory when done
-
-This is useful if you want to inspect the work directory after the harness is done. The work directory path will be printed at the end.
-
-=item -S SW
-
-=item -S SW=val
-
-=item --switch SW=val
-
-Pass the specified switch to perl for each test
-
-This is not compatible with preload.
-
-=back
-
-=head2 Display Options
+=head3 Display Options
 
 =over 4
 
@@ -410,125 +248,177 @@ This is not compatible with preload.
 
 =item --no-color
 
-Turn color on (Default: on)
+Turn color on, default is true if STDOUT is a TTY.
 
-Turn color off
 
-=item --show-job-info
+=item --no-wrap
 
-=item --no-show-job-info
+=item --no-no-wrap
 
-Show the job configuration when a job starts
+Do not do fancy text-wrapping, let the terminal handle it
 
-(Default: off, unless -vv)
 
-=item --show-job-launch
-
-=item --no-show-job-launch
-
-Show output for the start of a job
-
-(Default: off unless -v)
-
-=item --show-run-info
-
-=item --no-show-run-info
-
-Show the run configuration when a run starts
-
-(Default: off, unless -vv)
-
-=item -q
-
-=item --quiet
-
-Be very quiet
-
-=item -T
-
-=item --show-times
-
-Show the timing data for each job
-
-=item -v
-
-=item -vv
-
-=item --verbose
-
-Turn on verbose mode.
-
-Specify multiple times to be more verbose.
-
-=item --formatter Mod
-
-=item --formatter +Mod
-
-Specify the formatter to use
-
-(Default: "Test2")
-
-Only useful when a renderer is set to "Formatter". This specified the Test2::Formatter::XXX that will be used to render the test output.
+=item --progress
 
 =item --no-progress
 
-Turn off progress indicators
+Toggle progress indicators. On by default if STDOUT is a TTY. You can use --no-progress to disable the 'events seen' counter and buffered event pre-display
 
-This disables "events seen" counter and buffered event pre-display
+
+=item --quiet
+
+=item -q
+
+=item --no-quiet
+
+Be very quiet.
+
+Can be specified multiple times
+
+
+=item --renderers +My::Renderer
+
+=item --renderers Renderer=arg1,arg2,...
+
+=item --renderer +My::Renderer
+
+=item --renderer Renderer=arg1,arg2,...
+
+=item --no-renderers
+
+Specify renderers, (Default: "Formatter=Test2"). Use "+" to give a fully qualified module name. Without "+" "Test2::Harness::Renderer::" will be prepended to your argument.
+
+Can be specified multiple times. If the same key is listed multiple times the value lists will be appended together.
+
+
+=item --show-times
+
+=item -T
+
+=item --no-show-times
+
+Show the timing data for each job
+
+
+=item --term-width 80
+
+=item --term-width 200
+
+=item --term-size 80
+
+=item --term-size 200
+
+=item --no-term-width
+
+Alternative to setting $TABLE_TERM_SIZE. Setting this will override the terminal width detection to the number of characters specified.
+
+
+=item --verbose
+
+=item -v
+
+=item --no-verbose
+
+Be more verbose
+
+Can be specified multiple times
+
+
+=back
+
+=head3 Formatter Options
+
+=over 4
+
+=item --formatter ARG
+
+=item --formatter=ARG
+
+=item --no-formatter
+
+NO DESCRIPTION - FIX ME
+
 
 =item --qvf
 
-Quiet, but verbose on failure
+=item --no-qvf
 
-Hide all output from tests when they pass, except to say they passed. If a test fails then ALL output from the test is verbosely output.
+[Q]uiet, but [V]erbose on [F]ailure. Hide all output from tests when they pass, except to say they passed. If a test fails then ALL output from the test is verbosely output.
+
 
 =item --show-job-end
 
 =item --no-show-job-end
 
-Show output when a job ends
+Show output when a job ends. (Default: on)
 
-(Default: on)
 
-This is only used when the renderer is set to "Formatter"
+=item --show-job-info
 
-=item -r +Module
+=item --no-show-job-info
 
-=item -r Postfix
+Show the job configuration when a job starts. (Default: off, unless -vv)
 
-=item --renderer ...
 
-=item -r +Module=arg1,arg2,...
+=item --show-job-launch
 
-Specify renderers
+=item --no-show-job-launch
 
-(Default: "Formatter")
+Show output for the start of a job. (Default: off unless -v)
 
-Use "+" to give a fully qualified module name. Without "+" "Test2::Harness::Renderer::" will be prepended to your argument. You may specify custom arguments to the constructor after an "=" sign.
+
+=item --show-run-info
+
+=item --no-show-run-info
+
+Show the run configuration when a run starts. (Default: off, unless -vv)
+
 
 =back
 
-=head2 Plugins
+=head3 Help and Debugging
 
 =over 4
 
-=item -pPlugin
+=item --dummy
 
-=item -pPlugin=arg1,arg2,...
+=item -d
 
-=item -p+My::Plugin
+=item --no-dummy
 
-=item --plugin Plugin
+Dummy run, do not actually execute anything
 
-Load a plugin
+Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
 
-can be specified multiple times
 
-=item --no-plugins
+=item --help
 
-cancel any plugins listed until now
+=item -h
 
-This can be used to negate plugins specified in .yath.rc or similar
+=item --no-help
+
+exit after showing help information
+
+
+=item --keep-dirs
+
+=item --keep_dir
+
+=item -k
+
+=item --no-keep-dirs
+
+Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
+
+
+=item --summary
+
+=item --summary=/path/to/summary.json
+
+=item --no-summary
+
+Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extention is added automatically if omitted.
+
 
 =back
 
@@ -555,7 +445,7 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2019 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -563,3 +453,4 @@ modify it under the same terms as Perl itself.
 See F<http://dev.perl.org/licenses/>
 
 =cut
+

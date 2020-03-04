@@ -26,7 +26,9 @@ The list of analytics configurations for a bucket.
 
 =head2 ContinuationToken => Str
 
-The ContinuationToken that represents where this request began.
+The marker that is used as a starting point for this analytics
+configuration list response. This value is present if it was sent in
+the request.
 
 
 
@@ -40,10 +42,10 @@ the NextContinuationToken will be provided for a subsequent request.
 
 =head2 NextContinuationToken => Str
 
-NextContinuationToken is sent when isTruncated is true, which indicates
-that there are more analytics configurations to list. The next request
-must include this NextContinuationToken. The token is obfuscated and is
-not a usable value.
+C<NextContinuationToken> is sent when C<isTruncated> is true, which
+indicates that there are more analytics configurations to list. The
+next request must include this C<NextContinuationToken>. The token is
+obfuscated and is not a usable value.
 
 
 

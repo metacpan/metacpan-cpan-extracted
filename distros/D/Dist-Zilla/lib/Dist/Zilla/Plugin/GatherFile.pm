@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::GatherFile 6.012;
+package Dist::Zilla::Plugin::GatherFile 6.014;
 # ABSTRACT: gather individual file(s)
 
 use Moose;
@@ -8,6 +8,7 @@ with 'Dist::Zilla::Role::FileGatherer';
 use MooseX::Types::Moose 'ArrayRef';
 use Path::Tiny;
 use Dist::Zilla::File::OnDisk;
+use Dist::Zilla::Util;
 use namespace::autoclean;
 
 #pod =head1 SYNOPSIS
@@ -20,8 +21,7 @@ use namespace::autoclean;
 #pod This is a very, very simple L<FileGatherer|Dist::Zilla::Role::FileGatherer>
 #pod plugin.  It adds all the files referenced by the C<filename> option that are
 #pod found in the directory named in the L</root> attribute.  If the root begins
-#pod with a tilde, the tilde is replaced with the current user's home directory
-#pod according to L<File::HomeDir>.
+#pod with a tilde, the tilde is passed through C<glob()> first.
 #pod
 #pod Since normally every distribution will use a GatherDir plugin, you would only
 #pod need to use the GatherFile plugin if the file was already being excluded (e.g.
@@ -97,7 +97,7 @@ sub gather_files {
 
   my $repo_root = $self->zilla->root;
   my $root = "" . $self->root;
-  $root =~ s{^~([\\/])}{require File::HomeDir; File::HomeDir::->my_home . $1}e;
+  $root =~ s{^~([\\/])}{ Dist::Zilla::Util->homedir . $1 }e;
   $root = path($root);
   $root = $root->absolute($repo_root) if path($root)->is_relative;
 
@@ -145,7 +145,7 @@ Dist::Zilla::Plugin::GatherFile - gather individual file(s)
 
 =head1 VERSION
 
-version 6.012
+version 6.014
 
 =head1 SYNOPSIS
 
@@ -157,8 +157,7 @@ version 6.012
 This is a very, very simple L<FileGatherer|Dist::Zilla::Role::FileGatherer>
 plugin.  It adds all the files referenced by the C<filename> option that are
 found in the directory named in the L</root> attribute.  If the root begins
-with a tilde, the tilde is replaced with the current user's home directory
-according to L<File::HomeDir>.
+with a tilde, the tilde is passed through C<glob()> first.
 
 Since normally every distribution will use a GatherDir plugin, you would only
 need to use the GatherFile plugin if the file was already being excluded (e.g.
@@ -188,7 +187,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

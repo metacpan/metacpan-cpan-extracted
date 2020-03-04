@@ -8,7 +8,7 @@ Mojolicious::Command::migration — MySQL migration tool for Mojolicious
 
 =head1 VERSION
 
-version 0.15
+version 0.17
 
 =head1 SYNOPSIS
  

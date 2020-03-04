@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::ReCAPTCHAv2;
-$Mojolicious::Plugin::ReCAPTCHAv2::VERSION = '1.04';
+$Mojolicious::Plugin::ReCAPTCHAv2::VERSION = '1.05';
 # vim:syntax=perl:tabstop=4:number:noexpandtab:
 
 use Mojo::Base 'Mojolicious::Plugin';
@@ -189,7 +189,7 @@ Mojolicious::Plugin::ReCAPTCHAv2 - use Googles "No CAPTCHA reCAPCTHA" (reCAPTCHA
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

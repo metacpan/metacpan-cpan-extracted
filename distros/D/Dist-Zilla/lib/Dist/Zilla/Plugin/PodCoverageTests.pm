@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PodCoverageTests 6.012;
+package Dist::Zilla::Plugin::PodCoverageTests 6.014;
 # ABSTRACT: a author test for Pod coverage
 
 use Moose;
@@ -7,6 +7,14 @@ with 'Dist::Zilla::Role::PrereqSource';
 
 use namespace::autoclean;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod     # Add this line to dist.ini
+#pod     [PodCoverageTests]
+#pod
+#pod     # Run this in the command line to test for POD coverage:
+#pod     $ dzil test --release
+#pod
 #pod =head1 DESCRIPTION
 #pod
 #pod This is an extension of L<Dist::Zilla::Plugin::InlineFiles>, providing the
@@ -22,6 +30,8 @@ use namespace::autoclean;
 #pod
 #pod L<Test::Pod::Coverage> C<1.08> and L<Pod::Coverage::TrustPod> will be added as
 #pod C<develop requires> dependencies.
+#pod
+#pod One can run the release tests by invoking C<dzil test --release>.
 #pod
 #pod =cut
 
@@ -53,7 +63,15 @@ Dist::Zilla::Plugin::PodCoverageTests - a author test for Pod coverage
 
 =head1 VERSION
 
-version 6.012
+version 6.014
+
+=head1 SYNOPSIS
+
+    # Add this line to dist.ini
+    [PodCoverageTests]
+
+    # Run this in the command line to test for POD coverage:
+    $ dzil test --release
 
 =head1 DESCRIPTION
 
@@ -71,13 +89,15 @@ documentation can be found, you can add:
 L<Test::Pod::Coverage> C<1.08> and L<Pod::Coverage::TrustPod> will be added as
 C<develop requires> dependencies.
 
+One can run the release tests by invoking C<dzil test --release>.
+
 =head1 AUTHOR
 
 Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

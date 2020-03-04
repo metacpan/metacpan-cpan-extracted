@@ -1,5 +1,5 @@
 package Date::Manip::TZ_Base;
-# Copyright (c) 2010-2019 Sullivan Beck. All rights reserved.
+# Copyright (c) 2010-2020 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -12,7 +12,7 @@ use strict;
 use IO::File;
 
 our ($VERSION);
-$VERSION='6.79';
+$VERSION='6.81';
 END { undef $VERSION; }
 
 ########################################################################
@@ -35,7 +35,7 @@ sub _config_var {
                    $var eq 'configfile')) {
       if ($var eq 'tz') {
          warn "WARNING: the TZ Date::Manip config variable is deprecated\n" .
-              "         and will be removed in March 2017.  Please use\n" .
+              "         and will be removed in version 7.00.  Please use\n" .
               "         the SetDate or ForceDate config variables instead.\n";
       }
       return $self->_config_var_tz($var,$val);

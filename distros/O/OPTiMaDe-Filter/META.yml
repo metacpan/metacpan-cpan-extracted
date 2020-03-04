@@ -3,8 +3,13 @@ abstract: 'OPTiMaDe filter language parser/composer'
 author:
   - 'Andrius Merkys <merkys@cpan.org>'
 build_requires:
+  Data::Compare: '0'
+  Data::Dumper: '0'
+  File::Spec: '0'
   Module::Build: '0.28'
   Module::Build::Parse::Yapp: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
 configure_requires:
   Module::Build: '0.28'
   Module::Build::Parse::Yapp: '0'
@@ -18,5 +23,5 @@ name: OPTiMaDe-Filter
 requires:
   Parse::Yapp: '0'
   Scalar::Util: '0'
-version: 0.7.1
+version: 0.7.2
 x_serialization_backend: 'YAML::Tiny version 1.70'

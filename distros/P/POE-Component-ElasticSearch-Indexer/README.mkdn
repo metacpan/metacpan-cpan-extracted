@@ -4,7 +4,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 # VERSION
 
-version 0.012
+version 0.013
 
 # SYNOPSIS
 
@@ -20,7 +20,7 @@ This POE Session is used to index data to an ElasticSearch cluster.
         FlushSize        => 1_000,                   # Default
         LoggingConfig    => undef,                   # Default
         DefaultIndex     => 'logs-%Y.%m.%d',         # Default
-        DefaultType      => 'log',                   # Default
+        DefaultType      => '_doc',                  # Default
         BatchDir         => '/tmp/es_index_backlog', # Default
         BatchDiskSpace   => undef,                   # Default
         StatsHandler     => undef,                   # Default
@@ -125,7 +125,7 @@ following parameters.
 - **DefaultType**
 
     Use this `_type` attribute if the document is missing one.  Defaults to
-    **log**.
+    **\_doc** to be compatible with ES 7.x.
 
 - **BatchDir**
 

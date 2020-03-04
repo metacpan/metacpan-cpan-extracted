@@ -117,11 +117,11 @@ manual-T-IV-freq.pl - Complex example of custom sweep without Sweep framework
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2019       Simon Reinhardt
 

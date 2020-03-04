@@ -45,13 +45,13 @@ routines are properly documented.
 
 This package uses type constraints from:
 
-[Data::Object::Library](https://metacpan.org/pod/Data::Object::Library)
+[Test::Auto::Types](https://metacpan.org/pod/Test::Auto::Types)
 
 # SCENARIOS
 
 This package supports the following scenarios:
 
-## testauto
+## exports
 
     use Test::Auto;
     use Test::More;
@@ -75,9 +75,9 @@ This package has the following attributes:
 
 ## data
 
-    data(DataObject)
+    data(Data)
 
-This attribute is read-only, accepts `(DataObject)` values, and is optional.
+This attribute is read-only, accepts `(Data)` values, and is optional.
 
 ## file
 
@@ -91,7 +91,7 @@ This package implements the following functions:
 
 ## testauto
 
-    testauto(Str $file) : InstanceOf["Test::Auto::Subtests"]
+    testauto(Str $file) : Subtests
 
 This function is exported automatically and returns a [Test::Auto::Subtests](https://metacpan.org/pod/Test::Auto::Subtests)
 object for the test file given.
@@ -108,7 +108,7 @@ This package implements the following methods:
 
 ## document
 
-    document() : InstanceOf["Test::Auto::Document"]
+    document() : Document
 
 This method returns a [Test::Auto::Document](https://metacpan.org/pod/Test::Auto::Document) object.
 
@@ -120,7 +120,7 @@ This method returns a [Test::Auto::Document](https://metacpan.org/pod/Test::Auto
 
 ## parser
 
-    parser() : InstanceOf["Test::Auto::Parser"]
+    parser() : Parser
 
 This method returns a [Test::Auto::Parser](https://metacpan.org/pod/Test::Auto::Parser) object.
 
@@ -132,7 +132,7 @@ This method returns a [Test::Auto::Parser](https://metacpan.org/pod/Test::Auto::
 
 ## subtests
 
-    subtests() : InstanceOf["Test::Auto::Subtests"]
+    subtests() : Subtests
 
 This method returns a [Test::Auto::Subtests](https://metacpan.org/pod/Test::Auto::Subtests) object.
 
@@ -188,7 +188,7 @@ This method returns a [Test::Auto::Subtests](https://metacpan.org/pod/Test::Auto
     =type-library $name
     =type-composite $name # [optional]
     =type-parent $name # [optional]
-    =type-coercion $name # [optional]
+    =type-coercion-$number $name # [optional]
     =type-example-$number $name # [repeatable]
 
 The specification is designed to accommodate typical package declarations. It

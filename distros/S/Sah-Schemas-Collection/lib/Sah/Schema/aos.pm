@@ -1,20 +1,31 @@
 package Sah::Schema::aos;
 
-our $DATE = '2016-12-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-02'; # DATE
+our $DIST = 'Sah-Schemas-Collection'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 our $schema = [array => {
-    summary => 'Array of strings',
+    summary => 'Array of (defined) strings',
     description => <<'_',
 
-Note that for flexibility, the strings are allowed to be undefs.
+The elements (strings) of the array must be defined.
 
 _
-    of => ['str', {}, {}],
+    of => ['str', {req=>1}, {}],
+    examples => [
+        {data=>'a', valid=>0},
+        {data=>[], valid=>1},
+        {data=>{}, valid=>0},
+        {data=>['a'], valid=>1},
+        {data=>[undef], valid=>0},
+        {data=>['a', []], valid=>0},
+        {data=>[['a']], valid=>0},
+    ],
 }, {}];
 
 1;
-# ABSTRACT: Array of strings
+# ABSTRACT: Array of (defined) strings
 
 __END__
 
@@ -24,15 +35,15 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::aos - Array of strings
+Sah::Schema::aos - Array of (defined) strings
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::aos (from Perl distribution Sah-Schemas-Collection), released on 2016-12-09.
+This document describes version 0.002 of Sah::Schema::aos (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
 
 =head1 DESCRIPTION
 
-Note that for flexibility, the strings are allowed to be undefs.
+The elements (strings) of the array must be defined.
 
 =head1 HOMEPAGE
 
@@ -50,13 +61,18 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Sah::Schema::aoms> (array of maybe-strings) where the elements of the array
+are allowed to be undefs.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

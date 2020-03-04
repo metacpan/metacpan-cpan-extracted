@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::tz_name;
 
-our $DATE = '2020-02-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2020-03-03'; # DATE
+our $VERSION = '0.010'; # VERSION
 
-our $rschema = ["str",[{completion=>sub{package Sah::Schema::date::tz_name;require Complete::TZ;my(%args) = @_;Complete::TZ::complete_tz('word', $args{'word'})},summary=>"Timezone name"}],["str"]];
+our $rschema = ["str",[{examples=>[{data=>"Asia/Jakarta",valid=>1}],summary=>"Timezone name","x.completion"=>sub{package Sah::Schema::date::tz_name;require Complete::TZ;my(%args) = @_;Complete::TZ::complete_tz('word', $args{'word'})}}],["str"]];
 
 1;
 # ABSTRACT: Timezone name
@@ -20,7 +20,7 @@ Sah::SchemaR::date::tz_name - Timezone name
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::SchemaR::date::tz_name (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Sah::SchemaR::date::tz_name (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
 
 =head1 DESCRIPTION
 

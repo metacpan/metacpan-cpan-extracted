@@ -1,6 +1,12 @@
 package Mojolicious::Plugin::Minion::Overview::Controller::Jobs;
 use Mojo::Base 'Mojolicious::Controller';
 
+=head2 retry
+
+Retry a job
+
+=cut
+
 sub retry {
     my $self = shift;
     
@@ -11,12 +17,20 @@ sub retry {
     return $self->redirect_to('minion_overview.jobs.show', id => $job->id);
 }
 
+=head2 search
+
+Show a list of jobs
+
+=cut
+
 sub search {
     my $self = shift;
     
     my $search = $self->app->minion_overview
         ->search($self->req->param('term'))
         ->tags($self->req->every_param('tags'))
+        ->when($self->req->param('worker'), 'worker')
+        ->when($self->req->param('state'), 'state')
         ->page($self->param('page') || 1)
         ->jobs();
 
@@ -27,6 +41,12 @@ sub search {
         query   => $search->{ query },
     );
 }
+
+=head2 show
+
+Show a job
+
+=cut
 
 sub show {
     my $self = shift;

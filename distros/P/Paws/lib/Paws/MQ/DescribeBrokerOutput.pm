@@ -9,14 +9,18 @@ package Paws::MQ::DescribeBrokerOutput;
   has Configurations => (is => 'ro', isa => 'Paws::MQ::Configurations', request_name => 'configurations', traits => ['NameInRequest']);
   has Created => (is => 'ro', isa => 'Str', request_name => 'created', traits => ['NameInRequest']);
   has DeploymentMode => (is => 'ro', isa => 'Str', request_name => 'deploymentMode', traits => ['NameInRequest']);
+  has EncryptionOptions => (is => 'ro', isa => 'Paws::MQ::EncryptionOptions', request_name => 'encryptionOptions', traits => ['NameInRequest']);
   has EngineType => (is => 'ro', isa => 'Str', request_name => 'engineType', traits => ['NameInRequest']);
   has EngineVersion => (is => 'ro', isa => 'Str', request_name => 'engineVersion', traits => ['NameInRequest']);
   has HostInstanceType => (is => 'ro', isa => 'Str', request_name => 'hostInstanceType', traits => ['NameInRequest']);
   has Logs => (is => 'ro', isa => 'Paws::MQ::LogsSummary', request_name => 'logs', traits => ['NameInRequest']);
   has MaintenanceWindowStartTime => (is => 'ro', isa => 'Paws::MQ::WeeklyStartTime', request_name => 'maintenanceWindowStartTime', traits => ['NameInRequest']);
   has PendingEngineVersion => (is => 'ro', isa => 'Str', request_name => 'pendingEngineVersion', traits => ['NameInRequest']);
+  has PendingHostInstanceType => (is => 'ro', isa => 'Str', request_name => 'pendingHostInstanceType', traits => ['NameInRequest']);
+  has PendingSecurityGroups => (is => 'ro', isa => 'ArrayRef[Str|Undef]', request_name => 'pendingSecurityGroups', traits => ['NameInRequest']);
   has PubliclyAccessible => (is => 'ro', isa => 'Bool', request_name => 'publiclyAccessible', traits => ['NameInRequest']);
   has SecurityGroups => (is => 'ro', isa => 'ArrayRef[Str|Undef]', request_name => 'securityGroups', traits => ['NameInRequest']);
+  has StorageType => (is => 'ro', isa => 'Str', request_name => 'storageType', traits => ['NameInRequest']);
   has SubnetIds => (is => 'ro', isa => 'ArrayRef[Str|Undef]', request_name => 'subnetIds', traits => ['NameInRequest']);
   has Tags => (is => 'ro', isa => 'Paws::MQ::__mapOf__string', request_name => 'tags', traits => ['NameInRequest']);
   has Users => (is => 'ro', isa => 'ArrayRef[Paws::MQ::UserSummary]', request_name => 'users', traits => ['NameInRequest']);
@@ -107,6 +111,11 @@ characters, or special characters.
   Required. The deployment mode of the broker.
 
 
+=head2 EncryptionOptions => L<Paws::MQ::EncryptionOptions>
+
+  Encryption options for the broker.
+
+
 =head2 EngineType => Str
 
   Required. The type of broker engine. Note: Currently, Amazon MQ
@@ -143,6 +152,19 @@ engine versions, see
 https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/broker-engine.html
 
 
+=head2 PendingHostInstanceType => Str
+
+  The host instance type of the broker to upgrade to. For a list of
+supported instance types, see
+https://docs.aws.amazon.com/amazon-mq/latest/developer-guide//broker.html#broker-instance-types
+
+
+=head2 PendingSecurityGroups => ArrayRef[Str|Undef]
+
+  The list of pending security groups to authorize connections to
+brokers.
+
+
 =head2 PubliclyAccessible => Bool
 
   Required. Enables connections from applications outside of the VPC that
@@ -151,8 +173,13 @@ hosts the broker's subnets.
 
 =head2 SecurityGroups => ArrayRef[Str|Undef]
 
-  Required. The list of rules (1 minimum, 125 maximum) that authorize
+  The list of security groups (1 minimum, 5 maximum) that authorizes
 connections to brokers.
+
+
+=head2 StorageType => Str
+
+  The broker's storage type.
 
 
 =head2 SubnetIds => ArrayRef[Str|Undef]

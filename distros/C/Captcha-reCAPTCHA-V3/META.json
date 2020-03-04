@@ -1,0 +1,80 @@
+{
+   "abstract" : "A Perl implementation of reCAPTCHA API version v3",
+   "author" : [
+      "worthmine <worthmine@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Captcha-reCAPTCHA-V3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Captcha::reCAPTCHA::V3" : {
+         "file" : "lib/Captcha/reCAPTCHA/V3.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/worthmine/Captcha-reCAPTCHA-V3/issues"
+      },
+      "homepage" : "https://github.com/worthmine/Captcha-reCAPTCHA-V3",
+      "repository" : {
+         "url" : "git://github.com/worthmine/Captcha-reCAPTCHA-V3.git",
+         "web" : "https://github.com/worthmine/Captcha-reCAPTCHA-V3"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:WORTHMINE",
+   "x_contributors" : [
+      "worthmine <worthmine@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
+}

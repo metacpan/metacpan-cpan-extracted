@@ -36,6 +36,7 @@
          "requires" : {
             "List::Util" : "1.45",
             "Mojolicious" : "7.28",
+            "YAML::XS" : "0.80",
             "perl" : "5.010001"
          }
       },
@@ -62,6 +63,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "3.23",
+   "version" : "3.24",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

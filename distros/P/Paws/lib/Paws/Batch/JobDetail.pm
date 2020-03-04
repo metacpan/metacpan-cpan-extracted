@@ -80,7 +80,7 @@ and entered the C<PENDING> state.
 
 =head2 DependsOn => ArrayRef[L<Paws::Batch::JobDependency>]
 
-  A list of job names or IDs on which this job depends.
+  A list of job IDs on which this job depends.
 
 
 =head2 B<REQUIRED> JobDefinition => Str
@@ -139,8 +139,8 @@ C<RUNNING> state).
 
   The current status for the job.
 
-If your jobs do not progress to C<STARTING>, see Jobs Stuck in
-C<RUNNABLE> Status
+If your jobs do not progress to C<STARTING>, see Jobs Stuck in RUNNABLE
+Status
 (https://docs.aws.amazon.com/batch/latest/userguide/troubleshooting.html#job_stuck_in_runnable)
 in the troubleshooting section of the I<AWS Batch User Guide>.
 

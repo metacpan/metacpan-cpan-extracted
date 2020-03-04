@@ -1,5 +1,5 @@
 package Lab::Measurement;
-$Lab::Measurement::VERSION = '3.691';
+$Lab::Measurement::VERSION = '3.692';
 #ABSTRACT: Log, describe and plot data on the fly
 
 use strict;
@@ -30,7 +30,7 @@ Lab::Measurement - Log, describe and plot data on the fly
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ API; its documentation can be found on the Lab::Measurement homepage.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2005-2006  Daniel Schroeer
             2011       Andreas K. Huettel

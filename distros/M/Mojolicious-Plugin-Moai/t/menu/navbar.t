@@ -55,7 +55,7 @@ sub test_navbar {
     %test_args = (
         id => 'main',
         brand => [ 'My Brand' => 'home' ],
-        classes => {
+        class => {
             navbar => 'mynav',
         },
         menu => [

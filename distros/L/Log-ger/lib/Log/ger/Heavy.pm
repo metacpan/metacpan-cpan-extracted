@@ -1,7 +1,7 @@
 package Log::ger::Heavy;
 
-our $DATE = '2020-02-18'; # DATE
-our $VERSION = '0.029'; # VERSION
+our $DATE = '2020-03-04'; # DATE
+our $VERSION = '0.031'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -56,6 +56,7 @@ our %Default_Hooks = (
                              push @args, $_;
                          }
                      }
+                     no warnings 'redundant';
                      sprintf $fmt, @args;
                  };
 
@@ -202,10 +203,10 @@ sub init_target {
         # collect routine names, until a hook instructs to stop.
         sub {
             my ($hook, $hook_res) = @_;
-            my ($rn, $flow_control) = @$hook_res;
-            $rn or return;
-            for (keys %$rn) {
-                push @{ $routine_names->{$_} }, @{ $rn->{$_} };
+            my ($routine_rec, $flow_control) = @$hook_res;
+            $routine_rec or return;
+            for (keys %$routine_rec) {
+                push @{ $routine_names->{$_} }, @{ $routine_rec->{$_} };
             }
             $flow_control;
         },
@@ -216,17 +217,17 @@ sub init_target {
 
   CREATE_LOG_ROUTINES:
     {
-        my @rn;
+        my @routines_recs;
         if ($target eq 'package') {
-            push @rn, @{ $routine_names->{log_subs} || [] };
-            push @rn, @{ $routine_names->{logml_subs} || [] };
+            push @routines_recs, @{ $routine_names->{log_subs} || [] };
+            push @routines_recs, @{ $routine_names->{logml_subs} || [] };
         } else {
-            push @rn, @{ $routine_names->{log_methods} || [] };
-            push @rn, @{ $routine_names->{logml_methods} || [] };
+            push @routines_recs, @{ $routine_names->{log_methods} || [] };
+            push @routines_recs, @{ $routine_names->{logml_methods} || [] };
         }
         my $mllogger0;
-        for my $rn (@rn) {
-            my ($rname, $lname, $fmtname) = @$rn;
+        for my $routine_rec (@routines_recs) {
+            my ($rname, $lname, $fmtname, $rinit_args) = @$routine_rec;
             my $lnum; $lnum = $Levels{$lname} if defined $lname;
             my $routine_name_is_ml = !defined($lname);
             $fmtname = 'default' if !defined($fmtname);
@@ -278,42 +279,42 @@ sub init_target {
                         if ($logger0_is_ml) {
                             if ($routine_name_is_ml) {
                                 if ($object) { $logger = sub { shift; my $lnum=shift; my $lname = Log::ger::Util::string_level($lnum);
-                                                                                      $logger0->($init_args, $lnum, $layouter->($formatter->(@_), $init_args, $lnum, $lname)) };
+                                                                                      $logger0->($rinit_args || $init_args, $lnum, $layouter->($formatter->(@_), $init_args, $lnum, $lname)) };
                                 } else {       $logger = sub {        my $lnum=shift; my $lname = Log::ger::Util::string_level($lnum);
-                                                                                      $logger0->($init_args, $lnum, $layouter->($formatter->(@_), $init_args, $lnum, $lname)) }; }
+                                                                                      $logger0->($rinit_args || $init_args, $lnum, $layouter->($formatter->(@_), $init_args, $lnum, $lname)) }; }
                             } else { # routine name not multiple-level
-                                if ($object) { $logger = sub { shift;                 $logger0->($init_args, $lnum, $layouter->($formatter->(@_), $init_args, $lnum, $lname)) };
-                                } else {       $logger = sub {                        $logger0->($init_args, $lnum, $layouter->($formatter->(@_), $init_args, $lnum, $lname)) }; }
+                                if ($object) { $logger = sub { shift;                 $logger0->($rinit_args || $init_args, $lnum, $layouter->($formatter->(@_), $init_args, $lnum, $lname)) };
+                                } else {       $logger = sub {                        $logger0->($rinit_args || $init_args, $lnum, $layouter->($formatter->(@_), $init_args, $lnum, $lname)) }; }
                             }
                         } else { # logger0 not multiple-level
                             if ($routine_name_is_ml) {
                                 if ($object) { $logger = sub { shift; return 0 if Log::ger::Util::numeric_level(shift) > $Current_Level;
-                                                                                      $logger0->($init_args,        $layouter->($formatter->(@_), $init_args, $lnum, $lname)) };
+                                                                                      $logger0->($rinit_args || $init_args,        $layouter->($formatter->(@_), $init_args, $lnum, $lname)) };
                                 } else {       $logger = sub {        return 0 if Log::ger::Util::numeric_level(shift) > $Current_Level;
-                                                                                      $logger0->($init_args,        $layouter->($formatter->(@_), $init_args, $lnum, $lname)) }; }
+                                                                                      $logger0->($rinit_args || $init_args,        $layouter->($formatter->(@_), $init_args, $lnum, $lname)) }; }
                             } else { # routine name not multiple-level
-                                if ($object) { $logger = sub { shift;                 $logger0->($init_args,        $layouter->($formatter->(@_), $init_args, $lnum, $lname)) };
-                                } else {       $logger = sub {                        $logger0->($init_args,        $layouter->($formatter->(@_), $init_args, $lnum, $lname)) }; }
+                                if ($object) { $logger = sub { shift;                 $logger0->($rinit_args || $init_args,        $layouter->($formatter->(@_), $init_args, $lnum, $lname)) };
+                                } else {       $logger = sub {                        $logger0->($rinit_args || $init_args,        $layouter->($formatter->(@_), $init_args, $lnum, $lname)) }; }
                             }
                         }
                     } else { # no layouter
                         if ($logger0_is_ml) {
                             if ($routine_name_is_ml) {
-                                if ($object) { $logger = sub { shift; my $lnum=shift; $logger0->($init_args, $lnum,             $formatter->(@_)                            ) };
-                                } else {       $logger = sub {        my $lnum=shift; $logger0->($init_args, $lnum,             $formatter->(@_)                            ) }; }
+                                if ($object) { $logger = sub { shift; my $lnum=shift; $logger0->($rinit_args || $init_args, $lnum,             $formatter->(@_)                            ) };
+                                } else {       $logger = sub {        my $lnum=shift; $logger0->($rinit_args || $init_args, $lnum,             $formatter->(@_)                            ) }; }
                             } else { # routine name not multiple-level
-                                if ($object) { $logger = sub { shift;                 $logger0->($init_args, $lnum,             $formatter->(@_)                            ) };
-                                } else {       $logger = sub {                        $logger0->($init_args, $lnum,             $formatter->(@_)                            ) }; }
+                                if ($object) { $logger = sub { shift;                 $logger0->($rinit_args || $init_args, $lnum,             $formatter->(@_)                            ) };
+                                } else {       $logger = sub {                        $logger0->($rinit_args || $init_args, $lnum,             $formatter->(@_)                            ) }; }
                             }
                         } else { # logger0 not multiple-level
                             if ($routine_name_is_ml) {
                                 if ($object) { $logger = sub { shift; return 0 if Log::ger::Util::numeric_level(shift) > $Current_Level;
-                                                                                      $logger0->($init_args,                    $formatter->(@_)                            ) };
+                                                                                      $logger0->($rinit_args || $init_args,                    $formatter->(@_)                            ) };
                                 } else {       $logger = sub {        return 0 if Log::ger::Util::numeric_level(shift) > $Current_Level;
-                                                                                      $logger0->($init_args,                    $formatter->(@_)                            ) }; }
+                                                                                      $logger0->($rinit_args || $init_args,                    $formatter->(@_)                            ) }; }
                             } else { # routine name not multiple-level
-                                if ($object) { $logger = sub { shift;                 $logger0->($init_args,                    $formatter->(@_)                            ) };
-                                } else {       $logger = sub {                        $logger0->($init_args,                    $formatter->(@_)                            ) }; }
+                                if ($object) { $logger = sub { shift;                 $logger0->($rinit_args || $init_args,                    $formatter->(@_)                            ) };
+                                } else {       $logger = sub {                        $logger0->($rinit_args || $init_args,                    $formatter->(@_)                            ) }; }
                             }
                         }
                     }
@@ -321,21 +322,21 @@ sub init_target {
                     { # no layouter, just to align
                         if ($logger0_is_ml) {
                             if ($routine_name_is_ml) {
-                                if ($object) { $logger = sub { shift; my $lnum=shift; $logger0->($init_args, $lnum,                          @_                             ) };
-                                } else {       $logger = sub {        my $lnum=shift; $logger0->($init_args, $lnum,                          @_                             ) }; }
+                                if ($object) { $logger = sub { shift; my $lnum=shift; $logger0->($rinit_args || $init_args, $lnum,                          @_                             ) };
+                                } else {       $logger = sub {        my $lnum=shift; $logger0->($rinit_args || $init_args, $lnum,                          @_                             ) }; }
                             } else { # routine name not multiple-lvl
-                                if ($object) { $logger = sub { shift;                 $logger0->($init_args, $lnum,                          @_                             ) };
-                                } else {       $logger = sub {                        $logger0->($init_args, $lnum,                          @_                             ) }; }
+                                if ($object) { $logger = sub { shift;                 $logger0->($rinit_args || $init_args, $lnum,                          @_                             ) };
+                                } else {       $logger = sub {                        $logger0->($rinit_args || $init_args, $lnum,                          @_                             ) }; }
                             }
                         } else { # logger0 not multiple-level
                             if ($routine_name_is_ml) {
                                 if ($object) { $logger = sub { shift; return 0 if Log::ger::Util::numeric_level(shift) > $Current_Level;
-                                                                                      $logger0->($init_args,                                 @_                             ) };
+                                                                                      $logger0->($rinit_args || $init_args,                                 @_                             ) };
                                 } else {       $logger = sub {        return 0 if Log::ger::Util::numeric_level(shift) > $Current_Level;
-                                                                                      $logger0->($init_args,                                 @_                             ) }; }
+                                                                                      $logger0->($rinit_args || $init_args,                                 @_                             ) }; }
                             } else {
-                                if ($object) { $logger = sub { shift;                 $logger0->($init_args,                                 @_                             ) };
-                                } else {       $logger = sub {                        $logger0->($init_args,                                 @_                             ) }; }
+                                if ($object) { $logger = sub { shift;                 $logger0->($rinit_args || $init_args,                                 @_                             ) };
+                                } else {       $logger = sub {                        $logger0->($rinit_args || $init_args,                                 @_                             ) }; }
                             }
                         }
                     }
@@ -345,22 +346,22 @@ sub init_target {
             my $type = $routine_name_is_ml ?
                 ($object ? 'logml_method' : 'logml_sub') :
                 ($object ? 'log_method' : 'log_sub');
-            push @routines, [$logger, $rname, $lnum, $type];
+            push @routines, [$logger, $rname, $lnum, $type, $rinit_args||$init_args];
         }
     }
   CREATE_IS_ROUTINES:
     {
-        my @rn;
+        my @routines_recs;
         my $type;
         if ($target eq 'package') {
-            push @rn, @{ $routine_names->{is_subs} || [] };
+            push @routines_recs, @{ $routine_names->{is_subs} || [] };
             $type = 'is_sub';
         } else {
-            push @rn, @{ $routine_names->{is_methods} || [] };
+            push @routines_recs, @{ $routine_names->{is_methods} || [] };
             $type = 'is_method';
         }
-        for my $rn (@rn) {
-            my ($rname, $lname) = @$rn;
+        for my $routine_rec (@routines_recs) {
+            my ($rname, $lname) = @$routine_rec;
             my $lnum = $Levels{$lname};
 
             local $hook_args{name} = $rname;
@@ -371,7 +372,7 @@ sub init_target {
                 run_hooks('create_is_routine', \%hook_args, 1,
                           $target, $target_arg);
             next unless $code_is;
-            push @routines, [$code_is, $rname, $lnum, $type];
+            push @routines, [$code_is, $rname, $lnum, $type, $init_args];
         }
     }
 
@@ -407,7 +408,7 @@ Log::ger::Heavy - The bulk of the implementation of Log::ger
 
 =head1 VERSION
 
-version 0.029
+version 0.031
 
 =head1 DESCRIPTION
 

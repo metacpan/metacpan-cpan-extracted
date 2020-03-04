@@ -11,7 +11,7 @@ package LooksLike;
 use B ();
 
 
-our $VERSION = 'v0.20.050'; # VERSION
+our $VERSION = 'v0.20.060'; # VERSION
 
 
 my $digits = '[0123456789]';
@@ -79,7 +79,7 @@ sub decimal {
 
 
 
-my $infinity = 9e9999;
+my $infinity = 8888e8888;
 my $inf = do {
     my $inf = qr/inf(?:inity)?/i;
     if ( $^O eq 'MSWin32' || $^V ge v5.22.0 ) {
@@ -361,6 +361,29 @@ sub odd {
     return /\A\s*$Odd\s*\z/;
 }
 
+
+our %representation = (
+     "infinity" =>  "inf",
+    "-infinity" => "-inf",
+     "nan"      =>  "nan",
+);
+
+
+sub representation {
+    local $_ = shift if @_ % 2;
+    return undef unless defined;
+    return undef if ref;
+
+    my %repr = ( %representation, @_ );
+
+    return nan($_)                    ? $repr{"nan"}
+        : infinity($_) ? positive($_) ? $repr{"infinity"}
+                       :                $repr{"-infinity"}
+        : exists( $repr{$_} )         ? $repr{$_}
+        :                               $_
+        ;
+}
+
 1;
 
 __END__
@@ -540,6 +563,27 @@ Any integer which would divide evenly by 2.
 
 Any integer which would divde oddly by 2.
 
+=head2 C<%representation>
+
+The hash used by L<representation( $_ ; %representation )> to
+format various numeric representations.  Has three fields:
+
+=over
+
+=item C<infinity>
+
+How positive infinity should be represented.  Defaults to C<inf>.
+
+=item C<-infinity>
+
+How negative infinity should be represented.  Defaults to C<-inf>.
+
+=item C<nan>
+
+How not-a-number should be represented.  Defaults to C<nan>.
+
+=back
+
 =head1 FUNCTIONS
 
 =head2 C<binary($_)>
@@ -667,6 +711,18 @@ with 2.
 Returns true for any integer that would have a remainder when modulused
 with 2.
 
+=head2 C<representation( $_ ; %representation )>
+
+Condense the large set of representations for infinity and not-a-number
+to a simple set.  Pass in a value (or use C<$_> if nothing is passed in),
+and if it's something that matches positive infinity, negative infinity,
+or not-a-number, then format it as the L<C<%representation>> hash indicates.
+
+The keys and values to override the C<%representation> hash can be passed in,
+and the values will be used in place of the defaults.
+
+Since v0.20.056.
+
 =head1 TODO
 
 Nothing, my code is perfect.
@@ -683,7 +739,7 @@ feature.
 
 =head1 VERSION
 
-This document describes version v0.20.050 of this module.
+This document describes version v0.20.060 of this module.
 
 =head1 AUTHOR
 

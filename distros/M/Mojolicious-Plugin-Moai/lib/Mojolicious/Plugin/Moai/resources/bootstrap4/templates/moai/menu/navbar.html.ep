@@ -1,6 +1,6 @@
 <%
-    my $classes = stash 'classes';
-    my $navbar_class = $classes->{navbar};
+    my $classes = stash 'class';
+    my $navbar_class = $classes->{navbar} // '';
     # The default navbar is responsive at "large" screens. To disable
     # responsiveness, add the 'navbar-expand' class.
     if ( $classes->{navbar} !~ /^navbar-expand/ ) {

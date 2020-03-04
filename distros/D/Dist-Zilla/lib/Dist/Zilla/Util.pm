@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::Util 6.012;
+package Dist::Zilla::Util 6.014;
 # ABSTRACT: random snippets of code that Dist::Zilla wants
 
 use Carp ();
@@ -9,45 +9,73 @@ use Encode ();
 {
   package
     Dist::Zilla::Util::PEA;
-  @Dist::Zilla::Util::PEA::ISA = ('Pod::Eventual');
+  @Dist::Zilla::Util::PEA::ISA = ('Pod::Simple');
+
   sub _new  {
-    # Load Pod::Eventual only when used (and not yet loaded)
-    unless (exists $INC{'Pod/Eventual.pm'}) {
-      require Pod::Eventual;
-      Pod::Eventual->VERSION(0.091480); # better nonpod/blank events
+    my ($class, @args) = @_;
+    # Load Pod::Simple only when used (and not yet loaded)
+    unless (exists $INC{'Pod/Simple.pm'}) {
+      require Pod::Simple;
+    }
+    my $parser = $class->new(@args);
+    $parser->code_handler(sub {
+      my ($line, $line_number, $parser) = @_;
+      return if $parser->{abstract};
+
+
+      return $parser->{abstract} = $1
+        if $line =~ /^\s*#+\s*ABSTRACT:[ \t]*(\S.*)$/m;
+      return;
+    });
+    return $parser;
+  }
+
+  sub _handle_element_start {
+    my ($parser, $ele_name, $attr) = @_;
+
+    if ($ele_name eq 'head1') {
+      $parser->{buffer} = "";
+    }
+    elsif ($ele_name eq 'Para') {
+      $parser->{buffer} = "";
+    }
+    elsif ($ele_name eq 'C') {
+      $parser->{in_C} = 1;
     }
 
-    bless {} => shift;
-  }
-  sub handle_nonpod {
-    my ($self, $event) = @_;
-    return if $self->{abstract};
-    return $self->{abstract} = $1
-      if $event->{content}=~ /^\s*#+\s*ABSTRACT:[ \t]*(\S.*)$/m;
     return;
   }
-  sub handle_event {
-    my ($self, $event) = @_;
-    return if $self->{abstract};
-    if (
-      ! $self->{in_name}
-      and $event->{type} eq 'command'
-      and $event->{command} eq 'head1'
-      and $event->{content} =~ /^NAME\b/
-    ) {
-      $self->{in_name} = 1;
-      return;
+
+  sub _handle_element_end {
+    my ($parser, $ele_name, $attr) = @_;
+
+    return if $parser->{abstract};
+    if ($ele_name eq 'head1') {
+      $parser->{in_section} = $parser->{buffer};
+    }
+    elsif ($ele_name eq 'Para' && $parser->{in_section} eq 'NAME' ) {
+      if ($parser->{buffer} =~ /^(?:\S+\s+)+?-+\s+(.+)$/s) {
+        $parser->{abstract} = $1;
+      }
+    }
+    elsif ($ele_name eq 'C') {
+      delete $parser->{in_C};
     }
 
-    return unless $self->{in_name};
+    return;
+  }
 
-    if (
-      $event->{type} eq 'text'
-      and $event->{content} =~ /^(?:\S+\s+)+?-+\s+(.+)\n$/s
-    ) {
-      $self->{abstract} = $1;
-      $self->{abstract} =~ s/\s+/\x20/g;
+  sub _handle_text {
+    my ($parser, $text) = @_;
+
+    # The C<...> tags are expected to be preserved. MetaCPAN renders them.
+    if ($parser->{in_C}) {
+      $parser->{buffer} .= "C<$text>";
     }
+    else {
+      $parser->{buffer} .= $text;
+    }
+    return;
   }
 }
 
@@ -63,10 +91,7 @@ sub abstract_from_file {
   my ($self, $file) = @_;
   my $e = Dist::Zilla::Util::PEA->_new;
 
-  my $chars = $file->content;
-  my $bytes = Encode::encode('UTF-8', $chars, Encode::FB_CROAK);
-
-  $e->read_string($bytes);
+  $e->parse_string_document($file->content);
 
   return $e->{abstract};
 }
@@ -102,13 +127,16 @@ sub expand_config_package_name {
   shift; goto &_expand_config_package_name
 }
 
+sub homedir {
+  $^O eq 'MSWin32' && "$]" < 5.016 ? $ENV{HOME} || $ENV{USERPROFILE} : (glob('~'))[0];
+}
+
 sub _global_config_root {
   require Dist::Zilla::Path;
   return Dist::Zilla::Path::path($ENV{DZIL_GLOBAL_CONFIG_ROOT}) if $ENV{DZIL_GLOBAL_CONFIG_ROOT};
 
-  require File::HomeDir;
-  my $homedir = File::HomeDir->my_home
-    or Carp::croak("couldn't determine home directory");
+  my $homedir = homedir();
+  Carp::croak("couldn't determine home directory") if not $homedir;
 
   return Dist::Zilla::Path::path($homedir)->child('.dzil');
 }
@@ -146,7 +174,7 @@ Dist::Zilla::Util - random snippets of code that Dist::Zilla wants
 
 =head1 VERSION
 
-version 6.012
+version 6.014
 
 =head1 METHODS
 
@@ -191,7 +219,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 87 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 88 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/lcpan.pm',
@@ -89,6 +89,7 @@ my @module_files = (
     'App/lcpan/Cmd/subnames_by_count.pm',
     'App/lcpan/Cmd/subs.pm',
     'App/lcpan/Cmd/update.pm',
+    'App/lcpan/Cmd/x_mentions_for_mod.pm',
     'App/lcpan/PodParser.pm',
     'End/PrintBytesIn.pm',
     'LWP/UserAgent/Patch/FilterLcpan.pm'

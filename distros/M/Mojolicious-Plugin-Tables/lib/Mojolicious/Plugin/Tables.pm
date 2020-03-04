@@ -6,7 +6,7 @@ use File::Spec::Functions 'catdir';
 
 use Mojolicious::Plugin::Tables::Model;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -48,10 +48,12 @@ sub register {
     $app->hook(before_dispatch => sub {
         my $c = shift;
         # Move first part and slash from path to base path when deployed under a path
-        if ($c->req->headers->header('X-Request-Base')) {
+        if ($c->req->headers->to_string =~ /X-Forwarded/) {
             my $part0 = shift @{$c->req->url->path->leading_slash(0)};
             push @{$c->req->url->base->path->trailing_slash(0)}, $part0;
             $c->shipped(urlbase => $c->req->url->base);
+        } else {
+            $c->shipped(urlbase => '');
         }
         # capture https into base
         if ($c->req->headers->header('X-Forwarded-HTTPS')

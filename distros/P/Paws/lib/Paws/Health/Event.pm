@@ -40,10 +40,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Health::Eve
 
 =head1 DESCRIPTION
 
-Summary information about an event, returned by the DescribeEvents
-operation. The DescribeEventDetails operation also returns this
-information, as well as the EventDescription and additional event
-metadata.
+Summary information about an AWS Health event.
 
 =head1 ATTRIBUTES
 

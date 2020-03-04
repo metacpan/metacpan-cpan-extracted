@@ -1,7 +1,9 @@
 package App::lcpan;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '1.043'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-04'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.045'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,6 +44,7 @@ my %builtin_file_skip_list_sub = (
     'Shipment-3.01.tar.gz'                => 'segfaults Compiler::Lexer 0.22', # 2018-02-08
     'Shipment-3.02.tar.gz'                => 'segfaults Compiler::Lexer 0.22', # 2019-07-23
     'App-IndonesianBankingUtils-0.07.tar.gz' => 'segfaults at phase 3/3',      # 2016-08-18
+    'Bencher-Scenarios-HashSlicing-0.003.tar.gz' => 'eats memory',             # 2020-03-04
 );
 
 our %SPEC;
@@ -1976,7 +1979,17 @@ sub _update_index {
                 last if $pass != 3;
 
                 if (my $reason = $builtin_file_skip_list_sub{ $file->{name} }) {
-                    log_info("Skipped file %s (reason: built-in file skip list for sub: %s)", $file->{name}, $reason);
+                    log_info("Skipped indexing subs for file %s (reason: built-in file skip list for sub: %s)", $file->{name}, $reason);
+                    last;
+                }
+
+                if ($args{skip_sub_indexing_files} && first {$_ eq $file->{name}} @{ $args{skip_sub_indexing_files} }) {
+                    log_info("Skipped indexing subs for file %s (reason: skip_sub_indexing_files)", $file->{name});
+                    last;
+                }
+
+                if ($args{skip_sub_indexing_file_patterns} && first {$file->{name} =~ $_} @{ $args{skip_sub_indexing_file_patterns} }) {
+                    log_info("Skipped indexing subs for file %s (reason: skip_sub_indexing_file_patterns)", $file->{name});
                     last;
                 }
 
@@ -2143,7 +2156,25 @@ _
         skip_index_file_patterns => {
             summary => 'Skip one or more file patterns from being indexed',
             'x.name.is_plural' => 1,
-            'summary.alt.plurality.singular' => 'Skip a file pattern from being indexed',
+            'summary.alt.plurality.singular' => 'Specify a file pattern to skip from being indexed',
+            schema => ['array*', of=>'re*'],
+            cmdline_aliases => {
+            },
+            examples => ['^Foo-Bar-\d'],
+        },
+        skip_sub_indexing_files => {
+            summary => 'Skip one or more files from being parsed for subs',
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'skip_sub_indexing_file',
+            'summary.alt.plurality.singular' => 'Skip a file from being parsed for subs',
+            schema => ['array*', of=>'str*'],
+            examples => ['Foo-Bar-1.23.tar.gz'],
+        },
+        skip_sub_indexing_file_patterns => {
+            summary => 'Skip one or more file patterns from being parsed for subs',
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'skip_sub_indexing_file_pattern',
+            'summary.alt.plurality.singular' => 'Specify a file pattern to skip being parsed for subs',
             schema => ['array*', of=>'re*'],
             cmdline_aliases => {
             },
@@ -2985,7 +3016,7 @@ $SPEC{modules} = {
         namespaces => {
             'x.name.is_plural' => 1,
             summary => 'Select modules belonging to certain namespace(s)',
-            schema => ['array*', of=>'str*'],
+            schema => ['array*', of=>'perl::modname*'],
             tags => ['category:filtering'],
             element_completion => \&_complete_ns,
             cmdline_aliases => {N => {}},
@@ -4173,7 +4204,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.043 of App::lcpan (from Perl distribution App-lcpan), released on 2019-11-29.
+This document describes version 1.045 of App::lcpan (from Perl distribution App-lcpan), released on 2020-03-04.
 
 =head1 SYNOPSIS
 
@@ -4212,7 +4243,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -4243,6 +4274,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
+
 
 =back
 
@@ -4291,7 +4323,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -4377,7 +4409,8 @@ off.
 
 =item * B<with_xs_or_pp> => I<bool>
 
-Check each dependency as XS/PP.
+Check each dependency as XSE<sol>PP.
+
 
 =back
 
@@ -4432,7 +4465,7 @@ Filter by author.
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -4482,6 +4515,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -4507,7 +4541,7 @@ Usage:
 
  modules(%args) -> [status, msg, payload, meta]
 
-List modules/packages.
+List modulesE<sol>packages.
 
 This function is not exported by default, but exportable.
 
@@ -4521,7 +4555,7 @@ Filter by author.
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -4550,7 +4584,7 @@ using the C<index_name>.
 
 =item * B<latest> => I<bool>
 
-=item * B<namespaces> => I<array[str]>
+=item * B<namespaces> => I<array[perl::modname]>
 
 Select modules belonging to certain namespace(s).
 
@@ -4578,6 +4612,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
+
 
 =back
 
@@ -4614,7 +4649,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -4654,6 +4689,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -4675,7 +4711,7 @@ Usage:
 
  packages(%args) -> [status, msg, payload, meta]
 
-List modules/packages.
+List modulesE<sol>packages.
 
 This function is not exported.
 
@@ -4689,7 +4725,7 @@ Filter by author.
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -4718,7 +4754,7 @@ using the C<index_name>.
 
 =item * B<latest> => I<bool>
 
-=item * B<namespaces> => I<array[str]>
+=item * B<namespaces> => I<array[perl::modname]>
 
 Select modules belonging to certain namespace(s).
 
@@ -4746,6 +4782,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
+
 
 =back
 
@@ -4796,7 +4833,7 @@ herself.
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -4826,6 +4863,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -4847,7 +4885,7 @@ Usage:
 
  releases(%args) -> [status, msg, payload, meta]
 
-List releases/tarballs.
+List releasesE<sol>tarballs.
 
 The status field is the processing status of the file/release by lcpan. C<ok>
 means file has been extracted and the meta files parsed, C<nofile> means file is
@@ -4868,7 +4906,7 @@ Filter by author.
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -4916,6 +4954,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -4947,7 +4986,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -4966,6 +5005,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
+
 
 =back
 
@@ -4998,7 +5038,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -5017,6 +5057,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
+
 
 =back
 
@@ -5039,7 +5080,7 @@ Usage:
 
  update(%args) -> [status, msg, payload, meta]
 
-Create/update local CPAN mirror.
+CreateE<sol>update local CPAN mirror.
 
 This subcommand first create/update the mirror files by downloading from a
 remote CPAN mirror, then update the index.
@@ -5052,7 +5093,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -5104,6 +5145,14 @@ Skip one or more files from being indexed.
 Since sub indexing is still experimental, it is not enabled by default. To
 enable it, pass the C<--no-skip-sub-indexing> option.
 
+=item * B<skip_sub_indexing_file_patterns> => I<array[re]>
+
+Skip one or more file patterns from being parsed for subs.
+
+=item * B<skip_sub_indexing_files> => I<array[str]>
+
+Skip one or more files from being parsed for subs.
+
 =item * B<update_files> => I<bool> (default: 1)
 
 Update the files.
@@ -5118,6 +5167,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
+
 
 =back
 
@@ -5175,7 +5225,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

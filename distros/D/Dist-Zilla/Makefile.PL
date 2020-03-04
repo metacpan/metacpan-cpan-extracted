@@ -55,9 +55,8 @@ my %WriteMakefileArgs = (
     "Digest::MD5" => 0,
     "Encode" => 0,
     "ExtUtils::Manifest" => "1.66",
-    "File::Copy::Recursive" => 0,
+    "File::Copy::Recursive" => "0.41",
     "File::Find::Rule" => 0,
-    "File::HomeDir" => 0,
     "File::Path" => 0,
     "File::ShareDir" => 0,
     "File::ShareDir::Install" => "0.03",
@@ -83,9 +82,9 @@ my %WriteMakefileArgs = (
     "Params::Util" => 0,
     "Path::Tiny" => "0.052",
     "Perl::PrereqScanner" => "1.016",
-    "Pod::Eventual" => "0.091480",
+    "Pod::Simple" => 0,
     "Scalar::Util" => 0,
-    "Software::License" => "0.101370",
+    "Software::License" => "0.103014",
     "Software::LicenseUtils" => 0,
     "String::Formatter" => "0.100680",
     "String::RewritePrefix" => "0.006",
@@ -122,7 +121,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "lib" => 0
   },
-  "VERSION" => "6.012",
+  "VERSION" => "6.014",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/diagnostics/*.t t/plugins/*.t"
   }
@@ -160,9 +159,8 @@ my %FallbackPrereqs = (
   "Encode" => 0,
   "ExtUtils::MakeMaker" => 0,
   "ExtUtils::Manifest" => "1.66",
-  "File::Copy::Recursive" => 0,
+  "File::Copy::Recursive" => "0.41",
   "File::Find::Rule" => 0,
-  "File::HomeDir" => 0,
   "File::Path" => 0,
   "File::ShareDir" => 0,
   "File::ShareDir::Install" => "0.03",
@@ -188,9 +186,9 @@ my %FallbackPrereqs = (
   "Params::Util" => 0,
   "Path::Tiny" => "0.052",
   "Perl::PrereqScanner" => "1.016",
-  "Pod::Eventual" => "0.091480",
+  "Pod::Simple" => 0,
   "Scalar::Util" => 0,
-  "Software::License" => "0.101370",
+  "Software::License" => "0.103014",
   "Software::License::None" => 0,
   "Software::LicenseUtils" => 0,
   "String::Formatter" => "0.100680",
@@ -232,7 +230,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 if ( $^O eq 'MSWin32' ) {
-	$WriteMakefileArgs{PREREQ_PM}{'DateTime::TimeZone'} = '1.92';
+	$WriteMakefileArgs{PREREQ_PM}{'DateTime::TimeZone'} = $FallbackPrereqs{'DateTime::TimeZone'} = '1.92';
 }
 
 WriteMakefile(%WriteMakefileArgs);

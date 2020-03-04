@@ -2,7 +2,7 @@ package App::Yath::Command::watch;
 use strict;
 use warnings;
 
-our $VERSION = '0.001099';
+our $VERSION = '1.000006';
 
 use Time::HiRes qw/sleep/;
 
@@ -15,14 +15,6 @@ use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase;
 
 sub group { 'persist' }
-
-sub show_bench      { 0 }
-sub has_jobs        { 0 }
-sub has_runner      { 0 }
-sub has_logger      { 0 }
-sub has_display     { 0 }
-sub manage_runner   { 0 }
-sub always_keep_dir { 0 }
 
 sub summary { "Monitor the persistent test runner" }
 sub cli_args { "" }
@@ -37,7 +29,11 @@ STDERR will be printed as seen, so may not be in proper order.
 sub run {
     my $self = shift;
 
-    my $pfile = find_pfile()
+    my $args     = $self->args;
+    shift @$args if @$args && $args->[0] eq '--';
+    my $stop = 1 if @$args && $args->[0] eq 'STOP';
+
+    my $pfile = find_pfile($self->settings)
         or die "No persistent harness was found for the current path.\n";
 
     print "\nFound: $pfile\n";
@@ -64,6 +60,7 @@ sub run {
         }
 
         next if $count;
+        last if $stop;
         last unless -f $pfile;
         sleep 0.02;
     }
@@ -82,58 +79,185 @@ __END__
 
 =head1 NAME
 
+App::Yath::Command::watch - Monitor the persistent test runner
+
 =head1 DESCRIPTION
 
-=head1 SYNOPSIS
+This command will tail the logs from a persistent instance of yath. STDOUT and
+STDERR will be printed as seen, so may not be in proper order.
 
-=head1 COMMAND LINE USAGE
+
+=head1 USAGE
+
+    $ yath [YATH OPTIONS] watch [COMMAND OPTIONS]
+
+=head2 YATH OPTIONS
+
+=head3 Developer
+
+=over 4
+
+=item --dev-lib
+
+=item --dev-lib=lib
+
+=item -D
+
+=item -D=lib
+
+=item -Dlib
+
+=item --no-dev-lib
+
+Add paths to @INC before loading ANYTHING. This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
+
+Can be specified multiple times
 
 
-    $ yath watch [options]
+=back
 
-=head2 Help
+=head3 Environment
+
+=over 4
+
+=item --persist-dir ARG
+
+=item --persist-dir=ARG
+
+=item --no-persist-dir
+
+Where to find persistence files.
+
+
+=item --persist-file ARG
+
+=item --persist-file=ARG
+
+=item --pfile ARG
+
+=item --pfile=ARG
+
+=item --no-persist-file
+
+Where to find the persistence file. The default is /{system-tempdir}/project-yath-persist.json. If no project is specified then it will fall back to the current directory. If the current directory is not writable it will default to /tmp/yath-persist.json which limits you to one persistent runner on your system.
+
+
+=item --project ARG
+
+=item --project=ARG
+
+=item --project-name ARG
+
+=item --project-name=ARG
+
+=item --no-project
+
+This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file. This is necessary for a persistent runner.
+
+
+=back
+
+=head3 Help and Debugging
 
 =over 4
 
 =item --show-opts
 
+=item --no-show-opts
+
 Exit after showing what yath thinks your options mean
 
-=item -h
-
-=item --help
-
-Exit after showing this help message
-
-=item -V
 
 =item --version
 
-Show version information
+=item -V
+
+=item --no-version
+
+Exit after showing a helpful usage message
+
 
 =back
 
-=head2 Plugins
+=head3 Plugins
 
 =over 4
 
-=item -pPlugin
+=item --no-scan-plugins
 
-=item -pPlugin=arg1,arg2,...
+=item --no-no-scan-plugins
 
-=item -p+My::Plugin
+Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that it loading other modules when it should not.
 
-=item --plugin Plugin
 
-Load a plugin
+=item --plugins PLUGIN
 
-can be specified multiple times
+=item --plugins +App::Yath::Plugin::PLUGIN
+
+=item --plugins PLUGIN=arg1,arg2,...
+
+=item --plugin PLUGIN
+
+=item --plugin +App::Yath::Plugin::PLUGIN
+
+=item --plugin PLUGIN=arg1,arg2,...
+
+=item -pPLUGIN
 
 =item --no-plugins
 
-cancel any plugins listed until now
+Load a yath plugin.
 
-This can be used to negate plugins specified in .yath.rc or similar
+Can be specified multiple times
+
+
+=back
+
+=head2 COMMAND OPTIONS
+
+=head3 Help and Debugging
+
+=over 4
+
+=item --dummy
+
+=item -d
+
+=item --no-dummy
+
+Dummy run, do not actually execute anything
+
+Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
+
+
+=item --help
+
+=item -h
+
+=item --no-help
+
+exit after showing help information
+
+
+=item --keep-dirs
+
+=item --keep_dir
+
+=item -k
+
+=item --no-keep-dirs
+
+Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
+
+
+=item --summary
+
+=item --summary=/path/to/summary.json
+
+=item --no-summary
+
+Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extention is added automatically if omitted.
+
 
 =back
 
@@ -160,7 +284,7 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2019 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -168,3 +292,4 @@ modify it under the same terms as Perl itself.
 See F<http://dev.perl.org/licenses/>
 
 =cut
+

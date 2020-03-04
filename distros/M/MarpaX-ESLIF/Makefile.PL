@@ -542,9 +542,10 @@ my %WriteMakefileArgs = (
     "diagnostics" => 0,
     "open" => 0,
     "threads" => 0,
+    "threads::shared" => 0,
     "utf8" => 0
   },
-  "VERSION" => "3.0.30",
+  "VERSION" => "3.0.32",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -590,6 +591,7 @@ my %FallbackPrereqs = (
   "parent" => 0,
   "strict" => 0,
   "threads" => 0,
+  "threads::shared" => 0,
   "utf8" => 0,
   "vars" => 0,
   "warnings" => 0

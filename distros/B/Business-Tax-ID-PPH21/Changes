@@ -1,19 +1,24 @@
-0.061   2019-02-10 (PERLANCAR)
+0.062   2020-03-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Support 2019 (PTKP & tax brackets unchanged from 2016-2018).
+
+
+0.061   2019-02-10  Released-By: PERLANCAR
 
 	- Support 2018 (PTKP and tax brackets unchanged from 2016 & 2017).
 
 
-0.060   2017-12-04 (PERLANCAR)
+0.060   2017-12-04  Released-By: PERLANCAR
 
 	- Support 2017 (PTKP and tax brackets unchanged from 2016).
 
 
-0.05    2017-11-09 (PERLANCAR)
+0.05    2017-11-09  Released-By: PERLANCAR
 
 	- [ux] Set pph21_op as second positional argument.
 
 
-0.04    2017-05-24 (PERLANCAR)
+0.04    2017-05-24  Released-By: PERLANCAR
 
 	- Add function: calc_net_income_from_pph21_op.
 
@@ -22,12 +27,12 @@
 	- [ux] Give more helpful message about unsupported year.
 
 
-0.03    2017-02-09 (PERLANCAR)
+0.03    2017-02-09  Released-By: PERLANCAR
 
 	- Update for tax year 2016.
 
 
-0.02    2015-12-23 (PERLANCAR)
+0.02    2015-12-23  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -38,6 +43,6 @@
         - [doc] Add some example for calc_pph21_op().
 
 
-0.01    2015-12-22 (PERLANCAR)
+0.01    2015-12-22  Released-By: PERLANCAR
 
         - First release.

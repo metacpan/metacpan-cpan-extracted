@@ -3,9 +3,9 @@ NAME
     Sort::Sub::* modules
 
 VERSION
-    This document describes version 0.003 of Pod::Weaver::Plugin::Sort::Sub
+    This document describes version 0.005 of Pod::Weaver::Plugin::Sort::Sub
     (from Perl distribution Pod-Weaver-Plugin-Sort-Sub), released on
-    2019-12-15.
+    2019-12-17.
 
 SYNOPSIS
     In your weaver.ini:
@@ -21,6 +21,9 @@ DESCRIPTION
     *   Add Synopsis section if not already exists
 
     *   Add description about the module to Description section
+
+    *   Add Sort Arguments section containing list of sort arguments, from
+        metadata
 
     *   Mention some modules in See Also section
 

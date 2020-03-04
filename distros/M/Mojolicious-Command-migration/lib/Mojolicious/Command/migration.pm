@@ -16,7 +16,7 @@ use SQL::Translator::Diff;
 no warnings;
 use Data::Dumper;
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 has description => 'MySQL migration tool';
 has usage       => sub { shift->extract_usage };
@@ -39,6 +39,9 @@ has db => sub {
 	DBI->connect('dbi:mysql:'.$self->config->{datasource}->{database},
 		$self->config->{user    },
 		$self->config->{password},
+		{
+			host => $self->config->{datasource}->{host} || '', port => $self->config->{datasource}->{port},
+		}
 	);
 };
 has params => sub {{}};
@@ -512,6 +515,12 @@ sub get_schema {
 	my $self = shift;
 	my $p    = {@_};
 
+	my $args = join ';',
+		$self->config->{datasource}->{host} ? 'host='.$self->config->{datasource}->{host} : (),
+		$self->config->{datasource}->{port} ? 'port='.$self->config->{datasource}->{port} : (),
+	;
+	$args = ":$args" if $args;
+
 	my $translator = SQL::Translator->new(
 		debug => 1,
 		no_comments => $p->{no_comments} || 0,
@@ -521,7 +530,7 @@ sub get_schema {
 		:
 			(
 				parser_args     => {
-					dsn         => 'dbi:mysql:'.$self->config->{datasource}->{database},
+					dsn         => 'dbi:mysql:'.$self->config->{datasource}->{database}.$args,
 					db_user     => $self->config->{user    },
 					db_password => $self->config->{password},
 				},
@@ -608,7 +617,7 @@ Mojolicious::Command::migration — MySQL migration tool for Mojolicious
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
  

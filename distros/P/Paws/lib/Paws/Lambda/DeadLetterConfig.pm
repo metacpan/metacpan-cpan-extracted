@@ -31,9 +31,9 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Lambda::Dea
 
 =head1 DESCRIPTION
 
-The dead letter queue
-(https://docs.aws.amazon.com/lambda/latest/dg/dlq.html) for failed
-asynchronous invocations.
+The dead-letter queue
+(https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#dlq)
+for failed asynchronous invocations.
 
 =head1 ATTRIBUTES
 

@@ -86,22 +86,24 @@ sub start {
 	print "Running tests...\n";
 	run_tests(@test_files);
 
+	print "\nWatching for changes on ", (join ",", @{$watch}), ". Press CTRL+C to stop running tests.\n";
 	my $watcher = Filesys::Notify::Simple->new([@{$watch}, @{$test_files}]);
 	while (1) {
 		$watcher->wait(
 			sub {
 				my @files_changed;
-				print "\n";
 			  FILE: foreach my $event (@_) {
 					my $pwd = cwd();
 					my $path = $event->{path};
 					$path =~ s/$pwd\///g;
+					next if $path =~ /\/\./;
 
 					push @files_changed, $path;
-					print $path . " changed\n";
+					print "\n" . $path . " changed";
 				}
-				print "\n";
-				print "Running tests...\n";
+				return unless @files_changed;
+
+				print "\n\nRunning tests...\n";
 				eval {
 					clear_cache(@files_changed);
 					run_tests(@test_files);

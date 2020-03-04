@@ -1,3 +1,7 @@
+0.18 2020-02-28T14:09:25+01:00
+ - Improve object private parameter name.
+ - Update POD documentation to my standard.
+
 0.17 2020-02-02T21:45:26+01:00
  - Add missing dependency for Getopt::Std.
  - Change default value of debug to disable.

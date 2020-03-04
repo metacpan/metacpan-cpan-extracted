@@ -87,6 +87,7 @@ lib/App/lcpan/Cmd/stats_last_index_time.pm
 lib/App/lcpan/Cmd/subnames_by_count.pm
 lib/App/lcpan/Cmd/subs.pm
 lib/App/lcpan/Cmd/update.pm
+lib/App/lcpan/Cmd/x_mentions_for_mod.pm
 lib/App/lcpan/Manual/Cookbook.pod
 lib/App/lcpan/PodParser.pm
 lib/End/PrintBytesIn.pm

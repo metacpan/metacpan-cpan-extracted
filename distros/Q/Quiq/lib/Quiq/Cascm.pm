@@ -6,14 +6,14 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.175';
+our $VERSION = '1.176';
 
 use Quiq::Database::Row::Array;
 use Quiq::AnsiColor;
 use Quiq::Shell;
+use Quiq::Terminal;
 use Quiq::Path;
 use Quiq::Converter;
-use Quiq::Terminal;
 use Quiq::CommandLine;
 use Quiq::TempDir;
 use Quiq::Array;
@@ -325,8 +325,8 @@ sub abstract {
 
 =head4 Synopsis
 
-  $output = $scm->edit($repoFile);
   $output = $scm->edit($repoFile,$package);
+  $output = $scm->edit($repoFile,$package,$version);
 
 =head4 Arguments
 
@@ -344,6 +344,8 @@ untersten Stufe stehen. Befindet es sich auf einer höheren Stufe, wird
 intern ein Transportpackage erzeugt, das die Dateien zu der Stufe
 des Package bewegt.
 
+=item $version (Default: I<aktuelle Version>)
+
 =back
 
 =head4 Returns
@@ -352,32 +354,106 @@ Ausgabe der CASCM-Kommandos (String)
 
 =head4 Description
 
-Checke die Repository-Datei $repoFile aus und öffne sie im Editor.
-Nach dem Verlassen des Editors wird geprüft, ob die Datei (eine Kopie
-im lokalen Verzeichnis) verändert wurde. Der Benutzer wird gefragt,
-ob er seine Änderungen ins Repository übertragen möchte oder nicht.
-Anschließend wird die Repository-Datei wieder eingecheckt. Dies
-geschieht, gleichgültig, ob sie geändert wurde oder nicht. CASCM
-vergibt nur dann eine neue Versionsnummer, wenn die Datei sich
-geändert hat.
+Checke die Repository-Datei $repoFile aus und lade Version $version
+in den Editor. Wird die Datei bearbeitet, d.h. nach dem Verlassen
+des Editors ist ihr Inhalt ein anderer als vorher, wird dieser Stand
+(nach Rückfage) als neue Version eingecheckt. Andernfalls wird
+ohne Änderung eingecheckt, wobei die Vergabe einer neuen Versionsnummer
+unterbleibt.
+
+Das Editieren einer älteren Version kann genutzt werden,
+um eine in Arbeit befindliche Version zu übergehen. Ein weiteres Mal
+auf die zuvor aktuelle Version angewandt, kann die aktuelle Version
+wieder reaktiviert werden.
+
+=head4 Example
+
+Bearbeite eine ältere Version, so dass diese vor der unfertigen
+aktuellen Version promotet werden kann.
+
+Aktueller Stand:
+
+  $ $ dss-repo find-item DATEI
+  1 item_path
+  2 version
+  3 package
+  4 state
+  5 creationtime
+  6 username
+  
+  1            2   3                           4             5                     6
+  | DATEI | 0 | PACKAGE1 | Produktion  | 2020-02-27 14:05:30 | xv882js |
+  | DATEI | 1 | PACKAGE2 | TTEST       | 2020-02-27 14:06:16 | xv882js |
+
+Alte Version editieren und zur neusten Version machen:
+
+  $ dss-repo create PACKAGE3
+  $ dss-repo edit DATEI PACKAGE3 0
+
+Nächster Stand:
+
+  $ $ dss-repo find-item DATEI
+  1 item_path
+  2 version
+  3 package
+  4 state
+  5 creationtime
+  6 username
+  
+  1            2   3                           4             5
+  | DATEI | 0 | PACKAGE1 | Produktion  | 2020-02-27 14:05:30 | xv882js |
+  | DATEI | 1 | PACKAGE2 | TTEST       | 2020-02-27 14:06:16 | xv882js |
+  | DATEI | 2 | PACKAGE3 | Entwicklung | 2020-02-27 14:08:45 | xv882js |
+
+Die in PACKAGE3 befindliche bearbeitete Version 2, die aus Version 0
+hervorgegangen ist, kann nach Produktion promotet werden ohne den
+unfertigen Code aus Version 1.
+
+Unfertigen Stand wieder zum aktuellen Stand machen, u.U. mit den
+gleichen vormaligen Änderungen:
+
+  $ dss-repo edit DATEI PACKAGE2 1
+
+Nächster Stand:
+
+  $ dss-repo find-item DATEI
+  1 item_path
+  2 version
+  3 package
+  4 state
+  5 creationtime
+  6 username
+  
+  1            2   3                           4             5
+  | DATEI | 0 | PACKAGE1 | Produktion  | 2020-02-27 14:05:30 | xv882js |
+  | DATEI | 1 | PACKAGE2 | TTEST       | 2020-02-27 14:06:16 | xv882js |
+  | DATEI | 2 | PACKAGE3 | Entwicklung | 2020-02-27 14:08:45 | xv882js |
+  | DATEI | 2 | PACKAGE2 | TTEST       | 2020-02-27 14:10:45 | xv882js |
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub edit {
-    my ($self,$repoFile,$package) = @_;
+    my ($self,$repoFile,$package,$version) = @_;
 
     my $output = '';
+
+    # Information über die Versionen der Datei ausgeben
+    print $self->findItem($repoFile)->asTable(-info=>2);
+
+    my $answ = Quiq::Terminal->askUser('Continue?',
+        -values => 'y/n',
+        -default => 'y',
+    );
+    if ($answ ne 'y') {
+        return $output;
+    }
 
     my $p = Quiq::Path->new;
 
     # Vollständigen Pfad der Repository-Datei ermitteln
     my $file = $self->repoFileToFile($repoFile);
-
-    if (!$package) {
-        $package = $self->package($repoFile);
-    }
 
     # Ermittele die Stufe des Package
     my $state = $self->packageState($package);
@@ -392,36 +468,17 @@ sub edit {
         $output .= $self->createPackage($transportPackage);
     }
 
+    my $tmpDir = '~/tmp/cascm/';
+
     # Lokale Kopie der Datei erstellen
 
-    my $localFile = '~/tmp/'.$p->filename($file);
-    my $which = 'r';
-    if (-e $localFile) {
-        # Repo-Datei muss nicht kopiert werden, wenn sie schon
-        # vorhanden ist, falls sie nicht differiert
-        $which = 'l';
-        if ($p->compare($file,$localFile)) {
-            $which = Quiq::Terminal->askUser(
-                'Local file exists and differs from repository file.'.
-                    ' Which file: l=local, r=repository, q=quit?',
-                -values => 'l/r/q',
-                -default => 'r',
-            );
-            if ($which eq 'q') {
-                return $output;
-            }
-            # Datei differiert und wird kopiert, wenn r gewählt wurde
-        }
+    my $localFile;
+    if (defined($version)) {
+        $localFile = $self->getVersion($repoFile,$version,$tmpDir);
     }
-    if ($which eq 'r') {
-        $p->copyToDir($file,'~/tmp');
-    }
-
-    # Original-Datei mit dem Stand vor der ersten Änderung sichern
-
-    my $origFile = "$localFile.orig";
-    if (!$p->exists($origFile)) {
-        $p->copy($localFile,$origFile);
+    else {
+        $localFile = $tmpDir.'/'.$p->filename($file);
+        $p->copy($file,$localFile,-createDir=>1);
     }
 
     # Backup-Datei erstellen für den Vergleich nach
@@ -472,10 +529,7 @@ sub edit {
                 redo;
             }
         }
-        elsif (!$p->compare($localFile,$origFile)) {
-            # Wir löschen die Lokale Datei und Original-Datei, wenn sie
-            # nach dem Verlassen des Editors identisch sind
-            $p->delete($origFile);
+        else {
             $p->delete($localFile);
         }
         last;
@@ -1202,7 +1256,7 @@ sub deleteVersion {
     my $transportPackage;
     my @rows = reverse $tab->rows;
     for my $row (@rows) {
-        if ($row->[6] ne $self->states->[0]) {
+        if ($row->[3] ne $self->states->[0]) {
             my $name = Quiq::Converter->intToWord(time);
             $transportPackage = "S6800_0_Seitz_Lift_$name";
             $output .= $self->createPackage($transportPackage);
@@ -1216,7 +1270,7 @@ sub deleteVersion {
     if ($transportPackage) {
         my $transportPackageCount = 0;
         for my $row (@rows) {
-            my $state = $row->[6];
+            my $state = $row->[3];
             if ($state ne $self->states->[0]) {
                 my $out = $self->movePackage($state,$transportPackage,
                     -askUser => $transportPackageCount,
@@ -1230,9 +1284,9 @@ sub deleteVersion {
                 # Version in Transportpackage bewegen
                 # say sprintf '%s[%s] => %s',$state,$row->[3],$transportPackage;
 
-                my $repoFile = $row->[1];
-                my $package = $row->[5];
-                my $version = $row->[3];
+                my $repoFile = $row->[0];
+                my $package = $row->[3];
+                my $version = $row->[1];
 
                 $self->switchPackage($package,$transportPackage,
                     "$repoFile:$version");
@@ -1245,7 +1299,7 @@ sub deleteVersion {
     # Wir löschen die Dateien.
 
     for my $row (@rows) {
-        my $repoFile = $row->[1];
+        my $repoFile = $row->[0];
 
         my ($dir,$file) = Quiq::Path->split($repoFile);
         my $viewPath = $self->viewPath;
@@ -1274,11 +1328,11 @@ sub deleteVersion {
 
 # -----------------------------------------------------------------------------
 
-=head3 passVersion() - Überhole die aktuelle mit der vorigen Version
+=head3 passVersion() - Überhole die aktuelle mit älterer Version
 
 =head4 Synopsis
 
-  $output = $scm->passVersion($repoFile);
+  $output = $scm->passVersion($repoFile,$version,$package);
 
 =head4 Arguments
 
@@ -1288,6 +1342,14 @@ sub deleteVersion {
 
 Der Pfad der zu löschenden Repository-Datei.
 
+=item $version
+
+Ältere Version, die die neuere Version überholen soll.
+
+=item $package
+
+Package, dem die neue ältere Version hinzugefügt wird.
+
 =back
 
 =head4 Returns
@@ -1296,44 +1358,29 @@ Ausgabe des Kommandos (String)
 
 =head4 Description
 
-Erzeuge eine neue Version von $repoFile mit dem Stand I<vor> der aktuellen
-Version. Dies ist nützlich, wenn an einem vorherigen Stand "vorbeigezogen"
-werden soll.
+Erzeuge eine neue Version von $repoFile mit der älteren Version $version
+und füge diese zu Package $package hinzu. Dies ist nützlich, wenn an der
+aktuellen Version vorbeigezogen werden soll.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub passVersion {
-    my ($self,$repoFile) = @_;
-
-    my $output;
+    my ($self,$repoFile,$version,$package) = @_;
 
     my $p = Quiq::Path->new;
 
-    # Aktuelle Version ermitteln
-
-    my $version = $self->versionNumber($repoFile);
-    if ($version == 0) {
-        $self->throw(
-            'CASCM-00099: Previous version does not exist',
-            Version => $version,
-            RepoFile => $repoFile,
-        );
-    }
-    my $prevVersion = $version-1;
-
-    # Vormaligen Stand holen
+    # Alten Stand holen und in temporärer Datei speichern
 
     my $tmpDir = $p->tempDir;
-    my $file = $self->getVersion($repoFile,$version-1,$tmpDir,
+    my $file = $self->getVersion($repoFile,$version,$tmpDir,
         -sloppy => 1,
         -versionSuffix => 0,
     );
-    my $prevPackage = $self->package($repoFile,$prevVersion);
 
     my ($repoDir) = $p->split($repoFile);
-    return $self->putFiles($prevPackage,$repoDir,$file);
+    return $self->putFiles($package,$repoDir,$file);
 }
 
 # -----------------------------------------------------------------------------
@@ -1498,15 +1545,17 @@ sub findItem {
             *
         FROM (
             SELECT DISTINCT -- Warum ist hier DISTINCT nötig?
-                itm.itemobjid AS id
+                -- itm.itemobjid AS id
                 -- Warum ist /zenmod manchmal im Pfad?
-                , REPLACE(SYS_CONNECT_BY_PATH(itm.itemname,'/'),'/zenmod','')
+                REPLACE(SYS_CONNECT_BY_PATH(itm.itemname,'/'),'/zenmod','')
                     AS item_path
-                , itm.itemtype AS item_type
+                -- , itm.itemtype AS item_type
                 , ver.mappedversion AS version
-                , ver.versiondataobjid
+                -- , ver.versiondataobjid
                 , pkg.packagename AS package
                 , sta.statename AS state
+                , ver.creationtime
+                , usr.username
             FROM
                 haritems itm
                 JOIN harversions ver
@@ -1521,6 +1570,8 @@ sub findItem {
                     ON par.itemobjid = itm.parentobjid
                 JOIN harrepository rep
                     ON rep.repositobjid = itm.repositobjid
+                JOIN harallusers usr
+                    ON usr.usrobjid = ver.creatorid
             WHERE
                 env.environmentname = '$projectContext'
             START WITH
@@ -1541,7 +1592,7 @@ sub findItem {
     # da er für alle Pfade gleich ist
 
     for my $row ($tab->rows) {
-        $row->[1] =~ s|^/\Q$viewPath\E/||;
+        $row->[0] =~ s|^/\Q$viewPath\E/||;
     }
 
     return $tab;
@@ -1935,11 +1986,11 @@ sub showPackage {
 
     my $tab = $self->runSql("
         SELECT DISTINCT -- Warum ist hier DISTINCT nötig?
-            itm.itemobjid AS id
-            , SYS_CONNECT_BY_PATH(itm.itemname,'/') AS item_path
-            , itm.itemtype AS item_type
+            -- itm.itemobjid AS id
+            SYS_CONNECT_BY_PATH(itm.itemname,'/') AS item_path
+            -- , itm.itemtype AS item_type
             , ver.mappedversion AS version
-            , ver.versiondataobjid
+            -- , ver.versiondataobjid
             , pkg.packagename
         FROM
             haritems itm
@@ -1973,7 +2024,7 @@ sub showPackage {
     # da er für alle Pfade gleich ist
 
     for my $row ($tab->rows) {
-        $row->[1] =~ s|^/\Q$viewPath\E/||;
+        $row->[0] =~ s|^/\Q$viewPath\E/||;
     }
 
     return wantarray? $tab->rows: $tab;
@@ -2351,7 +2402,17 @@ sub packageState {
 
 =head4 Synopsis
 
-  $tab = $scm->listPackages;
+  $tab = $scm->listPackages(@opt);
+
+=head4 Options
+
+=over 4
+
+=item -order => 'package'|'username'|'time' (Default: 'time')
+
+Sortierkriterium.
+
+=back
 
 =head4 Returns
 
@@ -2375,22 +2436,36 @@ Liefere die Liste aller Packages.
 sub listPackages {
     my $self = shift;
 
+    # Optionen
+
+    my $order = 'time';
+
+    $self->parameters(\@_,
+        -order => \$order,
+    );
+
+    # Operation ausführen
+
     my $projectContext = $self->projectContext;
 
     return $self->runSql("
         SELECT
-            pkg.packagename
-            , sta.statename
+            pkg.packagename AS package
+            , sta.statename AS stage
+            , pkg.creationtime AS time
+            , usr.username AS username
         FROM
             harPackage pkg
             JOIN harEnvironment env
                 ON pkg.envobjid = env.envobjid
             JOIN harState sta
                 ON pkg.stateobjid = sta.stateobjid
+            JOIN harallusers usr
+                ON usr.usrobjid = pkg.creatorid
         WHERE
             env.environmentname = '$projectContext'
         ORDER BY
-            1
+            $order
     ");
 }
 
@@ -2744,7 +2819,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.175
+1.176
 
 =head1 AUTHOR
 

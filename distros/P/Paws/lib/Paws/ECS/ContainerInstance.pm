@@ -4,6 +4,7 @@ package Paws::ECS::ContainerInstance;
   has AgentUpdateStatus => (is => 'ro', isa => 'Str', request_name => 'agentUpdateStatus', traits => ['NameInRequest']);
   has Attachments => (is => 'ro', isa => 'ArrayRef[Paws::ECS::Attachment]', request_name => 'attachments', traits => ['NameInRequest']);
   has Attributes => (is => 'ro', isa => 'ArrayRef[Paws::ECS::Attribute]', request_name => 'attributes', traits => ['NameInRequest']);
+  has CapacityProviderName => (is => 'ro', isa => 'Str', request_name => 'capacityProviderName', traits => ['NameInRequest']);
   has ContainerInstanceArn => (is => 'ro', isa => 'Str', request_name => 'containerInstanceArn', traits => ['NameInRequest']);
   has Ec2InstanceId => (is => 'ro', isa => 'Str', request_name => 'ec2InstanceId', traits => ['NameInRequest']);
   has PendingTasksCount => (is => 'ro', isa => 'Int', request_name => 'pendingTasksCount', traits => ['NameInRequest']);
@@ -77,6 +78,11 @@ interfaces.
   The attributes set for the container instance, either by the Amazon ECS
 container agent at instance registration or manually with the
 PutAttributes operation.
+
+
+=head2 CapacityProviderName => Str
+
+  The capacity provider associated with the container instance.
 
 
 =head2 ContainerInstanceArn => Str
@@ -169,9 +175,51 @@ in the I<Amazon Elastic Container Service Developer Guide>.
 
   The metadata that you apply to the container instance to help you
 categorize and organize them. Each tag consists of a key and an
-optional value, both of which you define. Tag keys can have a maximum
-character length of 128 characters, and tag values can have a maximum
-length of 256 characters.
+optional value, both of which you define.
+
+The following basic restrictions apply to tags:
+
+=over
+
+=item *
+
+Maximum number of tags per resource - 50
+
+=item *
+
+For each resource, each tag key must be unique, and each tag key can
+have only one value.
+
+=item *
+
+Maximum key length - 128 Unicode characters in UTF-8
+
+=item *
+
+Maximum value length - 256 Unicode characters in UTF-8
+
+=item *
+
+If your tagging schema is used across multiple services and resources,
+remember that other services may have restrictions on allowed
+characters. Generally allowed characters are: letters, numbers, and
+spaces representable in UTF-8, and the following characters: + - = . _
+: / @.
+
+=item *
+
+Tag keys and values are case-sensitive.
+
+=item *
+
+Do not use C<aws:>, C<AWS:>, or any upper or lowercase combination of
+such as a prefix for either keys or values as it is reserved for AWS
+use. You cannot edit or delete tag keys or values with this prefix.
+Tags with this prefix do not count against your tags per resource
+limit.
+
+=back
+
 
 
 =head2 Version => Int

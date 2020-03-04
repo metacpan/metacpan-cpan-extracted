@@ -3,10 +3,13 @@ package Paws::Datasync::Options;
   has Atime => (is => 'ro', isa => 'Str');
   has BytesPerSecond => (is => 'ro', isa => 'Int');
   has Gid => (is => 'ro', isa => 'Str');
+  has LogLevel => (is => 'ro', isa => 'Str');
   has Mtime => (is => 'ro', isa => 'Str');
+  has OverwriteMode => (is => 'ro', isa => 'Str');
   has PosixPermissions => (is => 'ro', isa => 'Str');
   has PreserveDeletedFiles => (is => 'ro', isa => 'Str');
   has PreserveDevices => (is => 'ro', isa => 'Str');
+  has TaskQueueing => (is => 'ro', isa => 'Str');
   has Uid => (is => 'ro', isa => 'Str');
   has VerifyMode => (is => 'ro', isa => 'Str');
 1;
@@ -94,6 +97,15 @@ INT_VALUE: Preserve the integer value of user ID (UID) and GID
 NONE: Ignore UID and GID.
 
 
+=head2 LogLevel => Str
+
+  A value that determines the type of logs DataSync will deliver to your
+AWS CloudWatch Logs file. If set to C<OFF>, no logs will be delivered.
+C<BASIC> will deliver a few logs per transfer operation and C<TRANSFER>
+will deliver a verbose log that contains logs for every file that is
+transferred.
+
+
 =head2 Mtime => Str
 
   A value that indicates the last time that a file was modified (that is,
@@ -108,6 +120,20 @@ NONE: Ignore C<Mtime>.
 If C<Mtime> is set to PRESERVE, C<Atime> must be set to BEST_EFFORT.
 
 If C<Mtime> is set to NONE, C<Atime> must also be set to NONE.
+
+
+=head2 OverwriteMode => Str
+
+  A value that determines whether files at the destination should be
+overwritten or preserved when copying files. If set to C<NEVER> a
+destination file will not be replaced by a source file, even if the
+destination file differs from the source file. If you modify files in
+the destination and you sync the files, you can use this value to
+protect against overwriting those changes.
+
+Some storage classes have specific behaviors that can affect your S3
+storage cost. For detailed information, see using-storage-classes in
+the I<AWS DataSync User Guide>.
 
 
 =head2 PosixPermissions => Str
@@ -127,7 +153,11 @@ AWS DataSync can preserve extant permissions of a source location.
 =head2 PreserveDeletedFiles => Str
 
   A value that specifies whether files in the destination that don't
-exist in the source file system should be preserved.
+exist in the source file system should be preserved. This option can
+affect your storage cost. If your task deletes objects, you might incur
+minimum storage duration charges for certain storage classes. For
+detailed information, see using-storage-classes in the I<AWS DataSync
+User Guide>.
 
 Default value: PRESERVE.
 
@@ -155,6 +185,16 @@ PRESERVE: Preserve character and block device metadata. This option
 isn't currently supported for Amazon EFS.
 
 
+=head2 TaskQueueing => Str
+
+  A value that determines whether tasks should be queued before executing
+the tasks. If set to C<ENABLED>, the tasks will be queued. The default
+is C<ENABLED>.
+
+If you use the same agent to run multiple tasks you can enable the
+tasks to run in series. For more information see queue-task-execution.
+
+
 =head2 Uid => Str
 
   The user ID (UID) of the file's owner.
@@ -176,6 +216,9 @@ have been transferred.
 Default value: POINT_IN_TIME_CONSISTENT.
 
 POINT_IN_TIME_CONSISTENT: Perform verification (recommended).
+
+ONLY_FILES_TRANSFERRED: Perform verification on only files that were
+transferred.
 
 NONE: Skip verification.
 

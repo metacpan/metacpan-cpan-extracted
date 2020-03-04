@@ -1,3 +1,27 @@
+v0.120.5 2020-03-04T18:10:43Z
+ - nginx reuseport removed
+
+v0.120.4 2020-03-04T13:18:42Z
+ - lum proxies updated
+
+v0.120.3 2020-03-01T22:34:02Z
+ - nginx reuse port
+
+v0.120.2 2020-03-01T00:52:21Z
+ - nginx load balancer
+
+v0.120.1 2020-03-01T00:09:30Z
+ - nginx load balancer
+ - nginx refactored
+
+v0.120.0 2020-02-29T12:00:10Z
+ - nginx merged
+ - app tmpl updated
+
+v0.119.0 2020-02-28T03:55:46Z
+ - proxy refactored
+ - app tmpl fixed
+
 v0.118.0 2020-02-26T15:06:22Z
  - merged with Pcore::PDF
 

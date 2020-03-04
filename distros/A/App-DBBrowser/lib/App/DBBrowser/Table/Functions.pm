@@ -43,10 +43,11 @@ sub col_function {
         Concat              => 9, # Concatenate
         Epoch_to_Date       => 1,
         Epoch_to_DateTime   => 1,
-        Truncate            => 1,
+        Replace             => 1,
         Round               => 1,
+        Truncate            => 1,
     };
-    my @functions_sorted = qw( Concat Truncate Round Bit_Length Char_Length Epoch_to_Date Epoch_to_DateTime );
+    my @functions_sorted = qw( Bit_Length Char_Length Concat Epoch_to_Date Epoch_to_DateTime Replace Round Truncate );
 
     SCALAR_FUNC: while ( 1 ) {
         # Choose
@@ -105,7 +106,22 @@ sub __prepare_col_func {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $quote_f;
-    if ( $func =~ /^Epoch_to_Date(?:Time)?\z/ ) {
+    if ( $func eq 'Bit_Length' ) {
+        $quote_f = $plui->bit_length( $qt_col );
+    }
+    elsif ( $func eq 'Char_Length' ) {
+        $quote_f = $plui->char_length( $qt_col );
+    }
+    elsif ( $func eq 'Concat' ) {
+        my $info = "\n" . 'Concat( ' . join( ',', @$qt_col ) . ' )';
+        my $tf = Term::Form->new( $sf->{i}{tf_default} );
+        my $sep = $tf->readline( 'Separator: ',
+            { info => $info }
+        );
+        return if ! defined $sep;
+        $quote_f = $plui->concatenate( $qt_col, $sep );
+    }
+    elsif ( $func =~ /^Epoch_to_Date(?:Time)?\z/ ) {
         my $prompt = $func eq 'Epoch_to_Date' ? 'DATE' : 'DATETIME';
         $prompt .= "($qt_col)\nInterval:";
         my ( $microseconds, $milliseconds, $seconds ) = (
@@ -128,14 +144,25 @@ sub __prepare_col_func {
             $quote_f = $plui->epoch_to_date( $qt_col, $div );
         }
     }
-    elsif ( $func eq 'Truncate' ) {
-        my $info = $func . ': ' . $qt_col;
-        my $name = "Decimal places: ";
-        my $precision = $tu->choose_a_number( 2,
-            { cs_label => $name, info => $info, small_first => 1 }
+    elsif ( $func eq 'Replace' ) {
+        my $info = $func . '(' . $qt_col . ', from_str, to_str)';
+        my $tf = Term::Form->new( $sf->{i}{tf_default} );
+        my $fields = [
+            [ ' from str', ],
+            [ '   to str', ],
+        ];
+        my $form = $tf->fill_form(
+            $fields,
+            { info => $info, prompt => '', auto_up => 2,
+              confirm => '  OK', back => '  <<' }
         );
-        return if ! defined $precision;
-        $quote_f = $plui->truncate( $qt_col, $precision );
+        if ( ! $form ) {
+            return;
+        }
+        my $string_to_replace =  $sf->{d}{dbh}->quote( $form->[0][1] );
+        my $replacement_string = $sf->{d}{dbh}->quote( $form->[1][1] );
+        #return if ! ...;
+        $quote_f = $plui->replace( $qt_col, $string_to_replace, $replacement_string  );
     }
     elsif ( $func eq 'Round' ) {
         my $info = $func . ': ' . $qt_col;
@@ -156,20 +183,14 @@ sub __prepare_col_func {
         }
         $quote_f = $plui->round( $qt_col, $precision );
     }
-    elsif ( $func eq 'Bit_Length' ) {
-        $quote_f = $plui->bit_length( $qt_col );
-    }
-    elsif ( $func eq 'Char_Length' ) {
-        $quote_f = $plui->char_length( $qt_col );
-    }
-    elsif ( $func eq 'Concat' ) {
-        my $info = "\n" . 'Concat( ' . join( ',', @$qt_col ) . ' )';
-        my $tf = Term::Form->new( $sf->{i}{tf_default} );
-        my $sep = $tf->readline( 'Separator: ',
-            { info => $info }
+    elsif ( $func eq 'Truncate' ) {
+        my $info = $func . ': ' . $qt_col;
+        my $name = "Decimal places: ";
+        my $precision = $tu->choose_a_number( 2,
+            { cs_label => $name, info => $info, small_first => 1 }
         );
-        return if ! defined $sep;
-        $quote_f = $plui->concatenate( $qt_col, $sep );
+        return if ! defined $precision;
+        $quote_f = $plui->truncate( $qt_col, $precision );
     }
     return $quote_f;
 }

@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::update;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '1.043'; # VERSION
+our $DATE = '2020-03-04'; # DATE
+our $VERSION = '1.045'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::lcpan::Cmd::update - Create/update local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.043 of App::lcpan::Cmd::update (from Perl distribution App-lcpan), released on 2019-11-29.
+This document describes version 1.045 of App::lcpan::Cmd::update (from Perl distribution App-lcpan), released on 2020-03-04.
 
 =head1 FUNCTIONS
 
@@ -40,7 +40,7 @@ Usage:
 
  handle_cmd(%args) -> [status, msg, payload, meta]
 
-Create/update local CPAN mirror.
+CreateE<sol>update local CPAN mirror.
 
 This subcommand first create/update the mirror files by downloading from a
 remote CPAN mirror, then update the index.
@@ -53,7 +53,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -105,6 +105,14 @@ Skip one or more files from being indexed.
 Since sub indexing is still experimental, it is not enabled by default. To
 enable it, pass the C<--no-skip-sub-indexing> option.
 
+=item * B<skip_sub_indexing_file_patterns> => I<array[re]>
+
+Skip one or more file patterns from being parsed for subs.
+
+=item * B<skip_sub_indexing_files> => I<array[str]>
+
+Skip one or more files from being parsed for subs.
+
 =item * B<update_files> => I<bool> (default: 1)
 
 Update the files.
@@ -119,6 +127,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
+
 
 =back
 
@@ -155,7 +164,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

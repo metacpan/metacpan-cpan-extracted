@@ -1,5 +1,5 @@
 package Task::BeLike::SHLOMIF;
-$Task::BeLike::SHLOMIF::VERSION = '0.0.4';
+$Task::BeLike::SHLOMIF::VERSION = '0.0.5';
 use strict;
 use warnings;
 
@@ -9,17 +9,27 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Task::BeLike::SHLOMIF - Be like SHLOMIF / Shlomi Fish.
 
 =head1 VERSION
 
-version 0.0.4
+version 0.0.5
 
 =head1 TASK CONTENTS
 
 =head2 Shlomi Fish's Favourite Dists
+
+=head3 L<Devel::LineTrace>
+
+=head3 L<Devel::Trace>
+
+=head3 L<Devel::TraceUse>
+
+=head3 L<Devel::TraceVars>
 
 =head3 L<Dist::Zilla::PluginBundle::SHLOMIF>
 
@@ -63,6 +73,8 @@ version 0.0.4
 
 =head3 L<App::Timestamper::Format>
 
+=head3 L<App::gimpgitbuild>
+
 =head3 L<App::intrunningsum>
 
 =head3 L<App::intsum>
@@ -72,40 +84,9 @@ version 0.0.4
 Removed: pkg Term::ReadLine::Perl5 - not compatible with bleadperl/etc. -
 see https://github.com/rocky/p5-Term-ReadLine-Perl5/issues/18 .
 
-=head1 VERSION
-
-version 0.0.4
-
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/task-belike-shlomif/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Task::BeLike::SHLOMIF
 
 =head2 Websites
 
@@ -124,35 +105,11 @@ L<https://metacpan.org/release/Task-BeLike-SHLOMIF>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Task-BeLike-SHLOMIF>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Task-BeLike-SHLOMIF>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Task-BeLike-SHLOMIF>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Task-BeLike-SHLOMIF>
 
 =item *
 
@@ -203,5 +160,26 @@ from your repository :)
 L<https://github.com/shlomif/Task-BeLike-SHLOMIF>
 
   git clone https://github.com/shlomif/Task-BeLike-SHLOMIF.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/task-belike-shlomif/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

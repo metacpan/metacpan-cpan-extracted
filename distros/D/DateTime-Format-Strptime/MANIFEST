@@ -9,6 +9,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+azure-pipelines.yml
 bench
 cpanfile
 dist.ini
@@ -122,6 +123,8 @@ xt/author/locale-ccp-IN.t
 xt/author/locale-ccp.t
 xt/author/locale-ce-RU.t
 xt/author/locale-ce.t
+xt/author/locale-ceb-PH.t
+xt/author/locale-ceb.t
 xt/author/locale-cgg-UG.t
 xt/author/locale-cgg.t
 xt/author/locale-chr-US.t
@@ -167,6 +170,7 @@ xt/author/locale-el-GR.t
 xt/author/locale-el.t
 xt/author/locale-en-001.t
 xt/author/locale-en-150.t
+xt/author/locale-en-AE.t
 xt/author/locale-en-AG.t
 xt/author/locale-en-AI.t
 xt/author/locale-en-AS.t
@@ -382,6 +386,7 @@ xt/author/locale-fur-IT.t
 xt/author/locale-fur.t
 xt/author/locale-fy-NL.t
 xt/author/locale-fy.t
+xt/author/locale-ga-GB.t
 xt/author/locale-ga-IE.t
 xt/author/locale-gd-GB.t
 xt/author/locale-gd.t
@@ -596,6 +601,7 @@ xt/author/locale-pl.t
 xt/author/locale-prg-001.t
 xt/author/locale-prg.t
 xt/author/locale-ps-AF.t
+xt/author/locale-ps-PK.t
 xt/author/locale-ps.t
 xt/author/locale-pt-AO.t
 xt/author/locale-pt-BR.t

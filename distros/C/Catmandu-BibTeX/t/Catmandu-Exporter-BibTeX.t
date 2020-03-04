@@ -17,14 +17,20 @@ my $bibtex = <<TEX;
 TEX
 
 my $data = {
-	_citekey => 2602779,
-	_type => 'inproceedings',
-	author => ["Boukricha, Hana", "Wachsmuth, Ipke", "Carminati, Maria Nella", "Knoeferle, Pia", "Müller-Leßmann, Stephan"],
-	language => 'English',
-	publisher => 'IEEE',
-	year => 2013,
-	title => 'A Computational Model of Empathy: Empirical Evaluation',
-  keywords => 'computer science'
+    _citekey => 2602779,
+    _type    => 'inproceedings',
+    author   => [
+        "Boukricha, Hana",
+        "Wachsmuth, Ipke",
+        "Carminati, Maria Nella",
+        "Knoeferle, Pia",
+        "Müller-Leßmann, Stephan"
+    ],
+    language  => 'English',
+    publisher => 'IEEE',
+    year      => 2013,
+    title     => 'A Computational Model of Empathy: Empirical Evaluation',
+    keywords  => 'computer science'
 };
 
 my $data2 = clone($data);

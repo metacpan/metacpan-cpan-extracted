@@ -1,5 +1,5 @@
 package Lab::SCPI;
-$Lab::SCPI::VERSION = '3.691';
+$Lab::SCPI::VERSION = '3.692';
 #ABSTRACT: Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and parameters against keywords
 
 use 5.010;
@@ -570,7 +570,7 @@ Lab::SCPI - Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and paramet
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 Interface
 
@@ -680,7 +680,7 @@ if $thing = array ref -> flat is an array ref to flat hashes
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Charles Lane, Simon Reinhardt
             2017       Andreas K. Huettel

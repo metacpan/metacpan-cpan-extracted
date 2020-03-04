@@ -39,7 +39,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::S3::Lifecyc
 
 =head1 DESCRIPTION
 
-This class has no description
+A lifecycle rule for individual objects in an Amazon S3 bucket.
 
 =head1 ATTRIBUTES
 
@@ -51,7 +51,8 @@ This class has no description
 
 =head2 Expiration => L<Paws::S3::LifecycleExpiration>
 
-  
+  Specifies the expiration for the lifecycle of the object in the form of
+date, days and, whether the object has a delete marker.
 
 
 =head2 Filter => L<Paws::S3::LifecycleRuleFilter>
@@ -72,13 +73,18 @@ characters.
 
 =head2 NoncurrentVersionTransitions => ArrayRef[L<Paws::S3::NoncurrentVersionTransition>]
 
-  
+  Specifies the transition rule for the lifecycle rule that describes
+when noncurrent objects transition to a specific storage class. If your
+bucket is versioning-enabled (or versioning is suspended), you can set
+this action to request that Amazon S3 transition noncurrent object
+versions to a specific storage class at a set period in the object's
+lifetime.
 
 
 =head2 Prefix => Str
 
   Prefix identifying one or more objects to which the rule applies. This
-is No longer used; use Filter instead.
+is No longer used; use C<Filter> instead.
 
 
 =head2 B<REQUIRED> Status => Str
@@ -89,7 +95,8 @@ rule is not currently being applied.
 
 =head2 Transitions => ArrayRef[L<Paws::S3::Transition>]
 
-  
+  Specifies when an Amazon S3 object transitions to a specified storage
+class.
 
 
 

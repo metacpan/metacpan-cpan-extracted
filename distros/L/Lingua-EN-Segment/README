@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Lingua-EN-Segment,
-version 0.003:
+version 0.004:
 
-  split English-language domain names etc. into words
+  Split English-language domain names etc. into words
 
-This software is copyright (c) 2017 by Sam Kington <skington@cpan.org>.
+This software is copyright (c) 2020 by Sam Kington <skington@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

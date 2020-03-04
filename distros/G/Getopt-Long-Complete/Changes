@@ -1,3 +1,13 @@
+0.312   2020-02-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Improve compatibility with Getopt::Long by providing all the same
+	  exports.
+
+	- Remove perl 5.10 requirement.
+
+        - [test] Add some tests.
+
+
 0.311   2020-02-27  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -24,7 +24,7 @@ use constant RECURSION_LIMIT   => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 use constant YAML_SUPPORT      => eval 'use YAML::XS 0.67;1';
 
-our $VERSION = '3.23';
+our $VERSION = '3.24';
 our @EXPORT_OK = qw(joi validate_json);
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -519,8 +519,7 @@ sub _validate {
   # Test base schema before allOf, anyOf or oneOf
   if (ref $type eq 'ARRAY') {
     push @{$self->{temp_schema}}, [map { +{%$schema, type => $_} } @$type];
-    push @errors,
-      $self->_validate_any_of($to_json ? $$to_json : $_[1],
+    return $self->_validate_any_of_types($to_json ? $$to_json : $_[1],
       $path, $self->{temp_schema}[-1]);
   }
   elsif ($type) {
@@ -574,69 +573,105 @@ sub _validate {
 
 sub _validate_all_of {
   my ($self, $data, $path, $rules) = @_;
-  my $type = data_type $data, $rules;
-  my (@errors, @expected);
+  my (@errors, @errors_with_prefix);
 
   my $i = 0;
   for my $rule (@$rules) {
     next unless my @e = $self->_validate($_[1], $path, $rule);
-    my $schema_type = schema_type $rule;
-    push @expected, $schema_type if $schema_type;
-    push @errors, [$i, @e] if !$schema_type or $schema_type eq $type;
+    push @errors, @e;
+    push @errors_with_prefix, [$i, @e];
   }
   continue {
     $i++;
   }
 
-  return E $path, [allOf => type => join('/', uniq @expected), $type]
-    if !@errors and @expected;
-  return prefix_errors allOf => @errors if @errors;
-  return;
+  return if not @errors;
+
+  return prefix_errors(allOf => @errors_with_prefix)
+    if @errors == 1
+    or
+    (grep { $_->details->[1] ne 'type' or $_->path ne ($path || '/') } @errors);
+
+  # combine all 'type' errors at the base path together
+  my @details    = map $_->details, @errors;
+  my $want_types = join '/', uniq map $_->[0], @details;
+  return E $path, [allOf => type => $want_types, $details[-1][2]];
+}
+
+sub _validate_any_of_types {
+  my ($self, $data, $path, $rules) = @_;
+  my @errors;
+
+  for my $rule (@$rules) {
+    return unless my @e = $self->_validate($_[1], $path, $rule);
+    push @errors, @e;
+  }
+
+  # favour a non-type error from one of the rules
+  if (my @e
+    = grep { $_->details->[1] ne 'type' or $_->path ne ($path || '/') } @errors)
+  {
+    return @e;
+  }
+
+  # the type didn't match any of the rules: combine the errors together
+  my @details    = map $_->details, @errors;
+  my $want_types = join '/', uniq map $_->[0], @details;
+  return E $path, [$want_types => 'type', $details[-1][2]];
 }
 
 sub _validate_any_of {
   my ($self, $data, $path, $rules) = @_;
-  my $type = data_type $data, $rules;
-  my (@e, @errors, @expected);
+  my (@errors, @errors_with_prefix);
 
   my $i = 0;
   for my $rule (@$rules) {
-    @e = $self->_validate($_[1], $path, $rule);
-    return unless @e;
-    my $schema_type = schema_type $rule;
-    push @errors, [$i, @e] and next if !$schema_type or $schema_type eq $type;
-    push @expected, $schema_type;
+    return unless my @e = $self->_validate($_[1], $path, $rule);
+    push @errors, @e;
+    push @errors_with_prefix, [$i, @e];
   }
   continue {
     $i++;
   }
 
-  my $expected = join '/', uniq @expected;
-  return E $path, [anyOf => type => $expected, $type] unless @errors;
-  return prefix_errors anyOf => @errors;
+  return prefix_errors(anyOf => @errors_with_prefix)
+    if @errors == 1
+    or
+    (grep { $_->details->[1] ne 'type' or $_->path ne ($path || '/') } @errors);
+
+  # combine all 'type' errors at the base path together
+  my @details    = map $_->details, @errors;
+  my $want_types = join '/', uniq map $_->[0], @details;
+  return E $path, [anyOf => type => $want_types, $details[-1][2]];
 }
 
 sub _validate_one_of {
   my ($self, $data, $path, $rules) = @_;
-  my $type = data_type $data, $rules;
-  my (@errors, @expected);
+  my (@errors, @errors_with_prefix);
 
   my ($i, @passed) = (0);
   for my $rule (@$rules) {
     my @e = $self->_validate($_[1], $path, $rule) or push @passed, $i and next;
-    my $schema_type = schema_type $rule;
-    push @errors, [$i, @e] and next if !$schema_type or $schema_type eq $type;
-    push @expected, $schema_type;
+    push @errors_with_prefix, [$i, @e];
+    push @errors, @e;
   }
   continue {
     $i++;
   }
 
   return if @passed == 1;
-  return E $path, [oneOf => 'all_rules_match'] unless @errors + @expected;
+  return E $path, [oneOf => 'all_rules_match'] unless @errors;
   return E $path, [oneOf => 'n_rules_match', join(', ', @passed)] if @passed;
-  return prefix_errors oneOf => @errors if @errors;
-  return E $path, [oneOf => type => join('/', uniq @expected), $type];
+
+  return prefix_errors(oneOf => @errors_with_prefix)
+    if @errors == 1
+    or
+    (grep { $_->details->[1] ne 'type' or $_->path ne ($path || '/') } @errors);
+
+  # the type didn't match any of the rules: combine the errors together
+  my @details    = map $_->details, @errors;
+  my $want_types = join '/', uniq map $_->[0], @details;
+  return E $path, [oneOf => type => $want_types, $details[-1][2]];
 }
 
 sub _validate_number_max {
@@ -862,7 +897,7 @@ sub _validate_type_object {
   if (my $n_schema = $schema->{propertyNames}) {
     for my $name (keys %$data) {
       next unless my @e = $self->_validate($name, $path, $n_schema);
-      push @errors, prefix_errors propertyName => [map { ($name, $_) } @e];
+      push @errors, prefix_errors propertyName => map [$name, $_], @e;
     }
   }
 
@@ -1327,7 +1362,11 @@ the call/inheritance tree.
 =item * Any other URL
 
 An URL (without a recognized scheme) will be treated as a path to a file on
-disk.
+disk. If the file could not be found on disk and the path starts with "/", then
+the will be loaded from the app defined in L</ua>. Something like this:
+
+  $jv->ua->server->app(MyMojoApp->new);
+  $jv->ua->get('/any/other/url.json');
 
 =back
 

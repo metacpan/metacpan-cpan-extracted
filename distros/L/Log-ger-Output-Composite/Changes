@@ -1,3 +1,8 @@
+0.012   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe env LOG_LOG_GER_OUTPUT_COMPOSITE_CODE.
+
+
 0.011   2020-02-06  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix typo in package name.

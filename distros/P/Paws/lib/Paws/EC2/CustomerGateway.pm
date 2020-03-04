@@ -1,7 +1,9 @@
 package Paws::EC2::CustomerGateway;
   use Moose;
   has BgpAsn => (is => 'ro', isa => 'Str', request_name => 'bgpAsn', traits => ['NameInRequest']);
+  has CertificateArn => (is => 'ro', isa => 'Str', request_name => 'certificateArn', traits => ['NameInRequest']);
   has CustomerGatewayId => (is => 'ro', isa => 'Str', request_name => 'customerGatewayId', traits => ['NameInRequest']);
+  has DeviceName => (is => 'ro', isa => 'Str', request_name => 'deviceName', traits => ['NameInRequest']);
   has IpAddress => (is => 'ro', isa => 'Str', request_name => 'ipAddress', traits => ['NameInRequest']);
   has State => (is => 'ro', isa => 'Str', request_name => 'state', traits => ['NameInRequest']);
   has Tags => (is => 'ro', isa => 'ArrayRef[Paws::EC2::Tag]', request_name => 'tagSet', traits => ['NameInRequest']);
@@ -47,9 +49,19 @@ This class has no description
 Number (ASN).
 
 
+=head2 CertificateArn => Str
+
+  The Amazon Resource Name (ARN) for the customer gateway certificate.
+
+
 =head2 CustomerGatewayId => Str
 
   The ID of the customer gateway.
+
+
+=head2 DeviceName => Str
+
+  The name of customer gateway device.
 
 
 =head2 IpAddress => Str

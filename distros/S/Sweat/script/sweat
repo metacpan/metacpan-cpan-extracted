@@ -30,6 +30,7 @@ GetOptions ( \%options,
     'rest-length=i',
     'drill-count=i',
     'refocus!',
+    'interactive',
 );
 
 show_help_and_exit() if $options{help};
@@ -41,6 +42,8 @@ my %sweat_args = %options;
 $sweat_args{ config } = $config;
 
 my $sweat = Sweat->new( %sweat_args );
+
+run_wizard( $sweat ) if $sweat_args{ interactive };
 
 $sweat->sweat;
 
@@ -59,6 +62,7 @@ Basic options:
 --version          Show version information and exit
 --speech-program   Path to your text-to-speech program
 --no-entertainment Disable Sweat's various entertainment features
+--interactive      Ask you interactively for common options (-i for short!)
 
 Drill options:
 --drill-length     Length of each drill, in seconds (default 30)
@@ -115,6 +119,64 @@ sub get_config {
         $config = read_text( $config_path );
     }
     return $config;
+}
+
+sub run_wizard {
+    my ($sweat) = @_;
+    show_version();
+    say q{};
+
+    my $drill_count;
+
+    until ($drill_count) {
+        say 'How many drills today? ('
+            . $sweat->drill_count
+            . ')'
+        ;
+        chomp(my $input = <STDIN>);
+        if ($input && $input =~ /^\d+$/) {
+            $drill_count = $input;
+        }
+        elsif (not length $input) {
+            last;
+        }
+        else {
+            say 'Please provide a positive number, or just press [Return] ';
+            say 'to accept the default number of drills.';
+        }
+        say q{};
+    }
+
+    $sweat->drill_count( $drill_count ) if $drill_count;
+
+    my $entertainment;
+
+    until (defined $entertainment) {
+        say 'Activate entertainment mode? ('
+            . ($sweat->entertainment? 'yes' : 'no')
+            . ')'
+        ;
+
+        chomp(my $input = <STDIN>);
+        if ($input =~ /^y/i) {
+            $entertainment = 1;
+        }
+        elsif ($input =~ /^n/i) {
+            $entertainment = 0;
+        }
+        elsif (not length $input) {
+            last;
+        }
+        else {
+            say 'Please answer "yes" or "no", or just press [Return] ';
+            say 'to accept the default answer.';
+        }
+        say q{};
+    }
+
+    $sweat->entertainment( $entertainment ) if defined $entertainment;
+
+    return $sweat;
 }
 
 =head1 NAME
@@ -534,6 +596,15 @@ Default: C<.sweat>, in your home directory. (i.e. C<$HOME/.sweat>)
  sweat --help
 
 Prints a quick reference to Sweat's command-line options, then exits.
+
+=head3 interactive
+
+ sweat --interactive
+ sweat -i
+
+Sweat will ask a couple of questions at launch about
+how many drills you'd like, and whether to activate its entertainment features.
+Answers you provide will override values otherwise set by config or default.
 
 =head3 no-news
 

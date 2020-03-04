@@ -4,6 +4,12 @@ use Mojo::Base -base;
 use Mojolicious::Plugin::Minion::Overview::Backend::mysql;
 
 
+=head2 load
+
+Load the Minion overview backend
+
+=cut
+
 sub load {
     my ($self, $minion) = @_;
     

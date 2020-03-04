@@ -1,11 +1,23 @@
 package Test::Auto::Subtests;
 
-use Data::Object 'Class', 'Test::Auto::Types';
+use strict;
+use warnings;
 
-use Type::Registry;
+use feature 'state';
+
+use Data::Object::Class;
+use Data::Object::Attributes;
 use Test::More;
+use Type::Registry;
 
-our $VERSION = '0.05'; # VERSION
+use registry 'Test::Auto::Types';
+use routines;
+
+require Carp;
+
+our $VERSION = '0.07'; # VERSION
+
+# ATTRIBUTES
 
 has parser => (
   is => 'ro',
@@ -41,8 +53,6 @@ method package() {
 }
 
 method plugin($name) {
-  no autobox;
-
   my $package = join '::', map ucfirst, (
     'test', 'auto', 'plugin', $name
   );
@@ -193,8 +203,6 @@ method functions() {
 method types() {
   my $parser = $self->parser;
 
-  no autobox;
-
   subtest "testing types", fun () {
     my $types = $parser->types;
     plan skip_all => 'no types' if !$types || !%$types;
@@ -307,7 +315,7 @@ method example($number, $name, $type, $callback) {
     $signature = join "\n", @{$signature->[0]} if $signature;
   }
   else {
-    raise "$type is not a valid example type";
+    Carp::confess "$type is not a valid example type";
   }
 
   $number = abs $number;
@@ -354,7 +362,9 @@ method evaluator($context) {
   my $returned = eval "$context";
   my $failures = $@;
 
-  die $failures if $failures;
+  if ($failures) {
+    Carp::confess $failures
+  }
 
   return $returned;
 }
@@ -370,11 +380,12 @@ method tryable(@passed) {
 method registry() {
   my $parser = $self->parser;
   my $libraries = $parser->libraries;
+  my $package = $parser->name;
 
   $libraries = ['Types::Standard'] if !$libraries || !@$libraries;
 
   state $populate = 0;
-  state $registry = Type::Registry->for_me;
+  state $registry = Type::Registry->for_class($package);
 
   map $registry->add_types($_), @$libraries if !$populate++;
 
@@ -434,7 +445,7 @@ subtests.
 
 This package uses type constraints from:
 
-L<Data::Object::Library>
+L<Test::Auto::Types>
 
 =cut
 
@@ -446,9 +457,9 @@ This package has the following attributes:
 
 =head2 parser
 
-  parser(InstanceOf["Test::Auto::Parser"])
+  parser(Parser)
 
-This attribute is read-only, accepts C<(InstanceOf["Test::Auto::Parser"])> values, and is required.
+This attribute is read-only, accepts C<(Parser)> values, and is required.
 
 =cut
 
@@ -720,7 +731,7 @@ the result using the C<result> method.
 
   my $subtests = $test->subtests;
 
-  $subtests->scenario('testauto', sub {
+  $subtests->scenario('exports', sub {
     my ($tryable) = @_;
 
     ok my $result = $tryable->result, 'result ok';
@@ -734,7 +745,7 @@ the result using the C<result> method.
 
 =head2 standard
 
-  standard() : InstanceOf["Test::Auto::Subtests"]
+  standard() : Subtests
 
 This method is shorthand which registers and executes a series of other
 standard subtests.

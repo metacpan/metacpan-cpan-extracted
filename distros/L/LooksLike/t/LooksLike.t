@@ -28,10 +28,8 @@ foreach my $num (@decimal) {
     is LooksLike::decimal("-$num"), 1, "-$num is decimal";
 }
 
-my @infs  = ( qw( inf infinity ), 1e9999 );
-diag( "1e9999 == ", $infs[-1] );
+my @infs  = ( qw( inf infinity ), 8888e8888 );
 my @nans  = ( qw( nan NaN ), $infs[-1] / $infs[-1] );
-diag( "$infs[-1]/$infs[-1] == ", $nans[-1] );
 my @odds  = ( qw(   1   23  987654321 ),   123_456_789 );
 my @evens = ( qw( 456 7890 9876543210 ), 1_234_567_890 );
 my @ints  = ( @odds, @evens );
@@ -40,7 +38,17 @@ my @nums  = ( qw( 0.1 2.34 56.789 ), 4**4**4, 10 / 3 );
 my @zeroes = ( qw( 0 0.0 0e0 000 ), 0, 0.0, 0e0 );
 my @words  = (qw( infinite nano notanumber ));
 
-# These should only work on Perl 5.22 and greater.
+diag("Numbers of interest:");
+diag( "8888e8888 == ",           $infs[-1] );
+diag( "$infs[-1]/$infs[-1] == ", $nans[-1] );
+
+is( LooksLike::representation( $infs[-1] ), "inf",
+    "Infinity is represented" );
+is( LooksLike::representation( $nans[-1] ), "nan",
+    "Not-A-Number is represented" );
+
+
+# These should work on Perl 5.22 and greater, and on MSWin32.
 push @infs,
     map  { int( rand(2) ) ? uc() : $_ }
         grep { Scalar::Util::looks_like_number($_) }

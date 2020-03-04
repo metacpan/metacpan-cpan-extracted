@@ -1,7 +1,16 @@
 
 ========== version history of String::Print
 
-version 0.93:
+All modifications where created by Mark Overmeer, unless explicitly
+stated differently.
+
+version 0.94: Sun  1 Mar 12:37:41 CET 2020
+
+	Fixes:
+	- fix metadata [Mohammad S Anwar]
+	- test failed when year with blanks [cpantesters]
+
+version 0.93: Tue Jan 23 22:08:31 CET 2018
 
 	Improvements:
 	- convert to GIT

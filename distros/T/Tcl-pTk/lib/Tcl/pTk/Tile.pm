@@ -1,6 +1,6 @@
 package Tcl::pTk::Tile;
 
-our ($VERSION) = ('1.02');
+our ($VERSION) = ('1.03');
 
 use strict;
 use warnings;
@@ -27,10 +27,12 @@ Tcl::pTk::Tile -  Tile/ttk Widget Support for Tcl::pTk
 
 =head1 DESCRIPTION
 
-I<Tcl::pTk::Tile> provides some helper methods and mappings for Tile/ttk support L<Tcl::pTk> package. Tile/ttk are the
-new themed widget set that is present in Tcl version 8.5 and above.
-        
-This package is auto-loaded and the tile widgets declared if a Tcl version > 8.5 is being used by Tcl::pTk.
+I<Tcl::pTk::Tile> provides some helper methods and mappings for Tile/ttk support
+in the L<Tcl::pTk> package. Tile/ttk are the new themed widget set that is
+present in Tcl/Tk 8.5 and above, and available for Tcl/Tk 8.4 in the Tile package.
+
+This package is auto-loaded and the tile widgets declared if Tk 8.5 is being
+used by Tcl::pTk, or if the Tile package for Tk 8.4 is installed.
 
 =head2 Style method mapping
 
@@ -110,8 +112,9 @@ sub Tcl::pTk::Widget::ttkThemes {
 
 =head2 _declareTileWidgets
 
-Internal sub to declare the tile widgets. This is called when a mainwindow is created, if we are
-using a Tcl version >= 8.5.
+Internal sub to declare the tile widgets. This is called when a mainwindow
+is created, if we are using Tcl/Tk 8.5 or higher, or the Tile package for
+Tcl/Tk 8.4 is present.
 
 B<Usage:>
 
@@ -136,7 +139,11 @@ sub _declareTileWidgets {
 
 		#print STDERR "delcareing "."ttk".ucfirst($ttkwidget).
 		#                 "  ttk::$ttkwidget\n";
-		$interp->Declare( "ttk" . ucfirst($ttkwidget), "ttk::$ttkwidget", -require => 'Ttk' );
+		$interp->Declare(
+			'ttk' . ucfirst($ttkwidget),
+			"ttk::$ttkwidget",
+			-require => 'tile',
+		);
 	}
 
 }

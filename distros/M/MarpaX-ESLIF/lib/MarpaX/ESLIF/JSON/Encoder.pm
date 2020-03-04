@@ -8,7 +8,7 @@ use parent qw/MarpaX::ESLIF::Grammar/;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '3.0.30'; # VERSION
+our $VERSION = '3.0.32'; # VERSION
 
 
 
@@ -48,7 +48,7 @@ MarpaX::ESLIF::JSON::Encoder - ESLIF's JSON encoder interface
 
 =head1 VERSION
 
-version 3.0.30
+version 3.0.32
 
 =head1 DESCRIPTION
 

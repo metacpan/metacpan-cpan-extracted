@@ -1,5 +1,13 @@
 Revision history for App-gimpgitbuild
 
+0.8.0   2020-02-29
+    - Add the GIMPGITBUILD__SKIP_BUILDS_RE environment variable
+
+0.6.1   2020-02-28
+    - Fix meson installation libdir in Ubuntu and derivatives.
+        - Thanks to Owen for the report
+        - Thanks to https://github.com/libfuse/libfuse/issues/212 for the fix.
+
 0.6.0   2020-02-27
     - Use Git::Sync::App instead of git-s.
         - git-s may not be installed by default.

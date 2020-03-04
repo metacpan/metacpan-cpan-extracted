@@ -6,14 +6,14 @@ use warnings;
 use Exporter::Tiny;
 use IPC::Open2;
 use IO::Select;
-use IO::String;
 use File::Which;
+use Encode qw(encode decode);
 use Carp;
 
 use constant BLKSIZE => 1024;
 
 our
-	$VERSION = '0.08';
+	$VERSION = '0.10';
 
 our @ISA = qw(Exporter::Tiny);
 
@@ -56,6 +56,7 @@ sub _get_shell {
 	my $shell;
 	$shell->{shell} = \@cmd;
 	$shell->{debug} = $args{debug};
+	$shell->{encoding} = $args{encoding} // 'UTF-8';
 	return $shell;
 }
 
@@ -73,9 +74,8 @@ sub run {
 	shift;
 
 	# cmd input
-	my $input = shift;
-	my $inh = IO::String->new;
-	$inh->open($input);
+	my $input = encode($self->{encoding}, shift);
+	open my $inh, '<', \$input or croak "cannot open input data";
 	print STDERR "have input data\n" if $self->{debug} && $input;
 
 	# additional environment entries for use as shell variables
@@ -126,7 +126,7 @@ sub run {
 			}
 			print STDERR "read $bytes bytes from cmd\n"
 				if $self->{debug} && $bytes;
-			$output .= $data;
+			$output .= decode($self->{encoding}, $data);
 
 			# finish on eof from cmd
 			if (! $bytes) {
@@ -149,7 +149,7 @@ sub run {
 			}
 
 			# save position in case of partial writes
-			my $pos = $inh->getpos;
+			my $pos = tell $inh;
 
 			# try to write chunk of data
 			my $data = $inh->getline;
@@ -173,7 +173,7 @@ sub run {
 				
 			# adjust input data position
 			if ($bytes < length($data)) {
-				$inh->setpos($pos + $bytes);
+				seek $inh, $pos + $bytes, 0;
 			}
 
 			# close cmd input when data is exhausted
@@ -492,6 +492,11 @@ Use I<export> as the name of the exported subroutine.
 =item debug => I<debug>
 
 Provide debugging output to C<STDERR> if I<debug> has a true value.
+
+=item encoding => I<encoding>
+
+Specify encoding for input and output data.
+Defaults to C<UTF-8>.
 
 =back
 

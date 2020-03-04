@@ -9,6 +9,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+azure-pipelines.yml
 cpanfile
 dist.ini
 lib/List/AllUtils.pm

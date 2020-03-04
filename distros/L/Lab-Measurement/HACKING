@@ -30,12 +30,3 @@
 * Run "dzil clean"
 * Run "dzil release"
 
-
-4] How to build a RPM of L::M
-================================
-
-* Install Dist::Zilla and its plugins
-* Run "dzil clean"
-* Run "dzil build"
-* Run "dzil mkrpmspec"
-* Run "rpmbuild -ba dzil.spec"

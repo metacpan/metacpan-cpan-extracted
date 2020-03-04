@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.524';
+our $VERSION = '0.525';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -69,6 +69,7 @@ sub _valid_options {
             back             => 'Str',
             confirm          => 'Str',
             default          => 'Str',
+            extra            => 'Str', # experimental
             info             => 'Str',
             prompt           => 'Str',
         };
@@ -95,6 +96,7 @@ sub _valid_options {
             read_only        => 'ARRAY',
             back             => 'Str',
             confirm          => 'Str',
+            extra            => 'Str', # experimental
             info             => 'Str',
             prompt           => 'Str',
         };
@@ -111,6 +113,7 @@ sub _defaults {
         color            => 0,
         confirm          => 'CONFIRM',
         default          => '',
+        extra            => '', # experimental
         hide_cursor      => 1,
         info             => '',
         no_echo          => 0,
@@ -914,7 +917,12 @@ sub __write_screen {
 
 sub __write_first_screen {
     my ( $self, $list, $curr_row, $auto_up ) = @_;
-    $self->{i}{curr_row} = $auto_up == 2 ? $curr_row : @{$self->{i}{pre}};
+    if ( $auto_up == 2 ) {
+        $self->{i}{curr_row} = $curr_row;
+    }
+    else {
+        $self->{i}{curr_row} = @{$self->{i}{pre}};
+    }
     $self->{i}{begin_row} = 0;
     $self->{i}{end_row}  = ( $self->{i}{avail_h} - 1 );
     if ( $self->{i}{end_row} > $#$list ) {
@@ -940,6 +948,10 @@ sub __write_first_screen {
 sub __prepare_meta_menu_elements {
     my ( $self, $term_w ) = @_;
     my @meta_menu_elements = ( 'back', 'confirm' );
+    if ( defined $self->{extra} && length $self->{extra} ) {
+        unshift @meta_menu_elements, 'extra';
+    }
+    $self->{i}{pre} = [];
     for my $meta_menu_element ( @meta_menu_elements ) {
         my @color;
         my $tmp = $self->{i}{$meta_menu_element . '_orig'};
@@ -956,8 +968,8 @@ sub __prepare_meta_menu_elements {
             $tmp .= normal();
         }
         $self->{$meta_menu_element} = $tmp;
+        push @{$self->{i}{pre}}, [ $self->{$meta_menu_element}, ];
     }
-    $self->{i}{pre} = [ [ $self->{back}, ], [ $self->{confirm}, ] ];
 }
 
 
@@ -1000,6 +1012,7 @@ sub fill_form {
     };
     $self->__init_term();
     my ( $term_w, $term_h ) = get_term_size();
+    $self->{i}{extra_orig}   = $self->{extra};
     $self->{i}{back_orig}    = $self->{back};
     $self->{i}{confirm_orig} = $self->{confirm};
     $self->__prepare_meta_menu_elements( $term_w );
@@ -1024,10 +1037,14 @@ sub fill_form {
         $list = [ @{$self->{i}{pre}}, map { [ _sanitized_string( $_->[0] ), $_->[1] ] } @$orig_list ];
     }
     my $auto_up = $self->{auto_up};
+    my $back_row = 0;
+    if ( $self->{extra} ) {
+        $back_row = 1;
+    }
     $self->__length_longest_key( $list );
     $self->__prepare_width( $term_w );
     $self->__prepare_hight( $list, $term_w, $term_h );
-    $self->__write_first_screen( $list, 0, $auto_up );
+    $self->__write_first_screen( $list, $back_row, $auto_up );
     my $m = $self->__string_and_pos( $list );
     my $k = 0;
 
@@ -1063,7 +1080,7 @@ sub fill_form {
             $self->__length_longest_key( $list );
             $self->__prepare_width( $term_w );
             $self->__prepare_hight( $list, $term_w, $term_h );
-            $self->__write_first_screen( $list, 0, $auto_up );
+            $self->__write_first_screen( $list, $back_row, $auto_up );
             $m = $self->__string_and_pos( $list );
         }
         # reset $m->{avail_w} to default:
@@ -1207,7 +1224,7 @@ sub fill_form {
             else {
                 print up( $up );
                 print "\r" . clear_to_end_of_screen();
-                $self->__write_first_screen( $list, 0, 2 );
+                $self->__write_first_screen( $list, $back_row, 2 );
                 $m = $self->__string_and_pos( $list );
             }
         }
@@ -1234,10 +1251,14 @@ sub fill_form {
                 $self->__reset_term( $up );
                 return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
             }
+            elsif ( $list->[$self->{i}{curr_row}][0] eq $self->{extra} ) {
+                $self->__reset_term( $up );
+                return -1;
+            }
             if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
                 print up( $up );
                 print "\r" . clear_to_end_of_screen();
-                $self->__write_first_screen( $list, 0, $auto_up );                                                  # cursor on {back}
+                $self->__write_first_screen( $list, $back_row, $auto_up );                                                  # cursor on {back}
                 $m = $self->__string_and_pos( $list );
             }
             elsif ( $self->{i}{curr_row} == $#$list ) {                                                             # if ENTER && {last row}: jumps to the {first data row/2}
@@ -1324,7 +1345,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.524
+Version 0.525
 
 =cut
 
@@ -1683,7 +1704,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2019 Matthäus Kiem.
+Copyright 2014-2020 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

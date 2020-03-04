@@ -24,7 +24,7 @@ requires:
   Complete::Util: '0.608'
   Data::Sah::Normalize: '0'
   Exporter: '5.57'
-  Log::ger: '0.027'
+  Log::ger: '0.031'
   Module::Installed::Tiny: '0.004'
   perl: '5.010001'
   strict: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Sah
   homepage: https://metacpan.org/release/Complete-Sah
   repository: git://github.com/perlancar/perl-Complete-Sah.git
-version: '0.004'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -156,7 +156,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -292,7 +292,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.080'
+              version: '0.081'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

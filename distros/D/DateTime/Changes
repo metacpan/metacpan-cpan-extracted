@@ -1,3 +1,13 @@
+1.52   2020-02-29
+
+- Added a $dt->is_between($dt1, $dt2) method. Based on GH #97 by philip r
+  brenan.
+
+- Simplify the calculation of leap seconds in XS. This is a little more
+  efficient for most use cases (anything with future or recent past
+  datetimes). Contributed by Mark Overmeer. GH #91.
+
+
 1.51   2019-04-21
 
 - Fix CLDR formatting of 'S' pattern with more than 9 digits of
@@ -70,7 +80,7 @@
   relying on a fallback to stringification, we now return true directly, which
   is a little faster in cases like "if ($might_be_dt) { ... }".
 
-- The datetime() method now accepts a single argument to use as the separate
+- The datetime() method now accepts a single argument to use as the separator
   between the date and time portion. This defaults to "T".
 
 

@@ -8,7 +8,7 @@ use Module::Build 0.28;
 
 my %module_build_args = (
   "build_requires" => {
-    "Module::Build" => "0.28"
+    "Module::Build" => "0.4229"
   },
   "configure_requires" => {
     "Module::Build" => "0.28"
@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Steenlant C<< <nicolas.steenlant at ugent.be> >>"
   ],
   "dist_name" => "Catmandu-BibTeX",
-  "dist_version" => "0.15",
+  "dist_version" => "0.18",
   "license" => "perl",
   "module_name" => "Catmandu::BibTeX",
   "recursive_test_files" => 1,
@@ -27,6 +27,7 @@ my %module_build_args = (
     "Catmandu" => "1.2002",
     "Clone" => 0,
     "LaTeX::Decode" => "0.05",
+    "Module::Build" => "0.4229",
     "Moo" => 0,
     "perl" => "v5.10.1"
   },
@@ -37,7 +38,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "Module::Build" => "0.28",
+  "Module::Build" => "0.4229",
   "Test2::V0" => "0.000122"
 );
 

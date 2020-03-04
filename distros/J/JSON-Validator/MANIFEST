@@ -91,6 +91,7 @@ t/jv-required.t
 t/jv-string.t
 t/load-data.t
 t/load-file.t
+t/load-from-app.t
 t/load-http.t
 t/load-json.t
 t/load-yaml.t
@@ -115,6 +116,7 @@ t/spec/with-relative-ref.json
 t/stack/Some.pm
 t/stack/Some/Module.pm
 t/to-json.t
+t/util-checksum-yaml-xs.t
 t/util.t
 t/validate-draft07.t
 t/validate-id.t

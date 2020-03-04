@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.238';
+our $VERSION = '2.241';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -271,7 +271,7 @@ sub run {
             my $dbh;
             if ( ! eval {
                 $dbh = $plui->get_db_handle( $db );
-                #$sf->{i}{quote_char} = $dbh->get_info(29)  || '"', # SQL_IDENTIFIER_QUOTE_CHAR
+                $sf->{i}{quote_char} = $dbh->get_info(29)  || '"', # SQL_IDENTIFIER_QUOTE_CHAR
                 $sf->{i}{sep_char}   = $dbh->get_info(41)  || '.'; # SQL_CATALOG_NAME_SEPARATOR # name
                 1 }
             ) {
@@ -534,6 +534,13 @@ sub run {
                             next TABLE;
                         }
                     }
+                    if ( $sf->{i}{special_table} ) {
+                        $sf->{d}{table} = ucfirst $sf->{i}{special_table};
+                        my $qc = $sf->{i}{quote_char};
+                        if ( $qt_table =~ /\sAS\s\Q$qc\E([^\Q$qc\E]+)\Q$qc\E\z/ ) {
+                            $sf->{d}{table} .= ': ' . $1;
+                        }
+                    }
                     $sf->__browse_the_table( $qt_table, $qt_columns );
                 }
             }
@@ -725,7 +732,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.238
+Version 2.241
 
 =head1 DESCRIPTION
 

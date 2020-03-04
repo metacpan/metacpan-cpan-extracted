@@ -1,3 +1,7 @@
+0.08 2020-02-28T18:09:13+01:00
+ - Comment bad test and add TODO about it.
+ - Fix test dependency for writing jpeg file.
+
 0.07 2020-02-02T13:14:55+01:00
  - Add author tests.
  - Fix Makefile.PL fails with no '.' in @INC.

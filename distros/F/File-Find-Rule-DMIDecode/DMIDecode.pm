@@ -8,7 +8,7 @@ use List::MoreUtils qw(any);
 use Parse::DMIDecode;
 use Perl6::Slurp;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Detect dmidecode file.
 sub File::Find::Rule::dmidecode_file {
@@ -39,6 +39,20 @@ sub File::Find::Rule::dmidecode_handle {
 	});
 }
 
+sub File::Find::Rule::dmidecode_type {
+	my ($file_find_rule, $dmi_type) = @_;
+	my $self = $file_find_rule->_force_object;
+	return $self->file->exec(sub{
+		my $file = shift;
+
+		my $data = slurp($file);
+		my $dmidecode = Parse::DMIDecode->new;
+		$dmidecode->parse($data);
+
+		return $dmidecode->get_handles(dmitype => $dmi_type);
+	});
+}
+
 1;
 
 __END__
@@ -58,6 +72,7 @@ File::Find::Rule::DMIDecode - Common rules for searching for dmidecode files.
 
  my @files = File::Find::Rule->dmidecode_file->in($dir);
  my @files = File::Find::Rule->dmidecode_handle($handle)->in($dir);
+ my @files = File::Find::Rule->dmidecode_type($dmi_type)->in($dir);
 
 =head1 DESCRIPTION
 
@@ -84,6 +99,12 @@ The C<dmidecode_file()> rule detect dmidecode files by parsing of structure.
  my @files = File::Find::Rule->dmidecode_handle($handle)->in($dir);
 
 The C<dmidecode_handle($handle)> rule detect dmidecode handle in file.
+
+=head2 C<dmidecode_type>
+
+ my @files = File::Find::Rule->dmidecode_type($dmi_type)->in($dir);
+
+The C<dmidecode_type($dmi_type)> rule detect dmidecode DMI type in file.
 
 =head1 EXAMPLE1
 
@@ -130,7 +151,31 @@ The C<dmidecode_handle($handle)> rule detect dmidecode handle in file.
  }
 
  # Output like:
- # Usage: qr{[\w\/]+} dir
+ # Usage: qr{[\w\/]+} dir handle
+
+=head1 EXAMPLE3
+
+ use strict;
+ use warnings;
+
+ use File::Find::Rule;
+ use File::Find::Rule::DMIDecode;
+
+ # Arguments.
+ if (@ARGV < 2) {
+         print STDERR "Usage: $0 dir dmi_type\n";
+         exit 1;
+ }
+ my $dir = $ARGV[0];
+ my $dmi_type = $ARGV[1];
+
+ # Print all dmidecode handles in directory.
+ foreach my $file (File::Find::Rule->dmidecode_type($dmi_type)->in($dir)) {
+         print "$file\n";
+ }
+
+ # Output like:
+ # Usage: qr{[\w\/]+} dir dmi_type
 
 =head1 DEPENDENCIES
 
@@ -167,6 +212,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

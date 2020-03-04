@@ -1,3 +1,8 @@
+1.02 Fix for 5.26 not including '.' in INC, which was breaking the
+     Module::Install stuff (thanks to preaction)
+
+     Fix to link to the github repo (thanks to dsteinbrunner)
+
 1.01 
      Fix unnecesary warning caused by using /x (RT#88189)
      (Arthur Axel fREW Schmidt and Andrew Main)

@@ -1,12 +1,10 @@
 package Acme::CPANAuthors::Czech;
 
-# Pragmas.
 use strict;
 use utf8;
 use warnings;
 
-# Version.
-our $VERSION = 0.22;
+our $VERSION = 0.25;
 
 # Modules.
 use Acme::CPANAuthors::Register(
@@ -15,6 +13,7 @@ use Acme::CPANAuthors::Register(
 	'DANPEDER' => 'Daniel Peder',
 	'DOUGLISH' => 'Dalibor Hořínek',
 	'HIHIK' => 'Jiří Václavík',
+	'HOLCAPEK' => 'Jan Holčapek',
 	'HPA' => 'Petr Vraník',
 	'JANPAZ' => 'Jan Pazdziora',
 	'JANPOM' => 'Jan Pomikálek',
@@ -35,12 +34,13 @@ use Acme::CPANAuthors::Register(
 	'RUR' => 'Rudolf Rosa',
 	'RVASICEK' => 'Roman Vašíček',
 	'SEIDLJAN' => 'Jan Seidl',
-	'SKIM' => 'Michal Špaček',
+	'SKIM' => 'Michal Josef Špaček',
 	'SMRZ' => 'Otakar Smrž',
 	'STRAKA' => 'Milan Straka',
 	'TKR' => 'Tomáš Kraut',
 	'TRIPIE' => 'Tomáš Stýblo',
 	'TYNOVSKY' => 'Miroslav Týnovský',
+	'VARISD' => 'Dušan Variš',
 	'VASEKD' => 'Václav Dovrtěl',
 	'YENYA' => 'Jan "Yenya" Kasprzak',
 	'ZABA' => 'Zdeněk Žabokrtský',
@@ -63,6 +63,7 @@ Acme::CPANAuthors::Czech - We are Czech CPAN authors.
 =head1 SYNOPSIS
 
  use Acme::CPANAuthors;
+
  my $authors = Acme::CPANAuthors->new('Czech');
  my $url = $authors->avatar_url('TRIPIE');
  my $number = $authors->count;
@@ -77,11 +78,9 @@ See documentation for L<Acme::CPANAuthors> for more details.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Acme::CPANAuthors;
 
  # Create object.
@@ -94,15 +93,13 @@ See documentation for L<Acme::CPANAuthors> for more details.
  print "Count of Czech CPAN authors: $count\n";
 
  # Output:
- # Count of Czech CPAN authors: 36
+ # Count of Czech CPAN authors: 38
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Acme::CPANAuthors;
  use Data::Printer;
 
@@ -122,37 +119,39 @@ See documentation for L<Acme::CPANAuthors> for more details.
  #     [2]  "DANPEDER",
  #     [3]  "DOUGLISH",
  #     [4]  "HIHIK",
- #     [5]  "HPA",
- #     [6]  "JANPAZ",
- #     [7]  "JANPOM",
- #     [8]  "JENDA",
- #     [9]  "JIRA",
- #     [10] "JSPICAK",
- #     [11] "KLE",
- #     [12] "KOLCON",
- #     [13] "MAJLIS",
- #     [14] "MICHALS",
- #     [15] "MILSO",
- #     [16] "MJFO",
- #     [17] "PAJAS",
- #     [18] "PASKY",
- #     [19] "PEK",
- #     [20] "POPEL",
- #     [21] "PSME",
- #     [22] "RUR",
- #     [23] "RVASICEK",
- #     [24] "SEIDLJAN",
- #     [25] "SKIM",
- #     [26] "SMRZ",
- #     [27] "STRAKA",
- #     [28] "TKR",
- #     [29] "TRIPIE",
- #     [30] "TYNOVSKY",
- #     [31] "VASEKD",
- #     [32] "YENYA",
- #     [33] "ZABA",
- #     [34] "ZEMAN",
- #     [35] "ZOUL"
+ #     [5]  "HOLCAPEK",
+ #     [6]  "HPA",
+ #     [7]  "JANPAZ",
+ #     [8]  "JANPOM",
+ #     [9]  "JENDA",
+ #     [10] "JIRA",
+ #     [11] "JSPICAK",
+ #     [12] "KLE",
+ #     [13] "KOLCON",
+ #     [14] "MAJLIS",
+ #     [15] "MICHALS",
+ #     [16] "MILSO",
+ #     [17] "MJFO",
+ #     [18] "PAJAS",
+ #     [19] "PASKY",
+ #     [20] "PEK",
+ #     [21] "POPEL",
+ #     [22] "PSME",
+ #     [23] "RUR",
+ #     [24] "RVASICEK",
+ #     [25] "SEIDLJAN",
+ #     [26] "SKIM",
+ #     [27] "SMRZ",
+ #     [28] "STRAKA",
+ #     [29] "TKR",
+ #     [30] "TRIPIE",
+ #     [31] "TYNOVSKY",
+ #     [32] "VARISD",
+ #     [33] "VASEKD",
+ #     [34] "YENYA",
+ #     [35] "ZABA",
+ #     [36] "ZEMAN",
+ #     [37] "ZOUL"
  # ]
 
 =head1 DEPENDENCIES
@@ -161,21 +160,22 @@ L<Acme::CPANAuthors>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Acme-CPANAuthors-Czech>
+L<https://github.com/michal-josef-spacek/Acme-CPANAuthors-Czech>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2016 Michal Špaček
- BSD 2-Clause License
+© 2011-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.22
+0.25
 
 =cut

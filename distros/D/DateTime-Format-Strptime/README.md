@@ -4,7 +4,7 @@ DateTime::Format::Strptime - Parse and format strp and strf time patterns
 
 # VERSION
 
-version 1.76
+version 1.77
 
 # SYNOPSIS
 
@@ -247,7 +247,7 @@ The following tokens are allowed in the pattern string for strptime
 - %p or %P
 
     The equivalent of AM or PM according to the locale in use. See
-    [DateTime::Locale](https://metacpan.org/pod/DateTime::Locale).
+    [DateTime::Locale](https://metacpan.org/pod/DateTime%3A%3ALocale).
 
 - %r
 
@@ -264,7 +264,7 @@ The following tokens are allowed in the pattern string for strptime
 - %S
 
     The second (0-60; 60 may occur for leap seconds. See
-    [DateTime::LeapSecond](https://metacpan.org/pod/DateTime::LeapSecond)).
+    [DateTime::LeapSecond](https://metacpan.org/pod/DateTime%3A%3ALeapSecond)).
 
 - %t
 
@@ -337,7 +337,7 @@ This module was created by Rick Measham.
 
 http://datetime.perl.org/
 
-[perl](https://metacpan.org/pod/perl), [DateTime](https://metacpan.org/pod/DateTime), [DateTime::TimeZone](https://metacpan.org/pod/DateTime::TimeZone), [DateTime::Locale](https://metacpan.org/pod/DateTime::Locale)
+[perl](https://metacpan.org/pod/perl), [DateTime](https://metacpan.org/pod/DateTime), [DateTime::TimeZone](https://metacpan.org/pod/DateTime%3A%3ATimeZone), [DateTime::Locale](https://metacpan.org/pod/DateTime%3A%3ALocale)
 
 # BUGS
 
@@ -383,12 +383,13 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 
 - Christian Hansen <chansen@cpan.org>
 - D. Ilmari Mannsåker <ilmari.mannsaker@net-a-porter.com>
+- gregor herrmann <gregoa@debian.org>
 - key-amb <yasutake.kiyoshi@gmail.com>
 - Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 - 2019 by Dave Rolsky.
+This software is Copyright (c) 2015 - 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

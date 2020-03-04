@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.15.4 2020-02-28T00:52:18Z
+
+    - Support negation of effect in Colormap.pm.
+
 v1.15.3 2020-02-27T06:19:37Z
 
     - Introduce $NO_RESET_EL and $ENV{GETOPTEX_NO_RESET_EL} to control

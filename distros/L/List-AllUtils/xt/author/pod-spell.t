@@ -12,6 +12,7 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 ARRAYn
 AllUtils
+Andy
 BLOCK's
 Champoux
 DROLSKY
@@ -20,6 +21,8 @@ Dave
 EXPR
 Etheridge
 Haskell
+Jack
+Jacoby
 KEYFUNC
 KVLIST
 Karen
@@ -37,6 +40,9 @@ ether
 firstidx
 firstres
 firstval
+github
+jacoby
+keyvalue
 lastidx
 lastres
 lastval
@@ -55,11 +61,15 @@ pairkeys
 pairmap
 pairvalues
 probability
+probabilty
 randomisation
 rjbs
 specialisations
 thusly
 uniq
+uniqnum
+uniqstr
+unpairs
 unselected
 util
 yanick

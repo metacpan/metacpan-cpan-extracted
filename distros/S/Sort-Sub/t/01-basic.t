@@ -27,6 +27,9 @@ our $naturally;
 {
     my $sorter = Sort::Sub::get_sorter('$naturally<i>');
     is_deeply([sort $sorter qw(t1.mp3 T10.mp3 t2.mp3)], [qw/t1.mp3 t2.mp3 T10.mp3/]);
+
+    ($sorter, my $meta) = Sort::Sub::get_sorter('$by_rand', {}, "with meta");
+    is_deeply($meta, {v=>1, summary => "Sort randomly using Perl's rand()"});
 }
 
 done_testing;

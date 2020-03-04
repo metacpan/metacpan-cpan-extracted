@@ -79,7 +79,7 @@ One or more filters.
 
 =item *
 
-C<service-name>: The name of the service.
+C<service-name> - The name of the service.
 
 =item *
 
@@ -106,7 +106,7 @@ The maximum number of items to return for this request. The request
 returns a token that you can specify in a subsequent call to get the
 next set of results.
 
-Constraint: If the value is greater than 1000, we return only 1000
+Constraint: If the value is greater than 1,000, we return only 1,000
 items.
 
 

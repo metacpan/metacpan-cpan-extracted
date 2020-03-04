@@ -15,12 +15,9 @@ package Geometry {
 		}
 	}
 	
-	class Point3D {
-		extends Point;
+	class Point3D extends Point {
 		has *z ( is => rw, type => Int, default => 0 );
-		after clear () {
-			$self->z(0);
-		}
+		after clear = $self->z(0);
 	}
 }
 

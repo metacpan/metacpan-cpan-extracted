@@ -1,7 +1,12 @@
 package Acme::CPANModules::WorkingWithTree;
 
-our $DATE = '2020-02-04'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-01'; # DATE
+our $DIST = 'Acme-CPANModules-WorkingWithTree'; # DIST
+our $VERSION = '0.004'; # VERSION
+
+use strict;
+use Acme::CPANModulesUtil::Misc;
 
 my $text = <<'_';
 **Basics**
@@ -30,7 +35,7 @@ Memory-efficient tree nodes in Perl: <pm:Tree::Node>.
 <pm:Tree::To::Text>, <pm:Tree::To::TextLines>.
 
 
-**Visualizing as graphic**
+**Visualizing as graphics**
 
 TODO
 
@@ -39,6 +44,8 @@ TODO
 
 <pm:Tree::To::FS>.
 
+<pm:Tree::Shell>.
+
 Special kinds of trees: TODO.
 
 
@@ -46,19 +53,26 @@ Special kinds of trees: TODO.
 
 <pm:Role::TinyCommons::Tree>.
 
+
+**Modules that produce or work with Role::TinyCommons::Tree-compliant tree objects**
+
+<pm:Org::Parser>, <pm:Org::Parser::Tiny>.
+
+<pm:Tree::Dump>.
+
+<pm:Data::CSel> and its related modules: <pm:App::htmlsel>, <pm:App::jsonsel>,
+<pm:App::orgsel>, <pm:App::podsel>, <pm:App::ppisel>, <pm:App::yamlsel>,
+<pm:App::CSelUtils>.
+
 _
 
 our $LIST = {
     summary => 'Working with tree data structure in Perl',
     description => $text,
     tags => ['task'],
-    entries => [
-        map { +{module=>$_} }
-            do { my %seen; grep { !$seen{$_}++ }
-                 ($text =~ /<pm:(\w+(?:::\w+)+)>/g)
-             }
-    ],
 };
+
+Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
 # ABSTRACT: Working with tree data structure in Perl
@@ -75,7 +89,7 @@ Acme::CPANModules::WorkingWithTree - Working with tree data structure in Perl
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::WorkingWithTree (from Perl distribution Acme-CPANModules-WorkingWithTree), released on 2020-02-04.
+This document describes version 0.004 of Acme::CPANModules::WorkingWithTree (from Perl distribution Acme-CPANModules-WorkingWithTree), released on 2020-03-01.
 
 =head1 DESCRIPTION
 
@@ -104,7 +118,7 @@ B<Visualizing as text>
 
 L<Tree::To::Text>, L<Tree::To::TextLines>.
 
-B<Visualizing as graphic>
+B<Visualizing as graphics>
 
 TODO
 
@@ -112,11 +126,23 @@ B<Other modules>
 
 L<Tree::To::FS>.
 
+L<Tree::Shell>.
+
 Special kinds of trees: TODO.
 
 B<Roles>
 
 L<Role::TinyCommons::Tree>.
+
+B<Modules that produce or work with Role::TinyCommons::Tree-compliant tree objects>
+
+L<Org::Parser>, L<Org::Parser::Tiny>.
+
+L<Tree::Dump>.
+
+L<Data::CSel> and its related modules: L<App::htmlsel>, L<App::jsonsel>,
+L<App::orgsel>, L<App::podsel>, L<App::ppisel>, L<App::yamlsel>,
+L<App::CSelUtils>.
 
 =head1 INCLUDED MODULES
 
@@ -154,7 +180,31 @@ L<Role::TinyCommons::Tree>.
 
 =item * L<Tree::To::FS>
 
+=item * L<Tree::Shell>
+
 =item * L<Role::TinyCommons::Tree>
+
+=item * L<Org::Parser>
+
+=item * L<Org::Parser::Tiny>
+
+=item * L<Tree::Dump>
+
+=item * L<Data::CSel>
+
+=item * L<App::htmlsel>
+
+=item * L<App::jsonsel>
+
+=item * L<App::orgsel>
+
+=item * L<App::podsel>
+
+=item * L<App::ppisel>
+
+=item * L<App::yamlsel>
+
+=item * L<App::CSelUtils>
 
 =back
 

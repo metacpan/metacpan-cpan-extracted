@@ -13,12 +13,9 @@ $| = 1;
 
 my $TOP = MainWindow->new();
 
-my $version = $TOP->tclVersion;
-# print "version = $version\n";
-
-# Skip if Tcl/pTk version is < 8.5
-if( $version < 8.5 ){
-    print "1..0 # Skipped: Tile widgets only works for Tcl >= 8.5\n";
+# This will skip if Tile widgets not available
+unless ($Tcl::pTk::_Tile_available) {
+    print "1..0 # Skipped: Tile unavailable\n";
     exit;
 }
 

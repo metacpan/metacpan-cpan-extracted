@@ -1,7 +1,7 @@
 package Sah::Schemas::Collection;
 
-our $DATE = '2016-12-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-03-02'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Various Sah collection (array/hash) schemas
@@ -18,52 +18,94 @@ Sah::Schemas::Collection - Various Sah collection (array/hash) schemas
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::Collection (from Perl distribution Sah-Schemas-Collection), released on 2016-12-09.
+This document describes version 0.002 of Sah::Schemas::Collection (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
 
 =head1 SAH SCHEMAS
 
 =over
 
+=item * L<aoaoms|Sah::Schema::aoaoms>
+
+Array of (defined-)array-of-maybe-strings.
+
+
+
+
 =item * L<aoaos|Sah::Schema::aoaos>
 
-Array of array-of-strings.
+Array of (defined-)array-of-(defined-)strings.
 
-Note that for flexibility, the strings are allowed to be undefs.
+
+
+
+=item * L<aohoms|Sah::Schema::aohoms>
+
+Array of (defined-)hash-of-maybe-strings.
+
+
 
 
 =item * L<aohos|Sah::Schema::aohos>
 
-Array of hash-of-strings.
+Array of (defined-)hash-of-(defined-)strings.
 
-Note that for flexibility, the strings are allowed to be undefs.
+
+
+
+=item * L<aoms|Sah::Schema::aoms>
+
+Array of maybe-strings.
+
+
 
 
 =item * L<aos|Sah::Schema::aos>
 
-Array of strings.
+Array of (defined) strings.
 
-Note that for flexibility, the strings are allowed to be undefs.
+The elements (strings) of the array must be defined.
+
+
+=item * L<hoaoms|Sah::Schema::hoaoms>
+
+Hash of (defined-)array-of-(maybe-)strings.
+
+
 
 
 =item * L<hoaos|Sah::Schema::hoaos>
 
-Hash of array-of-strings.
+Hash of (defined-)array-of-(defined-)strings.
 
-Note that for flexibility, the strings are allowed to be undefs.
+
+
+
+=item * L<hohoms|Sah::Schema::hohoms>
+
+Hash of (defined-)hash-of-maybe-strings.
+
+
 
 
 =item * L<hohos|Sah::Schema::hohos>
 
-Hash of hash-of-strings.
+Hash of (defined-)hash-of-(defined-)strings.
 
-Note that for flexibility, the strings are allowed to be undefs.
+
+
+
+=item * L<homs|Sah::Schema::homs>
+
+Hash of maybe-strings.
+
+
 
 
 =item * L<hos|Sah::Schema::hos>
 
-Hash of strings.
+Hash of (defined) strings.
 
-Note that for flexibility, the strings are allowed to be undefs.
+
 
 
 =back
@@ -96,7 +138,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

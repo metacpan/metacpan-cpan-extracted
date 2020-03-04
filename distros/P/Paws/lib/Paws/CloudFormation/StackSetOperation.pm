@@ -3,11 +3,13 @@ package Paws::CloudFormation::StackSetOperation;
   has Action => (is => 'ro', isa => 'Str');
   has AdministrationRoleARN => (is => 'ro', isa => 'Str');
   has CreationTimestamp => (is => 'ro', isa => 'Str');
+  has DeploymentTargets => (is => 'ro', isa => 'Paws::CloudFormation::DeploymentTargets');
   has EndTimestamp => (is => 'ro', isa => 'Str');
   has ExecutionRoleName => (is => 'ro', isa => 'Str');
   has OperationId => (is => 'ro', isa => 'Str');
   has OperationPreferences => (is => 'ro', isa => 'Paws::CloudFormation::StackSetOperationPreferences');
   has RetainStacks => (is => 'ro', isa => 'Bool');
+  has StackSetDriftDetectionDetails => (is => 'ro', isa => 'Paws::CloudFormation::StackSetDriftDetectionDetails');
   has StackSetId => (is => 'ro', isa => 'Str');
   has Status => (is => 'ro', isa => 'Str');
 1;
@@ -76,6 +78,12 @@ dispatching the work to the requested regions, before actually creating
 the first stacks.
 
 
+=head2 DeploymentTargets => L<Paws::CloudFormation::DeploymentTargets>
+
+  [C<Service-managed> permissions] The AWS Organizations accounts
+affected by the stack operation.
+
+
 =head2 EndTimestamp => Str
 
   The time at which the stack set operation ended, across all accounts
@@ -112,6 +120,20 @@ delete the stacks. You can't reassociate a retained stack, or add an
 existing, saved stack to a new stack set.
 
 
+=head2 StackSetDriftDetectionDetails => L<Paws::CloudFormation::StackSetDriftDetectionDetails>
+
+  Detailed information about the drift status of the stack set. This
+includes information about drift operations currently being performed
+on the stack set.
+
+this information will only be present for stack set operations whose
+C<Action> type is C<DETECT_DRIFT>.
+
+For more information, see Detecting Unmanaged Changes in Stack Sets
+(https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-drift.html)
+in the AWS CloudFormation User Guide.
+
+
 =head2 StackSetId => Str
 
   The ID of the stack set.
@@ -132,6 +154,15 @@ failed stacks within a region exceeds the failure tolerance, the status
 of the operation in the region is set to C<FAILED>. This in turn sets
 the status of the operation as a whole to C<FAILED>, and AWS
 CloudFormation cancels the operation in any remaining regions.
+
+=item *
+
+C<QUEUED>: [Service-managed permissions] For automatic deployments that
+require a sequence of operations. The operation is queued to be
+performed. For more information, see the stack set operation status
+codes
+(https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-concepts.html#stackset-status-codes)
+in the AWS CloudFormation User Guide.
 
 =item *
 

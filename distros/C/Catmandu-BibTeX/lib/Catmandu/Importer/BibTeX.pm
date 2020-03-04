@@ -1,6 +1,6 @@
 package Catmandu::Importer::BibTeX;
 
-our $VERSION = '0.15';
+our $VERSION = '0.18';
 
 use namespace::clean;
 use Catmandu::Sane;
@@ -9,29 +9,42 @@ use Moo;
 
 with 'Catmandu::Importer';
 
+sub _contributor_name {
+    my ($self, $c) = @_;
+    my $name = $c->to_string;
+    $name =~ tr/\{\}//d;
+    $name;
+}
+
 sub generator {
-    my ($self) =@_;
+    my ($self) = @_;
     my $fh = $self->fh;
     sub {
         my $parser = BibTeX::Parser->new($fh);
         while (my $entry = $parser->next) {
             my $bib = {};
             if ($entry->parse_ok) {
-                map { $bib->{$_} = $entry->field($_) } $entry->fieldlist;
                 $bib->{type} = lc $entry->type;
+
                 $bib->{_citekey} = $entry->key;
 
-                if ($bib->{author} && $bib->{author} =~ / and /) {
-                  my $tmp = $bib->{author}; delete $bib->{author};
-                  @{$bib->{author}} = split(/ and /, $tmp);
+                if (my @authors = $entry->cleaned_author) {
+                    $bib->{author}
+                        = [map {$self->_contributor_name($_)} @authors];
                 }
-                if ($bib->{editor} && $bib->{editor} =~ / and /) {
-                  my $tmp = $bib->{editor}; delete $bib->{editor};
-                  @{$bib->{editor}} = split(/ and /, $tmp);
+                if (my @editors = $entry->cleaned_editor) {
+                    $bib->{editor}
+                        = [map {$self->_contributor_name($_)} @editors];
+                }
+
+                for my $field ($entry->fieldlist) {
+                    next if $field =~ /^type|author|editor$/;
+                    $bib->{$field} = $entry->cleaned_field($field);
                 }
 
                 return $bib;
-            } else {
+            }
+            else {
                 Catmandu::Error->throw($entry->error);
             }
         }

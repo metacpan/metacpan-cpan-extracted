@@ -1,9 +1,9 @@
 package Sah::Schema::date::tz_offset;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-27'; # DATE
+our $DATE = '2020-03-03'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 BEGIN {
 
@@ -58,6 +58,20 @@ _
             Complete::TZ::complete_tz_name(word => $args{word}),
         );
     },
+    examples => [
+        {data=>'', valid=>0},
+        {data=>'UTC', valid=>1, res=>0},
+        {data=>'3600', valid=>1, res=>3600},
+        {data=>'-43200', valid=>1, res=>-43200},
+        {data=>'-12', valid=>1, res=>-12*3600},
+        {data=>'-1200', valid=>1, res=>-12*3600},
+        {data=>'-12:00', valid=>1, res=>-12*3600},
+        {data=>'UTC-12', valid=>1, res=>-12*3600},
+        {data=>'UTC-1200', valid=>1, res=>-12*3600},
+        {data=>'UTC+12:45', valid=>1, res=>+12.75*3600},
+        {data=>'UTC-13', valid=>0},
+        {data=>'UTC+12:01', valid=>0, summary=>'Unknown offset'},
+    ],
 }, {}];
 
 1;
@@ -76,7 +90,65 @@ Sah::Schema::date::tz_offset - Timezone offset in seconds from UTC
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::date::tz_offset (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Sah::Schema::date::tz_offset (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+
+=head1 SYNOPSIS
+
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("date::tz_offset*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['date::tz_offset*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+
+Sample data:
+
+ ""  # INVALID
+
+ "UTC"  # valid, becomes 0
+
+ 3600  # valid, becomes 3600
+
+ -43200  # valid, becomes -43200
+
+ -12  # valid, becomes -43200
+
+ -1200  # valid, becomes -43200
+
+ "-12:00"  # valid, becomes -43200
+
+ "UTC-12"  # valid, becomes -43200
+
+ "UTC-1200"  # valid, becomes -43200
+
+ "UTC+12:45"  # valid, becomes 45900
+
+ "UTC-13"  # INVALID
+
+ "UTC+12:01"  # INVALID (Unknown offset)
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,18 @@
 package Path::Dispatcher::Dispatch;
-use Any::Moose;
+# ABSTRACT: a list of matches
+
+our $VERSION = '1.07';
+
+use Moo;
 use Try::Tiny;
+use Carp qw(confess);
+use Types::Standard qw(ArrayRef);
 
 use Path::Dispatcher::Match;
 
 has _matches => (
     is        => 'ro',
-    isa       => 'ArrayRef',
+    isa       => ArrayRef,
     default   => sub { [] },
 );
 
@@ -25,8 +31,8 @@ sub has_match   { scalar @{ shift->{_matches} } }
 sub first_match { shift->{_matches}[0] }
 
 # aliases
-__PACKAGE__->meta->add_method(add_matches => __PACKAGE__->can('add_match'));
-__PACKAGE__->meta->add_method(has_matches => __PACKAGE__->can('has_match'));
+sub add_matches { goto \&add_match }
+sub has_matches { goto \&has_match }
 
 sub run {
     my $self = shift;
@@ -61,15 +67,24 @@ sub run {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
+
+no Moo;
 
 1;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Path::Dispatcher::Dispatch - a list of matches
+
+=head1 VERSION
+
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -111,5 +126,20 @@ Each match's L<Path::Dispatcher::Match/run> method is evaluated in scalar
 context. The return value of this method is a list of these scalars (or the
 first if called in scalar context).
 
-=cut
+=head1 SUPPORT
 
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Dispatcher>
+(or L<bug-Path-Dispatcher@rt.cpan.org|mailto:bug-Path-Dispatcher@rt.cpan.org>).
+
+=head1 AUTHOR
+
+Shawn M Moore, C<< <sartak at bestpractical.com> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Shawn M Moore.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -5,10 +5,11 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.175';
+our $VERSION = '1.176';
 
 use Quiq::Option;
 use Quiq::Path;
+use Quiq::Shell;
 use Quiq::FileHandle;
 
 # -----------------------------------------------------------------------------
@@ -58,6 +59,84 @@ sub aspectRatio {
 
 # -----------------------------------------------------------------------------
 
+=head3 edit() - Editiere Bild mit Bildbearbeitungsprogramm
+
+=head4 Synopsis
+
+  $class->edit($file,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Pfad der Bilddatei.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -backupDir => (Default: undef)
+
+Sichere die unbearbeitete Bilddatei nach $dir.
+
+=item -program => $program (Default: 'gimp')
+
+Nutze Programm $program zum Editieren des Bildes.
+
+=back
+
+=head4 Description
+
+Editiere Bilddatei $file mit Programm $program. Ist ein Backupverzeichnis
+$backupDir gegeben, wird die unbearbeitete Datei unter einer laufenden
+Nummer plus Extension dorthin gesichert, aber nur, wenn die Bilddatei
+tatsächlich geändert wurde.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub edit {
+    my ($class,$file) = splice @_,0,2;
+    # @_: @opt
+    
+    # Optionen
+
+    my $backupDir = undef;
+    my $program = 'gimp';
+
+    Quiq::Option->extract(-mode=>'sloppy',\@_,
+        -backupDir => \$backupDir,
+        -program => \$program,
+    );
+
+    # Operation ausführen
+
+    my $p = Quiq::Path->new;
+
+    my $backupFile;
+    if ($backupDir) {
+        my $ext = $p->extension($file);
+        my $num = $p->nextNumber($backupDir,5);
+        $backupFile = sprintf '%s/%s.%s',$backupDir,$num,$ext;
+        $p->copy($file,$backupFile);
+    }
+    Quiq::Shell->exec("$program $file");
+
+    if ($backupFile && !$p->compare($file,$backupFile)) {
+        $p->delete($backupFile);
+            
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 findImages() - Suche Bild-Dateien
 
 =head4 Synopsis
@@ -83,9 +162,7 @@ oder nach Name. Per Default werden die Bilder unsortiert geliefert.
 =head4 Description
 
 Liefere die Liste aller Bild-Dateien, die in @filesAndDirs
-vorkommen. Vereichnisse werden rekursiv nach Bild-Dateien
-durchsucht.
-
+vorkommen. Vereichnisse werden rekursiv nach Bild-Dateien durchsucht.
 Als Bild-Dateien werden alle Dateien angesehen, die eine
 Bild-Extension (.jpg, .png, .gif) besitzen. Bei Dateien ohne
 Extension wird mittels Quiq::Image->type() geprüft, ob es sich
@@ -351,7 +428,7 @@ sub type {
 
 =head1 VERSION
 
-1.175
+1.176
 
 =head1 AUTHOR
 

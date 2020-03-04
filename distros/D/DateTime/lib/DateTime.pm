@@ -8,7 +8,7 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.51';
+our $VERSION = '1.52';
 
 use Carp;
 use DateTime::Duration;
@@ -897,7 +897,7 @@ sub hour {
 }
 sub hour_1 { $_[0]->{local_c}{hour} == 0 ? 24 : $_[0]->{local_c}{hour} }
 
-sub hour_12 { my $h = $_[0]->hour % 12; return $h ? $h : 12 }
+sub hour_12   { my $h = $_[0]->hour % 12; return $h ? $h : 12 }
 sub hour_12_0 { $_[0]->hour % 12 }
 
 sub minute {
@@ -2003,6 +2003,14 @@ sub _compare {
     return 0;
 }
 
+sub is_between {
+    my $self  = shift;
+    my $lower = shift;
+    my $upper = shift;
+
+    return $self->compare($lower) > 0 && $self->compare($upper) < 0;
+}
+
 sub _string_equals_overload {
     my ( $class, $dt1, $dt2 ) = ref $_[0] ? ( undef, @_ ) : @_;
 
@@ -2355,7 +2363,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -3139,10 +3147,10 @@ text.
 
 =head3 $dt->epoch()
 
-Return the UTC epoch value for the datetime object. Datetimes before the start
-of the epoch will be returned as a negative number.
+Returns the UTC epoch value for the datetime object. DateTimes before the
+start of the epoch will be returned as a negative number.
 
-The return value from this method is always an integer.
+The return value from this method is always an integer number of seconds.
 
 Since the epoch does not account for leap seconds, the epoch time for
 1972-12-31T23:59:60 (UTC) is exactly the same as that for
@@ -3351,7 +3359,7 @@ A synonym of C<< $dt->add_duration( $duration_object ) >>.
 =head3 $dt->subtract_duration( $duration_object )
 
 When given a C<DateTime::Duration> object, this method simply calls
-C<invert()> on that object and passes that new duration to the
+C<inverse()> on that object and passes that new duration to the
 C<add_duration> method.
 
 =head3 $dt->subtract( DateTime::Duration->new parameters )
@@ -3416,6 +3424,13 @@ represent a fixed number of seconds.
 
 Note that because of leap seconds, this may not return the same result as
 doing this math based on the value returned by C<< $dt->epoch() >>.
+
+=head3 $dt->is_between( $lower, $upper )
+
+Checks whether C<$dt> is strictly between two other DateTime objects.
+
+"Strictly" means that C<$dt> must be greater than C<$lower> and less than
+C<$upper>. If it is I<equal> to either object then this method returns false.
 
 =head2 Class Methods
 
@@ -3576,7 +3591,7 @@ wrong.
 
 =back
 
-=head3 Adding a Duration to a Datetime
+=head3 Adding a Duration to a DateTime
 
 The parts of a duration can be broken down into five parts. These are
 months, days, minutes, seconds, and nanoseconds. Adding one month to
@@ -3670,7 +3685,7 @@ different types of durations. These methods are
 C<subtract_datetime()>, C<subtract_datetime_absolute()>,
 C<delta_md()>, C<delta_days()>, and C<delta_ms()>.
 
-=head3 Datetime Subtraction
+=head3 DateTime Subtraction
 
 Date subtraction is done solely based on the two object's local
 datetimes, with one exception to handle DST changes. Also, if the two
@@ -4621,7 +4636,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Bennett Christian Hansen Daisuke Maki Dan Book Stewart David E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gianni Ceccarelli Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Michael Conrad R. Davis Mohammad S Anwar M Somerville Nick Tonkin Olaf Alders Ovid Paul Howarth Philippe Bruhat (BooK) Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
+=for stopwords Ben Bennett Christian Hansen Daisuke Maki Dan Book Stewart David E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gianni Ceccarelli Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Mark Overmeer Michael Conrad R. Davis Mohammad S Anwar M Somerville Nick Tonkin Olaf Alders Ovid Paul Howarth Philippe Bruhat (BooK) philip r brenan Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
 
 =over 4
 
@@ -4691,6 +4706,10 @@ Karen Etheridge <ether@cpan.org>
 
 =item *
 
+Mark Overmeer <mark@overmeer.net>
+
+=item *
+
 Michael Conrad <mike@nrdvana.net>
 
 =item *
@@ -4727,6 +4746,10 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =item *
 
+philip r brenan <philiprbrenan@gmail.com>
+
+=item *
+
 Ricardo Signes <rjbs@cpan.org>
 
 =item *
@@ -4749,7 +4772,7 @@ viviparous <viviparous@prc>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2003 - 2019 by Dave Rolsky.
+This software is Copyright (c) 2003 - 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

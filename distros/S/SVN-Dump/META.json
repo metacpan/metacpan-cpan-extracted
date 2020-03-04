@@ -74,27 +74,27 @@
    "provides" : {
       "SVN::Dump" : {
          "file" : "lib/SVN/Dump.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "SVN::Dump::Headers" : {
          "file" : "lib/SVN/Dump/Headers.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "SVN::Dump::Property" : {
          "file" : "lib/SVN/Dump/Property.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "SVN::Dump::Reader" : {
          "file" : "lib/SVN/Dump/Reader.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "SVN::Dump::Record" : {
          "file" : "lib/SVN/Dump/Record.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "SVN::Dump::Text" : {
          "file" : "lib/SVN/Dump/Text.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -109,7 +109,7 @@
          "web" : "http://github.com/book/SVN-Dump"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
       "fschlich <fschlich@zedat.fu-berlin.de>",
       "Andrew Sayers <andrew-svn-dump@pileofstuff.org>",

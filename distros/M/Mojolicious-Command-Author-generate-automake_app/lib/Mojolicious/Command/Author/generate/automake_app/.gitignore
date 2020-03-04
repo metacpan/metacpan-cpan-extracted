@@ -32,5 +32,6 @@ nytprof.out
 /config.*
 *~
 /.vscode/perl-lang/
-node_modules
+frontend/node_modules/
+frontend/qx_packages/
 /configure

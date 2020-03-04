@@ -1,19 +1,27 @@
 package Test::Auto;
 
-use Data::Object 'Class';
+use strict;
+use warnings;
 
+use Data::Object::Class;
+use Data::Object::Attributes;
 use Data::Object::Data;
 use Data::Object::Try;
 
 use Exporter;
-use Type::Registry;
 use Test::More;
+use Type::Registry;
+
+use registry 'Test::Auto::Types';
+use routines;
 
 use base 'Exporter';
 
 our @EXPORT = 'testauto';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.07'; # VERSION
+
+# ATTRIBUTES
 
 has file => (
   is => 'ro',
@@ -23,31 +31,29 @@ has file => (
 
 has data => (
   is => 'ro',
-  isa => 'DataObject',
+  isa => 'Data',
   opt => 1
 );
 
-# EXPORT
+# EXPORTS
 
 fun testauto($file) {
 
   return Test::Auto->new($file)->subtests;
 }
 
-# BUILD
+# BUILDS
 
 method BUILD($args) {
   my $data = $self->data;
   my $file = $self->file;
 
-  # build data-model from podish
   $self->{data} = Data::Object::Data->new(file => $file) if !$data;
 
   return $self;
 }
 
 around BUILDARGS(@args) {
-  # convert single args to proper pair
   @args = (file => $args[0]) if @args == 1 && !ref $args[0];
 
   $self->$orig(@args);
@@ -140,7 +146,7 @@ routines are properly documented.
 
 This package uses type constraints from:
 
-L<Data::Object::Library>
+L<Test::Auto::Types>
 
 =cut
 
@@ -150,7 +156,7 @@ This package supports the following scenarios:
 
 =cut
 
-=head2 testauto
+=head2 exports
 
   use Test::Auto;
   use Test::More;
@@ -178,9 +184,9 @@ This package has the following attributes:
 
 =head2 data
 
-  data(DataObject)
+  data(Data)
 
-This attribute is read-only, accepts C<(DataObject)> values, and is optional.
+This attribute is read-only, accepts C<(Data)> values, and is optional.
 
 =cut
 
@@ -200,7 +206,7 @@ This package implements the following functions:
 
 =head2 testauto
 
-  testauto(Str $file) : InstanceOf["Test::Auto::Subtests"]
+  testauto(Str $file) : Subtests
 
 This function is exported automatically and returns a L<Test::Auto::Subtests>
 object for the test file given.
@@ -225,7 +231,7 @@ This package implements the following methods:
 
 =head2 document
 
-  document() : InstanceOf["Test::Auto::Document"]
+  document() : Document
 
 This method returns a L<Test::Auto::Document> object.
 
@@ -243,7 +249,7 @@ This method returns a L<Test::Auto::Document> object.
 
 =head2 parser
 
-  parser() : InstanceOf["Test::Auto::Parser"]
+  parser() : Parser
 
 This method returns a L<Test::Auto::Parser> object.
 
@@ -261,7 +267,7 @@ This method returns a L<Test::Auto::Parser> object.
 
 =head2 subtests
 
-  subtests() : InstanceOf["Test::Auto::Subtests"]
+  subtests() : Subtests
 
 This method returns a L<Test::Auto::Subtests> object.
 
@@ -323,7 +329,7 @@ This method returns a L<Test::Auto::Subtests> object.
   =type-library $name
   =type-composite $name # [optional]
   =type-parent $name # [optional]
-  =type-coercion $name # [optional]
+  =type-coercion-$number $name # [optional]
   =type-example-$number $name # [repeatable]
 
 The specification is designed to accommodate typical package declarations. It

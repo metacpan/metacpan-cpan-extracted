@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::month_name::en;
 
-our $DATE = '2020-02-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2020-03-03'; # DATE
+our $VERSION = '0.010'; # VERSION
 
-our $rschema = ["cistr",[{in=>["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","january","february","march","april","june","july","august","september","october","november","december"],summary=>"Month name (abbreviated or full, in English)"}],["cistr"]];
+our $rschema = ["cistr",[{examples=>[{data=>"",valid=>0},{data=>1,valid=>0},{data=>"jan",valid=>1},{data=>"FeB",valid=>1},{data=>"March",valid=>1},{data=>"foo",valid=>0},{data=>13,valid=>0}],in=>["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","january","february","march","april","june","july","august","september","october","november","december"],summary=>"Month name (abbreviated or full, in English)"}],["cistr"]];
 
 1;
 # ABSTRACT: Month name (abbreviated or full, in English)
@@ -20,7 +20,7 @@ Sah::SchemaR::date::month_name::en - Month name (abbreviated or full, in English
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::SchemaR::date::month_name::en (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Sah::SchemaR::date::month_name::en (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package Catmandu::Exporter::BibTeX;
 
-our $VERSION = '0.15';
+our $VERSION = '0.18';
 
 use namespace::clean;
 use Catmandu::Sane;
@@ -9,57 +9,55 @@ use Moo;
 
 with 'Catmandu::Exporter';
 
-my $TAGS = [qw(
-    abstract
-    address
-    articleno
-    author
-    booktitle
-    chapter
-    day
-    edition
-    editor
-    eprint
-    howpublished
-    institution
-    isbn
-    issn
-    journal
-    keywords
-    language
-    location
-    month
-    note
-    number
-    organization
-    pages
-    publisher
-    school
-    series
-    title
-    type
-    url
-    doi
-    volume
-    year
-)];
+my $TAGS = [
+    qw(
+        abstract
+        address
+        articleno
+        author
+        booktitle
+        chapter
+        day
+        edition
+        editor
+        eprint
+        howpublished
+        institution
+        isbn
+        issn
+        journal
+        keywords
+        language
+        location
+        month
+        note
+        number
+        organization
+        pages
+        publisher
+        school
+        series
+        title
+        type
+        url
+        doi
+        volume
+        year
+        )
+];
 
-my $JOIN = {
-    author   => ' and ',
-    editor   => ' and ',
-    language => ',',
-    keywords  => ',',
-};
+my $JOIN = {author => ' and ', editor => ' and ', language => ',',
+    keywords => ',',};
 
 sub add {
     my ($self, $orig_data) = @_;
-    
+
     my $data = clone($orig_data);
-    
+
     my $fh = $self->fh;
 
-    my $type = $data->{type} || $data->{_type} || 'misc';
-    my $citekey = $data->{_citekey} || $data->{_id} || $self->count + 1;
+    my $type    = $data->{type}     || $data->{_type} || 'misc';
+    my $citekey = $data->{_citekey} || $data->{_id}   || $self->count + 1;
 
     for my $tag (keys %$JOIN) {
         my $val = $data->{$tag};

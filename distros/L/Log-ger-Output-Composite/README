@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::Composite - Composite output
 
 VERSION
-    version 0.011
+    version 0.012
 
 SYNOPSIS
      use Log::ger::Output Composite => (
@@ -141,6 +141,10 @@ FAQS
     the above per-category and per-output levels will be set to "trace".
 
 ENVIRONMENT
+  LOG_LOG_GER_OUTPUT_COMPOSITE_CODE
+    Bool. If set to true will print the generated logger source code to
+    stderr.
+
 SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -1,3 +1,8 @@
+0.942   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [test] Adjust to Complete::Sah 0.005.
+
+
 0.941   2019-12-18  Released-By: PERLANCAR; Urgency: medium
 
 	- [refactor] Extract complete_from_schema() to its own distro

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::DisplayXY;
-$Lab::Moose::Instrument::DisplayXY::VERSION = '3.691';
+$Lab::Moose::Instrument::DisplayXY::VERSION = '3.692';
 #ABSTRACT: Display with y vs x traces Role for Lab::Moose::Instrument
 
 use 5.010;
@@ -312,7 +312,7 @@ Lab::Moose::Instrument::DisplayXY - Display with y vs x traces Role for Lab::Moo
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 DESCRIPTION
 
@@ -453,7 +453,7 @@ Returns number of points in the trace.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Eugeniy E. Mikhailov, Simon Reinhardt
 

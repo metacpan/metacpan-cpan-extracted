@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Date
   homepage: https://metacpan.org/release/Sah-Schemas-Date
   repository: git://github.com/perlancar/perl-Sah-Schemas-Date.git
-version: '0.008'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -48,7 +48,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000036'
           version: '0.006'
       name: Sah::Schemas
-      version: '0.016'
+      version: '0.017'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -311,7 +311,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.05'
+              version: '0.061'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

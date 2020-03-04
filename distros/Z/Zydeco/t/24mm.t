@@ -18,9 +18,7 @@ package My {
 	
 	role RoleA {
 		with RoleC;
-		multi method foo :alias(foo_a) (HashRef $hash) {
-			return "A";
-		}
+		multi method foo :alias(foo_a) (HashRef $hash) = 'A';
 	}
 
 	role RoleB {
@@ -30,9 +28,7 @@ package My {
 	}
 	
 	role RoleC {
-		multi method foo () {
-			return $self;
-		}
+		multi method foo () = $self;
 	}
 };
 

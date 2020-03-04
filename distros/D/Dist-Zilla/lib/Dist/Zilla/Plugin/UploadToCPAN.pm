@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::UploadToCPAN 6.012;
+package Dist::Zilla::Plugin::UploadToCPAN 6.014;
 # ABSTRACT: upload the dist to CPAN
 
 use Moose;
@@ -7,6 +7,7 @@ with qw(Dist::Zilla::Role::BeforeRelease Dist::Zilla::Role::Releaser);
 use File::Spec;
 use Moose::Util::TypeConstraints;
 use Scalar::Util qw(weaken);
+use Dist::Zilla::Util;
 use Try::Tiny;
 
 use namespace::autoclean;
@@ -154,7 +155,7 @@ has pause_cfg_file => (
 #pod =attr pause_cfg_dir
 #pod
 #pod This is the directory for resolving a relative L</pause_cfg_file>.
-#pod It defaults to C<< File::HomeDir->my_home >>.
+#pod it defaults to the glob expansion of F<~>.
 #pod
 #pod =cut
 
@@ -162,7 +163,7 @@ has pause_cfg_dir => (
   is      => 'ro',
   isa     => 'Str',
   lazy    => 1,
-  default => sub { require File::HomeDir; File::HomeDir::->my_home },
+  default => sub { Dist::Zilla::Util->homedir },
 );
 
 #pod =attr pause_cfg
@@ -284,7 +285,7 @@ Dist::Zilla::Plugin::UploadToCPAN - upload the dist to CPAN
 
 =head1 VERSION
 
-version 6.012
+version 6.014
 
 =head1 SYNOPSIS
 
@@ -340,7 +341,7 @@ L</pause_cfg_dir>.
 =head2 pause_cfg_dir
 
 This is the directory for resolving a relative L</pause_cfg_file>.
-It defaults to C<< File::HomeDir->my_home >>.
+it defaults to the glob expansion of F<~>.
 
 =head2 pause_cfg
 
@@ -365,7 +366,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,10 +1,9 @@
 use strict;
 use warnings;
-use strict;
-use warnings;
 use utf8;
 
-use lib 't/lib';
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
 
 use T qw( run_tests_from_data test_datetime_object );
 use Test::More 0.96;

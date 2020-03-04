@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/LocaleCodesUtils/list_scripts
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.493
 
-our $DATE = '2018-03-07'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-02'; # DATE
 our $DIST = 'App-LocaleCodesUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,6 +17,8 @@ use Perinci::CmdLine::Any;
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/LocaleCodesUtils/list_scripts",
     program_name => "list-scripts",
+    read_config => 0,
+    read_env => 0,
 );
 
 $cmdline->run;
@@ -35,7 +38,7 @@ list-scripts - List scripts
 
 =head1 VERSION
 
-This document describes version 0.002 of list-scripts (from Perl distribution App-LocaleCodesUtils), released on 2018-03-07.
+This document describes version 0.003 of list-scripts (from Perl distribution App-LocaleCodesUtils), released on 2020-03-02.
 
 =head1 SYNOPSIS
 
@@ -51,36 +54,6 @@ REPLACE ME
 
 C<*> marks required options.
 
-=head2 Configuration options
-
-=over
-
-=item B<--config-path>=I<filename>
-
-Set path to configuration file.
-
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
-
-Set configuration profile to use.
-
-=item B<--no-config>
-
-Do not use any configuration file.
-
-=back
-
-=head2 Environment options
-
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
-
-=back
-
 =head2 Field selection options
 
 =over
@@ -91,6 +64,18 @@ Return array of full records instead of just ID fields.
 
 By default, only the key (ID) field is returned per result entry.
 
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
 
 =item B<--field>=I<s@>
 
@@ -320,6 +305,10 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =back
 
 =head2 Paging options
@@ -388,71 +377,6 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/list-scripts.conf>, F<~/list-scripts.conf>, or F</etc/list-scripts.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-List of available configuration parameters:
-
- code (see --code)
- code.contains (see --code-contains)
- code.in (see --code-in)
- code.is (see --code-is)
- code.isnt (see --code-isnt)
- code.max (see --code-max)
- code.min (see --code-min)
- code.not_contains (see --code-not-contains)
- code.not_in (see --code-not-in)
- code.xmax (see --code-xmax)
- code.xmin (see --code-xmin)
- detail (see --detail)
- fields (see --field)
- format (see --format)
- naked_res (see --naked-res)
- name (see --name)
- name.contains (see --name-contains)
- name.in (see --name-in)
- name.is (see --name-is)
- name.isnt (see --name-isnt)
- name.max (see --name-max)
- name.min (see --name-min)
- name.not_contains (see --name-not-contains)
- name.not_in (see --name-not-in)
- name.xmax (see --name-xmax)
- name.xmin (see --name-xmin)
- query (see --query)
- random (see --random)
- result_limit (see --result-limit)
- result_start (see --result-start)
- sort (see --sort)
- with_field_names (see --with-field-names)
-
-=head1 ENVIRONMENT
-
-=head2 LIST_SCRIPTS_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/list-scripts.conf>
-
-F<~/list-scripts.conf>
-
-F</etc/list-scripts.conf>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-LocaleCodesUtils>.
@@ -475,7 +399,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

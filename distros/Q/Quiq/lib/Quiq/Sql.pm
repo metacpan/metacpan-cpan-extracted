@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.175';
+our $VERSION = '1.176';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -406,7 +406,7 @@ my %Commands = (
         'DISCARD',
         'DO',
         'DROP',
-        # 'END'
+        'END',
         'EXECUTE',
         'EXPLAIN',
         'FETCH',
@@ -5389,7 +5389,7 @@ sub diff {
 
 =head1 VERSION
 
-1.175
+1.176
 
 =head1 AUTHOR
 

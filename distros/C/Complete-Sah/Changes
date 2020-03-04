@@ -1,3 +1,15 @@
+0.006   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Don't use invalid examples.
+
+
+0.005   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- When schema has examples, we no longer just complete from the
+	  examples but add other possible completions too. This is because
+	  examples now often serve as tests.
+
+
 0.004   2020-02-12  Released-By: PERLANCAR; Urgency: medium
 
 	- [testing] Fix test failures. Add missing dependency to schema modules

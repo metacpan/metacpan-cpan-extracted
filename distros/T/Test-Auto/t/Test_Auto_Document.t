@@ -2,7 +2,10 @@ use 5.014;
 
 use lib 't/lib';
 
-use Do;
+use strict;
+use warnings;
+use routines;
+
 use Test::Auto;
 use Test::More;
 
@@ -49,13 +52,13 @@ POD document.
 
 =libraries
 
-Data::Object::Library
+Test::Auto::Types
 
 =attributes
 
 content: ro, opt, ArrayRef[Str]
 template: ro, opt, Maybe[Str]
-parser: ro, req, InstanceOf["Test::Auto::Parser"]
+parser: ro, req, Parser
 
 =method render
 

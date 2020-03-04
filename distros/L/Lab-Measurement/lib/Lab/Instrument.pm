@@ -1,5 +1,5 @@
 package Lab::Instrument;
-$Lab::Instrument::VERSION = '3.691';
+$Lab::Instrument::VERSION = '3.692';
 #ABSTRACT: Instrument base class
 
 use strict;
@@ -1319,7 +1319,7 @@ Lab::Instrument - Instrument base class
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 SYNOPSIS
 
@@ -1539,7 +1539,7 @@ Probably many, with all the porting. This will get better.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2005-2006  Daniel Schroeer
             2009       Andreas K. Huettel

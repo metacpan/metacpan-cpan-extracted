@@ -1,20 +1,15 @@
 # vi:sw=2
-use strict;
-use warnings FATAL => 'all';
+use strictures 2;
 
-use Test::More;
+use Test2::V0 qw( done_testing );
 
-use_ok 'DBIx::Class::Sims::Types';
+use lib 't/lib';
+use types qw(types_test);
 
-my $sub = DBIx::Class::Sims::Types->can('us_city');
-
-my @tests = (
-  [ { data_type => 'varchar' }, qr/^[\w\s]+$/ ],
-);
-
-foreach my $test ( @tests ) {
-  $test->[0]{sim} = { type => 'us_city' };
-  like( $sub->($test->[0]), $test->[1] );
-}
+types_test us_city => {
+  tests => [
+    [ { data_type => 'varchar' }, qr/^[\w\s]+$/, 'Ithaca' ],
+  ],
+};
 
 done_testing;

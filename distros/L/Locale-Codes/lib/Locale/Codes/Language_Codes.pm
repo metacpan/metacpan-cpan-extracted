@@ -3,7 +3,7 @@ Locale::Codes::Language_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Thu Aug 29 15:06:47 EDT 2019
+#    Generated on: Mon Mar  2 09:30:28 EST 2020
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.62';
+$VERSION='3.63';
 
 $Locale::Codes::Data{'language'}{'id'} = '7974';
 
@@ -201,7 +201,6 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(Siksika),
       ],
    q(0058) => [
-      q(Bantu (Other)),
       q(Bantu languages),
       ],
    q(0059) => [
@@ -323,12 +322,10 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(English-based creoles and pidgins),
       ],
    q(0095) => [
-      q(Creoles and pidgins, French-based ),
       q(Creoles and pidgins, French-based),
       q(French-based creoles and pidgins),
       ],
    q(0096) => [
-      q(Creoles and pidgins, Portuguese-based ),
       q(Creoles and pidgins, Portuguese-based),
       q(Portuguese-based creoles and pidgins),
       ],
@@ -340,7 +337,6 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(Crimean Turkish),
       ],
    q(0099) => [
-      q(Creoles and pidgins ),
       q(Creoles and pidgins),
       ],
    q(0100) => [
@@ -1086,7 +1082,6 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(0327) => [
       q(Occitan (post 1500)),
-      q(Provencal),
       ],
    q(0328) => [
       q(Ojibwa),
@@ -1166,6 +1161,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(0351) => [
       q(Provencal, Old (to 1500)),
+      q(Occitan, Old (to 1500)),
       q(Old Provencal (to 1500)),
       q(Old Occitan (to 1500)),
       ],
@@ -1224,7 +1220,6 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(Yakut),
       ],
    q(0368) => [
-      q(South American Indian (Other)),
       q(South American Indian languages),
       ],
    q(0369) => [
@@ -1522,9 +1517,8 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(Wakashan languages),
       ],
    q(0464) => [
-      q(Walamo),
-      q(Wolaytta),
       q(Wolaitta),
+      q(Wolaytta),
       ],
    q(0465) => [
       q(Waray),
@@ -27074,13 +27068,9 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(1339),
       q(0),
       ],
-   q(bantu (other)) => [
-      q(0058),
-      q(0),
-      ],
    q(bantu languages) => [
       q(0058),
-      q(1),
+      q(0),
       ],
    q(banyjima) => [
       q(5550),
@@ -30340,10 +30330,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(creoles and pidgins) => [
       q(0099),
-      q(1),
-      ],
-   q(creoles and pidgins ) => [
-      q(0099),
       q(0),
       ],
    q(creoles and pidgins, english based) => [
@@ -30356,17 +30342,9 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(creoles and pidgins, french-based) => [
       q(0095),
-      q(1),
-      ],
-   q(creoles and pidgins, french-based ) => [
-      q(0095),
       q(0),
       ],
    q(creoles and pidgins, portuguese-based) => [
-      q(0096),
-      q(1),
-      ],
-   q(creoles and pidgins, portuguese-based ) => [
       q(0096),
       q(0),
       ],
@@ -32756,7 +32734,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(french-based creoles and pidgins) => [
       q(0095),
-      q(2),
+      q(1),
       ],
    q(friulian) => [
       q(0145),
@@ -46478,6 +46456,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(0327),
       q(0),
       ],
+   q(occitan, old (to 1500)) => [
+      q(0351),
+      q(1),
+      ],
    q(ocotepec mixtec) => [
       q(4300),
       q(0),
@@ -46724,7 +46706,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(old occitan (to 1500)) => [
       q(0351),
-      q(2),
+      q(3),
       ],
    q(old ossetic) => [
       q(5284),
@@ -46736,7 +46718,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(old provencal (to 1500)) => [
       q(0351),
-      q(1),
+      q(2),
       ],
    q(old russian) => [
       q(5302),
@@ -48332,7 +48314,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(portuguese-based creoles and pidgins) => [
       q(0096),
-      q(2),
+      q(1),
       ],
    q(potawatomi) => [
       q(5566),
@@ -48385,10 +48367,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
    q(principense) => [
       q(5587),
       q(0),
-      ],
-   q(provencal) => [
-      q(0327),
-      q(1),
       ],
    q(provencal, old (to 1500)) => [
       q(0351),
@@ -51262,13 +51240,9 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(5984),
       q(0),
       ],
-   q(south american indian (other)) => [
-      q(0368),
-      q(0),
-      ],
    q(south american indian languages) => [
       q(0368),
-      q(1),
+      q(0),
       ],
    q(south awyu) => [
       q(0977),
@@ -55506,10 +55480,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(7163),
       q(0),
       ],
-   q(walamo) => [
-      q(0464),
-      q(0),
-      ],
    q(walangama) => [
       q(4953),
       q(0),
@@ -56416,7 +56386,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(wolaitta) => [
       q(0464),
-      q(2),
+      q(0),
       ],
    q(wolane) => [
       q(7152),
@@ -62014,7 +61984,7 @@ $Locale::Codes::Data{'language'}{'code2id'} = {
          ],
       q(bnt) => [
          q(0058),
-         q(1),
+         q(0),
          ],
       q(bnu) => [
          q(1344),
@@ -64122,7 +64092,7 @@ $Locale::Codes::Data{'language'}{'code2id'} = {
          ],
       q(cpf) => [
          q(0095),
-         q(2),
+         q(1),
          ],
       q(cpg) => [
          q(1829),
@@ -64142,7 +64112,7 @@ $Locale::Codes::Data{'language'}{'code2id'} = {
          ],
       q(cpp) => [
          q(0096),
-         q(2),
+         q(1),
          ],
       q(cps) => [
          q(1833),
@@ -64226,7 +64196,7 @@ $Locale::Codes::Data{'language'}{'code2id'} = {
          ],
       q(crp) => [
          q(0099),
-         q(1),
+         q(0),
          ],
       q(crq) => [
          q(1851),
@@ -80322,7 +80292,7 @@ $Locale::Codes::Data{'language'}{'code2id'} = {
          ],
       q(pro) => [
          q(0351),
-         q(1),
+         q(2),
          ],
       q(prp) => [
          q(5596),
@@ -81550,7 +81520,7 @@ $Locale::Codes::Data{'language'}{'code2id'} = {
          ],
       q(sai) => [
          q(0368),
-         q(1),
+         q(0),
          ],
       q(saj) => [
          q(5885),

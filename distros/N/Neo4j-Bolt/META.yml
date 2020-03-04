@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/majensen/perlbolt/issues
   license: http://www.apache.org/licenses/LICENSE-2.0.txt
   repository: https://github.com/majensen/perlbolt.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

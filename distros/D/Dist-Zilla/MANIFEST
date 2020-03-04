@@ -8,6 +8,7 @@ Makefile.PL
 README
 bin/dzil
 corpus/README
+corpus/dist/AuthorDeps/LocalPlugin.pm
 corpus/dist/AuthorDeps/dist.ini
 corpus/dist/AutoPrereqs/bin/foobar
 corpus/dist/AutoPrereqs/dist.ini
@@ -208,6 +209,7 @@ t/plugins/autoname.t
 t/plugins/autoprereqs.t
 t/plugins/autoversion.t
 t/plugins/confirmrelease.t
+t/plugins/cpanfile.t
 t/plugins/distmeta-merge.t
 t/plugins/distmeta.t
 t/plugins/encoding.t

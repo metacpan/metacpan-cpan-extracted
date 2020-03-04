@@ -40,6 +40,7 @@ t/pod.t
 t/port.t
 t/prereq.t
 t/rt131347.t
+t/rt131607.t
 t/rt69509.t
 t/rt77332.t
 t/rt79214.t
@@ -48,7 +49,7 @@ t/snippets.t
 t/spelling.t
 t/strict.t
 t/sub-lang.t
-t/timezone.t
+t/time_zone.t
 t/unused.t
 t/used.t
 t/usgb.t

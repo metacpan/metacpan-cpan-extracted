@@ -277,6 +277,12 @@ t/testfiles/table-square-brackets.muse
 t/testfiles/table.exp.html
 t/testfiles/table.exp.ltx
 t/testfiles/table.muse
+t/testfiles/titles-anchors-2.exp.html
+t/testfiles/titles-anchors-2.exp.ltx
+t/testfiles/titles-anchors-2.muse
+t/testfiles/titles-anchors.exp.html
+t/testfiles/titles-anchors.exp.ltx
+t/testfiles/titles-anchors.muse
 t/testfiles/titles-short.exp.html
 t/testfiles/titles-short.exp.ltx
 t/testfiles/titles-short.muse
@@ -312,6 +318,7 @@ t/testfiles/zeros.exp.html
 t/testfiles/zeros.exp.ltx
 t/testfiles/zeros.muse
 t/text-amuse.t
+t/title-anchors.t
 t/tocs-with-fn.t
 t/tocs.t
 t/unroll.t

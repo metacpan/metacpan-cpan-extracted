@@ -6,9 +6,11 @@ package Paws::Glue::JobUpdate;
   has DefaultArguments => (is => 'ro', isa => 'Paws::Glue::GenericMap');
   has Description => (is => 'ro', isa => 'Str');
   has ExecutionProperty => (is => 'ro', isa => 'Paws::Glue::ExecutionProperty');
+  has GlueVersion => (is => 'ro', isa => 'Str');
   has LogUri => (is => 'ro', isa => 'Str');
   has MaxCapacity => (is => 'ro', isa => 'Num');
   has MaxRetries => (is => 'ro', isa => 'Int');
+  has NonOverridableArguments => (is => 'ro', isa => 'Paws::Glue::GenericMap');
   has NotificationProperty => (is => 'ro', isa => 'Paws::Glue::NotificationProperty');
   has NumberOfWorkers => (is => 'ro', isa => 'Int');
   has Role => (is => 'ro', isa => 'Str');
@@ -101,6 +103,18 @@ topic in the developer guide.
 runs allowed for this job.
 
 
+=head2 GlueVersion => Str
+
+  Glue version determines the versions of Apache Spark and Python that
+AWS Glue supports. The Python version indicates the version supported
+for jobs of type Spark.
+
+For more information about the available AWS Glue versions and
+corresponding Spark and Python versions, see Glue version
+(https://docs.aws.amazon.com/glue/latest/dg/add-job.html) in the
+developer guide.
+
+
 =head2 LogUri => Str
 
   This field is reserved for future use.
@@ -141,6 +155,11 @@ allocation.
 =head2 MaxRetries => Int
 
   The maximum number of times to retry this job if it fails.
+
+
+=head2 NonOverridableArguments => L<Paws::Glue::GenericMap>
+
+  Non-overridable arguments for this job, specified as name-value pairs.
 
 
 =head2 NotificationProperty => L<Paws::Glue::NotificationProperty>

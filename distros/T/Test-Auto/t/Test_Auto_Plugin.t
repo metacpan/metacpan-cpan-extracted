@@ -2,7 +2,10 @@ use 5.014;
 
 use lib 't/lib';
 
-use Do;
+use strict;
+use warnings;
+use routines;
+
 use Test::Auto;
 use Test::More;
 
@@ -46,11 +49,11 @@ plugins.
 
 =libraries
 
-Data::Object::Library
+Test::Auto::Types
 
 =attributes
 
-subtests: ro, req, InstanceOf["Test::Auto::Subtests"]
+subtests: ro, req, Subtests
 
 =method tests
 

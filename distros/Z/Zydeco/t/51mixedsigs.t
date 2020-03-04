@@ -15,6 +15,10 @@ package MyApp {
 		method bar2 :optimize ({$Int} $x, ArrayRef $y, HashRef *n1, ScalarRef *n2?, CodeRef $z) {
 			return [ $x, $y, $arg->n1, $arg->n2, $z ];
 		}
+		
+		method foo ($x, $, $y) {
+			return [$x, $y];
+		}
 	}
 }
 
@@ -30,5 +34,7 @@ for my $method (qw/ bar1 bar2 /) {
 
 #use B::Deparse;
 #note( B::Deparse->new->coderef2text(\&MyApp::Foo::bar2) );
+
+is_deeply( MyApp::Foo->foo(1,2,3), [1,3] );
 
 done_testing;

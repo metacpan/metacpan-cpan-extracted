@@ -8,6 +8,7 @@ SYNOPSIS
 
      my @files = File::Find::Rule->dmidecode_file->in($dir);
      my @files = File::Find::Rule->dmidecode_handle($handle)->in($dir);
+     my @files = File::Find::Rule->dmidecode_type($dmi_type)->in($dir);
 
 DESCRIPTION
     This Perl module contains File::Find::Rule rules for detecting dmidecode
@@ -33,6 +34,11 @@ SUBROUTINES
      my @files = File::Find::Rule->dmidecode_handle($handle)->in($dir);
 
     The "dmidecode_handle($handle)" rule detect dmidecode handle in file.
+
+  "dmidecode_type"
+     my @files = File::Find::Rule->dmidecode_type($dmi_type)->in($dir);
+
+    The "dmidecode_type($dmi_type)" rule detect dmidecode DMI type in file.
 
 EXAMPLE1
      use strict;
@@ -77,7 +83,30 @@ EXAMPLE2
      }
 
      # Output like:
-     # Usage: qr{[\w\/]+} dir
+     # Usage: qr{[\w\/]+} dir handle
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use File::Find::Rule;
+     use File::Find::Rule::DMIDecode;
+
+     # Arguments.
+     if (@ARGV < 2) {
+             print STDERR "Usage: $0 dir dmi_type\n";
+             exit 1;
+     }
+     my $dir = $ARGV[0];
+     my $dmi_type = $ARGV[1];
+
+     # Print all dmidecode handles in directory.
+     foreach my $file (File::Find::Rule->dmidecode_type($dmi_type)->in($dir)) {
+             print "$file\n";
+     }
+
+     # Output like:
+     # Usage: qr{[\w\/]+} dir dmi_type
 
 DEPENDENCIES
     File::Find::Rule, List::MoreUtils, Parse::DMIDecode, Perl6::Slurp.
@@ -100,5 +129,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

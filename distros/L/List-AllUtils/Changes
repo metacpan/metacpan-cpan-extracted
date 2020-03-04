@@ -1,3 +1,8 @@
+0.16    2020-02-29
+
+- Updated copied docs from other modules to their latest versions.
+
+
 0.15    2018-12-10
 
 - Require List::UtilsBy 0.11 and include the docs from that version.

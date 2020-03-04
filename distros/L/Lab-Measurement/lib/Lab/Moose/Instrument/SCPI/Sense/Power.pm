@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Sense::Power;
 #ABSTRACT: Role for the SCPI SENSe:POWer subsystem
-$Lab::Moose::Instrument::SCPI::Sense::Power::VERSION = '3.691';
+$Lab::Moose::Instrument::SCPI::Sense::Power::VERSION = '3.692';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -41,7 +41,7 @@ Lab::Moose::Instrument::SCPI::Sense::Power - Role for the SCPI SENSe:POWer subsy
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 METHODS
 
@@ -53,7 +53,7 @@ Query/Set the input attenuation.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Eugeniy E. Mikhailov
 

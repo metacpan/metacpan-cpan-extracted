@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore340;
-$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.691';
+$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.692';
 #ABSTRACT: Lakeshore Model 340 Temperature Controller
 
 use 5.010;
@@ -32,11 +32,14 @@ sub BUILD {
     $self->cls();
 }
 
+my %channel_arg = ( channel => { isa => enum( [qw/A B/] ), optional => 1 } );
+my %loop_arg = ( loop => { isa => enum( [qw/1 2/] ) } );
+
 
 sub get_T {
     my ( $self, %args ) = validated_getter(
         \@_,
-        channel => { isa => enum( [qw/A B/] ), optional => 1 }
+        %channel_arg
     );
     my $channel = delete $args{channel} // $self->input_channel();
     return $self->query( command => "KRDG? $channel", %args );
@@ -45,6 +48,160 @@ sub get_T {
 sub get_value {
     my $self = shift;
     return $self->get_T(@_);
+}
+
+
+sub get_setpoint {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %loop_arg
+    );
+    my $loop = delete $args{loop};
+    return $self->query( command => "SETP? $loop", %args );
+}
+
+sub set_setpoint {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        %loop_arg
+    );
+    my $loop = delete $args{loop};
+
+    # Device bug. The 340 cannot parse values with too many digits.
+    $value = sprintf( "%.6G", $value );
+    $self->write( command => "SETP $loop,$value", %args );
+}
+
+
+sub set_T {
+    my $self = shift;
+    $self->set_setpoint(@_);
+}
+
+
+sub set_heater_range {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [qw/0 1 2 3 4 5/] ) }
+    );
+    $self->write( command => "RANGE $value", %args );
+}
+
+sub get_heater_range {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->query( command => "RANGE?", %args );
+}
+
+
+sub set_control_mode {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [ ( 1 .. 6 ) ] ) },
+        %loop_arg
+    );
+    my $loop = delete $args{loop};
+    return $self->write( command => "CMODE $loop,$value", %args );
+}
+
+sub get_control_mode {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %loop_arg
+    );
+    my $loop = delete $args{loop};
+    return $self->query( command => "CMODE? $loop", %args );
+}
+
+
+sub set_control_parameters {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %loop_arg,
+        %channel_arg,
+        units          => { isa => enum( [qw/1 2 3/] ) },
+        state          => { isa => enum( [qw/0 1/] ) },
+        powerup_enable => { isa => enum( [qw/0 1/] ), default => 1 },
+    );
+    my $channel = delete $args{channel} // $self->input_channel();
+
+    my ( $loop, $units, $state, $powerup_enable )
+        = delete @args{qw/loop units state powerup_enable/};
+    $self->write( command => "CSET $loop, $channel, $units, $state,"
+            . "$powerup_enable", %args );
+}
+
+sub get_control_parameters {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %loop_arg
+    );
+    my $loop = delete $args{loop};
+    my $rv   = $self->query( command => "CSET? $loop", %args );
+    my @rv   = split /,/, $rv;
+    return (
+        channel        => $rv[0], units => $rv[1], state => $rv[2],
+        powerup_enable => $rv[3]
+    );
+}
+
+
+sub set_input_curve {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        %channel_arg,
+        value => { isa => enum( [ 0 .. 60 ] ) },
+    );
+    my $channel = delete $args{channel} // $self->input_channel();
+    $self->write( command => "INCRV $channel,$value", %args );
+}
+
+sub get_input_curve {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %channel_arg,
+    );
+    my $channel = delete $args{channel} // $self->input_channel();
+    return $self->query( command => "INCRV $channel", %args );
+}
+
+
+sub set_remote_mode {
+    my ( $self, $value, %args )
+        = validated_setter( \@_, value => { isa => enum( [ 1 .. 3 ] ) } );
+    $self->write( command => "MODE $value", %args );
+}
+
+sub get_remote_mode {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->query( command => "MODE?", %args );
+}
+
+
+sub set_pid {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %loop_arg,
+        P => { isa => 'Lab::Moose::PosNum' },
+        I => { isa => 'Lab::Moose::PosNum' },
+        D => { isa => 'Lab::Moose::PosNum' }
+    );
+    my ( $loop, $P, $I, $D ) = delete @args{qw/loop P I D/};
+    $self->write(
+        command => sprintf( "PID $loop %f.1 %f.1 %d", $P, $I, $D ),
+        %args
+    );
+}
+
+sub get_pid {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %loop_arg
+    );
+    my $loop = delete $args{loop};
+    my $pid = $self->query( command => "PID? $loop", %args );
+    my %pid;
+    @pid{qw/P I D/} = split /,/, $pid;
+    return %pid;
 }
 
 
@@ -64,7 +221,7 @@ Lab::Moose::Instrument::Lakeshore340 - Lakeshore Model 340 Temperature Controlle
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 SYNOPSIS
 
@@ -95,6 +252,61 @@ C<$channel> can be 'A' or 'B'. The default can be set in the constructor.
 
 alias for C<get_T>.
 
+=head2 set_setpoint/get_setpoint
+ # set/get SP for loop 1 in whatever units the setpoint is using
+ $lakeshore->set_setpoint(value => 10, loop => 1); 
+ my $setpoint1 = $lakeshore->get_setpoint(loop => 1);
+
+=head2 set_T
+
+alias for C<set_setpoint>
+
+=head2 set_heater_range/get_heater_range
+
+ $lakeshore->set_heater_range(value => 1);
+ my $range = $lakeshore->get_heater_range();
+
+Value is one of 0 (OFF),1,...,5 (MAX)
+
+=head2 set_control_mode/get_control_mode
+
+Specifies the control mode. Valid entries: 1 = Manual PID, 2 = Zone,
+ 3 = Open Loop 4 = AutoTune PID, 5 = AutoTune PI, 6 = AutoTune P.
+
+ # Set loop 1 to manual PID
+ $lakeshore->set_control_mode(value => 1, loop => 1);
+ my $cmode = $lakeshore->get_control_mode(loop => 1);
+
+=head2 set_control_parameters/get_control_parameters
+
+ $lakeshore->set_control_parameters(
+    loop => 1,
+    input => 'A',
+    units => 1, # 1 = Kelvin, 2 = Celsius, 3 = sensor units
+    state => 1, # 0 = off, 1 = on
+    powerup_enable => 1, # 0 = off, 1 = on, optional with default = off
+ );
+ my %args = $lakeshore->get_control_parameters(loop => 1);
+
+=head2 set_input_curve/get_input_curve
+
+ # Set channel 'B' to use curve 25
+ $lakeshore->set_input_curve(channel => 'B', value => 25);
+ my $curve = $lakeshore->get_input_curve(channel => 'B');
+
+=head2 set_remote_mode/get_remote_mode
+
+ $lakeshore->set_remote_mode(value => 1);
+ my $mode = $lakeshore->get_remote_mode();
+
+Valid entries: 1 = local, 2 = remote, 3 = remote with local lockout.
+
+=head2 set_pid/get_pid
+
+ $lakeshore->set_pid(loop => 1, P => 1, I => 50, D => 50)
+ my %PID = $lakeshore->get_pid(loop => 1);
+ # %PID = (P => $P, I => $I, D => $D);
+
 =head2 Consumed Roles
 
 This driver consumes the following roles:
@@ -107,9 +319,10 @@ This driver consumes the following roles:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
+            2020       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

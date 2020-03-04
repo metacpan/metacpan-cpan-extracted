@@ -32,7 +32,7 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::S3::ObjectI
 
 =head1 DESCRIPTION
 
-This class has no description
+Object Identifier is unique value to identify objects.
 
 =head1 ATTRIBUTES
 

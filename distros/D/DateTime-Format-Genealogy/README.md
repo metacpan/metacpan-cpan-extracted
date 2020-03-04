@@ -4,7 +4,7 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
@@ -16,8 +16,12 @@ Creates a DateTime::Format::Genealogy object.
 
 ## parse\_datetime($string)
 
-Given a date, runs it through [Genealogy::Gedcom::Date](https://metacpan.org/pod/Genealogy::Gedcom::Date) to create a [DateTime](https://metacpan.org/pod/DateTime) object.
+Given a date,
+runs it through [Genealogy::Gedcom::Date](https://metacpan.org/pod/Genealogy%3A%3AGedcom%3A%3ADate) to create a [DateTime](https://metacpan.org/pod/DateTime) object.
 If a date range is given, return a two element array in array context, or undef in scalar context
+
+Returns undef if the date can't be parsed, is just a year or if it is an appoximate date starting with "c", "ca" or "abt".
+Can be called as a class or object method.
 
 # AUTHOR
 
@@ -27,7 +31,7 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 # SEE ALSO
 
-[Genealogy::Gedcom::Date](https://metacpan.org/pod/Genealogy::Gedcom::Date) and
+[Genealogy::Gedcom::Date](https://metacpan.org/pod/Genealogy%3A%3AGedcom%3A%3ADate) and
 [DateTime](https://metacpan.org/pod/DateTime)
 
 # SUPPORT
@@ -42,20 +46,12 @@ You can also look for information at:
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Gedcom](http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Gedcom)
 
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/DateTime-Format-Gedcom](http://annocpan.org/dist/DateTime-Format-Gedcom)
-
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/DateTime-Format-Gedcom](http://cpanratings.perl.org/d/DateTime-Format-Gedcom)
 
-- Search CPAN
-
-    [http://search.cpan.org/dist/DateTime-Format-Gedcom/](http://search.cpan.org/dist/DateTime-Format-Gedcom/)
-
 # LICENSE AND COPYRIGHT
 
-Copyright 2018 Nigel Horne.
+Copyright 2018-2020 Nigel Horne.
 
 This program is released under the following licence: GPL

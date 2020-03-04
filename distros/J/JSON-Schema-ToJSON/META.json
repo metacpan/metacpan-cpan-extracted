@@ -4,7 +4,7 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,13 +32,14 @@
       },
       "runtime" : {
          "requires" : {
+            "B" : "0",
             "Cpanel::JSON::XS" : "3.0213",
             "Data::Dump" : "0",
             "Data::Fake" : "0.004",
             "File::Slurper" : "0",
             "FindBin" : "0",
             "Hash::Merge" : "0",
-            "JSON::Validator" : "1.08",
+            "JSON::Validator" : "3.23",
             "Mojolicious" : "7.15",
             "String::Random" : "0.29",
             "YAML::XS" : "0",
@@ -64,6 +65,6 @@
          "url" : "https://github.com/Humanstate/json-schema-tojson"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

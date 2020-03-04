@@ -1,11 +1,21 @@
 package Test::Auto::Document;
 
-use Data::Object 'Class', 'Test::Auto::Types';
+use strict;
+use warnings;
 
+use Data::Object::Class;
+use Data::Object::Attributes;
 use Type::Registry;
 use Test::More;
 
-our $VERSION = '0.05'; # VERSION
+use registry 'Test::Auto::Types';
+use routines;
+
+require Carp;
+
+our $VERSION = '0.07'; # VERSION
+
+# ATTRIBUTES
 
 has content => (
   is => 'ro',
@@ -428,7 +438,7 @@ method templated($content) {
 
   return $content unless $template;
 
-  open my $fh, "<", $template or raise "Can't open $template: $!";
+  open my $fh, "<", $template or Carp::confess "Can't open $template: $!";
 
   my $output = join "", <$fh>;
 
@@ -508,7 +518,7 @@ POD document.
 
 This package uses type constraints from:
 
-L<Data::Object::Library>
+L<Test::Auto::Types>
 
 =cut
 
@@ -528,9 +538,9 @@ This attribute is read-only, accepts C<(ArrayRef[Str])> values, and is optional.
 
 =head2 parser
 
-  parser(InstanceOf["Test::Auto::Parser"])
+  parser(Parser)
 
-This attribute is read-only, accepts C<(InstanceOf["Test::Auto::Parser"])> values, and is required.
+This attribute is read-only, accepts C<(Parser)> values, and is required.
 
 =cut
 

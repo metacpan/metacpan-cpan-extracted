@@ -6,12 +6,17 @@
 
     <title>Minion | Overview <%= title() %></title>
 
-    %= stylesheet 'https://use.fontawesome.com/releases/v5.9.0/css/all.css'
-    %= stylesheet 'https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css'
+    %= stylesheet '//use.fontawesome.com/releases/v5.9.0/css/all.css'
+    %= stylesheet '//stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css'
+
+    %= content_for 'stylesheet'
 </head>
 <body class="bg-light">
     <div class="container mb-5">
         <div class="d-flex align-items-center py-4 border-bottom border-muted">
+            <a href="<%= url_for($return_to) %>">
+                <i class="fa fa-home"></i>
+            </a>
             <h4 class="mb-0 ml-3"><strong>Minion</strong> | <i class="fa fa-puzzle-piece"></i> Overview</h4>
         </div>
 
@@ -53,8 +58,9 @@
         </div>
     </div>
 
-    %= javascript 'https://code.jquery.com/jquery-3.4.1.slim.min.js'
-    %= javascript 'https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js'
-    %= content_for 'head'
+    %= javascript '//code.jquery.com/jquery-3.4.1.min.js'
+    %= javascript '//stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js'
+
+    %= content_for 'javascript'
 </body>
 </html>

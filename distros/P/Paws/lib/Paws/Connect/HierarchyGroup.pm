@@ -35,36 +35,34 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::Connect::Hi
 
 =head1 DESCRIPTION
 
-A C<HierarchyGroup> object that contains information about a hierarchy
-group in your Amazon Connect instance.
+Contains information about a hierarchy group.
 
 =head1 ATTRIBUTES
 
 
 =head2 Arn => Str
 
-  The Amazon Resource Name (ARN) for the hierarchy group.
+  The Amazon Resource Name (ARN) of the hierarchy group.
 
 
 =head2 HierarchyPath => L<Paws::Connect::HierarchyPath>
 
-  A C<HierarchyPath> object that contains information about the levels in
-the hierarchy group.
+  Information about the levels in the hierarchy group.
 
 
 =head2 Id => Str
 
-  The identifier for the hierarchy group.
+  The identifier of the hierarchy group.
 
 
 =head2 LevelId => Str
 
-  The identifier for the level in the hierarchy group.
+  The identifier of the level in the hierarchy group.
 
 
 =head2 Name => Str
 
-  The name of the hierarchy group in your instance.
+  The name of the hierarchy group.
 
 
 

@@ -2,11 +2,16 @@
 db: sqlite:<: "<: $DATA_DIR :>/db.sqlite" | raw :>
 # db: pgsql://postgres:1@devel?db=test
 
-smtp:
-    username: no-reply@softvisio.net
-    password:
-    host: smtp.gmail.com
-    port: 465
-    tls: 1
-    to:
-    cc:
+# load_balancer:
+#     server_name:
+#         - devel
+#         - domain.com
+
+# smtp:
+#     username: no-reply@softvisio.net
+#     password:
+#     host: smtp.gmail.com
+#     port: 465
+#     tls: 1
+#     to:
+#     cc:

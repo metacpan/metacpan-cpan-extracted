@@ -1,0 +1,32 @@
+0.006   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Always test validated value (use original value if
+	  validated_value is not specified).
+
+
+0.005   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Look at example's 'validated_value' instead of 'res' (but 'res'
+	  is still supported for now).
+
+
+0.004   2020-03-04  Released-By: PERLANCAR; Urgency: high
+
+	- Regain backward compatibility, also look at example's 'data' if
+	  'value' is not available.
+
+
+0.003   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Use examples's 'value' instead of 'data'.
+
+
+0.002   2020-03-03  Released-By: PERLANCAR; Urgency: medium
+
+	- CLI now accepts and respects arguments/options
+	  (--include-modules, --exclude-modules).
+
+
+0.001   2020-03-01  Released-By: PERLANCAR
+
+        - First release.

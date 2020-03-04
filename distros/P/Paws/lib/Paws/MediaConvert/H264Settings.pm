@@ -83,9 +83,9 @@ visual quality.
 
 =head2 Bitrate => Int
 
-  Average bitrate in bits/second. Required for VBR and CBR. For MS Smooth
-outputs, bitrates must be unique when rounded down to the nearest
-multiple of 1000.
+  Specify the average bitrate in bits per second. Required for VBR and
+CBR. For MS Smooth outputs, bitrates must be unique when rounded down
+to the nearest multiple of 1000.
 
 
 =head2 CodecLevel => Str
@@ -296,7 +296,12 @@ define Rate control mode.
 
 =head2 SceneChangeDetect => Str
 
-  Scene change detection (inserts I-frames on scene changes).
+  Enable this setting to insert I-frames at scene changes that the
+service automatically detects. This improves video quality and is
+enabled by default. If this output uses QVBR, choose Transition
+detection (TRANSITION_DETECTION) for further video quality improvement.
+For more information about QVBR, see
+https://docs.aws.amazon.com/console/mediaconvert/cbr-vbr-qvbr.
 
 
 =head2 Slices => Int

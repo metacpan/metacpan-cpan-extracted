@@ -299,7 +299,7 @@ sub next_test {
 
 # Do not touch this method, *EVER*, it is needed for back compat.
 ## addendum: we had to split this method so we could have backwards
-## compatability.  otherwise, we'd have no way to pass stuff from __DATA__
+## compatibility.  otherwise, we'd have no way to pass stuff from __DATA__
 
 sub render_file {
     my ( $self, $file, $path, $vars, $perms ) = @_;
@@ -670,7 +670,7 @@ These are the methods that the Helper classes can call on the
 =head2 render_file ($file, $path, $vars, $perms)
 
 Render and create a file from a template in DATA using Template
-Toolkit. $file is the relevent chunk of the __DATA__ section, $path is
+Toolkit. $file is the relevant chunk of the __DATA__ section, $path is
 the path to the file, $vars is the hashref as expected by
 L<Template Toolkit|Template> and $perms are desired permissions (or system
 defaults if not set).

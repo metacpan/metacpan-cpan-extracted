@@ -2,7 +2,10 @@ use 5.014;
 
 use lib 't/lib';
 
-use Do;
+use strict;
+use warnings;
+use routines;
+
 use Test::Auto;
 use Test::More;
 
@@ -37,7 +40,7 @@ for accessing the data.
 
 =libraries
 
-Data::Object::Library
+Test::Auto::Types
 
 =attributes
 
@@ -52,7 +55,7 @@ attributes: ro, opt, ArrayRef[Str]
 libraries: ro, opt, ArrayRef[Str]
 headers: ro, opt, ArrayRef[Str]
 footers: ro, opt, ArrayRef[Str]
-source: ro, req, InstanceOf["Test::Auto"]
+source: ro, req, Source
 
 =cut
 

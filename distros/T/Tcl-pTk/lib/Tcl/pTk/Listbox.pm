@@ -2,7 +2,7 @@
 
 package Tcl::pTk::Listbox;
 
-our ($VERSION) = ('1.02');
+our ($VERSION) = ('1.03');
 
 @Tcl::pTk::Listbox::ISA = (Tcl::pTk::Widget);
 
@@ -10,7 +10,7 @@ use strict;
 
 use Carp;
 
-# Overriden version of configure that handles storing and tie-ing the  any -listvariable option,
+# Overridden version of configure that handles storing and tie-ing the  any -listvariable option,
 sub configure{
         my $self = shift;
         

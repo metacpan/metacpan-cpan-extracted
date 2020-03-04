@@ -1,7 +1,7 @@
 package Perinci::Sub::Complete;
 
-our $DATE = '2019-12-18'; # DATE
-our $VERSION = '0.941'; # VERSION
+our $DATE = '2020-03-04'; # DATE
+our $VERSION = '0.942'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1078,7 +1078,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.941 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2019-12-18.
+This document describes version 0.942 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2020-03-04.
 
 =head1 SYNOPSIS
 
@@ -1186,6 +1186,7 @@ See the C<riap_client> argument.
 
 Word to be completed.
 
+
 =back
 
 Return value:  (array)
@@ -1279,6 +1280,7 @@ See the C<riap_client> argument.
 =item * B<word> => I<str> (default: "")
 
 Word to be completed.
+
 
 =back
 
@@ -1377,6 +1379,7 @@ See the C<riap_client> argument.
 =item * B<word> => I<str> (default: "")
 
 Word to be completed.
+
 
 =back
 
@@ -1503,6 +1506,7 @@ See the C<riap_client> argument.
 
 Command-line arguments.
 
+
 =back
 
 Return value:  (hash)
@@ -1534,11 +1538,13 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
-Must be normalized.
+Will be normalized, unless when C<schema_is_normalized> is set to true, in which
+case schema must already be normalized.
 
 =item * B<schema_is_normalized> => I<bool> (default: 0)
 
 =item * B<word>* => I<str> (default: "")
+
 
 =back
 
@@ -1583,7 +1589,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

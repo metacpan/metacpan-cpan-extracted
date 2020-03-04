@@ -3,6 +3,7 @@ package Paws::CloudTrail::Trail;
   has CloudWatchLogsLogGroupArn => (is => 'ro', isa => 'Str');
   has CloudWatchLogsRoleArn => (is => 'ro', isa => 'Str');
   has HasCustomEventSelectors => (is => 'ro', isa => 'Bool');
+  has HasInsightSelectors => (is => 'ro', isa => 'Bool');
   has HomeRegion => (is => 'ro', isa => 'Str');
   has IncludeGlobalServiceEvents => (is => 'ro', isa => 'Bool');
   has IsMultiRegionTrail => (is => 'ro', isa => 'Bool');
@@ -67,6 +68,12 @@ to a user's log group.
   Specifies if the trail has custom event selectors.
 
 
+=head2 HasInsightSelectors => Bool
+
+  Specifies whether a trail has insight types specified in an
+C<InsightSelector> list.
+
+
 =head2 HomeRegion => Str
 
   The region in which the trail was created.
@@ -80,7 +87,7 @@ as IAM. Otherwise, B<False>.
 
 =head2 IsMultiRegionTrail => Bool
 
-  Specifies whether the trail belongs only to one region or exists in all
+  Specifies whether the trail exists only in one region or exists in all
 regions.
 
 
@@ -113,7 +120,7 @@ characters.
 
   Name of the Amazon S3 bucket into which CloudTrail delivers your trail
 files. See Amazon S3 Bucket Naming Requirements
-(http://docs.aws.amazon.com/awscloudtrail/latest/userguide/create_trail_naming_policy.html).
+(https://docs.aws.amazon.com/awscloudtrail/latest/userguide/create_trail_naming_policy.html).
 
 
 =head2 S3KeyPrefix => Str
@@ -121,7 +128,7 @@ files. See Amazon S3 Bucket Naming Requirements
   Specifies the Amazon S3 key prefix that comes after the name of the
 bucket you have designated for log file delivery. For more information,
 see Finding Your CloudTrail Log Files
-(http://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-find-log-files.html).The
+(https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-find-log-files.html).The
 maximum length is 200 characters.
 
 
@@ -136,7 +143,7 @@ C<arn:aws:sns:us-east-2:123456789012:MyTopic>
 
 =head2 SnsTopicName => Str
 
-  This field is deprecated. Use SnsTopicARN.
+  This field is no longer in use. Use SnsTopicARN.
 
 
 =head2 TrailARN => Str

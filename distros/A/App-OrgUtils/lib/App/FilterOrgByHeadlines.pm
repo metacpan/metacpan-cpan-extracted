@@ -1,7 +1,7 @@
 package App::FilterOrgByHeadlines;
 
-our $DATE = '2020-02-06'; # DATE
-our $VERSION = '0.472'; # VERSION
+our $DATE = '2020-02-28'; # DATE
+our $VERSION = '0.473'; # VERSION
 
 use 5.010;
 use strict;
@@ -301,7 +301,7 @@ App::FilterOrgByHeadlines - Filter Org by headlines
 
 =head1 VERSION
 
-This document describes version 0.472 of App::FilterOrgByHeadlines (from Perl distribution App-OrgUtils), released on 2020-02-06.
+This document describes version 0.473 of App::FilterOrgByHeadlines (from Perl distribution App-OrgUtils), released on 2020-02-28.
 
 =head1 FUNCTIONS
 

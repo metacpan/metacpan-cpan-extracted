@@ -2,7 +2,10 @@ use 5.014;
 
 use lib 't/lib';
 
-use Do;
+use strict;
+use warnings;
+use routines;
+
 use Test::Auto;
 use Test::More;
 
@@ -64,11 +67,11 @@ subtests.
 
 =libraries
 
-Data::Object::Library
+Test::Auto::Types
 
 =attributes
 
-parser: ro, req, InstanceOf["Test::Auto::Parser"]
+parser: ro, req, Parser
 
 =method attributes
 
@@ -268,7 +271,7 @@ standard subtests.
 
 =signature standard
 
-standard() : InstanceOf["Test::Auto::Subtests"]
+standard() : Subtests
 
 =example-1 standard
 
@@ -311,7 +314,7 @@ scenario(Str $name, CodeRef $callback) : Any
 
   my $subtests = $test->subtests;
 
-  $subtests->scenario('testauto', sub {
+  $subtests->scenario('exports', sub {
     my ($tryable) = @_;
 
     ok my $result = $tryable->result, 'result ok';

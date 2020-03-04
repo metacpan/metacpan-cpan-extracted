@@ -46,13 +46,13 @@ LIBRARIES
 
     This package uses type constraints from:
 
-    Data::Object::Library
+    Test::Auto::Types
 
 SCENARIOS
 
     This package supports the following scenarios:
 
- testauto
+ exports
 
       use Test::Auto;
       use Test::More;
@@ -76,10 +76,9 @@ ATTRIBUTES
 
  data
 
-      data(DataObject)
+      data(Data)
 
-    This attribute is read-only, accepts (DataObject) values, and is
-    optional.
+    This attribute is read-only, accepts (Data) values, and is optional.
 
  file
 
@@ -93,7 +92,7 @@ FUNCTIONS
 
  testauto
 
-      testauto(Str $file) : InstanceOf["Test::Auto::Subtests"]
+      testauto(Str $file) : Subtests
 
     This function is exported automatically and returns a
     Test::Auto::Subtests object for the test file given.
@@ -110,7 +109,7 @@ METHODS
 
  document
 
-      document() : InstanceOf["Test::Auto::Document"]
+      document() : Document
 
     This method returns a Test::Auto::Document object.
 
@@ -122,7 +121,7 @@ METHODS
 
  parser
 
-      parser() : InstanceOf["Test::Auto::Parser"]
+      parser() : Parser
 
     This method returns a Test::Auto::Parser object.
 
@@ -134,7 +133,7 @@ METHODS
 
  subtests
 
-      subtests() : InstanceOf["Test::Auto::Subtests"]
+      subtests() : Subtests
 
     This method returns a Test::Auto::Subtests object.
 
@@ -190,7 +189,7 @@ SPECIFICATION
       =type-library $name
       =type-composite $name # [optional]
       =type-parent $name # [optional]
-      =type-coercion $name # [optional]
+      =type-coercion-$number $name # [optional]
       =type-example-$number $name # [repeatable]
 
     The specification is designed to accommodate typical package

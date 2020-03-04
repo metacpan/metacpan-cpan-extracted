@@ -598,8 +598,11 @@ sub tex {
                      );
     }
     $self->purge('.tex');
-    $self->_process_template($self->templates->latex,
-                             $self->_prepare_tex_tokens(%arguments),
+    my $template_body = $self->templates->latex;
+    $self->_process_template($template_body,
+                             $self->_prepare_tex_tokens(%arguments,
+                                                        template_body => $template_body,
+                                                       ),
                              $texfile);
 }
 
@@ -624,8 +627,11 @@ sub sl_tex {
     $self->purge('.sl.tex');
     my $texfile = $self->name . '.sl.tex';
     return unless $self->wants_slides;
-    return $self->_process_template($self->templates->slides,
-                                    $self->_prepare_tex_tokens(is_slide => 1),
+    my $template_body = $self->templates->slides;
+    return $self->_process_template($template_body,
+                                    $self->_prepare_tex_tokens(is_slide => 1,
+                                                               template_body => $template_body,
+                                                              ),
                                     $texfile);
 }
 
@@ -1222,6 +1228,8 @@ sub _prepare_tex_tokens {
     my ($self, %args) = @_;
     my $doc = $self->document;
     my $is_slide = delete $args{is_slide};
+    my $template_body = delete $args{template_body};
+    die "Missing required argument template_body " unless $template_body;
     my %tokens = %{ $self->tex_options };
     my $escaped_args = $self->_escape_options_hashref(ltx => \%args);
     foreach my $k (keys %$escaped_args) {
@@ -1261,9 +1269,21 @@ sub _prepare_tex_tokens {
         $parsed{monofont} = $fonts->mono->name;
         $parsed{fontsize} = $fonts->size;
 
+    my $latex_body = $self->_interpolate_magic_comments($template_options->format_id, $doc);
+    my $enable_secondary_footnotes = $latex_body =~ m/\\footnoteB\{/;
+
+    # check if the template body support this conditional, which is new. If not,
+    # always setup bigfoot
+    # print "SECONDARY FOOTNOTES ENABLED? $enable_secondary_footnotes\n";
+    if (index($$template_body, '[% IF enable_secondary_footnotes %]', 0) < 0) {
+        $enable_secondary_footnotes = 1;
+    }
+    # print "SECONDARY FOOTNOTES ENABLED? $enable_secondary_footnotes\n";
+
     my $tex_setup_langs = $fonts
       ->compose_polyglossia_fontspec_stanza(lang => $doc->language,
                                             others => $doc->other_languages || [],
+                                            enable_secondary_footnotes => $enable_secondary_footnotes,
                                             bidi => $doc->is_bidi,
                                             is_slide => $is_slide,
                                            );
@@ -1288,8 +1308,8 @@ sub _prepare_tex_tokens {
             safe_options => \%parsed,
             doc => $doc,
             tex_setup_langs => $tex_setup_langs,
-            latex_body => $self->_interpolate_magic_comments($template_options->format_id, $doc),
-            disable_bigfoot => 0, # $doc->is_rtl || $doc->is_bidi,
+            latex_body => $latex_body,
+            enable_secondary_footnotes => $enable_secondary_footnotes,
             tex_metadata => $self->file_header->tex_metadata,
            };
 }

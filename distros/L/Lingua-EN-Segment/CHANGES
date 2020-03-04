@@ -1,3 +1,15 @@
+0.004 29-02-2020
+    [Documentation]
+        Fixed a broken POD link. This is
+        https://github.com/skington/lingua-en-segment/pull/3
+
+    [Packaging]
+        Removed a nytprof.out file that was left in the previous tarball
+        by accident. This is RT#130257
+
+    [Meta]
+        Point people to the GitHub issue tracker rather than RT.
+
 0.003 09-01-2018
     [Documentation]
         Fixed a missed method rename in the synopsis - thanks

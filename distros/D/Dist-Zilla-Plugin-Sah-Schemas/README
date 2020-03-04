@@ -3,9 +3,9 @@ NAME
     Sah-Schemas-* distribution
 
 VERSION
-    This document describes version 0.016 of
+    This document describes version 0.017 of
     Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution
-    Dist-Zilla-Plugin-Sah-Schemas), released on 2019-11-28.
+    Dist-Zilla-Plugin-Sah-Schemas), released on 2020-03-02.
 
 SYNOPSIS
     In dist.ini:
@@ -13,16 +13,19 @@ SYNOPSIS
      [Sah::Schemas]
 
 DESCRIPTION
-    This plugin is to be used when building "Sah-Schemas-*" distribution. It
-    currently does the following to "lib/Sah/Schemas/*" .pm files:
+    This plugin is to be used when building "Sah-Schemas-*" distribution.
 
-    *
-
-    It does the following to "lib/Sah/Schema/*" .pm files:
+    It adds xt/release/sah-schema.t which does the following:
 
     *   Check that schema is already normalized
 
-        Otherwise, the build is aborted.
+    *   Test examples in schema
+
+    It does the following to every "lib/Sah/Schemas/*" .pm file:
+
+    *
+
+    It does the following to every "lib/Sah/Schema/*" .pm file:
 
     *   Set module abstract from the schema's summary
 
@@ -63,7 +66,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

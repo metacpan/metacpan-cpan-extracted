@@ -1,42 +1,48 @@
 package Path::Dispatcher::Match;
-use Any::Moose;
+# ABSTRACT: the result of a successful rule match
 
+our $VERSION = '1.07';
+
+use Moo;
+
+use Type::Utils qw(class_type);
+use Types::Standard qw(Str ArrayRef HashRef Undef);
 use Path::Dispatcher::Path;
 use Path::Dispatcher::Rule;
 
 has path => (
     is       => 'ro',
-    isa      => 'Path::Dispatcher::Path',
+    isa      => class_type('Path::Dispatcher::Path'),
     required => 1,
 );
 
 has leftover => (
     is  => 'ro',
-    isa => 'Str',
+    isa => Str,
 );
 
 has rule => (
     is       => 'ro',
-    isa      => 'Path::Dispatcher::Rule',
+    isa      => class_type('Path::Dispatcher::Rule'),
     required => 1,
     handles  => ['payload'],
 );
 
 has positional_captures => (
     is      => 'ro',
-    isa     => 'ArrayRef[Str|Undef]',
+    isa     => ArrayRef[Str|Undef],
     default => sub { [] },
 );
 
 has named_captures => (
     is      => 'ro',
-    isa     => 'HashRef[Str|Undef]',
+    isa     => HashRef[Str|Undef],
     default => sub { {} },
 );
 
 has parent => (
     is        => 'ro',
-    isa       => 'Path::Dispatcher::Match',
+    isa      => class_type('Path::Dispatcher::Match'),
     predicate => 'has_parent',
 );
 
@@ -65,15 +71,23 @@ sub named {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
+no Moo;
 
 1;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Path::Dispatcher::Match - the result of a successful rule match
+
+=head1 VERSION
+
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -142,5 +156,20 @@ Executes the rule's codeblock with the same arguments.
 
 Returns the C<$i>th positional capture, 1-indexed.
 
-=cut
+=head1 SUPPORT
 
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Dispatcher>
+(or L<bug-Path-Dispatcher@rt.cpan.org|mailto:bug-Path-Dispatcher@rt.cpan.org>).
+
+=head1 AUTHOR
+
+Shawn M Moore, C<< <sartak at bestpractical.com> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Shawn M Moore.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

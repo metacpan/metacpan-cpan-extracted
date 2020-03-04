@@ -16,6 +16,7 @@ lib/Mojolicious/Plugin/Moai.pm
 lib/Mojolicious/Plugin/Moai/resources/bootstrap4/templates/moai/lib.html.ep
 lib/Mojolicious/Plugin/Moai/resources/bootstrap4/templates/moai/lib/javascript.html.ep
 lib/Mojolicious/Plugin/Moai/resources/bootstrap4/templates/moai/lib/stylesheet.html.ep
+lib/Mojolicious/Plugin/Moai/resources/bootstrap4/templates/moai/menu/buttons.html.ep
 lib/Mojolicious/Plugin/Moai/resources/bootstrap4/templates/moai/menu/navbar.html.ep
 lib/Mojolicious/Plugin/Moai/resources/bootstrap4/templates/moai/pager.html.ep
 lib/Mojolicious/Plugin/Moai/resources/bootstrap4/templates/moai/pager/mini.html.ep

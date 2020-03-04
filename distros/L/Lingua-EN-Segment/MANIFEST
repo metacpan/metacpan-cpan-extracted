@@ -9,7 +9,6 @@ README
 README.md
 dist.ini
 lib/Lingua/EN/Segment.pm
-nytprof.out
 share/count_1w.txt
 share/count_2w.txt
 t/pod.t

@@ -1,3 +1,88 @@
+1.000006  2020-03-03 15:32:49-08:00 America/Los_Angeles
+
+    - Provide methods in TestFile that let you get/set retry
+
+1.000005  2020-03-02 14:48:40-08:00 America/Los_Angeles
+
+    - Use --qvf in test.pl for better output
+    - Use -r1 in test.pl temporarily for some cpantesters
+
+1.000004  2020-03-02 10:05:10-08:00 America/Los_Angeles
+
+    - Switch away from sys-io in Util::File::Stream
+    - Properly wrap FLOCK to handle interrupted syscalls
+    - Remove unnecessary IPC::Open3 dep
+    - Remove unnecessary Module::Pluggable dep
+    - Add missing require statement
+
+1.000003  2020-03-01 21:50:08-08:00 America/Los_Angeles
+
+    - Do not run persistent tests in AUTOMATED_TESTING
+
+1.000002  2020-03-01 21:19:04-08:00 America/Los_Angeles
+
+    - Fix integration tests IO issues
+
+1.000001  2020-02-29 10:49:11-08:00 America/Los_Angeles
+
+    - Do not run tests on broken NJH smokers
+
+1.000000  2020-02-28 09:30:47-08:00 America/Los_Angeles
+
+    - No changes since last trial release
+    - This is the first stable release
+    - Huge changes/refactor from the alpha versions
+
+0.999010  2020-02-27 21:52:25-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Make signals.t author-testing
+    - Cleanup failure-test
+    - Show timeout delta when timing out a test
+
+0.999009  2020-02-27 07:27:29-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix sorting in ordering tests
+    - Fix incorrect line numbers in plugin.t errors
+    - Less fragile fork check in Makefile.PL
+
+0.999008  2020-02-26 20:25:34-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Only officially support systems with true fork().
+
+0.999007  2020-02-26 16:52:46-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix IOStream permissions issues
+
+0.999006  2020-02-26 15:39:28-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Do not use IOEvents by default
+
+0.999005  2020-02-25 14:02:01-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Remove blib from tarball
+    - Fix tests when outdated plugins are present
+
+0.999004  2020-02-25 07:48:30-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Warn+Skip when auto-loading outdated plugins
+
+0.999003  2020-02-24 14:51:18-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix older perls (down to 5.10)
+
+0.999002  2020-02-24 08:56:06-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix installation when an old yath is installed
+
+0.999001  2020-02-23 15:42:47-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Attempt to fix includes integration test
+
+0.999000  2020-02-23 10:19:36-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Huge refactor
+    - Fix signal restoration for forked tests
+
 0.001099  2019-09-09 21:12:15-07:00 America/Los_Angeles
 
     - Add --durations and --maybe_durations options

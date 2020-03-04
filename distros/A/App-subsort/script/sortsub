@@ -3,13 +3,14 @@
 ## no critic: (InputOutput::ProhibitReadlineInForLoop)
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-27'; # DATE
+our $DATE = '2020-02-28'; # DATE
 our $DIST = 'App-subsort'; # DIST
-our $VERSION = '0.044'; # VERSION
+our $VERSION = '0.045'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
+use Log::ger;
 
 use Complete::Util qw(arrayify_answer);
 use Getopt::Long::More;
@@ -20,7 +21,7 @@ my %opts = (
     reverse => 0,
     key => undef,
 );
-my $routine;
+my ($routine, $meta);
 my $routine_args = {};
 my @files;
 my $res = GetOptions(
@@ -162,12 +163,14 @@ _
 exit 1 unless $res;
 
 die "subsort: Please specify routine to use\n" unless defined $routine;
+$routine =~ s/-/_/g; # ux
 
-$routine = Sort::Sub::get_sorter(
+($routine, $meta) = Sort::Sub::get_sorter(
     "$routine".
         ($routine =~ /</ ? '' :
          "<".($opts{ignore_case} ? "i":"").($opts{reverse} ? "r":"").">"),
     $routine_args,
+    "with meta",
 );
 @ARGV = @files;
 if (defined $opts{key}) {
@@ -178,12 +181,32 @@ if (defined $opts{key}) {
     my @sorted_indices = sort {
         local $main::a = $keys[$a];
         local $main::b = $keys[$b];
-        $routine->($main::a, $main::b);
+        if ($meta->{compares_record}) {
+            $main::a = [$main::a, $_];
+            $main::b = [$main::b, $_];
+        }
+        my $res = $routine->($main::a, $main::b);
+        log_trace "Comparing keys %s and %s: %d",
+            $main::a, $main::b, $res;
+        $res;
     } 0..$#lines;
     say $lines[$_] for @sorted_indices;
 } else {
-    for (sort {&{$routine}} map {chomp;$_} <>) {
-        say $_;
+    my $i = 0;
+    for (sort {
+        my $res;
+        if ($meta->{compares_record}) {
+            $res = $routine->($main::a, $main::b);
+            log_trace "Comparing data records %s and %s: %d",
+                $main::a, $main::b, $res;
+        } else {
+            $res = $routine->($main::a->[0], $main::b->[0]);
+            log_trace "Comparing data items %s and %s: %d",
+                $main::a->[0], $main::b->[0], $res;
+        }
+        $res;
+    } map {chomp; [$_, $i++]} <>) {
+        say $_->[0];
     }
 }
 
@@ -202,7 +225,7 @@ sortsub - Sort lines of text using Sort::Sub routines
 
 =head1 VERSION
 
-This document describes version 0.044 of sortsub (from Perl distribution App-subsort), released on 2019-12-27.
+This document describes version 0.045 of sortsub (from Perl distribution App-subsort), released on 2020-02-28.
 
 =head1 SYNOPSIS
 
@@ -214,6 +237,11 @@ Examples:
  % subsort naturally -r data.txt
  % subsort 'naturally<r>' data.txt
  % some-cmd | subsort by_several -A first='by_length<r>' -A second=numerically data.txt
+
+Some other examples:
+
+ # like Unix's tac
+ % subsort record-by-reverse-order data.txt
 
 To list all available routines:
 
@@ -299,7 +327,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

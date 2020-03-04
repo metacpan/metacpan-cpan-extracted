@@ -16,10 +16,10 @@ my $Timeout		= 30;		# seconds
 my $ConnectionTimeout	= 15;		# seconds
 my $ErrorMode		= 'return';	# always return, so we check outcome in this test script
 my $ErrMsgFormat	= 'verbose';
-my $InputLog		;# = 'extremecli.t.in';
-my $OutputLog		;# = 'extremecli.t.out';
-my $DumpLog		;# = 'extremecli.t.dump';
-my $DebugLog		;# = 'extremecli.t.dbg';
+my $InputLog		 = 'extremecli.t.in';
+my $OutputLog		 = 'extremecli.t.out';
+my $DumpLog		 = 'extremecli.t.dump';
+my $DebugLog		 = 'extremecli.t.dbg';
 my $Host		;
 my $TcpPort		;
 my $Username		;# = 'rwa';
@@ -43,6 +43,9 @@ my %Cmd = (		# CLI commands to test with (output should be long enough to be mor
 			WLAN9100		=> 'show running-config',
 			ExtremeXOS		=> 'show system | exclude UpTime', # Suppress uptime line as seconds count risks modifying the output length between compares
 			ISW			=> 'show version',
+			Series200		=> 'show interfaces switchport general',
+			Wing			=> 'show wireless radio detail',
+			SLX			=> 'show system',
 );
 my %CmdRefreshed = (	# CLI commands whose output is refreshed; to test that we can exit the refresh
 			PassportERS_cli		=> 'monitor ports stats interface utilization',
@@ -156,10 +159,10 @@ sub attribute { # Read, test, print and return a attribute
 		}
 	}
 	if ($optional) {
-		ok( $ok && defined $displayValue, "Testing '$attribute' attribute $displayValue" );
+		ok( $ok && defined $displayValue, "Testing '$attribute' attribute" . (defined $displayValue ? ' '.$displayValue : ''));
 	}
 	else {
-		ok( $ok && defined $attribValue && defined $displayValue, "Testing '$attribute' attribute $displayValue" );
+		ok( $ok && defined $attribValue && defined $displayValue, "Testing '$attribute' attribute" . (defined $displayValue ? ' '.$displayValue : ''));
 	}
 	diag $cli->errmsg unless $ok;
 	return $attribValue;
@@ -235,7 +238,8 @@ if (@ARGV) {
 	else {
 		$Baudrate = shift(@ARGV) if @ARGV;
 		$UseBaudrate = $Baudrate =~ s/:(\w+)$// ? $1 : $Baudrate;
-		($Username, $Password) = split(':', shift(@ARGV)) if @ARGV;
+		$Username = shift(@ARGV) if @ARGV;
+		$Password = $2 if $Username =~ s/^([^:\s]+):(\S*)$/$1/;
 	}
 	if ($ARGV[0] =~ /\d{2,}/) { # TCP port number next
 		$Host .= ' ' . shift(@ARGV);
@@ -245,7 +249,7 @@ if (@ARGV) {
 
 do {{ # Test loop, we keep testing until user satisfied
 
-	my ($cli, $ok, $output, $output2, $result, $prompt, $lastPrompt, $diffPrompt, $more_prompt, $familyType, $acli, $masterCpu, $dualCpu, $cmd, $origBaudrate);
+	my ($cli, $ok, $output, $output2, $result, $prompt, $lastPrompt, $diffPrompt, $more_prompt, $familyType, $acli, $masterCpu, $dualCpu, $cmd, $origBaudrate, $slx);
 	my ($connectionType, $username, $password, $host, $tcpPort, $baudrate, $useBaudrate, $blocking)
 	 = ($ConnectionType, $Username, $Password, $Host, $TcpPort, $Baudrate, $UseBaudrate, $Blocking);
 
@@ -298,7 +302,8 @@ do {{ # Test loop, we keep testing until user satisfied
 		my $complexInput;
 		prompt(\$host, "Provide an Extreme device IP|hostname to test with (no config commands will be executed);\n [[username][:password]@]<host|IP> [port]; ENTER to end test]\n : ");
 		if ($host =~ s/^(.+)@//) {
-			($username, $password) = split(':', $1);
+			$username = $1;
+			$password = $2 if $username =~ s/^([^:\s]+):(\S*)$/$1/;
 			undef $username unless length $username;
 			print "Username = ", $username, "\n" if defined $username;
 			print "Password = ", $password, "\n" if defined $password;
@@ -426,7 +431,6 @@ do {{ # Test loop, we keep testing until user satisfied
 		else { ok( $ok, "Testing device_more_paging(1) and device_more_paging_poll() methods") }
 		diag $cli->errmsg unless $ok;
 	}
-
 	# Test global attributes
 	attribute($cli, 'model',1); # might be undefined if executed on a Standby CPU
 	attribute($cli, 'sysname',1); # might be undefined if executed on a Standby CPU
@@ -435,6 +439,13 @@ do {{ # Test loop, we keep testing until user satisfied
 	attribute($cli, 'is_voss',1); # will be undefined on non-PassportERS products
 	attribute($cli, 'is_xos',1); # will be undefined on non-ExtremeXOS products
 	attribute($cli, 'is_isw',1); # will be undefined on non-ISW products
+	attribute($cli, 'is_wing',1); # will be undefined on non-Wing products
+	$slx = attribute($cli, 'is_slx',1); # will be undefined on non-SLX products
+	if ($slx) {
+		attribute($cli, 'is_slx_r',1); # will be undefined on non-SLX products
+		attribute($cli, 'is_slx_s',1); # will be undefined on non-SLX products
+		attribute($cli, 'is_slx_x',1); # will be undefined on non-SLX products
+	}
 	attribute($cli, 'apls_box_type',1); # might be undefined if is_apls is false
 	attribute($cli, 'brand_name',1); # might be undefined if is_voss is false
 	$acli = attribute($cli, 'is_acli');
@@ -479,6 +490,28 @@ do {{ # Test loop, we keep testing until user satisfied
 		attribute($cli, 'oob_ip',1); # might be undefined
 		attribute($cli, 'is_oob_connected');
 	}
+	elsif ($familyType eq 'Series200') {
+		if ('Stack' eq attribute($cli, 'switch_mode')) {
+			attribute($cli, 'manager_unit');
+			attribute($cli, 'unit_number');
+			attribute($cli, 'stack_size');
+		}
+		attribute($cli, 'stp_mode');
+		attribute($cli, 'oob_ip',1); # might be undefined
+		attribute($cli, 'is_oob_connected');
+	}
+	elsif ($familyType eq 'SLX') {
+		attribute($cli, 'switch_type');
+		attribute($cli, 'is_active_mm');
+		attribute($cli, 'is_dual_mm');
+		attribute($cli, 'mm_number');
+		attribute($cli, 'is_ha',1); # might be undefined
+		attribute($cli, 'stp_mode',1); # might be undefined
+		attribute($cli, 'oob_ip',1); # might be undefined
+		attribute($cli, 'oob_virt_ip',1); # might be undefined
+		attribute($cli, 'oob_standby_ip',1); # might be undefined
+		attribute($cli, 'is_oob_connected',1); # might be undefined
+	}
 	elsif ($familyType eq 'Accelar') {
 		attribute($cli, 'is_master_cpu');
 		attribute($cli, 'is_dual_cpu');
@@ -518,7 +551,8 @@ do {{ # Test loop, we keep testing until user satisfied
 	unless ($familyType eq 'WLAN2300' || $familyType eq 'ExtremeXOS') { # Skip this test for family types which have no config context
 
 		# Test entering config mode (not applicable on some product / CLI modes)
-		if    ( ($familyType eq 'PassportERS' && !$acli) || $familyType eq 'Accelar' || $familyType eq 'WLAN9100') {
+		if    ( ($familyType eq 'PassportERS' && !$acli) || $familyType eq 'Accelar' || $familyType eq 'WLAN9100' ||
+			 $familyType eq 'Series200' || $familyType eq 'SLX') {
 			($ok, $result) = $cli->cmd(
 					Command			=>	'config',
 					Return_result		=>	1,
@@ -531,7 +565,7 @@ do {{ # Test loop, we keep testing until user satisfied
 					Return_result		=>	1,
 				);
 		}
-		elsif ($familyType eq 'SecureRouter' || $familyType eq 'ISW') {
+		elsif ($familyType eq 'SecureRouter' || $familyType eq 'ISW' || $familyType eq 'Wing') {
 			($ok, $result) = $cli->cmd(
 					Command			=>	'config term',
 					Return_result		=>	1,
@@ -605,7 +639,7 @@ do {{ # Test loop, we keep testing until user satisfied
 		$cmd = $Cmd{$familyType};
 	}
 	unless (defined $cmd) {
-		ok( 0, "Unexpected family type for testing config mode" );
+		ok( 0, "Unexpected family type for testing show command with more paging enabled" );
 		$cli->disconnect;
 		last;
 	}
@@ -655,7 +689,7 @@ do {{ # Test loop, we keep testing until user satisfied
 	if ($ok && !($familyType eq 'PassportERS' && !$masterCpu) ) { # If we disabled more paging above...
 
 		# Test sending same show command as above ('show sys info'), with more paging disabled
-		$ok = $cli->cmd(
+		($ok, $output2) = $cli->cmd(
 				Poll_syntax             =>	1,
 				Command			=>	$cmd,
 				Return_reference	=>	0,

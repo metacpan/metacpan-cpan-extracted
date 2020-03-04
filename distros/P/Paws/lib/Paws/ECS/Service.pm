@@ -1,5 +1,6 @@
 package Paws::ECS::Service;
   use Moose;
+  has CapacityProviderStrategy => (is => 'ro', isa => 'ArrayRef[Paws::ECS::CapacityProviderStrategyItem]', request_name => 'capacityProviderStrategy', traits => ['NameInRequest']);
   has ClusterArn => (is => 'ro', isa => 'Str', request_name => 'clusterArn', traits => ['NameInRequest']);
   has CreatedAt => (is => 'ro', isa => 'Str', request_name => 'createdAt', traits => ['NameInRequest']);
   has CreatedBy => (is => 'ro', isa => 'Str', request_name => 'createdBy', traits => ['NameInRequest']);
@@ -47,20 +48,25 @@ Each attribute should be used as a named argument in the calls that expect this 
 
 As an example, if Att1 is expected to be a Paws::ECS::Service object:
 
-  $service_obj->Method(Att1 => { ClusterArn => $value, ..., TaskSets => $value  });
+  $service_obj->Method(Att1 => { CapacityProviderStrategy => $value, ..., TaskSets => $value  });
 
 =head3 Results returned from an API call
 
 Use accessors for each attribute. If Att1 is expected to be an Paws::ECS::Service object:
 
   $result = $service_obj->Method(...);
-  $result->Att1->ClusterArn
+  $result->Att1->CapacityProviderStrategy
 
 =head1 DESCRIPTION
 
 Details on a service within a cluster
 
 =head1 ATTRIBUTES
+
+
+=head2 CapacityProviderStrategy => ArrayRef[L<Paws::ECS::CapacityProviderStrategyItem>]
+
+  The capacity provider strategy associated with the service.
 
 
 =head2 ClusterArn => Str
@@ -86,7 +92,9 @@ the deployment and the ordering of stopping and starting tasks.
 
 =head2 DeploymentController => L<Paws::ECS::DeploymentController>
 
-  The deployment controller type the service is using.
+  The deployment controller type the service is using. When using the
+DescribeServices API, this field is omitted if the service is using the
+C<ECS> deployment controller type.
 
 
 =head2 Deployments => ArrayRef[L<Paws::ECS::Deployment>]
@@ -137,14 +145,6 @@ in the I<Amazon Elastic Container Service Developer Guide>.
   A list of Elastic Load Balancing load balancer objects, containing the
 load balancer name, the container name (as it appears in a container
 definition), and the container port to access from the load balancer.
-
-Services with tasks that use the C<awsvpc> network mode (for example,
-those with the Fargate launch type) only support Application Load
-Balancers and Network Load Balancers. Classic Load Balancers are not
-supported. Also, when you create any target groups for these services,
-you must choose C<ip> as the target type, not C<instance>. Tasks that
-use the C<awsvpc> network mode are associated with an elastic network
-interface, not an Amazon EC2 instance.
 
 
 =head2 NetworkConfiguration => L<Paws::ECS::NetworkConfiguration>
@@ -264,9 +264,51 @@ or C<INACTIVE>.
 
   The metadata that you apply to the service to help you categorize and
 organize them. Each tag consists of a key and an optional value, both
-of which you define. Tag keys can have a maximum character length of
-128 characters, and tag values can have a maximum length of 256
-characters.
+of which you define.
+
+The following basic restrictions apply to tags:
+
+=over
+
+=item *
+
+Maximum number of tags per resource - 50
+
+=item *
+
+For each resource, each tag key must be unique, and each tag key can
+have only one value.
+
+=item *
+
+Maximum key length - 128 Unicode characters in UTF-8
+
+=item *
+
+Maximum value length - 256 Unicode characters in UTF-8
+
+=item *
+
+If your tagging schema is used across multiple services and resources,
+remember that other services may have restrictions on allowed
+characters. Generally allowed characters are: letters, numbers, and
+spaces representable in UTF-8, and the following characters: + - = . _
+: / @.
+
+=item *
+
+Tag keys and values are case-sensitive.
+
+=item *
+
+Do not use C<aws:>, C<AWS:>, or any upper or lowercase combination of
+such as a prefix for either keys or values as it is reserved for AWS
+use. You cannot edit or delete tag keys or values with this prefix.
+Tags with this prefix do not count against your tags per resource
+limit.
+
+=back
+
 
 
 =head2 TaskDefinition => Str

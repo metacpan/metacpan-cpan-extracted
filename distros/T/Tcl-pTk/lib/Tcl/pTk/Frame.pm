@@ -4,7 +4,7 @@
 
 package Tcl::pTk::Frame;
 
-our ($VERSION) = ('1.02');
+our ($VERSION) = ('1.03');
 
 use base ('Tcl::pTk::Derived', 'Tcl::pTk::Widget');
 
@@ -234,10 +234,9 @@ sub AddScrollbars
  my $c;
  $cw->freeze_on_map;
  
- # Use Tile Scrollbars, if tclVersion >= 8.5
- my $scrollBarWidget = 'Scrollbar';
- $scrollBarWidget    = 'ttkScrollbar' if( $cw->tclVersion >= 8.5);
- 
+ # Use Tile Scrollbars if available
+ my $scrollBarWidget = $Tcl::pTk::_Tile_available ? 'ttkScrollbar' : 'Scrollbar';
+
  foreach $c ($w->configure)
   {
    my $opt = $c->[0];

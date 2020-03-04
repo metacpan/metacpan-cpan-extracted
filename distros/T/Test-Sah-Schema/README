@@ -1,0 +1,83 @@
+NAME
+    Test::Sah::Schema - Test Sah::Schema::* modules in distribution
+
+VERSION
+    This document describes version 0.006 of Test::Sah::Schema (from Perl
+    distribution Test-Sah-Schema), released on 2020-03-04.
+
+SYNOPSIS
+    To check a single Sah::Schema::* module:
+
+     use Test::Sah::Schema tests=>1;
+     sah_schema_module_ok("Sah::Schema::Foo", {opt => ...}, $msg);
+
+    To check all Sah::Schema::* modules in a distro:
+
+     # save in release-sah-schema.t, put in distro's t/ subdirectory
+     use Test::More;
+     plan skip_all => "Not release testing" unless $ENV{RELEASE_TESTING};
+     eval "use Test::Sah::Schema";
+     plan skip_all => "Test::Sah::Schema required for testing Sah::Schema modules" if $@;
+     sah_schema_modules_ok({opt => ...}, $msg);
+
+DESCRIPTION
+    This module performs various checks on Sah::Schema::* modules. It is
+    recommended that you include something like "release-sah-schema.t" in
+    your distribution if you add metadata to your code. If you use
+    Dist::Zilla to build your distribution, there is
+    Dist::Zilla::Plugin::Sah::Schemas to make it easy to do so.
+
+ACKNOWLEDGEMENTS
+    Some code taken from Test::Pod::Coverage by Andy Lester.
+
+FUNCTIONS
+    All these functions are exported by default.
+
+  sah_schema_module_ok($module [, \%opts ] [, $msg])
+    Load $module, get its $schema, and perform test on it.
+
+    Available options:
+
+    *   test_schema_examples => BOOL (default: 1)
+
+        Whether to test examples in schema.
+
+  sah_schema_modules_ok([ \%opts ] [, $msg])
+    Look for modules in directory "lib" (or "blib" instead, if it exists),
+    and "run sah_schema_module_ok()" on each of them.
+
+    Options are the same as in "sah_schema_module_ok()", plus:
+
+    *   include_modules
+
+    *   exclude_modules
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Test-Sah-Schema>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Test-Sah-Schema>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Sah-Schema>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    test-sah-schema, a command-line interface for "sah_schema_modules_ok()".
+
+    Test::Sah to use Sah schema to test data.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

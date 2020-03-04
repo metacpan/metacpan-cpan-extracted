@@ -31,10 +31,19 @@
             "Parse::Yapp" : "0",
             "Scalar::Util" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Compare" : "0",
+            "Data::Dumper" : "0",
+            "File::Spec" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.7.1",
+   "version" : "0.7.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

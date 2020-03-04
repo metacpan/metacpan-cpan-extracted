@@ -1,6 +1,7 @@
 #! /usr/bin/env perl
 
 use Array::RefElem ();    #qw( hv_store );
+use File::Spec     ();
 use FindBin        ();    #qw( $Bin );
 
 
@@ -57,30 +58,45 @@ foreach my $inc ( $FindBin::Bin ) {
     note "\@INC now includes ", $inc;
     local @INC = ( $inc );
 
-    foreach my $prefix ( "", "$FindBin::Bin/" ) {
+    foreach my $prefix ( "", $FindBin::Bin ) {
 
         # Tests with good files
         foreach my $pm (qw( good symlink )) {
-            $_ = my $filename = sprintf( "%sTesting-%s.pm", $prefix, $pm );
+            my $filename = sprintf( "Testing-%s.pm", $pm );
+            my $fullpath = File::Spec->catfile(
+                $prefix ? $prefix : $FindBin::Bin,
+                $filename
+            );
+            local $_ = $prefix ? $fullpath : $filename;
 
             {
                 _save_INC(qw( CORE::require filename->require ));
 
-                is( &$file, &$core, "Can require $filename" );
+                is( &$file, &$core, "Can require $_" );
                 is( \%file, \%core,
                     "%INC is the same for filename and CORE" );
-                is( &$file, &$core, "Can re-require $filename" );
+                is( &$file, &$core, "Can re-require $_" );
                 is( \%file, \%core,
                     "%INC is still the same for filename and CORE" );
 
                 _restore_INC();
             }
 
-            my $statname = ( $prefix ? "" : "$FindBin::Bin/" ) . $filename;
-            my $mode = ( stat $statname )[2] & 07777
-                || die "Cannot stat $statname";
-            chmod( 00000, $statname ) or die "Could not chmod $statname: $!";
-            {
+            my $mode = ( stat $fullpath )[2] & 07777
+                || die "Cannot stat $fullpath";
+            chmod( 00000, $fullpath ) or die "Could not chmod $fullpath: $!";
+            SKIP: {
+                skip(
+                    sprintf(
+                        "Cannot change %s permission to non-readable (%05o)",
+                        $fullpath,
+                        $mode
+                    ),
+                    7
+                ) if ( $mode == ( ( stat $fullpath )[2] & 07777 ) );
+                # The mode did not change,
+                # and we cannot test on this filesystem
+
                 _save_INC(qw( CORE::require filename->require ));
 
                 my ( $fdie, $cdie ) = ( dies {&$file}, dies {&$core} );
@@ -95,16 +111,16 @@ foreach my $inc ( $FindBin::Bin ) {
                         defined($cdie) ? $cdie : "undefined"
                     );
                 is( $fdie, $cdie,
-                    "Cannot require unreadable $filename" );
+                    "Cannot require unreadable $_" );
                 is( \%file, \%core,
                     "%INC is the same for filename and CORE" );
 
-                is( exists $INC{$filename}, "",
-                    "%INC has not been updated for $filename" )
+                is( exists $INC{$_}, "",
+                    "%INC has not been updated for $_" )
                     || diag(
-                        "\$INC{$filename} is ",
-                        defined( $INC{$filename} )
-                            ? $INC{$filename}
+                        "\$INC{$_} is ",
+                        defined( $INC{$_} )
+                            ? $INC{$_}
                             : "undefined"
                     );
                 %file = %core = %INC;
@@ -116,7 +132,7 @@ foreach my $inc ( $FindBin::Bin ) {
 
                 _restore_INC();
             }
-            chmod( $mode, $statname ) or die "Could not chmod $statname: $!";
+            chmod( $mode, $fullpath ) or die "Could not chmod $fullpath: $!";
         }
 
         # Tests with files that return false
@@ -128,14 +144,18 @@ foreach my $inc ( $FindBin::Bin ) {
             false
             undef
         )) {
-            $_ = my $filename = sprintf( "%sTesting-%s.pm", $prefix, $pm );
-            my $fullpath = $prefix ? $filename : "$FindBin::Bin/$filename";
+            my $filename = sprintf( "Testing-%s.pm", $pm );
+            my $fullpath = File::Spec->catfile(
+                $prefix ? $prefix : $FindBin::Bin,
+                $filename
+            );
+            local $_ = $prefix ? $fullpath : $filename;
 
             {
                 _save_INC(qw( CORE::require filename->require ));
 
                 is( dies {&$file}, dies {&$core},
-                    "Cannot require $filename" );
+                    "Cannot require $_" );
                 is( \%file, \%core,
                     "%INC is the same for filename and CORE" );
 
@@ -146,18 +166,18 @@ foreach my $inc ( $FindBin::Bin ) {
                 _save_INC(qw( CORE::require filename->require ));
 
                 ok( length( dies { CORE::require } ),
-                    "Failed to require $filename" );
-                is( exists $INC{$filename}, "",
-                    "%INC has not been updated for $filename" )
+                    "Failed to require $_" );
+                is( exists $INC{$_}, "",
+                    "%INC has not been updated for $_" )
                     || diag(
-                        "\$INC{$filename} is ",
-                        defined( $INC{$filename} )
-                            ? $INC{$filename}
+                        "\$INC{$_} is ",
+                        defined( $INC{$_} )
+                            ? $INC{$_}
                             : "undefined"
                     );
 
                 is( dies {&$file}, dies {&$core},
-                    "Trying to re-require $filename" );
+                    "Trying to re-require $_" );
                 is( \%file, \%core,
                     "%INC is the same for filename and CORE" );
 
@@ -169,14 +189,18 @@ foreach my $inc ( $FindBin::Bin ) {
         foreach my $pm (qw(
             failure
         )) {
-            $_ = my $filename = sprintf( "%sTesting-%s.pm", $prefix, $pm );
-            my $fullpath = $prefix ? $filename : "$FindBin::Bin/$filename";
+            my $filename = sprintf( "Testing-%s.pm", $pm );
+            my $fullpath = File::Spec->catfile(
+                $prefix ? $prefix : $FindBin::Bin,
+                $filename
+            );
+            local $_ = $prefix ? $fullpath : $filename;
 
             {
                 _save_INC(qw( CORE::require filename->require ));
 
                 is( dies {&$file}, dies {&$core},
-                    "Cannot require $filename" );
+                    "Cannot require $_" );
                 is( \%file, \%core,
                     "%INC is the same for filename and CORE" );
 
@@ -198,21 +222,21 @@ foreach my $inc ( $FindBin::Bin ) {
                     sprintf(
                           "Attempt to reload %s aborted.\n"
                         . "Compilation failed in require at %s line %d.\n",
-                        $filename, __FILE__, __LINE__ + 4
+                        $_, __FILE__, __LINE__ + 4
                     ),
                 );
                 for my $expected_error (@expected_errors) {
                     is( dies { CORE::require }, $expected_error,
-                        "Failed to require $filename" );
-                    is( exists $INC{$filename}, 1,
-                        "%INC has been updated for $filename" );
-                    is( $INC{$filename}, undef,
-                        "\$INC{$filename} is undef" );
+                        "Failed to require $_" );
+                    is( exists $INC{$_}, 1,
+                        "%INC has been updated for $_" );
+                    is( $INC{$_}, undef,
+                        "\$INC{$_} is undef" );
                 }
                 _save_INC(qw( CORE::require filename->require ));
 
                 is( dies {&$file}, dies {&$core},
-                    "Trying to re-require $filename" );
+                    "Trying to re-require $_" );
                 is( \%file, \%core,
                     "%INC is the same for filename and CORE" );
 

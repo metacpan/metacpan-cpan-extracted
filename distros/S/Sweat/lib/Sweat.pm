@@ -1,6 +1,6 @@
 package Sweat;
 
-our $VERSION = 202002100;
+our $VERSION = 202002270;
 
 use v5.10;
 
@@ -242,7 +242,6 @@ sub BUILD {
         . ".wikipedia.org/w/api.php";
 
     $self->_check_resources;
-    $self->_load_entertainment;
 }
 
 sub _check_resources {
@@ -261,6 +260,7 @@ sub _check_resources {
         foreach (qw (url fortune) ) {
             my $method = "${_}_program";
             my $program = $self->$method;
+            next unless defined $program;
             my $bare_program = (split /\s+/, $program)[0];
             unless ( which( $bare_program ) ) {
                 $self->$method( undef );
@@ -288,8 +288,8 @@ sub _load_entertainment {
 sub _load_articles {
     my $self = shift;
 
-    if ( $self->newsapi_key ) {
-        try {
+    try {
+        if ( $self->newsapi_key ) {
             my $newsapi = Web::NewsAPI->new(
                 api_key => $self->newsapi_key,
             );
@@ -303,12 +303,7 @@ sub _load_articles {
                 );
             }
         }
-        catch {
-            die "Sweat ran into a problem fetching news articles: $_\n";
-        };
-    }
-    else {
-        try {
+        else {
             my $article = Sweat::Article->new_from_random_wikipedia_article;
             unless ( fork ) {
                 $self->add_article( $article );
@@ -320,11 +315,12 @@ sub _load_articles {
                 exit;
             }
         }
-        catch {
-            die "Sweat ran into a problem fetching Wikipedia articles: $_\n";
-        };
     }
-
+    catch {
+        die "Sweat ran into a problem fetching articles. Check your internet\n"
+            . "connection, or run with --no-entertainment to use sweat without\n"
+            . "loading any online distractions.\n";
+    }
 }
 
 my $temp_file = tmpnam();
@@ -333,6 +329,8 @@ sub sweat {
     my $self = shift;
 
     ReadMode 3;
+
+    $self->_load_entertainment;
 
     for my $drill (@{ $self->drills }) {
         $self->order($drill);
@@ -359,7 +357,13 @@ sub order {
     my ($extra_text, $url, $article) = $self->entertainment_for_drill( $drill );
     $extra_text //= q{};
 
+    # XXX Set the binmode to raw temporarily if we're side-switching (and thus
+    #     reporting weather.) This is a hack to get around a strange encoding
+    #     issue in this case only.
+    binmode STDOUT, ':raw' if $drill->requires_side_switching;
     $self->rudely_speak( "Start now. $extra_text");
+    binmode STDOUT, ':utf8' if $drill->requires_side_switching;
+
     my $url_tempfile;
     if ( defined $url ) {
         if ( $url =~ m{\Wyoutube.com/} ) {

@@ -118,13 +118,29 @@ qx.Class.define('callbackery.ui.plugin.Table', {
             var selectionModel = table.getSelectionModel();
             var currentRow = null;
             selectionModel.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
+            var buttonMap = this._action.getButtonMap();
+            var buttonSetMap = this._action.getButtonSetMap();
+            
             selectionModel.addListener('changeSelection',function(){
+                var noSelection = true;
                 selectionModel.iterateSelection(function(index) {
-                    if (model.getRowData(index) != null) {
-                        this.setSelection(model.getRowData(index));
+                    var rowData = model.getRowData(index);
+                    if (rowData != null) {
+                        noSelection = false;
+                        this.setSelection(rowData);
                         currentRow = index;
+                        if (rowData._actionSet) {
+                            for (var key in rowData._actionSet) {
+                                buttonMap[key].set(rowData._actionSet[key]);
+                            }
+                        }
                     }
                 },this);
+                if (noSelection){
+                    for (var key in buttonSetMap) {
+                        buttonMap[key].set(buttonSetMap[key]);
+                    }
+                }
             },this);
             var processing = false;
             model.addListener('dataChanged',function(e){

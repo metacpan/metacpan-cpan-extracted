@@ -7,7 +7,7 @@ use Win32;
 use Win32::Process;
 use File::Spec;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
   my $class = shift;
@@ -46,9 +46,10 @@ sub spawn {
       $code = $deparser->coderef2text( $code );
     }
     require File::Temp;
-    require File::Slurp;
     my $tmpfile = File::Temp::tempnam( $workdir => '_tmp' );
-    File::Slurp::write_file( $tmpfile, $code );
+    open my $fh, '>', $tmpfile or die $!;
+    print $fh $code;
+    close $fh;
     $args = "$args $tmpfile";
     $self->{$id}->{tmpfile} = $tmpfile;
   }

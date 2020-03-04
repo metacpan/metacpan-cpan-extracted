@@ -34,22 +34,22 @@ name: SVN-Dump
 provides:
   SVN::Dump:
     file: lib/SVN/Dump.pm
-    version: '0.07'
+    version: '0.08'
   SVN::Dump::Headers:
     file: lib/SVN/Dump/Headers.pm
-    version: '0.07'
+    version: '0.08'
   SVN::Dump::Property:
     file: lib/SVN/Dump/Property.pm
-    version: '0.07'
+    version: '0.08'
   SVN::Dump::Reader:
     file: lib/SVN/Dump/Reader.pm
-    version: '0.07'
+    version: '0.08'
   SVN::Dump::Record:
     file: lib/SVN/Dump/Record.pm
-    version: '0.07'
+    version: '0.08'
   SVN::Dump::Text:
     file: lib/SVN/Dump/Text.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Carp: '0'
   Digest: '0'
@@ -61,7 +61,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Dump
   repository: http://github.com/book/SVN-Dump.git
-version: '0.07'
+version: '0.08'
 x_contributors:
   - 'fschlich <fschlich@zedat.fu-berlin.de>'
   - 'Andrew Sayers <andrew-svn-dump@pileofstuff.org>'

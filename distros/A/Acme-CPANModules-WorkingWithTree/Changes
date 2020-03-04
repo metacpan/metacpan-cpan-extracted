@@ -1,3 +1,25 @@
+0.004   2020-03-01  Released-By: PERLANCAR; Urgency: high
+
+	- Merge two releases 0.003 and 0.003.1.
+
+
+0.003.1  2020-03-01  Released-By: PERLANCAR; Urgency: low; Broken: yes
+
+	- No functional changes.
+
+	- Use Acme::CPANModulesUtil::Misc.
+
+        - UPDATE: cancel release. Rename version from 0.002 -> 0.003.1
+          (duplicate).
+
+
+0.003   2020-02-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Add Tree::Shell.
+
+	- Add modules related to Role::TinyCommons::Tree.
+
+
 0.002   2020-02-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Update module names.

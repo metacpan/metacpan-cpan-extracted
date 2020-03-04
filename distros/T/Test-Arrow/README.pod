@@ -5,7 +5,7 @@ This is Perl module B<Test::Arrow>. It's Object-Oriented testing library.
 
 =begin html
 
-<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.11-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1582822443"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582822443&branch=master"/></a>
+<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.16-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1583346115"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1583346115&branch=master"/></a>
 
 =end html
 
@@ -15,7 +15,6 @@ This is Perl module B<Test::Arrow>. It's Object-Oriented testing library.
 
     my $arr = Test::Arrow->new;
 
-    $arr->ok(1);
     $arr->got(1)->ok;
 
     $arr->expect(uc 'foo')->to_be('FOO');
@@ -32,17 +31,6 @@ This is Perl module B<Test::Arrow>. It's Object-Oriented testing library.
     $arr->expected(qr/^ab/)
         ->got('abc')
         ->like;
-
-    # `unlike` shows where a place could have matched if it's failed
-    $arr->name('Unlike Fail example')
-        ->expected(qr/b/)
-        ->got('abc')
-        ->unlike;
-    #   Failed test 'Unlike Fail example'
-    #   at t/unlike.t line 12.
-    #                   'abc'
-    #           matches '(?^:b)'
-    #           matched at line: 1, offset: 2
 
     $arr->warnings(sub { warn 'Bar' })->catch(qr/^Ba/);
     $arr->throw(sub { die 'Baz' })->catch(qr/^Ba/);

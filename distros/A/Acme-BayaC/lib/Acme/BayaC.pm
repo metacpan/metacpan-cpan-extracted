@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 sub new {
     my $class = shift;
@@ -44,7 +44,7 @@ Acme::BayaC is
 
 =begin html
 
-<a href="https://github.com/bayashi/Acme-BayaC/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Acme-BayaC/actions"><img src="https://github.com/bayashi/Acme-BayaC/workflows/build/badge.svg?branch=master"/></a> <a href="https://coveralls.io/r/bayashi/Acme-BayaC"><img src="https://coveralls.io/repos/bayashi/Acme-BayaC/badge.png?branch=master"/></a>
+<a href="https://github.com/bayashi/Acme-BayaC/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Acme-BayaC/actions"><img src="https://github.com/bayashi/Acme-BayaC/workflows/build/badge.svg?_t=1583023018&branch=master"/></a> <a href="https://coveralls.io/r/bayashi/Acme-BayaC"><img src="https://coveralls.io/repos/bayashi/Acme-BayaC/badge.png?_t=1583023018&branch=master"/></a>
 
 =end html
 

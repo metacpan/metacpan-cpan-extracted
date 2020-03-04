@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::second;
 
-our $DATE = '2020-02-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2020-03-03'; # DATE
+our $VERSION = '0.010'; # VERSION
 
-our $rschema = ["int",[{max=>60,min=>0,summary=>"Second of minute"}],["int"]];
+our $rschema = ["int",[{examples=>[{data=>"",valid=>0},{data=>0,valid=>1},{data=>59,valid=>1},{data=>60,valid=>1},{data=>61,valid=>0}],max=>60,min=>0,summary=>"Second of minute"}],["int"]];
 
 1;
 # ABSTRACT: Second of minute
@@ -20,7 +20,7 @@ Sah::SchemaR::date::second - Second of minute
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::SchemaR::date::second (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Sah::SchemaR::date::second (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
 
 =head1 DESCRIPTION
 

@@ -31,6 +31,7 @@ sub defaults {
             quote_identifiers    => 1,
             thsd_sep             => ',',
             show_table_name      => 0,
+            base_indent          => 1,
             file_find_warnings   => 0,
         },
         alias => {
@@ -100,6 +101,7 @@ sub defaults {
         create => {
             autoincrement_col_name => 'Id',
             data_type_guessing     => 1,
+            view_name_prefix       => '',
         },
         split => {
             record_sep    => '\n',

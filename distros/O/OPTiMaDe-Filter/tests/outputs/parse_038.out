@@ -1,0 +1,19 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'name' => [
+                                                      'property'
+                                                    ]
+                                        }, 'OPTiMaDe::Filter::Property' ),
+                                 bless( {
+                                          'name' => [
+                                                      'another_property'
+                                                    ]
+                                        }, 'OPTiMaDe::Filter::Property' )
+                               ],
+                 'operator' => 'STARTS WITH'
+               }, 'OPTiMaDe::Filter::Comparison' );
+== Filter ==
+(property STARTS WITH another_property)
+== SQL ==
+('property' LIKE 'another_property')

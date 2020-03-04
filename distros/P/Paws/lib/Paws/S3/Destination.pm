@@ -4,6 +4,8 @@ package Paws::S3::Destination;
   has Account => (is => 'ro', isa => 'Str');
   has Bucket => (is => 'ro', isa => 'Str', required => 1);
   has EncryptionConfiguration => (is => 'ro', isa => 'Paws::S3::EncryptionConfiguration');
+  has Metrics => (is => 'ro', isa => 'Paws::S3::Metrics');
+  has ReplicationTime => (is => 'ro', isa => 'Paws::S3::ReplicationTime');
   has StorageClass => (is => 'ro', isa => 'Str');
 1;
 
@@ -36,7 +38,8 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::S3::Destina
 =head1 DESCRIPTION
 
 Specifies information about where to publish analysis or configuration
-results for an Amazon S3 bucket.
+results for an Amazon S3 bucket and S3 Replication Time Control (S3
+RTC).
 
 =head1 ATTRIBUTES
 
@@ -56,26 +59,37 @@ are owned by same AWS account that owns the source object.
 you direct Amazon S3 to change replica ownership to the AWS account
 that owns the destination bucket by specifying the
 C<AccessControlTranslation> property, this is the account ID of the
-destination bucket owner. For more information, see Cross-Region
-Replication Additional Configuration: Change Replica Owner
-(https://docs.aws.amazon.com/AmazonS3/latest/dev/crr-change-owner.html)
+destination bucket owner. For more information, see Replication
+Additional Configuration: Changing the Replica Owner
+(https://docs.aws.amazon.com/AmazonS3/latest/dev/replication-change-owner.html)
 in the I<Amazon Simple Storage Service Developer Guide>.
 
 
 =head2 B<REQUIRED> Bucket => Str
 
   The Amazon Resource Name (ARN) of the bucket where you want Amazon S3
-to store replicas of the object identified by the rule.
-
-A replication configuration can replicate objects to only one
-destination bucket. If there are multiple rules in your replication
-configuration, all rules must specify the same destination bucket.
+to store the results.
 
 
 =head2 EncryptionConfiguration => L<Paws::S3::EncryptionConfiguration>
 
   A container that provides information about encryption. If
 C<SourceSelectionCriteria> is specified, you must specify this element.
+
+
+=head2 Metrics => L<Paws::S3::Metrics>
+
+  A container specifying replication metrics-related settings enabling
+metrics and Amazon S3 events for S3 Replication Time Control (S3 RTC).
+Must be specified together with a C<ReplicationTime> block.
+
+
+=head2 ReplicationTime => L<Paws::S3::ReplicationTime>
+
+  A container specifying S3 Replication Time Control (S3 RTC), including
+whether S3 RTC is enabled and the time when all objects and operations
+on objects must be replicated. Must be specified together with a
+C<Metrics> block.
 
 
 =head2 StorageClass => Str

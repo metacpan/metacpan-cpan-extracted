@@ -22,6 +22,7 @@ sub build_schema {
 
   my $pkg = '';
   my @packages;
+  my $n = 0;
   while (my $name = shift @{$def}) {
     my $defn = shift @$def;
 
@@ -30,6 +31,7 @@ sub build_schema {
     push @packages, $name;
     $pkg .= "{ package ${prefix}::$name;\n  use base 'DBIx::Class::Core';\n";
 
+    $defn->{table} //= sprintf('table_%03d', $n++);
     $pkg .= "  __PACKAGE__->table('$defn->{table}');\n";
 
     (my $v = Dumper($defn->{columns})) =~ s/{\n(.*)}\n/$1/ms;

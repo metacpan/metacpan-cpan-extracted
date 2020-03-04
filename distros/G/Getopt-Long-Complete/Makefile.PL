@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
     "script/demo-getopt-long-complete"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Getopt::Long::Complete",
   "PREREQ_PM" => {
     "Complete::Bash" => "0.333",
@@ -35,9 +34,9 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0
+    "Test::More" => "0.98"
   },
-  "VERSION" => "0.311",
+  "VERSION" => "0.312",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +55,7 @@ my %FallbackPrereqs = (
   "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Test::More" => 0,
+  "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0
 );

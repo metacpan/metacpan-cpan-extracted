@@ -1,9 +1,9 @@
 package Sah::SchemaR::sortsub::spec;
 
-our $DATE = '2019-12-15'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2020-02-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
-our $rschema = ["str",[{match=>qr(\A\w+(?:<[ir]*>)?\z),summary=>"Sort::Sub specification string (name + optional <i,r>)","x.completion"=>["sortsub_spec"]}],["str"]];
+our $rschema = ["str",[{match=>qr(\A\w+(?:<[ir]*>)?\z),prefilters=>["Str::replace_dashes_with_underscores"],summary=>"Sort::Sub specification string (name + optional <i,r>)","x.completion"=>["sortsub_spec"]}],["str"]];
 
 1;
 # ABSTRACT: Sort::Sub specification string (name + optional <i,r>)
@@ -20,7 +20,7 @@ Sah::SchemaR::sortsub::spec - Sort::Sub specification string (name + optional <i
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::sortsub::spec (from Perl distribution Sah-Schemas-SortSub), released on 2019-12-15.
+This document describes version 0.003 of Sah::SchemaR::sortsub::spec (from Perl distribution Sah-Schemas-SortSub), released on 2020-02-28.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

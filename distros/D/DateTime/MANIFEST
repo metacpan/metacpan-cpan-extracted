@@ -12,7 +12,7 @@ META.yml
 Makefile.PL
 README.md
 TODO
-appveyor.yml
+azure-pipelines.yml
 cpanfile
 dist.ini
 inc/LeapSecondsHeader.pm

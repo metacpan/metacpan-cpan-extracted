@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-String-Print>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/String-Print/>
-    and <https://metacpan.org/release/String-Print>
+  * Indexed from CPAN: <https://metacpan.org/release/String-Print>
 
 This module inserts values into (format) strings.  It provides printf()
 and sprintf() alternatives via both an object oriented and a functional

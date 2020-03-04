@@ -1,5 +1,5 @@
 package Lab::Instrument::Lakeshore340;
-$Lab::Instrument::Lakeshore340::VERSION = '3.691';
+$Lab::Instrument::Lakeshore340::VERSION = '3.692';
 #ABSTRACT: Lakeshore 340 temperature controller
 
 use warnings;
@@ -951,7 +951,7 @@ Lab::Instrument::Lakeshore340 - Lakeshore 340 temperature controller
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 SYNOPSIS
 
@@ -1156,7 +1156,7 @@ probably many
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2013-2014  Christian Butschkow
             2016       Simon Reinhardt

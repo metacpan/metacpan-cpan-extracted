@@ -22,7 +22,9 @@ eval { $migration->run('badcommand') };
 like $@, qr/Usage/, 'right error';
 
 
-my $db = DBI->connect('dbi:mysql:'.$config->{datasource}->{database}, $config->{user}, $config->{password});
+my $db = DBI->connect('dbi:mysql:'.$config->{datasource}->{database}, $config->{user}, $config->{password}, {
+	host => $config->{datasource}->{host} || '', port => $config->{datasource}->{port},
+});
 $db->do('drop table if exists test') if @{$db->selectall_arrayref('show tables', { Slice => {} })};
 
 my $source = $migration->get_schema(

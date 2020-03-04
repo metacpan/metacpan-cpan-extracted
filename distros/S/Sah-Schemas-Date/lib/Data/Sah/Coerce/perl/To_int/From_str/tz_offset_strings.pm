@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_int::From_str::tz_offset_strings;
 
 # AUTHOR
-our $DATE = '2020-02-27'; # DATE
+our $DATE = '2020-03-03'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,6 +13,7 @@ sub meta {
     +{
         v => 4,
         summary => 'Convert timezone offset strings like UTC-500, UTC, or UTC+12:30 to number of offset seconds from UTC',
+        might_fail => 1,
         prio => 50,
     };
 }
@@ -24,13 +25,13 @@ sub coerce {
 
     my $res = {};
 
-    #                                               #1=sgn #2=hour           #3=min       #4=sec
-    $res->{expr_match} = "$dt =~ /\\A(?:UTC|GMT)(?: ([+-]) (\\d\\d?)(?: (?::?(\\d\\d)(?:: (\\d\\d) )?)?)?)?\\z/x";
+    #                                #1=label      #2=sgn #3=hour           #4=min       #5=sec
+    $res->{expr_match} = "$dt =~ /\\A(UTC|GMT)?(?: ([+-]) (\\d\\d?)(?: (?::?(\\d\\d)(?:: (\\d\\d) )?)?)?)?\\z/x";
     $res->{expr_coerce} = join(
         "",
         "do { ",
 
-        "\$1 ? ((\$1 eq '-' ? -1:1)*(\$2*3600 + (\$3 ? \$3*60:0) + (\$4 ? \$4:0))) : 0",
+        "!\$1 && !\$2 ? ['Cannot be empty', $dt] : [undef, \$2 ? ((\$2 eq '-' ? -1:1)*(\$3*3600 + (\$4 ? \$4*60:0) + (\$5 ? \$5:0))) : 0]",
 
         "}", # do
     );
@@ -53,7 +54,7 @@ Data::Sah::Coerce::perl::To_int::From_str::tz_offset_strings - Convert timezone 
 
 =head1 VERSION
 
-This document describes version 0.008 of Data::Sah::Coerce::perl::To_int::From_str::tz_offset_strings (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Data::Sah::Coerce::perl::To_int::From_str::tz_offset_strings (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
 
 =head1 SYNOPSIS
 

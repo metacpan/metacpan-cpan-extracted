@@ -193,6 +193,40 @@ potentially override it.
 Another advantage is that the proxied method can be a multimethod.
 (Multimethods are discussed in the next chapter.)
 
+=head2 Singletons
+
+Factories make it pretty easy to implement the singleton pattern.
+
+  package MyApp {
+    use Zydeco;
+    
+    class AppConfig {
+      ...;
+       
+      factory get_appconfig () {
+        state $config = $class->new();
+      }
+    }
+  }
+
+Now C<< MyApp->get_appconfig >> will always return the same AppConfig object.
+Because any explicit use of the factory keyword in a class definition
+suppresses the automatic creation of a factory method for the class, there
+will be no C<< MyApp->new_appconfig >> method for creating new objects of
+that class.
+
+(People can still manually call C<< MyApp::AppConfig->new >> to get a new
+AppConfig object, but remember Zydeco discourages calling constructors
+directly, and encourages you to use the factory package for instantiating
+objects!)
+
+=head2 Abbreviated Syntax
+
+Like with regular methods, the abbreviated syntax is allowed.
+
+  factory new_man   ($n) = $class->new(name => $n, gender => 'm');
+  factory new_woman ($n) = $class->new(name => $n, gender => 'f');
+
 =head1 KEYWORDS
 
 In this chapter, we looked at the following keyword:

@@ -1,6 +1,9 @@
 ##-*- Mode: ChangeLog; coding: utf-8; -*-
 
-v0.92 Wed, 19 Feb 2020 09:58:52 +0100 moocowq
+v0.93 Fri, 28 Feb 2020 13:36:33 +0100 moocow
+	* fixed typo vwarn(...)->vlog('warn',...) for empty token text in tcfalign.pm
+
+v0.92 Wed, 19 Feb 2020 09:58:52 +0100 moocow
 	* suppress 'use of uninitialzed value' messages from Processor::tok2xml for empty input documents,
 	  and emit a more informative warning instead
 

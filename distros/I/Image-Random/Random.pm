@@ -10,7 +10,7 @@ use Imager;
 use Imager::Color;
 use List::MoreUtils qw(none);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -298,6 +298,6 @@ L<http://skim.cz>
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

@@ -4,7 +4,7 @@ Mojolicious::Command::migration — MySQL migration tool for Mojolicious
 
 # VERSION
 
-version 0.15
+version 0.17
 
 # SYNOPSIS
 

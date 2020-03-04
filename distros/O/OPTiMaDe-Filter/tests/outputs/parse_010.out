@@ -1,0 +1,21 @@
+$VAR1 = bless( {
+                 'inner' => bless( {
+                                     'operands' => [
+                                                     bless( {
+                                                              'name' => [
+                                                                          'ice'
+                                                                        ]
+                                                            }, 'OPTiMaDe::Filter::Property' ),
+                                                     bless( {
+                                                              'name' => [
+                                                                          'val'
+                                                                        ]
+                                                            }, 'OPTiMaDe::Filter::Property' )
+                                                   ],
+                                     'operator' => '='
+                                   }, 'OPTiMaDe::Filter::Comparison' )
+               }, 'OPTiMaDe::Filter::Negation' );
+== Filter ==
+(NOT (ice = val))
+== SQL ==
+(NOT ('ice' = 'val'))

@@ -1,5 +1,16 @@
 Summary of Changes to Tcl::pTk
 
+Release 1.03:  2020-03-02
+
+ * Mark focusMethods.t as TODO due to unresolved failures (RT #131091)
+ * Add internal variable `$Tcl::pTk::_Tile_available` to indicate whether
+   Tile/Ttk is available; check this variable rather than checking the
+   Tcl/Tk version everywhere. Tile/Ttk should also now work on Tk 8.4
+   if the Tile package is installed.
+ * Remove need_tk (deprecated; was removed from Tcl::Tk 1.03 in 2011)
+ * $Tcl::pTk::platform should be 'unix' when using X11 Tk in Cygwin
+   (contribution from Vadim Konovalov)
+
 Release 1.02:  2019-06-29
 
  * Support focusNext and focusPrev methods as used with Perl/Tk
@@ -90,7 +101,7 @@ Release 0.95:  2019-02-25
    - Improve error shown if "package require Tk" fails (RT #127552)
    - Makefile.PL:
      - exit with status 0 if Tk 8.4+ is not present
-       (UNKNOWN reports will no loner be generated)
+       (UNKNOWN reports will no longer be generated)
      - warn if tklib is not present
      - Find tclsh8.x command more easily on FreeBSD
      - TCLSH_PROG environment variable is no longer used to specify tclsh

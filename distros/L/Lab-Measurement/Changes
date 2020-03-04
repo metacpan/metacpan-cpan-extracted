@@ -4,6 +4,10 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.692 2020-03-03
+  * Lakeshore 340: add more functions
+  * PD11042: Fix inifile and logfile for non-Activeperls
+
 3.691 2019-11-14
   * VISA: fix _set_visa_attribute
   * Add warning when using backslashes in hard copy plots on Windows

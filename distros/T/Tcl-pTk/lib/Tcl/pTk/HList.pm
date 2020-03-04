@@ -2,7 +2,7 @@
 
 package Tcl::pTk::HList;
 
-our ($VERSION) = ('1.02');
+our ($VERSION) = ('1.03');
 
 @Tcl::pTk::HList::ISA = (Tcl::pTk::Widget);
 
@@ -39,7 +39,7 @@ sub _procIndicatorCmd{
 }
                 
 
-# Overriden version of add that handles storing any -data option,
+# Overridden version of add that handles storing any -data option,
 #   because the interface between perl and tcl doesn't allow for tie-ing of
 #   arbitrary variable references (only scalar and hash references supported now)
 sub add
@@ -60,7 +60,7 @@ sub add
 }
 
 
-# Overriden version of entryconfigure that handles storing any -data option,
+# Overridden version of entryconfigure that handles storing any -data option,
 #   because the interface between perl and tcl doesn't allow for tie-ing of
 #   arbitrary variable references (only scalar and hash references supported now)
 sub entryconfigure{
@@ -84,7 +84,7 @@ sub entryconfigure{
         
 }
 
-# Overriden version of addChild that handles storing any -data option,
+# Overridden version of addChild that handles storing any -data option,
 #   because the interface between perl and tcl doesn't allow for tie-ing of
 #   arbitrary variable references (only scalar and hash references supported now)
 sub addchild{
@@ -109,7 +109,7 @@ sub addchild{
         
 }
 
-# Overriden version of delete that handles delete any -data option dadta
+# Overridden version of delete that handles delete any -data option dadta
 sub delete{
         my $self   = shift;
         my $option = shift;
@@ -161,7 +161,7 @@ sub delete{
         $self->SUPER::delete($option, @_);
 }
  
-# Overriden version of info that handles getting -data storage
+# Overridden version of info that handles getting -data storage
 sub info{
         my $self   = shift;
         my $option = shift;
@@ -176,7 +176,7 @@ sub info{
 }
 
  
-# Overriden version of info that handles getting -data storage and -window itemtypes
+# Overridden version of info that handles getting -data storage and -window itemtypes
 sub entrycget{
         my $self   = shift;
         my $item   = shift;

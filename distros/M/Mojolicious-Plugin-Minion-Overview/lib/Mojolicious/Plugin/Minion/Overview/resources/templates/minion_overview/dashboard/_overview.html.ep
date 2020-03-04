@@ -1,0 +1,22 @@
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5>Overview</h5>
+    </div>
+    <div class="card-bg-secondary">
+        <div class="d-flex">
+            % my $columns = 0;
+            % foreach my $card (@$overview) {
+                % if (($columns++ % 4) == 0) {
+                    </div>
+                    <div class="d-flex">
+                % }
+                <div class="w-25 border-right border-bottom">
+                    <div class="p-4">
+                        <small class="text-uppercase"><%= $card->{ title } %></small>
+                        <h4 class="mt-4 mb-0"><%= $card->{ count } %></h4>
+                    </div>
+                </div>
+            % }
+        </div>
+    </div>
+</div>

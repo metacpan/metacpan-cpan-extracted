@@ -31,7 +31,3 @@ doctype: weaver
 
 plugins:
   - +config: Author::CSSON
-
-  - +extend_plugin: Badges
-    badge:
-     - coverage

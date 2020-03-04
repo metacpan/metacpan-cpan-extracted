@@ -40,10 +40,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         },
         ...
       ],                           # OPTIONAL
-      NextToken                        => 'MyString',    # OPTIONAL
-      ReservedInstancesModificationIds => [
-        'MyString', ...                                  # OPTIONAL
-      ],                                                 # OPTIONAL
+      NextToken => 'MyString',     # OPTIONAL
+      ReservedInstancesModificationIds =>
+        [ 'MyReservedInstancesModificationId', ... ],    # OPTIONAL
       );
 
     # Results:

@@ -1,8 +1,9 @@
 package Log::ger::Layout::ConvertCase;
 
-our $DATE = '2019-10-27'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-22'; # DATE
 our $DIST = 'Log-ger-Layout-ConvertCase'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -17,7 +18,7 @@ sub get_hooks {
             __PACKAGE__, # key
             50,          # priority
             sub {        # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
                 my $layouter = sub {
                     $conf{case} eq 'upper' ? uc($_[0]) : lc($_[0]);
@@ -44,7 +45,7 @@ Log::ger::Layout::ConvertCase - Example layout plugin to convert the case of mes
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::Layout::ConvertCase (from Perl distribution Log-ger-Layout-ConvertCase), released on 2019-10-27.
+This document describes version 0.002 of Log::ger::Layout::ConvertCase (from Perl distribution Log-ger-Layout-ConvertCase), released on 2019-12-22.
 
 =head1 SYNOPSIS
 
@@ -64,6 +65,12 @@ The final message will be:
 This is an example layout plugin, mentioned in the Log::ger tutorial.
 
 =for Pod::Coverage ^(.+)$
+
+=head1 CONFIGURATION
+
+=head2 case
+
+Str. Required. Either C<upper> or C<lower>.
 
 =head1 HOMEPAGE
 

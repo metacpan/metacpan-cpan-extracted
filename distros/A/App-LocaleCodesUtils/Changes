@@ -1,8 +1,19 @@
-0.002   2018-03-07 (PERLANCAR)
+0.003   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	[list-countries]
+
+        - Show alpha-3 codes.
+
+	[list-languages]
+
+        - Show alpha-3 codes.
+
+
+0.002   2018-03-07  Released-By: PERLANCAR
 
 	- Add utility: list-scripts.
 
 
-0.001   2018-03-06 (PERLANCAR)
+0.001   2018-03-06  Released-By: PERLANCAR
 
         - First release.

@@ -30,8 +30,8 @@ requires:
   CPAN::Mini: '0'
   Clone::Util: '0.03'
   Compiler::Lexer: '0'
-  Complete::File: '0'
-  Complete::Util: '0.603'
+  Complete::File: '0.440'
+  Complete::Util: '0.608'
   DBD::SQLite: '0'
   DBI: '0'
   Data::Sah::Coerce::perl::To_date::From_float::epoch: '0'
@@ -40,13 +40,16 @@ requires:
   Data::Sah::Coerce::perl::To_date::From_str::iso8601: '0'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname: '0'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname: '0'
-  Data::Sah::Coerce::perl::To_str::From_str::strip_slashes: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::date: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::re: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
+  Data::Sah::Filter::perl::Path::expand_tilde: '0'
+  Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
+  Data::Sah::Filter::perl::Path::strip_slashes: '0'
+  Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
   Encode: '0'
   Exporter: '5.57'
   File::Copy: '0'
@@ -65,14 +68,14 @@ requires:
   LWP::Protocol::Patch::CountBytesIn: '0'
   LWP::UserAgent::Patch::FilterMirrorMaxSize: '0'
   List::Util: '1.45'
-  Log::ger: '0.027'
+  Log::ger: '0.031'
   Logfile::Rotate: '0'
   Module::CoreList::More: '0.04'
+  Module::List::Tiny: '0'
   Module::Patch: '0.270'
   Module::XSOrPP: '0'
   Number::Format::Metric: '0'
   OrePAN: '0'
-  PERLANCAR::Module::List: '0.004004'
   POSIX: '0'
   Parse::CPAN::Meta: '0'
   Perinci::CmdLine::Any: '0.13'
@@ -101,7 +104,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan
   homepage: https://metacpan.org/release/App-lcpan
   repository: git://github.com/perlancar/perl-App-lcpan.git
-version: '1.043'
+version: '1.045'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -220,11 +223,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -360,7 +363,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.081'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -374,7 +377,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

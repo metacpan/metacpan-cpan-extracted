@@ -1,5 +1,5 @@
 package SVN::Dump::Text;
-$SVN::Dump::Text::VERSION = '0.07';
+$SVN::Dump::Text::VERSION = '0.08';
 use strict;
 use warnings;
 
@@ -36,7 +36,7 @@ SVN::Dump::Text - A text block from a svn dump
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

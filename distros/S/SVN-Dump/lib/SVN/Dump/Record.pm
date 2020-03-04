@@ -1,5 +1,5 @@
 package SVN::Dump::Record;
-$SVN::Dump::Record::VERSION = '0.07';
+$SVN::Dump::Record::VERSION = '0.08';
 use strict;
 use warnings;
 
@@ -154,7 +154,7 @@ SVN::Dump::Record - A SVN dump record
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

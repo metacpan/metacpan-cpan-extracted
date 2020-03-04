@@ -45,9 +45,9 @@ subscription can't contain more than 20 million users.
 
 =head2 Active => Bool
 
-  Active status of user. When you create an Amazon QuickSight user
-thatE<rsquo>s not an IAM user or an AD user, that user is inactive
-until they sign in and provide a password
+  The active status of user. When you create an Amazon QuickSight user
+thatE<rsquo>s not an IAM user or an Active Directory user, that user is
+inactive until they sign in and provide a password.
 
 
 =head2 Arn => Str
@@ -72,7 +72,35 @@ until they sign in and provide a password
 
 =head2 Role => Str
 
-  The Amazon QuickSight role for the user.
+  The Amazon QuickSight role for the user. The user role can be one of
+the following:.
+
+=over
+
+=item *
+
+C<READER>: A user who has read-only access to dashboards.
+
+=item *
+
+C<AUTHOR>: A user who can create data sources, datasets, analyses, and
+dashboards.
+
+=item *
+
+C<ADMIN>: A user who is an author, who can also manage Amazon
+QuickSight settings.
+
+=item *
+
+C<RESTRICTED_READER>: This role isn't currently available for use.
+
+=item *
+
+C<RESTRICTED_AUTHOR>: This role isn't currently available for use.
+
+=back
+
 
 
 =head2 UserName => Str

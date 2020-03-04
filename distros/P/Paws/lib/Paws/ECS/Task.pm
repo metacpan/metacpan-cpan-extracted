@@ -1,6 +1,9 @@
 package Paws::ECS::Task;
   use Moose;
   has Attachments => (is => 'ro', isa => 'ArrayRef[Paws::ECS::Attachment]', request_name => 'attachments', traits => ['NameInRequest']);
+  has Attributes => (is => 'ro', isa => 'ArrayRef[Paws::ECS::Attribute]', request_name => 'attributes', traits => ['NameInRequest']);
+  has AvailabilityZone => (is => 'ro', isa => 'Str', request_name => 'availabilityZone', traits => ['NameInRequest']);
+  has CapacityProviderName => (is => 'ro', isa => 'Str', request_name => 'capacityProviderName', traits => ['NameInRequest']);
   has ClusterArn => (is => 'ro', isa => 'Str', request_name => 'clusterArn', traits => ['NameInRequest']);
   has Connectivity => (is => 'ro', isa => 'Str', request_name => 'connectivity', traits => ['NameInRequest']);
   has ConnectivityAt => (is => 'ro', isa => 'Str', request_name => 'connectivityAt', traits => ['NameInRequest']);
@@ -12,6 +15,7 @@ package Paws::ECS::Task;
   has ExecutionStoppedAt => (is => 'ro', isa => 'Str', request_name => 'executionStoppedAt', traits => ['NameInRequest']);
   has Group => (is => 'ro', isa => 'Str', request_name => 'group', traits => ['NameInRequest']);
   has HealthStatus => (is => 'ro', isa => 'Str', request_name => 'healthStatus', traits => ['NameInRequest']);
+  has InferenceAccelerators => (is => 'ro', isa => 'ArrayRef[Paws::ECS::InferenceAccelerator]', request_name => 'inferenceAccelerators', traits => ['NameInRequest']);
   has LastStatus => (is => 'ro', isa => 'Str', request_name => 'lastStatus', traits => ['NameInRequest']);
   has LaunchType => (is => 'ro', isa => 'Str', request_name => 'launchType', traits => ['NameInRequest']);
   has Memory => (is => 'ro', isa => 'Str', request_name => 'memory', traits => ['NameInRequest']);
@@ -68,6 +72,21 @@ Details on a task in a cluster.
 
   The Elastic Network Adapter associated with the task if the task uses
 the C<awsvpc> network mode.
+
+
+=head2 Attributes => ArrayRef[L<Paws::ECS::Attribute>]
+
+  The attributes of the task
+
+
+=head2 AvailabilityZone => Str
+
+  The availability zone of the task.
+
+
+=head2 CapacityProviderName => Str
+
+  The capacity provider associated with the task.
 
 
 =head2 ClusterArn => Str
@@ -182,6 +201,11 @@ specified in a parent image or from the image's Dockerfile) and not
 specified in the container definition. Health check parameters that are
 specified in a container definition override any Docker health checks
 that exist in the container image.
+
+
+=head2 InferenceAccelerators => ArrayRef[L<Paws::ECS::InferenceAccelerator>]
+
+  The Elastic Inference accelerator associated with the task.
 
 
 =head2 LastStatus => Str
@@ -309,9 +333,51 @@ C<RUNNING> state to C<STOPPED>).
 
   The metadata that you apply to the task to help you categorize and
 organize them. Each tag consists of a key and an optional value, both
-of which you define. Tag keys can have a maximum character length of
-128 characters, and tag values can have a maximum length of 256
-characters.
+of which you define.
+
+The following basic restrictions apply to tags:
+
+=over
+
+=item *
+
+Maximum number of tags per resource - 50
+
+=item *
+
+For each resource, each tag key must be unique, and each tag key can
+have only one value.
+
+=item *
+
+Maximum key length - 128 Unicode characters in UTF-8
+
+=item *
+
+Maximum value length - 256 Unicode characters in UTF-8
+
+=item *
+
+If your tagging schema is used across multiple services and resources,
+remember that other services may have restrictions on allowed
+characters. Generally allowed characters are: letters, numbers, and
+spaces representable in UTF-8, and the following characters: + - = . _
+: / @.
+
+=item *
+
+Tag keys and values are case-sensitive.
+
+=item *
+
+Do not use C<aws:>, C<AWS:>, or any upper or lowercase combination of
+such as a prefix for either keys or values as it is reserved for AWS
+use. You cannot edit or delete tag keys or values with this prefix.
+Tags with this prefix do not count against your tags per resource
+limit.
+
+=back
+
 
 
 =head2 TaskArn => Str
@@ -330,7 +396,7 @@ characters.
 change that triggers a CloudWatch event, the version counter is
 incremented. If you are replicating your Amazon ECS task state with
 CloudWatch Events, you can compare the version of a task reported by
-the Amazon ECS API actionss with the version reported in CloudWatch
+the Amazon ECS API actions with the version reported in CloudWatch
 Events for the task (inside the C<detail> object) to verify that the
 version in your event stream is current.
 

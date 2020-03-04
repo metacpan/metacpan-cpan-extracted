@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.510';
+our $VERSION   = '0.514';
 
 use Keyword::Simple ();
 use PPR;
@@ -20,6 +20,13 @@ use B::Hooks::EndOfScope;
 use Exporter::Shiny our @EXPORT = qw( version authority overload );
 use Devel::StrictMode qw(STRICT);
 use Types::Standard qw( is_HashRef is_Str );
+
+my $decomment = sub {
+	require Carp;
+	Carp::carp("Cannot remove comments within a type constraint; please upgrade perl");
+	return $_[0];
+};
+$decomment = \&PPR::decomment if $] >= 5.016;
 
 BEGIN {
 	package Zydeco::_Gather;
@@ -223,14 +230,14 @@ our $GRAMMAR = qr{
 		
 			(?&MxpSimpleTypeSpec)
 			(?:
-				\s*\&\s*
+				(?&PerlOWS) \& (?&PerlOWS)
 				(?&MxpSimpleTypeSpec)
 			)*
 			(?:
-				\s*\|\s*
+				(?&PerlOWS) \| (?&PerlOWS)
 				(?&MxpSimpleTypeSpec)
 				(?:
-					\s*\&\s*
+					(?&PerlOWS) \& (?&PerlOWS)
 					(?&MxpSimpleTypeSpec)
 				)*
 			)*
@@ -241,16 +248,21 @@ our $GRAMMAR = qr{
 			(?&MxpTypeSpec)|(?&PerlBlock)
 		)#</MxpExtendedTypeSpec>
 		
+		(?<MxpSignatureVariable>
+			[\$\@\%]
+			(?&PerlIdentifier)
+		)#</MxpSignatureVariable>
+		
 		(?<MxpSignatureElement>
 		
 			(?&PerlOWS)
 			(?: (?&MxpExtendedTypeSpec))?                 # CAPTURE:type
 			(?&PerlOWS)
 			(?:                                           # CAPTURE:name
-				(?&PerlVariable) | (\*(?&PerlIdentifier))
+				(?&MxpSignatureVariable) | (\*(?&PerlIdentifier) | [\$\@\%] )
 			)
 			(?:                                           # CAPTURE:postamble
-				\? | ((?&PerlOWS)=(?&PerlOWS)(?&PerlTerm))
+				\? | ((?&PerlOWS)=(?&PerlOWS)(?&PerlScalarExpression))
 			)?
 		)#</MxpSignatureElement>
 		
@@ -319,6 +331,12 @@ our $GRAMMAR = qr{
 				)?
 			)*
 		)#</MxpCompactRoleList>
+		
+		(?<MxpBlockLike>
+		
+			(?: (?&PerlBlock) ) |
+			(?: [=] (?&PerlOWS) (?&PerlScalarExpression) (?&PerlOWS) [;] )
+		)#</MxpBlockLike>
 		
 		(?<MxpIncludeSyntax>
 		
@@ -545,7 +563,7 @@ our $GRAMMAR = qr{
 				[)]
 			)?
 			(?&PerlOWS)
-			(?: (?&PerlBlock) )                           # CAPTURE:code
+			(?: (?&MxpBlockLike) )                        # CAPTURE:code
 			(?&PerlOWS)
 		)#</MxpMethodSyntax>
 		
@@ -568,7 +586,7 @@ our $GRAMMAR = qr{
 				[)]
 			)?
 			(?&PerlOWS)
-			(?: (?&PerlBlock) )                           # CAPTURE:code
+			(?: (?&MxpBlockLike) )                        # CAPTURE:code
 			(?&PerlOWS)
 		)#</MxpMultiSyntax>
 		
@@ -589,7 +607,7 @@ our $GRAMMAR = qr{
 				[)]
 			)?
 			(?&PerlOWS)
-			(?: (?&PerlBlock) )                           # CAPTURE:code
+			(?: (?&MxpBlockLike) )                        # CAPTURE:code
 			(?&PerlOWS)
 		)#</MxpModifierSyntax>
 		
@@ -612,7 +630,7 @@ our $GRAMMAR = qr{
 				[)]
 			)?
 			(?&PerlOWS)
-			(?: (?&PerlBlock) )                           # CAPTURE:code
+			(?: (?&MxpBlockLike) )                        # CAPTURE:code
 			(?&PerlOWS)
 		)#</MxpFactorySyntax>
 		
@@ -645,7 +663,7 @@ our $GRAMMAR = qr{
 				(?&PerlBlock)|(?&PerlIdentifier)|(?&PerlString)
 			)
 			(?&PerlOWS)
-			(?: (?&PerlBlock) )?                          # CAPTURE:code
+			(?: (?&MxpBlockLike) )?                       # CAPTURE:code
 			(?&PerlOWS)
 		)#</MxpCoerceSyntax>
 		
@@ -735,7 +753,7 @@ sub _handle_signature_list {
 		}
 		elsif ($sig =~ /^((?&MxpTypeSpec)) $GRAMMAR/xso) {
 			my $type = $1;
-			$parsed[-1]{type}          = $type;
+			$parsed[-1]{type}          = ($type =~ /#/) ? $type->$decomment : $type;
 			$parsed[-1]{type_is_block} = 0;
 			$sig =~ s/^\Q$type//xs;
 			$sig =~ s/^((?&PerlOWS)) $GRAMMAR//xso;
@@ -754,7 +772,16 @@ sub _handle_signature_list {
 			$sig =~ s/^\*\Q$name//xs;
 			$sig =~ s/^((?&PerlOWS)) $GRAMMAR//xso;
 		}
-		elsif ($sig =~ /^((?&PerlVariable)) $GRAMMAR/xso) {
+		elsif ($sig =~ /^ ( [\$\@\%] ) (?: [=),?] | (?&PerlNWS) | $ ) $GRAMMAR/xso) {
+			state $dummy = 0;
+			my $name = substr($sig,0,1) . '____ZYDECO_DUMMY_VAR_' . ++$dummy;
+			$parsed[-1]{name}       = $name;
+			$parsed[-1]{named}      = 0;
+			$parsed[-1]{positional} = 1;
+			$sig = substr($sig, 1);
+			$sig =~ s/^((?&PerlOWS)) $GRAMMAR//xs;
+		}
+		elsif ($sig =~ /^((?&MxpSignatureVariable)) $GRAMMAR/xso) {
 			my $name = $1;
 			$parsed[-1]{name}       = $name;
 			$parsed[-1]{named}      = 0;
@@ -768,7 +795,7 @@ sub _handle_signature_list {
 			$parsed[-1]{optional} = 1;
 			$sig =~ s/^\?((?&PerlOWS)) $GRAMMAR//xso;
 		}
-		elsif ($sig =~ /^=((?&PerlOWS))((?&PerlTerm)) $GRAMMAR/xso) {
+		elsif ($sig =~ /^=((?&PerlOWS))((?&PerlScalarExpression)) $GRAMMAR/xso) {
 			my ($ws, $default) = ($1, $2);
 			$parsed[-1]{default} = $default;
 			$sig =~ s/^=\Q$ws$default//xs;
@@ -934,6 +961,11 @@ sub _handle_role_list {
 	return join(",", @return);
 }
 
+sub _stringify_attributes {
+	my @quoted = map sprintf(q("%s"), quotemeta(substr $_, 1)), @{ $_[1] || [] };
+	sprintf '[%s]', join q[,], @quoted;
+}
+
 sub _handle_name_list {
 	my ($me, $names) = @_;
 	return unless $names;
@@ -951,6 +983,11 @@ sub _handle_factory_keyword {
 		$optim = 1 if $attr =~ /^:optimize\b/;
 	}
 	
+	if (defined $code and $code =~ /^=(.+)$/s) {
+		$code  = "{ $1 }";
+		$optim = 1;
+	}
+	
 	if ($via) {
 		return sprintf(
 			'q[%s]->_factory(%s, \\(%s));',
@@ -962,9 +999,10 @@ sub _handle_factory_keyword {
 	if (!$has_sig) {
 		my $munged_code = sprintf('sub { my ($factory, $class) = (@_); do %s }', $code);
 		return sprintf(
-			'q[%s]->_factory(%s, { caller => __PACKAGE__, code => %s, optimize => %d });',
+			'q[%s]->_factory(%s, { attributes => %s, caller => __PACKAGE__, code => %s, optimize => %d });',
 			$me,
 			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+			$me->_stringify_attributes($attrs),
 			$optim ? B::perlstring($munged_code) : $munged_code,
 			!!$optim,
 		);
@@ -972,9 +1010,10 @@ sub _handle_factory_keyword {
 	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 	my $munged_code = sprintf('sub { my($factory,$class,%s)=(shift,shift,@_); %s; do %s }', $signature_var_list, $extra, $code);
 	sprintf(
-		'q[%s]->_factory(%s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
+		'q[%s]->_factory(%s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 		$me,
 		($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+		$me->_stringify_attributes($attrs),
 		$optim ? B::perlstring($munged_code) : $munged_code,
 		!!$signature_is_named,
 		$type_params_stuff,
@@ -985,10 +1024,15 @@ sub _handle_factory_keyword {
 sub _handle_method_keyword {
 	my $me = shift;
 	my ($name, $code, $has_sig, $sig, $attrs) = @_;
-	
+
 	my $optim;
 	for my $attr (@$attrs) {
 		$optim = 1 if $attr =~ /^:optimize\b/;
+	}
+	
+	if (defined $code and $code =~ /^=(.+)$/s) {
+		$code  = "{ $1 }";
+		$optim = 1;
 	}
 	
 	my $lex_name;
@@ -1003,9 +1047,10 @@ sub _handle_method_keyword {
 			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 			$return = sprintf(
-				'q[%s]->_can(%s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
+				'q[%s]->_can(%s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 				$me,
 				($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+				$me->_stringify_attributes($attrs),
 				$optim ? B::perlstring($munged_code) : $munged_code,
 				!!$signature_is_named,
 				$type_params_stuff,
@@ -1015,9 +1060,10 @@ sub _handle_method_keyword {
 		else {
 			my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
 			$return = sprintf(
-				'q[%s]->_can(%s, { caller => __PACKAGE__, code => %s, optimize => %d });',
+				'q[%s]->_can(%s, { attributes => %s, caller => __PACKAGE__, code => %s, optimize => %d });',
 				$me,
 				($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+				$me->_stringify_attributes($attrs),
 				$optim ? B::perlstring($munged_code) : $munged_code,
 				!!$optim,
 			);
@@ -1028,8 +1074,9 @@ sub _handle_method_keyword {
 			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 			$return = sprintf(
-				'q[%s]->wrap_coderef({ caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
+				'q[%s]->wrap_coderef({ attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 				'MooX::Press',
+				$me->_stringify_attributes($attrs),
 				$optim ? B::perlstring($munged_code) : $munged_code,
 				!!$signature_is_named,
 				$type_params_stuff,
@@ -1039,8 +1086,9 @@ sub _handle_method_keyword {
 		else {
 			my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
 			$return = sprintf(
-				'q[%s]->wrap_coderef({ caller => __PACKAGE__, code => %s, optimize => %d });',
+				'q[%s]->wrap_coderef({ attributes => %s, caller => __PACKAGE__, code => %s, optimize => %d });',
 				'MooX::Press',
+				$me->_stringify_attributes($attrs),
 				$optim ? B::perlstring($munged_code) : $munged_code,
 				!!$optim,
 			);
@@ -1067,13 +1115,19 @@ sub _handle_multimethod_keyword {
 		}
 	}
 	
+	if (defined $code and $code =~ /^=(.+)$/s) {
+		$code  = "{ $1 }";
+		$optim = 1;
+	}
+	
 	if ($has_sig) {
 		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 		return sprintf(
-			'q[%s]->_multimethod(%s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, %s });',
+			'q[%s]->_multimethod(%s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, %s });',
 			$me,
 			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+			$me->_stringify_attributes($attrs),
 			$munged_code,
 			!!$signature_is_named,
 			$type_params_stuff,
@@ -1083,9 +1137,10 @@ sub _handle_multimethod_keyword {
 	else {
 		my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
 		return sprintf(
-			'q[%s]->_multimethod(%s, { caller => __PACKAGE__, code => %s, named => 0, signature => sub { @_ }, %s });',
+			'q[%s]->_multimethod(%s, { attributes => %s, caller => __PACKAGE__, code => %s, named => 0, signature => sub { @_ }, %s });',
 			$me,
 			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+			$me->_stringify_attributes($attrs),
 			$munged_code,
 			$extra_code,
 		);
@@ -1099,6 +1154,14 @@ sub _handle_modifier_keyword {
 	for my $attr (@$attrs) {
 		$optim = 1 if $attr =~ /^:optimize\b/;
 	}
+	
+	if (defined $code and $code =~ /^=(.+)$/s) {
+		$code  = "{ $1 }";
+		$optim = 1;
+	}
+	
+	# MooX::Press cannot handle optimizing method modifiers
+	$optim = 0;
 	
 	my @names = $me->_handle_name_list($names);
 	
@@ -1116,10 +1179,11 @@ sub _handle_modifier_keyword {
 			$munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 		}
 		sprintf(
-			'q[%s]->_modifier(q(%s), %s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
+			'q[%s]->_modifier(q(%s), %s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 			$me,
 			$kind,
 			$processed_names,
+			$me->_stringify_attributes($attrs),
 			$optim ? B::perlstring($munged_code) : $munged_code,
 			!!$signature_is_named,
 			$type_params_stuff,
@@ -1129,10 +1193,11 @@ sub _handle_modifier_keyword {
 	elsif ($kind eq 'around') {
 		my $munged_code = sprintf('sub { my ($next, $self) = @_; my $class = ref($self)||$self; do %s }', $code);
 		sprintf(
-			'q[%s]->_modifier(q(%s), %s, { caller => __PACKAGE__, code => %s, optimize => %d });',
+			'q[%s]->_modifier(q(%s), %s, { attributes => %s, caller => __PACKAGE__, code => %s, optimize => %d });',
 			$me,
 			$kind,
 			$processed_names,
+			$me->_stringify_attributes($attrs),
 			$optim ? B::perlstring($munged_code) : $munged_code,
 			!!$optim,
 		);
@@ -1140,10 +1205,11 @@ sub _handle_modifier_keyword {
 	else {
 		my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
 		sprintf(
-			'q[%s]->_modifier(q(%s), %s, { caller => __PACKAGE__, code => %s, optimize => %d });',
+			'q[%s]->_modifier(q(%s), %s, { attributes => %s, caller => __PACKAGE__, code => %s, optimize => %d });',
 			$me,
 			$kind,
 			$processed_names,
+			$me->_stringify_attributes($attrs),
 			$optim ? B::perlstring($munged_code) : $munged_code,
 			!!$optim,
 		);
@@ -2170,7 +2236,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.510';
+#	our $VERSION   = '0.514';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2181,7 +2247,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.510';
+#	our $VERSION   = '0.514';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2194,12 +2260,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.510';
+#	our $VERSION   = '0.514';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.510';
+#	our $VERSION   = '0.514';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2213,7 +2279,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.510';
+#	our $VERSION   = '0.514';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;

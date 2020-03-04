@@ -1,0 +1,56 @@
+% foreach my $worker (@$workers) {
+    <div class="card mt-3">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6><%= $worker->{ host } %></h6>
+        </div>
+        <div class="card-bg-secondary">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th colspan="4" class="text-center">Jobs</th>
+                        <th rowspan="2" class="align-middle">Command Interval</th>
+                        <th rowspan="2" class="align-middle">Max jobs</th>
+                        <th rowspan="2" class="align-middle">Started</th>
+                        <th rowspan="2" class="align-middle">Notified</th>
+                        <th rowspan="2" class="align-middle">Queues</th>
+                    </tr>
+                    <tr>
+                        <th>Performed</th>
+                        <th>Active</th>
+                        <th>Finished</th>
+                        <th>Failed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="align-middle">
+                            <a href="<%= url_for('minion_overview.jobs', )->query(worker => $worker->{ id }) %>">
+                                <%= $worker->{ jobs_stats }->{ performed } %>
+                            </a>
+                        </td>
+                        <td class="align-middle">
+                            <a href="<%= url_for('minion_overview.jobs', )->query(worker => $worker->{ id }, state => 'active') %>">
+                                <%= $worker->{ jobs_stats }->{ active } %>
+                            </a>
+                        </td>
+                        <td class="align-middle">
+                            <a href="<%= url_for('minion_overview.jobs', )->query(worker => $worker->{ id }, state => 'finished') %>">
+                                <%= $worker->{ jobs_stats }->{ finished } %>
+                            </a>
+                        </td>
+                        <td class="align-middle">
+                            <a href="<%= url_for('minion_overview.failed_jobs', )->query(worker => $worker->{ id }) %>">
+                                <%= $worker->{ jobs_stats }->{ failed } %>
+                            </a>
+                        </td>
+                        <td class="align-middle"><%= $worker->{ status }->{ command_interval } %></td>
+                        <td class="align-middle"><%= $worker->{ status }->{ jobs } %></td>
+                        <td class="align-middle"><%= $worker->{ started } %></td>
+                        <td class="align-middle"><%= $worker->{ notified } %></td>
+                        <td class="align-middle"><%= join(', ', @{ $worker->{ status }->{ queues } }) %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+% }

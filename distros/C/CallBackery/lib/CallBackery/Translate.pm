@@ -120,7 +120,8 @@ use overload
     };
 
 sub trm ($str,@args) {
-    return bless [$str,@args];
+    # make sure the arguments are stringified
+    return bless [$str,map { "$_" } @args];
 }
 
 =head2 $str->TO_JSON

@@ -32,8 +32,11 @@ get '/metacpan' => sub {
 my $ua = new_ok 'Mojo::UserAgent';
 my $tx = $ua->get('/')->with_roles('+Mechanize');
 ok $tx->does('Mojo::Transaction::HTTP::Role::Mechanize'), 'obj compose';
-my $dom = $tx->result->dom->with_roles('+Form');
-my $form = $dom->at('form');
+
+ok my $forms = $tx->extract_forms, 'extract forms';
+is $forms->size, 1, '1 form extracted';
+my $form = $forms->first;
+ok $form->does('Mojo::DOM::Role::Form'), 'correct role';
 
 my %exp = ( a => 'A', b => 'B', c => 'C', d => 'D', f => ['I', 'J'], m => 'M',
   o => 'O', p => 'P0', r => 'on', t => '',

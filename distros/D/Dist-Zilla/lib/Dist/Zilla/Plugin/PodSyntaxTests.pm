@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PodSyntaxTests 6.012;
+package Dist::Zilla::Plugin::PodSyntaxTests 6.014;
 # ABSTRACT: a author test for Pod syntax
 
 use Moose;
@@ -7,6 +7,14 @@ with 'Dist::Zilla::Role::PrereqSource';
 
 use namespace::autoclean;
 
+#pod =head1 SYNTAX
+#pod
+#pod     # Add this to your dist.ini.
+#pod     [PodSyntaxTests]
+#pod
+#pod     # To test for POD validity, run this in the shell:
+#pod     $ dzil test --release
+#pod
 #pod =head1 DESCRIPTION
 #pod
 #pod This is an extension of L<Dist::Zilla::Plugin::InlineFiles>, providing the
@@ -15,6 +23,8 @@ use namespace::autoclean;
 #pod   xt/author/pod-syntax.t   - a standard Test::Pod test
 #pod
 #pod L<Test::Pod> C<1.41> will be added as a C<develop requires> dependency.
+#pod
+#pod One can run the release tests by invoking C<dzil test --release>.
 #pod
 #pod =cut
 
@@ -47,7 +57,7 @@ Dist::Zilla::Plugin::PodSyntaxTests - a author test for Pod syntax
 
 =head1 VERSION
 
-version 6.012
+version 6.014
 
 =head1 DESCRIPTION
 
@@ -58,13 +68,23 @@ following files:
 
 L<Test::Pod> C<1.41> will be added as a C<develop requires> dependency.
 
+One can run the release tests by invoking C<dzil test --release>.
+
+=head1 SYNTAX
+
+    # Add this to your dist.ini.
+    [PodSyntaxTests]
+
+    # To test for POD validity, run this in the shell:
+    $ dzil test --release
+
 =head1 AUTHOR
 
 Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

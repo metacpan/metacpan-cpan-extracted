@@ -1,5 +1,17 @@
 Changelog for Mojolicious-Plugin-Moai
 
+0.009     2020-02-27 22:03:51-06:00 America/Chicago
+
+    [Added]
+
+    - Added `table_has` test method to test that a table contains
+      a subset of the rows/columns that are expected.
+    - Added menu buttons with dropdown menus.
+
+    [Fixed]
+
+    - Fixed the navbar template classes
+
 0.008     2020-01-15 00:39:48-05:00 America/New_York
 
     [Fixed]

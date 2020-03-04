@@ -43,11 +43,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         },
         ...
       ],                           # OPTIONAL
-      MaxResults => 1,             # OPTIONAL
-      NextToken  => 'MyString',    # OPTIONAL
-      ServiceIds => [
-        'MyString', ...            # OPTIONAL
-      ],                           # OPTIONAL
+      MaxResults => 1,                                    # OPTIONAL
+      NextToken  => 'MyString',                           # OPTIONAL
+      ServiceIds => [ 'MyVpcEndpointServiceId', ... ],    # OPTIONAL
       );
 
     # Results:
@@ -115,8 +113,8 @@ the tag value.
 The maximum number of results to return for the request in a single
 page. The remaining results of the initial request can be seen by
 sending another request with the returned C<NextToken> value. This
-value can be between 5 and 1000; if C<MaxResults> is given a value
-larger than 1000, only 1000 results are returned.
+value can be between 5 and 1,000; if C<MaxResults> is given a value
+larger than 1,000, only 1,000 results are returned.
 
 
 

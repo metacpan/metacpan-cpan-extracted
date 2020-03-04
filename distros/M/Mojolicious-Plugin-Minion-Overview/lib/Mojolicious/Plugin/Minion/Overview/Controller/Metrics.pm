@@ -1,6 +1,12 @@
 package Mojolicious::Plugin::Minion::Overview::Controller::Metrics;
 use Mojo::Base 'Mojolicious::Controller';
 
+=head2 search
+
+Show a list of unique jobs and finished/failed stats
+
+=cut
+
 sub search {
     my $self = shift;
     

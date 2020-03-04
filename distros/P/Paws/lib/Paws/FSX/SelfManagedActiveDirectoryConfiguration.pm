@@ -48,7 +48,7 @@ Directory (AD) directory.
   A list of up to two IP addresses of DNS servers or domain controllers
 in the self-managed AD directory. The IP addresses need to be either in
 the same VPC CIDR range as the one in which your Amazon FSx file system
-is being created, or in the private IP version 4 (Iv4) address ranges,
+is being created, or in the private IP version 4 (IPv4) address ranges,
 as specified in RFC 1918 (http://www.faqs.org/rfcs/rfc1918.html):
 
 =over
@@ -79,8 +79,9 @@ as C<corp.example.com>.
 
   (Optional) The name of the domain group whose members are granted
 administrative privileges for the file system. Administrative
-privileges include taking ownership of files and folders, and setting
-audit controls (audit ACLs) on files and folders. The group that you
+privileges include taking ownership of files and folders, setting audit
+controls (audit ACLs) on files and folders, and administering the file
+system remotely by using the FSx Remote PowerShell. The group that you
 specify must already exist in your domain. If you don't provide one,
 your AD domain's Domain Admins group is used.
 

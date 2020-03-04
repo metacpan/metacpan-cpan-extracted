@@ -1,0 +1,104 @@
+## name Accept non-empty alternatives
+## failures 0
+## cut
+
+m//;            # Null case
+m/(?:fubar)/;
+m/a|b|c/;
+s/ a | b | c /def/smx;
+qr< a | b | c >smx;
+m/ a | b | /;   # Not empty unless /x in effect
+m/(?[ [[:alpha:]] | [[:digit:]] ])/;
+
+#-----------------------------------------------------------------------------
+
+## name Reject empty alternatives
+## failures 5
+## cut
+
+m/a||c/;
+s/ a | b | /ab/smx;
+qr< a | (?: | b ) >smx;
+m/(foo||bar)$/; # End anchor does not help unless configured
+m/(?[\d|])/;    # Actually, this is a syntax error.
+
+#-----------------------------------------------------------------------------
+
+## name Accept empty final alternative if told to do so
+## parms { allow_empty_final_alternative => '1' }
+## failures 0
+## cut
+
+m/a|b|/;
+
+#-----------------------------------------------------------------------------
+
+## name Can not force empty final alternative in extended bracketed char cls
+## parms { allow_empty_final_alternative => '1' }
+## failures 1
+## cut
+
+m/(?[\d|])/;    # Actually, this is a syntax error.
+
+#-----------------------------------------------------------------------------
+
+## name Empty final alternative does not affect rejection for other causes
+## parms { allow_empty_final_alternative => '1' }
+## failures 1
+## cut
+
+m/a||b|/;
+
+#-----------------------------------------------------------------------------
+
+## name Allow end-anchored group with empty alternatives if told to do so
+## parms { allow_if_group_anchored => '1' }
+## failures 0
+## cut
+
+m/(foo||bar)$/;
+m/(foo|bar|)$/;
+m/(|Athos|Porthos|Aramis)!/;
+m/(|Athos|Porthos|Aramis)!?$/;
+m/((Larry|Moe|Shemp|)|Huey|Dewey|Louis)$/;
+
+#-----------------------------------------------------------------------------
+
+## name Anchor allowed but not found
+## parms { allow_if_group_anchored => '1' }
+## failures 3
+## cut
+
+m/(foo||bar)/;
+m/(foo|bar|)/;
+m/(|Athos|Porthos|Aramis)!?/;
+
+#-----------------------------------------------------------------------------
+
+## name Will not accept end-anchored extended bracketed character class
+## parms { allow_if_group_anchored => '1' }
+## failures 1
+## cut
+
+m/(?[\d|])$/;    # Actually, this is a syntax error.
+
+#-----------------------------------------------------------------------------
+
+## name Ignore file if told to do so
+## parms { ignore_files => '\bFubar\z' }
+## filename Fubar
+## failures 0
+## cut
+
+m/a||c/;
+
+#-----------------------------------------------------------------------------
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab shiftround :

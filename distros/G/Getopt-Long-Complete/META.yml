@@ -6,7 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0'
+  Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -25,14 +25,13 @@ requires:
   Complete::Zsh: '0'
   Exporter: '5.57'
   Getopt::Long: '2.50'
-  perl: '5.010001'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Complete
   homepage: https://metacpan.org/release/Getopt-Long-Complete
   repository: git://github.com/perlancar/perl-Getopt-Long-Complete.git
-version: '0.311'
+version: '0.312'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

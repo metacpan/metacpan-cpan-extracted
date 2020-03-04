@@ -1,7 +1,7 @@
 package Log::ger::Output::Composite;
 
-our $DATE = '2020-02-06'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2020-03-04'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use strict;
 use warnings;
@@ -87,7 +87,7 @@ sub get_hooks {
                 no strict 'refs';
                 require Data::Dmp;
 
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
                 my $target = $hook_args{target};
                 my $target_arg = $hook_args{target_arg};
@@ -250,7 +250,9 @@ sub get_hooks {
 
                     push @src, "};\n";
                     my $src = join("", @src);
-                    #print "D: logger source code: <<$src>>\n";
+                    if ($ENV{LOG_LOG_GER_OUTPUT_COMPOSITE_CODE}) {
+                        print STDERR "Log::ger::Output::Composite logger source code: <<$src>>\n";
+                    }
 
                     $logger = eval $src;
                 }
@@ -279,7 +281,7 @@ Log::ger::Output::Composite - Composite output
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -430,6 +432,10 @@ then after the C<Log::ger::Output::Composite::set_level('trace')>, all the above
 per-category and per-output levels will be set to C<trace>.
 
 =head1 ENVIRONMENT
+
+=head2 LOG_LOG_GER_OUTPUT_COMPOSITE_CODE
+
+Bool. If set to true will print the generated logger source code to stderr.
 
 =head1 SEE ALSO
 

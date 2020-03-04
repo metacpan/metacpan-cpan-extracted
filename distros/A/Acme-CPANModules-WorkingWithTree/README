@@ -3,9 +3,9 @@ NAME
     Perl
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.004 of
     Acme::CPANModules::WorkingWithTree (from Perl distribution
-    Acme-CPANModules-WorkingWithTree), released on 2020-02-04.
+    Acme-CPANModules-WorkingWithTree), released on 2020-03-01.
 
 DESCRIPTION
     Working with tree data structure in Perl.
@@ -33,7 +33,7 @@ DESCRIPTION
 
     Tree::To::Text, Tree::To::TextLines.
 
-    Visualizing as graphic
+    Visualizing as graphics
 
     TODO
 
@@ -41,11 +41,23 @@ DESCRIPTION
 
     Tree::To::FS.
 
+    Tree::Shell.
+
     Special kinds of trees: TODO.
 
     Roles
 
     Role::TinyCommons::Tree.
+
+    Modules that produce or work with Role::TinyCommons::Tree-compliant tree
+    objects
+
+    Org::Parser, Org::Parser::Tiny.
+
+    Tree::Dump.
+
+    Data::CSel and its related modules: App::htmlsel, App::jsonsel,
+    App::orgsel, App::podsel, App::ppisel, App::yamlsel, App::CSelUtils.
 
 INCLUDED MODULES
     *   Tree::Object
@@ -80,7 +92,31 @@ INCLUDED MODULES
 
     *   Tree::To::FS
 
+    *   Tree::Shell
+
     *   Role::TinyCommons::Tree
+
+    *   Org::Parser
+
+    *   Org::Parser::Tiny
+
+    *   Tree::Dump
+
+    *   Data::CSel
+
+    *   App::htmlsel
+
+    *   App::jsonsel
+
+    *   App::orgsel
+
+    *   App::podsel
+
+    *   App::ppisel
+
+    *   App::yamlsel
+
+    *   App::CSelUtils
 
 FAQ
   What are ways to use this module?

@@ -1,28 +1,59 @@
-SYNOPSIS
+NAME
+    Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building
+    Sah::Schemas::* distribution
 
+VERSION
+    This document describes version 0.05 of
+    Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution
+    Pod-Weaver-Plugin-Sah-Schemas), released on 2019-12-17.
+
+SYNOPSIS
     In your weaver.ini:
 
      [-Sah::Schemas]
 
 DESCRIPTION
-
     This plugin is used when building a Sah::Schemas::* distribution. It
     currently does the following to lib/Sah/Schemas/* .pm files:
 
-      * Create "SAH SCHEMAS" POD section from list of Sah::Schema::*
-      modules in the distribution
+    *   Create "SAH SCHEMAS" POD section from list of Sah::Schema::* modules
+        in the distribution
 
-      * Mention some modules in See Also section
+    *   Mention some modules in See Also section
 
-      e.g. Sah and Data::Sah.
+        e.g. Sah and Data::Sah.
 
     It does the following to "Sah/Schema/*" in lib .pm files:
 
-      * Add "DESCRIPTION" POD section schema's description
+    *   Add "DESCRIPTION" POD section schema's description
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Plugin-Sah-Schemas>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-Sah-Schemas>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Sah
+    -Schemas>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Sah and Data::Sah
 
     Dist::Zilla::Plugin::Sah::Schemas
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

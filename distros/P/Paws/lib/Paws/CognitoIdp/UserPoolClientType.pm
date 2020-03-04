@@ -13,6 +13,7 @@ package Paws::CognitoIdp::UserPoolClientType;
   has ExplicitAuthFlows => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has LastModifiedDate => (is => 'ro', isa => 'Str');
   has LogoutURLs => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
+  has PreventUserExistenceErrors => (is => 'ro', isa => 'Str');
   has ReadAttributes => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
   has RefreshTokenValidity => (is => 'ro', isa => 'Int');
   has SupportedIdentityProviders => (is => 'ro', isa => 'ArrayRef[Str|Undef]');
@@ -55,24 +56,32 @@ Contains information about a user pool client.
 
 =head2 AllowedOAuthFlows => ArrayRef[Str|Undef]
 
-  Set to C<code> to initiate a code grant flow, which provides an
+  The allowed OAuth flows.
+
+Set to C<code> to initiate a code grant flow, which provides an
 authorization code as the response. This code can be exchanged for
 access tokens with the token endpoint.
 
-Set to C<token> to specify that the client should get the access token
-(and, optionally, ID token, based on scopes) directly.
+Set to C<implicit> to specify that the client should get the access
+token (and, optionally, ID token, based on scopes) directly.
+
+Set to C<client_credentials> to specify that the client should get the
+access token (and, optionally, ID token, based on scopes) from the
+token endpoint using a combination of client and client_secret.
 
 
 =head2 AllowedOAuthFlowsUserPoolClient => Bool
 
-  Set to TRUE if the client is allowed to follow the OAuth protocol when
+  Set to true if the client is allowed to follow the OAuth protocol when
 interacting with Cognito user pools.
 
 
 =head2 AllowedOAuthScopes => ArrayRef[Str|Undef]
 
-  A list of allowed C<OAuth> scopes. Currently supported values are
-C<"phone">, C<"email">, C<"openid">, and C<"Cognito">.
+  The allowed OAuth scopes. Possible values provided by OAuth are:
+C<phone>, C<email>, C<openid>, and C<profile>. Possible values provided
+by AWS are: C<aws.cognito.signin.user.admin>. Custom scopes created in
+Resource Servers are also supported.
 
 
 =head2 AnalyticsConfiguration => L<Paws::CognitoIdp::AnalyticsConfigurationType>
@@ -164,7 +173,43 @@ App callback URLs such as myapp://example are also supported.
 
 =head2 ExplicitAuthFlows => ArrayRef[Str|Undef]
 
-  The explicit authentication flows.
+  The authentication flows that are supported by the user pool clients.
+Flow names without the C<ALLOW_> prefix are deprecated in favor of new
+names with the C<ALLOW_> prefix. Note that values with C<ALLOW_> prefix
+cannot be used along with values without C<ALLOW_> prefix.
+
+Valid values include:
+
+=over
+
+=item *
+
+C<ALLOW_ADMIN_USER_PASSWORD_AUTH>: Enable admin based user password
+authentication flow C<ADMIN_USER_PASSWORD_AUTH>. This setting replaces
+the C<ADMIN_NO_SRP_AUTH> setting. With this authentication flow,
+Cognito receives the password in the request instead of using the SRP
+(Secure Remote Password protocol) protocol to verify passwords.
+
+=item *
+
+C<ALLOW_CUSTOM_AUTH>: Enable Lambda trigger based authentication.
+
+=item *
+
+C<ALLOW_USER_PASSWORD_AUTH>: Enable user password-based authentication.
+In this flow, Cognito receives the password in the request instead of
+using the SRP protocol to verify passwords.
+
+=item *
+
+C<ALLOW_USER_SRP_AUTH>: Enable SRP based authentication.
+
+=item *
+
+C<ALLOW_REFRESH_TOKEN_AUTH>: Enable authflow to refresh tokens.
+
+=back
+
 
 
 =head2 LastModifiedDate => Str
@@ -175,6 +220,76 @@ App callback URLs such as myapp://example are also supported.
 =head2 LogoutURLs => ArrayRef[Str|Undef]
 
   A list of allowed logout URLs for the identity providers.
+
+
+=head2 PreventUserExistenceErrors => Str
+
+  Use this setting to choose which errors and responses are returned by
+Cognito APIs during authentication, account confirmation, and password
+recovery when the user does not exist in the user pool. When set to
+C<ENABLED> and the user does not exist, authentication returns an error
+indicating either the username or password was incorrect, and account
+confirmation and password recovery return a response indicating a code
+was sent to a simulated destination. When set to C<LEGACY>, those APIs
+will return a C<UserNotFoundException> exception if the user does not
+exist in the user pool.
+
+Valid values include:
+
+=over
+
+=item *
+
+C<ENABLED> - This prevents user existence-related errors.
+
+=item *
+
+C<LEGACY> - This represents the old behavior of Cognito where user
+existence related errors are not prevented.
+
+=back
+
+This setting affects the behavior of following APIs:
+
+=over
+
+=item *
+
+AdminInitiateAuth
+
+=item *
+
+AdminRespondToAuthChallenge
+
+=item *
+
+InitiateAuth
+
+=item *
+
+RespondToAuthChallenge
+
+=item *
+
+ForgotPassword
+
+=item *
+
+ConfirmForgotPassword
+
+=item *
+
+ConfirmSignUp
+
+=item *
+
+ResendConfirmationCode
+
+=back
+
+After February 15th 2020, the value of C<PreventUserExistenceErrors>
+will default to C<ENABLED> for newly created user pool clients if no
+value is provided.
 
 
 =head2 ReadAttributes => ArrayRef[Str|Undef]

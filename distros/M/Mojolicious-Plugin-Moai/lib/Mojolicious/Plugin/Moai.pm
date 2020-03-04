@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Moai;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 # ABSTRACT: Mojolicious UI components using modern UI libraries
 
 #pod =head1 SYNOPSIS
@@ -331,6 +331,12 @@ our $VERSION = '0.008';
 #pod
 #pod A customizable layout with good defaults.
 #pod
+#pod =item Default Colors
+#pod
+#pod A default color scheme (light / dark) that responds to a user's
+#pod light/dark preferences (MacOS "dark mode"). The default should be settable from
+#pod the main config, and overridable for individual elements.
+#pod
 #pod =item Extra Classes
 #pod
 #pod A standard way of adding extra classes to individual tags inside components. In addition
@@ -391,7 +397,7 @@ Mojolicious::Plugin::Moai - Mojolicious UI components using modern UI libraries
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -721,6 +727,12 @@ Built-in selection of CDN-based themes for each library
 =item Layouts
 
 A customizable layout with good defaults.
+
+=item Default Colors
+
+A default color scheme (light / dark) that responds to a user's
+light/dark preferences (MacOS "dark mode"). The default should be settable from
+the main config, and overridable for individual elements.
 
 =item Extra Classes
 

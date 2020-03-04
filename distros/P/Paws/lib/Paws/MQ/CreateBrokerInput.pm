@@ -5,6 +5,7 @@ package Paws::MQ::CreateBrokerInput;
   has Configuration => (is => 'ro', isa => 'Paws::MQ::ConfigurationId', request_name => 'configuration', traits => ['NameInRequest']);
   has CreatorRequestId => (is => 'ro', isa => 'Str', request_name => 'creatorRequestId', traits => ['NameInRequest']);
   has DeploymentMode => (is => 'ro', isa => 'Str', request_name => 'deploymentMode', traits => ['NameInRequest']);
+  has EncryptionOptions => (is => 'ro', isa => 'Paws::MQ::EncryptionOptions', request_name => 'encryptionOptions', traits => ['NameInRequest']);
   has EngineType => (is => 'ro', isa => 'Str', request_name => 'engineType', traits => ['NameInRequest']);
   has EngineVersion => (is => 'ro', isa => 'Str', request_name => 'engineVersion', traits => ['NameInRequest']);
   has HostInstanceType => (is => 'ro', isa => 'Str', request_name => 'hostInstanceType', traits => ['NameInRequest']);
@@ -12,6 +13,7 @@ package Paws::MQ::CreateBrokerInput;
   has MaintenanceWindowStartTime => (is => 'ro', isa => 'Paws::MQ::WeeklyStartTime', request_name => 'maintenanceWindowStartTime', traits => ['NameInRequest']);
   has PubliclyAccessible => (is => 'ro', isa => 'Bool', request_name => 'publiclyAccessible', traits => ['NameInRequest']);
   has SecurityGroups => (is => 'ro', isa => 'ArrayRef[Str|Undef]', request_name => 'securityGroups', traits => ['NameInRequest']);
+  has StorageType => (is => 'ro', isa => 'Str', request_name => 'storageType', traits => ['NameInRequest']);
   has SubnetIds => (is => 'ro', isa => 'ArrayRef[Str|Undef]', request_name => 'subnetIds', traits => ['NameInRequest']);
   has Tags => (is => 'ro', isa => 'Paws::MQ::__mapOf__string', request_name => 'tags', traits => ['NameInRequest']);
   has Users => (is => 'ro', isa => 'ArrayRef[Paws::MQ::User]', request_name => 'users', traits => ['NameInRequest']);
@@ -45,8 +47,9 @@ Use accessors for each attribute. If Att1 is expected to be an Paws::MQ::CreateB
 
 =head1 DESCRIPTION
 
-Required. The time period during which Amazon MQ applies pending
-updates or patches to the broker.
+Required. The version of the broker engine. For a list of supported
+engine versions, see
+https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/broker-engine.html
 
 =head1 ATTRIBUTES
 
@@ -85,6 +88,11 @@ idempotency.
   Required. The deployment mode of the broker.
 
 
+=head2 EncryptionOptions => L<Paws::MQ::EncryptionOptions>
+
+  Encryption options for the broker.
+
+
 =head2 EngineType => Str
 
   Required. The type of broker engine. Note: Currently, Amazon MQ
@@ -121,8 +129,13 @@ hosts the broker's subnets.
 
 =head2 SecurityGroups => ArrayRef[Str|Undef]
 
-  The list of rules (1 minimum, 125 maximum) that authorize connections
-to brokers.
+  The list of security groups (1 minimum, 5 maximum) that authorizes
+connections to brokers.
+
+
+=head2 StorageType => Str
+
+  The broker's storage type.
 
 
 =head2 SubnetIds => ArrayRef[Str|Undef]

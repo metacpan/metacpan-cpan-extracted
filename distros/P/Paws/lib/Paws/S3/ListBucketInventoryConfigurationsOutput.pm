@@ -33,17 +33,17 @@ The list of inventory configurations for a bucket.
 
 =head2 IsTruncated => Bool
 
-Indicates whether the returned list of inventory configurations is
-truncated in this response. A value of true indicates that the list is
-truncated.
+Tells whether the returned list of inventory configurations is
+complete. A value of true indicates that the list is not complete and
+the NextContinuationToken is provided for a subsequent request.
 
 
 
 =head2 NextContinuationToken => Str
 
 The marker used to continue this inventory configuration listing. Use
-the NextContinuationToken from this response to continue the listing in
-a subsequent request. The continuation token is an opaque value that
+the C<NextContinuationToken> from this response to continue the listing
+in a subsequent request. The continuation token is an opaque value that
 Amazon S3 understands.
 
 

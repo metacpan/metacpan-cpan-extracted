@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.043 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2019-11-29.
+    This document describes version 1.045 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2020-03-04.
 
 SYNOPSIS
     See lcpan script.
@@ -347,7 +347,7 @@ FUNCTIONS
 
     *   latest => *bool*
 
-    *   namespaces => *array[str]*
+    *   namespaces => *array[perl::modname]*
 
         Select modules belonging to certain namespace(s).
 
@@ -500,7 +500,7 @@ FUNCTIONS
 
     *   latest => *bool*
 
-    *   namespaces => *array[str]*
+    *   namespaces => *array[perl::modname]*
 
         Select modules belonging to certain namespace(s).
 
@@ -851,6 +851,14 @@ FUNCTIONS
         Since sub indexing is still experimental, it is not enabled by
         default. To enable it, pass the "--no-skip-sub-indexing" option.
 
+    *   skip_sub_indexing_file_patterns => *array[re]*
+
+        Skip one or more file patterns from being parsed for subs.
+
+    *   skip_sub_indexing_files => *array[str]*
+
+        Skip one or more files from being parsed for subs.
+
     *   update_files => *bool* (default: 1)
 
         Update the files.
@@ -915,7 +923,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

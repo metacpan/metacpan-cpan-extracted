@@ -17,8 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::Schemas::SortSub",
   "PREREQ_PM" => {
-    "Complete::Sequence" => 0,
-    "Complete::Util" => "0.603",
+    "Complete::Sequence" => "0.002",
+    "Complete::Util" => "0.608",
     "Log::ger" => "0.027",
     "Module::List::Tiny" => 0,
     "strict" => 0,
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,8 +38,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Complete::Sequence" => 0,
-  "Complete::Util" => "0.603",
+  "Complete::Sequence" => "0.002",
+  "Complete::Util" => "0.608",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

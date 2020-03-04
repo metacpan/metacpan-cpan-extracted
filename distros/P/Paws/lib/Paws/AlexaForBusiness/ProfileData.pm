@@ -3,6 +3,7 @@ package Paws::AlexaForBusiness::ProfileData;
   has Address => (is => 'ro', isa => 'Str');
   has DistanceUnit => (is => 'ro', isa => 'Str');
   has IsDefault => (is => 'ro', isa => 'Bool');
+  has Locale => (is => 'ro', isa => 'Str');
   has ProfileArn => (is => 'ro', isa => 'Str');
   has ProfileName => (is => 'ro', isa => 'Str');
   has TemperatureUnit => (is => 'ro', isa => 'Str');
@@ -58,6 +59,12 @@ The data of a room profile.
   Retrieves if the profile data is default or not.
 
 
+=head2 Locale => Str
+
+  The locale of a room profile. (This is currently available only to a
+limited preview audience.)
+
+
 =head2 ProfileArn => Str
 
   The ARN of a room profile.
@@ -75,7 +82,7 @@ The data of a room profile.
 
 =head2 Timezone => Str
 
-  The timezone of a room profile.
+  The time zone of a room profile.
 
 
 =head2 WakeWord => Str

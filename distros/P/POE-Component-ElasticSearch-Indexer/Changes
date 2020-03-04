@@ -1,9 +1,28 @@
 ==================================================
-Changes from 2017-09-03 00:00:00 +0000 to present.
+Changes from 2018-03-03 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.012 at 2019-09-03 20:23:00 +0000
+version 0.013 at 2020-03-02 21:27:07 +0000
+------------------------------------------
+
+  Change: 1f0a2f75ff089ae9a9db02e726f3b968d4011351
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-03-02 13:26:51 +0000
+
+    Ready for 0.013 
+
+  Change: 58e5ea761c0e0b6c20d38a6b26f5c212de38f0ee
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-03-02 13:24:10 +0000
+
+    Set the DefaultType to '_doc'
+
+    This allows indexing to ElasticSearch 7.x without modifying the
+    `DefaultType` attribute. 
+
+------------------------------------------
+version 0.012 at 2019-08-24 02:24:41 +0000
 ------------------------------------------
 
   Change: 63903d40bd2c6c4a9820daabf6d71cbc5779af03
@@ -298,155 +317,6 @@ version 0.002 at 2018-04-25 21:05:40 +0000
 
     Servers Parameter documented 
 
-------------------------------------------
-version 0.001 at 2018-02-23 05:59:53 +0000
-------------------------------------------
-
-  Change: 5b1928e1e8ce911c8bc6bf14e4635da8115b50ee
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-22 21:59:53 +0000
-
-    Simpler queue/flush logic
-
-    Most of the time, simpler is better. Stop trying to do weird stuff and just
-    do the simplest possible thing to reschedule the queue flushes. 
-
-  Change: c5902dfe4fa393504311dd711fe9d895d6a549f7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-22 21:48:14 +0000
-
-    Dispatch the correct HTTP response event. 
-
-  Change: d1c89dd751f4bf911f5067afd88da6f0a6b6dee5
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-22 21:43:16 +0000
-
-    Set the alias correctly. 
-
-  Change: ba11985f66ac2d44b282a404ed2cf0b76b25ed23
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-22 21:36:27 +0000
-
-    Ensure the queue method matches the documentation. 
-
-  Change: 7c4b03165823fbbae659a3f90a7a8c1be5ac2275
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-22 21:31:52 +0000
-
-    Comment out unimplemented features. 
-
-  Change: 5634cba4190c3b8d8bec6fe19cb330bbdc6e5b58
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-22 21:16:00 +0000
-
-    Fix accidental deletion of a character. 
-
-  Change: 9a1eede4fe2bc8ef4dd838a8b5c619c3c60bdfb8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-22 21:14:01 +0000
-
-    Fix the Servers parameter.
-
-    While converting this code, I mistakenly overlooked the connection
-    settings. 
-
-  Change: 2394ba7a48e3b27fc4b01dfd2484898c73a596cf
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-22 20:44:27 +0000
-
-    Allow sending the entire bulk operation as a scalar
-
-    The queue mechanism now takes the following:
-
-    1. An array reference, in which all elements must be one of: 2. A hash
-    reference, which is converted into the newline delimited JSON
-
-    expected by the Bulk API. 3. An object reference, which must implement an
-    as_bulk() method which
-
-    returns the newline delimited JSON expected by the Bulk API 4. A string of
-    newline delimited JSON which is passed unchanged to the
-
-    Bulk API. 
-
-  Change: 0308c7f788e07c5e696ea54cbd5e7c4e4d6556c8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-22 19:24:33 +0000
-
-    Documentation updates 
-
-  Change: 7ddb91c2fbaacafb7ae98a4afb98dce1c57ea72f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-22 19:11:02 +0000
-
-    Document the BatchDiskSpace argument 
-
-  Change: 78b001c5f55a92e89614553059c5081b7d9ea08a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-16 23:18:43 +0000
-
-    Throttle disk space and allow a shutdown event to be passed along to
-    prevent recurring tasks from being rescheduled. 
-
-  Change: 8165e90c16582e936d1ef78c87cb824d8f553890
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-16 21:08:30 +0000
-
-    Adjust log levels and how flushes are scheduled
-
-    Log4perl's log levels include "TRACE" below "DEBUG" and no "NOTICE" so
-    adjust log levels to compensate.
-
-    Only reschedule the flush routine if there was data. Have the queue event
-    schedule the flush when it happens. 
-
-  Change: bdcd29a6b27e01ce7166e403437b7fb43617f8c8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-16 20:22:26 +0000
-
-    Start of the Template Saving
-
-    Also, splitting out the batch save job to make it configurable. 
-
-  Change: 5bbaaa3be95c891744a1d620ba0e7044a20e4f98
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-07 13:08:40 +0000
-
-    Allow blessed objects to be sent to the bulk queue as long as they expose a
-    as_bulk() method 
-
-  Change: ab526468d4a233dce8f57dbbe01eefe18c21aa3e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-03 22:32:18 +0000
-
-    Run ExtraTests always and load the keepalive PoCo 
-
-  Change: 11a89c20537f11bc8788246b9640b20a2c810bf2
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-03 22:26:27 +0000
-
-    Fix tabs that somehow made it into the documentation 
-
-  Change: 3251f56c2450e2c0fb37cfde7e541fbba3391acb
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-03 22:22:42 +0000
-
-    Preparing for release
-
-    * Pod::Coverage tests sated * Example use case provided 
-
-  Change: b8fe6bfbac39afd771b7c33fa4480a8629ec1582
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-02 23:15:59 +0000
-
-    Initial checkin of the PoCo::ES::Indexer 
-
-  Change: cffce9ddea13d57df5248fe5afc691050feb0e97
-  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
-  Date : 2012-12-22 11:33:13 +0000
-
-    Distzilla setup of the module with some basic information. 
-
-================
-End of releases.
-================
+===============================================
+Plus 1 release after 2018-03-03 00:00:00 +0000.
+===============================================

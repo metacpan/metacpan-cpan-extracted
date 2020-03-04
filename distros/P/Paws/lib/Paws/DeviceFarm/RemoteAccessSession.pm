@@ -66,13 +66,16 @@ Represents information about the remote access session.
   The billing method of the remote access session. Possible values
 include C<METERED> or C<UNMETERED>. For more information about metered
 devices, see AWS Device Farm terminology
-(https://docs.aws.amazon.com/devicefarm/latest/developerguide/welcome.html#welcome-terminology)."
+(https://docs.aws.amazon.com/devicefarm/latest/developerguide/welcome.html#welcome-terminology).
 
 
 =head2 ClientId => Str
 
   Unique identifier of your client for the remote access session. Only
 returned if remote debugging is enabled for the remote access session.
+
+Remote debugging is no longer supported
+(https://docs.aws.amazon.com/devicefarm/latest/developerguide/history.html).
 
 
 =head2 Created => Str
@@ -96,6 +99,9 @@ returned if remote debugging is enabled for the remote access session.
   Unique device identifier for the remote device. Only returned if remote
 debugging is enabled for the remote access session.
 
+Remote debugging is no longer supported
+(https://docs.aws.amazon.com/devicefarm/latest/developerguide/history.html).
+
 
 =head2 Endpoint => Str
 
@@ -108,10 +114,13 @@ debugging is enabled for the remote access session.
 devices. Only returned if remote debugging is enabled for the remote
 access session.
 
+Remote debugging is no longer supported
+(https://docs.aws.amazon.com/devicefarm/latest/developerguide/history.html).
+
 
 =head2 InstanceArn => Str
 
-  The Amazon Resource Name (ARN) of the instance.
+  The ARN of the instance.
 
 
 =head2 InteractionMode => Str
@@ -123,19 +132,19 @@ access session.
 =item *
 
 INTERACTIVE: You can interact with the iOS device by viewing, touching,
-and rotating the screen. You B<cannot> run XCUITest framework-based
-tests in this mode.
+and rotating the screen. You cannot run XCUITest framework-based tests
+in this mode.
 
 =item *
 
-NO_VIDEO: You are connected to the device but cannot interact with it
+NO_VIDEO: You are connected to the device, but cannot interact with it
 or view the screen. This mode has the fastest test execution speed. You
-B<can> run XCUITest framework-based tests in this mode.
+can run XCUITest framework-based tests in this mode.
 
 =item *
 
-VIDEO_ONLY: You can view the screen but cannot touch or rotate it. You
-B<can> run XCUITest framework-based tests and watch the screen in this
+VIDEO_ONLY: You can view the screen, but cannot touch or rotate it. You
+can run XCUITest framework-based tests and watch the screen in this
 mode.
 
 =back
@@ -157,11 +166,13 @@ mode.
   This flag is set to C<true> if remote debugging is enabled for the
 remote access session.
 
+Remote debugging is no longer supported
+(https://docs.aws.amazon.com/devicefarm/latest/developerguide/history.html).
+
 
 =head2 RemoteRecordAppArn => Str
 
-  The Amazon Resource Name (ARN) for the app to be recorded in the remote
-access session.
+  The ARN for the app to be recorded in the remote access session.
 
 
 =head2 RemoteRecordEnabled => Bool
@@ -178,31 +189,31 @@ remote access session.
 
 =item *
 
-PENDING: A pending condition.
+PENDING.
 
 =item *
 
-PASSED: A passing condition.
+PASSED.
 
 =item *
 
-WARNED: A warning condition.
+WARNED.
 
 =item *
 
-FAILED: A failed condition.
+FAILED.
 
 =item *
 
-SKIPPED: A skipped condition.
+SKIPPED.
 
 =item *
 
-ERRORED: An error condition.
+ERRORED.
 
 =item *
 
-STOPPED: A stopped condition.
+STOPPED.
 
 =back
 
@@ -210,11 +221,11 @@ STOPPED: A stopped condition.
 
 =head2 SkipAppResign => Bool
 
-  When set to C<true>, for private devices, Device Farm will not sign
+  When set to C<true>, for private devices, Device Farm does not sign
 your app again. For public devices, Device Farm always signs your apps
-again and this parameter has no effect.
+again.
 
-For more information about how Device Farm re-signs your app(s), see Do
+For more information about how Device Farm re-signs your apps, see Do
 you modify my app? (https://aws.amazon.com/device-farm/faq/) in the
 I<AWS Device Farm FAQs>.
 
@@ -232,39 +243,39 @@ I<AWS Device Farm FAQs>.
 
 =item *
 
-PENDING: A pending status.
+PENDING.
 
 =item *
 
-PENDING_CONCURRENCY: A pending concurrency status.
+PENDING_CONCURRENCY.
 
 =item *
 
-PENDING_DEVICE: A pending device status.
+PENDING_DEVICE.
 
 =item *
 
-PROCESSING: A processing status.
+PROCESSING.
 
 =item *
 
-SCHEDULING: A scheduling status.
+SCHEDULING.
 
 =item *
 
-PREPARING: A preparing status.
+PREPARING.
 
 =item *
 
-RUNNING: A running status.
+RUNNING.
 
 =item *
 
-COMPLETED: A completed status.
+COMPLETED.
 
 =item *
 
-STOPPING: A stopping status.
+STOPPING.
 
 =back
 

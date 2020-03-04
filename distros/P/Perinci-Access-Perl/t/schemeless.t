@@ -17,9 +17,9 @@ use Perinci::Access::Schemeless;
 my $pa_cached;
 my $pa;
 
-package Foo;
+package Perinci::Access::Schemeless::Test::Foo;
 
-package Bar;
+package Perinci::Access::Schemeless::Test::Bar;
 our $VERSION = 0.123;
 our $DATE = '1999-01-01';
 
@@ -27,7 +27,7 @@ our %SPEC;
 $SPEC{f1} = {v=>1.1, args=>{}};
 sub f1 { [200] }
 
-package Baz;
+package Perinci::Access::Schemeless::Test::Baz;
 our $VERSION = 0.124;
 
 our %SPEC;
@@ -35,7 +35,7 @@ $SPEC{':package'} = {v=>1.1, entity_v=>9};
 $SPEC{f1} = {v=>1.1, entity_v=>10};
 sub f1 { [200] }
 
-package Test::Perinci::Access::Schemeless;
+package Perinci::Access::Schemeless::Test2;
 our %SPEC;
 
 $SPEC{':package'} = {v=>1.1, summary=>"A package"};
@@ -79,7 +79,7 @@ sub tx {
     [200, "OK", ($args{-tx_action}//'') eq 'check_state' ? 1:2];
 }
 
-package Test::Perinci::Access::Schemeless2;
+package Perinci::Access::Schemeless::Test3;
 our %SPEC;
 
 $SPEC{no_progress} = {v=>1.1};
@@ -303,7 +303,7 @@ test_request(
 );
 test_request(
     name => 'unknown action for a type (2)',
-    req => [list => "/Bar/f1"],
+    req => [list => "/Perinci/Access/Schemeless/Test/Bar/f1"],
     status => 501,
 );
 
@@ -408,7 +408,7 @@ subtest "opt: {allow,deny}_paths" => sub {
 subtest 'schema in metadata is normalized' => sub {
     test_request(
         name => 'first request (meta)',
-        req => [meta => '/Test/Perinci/Access/Schemeless/f1'],
+        req => [meta => '/Perinci/Access/Schemeless/Test2/f1'],
         status => 200,
         result => {
             v => 1.1,
@@ -430,13 +430,13 @@ subtest 'schema in metadata is normalized' => sub {
 
     test_request(
         name   => 'second request (call) to trigger wrapper',
-        req    => [call => '/Test/Perinci/Access/Schemeless/f1'],
+        req    => [call => '/Perinci/Access/Schemeless/Test2/f1'],
         status => 200,
     );
 
     test_request(
         name => 'third request (second meta) already uses meta from wrapper',
-        req => [meta => '/Test/Perinci/Access/Schemeless/f1'],
+        req => [meta => '/Perinci/Access/Schemeless/Test2/f1'],
         status => 200,
         result => {
             v => 1.1,
@@ -463,7 +463,7 @@ subtest 'schema in metadata is normalized' => sub {
 subtest "avoid double wrapping" => sub {
     my $h = patch_package("Perinci::Sub::Wrapper", "wrap_sub", "replace", sub { say "WRAPPING AGAIN!"; die });
     test_request(
-        req => [call => "/Test/Perinci/Access/Schemeless2/test_double_wrap1"],
+        req => [call => "/Perinci/Access/Schemeless/Test3/test_double_wrap1"],
         #req => [call => "/App/GenPericmdScript/gen_perinci_cmdline_script"],
         status => 200,
     );
@@ -478,15 +478,15 @@ subtest "action: info" => sub {
     );
     test_request(
         name => 'info on package',
-        req => [info => "/Foo/"],
+        req => [info => "/Perinci/Access/Schemeless/Test/Foo/"],
         status => 200,
-        result => {uri=>'/Foo/', type=>'package'},
+        result => {uri=>'/Perinci/Access/Schemeless/Test/Foo/', type=>'package'},
     );
     test_request(
         name => 'info on function',
-        req => [info => "/Baz/f1"],
+        req => [info => "/Perinci/Access/Schemeless/Test/Baz/f1"],
         status => 200,
-        result => {uri=>'/Baz/f1', type=>'function'},
+        result => {uri=>'/Perinci/Access/Schemeless/Test/Baz/f1', type=>'function'},
     );
 };
 
@@ -503,42 +503,42 @@ subtest "action: meta" => sub {
     );
     test_request(
         name => 'meta on package',
-        req => [meta => "/Test/Perinci/Access/Schemeless/"],
+        req => [meta => "/Perinci/Access/Schemeless/Test2/"],
         status => 200,
         result => { summary => "A package",
                     v => 1.1,
-                    entity_v => $Test::Perinci::Access::Schemeless::VERSION },
+                    entity_v => $Perinci::Access::Schemeless::Test2::VERSION },
     );
     test_request(
         name => 'meta on package (default meta, no VERSION)',
-        req => [meta => "/Foo/"],
+        req => [meta => "/Perinci/Access/Schemeless/Test/Foo/"],
         status => 200,
         result => { v => 1.1 },
     );
     test_request(
         name => 'meta on package (default meta, entity_v from VERSION)',
-        req => [meta => "/Bar/"],
+        req => [meta => "/Perinci/Access/Schemeless/Test/Bar/"],
         status => 200,
         result => { v => 1.1, entity_v => 0.123, entity_date=>'1999-01-01' },
     );
     test_request(
         name => 'meta on function (entity_v from VERSION)',
         object_opts=>{wrap=>0},
-        req => [meta => "/Bar/f1"],
+        req => [meta => "/Perinci/Access/Schemeless/Test/Bar/f1"],
         status => 200,
         result => {v=>1.1, args=>{}, result_naked=>0, _orig_result_naked=>undef, args_as=>'hash', _orig_args_as=>undef, entity_v => 0.123, entity_date=>'1999-01-01'},
     );
     test_request(
         name => 'meta on package (entity_v not overridden)',
         object_opts=>{wrap=>0},
-        req => [meta => "/Baz/"],
+        req => [meta => "/Perinci/Access/Schemeless/Test/Baz/"],
         status => 200,
         result => {v=>1.1, entity_v=>9},
     );
     test_request(
         name => 'meta on function (entity_v not overridden)',
         object_opts=>{wrap=>0},
-        req => [meta => "/Baz/f1"],
+        req => [meta => "/Perinci/Access/Schemeless/Test/Baz/f1"],
         status => 200,
         result => {v=>1.1, entity_v=>10, args=>{}, _orig_result_naked=>undef, result_naked=>0, args_as=>'hash', _orig_args_as=>undef},
     );
@@ -620,46 +620,46 @@ subtest "action: call" => sub {
     # XXX call: invalid args
     test_request(
         name => 'call: confirm (w/o)',
-        req => [call => "/Test/Perinci/Access/Schemeless/req_confirm",
+        req => [call => "/Perinci/Access/Schemeless/Test2/req_confirm",
                 {}],
         status => 331,
     );
     test_request(
         name => 'call: confirm (w/)',
-        req => [call => "/Test/Perinci/Access/Schemeless/req_confirm",
+        req => [call => "/Perinci/Access/Schemeless/Test2/req_confirm",
                 {confirm=>1}],
         status => 200,
     );
     test_request(
         name => 'call: dry_run to function that cannot do dry run -> 412',
-        req => [call => "/Test/Perinci/Access/Schemeless/f1",
+        req => [call => "/Perinci/Access/Schemeless/Test2/f1",
                 {dry_run=>1}],
         status => 412,
     );
     test_request(
         name => 'call: dry_run (using dry_run) (w/o)',
-        req => [call => "/Test/Perinci/Access/Schemeless/dry_run",
+        req => [call => "/Perinci/Access/Schemeless/Test2/dry_run",
                 {}],
         status => 200,
         result => 2,
     );
     test_request(
         name => 'call: dry_run (using dry_run) (w/)',
-        req => [call => "/Test/Perinci/Access/Schemeless/dry_run",
+        req => [call => "/Perinci/Access/Schemeless/Test2/dry_run",
                 {dry_run=>1}],
         status => 200,
         result => 1,
     );
     test_request(
         name => 'call: dry_run (using tx) (w/o)',
-        req => [call => "/Test/Perinci/Access/Schemeless/tx",
+        req => [call => "/Perinci/Access/Schemeless/Test2/tx",
                 {}],
         status => 200,
         result => 2,
     );
     test_request(
         name => 'call: dry_run (using tx) (w/)',
-        req => [call => "/Test/Perinci/Access/Schemeless/tx",
+        req => [call => "/Perinci/Access/Schemeless/Test2/tx",
                 {dry_run=>1}],
         status => 200,
         result => 1,
@@ -720,7 +720,7 @@ subtest "action: complete_arg_val" => sub {
 
 test_request(
     name => 'action: child_metas',
-    req => [child_metas => '/Test/Perinci/Access/Schemeless/'],
+    req => [child_metas => '/Perinci/Access/Schemeless/Test2/'],
     status => 200,
     result => {
         '$v1' =>
@@ -793,25 +793,25 @@ test_request(
 
 test_request(
     name => 'no progress',
-    req => [call => "/Test/Perinci/Access/Schemeless2/no_progress", {}],
+    req => [call => "/Perinci/Access/Schemeless/Test3/no_progress", {}],
     status => 500,
 );
 test_request(
     name => 'has progress',
-    req => [call => "/Test/Perinci/Access/Schemeless2/has_progress", {}],
+    req => [call => "/Perinci/Access/Schemeless/Test3/has_progress", {}],
     status => 200,
 );
 
 test_request(
     name => 'opt: wrap=0',
     object_opts=>{wrap=>0},
-    req => [call => '/Test/Perinci/Access/Schemeless2/test_uws', {args=>{x=>1}}],
+    req => [call => '/Perinci/Access/Schemeless/Test3/test_uws', {args=>{x=>1}}],
     status => 200,
 );
 test_request(
     name => 'opt: wrap=1 (the default)',
     object_opts=>{},
-    req => [call => '/Test/Perinci/Access/Schemeless2/test_uws', {args=>{x=>1}}],
+    req => [call => '/Perinci/Access/Schemeless/Test3/test_uws', {args=>{x=>1}}],
     status => 400,
 );
 
@@ -822,7 +822,7 @@ subtest 'opt: set_function_properties' => sub {
     test_request(
         name => 'opt: set_function_properties',
         object_opts=>{set_function_properties=>{retry=>1}},
-        req => [meta => '/Test/Perinci/Access/Schemeless/f1'],
+        req => [meta => '/Perinci/Access/Schemeless/Test2/f1'],
         status => 200,
         posttest => sub {
             my ($res) = @_;
@@ -835,7 +835,7 @@ subtest 'opt: set_function_properties' => sub {
 test_request(
     name => 'opt: normalize_metadata=0',
     object_opts=>{normalize_metadata=>0},
-    req => [meta => '/Test/Perinci/Access/Schemeless/f1'],
+    req => [meta => '/Perinci/Access/Schemeless/Test2/f1'],
     status => 200,
     posttest => sub {
         my ($res) = @_;

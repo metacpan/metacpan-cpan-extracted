@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Jun 30 21:15:32 2013
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Oct 25 20:47:13 2018
-# Update Count    : 63
+# Last Modified On: Tue Mar  3 13:00:41 2020
+# Update Count    : 66
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -87,6 +87,7 @@ sub app_setup {
 	  'cpanid=s',
 	  'githubid=s',
 	  'module=s',
+	  'summary=s',
 	  'template=s',
 	  'postcmd=s@',
 	  'license=s',
@@ -143,6 +144,7 @@ Usage: $0 [options] [ module ]
     --author=NAME	full name of author*
     --email=EMAIL	email address of author*
     --module=MMM	the new module
+    --summary=XXX	short description
     --cpanid=XXX	author's CPAN Id*
     --githubid=XXX	author's GitHub Id*
     --template=XXX	select a set of templates*

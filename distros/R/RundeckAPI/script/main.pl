@@ -24,9 +24,10 @@
 ###########################################################################
 
 use strict;
+use diagnostics;
 use Data::Dumper;
-use lib '../lib';
-use RundeckAPI;
+use lib "../lib";
+use RundeckAPI 1.1;
 
 #####
 ## PROTOS
@@ -49,6 +50,8 @@ my $api = RundeckAPI->new(
 		'url'		=> "https://rundeck.company.com:4440",
 		'login'		=> "admin",
 		'password'	=> "admin",
+### OR
+#		'token'		=> '<Token from GUI, as admin>'
 		'debug'		=> 1,
  		'proxy'		=> "http://proxy.your.company:3128",
 );

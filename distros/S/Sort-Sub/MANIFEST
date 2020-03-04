@@ -23,6 +23,8 @@ lib/Sort/Sub/by_rand.pm
 lib/Sort/Sub/naturally.pm
 lib/Sort/Sub/numerically.pm
 lib/Sort/Sub/randomly.pm
+lib/Sort/Sub/record_by_order.pm
+lib/Sort/Sub/record_by_reverse_order.pm
 lib/Sub/Sort.pm
 lib/Test/Sort/Sub.pm
 t/00-compile.t
@@ -43,4 +45,6 @@ t/by_perl_function.t
 t/by_perl_op.t
 t/naturally.t
 t/numerically.t
+t/record_by_order.t
+t/record_by_reverse_order.t
 weaver.ini

@@ -60,7 +60,7 @@ hyperparameter tuning job searches.
   The scale that hyperparameter tuning uses to search the hyperparameter
 range. For information about choosing a hyperparameter scale, see
 Hyperparameter Scaling
-(http://docs.aws.amazon.com//sagemaker/latest/dg/automatic-model-tuning-define-ranges.html#scaling-type).
+(https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-define-ranges.html#scaling-type).
 One of the following values:
 
 =over
@@ -77,7 +77,7 @@ by using a linear scale.
 
 =item Logarithmic
 
-Hyperparemeter tuning searches the values in the hyperparameter range
+Hyperparameter tuning searches the values in the hyperparameter range
 by using a logarithmic scale.
 
 Logarithmic scaling works only for ranges that have only values greater

@@ -98,13 +98,25 @@ grantee.
 
 =head2 ACL => Str
 
-The canned ACL to apply to the object.
+The canned ACL to apply to the object. For more information, see Canned
+ACL
+(https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#CannedACL).
 
 Valid values are: C<"private">, C<"public-read">, C<"public-read-write">, C<"authenticated-read">, C<"aws-exec-read">, C<"bucket-owner-read">, C<"bucket-owner-full-control">
 
 =head2 B<REQUIRED> Bucket => Str
 
+The bucket name that contains the object to which you want to attach
+the ACL.
 
+When using this API with an access point, you must direct requests to
+the access point hostname. The access point hostname takes the form
+I<AccessPointName>-I<AccountId>.s3-accesspoint.I<Region>.amazonaws.com.
+When using this operation using an access point through the AWS SDKs,
+you provide the access point ARN in place of the bucket name. For more
+information about access point ARNs, see Using Access Points
+(https://docs.aws.amazon.com/AmazonS3/latest/dev/using-access-points.html)
+in the I<Amazon Simple Storage Service Developer Guide>.
 
 
 
@@ -116,7 +128,10 @@ Size of the body in bytes.
 
 =head2 ContentMD5 => Str
 
-
+The base64-encoded 128-bit MD5 digest of the data. This header must be
+used as a message integrity check to verify that the request body was
+not corrupted in transit. For more information, go to RFC 1864.E<gt>
+(http://www.ietf.org/rfc/rfc1864.txt)
 
 
 
@@ -154,7 +169,7 @@ Allows grantee to write the ACL for the applicable bucket.
 
 =head2 B<REQUIRED> Key => Str
 
-
+Key for which the PUT operation was initiated.
 
 
 

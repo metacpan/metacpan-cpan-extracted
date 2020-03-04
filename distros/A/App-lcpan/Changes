@@ -1,3 +1,22 @@
+1.045   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add options: skip_sub_indexing_files,
+	  skip_sub_indexing_file_patterns.
+
+	- Add Bencher-Scenarios-HashSlicing-0.003.tar.gz to built-in skip
+	  list for sub indexing (eats memory).
+
+
+1.044   2020-02-13  Released-By: PERLANCAR; Urgency: low
+
+	- Add subcommand: x-mentions-for-mod.
+
+	- [internal] Replace PERLANCAR::Module::List with Module::List::Tiny.
+
+	- [mods subcommand] Tweak schema of 'namespaces' argument for better tab
+	  completion.
+
+
 1.043   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- deps: Add --{include,exclude}-{,un}registered options.
@@ -619,7 +638,7 @@
           bin/lcpan's POD.
 
 
-0.60    2015-12-25 (PERLANCAR) (It's *this* Christmas!)
+0.60    2015-12-25  Released-By: PERLANCAR; Message: It's *this* Christmas!
 
 	- Replace --exact-match with the more general --query-type to be
 	  able to search certain fields only or exact match on certain

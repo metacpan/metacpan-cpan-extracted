@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Acme::CPANAuthors;
+
      my $authors = Acme::CPANAuthors->new('Czech');
      my $url = $authors->avatar_url('TRIPIE');
      my $number = $authors->count;
@@ -15,11 +16,9 @@ DESCRIPTION
     See documentation for Acme::CPANAuthors for more details.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Acme::CPANAuthors;
 
      # Create object.
@@ -32,14 +31,12 @@ EXAMPLE1
      print "Count of Czech CPAN authors: $count\n";
 
      # Output:
-     # Count of Czech CPAN authors: 36
+     # Count of Czech CPAN authors: 38
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Acme::CPANAuthors;
      use Data::Printer;
 
@@ -59,54 +56,57 @@ EXAMPLE2
      #     [2]  "DANPEDER",
      #     [3]  "DOUGLISH",
      #     [4]  "HIHIK",
-     #     [5]  "HPA",
-     #     [6]  "JANPAZ",
-     #     [7]  "JANPOM",
-     #     [8]  "JENDA",
-     #     [9]  "JIRA",
-     #     [10] "JSPICAK",
-     #     [11] "KLE",
-     #     [12] "KOLCON",
-     #     [13] "MAJLIS",
-     #     [14] "MICHALS",
-     #     [15] "MILSO",
-     #     [16] "MJFO",
-     #     [17] "PAJAS",
-     #     [18] "PASKY",
-     #     [19] "PEK",
-     #     [20] "POPEL",
-     #     [21] "PSME",
-     #     [22] "RUR",
-     #     [23] "RVASICEK",
-     #     [24] "SEIDLJAN",
-     #     [25] "SKIM",
-     #     [26] "SMRZ",
-     #     [27] "STRAKA",
-     #     [28] "TKR",
-     #     [29] "TRIPIE",
-     #     [30] "TYNOVSKY",
-     #     [31] "VASEKD",
-     #     [32] "YENYA",
-     #     [33] "ZABA",
-     #     [34] "ZEMAN",
-     #     [35] "ZOUL"
+     #     [5]  "HOLCAPEK",
+     #     [6]  "HPA",
+     #     [7]  "JANPAZ",
+     #     [8]  "JANPOM",
+     #     [9]  "JENDA",
+     #     [10] "JIRA",
+     #     [11] "JSPICAK",
+     #     [12] "KLE",
+     #     [13] "KOLCON",
+     #     [14] "MAJLIS",
+     #     [15] "MICHALS",
+     #     [16] "MILSO",
+     #     [17] "MJFO",
+     #     [18] "PAJAS",
+     #     [19] "PASKY",
+     #     [20] "PEK",
+     #     [21] "POPEL",
+     #     [22] "PSME",
+     #     [23] "RUR",
+     #     [24] "RVASICEK",
+     #     [25] "SEIDLJAN",
+     #     [26] "SKIM",
+     #     [27] "SMRZ",
+     #     [28] "STRAKA",
+     #     [29] "TKR",
+     #     [30] "TRIPIE",
+     #     [31] "TYNOVSKY",
+     #     [32] "VARISD",
+     #     [33] "VASEKD",
+     #     [34] "YENYA",
+     #     [35] "ZABA",
+     #     [36] "ZEMAN",
+     #     [37] "ZOUL"
      # ]
 
 DEPENDENCIES
     Acme::CPANAuthors.
 
 REPOSITORY
-    <https://github.com/tupinek/Acme-CPANAuthors-Czech>
+    <https://github.com/michal-josef-spacek/Acme-CPANAuthors-Czech>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2016 Michal Špaček
-     BSD 2-Clause License
+    © 2011-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.22
+    0.25
 

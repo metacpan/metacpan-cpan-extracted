@@ -1,7 +1,9 @@
 package Sah::Schema::date::dow_name::en;
 
-our $DATE = '2020-02-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-03'; # DATE
+our $DIST = 'Sah-Schemas-Date'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 our $schema = [cistr => {
     summary => 'Day-of-week name (abbreviated or full, in English)',
@@ -9,6 +11,13 @@ our $schema = [cistr => {
         qw/su mo tu we th fr sa/,
         qw/sun mon tue wed thu fri sat/,
         qw/sunday monday tuesday wednesday thursday friday saturday/,
+    ],
+    examples => [
+        {data=>'', valid=>0},
+        {data=>'su', valid=>1},
+        {data=>'mOn', valid=>1},
+        {data=>'TUESDAY', valid=>1},
+        {data=>'foo', valid=>0},
     ],
 }, {}];
 
@@ -28,7 +37,51 @@ Sah::Schema::date::dow_name::en - Day-of-week name (abbreviated or full, in Engl
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::date::dow_name::en (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Sah::Schema::date::dow_name::en (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+
+=head1 SYNOPSIS
+
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("date::dow_name::en*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['date::dow_name::en*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+
+Sample data:
+
+ ""  # INVALID
+
+ "su"  # valid
+
+ "mOn"  # valid
+
+ "TUESDAY"  # valid
+
+ "foo"  # INVALID
 
 =head1 HOMEPAGE
 

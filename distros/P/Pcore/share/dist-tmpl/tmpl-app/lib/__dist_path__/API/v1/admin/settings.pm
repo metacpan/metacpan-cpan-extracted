@@ -13,7 +13,7 @@ around API_update => sub ( $orig, $self, $auth, $args ) {
 
     # $args->{use_proxy} = SQL_BOOL $args->{use_proxy} if defined $args->{use_proxy};
 
-    return $self->$orig($args);
+    return $self->$orig( $auth, $args );
 };
 
 1;

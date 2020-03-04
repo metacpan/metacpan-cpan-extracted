@@ -4,7 +4,9 @@ package Paws::AlexaForBusiness::Profile;
   has AddressBookArn => (is => 'ro', isa => 'Str');
   has DistanceUnit => (is => 'ro', isa => 'Str');
   has IsDefault => (is => 'ro', isa => 'Bool');
+  has Locale => (is => 'ro', isa => 'Str');
   has MaxVolumeLimit => (is => 'ro', isa => 'Int');
+  has MeetingRoomConfiguration => (is => 'ro', isa => 'Paws::AlexaForBusiness::MeetingRoomConfiguration');
   has ProfileArn => (is => 'ro', isa => 'Str');
   has ProfileName => (is => 'ro', isa => 'Str');
   has PSTNEnabled => (is => 'ro', isa => 'Bool');
@@ -67,9 +69,20 @@ A room profile with attributes.
   Retrieves if the profile is default or not.
 
 
+=head2 Locale => Str
+
+  The locale of a room profile. (This is currently available only to a
+limited preview audience.)
+
+
 =head2 MaxVolumeLimit => Int
 
   The max volume limit of a room profile.
+
+
+=head2 MeetingRoomConfiguration => L<Paws::AlexaForBusiness::MeetingRoomConfiguration>
+
+  Meeting room settings of a room profile.
 
 
 =head2 ProfileArn => Str

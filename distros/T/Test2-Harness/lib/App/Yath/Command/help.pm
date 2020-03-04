@@ -4,17 +4,17 @@ use warnings;
 
 use Test2::Util qw/pkg_to_file/;
 
-our $VERSION = '0.001099';
+our $VERSION = '1.000006';
 
 use parent 'App::Yath::Command';
-use Test2::Harness::Util::HashBase;
+use Test2::Harness::Util::HashBase qw/<_command_info_hash/;
 
-use Test2::Harness::Util qw/open_file/;
+use Test2::Harness::Util qw/open_file find_libraries/;
 use List::Util ();
 
-sub show_bench { 0 }
-
-sub summary { 'Show this list of commands' }
+sub options {};
+sub group { '' }
+sub summary { 'Show the list of commands' }
 
 sub description {
     return <<"    EOT"
@@ -24,30 +24,27 @@ command.
     EOT
 }
 
-sub group { '' }
-
 sub command_info_hash {
     my $self = shift;
 
-    require Module::Pluggable;
-    Module::Pluggable->import(search_path => ['App::Yath::Command']);
+    return $self->{+_COMMAND_INFO_HASH} if $self->{+_COMMAND_INFO_HASH};
 
     my %commands;
-    for my $pkg ($self->plugins) {
-        my $file = pkg_to_file($pkg);
-        eval {
-            require $file;
+    my $command_libs = find_libraries('App::Yath::Command::*');
+    for my $lib (sort keys %$command_libs) {
+        my $ok = eval { require $command_libs->{$lib}; 1 };
+        unless ($ok) {
+            warn "Failed to load command '$command_libs->{$lib}': $@";
+            next;
+        }
 
-            unless($pkg->internal_only) {
-                my $group = $pkg->group;
-                my $name = $pkg->name;
+        next if $lib->internal_only;
+        my $name = $lib->name;
+        my $group = $lib->group;
+        $commands{$group}->{$name} = $lib->summary;
+    }
 
-                $commands{$group}->{$name} = $pkg->summary;
-            }
-            1;
-        };
-      }
-    return \%commands;
+    return $self->{+_COMMAND_INFO_HASH} = \%commands;
 }
 
 sub command_list {
@@ -62,15 +59,12 @@ sub run {
     my $self = shift;
     my $args = $self->{+ARGS};
 
-    my @list;
-    push @list => @{$args->{opts}} if $args;
-    push @list => @{$args->{list}} if $args;
+    return $self->command_help($args->[0]) if @$args;
 
-    return $self->command_help(shift @list) if @list;
-
+    my $script = $self->settings->harness->script // $0;
     my $maxlen = List::Util::max(map length, $self->command_list);
 
-    print "\nUsage: $0 COMMAND [options]\n\nAvailable Commands:\n";
+    print "\nUsage: $script COMMAND [options]\n\nAvailable Commands:\n";
 
     my $command_info_hash = $self->command_info_hash;
     for my $group (sort keys %$command_info_hash) {
@@ -89,7 +83,7 @@ sub command_help {
 
     require App::Yath;
     my $cmd_class = App::Yath->load_command($command);
-    print $cmd_class->usage;
+    print $cmd_class->cli_help(settings => $self->{+SETTINGS});
 
     return 0;
 }
@@ -104,58 +98,186 @@ __END__
 
 =head1 NAME
 
+App::Yath::Command::help - Show the list of commands
+
 =head1 DESCRIPTION
 
-=head1 SYNOPSIS
+This command provides a list of commands when called with no arguments.
+When given a command name as an argument it will print the help for that
+command.
 
-=head1 COMMAND LINE USAGE
+
+=head1 USAGE
+
+    $ yath [YATH OPTIONS] help [COMMAND OPTIONS]
+
+=head2 YATH OPTIONS
+
+=head3 Developer
+
+=over 4
+
+=item --dev-lib
+
+=item --dev-lib=lib
+
+=item -D
+
+=item -D=lib
+
+=item -Dlib
+
+=item --no-dev-lib
+
+Add paths to @INC before loading ANYTHING. This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
+
+Can be specified multiple times
 
 
-    $ yath help [options]
+=back
 
-=head2 Help
+=head3 Environment
+
+=over 4
+
+=item --persist-dir ARG
+
+=item --persist-dir=ARG
+
+=item --no-persist-dir
+
+Where to find persistence files.
+
+
+=item --persist-file ARG
+
+=item --persist-file=ARG
+
+=item --pfile ARG
+
+=item --pfile=ARG
+
+=item --no-persist-file
+
+Where to find the persistence file. The default is /{system-tempdir}/project-yath-persist.json. If no project is specified then it will fall back to the current directory. If the current directory is not writable it will default to /tmp/yath-persist.json which limits you to one persistent runner on your system.
+
+
+=item --project ARG
+
+=item --project=ARG
+
+=item --project-name ARG
+
+=item --project-name=ARG
+
+=item --no-project
+
+This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file. This is necessary for a persistent runner.
+
+
+=back
+
+=head3 Help and Debugging
 
 =over 4
 
 =item --show-opts
 
+=item --no-show-opts
+
 Exit after showing what yath thinks your options mean
 
-=item -h
-
-=item --help
-
-Exit after showing this help message
-
-=item -V
 
 =item --version
 
-Show version information
+=item -V
+
+=item --no-version
+
+Exit after showing a helpful usage message
+
 
 =back
 
-=head2 Plugins
+=head3 Plugins
 
 =over 4
 
-=item -pPlugin
+=item --no-scan-plugins
 
-=item -pPlugin=arg1,arg2,...
+=item --no-no-scan-plugins
 
-=item -p+My::Plugin
+Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that it loading other modules when it should not.
 
-=item --plugin Plugin
 
-Load a plugin
+=item --plugins PLUGIN
 
-can be specified multiple times
+=item --plugins +App::Yath::Plugin::PLUGIN
+
+=item --plugins PLUGIN=arg1,arg2,...
+
+=item --plugin PLUGIN
+
+=item --plugin +App::Yath::Plugin::PLUGIN
+
+=item --plugin PLUGIN=arg1,arg2,...
+
+=item -pPLUGIN
 
 =item --no-plugins
 
-cancel any plugins listed until now
+Load a yath plugin.
 
-This can be used to negate plugins specified in .yath.rc or similar
+Can be specified multiple times
+
+
+=back
+
+=head2 COMMAND OPTIONS
+
+=head3 Help and Debugging
+
+=over 4
+
+=item --dummy
+
+=item -d
+
+=item --no-dummy
+
+Dummy run, do not actually execute anything
+
+Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
+
+
+=item --help
+
+=item -h
+
+=item --no-help
+
+exit after showing help information
+
+
+=item --keep-dirs
+
+=item --keep_dir
+
+=item -k
+
+=item --no-keep-dirs
+
+Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
+
+
+=item --summary
+
+=item --summary=/path/to/summary.json
+
+=item --no-summary
+
+Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extention is added automatically if omitted.
+
 
 =back
 
@@ -182,7 +304,7 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2019 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -190,3 +312,4 @@ modify it under the same terms as Perl itself.
 See F<http://dev.perl.org/licenses/>
 
 =cut
+

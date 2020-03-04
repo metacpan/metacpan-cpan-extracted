@@ -1,10 +1,21 @@
 package Test::Auto::Parser;
 
-use Data::Object 'Class', 'Test::Auto::Types';
+use strict;
+use warnings;
 
-use Data::Object 'WithStashable';
+use Data::Object::Class;
+use Data::Object::Attributes;
 
-our $VERSION = '0.05'; # VERSION
+use registry 'Test::Auto::Types';
+use routines;
+
+with 'Data::Object::Role::Stashable';
+
+require Carp;
+
+our $VERSION = '0.07'; # VERSION
+
+# ATTRIBUTES
 
 has name => (
   is => 'ro',
@@ -109,7 +120,7 @@ around BUILD($args) {
 
 method build_name() {
   $self->parse_name;
-  $self->check_name or raise 'build name failed';
+  $self->check_name or Carp::confess 'build name failed';
 
   return $self->name;
 }
@@ -132,7 +143,7 @@ method check_name() {
 
 method build_abstract() {
   $self->parse_abstract;
-  $self->check_abstract or raise 'build abstract failed';
+  $self->check_abstract or Carp::confess 'build abstract failed';
 
   return $self->abstract;
 }
@@ -155,7 +166,7 @@ method check_abstract() {
 
 method build_synopsis() {
   $self->parse_synopsis;
-  $self->check_synopsis or raise 'build synopsis failed';
+  $self->check_synopsis or Carp::confess 'build synopsis failed';
 
   return $self->synopsis;
 }
@@ -178,7 +189,7 @@ method check_synopsis() {
 
 method build_includes() {
   $self->parse_includes;
-  $self->check_includes or raise 'build includes failed';
+  $self->check_includes or Carp::confess 'build includes failed';
 
   return $self->includes;
 }
@@ -207,7 +218,7 @@ method check_includes() {
 
 method build_description() {
   $self->parse_description;
-  $self->check_description or raise 'build description failed';
+  $self->check_description or Carp::confess 'build description failed';
 
   return $self->description;
 }
@@ -227,7 +238,7 @@ method check_description() {
 
 method build_inherits() {
   $self->parse_inherits;
-  $self->check_inherits or raise 'build inherits failed';
+  $self->check_inherits or Carp::confess 'build inherits failed';
 
   return $self->inherits;
 }
@@ -252,7 +263,7 @@ method check_inherits() {
 
 method build_integrates() {
   $self->parse_integrates;
-  $self->check_integrates or raise 'build integrates failed';
+  $self->check_integrates or Carp::confess 'build integrates failed';
 
   return $self->integrates;
 }
@@ -277,7 +288,7 @@ method check_integrates() {
 
 method build_attributes() {
   $self->parse_attributes;
-  $self->check_attributes or raise 'build attributes failed';
+  $self->check_attributes or Carp::confess 'build attributes failed';
 
   return $self->attributes;
 }
@@ -326,7 +337,7 @@ method check_attributes() {
 
 method build_libraries() {
   $self->parse_libraries;
-  $self->check_libraries or raise 'build libraries failed';
+  $self->check_libraries or Carp::confess 'build libraries failed';
 
   return $self->libraries;
 }
@@ -351,7 +362,7 @@ method check_libraries() {
 
 method build_headers() {
   $self->parse_headers;
-  $self->check_headers or raise 'build headers failed';
+  $self->check_headers or Carp::confess 'build headers failed';
 
   return $self->headers;
 }
@@ -374,7 +385,7 @@ method check_headers() {
 
 method build_footers() {
   $self->parse_footers;
-  $self->check_footers or raise 'build footers failed';
+  $self->check_footers or Carp::confess 'build footers failed';
 
   return $self->footers;
 }
@@ -397,7 +408,7 @@ method check_footers() {
 
 method build_scenarios() {
   $self->parse_scenarios;
-  $self->check_scenarios or raise 'build scenarios failed';
+  $self->check_scenarios or Carp::confess 'build scenarios failed';
 
   return $self->stash('scenarios');
 }
@@ -439,7 +450,7 @@ method build_methods() {
   return if !$self->includes;
 
   $self->parse_methods;
-  $self->check_methods or raise 'build methods failed';
+  $self->check_methods or Carp::confess 'build methods failed';
 
   return $self->stash('methods');
 }
@@ -490,7 +501,7 @@ method build_functions() {
   return if !$self->includes;
 
   $self->parse_functions;
-  $self->check_functions or raise 'build functions failed';
+  $self->check_functions or Carp::confess 'build functions failed';
 
   return $self->stash('functions');
 }
@@ -541,7 +552,7 @@ method build_routines() {
   return if !$self->includes;
 
   $self->parse_routines;
-  $self->check_routines or raise 'build routines failed';
+  $self->check_routines or Carp::confess 'build routines failed';
 
   return $self->stash('routines');
 }
@@ -590,7 +601,7 @@ method check_routines() {
 
 method build_types() {
   $self->parse_types;
-  $self->check_types or raise 'build types failed';
+  $self->check_types or Carp::confess 'build types failed';
 
   return $self->stash('types');
 }
@@ -760,7 +771,7 @@ for accessing the data.
 
 This package uses type constraints from:
 
-L<Data::Object::Library>
+L<Test::Auto::Types>
 
 =cut
 
@@ -852,9 +863,9 @@ This attribute is read-only, accepts C<(ArrayRef[Str])> values, and is optional.
 
 =head2 source
 
-  source(InstanceOf["Test::Auto"])
+  source(Source)
 
-This attribute is read-only, accepts C<(InstanceOf["Test::Auto"])> values, and is required.
+This attribute is read-only, accepts C<(Source)> values, and is required.
 
 =cut
 

@@ -20,20 +20,32 @@ my %module_build_args = (
     "Andrius Merkys <merkys\@cpan.org>"
   ],
   "dist_name" => "OPTiMaDe-Filter",
-  "dist_version" => "0.7.1",
+  "dist_version" => "0.7.2",
   "license" => "lgpl",
   "module_name" => "OPTiMaDe::Filter",
   "recursive_test_files" => 1,
   "requires" => {
     "Parse::Yapp" => 0,
     "Scalar::Util" => 0
+  },
+  "test_requires" => {
+    "Data::Compare" => 0,
+    "Data::Dumper" => 0,
+    "File::Spec" => 0,
+    "Scalar::Util" => 0,
+    "Test::More" => 0
   }
 );
 
 
 my %fallback_build_requires = (
+  "Data::Compare" => 0,
+  "Data::Dumper" => 0,
+  "File::Spec" => 0,
   "Module::Build" => "0.28",
-  "Module::Build::Parse::Yapp" => 0
+  "Module::Build::Parse::Yapp" => 0,
+  "Scalar::Util" => 0,
+  "Test::More" => 0
 );
 
 

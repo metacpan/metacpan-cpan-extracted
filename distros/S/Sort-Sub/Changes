@@ -1,3 +1,16 @@
+0.118   2020-02-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Introduce meta property: compares_record.
+
+        - Add sorters: record_by_order, record_by_reverse_order.
+
+
+0.117   2020-02-28  Released-By: PERLANCAR; Urgency: medium
+
+	- get_sorter(): accept third argument $with_meta to allow it to
+	  return metadata.
+
+
 0.116   2019-12-15  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

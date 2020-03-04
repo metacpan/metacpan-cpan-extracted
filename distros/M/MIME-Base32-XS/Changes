@@ -1,0 +1,32 @@
+0.01 2020-03-02T14:30:00Z
+    - First release.
+
+0.02 2020-03-02T18:40:00Z
+    - Solved errors in pod and Makefile.
+
+0.03 2020-03-02T19:00:00Z
+    - Renamed Base32.xs to XS.xs.
+
+0.04 2020-03-02T20:00:00Z
+    - module : MIME::Base32::XS
+      version: undef
+      in file: MIME-Base32-XS/lib/MIME/Base32/XS.pm
+      status : The PAUSE indexer could not store the indexing result in
+             the DB due the following error: C< Lock wait timeout
+             exceeded; try restarting transaction >. Please report the
+             case to the PAUSE admins at modules@perl.org.
+
+0.05 2020-03-02T20:12:00Z
+    - Solved error in doc.
+
+0.06 2020-03-03T00:02:00Z
+    - Solved problem variable $VERSION.
+
+0.07 2020-03-03T00:02:00Z
+    - trying solve problem version.
+
+0.08 2020-03-03T15:02:00Z
+    - Solved errors left shift count and right shift count in OS Windows.
+
+0.09 2020-03-03T19:16:00Z
+    - Solved error in decode.

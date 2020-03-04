@@ -1,13 +1,13 @@
 package Locale::Codes::LangFam;
 # Copyright (C) 2001      Canon Research Centre Europe (CRE).
 # Copyright (C) 2002-2009 Neil Bowers
-# Copyright (c) 2010-2019 Sullivan Beck
+# Copyright (c) 2010-2020 Sullivan Beck
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'gen_mods' is run.
-#    Generated on: Thu Aug 29 15:08:58 EDT 2019
+#    Generated on: Mon Mar  2 09:30:59 EST 2020
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ require 5.006;
 use Exporter qw(import);
 
 our($VERSION,@EXPORT);
-$VERSION   = '3.62';
+$VERSION   = '3.63';
 
 ################################################################################
 use if $] >= 5.027007, 'deprecate';

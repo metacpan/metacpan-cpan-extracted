@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::NextRelease 6.012;
+package Dist::Zilla::Plugin::NextRelease 6.014;
 # ABSTRACT: update the next release number in your changelog
 
 use namespace::autoclean;
@@ -208,7 +208,7 @@ __PACKAGE__->meta->make_immutable;
 #pod
 #pod = format
 #pod sprintf-like string used to compute the next value of C<{{$NEXT}}>;
-#pod defaults to C<%-9v %{yyyy-MM-dd HH:mm:ss VVVV}d>
+#pod defaults to C<%-9v %{yyyy-MM-dd HH:mm:ssZZZZZ VVVV}d%{ (TRIAL RELEASE)}T>
 #pod
 #pod = time_zone
 #pod the timezone to use when generating the date;  defaults to I<local>
@@ -281,7 +281,7 @@ Dist::Zilla::Plugin::NextRelease - update the next release number in your change
 
 =head1 VERSION
 
-version 6.012
+version 6.014
 
 =head1 SYNOPSIS
 
@@ -335,7 +335,7 @@ the file to which to write an updated changelog to; defaults to the C<filename>
 =item format
 
 sprintf-like string used to compute the next value of C<{{$NEXT}}>;
-defaults to C<%-9v %{yyyy-MM-dd HH:mm:ss VVVV}d>
+defaults to C<%-9v %{yyyy-MM-dd HH:mm:ssZZZZZ VVVV}d%{ (TRIAL RELEASE)}T>
 
 =item time_zone
 
@@ -413,7 +413,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

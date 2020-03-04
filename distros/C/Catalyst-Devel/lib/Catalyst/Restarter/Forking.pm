@@ -17,6 +17,9 @@ sub _fork_and_start {
         $self->_child($pid);
     }
     else {
+        # Only the parent process needs to watch for changes, so the child
+        # should release any resources held by the watcher:
+        $self->_clear_watcher;
         $self->start_sub->();
     }
 }

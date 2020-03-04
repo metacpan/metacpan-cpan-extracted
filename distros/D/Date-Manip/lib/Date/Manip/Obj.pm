@@ -1,5 +1,5 @@
 package Date::Manip::Obj;
-# Copyright (c) 2008-2019 Sullivan Beck. All rights reserved.
+# Copyright (c) 2008-2020 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -13,7 +13,7 @@ use IO::File;
 use Storable qw(dclone);
 
 our ($VERSION);
-$VERSION='6.79';
+$VERSION='6.81';
 END { undef $VERSION; }
 
 ########################################################################
@@ -190,7 +190,7 @@ sub _clone {
 
       foreach my $rx (@rx) {
          my $r = shift(@tmp);
-         $$obj{'data'}{$rx}  = $r;
+         $$obj{'data'}{$rx} = $r;
          $$new{'data'}{$rx} = $r;
       }
 

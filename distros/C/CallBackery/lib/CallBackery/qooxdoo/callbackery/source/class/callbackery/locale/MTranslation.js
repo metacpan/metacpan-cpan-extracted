@@ -28,6 +28,9 @@ qx.Mixin.define("callbackery.locale.MTranslation", {
          */
         xtr: function(messageId,varargs) {
             var nlsManager = qx.locale.Manager;
+            if (messageId == ''){
+                return '';
+            }
             if (messageId instanceof Array) {
                 return nlsManager.tr.apply(nlsManager, messageId);
             }

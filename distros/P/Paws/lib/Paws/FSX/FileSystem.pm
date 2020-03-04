@@ -81,34 +81,34 @@ A description of a specific Amazon FSx file system.
 
   The ID of the AWS Key Management Service (AWS KMS) key used to encrypt
 the file system's data for an Amazon FSx for Windows File Server file
-system.
+system. Amazon FSx for Lustre does not support KMS encryption.
 
 
 =head2 Lifecycle => Str
 
-  The lifecycle status of the file system:
+  The lifecycle status of the file system, following are the possible
+values and what they mean:
 
 =over
 
 =item *
 
-C<AVAILABLE> indicates that the file system is reachable and available
-for use.
+C<AVAILABLE> - The file system is in a healthy state, and is reachable
+and available for use.
 
 =item *
 
-C<CREATING> indicates that Amazon FSx is in the process of creating the
-new file system.
+C<CREATING> - Amazon FSx is creating the new file system.
 
 =item *
 
-C<DELETING> indicates that Amazon FSx is in the process of deleting the
-file system.
+C<DELETING> - Amazon FSx is deleting an existing file system.
 
 =item *
 
-C<FAILED> indicates that Amazon FSx was not able to create the file
-system.
+C<FAILED> - An existing file system has experienced an unrecoverable
+failure. When creating a new file system, Amazon FSx was unable to
+create the file system.
 
 =item *
 

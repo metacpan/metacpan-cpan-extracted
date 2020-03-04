@@ -2537,7 +2537,7 @@ static void marpaESLIFPerl_stack_setv(pTHX_ marpaESLIF_t *marpaESLIFp, marpaESLI
           marpaESLIFValueResultp->type               = MARPAESLIF_VALUE_TYPE_STRING;
           marpaESLIFValueResultp->contextp           = MARPAESLIFPERL_CONTEXT;
           marpaESLIFValueResultp->representationp    = NULL;
-          marpaESLIFValueResultp->u.s.p              = bytep;
+          marpaESLIFValueResultp->u.s.p              = (unsigned char*) bytep;
           marpaESLIFValueResultp->u.s.sizel          = bytel;
           marpaESLIFValueResultp->u.s.encodingasciis = encodings;
           marpaESLIFValueResultp->u.s.shallowb       = 0;
@@ -2548,7 +2548,7 @@ static void marpaESLIFPerl_stack_setv(pTHX_ marpaESLIF_t *marpaESLIFp, marpaESLI
           marpaESLIFValueResultp->type               = MARPAESLIF_VALUE_TYPE_ARRAY;
           marpaESLIFValueResultp->contextp           = MARPAESLIFPERL_CONTEXT;
           marpaESLIFValueResultp->representationp    = NULL;
-          marpaESLIFValueResultp->u.a.p              = bytep;
+          marpaESLIFValueResultp->u.a.p              = (char *) bytep;
           marpaESLIFValueResultp->u.a.sizel          = bytel;
           marpaESLIFValueResultp->u.a.shallowb       = 0;
 	  marpaESLIFValueResultp->u.a.freeUserDatavp = marpaESLIFPerlaTHX;

@@ -297,7 +297,8 @@ sub __parse_with_Spreadsheet_Read {
         my @sheets = map { '- ' . ( length $book->[$_]{label} ? $book->[$_]{label} : 'sheet_' . $_ ) } 1 .. $#$book;
         my @pre = ( undef );
         my $choices = [ @pre, @sheets ];
-        my $old_idx = $sf->{i}{S_R}{$file_fs}{old_idx} // 0;
+        $sf->{i}{S_R}{$file_fs}{old_idx} //= 0;
+        my $old_idx = $sf->{i}{S_R}{$file_fs}{old_idx};
 
         SHEET: while ( 1 ) {
             # Choose

@@ -1,17 +1,13 @@
 use Zydeco prefix => 'MyApp';
 
 class JSON::Encoder {
-	multi method stringify (Undef $value) {
-		'null';
-	}
+	multi method stringify (Undef $) = 'null';
 	
-	multi method stringify (ScalarRef[Bool] $value) {
+	multi method stringify (  ScalarRef[Bool] $value) {
 		$$value ? 'true' : 'false';
 	}
 	
-	multi method stringify (Num $value) {
-		$value;
-	}
+	multi method stringify (Num $value) = $value;
 	
 	multi method stringify :alias(quote_str) (Str $value)  {
 		sprintf(q<"%s">, quotemeta $value);

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>reCAPTCHA v3 example</title>
+    <: $script4head | mark_raw :>
+</head>
+
+<body>
+<form action="/verify" method="POST">
+        <: $input4form | mark_raw :>
+        <button type="submit">submit</button>
+</form>
+
+: if $param.keys() {
+<dl>
+:   for $param.keys() -> $key {
+    <dt><: $key~':' :></dt>
+    <dd><: $param[$key] :></dd>
+:   }
+</dl>
+: }
+: if $response.keys() {
+<dl>
+:   for $response.keys() -> $key {
+    <dt><: $key~':' :></dt>
+    <dd><: $response[$key] :></dd>
+:   }
+</dl>
+: }
+</body></html>

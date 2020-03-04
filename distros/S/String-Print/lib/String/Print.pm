@@ -1,4 +1,4 @@
-# Copyrights 2016-2018 by [Mark Overmeer].
+# Copyrights 2016-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package String::Print;
 use vars '$VERSION';
-$VERSION = '0.93';
+$VERSION = '0.94';
 
 
 use warnings;
@@ -72,7 +72,7 @@ sub init($)
       = { %default_serializers, (ref $s eq 'ARRAY' ? @$s : %$s) };
 
     $self->encodeFor($args->{encode_for});
-	$self->{SP_missing} = $args->{missing_key} || \&_reportMissingKey;
+    $self->{SP_missing} = $args->{missing_key} || \&_reportMissingKey;
     $self;
 }
 
@@ -158,7 +158,7 @@ sub sprinti($@)
             my ($name, $tricks) = (shift @frags)
                 =~ m!^\s*([\pL\p{Pc}\pM][\w.]*)\s*(.*?)\s*$!o or die $format;
 
-	    push @parts, $name =~ $exclude
+        push @parts, $name =~ $exclude
               ? $self->_expand($name, $tricks, $args)
               : $encode->($self->_expand($name, $tricks, $args));
 
@@ -170,9 +170,9 @@ sub sprinti($@)
     {   push @parts, $args->{_prepend} if defined $args->{_prepend};
         push @parts, shift @frags;
         while(@frags) {
-	    (shift @frags) =~ /^\s*([\pL\p{Pc}\pM][\w.]*)\s*(.*?)\s*$/o
+        (shift @frags) =~ /^\s*([\pL\p{Pc}\pM][\w.]*)\s*(.*?)\s*$/o
                 or die $format;
-	    push @parts, $self->_expand($1, $2, $args);
+        push @parts, $self->_expand($1, $2, $args);
             push @parts, shift @frags if @frags;
         }
         push @parts, $args->{_append} if defined $args->{_append};
@@ -194,7 +194,7 @@ sub _expand($$$)
     }
     else
     {   my @parts = split /\./, $key;
-		my $key   = shift @parts;
+        my $key   = shift @parts;
         $value = exists $args->{$key} ? $args->{$key}
           : $self->_missingKey($key, $args);
 
@@ -244,21 +244,21 @@ sub _expand($$$)
 
 sub _missingKey($$)
 {   my ($self, $key, $args) = @_;
-	$self->{SP_missing}->($self, $key, $args);
+    $self->{SP_missing}->($self, $key, $args);
 }
 
 sub _reportMissingKey($$)
 {   my ($self, $key, $args) = @_;
 
     my $depth = 0;
-	my ($filename, $linenr);
+    my ($filename, $linenr);
     while((my $pkg, $filename, $linenr) = caller $depth++)
     {   last unless
             $pkg->isa(__PACKAGE__)
          || $pkg->isa('Log::Report::Minimal::Domain');
     }
 
-	warn $self->sprinti
+    warn $self->sprinti
       ( "Missing key '{key}' in format '{format}', file {fn} line {line}\n"
       , key => $key, format => $args->{_format}
       , fn => $filename, line => $linenr
@@ -324,12 +324,12 @@ sub _modif_bytes($$$)
 {   my ($self, $format, $value, $args) = @_;
     defined $value && length $value or return undef;
 
-	return sprintf("%3d  B", $value) if $value < 1000;
+    return sprintf("%3d  B", $value) if $value < 1000;
 
     my @scale = qw/kB MB GB TB PB EB ZB/;
-	$value /= 1024;
+    $value /= 1024;
 
-	while(@scale > 1 && $value > 999)
+    while(@scale > 1 && $value > 999)
     {   shift @scale;
         $value /= 1024;
     }
@@ -337,7 +337,7 @@ sub _modif_bytes($$$)
     return sprintf "%3d $scale[0]", $value + 0.5
         if $value > 9.949;
 
-	sprintf "%3.1f $scale[0]", $value;
+    sprintf "%3.1f $scale[0]", $value;
 }
 
 # Be warned: %F and %T (from C99) are not supported on Windows
@@ -353,11 +353,11 @@ sub _modif_year($$$)
 {   my ($self, $format, $value, $args) = @_;
     defined $value && length $value or return undef;
 
-	return $value
-        if $value !~ /\D/ && $value < 2200;
+    return $1
+        if $value =~ /^\s*([0-9]+)\s*$/ && $1 < 2200;
 
-	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
-	defined $stamp or return "year not found in '$value'";
+    my $stamp = $value =~ /^\s*([0-9]+)\s*$/ ? $1 : str2time($value);
+    defined $stamp or return "year not found in '$value'";
 
     strftime "%Y", localtime($stamp);
 }
@@ -366,12 +366,12 @@ sub _modif_date($$$)
 {   my ($self, $format, $value, $args) = @_;
     defined $value && length $value or return undef;
 
-	return sprintf("%4d-%02d-%02d", $1, $2, $3)
+    return sprintf("%4d-%02d-%02d", $1, $2, $3)
         if $value =~ m!^\s*([0-9]{4})[:/.-]([0-9]?[0-9])[:/.-]([0-9]?[0-9])\s*$!
         || $value =~ m!^\s*([0-9]{4})([0-9][0-9])([0-9][0-9])\s*$!;
 
-	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
-	defined $stamp or return "date not found in '$value'";
+    my $stamp = $value =~ /\D/ ? str2time($value) : $value;
+    defined $stamp or return "date not found in '$value'";
 
     strftime "%Y-%m-%d", localtime($stamp);
 }
@@ -380,26 +380,26 @@ sub _modif_time($$$)
 {   my ($self, $format, $value, $args) = @_;
     defined $value && length $value or return undef;
 
-	return sprintf "%02d:%02d:%02d", $1, $2, $3||0
+    return sprintf "%02d:%02d:%02d", $1, $2, $3||0
         if $value =~ m!^\s*(0?[0-9]|1[0-9]|2[0-3])\:([0-5]?[0-9])(?:\:([0-5]?[0-9]))?\s*$!
         || $value =~ m!^\s*(0[0-9]|1[0-9]|2[0-3])([0-5][0-9])(?:([0-5][0-9]))?\s*$!;
 
-	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
-	defined $stamp or return "time not found in '$value'";
+    my $stamp = $value =~ /\D/ ? str2time($value) : $value;
+    defined $stamp or return "time not found in '$value'";
 
     strftime "%H:%M:%S", localtime($stamp);
 }
 
 sub _modif_dt($$$)
 {   my ($self, $format, $value, $args) = @_;
-	defined $value && length $value or return undef;
+    defined $value && length $value or return undef;
 
-	my $kind    = ($format =~ m/DT\(([^)]*)\)/ ? $1 : undef) || 'FT';
-	my $pattern = $dt_format{$kind}
+    my $kind    = ($format =~ m/DT\(([^)]*)\)/ ? $1 : undef) || 'FT';
+    my $pattern = $dt_format{$kind}
         or return "dt format $kind not known";
 
-	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
-	defined $stamp or return "dt not found in '$value'";
+    my $stamp = $value =~ /\D/ ? str2time($value) : $value;
+    defined $stamp or return "dt not found in '$value'";
 
     strftime $pattern, localtime($stamp);
 }

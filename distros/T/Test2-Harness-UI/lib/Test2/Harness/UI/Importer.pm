@@ -2,7 +2,7 @@ package Test2::Harness::UI::Importer;
 use strict;
 use warnings;
 
-our $VERSION = '0.000021';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 
@@ -73,7 +73,7 @@ sub process {
 
     if ($ok && !$status->{errors}) {
         syswrite(\*STDOUT, "Completed run " . $run->run_id . " (" . $run->log_file->name . ") in $total seconds.\n");
-        $run->update({status => 'complete', passed => $status->{passed}, failed => $status->{failed}});
+        $run->update({status => 'complete', passed => $status->{passed}, failed => $status->{failed}, retried => $status->{retried}});
     }
     else {
         my $error = $ok ? join("\n" => @{$status->{errors}}) : $err;

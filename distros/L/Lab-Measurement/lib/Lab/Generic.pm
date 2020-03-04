@@ -1,5 +1,5 @@
 package Lab::Generic;
-$Lab::Generic::VERSION = '3.691';
+$Lab::Generic::VERSION = '3.692';
 #ABSTRACT: General function library for the L::M classes
 
 use Lab::Generic::CLOptions;
@@ -266,11 +266,11 @@ Lab::Generic - General function library for the L::M classes
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler
             2014       Alexei Iankilevitch, Andreas K. Huettel, Christian Butschkow

@@ -1,0 +1,104 @@
+daemon                        off;
+worker_processes              auto;
+pcre_jit                      on;
+: if $use_geoip2 {
+load_module                   modules/ngx_http_geoip2_module.so;
+: }
+pid                           <: $pid :>;
+: if $user {
+user                          <: $user :>;
+: }
+
+events {
+    worker_connections        8192;
+}
+
+http {
+    types {
+: for $mime_types.keys().sort() -> $suffix {
+        <: sprintf("%-80s %s", $mime_types[$suffix], $suffix) :>;
+: }
+    }
+    default_type              application/octet-stream;
+
+    # for FC29
+    types_hash_max_size       4096;
+
+    log_format                default "$time_local\t$remote_addr\t$status\t$body_bytes_sent\t$request";
+    error_log                 <: $error_log :>;
+    log_not_found             off;
+    access_log                off;
+
+    sendfile                  on;
+    # aio                       on;
+    # directio                  512;
+    output_buffers            1 128k;
+
+    keepalive_timeout         70;
+: if $geoip2_country_path {
+
+    # NOTE https://github.com/leev/ngx_http_geoip2_module
+    geoip2 <: $geoip2_country_path :> {
+        auto_reload 0m;
+        # $geoip2_metadata_country_build metadata build_epoch;
+        # $geoip2_data_country_code default=US source=$variable_with_ip country iso_code;
+        # $geoip2_data_country_name country names en;
+    }
+: }
+: if $geoip2_city_path {
+
+    # NOTE https://github.com/leev/ngx_http_geoip2_module
+    geoip2 <: $geoip2_city_path :> {
+        auto_reload 0m;
+        # $geoip2_data_city_name default=London city names en;
+    }
+: }
+
+    gzip                      on;
+    gzip_min_length           100;
+    gzip_comp_level           4;
+    gzip_proxied              any;
+    gzip_types                application/javascript application/x-javascript text/plain text/css text/xml text/csv;
+    gzip_static               on;
+
+    # set $remote_addr to value from this header, ONLY if real $remote_addr is trusted (described in "set_real_ip_from")
+    real_ip_header            X-Real-IP;
+    # all unix sockets is trusted
+    set_real_ip_from          unix:;
+
+    proxy_buffers             64 32k;
+    proxy_buffer_size         32k;
+    proxy_http_version        1.1;
+
+    resolver                  8.8.8.8 8.8.4.4 valid=300s;
+    resolver_timeout          5s;
+
+    server_tokens             off;
+
+    # SSL, from https://cipherli.st/ and https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
+    ssl_dhparam               <: $ssl_dhparam :>;
+    ssl_protocols             TLSv1.3 TLSv1.2; # TLSv1 TLSv1.1
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers               "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+    ssl_ecdh_curve            auto; # secp384r1;
+
+    ssl_stapling              on;
+    ssl_stapling_verify       on;
+
+    ssl_session_tickets       off;
+    ssl_session_cache         shared:SSL:10m;
+    ssl_session_timeout       10m;
+
+    # add_header                Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+    # add_header                X-Frame-Options DENY;
+    add_header                X-Content-Type-Options nosniff;
+
+    # for websocket proxy connection
+    map $http_connection $connection_upgrade {
+        ~*\bupgrade\b    "upgrade";
+        default          "";
+    }
+
+    # vhosts
+    include <: $vhost_dir :>/*.nginx;
+}

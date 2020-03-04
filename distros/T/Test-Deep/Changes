@@ -1,5 +1,14 @@
 Revision history for Test-Deep
 
+1.130     2020-03-01
+        - no changes since 1.129
+
+1.129     2020-01-26 - TRIAL RELEASE
+        - documentation fixes (thanks, Daniel Böhmer!)
+        - allow NoTest to be used without breaking other Test::Deep
+          (thanks, Alexander Karelas!)
+        - added true/false optional imports (thanks, Denis Ibaev!)
+
 1.128     2018-04-18
         - numerous small improvements to documentation; thanks to
           Fabrice Gabolde, Daniel Böhmer, Lance Wicks, Matthew Horsfall

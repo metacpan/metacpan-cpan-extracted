@@ -5,7 +5,7 @@ use 5.010_001;
 
 use strictures 2;
 
-our $VERSION = '0.401000';
+our $VERSION = '0.500001';
 
 {
   # Do **NOT** import a clone() function into the DBIx::Class::Schema namespace
@@ -40,7 +40,7 @@ use DBIx::Class::TopoSort ();
 use Hash::Merge qw( merge );
 use List::Util qw( first );
 use List::MoreUtils qw( natatime );
-use Scalar::Util qw( blessed reftype );
+use Scalar::Util qw( blessed );
 
 {
   # The aliases in this block are done at BEGIN time so that the ::Types class
@@ -103,7 +103,9 @@ use Scalar::Util qw( blessed reftype );
 use DBIx::Class::Sims::Types;
 
 use DBIx::Class::Sims::Runner;
-use DBIx::Class::Sims::Util;
+use DBIx::Class::Sims::Util qw( normalize_aoh reftype );
+
+Hash::Merge::set_behavior('RIGHT_PRECEDENT');
 
 sub add_sims {
   my $class = shift;
@@ -139,19 +141,10 @@ sub load_sims {
   my $spec = massage_input($schema, normalize_input($spec_proto));
   my $opts = normalize_input($opts_proto);
 
-  # 1. Ensure the belongs_to relationships are in $reqs
-  # 2. Set the rel_info as the leaf in $reqs
-  my $reqs = normalize_input($opts->{constraints} // {});
-
-  # 2: Create the rows in toposorted order
-  my $hooks = $opts->{hooks} // {};
-  $hooks->{preprocess}  //= sub {};
-  $hooks->{postprocess} //= sub {};
-
   # Create a lookup of the items passed in so we can return them back.
   my $initial_spec = {};
   foreach my $name (keys %$spec) {
-    my $normalized = DBIx::Class::Sims::Util->normalize_aoh($spec->{$name});
+    my $normalized = normalize_aoh($spec->{$name});
     unless ($normalized) {
       warn "Skipping $name - I don't know what to do!\n";
       delete $spec->{$name};
@@ -173,16 +166,28 @@ sub load_sims {
     $additional->{seed} = $opts->{seed} //= rand(time & $$);
     srand($opts->{seed});
 
-    my @toposort = DBIx::Class::TopoSort->toposort(
-      $schema,
-      %{$opts->{toposort} // {}},
-    );
+    my @toposort;
+    if ( $opts->{topograph_file} ) {
+      @toposort = load_topograph($opts->{topograph_file});
+    }
+    else {
+      @toposort = DBIx::Class::TopoSort->toposort(
+        $schema,
+        %{$opts->{toposort} // {}},
+      );
+    }
+
+    if ( $opts->{topograph_trace} ) {
+      save_topograph(\@toposort, $opts->{topograph_trace});
+    }
 
     my $strict_mode = $opts->{strict_mode} // 0;
     if ($strict_mode) {
       $opts->{ignore_unknown_tables} //= 0;
+      $opts->{ignore_unknown_columns} //= 0;
       $opts->{allow_relationship_column_names} //= 0;
       $opts->{die_on_failure} //= 1;
+      $opts->{die_on_unique_mismatch} //= 1;
     }
 
     my $runner = DBIx::Class::Sims::Runner->new(
@@ -191,13 +196,20 @@ sub load_sims {
       toposort => \@toposort,
       initial_spec => $initial_spec,
       spec => $spec,
-      hooks => $hooks,
-      reqs => $reqs,
-      # Set this to false to throw a warning if a non-null auto-increment column
+      constraints => normalize_input($opts->{constraints} // {}),
+
+      hooks => $opts->{hooks} // {},
+
+      # Set this to false to throw a warning if a PK auto-increment column
       # has a value set. It defaults to false. Set to true to disable.
       allow_pk_set_value => $opts->{allow_pk_set_value} // 0,
       ignore_unknown_tables => $opts->{ignore_unknown_tables} // 0,
+      ignore_unknown_columns => $opts->{ignore_unknown_columns} // 0,
       allow_relationship_column_names => $opts->{allow_relationship_column_names} // 1,
+      die_on_unique_mismatch => $opts->{die_on_unique_mismatch} // 1,
+
+      object_trace => $opts->{object_trace},
+      predictable_values => $opts->{predictable_values},
     );
 
     $rows = eval {
@@ -228,6 +240,7 @@ sub load_sims {
   }
 }
 
+use JSON::MaybeXS qw( decode_json encode_json );
 use YAML::Any qw( LoadFile Load );
 sub normalize_input {
   my ($proto) = @_;
@@ -260,13 +273,16 @@ sub massage_input {
       return @_;
     },
     wanted => sub {
-      return unless (reftype($_)//'') eq 'HASH' && !blessed($_);
+      return unless reftype($_) eq 'HASH' && !blessed($_);
       foreach my $k ( keys %$_ ) {
         my $t = $_;
 
         # Expand the dot-naming convention.
         while ( $k =~ /([^.]*)\.(.*)/ ) {
-          $t->{$1} = { $2 => delete($t->{$k}) };
+          $t->{$1} = merge(
+            ($t->{$1} // {}),
+            { $2 => delete($t->{$k}) },
+          );
           $t = $t->{$1}; $k = $2;
         }
 
@@ -289,6 +305,23 @@ sub massage_input {
   }, $struct);
 
   return $struct;
+}
+
+sub load_topograph {
+  my ($filename) = @_;
+  my $data = do {
+    local $/;
+    open my $fh, '<', $filename;
+    <$fh>;
+  };
+  return @{decode_json($data)};
+}
+
+sub save_topograph {
+  my ($array, $filename) = @_;
+  open my $fh, '>', $filename;
+  print $fh encode_json($array);
+  close $fh;
 }
 
 1;
@@ -765,6 +798,13 @@ This defaults to 1.
 
 If set, this will be the srand() seed used for this invocation.
 
+=head2 ignore_unknown_columns
+
+If set to 1, this will ignore column names that don't exist in the schema.
+Otherwise, it will raise an error.
+
+This defaults to 0.
+
 =head2 ignore_unknown_tables
 
 If set to 1, this will ignore table names that don't exist in the schema.
@@ -782,17 +822,29 @@ idea, but some schemas do this.)
 
 This defaults to 1.
 
+=head2 die_on_unique_mismatch
+
+If set to 0, this will prevent a die when an existing row is found that matches
+the unique columns set in the spec, but the other columns don't match. Instead,
+you will be responsible for checking C<< $additional->{error} >> yourself.
+
+This defaults to 1.
+
 =head2 strict_mode
 
 This sets the following options:
 
 =over 4
 
+=item * C<< die_on_failure => 1 >>
+
+=item * C<< ignore_unknown_columns => 0 >>
+
 =item * C<< ignore_unknown_tables => 0 >>
 
 =item * C<< allow_relationship_column_names => 0 >>
 
-=item * C<< die_on_failure => 1 >>
+=item * C<< die_on_unique_mismatch => 1 >>
 
 =back
 
@@ -801,6 +853,27 @@ If you have explicitly set one of these options, it will override strict_mode.
 =head2 toposort
 
 This is passed directly to the call to C<< DBIx::Class::TopoSort->toposort >>.
+
+See L<DBIx::Class::TopoSort/toposort> for more information.
+
+=head2 topograph_trace
+
+If this is set, then the list of tables from the toposort graph will be written
+out in JSON to this file.
+
+=head2 topograph_file
+
+If this is set, then the list of tables of the toposort graph will be read from
+this file in JSON. It's expected that it will return a list of strings.
+
+If this is set, then the toposort option will be ignored.
+
+This is often best used with the topograph_trace option.
+
+=head2 object_trace
+
+If this is set, then the ojbects found and created will be written out in JSON
+to this file.
 
 =head2 hooks
 
@@ -813,14 +886,56 @@ hooks:
 
 =item * preprocess
 
-This receives C<$name, $source, $spec> and ignores any return value. C<$spec>
-is the hashref that will be passed to C<< $schema->resultset($name)->create() >>.
-This hook is expected to modify C<$spec> as needed.
+This receives C<$source, $spec> and ignores any return value.
+
+=over 4
+
+=item * C<$source>
+
+This is a L<DBIx::Class::Sims::Source/> object.
+
+=item * C<$spec>
+
+This is a hashref of the Sims specification that was received. You are expected
+to modify this as needed.
+
+This will B<NOT> have any generated values.
+
+=back
+
+=item * before_create
+
+This receives C<$source, $item> and ignores any return value.
+
+=over 4
+
+=item * C<$source>
+
+This is a L<DBIx::Class::Sims::Source/> object.
+
+=item * C<$item>
+
+This is a L<DBIx::Class::Sims::Item/> object. You will probably want to call
+C<< $item->set_value($col, $val) >>.
+
+=back
 
 =item * postprocess
 
-This receives C<$name, $source, $row> and ignores any return value. This hook
-is expected to modify the newly-created row object as needed.
+This receives C<$source, $row> and ignores any return value.
+
+=over 4
+
+=item * C<$source>
+
+This is a L<DBIx::Class::Sims::Source/> object.
+
+=item * C<$row>
+
+This is the L<DBIx::Class::Row/> that was either found or created. You are
+expected to modify this as needed.
+
+=back
 
 =back
 
@@ -842,6 +957,12 @@ default value on the column.
 
 This can be either a string, number, or an arrayref of strings or numbers. If it
 is an arrayref, then a random choice from that array will be selected.
+
+=item * value_not / values_not
+
+This is the value(s) to avoid. It can be a string, arrayref of strings, or a
+function which takes a value and returns true if the value should be avoided.
+This can be combined with anything else to constrain in a specific situation.
 
 =item * type
 
@@ -886,39 +1007,90 @@ When an item is created, the following actions are taken (in this order):
 
 =over 4
 
-=item 1 The columns are fixed up.
+=item 1. The preprocess hook fires.
 
-This is where generated values are generated. After this is done, all the values
-that will be inserted into the database are now available.
+You can modify the Sims specification hashref as necessary. This includes
+potentially changing what parent and/or child rows to associate with this row.
+
+=item 2. Direct values are resolved.
+
+These are backreferences and blessed objects. They are resolved immediately
+because all other actions expect scalars.
+
+=item 3. Attempt to find a unique match (#1)
+
+This is the first of N attempts to find a unique match with what's been set so
+far. All combinations of the unique keys are attempted and all other columns
+are ignored. If a match is found, then other columns are compared against what
+was found to see if there's a mismatch (in which case an exception is thrown).
+
+If a row is found, then some other actions will be skipped.
+
+=item 4. Populate all non-NULL parent columns
+
+Resolve all parent relationships. This will involve creating an
+L<DBIx::Class::Sims::Item> object for each one. Parent rows will be created, if
+necessary.
+
+If a row has already been found, this step is skipped.
+
+=item 5. Attempt to find a unique match (#2)
+
+This is the second of N attempts to find a unique match with what's been set so
+far. This time, we include all parent information.
+
+If a row has already been found, this step is skipped.
+
+=item 6. The columns are fixed up.
+
+If a row has not been found, then ensure all columns which should have a value
+have a value set. After this is done, all the values that will be inserted into
+the database are now available.
 
 q.v. L</SIM ENTRY> for more information.
 
-=item 1 The preprocess hook fires.
+=item 7. Attempt to find a unique match (#3)
 
-You can modify the hashref as necessary. This includes potentially changing what
-parent and/or child rows to associate with this row.
+This is the third of N attempts to find a unique match with what's been set so
+far. This time, we include all columns.
 
-=item 1 All foreign keys are resolved.
+If a row has already been found, this step is skipped.
 
-If it's a parent relationship, the parent row will be found or created. All
-parent rows will go through the same sequence of events as described here.
+=item 8. Attempt to find any match
 
-If it's a child relationship, creation of the child rows will be deferred until
-later.
+Given all values that have been set, attempt to see if this row already exists
+in the database. This is regardless of unique constraints.
 
-=item 1 The row is found or created.
+If a row has already been found, this step is skipped.
 
-It might be found by unique constraint or created.
+=item 9. The before_create hook fires.
 
-=item 1 All child relationships are handled
+You can modify the L<DBIx::Class::Sims::Item> object as necessary, potentially
+changing what the column values are.
+
+If a row has already been found, this step is skipped.
+
+=item 10. The row is created.
+
+If a row has already been found, this step is skipped.
+
+=item 11. Populate all NULL-able parent columns
+
+Resolve all nullable parent relationships. This will involve creating an
+L<DBIx::Class::Sims::Item> object for each one. Parent rows will be created, if
+necessary.
+
+If a row has already been found, this step is skipped.
+
+=item 12. All child relationships are handled
 
 Because they're a child relationship, they are deferred until the time that
 model is handled in the toposorted graph. They are not created now because they
 might associate with a different parent that has not been created yet.
 
-=item 1 The postprocess hook fires.
+=item 13. The postprocess hook fires.
 
-Note that any child rows are not guaranteed to exist yet.
+You can modify the created/found row as necessary.
 
 =back
 

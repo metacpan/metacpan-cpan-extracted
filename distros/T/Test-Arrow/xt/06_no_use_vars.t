@@ -1,4 +1,4 @@
-use Test::More;
+use Test::Arrow;
 eval "use Test::Vars";
-plan skip_all => 'Test::Vars required for testing for unused vars' if $@;
+Test::Arrow->plan(skip_all => 'Test::Vars required for testing for unused vars') if $@;
 all_vars_ok();

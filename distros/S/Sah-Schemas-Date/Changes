@@ -1,6 +1,19 @@
+0.010   2020-03-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [date::tz_offset] Tweak coerce rule: allow [+-]HH or [+-]HHMM.
+
+	- Add examples (tests).
+
+
+0.009   2020-02-28  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix][date::tz_name] Fix property name (completion ->
+	  x.completion).
+
+
 0.008   2020-02-27  Released-By: PERLANCAR; Urgency: medium
 
-	- Add schemas: date::tz_name, date::tz_offset.
+	- Add schemas: date::tz_name, date::tz_offset, date::tz_offset_lax.
 
 
 0.007   2019-11-28  Released-By: PERLANCAR; Urgency: medium

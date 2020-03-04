@@ -40,8 +40,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         },
         ...
       ],                           # OPTIONAL
-      ReservedInstancesId        => 'MyString',    # OPTIONAL
-      ReservedInstancesListingId => 'MyString',    # OPTIONAL
+      ReservedInstancesId        => 'MyReservationId',                # OPTIONAL
+      ReservedInstancesListingId => 'MyReservedInstancesListingId',   # OPTIONAL
       );
 
     # Results:

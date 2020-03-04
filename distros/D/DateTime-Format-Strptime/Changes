@@ -1,3 +1,10 @@
+1.77     2020-02-29
+
+* When the parsed string contained an invalid time zone offset (parsed with
+  "%z") like "-9999", the error handling set in the parser's constructor was
+  ignored and an exception was always thrown. Reported by x-qq. GH #25.
+
+
 1.76     2019-02-07
 
 [BACKWARDS INCOMPATIBILITIES]
@@ -5,7 +12,7 @@
 * The ability to set the pattern, time_zone, and locale via accessor methods
   has been removed. This was deprecated over three years ago in version
   1.60. It also turns out that the setting was actually broken for a long time
-  but no one seemed to notice, so I think it's afe to remove this feature.
+  but no one seemed to notice, so I think it's safe to remove this feature.
 
 
 1.75     2017-12-24

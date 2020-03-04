@@ -1,3 +1,32 @@
+1.176 2020-03-01
+================
+
+[Quiq::Cascm]
+* edit() - Parameter $version hinzugefügt
+* passVersion() - Parameter $version hinzugefügt
+* findItem() - Kolumnen creationtime, username hinzugefügt
+* showPackage() - Unwichtige Kolumnen entfernt
+* listPackages() - Kolumnen creationtime, username hinzugefügt
+
+[Quiq::ChartJs::TimeSeries]
+* Generierten Beispielcode korrigiert
+
+[Quiq::CommandLine]
+* Doku bearbeitet
+
+[Quiq::Image]
+* edit() - hinzugefügt
+
+[Quiq::Path]
+* nextnumber() - hinzugefügt
+* numberPaths() - Option -start hinzugefügt
+
+[Quiq::PostgreSql::PgDump]
+* Doku bearbeitet
+
+[Quiq::Sql]
+commands() - PostgreSQL / END hinzugefügt
+
 1.175 2020-02-22
 ================
 

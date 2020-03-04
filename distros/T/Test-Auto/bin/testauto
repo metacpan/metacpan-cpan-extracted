@@ -1,46 +1,35 @@
 #!/usr/bin/env perl
 
-package
-  Test::Auto::Cli;
+use strict;
+use warnings;
+use routines;
 
-use Do 'Cli';
+use feature 'say';
 
 use File::Basename;
 use File::Find;
 use File::Spec::Functions;
-use Test::Auto;
+use Getopt::Long;
 use Data::Object::Name;
 
 use File::Path 'make_path';
 
-our $VERSION = '0.05'; # VERSION
+fun options() {
+  my $data = {};
 
-=head1 NAME
+  GetOptions(
+    "help|h" => \$data->{help},
+    "input|i=s" => \$data->{input},
+    "output|o=s" => \$data->{output},
+    "pattern|p=s" => \$data->{pattern},
+    "template|t=s" => \$data->{template},
+  );
 
-testauto
+  return $data;
+}
 
-=cut
-
-=head1 ABSTRACT
-
-Generate POD from Tests
-
-=cut
-
-=head1 SYNOPSIS
-
-  testauto -i t -o lib -t ./mytemplate
-
-=cut
-
-=head1 DESCRIPTION
-
-This tool lets you generate POD documents from test files that adhere to the
-specification, L<Test::Auto/SPECIFICATION>.
-
-=cut
-
-=head1 OPTIONS
+method helptext() {
+  return join "\n", "testauto [options]", <<"EOF";
 
   -h --help      Display help text.
   -t --template  Filepath for POD template.
@@ -48,65 +37,53 @@ specification, L<Test::Auto/SPECIFICATION>.
   -o --output    Directory for .pod files.
   -i --input     Directory for .t files.
 
-=cut
-
-method spec() {
-  return [qw(
-    help|h
-    input|i=s
-    output|o=s
-    pattern|p=s
-    template|t=s
-  )];
+e.g. testauto -i t -o lib -t ./template.pod
+EOF
 }
 
-method usage() {
-  my $data = $self->data;
-  my $help = $data->contents('head1', 'OPTIONS');
+fun main($helptext, $options) {
+  require Test::Auto;
 
-  say join "\n", "$0 [options]", "", @{$help->[0]};
-}
-
-method main(:$args, :$opts) {
   my @files;
 
-  return $self->fail('usage') if $opts->help;
+  if ($options->{help}) {
+    say $helptext;
+    exit 1;
+  }
 
-  my $input = $opts->input || 't';
-  my $output = $opts->output || 'lib';
-  my $pattern = $opts->pattern || '.*';
-  my $template = $opts->template;
+  my $input = $options->{input} || 't';
+  my $output = $options->{output} || 'lib';
+  my $pattern = $options->{pattern} || '.*';
+  my $template = $options->{template};
 
-  $ENV{TEST_AUTO_TEMPLATE} = $template if $template;
+  if ($template) {
+    $ENV{TEST_AUTO_TEMPLATE} = $template;
+  }
 
-  find fun() { push @files, $File::Find::name if -f && /\.t$/ }, $input;
+  find fun() {
+    push @files, $File::Find::name if -f && /\.t$/
+  }, $input;
 
-  @files = sort grep /$pattern/, @files;
-
-  for my $file (@files) {
+  for my $file (sort grep /$pattern/, @files) {
     my $test = Test::Auto->new($file);
     my $parser = $test->parser;
     my $package = $parser->render('name');
     my $namer = Data::Object::Name->new($package);
 
-    make_path dirname my $podfile = $namer->format(
-      'path', catfile($output, '%s.pod')
-    );
+    my $podfile = $package;
+       $podfile =~ s/::/\//g;
+       $podfile = catfile($output, "$podfile.pod");
 
-    my $rendered = $test->document->render;
+    make_path(dirname($podfile));
 
-    open my $fh, '>', $podfile or raise "Can't write POD file: $!";
-
-    print $fh $rendered;
-
+    open my $fh, '>', $podfile or die "Error writing POD file, $!: $podfile";
+    print $fh $test->document->render;
     close $fh;
 
     say "Created $podfile";
   }
 
-  return $self;
+  return;
 }
 
-run Test::Auto::Cli;
-
-__DATA__
+main(helptext(), options());

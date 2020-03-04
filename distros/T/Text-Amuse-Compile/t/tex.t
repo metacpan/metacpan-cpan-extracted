@@ -177,7 +177,7 @@ test_file({
              \\russianfont\{CMU\sSerif\}\[Script=Cyrillic\]\s*
              \\renewcaptionname\{russian\}\{\\contentsname\}\{Содржина\}
              .*
-             \\usepackage\{perpage\}/sx,
+             /sx,
              ],
          );
 
@@ -201,7 +201,6 @@ test_file({
              \\newfontfamily\s*
              \\russianfont\{CMU\sSerif\}\[Script=Cyrillic\]
              .*
-             \\usepackage\{perpage\}
             /sx
           ],
          );

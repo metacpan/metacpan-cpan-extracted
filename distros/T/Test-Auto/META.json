@@ -4,7 +4,7 @@
       "Al Newkirk <awncorp@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -21,14 +21,28 @@
       },
       "runtime" : {
          "requires" : {
-            "Do" : "1.87",
-            "perl" : "v5.14.0"
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Data" : "2.00",
+            "Data::Object::Role::Stashable" : "2.01",
+            "Data::Object::Try" : "2.01",
+            "perl" : "v5.14.0",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Do" : "1.87",
-            "perl" : "v5.14.0"
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Data" : "2.00",
+            "Data::Object::Role::Stashable" : "2.01",
+            "Data::Object::Try" : "2.01",
+            "perl" : "v5.14.0",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
@@ -44,9 +58,10 @@
          "web" : "https://github.com/iamalnewkirk/test-auto"
       }
    },
-   "version" : "0.05",
+   "version" : "0.07",
    "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Apache-2.0"
 }
 

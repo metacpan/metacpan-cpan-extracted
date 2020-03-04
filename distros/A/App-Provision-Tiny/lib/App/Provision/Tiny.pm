@@ -1,7 +1,5 @@
 package App::Provision::Tiny;
-BEGIN {
-  $App::Provision::Tiny::AUTHORITY = 'cpan:GENE';
-}
+our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Provision computers
 
@@ -10,7 +8,7 @@ use warnings;
 
 use File::Which;
 
-our $VERSION = '0.0402';
+our $VERSION = '0.0403';
 
 
 
@@ -87,7 +85,7 @@ App::Provision::Tiny - Provision computers
 
 =head1 VERSION
 
-version 0.0402
+version 0.0403
 
 =head1 SYNOPSIS
 
@@ -151,7 +149,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -321,6 +321,25 @@ No slurpies!
   $obj->print_html('h1', 'Hello World',   xml => true  , \*STDOUT);
   $obj->print_html('h1', 'Hello World',                  \*STDOUT);
 
+=head3 Placeholder Parameters
+
+A bare sigil can be used as a placeholder for parameters you don't care
+about.
+
+  method xyz ($foo, $, $bar) {
+    say $foo;
+    say $bar;
+  }
+  
+  $obj->xyz("x", "y", "z");    # says "x" then "z"
+
+The value is still available in C<< @_ >> as you would expect.
+
+Placeholders tend to be most useful in method modifiers and multimethods,
+which are discussed in the following chapters.
+
+Placeholders may have defaults and/or type constraints (see the next section).
+
 =head2 Types
 
 Type constraints may be used to ensure that values are of the correct type.
@@ -517,6 +536,24 @@ optimizations at compile-time to improve its run-time speed.
   }
 
 In optimized methods you cannot close over variables.
+
+=head2 Abbreviated Syntax
+
+For very short methods, an abbreviated syntax is allowed.
+
+  method is_oversized = $self->value > 100;
+
+The method is defined as usual, but instead of a block, there is an equals
+sign followed by a scalar expression (i.e. any expression with a higher
+precedence than comma), followed by a semicolon. The semicolon must be
+present, even if the method declaration is the last statement in its block.
+
+This has the side-effect of implying C<< :optimize >> for you, so don't use
+this syntax if you need to close over a variable.
+
+The abbreviated syntax also works for coercions.
+
+  coerce from Str via from_string = $class->new(name => $_);
 
 =head1 KEYWORDS
 

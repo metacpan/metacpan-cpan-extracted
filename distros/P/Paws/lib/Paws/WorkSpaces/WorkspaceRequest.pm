@@ -68,8 +68,8 @@ available directories.
 
 =head2 B<REQUIRED> UserName => Str
 
-  The username of the user for the WorkSpace. This username must exist in
-the AWS Directory Service directory for the WorkSpace.
+  The user name of the user for the WorkSpace. This user name must exist
+in the AWS Directory Service directory for the WorkSpace.
 
 
 =head2 UserVolumeEncryptionEnabled => Bool
@@ -79,7 +79,9 @@ the AWS Directory Service directory for the WorkSpace.
 
 =head2 VolumeEncryptionKey => Str
 
-  The KMS key used to encrypt data stored on your WorkSpace.
+  The symmetric AWS KMS customer master key (CMK) used to encrypt data
+stored on your WorkSpace. Amazon WorkSpaces does not support asymmetric
+CMKs.
 
 
 =head2 WorkspaceProperties => L<Paws::WorkSpaces::WorkspaceProperties>

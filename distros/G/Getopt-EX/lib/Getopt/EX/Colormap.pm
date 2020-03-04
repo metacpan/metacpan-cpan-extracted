@@ -141,7 +141,7 @@ sub ansi_numbers {
 	     | (?<c256>   [0-5][0-5][0-5]		# 216 (6x6x6) colors
 		      | L(?:[01][0-9]|[2][0-5]) )	# 24 grey levels + B/W
 	     | (?<c16>  [KRGYBMCW] )			# 16 colors
-	     | (?<efct> [;XNZDPIUFQSVJ] )		# effects
+	     | (?<efct> ~?[;XNZDPIUFQSVJ] )		# effects
 	     | (?<csi>  { (?<csi_name>[A-Z]+)		# other CSI
 			  (?<P> \( )?			# optional (
 			  (?<csi_param>[\d,;]*)		# 0;1;2
@@ -178,7 +178,10 @@ sub ansi_numbers {
 	}
 	elsif ($+{efct}) {
 	    my $efct = uc $+{efct};
-	    push @numbers, $numbers{$efct} if defined $numbers{$efct};
+	    my $offset = $efct =~ s/^~// ? 20 : 0;
+	    if (defined (my $n = $numbers{$efct})) {
+		push @numbers, $n + $offset;
+	    }
 	}
 	elsif ($+{csi}) {
 	    push @numbers, do {
@@ -212,9 +215,9 @@ sub ansi_numbers {
 }
 
 use constant {
-    CSI   => "\e[",
-    RESET => "\e[m",
-    EL    => "\e[K",
+    CSI   => "\e[",	# Control Sequence Introducer
+    RESET => "\e[m",	# SGR Reset
+    EL    => "\e[K",	# Erase Line
 };
 
 my %csi_terminator = (
@@ -544,6 +547,9 @@ switches foreground and background.  If multiple colors are given in
 the same spec, all indicators are produced in the order of their
 presence.  Consequently, the last one takes effect.
 
+If the character is preceded by tilde (C<~>), it means negation of
+following effect; C<~D> reset the effect of C<D>.
+
 If the spec start with plus (C<+>) or minus (C<->) character,
 following characters are appneded/deleted from previous value. Reset
 mark (C<^>) is inserted before appended string.
@@ -868,7 +874,7 @@ by B<ansi_code("Z")>.
 =item B<ansi_pair>(I<color_spec>)
 
 Produces introducer and recover sequences for given spec. Recover
-sequence includes I<Erace Line> related control with simple SGR reset
+sequence includes I<Erase Line> related control with simple SGR reset
 code.
 
 =item B<csi_code>(I<name>, I<params>)
@@ -878,6 +884,20 @@ numeric parameters.  I<name> is one of CUU, CUD, CUF, CUB, CNL, CPL,
 CHA, CUP, ED, EL, SU, SD, HVP, SGR, SCP, RCP.
 
 =back
+
+
+=head1 RESET SEQUENCE
+
+This module produces I<RESET> and I<Erase Line> sequence to recover
+from colored text.  This is preferable to clear background color set
+by scrolling in the middle of colored text at the bottom line of the
+terminal.
+
+However, some terminal, including Apple_Terminal, clear the text on
+the terminal when I<Erase Line> sequence is received at the rightmost
+column of the screen.  If you do not want this behavior, set module
+variable C<Getopt::EX::Colormap::NO_RESET_EL> or
+C<GETOPTEX_NO_RESET_EL> environment.
 
 
 =head1 SEE ALSO

@@ -1,0 +1,68 @@
+no SQL representation
+$VAR1 = bless( {
+                 'operator' => 'HAS ANY',
+                 'properties' => [
+                                   bless( {
+                                            'name' => [
+                                                        'elements'
+                                                      ]
+                                          }, 'OPTiMaDe::Filter::Property' ),
+                                   bless( {
+                                            'name' => [
+                                                        '_exmpl_element_counts'
+                                                      ]
+                                          }, 'OPTiMaDe::Filter::Property' ),
+                                   bless( {
+                                            'name' => [
+                                                        '_exmpl_element_weights'
+                                                      ]
+                                          }, 'OPTiMaDe::Filter::Property' )
+                                 ],
+                 'values' => [
+                               [
+                                 [
+                                   '>',
+                                   '3'
+                                 ],
+                                 [
+                                   '=',
+                                   'He'
+                                 ],
+                                 [
+                                   '>',
+                                   '55.3'
+                                 ]
+                               ],
+                               [
+                                 [
+                                   '=',
+                                   '6'
+                                 ],
+                                 [
+                                   '>',
+                                   'Ti'
+                                 ],
+                                 [
+                                   '<',
+                                   '37.6'
+                                 ]
+                               ],
+                               [
+                                 [
+                                   '=',
+                                   '8'
+                                 ],
+                                 [
+                                   '<',
+                                   'Ga'
+                                 ],
+                                 [
+                                   '=',
+                                   '0'
+                                 ]
+                               ]
+                             ]
+               }, 'OPTiMaDe::Filter::Zip' );
+== Filter ==
+(elements:_exmpl_element_counts:_exmpl_element_weights HAS ANY > "3" : = "He" : > "55.3", = "6" : > "Ti" : < "37.6", = "8" : < "Ga" : = "0")
+== SQL ==

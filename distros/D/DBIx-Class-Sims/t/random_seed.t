@@ -1,8 +1,7 @@
 # vi:sw=2
 use strictures 2;
 
-use Test::More;
-use Test::Deep;
+use Test2::V0 qw( done_testing subtest E );
 
 use lib 't/lib';
 
@@ -10,7 +9,6 @@ BEGIN {
   use loader qw(build_schema);
   build_schema([
     Artist => {
-      table => 'artists',
       columns => {
         id => {
           data_type => 'int',
@@ -42,7 +40,7 @@ subtest "Same random value when reusing a seed" => sub {
       Artist => { name => 'Joe' },
     },
     expect => {
-      Artist => { name => 'Joe', email => re('.+') },
+      Artist => { name => 'Joe', email => E() },
     },
     export => [
       [ \$email, sub { $_[0]{Artist}[0]->email } ],

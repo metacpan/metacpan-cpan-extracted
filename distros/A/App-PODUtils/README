@@ -2,8 +2,8 @@ NAME
     App::PODUtils - Command-line utilities related to POD
 
 VERSION
-    This document describes version 0.045 of App::PODUtils (from Perl
-    distribution App-PODUtils), released on 2019-12-15.
+    This document describes version 0.046 of App::PODUtils (from Perl
+    distribution App-PODUtils), released on 2020-02-28.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -16,6 +16,8 @@ SYNOPSIS
     *   poddump
 
     *   podless
+
+    *   reverse-pod-headings
 
     *   sort-pod-headings
 
@@ -53,10 +55,34 @@ FUNCTIONS
 
     Return value: (any)
 
+  reverse_pod_headings
+    Usage:
+
+     reverse_pod_headings(%args) -> any
+
+    .
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   command => *str* (default: "head1")
+
+    *   pod => *perl::pod_filename* (default: "-")
+
+        Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be
+        searched in @INC.
+
+        "-" means standard input.
+
+    Return value: (any)
+
   sort_pod_headings
     Usage:
 
      sort_pod_headings(%args) -> any
+
+    .
 
     This function is not exported.
 
@@ -97,8 +123,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    pomdump. Similar script, but using Pod::POM as backend to parse POD
-    document into tree.
+    pomdump. Perinci::To::POD=HASH(0x560307ca92c0).
 
     podsel.
 
@@ -114,7 +139,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

@@ -4,7 +4,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.61
+Version 0.62
 
 # SYNOPSIS
 
@@ -177,7 +177,7 @@ To be clear, if you're in the US and request the language in Spanish,
 and the site supports it, language() will return 'Spanish', and locale() will
 try to return the Locale::Object::Country for the US.
 
-## timezone
+## time\_zone
 
 Returns the timezone of the web client.
 

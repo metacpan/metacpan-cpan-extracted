@@ -8,6 +8,7 @@ build_requires:
   File::Object: 0.05
   Filesys::POSIX: 0
   Filesys::POSIX::Mem: 0
+  Imager::File::JPEG: 0
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
@@ -39,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Image-Random
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Image-Random
-version: '0.07'
+version: '0.08'

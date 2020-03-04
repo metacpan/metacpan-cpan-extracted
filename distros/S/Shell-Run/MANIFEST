@@ -7,9 +7,9 @@ t/00-load.t
 t/cmd.sh
 t/manifest.t
 t/pod.t
-t/z_os-test.t
-t/zz_features.t
-t/zz_oo.t
-t/zz_run_setup.t
+t/os-test.t
+t/features.t
+t/oo.t
+t/run_setup.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

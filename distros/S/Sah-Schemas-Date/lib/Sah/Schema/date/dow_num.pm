@@ -1,7 +1,9 @@
 package Sah::Schema::date::dow_num;
 
-our $DATE = '2020-02-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-03'; # DATE
+our $DIST = 'Sah-Schemas-Date'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 our $schema = [int => {
     summary => 'Day-of-week number (1-7, 1=Monday)',
@@ -9,6 +11,13 @@ our $schema = [int => {
     max => 7,
     'x.perl.coerce_rules' => ['From_str::convert_en_dow_name_to_num'],
     'x.completion' => ['date_dow_num'],
+    examples => [
+        {data=>'', valid=>0},
+        {data=>0, valid=>0},
+        {data=>1, valid=>1},
+        {data=>7, valid=>1},
+        {data=>8, valid=>0},
+    ],
 }, {}];
 
 1;
@@ -27,7 +36,51 @@ Sah::Schema::date::dow_num - Day-of-week number (1-7, 1=Monday)
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::date::dow_num (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Sah::Schema::date::dow_num (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+
+=head1 SYNOPSIS
+
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("date::dow_num*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['date::dow_num*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+
+Sample data:
+
+ ""  # INVALID
+
+ 0  # INVALID
+
+ 1  # valid
+
+ 7  # valid
+
+ 8  # INVALID
 
 =head1 HOMEPAGE
 

@@ -33,6 +33,7 @@ lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/compile.json
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/Makefile.am
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/package.json
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/compile.js
+lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/source/boot/index.html
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/source/class/app/Application.js
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/source/class/app/theme/Theme.js
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/source/class/app/__init__.js

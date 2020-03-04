@@ -1,6 +1,6 @@
 package Tcl::pTk::ItemStyle;
 
-our ($VERSION) = ('1.02');
+our ($VERSION) = ('1.03');
 
 require Tcl::pTk;
 use base  qw(Tcl::pTk::Widget);

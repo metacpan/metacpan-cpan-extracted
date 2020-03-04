@@ -1,18 +1,24 @@
 package App::OrgUtils;
 
-our $DATE = '2020-02-06'; # DATE
-our $VERSION = '0.472'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-28'; # DATE
+our $DIST = 'App-OrgUtils'; # DIST
+our $VERSION = '0.473'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
 use Log::ger;
 
-use Org::Parser;
+use File::Slurper::Dash 'read_text';
+use Org::Parser::Tiny;
+use Sort::Sub;
+
+our %SPEC;
 
 our %common_args1 = (
     files => {
-        schema => ['array*' => of => 'str*', min_len=>1],
+        schema => ['array*' => of => 'filename*', min_len=>1],
         req    => 1,
         pos    => 0,
         greedy => 1,
@@ -20,14 +26,27 @@ our %common_args1 = (
         'x.name.is_plural' => 1,
     },
     time_zone => {
-        schema => ['str'],
+        schema => ['date::tz_name'],
         summary => 'Will be passed to parser\'s options',
         description => <<'_',
 
 If not set, TZ environment variable will be picked as default.
 
 _
-        'x.schema.entity' => 'timezone',
+    },
+);
+
+our %arg0_file = (
+    file => {
+        summary => 'Path to an Org file',
+        description => <<'_',
+
+"-" means standard input.
+
+_
+        schema => 'filename*',
+        default => '-',
+        pos => 0,
     },
 );
 
@@ -136,6 +155,7 @@ our $_complete_tags = sub {
 sub _load_org_files {
     require Cwd;
     require Digest::MD5;
+    require Org::Parser;
 
     my ($files, $opts0) = @_;
     $files or die "Please specify files";
@@ -153,6 +173,106 @@ sub _load_org_files {
     %docs;
 }
 
+sub _parse_org_with_tiny {
+    require Org::Parser::Tiny;
+
+    my $file = shift;
+
+    my $doc = Org::Parser::Tiny->new->parse(read_text($file));
+    $doc;
+}
+
+sub _sort {
+    my ($node, $level, $sorter, $sorter_meta) = @_;
+
+    my @children = @{ $node->children // [] };
+    return unless @children;
+
+    # recurse depth-first to sort the children's children
+    for my $child (@children) {
+        next unless $child->can("children");
+        my $grandchildren = $child->children;
+        next unless $grandchildren && @$grandchildren;
+        _sort($child, $level, $sorter, $sorter_meta);
+    }
+
+    my $has_level_sub = sub {
+        $_->isa("Org::Parser::Tiny::Node::Headline") &&
+            $_->level == $level
+    };
+    return unless grep { $has_level_sub->($_) } @children;
+
+    my $child_has_level_sub = sub {
+        $children[$_]->isa("Org::Parser::Tiny::Node::Headline") &&
+            $children[$_]->level == $level
+    };
+
+    require Sort::SubList;
+    my @sorted_children =
+        map { $children[$_] }
+        Sort::SubList::sort_sublist(
+            sub {
+                if ($sorter_meta->{compares_record}) {
+                    my $rec0 = [$children[$_[0]]->as_string, $_[0]];
+                    my $rec1 = [$children[$_[1]]->as_string, $_[1]];
+                    $sorter->($rec0, $rec1);
+                } else {
+                    $sorter->($children[$_[0]]->as_string, $children[$_[1]]->as_string);
+                }
+            },
+            $child_has_level_sub,
+            0..$#children);
+    $node->children(\@sorted_children);
+}
+
+$Sort::Sub::argsopt_sortsub{sort_sub}{cmdline_aliases} = {S=>{}};
+$Sort::Sub::argsopt_sortsub{sort_args}{cmdline_aliases} = {A=>{}};
+
+$SPEC{sort_org_headlines} = {
+    v => 1.1,
+    summary => '',
+    args => {
+        %arg0_file,
+        level => {
+            schema => ['posint*'],
+            default => 1,
+        },
+        %Sort::Sub::argsopt_sortsub,
+    },
+    result_naked => 1,
+};
+sub sort_org_headlines {
+    my %args = @_;
+
+    my $sortsub_routine = $args{sort_sub} // 'asciibetically';
+    my $sortsub_args    = $args{sort_args} // {};
+    my ($sorter, $sorter_meta) =
+        Sort::Sub::get_sorter($sortsub_routine, $sortsub_args, 'with meta');
+
+    my $level = $args{level} // 1;
+
+    my $doc = _parse_org_with_tiny($args{file});
+    _sort($doc, $level, $sorter, $sorter_meta);
+    $doc->as_string;
+}
+
+$SPEC{reverse_org_headlines} = {
+    v => 1.1,
+    summary => 'Reverse Org headlines',
+    args => {
+        %arg0_file,
+        level => {
+            schema => ['posint*'],
+            default => 1,
+        },
+    },
+    result_naked => 1,
+};
+sub reverse_org_headlines {
+    my %args = @_;
+    sort_org_headlines(%args, sort_sub=>'record_by_reverse_order');
+}
+
 1;
 # ABSTRACT: Some utilities for Org documents
 
@@ -168,7 +288,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-This document describes version 0.472 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2020-02-06.
+This document describes version 0.473 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2020-02-28.
 
 =head1 DESCRIPTION
 
@@ -211,6 +331,73 @@ following are the included scripts:
 =item * L<stat-org-document>
 
 =back
+
+=head1 FUNCTIONS
+
+
+=head2 reverse_org_headlines
+
+Usage:
+
+ reverse_org_headlines(%args) -> any
+
+Reverse Org headlines.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<file> => I<filename> (default: "-")
+
+Path to an Org file.
+
+"-" means standard input.
+
+=item * B<level> => I<posint> (default: 1)
+
+
+=back
+
+Return value:  (any)
+
+
+
+=head2 sort_org_headlines
+
+Usage:
+
+ sort_org_headlines(%args) -> any
+
+.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<file> => I<filename> (default: "-")
+
+Path to an Org file.
+
+"-" means standard input.
+
+=item * B<level> => I<posint> (default: 1)
+
+=item * B<sort_args> => I<hash>
+
+Arguments to pass to the Sort::Sub::* routine.
+
+=item * B<sort_sub> => I<sortsub::spec>
+
+Name of a Sort::Sub::* module (without the prefix).
+
+
+=back
+
+Return value:  (any)
 
 =head1 HOMEPAGE
 

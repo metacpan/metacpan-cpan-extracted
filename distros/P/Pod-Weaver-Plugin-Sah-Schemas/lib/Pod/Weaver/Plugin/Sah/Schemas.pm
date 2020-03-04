@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::Sah::Schemas;
 
-our $DATE = '2016-05-08'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2019-12-17'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -58,7 +58,10 @@ sub weave_section {
                 for my $name (sort keys %schemas) {
                     my $sch = $schemas{$name};
                     push @pod, "=item * L<$name|Sah::Schema::$name>\n\n";
-                    push @pod, "$sch->[1]{summary}.\n\n" if $sch->[1]{summary};
+                    if (defined $sch->[1]{summary}) {
+                        require String::PodQuote;
+                        push @pod, String::PodQuote::pod_quote($sch->[1]{summary}), ".\n\n";
+                    }
                     if ($sch->[1]{description}) {
                         my $pod = Markdown::To::POD::markdown_to_pod(
                             $sch->[1]{description});
@@ -129,7 +132,7 @@ Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building Sah::Schemas::* 
 
 =head1 VERSION
 
-This document describes version 0.04 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2016-05-08.
+This document describes version 0.05 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2019-12-17.
 
 =head1 SYNOPSIS
 
@@ -190,7 +193,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

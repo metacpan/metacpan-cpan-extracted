@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.525   2020-03-04
+        - 'fill_form': experimental option 'extra'.
+
 0.524   2019-12-01
         - Updated Term::Choose::Util: adapt 'unicode_sprintf'.
 

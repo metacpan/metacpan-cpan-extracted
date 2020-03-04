@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PkgVersion 6.012;
+package Dist::Zilla::Plugin::PkgVersion 6.014;
 # ABSTRACT: add a $VERSION to your packages
 
 use Moose;
@@ -222,13 +222,14 @@ sub munge_perl {
     # the \x20 hack is here so that when we scan *this* document we don't find
     # an assignment to version; it shouldn't be needed, but it's been annoying
     # enough in the past that I'm keeping it here until tests are better
-    my $trial = $self->zilla->is_trial ? ' # TRIAL' : '';
     my $perl = $self->use_our
-        ? "{ our \$VERSION\x20=\x20'$version'; }$trial"
-        : "\$$package\::VERSION\x20=\x20'$version';$trial";
+        ? "{ our \$VERSION\x20=\x20'$version'; }"
+        : "\$$package\::VERSION\x20=\x20'$version';";
 
     $self->use_begin
       and $perl = "BEGIN { $perl }";
+    $self->zilla->is_trial
+      and $perl .= ' # TRIAL';
 
     $self->log_debug([
       'adding $VERSION assignment to %s in %s',
@@ -268,9 +269,16 @@ sub munge_perl {
 
     my $clean_version = $version =~ tr/_//dr;
     $perl .= (
-      $self->use_our
-        ? "\n\$VERSION\x20=\x20'$clean_version';"
-        : "\n\$$package\::VERSION\x20=\x20'$clean_version';"
+        (
+          $self->use_our
+            ? "\n\$VERSION\x20=\x20'$clean_version';"
+            : "\n\$$package\::VERSION\x20=\x20'$clean_version';"
+        ).
+        (
+          $blank
+            ? "\n"
+            : ""
+        )
       ) if $version ne $clean_version;
 
     # Why can't I use PPI::Token::Unknown? -- rjbs, 2014-01-11
@@ -332,7 +340,7 @@ Dist::Zilla::Plugin::PkgVersion - add a $VERSION to your packages
 
 =head1 VERSION
 
-version 6.012
+version 6.014
 
 =head1 SYNOPSIS
 
@@ -438,7 +446,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

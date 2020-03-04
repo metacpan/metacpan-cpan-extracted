@@ -1,0 +1,177 @@
+#!/trw/local/perl/default/bin/perl
+
+use 5.006001;
+
+use strict;
+use warnings;
+
+use English qw{ -no_match_vars };
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Perl::Critic;
+use Perl::Critic::Utils qw{ all_perl_files };
+use Perl::Critic::Violation;
+# The following is superfluous as far as Perl::Critic is concerned, but
+# handy if we want to run the debugger.
+use Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives;
+use Pod::Usage;
+use Readonly;
+
+our $VERSION = '0.001';
+
+Readonly::Scalar my $DEFAULT_SINGLE_FILE_FORMAT => 4;
+Readonly::Scalar my $DEFAULT_MULTI_FILE_FORMAT  => 5;
+
+my %opt;
+
+GetOptions( \%opt,
+    qw{
+        allow_empty_final_alternative|final!
+        allow_if_group_anchored|anchored!
+        ignore_files|ignore-files=s
+    },
+    'format=s'  => \( my $format ),
+    'verbose!'  => \( my $verbose ),
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+if ( ! @ARGV ) {
+    -e 'MANIFEST'
+        or die "No arguments specified and no MANIFEST found\n";
+    require ExtUtils::Manifest;
+    my $manifest = ExtUtils::Manifest::maniread();
+    @ARGV = sort all_perl_files( keys %{ $manifest } )  ## no critic (RequireLocalizedPunctuationVars)
+}
+
+my $critic = Perl::Critic->new(
+    -profile    => 'NONE',
+);
+
+$critic->add_policy(
+    -policy => 'RegularExpressions::ProhibitEmptyAlternatives',
+    -config => \%opt,
+);
+
+Perl::Critic::Violation::set_format(
+    defined $format ? $format :
+    ( @ARGV > 1 || -d $ARGV[0] ) ?
+        $DEFAULT_MULTI_FILE_FORMAT :
+        $DEFAULT_SINGLE_FILE_FORMAT
+);
+
+foreach my $fn ( @ARGV ) {
+
+    foreach my $pf ( -e $fn ? all_perl_files( $fn ) : \$fn ) {
+        my @violations = Perl::Critic::Violation::sort_by_location(
+            $critic->critique( $pf ) );
+
+        if ( @violations ) {
+            foreach ( @violations ) {
+                print;
+            }
+        } elsif ( $verbose ) {
+            local $_ = Perl::Critic::Violation::get_format();
+            local $OUTPUT_RECORD_SEPARATOR = "\n";
+            print m/ (?: \A | (?<= [^%] ) ) (?: %% )* %f /smx ?
+                "$pf source OK" : 'source OK';
+        }
+    }
+}
+
+__END__
+
+=head1 NAME
+
+empty-alternatives - Find regular expressions with empty alternatives
+
+=head1 SYNOPSIS
+
+ empty-alternatives .
+ empty-alternatives lib/
+ empty-alternatives -help
+ empty-alternatives -version
+
+=head1 OPTIONS
+
+The following options are accepted by this script.
+
+=head2 -anchored
+
+If this Boolean option is asserted, empty alternatives are accepted if
+the group in which they occur is anchored on the right.
+
+The default is C<-noanchored>.
+
+=head2 -final
+
+If this Boolean option is asserted, the final alternative in a group is
+allowed to be empty.
+
+=head2 -format
+
+ -format 5
+
+This option specifies the F<perlcritic> format to use for output. This
+corresponds to the F<perlcritic> C<-verbose> option, takes the same
+values, and has the same default.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -ignore-files
+
+ -ignore-files '\bFubar\.pm\z'
+
+This option specifies the value for the C<ignore_files> configuration.
+
+=head2 -verbose
+
+If this Boolean option is asserted, files that have no violations are
+displayed as C<'OK'>. If not, files having no violations produce no
+output.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DESCRIPTION
+
+This Perl script wraps the rogue Perl::Critic policy
+C<RegularExpressions::ProhibitEmptyAlternatives>.
+
+If no arguments are passed, the contents of the F<MANIFEST> are scanned
+-- at least, those which appear to be Perl files.
+
+If an argument is passed which is not a file name, it is assumed to be
+code to critique. It is written to a temporary file, and that file is
+analyzed.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012-2020 by Thomas R. Wyant, III
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 72
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=72 ft=perl expandtab shiftround :

@@ -2,10 +2,12 @@ package Paws::ES::ElasticsearchDomainStatus;
   use Moose;
   has AccessPolicies => (is => 'ro', isa => 'Str');
   has AdvancedOptions => (is => 'ro', isa => 'Paws::ES::AdvancedOptions');
+  has AdvancedSecurityOptions => (is => 'ro', isa => 'Paws::ES::AdvancedSecurityOptions');
   has ARN => (is => 'ro', isa => 'Str', required => 1);
   has CognitoOptions => (is => 'ro', isa => 'Paws::ES::CognitoOptions');
   has Created => (is => 'ro', isa => 'Bool');
   has Deleted => (is => 'ro', isa => 'Bool');
+  has DomainEndpointOptions => (is => 'ro', isa => 'Paws::ES::DomainEndpointOptions');
   has DomainId => (is => 'ro', isa => 'Str', required => 1);
   has DomainName => (is => 'ro', isa => 'Str', required => 1);
   has EBSOptions => (is => 'ro', isa => 'Paws::ES::EBSOptions');
@@ -66,6 +68,12 @@ The current status of an Elasticsearch domain.
   Specifies the status of the C<AdvancedOptions>
 
 
+=head2 AdvancedSecurityOptions => L<Paws::ES::AdvancedSecurityOptions>
+
+  The current status of the Elasticsearch domain's advanced security
+options.
+
+
 =head2 B<REQUIRED> ARN => Str
 
   The Amazon resource name (ARN) of an Elasticsearch domain. See
@@ -93,6 +101,11 @@ domain is complete. C<False> if domain creation is still in progress.
 received for the domain but resource cleanup is still in progress.
 C<False> if the domain has not been deleted. Once domain deletion is
 complete, the status of the domain is no longer returned.
+
+
+=head2 DomainEndpointOptions => L<Paws::ES::DomainEndpointOptions>
+
+  The current status of the Elasticsearch domain's endpoint options.
 
 
 =head2 B<REQUIRED> DomainId => Str

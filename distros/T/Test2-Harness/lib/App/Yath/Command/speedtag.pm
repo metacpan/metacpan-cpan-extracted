@@ -2,22 +2,39 @@ package App::Yath::Command::speedtag;
 use strict;
 use warnings;
 
-our $VERSION = '0.001099';
+our $VERSION = '1.000006';
 
-use Test2::Util qw/pkg_to_file/;
-use Test2::Util::Times qw/render_duration/;
+use Test2::Harness::Util::File::JSONL;
 
-use Test2::Harness::Watcher::TimeTracker;
-use Test2::Harness::Feeder::JSONL;
-use Test2::Harness::Run;
-use Test2::Harness;
+use App::Yath::Options;
 
-use Term::Table;
-
-use List::Util qw/min max/;
+use Cwd qw/getcwd/;
 
 use parent 'App::Yath::Command';
-use Test2::Harness::Util::HashBase qw/-max_short -max_medium/;
+use Test2::Harness::Util::HashBase qw/-log_file -max_short -max_medium/;
+use Test2::Harness::Util qw/clean_path/;
+
+include_options(
+    'App::Yath::Options::Debug',
+);
+
+option_group {prefix => 'speedtag', category => 'speedtag options'} => sub {
+    option generate_durations_file => (
+        type => 'd',
+        alt         => ['durations', 'duration'],
+        description => "Write out a duration json file, if no path is provided 'duration.json' will be used. The .json extention is added automatically if omitted.",
+
+        long_examples  => ['', '=/path/to/durations.json'],
+
+        normalize => \&normalize_duration,
+        action    => \&duration_action,
+    );
+
+    option pretty => (
+        description => "Generate a pretty 'durations.json' file when combined with --generate-durations-file. (sorted and multilines)",
+        default     => 0,
+    );
+};
 
 sub group { 'log' }
 
@@ -32,65 +49,74 @@ from the log based on the max durations for each type.
     EOT
 }
 
-sub has_runner  { 0 }
-sub has_logger  { 0 }
-sub has_display { 0 }
-sub show_bench  { 0 }
-
-sub handle_list_args {
+sub init {
     my $self = shift;
-    my ($list) = @_;
 
-    my $settings = $self->{+SETTINGS};
-
-    my ($log, $max_short, $max_medium, @bad) = @$list;
-
-    die "Too many arguments\n" if @bad;
-
-    $self->{+MAX_SHORT}  = $max_short  || 15;
-    $self->{+MAX_MEDIUM} = $max_medium || 30;
-
-    $settings->{log_file} = $log;
-
-    die "You must specify a log file.\n"
-        unless $log;
-
-    die "Invalid log file: '$log'"
-        unless -f $log;
+    $self->{+MAX_SHORT}  //= 15;
+    $self->{+MAX_MEDIUM} //= 30;
 }
 
-sub feeder {
-    my $self = shift;
+sub normalize_duration {
+    my $val = shift;
 
-    my $settings = $self->{+SETTINGS};
+    return $val if $val eq '1';
 
-    my $feeder = Test2::Harness::Feeder::JSONL->new(file => $settings->{log_file});
+    $val =~ s/\.json$//g;
+    $val .= '.json';
 
-    return ($feeder);
+    return clean_path($val);
 }
 
-sub run_command {
+sub duration_action {
+    my ($prefix, $field, $raw, $norm, $slot, $settings) = @_;
+
+    return $$slot = clean_path($norm)
+        unless $norm eq '1';
+
+    return if $$slot;
+    return $$slot = clean_path('durations.json');
+}
+
+sub run {
     my $self = shift;
 
-    my $settings = $self->{+SETTINGS};
+    my $settings = $self->settings;
+    my $args     = $self->args;
 
-    my $feeder = $self->feeder;
+    shift @$args if @$args && $args->[0] eq '--';
 
-    my %jobs;
+    my $initial_dir = clean_path(getcwd());
 
-    while (1) {
-        my @events = $feeder->poll(1000) or last;
+    $self->{+LOG_FILE} = shift @$args or die "You must specify a log file";
+    die "'$self->{+LOG_FILE}' is not a valid log file" unless -f $self->{+LOG_FILE};
+    die "'$self->{+LOG_FILE}' does not look like a log file" unless $self->{+LOG_FILE} =~ m/\.jsonl(\.(gz|bz2))?$/;
+
+    $self->{+MAX_SHORT}  = shift @$args if @$args;
+    $self->{+MAX_MEDIUM} = shift @$args if @$args;
+
+    die "max short duration must be an integer, got '$self->{+MAX_SHORT}'"  unless $self->{+MAX_SHORT}  && $self->{+MAX_SHORT} =~ m/^\d+$/;
+    die "max short duration must be an integer, got '$self->{+MAX_MEDIUM}'" unless $self->{+MAX_MEDIUM} && $self->{+MAX_MEDIUM} =~ m/^\d+$/;
+
+    my $stream = Test2::Harness::Util::File::JSONL->new(name => $self->{+LOG_FILE});
+
+    my $durations_file = $self->settings->speedtag->generate_durations_file;
+    my %durations;
+
+    while(1) {
+        my @events = $stream->poll(max => 1000) or last;
+
         for my $event (@events) {
             my $stamp  = $event->{stamp}      or next;
             my $job_id = $event->{job_id}     or next;
             my $f      = $event->{facet_data} or next;
 
-            my $job = $jobs{$job_id} ||= {};
-            $job->{file} //= File::Spec->abs2rel($f->{harness_job}->{file})    if $f->{harness_job}     && $f->{harness_job}->{file};
-            $job->{time} //= $f->{harness_job_end}->{times}->{totals}->{total} if $f->{harness_job_end} && $f->{harness_job_end}->{times};
+            next unless $f->{harness_job_end};
+
+            my $job = {};
+            $job->{file} = clean_path( $f->{harness_job_end}->{file} ) if $f->{harness_job_end} && $f->{harness_job_end}->{file};
+            $job->{time} = $f->{harness_job_end}->{times}->{totals}->{total} if $f->{harness_job_end} && $f->{harness_job_end}->{times};
 
             next unless $job->{file} && $job->{time};
-            delete $jobs{$job_id};
 
             my $dur;
             if ($job->{time} < $self->{+MAX_SHORT}) {
@@ -137,8 +163,19 @@ sub run_command {
             print $fh @lines;
             close($fh);
 
+            if ( $durations_file ) {
+                my $tfile = $job->{file};
+                $tfile =~ s{^\Q$initial_dir\E/+}{};
+                $durations{ $tfile } = uc( $dur );
+            }
+
             print "Tagged '$dur': $job->{file}\n";
         }
+    }
+
+    if ( $durations_file ) {
+        my $jfile = Test2::Harness::Util::File::JSON->new(name => $durations_file, pretty => $self->settings->speedtag->pretty );
+        $jfile->write( \%durations );
     }
 
     return 0;
@@ -154,60 +191,215 @@ __END__
 
 =head1 NAME
 
-App::Yath::Command::speedtag - Tag tests with proper duration tags based on a log
+App::Yath::Command::speedtag - Tag tests with duration (short medium long) using a source log
 
 =head1 DESCRIPTION
 
-=head1 SYNOPSIS
+This command will read the test durations from a log and tag/retag all tests
+from the log based on the max durations for each type.
 
-=head1 COMMAND LINE USAGE
+
+=head1 USAGE
+
+    $ yath [YATH OPTIONS] speedtag [COMMAND OPTIONS]
+
+=head2 YATH OPTIONS
+
+=head3 Developer
+
+=over 4
+
+=item --dev-lib
+
+=item --dev-lib=lib
+
+=item -D
+
+=item -D=lib
+
+=item -Dlib
+
+=item --no-dev-lib
+
+Add paths to @INC before loading ANYTHING. This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
+
+Can be specified multiple times
 
 
-    $ yath speedtag [options] [--] event_log.jsonl[.gz|.bz2] max_short_duration_seconds max_medium_duration_seconds
+=back
 
-=head2 Help
+=head3 Environment
+
+=over 4
+
+=item --persist-dir ARG
+
+=item --persist-dir=ARG
+
+=item --no-persist-dir
+
+Where to find persistence files.
+
+
+=item --persist-file ARG
+
+=item --persist-file=ARG
+
+=item --pfile ARG
+
+=item --pfile=ARG
+
+=item --no-persist-file
+
+Where to find the persistence file. The default is /{system-tempdir}/project-yath-persist.json. If no project is specified then it will fall back to the current directory. If the current directory is not writable it will default to /tmp/yath-persist.json which limits you to one persistent runner on your system.
+
+
+=item --project ARG
+
+=item --project=ARG
+
+=item --project-name ARG
+
+=item --project-name=ARG
+
+=item --no-project
+
+This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file. This is necessary for a persistent runner.
+
+
+=back
+
+=head3 Help and Debugging
 
 =over 4
 
 =item --show-opts
 
+=item --no-show-opts
+
 Exit after showing what yath thinks your options mean
 
-=item -h
-
-=item --help
-
-Exit after showing this help message
-
-=item -V
 
 =item --version
 
-Show version information
+=item -V
+
+=item --no-version
+
+Exit after showing a helpful usage message
+
 
 =back
 
-=head2 Plugins
+=head3 Plugins
 
 =over 4
 
-=item -pPlugin
+=item --no-scan-plugins
 
-=item -pPlugin=arg1,arg2,...
+=item --no-no-scan-plugins
 
-=item -p+My::Plugin
+Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that it loading other modules when it should not.
 
-=item --plugin Plugin
 
-Load a plugin
+=item --plugins PLUGIN
 
-can be specified multiple times
+=item --plugins +App::Yath::Plugin::PLUGIN
+
+=item --plugins PLUGIN=arg1,arg2,...
+
+=item --plugin PLUGIN
+
+=item --plugin +App::Yath::Plugin::PLUGIN
+
+=item --plugin PLUGIN=arg1,arg2,...
+
+=item -pPLUGIN
 
 =item --no-plugins
 
-cancel any plugins listed until now
+Load a yath plugin.
 
-This can be used to negate plugins specified in .yath.rc or similar
+Can be specified multiple times
+
+
+=back
+
+=head2 COMMAND OPTIONS
+
+=head3 Help and Debugging
+
+=over 4
+
+=item --dummy
+
+=item -d
+
+=item --no-dummy
+
+Dummy run, do not actually execute anything
+
+Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
+
+
+=item --help
+
+=item -h
+
+=item --no-help
+
+exit after showing help information
+
+
+=item --keep-dirs
+
+=item --keep_dir
+
+=item -k
+
+=item --no-keep-dirs
+
+Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
+
+
+=item --summary
+
+=item --summary=/path/to/summary.json
+
+=item --no-summary
+
+Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extention is added automatically if omitted.
+
+
+=back
+
+=head3 speedtag options
+
+=over 4
+
+=item --generate-durations-file
+
+=item --generate-durations-file=/path/to/durations.json
+
+=item --durations
+
+=item --durations=/path/to/durations.json
+
+=item --duration
+
+=item --duration=/path/to/durations.json
+
+=item --no-generate-durations-file
+
+Write out a duration json file, if no path is provided 'duration.json' will be used. The .json extention is added automatically if omitted.
+
+
+=item --pretty
+
+=item --no-pretty
+
+Generate a pretty 'durations.json' file when combined with --generate-durations-file. (sorted and multilines)
+
 
 =back
 
@@ -234,7 +426,7 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2019 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -242,3 +434,4 @@ modify it under the same terms as Perl itself.
 See F<http://dev.perl.org/licenses/>
 
 =cut
+

@@ -29,9 +29,12 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Sah" : "0.903",
+            "Markdown::To::POD" : "0",
             "Moose" : "0",
             "Pod::Weaver::Role::AddTextToSection" : "0.06",
             "Pod::Weaver::Role::Section" : "0",
+            "String::PodQuote" : "0",
             "perl" : "5.010001",
             "strict" : "0"
          }
@@ -57,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-Pod-Weaver-Plugin-Sort-Sub"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

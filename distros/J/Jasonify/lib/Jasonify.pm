@@ -1,14 +1,15 @@
 use v5.14;
 use warnings;
 
-package Jasonify v0.20.052;
+package Jasonify v0.20.064;
 # ABSTRACT: Just Another Serialized Object Notation library.
 
 
-use Carp             ();           #qw( carp );
-use Datify v0.20.052 ();
-use Scalar::Util     ();           #qw( blessed looks_like_number reftype );
-use String::Tools  qw( subst );    #qw( );
+use Carp                ();    #qw( carp );
+use Datify    v0.20.064 ();
+use LooksLike v0.20.060 ();    #qw( number representation );
+use Scalar::Util        ();    #qw( blessed reftype );
+use String::Tools       ();    #qw( subst );
 
 use parent 'Datify';
 
@@ -81,9 +82,9 @@ __PACKAGE__->set(
 
 __PACKAGE__->set(
     # Numify options
-    infinite  => '"Infinity"',
-    -infinite => '"-Infinity"',
-    nonnumber => '"NaN"',
+    infinite  => 'Infinity',
+    -infinite => '-Infinity',
+    nonnumber => 'NaN',
     #num_sep  => undef,
 );
 
@@ -133,6 +134,7 @@ __PACKAGE__->set(
     # Hashify options
     hash_ref         => '{$_}',
     pair             => '$key : $value',
+    keymap           => \&Jasonify::keymap,
     keysort          => \&Datify::keysort,
     keyfilter        => undef,
     keyfilterdefault => 1,
@@ -202,17 +204,49 @@ sub keyify {
     my $self = &Datify::self;
     local $_ = shift if @_;
 
-    return Scalar::Util::looks_like_number($_)
-        ? (
-            defined( $_ <=> 0 )
-                ? (
-                      $_ ==  "Infinity" ? $Jasonify::Number::inf
-                    : $_ == "-Infinity" ? $Jasonify::Number::ninf
-                    :                     $self->stringify($_)
-                )
-                : $Jasonify::Number::nan
-        )
+    my $blessed = Scalar::Util::blessed($_);
+    return defined($blessed) && $blessed->isa("Jasonify::Literal")
+        ? $_
         : $self->stringify($_);
+}
+
+# Override Datify::hashkeyvals to handle Jasonify::_key elements
+sub hashkeyvals {
+    my $self = shift;
+    my $hash = shift;
+
+    return map {
+        my $blessed = Scalar::Util::blessed($_);
+        if ( defined($blessed) ) {
+            Carp::croak("Cannot handle $blessed")
+                unless $blessed->isa("Jasonify::_key");
+            ( $_->string() => $hash->{ $_->key() } );
+        } else {
+            ( $_ => $hash->{$_} );
+        }
+    } $self->hashkeys($hash);
+}
+
+# Implement a keymap for unusual numbers
+sub keymap {
+    my $self = &Datify::self;
+    local $_ = shift if @_;
+
+    return $_ unless ( LooksLike::infinity($_) || LooksLike::nan($_) );
+
+    my $rep = LooksLike::representation(
+        $_,
+
+        "infinity"  => [ $Jasonify::Number::inf,  Jasonify->get("infinite")  ],
+        "-infinity" => [ $Jasonify::Number::ninf, Jasonify->get("-infinite") ],
+        "nan"       => [ $Jasonify::Number::nan,  Jasonify->get("nonnumber") ],
+    );
+    # key     string         sortby
+    # ======= ============== ===========
+    # "inf",  '"Infinity"',  "Infinity"
+    # "-inf", '"-Infinity"', "-Infinity"
+    # "nan",  '"NaN"',       "NaN"
+    return Jasonify::_key->new( $_, @$rep );
 }
 
 sub _objectify_via {
@@ -280,7 +314,7 @@ sub objectify {
             :                     $self->undefify;
     }
 
-    return subst(
+    return String::Tools::subst(
         $object_str,
         class_str => $self->stringify($class),
         class     => $class,
@@ -316,6 +350,24 @@ sub vstringify {
 }
 
 
+sub numify {
+    my $self = &Datify::self;
+    local $_ = shift if @_;
+
+    return $self->undefify unless defined;
+
+    return
+          $self->is_numeric($_) ? $_
+        : LooksLike::number($_) ? LooksLike::representation(
+            $_,
+
+            "infinity"  => $Jasonify::Number::inf,
+            "-infinity" => $Jasonify::Number::ninf,
+            "nan"       => $Jasonify::Number::nan,
+        )
+        :                         $Jasonify::Number::nan;
+}
+
 
 # Override Datify::scalarify to properly handle all of the various types
 sub _scalarify {
@@ -338,7 +390,7 @@ sub _scalarify {
               $ref2 eq 'GLOB'    ? $self->globify($_)
             : $ref2 eq 'LVALUE'  ? $self->lvalueify($_)
             : $ref2 eq 'VSTRING' ? $self->vstringify($_)
-            : $ref2 eq 'SCALAR' && Scalar::Util::looks_like_number($_)
+            : $ref2 eq 'SCALAR' && LooksLike::number($_)
                                  ? $self->numify($_)
             :                      $self->stringify($_)
             ;
@@ -423,10 +475,36 @@ __PACKAGE__->set(
 );
 
 
+
+package
+    Jasonify::_key;
+
+use parent -norequire => 'Jasonify::Literal';
+
+use overload
+    '""'  => 'string',
+    'cmp' => 'compares',
+    '<=>' => 'comparen',
+    ;
+
+sub new {
+    my $class = &Datify::class;
+    my @self  = @_;               # key, string, sortby
+    return bless( \@self, $class );
+}
+
+sub key    { $_[0][ 0] }
+sub string { $_[0][+1] }
+sub sortby { $_[0][-1] }
+
+sub comparen { ( $_[2] ? -1 : +1 ) * ( $_[0]->sortby <=> $_[1] ) }
+sub compares { ( $_[2] ? -1 : +1 ) * ( $_[0]->sortby cmp $_[1] ) }
+
+
 package
     Jasonify::Literal;
 
-use Scalar::Util ();    #qw( looks_like_number );
+use LooksLike ();    #qw( zero );
 
 use overload
     'bool' => 'bool',
@@ -469,13 +547,14 @@ sub bool {
         && $literal ne $$false
         && $literal ne '""'
         && $literal ne '"0"'
-        && !( Scalar::Util::looks_like_number($literal) && $literal == 0 );
+        && !LooksLike::zero($literal);
 }
+
 
 package
     Jasonify::Number;
 
-use Scalar::Util ();    #qw( looks_like_number );
+use LooksLike ();    #qw( number numeric representation );
 
 use overload
     '0+'  => 'as_num',
@@ -486,9 +565,10 @@ use overload
     ;
 use parent -norequire => 'Jasonify::Literal';
 
-our $nan  = bless \do { my $nan  = Jasonify->get('nonnumber') }, __PACKAGE__;
-our $inf  = bless \do { my $inf  = Jasonify->get( 'infinite') }, __PACKAGE__;
-our $ninf = bless \do { my $ninf = Jasonify->get('-infinite') }, __PACKAGE__;
+our ( $nan, $inf, $ninf )
+    = map {
+        bless \do { Jasonify->stringify($_) }, __PACKAGE__
+    } Jasonify->get(qw( nonnumber infinite -infinite ));
 
 sub Jasonify::jasonify_numberify { $_[1]->as_string }
 # OR
@@ -522,19 +602,20 @@ sub number {
     my $class = &Datify::class;
     my $num   = shift;
     Carp::croak( "Not a number ", $num )
-        unless ( Scalar::Util::looks_like_number($num) );
+        unless ( LooksLike::number($num) );
 
     return
-          not( defined( $num <=> 0 ) ) ? $nan
-        : $num ==  'Infinity'          ? $inf
-        : $num == '-Infinity'          ? $ninf
-        : $num =~ /\A$number_regex\z/  ? $class->new($num)
-        :   Carp::croak( "Malformed number ", $num );
+          LooksLike::numeric($num)
+        ? $num =~ /\A$number_regex\z/
+            ? $class->new($num)
+            : Carp::croak( "Malformed number ", $num )
+        : LooksLike::representation($num);
 }
 
 sub formatted { return shift()->number( sprintf( shift(), @_ ) ) }
 sub integer   { return shift()->formatted( '%d', shift() ) }
 sub float     { return shift()->formatted( '%f', shift() ) }
+
 
 package
     Jasonify::Boolean;
@@ -693,11 +774,11 @@ Special characters, and how they are encoded.
 
 =over
 
-=item I<infinite>  => B<"Infinifty">,
+=item I<infinite>  => B<Infinifty>,
 
-=item I<-infinite> => B<"-Infinifty">,
+=item I<-infinite> => B<-Infinifty>,
 
-=item I<nonnumber> => B<"NaN">,
+=item I<nonnumber> => B<NaN>,
 
 How to encode the values for infinity, negative infinity, and not-a-number.
 
@@ -998,7 +1079,7 @@ L<JSON>, L<Datify>
 
 =head1 VERSION
 
-This document describes version v0.20.052 of this module.
+This document describes version v0.20.064 of this module.
 
 =head1 AUTHOR
 
@@ -1006,7 +1087,7 @@ Bob Kleemann <bobk@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Bob Kleemann.
+This software is Copyright (c) 2020 by Bob Kleemann.
 
 This is free software, licensed under:
 

@@ -19,7 +19,7 @@ GetOptions(
 show_usage() if $help;
 
 @watch = split(/,/, join(',', @watch));
-@watch = ('.') unless @watch;
+@watch = ('lib', 't') unless @watch;
 
 @INC = ('.', @watch, @INC, @includes);
 
@@ -32,12 +32,12 @@ Test::Tdd::Runner::start(\@watch, \@test_files);
 sub show_usage {
 	print <<EOF;
 Usage: provetdd <options> <tests to run>
-(e.g. provetdd --watch lib t/Test.t)
+(e.g. provetdd --watch src t/Test.t)
 
 Options:
   -I            Library paths to include
-  -w, --watch   Folders to watch, default to current folder.
-  -h, --help    Print this message.
+  -w, --watch   Folders to watch, default to ./lib and ./t folders
+  -h, --help    Print this message
 EOF
 	exit 1;
 }

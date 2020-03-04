@@ -2,12 +2,12 @@ package Test2::Harness::Util::Term;
 use strict;
 use warnings;
 
-our $VERSION = '0.001099';
+our $VERSION = '1.000006';
 
 use Test2::Util qw/IS_WIN32/;
 
 use Importer Importer => 'import';
-our @EXPORT_OK = qw/USE_ANSI_COLOR window_size_changed/;
+our @EXPORT_OK = qw/USE_ANSI_COLOR/;
 
 {
     my $use = 0;
@@ -47,6 +47,30 @@ Test2::Harness::Util::Term - Terminal utilities for Test2::Harness
 
 =head1 DESCRIPTION
 
+This module provides information about the terminal in which the harness is
+running.
+
+=head1 SYNOPSIS
+
+    use Test2::Harness::Util::Term qw/USE_ANSI_COLOR/;
+
+    if (USE_ANSI_COLOR) {
+        ...
+    }
+    else {
+        ...
+    }
+
+=head1 EXPORTS
+
+=over 4
+
+=item $bool = USE_ANSI_COLOR()
+
+True if L<Term::ANSIColor> is available and usable.
+
+=back
+
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
@@ -70,7 +94,7 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2019 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

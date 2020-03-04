@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Format;
-$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.691';
+$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.692';
 #ABSTRACT: Role for SCPI FORMat subsystem.
 
 use Moose::Role;
@@ -74,7 +74,7 @@ Lab::Moose::Instrument::SCPI::Format - Role for SCPI FORMat subsystem.
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 METHODS
 
@@ -107,7 +107,7 @@ Set/Get byte order of transferred data. Normally you want 'SWAP'
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

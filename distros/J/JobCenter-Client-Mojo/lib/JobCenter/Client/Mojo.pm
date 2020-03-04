@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.39'; # VERSION
+our $VERSION = '0.40'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -32,7 +32,7 @@ use Sys::Hostname;
 use JSON::RPC2::TwoWay 0.02;
 # JSON::RPC2::TwoWay depends on JSON::MaybeXS anyways, so it can be used here
 # without adding another dependency
-use JSON::MaybeXS qw(decode_json encode_json);
+use JSON::MaybeXS qw(JSON decode_json encode_json);
 use MojoX::NetstringStream 0.06; # for the enhanced close
 
 has [qw(
@@ -408,34 +408,66 @@ sub get_job_status {
 	croak('no job_id?') unless $job_id;
 
 	my ($done, $job_id2, $outargs);
+	$self->get_job_status_nb(
+		job_id => $job_id,
+		statuscb => sub {
+			($job_id2, $outargs) = @_;
+			$done++;
+			return;
+		},
+	);
+	$self->_loop(sub { !$done });
+	return $job_id2, $outargs;
+}
+
+sub get_job_status_nb {
+	my ($self, %args) = @_;
+	my $job_id = $args{job_id} or
+		croak('no job_id?');
+
+	my $statuscb = $args{statuscb};
+	croak('statuscb should be a coderef')
+		if ref $statuscb ne 'CODE';
+
+	my $notifycb = $args{notifycb};
+	croak('notifycb should be a coderef')
+		if $notifycb and ref $notifycb ne 'CODE';
+
+	#my ($done, $job_id2, $outargs);
 	$self->ioloop->delay(
 	sub {
 		my $d = shift;
 		# fixme: check results?
-		$self->conn->call('get_job_status', { job_id => $job_id }, $d->begin(0));
+		$self->conn->call(
+			'get_job_status', {
+				job_id => $job_id,
+				notify => ($notifycb ? JSON->true : JSON->false),
+			}, $d->begin(0)
+		);
 	},
 	sub {
 		#say 'call returned: ', Dumper(\@_);
 		my ($d, $e, $r) = @_;
+		#$self->log->debug("get_job_satus_nb got job_id: $res msg: $msg");
 		if ($e) {
 			$self->log->error("get_job_status got error $e->{message} ($e->{code})");
-			$outargs = $e->{message};
-			$done++;
+			$statuscb->(undef, $e->{message});
 			return;
 		}
-		($job_id2, $outargs) = @$r;
-		#$self->log->debug("get_job_satus got job_id: $res msg: $msg");
-		$done++;
+		my ($job_id2, $outargs) = @$r;
+		if ($notifycb and !$job_id2 and !$outargs) {
+			$self->jobs->{$job_id} = $notifycb;
+		}
+		$outargs = encode_json($outargs) if $self->{json} and ref $outargs;
+		$statuscb->($job_id2, $outargs);
+		return;
 	})->catch(sub {
 		my ($err) = @_;
-		$self->log->debug("something went wrong with get_job_status: $err");
-		$done++;
+		$self->log->error("Something went wrong in get_job_status_nb: $err");
+		$err = { error => $err };
+		$err = encode_json($err) if $self->{json};
+		$statuscb->(undef, $err);
 	});
-
-	$self->_loop(sub { !$done });
-
-	$outargs = encode_json($outargs) if $self->{json} and ref $outargs;
-	return $job_id2, $outargs;
 }
 
 sub ping {
@@ -924,6 +956,36 @@ then the returned $job_id will be undefined and $result will be an error
 message.  If the job has not finished executing then both $job_id and
 $result will be undefined.  Otherwise the $result will contain the result of
 the job.  (Which may be a JobCenter error object)
+
+=head2 get_job_status_nb
+
+$client->get_job_status_nb(%args);
+
+Retrieves the status for the given $job_id.
+
+Valid arguments are:
+
+=over 4
+
+=item - job_id
+
+=item - statuscb: coderef to the callback for the current status
+
+( statuscb => sub { ($job_id, $result) = @_; ... } )
+
+If the job_id does not exist then the returned $job_id will be undefined
+and $result will be an error message.  If the job has not finished executing
+then both $job_id and $result will be undefined.  Otherwise the $result will
+contain the result of the job.  (Which may be a JobCenter error object)
+
+=item - notifycb: coderef to the callback for job completion
+
+( statuscb => sub { ($job_id, $result) = @_; ... } )
+
+If the job was still running when the get_job_status_nb call was made then
+this callback will be called on completion of the job.
+
+=back
 
 =head2 find_jobs
 

@@ -4,7 +4,7 @@
       "-2006"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.4",
+   "generated_by" : "Minilla/v3.1.9",
    "license" : [
       "artistic_2"
    ],
@@ -42,7 +42,7 @@
             "DBD::SQLite" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7",
             "Text::SimpleTable" : "0"
@@ -70,7 +70,7 @@
    "provides" : {
       "Data::ObjectDriver" : {
          "file" : "lib/Data/ObjectDriver.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       },
       "Data::ObjectDriver::BaseObject" : {
          "file" : "lib/Data/ObjectDriver/BaseObject.pm"
@@ -159,7 +159,7 @@
          "web" : "https://github.com/sixapart/data-objectdriver"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_authority" : "cpan:SIXAPART",
    "x_contributors" : [
       "Adam Thomason <athomason@sixapart.com>",

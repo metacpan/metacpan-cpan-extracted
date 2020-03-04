@@ -1,3 +1,10 @@
+0.017   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add xt/release/sah-schema.t. Remove code that checks for normalized
+          schema, because that logic is now moved to Test::Sah::Schema which is
+          used by this generated test script.
+
+
 0.016   2019-11-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Update naming of Sah coerce rule module from

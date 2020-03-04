@@ -7,8 +7,14 @@ use Mojo::ByteStream 'b';
 use Mojo::Date;
 use Mojo::File 'path';
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.5';
 
+
+=head2 register
+
+Register the plugin and defined the routes
+
+=cut
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -63,6 +69,12 @@ sub register {
 
         $dashboard->get('/')->to(action => 'search')
             ->name('minion_overview.dashboard');
+
+        $dashboard->get('overview')->to(action => 'overview')
+            ->name('minion_overview.dashboard.overview');
+
+        $dashboard->get('workers')->to(action => 'workers')
+            ->name('minion_overview.dashboard.workers');
 
     # Metrics
     my $metrics = $prefix->route('metrics')

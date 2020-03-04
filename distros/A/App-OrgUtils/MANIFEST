@@ -35,6 +35,8 @@ script/org-to-html
 script/org-to-html-wordpress
 script/org2html
 script/org2html-wp
+script/reverse-org-headlines
+script/sort-org-headlines
 script/stat-org-document
 t/00-compile.t
 t/author-critic.t

@@ -1,53 +1,53 @@
 package Pcore::API::Proxy;
 
-use Pcore -const, -class, -res;
+use Pcore -const, -role, -res;
 use Pcore::Util::Scalar qw[is_ref];
 
-has uri => ( required => 1 );    # InstanceOf['Pcore::Util::URI']
+has uri => ();
 
-has is_http    => ();
-has is_socks   => ();
+has is_http  => ();
+has is_socks => ();
+
 has is_socks4  => ();
 has is_socks4a => ();
 has is_socks5  => ();
 
-around new => sub ( $orig, $self, $uri ) {
+sub new ( $self, $uri ) {
     if ( !is_ref $uri) {
-        $uri = "http://$uri" if $uri !~ m[//]sm;
+        $uri = "http://$uri" if index( $uri, '//' ) == -1;
 
-        $uri = P->uri($uri);
+        $uri = P->uri( $uri, base => 'http:' );
     }
     else {
-        return $uri if $uri->isa('Pcore::API::Proxy');
+        return $uri if $uri->does('Pcore::API::Proxy');
     }
-
-    $self = $self->$orig( uri => $uri );
-
-    $self->{uri} = $uri;
 
     my $scheme = $uri->{scheme};
 
-    if ( !$scheme || $scheme eq 'http' ) {
-        $self->{is_http} = 1;
-    }
-    elsif ( $scheme eq 'socks' || $scheme eq 'socks5' ) {
-        $self->{is_socks}  = 1;
-        $self->{is_socks5} = 1;
-    }
-    elsif ( $scheme eq 'socks4' ) {
-        $self->{is_socks}  = 1;
-        $self->{is_socks4} = 1;
-    }
-    elsif ( $scheme eq 'socks4a' ) {
-        $self->{is_socks}   = 1;
-        $self->{is_socks4a} = 1;
+    my $class = P->class->load( $scheme, ns => 'Pcore::API::Proxy' );
+
+    my $proxy = $class->new($uri);
+
+    return $proxy;
+}
+
+# template method
+sub new_ip ( $self, @ ) {
+    return $self;
+}
+
+sub get_ip ($self) {
+    my $res = P->http->get( 'http://httpbin.org/ip', proxy => $self );
+
+    if ($res) {
+        my $data = P->data->from_json( $res->{data} );
+
+        return res 200, $data->{origin};
     }
     else {
-        die 'Invalid proxy scheme';
+        return $res;
     }
-
-    return $self;
-};
+}
 
 sub connect ( $self, $uri, @args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     $uri = P->uri($uri) if !is_ref $uri;

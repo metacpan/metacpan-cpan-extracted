@@ -1,7 +1,7 @@
 package App::ListOrgHeadlines;
 
-our $DATE = '2020-02-06'; # DATE
-our $VERSION = '0.472'; # VERSION
+our $DATE = '2020-02-28'; # DATE
+our $VERSION = '0.473'; # VERSION
 
 use 5.010001;
 use strict;
@@ -415,7 +415,7 @@ App::ListOrgHeadlines - List all headlines in all Org files
 
 =head1 VERSION
 
-This document describes version 0.472 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2020-02-06.
+This document describes version 0.473 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2020-02-28.
 
 =head1 SYNOPSIS
 
@@ -472,7 +472,7 @@ if today is 2011-06-30 and due_in is set to 7, then todo item with due date
 than 7) but <2011-07-10 Sun +1y -14d> will (warning period 14 days is already
 passed by that time).
 
-=item * B<files>* => I<array[str]>
+=item * B<files>* => I<array[filename]>
 
 =item * B<from_level> => I<int> (default: 1)
 
@@ -529,7 +529,7 @@ any), and HL is the Org::Headline object.
 
 Only show todo items that have this state.
 
-=item * B<time_zone> => I<str>
+=item * B<time_zone> => I<date::tz_name>
 
 Will be passed to parser's options.
 

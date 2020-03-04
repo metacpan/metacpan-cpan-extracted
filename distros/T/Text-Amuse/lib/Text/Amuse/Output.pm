@@ -929,6 +929,12 @@ sub manage_header {
                                  )
                                 /$catch_fn->($1)/gxe;
     undef $catch_fn;
+    my ($first_anchor) = $el->anchors;
+    # just in case, should be already vadidated
+    if ($first_anchor and $first_anchor =~ m/[A-Za-z0-9]/) {
+        $first_anchor =~ s/[^A-Za-z0-9-]//g;
+        $first_anchor = 'text-amuse-label-' . $first_anchor;
+    }
     my $anchors = $self->format_anchors($el);
     my ($body_for_toc) = $self->manage_regular($body_with_no_footnotes, nolinks => 1);
     my ($body)         = $self->manage_regular($long, nolinks => 1);
@@ -953,7 +959,9 @@ sub manage_header {
     if ($el->type =~ m/h([1-4])/) {
         my $level = $1;
         my $tocline = $body;
-        my $index = $self->add_to_table_of_contents($level => (defined($body_for_toc) ? $body_for_toc : $body));
+        my $index = $self->add_to_table_of_contents($level => (defined($body_for_toc) ? $body_for_toc : $body),
+                                                    $first_anchor,
+                                                   );
         $level++; # increment by one
         die "wtf, no index for toc?" unless $index;
 
@@ -976,7 +984,7 @@ It returns the numerical index (so you can inject the id).
 =cut
 
 sub add_to_table_of_contents {
-    my ($self, $level, $string) = @_;
+    my ($self, $level, $string, $named) = @_;
     return unless ($level and defined($string));
     unless (defined $self->{_toc_entries}) {
         $self->{_toc_entries} = [];
@@ -985,6 +993,7 @@ sub add_to_table_of_contents {
     push @{$self->{_toc_entries}}, { level => $level,
                                      string => $string,
                                      index => ++$index,
+                                     ($named ? (named => $named) : ())
                                    };
     return $index;
 }

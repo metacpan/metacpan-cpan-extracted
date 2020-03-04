@@ -56,7 +56,7 @@ feature.
 
 =head1 VERSION
 
-This document describes version v0.20.022 of this module.
+This document describes version v0.20.060 of this module.
 
 =head1 AUTHOR
 

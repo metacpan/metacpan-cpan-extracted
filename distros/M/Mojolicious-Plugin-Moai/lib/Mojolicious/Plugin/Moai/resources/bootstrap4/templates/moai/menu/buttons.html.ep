@@ -1,0 +1,108 @@
+<%
+    # This uses Bootstrap's navigation pills with the dropdown component
+    # to get buttons with menus.
+
+    my $part_item = sub {
+        my ( $item, $main_class ) = @_;
+        # These are the same arguments as link_to, but we need to add
+        # things to them...
+        # If the last argument is a subref, that's the content
+        # Otherwise, the first argument is the content
+        my $content = ref $item->[-1] eq 'CODE' ? pop @$item : shift @$item;
+
+        # The second argument is the route/destination or a dropdown
+        # If the third argument is a hashref, it's parameters for the
+        # route/destination
+        my @route = ( shift @$item, ref $item->[0] eq 'HASH' ? shift @$item : () );
+
+        # The rest of the arguments are a hash of options for the tag
+        my %opt = @$item;
+
+        $opt{class} = join ' ', $main_class, ($opt{class})x!!$opt{class};
+        if ( $opt{disabled} ) {
+            $opt{'aria-disabled'} = 'true';
+            $opt{class} .= ' disabled';
+            $opt{tabindex} = -1;
+        }
+
+        if ( current_route @route ) {
+            $opt{class} .= ' active';
+        }
+
+        return $content, \@route, \%opt;
+    };
+
+    use Mojo::ByteStream qw( b );
+    my @items = (
+        [ 'Foo' => 'foo' ],
+        [ 'Bar' => 'bar', ( class => 'is-active' ) ],
+        [ b('<i>Fizz</i>') => 'buzz' ],
+        [ # Dropdown
+            Dropdown => [
+                'Menu Title', # Plain text?
+                undef, # divider
+                [ 'Menu' => 'item' ],
+                b('...'), # anything!
+            ],
+        ],
+    );
+    @items = stash( 'items' ) ? @{ stash 'items' } : ();
+
+
+%>
+<ul class="nav nav-pills">
+    <% for my $item ( @items ) {
+        my ( $content, $route, $opt ) = $part_item->( $item, 'nav-link' );
+
+        # If the second argument is an arrayref, this is a dropdown
+        # menu...
+        if ( ref $route->[0] eq 'ARRAY' ) {
+            $opt->{class} .= ' dropdown-toggle';
+            $opt->{'data-toggle'} = 'dropdown';
+            $opt->{role} = 'button';
+            $opt->{'aria-haspopup'} = 'true';
+            $opt->{'aria-expanded'} = 'false';
+            %>
+                <li class="nav-item dropdown">
+                %= link_to $content, '#', %$opt
+                <div class="dropdown-menu">
+            <%
+
+            for my $drop_item ( @{ $route->[0] } ) {
+                if ( !defined $drop_item ) {
+                    %>
+                        <div class="dropdown-divider"></div>
+                    <%
+                }
+                elsif ( !ref $drop_item ) {
+                    %>
+                        <div class="dropdown-header"><%= $drop_item %></div>
+                    <%
+                }
+                elsif ( ref $drop_item eq 'ARRAY' ) {
+                    my ( $content, $route, $opt ) = $part_item->( $drop_item, 'dropdown-item' );
+                    %>
+                        <%= link_to $content, @$route, %$opt %>
+                    <%
+                }
+                else {
+                    %>
+                        <div class="px-4 py-3"><%= $drop_item %></div>
+                    <%
+                }
+            }
+            %>
+                </div>
+                </li>
+            <%
+        }
+        else {
+            %>
+                <li class="nav-item">
+                %= link_to $content, @$route, %$opt
+                </li>
+            <%
+        }
+    } %>
+</ul>
+

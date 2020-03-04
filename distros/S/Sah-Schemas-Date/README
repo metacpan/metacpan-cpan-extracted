@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Date - Sah schemas related to date
 
 VERSION
-    This document describes version 0.008 of Sah::Schemas::Date (from Perl
-    distribution Sah-Schemas-Date), released on 2020-02-27.
+    This document describes version 0.010 of Sah::Schemas::Date (from Perl
+    distribution Sah-Schemas-Date), released on 2020-03-03.
 
 SYNOPSIS
 HOMEPAGE

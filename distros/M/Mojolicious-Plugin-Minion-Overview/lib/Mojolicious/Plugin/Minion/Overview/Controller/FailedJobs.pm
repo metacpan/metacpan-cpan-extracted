@@ -1,12 +1,19 @@
 package Mojolicious::Plugin::Minion::Overview::Controller::FailedJobs;
 use Mojo::Base 'Mojolicious::Controller';
 
+=head2 search
+
+Show failed jobs
+
+=cut
+
 sub search {
     my $self = shift;
     
     my $search = $self->app->minion_overview
         ->search($self->req->param('term'))
         ->tags($self->req->every_param('tags'))
+        ->when($self->req->param('worker'), 'worker')
         ->page($self->param('page') || 1)
         ->failed_jobs();
 

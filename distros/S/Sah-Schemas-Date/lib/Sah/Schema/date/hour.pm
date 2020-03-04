@@ -1,12 +1,20 @@
 package Sah::Schema::date::hour;
 
-our $DATE = '2020-02-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-03'; # DATE
+our $DIST = 'Sah-Schemas-Date'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 our $schema = [int => {
     summary => 'Hour of day',
     min     => 0,
     max     => 23,
+    examples => [
+        {data=>'', valid=>0},
+        {data=>0, valid=>1},
+        {data=>23, valid=>1},
+        {data=>24, valid=>0},
+    ],
 }, {}];
 
 1;
@@ -25,7 +33,49 @@ Sah::Schema::date::hour - Hour of day
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::date::hour (from Perl distribution Sah-Schemas-Date), released on 2020-02-27.
+This document describes version 0.010 of Sah::Schema::date::hour (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+
+=head1 SYNOPSIS
+
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("date::hour*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['date::hour*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+
+Sample data:
+
+ ""  # INVALID
+
+ 0  # valid
+
+ 23  # valid
+
+ 24  # INVALID
 
 =head1 HOMEPAGE
 

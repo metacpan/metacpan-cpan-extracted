@@ -17,7 +17,7 @@ name: Control-CLI
 provides:
   Control::CLI:
     file: lib/Control/CLI.pm
-    version: '2.07'
+    version: '2.08'
 requires:
   Exporter: '0'
   IO::Handle: '0'
@@ -27,5 +27,5 @@ requires:
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '2.07'
+version: '2.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

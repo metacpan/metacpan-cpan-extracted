@@ -3,6 +3,7 @@ package Paws::EMR::Cluster;
   has Applications => (is => 'ro', isa => 'ArrayRef[Paws::EMR::Application]');
   has AutoScalingRole => (is => 'ro', isa => 'Str');
   has AutoTerminate => (is => 'ro', isa => 'Bool');
+  has ClusterArn => (is => 'ro', isa => 'Str');
   has Configurations => (is => 'ro', isa => 'ArrayRef[Paws::EMR::Configuration]');
   has CustomAmiId => (is => 'ro', isa => 'Str');
   has EbsRootVolumeSize => (is => 'ro', isa => 'Int');
@@ -14,6 +15,7 @@ package Paws::EMR::Cluster;
   has MasterPublicDnsName => (is => 'ro', isa => 'Str');
   has Name => (is => 'ro', isa => 'Str');
   has NormalizedInstanceHours => (is => 'ro', isa => 'Int');
+  has OutpostArn => (is => 'ro', isa => 'Str');
   has ReleaseLabel => (is => 'ro', isa => 'Str');
   has RepoUpgradeOnBoot => (is => 'ro', isa => 'Str');
   has RequestedAmiVersion => (is => 'ro', isa => 'Str');
@@ -22,6 +24,7 @@ package Paws::EMR::Cluster;
   has SecurityConfiguration => (is => 'ro', isa => 'Str');
   has ServiceRole => (is => 'ro', isa => 'Str');
   has Status => (is => 'ro', isa => 'Paws::EMR::ClusterStatus');
+  has StepConcurrencyLevel => (is => 'ro', isa => 'Int');
   has Tags => (is => 'ro', isa => 'ArrayRef[Paws::EMR::Tag]');
   has TerminationProtected => (is => 'ro', isa => 'Bool');
   has VisibleToAllUsers => (is => 'ro', isa => 'Bool');
@@ -77,6 +80,11 @@ instances in an instance group.
 
   Specifies whether the cluster should terminate after completing all
 steps.
+
+
+=head2 ClusterArn => Str
+
+  The Amazon Resource Name of the cluster.
 
 
 =head2 Configurations => ArrayRef[L<Paws::EMR::Configuration>]
@@ -157,16 +165,22 @@ normalized instance hours being incremented by four. This result is
 only an approximation and does not reflect the actual billing rate.
 
 
+=head2 OutpostArn => Str
+
+  The Amazon Resource Name (ARN) of the Outpost where the cluster is
+launched.
+
+
 =head2 ReleaseLabel => Str
 
   The Amazon EMR release label, which determines the version of
 open-source application packages installed on the cluster. Release
 labels are in the form C<emr-x.x.x>, where x.x.x is an Amazon EMR
-release version, for example, C<emr-5.14.0>. For more information about
+release version such as C<emr-5.14.0>. For more information about
 Amazon EMR release versions and included application versions and
 features, see https://docs.aws.amazon.com/emr/latest/ReleaseGuide/
 (https://docs.aws.amazon.com/emr/latest/ReleaseGuide/). The release
-label applies only to Amazon EMR releases versions 4.x and later.
+label applies only to Amazon EMR releases version 4.0 and later.
 Earlier versions use C<AmiVersion>.
 
 
@@ -221,6 +235,11 @@ AWS resources on your behalf.
   The current status details about the cluster.
 
 
+=head2 StepConcurrencyLevel => Int
+
+  Specifies the number of steps that can be executed concurrently.
+
+
 =head2 Tags => ArrayRef[L<Paws::EMR::Tag>]
 
   A list of tags associated with a cluster.
@@ -236,11 +255,14 @@ in the event of a cluster error.
 =head2 VisibleToAllUsers => Bool
 
   Indicates whether the cluster is visible to all IAM users of the AWS
-account associated with the cluster. If this value is set to C<true>,
-all IAM users of that AWS account can view and manage the cluster if
-they have the proper policy permissions set. If this value is C<false>,
-only the IAM user that created the cluster can view and manage it. This
-value can be changed using the SetVisibleToAllUsers action.
+account associated with the cluster. The default value, C<true>,
+indicates that all IAM users in the AWS account can perform cluster
+actions if they have the proper IAM policy permissions. If this value
+is C<false>, only the IAM user that created the cluster can perform
+actions. This value can be changed on a running cluster by using the
+SetVisibleToAllUsers action. You can override the default value of
+C<true> when you create a cluster by using the C<VisibleToAllUsers>
+parameter of the C<RunJobFlow> action.
 
 
 

@@ -36,8 +36,6 @@ Daisuke
 Dan
 DateTime
 DateTimes
-Datetime
-Datetimes
 Dave
 David
 Davis
@@ -78,6 +76,7 @@ MMM
 MMMM
 MMMMM
 Maki
+Mark
 McIntosh
 Measham
 Measham's
@@ -86,6 +85,7 @@ Mohammad
 Nick
 Olaf
 Oschwald
+Overmeer
 Ovid
 POSIX
 PP
@@ -126,6 +126,7 @@ autarch
 bian
 book
 bowen
+brenan
 ccc
 cccc
 ccccc
@@ -164,6 +165,7 @@ ji
 jmac
 lib
 madcityzen
+mark
 mike
 mohammad
 mrdvt92
@@ -176,6 +178,8 @@ olaf
 oschwald
 other's
 paul
+philip
+philiprbrenan
 proleptic
 qqq
 qqqq

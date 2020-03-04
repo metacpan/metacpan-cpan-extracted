@@ -1,7 +1,7 @@
 package Log::ger;
 
-our $DATE = '2020-02-18'; # DATE
-our $VERSION = '0.029'; # VERSION
+our $DATE = '2020-03-04'; # DATE
+our $VERSION = '0.031'; # VERSION
 
 #IFUNBUILT
 # use strict 'subs', 'vars';
@@ -94,20 +94,20 @@ sub install_routines {
 }
 
 sub add_target {
-    my ($target, $target_arg, $args, $replace) = @_;
+    my ($target, $target_arg, $init_args, $replace) = @_;
     $replace = 1 unless defined $replace;
 
     if ($target eq 'package') {
         unless ($replace) { return if $Package_Targets{$target_arg} }
-        $Package_Targets{$target_arg} = $args;
+        $Package_Targets{$target_arg} = $init_args;
     } elsif ($target eq 'object') {
         my ($addr) = "$target_arg" =~ $re_addr;
         unless ($replace) { return if $Object_Targets{$addr} }
-        $Object_Targets{$addr} = [$target_arg, $args];
+        $Object_Targets{$addr} = [$target_arg, $init_args];
     } elsif ($target eq 'hash') {
         my ($addr) = "$target_arg" =~ $re_addr;
         unless ($replace) { return if $Hash_Targets{$addr} }
-        $Hash_Targets{$addr} = [$target_arg, $args];
+        $Hash_Targets{$addr} = [$target_arg, $init_args];
     }
 }
 
@@ -123,16 +123,16 @@ sub _set_default_null_routines {
 }
 
 sub get_logger {
-    my ($package, %args) = @_;
+    my ($package, %init_args) = @_;
 
     my $caller = caller(0);
-    $args{category} = $caller if !defined($args{category});
+    $init_args{category} = $caller if !defined($init_args{category});
     my $obj = []; $obj =~ $re_addr;
     my $pkg = "Log::ger::Obj$1"; bless $obj, $pkg;
-    add_target(object => $obj, \%args);
+    add_target(object => $obj, \%init_args);
     if (keys %Global_Hooks) {
         require Log::ger::Heavy;
-        init_target(object => $obj, \%args);
+        init_target(object => $obj, \%init_args);
     } else {
         # if we haven't added any hooks etc, skip init_target() process and use
         # this preconstructed routines as shortcut, to save startup overhead
@@ -143,14 +143,14 @@ sub get_logger {
 }
 
 sub import {
-    my ($package, %args) = @_;
+    my ($package, %init_args) = @_;
 
     my $caller = caller(0);
-    $args{category} = $caller if !defined($args{category});
-    add_target(package => $caller, \%args);
+    $init_args{category} = $caller if !defined($init_args{category});
+    add_target(package => $caller, \%init_args);
     if (keys %Global_Hooks) {
         require Log::ger::Heavy;
-        init_target(package => $caller, \%args);
+        init_target(package => $caller, \%init_args);
     } else {
         # if we haven't added any hooks etc, skip init_target() process and use
         # this preconstructed routines as shortcut, to save startup overhead
@@ -174,9 +174,11 @@ Log::ger - A lightweight, flexible logging framework
 
 =head1 VERSION
 
-version 0.029
+version 0.031
 
 =head1 SYNOPSIS
+
+=head2 Producing logs
 
 In your module (producer):
 
@@ -185,19 +187,53 @@ In your module (producer):
 
  sub foo {
      ...
-     # produce some logs
-     log_error "an error occurred: %03d - %s", $errcode, $errmsg;
+     # produce some logs. no need to configure output or level.
+     log_error "an error occured: %03d - %s", $errcode, $errmsg;
      ...
      log_debug "http response: %s", $http; # automatic dumping of data
  }
  1;
 
+=head2 Consuming logs
+
+=head3 Choosing an output
+
 In your application (consumer/listener):
 
  use Foo;
- use Log::ger::Output 'Screen';
+ use Log::ger::Output 'Screen'; # configure output
+ # level is by default 'warn'
+ foo(); # the error message is shown, but debug message is not.
 
- foo();
+=head3 Choosing multiple outputs
+
+Instead of screen, you can output to multiple outputs (including multiple
+files):
+
+ use Log::ger::Output 'Composite' => (
+     outputs => {
+         Screen => {},
+         File   => [
+             {conf=>{path=>'/path/to/app.log'}},
+             ...
+         ],
+         ...
+     },
+ );
+
+See L<Log::ger::Manual::Tutorial::481_Output_Composite> for more examples.
+
+=head3 Choosing level
+
+One way to set level:
+
+ use Log::ger::Util;
+ Log::ger::Util::set_level('debug'); # be more verbose
+ foo(); # the error message as well as debug message are now shown
+
+There are better ways, e.g. letting users configure log level via configuration
+file or command-line option. See L<Log::ger::Manual::Tutorial::300_Level> for
+more details.
 
 =head1 DESCRIPTION
 
@@ -219,7 +255,7 @@ B<Slim distribution.> No non-core dependencies, extra functionalities are
 provided in separate distributions to be pulled as needed.
 
 B<Low startup overhead.> Only ~0.5-1ms. For comparison, L<strict> ~0.2-0.5ms,
-L<warnings> ~2ms, L<Log::Any> 0.15 ~2-3ms, Log::Any 1.049 ~8-10ms,
+L<warnings> ~2ms, L<Log::Any> (v0.15) ~2-3ms, Log::Any (v1.049) ~8-10ms,
 L<Log::Log4perl> ~35ms. This is measured on a 2014-2015 PC and before doing any
 output configuration. I strive to make C<use Log::ger;> statement to be roughly
 as light as C<use strict;> or C<use warnings;> so the impact of adding the

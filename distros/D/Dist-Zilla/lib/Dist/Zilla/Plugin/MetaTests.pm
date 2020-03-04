@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::MetaTests 6.012;
+package Dist::Zilla::Plugin::MetaTests 6.014;
 # ABSTRACT: common extra tests for META.yml
 
 use Moose;
@@ -54,7 +54,7 @@ Dist::Zilla::Plugin::MetaTests - common extra tests for META.yml
 
 =head1 VERSION
 
-version 6.012
+version 6.014
 
 =head1 DESCRIPTION
 
@@ -81,7 +81,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

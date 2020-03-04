@@ -61,18 +61,18 @@ struct CofCompiler {
     string infile;
     string outbase;
 
-    FILE *fin_local; //-- fin==fin_local iff we opened fin ourselves, otherwise fin_local=NULL
+    FILE *fin_local; ///< fin==fin_local iff we opened fin ourselves, otherwise fin_local=NULL
     FILE *fin;
-    FILE *fr1; // $r1 : [$end2]            @ $i1				: constant (logical index)
-    FILE *fr2; // $r2 : [$end3,$d1,$f1]*   @ end2($i1-1)..(end2($i1+1)-1)       : sorted by $d1 for each $i1
-    FILE *fr3; // $r3 : [$i2,$f12]*        @ end3($d1-1)..(end3($d1+1)-1)       : sorted by $i2 for each ($i1,$d1)
-    FILE *frN; // $rN : [$fN]              @ $date - $ymin                      : totals by date
+    FILE *fr1; ///< $r1 : [$end2]            @ $i1				: constant (logical index)
+    FILE *fr2; ///< $r2 : [$end3,$d1,$f1]*   @ end2($i1-1)..(end2($i1+1)-1)       : sorted by $d1 for each $i1
+    FILE *fr3; ///< $r3 : [$i2,$f12]*        @ end3($d1-1)..(end3($d1+1)-1)       : sorted by $i2 for each ($i1,$d1)
+    FILE *frN; ///< $rN : [$fN]              @ $date - $ymin                      : totals by date
     FreqT fmin;
 
     //-- iteration variables
-    PosT pos1; //-- offset in fr1
-    PosT pos2; //-- offset in fr2
-    PosT pos3; //-- offset in fr3
+    PosT pos1; ///< offset in fr1
+    PosT pos2; ///< offset in fr2
+    PosT pos3; ///< offset in fr3
 
     TermIdT i1_cur;
     DateT   d1_cur;
@@ -85,11 +85,11 @@ struct CofCompiler {
     //DateT d2;
     FreqT   f;
 
-    FreqT   N;
-    FreqT   N1;
+    FreqT   N;			///< N: total marginal frequency as extracted from %f12
+    FreqT   N1;			///< N1: total N as extracted from single-element records
 
-    TermFreqMapT f12map;
-    DateFreqMapT fNmap;
+    TermFreqMapT f12map;	///< ($i2=>$f12, ...) for ($i1_cur,$d1_cur)
+    DateFreqMapT fNmap;		///< ($d=>$Nd, ...)
 
     //----------------------------------------------------------
     static std::string className()
@@ -190,11 +190,11 @@ struct CofCompiler {
     void open(const string& infilename, const string& outbasename)
     {
         FILE *finp=NULL;
-        if (infile.empty() || infile=="-") {
+        if (infilename.empty() || infilename=="-") {
             infile  = "-";
             finp    = stdin;
-        } else if ( !(finp = fopen(infile.c_str(),"r")) ) {
-            throw std::runtime_error(Format("open failed for input file '%s': %s", infile.c_str(), strerror(errno)));
+        } else if ( !(finp = fopen(infilename.c_str(),"r")) ) {
+            throw std::runtime_error(Format("open failed for input file '%s': %s", infilename.c_str(), strerror(errno)));
         }
         open(finp, infilename, outbasename);
         if (finp != stdin) fin_local = finp;
@@ -237,7 +237,7 @@ struct CofCompiler {
             for (typename TermFreqMapT::const_iterator f12i=f12map.begin(); f12i!=f12map.end(); ++f12i) {
                 f   = f12i->second;
                 f1 += f;
-                if (f < fmin || f12i->first < 0) continue; //-- skip here so we can track "real" marginal frequencies
+                if (f < fmin || f12i->first == NOTERM) continue; //-- skip here so we can track "real" marginal frequencies
                 writeBin<TermIdT>(f12i->first, fr3);
                 writeBin<FreqT>(f, fr3);
                 ++pos3;
@@ -294,8 +294,9 @@ struct CofCompiler {
                 //-- 0 columns: blank line: skip it
                 continue;
             } else if (nscanned == 1) {
-                //-- 1 column: N
-                N += f12;
+                //-- 1 column: N (via N1)
+                N1 += f12;
+                continue;
             } else if (nscanned == 2) {
                 //-- 2 columns: not supported
                 throw runtime_error(Format("failed to parse %s input line %zd\n", infile.c_str(), lineno));

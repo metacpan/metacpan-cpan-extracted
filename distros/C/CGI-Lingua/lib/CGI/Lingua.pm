@@ -6,7 +6,7 @@ use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
 use vars qw($VERSION);
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.61
+Version 0.62
 
 =cut
 
@@ -1155,7 +1155,7 @@ sub locale {
 	return ();	# returns undef
 }
 
-=head2 timezone
+=head2 time_zone
 
 Returns the timezone of the web client.
 
@@ -1164,11 +1164,11 @@ CGI::Lingua will make use of that, otherwise it will use ip-api.com
 
 =cut
 
-sub timezone {
+sub time_zone {
 	my $self = shift;
 
 	if($self->{_logger}) {
-		$self->{_logger}->trace('Entered timezone');
+		$self->{_logger}->trace('Entered time_zone');
 	}
 	if($self->{_timezone}) {
 		if($self->{_logger}) {
@@ -1196,17 +1196,20 @@ sub timezone {
 	if($self->{_have_geoip} == 1) {
 		$self->{_timezone} = $self->{_geoip}->time_zone($ip);
 	}
-	if((!$self->{_timezone}) &&
-	   (eval { require LWP::Simple; require JSON::Parse } )) {
-		if($self->{_logger}) {
-			$self->{_logger}->debug("Look up $ip on ip-api.com");
-		}
+	if((!$self->{_timezone}) && $ip) {
+		if(eval { require LWP::Simple; require JSON::Parse } ) {
+			if($self->{_logger}) {
+				$self->{_logger}->debug("Look up $ip on ip-api.com");
+			}
 
-		LWP::Simple->import();
-		JSON::Parse->import();
+			LWP::Simple->import();
+			JSON::Parse->import();
 
-		if(my $data = LWP::Simple::get("http://ip-api.com/json/$ip")) {
-			$self->{_timezone} = JSON::Parse::parse_json($data)->{'timezone'};
+			if(my $data = LWP::Simple::get("http://ip-api.com/json/$ip")) {
+				$self->{_timezone} = JSON::Parse::parse_json($data)->{'timezone'};
+			}
+		} else {
+			Carp::croak('You must have LWP::Simple installed to connect to ip-api.com');
 		}
 	}
 

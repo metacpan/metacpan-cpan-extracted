@@ -18,7 +18,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $HASH => q{#};
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 # Constructor.
 sub new {
@@ -57,7 +57,7 @@ sub new {
 		print STDERR "\t--version\tPrint version.\n";
 		exit 1;
 	}
-	$self->{'_pod_file'} = shift @ARGV;
+	$self->{'_pod_file_or_module'} = shift @ARGV;
 	$self->{'_args'} = \@ARGV;
 	$self->{'_debug'} = $self->{'_opts'}->{'d'};
 	$self->{'_enumerate'} = $self->{'_opts'}->{'e'};
@@ -80,7 +80,7 @@ sub run {
 	my $self = shift;
 
 	# Get example code.
-	my $code = get($self->{'_pod_file'}, $self->{'_section'}, $self->{'_number'});
+	my $code = get($self->{'_pod_file_or_module'}, $self->{'_section'}, $self->{'_number'});
 
 	# No code.
 	if (! defined $code) {
@@ -153,18 +153,21 @@ App::Pod::Example - Base class for pod-example script.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $app = App::Pod::Example->new;
 
- Constructor.
+Constructor.
 
-=item C<run()>
+Returns object.
 
- Run method.
- Returns undef.
+=head2 C<run>
 
-=back
+ $app->run;
+
+Run method.
+
+Returns undef.
 
 =head1 ERRORS
 
@@ -220,11 +223,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2020 Michal Josef Špaček
- BSD 2-Clause License
+© 2011-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.17
+0.18
 
 =cut

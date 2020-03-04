@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.691';
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.692';
 #ABSTRACT: Text based data file ('Gnuplot style')
 
 use 5.010;
@@ -627,7 +627,7 @@ Lab::Moose::DataFile::Gnuplot - Text based data file ('Gnuplot style')
 
 =head1 VERSION
 
-version 3.691
+version 3.692
 
 =head1 SYNOPSIS
 
@@ -787,6 +787,10 @@ gnuplot terminal. If not set, use default gnuplot terminal.
 
 HashRef of terminal options. This defaults to
 C<< {persist => 1, raise => 0, enhanced => 0} >>.
+The different graphical terminal types (qt,x11,wxt) show different behaviour
+regarding persistent windows. For wxt, the plot windows are closed when
+the datafile object goes out of scope. To prevent this, push each new
+datafile object onto a global array.
 
 =item * plot_options
 
@@ -860,7 +864,7 @@ If the C<handle> argument is not given, refresh all plots.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

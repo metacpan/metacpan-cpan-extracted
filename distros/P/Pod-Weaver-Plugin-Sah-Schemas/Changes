@@ -1,21 +1,24 @@
-Revision history for Pod-Weaver-Plugin-Sah-Schemas
+0.05    2019-12-17  Released-By: PERLANCAR; Urgency: medium
 
-0.04    2016-05-08 (PERLANCAR)
+	- Use String::PodQuote to quote summary when added into POD.
+
+
+0.04    2016-05-08  Released-By: PERLANCAR
 
         - [Incompatible change] Rename dist from
-          Pod-Weaver-Plugin-Sah-Schema{,s}. Follow Sah::Schemas convention.
+          Pod-Weaver-Plugin-Sah-Schema{,s}.
 
 
-0.03    2016-03-08 (PERLANCAR)
+0.03    2016-03-08  Released-By: PERLANCAR
 
 	- Fix perl syntax mistake, derp.
 
 
-0.02    2016-03-08 (PERLANCAR)
+0.02    2016-03-08  Released-By: PERLANCAR
 
 	- Add some skips.
 
 
-0.01    2016-03-08 (PERLANCAR)
+0.01    2016-03-08  Released-By: PERLANCAR
 
         - First release.

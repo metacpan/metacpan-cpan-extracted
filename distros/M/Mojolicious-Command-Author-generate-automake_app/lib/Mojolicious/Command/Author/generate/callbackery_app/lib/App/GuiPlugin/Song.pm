@@ -167,6 +167,7 @@ has actionCfg => sub {
             action => 'popup',
             addToContextMenu => false,
             name => 'songFormAdd',
+            key => 'add',
             popupTitle => trm('New Song'),
             set => {
                 minHeight => 600,
@@ -187,7 +188,11 @@ has actionCfg => sub {
             action => 'popup',
             addToContextMenu => true,
             defaultAction => true,
+            key => 'edit',
             name => 'songFormEdit',
+            buttonSet => {
+                enabled => false,
+            },
             popupTitle => trm('Edit Song'),
             backend => {
                 plugin => 'SongForm',
@@ -202,6 +207,9 @@ has actionCfg => sub {
             addToContextMenu => true,
             question => trm('Do you really want to delete the selected Song '),
             key => 'delete',
+            buttonSet => {
+                enabled => false,
+            },
             actionHandler => sub {
                 my $self = shift;
                 my $args = shift;
@@ -221,8 +229,8 @@ has actionCfg => sub {
     ];
 };
 
-sub dbh {
-    shift->user->mojoSqlDb->dbh;
+sub db {
+    shift->user->mojoSqlDb;
 };
 
 sub _getFilter {
@@ -230,7 +238,7 @@ sub _getFilter {
     my $search = shift;
     my $filter = '';
     if ( $search ){
-        $filter = "WHERE song_title LIKE ".$self->dbh->quote('%'.$search);
+        $filter = "WHERE song_title LIKE ".$self->db->dbh->quote('%'.$search);
     }
     return $filter;
 }
@@ -239,7 +247,7 @@ sub getTableRowCount {
     my $self = shift;
     my $args = shift;
     my $filter = $self->_getFilter($args->{formData}{song_title});
-    return ($self->dbh->selectrow_array("SELECT count(song_id) FROM song $filter"))[0];
+    return $self->db->query("SELECT count(song_id) AS count FROM song $filter")->hash->{count};
 }
 
 sub getTableData {
@@ -251,13 +259,30 @@ sub getTableData {
         $SORT = 'ORDER BY '.$self->dbh->quote_identifier($args->{sortColumn});
         $SORT .= $args->{sortDesc} ? ' DESC' : ' ASC';
     }
-    return $self->dbh->selectall_arrayref(<<"SQL",{Slice => {}}, $args->{lastRow}-$args->{firstRow}+1,$args->{firstRow});
+    my $data = $self->db->query(<<"SQL",$args->{lastRow}-$args->{firstRow}+1,$args->{firstRow});
 SELECT *
 FROM song
 $filter
 $SORT
 LIMIT ? OFFSET ?
 SQL
+    # this is just a silly example to show how to modify the action button properties
+    # based on the row selected
+    for my $row (@$data) {
+        my $ok = true;        
+        if ($row->{song_note} ~= /protect/ and not $self->user->may('admin')){
+             $ok = fale;
+        }
+        $row->{_actionSet} = {
+            edit => {
+                enabled => $ok
+            },
+            delete => {
+                enabled => $ok,
+            }        
+       }
+    }
+    return $data;
 }
 
 1;

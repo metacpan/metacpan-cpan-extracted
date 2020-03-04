@@ -1,0 +1,99 @@
+NAME
+    Acme::CPANModules::ReadingFilesBackward - Reading files backward (in
+    reverse)
+
+VERSION
+    This document describes version 0.002 of
+    Acme::CPANModules::ReadingFilesBackward (from Perl distribution
+    Acme-CPANModules-ReadingFilesBackward), released on 2020-03-01.
+
+DESCRIPTION
+    Reading files backward (in reverse).
+
+    Probably the fastest way, if you are on a Unix system, is to use the tac
+    command, which can read a file line by line in reverse order, or
+    paragraph by paragraph, or character by character, or word by word, or
+    by a custom separator string or regular expression. Example for using it
+    from Perl:
+
+     open my $fh, "tac /etc/passwd |";
+     print while <$fh>;
+
+    Another convenient way is to use the Perl I/O layer PerlIO::reverse. It
+    only does line-by-line reversing, but you can use the regular Perl API.
+    You don't even have to "use" the module explicitly (but of course you
+    have to get it installed first):
+
+     open my $fh, "<:reverse", "/etc/passwd";
+     print while <$fh>;
+
+    If your file is small (fits in your system's memory), you can also slurp
+    the file contents first into an array (either line by line, or paragraph
+    by paragraph, or what have you) and then simply "reverse" the array:
+
+     open my $fh, "<", "/etc/passwd";
+     my @lines = <$fh>;
+     print for reverse @lines;
+
+    If the above solutions do not fit your needs, there are also these
+    modules which can help: File::ReadBackward, File::Bidirectional.
+    File::ReadBackward is slightly faster than File::Bidirectional, but
+    File::Bidirectional can read forward as well as backward. I now simply
+    prefer PerlIO::reverse because I don't have to use a custom API for
+    reading files.
+
+INCLUDED MODULES
+    *   PerlIO::reverse
+
+    *   File::ReadBackward
+
+    *   File::Bidirectional
+
+FAQ
+  What are ways to use this module?
+    Aside from reading it, you can install all the listed modules using
+    cpanmodules:
+
+        % cpanmodules ls-entries ReadingFilesBackward | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=ReadingFilesBackward -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    This module also helps lcpan produce a more meaningful result for "lcpan
+    related-mods" when it comes to finding related modules for the modules
+    listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-ReadingFilesBackward>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-ReadingFilesBackward
+    >.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Read
+    ingFilesBackward>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules::PickingRandomLinesFromFile
+
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

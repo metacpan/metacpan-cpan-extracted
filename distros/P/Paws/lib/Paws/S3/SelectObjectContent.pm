@@ -8,6 +8,7 @@ package Paws::S3::SelectObjectContent;
   has Key => (is => 'ro', isa => 'Str', uri_name => 'Key', traits => ['ParamInURI'], required => 1);
   has OutputSerialization => (is => 'ro', isa => 'Paws::S3::OutputSerialization', required => 1);
   has RequestProgress => (is => 'ro', isa => 'Paws::S3::RequestProgress');
+  has ScanRange => (is => 'ro', isa => 'Paws::S3::ScanRange');
   has SSECustomerAlgorithm => (is => 'ro', isa => 'Str', header_name => 'x-amz-server-side-encryption-customer-algorithm', traits => ['ParamInHeader']);
   has SSECustomerKey => (is => 'ro', isa => 'Str', header_name => 'x-amz-server-side-encryption-customer-key', traits => ['ParamInHeader']);
   has SSECustomerKeyMD5 => (is => 'ro', isa => 'Str', header_name => 'x-amz-server-side-encryption-customer-key-MD5', traits => ['ParamInHeader']);
@@ -80,6 +81,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       SSECustomerAlgorithm => 'MySSECustomerAlgorithm',    # OPTIONAL
       SSECustomerKey       => 'MySSECustomerKey',          # OPTIONAL
       SSECustomerKeyMD5    => 'MySSECustomerKeyMD5',       # OPTIONAL
+      ScanRange            => {
+        End   => 1,                                        # OPTIONAL
+        Start => 1,                                        # OPTIONAL
+      },    # OPTIONAL
     );
 
     # Results:
@@ -107,7 +112,7 @@ The expression that is used to query the object.
 
 =head2 B<REQUIRED> ExpressionType => Str
 
-The type of the provided expression (for example., SQL).
+The type of the provided expression (for example, SQL).
 
 Valid values are: C<"SQL">
 
@@ -133,6 +138,39 @@ response.
 =head2 RequestProgress => L<Paws::S3::RequestProgress>
 
 Specifies if periodic request progress information should be enabled.
+
+
+
+=head2 ScanRange => L<Paws::S3::ScanRange>
+
+Specifies the byte range of the object to get the records from. A
+record is processed when its first byte is contained by the range. This
+parameter is optional, but when specified, it must not be empty. See
+RFC 2616, Section 14.35.1 about how to specify the start and end of the
+range.
+
+C<ScanRange>may be used in the following ways:
+
+=over
+
+=item *
+
+C<E<lt>scanrangeE<gt>E<lt>startE<gt>50E<lt>/startE<gt>E<lt>endE<gt>100E<lt>/endE<gt>E<lt>/scanrangeE<gt>>
+- process only the records starting between the bytes 50 and 100
+(inclusive, counting from zero)
+
+=item *
+
+C<E<lt>scanrangeE<gt>E<lt>startE<gt>50E<lt>/startE<gt>E<lt>/scanrangeE<gt>>
+- process only the records starting after the byte 50
+
+=item *
+
+C<E<lt>scanrangeE<gt>E<lt>endE<gt>50E<lt>/endE<gt>E<lt>/scanrangeE<gt>>
+- process only the records within the last 50 bytes of the file.
+
+=back
+
 
 
 

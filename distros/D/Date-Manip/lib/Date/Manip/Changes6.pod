@@ -1,4 +1,4 @@
-# Copyright (c) 2009-2019 Sullivan Beck. All rights reserved.
+# Copyright (c) 2009-2020 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -27,7 +27,31 @@ For the most part, Date::Manip has remained backward compatible at
 every release, but occasionally, a change is made which is backward
 incompatible. These are marked with an exclamation mark (!).
 
-=head1 VERSION 6.79 (planned 2019-12-01)
+=head1 VERSION 6.84 (planned 2020-12-01)
+
+=head1 VERSION 6.83 (planned 2020-09-01)
+
+=head1 VERSION 6.82 (planned 2020-06-01)
+
+=head1 VERSION 6.81 (2020-03-01)
+
+=over 5
+
+=item Messed up the 6.80 package.  This release fixes it.
+
+=back
+
+=head1 VERSION 6.80 (2020-03-01)
+
+=over 5
+
+=item Missed Changes entry for previous version.
+
+Reported by Tina Muller (GitHub #31)
+
+=back
+
+=head1 VERSION 6.79 (2019-12-01)
 
 =over 5
 

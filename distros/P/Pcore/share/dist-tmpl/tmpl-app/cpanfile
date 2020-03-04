@@ -1,2 +1,1 @@
-requires 'Pcore',                 <: $pcore_version :>;
-requires 'Pcore::Service::Nginx', v0.1.0;
+requires 'Pcore', <: $pcore_version :>;

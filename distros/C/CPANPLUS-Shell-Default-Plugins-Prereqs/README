@@ -1,6 +1,9 @@
 NAME
-    CPANPLUS::Shell::Default::Plugin::Prereqs - Plugin for CPANPLUS to
+    CPANPLUS::Shell::Default::Plugins::Prereqs - Plugin for CPANPLUS to
     automate the installation of prerequisites without installing the module
+
+VERSION
+    version 0.12
 
 SYNOPSIS
       use CPANPLUS::Shell::Default::Plugin::Prereqs;
@@ -47,9 +50,6 @@ SUBROUTINES
 SEE ALSO
     "CPANPLUS", "CPANPLUS::Shell::Default::Plugins::HOWTO"
 
-AUTHOR
-    Mark Grimes, <mgrimes@cpan.org>
-
 THANKS
     Thanks to Jos Boumans for his excellent suggestions to improve both the
     plugin functionality and the quality of the code.
@@ -58,10 +58,12 @@ TODO
     Add test for MakeMaker and Module::Install based modules. Add test for
     /prereq install. Split "install_prereqs" into multiple subroutines.
 
-COPYRIGHT AND LICENSE
-    Copyright (C) 2007-12 by mgrimes
+AUTHOR
+    Mark Grimes, <mgrimes@cpan.org>
 
-    This library is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself, either Perl version 5.8.8 or, at
-    your option, any later version of Perl 5 you may have available.
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by Mark Grimes, <mgrimes@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 
