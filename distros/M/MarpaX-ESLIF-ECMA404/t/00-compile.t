@@ -6,12 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'MarpaX/ESLIF/ECMA404.pm',
-    'MarpaX/ESLIF/ECMA404/RecognizerInterface.pm',
-    'MarpaX/ESLIF/ECMA404/ValueInterface.pm'
+    'MarpaX/ESLIF/ECMA404.pm'
 );
 
 

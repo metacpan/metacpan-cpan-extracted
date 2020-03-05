@@ -1,5 +1,16 @@
 Revision history for App-gimpgitbuild
 
+0.10.2   2020-03-05
+    - Resubmit due to a PAUSE indexing failure; trying to get the new version
+    indexed.
+
+0.10.1   2020-03-02
+    - Fix missing $VERSION in lib/**.pm files.
+
+0.10.0   2020-03-02
+    - Use the API's class' extracted methods.
+    - Remove some unused copy+pasted code.
+
 0.8.0   2020-02-29
     - Add the GIMPGITBUILD__SKIP_BUILDS_RE environment variable
 

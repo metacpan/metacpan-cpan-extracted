@@ -56,6 +56,6 @@
          "url" : "https://github.com/oposs/mojolicious-automake"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.1",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

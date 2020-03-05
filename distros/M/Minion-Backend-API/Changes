@@ -1,2 +1,6 @@
 0.01 2020-02-10T22:33:00Z
     - First release.
+
+0.02 2020-03-05T11:50:00Z
+    - Removed code duplication.
+    - Added variable $VERSION in Mojolicious::Plugin::Minion::API.

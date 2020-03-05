@@ -4,6 +4,10 @@ package CGI::Ex::Conf;
 
 CGI::Ex::Conf - Conf Reader/Writer for many different data format types
 
+=head1 VERSION
+
+version 2.49
+
 =cut
 
 ###----------------------------------------------------------------###
@@ -18,7 +22,7 @@ use Carp qw(croak);
 
 our @EXPORT_OK = qw(conf_read conf_write in_cache);
 
-our $VERSION = '2.48';
+our $VERSION = '2.49'; # VERSION
 
 our $DEFAULT_EXT = 'conf';
 our @DEFAULT_PATHS;
@@ -926,4 +930,3 @@ This module may be distributed under the same terms as Perl itself.
 Paul Seamons <perl at seamons dot com>
 
 =cut
-

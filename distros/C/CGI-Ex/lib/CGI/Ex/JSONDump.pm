@@ -4,6 +4,10 @@ package CGI::Ex::JSONDump;
 
 CGI::Ex::JSONDump - Comprehensive data to JSON dump.
 
+=head1 VERSION
+
+version 2.49
+
 =cut
 
 ###----------------------------------------------------------------###
@@ -14,7 +18,7 @@ CGI::Ex::JSONDump - Comprehensive data to JSON dump.
 use strict;
 use Exporter qw(import);
 
-our $VERSION = '2.48';
+our $VERSION = '2.49'; # VERSION
 our @EXPORT = qw(JSONDump);
 our @EXPORT_OK = @EXPORT;
 

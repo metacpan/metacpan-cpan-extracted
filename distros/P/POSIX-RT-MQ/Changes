@@ -1,5 +1,9 @@
 # $Id: Changes,v 1.3 2003/01/28 07:08:50 ilja Exp $
 
+
+0.05 2020-03-05
+	Add timedreceive support (whole seconds only)
+
 0.04 2019-02-26
 	Release, no changes as to 0.04_04
 

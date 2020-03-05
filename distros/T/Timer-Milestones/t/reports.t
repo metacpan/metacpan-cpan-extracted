@@ -19,6 +19,7 @@ test_time_function_summaries();
 test_report_notification();
 test_divide_by_zero();
 test_human_elapsed_time();
+test_format_many_human_elapsed_times();
 
 done_testing();
 
@@ -42,29 +43,19 @@ sub test_generate_report {
 
     # Before any milestones have been recorded, we just report that timing
     # started, but there are no interval times.
-    like($timer->generate_intermediate_report,
-        qr{
-            ^
-            START: \s \Q$localtime_start\E \n
-            $
-        }xsm,
+    is($timer->generate_intermediate_report,
+        "START: $localtime_start\n",
         'Just a blank report before any milestones'
     );
 
     # Add a milestone; now there's a report.
-    # \s{4} and \s rather than \s{5} because (a) there's a leading 4-space
-    # indent, and then (b) because you can have up to 60 minutes, there's a
-    # one-space indent for the seconds.
     $timer->add_milestone('Something completely innocuous');
     my $intermediate_report = $timer->generate_intermediate_report;
-    like($intermediate_report,
-        qr{
-            ^
-            START: \s \Q$localtime_start\E \n
-            \s{4} \s 5 \s min \s 23 \s s \s [(] 100[.]00% [)] \n
-            \QSomething completely innocuous\E \n
-            $
-        }xsm,
+    is($intermediate_report, <<INTERMEDIATE_REPORT,
+START: $localtime_start
+    5 min 23 s (100.00%)
+Something completely innocuous
+INTERMEDIATE_REPORT
         'The report so far mentions when it started, milestone and elapsed time'
     );
 
@@ -75,33 +66,29 @@ sub test_generate_report {
     # But if we add another milestone, we do.
     $timer->add_milestone('Something equally innocuous, honest');
     my $updated_report = $timer->generate_intermediate_report;
-    like($updated_report,
-        qr{
-            ^
-            START: \s \Q$localtime_start\E \n
-            \s{4} \s 5 \s min \s 23 \s s \s [(] \s 29[.]10% [)] \n
-            \QSomething completely innocuous\E \n
-            \s{4} 13 \s min \s \s 7 \s s \s [()] \s 70[.]90% [)] \n
-            \QSomething equally innocuous, honest\E \n
-            $
-        }xsm,
+    is($updated_report, <<UPDATED_REPORT,
+START: $localtime_start
+     5 min 23 s ( 29.10%)
+Something completely innocuous
+    13 min  7 s ( 70.90%)
+Something equally innocuous, honest
+UPDATED_REPORT
         'The report now has a new milestone and recalculated percentages',
     );
 
-    # Eventually we can generate a final report.
+    # Eventually we can generate a final report. The earlier times
+    # are indented to cope with the monstrous amount of time, and extra
+    # significant figures involved, between the final milestone and the end.
     my $final_report = $timer->generate_final_report;
-    like($final_report,
-        qr{
-            ^
-            START: \s \Q$localtime_start\E \n
-            \s{4} \s 5 \s min \s 23 \s s \s [(] \s{2} 0[.]00% [)] \n
-            \QSomething completely innocuous\E \n
-            \s{4} 13 \s min \s \s 7 \s s \s [()] \s{2} 0[.]00% [)] \n
-            \QSomething equally innocuous, honest\E \n
-            \s{4} 11183 \s h \s 41 \s min \s [()] 100[.]00% [)] \n
-            END: \s \Q$localtime_end\E \n
-            $
-        }xsm,
+    is($final_report, <<FINAL_REPORT,
+START: $localtime_start
+        5 min 23 s   (  0.00%)
+Something completely innocuous
+       13 min  7 s   (  0.00%)
+Something equally innocuous, honest
+    11183 h   41 min (100.00%)
+END: $localtime_end
+FINAL_REPORT
         'Eventually we get an end time, and more recalculated percentages',
     );
     ok(
@@ -191,11 +178,11 @@ sub test_time_function {
         250 ms Obvious::Suspect::actually_pretty_efficient
 Finished chugging through set-up
     10 s ( 57.41%)
-        464 ms Obvious::Suspect::slow_but_could_be_worse
-           8 s Obscure::Package::pathological_problem
+        465 ms Obvious::Suspect::slow_but_could_be_worse
+          9 s  Obscure::Package::pathological_problem
 Done the hard work
      2 s ( 13.17%)
-           1 s Garbage::Collection::surprisingly_slow
+          2 s  Garbage::Collection::surprisingly_slow
 TIMING_STUFF
 }
 
@@ -278,7 +265,7 @@ sub test_time_function_summaries {
     }xsm;
     for ($functions_before, $functions_after) {
         s/^ \s{8} //xgsm;
-        s/^ \s{1,3} \d+ \s ms \s /(time) /xgsm;
+        s/^ \s* \d+ \s ms \s /(time) /xgsm;
     }
 
     # Because we said to summarise calls, each function call will be grouped
@@ -389,7 +376,7 @@ sub test_divide_by_zero {
         qr{
             ^
             START: \s [^\n]+ \n
-            \s{4} \s{2} 0 \s ms \s [(] [^)]+ [)] \n
+            \s{4} 0 \s ms \s [(] [^)]+ [)] \n
             END: \s [^\n]+ \n
             $
         }xsm, 'We generated a report even though no time elapsed'
@@ -402,18 +389,18 @@ sub test_divide_by_zero {
 sub test_human_elapsed_time {
     my %expect_human_elapsed_time = (
         # Anything below 1 second: milliseconds
-        0.001 => '  1 ms',
-        0.010 => ' 10 ms',
+        0.001 => '1 ms',
+        0.010 => '10 ms',
         0.234 => '234 ms',
         0.999 => '999 ms',
         # Anything below 1 minute: seconds
-        1     => ' 1 s',
+        1     => '1 s',
         30    => '30 s',
         59    => '59 s',
         # Less than an hour: minutes and seconds
-        60    => ' 1 min  0 s',
-        61    => ' 1 min  1 s',
-        123   => ' 2 min  3 s',
+        60    => '1 min  0 s',
+        61    => '1 min  1 s',
+        123   => '2 min  3 s',
         999   => '16 min 39 s',
         3599  => '59 min 59 s',
         # Beyond that, hours and minutes; hours aren't padded as there's
@@ -431,6 +418,74 @@ sub test_human_elapsed_time {
             $timer->_human_elapsed_time($elapsed_time),
             $expect_human_elapsed_time{$elapsed_time},
             "Correct value for $elapsed_time"
+        );
+    }
+}
+
+# We can combine those intervals together, and they're formatted in a way that
+# things line up. Notably: (a) we pad with leading spaces, (b) we pad the
+# units with spaces, and (c) we pad the whole lot with trailing spaces, for
+# cases where there was only one unit.
+
+sub test_format_many_human_elapsed_times {
+    # A whole bunch of elapsed times, deliberately and unhelpfully
+    # sorted asciibetically. The only formatting is for secondary values,
+    # because we always know how much space they can take up: beyond a
+    # specific maximum value, any further numbers get carried into the
+    # primary value instead.
+    my $untouched = <<UNTOUCHED;
+1000 h  0 min
+1 ms
+1 s
+1 h 59 min
+1 min 30 s
+1 h  5 min
+12 h 30 min
+2 min  6 s
+240 h 40 min
+36 h  1 min
+59 s
+59 ms
+556 h  6 min
+5555 h 55 min
+99 ms
+999 ms
+UNTOUCHED
+
+    # What they should look like instead. For want of a better marker,
+    # # signs added at the end to denote where the string should end.
+    # We'll remove those, and any trailing spaces added by editors,
+    # before testing.
+    my $formatted = <<FORMATTED;
+1000 h    0 min #
+   1 ms         #
+   1 s          #
+   1 h   59 min #
+   1 min 30 s   #
+   1 h    5 min #
+  12 h   30 min #
+   2 min  6 s   #
+ 240 h   40 min #
+  36 h    1 min #
+  59 s          #
+  59 ms         #
+ 556 h    6 min #
+5555 h   55 min #
+  99 ms         #
+ 999 ms         #
+FORMATTED
+    $formatted =~ s{ \s \# \s* $}{}gxms;
+
+    # Now format them, knowing what they all look like.
+    my @untouched_lines = split("\n", $untouched);
+    my @formatted_lines = split("\n", $formatted);
+    my $timer = Timer::Milestones->new(notify_report => sub {});
+    $timer->_format_times_to_fit(\(@untouched_lines));
+    for my $line_num (0..$#untouched_lines) {
+        is(
+            $untouched_lines[$line_num],
+            $formatted_lines[$line_num],
+            "Line 0..$line_num..x is what we expect"
         );
     }
 }

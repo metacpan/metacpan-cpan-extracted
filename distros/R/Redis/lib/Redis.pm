@@ -8,7 +8,7 @@
 #   The Artistic License 2.0 (GPL Compatible)
 #
 package Redis;
-$Redis::VERSION = '1.995';
+$Redis::VERSION = '1.996';
 # ABSTRACT: Perl binding for Redis database
 # VERSION
 # AUTHORITY
@@ -884,8 +884,9 @@ sub __try_read_sock {
       ## Keep going if nothing there, but socket is alive
       return 0 if $err and ($err == EWOULDBLOCK or $err == EAGAIN);
 
-      ## on freebsd, if we got ECONNRESET, it's a timeout from the other side
-      return 0 if ($err && $err == ECONNRESET && $^O eq 'freebsd');
+      ## if we got ECONNRESET, it might be due a timeout from the other side (on freebsd)
+      ## or because an intermediate proxy shut down our connection using its internal timeout counter
+      return 0 if ($err && $err == ECONNRESET);
 
       ## result is undef but err is 0? should never happen
       return if $err == 0;
@@ -924,7 +925,7 @@ Redis - Perl binding for Redis database
 
 =head1 VERSION
 
-version 1.995
+version 1.996
 
 =head1 SYNOPSIS
 

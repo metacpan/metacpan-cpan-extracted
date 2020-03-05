@@ -1,3 +1,48 @@
+0.003 2020-03-05
+
+    [Features]
+    
+        Times are now formatted more consistently:
+          * Primary units (e.g. 'm', 'ms', 'h') are aligned
+          * Including if leading digits are higher than expected
+          * Secondary units (e.g. 's', 'min') are also aligned
+          * All times are padded to be an equal length
+
+    [Bug fixes]
+
+        Uses floating-point with no decimal places rather than integers to
+        round values rather than truncate them, something which was
+        (a) inaccurate, and (b) could vary between Perls, depending on how
+        large floating point values were.
+        
+        Compiles under perl 5.8.9.
+
+0.002 2020-02-06
+
+    [Features]
+
+        You can supply a coderef to time instead of a function name; the
+        resulting wrapped coderef is returned to you.
+    
+        You can supply the name of a function in your own package to
+        time_function() without having to fully-quantify it.
+        
+        You can supply an alternate name to use in reports instead of the
+        function name you specified. This is most obviously useful when you
+        supply a coderef.
+        
+    [Bug fix]
+    
+        Some functions weren't marked as exportable: add_milestone was
+        misspelled; generate_intermediate_report and generate_final_report
+        were omitted entirely.
+        
+        Functions weren't being unwrapped when timing stopped.
+
+    [Documentation]
+
+        Various documentation fixes.
+
 0.001 2020-02-04
 
     Initial release.

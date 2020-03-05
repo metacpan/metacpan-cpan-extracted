@@ -22,5 +22,5 @@ resources:
   bugtracker: https://github.com/a6502/POSIX-RT-MQ/issues
   homepage: https://github.com/a6502/POSIX-RT-MQ
   repository: https://github.com/a6502/POSIX-RT-MQ.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

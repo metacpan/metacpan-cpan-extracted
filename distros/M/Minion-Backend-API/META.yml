@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/lucas1/Minion-Backend-API/issues
   homepage: https://github.com/lucas1/Minion-Backend-API
   repository: https://github.com/lucas1/Minion-Backend-API
-version: 0.01
+version: 0.02
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

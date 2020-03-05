@@ -1,3 +1,8 @@
+0.30.1 2020-03-05 13:54:01 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - make table context menu button track the changes
+ - do not execute default action if button is not enabled
+
 0.30.0 2020-03-04 18:08:25 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - Table rows with an '_actionSet' key containing a hash with key

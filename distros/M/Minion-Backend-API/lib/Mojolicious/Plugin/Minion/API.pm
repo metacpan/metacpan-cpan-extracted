@@ -3,6 +3,8 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Carp 'croak';
 
+our $VERSION = 0.02;
+
 sub register {
     my ($self, $app, $config) = @_;
     
@@ -25,7 +27,9 @@ sub register {
     
     # enable all origin
     $app->hook(before_render => sub {
-         shift->res->headers->header('Access-Control-Allow-Origin' => '*');
+        my $c = shift;
+
+        $c->res->headers->header('Access-Control-Allow-Origin' => '*') if $c->req->method ne 'OPTIONS';
     });
     
     # global

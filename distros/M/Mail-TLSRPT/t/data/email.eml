@@ -1,0 +1,182 @@
+Return-Path: <3ZzBeXhoKADojknalhu-oipl-pho-nalknpejcckkcha.Yki@smtp-tls-reporting.bounces.google.com>
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+	 by sloti7d1t02 (Cyrus 3.1.7-967-g014f925-fmstable-20200226v1) with LMTPA;
+	 Tue, 03 Mar 2020 05:24:41 -0500
+X-Cyrus-Session-Id: sloti7d1t02-1583231081-3740130-2-15886470321492970973
+X-Sieve: CMU Sieve 3.0
+X-Spam-known-sender: no
+X-Spam-sender-reputation: 500 (none)
+X-Spam-score: 0.0
+X-Spam-hits: ME_SENDERREP_NEUTRAL 0.001, RCVD_IN_DNSWL_NONE -0.0001,
+  RCVD_IN_MSPIKE_H2 -1.465, SPF_HELO_NONE 0.001, SPF_PASS -0.001,
+  LANGUAGES unknown, BAYES_USED none, SA_VERSION 3.4.2
+X-Spam-source: IP='209.85.167.199', Host='mail-oi1-f199.google.com', Country='US',
+  FromHeader='com', MailFrom='com'
+X-Spam-charsets: plain='UTF-8'
+X-Attached: google.com!fastmaildmarc.com!1583107200!1583193599!001.json.gz
+X-Delivered-to: tlsrpt@fastmaildmarc.com
+X-Mail-from: 3ZzBeXhoKADojknalhu-oipl-pho-nalknpejcckkcha.Yki@smtp-tls-reporting.bounces.google.com
+Received: from mx6 ([10.202.2.205])
+  by compute2.internal (LMTPProxy); Tue, 03 Mar 2020 05:24:41 -0500
+Received: from mx6.messagingengine.com (localhost [127.0.0.1])
+	by mailmx.nyi.internal (Postfix) with ESMTP id 3B8141640130
+	for <tlsrpt@fastmaildmarc.com>; Tue,  3 Mar 2020 05:24:41 -0500 (EST)
+Received: from mx6.messagingengine.com (localhost [127.0.0.1])
+    by mx6.messagingengine.com (Authentication Milter) with ESMTP
+    id 246996787CB;
+    Tue, 3 Mar 2020 05:24:41 -0500
+ARC-Seal: i=1; a=rsa-sha256; cv=none; d=messagingengine.com; s=fm2; t=
+    1583231081; b=zpFezyNleBaUysOEq0SZd1HGRhJ4IH8JG/tN0tjGxqFNcRHZIe
+    LYGIhrbNG2ZpU0FJQ9+mN+Mqidb18hEPFDntVDc0eWKEF+Wcr28TTMnCTRtwL+7v
+    r5RsFZijMlAyaBJb8ETcXeRcjiXFeNlWa0Yh4AwzRH/0RIOh3owrv8FqOKZQtYgg
+    NYDKGeQSf+QGDbi6MsJZQyG5hsGC2QI1g1EWDcS1iksWr8kt6bsbI1JG6by/wjIz
+    K3ajP8coGzmRz/CyOHn3NqtjwHOh2U3jvf5kpZL+BjG/otf6qnOt7YriMETuTyJp
+    U8zUsCig/bWrms5706fSrcIcvp9N3EK1ej4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=
+    messagingengine.com; h=mime-version:date:message-id:subject:from
+    :to:content-type; s=fm2; t=1583231081; bh=F5ENAj8ENPKQchrYB3O08n
+    5DMjCTbaMYq78SLUP9EhQ=; b=1vm06cKEQaiO1nEOlLEMKkSnBQJxFgVKONhCbp
+    842Amd0FTAFIc39iNL3GvXC0AwXlM0z1VOQv5nMp4tLqexfbmtEKqiSKoeCctRm1
+    xIDaa/INzeIaItngb78aPR97vbEUFGadaDOqSozLdQeofLNeC4a27gc7Jhgv11Hg
+    LIiZfyhK74kBxD65gUEE4O1xfaZpOheH2gxT25ANmppDv41qRYtvy+PFsJJad/bk
+    6eQK43UXGeIjpENEe04/iozVl4K8IxhNtXLTzHvcPiNwHn4QFVA4RdV47R4NYhXX
+    G8+yi5x2eoL0Wilizd2uZtQe3czaCgUA2AA5lML5myUgYS5g==
+ARC-Authentication-Results: i=1; mx6.messagingengine.com; arc=none (no signatures found);
+    bimi=none (Domain is not BIMI enabled);
+    dkim=pass (2048-bit rsa key sha256) header.d=google.com
+    header.i=@google.com header.b=W5GeNiti header.a=rsa-sha256
+    header.s=20161025 x-bits=2048;
+    dmarc=pass policy.published-domain-policy=reject
+    policy.applied-disposition=none policy.evaluated-disposition=none
+    (p=reject,d=none,d.eval=none) policy.policy-from=p
+    header.from=google.com;
+    iprev=pass smtp.remote-ip=209.85.167.199 (mail-oi1-f199.google.com);
+    spf=pass
+    smtp.mailfrom=
+    3ZzBeXhoKADojknalhu-oipl-pho-nalknpejcckkcha.Yki@smtp-tls-reporting.bounces.google.com
+    smtp.helo=mail-oi1-f199.google.com;
+    x-aligned-from=orgdomain_pass (Domain org match);
+    x-google-dkim=pass (2048-bit rsa key) header.d=1e100.net
+    header.i=@1e100.net header.b=pd6th5zY;
+    x-ptr=pass smtp.helo=mail-oi1-f199.google.com
+    policy.ptr=mail-oi1-f199.google.com;
+    x-return-mx=pass header.domain=google.com policy.is_org=yes
+    (MX Records found: aspmx.l.google.com,alt4.aspmx.l.google.com,alt2.aspmx.l.google.com,alt3.aspmx.l.google.com,alt1.aspmx.l.google.com);
+    x-return-mx=pass smtp.domain=smtp-tls-reporting.bounces.google.com
+    policy.org_domain=google.com policy.is_org=no
+    (MX Records found: alt1.gmr-smtp-in.l.google.com,gmr-smtp-in.l.google.com,alt2.gmr-smtp-in.l.google.com);
+    x-tls=pass smtp.version=TLSv1.2 smtp.cipher=ECDHE-RSA-AES128-GCM-SHA256
+    smtp.bits=128/128;
+    x-vs=clean score=40 state=0
+Authentication-Results: mx6.messagingengine.com;
+    arc=none (no signatures found);
+    bimi=none (Domain is not BIMI enabled);
+    dkim=pass (2048-bit rsa key sha256) header.d=google.com
+      header.i=@google.com header.b=W5GeNiti header.a=rsa-sha256
+      header.s=20161025 x-bits=2048;
+    dmarc=pass policy.published-domain-policy=reject
+      policy.applied-disposition=none policy.evaluated-disposition=none
+      (p=reject,d=none,d.eval=none) policy.policy-from=p
+      header.from=google.com;
+    iprev=pass smtp.remote-ip=209.85.167.199 (mail-oi1-f199.google.com);
+    spf=pass
+      smtp.mailfrom=
+      3ZzBeXhoKADojknalhu-oipl-pho-nalknpejcckkcha.Yki@smtp-tls-reporting.bounces.google.com
+      smtp.helo=mail-oi1-f199.google.com;
+    x-aligned-from=orgdomain_pass (Domain org match);
+    x-google-dkim=pass (2048-bit rsa key) header.d=1e100.net
+      header.i=@1e100.net header.b=pd6th5zY;
+    x-ptr=pass smtp.helo=mail-oi1-f199.google.com
+      policy.ptr=mail-oi1-f199.google.com;
+    x-return-mx=pass header.domain=google.com policy.is_org=yes
+      (MX Records found: aspmx.l.google.com,alt4.aspmx.l.google.com,alt2.aspmx.l.google.com,alt3.aspmx.l.google.com,alt1.aspmx.l.google.com);
+    x-return-mx=pass smtp.domain=smtp-tls-reporting.bounces.google.com
+      policy.org_domain=google.com policy.is_org=no
+      (MX Records found: alt1.gmr-smtp-in.l.google.com,gmr-smtp-in.l.google.com,alt2.gmr-smtp-in.l.google.com);
+    x-tls=pass smtp.version=TLSv1.2 smtp.cipher=ECDHE-RSA-AES128-GCM-SHA256
+      smtp.bits=128/128;
+    x-vs=clean score=40 state=0
+X-ME-VSCause: gggruggvucftvghtrhhoucdtuddrgedugedruddtiedgudejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucgotffhvedqqdfouhhlth
+    hiphgrrhhttfgvphhorhhtqdfpohftvghpohhrthculdegtddmnecujfgurhepggffkffu
+    hffvtgesphdtreertddtjeenucfhrhhomhepnhhorhgvphhlhidqshhmthhpqdhtlhhsqd
+    hrvghpohhrthhinhhgsehgohhoghhlvgdrtghomhenucffohhmrghinhepfhgrshhtmhgr
+    ihhlughmrghrtgdrtghomhenucfkphepvddtledrkeehrdduieejrdduleelnecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvddtledrkeehrdduieejrddu
+    leelpdhhvghlohepmhgrihhlqdhoihduqdhfudelledrghhoohhglhgvrdgtohhmpdhmrg
+    hilhhfrhhomhepoeefkgiiuegvighhohfmteffohhjkhhnrghlhhhuqdhoihhplhdqphhh
+    ohdqnhgrlhhknhhpvghjtggtkhhktghhrgdrjghkihesshhmthhpqdhtlhhsqdhrvghpoh
+    hrthhinhhgrdgsohhunhgtvghsrdhgohhoghhlvgdrtghomhequcfukfgkgfepfeduleei
+X-ME-VSScore: 40
+X-ME-VSCategory: clean
+Received-SPF: pass
+    (smtp-tls-reporting.bounces.google.com ... _spf.google.com: Sender is authorized to use '3ZzBeXhoKADojknalhu-oipl-pho-nalknpejcckkcha.Yki@smtp-tls-reporting.bounces.google.com' in 'mfrom' identity (mechanism 'include:_netblocks.google.com' matched))
+    receiver=mx6.messagingengine.com;
+    identity=mailfrom;
+    envelope-from="3ZzBeXhoKADojknalhu-oipl-pho-nalknpejcckkcha.Yki@smtp-tls-reporting.bounces.google.com";
+    helo=mail-oi1-f199.google.com;
+    client-ip=209.85.167.199
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mx6.messagingengine.com (Postfix) with ESMTPS
+	for <tlsrpt@fastmaildmarc.com>; Tue,  3 Mar 2020 05:24:41 -0500 (EST)
+Received: by mail-oi1-f199.google.com with SMTP id x207so1488322oix.19
+        for <tlsrpt@fastmaildmarc.com>; Tue, 03 Mar 2020 02:24:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:date:tls-report-domain:tls-report-submitter:message-id
+         :subject:from:to;
+        bh=F5ENAj8ENPKQchrYB3O08n5DMjCTbaMYq78SLUP9EhQ=;
+        b=W5GeNitiWcVwg+KQ2uxi4l+UtzBduoz35T+QMLtTt4HYL5QjmnGVL9Msyj5XI7F80H
+         ZAIvicQQcAS3o3mGJpfqQ2by+tizUZuZ+MUqTC2oX/Hd1S3fXywfLUY3mPJdbVlgcc3z
+         3z6Z3/bLT7VAKZ/AmTSMAuKzC8PtLrkCmsRVL3bntsWf7zqaqTvzNOc2sXMoTpYEeZE9
+         1EnTOkWo/ml9iMOwajJRaWv+HPNs4ZbY5elmw2fHfsUW6KINdV84vajzdsotI/xN5s2C
+         zTIR7bwW/hnqAAW5vpsDv0VD5NSQ4r4d3qLfpKwYHFkmWLZuOeLQFTjOkMHHNT+oXJp1
+         c79g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:tls-report-domain
+         :tls-report-submitter:message-id:subject:from:to;
+        bh=F5ENAj8ENPKQchrYB3O08n5DMjCTbaMYq78SLUP9EhQ=;
+        b=pd6th5zYo682MUr7GpTvesKZHAvHDkmnXdgAx+20829eawIgHCCS6jVrLKbjwFgcLk
+         X9i7toJfXVoIKhh/oGLinwZf+LmOqiKrY85nSLzUsgqk5Bwb1bwemtmvciu+EQUXBhKB
+         PQUfNt1b2MNghHraelsV9OmlxIc8+VjQas0rb47C+S4BurmOXGCvUyEJbzgTge0rcg3X
+         DtjhRpTHcQsBzvdkMefhut6L4xrdq3x59xpfChXQt+qEx5Fgvla4CE6ypHSfwhEDwxee
+         ISCFiWIX0TnvF98vNt2my2z4KINRe+qSWwSqGhMUf5dcH8YWFpop9cxt1pq0kTQuTz4a
+         59Fw==
+X-Gm-Message-State: ANhLgQ1S9H0KoyL0UNOgH7e7PMZt3xxQa7ZwiLPP0z0ufzt4cz82uhUU
+	gg+XZp4WwrvRqL6b72BX6WCsDsENiKxnbXDRaxBqUWpVEQ==
+X-Google-Smtp-Source: ADFU+vtFzaedLXtRsTY3cxbeLzFpsVuJK/b0l8yx1P/3d7Jz8giNiCXeKgjKbgYEEekpzM1JuZdM1H/Ohf8DRO83Gk1DeTI+bBtGGoOINKo=
+MIME-Version: 1.0
+X-Received: by 2002:a9d:3b6:: with SMTP id f51mr2962251otf.255.1583231079264;
+ Tue, 03 Mar 2020 02:24:39 -0800 (PST)
+Date: Tue, 03 Mar 2020 02:24:39 -0800
+TLS-Report-Domain: fastmaildmarc.com
+TLS-Report-Submitter: google.com
+Message-ID: <00000000000013b408059ff0b6f0@google.com>
+Subject: Report Domain: fastmaildmarc.com Submitter: google.com Report-ID: <2020.03.02T00.00.00Z+fastmaildmarc.com@google.com>
+From: noreply-smtp-tls-reporting@google.com
+To: tlsrpt@fastmaildmarc.com
+Content-Type: multipart/report; boundary="00000000000013b3e8059ff0b6ef"; report-type=tlsrpt
+
+--00000000000013b3e8059ff0b6ef
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+
+This is an aggregate TLS report from google.com
+
+--00000000000013b3e8059ff0b6ef
+Content-Type: application/tlsrpt+gzip; 
+	name="google.com!fastmaildmarc.com!1583107200!1583193599!001.json.gz"
+Content-Disposition: attachment; 
+	filename="google.com!fastmaildmarc.com!1583107200!1583193599!001.json.gz"
+Content-Transfer-Encoding: base64
+
+H4sIAAAAAAAAAHVQy2rEMAz8leJztJikPTSn3krvPW1ZirCdYIilYCuHbMi/V3n00rIgsDSeGY29
+GM49UryjRCYgTMG05p25H8LTB7mLqYxHCZCRer1aTBHMAhsmcSfXtrZgG7D1p7XtXldVBfIPWHXT
+vrxqXc1aGcck6AQiday0kmQEGQrkMHKWSP1bv4e5OE7qesAQ/YPF3x0WSRgHnzC7UzTyEF0MxbRf
+yzHM20uODmQet4DEcAIdT+R/ZTN4Vj9Sxn9rzV+mpOPuJyw4QJmcC6V0k7Z6br/q1FBM2zw31Unq
+1GbK4S/Drutt/QFwST34kwEAAA==
+--00000000000013b3e8059ff0b6ef--
+

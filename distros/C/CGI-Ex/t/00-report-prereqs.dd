@@ -1,0 +1,65 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::ConsistentVersion' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'CGI' => '0',
+                                      'Carp' => '0',
+                                      'Data::Dumper' => '0',
+                                      'Exporter' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Template::Alloy' => '1.016',
+                                      'Time::HiRes' => '0',
+                                      'base' => '0',
+                                      'constant' => '0',
+                                      'overload' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'vars' => '0',
+                                      'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'CGI' => '4.45',
+                                      'Config::IniHash' => '0',
+                                      'File::Find' => '0',
+                                      'JSON' => '0',
+                                      'Storable' => '0',
+                                      'XML::Simple' => '0',
+                                      'YAML' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'FindBin' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'lib' => '0'
+                                 },
+                   'suggests' => {
+                                   'Tie::Handle' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

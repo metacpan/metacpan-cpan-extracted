@@ -11,7 +11,7 @@ use Fcntl 'O_NONBLOCK';
 require DynaLoader;
 
 our @ISA = qw(DynaLoader);
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 bootstrap POSIX::RT::MQ $VERSION;
 
@@ -76,6 +76,14 @@ sub receive
     my $self = shift;
     (@_ == 0) or croak 'Usage: $mq->receive()';
     my @result = mq_receive($self->{mqdes}, $self->{_saved_attr_}{mq_msgsize});
+    wantarray ? @result : $result[0];
+}
+
+sub timedreceive
+{
+    my $self = shift;
+    (@_ <= 1) or croak 'Usage: $mq->timedreceive([ $time_in_seconds] )';
+    my @result = mq_timedreceive($self->{mqdes}, $self->{_saved_attr_}{mq_msgsize}, @_ );
     wantarray ? @result : $result[0];
 }
 
@@ -280,6 +288,20 @@ as the first element and it's priority as the second.
 
 On errror returns C<undef> or an empty list.
 
+=item timedreceive
+
+A wrapper for the C<mq_timedeceive()> function.
+
+ $msg = $mq->timedreceive($timeout);
+ ($msg, $prio) = $mq->receive();
+
+Gets a message from the queue waiting for at most $timeout seconds.
+In scalar context returns just the message, in list context
+returns a two-element array which contains the message
+as the first element and it's priority as the second.
+
+On errror or timeout returns C<undef> or an empty list.
+
 =item send( $msg [, $prio ] )
 
 A wrapper for the C<mq_send()> function.
@@ -422,11 +444,15 @@ Ilja Tabachnik E<lt>billy@arnis-bsl.comE<gt>
 
 Wieger Opmeer E<lt>wiegerop@cpan.orgE<gt>
 
+=head1 THANKS
+
+Thanks to Jim Dodgen for the timedreceive code
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2003, Ilja Tabachnik
 
-Copyright (C) 2019, Wieger Opmeer
+Copyright (C) 2019, 2020 Wieger Opmeer
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

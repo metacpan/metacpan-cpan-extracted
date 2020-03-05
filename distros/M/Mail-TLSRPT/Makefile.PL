@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "Import::Into" => 0,
     "JSON" => 0,
     "Moo" => 0,
+    "Net::IP" => 0,
     "Type::Utils" => 0,
     "Types::Standard" => 0,
     "feature" => 0,
@@ -32,27 +33,34 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "Clone" => 0,
+    "Test::Exception" => 0,
+    "Test::More" => 0,
+    "lib" => 0
   },
-  "VERSION" => "1.20200303.1",
+  "VERSION" => "1.20200305.1",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Clone" => 0,
   "Date::Parse" => 0,
   "DateTime" => 0,
   "English" => 0,
   "Import::Into" => 0,
   "JSON" => 0,
   "Moo" => 0,
+  "Net::IP" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "Type::Utils" => 0,
   "Types::Standard" => 0,
   "feature" => 0,
+  "lib" => 0,
   "open" => 0,
   "strict" => 0,
   "warnings" => 0

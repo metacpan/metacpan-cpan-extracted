@@ -145,6 +145,32 @@ mq_receive(mqdes, msg_max_len)
         XPUSHs(sv_2mortal(newSVuv(msg_prio)));
         free(msg_ptr);
 
+void
+mq_timedreceive(mqdes, msg_max_len, seconds)
+        mqd_t        mqdes
+        size_t       msg_max_len
+        unsigned int seconds
+
+    PREINIT:
+        char*        msg_ptr;
+        ssize_t      msg_len;
+        unsigned int msg_prio;
+    PPCODE:
+        struct timespec abs_timeout;
+        clock_gettime(CLOCK_REALTIME, &abs_timeout);
+        abs_timeout.tv_sec += seconds;
+        if ((msg_ptr = malloc(msg_max_len)) == NULL) { XSRETURN_EMPTY; }
+        msg_len = mq_timedreceive(mqdes, msg_ptr, msg_max_len, &msg_prio,
+        &abs_timeout);
+        if (msg_len == -1)
+        {
+            free(msg_ptr);
+            XSRETURN_EMPTY;
+        }
+        XPUSHs(sv_2mortal(newSVpvn(msg_ptr, msg_len)));
+        XPUSHs(sv_2mortal(newSVuv(msg_prio)));
+        free(msg_ptr);
+
 int 
 mq_notify(mqdes, ...)
         mqd_t  mqdes

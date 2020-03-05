@@ -4,11 +4,17 @@ author:
   - 'Paul Seamons'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::More: '0'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,19 +22,35 @@ meta-spec:
 name: CGI-Ex
 no_index:
   directory:
-    - t
-    - inc
-    - t
     - samples
+    - t
 requires:
   CGI: '0'
-  File::Temp: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  Scalar::Util: '0'
   Template::Alloy: '1.016'
+  Time::HiRes: '0'
+  base: '0'
+  constant: '0'
+  overload: '0'
   perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/ljepson/CGI-Ex/issues
-  homepage: https://metacpan.org/module/CGI::Ex
-  license: https://dev.perl.org/licenses/
-  repository: git://github.com/ljepson/CGI-Ex.git
-version: '2.48'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  homepage: https://github.com/ljepson/CGI-Ex
+  repository: https://github.com/ljepson/CGI-Ex.git
+version: '2.49'
+x_contributors:
+  - 'Lonny <jiskiras@gmail.com>'
+  - 'Charles McGarvey <chazmcgarvey@brokenzipper.com>'
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+  - 'Petr Písař <ppisar@redhat.com>'
+  - 'Matt Devey <mdevey91@gmail.com>'
+  - 'Paul Seamons <paul.seamons@endurance.com>'
+x_generated_by_perl: v5.22.4
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

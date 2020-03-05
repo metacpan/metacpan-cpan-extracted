@@ -1,0 +1,86 @@
+---
+abstract: 'a collection of Tickit::Widget implementations (using Object::Pad)'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Identity: '0'
+  Test::More: '0.88'
+  Test::Refcount: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alt-Tickit-Widgets-ObjectPad
+provides:
+  Alt::Tickit::Widgets::ObjectPad:
+    file: lib/Alt/Tickit/Widgets/ObjectPad.pm
+    version: '0.29'
+  Tickit::ContainerWidget:
+    file: lib/Tickit/ContainerWidget.pm
+    version: '0.52'
+  Tickit::OneLineWidget:
+    file: lib/Tickit/OneLineWidget.pm
+    version: '0.51'
+  Tickit::SingleChildWidget:
+    file: lib/Tickit/SingleChildWidget.pm
+    version: '0.52'
+  Tickit::Style:
+    file: lib/Tickit/Style.pm
+    version: '0.51'
+  Tickit::Style::Parser:
+    file: lib/Tickit/Style/Parser.pm
+    version: '0.51'
+  Tickit::Widget:
+    file: lib/Tickit/Widget.pm
+    version: '0.53'
+  Tickit::Widget::Box:
+    file: lib/Tickit/Widget/Box.pm
+    version: '0.52'
+  Tickit::Widget::Frame:
+    file: lib/Tickit/Widget/Frame.pm
+    version: '0.31'
+  Tickit::Widget::HBox:
+    file: lib/Tickit/Widget/HBox.pm
+    version: '0.47'
+  Tickit::Widget::HSplit:
+    file: lib/Tickit/Widget/HSplit.pm
+    version: '0.29'
+  Tickit::Widget::LinearBox:
+    file: lib/Tickit/Widget/LinearBox.pm
+    version: '0.46'
+  Tickit::Widget::LinearSplit:
+    file: lib/Tickit/Widget/LinearSplit.pm
+    version: '0.29'
+  Tickit::Widget::VBox:
+    file: lib/Tickit/Widget/VBox.pm
+    version: '0.47'
+  Tickit::Widget::VSplit:
+    file: lib/Tickit/Widget/VSplit.pm
+    version: '0.29'
+  Tickit::WidgetRole:
+    file: lib/Tickit/WidgetRole.pm
+    version: '0.51'
+  Tickit::WidgetRole::Alignable:
+    file: lib/Tickit/WidgetRole/Alignable.pm
+    version: '0.51'
+  Tickit::Widgets:
+    file: lib/Tickit/Widgets.pm
+    version: '0.29'
+requires:
+  List::Util: '1.33'
+  Object::Pad: '0.09'
+  Parser::MGC: '0'
+  Struct::Dumb: '0'
+  Tickit::Event: '0.63'
+  Tickit::RenderBuffer: '0'
+  Tickit::Utils: '0.29'
+  Tickit::Window: '0.57'
+  perl: '5.010'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.29'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

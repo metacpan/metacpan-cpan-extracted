@@ -84,14 +84,23 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
 #if NVSIZE > IVSIZE                          /* $Config{nvsize} > $Config{ivsize} */
         nv_arg = SvNV(arg);
 
-        if(nv_arg == 0) {
-            /* use 0 for both 0 and -0.0 */
-            sv_setpvs(keysv, "0");
+        /* use 0 for all zeros */
+        if(nv_arg == 0) sv_setpvs(keysv, "0");
+
+        /* for NaN, use the platform's normal stringification */
+        else if (nv_arg != nv_arg) sv_setpvf(keysv, "%" NVgf, nv_arg);
+
+#ifdef NV_IS_DOUBLEDOUBLE
+
+        /* If the least significant double is zero, it could be     *
+         * either 0.0 or -0.0. We should therefore ignore the least *
+         * significant double and assign to keysv only the bytes    *
+         * of the most significant double.                          */
+        else if(nv_arg == (double)nv_arg) {
+            double double_arg = (double)nv_arg;
+            sv_setpvn(keysv, (char *) &double_arg, 8);
         }
-        else if (nv_arg != nv_arg) {
-            /* for NaN, use the platform's normal stringification */
-            sv_setpvf(keysv, "%" NVgf, nv_arg);
-        }
+#endif
         else {
             /* Use the byte structure of the NV.                               *
              * ACTUAL_NVSIZE == sizeof(NV) minus the number of bytes           *
@@ -101,53 +110,49 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
             sv_setpvn(keysv, (char *) &nv_arg, ACTUAL_NVSIZE);  
         }
 #else                                       /* $Config{nvsize} == $Config{ivsize} == 8 */ 
-        if(!SvOK(arg) || SvUOK(arg)) {
-            UV uv = SvUV(arg);
+        if( SvIOK(arg) || !SvOK(arg) ) {
+            IV iv = SvIV(arg);   /* Doesn't matter if SvUOK(arg) is TRUE */
+            int uok = SvUOK(arg);
+            int sign = ( iv > 0 || uok ) ? 1 : -1;
 
-            /* Set keysv to the bytes of SvNV(arg) if and only if *
-               SvUV(arg) can be exactly represented as a double   */
+            /* use "0" for all zeros */
+            if(iv == 0) sv_setpvs(keysv, "0");
+            else {
 
-            while(!(uv & 1) && uv > 9007199254740992)
-                uv >>= 1;
+                /* Set keysv to the bytes of SvNV(arg) if and only if *
+                 * the integer value held by arg can be represented   *
+                 * exactly as a double.                               *
+                 * We use the solution provided by roboticus at:      *
+                 * https://www.perlmonks.org/?node_id=11113490        *
+                 * as it's the most efficient way I could find.       *
+                 * First we need to identify the lowest bit set       */
+                IV last_set = iv & -iv;
 
-            if(uv < 9007199254740993) { /* SvUV(arg) can be represented precisely by a double */
-                nv_arg = SvNV(arg);
-                sv_setpvn(keysv, (char *) &nv_arg, 8);
+                /* Shift it left 53 bits to get location of lowest invalid bit         *
+                 * NOTE: If smallest invalid bit is far enough left, then this will    *
+                 * turn into 0 making the invalid bits also 0, which happens to be OK! */
+                UV valid_bits = (last_set << 53) - 1; /* last_set always >= 0 */
+
+               /* The value of arg can be exactly represented by a double *
+                * unless one of the upper-order invalid bits are set.     */
+                if(!((iv * sign) & (~valid_bits))) {
+                    nv_arg = SvNV(arg);
+                    sv_setpvn(keysv, (char *) &nv_arg, 8);
+                }          
+                else if(uok) sv_setpvf(keysv, "%" UVuf, iv);
+                else sv_setpvf(keysv, "%" IVdf, iv);
             }
-            else
-            sv_setpvf(keysv, "%" UVuf, SvUV(arg));
-        }
-        else if(SvIOK(arg)) {
-            /* Set unsign to absolute value of SvIV(arg) */
-            UV unsign = SvIV(arg) < 0 ? SvIV(arg) * -1 : SvIV(arg);
-            
-            /* Set keysv to the bytes of SvNV(arg) if and only if *
-               SvIV(arg) can be exactly represented as a double   */
-                 
-            while(!(unsign & 1) && unsign > 9007199254740992)
-                unsign >>= 1;
 
-            if(unsign < 9007199254740993) { /* SvIV(arg) can be represented precisely by a double */
-                nv_arg = SvNV(arg);
-                sv_setpvn(keysv, (char *) &nv_arg, 8);
-            }
-            else
-            sv_setpvf(keysv, "%" IVdf, SvIV(arg));
         }
         else {
             nv_arg = SvNV(arg);
 
             /* for NaN, use the platform's normal stringification */
+            if (nv_arg != nv_arg) sv_setpvf(keysv, "%" NVgf, nv_arg);
 
-            if (nv_arg != nv_arg) {
-                sv_setpvf(keysv, "%" NVgf, nv_arg);
-            }
-            else {
-                if(nv_arg == 0.0) {
-                    nv_arg = 0.0; /* Ensure that nv_arg is 0.0, not -0.0 */
-                }
-                sv_setpvn(keysv, (char *) &nv_arg, 8);
-            }
+            /* use "0" for all zeros */
+            else if(nv_arg == 0) sv_setpvs(keysv, "0");
+            else sv_setpvn(keysv, (char *) &nv_arg, 8);
         }
 #endif
 #ifdef HV_FETCH_EMPTY_HE

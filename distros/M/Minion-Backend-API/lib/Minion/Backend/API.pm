@@ -2,8 +2,9 @@ package Minion::Backend::API;
 use Mojo::Base 'Minion::Backend';
 
 use Mojo::UserAgent;
+use Carp 'croak';
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has 'ua';
 has 'url';
@@ -18,9 +19,9 @@ sub broadcast {
             args    => $args,
             ids     => $ids
         }
-    )->result;
+    );
     
-    $self->_success($res);    
+    $self->_result($res);    
 }
 
 sub dequeue {
@@ -37,9 +38,9 @@ sub dequeue {
             options => $options,
             tasks   => [keys %{$self->minion->tasks}]
         }
-    )->result;
+    );
     
-    $self->_success($res);    
+    $self->_result($res);    
 }
 
 sub enqueue {
@@ -52,9 +53,9 @@ sub enqueue {
             args    => $args,
             options => $options
         }
-    )->result;
+    );
     
-    $self->_success($res);    
+    $self->_result($res);    
 }
 
 sub fail_job {
@@ -67,9 +68,9 @@ sub fail_job {
             retries => $retries,
             result  => $result
         }
-    )->result;
+    );
     
-    $self->_success($res);    
+    $self->_result($res);    
 }
 
 sub finish_job {
@@ -82,17 +83,17 @@ sub finish_job {
             retries => $retries,
             result  => $result
         }
-    )->result;
+    );
     
-    $self->_success($res);   
+    $self->_result($res);   
 }
 
 sub history {
     my $self = shift;
     
-    my $res = $self->ua->get($self->url . '/history')->result;
+    my $res = $self->ua->get($self->url . '/history');
     
-    $self->_success($res);
+    $self->_result($res);
 }
 
 sub list_jobs {
@@ -105,9 +106,9 @@ sub list_jobs {
             limit   => $limit,
             options => $options
         }
-    )->result;
+    );
     
-    $self->_success($res);    
+    $self->_result($res);    
 }
 
 sub list_locks {
@@ -120,9 +121,9 @@ sub list_locks {
             limit   => $limit,
             options => $options
         }
-    )->result;
+    );
     
-    $self->_success($res);    
+    $self->_result($res);    
 }
 
 sub list_workers {
@@ -135,9 +136,9 @@ sub list_workers {
             limit   => $limit,
             options => $options
         }
-    )->result;
+    );
     
-    $self->_success($res);    
+    $self->_result($res);    
 }
 
 sub lock {
@@ -150,9 +151,9 @@ sub lock {
             duration => $duration,
             options  => $options
         }
-    )->result;
+    );
     
-    $self->_success($res);    
+    $self->_result($res);    
 }
 
 sub new {
@@ -177,9 +178,9 @@ sub note {
             id    => $id,
             merge => $merge
         }
-    )->result;
+    );
     
-    $self->_success($res);    
+    $self->_result($res);    
 }
 
 sub receive {
@@ -190,9 +191,9 @@ sub receive {
         => json => {
             id => $id
         }
-    )->result;
+    );
     
-    $self->_success($res);    
+    $self->_result($res);    
 }
 
 sub register_worker {
@@ -204,9 +205,9 @@ sub register_worker {
             id      => $id,
             options => $options
         }
-    )->result;
+    );
     
-    $self->_success($res);   
+    $self->_result($res);   
 }
 
 sub remove_job {
@@ -217,9 +218,9 @@ sub remove_job {
         => json => {
             id => $id
         }
-    )->result;
+    );
     
-    $self->_success($res);     
+    $self->_result($res);     
 }
 
 sub repair {
@@ -227,9 +228,9 @@ sub repair {
     
     my $res = $self->ua->post(
         $self->url . '/repair'
-    )->result;
+    );
     
-    $self->_success($res);    
+    $self->_result($res);    
 }
 
 sub reset {
@@ -240,9 +241,9 @@ sub reset {
         => json => {
             options => $options
         }
-    )->result;
+    );
     
-    $self->_success($res);   
+    $self->_result($res);   
 }
 
 sub retry_job {
@@ -255,17 +256,17 @@ sub retry_job {
             retries => $retries,
             options => $options
         }
-    )->result;
+    );
     
-    $self->_success($res);     
+    $self->_result($res);     
 }
 
 sub stats {
     my $self = shift;
     
-    my $res = $self->ua->get($self->url . '/stats')->result;
+    my $res = $self->ua->get($self->url . '/stats');
     
-    $self->_success($res);
+    $self->_result($res);
 }
 
 sub unlock {
@@ -276,9 +277,9 @@ sub unlock {
         => json => {
             name => $name
         }
-    )->result;
+    );
     
-    $self->_success($res);     
+    $self->_result($res);     
 }
 
 sub unregister_worker {
@@ -289,21 +290,25 @@ sub unregister_worker {
         => json => {
             id => $id
         }
-    )->result;
+    );
     
-    $self->_success($res);
+    $self->_result($res);
 }
 
-sub _success {
+sub _result {
     my ($self, $res) = @_;
+
+    my $result = $res->result;
     
-    if ($res->is_success) {
-        my $data = $res->json;
+    if ($result->is_success) {
+        my $data = $result->json;
         
         return $data->{result} || undef if $data->{success};
     }
     
-    return;     
+    croak $result->message if $result->is_error;
+
+    return;
 }
 
 1;

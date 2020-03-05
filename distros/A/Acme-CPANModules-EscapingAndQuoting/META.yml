@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-EscapingAndQuoting
   homepage: https://metacpan.org/release/Acme-CPANModules-EscapingAndQuoting
   repository: git://github.com/perlancar/perl-Acme-CPANModules-EscapingAndQuoting.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

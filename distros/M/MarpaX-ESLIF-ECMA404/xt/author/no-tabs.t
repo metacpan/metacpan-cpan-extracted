@@ -8,8 +8,6 @@ use Test::NoTabs;
 
 my @files = (
     'lib/MarpaX/ESLIF/ECMA404.pm',
-    'lib/MarpaX/ESLIF/ECMA404/RecognizerInterface.pm',
-    'lib/MarpaX/ESLIF/ECMA404/ValueInterface.pm',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',

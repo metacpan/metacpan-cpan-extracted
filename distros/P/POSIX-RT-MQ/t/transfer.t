@@ -19,7 +19,8 @@ BEGIN
     use vars qw(@tests $testqueue @q_len @msg_len);
     @tests = ( \&test_integrity,
                \&test_nonblocking,
-               \&test_blocking );
+               \&test_blocking,
+               \&test_timed );
     # linux has a default maxmsg of 10 for non-privileged users
     # so use some low suitable whacky numbers
     #@q_len    = (1, 10, 128);
@@ -74,7 +75,7 @@ sub test_integrity
                 $msg eq $saved->[0] && $prio == $saved->[1]  or die "unexpected message and (or) priority\n";
             }
        }
-    }       
+    }
     1;
 }    
 
@@ -102,7 +103,7 @@ sub test_nonblocking
     my ($msg, undef) = construct_message($msg_len, 0);
     $mq->send($msg)  and die "send() OK to full queue\n";
     
-    1;      
+    1;
 }
 
 sub test_blocking
@@ -114,7 +115,7 @@ sub test_blocking
     
     POSIX::RT::MQ->unlink($testqueue);
     my $mq = POSIX::RT::MQ->open($testqueue, O_RDWR|O_CREAT, 0600, $attr)  or die "cannot open($testqueue, O_RDWR|O_CREAT, 0600, ...): $!\n";
-    
+
     # receive from empty queue
     {
         my $timeout = '';
@@ -124,13 +125,13 @@ sub test_blocking
         $timeout eq 'TIMEOUT'  or die "receive() didn't block\n";
     }
 
-    # fill the queue    
+    # fill the queue
     for (my $m=0; $m<$q_len; $m++)
     {
         my ($msg, undef) = construct_message($msg_len, $m);
         $mq->send($msg)  or die "cannot send(...): $!\n";
     }
-    
+
     # send to full queue
     {
         my $timeout = '';
@@ -140,8 +141,47 @@ sub test_blocking
         $mq->send($msg);
         $timeout eq 'TIMEOUT'  or die "send() didn't block\n";
     }
-    
-    1;      
+
+    1;
+}
+
+sub test_timed
+{
+    my $q_len   = $q_len[-1];
+    my $msg_len = $msg_len[-1];
+    #print STDERR "test_blocking { mq_maxmsg=>$q_len, mq_msgsize=>$msg_len }\n";
+    my $attr    = { mq_maxmsg=>$q_len, mq_msgsize=>$msg_len };
+
+    POSIX::RT::MQ->unlink($testqueue);
+    my $mq = POSIX::RT::MQ->open($testqueue, O_RDWR|O_CREAT, 0600, $attr)  or die "cannot open($testqueue, O_RDWR|O_CREAT, 0600, ...): $!\n";
+
+    # receive from empty queue
+    {
+        my $timeout = '';
+        local $SIG{ALRM} = sub { $timeout = 'TIMEOUT' };
+        alarm(3);
+        my $msg = $mq->timedreceive(1);
+        $timeout eq 'TIMEOUT' and die "timedreceive() didn't timeout\n";
+        $msg and die "received msg from empty queue\n";
+    }
+
+    # put something in the queue
+    {
+         my ($msg, undef) = construct_message($msg_len, 1);
+         $mq->send($msg)  or die "cannot send(...): $!\n";
+    }
+
+    # receive from non-empty queue
+    {
+        my $timeout = '';
+        local $SIG{ALRM} = sub { $timeout = 'TIMEOUT' };
+        alarm(3);
+        my $msg = $mq->timedreceive(1);
+        $timeout eq 'TIMEOUT' and die "timedreceive() blocked on non-empty queue\n";
+        $msg or die "did not receive msg from non-empty queue\n";
+    }
+
+    1;
 }
 
 sub construct_message

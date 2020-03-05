@@ -28,11 +28,6 @@ use Test::Trap;
 
 BEGIN { require_ok('MarpaX::ESLIF::ECMA404') };
 
-my $ecma404 = MarpaX::ESLIF::ECMA404->new(
-    # logger => $log
-    );
-isa_ok($ecma404, 'MarpaX::ESLIF::ECMA404');
-
 diag("###########################################################");
 diag("Testing inline JSON data");
 diag("###########################################################");
@@ -156,8 +151,14 @@ foreach my $dir_basename (qw/test_parsing test_transform/) {
 sub do_test {
     my ($want_ok, $name, $input, $encoding) = @_;
 
-    my @r = trap { $ecma404->decode($input, $encoding) };
-    ok($want_ok ? scalar(@r) : !scalar(@r), $name);
+    my @r = trap { MarpaX::ESLIF::ECMA404->decode($input, strict => 1, encoding => $encoding) };
+    my $ok = $want_ok ? scalar(@r) : !scalar(@r);
+    ok($ok, $name);
+    #
+    # We always printout information in case of failure or in case of implementation specific behaviour
+    #
+    print STDOUT $trap->stdout if $trap->stdout && (!$ok || $name =~ /(?:ok|ko) \/ i_/);
+    print STDERR $trap->stderr if $trap->stderr && (!$ok || $name =~ /(?:ok|ko) \/ i_/);
 }
 
 #

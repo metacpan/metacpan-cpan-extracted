@@ -4,9 +4,9 @@ use Mojo::Base -base;
 use Mojo::Loader qw(load_class);
 use Mojo::Server;
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
-has [qw/id parent_id user/];
+has [qw/id guard parent_id user/];
 
 has 'app' => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') }, weak => 1;
 
@@ -49,7 +49,7 @@ has 'subtasks' => sub { [] };
 has 'tags' => sub {
     my $self = shift;
 
-    my @tags = map(sprintf("%s %s", $_, $self->args->{ $_ }), sort(keys(%{ $self->args })));
+    my @tags = $self->tagify($self->args);
 
     return \@tags;
 };
@@ -107,6 +107,43 @@ sub start {
     }
 
     return $ok;
+}
+
+=head2 tag
+
+Convert name and value to a tag
+
+=cut
+
+sub tag {
+    my ($self, $name, $value) = @_;
+
+    return sprintf("%s %s", $name, $value);
+}
+
+=head2 tagify
+
+Convert a hash to an array of tags
+
+=cut
+
+sub tagify {
+    my ($self, $args, $prefix) = @_;
+    $prefix ||= '';
+
+    my @tags;
+
+    for my $key (sort(keys(%{ $args }))) {
+        if (ref($args->{ $key }) eq 'HASH') {
+            push(@tags, $self->tagify($args->{ $key }, $prefix . $key . ' '));
+        } elsif (ref($args->{ $key }) eq 'ARRAY') {
+            push(@tags, $self->tag($prefix . $key, join(', ', @{ $args->{ $key } })));
+        } else {
+            push(@tags, $self->tag($prefix . $key, $args->{ $key }));
+        }
+    }
+
+    return @tags;
 }
 
 1;

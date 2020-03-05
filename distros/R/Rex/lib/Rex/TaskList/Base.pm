@@ -9,7 +9,7 @@ package Rex::TaskList::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.1'; # VERSION
+our $VERSION = '1.8.2'; # VERSION
 
 BEGIN {
   use Rex::Shared::Var;
@@ -379,7 +379,7 @@ sub modify {
   $package =~ s/::/:/g;
 
   my @all_tasks = map { $self->get_task($_); } grep {
-    if ( $package ne "main" && $package ne "Rex::CLI" ) {
+    if ( $package ne "main" && $package ne "Rex:CLI" ) {
       $_ =~ m/^\Q$package\E:/;
     }
     else {

@@ -8,7 +8,7 @@ use Mojo::File;
 use POSIX qw(strftime);
 use Cwd 'getcwd';
 use File::Spec::Functions qw(catdir catfile);
-our $VERSION = '0.4.0';
+our $VERSION = '0.4.1';
 has description => 'Generate Callbackery web application with Automake';
 has usage => sub { shift->extract_usage };
 
@@ -48,7 +48,7 @@ sub file {
         'frontend/compile.json' => 'frontend/compile.json',
         'frontend/compile.js' => 'frontend/compile.js',
         'frontend/package.json' => 'frontend/package.json',
-        'frontend/boot/index.html' => 'frontend/source/boot/index.html',
+        'frontend/source/boot/index.html' => 'frontend/source/boot/index.html',
         'frontend/source/class/app/Application.js' => 'frontend/source/class/'.$self->class_file.'/Application.js',
         'frontend/source/class/app/__init__.js' => 'frontend/source/class/'.$self->class_file.'/__init__.js',
         'frontend/source/class/app/theme/Theme.js' => 'frontend/source/class/'.$self->class_file.'/theme/Theme.js',

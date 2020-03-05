@@ -1,3 +1,11 @@
+0.002   2019-12-24  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Acme::CPANModules to
+          add FAQ section.
+
+
 0.001   2019-12-23  Released-By: PERLANCAR
 
         - First release.

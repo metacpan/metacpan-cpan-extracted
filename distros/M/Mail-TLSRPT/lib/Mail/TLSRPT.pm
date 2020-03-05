@@ -1,6 +1,6 @@
 package Mail::TLSRPT;
 # ABSTRACT: TLSRPT object
-our $VERSION = '1.20200303.1'; # VERSION
+our $VERSION = '1.20200305.1'; # VERSION
 use 5.20.0;
 use Moo;
 use Carp;

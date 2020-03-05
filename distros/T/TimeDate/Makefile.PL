@@ -11,19 +11,11 @@ WriteMakefile(
   DISTNAME => 'TimeDate',
   AUTHOR   => 'Graham Barr <gbarr@pobox.com>',
   VERSION_FROM => 'lib/Date/Parse.pm',
-  (eval { ExtUtils::MakeMaker->VERSION(6.21) } ? (LICENSE => 'perl') : ()),
-  ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (
-      META_MERGE => {
+  META_MERGE => {
       resources => {
-        bugtracker => {web => 'https://github.com/atoomic/perl-TimeDate/issues'},
-        repository => {
-          type => 'git',
-          url  => 'https://github.com/atoomic/perl-TimeDate.git',
-          web  => 'https://github.com/atoomic/perl-TimeDate',
-        },
+        bugtracker => 'https://github.com/atoomic/perl-TimeDate/issues',
+        repository => 'https://github.com/atoomic/perl-TimeDate',
       }
-    }
-      )
-    : ()
-  ),
+  },
+  (eval { ExtUtils::MakeMaker->VERSION(6.21) } ? (LICENSE => 'perl') : ()),
 );

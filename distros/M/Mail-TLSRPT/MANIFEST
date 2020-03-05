@@ -12,3 +12,12 @@ lib/Mail/TLSRPT/Failure.pm
 lib/Mail/TLSRPT/Policy.pm
 lib/Mail/TLSRPT/Pragmas.pm
 lib/Mail/TLSRPT/Report.pm
+t/00-load.t
+t/01-failure-no-sub.t
+t/01-policy-no-sub.t
+t/01-report-no-sub.t
+t/02-data-full.t
+t/02-text-full.t
+t/data/email.eml
+t/data/report.json
+t/data/report.json.gz.b64

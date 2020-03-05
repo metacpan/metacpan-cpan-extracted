@@ -1,0 +1,34 @@
+NAME
+
+    Alt::Tickit::Widgets::ObjectPad - an alternative implemention of
+    Tickit::Widgets based on Object::Pad
+
+DESCRIPTION
+
+    This distribution provides an alternative implementation of
+    Tickit::Widgets whose classes are built using Object::Pad, rather than
+    basic perl OO. Its functionallity is intended to be identical to the
+    primary distribution. It exists simply to demonstrate the use of
+    Object::Pad in nontrivial code examples, and to help smoke test the
+    module being used.
+
+INSTALLATION
+
+    For safety purposes, by default this module installs into a local
+    directory rather than overwriting the primary installation path. If you
+    wish to install this implementation directly over the primary one, set
+    the environment variable PERL_ALT_INSTALL to the value OVERWRITE.
+
+       $ PERL_ALT_INSTALL=OVERWRITE cpan Alt::Tickit::Widgets::ObjectPad
+
+    or
+
+       $ PERL_ALT_INSTALL=OVERWRITE perl Build.PL
+       $ ./Build && ./Build install
+
+    or other equivalent.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

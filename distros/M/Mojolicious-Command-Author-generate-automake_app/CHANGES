@@ -1,3 +1,7 @@
+0.4.1 2020-03-04 22:05:46 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix errors in sample code
+
 0.4.0 2020-03-04 18:23:23 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - add action button property config demo (cb 0.30.0)

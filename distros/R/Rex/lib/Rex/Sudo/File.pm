@@ -11,7 +11,7 @@ package Rex::Sudo::File;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.1'; # VERSION
+our $VERSION = '1.8.2'; # VERSION
 
 use Rex;
 use Rex::Commands;

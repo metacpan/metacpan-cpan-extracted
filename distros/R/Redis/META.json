@@ -65,7 +65,7 @@
          "web" : "https://github.com/PerlRedis/perl-redis"
       }
    },
-   "version" : "1.995",
+   "version" : "1.996",
    "x_generated_by_perl" : "v5.28.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

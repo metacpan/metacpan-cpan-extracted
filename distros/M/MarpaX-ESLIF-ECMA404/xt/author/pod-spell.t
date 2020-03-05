@@ -16,7 +16,5 @@ ECMA404
 ESLIF
 Jean
 MarpaX
-RecognizerInterface
-ValueInterface
 jeandamiendurand
 lib

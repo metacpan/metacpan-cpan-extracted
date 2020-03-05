@@ -399,6 +399,7 @@ t/helper_hash.t
 t/helper_path.t
 t/hooks.t
 t/hooks_in_pkg.t
+t/hooks_in_rexfile.t
 t/host.t
 t/hosts.ex
 t/hosts.ex2

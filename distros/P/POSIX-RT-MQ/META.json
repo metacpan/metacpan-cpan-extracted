@@ -46,6 +46,6 @@
          "web" : "https://github.com/a6502/POSIX-RT-MQ"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

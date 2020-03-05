@@ -80,7 +80,22 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         }
                         
                         if ( btCfg.addToContextMenu ){
-                             menuButton = new qx.ui.menu.Button(this.xtr(btCfg.label));
+                            menuButton = new qx.ui.menu.Button(this.xtr(btCfg.label));
+                            [
+                                'Enabled',
+                                'Visibility',
+                                'Icon',
+                                'Label'
+                            ].forEach(function(Prop){
+                                var prop = Prop.toLowerCase();
+                                button.addListener('change'+Prop,function(e){
+                                    menuButton['set'+Prop](e.getData());
+                                },this);
+                                if (btCfg.buttonSet && prop in btCfg.buttonSet){
+                                    menuButton['set'+Prop](
+                                            btCfg.buttonSet[prop]);
+                                }
+                            },this);
                         }
                         break;
                     case 'refresh':
@@ -96,7 +111,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         }, this);
                         break;
                     case 'upload':
-                        this._addUploadButton(cfg,btCfg,getFormData);
+                        button = this._addUploadButton(cfg,btCfg,getFormData);
                         break;
                     case 'separator':
                         this.add(new qx.ui.core.Spacer(10,10));
@@ -106,6 +121,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 }
                 var action = function(){
                     var that = this;
+                    if (! button.isEnabled()) {
+                        return;
+                    }
                     switch (btCfg.action) {
                         case 'submitVerify':
                         case 'submit':
@@ -296,6 +314,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     this.fireDataEvent('actionResponse',response || {});
                 }
             },this);
+            return file;
 
         },
 

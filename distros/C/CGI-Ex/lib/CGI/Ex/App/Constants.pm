@@ -4,13 +4,17 @@ package CGI::Ex::App::Constants;
 
 CGI::Ex::App::Constants - Easier access to magic App values
 
+=head1 VERSION
+
+version 2.49
+
 =cut
 
 use strict;
 use warnings;
 use Exporter qw(import); # allow for goto from CGI::Ex::App
 
-our $VERSION = '2.48';
+our $VERSION = '2.49'; # VERSION
 our %constants;
 our @EXPORT;
 our @EXPORT_OK;

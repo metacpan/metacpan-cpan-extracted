@@ -2,6 +2,7 @@ package Timer::Milestones;
 
 use strict;
 use warnings;
+no warnings 'uninitialized';
 
 use parent 'Exporter';
 
@@ -15,7 +16,7 @@ our @EXPORT_OK = qw(start_timing add_milestone stop_timing
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 # Have you updated the version number in the POD below?
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -24,7 +25,7 @@ Timer::Milestones - measure code execution time succinctly by setting milestones
 
 =head1 VERSION
 
-This is version 0.002.
+This is version 0.003.
 
 =head1 SYNOPSIS
 
@@ -70,17 +71,17 @@ This is version 0.002.
 Spits out to STDERR e.g.
 
  START: Tue Feb  4 16:03:08 2020
-      3 s (  0.28%)
+      3 s        (  0.28%)
  Everything set up
       5 min 30 s ( 31.22%)
           3 min  7 s Some::ThirdParty::Module::do_slow_thing
-         15 s Possibly slow inlined code (x10)
+         15 s        Possibly slow inlined code (x10)
              Outgoing (x7)
              Incoming (x3)
  Telling the user
      12 min  7 s ( 68.78%)
           8 min 30 s Some::ThirdParty::Module::do_slow_thing (x3)
-         40 s _my_own_function_elsewhere
+         40 s        _my_own_function_elsewhere
  END: Tue Feb  4 16:20:48 2020
 
 =head1 DESCRIPTION
@@ -359,8 +360,10 @@ sub _add_function_call_to_list {
     my ($self, $function_call, $call_elements) = @_;
 
     my $elapsed_time = $function_call->{ended} - $function_call->{started};
-    my $function_name = $function_call->{report_name_as}
-        // $function_call->{function_name};
+    my $function_name = $function_call->{report_name_as};
+    if (!defined $function_name) {
+        $function_name = $function_call->{function_name};
+    }
 
     # If we're not summarising calls, we're going to add another element,
     # so just do that.
@@ -419,7 +422,7 @@ sub _generate_report_from_elements {
     my ($self, @elements) = @_;
 
     # Work out how much time passed between all intervals so far.
-    my $total_elapsed_time = 0;
+    my $total_elapsed_time;
     for my $element (grep { $_->{type} eq 'interval' } @elements) {
         $total_elapsed_time += $element->{elapsed_time};
     }
@@ -431,37 +434,43 @@ sub _generate_report_from_elements {
     $total_elapsed_time ||= 0.000_001;
 
     # Now we can report all of this: static times, and intervals between them.
-    my $report;
+    # Build up a set of lines that will go into the report: mostly static
+    # strings, but some lines that involve times may need to be adjusted to
+    # align together, and we'll only be able to do that when we have all of
+    # them.
+    my @report_lines;
     for my $element (@elements) {
         if ($element->{type} eq 'time') {
-            $report .= $element->{name} . ': '
-                . localtime($element->{time}) . "\n";
+            push @report_lines,
+                $element->{name} . ': ' . localtime($element->{time});
         } elsif ($element->{type} eq 'milestone') {
-            $report .= $element->{name} . "\n";
+            push @report_lines, $element->{name};
         } elsif ($element->{type} eq 'interval') {
-            my $elapsed_time_ratio
-                = $element->{elapsed_time} / $total_elapsed_time;
-            $report .= sprintf(
-                "    %s (%6.2f%%)\n",
-                $self->_human_elapsed_time($element->{elapsed_time}),
-                $elapsed_time_ratio * 100
-            );
+            push @report_lines,
+                {
+                indent_level => 1,
+                elapsed_time => $element->{elapsed_time},
+                suffix       => sprintf('(%6.2f%%)',
+                    $element->{elapsed_time} / $total_elapsed_time * 100)
+                };
         } elsif ($element->{type} eq 'function_call') {
             my $function_name = $element->{function_name};
             if ($element->{call_count}) {
                 $function_name .= ' (x' . $element->{call_count} . ')';
             }
-            $report .= sprintf("        %6s %s\n",
-                $self->_human_elapsed_time($element->{elapsed_time}),
-                $function_name
-            );
+            push @report_lines,
+                {
+                indent_level => 2,
+                elapsed_time => $element->{elapsed_time},
+                suffix       => $function_name
+                };
             if ($element->{arguments_seen}) {
                 for my $arguments (@{ $element->{arguments_seen}}) {
-                    $report .= (' ' x 12) . $arguments->{argument_summary};
+                    my $line = (' ' x 12) . $arguments->{argument_summary};
                     if ($arguments->{call_count} > 1) {
-                        $report .= ' (x' . $arguments->{call_count} . ')';
+                        $line .= ' (x' . $arguments->{call_count} . ')';
                     }
-                    $report .= "\n";
+                    push @report_lines, $line;
                 }
             }
         } else {
@@ -469,8 +478,40 @@ sub _generate_report_from_elements {
                 . $element->{type} . '?';
         }        
     }
-    return $report;
+
+    # Now that we know about all the times we're going to report, we can work
+    # on lining them up.
+    my %time_refs_by_indent_level;
+    for my $line (@report_lines) {
+        if (ref($line) eq 'HASH') {
+            $line->{human_elapsed_time}
+                = $self->_human_elapsed_time($line->{elapsed_time});
+            push @{ $time_refs_by_indent_level{ $line->{indent_level} } },
+                \($line->{human_elapsed_time});
+        }
+    }
+    for my $indent_level (keys %time_refs_by_indent_level) {
+        $self->_format_times_to_fit(
+            @{ $time_refs_by_indent_level{$indent_level} }
+        );
+    }
+
+    # Now that that's done, unpack all of this.
+    for my $line (@report_lines) {
+        if (ref($line) eq 'HASH') {
+            $line
+                = (' ' x (4 * $line->{indent_level}))
+                . $line->{human_elapsed_time} . ' '
+                . $line->{suffix};
+        }
+    }
+
+    # And return it all as a string.
+    return join("\n", @report_lines) . "\n";
 }
+
+# Supplied with an elapsed time, as a number of seconds, returns a
+# human-friendly description of the elapsed time.
 
 sub _human_elapsed_time {
     my ($self, $elapsed_time) = @_;
@@ -493,23 +534,23 @@ sub _unit_specs {
     (
         {
             max          => 1,
-            label_format => '%3d ms',
+            label_format => '%.0f ms',
             transform    => sub { (shift) * 1_000 },
         },
         {
             max => 60,
-            label_format => '%2d s',
+            label_format => '%.0f s',
         },
         {
             max          => 60 * 60,
-            label_format => '%2d min %2d s',
+            label_format => '%d min %2.0f s',
             transform    => sub {
                 my $seconds = shift;
                 ($seconds / 60, $seconds % 60)
             },
         },
         {
-            label_format => '%d h %2d min',
+            label_format => '%d h %2.0f min',
             transform    => sub {
                 my $seconds = shift;
                 my $minutes = $seconds / 60;
@@ -517,6 +558,55 @@ sub _unit_specs {
             },
         }
     );
+}
+
+# Supplied with a list of scalar references (!), works out how they could all
+# be formatted so they line up, and updates the references.
+# Specifically, it makes sure that:
+# * The primary units always lines up
+# * The primary units have as much space as they need
+# * After that, all strings are the same length, with trailing spaces added
+#   to pad
+# Any secondary units were already padded, as there can only ever be two
+# digits used by a secondary unit; any spillover goes into the primary unit.
+
+sub _format_times_to_fit {
+    my ($self, @time_refs) = @_;
+
+    # First up: find out how many characters we're using for the spaces
+    # (if any) and digits before the primary unit, and how many characters
+    # we're using for the primary unit.
+    my $re_primary_quantity_and_unit = qr{ ^ (\s* \d+ \s* ) ([a-z]+) }x;
+    my %max_length;
+    for my $time (map { $$_ } @time_refs) {
+        if ($time =~ $re_primary_quantity_and_unit) {
+            for ([unit_value => $1], [unit_name => $2]) {
+                my ($label, $value) = @$_;
+                my $value_length = length($value);
+                $max_length{$label} = $value_length
+                    if $value_length > $max_length{$label};
+            }
+        } else {
+            croak "Wasn't expecting $time";
+        }
+    }
+    my $value_format = '%'  . $max_length{unit_value} . 's';
+    my $name_format  = '%-' . $max_length{unit_name}  . 's';
+    for my $time_ref (@time_refs) {
+        $$time_ref =~ s{^ $re_primary_quantity_and_unit }{
+            sprintf($value_format, $1) . sprintf($name_format, $2)}xe;
+    }
+
+    # Now we've done that, pad all times to be the same length.
+    for my $time (map { $$_ } @time_refs) {
+        $max_length{total} = length($time)
+            if length($time) > $max_length{total};
+    }
+    my $total_format = '%-' . $max_length{total} . 's';
+    for my $time_ref (@time_refs) {
+        $$time_ref = sprintf($total_format, $$time_ref);
+    }
+    1;
 }
 
 =head3 generate_final_report

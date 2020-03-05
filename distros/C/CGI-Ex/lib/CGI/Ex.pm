@@ -4,6 +4,14 @@ package CGI::Ex;
 
 CGI::Ex - CGI utility suite - makes powerful application writing fun and easy
 
+=head1 VERSION
+
+version 2.49
+
+=for markdown [![master](https://travis-ci.org/ljepson/CGI-Ex.svg?branch=master)](https://travis-ci.org/ljepson/CGI-Ex)
+
+=for HTML <a href="https://travis-ci.org/ljepson/CGI-Ex"><img src="https://travis-ci.org/ljepson/CGI-Ex.svg?branch=master"></a>
+
 =cut
 
 ###----------------------------------------------------------------###
@@ -15,7 +23,7 @@ CGI::Ex - CGI utility suite - makes powerful application writing fun and easy
 
 use 5.006;
 use strict;
-our $VERSION = '2.48';
+our $VERSION = '2.49'; # VERSION
 
 our ($PREFERRED_CGI_MODULE,
      $PREFERRED_CGI_REQUIRED,

@@ -17,4 +17,9 @@
        I haven't yet narrowed it down further.
 
 0.06 - Further improvements to uniqnum().
-     - Remove t/02old_uniqnum.t (no longer relevant).     
+     - Remove t/02old_uniqnum.t (no longer relevant).
+
+0.07 - Alteration to the way we determine whether a UV or IV can be
+       represented exactly by a double.
+     - Fix handling of "DoubleDouble" NVs whose least significant double
+       could be either 0.0 or -0.0  

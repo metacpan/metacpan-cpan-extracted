@@ -63,6 +63,7 @@ qx.Class.define('callbackery.ui.plugin.Table', {
             }).set({
                 showCellFocusIndicator: false
             });
+            table.getDataRowRenderer().setHighlightFocusRow(false);
             var ctxMenu = this._action.getTableContextMenu();
             if (ctxMenu){
                 table.setContextMenu(ctxMenu);

@@ -9,7 +9,7 @@ package Rex::Interface::Fs::Local;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.1'; # VERSION
+our $VERSION = '1.8.2'; # VERSION
 
 use Rex::Interface::Fs::Base;
 use base qw(Rex::Interface::Fs::Base);
