@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -ex
+
+cip sudo apt-get update
+cip sudo apt-get install git unzip g++
+cip exec bash -c '
+  set -ex
+  git clone https://github.com/Microsoft/vcpkg.git ~/vcpkg
+  cd ~/vcpkg
+  ./bootstrap-vcpkg.sh
+  ./vcpkg integrate install
+'

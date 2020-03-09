@@ -1,0 +1,46 @@
+
+*** These modified files were found in JOE when it aborted on Mon Feb 24 13:44:13 2020
+*** JOE was aborted by UNIX signal 15
+
+*** File '(Unnamed)'
+checkouts
+omnisr28
+franz1
+OmniOS
+-Lauf
+0.8
+to
+example-proj
+2020
+node_modules
+
+*** File '(Unnamed)'
+46-140-183-210.static.cablecom.ch (46.140.183.210)
+46-140-183-210.static.cablecom.ch (46.140.183.210)
+
+OmnniOSce
+ Lauf
+0.7
+toto
+easii
+2019
+nm
+
+*** File '(Unnamed)'
+lib/Hello/GuiPlugin/Song.pm
+lib/Hello/GuiPlugin/Song.pm
+de.po
+bin/hello.pl
+frontend/Makefile.am
+thinlinc-startup.sh
+/scratch/thinRoot/.git/COMMIT_EDITMSG
+Makefile.am
+Makefile.am
+Makefile.am
+Makefile.am
+
+*** File '* Startup Log *'
+Processing '/etc/joe/jmacsrc'...
+Processing '/etc/joe/ftyperc'...
+Finished processing /etc/joe/ftyperc
+Finished processing /etc/joe/jmacsrc

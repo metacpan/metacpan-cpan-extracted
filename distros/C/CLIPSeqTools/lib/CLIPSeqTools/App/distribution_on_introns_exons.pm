@@ -54,7 +54,7 @@ location. The read copy number is not used in this analysis.
 =cut
 
 package CLIPSeqTools::App::distribution_on_introns_exons;
-$CLIPSeqTools::App::distribution_on_introns_exons::VERSION = '0.1.8';
+$CLIPSeqTools::App::distribution_on_introns_exons::VERSION = '0.1.9';
 
 # Make it an app command
 use MooseX::App::Command;

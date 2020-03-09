@@ -18,15 +18,6 @@ unless( $Tcl::pTk::_Tile_available ){
     print "1..0 # Skipped: Tile unavailable\n";
     exit;
 }
- 
-# This will skip if Tix not present
-my $retVal = $top->interp->pkg_require('Tix');
-
-unless( $retVal){
-    print "1..0 # Skipped: Tix Tcl package not available\n";
-    exit;
-}
-
        
 
 plan tests => 1;
@@ -42,10 +33,8 @@ my $LabEntry = $top->LabEntry(
 
 $LabEntry->pack(-side => 'top', -pady => 2, -anchor => 'w', -fill => 'x', -expand => 1);
 
-
-$top->after(100,sub{$top->destroy}) unless(@ARGV); # go away, unless something on command line (debug mode)
-
-MainLoop;
+$top->idletasks;
+(@ARGV) ? MainLoop : $top->destroy; # go away, unless something on command line (debug mode)
 
 
 ok(1, 1, "LabEntry Facelift Widget Creation");

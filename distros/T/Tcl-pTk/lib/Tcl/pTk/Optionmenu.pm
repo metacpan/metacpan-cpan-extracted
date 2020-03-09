@@ -7,7 +7,7 @@
 
 package Tcl::pTk::Optionmenu;
 
-our ($VERSION) = ('1.03');
+our ($VERSION) = ('1.05');
 
 use Tcl::pTk;
 require Tcl::pTk::Menubutton;

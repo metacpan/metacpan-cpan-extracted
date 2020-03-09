@@ -1,3 +1,7 @@
+0.010		2020-03-09	T. R. Wyant
+    Remove redundant and poorly-performing code introduced in version
+    0.009.
+
 0.009		2020-02-27	T. R. Wyant
     Add new() argument index_locations which causes locations to be
     indexed during the parse. This defaults based on whether a location

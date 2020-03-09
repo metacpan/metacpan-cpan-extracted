@@ -1,2 +1,10 @@
-0.001 17-08-2017
+1.000 2020-03-09
+
+    [Features]
+    
+        Also includes details of the timezone, if one was set. This is
+        basically https://github.com/skington/data-tersify/pull/2
+        - thanks David Cantrell!
+
+0.001 2017-08-17
     Initial version.

@@ -1,10 +1,15 @@
-0.002   2017-08-04 (PERLANCAR)
+0.003   2020-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust with Log::ger 0.033 (renamed routine types).
+
+
+0.002   2017-08-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix Abstracts and Synopses.
 
 
-0.001    2017-08-04 (PERLANCAR)
+0.001    2017-08-04  Released-By: PERLANCAR
 
          - First release.

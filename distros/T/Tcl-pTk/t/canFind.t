@@ -26,9 +26,4 @@ ok(scalar(@ids), 2, "canvas find returns list");
 
 #print "ids returned '".join("', '", @ids)."'\n";
 
-
-                
-MainLoop if(@ARGV);
-
-
-
+(@ARGV) ? MainLoop : $TOP->destroy;

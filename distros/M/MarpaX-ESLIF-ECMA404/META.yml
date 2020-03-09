@@ -13,10 +13,10 @@ build_requires:
   Test::More: '0'
   Test::More::UTF8: '0'
   Test::Trap: '0'
-  perl: '5.006'
+  perl: v5.10.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: v5.10.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -36,18 +36,19 @@ no_index:
 provides:
   MarpaX::ESLIF::ECMA404:
     file: lib/MarpaX/ESLIF/ECMA404.pm
-    version: '0.013'
+    version: '0.014'
 requires:
   Log::Any: '0'
   MarpaX::ESLIF: v3.0.32
-  perl: '5.006'
+  feature: '0'
+  perl: v5.10.0
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-ESLIF-ECMA404
   homepage: https://metacpan.org/release/MarpaX-ESLIF-ECMA404
   repository: git://github.com/jddurand/marpax-eslif-ecma404.git
-version: '0.013'
+version: '0.014'
 x_authority: cpan:JDDPAUSE
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

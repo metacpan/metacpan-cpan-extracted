@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.121   2020-03-08
+        - Adapt the code to the updated Term::Choose.
+
 0.120   2020-02-24
         - Experimental option 'table_name'.
 

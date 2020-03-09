@@ -1,4 +1,16 @@
-0.002   2017-08-03 (PERLANCAR)
+0.004   2020-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust with Log::ger 0.033 (renamed hook names, no more
+	  create_logml_routine hook).
+
+
+0.003   2020-02-18  Released-By: PERLANCAR; Urgency: medium
+
+	- [internal] Allow passing Log::Dispatch::Output object directly
+	  via '_output' configuration.
+
+
+0.002   2017-08-03  Released-By: PERLANCAR
 
 	- [Bugfix] Instantiate Log::Dispatch instead of Log::Dispatch
 	  output object so we can pass newline => 1 etc which is handled at
@@ -8,6 +20,6 @@
 	  Log::Dispatch object per logging routine.
 
 
-0.001   2017-06-26 (PERLANCAR)
+0.001   2017-06-26  Released-By: PERLANCAR
 
         - First version.

@@ -52,6 +52,6 @@
          "web" : "https://github.com/haarg/Devel-CompileLevel"
       }
    },
-   "version" : "0.001003",
+   "version" : "0.001004",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

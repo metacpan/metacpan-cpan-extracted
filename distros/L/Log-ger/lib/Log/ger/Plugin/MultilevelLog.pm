@@ -1,7 +1,9 @@
 package Log::ger::Plugin::MultilevelLog;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger'; # DIST
+our $VERSION = '0.033'; # VERSION
 
 use strict;
 use warnings;
@@ -11,15 +13,67 @@ use Log::ger::Util;
 sub get_hooks {
     my %conf = @_;
 
+    my $sub_name    = $conf{sub_name}    || 'log';
+    my $method_name = $conf{method_name} || 'log';
+
     return {
+        create_filter => [
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
+
+                my $filter = sub {
+                    my $level = Log::ger::Util::numeric_level(shift);
+                    return 0 unless $level <= $Log::ger::Current_Level;
+                    {level=>$level};
+                };
+
+                [$filter, 0, 'ml'];
+            },
+        ],
+
+        create_formatter => [
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
+
+                my $formatter =
+
+                 # just like the default formatter, except it accepts first
+                 # argument (level)
+                    sub {
+                        shift; # level
+                        return $_[0] if @_ < 2;
+                        my $fmt = shift;
+                        my @args;
+                        for (@_) {
+                            if (!defined($_)) {
+                                push @args, '<undef>';
+                            } elsif (ref $_) {
+                                push @args, Log::ger::Util::_dump($_);
+                            } else {
+                                push @args, $_;
+                            }
+                        }
+                        no warnings 'redundant';
+                        sprintf $fmt, @args;
+                    };
+
+                [$formatter, 0, 'ml'];
+            },
+        ],
+
         create_routine_names => [
-            __PACKAGE__, 50,
-            sub {
-                my %hook_args = @_;
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
                 return [{
-                    logml_subs    => [[$conf{sub_name}    || 'log', undef]],
-                    logml_methods => [[$conf{method_name} || 'log', undef]],
-                }];
+                    logger_subs    => [[$sub_name   , undef, 'ml', undef, 'ml']],
+                    logger_methods => [[$method_name, undef, 'ml', undef, 'ml']],
+                }, $conf{exclusive}];
             },
         ],
     };
@@ -40,22 +94,26 @@ Log::ger::Plugin::MultilevelLog - Create a log($LEVEL, ...) subroutine/method
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 
  use Log::ger::Plugin MultilevelLog => (
-     sub_name => 'log',    # optional
-     method_name => 'log', # optional
+     # sub_name => 'log_it',    # optional, defaults to 'log'
+     # method_name => 'log_it', # optional, defaults to 'log'
+     # exclusive => 1,          # optional, defaults to 0
  );
  use Log::ger;
 
+ log('warn', 'This is a warning');
+ log('debug', 'This is a debug, data is %s', $data);
+
 =head1 DESCRIPTION
 
-The default way is to create separate C<log_LEVEL> subroutine (or C<LEVEL>
+The Log::ger default is to create separate C<log_LEVEL> subroutine (or C<LEVEL>
 methods) for each level, e.g. C<log_trace> subroutine (or C<trace> method),
 C<log_warn> (or C<warn>), and so on. But sometimes you might want a log routine
-that takes $level as the first argument, e.g. instead of:
+that takes $level as the first argument. That is, instead of:
 
  log_warn('blah ...');
 
@@ -73,19 +131,33 @@ or:
 
 This plugin can create such log routine for you.
 
-Note: the multilevel log is slower because of extra argument and additional
-string level -> numeric level conversion.
+Note: the multilevel log is slightly slower because of the extra argument and
+additional string level -> numeric level conversion. See benchmarks in
+L<Bencher::Scenarios::LogGer>.
 
 Note: the individual separate C<log_LEVEL> subroutines (or C<LEVEL> methods) are
-still installed.
+still installed, unless you specify configuration L</exclusive> to true.
 
 =for Pod::Coverage ^(.+)$
 
 =head1 CONFIGURATION
 
-=head2 sub_name => str (default: "log")
+=head2 sub_name
 
-=head2 method_name => str (default: "log")
+String. Defaults to C<log>.
+
+=head2 method_name
+
+String. Defaults to C<log>.
+
+=head2 exclusive
+
+Boolean. If set to true, will block the generation of the default C<log_LEVEL>
+subroutines or C<LEVEL> methods (e.g. C<log_warn>, C<trace>, ...).
+
+=head1 SEE ALSO
+
+L<Log::ger::Plugin::HashArgs>
 
 =head1 AUTHOR
 

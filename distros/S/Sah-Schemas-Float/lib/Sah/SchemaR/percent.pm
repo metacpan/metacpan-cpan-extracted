@@ -1,9 +1,9 @@
 package Sah::SchemaR::percent;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.008'; # VERSION
 
-our $rschema = ["float",[{description=>"\nThis type is basically `float`, with `str_as_percent` coerce rule. So the\npercent sign is optional, but the number is always interpreted as percent, e.g.\n\"1\" is interpreted as 1% (0.01).\n\n",summary=>"A float","x.perl.coerce_rules"=>["From_str::as_percent"]}],["float"]];
+our $rschema = ["float",[{description=>"\nThis type is basically `float`, with `str_as_percent` coerce rule. So the\npercent sign is optional, but the number is always interpreted as percent, e.g.\n\"1\" is interpreted as 1% (0.01).\n\n",examples=>[{valid=>1,validated_value=>0,value=>0},{valid=>1,validated_value=>0.005,value=>0.5},{valid=>1,validated_value=>0.05,value=>5},{valid=>1,validated_value=>0.05,value=>"5%"}],summary=>"A float","x.perl.coerce_rules"=>["From_str::as_percent"]}],["float"]];
 
 1;
 # ABSTRACT: A float
@@ -20,7 +20,7 @@ Sah::SchemaR::percent - A float
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::percent (from Perl distribution Sah-Schemas-Float), released on 2019-11-29.
+This document describes version 0.008 of Sah::SchemaR::percent (from Perl distribution Sah-Schemas-Float), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -38,7 +38,7 @@ sub test_lib {
 
     $t->get_ok( '/moai/lib/stylesheet', form => { version => $attr{version} } )
       ->status_is( 200 )
-      ->or( sub { diag 'Error: ', shift->tx->res->dom->at( '#error,#routes' ) } )
+      ->or( sub { diag 'Error: ', shift->tx->res->dom->find( '#error,#routes,#log' )->join("\n") } )
       ;
     test_stylesheet( $t, %attr );
 

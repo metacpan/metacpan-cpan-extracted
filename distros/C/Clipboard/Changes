@@ -1,3 +1,15 @@
+0.24    2020-03-07
+    - Remove Makefile.PL due to ::OSPrereqs not munging it along with Build.PL
+        - https://github.com/dagolden/Dist-Zilla-Plugin-OSPrereqs/issues/4
+    - Fix macOS detection.
+        - https://github.com/shlomif/Clipboard/issues/1
+        - convert "darwin" to a regex.
+
+0.23    2020-03-06
+    - Require deps on MacOS and MSwin32
+        - See: https://github.com/shlomif/Clipboard/issues/1
+        - Thanks to https://metacpan.org/pod/Dist::Zilla::Plugin::OSPrereqs .
+
 0.22    2020-01-28
     - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
     POD documentation (see 0.001004 in

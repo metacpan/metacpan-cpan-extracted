@@ -1,0 +1,67 @@
+# NAME
+
+Data::Object::Role::Throwable
+
+# ABSTRACT
+
+Throwable Role for Perl 5
+
+# SYNOPSIS
+
+    package Example;
+
+    use Moo;
+
+    with 'Data::Object::Role::Throwable';
+
+    package main;
+
+    my $example = Example->new;
+
+    # $example->throw
+
+# DESCRIPTION
+
+This package provides mechanisms for throwing the object as an exception.
+
+# METHODS
+
+This package implements the following methods:
+
+## throw
+
+    throw(Str $message) : Object
+
+The throw method throws an exception with the object and the given message.
+
+- throw example #1
+
+        # given: synopsis
+
+        $example->throw('Oops!');
+
+# AUTHOR
+
+Al Newkirk, `awncorp@cpan.org`
+
+# LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the ["license
+file"](https://github.com/iamalnewkirk/data-object-role-throwable/blob/master/LICENSE).
+
+# PROJECT
+
+[Wiki](https://github.com/iamalnewkirk/data-object-role-throwable/wiki)
+
+[Project](https://github.com/iamalnewkirk/data-object-role-throwable)
+
+[Initiatives](https://github.com/iamalnewkirk/data-object-role-throwable/projects)
+
+[Milestones](https://github.com/iamalnewkirk/data-object-role-throwable/milestones)
+
+[Contributing](https://github.com/iamalnewkirk/data-object-role-throwable/blob/master/CONTRIBUTE.md)
+
+[Issues](https://github.com/iamalnewkirk/data-object-role-throwable/issues)

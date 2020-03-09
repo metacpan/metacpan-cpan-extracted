@@ -153,14 +153,6 @@ sub _can_release ($self) {
 
     # docker
     if ( $self->{dist}->docker ) {
-
-        # check dockerhun credentials
-        if ( !$ENV->user_cfg->{DOCKERHUB}->{username} || !$ENV->user_cfg->{DOCKERHUB}->{token} ) {
-            say q[You need to specify DockerHub credentials.];
-
-            return;
-        }
-
         say qq[Docker base image is "@{[$self->{dist}->docker->{from}]}".];
 
         # check parent docker repo tag

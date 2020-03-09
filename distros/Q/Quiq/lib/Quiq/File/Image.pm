@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.176';
+our $VERSION = '1.177';
 
 use Quiq::Hash;
 use Quiq::Path;
@@ -441,7 +441,7 @@ sub analyzeFile {
 
 =head1 VERSION
 
-1.176
+1.177
 
 =head1 AUTHOR
 

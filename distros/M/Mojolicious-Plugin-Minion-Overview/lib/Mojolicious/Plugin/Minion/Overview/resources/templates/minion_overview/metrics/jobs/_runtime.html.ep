@@ -1,0 +1,72 @@
+<p class="text-center">Runtime statistics for <span class="badge badge-secondary"><%= $job %></span></p>
+
+<div class="row">
+    <canvas id="runtime"></canvas>
+</div>
+
+% content_for javascript => begin
+    %= javascript begin
+    jQuery(document).ready(function($) {
+        var config = {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Finished',
+                    backgroundColor: 'rgb(201, 203, 207)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    fill: false,
+                    pointHoverRadius: 8,
+                    data: <%== to_json($runtime->grep(sub { $_->{ state } eq 'finished' })) %>
+                }, {
+                    label: 'Failed',
+                    backgroundColor: 'rgb(229,43,80)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    fill: false,
+                    borderDash: [5, 5],
+                    pointHoverRadius: 8,
+                    data: <%== to_json($runtime->grep(sub { $_->{ state } eq 'failed' })) %>
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    text: 'Runtime statistics for <%= $job %>',
+                },
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            parser: 'YYYY-MM-DD HH:mm:ss',
+                            // round: 'day'
+                            tooltipFormat: 'YYYY-MM-DD HH:mm:ss',
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Date'
+                        }
+                    }],
+                    yAxes: [{
+                        type: 'linear',
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Seconds'
+                        }
+                    }]
+                },
+            }
+        };
+        
+        var container = document.getElementById('runtime').getContext('2d');
+        var chart = new Chart(container, config);
+
+        setInterval(function() {
+            $.get('<%= url_for('minion_overview.api.metrics.jobs.runtime', job => $job) %>', function(json) {
+                config.data.datasets[0].data = json.finished;
+                config.data.datasets[1].data = json.failed;
+
+                chart.update(0);
+            });
+        }, 30 * 1000);
+    });
+    % end
+% end

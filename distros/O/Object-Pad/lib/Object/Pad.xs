@@ -53,6 +53,17 @@
 #  define HAVE_UNOP_AUX
 #endif
 
+#if !HAVE_PERL_VERSION(5, 18, 0)
+typedef AV PADNAMELIST;
+#  define PadlistARRAY(pl)        ((PAD **)AvARRAY(pl))
+#  define PadlistNAMES(pl)        (*PadlistARRAY(pl))
+
+typedef SV PADNAME;
+#  define PadnamePV(pn)           (SvPOKp(pn) ? SvPVX(pn) : NULL)
+#  define PadnameLEN(pn)          SvCUR(pn)
+#  define PadnamelistARRAY(pnl)   AvARRAY(pnl)
+#endif
+
 #ifndef HAVE_UNOP_AUX
 typedef struct {
   UNOP baseop;
@@ -133,6 +144,7 @@ typedef struct {
   HV *stash;
   SLOTOFFSET offset;   /* first slot index of this partial within its instance */
   AV *slots;           /* each AV item is a raw pointer directly to a SlotMeta */
+  CV *slotscope;       /* a (partial) CV to act as a scope storing lexicals for the slots */
   enum {
     REPR_NATIVE,       /* instances are in native format - blessed AV as slots */
     REPR_FOREIGN_HASH, /* instances are blessed HASHes; our slots live in $self->{"Object::Pad/slots"} */
@@ -512,12 +524,13 @@ static XS(injected_constructor)
         EXTEND(SP, SP-args + 1);
 
         SV **argtop = SP;
+        SV **svp;
 
         mPUSHs(newSVsv(class));
 
         /* Push a copy of the args in case the (foreign) constructor mutates
          * them. We still need them for BUILDALL */
-        for(SV **svp = args + 1; svp <= argtop; svp++)
+        for(svp = args + 1; svp <= argtop; svp++)
           PUSHs(*svp);
         PUTBACK;
 
@@ -589,7 +602,7 @@ static int keyword_class(pTHX_ OP **op_ptr)
   SV *superclassname = NULL;
   ClassMeta *supermeta = NULL;
 
-  // TODO: This grammar is quite flexible; maybe too much?
+  /* TODO: This grammar is quite flexible; maybe too much? */
   while(1) {
     lex_read_space(0);
 
@@ -657,6 +670,18 @@ static int keyword_class(pTHX_ OP **op_ptr)
 
   meta->tmpcop = (COP *)newSTATEOP(0, NULL, NULL);
   CopFILE_set(meta->tmpcop, __FILE__);
+
+  {
+    /* While creating the new scope CV we need to ENTER a block so as not to
+     * break any interpvars
+     */
+    ENTER;
+
+    CV *scope = meta->slotscope = MUTABLE_CV(newSV_type(SVt_PVCV));
+    CvPADLIST(scope) = pad_new(padnew_SAVE);
+
+    LEAVE;
+  }
 
   /* CARGOCULT from perl/op.c:Perl_package() */
   {
@@ -758,9 +783,17 @@ static int keyword_has(pTHX_ OP **op_ptr)
   if(!name)
     croak("Expected a slot name");
 
+  ENTER;
+  SAVESPTR(PL_comppad);
+  SAVESPTR(PL_comppad_name);
+  SAVESPTR(PL_curpad);
+  PL_comppad = PadlistARRAY(CvPADLIST(compclassmeta->slotscope))[1];
+  PL_comppad_name = PadlistNAMES(CvPADLIST(compclassmeta->slotscope));
+  PL_curpad  = AvARRAY(PL_comppad);
+
   AV *slots = compclassmeta->slots;
 
-  // TODO: Check for name collisions
+  /* TODO: Check for name collisions */
   SlotMeta *slotmeta;
   Newx(slotmeta, 1, SlotMeta);
 
@@ -768,6 +801,10 @@ static int keyword_has(pTHX_ OP **op_ptr)
   slotmeta->defaultop = NULL;
 
   av_push(slots, (SV *)slotmeta);
+
+  /* Claim these are all STATE variables just to quiet the "will not stay
+   * shared" warning */
+  pad_add_name_sv(name, padadd_STATE, NULL, NULL);
 
   lex_read_space(0);
 
@@ -780,8 +817,10 @@ static int keyword_has(pTHX_ OP **op_ptr)
 
     OP *op = parse_termexpr(0);
 
-    if(!op || PL_parser->error_count)
+    if(!op || PL_parser->error_count) {
+      LEAVE;
       return 0;
+    }
 
     /* TODO: This is currently very restrictive. However, if we allow any
      * expression then the pad indexes within it will be all wrong. We'll have
@@ -801,6 +840,12 @@ static int keyword_has(pTHX_ OP **op_ptr)
   }
 
   *op_ptr = newOP(OP_NULL, 0);
+
+  /* Make the new slot name visible to subsequent uses of the scope */
+  intro_my();
+
+  LEAVE;
+
   return KEYWORD_PLUGIN_STMT;
 }
 
@@ -815,6 +860,10 @@ static int keyword_method(pTHX_ OP **op_ptr)
 
   I32 floor_ix = start_subparse(FALSE, name ? 0 : CVf_ANON);
   SAVEFREESV(PL_compcv);
+
+  /* Splice in the slot scope CV in */
+  CvOUTSIDE(compclassmeta->slotscope) = CvOUTSIDE(PL_compcv);
+  CvOUTSIDE(PL_compcv) = compclassmeta->slotscope;
 
   OP *attrs = NULL;
   if(lex_peek_unichar(0) == ':') {
@@ -842,28 +891,9 @@ static int keyword_method(pTHX_ OP **op_ptr)
       newMETHSTARTOP(compclassmeta->repr)
     );
 
-    AV *slots = compclassmeta->slots;
-    SLOTOFFSET offset = compclassmeta->offset;
-    int i;
-    I32 nslots = av_count(slots);
-    for(i = 0; i < nslots; i++) {
-      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
-      char sigil = SvPV_nolen(slotmeta->name)[0];
-
-      padix = pad_add_name_sv(slotmeta->name, 0, NULL, NULL);
-      SLOTOFFSET slotix = offset + i;
-
-      U8 private;
-      switch(sigil) {
-        case '$': private = OPpSLOTPAD_SV; break;
-        case '@': private = OPpSLOTPAD_AV; break;
-        case '%': private = OPpSLOTPAD_HV; break;
-      }
-
-      slotops = op_append_list(OP_LINESEQ, slotops,
-        /* alias the padix from the slot */
-        newSLOTPADOP(0, private, padix, slotix));
-    }
+    /* Build the rest of the slot ops after the body is compiled so we know
+     * which slots we need
+     */
 
     intro_my();
   }
@@ -905,6 +935,50 @@ static int keyword_method(pTHX_ OP **op_ptr)
     op_free(body);
     *op_ptr = newOP(OP_NULL, 0);
     return name ? KEYWORD_PLUGIN_STMT : KEYWORD_PLUGIN_EXPR;
+  }
+
+  {
+    SLOTOFFSET offset = compclassmeta->offset;
+    CV *slotscope = compclassmeta->slotscope;
+    PADNAMELIST *slotnames = PadlistNAMES(CvPADLIST(slotscope));
+    I32 nslots = AvFILLp(PadlistARRAY(CvPADLIST(slotscope))[1]);
+    PADNAME **snames = PadnamelistARRAY(slotnames);
+    PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
+
+    int i;
+    for(i = 0; i < nslots; i++) {
+      PADNAME *slotname = snames[i + 1];
+      if(!slotname
+#if HAVE_PERL_VERSION(5, 22, 0)
+        /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
+         * slots are actually being used
+         */
+         || PadnameREFCNT(slotname) < 2
+#endif
+        )
+          continue;
+
+      SLOTOFFSET slotix = offset + i;
+      PADOFFSET padix = pad_findmy_pv(PadnamePV(slotname), 0);
+
+      U8 private;
+      switch(PadnamePV(slotname)[0]) {
+        case '$': private = OPpSLOTPAD_SV; break;
+        case '@': private = OPpSLOTPAD_AV; break;
+        case '%': private = OPpSLOTPAD_HV; break;
+      }
+
+      slotops = op_append_list(OP_LINESEQ, slotops,
+        /* alias the padix from the slot */
+        newSLOTPADOP(0, private, padix, slotix));
+
+#if HAVE_PERL_VERSION(5, 22, 0)
+      /* Unshare the padname so the one in the scopeslot returns to refcount 1 */
+      PADNAME *newpadname = newPADNAMEpvn(PadnamePV(slotname), PadnameLEN(slotname));
+      PadnameREFCNT_dec(padnames[padix]);
+      padnames[padix] = newpadname;
+#endif
+    }
   }
 
 #ifdef HAVE_PARSE_SUBSIGNATURE

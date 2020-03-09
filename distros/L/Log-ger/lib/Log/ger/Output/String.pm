@@ -1,36 +1,39 @@
 package Log::ger::Output::String;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger'; # DIST
+our $VERSION = '0.033'; # VERSION
 
 use strict;
 use warnings;
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
-    $conf{string} or die "Please specify string";
+    $plugin_conf{string} or die "Please specify string";
 
-    my $formatter = $conf{formatter};
-    my $append_newline = $conf{append_newline};
+    my $formatter = $plugin_conf{formatter};
+    my $append_newline = $plugin_conf{append_newline};
     $append_newline = 1 unless defined $append_newline;
 
     return {
-        create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %hook_args = @_;
+        create_outputter => [
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
                 my $level = $hook_args{level};
-                my $logger = sub {
-                    my $msg = $_[1];
+                my $outputter = sub {
+                    my ($per_target_conf, $msg, $per_msg_conf) = @_;
                     if ($formatter) {
                         $msg = $formatter->($msg);
                     }
-                    ${ $conf{string} } .= $msg;
-                    ${ $conf{string} } .= "\n"
+                    ${ $plugin_conf{string} } .= $msg;
+                    ${ $plugin_conf{string} } .= "\n"
                         unless !$append_newline || $msg =~ /\R\z/;
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -50,7 +53,7 @@ Log::ger::Output::String - Set output to a string
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 

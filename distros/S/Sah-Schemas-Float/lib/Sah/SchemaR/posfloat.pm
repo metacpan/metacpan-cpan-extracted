@@ -1,9 +1,9 @@
 package Sah::SchemaR::posfloat;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.008'; # VERSION
 
-our $rschema = ["float",[{description=>"\n",summary=>"Positive float",xmin=>0}],["float"]];
+our $rschema = ["float",[{description=>"\nSee also `ufloat` for floats that are equal or larger than 0.\n\n",examples=>[{valid=>0,value=>0},{valid=>1,value=>0.1},{valid=>1,value=>1},{valid=>0,value=>-0.1}],summary=>"Positive float",xmin=>0}],["float"]];
 
 1;
 # ABSTRACT: Positive float
@@ -20,7 +20,7 @@ Sah::SchemaR::posfloat - Positive float
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::posfloat (from Perl distribution Sah-Schemas-Float), released on 2019-11-29.
+This document describes version 0.008 of Sah::SchemaR::posfloat (from Perl distribution Sah-Schemas-Float), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

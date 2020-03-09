@@ -67,9 +67,9 @@ sub __tmp_history {
 sub __get_history {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $h_ref = $ax->read_json( $sf->{i}{f_subqueries} );
-    my $history_HD = $h_ref->{ $sf->{i}{driver} }{ $sf->{d}{db} }{substmt} || [];
-    my $history_RAM = $sf->__tmp_history( $history_HD ) || [];
+    my $h_ref = $ax->read_json( $sf->{i}{f_subqueries} ) // {};
+    my $history_HD = $h_ref->{ $sf->{i}{driver} }{ $sf->{d}{db} }{substmt} // [];
+    my $history_RAM = $sf->__tmp_history( $history_HD ) // [];
     return [ @$history_HD, @$history_RAM ];
 }
 
@@ -149,11 +149,11 @@ sub __edit_sq_file {
 
     while ( 1 ) {
         my $top_lines = [ 'Stored Subqueries:' ];
-        my $h_ref = $ax->read_json( $sf->{i}{f_subqueries} );
-        my $history_HD = $h_ref->{$driver}{$db}{substmt} || [];
+        my $h_ref = $ax->read_json( $sf->{i}{f_subqueries} ) // {};
+        my $history_HD = $h_ref->{$driver}{$db}{substmt} // [];
         my @tmp_info = (
             @$top_lines,
-            map( line_fold( $_->[-1], get_term_width(), { init_tab => '  ', subseq_tab => '    ' } ), @$history_HD ),
+            map( line_fold( $_->[-1], get_term_width(), { init_tab => '  ', subseq_tab => '    ', join => 1 } ), @$history_HD ), #
             ' '
         );
         my $info = join "\n", @tmp_info;
@@ -203,10 +203,10 @@ sub __add_subqueries {
     while ( 1 ) {
         my @tmp_info = (
             @$top_lines,
-            map( line_fold( $_->[1], get_term_width(), { init_tab => '  ', subseq_tab => '    ' } ), @$history_HD ),
+            map( line_fold( $_->[1], get_term_width(), { init_tab => '  ', subseq_tab => '    ', join => 1 } ), @$history_HD ), #
         );
         if ( @$tmp_new ) {
-            push @tmp_info, map( line_fold( $_->[1], get_term_width(), { init_tab => '| ', subseq_tab => '    ' } ), @$tmp_new );
+            push @tmp_info, map( line_fold( $_->[1], get_term_width(), { init_tab => '| ', subseq_tab => '    ', join => 1 } ), @$tmp_new ); #
         }
         push @tmp_info, ' ';
         my $info = join "\n", @tmp_info;
@@ -238,7 +238,7 @@ sub __add_subqueries {
             if ( $stmt =~ /^\s*\(([^)(]+)\)\s*\z/ ) {
                 $stmt = $1;
             }
-            my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, get_term_width(), { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ) } );
+            my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, get_term_width(), { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ), join => 1 } );
             # Readline
             my $name = $tf->readline( 'Name: ',
                 { info => $info . $folded_stmt, show_context => 1 }
@@ -254,7 +254,7 @@ sub __add_subqueries {
             push @$bu, [ [ @$tmp_new ], [ @$history_RAM ], [ @$used ] ];
             push @$used, splice @$history_RAM, $idx-@pre, 1;
             my $stmt = $used->[-1][0];
-            my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, get_term_width(), { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ) } );
+            my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, get_term_width(), { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ), join => 1 } );
             # Readline
             my $name = $tf->readline( 'Name: ',
                 { info => $info . $folded_stmt, show_context => 1 }
@@ -323,7 +323,7 @@ sub __edit_subqueries {
                 elsif ( any { $i == $_ } @$indexes ) {
                     $pre = '| ';
                 }
-                my $folded_stmt = line_fold( $stmt, get_term_width(), { init_tab => $pre,  subseq_tab => $pre . ( ' ' x 2 ) } );
+                my $folded_stmt = line_fold( $stmt, get_term_width(), { init_tab => $pre,  subseq_tab => $pre . ( ' ' x 2 ), join => 1 } );
                 push @tmp_info, $folded_stmt;
             }
             push @tmp_info, ' ';
@@ -336,7 +336,7 @@ sub __edit_subqueries {
             if ( ! defined $stmt || ! length $stmt ) {
                 next STMT;
             }
-            my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, get_term_width(), { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ) } );
+            my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, get_term_width(), { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ), join => 1 } );
             my $default;
             if ( $history_HD->[$idx][0] ne $history_HD->[$idx][1] ) {
                 $default = $history_HD->[$idx][1];
@@ -372,7 +372,7 @@ sub __remove_subqueries {
         my @tmp_info = (
             @$top_lines,
             'Remove:',,
-            map( line_fold( $_, get_term_width(), { init_tab => '  ', subseq_tab => '    ' } ), @remove ),
+            map( line_fold( $_, get_term_width(), { init_tab => '  ', subseq_tab => '    ', join => 1 } ), @remove ), #
             ' '
         );
         my $info = join "\n", @tmp_info;

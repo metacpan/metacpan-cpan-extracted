@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::LWP::UserAgent; # git description: v0.032-3-g468b77d
+package Test::LWP::UserAgent; # git description: v0.033-10-g54ec8f2
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A LWP::UserAgent suitable for simulating and testing network calls
 # KEYWORDS: testing useragent networking mock server client
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 
 use parent 'LWP::UserAgent';
 use Scalar::Util qw(blessed reftype);
@@ -139,14 +139,14 @@ sub unregister_psgi
 
     if (blessed $self)
     {
-        @{$self->{__response_map}} = grep { $_->[0] ne $domain } @{$self->{__response_map}};
+        @{$self->{__response_map}} = grep $_->[0] ne $domain, @{$self->{__response_map}};
 
-        @response_map = grep { $_->[0] ne $domain } @response_map
+        @response_map = grep $_->[0] ne $domain, @response_map
             unless $instance_only;
     }
     else
     {
-        @response_map = grep { $_->[0] ne $domain } @response_map;
+        @response_map = grep $_->[0] ne $domain, @response_map;
     }
     return $self;
 }
@@ -366,7 +366,7 @@ Test::LWP::UserAgent - A LWP::UserAgent suitable for simulating and testing netw
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 SYNOPSIS
 
@@ -403,7 +403,7 @@ Then, in your tests:
 This module is a subclass of L<LWP::UserAgent> which overrides a few key
 low-level methods that are concerned with actually sending your request over
 the network, allowing an interception of that request and simulating a
-particular response.  This greatly facilitates testing of client networking
+particular response.  This greatly facilitates testing of networking client
 code where the server follows a known protocol.
 
 The synopsis describes a typical case where you want to test how your
@@ -457,7 +457,7 @@ this module (or a subclass) to send your request, or it cannot be caught and
 processed.
 
 One common mechanism to swap out the useragent implementation is via a
-lazily-built Moose attribute; if no override is provided at construction time,
+lazily-built Moose(-like) attribute; if no override is provided at construction time,
 default to C<< LWP::UserAgent->new(%options) >>.
 
 Additionally, most methods can be called as class methods, which will store

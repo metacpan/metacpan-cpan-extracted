@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # DESCRIPTION: Perl ExtUtils: Type 'make test' to test this package
 #
-# Copyright 2007-2019 by Wilson Snyder.  This program is free software;
+# Copyright 2007-2020 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 ######################################################################
@@ -32,7 +32,7 @@ ok(1, "sig");
 my $p1 = $fork->schedule(label=>'p1',
 			 run_on_start => sub {
 			     print "p1 starting... $$\n";
-			     for my $i (1..10) { print "p1 ==> $i\n"; usleep(100*1000);}
+			     for my $i (1..10) { print "p1 ==> $i\n"; usleep(20*1000);}
 			     exit(0);
 			 },
 			 run_on_finish => sub {
@@ -43,7 +43,7 @@ my $p1 = $fork->schedule(label=>'p1',
 my $p2 = $fork->schedule(label=>'p2',
 			 run_on_start => sub {
 			     print "p2 starting... $$\n";
-			     for my $i (1..10) { print "p2 ==> $i\n"; usleep(100*1000);}
+			     for my $i (1..10) { print "p2 ==> $i\n"; usleep(20*1000);}
 			     exit(0);
 			 },
 			 run_on_finish => sub {

@@ -1,5 +1,5 @@
 package App::gimpgitbuild::API::GitBuild;
-$App::gimpgitbuild::API::GitBuild::VERSION = '0.10.2';
+$App::gimpgitbuild::API::GitBuild::VERSION = '0.12.0';
 use strict;
 use warnings;
 use 5.014;
@@ -57,6 +57,7 @@ sub new_env
 {
     my $self            = shift;
     my $gegl_p          = $self->gegl_p;
+    my $gimp_p          = $self->gimp_p;
     my $babl_p          = $self->babl_p;
     my $mypaint_p       = $self->mypaint_p;
     my $PKG_CONFIG_PATH = join(
@@ -69,12 +70,23 @@ sub new_env
         ),
         ( $ENV{PKG_CONFIG_PATH} // '' )
     );
+    my $LD_LIBRARY_PATH = join(
+        ":",
+        (
+            map {
+                my $p = $_;
+                map { "$p/$_" } qw# lib64 lib  #
+            } ( $gimp_p, $babl_p, $gegl_p, $mypaint_p )
+        ),
+        ( $ENV{LD_LIBRARY_PATH} // '' )
+    );
     my $XDG_DATA_DIRS =
 "$gegl_p/share:$mypaint_p/share:$mypaint_p/share/pkgconfig:$babl_p/share:$ENV{XDG_DATA_DIRS}";
     return +{
-        XDG_DATA_DIRS   => $XDG_DATA_DIRS,
-        PKG_CONFIG_PATH => $PKG_CONFIG_PATH,
+        LD_LIBRARY_PATH => $LD_LIBRARY_PATH,
         PATH            => "$gegl_p/bin:$ENV{PATH}",
+        PKG_CONFIG_PATH => $PKG_CONFIG_PATH,
+        XDG_DATA_DIRS   => $XDG_DATA_DIRS,
     };
 }
 
@@ -92,7 +104,7 @@ App::gimpgitbuild::API::GitBuild - common API
 
 =head1 VERSION
 
-version 0.10.2
+version 0.12.0
 
 =head1 METHODS
 

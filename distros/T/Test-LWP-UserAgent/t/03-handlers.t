@@ -47,7 +47,7 @@ my @response_phases = qw(response_done response_redirect);
 
     cmp_deeply(
         \%phase_called,
-        { map { ( $_ => 1 ) } @request_phases, @response_phases },
+        { map +($_ => 1), @request_phases, @response_phases },
         'all handlers called',
     );
 }

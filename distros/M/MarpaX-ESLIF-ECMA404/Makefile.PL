@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,11 +14,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "MarpaX-ESLIF-ECMA404",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "MarpaX::ESLIF::ECMA404",
   "PREREQ_PM" => {
     "Log::Any" => 0,
     "MarpaX::ESLIF" => "3.0.32",
+    "feature" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More::UTF8" => 0,
     "Test::Trap" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::More::UTF8" => 0,
   "Test::Trap" => 0,
+  "feature" => 0,
   "strict" => 0,
   "warnings" => 0
 );

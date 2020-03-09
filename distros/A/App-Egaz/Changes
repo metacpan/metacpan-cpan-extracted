@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Egaz
 
+0.2.5 2020-03-06T19:07:31Z
+
+    - `egaz template`
+        - Use `samtools faidx` to replace `faops region`
+
 0.2.4 2019-09-03T17:49:53Z
 
     - `egaz template`

@@ -4,7 +4,7 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.07
+Version 2.08
 
 # SYNOPSIS
 
@@ -145,16 +145,18 @@ warned (**--warn-overlap** by default) and ignored.
 This module includes example dictionaries.  They are installed share
 directory and accessed by **--exdict** option.
 
-    greple -Msubst --exdict katakana-guide-3.dict
+    greple -Msubst --exdict jtca-katakana-guide-3.dict
 
 - **--exdict** _dictionary_
-- **--exdictdir**
 
     Use _dictionary_ flie in the distribution as a dictionary file.
 
-- **--jtca-katakana-guide**
+- **--exdictdir**
 
-    Shortcut for "**--exdict** [jtca-katakana-guide-3.dict](https://metacpan.org/pod/jtca-katakana-guide-3.dict)".
+    Show dictionary directory.
+
+- **--exdict** jtca-katakana-guide-3.dict
+- **--jtca-katakana-guide**
 
     Created from following guideline document.
 
@@ -164,6 +166,14 @@ directory and accessed by **--exdict** option.
         一般財団法人テクニカルコミュニケーター協会 
         Japan Technical Communicators Association
         https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf
+
+- **--exdict** sccc2.dict
+- **--sccc2**
+
+    Dictionary used for "C/C++ セキュアコーディング 第2版" published in
+    2014.
+
+    https://www.jpcert.or.jp/securecoding\_book\_2nd.html
 
 # INSTALL
 

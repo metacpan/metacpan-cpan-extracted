@@ -3,7 +3,7 @@ package File::Slurp;
 use strict;
 use warnings ;
 
-our $VERSION = '9999.29';
+our $VERSION = '9999.30';
 $VERSION = eval $VERSION;
 
 use Carp ;
@@ -281,7 +281,7 @@ sub write_file {
 			# exist). This is slower, but safer.
 			{
 				local $^W = 0; # AYFKM
-				(undef, $file_name) = tempfile('tempXXXXX', DIR => $dir, OPEN => 0);
+				(undef, $file_name) = tempfile('.tempXXXXX', DIR => $dir, OPEN => 0);
 			}
 		}
 		$fh = local *FH;

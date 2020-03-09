@@ -1,3 +1,7 @@
+2019-04-21  Kingpin  <martin@martin-M17x>
+
+	* author-only: Converted from Module::Install to Dist::Zilla
+
 2009-07-04  Kingpin  <Martin@BLUEMAX>
 
 	* lib/RDF/Simple/Serialiser/N3.pm (render): try not to put <> around non-URI items

@@ -1,6 +1,9 @@
 use 5.014;
 
-use Do;
+use strict;
+use warnings;
+use routines;
+
 use Test::Auto;
 use Test::More;
 
@@ -225,7 +228,7 @@ subtest 't/0.05/can/Doodle_Column_delete.t', fun() {
   isa_ok $x, 'Doodle::Command';
 
   is $c->type, 'string';
-  is $c, $x->columns->first;
+  is $c, $x->columns->[0];
   is $x->name, 'delete_column';
 
   ok 1 and done_testing;
@@ -271,7 +274,7 @@ subtest 't/0.05/can/Doodle_Column_create.t', fun() {
   isa_ok $x, 'Doodle::Command';
 
   is $c->type, 'string';
-  is $c, $x->columns->first;
+  is $c, $x->columns->[0];
   is $x->name, 'create_column';
 
   ok 1 and done_testing;

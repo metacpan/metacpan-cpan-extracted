@@ -144,6 +144,8 @@ pod_spelling_system:
     - api
     - WriteMakefile
     - Grinnz
+    - Vcpkg
+    - macOS
 
 pod_coverage:
   skip: 0

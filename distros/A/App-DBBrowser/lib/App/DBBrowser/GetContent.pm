@@ -71,32 +71,37 @@ sub get_content {
 
     MENU: while ( 1 ) {
         if ( ! $skip_to ) {
-            my $hidden = "Choose type of data source:";
-            my @pre = ( $hidden, undef );
-            my $choices = [ @pre, map { $_->[1] } @cu ];
-            # Choose
-            my $idx = $tc->choose(
-                $choices,
-                { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx, undef => '  <=' }
-            );
-            if ( ! defined $idx || ! defined $choices->[$idx] ) {
-                return;
-            }
-            if ( $sf->{o}{G}{menu_memory} ) {
-                if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                    $old_idx = 1;
+            if ( $sf->{o}{insert}{data_source} == 3 ) {
+                my $hidden = "Choose type of data source:";
+                my @pre = ( $hidden, undef );
+                my $choices = [ @pre, map { $_->[1] } @cu ];
+                # Choose
+                my $idx = $tc->choose(
+                    $choices,
+                    { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx, undef => '  <=' }
+                );
+                if ( ! defined $idx || ! defined $choices->[$idx] ) {
+                    return;
+                }
+                if ( $sf->{o}{G}{menu_memory} ) {
+                    if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                        $old_idx = 1;
+                        next MENU;
+                    }
+                    $old_idx = $idx;
+                }
+                if ( $choices->[$idx] eq $hidden ) {
+                    require App::DBBrowser::Opt::Set;
+                    my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+                    my $info = "Parse options:";
+                    $opt_set->set_options( $sf->__setting_menu_entries( 1 ), $info );
                     next MENU;
                 }
-                $old_idx = $idx;
+                $sf->{i}{gc}{source_type} = $cu[$idx-@pre][0];
             }
-            if ( $choices->[$idx] eq $hidden ) {
-                require App::DBBrowser::Opt::Set;
-                my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-                my $info = "Parse options:";
-                $opt_set->set_options( $sf->__setting_menu_entries( 1 ), $info );
-                next MENU;
+            else {
+                $sf->{i}{gc}{source_type} = $cu[ $sf->{o}{insert}{data_source} ][0];
             }
-            $sf->{i}{gc}{source_type} = $cu[$idx-@pre][0];
         }
 
         GET_DATA: while ( 1 ) {
@@ -115,6 +120,7 @@ sub get_content {
                     ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_file( $sql );
                 }
                 if ( ! $ok ) {
+                    return if $sf->{o}{insert}{data_source} < 3;
                     next MENU;
                 }
             }

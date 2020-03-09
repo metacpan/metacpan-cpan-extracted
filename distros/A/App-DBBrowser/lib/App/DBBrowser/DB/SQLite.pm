@@ -65,9 +65,9 @@ sub get_databases {
     return \@ARGV if @ARGV;
     my $cache_sqlite_files = catfile $sf->{i}{app_dir}, 'cache_SQLite_files.json';
     my $ax = App::DBBrowser::Auxil->new( {}, {}, {} );
-    my $db_cache = $ax->read_json( $cache_sqlite_files );
-    my $dirs = $db_cache->{directories} || [ $sf->{i}{home_dir} ];
-    my $databases = $db_cache->{databases} || [];
+    my $db_cache = $ax->read_json( $cache_sqlite_files ) // {};
+    my $dirs = $db_cache->{directories} // [ $sf->{i}{home_dir} ];
+    my $databases = $db_cache->{databases} // [];
     if ( ! $sf->{i}{sqlite_search} && @$databases ) {
         return $databases;
     }

@@ -5,7 +5,7 @@ use warnings;
 package Object::Adhoc;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.003';
 
 use Hash::Util qw(lock_ref_keys);
 use Digest::MD5 qw(md5_hex);
@@ -17,6 +17,24 @@ BEGIN {
 		? sub () { !!1 }
 		: sub () { !!0 };
 };
+
+our $RESERVED_REGEXP;
+
+# Yes, you can push extra methods onto this array if you need to,
+# but if you do that, then set $RESERVED_REGEXP to undef so that
+# make_class will rebuild it! 
+#
+our @RESERVED_METHODS = qw(
+	import unimport
+	DESTROY
+	AUTOLOAD
+	isa DOES does can VERSION
+	meta new
+);
+#
+# Note that tie-related stuff isn't on the list of reserved methods
+# because people using those names isn't likely to cause any actual
+# harm.
 
 sub object {
 	my ($data, $keys) = @_;
@@ -37,15 +55,20 @@ sub make_class {
 	my %getters     = map(+($_ => $_), @$keys);
 	my %predicates  = map(+((/^_/?"_has$_":"has_$_")=> $_), @$keys);
 	
+	$RESERVED_REGEXP ||= do {
+		my $re = join "|", map quotemeta($_), @RESERVED_METHODS;
+		qr/\A(?:$re)\z/;
+	};
+	
 	for my $key (@$keys) {
 		if (exists $predicates{$key}) {
 			delete $predicates{$key};
 			require Carp;
-			Carp::carp("Ambiguous method $key is getter, not predicate");
+			Carp::carp("Ambiguous method '$key' is getter, not predicate");
 		}
-		if ($key !~ /^[^\W0-9]\w*$/s) {
+		if ($key !~ /^[^\W0-9]\w*$/s or $key =~ $RESERVED_REGEXP) {
 			require Carp;
-			Carp::carp("Key $key would be bad method name, not generating methods");
+			Carp::carp("Key '$key' would be bad method name, not generating methods");
 			my $predicate = ($key =~ /^_/) ? "_has$key" : "has_$key";
 			delete $getters{$key};
 			delete $predicates{$predicate};
@@ -74,6 +97,13 @@ sub make_class {
 		eval($code) or do { require Carp; Carp::croak($@) };
 	}
 	
+	do {
+		no strict 'refs';
+		*{"$class\::DOES"}     = \&_DOES;
+		*{"$class\::does"}     = \&_DOES;
+		*{"$class\::VERSION"}  = \$VERSION;
+	};
+	
 	$made{$joined} = $class;
 }
 
@@ -82,6 +112,12 @@ sub _usage {
 	require Carp;
 	local $Carp::CarpLevel = 1 + $Carp::CarpLevel;
 	Carp::croak("Usage: $caller\(self)"); # mimic XS usage message
+}
+
+sub _DOES {
+	return !!1 if $_[1] eq __PACKAGE__;
+	return !!1 if $_[1] eq 'HASH';
+	shift->isa(@_);
 }
 
 1;
@@ -169,7 +205,7 @@ C<make_class> is not exported by default.
 
 =head2 Diagnostics
 
-=head3 Ambiguous method %s is getter, not predicate
+=head3 Ambiguous method '%s' is getter, not predicate
 
 Given the following:
 
@@ -182,7 +218,7 @@ Object::Adhoc doesn't know if you want the C<has_name> method to be a
 getter for the "has_name" attribute, or a predicate for the "name" attribute.
 The getter wins, but it will issue a warning.
 
-=head3 Key %s would be bad method name, not generating methods
+=head3 Key '%s' would be bad method name, not generating methods
 
 You've got a key with a name that cannot be called as a method.
 For example:
@@ -192,6 +228,10 @@ For example:
 Perl methods cannot contain spaces, so Object::Adhoc refuses to
 create the method and gives you a warning. (Technically it is possible
 to create and call methods containing spaces, but it's fiddly.)
+
+This also happens for a few reserved method names like C<AUTOLOAD>,
+C<DESTROY>, C<isa>, C<DOES>, C<can>, etc. These have particular meanings
+in Perl that would conflict with them being used as a getter method.
 
 =head3 Usage %s(self)
 

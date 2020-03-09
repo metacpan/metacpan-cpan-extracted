@@ -15,7 +15,7 @@ package main;
 
 subtest "opt:append_newline=1" => sub {
     my $str = "";
-    Log::ger::Util::reset_hooks('create_log_routine');
+    Log::ger::Util::reset_hooks('create_outputter');
     require Log::ger::Output;
     Log::ger::Output->set('String', string => \$str, append_newline => 1);
     my $h = {}; Log::ger::init_target(hash => $h);
@@ -32,7 +32,7 @@ subtest "opt:append_newline=1" => sub {
 
 subtest "opt:append_newline=0" => sub {
     my $str = "";
-    Log::ger::Util::reset_hooks('create_log_routine');
+    Log::ger::Util::reset_hooks('create_outputter');
     require Log::ger::Output;
     Log::ger::Output->set('String', string => \$str, append_newline => 0);
     my $h = {}; Log::ger::init_target(hash => $h);

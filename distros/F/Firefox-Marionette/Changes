@@ -1,7 +1,10 @@
 Revision history for Firefox-Marionette
 
+0.96  Mon Mar  9 18:14:00 2020
+       Improved cleanups and added chatty/seer options to new method.
+
 0.95  Thu Feb 27 08:56:00 2020
-       Increasing PDF::API2 requirement, moving har testing into RELEASE_TESTING only
+       Increasing PDF::API2 requirement, moving har testing into RELEASE_TESTING only.
 
 0.94  Tue Feb 25 17:09:00 2020
        Fix a profile bug preventing remote downloads.

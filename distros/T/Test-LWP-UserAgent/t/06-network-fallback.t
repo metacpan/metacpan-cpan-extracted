@@ -46,7 +46,7 @@ $^W = 1;
     test_send_request('no network_fallback on other instance', $useragent2, POST($redirect_url), '404');
 
     $useragent->network_fallback(0);
-    ok(!$useragent->network_fallback, 'network_fallback disnabled for the instance');
+    ok(!$useragent->network_fallback, 'network_fallback disabled for the instance');
     test_send_request('no network_fallback on instance', $useragent, POST($redirect_url), '404');
     test_send_request('no network_fallback on other instance', $useragent2, POST($redirect_url), '404');
 }

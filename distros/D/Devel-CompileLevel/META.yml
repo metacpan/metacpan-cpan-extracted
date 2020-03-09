@@ -22,5 +22,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-CompileLevel
   license: http://dev.perl.org/licenses/
   repository: https://github.com/haarg/Devel-CompileLevel.git
-version: '0.001003'
+version: '0.001004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

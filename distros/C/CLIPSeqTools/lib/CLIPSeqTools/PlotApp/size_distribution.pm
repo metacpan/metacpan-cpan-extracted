@@ -26,7 +26,7 @@ Create plots for script size_distribution.
 =cut
 
 package CLIPSeqTools::PlotApp::size_distribution;
-$CLIPSeqTools::PlotApp::size_distribution::VERSION = '0.1.8';
+$CLIPSeqTools::PlotApp::size_distribution::VERSION = '0.1.9';
 
 # Make it an app command
 use MooseX::App::Command;

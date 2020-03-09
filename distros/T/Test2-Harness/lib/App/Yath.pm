@@ -2,7 +2,7 @@ package App::Yath;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use Test2::Harness::Util::HashBase qw{
     -config
@@ -175,8 +175,10 @@ sub process_argv {
 }
 
 sub clear_env {
+    delete $ENV{HARNESS_IS_VERBOSE};
     delete $ENV{T2_FORMATTER};
     delete $ENV{T2_HARNESS_FORKED};
+    delete $ENV{T2_HARNESS_IS_VERBOSE};
     delete $ENV{T2_HARNESS_JOB_IS_TRY};
     delete $ENV{T2_HARNESS_JOB_NAME};
     delete $ENV{T2_HARNESS_PRELOAD};
@@ -675,6 +677,16 @@ to mark the test with LONG or MEDIUM in addition to this marker.
     ...
 
 =back
+
+=head3 HARNESS-RETRY-n
+
+This lets you specify a number (minimum n=1) of retries on test failure
+for a specific test. HARNESS-RETRY-1 means a failing test will be run twice
+and is equivalent to HARNESS-RETRY.
+
+=head3 HARNESS-NO-RETRY
+
+Use this to avoid this test being retried regardless of your retry settings.
 
 =head1 MODULE DOCS
 

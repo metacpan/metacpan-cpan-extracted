@@ -32,6 +32,7 @@ my @codespell_skip = qw(
   *.gmo
   *.add
   *.cache
+  *~
   ChangeLog
   Makefile.in
   Makefile
@@ -39,6 +40,8 @@ my @codespell_skip = qw(
   libtool
   libtool.m4
   aclocal.m4
+  build-tree
+  tmp
 );
 my $codespell_skip = join ',', @codespell_skip;
 
@@ -53,6 +56,9 @@ my $tags = qx(codespell @codespell_opts 2>&1);
 $tags =~ s/^WARNING: Binary file:.*\n//mg;
 $tags =~ s{^\./build-aux/.*\n}{}mg;
 $tags =~ s{^\./man/[a-zA-Z_]+/.*\n}{}mg;
+# XXX: Ignore python-3.8 runtime warnings:
+$tags =~ s{^.*: RuntimeWarning: line buffering .*\n}{}mg;
+$tags =~ s{^\s*file = builtins.open.*\n}{}mg;
 chomp $tags;
 
 my $ok = length $tags == 0;

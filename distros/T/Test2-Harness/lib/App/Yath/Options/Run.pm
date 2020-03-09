@@ -2,7 +2,7 @@ package App::Yath::Options::Run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use Test2::Harness::Util::UUID qw/gen_uuid/;
 
@@ -24,7 +24,7 @@ option_group {prefix => 'run', category => "Run Options", builds => 'Test2::Harn
 
     option test_args => (
         type => 'm',
-        description => 'Arguments to pass in as @ARGV for all tests that are run. These can be provided easier using the \'::\' argument seperator.'
+        description => 'Arguments to pass in as @ARGV for all tests that are run. These can be provided easier using the \'::\' argument separator.'
     );
 
     option input => (
@@ -63,7 +63,7 @@ option_group {prefix => 'run', category => "Run Options", builds => 'Test2::Harn
         field       => 'use_stream',
         alt         => ['TAP', '--no-stream'],
         normalize   => sub { $_[0] ? 0 : 1 },
-        description => "The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests wh    ere this causes problems, in which case setting --TAP or --no-stream can help."
+        description => "The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help."
     );
 
     option fields => (
@@ -359,7 +359,7 @@ Set a specific run-id. (Default: a UUID)
 
 =item --no-test-args
 
-Arguments to pass in as @ARGV for all tests that are run. These can be provided easier using the '::' argument seperator.
+Arguments to pass in as @ARGV for all tests that are run. These can be provided easier using the '::' argument separator.
 
 Can be specified multiple times
 
@@ -379,7 +379,7 @@ Use the stream formatter (default is on)
 
 =item --no-tap
 
-The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests wh    ere this causes problems, in which case setting --TAP or --no-stream can help.
+The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.
 
 
 =back

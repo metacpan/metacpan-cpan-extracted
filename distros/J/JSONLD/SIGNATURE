@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,36 +14,35 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 5abce076fd8d3707a2d7e7112998fcd2e225b2e5 Changes
-SHA1 f251c78a528ba8ef717433c498d6bf457c334e88 MANIFEST
-SHA1 c10f19370658e73222434cd2249e429c63afaa91 META.yml
-SHA1 96192595a334fd77bcacd49a9c9605284ffe2409 Makefile.PL
-SHA1 86265d817d8e8f7b766376a1c7975d60ea466bf4 README.md
-SHA1 98c7471eea1dc975c7fb0c23429360709af667d9 bin/jsonld-compact
-SHA1 aefc63c13dd8e8d49ef23bbc4363d3c53e57a5e3 bin/jsonld-expand
-SHA1 9f330f63a8f5c0a0a77ea34231ffc01aed4de2a3 bin/jsonld-nq
-SHA1 05a17c51aceb6435a1eac17137f19911a09e5050 inc/Module/Install.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 dc73c2baf4357ad1cc884146147f557a50a29300 inc/Module/Install/Base.pm
-SHA1 c7f311a5bc5a7f96e9105d5f16a0e13fc596899d inc/Module/Install/Can.pm
-SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
-SHA1 8c8f9ff5b0a536af59814e16a901ce39fbc23299 inc/Module/Install/Fetch.pm
-SHA1 4f77eb02e104324b08a047585c498146b045613b inc/Module/Install/Makefile.pm
-SHA1 2f5be6af6098acf6d786a4a7299a34d0c6c04ef9 inc/Module/Install/Metadata.pm
-SHA1 fa532ce949d1c607589aded93d5ea1d49a27e5d8 inc/Module/Install/Scripts.pm
-SHA1 aa6723cc4a8d4475026f6ceb28e1f16459e8a11b inc/Module/Install/Win32.pm
-SHA1 6661285caedfe012cb5a1ca915a422ffc292ae2b inc/Module/Install/WriteAll.pm
-SHA1 85fb410247fc1213188b4d9534f34a5e78466d52 lib/JSONLD.pm
-SHA1 5601e570444de775d045327a965fb289bb868075 meta/changes.ttl
-SHA1 b366e7addb62f2915ae0a13ba50ad28188c33f63 t/00.load.t
-SHA1 8d62325b1ec6fcadd2237bbb698ade4ffaa54df4 t/simple.t
-SHA1 929a28352946c0ae371899181ce6ac2583428037 xt/compact.t
-SHA1 be529fa34881a7bb5cd365e385484fc78bdfef7c xt/expand.t
-SHA1 c09ea7f79580f6d037ca6d1ee7d3b158921c4d62 xt/to-rdf.t
+SHA256 e3402492a715e97302fe55e38d32c6bcb5106cb30c6492bf37b1a123285505f8 Changes
+SHA256 0feb9b349674cef95d7a4937a5eb89575be7eec3615fec6236eb60ed853ac8d6 MANIFEST
+SHA256 7de3b96eca5c194d643098b67346825a00b034a3f32475b037f27f5ad1c5786f META.yml
+SHA256 fcfcdd483dd39a4ee77eab24bc1ecd0244d30008171633084864f38c1dbdd4b1 Makefile.PL
+SHA256 9b3252d8f9b6e88c4de66faec2c793ad3f8b8f9d8874304523774ee25a22414f README.md
+SHA256 0e3d6f1cd477ae5a1f1925febe1bce69ce35dd0463533c5dccb42daf97766b94 bin/jsonld-compact
+SHA256 7f882be4593a21e3c13850232f737dbcc7f3afafd2c21d39f4892103ce68d8eb bin/jsonld-expand
+SHA256 158ded12f7815787216f929272990d2622738114aa882c12b576d810669aa9cc bin/jsonld-nq
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 668306ae2fad17b3049f885251b8679497c4eb8d5c4b0d13f5c95bda331d1f00 inc/Module/Install/DOAPChangeSets.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 bfbf2ee0cfd9ab356e5288eb4cd8a1e4175c579018d2f2d634d72b8cd1226b8d lib/JSONLD.pm
+SHA256 6526389889495109f8273e6b32129d0face7d9e061a1ff34b2f40566f7bb8b4f meta/changes.ttl
+SHA256 1cbe0a35a6a17ccf8164bb0608ded87a8efd2bb268edd82276c350b6b197ff74 t/00.load.t
+SHA256 68a9f0d9b20febda91d2983f3f01876376aab2bfa077837d1d19f53f11c233ad t/simple.t
+SHA256 888fc58dd2f8605455470652c5f7117137e2cf2d72fad75c658df399438ec1db xt/compact.t
+SHA256 47ae91e2737195a2c6f7aa7306d1113c0b17048e9d219a589bd351dc183d5198 xt/expand.t
+SHA256 ecd3e9e6131101433534e516b26cef7a0226d5133cc5c91d1003524083eeaa07 xt/to-rdf.t
 -----BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
 
-iEYEARECAAYFAl4t3JgACgkQhPK6VMqoyC1KcQCaA921aPSY4PDTUrCWnKDKzclh
-6uMAn2+KC9hCsOxpowzWeZs0TRWej4ZF
-=SzOv
+iF0EARECAB0WIQSC+8GhU5AgVmDLxA+E8rpUyqjILQUCXmW7rwAKCRCE8rpUyqjI
+LbH6AKCRWfQT3+qT897mCoaUtydrjUKP7gCeM1819kjtxlKrbL945LBmmHBMS1c=
+=ynrI
 -----END PGP SIGNATURE-----

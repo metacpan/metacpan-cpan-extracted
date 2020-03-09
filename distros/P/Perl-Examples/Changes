@@ -1,26 +1,33 @@
-0.094   2018-11-29 (PERLANCAR)
+0.095   2020-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Add Synopsis in Perl::Examples::POD::Link.
+
+	- Add example POD: Perl::Examples::POD::Escape.
+
+
+0.094   2018-11-29  Released-By: PERLANCAR
 
 	- Try L</Chapter/Subchapter> syntax.
 
 
-0.093   2018-11-29 (PERLANCAR)
+0.093   2018-11-29  Released-By: PERLANCAR
 
 	- Add example POD: Perl::Examples::POD::Link::AmbiguousSection.
 
 
-0.092   2018-09-11 (PERLANCAR)
+0.092   2018-09-11  Released-By: PERLANCAR
 
 	- Add an example module (Module::One).
 
 
-0.091   2018-09-10 (PERLANCAR)
+0.091   2018-09-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [dist] Edit Changes, change reference URL.
 
 
-0.090   2018-09-10 (PERLANCAR)
+0.090   2018-09-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -28,39 +35,39 @@
           https://perlancar.wordpress.com/2018/09/10/should-i-choose-x-yy-or-x-yyy-versioning-scheme-for-my-perl-module/
 
 
-0.08    2018-09-10 (PERLANCAR)
+0.08    2018-09-10  Released-By: PERLANCAR
 
 	- POD::Link: Add source as well as rendered result.
 
 
-0.07    2016-06-26 (PERLANCAR)
+0.07    2016-06-26  Released-By: PERLANCAR
 
 	- Add module: Perl::Examples::POD::HTML.
 
 
-0.06    2016-03-21 (PERLANCAR)
+0.06    2016-03-21  Released-By: PERLANCAR
 
         - Add module: Perl::Examples::POD::Text.
 
         - Fixes.
 
 
-0.05    2016-02-08 (PERLANCAR)
+0.05    2016-02-08  Released-By: PERLANCAR
 
 	- Add examples of links in head2 & bullet points.
 
 
-0.04    2016-02-07 (PERLANCAR)
+0.04    2016-02-07  Released-By: PERLANCAR
 
         - Add module: Perl::Examples::POD::Link.
 
 
-0.03    2015-12-31 (PERLANCAR)
+0.03    2015-12-31  Released-By: PERLANCAR
 
 	- perl-example-die: Add --warn & --carp.
 
 
-0.02     2015-12-31 (PERLANCAR)
+0.02     2015-12-31  Released-By: PERLANCAR
 
          - Add scripts: perl-example-endless-loop,
            perl-example-grow-indefinitely.
@@ -73,6 +80,6 @@
            Devel::Confess & Carp::Always.
 
 
-0.01     2015-01-06 (PERLANCAR)
+0.01     2015-01-06  Released-By: PERLANCAR
 
          - First release.

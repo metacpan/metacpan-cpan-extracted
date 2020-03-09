@@ -1,0 +1,40 @@
+---
+abstract: 'a game featuring @ versus the Xarci Bedo'
+author:
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Scalar::Util: '0'
+  Test::More: '0.88'
+  Test::Most: '0'
+  Test::UnixCmdWrap: '0'
+  strict: '0'
+configure_requires:
+  CPAN::Meta: '2.142060'
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Game-Xomb
+provides:
+  Game::Xomb:
+    file: lib/Game/Xomb.pm
+    version: '1.00'
+requires:
+  List::Util: '0'
+  List::UtilsBy: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Term::ReadKey: '0'
+  Time::HiRes: '0'
+  XSLoader: '0'
+  perl: v5.24.0
+  strict: '0'
+resources:
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://github.com/thrig/Game-Xomb
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

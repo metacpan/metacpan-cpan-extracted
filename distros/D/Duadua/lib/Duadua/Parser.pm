@@ -1,12 +1,6 @@
 package Duadua::Parser;
 use strict;
 use warnings;
-use Module::Pluggable::Object;
-
-Module::Pluggable::Object->new(
-    search_path => [ __PACKAGE__ ],
-    require     => 1,
-)->plugins;
 
 my $BLANK_UA = {
     name => 'UNKNOWN',
@@ -26,8 +20,8 @@ sub parse {
         return $BLANK_UA;
     }
 
-    if ( my $is_bot = $class->_detect_general_bot($d) ) {
-        return $is_bot;
+    if ( my $bot = $class->_detect_general_bot($d) ) {
+        return $bot;
     }
 
     return $BLANK_UA;
@@ -36,25 +30,25 @@ sub parse {
 sub _detect_general_bot {
     my ($class, $d) = @_;
 
-    my $h = \%{$BLANK_UA};
+    my %h = %{$BLANK_UA};
 
     if ( index($d->ua, 'http://') > -1 || index($d->ua, 'https://') > -1 ) {
-        $h->{is_bot} = 1;
+        $h{is_bot} = 1;
         if ( index($d->ua, 'Mozilla/') != 0 && $d->ua =~ m!^([^/;]+)/(v?[\d.]+)! ) {
             my ($name, $version) = ($1, $2);
-            $h->{name}    = $name;
-            $h->{version} = $version;
+            $h{name}    = $name;
+            $h{version} = $version;
         }
         elsif ( $d->ua =~ m![\s\(]([^/\s:;]+(?:bot|crawl|crawler|spider|fetcher))/(v?[\d.]+)!i ) {
             my ($name, $version) = ($1, $2);
-            $h->{name}    = $1;
-            $h->{version} = $version;
+            $h{name}    = $1;
+            $h{version} = $version;
         }
         elsif ( $d->ua =~ m!([a-zA-Z0-9\-\_\.\!]+(?:bot|crawler))!i ) {
-            $h->{name} = $1;
+            $h{name} = $1;
         }
 
-        return $h;
+        return \%h;
     }
 }
 

@@ -43,7 +43,7 @@ Measure reads at each conservation level
 =cut
 
 package CLIPSeqTools::App::conservation_distribution;
-$CLIPSeqTools::App::conservation_distribution::VERSION = '0.1.8';
+$CLIPSeqTools::App::conservation_distribution::VERSION = '0.1.9';
 
 # Make it an app command
 use MooseX::App::Command;

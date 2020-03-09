@@ -1,13 +1,16 @@
 package Mail::TLSRPT::Report;
 # ABSTRACT: TLSRPT report object
-our $VERSION = '1.20200305.1'; # VERSION
+our $VERSION = '1.20200306.1'; # VERSION
 use 5.20.0;
 use Moo;
 use Carp;
 use Mail::TLSRPT::Pragmas;
 use Mail::TLSRPT::Policy;
+use Mail::TLSRPT::Failure;
 use DateTime;
 use Date::Parse qw{ str2time };
+use IO::Uncompress::Gunzip;
+use Text::CSV;
     has organization_name => (is => 'rw', isa => Str, required => 1);
     has start_datetime => (is => 'rw', isa => class_type('DateTime'), required => 1);
     has end_datetime => (is => 'rw', isa => class_type('DateTime'), required => 1);
@@ -19,6 +22,12 @@ sub new_from_json($class,$json) {
     my $j = JSON->new;
     my $data = $j->decode($json);
     return $class->new_from_data($data);
+}
+
+sub new_from_json_gz($class,$compressed_json) {
+  my $json;
+  IO::Uncompress::Gunzip::gunzip(\$compressed_json,\$json);
+  return $class->new_from_json($json);
 }
 
 sub new_from_data($class,$data) {
@@ -66,5 +75,79 @@ sub as_string($self) {
     );
 }
 
+sub _csv_headers($self) {
+    return (
+        'report id',
+        'organization name',
+        'start date time',
+        'end date time',
+        'contact info',
+    );
+}
+
+sub _csv_fragment($self) {
+    return (
+        $self->report_id,
+        $self->organization_name,
+        $self->start_datetime->datetime.'Z',
+        $self->end_datetime->datetime.'Z',
+        $self->contact_info,
+    );
+}
+
+sub as_csv($self,$args) {
+    my @output;
+    my $csv = Text::CSV->new;
+    if ( $args->{add_header} ) {
+      $csv->combine($self->_csv_headers,Mail::TLSRPT::Policy->_csv_headers,Mail::TLSRPT::Failure->_csv_headers);
+      push @output, $csv->string;
+    }
+    if ( scalar $self->policies->@* ) {
+        foreach my $policy ( $self->policies->@* ) {
+            if ( scalar $policy->failures->@* ) {
+                foreach my $failure ( $policy->failures->@* ) {
+                    $csv->combine($self->_csv_fragment,$policy->_csv_fragment,$failure->_csv_fragment);
+                    push @output, $csv->string;
+                }
+            }
+            else {
+                $csv->combine($self->_csv_fragment,$policy->_csv_fragment);
+                push @output, $csv->string;
+            }
+        }
+    }
+    else {
+        $csv->combine($self->_csv_fragment);
+        push @output, $csv->string;
+    }
+    return join( "\n", @output );
+}
+
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::TLSRPT::Report - TLSRPT report object
+
+=head1 VERSION
+
+version 1.20200306.1
+
+=head1 AUTHOR
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Marc Bradshaw.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

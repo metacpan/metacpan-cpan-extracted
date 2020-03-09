@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.241';
+our $VERSION = '2.243';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -46,6 +46,7 @@ sub new {
         lyt_h       => { order => 0, alignment => 2 },
         lyt_v       => { undef => '  BACK', layout => 3, },
         lyt_v_clear => { undef => '  BACK', layout => 3, clear_screen => 1 },
+        dots        => [ [ '...', 3 ], [ '|', 1 ], [] ],
         quit        => 'QUIT',
         back        => 'BACK',
         confirm     => 'CONFIRM',
@@ -78,15 +79,20 @@ sub __init {
     }
     my $app_dir = catdir( $config_home // $home, 'db_browser' );
     mkdir $app_dir or die $! if ! -d $app_dir;
-    $sf->{i}{home_dir}      = $home;
-    $sf->{i}{app_dir}       = $app_dir;
-    $sf->{i}{f_settings}    = catfile $app_dir, 'general_settings.json';
-    $sf->{i}{conf_file_fmt} = catfile $app_dir, 'config_%s.json';
-    $sf->{i}{f_attached_db} = catfile $app_dir, 'attached_DB.json';
-    $sf->{i}{f_dir_history} = catfile $app_dir, 'dir_history.json';
-    $sf->{i}{f_subqueries}  = catfile $app_dir, 'subqueries.json';
-    $sf->{i}{f_copy_paste}  = catfile $app_dir, 'tmp_file_copy_and_paste.csv';
-    $sf->{i}{f_plain}       = catfile $app_dir, 'tmp_file_plain.csv';
+    $sf->{i}{home_dir} = $home;
+    $sf->{i}{app_dir}  = $app_dir;
+    $sf->{i}{f_settings}           = catfile $app_dir, 'general_settings.json';
+    $sf->{i}{conf_file_fmt}        = catfile $app_dir, 'config_%s.json';
+    $sf->{i}{f_attached_db}        = catfile $app_dir, 'attached_DB.json';
+    $sf->{i}{f_dir_history}        = catfile $app_dir, 'dir_history.json';
+    $sf->{i}{f_subqueries}         = catfile $app_dir, 'subqueries.json';
+    $sf->{i}{f_search_and_replace} = catfile $app_dir, 'search_and_replace.json';
+    $sf->{i}{f_copy_and_paste}     = catfile $app_dir, 'tmp_file_copy_and_paste.csv';
+    $sf->{i}{f_plain}              = catfile $app_dir, 'tmp_file_plain.csv';
+    END {
+        unlink $sf->{i}{f_copy_and_paste} if -e $sf->{i}{f_copy_and_paste};
+        unlink $sf->{i}{f_plain}      if -e $sf->{i}{f_plain};
+    }
 }
 
 
@@ -132,8 +138,8 @@ sub run {
     my ( $sf ) = @_;
     local $| = 1;
     local $SIG{INT} = sub {
-        if ( defined $sf->{i}{f_copy_paste} && -e $sf->{i}{f_copy_paste} ) {
-            unlink $sf->{i}{f_copy_paste};
+        if ( defined $sf->{i}{f_copy_and_paste} && -e $sf->{i}{f_copy_and_paste} ) {
+            unlink $sf->{i}{f_copy_and_paste};
         }
         if ( defined $sf->{i}{f_plain} && -e $sf->{i}{f_plain} ) {
             unlink $sf->{i}{f_plain};
@@ -271,8 +277,8 @@ sub run {
             my $dbh;
             if ( ! eval {
                 $dbh = $plui->get_db_handle( $db );
-                $sf->{i}{quote_char} = $dbh->get_info(29)  || '"', # SQL_IDENTIFIER_QUOTE_CHAR
-                $sf->{i}{sep_char}   = $dbh->get_info(41)  || '.'; # SQL_CATALOG_NAME_SEPARATOR # name
+                $sf->{i}{quote_char} = $dbh->get_info(29)  // '"', # SQL_IDENTIFIER_QUOTE_CHAR
+                $sf->{i}{sep_char}   = $dbh->get_info(41)  // '.'; # SQL_CATALOG_NAME_SEPARATOR # name
                 1 }
             ) {
                 $ax->print_error_message( $@ );
@@ -291,8 +297,8 @@ sub run {
             };
             $sf->{db_attached} = 0;
             if ( $driver eq 'SQLite' && -s $sf->{i}{f_attached_db} ) {
-                my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} );
-                my $attached_db = $h_ref->{$db} || [];
+                my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
+                my $attached_db = $h_ref->{$db} // [];
                 if ( @$attached_db ) {
                     for my $ref ( @$attached_db ) {
                         my $stmt = sprintf "ATTACH DATABASE %s AS %s", $dbh->quote_identifier( $ref->[0] ), $dbh->quote( $ref->[1] );
@@ -732,7 +738,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.241
+Version 2.243
 
 =head1 DESCRIPTION
 

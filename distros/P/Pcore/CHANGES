@@ -1,3 +1,10 @@
+v0.121.1 2020-03-06T19:26:16Z
+ - resources updated
+
+v0.121.0 2020-03-06T19:19:37Z
+ - docker api updated
+ - docker wrapper updated
+
 v0.120.5 2020-03-04T18:10:43Z
  - nginx reuseport removed
 

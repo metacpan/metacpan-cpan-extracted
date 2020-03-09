@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.007     2020-03-07 16:52:17+01:00 Europe/Amsterdam
+          - Make 256M test an extended test
+
 0.006     2019-08-29 00:54:56+02:00 Europe/Amsterdam
           - Update argon2 sources to 20190702
           - Add -pthread option when compiling

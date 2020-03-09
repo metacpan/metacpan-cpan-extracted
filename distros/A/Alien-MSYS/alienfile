@@ -3,6 +3,10 @@ use Path::Tiny qw( path );
 use File::Glob qw( bsd_glob );
 use File::Which qw( which );
 
+#  no share install unless on windows
+delete $ENV{ALIEN_INSTALL_TYPE}
+  if $^O ne 'MSWin32' && $^O ne 'cygwin';
+
 if($^O eq 'MSWin32')
 {
   my $ver;

@@ -1,7 +1,9 @@
 package App::cpanmodules;
 
-our $DATE = '2019-11-19'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-24'; # DATE
+our $DIST = 'App-cpanmodules'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -109,9 +111,19 @@ sub list_acmemods {
             }
         }
         if ($args{detail}) {
+            my $has_benchmark = 0;
+          L1:
+            for my $entry (@{ $list->{entries} }) {
+                if (grep {/^bench_/} keys %$entry) {
+                    $has_benchmark = 1;
+                    last L1;
+                }
+            }
             push @res, {
                 acmemod => $e,
                 summary => $list->{summary},
+                num_entries => scalar(@{ $list->{entries} }),
+                has_benchmark => $has_benchmark,
             };
         } else {
             push @res, $e;
@@ -232,7 +244,7 @@ App::cpanmodules - The Acme::CPANModules CLI
 
 =head1 VERSION
 
-This document describes version 0.003 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2019-11-19.
+This document describes version 0.004 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2019-12-24.
 
 =head1 SYNOPSIS
 

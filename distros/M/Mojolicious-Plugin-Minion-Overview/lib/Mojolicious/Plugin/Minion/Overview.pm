@@ -7,7 +7,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Date;
 use Mojo::File 'path';
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.8';
 
 
 =head2 register
@@ -108,6 +108,23 @@ sub register {
 
         $jobs->get('/:id/retry')->to(action => 'retry')
             ->name('minion_overview.jobs.retry');
+
+
+    # API
+    my $api = $prefix->route('api');
+
+        # Metrics
+        my $api_metrics = $api->route('metrics');
+
+            # Jobs
+            my $api_metrics_jobs = $api_metrics->route('jobs')
+                ->to(controller => 'API::Metrics::Jobs');
+
+                $api_metrics_jobs->get('/:job/runtime')->to(action => 'runtime')
+                    ->name('minion_overview.api.metrics.jobs.runtime');
+
+                $api_metrics_jobs->get('/:job/throughput')->to(action => 'throughput')
+                    ->name('minion_overview.api.metrics.jobs.throughput');
 }
 
 1;

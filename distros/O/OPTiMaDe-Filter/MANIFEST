@@ -21,6 +21,7 @@ t/02parse.t
 t/03modify.t
 t/04modify.t
 t/05modify.t
+t/06property.t
 tests/cases/parse_001.inp
 tests/cases/parse_002.inp
 tests/cases/parse_003.inp

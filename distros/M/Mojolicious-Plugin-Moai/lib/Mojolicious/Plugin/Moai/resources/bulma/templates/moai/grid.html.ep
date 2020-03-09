@@ -1,0 +1,4 @@
+% my $class = stash( 'full' ) ? 'columns-fluid' : 'columns';
+%= tag div => ( class => $class ), begin
+    %= ref $content eq 'CODE' ? $content->() : $content
+% end

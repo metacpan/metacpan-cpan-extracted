@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Job;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use Carp qw/confess croak/;
 use Config qw/%Config/;
@@ -23,6 +23,8 @@ use Test2::Harness::Util::HashBase(
         <fork_callback
         <last_output_size
         +output_changed
+
+        +verbose
 
         +via
 
@@ -111,10 +113,9 @@ sub spawn_params {
 
     my $task = $self->{+TASK};
 
-    my $file = $self->ch_dir ? $self->file : $self->rel_file;
-
     my $command;
     if ($task->{binary} || $task->{non_perl}) {
+        my $file = $self->ch_dir ? $self->file : $self->rel_file;
         $command = [clean_path($file), $self->args];
     }
     else {
@@ -124,7 +125,7 @@ sub spawn_params {
             $self->switches,
             $self->cli_options,
 
-            $self->{+SETTINGS}->debug->dummy ? ('-e', 'print "1..0 # SKIP dummy mode"') : ($file),
+            $self->{+SETTINGS}->debug->dummy ? ('-e', 'print "1..0 # SKIP dummy mode"') : (sub { $self->rel_file }),
 
             $self->args,
         ];
@@ -248,8 +249,9 @@ sub output_changed {
     return $self->{+OUTPUT_CHANGED} //= time();
 }
 
-sub is_try { $_[0]->{+IS_TRY} //= $_[0]->{+TASK}->{is_try} // 0 }
-sub ch_dir { $_[0]->{+CH_DIR} //= $_[0]->{+TASK}->{ch_dir} // '' }
+sub verbose { $_[0]->{+VERBOSE} //= $_[0]->{+TASK}->{verbose} // 0 }
+sub is_try  { $_[0]->{+IS_TRY}  //= $_[0]->{+TASK}->{is_try}  // 0 }
+sub ch_dir  { $_[0]->{+CH_DIR}  //= $_[0]->{+TASK}->{ch_dir}  // '' }
 sub unsafe_inc  { $_[0]->{+UNSAFE_INC}  //= $_[0]->{+RUNNER}->unsafe_inc }
 sub event_uuids { $_[0]->{+EVENT_UUIDS} //= $_[0]->run->event_uuids }
 sub mem_usage   { $_[0]->{+MEM_USAGE}   //= $_[0]->run->mem_usage }
@@ -381,7 +383,7 @@ sub includes {
             include_dot     => $self->unsafe_inc,
             include_current => 1,
             clean           => 1,
-            $self->{+CH_DIR} ? (ch_dir => $self->{+CH_DIR}) : (),
+            $self->ch_dir ? (ch_dir => $self->ch_dir) : (),
         )
     ];
 
@@ -449,6 +451,8 @@ sub env_vars {
     push @p5l => $ENV{PERL5LIB} if $ENV{PERL5LIB};
     my $p5l = join $Config{path_sep} => grep { defined $_ && $_ ne '.' } @p5l;
 
+    my $verbose = $self->verbose;
+
     return $self->{+ENV_VARS} = {
         $from_run  ? (%$from_run)  : (),
         $from_task ? (%$from_task) : (),
@@ -461,6 +465,9 @@ sub env_vars {
         TEST2_RUN_DIR       => $self->run_dir,
         TMPDIR              => $self->tmp_dir,
         TEMPDIR             => $self->tmp_dir,
+
+        HARNESS_IS_VERBOSE    => $verbose,
+        T2_HARNESS_IS_VERBOSE => $verbose,
 
         HARNESS_ACTIVE       => 1,
         TEST2_HARNESS_ACTIVE => 1,

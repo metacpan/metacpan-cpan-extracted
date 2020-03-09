@@ -59,7 +59,7 @@
    "provides" : {
       "App::Greple::subst" : {
          "file" : "lib/App/Greple/subst.pm",
-         "version" : "2.07"
+         "version" : "2.08"
       },
       "App::Greple::subst::SmartString" : {
          "file" : "lib/App/Greple/subst.pm"
@@ -76,7 +76,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-subst"
       }
    },
-   "version" : "2.07",
+   "version" : "2.08",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <kaz@utashiro.com>"

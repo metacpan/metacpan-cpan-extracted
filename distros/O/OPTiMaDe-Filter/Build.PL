@@ -20,7 +20,7 @@ my %module_build_args = (
     "Andrius Merkys <merkys\@cpan.org>"
   ],
   "dist_name" => "OPTiMaDe-Filter",
-  "dist_version" => "0.7.2",
+  "dist_version" => "0.7.3",
   "license" => "lgpl",
   "module_name" => "OPTiMaDe::Filter",
   "recursive_test_files" => 1,

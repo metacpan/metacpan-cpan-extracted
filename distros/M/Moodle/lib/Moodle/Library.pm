@@ -2,9 +2,17 @@ package Moodle::Library;
 
 use 5.014;
 
-use Data::Object 'Library';
+use strict;
+use warnings;
 
-our $VERSION = '0.04'; # VERSION
+use Type::Library -base;
+use Type::Utils -all;
+
+BEGIN {
+  extends 'Data::Object::Types';
+}
+
+our $VERSION = '0.05'; # VERSION
 
 our $MysqlDriver = declare "MysqlDriver",
   as InstanceOf["Mojo::mysql"];
@@ -54,7 +62,7 @@ L<Data::Object::Library> which is a L<Type::Library>.
 
 This package uses type constraints from:
 
-L<Data::Object::Library>
+L<Data::Object::Types>
 
 =cut
 

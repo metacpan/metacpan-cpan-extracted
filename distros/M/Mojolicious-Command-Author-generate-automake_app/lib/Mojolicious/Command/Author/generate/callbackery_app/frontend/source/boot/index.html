@@ -23,7 +23,12 @@
 
             loadComplete: function(callback) {
                 output = null;
-                splash.remove();
+                if (splash.remove) {
+                  splash.remove();
+                }
+                else if (splash.parentNode) {
+                  splash.parentNode.removeChild(splash);
+                }
                 splash = null;
                 callback();
             },

@@ -29,11 +29,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger
   homepage: https://metacpan.org/release/Log-ger
   repository: git://github.com/perlancar/perl-Log-ger.git
-version: '0.031'
+version: '0.033'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::InsertBlock
+      name: InsertBlock
+      version: '0.100'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:

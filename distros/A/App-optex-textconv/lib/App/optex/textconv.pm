@@ -6,7 +6,7 @@ use warnings;
 
 use Encode;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 =encoding utf-8
 
@@ -16,11 +16,13 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 
 optex command -Mtextconv
+
+optex command -Mtc (alias module)
 
 =head1 DESCRIPTION
 
@@ -42,11 +44,41 @@ Next command simply produces the same result.
 
     $ diff OLD.docx NEW.docx
 
+=head1 INSTALL
+
+=head2 CPANM
+
+    $ cpanm App::optex::textconv
+    or
+    $ curl -sL http://cpanmin.us | perl - App::optex::textconv
+
+=head2 GIT
+
+Those are sample configurations using L<App::optex::textconv> in git
+environment.
+
+	~/.gitconfig
+		[diff "msdoc"]
+			textconv = optex -Mtextconv cat
+		[diff "pdf"]
+			textconv = optex -Mtextconv cat
+		[diff "jpg"]
+			textconv = optex -Mtextconv cat
+
+	~/.config/git/attributes
+		*.docx   diff=msdoc
+		*.pptx   diff=msdoc
+		*.xlmx   diff=msdoc
+		*.pdf    diff=pdf
+		*.jpg    diff=jpg
+
 =head1 SEE ALSO
 
 L<https://github.com/kaz-utashiro/optex>
 
 L<https://github.com/kaz-utashiro/optex-textconv>
+
+L<https://qiita.com/kaz-utashiro/items/23fd825bd325240592c2>
 
 =head1 LICENSE
 
@@ -156,6 +188,7 @@ sub textconv {
 	    my $tmp = $persist[@persist] = new App::optex::Tmpfile;
 	    my $data = do {
 		no strict 'refs';
+		use charnames ':full';
 		local $_ = decode 'utf8', &$func($_);
 		s/[\p{Private_Use}\p{Unassigned}]/\N{GETA MARK}/g;
 		encode 'utf8', $_;

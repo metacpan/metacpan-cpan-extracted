@@ -43,7 +43,7 @@ Measure nucleotide composition along reads.
 =cut
 
 package CLIPSeqTools::App::nucleotide_composition;
-$CLIPSeqTools::App::nucleotide_composition::VERSION = '0.1.8';
+$CLIPSeqTools::App::nucleotide_composition::VERSION = '0.1.9';
 
 # Make it an app command
 use MooseX::App::Command;

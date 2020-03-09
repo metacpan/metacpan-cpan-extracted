@@ -1,3 +1,8 @@
+1.302172  2020-03-08 15:21:25-07:00 America/Los_Angeles
+
+    - Fix transition doc
+    - Fix warnings from info / debug tap
+
 1.302171  2020-01-17 09:47:59-08:00 America/Los_Angeles
 
     - Fix 5.6

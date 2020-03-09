@@ -24,18 +24,26 @@ my %WriteMakefileArgs = (
     "JSON::Path" => "0.420",
     "Pod::Usage" => 0
   },
-  "VERSION" => "0.1.0",
+  "TEST_REQUIRES" => {
+    "File::Spec" => 0,
+    "IPC::Open2" => 0,
+    "Test::More" => 0
+  },
+  "VERSION" => "0.1.1",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
   "Data::Printer" => "0.40",
+  "File::Spec" => 0,
   "Getopt::Long" => 0,
+  "IPC::Open2" => 0,
   "JSON::Path" => "0.420",
-  "Pod::Usage" => 0
+  "Pod::Usage" => 0,
+  "Test::More" => 0
 );
 
 

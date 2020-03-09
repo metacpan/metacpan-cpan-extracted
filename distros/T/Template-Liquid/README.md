@@ -198,6 +198,39 @@ the name of the group. This can even be a variable.
 
 For more, see [Template::Liquid::Tag::Cycle](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3ACycle).
 
+## `increment`
+
+Creates a new number variable, and increases its value by one every time it is
+called. The initial value is `0`.
+
+    {% increment my_counter %}
+    {% increment my_counter %}
+    {% increment my_counter %}
+
+...would become...
+
+    0
+    1
+    2
+
+## `decrement`
+
+Creates a new number variable, and decreases its value by one every time it is
+called. The initial value is `-1`.
+
+    {% decrement variable %}
+    {% decrement variable %}
+    {% decrement variable %}
+
+...would become...
+
+    -1
+    -2
+    -3
+
+For more, see
+[Template::Liquid::Tag::Decrement](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3ADecrement).
+
 ## `for`
 
 Liquid allows for loops over collections:

@@ -2,11 +2,18 @@ package Doodle::Column;
 
 use 5.014;
 
-use Data::Object 'Class', 'Doodle::Library';
+use strict;
+use warnings;
+
+use registry 'Doodle::Library';
+use routines;
+
+use Data::Object::Class;
+use Data::Object::ClassHas;
 
 with 'Doodle::Column::Helpers';
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 has name => (
   is => 'ro',
@@ -38,11 +45,21 @@ fun new_data($self) {
   return {};
 }
 
-# METHODS
-
 method BUILD($args) {
   for my $key (keys %$args) {
     $self->{data}{$key} = $args->{$key} if !$self->can($key);
+  }
+
+  return $self;
+}
+
+# METHODS
+
+method stash(%args) {
+  my $data = $self->data;
+
+  while (my($key, $value) = each(%args)) {
+    $data->{$key} = $value;
   }
 
   return $self;
@@ -73,8 +90,8 @@ method update(Any %args) {
   $args{schema} = $table->schema if $table->schema;
   $args{columns} = [$self];
 
-  $self->data->set(drop => delete $args{drop}) if $args{drop};
-  $self->data->set(set => delete $args{set}) if $args{set};
+  $self->stash(drop => delete $args{drop}) if $args{drop};
+  $self->stash(set => delete $args{set}) if $args{set};
 
   my $command = $self->doodle->column_update(%args);
 

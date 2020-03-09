@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use App::Yath::Options;
 
@@ -72,7 +72,7 @@ sub description {
     return <<"    EOT";
 This yath command (which is also the default command) will run all the test
 files for the current project. If no test files are specified this command will
-look for the 't', and 't2' dirctories, as well as the 'test.pl' file.
+look for the 't', and 't2' directories, as well as the 'test.pl' file.
 
 This command is always recursive when given directories.
 
@@ -378,7 +378,7 @@ sub populate_queue {
 
     my $state = $self->state;
     my $tasks_queue = $self->tasks_queue;
-    my $plugins = $self->settings->harness->plugins;
+    my $plugins = $settings->harness->plugins;
 
     $state->queue_run($run->queue_item($plugins));
 
@@ -391,7 +391,9 @@ sub populate_queue {
 
     my $job_count = 0;
     for my $file (@files) {
-        my $task = $file->queue_item(++$job_count, $run->run_id);
+        my $task = $file->queue_item(++$job_count, $run->run_id,
+            $settings->check_prefix('display') ? (verbose => $settings->display->verbose) : (),
+        );
         $state->queue_task($task);
         $tasks_queue->enqueue($task);
     }
@@ -705,7 +707,7 @@ App::Yath::Command::test - Run tests
 
 This yath command (which is also the default command) will run all the test
 files for the current project. If no test files are specified this command will
-look for the 't', and 't2' dirctories, as well as the 'test.pl' file.
+look for the 't', and 't2' directories, as well as the 'test.pl' file.
 
 This command is always recursive when given directories.
 
@@ -997,6 +999,17 @@ Exclude a file from testing
 Can be specified multiple times
 
 
+=item --exclude-list file.txt
+
+=item --exclude-list http://example.com/exclusions.txt
+
+=item --no-exclude-list
+
+Point at a file or url which has a new line separated list of test file names to exclude from testing. Starting a line with a '#' will comment it out (for compatibility with Test2::Aggregate list files).
+
+Can be specified multiple times
+
+
 =item --exclude-pattern t/nope.t
 
 =item --no-exclude-pattern
@@ -1148,7 +1161,7 @@ Do not delete directories when done. This is useful if you want to inspect the d
 
 =item --no-summary
 
-Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extention is added automatically if omitted.
+Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extension is added automatically if omitted.
 
 
 =back
@@ -1506,7 +1519,7 @@ Set a specific run-id. (Default: a UUID)
 
 =item --no-test-args
 
-Arguments to pass in as @ARGV for all tests that are run. These can be provided easier using the '::' argument seperator.
+Arguments to pass in as @ARGV for all tests that are run. These can be provided easier using the '::' argument separator.
 
 Can be specified multiple times
 
@@ -1526,7 +1539,7 @@ Use the stream formatter (default is on)
 
 =item --no-tap
 
-The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests wh    ere this causes problems, in which case setting --TAP or --no-stream can help.
+The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.
 
 
 =back
@@ -1687,7 +1700,7 @@ Can also be set with the following environment variables: C<PERL_USE_UNSAFE_INC>
 
 =item --no-use-fork
 
-(default: on, except on windows) Normally tests are run by forking, which allows for features like preloading. This will turn off the behavior globally (which is not compatible with preloading). This is slower, it is better to tag misbehaving tests with the '# HARNESS-NO-PRELOAD' coment in their header to disable forking only for those tests.
+(default: on, except on windows) Normally tests are run by forking, which allows for features like preloading. This will turn off the behavior globally (which is not compatible with preloading). This is slower, it is better to tag misbehaving tests with the '# HARNESS-NO-PRELOAD' comment in their header to disable forking only for those tests.
 
 Can also be set with the following environment variables: C<!T2_NO_FORK>, C<T2_HARNESS_FORK>, C<!T2_HARNESS_NO_FORK>, C<YATH_FORK>, C<!YATH_NO_FORK>
 

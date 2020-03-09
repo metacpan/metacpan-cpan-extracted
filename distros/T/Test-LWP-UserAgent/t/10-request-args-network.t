@@ -25,8 +25,9 @@ use Test::LWP::UserAgent;
 # arguments to request() to the superclass, e.g. the option to save the
 # content to a file.
 
+my $url = 'http://httpbin.org/response-headers';
 my $useragent = Test::LWP::UserAgent->new(network_fallback => 1);
-my $response = $useragent->get('http://httpbin.org/get');
+my $response = $useragent->get($url);
 my $expected_content = $response->decoded_content;
 
 {
@@ -34,11 +35,7 @@ my $expected_content = $response->decoded_content;
 
     my $tmpfile = Path::Tiny->tempfile;
 
-    my $response = $useragent->get(
-        'http://httpbin.org/get',
-        ':content_file' => $tmpfile->stringify,
-    );
-
+    my $response = $useragent->get($url, ':content_file' => $tmpfile->stringify);
     my $contents = $tmpfile->slurp_utf8;
     is($contents, $expected_content, 'response body is saved to file (network responses)');
 

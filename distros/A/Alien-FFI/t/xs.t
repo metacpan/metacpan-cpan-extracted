@@ -32,9 +32,9 @@ test2(unsigned char input_value)
   ffi_type       *args[1];
   void           *values[1];
   ffi_arg         return_value;
-  
+
   args[0] = &ffi_type_uint8;
-  
+
   if(ffi_prep_cif(&ffi_cif, FFI_DEFAULT_ABI, 1, &ffi_type_uchar, args) == FFI_OK)
   {
     values[0] = &input_value;

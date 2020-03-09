@@ -2,7 +2,10 @@
 abstract: 'XPath for JSON|https://goessner.net/articles/JsonPath/> is an article about JSONPath. Useful to start learning how to use it.'
 author:
   - 'Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>'
-build_requires: {}
+build_requires:
+  File::Spec: '0'
+  IPC::Open2: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -17,6 +20,6 @@ requires:
   Getopt::Long: '0'
   JSON::Path: '0.420'
   Pod::Usage: '0'
-version: 0.1.0
+version: 0.1.1
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

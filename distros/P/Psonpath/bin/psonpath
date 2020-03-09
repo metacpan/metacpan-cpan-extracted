@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use JSON::Path 0.420;
-use Data::Printer 0.40;
+use Data::Printer 0.40 { output => 'stdout' };
 use Getopt::Long;
 use Pod::Usage;
 

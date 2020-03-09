@@ -1,6 +1,6 @@
 package App::optex::textconv::pdf;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use v5.14;
 use strict;
@@ -39,7 +39,7 @@ sub to_text {
     my $file = shift;
     my $type = ($file =~ /\.(pdf)$/i)[0] or return;
     my $break = $pagebreak{$param{pagebreak}}->();
-    local $_ = qx{ pdftotext \"$file\" - };
+    local $_ = qx{ pdftotext -q \"$file\" - };
     s/\f/$break->()/ger;
 }
 

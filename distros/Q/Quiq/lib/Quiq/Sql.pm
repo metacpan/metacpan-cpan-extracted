@@ -6,11 +6,12 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.176';
+our $VERSION = '1.177';
 
 use Quiq::Hash;
 use Quiq::Option;
 use Quiq::String;
+use Quiq::Template;
 use Scalar::Util ();
 use Quiq::Unindent;
 use Quiq::Reference;
@@ -2910,13 +2911,28 @@ sub setSequence {
 
 # -----------------------------------------------------------------------------
 
-=head2 Trigger
+=head2 Function
 
 =head3 createFunction() - Generiere Statement zum Erzeugen einer Funktion
 
 =head4 Synopsis
 
-  $stmt = $sql->createFunction($name,$body,@opt);
+  $stmt = $sql->createFunction($signature,$body,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $signature
+
+Signatur der Funktion, also Name mit Typ-Parameterliste und ggf.
+Schema-Präfix.
+
+=item $body
+
+Rumpf der Funktion.
+
+=back
 
 =head4 Options
 
@@ -2936,7 +2952,7 @@ Generiere "RETURNS $type" Klausel.
 
 B<PostgreSQL>
 
-  CREATE OR REPLACE FUNCTION <name>()
+  CREATE OR REPLACE FUNCTION <signature>
   RETURNS <returns>
   AS $SQL$
     <body>
@@ -2956,7 +2972,7 @@ B<PostgreSQL>
 
 sub createFunction {
     my $self = shift;
-    # @_: $name,$body,@opt
+    # @_: $signature,$body,@opt
 
     # Argumente
 
@@ -2967,7 +2983,7 @@ sub createFunction {
         -replace => \$replace,
         -returns => \$returns,
     );
-    my $name = shift;
+    my $signature = shift;
     my $body = Quiq::String->removeIndentation(shift);
 
     my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
@@ -2978,7 +2994,7 @@ sub createFunction {
         if ($replace) {
             $stmt .= ' OR REPLACE';
         }
-        $stmt .= " FUNCTION $name()";
+        $stmt .= " FUNCTION $signature";
         if ($returns) {
             $stmt .= "\nRETURNS $returns";
         }
@@ -2999,13 +3015,24 @@ sub createFunction {
 
 =head4 Synopsis
 
-  $stmt = $sql->dropFunction($name);
+  $stmt = $sql->dropFunction($signature);
+
+=head4 Arguments
+
+=over 4
+
+=item $signature
+
+Signatur der Funktion, also Name mit Typ-Parameterliste und ggf.
+Schema-Präfix.
+
+=back
 
 =head4 Description
 
 B<PostgreSQL>
 
-  DROP FUNCTION <name>() CASCADE
+  DROP FUNCTION <signature> CASCADE
 
 =cut
 
@@ -3013,7 +3040,7 @@ B<PostgreSQL>
 
 sub dropFunction {
     my $self = shift;
-    # @_: $name,@opt
+    # @_: $signature,@opt
 
     # Argumente
 
@@ -3022,12 +3049,12 @@ sub dropFunction {
     Quiq::Option->extract(\@_,
         -cascade => \$cascade,
     );
-    my $name = shift;
+    my $signature = shift;
 
     my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
 
     if ($postgresql) {
-        my $stmt = "DROP FUNCTION $name()";
+        my $stmt = "DROP FUNCTION $signature";
         if ($cascade) {
             $stmt .= ' CASCADE';
         }
@@ -3038,6 +3065,53 @@ sub dropFunction {
 }
 
 # -----------------------------------------------------------------------------
+
+=head3 moveFunction() - Bewege Funktion in ein anderes Schema
+
+=head4 Synopsis
+
+  $stmt = $sql->moveFunction($signature,$schema);
+
+=head4 Arguments
+
+=over 4
+
+=item $signature
+
+Signatur der Funktion, also Name mit Typ-Parameterliste und
+Schema-Präfix.
+
+=item $schema
+
+Zielschema, in das die Funktion bewegt wird.
+
+=back
+
+=head4 Description
+
+B<PostgreSQL>
+
+  ALTER FUNCTION <signature> SET SCHEMA <schema>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub moveFunction {
+    my ($self,$signature,$schema) = @_;
+
+    my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
+
+    if ($postgresql) {
+        return "ALTER FUNCTION $signature SET SCHEMA $schema";
+    }
+
+    $self->throw('Not implemented');
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Trigger
 
 =head3 createTrigger() - Generiere Statement zum Erzeugen eines Triggers
 
@@ -3493,17 +3567,17 @@ sub rollback {
 
 =over 4
 
-=item -args, $name => $value, ...
-
-=item -args => "$name=$value,..."
-
-Ersetze im SELECT-Statement den Platzhalter "__$name__" durch $value.
-Mehrere Name/Wert-Kombinationen können angegeben werden.
-
-=item -comment => $text (Default: keiner)
+=item -comment => $text
 
 Setze Kommentar mit dem ein- oder mehrzeiligen Text $text an den
 Anfang des Statement.
+
+=item -with => @withElements
+
+Liste von WITH-Elementen. Dies ist eine Liste von
+Schlüssel/Wert-Paaren der Art
+
+  $name => $select, ...
 
 =item -select => @selectExpr (Default: '*')
 
@@ -3513,20 +3587,20 @@ spezifiziert, wird '*' angenommen.
 
 Platzhalter: %SELECT%
 
-=item -distinct => $bool (Default: keiner)
+=item -distinct => $bool
 
 Generiere "SELECT DISTINCT" statement.
 
 Schlüsselwort "DISTINCT" wird in %SELECT%-Platzhalter mit eingsetzt.
 
-=item -hint => $hint (Default: keiner)
+=item -hint => $hint
 
 Setze im Statement hinter das Schlüsselwort SELECT einen
 Hint, d.h. einen Kommentar in der Form /*+ ... */. (nur Oracle)
 
 hint wird in %SELECT%-Platzhalter mit eingsetzt.
 
-=item -from => @fromExpr (Default: keiner)
+=item -from => @fromExpr
 
 Generiere eine FROM-Klausel aus den Ausdrücken @fromExpr.
 Die Ausdrücke werden mit Komma separiert. Die FROM-Klausel ist
@@ -3538,47 +3612,47 @@ Platzhalter: %FROM%
 Option angegeben, werden die folgenden Parameter als
 Tabellennamen interpretiert.
 
-=item -where => @whereExpr (Default: keiner)
+=item -where => @whereExpr
 
 Generiere eine WHERE-Klausel aus den Ausdrücken @whereExpr.
 Die Ausdrücke werden mit 'AND' separiert.
 
 Platzhalter: %WHERE%
 
-=item -groupBy => @groupExpr (Default: keiner)
+=item -groupBy => @groupExpr
 
 Generiere eine GROUP BY-Klausel aus den Ausdrücken @groupExpr.
 Die Ausdrücke werden mit Komma separiert.
 
 Platzhalter: %GROUPBY%
 
-=item -having => @havingExpr (Default: keiner)
+=item -having => @havingExpr
 
 Generiere eine HAVING-Klausel aus den Ausdrücken @havingExpr.
 Die Ausdrücke werden mit Komma separiert.
 
 Platzhalter: %HAVING%
 
-=item -orderBy => @orderExpr (Default: keiner)
+=item -orderBy => @orderExpr
 
 Generiere eine ORDER BY-Klausel aus den Ausdrücken @orderExpr.
 Die Ausdrücke werden mit Komma separiert.
 
 Platzhalter: %ORDERBY%
 
-=item -limit => $n (Default: keiner)
+=item -limit => $n
 
 Generiere eine LIMIT-Klausel.
 
 Platzhalter: %LIMIT%
 
-=item -offset => $n (Default: keiner)
+=item -offset => $n
 
 Generiere eine OFFSET-Klausel.
 
 Platzhalter: %OFFSET%
 
-=item -stmt => $stmt (Default: keiner)
+=item -stmt => $stmt
 
 Liefere $stmt als Statement. Enthält $stmt Platzhalter,
 werden diese durch die entsprechenden Komponenten ersetzt
@@ -3673,9 +3747,9 @@ SELECT mit Statement-Platzhaltern
           vorname = '__VORNAME__'
           AND nachname = '__NACHNAME__'
       ",
-      -args =>
-           VORNAME => 'Elli',
-           NACHNAME => 'Pirelli'
+      -placeholders =>
+           __VORNAME__ => 'Elli',
+           __NACHNAME__ => 'Pirelli'
   );
   =>
   SELECT
@@ -3740,6 +3814,7 @@ sub select {
 
     my @args;
     my $comment;
+    my @with;
     my @select;
     my $distinct;
     my $hint;
@@ -3748,13 +3823,14 @@ sub select {
     my @groupBy;
     my @having;
     my @orderBy;
+    my @placeholders;
     my $limit;
     my $offset;
     my $stmt = '';
 
     Quiq::Option->extractMulti(\@_,
-        -args => \@args,
         -comment => \$comment,
+        -with => \@with,
         -select => \@select,
         -distinct => \$distinct,
         -hint => \$hint,
@@ -3766,6 +3842,7 @@ sub select {
         -limit => \$limit,
         -offset => \$offset,
         -stmt => \$stmt,
+        -placeholders => \@placeholders,
     );
 
     my ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) =
@@ -3816,9 +3893,6 @@ sub select {
         }
         $selectClause .= $self->selectClause(@select);
     }
-
-    # From-Klausel ($fromClause)
-    my $fromClause = $self->fromClause(@from);
 
     # Where-Klausel ($whereClause)
 
@@ -3906,12 +3980,48 @@ sub select {
         );
     }
 
+    # WITH-Klausel
+
+    if (@with == 1) {
+        unshift @with,'query';
+        if (!@from) {
+            @from = ('query');
+        }
+    }
+
+    my $withClause = $self->withClause(@with);
+    if ($withClause) {
+        if ($body =~ /%WITH%/) {
+            $stmt =~ s/%WITH%/$withClause/g;
+        }
+        elsif ($body !~ /\bWITH\b/i) {
+            # WITH-Klausel an den Anfang stellen
+            $stmt = "WITH $withClause\n$stmt";
+        }
+        else {
+            $self->throw(
+                'SELECT-00002: Kein Platzhalter für WITH-Klausel',
+                Stmt => $stmt,
+                WithClause => $withClause,
+            );
+        }
+    }
+
+    # FROM-Klausel
+
+    my $fromClause = $self->fromClause(@from);
     if ($fromClause) {
+        $fromClause =~ s/\n/\n    /mg;
         if ($body =~ /%FROM%/) {
             $stmt =~ s/%FROM%/$fromClause/g;
         }
         elsif ($body !~ /\bFROM\b/i) {
-            $stmt .= "\nFROM\n    $fromClause";
+            if ($fromClause =~ /^\s*\(/) {
+                $stmt .= "\nFROM $fromClause";
+            }
+            else {
+                $stmt .= "\nFROM\n    $fromClause";
+            }
         }
         else {
             $self->throw(
@@ -4047,15 +4157,13 @@ sub select {
         $stmt = "$comment\n$stmt";
     }
 
-    # Statement-Argumente einsetzen. Übergabemöglichkeiten:
-    # -args => 'NAME=VALUE,..."
-    # -args, $name => $value, ...
+    # Platzhalter-Ersetzung
 
-    if (@args == 1) {
-        @args = map {split /\s*=\s*/} split /\s*,\s*/,$args[0];
-    }
-    for (my $i = 0; $i < @args; $i += 2) {
-         $stmt =~ s/__$args[$i]__/$args[$i+1]/g;
+    if (@placeholders) {
+        $stmt = Quiq::Template->combine(
+            placeholders => \@placeholders,
+            template => $stmt,
+        );
     }
 
     return $stmt;
@@ -5034,6 +5142,52 @@ sub stringLiteral {
 
 # -----------------------------------------------------------------------------
 
+=head3 withClause() - Liefere WITH-Klausel
+
+=head4 Synopsis
+
+  $withClause = $sql->withClause(@keyVal);
+
+=head4 Description
+
+Wandele die Liste von Schlüssel/Wert-Paaren @keyVal in eine WITH-Klausel
+(ohne WITH-Schlüsselwort) und liefere diese zurück. Der Wert ist jeweils
+ein SELECT-Statement und der Schlüssel ein Bezeichner für das Statement.
+
+=head4 Example
+
+  $sql->withClause(x=>'SELECT * FROM a',y=>'SELECT * FROM b');
+
+liefert
+
+  x AS (
+      SELECT * FROM a
+  ),
+  y AS (
+      SELECT * FROM b
+  )
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub withClause {
+    my $self = shift;
+    # @_: @keyVal
+
+    my @arr;
+    while (@_) {
+        my $name = shift;
+        my $stmt = Quiq::Unindent->trim(shift);
+        $stmt =~ s/^/    /mg;
+        push @arr,"$name AS (\n$stmt\n)";
+    }
+
+    return @arr? join(",\n",@arr): '';
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 selectClause() - Liefere SELECT-Klausel
 
 =head4 Synopsis
@@ -5052,7 +5206,7 @@ sub selectClause {
         $expr = $self->keyExpr($expr);
     }
 
-    return join ",\n    ",@select;
+    return join "\n    , ",@select;
 }
 
 # -----------------------------------------------------------------------------
@@ -5077,7 +5231,7 @@ folgendermaßen behandelt:
 
 Eine Zeichenkette wird nicht verändert.
 
-=item ['AS',$fromExpr,$alias]
+=item ['AS',$alias,$fromExpr]
 
 Es wird ein FROM-Alias erzeugt. Dieser hat entweder den Aufbau
 "expr AS alias" oder "fromExpr alias", abhängig vom DBMS.
@@ -5091,16 +5245,16 @@ Oracle akzeptiert "fromExpr AS alias" nicht.
 
 sub fromClause {
     my $self = shift;
-    my @from = @_;
+    my @from = @_; # Wir müssen kopieren
 
     for my $expr (@from) {
         if (ref $expr) {
             if ($expr->[0] eq 'AS') {
                 if ($self->isOracle) {
-                    $expr = "$expr->[1] $expr->[2]";
+                    $expr = "$expr->[2] $expr->[1]";
                 }
                 else {
-                    $expr = "$expr->[1] AS $expr->[2]";
+                    $expr = "$expr->[2] AS $expr->[1]";
                 }
             }
             else {
@@ -5108,10 +5262,10 @@ sub fromClause {
             }
         }
         $expr = Quiq::String->removeIndentation($expr);
-        $expr =~ s/\n/\n    /g;
+        # $expr =~ s/\n/\n    /g;
     }
 
-    return join ",\n    ",@from;
+    return join "\n, ",@from;
 }
 
 # -----------------------------------------------------------------------------
@@ -5389,7 +5543,7 @@ sub diff {
 
 =head1 VERSION
 
-1.176
+1.177
 
 =head1 AUTHOR
 

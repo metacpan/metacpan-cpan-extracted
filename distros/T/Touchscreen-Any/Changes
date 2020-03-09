@@ -1,0 +1,11 @@
+0.002   2019-12-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention some related modules: App::TouchscreenUtils,
+	  Touchpad::Any, Bluetooth::Any.
+
+
+0.001   2019-12-01  Released-By: PERLANCAR
+
+        - First release.

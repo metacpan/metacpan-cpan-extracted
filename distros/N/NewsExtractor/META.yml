@@ -15,7 +15,7 @@ name: NewsExtractor
 provides:
   NewsExtractor:
     file: lib/NewsExtractor.pm
-    version: v0.11.0
+    version: v0.12.0
   NewsExtractor::Article:
     file: lib/NewsExtractor/Article.pm
   NewsExtractor::CSSExtractor:
@@ -70,6 +70,8 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_setn_com.pm
   NewsExtractor::SiteSpecificExtractor::www_taipeitimes_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_taipeitimes_com.pm
+  NewsExtractor::SiteSpecificExtractor::www_upmedia_mg:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_upmedia_mg.pm
   NewsExtractor::TXExtractor:
     file: lib/NewsExtractor/TXExtractor.pm
   NewsExtractor::TextUtil:
@@ -90,7 +92,7 @@ requires:
   Type::Tiny: '0'
   Types::URI: '0'
   YAML: '0'
-version: v0.11.0
+version: v0.12.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: CC0-1.0
 x_static_install: '1'

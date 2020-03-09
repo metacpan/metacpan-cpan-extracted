@@ -27,7 +27,7 @@ sub init ( $self, $args ) {
         exit 3;
     }
 
-    my $repo_namespace = $args->{namespace} || $ENV->user_cfg->{DOCKERHUB}->{default_namespace} || $ENV->user_cfg->{DOCKERHUB}->{username};
+    my $repo_namespace = $args->{namespace} || $ENV->user_cfg->{DOCKER}->{default_namespace} || $ENV->user_cfg->{DOCKER}->{registry}->{''}->{username};
 
     if ( !$repo_namespace ) {
         say 'DockerHub repo namespace is not defined.';
@@ -337,13 +337,13 @@ sub build_local ( $self, $tag, $args ) {
     my $repo_id  = $dist->docker->{repo_id};
     my $is_dirty = $id->{is_dirty} ? '.dirty' : $EMPTY;
 
-    my @tags;
+    my @images;
 
-    @tags = map {"$repo_id:${_}${is_dirty}"} grep {defined} $id->{branch}, $id->{tags}->@*;
+    @images = map {"$repo_id:${_}${is_dirty}"} grep {defined} $id->{branch}, $id->{tags}->@*;
 
-    @tags = ("$repo_id:$id->{hash_short}${is_dirty}") if $is_dirty || !@tags;
+    @images = ("$repo_id:$id->{hash_short}${is_dirty}") if $is_dirty || !@images;
 
-    for my $tag (@tags) { say "Tag: $tag" }
+    for my $image (@images) { say "Image: $image" }
 
     my $dockerignore = $self->_build_dockerignore("$repo->{root}/.dockerignore");
 
@@ -378,7 +378,7 @@ sub build_local ( $self, $tag, $args ) {
     my $docker = Pcore::API::Docker::Engine->new;
 
     print 'Building image ... ';
-    $res = $docker->image_build( $tar, \@tags );
+    $res = $docker->image_build( $tar, \@images );
     say $res;
 
     # docker image build error
@@ -398,9 +398,9 @@ sub build_local ( $self, $tag, $args ) {
 
     # push images
     if ( $args->{push} ) {
-        for my $tag (@tags) {
-            print qq[Pushing image "$tag" ... ];
-            $res = $docker->image_push($tag);
+        for my $image (@images) {
+            print qq[Pushing image "$image" ... ];
+            $res = $docker->image_push($image);
             say $res;
         }
     }
@@ -486,6 +486,16 @@ sub _build_dockerignore ( $self, $path ) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    2 | 30                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

@@ -1,0 +1,31 @@
+---
+abstract: 'tersify DBIx::Class objects'
+author:
+  - 'Sam Kington <skington@cpan.org>'
+build_requires:
+  DBIx::Class: '0'
+  Data::Dumper: '0'
+  Data::Tersify: '1.000'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '1.08'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Tersify-Plugin-DBIx-Class
+requires:
+  DBIx::Class: '0'
+  Data::Tersify: '1.000'
+  DateTime: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/skington/data-tersify/issues
+  repository: git://github.com/skington/data-tersify.git
+version: '1.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

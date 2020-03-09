@@ -1,0 +1,130 @@
+NAME
+    App::ProveDirs - Prove one or more directories
+
+VERSION
+    This document describes version 0.005 of App::ProveDirs (from Perl
+    distribution App-ProveDirs), released on 2020-03-07.
+
+SYNOPSIS
+    See the included script prove-dirs.
+
+FUNCTIONS
+  prove_dirs
+    Usage:
+
+     prove_dirs(%args) -> [status, msg, payload, meta]
+
+    Prove one or more directories.
+
+    Given one or more directories as argument (which are assumed to be
+    directories of Perl distributions), this utility "cd" to each directory
+    and run "prove" in each. It then provides a summary at the end.
+
+    You can run with "--dry-run" ("-n") option first to not actually run
+    "prove" but just see what directories will get tested. An example
+    output:
+
+     % prove-dirs perl-* -n
+     prove-dirs: [DRY] [1/8] Running prove in directory 'perl-Acme-CPANModules' ...
+     prove-dirs: [DRY] [1/8] Running prove in directory 'perl-Data-Sah' ...
+     prove-dirs: [DRY] [1/8] Running prove in directory 'perl-Data-Sah-Filter' ...
+     prove-dirs: [DRY] [1/8] Running prove in directory 'perl-Date-strftimeq' ...
+     prove-dirs: [DRY] [1/8] Running prove in directory 'perl-Log-ger' ...
+     prove-dirs: [DRY] [1/8] Running prove in directory 'perl-Log-ger-Output-Screen' ...
+     prove-dirs: [DRY] [1/8] Running prove in directory 'perl-Module-Installed-Tiny' ...
+     prove-dirs: [DRY] [1/8] Running prove in directory 'perl-Text-ANSITable' ...
+     prove-dirs: [DRY] [1/8] Running prove in directory 'perl-lib-filter' ...
+
+    If we reinvoke the above command without the "-n", *prove-dirs* will
+    actually run "prove" in each directory and provide a summary at the end.
+    Example output:
+
+     % prove-dirs perl-* -n
+     ...
+     +-----------------------------+-----------------------------------+--------+
+     | dist                        | reason                            | status |
+     +-----------------------------+-----------------------------------+--------+
+     | perl-Acme-CPANModules       | Test failed (Failed 1/1 subtests) | 500    |
+     | perl-Date-strftimeq         | Test failed (No subtests run)     | 500    |
+     | perl-lib-filter             | Non-zero exit code (2)            | 500    |
+     +-----------------------------+-----------------------------------+--------+
+
+    The above example shows that three directories (distributions) failed
+    testing. You can scroll up for the detailed "prove" output to see why
+    they failed, fix things, and re-run.
+
+    When a distribution's test fails, this counts as a 500 error (Error).
+    Otherwise, the status is 200 (OK).
+
+    *prove-dirs* will return status 200 (OK) with the status of each
+    directory. It will exit 0 if all directories are successful, otherwise
+    it will exit 1.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dirs* => *array[dirname]*
+
+        The directories.
+
+    *   prove_opts => *array[str]* (default: ["-l"])
+
+        Options to pass to the prove command.
+
+    *   summarize_all => *bool*
+
+        If true, also summarize successes in addition to failures.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ProveDirs>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ProveDirs>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProveDirs>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    prove-dists in App::ProveDists
+
+    prove-mods in App::ProveMods
+
+    prove-rdeps in App::ProveRdeps
+
+    prove
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

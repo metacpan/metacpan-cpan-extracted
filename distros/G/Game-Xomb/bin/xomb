@@ -1,0 +1,300 @@
+#!perl
+#
+# xomb - launcher for Game::Xomb
+
+use 5.24.0;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use Game::Xomb;
+
+GetOptions(
+    'help|h|?' => sub {
+        warn <<'TLDR';
+Usage: xomb [options]
+
+  --err     - send STDERR to this file if not already redirected
+  --delay   - sleep delay for when player may want to take notice
+  --seed    - set the game seed
+  --version - shows xomb version and then quits
+
+xomb hides STDERR by default to not show warning or error messages;
+debug with a command similar to
+
+  xomb 2>log
+  xomb --err=log
+
+and then inspect the log file when things do go awry
+
+TLDR
+        exit 64;
+    },
+    'delay=f'   => \$Game::Xomb::Draw_Delay,
+    'err=s'     => \my $err,
+    'seed=i'    => \$Game::Xomb::Seed,
+    'version|v' => sub { say $Game::Xomb::VERSION; exit 1 },
+) or exit 64;
+
+if (-t STDERR) {
+    close STDERR;
+    if (defined $err) {
+        unless (open STDERR, '>', $err) {
+            say "Could not redirect STDERR to '$err': $!";
+            exit 1;
+        }
+        STDERR->autoflush(1);
+    }
+}
+
+# NOTE this is not really portable and will likely be replaced by a
+# custom pRNG as time permits
+$Game::Xomb::Seed = srand unless defined $Game::Xomb::Seed;
+srand $Game::Xomb::Seed;
+
+Game::Xomb::game_loop;
+
+exit(1);    # NOTREACHED
+
+__END__
+=encoding utf8
+
+=head1 NAME
+
+B<xomb> - a game featuring @ versus the Xarci Bedo
+
+=head1 SYNOPSIS
+
+B<xomb> I<--delay=f> I<--err=file> I<--seed=i> I<--version>
+
+=head1 DESCRIPTION
+
+B<xomb> is a computer fantasy game. The object of the game is to survive
+the attacks of the Xarci Bedo and obtain a lot of gems. To win the game
+you must locate the Dragonstone and get it out.
+
+A game should take under 15 minutes to complete.
+
+=head2 Options
+
+=over 4
+
+=item --delay=seconds
+
+Floating point value to sleep after events the player may wish to take
+notice of. Probably should be much lower than C<1.0>. Default is
+C<0.15> seconds.
+
+=item --err=file
+
+Send STDERR to this file if not already redirected.
+
+=item --seed=i
+
+Start the game with the seed set to the given integer value. The RNG
+algorithm will very likely change in future releases of the game.
+
+=item --version
+
+Shows the B<xomb> version and quits the game.
+
+=back
+
+=head2 An Overview of Minos III 
+
+The most recent message is shown at the top of the screen. More of these
+can be viewed using the C<M> command. The status bar at the bottom
+
+    Level 01 T10 SP[=========================-         ][ .][*] 121B
+
+shows the level (C<1>), the time or cost of the last energy-consuming
+move (C<10>), shield points remaining, the item and ground tile of the
+current cell (here: no item and an empty cell), whether a gem is loaded
+for shield repair (yes), and finally the error code display (C<121B>).
+Consult the L</"DIAGNOSTICS"> section for details on the error codes.
+
+The middle of the screen shows the level map. Various L</"Symbols"> are
+present in this space. Note that the Field Operation View (FOV) readouts
+may be impacted by the harsh conditions on Minos III, and the scanner is
+an older model.
+
+In examine mode (C<x>) level map features are described, if they are in
+view of the FOV scanner. Range and coordinate details are also provided.
+
+=head2 Commands
+
+With numlock enabled a numeric keypad may be able to be used to
+navigate.
+
+     y  k  u     Motion is traditional to rogue(6) as shown in the
+      \ | /      compass to the left. Other commands, of which some
+    h - @ - l    take time to complete, include:
+      / | \             
+     b  j  n                . - wait a turn      x - examine board
+                          g , - pick up item     i - show inventory
+    M - show messages     < > - activate gate    E - equip a gem
+    p - clear PKC code    C-l - redraw screen    R - remove a gem
+    ? - show help         v   - show version     d - drop a gem
+    @ - show location     Q   - quit the game
+
+    Esc or q will exit from sub-displays such as this one. Prompts
+    must be answered with Y to carry out the action; N or n or Esc
+    will reject the action.
+
+=head2 Symbols
+
+These may be inspected in-game using the examine command, assuming they
+were picked up by the FOV scanner. At most only one Xarci Bedo, item,
+and ground tile can occupy the same cell. Scientists believe this is due
+to particularities of the geology on Minos III, and some even speculate
+that there is a relationship between the gems and the Xarci Bedo.
+
+=over 4
+
+=item C<@>
+
+Vessel location.
+
+=item C< >
+
+A crevasse in the ground that you can fall down.
+
+=item C<%>
+
+A gate to the next level (via the C<< > >> command). A gate takes some
+time to complete the level transition. Ascent is only possible with the
+Dragonstone using C<< < >> on the gate. As is traditional.
+
+=item C<#>
+
+Wall. Impassable. Generally blocks FOV, though again the FOV scanner is
+an older model, so there may be defects.
+
+=item C<^>
+
+Rubble. Somewhat passable. Sometimes blocks FOV. Sometimes blocks
+enemy fire.
+
+=item C<~>
+
+Acid pond. Probably an OSHA violation.
+
+=item C<.>
+
+An empty cell.
+
+=item C<*>
+
+A gemstone. These may be equipped from the inventory to provide shield
+repair over time, though this will greatly damage the gem due to
+harmonic stress caused by the shield module. The gem value is shown
+before the name in the inventory and some log messages.
+
+=back
+
+The Xarci Bedo are represented by uppercase ASCII letters, and exhibit
+the usual fantasy tropes: Gatling Autocannon, Railgun, etc.
+
+=head1 DIAGNOSTICS
+
+Various messages may be shown by the Patrol Kombat Computer (PKC) in
+response to command inputs. Details on important codes are listed below.
+Consult the VP XII Operations Manual (Green) for complete scenario
+process control instructions. Due to memory limitations only the last
+error code is stored. The readout can be cleared with the C<p> command.
+
+=head2 PKC-0001
+
+A move was attempted beyond the boundaries of the game. In strict mode
+this would normally result in the immediate termination of the
+contestant.
+
+=head2 PKC-0002
+
+The motion control guidance system has encountered a significant
+obstacle and signals that fact with this code.
+
+=head2 PKC-0004
+
+Gate activation error.
+
+=head2 PKC-0010
+
+Dragonstone is required for vertical ascent module gate activation.
+
+=head2 PKC-0014
+
+Gate is out of service, or was never enabled by the contractors.
+
+=head2 PKC-007E
+
+Environmental hazard proximity alarm.
+
+=head2 PKC-0099
+
+Gyroscopic alignment control array reports unexpected acceleration.
+
+=head2 PKC-0101
+
+Item retrieval command call failure.
+
+=head2 PKC-0102
+
+Inventory stack allocation failure.
+
+=head2 PKC-0104
+
+Item disposal process error. Clear item exit disposal slot before retry.
+
+=head2 PKC-0111
+
+Incompatible item use handler exception error.
+
+=head2 PKC-0112
+
+Underflow on inventory stack query request.
+
+=head2 PKC-0113
+
+Underflow on shield module feed slot retrieval call.
+
+=head2 PKC-0302
+
+Target acquisition lock failure. Often caused by excess vibration in the
+FOV scanner array.
+
+=head2 PKC-1202
+
+Executive overflow on guidance module.
+
+=head2 PKC-1203
+
+Spurious interrupt on data bus array.
+
+=head2 PKC-121B
+
+Unit is already in command mode.
+
+=head2 PKC-1220
+
+Background subspace communications link query negative acknowledgment.
+
+=head1 EXIT STATUS
+
+B<xomb> exits with a C<0> on victory, and C<< >0 >> in every other case.
+
+=head1 SEE ALSO
+
+L<Game::Xomb>, L<rogue(6)>
+
+VP XII Operations Manual (Green)
+
+=head1 AUTHOR
+
+Jeremy Mates
+
+=head1 BUGS
+
+B<xomb> assumes that the terminal used supports various ANSI or XTerm
+Control Sequences. Given certain time constraints (7DRL 2020) not much
+portability testing has been done.
+
+=cut

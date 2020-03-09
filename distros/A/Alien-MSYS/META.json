@@ -15,9 +15,6 @@
    "name" : "Alien-MSYS",
    "prereqs" : {
       "build" : {
-         "recommends" : {
-            "Win32::Shortcut" : "0"
-         },
          "requires" : {
             "Alien::Build" : "0.99",
             "Alien::Build::MM" : "0.32",
@@ -39,13 +36,16 @@
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
             "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
-            "Test::Pod::Coverage" : "0",
             "Test::Pod::Spelling::CommonMistakes" : "0",
             "Test::Spelling" : "0",
             "Test::Strict" : "0",
@@ -53,9 +53,6 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Win32::Shortcut" : "0"
-         },
          "requires" : {
             "Alien::Base" : "0.038",
             "Alien::Build" : "0.99",
@@ -86,7 +83,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.12",
+   "version" : "0.14",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.29",
       "requires" : {
@@ -102,6 +99,10 @@
          "system" : {}
       }
    },
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Shawn Laffan (SLAFFAN, shawnlaffan)"
+   ],
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.18",
    "x_use_unsafe_inc" : 0

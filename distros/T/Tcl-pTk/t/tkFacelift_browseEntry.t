@@ -28,14 +28,6 @@ unless ($Tcl::pTk::_Tile_available) {
     exit;
 }
  
-# This will skip if Tix not present
-my $retVal = $top->interp->pkg_require('Tix');
-
-unless( $retVal){
-    print "1..0 # Skipped: Tix Tcl package not available\n";
-    exit;
-}
-
 plan tests => 3;
 
 

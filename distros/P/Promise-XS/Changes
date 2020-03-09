@@ -1,5 +1,8 @@
 Revision history for Perl extension Promise::XS:
 
+0.09 Fri 6 Mar 2020
+- Fix uninitialized pointer.
+
 0.08 Mon 24 Feb 2020
 - BREAKING CHANGE (minor): finally() is now closer to ECMAScript’s
   specification. Toward that end, finally() callbacks no longer receive

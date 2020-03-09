@@ -53,11 +53,11 @@
    "provides" : {
       "Mojolicious::Plugin::Moai" : {
          "file" : "lib/Mojolicious/Plugin/Moai.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Test::Mojo::Role::Moai" : {
          "file" : "lib/Test/Mojo/Role/Moai.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/preaction/Mojolicious-Plugin-Moai"
       }
    },
-   "version" : "0.009",
+   "version" : "0.011",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

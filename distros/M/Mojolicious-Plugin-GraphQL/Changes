@@ -1,4 +1,5 @@
-Revision history for Mojolicious::Plugin::GraphQL
+0.14 2020-03-09
+- no report decoding errors verbatim - thanks @schroeer for suggestion
 
 0.13 2019-04-11
  - update deps - thanks @manwar!

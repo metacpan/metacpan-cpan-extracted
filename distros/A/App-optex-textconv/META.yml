@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.6, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,9 +24,11 @@ no_index:
     - author
     - builder
 provides:
+  App::optex::tc:
+    file: lib/App/optex/tc.pm
   App::optex::textconv:
     file: lib/App/optex/textconv.pm
-    version: '0.07'
+    version: '0.08'
   App::optex::textconv::Converter:
     file: lib/App/optex/textconv/Converter.pm
   App::optex::textconv::Zip:
@@ -35,10 +37,10 @@ provides:
     file: lib/App/optex/textconv/default.pm
   App::optex::textconv::msdoc:
     file: lib/App/optex/textconv/msdoc.pm
-    version: '0.07'
+    version: '0.08'
   App::optex::textconv::pdf:
     file: lib/App/optex/textconv/pdf.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   App::optex: v0.3.0
   List::Util: '1.45'
@@ -47,7 +49,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/optex-textconv/issues
   homepage: https://github.com/kaz-utashiro/optex-textconv
   repository: git://github.com/kaz-utashiro/optex-textconv.git
-version: '0.07'
+version: '0.08'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

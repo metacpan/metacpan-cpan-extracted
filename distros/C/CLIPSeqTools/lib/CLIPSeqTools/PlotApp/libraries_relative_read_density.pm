@@ -26,7 +26,7 @@ Create plots for script libraries_relative_read_density.
 =cut
 
 package CLIPSeqTools::PlotApp::libraries_relative_read_density;
-$CLIPSeqTools::PlotApp::libraries_relative_read_density::VERSION = '0.1.8';
+$CLIPSeqTools::PlotApp::libraries_relative_read_density::VERSION = '0.1.9';
 
 # Make it an app command
 use MooseX::App::Command;

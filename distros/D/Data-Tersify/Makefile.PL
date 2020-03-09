@@ -16,6 +16,8 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Data::Tersify",
   "PREREQ_PM" => {
+    "Carp" => 0,
+    "Devel::OverloadInfo" => "0.005",
     "Exporter" => 0,
     "Module::Pluggable" => 0,
     "Scalar::Util" => 0,
@@ -24,13 +26,15 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Dumper" => 0,
     "FindBin" => 0,
     "Test::More" => 0,
     "Test::Pod" => 0,
     "Test::Pod::Coverage" => "1.08",
-    "lib" => 0
+    "lib" => 0,
+    "overload" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "1.000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +42,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Data::Dumper" => 0,
+  "Devel::OverloadInfo" => "0.005",
   "Exporter" => 0,
   "FindBin" => 0,
   "Module::Pluggable" => 0,
@@ -46,6 +53,7 @@ my %FallbackPrereqs = (
   "Test::Pod" => 0,
   "Test::Pod::Coverage" => "1.08",
   "lib" => 0,
+  "overload" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

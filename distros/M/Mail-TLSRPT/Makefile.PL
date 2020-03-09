@@ -13,18 +13,24 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Mail-TLSRPT",
+  "EXE_FILES" => [
+    "bin/tlsrpt"
+  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "Mail::TLSRPT",
   "PREREQ_PM" => {
+    "App::Cmd::Setup" => 0,
     "Carp" => 0,
     "Date::Parse" => 0,
     "DateTime" => 0,
     "English" => 0,
+    "IO::Uncompress::Gunzip" => 0,
     "Import::Into" => 0,
     "JSON" => 0,
     "Moo" => 0,
     "Net::IP" => 0,
+    "Text::CSV" => 0,
     "Type::Utils" => 0,
     "Types::Standard" => 0,
     "feature" => 0,
@@ -34,11 +40,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Clone" => 0,
+    "MIME::Base64" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.20200305.1",
+  "VERSION" => "1.20200306.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,17 +53,21 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "App::Cmd::Setup" => 0,
   "Carp" => 0,
   "Clone" => 0,
   "Date::Parse" => 0,
   "DateTime" => 0,
   "English" => 0,
+  "IO::Uncompress::Gunzip" => 0,
   "Import::Into" => 0,
   "JSON" => 0,
+  "MIME::Base64" => 0,
   "Moo" => 0,
   "Net::IP" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Text::CSV" => 0,
   "Type::Utils" => 0,
   "Types::Standard" => 0,
   "feature" => 0,

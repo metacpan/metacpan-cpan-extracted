@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        %= include 'moai/lib'
+        <title><%= title() %></title>
+        %= content 'head'
+    </head>
+    <body>
+        <header>
+        %= content header => begin
+            %= content 'navbar'
+            %= content 'hero'
+        % end
+        </header>
+        %= content container => begin
+            %= include 'moai/grid' => content => begin
+                %= include 'moai/grid/col' => size => 9, content => begin
+                    <main>
+                    %= content main => begin
+                        %= content
+                    % end
+                    </main>
+                % end
+
+                %= include 'moai/grid/col' => size => 3, content => begin
+                    %= content 'sidebar'
+                % end
+            % end
+        % end
+        <footer>
+            %= content footer => begin
+            <div class="container tagline">
+                <a href="http://mojolicious.org">Made with Mojolicious</a><br/>
+                <a href="http://perl.org">Powered by Perl</a>
+            </div>
+            % end
+        </footer>
+
+    </body>
+</html>

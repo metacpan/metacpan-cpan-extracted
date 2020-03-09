@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # DESCRIPTION: Perl ExtUtils: Type 'make test' to test this package
 #
-# Copyright 2007-2019 by Wilson Snyder.  This program is free software;
+# Copyright 2007-2020 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 
@@ -23,7 +23,8 @@ foreach my $filename (keys %{$manifest}) {
 	ok(1);
     } elsif ($filename =~ m!NONE_NEEDED!) {
 	skip("File doesn't need check (harmless)");
-    } elsif (!$ENV{VERILATOR_AUTHOR_SITE}) {
+    } elsif (!$ENV{PARALLELFORKER_AUTHOR_SITE}) {
+	warn "(skip as no PARALLELFORKER_AUTHOR_SITE)\n";
 	skip("author only test (harmless)",1);
     } else {
 	warn "%Error: $filename: Bad indentation\n";

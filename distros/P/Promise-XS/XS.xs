@@ -782,7 +782,7 @@ static inline xspr_promise_t* create_promise(pTHX) {
 
     xspr_promise_t* promise = xspr_promise_new(aTHX);
 
-    SV *detect_leak_perl;
+    SV *detect_leak_perl = NULL;
 
     SV** dml_svgv = hv_fetchs( MY_CXT.pxs_base_stash, "DETECT_MEMORY_LEAKS", 0 );
 

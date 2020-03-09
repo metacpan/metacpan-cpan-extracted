@@ -61,7 +61,7 @@ EXAMPLE2
      # EXAMPLE2
 
 DEPENDENCIES
-    Error::Pure, Exporter, Module::Info, Pod::Abstract, Readonly.
+    Error::Pure, Exporter, Pod::Abstract, Pod::Find, Readonly.
 
 SEE ALSO
     pod-example
@@ -84,5 +84,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.09
+    0.11
 

@@ -31,6 +31,15 @@ if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
 	}
 }
 
+my @sig_nums  = split q[ ], $Config{sig_num};
+my @sig_names = split q[ ], $Config{sig_name};
+my %signals_by_name;
+my $idx = 0;
+foreach my $sig_name (@sig_names) {
+	$signals_by_name{$sig_name} = $sig_nums[$idx];
+	$idx += 1;
+}
+
 $SIG{INT} = sub { $terminated = 1; die "Caught an INT signal"; };
 $SIG{TERM} = sub { $terminated = 1; die "Caught a TERM signal"; };
 
@@ -244,7 +253,7 @@ sub start_firefox {
 					diag("Failed to start a visible firefox in $^O but Xvfb succeeded:$exception");
 				}
 			} elsif ($? == 1) {
-				`dbus-launch 2>/dev/null >/dev/null`;
+				my $dbus_output = `dbus-launch 2>/dev/null`;
 				if ($? == 0) {
 					if ($^O eq 'freebsd') {
 						my $mount = `mount`;
@@ -255,6 +264,14 @@ sub start_firefox {
 						}
 					} else {
 						diag("Failed to start with a working Xvfb and D-Bus:$exception");
+					}
+					if ($dbus_output =~ /DBUS_SESSION_BUS_PID=(\d+)\b/smx) {
+						my ($dbus_pid) = ($1);
+						while(kill 0, $dbus_pid) {
+							kill $signals_by_name{INT}, $dbus_pid;
+							sleep 1;
+							waitpid $dbus_pid, POSIX::WNOHANG();
+						}
 					}
 				} else {
 					$skip_message = "Unable to launch a visible firefox in $^O with an incorrectly setup D-Bus:$exception";
@@ -317,9 +334,17 @@ if ($^O eq 'MSWin32') {
 	if (exists $ENV{DISPLAY}) {
 		diag("DISPLAY is $ENV{DISPLAY}");
 	}
-	`dbus-launch >/dev/null`;
+	my $dbus_output = `dbus-launch`;
 	if ($? == 0) {
 		diag("D-Bus is working");
+		if ($dbus_output =~ /DBUS_SESSION_BUS_PID=(\d+)\b/smx) {
+			my ($dbus_pid) = ($1);
+			while(kill 0, $dbus_pid) {
+				kill $signals_by_name{INT}, $dbus_pid;
+				sleep 1;
+				waitpid $dbus_pid, POSIX::WNOHANG();
+			}
+		}
 	} else {
 		diag("D-Bus appears to be broken.  'dbus-launch' was unable to successfully complete:$?");
 	}
@@ -499,7 +524,7 @@ SKIP: {
 			ok(defined $new2->pos_y() && $new2->pos_y() == $new->pos_y(), "Window has a Y position of " . $new->pos_y());
 		}
 		TODO: {
-			local $TODO = $major_version >= 60 && $^O eq 'darwin' ? "darwin has dodgy support for \$firefox->window_rect()->width()" : $^O eq 'MSWin32' && $firefox->nightly() ? "Nightly returns incorrect values for \$firefox->window_rect()->width()" : q[];
+			local $TODO = $major_version >= 60 && $^O eq 'darwin' ? "darwin has dodgy support for \$firefox->window_rect()->width()" : $firefox->nightly() ? "Nightly returns incorrect values for \$firefox->window_rect()->width()" : q[];
 			ok($new2->width() == $new->width(), "Window has a width of " . $new->width() . ":" . $new2->width());
 		}
 		ok($new2->height() == $new->height(), "Window has a height of " . $new->height());
@@ -555,10 +580,8 @@ if ($major_version < 40) {
 }
 $profile->set_value('browser.newtabpage.activity-stream.feeds.favicon', 'true'); 
 $profile->set_value('browser.shell.shortcutFavicons', 'true'); 
-$profile->set_value('browser.discovery.enabled', 'true'); 
 $profile->set_value('browser.newtabpage.enabled', 'true'); 
 $profile->set_value('browser.pagethumbnails.capturing_disabled', 'false', 0); 
-$profile->set_value('distribution.fedora.bookmarksProcessed', 'false', 0); 
 $profile->set_value('startup.homepage_welcome_url', 'false', 0); 
 
 if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
@@ -721,14 +744,6 @@ SKIP: {
 			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 1);
 		} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
 			if ($ENV{RELEASE_TESTING}) {
-				my @sig_nums  = split q[ ], $Config{sig_num};
-				my @sig_names = split q[ ], $Config{sig_name};
-				my %signals_by_name;
-				my $idx = 0;
-				foreach my $sig_name (@sig_names) {
-					$signals_by_name{$sig_name} = $sig_nums[$idx];
-					$idx += 1;
-				}
 				if (my $pid = fork) {
 					$firefox->go('http://wtf.example.org');
 					ok($firefox->html() =~ /success/smx, "Correctly accessed the Proxy");
@@ -789,7 +804,7 @@ SKIP: {
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, debug => 1, page_load => 65432, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( pac => URI->new('https://proxy.example.org')), moz_headless => 1));
+	($skip_message, $firefox) = start_firefox(0, chatty => 1, debug => 1, page_load => 65432, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( pac => URI->new('https://proxy.example.org')), moz_headless => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -812,7 +827,7 @@ SKIP: {
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( host => 'proxy.example.org:3128')));
+	($skip_message, $firefox) = start_firefox(1, seer => 1, chatty => 1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( host => 'proxy.example.org:3128')));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -1672,8 +1687,8 @@ SKIP: {
 	if ($major_version >= 64) {
 		$additional{sandbox} = 'system';
 	}
-	ok($firefox->script('return window.find("lucky");', %additional), "metacpan.org contains the phrase 'lucky' in a 'window.find' javascript command");
-	ok($firefox->script('return true', timeout => 10_000, new => 1, %additional), "javascript command 'returns true' (using timeout and new (true) as parameters)");
+	ok($firefox->script('return true;', %additional), "javascript command 'return true' executes successfully");
+	ok($firefox->script('return true', timeout => 10_000, new => 1, %additional), "javascript command 'return true' (using timeout and new (true) as parameters)");
 	my $cookie = Firefox::Marionette::Cookie->new(name => 'BonusCookie', value => 'who really cares about privacy', expiry => time + 500000);
 	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie without a domain");
 	$cookie = Firefox::Marionette::Cookie->new(name => 'BonusSessionCookie', value => 'will go away anyway');
@@ -1924,14 +1939,6 @@ SKIP: {
 			diag("\$capabilities->proxy is not supported for remote hosts");
 			skip("\$capabilities->proxy is not supported for remote hosts", 3);
 		} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
-			my @sig_nums  = split q[ ], $Config{sig_num};
-			my @sig_names = split q[ ], $Config{sig_name};
-			my %signals_by_name;
-			my $idx = 0;
-			foreach my $sig_name (@sig_names) {
-				$signals_by_name{$sig_name} = $sig_nums[$idx];
-				$idx += 1;
-			}
 			my $json_document = '{ "id": "5", "value": "something"}';
 			my $txt_document = 'This is ordinary text';
 			if (my $pid = fork) {
@@ -2222,14 +2229,7 @@ SKIP: {
 		}
 		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 	} else {
-		my @sig_nums  = split q[ ], $Config{sig_num};
-		my @sig_names = split q[ ], $Config{sig_name};
-		my %signals_by_name;
-		my $idx = 0;
-		foreach my $sig_name (@sig_names) {
-			$signals_by_name{$sig_name} = $sig_nums[$idx];
-			$idx += 1;
-		}
+		my $xvfb_pid = $firefox->xvfb();
 		while($firefox->alive()) {
 			diag("Killing PID " . $capabilities->moz_process_id() . " with a signal " . $signals_by_name{TERM});
 			sleep 1; 
@@ -2244,6 +2244,11 @@ SKIP: {
 		ok($@ =~ /Firefox[ ]killed[ ]by[ ]a[ ]TERM[ ]signal/smx, "Consistent exception is thrown when a command is issued to a dead firefox process:$@");
 		ok($firefox->quit() == $signals_by_name{TERM}, "Firefox has been killed by a signal with value of $signals_by_name{TERM}:" . $firefox->child_error() . ":" . $firefox->error_message());
 		diag("Error Message was " . $firefox->error_message());
+		if (defined $xvfb_pid) {
+			ok((!(kill 0, $xvfb_pid)) && ($! == POSIX::ESRCH()), "Xvfb process $xvfb_pid has been cleaned up:$!");
+		} else {
+			ok(1, "No Xvfb process exists");
+		}
 	}
 }
 SKIP: {

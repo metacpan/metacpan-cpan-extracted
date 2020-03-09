@@ -26,7 +26,7 @@ ok @seg == 4;
 
 my $root = pop @seg;
 is $root->{name}, "main";
-is $root->{metadata}->{method}, "myApp";
+is $root->{metadata}->{method},  "myApp";
 is $root->{metadata}->{package}, "main";
 like $root->{trace_id} => qr/\A1-[0-9a-fA-F]{8}-[0-9a-fA-F]{24}\z/, "trace_id format";
 like $root->{id}       => qr/\A[0-9a-fA-F]{16}\z/;
@@ -44,7 +44,7 @@ is $seg1->{parent_id} => $root_id;
 is $seg1->{trace_id}  => $trace_id;
 is $seg1->{type}      => "subsegment";
 ok $seg1->{start_time} >= $root->{start_time};
-ok $seg1->{end_time}   <= $root->{end_time};
+ok $seg1->{end_time} <= $root->{end_time};
 
 # remote2
 my $seg2 = pop @seg;
@@ -54,7 +54,7 @@ is $seg2->{parent_id} => $root_id;
 is $seg2->{trace_id}  => $trace_id;
 is $seg2->{type}      => "subsegment";
 ok $seg2->{start_time} >= $seg1->{start_time};
-ok $seg2->{end_time}   <= $root->{end_time};
+ok $seg2->{end_time} <= $root->{end_time};
 
 # remote3
 my $seg3 = shift @seg;
@@ -64,6 +64,6 @@ is $seg3->{parent_id} => $seg2->{id};
 is $seg3->{trace_id}  => $trace_id;
 is $seg3->{type}      => "subsegment";
 ok $seg3->{start_time} >= $seg2->{start_time};
-ok $seg3->{end_time}   <= $seg2->{end_time};
+ok $seg3->{end_time} <= $seg2->{end_time};
 
 done_testing;

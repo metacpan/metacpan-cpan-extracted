@@ -1,0 +1,38 @@
+# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+
+# This file is part of I18N-Langinfo-Wide.
+#
+# I18N-Langinfo-Wide is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# I18N-Langinfo-Wide is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with I18N-Langinfo-Wide.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: libi18n-langinfo-wide-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.5
+Homepage: http://user42.tuxfamily.org/i18n-langinfo-wide/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libi18n-langinfo-wide-perl
+Architecture: all
+Depends: perl (>= 5.8.1), ${perl:Depends}, ${misc:Depends}
+Description: Langinfo functions with wide-char strings
+ This is a variation of the I18N::Langinfo module returning Perl
+ wide-char strings, rather than locale charset bytes like the plain
+ langinfo() function does.

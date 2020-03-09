@@ -1,5 +1,10 @@
 Revision history for Test-LWP-UserAgent
 
+0.034     2020-03-06 04:22:25Z
+          - fix t/10-request-args-network.t under EXTENDED_TESTING=1 where the
+            test URL was returning random content for each request and
+            therefore failing a comparison check
+
 0.033     2017-05-18 00:46:41Z
           - fix network tests that failed from 0.032, due to inadequate author
             testing before release

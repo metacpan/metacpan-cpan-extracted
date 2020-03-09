@@ -54,15 +54,17 @@
       },
       "test" : {
          "requires" : {
+            "HTTP::Server::PSGI" : "0",
             "IO::Scalar" : "0",
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Test::TCP" : "0"
          }
       }
    },
    "provides" : {
       "AWS::XRay" : {
          "file" : "lib/AWS/XRay.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "AWS::XRay::Buffer" : {
          "file" : "lib/AWS/XRay/Buffer.pm"
@@ -88,11 +90,12 @@
          "web" : "https://github.com/fujiwara/AWS-XRay"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_authority" : "cpan:FUJIWARA",
    "x_contributors" : [
       "Ichinose Shogo <shogo82148@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Pedro Melo <melo@simplicidade.org>",
       "moznion <moznion@gmail.com>",
       "mutsutoshi.yoshimoto <mutsutoshi.yoshimoto@20202759n.guest.mixi.co.jp>",
       "papix <mail@papix.net>"

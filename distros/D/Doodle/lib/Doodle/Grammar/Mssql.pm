@@ -2,11 +2,18 @@ package Doodle::Grammar::Mssql;
 
 use 5.014;
 
-use Data::Object 'Class', 'Doodle::Library';
+use strict;
+use warnings;
+
+use registry 'Doodle::Library';
+use routines;
+
+use Data::Object::Class;
+use Data::Object::ClassHas;
 
 extends 'Doodle::Grammar';
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 has name => (
   def => 'mssql',

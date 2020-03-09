@@ -62,6 +62,7 @@ dep
 deps
 dpkg
 dpkg-buildflags
+dpkg-buildpackage
 dpkg-checkbuilddeps
 dpkg-dev
 dpkg-genbuildinfo
@@ -72,12 +73,14 @@ dup'ed
 env
 envvar
 fieldnames
+forceplugin
 ge
 getters
 gettext
 hurd
 keyrings
 le
+libdir
 lzma
 modelines
 multiarch

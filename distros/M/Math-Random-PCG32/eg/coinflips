@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+#
+# eg/coinflips - does the coinflip show any bias over a few rolls?
+# (there was a run of zeros at the exact point the tests ended up
+# pulling from...)
+#
+#   ./eg/coinflips | r-fu summary -
+
+use 5.14.0;
+use warnings;
+use Fcntl;
+use Math::Random::PCG32 0.17 qw(coinflip);
+use Scalar::Util qw(looks_like_number);
+
+my $trials = 1e6;
+
+my @seeds;
+if (@ARGV) {
+    $trials = shift;
+    die "Usage: $0 trials [initstate initseq]\n"
+      unless defined $trials
+      and looks_like_number($trials)
+      and $trials > 0;
+    if (@ARGV == 2) {
+        @seeds = @ARGV[ 0, 1 ];
+    } else {
+        die "Usage: $0 trials [initstate initseq]\n";
+    }
+}
+
+unless (@seeds) {
+    sysopen my $fh, "/dev/random", O_RDONLY or die "no random: $!\n";
+    my $bert;
+    for (1 .. 2) {
+        my $len = sysread $fh, $bert, 8;
+        die "uh what?? $!\n" if !defined $len or $len != 8;
+        push @seeds, unpack 'Q', $bert;
+    }
+}
+
+my $rng = Math::Random::PCG32->new(@seeds);
+say coinflip($rng) for 1 .. $trials;

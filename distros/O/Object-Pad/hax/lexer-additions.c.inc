@@ -48,7 +48,7 @@ static SV *MY_lex_scan_ident(pTHX_ int flags)
   while((c = lex_peek_unichar(0))) {
     if(at_start ? isIDFIRST_uni(c) : isALNUM_uni(c))
       at_start = FALSE;
-    // TODO: This sucks in the case of a false Foo:Bar match
+    /* TODO: This sucks in the case of a false Foo:Bar match */
     else if((flags & LEX_IDENT_PACKAGENAME) && (c == ':')) {
       lex_read_unichar(0);
       if(lex_read_unichar(0) != ':')

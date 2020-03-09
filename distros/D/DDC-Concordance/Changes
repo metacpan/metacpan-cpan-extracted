@@ -2,6 +2,12 @@
 ##
 ## Change log for perl distribution DDC-Concordance
 
+v0.44 Mon, 09 Mar 2020 12:21:57 +0100 moocow
+	+ added global variable $DDC::Client::JSON_BACKEND - workaround for JSON::XS with perl threads
+	+ added DDC::Client methods parseAddr(), addrStr() for URL-specification of connect parameters
+	+ added syntactic sugar for DDC::Client->new(url=>$url), omitting connect=>{...}
+	+ added ddc-tee.perl
+
 v0.43 Thu, 19 Sep 2019 14:47:12 +0200 moocow
 	+ added DDC::Client support for UNIX-domain sockets (tested with socat wrappers)
 

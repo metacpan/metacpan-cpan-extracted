@@ -1,3 +1,16 @@
+0.008   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+	- [build] Rebuild with updated dzil plugin [Sah::Schemas] to correctly
+          show examples.
+
+
+0.007   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Move tests to examples.
+
+
 0.006   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename coerce rule module(s) (0.034+).

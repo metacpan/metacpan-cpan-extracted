@@ -1,5 +1,11 @@
 Revision history for Perl extension App-Greple-subst
 
+2.08 2020-03-06T00:43:45Z
+
+    - Update jtca rule.
+    - Add --ignore-space option.
+    - Add --sccc2 option and dictionary.
+
 2.07 2020-02-26T08:39:27Z
 
     - Example dictionary support: share/jtca-katakana-guide

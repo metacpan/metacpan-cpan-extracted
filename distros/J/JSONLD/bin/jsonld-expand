@@ -11,12 +11,23 @@ use open ':std', ':encoding(UTF-8)';
 my $data;
 my $base;
 my $j		= JSON->new->pretty(1)->canonical(1)->allow_nonref(1);
+my $context	= {};
 while (scalar(@ARGV) and $ARGV[0] =~ /^-(\w+)$/) {
 	my $flag	= $1;
 	shift;
 	if ($flag eq 'v') {
 		$JSONLD::debug	= 1;
+	} elsif ($flag eq 'c') {
+		my $file	= shift;
+		open(my $fh, '<:utf8', $file);
+		my $j	= JSON->new();
+		$context	= $j->decode(do { local($/); <$fh> });
 	}
+}
+
+my %args;
+if (scalar(@{ [keys %$context] })) {
+	$args{expandContext}	= $context;
 }
 
 if (scalar(@ARGV)) {
@@ -30,7 +41,7 @@ if (scalar(@ARGV)) {
 }
 
 my $jld			= JSONLD->new(base_iri => IRI->new($base));
-my $expanded	= eval { $jld->expand($data) };
+my $expanded	= eval { $jld->expand($data, %args) };
 if ($@) {
 	die $@;
 }

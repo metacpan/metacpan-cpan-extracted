@@ -1,0 +1,20 @@
+1.001 2020-03-09
+
+    [Bugfix]
+    
+        This plugin handles multiple classes, so needs version 1.000
+        of Data::Tersify (which is the first version that works properly
+        so no harm done there).
+
+1.000 2020-03-08
+
+    [Features]
+    
+        Also summarise views.
+
+    [Documentation]
+    
+        Explain what this tersifies and how, and why that's useful.
+
+0.001 2018-08-12
+    Initial version.

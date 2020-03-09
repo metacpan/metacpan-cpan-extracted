@@ -39,6 +39,7 @@ lib/NewsExtractor/SiteSpecificExtractor/www_rti_org_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_rvn_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_setn_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_taipeitimes_com.pm
+lib/NewsExtractor/SiteSpecificExtractor/www_upmedia_mg.pm
 lib/NewsExtractor/TXExtractor.pm
 lib/NewsExtractor/TextUtil.pm
 lib/NewsExtractor/Types.pm

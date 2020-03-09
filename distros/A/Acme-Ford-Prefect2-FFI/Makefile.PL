@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
     "lib/Acme/Ford/Prefect2/FFI.pm" => "\$(INST_LIB)/Acme/Ford/Prefect2/FFI.pm"
   },
   "PREREQ_PM" => {
-    "Acme::Alien::DontPanic2" => "2.0400",
+    "Acme::Alien::DontPanic2" => "2.1100",
     "FFI::CheckLib"           => "0.15",
     "FFI::Platypus"           => "1.00",
     "FFI::Platypus::Declare"  => 0
@@ -59,14 +59,14 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "2.0400",
+  "VERSION" => "2.1100",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Acme::Alien::DontPanic2" => "2.0400",
+  "Acme::Alien::DontPanic2" => "2.1100",
   "FFI::CheckLib"           => "0.15",
   "FFI::Platypus"           => "1.00",
   "FFI::Platypus::Declare"  => 0,

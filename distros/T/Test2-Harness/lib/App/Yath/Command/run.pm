@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use App::Yath::Options;
 
@@ -375,6 +375,17 @@ Exclude a file from testing
 Can be specified multiple times
 
 
+=item --exclude-list file.txt
+
+=item --exclude-list http://example.com/exclusions.txt
+
+=item --no-exclude-list
+
+Point at a file or url which has a new line separated list of test file names to exclude from testing. Starting a line with a '#' will comment it out (for compatibility with Test2::Aggregate list files).
+
+Can be specified multiple times
+
+
 =item --exclude-pattern t/nope.t
 
 =item --no-exclude-pattern
@@ -526,7 +537,7 @@ Do not delete directories when done. This is useful if you want to inspect the d
 
 =item --no-summary
 
-Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extention is added automatically if omitted.
+Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extension is added automatically if omitted.
 
 
 =back
@@ -884,7 +895,7 @@ Set a specific run-id. (Default: a UUID)
 
 =item --no-test-args
 
-Arguments to pass in as @ARGV for all tests that are run. These can be provided easier using the '::' argument seperator.
+Arguments to pass in as @ARGV for all tests that are run. These can be provided easier using the '::' argument separator.
 
 Can be specified multiple times
 
@@ -904,7 +915,7 @@ Use the stream formatter (default is on)
 
 =item --no-tap
 
-The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests wh    ere this causes problems, in which case setting --TAP or --no-stream can help.
+The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.
 
 
 =back

@@ -2,9 +2,16 @@ package Moodle;
 
 use 5.014;
 
-use Data::Object 'Class', 'Moodle::Library';
+use strict;
+use warnings;
 
-our $VERSION = '0.04'; # VERSION
+use registry 'Moodle::Library';
+use routines;
+
+use Data::Object::Class;
+use Data::Object::ClassHas;
+
+our $VERSION = '0.05'; # VERSION
 
 has driver => (
   is => 'ro',

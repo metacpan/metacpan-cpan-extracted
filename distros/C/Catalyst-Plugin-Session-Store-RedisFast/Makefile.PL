@@ -17,6 +17,7 @@ WriteMakefile(
         'CBOR::XS'                  => '1.71',
         'Catalyst'                  => 0,
         'MIME::Base64'              => '3.13',
+        'Class::Data::Inheritable'  => 0,
     },
     META_MERGE   => {
           requires  => { perl => '5.14.2' },

@@ -52,6 +52,7 @@ my %WriteMakefileArgs = (
     "Modern::Perl" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
+    "Number::Format" => 0,
     "Path::Iterator::Rule" => 0,
     "Scalar::Util" => 0,
     "Scalar::Util::Numeric" => 0,
@@ -71,7 +72,7 @@ my %WriteMakefileArgs = (
     "Test2::Plugin::DieOnFail" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.024",
+  "VERSION" => "0.025",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -105,6 +106,7 @@ my %FallbackPrereqs = (
   "Modern::Perl" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
+  "Number::Format" => 0,
   "Path::Iterator::Rule" => 0,
   "Scalar::Util" => 0,
   "Scalar::Util::Numeric" => 0,

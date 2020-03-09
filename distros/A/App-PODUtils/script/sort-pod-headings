@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/PODUtils/sort_pod_headings
-# and generated automatically using Perinci::CmdLine::Gen version 0.493
+# and generated automatically using Perinci::CmdLine::Gen version 0.494
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'App-PODUtils'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,7 +25,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: 
+# ABSTRACT: Sort POD headings in text
 # PODNAME: sort-pod-headings
 
 __END__
@@ -36,17 +36,59 @@ __END__
 
 =head1 NAME
 
-sort-pod-headings -  
+sort-pod-headings - Sort POD headings in text
 
 =head1 VERSION
 
-This document describes version 0.046 of sort-pod-headings (from Perl distribution App-PODUtils), released on 2020-02-28.
+This document describes version 0.047 of sort-pod-headings (from Perl distribution App-PODUtils), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % sort-pod-headings [options] [pod]
+
+=head1 DESCRIPTION
+
+This utility sorts POD headings in text. By default it sorts =head1 headings.
+For example this POD:
+
+ =head1 b
+ 
+ some text for b
+ 
+ =head1 a
+ 
+ text for a
+ 
+ =head2 a2
+ 
+ =head2 a1
+ 
+ =head1 c
+ 
+ text for c
+
+will be sorted into:
+
+ =head1 a
+ 
+ text for a
+ 
+ =head2 a2
+ 
+ =head2 a1
+ 
+ =head1 b
+ 
+ some text for b
+ 
+ =head1 c
+ 
+ text for c
+
+Note that the =head2 headings are not sorted. If you want to sort those, you can
+rerun the utility and specify the C<--command=head2> option.
 
 =head1 OPTIONS
 

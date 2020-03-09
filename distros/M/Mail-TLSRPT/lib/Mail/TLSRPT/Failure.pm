@@ -1,6 +1,6 @@
 package Mail::TLSRPT::Failure;
 # ABSTRACT: TLSRPT failure object
-our $VERSION = '1.20200305.1'; # VERSION
+our $VERSION = '1.20200306.1'; # VERSION
 use 5.20.0;
 use Moo;
 use Carp;
@@ -62,5 +62,57 @@ sub as_string($self) {
     );
 }
 
+sub _csv_headers($self) {
+    return (
+        'result type',
+        'sending mta ip',
+        'receiving mx hostname',
+        'receiving mx helo',
+        'receiving ip',
+        'failed session count',
+        'additional information',
+        'failure reason code',
+    );
+}
+
+sub _csv_fragment($self) {
+    return (
+        $self->result_type,
+        $self->sending_mta_ip->ip,
+        $self->receiving_mx_hostname,
+        $self->receiving_mx_helo // '',
+        $self->receiving_ip ? $self->receiving_ip->ip : '',
+        $self->failed_session_count,
+        $self->additional_information // '',
+        $self->failure_reason_code // '',
+    );
+}
+
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::TLSRPT::Failure - TLSRPT failure object
+
+=head1 VERSION
+
+version 1.20200306.1
+
+=head1 AUTHOR
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Marc Bradshaw.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

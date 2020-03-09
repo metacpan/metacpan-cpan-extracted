@@ -223,4 +223,3 @@ t/synopsis.t
 t/syntax.t
 META.yml
 META.json
-SIGNATURE    Added here by Module::Build

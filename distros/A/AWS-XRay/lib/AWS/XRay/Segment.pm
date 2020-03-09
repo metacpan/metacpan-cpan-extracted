@@ -4,7 +4,7 @@ use 5.012000;
 use strict;
 use warnings;
 
-use JSON::XS ();
+use JSON::XS    ();
 use Time::HiRes ();
 
 my $header = qq|{"format":"json","version":1}\n|;
@@ -43,9 +43,9 @@ sub close {
 
 sub trace_header {
     my $self = shift;
-    my $h = sprintf("Root=%s;Parent=%s", $self->{trace_id}, $self->{id});
+    my $h    = sprintf("Root=%s;Parent=%s", $self->{trace_id}, $self->{id});
     if (defined $AWS::XRay::SAMPLED) {
-        $h .= ";Sampled=$AWS::XRay::SAMPLED"
+        $h .= ";Sampled=$AWS::XRay::SAMPLED";
     }
     return $h;
 }
@@ -64,6 +64,5 @@ sub close {
 sub trace_header {
     "";
 }
-
 
 1;

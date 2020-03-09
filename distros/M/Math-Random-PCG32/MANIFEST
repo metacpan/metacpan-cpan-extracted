@@ -5,6 +5,8 @@ MANIFEST
 META.json
 META.yml
 README
+eg/coinflips
+eg/leakcheck
 lib/Math/Random/PCG32.pm
 lib/Math/Random/PCG32.xs
 lib/Math/Random/typemap

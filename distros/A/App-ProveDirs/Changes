@@ -1,0 +1,26 @@
+0.005   2020-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Set CLI's default log level to info (verbose).
+
+
+0.004   2020-03-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix undefined warning.
+
+
+0.003   2020-03-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Forgot to set prove_opts' default to the sensible '-l'.
+
+
+0.002   2020-03-06  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Fix copy-paste mistake in description.
+
+
+0.001   2020-03-06  Released-By: PERLANCAR
+
+        - First release, refactored/extracted from App-ProveRdeps. Add
+          --summarize-all option.

@@ -2,7 +2,7 @@ package Test2::Harness::TestFile;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use Carp qw/croak/;
 
@@ -259,13 +259,17 @@ sub _scan {
 
         if ($dir eq 'no') {
             my $feature = lc(join '_' => @args);
-            $headers{features}->{$feature} = 0;
+            if ($feature eq 'retry') {
+                $headers{retry} = 0
+            } else {
+                $headers{features}->{$feature} = 0;
+            }
         }
         elsif ($dir eq 'smoke') {
             $headers{features}->{smoke} = 1;
         }
         elsif ($dir eq 'retry') {
-            $headers{retry} = 1 unless @args;
+            $headers{retry} = 1 unless @args || defined $headers{retry};
             for my $arg (@args) {
                 if ($arg =~ m/^\d+$/) {
                     $headers{retry} = int $arg;
@@ -373,7 +377,7 @@ sub _parse_shbang {
 
 sub queue_item {
     my $self = shift;
-    my ($job_name, $run_id) = @_;
+    my ($job_name, $run_id, %inject) = @_;
 
     die "The '$self->{+FILE}' test specifies that it should not be run by Test2::Harness.\n"
         unless $self->check_feature(run => 1);
@@ -428,6 +432,8 @@ sub queue_item {
         defined($pet)            ? (post_exit_timeout => $self->post_exit_timeout) : (),
 
         @{$self->{+QUEUE_ARGS}},
+
+        %inject,
     };
 }
 

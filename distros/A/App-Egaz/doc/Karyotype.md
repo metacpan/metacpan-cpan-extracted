@@ -1,9 +1,11 @@
 # Prebuilt karyotype bands for Circos
 
-[TOC levels=1-3]: # " "
+[TOC levels=1-3]: # ""
+
 - [Prebuilt karyotype bands for Circos](#prebuilt-karyotype-bands-for-circos)
 - [Coming with Circos](#coming-with-circos)
 - [Arabidopsis](#arabidopsis)
+- [Rice](#rice)
 
 
 # Coming with Circos
@@ -81,3 +83,4 @@ mysql -hmysql-eg-publicsql.ebi.ac.uk -P4157 -uanonymous
 perl ~/Scripts/withncbi/ensembl/chr_kary.pl -s mysql-eg-publicsql.ebi.ac.uk --port 4157 -u anonymous -p '' -e oryza_sativa_core_29_82_7
 
 ```
+

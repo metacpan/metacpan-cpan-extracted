@@ -1,0 +1,16 @@
+7DRL 2020 - start time 2020-02-29 18:00 UTC
+
+1.00    2020-03-07 15:45
+    * bugfix: remove debug logfile redirect
+    * examine mode shows range and coordinate details
+    * make Fungi more relevant by having them camp resources
+    * Stalkers get = for shots so they can be distinguished from Railgun
+      or Gatling fire
+    * update_* cleanups to remove old/duplicate variables and thus fix
+      and create some old and new bugs
+    * try to only delay the game if the player is hit or something
+      visible happens in the FOV
+    * various other fixes, improvements, and regressions
+
+0.20    2020-03-06 17:56 UTC
+    * the first at least not hopelessly buggy release

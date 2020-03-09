@@ -1,7 +1,9 @@
 package Log::ger::Layout::LTSV;
 
-our $DATE = '2019-04-13'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger-Layout-LTSV'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +32,7 @@ sub _encode {
 
 sub _layout {
     my $pkg = shift;
-    my ($conf, $msg0, $init_args, $lnum, $level) = @_;
+    my ($plugin_conf, $msg0, $per_target_conf, $lnum, $level) = @_;
 
     ($time_last, $time_now) = ($time_now, time());
     my %per_message_data;
@@ -42,8 +44,8 @@ sub _layout {
         $msg = {message => $msg0};
     }
 
-    if ($conf->{delete_fields}) {
-        for my $f (@{ $conf->{delete_fields} }) {
+    if ($plugin_conf->{delete_fields}) {
+        for my $f (@{ $plugin_conf->{delete_fields} }) {
             if (ref $f eq 'Regexp') {
                 for my $k (keys %$msg) {
                     delete $msg->{$k} if $k =~ $f;
@@ -54,13 +56,13 @@ sub _layout {
         }
     }
 
-    if (my $ff = $conf->{add_fields}) {
+    if (my $ff = $plugin_conf->{add_fields}) {
         for my $f (keys %$ff) {
             $msg->{$f} = $ff->{$f};
         }
     }
 
-    if (my $ff = $conf->{add_special_fields}) {
+    if (my $ff = $plugin_conf->{add_special_fields}) {
         my %mentioned_specials;
         for my $f (keys %$ff) {
             $mentioned_specials{ $ff->{$f} }++;
@@ -73,25 +75,25 @@ sub _layout {
                 $mentioned_specials{Location}
             ) {
             $per_message_data{caller0} =
-                [Devel::Caller::Util::caller (0, 0, $conf->{packages_to_ignore}, $conf->{subroutines_to_ignore})];
+                [Devel::Caller::Util::caller (0, 0, $plugin_conf->{packages_to_ignore}, $plugin_conf->{subroutines_to_ignore})];
         }
         if (
             $mentioned_specials{Location} ||
                 $mentioned_specials{Method}
             ) {
             $per_message_data{caller1} =
-                [Devel::Caller::Util::caller (1, 0, $conf->{packages_to_ignore}, $conf->{subroutines_to_ignore})];
+                [Devel::Caller::Util::caller (1, 0, $plugin_conf->{packages_to_ignore}, $plugin_conf->{subroutines_to_ignore})];
         }
         if ($mentioned_specials{Stack_Trace}) {
             $per_message_data{callers} =
-                [Devel::Caller::Util::callers(0, 0, $conf->{packages_to_ignore}, $conf->{subroutines_to_ignore})];
+                [Devel::Caller::Util::callers(0, 0, $plugin_conf->{packages_to_ignore}, $plugin_conf->{subroutines_to_ignore})];
         }
 
         for my $f (keys %$ff) {
             my $sf = $ff->{$f};
             my $val;
             if ($sf eq 'Category') {
-                $val = $init_args->{category};
+                $val = $per_target_conf->{category};
             } elsif ($sf eq 'Class') {
                 $val = $per_message_data{caller0}[0];
             } elsif ($sf eq 'Date_Local') {
@@ -146,9 +148,9 @@ sub _layout {
 
 sub _get_hooks {
     my $pkg = shift;
-    my %conf = @_;
+    my %plugin_conf = @_;
 
-    $conf{packages_to_ignore} //= [
+    $plugin_conf{packages_to_ignore} //= [
         "Log::ger",
         "Log::ger::Layout::LTSV",
         "Try::Tiny",
@@ -156,11 +158,13 @@ sub _get_hooks {
 
     return {
         create_layouter => [
-            $pkg, 50,
-            sub {
-                my %args = @_;
+            $pkg, # key
+            50,   # priority
+            sub { # hook
+                my %hook_args = @_;
 
-                [sub { $pkg->_layout(\%conf, @_) }];
+                my $layouter = sub { $pkg->_layout(\%plugin_conf, @_) };
+                [$layouter];
             }],
     };
 }
@@ -184,7 +188,7 @@ Log::ger::Layout::LTSV - Layout log message as LTSV
 
 =head1 VERSION
 
-This document describes version 0.003 of Log::ger::Layout::LTSV (from Perl distribution Log-ger-Layout-LTSV), released on 2019-04-13.
+This document describes version 0.004 of Log::ger::Layout::LTSV (from Perl distribution Log-ger-Layout-LTSV), released on 2020-03-07.
 
 =head1 SYNOPSIS
 
@@ -288,7 +292,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

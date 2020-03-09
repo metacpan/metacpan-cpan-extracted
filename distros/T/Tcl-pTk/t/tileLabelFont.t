@@ -35,5 +35,4 @@ my $cloned = $font->Clone( -weight => 'bold');
 ok( ref($cloned), "Tcl::pTk::Font", "Cloned Font is blessed object");
 
 
-MainLoop if (@ARGV); # Pause if any args, (for debugging)
-
+(@ARGV) ? MainLoop : $TOP->destroy; # Pause if any args, (for debugging)

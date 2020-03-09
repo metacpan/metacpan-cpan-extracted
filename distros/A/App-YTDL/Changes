@@ -1,6 +1,9 @@
 Revision history for App-YTDL
 
 
+0.307   2020-03-08
+        - Adapt the code to the updated Term::Choose.
+
 0.306   2019-09-05
         - Adapt the code to the updated Term::Choose::Util.
 

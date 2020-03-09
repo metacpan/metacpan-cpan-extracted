@@ -2,9 +2,16 @@ package Doodle::Statement;
 
 use 5.014;
 
-use Data::Object 'Class', 'Doodle::Library';
+use strict;
+use warnings;
 
-our $VERSION = '0.07'; # VERSION
+use registry 'Doodle::Library';
+use routines;
+
+use Data::Object::Class;
+use Data::Object::ClassHas;
+
+our $VERSION = '0.08'; # VERSION
 
 has cmd => (
   is => 'ro',

@@ -1,6 +1,4 @@
 
-# $Id: coverage.t,v 1.1 2009/04/11 15:50:20 Martin Exp $
-
 use strict;
 use warnings;
 
@@ -22,6 +20,11 @@ pass(q{parse_uri()...});
 $par->parse_uri();
 pass(q{parse_uri('')...});
 $par->parse_uri(q{});
+
+use IO::CaptureOutput qw( capture );
+my ($sStderr, $sWarn);
+$SIG{__WARN__} = sub { $sWarn .= $_[0] };
+
 my $sRDFEmpty = <<EMPTY;
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF
@@ -30,7 +33,17 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 </rdf:RDF>
 EMPTY
 pass(q{parse 'empty' rdf...});
-$par->parse_rdf($sRDFEmpty);
+capture { eval {$par->parse_rdf($sRDFEmpty)} } undef, \$sStderr;
+$sStderr .= $@;
+$sStderr .= $sWarn;
+if ($sStderr =~ m/UNABLE TO PROVIDE REQUIRED FEATURE/i)
+  {
+  diag(q{XML::SAX is not installed properly.});
+  diag(q{Please use cpan or cpanp to install the XML::SAX module.});
+  diag(q{See http://perl-xml.sourceforge.net/faq/#parserdetails.ini for more information.});
+  BAIL_OUT(q{XML::SAX is not installed properly});
+  } # if
+
 undef $/;
 my $sRDFFeatures = <DATA>;
 pass(q{parse rdf with special features...});
@@ -41,7 +54,6 @@ $ser->genid();
 $ser->genid(q{});
 $ser->genid(q{fubar});
 pass(q{all done});
-
 
 __END__
 <?xml version="1.0" encoding="UTF-8"?>

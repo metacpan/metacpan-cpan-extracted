@@ -27,7 +27,7 @@ Create plots for script cluster_size_and_score_distribution.
 =cut
 
 package CLIPSeqTools::PlotApp::cluster_size_and_score_distribution;
-$CLIPSeqTools::PlotApp::cluster_size_and_score_distribution::VERSION = '0.1.8';
+$CLIPSeqTools::PlotApp::cluster_size_and_score_distribution::VERSION = '0.1.9';
 
 # Make it an app command
 use MooseX::App::Command;

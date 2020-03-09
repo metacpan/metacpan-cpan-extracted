@@ -1,3 +1,9 @@
+0.008   2020-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Log::ger 0.033 (renamed routine type, renamed hook
+	  arguments, removed logml routine type).
+
+
 0.007   2020-02-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Add configuration: all.

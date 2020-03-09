@@ -6,9 +6,11 @@ use warnings;
 use overload '@{}' => sub { return $_[0]->{name} },
              '""'  => sub { return $_[0]->to_filter };
 
+our $identifier_re = q/([a-z_][a-z0-9_]*)/;
+
 sub new {
     my $class = shift;
-    return bless { name => \@_ }, $class;
+    return bless { name => [ map { lc } @_ ] }, $class;
 }
 
 sub to_filter
@@ -56,6 +58,11 @@ sub validate
 {
     my $self = shift;
     die 'name undefined for OPTiMaDe::Filter::Property' if !@$self;
+
+    for my $name (@$self) {
+        next if $name =~ /^$identifier_re$/;
+        die "name '$name' does not match identifier syntax: $identifier_re";
+    }
 }
 
 1;

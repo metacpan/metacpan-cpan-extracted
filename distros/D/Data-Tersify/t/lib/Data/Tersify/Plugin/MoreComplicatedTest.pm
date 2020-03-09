@@ -3,7 +3,7 @@ package Data::Tersify::Plugin::MoreComplicatedTest;
 use strict;
 use warnings;
 
-sub handles { ['TestObject::WithName', 'TestObject::WithUUID'] }
+sub handles { 'TestObject::WithName', 'TestObject::WithUUID' }
 sub tersify {
     my ($class, $object) = @_;
 

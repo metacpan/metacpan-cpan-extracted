@@ -2,7 +2,14 @@ package Doodle::Table;
 
 use 5.014;
 
-use Data::Object 'Class', 'Doodle::Library';
+use strict;
+use warnings;
+
+use registry 'Doodle::Library';
+use routines;
+
+use Data::Object::Class;
+use Data::Object::ClassHas;
 
 with 'Doodle::Table::Helpers';
 
@@ -10,7 +17,7 @@ use Doodle::Column;
 use Doodle::Index;
 use Doodle::Relation;
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 has name => (
   is => 'ro',
@@ -89,12 +96,22 @@ fun new_relations($self) {
 
 # METHODS
 
+method stash(%args) {
+  my $data = $self->data;
+
+  while (my($key, $value) = each(%args)) {
+    $data->{$key} = $value;
+  }
+
+  return $self;
+}
+
 method column(Str $name, Any %args) {
   $args{table} = $self;
 
   my $column = Doodle::Column->new(%args, name => $name);
 
-  $self->columns->push($column);
+  push @{$self->columns}, $column;
 
   return $column;
 }
@@ -104,7 +121,7 @@ method index(ArrayRef :$columns, Any %args) {
 
   my $index = Doodle::Index->new(%args);
 
-  $self->indices->push($index);
+  push @{$self->indices}, $index;
 
   return $index;
 }
@@ -118,7 +135,7 @@ method relation(Str $column, Str $ftable, Str $fcolumn = 'id', Any %args) {
 
   my $relation = Doodle::Relation->new(%args);
 
-  $self->relations->push($relation);
+  push @{$self->relations}, $relation;
 
   return $relation;
 }

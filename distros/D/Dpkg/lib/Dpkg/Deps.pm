@@ -29,7 +29,7 @@ Dpkg::Deps - parse and manipulate dependencies of Debian packages
 
 =head1 DESCRIPTION
 
-The Dpkg::Deps module provides objects implementing various types of
+The Dpkg::Deps module provides classes implementing various types of
 dependencies.
 
 The most important function is deps_parse(), it turns a dependency line in
@@ -46,7 +46,7 @@ All the deps_* functions are exported by default.
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 our @EXPORT = qw(
     deps_concat
     deps_parse
@@ -235,6 +235,12 @@ them if set.
 If set to 1, returns a Dpkg::Deps::Union instead of a Dpkg::Deps::AND. Use
 this when parsing non-dependency fields like Conflicts.
 
+=item virtual (defaults to 0)
+
+If set to 1, allow only virtual package version relations, that is none,
+or “=”.
+This should be set whenever working with Provides fields.
+
 =item build_dep (defaults to 0)
 
 If set to 1, allow build-dep only arch qualifiers, that is “:native”.
@@ -265,6 +271,7 @@ sub deps_parse {
     $options{reduce_profiles} //= 0;
     $options{reduce_restrictions} //= 0;
     $options{union} //= 0;
+    $options{virtual} //= 0;
     $options{build_dep} //= 0;
     $options{tests_dep} //= 0;
 
@@ -301,6 +308,12 @@ sub deps_parse {
 		warning(g_("can't parse dependency %s"), $dep_or);
 		return;
 	    }
+            if ($options{virtual} && defined $dep_simple->{relation} &&
+                $dep_simple->{relation} ne '=') {
+                warning(g_('virtual dependency contains invalid relation: %s'),
+                        $dep_simple->output);
+                return;
+            }
 	    $dep_simple->{arches} = undef if not $options{use_arch};
             if ($options{reduce_arch}) {
 		$dep_simple->reduce_arch($options{host_arch});
@@ -416,11 +429,11 @@ sub deps_compare {
     }
 }
 
-=head1 OBJECTS - Dpkg::Deps::*
+=head1 CLASSES - Dpkg::Deps::*
 
 There are several kind of dependencies. A Dpkg::Deps::Simple dependency
 represents a single dependency statement (it relates to one package only).
-Dpkg::Deps::Multiple dependencies are built on top of this object
+Dpkg::Deps::Multiple dependencies are built on top of this class
 and combine several dependencies in different manners. Dpkg::Deps::AND
 represents the logical "AND" between dependencies while Dpkg::Deps::OR
 represents the logical "OR". Dpkg::Deps::Multiple objects can contain
@@ -430,12 +443,16 @@ In practice, the code is only meant to handle the realistic cases which,
 given Debian's dependencies structure, imply those restrictions: AND can
 contain Simple or OR objects, OR can only contain Simple objects.
 
-Dpkg::Deps::KnownFacts is a special object that is used while evaluating
+Dpkg::Deps::KnownFacts is a special class that is used while evaluating
 dependencies and while trying to simplify them. It represents a set of
 installed packages along with the virtual packages that they might
 provide.
 
 =head1 CHANGES
+
+=head2 Version 1.07 (dpkg 1.20.0)
+
+New option: Add virtual option to Dpkg::Deps::deps_parse().
 
 =head2 Version 1.06 (dpkg 1.18.7; module version bumped on dpkg 1.18.24)
 

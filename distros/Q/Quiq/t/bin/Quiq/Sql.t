@@ -506,7 +506,7 @@ sub test_createFunction_postgresql : Test(4) {
 
     my $sql = Quiq::Sql->new('PostgreSQL');
     my $stmt = $sql->createFunction(
-        '<name>',
+        '<name>()',
         -replace => 1,
         -returns => '<returns>','
         <body>
@@ -656,9 +656,9 @@ sub test_select : Test(7) {
 
     my $stmt2 = Quiq::String->removeIndentation(<< '    __SQL__');
     SELECT
-        col1,
-        col2,
-        col3
+        col1
+        , col2
+        , col3
     FROM
         tab
     WHERE
@@ -722,10 +722,10 @@ sub test_select : Test(7) {
     
     $stmt2 = Quiq::String->removeIndentation(<< '    __SQL__');
     SELECT
-        sta_id,
-        sta_name,
-        par_id,
-        par_name
+        sta_id
+        , sta_name
+        , par_id
+        , par_name
     FROM
         station sta LEFT JOIN parameter par
         ON par_station_id = sta_id
@@ -1047,6 +1047,28 @@ sub test_stringLiteral : Test(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_withClause : Test(1) {
+    my $self = shift;
+
+    my $sql = Quiq::Sql->new('PostgreSQL');
+
+    my $expected = Quiq::Unindent->trim(q~
+        x AS (
+            SELECT * FROM a
+        ),
+        y AS (
+            SELECT * FROM b
+        )
+    ~);
+
+    my $stmt = $sql->withClause(x=>'SELECT * FROM a',y=>'SELECT * FROM b');
+    $self->is($stmt,$expected);
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_selectClause : Test(0) {
     my $self = shift;
 
@@ -1064,8 +1086,8 @@ sub test_fromClause_oracle : Test(2) {
     my $fromClause = $sql->fromClause('x');
     $self->is($fromClause,'x');
 
-    $fromClause = $sql->fromClause(['AS','x','y']);
-    $self->is($fromClause,'x y');
+    $fromClause = $sql->fromClause(['AS','x','stmt']);
+    $self->is($fromClause,'stmt x');
 }
 
 sub test_fromClause_postgresql : Test(2) {
@@ -1075,8 +1097,8 @@ sub test_fromClause_postgresql : Test(2) {
     my $fromClause = $sql->fromClause('x');
     $self->is($fromClause,'x');
 
-    $fromClause = $sql->fromClause(['AS','x','y']);
-    $self->is($fromClause,'x AS y');
+    $fromClause = $sql->fromClause(['AS','x','stmt']);
+    $self->is($fromClause,'stmt AS x');
 }
 
 # -----------------------------------------------------------------------------

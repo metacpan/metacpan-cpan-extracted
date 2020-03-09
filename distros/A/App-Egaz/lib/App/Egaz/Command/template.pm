@@ -1211,8 +1211,10 @@ cat axt.gl.fasta > axt.all.fasta
 #----------------------------#
 echo >&2 "==> Get more paralogs"
 egaz blastn axt.gl.fasta genome.fa -o axt.bg.blast --parallel [% opt.parallel2 %]
-egaz blastmatch axt.bg.blast -c 0.95 --perchr -o axt.bg.region --parallel [% opt.parallel2 %]
-faops region -s genome.fa axt.bg.region axt.bg.fasta
+egaz blastmatch axt.bg.blast -c 0.95 -o axt.bg.region --parallel [% opt.parallel2 %]
+samtools faidx genome.fa -r axt.bg.region --continue |
+    perl -p -e "/^>/ and s/:/(+):/" \
+    > axt.bg.fasta
 
 cat axt.gl.fasta axt.bg.fasta |
     faops filter -u stdin stdout |

@@ -2,7 +2,7 @@
 
 use lib qw(. ./ddc-perl ./DDC-perl);
 use DDC::Concordance;
-use JSON::XS;
+use JSON;
 use Encode qw(encode decode);
 use Getopt::Long qw(:config no_ignore_case);
 use File::Basename qw(basename dirname);

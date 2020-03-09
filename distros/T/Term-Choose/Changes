@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.710   2020-03-08
+    - 'line_fold': new option 'join'.
+
 1.709   2020-02-24
     - Bugfix option 'footer_string'.
 

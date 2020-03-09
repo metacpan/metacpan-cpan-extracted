@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
 package Object::Pad;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 
@@ -36,6 +36,10 @@ C<Object::Pad> - a simple syntax for lexical slot-based objects
       has $x = 0;
       has $y = 0;
 
+      method BUILD {
+        ($x, $y) = @_;
+      }
+
       method move($dX, $dY) {
          $x += $dX;
          $y += $dY;
@@ -45,6 +49,8 @@ C<Object::Pad> - a simple syntax for lexical slot-based objects
          print "A point at ($x, $y)\n";
       }
    }
+
+   Point->new(5,10)->describe;
 
 =head1 DESCRIPTION
 
@@ -295,12 +301,6 @@ private slots.
 
 Consider multiple inheritence of subclassing, if that is still considered
 useful after adding roles.
-
-=item *
-
-Experiment with C<CvOUTSIDE> or other techniques as a way to set up the
-per-method pad, and consider if we can detect which slots are in use that way
-to improve method-enter performance.
 
 =item *
 

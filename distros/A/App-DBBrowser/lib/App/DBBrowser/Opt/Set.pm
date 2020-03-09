@@ -90,17 +90,18 @@ sub _options {
             { name => 'max_rows',                text => "- Max Rows",       section => 'G'      },
         ],
         group_output => [
-            { name => 'min_col_width',       text => "- Colwidth",      section => 'table' },
-            { name => 'progress_bar',        text => "- ProgressBar",   section => 'table' },
-            { name => 'tab_width',           text => "- Tabwidth",      section => 'table' },
-            { name => '_grid',               text => "- Grid",          section => 'table' },
-            { name => '_color',              text => "- Color",         section => 'table' },
-            { name => '_binary_filter',      text => "- Binary filter", section => 'table' },
-            { name => '_squash_spaces',      text => "- Squash spaces", section => 'table' },
-            { name => '_show_table_name',    text => "- Table name",    section => 'G'     },
-            { name => '_base_indent',        text => "- Indentation",   section => 'G'     },
-            { name => '_set_string',         text => "- Set string",    section => 'table' },
-            { name => '_file_find_warnings', text => "- Warnings",      section => 'G'     },
+            { name => 'min_col_width',       text => "- Colwidth",       section => 'table' },
+            { name => 'progress_bar',        text => "- ProgressBar",    section => 'table' },
+            { name => 'tab_width',           text => "- Tabwidth",       section => 'table' },
+            { name => '_grid',               text => "- Grid",           section => 'table' },
+            { name => '_color',              text => "- Color",          section => 'table' },
+            { name => '_binary_filter',      text => "- Binary filter",  section => 'table' },
+            { name => '_squash_spaces',      text => "- Squash spaces",  section => 'table' },
+            { name => '_show_table_name',    text => "- Table name",     section => 'G'     },
+            { name => '_base_indent',        text => "- Indentation",    section => 'G'     },
+            { name => '_dots',               text => "- Truncated rows", section => 'G'     },
+            { name => '_set_string',         text => "- Set string",     section => 'table' },
+            { name => '_file_find_warnings', text => "- Warnings",       section => 'G'     },
         ],
         group_insert => [
             { name => '_parse_file',        text => "- Parse file",     section => 'insert' },
@@ -110,6 +111,7 @@ sub _options {
             { name => '_csv_options',       text => "- CSV settings-b", section => 'csv'    },
             { name => '_empty_to_null',     text => "- Empty to NULL",  section => 'insert' },
             { name => '_file_encoding',     text => "- File encoding",  section => 'insert' },
+            { name => '_data_source',       text => "- Data source",    section => 'insert' },
             { name => 'history_dirs',       text => "- Dir history",    section => 'insert' },
             { name => '_file_filter',       text => "- File filter",    section => 'insert' },
             { name => '_show_hidden_files', text => "- Show hidden",    section => 'insert' },
@@ -376,6 +378,13 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
+            elsif ( $opt eq '_data_source' ) {
+                my $prompt = 'Choose data source options';
+                my $sub_menu = [
+                    [ 'data_source', "- Data source", [ 'plain', 'copy&paste', 'file', 'plain/copy&pase/file' ] ]
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
             elsif ( $opt eq '_grid' ) {
                 my $prompt = '"Grid"';
                 my $sub_menu = [
@@ -383,7 +392,13 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-
+            elsif ( $opt eq '_dots' ) {
+                my $prompt = '"How to mark truncated lines"';
+                my $sub_menu = [
+                    [ 'dots', "- Mark of truncated lines", [ '...', '|', 'none' ] ]
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
             elsif ( $opt eq '_color' ) {
                 my $prompt = '"ANSI color escapes"';
                 my $sub_menu = [
@@ -659,7 +674,7 @@ sub __group_readline {
 sub __new_dir_search { # used in Read.pm
     my ( $sf ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
-    my $default_dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
+    my $default_dir = $sf->{i}{tmp_files_dir} // $sf->{i}{home_dir};
     # Choose
     my $dir_fs = $tu->choose_a_directory(
         { init_dir => $default_dir, decoded => 0, clear_screen => 1 }

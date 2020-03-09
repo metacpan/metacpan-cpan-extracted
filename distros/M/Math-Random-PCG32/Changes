@@ -1,5 +1,10 @@
 See also the git repository.
 
+0.17    2020-03-08
+        Break interface, dice() renamed to roll(). Made this routine
+        slightly faster. rand() made faster. Add coinflip() and
+        rand_from().
+
 0.12    2018-10-11
         Require use64bitint=define as need 64-bit ints.
 

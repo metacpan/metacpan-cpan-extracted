@@ -1,0 +1,10 @@
+Revision history for Win32-Vcpkg},
+
+0.02      2020-03-07 18:40:58 -0700
+  - Add PERL_WIN32_VCPKG_DEBUG env var to override default
+    for debug.
+
+0.01      2020-03-07 14:21:08 -0700
+  - initial version
+
+

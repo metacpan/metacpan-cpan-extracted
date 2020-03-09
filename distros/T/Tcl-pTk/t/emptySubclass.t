@@ -40,12 +40,12 @@ $be->insert('end',qw(one two three four));
 
 $be->pack(-side => 'top', -fill => 'x', -expand => 1);
 
-$top->after(1000,sub{$top->destroy});
+$top->idletasks;
+(@ARGV) ? MainLoop : $top->destroy;
 
 ok(1, 1, "Empty SubWidget Widget Creation");
-    
-MainLoop;
+   
 
-print "Option = $option\n" if (defined($option));
+print "# Option = $option\n" if (defined($option));
 
 

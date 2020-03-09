@@ -1,0 +1,91 @@
+# NAME
+
+Data::Object::Role::Tryable
+
+# ABSTRACT
+
+Tryable Role for Perl 5
+
+# SYNOPSIS
+
+    package Example;
+
+    use Moo;
+
+    with 'Data::Object::Role::Tryable';
+
+    package main;
+
+    use routines;
+
+    my $example = Example->new;
+
+# DESCRIPTION
+
+This package provides a wrapper around the [Data::Object::Try](https://metacpan.org/pod/Data::Object::Try) class which
+provides an object-oriented interface for performing complex try/catch
+operations.
+
+# METHODS
+
+This package implements the following methods:
+
+## try
+
+    try(CodeRef | Str $method) : InstanceOf['Data::Object::Try']
+
+The try method takes a method name or coderef and returns a
+[Data::Object::Try](https://metacpan.org/pod/Data::Object::Try) object with the current object passed as the invocant
+which means that `try` and `finally` callbacks will receive that as the first
+argument.
+
+- try example #1
+
+        # given: synopsis
+
+        my $tryer = $example->try(fun(@args) {
+          [@args]
+        });
+
+        # $tryer->result(...)
+
+- try example #2
+
+        # given: synopsis
+
+        my $tryer = $example->try(fun(@args) {
+          die 'tried';
+        });
+
+        $tryer->default(fun($error) {
+          return ['tried'] if $error =~ 'tried';
+          return [$error];
+        });
+
+        # $tryer->result(...)
+
+# AUTHOR
+
+Al Newkirk, `awncorp@cpan.org`
+
+# LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the ["license
+file"](https://github.com/iamalnewkirk/data-object-role-tryable/blob/master/LICENSE).
+
+# PROJECT
+
+[Wiki](https://github.com/iamalnewkirk/data-object-role-tryable/wiki)
+
+[Project](https://github.com/iamalnewkirk/data-object-role-tryable)
+
+[Initiatives](https://github.com/iamalnewkirk/data-object-role-tryable/projects)
+
+[Milestones](https://github.com/iamalnewkirk/data-object-role-tryable/milestones)
+
+[Contributing](https://github.com/iamalnewkirk/data-object-role-tryable/blob/master/CONTRIBUTE.md)
+
+[Issues](https://github.com/iamalnewkirk/data-object-role-tryable/issues)

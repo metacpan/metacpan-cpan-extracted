@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.176';
+our $VERSION = '1.177';
 
 use Time::HiRes ();
 use Quiq::Duration;
@@ -230,7 +230,7 @@ sub restart {
 
 =head1 VERSION
 
-1.176
+1.177
 
 =head1 AUTHOR
 

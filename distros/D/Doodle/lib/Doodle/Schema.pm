@@ -2,13 +2,20 @@ package Doodle::Schema;
 
 use 5.014;
 
-use Data::Object 'Class', 'Doodle::Library';
+use strict;
+use warnings;
+
+use registry 'Doodle::Library';
+use routines;
+
+use Data::Object::Class;
+use Data::Object::ClassHas;
 
 with 'Doodle::Schema::Helpers';
 
 use Doodle::Table;
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 has doodle => (
   is => 'ro',
@@ -40,6 +47,16 @@ fun new_data($self) {
 }
 
 # METHODS
+
+method stash(%args) {
+  my $data = $self->data;
+
+  while (my($key, $value) = each(%args)) {
+    $data->{$key} = $value;
+  }
+
+  return $self;
+}
 
 method table(Str $name, Any %args) {
   $args{doodle} = $self->doodle;

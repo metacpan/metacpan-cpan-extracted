@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -133,69 +133,174 @@ sub existing {
 sub new {
     my ( $class, %parameters ) = @_;
     my $profile = bless { comments => q[], keys => {} }, $class;
-    $profile->set_value( 'browser.shell.checkDefaultBrowser',     'false', 0 );
-    $profile->set_value( 'browser.reader.detectedFirstArticle',   'true',  0 );
-    $profile->set_value( 'dom.disable_open_click_delay',          0,       0 );
-    $profile->set_value( 'media.gmp-gmpopenh264.autoupdate',      'false', 0 );
-    $profile->set_value( 'app.update.auto',                       'false', 0 );
-    $profile->set_value( 'app.update.enabled',                    'false', 0 );
-    $profile->set_value( 'devtools.jsonview.enabled',             'false', 0 );
-    $profile->set_value( 'network.http. request.max-start-delay', '0',     0 );
-    $profile->set_value( 'browser.startup.homepage', 'about:blank', 1 );
-    $profile->set_value( 'browser.startup.homepage_override.mstone',
-        'ignore', 1 );
-    $profile->set_value( 'browser.aboutHomeSnippets.updateUrl', q[], 1 );
-    $profile->set_value( 'browser.search.geoip.url',            q[], 1 );
-    $profile->set_value( 'startup.homepage_welcome_url', 'about:blank', 1 );
-    $profile->set_value( 'startup.homepage_welcome_url.additional',
-        'about:blank', 1 );
-    $profile->set_value( 'toolkit.telemetry.reportingpolicy.firstRun',
+    $profile->set_value( 'bookmarks.initialized.pref', 'true', 0 );
+    $profile->set_value( 'browser.bookmarks.restore_default_bookmarks',
         'false', 0 );
     $profile->set_value( 'browser.download.useDownloadDir', 'true', 0 );
     $profile->set_value( 'browser.download.folderList',     2,      0 )
       ;    # the last folder specified for a download
-    $profile->set_value( 'marionette.port',                       _ANY_PORT() );
-    $profile->set_value( 'devtools.toolbox.host',                 'window', 1 );
-    $profile->set_value( 'devtools.netmonitor.persistlog',        'true', 0 );
-    $profile->set_value( 'browser.safebrowsing.phishing.enabled', 'false', 0 );
-    $profile->set_value( 'browser.safebrowsing.malware.enabled',  'false', 0 );
-    $profile->set_value( 'datareporting.healthreport.uploadEnabled',
-        'false', 0 );
-    $profile->set_value( 'network.cookie.lifetimePolicy', '2',     0 );
-    $profile->set_value( 'toolkit.telemetry.enabled',     'false', 0 );
-    $profile->set_value( 'browser.send_pings',            'false', 0 );
-    $profile->set_value( 'browser.urlbar.speculativeConnect.enable',
-        'false', 0 );
-    $profile->set_value( 'dom.battery.enabled',       'false', 0 );
-    $profile->set_value( 'media.navigator.enabled',   'false', 0 );
-    $profile->set_value( 'browser.chrome.favicons',   'false', 0 );
-    $profile->set_value( 'browser.chrome.site_icons', 'false', 0 );
-    $profile->set_value( 'browser.bookmarks.restore_default_bookmarks',
-        'false', 0 );
-    $profile->set_value( 'browser.shell.shortcutFavicons', 'false', 0 );
-    $profile->set_value( 'extensions.blocklist.enabled',   'false', 0 );
-    $profile->set_value( 'browser.safebrowsing.downloads.remote.enabled',
-        'false', 0 );
-    $profile->set_value( 'extensions.getAddons.cache.enabled',     'false', 0 );
-    $profile->set_value( 'app.normandy.enabled',                   'false', 0 );
-    $profile->set_value( 'media.gmp-gmpopenh264.enabled',          'false', 0 );
-    $profile->set_value( 'browser.casting.enabled',                'false', 0 );
-    $profile->set_value( 'xpinstall.signatures.required',          'false', 0 );
-    $profile->set_value( 'network.captive-portal-service.enabled', 'false', 0 );
-    $profile->set_value( 'profile.enable_profile_migration',       'false', 0 );
-    $profile->set_value( 'bookmarks.initialized.pref',             'true',  0 );
-    $profile->set_value( 'browser.bookmarks.restore_default_bookmarks',
-        'false', 0 );
-    $profile->set_value( 'app.update.disabledForTesting', 'true', 0 );
-    $profile->set_value( 'browser.newtabpage.activity-stream.feeds.snippets',
-        'false', 0 );
-    $profile->set_value(
-        'browser.newtabpage.activity-stream.feeds.section.highlights',
-        'false', 0 );
-    $profile->set_value( 'browser.newtabpage.activity-stream.feeds.topsites',
-        'false', 0 );
-    $profile->set_value( 'browser.search.update', 'false', 0 );
+    $profile->set_value( 'browser.places.importBookmarksHTML',  'true',  0 );
+    $profile->set_value( 'browser.reader.detectedFirstArticle', 'true',  0 );
+    $profile->set_value( 'browser.shell.checkDefaultBrowser',   'false', 0 );
+    $profile->set_value( 'browser.showQuitWarning',             'false', 0 );
+    $profile->set_value( 'browser.startup.homepage', 'about:blank', 1 );
+    $profile->set_value( 'browser.startup.homepage_override.mstone',
+        'ignore', 1 );
+    $profile->set_value( 'browser.startup.page',                 '0',      0 );
+    $profile->set_value( 'browser.tabs.warnOnClose',             'false',  0 );
+    $profile->set_value( 'browser.warnOnQuit',                   'false',  0 );
+    $profile->set_value( 'devtools.jsonview.enabled',            'false',  0 );
+    $profile->set_value( 'devtools.netmonitor.persistlog',       'true',   0 );
+    $profile->set_value( 'devtools.toolbox.host',                'window', 1 );
+    $profile->set_value( 'dom.disable_open_click_delay',         0,        0 );
+    $profile->set_value( 'extensions.installDistroAddons',       'false',  0 );
+    $profile->set_value( 'extensions.update.notifyUser',         'false',  0 );
+    $profile->set_value( 'extensions.update.enabled',            'false',  0 );
+    $profile->set_value( 'extensions.update.notifyUser',         'false',  0 );
+    $profile->set_value( 'focusmanager.testmode',                'true',   0 );
+    $profile->set_value( 'general.useragent.updates.enabled',    'false',  0 );
+    $profile->set_value( 'marionette.port',                      _ANY_PORT() );
+    $profile->set_value( 'media.gmp-gmpopenh264.autoupdate',     'false',  0 );
+    $profile->set_value( 'network.http.prompt-temp-redirect',    'false',  0 );
+    $profile->set_value( 'network.http.request.max-start-delay', '0',      0 );
+    $profile->set_value( 'signon.autofillForms',                 'false',  0 );
+    $profile->set_value( 'signon.rememberSignons',               'false',  0 );
+    $profile->set_value( 'startup.homepage_welcome_url', 'about:blank', 1 );
+    $profile->set_value( 'startup.homepage_welcome_url.additional',
+        'about:blank', 1 );
 
+    if ( !$parameters{seer} ) {
+        $profile->set_value( 'browser.urlbar.speculativeConnect.enable',
+            'false', 0 );
+        $profile->set_value( 'network.dns.disablePrefetch', 'false', 0 );
+        $profile->set_value( 'network.http.speculative-parallel-limit', '0',
+            0 );
+        $profile->set_value( 'network.prefetch-next', 'false', 0 );
+    }
+    if ( !$parameters{chatty} ) {
+        $profile->set_value( 'app.normandy.enabled',        'false',   0 );
+        $profile->set_value( 'app.update.auto',             'false',   0 );
+        $profile->set_value( 'app.update.doorhanger',       'false',   0 );
+        $profile->set_value( 'app.update.enabled',          'false',   0 );
+        $profile->set_value( 'app.update.checkInstallTime', 'false',   0 );
+        $profile->set_value( 'app.update.idletime',         '1314000', 0 );
+        $profile->set_value(
+            'app.update.lastUpdateDate.background-update-timer',
+            time, 0 );
+        $profile->set_value( 'app.update.staging.enabled', 'false',     0 );
+        $profile->set_value( 'app.update.timer',           '131400000', 0 );
+        $profile->set_value( 'beacon.enabled',             'false',     0 );
+        $profile->set_value( 'browser.aboutHomeSnippets.updateUrl', q[], 1 );
+        $profile->set_value( 'browser.beacon.enabled',          'false', 0 );
+        $profile->set_value( 'browser.casting.enabled',         'false', 0 );
+        $profile->set_value( 'browser.chrome.favicons',         'false', 0 );
+        $profile->set_value( 'browser.chrome.site_icons',       'false', 0 );
+        $profile->set_value( 'browser.dom.window.dump.enabled', 'false', 0 );
+        $profile->set_value( 'browser.download.panel.shown',    'true',  0 );
+        $profile->set_value( 'browser.EULA.override',           'true',  0 );
+        $profile->set_value(
+            'browser.newtabpage.activity-stream.feeds.section.highlights',
+            'false', 0 );
+        $profile->set_value(
+'browser.newtabpage.activity-stream.feeds.section.topstories.options',
+            q[], 1
+        );
+        $profile->set_value(
+            'browser.newtabpage.activity-stream.feeds.snippets',
+            'false', 0 );
+        $profile->set_value(
+            'browser.newtabpage.activity-stream.feeds.topsites',
+            'false', 0 );
+        $profile->set_value( 'browser.newtabpage.introShown', 'true',  0 );
+        $profile->set_value( 'browser.offline',               'false', 0 );
+        $profile->set_value( 'browser.pagethumbnails.capturing_disabled',
+            'false', 0 );
+        $profile->set_value( 'browser.reader.detectedFirstArticle', 'true', 0 );
+        $profile->set_value( 'browser.safebrowsing.blockedURIs.enabled',
+            'false', 0 );
+        $profile->set_value( 'browser.safebrowsing.downloads.enabled',
+            'false', 0 );
+        $profile->set_value( 'browser.safebrowsing.downloads.remote.enabled',
+            'false', 0 );
+        $profile->set_value( 'browser.safebrowsing.enabled', 'false', 0 );
+        $profile->set_value( 'browser.safebrowsing.forbiddenURIs.enabled',
+            'false', 0 );
+        $profile->set_value( 'browser.safebrowsing.malware.enabled',
+            'false', 0 );
+        $profile->set_value( 'browser.safebrowsing.phishing.enabled',
+            'false', 0 );
+        $profile->set_value( 'browser.safebrowsing.provider.google.lists',
+            q[], 1 );
+        $profile->set_value( 'browser.search.geoip.url', q[],     1 );
+        $profile->set_value( 'browser.search.update',    'false', 0 );
+        $profile->set_value( 'browser.selfsupport',      'false', 0 );
+        $profile->set_value( 'browser.send_pings',       'false', 0 );
+        $profile->set_value( 'browser.sessionstore.resume_from_crash',
+            'false', 0 );
+        $profile->set_value( 'browser.shell.shortcutFavicons',     'false', 0 );
+        $profile->set_value( 'browser.snippets.enabled',           'false', 0 );
+        $profile->set_value( 'browser.snippets.syncPromo.enabled', 'false', 0 );
+        $profile->set_value( 'browser.snippets.firstrunHomepage.enabled',
+            'false', 0 );
+        $profile->set_value( 'browser.tabs.animate', 'false', 0 );
+        $profile->set_value( 'browser.tabs.closeWindowWithLastTab', 'false',
+            0 );
+        $profile->set_value( 'browser.tabs.disableBackgroundZombification',
+            'false', 0 );
+        $profile->set_value( 'browser.tabs.warnOnCloseOtherTabs', 'false', 0 );
+        $profile->set_value( 'browser.tabs.warnOnOpen',           'false', 0 );
+        $profile->set_value( 'browser.usedOnWindows10.introURL',  q[],     1 );
+        $profile->set_value( 'browser.uitour.enabled',            'false', 0 );
+        $profile->set_value( 'datareporting.healthreport.uploadEnabled',
+            'false', 0 );
+        $profile->set_value( 'dom.battery.enabled',                'false', 0 );
+        $profile->set_value( 'extensions.blocklist.enabled',       'false', 0 );
+        $profile->set_value( 'extensions.pocket.enabled',          'false', 0 );
+        $profile->set_value( 'extensions.pocket.site',             q[],     1 );
+        $profile->set_value( 'extensions.getAddons.cache.enabled', 'false', 0 );
+        $profile->set_value( 'extensions.update.autoUpdateDefault', 'false',
+            0 );
+        $profile->set_value( 'geo.enabled',                   'false', 0 );
+        $profile->set_value( 'geo.provider.testing',          'true',  0 );
+        $profile->set_value( 'geo.wifi.scan',                 'false', 0 );
+        $profile->set_value( 'media.gmp-gmpopenh264.enabled', 'false', 0 );
+        $profile->set_value( 'media.gmp-manager.cert.checkAttributes',
+            'false', 0 );
+        $profile->set_value( 'media.gmp-manager.cert.requireBuiltIn',
+            'false', 0 );
+        $profile->set_value( 'media.gmp-provider.enabled', 'false', 0 );
+        $profile->set_value( 'media.navigator.enabled',    'false', 0 );
+        $profile->set_value( 'network.captive-portal-service.enabled',
+            'false', 0 );
+        $profile->set_value( 'network.cookie.lifetimePolicy', '2', 0 );
+        $profile->set_value(
+            'privacy.trackingprotection.fingerprinting.enabled',
+            'false', 0 );
+        $profile->set_value( 'privacy.trackingprotection.pbmode.enabled',
+            'false', 0 );
+        $profile->set_value( 'profile.enable_profile_migration', 'false', 0 );
+        $profile->set_value( 'services.sync.prefs.sync.browser.search.update',
+            'false', 0 );
+        $profile->set_value(
+'services.sync.prefs.sync.privacy.trackingprotection.cryptomining.enabled',
+            'false', 0
+        );
+        $profile->set_value(
+            'services.sync.prefs.sync.privacy.trackingprotection.enabled',
+            'false', 0 );
+        $profile->set_value(
+'services.sync.prefs.sync.privacy.trackingprotection.fingerprinting.enabled',
+            'false', 0
+        );
+        $profile->set_value(
+'services.sync.prefs.sync.privacy.trackingprotection.pbmode.enabled',
+            'false', 0
+        );
+        $profile->set_value( 'toolkit.telemetry.enabled', 'false', 0 );
+        $profile->set_value( 'toolkit.telemetry.reportingpolicy.firstRun',
+            'false', 0 );
+        $profile->set_value( 'xpinstall.signatures.required', 'false', 0 );
+    }
     return $profile;
 }
 
@@ -317,7 +422,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.95
+Version 0.96
 
 =head1 SYNOPSIS
 

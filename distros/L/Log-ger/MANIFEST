@@ -8,13 +8,15 @@ Makefile.PL
 README
 dist.ini
 lib/Log/ger.pm
+lib/Log/ger/Filter.pm
+lib/Log/ger/Filter/Code.pm
 lib/Log/ger/Format.pm
+lib/Log/ger/Format/Default.pm
 lib/Log/ger/Format/None.pm
 lib/Log/ger/Heavy.pm
 lib/Log/ger/Layout.pm
 lib/Log/ger/Output.pm
 lib/Log/ger/Output/Array.pm
-lib/Log/ger/Output/ArrayML.pm
 lib/Log/ger/Output/Null.pm
 lib/Log/ger/Output/String.pm
 lib/Log/ger/Plugin.pm
@@ -27,6 +29,7 @@ t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/format-none.t
 t/level.t
+t/no-format.t
 t/output-array.t
 t/output-null.t
 t/output-string.t

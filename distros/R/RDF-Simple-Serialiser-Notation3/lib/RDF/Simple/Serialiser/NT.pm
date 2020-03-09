@@ -1,5 +1,5 @@
 
-# $Id: NT.pm,v 1.5 2009-07-04 14:29:29 Martin Exp $
+# $Id: NT.pm,v 1.6 2010-12-02 23:41:57 Martin Exp $
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ use constant DEBUG => 0;
 use constant DEBUG_URIREF => 0;
 
 our
-$VERSION = do { my @r = (q$Revision: 1.5 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
 =item render
 
@@ -235,7 +235,7 @@ Not yet, anyway.
 
 =head1 AUTHOR
 
-Martin 'Kingpin' Thurn <mthurn@cpan.org>
+Martin 'Kingpin' Thurn, C<mthurn at cpan.org>, L<http://tinyurl.com/nn67z>.
 
 =head1 LICENSE
 

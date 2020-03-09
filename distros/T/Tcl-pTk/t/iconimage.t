@@ -24,9 +24,8 @@ my $icon = $top->Photo(-file =>  Tcl::pTk->findINC("icon.gif"));
 
 $top->iconimage($icon);
 
-$top->after(1000,sub{$top->destroy});
-
-MainLoop;
+$top->idletasks;
+(@ARGV) ? MainLoop : $top->destroy;
 
 ok(1);
 

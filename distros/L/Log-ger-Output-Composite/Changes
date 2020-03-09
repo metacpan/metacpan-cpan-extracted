@@ -1,3 +1,11 @@
+0.013   2020-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Log::ger 0.032 (no more logml stuffs, filters).
+
+	- Use warn() instead of 'print STDERR' so we can print stack trace
+	  when wanted.
+
+
 0.012   2020-03-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Observe env LOG_LOG_GER_OUTPUT_COMPOSITE_CODE.

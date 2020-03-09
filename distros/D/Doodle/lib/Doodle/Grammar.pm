@@ -2,13 +2,20 @@ package Doodle::Grammar;
 
 use 5.014;
 
-use Data::Object 'Class', 'Doodle::Library';
+use strict;
+use warnings;
+
+use registry 'Doodle::Library';
+use routines;
+
+use Data::Object::Class;
+use Data::Object::ClassHas;
 
 use Doodle::Statement;
 
 use Scalar::Util ();
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 has name => (
   is => 'ro',
@@ -25,7 +32,9 @@ method wrap(Str $arg) {
 method exception(Str $msg) {
   my $engine = ucfirst $self->name;
 
-  raise sprintf "[%s] %s", $engine, ucfirst $msg;
+  require Carp;
+
+  Carp::confess sprintf "[%s] %s", $engine, ucfirst $msg;
 }
 
 method execute(Command $cmd) {
@@ -144,7 +153,7 @@ method render(Str $str, Command $cmd) {
 method render_unique(Command $cmd) {
   # render index "unique" clause
 
-  return $cmd->indices->first->data->{unique} ? 'unique' : undef;
+  return $cmd->indices->[0]->data->{unique} ? 'unique' : undef;
 }
 
 method render_temporary(Command $cmd) {
@@ -194,25 +203,25 @@ method render_new_table(Command $cmd) {
 method render_new_column(Command $cmd) {
   # render alter table add column expression
 
-  return $self->render_column($cmd->columns->first);
+  return $self->render_column($cmd->columns->[0]);
 }
 
 method render_new_column_name(Command $cmd) {
   # render alter table rename column to expression
 
-  return $self->wrap($cmd->columns->first->data->{to});
+  return $self->wrap($cmd->columns->[0]->data->{to});
 }
 
 method render_column_name(Command $cmd) {
   # render alter table alter column name
 
-  return $self->wrap($cmd->columns->first->name);
+  return $self->wrap($cmd->columns->[0]->name);
 }
 
 method render_column_change(Command $cmd) {
   # render alter table alter column changes
 
-  my $col = $cmd->columns->first;
+  my $col = $cmd->columns->[0];
 
   return join ' ', 'set', $col->data->{set} if $col->data->{set};
   return join ' ', 'drop', $col->data->{drop} if $col->data->{drop};
@@ -222,13 +231,13 @@ method render_column_change(Command $cmd) {
 method render_columns(Command $cmd) {
   # render create table column expressions
 
-  return join ', ', map $self->render_column($_), $cmd->table->columns->list;
+  return join ', ', map $self->render_column($_), @{$cmd->table->columns};
 }
 
 method render_constraints(Command $cmd) {
   # render create table constraints
 
-  return join ', ', map $self->render_constraint($_), $cmd->table->relations->list;
+  return join ', ', map $self->render_constraint($_), @{$cmd->table->relations};
 }
 
 method render_type(Column $col) {
@@ -332,13 +341,13 @@ method render_primary(Column $col) {
 method render_index_name(Command $cmd) {
   # render table create index expression
 
-  return $self->wrap($cmd->indices->first->name);
+  return $self->wrap($cmd->indices->[0]->name);
 }
 
 method render_index_columns(Command $cmd) {
   # render table create index columns expression
 
-  return join ', ', map $self->wrap($_), @{$cmd->indices->first->columns};
+  return join ', ', map $self->wrap($_), @{$cmd->indices->[0]->columns};
 }
 
 method render_relation(Command $cmd) {

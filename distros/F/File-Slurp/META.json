@@ -75,7 +75,7 @@
          "web" : "https://github.com/perhunter/slurp"
       }
    },
-   "version" : "9999.29",
+   "version" : "9999.30",
    "x_contributors" : [
       "Aristotle Pagaltzis <ARISTOTLE@cpan.org>",
       "Chase Whitener <capoeirab@cpan.org>",

@@ -28,6 +28,7 @@ t/modules/Ex5.pm
 t/modules/Ex6.pm
 t/modules/Ex7.pm
 t/modules/Ex8.pm
+t/modules/Ex9.pod
 t/Pod-Example/01-use.t
 t/Pod-Example/02-version.t
 t/Pod-Example/03-get.t

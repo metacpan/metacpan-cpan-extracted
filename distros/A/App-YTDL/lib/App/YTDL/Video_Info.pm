@@ -41,17 +41,17 @@ sub gather_video_infos {
             my $key_len = 12;
             $count++;
             $info->{$ex}{$video_id}{count} = $count;
-            my $print_array = linefolded_print_info( $opt, $info, $ex, $video_id, $key_len );
+            my @print_array = linefolded_print_info( $opt, $info, $ex, $video_id, $key_len );
             print "\n";
             $opt->{up}++;
-            print for @$print_array;
-            $opt->{up} += @$print_array;
+            say for @print_array;
+            $opt->{up} += @print_array;
             print "\n";
             $opt->{up}++;
             print up( $opt->{up} ), cldown;
             $opt->{up} = 0;
             printf "%*.*s : %s\n", $key_len, $key_len, 'video', $count;
-            print for @$print_array;
+            say for @print_array;
             print "\n";
         }
     }
@@ -106,24 +106,22 @@ sub linefolded_print_info {
     my ( $maxcols, $maxrows ) = get_term_size();
     $maxcols -= $opt->{right_margin};
     my $col_max = $maxcols > $opt->{max_info_width} ? $opt->{max_info_width} : $maxcols;
-    my $print_array = [];
+    my @print_array = ();
     for my $key ( @keys ) {
         next if ! length $info->{$ex}{$video_id}{$key};
         $info->{$ex}{$video_id}{$key} =~ s/\n+/\n/g;
         $info->{$ex}{$video_id}{$key} =~ s/^\s+//;
         ( my $kk = $key ) =~ s/_/ /g;
         my $pr_key = sprintf "%*.*s : ", $key_len, $key_len, $kk;
-        my $text = line_fold(
+        push @print_array, line_fold(
             $pr_key . $info->{$ex}{$video_id}{$key},
             $col_max,
-            { init_tab => '' , subseq_tab => ' ' x $s_tab }
+            { init_tab => '' , subseq_tab => ' ' x $s_tab, join => 0 }
         );
-        $text =~ s/\R+\z//;
-        push @$print_array, map { "$_\n" } split /\R+/, $text;
     }
-    return $print_array if ! @$print_array;
+    return @print_array if ! @print_array;
     # auto width:
-    my $ratio = @$print_array / $maxrows;
+    my $ratio = @print_array / $maxrows;
     my $begin = 0.70;
     my $end   = 1.50;
     my $step  = 0.0125;
@@ -135,37 +133,33 @@ sub linefolded_print_info {
     }
     if ( $plus ) {
         $col_max += $plus;
-        $print_array = [];
+        @print_array = ();
         for my $key ( @keys ) {
             next if ! length $info->{$ex}{$video_id}{$key};
             ( my $kk = $key ) =~ s/_/ /g;
             my $pr_key = sprintf "%*.*s : ", $key_len, $key_len, $kk;
-            my $text = line_fold(
+            push @print_array, line_fold(
                 $pr_key . $info->{$ex}{$video_id}{$key},
                 $col_max,
-                { init_tab => '' , subseq_tab => ' ' x $s_tab }
+                { init_tab => '' , subseq_tab => ' ' x $s_tab, join => 0 }
             );
-            $text =~ s/\R+\z//;
-            push @$print_array, map { "$_\n" } split /\R+/, $text;
         }
     }
-    if ( @$print_array > ( $maxrows - 6 ) ) {
+    if ( @print_array > ( $maxrows - 6 ) ) {
         $col_max = $maxcols;
-        $print_array = [];
+        @print_array = ();
         for my $key ( @keys ) {
             next if ! length $info->{$ex}{$video_id}{$key};
             ( my $kk = $key ) =~ s/_/ /g;
             my $pr_key = sprintf "%*.*s : ", $key_len, $key_len, $kk;
-            my $text = line_fold(
+            push @print_array, line_fold(
                 $pr_key . $info->{$ex}{$video_id}{$key},
                 $col_max,
-                { init_tab => '' , subseq_tab => ' ' x $s_tab }
+                { init_tab => '' , subseq_tab => ' ' x $s_tab, join => 0 }
             );
-            $text =~ s/\R+\z//;
-            push @$print_array, map { "$_\n" } split /\R+/, $text;
         }
     }
-    return $print_array;
+    return @print_array;
 }
 
 

@@ -3,12 +3,12 @@ use strict;
 use warnings;
 no warnings 'once';
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001004';
 $VERSION =~ tr/_//d;
 
 use Exporter (); BEGIN { *import = \&Exporter::import }
 BEGIN {
-  *_WARNING_BITS_CHECK = "$]" <= 5.031006 ? sub(){1} : sub(){0};
+  *_WARNING_BITS_CHECK = "$]" <= 5.030001 ? sub(){1} : sub(){0};
 }
 
 our @EXPORT_OK = qw(

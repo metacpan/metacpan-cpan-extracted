@@ -1,33 +1,42 @@
 package Log::ger::Output::Perl;
 
-our $DATE = '2017-07-24'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger-Output-Perl'; # DIST
+our $VERSION = '0.002'; # VERSION
 
+use 5.010001;
 use strict;
 use warnings;
 use Log::ger::Util ();
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
-    my $action = delete($conf{action}) || {
+    my $action = delete($plugin_conf{action}) || {
         warn  => 'warn',
         error => 'warn',
         fatal => 'die',
     };
-    keys %conf and die "Unknown configuration: ".join(", ", sort keys %conf);
+    keys %plugin_conf and die "Unknown configuration: ".
+        join(", ", sort keys %plugin_conf);
 
     return {
-        create_logml_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+        create_outputter => [
+            __PACKAGE__, # key
+            # we want to handle all levels, thus we need to be higher priority
+            # than default Log::ger hooks (10) which will install null loggers
+            # for less severe levels.
+            9,           # priority
+            sub {        # hook
+                my %hook_args = @_;
 
-                my $logger = sub {
-                    my $ctx = shift;
-                    my $lvl = shift;
+                my $outputter = sub {
+                    my ($per_target_conf, $msg, $per_msg_conf) = @_;
+                    my $lvl = $per_msg_conf->{level} // $hook_args{level};
                     if (my $act =
                             $action->{Log::ger::Util::string_level($lvl)}) {
+                        @_ = ref $msg eq 'ARRAY' ? @$msg : ($msg);
                         if ($act eq 'warn') {
                             warn @_;
                         } elsif ($act eq 'carp') {
@@ -48,7 +57,7 @@ sub get_hooks {
                         }
                     }
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -68,7 +77,7 @@ Log::ger::Output::Perl - Log to Perl's standard facility (warn, die, etc)
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::Output::Perl (from Perl distribution Log-ger-Output-Perl), released on 2017-07-24.
+This document describes version 0.002 of Log::ger::Output::Perl (from Perl distribution Log-ger-Output-Perl), released on 2020-03-07.
 
 =head1 SYNOPSIS
 
@@ -150,7 +159,7 @@ feature.
 
 Modelled after L<Log::Dispatch::Perl>.
 
-L<Log::Dispatch::Plugin::Perl> which actually replaces the log statements with
+L<Log::ger::Plugin::Perl> which actually replaces the log statements with
 warn(), die(), etc.
 
 =head1 AUTHOR
@@ -159,7 +168,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

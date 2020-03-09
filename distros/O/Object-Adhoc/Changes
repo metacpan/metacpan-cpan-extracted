@@ -6,6 +6,20 @@ Home page:    <https://metacpan.org/release/Object-Adhoc>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Object-Adhoc>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003	2020-03-06
+
+ [ Test Suite ]
+ - Fix a warning in test suite.
+
+ [ Other ]
+ - Objects created using Object::Adhoc will now report Object::Adhoc's
+   version number when $obj->VERSION is called instead of returning undef.
+ - Objects created using Object::Adhoc will now return true for
+   $obj->DOES('Object::Adhoc') and $obj->DOES('HASH').
+ - Quote method names in warning messages.
+ - Refuse to create getter methods that would override standard methods
+   like `can`, `isa`, and `DOES`.
+
 0.002	2020-01-24
 
  [ Packaging ]

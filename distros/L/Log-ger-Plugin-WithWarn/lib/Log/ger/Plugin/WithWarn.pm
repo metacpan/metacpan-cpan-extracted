@@ -1,7 +1,9 @@
 package Log::ger::Plugin::WithWarn;
 
-our $DATE = '2017-08-04'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger-Plugin-WithWarn'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -9,50 +11,50 @@ use warnings;
 use Log::ger ();
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     return {
         create_routine_names => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_;
 
                 my $levels = \%Log::ger::Levels;
 
                 return [{
-                    log_subs    => [
+                    logger_subs => [
                         (map { ["log_${_}_warn", $_, "default"] }
                              grep {$levels->{$_} == 30} keys %$levels),
                     ],
-                    is_subs     => [],
-                    log_methods => [
+                    level_checker_subs => [],
+                    logger_methods => [
                         (map { ["${_}_warn", $_, "default"] }
                              grep {$levels->{$_} == 30} keys %$levels),
                     ],
-                    logml_methods => [
-                    ],
-                    is_methods  => [
+                    level_checker_methods  => [
                     ],
                 }, 0];
             }],
         before_install_routines => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_;
 
                 # wrap the logger
-                for my $r (@{ $args{routines} }) {
+                for my $r (@{ $hook_args{routines} }) {
                     my ($code, $name, $numlevel, $type) = @$r;
-                    if ($type eq 'log_sub' && $name =~ /\Alog_\w+_warn\z/) {
+                    if ($type =~ /^log(ger)?_sub/ && $name =~ /\Alog_\w+_warn\z/) {
                         $r->[0] = sub {
                             $code->(@_);
-                            warn $args{formatters}{default}(@_)."\n"
+                            warn $hook_args{formatters}{default}(@_)."\n"
                         };
-                    } elsif ($type eq 'log_method' && $name =~ /\A\w+_warn\z/) {
+                    } elsif ($type =~ /log(ger)?_method/ && $name =~ /\A\w+_warn\z/) {
                         $r->[0] = sub {
                             $code->(@_);
                             shift;
-                            warn $args{formatters}{default}(@_)."\n"
+                            warn $hook_args{formatters}{default}(@_)."\n"
                         };
                     }
                 }
@@ -76,7 +78,7 @@ Log::ger::Plugin::WithWarn - Add *_warn logging routines
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -102,13 +104,15 @@ L<Log::ger::Plugin::WithDie>
 
 L<Log::ger::Plugin::WithCarp>
 
+L<Log::ger::Plugin::Log4perl>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

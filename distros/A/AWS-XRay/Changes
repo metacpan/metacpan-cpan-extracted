@@ -1,5 +1,11 @@
 Revision history for Perl extension AWS-XRay
 
+0.11 2020-03-09T15:57:11Z
+    - capture() may die on invalid names (#20)
+    - fix race condition of creating the directory (#19 @shogo82148)
+    - Create XRay control directory only if necessary (#18 @melo)
+    - Support IMDSv2 (#16 @shogo82148)
+
 0.10 2020-01-23T00:28:43Z
     - Fix Bareword (#13 @negachov)
 

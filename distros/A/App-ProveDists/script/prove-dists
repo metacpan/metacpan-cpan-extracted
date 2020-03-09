@@ -1,0 +1,408 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/ProveDists/prove_dists
+# and generated automatically using Perinci::CmdLine::Gen version 0.493
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'App-ProveDists'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/ProveDists/prove_dists",
+    program_name => "prove-dists",
+    log => 1,
+    log_level => "info",
+);
+
+$cmdline->run;
+
+# ABSTRACT: Prove Perl distributions
+# PODNAME: prove-dists
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+prove-dists - Prove Perl distributions
+
+=head1 VERSION
+
+This document describes version 0.003 of prove-dists (from Perl distribution App-ProveDists), released on 2020-03-07.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % prove-dists [options] <dist_pattern> ...
+
+=head1 DESCRIPTION
+
+To use this utility, first create C<~/.config/prove-dists.conf>:
+
+ dists_dirs = ~/repos
+ dists_dirs = ~/repos-other
+
+The above tells I<prove-dists> where to look for Perl distributions. Then:
+
+ % prove-dists '^Games-Word-Wordlist-.+$'
+
+This will search local CPAN mirror for all distributions that match that regex
+pattern, then search the distributions in the distribution directories (or
+download them from local CPAN mirror), C<cd> to each and run C<prove> in it.
+
+You can run with C<--dry-run> (C<-n>) option first to not actually run C<prove> but
+just see what distributions will get tested. An example output:
+
+ % prove-dists '^Games-Word-Wordlist-.+$' -n
+ prove-dists: Found dist: Games-Word-Wordlist-Country
+ prove-dists: Found dist: Games-Word-Wordlist-Enable
+ prove-dists: Found dist: Games-Word-Wordlist-HSK
+ prove-dists: Found dist: Games-Word-Wordlist-KBBI
+ prove-dists: Found dist: Games-Word-Wordlist-SGB
+ prove-dists: [DRY] [1/5] Running prove for distribution Games-Word-Wordlist-Country (directory /home/u1/repos/perl-Games-Word-Wordlist-Country) ...
+ prove-dists: [DRY] [2/5] Running prove for distribution Games-Word-Wordlist-Enable (directory /tmp/AmYe5AHXpm/Games-Word-Wordlist-Enable-2010090401) ...
+ prove-dists: [DRY] [3/5] Running prove for distribution Games-Word-Wordlist-HSK (directory /home/u1/repos/perl-Games-Word-Wordlist-HSK) ...
+ prove-dists: [DRY] [4/5] Running prove for distribution Games-Word-Wordlist-KBBI (directory /home/u1/repos/perl-Games-Word-Wordlist-KBBI) ...
+ prove-dists: [DRY] [5/5] Running prove for distribution Games-Word-Wordlist-SGB (directory /tmp/xHAvt5uAhM/Games-Word-Wordlist-SGB-2010091501) ...
+
+The above example shows that I have the distribution directories locally on my
+C<~/repos>, except for C<Games-Word-Wordlist-Enable> and
+C<Games-Word-Wordlist-SGB>, which I<prove-dists> downloads and extracts from local
+CPAN mirror and puts into temporary directories.
+
+If we reinvoke the above command without the C<-n>, I<prove-dists> will actually
+run C<prove> on each directory and provide a summary at the end. Example output:
+
+ % prove-dists '^Games-Word-Wordlist-.+$'
+ +----------------------------------------------+---------------------------------------+-----------------------------------+--------+
+ | dir                                          | label                                 | reason                            | status |
+ +----------------------------------------------+---------------------------------------+-----------------------------------+--------+
+ | /home/u1/repos/perl-Games-Word-Wordlist-KBBI | distribution Games-Word-Wordlist-KBBI | Test failed (Failed 1/1 subtests) | 500    |
+ +----------------------------------------------+---------------------------------------+-----------------------------------+--------+
+
+The above example shows that one distribution failed testing. You can scroll up
+for the detailed C<prove> output to see the detail of the failure, fix things,
+and re-run.
+
+To summarize not only failures but all successes as well, use C<--summarize-all>
+option:
+
+ % prove-dists '^Games-Word-Wordlist-.+$' --summarize-all
+ +-------------------------------------------------------+------------------------------------------+-----------------------------------+--------+
+ | dir                                                   | label                                    | reason                            | status |
+ +-------------------------------------------------------+------------------------------------------+-----------------------------------+--------+
+ | /home/u1/repos/perl-Games-Word-Wordlist-Country       | distribution Games-Word-Wordlist-Country | PASS                              | 200    |
+ | /tmp/rjjMJVgaXg/Games-Word-Wordlist-Enable-2010090401 | distribution Games-Word-Wordlist-Enable  | PASS                              | 200    |
+ | /home/u1/repos/perl-Games-Word-Wordlist-HSK           | distribution Games-Word-Wordlist-HSK     | NOTESTS                           | 200    |
+ | /home/u1/repos/perl-Games-Word-Wordlist-KBBI          | distribution Games-Word-Wordlist-KBBI    | Test failed (Failed 1/1 subtests) | 500    |
+ | /tmp/_W8im6EvA0/Games-Word-Wordlist-SGB-2010091501    | distribution Games-Word-Wordlist-SGB     | PASS                              | 200    |
+ +-------------------------------------------------------+------------------------------------------+-----------------------------------+--------+
+
+How distribution directory is searched: first, the exact name (C<My-Perl-Dist>)
+is searched. If not found, then the name with different case (e.g.
+C<my-perl-dist>) is searched. If not found, a suffix match (e.g.
+C<p5-My-Perl-Dist> or C<cpan-My-Perl-Dist>) is searched. If not found, a prefix
+match (e.g. C<My-Perl-Dist-perl>) is searched. If not found, I<prove-dists> will
+try to download the distribution tarball from local CPAN mirror and extract it
+to a temporary directory. If C<--no-dowload> is given, the I<prove-dists> will not
+download from local CPAN mirror and give up for that distribution.
+
+When a distribution cannot be found or downloaded/extracted, this counts as a
+412 error (Precondition Failed).
+
+When a distribution's test fails, this counts as a 500 error (Error). Otherwise,
+the status is 200 (OK).
+
+I<prove-dists> will return status 200 (OK) with the status of each dist. It will
+exit 0 if all distros are successful, otherwise it will exit 1.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--dist-pattern>=I<s@>*
+
+Distribution name patterns to find.
+
+Can be specified multiple times.
+
+=item B<--dist-patterns-json>=I<s>
+
+Distribution name patterns to find (JSON-encoded).
+
+See C<--dist-pattern>.
+
+=item B<--dists-dir>=I<s@>*
+
+Where to find the distributions directories.
+
+Can be specified multiple times.
+
+=item B<--dists-dirs-json>=I<s>
+
+Where to find the distributions directories (JSON-encoded).
+
+See C<--dists-dir>.
+
+=item B<--no-download>
+
+=item B<--prove-opt>=I<s@>
+
+Options to pass to the prove command.
+
+Default value:
+
+ ["-l"]
+
+Can be specified multiple times.
+
+=item B<--prove-opts-json>=I<s>
+
+Options to pass to the prove command (JSON-encoded).
+
+See C<--prove-opt>.
+
+=item B<--summarize-all>
+
+If true, also summarize successes in addition to failures.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--dry-run>
+
+Run in simulation mode (also via DRY_RUN=1).
+
+Default value:
+
+ ""
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C prove-dists prove-dists
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete prove-dists 'p/*/`prove-dists`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/prove-dists.conf>, F<~/prove-dists.conf>, or F</etc/prove-dists.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ dist_patterns (see --dist-pattern)
+ dists_dirs (see --dists-dir)
+ download (see --no-download)
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ prove_opts (see --prove-opt)
+ summarize_all (see --summarize-all)
+
+=head1 ENVIRONMENT
+
+=head2 PROVE_DISTS_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/prove-dists.conf>
+
+F<~/prove-dists.conf>
+
+F</etc/prove-dists.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ProveDists>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ProveDists>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProveDists>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

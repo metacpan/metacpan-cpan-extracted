@@ -62,7 +62,7 @@ my %module_build_args = (
   },
   "configure_requires" => {
     "Alien::Base::ModuleBuild" => "1.14",
-    "Alien::Build" => "2.04",
+    "Alien::Build" => "2.11",
     "File::ShareDir" => "1.03",
     "perl" => "5.006"
   },
@@ -72,12 +72,12 @@ my %module_build_args = (
     "Joel A Berger <joel.a.berger\@gmail.com>"
   ],
   "dist_name" => "Acme-Alien-DontPanic",
-  "dist_version" => "2.0400",
+  "dist_version" => "2.1100",
   "license" => "perl",
   "module_name" => "Acme::Alien::DontPanic",
   "recursive_test_files" => 1,
   "requires" => {
-    "Alien::Base" => "2.04",
+    "Alien::Base" => "2.11",
     "File::ShareDir" => "1.03",
     "perl" => "5.006"
   },

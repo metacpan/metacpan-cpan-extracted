@@ -4,7 +4,7 @@
       "Dpkg Developers <debian-dpkg@lists.debian.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "dpkg",
       "debian",
@@ -40,7 +40,7 @@
             "Locale::gettext" : "0"
          },
          "requires" : {
-            "perl" : "v5.20.2"
+            "perl" : "v5.24.1"
          }
       },
       "test" : {
@@ -57,7 +57,7 @@
    "provides" : {
       "Dpkg" : {
          "file" : "lib/Dpkg.pm",
-         "version" : "1.03"
+         "version" : "2.00"
       },
       "Dpkg::Arch" : {
          "file" : "lib/Dpkg/Arch.pm",
@@ -77,7 +77,7 @@
       },
       "Dpkg::BuildFlags" : {
          "file" : "lib/Dpkg/BuildFlags.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Dpkg::BuildOptions" : {
          "file" : "lib/Dpkg/BuildOptions.pm",
@@ -89,7 +89,7 @@
       },
       "Dpkg::Changelog" : {
          "file" : "lib/Dpkg/Changelog.pm",
-         "version" : "1.01"
+         "version" : "2.00"
       },
       "Dpkg::Changelog::Debian" : {
          "file" : "lib/Dpkg/Changelog/Debian.pm",
@@ -101,19 +101,19 @@
       },
       "Dpkg::Changelog::Entry::Debian" : {
          "file" : "lib/Dpkg/Changelog/Entry/Debian.pm",
-         "version" : "1.03"
+         "version" : "2.00"
       },
       "Dpkg::Changelog::Parse" : {
          "file" : "lib/Dpkg/Changelog/Parse.pm",
-         "version" : "1.03"
+         "version" : "2.00"
       },
       "Dpkg::Checksums" : {
          "file" : "lib/Dpkg/Checksums.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Dpkg::Compression" : {
          "file" : "lib/Dpkg/Compression.pm",
-         "version" : "1.02"
+         "version" : "2.00"
       },
       "Dpkg::Compression::FileHandle" : {
          "file" : "lib/Dpkg/Compression/FileHandle.pm",
@@ -125,7 +125,7 @@
       },
       "Dpkg::Conf" : {
          "file" : "lib/Dpkg/Conf.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Dpkg::Control" : {
          "file" : "lib/Dpkg/Control.pm",
@@ -172,7 +172,7 @@
       },
       "Dpkg::Deps" : {
          "file" : "lib/Dpkg/Deps.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Dpkg::Deps::AND" : {
          "file" : "lib/Dpkg/Deps/AND.pm",
@@ -180,7 +180,7 @@
       },
       "Dpkg::Deps::KnownFacts" : {
          "file" : "lib/Dpkg/Deps/KnownFacts.pm",
-         "version" : "1.01"
+         "version" : "2.00"
       },
       "Dpkg::Deps::Multiple" : {
          "file" : "lib/Dpkg/Deps/Multiple.pm",
@@ -208,7 +208,7 @@
       },
       "Dpkg::Exit" : {
          "file" : "lib/Dpkg/Exit.pm",
-         "version" : "1.01"
+         "version" : "2.00"
       },
       "Dpkg::File" : {
          "file" : "lib/Dpkg/File.pm",
@@ -220,7 +220,7 @@
       },
       "Dpkg::Gettext" : {
          "file" : "lib/Dpkg/Gettext.pm",
-         "version" : "1.03"
+         "version" : "2.00"
       },
       "Dpkg::IPC" : {
          "file" : "lib/Dpkg/IPC.pm",
@@ -228,7 +228,7 @@
       },
       "Dpkg::Index" : {
          "file" : "lib/Dpkg/Index.pm",
-         "version" : "1.01"
+         "version" : "2.00"
       },
       "Dpkg::Interface::Storable" : {
          "file" : "lib/Dpkg/Interface/Storable.pm",
@@ -291,7 +291,7 @@
       },
       "Dpkg::Source::Package" : {
          "file" : "lib/Dpkg/Source/Package.pm",
-         "version" : "1.03"
+         "version" : "2.00"
       },
       "Dpkg::Source::Package::V1" : {
          "file" : "lib/Dpkg/Source/Package/V1.pm",
@@ -331,7 +331,7 @@
       },
       "Dpkg::Substvars" : {
          "file" : "lib/Dpkg/Substvars.pm",
-         "version" : "1.06"
+         "version" : "2.00"
       },
       "Dpkg::Vars" : {
          "file" : "lib/Dpkg/Vars.pm",
@@ -355,7 +355,7 @@
       },
       "Dpkg::Version" : {
          "file" : "lib/Dpkg/Version.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Test::Dpkg" : {
          "file" : "lib/Test/Dpkg.pm"
@@ -376,6 +376,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.19.7",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v1.20.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

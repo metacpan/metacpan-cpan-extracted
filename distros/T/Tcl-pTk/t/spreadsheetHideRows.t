@@ -120,8 +120,7 @@ $t->tagConfigure('detail2', -bg => 'lightskyblue1', -relief => 'sunken');
 
 $t->pack(-expand => 1, -fill => 'both');
 
-$top->after(1000,sub{$top->destroy}) unless(@ARGV); # auto-quit unless commands supplied (for debugging)
+$top->idletasks;
+(@ARGV) ? MainLoop : $top->destroy; # auto-quit unless commands supplied (for debugging)
 
 ok(1, 1, "SpreadsheetHideRows Widget Creation");
-
-MainLoop;

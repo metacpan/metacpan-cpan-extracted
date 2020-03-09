@@ -3,7 +3,6 @@
 requires 'perl', '5.008005';
 requires 'strict';
 requires 'warnings';
-requires 'Module::Pluggable::Object';
 
 # for CLI
 requires 'Pod::Usage';
@@ -33,5 +32,6 @@ on 'develop' => sub {
     requires 'Test::Pod';
     requires 'Test::NoTabs';
     requires 'Test::Vars';
-    requires 'Test::File::Find::Rule';
+    requires 'File::Find::Rule::ConflictMarker';
+    requires 'File::Find::Rule::BOM';
 };

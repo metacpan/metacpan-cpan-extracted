@@ -44,6 +44,4 @@ $widgetOnly =~ s/\d+//;
 ok( $widgetOnly, 'hey_dude');
 
 
-MainLoop if(@ARGV); # For debugging, stay in the mainloop if anything on the commandline
-
-
+(@ARGV) ? MainLoop : $toplevel->destroy; # For debugging, stay in the mainloop if anything on the commandline

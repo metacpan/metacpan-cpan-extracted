@@ -35,4 +35,4 @@ my $TOP = MainWindow->new();
     ok( $e2Text, 'Entry1', "Entry Paste Successfull");
     
 
-MainLoop if( @ARGV); 
+(@ARGV) ? MainLoop : $TOP->destroy;

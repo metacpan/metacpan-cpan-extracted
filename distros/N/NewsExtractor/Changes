@@ -1,3 +1,7 @@
+v0.12.0 2020-03-09T09:57:13+0900
+  - Improve the extraction of www.upmedia.mg
+  - Improve the extraction of journalist names on www.setn.com
+
 v0.11.0 2020-02-15T09:54:00+0900
   - Improve the accuracy of extracting www.taiwannews.com.tw
   - Improve the extraction of news.cts.com.tw

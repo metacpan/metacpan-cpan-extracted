@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => '5.006'
+                                        'perl' => 'v5.10.0'
                                       }
                       },
        'develop' => {
@@ -32,7 +32,8 @@ do { my $x = {
                       'requires' => {
                                       'Log::Any' => '0',
                                       'MarpaX::ESLIF' => 'v3.0.32',
-                                      'perl' => '5.006',
+                                      'feature' => '0',
+                                      'perl' => 'v5.10.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -52,7 +53,7 @@ do { my $x = {
                                    'Test::More' => '0',
                                    'Test::More::UTF8' => '0',
                                    'Test::Trap' => '0',
-                                   'perl' => '5.006'
+                                   'perl' => 'v5.10.0'
                                  }
                  }
      };

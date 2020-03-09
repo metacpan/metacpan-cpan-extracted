@@ -25,6 +25,13 @@ new(CLASS, initstate, initseq)
         RETVAL
 
 UV
+coinflip(pcg32_random_t *rng)
+    CODE:
+        RETVAL = pcg32_random_r(rng) & 1;
+    OUTPUT:
+        RETVAL
+
+UV
 decay(pcg32_random_t *rng, uint32_t odds, uint32_t min, uint32_t max)
     PREINIT:
         uint32_t count;
@@ -35,17 +42,6 @@ decay(pcg32_random_t *rng, uint32_t odds, uint32_t min, uint32_t max)
             count++;
         }
         RETVAL = count;
-    OUTPUT:
-        RETVAL
-
-UV
-dice(pcg32_random_t *rng, uint32_t count, uint32_t sides)
-    PREINIT:
-        uint32_t i, sum;
-    CODE:
-        sum = 0;
-        for (i = 0; i < count; i++) sum += 1 + pcg32_random_r(rng) % sides;
-        RETVAL = sum;
     OUTPUT:
         RETVAL
 
@@ -86,12 +82,12 @@ irand_way(pcg32_random_t *rng, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
         magx = abs(dx);
         if (pcg32_random_r(rng) % (magx + abs(dy)) < magx) {
             MOVE_X:
-            PUSHs(sv_2mortal(newSViv(x1 + (dx > 0 ? 1 : -1))));
-            PUSHs(sv_2mortal(newSViv(y1)));
+            mPUSHs(newSViv(x1 + (dx > 0 ? 1 : -1)));
+            mPUSHs(newSViv(y1));
         } else {
             MOVE_Y:
-            PUSHs(sv_2mortal(newSViv(x1)));
-            PUSHs(sv_2mortal(newSViv(y1 + (dy > 0 ? 1 : -1))));
+            mPUSHs(newSViv(x1));
+            mPUSHs(newSViv(y1 + (dy > 0 ? 1 : -1)));
         }
 
 double
@@ -105,7 +101,10 @@ rand(pcg32_random_t *rng, ...)
               croak("factor must be a number");
             factor = SvNV(ST(1));
         } else factor = 1.0;
-        RETVAL = pcg32_random_r(rng) / 4294967296.0 * factor;
+        /* "binary floating point constant for 2^-32" from PCG blog
+         * post "Efficiently Generating a Number in a Range" (fast,
+         * but biased) */
+        RETVAL = 0x1.0p-32 * pcg32_random_r(rng) * factor;
     OUTPUT:
         RETVAL
 
@@ -113,7 +112,7 @@ SV *
 rand_elm(pcg32_random_t *rng, avref)
     AV *avref;
     PREINIT:
-        int len;
+        SSize_t len;
         SV **svp;
     CODE:
         len = av_len(avref) + 1;
@@ -124,15 +123,49 @@ rand_elm(pcg32_random_t *rng, avref)
     OUTPUT:
         RETVAL
 
+SV *
+rand_from(pcg32_random_t *rng, avref)
+    AV *avref;
+    PREINIT:
+        SSize_t i, len, rnd, trim;
+        SV *dunno, **src, **dst;
+    CODE:
+        len = av_len(avref) + 1;
+        if (len == 0) XSRETURN_UNDEF;
+        rnd = pcg32_random_r(rng) % len;
+        dunno = av_delete(avref, rnd, 0);
+        if (rnd != len - 1) {
+            dst = &AvARRAY(avref)[rnd];
+            src = dst + 1;
+            for (i = rnd; i < len - 1; i++) *dst++ = *src++;
+            AvFILLp(avref) -= 1;
+            AvMAX(avref) -= 1;
+        }
+        SvREFCNT_inc(dunno);
+        RETVAL = dunno;
+    OUTPUT:
+        RETVAL
+
 UV
 rand_idx(pcg32_random_t *rng, avref)
     AV *avref;
     PREINIT:
-        int len;
+        SSize_t len;
     CODE:
         len = av_len(avref) + 1;
         if (len == 0) XSRETURN_UNDEF;
         else          RETVAL = pcg32_random_r(rng) % len;
+    OUTPUT:
+        RETVAL
+
+UV
+roll(pcg32_random_t *rng, uint32_t count, uint32_t sides)
+    PREINIT:
+        uint32_t i, sum;
+    CODE:
+        sum = count;
+        for (i = 0; i < count; i++) sum += pcg32_random_r(rng) % sides;
+        RETVAL = sum;
     OUTPUT:
         RETVAL
 

@@ -20,7 +20,7 @@ use Term::ANSIColor qw/colored/;
 use File::chdir;
 use Time::HiRes qw/sleep/;
 
-our $VERSION = version->new('0.7.3');
+our $VERSION = version->new('0.7.4');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -30,7 +30,7 @@ sub main {
 
     # do stuff here
     my $conf = Config::Any->load_stems({
-        stems   => [ qw/group group-git/ ],
+        stems   => [ qw/group group-git .group-git/, "$ENV{HOME}/.group", "$ENV{HOME}/.group-git", "/etc/group-git" ],
         use_ext => 1,
     });
     $conf = {
@@ -39,6 +39,11 @@ sub main {
         map { values %$_ }
         @{$conf}
     };
+    my $aliases = $conf->{aliases} || {};
+    $aliases = {
+        map { $_ => ref $aliases->{$_} ? $aliases->{$_} : [ split /\s+/, $aliases->{$_} ] }
+        keys %$aliases
+    };
 
     my ($opt, $cmd) = get_options(
         {
@@ -46,6 +51,7 @@ sub main {
             auto_complete => \&auto,
             conf_prefix   => '',
             conf_section  => 'defaults',
+            aliases       => $aliases,
             default       => {
                 max      => 10,
                 runtime  => 600,
@@ -63,7 +69,8 @@ sub main {
             'limit|l=i',
             'recurse|r!',
             'page|p!',
-            'tag|t=s',
+            'tag|t=s@',
+            'tag_group|tag-group|g=s',
             'test|T!',
             'bw',
             'separate|S!',
@@ -86,6 +93,10 @@ sub main {
         require Pod::Usage;
         warn "No command specified!\n";
         Pod::Usage::pod2usage( -verbose => 1 );
+    }
+
+    if ( $opt->tag_group ) {
+        $opt->tag([ @{ $opt->tag || [] }, @{ $conf->{'tag-group'}{$opt->tag_group} || [] } ]);
     }
 
     my $action = $cmd;
@@ -254,17 +265,25 @@ sub exclude_tagged {
 
 my $tagged;
 sub tagged {
-    my ($conf, $tag, $project, $object) = @_;
+    my ($conf, $tags, $project, $object) = @_;
 
     # everything is "tagged" if none is specified
-    return 1 if !$tag;
+    return 1 if !$tags || !@{$tags};
 
     if ( !defined $tagged ) {
-        $tagged = { map { $_ => 1 } @{ $conf->{tags}{$tag} || [] } };
+        $tagged = { map { $_ => 1 } map { @{ $conf->{tags}{$_} || [] } } @{$tags} };
     }
 
-    # return true if the project is tagged in the config file or has a tag file
-    return $tagged->{$project} || $object->tags->{$tag} || dyna_tags($tag, $project);
+    if ( $tagged->{$project} ) {
+        return 1;
+    }
+
+    for my $tag (@{ $tags }) {
+        # return true if the project is tagged in the config file or has a tag file
+        return 1 if $object->tags->{$tag} || dyna_tags($tag, $project);
+    }
+
+    return 0;
 }
 
 sub dyna_tags {
@@ -340,7 +359,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.7.3.
+This documentation refers to group-git version 0.7.4.
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,12 @@
+#!perl
+
 use strict;
 use warnings;
 use Config;
 use Module::Build;
 
 # for irand64 and probably also to feed 64-bit seed values into ->new
-if ( !$Config{use64bitint} ) {
+if (!$Config{use64bitint}) {
     print "need perl compiled with use64bitint=define\n";
     exit(0);
 }
@@ -12,7 +14,7 @@ if ( !$Config{use64bitint} ) {
 my $builder = Module::Build->new(
     module_name        => 'Math::Random::PCG32',
     license            => 'apache',
-    dist_author        => 'Jeremy Mates <jmates@cpan.org>',
+    dist_author        => 'Jeremy Mates <jeremy.mates@gmail.com>',
     dist_version_from  => 'lib/Math/Random/PCG32.pm',
     dist_abstract      => 'minimal random permuted congruential generator',
     include_dirs       => [qw(. src)],

@@ -31,6 +31,7 @@ sub defaults {
             quote_identifiers    => 1,
             thsd_sep             => ',',
             show_table_name      => 0,
+            dots                 => 0,
             base_indent          => 1,
             file_find_warnings   => 0,
         },
@@ -95,6 +96,7 @@ sub defaults {
             empty_to_null_plain   => 1,
             empty_to_null_copy    => 1,
             empty_to_null_file    => 0,
+            data_source           => 3,
             show_hidden_files     => 0,
             file_filter           => '',
         },
@@ -138,7 +140,7 @@ sub read_config_files {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $file_fs = $sf->{i}{f_settings};
     if ( -f $file_fs && -s $file_fs ) {
-        my $tmp = $ax->read_json( $file_fs );
+        my $tmp = $ax->read_json( $file_fs ) // {};
         for my $section ( keys %$tmp ) {
             for my $opt ( keys %{$tmp->{$section}} ) {
                 $o->{$section}{$opt} = $tmp->{$section}{$opt} if exists $o->{$section}{$opt};

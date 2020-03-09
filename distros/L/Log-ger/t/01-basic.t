@@ -178,7 +178,7 @@ subtest "switch output" => sub {
     is_deeply($str, "warn1\n");
     is_deeply($ary, []);
 
-    Log::ger::Output->set('ArrayML', array => $ary);
+    Log::ger::Output->set('Array', array => $ary);
     $h->{warn}("warn2");
     is_deeply($str, "warn1\n");
     is_deeply($ary, ["warn2"]);
@@ -188,7 +188,7 @@ subtest "switch output" => sub {
     is_deeply($str, "warn1\nwarn3\n");
     is_deeply($ary, ["warn2"]);
 
-    Log::ger::Output->set('ArrayML', array => $ary);
+    Log::ger::Output->set('Array', array => $ary);
     $h->{warn}("warn4");
     is_deeply($str, "warn1\nwarn3\n");
     is_deeply($ary, ["warn2", "warn4"]);

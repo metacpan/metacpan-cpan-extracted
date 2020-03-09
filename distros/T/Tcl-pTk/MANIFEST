@@ -251,7 +251,7 @@ lib/Tcl/pTk/XEvent.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 slide.pl
 t/after.t
 t/afterDestroy.t
@@ -272,12 +272,14 @@ t/callbackSet.t
 t/canFind.t
 t/canIndex.t
 t/canScale.t
+t/canvasFocusBusy.t
 t/checkradio.t
 t/cleanupCrashTest.t
 t/command.t
 t/configureReturn.t
 t/dialog.t
 t/dialogBox.t
+t/dialogBoxGeom.t
 t/dirtree.t
 t/dndlocal.t
 t/emptyMenuButtonSubclass.t
@@ -316,6 +318,7 @@ t/moveToplevelWindow.t
 t/multMainWindow1.t
 t/multMainWindow2.t
 t/notebook.t
+t/notebook2.t
 t/onDestroy.t
 t/optmenu.t
 t/palette.t
@@ -361,6 +364,7 @@ t/tkFacelift_BEsubclass.t
 t/tkFacelift_browseEntry.t
 t/tkFacelift_frameSubclass.t
 t/tkFacelift_mega1.t
+t/tkFacelift_notebook.t
 t/tkFacelift_simple.t
 t/tkHijack_BEsubclass.t
 t/tkHijack_bgerror1.t
@@ -373,11 +377,13 @@ t/trace.t
 t/tree.t
 t/ttkBrowseEntry.t
 t/ttkEntryValidate.t
+t/ttkTixNoteBook.t
 t/unicode.t
 t/virtualEv.t
 t/widgetDelete.t
 t/widgetName.t
 t/wmForget.t
+t/wmStackorder.t
 t/Xcamel.gif
 t/xevent.t
 t/zzPhoto.t

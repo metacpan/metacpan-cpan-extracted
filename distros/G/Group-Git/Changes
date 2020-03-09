@@ -1,5 +1,13 @@
 Revision history for Group-Git
 
+0.7.4   2020-03-06
+        Updating for release of version 0.7.4
+        Fixing issue when tag_group doesn't exist (Ivan Wills)
+        Making --tag accept more than 1 tag and adding --tag-group to allow the easy use of tag-group from the config (Ivan Wills)
+        Actually implementing aliases (don't know how I missed that before) (Ivan Wills)
+        Fixing not loading the global group-git config (Ivan Wills)
+        Config update (Ivan Wills)
+
 0.7.3   2020-02-01
         Updating for release of version 0.7.3
         Updated date (Ivan Wills)

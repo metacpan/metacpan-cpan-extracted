@@ -14,13 +14,13 @@ subtest pretest => sub {
 	my $pp2 = Business::PayPal->new(id => 'foobar');
 	isa_ok($pp1, 'Business::PayPal');
 	isa_ok($pp2, 'Business::PayPal');
-	
+
 	my $id1 = $pp1->id;
 	like($id1, qr/^[a-f0-9]{32}$/, 'id is hex');
-	
+
 	my $id2 = $pp2->id;
 	is $id2, 'foobar', 'id set manually';
-	
+
 	my $button1 = $pp1->button();
 	ok($button1, 'button created');
     like $button1, qr{<form method="post" action="https://www.paypal.com/cgi-bin/webscr" enctype="multipart/form-data"\s*>};
@@ -65,7 +65,7 @@ subtest loop => sub {
 			notify_url     => 'http://bar.com/hello_water',
 		);
 		#diag $button;
-	
+
         like $button, qr{<form method="post" action="https://www.paypal.com/cgi-bin/webscr" enctype="multipart/form-data"\s*>};
 		like $button, qr{action="https://www.paypal.com/cgi-bin/webscr"}, 'address';
 		like $button, qr{foo\@bar\.com}, 'email';

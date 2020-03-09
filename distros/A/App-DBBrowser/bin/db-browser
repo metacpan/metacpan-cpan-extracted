@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.241';
+our $VERSION = '2.243';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.241
+Version 2.243
 
 =head1 SYNOPSIS
 
@@ -469,6 +469,8 @@ row-group.
 In the replacement it can be used the variable C<$c> as a counter. C<$c> is set to C<0> before each C<s///>.
 
 Available modifiers: C<g>, C<i>, C<e>.
+
+By selecting the prompt line (C<Choose:>) one can save search & replace instructions for later use.
 
 =item Split Table
 
@@ -982,6 +984,10 @@ If enabled, the table name is displayed in the lower left corner of the terminal
 
 Set the indentation width for the info output.
 
+=head3 Truncated rows
+
+How should truncated data source rows be marked at the end: C<...>, C<|> or C<none>.
+
 =head3 Set string
 
 =head4 Undef
@@ -1192,6 +1198,12 @@ Set the I<empty_to_null> defaults for the different data source types.
 =head3 File encoding
 
 How to decode text files.
+
+=head3 Data source
+
+Set the data source to C<plain>, C<copy&paste>, C<file> or C<plain/copy&paste/file>.
+
+If this option is set to C<plain/copy&paste/file>, a menu is offered where the user can choose the data source.
 
 =head3 Dir history
 

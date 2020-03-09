@@ -2,9 +2,16 @@ package Doodle::Index;
 
 use 5.014;
 
-use Data::Object 'Class', 'Doodle::Library';
+use strict;
+use warnings;
 
-our $VERSION = '0.07'; # VERSION
+use registry 'Doodle::Library';
+use routines;
+
+use Data::Object::Class;
+use Data::Object::ClassHas;
+
+our $VERSION = '0.08'; # VERSION
 
 has name => (
   is => 'ro',
@@ -50,6 +57,16 @@ fun new_name($self) {
 }
 
 # METHODS
+
+method stash(%args) {
+  my $data = $self->data;
+
+  while (my($key, $value) = each(%args)) {
+    $data->{$key} = $value;
+  }
+
+  return $self;
+}
 
 method doodle() {
   my $doodle = $self->table->doodle;

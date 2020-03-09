@@ -1,0 +1,11 @@
+=pod
+
+=head1 EXAMPLE
+
+ use strict;
+ use warnings;
+
+ # Print.
+ print "Foo.\n";
+
+=cut

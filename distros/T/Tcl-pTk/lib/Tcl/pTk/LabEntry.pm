@@ -4,7 +4,10 @@
 
 package Tcl::pTk::LabEntry;
 
-our ($VERSION) = ('1.03');
+our ($VERSION) = ('1.05');
+
+use warnings;
+use strict;
 
 use base  qw(Tcl::pTk::Frame);
 #use Tk::widgets qw(Frame Label Entry);

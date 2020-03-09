@@ -49,10 +49,7 @@ my $TOP = MainWindow->new();
         )->pack(@pl);
     }
     
-$TOP->after(1000,sub{$TOP->destroy});
+$TOP->idletasks;
+(@ARGV) ? MainLoop : $TOP->destroy;
 
 ok(1, 1, "Check/Radio button Creation");
-
-MainLoop;
-
-1;

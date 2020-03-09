@@ -1,0 +1,29 @@
+---
+abstract: 'Touch with directories'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000060'
+  Test::Script: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-supertouch
+requires:
+  Path::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/App-supertouch/issues
+  homepage: https://metacpan.org/pod/App::supertouch
+  repository: git://github.com/plicease/App-supertouch.git
+version: '0.02'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

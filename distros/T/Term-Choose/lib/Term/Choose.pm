@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.709';
+our $VERSION = '1.710';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -144,7 +144,7 @@ sub __copy_orig_list {
             }
             if ( $self->{color} ) {
                 s/\x{feff}//g;
-                s/\e\[[\d;]*m/\x{feff}/msg;
+                s/\e\[[\d;]*m/\x{feff}/g;
             }
             s/\t/ /g;
             s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
@@ -659,7 +659,7 @@ sub __prepare_promptline {
         my $subseq = $self->{tabs_info}[1] ? $self->{tabs_info}[1] : 0;
         $prompt .= line_fold(
             $self->{info}, $self->{avail_width},
-            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color} }
+            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 1 }
         );
     }
     if ( length $self->{prompt} ) {
@@ -670,7 +670,7 @@ sub __prepare_promptline {
         my $subseq = $self->{tabs_prompt}[1] ? $self->{tabs_prompt}[1] : 0;
         $prompt .= line_fold(
             $self->{prompt}, $self->{avail_width},
-            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color} }
+            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 1 }
         );
     }
     if ( $prompt eq '' ) {
@@ -1196,7 +1196,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.709
+Version 1.710
 
 =cut
 

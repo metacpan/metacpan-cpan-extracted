@@ -1,7 +1,9 @@
 package Perl::Examples;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.094'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Perl-Examples'; # DIST
+our $VERSION = '0.095'; # VERSION
 
 1;
 # ABSTRACT: A collection of various examples of Perl modules/scripts
@@ -18,11 +20,9 @@ Perl::Examples - A collection of various examples of Perl modules/scripts
 
 =head1 VERSION
 
-This document describes version 0.094 of Perl::Examples (from Perl distribution Perl-Examples), released on 2018-11-29.
+This document describes version 0.095 of Perl::Examples (from Perl distribution Perl-Examples), released on 2020-03-07.
 
 =head1 DESCRIPTION
-
-B<EARLY RELEASE, MORE EXAMPLES TO COME, CONTRIBUTIONS WELCOME.>
 
 This distribution, as the name suggests, contains a random collection of various
 Perl modules/scripts, mostly for testing. Some examples are:
@@ -66,7 +66,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

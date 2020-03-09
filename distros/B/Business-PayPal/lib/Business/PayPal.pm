@@ -4,7 +4,7 @@ use 5.6.1;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Net::SSLeay 1.14;
 use Digest::MD5 qw(md5_hex);
@@ -229,6 +229,53 @@ NeQitYiySDIepHGnng==
 -----END CERTIFICATE-----
 CERT
 
+# added to 0.19 on 2020.03.07
+push @certificates, <<'CERT';
+-----BEGIN CERTIFICATE-----
+MIIHmTCCBoGgAwIBAgIQDsNOdwJXAE+tzPSi9RnWDDANBgkqhkiG9w0BAQsFADB1
+MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3
+d3cuZGlnaWNlcnQuY29tMTQwMgYDVQQDEytEaWdpQ2VydCBTSEEyIEV4dGVuZGVk
+IFZhbGlkYXRpb24gU2VydmVyIENBMB4XDTIwMDEwOTAwMDAwMFoXDTIyMDExMjEy
+MDAwMFowgdwxHTAbBgNVBA8MFFByaXZhdGUgT3JnYW5pemF0aW9uMRMwEQYLKwYB
+BAGCNzwCAQMTAlVTMRkwFwYLKwYBBAGCNzwCAQITCERlbGF3YXJlMRAwDgYDVQQF
+EwczMDE0MjY3MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTERMA8G
+A1UEBxMIU2FuIEpvc2UxFTATBgNVBAoTDFBheVBhbCwgSW5jLjEUMBIGA1UECxML
+Q0ROIFN1cHBvcnQxFzAVBgNVBAMTDnd3dy5wYXlwYWwuY29tMIIBIjANBgkqhkiG
+9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq5rER+ZPS/B6KW+aHWtO1QQOsgLtjdGprtXa
+IIx+ikkaPAkT93LuLkDgKUECeJdV+AYNeyrj4LPlZPLeuLg14cV86xLjaEd0bLwE
+JTMJFyjgyTqyTmVQ0ErkO7LhLoJFy1IFO6S3N+vIKfxDZ8xmqeWfIhsb94Y2NZtF
+9Q9sPR0VVV3+yn1c7x12t/BZhYkaydK/WLwmnBF1YMtZ5nQY7g4GvFShR/n1tcC+
+rW3u3Zm2UO2FM/W9k0tmqQjwZ8e9QiTCO+N/8eJRYrVRriGoJNnJ7dO0YBdqDHhp
+wZatYh0YEabq9IPrLa6wvi5Wnc+dLHBa37IeOsfkI+M7WOH9nQIDAQABo4IDuzCC
+A7cwHwYDVR0jBBgwFoAUPdNQpdagre7zSmAKZdMh1Pj41g8wHQYDVR0OBBYEFPAe
+9ePuM1NpVGonQODOhLZpaEueMGcGA1UdEQRgMF6CDnd3dy5wYXlwYWwuY29tghBs
+b2dpbi5wYXlwYWwuY29tghJoaXN0b3J5LnBheXBhbC5jb22CFXd3dy5wYXlwYWxv
+YmplY3RzLmNvbYIPcGljcy5wYXlwYWwuY29tMA4GA1UdDwEB/wQEAwIFoDAdBgNV
+HSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwdQYDVR0fBG4wbDA0oDKgMIYuaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL3NoYTItZXYtc2VydmVyLWcyLmNybDA0oDKg
+MIYuaHR0cDovL2NybDQuZGlnaWNlcnQuY29tL3NoYTItZXYtc2VydmVyLWcyLmNy
+bDBLBgNVHSAERDBCMDcGCWCGSAGG/WwCATAqMCgGCCsGAQUFBwIBFhxodHRwczov
+L3d3dy5kaWdpY2VydC5jb20vQ1BTMAcGBWeBDAEBMIGIBggrBgEFBQcBAQR8MHow
+JAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBSBggrBgEFBQcw
+AoZGaHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0U0hBMkV4dGVu
+ZGVkVmFsaWRhdGlvblNlcnZlckNBLmNydDAMBgNVHRMBAf8EAjAAMIIBfgYKKwYB
+BAHWeQIEAgSCAW4EggFqAWgAdwCkuQmQtBhYFIe7E6LMZ3AKPDWYBPkb37jjd80O
+yA3cEAAAAW+Hv9N9AAAEAwBIMEYCIQD22HBv3vOh3xDflHjmJ5ipfGDRwgl9Od4Y
+5kvUeff7AAIhAKW5E/P2aatw3NDzrR/v+k9XDjgAbEioeJmcjDKUlyEkAHYAVhQG
+mi/XwuzT9eG9RLI+x0Z2ubyZEVzA75SYVdaJ0N0AAAFvh7/UXwAABAMARzBFAiEA
+/5GV9keLQVjAvRlzi5+YoFzymiQiKvJkD0i33kAijdwCIEuaqfF5owFlEMq8/CT1
+Cp2aGgUQ8C4M78yprySEEymgAHUA7ku9t3XOYLrhQmkfq+GeZqMPfl+wctiDAMR7
+iXqo/csAAAFvh7/TxQAABAMARjBEAiAI/pmrL76VNgjgI/f6De5QokYAUdP0inWM
+dGICpFNcigIgE4pM5uLHDTg560kp1CNDTPpLAYzS28t/OUyEFOSk3SQwDQYJKoZI
+hvcNAQELBQADggEBAJUGjFwcOaoZMwxwWH+UK6RxvvcTTiNz8Kh8NRYO4r5ZVj2M
+XfqM+93ejjSjarOGWylSSl/3yx8zuMhgOzBylPxh312AL/mPrfOFmCro7WwC4T7Q
+zO9oNk6uUW3KLnuuo3k9J2d0FU3PyR2h+UNpzmay6+zEMUgn2S3i6/RyCnMj0Zxd
+jjSylaOoCRbOL7/R+Ee9wW02fjqcWMFHQJKOtjKXiV77RsM9LAZGI4YqbNI6GD46
+K/zDOsAXakwy9dKoqaNfKlPJv4ifD8Z0Y32DF0lgctLLybgCWPfZ8Dz+H03760Og
++lieGRy3bEXsDLkNSgm+dmg1SGJcgjyA5Od7Zvc=
+-----END CERTIFICATE-----
+CERT
+
 # NEXT @certificates comes here
 # added to 0.17 on 2015.10.02
 # push @certificates, <<'CERT';
@@ -253,6 +300,11 @@ Subject Name: /1.3.6.1.4.1.311.60.2.1.3=US/1.3.6.1.4.1.311.60.2.1.2=Delaware/bus
 Issuer  Name: /C=US/O=Symantec Corporation/OU=Symantec Trust Network/CN=Symantec Class 3 EV SSL CA - G3
 CERTCONTENT
 
+# added to 0.19 on 2020.03.07
+push @cert_contents, <<'CERTCONTENT';
+Subject Name: /businessCategory=Private Organization/jurisdictionC=US/jurisdictionST=Delaware/serialNumber=3014267/C=US/ST=California/L=San Jose/O=PayPal, Inc./OU=CDN Support/CN=www.paypal.com
+Issuer  Name: /C=US/O=DigiCert Inc/OU=www.digicert.com/CN=DigiCert SHA2 Extended Validation Server CA
+CERTCONTENT
 
 chomp(@cert_contents);
 
@@ -263,7 +315,7 @@ sub new {
     my $self = {
         id => undef,
         address => 'https://www.paypal.com/cgi-bin/webscr',
-		check_cert => 1,
+        check_cert => 1,
         @_,
     };
     bless $self, $class;
@@ -273,9 +325,9 @@ sub new {
 }
 
 sub check_cert {
-	my ($self, $value) = @_;
-	$self->{check_cert} = $value;
-	return;	
+    my ($self, $value) = @_;
+    $self->{check_cert} = $value;
+    return;
 }
 
 # returns current PayPal id
@@ -408,39 +460,39 @@ sub postpaypal {
     chomp $ppx509;
     chomp $ppcertcontent;
 
-	my @certs = @certificates;
-	if ($Cert) {
-		# TODO added in 0.12
-		warn "The global variable \$Cert is deprecated and will be removed soon. Pass a certificate to the constructor using the 'cert' parameter.\n";
-		push @certs, $Cert;
-	}
-	my @cert_cont = @cert_contents;
-	if ($Certcontent) {
-		# TODO added in 0.12
-		warn "The global variable \$Certcontent is deprecated and will be removed soon. Pass a certificate to the constructor using the 'certcontent' parameter.\n";
-		push @cert_cont, $Certcontent;
-	}
+    my @certs = @certificates;
+    if ($Cert) {
+        # TODO added in 0.12
+        warn "The global variable \$Cert is deprecated and will be removed soon. Pass a certificate to the constructor using the 'cert' parameter.\n";
+        push @certs, $Cert;
+    }
+    my @cert_cont = @cert_contents;
+    if ($Certcontent) {
+        # TODO added in 0.12
+        warn "The global variable \$Certcontent is deprecated and will be removed soon. Pass a certificate to the constructor using the 'certcontent' parameter.\n";
+        push @cert_cont, $Certcontent;
+    }
 
-	if ($self->{addcert}) {
-		push @certs, $self->{cert};
-	}
-	if ($self->{addcertcontent}) {
-		push @cert_cont, $self->{certcontent};
-	}
+    if ($self->{addcert}) {
+        push @certs, $self->{cert};
+    }
+    if ($self->{addcertcontent}) {
+        push @cert_cont, $self->{certcontent};
+    }
 
-	if ($self->{cert}) {
-		@certs = $self->{cert};
-	}
-	if ($self->{certcontent}) {
-		@cert_cont = $self->{certcontent};
-	}
+    if ($self->{cert}) {
+        @certs = $self->{cert};
+    }
+    if ($self->{certcontent}) {
+        @cert_cont = $self->{certcontent};
+    }
 
-	if ($self->{check_cert}) {
-		return (wantarray ? (undef, "PayPal cert failed to match:\n$ppx509") : undef)
-			unless grep {$_ eq $ppx509} @certs;
-		return (wantarray ? (undef, "PayPal cert contents failed to match:\n$ppcertcontent") : undef)
-		unless grep { $_ eq $ppcertcontent } @cert_cont;
-	}
+    if ($self->{check_cert}) {
+        return (wantarray ? (undef, "PayPal cert failed to match:\n$ppx509") : undef)
+            unless grep {$_ eq $ppx509} @certs;
+        return (wantarray ? (undef, "PayPal cert contents failed to match:\n$ppcertcontent") : undef)
+        unless grep { $_ eq $ppcertcontent } @cert_cont;
+    }
     return (wantarray ? (undef, 'PayPal says transaction INVALID') : undef)
         if $page eq 'INVALID';
     return (wantarray ? (1, 'PayPal says transaction VERIFIED') : 1)

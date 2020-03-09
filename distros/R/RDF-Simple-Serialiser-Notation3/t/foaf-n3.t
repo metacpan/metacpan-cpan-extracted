@@ -1,17 +1,17 @@
 
 # $Id: foaf-n3.t,v 1.7 2009-07-04 14:49:43 Martin Exp $
 
-use blib;
+# use blib;
 use Test::More 'no_plan';
 use Test::Deep;
 
 my $sMod;
 
-BEGIN
-  {
+BEGIN {
   $sMod = 'RDF::Simple::Serialiser::N3';
-  use_ok($sMod);
   } # end of BEGIN block
+
+use_ok($sMod);
 
 # This sample ontology is taken from the SYNOPSIS of
 # RDF::Simple::Serialiser:

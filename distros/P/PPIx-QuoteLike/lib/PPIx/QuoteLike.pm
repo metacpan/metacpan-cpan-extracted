@@ -38,7 +38,15 @@ use PPIx::QuoteLike::Utils qw{
 use Scalar::Util ();
 use Text::Tabs ();
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
+
+use constant CLASS_CONTROL       => 'PPIx::QuoteLike::Token::Control';
+use constant CLASS_DELIMITER     => 'PPIx::QuoteLike::Token::Delimiter';
+use constant CLASS_INTERPOLATION => 'PPIx::QuoteLike::Token::Interpolation';
+use constant CLASS_STRING        => 'PPIx::QuoteLike::Token::String';
+use constant CLASS_STRUCTURE     => 'PPIx::QuoteLike::Token::Structure';
+use constant CLASS_UNKNOWN       => 'PPIx::QuoteLike::Token::Unknown';
+use constant CLASS_WHITESPACE    => 'PPIx::QuoteLike::Token::Whitespace';
 
 use constant CODE_REF	=> ref sub {};
 
@@ -101,8 +109,8 @@ $PPIx::QuoteLike::DEFAULT_POSTDEREF = 1;
 	    ( $type, $gap, $start_delim ) = ( $1, $2, $3 );
 	    not $gap
 		and $start_delim =~ m< \A \w \z >smx
-		and return $self->_link_elems( $self->_unknown(
-		    $string, ILLEGAL_FIRST ) );
+		and return $self->_link_elems( $self->_make_token(
+		    CLASS_UNKNOWN, $string, error => ILLEGAL_FIRST ) );
 	    $arg{trace}
 		and warn "Initial match '$type$start_delim'\n";
 	    $self->{interpolates} = 'qq' eq $type ||
@@ -132,14 +140,14 @@ $PPIx::QuoteLike::DEFAULT_POSTDEREF = 1;
 		$end_delim = '';
 	    }
 	    $self->{start} = [
-		$self->_make_token( Delimiter => content => $start_delim ),
-		$self->_make_token( Whitespace => content => "\n" ),
+		$self->_make_token( CLASS_DELIMITER, $start_delim ),
+		$self->_make_token( CLASS_WHITESPACE, "\n" ),
 	    ];
 
 	    # Don't instantiate yet -- we'll do them at the end.
 	    $self->{finish} = [
-		[ Delimiter => content => $end_delim ],
-		[ Whitespace => content => "\n" ],
+		[ CLASS_DELIMITER, $end_delim ],
+		[ CLASS_WHITESPACE, "\n" ],
 	    ];
 
 	# ``, '', "", <>
@@ -160,94 +168,76 @@ $PPIx::QuoteLike::DEFAULT_POSTDEREF = 1;
 	} else {
 	    $arg{trace}
 		and warn "No initial match\n";
-	    return $self->_link_elems( $self->_unknown(
-		    $string, ILLEGAL_FIRST ) );
+	    return $self->_link_elems( $self->_make_token(
+		    CLASS_UNKNOWN, $string, error => ILLEGAL_FIRST ) );
 	}
 
 	$self->{interpolates} = $self->{interpolates} ? 1 : 0;
 
 	$self->{type} = [
-	    $self->_make_token( Structure => content => $type ),
+	    $self->_make_token( CLASS_STRUCTURE, $type ),
 	    length $gap ?
-		$self->_make_token( Whitespace => content => $gap ) :
+		$self->_make_token( CLASS_WHITESPACE, $gap ) :
 		(),
 	];
 	$self->{start} ||= [
-	    $self->_make_token( Delimiter => content => $start_delim ),
+	    $self->_make_token( CLASS_DELIMITER, $start_delim ),
 	];
 
 	$arg{trace}
 	    and warn "Without delimiters: '$content'\n";
 
+	# We accumulate data and manufacure tokens at the end to reduce
+	# the overhead involved in merging strings.
 	if ( $self->{interpolates} ) {
-	    {	# Single-iteration loop
+	    push @children, [ '' => '' ];	# Prime the pump
+	    while ( 1 ) {
 
 		if ( $content =~ m/ \G ( \\ [ULulQEF] ) /smxgc ) {
-		    push @children, $self->_make_token(
-			Control => content	=> "$1",	# Remove magic
-		    );
-		    redo;
-		}
-
-		# Handle \N{...} separately because it can not contain
-		# an interpolation even inside of an
-		# otherwise-interpolating string. That is to say,
-		# "\N{$foo}" is simply invalid, and does not even try to
-		# interpolate $foo.  {
-		if ( $content =~ m/ \G ( \\ N [{] ( [^}]+ ) [}] ) /smxgc ) {
+		    push @children, [ CLASS_CONTROL, "$1" ];
+		} elsif ( $content =~ m/ \G ( \\ N [{] ( [^}]+ ) [}] ) /smxgc ) {
+		    # Handle \N{...} separately because it can not
+		    # contain an interpolation even inside of an
+		    # otherwise-interpolating string. That is to say,
+		    # "\N{$foo}" is simply invalid, and does not even
+		    # try to interpolate $foo.  {
+		    # TODO use $re = _match_enclosed( '{' ); # }
 		    my ( $seq, $name ) = ( $1, $2 );
 		    # TODO The Regexp is certainly too permissive. For
 		    # the moment all I am doing is disallowing
 		    # interpolation.
 		    push @children, $name =~ m/ [\$\@] /smx ?
-			$self->_unknown( $seq, "Unknown charname '$name'" ) :
-			$self->_make_token( String => content => $seq );
-		    redo;
-		}
-
-		if ( $content =~ m/ \G ( [\$\@] \#? \$* ) /smxgc ) {
+			[ CLASS_UNKNOWN, $seq,
+			    error => "Unknown charname '$name'" ] :
+			[ CLASS_STRING, $seq ];
+		} elsif ( $content =~ m/ \G ( [\$\@] \#? \$* ) /smxgc ) {
 		    push @children, $self->_interpolation( "$1", $content );
-		    redo;
-		}
-
-		if ( $content =~ m/ \G ( \\ . | [^\\\$\@]+ ) /smxgc ) {
-		    my $content = $1;
-		    @children
-			and $children[-1]->isa(
-			    'PPIx::QuoteLike::Token::String' )
-			and $content = ( pop @children )->content() .
-		    $content;
-		    push @children, $self->_make_token(
-			String => content => $content,
-		    );
-		    redo;
-		}
-	    }
-
-	    # We might have consecutive strings if _interpolation()
-	    # generated a string rather than an interpolation. Merge
-	    # these.
-	    # FIXME if I'm to tokenize strictly left-to-right I need to
-	    # do this on the fly.
-	    my @rslt;
-	    foreach my $elem ( @children ) {
-		if ( $elem->isa( 'PPIx::QuoteLike::Token::String' ) &&
-		    @rslt &&
-		    $rslt[-1]->isa( 'PPIx::QuoteLike::Token::String' )
-		) {
-		    $rslt[-1]{content} .= $elem->{content};
+		} elsif ( $content =~ m/ \G ( \\ . | [^\\\$\@]+ ) /smxgc ) {
+		    push @children, [ CLASS_STRING, "$1" ];
 		} else {
-		    push @rslt, $elem;
+		    last;
+		}
+	    } continue {
+		# We might have consecutive strings for various reasons.
+		# Merge these.
+		if ( CLASS_STRING eq $children[-1][0] &&
+		    CLASS_STRING eq $children[-2][0] ) {
+		    my $merge = pop @children;
+		    $children[-1][1] .= $merge->[1];
 		}
 	    }
-	    @children = @rslt;
+	    shift @children;	# remove the priming
+
+	    # Make the tokens, at long last.
+	    foreach ( @children ) {
+		$_ = $self->_make_token( @{ $_ } );
+	    }
 
 	} else {
 
 	    length $content
 		and push @children, $self->_make_token(
-		    String => content => $content,
-		);
+		    CLASS_STRING, $content );
 
 	}
 
@@ -258,7 +248,7 @@ $PPIx::QuoteLike::DEFAULT_POSTDEREF = 1;
 	    }
 	} else {
 	    $self->{finish} = [
-		$self->_make_token( Delimiter => content => $end_delim ),
+		$self->_make_token( CLASS_DELIMITER, $end_delim ),
 	    ];
 	}
 
@@ -358,10 +348,10 @@ sub location {
 }
 
 sub _make_token {
-    my ( $self, $class, %arg ) = @_;
-    $class =~ m/ \A PPIx::QuoteLike::Token:: /smx
-	or substr $class, 0, 0, 'PPIx::QuoteLike::Token::';
-    my $token = $class->__new( %arg );
+    my ( $self, $class, $content, %arg ) = @_;
+    my $token = $class->__new( content => $content, %arg );
+    CLASS_UNKNOWN eq $class
+	and $self->{failures}++;
     $self->{index_locations}
 	and $self->_update_location( $token );
     return $token;
@@ -592,20 +582,18 @@ sub __decode {
 
     my %special = (
 	'$$'	=> sub {	# Process ID.
-	    my ( $self, $sigil ) = @_;
-	    return $self->_make_token( Interpolation => content	=> $sigil );
+	    my ( undef, $sigil ) = @_;
+	    return [ CLASS_INTERPOLATION, $sigil ];
 	},
 	'$'	=> sub {	# Called if we find (e.g.) '$@'
-	    my ( $self, $sigil ) = @_;
+	    my ( undef, $sigil ) = @_;
 	    $_[2] =~ m/ \G ( [\@] ) /smxgc
 		or return;
-	    return $self->_make_token(
-		Interpolation => content	=> "$sigil$1",
-	    );
+	    return [ CLASS_INTERPOLATION, "$sigil$1" ];
 	},
 	'@'	=> sub {	# Called if we find '@@'.
-	    my ( $self, $sigil ) = @_;
-	    return $self->_make_token( String => content => $sigil );
+	    my ( undef, $sigil ) = @_;
+	    return [ CLASS_STRING, $sigil ];
 	},
     );
 
@@ -618,11 +606,10 @@ sub __decode {
 	    # variable name enclosed in {}
 	    my $delim_re = _match_enclosed( qw< { > );
 	    $_[2] =~ m/ \G ( $delim_re ) /smxgc
-		and return $self->_make_token(
-		    Interpolation => content => "$sigil$1",
-		);
+		and return [ CLASS_INTERPOLATION, "$sigil$1" ];
 	    $_[2] =~ m/ \G ( .* ) /smxgc
-		and return $self->_unknown( "$sigil$1", MISMATCHED_DELIM );
+		and return [ CLASS_UNKNOWN, "$sigil$1",
+		    error => MISMATCHED_DELIM ];
 	    confess 'Failed to match /./';
 	}
 
@@ -638,10 +625,8 @@ sub __decode {
 		} else {
 		    $_[2] =~ m/ ( .* ) /smxgc;
 		    return (
-			$self->_make_token(
-			    Interpolation => content => $interp,
-			),
-			$self->_unknown( "$1", MISMATCHED_DELIM ),
+			[ CLASS_INTERPOLATION, $interp ],
+			[ CLASS_UNKNOWN, "$1", error => MISMATCHED_DELIM ],
 		    );
 		}
 	    }
@@ -651,13 +636,14 @@ sub __decode {
 		$interp .= $deref;
 	    }
 
-	    return $self->_make_token( Interpolation => content	=> $interp );
+	    return [ CLASS_INTERPOLATION, $interp ];
 	}
 
 	my $code;
 	$code = $special{$sigil}
 	    and my $elem = $code->( $self, $sigil, $_[2] )
-	    or return $self->_unknown( $sigil, 'Sigil without interpolation' );
+	    or return [ CLASS_UNKNOWN, $sigil,
+		error => 'Sigil without interpolation' ];
 
 	return $elem;
     }
@@ -839,15 +825,6 @@ sub _stringify_source {
 	and return $opt{test} ? 1 : $string;
 
     return;
-}
-
-sub _unknown {
-    my ( $self, $content, $error ) = @_;
-    $self->{failures}++;
-    return $self->_make_token( Unknown =>
-	content	=> $content,
-	error	=> $error,
-    );
 }
 
 sub _unquote {

@@ -62,6 +62,5 @@ ok(ref($window), "Tcl::pTk::Label", "entrycget -window returns widget");
 my $image = $tree->entrycget("C:\\Windows\\System", -image);
 ok(ref($image), "Tcl::pTk::Photo", "entrycget image returns photo object");
  
-$top->after(1000,sub{$top->destroy});
-
-MainLoop();
+$top->idletasks;
+(@ARGV) ? MainLoop : $top->destroy;

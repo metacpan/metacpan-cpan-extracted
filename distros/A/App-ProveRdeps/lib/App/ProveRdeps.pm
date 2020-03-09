@@ -1,131 +1,19 @@
 package App::ProveRdeps;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-30'; # DATE
+our $DATE = '2020-03-07'; # DATE
 our $DIST = 'App-ProveRdeps'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
-use File::chdir;
-use File::Temp qw(tempdir);
+use App::ProveDists ();
+use Hash::Subset qw(hash_subset);
 
 our %SPEC;
-
-sub _find_dist_dir {
-    my ($dist, $dirs) = @_;
-
-  DIR:
-    for my $dir (@$dirs) {
-        my @entries = do {
-            opendir my $dh, $dir or do {
-                warn "prove-rdeps: Can't opendir '$dir': $!\n";
-                next DIR;
-            };
-            my @entries = grep { $_ ne '.' && $_ ne '..' } readdir $dh;
-            closedir $dh;
-            @entries;
-        };
-        #log_trace("entries: %s", \@entries);
-      FIND:
-        {
-            my @res;
-
-            # exact match
-            @res = grep { $_ eq $dist } @entries;
-            #log_trace("exact matches: %s", \@res);
-            return "$dir/$res[0]" if @res == 1;
-
-            # case-insensitive match
-            my $dist_lc = lc $dist;
-            @res = grep { lc($_) eq $dist_lc } @entries;
-            return "$dir/$res[0]" if @res == 1;
-
-            # suffix match, e.g. perl-DIST or cpan_DIST
-            @res = grep { /\A\w+[_-]\Q$dist\E\z/ } @entries;
-            #log_trace("suffix matches: %s", \@res);
-            return "$dir/$res[0]" if @res == 1;
-
-            # prefix match, e.g. DIST-perl
-            @res = grep { /\A\Q$dist\E[_-]\w+\z/ } @entries;
-            return "$dir/$res[0]" if @res == 1;
-        }
-    }
-    undef;
-}
-
-# return directory
-sub _download_dist {
-    my ($dist) = @_;
-    require App::lcpan::Call;
-
-    my $tempdir = tempdir(CLEANUP=>1);
-
-    local $CWD = $tempdir;
-
-    my $res = App::lcpan::Call::call_lcpan_script(
-        argv => ['extract-dist', $dist],
-    );
-
-    return [412, "Can't lcpan extract-dist: $res->[0] - $res->[1]"]
-        unless $res->[0] == 200;
-
-    my @dirs = glob "*";
-    return [412, "Can't find extracted dist (found ".join(", ", @dirs).")"]
-        unless @dirs == 1 && (-d $dirs[0]);
-
-    [200, "OK", "$tempdir/$dirs[0]"];
-}
-
-sub _prove {
-    require IPC::System::Options;
-
-    my $opts = shift;
-
-    my $stdout = "";
-    my $stderr = "";
-
-    my $act_stdout;
-    my $act_stderr;
-    if (log_is_warn()) {
-        $act_stdout = "tee_stdout";
-        $act_stderr = "tee_stderr";
-    } else {
-        $act_stdout = "capture_stdout";
-        $act_stderr = "capture_stderr";
-    }
-    IPC::System::Options::system(
-        {
-            log=>1,
-            ($act_stdout => \$stdout) x !!$act_stdout,
-            ($act_stderr => \$stderr) x !!$act_stderr,
-        },
-        "prove", @{ $opts || [] },
-        log_is_debug() ? ("-v") : (),
-    );
-    if ($?) {
-        if ($stdout =~ /^Result: FAIL/m) {
-            my $detail = "";
-            if ($stdout =~ m!^(Failed \d+/\d+ subtests|No subtests run)!m) {
-                $detail = " ($1)";
-            }
-            [500, "Test failed". $detail];
-        } else {
-            [500, "Non-zero exit code (".($? >> 8).")"];
-        }
-    } else {
-        if ($stdout =~ /^Result: PASS/m) {
-            [200, "PASS"];
-        } elsif ($stdout =~ /^Result: NOTESTS/m) {
-            [200, "NOTESTS"];
-        } else {
-            [500, "No PASS marker"];
-        }
-    }
-}
 
 $SPEC{prove_rdeps} = {
     v => 1.1,
@@ -134,8 +22,8 @@ $SPEC{prove_rdeps} = {
 
 To use this utility, first create `~/.config/prove-rdeps.conf`:
 
-    dist_dirs = ~/repos
-    dist_dirs = ~/repos-other
+    dists_dirs = ~/repos
+    dists_dirs = ~/repos-other
 
 The above tells *prove-rdeps* where to look for Perl distributions. Then:
 
@@ -194,14 +82,7 @@ Or you can also put these lines in the configuration file:
     exclude_dists = Acme-DependOnEverything
     exclude_dists = Regexp-Common-RegexpPattern
 
-How distribution directory is searched: first, the exact name (`My-Perl-Dist`)
-is searched. If not found, then the name with different case (e.g.
-`my-perl-dist`) is searched. If not found, a suffix match (e.g.
-`p5-My-Perl-Dist` or `cpan-My-Perl-Dist`) is searched. If not found, a prefix
-match (e.g. `My-Perl-Dist-perl`) is searched. If not found, *prove-rdeps* will
-try to download the distribution tarball from local CPAN mirror and extract it
-to a temporary directory. If `--no-dowload` is given, the *prove-deps* will not
-download from local CPAN mirror and give up for that distribution.
+How distribution directory is searched: see <pm:App::ProveDists> documentation.
 
 When a dependent distribution cannot be found or downloaded/extracted, this
 counts as a 412 error (Precondition Failed).
@@ -209,11 +90,12 @@ counts as a 412 error (Precondition Failed).
 When a distribution's test fails, this counts as a 500 error (Error). Otherwise,
 the status is 200 (OK).
 
-*prove-deps* will return status 200 (OK) with the status of each dist. It will
+*prove-rdeps* will return status 200 (OK) with the status of each dist. It will
 exit 0 if all distros are successful, otherwise it will exit 1.
 
 _
     args => {
+        %App::ProveDists::args_common,
         modules => {
             summary => 'Module names to find dependents of',
             'x.name.is_plural' => 1,
@@ -222,25 +104,6 @@ _
             req => 1,
             pos => 0,
             greedy => 1,
-        },
-        prove_opts => {
-            summary => 'Options to pass to the prove command',
-            'x.name.is_plural' => 1,
-            'x.name.singular' => 'prove_opt',
-            schema => ['array*', of=>'str*'],
-            default => ['-l'],
-        },
-        dist_dirs => {
-            summary => 'Where to find the distributions',
-            'x.name.is_plural' => 1,
-            'x.name.singular' => 'dist_dir',
-            schema => ['array*', of=>'dirname*'],
-            req => 1,
-        },
-        download => {
-            summary => 'Whether to try download/extract distribution from local CPAN mirror (when not found in dist_dirs)',
-            schema => 'bool*',
-            default => 1,
         },
 
         phases => {
@@ -288,9 +151,6 @@ _
         # XXX add arg: level, currently direct dependents only
         # XXX add arg: dzil test instead of prove
     },
-    deps => {
-        prog => 'prove',
-    },
     features => {
         dry_run => 1,
     },
@@ -299,7 +159,6 @@ sub prove_rdeps {
     require App::lcpan::Call;
 
     my %args = @_;
-    my $arg_download = $args{download} // 1;
 
     my $res = App::lcpan::Call::call_lcpan_script(
         argv => ['rdeps', @{ $args{modules} }],
@@ -308,7 +167,6 @@ sub prove_rdeps {
     return [412, "Can't lcpan rdeps: $res->[0] - $res->[1]"]
         unless $res->[0] == 200;
 
-    my @fails;
     my @included_recs;
   REC:
     for my $rec (@{ $res->[2] }) {
@@ -332,62 +190,14 @@ sub prove_rdeps {
             do { log_info "Dep %s skipped (matches exclude_dist_pattern)", $rec->{dist}; next REC } if $rec->{dist} =~ /$args{exclude_dist_pattern}/;
         }
 
-        my $dir;
-        {
-            $dir = _find_dist_dir($rec->{dist}, $args{dist_dirs});
-            last if defined $dir;
-            unless ($arg_download) {
-                log_error "Can't find dir for dist '%s', skipped", $rec->{dist};
-                push @fails, {dist=>$rec->{dist}, status=>412, reason=>"Can't find dist dir"};
-                next REC2;
-            }
-            my $dlres = _download_dist($rec->{dist});
-            unless ($dlres->[0] == 200) {
-                log_error "Can't download/extract dist '%s' from local CPAN mirror: %s - %s",
-                    $rec->{dist}, $dlres->[0], $dlres->[1];
-                push @fails, {dist=>$rec->{dist}, status=>$dlres->[0], reason=>"Can't download/extract: $dlres->[1]"};
-                next REC2;
-            }
-            $dir = $dlres->[2];
-        }
-
-        $rec->{dir} = $dir;
         push @included_recs, $rec;
     }
 
-    my $i = 0;
-  REC2:
-    for my $rec (@included_recs) {
-        $i++;
-        if ($args{-dry_run}) {
-            log_info("[DRY] [%d/%d] Running prove for dist '%s' in '%s' ...",
-                     $i, scalar(@included_recs),
-                     $rec->{dist}, $rec->{dir});
-            next REC2;
-        }
-
-        {
-            local $CWD = $rec->{dir};
-            log_warn("[%d/%d] Running prove for dist '%s' in '%s' ...",
-                     $i, scalar(@included_recs),
-                     $rec->{dist}, $rec->{dir});
-            my $pres = _prove($args{prove_opts});
-            log_debug("Prove result: %s", $pres);
-            if ($pres->[0] == 200) {
-                # success
-            } else {
-                log_error "Test for dist '%s' failed: %s",
-                    $rec->{dist}, $pres->[1];
-                push @fails, {dist=>$rec->{dist}, status=>500, reason=>$pres->[1]};
-            }
-        }
-    }
-
-    [
-        @{@fails == 0 ? [200, "All succeeded"] : @fails == @{$res} ? [200, "All failed"] : [200, "Some failed"]},
-        \@fails,
-        {'cmdline.exit_code' => @fails ? 1:0},
-    ];
+    App::ProveDists::prove_dists(
+        hash_subset(\%args, \%App::ProveDists::args_common),
+        -dry_run => $args{-dry_run},
+        _res => [200, "OK", \@included_recs],
+    );
 }
 
 1;
@@ -405,7 +215,7 @@ App::ProveRdeps - Prove all distributions depending on specified module(s)
 
 =head1 VERSION
 
-This document describes version 0.006 of App::ProveRdeps (from Perl distribution App-ProveRdeps), released on 2020-01-30.
+This document describes version 0.009 of App::ProveRdeps (from Perl distribution App-ProveRdeps), released on 2020-03-07.
 
 =head1 SYNOPSIS
 
@@ -424,8 +234,8 @@ Prove all distributions depending on specified module(s).
 
 To use this utility, first create C<~/.config/prove-rdeps.conf>:
 
- dist_dirs = ~/repos
- dist_dirs = ~/repos-other
+ dists_dirs = ~/repos
+ dists_dirs = ~/repos-other
 
 The above tells I<prove-rdeps> where to look for Perl distributions. Then:
 
@@ -484,14 +294,7 @@ Or you can also put these lines in the configuration file:
  exclude_dists = Acme-DependOnEverything
  exclude_dists = Regexp-Common-RegexpPattern
 
-How distribution directory is searched: first, the exact name (C<My-Perl-Dist>)
-is searched. If not found, then the name with different case (e.g.
-C<my-perl-dist>) is searched. If not found, a suffix match (e.g.
-C<p5-My-Perl-Dist> or C<cpan-My-Perl-Dist>) is searched. If not found, a prefix
-match (e.g. C<My-Perl-Dist-perl>) is searched. If not found, I<prove-rdeps> will
-try to download the distribution tarball from local CPAN mirror and extract it
-to a temporary directory. If C<--no-dowload> is given, the I<prove-deps> will not
-download from local CPAN mirror and give up for that distribution.
+How distribution directory is searched: see L<App::ProveDists> documentation.
 
 When a dependent distribution cannot be found or downloaded/extracted, this
 counts as a 412 error (Precondition Failed).
@@ -499,7 +302,7 @@ counts as a 412 error (Precondition Failed).
 When a distribution's test fails, this counts as a 500 error (Error). Otherwise,
 the status is 200 (OK).
 
-I<prove-deps> will return status 200 (OK) with the status of each dist. It will
+I<prove-rdeps> will return status 200 (OK) with the status of each dist. It will
 exit 0 if all distros are successful, otherwise it will exit 1.
 
 This function is not exported.
@@ -511,13 +314,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<dist_dirs>* => I<array[dirname]>
+=item * B<dists_dirs>* => I<array[dirname]>
 
-Where to find the distributions.
+Where to find the distributions directories.
 
 =item * B<download> => I<bool> (default: 1)
 
-Whether to try downloadE<sol>extract distribution from local CPAN mirror (when not found in dist_dirs).
+Whether to try downloadE<sol>extract distribution from local CPAN mirror (when not found in dists_dirs).
 
 =item * B<exclude_dist_pattern> => I<re>
 
@@ -550,6 +353,10 @@ Options to pass to the prove command.
 =item * B<rels> => I<array[str]> (default: ["requires"])
 
 Only select dists that depend using these relationships.
+
+=item * B<summarize_all> => I<bool>
+
+If true, also summarize successes in addition to failures.
 
 
 =back

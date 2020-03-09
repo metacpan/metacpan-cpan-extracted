@@ -2,7 +2,7 @@ package App::Yath::Command::runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use Config qw/%Config/;
 use File::Spec;
@@ -108,6 +108,9 @@ sub generate_run_sub {
 
     die "Invalid action: $action" if $action ne 'run_test';
 
+    if (my $chdir = $job->ch_dir) {
+        chdir($chdir) or die "Could not chdir: $!";
+    }
     goto::file->import($job->rel_file);
     $class->cleanup_process($job, $stage);
 }
@@ -269,10 +272,6 @@ sub { $_[0]->import(@{$_[1]}) }
 sub build_init_state {
     my $class = shift;
     my ($job) = @_;
-
-    if (my $chdir = $job->ch_dir) {
-        chdir($chdir) or die "Could not chdir: $!";
-    }
 
     $0 = $job->rel_file;
     $class->_reset_DATA();
@@ -581,7 +580,7 @@ Do not delete directories when done. This is useful if you want to inspect the d
 
 =item --no-summary
 
-Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extention is added automatically if omitted.
+Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extension is added automatically if omitted.
 
 
 =back

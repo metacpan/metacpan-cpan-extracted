@@ -10,7 +10,7 @@ our @EXPORT    = qw( msys msys_run );
 our @EXPORT_OK = qw( msys msys_run msys_path );
 
 # ABSTRACT: Tools required for GNU style configure scripts on Windows
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 sub msys (&)
@@ -68,7 +68,7 @@ Alien::MSYS - Tools required for GNU style configure scripts on Windows
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -221,7 +221,11 @@ On using the MSYS2 / MinGW / MSWin32 Perl from the MSYS2 project.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Shawn Laffan (SLAFFAN, shawnlaffan)
 
 =head1 COPYRIGHT AND LICENSE
 

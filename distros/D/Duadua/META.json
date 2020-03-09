@@ -4,7 +4,7 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "artistic_2"
    ],
@@ -30,7 +30,6 @@
          "requires" : {
             "Getopt::Long" : "0",
             "JSON" : "0",
-            "Module::Pluggable::Object" : "0",
             "Pod::Usage" : "0",
             "perl" : "5.008005",
             "strict" : "0",
@@ -51,7 +50,7 @@
    "provides" : {
       "Duadua" : {
          "file" : "lib/Duadua.pm",
-         "version" : "0.08"
+         "version" : "0.12"
       },
       "Duadua::CLI" : {
          "file" : "lib/Duadua/CLI.pm"
@@ -207,6 +206,6 @@
          "url" : "http://github.com/bayashi/Duadua"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

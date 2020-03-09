@@ -5,15 +5,15 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
-use Module::Info;
 use Pod::Abstract;
+use Pod::Find qw(pod_where);
 use Readonly;
 
 # Constants.
 Readonly::Array our @EXPORT_OK => qw(get sections);
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.09;
+our $VERSION = 0.11;
 
 # Get content for file or module.
 sub get {
@@ -68,16 +68,16 @@ sub _get_content {
 	foreach my $child ($pod_section->children) {
 		if ($child->type eq 'begin') {
 
-			# Skip =begin html
-			if ($child->body =~ m/^html/ms) {
-				next;
-
 			# =begin text as commented text.
-			} elsif ($child->body =~ m/^text/ms) {
+			if ($child->body =~ m/^text/ms) {
 				$child_pod .= join "\n",
 					map { ' #'.$_ }
 					split m/\n/ms,
 					($child->children)[0]->pod;
+
+			# Skip =begin html and other unsupported sections.
+			} else {
+				next;
 			}
 		} else {
 			$child_pod .= $child->pod;
@@ -129,11 +129,10 @@ sub _pod_abstract {
 
 	# Module.
 	} else {
-		my $mod = Module::Info->new_from_module($file_or_module);
-		if (! $mod) {
+		$file = pod_where({ -inc => 1 }, $file_or_module);
+		if (! $file) {
 			err 'Cannot open pod file or Perl module.';
 		}
-		$file = $mod->file;
 	}
 
 	# Get and return pod.
@@ -258,8 +257,8 @@ Returns array of example sections.
 
 L<Error::Pure>,
 L<Exporter>,
-L<Module::Info>,
 L<Pod::Abstract>,
+L<Pod::Find>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -294,6 +293,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.11
 
 =cut

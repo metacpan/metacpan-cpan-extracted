@@ -25,7 +25,7 @@ our $query_multi = 0; ##-- multi-query mode?
 
 our $bench_iters = undef;
 our $bench_seconds = undef;
-our $bench_clear_cache = 1;
+our $bench_clear_cache = 0; ##-- not working at server log-level<=info 2020-02-10
 our $expandChain = undef;
 
 our %fmt = (
@@ -77,6 +77,7 @@ GetOptions(##-- General
 	   'server|s=s' => \$client{connect}{PeerAddr},
 	   'port|p=s'   => \$client{connect}{PeerPort},
 	   'unix|u=s'   => sub { %{$client{connect}} = (Domain=>'UNIX',Peer=>$_[1]) },
+           'url|U=s'    => \$client{connect}{url},
 	   'corpora|corpus|c=s' => \$corpora,
 	   'opt-file|opt|O=s' => \$client{optFile},
 	   'mode|m=s' => \$client{mode},
@@ -167,11 +168,8 @@ our $dclient = DDC::Client::Distributed->new(%client,
 					     keepRaw=>($fmt_class =~ /Raw/ || $client{mode} =~ /^(?:raw|req)/i ? 1 : 0),
 					     fieldNames=>$fieldNames,
 					    );
-my $srv_addr = ($client{connect}{Domain} eq 'INET'
-		? join(':', map {$_//'?'} @{$client{connect}}{qw(PeerAddr PeerPort)})
-		: join(':', 'UNIX', map {$_//'?'} @{$client{connect}}{qw(Peer)}));
 $dclient->open()
-  or die("$prog: could not connect to DDC server on $srv_addr: $!");
+  or die("$prog: could not connect to DDC server on ", $dclient->addrStr, ": $!");
 
 if ($expandChain) {
   ##-- term expansion mode
@@ -358,6 +356,7 @@ ddc-query.perl - distributed DDC query tool in perl
   -server  SERVER                   ##-- TCP server host address (default=localhost)
   -port    PORT                     ##-- TCP server port (default=50011)
   -unix    PATH                     ##-- UNIX server socket path (overrides TCP settings)
+  -url     URL                      ##-- generic server URL (unix://PATH or inet://HOST:PORT)
   -timeout DDC_TIMEOUT              ##-- default=60
   -mode    QMODE                    ##-- query mode: 'json', 'table', 'text', 'request' (default='json')
   -qenc    QENCODING                ##-- query encoding (default=raw bytes)

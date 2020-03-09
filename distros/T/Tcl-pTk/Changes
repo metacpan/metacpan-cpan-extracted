@@ -1,5 +1,34 @@
 Summary of Changes to Tcl::pTk
 
+Release 1.05:  2020-03-09
+
+ * Support $toplevel->stackorder method (as used with Perl/Tk)
+ * Experimental workaround for regression in Tcl/Tk 8.6.10
+   which causes an error when using facelifted LabEntry widgets
+
+Release 1.04_03:  2020-03-07
+
+ * Facelift/Hijack tests: don't skip when Tix is unavailable
+   for tests that don't depend on Tix
+
+Release 1.04_02:  2020-03-07
+
+ * Add tests in repository but missing from MANIFEST and distribution
+
+Release 1.04_01:  2020-03-07
+
+ * configureReturn.t:
+   - fix check for skipping Tix widget tests
+     (was skipping some tests even with Tix present)
+   - Workaround for RT #128804: manually destroy $mw at end of test
+     to avoid segmentation fault (observed on CentOS 6.10)
+
+Release 1.04:  2020-03-07
+
+ * Replaced README with improved markdown README.md;
+   documentation fixes (contributions from Vadim Konovalov)
+ * Update MANIFEST (README.md was missing from 1.03)
+
 Release 1.03:  2020-03-02
 
  * Mark focusMethods.t as TODO due to unresolved failures (RT #131091)

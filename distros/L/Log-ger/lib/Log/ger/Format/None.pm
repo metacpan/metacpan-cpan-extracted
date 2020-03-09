@@ -1,7 +1,9 @@
 package Log::ger::Format::None;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger'; # DIST
+our $VERSION = '0.033'; # VERSION
 
 sub get_hooks {
     return {
@@ -9,7 +11,7 @@ sub get_hooks {
             __PACKAGE__, # key
             50,          # priority
             sub {        # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
                 my $formatter = sub { shift };
                 [$formatter];
             }],
@@ -31,7 +33,7 @@ Log::ger::Format::None - Perform no formatting on the message
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 

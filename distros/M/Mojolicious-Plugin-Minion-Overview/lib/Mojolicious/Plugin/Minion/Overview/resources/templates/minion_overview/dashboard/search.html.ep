@@ -13,11 +13,11 @@
     jQuery(document).ready(function($) {
         setInterval(function() {
             $('#overview').load('<%= url_for('minion_overview.dashboard.overview') %>');
-        }, 20 * 1000);
+        }, 30 * 1000);
 
         setInterval(function() {
             $('#workers').load('<%= url_for('minion_overview.dashboard.workers') %>');
-        }, 20 * 1000);
+        }, 30 * 1000);
     });
     % end
 % end

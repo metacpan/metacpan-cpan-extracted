@@ -17,6 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-ProveRdeps
 requires:
+  App::ProveDists: '0'
   App::lcpan::Call: '0.11'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname: '0'
@@ -25,13 +26,12 @@ requires:
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::re: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
-  File::Temp: '0'
-  File::chdir: '0'
-  IPC::System::Options: '0.332'
-  Log::ger: '0.027'
+  Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
+  Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
+  Hash::Subset: '0.005'
+  Log::ger: '0.032'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
-  Perinci::Sub::DepChecker: '0'
   Sah::Schema::dirname: '0'
   Sah::Schema::perl::distname: '0'
   Sah::Schema::perl::modname: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProveRdeps
   homepage: https://metacpan.org/release/App-ProveRdeps
   repository: git://github.com/perlancar/perl-App-ProveDeps.git
-version: '0.006'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -169,7 +169,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -305,7 +305,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.07'
+              version: '0.081'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

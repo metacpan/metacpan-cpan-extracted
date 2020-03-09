@@ -14,9 +14,9 @@ foreach my $version (@tags)
   next if $version =~ /^PRE_MUCKUP/;
   next if $version eq 'help';
   next if $version =~ /^(help|GNUMERIC_FIRST_PUBLIC_RELEASE|ChangeLog|EAZEL-NAUTILUS-MS-AUG07|FOR_GNOME_0_99_1|GNOME_0_30|GNOME_PRINT_0_24|LIBXML2_2_5_x|LIB_XML_1_X)$/;
-  
+
   my @v;
-  
+
   if($version =~ /^LIBXML([0-9]+)\.([0-9]+)\.([0-9]+)$/)
   {
     @v = ($1,$2,$3);
@@ -49,13 +49,13 @@ foreach my $version (@tags)
   {
     die "unrecognized tag format: $version";
   }
-  
+
   next if $v[0] != 2;
 
   for(0..$3)
   {
     $v{"$v[0].$v[1].$_"} = 1;
-  }  
+  }
 }
 
 my $bl = [
@@ -107,7 +107,7 @@ foreach my $ver (sort map { version->parse($_) } keys %v)
     last if $point <= $i->[2];
     $state = undef;
   }
-  
+
   if(defined $state and $state == 0)
   {
     print "'$ver',";

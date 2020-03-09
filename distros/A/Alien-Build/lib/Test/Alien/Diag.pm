@@ -9,7 +9,7 @@ our @EXPORT = qw( alien_diag );
 our @EXPORT_OK = @EXPORT;
 
 # ABSTRACT: Print out standard diagnostic for Aliens in the test step.
-our $VERSION = '2.08'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 
 sub alien_diag ($@)
@@ -78,7 +78,7 @@ Test::Alien::Diag - Print out standard diagnostic for Aliens in the test step.
 
 =head1 VERSION
 
-version 2.08
+version 2.12
 
 =head1 SYNOPSIS
 

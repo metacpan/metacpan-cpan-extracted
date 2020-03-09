@@ -1,2 +1,35 @@
-0.001 17-08-2017
+1.000 FIXME WHEN
+
+    [Features]
+    
+        After tersification, any references to now-tersified data structures
+        will be updated to point to the new, terser data structures.
+        This makes this module worth using on anything other than trivial
+        things!
+        
+        tersify_many() takes a list of values, and is used in the perl debugger
+        plugin Data::Tersify::perldb.
+
+    [Tweaks]
+    
+        Summary objects include the refaddr of the object they're summarising
+        in hexadecimal, rather than decimal, because that's the format you
+        expect that number to be in.
+
+    [Documentation]
+    
+        Added structure to this CHANGES file.
+
+0.002 2018-08-12
+
+    [Features]
+
+        Tersifies objects that it doesn't recognise, but which contain objects
+        that it does. This was the point of writing this module, and something
+        that it took me an embarrassing amount of time to get around to doing.
+
+        Very simple Data::Tersify::perldb module for tweaking the debugger to
+        automatically tersify.
+
+0.001 2017-08-17
     Initial version.

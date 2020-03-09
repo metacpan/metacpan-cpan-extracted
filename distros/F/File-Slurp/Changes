@@ -1,5 +1,9 @@
 Revision history File::Slurp
 
+9999.30
+    - Altered the atomic version of write_file to use temporary files that
+      are also hidden files. (RT #132064)
+
 9999.29     2019-11-27
     - Correct some documentation errors where copy-paste had us saying
       File::Spec rather than File::Slurp. (RT 131097 - Thanks, Mike)

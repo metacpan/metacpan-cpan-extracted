@@ -40,7 +40,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Log::ger" : "0.027",
+            "Log::ger" : "0.032",
             "Log::ger::Layout" : "0",
             "Log::ger::Layout::Pattern" : "0.002",
             "Log::ger::Output" : "0.007",
@@ -61,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-Output-Composite"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

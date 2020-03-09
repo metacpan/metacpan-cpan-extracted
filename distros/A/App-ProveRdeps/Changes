@@ -1,3 +1,23 @@
+0.009   2020-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to pass -dry_run argument to prove_dists().
+
+
+0.008   2020-03-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Rename argument dist_dirs to dists_dirs.
+
+	- Refactor/extract functionalities to App::ProveDirs and
+	  App::ProveDists.
+
+
+0.007   2020-01-31  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Update a couple of instances of old names.
+
+
 0.006   2020-01-30  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename dist/script prove-deps -> prove-rdeps.

@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ProveRdeps/prove_rdeps
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.493
 
-our $DATE = '2020-01-30'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
 our $DIST = 'App-ProveRdeps'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,6 +19,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ProveRdeps/prove_rdeps",
     program_name => "prove-rdeps",
     log => 1,
+    log_level => "info",
 );
 
 $cmdline->run;
@@ -37,7 +39,7 @@ prove-rdeps - Prove all distributions depending on specified module(s)
 
 =head1 VERSION
 
-This document describes version 0.006 of prove-rdeps (from Perl distribution App-ProveRdeps), released on 2020-01-30.
+This document describes version 0.009 of prove-rdeps (from Perl distribution App-ProveRdeps), released on 2020-03-07.
 
 =head1 SYNOPSIS
 
@@ -49,8 +51,8 @@ Usage:
 
 To use this utility, first create C<~/.config/prove-rdeps.conf>:
 
- dist_dirs = ~/repos
- dist_dirs = ~/repos-other
+ dists_dirs = ~/repos
+ dists_dirs = ~/repos-other
 
 The above tells I<prove-rdeps> where to look for Perl distributions. Then:
 
@@ -109,14 +111,7 @@ Or you can also put these lines in the configuration file:
  exclude_dists = Acme-DependOnEverything
  exclude_dists = Regexp-Common-RegexpPattern
 
-How distribution directory is searched: first, the exact name (C<My-Perl-Dist>)
-is searched. If not found, then the name with different case (e.g.
-C<my-perl-dist>) is searched. If not found, a suffix match (e.g.
-C<p5-My-Perl-Dist> or C<cpan-My-Perl-Dist>) is searched. If not found, a prefix
-match (e.g. C<My-Perl-Dist-perl>) is searched. If not found, I<prove-rdeps> will
-try to download the distribution tarball from local CPAN mirror and extract it
-to a temporary directory. If C<--no-dowload> is given, the I<prove-deps> will not
-download from local CPAN mirror and give up for that distribution.
+How distribution directory is searched: see L<App::ProveDists> documentation.
 
 When a dependent distribution cannot be found or downloaded/extracted, this
 counts as a 412 error (Precondition Failed).
@@ -124,7 +119,7 @@ counts as a 412 error (Precondition Failed).
 When a distribution's test fails, this counts as a 500 error (Error). Otherwise,
 the status is 200 (OK).
 
-I<prove-deps> will return status 200 (OK) with the status of each dist. It will
+I<prove-rdeps> will return status 200 (OK) with the status of each dist. It will
 exit 0 if all distros are successful, otherwise it will exit 1.
 
 =head1 OPTIONS
@@ -135,17 +130,17 @@ C<*> marks required options.
 
 =over
 
-=item B<--dist-dir>=I<s@>*
+=item B<--dists-dir>=I<s@>*
 
-Where to find the distributions.
+Where to find the distributions directories.
 
 Can be specified multiple times.
 
-=item B<--dist-dirs-json>=I<s>
+=item B<--dists-dirs-json>=I<s>
 
-Where to find the distributions (JSON-encoded).
+Where to find the distributions directories (JSON-encoded).
 
-See C<--dist-dir>.
+See C<--dists-dir>.
 
 =item B<--module>=I<s@>*
 
@@ -176,6 +171,10 @@ Can be specified multiple times.
 Options to pass to the prove command (JSON-encoded).
 
 See C<--prove-opt>.
+
+=item B<--summarize-all>
+
+If true, also summarize successes in addition to failures.
 
 =back
 
@@ -340,6 +339,10 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =back
 
 =head2 Other options
@@ -416,7 +419,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
- dist_dirs (see --dist-dir)
+ dists_dirs (see --dists-dir)
  download (see --no-download)
  exclude_dist_pattern (see --exclude-dist-pattern)
  exclude_dists (see --exclude-dist)
@@ -429,6 +432,7 @@ List of available configuration parameters:
  phases (see --phase)
  prove_opts (see --prove-opt)
  rels (see --rel)
+ summarize_all (see --summarize-all)
 
 =head1 ENVIRONMENT
 

@@ -222,6 +222,10 @@ t/integration/test/pass.tx
 t/integration/times.t
 t/integration/times/pass.tx
 t/integration/times/pass2.tx
+t/integration/verbose_env.t
+t/integration/verbose_env/not_verbose.tx
+t/integration/verbose_env/verbose1.tx
+t/integration/verbose_env/verbose2.tx
 t/lib/App/Yath/Command/broken.pm
 t/lib/App/Yath/Command/fake.pm
 t/lib/App/Yath/Plugin/Fail.pm

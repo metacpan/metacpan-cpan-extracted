@@ -11,7 +11,7 @@ configure_requires:
   CPAN::Meta: '2.142060'
   Module::Build: '0.4004'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,11 +20,11 @@ name: Math-Random-PCG32
 provides:
   Math::Random::PCG32:
     file: lib/Math/Random/PCG32.pm
-    version: '0.12'
+    version: '0.17'
 requires:
   perl: '5.014000'
 resources:
-  license: http://apache.org/licenses/LICENSE-2.0
+  license: http://www.apache.org/licenses/LICENSE-2.0.txt
   repository: https://github.com/thrig/Math-Random-PCG32
-version: '0.12'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

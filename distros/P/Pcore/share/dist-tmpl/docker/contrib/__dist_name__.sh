@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 
 export TAG=latest
 export NAME=<: $dockerhub_dist_repo_name :>
-export DOCKERHUB_NAMESPACE=<: $dockerhub_dist_repo_namespace :>
+export DOCKER_NAMESPACE=<: $dockerhub_dist_repo_namespace :>
 export SERVICE=0
 
 # Docker container restart policy, https://docs.docker.com/config/containers/start-containers-automatically/

@@ -1,9 +1,11 @@
+## no critic (InputOutput::RequireBriefOpen)
+
 package Log::ger::Output::File;
 
-our $DATE = '2019-09-10'; # DATE
-our $VERSION = '0.009'; # VERSION
-
-## no critic (InputOutput::RequireBriefOpen)
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger-Output-File'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 use strict;
 use warnings;
@@ -14,26 +16,26 @@ use FileHandle;
 our %lock_handles;
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
-    my $lazy      = $conf{lazy};
-    my $autoflush = $conf{autoflush}; $autoflush = 1 unless defined $autoflush;
-    my $lock_mode = $conf{lock_mode} || 'none';
+    my $lazy      = $plugin_conf{lazy};
+    my $autoflush = $plugin_conf{autoflush}; $autoflush = 1 unless defined $autoflush;
+    my $lock_mode = $plugin_conf{lock_mode} || 'none';
 
-    (defined($conf{path}) || $conf{handle}) or
+    (defined($plugin_conf{path}) || $plugin_conf{handle}) or
         die "Please specify 'path' or 'handle'";
     $lock_mode =~ /\A(none|write|exclusive)\z/ or
         die "Invalid lock_mode, please choose none|write|exclusive";
-    $lock_mode ne 'none' && $conf{handle} and
+    $lock_mode ne 'none' && $plugin_conf{handle} and
         die "Locking using handle not supported for now";
 
     my $code_lock = sub {
         require File::Flock::Retry;
-        my $key = defined($conf{path}) ? ":$conf{path}" : $conf{handle};
+        my $key = defined($plugin_conf{path}) ? ":$plugin_conf{path}" : $plugin_conf{handle};
         if ($lock_handles{$key}) {
             return $lock_handles{$key};
         }
-        $lock_handles{$key} = File::Flock::Retry->lock("$conf{path}.lck");
+        $lock_handles{$key} = File::Flock::Retry->lock("$plugin_conf{path}.lck");
         #Scalar::Util::weaken($lock_handles{$key});
         # XXX how do we purge old %lock_handles keys?
         return $lock_handles{$key};
@@ -42,10 +44,10 @@ sub get_hooks {
     my $fh;
     my $code_open = sub {
         return if $fh;
-        if (defined(my $path = $conf{path})) {
+        if (defined(my $path = $plugin_conf{path})) {
             open $fh, ">>", $path or die "Can't open log file '$path': $!";
         } else {
-            $fh = $conf{handle};
+            $fh = $plugin_conf{handle};
         }
         $fh;
     };
@@ -58,16 +60,18 @@ sub get_hooks {
 
     return {
         create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_;
 
                 my $logger = sub {
+                    my ($per_target_conf, $msg, $per_msg_conf) = @_;
                     my $lock_handle;
                     $code_open->() if $lazy && !$fh;
                     $lock_handle = $code_lock->() if $lock_mode eq 'write';
-                    print $fh $_[1];
-                    print $fh "\n" unless $_[1] =~ /\R\z/;
+                    print $fh $msg;
+                    print $fh "\n" unless $msg =~ /\R\z/;
                     $fh->flush if $autoflush || $lock_handle;
                     undef $lock_handle;
                 };
@@ -91,7 +95,7 @@ Log::ger::Output::File - Send logs to file
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -173,7 +177,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

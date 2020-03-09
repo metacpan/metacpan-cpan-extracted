@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # DESCRIPTION: Perl ExtUtils: Type 'make test' to test this package
 #
-# Copyright 2003-2019 by Wilson Snyder.  This program is free software;
+# Copyright 2003-2020 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 ######################################################################
@@ -29,7 +29,20 @@ $SIG{TERM} = sub { $fork->kill_tree_all('TERM') if $fork && $fork->in_parent; di
 $fork->use_sig_child(1);
 ok(1, "sig");
 
+ SKIP:
 {
+    if (!$ENV{PARALLELFORKER_AUTHOR_SITE}) {
+	warn "(skip author only test)\n";
+	skip("author only test (harmless)", 97);
+    }
+    test_waitall();
+    test_poll();
+    test_runa();
+    test_ss();
+    test_reap();
+}
+
+sub test_waitall {
     my $Didit;
     my ($start_pid, $finish_pid);
     $fork->schedule(
@@ -60,8 +73,8 @@ sub restarting_sleep {
 #  - poll() should fire both run_on_finish callbacks
 #  - Current running process count should be 3 again (3rd original process
 #    plus two new ones)
-{
-    my @done;
+my @done;
+sub test_poll {
     sub quick_sleep { sleep 1 }
     sub slow_sleep { sleep 7 }
     sub finish_func { push @done, $_[0]{name} }
@@ -138,11 +151,13 @@ sub restarting_sleep {
     is( scalar(@done), 6, "all done" ); # sanity check
 }
 
-run_a_test(run_it=>1);
-run_a_test(wait_it=>1);
-run_a_test(wait_it=>1, wait_label=>1);
-
 ######################################################################
+
+sub test_runa {
+    run_a_test(run_it=>1);
+    run_a_test(wait_it=>1);
+    run_a_test(wait_it=>1, wait_label=>1);
+}
 
 our $WTN;
 sub run_a_test {
@@ -208,7 +223,7 @@ sub run_a_test {
 
 # White-box test to ensure that poll() short-circuits and does less work IF
 #   you have use_sig_child set to true and _activity is false.
-{
+sub test_ss {
     # sanity-check precondition:
     ok( $fork->use_sig_child, "use_sig_child" );
 
@@ -244,7 +259,7 @@ sub run_a_test {
 }
 
 # Can reap "done" processes
-{
+sub test_reap {
   my $name1 = 'ONE';
   my $job1 = $fork->schedule(
     name => $name1,

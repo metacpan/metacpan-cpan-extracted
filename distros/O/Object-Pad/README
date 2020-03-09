@@ -10,6 +10,10 @@ SYNOPSIS
           has $x = 0;
           has $y = 0;
     
+          method BUILD {
+            ($x, $y) = @_;
+          }
+    
           method move($dX, $dY) {
              $x += $dX;
              $y += $dY;
@@ -19,6 +23,8 @@ SYNOPSIS
              print "A point at ($x, $y)\n";
           }
        }
+    
+       Point->new(5,10)->describe;
 
 DESCRIPTION
 
@@ -225,10 +231,6 @@ IMPLEMENTATION TODOs
 
       * Consider multiple inheritence of subclassing, if that is still
       considered useful after adding roles.
-
-      * Experiment with CvOUTSIDE or other techniques as a way to set up
-      the per-method pad, and consider if we can detect which slots are in
-      use that way to improve method-enter performance.
 
       * Some extensions of the has syntax:
 

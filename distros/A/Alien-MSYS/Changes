@@ -1,5 +1,9 @@
 Revision history for Alien-MSYS
 
+0.14      2020-03-08 17:07:11 -0600
+  - Force a system install on non-MSWin32 and non-cygwin as a share
+    install doesn't make sense on non-Windows. (SLAFFAN++ gh#9, gh#10)
+
 0.12      2020-02-06 14:46:30 -0700
   - Require at least Windows 7.  Windows XP is known to have poor
     native crypto support, which is used my mingw-get and doesn't

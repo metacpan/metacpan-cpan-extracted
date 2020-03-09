@@ -1,5 +1,5 @@
 
-# $Id: N3.pm,v 1.17 2009-07-04 14:28:18 Martin Exp $
+# $Id: N3.pm,v 1.18 2010-12-02 23:41:57 Martin Exp $
 
 =head1 NAME
 
@@ -30,7 +30,7 @@ use RDF::Simple::Serialiser 1.007;
 use base 'RDF::Simple::Serialiser';
 
 our
-$VERSION = do { my @r = (q$Revision: 1.17 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 1.18 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 
 use constant DEBUG => 0;
 
@@ -210,7 +210,7 @@ to report bugs and request new features.
 
 =head1 AUTHOR
 
-Martin Thurn <mthurn@cpan.org>
+Martin 'Kingpin' Thurn, C<mthurn at cpan.org>, L<http://tinyurl.com/nn67z>.
 
 =head1 LICENSE
 

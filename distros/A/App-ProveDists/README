@@ -1,0 +1,181 @@
+NAME
+    App::ProveDists - Prove Perl distributions
+
+VERSION
+    This document describes version 0.003 of App::ProveDists (from Perl
+    distribution App-ProveDists), released on 2020-03-07.
+
+SYNOPSIS
+    See the included script prove-dists.
+
+FUNCTIONS
+  prove_dists
+    Usage:
+
+     prove_dists(%args) -> [status, msg, payload, meta]
+
+    Prove Perl distributions.
+
+    To use this utility, first create "~/.config/prove-dists.conf":
+
+     dists_dirs = ~/repos
+     dists_dirs = ~/repos-other
+
+    The above tells *prove-dists* where to look for Perl distributions.
+    Then:
+
+     % prove-dists '^Games-Word-Wordlist-.+$'
+
+    This will search local CPAN mirror for all distributions that match that
+    regex pattern, then search the distributions in the distribution
+    directories (or download them from local CPAN mirror), "cd" to each and
+    run "prove" in it.
+
+    You can run with "--dry-run" ("-n") option first to not actually run
+    "prove" but just see what distributions will get tested. An example
+    output:
+
+     % prove-dists '^Games-Word-Wordlist-.+$' -n
+     prove-dists: Found dist: Games-Word-Wordlist-Country
+     prove-dists: Found dist: Games-Word-Wordlist-Enable
+     prove-dists: Found dist: Games-Word-Wordlist-HSK
+     prove-dists: Found dist: Games-Word-Wordlist-KBBI
+     prove-dists: Found dist: Games-Word-Wordlist-SGB
+     prove-dists: [DRY] [1/5] Running prove for distribution Games-Word-Wordlist-Country (directory /home/u1/repos/perl-Games-Word-Wordlist-Country) ...
+     prove-dists: [DRY] [2/5] Running prove for distribution Games-Word-Wordlist-Enable (directory /tmp/AmYe5AHXpm/Games-Word-Wordlist-Enable-2010090401) ...
+     prove-dists: [DRY] [3/5] Running prove for distribution Games-Word-Wordlist-HSK (directory /home/u1/repos/perl-Games-Word-Wordlist-HSK) ...
+     prove-dists: [DRY] [4/5] Running prove for distribution Games-Word-Wordlist-KBBI (directory /home/u1/repos/perl-Games-Word-Wordlist-KBBI) ...
+     prove-dists: [DRY] [5/5] Running prove for distribution Games-Word-Wordlist-SGB (directory /tmp/xHAvt5uAhM/Games-Word-Wordlist-SGB-2010091501) ...
+
+    The above example shows that I have the distribution directories locally
+    on my "~/repos", except for "Games-Word-Wordlist-Enable" and
+    "Games-Word-Wordlist-SGB", which *prove-dists* downloads and extracts
+    from local CPAN mirror and puts into temporary directories.
+
+    If we reinvoke the above command without the "-n", *prove-dists* will
+    actually run "prove" on each directory and provide a summary at the end.
+    Example output:
+
+     % prove-dists '^Games-Word-Wordlist-.+$'
+     +----------------------------------------------+---------------------------------------+-----------------------------------+--------+
+     | dir                                          | label                                 | reason                            | status |
+     +----------------------------------------------+---------------------------------------+-----------------------------------+--------+
+     | /home/u1/repos/perl-Games-Word-Wordlist-KBBI | distribution Games-Word-Wordlist-KBBI | Test failed (Failed 1/1 subtests) | 500    |
+     +----------------------------------------------+---------------------------------------+-----------------------------------+--------+
+
+    The above example shows that one distribution failed testing. You can
+    scroll up for the detailed "prove" output to see the detail of the
+    failure, fix things, and re-run.
+
+    To summarize not only failures but all successes as well, use
+    "--summarize-all" option:
+
+     % prove-dists '^Games-Word-Wordlist-.+$' --summarize-all
+     +-------------------------------------------------------+------------------------------------------+-----------------------------------+--------+
+     | dir                                                   | label                                    | reason                            | status |
+     +-------------------------------------------------------+------------------------------------------+-----------------------------------+--------+
+     | /home/u1/repos/perl-Games-Word-Wordlist-Country       | distribution Games-Word-Wordlist-Country | PASS                              | 200    |
+     | /tmp/rjjMJVgaXg/Games-Word-Wordlist-Enable-2010090401 | distribution Games-Word-Wordlist-Enable  | PASS                              | 200    |
+     | /home/u1/repos/perl-Games-Word-Wordlist-HSK           | distribution Games-Word-Wordlist-HSK     | NOTESTS                           | 200    |
+     | /home/u1/repos/perl-Games-Word-Wordlist-KBBI          | distribution Games-Word-Wordlist-KBBI    | Test failed (Failed 1/1 subtests) | 500    |
+     | /tmp/_W8im6EvA0/Games-Word-Wordlist-SGB-2010091501    | distribution Games-Word-Wordlist-SGB     | PASS                              | 200    |
+     +-------------------------------------------------------+------------------------------------------+-----------------------------------+--------+
+
+    How distribution directory is searched: first, the exact name
+    ("My-Perl-Dist") is searched. If not found, then the name with different
+    case (e.g. "my-perl-dist") is searched. If not found, a suffix match
+    (e.g. "p5-My-Perl-Dist" or "cpan-My-Perl-Dist") is searched. If not
+    found, a prefix match (e.g. "My-Perl-Dist-perl") is searched. If not
+    found, *prove-dists* will try to download the distribution tarball from
+    local CPAN mirror and extract it to a temporary directory. If
+    "--no-dowload" is given, the *prove-dists* will not download from local
+    CPAN mirror and give up for that distribution.
+
+    When a distribution cannot be found or downloaded/extracted, this counts
+    as a 412 error (Precondition Failed).
+
+    When a distribution's test fails, this counts as a 500 error (Error).
+    Otherwise, the status is 200 (OK).
+
+    *prove-dists* will return status 200 (OK) with the status of each dist.
+    It will exit 0 if all distros are successful, otherwise it will exit 1.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dist_patterns* => *array[re]*
+
+        Distribution name patterns to find.
+
+    *   dists_dirs* => *array[dirname]*
+
+        Where to find the distributions directories.
+
+    *   download => *bool* (default: 1)
+
+        Whether to try download/extract distribution from local CPAN mirror
+        (when not found in dists_dirs).
+
+    *   prove_opts => *array[str]* (default: ["-l"])
+
+        Options to pass to the prove command.
+
+    *   summarize_all => *bool*
+
+        If true, also summarize successes in addition to failures.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ProveDists>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ProveDists>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProveDists>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    prove-dirs in App::ProveDirs
+
+    prove-mods in App::ProveMods
+
+    prove-rdeps in App::ProveRdeps
+
+    prove
+
+    App::lcpan
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+#
+# eg/leakcheck - do any of the SV* routines leak memory or cause any
+# other problems?
+
+use 5.14.0;
+use warnings;
+use Fcntl;
+use Math::Random::PCG32 0.17 qw(irand_way rand_elm rand_from);
+
+my $rng;
+
+my %dispatch = (
+    irand_way => sub {
+        while (1) {
+            my ($x, $y) = irand_way($rng, 0, 0, int(rand 10 - 5), int(rand 10 - 5));
+        }
+    },
+    rand_elm => sub {
+        my @a = 'a' .. 'z';
+        while (1) {
+            my $x = rand_elm($rng, \@a);
+        }
+    },
+    rand_from => sub {
+        while (1) {
+            while (1) {
+                my @a = 'a' .. 'f';
+                my $x = rand_from($rng, \@a);
+                last unless defined $x;
+            }
+        }
+    },
+);
+
+my $call = shift // die "Usage: $0 dispatch-method\n";
+die "no such method\n" unless exists $dispatch{$call};
+
+my @seeds;
+sysopen my $fh, "/dev/random", O_RDONLY or die "no random: $!\n";
+my $bert;
+for (1 .. 2) {
+    my $len = sysread $fh, $bert, 8;
+    die "uh what?? $!\n" if !defined $len or $len != 8;
+    push @seeds, unpack 'Q', $bert;
+}
+
+$rng = Math::Random::PCG32->new(@seeds);
+$dispatch{$call}->();

@@ -12,6 +12,7 @@ author.yml
 dist.ini
 lib/Alien/FFI.pm
 maint/cip-before-install
+maint/cip-before-install-inside
 maint/cip-test
 t/00_diag.t
 t/xs.t

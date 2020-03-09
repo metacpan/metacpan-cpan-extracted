@@ -1,12 +1,13 @@
 #!/usr/bin/perl -w
 # DESCRIPTION: Perl ExtUtils: Type 'make test' to test this package
 #
-# Copyright 2003-2019 by Wilson Snyder.  This program is free software;
+# Copyright 2003-2020 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 ######################################################################
 
 use Test::More;
+use Time::HiRes qw(usleep sleep);
 use strict;
 
 our $Other_Host = "localhost";
@@ -16,12 +17,19 @@ BEGIN { require "./t/test_utils.pl"; }
 
 BEGIN { $Parallel::Forker::Debug = 1; }
 
-use Parallel::Forker;
-ok(1, "use");
+ SKIP:
+{
+    if (!$ENV{PARALLELFORKER_AUTHOR_SITE}) {
+	warn "(skip author only test)\n";
+	skip("author only test (harmless)", 3);
+    }
+    use Parallel::Forker;
+    ok(1, "use");
+    a_test();
+}
 
 ######################################################################
 
-a_test();
 
 sub a_test {
     my $failit = shift;
@@ -39,7 +47,8 @@ sub a_test {
 			run_on_start => sub {
 			    print "Start\n";
 			    #exec "ssh $Other_Host sleep 2;";
-			    exec "sleep 2;";
+			    #exec "sleep 1;";
+			    sleep 0.1;
 			    exit(0);
 			},
 			run_on_finish => sub {

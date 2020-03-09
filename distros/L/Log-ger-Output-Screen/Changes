@@ -1,3 +1,15 @@
+0.011   2020-03-07  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Rename variables for clarity.
+
+
+0.010   2020-03-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Log::ger 0.032.
+
+
 0.009   2020-02-06  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Check interactive on the correct handle, STDERR instead
@@ -34,4 +46,4 @@
 
 0.003    2017-06-21  Released-By: PERLANCAR
 
-         - First release, split from Log-err.
+         - First release, split from Log-ger.

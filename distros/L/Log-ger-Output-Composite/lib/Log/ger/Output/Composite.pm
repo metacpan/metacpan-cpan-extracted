@@ -1,7 +1,7 @@
 package Log::ger::Output::Composite;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2020-03-07'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 use strict;
 use warnings;
@@ -31,11 +31,11 @@ sub _get_min_max_level {
 }
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     # check arguments
-    for my $k (keys %conf) {
-        my $conf = $conf{$k};
+    for my $k (keys %plugin_conf) {
+        my $conf = $plugin_conf{$k};
         if ($k eq 'outputs') {
             for my $o (keys %$conf) {
                 for my $oconf (ref $conf->{$o} eq 'ARRAY' ?
@@ -56,7 +56,7 @@ sub get_hooks {
 
     my @ospecs;
     {
-        my $outputs = $conf{outputs};
+        my $outputs = $plugin_conf{outputs};
         for my $oname (sort keys %$outputs) {
             my $ospec0 = $outputs->{$oname};
             my @ospecs0;
@@ -80,20 +80,19 @@ sub get_hooks {
     }
 
     return {
-        create_logml_routine => [
+        create_log_routine => [
             __PACKAGE__, # key
-            50,          # priority
+            9,           # priority.
+            # we use a high priority to override Log::ger's default hook (at
+            # priority 10) which create null loggers for levels lower than the
+            # general level, since we want to do our own custom level checking.
             sub {        # hook
                 no strict 'refs';
                 require Data::Dmp;
 
                 my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
-                my $target = $hook_args{target};
-                my $target_arg = $hook_args{target_arg};
-
                 my $loggers = [];
-                my $logger_is_ml = [];
                 my $layouters = [];
                 for my $ospec (@ospecs) {
                     my $oname = $ospec->{_name};
@@ -101,34 +100,24 @@ sub get_hooks {
                     my $hooks = &{"$mod\::get_hooks"}(%{ $ospec->{conf} || {} })
                         or die "Output module $mod does not return any hooks";
                     my @hook_args = (
-                        target => $hook_args{target},
-                        target_arg => $hook_args{target_arg},
-                        init_args => $hook_args{init_args},
+                        routine_name    => $hook_args{routine_name},
+                        target_type     => $hook_args{target_type},
+                        target_name     => $hook_args{target_name},
+                        per_target_conf => $hook_args{per_target_conf},
                     );
                     my $res;
                     {
-                        if ($hooks->{create_logml_routine}) {
-                            $res = $hooks->{create_logml_routine}->[2]->(
-                                @hook_args);
-                            if ($res->[0]) {
-                                push @$loggers, $res->[0];
-                                push @$logger_is_ml, 1;
-                                last;
-                            }
-                        }
                         push @hook_args, (level => 60, str_level => 'trace');
                         if ($hooks->{create_log_routine}) {
                             $res = $hooks->{create_log_routine}->[2]->(
                                 @hook_args);
                             if ($res->[0]) {
                                 push @$loggers, $res->[0];
-                                push @$logger_is_ml, 0;
                                 last;
                             }
                         }
                         die "Output module $mod does not produce logger in ".
-                            "its create_logml_routine nor create_log_routine ".
-                                "hook";
+                            "its create_log_routine hook";
                     }
                     if ($ospec->{layout}) {
                         my $lname = $ospec->{layout}[0];
@@ -143,9 +132,9 @@ sub get_hooks {
                             or die "Layout module $mod does not declare ".
                             "layouter";
                         my @lhook_args = (
-                            target => $hook_args{target},
-                            target_arg => $hook_args{target_arg},
-                            init_args => $hook_args{init_args},
+                            target_type     => $hook_args{target_type},
+                            target_name     => $hook_args{target_name},
+                            per_target_conf => $hook_args{per_target_conf},
                         );
                         my $lres = $lhooks->{create_layouter}->[2]->(
                             @lhook_args) or die "Hook from layout module ".
@@ -167,10 +156,10 @@ sub get_hooks {
                 # package so they are addressable
                 my $varname = do {
                     my $suffix;
-                    if ($hook_args{target} eq 'package') {
-                        $suffix = $hook_args{target_arg};
+                    if ($hook_args{target_type} eq 'package') {
+                        $suffix = $hook_args{target_name};
                     } else {
-                        ($suffix) = "$hook_args{target_arg}" =~ /\(0x(\w+)/;
+                        ($suffix) = "$hook_args{target_name}" =~ /\(0x(\w+)/;
                     }
                     "Log::ger::Stash::OComposite_$suffix";
                 };
@@ -179,7 +168,7 @@ sub get_hooks {
                     ${$varname} = [];
                     ${$varname}->[0] = $loggers;
                     ${$varname}->[1] = $layouters;
-                    ${$varname}->[2] = $hook_args{init_args};
+                    ${$varname}->[2] = $hook_args{per_target_conf};
                 }
 
                 # generate our logger routine
@@ -187,7 +176,9 @@ sub get_hooks {
                 {
                     my @src;
                     push @src, "sub {\n";
-                    push @src, "  my (\$ctx, \$lvl, \$msg) = \@_;\n";
+                    push @src, "  my (\$per_target_conf, \$fmsg, \$per_msg_conf) = \@_;\n";
+                    push @src, "  my \$lvl; if (\$per_msg_conf) { \$lvl = \$per_msg_conf->{level} }", (defined $hook_args{level} ? " if (!defined \$lvl) { \$lvl = $hook_args{level} }" : ""), "\n";
+                    push @src, "  if (!\$per_msg_conf) { \$per_msg_conf = {level=>\$lvl} }\n"; # since we want to pass level etc to other outputs
 
                     for my $i (0..$#ospecs) {
                         my $ospec = $ospecs[$i];
@@ -195,9 +186,9 @@ sub get_hooks {
                         push @src, "  {\n";
 
                         # filter by output's category_level and category-level
-                        if ($ospec->{category_level} || $conf{category_level}) {
-                            push @src, "    my \$cat = \$ctx->{category} || ".
-                                "'';\n";
+                        if ($ospec->{category_level} || $plugin_conf{category_level}) {
+                            push @src, "    my \$cat = (\$per_msg_conf ? \$per_msg_conf->{category} : undef) || \$per_target_conf->{category} || '';\n";
+                            push @src, "    local \$per_msg_conf->{category} = \$cat;\n";
 
                             my @cats;
                             if ($ospec->{category_level}) {
@@ -206,9 +197,9 @@ sub get_hooks {
                                     push @cats, [$cat, 1, $clevel];
                                 }
                             }
-                            if ($conf{category_level}) {
-                                for my $cat (keys %{$conf{category_level}}) {
-                                    my $clevel = $conf{category_level}{$cat};
+                            if ($plugin_conf{category_level}) {
+                                for my $cat (keys %{$plugin_conf{category_level}}) {
+                                    my $clevel = $plugin_conf{category_level}{$cat};
                                     push @cats, [$cat, 2, $clevel];
                                 }
                             }
@@ -221,7 +212,7 @@ sub get_hooks {
                                 my ($min_level, $max_level) =
                                     _get_min_max_level($cat->[2]);
                                 push @src, "if (\$lvl >= $min_level && ".
-                                    "\$lvl <= $max_level) { goto L } else { last }";
+                                    "\$lvl <= $max_level) { goto LOG } else { last }";
                                 push @src, " }\n";
                             }
                             push @src, "\n";
@@ -232,18 +223,19 @@ sub get_hooks {
                             $ospec->{level});
                         if (defined $min_level) {
                             push @src, "    if (\$lvl >= $min_level && ".
-                                "\$lvl <= $max_level) { goto L } else { last }\n";
+                                "\$lvl <= $max_level) { goto LOG } else { last }\n";
                         }
 
                         # filter by general level
-                        push @src, "    if (\$Log::ger::Current_Level >= \$lvl) { goto L } else { last }\n";
+                        push @src, "    if (\$Log::ger::Current_Level >= \$lvl) { goto LOG } else { last }\n";
 
                         # run output's log routine
-                        if ($logger_is_ml->[$i]) {
-                            push @src, "    L: if (\$$varname\->[1][$i]) { \$$varname\->[0][$i]->(\$ctx, \$lvl, \$$varname\->[1][$i]->(\$msg, \$$varname\->[2], \$lvl, Log::ger::Util::string_level(\$lvl))) } else { \$$varname\->[0][$i]->(\$ctx, \$lvl, \$msg) }\n";
-                        } else {
-                            push @src, "    L: if (\$$varname\->[1][$i]) { \$$varname\->[0][$i]->(\$ctx,        \$$varname\->[1][$i]->(\$msg, \$$varname\->[2], \$lvl, Log::ger::Util::string_level(\$lvl))) } else { \$$varname\->[0][$i]->(\$ctx,        \$msg) }\n";
-                        }
+                        push @src, "    LOG:\n";
+                        push @src, "    if (\$$varname\->[1][$i]) {\n";
+                        push @src, "      \$$varname\->[0][$i]->(\$per_target_conf, \$$varname\->[1][$i]->(\$fmsg, \$$varname\->[2], \$lvl, Log::ger::Util::string_level(\$lvl)), \$per_msg_conf);\n";
+                        push @src, "    } else {\n";
+                        push @src, "      \$$varname\->[0][$i]->(\$per_target_conf, \$fmsg, \$per_msg_conf);\n";
+                        push @src, "    }\n";
                         push @src, "  }\n";
                         push @src, "  # end output #$i\n\n";
                     } # for ospec
@@ -251,7 +243,7 @@ sub get_hooks {
                     push @src, "};\n";
                     my $src = join("", @src);
                     if ($ENV{LOG_LOG_GER_OUTPUT_COMPOSITE_CODE}) {
-                        print STDERR "Log::ger::Output::Composite logger source code: <<$src>>\n";
+                        warn "Log::ger::Output::Composite logger source code (target type=$hook_args{target_type} target name=$hook_args{target_name}, routine name=$hook_args{routine_name}): <<$src>>\n";
                     }
 
                     $logger = eval $src;
@@ -281,7 +273,7 @@ Log::ger::Output::Composite - Composite output
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

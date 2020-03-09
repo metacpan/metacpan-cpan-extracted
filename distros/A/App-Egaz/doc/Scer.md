@@ -1,12 +1,13 @@
 # *Saccharomyces cerevisiae* strains
 
-[TOC levels=1-3]: # " "
+[TOC levels=1-3]: # ""
+
 - [*Saccharomyces cerevisiae* strains](#saccharomyces-cerevisiae-strains)
 - [Prepare sequences](#prepare-sequences)
 - [Detailed/alternative steps](#detailedalternative-steps)
-    - [lastz and lav2axt](#lastz-and-lav2axt)
-    - [lastz and lpcnam](#lastz-and-lpcnam)
-    - [lastz with partitioned sequences](#lastz-with-partitioned-sequences)
+  - [lastz and lav2axt](#lastz-and-lav2axt)
+  - [lastz and lpcnam](#lastz-and-lpcnam)
+  - [lastz with partitioned sequences](#lastz-with-partitioned-sequences)
 - [Template steps](#template-steps)
 
 
@@ -200,3 +201,4 @@ bash multi6/7_multi_aligndb.sh
 bash multi6/9_pack_up.sh
 
 ```
+

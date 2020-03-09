@@ -2,7 +2,7 @@ package App::Yath::Command::replay;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use App::Yath::Options;
 require App::Yath::Command::test;
@@ -417,7 +417,7 @@ Do not delete directories when done. This is useful if you want to inspect the d
 
 =item --no-summary
 
-Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extention is added automatically if omitted.
+Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extension is added automatically if omitted.
 
 
 =back

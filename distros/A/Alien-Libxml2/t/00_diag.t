@@ -15,6 +15,7 @@ $modules{$_} = $_ for qw(
   Alien::Build::MM
   Alien::Build::Plugin::Build::SearchDep
   Alien::Build::Plugin::Prefer::BadVersion
+  Alien::Build::Plugin::Probe::Vcpkg
   ExtUtils::CBuilder
   ExtUtils::MakeMaker
   Test2::V0
@@ -98,3 +99,4 @@ if($post_diag)
 spacer;
 
 done_testing;
+

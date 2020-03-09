@@ -25,8 +25,6 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-MSYS
-recommends:
-  Win32::Shortcut: '0'
 requires:
   Alien::Base: '0.038'
   Alien::Build: '0.99'
@@ -38,7 +36,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-MSYS/issues
   homepage: https://metacpan.org/pod/Alien::MSYS
   repository: git://github.com/Perl5-Alien/Alien-MSYS.git
-version: '0.12'
+version: '0.14'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.29'
   requires:
@@ -51,6 +49,9 @@ x_alienfile:
       URI: '0'
       URI::Escape: '0'
     system: {}
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Shawn Laffan (SLAFFAN, shawnlaffan)'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

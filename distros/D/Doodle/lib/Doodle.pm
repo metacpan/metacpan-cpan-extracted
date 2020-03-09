@@ -2,7 +2,14 @@ package Doodle;
 
 use 5.014;
 
-use Data::Object 'Class', 'Doodle::Library';
+use strict;
+use warnings;
+
+use registry 'Doodle::Library';
+use routines;
+
+use Data::Object::Class;
+use Data::Object::ClassHas;
 
 with 'Doodle::Helpers';
 
@@ -12,7 +19,7 @@ use Doodle::Command;
 use Doodle::Schema;
 use Doodle::Table;
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 has commands => (
   is => 'ro',
@@ -47,8 +54,8 @@ method schema(Str $name, Any %args) {
 method statements(Grammar $grammar) {
   my $statements = [];
 
-  for my $command ($self->commands->list) {
-    $statements->push($grammar->execute($command));
+  for my $command (@{$self->commands}) {
+    push @{$statements}, $grammar->execute($command);
   }
 
   return $statements;
@@ -57,7 +64,7 @@ method statements(Grammar $grammar) {
 method build(Grammar $grammar, CodeRef $callback) {
   my $statements = $self->statements($grammar);
 
-  for my $statement ($statements->list) {
+  for my $statement (@{$statements}) {
     $callback->($statement);
   }
 

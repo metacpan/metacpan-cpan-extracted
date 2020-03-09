@@ -1,7 +1,9 @@
 package Log::ger::Output::Screen;
 
-our $DATE = '2020-02-06'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger-Output-Screen'; # DIST
+our $VERSION = '0.011'; # VERSION
 
 use strict;
 use warnings;
@@ -51,14 +53,14 @@ sub hook_after_log {
 }
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
-    my $stderr = $conf{stderr};
+    my $stderr = $plugin_conf{stderr};
     $stderr = 1 unless defined $stderr;
     my $handle = $stderr ? \*STDERR : \*STDOUT;
     my $use_color = do {
-        if (defined $conf{use_color}) {
-            $conf{use_color};
+        if (defined $plugin_conf{use_color}) {
+            $plugin_conf{use_color};
         } elsif (exists $ENV{NO_COLOR}) {
             0;
         } elsif (defined $ENV{COLOR}) {
@@ -67,43 +69,17 @@ sub get_hooks {
             $stderr ? (-t STDERR) : (-t STDOUT);
         }
     };
-    my $formatter = $conf{formatter};
+    my $formatter = $plugin_conf{formatter};
 
     return {
-        # we provide two versions for testing, one using create_log_routine and
-        # one using create_logml_routine. by default, create_logml_routine will
-        # take precendence.
-
         create_log_routine => [
             __PACKAGE__, # key
             50,          # priority
             sub {        # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
                 my $logger = sub {
-                    my $level = $hook_args{level};
-                    my $msg = $_[1];
-                    if ($formatter) {
-                        $msg = $formatter->($msg);
-                    }
-                    hook_before_log({ _fh=>$handle }, $msg);
-                    if ($use_color) {
-                        print $handle _pick_color($level), $msg, "\e[0m";
-                    } else {
-                        print $handle $msg;
-                    }
-                    hook_after_log({ _fh=>$handle }, $msg);
-                };
-                [$logger];
-            }],
-        create_logml_routine => [
-            __PACKAGE__, # key
-            50,          # priority
-            sub {        # hook
-                my %hook_args = @_;
-                my $logger = sub {
-                    my $level = Log::ger::Util::numeric_level($_[1]);
-                    return if $level > $Log::ger::Current_Level;
-                    my $msg = $_[2];
+                    my ($per_target_conf, $msg, $per_msg_conf) = @_;
+                    my $level = $per_msg_conf ? $per_msg_conf->{level} : $hook_args{level};
                     if ($formatter) {
                         $msg = $formatter->($msg);
                     }
@@ -135,7 +111,7 @@ Log::ger::Output::Screen - Output log to screen
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 

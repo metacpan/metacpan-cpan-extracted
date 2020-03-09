@@ -11,7 +11,7 @@ use Tcl::pTk;
 my $mw  = MainWindow->new();
 $mw->geometry('+100+100');
 
-# This will skip if Tix not present
+# This will skip if Img not present
 my $imagePresent = $mw->interp->pkg_require('Img');
 
 

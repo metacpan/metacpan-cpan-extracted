@@ -32,8 +32,6 @@ my $o2 = object { name => 'Bob' };
 ok($o1->has_name);
 is($o1->name, 'Alice');
 
-my $o2 = object { name => 'Bob' };
-
 is(ref($o1), ref($o2));
 
 my $o3 = object { name => 'Carol' }, [qw/ name age /];

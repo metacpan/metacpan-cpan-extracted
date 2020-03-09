@@ -47,51 +47,51 @@
    "provides" : {
       "PPIx::QuoteLike" : {
          "file" : "lib/PPIx/QuoteLike.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "PPIx::QuoteLike::Constant" : {
          "file" : "lib/PPIx/QuoteLike/Constant.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "PPIx::QuoteLike::Dumper" : {
          "file" : "lib/PPIx/QuoteLike/Dumper.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "PPIx::QuoteLike::Token" : {
          "file" : "lib/PPIx/QuoteLike/Token.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "PPIx::QuoteLike::Token::Control" : {
          "file" : "lib/PPIx/QuoteLike/Token/Control.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "PPIx::QuoteLike::Token::Delimiter" : {
          "file" : "lib/PPIx/QuoteLike/Token/Delimiter.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "PPIx::QuoteLike::Token::Interpolation" : {
          "file" : "lib/PPIx/QuoteLike/Token/Interpolation.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "PPIx::QuoteLike::Token::String" : {
          "file" : "lib/PPIx/QuoteLike/Token/String.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "PPIx::QuoteLike::Token::Structure" : {
          "file" : "lib/PPIx/QuoteLike/Token/Structure.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "PPIx::QuoteLike::Token::Unknown" : {
          "file" : "lib/PPIx/QuoteLike/Token/Unknown.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "PPIx::QuoteLike::Token::Whitespace" : {
          "file" : "lib/PPIx/QuoteLike/Token/Whitespace.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "PPIx::QuoteLike::Utils" : {
          "file" : "lib/PPIx/QuoteLike/Utils.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -109,6 +109,6 @@
          "web" : "https://github.com/trwyant/perl-PPIx-QuoteLike"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

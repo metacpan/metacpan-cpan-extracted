@@ -11,7 +11,7 @@ use Parallel::Forker::Process;
 use strict;
 use vars qw($Debug $VERSION);
 
-$VERSION = '1.252';
+$VERSION = '1.254';
 
 ######################################################################
 #### CONSTRUCTOR
@@ -556,7 +556,7 @@ Print a dump of the execution tree.
 The latest version is available from CPAN and from
 L<https://www.veripool.org/parallel-forker>.
 
-Copyright 2002-2019 by Wilson Snyder.  This package is free software; you
+Copyright 2002-2020 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License
 Version 2.0.

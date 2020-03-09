@@ -29,8 +29,8 @@ sub attach_db {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $cur_attached;
     if ( -s $sf->{i}{f_attached_db} ) {
-        my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} );
-        $cur_attached = $h_ref->{$sf->{d}{db}} || [];
+        my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
+        $cur_attached = $h_ref->{$sf->{d}{db}} // [];
     }
     my $choices = [ undef, @{$sf->{d}{user_dbs}}, @{$sf->{d}{sys_dbs}} ];
     my $new_attached = [];
@@ -106,7 +106,7 @@ sub attach_db {
                     if ( ! @$new_attached ) {
                         return;
                     }
-                    my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} );
+                    my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
                     $h_ref->{$sf->{d}{db}} = [ sort( @$cur_attached, @$new_attached  ) ];
                     $ax->write_json( $sf->{i}{f_attached_db}, $h_ref );
                     return 1;
@@ -126,8 +126,8 @@ sub detach_db {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $attached_db;
     if ( -s $sf->{i}{f_attached_db} ) {
-        my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} );
-        $attached_db = $h_ref->{$sf->{d}{db}} || [];
+        my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
+        $attached_db = $h_ref->{$sf->{d}{db}} // [];
     }
     my @chosen;
 
@@ -152,7 +152,7 @@ sub detach_db {
             return;
         }
         elsif ( $idx == $#pre ) {
-            my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} );
+            my $h_ref = $ax->read_json( $sf->{i}{f_attached_db} ) // {};
             if ( @$attached_db ) {
                 $h_ref->{$sf->{d}{db}} = $attached_db;
             }

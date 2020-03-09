@@ -122,6 +122,16 @@ When $mode is 0, segment data are buffered in memory. You should call AWS::XRay-
 
 Set the host and port of the X-Ray daemon. Default 127.0.0.1:2000
 
+## $AWS::XRay::CROAK\_INVALID\_NAME
+
+When set to 1 (default 0), capture() will raise exception if a segment name is invalid.
+
+See https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html
+
+> name – The logical name of the service that handled the request, up to 200 characters.
+> For example, your application's name or domain name.
+> Names can contain Unicode letters, numbers, and whitespace, and the following symbols: \_, ., :, /, %, &, #, =, +, \\, -, @
+
 # LICENSE
 
 Copyright (C) FUJIWARA Shunichiro.

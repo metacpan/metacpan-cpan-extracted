@@ -1,0 +1,10 @@
+Revision history for Perl extension Test-PostgreSQL-Docker
+
+0.02 2020-03-07T08:54:30Z
+
+    - rename module name
+
+0.01 2020-03-07T08:47:06Z
+
+    - original version
+

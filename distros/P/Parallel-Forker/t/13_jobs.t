@@ -1,12 +1,13 @@
 #!/usr/bin/perl -w
 # DESCRIPTION: Perl ExtUtils: Type 'make test' to test this package
 #
-# Copyright 2003-2019 by Wilson Snyder.  This program is free software;
+# Copyright 2003-2020 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 ######################################################################
 
 use Test::More;
+use Time::HiRes qw(usleep sleep);
 use strict;
 
 BEGIN { plan tests => 4 }
@@ -33,7 +34,7 @@ sub a_test {
     for (my $i=0; $i<8; $i++) {
 	$fork->schedule(
 			run_on_start => sub {
-			    sleep 1;
+			    sleep 0.1;
 			},
 			run_on_finish => sub {
 			    my $running=0;

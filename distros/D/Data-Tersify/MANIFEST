@@ -2,6 +2,7 @@
 CHANGES
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
@@ -9,9 +10,13 @@ dist.ini
 lib/Data/Tersify.pm
 lib/Data/Tersify/Plugin.pm
 lib/Data/Tersify/Summary.pm
+lib/Data/Tersify/perldb.pm
 t/lib/Data/Tersify/Plugin/MoreComplicatedTest.pm
 t/lib/Data/Tersify/Plugin/Test.pm
 t/lib/TestObject.pm
+t/lib/TestObject/Overloaded.pm
+t/lib/TestObject/Overloaded/JustImport.pm
+t/lib/TestObject/Overloaded/OtherOperator.pm
 t/lib/TestObject/WithName.pm
 t/lib/TestObject/WithUUID.pm
 t/pod.t

@@ -1,0 +1,10 @@
+Revision history for App-supertouch},
+
+0.02      2020-03-07 18:20:39 -0700
+  - paths with trailing / or \ will create directory
+    instead of a file.
+
+0.01      2020-03-07 08:02:00 -0700
+  - initial version
+
+

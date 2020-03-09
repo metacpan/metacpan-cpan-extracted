@@ -21,8 +21,8 @@
         </div>
 
         <div class="row mt-4">
-            <div class="col-2">
-                <ul class="nav nav-pills flex-column">
+            <div class="col-12 col-lg-2">
+                <ul class="nav nav-pills justify-content-center flex-lg-column mb-4">
                     <li class="nav-item">
                         <a href="<%= url_for('minion_overview.dashboard') %>" class="nav-link <%= $self->current_route =~ m/minion\.overview\.dashboard/ ? 'active' : '' %>">
                             <i class="fa fa-poll"></i> Dashboard
@@ -52,7 +52,7 @@
                     -->
                 </ul>
             </div>
-            <div class="col-10">
+            <div class="col-12 col-lg-10">
                 %= content
             </div>
         </div>

@@ -1,18 +1,21 @@
 package Log::ger::Output::Null;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger'; # DIST
+our $VERSION = '0.033'; # VERSION
 
 sub get_hooks {
     return {
-        create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %hook_args = @_;
+        create_outputter => [
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
-                $Log::ger::_logger_is_null = 1;
-                my $logger = sub {0};
-                [$logger];
+                $Log::ger::_outputter_is_null = 1;
+                my $outputter = sub {0};
+                [$outputter];
             }],
     };
 }
@@ -32,7 +35,7 @@ Log::ger::Output::Null - Null output
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 

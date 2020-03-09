@@ -13,6 +13,7 @@ $modules{$_} = $_ for qw(
   Alien::Base
   Alien::Build
   Alien::Build::MM
+  Alien::Build::Plugin::Probe::Vcpkg
   Capture::Tiny
   ExtUtils::MakeMaker
   IPC::Cmd
@@ -106,3 +107,4 @@ if($post_diag)
 spacer;
 
 done_testing;
+

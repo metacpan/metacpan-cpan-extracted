@@ -1,36 +1,36 @@
 ---
 abstract: 'slide rule support for Perl'
 author:
-  - 'Jeremy Mates <jmates@cpan.org>'
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
 build_requires:
-  Pod::Coverage: '0.18'
+  Test::More: '0.88'
   Test::Most: '0'
-  Test::Pod: '1.22'
-  Test::Pod::Coverage: '1.08'
-  lib: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '6.48'
   strict: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+configure_requires:
+  CPAN::Meta: '2.142060'
+  Module::Build: '0.4004'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Math-SlideRule
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Math::SlideRule:
+    file: lib/Math/SlideRule.pm
+    version: '1.09'
+  Math::SlideRule::PickettPocket:
+    file: lib/Math/SlideRule/PickettPocket.pm
+    version: '1.09'
 requires:
   Moo: '0'
   Scalar::Util: '0'
   namespace::clean: '0'
-  perl: '5.010000'
+  perl: v5.10.0
+  strict: '0'
 resources:
-  bugtracker: https://github.com/thrig/Math-SlideRule/issues
-  homepage: https://github.com/thrig/Math-SlideRule
-  license: https://opensource.org/licenses/BSD-3-Clause
-  repository: git://github.com/thrig/Math-SlideRule.git
-version: '1.07'
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://github.com/thrig/Math-SlideRule
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

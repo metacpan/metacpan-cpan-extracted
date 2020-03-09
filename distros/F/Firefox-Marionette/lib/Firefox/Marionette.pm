@@ -44,7 +44,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -479,7 +479,29 @@ sub _build_local_extension_directory {
 
 sub _clean_local_extension_directory {
     my ($self) = @_;
-    delete $self->{_local_extension_directory};
+    if ( $self->{_local_extension_directory} ) {
+
+        # manual clearing of the directory to aid with win32 idiocy
+        my $handle = DirHandle->new( $self->{_local_extension_directory} )
+          or Firefox::Marionette::Exception->throw(
+"Failed to open directory '$self->{_local_extension_directory}':$EXTENDED_OS_ERROR"
+          );
+        my $cleaned = 1;
+        while ( my $entry = $handle->read() ) {
+            next if ( $entry eq File::Spec->updir() );
+            next if ( $entry eq File::Spec->curdir() );
+            my $path = File::Spec->catfile( $self->{_local_extension_directory},
+                $entry );
+            unlink $path or $cleaned = 0;
+        }
+        $handle->close()
+          or Firefox::Marionette::Exception->throw(
+"Failed to close directory '$self->{_local_extension_directory}':$EXTENDED_OS_ERROR"
+          );
+        if ($cleaned) {
+            delete $self->{_local_extension_directory};
+        }
+    }
     return;
 }
 
@@ -628,7 +650,7 @@ sub _setup_arguments {
     }
     else {
         my $profile_directory =
-          $self->_setup_new_profile( $parameters{profile} );
+          $self->_setup_new_profile( $parameters{profile}, %parameters );
         if ( $OSNAME eq 'cygwin' ) {
             $profile_directory =
               $self->execute( {}, 'cygpath', '-s', '-m', $profile_directory );
@@ -1863,7 +1885,7 @@ sub _make_remote_directory {
     return;
 }
 
-sub _setup_new_profile {
+sub _setup_profile_directories {
     my ( $self, $profile ) = @_;
     if ( ($profile) && ( $profile->download_directory() ) ) {
     }
@@ -1899,6 +1921,12 @@ sub _setup_new_profile {
           );
         $self->{_download_directory} = $download_directory;
     }
+    return;
+}
+
+sub _setup_new_profile {
+    my ( $self, $profile, %parameters ) = @_;
+    $self->_setup_profile_directories($profile);
     my $profile_path;
     if ( $self->_ssh() ) {
         $profile_path =
@@ -1915,9 +1943,52 @@ sub _setup_new_profile {
         }
     }
     else {
-        my %parameters = ( marionette => $self );
-        $profile = Firefox::Marionette::Profile->new(%parameters);
+        my %profile_parameters = ( marionette => $self );
+        if ( $parameters{chatty} ) {
+            $profile_parameters{chatty} = 1;
+        }
+        $profile = Firefox::Marionette::Profile->new(%profile_parameters);
         $profile->download_directory( $self->{_download_directory} );
+        my $bookmarks_path = $self->_setup_empty_bookmarks();
+        $profile->set_value( 'browser.bookmarks.file', $bookmarks_path, 1 );
+        if ( !$parameters{chatty} ) {
+            my $port = $self->_get_local_port_for_profile_urls();
+            $profile->set_value( 'media.gmp-manager.url',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'app.update.url',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'app.update.url.manual',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'browser.newtabpage.directory.ping',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'browser.newtabpage.directory.source',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'browser.selfsupport.url',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'extensions.systemAddon.update.url',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'dom.push.serverURL',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'services.settings.server',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'browser.safebrowsing.gethashURL',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'browser.safebrowsing.keyURL',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value(
+                'browser.safebrowsing.provider.mozilla.updateURL',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value(
+                'browser.safebrowsing.provider.mozilla.gethashURL',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value(
+                'browser.safebrowsing.provider.google4.updateURL',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'browser.safebrowsing.updateURL',
+                q[http://localhost:] . $port, 1 );
+            $profile->set_value( 'extensions.shield-recipe-client.api_url',
+                q[http://localhost:] . $port, 1 );
+        }
     }
     my $mime_types = join q[,], $self->mime_types();
     $profile->set_value( 'browser.helperApps.neverAsk.saveToDisk',
@@ -1943,6 +2014,80 @@ sub _setup_new_profile {
         $profile->save($profile_path);
     }
     return $self->{_profile_directory};
+}
+
+sub _get_local_port_for_profile_urls {
+    my ($self) = @_;
+    socket my $socket, Socket::PF_INET(), Socket::SOCK_STREAM(), 0
+      or Firefox::Marionette::Exception->throw(
+        "Failed to create a socket:$EXTENDED_OS_ERROR");
+    bind $socket, Socket::sockaddr_in( 0, Socket::INADDR_LOOPBACK() )
+      or Firefox::Marionette::Exception->throw(
+        "Failed to bind socket:$EXTENDED_OS_ERROR");
+    my $port = ( Socket::sockaddr_in( getsockname $socket ) )[0];
+    close $socket
+      or Firefox::Marionette::Exception->throw(
+        "Failed to close random socket:$EXTENDED_OS_ERROR");
+    return $port;
+}
+
+sub _setup_empty_bookmarks {
+    my ($self)  = @_;
+    my $now     = time;
+    my $content = <<"_HTML_";
+<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<!-- This is an automatically generated file.
+     It will be read and overwritten.
+     DO NOT EDIT! -->
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks Menu</H1>
+
+<DL><p>
+    <DT><H3 ADD_DATE="$now" LAST_MODIFIED="$now" PERSONAL_TOOLBAR_FOLDER="true">Bookmarks Toolbar</H3>
+    <DL><p>
+    </DL><p>
+    <DT><H3 ADD_DATE="$now" LAST_MODIFIED="$now" UNFILED_BOOKMARKS_FOLDER="true">Other Bookmarks</H3>
+    <DL><p>
+    </DL><p>
+</DL>
+_HTML_
+    my $path;
+    if ( $self->_ssh() ) {
+        my $handle = File::Temp::tempfile(
+            File::Spec->catfile(
+                File::Spec->tmpdir(),
+                'firefox_marionette_local_bookmarks_XXXXXXXXXXX'
+            )
+          )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to open temporary file for writing:$EXTENDED_OS_ERROR");
+        print {$handle} $content
+          or Firefox::Marionette::Exception->throw(
+            "Failed to write to temporary file:$EXTENDED_OS_ERROR");
+        seek $handle, 0, Fcntl::SEEK_SET()
+          or Firefox::Marionette::Exception->throw(
+            "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
+        $path = $self->_remote_catfile( $self->{_profile_directory},
+            'bookmarks.html' );
+        $self->_put_file_via_ssh( $handle, $path, 'bookmarks.html' );
+    }
+    else {
+        $path =
+          File::Spec->catfile( $self->{_profile_directory}, 'bookmarks.html' );
+        my $handle =
+          FileHandle->new( $path,
+            Fcntl::O_CREAT() | Fcntl::O_EXCL() | Fcntl::O_WRONLY() )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to open $path for writing:$EXTENDED_OS_ERROR");
+        $handle->print($content)
+          or Firefox::Marionette::Exception->throw(
+            "Failed to write to $path:$EXTENDED_OS_ERROR");
+        $handle->close()
+          or Firefox::Marionette::Exception->throw(
+            "Failed to close '$path':$EXTENDED_OS_ERROR");
+    }
+    return $path;
 }
 
 sub _save_profile_via_ssh {
@@ -3991,6 +4136,7 @@ sub quit {
               or Firefox::Marionette::Exception->throw(
                 "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
         }
+        $self->_terminate_xvfb();
     }
     elsif ( $self->_socket() ) {
         if ( $self->_session_id() ) {
@@ -4710,7 +4856,8 @@ sub _get_xpi_path {
         my $zip      = Archive::Zip->new();
         File::Find::find(
             {
-                wanted => sub {
+                no_chdir => 1,
+                wanted   => sub {
                     my $full_path = $File::Find::name;
                     my ( undef, undef, $file_name ) =
                       File::Spec->splitpath($path);
@@ -5042,7 +5189,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.95
+Version 0.96
 
 =head1 SYNOPSIS
 
@@ -5504,7 +5651,7 @@ returns a hashref representing the L<http archive|https://en.wikipedia.org/wiki/
     $firefox->go("http://metacpan.org/");
 
     $firefox->find('//input[@id="search-input"]')->type('Test::More');
-    $firefox->find_name('lucky')->click($element);
+    $firefox->find_name('lucky')->click();
 
     my $har = Archive::Har->new();
     $har->hashref($firefox->har());
@@ -5640,6 +5787,8 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * capabilities - use the supplied L<capabilities|Firefox::Marionette::Capabilities> object, for example to set whether the browser should L<accept insecure certs|Firefox::Marionette::Capabilities#accept_insecure_certs> or whether the browser should use a L<proxy|Firefox::Marionette::Proxy>.
 
+=item * chatty - Firefox is extremely chatty on the network, including checking for the lastest malware/phishing sites, updates to firefox/etc.  This option is therefore off ("0") by default, however, it can be switched on ("1") if required.  Even with chatty switched off, connections to firefox.settings.services.mozilla.com may still be made.  The only way to prevent this seems to be to set firefox.settings.services.mozilla.com to 127.0.0.1 via L</etc/hosts|https://en.wikipedia.org/wiki//etc/hosts>.  NOTE: that this option only works when profile_name/profile is not specified.
+
 =item * firefox - use the specified path to the L<Firefox|https://firefox.org/> binary, rather than the default path.
 
 =item * debug - should firefox's debug to be available via STDERR. This defaults to "0". Any ssh connections will also be printed to STDERR.
@@ -5660,9 +5809,11 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * profile - create a new profile based on the supplied L<profile|Firefox::Marionette::Profile>.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
 
-=item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  Note that L<firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
+=item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  L<Firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
 
 =item * script - a shortcut to allow directly providing the L<script|Firefox::Marionette::Timeout#script> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
+
+=item * seer - this option is switched off "0" by default.  When it is switched on "1", it will activate the various speculative and pre-fetch options for firefox.  NOTE: that this option only works when profile_name/profile is not specified.
 
 =item * sleep_time_in_ms - the amount of time (in milliseconds) that this module should sleep when unsuccessfully calling the subroutine provided to the L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods.  This defaults to "1" millisecond.
 
@@ -5684,11 +5835,16 @@ This method returns a new C<Firefox::Marionette> object, connected to an instanc
  
     use Firefox::Marionette();
 
-    my $remote_darwin_firefox = Firefox::Marionette->new( debug => 1, host => '10.1.2.3', firefox => '/Applications/Firefox.app/Contents/MacOS/firefox' );
+    my $remote_darwin_firefox = Firefox::Marionette->new(
+                     debug => 1,
+                     host => '10.1.2.3',
+                     trust => '/path/to/root_ca.pem',
+                     firefox => '/Applications/Firefox.app/Contents/MacOS/firefox'
+                                                        ); # start a temporary profile for a remote firefox and load a new CA into the temp profile
     ...
 
     foreach my $profile_name (Firefox::Marionette::Profile->names()) {
-        my $firefox_with_existing_profile = Firefox::Marionette->new( profile_name => $profile_name, trust => "/path/to/root_ca.pem", visible => 1 );
+        my $firefox_with_existing_profile = Firefox::Marionette->new( profile_name => $profile_name, visible => 1 );
         ...
     }
 

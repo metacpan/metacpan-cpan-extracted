@@ -7,7 +7,7 @@ use Acme::Alien::DontPanic ();
 use FFI::Platypus::Declare;
 
 # ABSTRACT: FFI test module for Alien::Base
-our $VERSION = '2.0400'; # VERSION
+our $VERSION = '2.1100'; # VERSION
 
 
 our($dll) = Acme::Alien::DontPanic->dynamic_libs;
@@ -30,7 +30,7 @@ Acme::Ford::Prefect::FFI - FFI test module for Alien::Base
 
 =head1 VERSION
 
-version 2.0400
+version 2.1100
 
 =head1 SYNOPSIS
 

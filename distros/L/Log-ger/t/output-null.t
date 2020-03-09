@@ -12,7 +12,7 @@ use Log::ger;
 package main;
 
 subtest "basics" => sub {
-    Log::ger::Util::reset_hooks('create_log_routine');
+    Log::ger::Util::reset_hooks('create_outputter');
     require Log::ger::Output;
     Log::ger::Output->set('Null');
     my $h = {}; Log::ger::init_target(hash => $h);

@@ -4,7 +4,7 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -64,103 +64,102 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::Differences" : "0",
-            "Test::More" : "0.88",
-            "base" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Games::Solitaire::Verify" : {
          "file" : "lib/Games/Solitaire/Verify.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::App::CmdLine" : {
          "file" : "lib/Games/Solitaire/Verify/App/CmdLine.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::App::CmdLine::Expand" : {
          "file" : "lib/Games/Solitaire/Verify/App/CmdLine/Expand.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::App::CmdLine::From_Patsolve" : {
          "file" : "lib/Games/Solitaire/Verify/App/CmdLine/From_Patsolve.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::App::Golf" : {
          "file" : "lib/Games/Solitaire/Verify/App/Golf.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Base" : {
          "file" : "lib/Games/Solitaire/Verify/Base.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Card" : {
          "file" : "lib/Games/Solitaire/Verify/Card.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Column" : {
          "file" : "lib/Games/Solitaire/Verify/Column.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Exception" : {
          "file" : "lib/Games/Solitaire/Verify/Exception.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Foundations" : {
          "file" : "lib/Games/Solitaire/Verify/Foundations.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Freecells" : {
          "file" : "lib/Games/Solitaire/Verify/Freecells.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Golf" : {
          "file" : "lib/Games/Solitaire/Verify/Golf.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::HorneAutomovePrune" : {
          "file" : "lib/Games/Solitaire/Verify/HorneAutomovePrune.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::KlondikeTalon" : {
          "file" : "lib/Games/Solitaire/Verify/KlondikeTalon.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Move" : {
          "file" : "lib/Games/Solitaire/Verify/Move.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Solution" : {
          "file" : "lib/Games/Solitaire/Verify/Solution.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Solution::Base" : {
          "file" : "lib/Games/Solitaire/Verify/Solution/Base.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Solution::ExpandMultiCardMoves" : {
          "file" : "lib/Games/Solitaire/Verify/Solution/ExpandMultiCardMoves.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::Lax" : {
          "file" : "lib/Games/Solitaire/Verify/Solution/ExpandMultiCardMoves/Lax.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::State" : {
          "file" : "lib/Games/Solitaire/Verify/State.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::State::LaxParser" : {
          "file" : "lib/Games/Solitaire/Verify/State/LaxParser.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::VariantParams" : {
          "file" : "lib/Games/Solitaire/Verify/VariantParams.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       },
       "Games::Solitaire::Verify::VariantsMap" : {
          "file" : "lib/Games/Solitaire/Verify/VariantsMap.pm",
-         "version" : "0.2202"
+         "version" : "0.2300"
       }
    },
    "release_status" : "stable",
@@ -175,10 +174,10 @@
          "web" : "https://github.com/shlomif/fc-solve"
       }
    },
-   "version" : "0.2202",
+   "version" : "0.2300",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028002"
+         "version" : "5.030001"
       },
       "plugins" : [
          {
@@ -190,17 +189,17 @@
                }
             },
             "name" : "@Filter/TestMoreDoneTesting",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@Filter/AutoPrereqs",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Filter/ExecDir",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -216,38 +215,38 @@
                }
             },
             "name" : "@Filter/GatherDir",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Filter/License",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Filter/ManifestSkip",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Filter/MetaYAML",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Filter/PruneCruft",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "@Filter/Readme",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
+                  "default_jobs" : "4"
                }
             },
             "name" : "@Filter/RunExtraTests",
@@ -256,7 +255,7 @@
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Filter/ShareDir",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
@@ -266,22 +265,22 @@
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Filter/ConfirmRelease",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Filter/Manifest",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Filter/MetaConfig",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Filter/MetaJSON",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -291,7 +290,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.012"
+                        "version" : "6.014"
                      }
                   ],
                   "include_underscores" : 0
@@ -303,7 +302,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -313,32 +312,32 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@Filter/MetaResources",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::ModuleBuild",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
+                  "default_jobs" : "4"
                }
             },
             "name" : "@Filter/ModuleBuild",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "@Filter/PkgVersion",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Filter/PodCoverageTests",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Filter/PodSyntaxTests",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -407,7 +406,7 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@Filter/TestRelease",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -419,6 +418,16 @@
                   ],
                   "plugins" : [
                      {
+                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
+                        "name" : "@SHLOMIF/SingleEncoding",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::WikiDoc",
+                        "name" : "@SHLOMIF/WikiDoc",
+                        "version" : "0.093004"
+                     },
+                     {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
                         "version" : "4.015"
@@ -429,79 +438,109 @@
                         "version" : "4.015"
                      },
                      {
-                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
-                        "name" : "-SingleEncoding",
-                        "version" : "4.015"
-                     },
-                     {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "NAME",
+                        "name" : "@SHLOMIF/Name",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
-                        "name" : "Version",
+                        "name" : "@SHLOMIF/Version",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
-                        "name" : "prelude",
+                        "name" : "@SHLOMIF/Prelude",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "SYNOPSIS",
+                        "name" : "@SHLOMIF/Synopsis",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "DESCRIPTION",
+                        "name" : "@SHLOMIF/Description",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "OVERVIEW",
+                        "name" : "@SHLOMIF/Usage",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Overview",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Stability",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
-                        "name" : "ATTRIBUTES",
+                        "name" : "Requirements",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
-                        "name" : "METHODS",
+                        "name" : "Attributes",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Constructors",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Methods",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Functions",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
-                        "name" : "Leftovers",
+                        "name" : "@SHLOMIF/Leftovers",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
-                        "name" : "postlude",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Authors",
-                        "name" : "Authors",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Legal",
-                        "name" : "Legal",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Bugs",
-                        "name" : "Bugs",
+                        "name" : "@SHLOMIF/postlude",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Support",
-                        "name" : "Support",
-                        "version" : "1.010"
+                        "name" : "@SHLOMIF/Support",
+                        "version" : "1.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Authors",
+                        "name" : "@SHLOMIF/Authors",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Bugs",
+                        "name" : "@SHLOMIF/Bugs",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Contributors",
+                        "name" : "@SHLOMIF/Contributors",
+                        "version" : "0.009"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Legal",
+                        "name" : "@SHLOMIF/Legal",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Transformer",
+                        "name" : "@SHLOMIF/List",
+                        "version" : "4.015"
                      }
                   ]
                }
@@ -512,12 +551,12 @@
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/UploadToCPAN",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "ExecDir",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -528,7 +567,7 @@
                }
             },
             "name" : "Runtime",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
@@ -554,57 +593,57 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.012"
+            "version" : "6.014"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.012"
+            "version" : "6.014"
          }
       ],
       "zilla" : {
@@ -612,10 +651,11 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.012"
+         "version" : "6.014"
       }
    },
-   "x_generated_by_perl" : "v5.28.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "x_generated_by_perl" : "v5.30.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "MIT"
 }
 

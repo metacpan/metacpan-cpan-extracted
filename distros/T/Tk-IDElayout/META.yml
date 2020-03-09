@@ -1,7 +1,7 @@
 ---
-abstract: 'Tk Widget for Layout of Frames Similar to an IDE'
+abstract: unknown
 author:
-  - 'jcerney@home.com (John Cerney)'
+  - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -17,11 +17,14 @@ no_index:
   directory:
     - t
     - inc
+  package:
+    - Tk
+    - Tk::CaptureRelease
 requires:
   Graph: '0.20105'
   Tk: '804.027'
   Tk::DynaTabFrame: '0.23'
 resources:
   repository: https://github.com/asb-capfan/Tk-IDElayout.git
-version: '0.34'
+version: '0.35'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

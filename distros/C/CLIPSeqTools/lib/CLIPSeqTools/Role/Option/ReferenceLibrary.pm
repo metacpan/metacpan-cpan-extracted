@@ -43,13 +43,14 @@ Role to enable reading reference libraries with reads from the command line
 
 
 package CLIPSeqTools::Role::Option::ReferenceLibrary;
-$CLIPSeqTools::Role::Option::ReferenceLibrary::VERSION = '0.1.8';
+$CLIPSeqTools::Role::Option::ReferenceLibrary::VERSION = '0.1.9';
 
 #######################################################################
 #######################   Load External modules   #####################
 #######################################################################
 use Modern::Perl;
 use MooseX::App::Role;
+use MooseX::Getopt;
 
 
 #######################################################################

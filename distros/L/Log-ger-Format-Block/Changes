@@ -1,4 +1,9 @@
-0.005   2017-08-01 (PERLANCAR)
+0.006   2020-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Log::ger 0.033 (rename routine name log_* -> logger_*).
+
+
+0.005   2017-08-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,23 +11,23 @@
 	  applies formatting locally instead of globally).
 
 
-0.004   2017-06-30 (PERLANCAR)
+0.004   2017-06-30  Released-By: PERLANCAR
 
 	- Adjust to Log::ger 0.011.
 
 
-0.003   2017-06-25 (PERLANCAR)
+0.003   2017-06-25  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Fix example in Synopsis.
 
 
-0.002   2017-06-23 (PERLANCAR)
+0.002   2017-06-23  Released-By: PERLANCAR
 
 	- Adjust to Log::ger 0.005.
 
 
-0.001    2017-06-21 (PERLANCAR)
+0.001    2017-06-21  Released-By: PERLANCAR
 
          - First release.

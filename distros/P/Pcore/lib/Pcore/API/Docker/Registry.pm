@@ -2,23 +2,11 @@ package Pcore::API::Docker::Registry;
 
 use Pcore -class, -const, -res;
 
-has username => ( required => 1 );
-has token    => ( required => 1 );
-has repo_id  => ( required => 1 );
-
 has _token => ( init_arg => undef );
 
 const our $BASE_URL => 'https://hub.docker.com/v2';
 
 # https://docs.docker.com/registry/spec/api/
-
-sub BUILDARGS ( $self, $args = undef ) {
-    $args->{username} ||= $ENV->user_cfg->{DOCKERHUB}->{username};
-
-    $args->{token} ||= $ENV->user_cfg->{DOCKERHUB}->{token};
-
-    return $args;
-}
 
 # https://docs.docker.com/registry/spec/auth/token/
 sub _authenticate ($self) {
@@ -125,10 +113,10 @@ sub catalog ( $self ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 24                   | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_authenticate' declared but not     |
+## |    3 | 12                   | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_authenticate' declared but not     |
 ## |      |                      | used                                                                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 112                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 100                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

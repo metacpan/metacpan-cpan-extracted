@@ -18,8 +18,11 @@ t/05_sampled_header.t
 t/06_sampler.t
 t/07_buffer.t
 t/08_add.t
-t/09_plugin.t
 t/09_wantarray.t
+t/10_plugin_ec2_v1.t
+t/10_plugin_ec2_v2.t
+t/11_valid_name.t
+t/12_croak_capture.t
 t/Util.pm
 xt/01_overhead.t
 META.yml

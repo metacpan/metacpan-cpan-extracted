@@ -2,7 +2,7 @@ NAME
     Log::ger::Plugin::OptAway - Optimize away log statements
 
 VERSION
-    version 0.007
+    version 0.008
 
 SYNOPSIS
      use Log::ger::Plugin->set('OptAway');

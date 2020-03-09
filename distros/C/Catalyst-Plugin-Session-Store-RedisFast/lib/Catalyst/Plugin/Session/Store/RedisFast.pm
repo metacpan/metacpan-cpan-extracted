@@ -14,7 +14,7 @@ use base qw/
     Class::Data::Inheritable
     /;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 __PACKAGE__->mk_classdata(qw/_session_redis_storage/);
 
@@ -135,7 +135,7 @@ Catalyst::Plugin::Session::Store::RedisFast - Redis Session store for Catalyst f
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSYS
 

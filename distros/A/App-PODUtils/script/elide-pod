@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-02-28'; # DATE
-our $VERSION = '0.046'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.047'; # VERSION
 
 use 5.010001;
 use strict;
@@ -81,7 +81,7 @@ elide-pod - Elide POD
 
 =head1 VERSION
 
-This document describes version 0.046 of elide-pod (from Perl distribution App-PODUtils), released on 2020-02-28.
+This document describes version 0.047 of elide-pod (from Perl distribution App-PODUtils), released on 2020-03-08.
 
 =head1 SYNOPSIS
 

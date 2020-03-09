@@ -1,0 +1,83 @@
+{
+   "abstract" : "A Postgresql mock server for testing perl programs",
+   "author" : [
+      "Satoshi Azuma <ytnobody@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.5",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-PostgreSQL-Docker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::Pg" : "0",
+            "DBI" : "0",
+            "Guard" : "0",
+            "Net::EmptyPort" : "0",
+            "Sub::Retry" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Test::PostgreSQL::Docker" : {
+         "file" : "lib/Test/PostgreSQL/Docker.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ytnobody/p5-Test-PostgreSQL-Docker/issues"
+      },
+      "homepage" : "https://github.com/ytnobody/p5-Test-PostgreSQL-Docker",
+      "repository" : {
+         "url" : "git://github.com/ytnobody/p5-Test-PostgreSQL-Docker.git",
+         "web" : "https://github.com/ytnobody/p5-Test-PostgreSQL-Docker"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:YTURTLE",
+   "x_contributors" : [
+      "makamaka <makamaka.donzoko@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
+}

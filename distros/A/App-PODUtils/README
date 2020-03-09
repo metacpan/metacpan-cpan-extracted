@@ -2,8 +2,8 @@ NAME
     App::PODUtils - Command-line utilities related to POD
 
 VERSION
-    This document describes version 0.046 of App::PODUtils (from Perl
-    distribution App-PODUtils), released on 2020-02-28.
+    This document describes version 0.047 of App::PODUtils (from Perl
+    distribution App-PODUtils), released on 2020-03-08.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -60,7 +60,7 @@ FUNCTIONS
 
      reverse_pod_headings(%args) -> any
 
-    .
+    Reverse POD headings.
 
     This function is not exported.
 
@@ -82,7 +82,47 @@ FUNCTIONS
 
      sort_pod_headings(%args) -> any
 
-    .
+    Sort POD headings in text.
+
+    This utility sorts POD headings in text. By default it sorts =head1
+    headings. For example this POD:
+
+     =head1 b
+ 
+     some text for b
+ 
+     =head1 a
+ 
+     text for a
+ 
+     =head2 a2
+ 
+     =head2 a1
+ 
+     =head1 c
+ 
+     text for c
+
+    will be sorted into:
+
+     =head1 a
+ 
+     text for a
+ 
+     =head2 a2
+ 
+     =head2 a1
+ 
+     =head1 b
+ 
+     some text for b
+ 
+     =head1 c
+ 
+     text for c
+
+    Note that the =head2 headings are not sorted. If you want to sort those,
+    you can rerun the utility and specify the "--command=head2" option.
 
     This function is not exported.
 
@@ -123,7 +163,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    pomdump. Perinci::To::POD=HASH(0x560307ca92c0).
+    pomdump. Perinci::To::POD=HASH(0x55aa003ac738).
 
     podsel.
 

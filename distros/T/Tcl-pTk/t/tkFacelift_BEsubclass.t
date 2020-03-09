@@ -38,14 +38,6 @@ unless ($Tcl::pTk::_Tile_available) {
     exit;
 }
  
-# This will skip if Tix not present
-my $retVal = $top->interp->pkg_require('Tix');
-
-unless( $retVal){
-    print "1..0 # Skipped: Tix Tcl package not available\n";
-    exit;
-}
-
 plan tests => 2;
 
 
@@ -79,6 +71,4 @@ ok(scalar(@components), 1, "Facelifted BrowseEntry Subclass Components = 1");
 $be2->pack(-side => 'top', -fill => 'x', -expand => 1);
 
 
-MainLoop if(@ARGV); # For debugging only, enter the mainloop if args supplied on the command line
-
-
+(@ARGV) ? MainLoop : $top->destroy; # For debugging only, enter the mainloop if args supplied on the command line

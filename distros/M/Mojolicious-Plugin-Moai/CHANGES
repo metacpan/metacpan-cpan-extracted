@@ -1,5 +1,24 @@
 Changelog for Mojolicious-Plugin-Moai
 
+0.011     2020-03-07 15:38:36-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed regression causing failures on case-sensitive file systems.
+      Thanks CPAN Testers and Travis-CI!
+
+0.010     2020-03-05 23:29:55-06:00 America/Chicago
+
+    [Added]
+
+    - Added a grid template for using a library's grid system
+    - Added a default layout
+
+    [Fixed]
+
+    - Fixed the documentation examples to pass an arrayref when
+      registering the plugin, as expected
+
 0.009     2020-02-27 22:03:51-06:00 America/Chicago
 
     [Added]

@@ -1,3 +1,8 @@
+0.494   2020-03-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump generated prereq version Log::ger 0.027 -> 0.033.
+
+
 0.493   2020-02-18  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Add workaround to disabling [Rinci::Wrap] by setting

@@ -41,7 +41,7 @@ sub __print_args {
     my $term_w = get_term_width();
     my @tmp = ( 'Table Data:' );
     for my $row ( @$aoa ) {
-        push @tmp, line_fold( join( ', ', @$row ), $term_w, { subseq_tab => ' ' x 4 } );
+        push @tmp, line_fold( join( ', ', @$row ), $term_w, { subseq_tab => ' ' x 4, join => 0 } );
     }
     my $str = join( "\n", @tmp ) . "\n\n";
     print clear_screen();
@@ -144,7 +144,7 @@ sub from_copy_and_paste {
     print clear_screen();
     print show_cursor();
     print "Paste multi-row:  (then press Ctrl-D)\n";
-    my $file_fs = $sf->{i}{f_copy_paste};
+    my $file_fs = $sf->{i}{f_copy_and_paste};
     if ( ! eval {
         open my $fh_in, '>', $file_fs or die $!;
         # STDIN
@@ -257,16 +257,16 @@ sub __directory {
         return realpath $dir_fs; # available in the prompt menu only if history_dirs == 1, therefore `return $dir_fs;`
     }
     if ( $sf->{o}{insert}{history_dirs} == 1 ) {
-        my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} );
-        if ( @{$h_ref->{dirs}||[]} ) {
+        my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} ) // {};
+        if ( @{$h_ref->{dirs}//[]} ) {
             return realpath encode 'locale_fs', $h_ref->{dirs}[0];
         }
     }
     $sf->{i}{gc}{old_dir_idx} //= 1;
 
     DIR: while ( 1 ) {
-        my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} );
-        my @dirs = sort @{$h_ref->{dirs}||[]};
+        my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} ) // {};
+        my @dirs = sort @{$h_ref->{dirs}//[]};
         my $hidden = "Choose a dir:";
         my $new_search = '  NEW search';
         my @pre = ( $hidden, undef, $new_search );
@@ -316,8 +316,8 @@ sub __directory {
 sub __add_to_history {
     my ( $sf, $dir_fs ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} );
-    my $dirs_fs = [ map { realpath encode( 'locale_fs', $_ ) } @{$h_ref->{dirs}||[]} ];
+    my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} ) // {};
+    my $dirs_fs = [ map { realpath encode( 'locale_fs', $_ ) } @{$h_ref->{dirs}//[]} ];
     unshift @$dirs_fs, $dir_fs;
     @$dirs_fs = uniq @$dirs_fs;
     if ( @$dirs_fs > $sf->{o}{insert}{history_dirs} ) {
@@ -339,6 +339,14 @@ sub __file_setting_menu_entries {
         { name => 'history_dirs',       text => "- Dir History",   section => 'insert' },
         { name => '_file_encoding',     text => "- File Encoding", section => 'insert' },
     ];
+    #if ( $sf->{o}{insert}{data_source} == 2 ) {
+    #    unshift @$options,
+    #    { name => '_parse_file',    text => "- Parse tool for File",         section => 'insert' },
+    #    { name => '_parse_copy',    text => "- Parse tool for Copy & Paste", section => 'insert' },
+    #    { name => '_split_config',  text => "- Settings 'split'",            section => 'split'  },
+    #    { name => '_csv_char',      text => "- Settings 'CSV-a'",            section => 'csv'    },
+    #    { name => '_csv_options',   text => "- Settings 'CSV-b'",            section => 'csv'    };
+    #}
     if ( $sf->{o}{insert}{history_dirs} == 1 ) {
         push @$options, { name => 'add_file_dir', text => "- NEW search", section => 'insert' };
     }

@@ -8,6 +8,7 @@ lib/App/Greple/subst.pm
 minil.toml
 share/jtca-katakana-guide-3.dict
 share/jtca-katakana-guide-3.pl
+share/sccc2.dict
 t/00_compile.t
 META.yml
 MANIFEST

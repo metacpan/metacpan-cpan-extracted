@@ -5,21 +5,18 @@ use Pcore -class, -const, -res;
 const our $API_VER               => 'v1.40';
 const our $DEFAULT_BUILD_TIMEOUT => 60 * 60 * 2;    # 2 hours
 
-has username => sub { $ENV->user_cfg->{DOCKERHUB}->{username} };
-has token    => sub { $ENV->user_cfg->{DOCKERHUB}->{token} };
-
 has host          => '/var/run/docker.sock';
 has build_timeout => $DEFAULT_BUILD_TIMEOUT;
 
-# NOTE https://docs.docker.com/engine/api/v1.39/
+# NOTE https://docs.docker.com/engine/api/v1.40/
 
 # IMAGES
-# https://docs.docker.com/engine/api/v1.39/#operation/ImageList
+# https://docs.docker.com/engine/api/v1.40/#operation/ImageList
 sub get_images ($self) {
     return $self->_req( 'GET', 'images/json' );
 }
 
-# https://docs.docker.com/engine/api/v1.39/#operation/ImageBuild
+# https://docs.docker.com/engine/api/v1.40/#operation/ImageBuild
 sub image_build ( $self, $tar, $tags ) {
     my $params = [
 
@@ -64,8 +61,13 @@ sub image_build ( $self, $tar, $tags ) {
     return res 200, $image_id;
 }
 
-# https://docs.docker.com/engine/api/v1.39/#operation/ImagePush
+# https://docs.docker.com/engine/api/v1.40/#operation/ImagePush
 sub image_push ( $self, $tag ) {
+    my $registry = $self->get_image_registry($tag);
+
+    my $username = $ENV->user_cfg->{DOCKER}->{registry}->{$registry}->{username};
+    my $token    = $ENV->user_cfg->{DOCKER}->{registry}->{$registry}->{token};
+
     my $url = $self->_create_url("images/$tag/push");
 
     my $res = P->http->request(
@@ -74,8 +76,8 @@ sub image_push ( $self, $tag ) {
         headers => [
             'X-Registry-Auth' => P->data->to_b64(
                 P->data->to_json( {
-                    username => $self->{username},
-                    password => $self->{token},
+                    username => $username,
+                    password => $token,
                 } ),
                 $EMPTY
             ),
@@ -83,14 +85,22 @@ sub image_push ( $self, $tag ) {
         timeout => undef,
     );
 
+    if ($res) {
+        for my $log ( split /\r\n/sm, $res->{data}->$* ) {
+            my $data = P->data->from_json($log);
+
+            return res [ 500, $data->{error} ] if $data->{error};
+        }
+    }
+
     return $res;
 }
 
-# https://docs.docker.com/engine/api/v1.39/#operation/ImageDelete
+# https://docs.docker.com/engine/api/v1.40/#operation/ImageDelete
 sub image_remove ( $self, $tag, $force = undef ) {
     my $url = $self->_create_url("images/$tag");
 
-    $url .= "?force=1" if $force;
+    $url .= '?force=1' if $force;
 
     my $res = P->http->request(
         method  => 'DELETE',
@@ -102,7 +112,7 @@ sub image_remove ( $self, $tag, $force = undef ) {
 }
 
 # CONTAINERS
-# https://docs.docker.com/engine/api/v1.39/#operation/ContainerList
+# https://docs.docker.com/engine/api/v1.40/#operation/ContainerList
 sub get_containers ($self) {
     return $self->_req( 'GET', 'containers/json' );
 }
@@ -134,17 +144,15 @@ sub _create_url ( $self, $path ) {
     return $url;
 }
 
+sub get_image_registry ( $self, $image ) {
+    my ($registry) = $image =~ m[\A(.+?)/]sm;
+
+    $registry = $EMPTY if $registry !~ /(?:[.]|:)/sm;
+
+    return $registry;
+}
+
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 93                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

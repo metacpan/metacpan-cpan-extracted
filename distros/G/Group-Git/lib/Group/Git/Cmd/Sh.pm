@@ -16,7 +16,7 @@ use File::chdir;
 use Getopt::Alt;
 use Path::Tiny;
 
-our $VERSION = version->new('0.7.3');
+our $VERSION = version->new('0.7.4');
 
 requires 'repos';
 requires 'verbose';
@@ -78,7 +78,7 @@ Group::Git::Cmd::Sh - Runs shell script in each git project
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::Sh version 0.7.3.
+This documentation refers to Group::Git::Cmd::Sh version 0.7.4.
 
 =head1 SYNOPSIS
 

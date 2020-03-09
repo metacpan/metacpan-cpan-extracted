@@ -1,0 +1,68 @@
+{
+   "abstract" : "a game featuring @ versus the Xarci Bedo",
+   "author" : [
+      "Jeremy Mates <jeremy.mates@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Game-Xomb",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "2.142060",
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "0",
+            "List::UtilsBy" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Term::ReadKey" : "0",
+            "Time::HiRes" : "0",
+            "XSLoader" : "0",
+            "perl" : "v5.24.0",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test::More" : "0.88",
+            "Test::Most" : "0",
+            "Test::UnixCmdWrap" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Game::Xomb" : {
+         "file" : "lib/Game/Xomb.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://github.com/thrig/Game-Xomb"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

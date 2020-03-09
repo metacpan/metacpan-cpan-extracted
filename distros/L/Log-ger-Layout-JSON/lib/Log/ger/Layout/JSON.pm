@@ -1,7 +1,9 @@
 package Log::ger::Layout::JSON;
 
-our $DATE = '2017-06-28'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger-Layout-JSON'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +40,7 @@ Log::ger::Layout::JSON - Layout log message as a JSON object (hash)
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::Layout::JSON (from Perl distribution Log-ger-Layout-JSON), released on 2017-06-28.
+This document describes version 0.002 of Log::ger::Layout::JSON (from Perl distribution Log-ger-Layout-JSON), released on 2020-03-07.
 
 =head1 SYNOPSIS
 
@@ -132,7 +134,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

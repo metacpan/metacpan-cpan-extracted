@@ -1,6 +1,9 @@
 use 5.014;
 
-use Do;
+use strict;
+use warnings;
+use routines;
+
 use Test::Auto;
 use Test::More;
 
@@ -25,13 +28,13 @@ Doodle Type Library
 =description
 
 Doodle::Library is the L<Doodle> type library derived from
-L<Data::Object::Library> which is a L<Type::Library>.
+L<Data::Object::Types> which is a L<Type::Library>.
 
 =cut
 
 =libraries
 
-Data::Object::Library
+Data::Object::Types
 
 =cut
 

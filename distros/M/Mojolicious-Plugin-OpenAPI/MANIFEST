@@ -38,7 +38,9 @@ t/plugin-security-v2.t
 t/plugin-security-v3.t
 t/plugin-spec-renderer-doc.t
 t/plugin-spec-renderer-options.t
+t/plugin-spec-renderer-standalone.t
 t/spec/bundlecheck.json
+t/spec/v2-petstore.json
 t/spec/v3-invalid_file_refs.yaml
 t/spec/v3-invalid_file_refs_no_path.yaml
 t/spec/v3-invalid_include.yaml

@@ -98,6 +98,7 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin/Probe.pod"                   => "\$(INST_LIB)/Alien/Build/Plugin/Probe.pod",
     "lib/Alien/Build/Plugin/Probe/CBuilder.pm"           => "\$(INST_LIB)/Alien/Build/Plugin/Probe/CBuilder.pm",
     "lib/Alien/Build/Plugin/Probe/CommandLine.pm"        => "\$(INST_LIB)/Alien/Build/Plugin/Probe/CommandLine.pm",
+    "lib/Alien/Build/Plugin/Probe/Vcpkg.pm"              => "\$(INST_LIB)/Alien/Build/Plugin/Probe/Vcpkg.pm",
     "lib/Alien/Build/Plugin/Test/Mock.pm"                => "\$(INST_LIB)/Alien/Build/Plugin/Test/Mock.pm",
     "lib/Alien/Build/Temp.pm"                            => "\$(INST_LIB)/Alien/Build/Temp.pm",
     "lib/Alien/Build/Util.pm"                            => "\$(INST_LIB)/Alien/Build/Util.pm",
@@ -131,7 +132,7 @@ my %WriteMakefileArgs = (
     "Test2::API" => "1.302096",
     "Test2::V0"  => "0.000060"
   },
-  "VERSION" => "2.08",
+  "VERSION" => "2.12",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -165,6 +166,11 @@ if ( do { use Config; ( $^O eq 'solaris' && $Config{ptrsize} == 8 ) || $^O eq 'M
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.036
 $WriteMakefileArgs{clean} = { FILES => ".tmp" };
+
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.036
+if ( do { use Config; $^O eq 'MSWin32' && $Config{ccname} eq 'cl' } ) {
+  requires( 'Win32::Vcpkg' => '0.02' );
+}
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
   delete $WriteMakefileArgs{TEST_REQUIRES};

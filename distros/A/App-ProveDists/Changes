@@ -1,0 +1,13 @@
+0.003   2020-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix CLI's default log level.
+
+
+0.002   2020-03-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Set CLI's default log level to 'info'.
+
+
+0.001   2020-03-06  Released-By: PERLANCAR
+
+        - First release, refactored/extracted from App-ProveRdeps.

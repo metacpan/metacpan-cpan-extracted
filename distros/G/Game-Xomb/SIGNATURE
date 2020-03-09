@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 e155a6a1aa47d6778249918794865fe1b6f744a3a6c5f73f845764e9efe6407a Build.PL
+SHA256 64673df9c3495f90b4a1fbc3a88b9c9699735b8751e478577686d537f3545dcd Changes
+SHA256 63d5dc9cd1ee16c57a818cb7aeac699734d09aa8b02483837af4e2f954e139e9 LICENSE
+SHA256 9ad5ed3478a4c9086b9d051049a46d81fe62acea1d4ff6a34d65b1b2766fd258 MANIFEST
+SHA256 1f802ba57b2715c07fb7b318159987b9e7ce7c2c2bdde6fb36cb12a9ccf63e67 META.json
+SHA256 a7c23470e076496a24fa27d4f493c246d5e5e121f36836dd29b9dea0ff1f77bb META.yml
+SHA256 3151d7fdf8408155d3f8f56464aec16b36a2fcb92c246b2995c0631378ae435c README
+SHA256 b9ddb5ba234641eb8db6eafe0c2e72662a62b3d022aecf1b234dbcb6bc71e7b3 bin/xomb
+SHA256 62003830e8fe606baed103cbf81b5e6e3f0519754bc3b2bafef7dea8c8650c73 lib/Game/Xomb.pm
+SHA256 ddf6dc41d03adfff1064867f065f8372a3ecca7b28a0f1561f06e39ee7dad061 lib/Game/Xomb.xs
+SHA256 f0efc3f7ede9898d268a3abb87f7e62aefe9ce81309e8c6102364f3d7b5d1d83 lib/Game/typemap
+SHA256 52578b87ba87c82c018ae618171974d1c46045a45066d5d3cad47a981bb05957 ppport.h
+SHA256 b1d70c0160fea8ddaffdba6bb6a64c4796f15d32f8e16bd2ac7d7b8cbc409469 t/00-load.t
+SHA256 acbd004fa4c34ba00d6be85e7527ca32c3182d10e704247b0e1470d7081d6693 t/damage-stats.t
+SHA256 d74b02f6ef9e1c2470075e364c9c1efc74b5fc180963de1c4eacfded36e59306 t/pod.t
+SHA256 02861b7c6eacca39f17cb1b0502e02a2fc9662b223e830e22bb4d8852ef35ac9 t/xomb.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJeY8I0AAoJEIGZLuHhLAOFnhkH/jbV4rRyub1mtDzYiXLvjIGM
+0wjBW+SVEpfinft5dQC75d2OYaF2D2u727grg3PpKqY2cpwWlacOKJ5fJsWsJ9bS
+EOEEkRTKelOu+6izCBFV4J5+ZJg5aWTlTjk2K/mwgcSbI8HrYNGVaYKqT0CFSLz9
+T5Rv6tG7+s8x3aS5fwTcvQlK5kXDnbH+slcdRLoWJMHyDCEUCQgKdgH+r2NKF/u4
+HPhvN4HK70f8fX7qkMytJZ4M/LzBg/lGoY0EGB4fuOXjbZI/pNzVnRvIH5Gv4+i3
+0gqL3D0FhiNNvYKhl8hXzrYBuEgPVX2MD4aetyS1lZIB8z/2EU4iBAMPVE1xbiA=
+=vTcq
+-----END PGP SIGNATURE-----

@@ -1,6 +1,9 @@
 use 5.014;
 
-use Do;
+use strict;
+use warnings;
+use routines;
+
 use Test::Auto;
 use Test::More;
 

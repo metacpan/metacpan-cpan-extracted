@@ -2,7 +2,7 @@ package App::Yath::Options::Finder;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use Test2::Harness::Util qw/mod2file/;
 
@@ -79,6 +79,16 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
         short_examples => [' t/nope.t'],
 
         description => "Exclude a pattern from testing, matched using m/\$PATTERN/",
+    );
+
+    option exclude_list => (
+        field => 'exclude_lists',
+        type => 'm',
+
+        long_examples  => [' file.txt', ' http://example.com/exclusions.txt'],
+        short_examples => [' file.txt', ' http://example.com/exclusions.txt'],
+
+        description => "Point at a file or url which has a new line separated list of test file names to exclude from testing. Starting a line with a '#' will comment it out (for compatibility with Test2::Aggregate list files).",
     );
 
     option default_search => (
@@ -230,6 +240,17 @@ Point at a json file or url which has a hash of relative test filenames as keys,
 =item --no-exclude-file
 
 Exclude a file from testing
+
+Can be specified multiple times
+
+
+=item --exclude-list file.txt
+
+=item --exclude-list http://example.com/exclusions.txt
+
+=item --no-exclude-list
+
+Point at a file or url which has a new line separated list of test file names to exclude from testing. Starting a line with a '#' will comment it out (for compatibility with Test2::Aggregate list files).
 
 Can be specified multiple times
 

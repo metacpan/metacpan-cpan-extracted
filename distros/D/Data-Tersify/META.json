@@ -1,0 +1,60 @@
+{
+   "abstract" : "generate terse equivalents of complex data structures",
+   "author" : [
+      "Sam Kington <skington@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Tersify",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Devel::OverloadInfo" : "0.005",
+            "Exporter" : "0",
+            "Module::Pluggable" : "0",
+            "Scalar::Util" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "1.08",
+            "lib" : "0",
+            "overload" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skington/data-tersify/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/skington/data-tersify.git",
+         "web" : "https://github.com/skington/data-tersify"
+      }
+   },
+   "version" : "1.000",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

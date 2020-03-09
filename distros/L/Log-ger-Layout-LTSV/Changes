@@ -1,15 +1,22 @@
-0.003   2019-04-13 (PERLANCAR)
+0.004   2020-03-07  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Rename variables for clarity.
+
+
+0.003   2019-04-13  Released-By: PERLANCAR
 
 	- Bump prereq Devel::Caller::Util 0.040 -> 0.042 [RT#129150].
 
 
-0.002   2019-04-12 (PERLANCAR)
+0.002   2019-04-12  Released-By: PERLANCAR
 
 	- Instead of using offsets, use Devel::Caller::Util's
 	  caller()/callers() that can ignore certain subs/packages for more
 	  friendly caller/stack trace information.
 
 
-0.001   2017-06-28 (PERLANCAR)
+0.001   2017-06-28  Released-By: PERLANCAR
 
         - First version.

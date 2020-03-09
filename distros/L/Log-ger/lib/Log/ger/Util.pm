@@ -1,7 +1,9 @@
 package Log::ger::Util;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger'; # DIST
+our $VERSION = '0.033'; # VERSION
 
 use strict;
 use warnings;
@@ -69,16 +71,16 @@ sub set_level {
 sub _action_on_hooks {
     no warnings 'once';
 
-    my ($action, $target, $target_arg, $phase) = splice @_, 0, 4;
+    my ($action, $target_type, $target_name, $phase) = splice @_, 0, 4;
 
     my $hooks = $Log::ger::Global_Hooks{$phase} or die "Unknown phase '$phase'";
-    if ($target eq 'package') {
-        $hooks = ($Log::ger::Per_Package_Hooks{$target_arg}{$phase} ||= []);
-    } elsif ($target eq 'object') {
-        my ($addr) = $target_arg =~ $Log::ger::re_addr;
+    if ($target_type eq 'package') {
+        $hooks = ($Log::ger::Per_Package_Hooks{$target_name}{$phase} ||= []);
+    } elsif ($target_type eq 'object') {
+        my ($addr) = $target_name =~ $Log::ger::re_addr;
         $hooks = ($Log::ger::Per_Object_Hooks{$addr}{$phase} ||= []);
-    } elsif ($target eq 'hash') {
-        my ($addr) = $target_arg =~ $Log::ger::re_addr;
+    } elsif ($target_type eq 'hash') {
+        my ($addr) = $target_name =~ $Log::ger::re_addr;
         $hooks = ($Log::ger::Per_Hash_Hooks{$addr}{$phase} ||= []);
     }
 
@@ -116,8 +118,8 @@ sub add_hook {
 }
 
 sub add_per_target_hook {
-    my ($target, $target_arg, $phase, $hook) = @_;
-    _action_on_hooks('add', $target, $target_arg, $phase, $hook);
+    my ($target_type, $target_name, $phase, $hook) = @_;
+    _action_on_hooks('add', $target_type, $target_name, $phase, $hook);
 }
 
 sub remove_hook {
@@ -126,8 +128,8 @@ sub remove_hook {
 }
 
 sub remove_per_target_hook {
-    my ($target, $target_arg, $phase, $code) = @_;
-    _action_on_hooks('remove', $target, $target_arg, $phase, $code);
+    my ($target_type, $target_name, $phase, $code) = @_;
+    _action_on_hooks('remove', $target_type, $target_name, $phase, $code);
 }
 
 sub reset_hooks {
@@ -136,8 +138,8 @@ sub reset_hooks {
 }
 
 sub reset_per_target_hooks {
-    my ($target, $target_arg, $phase) = @_;
-    _action_on_hooks('reset', $target, $target_arg, $phase);
+    my ($target_type, $target_name, $phase) = @_;
+    _action_on_hooks('reset', $target_type, $target_name, $phase);
 }
 
 sub empty_hooks {
@@ -146,8 +148,8 @@ sub empty_hooks {
 }
 
 sub empty_per_target_hooks {
-    my ($target, $target_arg, $phase) = @_;
-    _action_on_hooks('empty', $target, $target_arg, $phase);
+    my ($target_type, $target_name, $phase) = @_;
+    _action_on_hooks('empty', $target_type, $target_name, $phase);
 }
 
 sub save_hooks {
@@ -156,8 +158,8 @@ sub save_hooks {
 }
 
 sub save_per_target_hooks {
-    my ($target, $target_arg, $phase) = @_;
-    _action_on_hooks('save', $target, $target_arg, $phase);
+    my ($target_type, $target_name, $phase) = @_;
+    _action_on_hooks('save', $target_type, $target_name, $phase);
 }
 
 sub restore_hooks {
@@ -166,33 +168,33 @@ sub restore_hooks {
 }
 
 sub restore_per_target_hooks {
-    my ($target, $target_arg, $phase, $saved) = @_;
-    _action_on_hooks('restore', $target, $target_arg, $phase, $saved);
+    my ($target_type, $target_name, $phase, $saved) = @_;
+    _action_on_hooks('restore', $target_type, $target_name, $phase, $saved);
 }
 
 sub reinit_target {
-    my ($target, $target_arg) = @_;
+    my ($target_type, $target_name) = @_;
 
     # adds target if not already exists
-    Log::ger::add_target($target, $target_arg, {}, 0);
+    Log::ger::add_target($target_type, $target_name, {}, 0);
 
-    if ($target eq 'package') {
-        my $init_args = $Log::ger::Package_Targets{$target_arg};
-        Log::ger::init_target(package => $target_arg, $init_args);
-    } elsif ($target eq 'object') {
-        my ($obj_addr) = $target_arg =~ $Log::ger::re_addr
-            or die "Invalid object '$target_arg': not a reference";
+    if ($target_type eq 'package') {
+        my $per_target_conf = $Log::ger::Package_Targets{$target_name};
+        Log::ger::init_target(package => $target_name, $per_target_conf);
+    } elsif ($target_type eq 'object') {
+        my ($obj_addr) = $target_name =~ $Log::ger::re_addr
+            or die "Invalid object '$target_name': not a reference";
         my $v = $Log::ger::Object_Targets{$obj_addr}
-            or die "Unknown object target '$target_arg'";
+            or die "Unknown object target '$target_name'";
         Log::ger::init_target(object => $v->[0], $v->[1]);
-    } elsif ($target eq 'hash') {
-        my ($hash_addr) = $target_arg =~ $Log::ger::re_addr
-            or die "Invalid hashref '$target_arg': not a reference";
+    } elsif ($target_type eq 'hash') {
+        my ($hash_addr) = $target_name =~ $Log::ger::re_addr
+            or die "Invalid hashref '$target_name': not a reference";
         my $v = $Log::ger::Hash_Targets{$hash_addr}
-            or die "Unknown hash target '$target_arg'";
+            or die "Unknown hash target '$target_name'";
         Log::ger::init_target(hash => $v->[0], $v->[1]);
     } else {
-        die "Unknown target '$target'";
+        die "Unknown target type '$target_type'";
     }
 }
 
@@ -203,12 +205,12 @@ sub reinit_all_targets {
             package => $pkg, $Log::ger::Package_Targets{$pkg});
     }
     for my $k (keys %Log::ger::Object_Targets) {
-        my ($obj, $init_args) = @{ $Log::ger::Object_Targets{$k} };
-        Log::ger::init_target(object => $obj, $init_args);
+        my ($obj, $per_target_conf) = @{ $Log::ger::Object_Targets{$k} };
+        Log::ger::init_target(object => $obj, $per_target_conf);
     }
     for my $k (keys %Log::ger::Hash_Targets) {
-        my ($hash, $init_args) = @{ $Log::ger::Hash_Targets{$k} };
-        Log::ger::init_target(hash => $hash, $init_args);
+        my ($hash, $per_target_conf) = @{ $Log::ger::Hash_Targets{$k} };
+        Log::ger::init_target(hash => $hash, $per_target_conf);
     }
 }
 
@@ -288,7 +290,7 @@ Log::ger::Util - Utility routines for Log::ger
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 DESCRIPTION
 

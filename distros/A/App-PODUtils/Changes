@@ -1,9 +1,24 @@
-0.046   2020-02-28  Released-By: PERLANCAR; Urgency: medium
+0.047   2020-03-08  Released-By: PERLANCAR; Urgency: high
+
+        - Merge two releases 0.046 & 0.046.1.
+
+
+0.046.1 2020-02-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Support Sort::Sub sorters with compares_record=1.
 
 	- Add CLI: reverse-pod-headings (equivalent to "sort-pod-headings -S
           record_by_reverse_order").
+
+        - (UPDATE 2020-03-08: rename release from 0.046 to 0.046.1 due to
+          duplicate versions).
+
+
+0.046   2020-02-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] [sort-pod-headings] Add summary (Abstract) and example.
 
 
 0.045   2019-12-15  Released-By: PERLANCAR; Urgency: medium

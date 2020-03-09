@@ -5,7 +5,7 @@ use warnings;
 
 use DateTime;
 
-our $VERSION = '0.001';
+our $VERSION = '1.000';
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -33,9 +33,13 @@ sub handles { 'DateTime' }
 
 =head2 tersify
 
-It summarises DateTime objects into either C<yyyy-mm-dd> or
-C<yyyy-mm-dd hh:mm:ss>, depending on whether there's a time component to the
-DateTime object or not.
+It summarises DateTime objects into human-readable representations, using
+variants of the One True Date format.
+
+If the time is 00:00:00, it returns I<yyyy-mm-dd>; if there's a more interesing
+time, it returns I<yyyy-mm-dd hh:mm:ss>. If there's also a non-floating
+timezone, it returns details of that timezone as well, so
+I<yyyy-mm-dd hh:mm:ss Time/Zone>.
 
 =cut
 
@@ -45,6 +49,9 @@ sub tersify {
     my $terse = $datetime->ymd;
     if ($datetime->hms ne '00:00:00') {
         $terse .= ' ' . $datetime->hms;
+        if ($datetime->time_zone->name ne 'floating') {
+            $terse .= ' ' . $datetime->time_zone->name;
+        }
     }
     return $terse;
 }

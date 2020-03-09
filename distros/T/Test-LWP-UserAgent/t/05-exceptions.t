@@ -102,7 +102,7 @@ sub test_send_request
         $response,
         methods(
             code => $expected_code,
-            ( map { [ header => $_ ] => $header_spec{$_} } keys %header_spec ),
+            ( map +([ header => $_ ] => $header_spec{$_}), keys %header_spec ),
             content => $expected_content,
             request => $useragent->last_http_request_sent,
         ),

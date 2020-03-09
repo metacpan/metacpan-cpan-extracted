@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::Composite - Composite output
 
 VERSION
-    version 0.012
+    version 0.013
 
 SYNOPSIS
      use Log::ger::Output Composite => (

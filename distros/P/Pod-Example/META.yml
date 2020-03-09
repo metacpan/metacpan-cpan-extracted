@@ -27,8 +27,8 @@ no_index:
 requires:
   Error::Pure: 0.08
   Exporter: 0
-  Module::Info: 0
   Pod::Abstract: 0
+  Pod::Find: 0
   Readonly: 0
   perl: 5.6.2
 resources:
@@ -36,4 +36,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Pod-Example
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Pod-Example
-version: '0.09'
+version: 0.11

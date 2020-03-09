@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.176';
+our $VERSION = '1.177';
 
 use Quiq::Udl;
 use Quiq::CommandLine;
@@ -145,6 +145,9 @@ sub run {
     }
 
     my $exp = Expect->new;
+    if ($debug) {
+        $exp->exp_internal(1);
+    }
     $exp->spawn($cmd) || do {
         $class->throw(
             'EXPECT-00099: Cannot spawn command',
@@ -186,7 +189,7 @@ sub run {
 
 =head1 VERSION
 
-1.176
+1.177
 
 =head1 AUTHOR
 

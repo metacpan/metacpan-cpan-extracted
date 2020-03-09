@@ -6,8 +6,9 @@
 
 package Tcl::pTk::Wm;
 
-our ($VERSION) = ('1.03');
+our ($VERSION) = ('1.05');
 
+use warnings;
 use strict;
 
 use base qw( Tcl::pTk::Derived );
@@ -19,7 +20,7 @@ Direct Tcl::pTk::Submethods ('wm' => [qw(aspect attributes capture client colorm
                        deiconify focusmodel frame geometry group
                        iconbitmap iconify  iconphoto iconmask iconname
                        iconwindow maxsize minsize overrideredirect positionfrom
-                        release resizable sizefrom state title transient
+                        release resizable sizefrom stackorder state title transient
                        withdraw wrapper )]);
 
 sub SetBindtags
@@ -54,7 +55,7 @@ sub MoveToplevelWindow
 
 # Implementation of the perl/tk 'iconimage' method. 
 # This is translated to an 'iconphoto' call, which is only available
-#  in more recent (> 8.5) tk's
+#  in more recent (>= 8.5) tk's
 sub iconimage{
  my ($w, $photo) = @_;
  $w->interp->icall('wm', 'iconphoto', $w->path, $photo);

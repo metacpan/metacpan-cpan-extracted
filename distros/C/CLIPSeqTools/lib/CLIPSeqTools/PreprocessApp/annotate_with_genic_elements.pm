@@ -47,7 +47,7 @@ Column values will be NOT NULL if an alignment is contained in the corresponding
 =cut
 
 package CLIPSeqTools::PreprocessApp::annotate_with_genic_elements;
-$CLIPSeqTools::PreprocessApp::annotate_with_genic_elements::VERSION = '0.1.8';
+$CLIPSeqTools::PreprocessApp::annotate_with_genic_elements::VERSION = '0.1.9';
 
 # Make it an app command
 use MooseX::App::Command;

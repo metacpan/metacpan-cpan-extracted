@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use base qw{ Exporter };
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 our @CARP_NOT = qw{
     PPIx::QuoteLike

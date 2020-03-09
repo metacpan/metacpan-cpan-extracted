@@ -1,3 +1,39 @@
+1.177 2020-03-08
+================
+
+[Quiq::Assert]
+* check() - hinzugefügt
+* Wert in Fehlermeldungen nun ohne Quoting
+
+[Quiq::Cascm]
+* deleteVersion() - Packagenamen-Bug behoben
+
+[Quiq::ChartJs::TimeSeries]
+* Generierten Beispielcode korrigiert
+
+[Quiq::Database::Connection]
+* selectWith() - hinzugefügt
+* createTrigger() - Funktionsname zu Signatur erweitert
+* dropTrigger() - Funktionsname zu Signatur erweitert
+
+[Quiq::PostgreSql::Catalog]
+* correctFunctionDef() - Erkennung 'BEGIN' verbessert
+* functionSelect() - hinzugefügt
+
+[Quiq::PostgreSql::Psql]
+* Debug-Modus um Expect-Protokoll erweitert
+
+[Quiq::Sql]
+* createFunction() - statt Name nun Signatur
+* dropFunction() - statt Name nun Signatur
+* moveFunction() - hinzugefügt
+* select() - Option -with hinzugefügt
+* select() - Option -args durch -placeholders ersetzt
+* withClause() - hinzugefügt
+* selectClause() - Komma auf nächster Zeile
+* fromClause() - Alias als erstes Argument bei ['AS',...]
+* fromClause() - Komma auf nächster Zeile
+
 1.176 2020-03-01
 ================
 

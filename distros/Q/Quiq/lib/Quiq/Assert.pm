@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.176';
+our $VERSION = '1.177';
 
 use Quiq::Math;
 
@@ -26,6 +26,9 @@ L<Quiq::Hash>
   use Quiq::Assert;
   
   my $a = Quiq::Assert->new;
+  
+  # Universeller Test (hier: Prüfe, ob Wert einen Punkt (.) enthält)
+  $a->check('a.b',sub {index(shift,'.') >= 0});
   
   # Prüfe, ob Wert in Aufzählung vorkommt
   $a->isEnumValue('Birne',['Apfel','Birne','Pflaume']);
@@ -109,8 +112,91 @@ sub new {
 =head2 Zusicherungen
 
 Die folgenden Testmethoden können sowohl als Klassen- als auch als
-Objektmethoden aufgerufen werden. Im Void-Kontext gerufen, werfen sie
+Objektmethoden gerufen werden. Im Void-Kontext gerufen, werfen sie
 eine Exception, wenn die Bedingung verletzt ist, andernfalls 0 oder 1.
+
+=head3 check() - Prüfe beliebige Bedingung
+
+=head4 Synopsis
+
+  $this->check($val,@opt,$sub);         # Exception
+  $bool = $this->check($val,@opt,$sub); # Rückgabewert
+
+=head4 Arguments
+
+=over 4
+
+=item $val
+
+Wert, der geprüft wird.
+
+=item $sub
+
+Prüf-Subroutine. Ist die Bedingung erfüllt, liefert sie "wahr",
+andernfalls "falsch".
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -name => $str
+
+Name, der bei Verletzung der Bedingung als Teil der Fehlermeldung
+ausgegeben wird. Dies kann der Name der geprüften Variable,
+des geprüften Parameters o.ä. sein.
+
+=back
+
+=head4 Returns
+
+Boolean
+
+=head4 Description
+
+Prüfe den Wert $val daraufhin, ob er die Prüfung $sub besteht.
+Ist dies nicht der Fall, wirf eine Exception, wenn die Methode im
+Void-Kontext gerufen wurde, andernfalls 0. Ein leerer Wert verletzt
+die Bedingung nicht (die Subroutine wird für einen leeren Wert nicht
+gerufen).
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub check {
+    my $self = ref $_[0]? shift: shift->new;
+    my $val = shift;
+    # @_: @opt,$sub
+
+    # Optionen und Argumente
+
+    my $name = undef;
+
+    my $argA = $self->parameters(1,1,\@_,
+        -name => \$name,
+    );
+    my $sub = shift @$argA;
+
+    # Prüfung
+
+    if (!defined($val) || $val eq '' || $sub->($val)) {
+        return 1;
+    }
+    elsif (defined wantarray) {
+        return 0;
+    }
+
+    $self->throw(
+        'ASSERT-00001: Check failed',
+        defined $name? ($self->{'nameSection'} => $name): (),
+        Value => $val,
+        -stacktrace => $self->{'stacktrace'},
+    );
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 isEnumValue() - Prüfe auf Enthaltensein in Enum
 
@@ -186,7 +272,7 @@ sub isEnumValue {
     $self->throw(
         'ASSERT-00001: Unexpected value',
         defined $name? ($self->{'nameSection'} => $name): (),
-        Value => "'$val'",
+        Value => $val,
         Allowed => join(', ',map {"'$_'"} @$valueA),
         -stacktrace => $self->{'stacktrace'},
     );
@@ -337,7 +423,7 @@ sub isNumber {
     $self->throw(
         'ASSERT-00001: Not a number',
         defined $name? ($self->{'nameSection'} => $name): (),
-        Value => "'$val'",
+        Value => $val,
         -stacktrace => $self->{'stacktrace'},
     );
 }
@@ -346,7 +432,7 @@ sub isNumber {
 
 =head1 VERSION
 
-1.176
+1.177
 
 =head1 AUTHOR
 

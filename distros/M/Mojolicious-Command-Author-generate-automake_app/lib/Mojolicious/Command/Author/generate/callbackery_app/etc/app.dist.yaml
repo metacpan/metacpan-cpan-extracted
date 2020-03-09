@@ -1,0 +1,30 @@
+
+BACKEND:
+  cfg_db: /tmp/<%= ${filename} %>.db
+  sesame_user: adfadsfasdf4ee3r
+# perl -MDigest::SHA -e 'print Digest::SHA::hmac_sha1_hex("access"),"\n"'
+  sesame_pass: 393afhkjhffjj
+
+FRONTEND:
+# logo = ../resource/<%= ${filename} %>/logo.png
+# logo_small = ../resource/<%= ${filename} %>/logo-small.png
+  title: Song List
+  initial_plugin: Songs
+  company_name: OETIKER+PARTNER AG
+  company_url: http://www.oetiker.ch
+# max_width = 800
+
+PLUGIN:
+  - InitialUser:
+      module: UserForm
+      mode: init
+      type: add
+      tab-name: Create Initial User
+
+  - Songs:
+      module: Song
+      tab-name: Songs
+
+  - AdminUser:
+      module: Users
+      tab-name: Admin User Manager

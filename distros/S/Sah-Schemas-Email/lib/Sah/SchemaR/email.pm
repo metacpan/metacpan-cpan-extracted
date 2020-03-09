@@ -1,13 +1,9 @@
 package Sah::SchemaR::email;
 
-our $DATE = '2017-01-21'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.003'; # VERSION
 
-our $rschema = [
-  "str",
-  [{ match => "\@", summary => "Email address" }],
-  ["str"],
-];
+our $rschema = ["str",[{examples=>[{valid=>0,value=>"foo"},{valid=>1,value=>"foo\@bar"},{valid=>1,value=>"<foo\@bar>"},{valid=>1,value=>"\"some name\" <foo\@bar.baz>"}],match=>"\@",summary=>"Email address"}],["str"]];
 
 1;
 # ABSTRACT: Email address
@@ -24,7 +20,7 @@ Sah::SchemaR::email - Email address
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::email (from Perl distribution Sah-Schemas-Email), released on 2017-01-21.
+This document describes version 0.003 of Sah::SchemaR::email (from Perl distribution Sah-Schemas-Email), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -54,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

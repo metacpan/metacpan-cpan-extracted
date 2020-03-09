@@ -1,13 +1,14 @@
 # Self alignments of *Saccharomyces cerevisiae* S288c
 
-[TOC levels=1-3]: # " "
+[TOC levels=1-3]: # ""
+
 - [Self alignments of *Saccharomyces cerevisiae* S288c](#self-alignments-of-saccharomyces-cerevisiae-s288c)
 - [Prepare sequences](#prepare-sequences)
 - [Detailed steps](#detailed-steps)
-    - [self alignement](#self-alignement)
-    - [blast](#blast)
-    - [merge](#merge)
-    - [clean](#clean)
+  - [self alignment](#self-alignment)
+  - [blast](#blast)
+  - [merge](#merge)
+  - [clean](#clean)
 - [Template steps](#template-steps)
 
 
@@ -98,8 +99,10 @@ fasops separate axt.correct.fas --nodash --rc -o stdout |
 
 # Get more paralogs
 egaz blastn axt.gl.fasta genome.fa -o axt.bg.blast
-egaz blastmatch axt.bg.blast -c 0.95 --perchr -o axt.bg.region
-faops region -s genome.fa axt.bg.region axt.bg.fasta
+egaz blastmatch axt.bg.blast -c 0.95 -o axt.bg.region
+samtools faidx genome.fa -r axt.bg.region --continue |
+    perl -p -e '/^>/ and s/:/(+):/' \
+    > axt.bg.fasta
 
 cat axt.gl.fasta axt.bg.fasta |
     faops filter -u stdin stdout |

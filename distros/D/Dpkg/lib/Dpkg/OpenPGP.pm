@@ -18,11 +18,13 @@ package Dpkg::OpenPGP;
 use strict;
 use warnings;
 
+use POSIX qw(:sys_wait_h);
 use Exporter qw(import);
 use File::Copy;
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
+use Dpkg::IPC;
 use Dpkg::Path qw(find_command);
 
 our $VERSION = '0.01';
@@ -78,6 +80,82 @@ sub openpgp_sig_to_asc
     }
 
     return;
+}
+
+sub import_key {
+    my ($asc, %opts) = @_;
+
+    $opts{require_valid_signature} //= 1;
+
+    my @exec;
+    if (find_command('gpg')) {
+        push @exec, 'gpg';
+    } elsif ($opts{require_valid_signature}) {
+        error(g_('cannot import key in %s since GnuPG is not installed'),
+              $asc);
+    } else {
+        warning(g_('cannot import key in %s since GnuPG is not installed'),
+                $asc);
+        return;
+    }
+    push @exec, '--no-options', '--no-default-keyring', '-q', '--import';
+    push @exec, '--keyring', $opts{keyring};
+    push @exec, $asc;
+
+    my ($stdout, $stderr);
+    spawn(exec => \@exec, wait_child => 1, nocheck => 1, timeout => 10,
+          to_string => \$stdout, error_to_string => \$stderr);
+    if (WIFEXITED($?)) {
+        my $status = WEXITSTATUS($?);
+        print { *STDERR } "$stdout$stderr" if $status;
+        if ($status == 1 or ($status && $opts{require_valid_signature})) {
+            error(g_('failed to import key in %s'), $asc);
+        } elsif ($status) {
+            warning(g_('failed to import key in %s'), $asc);
+        }
+    } else {
+        subprocerr("@exec");
+    }
+}
+
+sub verify_signature {
+    my ($sig, %opts) = @_;
+
+    $opts{require_valid_signature} //= 1;
+
+    my @exec;
+    if (find_command('gpgv')) {
+        push @exec, 'gpgv';
+    } elsif (find_command('gpg')) {
+        push @exec, 'gpg', '--no-default-keyring', '-q', '--verify';
+    } elsif ($opts{require_valid_signature}) {
+        error(g_('cannot verify signature on %s since GnuPG is not installed'),
+              $sig);
+    } else {
+        warning(g_('cannot verify signature on %s since GnuPG is not installed'),
+                $sig);
+        return;
+    }
+    foreach my $keyring (@{$opts{keyrings}}) {
+        push @exec, '--keyring', $keyring;
+    }
+    push @exec, $sig;
+    push @exec, $opts{datafile} if exists $opts{datafile};
+
+    my ($stdout, $stderr);
+    spawn(exec => \@exec, wait_child => 1, nocheck => 1, timeout => 10,
+          to_string => \$stdout, error_to_string => \$stderr);
+    if (WIFEXITED($?)) {
+        my $status = WEXITSTATUS($?);
+        print { *STDERR } "$stdout$stderr" if $status;
+        if ($status == 1 or ($status && $opts{require_valid_signature})) {
+            error(g_('failed to verify signature on %s'), $sig);
+        } elsif ($status) {
+            warning(g_('failed to verify signature on %s'), $sig);
+        }
+    } else {
+        subprocerr("@exec");
+    }
 }
 
 1;

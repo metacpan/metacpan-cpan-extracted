@@ -63,7 +63,7 @@ DESCRIPTION
         `make_class` is not exported by default.
 
   Diagnostics
-   Ambiguous method %s is getter, not predicate
+   Ambiguous method '%s' is getter, not predicate
     Given the following:
 
       my $object = object {
@@ -75,7 +75,7 @@ DESCRIPTION
     getter for the "has_name" attribute, or a predicate for the "name"
     attribute. The getter wins, but it will issue a warning.
 
-   Key %s would be bad method name, not generating methods
+   Key '%s' would be bad method name, not generating methods
     You've got a key with a name that cannot be called as a method. For
     example:
 
@@ -84,6 +84,10 @@ DESCRIPTION
     Perl methods cannot contain spaces, so Object::Adhoc refuses to create the
     method and gives you a warning. (Technically it is possible to create and
     call methods containing spaces, but it's fiddly.)
+
+    This also happens for a few reserved method names like `AUTOLOAD`,
+    `DESTROY`, `isa`, `DOES`, `can`, etc. These have particular meanings in
+    Perl that would conflict with them being used as a getter method.
 
    Usage %s(self)
     The methods defined by Object::Adhoc expect to be invoked with a blessed

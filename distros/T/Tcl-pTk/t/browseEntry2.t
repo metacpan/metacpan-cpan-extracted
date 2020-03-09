@@ -111,7 +111,4 @@ ok(Tcl::pTk::Exists($be2), "BrowseEntry creation");
 # Prevent bgerror due to destroying window too early
 $mw->idletasks;
 
-MainLoop if (@ARGV);
-
-1;
-__END__
+(@ARGV) ? MainLoop : $mw->destroy;

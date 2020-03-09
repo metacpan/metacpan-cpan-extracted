@@ -24,11 +24,9 @@ my $e = $e1->XEvent();
 
 my $x = $e->x();
 my $y = $e->y();
-#print "x/y = $x/$y\n";
-    
-$TOP->after(1000,sub{$TOP->destroy});
+print "# x/y = $x/$y\n";
+
+$TOP->idletasks;
+(@ARGV) ? MainLoop : $TOP->destroy;
 
 ok(1, 1, "XEvent usage");
-
-
-MainLoop;

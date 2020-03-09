@@ -1,26 +1,32 @@
-0.006   2017-06-26 (PERLANCAR)
+0.007   2020-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust with Log::ger 0.033 (renamed hook names, renamed hook
+	  arguments).
+
+
+0.006   2017-06-26  Released-By: PERLANCAR
 
 	- Use per-target stash, [Bugfix] load Log::Any.
 
 
-0.005   2017-06-24 (PERLANCAR)
+0.005   2017-06-24  Released-By: PERLANCAR
 
         - Add missing prereq to Log::Any::Adapter::Callback [RT#122193].
 
 
-0.004   2017-06-24 (PERLANCAR)
+0.004   2017-06-24  Released-By: PERLANCAR
 
 	- [Bugfix] Return arrayref even when declining.
 
 
-0.003   2017-06-23 (PERLANCAR)
+0.003   2017-06-23  Released-By: PERLANCAR
 
 	- Adjust to Log::ger 0.005.
 
 	- [doc] Fix example in Synopsis.
 
 
-0.002    2017-06-21 (PERLANCAR)
+0.002    2017-06-21  Released-By: PERLANCAR
 
          - Rename dist/module from Log-ger-LogAny to Log-ger-Output-LogAny.
 
@@ -29,6 +35,6 @@
          - Add tests.
 
 
-0.001    2017-06-19 (PERLANCAR)
+0.001    2017-06-19  Released-By: PERLANCAR
 
          - First release.

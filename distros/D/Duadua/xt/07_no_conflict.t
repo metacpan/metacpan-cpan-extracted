@@ -1,9 +1,7 @@
 use Test::More;
-eval "use File::Find::Rule; use Test::File::Find::Rule;";
+eval "use File::Find::Rule::ConflictMarker;";
 plan skip_all => "skip the no conflict test because $@" if $@;
-match_rule_no_result(
-    File::Find::Rule->file->relative->name(qr/(?<!blib)/)->name(qr/^(?<!07_no_conflict\.t)$/)->nonempty->grep(qr/(<<<<<<<|=======|>>>>>>>)/, sub { 0 }),
-    '.',
-    'no conflict'
-);
+my @files = File::Find::Rule->conflict_marker->in('lib', 't', 'xt');
+ok( scalar(@files) == 0 )
+    or die join("\t", map { "'$_' has conflict markers." } @files);
 done_testing;

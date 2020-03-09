@@ -2,8 +2,8 @@ NAME
     Log::ger::Layout::LTSV - Layout log message as LTSV
 
 VERSION
-    This document describes version 0.003 of Log::ger::Layout::LTSV (from
-    Perl distribution Log-ger-Layout-LTSV), released on 2019-04-13.
+    This document describes version 0.004 of Log::ger::Layout::LTSV (from
+    Perl distribution Log-ger-Layout-LTSV), released on 2020-03-07.
 
 SYNOPSIS
      use Log::ger::Layout LTSV => (
@@ -94,7 +94,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

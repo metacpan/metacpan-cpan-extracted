@@ -1,15 +1,15 @@
 package Log::ger::Plugin::OptAway;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-03-07'; # DATE
 our $DIST = 'Log-ger-Plugin-OptAway'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use strict;
 use warnings;
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     return {
         after_install_routines => [
@@ -22,21 +22,20 @@ sub get_hooks {
                 my %hook_args = @_;
 
                 # we are only relevant when targetting package
-                return [undef] unless ($hook_args{target}||'') eq 'package';
+                return [undef] unless ($hook_args{target_type}||'') eq 'package';
 
                 #use DD; dd \%hook_args;
                 for my $r (@{ $hook_args{routines} }) {
                     my ($code, $name, $lnum, $type) = @$r;
                     #print "D:got routine name=$name, lnum=",(defined $lnum ? $lnum : '-'), ", type=$type\n";
-                    next unless $type =~ /\A(logml_|log_|is_)/;
-                    my $is_ml = $type =~ /ml_/;
-                    my $fullname = "$hook_args{target_arg}\::$name";
+                    next unless $type =~ /\A(logger_|log_|level_checker_|is_)/;
+                    my $fullname = "$hook_args{target_name}\::$name";
 
                     no warnings 'once'; # $Log::ger::Current_Level
                     my $should_opt_away;
-                    if ($conf{all}) {
+                    if ($plugin_conf{all}) {
                         $should_opt_away = 1;
-                    } elsif (!$is_ml && $Log::ger::Current_Level < $r->[2]) {
+                    } elsif ($Log::ger::Current_Level < $r->[2]) {
                         $should_opt_away = 1;
                     }
 
@@ -69,7 +68,7 @@ Log::ger::Plugin::OptAway - Optimize away log statements
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

@@ -29,7 +29,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "v5.10.0"
          }
       },
       "develop" : {
@@ -59,7 +59,8 @@
          "requires" : {
             "Log::Any" : "0",
             "MarpaX::ESLIF" : "v3.0.32",
-            "perl" : "5.006",
+            "feature" : "0",
+            "perl" : "v5.10.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -79,14 +80,14 @@
             "Test::More" : "0",
             "Test::More::UTF8" : "0",
             "Test::Trap" : "0",
-            "perl" : "5.006"
+            "perl" : "v5.10.0"
          }
       }
    },
    "provides" : {
       "MarpaX::ESLIF::ECMA404" : {
          "file" : "lib/MarpaX/ESLIF/ECMA404.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -102,7 +103,7 @@
          "web" : "https://github.com/jddurand/marpax-eslif-ecma404"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_authority" : "cpan:JDDPAUSE",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",

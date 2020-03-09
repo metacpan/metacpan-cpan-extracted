@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.176';
+our $VERSION = '1.177';
 
 use Quiq::Database::Row::Array;
 use Quiq::AnsiColor;
@@ -1285,7 +1285,7 @@ sub deleteVersion {
                 # say sprintf '%s[%s] => %s',$state,$row->[3],$transportPackage;
 
                 my $repoFile = $row->[0];
-                my $package = $row->[3];
+                my $package = $row->[2];
                 my $version = $row->[1];
 
                 $self->switchPackage($package,$transportPackage,
@@ -2819,7 +2819,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.176
+1.177
 
 =head1 AUTHOR
 

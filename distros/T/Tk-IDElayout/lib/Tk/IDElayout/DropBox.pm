@@ -1,5 +1,5 @@
 package Tk::IDElayout::DropBox;
-our ($VERSION) = ('0.32');
+our ($VERSION) = ('0.35');
 
 use strict;
 use warnings;

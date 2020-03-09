@@ -21,7 +21,6 @@ $modules{$_} = $_ for qw(
   Path::Tiny
   Test2::V0
   Test::Alien::Build
-  Win32::Shortcut
 );
 
 $post_diag = sub {

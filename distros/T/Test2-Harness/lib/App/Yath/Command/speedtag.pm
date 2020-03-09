@@ -2,7 +2,7 @@ package App::Yath::Command::speedtag;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use Test2::Harness::Util::File::JSONL;
 
@@ -22,7 +22,7 @@ option_group {prefix => 'speedtag', category => 'speedtag options'} => sub {
     option generate_durations_file => (
         type => 'd',
         alt         => ['durations', 'duration'],
-        description => "Write out a duration json file, if no path is provided 'duration.json' will be used. The .json extention is added automatically if omitted.",
+        description => "Write out a duration json file, if no path is provided 'duration.json' will be used. The .json extension is added automatically if omitted.",
 
         long_examples  => ['', '=/path/to/durations.json'],
 
@@ -368,7 +368,7 @@ Do not delete directories when done. This is useful if you want to inspect the d
 
 =item --no-summary
 
-Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extention is added automatically if omitted.
+Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extension is added automatically if omitted.
 
 
 =back
@@ -391,7 +391,7 @@ Write out a summary json file, if no path is provided 'summary.json' will be use
 
 =item --no-generate-durations-file
 
-Write out a duration json file, if no path is provided 'duration.json' will be used. The .json extention is added automatically if omitted.
+Write out a duration json file, if no path is provided 'duration.json' will be used. The .json extension is added automatically if omitted.
 
 
 =item --pretty

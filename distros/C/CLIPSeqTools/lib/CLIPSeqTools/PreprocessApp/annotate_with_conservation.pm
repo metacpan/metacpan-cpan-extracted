@@ -53,7 +53,7 @@ floating point number to integer by multiplying with 1000.
 =cut
 
 package CLIPSeqTools::PreprocessApp::annotate_with_conservation;
-$CLIPSeqTools::PreprocessApp::annotate_with_conservation::VERSION = '0.1.8';
+$CLIPSeqTools::PreprocessApp::annotate_with_conservation::VERSION = '0.1.9';
 
 # Make it an app command
 use MooseX::App::Command;

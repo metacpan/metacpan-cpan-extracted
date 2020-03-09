@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.12
+    version 0.14
 
 SYNOPSIS
 
@@ -159,7 +159,11 @@ CAVEATS
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Shawn Laffan (SLAFFAN, shawnlaffan)
 
 COPYRIGHT AND LICENSE
 

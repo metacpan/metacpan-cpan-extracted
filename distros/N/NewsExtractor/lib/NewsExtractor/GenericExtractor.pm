@@ -222,7 +222,7 @@ sub journalist {
 
 sub content_text {
     my ($self) = @_;
-    my ($content_dom, $el, $html);
+    my ($el, $html);
 
     # Cleanup some noisy elements that are known to interfere.
     $self->dom->find('script, style, p.appE1121, div.sexmask, div.cat-list, div#marquee, #setting_weather')->map('remove');

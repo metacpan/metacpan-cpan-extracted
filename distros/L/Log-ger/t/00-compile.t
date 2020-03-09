@@ -6,17 +6,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Log/ger.pm',
+    'Log/ger/Filter.pm',
+    'Log/ger/Filter/Code.pm',
     'Log/ger/Format.pm',
+    'Log/ger/Format/Default.pm',
     'Log/ger/Format/None.pm',
     'Log/ger/Heavy.pm',
     'Log/ger/Layout.pm',
     'Log/ger/Output.pm',
     'Log/ger/Output/Array.pm',
-    'Log/ger/Output/ArrayML.pm',
     'Log/ger/Output/Null.pm',
     'Log/ger/Output/String.pm',
     'Log/ger/Plugin.pm',

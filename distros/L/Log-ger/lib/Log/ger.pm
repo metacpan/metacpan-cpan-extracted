@@ -1,7 +1,9 @@
 package Log::ger;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger'; # DIST
+our $VERSION = '0.033'; # VERSION
 
 #IFUNBUILT
 # use strict 'subs', 'vars';
@@ -29,7 +31,7 @@ our $Current_Level = 30;
 our $Caller_Depth_Offset = 0;
 
 # a flag that can be used by null output to skip using formatter
-our $_logger_is_null;
+our $_outputter_is_null;
 
 our $_dumper;
 
@@ -38,13 +40,13 @@ our %Global_Hooks;
 # in Log/ger/Heavy.pm
 # our %Default_Hooks = (
 
-our %Package_Targets; # key = package name, value = \%init_args
+our %Package_Targets; # key = package name, value = \%per_target_conf
 our %Per_Package_Hooks; # key = package name, value = { phase => hooks, ... }
 
-our %Hash_Targets; # key = hash address, value = [$hashref, \%init_args]
+our %Hash_Targets; # key = hash address, value = [$hashref, \%per_target_conf]
 our %Per_Hash_Hooks; # key = hash address, value = { phase => hooks, ... }
 
-our %Object_Targets; # key = object address, value = [$obj, \%init_args]
+our %Object_Targets; # key = object address, value = [$obj, \%per_target_conf]
 our %Per_Object_Hooks; # key = object address, value = { phase => hooks, ... }
 
 my $sub0 = sub {0};
@@ -94,45 +96,46 @@ sub install_routines {
 }
 
 sub add_target {
-    my ($target, $target_arg, $init_args, $replace) = @_;
+    my ($target_type, $target_name, $per_target_conf, $replace) = @_;
     $replace = 1 unless defined $replace;
 
-    if ($target eq 'package') {
-        unless ($replace) { return if $Package_Targets{$target_arg} }
-        $Package_Targets{$target_arg} = $init_args;
-    } elsif ($target eq 'object') {
-        my ($addr) = "$target_arg" =~ $re_addr;
+    if ($target_type eq 'package') {
+        unless ($replace) { return if $Package_Targets{$target_name} }
+        $Package_Targets{$target_name} = $per_target_conf;
+    } elsif ($target_type eq 'object') {
+        my ($addr) = "$target_name" =~ $re_addr;
         unless ($replace) { return if $Object_Targets{$addr} }
-        $Object_Targets{$addr} = [$target_arg, $init_args];
-    } elsif ($target eq 'hash') {
-        my ($addr) = "$target_arg" =~ $re_addr;
+        $Object_Targets{$addr} = [$target_name, $per_target_conf];
+    } elsif ($target_type eq 'hash') {
+        my ($addr) = "$target_name" =~ $re_addr;
         unless ($replace) { return if $Hash_Targets{$addr} }
-        $Hash_Targets{$addr} = [$target_arg, $init_args];
+        $Hash_Targets{$addr} = [$target_name, $per_target_conf];
     }
 }
 
 sub _set_default_null_routines {
     $default_null_routines ||= [
         (map {(
-            [$sub0, "log_$_", $Levels{$_}, 'log_sub'],
-            [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "log_is_$_", $Levels{$_}, 'is_sub'],
-            [$sub0, $_, $Levels{$_}, 'log_method'],
-            [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "is_$_", $Levels{$_}, 'is_method'],
+            [$sub0, "log_$_", $Levels{$_}, 'logger_sub'],
+            [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "log_is_$_", $Levels{$_}, 'level_checker_sub'],
+            [$sub0, $_, $Levels{$_}, 'logger_method'],
+            [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "is_$_", $Levels{$_}, 'level_checker_method'],
         )} keys %Levels),
     ];
 }
 
 sub get_logger {
-    my ($package, %init_args) = @_;
+    my ($package, %per_target_conf) = @_;
 
     my $caller = caller(0);
-    $init_args{category} = $caller if !defined($init_args{category});
+    $per_target_conf{category} = $caller
+        if !defined($per_target_conf{category});
     my $obj = []; $obj =~ $re_addr;
     my $pkg = "Log::ger::Obj$1"; bless $obj, $pkg;
-    add_target(object => $obj, \%init_args);
+    add_target(object => $obj, \%per_target_conf);
     if (keys %Global_Hooks) {
         require Log::ger::Heavy;
-        init_target(object => $obj, \%init_args);
+        init_target(object => $obj, \%per_target_conf);
     } else {
         # if we haven't added any hooks etc, skip init_target() process and use
         # this preconstructed routines as shortcut, to save startup overhead
@@ -143,14 +146,15 @@ sub get_logger {
 }
 
 sub import {
-    my ($package, %init_args) = @_;
+    my ($package, %per_target_conf) = @_;
 
     my $caller = caller(0);
-    $init_args{category} = $caller if !defined($init_args{category});
-    add_target(package => $caller, \%init_args);
+    $per_target_conf{category} = $caller
+        if !defined($per_target_conf{category});
+    add_target(package => $caller, \%per_target_conf);
     if (keys %Global_Hooks) {
         require Log::ger::Heavy;
-        init_target(package => $caller, \%init_args);
+        init_target(package => $caller, \%per_target_conf);
     } else {
         # if we haven't added any hooks etc, skip init_target() process and use
         # this preconstructed routines as shortcut, to save startup overhead
@@ -174,7 +178,7 @@ Log::ger - A lightweight, flexible logging framework
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 
@@ -183,7 +187,7 @@ version 0.031
 In your module (producer):
 
  package Foo;
- use Log::ger; # will import some logging methods e.g. log_warn, log_error
+ use Log::ger; # will install some logger routines e.g. log_warn, log_error
 
  sub foo {
      ...
@@ -294,9 +298,9 @@ formatting like Log::Contextual. This eases code migration and teamwork. Each
 module author can preserve her own logging style, if wanted, and all the modules
 still use the same framework.
 
-B<Dynamic.> Outputs and levels can be changed anytime during run-time and
-logging routines will be updated automatically. This is useful in situation like
-a long-running server application: you can turn on tracing logs temporarily to
+B<Dynamic.> Outputs and levels can be changed anytime during run-time and logger
+routines will be updated automatically. This is useful in situation like a
+long-running server application: you can turn on tracing logs temporarily to
 debug problems, then turn them off again, without restarting your server.
 
 B<Interoperability.> There are modules to interop with Log::Any, either consume

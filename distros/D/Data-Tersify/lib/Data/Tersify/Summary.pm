@@ -11,7 +11,8 @@ Data::Tersify::Summary - a summary of a verbose object
 
 Data::Tersify::Summary objects are generated when Data::Tersify finds an
 object that it knows how to summarise. They're simple blessed scalars
-describing the object. You can't do anything useful with them.
+describing the object, or blessed hashrefs or arrayrefs that match the
+object's internal status. You can't do anything useful with them.
 
 =cut
 

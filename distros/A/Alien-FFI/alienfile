@@ -4,7 +4,10 @@ use Text::ParseWords qw( shellwords );
 
 # this alienfile requires Alien::Build 0.26 for features and bugfixes
 
-plugin 'PkgConfig' => 'libffi';
+configure { requires 'Alien::Build' => '2.10' };
+
+plugin 'Probe::Vcpkg' => 'libffi';
+plugin 'PkgConfig'    => 'libffi';
 
 share {
 
@@ -12,24 +15,24 @@ share {
     url     => 'https://sourceware.org/pub/libffi/',
     version => qr/^libffi-([0-9\.]+)\.tar\.gz$/,
   );
-  
+
   plugin Extract => 'tar.gz';
-  
+
   plugin 'Build::Autoconf' => ();
 
   my $configure = '--disable-shared --enable-static --disable-builddir';
-  
+
   if($^O eq 'MSWin32')
   {
     my $bits = $Config{archname} =~ /^MSWin32-x64/ ? 64 : 32;
-  
+
     $configure .= ' --build=x86_64-pc-mingw64' if $bits == 64;
-    
+
     if(meta->prop->{platform}->{compiler_type} eq 'microsoft')
     {
       # Visual C++ is "special"
       $configure .= ' LD=link CPP="cl -nologo -EP"';
-      
+
       if($bits == 64)
       { $configure .= ' CC="%{cwd}/msvcc.sh -m64"' }
       else
@@ -42,17 +45,17 @@ share {
         my $orig = shift;
 
         my $ret = $orig->(@_);
-    
+
         $ret->{list} = [
           grep { $_->{version} ne '3.3' }
           grep { $_->{version} ne '3.2' }
           grep { $_->{version} !~ /^3\.2\./ }
-          @{ $ret->{list} }  
+          @{ $ret->{list} }
         ];
 
         $ret;
       });
-      
+
       requires 'Path::Tiny' => '0.077';
       patch sub {
         my($build) = @_;
@@ -69,7 +72,7 @@ share {
           });
         }
       };
-      
+
       meta->after_hook( gather_share => sub {
         my($build) = @_;
         $build->runtime_prop->{$_} .= " -DFFI_BUILDING" for qw( cflags cflags_static );
@@ -95,7 +98,7 @@ share {
       $configure .= " CFLAGS='@arch'";
     }
   }
-  
+
   if($^O eq 'openbsd')
   {
     unless($Config{usethreads})
@@ -106,7 +109,7 @@ share {
       });
     }
   }
-  
+
   if($Config{archname} =~ /^i[3456]86/)
   {
     my %flags;
@@ -137,7 +140,7 @@ share {
       $configure .= " --with-gcc-arch=pentium4";
     }
   }
-  
+
   build [
     sub {
       my($build) = @_;

@@ -21,6 +21,7 @@ requires:
   CBOR::XS: '1.71'
   Catalyst: '0'
   Catalyst::Test: '0'
+  Class::Data::Inheritable: '0'
   MIME::Base64: '3.13'
   Redis::Fast: '0.25'
   Test::Mock::Redis: '0'
@@ -29,5 +30,5 @@ resources:
   bugtracker: https://github.com/vrag86/catalyst-plugin-session-store-redisfast/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/vrag86/catalyst-plugin-session-store-redisfast
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

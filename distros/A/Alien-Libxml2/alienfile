@@ -1,7 +1,7 @@
 use alienfile;
 use Config;
 
-configure { requires 'Alien::Build' => '1.60' };
+configure { requires 'Alien::Build' => '2.12' };
 
 my $test_program = <<'EOF';
 #include <stdio.h>
@@ -28,6 +28,8 @@ my @try_flags = (
   { cflags => '-I/usr/include/libxml2',       libs => '-lxml2' },
   { cflags => '-I/usr/local/include/libxml2', libs => '-lxml2' },
 );
+
+plugin 'Probe::Vcpkg' => 'libxml2';
 
 probe [
   ['xml2-config', '--version' => \'%{.install.my_version}'],
@@ -79,6 +81,8 @@ meta->around_hook(
       my $version = $build->hook_prop->{version}                                    ||
                     $build->install_prop->{plugin_probe_cbuilder_gather}->{version} ||
                     $build->install_prop->{my_version};
+
+      $version =~ s/-.*$//g;
 
       unless(defined $version)
       {

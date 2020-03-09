@@ -5,7 +5,7 @@ use Tcl::pTk::ttkTixNoteBook;
 
 package Tcl::pTk::Facelift;
 
-our ($VERSION) = ('1.03');
+our ($VERSION) = ('1.05');
 
 =head1 NAME
 
@@ -523,7 +523,18 @@ sub Populate {
 	#  work with -labelJustify, etc options
         -justify => ['SELF', 'justify', 'Justify', 'center'],
         -anchor  => ['SELF', 'justify', 'Justify', 'center'],
-        'DEFAULT' => ['SELF']
+        'DEFAULT' => ['SELF'],
+
+        # Experimental workaround for regression in Tcl/Tk 8.6.10
+        # (see https://core.tcl-lang.org/tk/tktview/077d49828b)
+        # which causes an error when using facelifted LabEntry widgets:
+        #
+        #     Can't set -labelCompound to `' for .ttkframe02:
+        #     Can't set -compound to `' for .ttkframe02.ttklabel04:
+        #     ambiguous compound "": must be none, text, image,
+        #     center, top, bottom, left, or right
+        #
+        -compound => ['SELF', 'compound', 'Compound', 'none'],
     );
 
 

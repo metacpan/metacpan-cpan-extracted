@@ -1,5 +1,8 @@
 Revision history for Alien-Libxml2
 
+0.14      2020-03-09 10:59:12 -0600
+  - Support for Visual C++ Perl + Vcpkg system install (gh#17)
+
 0.12      2019-12-13 17:35:02 -0700
   - Support for Visual C++ Perl (gh#14)
 

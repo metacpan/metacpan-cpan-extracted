@@ -17,7 +17,6 @@ test_requires	'Attean'					=> 0;
 perl_version	'5.014';
 
 requires		'Clone'						=> 0;
-requires		'Debug::ShowStuff'			=> 0;
 requires		'IRI'						=> 0.010;
 requires		'List::Util'				=> 1.33;
 requires		'JSON'						=> 4.02;

@@ -1,39 +1,42 @@
 package Log::ger::Output::LogAny;
 
-our $DATE = '2017-06-26'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger-Output-LogAny'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 use strict;
 use warnings;
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     return {
-        create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+        create_outputter => [
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_;
 
                 my $pkg;
-                if ($args{target} eq 'package') {
-                    $pkg = $args{target_arg};
-                } elsif ($args{target} eq 'object') {
-                    $pkg = ref $args{target_arg};
+                if ($hook_args{target_type} eq 'package') {
+                    $pkg = $hook_args{target_name};
+                } elsif ($hook_args{target_type} eq 'object') {
+                    $pkg = ref $hook_args{target_name};
                 } else {
                     return [];
                 }
 
                 # use init_args as a per-target stash
-                $args{init_args}{_la} ||= do {
+                $hook_args{per_target_conf}{_la} ||= do {
                     require Log::Any;
                     Log::Any->get_logger(category => $pkg);
                 };
 
-                my $meth = $args{str_level};
+                my $meth = $hook_args{str_level};
                 my $logger = sub {
                     my $ctx = shift;
-                    $args{init_args}{_la}->$meth(@_);
+                    $hook_args{per_target_conf}{_la}->$meth(@_);
                 };
                 [$logger];
             }],
@@ -55,7 +58,7 @@ Log::ger::Output::LogAny - Send logs to Log::Any
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -83,7 +86,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

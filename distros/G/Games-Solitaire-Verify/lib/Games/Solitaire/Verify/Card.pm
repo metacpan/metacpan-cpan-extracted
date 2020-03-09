@@ -1,12 +1,12 @@
 package Games::Solitaire::Verify::Card;
-$Games::Solitaire::Verify::Card::VERSION = '0.2202';
+$Games::Solitaire::Verify::Card::VERSION = '0.2300';
 use warnings;
 use strict;
 
 
 use parent 'Games::Solitaire::Verify::Base';
 
-use Games::Solitaire::Verify::Exception;
+use Games::Solitaire::Verify::Exception ();
 
 __PACKAGE__->mk_acc_ref(
     [
@@ -272,7 +272,7 @@ Solitaire card.
 
 =head1 VERSION
 
-version 0.2202
+version 0.2300
 
 =head1 SYNOPSIS
 
@@ -362,36 +362,9 @@ Determines if the card is flipped.
 
 Sets the card’s flipped status.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2014 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/fc-solve/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Games::Solitaire::Verify::Card
 
 =head2 Websites
 
@@ -410,35 +383,11 @@ L<https://metacpan.org/release/Games-Solitaire-Verify>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Games-Solitaire-Verify>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Solitaire-Verify>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Games-Solitaire-Verify>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Games-Solitaire-Verify>
 
 =item *
 
@@ -489,5 +438,26 @@ from your repository :)
 L<https://github.com/shlomif/fc-solve>
 
   git clone git://github.com/shlomif/fc-solve.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/fc-solve/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

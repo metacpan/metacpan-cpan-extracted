@@ -61,4 +61,4 @@ ok($mw->focusCurrent, $entry3,
 );
 
 
-MainLoop if (@ARGV);
+(@ARGV) ? MainLoop : $mw->destroy;

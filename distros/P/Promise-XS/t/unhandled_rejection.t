@@ -53,6 +53,35 @@ use Promise::XS;
 
         my $p = $d->promise();
 
+        my @caught;
+
+        my $p2 = $p->then( sub {
+            return Promise::XS::rejected(666);
+        } )->catch( sub {
+            push @caught, shift;
+        } );
+
+        $d->resolve(234);
+
+        is_deeply(\@caught, [666], 'returned rejection caught');
+    }
+
+    cmp_deeply(
+        \@w,
+        [ ],
+        'returned rejected() propagates as expected, doesn’t trigger unhandled warning',
+    );
+}
+
+{
+    my @w;
+    local $SIG{'__WARN__'} = sub { push @w, @_ };
+
+    {
+        my $d = Promise::XS::deferred();
+
+        my $p = $d->promise();
+
         my $p2 = $p->then( sub {
             die "nonono";
         } );

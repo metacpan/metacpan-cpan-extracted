@@ -24,7 +24,7 @@ Dpkg::Changelog - base class to implement a changelog parser
 
 Dpkg::Changelog is a class representing a changelog file
 as an array of changelog entries (Dpkg::Changelog::Entry).
-By deriving this object and implementing its parse method, you
+By deriving this class and implementing its parse method, you
 add the ability to fill this object with changelog entries.
 
 =cut
@@ -34,7 +34,7 @@ package Dpkg::Changelog;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '2.00';
 
 use Carp;
 
@@ -89,6 +89,22 @@ sub set_options {
     my ($self, %opts) = @_;
     $self->{$_} = $opts{$_} foreach keys %opts;
 }
+
+=item $count = $c->parse($fh, $description)
+
+Read the filehandle and parse a changelog in it. The data in the object is
+reset before parsing new data.
+
+Returns the number of changelog entries that have been parsed with success.
+
+This method needs to be implemented by one of the specialized changelog
+format subclasses.
+
+=item $count = $c->load($filename)
+
+Parse $filename contents for a changelog.
+
+Returns the number of changelog entries that have been parsed with success.
 
 =item $c->reset_parse_errors()
 
@@ -654,36 +670,6 @@ sub format_range {
     }
 }
 
-=item $control = $c->dpkg($range)
-
-This is a deprecated alias for $c->format_range('dpkg', $range).
-
-=cut
-
-sub dpkg {
-    my ($self, $range) = @_;
-
-    warnings::warnif('deprecated',
-                     'deprecated method, please use format_range("dpkg", $range) instead');
-
-    return $self->format_range('dpkg', $range);
-}
-
-=item @controls = $c->rfc822($range)
-
-This is a deprecated alias for C<scalar c->format_range('rfc822', $range)>.
-
-=cut
-
-sub rfc822 {
-    my ($self, $range) = @_;
-
-    warnings::warnif('deprecated',
-                     'deprecated method, please use format_range("rfc822", $range) instead');
-
-    return scalar $self->format_range('rfc822', $range);
-}
-
 =back
 
 =head1 RANGE SELECTION
@@ -762,6 +748,10 @@ C<until> and C<to> returns the intersection of the two results
 with only one of the options specified.
 
 =head1 CHANGES
+
+=head2 Version 2.00 (dpkg 1.20.0)
+
+Remove methods: $c->dpkg(), $c->rfc822().
 
 =head2 Version 1.01 (dpkg 1.18.8)
 

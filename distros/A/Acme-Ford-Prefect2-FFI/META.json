@@ -38,7 +38,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Acme::Alien::DontPanic2" : "2.0400",
+            "Acme::Alien::DontPanic2" : "2.1100",
             "FFI::CheckLib" : "0.15",
             "FFI::Platypus" : "1.00",
             "FFI::Platypus::Declare" : "0",
@@ -65,7 +65,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.0400",
+   "version" : "2.1100",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_use_unsafe_inc" : 0

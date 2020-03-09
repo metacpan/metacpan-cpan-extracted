@@ -34,11 +34,11 @@ use parent qw(Dpkg::Vendor::Debian);
 
 =head1 NAME
 
-Dpkg::Vendor::Ubuntu - Ubuntu vendor object
+Dpkg::Vendor::Ubuntu - Ubuntu vendor class
 
 =head1 DESCRIPTION
 
-This vendor object customizes the behaviour of dpkg scripts for Ubuntu
+This vendor class customizes the behaviour of dpkg scripts for Ubuntu
 specific behavior and policies.
 
 =cut
@@ -65,9 +65,6 @@ sub run_hook {
                warning(g_('Version number suggests Ubuntu changes, but there is no XSBC-Original-Maintainer field'));
            }
         }
-
-    } elsif ($hook eq 'keyrings') {
-        return $self->run_hook('package-keyrings', @params);
     } elsif ($hook eq 'package-keyrings') {
         return ($self->SUPER::run_hook($hook),
                 '/usr/share/keyrings/ubuntu-archive-keyring.gpg');

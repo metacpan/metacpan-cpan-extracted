@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/gimpgitbuild.pm',
     'App/gimpgitbuild/API/GitBuild.pm',
     'App/gimpgitbuild/Command/build.pm',
-    'App/gimpgitbuild/Command/env.pm'
+    'App/gimpgitbuild/Command/env.pm',
+    'App/gimpgitbuild/Command/runenv.pm'
 );
 
 my @scripts = (

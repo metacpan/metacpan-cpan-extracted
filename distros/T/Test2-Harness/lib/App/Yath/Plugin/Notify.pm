@@ -2,7 +2,7 @@ package App::Yath::Plugin::Notify;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use Test2::Harness::Util::JSON qw/encode_json/;
 
@@ -294,7 +294,7 @@ sub send_run_notification_slack {
         for my $set (@{$final->{failed}}) {
             my $file = $set->[1];
 
-            $files = $files ? "\n$file" : $file;
+            $files = $files ? "$files\n$file" : $file;
 
             next unless $settings->notify->slack_owner;
             my $tf = Test2::Harness::TestFile->new(file => $file);
@@ -330,7 +330,7 @@ sub send_run_notification_email {
         for my $set (@{$final->{failed}}) {
             my $file = $set->[1];
 
-            $files = $files ? "\n$file" : $file;
+            $files = $files ? "$files\n$file" : $file;
 
             next unless $settings->notify->email_owner;
             my $tf = Test2::Harness::TestFile->new(file => $file);

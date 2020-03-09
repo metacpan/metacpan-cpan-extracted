@@ -15,6 +15,26 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_check : Test(4) {
+    my $self = shift;
+
+    my $sub = sub {index(shift,'.') >= 0};
+
+    eval {Quiq::Assert->check(undef,$sub)};
+    $self->is($@,'');
+
+    eval {Quiq::Assert->check('',$sub)};
+    $self->is($@,'');
+
+    eval {Quiq::Assert->check('a.b',$sub)};
+    $self->is($@,'');
+
+    eval {Quiq::Assert->check('a',$sub)};
+    $self->ok($@);
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_isEnumValue : Test(4) {
     my $self = shift;
 

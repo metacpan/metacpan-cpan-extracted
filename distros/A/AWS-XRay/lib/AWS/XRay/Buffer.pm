@@ -17,7 +17,7 @@ sub new {
 sub flush {
     my $self = shift;
     my $sock = $self->{sock};
-    for my $buf (@{$self->{buf}}) {
+    for my $buf (@{ $self->{buf} }) {
         $sock->syswrite($buf, length($buf));
     }
     $self->{buf} = [];
@@ -37,7 +37,7 @@ sub print {
         $self->{sock}->syswrite($data, length($data));
     }
     else {
-        push @{$self->{buf}}, $data;
+        push @{ $self->{buf} }, $data;
     }
 }
 

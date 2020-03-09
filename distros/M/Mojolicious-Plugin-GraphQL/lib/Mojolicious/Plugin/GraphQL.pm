@@ -10,7 +10,7 @@ use Module::Runtime qw(require_module);
 use Mojo::Promise;
 use Exporter 'import';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our @EXPORT_OK = qw(promise_code);
 
 use constant promise_code => +{
@@ -101,8 +101,13 @@ sub register {
     }
     my $data;
     my $body = eval { decode_json($c->req->body) };
-    $data = eval { $handler->($c, $body, EXECUTE()) } if !$@;
-    $data = { errors => [ { message => $@ } ] } if $@;
+    if ($@) {
+      # conceal error info like versions from attackers
+      $data = { errors => [ { message => "Malformed request" } ] };
+    } else {
+      $data = eval { $handler->($c, $body, EXECUTE()) } if !$@;
+      $data = { errors => [ { message => $@ } ] } if $@;
+    }
     return $data->then(sub { $c->render(json => shift) }) if is_Promise($data);
     $c->render(json => $data);
   };

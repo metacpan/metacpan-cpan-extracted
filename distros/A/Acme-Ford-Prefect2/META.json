@@ -17,13 +17,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Acme::Alien::DontPanic2" : "2.0400"
+            "Acme::Alien::DontPanic2" : "2.1100"
          }
       },
       "configure" : {
          "requires" : {
-            "Acme::Alien::DontPanic2" : "2.0400",
-            "Alien::Base::Wrapper" : "2.04",
+            "Acme::Alien::DontPanic2" : "2.1100",
+            "Alien::Base::Wrapper" : "2.11",
             "ExtUtils::MakeMaker" : "6.64",
             "perl" : "5.006"
          }
@@ -73,7 +73,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.0400",
+   "version" : "2.1100",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_use_unsafe_inc" : 0

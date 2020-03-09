@@ -1,0 +1,58 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Test::More;
+
+use HTTP::Status qw/ :constants :is /;
+use HTTP::Request::Common;
+use Plack::Builder;
+use Plack::Test;
+
+my $handler = builder {
+    enable "Security::Simple",
+        rules => {
+            PATH_INFO      => qr{^/cgi-bin/},
+            REQUEST_METHOD => "POST",
+        };
+
+    sub { return [ HTTP_OK, [], ['Ok'] ] };
+};
+
+test_psgi
+  app    => $handler,
+  client => sub {
+    my $cb = shift;
+
+    subtest 'not blocked' => sub {
+        my $req = GET "/some/thing.html";
+        my $res = $cb->($req);
+
+        ok is_success( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_OK, "HTTP_OK";
+
+    };
+
+    subtest 'not blocked' => sub {
+        my $req = GET "/cgi-bin/thing.html";
+        my $res = $cb->($req);
+
+        ok is_success( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_OK, "HTTP_OK";
+
+    };
+
+
+    subtest 'blocked' => sub {
+        my $req = POST "/cgi-bin/thing?stuff=1";
+        my $res = $cb->($req);
+
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+
+    };
+
+ };
+
+done_testing;

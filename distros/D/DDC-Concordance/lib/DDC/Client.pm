@@ -32,6 +32,12 @@ our $ifmt = 'V';
 ## + for ddc-1.x, use machine word size and endian-ness of server
 our $ilen = 4;
 
+## $JSON_BACKEND
+## + underlying JSON module (default='JSON')
+our ($JSON_BACKEND);
+BEGIN {
+  $JSON_BACKEND = 'JSON' if (!defined($JSON_BACKEND));
+}
 
 ##======================================================================
 ## Constructors etc
@@ -40,7 +46,7 @@ our $ilen = 4;
 ##  + %args:
 ##    (
 ##     ##-- connection options
-##     connect=>\%connectArgs,  ##-- passed to IO::Socket::(INET|UNIX)->new()
+##     connect=>\%connectArgs,  ##-- passed to IO::Socket::(INET|UNIX)->new(); also accepts connect=>$connectURL
 ##     mode   =>$queryMode,     ##-- one of 'table', 'html', 'text', 'json', or 'raw'; default='json' ('html' is not yet supported)
 ##     linger =>\@linger,       ##-- SO_LINGER socket option; default=[1,0]: immediate termination
 ##     ##
@@ -72,9 +78,17 @@ our $ilen = 4;
 ##     Proto=>'tcp',
 ##     Type=>SOCK_STREAM,
 ##     Blocking=>1,
-##
+##  + URL specification of \%connectArgs via connect=>{url=>$url} or connect=>$url,
+##     inet://ADDR:PORT?OPT=VAL...
+##     unix://UNIX_PATH?OPT=VAL...
+##     unix:UNIX_PATH?OPT=VAL...
+##     ADDR?OPT=VAL...
+##     :PORT?OPT=VAL...
+##     ADDR:PORT?OPT=VAL...
+##     /UNIX_PATH?OPT=VAL...
 sub new {
   my ($that,%args) = @_;
+  my @connect_args = grep {exists $args{$_}} map {($_,lc($_),uc($_))} qw(Peer PeerAddr PeerPort Url);
   my %connect = (
 		 ##-- connection options
 		 Domain=>'INET',
@@ -86,8 +100,11 @@ sub new {
 
 		 ##-- connect: user args
 		 (defined($args{'connect'}) ? %{$args{'connect'}} : qw()),
+
+                 ##-- connect: top-level args
+                 (map {($_=>$args{$_})} @connect_args),
 		);
-  delete($args{'connect'});
+  delete @args{'connect',@connect_args};
 
   my $dc =bless {
 		 ##-- connection options
@@ -421,9 +438,99 @@ sub run_query {
 ##======================================================================
 ## Low-level communications
 
+## \%connect = $dc->parseAddr()
+## \%connect = $CLASS_OR_OBJECT->parseAddr(\%connect, $PEER_OR_LOCAL='peer', %options)
+## \%connect = $CLASS_OR_OBJECT->parserAddr({url=>$url}, $PEER_OR_LOCAL='peer', %options)
+##  + parses connect URLs to option-hashes suitable for use as $dc->{connect}
+##  + supported URLs formats:
+##     inet://ADDR:PORT?OPT=VAL...
+##     unix://UNIX_PATH?OPT=VAL...
+##     unix:UNIX_PATH?OPT=VAL...
+##     ADDR?OPT=VAL...
+##     :PORT?OPT=VAL...
+##     ADDR:PORT?OPT=VAL...
+##     /UNIX_PATH?OPT=VAL...
+sub parseAddr {
+  my ($that,$connect,$prefix,%opts) = @_;
+  my ($override);
+  if (!$connect && ref($that)) {
+    $connect  = $that->{connect};
+    $override = 1;
+  }
+  $connect //= 'inet://localhost:50000';
+  $connect   = {url=>$connect} if (!UNIVERSAL::isa($connect,'HASH'));
+
+  $prefix ||= 'Peer';
+  $prefix   = ucfirst($prefix);
+  my $url = $connect->{URL} || $connect->{Url} || $connect->{url};
+  if (defined($url)) {
+    my ($base,$opts) = split(/\?/,$url,2);
+    my $scheme = ($base =~ s{^([\w\+\-]+):(?://)?}{} ? $1 : '');
+    if (lc($scheme) eq 'unix' || (!$scheme && $base =~ m{^/})) {
+      $connect->{Domain} = 'UNIX';
+      $connect->{$prefix} = $base;
+    }
+    elsif (!$scheme || grep {$_ eq lc($scheme)} qw(inet tcp)) {
+      $connect->{Domain} = 'INET';
+      my ($host,$port) = split(':',$base,2);
+      $host ||= 'localhost';
+      $port ||= 50000;
+      @$connect{"${prefix}Addr","${prefix}Port"} = ($host,$port);
+    }
+    else {
+      die(__PACKAGE__, "::parseAddr(): unsupported scheme '$scheme' for URL $url");
+    }
+    my %urlopts = map {split(/=/,$_,2)} grep {$_} split(/[\&\;]/,($opts//''));
+    @$connect{keys %urlopts} = values %urlopts;
+  }
+  @$connect{keys %opts} = values %opts;
+
+  $that->{connect} = $connect if ($override);
+  return $connect;
+}
+
+## $str = $dc->addrStr()
+## $str = $CLASS_OR_OBJECT->addrStr(\%connect,$PEER_OR_LOCAL)
+## $str = $CLASS_OR_OBJECT->addrStr($url,$PEER_OR_LOCAL)
+## $str = $CLASS_OR_OBJECT->addrStr($sock,$PEER_OR_LOCAL)
+sub addrStr {
+  my ($that,$addr,$prefix) = @_;
+  $addr   = ($that->{sock} || $that->{connect}) if (ref($that) && !defined($addr));
+  $prefix ||= 'Peer';
+  $prefix   = ucfirst($prefix);
+
+  if (UNIVERSAL::isa($addr,'IO::Socket::UNIX')) {
+    return "unix://$addr->{$prefix}";
+  }
+  elsif (UNIVERSAL::isa($addr,'IO::Socket::INET')) {
+    my $mprefix = (lc($prefix) eq 'peer' ? 'peer' : 'sock');
+    return "inet://".$addr->can($mprefix."host")->($addr).":".$addr->can($mprefix."port")->($addr);
+  }
+  $addr = $addr->{connect} if (UNIVERSAL::isa($addr,'DDC::Client'));
+  $addr = $that->parseAddr($addr,$prefix) if (!ref($addr));
+  my ($url);
+  #my %uopts = %$addr;
+  if ($addr->{Domain} eq 'UNIX') {
+    $url = "unix://$addr->{$prefix}";
+    #delete $uopts{$prefix};
+  }
+  else {
+    $url = "inet://".($addr->{"${prefix}Addr"} && $addr->{"${prefix}Port"}
+		      ? ($addr->{"${prefix}Addr"}.":".$addr->{"${prefix}Port"})
+		      : $addr->{"${prefix}Addr"});
+    #delete @uopts{"${prefix}Addr","${prefix}Port"};
+  }
+  #delete $opts{Domain};
+  #if (%uopts) {
+  #  $url .= '?'.join('&',map {("$_=$uopts{$_}")} sort keys %uopts);
+  #}
+  return $url;
+}
+
 ## $io_socket = $dc->open()
 sub open {
   my $dc = shift;
+  $dc->parseAddr();
   my $domain = $dc->{connect}{Domain} // 'INET';
   if (lc($domain) eq 'unix') {
     ##-- v0.43: use unix-domain socket connection
@@ -745,9 +852,12 @@ sub decodeJson {
     $bufr   = \$buf;
   }
 
-  require JSON;
+  my $module = $JSON_BACKEND // 'JSON';
+  $module =~ s{::}{/}g;
+  require "$module.pm";
+
   my $jxs = $dc->{jxs};
-  $jxs    = $dc->{jxs} = JSON->new->utf8(0)->relaxed(1)->canonical(0) if (!defined($jxs));
+  $jxs    = $dc->{jxs} = $JSON_BACKEND->new->utf8(0)->relaxed(1)->canonical(0) if (!defined($jxs));
   return $jxs->decode($$bufr);
 }
 
@@ -828,6 +938,9 @@ DDC::Client - Client socket object and utilities for DDC::Concordance
  ##---------------------------------------------------------------------
  ## Low-level Communications
 
+ $connect = $dc->parseAddr();       ##-- parse connection parameters
+ $urlstr  = $dc->addrStr();         ##-- get connection parameter string
+
  $io_socket = $dc->open();          ##-- open the connection
  undef      = $dc->close();         ##-- close the connection
 
@@ -885,6 +998,13 @@ e.g. by setting:
 
  $ilen = length(pack($ifmt,0));
 
+=item Variable: $JSON_BACKEND
+
+Name of module to use for JSON response decoding via L<decodeJson()>,
+defaults to C<JSON>.  Set this to C<JSON::PP> or set the environment
+variable C<PERL_JSON_BACKEND=JSON::PP> if you are using multiple
+DDC clients via the L<threads|threads> module.
+
 =back
 
 =cut
@@ -908,6 +1028,7 @@ e.g. by setting:
  (
   ##-- connection options
   connect  =>\%connectArgs,   ##-- passed to IO::Socket::(INET|UNIX)->new(), depending on $connectArgs{Domain}
+                              ##   + you can also specify connect=>{url=>$url} or connect=>$url
   mode     =>$mode,           ##-- query mode; one of qw(json table text html raw); default='json'
   linger   =>\@linger,        ##-- SO_LINGER socket option (default=[1,0]: immediate termination)
  
@@ -940,9 +1061,26 @@ e.g. by setting:
  Type=>SOCK_STREAM,
  Blocking=>1,
 
-=item connect to a UNIX socket at C<$SOCKPATH> on the local host:
+=item Examples
 
+  #-- connect to an INET socket on C<$HOST:$PORT>:
+  $dc = DDC::Client->new(connect=>{Domain=>'INET',PeerAddr=>$HOST,PeerPort=>$Port});
+  #
+  # ... syntactic sugar:
+  $dc = DDC::Client->new(connect=>{url=>"inet://$HOST:$PORT"})
+  $dc = DDC::Client->new(connect=>"inet://$HOST:$PORT")
+  $dc = DDC::Client->new(connect=>"$HOST:$PORT")
+
+  #-- connect to an INET socket on localhost port C<$PORT>, setting socket timeout $TIMEOUT
+  $dc = DDC::Client->new(connect=>{PeerPort=>$PORT,Timeout=>$TIMEOUT});
+  $dc = DDC::Client->new(connect=>":$PORT?Timeout=$TIMEOUT")
+
+  #-- connect to a UNIX socket at C<$SOCKPATH> on the local host:
   $dc = DDC::Client->new(connect=>{Domain=>'UNIX',Peer=>$SOCKPATH});
+  #
+  # ... syntactic sugar:
+  $dc = DDC::Client->new(connect=>{url=>"unix://$SOCKPATH"})
+  $dc = DDC::Client->new(connect=>"unix://$SOCKPATH")
 
 =back
 
@@ -1140,6 +1278,39 @@ but not between individual requests.
 
 =over 4
 
+=item parseAddr
+
+ \%connect = $dc->parseAddr()
+ \%connect = $CLASS_OR_OBJECT->parseAddr(\%connect,    $PEER_OR_LOCAL, %options)
+ \%connect = $CLASS_OR_OBJECT->parserAddr({url=>$url}, $PEER_OR_LOCAL, %options)
+ \%connect = $CLASS_OR_OBJECT->parserAddr($url,        $PEER_OR_LOCAL, %options)
+
+Parses connect options into a form suitable for use as parameters to
+C<IO::Socket::INET::new()> rsp. C<IO::Socket::UNIX::new()>.
+Sets C<$connect{Domain}> to either C<INET> or C<UNIX>.
+If called as an object method, operates directly on (and updates)
+C<$dc-E<gt>{connect}>.
+
+Honors bare URL-style strings C<$url> of the form:
+
+ inet://ADDR:PORT?OPT=VAL...
+ unix://UNIX_PATH?OPT=VAL...
+ unix:UNIX_PATH?OPT=VAL...
+ ADDR?OPT=VAL...
+ :PORT?OPT=VAL...
+ ADDR:PORT?OPT=VAL...
+ /UNIX_PATH?OPT=VAL...
+
+=item addrStr
+
+ $urlstr = $dc->addrStr();
+ $urlstr = $CLASS_OR_OBJECT->addrStr(\%connect, $PEER_OR_LOCAL);
+ $urlstr = $CLASS_OR_OBJECT->addrStr($url,  $PEER_OR_LOCAL);
+ $urlstr = $CLASS_OR_OBJECT->addrStr($sock, $PEER_OR_LOCAL);
+
+Formats specified socket connection parameters (by default those of the
+calling object if called as an object method) as a URL-style string.
+
 =item open
 
  $io_socket = $dc->open();
@@ -1260,7 +1431,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2019 by Bryan Jurish
+Copyright (C) 2006-2020 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.24.1 or,

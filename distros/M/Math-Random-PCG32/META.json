@@ -4,7 +4,7 @@
       "Jeremy Mates <jmates@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "apache_2_0"
    ],
@@ -41,18 +41,18 @@
    "provides" : {
       "Math::Random::PCG32" : {
          "file" : "lib/Math/Random/PCG32.pm",
-         "version" : "0.12"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://apache.org/licenses/LICENSE-2.0"
+         "http://www.apache.org/licenses/LICENSE-2.0.txt"
       ],
       "repository" : {
          "url" : "https://github.com/thrig/Math-Random-PCG32"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

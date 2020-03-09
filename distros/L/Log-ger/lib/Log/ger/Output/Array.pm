@@ -1,27 +1,30 @@
 package Log::ger::Output::Array;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger'; # DIST
+our $VERSION = '0.033'; # VERSION
 
 use strict;
 use warnings;
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
-    $conf{array} or die "Please specify array";
+    $plugin_conf{array} or die "Please specify array";
 
     return {
-        create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %hook_args = @_;
+        create_outputter => [
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
-                my $logger = sub {
-                    my ($ctx, $msg) = @_;
-                    push @{$conf{array}}, $msg;
+                my $outputter = sub {
+                    my ($per_target_conf, $msg, $per_msg_conf) = @_;
+                    push @{$plugin_conf{array}}, $msg;
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -41,7 +44,7 @@ Log::ger::Output::Array - Log to array
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 

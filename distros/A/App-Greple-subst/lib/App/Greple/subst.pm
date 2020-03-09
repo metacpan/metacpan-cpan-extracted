@@ -6,7 +6,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.07
+Version 2.08
 
 =head1 SYNOPSIS
 
@@ -153,19 +153,21 @@ Default off.
 This module includes example dictionaries.  They are installed share
 directory and accessed by B<--exdict> option.
 
-    greple -Msubst --exdict katakana-guide-3.dict
+    greple -Msubst --exdict jtca-katakana-guide-3.dict
 
 =over 7
 
 =item B<--exdict> I<dictionary>
 
-=item B<--exdictdir>
-
 Use I<dictionary> flie in the distribution as a dictionary file.
 
-=item B<--jtca-katakana-guide>
+=item B<--exdictdir>
 
-Shortcut for "B<--exdict> L<jtca-katakana-guide-3.dict>".
+Show dictionary directory.
+
+=item B<--exdict> jtca-katakana-guide-3.dict
+
+=item B<--jtca-katakana-guide>
 
 Created from following guideline document.
 
@@ -175,6 +177,15 @@ Created from following guideline document.
     一般財団法人テクニカルコミュニケーター協会 
     Japan Technical Communicators Association
     https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf
+
+=item B<--exdict> sccc2.dict
+
+=item B<--sccc2>
+
+Dictionary used for "C/C++ セキュアコーディング 第2版" published in
+2014.
+
+https://www.jpcert.or.jp/securecoding_book_2nd.html
 
 =back
 
@@ -208,7 +219,7 @@ Kazumasa Utashiro
 
 package App::Greple::subst;
 
-our $VERSION = '2.07';
+our $VERSION = '2.08';
 
 use v5.14;
 use strict;
@@ -284,6 +295,7 @@ our @opt_format;
 our @default_opt_format = ( '%s' );
 our $opt_subst_select;
 our $opt_linefold;
+our $opt_ignore_space = 1;
 our $opt_warn_overlap = 1;
 our $opt_warn_include = 0;
 our $opt_stat_style = "default";
@@ -292,6 +304,7 @@ my $current_file;
 my $contents;
 my @fromto;
 my @subst_diffcmd;
+my $ignorechar_re;
 
 sub debug {
     $debug = 1;
@@ -306,6 +319,8 @@ sub subst_initialize {
     @subst_diffcmd = shellwords $opt_subst_diffcmd;
 
     @opt_format = @default_opt_format if @opt_format == 0;
+
+    $ignorechar_re = $opt_ignore_space ? qr/\s+/ : qr/\R+/;
 
     if (defined $opt_U) {
 	@subst_diffcmd = ("diff", "-U$opt_U");
@@ -325,11 +340,11 @@ sub subst_initialize {
 	    map  { $numbers->parse($_)->sequence }
 	    split /,/, $select;
 	};
-	@fromto = sub {
-	    my @result = (undef) x $max;
-	    @result[@select] = @fromto[@select];
-	    @result;
-	}->(@fromto);
+	@fromto = do {
+	    my @tmp = (undef) x $max;
+	    @tmp[@select] = @fromto[@select];
+	    @tmp;
+	};
     }
 }
 
@@ -487,7 +502,7 @@ sub subst_search {
 	next if @match == 0 and $opt_check ne 'all';
 	my $callback = sub {
 	    my($ms, $me, $i, $matched) = @_;
-	    my $s = $matched =~ s/\R//gr;
+	    my $s = $matched =~ s/$ignorechar_re//gr;
 	    $match_list[$index]->{$s}++;
 	    my $format = @opt_format[ $i % @opt_format ];
 	    sprintf($format,
@@ -497,7 +512,7 @@ sub subst_search {
 	my(@ok, @ng);
 	for (@match) {
 	    my $matched = substr $text, $_->[0], $_->[1] - $_->[0];
-	    if ($matched =~ s/\R//gr ne $to) {
+	    if ($matched =~ s/$ignorechar_re//gr ne $to) {
 		$_->[2] = $index * 2;
 		push @ng, $_;
 	    } else {
@@ -619,6 +634,7 @@ builtin linefold!      $opt_linefold
 builtin remember!      $remember_data
 builtin warn-overlap!  $opt_warn_overlap
 builtin warn-include!  $opt_warn_include
+builtin ignore-space!  $opt_ignore_space
 
 option default \
 	--prologue subst_initialize \
@@ -673,6 +689,8 @@ option --exdict  --dict $ENV{GREPLE_SUBST_DICT}/$<shift>
 option --exdictdir --prologue 'sub{ say "$ENV{GREPLE_SUBST_DICT}"; exit }'
 
 option --jtca-katakana-guide --exdict jtca-katakana-guide-3.dict
+
+option --sccc2 --exdict sccc2.dict
 
 option --dumpdict --printdict --prologue 'sub{exit}'
 

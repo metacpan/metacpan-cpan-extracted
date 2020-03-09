@@ -358,18 +358,18 @@ sub execute {
 
         # bsdtar (mac) doesn't support `--remove-files`
         if ( !-e "lav.tar.gz" ) {
-            App::Egaz::Common::exec_cmd( "tar -cvf - *.lav | $gzip_bin > lav.tar.gz",
+            App::Egaz::Common::exec_cmd( "tar -cf - *.lav | $gzip_bin > lav.tar.gz",
                 { verbose => $opt->{verbose}, } );
         }
         for ( Path::Tiny::path(".")->children(qr/\.lav$/) ) {
             $_->remove;
         }
 
-        App::Egaz::Common::exec_cmd( "tar -cvf - net/ | $gzip_bin > net.tar.gz",
+        App::Egaz::Common::exec_cmd( "tar -cf - net/ | $gzip_bin > net.tar.gz",
             { verbose => $opt->{verbose}, } );
         Path::Tiny::path("net")->remove_tree;
 
-        App::Egaz::Common::exec_cmd( "tar -cvf - *.psl | $gzip_bin > psl.tar.gz",
+        App::Egaz::Common::exec_cmd( "tar -cf - *.psl | $gzip_bin > psl.tar.gz",
             { verbose => $opt->{verbose}, } );
         for ( Path::Tiny::path(".")->children(qr/^.+\.psl$/) ) {
             $_->remove;
@@ -383,7 +383,7 @@ sub execute {
             App::Egaz::Common::exec_cmd( "$gzip_bin $p.chain", { verbose => $opt->{verbose}, } );
         }
 
-        App::Egaz::Common::exec_cmd( "tar -cvf - *.chain | $gzip_bin > chain.tar.gz",
+        App::Egaz::Common::exec_cmd( "tar -cf - *.chain | $gzip_bin > chain.tar.gz",
             { verbose => $opt->{verbose}, } );
         for ( Path::Tiny::path(".")->children(qr/^.+\.chain$/) ) {
             $_->remove;

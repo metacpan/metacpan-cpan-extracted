@@ -1,5 +1,5 @@
 package Template::Liquid;
-our $VERSION = '1.0.17';
+our $VERSION = '1.0.18';
 use strict;
 use warnings;
 our (%tags, %filters);
@@ -18,8 +18,10 @@ use Template::Liquid::Tag::Case;
 use Template::Liquid::Tag::Comment;
 use Template::Liquid::Tag::Continue;
 use Template::Liquid::Tag::Cycle;
+use Template::Liquid::Tag::Decrement;
 use Template::Liquid::Tag::For;
 use Template::Liquid::Tag::If;
+use Template::Liquid::Tag::Increment;
 use Template::Liquid::Tag::Raw;
 use Template::Liquid::Tag::Unless;
 sub register_filter { $filters{$_} = scalar caller for @_ }
@@ -271,6 +273,39 @@ the name of the group. This can even be a variable.
     two
 
 For more, see L<Template::Liquid::Tag::Cycle|Template::Liquid::Tag::Cycle>.
+
+=head2 C<increment>
+
+Creates a new number variable, and increases its value by one every time it is
+called. The initial value is C<0>.
+
+    {% increment my_counter %}
+    {% increment my_counter %}
+    {% increment my_counter %}
+
+...would become...
+
+    0
+    1
+    2
+
+=head2 C<decrement>
+
+Creates a new number variable, and decreases its value by one every time it is
+called. The initial value is C<-1>.
+
+    {% decrement variable %}
+    {% decrement variable %}
+    {% decrement variable %}
+
+...would become...
+
+   -1
+   -2
+   -3
+
+For more, see
+L<Template::Liquid::Tag::Decrement|Template::Liquid::Tag::Decrement>.
 
 =head2 C<for>
 

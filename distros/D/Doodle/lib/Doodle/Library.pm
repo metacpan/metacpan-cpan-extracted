@@ -1,6 +1,14 @@
 package Doodle::Library;
 
-use Data::Object 'Library';
+use strict;
+use warnings;
+
+use Type::Library -base;
+use Type::Utils -all;
+
+BEGIN {
+  extends 'Data::Object::Types';
+}
 
 our $Data = declare "Data",
   as HashLike;
@@ -72,7 +80,7 @@ Doodle Type Library
 =head1 DESCRIPTION
 
 Doodle::Library is the L<Doodle> type library derived from
-L<Data::Object::Library> which is a L<Type::Library>.
+L<Data::Object::Types> which is a L<Type::Library>.
 
 =cut
 
@@ -80,7 +88,7 @@ L<Data::Object::Library> which is a L<Type::Library>.
 
 This package uses type constraints from:
 
-L<Data::Object::Library>
+L<Data::Object::Types>
 
 =cut
 

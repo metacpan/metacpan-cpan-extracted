@@ -1,11 +1,11 @@
 package Mojolicious::Plugin::Moai;
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 # ABSTRACT: Mojolicious UI components using modern UI libraries
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Mojolicious::Lite;
-#pod     plugin Moai => 'Bootstrap4', { version => '4.4.1' };
+#pod     plugin Moai => [ 'Bootstrap4', { version => '4.4.1' } ];
 #pod     app->start;
 #pod     __DATA__
 #pod     @@ list.html.ep
@@ -46,9 +46,9 @@ our $VERSION = '0.009';
 #pod UI library and version of that library you want to use.
 #pod
 #pod     use Mojolicious::Lite;
-#pod     plugin Moai => 'Bootstrap4', {
+#pod     plugin Moai => [ 'Bootstrap4', {
 #pod         version => '4.4.1',
-#pod     };
+#pod     } ];
 #pod
 #pod Now you can add widgets. You will likely first want to add the C<moai/lib>
 #pod widget to your layout template to get the UI library.
@@ -64,6 +64,23 @@ our $VERSION = '0.009';
 #pod
 #pod Widgets are snippets that you can include in your templates using the
 #pod L<include helper|Mojolicious::Guides::Rendering/Partial templates>.
+#pod
+#pod =head2 moai/grid
+#pod
+#pod     <%= include 'moai/grid', content => begin %>
+#pod         <%= include 'moai/grid/col', size => 9, content => begin %>
+#pod             This column takes up 9/12 width
+#pod         <% end %>
+#pod         <%= include 'moai/grid/col', content => begin %>
+#pod             This column will fill the remaining space
+#pod         <% end %>
+#pod     <% end %>
+#pod
+#pod The C<moai/grid> and C<moai/grid/col> templates provide the library's
+#pod grid system. C<moai/grid> starts a grid row, and C<moai/grid/col> is
+#pod a column in that row.  For libraries like Bootstrap which have an
+#pod additional "container" element, that element is already included in the
+#pod C<moai/grid> template.
 #pod
 #pod =head2 moai/pager
 #pod
@@ -250,6 +267,101 @@ our $VERSION = '0.009';
 #pod
 #pod =back
 #pod
+#pod =head1 LAYOUTS
+#pod
+#pod Layouts wrap your templates in a common framing. See L<the Mojolicious
+#pod docs for more information on
+#pod Layouts|https://mojolicious.org/perldoc/Mojolicious/Guides/Rendering#Layouts>.
+#pod
+#pod =head2 Using Moai Layouts
+#pod
+#pod To get started using a Moai layout, L<extend a Moai layout template|https://mojolicious.org/perldoc/Mojolicious/Guides/Rendering#Template-inheritance>
+#pod to fill in the missing parts.
+#pod
+#pod     use Mojolicious::Lite;
+#pod     plugin Moai => [ 'Bootstrap4', { version => '4.4.1' } ];
+#pod     get '/' => 'index';
+#pod     __END__
+#pod     @@ index.html.ep
+#pod     % layout 'site';
+#pod     <h1>Welcome!</h1>
+#pod     @@ layouts/site.html.ep
+#pod     % extends 'layouts/moai/default';
+#pod     %# Add a main nav with links to our products, a history, and contact page
+#pod     % content_for navbar => begin
+#pod         <%= include 'moai/navbar',
+#pod             position => 'fixed-top',
+#pod             brand => [ 'My Site' => 'index' ],
+#pod             menu => [
+#pod                 [ 'Products'   => 'products' ],
+#pod                 [ 'About Us'   => 'history'  ],
+#pod                 [ 'Contact Us' => 'contact'  ],
+#pod             ],
+#pod         %>
+#pod     % end
+#pod
+#pod =head2 Included Layouts
+#pod
+#pod These layouts are included with Moai.
+#pod
+#pod =head3 default
+#pod
+#pod The default layout is a general-purpose layout for almost any use. Other
+#pod layouts can extend this one to provide more-specific features.
+#pod
+#pod =head4 Content Sections
+#pod
+#pod =over
+#pod
+#pod =item head
+#pod
+#pod This content goes inside the C<< <head> .. </head> >> element, just before the
+#pod closing C<< </head> >>.
+#pod
+#pod =item header
+#pod
+#pod This section is the very top of the page and contains the navbar and an optional
+#pod hero element.
+#pod
+#pod =over
+#pod
+#pod =item navbar
+#pod
+#pod This section is a placeholder for a L</moai/menu/navbar> widget (though
+#pod you can put anything here if you'd like).
+#pod
+#pod =item hero
+#pod
+#pod This content section is a placeholder for whatever header element the current
+#pod page requires.
+#pod
+#pod =back
+#pod
+#pod =item container
+#pod
+#pod This section contains a grid container with a single row and two
+#pod columns: the C<main> section and the C<sidebar> section.
+#pod
+#pod =over
+#pod
+#pod =item main
+#pod
+#pod This section contains the C<< <main> >> element and the main content of
+#pod the page from the default buffer of the L<Mojolicious C<content> helper|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#content>.
+#pod
+#pod =item sidebar
+#pod
+#pod This section is a placeholder for whatever sidebar content the current page
+#pod requires.
+#pod
+#pod =back
+#pod
+#pod =item footer
+#pod
+#pod This section is a placeholder for whatever footer content the current page requires.
+#pod
+#pod =back
+#pod
 #pod =head1 TODO
 #pod
 #pod =over
@@ -288,8 +400,6 @@ our $VERSION = '0.009';
 #pod
 #pod =item * popups (modal dialogs, tooltips, notifications)
 #pod
-#pod =item * grid (maybe...)
-#pod
 #pod =back
 #pod
 #pod =item Add more libraries
@@ -326,10 +436,6 @@ our $VERSION = '0.009';
 #pod =item Themes
 #pod
 #pod Built-in selection of CDN-based themes for each library
-#pod
-#pod =item Layouts
-#pod
-#pod A customizable layout with good defaults.
 #pod
 #pod =item Default Colors
 #pod
@@ -377,11 +483,14 @@ use Mojo::File qw( path );
 has config =>;
 sub register {
     my ( $self, $app, $config ) = @_;
-    my $library = $config->[0];
+    my $library = lc $config->[0];
     $self->config( $config->[1] || {} );
     $app->helper( moai => sub { $self } );
-    my $libdir = path( __FILE__ )->sibling( 'Moai' )->child( 'resources', lc $library );
-    push @{$app->renderer->paths}, $libdir->child( 'templates' );
+    my $resources = path( __FILE__ )->sibling( 'Moai', 'resources' );
+    push @{$app->renderer->paths},
+        $resources->child( $library, 'templates' ),
+        $resources->child( 'shared', 'templates' ),
+        ;
     return;
 }
 
@@ -397,12 +506,12 @@ Mojolicious::Plugin::Moai - Mojolicious UI components using modern UI libraries
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 
     use Mojolicious::Lite;
-    plugin Moai => 'Bootstrap4', { version => '4.4.1' };
+    plugin Moai => [ 'Bootstrap4', { version => '4.4.1' } ];
     app->start;
     __DATA__
     @@ list.html.ep
@@ -443,9 +552,9 @@ Add the Moai plugin to your Mojolicious application and specify which
 UI library and version of that library you want to use.
 
     use Mojolicious::Lite;
-    plugin Moai => 'Bootstrap4', {
+    plugin Moai => [ 'Bootstrap4', {
         version => '4.4.1',
-    };
+    } ];
 
 Now you can add widgets. You will likely first want to add the C<moai/lib>
 widget to your layout template to get the UI library.
@@ -461,6 +570,23 @@ widget to your layout template to get the UI library.
 
 Widgets are snippets that you can include in your templates using the
 L<include helper|Mojolicious::Guides::Rendering/Partial templates>.
+
+=head2 moai/grid
+
+    <%= include 'moai/grid', content => begin %>
+        <%= include 'moai/grid/col', size => 9, content => begin %>
+            This column takes up 9/12 width
+        <% end %>
+        <%= include 'moai/grid/col', content => begin %>
+            This column will fill the remaining space
+        <% end %>
+    <% end %>
+
+The C<moai/grid> and C<moai/grid/col> templates provide the library's
+grid system. C<moai/grid> starts a grid row, and C<moai/grid/col> is
+a column in that row.  For libraries like Bootstrap which have an
+additional "container" element, that element is already included in the
+C<moai/grid> template.
 
 =head2 moai/pager
 
@@ -647,6 +773,101 @@ specified in the plugin (if any). Required.
 
 =back
 
+=head1 LAYOUTS
+
+Layouts wrap your templates in a common framing. See L<the Mojolicious
+docs for more information on
+Layouts|https://mojolicious.org/perldoc/Mojolicious/Guides/Rendering#Layouts>.
+
+=head2 Using Moai Layouts
+
+To get started using a Moai layout, L<extend a Moai layout template|https://mojolicious.org/perldoc/Mojolicious/Guides/Rendering#Template-inheritance>
+to fill in the missing parts.
+
+    use Mojolicious::Lite;
+    plugin Moai => [ 'Bootstrap4', { version => '4.4.1' } ];
+    get '/' => 'index';
+    __END__
+    @@ index.html.ep
+    % layout 'site';
+    <h1>Welcome!</h1>
+    @@ layouts/site.html.ep
+    % extends 'layouts/moai/default';
+    %# Add a main nav with links to our products, a history, and contact page
+    % content_for navbar => begin
+        <%= include 'moai/navbar',
+            position => 'fixed-top',
+            brand => [ 'My Site' => 'index' ],
+            menu => [
+                [ 'Products'   => 'products' ],
+                [ 'About Us'   => 'history'  ],
+                [ 'Contact Us' => 'contact'  ],
+            ],
+        %>
+    % end
+
+=head2 Included Layouts
+
+These layouts are included with Moai.
+
+=head3 default
+
+The default layout is a general-purpose layout for almost any use. Other
+layouts can extend this one to provide more-specific features.
+
+=head4 Content Sections
+
+=over
+
+=item head
+
+This content goes inside the C<< <head> .. </head> >> element, just before the
+closing C<< </head> >>.
+
+=item header
+
+This section is the very top of the page and contains the navbar and an optional
+hero element.
+
+=over
+
+=item navbar
+
+This section is a placeholder for a L</moai/menu/navbar> widget (though
+you can put anything here if you'd like).
+
+=item hero
+
+This content section is a placeholder for whatever header element the current
+page requires.
+
+=back
+
+=item container
+
+This section contains a grid container with a single row and two
+columns: the C<main> section and the C<sidebar> section.
+
+=over
+
+=item main
+
+This section contains the C<< <main> >> element and the main content of
+the page from the default buffer of the L<Mojolicious C<content> helper|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#content>.
+
+=item sidebar
+
+This section is a placeholder for whatever sidebar content the current page
+requires.
+
+=back
+
+=item footer
+
+This section is a placeholder for whatever footer content the current page requires.
+
+=back
+
 =head1 TODO
 
 =over
@@ -685,8 +906,6 @@ There should be widgets for...
 
 =item * popups (modal dialogs, tooltips, notifications)
 
-=item * grid (maybe...)
-
 =back
 
 =item Add more libraries
@@ -723,10 +942,6 @@ Some examples of progressive enhancement:
 =item Themes
 
 Built-in selection of CDN-based themes for each library
-
-=item Layouts
-
-A customizable layout with good defaults.
 
 =item Default Colors
 

@@ -1,0 +1,76 @@
+                                        .bbmoooxxxooommb.
+                                       .bmoooxx...xxooobb.
+                                      .bbmoxxxxxxxxxxxomb..
+                                      .bmooxxbbmmmbbxxoomb.
+                                      .bmxx.bbmooombb.xxmb .
+                                 _    bmxox.bmooxoomb.xoxmb.
+            __  _____  _ __ ___ | |__ bxxx.bmoox.xoomb.xxxb.
+            \ \/ / _ \| '_ ` _ \| '_ \xmox.bmox.@.xomb.xomx.
+           _ >  < (_) | | | | | | |_) xmox.bmoox.xoomb.xomx
+          (_)_/\_\___/|_| |_| |_|_.__/bmoox.bmooxoomb.xoombx
+                                     x.bmox.bbmooombb.xomb x
+                                    x .bmoox.bbmmmbb.xoomb  x
+                                    x .bbmoxx..bbb..xxomb   x
+                                    x  .bmoooxx...xxooobb   x
+                                    x   .bbmoooxxxooommb   .x
+                                    x   ..bmmmooooommbb    .
+                                    x     ..bbmmmmmbb      .
+                                    x       ..bbbbbb       .
+                                     x        .           .
+                                     x         .         ..
+                                      x         .        .
+                                      x         .       .
+                                       xx        .     .
+    Know then on Minos III sacred to Mars
+    do grow the spawn of Cadmus from afar
+
+    as towers tall, monoliths for Clotho
+    to spread as she would. The Xarci Bedo
+
+    we call this foe. Do you now seek the stone
+    below of Dragon born to call your own?
+
+Xomb is a terminal-based roguelike. Assuming that the development tools,
+perl, App::cpanminus, and possibly also local::lib are installed and
+setup, in a suitable terminal install and run the game via:
+
+    cpanm Game::Xomb
+    xomb
+
+Documentation is available in xomb(1) or by running:
+
+    perldoc xomb
+
+
+For the source code, see:
+
+https://github.com/thrig/Game-Xomb
+
+
+This can be built and installed (chasing dependencies):
+
+    git clone https://github.com/thrig/Game-Xomb
+    cd Game-Xomb
+    cpanm .
+
+or without dependencies the manual old fashioned way:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+and new releases may be authored along the lines of:
+
+    git tag -u ... -s v...
+    git push github master
+    RELEASE_TESTING=1 TEST_SIGNATURE=1 ./Build disttest
+    RELEASE_TESTING=1 TEST_SIGNATURE=1 ./Build dist
+    cpan-upload ...
+    ./Build realclean
+
+If the same directory is shared between different systems the build tree
+may need to be rebuilt:
+
+    perl Build.PL
+    ./Build realclean

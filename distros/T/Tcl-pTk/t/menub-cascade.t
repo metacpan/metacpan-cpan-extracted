@@ -33,7 +33,7 @@ $mb->command(-label => 'Close',
 
 #$mb->interp->icall($mb.".m", 'add', 'cascade', -label, "cascade entry");
 
-$top->after(1000, sub{ $top->destroy});
-MainLoop;
+$top->idletasks;
+(@ARGV) ? MainLoop : $top->destroy;
 
 ok(1);

@@ -59,7 +59,7 @@ the following output file is produced
 =cut
 
 package CLIPSeqTools::CompareApp::join_tables;
-$CLIPSeqTools::CompareApp::join_tables::VERSION = '0.1.8';
+$CLIPSeqTools::CompareApp::join_tables::VERSION = '0.1.9';
 
 # Make it an app command
 use MooseX::App::Command;

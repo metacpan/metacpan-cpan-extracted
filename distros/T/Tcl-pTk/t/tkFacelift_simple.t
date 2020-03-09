@@ -58,8 +58,7 @@ my $cancel = $top->Button( qw/-text Cancel -underline 0 -width 6/,
 $ok->pack(     qw/-side left  -padx 10 -pady 10/ );
 $cancel->pack( qw/-side right -padx 10 -pady 10/ );
 
-$top->after(1000,sub{$top->destroy});
-
-MainLoop();
+$top->idletasks;
+(@ARGV) ? MainLoop : $top->destroy;
 
 ok(1);

@@ -2,14 +2,14 @@ NAME
     Log::ger - A lightweight, flexible logging framework
 
 VERSION
-    version 0.031
+    version 0.033
 
 SYNOPSIS
   Producing logs
     In your module (producer):
 
      package Foo;
-     use Log::ger; # will import some logging methods e.g. log_warn, log_error
+     use Log::ger; # will install some logger routines e.g. log_warn, log_error
 
      sub foo {
          ...
@@ -119,8 +119,8 @@ DESCRIPTION
         modules still use the same framework.
 
         Dynamic. Outputs and levels can be changed anytime during run-time
-        and logging routines will be updated automatically. This is useful
-        in situation like a long-running server application: you can turn on
+        and logger routines will be updated automatically. This is useful in
+        situation like a long-running server application: you can turn on
         tracing logs temporarily to debug problems, then turn them off
         again, without restarting your server.
 

@@ -1,11 +1,13 @@
 package Log::ger::Layout;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger'; # DIST
+our $VERSION = '0.033'; # VERSION
 
 use parent qw(Log::ger::Plugin);
 
-# we only use one output, so set() should replace all hooks from previously set
+# we only use one layout, so set() should replace all hooks from previously set
 # plugin package
 sub _replace_package_regex { qr/\ALog::ger::Layout::/ }
 
@@ -24,7 +26,7 @@ Log::ger::Layout - Use a layout plugin
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 

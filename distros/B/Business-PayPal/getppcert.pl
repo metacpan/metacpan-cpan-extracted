@@ -22,7 +22,7 @@ socket  (S, &AF_INET, &SOCK_STREAM, 0)  or die "socket: $!";
 connect (S, $dest_serv_params)          or die "connect: $!";
 select  (S); $| = 1; select (STDOUT);   # Eliminate STDIO buffering
 
-# The network connection is now open, lets fire up SSL    
+# The network connection is now open, lets fire up SSL
 
 my $ctx = Net::SSLeay::CTX_new() or die_now("Failed to create SSL_CTX $!");
 Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_ALL)
@@ -33,12 +33,12 @@ Net::SSLeay::set_fd($ssl, fileno(S));   # Must use fileno
 
 my $res = Net::SSLeay::connect($ssl) and die_if_ssl_error("ssl connect");
 #  print "Cipher `" . Net::SSLeay::get_cipher($ssl) . "'\n";
-print Net::SSLeay::dump_peer_certificate($ssl),"\n";        
+print Net::SSLeay::dump_peer_certificate($ssl),"\n";
 my $cert = Net::SSLeay::get_peer_certificate($ssl);
 print Net::SSLeay::PEM_get_string_X509($cert),"\n";
 # print Net::SSLeay::get_verify_result($ssl),"\n";
 # Exchange data
-        
+
 $res = Net::SSLeay::write($ssl, $msg);  # Perl knows how long $msg is
 die_if_ssl_error("ssl write");
 shutdown S, 1;  # Half close --> No more output, sends EOF to server
@@ -46,7 +46,7 @@ shutdown S, 1;  # Half close --> No more output, sends EOF to server
 my $got = Net::SSLeay::read($ssl);         # Perl returns undef on failure
 die_if_ssl_error("ssl read");
 # print $got;
-                
+
 Net::SSLeay::free ($ssl);               # Tear down connection
 Net::SSLeay::CTX_free ($ctx);
 close S;

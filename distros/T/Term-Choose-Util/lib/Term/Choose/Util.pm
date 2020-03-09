@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.113';
+our $VERSION = '0.115';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf
@@ -142,6 +142,7 @@ sub _valid_options {
         color               => '[ 0 1 2 ]',
         layout              => '[ 0 1 2 3 ]',
         mark                => 'ARRAY',
+        solo                => 'ARRAY',     # experimental
         tabs_info           => 'ARRAY',
         tabs_prompt         => 'ARRAY',
         busy_string         => 'Str',
@@ -223,6 +224,7 @@ sub _defaults {
         reset          => 'reset',
         show_hidden    => 1,
         small_first    => 0,
+        #solo          => undef,    # experimental
         cs_begin       => '',
         cs_end         => '',
         #cs_label      => undef,
@@ -253,7 +255,7 @@ sub _routine_options {
         $options = [ @every, qw( small_first reset thousands_separator ) ];
     }
     elsif ( $caller eq 'choose_a_subset' ) {
-        $options = [ @every, qw( layout order alignment enchanted keep_chosen index prefix all_by_default cs_begin cs_end cs_separator mark busy_string ) ];
+        $options = [ @every, qw( layout order alignment enchanted keep_chosen index prefix all_by_default cs_begin cs_end cs_separator mark busy_string solo ) ];
     }
     elsif ( $caller eq 'settings_menu' ) {
         $options = [ @every ];
@@ -387,7 +389,7 @@ sub choose_directories {
             my $cs_label_w = print_columns_ext( $self->{cs_label}, $self->{color} );
             $info .= line_fold(
                 $self->{cs_label} . join( ', ', map { decode 'locale_fs', $_ } @$chosen_dirs_fs ), get_term_width(),
-                { subseq_tab => ' ' x $cs_label_w, color => $self->{color} }
+                { subseq_tab => ' ' x $cs_label_w, color => $self->{color}, join => 1 }
             );
             my $prompt = 'Choose directories:' . "\n>" . decode( 'locale_fs', $dir_fs );
             my $bu_opt;
@@ -502,7 +504,7 @@ sub __choose_a_path {
             my $cs_label_w = print_columns_ext( $self->{cs_label}, $self->{color} );
             push @tmp, line_fold(
                 $self->{cs_label} . join( ', ', map { decode 'locale_fs', $_ } @{$opt->{chosen_dirs_fs}} ), get_term_width(),
-                { subseq_tab => ' ' x $cs_label_w, color => $self->{color} }
+                { subseq_tab => ' ' x $cs_label_w, color => $self->{color}, join => 0 }
             );
             my $prompt = defined $self->{prompt} ? $self->{prompt} : 'Browse directories:';
             push @tmp, $prompt . "\n>" . decode( 'locale_fs', $dir_fs );
@@ -788,6 +790,10 @@ sub choose_a_subset {
         if ( defined $self->{mark} && @{$self->{mark}} ) {
             $self->{mark} = [ map { $_ + @pre } @{$self->{mark}} ];
         }
+        my $no_spacebar;
+        if ( defined $self->{solo} ) {
+            $no_spacebar = [ map { $_ + @pre } @{$self->{solo}} ];
+        }
         my $lines = join "\n", @tmp;
         # Choose
         my @idx = choose(
@@ -797,7 +803,7 @@ sub choose_a_subset {
               meta_items => [ 0 .. $#pre ], mark => $self->{mark}, include_highlighted => 2,
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
-              undef => $self->{back}, busy_string => $self->{busy_string} }
+              undef => $self->{back}, busy_string => $self->{busy_string}, no_spacebar => $no_spacebar }
         );
         $self->{mark} = undef;
         if ( ! defined $idx[0] || $idx[0] == 0 ) {
@@ -807,6 +813,14 @@ sub choose_a_subset {
             }
             $self->__restore_defaults();
             return;
+        }
+        if ( defined $self->{solo} ) {
+            my $idx = $idx[0] - @pre;
+            if ( grep { $idx == $_ } @{$self->{solo}} ) {
+                my $return_indexes = $self->{index}; # because __restore_defaults resets $self->{index}
+                $self->__restore_defaults();
+                return [ $return_indexes ? $idx : $available->[ $idx ] ];
+            }
         }
         push @$bu, [ [ @$curr_avail ], [ @$new_idx ] ];
         my $ok = $idx[0] == 1 ? shift @idx : 0; ##
@@ -825,7 +839,15 @@ sub choose_a_subset {
         push @$new_idx, reverse @tmp_idx;
         if ( $ok ) {
             if ( ! @$new_idx && $opt->{all_by_default} ) {
-                $new_idx = [ 0 .. $#{$available} ];
+                if ( defined $self->{solo} ) {
+                    for my $e ( 0 .. $#{$available} ) {
+                        next if List::Util::any { $e == $_ } @{$self->{solo}}; # any
+                        push @$new_idx, $e;
+                    }
+                }
+                else {
+                    $new_idx = [ 0 .. $#{$available} ];
+                }
             }
             my $return_indexes = $self->{index}; # because __restore_defaults resets $self->{index}
             $self->__restore_defaults();
@@ -963,69 +985,43 @@ sub get_term_height {
 
 
 sub unicode_sprintf {
-    #my ( $unicode, $avail_width, $opt ) = @_;
-    my $opt = defined $_[2] ? $_[2] : {};
+    my ( $str, $avail_w, $opt ) = @_;
+    $opt ||= {};
     my $colwidth;
     if ( $opt->{color} ) {
-        ( my $tmp = $_[0] ) =~ s/\e\[[\d;]*m//msg;
+        ( my $tmp = $str ) =~ s/\e\[[\d;]*m//g;
         $colwidth = print_columns( $tmp );
     }
     else {
-        $colwidth = print_columns( $_[0] );
+        $colwidth = print_columns( $str );
     }
-    if ( $colwidth > $_[1] ) {
-        if ( $opt->{add_dots} ) {
-            return cut_to_printwidth( $_[0], $_[1] - 3 ) . '...';
+    #my $colwidth = print_columns_ext( $str, $opt->{color} );
+    if ( $colwidth > $avail_w ) {
+        if ( @{$opt->{mark_if_truncated}||[]} ) {
+            return cut_to_printwidth( $str, $avail_w - $opt->{mark_if_truncated}[1] ) . $opt->{mark_if_truncated}[0];
         }
-        return cut_to_printwidth( $_[0], $_[1] );
+        return cut_to_printwidth( $str, $avail_w );
     }
-    elsif ( $colwidth < $_[1] ) {
+    elsif ( $colwidth < $avail_w ) {
         if ( $opt->{right_justify} ) {
-            return " " x ( $_[1] - $colwidth ) . $_[0];
+            return " " x ( $avail_w - $colwidth ) . $str;
         }
         else {
-            return $_[0] . " " x ( $_[1] - $colwidth );
+            return $str . " " x ( $avail_w - $colwidth );
         }
     }
     else {
-        return $_[0];
+        return $str;
     }
 }
-#sub unicode_sprintf {
-#    my ( $unicode, $avail_width, $opt ) = @_;
-#    if ( ! defined $opt ) {
-#        $opt = {};
-#    }
-#    my $colwidth = print_columns_ext( $unicode, $opt->{color} );
-#    if ( $colwidth > $avail_width ) {
-#        if ( $opt->{add_dots} ) {
-#            return cut_to_printwidth( $unicode, $avail_width - 3 ) . '...';
-#        }
-#        return cut_to_printwidth( $unicode, $avail_width );
-#    }
-#    elsif ( $colwidth < $avail_width ) {
-#        if ( $opt->{right_justify} ) {
-#            return " " x ( $avail_width - $colwidth ) . $unicode;
-#        }
-#        else {
-#            return $unicode . " " x ( $avail_width - $colwidth );
-#        }
-#    }
-#    else {
-#        return $unicode;
-#    }
-#}
 
 
 sub print_columns_ext {
-    #my ( $str, $color ) = @_;
-    if ( $_[1] ) {
-        ( my $tmp = $_[0] ) =~ s/\e\[[\d;]*m//msg;
-        return print_columns( $tmp );
+    my ( $str, $color ) = @_;
+    if ( $color ) {
+        $str =~ s/\e\[[\d;]*m//g;
     }
-    else {
-        return print_columns( $_[0] );
-    }
+    return print_columns( $str );
 }
 
 
@@ -1045,7 +1041,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.113
+Version 0.115
 
 =cut
 
@@ -1367,6 +1363,8 @@ Options:
 all_by_default
 
 If enabled, all elements are selected if CONFIRM is chosen without any selected elements.
+
+Values: 0,[1].
 
 =item
 

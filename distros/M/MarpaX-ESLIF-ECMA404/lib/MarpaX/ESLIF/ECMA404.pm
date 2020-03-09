@@ -1,6 +1,7 @@
 
 use strict;
 use warnings FATAL => 'all';
+use feature 'state';
 
 package MarpaX::ESLIF::ECMA404;
 use Log::Any qw/$log/;
@@ -10,7 +11,7 @@ my $ESLIF = MarpaX::ESLIF->new($log);
 
 # ABSTRACT: JSON Data Interchange Format following ECMA-404 specification
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -33,13 +34,13 @@ sub encode {
 # Private stubs
 # -------------
 sub _JSONStrict {
-    CORE::state $JSONStrict = MarpaX::ESLIF::JSON->new($ESLIF, 1);
+    state $JSONStrict = MarpaX::ESLIF::JSON->new($ESLIF, 1);
 
     return $JSONStrict
 }
 
 sub _JSONRelaxed {
-    CORE::state $JSONRelaxed = MarpaX::ESLIF::JSON->new($ESLIF, 0);
+    state $JSONRelaxed = MarpaX::ESLIF::JSON->new($ESLIF, 0);
 
     return $JSONRelaxed
 }
@@ -59,7 +60,7 @@ MarpaX::ESLIF::ECMA404 - JSON Data Interchange Format following ECMA-404 specifi
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

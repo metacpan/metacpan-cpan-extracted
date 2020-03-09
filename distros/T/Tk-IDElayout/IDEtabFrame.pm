@@ -176,13 +176,14 @@ is used as a "dropbox" where the source can put a object in this hash, key'ed by
 name is passed to the target (i.e. the drop location). The target can use the string to lookup the
 real object in this hash.
 
+=back
 
 =head1 Methods
 
 =cut
 
 package Tk::IDEtabFrame;
-our ($VERSION) = ('0.34');
+our ($VERSION) = ('0.35');
 
 use Carp;
 use strict;

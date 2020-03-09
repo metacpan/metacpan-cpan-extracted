@@ -9,7 +9,7 @@ BEGIN {
 
     $IsWin32 = ($^O eq 'MSWin32' || $Config{'ccflags'} =~ /-D_?WIN32_?/);
 
-    $VERSION = '0.34';
+    $VERSION = '0.35';
     $win_arch = shift @ARGV if @ARGV and $ARGV[0] =~ /^(open32|pm|x|MSWin32)$/;
     require('fix_4_os2.pl'), OS2_massage() if $^O eq 'os2';
     
@@ -31,6 +31,9 @@ BEGIN {
             'LICENSE'  => 'perl_5',
             'META_MERGE' => {
                 'meta-spec' => { version => 2 },
+                no_index => {
+                    'package' => [ 'Tk', 'Tk::CaptureRelease' ],
+                },
                 resources => {
                     repository => {
                         type => 'git',
@@ -94,6 +97,9 @@ Tk::MMutil::TkExtMakefile(
     'LICENSE'  => 'perl_5',
     'META_MERGE' => {
         'meta-spec' => { version => 2 },
+        no_index => {
+            'package' => [ 'Tk', 'Tk::CaptureRelease' ],
+        },
         resources => {
             repository => {
                 type => 'git',

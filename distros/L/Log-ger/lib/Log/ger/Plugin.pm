@@ -1,7 +1,9 @@
 package Log::ger::Plugin;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger'; # DIST
+our $VERSION = '0.033'; # VERSION
 
 use strict;
 use warnings;
@@ -69,7 +71,7 @@ Log::ger::Plugin - Use a plugin
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 
@@ -96,6 +98,8 @@ L<Log::ger::Format>
 L<Log::ger::Layout>
 
 L<Log::ger::Output>
+
+L<Log::ger::Filter>
 
 =head1 AUTHOR
 

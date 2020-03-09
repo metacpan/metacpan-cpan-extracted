@@ -1,3 +1,23 @@
+0.4.6 2020-03-08 23:11:11 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix MANIFEST
+
+0.4.5 2020-03-08 20:57:32 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add missing cpanfile
+
+0.4.4 2020-03-06 10:36:04 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix IE regression in index.html
+
+0.4.3 2020-03-06 10:08:19 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix package-lock.json regression
+
+0.4.2 2020-03-06 09:46:06 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fixed node_modules dependency rules
+
 0.4.1 2020-03-04 22:05:46 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix errors in sample code

@@ -2,7 +2,7 @@ package Test2::Harness::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use File::Spec();
 
@@ -412,10 +412,17 @@ sub next {
         }
 
         if (my $lock = $self->lock_dispatch) {
+            my $count = 0;
+
             while (1) {
-                next if $state->advance();
+                if ($state->advance) {
+                    $count++;
+                    next;
+                }
                 last;
             }
+
+            next if $count;
         }
 
         return undef;

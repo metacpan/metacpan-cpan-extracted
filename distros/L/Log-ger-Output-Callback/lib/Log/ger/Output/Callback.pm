@@ -1,38 +1,48 @@
 package Log::ger::Output::Callback;
 
-our $DATE = '2018-12-20'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger-Output-Callback'; # DIST
+our $VERSION = '0.006'; # VERSION
 
+use 5.010001;
 use strict;
 use warnings;
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     my $hooks = {};
 
-    if ($conf{logging_cb}) {
-        $hooks->{create_logml_routine} = [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
-                my $logger = sub {
-                    $conf{logging_cb}->(@_);
+    if ($plugin_conf{logging_cb}) {
+        $hooks->{create_outputter} = [
+            __PACKAGE__, # key
+            # we want to handle all levels, thus we need to be higher priority
+            # than default Log::ger hooks (10) which will install null loggers
+            # for less severe levels.
+            9,           # priority
+            sub {        # hook
+                my %hook_args = @_;
+                my $outputter = sub {
+                    my ($per_target_conf, $msg, $per_msg_conf) = @_;
+                    my $level = $per_msg_conf->{level} // $hook_args{level};
+                    $plugin_conf{logging_cb}->($per_target_conf, $level, $msg, $per_msg_conf);
                 };
-                [$logger];
+                [$outputter];
             },
         ];
     }
 
-    if ($conf{detection_cb}) {
-        $hooks->{create_is_routine} = [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
-                my $logger = sub {
-                    $conf{detection_cb}->($args{level});
+    if ($plugin_conf{detection_cb}) {
+        $hooks->{create_level_checker} = [
+            __PACKAGE__, # key
+            9,          # priority
+            sub {        # hook
+                my %hook_args = @_;
+                my $level_checker = sub {
+                    $plugin_conf{detection_cb}->($hook_args{level});
                 };
-                [$logger];
+                [$level_checker];
             },
         ];
     }
@@ -55,13 +65,13 @@ Log::ger::Output::Callback - Send logs to a subroutine
 
 =head1 VERSION
 
-This document describes version 0.004 of Log::ger::Output::Callback (from Perl distribution Log-ger-Output-Callback), released on 2018-12-20.
+This document describes version 0.006 of Log::ger::Output::Callback (from Perl distribution Log-ger-Output-Callback), released on 2020-03-07.
 
 =head1 SYNOPSIS
 
  use Log::ger::Output Callback => (
-     logging_cb   => sub { my ($ctx, $numlevel, $msg) = @_; ... }, # optional
-     detection_cb => sub { my ($numlevel) = @_; ... },             # optional
+     logging_cb   => sub { my ($per_target_conf, $lvlnum, $msg, $per_msg_conf) = @_; ... }, # optional
+     detection_cb => sub { my ($lvlnum) = @_; ... },                                        # optional
  );
 
 =head1 DESCRIPTION
@@ -108,7 +118,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

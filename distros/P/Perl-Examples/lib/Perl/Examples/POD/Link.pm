@@ -15,7 +15,22 @@ Perl::Examples::POD::Link - Show the various examples of links
 
 =head1 VERSION
 
-This document describes version 0.094 of Perl::Examples::POD::Link (from Perl distribution Perl-Examples), released on 2018-11-29.
+This document describes version 0.095 of Perl::Examples::POD::Link (from Perl distribution Perl-Examples), released on 2020-03-07.
+
+=head1 SYNOPSIS
+
+ target link                   text     syntax
+ -----------                   ----     ------
+ Perl module's POD             no       L<Foo::Bar>
+ Perl module's POD             yes      L<that module|Foo::Bar>
+ Perl module's POD + section   no       L<Foo::Bar/"SEE ALSO">
+ Perl module's POD + section   yes      L<that module's See Also section|Foo::Bar/"SEE ALSO">
+ section in the same POD       no       L</"SEE ALSO">
+ section in the same POD       yes      L<See Also section|/"SEE ALSO">
+ Perl script                   no       L<httpthis>
+ Perl script                   yes      L<that script|httpthis>
+ URL                           no       L<http://www.example.com/page>
+ URL                           yes      L<that page|http://www.example.com/pages>
 
 =head1 DESCRIPTION
 
@@ -29,9 +44,9 @@ Rendered result: L<Perl::Examples>
 
 =head3 Link to module + section
 
- L<Perl::Examples/"DESCRIPTION">
+ L<Perl::Examples/"SEE ALSO">
 
-Rendered result: L<Perl::Examples/"DESCRIPTION">
+Rendered result: L<Perl::Examples/"SEE ALSO">
 
 =head3 Link this page + section
 
@@ -155,7 +170,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

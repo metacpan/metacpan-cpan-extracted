@@ -2,9 +2,15 @@ package Doodle::Column::Helpers;
 
 use 5.014;
 
-use Data::Object 'Role', 'Doodle::Library';
+use strict;
+use warnings;
 
-our $VERSION = '0.07'; # VERSION
+use registry 'Doodle::Library';
+use routines;
+
+use Data::Object::Role;
+
+our $VERSION = '0.08'; # VERSION
 
 # BUILD
 # METHODS
@@ -12,7 +18,7 @@ our $VERSION = '0.07'; # VERSION
 method binary(Any %args) {
   $self->type('binary');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -20,7 +26,7 @@ method binary(Any %args) {
 method boolean(Any %args) {
   $self->type('boolean');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -28,7 +34,7 @@ method boolean(Any %args) {
 method char(Any %args) {
   $self->type('char');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -36,7 +42,7 @@ method char(Any %args) {
 method date(Any %args) {
   $self->type('date');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -44,7 +50,7 @@ method date(Any %args) {
 method datetime(Any %args) {
   $self->type('datetime');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -52,7 +58,7 @@ method datetime(Any %args) {
 method datetime_tz(Any %args) {
   $self->type('datetime_tz');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -60,7 +66,7 @@ method datetime_tz(Any %args) {
 method decimal(Any %args) {
   $self->type('decimal');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -68,7 +74,7 @@ method decimal(Any %args) {
 method default(Str @args) {
   unshift @args, 'deduce' if @args == 1;
 
-  $self->data->set(default => [@args]);
+  $self->stash(default => [@args]);
 
   return $self;
 }
@@ -94,7 +100,7 @@ method default_current_datetime() {
 method double(Any %args) {
   $self->type('double');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -102,7 +108,7 @@ method double(Any %args) {
 method enum(Any %args) {
   $self->type('enum');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -110,19 +116,19 @@ method enum(Any %args) {
 method float(Any %args) {
   $self->type('float');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
 
 method primary() {
-  $self->data->set(primary => 1);
+  $self->stash(primary => 1);
 
   return $self;
 }
 
 method increments() {
-  $self->data->set(increments => 1);
+  $self->stash(increments => 1);
 
   $self->integer if $self->type !~ /integer/;
 
@@ -153,7 +159,7 @@ method increments_small(Any %args) {
 method integer(Any %args) {
   $self->type('integer');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -161,7 +167,7 @@ method integer(Any %args) {
 method integer_big(Any %args) {
   $self->type('integer_big');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -169,7 +175,7 @@ method integer_big(Any %args) {
 method integer_big_unsigned(Any %args) {
   $self->type('integer_big_unsigned');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -177,7 +183,7 @@ method integer_big_unsigned(Any %args) {
 method integer_medium(Any %args) {
   $self->type('integer_medium');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -185,7 +191,7 @@ method integer_medium(Any %args) {
 method integer_medium_unsigned(Any %args) {
   $self->type('integer_medium_unsigned');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -193,7 +199,7 @@ method integer_medium_unsigned(Any %args) {
 method integer_small(Any %args) {
   $self->type('integer_small');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -201,7 +207,7 @@ method integer_small(Any %args) {
 method integer_small_unsigned(Any %args) {
   $self->type('integer_small_unsigned');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -209,7 +215,7 @@ method integer_small_unsigned(Any %args) {
 method integer_tiny(Any %args) {
   $self->type('integer_tiny');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -217,7 +223,7 @@ method integer_tiny(Any %args) {
 method integer_tiny_unsigned(Any %args) {
   $self->type('integer_tiny_unsigned');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -225,7 +231,7 @@ method integer_tiny_unsigned(Any %args) {
 method integer_unsigned(Any %args) {
   $self->type('integer_unsigned');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -233,19 +239,19 @@ method integer_unsigned(Any %args) {
 method json(Any %args) {
   $self->type('json');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
 
 method null(Any %args) {
-  $self->data->set(%args, nullable => 1);
+  $self->stash(%args, nullable => 1);
 
   return $self;
 }
 
 method not_null(Any %args) {
-  $self->data->set(%args, nullable => 0);
+  $self->stash(%args, nullable => 0);
 
   return $self;
 }
@@ -259,7 +265,7 @@ method references(Str $ftable, Str @args) {
 method string(Any %args) {
   $self->type('string');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -267,7 +273,7 @@ method string(Any %args) {
 method text(Any %args) {
   $self->type('text');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -275,7 +281,7 @@ method text(Any %args) {
 method text_long(Any %args) {
   $self->type('text_long');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -283,7 +289,7 @@ method text_long(Any %args) {
 method text_medium(Any %args) {
   $self->type('text_medium');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -291,7 +297,7 @@ method text_medium(Any %args) {
 method time(Any %args) {
   $self->type('time');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -299,7 +305,7 @@ method time(Any %args) {
 method time_tz(Any %args) {
   $self->type('time_tz');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -307,7 +313,7 @@ method time_tz(Any %args) {
 method timestamp(Any %args) {
   $self->type('timestamp');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -315,7 +321,7 @@ method timestamp(Any %args) {
 method timestamp_tz(Any %args) {
   $self->type('timestamp_tz');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }
@@ -323,7 +329,7 @@ method timestamp_tz(Any %args) {
 method uuid(Any %args) {
   $self->type('uuid');
 
-  $self->data->set(%args) if %args;
+  $self->stash(%args) if %args;
 
   return $self;
 }

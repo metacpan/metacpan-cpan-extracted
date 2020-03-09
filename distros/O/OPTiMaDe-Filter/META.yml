@@ -23,5 +23,5 @@ name: OPTiMaDe-Filter
 requires:
   Parse::Yapp: '0'
   Scalar::Util: '0'
-version: 0.7.2
+version: 0.7.3
 x_serialization_backend: 'YAML::Tiny version 1.70'

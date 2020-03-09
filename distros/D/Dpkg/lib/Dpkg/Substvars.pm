@@ -19,10 +19,11 @@ package Dpkg::Substvars;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '2.00';
 
 use Dpkg ();
 use Dpkg::Arch qw(get_host_arch);
+use Dpkg::Vendor qw(get_current_vendor);
 use Dpkg::Version;
 use Dpkg::ErrorHandling;
 use Dpkg::Gettext;
@@ -39,7 +40,7 @@ Dpkg::Substvars - handle variable substitution in strings
 
 =head1 DESCRIPTION
 
-It provides an object which is able to substitute variables in strings.
+It provides a class which is able to substitute variables in strings.
 
 =cut
 
@@ -168,21 +169,6 @@ sub mark_as_used {
     $self->{attr}{$key} |= SUBSTVAR_ATTR_USED;
 }
 
-=item $s->no_warn($key)
-
-Obsolete function, use mark_as_used() instead.
-
-=cut
-
-sub no_warn {
-    my ($self, $key) = @_;
-
-    warnings::warnif('deprecated',
-                     'obsolete no_warn() function, use mark_as_used() instead');
-
-    $self->mark_as_used($key);
-}
-
 =item $s->parse($fh, $desc)
 
 Add new substitutions read from the filehandle. $desc is used to identify
@@ -265,6 +251,24 @@ sub set_arch_substvars {
     my $attr = SUBSTVAR_ATTR_USED | SUBSTVAR_ATTR_AUTO;
 
     $self->set('Arch', get_host_arch(), $attr);
+}
+
+=item $s->set_vendor_substvars()
+
+Defines vendor variables: ${vendor:Name} and ${vendor:Id}.
+
+These will never be warned about when unused.
+
+=cut
+
+sub set_vendor_substvars {
+    my ($self, $desc) = @_;
+
+    my $attr = SUBSTVAR_ATTR_USED | SUBSTVAR_ATTR_AUTO;
+
+    my $vendor = get_current_vendor();
+    $self->set('vendor:Name', $vendor, $attr);
+    $self->set('vendor:Id', lc $vendor, $attr);
 }
 
 =item $s->set_desc_substvars()
@@ -437,6 +441,12 @@ indicated file.
 =back
 
 =head1 CHANGES
+
+=head2 Version 2.00 (dpkg 1.20.0)
+
+Remove method: $s->no_warn().
+
+New method: $s->set_vendor_substvars().
 
 =head2 Version 1.06 (dpkg 1.19.0)
 

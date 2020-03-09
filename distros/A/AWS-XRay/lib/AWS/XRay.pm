@@ -11,11 +11,12 @@ use Time::HiRes ();
 use Types::Serialiser;
 use AWS::XRay::Segment;
 use AWS::XRay::Buffer;
+use Carp;
 
 use Exporter 'import';
 our @EXPORT_OK = qw/ new_trace_id capture capture_from trace /;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 our $TRACE_ID;
 our $SEGMENT_ID;
@@ -29,6 +30,9 @@ our @PLUGINS;
 
 our $DAEMON_HOST = "127.0.0.1";
 our $DAEMON_PORT = 2000;
+
+our $CROAK_INVALID_NAME = 0;
+my $VALID_NAME_REGEXP = qr/\A[\p{L}\p{N}\p{Z}_.:\/%&#=+\\\-@]{1,200}\z/;
 
 if ($ENV{"AWS_XRAY_DAEMON_ADDRESS"}) {
     ($DAEMON_HOST, $DAEMON_PORT) = split /:/, $ENV{"AWS_XRAY_DAEMON_ADDRESS"};
@@ -76,13 +80,13 @@ sub auto_flush {
 
 sub sock {
     $Sock //= AWS::XRay::Buffer->new(
-            IO::Socket::INET->new(
-                PeerAddr => $DAEMON_HOST || "127.0.0.1",
-                PeerPort => $DAEMON_PORT || 2000,
-                Proto    => "udp",
-            ),
-            $AUTO_FLUSH,
-        );
+        IO::Socket::INET->new(
+            PeerAddr => $DAEMON_HOST || "127.0.0.1",
+            PeerPort => $DAEMON_PORT || 2000,
+            Proto    => "udp",
+        ),
+        $AUTO_FLUSH,
+    );
 }
 
 sub new_trace_id {
@@ -94,7 +98,11 @@ sub new_trace_id {
 }
 
 sub new_id {
-    unpack("H*", Crypt::URandom::urandom(8))
+    unpack("H*", Crypt::URandom::urandom(8));
+}
+
+sub is_valid_name {
+    $_[0] =~ $VALID_NAME_REGEXP;
 }
 
 # alias for backward compatibility
@@ -102,15 +110,21 @@ sub new_id {
 
 sub capture {
     my ($name, $code) = @_;
+    if (!is_valid_name($name)) {
+        my $msg = "invalid segment name: $name";
+        $CROAK_INVALID_NAME ? croak($msg) : carp($msg);
+    }
     my $wantarray = wantarray;
 
     my $enabled;
     my $sampled = $SAMPLED;
     if (defined $ENABLED) {
         $enabled = $ENABLED ? 1 : 0; # fix true or false (not undef)
-    } elsif ($TRACE_ID) {
-        $enabled = 0; # called from parent capture
-    } else {
+    }
+    elsif ($TRACE_ID) {
+        $enabled = 0;                # called from parent capture
+    }
+    else {
         # root capture try sampling
         $sampled = $SAMPLER->() ? 1 : 0;
         $enabled = $sampled     ? 1 : 0;
@@ -165,12 +179,12 @@ sub capture {
 }
 
 sub capture_from {
-    my ($header, $name, $code) = @_;
+    my ($header,   $name,       $code)    = @_;
     my ($trace_id, $segment_id, $sampled) = parse_trace_header($header);
 
     local $AWS::XRay::SAMPLED = $sampled // $SAMPLER->();
     local $AWS::XRay::ENABLED = $AWS::XRay::SAMPLED;
-    local($AWS::XRay::TRACE_ID, $AWS::XRay::SEGMENT_ID) = ($trace_id, $segment_id);
+    local ($AWS::XRay::TRACE_ID, $AWS::XRay::SEGMENT_ID) = ($trace_id, $segment_id);
     capture($name, $code);
 }
 
@@ -214,7 +228,13 @@ sub add_capture {
 if ($ENV{LAMBDA_TASK_ROOT}) {
     # AWS::XRay is loaded in AWS Lambda worker.
     # notify the Lambda Runtime that initialization is complete.
-    mkdir '/tmp/.aws-xray' or warn "failed to make directory: $!";
+    unless (mkdir '/tmp/.aws-xray') {
+        # ignore the error if the directory is already exits or other process created it.
+        my $err = $!;
+        unless (-d '/tmp/.aws-xray') {
+            warn "failed to make directory: $err";
+        }
+    }
     open my $fh, '>', '/tmp/.aws-xray/initialized' or warn "failed to create file: $!";
     close $fh;
     utime undef, undef, '/tmp/.aws-xray/initialized' or warn "failed to touch file: $!";
@@ -227,9 +247,9 @@ if ($ENV{LAMBDA_TASK_ROOT}) {
         my ($trace_id, $segment_id, $sampled) = parse_trace_header($ENV{_X_AMZN_TRACE_ID});
         local $AWS::XRay::SAMPLED = $sampled // $SAMPLER->();
         local $AWS::XRay::ENABLED = $AWS::XRay::SAMPLED;
-        local($AWS::XRay::TRACE_ID, $AWS::XRay::SEGMENT_ID) = ($trace_id, $segment_id);
+        local ($AWS::XRay::TRACE_ID, $AWS::XRay::SEGMENT_ID) = ($trace_id, $segment_id);
         local *capture = $org;
-        local *trace = $org;
+        local *trace   = $org;
         capture(@_);
     };
     *trace = \&capture;
@@ -364,6 +384,20 @@ When $mode is 0, segment data are buffered in memory. You should call AWS::XRay-
 
 Set the host and port of the X-Ray daemon. Default 127.0.0.1:2000
 
+=head2 $AWS::XRay::CROAK_INVALID_NAME
+
+When set to 1 (default 0), capture() will raise exception if a segment name is invalid.
+
+See https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html
+
+=over
+
+name – The logical name of the service that handled the request, up to 200 characters.
+For example, your application's name or domain name.
+Names can contain Unicode letters, numbers, and whitespace, and the following symbols: _, ., :, /, %, &, #, =, +, \, -, @
+
+=back
+
 =head1 LICENSE
 
 Copyright (C) FUJIWARA Shunichiro.
@@ -376,4 +410,3 @@ it under the same terms as Perl itself.
 FUJIWARA Shunichiro E<lt>fujiwara.shunichiro@gmail.comE<gt>
 
 =cut
-

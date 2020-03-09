@@ -3,8 +3,8 @@ NAME
     etc)
 
 VERSION
-    This document describes version 0.001 of Log::ger::Output::Perl (from
-    Perl distribution Log-ger-Output-Perl), released on 2017-07-24.
+    This document describes version 0.002 of Log::ger::Output::Perl (from
+    Perl distribution Log-ger-Output-Perl), released on 2020-03-07.
 
 SYNOPSIS
      use Log::ger::Output Perl => (
@@ -74,14 +74,14 @@ BUGS
 SEE ALSO
     Modelled after Log::Dispatch::Perl.
 
-    Log::Dispatch::Plugin::Perl which actually replaces the log statements
-    with warn(), die(), etc.
+    Log::ger::Plugin::Perl which actually replaces the log statements with
+    warn(), die(), etc.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

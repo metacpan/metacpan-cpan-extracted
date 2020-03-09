@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.525';
+our $VERSION = '0.526';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -203,7 +203,7 @@ sub __calculate_threshold {
 
 sub __before_readline {
     my ( $self, $m ) = @_;
-    my @info = split /\n/, line_fold( $self->{info}, $self->{i}{term_w}, { color => $self->{color} } ), -1;
+    my @info = line_fold( $self->{info}, $self->{i}{term_w}, { color => $self->{color}, join => 0 } );
     if ( $self->{show_context} ) {
         my @before_lines;
         if ( $m->{diff} ) {
@@ -809,7 +809,7 @@ sub __prepare_hight {
     my ( $self, $list, $term_w, $term_h ) = @_;
     $self->{i}{avail_h} = $term_h;
     if ( length $self->{i}{pre_text} ) {
-        $self->{i}{pre_text} = line_fold( $self->{i}{pre_text}, $term_w, { color => $self->{color} } );
+        $self->{i}{pre_text} = line_fold( $self->{i}{pre_text}, $term_w, { color => $self->{color}, join => 1 } );
         $self->{i}{pre_text_row_count} = $self->{i}{pre_text} =~ tr/\n//;
         $self->{i}{pre_text_row_count} += 1;
         $self->{i}{avail_h} -= $self->{i}{pre_text_row_count};
@@ -1345,7 +1345,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.525
+Version 0.526
 
 =cut
 

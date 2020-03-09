@@ -1,8 +1,10 @@
 Revision history for App-gimpgitbuild
 
-0.10.2   2020-03-05
-    - Resubmit due to a PAUSE indexing failure; trying to get the new version
-    indexed.
+0.12.0   2020-03-08
+    - Add the eval "$(gimpgitbuild runenv)" sub-command for LD_LIBRARY_PATH
+    runtime vars.
+        - By inspiration from https://mail.gnome.org/archives/gimp-developer-list/2020-February/msg00026.html
+        - Thanks, Owen!
 
 0.10.1   2020-03-02
     - Fix missing $VERSION in lib/**.pm files.

@@ -20,7 +20,7 @@ my $header2 = capture_from $header1, "from", sub {
 };
 diag $header2;
 capture_from $header2, "to", sub {
-    capture "sub", sub {};
+    capture "sub", sub { };
 };
 
 my @seg = segments();

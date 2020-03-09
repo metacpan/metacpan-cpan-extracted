@@ -1,6 +1,9 @@
 use 5.014;
 
-use Do;
+use strict;
+use warnings;
+use routines;
+
 use Test::Auto;
 use Test::More;
 
@@ -1227,10 +1230,10 @@ subtest 't/0.05/can/Doodle_Table_Helpers_no_morphs.t', fun() {
   isa_ok $type, 'Doodle::Command';
   isa_ok $fkey, 'Doodle::Command';
 
-  is $type->columns->first->name, 'profile_type';
+  is $type->columns->[0]->name, 'profile_type';
   is $type->name, 'delete_column';
 
-  is $fkey->columns->first->name, 'profile_fkey';
+  is $fkey->columns->[0]->name, 'profile_fkey';
   is $fkey->name, 'delete_column';
 
   ok 1 and done_testing;
@@ -1472,13 +1475,13 @@ subtest 't/0.05/can/Doodle_Table_Helpers_no_timestamps.t', fun() {
   isa_ok $updated_at, 'Doodle::Command';
   isa_ok $deleted_at, 'Doodle::Command';
 
-  is $created_at->columns->first->name, 'created_at';
+  is $created_at->columns->[0]->name, 'created_at';
   is $created_at->name, 'delete_column';
 
-  is $updated_at->columns->first->name, 'updated_at';
+  is $updated_at->columns->[0]->name, 'updated_at';
   is $updated_at->name, 'delete_column';
 
-  is $deleted_at->columns->first->name, 'deleted_at';
+  is $deleted_at->columns->[0]->name, 'deleted_at';
   is $deleted_at->name, 'delete_column';
 
   ok 1 and done_testing;

@@ -5,40 +5,21 @@ To install this module, use CPAN, for example:
   cpanm Math::SlideRule
 
 
+Run perldoc(1) on Math::SlideRule for more documentation.
+
+
 For the current release, see:
 
 https://github.com/thrig/Math-SlideRule
 
 This can be built and installed by running:
 
-  perl Makefile.PL
-  make
-  make test
-  make install
-
-
-Run perldoc(1) on Math::SlideRule for more documentation.
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
 
 
 DEPENDENCIES
 
 Some knowledge of how a slide rule works may be handy.
-
-
-SUPPORT AND DOCUMENTATION
-
-After installing, you can find documentation for this module with the
-perldoc command.
-
-    perldoc Math::SlideRule
-
-You can also look for information at:
-
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-SlideRule
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Math-SlideRule
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Math-SlideRule

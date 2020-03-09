@@ -456,7 +456,11 @@ be highlighted!</p>
                         . Mojo::Util::md5_sum( 'doug@preaction.me' )
                         . q{.jpg?s=200">
                     &lt;/span>
+                    Doug Bell
                 }),
+                [ b('Inbox &lt;span class="badge badge-info pull-right">5&lt;/span>') => '#' ],
+                undef,
+                [ 'Edit Profile' => '#' ],
             ],
         ],
         [ b('&lt;i class="fa fa-sign-out">&lt;/i>') => '#' ],

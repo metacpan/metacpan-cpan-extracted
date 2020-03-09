@@ -48,7 +48,7 @@ Measure words of length N (Nmer) enrichment and compare to shuffled reads. Shuff
 =cut
 
 package CLIPSeqTools::App::nmer_enrichment_over_shuffled;
-$CLIPSeqTools::App::nmer_enrichment_over_shuffled::VERSION = '0.1.8';
+$CLIPSeqTools::App::nmer_enrichment_over_shuffled::VERSION = '0.1.9';
 
 # Make it an app command
 use MooseX::App::Command;

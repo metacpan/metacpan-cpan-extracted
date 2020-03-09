@@ -118,20 +118,21 @@ sub __print_template_info {
     $first_part_end--;
     $second_part_begin--;
     my $end_idx = $#{$rows};
+    my $dots = $sf->{i}{dots}[ $sf->{o}{G}{dots} ];
     if ( @$rows > $avail_h ) {
         for my $row ( @{$rows}[ 0 .. $first_part_end ] ) {
-            $info .= "\n" . unicode_sprintf( $row, $term_w, { add_dots => 1 } );
+            $info .= "\n" . unicode_sprintf( $row, $term_w, { mark_if_truncated => $dots } );
         }
         $info .= "\n[...]";
         for my $row ( @{$rows}[ $end_idx - $second_part_begin .. $end_idx ] ) {
-            $info .= "\n" . unicode_sprintf( $row, $term_w, { add_dots => 1 } );
+            $info .= "\n" . unicode_sprintf( $row, $term_w, { mark_if_truncated => $dots } );
         }
         my $row_count = scalar( @$rows );
-        $info .= "\n" . unicode_sprintf( '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]', $term_w, { add_dots => 1 } );
+        $info .= "\n" . unicode_sprintf( '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]', $term_w, { mark_if_truncated => $dots } );
     }
     else {
         for my $row ( @$rows ) {
-            $info .= "\n" . unicode_sprintf( $row, $term_w, { add_dots => 1 } );
+            $info .= "\n" . unicode_sprintf( $row, $term_w, { mark_if_truncated => $dots } );
         }
     }
     $info .= "\n";

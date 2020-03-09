@@ -4,6 +4,7 @@ LICENSE
 META.json
 README.md
 cpanfile
+lib/App/optex/tc.pm
 lib/App/optex/textconv.pm
 lib/App/optex/textconv/Converter.pm
 lib/App/optex/textconv/Zip.pm

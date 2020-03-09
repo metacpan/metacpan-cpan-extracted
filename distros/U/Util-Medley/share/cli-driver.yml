@@ -29,6 +29,32 @@
 #      optional:                   
 #      flags:
 
+commify:
+  class:
+    name: Util::Medley::Exec
+    attr:
+      required:
+      optional:
+  method:
+    name: commify
+    args:
+      required:
+        hard: 
+          v: val
+
+decommify:
+  class:
+    name: Util::Medley::Exec
+    attr:
+      required:
+      optional:
+  method:
+    name: decommify
+    args:
+      required:
+        hard: 
+          v: val
+                  
 encrypt-str:
   class:
     name: Util::Medley::Exec

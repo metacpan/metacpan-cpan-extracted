@@ -1,11 +1,18 @@
 package Test_Doodle_Column_Helpers;
 
+use strict;
+use warnings;
+
+use registry 'Doodle::Library';
+use routines;
+
 use Test::More;
 
 use Doodle;
 use Doodle::Column::Helpers;
 
-use Data::Object 'Class', 'Doodle::Library';
+use Data::Object::Class;
+use Data::Object::ClassHas;
 
 has 'table';
 has 'column';

@@ -1,9 +1,9 @@
 package App::PODUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'App-PODUtils'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 use 5.010001;
 use strict;
@@ -199,7 +199,50 @@ $Sort::Sub::argsopt_sortsub{sort_args}{cmdline_aliases} = {A=>{}};
 
 $SPEC{sort_pod_headings} = {
     v => 1.1,
-    summary => '',
+    summary => 'Sort POD headings in text',
+    description => <<'_',
+
+This utility sorts POD headings in text. By default it sorts =head1 headings.
+For example this POD:
+
+    =head1 b
+
+    some text for b
+
+    =head1 a
+
+    text for a
+
+    =head2 a2
+
+    =head2 a1
+
+    =head1 c
+
+    text for c
+
+will be sorted into:
+
+    =head1 a
+
+    text for a
+
+    =head2 a2
+
+    =head2 a1
+
+    =head1 b
+
+    some text for b
+
+    =head1 c
+
+    text for c
+
+Note that the =head2 headings are not sorted. If you want to sort those, you can
+rerun the utility and specify the `--command=head2` option.
+
+_
     args => {
         %arg0_pod,
         command => {
@@ -230,7 +273,7 @@ sub sort_pod_headings {
 
 $SPEC{reverse_pod_headings} = {
     v => 1.1,
-    summary => '',
+    summary => 'Reverse POD headings',
     args => {
         %arg0_pod,
         command => {
@@ -263,7 +306,7 @@ App::PODUtils - Command-line utilities related to POD
 
 =head1 VERSION
 
-This document describes version 0.046 of App::PODUtils (from Perl distribution App-PODUtils), released on 2020-02-28.
+This document describes version 0.047 of App::PODUtils (from Perl distribution App-PODUtils), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -335,7 +378,7 @@ Usage:
 
  reverse_pod_headings(%args) -> any
 
-.
+Reverse POD headings.
 
 This function is not exported.
 
@@ -364,7 +407,47 @@ Usage:
 
  sort_pod_headings(%args) -> any
 
-.
+Sort POD headings in text.
+
+This utility sorts POD headings in text. By default it sorts =head1 headings.
+For example this POD:
+
+ =head1 b
+ 
+ some text for b
+ 
+ =head1 a
+ 
+ text for a
+ 
+ =head2 a2
+ 
+ =head2 a1
+ 
+ =head1 c
+ 
+ text for c
+
+will be sorted into:
+
+ =head1 a
+ 
+ text for a
+ 
+ =head2 a2
+ 
+ =head2 a1
+ 
+ =head1 b
+ 
+ some text for b
+ 
+ =head1 c
+ 
+ text for c
+
+Note that the =head2 headings are not sorted. If you want to sort those, you can
+rerun the utility and specify the C<--command=head2> option.
 
 This function is not exported.
 
@@ -412,7 +495,7 @@ feature.
 =head1 SEE ALSO
 
 
-L<pomdump>. Perinci::To::POD=HASH(0x560307ca92c0).
+L<pomdump>. Perinci::To::POD=HASH(0x55aa003ac738).
 
 L<podsel>.
 

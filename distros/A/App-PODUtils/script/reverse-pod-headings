@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/PODUtils/reverse_pod_headings
-# and generated automatically using Perinci::CmdLine::Gen version 0.493
+# and generated automatically using Perinci::CmdLine::Gen version 0.494
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'App-PODUtils'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,7 +25,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: 
+# ABSTRACT: Reverse POD headings
 # PODNAME: reverse-pod-headings
 
 __END__
@@ -36,11 +36,11 @@ __END__
 
 =head1 NAME
 
-reverse-pod-headings -  
+reverse-pod-headings - Reverse POD headings
 
 =head1 VERSION
 
-This document describes version 0.046 of reverse-pod-headings (from Perl distribution App-PODUtils), released on 2020-02-28.
+This document describes version 0.047 of reverse-pod-headings (from Perl distribution App-PODUtils), released on 2020-03-08.
 
 =head1 SYNOPSIS
 

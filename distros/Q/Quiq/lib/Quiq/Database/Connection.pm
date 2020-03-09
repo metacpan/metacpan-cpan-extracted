@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.176';
+our $VERSION = '1.177';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -23,6 +23,7 @@ use Quiq::Digest;
 use Quiq::Database::Cursor;
 use Time::HiRes ();
 use Quiq::AnsiColor;
+use Quiq::Unindent;
 use Quiq::Database::ResultSet;
 
 # -----------------------------------------------------------------------------
@@ -2170,6 +2171,188 @@ sub select {
 
 # -----------------------------------------------------------------------------
 
+=head3 selectWith() - Liefere Liste von Datensätzen
+
+=head4 Synopsis
+
+  $tab|@rows|$cur = $db->selectWith($stmt,@select,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $stmt
+
+SELECT-Statement, das in eine WITH Klausel eingebettet wird.
+
+=item @select
+
+Siehe L<select|"select() - Liefere Liste von Datensätzen">()
+
+=item @opt
+
+Siehe L<select|"select() - Liefere Liste von Datensätzen">()
+
+=back
+
+=head4 Options
+
+Siehe L<select|"select() - Liefere Liste von Datensätzen">()
+
+=head4 Returns
+
+Siehe L<select|"select() - Liefere Liste von Datensätzen">()
+
+=head4 Description
+
+Bette SELECT-Statement $stmt in eine WITH-Klausel ein und führe
+die Selektion über dieser WITH-Klausel aus. Die WITH-Klausel
+hat den Vorteil, dass die Bedingungen der WHERE-Klausel über
+den Kolumnennamen der SELECT-Liste formuliert werden können.
+
+=head4 Rationale
+
+Eine Selektion über dem Statement
+
+  SELECT
+      fun.oid AS fun_oid
+      , usr.usename AS fun_owner
+      , nsp.nspname AS fun_schema
+      , fun.proname AS fun_name
+      , pg_get_function_identity_arguments(fun.oid) AS fun_arguments
+      , fun.proname || '(' ||
+          COALESCE(pg_get_function_identity_arguments(fun.oid), '')
+          || ')' AS fun_signature
+      , pg_get_functiondef(fun.oid) AS fun_source
+  FROM
+      pg_proc AS fun
+      JOIN pg_namespace AS nsp
+          ON fun.pronamespace = nsp.oid
+      JOIN pg_user usr
+          ON fun.proowner = usr.usesysid
+
+liefert zwar Datensätze mit den eigens vergebenen Kolumnennamen fun_oid,
+fun_owner usw. Diese Namen können jedoch I<nicht> bei der Formulierung
+der WHERE-Klausel verwendet werden. Stattdessen müssen die Namen der
+zugrundeliegenden Tabellen verwendet werden. Diese Assymetrie, die eine
+wirkliche Kapselung verhindert, lässt sich vermeiden, wenn das Statement
+in eine WITH-Klausel eingebettet und über I<dieser> die Selektion
+formuliert wird. In dem Fall können (und müssen) die Namen des
+eingebetteten SELECT verwendet werden. Hier eine Suche via fun_name
+($stmt ist obiges Statement):
+
+  $stmt = $sql->selectWith($stmt,
+      -select => 'fun_schema','fun_signature',
+      -where => fun_name => 'check_bigint',
+          fun_arguments => 'text, boolean, text, text',
+      -orderBy => 'fun_schema',
+  );
+
+liefert
+
+  WITH qry AS (
+      SELECT
+          fun.oid AS fun_oid
+          , usr.usename AS fun_owner
+          , nsp.nspname AS fun_schema
+          , fun.proname AS fun_name
+          , pg_get_function_identity_arguments(fun.oid) AS fun_arguments
+          , fun.proname || '(' ||
+              COALESCE(pg_get_function_identity_arguments(fun.oid), '')
+              || ')' AS fun_signature
+          , pg_get_functiondef(fun.oid) AS fun_source
+      FROM
+          pg_proc AS fun
+          JOIN pg_namespace AS nsp
+              ON fun.pronamespace = nsp.oid
+          JOIN pg_user usr
+              ON fun.proowner = usr.usesysid
+  )
+  SELECT
+      fun_schema
+      , fun_signature
+  FROM
+      qry
+  WHERE
+      fun_name = 'check_bigint'
+      AND fun_arguments = 'text, boolean, text, text'
+  ORDER BY
+      fun_schema
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub selectWith {
+    my ($self,$stmt) = splice @_,0,2;
+    # @_: @select,@opt
+    return $self->select(@_,-with,query=>$stmt,-from=>'query');
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 selectFrom() - Liefere Liste von Datensätzen
+
+=head4 Synopsis
+
+  $tab|@rows|$cur = $db->selectFrom($stmt,@select,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $stmt
+
+SELECT-Statement, das in eine WITH Klausel eingebettet wird.
+
+=item @select
+
+Siehe L<select|"select() - Liefere Liste von Datensätzen">()
+
+=item @opt
+
+Siehe L<select|"select() - Liefere Liste von Datensätzen">()
+
+=back
+
+=head4 Options
+
+Siehe L<select|"select() - Liefere Liste von Datensätzen">()
+
+=head4 Returns
+
+Siehe L<select|"select() - Liefere Liste von Datensätzen">()
+
+=head4 Description
+
+Bette SELECT-Statement $stmt inline in eine FROM-Klausel ein und führe
+die Selektion aus. Die Inline-Einbettung hat den Vorteil, dass die
+Bedingungen der WHERE-Klausel über den Kolumnennamen der SELECT-Liste
+formuliert werden können:
+
+  ...
+  FROM (
+      STMT
+     ) AS query
+
+=head4 Rationale
+
+Analog zu L<selectWith|"selectWith() - Liefere Liste von Datensätzen">().
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub selectFrom {
+    my $self = shift;
+    my $stmt = Quiq::Unindent->trim(shift);
+    # @_: @select,@opt
+
+    return $self->select(@_,-from=>['AS','query',"(\n$stmt\n)"]);
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 lookup() - Liefere Datensatz
 
 =head4 Synopsis
@@ -3422,11 +3605,11 @@ sub tableDiff {
         ORDER BY
             __TITLES1__
         ",
-        -args =>
-            TABLE1 => $table1,
-            TITLES1 => join(', ',@columns),
-            TABLE2 => $table2,
-            TITLES2 => join(', ',@columns),
+        -placeholders =>
+            __TABLE1__ => $table1,
+            __TITLES1__ => join(', ',@columns),
+            __TABLE2__ => $table2,
+            __TITLES2__ => join(', ',@columns),
     );
 
     my $i = 0;
@@ -3455,11 +3638,11 @@ sub tableDiff {
         ORDER BY
             __TITLES2__
         ",
-        -args =>
-            TABLE1 => $table1,
-            TITLES1 => join(', ',@columns),
-            TABLE2 => $table2,
-            TITLES2 => join(', ',@columns),
+        -placeholders =>
+            __TABLE1__ => $table1,
+            __TITLES1__ => join(', ',@columns),
+            __TABLE2__ => $table2,
+            __TITLES2__ => join(', ',@columns),
     );
 
     $i = 0;
@@ -4545,7 +4728,7 @@ sub createTrigger {
         return $self->sqlAtomic($stmt,-forceExec=>1);
     }
     elsif ($self->isPostgreSQL) { 
-        my $procName = $name.'_proc';
+        my $procName = $name.'_proc()';
 
         my $stmt = $sql->createFunction($procName,$body,
             -returns => 'trigger'
@@ -4584,7 +4767,7 @@ sub dropTrigger {
         return $self->sqlAtomic($stmt);
     }
     elsif ($self->isPostgreSQL) {
-        my $stmt = $sql->dropFunction($name.'_proc',-cascade=>1);
+        my $stmt = $sql->dropFunction($name.'_proc()',-cascade=>1);
         return $self->sqlAtomic($stmt);
     }
 
@@ -5018,7 +5201,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.176
+1.177
 
 =head1 AUTHOR
 

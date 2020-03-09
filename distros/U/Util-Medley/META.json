@@ -52,6 +52,7 @@
             "Modern::Perl" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
+            "Number::Format" : "0",
             "Path::Iterator::Rule" : "0",
             "Scalar::Util" : "0",
             "Scalar::Util::Numeric" : "0",
@@ -77,7 +78,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.024",
+   "version" : "0.025",
    "x_generated_by_perl" : "v5.16.3",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,6 +1,9 @@
 use 5.014;
 
-use Do;
+use strict;
+use warnings;
+use routines;
+
 use Test::Auto;
 use Test::More;
 
@@ -302,13 +305,13 @@ subtest 't/0.05/can/Doodle_Table_create.t', fun() {
 
   my $x = $d->commands;
 
-  is $x->count, 1;
+  is @{$x}, 1;
 
-  is $x->get(0)->name, 'create_table';
-  is $x->get(0)->table, $t;
-  is $x->get(0)->columns->count, 4;
-  is $x->get(0)->indices->count, 0;
-  is $x->get(0)->relation, undef;
+  is $x->[0]->name, 'create_table';
+  is $x->[0]->table, $t;
+  is @{$x->[0]->columns}, 4;
+  is @{$x->[0]->indices}, 0;
+  is $x->[0]->relation, undef;
 
   ok 1 and done_testing;
 };
@@ -325,13 +328,13 @@ subtest 't/0.05/can/Doodle_Table_delete.t', fun() {
 
   my $x = $d->commands;
 
-  is $x->count, 1;
+  is @{$x}, 1;
 
-  is $x->get(0)->name, 'delete_table';
-  is $x->get(0)->table, $t;
-  is $x->get(0)->columns, undef;
-  is $x->get(0)->indices, undef;
-  is $x->get(0)->relation, undef;
+  is $x->[0]->name, 'delete_table';
+  is $x->[0]->table, $t;
+  is $x->[0]->columns, undef;
+  is $x->[0]->indices, undef;
+  is $x->[0]->relation, undef;
 
   ok 1 and done_testing;
 };

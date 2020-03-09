@@ -1,0 +1,48 @@
+Copyright 2010, 2014 Kevin Ryde
+
+This file is part of I18N-Langinfo-Wide.
+
+I18N-Langinfo-Wide is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+I18N-Langinfo-Wide is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with I18N-Langinfo-Wide.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 9, October 2014
+    - split the POSIX parts out to its own dist
+
+Version 8, February 2014
+    - POSIX::Wide new @LOCALECONV_STRING_FIELDS
+    - tests thousands_sep is a string field, as reported by Karl
+      Williamson RT#120943
+
+Version 7, August 2010
+    - test manifest only as an author test
+    - file/line in the $ERRNO and $EXTENDED_OS_ERROR subrs
+
+Version 6, July 2010
+    - POSIX::Wide new $EXTENDED_OS_ERROR
+
+Version 5, May 2010
+    - POSIX::Wide new tzname()
+
+Version 4, April 2010
+    - Makefile.PL express dependency on I18N::Langinfo
+
+Version 3, April 2010
+    - tests allow for langinfo constants not available
+
+Version 2, April 2010
+    - Encode::resolve_alias() to handle "646" from netbsd
+
+Version 1, April 2010
+    - the first version

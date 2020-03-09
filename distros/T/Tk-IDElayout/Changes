@@ -1,5 +1,12 @@
 Summary of Changes to Tk::IDElayout
 
+Release 0.35:  2020-03-09
+
+ * Fix POD error (missing `=back` before `=head1`) in IDEtabFrame.pm
+   (contribution from Mohammad S Anwar)
+ * Makefile.PL: Don't index unauthorized packages Tk and Tk::CaptureRelease
+   to avoid CPAN permission issue
+
 Release 0.34:  2018-08-02
 
  * Improved error message if widgets are missing containers needed for dropping

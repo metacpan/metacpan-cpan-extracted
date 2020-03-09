@@ -1,33 +1,27 @@
 ---
-abstract: 'Output RDF triples in Notation3 format'
+abstract: 'Output RDF triples in Notation3 format '
 author:
   - 'Martin Thurn <mthurn@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::Deep: 0
-  Test::More: 0
-  Test::Pod: 0
-  Test::Pod::Coverage: 0
+  Test::Deep: '0'
+  Test::More: '0'
+  blib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 0.91'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: RDF-Simple-Serialiser-Notation3
-no_index:
-  directory:
-    - examples
-    - inc
-    - t
 requires:
-  Data::Dumper: 0
-  Pod::Coverage: 0
-  RDF::Simple::Serialiser: 0
-  Regexp::Common: 0
-  perl: 5
-resources:
-  license: http://dev.perl.org/licenses/
-version: 1.017
+  Data::Dumper: '0'
+  RDF::Simple::Serialiser: '1.14'
+  Regexp::Common: '0'
+  base: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+version: '1.019'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,15 +1,21 @@
-SYNOPSIS
+NAME
+    Log::ger::Layout::JSON - Layout log message as a JSON object (hash)
 
+VERSION
+    This document describes version 0.002 of Log::ger::Layout::JSON (from
+    Perl distribution Log-ger-Layout-JSON), released on 2020-03-07.
+
+SYNOPSIS
      use Log::ger::Layout JSON => (
          add_fields         => {key3 => 'value', key4 => 'value', ...},         # optional
          add_special_fields => {_date => 'Date_GMT', _host => 'Hostname', ...}, # optional
          delete_fields      => ['key1', 'key2', qr/some-regex/, ...],           # optional
      );
      use Log::ger;
-    
+
      # if you use it together with Log::ger::Format::None:
      log_warn({key1 => 'val1', key2 => 'val2', foo => 'bar', ...);
-    
+
      # otherwise, using the standard formatter:
      log_warn("blah %s", ['some', 'data']);
 
@@ -22,19 +28,15 @@ SYNOPSIS
      {"message":"blah [\"some\",\"data\"]", "_date":"2017-06-28T14:08:22", "_host":"example.com"}
 
 DESCRIPTION
-
     This layouter allows you to log as JSON. If you use
     Log::ger::Format::None, you can pass a hashref. Otherwise, the message
-    will be put in message key. You can then delete keys then add
+    will be put in "message" key. You can then delete keys then add
     additional fields/keys (including special fields, a la
     Log::ger::Layout::Pattern).
 
 CONFIGURATION
-
- add_fields => hash
-
- add_special_fields => hash
-
+  add_fields => hash
+  add_special_fields => hash
     Known special fields:
 
      Category: Category of the logging event
@@ -57,13 +59,35 @@ CONFIGURATION
 
     Unknown special fields will cause the layouter to die.
 
- delete_fields
+  delete_fields
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-Layout-JSON>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-Layout-JSON>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Layout-JSON>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Log::ger
 
     Log::ger::Layout::Pattern
 
     Log::ger::Layout::LTSV
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -7,3 +7,5 @@ README
 bin/psonpath
 dist.ini
 lib/Psonpath.pm
+t/data/metadata.json
+t/simple.t

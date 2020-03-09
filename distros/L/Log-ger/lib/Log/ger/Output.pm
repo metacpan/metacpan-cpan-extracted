@@ -1,7 +1,9 @@
 package Log::ger::Output;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger'; # DIST
+our $VERSION = '0.033'; # VERSION
 
 use parent 'Log::ger::Plugin';
 
@@ -24,7 +26,7 @@ Log::ger::Output - Set logging output
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 
@@ -60,6 +62,8 @@ L<Log::ger::Format>
 L<Log::ger::Layout>
 
 L<Log::ger::Plugin>
+
+L<Log::ger::Filter>
 
 =head1 AUTHOR
 

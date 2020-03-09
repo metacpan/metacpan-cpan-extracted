@@ -13,7 +13,8 @@ subtest "disable", sub {
     reset();
     AWS::XRay->sampling_rate(0);
     capture "root", sub {
-        capture "sub $_", sub {} for ( 1 .. 100 );
+        capture "sub $_", sub { }
+            for (1 .. 100);
     };
     my @seg = segments();
     ok scalar(@seg) == 0;
@@ -23,7 +24,8 @@ subtest "enable", sub {
     reset();
     AWS::XRay->sampling_rate(1);
     capture "root", sub {
-        capture "sub $_", sub {} for ( 1 .. 100 );
+        capture "sub $_", sub { }
+            for (1 .. 100);
     };
     my @seg = segments();
     ok scalar(@seg) == 101;
@@ -32,20 +34,21 @@ subtest "enable", sub {
 subtest "50%", sub {
     reset();
     AWS::XRay->sampling_rate(0.5);
-    for ( 1 .. 1000 ) {
-        capture "root $_", sub {};
+    for (1 .. 1000) {
+        capture "root $_", sub { };
     }
     my @seg = segments();
-    ok scalar(@seg) >  400;
+    ok scalar(@seg) > 400;
     ok scalar(@seg) <= 600;
 };
 
 subtest "50% sub", sub {
-    for ( 1 .. 10 ) {
+    for (1 .. 10) {
         reset();
         AWS::XRay->sampling_rate(0.5);
         capture "root", sub {
-            capture "sub $_", sub {} for ( 1 .. 100 );
+            capture "sub $_", sub { }
+                for (1 .. 100);
         };
         my @seg = segments();
         ok scalar(@seg) == 101 || scalar(@seg) == 0;

@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 f83941b2bc73873509e7a4f373b488687a285cb8 Changes
+SHA1 fa7649c0d298deacff1334e137e7d4770d7542a6 MANIFEST
+SHA1 d73f6910c2283dca6aa23a5d820950745dcb76f6 MANIFEST.SKIP
+SHA1 af37a5575677af132728e3a18aff2cc6cb86a01c META.json
+SHA1 37c9da0344a277d8b7b2a72792da762b378120f8 META.yml
+SHA1 bdf1d3ccd0cd2a870b3cfd16e8ba4bd67ea20142 Makefile.PL
+SHA1 c6a301a912d7fabc8dcbb9d976ed7085dc90b360 README
+SHA1 cac3da23fba4a13d46d925a08d44a7e9cc58a90d debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 748e750842b17ad8d23da73a4ff201a1d0781f68 debian/control
+SHA1 548270c43d1c1bcd568f0159f73e14fbfb30320f debian/copyright
+SHA1 ef443a6152ccd92ca65e72d3128d1c91b77a8ff4 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 1e7b60bb454cff3f60f5e210bc1fb4105ccc1688 debian/watch
+SHA1 9c52fce6883032a4d7112ef81e6cb394153870c7 devel/Makefile
+SHA1 f27080a43f9bee405f97c6b83eab8eb0e8b8f50e devel/check-categories.pl
+SHA1 ce6adffbc58f5d44f4d1d47f6982fb785bf2e8c0 devel/exe-glibc-alt-digits.c
+SHA1 a8d41cd4050ee2c093fa4b883827b789a0b75b72 devel/filename.pl
+SHA1 6b94690acdb3dd055f4d012b37d55bb4ff4b346e devel/funcs.pl
+SHA1 2574f8504a1ad1335acb0d19cd92b1b9050a4fc5 devel/langinfo-wide.pl
+SHA1 2c31f38013695c85f0a75eb2c783989978aa298b inc/my_pod2html
+SHA1 acf148a9bca2c8d1da3dda38e07d9574246e1803 lib/I18N/Langinfo/Wide.pm
+SHA1 e29372ed93b8ff7f4f109954a556d6bf91066da5 t/I18N-Langinfo-Wide.t
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 92f32aa7a6bba4fe0ce6dc07a9c2581b67070232 xtools/my-check-copyright-years.sh
+SHA1 b12199bcc70c569ff43f8d8e2ea1c896f587c62f xtools/my-check-spelling.sh
+SHA1 fa07c8e559adbd1af5ba613e021991b0819fc7ba xtools/my-deb.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFUL0QyLFMCIV9q3ToRAqKSAKCIwRkvHsVqbLeIc2dlznAzCSAEDgCfZa+r
+OVpyC/xtNpLVTlKRCZuKrHA=
+=AEuz
+-----END PGP SIGNATURE-----

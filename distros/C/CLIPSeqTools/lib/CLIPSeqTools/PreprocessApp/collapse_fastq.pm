@@ -34,7 +34,7 @@ identical sequences.
 =cut
 
 package CLIPSeqTools::PreprocessApp::collapse_fastq;
-$CLIPSeqTools::PreprocessApp::collapse_fastq::VERSION = '0.1.8';
+$CLIPSeqTools::PreprocessApp::collapse_fastq::VERSION = '0.1.9';
 
 # Make it an app command
 use MooseX::App::Command;

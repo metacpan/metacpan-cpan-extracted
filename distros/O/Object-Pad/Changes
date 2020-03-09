@@ -1,5 +1,14 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.11    2020-03-07
+        [CHANGES]
+         * More efficient method enter on perl 5.22 onwards by detecting which
+           slots are being used per method and only set those ones up
+
+        [BUGFIXES]
+         * Fix some C99isms in XS code (RT131417)
+         * Avoid a C++-style comment in hax/lexer-additions.c.inc
+
 0.10    2019-11-20
         [BUGFIXES]
          * Back-compat fixes for perl 5.16, 5.20

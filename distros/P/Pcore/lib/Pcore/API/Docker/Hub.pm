@@ -37,9 +37,9 @@ const our $BUILD_STATUS_TEXT => {
 };
 
 sub BUILDARGS ( $self, $args = undef ) {
-    $args->{username} ||= $ENV->user_cfg->{DOCKERHUB}->{username};
+    $args->{username} ||= $ENV->user_cfg->{DOCKER}->{registry}->{''}->{username};
 
-    $args->{token} ||= $ENV->user_cfg->{DOCKERHUB}->{token};
+    $args->{token} ||= $ENV->user_cfg->{DOCKER}->{registry}->{''}->{token};
 
     return $args;
 }
@@ -439,6 +439,8 @@ sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 160, 271, 306, 355,  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |      | 372, 376, 399, 410   |                                                                                                                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 40, 42               | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 138                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

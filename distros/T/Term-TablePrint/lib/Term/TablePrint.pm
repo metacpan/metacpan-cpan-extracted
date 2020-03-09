@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.120';
+our $VERSION = '0.121';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -365,7 +365,7 @@ sub __copy_table {
             }
             if ( $self->{color} ) {
                 $str =~ s/\x{feff}//g;
-                $str =~ s/\e\[[\d;]*m/\x{feff}/msg;
+                $str =~ s/\e\[[\d;]*m/\x{feff}/g;
             }
             if ( $self->{binary_filter} && substr( $str, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
                 $str = $self->{binary_string};
@@ -576,7 +576,7 @@ sub __cols_to_string {
                 $str = $str . unicode_sprintf( $self->{table_copy}[$row][$col], $w_cols->[$col] ); # ###
             }
             if ( $self->{color} && defined $self->{orig_table}[$row][$col] ) {
-                my @color = $self->{orig_table}[$row][$col] =~ /(\e\[[\d;]*m)/msg;
+                my @color = $self->{orig_table}[$row][$col] =~ /(\e\[[\d;]*m)/g;
                 $str =~ s/\x{feff}/shift @color/ge;
                 $str = $str . $color[-1] if @color;
             }
@@ -645,13 +645,13 @@ sub __print_single_row {
     my $row_data = [ ' Close with ENTER' ];
 
     for my $col ( @{$self->{chosen_cols}} ) {
-        push @{$row_data}, ' ';
+        push @$row_data, ' ';
         my $key = $orig_tbl->[0][$col];
         if ( ! defined $key ) {
             $key = $self->{undef};
         }
         if ( $self->{color} ) {
-            $key =~ s/\e\[[\d;]*m//msg;
+            $key =~ s/\e\[[\d;]*m//g;
         }
         $key =~ s/\t/ /g;
         $key =~ s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
@@ -663,13 +663,13 @@ sub __print_single_row {
             $value = ' '; # to show also keys/columns with no values
         }
         if ( $self->{color} ) {
-            $value =~ s/\e\[[\d;]*m//msg;
+            $value =~ s/\e\[[\d;]*m//g;
         }
         if ( ref $value ) {
             $value = _handle_reference( $value );
         }
-        for my $line ( split /\n+/, line_fold( $value, $col_max ) ) {
-            push @{$row_data}, sprintf "%*.*s%*s%s", $len_key, $len_key, $key, $len_sep, $copy_sep, $line;
+        for my $line ( line_fold( $value, $col_max, { join => 0 } ) ) {
+            push @$row_data, sprintf "%*.*s%*s%s", $len_key, $len_key, $key, $len_sep, $copy_sep, $line;
             $key      = '' if $key;
             $copy_sep = '' if $copy_sep;
         }
@@ -741,7 +741,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.120
+Version 0.121
 
 =cut
 

@@ -1,0 +1,43 @@
+Revision history for Plack-Middleware-Security-Simple:
+
+v0.4.0    2020-03-09 17:37:21+00:00 Europe/London
+  [Enhancements]
+  - Added Plack::Middleware::Security::Common with some common
+    filtering rules.
+
+v0.3.1    2020-03-09 08:35:06+00:00 Europe/London
+  [Bug Fixes]
+  - Removed unused import of Plack::Util.
+
+v0.3.0    2020-03-07 19:48:36+00:00 Europe/London
+  [Enhancements]
+  - HTTP::Exception is no longer a run-time prerequisite.
+
+  [Bug Fixes]
+  - Set minimum Perl to v5.10, since that is the minimum used by some
+    of the prerequisites.
+
+
+  [Tests]
+  - Simplified code in tests.
+
+  - Specified a minimum version of Log::Dispatch used for tests.
+
+v0.2.1    2020-03-07 10:23:06+00:00 Europe/London
+  [Bug Fixes]
+  - Fixed call to logger.
+
+  [Documentation]
+  - Documented using a coderef for rules.
+
+  - Added example of user agent check to SYNOPSIS.
+
+  [Tests]
+  - Added test of coderef for rules.
+
+  - Added test of logging.
+
+  - Added test of custom handler.
+
+v0.2.0    2020-03-07 00:13:56+00:00 Europe/London
+ - This is the first, publicly-released version.

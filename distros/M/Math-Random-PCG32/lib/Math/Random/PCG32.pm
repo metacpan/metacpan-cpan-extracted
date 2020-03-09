@@ -6,18 +6,15 @@
 
 package Math::Random::PCG32;
 
+our $VERSION = '0.17';
+
 use strict;
 use warnings;
-
-require Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT_OK =
-  qw(decay dice irand irand64 irand_in irand_way rand rand_elm rand_idx);
-
-our $VERSION = '0.12';
-
+use Exporter qw(import);
+our @EXPORT_OK = qw(coinflip decay irand irand64 irand_in irand_way
+  rand rand_elm rand_from rand_idx roll);
 require XSLoader;
-XSLoader::load( 'Math::Random::PCG32', $VERSION );
+XSLoader::load('Math::Random::PCG32', $VERSION);
 
 1;
 __END__
@@ -29,16 +26,27 @@ Math::Random::PCG32 - minimal PCG random number generator
 =head1 SYNOPSIS
 
   use Math::Random::PCG32;
-  # ideally use better seeds than this (see e.g. what
-  # Math::Random::Secure does)
+
+  # probably want a better seed, see Math::Random::Secure
+  # a game by contrast could want the seed given by YYYYMMDD
   my $rng = Math::Random::PCG32->new( 42, 54 );
 
-  $rng->rand;
-  $rng->rand(10);
-  $rng->irand;
-  $rng->irand_in( 1, 100 );
-  $rng->rand_idx( \@some_array );
-  $rng->rand_elm( \@some_array );
+  $rng->coinflip;                   # 0,1
+
+  $rng->decay( 2147483648, 1, 20 ); # 50% odds decay from 1 out to 20
+                                    # (results closer to 1 than 20)
+
+  $rng->irand;                  # 32-bit unsigned int
+  $rng->irand_in( 1, 100 );     # 1..100 result (biased)
+
+  $rng->rand;                   # float [0..1) (biased)
+  $rng->rand(10);               # previous multiplied by ...
+
+  $rng->rand_elm( \@a );        # random element of array (biased)
+  $rng->rand_from( \@a );       # splice out a random element "
+  $rng->rand_idx( \@a );        # random index of array       "
+
+  $rng->roll( 3, 6 );           # 3d6 (biased)
 
 =head1 DESCRIPTION
 
@@ -47,7 +55,7 @@ random numbers
 
 L<http://www.pcg-random.org/>
 
-plus utility routines for PCG (Procedural Content Generation).
+and some utility routines for PCG (Procedural Content Generation).
 
 =head2 A RANDOM BENCHMARK
 
@@ -66,7 +74,9 @@ the L<Benchmark> module on my somehow still functional 2009 macbook.
 =head1 METHODS
 
 Various methods may croak if invalid input is detected. Use B<new> to
-obtain an object and then call the others using that.
+obtain an object and then call the others using that. Note that many of
+these are biased, as this module favors speed and is expected to deal
+only with small numbers.
 
 =over 4
 
@@ -82,8 +92,15 @@ unsigned integers. These could be read off of C</dev/random>, e.g.
     my $seed = unpack "Q", $raw;
 
 or for a game one might use values from L<Time::HiRes> or provided by
-the user with the caveat that C<pcg32_srandom_r> may need to be checked
-that it is okay for users to provide whatever they want.
+the user. I<initstate> and I<initseq> are documented at:
+
+L<https://www.pcg-random.org/using-pcg-c-basic.html>
+
+=item B<coinflip>
+
+Returns C<0> or C<1>.
+
+I<Since version 0.17.>
 
 =item B<decay> I<odds> I<min> I<max>
 
@@ -92,10 +109,6 @@ ending should a random value fail or I<max> be reached. I<odds> is
 treated as a C<uint32_t> value (as are I<min> and I<max>), so 50% odds
 of decay would be C<2147483648>. Returns the value I<min> is
 incremented to.
-
-=item B<dice> I<count> I<sides>
-
-Sums the result of rolling the given number of dice.
 
 =item B<irand>
 
@@ -131,29 +144,66 @@ other range if a number is given as a I<factor>.
 =item B<rand_elm> I<array-reference>
 
 Returns a random element from the given array, or C<undef> if the array
-is empty (or if that is what the array element contained).
+is empty (or if that is what the array element contained). The reference
+is not modified.
+
+=item B<rand_from> I<array-reference>
+
+Like B<rand_elm> but cuts the element out of the array reference before
+returning it. Pretty similar to C<splice> with a random index:
+
+    $rng->rand_from(\@seed);
+    splice @seed, rand @seed, 1;
+
+I<Since version 0.17.>
 
 =item B<rand_idx> I<array-reference>
 
 Returns a random index from the given array, or C<undef> if the
 array is empty.
 
+=item B<roll> I<count> I<sides>
+
+Sums the result of rolling the given number of dice.
+
+I<Since version 0.17.> Prior to that was called B<dice>. Prior to
+version 0.10 did not exist.
+
 =back
 
-=head1 MODULO BIAS
+=head1 CAVEATS
 
-B<rand_elm> and B<rand_idx> ignore modulo bias so will become
-increasingly unsound as the length of the array approaches
-C<UINT32_MAX>. If modulo bias is a concern this module is not
-what you need.
+This module MUST NOT be used for anything cryptographic or security
+related. It probably should not be used for any analysis that needs
+non-biased pseudo random numbers.
+
+Various routines are subject to various forms of modulo bias so will
+become increasingly unsound as the values used approach
+C<UINT32_MAX>. If modulo bias is a concern this module is B<not> what
+you need. More reading:
+
+L<https://www.pcg-random.org/posts/bounded-rands.html>
+
+This module does use C<%> (which is biased) in various routines; there
+are apparently faster methods (or ones more suitable for larger inputs)
+though benchmarking
+
+  uint32_t byinteger(uint32_t max) {
+      uint32_t x = rand();
+      uint64_t m = (uint64_t) x * (uint64_t) max;
+      return m >> 32;
+  }
+
+against
+
+  uint32_t bymodulus(uint32_t max) { return rand() % max; }
+
+did not show any notable speed gain for me (though perhaps my benchmark
+was flawed, or compiler too old? YMMV).
 
 =head1 BUGS
 
 =head2 Reporting Bugs
-
-Please report any bugs or feature requests to
-C<bug-math-random-pcg32 at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-Random-PCG32>.
 
 Patches might best be applied towards:
 
@@ -161,16 +211,17 @@ L<https://github.com/thrig/Math-Random-PCG32>
 
 =head2 Known Issues
 
-New code, not many features, questionable XS. Probably needs a modern
-compiler for the C<stdint> types. Untested on older versions of Perl.
-Untested (by me) on 32-bit versions of Perl; C<use64bitint=define> is
-now required.
+Probably needs a modern compiler for the C<stdint> types. Untested on
+older versions of Perl. Untested (by me) on 32-bit versions of Perl;
+C<use64bitint=define> is now required.
 
-Various tradeoffs have been made to favor speed over safety: modulo bias
-is ignored and some methods have integer overflow issues. Using numbers
-well below C<INT32_MAX> should avoid these issues.
+Various tradeoffs have been made to always favor speed over safety:
+modulo bias is ignored and some methods have integer overflow issues.
+Using numbers well below C<INT32_MAX> should avoid these issues.
 
 =head1 SEE ALSO
+
+L<https://www.pcg-random.org/using-pcg-c-basic.html>
 
 L<https://github.com/imneme/pcg-c-basic>
 
@@ -179,12 +230,13 @@ L<Math::Random::Secure> for good seed choice.
 L<http://xoshiro.di.unimi.it> for a different PRNG and tips on compiler
 flags for use during benchmarks.
 
-I<though I must say, those PRNG writers, it feels like they are in a
-small scale war with each other at times> -- random chat comment
+  "though I must say, those PRNG writers, it feels like they are in a
+  small scale war with each other at times"
+    -- random chat comment
 
 =head1 AUTHOR
 
-thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
+thrig - Jeremy Mates (cpan:JMATES) C<< <jeremy.mates at gmail.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 

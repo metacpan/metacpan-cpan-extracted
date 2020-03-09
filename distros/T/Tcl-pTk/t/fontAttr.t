@@ -80,4 +80,4 @@ foreach my $fontName(@fontNames){
         $TOP->Label(-text => "This text should be the same size for this font", -font => $clonedFont)->pack();
 }
 
-MainLoop if (@ARGV); # Pause if any args, (for debugging)
+(@ARGV) ? MainLoop : $TOP->destroy; # Pause if any args, (for debugging)

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Duadua::Parser;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Browser::MicrosoftEdge
@@ -60,6 +60,11 @@ my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Bot::SMTBot
 /;
 
+for my $parser (@PARSER_PROC_LIST) {
+    eval "require $parser;"; ## no critic
+    die "Could not load $parser, $@" if $@;
+}
+
 sub new {
     my $class = shift;
     my $ua    = shift;
@@ -72,24 +77,28 @@ sub new {
         }
     }
 
-    my @parsers;
-    if (exists $opt->{skip}) {
-        for my $p (@PARSER_PROC_LIST) {
-            next if grep { $p eq $_ } @{$opt->{skip}};
-            push @parsers, $p;
-        }
-    }
-    else {
-        @parsers = @PARSER_PROC_LIST;
-    }
-
     bless {
         _ua          => $ua,
         _parsed      => 0,
         _result      => {},
-        _parsers     => \@parsers,
+        _parsers     => $class->_build_parsers($opt),
         _opt_version => $opt->{version},
     }, $class;
+}
+
+sub _build_parsers {
+    my ($class, $opt) = @_;
+
+    if (exists $opt->{skip}) {
+        my @parsers;
+        for my $p (@PARSER_PROC_LIST) {
+            next if grep { $p eq $_ } @{$opt->{skip}};
+            push @parsers, $p;
+        }
+        return \@parsers;
+    }
+
+    return \@PARSER_PROC_LIST;
 }
 
 sub opt_version { shift->{_opt_version} }
@@ -308,7 +317,7 @@ The list of User Agent Parser
 
 =begin html
 
-<a href="https://github.com/bayashi/Duadua/blob/master/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.08-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/master/badge.svg?_t=1582644239"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1582644239&branch=master"/></a>
+<a href="https://github.com/bayashi/Duadua/blob/master/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.12-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/master/badge.svg?_t=1583715024"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1583715024&branch=master"/></a>
 
 =end html
 

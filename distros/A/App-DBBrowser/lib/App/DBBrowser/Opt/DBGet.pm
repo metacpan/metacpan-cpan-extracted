@@ -26,7 +26,7 @@ sub read_db_config_files {
     my $file_fs = sprintf( $sf->{i}{conf_file_fmt}, $plugin );
     my $db_opt;
     if ( -f $file_fs && -s $file_fs ) {
-        $db_opt = $ax->read_json( $file_fs ) || {};
+        $db_opt = $ax->read_json( $file_fs ) // {};
     }
     return $db_opt;
 }

@@ -1,7 +1,9 @@
 package Log::ger::Format::Block;
 
-our $DATE = '2017-08-01'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-07'; # DATE
+our $DIST = 'Log-ger-Format-Block'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -9,29 +11,35 @@ use warnings;
 use Sub::Metadata qw(mutate_sub_prototype);
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     return {
         create_formatter => [
-            __PACKAGE__, 50,
-            sub {
-                [sub { my $code = shift; $code->(@_) }];
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_;
+
+                my $formatter = sub { my $code = shift; $code->(@_) };
+                [$formatter];
             }],
 
         before_install_routines => [
-            __PACKAGE__, 50,
-            sub {
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
                 no strict 'refs';
 
-                my %args = @_;
-                for my $r (@{ $args{routines} }) {
+                my %hook_args = @_;
+
+                for my $r (@{ $hook_args{routines} }) {
                     my ($coderef, $name, $lnum, $type) = @$r;
-                    next unless $type =~ /\Alog_/;
+                    next unless $type =~ /\Alog(ger)?_/;
                     # avoid prototype mismatch warning when redefining
-                    if ($args{target} eq 'package' ||
-                            $args{target} eq 'object') {
-                        if (defined ${"$args{target_arg}\::"}{$name}) {
-                            delete ${"$args{target_arg}\::"}{$name};
+                    if ($hook_args{target_type} eq 'package' ||
+                            $hook_args{target_type} eq 'object') {
+                        if (defined ${"$hook_args{target_name}\::"}{$name}) {
+                            delete ${"$hook_args{target_name}\::"}{$name};
                         }
                     }
                     mutate_sub_prototype($coderef, '&');
@@ -56,7 +64,7 @@ Log::ger::Format::Block - Use formatting using block instead of sprintf-style
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -87,7 +95,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,9 +2,15 @@ package Doodle::Table::Helpers;
 
 use 5.014;
 
-use Data::Object 'Role', 'Doodle::Library';
+use strict;
+use warnings;
 
-our $VERSION = '0.07'; # VERSION
+use registry 'Doodle::Library';
+use routines;
+
+use Data::Object::Role;
+
+our $VERSION = '0.08'; # VERSION
 
 # METHODS
 
