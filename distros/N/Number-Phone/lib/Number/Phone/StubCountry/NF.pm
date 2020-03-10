@@ -22,17 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212302;
+our $VERSION = 1.20200309202348;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '1',
+                  'leading_digits' => '1[0-3]',
                   'pattern' => '(\\d{2})(\\d{4})'
                 },
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '3',
+                  'leading_digits' => '[13]',
                   'pattern' => '(\\d)(\\d{5})'
                 }
               ];
@@ -60,19 +60,29 @@ my $validators = {
             3[0-2]\\d
           )\\d{3}
         ',
-                'mobile' => '3[58]\\d{4}',
+                'mobile' => '
+          (?:
+            14|
+            3[58]
+          )\\d{4}
+        ',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '',
                 'toll_free' => '',
                 'voip' => ''
               };
+my %areanames = ();
+$areanames{en}->{67210} = "Davis";
+$areanames{en}->{67211} = "Mawson";
+$areanames{en}->{67212} = "Casey";
+$areanames{en}->{67213} = "Macquarie\ Island";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+672|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       my $prefix = qr/^(?:([0-258]\d{4})$)/;
       my @matches = $number =~ /$prefix/;
@@ -83,7 +93,7 @@ my $validators = {
       else {
         $number =~ s/$prefix//;
       }
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

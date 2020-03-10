@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::Query::GlobalQuery;
-$Bio::Tools::EUtilities::Query::GlobalQuery::VERSION = '1.76';
+$Bio::Tools::EUtilities::Query::GlobalQuery::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -80,7 +80,7 @@ Bio::Tools::EUtilities::Query::GlobalQuery - Container class for egquery data.
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

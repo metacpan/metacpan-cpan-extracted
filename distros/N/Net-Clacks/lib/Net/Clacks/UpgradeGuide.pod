@@ -1,49 +1,17 @@
-package Net::Clacks;
-#---AUTOPRAGMASTART---
-use 5.020;
-use strict;
-use warnings;
-use diagnostics;
-use mro 'c3';
-use English;
-use Carp;
-our $VERSION = 10;
-use autodie qw( close );
-use Array::Contains;
-use utf8;
-#---AUTOPRAGMAEND---
-use Net::Clacks::Client;
-use Net::Clacks::Server;
-use Net::Clacks::ClacksCache;
-1;
-__END__
-
-
 =head1 NAME
 
-Net::Clacks - Fast client/server interprocess messaging and memcached replacement
+Net::Clacks::UpgradeGuide - Notes on upgrading L<Net::Clacks>
 
 =head1 SYNOPSIS
 
-The Net::Clacks system implements a fast client/server based interprocess messaging. For
-handling a high number of clients, you can run multiple servers in a master/slave configuration.
-A slave can also run itself as master for it's own slaves, so a tree-like setup is possible.
+This document lists important information when upgrading from previous versions of L<Net::Clacks>.
 
-=head1 DESCRIPTION
+Please be sure to read all relevant sections of this short guide. While i myself don't like breaking/incompatible
+changes, bugfixes and major enhancements sometimes make them the most painless way of handling things.
 
-The Net::Clacks system implements a fast client/server based interprocess messaging. For
-handling a high number of clients, you can run multiple servers in a master/slave configuration.
-A slave can also run itself as master for it's own slaves, so a tree-like setup is possible.
-
-Clacks has two ways to handle data. One is (near) real time messaging, the other is storing in
-memory (as a replacement for memcached).
-
-Clacks has also a DEBUG feature, that forwards all messages to a requesting client.
-
-The Net::Clacks system implements a fast client/server based interprocess messaging. For
-handling a high number of clients, you can run multiple servers in a master/slave configuration.
-A slave can also run itself as master for it's own slaves, so a tree-like setup is possible. This
-is implemented by using Interclacks mode via OVERHEAD mode setting.
+On the bright side, after you've gone through this document and implemented required changes (if any), you get
+to enjoy a newer, shinier version of your favourite real time interprocess messaging system. While i strive to
+remove bugs in each release, sometimes new ones creep in. Just keep bugging me about them until i fix them as well.
 
 =head1 IMPORTANT UPGRADE NOTES
 
@@ -121,15 +89,23 @@ forwards this to the client software via a clacks message of type "error_message
 In theory, the only *breaking* incompatible change is contained in handling Unix Domain Sockets. You could (try to) upgrade
 to Version 10 client-by-client if you don't use Unix Domain Sockets, but this is neither tested nor recommended.
 
-=head1 PROTOCOL
+=head2 VERSION 11
 
-Clacks is a text based protocol through SSL/TLS encrypted TCP connections. Most of the
-commands are asyncronous and do not generate any return value. These commands are truly
-fire-and-forget with minimal delay for the client.
+Under certain circumstances L<Net::Clacks::Client> would hang or otherwise error out during DESTROY(). This is due to
+the fact that the underlying socket might already have been DESTROYed by perl. I could reliably produce hangs in 
+certain applications when calling exit(0) in the main loop.
 
-A few functions/commands generate one or more lines of data return, so the client has to wait
-for them. The L<Net::Clacks::Client> module knows what to do in each case, so there is little
-to none special handling required in the application. The same goes for L<Net::Clacks::ClacksCache>.
+In Version 11, the DESTROY method now uses eval() to try and catch any errors. It is recommended that you use the new
+disconnect() function in L<Net::Clacks::Client> BEFORE exiting the program or deleting the last reference to the instance.
+This will then try to send out any remaining commands in the output buffer. Simply exiting the program will still work,
+but there is a good chance that anything still remaining in the output buffer after your last call to doNetwork() will
+NOT be sent.
+
+Version 11 also implements a Unicode/UTF8 bugfix. This should have no visible side effects in pretty much all use-cases of
+L<Net::Clacks>
+
+Upgrading to version 11 on a client-by-client basis should work fine since there have been no incompatible changes,
+but this has only seen limited testing. As always, it is recommended to upgrade everything in one go.
 
 
 =head1 MODULES
@@ -159,7 +135,7 @@ L<https://cavac.at/public/mercurial/Net-Clacks/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2019 Rene Schickbauer
+Copyright (C) 2008-2020 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

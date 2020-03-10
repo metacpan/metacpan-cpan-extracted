@@ -19,7 +19,7 @@ meta-spec:
   version: '1.4'
 name: IPC-System-Options
 recommends:
-  Log::ger: '0.027'
+  Log::ger: '0.034'
 requires:
   Capture::Tiny: '0'
   Cwd: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-System-Options
   homepage: https://metacpan.org/release/IPC-System-Options
   repository: git://github.com/perlancar/perl-IPC-System-Options.git
-version: '0.333'
+version: '0.334'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -151,11 +151,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Filter/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Filter/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Filter/MetaJSON'
@@ -291,7 +291,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.081'
       name: '@Filter/PodWeaver'
       version: '4.008'
     -
@@ -305,7 +305,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Filter/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Filter/Rinci::AddToDb'

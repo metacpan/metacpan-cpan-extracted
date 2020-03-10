@@ -11,48 +11,74 @@
 
     %= content_for 'stylesheet'
 </head>
-<body class="bg-light">
-    <div class="container mb-5">
-        <div class="d-flex align-items-center py-4 border-bottom border-muted">
-            <a href="<%= url_for($return_to) %>">
-                <i class="fa fa-home"></i>
+<body class="bg-light" style="padding-top: 4.5rem;">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-secondary">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a href="<%= url_for('minion_overview.dashboard') %>" class="navbar-brand">
+                <strong>Minion</strong> | <i class="fa fa-puzzle-piece"></i> Overview
             </a>
-            <h4 class="mb-0 ml-3"><strong>Minion</strong> | <i class="fa fa-puzzle-piece"></i> Overview</h4>
-        </div>
 
-        <div class="row mt-4">
-            <div class="col-12 col-lg-2">
-                <ul class="nav nav-pills justify-content-center flex-lg-column mb-4">
-                    <li class="nav-item">
-                        <a href="<%= url_for('minion_overview.dashboard') %>" class="nav-link <%= $self->current_route =~ m/minion\.overview\.dashboard/ ? 'active' : '' %>">
-                            <i class="fa fa-poll"></i> Dashboard
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                    <li class="nav-item <%= $self->current_route =~ m/minion_overview\.dashboard/ ? 'active' : '' %>">
+                        <a href="<%= url_for('minion_overview.dashboard') %>" class="nav-link">
+                            <span class="d-inline-block align-top"><i class="fa fa-poll"></i><span> Dashboard
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="<%= url_for('minion_overview.jobs') %>" class="nav-link <%= $self->current_route =~ m/minion\.overview\.jobs/ ? 'active' : '' %>">
-                            <i class="fa fa-sitemap"></i> Recent Jobs
+                    <li class="nav-item <%= $self->current_route =~ m/minion_overview\.jobs/ ? 'active' : '' %>">
+                        <a href="<%= url_for('minion_overview.jobs') %>" class="nav-link">
+                            <span class="d-inline-block align-top"><i class="fa fa-sitemap"></i><span> Recent Jobs
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="<%= url_for('minion_overview.failed_jobs') %>" class="nav-link <%= $self->current_route =~ m/minion\.overview\.failed_jobs/ ? 'active' : '' %>">
-                            <i class="fa fa-times-circle text-danger"></i> Failed Jobs
+                    <li class="nav-item <%= $self->current_route =~ m/minion_overview\.failed_jobs/ ? 'active' : '' %>">
+                        <a href="<%= url_for('minion_overview.failed_jobs') %>" class="nav-link">
+                            <span class="d-inline-block align-top"><i class="fa fa-times-circle text-danger"></i><span> Failed Jobs
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="<%= url_for('minion_overview.metrics') %>" class="nav-link <%= $self->current_route =~ m/minion\.overview\.metrics/ ? 'active' : '' %>">
-                            <i class="fa fa-chart-bar"></i> Metrics
+                    <li class="nav-item <%= $self->current_route =~ m/minion_overview\.metrics/ ? 'active' : '' %>">
+                        <a href="<%= url_for('minion_overview.metrics') %>" class="nav-link">
+                            <span class="d-inline-block align-top"><i class="fa fa-chart-bar"></i><span> Metrics
                         </a>
                     </li>
-                    <!-- 
-                    <li class="nav-item">
-                        <a href="<%= url_for('minion_overview.monitoring') %>" class="nav-link <%= $self->current_route =~ m/minion\.overview\.monitoring/ ? 'active' : '' %>">
-                            <i class="fa fa-eye"></i> Monitoring
+                    <!--
+                    <li class="nav-item <%= $self->current_route =~ m/minion_overview\.monitoring/ ? 'active' : '' %>">
+                        <a href="<%= url_for('minion_overview.monitoring') %>" class="nav-link">
+                            <span class="d-inline-block align-top"><i class="fa fa-eye"></i><span> Monitoring
                         </a>
                     </li>
                     -->
                 </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a href="<%= url_for($return_to) %>" class="nav-link">
+                            <span class="d-inline-block align-top"><i class="fa fa-home"></i><span> Home
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            %= session('minion_overview_date') || 'Only today'
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="<%= url_for('minion_overview.overview.set_date', date => 'Only today') %>">Only today</a>
+                            <a class="dropdown-item" href="<%= url_for('minion_overview.overview.set_date', date => 'Since yesterday') %>">Since yesterday</a>
+                            <a class="dropdown-item" href="<%= url_for('minion_overview.overview.set_date', date => 'Last 3 days') %>">Last 3 days</a>
+                            <a class="dropdown-item" href="<%= url_for('minion_overview.overview.set_date', date => 'Last 7 days') %>">Last 7 days</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="<%= url_for('minion_overview.overview.set_date', date => 'This month') %>">This month</a>
+                            <a class="dropdown-item" href="<%= url_for('minion_overview.overview.set_date', date => 'Last 3 months') %>">Last 3 months</a>
+                        </div>
+                    </li>
+                </ul>
             </div>
-            <div class="col-12 col-lg-10">
+        </div>
+    </nav>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-12">
                 %= content
             </div>
         </div>

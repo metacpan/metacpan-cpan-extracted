@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::Link::LinkSet;
-$Bio::Tools::EUtilities::Link::LinkSet::VERSION = '1.76';
+$Bio::Tools::EUtilities::Link::LinkSet::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -339,7 +339,7 @@ Bio::Tools::EUtilities::Link::LinkSet - Class for EUtils LinkSets.
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

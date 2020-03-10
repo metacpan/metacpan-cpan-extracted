@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212258;
+our $VERSION = 1.20200309202343;
 
 my $formatters = [
                 {
@@ -491,6 +491,8 @@ $areanames{de}->{432829} = "Schweiggers";
 $areanames{de}->{432841} = "Vitis";
 $areanames{de}->{432842} = "Waidhofen\ an\ der\ Thaya";
 $areanames{de}->{432843} = "Dobersberg";
+$areanames{de}->{432844} = "Karlstein\ an\ der\ Thaya";
+$areanames{de}->{432845} = "Weikertschlag\ an\ der\ Thaya";
 $areanames{de}->{432846} = "Raabs\ an\ der\ Thaya";
 $areanames{de}->{432847} = "Groß\-Siegharts";
 $areanames{de}->{432848} = "Pfaffenschlag\ bei\ Waidhofen";
@@ -1518,6 +1520,8 @@ $areanames{en}->{432829} = "Schweiggers";
 $areanames{en}->{432841} = "Vitis";
 $areanames{en}->{432842} = "Waidhofen\ an\ der\ Thaya";
 $areanames{en}->{432843} = "Dobersberg";
+$areanames{en}->{432844} = "Karlstein\ an\ der\ Thaya";
+$areanames{en}->{432845} = "Weikertschlag\ an\ der\ Thaya";
 $areanames{en}->{432846} = "Raabs\ an\ der\ Thaya";
 $areanames{en}->{432847} = "Gross\-Siegharts";
 $areanames{en}->{432848} = "Pfaffenschlag\ bei\ Waidhofen";

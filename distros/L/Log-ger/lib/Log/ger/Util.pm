@@ -1,9 +1,9 @@
 package Log::ger::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-10'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.036'; # VERSION
 
 use strict;
 use warnings;
@@ -227,6 +227,13 @@ sub set_plugin {
         $mod = $prefix . $mod unless index($mod, $prefix) == 0;
         (my $mod_pm = "$mod.pm") =~ s!::!/!g;
         require $mod_pm;
+        my $meta  = $mod->can("meta") ? $mod->meta : {v=>1};
+        my $v     = $meta->{v} || 1;
+        unless ($v == 1) {
+            die "Plugin '$mod' follows meta version $v but Log::ger ".
+                (${__PACKAGE__."::VERSION"} || "dev").
+                " requires meta version 1, please upgrade the plugin";
+        }
         $hooks = &{"$mod\::get_hooks"}(%{ $args{conf} || {} });
     }
 
@@ -290,7 +297,7 @@ Log::ger::Util - Utility routines for Log::ger
 
 =head1 VERSION
 
-version 0.033
+version 0.036
 
 =head1 DESCRIPTION
 

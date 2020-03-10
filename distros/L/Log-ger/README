@@ -2,7 +2,7 @@ NAME
     Log::ger - A lightweight, flexible logging framework
 
 VERSION
-    version 0.033
+    version 0.036
 
 SYNOPSIS
   Producing logs

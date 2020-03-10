@@ -10,10 +10,12 @@ build_requires:
   Test::Lib: '0'
   Test::More: '0'
   Test::Most: '0'
+  Test::Spec: '0'
+  Test::Spec::Mocks: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150005'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -44,6 +46,12 @@ requires:
 resources:
   bugtracker: https://github.com/pplu/docker-registry/issues
   repository: https://github.com/pplu/docker-registry.git
-version: '0.06'
-x_generated_by_perl: v5.28.0
+version: '0.07'
+x_contributors:
+  - 'Jose Luis Martinez <jlmartinez@capside.com>'
+  - 'Wesley Schwengle <wesley@schwengle.net>'
+  - 'Oriol Soriano <oriol.soriano@capside.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_generated_by_perl: v5.24.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Apache-2.0

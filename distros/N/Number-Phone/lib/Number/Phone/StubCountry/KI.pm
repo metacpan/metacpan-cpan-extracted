@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212302;
+our $VERSION = 1.20200309202347;
 
 my $formatters = [];
 
@@ -84,11 +84,13 @@ my $validators = {
           )\\d{3}
         ',
                 'mobile' => '
-          73140\\d{3}|
           (?:
-            630[01]|
-            730[0-5]
-          )\\d{4}|
+            63\\d{3}|
+            73(?:
+              0[0-5]\\d|
+              140
+            )
+          )\\d{3}|
           [67]200[01]\\d{3}
         ',
                 'pager' => '',
@@ -115,7 +117,6 @@ $areanames{en}->{68626} = "Betio";
 $areanames{en}->{68627} = "Tarawa";
 $areanames{en}->{68628} = "Bikenibeu";
 $areanames{en}->{68629} = "Bikenibeu";
-$areanames{en}->{68630} = "Tarawa";
 $areanames{en}->{68631} = "North\ Tarawa";
 $areanames{en}->{68632} = "North\ Tarawa";
 $areanames{en}->{68633} = "Abaiang";

@@ -24,3 +24,10 @@ Revision history for Mojolicious-Plugin-Minion-Tasks
 
 0.0.8   2020-03-09
         Add/remove tag to search
+
+0.1.0   2020-03-10
+        Navbar fixed top
+        Choose date interval
+
+0.1.1   2020-03-10
+        Chart for each worker on dashboard

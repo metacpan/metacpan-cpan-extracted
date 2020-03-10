@@ -10,7 +10,9 @@ Show dashboard overview
 sub overview {
     my $self = shift;
 
-    my $overview = $self->app->minion_overview->overview;
+    my $overview = $self->app->minion_overview
+        ->date($self->session('minion_overview_date'))
+        ->overview;
 
     return $self->render('minion_overview/dashboard/_overview',
         overview   => $overview,
@@ -26,7 +28,9 @@ Show dashboard metrics
 sub search {
     my $self = shift;
 
-    my $dashboard = $self->app->minion_overview->dashboard;
+    my $dashboard = $self->app->minion_overview
+        ->date($self->session('minion_overview_date'))
+        ->dashboard;
 
     return $self->render('minion_overview/dashboard/search',
         overview    => $dashboard->{ overview },
@@ -43,7 +47,9 @@ Show dashboard workers
 sub workers {
     my $self = shift;
 
-    my $workers = $self->app->minion_overview->workers;
+    my $workers = $self->app->minion_overview
+        ->date($self->session('minion_overview_date'))
+        ->workers;
 
     return $self->render('minion_overview/dashboard/_workers',
         workers   => $workers,

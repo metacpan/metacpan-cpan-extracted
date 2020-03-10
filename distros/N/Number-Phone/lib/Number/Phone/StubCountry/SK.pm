@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212303;
+our $VERSION = 1.20200309202348;
 
 my $formatters = [
                 {
@@ -71,7 +71,13 @@ my $validators = {
               16|
               [2-9]\\d{3}
             )|
-            [3-5][1-8]\\d{3}
+            (?:
+              (?:
+                [3-5][1-8]\\d|
+                819
+              )\\d|
+              601[1-5]
+            )\\d
           )\\d{4}|
           (?:
             2|
@@ -85,7 +91,13 @@ my $validators = {
               16|
               [2-9]\\d{3}
             )|
-            [3-5][1-8]\\d{3}
+            (?:
+              (?:
+                [3-5][1-8]\\d|
+                819
+              )\\d|
+              601[1-5]
+            )\\d
           )\\d{4}|
           (?:
             2|
@@ -98,7 +110,8 @@ my $validators = {
           9(?:
             0[1-8]|
             1[0-24-9]|
-            [45]\\d
+            4[03-57-9]|
+            5\\d
           )\\d{6}
         ',
                 'pager' => '9090\\d{3}',
@@ -120,30 +133,31 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en}->{4212} = "Bratislava";
-$areanames{en}->{42131} = "Dunajská\ Streda";
-$areanames{en}->{42132} = "Trenčín";
+$areanames{en}->{42131} = "Dunajska\ Streda";
+$areanames{en}->{42132} = "Trencin";
 $areanames{en}->{42133} = "Trnava";
 $areanames{en}->{42134} = "Senica";
-$areanames{en}->{42135} = "Nové\ Zámky";
+$areanames{en}->{42135} = "Nove\ Zamky";
 $areanames{en}->{42136} = "Levice";
 $areanames{en}->{42137} = "Nitra";
-$areanames{en}->{42138} = "Topoľčany";
-$areanames{en}->{42141} = "Žilina";
-$areanames{en}->{42142} = "Považská\ Bystrica";
+$areanames{en}->{42138} = "Topolcany";
+$areanames{en}->{42141} = "Zilina";
+$areanames{en}->{42142} = "Povazska\ Bystrica";
 $areanames{en}->{42143} = "Martin";
-$areanames{en}->{42144} = "Liptovský\ Mikuláš";
+$areanames{en}->{42144} = "Liptovsky\ Mikulas";
 $areanames{en}->{42145} = "Zvolen";
 $areanames{en}->{42146} = "Prievidza";
-$areanames{en}->{42147} = "Lučenec";
-$areanames{en}->{42148} = "Banská\ Bystrica";
-$areanames{en}->{42151} = "Prešov";
+$areanames{en}->{42147} = "Lucenec";
+$areanames{en}->{42148} = "Banska\ Bystrica";
+$areanames{en}->{42151} = "Presov";
 $areanames{en}->{42152} = "Poprad";
-$areanames{en}->{42153} = "Spišská\ Nová\ Ves";
+$areanames{en}->{42153} = "Spisska\ Nova\ Ves";
 $areanames{en}->{42154} = "Bardejov";
-$areanames{en}->{42155} = "Košice";
+$areanames{en}->{42155} = "Kosice";
 $areanames{en}->{42156} = "Michalovce";
-$areanames{en}->{42157} = "Humenné";
-$areanames{en}->{42158} = "Rožňava";
+$areanames{en}->{42157} = "Humenne";
+$areanames{en}->{42158} = "Roznava";
+$areanames{en}->{421601} = "Roznava";
 
     sub new {
       my $class = shift;

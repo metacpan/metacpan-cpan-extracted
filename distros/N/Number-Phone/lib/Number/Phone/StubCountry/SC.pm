@@ -22,12 +22,15 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212303;
+our $VERSION = 1.20200309202348;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[246]',
+                  'leading_digits' => '
+            [246]|
+            9[57]
+          ',
                   'pattern' => '(\\d)(\\d{3})(\\d{3})'
                 }
               ];

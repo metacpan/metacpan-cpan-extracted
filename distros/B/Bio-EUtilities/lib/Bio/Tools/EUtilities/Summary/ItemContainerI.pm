@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::Summary::ItemContainerI;
-$Bio::Tools::EUtilities::Summary::ItemContainerI::VERSION = '1.76';
+$Bio::Tools::EUtilities::Summary::ItemContainerI::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -96,7 +96,7 @@ Bio::Tools::EUtilities::Summary::ItemContainerI - Abtract interface methods for 
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

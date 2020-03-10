@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::EUtilDataI;
-$Bio::Tools::EUtilities::EUtilDataI::VERSION = '1.76';
+$Bio::Tools::EUtilities::EUtilDataI::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -69,7 +69,7 @@ Bio::Tools::EUtilities::EUtilDataI - EUtil data object interface.
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use Exporter 'import';
 
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 our @EXPORT_OK = qw(twitter_tx_error);
 
 has 'api_errors' => sub { [] };

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212303;
+our $VERSION = 1.20200309202349;
 
 my $formatters = [
                 {
@@ -100,22 +100,28 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'mobile' => '6[1-9]\\d{6}',
+                'mobile' => '6\\d{7}',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '',
                 'toll_free' => '',
                 'voip' => ''
               };
+my %areanames = ();
+$areanames{en}->{9931} = "Ahal";
+$areanames{en}->{9932} = "Balkan";
+$areanames{en}->{9933} = "Daşoguz";
+$areanames{en}->{9934} = "Lebap";
+$areanames{en}->{9935} = "Mary";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+993|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:8)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

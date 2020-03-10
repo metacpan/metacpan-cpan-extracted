@@ -10,8 +10,13 @@ Show metrics for a job
 sub show {
     my $self = shift;
     
-    my $runtime = $self->app->minion_overview->job_runtime_metrics($self->param('job'));
-    my $throughput = $self->app->minion_overview->job_throughput_metrics($self->param('job'));
+    my $runtime = $self->app->minion_overview
+        ->date($self->session('minion_overview_date'))
+        ->job_runtime_metrics($self->param('job'));
+
+    my $throughput = $self->app->minion_overview
+        ->date($self->session('minion_overview_date'))
+        ->job_throughput_metrics($self->param('job'));
 
     return $self->render('minion_overview/metrics/jobs/show',
         job         => $self->param('job'),

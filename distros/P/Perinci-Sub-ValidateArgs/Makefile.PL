@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Perinci::Sub::ValidateArgs",
   "PREREQ_PM" => {
     "Data::Dmp" => "0.21",
-    "Data::Sah" => "0.903",
+    "Data::Sah" => "0.907",
     "Exporter" => "5.57",
     "strict" => 0,
     "warnings" => 0
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Dmp" => "0.21",
-  "Data::Sah" => "0.903",
+  "Data::Sah" => "0.907",
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "Function::Fallback::CoreOrPP" => 0,

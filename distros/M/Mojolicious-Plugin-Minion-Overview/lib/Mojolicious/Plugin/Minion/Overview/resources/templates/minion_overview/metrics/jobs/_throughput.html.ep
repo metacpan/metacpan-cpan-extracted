@@ -1,7 +1,12 @@
-<p class="text-center">Throughput statistics for <span class="badge badge-secondary"><%= $job %></span></p>
-
-<div class="row">
-    <canvas id="throughput"></canvas>
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <h5>Throughput statistics for <span class="badge badge-secondary"><%= $job %></span></h5>
+    </div>
+    <div class="card-body card-bg-secondary">
+        <div class="row">
+            <canvas id="throughput"></canvas>
+        </div>
+    </div>
 </div>
 
 % content_for javascript => begin

@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::Bencher::Scenario;
 
-our $DATE = '2019-12-17'; # DATE
-our $VERSION = '0.245'; # VERSION
+our $DATE = '2019-12-25'; # DATE
+our $VERSION = '0.246'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -404,6 +404,7 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
                 require String::PodQuote;
                 push @pod, String::PodQuote::pod_quote($p0->{summary}), ".\n\n";
             }
+
             if ($p->{cmdline}) {
                 push @pod, "Command line:\n\n", " $p->{cmdline}\n\n";
             } elsif ($p0->{cmdline_template}) {
@@ -422,6 +423,14 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
                 }
                 push @pod, "\n\n";
             }
+
+            if ($p0->{description}) {
+                require Markdown::To::POD;
+                my $pod = Markdown::To::POD::markdown_to_pod(
+                    $p0->{description});
+                push @pod, $pod, "\n\n";
+            }
+
             push @pod, "\n\n";
         }
         push @pod, "=back\n\n";
@@ -445,7 +454,16 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
             push @pod, "=item * $ds->{name}";
             push @pod, " [".join(", ", @{$ds->{tags}})."]" if $ds->{tags};
             push @pod, "\n\n";
-            push @pod, "$ds->{summary}\n\n" if $ds->{summary};
+            if (defined $ds->{summary}) {
+                require String::PodQuote;
+                push @pod, String::PodQuote::pod_quote($ds->{summary}), ".\n\n";
+            }
+            if ($ds->{description}) {
+                require Markdown::To::POD;
+                my $pod = Markdown::To::POD::markdown_to_pod(
+                    $ds->{description});
+                push @pod, $pod, "\n\n";
+            }
         }
 
         # also mentions datasets not included by default. get it from the raw
@@ -618,7 +636,7 @@ Pod::Weaver::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.245 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-12-17.
+This document describes version 0.246 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-12-25.
 
 =head1 SYNOPSIS
 

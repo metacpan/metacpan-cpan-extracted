@@ -2,9 +2,11 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 package Tcl::pTk::Clipboard;
-use strict;
 
-our ($VERSION) = ('1.05');
+our ($VERSION) = ('1.06');
+
+use warnings;
+use strict;
 
 use Tcl::pTk;
 

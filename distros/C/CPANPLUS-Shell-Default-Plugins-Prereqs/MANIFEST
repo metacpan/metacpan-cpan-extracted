@@ -3,13 +3,12 @@ Build.PL
 Changes
 lib/CPANPLUS/Shell/Default/Plugins/Prereqs.pm
 LICENSE
-MANIFEST
+MANIFEST			This list of files
 META.json
-META.yml			Module meta-data (added by MakeMaker)
+META.yml
 README
 README.md
 samples/display-prereqs
-t.pl
 t/00-plugin.t
 t/01-core.t
 t/inc1/inc/Module/Install.pm

@@ -1,12 +1,16 @@
 package Log::ger::Format::Default;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-10'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.036'; # VERSION
 
 use strict;
 use warnings;
+
+sub meta { +{
+    v => 1,
+} }
 
 sub get_hooks {
     my %conf = @_;
@@ -37,7 +41,9 @@ sub get_hooks {
                              push @args, $_;
                          }
                      }
-                     no warnings 'redundant';
+                     # redefine is just a dummy category for perls < 5.22 which
+                     # don't have 'redundant' yet
+                     no warnings ($warnings::Bits{'redundant'} ? 'redundant' : 'redefine');
                      sprintf $fmt, @args;
                  };
 
@@ -63,7 +69,7 @@ Log::ger::Format::Default - Use default Log::ger formatting style
 
 =head1 VERSION
 
-version 0.033
+version 0.036
 
 =head1 SYNOPSIS
 

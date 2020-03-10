@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::Link;
-$Bio::Tools::EUtilities::Link::VERSION = '1.76';
+$Bio::Tools::EUtilities::Link::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -99,7 +99,7 @@ Bio::Tools::EUtilities::Link - General API for accessing data retrieved from eli
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Duadua::Parser;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Browser::MicrosoftEdge
@@ -24,6 +24,8 @@ my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Browser::AppleSafari
     Duadua::Parser::Browser::Vivaldi
 
+    Duadua::Parser::Bot::Huawei
+    Duadua::Parser::Bot::Sakura
     Duadua::Parser::HTTPClient::HTTPClient
 
     Duadua::Parser::Bot::Twitterbot
@@ -54,6 +56,7 @@ my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Bot::Inoreader
     Duadua::Parser::Bot::Fastladder
     Duadua::Parser::Bot::Feedeen
+    Duadua::Parser::Browser::Xiaomi
     Duadua::Parser::FeaturePhone::FeaturePhone
     Duadua::Parser::Bot::Netcraft
     Duadua::Parser::Bot::Barkrowler
@@ -317,7 +320,7 @@ The list of User Agent Parser
 
 =begin html
 
-<a href="https://github.com/bayashi/Duadua/blob/master/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.12-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/master/badge.svg?_t=1583715024"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1583715024&branch=master"/></a>
+<a href="https://github.com/bayashi/Duadua/blob/master/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.13-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/master/badge.svg?_t=1583851185"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1583851185&branch=master"/></a>
 
 =end html
 

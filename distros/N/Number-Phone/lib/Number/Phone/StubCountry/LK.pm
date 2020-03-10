@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212302;
+our $VERSION = 1.20200309202347;
 
 my $formatters = [
                 {
@@ -42,7 +42,17 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '
           (?:
-            [189]1|
+            12[2-9]|
+            602|
+            8[12]\\d|
+            9(?:
+              1\\d|
+              22|
+              9[245]
+            )
+          )\\d{6}|
+          (?:
+            11|
             2[13-7]|
             3[1-8]|
             4[157]|
@@ -52,7 +62,17 @@ my $validators = {
         ',
                 'geographic' => '
           (?:
-            [189]1|
+            12[2-9]|
+            602|
+            8[12]\\d|
+            9(?:
+              1\\d|
+              22|
+              9[245]
+            )
+          )\\d{6}|
+          (?:
+            11|
             2[13-7]|
             3[1-8]|
             4[157]|
@@ -95,8 +115,8 @@ $areanames{en}->{9463} = "Ampara";
 $areanames{en}->{9465} = "Batticaloa";
 $areanames{en}->{9466} = "Matale";
 $areanames{en}->{9467} = "Kalmunai\,\ Ampara";
-$areanames{en}->{948} = "Kandy";
-$areanames{en}->{949} = "Galle";
+$areanames{en}->{9482} = "Kandy";
+$areanames{en}->{9491} = "Galle";
 
     sub new {
       my $class = shift;

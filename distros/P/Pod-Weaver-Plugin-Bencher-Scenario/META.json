@@ -69,7 +69,7 @@
          "web" : "https://github.com/perlancar/perl-Pod-Weaver-Plugin-Bencher-Scenario"
       }
    },
-   "version" : "0.245",
+   "version" : "0.246",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -220,7 +220,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.003"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -394,7 +394,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.06"
+                        "version" : "0.07"
                      }
                   ]
                }

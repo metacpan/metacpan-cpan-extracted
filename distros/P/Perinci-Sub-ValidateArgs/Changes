@@ -1,3 +1,8 @@
+0.013   2020-03-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Support exporting old name gen_args_validator [RT#132065].
+
+
 0.012   2020-02-05  Released-By: PERLANCAR; Urgency: medium
 
 	- Add function: validate_args_using_meta().

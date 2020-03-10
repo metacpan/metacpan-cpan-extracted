@@ -21,8 +21,7 @@ sub main {
         $insert->execute( split(/\|/) );
     }
 
-    test_normal_query($dq);
-    test_fast_query($dq);
+    test_query($dq);
     test_crud($dq);
     test_where($dq);
     test_db_helper_methods($dq);
@@ -35,7 +34,7 @@ sub main {
     return 0;
 }
 
-sub test_normal_query {
+sub test_query {
     my ($dq) = @_;
 
     is(
@@ -49,29 +48,14 @@ sub test_normal_query {
         '$dq->get(...)->run(...)->value()',
     );
     is(
-        $dq->sql_cached('SELECT west FROM movie WHERE open = ?')->run('Jul 1, 2011')->value(),
+        $dq->sql_uncached('SELECT west FROM movie WHERE open = ?')->run('Jul 1, 2011')->value(),
         'Raising Arizona',
-        '$dq->sql_cached(...)->run(...)->value()',
+        '$dq->sql_uncached(...)->run(...)->value()',
     );
     is(
-        $dq->get_cached( 'movie', ['west'], { 'open' => 'Jul 1, 2011' } )->run()->value(),
+        $dq->get_uncached( 'movie', ['west'], { 'open' => 'Jul 1, 2011' } )->run()->value(),
         'Raising Arizona',
-        '$dq->get_cached(...)->run(...)->value()',
-    );
-}
-
-sub test_fast_query {
-    my ($dq) = @_;
-
-    is(
-        $dq->sql_fast('SELECT west FROM movie WHERE open = ?')->run('Jul 1, 2011')->value(),
-        'Raising Arizona',
-        '$dq->sql_fast(...)->run(...)->value()',
-    );
-    is(
-        $dq->get_fast( 'movie', ['west'], { 'open' => 'Jul 1, 2011' } )->run()->value(),
-        'Raising Arizona',
-        '$dq->get_fast(...)->run(...)->value()',
+        '$dq->get_uncached(...)->run(...)->value()',
     );
 }
 
@@ -92,7 +76,7 @@ sub test_crud {
         'add() succeeds and returns a primary key',
     );
     is(
-        $dq->get_fast( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run()->value(),
+        $dq->get( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run()->value(),
         'Vertigo',
         'add() data verified being in the database',
     );
@@ -100,7 +84,7 @@ sub test_crud {
     my $rv = $dq->update( 'movie', { 'west' => 'Another Earth' }, { 'open' => 'Jun 14, 2013' } );
     isa_ok( $rv, MODULE . '::db' );
     is(
-        $dq->get_fast( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run()->value(),
+        $dq->get( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run()->value(),
         'Another Earth',
         'update() data verified being in the database',
     );
@@ -108,7 +92,7 @@ sub test_crud {
     $rv = $dq->rm( 'movie', { 'open' => 'Jun 14, 2013' } );
     isa_ok( $rv, MODULE . '::db' );
     is(
-        $dq->get_fast( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run()->value(),
+        $dq->get( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run()->value(),
         undef,
         'rm() data verified being not in the database',
     );
@@ -326,6 +310,54 @@ sub test_row_set_methods {
         [ $dq->sql('SELECT west, east FROM movie WHERE east = ?')->run('Jane Eyre')->value() ],
         [ 'Hunt for Red October', 'Jane Eyre' ],
         '$dq->sql(...)->run(...)->value() in list context',
+    );
+
+    is_deeply(
+        [ $dq->sql('SELECT * FROM movie')->run()->first ],
+        [ [
+            'Jun 17, 2011',
+            'Jun 19, 2011',
+            'Hunt for Red October',
+            'Jane Eyre',
+        ] ],
+        'first()',
+    );
+
+    is_deeply(
+        [ $dq->sql('SELECT * FROM movie')->run()->first({}) ],
+        [ {
+            east  => 'Jane Eyre',
+            final => 'Jun 19, 2011',
+            open  => 'Jun 17, 2011',
+            west  => 'Hunt for Red October',
+        } ],
+        'first({})',
+    );
+
+    my $titles = [
+        'Hunt for Red October',
+        'Robots',
+        'Raising Arizona',
+        q{Miller's Crossing},
+        'Big Lebowski',
+        'Super 8',
+        'Raiders of the Lost Ark',
+        'Indiana Jones and the Temple of Doom',
+        'Indiana Jones and the Last Crusade',
+        'Neverending Story',
+        'Gladiator',
+    ];
+
+    is_deeply(
+        [ $dq->sql('SELECT west FROM movie')->run()->column() ],
+        $titles,
+        'column() array context',
+    );
+
+    is_deeply(
+        scalar( $dq->sql('SELECT west FROM movie')->run()->column() ),
+        $titles,
+        'column() scalar context',
     );
 }
 

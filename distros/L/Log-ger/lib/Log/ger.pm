@@ -1,9 +1,9 @@
 package Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-10'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.036'; # VERSION
 
 #IFUNBUILT
 # use strict 'subs', 'vars';
@@ -145,22 +145,28 @@ sub get_logger {
     $obj; # XXX add DESTROY to remove from list of targets
 }
 
-sub import {
-    my ($package, %per_target_conf) = @_;
+sub _import_to {
+    my ($package, $target_pkg, %per_target_conf) = @_;
 
-    my $caller = caller(0);
-    $per_target_conf{category} = $caller
+    $per_target_conf{category} = $target_pkg
         if !defined($per_target_conf{category});
-    add_target(package => $caller, \%per_target_conf);
+    add_target(package => $target_pkg, \%per_target_conf);
     if (keys %Global_Hooks) {
         require Log::ger::Heavy;
-        init_target(package => $caller, \%per_target_conf);
+        init_target(package => $target_pkg, \%per_target_conf);
     } else {
         # if we haven't added any hooks etc, skip init_target() process and use
         # this preconstructed routines as shortcut, to save startup overhead
         _set_default_null_routines();
-        install_routines(package => $caller, $default_null_routines, 0);
+        install_routines(package => $target_pkg, $default_null_routines, 0);
     }
+}
+
+sub import {
+    my ($package, %per_target_conf) = @_;
+
+    my $caller = caller(0);
+    $package->_import_to($caller, %per_target_conf);
 }
 
 1;
@@ -178,7 +184,7 @@ Log::ger - A lightweight, flexible logging framework
 
 =head1 VERSION
 
-version 0.033
+version 0.036
 
 =head1 SYNOPSIS
 

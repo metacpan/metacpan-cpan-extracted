@@ -1,9 +1,9 @@
-use strict;
-
-
 package Tcl::pTk::Entry;
 
-our ($VERSION) = ('1.05');
+our ($VERSION) = ('1.06');
+
+use warnings;
+use strict;
 
 # Entry widget is all auto-wrapped. 
 # This File primarily needed to keep from getting the double-paste problem seen, where pasting into an

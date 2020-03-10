@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212303;
+our $VERSION = 1.20200309202348;
 
 my $formatters = [
                 {
@@ -38,11 +38,10 @@ my $formatters = [
                 {
                   'format' => '$1 $2',
                   'leading_digits' => '
-            1|
+            [15]|
             2[0-79]|
             3[0-46-8]|
-            4[0-7]|
-            59
+            4[0-7]
           ',
                   'pattern' => '(\\d)(\\d{6})'
                 },
@@ -57,9 +56,8 @@ my $formatters = [
                 {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
-            [348]|
+            [3478]|
             64|
-            79[0-8]|
             90
           ',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
@@ -70,7 +68,6 @@ my $formatters = [
             1|
             28|
             6[1-35-9]|
-            799|
             9[2-9]
           ',
                   'pattern' => '(\\d{2})(\\d{5,7})'
@@ -84,7 +81,7 @@ my $validators = {
             2[0-79]|
             3[0-46-8]|
             4[0-7]|
-            59
+            5[57-9]
           )\\d{5}|
           (?:
             [134]\\d|
@@ -97,7 +94,7 @@ my $validators = {
             2[0-79]|
             3[0-46-8]|
             4[0-7]|
-            59
+            5[57-9]
           )\\d{5}|
           (?:
             [134]\\d|
@@ -121,7 +118,7 @@ my $validators = {
             60|
             7[1-8]|
             9(?:
-              0[67]|
+              0\\d|
               [2-9]
             )
           )\\d{6}
@@ -136,7 +133,6 @@ my %areanames = ();
 $areanames{en}->{2521} = "Mogadishu";
 $areanames{en}->{2523} = "Hargeisa";
 $areanames{en}->{2524} = "Garowe";
-$areanames{en}->{25261} = "Mogadishu";
 
     sub new {
       my $class = shift;

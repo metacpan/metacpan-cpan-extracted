@@ -77,7 +77,7 @@
          "web" : "https://github.com/bioperl/bio-eutilities"
       }
    },
-   "version" : "1.76",
+   "version" : "1.77",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028001"
@@ -454,7 +454,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "Bio-EUtilities-v1.76",
+                  "tag" : "Bio-EUtilities-v1.77",
                   "tag_format" : "%N-v%v",
                   "tag_message" : "%N-v%v"
                },

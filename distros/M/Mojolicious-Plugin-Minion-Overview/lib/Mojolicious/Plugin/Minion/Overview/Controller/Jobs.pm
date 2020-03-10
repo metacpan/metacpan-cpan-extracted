@@ -27,6 +27,7 @@ sub search {
     my $self = shift;
     
     my $search = $self->app->minion_overview
+        ->date($self->session('minion_overview_date'))
         ->search($self->req->param('term'))
         ->tags($self->req->every_param('tags'))
         ->when($self->req->param('worker'), 'worker')

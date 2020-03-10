@@ -134,6 +134,16 @@ sub _python {
             $h->{version} = $version if $version;
         }
     }
+    elsif ( index($d->ua, 'AdsTxtCrawler/') > -1 ) {
+        $h = {
+            name => 'AdsTxtCrawler',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!^AdsTxtCrawler/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+    }
 
     return $h;
 }
@@ -209,6 +219,26 @@ sub _java {
 
         if ($d->opt_version) {
             my ($version) = ($d->ua =~ m!^Apache-HttpClient/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+    }
+    elsif ( index($d->ua, 'Jersey/') > -1 ) {
+        $h = {
+            name => 'Jersey',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!^Jersey/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+    }
+    elsif ( index($d->ua, 'Java/') > -1 ) {
+        $h = {
+            name => 'Java',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!^Java/([\d.\_]+)!);
             $h->{version} = $version if $version;
         }
     }

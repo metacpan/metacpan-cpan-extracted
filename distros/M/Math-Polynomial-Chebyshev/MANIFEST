@@ -1,0 +1,32 @@
+Changes
+lib/Math/Polynomial/Chebyshev.pm
+lib/Math/Polynomial/Chebyshev2.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00sig.t
+t/01load.t
+t/02chebyshev.t
+t/03chebyshev2.t
+t/author-changelog.t
+t/author-critic.t
+t/author-git.t
+t/author-pod-coverage.t
+t/author-pod-linkcheck.t
+t/author-pod-syntax.t
+t/author-synopsis.t
+t/author-test-version.t
+t/author-unused-vars.t
+t/release-cpan-changes.t
+t/release-dist-manifest.t
+t/release-distmeta.t
+t/release-kwalitee.t
+t/release-meta-json.t
+t/release-minimum-version.t
+t/release-portability.t
+t/release-whitespaces.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

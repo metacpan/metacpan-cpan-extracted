@@ -11,6 +11,7 @@ sub search {
     my $self = shift;
     
     my $search = $self->app->minion_overview
+        ->date($self->session('minion_overview_date'))
         ->search($self->req->param('term'))
         ->page($self->param('page') || 1)
         ->unique_jobs();

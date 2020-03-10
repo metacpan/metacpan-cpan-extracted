@@ -1,0 +1,39 @@
+NAME
+    Shell::Cap - Probe shell's capabilities
+
+VERSION
+    This document describes version 0.002 of Shell::Cap (from Perl
+    distribution Shell-Cap), released on 2020-03-10.
+
+SYNOPSIS
+DESCRIPTION
+FUNCTIONS
+  shell_supports_pipe
+    Check whether shell supports pipe syntax.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Shell-Cap>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Shell-Cap>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Shell-Cap>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    The "SHELL" environment variable.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

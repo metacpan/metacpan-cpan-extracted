@@ -1,9 +1,9 @@
 package Perinci::Sub::ValidateArgs;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-05'; # DATE
+our $DATE = '2020-03-10'; # DATE
 our $DIST = 'Perinci-Sub-ValidateArgs'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -12,7 +12,11 @@ use warnings;
 use Data::Dmp;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(gen_args_validator_from_meta validate_args_using_meta);
+our @EXPORT_OK = qw(
+                       gen_args_validator
+                       gen_args_validator_from_meta
+                       validate_args_using_meta
+               );
 
 # old name, deprecated
 *gen_args_validator = \&gen_args_validator_from_meta;
@@ -301,7 +305,7 @@ Perinci::Sub::ValidateArgs - Validate function arguments using schemas in Rinci 
 
 =head1 VERSION
 
-This document describes version 0.012 of Perinci::Sub::ValidateArgs (from Perl distribution Perinci-Sub-ValidateArgs), released on 2020-02-05.
+This document describes version 0.013 of Perinci::Sub::ValidateArgs (from Perl distribution Perinci-Sub-ValidateArgs), released on 2020-03-10.
 
 =head1 SYNOPSIS
 

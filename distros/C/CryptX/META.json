@@ -34,6 +34,11 @@
          "requires" : {
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -45,6 +50,6 @@
          "url" : "https://github.com/DCIT/perl-CryptX"
       }
    },
-   "version" : "0.067",
+   "version" : "0.068",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

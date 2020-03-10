@@ -3,7 +3,7 @@
 # modify it under the same terms as Perl itself.
 package Tcl::pTk::Image;
 
-our ($VERSION) = ('1.05');
+our ($VERSION) = ('1.06');
 
 # This module does for images what Tk::Widget does for widgets:
 # provides a base class for them to inherit from.

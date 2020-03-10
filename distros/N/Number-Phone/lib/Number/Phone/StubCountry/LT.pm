@@ -22,12 +22,12 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212302;
+our $VERSION = 1.20200309202347;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '52[0-79]',
+                  'leading_digits' => '52[0-7]',
                   'national_rule' => '(8-$1)',
                   'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 },
@@ -74,15 +74,15 @@ my $validators = {
         ',
                 'mobile' => '6\\d{7}',
                 'pager' => '',
-                'personal_number' => '700\\d{5}',
+                'personal_number' => '70[05]\\d{5}',
                 'specialrate' => '(808\\d{5})|(
           9(?:
             0[0239]|
             10
           )\\d{5}
         )|(70[67]\\d{5})',
-                'toll_free' => '800\\d{5}',
-                'voip' => ''
+                'toll_free' => '80[02]\\d{5}',
+                'voip' => '[89]01\\d{5}'
               };
 my %areanames = ();
 $areanames{en}->{370310} = "Varėna";
@@ -130,8 +130,15 @@ $areanames{en}->{370459} = "Kupiškis";
 $areanames{en}->{37046} = "Klaipėda";
 $areanames{en}->{370460} = "Palanga";
 $areanames{en}->{370469} = "Neringa";
-$areanames{en}->{37052} = "Vilnius";
-$areanames{en}->{370528} = "Elektrėnai\/Trakai";
+$areanames{en}->{370520} = "Vilnius";
+$areanames{en}->{370521} = "Vilnius";
+$areanames{en}->{370522} = "Vilnius";
+$areanames{en}->{370523} = "Vilnius";
+$areanames{en}->{370524} = "Vilnius";
+$areanames{en}->{370525} = "Vilnius";
+$areanames{en}->{370526} = "Vilnius";
+$areanames{en}->{370527} = "Vilnius";
+$areanames{en}->{370528} = "Trakai";
 
     sub new {
       my $class = shift;

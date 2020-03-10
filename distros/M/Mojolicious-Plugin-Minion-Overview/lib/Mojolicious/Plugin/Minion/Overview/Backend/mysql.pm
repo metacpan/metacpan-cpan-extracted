@@ -24,6 +24,8 @@ Job runtime metrics
 sub job_runtime_metrics {
     my ($self, $job) = @_;
 
+    my $start = $self->start;
+
     my $sql = <<SQL;
 SELECT
     `started` AS `x`,
@@ -32,7 +34,7 @@ SELECT
 FROM `minion_jobs`
 WHERE
     `task` = ?
-    AND `created` >= DATE_ADD(NOW(), INTERVAL -7 DAY)
+    AND `created` >= $start
 ORDER BY `minion_jobs`.`created`
 LIMIT 1000
 SQL
@@ -51,6 +53,8 @@ Job throughput metrics
 sub job_throughput_metrics {
     my ($self, $job) = @_;
 
+    my $start = $self->start;
+
     my $sql = <<SQL;
 SELECT
     DATE_FORMAT(`started`, "%Y-%m-%d %H:00:00") AS `x`,
@@ -59,7 +63,7 @@ SELECT
 FROM `minion_jobs`
 WHERE
     `task` = ?
-    AND `created` >= DATE_ADD(NOW(), INTERVAL -7 DAY)
+    AND `created` >= $start
 GROUP BY `x`, `state`
 ORDER BY `x` ASC
 LIMIT 1000
@@ -79,7 +83,7 @@ Search jobs
 sub jobs {
     my $self = shift;
 
-    my @where = ('`created` >= DATE_ADD(NOW(), INTERVAL -7 DAY)');
+    my @where = ('`created` >= ' . $self->start);
     my @params;
 
     # Search by term
@@ -175,6 +179,8 @@ Dashboard overview
 sub overview {
     my $self = shift;
 
+    my $start = $self->start;
+
 my $sql = <<SQL;
 SELECT
     COALESCE(SUM(IF(state = 'finished', 1, 0)), 0) AS `finished`,
@@ -182,13 +188,11 @@ SELECT
     COALESCE(SUM(IF(state = 'inactive', 1, 0)), 0) AS `inactive`
 FROM `minion_jobs`
 WHERE
-    `created` >= DATE_ADD(NOW(), INTERVAL -7 DAY)
+    `created` >= $start
     AND `state` IN ('finished', 'failed')
 SQL
     
-    my $finished = $self->db->query($sql)->hash->{ finished };
-    my $failed = $self->db->query($sql)->hash->{ failed };
-    my $inactive = $self->db->query($sql)->hash->{ inactive };
+    my $jobs = $self->db->query($sql)->hash;
 
 $sql = <<SQL;
 SELECT
@@ -200,16 +204,16 @@ SQL
 
     return [
         {
-            title   => 'Finished jobs past 7 days',
-            count   => $finished,
+            title   => 'Finished jobs',
+            count   => $jobs->{ finished },
         },
         {
-            title   => 'Failed jobs past 7 days',
-            count   => $failed,
+            title   => 'Failed jobs',
+            count   => $jobs->{ failed },
         },
         {
-            title   => 'Inactive jobs past 7 days',
-            count   => $inactive,
+            title   => 'Inactive jobs',
+            count   => $jobs->{ inactive },
         },
         {
             title   => 'Active workers',
@@ -227,7 +231,7 @@ Search the list of unique jobs
 sub unique_jobs {
     my $self = shift;
 
-    my @where = ("`state` IN ('finished', 'failed')");
+    my @where = ('`created` >= ' . $self->start, "`state` IN ('finished', 'failed')");
     my @params;
 
     # Search by term

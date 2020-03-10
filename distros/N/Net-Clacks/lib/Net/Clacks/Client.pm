@@ -7,10 +7,11 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 10;
+our $VERSION = 11;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
+use Encode qw(is_utf8 encode_utf8 decode_utf8);
 #---AUTOPRAGMAEND---
 
 use IO::Socket::IP;
@@ -244,7 +245,10 @@ sub doNetwork {
 
     {
         my $select = IO::Select->new($self->{socket});
-        my @temp = $self->{selector}->can_read($readtimeout);
+        my @temp;
+        eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+            @temp = $self->{selector}->can_read($readtimeout);
+        };
         if(scalar @temp == 0) {
             # Timeout
             return $workCount;
@@ -1029,11 +1033,14 @@ sub setAndStore {
     return;
 }
 
-
-sub DESTROY {
+sub disconnect {
     my ($self) = @_;
 
-    # Notify server we are leaving and make sure we send everything in our outgoing buffer
+    if($self->{needreconnect}) {
+        # We are not connected, just do nothing
+        return;
+    }
+
     $self->flush();
     $self->{outbuffer} .= "QUIT\r\n";
     my $endtime = time + 1; # Wait a maximum of one second to send
@@ -1046,6 +1053,18 @@ sub DESTROY {
     sleep(0.5); # Wait another half second for the OS to flush the socket
 
     delete $self->{socket};
+    $self->{needreconnect} = 1;
+
+    return;
+}
+
+sub DESTROY {
+    my ($self) = @_;
+
+    # Try to disconnect cleanly, but socket might already be DESTROYed, so catch any errors
+    eval {
+        $self->disconnect();
+    };
 
     return;
 }
@@ -1179,9 +1198,15 @@ workaround. Use L<Net::Clacks::ClacksCache> instead.
 
 This is also part of the internal memcached compatibility setup. Don't use this directly.
 
+=head2 disconnect
+
+Tries to send all remaining data in the output buffers and then disconnect cleanly from the server. Of course, if
+the connection already has gone the way of the dodo, any chance of cleanly disconnecting has already passed.
+
 =head2 DESTROY
 
-Automatically closes the connection.
+This tries to close the connection cleanly but there is a good chance it wont succeed under certain circumstances,
+especially on program exit. Use disconnect() before exiting your program for a better controlled behaviour.
 
 =head1 IMPORTANT NOTE
 
@@ -1194,7 +1219,7 @@ Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2019 Rene Schickbauer
+Copyright (C) 2008-2020 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

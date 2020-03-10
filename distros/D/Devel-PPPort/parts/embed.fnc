@@ -91,9 +91,9 @@
 : The E flag is used instead for a function and its short name that is supposed
 :            to be used only in the core, and in extensions compiled with the
 :            PERL_EXT symbol defined.  Again, on some platforms, the function
-:            will be visible everywhere, so the 'p' flag is generally needed.
-:            Also note that an XS writer can always cheat and pretend to be an
-:            extension by #defining PERL_EXT.
+:            will be visible everywhere, so one of the 'p' or 'S' flags is
+:            generally needed.  Also note that an XS writer can always cheat
+:            and pretend to be an extension by #defining PERL_EXT.
 :
 : The X flag is similar to the C flag in that the function (whose entry better
 :	     have the 'p' flag) is accessible everywhere on all platforms.
@@ -248,10 +248,18 @@
 :
 :   f  Function takes a format string. If the function name =~ qr/strftime/
 :      then it is assumed to take a strftime-style format string as the 1st
-:      arg; otherwise it's assumed to be a printf style format string, varargs
-:      (hence any entry that would otherwise go in embed.h is suppressed):
+:      arg; otherwise it's assumed to take a printf style format string, not
+:      necessarily the 1st arg.  All the arguments following it (including
+:      possibly '...') are assumed to be for the format.
 :
+:         embed.h: any entry in here is suppressed because of varargs
 :         proto.h: add __attribute__format__ (or ...null_ok__)
+:
+:   F  Function has a '...' parameter, but don't assume it is a format.  This
+:      is to make sure that new functions with formats can't be added without
+:      considering if they are format functions or not.  A reason to use this
+:      flag even on a format function is if the format would generate
+:	    error: format string argument is not a string type
 :
 :   G  Suppress empty PERL_ARGS_ASSERT_foo macro.  Normally such a macro is
 :      generated for all entries for functions 'foo' in this file.  If there is
@@ -583,7 +591,7 @@ AfTrp	|void	|croak_nocontext|NULLOK const char* pat|...
 AfTrp	|OP*    |die_nocontext  |NULLOK const char* pat|...
 AfTp	|void	|deb_nocontext	|NN const char* pat|...
 AfTp	|char*	|form_nocontext	|NN const char* pat|...
-ATp	|void	|load_module_nocontext|U32 flags|NN SV* name|NULLOK SV* ver|...
+AFTp	|void	|load_module_nocontext|U32 flags|NN SV* name|NULLOK SV* ver|...
 AfTp	|SV*	|mess_nocontext	|NN const char* pat|...
 AfTp	|void	|warn_nocontext	|NN const char* pat|...
 AfTp	|void	|warner_nocontext|U32 err|NN const char* pat|...
@@ -1131,7 +1139,7 @@ ApdT	|OP*	|op_parent|NN OP *o
 S	|OP*	|listkids	|NULLOK OP* o
 #endif
 p	|OP*	|list		|NULLOK OP* o
-Apd	|void	|load_module|U32 flags|NN SV* name|NULLOK SV* ver|...
+AFpd	|void	|load_module|U32 flags|NN SV* name|NULLOK SV* ver|...
 Ap	|void	|vload_module|U32 flags|NN SV* name|NULLOK SV* ver|NULLOK va_list* args
 : Used in perly.y
 p	|OP*	|localize	|NN OP *o|I32 lex
@@ -1252,7 +1260,7 @@ p	|int	|magic_setutf8	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_set_all_env|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_sizepack	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_wipepack	|NN SV* sv|NN MAGIC* mg
-pod	|SV*	|magic_methcall	|NN SV *sv|NN const MAGIC *mg \
+Fpod	|SV*	|magic_methcall	|NN SV *sv|NN const MAGIC *mg \
 				|NN SV *meth|U32 flags \
 				|U32 argc|...
 Ap	|I32 *	|markstack_grow
@@ -1484,7 +1492,7 @@ dopx	|PerlIO*|start_glob	|NN SV *tmpglob|NN IO *io
 Ap	|void	|reentrant_size
 Ap	|void	|reentrant_init
 Ap	|void	|reentrant_free
-ATp	|void*	|reentrant_retry|NN const char *f|...
+AFTp	|void*	|reentrant_retry|NN const char *f|...
 
 : "Very" special - can't use the O flag for this one:
 : (The rename from perl_atexit to Perl_call_atexit was in 864dbfa3ca8032ef)
@@ -1913,11 +1921,17 @@ EiRT	|bool	|invlist_iternext|NN SV* invlist|NN UV* start|NN UV* end
 EiT	|void	|invlist_iterfinish|NN SV* invlist
 #endif
 #if defined(PERL_IN_REGCOMP_C)
+ERS	|REGEXP*|re_op_compile_wrapper|NN SV * const pattern|U32 orig_rx_flags|const U32 pm_flags
 EiRT	|bool	|invlist_is_iterating|NN SV* const invlist
 EiR	|SV*	|invlist_contents|NN SV* const invlist		    \
 				 |const bool traditional_style
 EixRT	|UV	|invlist_lowest|NN SV* const invlist
 #ifndef PERL_EXT_RE_BUILD
+ERS	|REGEXP*|compile_wildcard|NN const char * name|const STRLEN len	    \
+				 |const bool ignore_case
+ES	|I32	|execute_wildcard|NN REGEXP * const prog|NN char* stringarg \
+				|NN char* strend|NN char* strbeg \
+				|SSize_t minend |NN SV* screamer|U32 nosave
 EiRT	|UV*	|_invlist_array_init	|NN SV* const invlist|const bool will_have_0
 EiRT	|UV	|invlist_max	|NN SV* const invlist
 EiRT	|IV*	|get_invlist_previous_index_addr|NN SV* invlist
@@ -2067,7 +2081,7 @@ AxTp	|U8*	|bytes_from_utf8_loc|NN const U8 *s			    \
 				    |NN bool *is_utf8p			    \
 				    |NULLOK const U8 ** first_unconverted
 Apxd	|U8*	|bytes_to_utf8	|NN const U8 *s|NN STRLEN *lenp
-ApdD	|UV	|utf8_to_uvchr	|NN const U8 *s|NULLOK STRLEN *retlen
+ApdDb	|UV	|utf8_to_uvchr	|NN const U8 *s|NULLOK STRLEN *retlen
 CbpdD	|UV	|utf8_to_uvuni	|NN const U8 *s|NULLOK STRLEN *retlen
 CbpD	|UV	|valid_utf8_to_uvuni	|NN const U8 *s|NULLOK STRLEN *retlen
 AMpd	|UV	|utf8_to_uvchr_buf	|NN const U8 *s|NN const U8 *send|NULLOK STRLEN *retlen
@@ -2098,7 +2112,7 @@ CTp	|UV	|_utf8n_to_uvchr_msgs_helper				    \
 				|NULLOK U32 * errors			    \
 				|NULLOK AV ** msgs
 CipTRd	|UV	|valid_utf8_to_uvchr	|NN const U8 *s|NULLOK STRLEN *retlen
-Cdp	|UV	|utf8n_to_uvuni|NN const U8 *s|STRLEN curlen|NULLOK STRLEN *retlen|U32 flags
+CdbDp	|UV	|utf8n_to_uvuni|NN const U8 *s|STRLEN curlen|NULLOK STRLEN *retlen|U32 flags
 
 Adm	|U8*	|uvchr_to_utf8	|NN U8 *d|UV uv
 Cp	|U8*	|uvuni_to_utf8	|NN U8 *d|UV uv
@@ -2106,7 +2120,7 @@ Adm	|U8*	|uvchr_to_utf8_flags	|NN U8 *d|UV uv|UV flags
 Admx	|U8*	|uvchr_to_utf8_flags_msgs|NN U8 *d|UV uv|UV flags|NULLOK HV ** msgs
 CMpd	|U8*	|uvoffuni_to_utf8_flags	|NN U8 *d|UV uv|const UV flags
 Cp	|U8*	|uvoffuni_to_utf8_flags_msgs|NN U8 *d|UV uv|const UV flags|NULLOK HV** msgs
-Cdp	|U8*	|uvuni_to_utf8_flags	|NN U8 *d|UV uv|UV flags
+CdpbD	|U8*	|uvuni_to_utf8_flags	|NN U8 *d|UV uv|UV flags
 Apd	|char*	|pv_uni_display	|NN SV *dsv|NN const U8 *spv|STRLEN len|STRLEN pvlim|UV flags
 ApdR	|char*	|sv_uni_display	|NN SV *dsv|NN SV *ssv|STRLEN pvlim|UV flags
 EXpR	|Size_t	|_inverse_folds	|const UV cp				    \
@@ -2564,14 +2578,14 @@ SR	|int	|dooneliner	|NN const char *cmd|NN const char *filename
 #  endif
 S	|SV *	|space_join_names_mortal|NULLOK char *const *array
 #endif
-p	|OP *	|tied_method|NN SV *methname|NN SV **sp \
+Fp	|OP *	|tied_method|NN SV *methname|NN SV **sp \
 				|NN SV *const sv|NN const MAGIC *const mg \
 				|const U32 flags|U32 argc|...
 
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_IN_REGEXEC_C)
 Ep	|void	|regprop	|NULLOK const regexp *prog|NN SV* sv|NN const regnode* o|NULLOK const regmatch_info *reginfo \
 				|NULLOK const RExC_state_t *pRExC_state
-Ep	|int	|re_printf	|NN const char *fmt|...
+Efp	|int	|re_printf	|NN const char *fmt|...
 #endif
 #if defined(PERL_IN_REGCOMP_C)
 ES	|regnode_offset|reg	|NN RExC_state_t *pRExC_state \
@@ -2583,6 +2597,8 @@ ES	|regnode_offset|regnode_guts|NN RExC_state_t *pRExC_state          \
 ES	|void	|change_engine_size|NN RExC_state_t *pRExC_state|const Ptrdiff_t size
 ES	|regnode_offset|reganode|NN RExC_state_t *pRExC_state|U8 op \
 				|U32 arg
+ES	|regnode_offset|regpnode|NN RExC_state_t *pRExC_state|U8 op \
+				|NN void * arg
 ES	|regnode_offset|reg2Lanode|NN RExC_state_t *pRExC_state		   \
 				|const U8 op				   \
 				|const U32 arg1				   \
@@ -2702,7 +2718,7 @@ ES	|SSize_t|study_chunk	|NN RExC_state_t *pRExC_state \
 ESR	|SV *	|get_ANYOFM_contents|NN const regnode * n
 ESRT	|U32	|add_data	|NN RExC_state_t* const pRExC_state \
 				|NN const char* const s|const U32 n
-rS	|void	|re_croak2	|bool utf8|NN const char* pat1|NN const char* pat2|...
+frS	|void	|re_croak	|bool utf8|NN const char* pat|...
 ES	|int	|handle_possible_posix					    \
 				|NN RExC_state_t *pRExC_state		    \
 				|NN const char* const s			    \
@@ -2740,7 +2756,7 @@ EXp	|SV *	|handle_user_defined_property|NN const char * name	    \
 					     |NN SV * msg		    \
 					     |const STRLEN level
 #  ifdef DEBUGGING
-Ep	|int	|re_indentf	|NN const char *fmt|U32 depth|...
+EFp	|int	|re_indentf	|NN const char *fmt|U32 depth|...
 ES	|void        |regdump_intflags|NULLOK const char *lead| const U32 flags
 ES	|void	|regdump_extflags|NULLOK const char *lead| const U32 flags
 ES	|const regnode*|dumpuntil|NN const regexp *r|NN const regnode *start \
@@ -2880,7 +2896,7 @@ ES	|void	|debug_start_match|NN const REGEXP *prog|const bool do_utf8\
 				|NN const char *start|NN const char *end\
 				|NN const char *blurb
 
-Ep	|int	|re_exec_indentf	|NN const char *fmt|U32 depth|...
+EFp	|int	|re_exec_indentf|NN const char *fmt|U32 depth|...
 #  endif
 #endif
 
@@ -2962,6 +2978,10 @@ EXpR	|SV*	|get_and_check_backslash_N_name|NN const char* s	\
 				|NN const char* const e			\
 				|const bool is_utf8			\
 				|NN const char** error_msg
+EXpR	|HV*	|load_charnames	|NN SV * char_name			\
+				|NN const char * context		\
+				|const STRLEN context_len		\
+				|NN const char ** error_msg
 
 : For use ONLY in B::Hooks::Parser, by special dispensation
 EXpxR	|char*	|scan_str	|NN char *start|int keep_quoted \
@@ -3369,7 +3389,7 @@ Apo	|void*	|my_cxt_init	|NN int *indexp|size_t size
 So	|void	|xs_version_bootcheck|U32 items|U32 ax|NN const char *xs_p \
 				|STRLEN xs_len
 #endif
-XpoT	|I32	|xs_handshake	|const U32 key|NN void * v_my_perl\
+FXpoT	|I32	|xs_handshake	|const U32 key|NN void * v_my_perl\
 				|NN const char * file| ...
 Xp	|void	|xs_boot_epilog	|const I32 ax
 #ifndef HAS_STRLCAT
@@ -3459,7 +3479,7 @@ ATop	|void	|clone_params_del|NN CLONE_PARAMS *param
 #endif
 
 : Used in perl.c and toke.c
-op	|void	|populate_isa	|NN const char *name|STRLEN len|...
+Fop	|void	|populate_isa	|NN const char *name|STRLEN len|...
 
 : Some static inline functions need predeclaration because they are used
 : inside other static inline functions.

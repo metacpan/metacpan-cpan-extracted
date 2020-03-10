@@ -8,7 +8,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
 use namespace::clean;
 use Data::Section -setup;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 sub configure {
 	my $self = shift;
@@ -28,7 +28,6 @@ sub configure {
 	$self->add_plugins([GithubMeta => \%githubmeta_config]);
 	$self->add_plugins([ReadmeAnyFromPod => 'Readme_Github' => { type => 'pod', filename => 'README.pod', location => 'root', phase => 'release' }]);
 	$self->add_plugins([GenerateFile => 'Generate_Contrib' => { filename => 'CONTRIBUTING.md', content => [split /\n/, ${$self->section_data('CONTRIBUTING.md')}] }]);
-	$self->add_plugins('MetaConfig');
 	$self->add_plugins('MetaProvides::Package', 'Prereqs::FromCPANfile', 'Git::Contributors');
 	$self->add_plugins([MetaNoIndex => { directory => [ qw/t xt inc share eg examples/ ] }]);
 	
@@ -112,7 +111,6 @@ This is the plugin bundle that DBOOK uses. It is equivalent to:
  filename = CONTRIBUTING.md
  content = ...
  
- [MetaConfig]
  [MetaProvides::Package]
  [Prereqs::FromCPANfile]
  [Git::Contributors]

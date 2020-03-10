@@ -5,14 +5,14 @@ use Carp 'croak';
 use Scalar::Util 'blessed';
 use Mojo::Collection;
 use Mojo::UserAgent;
-use Mojo::Util qw(b64_encode url_escape);
+use Mojo::Util qw(b64_encode encode url_escape);
 use Mojo::WebService::Twitter::Error 'twitter_tx_error';
 use Mojo::WebService::Twitter::Tweet;
 use Mojo::WebService::Twitter::User;
 use Mojo::WebService::Twitter::Util;
 use WWW::OAuth;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 has ['api_key','api_secret'];
 has 'ua' => sub { Mojo::UserAgent->new };
@@ -202,7 +202,8 @@ sub _build_get_tweet {
 	my ($self, $id) = @_;
 	croak 'Tweet ID is required for get_tweet' unless defined $id;
 	croak 'Invalid tweet ID to retrieve' unless $id =~ m/\A[0-9]+\z/;
-	my $tx = $self->ua->build_tx(GET => _api_url('statuses/show.json')->query(id => $id, tweet_mode => 'extended'));
+	my $tx = $self->ua->build_tx(GET => _api_url('statuses/show.json')
+		->query(_www_form_urlencode(id => $id, tweet_mode => 'extended')));
 	$self->authentication->($tx->req);
 	return $tx;
 }
@@ -241,7 +242,7 @@ sub _build_get_user {
 	$query{screen_name} = $params{screen_name} if defined $params{screen_name};
 	croak 'user_id or screen_name is required for get_user' unless %query;
 	$query{tweet_mode} = 'extended';
-	my $tx = $self->ua->build_tx(GET => _api_url('users/show.json')->query(%query));
+	my $tx = $self->ua->build_tx(GET => _api_url('users/show.json')->query(_www_form_urlencode(%query)));
 	$self->authentication->($tx->req);
 	return $tx;
 }
@@ -283,7 +284,8 @@ sub _build_post_tweet {
 	$form{$_} = $params{$_} ? 'true' : 'false' for grep { defined $params{$_} }
 		qw(display_coordinates);
 	$form{tweet_mode} = 'extended';
-	my $tx = $self->ua->build_tx(POST => _api_url('statuses/update.json'), form => \%form);
+	my $tx = $self->ua->build_tx(POST => _api_url('statuses/update.json'),
+		{'Content-Type' => 'application/x-www-form-urlencoded'}, _www_form_urlencode(%form));
 	$self->authentication->($tx->req);
 	return $tx;
 }
@@ -367,7 +369,7 @@ sub _build_search_tweets {
 	$query{geocode} = $geocode if defined $geocode;
 	$query{$_} = $params{$_} for grep { defined $params{$_} } qw(lang result_type count until since_id max_id);
 	$query{tweet_mode} = 'extended';
-	my $tx = $self->ua->build_tx(GET => _api_url('search/tweets.json')->query(%query));
+	my $tx = $self->ua->build_tx(GET => _api_url('search/tweets.json')->query(_www_form_urlencode(%query)));
 	$self->authentication->($tx->req);
 	return $tx;
 }
@@ -441,6 +443,18 @@ sub _oauth2 {
 sub _tweet_object { Mojo::WebService::Twitter::Tweet->new->from_source(shift) }
 
 sub _user_object { Mojo::WebService::Twitter::User->new->from_source(shift) }
+
+sub _www_form_urlencode {
+	my @params = @_;
+	my @terms;
+	while (@params) {
+		my ($key, $values) = splice @params, 0, 2;
+		foreach my $value (ref $values eq 'ARRAY' ? @$values : $values) {
+			push @terms, join '=', map { url_escape encode 'UTF-8', $_ } ($key // ''), ($value // '');
+		}
+	}
+	return join '&', @terms;
+}
 
 1;
 

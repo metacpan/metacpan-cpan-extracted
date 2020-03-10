@@ -1,0 +1,68 @@
+NAME
+    ShellQuote::Any::PERLANCAR - Escape strings for the shell on Unix or
+    MSWin32
+
+VERSION
+    This document describes version 0.003 of ShellQuote::Any::PERLANCAR
+    (from Perl distribution ShellQuote-Any-PERLANCAR), released on
+    2020-03-10.
+
+SYNOPSIS
+     use ShellQuote::Any; # exports shell_quote()
+
+     shell_quote('curl', 'http://example.com/?foo=123&bar=baz');
+     # curl 'http://example.com/?foo=123&bar=baz'
+
+DESCRIPTION
+    This distribution is currently For testing only.
+
+FUNCTIONS
+  shell_quote(@cmd) => str
+    Quote command @cmd according to OS. On Windows, will use
+    Win32::ShellQuote's "quote_system_string()". Otherwise, will use
+    String::ShellQuote's "shell_quote()". Exported by default.
+
+    If you want to simulate how quoting is done under another OS, you could
+    do something like:
+
+     {
+         local $^O = "Win32"; # simulate Windows
+         say shell_quote("foo bar");
+     }
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ShellQuote-Any-PERLANCAR>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ShellQuote-Any-PERLANCAR>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ShellQuote-Any-PERLAN
+    CAR>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    ShellQuote::Any which currently uses Win32::ShellQuote's "cmd_escape"
+    instead of "quote_system_string()". See also: discussion on
+    <https://github.com/bayashi/ShellQuote-Any/issues/2>.
+
+    ShellQuote::Any::Tiny
+
+    Win32::ShellQuote
+
+    String::ShellQuote
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

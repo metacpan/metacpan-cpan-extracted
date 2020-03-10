@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::EUtilParameters;
-$Bio::Tools::EUtilities::EUtilParameters::VERSION = '1.76';
+$Bio::Tools::EUtilities::EUtilParameters::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -416,7 +416,7 @@ Bio::Tools::EUtilities::EUtilParameters - Manipulation of NCBI eutil-based param
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

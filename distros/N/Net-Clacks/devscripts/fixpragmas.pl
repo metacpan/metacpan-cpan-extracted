@@ -7,13 +7,14 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 10;
+our $VERSION = 11;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
+use Encode qw(is_utf8 encode_utf8 decode_utf8);
 #---AUTOPRAGMAEND---
 
-# PAGECAMEL  (C) 2008-2019 Rene Schickbauer
+# PAGECAMEL  (C) 2008-2020 Rene Schickbauer
 # Developed under Artistic license
 
 
@@ -35,7 +36,7 @@ foreach my $file (@files) {
     foreach my $line (@lines) {
         if($line =~ /^use\ +(.+)\;/) {
             my $pragma = $1;
-            if($pragma =~ /(strict|warnings|English|mro|diagnostics|Carp|Fatal|Array\:\:Contains|autodie|utf8)/ && $pragma !~ /Digest/) {
+            if($pragma =~ /(strict|warnings|English|mro|diagnostics|Carp|Fatal|Array\:\:Contains|autodie|utf8|Encode)/ && $pragma !~ /Digest/) {
                 # Remove this (old) lines
                 next;
             }
@@ -70,10 +71,11 @@ foreach my $file (@files) {
             print $ofh "use mro 'c3';\n";
             print $ofh "use English;\n";
             print $ofh "use Carp;\n";
-            print $ofh "our \$VERSION = 10;\n";
+            print $ofh "our \$VERSION = 11;\n";
             print $ofh "use autodie qw( close );\n";
             print $ofh "use Array::Contains;\n";
             print $ofh "use utf8;\n";
+            print $ofh "use Encode qw(is_utf8 encode_utf8 decode_utf8);\n";
             print $ofh "#---AUTOPRAGMAEND---\n";
             $inserted = 1;
         }

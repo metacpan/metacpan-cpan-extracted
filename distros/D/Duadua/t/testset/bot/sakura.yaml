@@ -1,0 +1,8 @@
+- ua: 'SAKURA Cloud Simplemon ID:12345'
+  name: 'SAKURA Cloud Simplemon'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false

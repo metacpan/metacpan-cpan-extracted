@@ -115,16 +115,18 @@ sub _render_spec {
   my %spec;
 
   if ($openapi) {
+    my $req_url = $c->req->url->to_abs;
     $openapi->{bundled} ||= $openapi->validator->bundle;
     %spec = %{$openapi->{bundled}};
 
     if ($openapi->validator->version ge '3') {
-      $spec{servers} = [{url => $c->req->url->to_abs->to_string}];
+      $spec{servers}[0]{url} = $req_url->to_string;
       delete $spec{basePath};    # Added by Plugin::OpenAPI
     }
     else {
-      $spec{basePath} = $c->url_for($spec{basePath});
-      $spec{host}     = $c->req->url->to_abs->host_port;
+      $spec{basePath}   = $c->url_for($spec{basePath});
+      $spec{host}       = $req_url->host_port;
+      $spec{schemes}[0] = $req_url->scheme;
     }
   }
   elsif ($c->stash('openapi_spec')) {
@@ -445,7 +447,7 @@ new SpecRenderer().setup();
   % $body = $p->{schema} if $p->{in} eq 'body';
   <tr>
     % if ($spec->{parameters}{$p->{name}}) {
-      <td><a href="#<%= $slugify->(qw(ref, parameters), $p->{name}) %>"><%= $p->{name} %></a></td>
+      <td><a href="#<%= $slugify->(qw(ref parameters), $p->{name}) %>"><%= $p->{name} %></a></td>
     % } else {
       <td><%= $p->{name} %></td>
     % }
@@ -708,18 +710,13 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
   }
   a { color: #508a25; text-decoration: underline; word-break: break-word; }
   a:hover { text-decoration: none; }
-  h1, h2, h3, h4 { font-family: Verdana; color: #403f41; font-weight: bold; line-height: 1.2em; margin: 1em 0; }
+  h1, h2, h3, h4 { font-family: Verdana; color: #403f41; font-weight: bold; line-height: 1.2em; margin: 1em 0; padding-top: 0.4rem; }
   h1 a, h2 a, h3 a, h4 a { text-decoration: none; color: inherit; }
   h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover { text-decoration: underline; }
   h1 { font-size: 2.4em; }
 
-  h2 {
-    font-size: 1.8em;
-    border-bottom: 2px solid #cfd4c5;
-    padding: 0.5rem 0;
-    margin-top: 1.5em;
-  }
-
+  h1 { margin-top: 0; padding-top: 1em; }
+  h2 { font-size: 1.8em; border-bottom: 2px solid #cfd4c5; }
   h3 { font-size: 1.4em; }
   h4 { font-size: 1.1em; }
   table {
@@ -802,14 +799,14 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
 
   @media only screen {
     .openapi-up-button {
-      background: #403f41;
+      background: #436d24;
       color: #f2f3ed;
       font-weight: bold;
       font-size: 1.2rem;
       line-height: 1.5em;
       text-align: center;
       border: 0;
-      box-shadow: 0 0 4px 3px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.2);
       border-radius: 50%;
       padding-top: 0.3em;
       width: 2.1em;
@@ -823,7 +820,7 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
     }
 
     .openapi-up-button:hover {
-      background: #000;
+      background: #2c520f;
     }
 
     .openapi-up-button.is-visible {
@@ -853,7 +850,7 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
 
     .openapi-nav {
       padding: 1.4rem 0 3rem 1rem;
-      max-width: 18rem;
+      width: 18rem;
       height: 100vh;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
@@ -909,8 +906,16 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
 
     .openapi-footer {
       border-top: 4px solid #cfd4c5;
-      padding-top: 3rem;
+      padding-top: 2.5rem;
       margin-top: 4rem;
+    }
+
+    #about {
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      top: -10rem;
+      opacity: 0;
     }
   }
 </style>

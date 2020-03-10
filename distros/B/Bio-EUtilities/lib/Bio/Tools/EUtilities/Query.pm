@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::Query;
-$Bio::Tools::EUtilities::Query::VERSION = '1.76';
+$Bio::Tools::EUtilities::Query::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -114,7 +114,7 @@ Bio::Tools::EUtilities::Query - Parse and collect esearch, epost, espell, egquer
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

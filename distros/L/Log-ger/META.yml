@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger
   homepage: https://metacpan.org/release/Log-ger
   repository: git://github.com/perlancar/perl-Log-ger.git
-version: '0.033'
+version: '0.036'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

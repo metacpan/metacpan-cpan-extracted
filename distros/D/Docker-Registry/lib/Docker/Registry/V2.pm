@@ -1,31 +1,33 @@
 package Docker::Registry::Call::Repositories;
   use Moo;
-  use Types::Standard qw/Int/;
+  use Types::Standard qw/Int Str/;
   has n => (is => 'ro', isa => Int);
-  has limit => (is => 'ro', isa => Int);
+  has last => (is => 'ro', isa => Str);
 
 package Docker::Registry::Result::Repositories;
   use Moo;
   use Types::Standard qw/ArrayRef Str/;
   has repositories => (is => 'ro', isa => ArrayRef[Str]);
+  has last => (is => 'ro', isa => Str);
 
 package Docker::Registry::Call::RepositoryTags;
   use Moo;
   use Types::Standard qw/Int Str/;
   has repository => (is => 'ro', isa => Str, required => 1);
   has n => (is => 'ro', isa => Int);
-  has limit => (is => 'ro', isa => Int);
+  has last => (is => 'ro', isa => Str);
 
 package Docker::Registry::Result::RepositoryTags;
   use Moo;
   use Types::Standard qw/ArrayRef Str/;
   has name => (is => 'ro', isa => Str, required => 1);
   has tags => (is => 'ro', isa => ArrayRef[Str], required => 1);
+  has last => (is => 'ro', isa => Str);
 
 package Docker::Registry::V2;
   use Moo;
   use Docker::Registry::Types qw(DockerRegistryURI);
-  use Types::Standard qw/Str ConsumerOf/;
+  use Types::Standard qw/Str ConsumerOf InstanceOf/;
 
   has url => (is => 'ro', coerce => 1, isa => DockerRegistryURI, required => 1);
   has api_base => (is => 'ro', default => 'v2');
@@ -35,6 +37,11 @@ package Docker::Registry::V2;
     Docker::Registry::IO::Simple->new;  
   });
   has auth => (is => 'ro', isa => ConsumerOf['Docker::Registry::Auth'], lazy => 1, builder => 'build_auth' );
+  has request_builder => (is => 'ro', isa => InstanceOf['Docker::Registry::RequestBuilder'], lazy => 1, default => sub {
+      my $self = shift;
+      require Docker::Registry::RequestBuilder;
+      Docker::Registry::RequestBuilder->new(url => $self->url, api_base => $self->api_base);
+  });
 
   sub build_auth {
     require Docker::Registry::Auth::None;
@@ -54,7 +61,8 @@ package Docker::Registry::V2;
       if ($@) {
         Docker::Registry::Exception->throw({ message => $@ });
       }
-      return $struct;
+      my $pagination = $self->_parse_pagination_header($response);
+      return { %$struct, %$pagination };
     } elsif ($response->status == 401) {
       Docker::Registry::Exception::Unauthorized->throw({
         message => $response->content,
@@ -66,6 +74,19 @@ package Docker::Registry::V2;
         status  => $response->status
       });
     }
+  }
+
+  use URI;
+  sub _parse_pagination_header {
+    my ($self, $response) = @_;
+
+    return {}  unless($response->headers->{link});
+
+    my ($link) = ($response->headers->{link} =~ /<([^>]*)>/);
+    my $url = URI->new($link);
+    my %url_params = $url->query_form;
+
+    return {last => $url_params{last}};
   }
 
   sub repositories {
@@ -83,15 +104,9 @@ package Docker::Registry::V2;
     # }
     my $call_class = 'Docker::Registry::Call::Repositories';
     my $call = $call_class->new({ @_ });
-    my $params = { };
-    $params->{ n } = $call->n if (defined $call->n);
-    $params->{ limit } = $call->limit if (defined $call->limit);
 
-    my $request = Docker::Registry::Request->new(
-      parameters => $params,
-      method => 'GET',
-      url => (join '/', $self->url, $self->api_base, '_catalog')
-    );
+    my $request = $self->request_builder->build_request($call);
+
     my $scope = 'registry:catalog:*';
     $request = $self->auth->authorize($request, $scope);
     my $response = $self->caller->send_request($request);
@@ -109,16 +124,9 @@ package Docker::Registry::V2;
     #{"name":"$repository","tags":["2017.09","latest"]}
     my $call_class = 'Docker::Registry::Call::RepositoryTags';
     my $call = $call_class->new({ @_ });
-    my $params = { };
 
-    $params->{ n } = $call->n if (defined $call->n);
-    $params->{ limit } = $call->limit if (defined $call->limit);
+    my $request = $self->request_builder->build_request($call);
 
-    my $request = Docker::Registry::Request->new(
-      parameters => $params,
-      method => 'GET',
-      url => (join '/', $self->url, $self->api_base, $call->repository, 'tags/list')
-    );
     my $scope = sprintf 'repository:%s:%s', $call->repository, 'pull';
     $request = $self->auth->authorize($request, $scope);
     my $response = $self->caller->send_request($request);

@@ -107,6 +107,14 @@ use Test::More 0.88;
     has 'size'  => ( is => 'rw', 'init_arg' => undef );
 }
 
+{
+    package InTrace;
+
+    sub be_strict {
+        Stricter->new( password => 'unredacted' )
+    }
+}
+
 is( exception { Standard->new( thing => 1, bad => 99 ) },
     undef, 'standard Moo class ignores unknown params' );
 
@@ -180,5 +188,10 @@ like(
 
 is( exception { InitArg->new( other => 1 ) },
     undef, 'InitArg works when given proper init_arg' );
+
+unlike( exception{ InTrace->be_strict },
+    qr/unredacted/,
+    'Stack traces are not dumped by default'
+);
 
 done_testing();

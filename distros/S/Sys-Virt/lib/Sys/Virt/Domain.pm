@@ -100,9 +100,22 @@ Returns a printable string representation of the raw UUID, in the format
 
 Returns a string with a locally unique name of the domain
 
-=item my $hostname = $dom->get_hostname()
+=item my $hostname = $dom->get_hostname($flags=0)
 
-Returns a string representing the hostname of the guest
+Returns a string representing the hostname of the guest.  C<$flags>
+can be zero or more of
+
+=over 4
+
+=item Sys::Virt::Domain::GET_HOSTNAME_AGENT
+
+Report the guest agent hostname
+
+=item Sys::Virt::Domain::GET_HOSTNAME_LEASE
+
+Report the DHCP lease hostname
+
+=back
 
 =item my $str = $dom->get_metadata($type, $uri, $flags =0)
 
@@ -3481,6 +3494,10 @@ The domain has crashed
 =item Sys::Virt::Domain::EVENT_CRASHED_PANICKED
 
 The domain has crashed due to a kernel panic
+
+=item Sys::Virt::Domain::EVENT_CRASHED_CRASHLOADED
+
+The domain has crashed and reloaded itself
 
 =back
 

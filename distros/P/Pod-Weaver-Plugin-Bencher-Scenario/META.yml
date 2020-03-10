@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Bencher-Scenario
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Bencher-Scenario
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Bencher-Scenario.git
-version: '0.245'
+version: '0.246'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -157,7 +157,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -297,7 +297,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

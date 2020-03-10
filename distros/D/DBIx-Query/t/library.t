@@ -12,15 +12,12 @@ sub main {
     require_ok(MODULE);
 
     my $data = load_sponge_data();
-    my $dq   = test_connect();
 
-    test_connection( $dq, $data );
+    my $dq = test_connection($data);
     test_sql( $dq, $data );
     test_get( $dq, $data );
-    test_sql_cached( $dq, $data );
-    test_get_cached( $dq, $data );
-    test_sql_fast( $dq, $data );
-    test_get_fast( $dq, $data );
+    test_sql_uncached( $dq, $data );
+    test_get_uncached( $dq, $data );
     test_add( $dq, $data );
     test_rm( $dq, $data );
     test_update( $dq, $data );
@@ -50,28 +47,64 @@ sub load_sponge_data {
     return $sponge_data;
 }
 
-sub test_connect {
-    my $dq = MODULE->connect( 'dbi:Sponge:', '', '', { 'RaiseError' => 1 } );
-    ok( $dq, MODULE . '->connect()' );
-    isa_ok( $dq, MODULE . '::db' );
-
-    return $dq;
-}
-
 sub test_connection {
-    my $dq = shift;
+    my $dq = MODULE->connect_uncached( 'dbi:Sponge:', '', '' );
+    ok( $dq, MODULE . '->connect_uncached()' );
+    isa_ok( $dq, MODULE . '::db' );
 
     is( $dq->connection('dsn'), 'dbi:Sponge:', q{connection('dsn') should return dsn} );
     is_deeply(
         scalar $dq->connection,
-        { 'dsn' => 'dbi:Sponge:', 'user' => '', 'pass' => '', 'attr' => { RaiseError => 1 } },
+        {
+            'dsn'  => 'dbi:Sponge:',
+            'user' => '',
+            'pass' => '',
+            'attr' => {
+                dbi_connect_method => 'connect',
+                RaiseError         => 1,
+                PrintError         => 0,
+            },
+        },
         'scalar connection() should return full hashref',
     );
     is_deeply(
         [ $dq->connection ],
-        [ 'dbi:Sponge:', '', '', { RaiseError => 1 } ],
+        [ 'dbi:Sponge:', '', '', {
+            dbi_connect_method => 'connect',
+            RaiseError         => 1,
+            PrintError         => 0,
+        } ],
         'connection() in list context should return full list',
     );
+
+    $dq = MODULE->connect( 'dbi:Sponge:', '', '', { 'RaiseError' => 1 } );
+    ok( $dq, MODULE . '->connect()' );
+    isa_ok( $dq, MODULE . '::db' );
+
+    is_deeply(
+        scalar $dq->connection,
+        {
+            'dsn'  => 'dbi:Sponge:',
+            'user' => '',
+            'pass' => '',
+            'attr' => {
+                dbi_connect_method => 'connect_cached',
+                RaiseError         => 1,
+                PrintError         => 0,
+            },
+        },
+        'scalar connection() should return full hashref',
+    );
+    is_deeply(
+        [ $dq->connection ],
+        [ 'dbi:Sponge:', '', '', {
+            dbi_connect_method => 'connect_cached',
+            RaiseError         => 1,
+            PrintError         => 0,
+        } ],
+        'connection() in list context should return full list',
+    );
+
     is_deeply(
         scalar $dq->connection( qw( dsn user ) ),
         [ 'dbi:Sponge:', '' ],
@@ -82,6 +115,8 @@ sub test_connection {
         [ 'dbi:Sponge:', '' ],
         'connection( qw( dsn user ) ) in list context should return array',
     );
+
+    return $dq;
 }
 
 sub test_sql {
@@ -106,16 +141,16 @@ sub test_get {
     is( $row_set->sql(), 'SELECT a, b, c FROM data WHERE ( id = ? )', '$row_set->sql()' );
 }
 
-sub test_sql_cached {
+sub test_sql_uncached {
     my ( $dq, $sponge_data ) = @_;
-    my $query = $dq->sql_cached( 'SELECT * FROM data', clone($sponge_data) );
+    my $query = $dq->sql_uncached( 'SELECT * FROM data', clone($sponge_data) );
     ok( $query, 'sql_cached() should return a query object' );
     isa_ok( $query, MODULE . '::st' );
 }
 
-sub test_get_cached {
+sub test_get_uncached {
     my ( $dq, $sponge_data ) = @_;
-    my $row_set = $dq->get_cached(
+    my $row_set = $dq->get_uncached(
         'data',
         [ qw( a b c ) ],
         { 'id' => 1 },
@@ -124,49 +159,6 @@ sub test_get_cached {
     );
 
     is( $row_set->sql(), 'SELECT a, b, c FROM data WHERE ( id = ? )', '$dq->get_cached()->sql()' );
-}
-
-sub test_sql_fast {
-    my ( $dq, $sponge_data ) = @_;
-
-    my $sth = $dq->sql_fast( 'SELECT * FROM data', clone($sponge_data) );
-    isa_ok( $sth, MODULE . '::st' );
-    is_deeply(
-        $sth->fetchrow_hashref(),
-        {
-            'open' => 'Jun 17, 2011',
-            'final' => 'Jun 19, 2011',
-            'west' => 'Hunt for Red October',
-            'east' => 'Jane Eyre'
-        },
-        'sql_fast() returns results',
-    );
-}
-
-sub test_get_fast {
-    my ( $dq, $sponge_data ) = @_;
-
-    my $sth = $dq->get_fast(
-        'data',
-        [ '*' ],
-        { 'id' => 1 },
-        undef,
-        clone($sponge_data),
-    );
-
-    $sth->execute();
-
-    isa_ok( $sth, MODULE . '::st' );
-    is_deeply(
-        $sth->fetchrow_hashref(),
-        {
-            'open'  => 'Jun 17, 2011',
-            'final' => 'Jun 19, 2011',
-            'west'  => 'Hunt for Red October',
-            'east'  => 'Jane Eyre'
-        },
-        'get_fast()->execute() returns results',
-    );
 }
 
 sub test_add {

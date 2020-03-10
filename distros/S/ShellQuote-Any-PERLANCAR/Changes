@@ -1,0 +1,19 @@
+0.003   2020-03-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module from PERLANCAR::ShellQuote::Any to
+	  ShellQuote::Any::PERLANCAR (PERLANCAR::* is for private modules).
+
+        - [doc] Describe more details the difference between this module and
+	  ShellQuote::Any.
+
+
+0.002   2016-09-27  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- [doc] Fix/update documentation.
+
+
+0.001   2016-09-26  Released-By: PERLANCAR
+
+        - First release.

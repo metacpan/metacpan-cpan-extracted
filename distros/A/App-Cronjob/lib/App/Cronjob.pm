@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::Cronjob;
 # ABSTRACT: wrap up programs to be run as cron jobs
-$App::Cronjob::VERSION = '1.200007';
+$App::Cronjob::VERSION = '1.200008';
 use Digest::MD5 qw(md5_hex);
 use Errno;
 use Fcntl qw( :DEFAULT :flock );
@@ -48,7 +48,8 @@ sub run {
      [ 'sender|f=s',    'sender for message',                                ],
      [ 'jobname|j=s',   'job name; used for locking, if given'               ],
      [ 'timeout=i',     "fail if the child isn't completed within n seconds" ],
-     [ 'ignore-errors=s@', 'error types to ignore (like: lock)'              ],
+     [ 'ignore-errors=s@',  'error types to ignore (like: lock)'              ],
+     [ 'email-header|h=s@', 'add header to the report email, if you send one' ],
      [ 'temp-ignore-lock-errors=i',
                      'failure to lock only signals an error after this long' ],
      [ 'lock!',         'lock this job (defaults to true; --no-lock for off)',
@@ -62,6 +63,19 @@ sub run {
     if (grep {; $_ eq "lock" } @{$opt->{ignore_errors}}) {
       die "--temp-ignore-lock-errors and --ignore-errors=lock are incompatible\n";
     }
+  }
+
+  my @extra_headers;
+  for my $entry (@{ $opt->email_header || [] }) {
+    my ($h, $v) = split /=/, $entry;
+
+    lc $h eq $_ && die "You can't replace the $_ header!\n"
+      for qw(to from subject);
+
+    die "Invalid header name: $h" if $h =~ /\P{ASCII}/;
+    die "Invalid header name: $h" unless $h =~ /\A[A-Za-z][-A-Za-z0-9]*\z/;
+
+    push @extra_headers, $h, $v;
   }
 
   $rcpts   = $opt->{rcpt}
@@ -151,6 +165,7 @@ sub run {
         status  => $status,
         time    => \$time_taken,
         output  => \$output,
+        extra_headers => \@extra_headers,
       });
     }
 
@@ -171,6 +186,7 @@ sub run {
       send_cronjob_report({
         is_fail => 1,
         output  => \$err->{text},
+        extra_headers => \@extra_headers,
       });
     }
 
@@ -179,7 +195,8 @@ sub run {
     $subject = "ERROR: $subject";
     send_cronjob_report({
       is_fail => 1,
-      output  => \$err
+      output  => \$err,
+      extra_headers => \@extra_headers,
     });
     exit 0;
   }
@@ -219,6 +236,7 @@ sub send_cronjob_report {
       Subject => $subject,
       'In-Reply-To' => $irt,
       'Auto-Submitted' => 'auto-generated',
+      @{ $arg->{extra_headers} },
     ],
   );
 
@@ -245,7 +263,7 @@ END_TEMPLATE
 
 {
   package App::Cronjob::Exception;
-$App::Cronjob::Exception::VERSION = '1.200007';
+$App::Cronjob::Exception::VERSION = '1.200008';
 sub new {
     my ($class, $type, $text, $extra) = @_;
     bless { type => $type, text => $text, extra => $extra } => $class;
@@ -266,7 +284,7 @@ App::Cronjob - wrap up programs to be run as cron jobs
 
 =head1 VERSION
 
-version 1.200007
+version 1.200008
 
 =head1 SEE INSTEAD
 
@@ -284,7 +302,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords chromatic Mark Jason Dominus Rob N ★
+=for stopwords chromatic Mark Jason Dominus Ricardo Signes Rob N ★
 
 =over 4
 
@@ -295,6 +313,10 @@ chromatic <chromatic@wgz.org>
 =item *
 
 Mark Jason Dominus <mjd@plover.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

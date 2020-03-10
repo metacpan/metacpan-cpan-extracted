@@ -1,4 +1,22 @@
 Revision history for API::GitForge
 
+0.003     2020-03-10 09:21:28-07:00 America/Phoenix
+    - API::GitForge::GitLab::_ensure_repo(): avoid an unnecessary API
+      call.
+    - API::GitForge::Role::GitForge::clean_repo(): try to unprotect
+      fork branches before deleting them, if GitForge API library
+      supports doing this.
+    - API::GitForge::Role::GitForge::clean_repo(): push the gitforge
+      branch using Git::Wrapper again.
+      During early testing, this seemed to hang after pushing to
+      GitLab installations, but it seems to work well now.
+
+0.002     2020-03-09 12:17:47-07:00 America/Phoenix
+    - Implement API::GitForge::GitLab::_ensure_repo().
+    - Add git repo metadata to dist.ini.
+    - Don't disable merge requests in GitLab clean forks.
+      Otherwise we can't submit merge requests upstream.
+    - Code cleanup.
+
 0.001     2020-02-16 16:20:35-07:00 America/Phoenix
     - First public release.

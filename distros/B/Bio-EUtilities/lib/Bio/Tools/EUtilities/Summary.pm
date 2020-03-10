@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::Summary;
-$Bio::Tools::EUtilities::Summary::VERSION = '1.76';
+$Bio::Tools::EUtilities::Summary::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -60,7 +60,7 @@ Bio::Tools::EUtilities::Summary - Class for handling data output (XML) from esum
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

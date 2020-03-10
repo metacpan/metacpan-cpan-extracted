@@ -1,6 +1,7 @@
 % layout 'minion_overview', title => '| Metrics for ' . $job;
 
 %= include 'minion_overview/metrics/jobs/_runtime', job => $job, runtime => $runtime
+<br/>
 %= include 'minion_overview/metrics/jobs/_throughput', job => $job, throughput => $throughput
 
 % content_for javascript => begin

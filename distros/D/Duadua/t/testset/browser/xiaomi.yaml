@@ -1,0 +1,9 @@
+- ua: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/61.0.3163.128 Safari/534.24 XiaoMi/MiuiBrowser/9.6.0-Beta"
+  name: 'XiaoMi/MiuiBrowser'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+  version: '9.6.0-Beta'

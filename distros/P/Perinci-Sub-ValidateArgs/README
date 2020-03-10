@@ -3,9 +3,9 @@ NAME
     in Rinci function metadata
 
 VERSION
-    This document describes version 0.012 of Perinci::Sub::ValidateArgs
+    This document describes version 0.013 of Perinci::Sub::ValidateArgs
     (from Perl distribution Perinci-Sub-ValidateArgs), released on
-    2020-02-05.
+    2020-03-10.
 
 SYNOPSIS
      use Perinci::Sub::ValidateArgs qw(gen_args_validator_from_meta);

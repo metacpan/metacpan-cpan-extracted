@@ -3,7 +3,7 @@ NAME
     automate the installation of prerequisites without installing the module
 
 VERSION
-    version 0.12
+    version 0.14
 
 SYNOPSIS
       use CPANPLUS::Shell::Default::Plugin::Prereqs;

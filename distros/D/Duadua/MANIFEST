@@ -23,11 +23,13 @@ lib/Duadua/Parser/Bot/GooglebotMisc.pm
 lib/Duadua/Parser/Bot/GooglebotMobile.pm
 lib/Duadua/Parser/Bot/GoogleRead.pm
 lib/Duadua/Parser/Bot/HatenaBot.pm
+lib/Duadua/Parser/Bot/Huawei.pm
 lib/Duadua/Parser/Bot/Inoreader.pm
 lib/Duadua/Parser/Bot/MailRUBot.pm
 lib/Duadua/Parser/Bot/Msnbot.pm
 lib/Duadua/Parser/Bot/Netcraft.pm
 lib/Duadua/Parser/Bot/OracleGrapeshotCrawler.pm
+lib/Duadua/Parser/Bot/Sakura.pm
 lib/Duadua/Parser/Bot/Slackbot.pm
 lib/Duadua/Parser/Bot/SMTBot.pm
 lib/Duadua/Parser/Bot/Twitterbot.pm
@@ -45,6 +47,7 @@ lib/Duadua/Parser/Browser/Opera.pm
 lib/Duadua/Parser/Browser/PaleMoon.pm
 lib/Duadua/Parser/Browser/UCBrowser.pm
 lib/Duadua/Parser/Browser/Vivaldi.pm
+lib/Duadua/Parser/Browser/Xiaomi.pm
 lib/Duadua/Parser/Browser/Yandex.pm
 lib/Duadua/Parser/FeaturePhone/FeaturePhone.pm
 lib/Duadua/Parser/HTTPClient/HTTPClient.pm
@@ -80,11 +83,13 @@ t/testset/bot/googlebot_ad.yaml
 t/testset/bot/googlebot_misc.yaml
 t/testset/bot/googlebot_mobile.yaml
 t/testset/bot/hatena_bot.yaml
+t/testset/bot/huawei.yaml
 t/testset/bot/inoreader.yaml
 t/testset/bot/mail_ru_bot.yaml
 t/testset/bot/msnbot.yaml
 t/testset/bot/netcraft.yaml
 t/testset/bot/oracle_grapeshotcrawler.yaml
+t/testset/bot/sakura.yaml
 t/testset/bot/slackbot.yaml
 t/testset/bot/smtbot.yaml
 t/testset/bot/twitterbot.yaml
@@ -102,6 +107,7 @@ t/testset/browser/opera.yaml
 t/testset/browser/palemoon.yaml
 t/testset/browser/uc_browser.yaml
 t/testset/browser/vivaldi.yaml
+t/testset/browser/xiaomi.yaml
 t/testset/browser/yandex.yaml
 t/testset/feature_phone/feature_phone.yaml
 t/testset/http_client/http_clients.yaml

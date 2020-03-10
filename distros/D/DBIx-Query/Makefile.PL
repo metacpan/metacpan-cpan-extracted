@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,12 +14,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "DBIx-Query",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "DBIx::Query",
   "PREREQ_PM" => {
     "Carp" => 0,
     "DBD::SQLite" => 0,
-    "DBI" => 0,
+    "DBI" => "1.40",
     "SQL::Abstract::Complete" => 0,
     "SQL::Parser" => 0,
     "parent" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "constant" => 0
   },
-  "VERSION" => "1.07",
+  "VERSION" => "1.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Clone" => 0,
   "DBD::SQLite" => 0,
-  "DBI" => 0,
+  "DBI" => "1.40",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

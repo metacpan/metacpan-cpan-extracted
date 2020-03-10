@@ -73,8 +73,8 @@ selection to the point of the insertion cursor.
 You can also bind commands to tags. Like press the right mouse button for menu ");
 
 
-$top->after(1000,sub{$top->destroy});
-MainLoop;
+$top->idletasks;
+(@ARGV) ? MainLoop : $top->destroy;
 ok(1);
 
 sub sayopen { print "Open something\n" }

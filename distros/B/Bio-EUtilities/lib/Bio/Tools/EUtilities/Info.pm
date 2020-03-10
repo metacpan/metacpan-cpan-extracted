@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::Info;
-$Bio::Tools::EUtilities::Info::VERSION = '1.76';
+$Bio::Tools::EUtilities::Info::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -83,7 +83,7 @@ Bio::Tools::EUtilities::Info - Interface class for storing einfo data.
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

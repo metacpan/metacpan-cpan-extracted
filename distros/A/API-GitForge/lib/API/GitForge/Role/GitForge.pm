@@ -15,7 +15,7 @@ package API::GitForge::Role::GitForge;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$API::GitForge::Role::GitForge::VERSION = '0.001';
+$API::GitForge::Role::GitForge::VERSION = '0.003';
 
 use 5.028;
 use strict;
@@ -58,14 +58,13 @@ sub ensure_fork { shift->_ensure_fork(@_) }
 
 sub clean_fork {
     my $self     = shift;
-    my $fork_uri = $self->_ensure_fork(@_);
+    my $fork_uri = $self->_ensure_fork($_[0]);
 
     my $temp = tempdir CLEANUP => 1;
     my $git = Git::Wrapper->new($temp);
     $git->init;
-    $git->remote(qw(add fork), $fork_uri);
     my @fork_branches
-      = map { m#refs/heads/#; $' } $git->ls_remote(qw(--heads fork));
+      = map { m#refs/heads/#; $' } $git->ls_remote("--heads", $fork_uri);
     return $fork_uri if grep /\Agitforge\z/, @fork_branches;
 
     open my $fh, ">", catfile $temp, "README.md";
@@ -74,15 +73,15 @@ sub clean_fork {
     $git->add("README.md");
     $git->commit({ message => "Temporary fork for pull request(s)" });
 
-    # TODO why does Git::Wrapper hang after pushing the branch to
-    # GitLab?  for now, just use system() to do the push ourselves
-    system "git", "-C", $git->dir, "push", $fork_uri, "master:gitforge";
-
-    $self->_clean_config_fork(@_);
+    $git->push($fork_uri, "master:gitforge");
+    $self->_clean_config_fork($_[0]);
 
     # assume that if we had to create the gitforge branch, we just
     # created the fork, so can go ahead and nuke all branches there.
-    # may fail if some branches are protected; that's okay.
+    if ($self->can("_ensure_fork_branch_unprotected")) {
+        $self->_ensure_fork_branch_unprotected($_[0], $_) for @fork_branches;
+    }
+    # may fail if we couldn't unprotect; that's okay
     eval { $git->push($fork_uri, "--delete", @fork_branches) };
 
     return $fork_uri;
@@ -115,7 +114,7 @@ API::GitForge::Role::GitForge - role implementing generic git forge operations
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 DESCRIPTION
 
@@ -123,7 +122,7 @@ Operations which one might wish to perform against any git forge.  See
 L<API::GitForge>.
 
 In this documentation, C<example.com> should be replaced with the
-domain at which your GitForge is hosted, e.g. C<salsa.debian.org>.
+domain at which your git forge is hosted, e.g. C<salsa.debian.org>.
 
 =head1 METHODS
 

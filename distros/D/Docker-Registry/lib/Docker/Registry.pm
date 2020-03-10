@@ -1,5 +1,5 @@
 package Docker::Registry;
-  our $VERSION = '0.06';
+  our $VERSION = '0.07';
 
 1;
 
@@ -28,44 +28,48 @@ Docker::Registry - A client for talking to Docker Registries
 
 =head1 DESCRIPTION
 
-This module helps you talk to different Docker Registries from different cloud providers.
+This module helps you talk to different Docker Registries from different cloud
+providers.
 
-Docker Registry APIs are standard, but authentication methods differ from vendor to vendor.
-This set of modules helps manage that for you.
+Docker Registry APIs are standard, but authentication methods differ from
+vendor to vendor.  This set of modules helps manage that for you.
 
 =head1 WARNING
 
-Consider this code Alpha quality. It works, but only some read-only methods have been implemented, and the API
-may still change. Be careful if you start depending on this module.
+Consider this code Alpha quality. It works, but only some read-only methods
+have been implemented, and the API may still change. Be careful if you start
+depending on this module.
 
 =head1 ATTRIBUTES
 
 =head2 url
 
-The URL of the registry. Most of the time this URL is automatically derived by provider classes 
-like (L<Docker::Registry::ECR>.
+The URL of the registry. Most of the time this URL is automatically derived by
+provider classes like (L<Docker::Registry::ECR>.
 
 =head2 auth
 
-An instance of an object that has the L<Docker::Registry::Auth> Role. See AUTHENTICATION for 
+An instance of an object that has the L<Docker::Registry::Auth> Role. See L</AUTHENTICATION> for
 a list of authentication types. Subclasses (like L<Docker::Registry::GCE>) will set a default
-authentication object appropiate for the specific provider. This is left injectable in the 
+authentication object appropriate for the specific provider. This is left injectable in the
 constructor so the programmer can force a specific auth provider.
 
 =head1 METHODS
 
 =head2 repositories
 
-Returns a L<Docker::Registry::Result::Repositories> object with the list of repositories
+Returns a L<Docker::Registry::Result::Repositories> object with the list of
+repositories
 
 =head2 repository_tags(name => $repo_name)
 
-Returns a L<Docker::Registry::Result::RepositoryTags> object with the list of tags
+Returns a L<Docker::Registry::Result::RepositoryTags> object with the list of
+tags
 
 =head1 PROVIDERS
 
-Different cloud providers of Docker registries have subtle differences between them,
-so there are specialized classes for each supported provider:
+Different cloud providers of Docker registries have subtle differences between
+them, so there are specialized classes for each supported provider:
 
 L<Docker::Registry::Azure>
 
@@ -87,8 +91,8 @@ L<Docker::Registry::Auth::GCEServiceAccount>
 
 L<Docker::Registry::Auth::Gitlab>
 
-The most of the time the specialized provider tries to select the appropiate authentication
-module, but it can be overrided with the C<auth> attribute 
+The most of the time the specialized provider tries to select the appropiate
+authentication module, but it can be overrided with the C<auth> attribute
 
 =head1 SEE ALSO
 
@@ -100,9 +104,13 @@ L<https://docs.docker.com/registry/spec/api/>
     CAPSiDE
     jlmartinez@capside.com
 
-=head1 Contributors
+=head1 CONTRIBUTORS
 
-Wesley Schwengle (waterkip) has implemented the GitLab provider, as well as refactored code
+Wesley Schwengle (waterkip) has implemented the GitLab provider, as well as
+refactored code
+
+For a full list of all the contributors see the CONTRIBUTORS file included in
+this module.
 
 =head1 BUGS and SOURCE
 

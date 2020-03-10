@@ -15,6 +15,8 @@ has 'query' => sub {{
     term    => '',
 }};
 
+has 'start' => 'CURDATE()';
+
 
 =head2 clear_query
 
@@ -32,6 +34,34 @@ sub clear_query {
         tags    => [],
         term    => '',
     });
+
+    return $self;
+}
+
+=head2 date
+
+Set date
+
+=cut
+
+sub date {
+    my ($self, $date) = @_;
+
+    my $start = 'CURDATE()';
+
+    if ($date eq 'Since yesterday') {
+        $start = 'DATE_ADD(CURDATE(), INTERVAL -1 DAY)';
+    } elsif ($date eq 'Last 3 days') {
+        $start = 'DATE_ADD(CURDATE(), INTERVAL -3 DAY)';
+    } elsif ($date eq 'Last 7 days') {
+        $start = 'DATE_ADD(CURDATE(), INTERVAL -7 DAY)';
+    } elsif ($date eq 'This month') {
+        $start = 'LAST_DAY(CURDATE() + INTERVAL -1 MONTH) + INTERVAL 1 DAY';
+    } elsif ($date eq 'Last 3 months') {
+        $start = 'LAST_DAY(CURDATE() + INTERVAL -3 MONTH) + INTERVAL 1 DAY';
+    }
+
+    $self->start($start);
 
     return $self;
 }

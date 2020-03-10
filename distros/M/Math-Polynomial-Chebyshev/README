@@ -1,0 +1,30 @@
+Math-Polynomial-Chebyshev
+
+Math::Polynomial::Chebyshev - create Chebyshev polynomials
+
+This module extends Math::Polynomial and implements methods related to
+Chebyshev polynomials of the first and second kind.
+
+INSTALLATION
+
+To install this module, unpack the distribution file, and run the following
+commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for these modules with the
+perldoc command.
+
+    perldoc Math::Polynomial::Chebyshev
+
+COPYRIGHT AND LICENCE
+
+Copyright 2020 Peter John Acklam pjacklam (at) gmail.com.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

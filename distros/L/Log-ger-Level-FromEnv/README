@@ -3,7 +3,7 @@ NAME
     variables
 
 VERSION
-    version 0.003
+    version 0.004
 
 SYNOPSIS
      use Log::ger;
@@ -19,14 +19,18 @@ DESCRIPTION
     to debug (50)), "VERBOSE" (if true, will set log level to info (40)),
     "QUIET" (if true, will set log level to error (20)).
 
-    This is convenient for CLI programs.
+    This is convenient for CLI programs or one-liners.
 
 SEE ALSO
+    Log::ger::App
+
+    Log::ger::Screen
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 use strict;                     # redundant, but quiets perlcritic
 package Method::Generate::Constructor::Role::StrictConstructor;
-$Method::Generate::Constructor::Role::StrictConstructor::VERSION = '0.010';
+$Method::Generate::Constructor::Role::StrictConstructor::VERSION = '0.011';
 # ABSTRACT: a role to make Moo constructors strict.
 
 
@@ -32,7 +32,7 @@ around _assign_new => sub {
     $state \$attrs = { @attrs };
     my \@bad = sort grep { ! exists \$attrs->{\$_} }  keys \%{ \$args };
     if (\@bad) {
-       Carp::confess("Found unknown attribute(s) passed to the constructor: " .
+       die("Found unknown attribute(s) passed to the constructor: " .
            join ", ", \@bad);
     }
 
@@ -56,7 +56,7 @@ Method::Generate::Constructor::Role::StrictConstructor - a role to make Moo cons
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -89,7 +89,7 @@ George Hartzell <hartzell@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by George Hartzell.
+This software is copyright (c) 2020 by George Hartzell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,11 @@
 Revision history for perl module Sys::Virt
 
+6.1.0 2020-03-09
+
+ - Add VIR_ERR_NO_HOSTNAME constant
+ - Add VIR_DOMAIN_GET_HOSTNAME_* constants
+ - Add VIR_DOMAIN_EVENT_CRASHED_CRASHLOADED constant
+
 6.0.0 2020-01-16
 
  - Add VIR_DOMAIN_JOB_SUCCESS and VIR_DOMAIN_JOB_STATS_KEEP_COMPLETED

@@ -20,7 +20,7 @@ meta-spec:
 name: Perinci-Sub-ValidateArgs
 requires:
   Data::Dmp: '0.21'
-  Data::Sah: '0.903'
+  Data::Sah: '0.907'
   Exporter: '5.57'
   perl: '5.010001'
   strict: '0'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-ValidateArgs
   homepage: https://metacpan.org/release/Perinci-Sub-ValidateArgs
   repository: git://github.com/perlancar/perl-Perinci-Sub-ValidateArgs.git
-version: '0.012'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -152,7 +152,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -288,7 +288,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.07'
+              version: '0.081'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

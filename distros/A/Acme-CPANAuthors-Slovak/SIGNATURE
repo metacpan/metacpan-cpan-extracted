@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 5e2ebfd1712c0e70c8da167bd9a6b7ac7860628151e56f641d5ae71463838643 Changes
+SHA256 9984f7b209d43761721f55f57d3b943c1d5308788d8d1818642db5deac235044 LICENSE
+SHA256 d5b374382d65b05cadea76f5fb38f179ec6c77481a1b0869975312ccc1c37bca MANIFEST
+SHA256 54965e4326e3afc5d6ef0799589c7de73fbe517c6f97e06a039d7a11bd22d1e0 META.yml
+SHA256 986bb6d8282c1454f14fdef8b7fb98ccca6ba525134184aa8f5e721de10b05d1 Makefile.PL
+SHA256 8104d7497571d3be6fbc7d627597d10d31741a4589c5ec0c38b6f0fff3f802b9 README
+SHA256 462fa19bb890326d39882f58bf56f6c9fd9c53473c7607775abe6a829b51407b Slovak.pm
+SHA256 aaa7508f2628c354603a3444c8864c0cb6939fa660e0e4139dc057c21f00db0b examples/ex1.pl
+SHA256 18bf641b3db95f32cb5e8fee4c3e56d7bd0aa3599bda51a80b648b8114be7bd9 examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 2697804e3dfa8669ada9a059ea72a50e7d78eb9026e0da6fc06ffc8c669f1866 t/Acme-CPANAuthors-Slovak/01-use.t
+SHA256 ea9dc5fbc4c5f6092a63110cd6bf13cf46694906d7ef3a04aca673f94298aeaf t/Acme-CPANAuthors-Slovak/02-version.t
+SHA256 e45c7a6d8995b87d8b9ca8aa738851f12d81ba08b31f818c9512d3d176d5d19e t/Acme-CPANAuthors-Slovak/03-new.t
+SHA256 2adf5d1e09491741554b0a7aa222e43c3388bcfa534250b279315243a43ea7b8 t/Acme-CPANAuthors-Slovak/04-authors.t
+SHA256 c7b141e5c0dbe877e6ec9797a6df8a79e4df74b31c3d4b328a4f335b76900e87 t/Acme-CPANAuthors-Slovak/05-count.t
+SHA256 1201c39939b39e44835a59a0be388de3fc49a89b983c4bafde32f3606447645f t/Acme-CPANAuthors-Slovak/06-id.t
+SHA256 0ed63d6d962897caf6ddd0911051a197b2a095b9a5a791df3920af25e4db691e xt/Acme-CPANAuthors-Slovak/01-pod_coverage.t
+SHA256 6074a30a38033602e6743ea57d096f0581f8c3241ab89fc6ce339985de595345 xt/Acme-CPANAuthors-Slovak/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl5ngvEACgkQKyiOZjWe
+rHbphQf+IEOdQjETkcv3gIYH0L8/LiJ6KxRqR6QhrHzeMyN6tECFK7CWbvISeWR0
+25kABGAgMmHThAJ/vp4Afdbcazv/82T46lwlhAQZX+drFC4fZWa57XWO7NA5yrMA
+CkDEcBThYQKTSdo4jjlpTa4cv7+B+Bfru/3mSOfKOMD7WOOyagrMMkNfCk8cIwB5
+n5Y3V9K7Atz3hzbN+ZBl5CgoPLB0q5DOphmFhlA8CFEJP/AqWjfipQjf+P7CmW4l
+0qYaCgmG+RNPHfZijlNb7fi+F2TRzpuszNNAmX3vUUyJo4DycHQMiPUkFuJjeITP
+Ujw1fWac8QbZgLefHmrqu9gh1KWb2w==
+=x/7w
+-----END PGP SIGNATURE-----

@@ -3,9 +3,9 @@ NAME
     Bencher::Scenario::* distribution
 
 VERSION
-    This document describes version 0.245 of
+    This document describes version 0.246 of
     Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution
-    Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-12-17.
+    Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-12-25.
 
 SYNOPSIS
     In your weaver.ini:

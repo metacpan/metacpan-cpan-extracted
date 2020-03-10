@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::Info::LinkInfo;
-$Bio::Tools::EUtilities::Info::LinkInfo::VERSION = '1.76';
+$Bio::Tools::EUtilities::Info::LinkInfo::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -119,7 +119,7 @@ Bio::Tools::EUtilities::Info::LinkInfo - Class for storing einfo link data.
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

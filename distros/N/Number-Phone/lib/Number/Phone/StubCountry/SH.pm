@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212303;
+our $VERSION = 1.20200309202348;
 
 my $formatters = [];
 
@@ -50,13 +50,23 @@ my %areanames = ();
 $areanames{fr}->{29022} = "Jamestown";
 $areanames{fr}->{29023} = "Sainte\-Hélène";
 $areanames{fr}->{29024} = "Sainte\-Hélène";
-$areanames{fr}->{29026} = "Sainte\-Hélène";
+$areanames{fr}->{290264} = "Sainte\-Hélène";
+$areanames{fr}->{290265} = "Sainte\-Hélène";
+$areanames{fr}->{290266} = "Sainte\-Hélène";
+$areanames{fr}->{290267} = "Sainte\-Hélène";
+$areanames{fr}->{290268} = "Sainte\-Hélène";
+$areanames{fr}->{290269} = "Sainte\-Hélène";
 $areanames{fr}->{29027} = "Sainte\-Hélène";
 $areanames{fr}->{2908} = "Tristan\ da\ Cunha";
 $areanames{en}->{29022} = "Jamestown";
 $areanames{en}->{29023} = "St\.\ Helena";
 $areanames{en}->{29024} = "St\.\ Helena";
-$areanames{en}->{29026} = "St\.\ Helena";
+$areanames{en}->{290264} = "St\.\ Helena";
+$areanames{en}->{290265} = "St\.\ Helena";
+$areanames{en}->{290266} = "St\.\ Helena";
+$areanames{en}->{290267} = "St\.\ Helena";
+$areanames{en}->{290268} = "St\.\ Helena";
+$areanames{en}->{290269} = "St\.\ Helena";
 $areanames{en}->{29027} = "St\.\ Helena";
 $areanames{en}->{2908} = "Tristan\ da\ Cunha";
 

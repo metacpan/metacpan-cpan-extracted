@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::Summary::Item;
-$Bio::Tools::EUtilities::Summary::Item::VERSION = '1.76';
+$Bio::Tools::EUtilities::Summary::Item::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -245,7 +245,7 @@ Bio::Tools::EUtilities::Summary::Item - Simple layered object for DocSum item da
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,6 @@
+v1.0.1    2020-03-09 17:52:54 EDT
+  - Remove [MetaConfig] to reduce META clutter
+
 v1.0.0    2019-11-06 13:25:17 EST
   - Update travis config in minting profile to add perl 5.30 and correctly
     configure perls 5.20 and older

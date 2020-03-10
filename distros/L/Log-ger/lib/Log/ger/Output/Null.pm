@@ -1,9 +1,13 @@
 package Log::ger::Output::Null;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-10'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.036'; # VERSION
+
+sub meta { +{
+    v => 1,
+} }
 
 sub get_hooks {
     return {
@@ -35,7 +39,7 @@ Log::ger::Output::Null - Null output
 
 =head1 VERSION
 
-version 0.033
+version 0.036
 
 =head1 SYNOPSIS
 

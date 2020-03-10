@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::HistoryI;
-$Bio::Tools::EUtilities::HistoryI::VERSION = '1.76';
+$Bio::Tools::EUtilities::HistoryI::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -51,7 +51,7 @@ Bio::Tools::EUtilities::HistoryI - Simple extension of EUtilDataI interface clas
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

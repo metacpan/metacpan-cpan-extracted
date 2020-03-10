@@ -1,12 +1,16 @@
 package Log::ger::Output::Array;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-10'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.036'; # VERSION
 
 use strict;
 use warnings;
+
+sub meta { +{
+    v => 1,
+} }
 
 sub get_hooks {
     my %plugin_conf = @_;
@@ -44,7 +48,7 @@ Log::ger::Output::Array - Log to array
 
 =head1 VERSION
 
-version 0.033
+version 0.036
 
 =head1 SYNOPSIS
 

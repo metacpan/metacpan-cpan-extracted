@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212302;
+our $VERSION = 1.20200309202347;
 
 my $formatters = [
                 {
@@ -377,7 +377,6 @@ $areanames{de}->{35256} = "Rümelingen";
 $areanames{de}->{35257} = "Esch\-sur\-Alzette\/Schifflingen";
 $areanames{de}->{35258} = "Differdingen";
 $areanames{de}->{35259} = "Soleuvre";
-$areanames{de}->{35267} = "Düdelingen";
 $areanames{de}->{35271} = "Betzdorf";
 $areanames{de}->{35272} = "Echternach";
 $areanames{de}->{35273} = "Rosport";
@@ -606,7 +605,6 @@ $areanames{fr}->{35256} = "Rumelange";
 $areanames{fr}->{35257} = "Esch\-sur\-Alzette\/Schifflange";
 $areanames{fr}->{35258} = "Differdange";
 $areanames{fr}->{35259} = "Soleuvre";
-$areanames{fr}->{35267} = "Dudelange";
 $areanames{fr}->{35271} = "Betzdorf";
 $areanames{fr}->{35272} = "Echternach";
 $areanames{fr}->{35273} = "Rosport";
@@ -835,7 +833,6 @@ $areanames{en}->{35256} = "Rumelange";
 $areanames{en}->{35257} = "Esch\-sur\-Alzette\/Schifflange";
 $areanames{en}->{35258} = "Differdange";
 $areanames{en}->{35259} = "Soleuvre";
-$areanames{en}->{35267} = "Dudelange";
 $areanames{en}->{35271} = "Betzdorf";
 $areanames{en}->{35272} = "Echternach";
 $areanames{en}->{35273} = "Rosport";

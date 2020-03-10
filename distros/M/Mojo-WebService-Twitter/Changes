@@ -1,3 +1,7 @@
+1.001     2020-03-09 18:32:29 EDT
+  - Use strict RFC 3986 URL encoding for parameters sent to twitter to match
+    signature generation. (#2)
+
 1.000     2018-08-04 17:40:55 EDT
   - INCOMPATIBLE CHANGE: Always retrieve extended tweets so the full text is
     available in the text attribute of tweet objects, since many tweets now

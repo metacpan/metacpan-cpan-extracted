@@ -65,6 +65,5 @@ is_deeply $meta->{prereqs}{test}{requires},
 is_deeply $meta->{provides}, { 'DZT::Sample' => { file => 'lib/DZT/Sample.pm', version => '0.001' } }, 'right provides metadata';
 my @expected_no_index = sort qw(eg examples inc share t xt);
 is_deeply [sort @{$meta->{no_index}{directory}}], \@expected_no_index, 'right no_index metadata';
-ok defined($meta->{x_Dist_Zilla}), 'dzil config included in metadata';
 
 done_testing;

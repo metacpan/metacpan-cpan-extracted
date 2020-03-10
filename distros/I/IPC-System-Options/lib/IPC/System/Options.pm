@@ -1,14 +1,14 @@
 package IPC::System::Options;
 
-our $DATE = '2019-11-23'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-10'; # DATE
 our $DIST = 'IPC-System-Options'; # DIST
-our $VERSION = '0.333'; # VERSION
+our $VERSION = '0.334'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
 
 use Proc::ChildError qw(explain_child_error);
-use String::ShellQuote;
 
 my $log;
 our %Global_Opts;
@@ -34,19 +34,19 @@ sub import {
     }
 }
 
-sub _quote {
+sub _args2cmd {
     if (@_ == 1) {
         return $_[0];
     }
-
     if ($^O eq 'MSWin32') {
         require Win32::ShellQuote;
         return Win32::ShellQuote::quote_system_string(
             map { ref($_) eq 'SCALAR' ? $$_ : $_ } @_);
     } else {
+        require String::ShellQuote;
         return join(
             " ",
-            map { ref($_) eq 'SCALAR' ? $$_ : shell_quote($_) } @_
+            map { ref($_) eq 'SCALAR' ? $$_ : String::ShellQuote::shell_quote($_) } @_
         );
     }
 }
@@ -122,6 +122,10 @@ sub _system_or_readpipe_or_run_or_start {
     my $wa;
     my $res;
 
+    my $capture_stdout_was_false;
+    my $emulate_backtick;
+    my $tmp_capture_stdout;
+
     my $code_capture = sub {
         my $doit = shift;
 
@@ -178,7 +182,7 @@ sub _system_or_readpipe_or_run_or_start {
                 }
                 $routine->("%ssystem(%s), env=%s", $label, \@args, \%set_env);
             } else {
-                warn "[DRY RUN] system(".join(", ", @args).")\n";
+                warn "[DRY RUN] system("._args2cmd(@args).")\n";
             }
             if ($opts->{dry_run}) {
                 $exit_code = 0;
@@ -190,7 +194,7 @@ sub _system_or_readpipe_or_run_or_start {
         my $doit = sub {
             if ($opts->{shell}) {
                 # force the use of shell
-                $res = system _quote(@args);
+                $res = system _args2cmd(@args);
             } elsif (defined $opts->{shell}) {
                 # forbid shell
                 $res = system {$args[0]} @args;
@@ -206,7 +210,6 @@ sub _system_or_readpipe_or_run_or_start {
     } elsif ($which eq 'readpipe') {
 
         $wa = wantarray;
-        my $cmd = _quote(@args);
 
         if ($opts->{log} || $opts->{dry_run}) {
             if ($opts->{log}) {
@@ -219,9 +222,9 @@ sub _system_or_readpipe_or_run_or_start {
                 } else {
                     $routine = "log_trace";
                 }
-                $routine->("%sreadpipe(%s), env=%s", $label, $cmd, \%set_env);
+                $routine->("%sreadpipe(%s), env=%s", $label, _args2cmd(@args), \%set_env);
             } else {
-                warn "[DRY RUN] readpipe($cmd)\n";
+                warn "[DRY RUN] readpipe("._args2cmd(@args).")\n";
             }
             if ($opts->{dry_run}) {
                 $exit_code = 0;
@@ -230,16 +233,44 @@ sub _system_or_readpipe_or_run_or_start {
             }
         }
 
+        # we want to avoid the shell, so we don't use the builtin backtick.
+        # instead, we emulate backtick by system + capturing the output
+        if (defined $opts->{shell} && !$opts->{shell}) {
+            $emulate_backtick++;
+            die "Currently cannot backtick() with options shell=0 and capture_merged|tee_*"
+                if $opts->{capture_merged} || $opts->{tee_stdout} || $opts->{tee_stderr} || $opts->{tee_merged};
+            if (!$opts->{capture_stdout}) {
+                $capture_stdout_was_false++;
+                $opts->{capture_stdout} = \$tmp_capture_stdout;
+            }
+        }
+
         my $doit = sub {
-            if ($wa) {
-                $res = [`$cmd`];
+            if ($emulate_backtick) {
+                # we don't want shell so we have to emulate backtick with system
+                # + capture the output ourselves
+                system {$args[0]} @args;
             } else {
-                $res = `$cmd`;
+                my $cmd = _args2cmd(@args);
+                #warn "cmd for backtick: " . $cmd;
+                # use backtick, which uses the shell
+                if ($wa) {
+                    $res = [`$cmd`];
+                } else {
+                    $res = `$cmd`;
+                }
             }
             $exit_code = $?;
             $os_error = $!;
         };
         $code_capture->($doit);
+
+        if ($emulate_backtick) {
+            $res = $capture_stdout_was_false ? $tmp_capture_stdout :
+                ${ $opts->{capture_stdout} };
+            $res = [split /^/m, $res] if $wa;
+            $opts->{capture_stdout} = undef if $capture_stdout_was_false;
+        }
 
         # log output
         if ($opts->{log}) {
@@ -414,7 +445,7 @@ IPC::System::Options - Perl's system() and readpipe/qx replacement, with options
 
 =head1 VERSION
 
-This document describes version 0.333 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2019-11-23.
+This document describes version 0.334 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2020-03-10.
 
 =head1 SYNOPSIS
 
@@ -423,25 +454,30 @@ This document describes version 0.333 of IPC::System::Options (from Perl distrib
  # use exactly like system()
  system(...);
 
- # use exactly like readpipe() (a.k.a. qx a.k.a. `` a.k.a. the backtick operator)
+ # use exactly like readpipe() (a.k.a. qx a.k.a. `` a.k.a. the backtick
+ # operator). if you import readpipe, you'll override the backtick operator with
+ # this module's version (along with your chosen settings).
  my $res = readpipe(...);
  $res = `...`;
 
  # but these functions accept an optional hash first argument to specify options
  system({...}, ...);
- readpipe({...}, ...);
+ $res = readpipe({...}, ...);
 
  # run without shell, even though there is only one argument
  system({shell=>0}, "ls");
- system({shell=>0}, "ls -lR"); # will fail, as there is no 'ls -lR' binary
+ system({shell=>0}, "ls -lR");          # will fail, as there is no 'ls -lR' binary
+ $res = readpipe({shell=>0}, "ls -lR"); # ditto
 
  # force shell, even though there are multiple arguments (arguments will be
- # quoted for you, including proper quoting on Win32).
- system({shell=>1}, "ls", "-laR");
+ # quoted and joined together for you, including proper quoting on Win32).
+ system({shell=>1}, "perl", "-e", "print 123"); # will print 123
+ $res = readpipe({shell=>1}, "perl", "-e", "print 123");
 
  # note that to prevent the quoting mechanism from quoting some special
  # characters (like ">") you can use scalar references, e.g.:
- system({shell=>1}, "ls", "-laR", \">", "/root/ls-laR");
+ system({shell=>1}, "ls", "-laR",  ">", "/root/ls-laR"); # fails, because the arguments are quoted so the command becomes: ls '-laR' '>' '/root/ls-laR'
+ system({shell=>1}, "ls", "-laR", \">", "/root/ls-laR"); # works
 
  # set LC_ALL/LANGUAGE/LANG environment variable
  $res = readpipe({lang=>"de_DE.UTF-8"}, "df");
@@ -748,7 +784,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

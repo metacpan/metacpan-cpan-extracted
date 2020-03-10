@@ -1,9 +1,9 @@
 package Log::ger::Heavy;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-10'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.036'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -60,7 +60,9 @@ our %Default_Hooks = (
                              push @args, $_;
                          }
                      }
-                     no warnings 'redundant';
+                     # redefine is just a dummy category for perls < 5.22 which
+                     # don't have 'redundant' yet
+                     no warnings ($warnings::Bits{'redundant'} ? 'redundant' : 'redefine');
                      sprintf $fmt, @args;
                  };
 
@@ -378,7 +380,7 @@ Log::ger::Heavy - The bulk of the implementation of Log::ger
 
 =head1 VERSION
 
-version 0.033
+version 0.036
 
 =head1 DESCRIPTION
 

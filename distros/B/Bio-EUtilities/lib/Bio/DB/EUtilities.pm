@@ -1,5 +1,5 @@
 package Bio::DB::EUtilities;
-$Bio::DB::EUtilities::VERSION = '1.76';
+$Bio::DB::EUtilities::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -395,7 +395,7 @@ Bio::DB::EUtilities - Webagent which interacts with and retrieves data from NCBI
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

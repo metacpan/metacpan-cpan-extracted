@@ -11,6 +11,12 @@ my $builder = Module::Build::Pluggable->new(
     add_to_cleanup      => [ 'Duadua-*' ],
     script_files        => [ 'script/duadua' ],
     add_to_cleanup      => [ 'Duadua-*' ],
+    meta_add => {
+        no_index => {
+            directory => [ 't', 'xt', 'inc' ],
+            namespace => [ 'Duadua::Parser' ],
+        },
+    },
     meta_merge     => {
       resources => {
         repository  => 'http://github.com/bayashi/Duadua',

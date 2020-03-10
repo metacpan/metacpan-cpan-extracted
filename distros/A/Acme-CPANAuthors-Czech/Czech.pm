@@ -4,7 +4,7 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 # Modules.
 use Acme::CPANAuthors::Register(
@@ -33,6 +33,7 @@ use Acme::CPANAuthors::Register(
 	'PSME' => 'Petr Šmejkal',
 	'RUR' => 'Rudolf Rosa',
 	'RVASICEK' => 'Roman Vašíček',
+	'SARFY' => 'Martin Šárfy',
 	'SEIDLJAN' => 'Jan Seidl',
 	'SKIM' => 'Michal Josef Špaček',
 	'SMRZ' => 'Otakar Smrž',
@@ -93,7 +94,7 @@ See documentation for L<Acme::CPANAuthors> for more details.
  print "Count of Czech CPAN authors: $count\n";
 
  # Output:
- # Count of Czech CPAN authors: 38
+ # Count of Czech CPAN authors: 39
 
 =head1 EXAMPLE2
 
@@ -139,19 +140,20 @@ See documentation for L<Acme::CPANAuthors> for more details.
  #     [22] "PSME",
  #     [23] "RUR",
  #     [24] "RVASICEK",
- #     [25] "SEIDLJAN",
- #     [26] "SKIM",
- #     [27] "SMRZ",
- #     [28] "STRAKA",
- #     [29] "TKR",
- #     [30] "TRIPIE",
- #     [31] "TYNOVSKY",
- #     [32] "VARISD",
- #     [33] "VASEKD",
- #     [34] "YENYA",
- #     [35] "ZABA",
- #     [36] "ZEMAN",
- #     [37] "ZOUL"
+ #     [25] "SARFY",
+ #     [26] "SEIDLJAN",
+ #     [27] "SKIM",
+ #     [28] "SMRZ",
+ #     [29] "STRAKA",
+ #     [30] "TKR",
+ #     [31] "TRIPIE",
+ #     [32] "TYNOVSKY",
+ #     [33] "VARISD",
+ #     [34] "VASEKD",
+ #     [35] "YENYA",
+ #     [36] "ZABA",
+ #     [37] "ZEMAN",
+ #     [38] "ZOUL"
  # ]
 
 =head1 DEPENDENCIES
@@ -176,6 +178,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut

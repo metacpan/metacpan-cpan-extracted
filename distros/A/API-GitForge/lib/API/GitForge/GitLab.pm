@@ -15,7 +15,7 @@ package API::GitForge::GitLab;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$API::GitForge::GitLab::VERSION = '0.001';
+$API::GitForge::GitLab::VERSION = '0.003';
 
 use 5.028;
 use strict;
@@ -64,12 +64,11 @@ sub _ensure_fork {
 
 sub _assert_fork_has_parent {
     my ($self, $upstream) = @_;
-    my (undef, $repo)     = _extract_project_id($upstream);
+    my ($path, $repo)     = _extract_project_id($upstream);
     my $user = $self->{_api}->current_user->{username};
     my $fork = $self->{_api}->project("$user/$repo");
 
-    $upstream =~ s/\.git$//;
-    $fork->{forked_from_project}{path_with_namespace} eq $upstream
+    $fork->{forked_from_project}{path_with_namespace} eq $path . "/" . $repo
       or croak
       "$user/$repo does not have parent $upstream; don't know what to do";
 }
@@ -95,15 +94,24 @@ sub _clean_config_fork {
     $self->{_api}->edit_project(
         "$user/$repo",
         {
-            default_branch => "gitforge",
-            description    => "Temporary fork for merge request(s)",
+            default_branch      => "gitforge",
+            description         => "Temporary fork for merge request(s)",
+            issues_access_level => "disabled",
+            # merge requests have to be enabled in the fork in order
+            # to submit merge requests to the upstream repo from which
+            # we forked, it seems
+            merge_requests_access_level => "enabled",
         });
-
-    $self->_clean_config_repo("$user/$repo");
 }
 
 sub _ensure_repo {
-    die "unimplemented";
+    my ($self, $target) = @_;
+    my ($ns,   $repo)   = _extract_project_id($target);
+    return if $self->{_api}->project($target);
+    my $namespace = $self->{_api}->namespace($ns)
+      or croak "invalid project namespace $ns";
+    $self->{_api}
+      ->create_project({ name => $repo, namespace_id => $namespace->{id} });
 }
 
 sub _nuke_fork {
@@ -112,6 +120,14 @@ sub _nuke_fork {
     my (undef, $repo) = _extract_project_id($upstream);
     my $user = $self->{_api}->current_user->{username};
     $self->{_api}->delete_project("$user/$repo");
+}
+
+sub _ensure_fork_branch_unprotected {
+    my ($self, $upstream, $branch) = @_;
+    my (undef, $repo) = _extract_project_id($upstream);
+    my $user = $self->{_api}->current_user->{username};
+    return unless $self->{_api}->protected_branch("$user/$repo", $branch);
+    $self->{_api}->unprotect_branch("$user/$repo", $branch);
 }
 
 sub _extract_project_id {
@@ -135,7 +151,7 @@ API::GitForge::GitLab - common git forge operations using the GitLab API
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 DESCRIPTION
 

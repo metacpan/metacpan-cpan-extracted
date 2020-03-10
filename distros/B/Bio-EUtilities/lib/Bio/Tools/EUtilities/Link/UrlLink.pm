@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::Link::UrlLink;
-$Bio::Tools::EUtilities::Link::UrlLink::VERSION = '1.76';
+$Bio::Tools::EUtilities::Link::UrlLink::VERSION = '1.77';
 use utf8;
 use base qw(Bio::Root::Root Bio::Tools::EUtilities::EUtilDataI);
 
@@ -106,7 +106,7 @@ Bio::Tools::EUtilities::Link::UrlLink - Class for EUtils UrlLinks.
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

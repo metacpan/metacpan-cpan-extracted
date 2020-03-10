@@ -73,7 +73,7 @@ bp_einfo - Query einfo to find all available databases or information about a sp
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

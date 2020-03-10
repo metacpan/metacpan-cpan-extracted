@@ -1,3 +1,10 @@
+0.334   2020-03-10  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] readpipe() didn't respect shell=0 option. Since Perl's
+          backtick always uses shell, when user wants shell=0, we need to avoid
+          using backtick and emulate it with system() + capture_output instead.
+
+
 0.333   2019-11-23  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

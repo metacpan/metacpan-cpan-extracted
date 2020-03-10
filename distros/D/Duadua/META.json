@@ -13,6 +13,16 @@
       "version" : 2
    },
    "name" : "Duadua",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc"
+      ],
+      "namespace" : [
+         "Duadua::Parser"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -50,7 +60,7 @@
    "provides" : {
       "Duadua" : {
          "file" : "lib/Duadua.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "Duadua::CLI" : {
          "file" : "lib/Duadua/CLI.pm"
@@ -115,6 +125,9 @@
       "Duadua::Parser::Bot::HatenaBot" : {
          "file" : "lib/Duadua/Parser/Bot/HatenaBot.pm"
       },
+      "Duadua::Parser::Bot::Huawei" : {
+         "file" : "lib/Duadua/Parser/Bot/Huawei.pm"
+      },
       "Duadua::Parser::Bot::Inoreader" : {
          "file" : "lib/Duadua/Parser/Bot/Inoreader.pm"
       },
@@ -132,6 +145,9 @@
       },
       "Duadua::Parser::Bot::SMTBot" : {
          "file" : "lib/Duadua/Parser/Bot/SMTBot.pm"
+      },
+      "Duadua::Parser::Bot::Sakura" : {
+         "file" : "lib/Duadua/Parser/Bot/Sakura.pm"
       },
       "Duadua::Parser::Bot::Slackbot" : {
          "file" : "lib/Duadua/Parser/Bot/Slackbot.pm"
@@ -181,6 +197,9 @@
       "Duadua::Parser::Browser::Vivaldi" : {
          "file" : "lib/Duadua/Parser/Browser/Vivaldi.pm"
       },
+      "Duadua::Parser::Browser::Xiaomi" : {
+         "file" : "lib/Duadua/Parser/Browser/Xiaomi.pm"
+      },
       "Duadua::Parser::Browser::Yandex" : {
          "file" : "lib/Duadua/Parser/Browser/Yandex.pm"
       },
@@ -206,6 +225,6 @@
          "url" : "http://github.com/bayashi/Duadua"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

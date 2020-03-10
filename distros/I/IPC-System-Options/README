@@ -3,8 +3,8 @@ NAME
     options
 
 VERSION
-    This document describes version 0.333 of IPC::System::Options (from Perl
-    distribution IPC-System-Options), released on 2019-11-23.
+    This document describes version 0.334 of IPC::System::Options (from Perl
+    distribution IPC-System-Options), released on 2020-03-10.
 
 SYNOPSIS
      use IPC::System::Options qw(system readpipe run start);
@@ -12,25 +12,30 @@ SYNOPSIS
      # use exactly like system()
      system(...);
 
-     # use exactly like readpipe() (a.k.a. qx a.k.a. `` a.k.a. the backtick operator)
+     # use exactly like readpipe() (a.k.a. qx a.k.a. `` a.k.a. the backtick
+     # operator). if you import readpipe, you'll override the backtick operator with
+     # this module's version (along with your chosen settings).
      my $res = readpipe(...);
      $res = `...`;
 
      # but these functions accept an optional hash first argument to specify options
      system({...}, ...);
-     readpipe({...}, ...);
+     $res = readpipe({...}, ...);
 
      # run without shell, even though there is only one argument
      system({shell=>0}, "ls");
-     system({shell=>0}, "ls -lR"); # will fail, as there is no 'ls -lR' binary
+     system({shell=>0}, "ls -lR");          # will fail, as there is no 'ls -lR' binary
+     $res = readpipe({shell=>0}, "ls -lR"); # ditto
 
      # force shell, even though there are multiple arguments (arguments will be
-     # quoted for you, including proper quoting on Win32).
-     system({shell=>1}, "ls", "-laR");
+     # quoted and joined together for you, including proper quoting on Win32).
+     system({shell=>1}, "perl", "-e", "print 123"); # will print 123
+     $res = readpipe({shell=>1}, "perl", "-e", "print 123");
 
      # note that to prevent the quoting mechanism from quoting some special
      # characters (like ">") you can use scalar references, e.g.:
-     system({shell=>1}, "ls", "-laR", \">", "/root/ls-laR");
+     system({shell=>1}, "ls", "-laR",  ">", "/root/ls-laR"); # fails, because the arguments are quoted so the command becomes: ls '-laR' '>' '/root/ls-laR'
+     system({shell=>1}, "ls", "-laR", \">", "/root/ls-laR"); # works
 
      # set LC_ALL/LANGUAGE/LANG environment variable
      $res = readpipe({lang=>"de_DE.UTF-8"}, "df");
@@ -320,7 +325,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

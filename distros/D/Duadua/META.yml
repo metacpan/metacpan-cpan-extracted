@@ -21,10 +21,17 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Duadua
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+  namespace:
+    - Duadua::Parser
 provides:
   Duadua:
     file: lib/Duadua.pm
-    version: '0.12'
+    version: '0.13'
   Duadua::CLI:
     file: lib/Duadua/CLI.pm
   Duadua::Parser:
@@ -67,6 +74,8 @@ provides:
     file: lib/Duadua/Parser/Bot/GooglebotMobile.pm
   Duadua::Parser::Bot::HatenaBot:
     file: lib/Duadua/Parser/Bot/HatenaBot.pm
+  Duadua::Parser::Bot::Huawei:
+    file: lib/Duadua/Parser/Bot/Huawei.pm
   Duadua::Parser::Bot::Inoreader:
     file: lib/Duadua/Parser/Bot/Inoreader.pm
   Duadua::Parser::Bot::MailRUBot:
@@ -79,6 +88,8 @@ provides:
     file: lib/Duadua/Parser/Bot/OracleGrapeshotCrawler.pm
   Duadua::Parser::Bot::SMTBot:
     file: lib/Duadua/Parser/Bot/SMTBot.pm
+  Duadua::Parser::Bot::Sakura:
+    file: lib/Duadua/Parser/Bot/Sakura.pm
   Duadua::Parser::Bot::Slackbot:
     file: lib/Duadua/Parser/Bot/Slackbot.pm
   Duadua::Parser::Bot::Twitterbot:
@@ -111,6 +122,8 @@ provides:
     file: lib/Duadua/Parser/Browser/UCBrowser.pm
   Duadua::Parser::Browser::Vivaldi:
     file: lib/Duadua/Parser/Browser/Vivaldi.pm
+  Duadua::Parser::Browser::Xiaomi:
+    file: lib/Duadua/Parser/Browser/Xiaomi.pm
   Duadua::Parser::Browser::Yandex:
     file: lib/Duadua/Parser/Browser/Yandex.pm
   Duadua::Parser::FeaturePhone::FeaturePhone:
@@ -130,5 +143,5 @@ resources:
   bugtracker: http://github.com/bayashi/Duadua/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/bayashi/Duadua
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

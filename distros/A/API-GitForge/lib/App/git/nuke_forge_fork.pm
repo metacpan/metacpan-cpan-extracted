@@ -15,7 +15,7 @@ package App::git::nuke_forge_fork;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$App::git::nuke_forge_fork::VERSION = '0.001';
+$App::git::nuke_forge_fork::VERSION = '0.003';
 use 5.028;
 use strict;
 use warnings;
@@ -84,7 +84,7 @@ App::git::nuke_forge_fork - delete forks created by git-clean-forge-fork(1)
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 FUNCTIONS
 

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212303;
+our $VERSION = 1.20200309202349;
 
 my $formatters = [
                 {
@@ -71,18 +71,15 @@ my $validators = {
           )\\d{3}
         ',
                 'mobile' => '
+          6(?:
+            3[02]|
+            8[5-9]
+          )\\d{4}|
           (?:
-            6(?:
-              3[02]|
-              85|
-              90
-            )|
-            7(?:
-              [2-46]0|
-              [578]\\d
-            )|
-            8[46-9]\\d
-          )\\d{4}
+            6[09]|
+            7\\d|
+            8[46-9]
+          )\\d{5}
         ',
                 'pager' => '',
                 'personal_number' => '',

@@ -1,5 +1,10 @@
 Changes for CPANPLUS::Shell::Default::Plugins::Prereqs
 
+0.14 - Mon Mar  9 17:10:46 EDT 2020
+    Turns off failing tests
+    These failures are related to the test, not the module.
+    ** I do not use CPANPLUS anymore. Please adopt. **
+
 0.12 - Wed Mar  4 09:18:28 EST 2020
     Fixes bug in tests
     Adds minimum version of perl to the prereqs

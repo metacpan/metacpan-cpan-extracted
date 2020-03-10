@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Data::Dmp" : "0.21",
-            "Data::Sah" : "0.903",
+            "Data::Sah" : "0.907",
             "Exporter" : "5.57",
             "perl" : "5.010001",
             "strict" : "0",
@@ -64,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-ValidateArgs"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -220,7 +220,7 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
@@ -389,7 +389,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.07"
+                        "version" : "0.081"
                      }
                   ]
                }

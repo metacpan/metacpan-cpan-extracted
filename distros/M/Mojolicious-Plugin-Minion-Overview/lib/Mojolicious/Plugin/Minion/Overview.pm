@@ -7,7 +7,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Date;
 use Mojo::File 'path';
 
-our $VERSION = '0.0.8';
+our $VERSION = '0.1.1';
 
 
 =head2 register
@@ -59,6 +59,11 @@ sub register {
 
     # Templates
     push @{$app->renderer->paths}, $resources->child('templates')->to_string;
+
+    # Set date
+    $prefix->get('/date/:date')
+        ->to(controller => 'Overview', action => 'setDate')
+        ->name('minion_overview.overview.set_date');
 
     # Dashboard
     $prefix->get('/')

@@ -9,6 +9,9 @@
 </div>
 
 % content_for javascript => begin
+    %= javascript '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js'
+    %= javascript '//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js'
+    
     %= javascript begin
     jQuery(document).ready(function($) {
         setInterval(function() {

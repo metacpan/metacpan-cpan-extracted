@@ -1,5 +1,9 @@
 Summary of Changes to Tcl::pTk
 
+Release 1.06:  2020-03-10
+
+ * Mark wmStackorder.t as TODO due to unresolved failures (RT #132100)
+
 Release 1.05:  2020-03-09
 
  * Support $toplevel->stackorder method (as used with Perl/Tk)

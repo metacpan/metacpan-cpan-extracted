@@ -30,5 +30,7 @@ on test => sub {
   requires 'Import::Into' => '1.002003';
   requires 'Test::Deep';
   requires 'Test::Lib';
+  requires 'Test::Spec';
+  requires 'Test::Spec::Mocks';
 };
 

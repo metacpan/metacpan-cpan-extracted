@@ -1,6 +1,6 @@
 use strict;                     # redundant, but quiets perlcritic
 package MooX::StrictConstructor;
-$MooX::StrictConstructor::VERSION = '0.010';
+$MooX::StrictConstructor::VERSION = '0.011';
 # ABSTRACT: Make your Moo-based object constructors blow up on unknown attributes.
 
 
@@ -53,7 +53,7 @@ MooX::StrictConstructor - Make your Moo-based object constructors blow up on unk
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -75,6 +75,12 @@ version 0.010
 Simply loading this module makes your constructors "strict". If your
 constructor is called with an attribute init argument that your class does not
 declare, then it dies. This is a great way to catch small typos.
+
+Your application can use L<Carp::Always> to generate stack traces on C<die>.
+Previously all exceptions contained traces, but this could potentially leak
+sensitive information, e.g.
+
+    My::Sensitive::Class->new( password => $sensitive, extra_value => 'foo' );
 
 =head2 STANDING ON THE SHOULDERS OF ...
 
@@ -151,7 +157,7 @@ George Hartzell <hartzell@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by George Hartzell.
+This software is copyright (c) 2020 by George Hartzell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,14 +1,21 @@
-0.003   2018-02-05 (PERLANCAR)
+0.004   2020-03-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Use Log::ger::Util::set_level and be more flexible (pass any
+	  value from LOG_LEVEL to set_level() instead of only accepting
+	  predefined values).
+
+
+0.003   2018-02-05  Released-By: PERLANCAR
 
 	- Update to Log::ger 0.023 (changed numeric levels).
 
 
-0.002    2017-08-03 (PERLANCAR)
+0.002    2017-08-03  Released-By: PERLANCAR
 
          - Rename dist/module from Log-ger-LevelFromEnv to
            Log-ger-Level-FromEnv.
 
 
-0.001    2017-06-19 (PERLANCAR)
+0.001    2017-06-19  Released-By: PERLANCAR
 
          - First release.

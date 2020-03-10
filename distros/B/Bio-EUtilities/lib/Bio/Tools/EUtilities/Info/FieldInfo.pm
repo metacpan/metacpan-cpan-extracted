@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities::Info::FieldInfo;
-$Bio::Tools::EUtilities::Info::FieldInfo::VERSION = '1.76';
+$Bio::Tools::EUtilities::Info::FieldInfo::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -106,7 +106,7 @@ Bio::Tools::EUtilities::Info::FieldInfo - Class for storing einfo field data.
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,50 @@
-@  changeset:   103:fe24c816fd92
+@  changeset:   112:69a8c1cc562f
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Tue Mar 10 14:36:34 2020 +0100
+|  summary:     Split documentation and UpgradeGuide, because the upgrade guide gets longer and longer and longer and longer and longer....
+|
+o  changeset:   111:79752633b55f
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Tue Mar 10 14:15:50 2020 +0100
+|  summary:     Final update of docs before release
+|
+o  changeset:   110:2afdec6ea408
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Tue Mar 10 14:08:58 2020 +0100
+|  summary:     Bump version to 11
+|
+o  changeset:   109:a415968e12b2
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Tue Mar 10 14:08:34 2020 +0100
+|  summary:     Clean disconnect in cliewnt examples
+|
+o  changeset:   108:36b83cd2e90e
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Tue Mar 10 14:05:00 2020 +0100
+|  summary:     Update copyright
+|
+o  changeset:   107:f382a3e57f28
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Tue Mar 10 14:03:21 2020 +0100
+|  summary:     Major bugfix should prevent hangs when Net::Clacks::Client is DESTROYed
+|
+o  changeset:   106:520fa6712c8c
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Wed Nov 13 17:38:05 2019 +0100
+|  summary:     Fewer useless messages when killing the process
+|
+o  changeset:   105:44d3a5694fe7
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Wed Nov 13 16:27:24 2019 +0100
+|  summary:     Fix some unicode stuff (preventive merge from pagecamel_framework, not actual bug)
+|
+o  changeset:   104:a05465f70905
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Nov 13 15:01:17 2019 +0100
+|  summary:     Update Changes file in preparation for release
+|
+o  changeset:   103:fe24c816fd92
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Nov 13 15:00:25 2019 +0100
 |  summary:     Bump version number to 10

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212301;
+our $VERSION = 1.20200309202346;
 
 my $formatters = [
                 {
@@ -39,25 +39,31 @@ my $formatters = [
 
 my $validators = {
                 'fixed_line' => '
-          30(?:
-            24|
-            3[12]|
-            4[1-35-7]|
-            5[13]|
-            6[189]|
-            [78]1|
-            9[1478]
+          3(?:
+            0(?:
+              24|
+              3[12]|
+              4[1-35-7]|
+              5[13]|
+              6[189]|
+              [78]1|
+              9[1478]
+            )|
+            1\\d\\d
           )\\d{4}
         ',
                 'geographic' => '
-          30(?:
-            24|
-            3[12]|
-            4[1-35-7]|
-            5[13]|
-            6[189]|
-            [78]1|
-            9[1478]
+          3(?:
+            0(?:
+              24|
+              3[12]|
+              4[1-35-7]|
+              5[13]|
+              6[189]|
+              [78]1|
+              9[1478]
+            )|
+            1\\d\\d
           )\\d{4}
         ',
                 'mobile' => '6[02356]\\d{7}',
@@ -72,7 +78,7 @@ $areanames{en}->{224302} = "Fria";
 $areanames{en}->{2243031} = "Boké";
 $areanames{en}->{2243032} = "Kamsar";
 $areanames{en}->{2243041} = "Conakry";
-$areanames{en}->{2243042} = "Conakry";
+$areanames{en}->{2243042} = "Sangoya";
 $areanames{en}->{2243043} = "Conakry";
 $areanames{en}->{2243045} = "Conakry";
 $areanames{en}->{2243046} = "Boussoura";

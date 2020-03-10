@@ -10,7 +10,7 @@ use CPANPLUS::Internals::Constants;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 sub plugins {
     return ( prereqs => 'install_prereqs', );
@@ -132,7 +132,7 @@ CPANPLUS::Shell::Default::Plugins::Prereqs - Plugin for CPANPLUS to automate the
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 

@@ -45,7 +45,7 @@ my %tweet_data = (
 		in_reply_to_status_id => undef,
 		in_reply_to_user_id => undef,
 		media => [{id => '657618738447958017', media_url => 'https://pbs.twimg.com/media/CSBUwibUwAEg0fF.jpg', type => 'photo'}],
-		retweets => 35897,
+		retweets => 30000,
 		text => q{RT @StationCDRKelly: Hurricane #Patricia looks menacing from @space_station. Stay safe below, #Mexico. #YearInSpace https://t.co/6LP2xCYcGD},
 		user_id => '1451773004',
 	},

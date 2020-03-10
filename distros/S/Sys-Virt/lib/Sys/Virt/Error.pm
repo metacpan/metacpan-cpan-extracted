@@ -864,6 +864,10 @@ Invalid network port object
 
 Network port already exists
 
+=item Sys::Virt::Error::ERR_NO_HOSTNAME
+
+No domain hostname found
+
 =back
 
 =head1 AUTHORS

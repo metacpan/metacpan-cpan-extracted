@@ -1,0 +1,44 @@
+NAME
+    Log::ger::Screen - Convenient packaging of Log::ger +
+    Log::ger::Output::Screen + Log::ger::Level::FromEnv for one-liner
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+    Mostly in one-liners:
+
+     % perl -MLog::ger::Screen -E'log_warn "blah..."; ...'
+
+    Set level from environment variable (see Log::ger::Level::FromEnv for
+    more details:
+
+     % TRACE=1 perl ...
+
+DESCRIPTION
+    This is just a convenient packaging of:
+
+     use Log::ger::Level::FromEnv;
+     use Log::ger::Output 'Screen';
+     use Log::ger; # in the caller's package
+
+    mostly for one-liner usage.
+
+SEE ALSO
+    Log::ger::App
+
+    Log::ger
+
+    Log::ger::Level::FromEnv
+
+    Log::ger::Output::Screen
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

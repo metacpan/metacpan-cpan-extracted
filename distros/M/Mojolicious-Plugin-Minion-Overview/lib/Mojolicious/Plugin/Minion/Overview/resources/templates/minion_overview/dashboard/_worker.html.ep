@@ -1,0 +1,115 @@
+<div class="card mt-3">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h6><%= $worker->{ host } %></h6>
+    </div>
+    <div class="card-bg-secondary">
+        <div class="row">
+            <div class="col-12">
+                <canvas id="worker_<%= $worker->{ id } %>"></canvas>
+            </div>
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr>
+                                <th>Jobs</th>
+                                <td>
+                                    <a href="<%= url_for('minion_overview.jobs', )->query(worker => $worker->{ id }) %>">
+                                        <%= $worker->{ jobs_stats }->{ performed } %> performed
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="<%= url_for('minion_overview.jobs', )->query(worker => $worker->{ id }, state => 'finished') %>">
+                                        <%= $worker->{ jobs_stats }->{ finished } %> finished
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="<%= url_for('minion_overview.jobs', )->query(worker => $worker->{ id }, state => 'active') %>">
+                                        <%= $worker->{ jobs_stats }->{ active } %> active
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="<%= url_for('minion_overview.failed_jobs', )->query(worker => $worker->{ id }) %>">
+                                        <%= $worker->{ jobs_stats }->{ failed } %> failed
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Command Interval</th>
+                                <td colspan="4"><%= $worker->{ status }->{ command_interval } %></td>
+                            </tr>
+                            <tr>
+                                <th>Max jobs</th>
+                                <td colspan="4"><%= $worker->{ status }->{ jobs } %></td>
+                            </tr>
+                            <tr>
+                                <th>Started</th>
+                                <td colspan="4"><%= $worker->{ started } %></td>
+                            </tr>
+                            <tr>
+                                <th>Notified</th>
+                                <td colspan="4"><%= $worker->{ notified } %></td>
+                            </tr>
+                            <tr>
+                                <th>Queues</th>
+                                <td colspan="4"><%= join(', ', @{ $worker->{ status }->{ queues } }) %></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+% content_for javascript => begin
+    %= javascript begin
+    jQuery(document).ready(function($) {
+        var config = {
+            type: 'bar',
+            data: {
+                labels: ['Jobs'],
+                datasets: [{
+                    label: 'Performed',
+                    backgroundColor: 'rgb(54, 162, 235)',
+                    borderColor: 'rgb(13, 83, 131)',
+                    borderWidth: 1,
+                    data: [
+                        <%= $worker->{ jobs_stats }->{ performed } %>
+                    ]
+                }, {
+                    label: 'Finished',
+                    backgroundColor: 'rgb(75, 192, 192)',
+                    borderColor: 'rgb(34, 98, 98)',
+                    borderWidth: 1,
+                    data: [
+                        <%= $worker->{ jobs_stats }->{ finished } %>
+                    ]
+                }, {
+                    label: 'Active',
+                    backgroundColor: 'rgb(255, 205, 86)',
+                    borderColor: 'rgb(238, 168, 0)',
+                    borderWidth: 1,
+                    data: [
+                        <%= $worker->{ jobs_stats }->{ active } %>
+                    ]
+                }, {
+                    label: 'Failed',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(177, 0, 37)',
+                    borderWidth: 1,
+                    data: [
+                        <%= $worker->{ jobs_stats }->{ failed } %>
+                    ]
+                }],
+                options: {
+                    responsive: true
+                }
+            }
+        };
+
+        var container = document.getElementById('worker_<%= $worker->{ id } %>').getContext('2d');
+        var chart = new Chart(container, config);
+    });
+    % end
+% end

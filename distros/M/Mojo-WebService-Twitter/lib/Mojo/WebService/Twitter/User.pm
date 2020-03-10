@@ -5,7 +5,7 @@ use Mojo::WebService::Twitter::Tweet;
 use Mojo::WebService::Twitter::Util 'parse_twitter_timestamp';
 use Scalar::Util 'weaken';
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 has [qw(source created_at description followers friends id last_tweet name
 	protected screen_name statuses time_zone url utc_offset verified)];

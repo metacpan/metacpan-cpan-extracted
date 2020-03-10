@@ -1,5 +1,5 @@
 package Bio::Tools::EUtilities;
-$Bio::Tools::EUtilities::VERSION = '1.76';
+$Bio::Tools::EUtilities::VERSION = '1.77';
 use utf8;
 use strict;
 use warnings;
@@ -149,7 +149,7 @@ sub parse_data {
     if (defined $simple->{ERROR} && ! ref($simple->{ERROR})) {
         ## Some errors may not be fatal but there doesn't seem to be a
         ## way for us to know.  So we warn.
-        self->warn("NCBI $eutil error: " . $simple->{ERROR});
+        $self->warn("NCBI $eutil error: " . $simple->{ERROR});
     }
 
 
@@ -795,7 +795,7 @@ Bio::Tools::EUtilities - NCBI eutil XML parsers.
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 

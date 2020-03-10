@@ -30,7 +30,6 @@ DESCRIPTION
      filename = CONTRIBUTING.md
      content = ...
      
-     [MetaConfig]
      [MetaProvides::Package]
      [Prereqs::FromCPANfile]
      [Git::Contributors]

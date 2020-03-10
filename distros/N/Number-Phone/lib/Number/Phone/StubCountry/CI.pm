@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212259;
+our $VERSION = 1.20200309202344;
 
 my $formatters = [
                 {
@@ -68,7 +68,10 @@ my $validators = {
           )\\d{5}
         ',
                 'mobile' => '
-          97[0-3]\\d{5}|
+          (?:
+            2[0-3]80|
+            97[0-3]\\d
+          )\\d{4}|
           (?:
             0[1-9]|
             [457]\\d|
@@ -84,10 +87,20 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{fr}->{22520} = "Plateau\,\ Abidjan";
-$areanames{fr}->{22521} = "Abidjan\ \(southeast\)";
-$areanames{fr}->{22522} = "Cocody\,\ Abidjan";
-$areanames{fr}->{22523} = "Banco\,\ Abidjan";
+$areanames{fr}->{225200} = "Plateau\,\ Abidjan";
+$areanames{fr}->{225202} = "Plateau\,\ Abidjan";
+$areanames{fr}->{225203} = "Plateau\,\ Abidjan";
+$areanames{fr}->{225210} = "Abidjan\ \(southeast\)";
+$areanames{fr}->{225212} = "Abidjan\ \(southeast\)";
+$areanames{fr}->{225213} = "Abidjan\ \(southeast\)";
+$areanames{fr}->{225215} = "Abidjan\ \(southeast\)";
+$areanames{fr}->{225217} = "Abidjan\ \(southeast\)";
+$areanames{fr}->{225220} = "Cocody\,\ Abidjan";
+$areanames{fr}->{225224} = "Cocody\,\ Abidjan";
+$areanames{fr}->{225225} = "Cocody\,\ Abidjan";
+$areanames{fr}->{225230} = "Banco\,\ Abidjan";
+$areanames{fr}->{225234} = "Banco\,\ Abidjan";
+$areanames{fr}->{225235} = "Banco\,\ Abidjan";
 $areanames{fr}->{22524} = "Abobo\,\ Abidjan";
 $areanames{fr}->{22530} = "Yamoussoukro";
 $areanames{fr}->{22531} = "Bouaké";
@@ -96,10 +109,20 @@ $areanames{fr}->{22533} = "Man";
 $areanames{fr}->{22534} = "San\-Pédro";
 $areanames{fr}->{22535} = "Abengourou";
 $areanames{fr}->{22536} = "Korhogo";
-$areanames{en}->{22520} = "Plateau\,\ Abidjan";
-$areanames{en}->{22521} = "Abidjan\ \(southeast\)";
-$areanames{en}->{22522} = "Cocody\,\ Abidjan";
-$areanames{en}->{22523} = "Banco\,\ Abidjan";
+$areanames{en}->{225200} = "Plateau\,\ Abidjan";
+$areanames{en}->{225202} = "Plateau\,\ Abidjan";
+$areanames{en}->{225203} = "Plateau\,\ Abidjan";
+$areanames{en}->{225210} = "Abidjan\ \(southeast\)";
+$areanames{en}->{225212} = "Abidjan\ \(southeast\)";
+$areanames{en}->{225213} = "Abidjan\ \(southeast\)";
+$areanames{en}->{225215} = "Abidjan\ \(southeast\)";
+$areanames{en}->{225217} = "Abidjan\ \(southeast\)";
+$areanames{en}->{225220} = "Cocody\,\ Abidjan";
+$areanames{en}->{225224} = "Cocody\,\ Abidjan";
+$areanames{en}->{225225} = "Cocody\,\ Abidjan";
+$areanames{en}->{225230} = "Banco\,\ Abidjan";
+$areanames{en}->{225234} = "Banco\,\ Abidjan";
+$areanames{en}->{225235} = "Banco\,\ Abidjan";
 $areanames{en}->{22524} = "Abobo\,\ Abidjan";
 $areanames{en}->{22530} = "Yamoussoukro";
 $areanames{en}->{22531} = "Bouaké";

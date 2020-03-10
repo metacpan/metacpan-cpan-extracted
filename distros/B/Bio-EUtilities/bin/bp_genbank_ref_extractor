@@ -39,7 +39,9 @@ my $debug         = 0;
 my $downstream    = 0;
 
 my $email = "";
+
 my $api_key = "";
+
 my $format        = 'genbank';
 
 my $genes         = '';
@@ -111,7 +113,10 @@ GetOptions(
             'debug'               => \$debug,
             'down|downstream=i'   => \$downstream,
             'email=s'             => \$email,
-            'api_key=s'           => \$api_key,
+            ## The 'api_key' is undocumented and only kept for
+            ## backwards compatibility (it was only during version
+            ## 1.76).
+            'api-key|api_key=s'   => \$api_key,
             'format=s'            => \$format,
             'genes:s'             => \&genes_option_parsing,
             'limit=i'             => \$limit,
@@ -135,6 +140,7 @@ GetOptions(
 my $verbosity;
 if ($debug) {
   $verbosity = 9;
+  $Bio::Root::Root::DEBUG = 1;
 } elsif ($very_verbose) {
   $verbosity = 3;
 } elsif ($verbose) {
@@ -178,6 +184,17 @@ if ($save_data) { save_structure($data); }
 if ($debug) { use Data::Dumper; print Dumper $data; }
 exit;
 
+
+## email and api_key are optional and should removed if empty.  In
+## practice, passing an empty email string works fine but the api_key
+## must be valid.  See Bio-EUtilities issue #14.
+sub entrez_parameters {
+    my @parameters;
+    push @parameters, -email => $email if length $email;
+    push @parameters, -api_key => $api_key if length $api_key;
+    return @parameters;
+}
+
 ################################################################################
 ## genbank search subs
 ################################################################################
@@ -189,8 +206,7 @@ sub gb_search {
                                             -db      => 'gene',
                                             -term    => $_[0],
                                             -retmax  => $limit,
-                                            -api_key => $api_key,
-                                            -email   => $email,
+                                            entrez_parameters(),
                                             );
   log_it (3, "Entrez gene: query $_[0] translated into '" . $searcher->get_query_translation . "'");
   log_it (2, "Entrez gene: found " . $searcher->get_count . " UIDS");
@@ -218,8 +234,7 @@ sub analyze_entrez_genes {
                                           -id      => $uid_ref,
                                           -retmode => 'text',
                                           -rettype => 'asn1',
-                                          -api_key => $api_key,
-                                          -email   => $email,
+                                          entrez_parameters(),
                                          );
   my $response = $fetcher->get_Response->content;
   open(my $seq_fh, "<", \$response) or die "Could not open sequences string for reading: $!";
@@ -484,8 +499,7 @@ sub create_fetcher {
                                           -db       => $searched,
                                           -retmode  => 'text',
                                           -rettype  => $rettype,
-                                          -api_key => $api_key,
-                                          -email    => $email,
+                                          entrez_parameters(),
                                           );
   return $fetcher;
 }
@@ -756,7 +770,7 @@ sub create_csv {
 ## Structure methods
 ################################################################################
 package Structure;
-$Structure::VERSION = '1.76';
+$Structure::VERSION = '1.77';
 ## creates a new instance of the object
 sub new {
   my $class = shift;
@@ -904,7 +918,7 @@ bp_genbank_ref_extractor - Retrieves all related sequences for a list of searche
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 
@@ -952,9 +966,10 @@ A valid email used to connect to the NCBI servers. This may be used by
 NCBI to contact users in case of problems and before blocking access in
 case of heavy usage.
 
-=item B <--api_key>
-NCBI requires an API key for requests over 10/sec as of December 2018. You
-may generate one in the "My NCBI" area
+=item B <--api-key>
+
+NCBI requires an API key for requests over 10/sec as of December
+2018. You may generate one in the "My NCBI" area.
 
 =item B<--format>
 

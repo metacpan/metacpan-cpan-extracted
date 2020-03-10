@@ -1,6 +1,9 @@
 package Tcl::pTk::MainWindow;
 
-our ($VERSION) = ('1.05');
+our ($VERSION) = ('1.06');
+
+use warnings;
+use strict;
 
 use Tcl::pTk::Toplevel;
 

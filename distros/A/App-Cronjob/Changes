@@ -1,5 +1,9 @@
 Revision history for App-Cronjob
 
+1.200008  2020-03-09 15:48:21-04:00 America/New_York
+        - new switch --email-headers to let you put extra headers in any
+          generated email
+
 1.200007  2018-01-29 16:24:36-05:00 America/New_York
         - new switch --timeout lets you set a timeout to kill jobs that take
           too long

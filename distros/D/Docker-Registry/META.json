@@ -4,7 +4,7 @@
       "Jose Luis Mart\u00ednez <joseluis.martinez@capside.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "apache_2_0"
    ],
@@ -63,7 +63,9 @@
             "Test::Exception" : "0",
             "Test::Lib" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0"
+            "Test::Most" : "0",
+            "Test::Spec" : "0",
+            "Test::Spec::Mocks" : "0"
          }
       }
    },
@@ -78,8 +80,15 @@
          "web" : "https://github.com/pplu/docker-registry"
       }
    },
-   "version" : "0.06",
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "version" : "0.07",
+   "x_contributors" : [
+      "Jose Luis Martinez <jlmartinez@capside.com>",
+      "Wesley Schwengle <wesley@schwengle.net>",
+      "Oriol Soriano <oriol.soriano@capside.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Apache-2.0"
 }
 

@@ -1,0 +1,3 @@
+%= content_for 'stylesheet'
+%= content
+%= content_for 'javascript'

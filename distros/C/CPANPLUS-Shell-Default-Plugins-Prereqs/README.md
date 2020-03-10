@@ -4,7 +4,7 @@ CPANPLUS::Shell::Default::Plugins::Prereqs - Plugin for CPANPLUS to automate the
 
 # VERSION
 
-version 0.12
+version 0.14
 
 # SYNOPSIS
 

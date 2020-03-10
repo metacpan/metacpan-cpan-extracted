@@ -10,7 +10,9 @@ Show runtime metrics for a job
 sub runtime {
     my $self = shift;
     
-    my $runtime = $self->app->minion_overview->job_runtime_metrics($self->param('job'));
+    my $runtime = $self->app->minion_overview
+        ->date($self->session('minion_overview_date'))
+        ->job_runtime_metrics($self->param('job'));
 
     my $finished = $runtime->grep(sub { $_->{ state } eq 'finished' });
     my $failed = $runtime->grep(sub { $_->{ state } eq 'failed' });
@@ -30,7 +32,9 @@ Show throughput metrics for a job
 sub throughput {
     my $self = shift;
 
-    my $throughput = $self->app->minion_overview->job_throughput_metrics($self->param('job'));
+    my $throughput = $self->app->minion_overview
+        ->date($self->session('minion_overview_date'))
+        ->job_throughput_metrics($self->param('job'));
 
     my $finished = $throughput->grep(sub { $_->{ state } eq 'finished' });
     my $failed = $throughput->grep(sub { $_->{ state } eq 'failed' });

@@ -22,17 +22,20 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212304;
+our $VERSION = 1.20200309202349;
 
 my $formatters = [
                 {
                   'format' => '$1',
-                  'leading_digits' => '[2-6]',
+                  'leading_digits' => '
+            [2-5]|
+            6[1-9]
+          ',
                   'pattern' => '(\\d{5})'
                 },
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '8',
+                  'leading_digits' => '[68]',
                   'pattern' => '(\\d{3})(\\d{3,7})'
                 },
                 {
@@ -44,20 +47,22 @@ my $formatters = [
 
 my $validators = {
                 'fixed_line' => '
+          6[1-9]\\d{3}|
           (?:
-            [2-5]\\d|
-            6[1-9]
-          )\\d{3}
+            [2-5]|
+            60
+          )\\d{4}
         ',
                 'geographic' => '
+          6[1-9]\\d{3}|
           (?:
-            [2-5]\\d|
-            6[1-9]
-          )\\d{3}
+            [2-5]|
+            60
+          )\\d{4}
         ',
                 'mobile' => '
           (?:
-            7[25-7]|
+            7[235-7]|
             8(?:
               [3-7]|
               9\\d{3}
@@ -70,12 +75,26 @@ my $validators = {
                 'toll_free' => '800\\d{3}',
                 'voip' => ''
               };
+my %areanames = ();
+$areanames{en}->{6852} = "Apia";
+$areanames{en}->{6853} = "Apia";
+$areanames{en}->{6854} = "Upolu\ Rural";
+$areanames{en}->{6855} = "Savaii";
+$areanames{en}->{68561} = "Apia";
+$areanames{en}->{68562} = "Apia";
+$areanames{en}->{68563} = "Apia";
+$areanames{en}->{68564} = "Apia";
+$areanames{en}->{68565} = "Apia";
+$areanames{en}->{68566} = "Apia";
+$areanames{en}->{68567} = "Apia";
+$areanames{en}->{68568} = "Apia";
+$areanames{en}->{68569} = "Apia";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+685|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

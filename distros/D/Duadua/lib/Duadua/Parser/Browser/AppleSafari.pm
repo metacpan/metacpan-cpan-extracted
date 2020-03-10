@@ -7,7 +7,6 @@ sub try {
     my ($class, $d) = @_;
 
     return if index($d->ua, 'http') > -1;
-    return if index($d->ua, ' Mobile/') > -1;
     return if index($d->ua, 'Browser/') > -1;
     return if index($d->ua, 'HatenaBookmark/Android') > -1;
 

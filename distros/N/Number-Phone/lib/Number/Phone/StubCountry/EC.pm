@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212301;
+our $VERSION = 1.20200309202346;
 
 my $formatters = [
                 {
@@ -59,25 +59,36 @@ my $validators = {
           9(?:
             39|
             [57][89]|
-            6[0-37-9]|
+            6[0-36-9]|
             [89]\\d
           )\\d{6}
         ',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '',
-                'toll_free' => '1800\\d{6,7}',
+                'toll_free' => '
+          1800\\d{7}|
+          1[78]00\\d{6}
+        ',
                 'voip' => '[2-7]890\\d{4}'
               };
+my %areanames = ();
+$areanames{en}->{59322} = "Pichincha";
+$areanames{en}->{59323} = "Cotopaxi\/Tungurahua\/Chimborazo\/Bolívar\/Pastaza";
+$areanames{en}->{59326} = "Carchi\/Imbabura\/Esmeraldas\/Sucumbíos\/Napo\/Orellana";
+$areanames{en}->{59327} = "Azuay\/Cañar\/Morona\ Santiago";
+$areanames{en}->{59344} = "Guayas";
+$areanames{en}->{59345} = "Manabí\/Los\ Ríos\/Galápagos";
+$areanames{en}->{59347} = "Loja\/El\ Oro\/Zamora\ Chinchipe";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+593|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

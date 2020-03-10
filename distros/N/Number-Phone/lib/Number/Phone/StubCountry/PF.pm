@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20191211212303;
+our $VERSION = 1.20200309202348;
 
 my $formatters = [
                 {
@@ -40,29 +40,40 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '
           4(?:
-            [09][4-689]\\d|
-            4
-          )\\d{4}
+            0[4-689]|
+            9[4-68]
+          )\\d{5}
         ',
                 'geographic' => '
           4(?:
-            [09][4-689]\\d|
-            4
-          )\\d{4}
+            0[4-689]|
+            9[4-68]
+          )\\d{5}
         ',
                 'mobile' => '8[7-9]\\d{6}',
                 'pager' => '',
                 'personal_number' => '',
-                'specialrate' => '',
+                'specialrate' => '(44\\d{4})',
                 'toll_free' => '',
-                'voip' => ''
+                'voip' => '499\\d{5}'
               };
+my %areanames = ();
+$areanames{en}->{689404} = "Îles\ du\ Vent\(IDV\)";
+$areanames{en}->{689405} = "Îles\ du\ Vent\(IDV\)";
+$areanames{en}->{689406} = "Îles\ Sous\-le\-vent\(ISLV\)";
+$areanames{en}->{689408} = "Îles\ du\ Vent\(IDV\)";
+$areanames{en}->{6894088} = "Polynesia";
+$areanames{en}->{689409} = "Remote\ Archipelago";
+$areanames{en}->{689494} = "Polynesia";
+$areanames{en}->{689495} = "Polynesia";
+$areanames{en}->{689496} = "Polynesia";
+$areanames{en}->{689498} = "Polynesia";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+689|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

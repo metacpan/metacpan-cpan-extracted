@@ -1,3 +1,7 @@
+0.07 2020-03-10
+ - Implement result pagination for all calls (osoriano)
+ - use Test::Lib in tests (waterkip) 
+
 0.06 2018-11-05
  - GCE receives a new attribute "region" to select the region where the registry
    is hosted.
@@ -7,7 +11,7 @@
    to random HTML (so the response processor was not making anything out of these responses)
  - Internal refactor
    - using Moo and Types::Standard instead of Moose
-   - pass the scope to the signnature method in auth modules
+   - pass the scope to the signature method in auth modules
 
 0.05 2018-06-04
  - Require Import::Into 1.002003 to avoid some installation failures on 

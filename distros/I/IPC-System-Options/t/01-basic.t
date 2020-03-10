@@ -8,6 +8,7 @@ use Test::More 0.98;
 use Cwd;
 use File::Temp qw(tempfile tempdir);
 use IPC::System::Options qw(system readpipe run start);
+#use Perl::osnames;
 
 subtest system => sub {
 
@@ -79,6 +80,20 @@ subtest system => sub {
 
 subtest readpipe => sub {
     is(readpipe($^X, "-e", "print 123"), "123");
+
+    subtest "opt:shell" => sub {
+        # XXX only run on shells that support pipe
+
+        my ($fh_script1, $script1) = tempfile();
+        print $fh_script1 "print 123";
+        close $fh_script1;
+        my ($fh_script2, $script2) = tempfile();
+        print $fh_script2 "print <STDIN> * 2";
+        close $fh_script2;
+
+        is(readpipe({shell=>1}, $^X, $script1, \"|", $^X, $script2), 246);
+        is(readpipe({shell=>0}, $^X, $script1, \"|", $^X, $script2), 123);
+    };
 
     # XXX opt:max_log_output
     ok 1;

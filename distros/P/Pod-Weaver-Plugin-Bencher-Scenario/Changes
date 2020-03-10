@@ -1,3 +1,8 @@
+0.246   2019-12-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Include participant's and dataset's description.
+
+
 0.245   2019-12-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Use String::PodQuote to quote summary when added into POD.

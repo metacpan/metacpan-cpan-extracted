@@ -1,5 +1,5 @@
 package Bio::EUtilities;
-$Bio::EUtilities::VERSION = '1.76';
+$Bio::EUtilities::VERSION = '1.77';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Bio::EUtilities - BioPerl low-level API for retrieving and storing data from NCB
 
 =head1 VERSION
 
-version 1.76
+version 1.77
 
 =head1 SYNOPSIS
 
