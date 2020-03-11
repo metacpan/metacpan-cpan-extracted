@@ -52,4 +52,14 @@ use Future::AsyncAwait;
    is( $f->get, "ac", 'parsed unnamed parameter' );
 }
 
+# RT131571
+{
+   ok( defined eval q{
+      use experimental 'signatures';
+      async sub func :method ($self, @args) { }
+      1;
+   }, 'signatures do not leak into attributes (RT131571)' ) or
+      diag( "Error was $@" );
+}
+
 done_testing;

@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Fillable;
 # ABSTRACT: Fillable Moose role for the construction of DomainPlus object arrays and Exploratory methods
-$Bio::Palantir::Roles::Fillable::VERSION = '0.200290';
+$Bio::Palantir::Roles::Fillable::VERSION = '0.200700';
 use Moose::Role;
 
 use autodie;
@@ -430,7 +430,6 @@ sub _get_domain_features {
 
     my %domain_for = %{ $self->_parse_generic_domains($query) };
 
-
     unless (%domain_for) {
         $domain->_set_function('to_remove');
         return;
@@ -445,9 +444,8 @@ sub _get_domain_features {
         my $_set_attr = '_set_' . $feature;
         $domain->$_set_attr( $domain_for{$best_hit}{$feature} );
     }
-   
+
     $self->_use_hit_information($domain, $gene_pos);
-    
     return;
 }
 
@@ -463,8 +461,11 @@ sub _use_hit_information {
     $domain->_set_end($gene_pos + $domain->ali_to);
     
     $domain->_set_phmm_name($domain->target_name);
-    $domain->_set_function($domain->target_name) 
-        unless $domain->function;
+
+
+    if (! $domain->function || $domain->function =~ m/NA/xmsi) {
+        $domain->_set_function($domain->target_name) 
+    }
     
     return;
 }
@@ -546,7 +547,7 @@ Bio::Palantir::Roles::Fillable - Fillable Moose role for the construction of Dom
 
 =head1 VERSION
 
-version 0.200290
+version 0.200700
 
 =head1 SYNOPSIS
 

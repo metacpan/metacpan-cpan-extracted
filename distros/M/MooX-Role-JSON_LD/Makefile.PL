@@ -5,6 +5,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/MooX/Role/JSON_LD.pm',
     MIN_PERL_VERSION  => '5.6.0',
     PREREQ_PM         => {
+        List::Util      => 1.33,
         Moose           => 0,
         Moo             => 0,
         Sub::Quote      => 0, # no longer part of Moo
@@ -22,15 +23,19 @@ WriteMakefile(
     META_MERGE        => {
         'meta-spec' => { version => 2 },
         resources => {
-            repository => {
-                type => 'git',
-                url => 'git://github.com/davorg/moox-role-json_ld.git',
-                web => 'https://github.com/davorg/moox-role-json_ld',
-            },
+                      repository => {
+                           type => 'git',
+                           url => 'git://github.com/davorg/moox-role-json_ld.git',
+                           web => 'https://github.com/davorg/moox-role-json_ld',
+                          },
+                      bugtracker => {
+                                     "web" => "https://github.com/davorg/moox-role-json_ld/issues"
+                                    }
         },
         x_contributors => [
             'Robert Rothenberg <rrwo@cpan.org>',
             'Mohammad S Anwar <mohammad.anwar@yahoo.com>',
+            'Anirvan Chatterjee <anirvan@cpan.org>',
         ],
     },
 );

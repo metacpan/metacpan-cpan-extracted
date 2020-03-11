@@ -77,6 +77,8 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
             return;
         }
 
+        say 'Cluster' . $cluster->rank . ': ' . $cluster->type;
+
         if ($ARGV_verbose) {
 
             if (@clusters == 3) {
@@ -89,7 +91,7 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
 
                 say $annotation;
             }
-            say 'Cluster' . $cluster->rank . ': ' . $cluster->type;
+
         }
 
         my $domains_size;
@@ -203,7 +205,10 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
 
                 my $module_begin = $mgenes[0]->{begin}  + $mdomains[0]->begin;
                 my $module_end   = $mgenes[-1]->{begin} + $mdomains[-1]->end;
-                
+
+                # NB: it's normal there is a difference between modules sizes calculated here and those from $module->coordinates
+                # The modules calculated here are smaller because there are Nts between Palantir genes (from the genome), as gene coordinates are computed differently here, it's not the case.
+
                 push @modules, {
                     name      => 'M' . $module->rank, 
                     begin     => $module_begin, 
@@ -231,8 +236,6 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
     my $right_margin = 50;
     
     my $img = GD::Simple->new($width + $left_margin + $right_margin, $height);
-
-    ### Drawing object: 'Cluster' . $cluster_rank
 
     # draw tickles
     $img->penSize(5,5);
@@ -399,7 +402,7 @@ draw_bgc_maps.pl - This script draws NRPS/PKS BGC clusters maps in PNG
 
 =head1 VERSION
 
-version 0.200290
+version 0.200700
 
 =head1 NAME
 

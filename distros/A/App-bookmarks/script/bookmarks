@@ -3,15 +3,15 @@
 # bookmarks - Export browser bookmarks as plain text.
 #
 # bookmarks is a tool to export bookmarks from files supplied as arguments, or
-# from browsers default locations (without arguments). The following browsers
-# and platform are supported :
+# from browsers default locations (when called without arguments). The following
+# browsers and platform are supported :
 #
 # - Safari (Mac)
 # - Firefox (Mac/Linux/Windows)
 # - Chrome (Mac/Linux/Windows)
 # - Internet Explorer (Windows)
 #
-# Files named *.plist, *.sqlite and *Bookmarks are processed as Safari and Firefox
+# Files named *.plist, *.sqlite and *Bookmarks are processed as Safari, Firefox
 # and Chrome bookmarks, respectively. Directories named *Favorites" are processed
 # as Internet Explorer favorites.
 #
@@ -20,15 +20,17 @@
 # <title> <url> <description>
 #
 # The <description> field is filled with Safari 'Description', Firefox 'Tags' or
-# empty for Internet Explorer.
-
-# TODO :
-# - with firefox open (locked DB), script does not exit but wait (good or bad?)
-# - dirty plist parsing using external tool plutil
-# - export bookmarks from plain text files
-# - export bookmarks from markdown files
-# - exception handling
+# empty for Chrome and Internet Explorer.
 #
+# Implementation Notes :
+#
+# - For Safari, this tool relies on dirty plist parsing using Apple's 'plutil'
+#   command. It should use Mac::PropertyList instead. For performance reasons
+#   when used interactively, I've decided to keep it like that (see README.md).
+#
+# - Since Firefox sets an EXCLUSIVE SQLite lock, a tmp DB file copy is used.
+#
+# 2020.03.10 v0.20 jul : fixed EXCLUSIVE SQLite lock set by Firefox
 # 2019.12.22 v0.19 jul : added chrome support, require, bugfixes
 # 2019.10.22 v0.17 jul : created module
 # 2019.10.17 v0.16 jul : fixed firefox tags
@@ -45,8 +47,10 @@ use warnings;
 use utf8;
 use Getopt::Std;
 use File::Basename;
+use File::Temp qw(tempdir);
+use File::Copy qw(copy);
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 my $program	 = basename($0);
 my $usage    = <<EOF;
 
@@ -177,7 +181,14 @@ sub _firefox {
 
     my $dbfile = shift // "";
     warn "\$dbfile: $dbfile\n" if $debug;
+
+    # fix EXCLUSIVE SQLite lock set by Firefox
+    my $dir = tempdir( CLEANUP => 1 );
+    copy $dbfile, $dir or die "unable to copy file : $dbfile";
     
+    # from now on, we use a tmp db copy
+    $dbfile = "$dir/" . basename($dbfile);
+  
     my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", # DSN: dbi, driver, database file
                            "",                          # no user
                            "",                          # no password
@@ -334,18 +345,11 @@ bookmarks - Export browser bookmarks as plain text.
 =head1 DESCRIPTION
 
 bookmarks is a tool to export bookmarks from files supplied as arguments, or
-from browsers default locations (without arguments). The following browsers
-and platform are supported : Safari (Mac), Firefox (Mac/Linux/Windows) and
-Internet Explorer (Windows). Files with .plist and .sqlite extensions are
-processed as Safari and Firefox bookmarks, respectively, and directories
-named "Favorites" are processed as Internet Explorer favorites.
-
-bookmarks is a tool to export bookmarks from files supplied as arguments, or
-from browsers default locations (without arguments). The following browsers
-and platform are supported : Safari (Mac), Firefox (Mac/Linux/Windows),
+from browsers default locations (when called without arguments). The following
+browsers and platform are supported : Safari (Mac), Firefox (Mac/Linux/Windows),
 Chrome (Mac/Linux/Windows) and Internet Explorer (Windows). Files named *.plist,
-*.sqlite and *Bookmarks are processed as Safari and Firefox and Chrome bookmarks,
-respectively. Directories named *Favorites" are processed as Internet Explorer
+*.sqlite and *Bookmarks are processed as Safari, Firefox and Chrome bookmarks,
+respectively. Directories named *Favorites are processed as Internet Explorer
 favorites.
 
 =head1 BUGS

@@ -34,6 +34,8 @@ use Future::AsyncAwait;
 
 # some custom ones
 {
+   package TestCustomAttrs;
+
    my $modify_invoked;
 
    sub MODIFY_CODE_ATTRIBUTES
@@ -41,13 +43,13 @@ use Future::AsyncAwait;
       my ( $pkg, $sub, $attr ) = @_;
 
       $modify_invoked++;
-      is( $attr, "MyCustomAttribute(value here)", 'MODIFY_CODE_ATTRIBUTES takes attr' );
+      ::is( $attr, "MyCustomAttribute(value here)", 'MODIFY_CODE_ATTRIBUTES takes attr' );
 
       return ();
    }
 
    async sub is_attributed :MyCustomAttribute(value here) { }
-   ok( $modify_invoked, 'MODIFY_CODE_ATTRIBUTES invoked' );
+   ::ok( $modify_invoked, 'MODIFY_CODE_ATTRIBUTES invoked' );
 }
 
 done_testing;

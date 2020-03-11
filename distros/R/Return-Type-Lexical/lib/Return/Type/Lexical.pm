@@ -7,7 +7,7 @@ use strict;
 
 use parent 'Return::Type';
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub import {
     my ($class, %args) = @_;
@@ -19,12 +19,17 @@ sub unimport {
 }
 
 sub _in_effect {
-    my $level = shift // 0;
+    my ($level) = @_;
+    $level = 0 if !defined $level;
     my $hinthash = (caller($level))[10];
     my $in_effect = $hinthash->{'Return::Type::Lexical/in_effect'};
     return !defined $in_effect || $in_effect;
 }
 
+# XXX This is kind of janky. It relies upon Return::Type using Attribute::Handlers, and it assumes
+# some internal Attribute::Handlers behavior. If it proves to be too fragile, we may need to copy
+# the Return::Type code to here. Or make Return::Type lexical if that can be done without breaking
+# backward-compatibility.
 my $handler;
 BEGIN {
     $handler = $UNIVERSAL::{ReturnType};
@@ -52,7 +57,7 @@ Return::Type::Lexical - Same thing as Return::Type, but lexical
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

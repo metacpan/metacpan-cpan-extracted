@@ -26,17 +26,17 @@ no_index:
 provides:
   HTML::HTMLDoc:
     file: lib/HTML/HTMLDoc.pm
-    version: '0.15'
+    version: '0.16'
   HTML::HTMLDoc::PDF:
     file: lib/HTML/HTMLDoc/PDF.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/ericschernoff/HTMLDoc/issues
   homepage: https://github.com/ericschernoff/HTMLDoc
   repository: git://github.com/ericschernoff/HTMLDoc.git
-version: '0.15'
+version: '0.16'
 x_contributors:
   - 'Eric Chernoff <eric@weaverstreet.net>'
   - 'Eric Chernoff <ericschernoff@gmail.com>'

@@ -1,5 +1,14 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.12    2020-03-10
+        [CHANGES]
+         * Minor adjustments to order of operations in method keyword parsing
+           to closer match core's parser
+
+        [BUGFIXES]
+         * Rename t/80dynamically+Object::Pad.t to use a hyphen because colons
+           confuse MSWin32 (RT132087)
+
 0.11    2020-03-07
         [CHANGES]
          * More efficient method enter on perl 5.22 onwards by detecting which

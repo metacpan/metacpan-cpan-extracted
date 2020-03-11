@@ -9,7 +9,7 @@ use HTML::HTMLDoc::PDF;
 use vars qw(@ISA $VERSION);
 
 @ISA = qw();
-$VERSION = '0.15';
+$VERSION = '0.16';
 my $DEBUG = 0;
 
 ###############
@@ -1188,6 +1188,32 @@ sub _run {
 	return($pid,$output,$error);
 }
 
+###############
+# see the 'htmldoc' command which will be issued with their options
+# only works in file mode
+# param: -
+# return: 'htmldoc ...many arguments here...
+###############
+sub get_htmldoc_command {
+	my $self = shift;
+
+	if ($self->_config('mode') eq 'ipc') {
+		$self->error("get_htmldoc_command() only works in file mode.");
+		return 0;
+	} 
+
+	my $filename = $self->_prepare_input_file();
+	if (!$filename) {
+		$self->error("Input filename not set.");
+		return 0;
+	}
+
+	# build and return
+	my $params = $self->_build_parameters();
+
+	return $self->{'config'}->{'bindir'}.'htmldoc '.$params.' --webpage '.$filename.' > '.$filename.'.pdf';
+
+}
 
 ###############
 # set or retrieve an occurred error
@@ -1237,6 +1263,9 @@ HTML::HTMLDoc - Perl interface to the htmldoc program for producing PDF Files fr
   # save to a file
   $pdf->to_file('foo.pdf');
 
+  # see the htmldoc command used to generate a PDF -- after using set_input_file() 
+  # and all other desired configuration methods
+  print $htmldoc->get_htmldoc_command();
 
 =head1 DESCRIPTION
 
@@ -1246,7 +1275,8 @@ maintained and available via the package manager (apt, yum) of the major Linux d
 
 HTML 3.2 is very limited for web interfaces, but it can do a lot when preparing a 
 document for printing.  The complete list of supported HTML tags is listed here:
-L<https://www.msweet.org/htmldoc/htmldoc.html#HTMLREF>
+L<https://www.msweet.org/htmldoc/htmldoc.html#HTMLREF>  There are also several 
+HTMLDOC-specific comment options detailed here: L<https://www.msweet.org/htmldoc/htmldoc.html#COMMENTS>
 
 The HTMLDOC home page at L<https://www.msweet.org/htmldoc> and includes complete
 documentation for the program and a link to the GitHub repo.
@@ -1257,7 +1287,11 @@ recommended to experiment with the 'htmldoc' command prior to utilizing this mod
 All the config-setting modules return true for success or false for failure. You can 
 test if errors occurred by calling the error-method.
 
-Normaly this module uses IPC::Open3 for communication with the HTMLDOC process.
+Please use the get_htmldoc_command() method to retrieve an HTMLDOC command with your 
+options for easy troubleshooting.  B<If your HTML does not work with the HTMLDOC
+command, it will also not work with this module.>
+
+Normally this module uses IPC::Open3 for communication with the HTMLDOC process.
 This works in PSGI and CGI environments, but if you are working in a Mod_Perl environment,
 you may need to set the file mode in new():
 	
@@ -1753,6 +1787,13 @@ Turn the font-embedding previously enabled by embed_fonts() off.
 
 Generates the output-document. Returns a instance of HTML::HTMLDoc::PDF. See the perldoc of this class
 for details
+
+
+=head2 get_htmldoc_command()
+
+Returns the 'htmldoc' command with arguments to generate the PDF based on the configuration you've set
+via the other methods.  Only works if you have specified an input HTML files via set_input_file().
+Very useful for troubleshooting your output very quickly.
 
 
 =head2 error()

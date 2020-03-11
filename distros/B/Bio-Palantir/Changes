@@ -1,3 +1,7 @@
+0.200700  2020-03-10 20:49:48+01:00 Europe/Brussels
+	- Changes
+		- Roles::Modulable: improved the module delineation algorithm
+
 0.200290  2020-01-29 16:10:33+01:00 Europe/Brussels
 	- Addition
 	  - Roles::Modulable::Component: added a new class for handling the old module delineation algorithm

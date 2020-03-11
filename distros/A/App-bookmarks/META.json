@@ -58,6 +58,6 @@
          "web" : "https://github.com/kal247/App-bookmarks"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

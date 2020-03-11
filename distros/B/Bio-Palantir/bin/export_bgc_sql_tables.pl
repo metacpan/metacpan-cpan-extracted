@@ -99,6 +99,7 @@ CREATE TABLE IF NOT EXISTS Domains (
 id              TEXT       NOT NULL    PRIMARY KEY,
 base_id         TEXT       NULL,
 rank            INTEGER    NOT NULL,
+name            TEXT       NOT NULL,
 activity        TEXT       NULL,
 symbol          TEXT       NULL,
 chemistry       TEXT       NULL,
@@ -128,6 +129,7 @@ FOREIGN KEY(id)   REFERENCES sequences(id)
 CREATE TABLE IF NOT EXISTS Domains_plus (
 id              TEXT       NOT NULL    PRIMARY KEY,
 rank            INTEGER    NOT NULL,
+name            TEXT       NOT NULL,
 activity        TEXT       NULL,
 symbol          TEXT       NULL,
 chemistry       TEXT       NULL,
@@ -181,6 +183,7 @@ strain          TEXT        NULL
 CREATE TABLE IF NOT EXISTS Domains_explus (
 id              TEXT       NOT NULL    PRIMARY KEY,
 rank            INTEGER    NULL,
+name            TEXT       NOT NULL,
 activity        TEXT       NULL,
 symbol          TEXT       NULL,
 chemistry       TEXT       NULL,
@@ -426,7 +429,7 @@ sub get_lineageid_and_fill_lineage_table {
                 (map { $lineages[$_] } (1, 2, 3)),
                 (map { $tax->get_term_at_level($gca, $_) }
                     qw(order family genus species)),
-                    $lineages[-1],
+                $lineages[-1],
             ;
 
             $lineage_id = $gca;
@@ -445,7 +448,7 @@ sub get_lineageid_and_fill_lineage_table {
                     (map { $lineages[$_] } (1, 2, 3)),
                     (map { $tax->get_term_at_level($taxid, $_) } 
                         qw(order family genus species)),
-                        $lineages[-1],
+                    $lineages[-1],
                 ;
             }
 
@@ -487,8 +490,10 @@ sub fill_bgc_tables {
     CLUSTER:
     for my $cluster (@$ref_clusters) {
 
-        #TODO make an option to allow others? -> need to create new uui for genes and maybe domains that are used several times
-        #TODO use the same loop (with fix&proceed for additional information) for Parser and Refiner
+        if ($cluster->type =~ m/other/  && ! $ARGV_keep_other_type) {    # contain mostly redundant genes and domains
+            next CLUSTER;
+        }
+
         if (@ARGV_types) {
             next CLUSTER unless
                 grep { $cluster->type =~ m/$_/xmsi } @ARGV_types;
@@ -602,9 +607,10 @@ sub fill_bgc_tables {
                     }
 
                     @domain_elmts = (
-                        $domain_uui, $domain->uui, $domain->rank, $function,
-                        $domain->symbol, $domain->chemistry, $domain->monomer, 
-                        $domain->size, (join '-', @{ $domain->coordinates }),
+                        $domain_uui, $domain->uui, $domain->rank, $domain->name,
+                        $function, $domain->symbol, $domain->chemistry,
+                        $domain->monomer, $domain->size,
+                        (join '-', @{ $domain->coordinates }),
                         $domain->begin, $domain->end, 
                         $module_uui_for{$domain->uui} // 'null', $gene_uui,
                     );
@@ -613,9 +619,9 @@ sub fill_bgc_tables {
                 else {
                 
                     @domain_elmts = (
-                        $domain_uui, $domain->rank, $domain->function,
-                        $domain->symbol, $domain->chemistry, $domain->monomer, 
-                        $domain->subtype, $domain->size, 
+                        $domain_uui, $domain->rank, $domain->name,
+                        $domain->function, $domain->symbol, $domain->chemistry,
+                        $domain->monomer, $domain->subtype, $domain->size, 
                         (join '-', @{ $domain->coordinates }),
                         $domain->begin, $domain->end, $domain->evalue,
                         $domain->score, $domain->subtype_evalue,
@@ -641,8 +647,8 @@ sub fill_bgc_tables {
                     $gene->all_exp_domains) {
 
                     my @domain_explus_elmts = (
-                        $domain->uui, $domain->rank, $domain->function,
-                        $domain->symbol, $domain->chemistry,
+                        $domain->uui, $domain->rank, $domain->name,
+                        $domain->function, $domain->symbol, $domain->chemistry,
                         $domain->monomer, $domain->subtype, $domain->size, 
                         (join '-', @{ $domain->coordinates }),
                         $domain->begin, $domain->end, $domain->evalue,
@@ -747,7 +753,7 @@ export_bgc_sql_tables.pl - Exports SQL tables of BGC data (Palantir and antiSMAS
 
 =head1 VERSION
 
-version 0.200290
+version 0.200700
 
 =head1 NAME
 
@@ -841,6 +847,13 @@ Method for delineating the modules. Modules can either be cut on condensation
 
 =for Euclid: str.type: /condensation|substrate\-selection/
     str.default: 'substrate-selection'
+
+=item --keep-other-type
+
+Allow clusters characterized as "other" by antiSMASH.
+WARNING: these clusters often include redundant genes and domains with
+other clusters of the genome, and thus might create non-unique id issues when
+creating an SQL database. 
 
 =item --gap-filling [=] <bool>
 

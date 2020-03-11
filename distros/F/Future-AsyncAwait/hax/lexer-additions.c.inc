@@ -78,7 +78,7 @@ static SV *MY_lex_scan_attr(pTHX)
   if(!ret)
     return ret;
 
-  lex_read_space(0);
+  /* Do not read space here as space is not allowed between NAME(ARGS) */
 
   if(lex_peek_unichar(0) != '(')
     return ret;

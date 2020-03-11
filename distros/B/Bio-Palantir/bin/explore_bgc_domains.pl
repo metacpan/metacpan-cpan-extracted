@@ -83,7 +83,7 @@ explore_bgc_domains.pl - Reports all detected domain signatures for a NRPS/PKS g
 
 =head1 VERSION
 
-version 0.200290
+version 0.200700
 
 =head1 NAME
 

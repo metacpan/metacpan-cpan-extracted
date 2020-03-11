@@ -1,5 +1,5 @@
 package Bio::Palantir::Roles::Modulable::Component;
-$Bio::Palantir::Roles::Modulable::Component::VERSION = '0.200290';
+$Bio::Palantir::Roles::Modulable::Component::VERSION = '0.200700';
 use Moose;
 use namespace::autoclean;
 
@@ -28,10 +28,10 @@ has 'rank' => (
 	writer  => '_set_rank',
 );
 
-has 'protein_sequence' => (
+has $_ => (
     is       => 'ro',
     isa      => 'Str',
-);
+) for qw(protein_sequence cumulative_protein_sequence);
 
 has $_ => (
     is  => 'ro',
@@ -41,7 +41,7 @@ has $_ => (
 has $_ => (
     is       => 'ro',
     isa      => 'Num',
-) for qw(genomic_prot_begin genomic_prot_end);
+) for qw(genomic_prot_begin genomic_prot_end size);
 
 
 # public array(s) of composed objects
@@ -88,16 +88,6 @@ sub sort_domains {
 }
 
 
-sub size {
-
-    my $self = shift;
-
-    my $size = length $self->protein_sequence;
-
-    return $size;
-}
-
-
 sub genomic_dna_begin {
     return (shift->genomic_prot_begin * 3)
 }
@@ -129,7 +119,7 @@ Bio::Palantir::Roles::Modulable::Component
 
 =head1 VERSION
 
-version 0.200290
+version 0.200700
 
 =head1 SYNOPSIS
 
@@ -199,13 +189,6 @@ Returns a array of sorted domains by increasing start coordinate (by default, th
 	my @sorted_domains = $component->sort_domains;
 
 This method does not accept any arguments.
-
-=head2 size
-
-Returns the size of the module.
-
-    # $component is a Bio::Palantir::Roles::Modulable::Component
-	my $size = $component->size;
 
 =head2 genomic_dna_begin
 

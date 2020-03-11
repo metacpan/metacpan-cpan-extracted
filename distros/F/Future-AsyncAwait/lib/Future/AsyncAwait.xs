@@ -2082,6 +2082,14 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
     attrs = lex_scan_attrs(PL_compcv);
   }
 
+  PL_hints |= HINT_LOCALIZE_HH;
+  I32 save_ix = block_start(TRUE);
+
+  /* Save the identity of the currently-compiling sub so that 
+   * await_keyword_plugin() can check
+   */
+  hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", newSVuv(PTR2UV(PL_compcv)));
+
 #ifdef HAVE_PARSE_SUBSIGNATURE
   OP *sigop = NULL;
   if(lex_peek_unichar(0) == '(') {
@@ -2105,27 +2113,13 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   if(lex_peek_unichar(0) != '{')
     croak("Expected async sub %sto be followed by '{'", name ? "NAME " : "");
 
-  /* Save the identity of the currently-compiling sub so that 
-   * await_keyword_plugin() can check
-   */
-  PL_hints |= HINT_LOCALIZE_HH;
-  SAVEHINTS();
-
-  hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", newSVuv(PTR2UV(PL_compcv)));
-
-  I32 save_ix = block_start(TRUE);
-
   OP *body = parse_block(0);
-  /* body might be NULL if an error happened; we check that below so for now
-   * just be defensive
-   */
-  if(body) {
-    COP *last_cop = PL_curcop;
-    check_optree(aTHX_ body, NO_FORBID, &last_cop);
-  }
-
   SvREFCNT_inc(PL_compcv);
-  body = block_end(save_ix, body);
+
+#ifdef HAVE_PARSE_SUBSIGNATURE
+  if(sigop)
+    body = op_append_list(OP_LINESEQ, sigop, body);
+#endif
 
   if(PL_parser->error_count) {
     /* parse_block() still sometimes returns a valid body even if a parse
@@ -2152,10 +2146,13 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
     }
   }
 
-#ifdef HAVE_PARSE_SUBSIGNATURE
-  if(sigop)
-    body = op_append_list(OP_LINESEQ, sigop, body);
-#endif
+  /* body might be NULL if an error happened; we check that below so for now
+   * just be defensive
+   */
+  if(body) {
+    COP *last_cop = PL_curcop;
+    check_optree(aTHX_ body, NO_FORBID, &last_cop);
+  }
 
   /* turn block into
    *    NEXTSTATE; PUSHMARK; eval { BLOCK }; LEAVEASYNC
@@ -2169,12 +2166,15 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   op_contextualize(try, G_ARRAY);
 
   op = op_append_elem(OP_LINESEQ, op, newLEAVEASYNCOP(OPf_WANT_SCALAR));
+  body = op;
+
+  body = block_end(save_ix, body);
 
   CV *cv = newATTRSUB(floor_ix,
     name ? newSVOP(OP_CONST, 0, SvREFCNT_inc(name)) : NULL,
     NULL,
     attrs,
-    op);
+    body);
 
   if(CvLVALUE(cv))
     warn("Pointless use of :lvalue on async sub");

@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Sah-Schema
   homepage: https://metacpan.org/release/Test-Sah-Schema
   repository: git://github.com/perlancar/perl-Test-Sah-Schema.git
-version: '0.006'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

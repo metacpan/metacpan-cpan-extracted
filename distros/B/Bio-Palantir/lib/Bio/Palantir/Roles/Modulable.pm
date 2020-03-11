@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Modulable;
 # ABSTRACT: Modulable Moose role for Module object construction
-$Bio::Palantir::Roles::Modulable::VERSION = '0.200290';
+$Bio::Palantir::Roles::Modulable::VERSION = '0.200700';
 use Moose::Role;
 
 use autodie;
@@ -20,7 +20,7 @@ has 'cutting_mode' => (
     writer   => '_set_cutting_mode',
 );
 
-const my $_modular_domains => qr/^A$ | ^AT | ^C$ | ^KS | ^E$ | ^H$
+const my $_modular_domains => qr/^A$ | ^AT | ^C$ | ^CAL$ | ^KS | ^E$ | ^H$
         | ^PCP$ | ^ACP$ | KR | DH | ER | cyc | ^TE$ | ^Red$
         | ^NAD | NRPS-COM/xms
 ;
@@ -63,9 +63,19 @@ sub _build_modules {
 
     my $module_n = 1; #TODO move in Cluster.pm
     my $module_in = 0; # to know if the algo is inside a module or not
-    my (%module_for, $last_gene);
 
-### ok: $self->cutting_mode
+    # avoid redondant condensation or selection domains in a module
+    my %nr_domain_for = (
+        condensation          => 0,
+        'substrate-selection' => 0,
+        'tailoring/other'     => 0,
+        'carrier-protein'     => 0,
+        termination           => 0,
+        NA                    => 0,
+    );
+
+    my %module_for;
+    my $last_gene = 1;
 
     GENE:
     for my $gene_n (0 .. @genes - 1) {
@@ -79,8 +89,6 @@ sub _build_modules {
         DOMAIN:
         for my $i (0 .. @domains - 1) {
 
-#             next unless $domains[$i]->function; # avoid warnings when antismash domains are undef    
-
             # initiate first module based on cutting mode
             if ( ($domains[$i]->class eq 'condensation'
                     || $domains[$i]->class eq 'substrate-selection')
@@ -93,115 +101,60 @@ sub _build_modules {
                 };
 
                 $last_gene = $gene_n;   # for avoiding empty values
+                $nr_domain_for{ $domains[$i]->class } = 1;
                 $module_in = 1;
             }
             
             # initiate a new module if cutting domain
             elsif( $domains[$i]->class eq $self->cutting_mode ) {
-                
-#                 # allow starter condensation domains
-#                 if ($module_n == 1 
-#                     && scalar @{ $module_for{'1'}{domains} } == 1
-#                     && @{ $module_for{'1'}{domains} }[0]->class 
-#                         eq 'condensation'
-#                     && $domains[$i]->class ne 'condensation'
-#                     ) {
-# 
-#                     $module_for{$module_n}{end} = $gene_n;
-#                     push @{ $module_for{$module_n}{domains} }, $domains[$i];
-#                 }
 
-                # initiate a new module
-#                 else {
-                    $module_for{++$module_n} = {
-                        start   => $gene_n,
-                        end     => $gene_n,
-                        domains => [$domains[$i]],
-                    };
+                $module_for{++$module_n} = {
+                    start   => $gene_n,
+                    end     => $gene_n,
+                    domains => [$domains[$i]],
+                };
 
-                    $module_in = 1;
-#                 }
+                # reset non redundant counter
+                $nr_domain_for{$_} = 0
+                    for qw(condensation substrate-selection);
+
+                $nr_domain_for{ $domains[$i]->class } = 1;
+                $module_in = 1;
+            }
+
+            # terminate a module if:
+                # encounter a non modular domain or trans-acting
+                # OR domains are separated by more than one gene
+                # OR two consecutive selection or condensation domains
+            elsif ( ( ($gene_n - $last_gene) >= 2
+                    || ! $domains[$i]->symbol =~ $_modular_domains
+                    || $nr_domain_for{ $domains[$i]->class } == 1 )
+                && $module_in == 1) {
+
+                $module_for{$module_n}{end} = $last_gene;
+
+                $nr_domain_for{$_} = 0
+                    for qw(condensation 'substrate-selection');
+                $module_in = 0;
             }
 
             # module elongation (if inside a module & a modular domain & but not cutting one)
             elsif( $domains[$i]->symbol =~ $_modular_domains
                 && $module_in == 1) {
 
+                if ($domains[$i]->class eq 'condensation'
+                    || $domains[$i]->class eq 'substrate-selection') {
+                    $nr_domain_for{ $domains[$i]->class } = 1
+                }
+                
                 $module_for{$module_n}{end} = $gene_n;
+
                 push @{ $module_for{$module_n}{domains} }, $domains[$i];
             }
-            
-            # terminate a module if encounter a non modular domain or trans-acting
-            elsif (! $domains[$i]->symbol =~ $_modular_domains
-                  && $domains[$i - 1]->symbol =~ $_modular_domains
-                  && ($gene_n - $last_gene) < 2
-                  && $module_in == 1) {
 
-                $module_for{$module_n}{end} = $last_gene;
-                $module_in = 0;
-            }
+            $last_gene = $gene_n;   # positionned here to directly update transitions between genes
         }
-
-        $last_gene = $gene_n;
     }
-
-
-# first method try
-#             # initiate first module (ignore C domains)
-#             if ($domains[$i]->symbol =~ $_modular_domains
-#                     && $module_n == 1 && ! %module_for) {
-# 
-#                 $module_for{$module_n} = {
-#                     start => $gene_n,
-#                     domains => [$domains[$i]],
-#                 };
-# 
-#                 $last_gene = $gene_n;
-#             }
-# 
-#             # module elongation or delineation of successive modules
-#             elsif ($domains[$i - 1]->symbol =~ $_modular_domains
-#                     && $domains[$i]->symbol =~ $_modular_domains
-#                 ) { 
-# 
-#                 # begin a new module following cutting mode
-#                 if ($domains[$i]->symbol 
-#                     =~ $_cutting_regex_for{ $self->cutting_mode }) {
-#                     
-#                     $module_for{$module_n}{end} = $last_gene;
-# 
-#                     $module_for{++$module_n} = {
-#                         start => $gene_n,
-#                         domains => [$domains[$i]],
-#                     };
-#                 }
-# 
-#                 else {
-#                     push @{ $module_for{$module_n}{domains} }, $domains[$i];
-#                 }
-#             }
-# 
-#             # end module if non-modular domain encountered
-#             elsif (! $domains[$i]->symbol =~ $_modular_domains
-#                     && $domains[$i - 1]->symbol =~ $_modular_domains
-#                     ) {
-#                 $module_for{$module_n}{end} = $last_gene;
-#                 push @{ $module_for{$module_n}{domains} }, $domains[$i];
-#             }
-# 
-#             # start over a new module after a break (even if truncated)
-#             elsif (! $domains[$i -1 ]->symbol =~ $_modular_domains
-#                    &&  $domains[$i]->symbol =~ $_modular_domains) {
-# 
-#                 $module_for{++$module_n} = {
-#                     start => $gene_n,
-#                     domains => [$domains[$i]],
-#                 };
-#             }
-# 
-#             $last_gene = $gene_n;
-#         }   
-#     }
     
     return [] unless %module_for;
 
@@ -221,11 +174,10 @@ sub _build_modules {
        delete $module_for{ $module_n };
     }
     
-#     # filter modules: considered incomplete if < 2 (min module is starter A-PCP)
-#     delete $module_for{$_} for grep { 
-#         scalar @{ $module_for{$_}{domains} } < 2 } keys %module_for;
-#   stopped as it eliminates modular domains -> [C] [A-PCP-C] [A-PCP-C]... 
-    
+    # filter modules: considered incomplete if < 2 (min module is starter A-PCP)
+    delete $module_for{$_} for grep { 
+        scalar @{ $module_for{$_}{domains} } < 2 } keys %module_for;
+
     my @modules = _create_elmt_array(\%module_for, \@genes, 'module');
     return \@modules;
 }
@@ -256,6 +208,7 @@ sub _build_components {
     my $component_n = 1; #TODO move in Cluster.pm
     my $launched = 0;
     my (%component_for);
+
     GENE:
     for my $gene_n (0 .. @genes - 1) {
 
@@ -316,28 +269,45 @@ sub _create_elmt_array {
 
     my ($element_for, $genes, $str) = @_;
 
-    my @elements;
+    my (@elements, $rank);
     for my $element_n (sort { $a <=> $b } keys %{ $element_for }) {
         
+        my $start_gene = $genes->[ $element_for->{$element_n}{start} ];
+
+        my $end_gene = $genes->[ $element_for->{$element_n}{end} ];
+
+        my $start_domain = @{ $element_for->{$element_n}{domains} }[0];
+        my $end_domain = @{ $element_for->{$element_n}{domains} }[-1];
+        
+        my $genomic_prot_begin = $start_gene->genomic_prot_begin
+            + $start_domain->begin;
+        my $genomic_prot_end = $end_gene->genomic_prot_begin
+            + $end_domain->end;
+
+        my $size = $genomic_prot_end - $genomic_prot_begin + 1;
+
         # create protein sequence of element by domain sequence contatenation
-        my $seq;
+        my $cumulative_seq;
         for my $domain (@{ $element_for->{ $element_n}{domains} }) {
-            $seq .= $domain->protein_sequence;
+            $cumulative_seq .= $domain->protein_sequence;
         }
 
-        my $size = length $seq;
+        my $full_seq;       
+        if ($start_gene->name eq $end_gene->name) {
+            my ($seq) = $start_gene->protein_sequence;
+            $full_seq = substr( $seq, ($start_domain->begin - 1),
+                ($end_domain->end - $start_domain->begin + 1) );
+        }
 
-        my $start_gene 
-            = $genes->[ $element_for->{$element_n}{start} ]->genomic_prot_begin;
+        else {
+            my ($seq1) = $start_gene->protein_sequence;
+            my $start_seq = substr ( $seq1, ($start_domain->begin - 1) );
 
-        my $end_gene 
-            = $genes->[ $element_for->{$element_n}{end} ]->genomic_prot_begin;
+            my ($seq2) = $end_gene->protein_sequence;
+            my $end_seq = substr ( $seq2, 0, ($end_domain->end) );
 
-        my $start_domain = @{ $element_for->{$element_n}{domains} }[0]->begin;
-        my $end_domain = @{ $element_for->{$element_n}{domains} }[-1]->end;
-        
-        my $genomic_prot_begin = $start_gene + $start_domain;
-        my $genomic_prot_end = $end_gene + $end_domain;
+            $full_seq = $start_seq . $end_seq;
+        }
 
         my @gene_uuis 
             = map { $genes->[ $_ ]->uui } 
@@ -347,15 +317,17 @@ sub _create_elmt_array {
         if ($str eq 'module') { 
 
             my $element = Module->new( 
-                               rank      => $element_n,
-                             domains     => $element_for->{$element_n}{domains}
+                                    rank => ++$rank,
+                                 domains => $element_for->{$element_n}{domains}
                                             // [],
-                          gene_uuis      => \@gene_uuis, 
+                               gene_uuis => \@gene_uuis, 
                       genomic_prot_begin => $genomic_prot_begin,
                         genomic_prot_end => $genomic_prot_end,
                 genomic_prot_coordinates => [$genomic_prot_begin, 
                                                 $genomic_prot_end],
-                   protein_sequence      => $seq,
+                                    size => $size,
+                        protein_sequence => $full_seq,
+             cumulative_protein_sequence => $cumulative_seq,
             );
         
             push @elements, $element;
@@ -364,15 +336,17 @@ sub _create_elmt_array {
         else { 
 
             my $element = Component->new( 
-                               rank      => $element_n,
-                             domains     => $element_for->{$element_n}{domains}
+                                    rank => $element_n,
+                                 domains => $element_for->{$element_n}{domains}
                                             // [],
-                          gene_uuis      => \@gene_uuis, 
+                               gene_uuis => \@gene_uuis, 
                       genomic_prot_begin => $genomic_prot_begin,
                         genomic_prot_end => $genomic_prot_end,
-                genomic_prot_coordinates => [$genomic_prot_begin, 
+                genomic_prot_coordinates => [$genomic_prot_begin,
                                                 $genomic_prot_end],
-                   protein_sequence      => $seq,
+                                    size => $size,
+                        protein_sequence => $full_seq,
+             cumulative_protein_sequence => $cumulative_seq,
             );
         
             push @elements, $element;
@@ -395,7 +369,7 @@ Bio::Palantir::Roles::Modulable - Modulable Moose role for Module object constru
 
 =head1 VERSION
 
-version 0.200290
+version 0.200700
 
 =head1 SYNOPSIS
 

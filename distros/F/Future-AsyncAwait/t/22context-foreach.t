@@ -196,6 +196,7 @@ SKIP: {
 
 {
    our $VAR;
+   my $f1;
 
    my $ok = !eval q{
       async sub foreach_pkgvar

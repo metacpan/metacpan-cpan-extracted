@@ -148,9 +148,10 @@ use Moo::Role;
 use Carp;
 use JSON::MaybeXS;
 use MRO::Compat;
-use Types::Standard qw[ArrayRef HashRef InstanceOf Str is_CodeRef is_HashRef is_Ref is_Object];
+use Types::Standard qw[ArrayRef HashRef InstanceOf Str is_CodeRef is_HashRef
+  is_ArrayRef is_Ref is_Object];
 
-our $VERSION = '0.0.16';
+our $VERSION = '0.0.17';
 
 requires qw[json_ld_type json_ld_fields];
 
@@ -163,7 +164,7 @@ has json_ld_encoder => (
 sub _build_json_ld_encoder {
     my ($self) = @_;
     return $self->maybe::next::method ||
-        JSON->new->canonical->utf8->space_after->indent->pretty;
+      JSON->new->canonical->utf8->space_after->indent->pretty->convert_blessed;
 };
 
 has context => (
@@ -178,6 +179,13 @@ sub _build_context {
 
 sub _resolve_nested {
     my ($val) = @_;
+
+    if (is_ArrayRef($val)) {
+      return [ map { is_Object($_) && $_->can('json_ld_data')
+          ? $_->json_ld_data
+          : $_; } @$val ];
+    }
+
     is_Object($val) && $val->can('json_ld_data')
         ? $val->json_ld_data
         : $val;
@@ -206,7 +214,6 @@ sub json_ld_data {
                   }
 
               }
-
           }
           else {
               carp "Weird JSON-LD reference: " . ref $_;

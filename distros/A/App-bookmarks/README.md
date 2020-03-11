@@ -16,30 +16,31 @@ DESCRIPTION
 -----------
 
 `bookmarks` is a tool to export bookmarks from files supplied as arguments, or
-from browsers default locations (without arguments). The following browsers
-and platform are supported :
+from browsers default locations (when called without arguments). The following
+browsers and platform are supported :
 
 - Safari (Mac)
 - Firefox (Mac/Linux/Windows)
 - Chrome (Mac/Linux/Windows)
 - Internet Explorer (Windows)
 
-Files named *.plist, *.sqlite and *Bookmarks are processed as Safari and Firefox
-and Chrome bookmarks, respectively. Directories named *Favorites" are processed
+Files named _*.plist_, _*.sqlite_ and _*Bookmarks_ are processed as Safari, Firefox
+and Chrome bookmarks, respectively. Directories named _*Favorites_ are processed
 as Internet Explorer favorites.
 
 The fields `<title>`, `<url>` and `<description>` are retrieved (when existing) and
 are available for exporting (in the desired format), by default :
 `<title> <url> <description>`
-
+    
 The `<description>` field is filled with Safari's Description, Firefox's Tags or
-empty for Internet Explorer.
+empty for Chrome and Internet Explorer.
+
 
 SEARCH BOOKMARKS INTERACTIVELY FROM CLI
 ---------------------------------------
 
-This tool can be used to search and open bookmarks interactively from the CLI. The following
-instructions are for macOS, but it should be similar on any regular OS.
+This tool can be used to search and open bookmarks interactively from the CLI. The
+following instructions are for macOS, but it should be similar on any regular OS.
 
 ![](tty.png)
 
@@ -50,12 +51,12 @@ and add these aliases to your shell :
 
 **Open links(s) with default application :**
 ```
-alias lk="safari-bookmarks.pl | uricolor | fzf --ansi --exact --multi | urifind | xargs open"
+alias lk="bookmarks | uricolor | fzf --ansi --exact --multi | urifind | xargs open"
 ```
 
 **Copy links(s) to clipboard :**
 ```
-alias lkc="safari-bookmarks.pl | uricolor | fzf --ansi --exact --multi | urifind | pbcopy"
+alias lkc="bookmarks | uricolor | fzf --ansi --exact --multi | urifind | pbcopy"
 ```
 
 - `uricolor` colorizes URIs to distinguish them from title and description.

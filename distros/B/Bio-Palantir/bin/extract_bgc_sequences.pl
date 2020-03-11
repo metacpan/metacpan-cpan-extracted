@@ -126,7 +126,7 @@ extract_bgc_sequences.pl - Extracts protein sequences for different BGC scales i
 
 =head1 VERSION
 
-version 0.200290
+version 0.200700
 
 =head1 NAME
 

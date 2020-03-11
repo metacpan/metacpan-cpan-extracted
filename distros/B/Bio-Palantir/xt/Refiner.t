@@ -5,6 +5,8 @@ use Test::Most;
 use autodie;
 use feature qw(say);
 
+use Smart::Comments;
+
 use List::AllUtils;
 use Path::Class qw(file);
 
@@ -116,7 +118,7 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     for my $module($nrps_clusters2[2]->all_modules) {
         push @modules2, join '-', map {$_->function } $module->all_domains;
     }
-    
+
     cmp_deeply \@components, @expected_components,
         'got expected domain architecture for NRPS Component objects'
         . ' - \'condensation\' component delineation (Modulable build method) test';
@@ -127,11 +129,11 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     
     cmp_deeply \@modules, @expected_modules,
         'got expected domain architecture for NRPS Module objects'
-        . ' - \'condensation\' component delineation (Modulable build method) test';
+        . ' - \'condensation\' module delineation (Modulable build method) test';
     
     cmp_deeply \@modules2, @expected_modules2,
         'got expected domain architecture for NRPS Module objects'
-        . ' - \'selection\' component delineation (Modulable build method) test';
+        . ' - \'selection\' module delineation (Modulable build method) test';
 
     # TODO find a better example: here additional detection of a 900aa domain in the gene following the cluster...
     # Test additional domain detection
@@ -143,12 +145,22 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
         'A', 'C', 'A', 'PCP',
     ];
 
+    my @expected_domain_names = [
+        'Acyltransferase domain', 'Peptidyl Carrier Protein domain',
+        'Condensation domain', 'Adenylation domain',
+        'Peptidyl Carrier Protein domain', 'Condensation domain',
+        'Adenylation domain', 'Adenylation domain',
+        'Peptidyl Carrier Protein domain', 'Condensation domain',
+        'Adenylation domain', 'Condensation domain',
+        'Adenylation domain', 'Peptidyl Carrier Protein domain',
+    ];
+
     my @expected_domain_classes = [
         'substrate-selection', 'carrier-protein', 'condensation', 
         'substrate-selection', 'carrier-protein', 'condensation',
         'substrate-selection', 'substrate-selection', 'carrier-protein',
         'condensation', 'substrate-selection', 'condensation', 
-         'substrate-selection', 'carrier-protein',
+        'substrate-selection', 'carrier-protein',
     ];
 
     my @expected_domain_coordinates = [
@@ -160,9 +172,10 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     my $domain_n;
     $domain_n += $_->count_domains for $ClusterPlus2->all_genes;
 
-    my (@domain_symbols, @domain_classes, @domain_coordinates);
+    my (@domain_symbols, @domain_names, @domain_classes, @domain_coordinates);
     for my $gene ($ClusterPlus2->all_genes) {
         push @domain_symbols, $_->symbol for $gene->all_domains;
+        push @domain_names, $_->name     for $gene->all_domains;
         push @domain_classes, $_->class  for $gene->all_domains;
         push @domain_coordinates, $_->coordinates for $gene->all_domains;
     }
@@ -173,6 +186,10 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
 
     cmp_deeply \@domain_symbols, @expected_domain_symbols,
         'got expected domain symbols for NRPS DomainPlus objects'
+        . ' - Domainable symbol method test';
+
+    cmp_deeply \@domain_names, @expected_domain_names,
+        'got expected domain standard names for NRPS DomainPlus objects'
         . ' - Domainable symbol method test';
 
     cmp_deeply \@domain_classes, @expected_domain_classes,
@@ -250,20 +267,31 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
         'KS', 'AT', 'DH', 'MT', 'ER', 'KR',
     ];
 
+    my @expected_domain_names = [
+        'Ketosynthase domain', 'Acyltransferase domain',
+        'Dehydratase domain', 'Methyl transferase domain',
+        'Enoylreductase domain', 'Ketoreductase domain',
+    ];
+
     my @expected_domain_classes = [
         'condensation', 'substrate-selection', 
         'tailoring/other', 'tailoring/other', 'tailoring/other', 
         'tailoring/other',
     ];
 
-    my (@domain_symbols, @domain_classes);
+    my (@domain_symbols, @domain_names, @domain_classes);
     for my $gene ($ClusterPlus->all_genes) {
         push @domain_symbols, $_->symbol for $gene->all_domains;
+        push @domain_names, $_->name     for $gene->all_domains;
         push @domain_classes, $_->class  for $gene->all_domains;
     }
 
     cmp_deeply \@domain_symbols, @expected_domain_symbols,
         'got expected domain symbols for PKS DomainPlus objects'
+        . ' - Domainable symbol method test';
+
+    cmp_deeply \@domain_names, @expected_domain_names,
+        'got expected domain standard names for PKS DomainPlus objects'
         . ' - Domainable symbol method test';
 
     cmp_deeply \@domain_classes, @expected_domain_classes,

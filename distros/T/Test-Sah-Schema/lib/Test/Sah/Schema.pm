@@ -5,7 +5,7 @@ package Test::Sah::Schema;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-04'; # DATE
 our $DIST = 'Test-Sah-Schema'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -98,12 +98,20 @@ sub sah_schema_module_ok {
                                 my ($errmsg, $res)  = @{ $vdr->($value) };
                             if ($eg->{valid}) {
                                 if ($errmsg) {
-                                    $Test->ok(0, "Value should be valid, but isn't");
+                                    $Test->ok(0, "Value should be valid, but isn't ($errmsg)");
                                     $ok = 0;
                                     return;
                                 } else {
                                     $Test->ok(1, "Value should be valid");
                                 }
+                                my $validated_value =
+                                    exists $eg->{validated_value} ? $eg->{validated_value} :
+                                    exists $eg->{res} ? $eg->{res} :
+                                    exists $eg->{value} ? $eg->{value} : $eg->{data};
+                                Test::More::is_deeply($res, $validated_value, 'Validated value matches') or do {
+                                    $Test->diag($Test->explain($res));
+                                    $ok = 0;
+                                };
                             } else {
                                 if (!$errmsg) {
                                     $Test->ok(0, "Value shouldn't be valid, but is");
@@ -113,14 +121,6 @@ sub sah_schema_module_ok {
                                     $Test->ok(1, "Value should not be valid");
                                 }
                             }
-
-                            my $validated_value =
-                                exists $eg->{validated_value} ? $eg->{validated_value} :
-                                exists $eg->{res} ? $eg->{res} : $eg->{value};
-                            Test::More::is_deeply($res, $validated_value, 'Validated value matches') or do {
-                                $Test->diag($Test->explain($res));
-                                $ok = 0;
-                            };
                         }
                     );
                 } # for example
@@ -259,7 +259,7 @@ Test::Sah::Schema - Test Sah::Schema::* modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.006 of Test::Sah::Schema (from Perl distribution Test-Sah-Schema), released on 2020-03-04.
+This document describes version 0.008 of Test::Sah::Schema (from Perl distribution Test-Sah-Schema), released on 2020-03-04.
 
 =head1 SYNOPSIS
 

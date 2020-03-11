@@ -1,5 +1,10 @@
 Revision history for Perl extension HTML-HTMLDoc
 
+0.16 2020-03-10T19:31:24Z
+
+    - get_htmldoc_command() method to retrieve 'htmldoc' command equivalent to your options
+    - tweaks to the documentation
+
 0.15 2020-02-15T03:46:14Z
 
     - Corrected misnamed subroutine (get_letterhead)

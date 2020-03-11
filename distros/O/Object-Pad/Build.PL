@@ -21,11 +21,7 @@ my $build = Module::Build->new(
    create_license => 1,
    create_readme  => 1,
 
-   extra_compiler_flags => [qw( -Ihax -std=c89 )],
+   extra_compiler_flags => [qw( -Ihax )],
 );
-
-# Much cheating
-$build->add_property( 'optimize' );
-$build->config( optimize => '-ggdb3' );
 
 $build->create_build_script;

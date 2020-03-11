@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/kal247/App-bookmarks/issues
   homepage: https://github.com/kal247/App-bookmarks
   repository: https://github.com/kal247/App-bookmarks.git
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,20 @@
 ==================================================
-Changes from 2015-02-05 00:00:00 +0000 to present.
+Changes from 2015-03-12 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.88 at 2020-03-10 20:11:48 +0000
+-----------------------------------------
+
+  Change: a54f02952cf7e62be4ed4f4772a1db6544949fcf
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-03-10 20:11:48 +0000
+
+    Release engineering for 1.88
+
+    - Fixes for Locale.t year 2020 problems
+
+    Applies back to v5.13.9 
 
 -----------------------------------------
 version 1.86 at 2020-02-04 15:37:02 +0000
@@ -549,5 +563,5 @@ version 1.32 at 2015-03-30 15:52:27 +0000
     Updated the included hints to latest from blead 
 
 =================================================
-Plus 65 releases after 2015-02-05 00:00:00 +0000.
+Plus 65 releases after 2015-03-12 00:00:00 +0000.
 =================================================

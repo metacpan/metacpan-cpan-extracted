@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser;
 # ABSTRACT: front-end class for Bio::Palantir::Parser module, wich handles the parsing of biosynML.xml and regions.js antiSMASH reports
-$Bio::Palantir::Parser::VERSION = '0.200290';
+$Bio::Palantir::Parser::VERSION = '0.200700';
 use Moose;
 use namespace::autoclean;
 
@@ -201,16 +201,6 @@ sub _convert_js2biosynml {
                 
                 for my $module (@{ $orf->{modules} }) {
 
-#                     my $domain_for = $json_for{$cluster_name}{genes}{
-#                         $gene_name}{domains};
-# 
-#                     my @module_domains =  
-#                         map { $domain_for->{$_}{abbreviation} } 
-#                         grep { $domain_for->{$_}{prot_start} < $module->{end}
-#                             && $domain_for->{$_}{prot_end} > $module->{start} }
-#                         keys %{ $domain_for }
-#                     ;
-                    
                     my @gene_dna_coordinates = (
                         $json_for{$cluster_name}{genes}{$gene_name}{start},
                         $json_for{$cluster_name}{genes}{$gene_name}{end},
@@ -390,7 +380,7 @@ Bio::Palantir::Parser - front-end class for Bio::Palantir::Parser module, wich h
 
 =head1 VERSION
 
-version 0.200290
+version 0.200700
 
 =head1 SYNOPSIS
 

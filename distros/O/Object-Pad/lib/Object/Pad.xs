@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -861,10 +861,6 @@ static int keyword_method(pTHX_ OP **op_ptr)
   I32 floor_ix = start_subparse(FALSE, name ? 0 : CVf_ANON);
   SAVEFREESV(PL_compcv);
 
-  /* Splice in the slot scope CV in */
-  CvOUTSIDE(compclassmeta->slotscope) = CvOUTSIDE(PL_compcv);
-  CvOUTSIDE(PL_compcv) = compclassmeta->slotscope;
-
   OP *attrs = NULL;
   if(lex_peek_unichar(0) == ':') {
     lex_read_unichar(0);
@@ -874,7 +870,10 @@ static int keyword_method(pTHX_ OP **op_ptr)
 
   I32 save_ix = block_start(TRUE);
 
-  OP *slotops = NULL;
+  /* Splice in the slot scope CV in */
+  CvOUTSIDE(compclassmeta->slotscope) = CvOUTSIDE(PL_compcv);
+  CvOUTSIDE(PL_compcv) = compclassmeta->slotscope;
+
   {
     PADOFFSET padix;
 
@@ -886,14 +885,6 @@ static int keyword_method(pTHX_ OP **op_ptr)
     padix = pad_add_name_pvs("@(Object::Pad/slots)", 0, NULL, NULL);
     if(padix != PADIX_SLOTS)
       croak("ARGH: Expected that padix[@slots] = 2");
-
-    slotops = op_append_list(OP_LINESEQ, slotops,
-      newMETHSTARTOP(compclassmeta->repr)
-    );
-
-    /* Build the rest of the slot ops after the body is compiled so we know
-     * which slots we need
-     */
 
     intro_my();
   }
@@ -918,7 +909,11 @@ static int keyword_method(pTHX_ OP **op_ptr)
 
   OP *body = parse_block(0);
   SvREFCNT_inc(PL_compcv);
-  body = block_end(save_ix, body);
+
+#ifdef HAVE_PARSE_SUBSIGNATURE
+  if(sigop)
+    body = op_append_list(OP_LINESEQ, sigop, body);
+#endif
 
   if(PL_parser->error_count) {
     /* parse_block() still sometimes returns a valid body even if a parse
@@ -944,6 +939,11 @@ static int keyword_method(pTHX_ OP **op_ptr)
     I32 nslots = AvFILLp(PadlistARRAY(CvPADLIST(slotscope))[1]);
     PADNAME **snames = PadnamelistARRAY(slotnames);
     PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
+    OP *slotops = NULL;
+
+    slotops = op_append_list(OP_LINESEQ, slotops,
+      newMETHSTARTOP(compclassmeta->repr)
+    );
 
     int i;
     for(i = 0; i < nslots; i++) {
@@ -979,14 +979,11 @@ static int keyword_method(pTHX_ OP **op_ptr)
       padnames[padix] = newpadname;
 #endif
     }
+
+    body = op_append_list(OP_LINESEQ, slotops, body);
   }
 
-#ifdef HAVE_PARSE_SUBSIGNATURE
-  if(sigop)
-    body = op_append_list(OP_LINESEQ, sigop, body);
-#endif
-
-  body = op_append_list(OP_LINESEQ, slotops, body);
+  body = block_end(save_ix, body);
 
   CV *cv = newATTRSUB(floor_ix,
     name ? newSVOP(OP_CONST, 0, SvREFCNT_inc(name)) : NULL,

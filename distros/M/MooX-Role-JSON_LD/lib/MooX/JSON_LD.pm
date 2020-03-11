@@ -111,7 +111,7 @@ use MRO::Compat;
 use List::Util qw/ all /;
 use Sub::Quote qw/ quote_sub /;
 
-our $VERSION = '0.0.15';
+our $VERSION = '0.0.17';
 
 my %Attributes;
 
@@ -126,7 +126,7 @@ sub import {
     my $installer =
       $target->isa("Moo::Object")
       ? \&Moo::_install_tracked
-      : \&Moo::Role::install_tracked;
+      : \&Moo::Role::_install_tracked;
 
     if ( my $has = $target->can('has') ) {
         my $new_has = sub {

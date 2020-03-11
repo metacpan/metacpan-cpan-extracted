@@ -1,5 +1,15 @@
 # Change Log
 
+## [0.0.17] - 2020-03-10
+
+- Fix problem with arrays of objects (Github #22)
+
+- Fix installation of MooX::JSON_LD methods into Moo roles.
+
+- Fix inconsistent version between modules.
+
+- Fix minimum prereq for List::Util.
+
 ## [0.0.16] - 2018-11-06
 
 ### Fixed

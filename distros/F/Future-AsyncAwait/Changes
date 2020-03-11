@@ -1,5 +1,14 @@
 Revision history for Future-AsyncAwait
 
+0.37    2020-03-10
+        [CHANGES]
+         * Minor reärrangement of internal stages to closer match core's
+           sub parser and allow more generic hooking in future
+
+        [BUGFIXES]
+         * Don't allow a space between attr name and optional parenthesized
+           argument (RT131571)
+
 0.36    2020-01-16
         [CHANGES]
          * Add an optional 'force' callback to test_awaitable()

@@ -1,6 +1,6 @@
 package Bio::Palantir::Refiner::GenePlus;
 # ABSTRACT: Refiner internal class for handling GenePlus objects
-$Bio::Palantir::Refiner::GenePlus::VERSION = '0.200290';
+$Bio::Palantir::Refiner::GenePlus::VERSION = '0.200700';
 use Moose;
 use namespace::autoclean;
 
@@ -274,7 +274,7 @@ Bio::Palantir::Refiner::GenePlus - Refiner internal class for handling GenePlus 
 
 =head1 VERSION
 
-version 0.200290
+version 0.200700
 
 =head1 SYNOPSIS
 
