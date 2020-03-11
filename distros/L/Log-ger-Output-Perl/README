@@ -3,8 +3,8 @@ NAME
     etc)
 
 VERSION
-    This document describes version 0.002 of Log::ger::Output::Perl (from
-    Perl distribution Log-ger-Output-Perl), released on 2020-03-07.
+    This document describes version 0.004 of Log::ger::Output::Perl (from
+    Perl distribution Log-ger-Output-Perl), released on 2020-03-11.
 
 SYNOPSIS
      use Log::ger::Output Perl => (

@@ -8,7 +8,7 @@ use Pod::Usage;
 use File::Basename qw(basename);
 use strict;
 
-use DiaColloDB::Relation::TDF; ##-- DEBUG
+#use DiaColloDB::Relation::TDF; ##-- DEBUG
 
 BEGIN {
   select STDERR; $|=1; select STDOUT;
@@ -167,7 +167,7 @@ $query{bquery} = @ARGV ? shift : $query{query};
 $rel  = "d$rel" if ($isDiff);
 
 ##-- DEBUG queries
-if (1 && $query{query} eq 'debug') {
+if (0 && $query{query} eq 'debug') {
   #$query{query} = '$p=NN !#has[textClass,/politik/i]';
   #$query{query} = 'Mann #has[textClass,/zeitung/i]';
   #$query{query} = '* #has[textClass,/Zeitung/i]';
@@ -194,7 +194,13 @@ if (1 && $query{query} eq 'debug') {
   #($rel,@query{qw(query date groupby slice)}) = ('ddc','near(flood,{frequency,uncertainty,risk}=2,8) #fmin 1', 2004, '[@const]', 1);
   ##
   #($rel,@query{qw(slice query)}) = ('tdf',0,'function &= $p=/^N/');
-  ($rel,@query{qw(slice query)}) = ('tdf',0,'/optics/');
+  #($rel,@query{qw(slice query)}) = ('tdf',0,'/optics/');
+  ##
+  #($rel,@query{qw(slice query)}) = ('ddc',0,'"$p=ADJA=2 @Maus" #fmin 1');
+  ##
+  #($rel,@query{qw(slice query)}) = ('tdf',0,'Maschine');
+  #($rel,@query{qw(slice query groupby)}) = ('tdf',0,'Zahnstange && Nuth','basename');
+  ($rel,@query{qw(slice query groupby)}) = ('tdf',0,'Zahnstange #has[basename,fischer_w*]','basename');
 }
 ##--/DEBUG queries
 

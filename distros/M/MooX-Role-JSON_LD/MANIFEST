@@ -11,6 +11,7 @@ t/03-moose-basic.t
 t/04-moox-json-subclass.t
 t/05-moo-nested.t
 t/06-bugfix-multival-props.t
+t/07-bugfix-nest-same-type.t
 t/lib/MooseTester.pm
 t/lib/MooTester.pm
 t/lib/MooTester2.pm

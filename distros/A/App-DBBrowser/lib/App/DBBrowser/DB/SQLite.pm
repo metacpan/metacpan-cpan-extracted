@@ -145,6 +145,7 @@ sub get_databases {
     }
     print 'Ended searching' . "\n";
     $db_cache->{directories} = $dirs;
+    $databases = [ sort { $a cmp $b } @$databases ];
     $db_cache->{databases} = $databases;
     $ax->write_json( $cache_sqlite_files, $db_cache );
     return $databases;

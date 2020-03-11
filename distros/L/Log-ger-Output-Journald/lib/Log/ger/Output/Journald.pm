@@ -1,33 +1,44 @@
 package Log::ger::Output::Journald;
 
-our $DATE = '2017-09-28'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-11'; # DATE
+our $DIST = 'Log-ger-Output-Journald'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
 
+sub meta { +{
+    v => 2,
+} }
+
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     require Log::Journald;
 
     return {
-        create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+        create_outputter => [
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
-                my $logger = sub {
+                my $outputter = sub {
+                    my ($per_target_conf, $fmsg, $per_msg_conf) = @_;
+
                     my %log;
-                    $log{PRIORITY} = $args{level};
-                    if (ref $_[1] eq 'HASH') {
-                        $log{$_} = $_[1]{$_} for keys %{$_[1]};
+                    my $level = defined $per_msg_conf->{level} ?
+                        $per_msg_conf->{level} : $hook_args{level};
+                    $log{PRIORITY} = $level;
+                    if (ref $fmsg eq 'HASH') {
+                        $log{$_} = $fmsg->{$_} for keys %{$fmsg};
                     } else {
-                        $log{MESSAGE} = $_[1];
+                        $log{MESSAGE} = $fmsg;
                     }
                     Log::Journald::send(%log) or warn $!;
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -47,7 +58,7 @@ Log::ger::Output::Journald - Send logs to journald
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -77,7 +88,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

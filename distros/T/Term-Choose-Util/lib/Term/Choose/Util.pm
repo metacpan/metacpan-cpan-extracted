@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.115';
+our $VERSION = '0.116';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf
@@ -15,7 +15,7 @@ use Cwd                   qw( realpath );
 use Encode                qw( decode encode );
 use File::Basename        qw( basename dirname );
 use File::Spec::Functions qw( catdir catfile );
-use List::Util            qw( sum );
+use List::Util            qw( sum any );
 
 use Encode::Locale qw();
 use File::HomeDir  qw();
@@ -786,26 +786,35 @@ sub choose_a_subset {
         if ( length $self->{prompt} ) {
             push @tmp, $self->{prompt};
         }
-
-        if ( defined $self->{mark} && @{$self->{mark}} ) {
-            $self->{mark} = [ map { $_ + @pre } @{$self->{mark}} ];
-        }
-        my $no_spacebar;
+        my $mark;
+        my $solo;
         if ( defined $self->{solo} ) {
-            $no_spacebar = [ map { $_ + @pre } @{$self->{solo}} ];
+            $solo = [ map { $_ + @pre } @{$self->{solo}} ];
+            if ( defined $self->{mark} && @{$self->{mark}} ) {
+                for my $m ( map { $_ + @pre } @{$self->{mark}} ) {
+                    next if any { $m == $_ } @$solo;    # solo elements are not markable with the SpaceBar
+                    push @$mark, $m;
+                }
+            }
         }
+        else {
+            if ( defined $self->{mark} && @{$self->{mark}} ) {
+                $mark = [ map { $_ + @pre } @{$self->{mark}} ];
+            }
+        }
+        my $meta_items = [ 0 .. $#pre, @{$solo||[]} ];
         my $lines = join "\n", @tmp;
         # Choose
         my @idx = choose(
             [ @pre, map { $self->{prefix} . ( defined $_ ? $_ : '' ) } @$curr_avail ],
             { info => $self->{info}, prompt => $lines, layout => $self->{layout}, index => 1,
               alignment => $self->{alignment}, order => $self->{order}, mouse => $self->{mouse},
-              meta_items => [ 0 .. $#pre ], mark => $self->{mark}, include_highlighted => 2,
+              meta_items => $meta_items, mark => $mark, include_highlighted => 2,
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
-              undef => $self->{back}, busy_string => $self->{busy_string}, no_spacebar => $no_spacebar }
+              undef => $self->{back}, busy_string => $self->{busy_string} }
         );
-        $self->{mark} = undef;
+        $self->{mark} = $mark = undef;
         if ( ! defined $idx[0] || $idx[0] == 0 ) {
             if ( @$bu ) {
                 ( $curr_avail, $new_idx ) = @{pop @$bu};
@@ -815,11 +824,17 @@ sub choose_a_subset {
             return;
         }
         if ( defined $self->{solo} ) {
-            my $idx = $idx[0] - @pre;
-            if ( grep { $idx == $_ } @{$self->{solo}} ) {
+            my $solo_idx;
+            for my $i ( @idx ) {                    # Experimental (may be removed):
+                if ( any { $_ == $i } @$solo ) {    # If a solo element is chosen, it is returned solo. Only one solo
+                    $solo_idx = $i - @pre;          # element can be chosen, because the SpaceBar doesn't work for solo
+                    last;                           # elements. Other elements marked with the SpaceBar are ignored when
+                }                                   # a solo element is chosen.
+            }                                       # A chosen solo element returns immediately (without a CONFIRM)
+            if ( defined $solo_idx ) {
                 my $return_indexes = $self->{index}; # because __restore_defaults resets $self->{index}
                 $self->__restore_defaults();
-                return [ $return_indexes ? $idx : $available->[ $idx ] ];
+                return [ $return_indexes ? $solo_idx : $available->[ $solo_idx ] ];
             }
         }
         push @$bu, [ [ @$curr_avail ], [ @$new_idx ] ];
@@ -841,7 +856,7 @@ sub choose_a_subset {
             if ( ! @$new_idx && $opt->{all_by_default} ) {
                 if ( defined $self->{solo} ) {
                     for my $e ( 0 .. $#{$available} ) {
-                        next if List::Util::any { $e == $_ } @{$self->{solo}}; # any
+                        next if any { $e == $_ } @{$self->{solo}};
                         push @$new_idx, $e;
                     }
                 }
@@ -1041,7 +1056,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.115
+Version 0.116
 
 =cut
 

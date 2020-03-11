@@ -1,6 +1,9 @@
 package StatsApp;
 
-use Catalyst qw/ Statsd -Stats=1 /;
+use Catalyst qw/
+  Statsd
+  -Stats=1
+ /;
 
 use MockStatsd;
 
@@ -25,5 +28,9 @@ __PACKAGE__->log( Test::Log::Dispatch->new );
 __PACKAGE__->setup(
 );
 
+sub sessionid {
+    my $c = shift;
+    return 1;
+}
 
 1;

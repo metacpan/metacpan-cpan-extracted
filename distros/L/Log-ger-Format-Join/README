@@ -2,7 +2,7 @@ NAME
     Log::ger::Format::Join - Join arguments together as string
 
 VERSION
-    version 0.001
+    version 0.004
 
 SYNOPSIS
      use Log::ger::Format 'Join';
@@ -30,6 +30,8 @@ CONFIGURATION
     with.
 
 SEE ALSO
+    Log::ger::Format::Default
+
     Log::ger
 
 AUTHOR

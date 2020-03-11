@@ -12,6 +12,7 @@ bin/annex-review-unused
 bin/annex-to-annex
 bin/annex-to-annex-dropunused
 bin/annex-to-annex-reinject
+debian/files
 dist.ini
 lib/App/annex_review_unused.pm
 lib/App/annex_to_annex.pm

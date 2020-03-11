@@ -14,11 +14,11 @@ use HTTP::Status qw( HTTP_BAD_REQUEST );
 use Ref::Util qw/ is_plain_arrayref is_plain_hashref /;
 
 use Plack::Response;
-use Plack::Util::Accessor qw( rules handler );
+use Plack::Util::Accessor qw( rules handler status );
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 
 
 sub prepare_app {
@@ -32,18 +32,23 @@ sub prepare_app {
 
     }
 
+    unless ( $self->status ) {
+        $self->status( HTTP_BAD_REQUEST );
+    }
+
     unless ( $self->handler ) {
         $self->handler(
             sub {
                 my ($env) = @_;
+                my $status = $self->status;
                 if ( my $logger = $env->{'psgix.logger'} ) {
                     $logger->({
                         level   => "warn",
                         message => __PACKAGE__
-                          . " Blocked $env->{REMOTE_ADDR} $env->{REQUEST_URI}"
+                          . " Blocked $env->{REMOTE_ADDR} $env->{REQUEST_METHOD} $env->{REQUEST_URI} HTTP $status"
                     });
                 }
-            my $res = Plack::Response->new(HTTP_BAD_REQUEST, [ 'Content-Type' => 'text/plain' ], [ "Bad Request" ] );
+            my $res = Plack::Response->new($status, [ 'Content-Type' => 'text/plain' ], [ "Bad Request" ] );
                 return $res->finalize;
 
             }
@@ -75,7 +80,7 @@ Plack::Middleware::Security::Simple - A simple security filter for Plack
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -100,6 +105,9 @@ This module provides a simple security filter for PSGI-based
 applications, so that you can filter out obvious exploit-seeking
 scripts.
 
+Note that as an alternative, you may want to consider using something like
+L<modsecurity|https://modsecurity.org/> as a filter in a reverse proxy.
+
 =head1 ATTRIBUTES
 
 =head2 rules
@@ -112,6 +120,8 @@ It can also be a code reference for a subroutine that takes the Plack
 environment as an argument and returns a true value if there is a
 match.
 
+See L<Plack::Middleware::Security::Common> for a set of common rules.
+
 =head2 handler
 
 This is a function that is called when a match is found.
@@ -122,6 +132,17 @@ L<Plack::Middleware::HTTPExceptions>.
 
 The default handler will log a warning to the C<psgix.logger>, and
 return a HTTP 400 (Bad Request) response.
+
+The message is of the form
+
+  Plack::Middleware::Security::Simple Blocked $ip $method $path_query HTTP $status
+
+This can be used if you are writing L<fail2ban> filters.
+
+=head2 status
+
+This is the HTTP status code that the default L</handler> will return
+when a resource is blocked.  It defaults to 400 (Bad Request).
 
 =head1 SEE ALSO
 

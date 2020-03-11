@@ -400,7 +400,7 @@ sub saveTextFh {
 }
 
 ##==============================================================================
-## Relation API: XS
+## Cofreqs API: XS
 
 ## $bool = $CLASS_OR_OBJECT->wantXS()
 ##  + attempts to load and import DiaColloDB::XS::CofUtils
@@ -539,9 +539,9 @@ sub generatePairsPP {
 
 
 ## $cof = CLASS_OR_OBJECT->union($coldb, \@pairs, %opts)
-##  + merge multiple unigram unigram indices from \@pairs into new object
+##  + merge multiple cofreqs indices from \@pairs into new object
 ##  + @pairs : array of pairs ([$cof,\@ti2u],...)
-##    of unigram-objects $cof and tuple-id maps \@ti2u for $cof
+##    of cofreqs-objects $cof and tuple-id maps \@ti2u for $cof
 ##    - \@ti2u may also be a mapping object supporting a toArray() method
 ##  + %opts: clobber %$cof
 ##  + implicitly flushes the new index
@@ -643,6 +643,7 @@ sub f12 {
 ##  + %opts: as for profile(), also:
 ##     coldb => $coldb,   ##-- parent DiaColloDB object (for shared data, debugging)
 ##     dreq  => \%dreq,   ##-- parsed date request
+##     extend => \%slice2keys_packed, ##-- packed extend
 sub subprofile1 {
   my ($cof,$tids,$opts) = @_;
 
@@ -653,6 +654,7 @@ sub subprofile1 {
   my $dreq  = $opts->{dreq};
   my $dfilter = $dreq->{dfilter};
   my $groupby = $opts->{groupby}{ti2g};
+  my $extend  = $opts->{extend};
   my $onepass = $opts->{onepass};
   my $pack_id = $coldb->{pack_id};
 
@@ -695,9 +697,10 @@ sub subprofile1 {
 
       next if ($beg3 >= $size3);
       for ($pos3=$beg3; $pos3 < $end3; ++$pos3) {
-	($i2,$f12) = unpack($pack3, $r3->fetchraw($pos3,\$buf));
-	$key2      = $groupby ? $groupby->($i2) : pack($pack_id,$i2);
-	next if (!defined($key2)); ##-- item2 selection via groupby CODE-ref
+	($i2,$f12)  = unpack($pack3, $r3->fetchraw($pos3,\$buf));
+	$key2       = $groupby ? $groupby->($i2) : pack($pack_id,$i2);
+	next if (!defined($key2)					##-- item2 selection via groupby CODE-ref
+                 || ($extend && !exists($extend->{$ds}{$key2})));	##-- ... or via 'extend' parameter
 	$dprf->{f12}{$key2} += $f12;
 
 	if ($onepass && !exists($id2{"$i2 $d1"})) {
@@ -790,18 +793,6 @@ sub subprofile2 {
   }
 
   return $slice2prf;
-}
-
-##--------------------------------------------------------------
-## Relation API: default: subextend
-
-## \%slice2prf = $rel->subextend(\%slice2prf,\%opts)
-##  + populate f2 frequencies for profiles in \%slice2prf
-##  + %opts: as for subprofile1()
-##  + override calls subprofile2()
-sub subextend {
-  my $cof = shift;
-  return $cof->subprofile2(@_);
 }
 
 ##--------------------------------------------------------------

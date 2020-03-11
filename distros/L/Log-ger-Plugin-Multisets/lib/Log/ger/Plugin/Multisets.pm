@@ -1,43 +1,47 @@
 package Log::ger::Plugin::Multisets;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-04'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Plugin-Multisets'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
 
 use Log::ger ();
 
+sub meta { +{
+    v => 2,
+} }
+
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     die "Please specify at least one of ".
         "log_sub_prefixes|is_sub_prefixes|log_method_prefixes|is_method_prefixes"
         unless
-        $conf{log_sub_prefixes} ||
-        $conf{is_sub_prefixes} ||
-        $conf{log_method_prefixes} ||
-        $conf{is_method_prefixes};
+        $plugin_conf{logger_sub_prefixes} ||
+        $plugin_conf{level_checker_sub_prefixes} ||
+        $plugin_conf{logger_method_prefixes} ||
+        $plugin_conf{level_checker_method_prefixes};
 
     return {
         create_routine_names => [
             __PACKAGE__, # key
             50,          # priority
             sub {        # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
                 my $levels = [keys %Log::ger::Levels];
 
                 my $routine_names = {};
-                for my $key0 (qw(log_sub is_sub log_method is_method)) {
+                for my $key0 (qw(logger_sub level_checker_sub logger_method level_checker_method)) {
                     my $routine_names_key = "${key0}s";
-                    my $conf_key = "${key0}_prefixes";
+                    my $plugin_conf_key = "${key0}_prefixes";
                     $routine_names->{$routine_names_key} = [];
-                    next unless $conf{$conf_key};
-                    for my $prefix (keys %{ $conf{$conf_key} }) {
-                        my $init_args = $conf{$conf_key}{$prefix};
+                    next unless $plugin_conf{$plugin_conf_key};
+                    for my $prefix (keys %{ $plugin_conf{$plugin_conf_key} }) {
+                        my $init_args = $plugin_conf{$plugin_conf_key}{$prefix};
                         push @{ $routine_names->{$routine_names_key} }, map
                             { ["${prefix}$_", $_, undef, $init_args] }
                             @$levels;
@@ -64,7 +68,7 @@ Log::ger::Plugin::Multisets - Create multiple sets of logger routines, each set 
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -84,13 +88,13 @@ Instead of having to resort to OO style to log to different categories:
 you can instead:
 
  use Log::ger::Plugin Multisets => (
-     log_sub_prefixes => {
-         # prefix  => init args
+     logger_sub_prefixes => {
+         # prefix  => per-target conf
          log_      => {category=>'error' }, # or undef, to use the default init args (including category)
          access_   => {category=>'access'},
      },
-     is_sub_prefixes => {
-         # prefix   => category
+     level_checker_sub_prefixes => {
+         # prefix  => per-target conf
          is_        => {category=>'error' },
          access_is_ => {category=>'access'},
      },
@@ -113,19 +117,19 @@ categories without resorting to OO style.
 
 =head1 CONFIGURATION
 
-=head2 log_sub_prefixes
+=head2 logger_sub_prefixes
 
 Hash.
 
-=head2 is_sub_prefixes
+=head2 level_checker_sub_prefixes
 
 Hash.
 
-=head2 log_method_prefixes
+=head2 logger_method_prefixes
 
 Hash.
 
-=head2 is_method_prefixes
+=head2 level_checker_method_prefixes
 
 Hash.
 

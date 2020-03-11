@@ -1,12 +1,16 @@
 package Log::ger::Output::LogAny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Output-LogAny'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use strict;
 use warnings;
+
+sub meta { +{
+    v => 2,
+} }
 
 sub get_hooks {
     my %plugin_conf = @_;
@@ -16,7 +20,7 @@ sub get_hooks {
             __PACKAGE__, # key
             50,          # priority
             sub {        # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
                 my $pkg;
                 if ($hook_args{target_type} eq 'package') {
@@ -34,11 +38,12 @@ sub get_hooks {
                 };
 
                 my $meth = $hook_args{str_level};
-                my $logger = sub {
-                    my $ctx = shift;
-                    $hook_args{per_target_conf}{_la}->$meth(@_);
+                my $outputter = sub {
+                    my ($per_target_conf, $fmsg, $per_msg_conf) = @_;
+                    $hook_args{per_target_conf}{_la}->$meth(
+                        ref $fmsg eq 'ARRAY' ? @$fmsg : $fmsg);
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -58,7 +63,7 @@ Log::ger::Output::LogAny - Send logs to Log::Any
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 

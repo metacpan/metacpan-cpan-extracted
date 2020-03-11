@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.243';
+our $VERSION = '2.244';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.243
+Version 2.244
 
 =head1 SYNOPSIS
 
@@ -411,6 +411,9 @@ Use only selected columns of the imported data.
 If the data has empty columns (C<-->), the non-empty columns are preselected. Columns are regarded as
 empty if the values of all fields in the column - including the column header - have no length.
 
+If the selected columns of a previous I<Choose Cols> usage are a subset of the current available columns, this subset
+of columns is preselected. A I<RESET> removes this preselection.
+
 Columns added with the filter I<Append Col> are empty and therefore not preselected.
 
 If a column is not empty, but has no header name the header is named temporarily C<tmp>.
@@ -471,6 +474,8 @@ In the replacement it can be used the variable C<$c> as a counter. C<$c> is set 
 Available modifiers: C<g>, C<i>, C<e>.
 
 By selecting the prompt line (C<Choose:>) one can save search & replace instructions for later use.
+
+If a search & replace has altered the first row of the input data, a menu entry named C<RESTORE header row> is offered.
 
 =item Split Table
 
@@ -1201,7 +1206,8 @@ How to decode text files.
 
 =head3 Data source
 
-Set the data source to C<plain>, C<copy&paste>, C<file> or C<plain/copy&paste/file>.
+Set the data source to C<plain>, C<copy&paste>, C<file> or C<plain/copy&paste/file> for C<Insert Into> and for
+C<Create Table>.
 
 If this option is set to C<plain/copy&paste/file>, a menu is offered where the user can choose the data source.
 
@@ -1217,14 +1223,6 @@ If I<Dir history> is set to C<1> and a directory has already been saved, the dir
 
 To find out the location of the configuration files call C<db-browser -h> and choose I<Path>. The data is saved in JSON
 format.
-
-=head1 BACKWARD INCOMPATIBLE CHANGES
-
-Backward incompatible changes introduced with C<2.200>:
-
-Perl minimum version is now C<5.10.1> instead of C<5.8.3>.
-
-New L<Plugin API|App::DBBrowser::DB>.
 
 =head1 REQUIREMENTS
 

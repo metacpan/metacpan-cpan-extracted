@@ -1,6 +1,20 @@
 ==================================================
-Changes from 2015-03-12 00:00:00 +0000 to present.
+Changes from 2015-03-13 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.90 at 2020-03-11 15:12:17 +0000
+-----------------------------------------
+
+  Change: 4e7524712ba22826ee94dc270270d544a8402b40
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-03-11 15:12:17 +0000
+
+    Release engineering for 1.90
+
+    - Finessed patching for Time::Local 2020 problem
+
+    Local.t patching back to v5.8.7 
 
 -----------------------------------------
 version 1.88 at 2020-03-10 20:11:48 +0000
@@ -563,5 +577,5 @@ version 1.32 at 2015-03-30 15:52:27 +0000
     Updated the included hints to latest from blead 
 
 =================================================
-Plus 65 releases after 2015-03-12 00:00:00 +0000.
+Plus 65 releases after 2015-03-13 00:00:00 +0000.
 =================================================

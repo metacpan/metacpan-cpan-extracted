@@ -5,8 +5,6 @@ author:
 build_requires:
   Test::Exception: '0'
   Test::More: '0'
-  strict: '0'
-  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -18,8 +16,11 @@ meta-spec:
 name: Test-Consul
 requires:
   Carp: '0'
+  Data::Random: '0'
+  Defined::KV: '0'
   File::Temp: '0'
   File::Which: '0'
+  Getopt::Long::Descriptive: '0'
   HTTP::Tiny: v0.14.0
   JSON::MaybeXS: '0'
   Moo: '0'
@@ -32,11 +33,13 @@ requires:
   Types::Standard: '0'
   namespace::autoclean: '0'
   perl: '5.010'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/robn/Test-Consul/issues
   homepage: https://github.com/robn/Test-Consul
   repository: https://github.com/robn/Test-Consul.git
-version: '0.015'
+version: '0.016'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -178,7 +181,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.015'
+          tag: '0.016'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

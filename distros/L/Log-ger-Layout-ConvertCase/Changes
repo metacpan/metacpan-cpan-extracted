@@ -1,3 +1,10 @@
+0.003   2020-03-09  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Adjust to Log::ger 0.034 (add meta()).
+
+
 0.002   2019-12-22  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

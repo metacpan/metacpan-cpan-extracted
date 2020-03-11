@@ -1,9 +1,9 @@
 package Log::ger::Filter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-10'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.036'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 use parent qw(Log::ger::Plugin);
 
@@ -22,7 +22,7 @@ Log::ger::Filter - Use a filter plugin
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 SYNOPSIS
 

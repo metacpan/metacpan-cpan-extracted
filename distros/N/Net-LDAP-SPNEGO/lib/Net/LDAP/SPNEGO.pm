@@ -1,5 +1,5 @@
 package Net::LDAP::SPNEGO;
-our $VERSION = '0.1.6';
+our $VERSION = '0.1.7';
 
 =encoding utf8
 
@@ -141,7 +141,7 @@ use warnings;
 
 use parent 'Net::LDAP';
 use Net::LDAP::Constant qw(LDAP_SASL_BIND_IN_PROGRESS LDAP_SUCCESS LDAP_LOCAL_ERROR);
-
+use Net::LDAP::Util qw(escape_filter_value);
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Net::LDAP::Message;
 use Encoding::BER::DER;
@@ -271,15 +271,29 @@ sub get_ad_groups {
         attrs => [],
     )->entry(0);
 
-    my @groups = $self->search(
+    my @groups;
+    my $search = $self->search(
         base => $self->_get_base_dn,
         filter => '(|'
         .'(objectSID='._ldap_quote($primaryGroupSID).')'
-        .'(member:1.2.840.113556.1.4.1941:='.$userDN.')'
-        .'(member:1.2.840.113556.1.4.1941:='.$primaryGroup->dn.')'
+        .'(member:1.2.840.113556.1.4.1941:='.escape_filter_value($userDN).')'
+        .'(member:1.2.840.113556.1.4.1941:='.escape_filter_value($primaryGroup->dn).')'
         .')',
         attrs => ['sAMAccountName','description']
-    )->entries;
+    );
+    if ($search->is_error) {
+        warn "LDAP Search failed: ".$search->error;
+        return {};
+    }
+    while (my $entry = eval { $search->shift_entry }){
+        push @groups, $entry;
+    };
+    if ($@) {
+        warn "Problem fetching search entry $@";
+    }
+    if ($search->is_error) {
+        warn "LDAP Search error: ".$search->error;
+    }
 
     return {
      map {
@@ -313,7 +327,7 @@ sub _get_ad_user {
  my $user = $self->search(
      base => $self->_get_base_dn,
      scope => 'sub',
-     filter => "(sAMAccountName=".$sAMAccountName.')',
+     filter => "(sAMAccountName=".escape_filter_value($sAMAccountName).')',
      attrs => [],
  )->entry(0);
 

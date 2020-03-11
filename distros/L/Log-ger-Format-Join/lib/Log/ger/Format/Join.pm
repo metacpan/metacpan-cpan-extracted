@@ -1,17 +1,21 @@
 package Log::ger::Format::Join;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-18'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Format-Join'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
 
-sub get_hooks {
-    my %conf = @_;
+sub meta { +{
+    v => 2,
+} }
 
-    my $with = $conf{with} ? $conf{with} : '';
+sub get_hooks {
+    my %plugin_conf = @_;
+
+    my $with = $plugin_conf{with} ? $plugin_conf{with} : '';
 
     return {
         create_formatter => [
@@ -41,7 +45,7 @@ Log::ger::Format::Join - Join arguments together as string
 
 =head1 VERSION
 
-version 0.001
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -74,6 +78,8 @@ formatting; it just joins the arguments into a string.
 String. Default empty string. Characters to use to join the arguments with.
 
 =head1 SEE ALSO
+
+L<Log::ger::Format::Default>
 
 L<Log::ger>
 

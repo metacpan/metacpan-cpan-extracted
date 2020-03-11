@@ -412,7 +412,7 @@ sub union {
   ##-- stage2: sort & load tempfile
   env_push(LC_ALL=>'C');
   $ug->vlog('trace', "union(): stage2: load unigram frequencies");
-  my $sortfh = opencmd("sort -n -k2 -k3 $tmpfile |")
+  my $sortfh = opencmd("sort -n -k2 -k3 ".sortJobs()." $tmpfile |")
     or $ug->logconfess("union(): open failed for pipe from sort: $!");
   binmode($sortfh,':raw');
   $ug->loadTextFh($sortfh)
@@ -479,6 +479,7 @@ sub subprofile1 {
   my $dreq  = $opts->{dreq};
   my $dfilter = $dreq->{dfilter};
   my $groupby = $opts->{groupby}{ti2g};
+  my $extend  = $opts->{extend};
   my $onepass = $opts->{onepass};
   my $pack_id = $coldb->{pack_id};
 
@@ -518,7 +519,9 @@ sub subprofile1 {
       $dprf = $slice2prf{$ds};
       $dprf->{f1} += $f1;
 
-      next if (!defined($key2)); ##-- item2 selection via groupby CODE-ref
+      next if (!defined($key2)					##-- item2 selection via groupby CODE-ref
+               || ($extend && !exists($extend->{$ds}{$key2}))	##-- ... or via 'extend' parameter
+              );
       $dprf->{f12}{$key2} += $f1;
       $dprf->{f2}{$key2}  += $f1;
     }
@@ -534,17 +537,6 @@ sub subprofile1 {
 ##  + populate f2 frequencies for profiles in \%slice2prf
 ##  + %opts: as for subprofile1()
 ##  + INHERITED from DiaColloDB::Relation : no-op
-
-##--------------------------------------------------------------
-## Relation API: default: subextend
-
-## \%slice2prf = $rel->subextend(\%slice2prf,\%opts)
-##  + populate f2 frequencies for profiles in \%slice2prf
-##  + %opts: as for subprofile1()
-##  + override returns empty meta-profile (no-op)
-sub subextend {
-  return DiaColloDB::Profile::Multi->new();
-}
 
 ##--------------------------------------------------------------
 ## Relation API: default: qinfo

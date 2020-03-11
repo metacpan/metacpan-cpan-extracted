@@ -1,3 +1,15 @@
+0.004   2020-03-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump v to 2 to comply to Log::ger 0.037.
+
+
+0.003   2020-03-09  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Adjust to Log::ger 0.034 (add meta()).
+
+
 0.002   2020-03-07  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust with Log::ger 0.033 (renamed hook names, no more

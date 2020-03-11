@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Catalyst",
       "StatsD",
@@ -80,7 +80,7 @@
    "provides" : {
       "Catalyst::Plugin::Statsd" : {
          "file" : "lib/Catalyst/Plugin/Statsd.pm",
-         "version" : "v0.6.3"
+         "version" : "v0.7.1"
       }
    },
    "release_status" : "stable",
@@ -94,12 +94,13 @@
          "web" : "https://github.com/robrwo/CatalystX-Statsd"
       }
    },
-   "version" : "v0.6.3",
+   "version" : "v0.7.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Slaven Rezi\u0107 <slaven@rezic.de>"
    ],
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

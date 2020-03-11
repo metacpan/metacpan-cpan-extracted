@@ -31,3 +31,7 @@ Revision history for Mojolicious-Plugin-Minion-Tasks
 
 0.1.1   2020-03-10
         Chart for each worker on dashboard
+
+0.1.2   2020-03-11
+        Show wait time for each worker
+        Metrics page for each worker

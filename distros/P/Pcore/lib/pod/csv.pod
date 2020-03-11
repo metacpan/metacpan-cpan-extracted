@@ -21,12 +21,12 @@
 
     Text::CSV_XS::csv(
         in          => Array[HashRef],
-        out         => 'filename.csv',
+        out         => 'filename.csv', # \my $csv
         headers     => [qw[field1 field2 ...]],
         binary      => 1,
         encoding    => 'UTF-8',
         decode_utf8 => 0,
-        eol         => $LF,
+        eol         => "\n",
     );
 
 =cut

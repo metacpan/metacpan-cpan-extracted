@@ -1,3 +1,7 @@
+0.4.1 2020-03-11
+  - longer default timeout
+  - log to the controller
+
 0.4.0 2019-06-18
   - support TLS for ldap
 

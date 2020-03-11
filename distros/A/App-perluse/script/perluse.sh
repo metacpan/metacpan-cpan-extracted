@@ -19,11 +19,11 @@ S<perl-I<version> | I<version> | I<name>>
 
 Examples:
 
-  $ perluse 5.18.1 perl -E 'say $^V'
+  $ perluse 5.30.0 perl -E 'say $^V'
 
   $ perluse blead perldoc perldelta
 
-  $ perluse perl-5.18.1
+  $ perluse perl-5.30.0
 
   $ perluse
 
@@ -32,26 +32,31 @@ Examples:
 This command wraps L<perlbrew> command and uses the given version perl in
 current shell.
 
+ActivePerl is supported if is located in the default
+directory: F</opt/ActivePerl-VERSION> or F<$HOME/opt/ActivePerl-VESION>.
+
 =cut
 
 POD
 
 
-VERSION=0.0102
+VERSION=0.0201
 
 PERLBREW_ROOT=${PERLBREW_ROOT:-$HOME/perl5/perlbrew}
 
 if [ -x "$PERLBREW_ROOT/bin/perlbrew" ]; then
     perlbrew="$PERLBREW_ROOT/bin/perlbrew"
-else
+elif command -v perlbrew >/dev/null; then
     perlbrew=perlbrew
+else
+    perlbrew=:
 fi
 
 if [ ! -f "$PERLBREW_ROOT/etc/bashrc" ]; then
     $perlbrew init
 fi
 
-if [ -n "$BASH_VERSION" ]; then
+if [ -n "$BASH_VERSION" ] && [ -f "$PERLBREW_ROOT/etc/bashrc" ]; then
     source "$PERLBREW_ROOT/etc/bashrc"
 fi
 
@@ -66,19 +71,43 @@ if [ $# -lt 1 ]; then
     echo ""
     echo "Installed versions:"
     $perlbrew list
+    for d in $HOME/opt/ActivePerl-* /opt/ActivePerl-*; do
+        test -d "$d" || continue
+        p=`basename $d`
+        echo "  $p"
+    done
     exit 1
 fi
 
 version="$1"
 shift
 
-env=`$perlbrew env "$version" | sed 's/^export //'` || exit 2
-eval $env
-export PERLBREW_MANPATH PERLBREW_PATH PERLBREW_ROOT PERLBREW_VERSION
+case "$version" in
+    5.[0-9]|5.[0-9][0-9])
+        if [ -d $HOME/opt/ActivePerl-$version ] || [ -d /opt/ActivePerl-$version ]; then
+            version="ActivePerl-$version"
+        fi
+esac
 
-PATH="$PERLBREW_PATH:${PATH:-/usr/bin:/bin}"
-PERL5LIB=$(perl -le 'print join ":", grep { /site_perl/ } @INC')
-debian_chroot="$PERLBREW_PERL"
+case "$version" in
+    ActivePerl-*)
+        for d in $HOME/opt/ActivePerl-* /opt/ActivePerl-*; do
+            test -d "$d" || continue
+            PATH="$d/site/bin:$d/bin:${PATH:-/usr/bin:/bin}"
+            debian_chroot="$version"
+            break
+        done
+        ;;
+    *)
+        env=`$perlbrew env "$version" | sed 's/^export //'`
+        test -n "$env" || exit 2
+        eval $env
+        export PERLBREW_MANPATH PERLBREW_PATH PERLBREW_ROOT PERLBREW_VERSION
+
+        PATH="$PERLBREW_PATH:${PATH:-/usr/bin:/bin}"
+        PERL5LIB=$(perl -le 'print join ":", grep { /site_perl/ } @INC')
+        debian_chroot="$PERLBREW_PERL"
+esac
 
 export PATH PERL5LIB debian_chroot
 
@@ -107,6 +136,10 @@ or
 
   $ curl -kL http://git.io/dXVJCg | sh
 
+or
+
+  $ wget -O- http://git.io/dXVJCg | sh
+
 =head1 SEE ALSO
 
 L<perlbrew>.
@@ -117,7 +150,7 @@ Piotr Roszatycki <dexter@cpan.org>
 
 =head1 LICENSE
 
-Copyright (c) 2011-2014 Piotr Roszatycki <dexter@cpan.org>.
+Copyright (c) 2011-2014, 2020 Piotr Roszatycki <dexter@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as perl itself.

@@ -2,7 +2,7 @@
 
 <div class="card">
     <div class="card-header d-flex justify-content-between">
-        <h5><%= $job->task %> <%= overview_job_status($job->info->{ state }) %></h5>
+        <span><%= $job->task %> <%= overview_job_status($job->info->{ state }) %></span>
 
         <div class="pull-left">
             <a href="<%= url_for('minion_overview.metrics.jobs.show', job => $job->task) %>" title="Metrics"><i class="fa fa-chart-bar"></i></a>

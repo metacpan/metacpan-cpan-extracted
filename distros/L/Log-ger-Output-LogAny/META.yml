@@ -8,7 +8,7 @@ build_requires:
   IPC::Open3: '0'
   Log::Any::Adapter: '0'
   Log::Any::Adapter::Callback: '0'
-  Log::ger: '0.033'
+  Log::ger: '0.037'
   Log::ger::Output: '0.008'
   Test::More: '0.98'
   vars: '0'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Output-LogAny
   homepage: https://metacpan.org/release/Log-ger-Output-LogAny
   repository: git://github.com/perlancar/perl-Log-ger-Output-LogAny.git
-version: '0.007'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

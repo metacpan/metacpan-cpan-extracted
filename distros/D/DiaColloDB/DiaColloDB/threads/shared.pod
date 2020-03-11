@@ -1,0 +1,97 @@
+##========================================================================
+## NAME
+=pod
+
+=head1 NAME
+
+DiaColloDB::threads::shared - wrapper for threads/shared.pm or forks/shared.pm
+
+=cut
+
+##========================================================================
+## SYNOPSIS
+=pod
+
+=head1 SYNOPSIS
+
+ ##========================================================================
+ ## PRELIMINARIES
+ 
+ use DiaColloDB::threads::shared;
+ 
+ $module = $DiaColloDB::threads::shared::MODULE;
+ 
+ if ($DiaColloDB::threads::shared::MODULE) {
+   ##-- you can use the threads::shared API
+   my ($var);
+   share($var);
+   lock($var);
+   #... etc.
+ }
+
+=cut
+
+##========================================================================
+## DESCRIPTION
+=pod
+
+=head1 DESCRIPTION
+
+The C<DiaColloDB::threads::shared> module attempts to load shared variable support
+for (pseudo)-threads
+from either L<threads/shared.pm|threads::shared> or L<forks/shared.pm|forks::shared>,
+depending on whether or not your perl has builtin thread support according to
+L<C<$Config{usethreads}>|Config>.  It also wraps the C<import()> method of
+whatever module it actually loads, so it should work as a drop-in replacement
+for whatever C<threads::shared>-like module you have available.
+
+=cut
+
+##----------------------------------------------------------------
+## DESCRIPTION: DiaColloDB::threads::shared: Gloabls
+=pod
+
+=head2 Gloabls
+
+=over 4
+
+=item Variable: $MODULE
+
+After using C<DiaColloDB::threads::shared>, the variable
+C<$DiaColloDB::threads::shared::MODULE> is set to the
+name of the module providing the underlying C<threads::shared> implementation
+(either C<threads::shared> or C<forks::shared>), if any.
+Otherwise, it is set to the empty string.
+
+=back
+
+=cut
+
+##======================================================================
+## Footer
+##======================================================================
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2020 by Bryan Jurish
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 SEE ALSO
+
+L<DiaColloDB::threads(3pm)|DiaColloDB::threads>,
+L<threads::shared(3pm)|threads::shared>,
+L<forks::shared(3pm)|forks::shared>,
+L<perl(1)|perl>,
+...
+
+
+
+=cut

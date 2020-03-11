@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::LogAny - Send logs to Log::Any
 
 VERSION
-    version 0.007
+    version 0.009
 
 SYNOPSIS
      use Log::ger::Output 'LogAny';

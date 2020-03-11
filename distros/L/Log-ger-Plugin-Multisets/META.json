@@ -29,7 +29,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::ger" : "0.031",
+            "Log::ger" : "0.037",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -39,7 +39,10 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0"
+            "Log::ger::Output" : "0.005",
+            "Log::ger::Plugin" : "0",
+            "Test::More" : "0.98",
+            "vars" : "0"
          }
       }
    },
@@ -55,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-Plugin-Multisets"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

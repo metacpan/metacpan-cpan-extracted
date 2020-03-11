@@ -19,6 +19,7 @@ END { print SHOW_CURSOR }
 sub _choose_fmt {
     my ( $opt, $info, $ex, $video_id ) = @_;
     my $fmt_to_info = $info->{$ex}{$video_id}{fmt_to_info};
+    my $title = "\n" . '"' . $info->{$ex}{$video_id}{title} . '"';
     my ( @choices, @format_ids );
     if ( $ex eq 'youtube' ) {
         for my $fmt ( sort { $a <=> $b } keys %$fmt_to_info ) {
@@ -43,7 +44,7 @@ sub _choose_fmt {
         # Choose
         my $idx = choose(
             [ @pre, @choices ],
-            { prompt => 'fmt: ' . join( '', @fmt_str ), index => 1, order => 1, undef => '<<' }
+            { prompt => 'fmt: ' . join( '', @fmt_str ), index => 1, order => 1, undef => '<<', info => $title }
         );
         if ( ! $idx ) {
             return if ! @fmt_str;
@@ -54,7 +55,7 @@ sub _choose_fmt {
         push @fmt_str, @format_ids[ $idx - @pre ];
         my $enough = 'OK';
         my @ops = ( undef, $enough, '+', ',', '/', );
-        my $op = choose( \@ops, { prompt => 'fmt: ' . join( '', @fmt_str ), undef => '<<' } );
+        my $op = choose( \@ops, { prompt => 'fmt: ' . join( '', @fmt_str ), undef => '<<', info => $title } );
         if ( ! defined $op ) { #
             pop @fmt_str;
             next;
@@ -92,33 +93,26 @@ sub download_youtube {
 
     EX: for my $ex ( sort keys %$info ) {
         my @sorted_video_ids = sort { $info->{$ex}{$a}{count} <=> $info->{$ex}{$b}{count} } keys %{$info->{$ex}};
-        my $ask_each = @sorted_video_ids == 1 ? 0 : 1;
-        my $ask_fmt  = 1;
-        my $choice = '';
-        my $keep = 'YES';
+        my $ask_fmt_for_each_video = 0;
+        if ( $qty eq 'manually' && @sorted_video_ids > 1 ) {
+            my $prompt = 'Keep format choices for all videos?';
+            my $choice = choose( [ undef, 'YES' ], { prompt => $prompt, undef => 'NO' } );
+            if ( ! defined $choice ) {
+                $ask_fmt_for_each_video = 1;
+            }
+        }
         my $fmt_str;
 
         VIDEO: for my $video_id ( @sorted_video_ids ) {
             my @cmd = @{$opt->{youtube_dl}};
             #push @cmd, '--skip-download';
             if ( $qty eq 'manually' ) {
-                if ( $ask_each ) {
-                    my $prompt = 'Keep format choices for all videos?';
-                    $choice = choose( [ 'NO', $keep ], { prompt => $prompt } );
-                    if ( ! defined $choice ) {
-                        print $info->{$ex}{$video_id}{count} . '/' . $total . ' skipped' . "\n";
-                        next VIDEO;
-                    }
-                    $ask_each = 0;
-                }
-
-                if ( $ask_fmt ) {
+                if ( $ask_fmt_for_each_video || ! $fmt_str ) {
                     $fmt_str = _choose_fmt( $opt, $info, $ex, $video_id );
                     if ( ! defined $fmt_str ) {
                         print $info->{$ex}{$video_id}{count} . '/' . $total . ' skipped' . "\n";
                         next VIDEO;
                     }
-                    $ask_fmt = 0 if $choice eq $keep;
                 }
                 push @cmd, '-f', $fmt_str;
             }

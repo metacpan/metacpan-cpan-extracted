@@ -2,6 +2,30 @@
 ##
 ## Change log for perl distribution DiaColloDB
 
+v0.12.016 Wed, 11 Mar 2020 14:05:15 +0100 moocow
+	* added DiaColloDB::threads, DiaColloDB::threads::shared - attempt to wrap threads/forks support
+	* updated $TDF_MGOOD_DEFAULT regex (added fields country|region|party|role)
+	* added {s2gx} key to DiaColloDB::groupby() and TDF::groupby(): "safe" inverse stringification for extend()
+	* fixed incorrect f12-acquisition bug for Client::list
+	  - Relation::extend() now performs a full profile(), restricted to "missing" candidate keys
+	  - DDC-mode list-client disable extend() support, always return full profiles (they're already stringified)
+	  - removed Relation::DDC::extend() method (now just a no-op)
+	* added support for direct list-client "ddcServer" option (dedicated metaserver, bypasses default list-client dispatch)
+	* fixed incorrect f12-acquisition for TDF in PDL-Utils diacollo_cof_c_* methods (groupby metadata attributes only)
+	  - old version was returning bogus data with (f12 > f1) due to unncessary embedded all-matching-docs loop (adnzi)
+	* changed semantics of Client::list "fudge" option value "0" (zero)
+	  - old: fudge maximized -> fetch all available results from all sub-clients (as for $fudge < 0)
+	  - new: fudge disabled  -> fetch exactly $kbest results from all sub-clients (as for $fudge = 1)
+	* changed Client::list 'logFork' option name to 'logThread'
+	* improved passing down of command-line dcdb-query.perl options through Client::open() calls
+	  - %opts were getting dropped in Client::file::open_file() call to open_rcfile()
+	* added "extend" option to Profile::Multi::trim(), maps to slice-dependent "keep" option for each sub-profile
+	* fixed precision/overflow error computing TDF "N" attribute during union() and create()
+	  - was computed using $tdm->_vals->sum() --> float accumulator, 24-bit integer resolution -> max N=16M
+	  - now computed using $tdm->_vals->dsum() --> double accumulator, 53-bit(?) integer resolution -> max N=18P
+	* updated prerequisite DDC::Concordance >= v0.44, for $DDC::Client::JSON_BACKEND
+	  - fixes JSON::XS breakdowns observed for threaded list-clients in DDC mode
+
 v0.12.015 Wed, 04 Mar 2020 13:11:43 +0100 moocow
 	* fix XS/cof-compile.h (un)signedness bug resulting in bogus indices from union
 	  - un-collocated f1 components from temporary cof.udat were getting counted as i2=4294967295 == (uint32_t)-1

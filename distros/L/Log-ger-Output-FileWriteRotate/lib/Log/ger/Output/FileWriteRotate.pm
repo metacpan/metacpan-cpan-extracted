@@ -1,28 +1,31 @@
 package Log::ger::Output::FileWriteRotate;
 
-our $DATE = '2019-09-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-09'; # DATE
+our $DIST = 'Log-ger-Output-FileWriteRotate'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     require File::Write::Rotate;
-    my $fwr = File::Write::Rotate->new(%conf);
+    my $fwr = File::Write::Rotate->new(%plugin_conf);
 
     return {
-        create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+        create_outputter => [
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
-                my $logger = sub {
-                    my ($ctx, $msg) = @_;
-                    $fwr->write($msg, $msg =~ /\R\z/ ? "" : "\n");
+                my $outputter = sub {
+                    my ($per_target_conf, $fmsg, $per_msg_conf) = @_;
+                    $fwr->write($fmsg, $fmsg =~ /\R\z/ ? "" : "\n");
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -42,7 +45,7 @@ Log::ger::Output::FileWriteRotate - Log to File::Write::Rotate
 
 =head1 VERSION
 
-This document describes version 0.003 of Log::ger::Output::FileWriteRotate (from Perl distribution Log-ger-Output-FileWriteRotate), released on 2019-09-10.
+This document describes version 0.004 of Log::ger::Output::FileWriteRotate (from Perl distribution Log-ger-Output-FileWriteRotate), released on 2020-03-09.
 
 =head1 SYNOPSIS
 
@@ -114,7 +117,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

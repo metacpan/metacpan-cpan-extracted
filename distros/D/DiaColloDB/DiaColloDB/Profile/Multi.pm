@@ -204,8 +204,9 @@ sub sumover {
 ## $mp_or_undef = $mp->trim(%opts)
 ##  + %opts: as for DiaColloDB::Profile::trim(), also:
 ##    (
-##     empty => $bool,   ##-- remove empty sub-profiles? (default=true)
-##     global => $bool,  ##-- trim sub-profiles globally (default=false)
+##     empty  => $bool,        ##-- remove empty sub-profiles? (default=true)
+##     global => $bool,        ##-- trim sub-profiles globally (default=false)
+##     extend => \%label2keys, ##-- maps Profile::Multi labels to trim() keys
 ##    )
 ##  + calls $prf->trim(%opts) for each sub-profile $prf
 sub trim {
@@ -219,7 +220,13 @@ sub trim {
   ##-- trim empty sub-profiles
   @{$mp->{profiles}} = grep {!$_->empty} @{$mp->{profiles}} if (!exists($opts{empty}) || $opts{empty});
 
-  if (!$opts{global}) {
+  if ($opts{extend}) {
+    ##-- "extend" mode: slice-dependent trimming for 2nd-pass distributed queries
+    my $extend = $opts{extend};
+    $_->trim(%opts,keep=>($extend->{$_->{label}}//{})) or return undef
+      foreach (grep {defined($_)} @{$mp->{profiles}});
+  }
+  elsif (!$opts{global}) {
     ##-- slice-local trimming (default)
     $_->trim(%opts) or return undef foreach (grep {defined($_)} @{$mp->{profiles}});
   } else {

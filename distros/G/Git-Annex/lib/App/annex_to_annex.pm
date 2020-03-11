@@ -15,7 +15,7 @@ package App::annex_to_annex;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$App::annex_to_annex::VERSION = '0.002';
+$App::annex_to_annex::VERSION = '0.003';
 use 5.028;
 use strict;
 use warnings;
@@ -99,9 +99,9 @@ sub main {
             #>>>
         }
 
-        my $base = basename $source;
         my @missing
-          = $annex->annex->find("--not", "--in", "here", $base);
+          = $annex->annex->find("--not", "--in", "here",
+                                abs2rel $source, $annex->toplevel);
         if (@missing) {
             say "Following annexed files are not present in this repo:";
             say for @missing;
@@ -120,7 +120,7 @@ sub main {
                     die "$target already exists!\n"
                       if -e $target and !-d $target;
 
-                    my $key = $lk->ask($rel);
+                    my $key = $lk->ask($File::Find::name);
                     if ($key) {    # this is an annexed file
                         my $content = rel2abs $cl->ask($key), $annex->toplevel;
                         my $content_device_id = (stat $content)[0];
@@ -137,7 +137,8 @@ sub main {
                         # to the source, or anything like that
                         system "git", "-C", $dest, "annex", "add",    $rel;
                         system "git", "-C", $dest, "annex", "unlock", $rel
-                          if $find->ask($rel);
+                          if $find->ask(abs2rel $File::Find::name,
+                                        $annex->toplevel);
 
                         # if using the default backend, quick sanity check
                         if ($key =~ /^SHA256E-s[0-9]+--([0-9a-f]+)/) {
@@ -198,7 +199,7 @@ App::annex_to_annex - use hardlinks to migrate files between git annex repos
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 FUNCTIONS
 

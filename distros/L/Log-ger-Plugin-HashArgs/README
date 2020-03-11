@@ -1,0 +1,61 @@
+NAME
+    Log::ger::Plugin::HashArgs - Log using hash arguments
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+     use Log::ger::Plugin 'HashArgs', (
+         # sub_name    => 'log_it', # the default name is 'log'
+         # method_name => 'log_it', # the default name is 'log'
+         # exclusive => 1,          # optional, defaults to 0
+     );
+     use Log::ger::Output 'Screen';
+     use Log::ger;
+
+     log(level => 'info', message => 'an info message ...'); # won't be output to screen
+     log(level => 'warn', message => 'a warning!');          # will be output
+
+    To set category:
+
+     log(category=>..., level=>..., message=>...);
+
+DESCRIPTION
+    This is a plugin to log using a single log subroutine that is passed the
+    message as well as the level, using hash arguments.
+
+    Note: the multilevel log is slightly slower because of the extra
+    argument and additional string level -> numeric level conversion. See
+    benchmarks in Bencher::Scenarios::LogGer.
+
+    Note: the individual separate "log_LEVEL" subroutines (or "LEVEL"
+    methods) are still installed, unless you specify configuration
+    "exclusive" to true.
+
+CONFIGURATION
+  sub_name
+    Str. Logger subroutine name. Defaults to "log" if not specified.
+
+  method_name
+    Str. Logger method name. Defaults to "log" if not specified.
+
+  exclusive
+    Boolean. If set to true, will block the generation of the default
+    "log_LEVEL" subroutines or "LEVEL" methods (e.g. "log_warn", "trace",
+    ...).
+
+SEE ALSO
+    Log::ger::Like::LogDispatch which uses this plugin. The interface
+    provided by this HashArgs plugin is similar to Log::Dispatch interface.
+
+    Log::ger::Plugin::MultilevelLog
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

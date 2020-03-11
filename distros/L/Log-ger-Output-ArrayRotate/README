@@ -2,9 +2,9 @@ NAME
     Log::ger::Output::ArrayRotate - Log to array, rotating old elements
 
 VERSION
-    This document describes version 0.001 of Log::ger::Output::ArrayRotate
+    This document describes version 0.004 of Log::ger::Output::ArrayRotate
     (from Perl distribution Log-ger-Output-ArrayRotate), released on
-    2017-07-16.
+    2020-03-11.
 
 SYNOPSIS
      use Log::ger::Output ArrayRotate => (
@@ -37,7 +37,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

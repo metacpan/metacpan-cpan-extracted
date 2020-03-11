@@ -68,10 +68,11 @@ sub get_content {
         [ 'file',  '- From File' ],
     );
     my $old_idx = 1;
+    my $data_source_choice = $sf->{o}{insert}{'data_source_' . $sf->{i}{stmt_types}[0]};
 
     MENU: while ( 1 ) {
         if ( ! $skip_to ) {
-            if ( $sf->{o}{insert}{data_source} == 3 ) {
+            if ( $data_source_choice == 3 ) {
                 my $hidden = "Choose type of data source:";
                 my @pre = ( $hidden, undef );
                 my $choices = [ @pre, map { $_->[1] } @cu ];
@@ -100,7 +101,7 @@ sub get_content {
                 $sf->{i}{gc}{source_type} = $cu[$idx-@pre][0];
             }
             else {
-                $sf->{i}{gc}{source_type} = $cu[ $sf->{o}{insert}{data_source} ][0];
+                $sf->{i}{gc}{source_type} = $cu[ $data_source_choice ][0];
             }
         }
 
@@ -120,7 +121,7 @@ sub get_content {
                     ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_file( $sql );
                 }
                 if ( ! $ok ) {
-                    return if $sf->{o}{insert}{data_source} < 3;
+                    return if $data_source_choice < 3;
                     next MENU;
                 }
             }

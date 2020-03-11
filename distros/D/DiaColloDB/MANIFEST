@@ -133,6 +133,10 @@ DiaColloDB/methods/compile.pm
 DiaColloDB/methods/compile.pod
 DiaColloDB/methods/export.pm
 DiaColloDB/methods/export.pod
+DiaColloDB/threads.pm
+DiaColloDB/threads.pod
+DiaColloDB/threads/shared.pm
+DiaColloDB/threads/shared.pod
 
 PDL-Utils/Makefile.PL
 PDL-Utils/pdlutils.pd

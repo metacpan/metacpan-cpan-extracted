@@ -1,5 +1,15 @@
 Revision history for Git::Annex
 
+0.003     2020-03-11 14:35:04-07:00 America/Phoenix
+    - annex-to-annex: Fix path passed to git-annex-find(1) when
+      looking for missing files.
+    - annex-to-annex: Fix path passed to git-annex-lookupkey(1) when
+      determining whether source files are annexed.
+    - annex-to-annex: Pass relative path to git-annex-find(1) when
+      determining if a file was unlocked in the source annex.
+      Workaround for bug in git-annex: git-annex-find(1) returns
+      incorrect response for absolute paths when in --batch mode.
+
 0.002     2020-02-24 07:33:02-07:00 America/Phoenix
     - Fix logic in an example in Git::Annex::BatchCommand SYNOPSIS.
     - annex-review-unused: 'b' should go back one entry not two.

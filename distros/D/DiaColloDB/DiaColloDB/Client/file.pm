@@ -45,7 +45,7 @@ sub open_file {
   my %dbopts = ($cli->dbOptions, $uri->query_form());
 
   ##-- check whether the path looks like an rc-file; if so, try to open it as one
-  return $cli->open_rcfile($cli->{url})
+  return $cli->open_rcfile($cli->{url},%opts)
     if (!-d $path && !-e "$path/header.json");
 
   $cli->{db} = DiaColloDB->new(%dbopts,dbdir=>$path)

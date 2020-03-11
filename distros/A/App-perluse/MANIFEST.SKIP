@@ -56,11 +56,12 @@
 \bDebian_CPANTS.txt$
 -stamp$
 
-# Avoid Eclipse files
+# Avoid IDE files
 .cproject
 .includepath
 .project
 .settings
+.vscode
 
 # Avoid distdir
 \d+\.\d+\b

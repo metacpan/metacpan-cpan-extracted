@@ -289,107 +289,15 @@ sub profile {
 ## Relation API: extend
 
 ## $mprf = $rel->extend($coldb, %opts)
-## + get f2 frequencies profile for selected items as a DiaColloDB::Profile::Multi object
+## + get f12,f2 frequencies for selected items as a DiaColloDB::Profile::Multi object
 ## + requires 'query' option for correct estimation of 'fcoef'
 ## + %opts: as for profile()
 sub extend {
-  my ($that,$coldb,%opts) = @_;
-  my $rel = $that->fromDB($coldb,%opts)
-    or $that->logconfess($coldb->{error}="extend(): initialization failed (did you forget to set the 'ddcServer' option?)");
-
-  ##-- common variables
-  $opts{coldb}   = $coldb;
-  my $opts       = \%opts;
-  my $logProfile = $coldb->{logProfile};
-
-  ##-- sanity check(s)
-  my ($slice2keys);
-  if (!($slice2keys=$opts{slice2keys})) {
-    $rel->warn($coldb->{error}="extend(): no 'slice2keys' parameter specified!");
-    return undef;
-  }
-  elsif (!UNIVERSAL::isa($slice2keys,'HASH')) {
-    $rel->warn($coldb->{error}="extend(): failed to parse 'slice2keys' parameter");
-    return undef;
-  }
-
-  ##-- get "real" count-query, count-by expressions, titles, fcoef, ...
-  my $qcount = $rel->countQuery($coldb,\%opts);
-
-  ##-- parse slice2keys into HASH-refs: ($slice => {$key=>[split(/\t/,$key)], ... }, ...)
-  $slice2keys->{$_} = {map {($_=>[split(/\t/,$_)])} @{$slice2keys->{$_}}} foreach (keys %$slice2keys);
-  my $items         = {map { %$_ } values %$slice2keys};
-
-  ##-- create "extend" query (batch)
-  my $gbexprs   = $opts{gbexprs}->getExprs;
-  my $gbfilters = $opts{gbfilters};
-  my $qxdtr     = undef;
-  my @qxfilt    = qw();
-  my ($gbxi,$gbai,$expr,$qa,$fa);
-  foreach $gbxi (1..$#$gbexprs) {
-    $expr = $gbexprs->[$gbxi];
-    $gbai = $gbxi-1;
-    if (UNIVERSAL::isa($expr,'DDC::Any::CountKeyExprConstant') || UNIVERSAL::isa($_,'DDC::Any::CQCountKeyExprDate')) {
-      ; ##-- skip these
-    }
-    if (UNIVERSAL::isa($expr,'DDC::Any::CQCountKeyExprToken')) {
-      ##-- token expression -> literal set
-      $qa = DDC::Any::CQTokSet->new;
-      $qa->setIndexName($expr->getIndexName);
-      $qa->setValues([map {$_->[$gbai]//''} values %$items]);
-      $qxdtr = defined($qxdtr) ? DDC::Any::CQWith->new($qxdtr,$qa) : $qa;
-    }
-    elsif (UNIVERSAL::isa($expr,'DDC::Any::CQCountKeyExprBibl')) {
-      ##-- bibl expression -> literal set
-      $fa = DDC::Any::CQFHasFieldSet->new($expr->getLabel,[map {$_->[$gbai]//''} values %$items]);
-      push(@qxfilt, $fa);
-    }
-    elsif (UNIVERSAL::isa($_, 'DDC::Any::CQCountKeyExprRegex') && UNIVERSAL::isa($_->getSrc, 'DDC::Any::CQCountKeyExprBibl')) {
-      ##-- regex transformation: ignore
-      #$fa = DDC::Any::CQFHasFieldRegex->new($expr->getLabel);
-      #$fa->setRegex(join('|', map {"\\Q$_->[$gbai]\\E"} values %$items));
-      #push(@qxfilt, $fa);
-      ;
-    }
-    else {
-      $coldb->warn("can't generate extend query-template for groupby expression of type ", ref($expr)//'(undefined)', " \`", $expr->toString, "'");
-    }
-  }
-  $coldb->logconfess($coldb->{error}="no query restrictions found for 'extend' query") if (!$qxdtr);
-  $qxdtr->setMatchId(2);
-  $qxdtr->setOptions($qcount->getDtr->getOptions->clone);
-
-  ##-- cleanup coldb parser (so we're using "real" refcounts)
-  $coldb->qcompiler->CleanParser();
-
-  my $qextend = $qcount->clone;
-  $qextend->setDtr($qxdtr);
-
-  ##-- get slice-wise f2
-  my $xresult = $rel->ddcQuery($coldb, $qextend, limit=>$opts{limit}, logas=>'f2_extend', logTrunc=>-1);
-  my $fcoef   = $opts{fcoef} || 1;
-  my (%y2prf,$y,$prf,$key);
-  foreach (@{$xresult->{counts_}}) {
-    $y   = ($_->[1]//'0');
-    $key = join("\t", @$_[2..$#$_]);
-    next if (!exists $slice2keys->{$y}{$key});
-    $prf = ($y2prf{$y} //= DiaColloDB::Profile->new(label=>$y,N=>0,f1=>0));
-    $prf->{f2}{$key} += $_->[0]*$fcoef;
-    $prf->{f12}{$key} = 0;
-  }
-
-  ##-- honor "fill" option
-  if ($opts{fill}) {
-    for ($y=$opts{dslo}; $y <= $opts{dshi}; $y += ($opts{slice}||1)) {
-      next if (exists($y2prf{$y}));
-      $prf = $y2prf{$y} = DiaColloDB::Profile->new(label=>$y,N=>0,f1=>0);
-    }
-  }
-
-  ##-- finalize: collect multi-profile
-  my $mp = DiaColloDB::Profile::Multi->new(profiles => [@y2prf{sort {$a<=>$b || $a cmp $b} keys %y2prf}]);
-  return $mp;
+  my $that = shift;
+  $that->debug("extend() method not supported - returning empty profile");
+  return DiaColloDB::Profile::Multi->new();
 }
+
 
 ##--------------------------------------------------------------
 ## Relation API: compare

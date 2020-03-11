@@ -1,12 +1,12 @@
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between">
-        <h5>Overview</h5>
+        <h5 class="mb-0">Overview</h5>
     </div>
     <div class="card-bg-secondary">
         <div class="d-flex">
             % my $columns = 0;
             % foreach my $card (@$overview) {
-                % if (($columns++ % 4) == 0) {
+                % if (($columns++ % 5) == 0) {
                     </div>
                     <div class="d-flex">
                 % }

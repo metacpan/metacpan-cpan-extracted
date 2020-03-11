@@ -1,9 +1,9 @@
 package Log::ger::Layout::LTSV;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Layout-LTSV'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,6 +16,10 @@ use Time::HiRes qw(time);
 our $time_start = time();
 our $time_now   = $time_start;
 our $time_last  = $time_start;
+
+sub meta { +{
+    v => 2,
+} }
 
 sub _encode {
     my ($pkg, $msg) = @_;
@@ -161,7 +165,7 @@ sub _get_hooks {
             $pkg, # key
             50,   # priority
             sub { # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
                 my $layouter = sub { $pkg->_layout(\%plugin_conf, @_) };
                 [$layouter];
@@ -188,7 +192,7 @@ Log::ger::Layout::LTSV - Layout log message as LTSV
 
 =head1 VERSION
 
-This document describes version 0.004 of Log::ger::Layout::LTSV (from Perl distribution Log-ger-Layout-LTSV), released on 2020-03-07.
+This document describes version 0.006 of Log::ger::Layout::LTSV (from Perl distribution Log-ger-Layout-LTSV), released on 2020-03-11.
 
 =head1 SYNOPSIS
 

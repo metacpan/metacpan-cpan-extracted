@@ -1,9 +1,9 @@
 package Log::ger::Heavy;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-10'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.036'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -380,7 +380,7 @@ Log::ger::Heavy - The bulk of the implementation of Log::ger
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 DESCRIPTION
 

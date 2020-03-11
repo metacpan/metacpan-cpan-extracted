@@ -3,7 +3,7 @@ NAME
     each set with its own init arguments
 
 VERSION
-    version 0.001
+    version 0.003
 
 SYNOPSIS
     Instead of having to resort to OO style to log to different categories:
@@ -22,13 +22,13 @@ SYNOPSIS
     you can instead:
 
      use Log::ger::Plugin Multisets => (
-         log_sub_prefixes => {
-             # prefix  => init args
+         logger_sub_prefixes => {
+             # prefix  => per-target conf
              log_      => {category=>'error' }, # or undef, to use the default init args (including category)
              access_   => {category=>'access'},
          },
-         is_sub_prefixes => {
-             # prefix   => category
+         level_checker_sub_prefixes => {
+             # prefix  => per-target conf
              is_        => {category=>'error' },
              access_is_ => {category=>'access'},
          },
@@ -47,16 +47,16 @@ DESCRIPTION
     log to different categories without resorting to OO style.
 
 CONFIGURATION
-  log_sub_prefixes
+  logger_sub_prefixes
     Hash.
 
-  is_sub_prefixes
+  level_checker_sub_prefixes
     Hash.
 
-  log_method_prefixes
+  logger_method_prefixes
     Hash.
 
-  is_method_prefixes
+  level_checker_method_prefixes
     Hash.
 
 SEE ALSO

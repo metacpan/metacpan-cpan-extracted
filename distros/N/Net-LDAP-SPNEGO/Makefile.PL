@@ -47,7 +47,7 @@ sub MY::postamble {
 all:: README.md README
 
 README.md: lib/Net/LDAP/SPNEGO.pm
-	\$(PERL) -I$tpd/lib/perl5 -MPod::Markdown::Github -e 'binmode(STDOUT, ":utf8");Pod::Markdown::Github->new->filter(q{lib/Net/LDAP/SPNEGO.pm})' > README.md
+	\$(PERL) -I$tpd/lib/perl5 -MPod::Markdown::Github -e "binmode(STDOUT, q(:utf8));Pod::Markdown::Github->new->filter(q(lib/Net/LDAP/SPNEGO.pm))" > README.md
 
 README: README.md
 	cp README.md README

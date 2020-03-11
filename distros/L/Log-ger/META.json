@@ -61,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger"
       }
    },
-   "version" : "0.036",
+   "version" : "0.037",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

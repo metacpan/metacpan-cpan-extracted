@@ -2,7 +2,7 @@ NAME
     Log::ger::Format::Hashref - Format arguments as hashref
 
 VERSION
-    version 0.001
+    version 0.002
 
 SYNOPSIS
      use Log::ger::Format 'Hashref';

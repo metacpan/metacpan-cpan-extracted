@@ -7,6 +7,7 @@ has listen => '//127.0.0.1';
 
 has proxy => ();    # upstream proxy
 
+has on_accept    => ();
 has backlog      => 0;
 has so_no_delay  => 1;
 has so_keepalive => 1;
@@ -46,6 +47,10 @@ sub _on_prepare ( $self, $fh, $host, $port ) {
 }
 
 sub _on_accept ( $self, $fh, $host, $port ) {
+    if ( my $on_accept = $self->{on_accept} ) {
+        return if !$on_accept->( $self, $fh, $host, $port );
+    }
+
     my $h = P->handle(
         $fh,
         so_no_delay  => $self->{so_no_delay},
@@ -327,10 +332,10 @@ sub _run_tunnel ( $self, $h1, $h2 ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 77                   | * Subroutine "_socks5" with high complexity score (24)                                                         |
-## |      | 180                  | * Subroutine "_http" with high complexity score (28)                                                           |
+## |      | 82                   | * Subroutine "_socks5" with high complexity score (24)                                                         |
+## |      | 185                  | * Subroutine "_http" with high complexity score (28)                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 157                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 162                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

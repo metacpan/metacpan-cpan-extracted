@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.116   2020-03-11
+        - Update experimental option 'solo'.
+
 0.115   2020-03-09
         - 'choose_a_subset': bugfix in option 'no_spacebar'.
         - 'choose_a_subset': renamed option 'no_spacebar' to 'solo'.

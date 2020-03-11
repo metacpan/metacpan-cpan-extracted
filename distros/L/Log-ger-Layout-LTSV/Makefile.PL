@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Log::ger::Layout::LTSV",
   "PREREQ_PM" => {
     "Devel::Caller::Util" => "0.042",
-    "Log::ger" => "0.033",
+    "Log::ger" => "0.037",
     "Sys::Hostname" => 0,
     "Time::HiRes" => 0,
     "strict" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "vars" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.033",
+  "Log::ger" => "0.037",
   "Log::ger::Format" => "0.018",
   "Log::ger::Format::None" => 0,
   "Log::ger::Layout" => 0,

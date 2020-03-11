@@ -112,7 +112,7 @@ sub API_create ( $self, $auth, $args ) {
 
     # update user email
     if ( $args->{email} ) {
-        $res = $dbh->do(
+        my $res1 = $dbh->do(
             'UPDATE "user" SET "email" = ? WHERE "id" = ?',
             [   $args->{email},    #
                 $res->{data}->{id},

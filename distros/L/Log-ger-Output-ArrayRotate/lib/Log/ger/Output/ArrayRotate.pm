@@ -1,31 +1,38 @@
 package Log::ger::Output::ArrayRotate;
 
-our $DATE = '2017-07-16'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-11'; # DATE
+our $DIST = 'Log-ger-Output-ArrayRotate'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
 
-sub get_hooks {
-    my %conf = @_;
+sub meta { +{
+    v => 2,
+} }
 
-    my $ary = $conf{array} or die "Please specify array";
+sub get_hooks {
+    my %plugin_conf = @_;
+
+    my $ary = $plugin_conf{array} or die "Please specify array";
     ref $ary eq 'ARRAY' or die "Please specify arrayref in array";
 
     return {
-        create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+        create_outputter => [
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
-                my $logger = sub {
+                my $outputter = sub {
                     my ($ctx, $msg) = @_;
                     push @$ary, $msg;
-                    if (defined $conf{max_elems} && @$ary > $conf{max_elems}) {
+                    if (defined $plugin_conf{max_elems} && @$ary > $plugin_conf{max_elems}) {
                         shift @$ary;
                     }
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -45,7 +52,7 @@ Log::ger::Output::ArrayRotate - Log to array, rotating old elements
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::Output::ArrayRotate (from Perl distribution Log-ger-Output-ArrayRotate), released on 2017-07-16.
+This document describes version 0.004 of Log::ger::Output::ArrayRotate (from Perl distribution Log-ger-Output-ArrayRotate), released on 2020-03-11.
 
 =head1 SYNOPSIS
 
@@ -86,7 +93,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

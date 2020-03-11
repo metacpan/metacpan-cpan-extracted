@@ -1,5 +1,5 @@
 package Test::Consul;
-$Test::Consul::VERSION = '0.015';
+$Test::Consul::VERSION = '0.016';
 # ABSTRACT: Run a consul server for testing
 
 use 5.010;
@@ -11,289 +11,304 @@ use Path::Tiny;
 use POSIX qw(WNOHANG);
 use Carp qw(croak);
 use HTTP::Tiny v0.014;
-use Net::EmptyPort qw( check_port );
-use File::Temp qw( tempfile );
-use Scalar::Util qw( blessed );
+use Net::EmptyPort qw(check_port);
+use File::Temp qw(tempfile);
+use Scalar::Util qw(blessed);
+use Data::Random qw(rand_words);
 
 use Moo;
-use Types::Standard qw( Bool Enum Undef );
-use Types::Common::Numeric qw( PositiveInt PositiveOrZeroInt );
-use Types::Common::String qw( NonEmptySimpleStr );
+use Types::Standard qw(Bool Enum Undef);
+use Types::Common::Numeric qw(PositiveInt PositiveOrZeroInt);
+use Types::Common::String qw(NonEmptySimpleStr);
 
 my $start_port = 49152;
 my $current_port = $start_port;
 my $end_port  = 65535;
 
 sub _unique_empty_port {
-    my ($udp_too) = @_;
+  my ($udp_too) = @_;
 
-    my $port = 0;
-    while ($port == 0) {
-        $current_port ++;
-        $current_port = $start_port if $current_port > $end_port;
-        next if check_port( $current_port, 'tcp' );
-        next if $udp_too and check_port( $current_port, 'udp' );
-        $port = $current_port;
-    }
+  my $port = 0;
+  while ($port == 0) {
+    $current_port ++;
+    $current_port = $start_port if $current_port > $end_port;
+    next if check_port($current_port, 'tcp');
+    next if $udp_too and check_port($current_port, 'udp');
+    $port = $current_port;
+  }
 
-    # Make sure we return a scalar with just numeric data so it gets
-    # JSON encoded without quotes.
-    return $port;
+  # Make sure we return a scalar with just numeric data so it gets
+  # JSON encoded without quotes.
+  return $port;
+}
+
+sub _generate_name {
+  my ($wordcount) = @_;
+  join '-', map { lc } rand_words(size => $wordcount, shuffle => 1);
 }
 
 has _pid => (
-    is        => 'rw',
-    predicate => '_has_pid',
-    clearer   => '_clear_pid',
+  is    => 'rw',
+  predicate => '_has_pid',
+  clearer   => '_clear_pid',
 );
 
 has port => (
-    is  => 'lazy',
-    isa => PositiveInt,
+  is  => 'lazy',
+  isa => PositiveInt,
 );
 sub _build_port {
-    return _unique_empty_port();
+  return _unique_empty_port();
 }
 
-has serf_lan_port => ( 
-    is  => 'lazy',
-    isa => PositiveInt,
+has serf_lan_port => (
+  is  => 'lazy',
+  isa => PositiveInt,
 );
 sub _build_serf_lan_port {
-    return _unique_empty_port( 1 );
+  return _unique_empty_port(1);
 }
 
 has serf_wan_port => (
-    is  => 'lazy',
-    isa => PositiveInt,
+  is  => 'lazy',
+  isa => PositiveInt,
 );
 sub _build_serf_wan_port {
-    return _unique_empty_port( 1 );
+  return _unique_empty_port(1);
 }
 
 has server_port => (
-    is  => 'lazy',
-    isa => PositiveInt,
+  is  => 'lazy',
+  isa => PositiveInt,
 );
 sub _build_server_port {
-    return _unique_empty_port();
+  return _unique_empty_port();
 }
 
 has node_name => (
-    is  => 'lazy',
-    isa => NonEmptySimpleStr,
+  is  => 'lazy',
+  isa => NonEmptySimpleStr,
 );
 sub _build_node_name {
-    state $node_num = 0;
-    $node_num++;
-    return "tc_node$node_num";
+  _generate_name(2)
 }
 
 has datacenter => (
-    is  => 'lazy',
-    isa => NonEmptySimpleStr,
+  is  => 'lazy',
+  isa => NonEmptySimpleStr,
 );
 sub _build_datacenter {
-    state $dc_num = 0;
-    $dc_num++;
-    return "tc_dc$dc_num";
+  _generate_name(1)
 }
 
 has enable_acls => (
-    is  => 'ro',
-    isa => Bool,
+  is  => 'ro',
+  isa => Bool,
 );
 
 has acl_default_policy => (
-    is      => 'ro',
-    isa     => Enum[qw( allow deny )],
-    default => 'allow',
+  is    => 'ro',
+  isa   => Enum[qw(allow deny)],
+  default => 'allow',
 );
 
 has acl_master_token => (
-    is      => 'ro',
-    isa     => NonEmptySimpleStr,
-    default => '01234567-89AB-CDEF-GHIJ-KLMNOPQRSTUV',
+  is    => 'ro',
+  isa   => NonEmptySimpleStr,
+  default => '01234567-89AB-CDEF-GHIJ-KLMNOPQRSTUV',
 );
 
 has enable_remote_exec => (
-    is      => 'ro',
-    isa     => Bool,
+  is    => 'ro',
+  isa   => Bool,
 );
 
 has bin => (
-    is => 'lazy',
-    isa => NonEmptySimpleStr | Undef,
+  is => 'lazy',
+  isa => NonEmptySimpleStr | Undef,
 );
 sub _build_bin {
-    my ($self) = @_;
-    return $self->found_bin;
+  my ($self) = @_;
+  return $self->found_bin;
 }
 
 has datadir => (
-    is        => 'ro',
-    isa       => NonEmptySimpleStr,
-    predicate => 1,
+  is    => 'ro',
+  isa     => NonEmptySimpleStr,
+  predicate => 1,
 );
 
 has version => (
   is => 'lazy',
   isa => PositiveOrZeroInt,
   default => sub {
-    my ($self) = @_;
-    return $self->found_version;
+  my ($self) = @_;
+  return $self->found_version;
   },
 );
 
 sub running {
-    my ($self) = @_;
-    return !!$self->_has_pid();
+  my ($self) = @_;
+  return !!$self->_has_pid();
 }
 
 sub start {
-    my $self = shift;
-    my $is_class_method = 0;
+  my $self = shift;
+  my $is_class_method = 0;
 
-    if (!blessed $self) {
-      $self = $self->new( @_ );
-      $is_class_method = 1;
+  if (!blessed $self) {
+    $self = $self->new(@_);
+    $is_class_method = 1;
+  }
+
+  my $bin = $self->bin();
+
+  # Make sure we have at least Consul 0.6.1 which supports the -dev option.
+  unless ($self->version >= 6_001) {
+    croak "consul not version 0.6.1 or newer";
+  }
+
+  my @opts;
+
+  my %config = (
+    node_name  => $self->node_name(),
+    datacenter => $self->datacenter(),
+    bind_addr  => '127.0.0.1',
+    ports => {
+      dns    => -1,
+      http   => $self->port() + 0,
+      https  => -1,
+      serf_lan => $self->serf_lan_port() + 0,
+      serf_wan => $self->serf_wan_port() + 0,
+      server   => $self->server_port() + 0,
+    },
+ );
+
+  # Version 0.7.0 reduced default performance behaviors in a way
+  # that makese these tests slower to startup.  Override this and
+  # make leadership election happen ASAP.
+  if ($self->version >= 7_000) {
+    $config{performance} = { raft_multiplier => 1 };
+  }
+
+  # gRPC health checks were added 1.0.5, and in dev mode are enabled and bind
+  # to port 8502, which then clashes if you want to run up a second
+  # Test::Consul. Just disable it.
+  if ($self->version >= 1_000_005) {
+    $config{ports}{grpc} = -1;
+  }
+
+  if ($self->enable_acls()) {
+    if ($self->version >= 1_004_000) {
+    croak "ACLs not supported with Consul >= 1.4.0"
     }
 
-    my $bin = $self->bin();
+    $config{acl_master_token} = $self->acl_master_token();
+    $config{acl_default_policy} = $self->acl_default_policy();
+    $config{acl_datacenter} = $self->datacenter();
+    $config{acl_token} = $self->acl_master_token();
+  }
 
-    # Make sure we have at least Consul 0.6.1 which supports the -dev option.
-    unless ($self->version >= 6_001) {
-        croak "consul not version 0.6.1 or newer";
-    }
+  if (defined $self->enable_remote_exec) {
+    $config{disable_remote_exec} = $self->enable_remote_exec ? JSON->false : JSON->true;
+  }
 
-    my @opts;
+  my $configpath;
+  if ($self->has_datadir()) {
+    $config{data_dir}  = $self->datadir();
+    $config{bootstrap} = \1;
+    $config{server}  = \1;
 
-    my %config = (
-        node_name  => $self->node_name(),
-        datacenter => $self->datacenter(),
-        bind_addr  => '127.0.0.1',
-        ports => {
-            dns      => -1,
-            http     => $self->port() + 0,
-            https    => -1,
-            serf_lan => $self->serf_lan_port() + 0,
-            serf_wan => $self->serf_wan_port() + 0,
-            server   => $self->server_port() + 0,
-        },
-    );
+    my $datapath = path($self->datadir());
+    $datapath->remove_tree;
+    $datapath->mkpath;
 
-    # Version 0.7.0 reduced default performance behaviors in a way
-    # that makese these tests slower to startup.  Override this and
-    # make leadership election happen ASAP.
-    if ($self->version >= 7_000) {
-        $config{performance} = { raft_multiplier => 1 };
-    }
+    $configpath = $datapath->child("consul.json");
+  }
+  else {
+    push @opts, '-dev';
+    $configpath = path((tempfile(SUFFIX => '.json'))[1]);
+  }
 
-    # gRPC health checks were added 1.0.5, and in dev mode are enabled and bind
-    # to port 8502, which then clashes if you want to run up a second
-    # Test::Consul. Just disable it.
-    if ($self->version >= 1_000_005) {
-      $config{ports}{grpc} = -1;
-    }
+  $configpath->spew(encode_json(\%config));
+  push @opts, '-config-file', "$configpath";
 
-    if ($self->enable_acls()) {
-      if ($self->version >= 1_004_000) {
-        croak "ACLs not supported with Consul >= 1.4.0"
-      }
+  my $pid = fork();
+  unless (defined $pid) {
+    croak "fork failed: $!";
+  }
+  unless ($pid) {
+    exec $bin, "agent", @opts;
+  }
 
-        $config{acl_master_token} = $self->acl_master_token();
-        $config{acl_default_policy} = $self->acl_default_policy();
-        $config{acl_datacenter} = $self->datacenter();
-        $config{acl_token} = $self->acl_master_token();
-    }
+  my $http = HTTP::Tiny->new(timeout => 10);
+  my $now = time;
+  my $res;
+  my $port = $self->port();
+  while (time < $now+30) {
+    $res = $http->get("http://127.0.0.1:$port/v1/status/leader");
+    last if $res->{success} && $res->{content} =~ m/^"[0-9\.]+:[0-9]+"$/;
+    sleep 1;
+  }
+  unless ($res->{success}) {
+    kill 'KILL', $pid;
+    croak "consul API test failed: $res->{status} $res->{reason}";
+  }
 
-    if (defined $self->enable_remote_exec) {
-        $config{disable_remote_exec} = $self->enable_remote_exec ? JSON->false : JSON->true;
-    }
+  unlink $configpath if !$self->has_datadir();
 
-    my $configpath;
-    if ($self->has_datadir()) {
-        $config{data_dir}  = $self->datadir();
-        $config{bootstrap} = \1;
-        $config{server}    = \1;
+  $self->_pid($pid);
 
-        my $datapath = path($self->datadir());
-        $datapath->remove_tree;
-        $datapath->mkpath;
-
-        $configpath = $datapath->child("consul.json");
-    }
-    else {
-      push @opts, '-dev';
-      $configpath = path( ( tempfile(SUFFIX => '.json') )[1] );
-    }
-
-    $configpath->spew( encode_json(\%config) );
-    push @opts, '-config-file', "$configpath";
-
-    my $pid = fork();
-    unless (defined $pid) {
-        croak "fork failed: $!";
-    }
-    unless ($pid) {
-        exec $bin, "agent", @opts;
-    }
-
-    my $http = HTTP::Tiny->new(timeout => 10);
-    my $now = time;
-    my $res;
-    my $port = $self->port();
-    while (time < $now+30) {
-        $res = $http->get("http://127.0.0.1:$port/v1/status/leader");
-        last if $res->{success} && $res->{content} =~ m/^"[0-9\.]+:[0-9]+"$/;
-        sleep 1;
-    }
-    unless ($res->{success}) {
-        kill 'KILL', $pid;
-        croak "consul API test failed: $res->{status} $res->{reason}";
-    }
-
-    unlink $configpath if !$self->has_datadir();
-
-    $self->_pid( $pid );
-
-    return $self if $is_class_method;
-    return;
+  return $self if $is_class_method;
+  return;
 }
 
 sub stop {
-    my ($self) = @_;
-    return unless $self->_has_pid();
-    my $pid = $self->_pid();
-    $self->_clear_pid();
-    kill 'TERM', $pid;
-    my $now = time;
-    while (time < $now+2) {
-        return if waitpid($pid, WNOHANG) > 0;
-    }
-    kill 'KILL', $pid;
-    return;
+  my ($self) = @_;
+  return unless $self->_has_pid();
+  my $pid = $self->_pid();
+  $self->_clear_pid();
+  kill 'TERM', $pid;
+  my $now = time;
+  while (time < $now+2) {
+    return if waitpid($pid, WNOHANG) > 0;
+  }
+  kill 'KILL', $pid;
+  return;
 }
 
 sub end {
-    goto \&stop;
+  goto \&stop;
 }
 
 sub DESTROY {
-    goto \&stop;
+  goto \&stop;
+}
+
+sub join {
+  my ($self, $other) = @_;
+
+  my $http = HTTP::Tiny->new(timeout => 10);
+  my $port = $self->port;
+  my $other_lan_port = $other->serf_lan_port;
+
+  my $res = $http->put("http://127.0.0.1:$port/v1/agent/join/127.0.0.1:$other_lan_port");
+  unless ($res->{success}) {
+    croak "join failed: $res->{status} $res->{reason}"
+  }
 }
 
 sub wan_join {
-    my ($self, $other) = @_;
+  my ($self, $other) = @_;
 
-    my $http = HTTP::Tiny->new(timeout => 10);
-    my $port = $self->port;
-    my $other_wan_port = $other->serf_wan_port;
+  my $http = HTTP::Tiny->new(timeout => 10);
+  my $port = $self->port;
+  my $other_wan_port = $other->serf_wan_port;
 
-    my $res = $http->put("http://127.0.0.1:$port/v1/agent/join/127.0.0.1:$other_wan_port?wan=1");
-    unless ($res->{success}) {
-        croak "WAN join failed: $res->{status} $res->{reason}"
-    }
+  my $res = $http->put("http://127.0.0.1:$port/v1/agent/join/127.0.0.1:$other_wan_port?wan=1");
+  unless ($res->{success}) {
+    croak "WAN join failed: $res->{status} $res->{reason}"
+  }
 }
 
 sub found_bin {
@@ -306,16 +321,16 @@ sub found_bin {
 }
 
 sub skip_all_if_no_bin {
-    my ($class) = @_;
+  my ($class) = @_;
 
-    croak 'The skip_all_if_no_bin method may only be used if the plan ' .
-          'function is callable on the main package (which Test::More ' .
-          'and Test2::Tools::Basic provide)'
-          if !main->can('plan');
+  croak 'The skip_all_if_no_bin method may only be used if the plan ' .
+      'function is callable on the main package (which Test::More ' .
+      'and Test2::Tools::Basic provide)'
+      if !main->can('plan');
 
-    return if defined $class->found_bin();
+  return if defined $class->found_bin();
 
-    main::plan( skip_all => 'The Consul binary must be available to run this test.' );
+  main::plan(skip_all => 'The Consul binary must be available to run this test.');
 }
 
 sub found_version {
@@ -324,36 +339,36 @@ sub found_version {
   my $bin = found_bin();
   ($version) = qx{$bin version};
   if ($version and $version =~ m{v(\d+)\.(\d+)\.(\d+)}) {
-    $version = sprintf('%03d%03d%03d', $1, $2, $3);
+  $version = sprintf('%03d%03d%03d', $1, $2, $3);
   }
   else {
-    $version = 0;
+  $version = 0;
   }
 }
 
 sub skip_all_unless_version {
-    my ($class, $minver, $maxver) = @_;
+  my ($class, $minver, $maxver) = @_;
 
-    croak 'usage: Test::Consul->skip_all_unless_version($minver, [$maxver])'
-      unless defined $minver;
+  croak 'usage: Test::Consul->skip_all_unless_version($minver, [$maxver])'
+    unless defined $minver;
 
-    croak 'The skip_all_unless_version method may only be used if the plan ' .
-          'function is callable on the main package (which Test::More ' .
-          'and Test2::Tools::Basic provide)'
-          if !main->can('plan');
+  croak 'The skip_all_unless_version method may only be used if the plan ' .
+      'function is callable on the main package (which Test::More ' .
+      'and Test2::Tools::Basic provide)'
+      if !main->can('plan');
 
-    $class->skip_all_if_no_bin;
+  $class->skip_all_if_no_bin;
 
-    my $version = $class->found_version;
+  my $version = $class->found_version;
 
-    if (defined $maxver) {
-      return if $minver <= $version && $maxver > $version;
-      main::plan( skip_all => "Consul must be between version $minver and $maxver to run this test." );
-    }
-    else {
-      return if $minver <= $version;
-      main::plan( skip_all => "Consul must be version $minver or higher to run this test." );
-    }
+  if (defined $maxver) {
+    return if $minver <= $version && $maxver > $version;
+    main::plan(skip_all => "Consul must be between version $minver and $maxver to run this test.");
+  }
+  else {
+    return if $minver <= $version;
+    main::plan(skip_all => "Consul must be version $minver or higher to run this test.");
+  }
 }
 
 1;
@@ -462,11 +477,11 @@ Returns C<true> if L</start> has been called and L</stop> has not been called.
 =head2 start
 
     # As an object method:
-    my $tc = Test::Consul->new( %args );
+    my $tc = Test::Consul->new(%args);
     $tc->start();
     
     # As a class method:
-    my $tc = Test::Consul->start( %args );
+    my $tc = Test::Consul->start(%args);
 
 Starts a Consul instance. This method can take a moment to run, because it
 waits until Consul's HTTP endpoint is available before returning. If it fails
@@ -481,6 +496,14 @@ Kill the Consul instance. Graceful shutdown is attempted first, and if it
 doesn't die within a couple of seconds, the process is killed.
 
 This method is also called if the instance of this class falls out of scope.
+
+=head2 join
+
+    my $tc1 = Test::Consul->start;
+    my $tc2 = Test::Consul->start(datacenter => $tc1);
+    $tc1->wan_join($tc2);
+
+Perform a join to another L<Test::Consul> instance. Use this to test Consul applications that operate across nodes.
 
 =head2 wan_join
 
@@ -536,7 +559,7 @@ L<Consul> - Consul client library. Uses L<Test::Consul> in its test suite.
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/robn/Consul-Test/issues>.
+at L<https://github.com/robn/Test-Consul/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -544,9 +567,9 @@ You will be notified automatically of any progress on your issue.
 This is open source software. The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/robn/Consul-Test>
+L<https://github.com/robn/Test-Consul>
 
-  git clone https://github.com/robn/Consul-Test.git
+  git clone https://github.com/robn/Test-Consul.git
 
 =head1 AUTHORS
 
@@ -570,7 +593,7 @@ Aran Deltac <bluefeet@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) (c) 2015 by Rob N ★ and was supported by FastMail
+This software is copyright (c) 2015 by Rob N ★ and was supported by FastMail
 Pty Ltd.
 
 This is free software; you can redistribute it and/or modify it under

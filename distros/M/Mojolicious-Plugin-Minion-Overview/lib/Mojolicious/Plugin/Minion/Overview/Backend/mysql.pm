@@ -28,13 +28,13 @@ sub job_runtime_metrics {
 
     my $sql = <<SQL;
 SELECT
-    `started` AS `x`,
-    TIME_TO_SEC(TIMEDIFF(COALESCE(`finished`, NOW()), `started`)) AS `y`,
-    `state`
+    `minion_jobs`.`started` AS `x`,
+    TIME_TO_SEC(TIMEDIFF(COALESCE(`minion_jobs`.`finished`, NOW()), `minion_jobs`.`started`)) AS `y`,
+    `minion_jobs`.`state`
 FROM `minion_jobs`
 WHERE
-    `task` = ?
-    AND `created` >= $start
+    `minion_jobs`.`task` = ?
+    AND `minion_jobs`.`created` >= $start
 ORDER BY `minion_jobs`.`created`
 LIMIT 1000
 SQL
@@ -57,16 +57,15 @@ sub job_throughput_metrics {
 
     my $sql = <<SQL;
 SELECT
-    DATE_FORMAT(`started`, "%Y-%m-%d %H:00:00") AS `x`,
+    DATE_FORMAT(`minion_jobs`.`started`, "%Y-%m-%d %H:00:00") AS `x`,
     COUNT(*) AS `y`,
-    `state`
+    `minion_jobs`.`state`
 FROM `minion_jobs`
 WHERE
-    `task` = ?
-    AND `created` >= $start
-GROUP BY `x`, `state`
+    `minion_jobs`.`task` = ?
+    AND `minion_jobs`.`created` >= $start
+GROUP BY `x`, `minion_jobs`.`state`
 ORDER BY `x` ASC
-LIMIT 1000
 SQL
     
     my $collection = $self->db->query($sql, $job)->hashes;
@@ -83,12 +82,12 @@ Search jobs
 sub jobs {
     my $self = shift;
 
-    my @where = ('`created` >= ' . $self->start);
+    my @where = ('`minion_jobs`.`created` >= ' . $self->start);
     my @params;
 
     # Search by term
     if (my $term = $self->query->{ term }) {
-        push(@where, 'CONCAT(`task`, CAST(`notes` AS CHAR)) LIKE ?');
+        push(@where, 'CONCAT(`minion_jobs`.`task`, CAST(`minion_jobs`.`notes` AS CHAR)) LIKE ?');
         push(@params, '%' . $term . '%');
     }
 
@@ -100,7 +99,7 @@ sub jobs {
 
     # Search tags
     for my $tag (@{ $self->query->{ tags } }) {
-        push(@where, '(`notes` LIKE ? OR `task` = ?)');
+        push(@where, '(`minion_jobs`.`notes` LIKE ? OR `minion_jobs`.`task` = ?)');
         push(@params, '%"tags":[%' . $tag . '%]%', $tag);
     }
 
@@ -121,7 +120,7 @@ SQL
 SELECT
     `minion_jobs`.*,
     `minion_jobs_depends`.`parent_id`,
-    TIME_TO_SEC(TIMEDIFF(IF(`finished` = '0000-00-00 00:00:00', NOW(), `finished`), IF(`started` = '0000-00-00 00:00:00', NOW(), `started`))) AS `runtime`
+    TIME_TO_SEC(TIMEDIFF(IF(`minion_jobs`.`finished` = '0000-00-00 00:00:00', NOW(), `minion_jobs`.`finished`), IF(`minion_jobs`.`started` = '0000-00-00 00:00:00', NOW(), `minion_jobs`.`started`))) AS `runtime`
 FROM `minion_jobs`
 LEFT JOIN `minion_jobs_depends` ON `minion_jobs_depends`.`child_id` = `minion_jobs`.`id`
 WHERE
@@ -181,26 +180,26 @@ sub overview {
 
     my $start = $self->start;
 
-my $sql = <<SQL;
+    my $stats_sql = <<SQL;
 SELECT
-    COALESCE(SUM(IF(state = 'finished', 1, 0)), 0) AS `finished`,
-    COALESCE(SUM(IF(state = 'failed', 1, 0)), 0) AS `failed`,
-    COALESCE(SUM(IF(state = 'inactive', 1, 0)), 0) AS `inactive`
+    COALESCE(SUM(IF(`minion_jobs`.`state` = 'finished', 1, 0)), 0) AS `finished`,
+    COALESCE(SUM(IF(`minion_jobs`.`state` = 'failed', 1, 0)), 0) AS `failed`,
+    COALESCE(SUM(IF(`minion_jobs`.`state` = 'active', 1, 0)), 0) AS `active`,
+    COALESCE(SUM(IF(`minion_jobs`.`state` = 'inactive', 1, 0)), 0) AS `inactive`
 FROM `minion_jobs`
 WHERE
-    `created` >= $start
-    AND `state` IN ('finished', 'failed')
+    `minion_jobs`.`created` >= $start
 SQL
     
-    my $jobs = $self->db->query($sql)->hash;
+    my $jobs = $self->db->query($stats_sql)->hash;
 
-$sql = <<SQL;
+    my $workers_sql = <<SQL;
 SELECT
     COUNT(*) AS `workers`
 FROM `minion_workers`
 SQL
     
-    my $workers = $self->db->query($sql)->hash->{ workers };
+    my $workers = $self->db->query($workers_sql)->hash->{ workers };
 
     return [
         {
@@ -210,6 +209,10 @@ SQL
         {
             title   => 'Failed jobs',
             count   => $jobs->{ failed },
+        },
+        {
+            title   => 'Active jobs',
+            count   => $jobs->{ active },
         },
         {
             title   => 'Inactive jobs',
@@ -231,12 +234,12 @@ Search the list of unique jobs
 sub unique_jobs {
     my $self = shift;
 
-    my @where = ('`created` >= ' . $self->start, "`state` IN ('finished', 'failed')");
+    my @where = ('`minion_jobs`.`created` >= ' . $self->start, "`minion_jobs`.`state` IN ('finished', 'failed')");
     my @params;
 
     # Search by term
     if (my $term = $self->query->{ term }) {
-        push(@where, 'CONCAT(`task`, CAST(`notes` AS CHAR)) LIKE ?');
+        push(@where, 'CONCAT(`minion_jobs`.`task`, CAST(`minion_jobs`.`notes` AS CHAR)) LIKE ?');
         push(@params, '%' . $term . '%');
     }
 
@@ -244,7 +247,7 @@ sub unique_jobs {
 
     my $sql_count = <<SQL;
 SELECT
-    COUNT(DISTINCT(`task`)) AS `total`
+    COUNT(DISTINCT(`minion_jobs`.`task`)) AS `total`
 FROM `minion_jobs`
 WHERE
     $where_clause
@@ -260,15 +263,15 @@ SELECT
 FROM (
     SELECT
         `task`,
-        SUM(IF(`state` = 'finished', TIME_TO_SEC(TIMEDIFF(`finished`, `started`)), 0)) AS `finished_in`,
-        SUM(IF(`state` = 'finished', 1, 0)) AS `finished`,
-        SUM(IF(`state` = 'failed', TIME_TO_SEC(TIMEDIFF(`finished`, `started`)), 0)) AS `failed_in`,
-        SUM(IF(`state` = 'failed', 1, 0)) AS `failed`
+        SUM(IF(`minion_jobs`.`state` = 'finished', TIME_TO_SEC(TIMEDIFF(`minion_jobs`.`finished`, `minion_jobs`.`started`)), 0)) AS `finished_in`,
+        SUM(IF(`minion_jobs`.`state` = 'finished', 1, 0)) AS `finished`,
+        SUM(IF(`minion_jobs`.`state` = 'failed', TIME_TO_SEC(TIMEDIFF(`minion_jobs`.`finished`, `minion_jobs`.`started`)), 0)) AS `failed_in`,
+        SUM(IF(`minion_jobs`.`state` = 'failed', 1, 0)) AS `failed`
 
     FROM `minion_jobs`
     WHERE
         $where_clause
-    GROUP BY `task`
+    GROUP BY `minion_jobs`.`task`
     LIMIT ?
     OFFSET ?
 ) AS `metrics`
@@ -309,6 +312,91 @@ SQL
     return $response;
 }
 
+=head2 worker
+
+Find a worker by id
+
+=cut
+
+sub worker {
+    my ($self, $id) = @_;
+
+
+    my $sql = <<SQL;
+SELECT
+    `minion_workers`.*,
+    CAST(AVG(TIME_TO_SEC(TIMEDIFF(`minion_jobs`.`started`, `minion_jobs`.`created`))) AS DECIMAL(10, 2)) AS `wait`
+FROM `minion_workers`
+INNER JOIN `minion_jobs` on `minion_jobs`.`worker` = `minion_workers`.`id`
+WHERE
+    `minion_workers`.`id` = ?
+SQL
+
+    my $worker = $self->db->query($sql, $id)->hash;
+
+    return $worker;
+}
+
+=head2 worker_waittime_metrics
+
+Worker waittime metrics
+
+=cut
+
+sub worker_waittime_metrics {
+    my ($self, $worker_id) = @_;
+
+    my $start = $self->start;
+
+    my $sql = <<SQL;
+SELECT
+    `minion_jobs`.`created` AS `x`,
+    TIME_TO_SEC(TIMEDIFF(`minion_jobs`.`started`, `minion_jobs`.`created`)) AS `y`,
+    `minion_jobs`.`state`
+FROM `minion_jobs`
+INNER JOIN `minion_workers` on `minion_workers`.`id` = `minion_jobs`.`worker`
+WHERE
+    `minion_workers`.`id` = ?
+    AND `minion_jobs`.`created` >= $start
+ORDER BY `minion_jobs`.`created`
+LIMIT 1000
+SQL
+    
+    my $collection = $self->db->query($sql, $worker_id)->hashes;
+
+    return $collection;
+}
+
+=head2 worker_throughput_metrics
+
+Worker throughput metrics
+
+=cut
+
+sub worker_throughput_metrics {
+    my ($self, $worker_id) = @_;
+
+    my $start = $self->start;
+
+    my $sql = <<SQL;
+SELECT
+    DATE_FORMAT(`minion_jobs`.`started`, "%Y-%m-%d %H:00:00") AS `x`,
+    COUNT(*) AS `y`,
+    `minion_jobs`.`state`
+FROM `minion_jobs`
+INNER JOIN `minion_workers` on `minion_workers`.`id` = `minion_jobs`.`worker`
+WHERE
+    `minion_workers`.`id` = ?
+    AND `minion_jobs`.`created` >= $start
+GROUP BY `x`, `state`
+ORDER BY `x` ASC
+SQL
+    
+    my $collection = $self->db->query($sql, $worker_id)->hashes;
+
+    return $collection;
+}
+
 =head2 workers
 
 Get workers information
@@ -318,17 +406,21 @@ Get workers information
 sub workers {
     my $self = shift;
 
-my $sql = <<SQL;
-SELECT *
+    my $sql = <<SQL;
+SELECT
+    `minion_workers`.*,
+    CAST(AVG(TIME_TO_SEC(TIMEDIFF(`minion_jobs`.`started`, `minion_jobs`.`created`))) AS DECIMAL(10, 2)) AS `wait`
 FROM `minion_workers`
+INNER JOIN `minion_jobs` on `minion_jobs`.`worker` = `minion_workers`.`id`
+GROUP BY `minion_workers`.`id`
 SQL
 
-my $stats_sql = <<SQL;
+    my $stats_sql = <<SQL;
 SELECT
     COUNT(*) AS `performed`,
-    COALESCE(SUM(IF(state = 'active', 1, 0)), 0) AS `active`,
-    COALESCE(SUM(IF(state = 'finished', 1, 0)), 0) AS `finished`,
-    COALESCE(SUM(IF(state = 'failed', 1, 0)), 0) AS `failed`
+    COALESCE(SUM(IF(`minion_jobs`.`state` = 'active', 1, 0)), 0) AS `active`,
+    COALESCE(SUM(IF(`minion_jobs`.`state` = 'finished', 1, 0)), 0) AS `finished`,
+    COALESCE(SUM(IF(`minion_jobs`.`state` = 'failed', 1, 0)), 0) AS `failed`
 FROM `minion_jobs`
 INNER JOIN `minion_workers` on `minion_workers`.`id` = `minion_jobs`.`worker`
 WHERE

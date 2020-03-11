@@ -2,8 +2,8 @@ NAME
     Log::ger::Layout::LTSV - Layout log message as LTSV
 
 VERSION
-    This document describes version 0.004 of Log::ger::Layout::LTSV (from
-    Perl distribution Log-ger-Layout-LTSV), released on 2020-03-07.
+    This document describes version 0.006 of Log::ger::Layout::LTSV (from
+    Perl distribution Log-ger-Layout-LTSV), released on 2020-03-11.
 
 SYNOPSIS
      use Log::ger::Layout LTSV => (

@@ -116,8 +116,9 @@ sub open_rcfile {
     or $cli->logconfess("open_rcfile() failed to open config file '$rcpath' for URL '$rcurl': $!");
   $cli->promote($hdr->{class}) if ($hdr->{class});
   delete $hdr->{class};
-  @$cli{keys %$hdr}   = values %$hdr;
+  @$cli{keys %$hdr} = values %$hdr;
   @$cli{keys %rcopts} = values %rcopts;
+  @$cli{keys %opts} = values %opts;
 
   ##-- dispatch to lower-level open:// call
   delete $cli->{url} if (($cli->{url}//'') eq $rcurl);

@@ -1,12 +1,14 @@
 package Log::ger::Output::Syslog;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-18'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Output-Syslog'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
+
+use Log::ger::Util;
 
 our %level_map = (
     # Log::ger default level => syslog level
@@ -21,43 +23,51 @@ our %level_map = (
     trace => 'debug',
 );
 
-sub get_hooks {
-    my %conf = @_;
+sub meta { +{
+    v => 2,
+} }
 
-    my $ident = delete($conf{ident});
+sub get_hooks {
+    my %plugin_conf = @_;
+
+    my $ident = delete($plugin_conf{ident});
     defined($ident) or die "Please specify ident";
 
-    my $facility = delete($conf{facility}) || 'user';
+    my $facility = delete($plugin_conf{facility}) || 'user';
     $facility =~ /\A(auth|authpriv|cron|daemon|ftp|kern|local[0-7]|lpr|mail|news|syslog|user|uucp)\z/
         or die "Invalid value for facility, please choose ".
         "auth|authpriv|cron|daemon|ftp|kern|local[0-7]|lpr|mail|news|syslog|user|uucp";
 
-    my $logopt = delete($conf{logopt});
+    my $logopt = delete($plugin_conf{logopt});
     $logopt = "pid" unless defined $logopt;
 
-    keys %conf and die "Unknown configuration: ".join(", ", sort keys %conf);
+    keys %plugin_conf and
+        die "Unknown configuration: ".join(", ", sort keys %plugin_conf);
 
     require Sys::Syslog;
     Sys::Syslog::openlog($ident, $logopt, $facility) or die;
 
     return {
-        create_log_routine => [
+        create_outputter => [
             __PACKAGE__, # key
             50,          # priority
             sub {        # hook
                 my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
-                my $str_level = $hook_args{str_level};
-                $level_map{$str_level} or die "Don't know how to map ".
-                    "Log::ger level '$str_level' to syslog level";
+                my $outputter = sub {
+                    my ($per_target_conf, $fmsg, $per_msg_conf) = @_;
 
-                my $logger = sub {
+                    my $num_level = $per_msg_conf ? $per_msg_conf->{level} : undef; $num_level = $hook_args{level} if !defined $num_level;
+                    my $str_level = Log::ger::Util::string_level($num_level);
+                    $level_map{$str_level} or die "Don't know how to map ".
+                        "Log::ger level '$str_level' to syslog level";
+
                     Sys::Syslog::syslog(
                         &{"Sys::Syslog::LOG_".uc($level_map{$str_level})},
-                        $_[1],
+                        $fmsg,
                     );
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -77,7 +87,7 @@ Log::ger::Output::Syslog - Send logs to syslog
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 

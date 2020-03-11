@@ -1,28 +1,35 @@
 package Log::ger::Output::DirWriteRotate;
 
-our $DATE = '2017-06-26'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-09'; # DATE
+our $DIST = 'Log-ger-Output-DirWriteRotate'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
 
+sub meta { +{
+    v => 1,
+} }
+
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     require Dir::Write::Rotate;
-    my $dwr = Dir::Write::Rotate->new(%conf);
+    my $dwr = Dir::Write::Rotate->new(%plugin_conf);
 
     return {
-        create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+        create_outputter => [
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
-                my $logger = sub {
-                    my ($ctx, $msg) = @_;
-                    $dwr->write($msg);
+                my $outputter = sub {
+                    my ($per_target_conf, $fmsg, $per_msg_conf) = @_;
+                    $dwr->write($fmsg);
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -42,7 +49,7 @@ Log::ger::Output::DirWriteRotate - Log to Dir::Write::Rotate
 
 =head1 VERSION
 
-This document describes version 0.002 of Log::ger::Output::DirWriteRotate (from Perl distribution Log-ger-Output-DirWriteRotate), released on 2017-06-26.
+This document describes version 0.003 of Log::ger::Output::DirWriteRotate (from Perl distribution Log-ger-Output-DirWriteRotate), released on 2020-03-09.
 
 =head1 SYNOPSIS
 
@@ -108,7 +115,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

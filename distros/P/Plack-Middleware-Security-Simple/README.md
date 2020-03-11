@@ -4,7 +4,7 @@ Plack::Middleware::Security::Simple - A simple security filter for Plack
 
 # VERSION
 
-version v0.4.0
+version v0.4.1
 
 # SYNOPSIS
 
@@ -31,6 +31,9 @@ This module provides a simple security filter for PSGI-based
 applications, so that you can filter out obvious exploit-seeking
 scripts.
 
+Note that as an alternative, you may want to consider using something like
+[modsecurity](https://modsecurity.org/) as a filter in a reverse proxy.
+
 # ATTRIBUTES
 
 ## rules
@@ -43,6 +46,8 @@ It can also be a code reference for a subroutine that takes the Plack
 environment as an argument and returns a true value if there is a
 match.
 
+See [Plack::Middleware::Security::Common](https://metacpan.org/pod/Plack::Middleware::Security::Common) for a set of common rules.
+
 ## handler
 
 This is a function that is called when a match is found.
@@ -53,6 +58,19 @@ It takes the Plack environment as an argument, and returns a
 
 The default handler will log a warning to the `psgix.logger`, and
 return a HTTP 400 (Bad Request) response.
+
+The message is of the form
+
+```
+Plack::Middleware::Security::Simple Blocked $ip $method $path_query HTTP $status
+```
+
+This can be used if you are writing [fail2ban](https://metacpan.org/pod/fail2ban) filters.
+
+## status
+
+This is the HTTP status code that the default ["handler"](#handler) will return
+when a resource is blocked.  It defaults to 400 (Bad Request).
 
 # SEE ALSO
 

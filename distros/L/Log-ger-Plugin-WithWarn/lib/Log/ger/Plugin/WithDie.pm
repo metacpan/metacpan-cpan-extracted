@@ -1,14 +1,18 @@
 package Log::ger::Plugin::WithDie;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Plugin-WithWarn'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
 
 use Log::ger ();
+
+sub meta { +{
+    v => 2,
+} }
 
 sub get_hooks {
     my %plugin_conf = @_;
@@ -76,7 +80,7 @@ Log::ger::Plugin::WithDie - Add *_die logging routines
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

@@ -97,24 +97,45 @@ sub _generic {
 }
 
 
+my $playlist_id_re = qr/(?:PL|LL|EC|UU|FL|RD|UL|TL|PU|OLAK5uy_)[0-9A-Za-z-_]{10,}/;    # youtube-dl/youtube_dl/extractor/youtube.py (_PLAYLIST_ID_RE =) 2020.03.11
+
+
 sub _youtube_video_id {
     my ( $opt, $webpage_url ) = @_;
     return if ! $opt->{list_type_youtube};
     return if ! $webpage_url;
     return if   $webpage_url =~ m|http://|;
-    my $playlist_id_re = qr/(?:PL|LL|EC|UU|FL|RD|UL|TL)[0-9A-Za-z-_]{10,}/;
-
-    my $regexp_video_url = qr"           # youtube-dl/youtube_dl/extractor/youtube.py    2018.06.11
+    my $regexp_video_url = qr"    # youtube-dl/youtube_dl/extractor/youtube.py (class YoutubeIE(YoutubeBaseInfoExtractor):) 2020.03.11
         ^
         (
             (?:https?://|//)                                    # http(s):// or protocol-independent URL
-            (?:(?:(?:(?:\w+\.)?[yY][oO][uU][tT][uU][bB][eE](?:-nocookie)?\.com/|
-            (?:www\.)?deturl\.com/www\.youtube\.com/|
-            (?:www\.)?pwnyoutube\.com/|
-            (?:www\.)?hooktube\.com/|
-            (?:www\.)?yourepeat\.com/|
-            tube\.majestyc\.net/|
-            youtube\.googleapis\.com/)                        # the various hostnames, with wildcard subdomains
+            (?:(?:(?:(?:\w+\.)?[yY][oO][uU][tT][uU][bB][eE](?:-nocookie|kids)?\.com/|
+                (?:www\.)?deturl\.com/www\.youtube\.com/|
+                (?:www\.)?pwnyoutube\.com/|
+                (?:www\.)?hooktube\.com/|
+                (?:www\.)?yourepeat\.com/|
+                tube\.majestyc\.net/|
+                # Invidious instances taken from https://github.com/omarroth/invidious/wiki/Invidious-Instances
+                (?:(?:www|dev)\.)?invidio\.us/|
+                (?:(?:www|no)\.)?invidiou\.sh/|
+                (?:(?:www|fi|de)\.)?invidious\.snopyta\.org/|
+                (?:www\.)?invidious\.kabi\.tk/|
+                (?:www\.)?invidious\.13ad\.de/|
+                (?:www\.)?invidious\.mastodon\.host/|
+                (?:www\.)?invidious\.nixnet\.xyz/|
+                (?:www\.)?invidious\.drycat\.fr/|
+                (?:www\.)?tube\.poal\.co/|
+                (?:www\.)?vid\.wxzm\.sx/|
+                (?:www\.)?yt\.elukerio\.org/|
+                (?:www\.)?yt\.lelux\.fi/|
+                (?:www\.)?kgg2m7yk5aybusll\.onion/|
+                (?:www\.)?qklhadlycap4cnod\.onion/|
+                (?:www\.)?axqzx4s6s54s32yentfqojs3x5i7faxza6xo3ehd4bzzsg2ii4fv2iid\.onion/|
+                (?:www\.)?c7hqkpkpemu6e7emz5b4vyz7idjgdvgaaa3dyimmeojqbgpea3xqjoid\.onion/|
+                (?:www\.)?fz253lmuao3strwbfbmx46yu7acac2jz27iwtorgmbqlkurlclmancad\.onion/|
+                (?:www\.)?invidious\.l4qlywnpwqsluw65ts7md3khrivpirse744un3x7mlskqauz5pyuzgqd\.onion/|
+                (?:www\.)?owxfohz4kjyv25fvlqilyxast7inivgiktls3th44jhk3ej3i7ya\.b32\.i2p/|
+                youtube\.googleapis\.com/)                       # the various hostnames, with wildcard subdomains
             (?:.*?\#/)?                                          # handle anchor (#/) redirect urls
             (?:                                                  # the various things that can precede the ID:
                 (?:(?:v|embed|e)/(?!videoseries))                # v/ or embed/ or e/
@@ -136,8 +157,8 @@ sub _youtube_video_id {
         ([0-9A-Za-z_-]{11})                                      # here is it! the YouTube video ID
         (?!.*?\blist=
             (?:
-                $playlist_id_re|                                  # combined list/video URLs are handled by the playlist IE    #           %(playlist_id)s|
-                WL                                                # WL are handled by the watch later IE
+                $playlist_id_re|                                 # combined list/video URLs are handled by the playlist IE      # $playlist_id_re --> %(playlist_id)s
+                WL                                               # WL are handled by the watch later IE
             )
         )
         (?(1).+)?                                                # if we found the ID, everything can follow
@@ -154,14 +175,16 @@ sub _youtube_playlist_id {
     return if ! $opt->{list_type_youtube};
     return if ! $webpage_url;
     return if   $webpage_url =~ m|http://|;
-    my $playlist_id_re = qr/(?:PL|LL|EC|UU|FL|RD|UL|TL)[0-9A-Za-z-_]{10,}/;
-
-    my $regexp_playlist_url = qr"           # youtube-dl/youtube_dl/extractor/youtube.py    2018.06.11
+    my $regexp_playlist_url = qr"    # youtube-dl/youtube_dl/extractor/youtube.py (class YoutubePlaylistIE(YoutubePlaylistBaseInfoExtractor):) 2020.03.11
         (?:
             (?:https?://)?
             (?:\w+\.)?
             (?:
-                youtube\.com/
+                (?:
+                    youtube(?:kids)?\.com|
+                    invidio\.us
+                )
+                /
                 (?:
                     (?:course|view_play_list|my_playlists|artist|playlist|watch|embed/(?:videoseries|[0-9A-Za-z_-]{11}))
                     \? (?:.*?[&;])*? (?:p|a|list)=
@@ -170,13 +193,13 @@ sub _youtube_playlist_id {
                 youtu\.be/[0-9A-Za-z_-]{11}\?.*?\blist=
             )
             (
-                (?:PL|LL|EC|UU|FL|RD|UL|TL)?[0-9A-Za-z-_]{10,}
+                (?:PL|LL|EC|UU|FL|RD|UL|TL|PU|OLAK5uy_)?[0-9A-Za-z-_]{10,}
                 # Top tracks, they can also include dots
                 |(?:MC)[\w\.]*
             )
             .*
             |
-            ($playlist_id_re) #%(playlist_id)s)
+            ($playlist_id_re)   # %(playlist_id)s)
         )
     "x;
 
@@ -190,8 +213,8 @@ sub _youtube_channel_id {
     return if ! $opt->{list_type_youtube};
     return if ! $webpage_url;
     return if   $webpage_url =~ m|http://|;
-    my $regexp_channel_url = qr"            # youtube-dl/youtube_dl/extractor/youtube.py    2018.06.11
-        https?://(?:youtu\.be|(?:\w+\.)?youtube(?:-nocookie)?\.com)/channel/(?P<id>[0-9A-Za-z_-]+)
+    my $regexp_channel_url = qr"    # youtube-dl/youtube_dl/extractor/youtube.py (class YoutubeChannelIE(YoutubePlaylistBaseInfoExtractor):) 2020.03.11
+        https?://(?:youtu\.be|(?:\w+\.)?youtube(?:-nocookie|kids)?\.com|(?:www\.)?invidio\.us)/channel/(?P<id>[0-9A-Za-z_-]+)
     "x;
     return $+{id} if $webpage_url =~ $regexp_channel_url; # $+{id}
     return;
@@ -203,7 +226,7 @@ sub _youtube_user_id {
     return if ! $opt->{list_type_youtube};
     return if ! $webpage_url;
     return if   $webpage_url =~ m|http://|;
-    my $regexp_user_url = qr"           # youtube-dl/youtube_dl/extractor/youtube.py    2018.06.11
+    my $regexp_user_url = qr"    # youtube-dl/youtube_dl/extractor/youtube.py (class YoutubeUserIE(YoutubeChannelIE):) 2020.03.11
         (?:(?:https?://(?:\w+\.)?youtube\.com/(?:(?P<user>user|c)/)?(?!(?:attribution_link|watch|results|shared)(?:$|[^a-z_A-Z0-9-])))|ytuser:)(?!feed/)(?P<id>[A-Za-z0-9_-]+)
     "x;
     return $+{user}, $+{id} if $webpage_url =~ $regexp_user_url;

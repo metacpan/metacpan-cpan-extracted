@@ -2,9 +2,9 @@ NAME
     Log::ger::Output::FileWriteRotate - Log to File::Write::Rotate
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     Log::ger::Output::FileWriteRotate (from Perl distribution
-    Log-ger-Output-FileWriteRotate), released on 2019-09-10.
+    Log-ger-Output-FileWriteRotate), released on 2020-03-09.
 
 SYNOPSIS
      use Log::ger::Output FileWriteRotate => (
@@ -62,7 +62,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

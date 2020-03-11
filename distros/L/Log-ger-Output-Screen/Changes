@@ -1,3 +1,21 @@
+0.014   2020-03-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump v to 2 to comply to Log::ger 0.037.
+
+
+0.013   2020-03-09  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Adjust to Log::ger 0.034 (add meta()).
+
+
+0.012   2020-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Log::ger 0.033 (rename hook 'create_log_routine' to
+          'create_outputter').
+
+
 0.011   2020-03-07  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -15,7 +15,7 @@ package App::annex_review_unused;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$App::annex_review_unused::VERSION = '0.002';
+$App::annex_review_unused::VERSION = '0.003';
 use 5.028;
 use strict;
 use warnings;
@@ -198,7 +198,7 @@ App::annex_review_unused - interactively process 'git annex unused' output
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 FUNCTIONS
 

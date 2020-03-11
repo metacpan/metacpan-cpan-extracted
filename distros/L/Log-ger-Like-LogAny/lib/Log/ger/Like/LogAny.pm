@@ -1,7 +1,9 @@
 package Log::ger::Like::LogAny;
 
-our $DATE = '2017-08-03'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-11'; # DATE
+our $DIST = 'Log-ger-Like-LogAny'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 # IFUNBUILT
 # use strict 'subs', 'vars';
@@ -58,7 +60,7 @@ Log::ger::Like::LogAny - Log like Log::Any
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -107,7 +109,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

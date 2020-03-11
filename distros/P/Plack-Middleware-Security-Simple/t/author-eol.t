@@ -25,6 +25,7 @@ my @files = (
     't/10-hashref.t',
     't/20-logging.t',
     't/30-handler.t',
+    't/31-status.t',
     't/40-common.t',
     't/author-critic.t',
     't/author-eof.t',

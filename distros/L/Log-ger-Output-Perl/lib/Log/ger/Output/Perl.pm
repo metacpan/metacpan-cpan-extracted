@@ -1,14 +1,18 @@
 package Log::ger::Output::Perl;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Output-Perl'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger::Util ();
+
+sub meta { +{
+    v => 2,
+} }
 
 sub get_hooks {
     my %plugin_conf = @_;
@@ -29,7 +33,7 @@ sub get_hooks {
             # for less severe levels.
             9,           # priority
             sub {        # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
                 my $outputter = sub {
                     my ($per_target_conf, $msg, $per_msg_conf) = @_;
@@ -77,7 +81,7 @@ Log::ger::Output::Perl - Log to Perl's standard facility (warn, die, etc)
 
 =head1 VERSION
 
-This document describes version 0.002 of Log::ger::Output::Perl (from Perl distribution Log-ger-Output-Perl), released on 2020-03-07.
+This document describes version 0.004 of Log::ger::Output::Perl (from Perl distribution Log-ger-Output-Perl), released on 2020-03-11.
 
 =head1 SYNOPSIS
 

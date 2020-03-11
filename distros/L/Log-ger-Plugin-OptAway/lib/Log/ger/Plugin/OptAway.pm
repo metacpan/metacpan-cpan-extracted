@@ -1,12 +1,16 @@
 package Log::ger::Plugin::OptAway;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Plugin-OptAway'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use strict;
 use warnings;
+
+sub meta { +{
+    v => 2,
+} }
 
 sub get_hooks {
     my %plugin_conf = @_;
@@ -68,7 +72,7 @@ Log::ger::Plugin::OptAway - Optimize away log statements
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

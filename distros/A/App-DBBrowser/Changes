@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.244    2020-03-11
+        - SQLite plugin: sort databases.
+        - Option 'Data source': different settings for 'Insert' and 'Create table'.
+        - Update filter 'choose cols'.
+        - Update filter 'search & replace'.
+        - Update documentation.
+
 2.243    2020-03-08
         - New option 'Data source'.
         - New option 'Truncated rows'.

@@ -2,7 +2,7 @@ NAME
     Log::ger::Like::Log4perl - Mimic Log::Log4perl
 
 VERSION
-    version 0.001
+    version 0.003
 
 SYNOPSIS
      use Log::ger::Like::Log4perl;
@@ -64,7 +64,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

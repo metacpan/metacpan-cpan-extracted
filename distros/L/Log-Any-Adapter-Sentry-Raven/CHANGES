@@ -1,9 +1,27 @@
 ==================================================
-Changes from 2019-02-03 00:00:00 +0000 to present.
+Changes from 2019-03-12 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version v0.0.1 at 2020-02-03 18:01:47 +0000
+version v0.0.2 at 2020-03-11 14:01:50 +0000
+-------------------------------------------
+
+  Change: 3928d4bde3991be3ef5ed82d2ab131a897dd3233
+  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
+  Date : 2020-03-10 11:10:07 +0000
+
+    Run make update 
+
+  Change: 97231d156828cbd81078f17622efc2b5505f4e1d
+  Author: jrubinator <jjrs.pam+github@gmail.com>
+  Date : 2020-03-10 10:47:06 +0000
+
+    Require a minimum version of Log::Any
+
+    As diagnosed by statistical analysis 
+
+-------------------------------------------
+version v0.0.1 at 2020-02-03 16:09:17 +0000
 -------------------------------------------
 
   Change: 5a36e232cfbc3419f87f2aa3f72c223be3c3617f

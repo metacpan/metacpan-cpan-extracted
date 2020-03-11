@@ -9,7 +9,7 @@ use PDL;
 use Config;
 use strict;
 
-our $VERSION = '0.12.015';
+our $VERSION = '0.12.016';
 pp_setversion($VERSION);
 
 #$::PP_VERBOSE=1; ##-- PDL::PP debugging
@@ -215,7 +215,7 @@ sub tym_create_def {
 
       //-- maybe re-alloc term-local buffer
       if (tbn==tballoc) {
-         DCDEBUG(fprintf(stderr, "tym_create_%s [ti=%d,nzi=%d,tbn=%d]: realloc %zd -> %zd\n", DIACOLLO_INAME, ti, nzi, tbn, tballoc, 2*tballoc); fflush(stderr);)
+         DCDEBUG(fprintf(stderr, "tym_create_%s [ti=%d,nzi1=%d,tbn=%d]: realloc %zd -> %zd\n", DIACOLLO_INAME, ti, nzi1, tbn, tballoc, 2*tballoc); fflush(stderr);)
          tballoc *= 2;
          tbuf     = (DIACOLLO_ITYPE*)realloc(tbuf, 2*tballoc*sizeof(DIACOLLO_ITYPE));
       }
@@ -341,9 +341,10 @@ sub cof_x_def {
   DIACOLLO_ITYPE *keybuf = (DIACOLLO_ITYPE*)malloc(keylen);
   HV *f1hv  = INT2PTR(HV*, $COMP(f1Hash));
   HV *f12hv = INT2PTR(HV*, $COMP(f12Hash));
-  SV **svpp;
-  UV fval0,fval;
-#ifdef DIACOLLO_COF_T
+  HV *exthv = INT2PTR(HV*, $COMP(extendHash));
+  SV **svpp1, **svpp12, **svppd;
+  UV f1val0,f1val, f12val0,f12val;
+#if defined(DIACOLLO_COF_T)
   //-- temporary hash for doc-local group-counts
   HV   *dochv = newHV();
   char *gkey;
@@ -360,7 +361,7 @@ sub cof_x_def {
     keybuf[$SIZE(NG)] = sliceby;
 
     /*-- guts: compute co-frequencies cofreq(w,v|d) = min{f(w,d),f(v,d)} in f12hv --*/
-    //DCDEBUG(fprintf(stderr,"cof_x(): loop\n"); fflush(stderr);)
+    DCDEBUG(fprintf(stderr,"cof_x(): loop\n"); fflush(stderr);)
     loop (NnzQ) %{
       qval = $qvals();
       qd   = $qdocs();
@@ -375,94 +376,98 @@ sub cof_x_def {
       }
 
       //-- track f1 frequency (by slice)
-      svpp = hv_fetch(f1hv, (char*)(keybuf+$SIZE(NG)), keylen1, TRUE);
-      if (SvOK(*svpp)) {
-        fval0 = SvUV(*svpp);
-	sv_setuv(*svpp, fval0+(UV)qval);
+      svpp1 = hv_fetch(f1hv, (char*)(keybuf+$SIZE(NG)), keylen1, TRUE);
+      if (SvOK(*svpp1)) {
+        f1val0 = SvUV(*svpp1);
+	sv_setuv(*svpp1, f1val0+(UV)qval);
       } else {
-        sv_setuv(*svpp, (UV)qval);
+        sv_setuv(*svpp1, (UV)qval);
       }
 
-#ifdef DIACOLLO_COF_C
-      //-- check HAVING restrictions (groupby-cats mode)
+#if defined(DIACOLLO_COF_C)
+      //DCDEBUG(fprintf(stderr,"DIACOLLO_COF_C: qd=%d ; qc=%d\n", qd, qc));
+
+      //-- COF_C: check HAVING restrictions (groupby-cats mode)
       if ($SIZE(NHaving) > 0) {
         $LB('qc', '$ghaving(NHaving=>$_)', 0,'$SIZE(NHaving)', 'gh');
         if (gh >= $SIZE(NHaving) || $ghaving(NHaving=>gh) != qc) continue;
       }
 
-      //-- setup output output hash key (groupby-cats mode)
+      //-- COF_C: setup output output hash key (groupby-cats mode)
       loop (NG) %{
         ga = $groupby();
 	keybuf[NG] = $xattrs(NA=>ga,NX=>qc);
       %}
 
-      //-- setup item2 count (groupby-cats mode)
-      svpp = hv_fetch(f12hv, (char*)keybuf, keylen, TRUE);
-      if (SvOK(*svpp)) {
-        fval = SvUV(*svpp);
-      } else {
-        fval = 0;
+      //-- COF_C: check EXTEND restrictions (if specified)
+      if (exthv && !hv_exists(exthv, (char*)keybuf, keylen)) {
+        continue;
       }
-#endif
 
-      //-- collect co-occurence frequencies by document
+      //-- COF_C: propagate query-supplied f12 count (qval) to f12Hash (groupby-cats mode)
+      svpp12 = hv_fetch(f12hv, (char*)keybuf, keylen, TRUE);
+      if (SvOK(*svpp12)) {
+        f12val = SvUV(*svpp12);
+      } else {
+        f12val = 0;
+      }
+      sv_setuv(*svpp12, f12val+(UV)qval);
+
+#elif defined(DIACOLLO_COF_T)
+
+      //-- COF_T: collect co-occurence frequencies by document
       adnzlo = $aptr1(NDplus1=>qd);
       adnzhi = $aptr1(NDplus1=>qd1);
       for (adnzi=adnzlo; adnzi < adnzhi; ++adnzi) {
         anzi   = $apix1(NnzA=>adnzi);
  	at     = $awhich(Ndims=>0,NnzA=>anzi);
 
-#ifdef DIACOLLO_COF_T
-        //-- check HAVING restrictions (groupby-terms mode)
+        //-- COF_T: check HAVING restrictions (groupby-terms mode)
         if ($SIZE(NHaving) > 0) {
 	  $LB('at', '$ghaving(NHaving=>$_)', 0,'$SIZE(NHaving)', 'gh');
           if (gh >= $SIZE(NHaving) || $ghaving(NHaving=>gh) != at) continue;
         }
 
-	//-- setup output output hash key (groupby-terms mode)
+	//-- COF_T: setup output output hash key (groupby-terms mode)
 	loop (NG) %{
 	  ga = $groupby();
 	  keybuf[NG] = $xattrs(NA=>ga,NX=>at);
 	%}
 
-        //-- update doc-local f12 value in temporary dochv (avoid over-counting joint frequencies for nontrivial groupby aggregation)
-        fval = (UV)($avals(NnzA1=>anzi));
-        svpp = hv_fetch(dochv, (char*)keybuf, keylen, TRUE);
-        if (SvOK(*svpp)) {
-	  fval += SvUV(*svpp);
+        //-- COF_T: check EXTEND restrictions (if specified)
+        if (exthv && !hv_exists(exthv, (char*)keybuf, keylen)) {
+          continue;
         }
-        sv_setuv(*svpp, fval);
 
-        //DCDEBUG(fprintf(stderr, "cof_x(): iter[qd=%d,anzi=%d,at=%d]: qval=%d, aval=%d, dochv.f2=%u\n", qd, anzi, at, qval, $avals(NnzA1=>anzi), SvUV(*svpp)); fflush(stderr));
-#endif /* DIACOLLO_COF_T */
+        //-- COF_T: update doc-local f12 value in temporary dochv (avoid over-counting joint frequencies for nontrivial groupby aggregation)
+        f12val = (UV)($avals(NnzA1=>anzi));
+        svppd  = hv_fetch(dochv, (char*)keybuf, keylen, TRUE);
+        if (SvOK(*svppd)) {
+	  f12val += SvUV(*svppd);
+        }
+        sv_setuv(*svppd, f12val);
 
-#ifdef DIACOLLO_COF_C
-        fval += (UV)(qval < $avals(NnzA1=>anzi) ? qval : $avals(NnzA1=>anzi));
-#endif  /* DIACOLLO_COF_C */
+        //DCDEBUG(fprintf(stderr, "cof_x(): iter[qd=%d,anzi=%d,at=%d]: qval=%d, aval=%d, dochv.f12=%u\n", qd, anzi, at, qval, $avals(NnzA1=>anzi), SvUV(*svppd)); fflush(stderr));
       }
 
-#ifdef DIACOLLO_COF_T
-      //-- propagate doc-local f12 values to f12Hash
+      //-- COF_T: propagate doc-local f12 values to f12Hash
       hv_iterinit(dochv);
       while ( (gvalsv = hv_iternextsv(dochv, &gkey, &gkeylen)) ) {
-        fval = SvUV(gvalsv);
-        if (fval > qval) fval = qval;
+        f12val = SvUV(gvalsv);
+        if (f12val > qval) f12val = qval;
 
-        svpp = hv_fetch(f12hv, gkey, gkeylen, TRUE);
-        if (SvOK(*svpp))
-          fval += SvUV(*svpp);
-        sv_setuv(*svpp, fval);
+        svpp12 = hv_fetch(f12hv, gkey, gkeylen, TRUE);
+        if (SvOK(*svpp12))
+          f12val += SvUV(*svpp12);
+        sv_setuv(*svpp12, f12val);
       }
       hv_clear(dochv);
-#endif /* DIACOLLO_COF_T */
 
-#ifdef DIACOLLO_COF_C
-      sv_setuv(*svpp, fval);
-#endif   /* DIACOLLO_COF_C */
-
+#endif /* DIACOLLO_COF_C, DIACOLLO_COF_T */
     %}
   %}
 
+  //-- cleanup
 #ifdef DIACOLLO_COF_T
   SvREFCNT_dec(dochv);
 #endif /* DIACOLLO_COF_T */
@@ -479,12 +484,12 @@ sub cof_x_def {
 	   Pars => join("\n    ",
 			'',
 			"$INDX awhich(Ndims,NnzA);",	##-- a() ~ tdm: logical (T,D) with ptr(1) : $vs->{tdm}->_whichND
-			"$INDX aptr1(NDplus1);",		##-- a(): ptr(1) : $vs->{ptr1}
+			"$INDX aptr1(NDplus1);",	##-- a(): ptr(1) : $vs->{ptr1}
 			"$INDX apix1(NnzA);",		##-- a(): sort-indices over NNzA for ptr(1) : $vs->{pix1}
 			"      avals(NnzA1);",		##-- a(): nonzeroes : $vs->{tdm}->_vals
 			##
 			"$INDX xattrs(NA,NX);",		##-- attrs() ~ (term|cat) attributes
-			"$INDX d2c(ND);",               	##-- d2c(): doc->cat map : $vs->{d2c}
+			"$INDX d2c(ND);",               ##-- d2c(): doc->cat map : $vs->{d2c}
 			##
 			"ushort c2date(NC);",           ##-- c2date(): cat->date map : $vs->{c2date}
 			"ushort dateslice();",          ##-- slice value
@@ -499,8 +504,9 @@ sub cof_x_def {
 			''
 		       ),
 	   OtherPars => join("\n    ",
-			   'IV f1Hash;',		##-- output hash, ( pack($pack_ix, $slice) => $f1, ... )
-			   'IV f12Hash;',		##-- output hash, ( pack($pack_ix, $tvals($groupby(),($ti2)), $slice) => $f12, ... )
+                             'IV f1Hash;',		##-- output hash, ( pack($pack_ix, $slice) => $f1, ... )
+                             'IV f12Hash;',		##-- output hash, ( pack($pack_ix, $tvals($groupby(),($ti2)), $slice) => $f12, ... )
+                             'IV extendHash;'		##-- extend selections: ( $slice => { $groupkey => undef, ... } )
 			    ),
 	   GenericTypes => \@VAL_TYPE_CHRS,
 	   Code => $code,
@@ -543,6 +549,7 @@ sub cof_tc_def {
   DIACOLLO_ITYPE *keybuf = (DIACOLLO_ITYPE*)malloc(keylen);
   HV *f1hv  = INT2PTR(HV*, $COMP(f1Hash));
   HV *f12hv = INT2PTR(HV*, $COMP(f12Hash));
+  HV *exthv = INT2PTR(HV*, $COMP(extendHash));
   SV **svpp;
   UV fval0,fval;
 
@@ -603,6 +610,11 @@ sub cof_tc_def {
 	  keybuf[NG] = $groupas()==0 ? $tattrs(NA=>ga,NT=>at) : $mattrs(NM=>ga,NC=>qc);
 	%}
 
+        //-- check EXTEND restrictions (if specified)
+        if (exthv && !hv_exists(exthv, (char*)keybuf, keylen)) {
+          continue;
+        }
+
         //-- set or update f12 hash value
         fval = (UV)(qval < $avals(NnzA1=>anzi) ? qval : $avals(NnzA1=>anzi));
 	svpp = hv_fetch(f12hv, (char*)keybuf, keylen, TRUE);
@@ -652,6 +664,7 @@ sub cof_tc_def {
 	   OtherPars => join("\n    ",
 			     'IV f1Hash;',		##-- output hash, ( pack($pack_ix, $slice) => $f1, ... )
 			     'IV f12Hash;',		##-- output hash, ( pack($pack_ix, $tvals($groupby(),($ti2)), $slice) => $f12, ... )
+                             'IV extendHash;'		##-- extend selections: ( $slice => { $groupkey => undef, ... } )
 			    ),
 	   GenericTypes => \@VAL_TYPE_CHRS,
 	   Code => $code,

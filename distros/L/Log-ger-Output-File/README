@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::File - Send logs to file
 
 VERSION
-    version 0.010
+    version 0.011
 
 SYNOPSIS
      use Log::ger::Output 'File' => (

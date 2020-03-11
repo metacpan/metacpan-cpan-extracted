@@ -1,3 +1,17 @@
-0.001    2017-07-12  Released-By: PERLANCAR
+0.003   2020-03-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump v to 2 to comply to Log::ger 0.037.
+
+
+0.002    2020-03-11  Released-By: PERLANCAR
+
+         - [incompatible changes] Rename configuration:
+           log_{sub,method}_prefixes -> logger_{sub,method}_prefixes.
+           is_{sub,method}_prefixes -> level_checker_{sub,method}_prefixes.
+
+         - Adjust to Log::ger 0.036 (renamed routine types in 0.033, add meta()
+           in 0.034).
+
+0.001    2020-03-04  Released-By: PERLANCAR
 
          - First release.

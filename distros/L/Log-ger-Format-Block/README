@@ -3,7 +3,7 @@ NAME
     sprintf-style
 
 VERSION
-    version 0.006
+    version 0.008
 
 SYNOPSIS
      use Log::ger::Format 'Block';

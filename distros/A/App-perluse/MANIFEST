@@ -15,7 +15,6 @@ script/perluse.sh
 t/010_version.t
 xt/check_changes.t
 xt/consistent_version_numbers.t
-xt/copyright.t
 xt/cover.pl
 xt/cpan_changes.t
 xt/cpan_meta.t

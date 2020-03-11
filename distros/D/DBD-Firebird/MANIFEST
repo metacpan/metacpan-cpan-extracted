@@ -67,5 +67,3 @@ t/TestFirebirdEmbedded.pm
 t/zz-cleanup.t
 typemap
 var/.keep_dir
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

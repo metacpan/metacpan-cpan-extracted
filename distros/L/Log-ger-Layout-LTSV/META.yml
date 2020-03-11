@@ -24,7 +24,7 @@ meta-spec:
 name: Log-ger-Layout-LTSV
 requires:
   Devel::Caller::Util: '0.042'
-  Log::ger: '0.033'
+  Log::ger: '0.037'
   Sys::Hostname: '0'
   Time::HiRes: '0'
   perl: '5.010001'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Layout-LTSV
   homepage: https://metacpan.org/release/Log-ger-Layout-LTSV
   repository: git://github.com/perlancar/perl-Log-ger-Layout-LTSV.git
-version: '0.004'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

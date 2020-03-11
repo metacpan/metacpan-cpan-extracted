@@ -1,22 +1,34 @@
-0.004   2019-04-13 (PERLANCAR)
+0.006   2020-03-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump v to 2 to comply to Log::ger 0.037.
+
+
+0.005   2020-03-09  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Adjust to Log::ger 0.034 (add meta()).
+
+
+0.004   2019-04-13  Released-By: PERLANCAR
 
 	- Bump prereq Devel::Caller::Util 0.040 -> 0.042 [RT#129150].
 
 
-0.003   2019-04-12 (PERLANCAR)
+0.003   2019-04-12  Released-By: PERLANCAR
 
 	- Instead of using offsets, use Devel::Caller::Util's
 	  caller()/callers() that can ignore certain subs/packages for more
 	  friendly caller/stack trace information. [ref: GH#1]
 
 
-0.002   2019-03-26 (PERLANCAR)
+0.002   2019-03-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention Log::ger::Layout::Pattern::Multiline.
 
 
-0.001    2017-06-28 (PERLANCAR)
+0.001    2017-06-28  Released-By: PERLANCAR
 
          - First release.

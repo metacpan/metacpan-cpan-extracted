@@ -1,3 +1,7 @@
+0.1.7 2020-03-11
+  - when fetching ad groups, get them one by one and complain
+    if there is a problem
+  - escape filter value in ad group search
 0.1.6 2016-08-22
   - documentation update
 

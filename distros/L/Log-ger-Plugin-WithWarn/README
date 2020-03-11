@@ -2,7 +2,7 @@ NAME
     Log::ger::Plugin::WithWarn - Add *_warn logging routines
 
 VERSION
-    version 0.003
+    version 0.004
 
 SYNOPSIS
      use Log::ger::Plugin 'WithWarn';

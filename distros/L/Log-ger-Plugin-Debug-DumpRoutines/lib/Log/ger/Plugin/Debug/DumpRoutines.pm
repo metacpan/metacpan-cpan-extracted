@@ -1,16 +1,20 @@
 package Log::ger::Plugin::Debug::DumpRoutines;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-04'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Plugin-Debug-DumpRoutines'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
 use Data::Dump::Color;
 
+sub meta { +{
+    v => 2,
+} }
+
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     return {
         before_install_routines => [
@@ -41,7 +45,7 @@ Log::ger::Plugin::Debug::DumpRoutines - Dump routines before Log::ger instals th
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

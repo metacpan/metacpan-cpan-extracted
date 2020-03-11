@@ -57,7 +57,7 @@ test_psgi
     };
 
     subtest 'blocked' => sub {
-        my $req = GET "/some/thing.php";
+        my $req = POST "/some/thing.php";
         my $res = $cb->($req);
 
         ok is_error( $res->code ), join( " ", $req->method, $req->uri );
@@ -67,7 +67,7 @@ test_psgi
           [
             {
                 level => 'warn',
-                message => 'Plack::Middleware::Security::Simple Blocked 127.0.0.1 /some/thing.php',
+                message => 'Plack::Middleware::Security::Simple Blocked 127.0.0.1 POST /some/thing.php HTTP ' . HTTP_BAD_REQUEST,
             }
           ],
           'nothing logged';

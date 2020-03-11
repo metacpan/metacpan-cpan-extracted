@@ -1,3 +1,10 @@
+v0.122.1 2020-03-11T12:18:35Z
+ - proxy server on accept hook
+
+v0.122.0 2020-03-11T04:09:30Z
+ - user api role updated
+ - pod updated
+
 v0.121.1 2020-03-06T19:26:16Z
  - resources updated
 

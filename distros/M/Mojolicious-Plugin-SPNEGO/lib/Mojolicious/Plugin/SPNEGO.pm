@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 use IO::Socket::Timeout;
 use Mojo::Util qw(b64_decode);
-our $VERSION = '0.4.0';
+our $VERSION = '0.4.1';
 
 my %cCache;
 
@@ -33,17 +33,20 @@ sub register {
 
             if ($AuthBase64 and $status){
                 for ($status){
-                    my $timeout = $cfg->{timeout} // 5;
+                    my $timeout = $cfg->{timeout} // 10;
                     my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new(
                         $cfg->{ad_server},
                         debug=>($cfg->{ldap_debug}//$ENV{SPNEGO_LDAP_DEBUG}//0),
-                        onerror=> sub { my $msg = shift; $c->app->log->error($msg->error);return $msg},
+                        onerror=> sub { my $msg = shift; 
+                            $c->log->error("LDAP ERROR: " . $msg->error);
+                            return $msg
+                        },
                         timeout=>$timeout
                     );
                     if ($cfg->{start_tls}){
                         my $msg = $ldap->start_tls($cfg->{start_tls});
                         if ($msg->is_error()){
-                            $c->app->log->error($msg->error);
+                            $c->log->error($msg->error);
                         }
                     }
                     # Read/Write timeouts via setsockopt

@@ -1,3 +1,9 @@
+0.037   2020-03-11  Released-By: PERLANCAR; Urgency: high
+
+	- [Incompatible change] Bump meta version to 2 to force all plugins
+	  to be upgraded to comply to Log::ger >0.032.
+
+
 0.036   2020-03-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Add _import_to() to easily import to an arbitrary package.

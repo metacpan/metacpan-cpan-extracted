@@ -1,14 +1,18 @@
 package Log::ger::Format::Block;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Format-Block'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use strict;
 use warnings;
 
 use Sub::Metadata qw(mutate_sub_prototype);
+
+sub meta { +{
+    v => 2,
+} }
 
 sub get_hooks {
     my %plugin_conf = @_;
@@ -18,7 +22,7 @@ sub get_hooks {
             __PACKAGE__, # key
             50,          # priority
             sub {        # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
                 my $formatter = sub { my $code = shift; $code->(@_) };
                 [$formatter];
@@ -30,7 +34,7 @@ sub get_hooks {
             sub {        # hook
                 no strict 'refs';
 
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
                 for my $r (@{ $hook_args{routines} }) {
                     my ($coderef, $name, $lnum, $type) = @$r;
@@ -64,7 +68,7 @@ Log::ger::Format::Block - Use formatting using block instead of sprintf-style
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 

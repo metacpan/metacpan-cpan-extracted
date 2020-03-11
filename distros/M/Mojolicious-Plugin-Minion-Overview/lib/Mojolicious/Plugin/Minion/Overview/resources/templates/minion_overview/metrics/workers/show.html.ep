@@ -1,0 +1,10 @@
+% layout 'minion_overview', title => '| Metrics for ' . $worker->{ host };
+
+%= include 'minion_overview/metrics/workers/_waittime', worker => $worker, waittime => $waittime
+<br/>
+%= include 'minion_overview/metrics/workers/_throughput', worker => $worker, throughput => $throughput
+
+% content_for javascript => begin
+    %= javascript '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js'
+    %= javascript '//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js'
+% end

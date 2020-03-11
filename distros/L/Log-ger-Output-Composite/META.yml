@@ -6,7 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Log::ger: '0.032'
+  Log::ger: '0.037'
   Log::ger::Layout: '0'
   Log::ger::Layout::Pattern: '0.002'
   Log::ger::Output: '0.007'
@@ -23,14 +23,14 @@ meta-spec:
 name: Log-ger-Output-Composite
 requires:
   Data::Dmp: '0.21'
-  Log::ger::Util: '0.008'
+  Log::ger::Util: '0.037'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Output-Composite
   homepage: https://metacpan.org/release/Log-ger-Output-Composite
   repository: git://github.com/perlancar/perl-Log-ger-Output-Composite.git
-version: '0.013'
+version: '0.016'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

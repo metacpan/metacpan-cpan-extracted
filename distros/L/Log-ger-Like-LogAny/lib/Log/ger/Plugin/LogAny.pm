@@ -1,15 +1,21 @@
 package Log::ger::Plugin::LogAny;
 
-our $DATE = '2017-08-03'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-11'; # DATE
+our $DIST = 'Log-ger-Like-LogAny'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
 
 use Log::ger ();
 
+sub meta { +{
+    v => 2,
+} }
+
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     return {
         create_formatter => [
@@ -22,19 +28,20 @@ sub get_hooks {
             },
         ],
         create_routine_names => [
-            __PACKAGE__, 50,
+            __PACKAGE__, # key
+            50,          # priority
             sub {
-                my %args = @_;
+                my %hook_args = @_;
 
                 my $levels = [keys %Log::ger::Levels];
 
                 return [{
-                    log_subs    => [map { (["log_$_", $_, "join"], ["log_${_}f", $_, "default"]) }
-                                        @$levels],
-                    is_subs     => [map { ["log_is_$_", $_] } @$levels],
-                    log_methods => [map { (["$_", $_, "join"], ["${_}f", $_, "default"]) }
-                                        @$levels],
-                    is_methods  => [map { ["is_$_", $_] } @$levels],
+                    logger_subs            => [map { (["log_$_", $_, "join"], ["log_${_}f", $_, "default"]) }
+                                                   @$levels],
+                    level_checker_subs     => [map { ["log_is_$_", $_] } @$levels],
+                    logger_methods         => [map { (["$_", $_, "join"], ["${_}f", $_, "default"]) }
+                                                   @$levels],
+                    level_checker_methods => [map { ["is_$_", $_] } @$levels],
                 }, 1];
             }],
     };
@@ -55,7 +62,7 @@ Log::ger::Plugin::LogAny - Plugin to mimic Log::Any
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -75,7 +82,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

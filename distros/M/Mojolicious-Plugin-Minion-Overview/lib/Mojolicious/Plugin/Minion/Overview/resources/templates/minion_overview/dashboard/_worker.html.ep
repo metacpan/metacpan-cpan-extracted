@@ -1,6 +1,7 @@
 <div class="card mt-3">
     <div class="card-header d-flex align-items-center justify-content-between">
-        <h6><%= $worker->{ host } %></h6>
+        <span><%= $worker->{ host } %> <span class="badge badge-secondary" title="Average wait time"><%= $worker->{ wait } %>s</span></span>
+        <a href="<%= url_for('minion_overview.metrics.workers.show', worker => $worker->{ id }) %>" title="Metrics"><i class="fa fa-chart-bar"></i></a>
     </div>
     <div class="card-bg-secondary">
         <div class="row">

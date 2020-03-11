@@ -1,3 +1,10 @@
+0.004   2020-03-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- Adjust to Log::ger 0.034 (add meta()).
+
+
 0.003   2019-10-27  Released-By: PERLANCAR; Urgency: medium
 
 	- [optimize] Reduce one subcall.

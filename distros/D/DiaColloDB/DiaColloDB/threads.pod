@@ -1,0 +1,95 @@
+##========================================================================
+## NAME
+=pod
+
+=head1 NAME
+
+DiaColloDB::threads - wrapper for threads.pm or forks.pm
+
+=cut
+
+##========================================================================
+## SYNOPSIS
+=pod
+
+=head1 SYNOPSIS
+
+ ##========================================================================
+ ## PRELIMINARIES
+ 
+ use DiaColloDB::threads;
+ 
+ $module = $DiaColloDB::threads::MODULE;
+ $tid    = DiaColloDB::threads->tid();
+ 
+ if ($DiaColloDB::threads::MODULE) {
+   ##-- you can use the threads API
+   my $thr = threads->create(\&callback,@args);
+   my $rc  = $thr->join();
+   #... etc.
+ }
+
+=cut
+
+##========================================================================
+## DESCRIPTION
+=pod
+
+=head1 DESCRIPTION
+
+The C<DiaColloDB::threads> module attempts to load (pseudo)-thread support
+from either L<threads.pm|threads> or L<forks.pm|forks>, depending on whether
+or not your perl has builtin thread support according to
+L<C<$Config{usethreads}>|Config>.  It also wraps the C<import()> method of
+whatever module it actually loads, so it should work as a drop-in replacement
+for whatever C<threads>-like module you have available.
+
+=cut
+
+##----------------------------------------------------------------
+## DESCRIPTION: DiaColloDB::threads: Gloabls
+=pod
+
+=head2 Gloabls
+
+=over 4
+
+=item Variable: $MODULE
+
+After using C<DiaColloDB::threads>, the variable C<$DiaColloDB::threads::MODULE> is set to the
+name of the module providing the underlying C<threads> implementation
+(either C<threads> or C<forks>), if any.
+Otherwise, it is set to the empty string.
+
+=back
+
+=cut
+
+##======================================================================
+## Footer
+##======================================================================
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2020 by Bryan Jurish
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 SEE ALSO
+
+L<DiaColloDB::threads::shared(3pm)|DiaColloDB::threads::shared>,
+L<threads(3pm)|threads>,
+L<forks(3pm)|forks>,
+L<perl(1)|perl>,
+...
+
+
+
+=cut

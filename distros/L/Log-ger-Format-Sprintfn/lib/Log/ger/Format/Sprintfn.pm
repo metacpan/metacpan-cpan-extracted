@@ -1,21 +1,28 @@
 package Log::ger::Format::Sprintfn;
 
-our $DATE = '2017-08-01'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-09'; # DATE
+our $DIST = 'Log-ger-Format-Sprintfn'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
 
 use Text::sprintfn;
 
+sub meta { +{
+    v => 1,
+} }
+
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     return {
         create_formatter => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
                 my $formatter = sub {
                     return $_[0] if @_ < 2;
@@ -70,7 +77,7 @@ Log::ger::Format::Sprintfn - Use Text::sprintfn for formatting instead of sprint
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -100,7 +107,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

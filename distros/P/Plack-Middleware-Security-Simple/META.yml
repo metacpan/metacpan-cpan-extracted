@@ -31,10 +31,10 @@ name: Plack-Middleware-Security-Simple
 provides:
   Plack::Middleware::Security::Common:
     file: lib/Plack/Middleware/Security/Common.pm
-    version: v0.4.0
+    version: v0.4.1
   Plack::Middleware::Security::Simple:
     file: lib/Plack/Middleware/Security/Simple.pm
-    version: v0.4.0
+    version: v0.4.1
 recommends:
   Ref::Util::XS: '0'
 requires:
@@ -50,7 +50,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Plack-Middleware-Security-Simple/issues
   repository: git://github.com/robrwo/Plack-Middleware-Security-Simple.git
-version: v0.4.0
+version: v0.4.1
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

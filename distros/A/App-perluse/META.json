@@ -4,13 +4,13 @@
       "Piotr Roszatycki <dexter@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4204",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-perluse",
    "prereqs" : {
@@ -23,7 +23,7 @@
    "provides" : {
       "App::perluse" : {
          "file" : "lib/App/perluse.pm",
-         "version" : "0.0102"
+         "version" : "0.0201"
       }
    },
    "release_status" : "stable",
@@ -38,5 +38,6 @@
          "url" : "http://github.com/dex4er/perluse"
       }
    },
-   "version" : "0.0102"
+   "version" : "0.0201",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

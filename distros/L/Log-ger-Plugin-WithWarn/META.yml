@@ -23,14 +23,14 @@ meta-spec:
 name: Log-ger-Plugin-WithWarn
 requires:
   Carp: '1.12'
-  Log::ger: '0.033'
+  Log::ger: '0.037'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Plugin-WithWarn
   homepage: https://metacpan.org/release/Log-ger-Plugin-WithWarn
   repository: git://github.com/perlancar/perl-Log-ger-Plugin-WithWarn.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

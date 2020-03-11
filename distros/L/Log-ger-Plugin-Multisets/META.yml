@@ -6,7 +6,10 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0'
+  Log::ger::Output: '0.005'
+  Log::ger::Plugin: '0'
+  Test::More: '0.98'
+  vars: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -17,14 +20,14 @@ meta-spec:
   version: '1.4'
 name: Log-ger-Plugin-Multisets
 requires:
-  Log::ger: '0.031'
+  Log::ger: '0.037'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Plugin-Multisets
   homepage: https://metacpan.org/release/Log-ger-Plugin-Multisets
   repository: git://github.com/perlancar/perl-Log-ger-Plugin-Multisets.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

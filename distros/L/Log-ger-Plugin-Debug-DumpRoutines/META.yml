@@ -24,7 +24,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Plugin-Debug-DumpRoutines
   homepage: https://metacpan.org/release/Log-ger-Plugin-Debug-DumpRoutines
   repository: git://github.com/perlancar/perl-Log-ger-Plugin-Debug-DumpRoutines.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

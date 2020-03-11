@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Log::ger::Plugin::WithWarn",
   "PREREQ_PM" => {
     "Carp" => "1.12",
-    "Log::ger" => "0.033",
+    "Log::ger" => "0.037",
     "strict" => 0,
     "warnings" => 0
   },
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "vars" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +44,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.033",
+  "Log::ger" => "0.037",
   "Log::ger::Output" => "0.007",
   "Log::ger::Plugin" => 0,
   "Test::Exception" => 0,

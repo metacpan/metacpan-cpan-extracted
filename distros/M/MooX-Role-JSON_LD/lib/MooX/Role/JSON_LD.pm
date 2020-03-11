@@ -151,7 +151,7 @@ use MRO::Compat;
 use Types::Standard qw[ArrayRef HashRef InstanceOf Str is_CodeRef is_HashRef
   is_ArrayRef is_Ref is_Object];
 
-our $VERSION = '0.0.17';
+our $VERSION = '0.0.18';
 
 requires qw[json_ld_type json_ld_fields];
 
@@ -181,9 +181,11 @@ sub _resolve_nested {
     my ($val) = @_;
 
     if (is_ArrayRef($val)) {
-      return [ map { is_Object($_) && $_->can('json_ld_data')
+      return [
+	      map { is_Object($_) && $_->can('json_ld_data')
           ? $_->json_ld_data
-          : $_; } @$val ];
+          : $_; } @$val
+        ];
     }
 
     is_Object($val) && $val->can('json_ld_data')
@@ -199,35 +201,43 @@ sub json_ld_data {
     '@type'    => $self->json_ld_type,
   };
 
-  foreach (@{$self->json_ld_fields}) {
+  foreach my $field (@{$self->json_ld_fields}) {
 
-      if (is_Ref($_)) {
+    if (is_Ref($field)) {
 
-          if (is_HashRef($_)) {
+      if (is_HashRef($field)) {
 
-              while (my ($key, $val) = each %{$_}) {
+        my @keys = keys %$field;
+        my @vals = values %$field;
 
-                  if (defined (my $res = is_CodeRef($val)
-                               ? $val->($self)
-                               : $self->$val)) {
-                      $data->{$key} = _resolve_nested($res);
-                  }
+        # Originally, this code used 'each', but there seemed
+        # to be some circumstances where the internet iterator
+        # got confused - particularly when an object contained
+        # a sub-object of the same type.
+        for my $x (0 .. $#keys) {
+          my $key = $keys[$x];
+          my $val = $vals[$x];
 
-              }
+          if (defined (my $res = is_CodeRef($val)
+                       ? $val->($self)
+                       : $self->$val)) {
+            $data->{$key} = _resolve_nested($res);
           }
-          else {
-              carp "Weird JSON-LD reference: " . ref $_;
-              next;
-          }
-
+        }
       }
       else {
-
-          if (defined (my $res = $self->$_)) {
-              $data->{$_} = _resolve_nested($res);
-          }
-
+        carp "Weird JSON-LD reference: " . ref $field;
+        next;
       }
+
+    }
+    else {
+
+      if (defined (my $res = $self->$field)) {
+        $data->{$field} = _resolve_nested($res);
+      }
+
+    }
 
   }
 

@@ -381,7 +381,8 @@ sub set_options {
             elsif ( $opt eq '_data_source' ) {
                 my $prompt = 'Choose data source options';
                 my $sub_menu = [
-                    [ 'data_source', "- Data source", [ 'plain', 'copy&paste', 'file', 'plain/copy&pase/file' ] ]
+                    [ 'data_source_Create_table', "- Data source \"Create table\"", [ 'plain', 'copy&paste', 'file', 'plain/copy&pase/file' ], ],
+                    [ 'data_source_Insert',       "- Data source \"Insert into\"",  [ 'plain', 'copy&paste', 'file', 'plain/copy&pase/file' ], ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

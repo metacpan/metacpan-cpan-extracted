@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::SimpleFile - Send logs to file
 
 VERSION
-    version 0.002
+    version 0.004
 
 SYNOPSIS
      use Log::ger::Output 'SimpleFile' => (
@@ -38,7 +38,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

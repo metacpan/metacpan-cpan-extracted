@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Log::Dispatch" => 0,
     "Log::Dispatch::ArrayWithLimits" => 0,
-    "Log::ger::Util" => "0.033",
+    "Log::ger::Util" => "0.034",
     "strict" => 0,
     "warnings" => 0
   },
@@ -26,11 +26,11 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Log::ger" => "0.033",
+    "Log::ger" => "0.034",
     "Log::ger::Output" => "0.008",
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,9 +43,9 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Log::Dispatch" => 0,
   "Log::Dispatch::ArrayWithLimits" => 0,
-  "Log::ger" => "0.033",
+  "Log::ger" => "0.034",
   "Log::ger::Output" => "0.008",
-  "Log::ger::Util" => "0.033",
+  "Log::ger::Util" => "0.034",
   "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0

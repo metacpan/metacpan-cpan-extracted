@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 requires qw/ log_stats /;
 
-our $VERSION = 'v0.6.3';
+our $VERSION = 'v0.7.1';
 
 
 sub statsd_client {
@@ -65,6 +65,25 @@ around log_stats => sub {
     $c->$next unless $disabled;
 };
 
+around finalize => sub {
+    my ($next, $c) = @_;
+
+    if (my $client = $c->statsd_client) {
+
+        if ($c->can("sessionid") && (my $id = $c->sessionid)) {
+            $client->set_add("catalyst.sessionid", "$id");
+        }
+        # Plack::Middleware::Session
+        elsif (my $options = $c->req->env->{'psgix.session.options'}) {
+            if (my $id = $options->{id}) {
+                $client->set_add("catalyst.sessionid", "$id");
+            }
+        }
+    }
+
+    $c->$next();
+};
+
 
 1;
 
@@ -80,7 +99,7 @@ Catalyst::Plugin::Statsd - Log Catalyst stats to statsd
 
 =head1 VERSION
 
-version v0.6.3
+version v0.7.1
 
 =head1 SYNOPSIS
 
@@ -169,6 +188,13 @@ This logs the Catalyst reponse time that is normally reported by
 Catalyst.  However, it is probably unnecessary since
 L<Plack::Middleware::Statsd> also logs response times.
 
+=head2 C<catalyst.sessionid>
+
+If L<Catalyst::Plugin::Session> or L<Plack::Middleware::Session> is
+used, or anything that adds a C<sessionid> method to the context, then
+the session id is added as a set, to count the number of unique
+sessions.
+
 =head2 C<catalyst.stats.*.time>
 
 These are metrics generated from L<Catalyst::Stats>.
@@ -199,6 +225,14 @@ If you do not want this, then you can work around this by prefixing
 the block name with a controller name, e.g.
 
   $stats->profile( begin => 'controller.here' );
+
+=head2 Large Databases When Profiling
+
+When profiling your application, the size of your stats database may
+grow quite large.
+
+Your database storage and retention settings should be adjusted
+accordingly.
 
 =head1 SEE ALSO
 

@@ -81,6 +81,16 @@ sub dashboard {
     };
 }
 
+=head2 failed_jobs
+
+Search failed jobs
+
+=cut
+
+sub failed_jobs {
+    return {};
+}
+
 =head2 job
 
 Find a job by id
@@ -91,6 +101,36 @@ sub job {
     my ($self, $id) = @_;
 
     return $self->minion->job($id);
+}
+
+=head2 job_runtime_metrics
+
+Job runtime metrics
+
+=cut
+
+sub job_runtime_metrics {
+    return [];
+}
+
+=head2 job_throughput_metrics
+
+Job throughput metrics
+
+=cut
+
+sub job_throughput_metrics {
+    return [];
+}
+
+=head2 jobs
+
+Search jobs
+
+=cut
+
+sub jobs {
+    return {};
 }
 
 =head2 limit
@@ -159,6 +199,16 @@ sub tags {
     return $self;
 }
 
+=head2 unique_jobs
+
+Search the list of unique jobs
+
+=cut
+
+sub unique_jobs {
+    return {};
+}
+
 =head2 when
 
 Add where condition when first param is true
@@ -190,6 +240,36 @@ sub where {
     $self->query->{ where }->{ $field } = $value || $condition;
 
     return $self;
+}
+
+=head2 worker
+
+Find a worker by id
+
+=cut
+
+sub worker {
+    return {};
+}
+
+=head2 worker_waittime_metrics
+
+Worker waittime metrics
+
+=cut
+
+sub worker_waittime_metrics {
+    return [];
+}
+
+=head2 worker_throughput_metrics
+
+Worker throughput metrics
+
+=cut
+
+sub worker_throughput_metrics {
+    return [];
 }
 
 =head2 workers

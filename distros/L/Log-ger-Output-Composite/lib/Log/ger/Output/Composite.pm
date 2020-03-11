@@ -1,7 +1,9 @@
 package Log::ger::Output::Composite;
 
-our $DATE = '2020-03-07'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-11'; # DATE
+our $DIST = 'Log-ger-Output-Composite'; # DIST
+our $VERSION = '0.016'; # VERSION
 
 use strict;
 use warnings;
@@ -10,6 +12,10 @@ use Log::ger::Util;
 # this can be used to override all level settings as it has the highest
 # precedence.
 our $Current_Level;
+
+sub meta { +{
+    v => 2,
+} }
 
 sub _get_min_max_level {
     my $level = shift;
@@ -80,11 +86,11 @@ sub get_hooks {
     }
 
     return {
-        create_log_routine => [
+        create_outputter => [
             __PACKAGE__, # key
             9,           # priority.
             # we use a high priority to override Log::ger's default hook (at
-            # priority 10) which create null loggers for levels lower than the
+            # priority 10) which create null outputter for levels lower than the
             # general level, since we want to do our own custom level checking.
             sub {        # hook
                 no strict 'refs';
@@ -92,7 +98,7 @@ sub get_hooks {
 
                 my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
-                my $loggers = [];
+                my $outputters = [];
                 my $layouters = [];
                 for my $ospec (@ospecs) {
                     my $oname = $ospec->{_name};
@@ -108,16 +114,24 @@ sub get_hooks {
                     my $res;
                     {
                         push @hook_args, (level => 60, str_level => 'trace');
-                        if ($hooks->{create_log_routine}) {
+                        if ($hooks->{create_log_routine}) { # old name, will be removed in the future
                             $res = $hooks->{create_log_routine}->[2]->(
                                 @hook_args);
                             if ($res->[0]) {
-                                push @$loggers, $res->[0];
+                                push @$outputters, $res->[0];
                                 last;
                             }
                         }
-                        die "Output module $mod does not produce logger in ".
-                            "its create_log_routine hook";
+                        if ($hooks->{create_outputter}) {
+                            $res = $hooks->{create_outputter}->[2]->(
+                                @hook_args);
+                            if ($res->[0]) {
+                                push @$outputters, $res->[0];
+                                last;
+                            }
+                        }
+                        die "Output module $mod does not produce outputter in ".
+                            "its create_outputter (or create_log_routine) hook"; # old name create_log_routine will be removed in the future
                     }
                     if ($ospec->{layout}) {
                         my $lname = $ospec->{layout}[0];
@@ -147,8 +161,8 @@ sub get_hooks {
                         push @$layouters, undef;
                     }
                 }
-                unless (@$loggers) {
-                    $Log::ger::_logger_is_null = 1;
+                unless (@$outputters) {
+                    $Log::ger::_outputter_is_null = 1;
                     return [sub {0}];
                 }
 
@@ -166,13 +180,13 @@ sub get_hooks {
                 {
                     no strict 'refs';
                     ${$varname} = [];
-                    ${$varname}->[0] = $loggers;
+                    ${$varname}->[0] = $outputters;
                     ${$varname}->[1] = $layouters;
                     ${$varname}->[2] = $hook_args{per_target_conf};
                 }
 
-                # generate our logger routine
-                my $logger;
+                # generate our outputter routine
+                my $composite_outputter;
                 {
                     my @src;
                     push @src, "sub {\n";
@@ -246,9 +260,9 @@ sub get_hooks {
                         warn "Log::ger::Output::Composite logger source code (target type=$hook_args{target_type} target name=$hook_args{target_name}, routine name=$hook_args{routine_name}): <<$src>>\n";
                     }
 
-                    $logger = eval $src;
+                    $composite_outputter = eval $src;
                 }
-                [$logger];
+                [$composite_outputter];
             }] # hook record
     };
 }
@@ -273,7 +287,7 @@ Log::ger::Output::Composite - Composite output
 
 =head1 VERSION
 
-version 0.013
+version 0.016
 
 =head1 SYNOPSIS
 

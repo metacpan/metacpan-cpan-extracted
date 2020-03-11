@@ -12,7 +12,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Log::Any::Adapter::Base' => '0',
+                                      'Log::Any::Adapter::Base' => '1.708',
                                       'Log::Any::Adapter::Util' => '0',
                                       'Sentry::Raven' => '0'
                                     }

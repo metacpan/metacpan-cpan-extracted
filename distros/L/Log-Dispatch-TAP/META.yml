@@ -1,0 +1,44 @@
+---
+abstract: 'Log to TAP output'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Log::Dispatch: '0'
+  Module::Metadata: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Log::Dispatch
+  - logging
+  - development
+  - TAP
+  - testing
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Dispatch-TAP
+provides:
+  Log::Dispatch::TAP:
+    file: lib/Log/Dispatch/TAP.pm
+    version: v0.1.0
+requires:
+  Log::Dispatch::Output: '0'
+  Params::ValidationCompiler: '0'
+  Test2::API: '0'
+  Types::Standard: '0'
+  base: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/robrwo/Log-Dispatch-TAP/issues
+  repository: git://github.com/robrwo/Log-Dispatch-TAP.git
+version: v0.1.0
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

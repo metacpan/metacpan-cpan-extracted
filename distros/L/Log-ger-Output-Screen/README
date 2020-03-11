@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::Screen - Output log to screen
 
 VERSION
-    version 0.011
+    version 0.014
 
 SYNOPSIS
      use Log::ger::Output Screen => (

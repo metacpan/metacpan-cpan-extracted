@@ -1,6 +1,10 @@
 Revision history for App-YTDL
 
 
+0.308   2020-03-11
+        - Update youtube regexes.
+        - Update manual format userinterface.
+
 0.307   2020-03-08
         - Adapt the code to the updated Term::Choose.
 

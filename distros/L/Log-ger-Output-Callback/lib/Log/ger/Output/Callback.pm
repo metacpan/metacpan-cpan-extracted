@@ -1,13 +1,17 @@
 package Log::ger::Output::Callback;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Output-Callback'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+sub meta { +{
+    v => 2,
+} }
 
 sub get_hooks {
     my %plugin_conf = @_;
@@ -22,10 +26,10 @@ sub get_hooks {
             # for less severe levels.
             9,           # priority
             sub {        # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
                 my $outputter = sub {
                     my ($per_target_conf, $msg, $per_msg_conf) = @_;
-                    my $level = $per_msg_conf->{level} // $hook_args{level};
+                    my $level = $per_msg_conf ? $per_msg_conf->{level} : undef; $level = $hook_args{level} if !defined $level;
                     $plugin_conf{logging_cb}->($per_target_conf, $level, $msg, $per_msg_conf);
                 };
                 [$outputter];
@@ -38,7 +42,7 @@ sub get_hooks {
             __PACKAGE__, # key
             9,          # priority
             sub {        # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
                 my $level_checker = sub {
                     $plugin_conf{detection_cb}->($hook_args{level});
                 };
@@ -65,7 +69,7 @@ Log::ger::Output::Callback - Send logs to a subroutine
 
 =head1 VERSION
 
-This document describes version 0.006 of Log::ger::Output::Callback (from Perl distribution Log-ger-Output-Callback), released on 2020-03-07.
+This document describes version 0.009 of Log::ger::Output::Callback (from Perl distribution Log-ger-Output-Callback), released on 2020-03-11.
 
 =head1 SYNOPSIS
 

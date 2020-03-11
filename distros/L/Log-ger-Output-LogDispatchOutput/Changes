@@ -1,3 +1,10 @@
+0.005   2020-03-09  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Adjust to Log::ger 0.034 (add meta()).
+
+
 0.004   2020-03-07  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust with Log::ger 0.033 (renamed hook names, no more

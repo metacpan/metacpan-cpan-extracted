@@ -3,7 +3,7 @@ NAME
     instals them
 
 VERSION
-    version 0.001
+    version 0.003
 
 SYNOPSIS
      use Log::ger::Plugin->set('Debug::DumpRoutines');

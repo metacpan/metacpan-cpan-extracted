@@ -1,34 +1,41 @@
 package Log::ger::Output::SimpleFile;
 
-our $DATE = '2019-09-10'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-11'; # DATE
+our $DIST = 'Log-ger-Output-SimpleFile'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
 
+sub meta { +{
+    v => 2,
+} }
+
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     my $fh;
-    if (defined(my $path = $conf{path})) {
+    if (defined(my $path = $plugin_conf{path})) {
         open $fh, ">>", $path or die "Can't open log file '$path': $!";
-    } elsif ($fh = $conf{handle}) {
+    } elsif ($fh = $plugin_conf{handle}) {
     } else {
         die "Please specify 'path' or 'handle'";
     }
 
     return {
-        create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+        create_outputter => [
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
-                my $logger = sub {
-                    print $fh $_[1];
-                    print $fh "\n" unless $_[1] =~ /\R\z/;
+                my $outputter = sub {
+                    my ($per_target_conf, $fmsg, $per_msg_conf) = @_;
+                    print $fh $fmsg . ($fmsg =~ /\R\z/ ? "" : "\n");
                     $fh->flush;
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -48,7 +55,7 @@ Log::ger::Output::SimpleFile - Send logs to file
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -93,7 +100,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

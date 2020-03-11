@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between">
-        <h5>Throughput statistics for <span class="badge badge-secondary"><%= $job %></span></h5>
+        <span>Throughput statistics for <span class="badge badge-secondary"><%= $job %></span></span>
     </div>
     <div class="card-body card-bg-secondary">
         <div class="row">
@@ -17,14 +17,14 @@
             data: {
                 datasets: [{
                     label: 'Finished jobs per hour',
-                    backgroundColor: 'rgb(201, 203, 207)',
+                    backgroundColor: 'rgb(34, 98, 98)',
                     borderColor: 'rgb(75, 192, 192)',
                     fill: false,
                     pointHoverRadius: 8,
                     data: <%== to_json($throughput->grep(sub { $_->{ state } eq 'finished' })) %>
                 }, {
                     label: 'Failed jobs per hour',
-                    backgroundColor: 'rgb(229,43,80)',
+                    backgroundColor: 'rgb(177, 0, 37)',
                     borderColor: 'rgb(255, 99, 132)',
                     fill: false,
                     borderDash: [5, 5],

@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.18] - 2020-03-11
+
+- Fix problem with nested objects of same type (Github #23)
+
 ## [0.0.17] - 2020-03-10
 
 - Fix problem with arrays of objects (Github #22)

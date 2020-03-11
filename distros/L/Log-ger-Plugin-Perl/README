@@ -1,0 +1,100 @@
+NAME
+    Log::ger::Plugin::Perl - Replace log statements with Perl's standard
+    facility (warn, die, etc)
+
+VERSION
+    This document describes version 0.002 of Log::ger::Plugin::Perl (from
+    Perl distribution Log-ger-Plugin-Perl), released on 2020-03-11.
+
+SYNOPSIS
+     use Log::ger::Plugin Perl => (
+         action => { # optional
+             trace => '',
+             debug => '',
+             info  => '',
+             warn  => 'warn',
+             error => 'warn',
+             fatal => 'die',
+         },
+     );
+
+DESCRIPTION
+    This plugin uses B::CallChecker to replace logging statements with
+    "warn()", "die()", etc.
+
+    Caveats:
+
+    *   must be done at compile-time
+
+    *   only works when you are using procedural style
+
+    *   logging statements at level with action='' or unmentioned, will
+        become no-op
+
+        The effect is similar to what is achieved by
+
+    *   once replaced/optimized away, subsequent logger reinitialization at
+        run-time won't take effect
+
+    *   currently formats message with sprintf(), no layouter support
+
+CONFIGURATION
+  action => hash
+    A mapping of Log::ger error level name and action. Unmentioned levels
+    mean to ignore log for that level. Action can be one of:
+
+    *   '' (empty string)
+
+        Ignore the log message.
+
+    *   warn
+
+        Pass message to Perl's "warn()".
+
+    *   die
+
+        Pass message to Perl's "die()".
+
+    *   carp
+
+        Pass message to Carp's "carp()".
+
+    *   cluck
+
+        Pass message to Carp's "cluck()".
+
+    *   croak
+
+        Pass message to Carp's "croak()".
+
+    *   confess
+
+        Pass message to Carp's "confess()".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-Plugin-Perl>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-Plugin-Perl>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Plugin-Perl>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Log::ger::Output::Perl
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

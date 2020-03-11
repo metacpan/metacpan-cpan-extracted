@@ -5,6 +5,8 @@ use warnings;
 use strict;
 use 5.010001;
 
+use List::MoreUtils qw( any );
+
 use Term::Choose           qw();
 use Term::Choose::LineFold qw( line_fold print_columns );
 use Term::Choose::Util     qw( insert_sep get_term_width unicode_sprintf );
@@ -84,6 +86,7 @@ sub input_filter {
             $sf->__print_filter_info( $sql, $count_static_rows, undef ); #
             $sql->{insert_into_args} = [ map { [ @$_ ] } @{$sf->{i}{gc}{bu_insert_into_args}} ];
             $sf->{empty_to_null} = $sf->{o}{insert}{'empty_to_null_' . $sf->{i}{gc}{source_type}};
+            delete $sf->{i}{prev_chosen_cols};
             next FILTER
         }
         elsif ( $filter eq $confirm ) {
@@ -222,15 +225,23 @@ sub __choose_columns {
     if ( @$mark == $col_count ) {
         $mark = undef; # no preselect if all cols have entries
     }
-    # Choose
+    my $prev_chosen = $sf->{i}{prev_chosen_cols}{db}{ $sf->{d}{db} } // [];
+    if ( @$prev_chosen && @$prev_chosen < @$header ) {
+        my $mark2 = [];
+        for my $i ( 0 .. $#{$header} ) {
+            push @$mark2, $i if any { $_ eq $header->[$i] } @$prev_chosen;
+        }
+        $mark = $mark2 if @$mark2 == @$prev_chosen;
+    }
     my $col_idx = $tu->choose_a_subset(
         $header,
         { cs_label => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1, index => 1,
-          confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{working} }
+            confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{working} }
     );
     if ( ! defined $col_idx ) {
         return;
     }
+    $sf->{i}{prev_chosen_cols}{db}{ $sf->{d}{db} } = [ @{$header}[@$col_idx] ];
     $sql->{insert_into_args} = [ map { [ @{$_}[@$col_idx] ] } @$aoa ];
     return 1;
 }

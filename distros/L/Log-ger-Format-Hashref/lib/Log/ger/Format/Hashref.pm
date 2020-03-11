@@ -1,15 +1,19 @@
 package Log::ger::Format::Hashref;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-18'; # DATE
+our $DATE = '2020-03-09'; # DATE
 our $DIST = 'Log-ger-Format-Hashref'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
 
+sub meta { +{
+    v => 1,
+} }
+
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
     return {
         create_formatter => [
@@ -52,7 +56,7 @@ Log::ger::Format::Hashref - Format arguments as hashref
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

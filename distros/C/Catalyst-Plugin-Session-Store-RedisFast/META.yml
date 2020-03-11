@@ -30,5 +30,5 @@ resources:
   bugtracker: https://github.com/vrag86/catalyst-plugin-session-store-redisfast/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/vrag86/catalyst-plugin-session-store-redisfast
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

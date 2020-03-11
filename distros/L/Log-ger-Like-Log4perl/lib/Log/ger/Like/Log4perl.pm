@@ -1,7 +1,9 @@
 package Log::ger::Like::Log4perl;
 
-our $DATE = '2017-07-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-11'; # DATE
+our $DIST = 'Log-ger-Like-Log4perl'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 # IFUNBUILT
 # use strict 'subs', 'vars';
@@ -16,9 +18,14 @@ sub get_logger {
     require Log::ger::Plugin;
     my $log = Log::ger->get_logger(category => $category);
     Log::ger::Plugin->set({
-        name       => 'Log4perl',
-        target     => 'object',
-        target_arg => $log,
+        name        => 'Log4perl',
+        target_type => 'object',
+        target_name => $log,
+    });
+    Log::ger::Plugin->set({
+        name        => 'Log4perl_Multi',
+        target_type => 'object',
+        target_name => $log,
     });
     $log;
 }
@@ -38,9 +45,9 @@ sub import {
     require Log::ger;
     require Log::ger::Plugin;
     Log::ger::Plugin->set({
-        name       => 'Log4perl',
-        target     => 'package',
-        target_arg => $caller,
+        name        => 'Log4perl',
+        target_type => 'package',
+        target_name => $caller,
     });
     Log::ger::add_target(package => $caller, {});
     Log::ger::init_target(package => $caller, {});
@@ -61,7 +68,7 @@ Log::ger::Like::Log4perl - Mimic Log::Log4perl
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -133,7 +140,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

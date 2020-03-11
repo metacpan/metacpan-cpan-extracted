@@ -14,6 +14,7 @@ our @EXPORT = qw(
    misc_extensions
    non_printable_chars
    null_or_escape
+   require_content
    script_extensions
    system_dirs
    unexpected_content
@@ -21,7 +22,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 
 
 
@@ -35,7 +36,7 @@ sub archive_extensions {
 
 
 sub cgi_bin {
-    my $re = qr{/cgi-bin/};
+    my $re = qr{/cgi[_\-](bin|wrapper)};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -45,7 +46,8 @@ sub cgi_bin {
 
 sub dot_files {
     return (
-        PATH_INFO => qr{/\.(?!well-known/)},
+        PATH_INFO    => qr{(?:\.\./|/\.(?!well-known/))},
+        QUERY_STRING => qr{\.\./},
     );
 }
 
@@ -72,6 +74,16 @@ sub null_or_escape {
 }
 
 
+sub require_content {
+    return (
+        -and => [
+             REQUEST_METHOD => qr{^(?:POST|PUT)$},
+             CONTENT_LENGTH => sub { !$_[0] },
+        ],
+    );
+}
+
+
 sub script_extensions {
     my $re = qr{[.](?:aspx?|cgi|php|p[lm]|sql)\b};
     return (
@@ -94,7 +106,7 @@ sub unexpected_content {
     return (
         -and => [
              REQUEST_METHOD => qr{^(?:GET|HEAD|CONNECT|OPTIONS|TRACE)$},
-             CONTENT_LENGTH => sub { $_[0] > 0 },
+             CONTENT_LENGTH => sub { !!$_[0] },
         ],
     );
 }
@@ -125,7 +137,7 @@ Plack::Middleware::Security::Common - A simple security filter for with common r
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -169,12 +181,12 @@ or query string.
 
 =head2 cgi_bin
 
-This blocks requests that refer to the cgi-bin directory in the path
-or query string.
+This blocks requests that refer to the C<cgi-bin> directory in the path
+or query string, or a C<cgi_wrapper> script.
 
 =head2 dot_files
 
-This blocks all requests that refer to dot-files, except for
+This blocks all requests that refer to dot-files or C<..>, except for
 the F</.well-known/> path.
 
 =head2 misc_extensions
@@ -190,6 +202,12 @@ This blocks requests with non-printable characters in the path.
 
 This blocks requests with nulls or escape chatacters in the path or
 query string.
+
+=head2 require_content
+
+This blocks POST or PUT requests with no content.
+
+This was added in v0.4.1.
 
 =head2 script_extensions
 

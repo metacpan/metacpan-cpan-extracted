@@ -5,8 +5,12 @@
 
 package DiaColloDB::Corpus::Compiled;
 
-use threads;
-use threads::shared;
+use DiaColloDB::threads;
+use DiaColloDB::threads::shared;
+our ($HAVE_THREADS);
+BEGIN {
+  $HAVE_THREADS = $DiaColloDB::threads::shared::MODULE ? 1 : 0;
+}
 
 use DiaColloDB::Corpus;
 use DiaColloDB::Corpus::Filters;
@@ -319,7 +323,7 @@ sub create {
 
   ##--------------------------------------------
   my $cb_worker = sub {
-    my $thrid = shift || threads->tid();
+    my $thrid = shift || DiaColloDB::threads->tid();
     $logas .= "#$thrid";
     (*STDERR)->autoflush(1);
     $ocorpus->vlog($ocorpus->{logThreads}, "$logas: starting worker thread #$thrid");
@@ -389,7 +393,7 @@ sub create {
 
   ##-- spawn workers
   my $njobs = nJobs($ocorpus->{njobs});
-  if ($njobs==0) {
+  if ($njobs==0 || !$HAVE_THREADS) {
     $ocorpus->info("$logas: running in serial mode");
     $cb_worker->(0);
   } else {

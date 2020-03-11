@@ -1,17 +1,21 @@
 package Log::ger::Layout::ConvertCase;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-22'; # DATE
+our $DATE = '2020-03-09'; # DATE
 our $DIST = 'Log-ger-Layout-ConvertCase'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
 
+sub meta { +{
+    v => 1,
+} }
+
 sub get_hooks {
-    my %conf = @_;
-    $conf{case} or die "Please specify case";
-    $conf{case} =~ /\A(upper|lower)\z/
+    my %plugin_conf = @_;
+    $plugin_conf{case} or die "Please specify case";
+    $plugin_conf{case} =~ /\A(upper|lower)\z/
         or die "Invalid value for 'case', please use 'upper' or 'lower'";
     return {
         create_layouter => [
@@ -21,7 +25,7 @@ sub get_hooks {
                 my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
                 my $layouter = sub {
-                    $conf{case} eq 'upper' ? uc($_[0]) : lc($_[0]);
+                    $plugin_conf{case} eq 'upper' ? uc($_[0]) : lc($_[0]);
                 };
 
                 [$layouter];
@@ -45,7 +49,7 @@ Log::ger::Layout::ConvertCase - Example layout plugin to convert the case of mes
 
 =head1 VERSION
 
-This document describes version 0.002 of Log::ger::Layout::ConvertCase (from Perl distribution Log-ger-Layout-ConvertCase), released on 2019-12-22.
+This document describes version 0.003 of Log::ger::Layout::ConvertCase (from Perl distribution Log-ger-Layout-ConvertCase), released on 2020-03-09.
 
 =head1 SYNOPSIS
 
@@ -100,7 +104,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

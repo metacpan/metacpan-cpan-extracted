@@ -3,9 +3,9 @@
 package Log::ger::Output::File;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-09'; # DATE
 our $DIST = 'Log-ger-Output-File'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use strict;
 use warnings;
@@ -14,6 +14,10 @@ use warnings;
 use FileHandle;
 
 our %lock_handles;
+
+sub meta { +{
+    v => 1,
+} }
 
 sub get_hooks {
     my %plugin_conf = @_;
@@ -59,13 +63,13 @@ sub get_hooks {
     $code_open->() unless $lazy;
 
     return {
-        create_log_routine => [
+        create_outputter => [
             __PACKAGE__, # key
             50,          # priority
             sub {        # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
-                my $logger = sub {
+                my $outputter = sub {
                     my ($per_target_conf, $msg, $per_msg_conf) = @_;
                     my $lock_handle;
                     $code_open->() if $lazy && !$fh;
@@ -75,7 +79,7 @@ sub get_hooks {
                     $fh->flush if $autoflush || $lock_handle;
                     undef $lock_handle;
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -95,7 +99,7 @@ Log::ger::Output::File - Send logs to file
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

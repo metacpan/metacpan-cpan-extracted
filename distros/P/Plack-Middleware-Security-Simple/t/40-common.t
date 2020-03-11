@@ -20,6 +20,7 @@ my $handler = builder {
             dot_files,
             non_printable_chars,
             null_or_escape,
+            require_content,
             script_extensions,
             system_dirs,
             unexpected_content,
@@ -115,6 +116,20 @@ test_psgi
 
     subtest 'not blocked' => sub {
         my $req = GET "/.well-known/time";
+        my $res = $cb->($req);
+        ok is_success( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_OK, "HTTP_OK";
+    };
+
+    subtest 'blocked post with no content body' => sub {
+        my $req = POST "/some/thing.html";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'not blocked' => sub {
+        my $req = POST "/some/thing.html", [ search => 'suff' ];
         my $res = $cb->($req);
         ok is_success( $res->code ), join( " ", $req->method, $req->uri );
         is $res->code, HTTP_OK, "HTTP_OK";

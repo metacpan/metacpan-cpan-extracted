@@ -4,7 +4,7 @@
       "Tobias Oetiker <tobi@oetiker.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -25,7 +25,6 @@
       "build" : {
          "requires" : {
             "CPAN::Uploader" : "0",
-            "Mojolicious" : "7.01",
             "Pod::Markdown::Github" : "0.01"
          }
       },
@@ -39,6 +38,11 @@
             "Encoding::BER" : "1.02",
             "Net::LDAP" : "0.65",
             "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mojolicious" : "7.01"
          }
       }
    },
@@ -54,5 +58,6 @@
          "url" : "https://github.com/oetiker/net-ldap-spnego"
       }
    },
-   "version" : "v0.1.6"
+   "version" : "v0.1.7",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

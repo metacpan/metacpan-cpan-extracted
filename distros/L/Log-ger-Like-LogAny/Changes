@@ -1,9 +1,20 @@
-0.004   2017-08-03 (PERLANCAR)
+0.006   2020-03-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump v to 2 to comply to Log::ger 0.037.
+
+
+0.005   2020-03-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Log::ger 0.034 (add meta(), renamed routine names in
+	  0.033).
+
+
+0.004   2017-08-03  Released-By: PERLANCAR
 
 	- Use Log::Any::Level::Like::LogAny.
 
 
-0.003   2017-07-12 (PERLANCAR)
+0.003   2017-07-12  Released-By: PERLANCAR
 
         - [Bugfix] By default set the LogAny plugin to apply to the log object
           only to avoid disrupting other targets.
@@ -11,11 +22,11 @@
         - [ux] Provide convenience by making Log::Any->get_logger work.
 
 
-0.002   2017-07-11 (PERLANCAR)
+0.002   2017-07-11  Released-By: PERLANCAR
 
 	- Support multiple argument in $log->warn("a", "b", ...).
 
 
-0.001   2017-06-24 (PERLANCAR)
+0.001   2017-06-24  Released-By: PERLANCAR
 
         - First release.

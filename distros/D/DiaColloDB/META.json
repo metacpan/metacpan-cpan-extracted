@@ -45,7 +45,7 @@
          "requires" : {
             "Algorithm::BinarySearch::Vec" : "0.07",
             "DB_File" : "0",
-            "DDC::Concordance" : "0.34",
+            "DDC::Concordance" : "0.44",
             "File::Copy" : "0",
             "File::Find" : "0",
             "File::Map" : "0",
@@ -69,6 +69,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "v0.12.015",
+   "version" : "v0.12.016",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

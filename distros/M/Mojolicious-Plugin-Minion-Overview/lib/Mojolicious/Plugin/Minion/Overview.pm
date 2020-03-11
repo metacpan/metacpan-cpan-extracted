@@ -7,7 +7,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Date;
 use Mojo::File 'path';
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 
 =head2 register
@@ -94,6 +94,12 @@ sub register {
             $metrics_jobs->get(':job')->to(action => 'show')
                 ->name('minion_overview.metrics.jobs.show');
 
+        my $metrics_workers = $metrics->route('workers')
+            ->to(controller => 'Metrics::Workers');
+
+            $metrics_workers->get(':worker')->to(action => 'show')
+                ->name('minion_overview.metrics.workers.show');
+
     # Recent Jobs
     my $failed_jobs = $prefix->route('failed-jobs')
         ->to(controller => 'FailedJobs');
@@ -130,6 +136,16 @@ sub register {
 
                 $api_metrics_jobs->get('/:job/throughput')->to(action => 'throughput')
                     ->name('minion_overview.api.metrics.jobs.throughput');
+
+            # Workers
+            my $api_metrics_workers = $api_metrics->route('workers')
+                ->to(controller => 'API::Metrics::Workers');
+
+                $api_metrics_workers->get('/:worker/waittime')->to(action => 'waittime')
+                    ->name('minion_overview.api.metrics.workers.waittime');
+
+                $api_metrics_workers->get('/:worker/throughput')->to(action => 'throughput')
+                    ->name('minion_overview.api.metrics.workers.throughput');
 }
 
 1;

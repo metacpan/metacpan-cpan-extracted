@@ -1,7 +1,9 @@
 package Log::ger::Layout::Pattern;
 
-our $DATE = '2019-04-13'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-11'; # DATE
+our $DIST = 'Log-ger-Layout-Pattern'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -68,6 +70,10 @@ our %format_for = (
     '%' => sub { '%' },
 );
 
+sub meta { +{
+    v => 2,
+} }
+
 sub _layout {
     my $format = shift;
     my $packages_to_ignore = shift;
@@ -109,10 +115,10 @@ sub _layout {
 }
 
 sub get_hooks {
-    my %conf = @_;
+    my %plugin_conf = @_;
 
-    $conf{format} or die "Please specify format";
-    $conf{packages_to_ignore} //= [
+    $plugin_conf{format} or die "Please specify format";
+    $plugin_conf{packages_to_ignore} //= [
         "Log::ger",
         "Log::ger::Layout::Pattern",
         "Try::Tiny",
@@ -120,9 +126,14 @@ sub get_hooks {
 
     return {
         create_layouter => [
-            __PACKAGE__, 50,
-            sub {
-                [sub { _layout($conf{format}, $conf{packages_to_ignore}, $conf{subroutines_to_ignore}, @_) }];
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
+                my $layouter = sub {
+                    _layout($plugin_conf{format}, $plugin_conf{packages_to_ignore}, $plugin_conf{subroutines_to_ignore}, @_);
+                };
+                [$layouter];
             }],
     };
 }
@@ -142,7 +153,7 @@ Log::ger::Layout::Pattern - Pattern layout
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -207,7 +218,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

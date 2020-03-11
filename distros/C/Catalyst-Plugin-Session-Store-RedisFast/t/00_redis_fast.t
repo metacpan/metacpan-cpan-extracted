@@ -20,8 +20,6 @@ test_delete_session_data();
 test_get_set_expires_key();
 test_increase_ttl_time();
 
-done_testing;
-
 sub test_get_set_session_data {
     my ($key, $value) = ('test_key', 'test_value');
     ok (RedisFastApp->store_session_data($key, $value), "Test store_session_data");

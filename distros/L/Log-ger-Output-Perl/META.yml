@@ -21,7 +21,7 @@ meta-spec:
 name: Log-ger-Output-Perl
 requires:
   Carp: '1.12'
-  Log::ger::Util: '0.033'
+  Log::ger::Util: '0.037'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Output-Perl
   homepage: https://metacpan.org/release/Log-ger-Output-Perl
   repository: git://github.com/perlancar/perl-Log-ger-Output-Perl.git
-version: '0.002'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

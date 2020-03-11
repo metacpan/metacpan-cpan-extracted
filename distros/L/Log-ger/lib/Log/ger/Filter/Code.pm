@@ -1,9 +1,9 @@
 package Log::ger::Filter::Code;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-10'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.036'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 use strict;
 use warnings;
@@ -44,7 +44,7 @@ Log::ger::Filter::Code - Filter using a coderef
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 SYNOPSIS
 

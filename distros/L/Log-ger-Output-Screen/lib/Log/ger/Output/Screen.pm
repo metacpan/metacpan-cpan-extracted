@@ -1,9 +1,9 @@
 package Log::ger::Output::Screen;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-07'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Output-Screen'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use strict;
 use warnings;
@@ -20,6 +20,10 @@ our %colors = (
 );
 
 our %level_map;
+
+sub meta { +{
+    v => 2,
+} }
 
 sub _pick_color {
     my $level = shift;
@@ -72,14 +76,14 @@ sub get_hooks {
     my $formatter = $plugin_conf{formatter};
 
     return {
-        create_log_routine => [
+        create_outputter => [
             __PACKAGE__, # key
             50,          # priority
             sub {        # hook
                 my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
-                my $logger = sub {
+                my $outputter = sub {
                     my ($per_target_conf, $msg, $per_msg_conf) = @_;
-                    my $level = $per_msg_conf ? $per_msg_conf->{level} : $hook_args{level};
+                    my $level; $level = $per_msg_conf->{level} if $per_msg_conf; $level = $hook_args{level} unless defined $level;
                     if ($formatter) {
                         $msg = $formatter->($msg);
                     }
@@ -91,7 +95,7 @@ sub get_hooks {
                     }
                     hook_after_log({ _fh=>$handle }, $msg);
                 };
-                [$logger];
+                [$outputter];
             }],
     };
 }
@@ -111,7 +115,7 @@ Log::ger::Output::Screen - Output log to screen
 
 =head1 VERSION
 
-version 0.011
+version 0.014
 
 =head1 SYNOPSIS
 

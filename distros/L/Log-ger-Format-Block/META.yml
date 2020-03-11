@@ -6,7 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Log::ger: '0.033'
+  Log::ger: '0.037'
   Log::ger::Format: '0.018'
   Log::ger::Output: '0.007'
   Test::More: '0.98'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Format-Block
   homepage: https://metacpan.org/release/Log-ger-Format-Block
   repository: git://github.com/perlancar/perl-Log-ger-Format-Block.git
-version: '0.006'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

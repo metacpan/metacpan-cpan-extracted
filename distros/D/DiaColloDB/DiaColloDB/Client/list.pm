@@ -4,11 +4,14 @@
 ## Description: collocation db, client: list
 
 package DiaColloDB::Client::list;
+
+use DiaColloDB::threads;
+
 use DiaColloDB::Client;
 use DiaColloDB::Utils qw(:list :math :si);
 use strict;
 
-##-- try to use threads
+##-- OLD: try to use threads
 ## + weird cpantesters errors for DiaColloDB v0.12.01[23], e.g.
 ##   - http://www.cpantesters.org/cpan/report/b8caf29a-4121-11ea-9d04-93d2cf6284ad
 ##   - http://www.cpantesters.org/cpan/report/acb1841c-41b5-11ea-81ed-d3b978f58c5e
@@ -25,15 +28,12 @@ use strict;
 
 our ($WANT_THREADS);
 BEGIN {
-  $WANT_THREADS = 0 if ($^P); ##-- disable threads if running under debugger
+  $WANT_THREADS = ($^P
+                   ? 0 ##-- disable threads if running under debugger
+                   : $DiaColloDB::threads::MODULE);
 
-#  $WANT_THREADS = ($^P ? 0 ##-- disable threads if running under debugger
-#                   : ($INC{'threads.pm'} ? 1    ##-- try to avoid "Attempt to reload threads.pm aborted." on perl 5.31.7 (cpantesters)
-#                      : eval "use threads; 1"   ##-- this causes segfaults when join()ing 2nd thread (bogus destruction) for DDC::XS < v0.23
-#                      #: eval "use forks; 1"    ##-- forks module works basically as expected
-#                     ))
-#    if (!defined($WANT_THREADS));
-#  $@ = '';
+  ##-- avoid heinous death with JSON::XS backend using threads
+  $DDC::Client::JSON_BACKEND = 'JSON::PP';
 }
 
 
@@ -55,12 +55,12 @@ our @ISA = qw(DiaColloDB::Client);
 ##    ##-- DiaColloDB::Client::list
 ##    urls  => \@urls,     ##-- db urls
 ##    opts  => \%opts,     ##-- sub-client options (includes all list-client "log*" options and "sub.OPT" options)
-##    fudge => $coef,      ##-- get ($coef*$kbest) items from sub-clients (0:all, default=10)
+##    fudge => $coef,      ##-- get ($coef*$kbest) items from sub-clients (-1:all, 0|1:none, default=10)
 ##    fork  => $bool,      ##-- run each subclient query in its own fork? (default=if available)
 ##    lazy => $bool,       ##-- use temporary on-demand sub-clients (true,default) or persistent sub-clients (false)
 ##    extend => $bool,     ##-- use extend() queries to acquire correct f2 counts? (default=true)
 ##    logFudge => $level,  ##-- log-level for fudge-factor debugging (default='debug')
-##    logFork => $level,   ##-- log-level for thread (fork) options (default='none')
+##    logThread => $level,   ##-- log-level for thread (fork) options (default='none')
 ##    ##
 ##    ##-- guts
 ##    #clis => \@clis,     ##-- per-url clients for mode, v0.11.000
@@ -232,6 +232,7 @@ sub subcall {
   }
   else {
     ##-- non-threaded call
+    $cli->vlog($cli->{logThread}, "subcall(): running in serial mode");
     for ($i=0; $i <= $#{$cli->{urls}}; ++$i) {
       push(@results, scalar($code->($cli,$i,@args)));
     }
@@ -269,7 +270,7 @@ sub dbinfo {
   }
   $info->{timestamp} = (sort map {$_->{timestamp}||''} @dtrs)[$#dtrs];
   $info->{xdmax}     = lmax(map {$_->{xdmax}} @dtrs);
-  $info->{xdmin}     = lmin(map {$_->{xdmax}} @dtrs);
+  $info->{xdmin}     = lmin(map {$_->{xdmin}} @dtrs);
   $info->{du_b}      = lsum(map {$_->{du_b}} @dtrs);
   $info->{du_h}      = si_str($info->{du_b});
   $info->{version}   = $DiaColloDB::VERSION;
@@ -321,38 +322,45 @@ sub dbinfo {
 sub profile {
   my ($cli,$rel,%opts) = @_;
 
+  ##-- kludge: ddc metaserver dispatch
+  return $cli->ddcMeta('profile',$rel,%opts) if ($rel eq 'ddc' && $cli->{ddcServer});
+
   ##-- defaults
   DiaColloDB->profileOptions(\%opts);
 
   ##-- fudge coefficient
+  my $fudge  = ($rel eq 'ddc' ? -1 : $cli->{fudge}) // 0; ##-- ddc relation always stringifies: fetch full sub-results in 1st pass (disable extend())
   my $kbest  = $opts{kbest} // 0;
-  my $kfudge = ($cli->{fudge} // 1)*$kbest;
-  $cli->vlog($cli->{logFudge}, "profile(): querying ", scalar(@{$cli->{urls}}), " client URL(s) with (fudge=", ($cli->{fudge}//1), ") * (kbest=$kbest) = $kfudge");
+  my $kfudge = ($fudge < 0 ? -1
+                : ($fudge == 0 ? $kbest
+                   : ($fudge * $kbest)));
+  $cli->vlog($cli->{logFudge}, "profile(): querying ", scalar(@{$cli->{urls}}), " client URL(s) with (fudge=$fudge) * (kbest=$kbest) = $kfudge");
 
   ##-- query clients
   my @mps = $cli->subcall(sub {
 			    my $sub = $_[0]->client($_[1]);
-			    $sub->profile($rel,%opts,strings=>1,kbest=>$kfudge,cutoff=>0)
+			    $sub->profile($rel,%opts,strings=>1,kbest=>$kfudge,cutoff=>0,fill=>1)
 			      or $_[0]->logconfess("profile() failed for client URL $sub->{url}: $sub->{error}");
 			  });
 
-  if ($cli->{extend} && @mps > 1) {
+  if ($cli->{extend} && @mps > 1 && $rel ne 'ddc') {
     $cli->vlog($cli->{logFudge}, "profile(): extending sub-profiles");
 
     ##-- fill-out multi-profiles (ensure compatible slice-partitioning & find "missing" keys)
     DiaColloDB::Profile::Multi->xfill(\@mps);
     my $xkeys = DiaColloDB::Profile::Multi->xkeys(\@mps);
     #$cli->trace("extend(): xkeys=", DiaColloDB::Utils::saveJsonString($xkeys, utf8=>0));
+    #$cli->trace("extend(): N.pre=", join('+',map {$_->{profiles}[0]{N}} @mps));
 
     ##-- extend multi-profiles with "missing" keys
     my @mpx = $cli->subcall(sub {
 			      #return undef if (!$xkeys->[$_[1]] || !grep {@$_} values(%{$xkeys->[$_[1]]})); ##-- don't need extend here
 			      my $sub = $_[0]->client($_[1]);
-			      $sub->extend($rel,%opts,strings=>1,score=>'f',cutoff=>0,slice2keys=>JSON::to_json($xkeys->[$_[1]], {allow_nonref=>1}))
+			      $sub->extend($rel,%opts,strings=>1,score=>'f',cutoff=>0,fill=>1,slice2keys=>JSON::to_json($xkeys->[$_[1]], {allow_nonref=>1}))
 				or $_[0]->logconfess("extend() failed for client url $sub->{url}: $sub->{error}");
 			    });
     foreach (0..$#mpx) {
-      $mps[$_]->_add($mpx[$_]) if (defined($mpx[$_]));
+      $mps[$_]->_add($mpx[$_], N=>0,f1=>0) if (defined($mpx[$_]));
     }
   }
 
@@ -363,7 +371,7 @@ sub profile {
     if (($cli->{logFudge}//'off') !~ /^(?:off|none)$/);
 
   ##-- re-compile and -trim
-  $mp->compile($opts{score}, eps=>$opts{eps})->trim(global=>$opts{global}, kbest=>$kbest, cutoff=>$opts{cutoff}, empty=>!$opts{fill});
+  $mp->compile($opts{score}, eps=>$opts{eps})->trim(global=>$opts{global}, drop=>[''], kbest=>$kbest, cutoff=>$opts{cutoff}, empty=>!$opts{fill});
 
   $cli->vlog($cli->{logFudge}, "profile(): trimmed final profile to size ", $mp->size)
     if (($cli->{logFudge}//'off') !~ /^(?:off|none)$/);
@@ -380,6 +388,9 @@ sub profile {
 ##  + sets $cli->{error} on error
 sub extend {
   my ($cli,$rel,%opts) = @_;
+
+  ##-- kludge: ddc metaserver dispatch
+  return $cli->ddcMeta('extend',$rel,%opts) if ($rel eq 'ddc' && $cli->{ddcServer});
 
   ##-- defaults
   DiaColloDB->profileOptions(\%opts);
@@ -409,6 +420,9 @@ sub extend {
 sub compare {
   my ($cli,$rel,%opts) = @_;
 
+  ##-- kludge: ddc metaserver dispatch
+  return $cli->ddcMeta('compare',$rel,%opts) if ($rel eq 'ddc' && $cli->{ddcServer});
+
   ##-- defaults
   DiaColloDB->compareOptions(\%opts);
 
@@ -430,6 +444,30 @@ sub compare {
   ##-- return
   return $diff;
 }
+
+##--------------------------------------------------------------
+## Profiling: DDC (via metaserver in $list->{ddcServer})
+
+## $rc = $cli->ddcMeta($method_name, @args)
+##  + calls $COLDB->can($method_name)->($COLDB,@args) on temporary ddc metaserver object
+sub ddcMeta {
+  my $cli = shift;
+  return undef if (!$cli->{ddcServer});
+  $cli->vlog('trace', "ddcMeta(): dispatching to $cli->{ddcServer}");
+
+  ##-- create temporary dummy DiaColloDB object
+  my $dbinfo = $cli->dbinfo();
+  my $coldb  = DiaColloDB->new( attrs=>$dbinfo->{attrs}, ddcServer=>$cli->{ddcServer} )
+    or $cli->logconfess("ddcMeta(): failed to create DiaColloDB wrapper object");
+  $coldb->{ddc} = DiaColloDB::Relation::DDC->create($coldb);
+
+  ##-- dispatch
+  my $method = shift;
+  my $coderef = $coldb->can($method)
+    or $cli->logconfess("ddcMeta(): failed to resolve method name '$method'");
+  return $coderef->($coldb,@_);
+}
+
 
 ##==============================================================================
 ## Footer
