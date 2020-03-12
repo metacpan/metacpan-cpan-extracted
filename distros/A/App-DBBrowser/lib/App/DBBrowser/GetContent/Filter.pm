@@ -252,7 +252,7 @@ sub __choose_rows {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aoa = $sql->{insert_into_args};
-    my $count_static_rows = 2 + @$aoa; # filter_str, prompt and aoa
+    my $count_static_rows = 4 + @$aoa; # filter_str, prompt, back, confirm and aoa
     $sf->__print_filter_info( $sql, $count_static_rows, undef );
     my @pre = ( undef, $sf->{i}{ok} );
     my @stringified_rows;
@@ -277,7 +277,6 @@ sub __choose_rows {
             { %{$sf->{i}{lyt_v}}, prompt => $prompt, info => $filter_str, meta_items => [ 0 .. $#pre ],
               include_highlighted => 2, index => 1, undef => '<<', busy_string => $sf->{i}{working}, mark => $mark }
         );
-        my $count_static_rows = 2 + @$aoa; # filter_str, prompt and aoa
         $sf->__print_filter_info( $sql, $count_static_rows, undef );
         if ( ! $idx[0] ) {
             $sql->{insert_into_args} = $aoa;
@@ -304,7 +303,7 @@ sub __choose_rows {
 sub __range_of_rows {
     my ( $sf, $sql, $filter_str ) = @_;
     my $aoa = $sql->{insert_into_args};
-    my $count_static_rows = 2 + @$aoa; # filter_str, prompt and aoa
+    my $count_static_rows = 3 + @$aoa; # filter_str, prompt, back and aoa
     $sf->__print_filter_info( $sql, $count_static_rows, undef );
     # Choose
     my $prompt = "Choose first row:";
@@ -313,7 +312,6 @@ sub __range_of_rows {
     if ( ! defined $idx_first_row ) {
         return;
     }
-    $count_static_rows = 2 + @$aoa; # filter_str, prompt and aoa
     $sf->__print_filter_info( $sql, $count_static_rows, undef );
     $prompt = "Choose last row:";
     # Choose
@@ -382,7 +380,7 @@ sub __remove_cell {
     my $aoa = $sql->{insert_into_args};
 
     while ( 1 ) {
-        my $count_static_rows = 2 + @$aoa; # filter_str, prompt and aoa
+        my $count_static_rows = 3 + @$aoa; # filter_str, prompt, back and aoa
         $sf->__print_filter_info( $sql, $count_static_rows, undef );
         my $prompt = "Choose row:";
         # Choose
@@ -419,7 +417,7 @@ sub __insert_cell {
     my $aoa = $sql->{insert_into_args};
 
     while ( 1 ) {
-        my $count_static_rows = 2 + @$aoa; # filter_str, prompt and aoa
+        my $count_static_rows = 3 + @$aoa; # filter_str, prompt, back and aoa
         $sf->__print_filter_info( $sql, $count_static_rows, undef );
         my $prompt = "Choose row:";
         # Choose
@@ -442,7 +440,7 @@ sub __insert_cell {
         $str_row_with_placeholder =~ s/"<\*>"/<*>/;
         my $term_w = get_term_width();
         my $label = 'Row: ';
-        my @info = ( $filter_str, ' ' );
+        my @info = ( $filter_str );
         push @info, line_fold(
             $label . $str_row_with_placeholder, $term_w,
             { subseq_tab => ' ' x length $label, join => 0 }
@@ -624,7 +622,7 @@ sub __merge_rows {
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $aoa = $sql->{insert_into_args};
-    my $count_static_rows = 2 + @$aoa; # filter_str, prompt and aoa
+    my $count_static_rows = 4 + @$aoa; # filter_str, prompt, back, confirm and aoa
     $sf->__print_filter_info( $sql, $count_static_rows, undef );
     my $term_w = get_term_width();
     my @stringified_rows;

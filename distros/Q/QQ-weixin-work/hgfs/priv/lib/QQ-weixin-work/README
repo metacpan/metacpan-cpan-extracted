@@ -1,0 +1,105 @@
+QQ::weixin::work v0.01
+
+腾讯企业微信提供了服务端API管理方式，可以参见页面
+L<https://work.weixin.qq.com/api/doc/90000/90003/90556>
+
+一、主动调用
+1.获取ACCESS_TOKEN
+QQ::weixin::work::gettoken(corpid,corpsecret);
+
+2.获取企业微信API域名IP段
+API域名IP即qyapi.weixin.qq.com的解析地址，由开发者调用企业微信侧的接入IP。
+如果企业需要做防火墙配置，那么可以通过这个接口获取到所有相关的IP段。
+IP段有变更可能，当IP段变更时，新旧IP段会同时保留一段时间。
+建议企业每天定时拉取IP段，更新防火墙设置，避免因IP段变更导致网络不通。
+QQ::weixin::work::getcallbackip(access_token);
+
+二、通讯录管理
+1. 成员管理
+1) 创建成员
+QQ::weixin::work::user::create(access_token, hash);
+2) 读取成员
+QQ::weixin::work::user::get(access_token, userid);
+3) 更新成员
+QQ::weixin::work::user::update(access_token, hash);
+4) 删除成员
+QQ::weixin::work::user::delete(access_token, userid);
+5) 批量删除成员
+QQ::weixin::work::user::batchdelete(access_token, hash);
+6) 获取部门成员
+QQ::weixin::work::user::simplelist(access_token, department_id, fetch_child);
+7) 获取部门成员详情
+QQ::weixin::work::user::list(access_token, department_id, fetch_child);
+8) userid与openid互换
+(1) userid转openid
+QQ::weixin::work::user::convert_to_openid(access_token, hash);
+(2) openid转userid
+QQ::weixin::work::user::convert_to_userid(access_token, hash);
+9) 二次验证
+QQ::weixin::work::user::authsucc(access_token, userid);
+10) 获取访问用户身份
+QQ::weixin::work::user::getuserinfo(access_token, code);
+11) 获取手机号随机串
+QQ::weixin::work::user::get_mobile_hashcode(access_token, hash);
+2. 部门管理
+1) 创建部门
+QQ::weixin::work::department::create(access_token, hash);
+2) 更新部门
+QQ::weixin::work::department::update(access_token, hash);
+3) 删除部门
+QQ::weixin::work::department::delete(access_token, id);
+4) 获取部门列表
+QQ::weixin::work::department::list(access_token, id);
+3. 标签管理
+1) 创建标签
+QQ::weixin::work::tag::create(access_token, hash);
+2) 更新标签名字
+QQ::weixin::work::tag::update(access_token, hash);
+3) 删除标签
+QQ::weixin::work::tag::delete(access_token, tagid);
+4) 获取标签成员
+QQ::weixin::work::tag::get(access_token, tagid);
+5) 增加标签成员
+QQ::weixin::work::tag::addtagusers(access_token, hash);
+6) 删除标签成员
+QQ::weixin::work::tag::deltagusers(access_token, hash);
+7) 获取标签列表
+QQ::weixin::work::tag::list(access_token);
+三、应用管理
+1. 应用管理
+1) 获取应用
+(1) 获取指定的应用详情
+QQ::weixin::work::agent::get(access_token,agentid);
+(2) 获取access_token对应的应用列表
+QQ::weixin::work::agent::list(access_token);
+2) 设置应用
+QQ::weixin::work::agent::set(access_token, hash);
+2. 菜单管理
+1) 创建菜单
+QQ::weixin::work::menu::create(access_token, agentid, hash);
+2) 获取菜单
+QQ::weixin::work::menu::get(access_token,agentid);
+3) 删除菜单
+QQ::weixin::work::menu::delete(access_token,agentid);
+四、消息推送
+1. 发送应用消息
+QQ::weixin::work::message::send(access_token, hash);
+2. 更新任务卡片消息状态
+QQ::weixin::work::message::update_taskcard(access_token, hash);
+3. 查询应用消息发送统计
+QQ::weixin::work::message::get_statistics(access_token, hash);
+五、OA数据接口
+1. 企业微信打卡应用
+1) 获取打卡数据
+QQ::weixin::work::checkin::getcheckindata(access_token, hash);
+2) 获取打卡规则
+QQ::weixin::work::checkin::getcheckinoption(access_token, hash);
+2. 企业微信审批应用
+1) 获取审批模板详情
+QQ::weixin::work::oa::gettemplatedetail(access_token, hash);
+2) 提交审批申请
+QQ::weixin::work::oa::applyevent(access_token, hash);
+3) 批量获取审批单号
+QQ::weixin::work::oa::getapprovalinfo(access_token, hash);
+4) 获取审批申请详情
+QQ::weixin::work::oa::getapprovaldetail(access_token, hash);

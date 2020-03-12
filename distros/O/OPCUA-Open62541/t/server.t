@@ -3,29 +3,29 @@ use warnings;
 use OPCUA::Open62541;
 
 use Test::More tests => 11;
+use Test::Exception;
+use Test::LeakTrace;
 use Test::NoWarnings;
 use Test::Warn;
 
-my $s = OPCUA::Open62541::Server->new();
-ok(defined($s), "server defined");
-ok($s, "server new");
-is(ref($s), "OPCUA::Open62541::Server", "class");
+ok(my $server = OPCUA::Open62541::Server->new(), "server new");
+is(ref($server), "OPCUA::Open62541::Server", "server new class");
+no_leaks_ok { OPCUA::Open62541::Server->new()} "server new leak";
 
-eval { OPCUA::Open62541::Server::new() };
-ok($@, "class missing");
-like($@, qr/OPCUA::Open62541::Server::new\(class\) /, "class missing error");
+throws_ok { OPCUA::Open62541::Server::new() }
+    (qr/OPCUA::Open62541::Server::new\(class\) /, "class missing");
+no_leaks_ok { eval { OPCUA::Open62541::Server::new() } } "class missing leak";
 
-warnings_like { eval { OPCUA::Open62541::Server::new(undef) } }
-    (qr/uninitialized value in subroutine entry /, "class undef warning");
-
-eval {
+warnings_like {
+    throws_ok { OPCUA::Open62541::Server::new(undef) }
+	(qr/Class '' is not OPCUA::Open62541::Server /, "class undef");
+} (qr/uninitialized value in subroutine entry /, "class undef warning");
+no_leaks_ok {
     no warnings 'uninitialized';
-    OPCUA::Open62541::Server::new(undef)
-};
-ok($@, "class undef");
-like($@, qr/class '' is not OPCUA::Open62541::Server /, "class undef error");
+    eval { OPCUA::Open62541::Server::new(undef) }
+} "class undef leak";
 
-eval { OPCUA::Open62541::Server::new("subclass") };
-ok($@, "class subclass");
-like($@, qr/class 'subclass' is not OPCUA::Open62541::Server /,
-    "class subclass error");
+throws_ok { OPCUA::Open62541::Server::new("subclass") }
+    (qr/Class 'subclass' is not OPCUA::Open62541::Server /, "subclass");
+no_leaks_ok { eval { OPCUA::Open62541::Server::new("subclass") } }
+    "subclass leak";

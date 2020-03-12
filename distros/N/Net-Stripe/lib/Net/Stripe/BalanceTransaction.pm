@@ -1,5 +1,5 @@
 package Net::Stripe::BalanceTransaction;
-$Net::Stripe::BalanceTransaction::VERSION = '0.39';
+$Net::Stripe::BalanceTransaction::VERSION = '0.41';
 use Moose;
 use Moose::Util::TypeConstraints qw(subtype as where message);
 extends 'Net::Stripe::Resource';
@@ -42,7 +42,89 @@ Net::Stripe::BalanceTransaction - represent a BalanceTransaction object from Str
 
 =head1 VERSION
 
-version 0.39
+version 0.41
+
+=head1 ATTRIBUTES
+
+=head2 amount
+
+Reader: amount
+
+Type: Int
+
+=head2 available_on
+
+Reader: available_on
+
+Type: Int
+
+=head2 boolean_attributes
+
+Reader: boolean_attributes
+
+Type: ArrayRef[Str]
+
+=head2 created
+
+Reader: created
+
+Type: Int
+
+=head2 currency
+
+Reader: currency
+
+Type: Str
+
+This attribute is required.
+
+=head2 description
+
+Reader: description
+
+Type: Maybe[Str]
+
+=head2 fee
+
+Reader: fee
+
+Type: Int
+
+=head2 fee_details
+
+Reader: fee_details
+
+Type: Maybe[ArrayRef]
+
+=head2 id
+
+Reader: id
+
+Type: Str
+
+=head2 net
+
+Reader: net
+
+Type: Int
+
+=head2 source
+
+Reader: source
+
+Type: Str
+
+=head2 status
+
+Reader: status
+
+Type: StatusType
+
+=head2 type
+
+Reader: type
+
+Type: TransactionType
 
 =head1 AUTHORS
 

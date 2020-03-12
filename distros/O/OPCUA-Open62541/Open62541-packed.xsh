@@ -192,7 +192,7 @@ XS_unpack_UA_Argument(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_Argument_init(&out);
 	hv = (HV*)SvRV(in);
@@ -212,13 +212,13 @@ XS_unpack_UA_Argument(SV *in)
 	svp = hv_fetchs(hv, "Argument_arrayDimensions", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: Argument_arrayDimensions not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for Argument_arrayDimensions");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.arrayDimensions = calloc(top + 1, sizeof(UA_UInt32));
 		if (out.arrayDimensions == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -271,7 +271,7 @@ XS_unpack_UA_EnumValueType(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_EnumValueType_init(&out);
 	hv = (HV*)SvRV(in);
@@ -419,7 +419,7 @@ XS_unpack_UA_ApplicationDescription(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ApplicationDescription_init(&out);
 	hv = (HV*)SvRV(in);
@@ -451,13 +451,13 @@ XS_unpack_UA_ApplicationDescription(SV *in)
 	svp = hv_fetchs(hv, "ApplicationDescription_discoveryUrls", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ApplicationDescription_discoveryUrls not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ApplicationDescription_discoveryUrls");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.discoveryUrls = calloc(top + 1, sizeof(UA_String));
 		if (out.discoveryUrls == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -522,7 +522,7 @@ XS_unpack_UA_RequestHeader(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RequestHeader_init(&out);
 	hv = (HV*)SvRV(in);
@@ -614,7 +614,7 @@ XS_unpack_UA_ResponseHeader(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ResponseHeader_init(&out);
 	hv = (HV*)SvRV(in);
@@ -638,13 +638,13 @@ XS_unpack_UA_ResponseHeader(SV *in)
 	svp = hv_fetchs(hv, "ResponseHeader_stringTable", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ResponseHeader_stringTable not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ResponseHeader_stringTable");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.stringTable = calloc(top + 1, sizeof(UA_String));
 		if (out.stringTable == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -689,7 +689,7 @@ XS_unpack_UA_ServiceFault(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ServiceFault_init(&out);
 	hv = (HV*)SvRV(in);
@@ -754,7 +754,7 @@ XS_unpack_UA_FindServersRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_FindServersRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -770,13 +770,13 @@ XS_unpack_UA_FindServersRequest(SV *in)
 	svp = hv_fetchs(hv, "FindServersRequest_localeIds", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: FindServersRequest_localeIds not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for FindServersRequest_localeIds");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.localeIds = calloc(top + 1, sizeof(UA_String));
 		if (out.localeIds == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -790,13 +790,13 @@ XS_unpack_UA_FindServersRequest(SV *in)
 	svp = hv_fetchs(hv, "FindServersRequest_serverUris", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: FindServersRequest_serverUris not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for FindServersRequest_serverUris");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.serverUris = calloc(top + 1, sizeof(UA_String));
 		if (out.serverUris == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -850,7 +850,7 @@ XS_unpack_UA_FindServersResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_FindServersResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -862,13 +862,13 @@ XS_unpack_UA_FindServersResponse(SV *in)
 	svp = hv_fetchs(hv, "FindServersResponse_servers", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: FindServersResponse_servers not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for FindServersResponse_servers");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.servers = calloc(top + 1, sizeof(UA_ApplicationDescription));
 		if (out.servers == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -930,7 +930,7 @@ XS_unpack_UA_ServerOnNetwork(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ServerOnNetwork_init(&out);
 	hv = (HV*)SvRV(in);
@@ -950,13 +950,13 @@ XS_unpack_UA_ServerOnNetwork(SV *in)
 	svp = hv_fetchs(hv, "ServerOnNetwork_serverCapabilities", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ServerOnNetwork_serverCapabilities not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ServerOnNetwork_serverCapabilities");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.serverCapabilities = calloc(top + 1, sizeof(UA_String));
 		if (out.serverCapabilities == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1018,7 +1018,7 @@ XS_unpack_UA_FindServersOnNetworkRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_FindServersOnNetworkRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1038,13 +1038,13 @@ XS_unpack_UA_FindServersOnNetworkRequest(SV *in)
 	svp = hv_fetchs(hv, "FindServersOnNetworkRequest_serverCapabilityFilter", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: FindServersOnNetworkRequest_serverCapabilityFilter not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for FindServersOnNetworkRequest_serverCapabilityFilter");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.serverCapabilityFilter = calloc(top + 1, sizeof(UA_String));
 		if (out.serverCapabilityFilter == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1102,7 +1102,7 @@ XS_unpack_UA_FindServersOnNetworkResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_FindServersOnNetworkResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1118,13 +1118,13 @@ XS_unpack_UA_FindServersOnNetworkResponse(SV *in)
 	svp = hv_fetchs(hv, "FindServersOnNetworkResponse_servers", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: FindServersOnNetworkResponse_servers not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for FindServersOnNetworkResponse_servers");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.servers = calloc(top + 1, sizeof(UA_ServerOnNetwork));
 		if (out.servers == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1215,7 +1215,7 @@ XS_unpack_UA_UserTokenPolicy(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_UserTokenPolicy_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1307,7 +1307,7 @@ XS_unpack_UA_EndpointDescription(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_EndpointDescription_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1335,13 +1335,13 @@ XS_unpack_UA_EndpointDescription(SV *in)
 	svp = hv_fetchs(hv, "EndpointDescription_userIdentityTokens", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: EndpointDescription_userIdentityTokens not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for EndpointDescription_userIdentityTokens");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.userIdentityTokens = calloc(top + 1, sizeof(UA_UserTokenPolicy));
 		if (out.userIdentityTokens == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1416,7 +1416,7 @@ XS_unpack_UA_GetEndpointsRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_GetEndpointsRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1432,13 +1432,13 @@ XS_unpack_UA_GetEndpointsRequest(SV *in)
 	svp = hv_fetchs(hv, "GetEndpointsRequest_localeIds", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: GetEndpointsRequest_localeIds not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for GetEndpointsRequest_localeIds");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.localeIds = calloc(top + 1, sizeof(UA_String));
 		if (out.localeIds == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1452,13 +1452,13 @@ XS_unpack_UA_GetEndpointsRequest(SV *in)
 	svp = hv_fetchs(hv, "GetEndpointsRequest_profileUris", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: GetEndpointsRequest_profileUris not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for GetEndpointsRequest_profileUris");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.profileUris = calloc(top + 1, sizeof(UA_String));
 		if (out.profileUris == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1512,7 +1512,7 @@ XS_unpack_UA_GetEndpointsResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_GetEndpointsResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1524,13 +1524,13 @@ XS_unpack_UA_GetEndpointsResponse(SV *in)
 	svp = hv_fetchs(hv, "GetEndpointsResponse_endpoints", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: GetEndpointsResponse_endpoints not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for GetEndpointsResponse_endpoints");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.endpoints = calloc(top + 1, sizeof(UA_EndpointDescription));
 		if (out.endpoints == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1613,7 +1613,7 @@ XS_unpack_UA_RegisteredServer(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RegisteredServer_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1629,13 +1629,13 @@ XS_unpack_UA_RegisteredServer(SV *in)
 	svp = hv_fetchs(hv, "RegisteredServer_serverNames", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: RegisteredServer_serverNames not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for RegisteredServer_serverNames");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.serverNames = calloc(top + 1, sizeof(UA_LocalizedText));
 		if (out.serverNames == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1657,13 +1657,13 @@ XS_unpack_UA_RegisteredServer(SV *in)
 	svp = hv_fetchs(hv, "RegisteredServer_discoveryUrls", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: RegisteredServer_discoveryUrls not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for RegisteredServer_discoveryUrls");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.discoveryUrls = calloc(top + 1, sizeof(UA_String));
 		if (out.discoveryUrls == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1716,7 +1716,7 @@ XS_unpack_UA_RegisterServerRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RegisterServerRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1759,7 +1759,7 @@ XS_unpack_UA_RegisterServerResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RegisterServerResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1777,7 +1777,7 @@ static void
 XS_pack_UA_DiscoveryConfiguration(SV *out, UA_DiscoveryConfiguration in)
 {
 	dTHX;
-	croak("%s: conversion for type not implemented", __func__);
+	CROAK("No conversion implemented");
 }
 
 static UA_DiscoveryConfiguration XS_unpack_UA_DiscoveryConfiguration(SV *in)  __attribute__((unused));
@@ -1785,7 +1785,7 @@ static UA_DiscoveryConfiguration
 XS_unpack_UA_DiscoveryConfiguration(SV *in)
 {
 	dTHX;
-	croak("%s: conversion for type not implemented", __func__);
+	CROAK("No conversion implemented");
 }
 
 /* MdnsDiscoveryConfiguration */
@@ -1828,7 +1828,7 @@ XS_unpack_UA_MdnsDiscoveryConfiguration(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_MdnsDiscoveryConfiguration_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1840,13 +1840,13 @@ XS_unpack_UA_MdnsDiscoveryConfiguration(SV *in)
 	svp = hv_fetchs(hv, "MdnsDiscoveryConfiguration_serverCapabilities", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: MdnsDiscoveryConfiguration_serverCapabilities not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for MdnsDiscoveryConfiguration_serverCapabilities");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.serverCapabilities = calloc(top + 1, sizeof(UA_String));
 		if (out.serverCapabilities == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1904,7 +1904,7 @@ XS_unpack_UA_RegisterServer2Request(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RegisterServer2Request_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1920,13 +1920,13 @@ XS_unpack_UA_RegisterServer2Request(SV *in)
 	svp = hv_fetchs(hv, "RegisterServer2Request_discoveryConfiguration", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: RegisterServer2Request_discoveryConfiguration not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for RegisterServer2Request_discoveryConfiguration");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.discoveryConfiguration = calloc(top + 1, sizeof(UA_ExtensionObject));
 		if (out.discoveryConfiguration == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -1989,7 +1989,7 @@ XS_unpack_UA_RegisterServer2Response(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RegisterServer2Response_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2001,13 +2001,13 @@ XS_unpack_UA_RegisterServer2Response(SV *in)
 	svp = hv_fetchs(hv, "RegisterServer2Response_configurationResults", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: RegisterServer2Response_configurationResults not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for RegisterServer2Response_configurationResults");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.configurationResults = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.configurationResults == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -2021,13 +2021,13 @@ XS_unpack_UA_RegisterServer2Response(SV *in)
 	svp = hv_fetchs(hv, "RegisterServer2Response_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: RegisterServer2Response_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for RegisterServer2Response_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -2097,7 +2097,7 @@ XS_unpack_UA_ChannelSecurityToken(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ChannelSecurityToken_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2168,7 +2168,7 @@ XS_unpack_UA_OpenSecureChannelRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_OpenSecureChannelRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2239,7 +2239,7 @@ XS_unpack_UA_OpenSecureChannelResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_OpenSecureChannelResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2290,7 +2290,7 @@ XS_unpack_UA_CloseSecureChannelRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CloseSecureChannelRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2329,7 +2329,7 @@ XS_unpack_UA_CloseSecureChannelResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CloseSecureChannelResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2372,7 +2372,7 @@ XS_unpack_UA_SignedSoftwareCertificate(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_SignedSoftwareCertificate_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2419,7 +2419,7 @@ XS_unpack_UA_SignatureData(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_SignatureData_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2494,7 +2494,7 @@ XS_unpack_UA_CreateSessionRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CreateSessionRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2615,7 +2615,7 @@ XS_unpack_UA_CreateSessionResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CreateSessionResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2647,13 +2647,13 @@ XS_unpack_UA_CreateSessionResponse(SV *in)
 	svp = hv_fetchs(hv, "CreateSessionResponse_serverEndpoints", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CreateSessionResponse_serverEndpoints not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CreateSessionResponse_serverEndpoints");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.serverEndpoints = calloc(top + 1, sizeof(UA_EndpointDescription));
 		if (out.serverEndpoints == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -2667,13 +2667,13 @@ XS_unpack_UA_CreateSessionResponse(SV *in)
 	svp = hv_fetchs(hv, "CreateSessionResponse_serverSoftwareCertificates", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CreateSessionResponse_serverSoftwareCertificates not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CreateSessionResponse_serverSoftwareCertificates");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.serverSoftwareCertificates = calloc(top + 1, sizeof(UA_SignedSoftwareCertificate));
 		if (out.serverSoftwareCertificates == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -2722,7 +2722,7 @@ XS_unpack_UA_UserIdentityToken(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_UserIdentityToken_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2761,7 +2761,7 @@ XS_unpack_UA_AnonymousIdentityToken(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_AnonymousIdentityToken_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2812,7 +2812,7 @@ XS_unpack_UA_UserNameIdentityToken(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_UserNameIdentityToken_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2867,7 +2867,7 @@ XS_unpack_UA_X509IdentityToken(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_X509IdentityToken_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2918,7 +2918,7 @@ XS_unpack_UA_IssuedIdentityToken(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_IssuedIdentityToken_init(&out);
 	hv = (HV*)SvRV(in);
@@ -2999,7 +2999,7 @@ XS_unpack_UA_ActivateSessionRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ActivateSessionRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -3015,13 +3015,13 @@ XS_unpack_UA_ActivateSessionRequest(SV *in)
 	svp = hv_fetchs(hv, "ActivateSessionRequest_clientSoftwareCertificates", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ActivateSessionRequest_clientSoftwareCertificates not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ActivateSessionRequest_clientSoftwareCertificates");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.clientSoftwareCertificates = calloc(top + 1, sizeof(UA_SignedSoftwareCertificate));
 		if (out.clientSoftwareCertificates == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3035,13 +3035,13 @@ XS_unpack_UA_ActivateSessionRequest(SV *in)
 	svp = hv_fetchs(hv, "ActivateSessionRequest_localeIds", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ActivateSessionRequest_localeIds not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ActivateSessionRequest_localeIds");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.localeIds = calloc(top + 1, sizeof(UA_String));
 		if (out.localeIds == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3116,7 +3116,7 @@ XS_unpack_UA_ActivateSessionResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ActivateSessionResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -3132,13 +3132,13 @@ XS_unpack_UA_ActivateSessionResponse(SV *in)
 	svp = hv_fetchs(hv, "ActivateSessionResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ActivateSessionResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ActivateSessionResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3152,13 +3152,13 @@ XS_unpack_UA_ActivateSessionResponse(SV *in)
 	svp = hv_fetchs(hv, "ActivateSessionResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ActivateSessionResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ActivateSessionResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3203,7 +3203,7 @@ XS_unpack_UA_CloseSessionRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CloseSessionRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -3246,7 +3246,7 @@ XS_unpack_UA_CloseSessionResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CloseSessionResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -3318,7 +3318,7 @@ XS_unpack_UA_NodeAttributes(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_NodeAttributes_init(&out);
 	hv = (HV*)SvRV(in);
@@ -3393,7 +3393,7 @@ XS_unpack_UA_ObjectAttributes(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ObjectAttributes_init(&out);
 	hv = (HV*)SvRV(in);
@@ -3509,7 +3509,7 @@ XS_unpack_UA_VariableAttributes(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_VariableAttributes_init(&out);
 	hv = (HV*)SvRV(in);
@@ -3549,13 +3549,13 @@ XS_unpack_UA_VariableAttributes(SV *in)
 	svp = hv_fetchs(hv, "VariableAttributes_arrayDimensions", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: VariableAttributes_arrayDimensions not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for VariableAttributes_arrayDimensions");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.arrayDimensions = calloc(top + 1, sizeof(UA_UInt32));
 		if (out.arrayDimensions == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3636,7 +3636,7 @@ XS_unpack_UA_MethodAttributes(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_MethodAttributes_init(&out);
 	hv = (HV*)SvRV(in);
@@ -3719,7 +3719,7 @@ XS_unpack_UA_ObjectTypeAttributes(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ObjectTypeAttributes_init(&out);
 	hv = (HV*)SvRV(in);
@@ -3823,7 +3823,7 @@ XS_unpack_UA_VariableTypeAttributes(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_VariableTypeAttributes_init(&out);
 	hv = (HV*)SvRV(in);
@@ -3863,13 +3863,13 @@ XS_unpack_UA_VariableTypeAttributes(SV *in)
 	svp = hv_fetchs(hv, "VariableTypeAttributes_arrayDimensions", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: VariableTypeAttributes_arrayDimensions not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for VariableTypeAttributes_arrayDimensions");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.arrayDimensions = calloc(top + 1, sizeof(UA_UInt32));
 		if (out.arrayDimensions == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -3942,7 +3942,7 @@ XS_unpack_UA_ReferenceTypeAttributes(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ReferenceTypeAttributes_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4029,7 +4029,7 @@ XS_unpack_UA_DataTypeAttributes(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DataTypeAttributes_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4112,7 +4112,7 @@ XS_unpack_UA_ViewAttributes(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ViewAttributes_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4199,7 +4199,7 @@ XS_unpack_UA_AddNodesItem(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_AddNodesItem_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4266,7 +4266,7 @@ XS_unpack_UA_AddNodesResult(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_AddNodesResult_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4322,7 +4322,7 @@ XS_unpack_UA_AddNodesRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_AddNodesRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4334,13 +4334,13 @@ XS_unpack_UA_AddNodesRequest(SV *in)
 	svp = hv_fetchs(hv, "AddNodesRequest_nodesToAdd", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: AddNodesRequest_nodesToAdd not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for AddNodesRequest_nodesToAdd");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.nodesToAdd = calloc(top + 1, sizeof(UA_AddNodesItem));
 		if (out.nodesToAdd == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4403,7 +4403,7 @@ XS_unpack_UA_AddNodesResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_AddNodesResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4415,13 +4415,13 @@ XS_unpack_UA_AddNodesResponse(SV *in)
 	svp = hv_fetchs(hv, "AddNodesResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: AddNodesResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for AddNodesResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_AddNodesResult));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4435,13 +4435,13 @@ XS_unpack_UA_AddNodesResponse(SV *in)
 	svp = hv_fetchs(hv, "AddNodesResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: AddNodesResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for AddNodesResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4502,7 +4502,7 @@ XS_unpack_UA_AddReferencesItem(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_AddReferencesItem_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4574,7 +4574,7 @@ XS_unpack_UA_AddReferencesRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_AddReferencesRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4586,13 +4586,13 @@ XS_unpack_UA_AddReferencesRequest(SV *in)
 	svp = hv_fetchs(hv, "AddReferencesRequest_referencesToAdd", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: AddReferencesRequest_referencesToAdd not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for AddReferencesRequest_referencesToAdd");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.referencesToAdd = calloc(top + 1, sizeof(UA_AddReferencesItem));
 		if (out.referencesToAdd == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4655,7 +4655,7 @@ XS_unpack_UA_AddReferencesResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_AddReferencesResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4667,13 +4667,13 @@ XS_unpack_UA_AddReferencesResponse(SV *in)
 	svp = hv_fetchs(hv, "AddReferencesResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: AddReferencesResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for AddReferencesResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4687,13 +4687,13 @@ XS_unpack_UA_AddReferencesResponse(SV *in)
 	svp = hv_fetchs(hv, "AddReferencesResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: AddReferencesResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for AddReferencesResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4738,7 +4738,7 @@ XS_unpack_UA_DeleteNodesItem(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DeleteNodesItem_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4794,7 +4794,7 @@ XS_unpack_UA_DeleteNodesRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DeleteNodesRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4806,13 +4806,13 @@ XS_unpack_UA_DeleteNodesRequest(SV *in)
 	svp = hv_fetchs(hv, "DeleteNodesRequest_nodesToDelete", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteNodesRequest_nodesToDelete not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteNodesRequest_nodesToDelete");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.nodesToDelete = calloc(top + 1, sizeof(UA_DeleteNodesItem));
 		if (out.nodesToDelete == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4875,7 +4875,7 @@ XS_unpack_UA_DeleteNodesResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DeleteNodesResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -4887,13 +4887,13 @@ XS_unpack_UA_DeleteNodesResponse(SV *in)
 	svp = hv_fetchs(hv, "DeleteNodesResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteNodesResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteNodesResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4907,13 +4907,13 @@ XS_unpack_UA_DeleteNodesResponse(SV *in)
 	svp = hv_fetchs(hv, "DeleteNodesResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteNodesResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteNodesResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -4970,7 +4970,7 @@ XS_unpack_UA_DeleteReferencesItem(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DeleteReferencesItem_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5038,7 +5038,7 @@ XS_unpack_UA_DeleteReferencesRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DeleteReferencesRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5050,13 +5050,13 @@ XS_unpack_UA_DeleteReferencesRequest(SV *in)
 	svp = hv_fetchs(hv, "DeleteReferencesRequest_referencesToDelete", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteReferencesRequest_referencesToDelete not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteReferencesRequest_referencesToDelete");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.referencesToDelete = calloc(top + 1, sizeof(UA_DeleteReferencesItem));
 		if (out.referencesToDelete == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5119,7 +5119,7 @@ XS_unpack_UA_DeleteReferencesResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DeleteReferencesResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5131,13 +5131,13 @@ XS_unpack_UA_DeleteReferencesResponse(SV *in)
 	svp = hv_fetchs(hv, "DeleteReferencesResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteReferencesResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteReferencesResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5151,13 +5151,13 @@ XS_unpack_UA_DeleteReferencesResponse(SV *in)
 	svp = hv_fetchs(hv, "DeleteReferencesResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteReferencesResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteReferencesResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5223,7 +5223,7 @@ XS_unpack_UA_ViewDescription(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ViewDescription_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5290,7 +5290,7 @@ XS_unpack_UA_BrowseDescription(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_BrowseDescription_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5390,7 +5390,7 @@ XS_unpack_UA_ReferenceDescription(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ReferenceDescription_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5470,7 +5470,7 @@ XS_unpack_UA_BrowseResult(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_BrowseResult_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5486,13 +5486,13 @@ XS_unpack_UA_BrowseResult(SV *in)
 	svp = hv_fetchs(hv, "BrowseResult_references", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: BrowseResult_references not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for BrowseResult_references");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.references = calloc(top + 1, sizeof(UA_ReferenceDescription));
 		if (out.references == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5554,7 +5554,7 @@ XS_unpack_UA_BrowseRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_BrowseRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5574,13 +5574,13 @@ XS_unpack_UA_BrowseRequest(SV *in)
 	svp = hv_fetchs(hv, "BrowseRequest_nodesToBrowse", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: BrowseRequest_nodesToBrowse not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for BrowseRequest_nodesToBrowse");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.nodesToBrowse = calloc(top + 1, sizeof(UA_BrowseDescription));
 		if (out.nodesToBrowse == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5643,7 +5643,7 @@ XS_unpack_UA_BrowseResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_BrowseResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5655,13 +5655,13 @@ XS_unpack_UA_BrowseResponse(SV *in)
 	svp = hv_fetchs(hv, "BrowseResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: BrowseResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for BrowseResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_BrowseResult));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5675,13 +5675,13 @@ XS_unpack_UA_BrowseResponse(SV *in)
 	svp = hv_fetchs(hv, "BrowseResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: BrowseResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for BrowseResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5739,7 +5739,7 @@ XS_unpack_UA_BrowseNextRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_BrowseNextRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5755,13 +5755,13 @@ XS_unpack_UA_BrowseNextRequest(SV *in)
 	svp = hv_fetchs(hv, "BrowseNextRequest_continuationPoints", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: BrowseNextRequest_continuationPoints not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for BrowseNextRequest_continuationPoints");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.continuationPoints = calloc(top + 1, sizeof(UA_ByteString));
 		if (out.continuationPoints == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5824,7 +5824,7 @@ XS_unpack_UA_BrowseNextResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_BrowseNextResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5836,13 +5836,13 @@ XS_unpack_UA_BrowseNextResponse(SV *in)
 	svp = hv_fetchs(hv, "BrowseNextResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: BrowseNextResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for BrowseNextResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_BrowseResult));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5856,13 +5856,13 @@ XS_unpack_UA_BrowseNextResponse(SV *in)
 	svp = hv_fetchs(hv, "BrowseNextResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: BrowseNextResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for BrowseNextResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -5915,7 +5915,7 @@ XS_unpack_UA_RelativePathElement(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RelativePathElement_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5975,7 +5975,7 @@ XS_unpack_UA_RelativePath(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RelativePath_init(&out);
 	hv = (HV*)SvRV(in);
@@ -5983,13 +5983,13 @@ XS_unpack_UA_RelativePath(SV *in)
 	svp = hv_fetchs(hv, "RelativePath_elements", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: RelativePath_elements not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for RelativePath_elements");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.elements = calloc(top + 1, sizeof(UA_RelativePathElement));
 		if (out.elements == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6034,7 +6034,7 @@ XS_unpack_UA_BrowsePath(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_BrowsePath_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6081,7 +6081,7 @@ XS_unpack_UA_BrowsePathTarget(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_BrowsePathTarget_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6137,7 +6137,7 @@ XS_unpack_UA_BrowsePathResult(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_BrowsePathResult_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6149,13 +6149,13 @@ XS_unpack_UA_BrowsePathResult(SV *in)
 	svp = hv_fetchs(hv, "BrowsePathResult_targets", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: BrowsePathResult_targets not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for BrowsePathResult_targets");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.targets = calloc(top + 1, sizeof(UA_BrowsePathTarget));
 		if (out.targets == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6209,7 +6209,7 @@ XS_unpack_UA_TranslateBrowsePathsToNodeIdsRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_TranslateBrowsePathsToNodeIdsRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6221,13 +6221,13 @@ XS_unpack_UA_TranslateBrowsePathsToNodeIdsRequest(SV *in)
 	svp = hv_fetchs(hv, "TranslateBrowsePathsToNodeIdsRequest_browsePaths", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: TranslateBrowsePathsToNodeIdsRequest_browsePaths not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for TranslateBrowsePathsToNodeIdsRequest_browsePaths");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.browsePaths = calloc(top + 1, sizeof(UA_BrowsePath));
 		if (out.browsePaths == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6290,7 +6290,7 @@ XS_unpack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_TranslateBrowsePathsToNodeIdsResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6302,13 +6302,13 @@ XS_unpack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *in)
 	svp = hv_fetchs(hv, "TranslateBrowsePathsToNodeIdsResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: TranslateBrowsePathsToNodeIdsResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for TranslateBrowsePathsToNodeIdsResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_BrowsePathResult));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6322,13 +6322,13 @@ XS_unpack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *in)
 	svp = hv_fetchs(hv, "TranslateBrowsePathsToNodeIdsResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: TranslateBrowsePathsToNodeIdsResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for TranslateBrowsePathsToNodeIdsResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6382,7 +6382,7 @@ XS_unpack_UA_RegisterNodesRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RegisterNodesRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6394,13 +6394,13 @@ XS_unpack_UA_RegisterNodesRequest(SV *in)
 	svp = hv_fetchs(hv, "RegisterNodesRequest_nodesToRegister", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: RegisterNodesRequest_nodesToRegister not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for RegisterNodesRequest_nodesToRegister");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.nodesToRegister = calloc(top + 1, sizeof(UA_NodeId));
 		if (out.nodesToRegister == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6454,7 +6454,7 @@ XS_unpack_UA_RegisterNodesResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RegisterNodesResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6466,13 +6466,13 @@ XS_unpack_UA_RegisterNodesResponse(SV *in)
 	svp = hv_fetchs(hv, "RegisterNodesResponse_registeredNodeIds", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: RegisterNodesResponse_registeredNodeIds not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for RegisterNodesResponse_registeredNodeIds");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.registeredNodeIds = calloc(top + 1, sizeof(UA_NodeId));
 		if (out.registeredNodeIds == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6526,7 +6526,7 @@ XS_unpack_UA_UnregisterNodesRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_UnregisterNodesRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6538,13 +6538,13 @@ XS_unpack_UA_UnregisterNodesRequest(SV *in)
 	svp = hv_fetchs(hv, "UnregisterNodesRequest_nodesToUnregister", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: UnregisterNodesRequest_nodesToUnregister not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for UnregisterNodesRequest_nodesToUnregister");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.nodesToUnregister = calloc(top + 1, sizeof(UA_NodeId));
 		if (out.nodesToUnregister == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6585,7 +6585,7 @@ XS_unpack_UA_UnregisterNodesResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_UnregisterNodesResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6654,7 +6654,7 @@ XS_unpack_UA_ContentFilterElement(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ContentFilterElement_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6666,13 +6666,13 @@ XS_unpack_UA_ContentFilterElement(SV *in)
 	svp = hv_fetchs(hv, "ContentFilterElement_filterOperands", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ContentFilterElement_filterOperands not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ContentFilterElement_filterOperands");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.filterOperands = calloc(top + 1, sizeof(UA_ExtensionObject));
 		if (out.filterOperands == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6722,7 +6722,7 @@ XS_unpack_UA_ContentFilter(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ContentFilter_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6730,13 +6730,13 @@ XS_unpack_UA_ContentFilter(SV *in)
 	svp = hv_fetchs(hv, "ContentFilter_elements", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ContentFilter_elements not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ContentFilter_elements");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.elements = calloc(top + 1, sizeof(UA_ContentFilterElement));
 		if (out.elements == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -6756,7 +6756,7 @@ static void
 XS_pack_UA_FilterOperand(SV *out, UA_FilterOperand in)
 {
 	dTHX;
-	croak("%s: conversion for type not implemented", __func__);
+	CROAK("No conversion implemented");
 }
 
 static UA_FilterOperand XS_unpack_UA_FilterOperand(SV *in)  __attribute__((unused));
@@ -6764,7 +6764,7 @@ static UA_FilterOperand
 XS_unpack_UA_FilterOperand(SV *in)
 {
 	dTHX;
-	croak("%s: conversion for type not implemented", __func__);
+	CROAK("No conversion implemented");
 }
 
 /* ElementOperand */
@@ -6794,7 +6794,7 @@ XS_unpack_UA_ElementOperand(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ElementOperand_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6833,7 +6833,7 @@ XS_unpack_UA_LiteralOperand(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_LiteralOperand_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6888,7 +6888,7 @@ XS_unpack_UA_AttributeOperand(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_AttributeOperand_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6964,7 +6964,7 @@ XS_unpack_UA_SimpleAttributeOperand(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_SimpleAttributeOperand_init(&out);
 	hv = (HV*)SvRV(in);
@@ -6976,13 +6976,13 @@ XS_unpack_UA_SimpleAttributeOperand(SV *in)
 	svp = hv_fetchs(hv, "SimpleAttributeOperand_browsePath", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SimpleAttributeOperand_browsePath not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SimpleAttributeOperand_browsePath");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.browsePath = calloc(top + 1, sizeof(UA_QualifiedName));
 		if (out.browsePath == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7053,7 +7053,7 @@ XS_unpack_UA_ContentFilterElementResult(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ContentFilterElementResult_init(&out);
 	hv = (HV*)SvRV(in);
@@ -7065,13 +7065,13 @@ XS_unpack_UA_ContentFilterElementResult(SV *in)
 	svp = hv_fetchs(hv, "ContentFilterElementResult_operandStatusCodes", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ContentFilterElementResult_operandStatusCodes not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ContentFilterElementResult_operandStatusCodes");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.operandStatusCodes = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.operandStatusCodes == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7085,13 +7085,13 @@ XS_unpack_UA_ContentFilterElementResult(SV *in)
 	svp = hv_fetchs(hv, "ContentFilterElementResult_operandDiagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ContentFilterElementResult_operandDiagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ContentFilterElementResult_operandDiagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.operandDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.operandDiagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7150,7 +7150,7 @@ XS_unpack_UA_ContentFilterResult(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ContentFilterResult_init(&out);
 	hv = (HV*)SvRV(in);
@@ -7158,13 +7158,13 @@ XS_unpack_UA_ContentFilterResult(SV *in)
 	svp = hv_fetchs(hv, "ContentFilterResult_elementResults", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ContentFilterResult_elementResults not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ContentFilterResult_elementResults");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.elementResults = calloc(top + 1, sizeof(UA_ContentFilterElementResult));
 		if (out.elementResults == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7178,13 +7178,13 @@ XS_unpack_UA_ContentFilterResult(SV *in)
 	svp = hv_fetchs(hv, "ContentFilterResult_elementDiagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ContentFilterResult_elementDiagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ContentFilterResult_elementDiagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.elementDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.elementDiagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7254,7 +7254,7 @@ XS_unpack_UA_ReadValueId(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ReadValueId_init(&out);
 	hv = (HV*)SvRV(in);
@@ -7326,7 +7326,7 @@ XS_unpack_UA_ReadRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ReadRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -7346,13 +7346,13 @@ XS_unpack_UA_ReadRequest(SV *in)
 	svp = hv_fetchs(hv, "ReadRequest_nodesToRead", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ReadRequest_nodesToRead not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ReadRequest_nodesToRead");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.nodesToRead = calloc(top + 1, sizeof(UA_ReadValueId));
 		if (out.nodesToRead == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7415,7 +7415,7 @@ XS_unpack_UA_ReadResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ReadResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -7427,13 +7427,13 @@ XS_unpack_UA_ReadResponse(SV *in)
 	svp = hv_fetchs(hv, "ReadResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ReadResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ReadResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_DataValue));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7447,13 +7447,13 @@ XS_unpack_UA_ReadResponse(SV *in)
 	svp = hv_fetchs(hv, "ReadResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ReadResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ReadResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7506,7 +7506,7 @@ XS_unpack_UA_WriteValue(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_WriteValue_init(&out);
 	hv = (HV*)SvRV(in);
@@ -7570,7 +7570,7 @@ XS_unpack_UA_WriteRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_WriteRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -7582,13 +7582,13 @@ XS_unpack_UA_WriteRequest(SV *in)
 	svp = hv_fetchs(hv, "WriteRequest_nodesToWrite", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: WriteRequest_nodesToWrite not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for WriteRequest_nodesToWrite");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.nodesToWrite = calloc(top + 1, sizeof(UA_WriteValue));
 		if (out.nodesToWrite == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7651,7 +7651,7 @@ XS_unpack_UA_WriteResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_WriteResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -7663,13 +7663,13 @@ XS_unpack_UA_WriteResponse(SV *in)
 	svp = hv_fetchs(hv, "WriteResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: WriteResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for WriteResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7683,13 +7683,13 @@ XS_unpack_UA_WriteResponse(SV *in)
 	svp = hv_fetchs(hv, "WriteResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: WriteResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for WriteResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7747,7 +7747,7 @@ XS_unpack_UA_CallMethodRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CallMethodRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -7763,13 +7763,13 @@ XS_unpack_UA_CallMethodRequest(SV *in)
 	svp = hv_fetchs(hv, "CallMethodRequest_inputArguments", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CallMethodRequest_inputArguments not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CallMethodRequest_inputArguments");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.inputArguments = calloc(top + 1, sizeof(UA_Variant));
 		if (out.inputArguments == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7841,7 +7841,7 @@ XS_unpack_UA_CallMethodResult(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CallMethodResult_init(&out);
 	hv = (HV*)SvRV(in);
@@ -7853,13 +7853,13 @@ XS_unpack_UA_CallMethodResult(SV *in)
 	svp = hv_fetchs(hv, "CallMethodResult_inputArgumentResults", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CallMethodResult_inputArgumentResults not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CallMethodResult_inputArgumentResults");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.inputArgumentResults = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.inputArgumentResults == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7873,13 +7873,13 @@ XS_unpack_UA_CallMethodResult(SV *in)
 	svp = hv_fetchs(hv, "CallMethodResult_inputArgumentDiagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CallMethodResult_inputArgumentDiagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CallMethodResult_inputArgumentDiagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.inputArgumentDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.inputArgumentDiagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7893,13 +7893,13 @@ XS_unpack_UA_CallMethodResult(SV *in)
 	svp = hv_fetchs(hv, "CallMethodResult_outputArguments", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CallMethodResult_outputArguments not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CallMethodResult_outputArguments");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.outputArguments = calloc(top + 1, sizeof(UA_Variant));
 		if (out.outputArguments == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -7953,7 +7953,7 @@ XS_unpack_UA_CallRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CallRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -7965,13 +7965,13 @@ XS_unpack_UA_CallRequest(SV *in)
 	svp = hv_fetchs(hv, "CallRequest_methodsToCall", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CallRequest_methodsToCall not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CallRequest_methodsToCall");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.methodsToCall = calloc(top + 1, sizeof(UA_CallMethodRequest));
 		if (out.methodsToCall == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8034,7 +8034,7 @@ XS_unpack_UA_CallResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CallResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8046,13 +8046,13 @@ XS_unpack_UA_CallResponse(SV *in)
 	svp = hv_fetchs(hv, "CallResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CallResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CallResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_CallMethodResult));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8066,13 +8066,13 @@ XS_unpack_UA_CallResponse(SV *in)
 	svp = hv_fetchs(hv, "CallResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CallResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CallResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8172,7 +8172,7 @@ XS_unpack_UA_DataChangeFilter(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DataChangeFilter_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8232,7 +8232,7 @@ XS_unpack_UA_EventFilter(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_EventFilter_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8240,13 +8240,13 @@ XS_unpack_UA_EventFilter(SV *in)
 	svp = hv_fetchs(hv, "EventFilter_selectClauses", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: EventFilter_selectClauses not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for EventFilter_selectClauses");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.selectClauses = calloc(top + 1, sizeof(UA_SimpleAttributeOperand));
 		if (out.selectClauses == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8307,7 +8307,7 @@ XS_unpack_UA_AggregateConfiguration(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_AggregateConfiguration_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8374,7 +8374,7 @@ XS_unpack_UA_AggregateFilter(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_AggregateFilter_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8447,7 +8447,7 @@ XS_unpack_UA_EventFilterResult(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_EventFilterResult_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8455,13 +8455,13 @@ XS_unpack_UA_EventFilterResult(SV *in)
 	svp = hv_fetchs(hv, "EventFilterResult_selectClauseResults", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: EventFilterResult_selectClauseResults not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for EventFilterResult_selectClauseResults");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.selectClauseResults = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.selectClauseResults == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8475,13 +8475,13 @@ XS_unpack_UA_EventFilterResult(SV *in)
 	svp = hv_fetchs(hv, "EventFilterResult_selectClauseDiagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: EventFilterResult_selectClauseDiagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for EventFilterResult_selectClauseDiagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.selectClauseDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.selectClauseDiagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8542,7 +8542,7 @@ XS_unpack_UA_MonitoringParameters(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_MonitoringParameters_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8605,7 +8605,7 @@ XS_unpack_UA_MonitoredItemCreateRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_MonitoredItemCreateRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8668,7 +8668,7 @@ XS_unpack_UA_MonitoredItemCreateResult(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_MonitoredItemCreateResult_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8744,7 +8744,7 @@ XS_unpack_UA_CreateMonitoredItemsRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CreateMonitoredItemsRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8764,13 +8764,13 @@ XS_unpack_UA_CreateMonitoredItemsRequest(SV *in)
 	svp = hv_fetchs(hv, "CreateMonitoredItemsRequest_itemsToCreate", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CreateMonitoredItemsRequest_itemsToCreate not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CreateMonitoredItemsRequest_itemsToCreate");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.itemsToCreate = calloc(top + 1, sizeof(UA_MonitoredItemCreateRequest));
 		if (out.itemsToCreate == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8833,7 +8833,7 @@ XS_unpack_UA_CreateMonitoredItemsResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CreateMonitoredItemsResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8845,13 +8845,13 @@ XS_unpack_UA_CreateMonitoredItemsResponse(SV *in)
 	svp = hv_fetchs(hv, "CreateMonitoredItemsResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CreateMonitoredItemsResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CreateMonitoredItemsResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_MonitoredItemCreateResult));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8865,13 +8865,13 @@ XS_unpack_UA_CreateMonitoredItemsResponse(SV *in)
 	svp = hv_fetchs(hv, "CreateMonitoredItemsResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: CreateMonitoredItemsResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for CreateMonitoredItemsResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -8916,7 +8916,7 @@ XS_unpack_UA_MonitoredItemModifyRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_MonitoredItemModifyRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -8971,7 +8971,7 @@ XS_unpack_UA_MonitoredItemModifyResult(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_MonitoredItemModifyResult_init(&out);
 	hv = (HV*)SvRV(in);
@@ -9043,7 +9043,7 @@ XS_unpack_UA_ModifyMonitoredItemsRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ModifyMonitoredItemsRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -9063,13 +9063,13 @@ XS_unpack_UA_ModifyMonitoredItemsRequest(SV *in)
 	svp = hv_fetchs(hv, "ModifyMonitoredItemsRequest_itemsToModify", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ModifyMonitoredItemsRequest_itemsToModify not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ModifyMonitoredItemsRequest_itemsToModify");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.itemsToModify = calloc(top + 1, sizeof(UA_MonitoredItemModifyRequest));
 		if (out.itemsToModify == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9132,7 +9132,7 @@ XS_unpack_UA_ModifyMonitoredItemsResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ModifyMonitoredItemsResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -9144,13 +9144,13 @@ XS_unpack_UA_ModifyMonitoredItemsResponse(SV *in)
 	svp = hv_fetchs(hv, "ModifyMonitoredItemsResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ModifyMonitoredItemsResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ModifyMonitoredItemsResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_MonitoredItemModifyResult));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9164,13 +9164,13 @@ XS_unpack_UA_ModifyMonitoredItemsResponse(SV *in)
 	svp = hv_fetchs(hv, "ModifyMonitoredItemsResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: ModifyMonitoredItemsResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for ModifyMonitoredItemsResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9232,7 +9232,7 @@ XS_unpack_UA_SetMonitoringModeRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_SetMonitoringModeRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -9252,13 +9252,13 @@ XS_unpack_UA_SetMonitoringModeRequest(SV *in)
 	svp = hv_fetchs(hv, "SetMonitoringModeRequest_monitoredItemIds", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetMonitoringModeRequest_monitoredItemIds not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetMonitoringModeRequest_monitoredItemIds");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.monitoredItemIds = calloc(top + 1, sizeof(UA_UInt32));
 		if (out.monitoredItemIds == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9321,7 +9321,7 @@ XS_unpack_UA_SetMonitoringModeResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_SetMonitoringModeResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -9333,13 +9333,13 @@ XS_unpack_UA_SetMonitoringModeResponse(SV *in)
 	svp = hv_fetchs(hv, "SetMonitoringModeResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetMonitoringModeResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetMonitoringModeResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9353,13 +9353,13 @@ XS_unpack_UA_SetMonitoringModeResponse(SV *in)
 	svp = hv_fetchs(hv, "SetMonitoringModeResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetMonitoringModeResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetMonitoringModeResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9430,7 +9430,7 @@ XS_unpack_UA_SetTriggeringRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_SetTriggeringRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -9450,13 +9450,13 @@ XS_unpack_UA_SetTriggeringRequest(SV *in)
 	svp = hv_fetchs(hv, "SetTriggeringRequest_linksToAdd", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetTriggeringRequest_linksToAdd not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetTriggeringRequest_linksToAdd");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.linksToAdd = calloc(top + 1, sizeof(UA_UInt32));
 		if (out.linksToAdd == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9470,13 +9470,13 @@ XS_unpack_UA_SetTriggeringRequest(SV *in)
 	svp = hv_fetchs(hv, "SetTriggeringRequest_linksToRemove", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetTriggeringRequest_linksToRemove not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetTriggeringRequest_linksToRemove");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.linksToRemove = calloc(top + 1, sizeof(UA_UInt32));
 		if (out.linksToRemove == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9557,7 +9557,7 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_SetTriggeringResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -9569,13 +9569,13 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 	svp = hv_fetchs(hv, "SetTriggeringResponse_addResults", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetTriggeringResponse_addResults not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetTriggeringResponse_addResults");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.addResults = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.addResults == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9589,13 +9589,13 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 	svp = hv_fetchs(hv, "SetTriggeringResponse_addDiagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetTriggeringResponse_addDiagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetTriggeringResponse_addDiagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.addDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.addDiagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9609,13 +9609,13 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 	svp = hv_fetchs(hv, "SetTriggeringResponse_removeResults", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetTriggeringResponse_removeResults not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetTriggeringResponse_removeResults");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.removeResults = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.removeResults == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9629,13 +9629,13 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 	svp = hv_fetchs(hv, "SetTriggeringResponse_removeDiagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetTriggeringResponse_removeDiagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetTriggeringResponse_removeDiagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.removeDiagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.removeDiagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9693,7 +9693,7 @@ XS_unpack_UA_DeleteMonitoredItemsRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DeleteMonitoredItemsRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -9709,13 +9709,13 @@ XS_unpack_UA_DeleteMonitoredItemsRequest(SV *in)
 	svp = hv_fetchs(hv, "DeleteMonitoredItemsRequest_monitoredItemIds", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteMonitoredItemsRequest_monitoredItemIds not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteMonitoredItemsRequest_monitoredItemIds");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.monitoredItemIds = calloc(top + 1, sizeof(UA_UInt32));
 		if (out.monitoredItemIds == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9778,7 +9778,7 @@ XS_unpack_UA_DeleteMonitoredItemsResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DeleteMonitoredItemsResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -9790,13 +9790,13 @@ XS_unpack_UA_DeleteMonitoredItemsResponse(SV *in)
 	svp = hv_fetchs(hv, "DeleteMonitoredItemsResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteMonitoredItemsResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteMonitoredItemsResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9810,13 +9810,13 @@ XS_unpack_UA_DeleteMonitoredItemsResponse(SV *in)
 	svp = hv_fetchs(hv, "DeleteMonitoredItemsResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteMonitoredItemsResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteMonitoredItemsResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -9881,7 +9881,7 @@ XS_unpack_UA_CreateSubscriptionRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CreateSubscriptionRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -9960,7 +9960,7 @@ XS_unpack_UA_CreateSubscriptionResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_CreateSubscriptionResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10039,7 +10039,7 @@ XS_unpack_UA_ModifySubscriptionRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ModifySubscriptionRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10114,7 +10114,7 @@ XS_unpack_UA_ModifySubscriptionResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ModifySubscriptionResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10182,7 +10182,7 @@ XS_unpack_UA_SetPublishingModeRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_SetPublishingModeRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10198,13 +10198,13 @@ XS_unpack_UA_SetPublishingModeRequest(SV *in)
 	svp = hv_fetchs(hv, "SetPublishingModeRequest_subscriptionIds", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetPublishingModeRequest_subscriptionIds not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetPublishingModeRequest_subscriptionIds");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.subscriptionIds = calloc(top + 1, sizeof(UA_UInt32));
 		if (out.subscriptionIds == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10267,7 +10267,7 @@ XS_unpack_UA_SetPublishingModeResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_SetPublishingModeResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10279,13 +10279,13 @@ XS_unpack_UA_SetPublishingModeResponse(SV *in)
 	svp = hv_fetchs(hv, "SetPublishingModeResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetPublishingModeResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetPublishingModeResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10299,13 +10299,13 @@ XS_unpack_UA_SetPublishingModeResponse(SV *in)
 	svp = hv_fetchs(hv, "SetPublishingModeResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: SetPublishingModeResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for SetPublishingModeResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10363,7 +10363,7 @@ XS_unpack_UA_NotificationMessage(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_NotificationMessage_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10379,13 +10379,13 @@ XS_unpack_UA_NotificationMessage(SV *in)
 	svp = hv_fetchs(hv, "NotificationMessage_notificationData", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: NotificationMessage_notificationData not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for NotificationMessage_notificationData");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.notificationData = calloc(top + 1, sizeof(UA_ExtensionObject));
 		if (out.notificationData == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10430,7 +10430,7 @@ XS_unpack_UA_MonitoredItemNotification(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_MonitoredItemNotification_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10486,7 +10486,7 @@ XS_unpack_UA_EventFieldList(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_EventFieldList_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10498,13 +10498,13 @@ XS_unpack_UA_EventFieldList(SV *in)
 	svp = hv_fetchs(hv, "EventFieldList_eventFields", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: EventFieldList_eventFields not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for EventFieldList_eventFields");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.eventFields = calloc(top + 1, sizeof(UA_Variant));
 		if (out.eventFields == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10549,7 +10549,7 @@ XS_unpack_UA_StatusChangeNotification(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_StatusChangeNotification_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10596,7 +10596,7 @@ XS_unpack_UA_SubscriptionAcknowledgement(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_SubscriptionAcknowledgement_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10652,7 +10652,7 @@ XS_unpack_UA_PublishRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_PublishRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10664,13 +10664,13 @@ XS_unpack_UA_PublishRequest(SV *in)
 	svp = hv_fetchs(hv, "PublishRequest_subscriptionAcknowledgements", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: PublishRequest_subscriptionAcknowledgements not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for PublishRequest_subscriptionAcknowledgements");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.subscriptionAcknowledgements = calloc(top + 1, sizeof(UA_SubscriptionAcknowledgement));
 		if (out.subscriptionAcknowledgements == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10754,7 +10754,7 @@ XS_unpack_UA_PublishResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_PublishResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10770,13 +10770,13 @@ XS_unpack_UA_PublishResponse(SV *in)
 	svp = hv_fetchs(hv, "PublishResponse_availableSequenceNumbers", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: PublishResponse_availableSequenceNumbers not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for PublishResponse_availableSequenceNumbers");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.availableSequenceNumbers = calloc(top + 1, sizeof(UA_UInt32));
 		if (out.availableSequenceNumbers == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10798,13 +10798,13 @@ XS_unpack_UA_PublishResponse(SV *in)
 	svp = hv_fetchs(hv, "PublishResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: PublishResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for PublishResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10818,13 +10818,13 @@ XS_unpack_UA_PublishResponse(SV *in)
 	svp = hv_fetchs(hv, "PublishResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: PublishResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for PublishResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -10873,7 +10873,7 @@ XS_unpack_UA_RepublishRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RepublishRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10924,7 +10924,7 @@ XS_unpack_UA_RepublishResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_RepublishResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10980,7 +10980,7 @@ XS_unpack_UA_DeleteSubscriptionsRequest(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DeleteSubscriptionsRequest_init(&out);
 	hv = (HV*)SvRV(in);
@@ -10992,13 +10992,13 @@ XS_unpack_UA_DeleteSubscriptionsRequest(SV *in)
 	svp = hv_fetchs(hv, "DeleteSubscriptionsRequest_subscriptionIds", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteSubscriptionsRequest_subscriptionIds not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteSubscriptionsRequest_subscriptionIds");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.subscriptionIds = calloc(top + 1, sizeof(UA_UInt32));
 		if (out.subscriptionIds == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -11061,7 +11061,7 @@ XS_unpack_UA_DeleteSubscriptionsResponse(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DeleteSubscriptionsResponse_init(&out);
 	hv = (HV*)SvRV(in);
@@ -11073,13 +11073,13 @@ XS_unpack_UA_DeleteSubscriptionsResponse(SV *in)
 	svp = hv_fetchs(hv, "DeleteSubscriptionsResponse_results", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteSubscriptionsResponse_results not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteSubscriptionsResponse_results");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.results = calloc(top + 1, sizeof(UA_StatusCode));
 		if (out.results == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -11093,13 +11093,13 @@ XS_unpack_UA_DeleteSubscriptionsResponse(SV *in)
 	svp = hv_fetchs(hv, "DeleteSubscriptionsResponse_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DeleteSubscriptionsResponse_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DeleteSubscriptionsResponse_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -11160,7 +11160,7 @@ XS_unpack_UA_BuildInfo(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_BuildInfo_init(&out);
 	hv = (HV*)SvRV(in);
@@ -11297,7 +11297,7 @@ XS_unpack_UA_ServerDiagnosticsSummaryDataType(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ServerDiagnosticsSummaryDataType_init(&out);
 	hv = (HV*)SvRV(in);
@@ -11400,7 +11400,7 @@ XS_unpack_UA_ServerStatusDataType(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ServerStatusDataType_init(&out);
 	hv = (HV*)SvRV(in);
@@ -11463,7 +11463,7 @@ XS_unpack_UA_Range(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_Range_init(&out);
 	hv = (HV*)SvRV(in);
@@ -11524,7 +11524,7 @@ XS_unpack_UA_DataChangeNotification(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DataChangeNotification_init(&out);
 	hv = (HV*)SvRV(in);
@@ -11532,13 +11532,13 @@ XS_unpack_UA_DataChangeNotification(SV *in)
 	svp = hv_fetchs(hv, "DataChangeNotification_monitoredItems", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DataChangeNotification_monitoredItems not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DataChangeNotification_monitoredItems");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.monitoredItems = calloc(top + 1, sizeof(UA_MonitoredItemNotification));
 		if (out.monitoredItems == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -11552,13 +11552,13 @@ XS_unpack_UA_DataChangeNotification(SV *in)
 	svp = hv_fetchs(hv, "DataChangeNotification_diagnosticInfos", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: DataChangeNotification_diagnosticInfos not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for DataChangeNotification_diagnosticInfos");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.diagnosticInfos = calloc(top + 1, sizeof(UA_DiagnosticInfo));
 		if (out.diagnosticInfos == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
@@ -11608,7 +11608,7 @@ XS_unpack_UA_EventNotificationList(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_EventNotificationList_init(&out);
 	hv = (HV*)SvRV(in);
@@ -11616,13 +11616,13 @@ XS_unpack_UA_EventNotificationList(SV *in)
 	svp = hv_fetchs(hv, "EventNotificationList_events", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-			croak("%s: EventNotificationList_events not an ARRAY reference", __func__);
+			CROAK("No ARRAY reference for EventNotificationList_events");
 		}
 		av = (AV*)SvRV(*svp);
 		top = av_top_index(av);
 		out.events = calloc(top + 1, sizeof(UA_EventFieldList));
 		if (out.events == NULL) {
-			croak("%s: calloc", __func__);
+			CROAKE("calloc");
 		}
 		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);

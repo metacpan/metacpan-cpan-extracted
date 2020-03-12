@@ -25,6 +25,9 @@ severity = 2
 [InputOutput::ProhibitBacktickOperators]
 [InputOutput::ProhibitBarewordFileHandles]
 [InputOutput::ProhibitTwoArgOpen]
+severity = 3
+[InputOutput::RequireBriefOpen]
+severity = 2
 [InputOutput::RequireCheckedClose]
 [InputOutput::RequireCheckedOpen]
 [InputOutput::RequireCheckedSyscalls]
@@ -35,8 +38,12 @@ severity = 2
 [Modules::RequireNoMatchVarsWithUseEnglish]
 [NamingConventions::ProhibitAmbiguousNames]
 [RegularExpressions::ProhibitCaptureWithoutTest]
-[Subroutines::ProhibitExplicitReturnUndef]
+severity = 3
+[RegularExpressions::RequireExtendedFormatting]
 severity = 2
+[Subroutines::ProhibitExcessComplexity]
+severity = 2
+[Subroutines::ProhibitExplicitReturnUndef]
 [Subroutines::ProhibitNestedSubs]
 [Subroutines::RequireArgUnpacking]
 severity = 2
@@ -44,6 +51,7 @@ severity = 2
 [Subroutines::RequireFinalReturn]
 severity = 2
 [TestingAndDebugging::RequireUseStrict]
+[TestingAndDebugging::RequireUseWarnings]
 [ValuesAndExpressions::ProhibitMixedBooleanOperators]
 severity = 2
 [ValuesAndExpressions::RequireQuotedHeredocTerminator]
@@ -52,5 +60,3 @@ severity = 2
 [Variables::ProhibitConditionalDeclarations]
 
 #[Modules::ProhibitExcessMainComplexity]
-#[Subroutines::ProhibitExcessComplexity]
-#[TestingAndDebugging::RequireUseWarnings]

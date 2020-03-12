@@ -4,7 +4,7 @@
       "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "bsd"
    ],
@@ -40,11 +40,11 @@
    "provides" : {
       "Math::SlideRule" : {
          "file" : "lib/Math/SlideRule.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "Math::SlideRule::PickettPocket" : {
          "file" : "lib/Math/SlideRule/PickettPocket.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "url" : "https://github.com/thrig/Math-SlideRule"
       }
    },
-   "version" : "1.09",
+   "version" : "1.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

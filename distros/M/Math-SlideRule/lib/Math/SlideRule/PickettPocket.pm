@@ -14,7 +14,7 @@ use Scalar::Util qw/looks_like_number/;
 
 extends 'Math::SlideRule';
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 ########################################################################
 #

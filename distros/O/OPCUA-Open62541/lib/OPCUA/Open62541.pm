@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent 'Exporter';
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 my @types = qw(
     TYPES_BOOLEAN
@@ -705,6 +705,41 @@ magically.
 =over 4
 
 =item $status_code = $client_config->setDefault()
+
+=back
+
+=head3 Logger
+
+The Logger can either be a standalone object or use the embedded
+logger of a sever config.  In the latter case the life time is
+entangled with the config.  It contains Perl callbacks to the log
+and clear functions.  The log funtions are exported to Perl.
+
+=over 4
+
+=item $logger = OPCUA::Open62541::Logger->new()
+
+=item $logger->setCallback($log, $context, $clear);
+
+=over 8
+
+=item $log = sub { my ($context, $level, $category, $message) = @_ }
+
+=item $clear = sub { my ($context) = @_ }
+
+=back
+
+=item $logger->logTrace($category, $msg, ...);
+
+=item $logger->logDebug($category, $msg, ...);
+
+=item $logger->logInfo($category, $msg, ...);
+
+=item $logger->logWarning($category, $msg, ...);
+
+=item $logger->logError($category, $msg, ...);
+
+=item $logger->logFatal($category, $msg, ...);
 
 =back
 

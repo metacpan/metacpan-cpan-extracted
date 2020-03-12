@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.527   2020-03-12
+        - Term::Choose::Util minimum version is "0.117".
+
 0.526   2020-03-08
         - Adapt the code to the updated Term::Choose.
 

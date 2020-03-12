@@ -4,7 +4,7 @@
       "Thibault DUPONCHELLE <thibault.duponchelle@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.7",
+   "generated_by" : "Minilla/v3.1.9",
    "license" : [
       "perl_5"
    ],
@@ -54,7 +54,7 @@
    "provides" : {
       "Acme::LSD" : {
          "file" : "lib/Acme/LSD.pm",
-         "version" : "0.01"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/thibaultduponchelle/Acme-LSD"
       }
    },
-   "version" : "0.01",
+   "version" : "0.04",
    "x_contributors" : [
       "Thibault DUPONCHELLE <thibault.duponchelle@amadeus.com>",
       "thibaultduponchelle <580360+thibaultduponchelle@users.noreply.github.com>"

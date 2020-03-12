@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.117   2020-03-12
+        - List::Util::any requires List::Util minimum version '1.33'.
+
 0.116   2020-03-11
         - Update experimental option 'solo'.
 

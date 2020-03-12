@@ -40,10 +40,10 @@ WriteMakefile(
         'Carp'                    => 0,
         'Data::Dumper'            => 0,
         'Exporter'                => 0,
-        'List::Util'              => 0,
+        'List::Util'              => '1.33',
         'Scalar::Util'            => 0,
         'Term::Choose'            => '1.710',
-        'Term::Choose::Util'      => '0.114',
+        'Term::Choose::Util'      => '0.117',
         %prereqs_os_specific,
     },
     dist  => {

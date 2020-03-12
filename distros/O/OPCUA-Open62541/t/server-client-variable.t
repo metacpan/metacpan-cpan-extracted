@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use OPCUA::Open62541 ':all';
-use POSIX qw(sigaction SIGALRM);
 
 use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
@@ -57,10 +56,10 @@ is($server->{server}->addVariableNode(\%requestedNewNodeId, \%parentNodeId,
     undef), STATUSCODE_GOOD, "server add variable node");
 
 $server->start();
-my $port = $server->port();
-
-my $client = OPCUA::Open62541::Test::Client->new(port => $port);
+my $client = OPCUA::Open62541::Test::Client->new(port => $server->port());
 $client->start();
+$server->run();
+$client->run();
 
 my $out;
 

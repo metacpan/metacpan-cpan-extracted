@@ -1,5 +1,5 @@
 package Net::Stripe::Refund;
-$Net::Stripe::Refund::VERSION = '0.39';
+$Net::Stripe::Refund::VERSION = '0.41';
 use Moose;
 use Kavorka;
 extends 'Net::Stripe::Resource';
@@ -31,11 +31,8 @@ has 'description'         => (
 has 'refund_application_fee' => (is => 'ro', isa => 'Maybe[Bool|Object]');
 
 method form_fields {
-    return (
-        $self->form_fields_for_metadata(),
-        map { $_ => $self->$_ }
-            grep { defined $self->$_ }
-                qw/amount refund_application_fee reason/
+    return $self->form_fields_for(
+        qw/amount refund_application_fee reason metadata/
     );
 }
 
@@ -52,7 +49,87 @@ Net::Stripe::Refund - represent a Refund object from Stripe
 
 =head1 VERSION
 
-version 0.39
+version 0.41
+
+=head1 ATTRIBUTES
+
+=head2 amount
+
+Reader: amount
+
+Type: Maybe[Int]
+
+=head2 balance_transaction
+
+Reader: balance_transaction
+
+Type: Maybe[Str]
+
+=head2 boolean_attributes
+
+Reader: boolean_attributes
+
+Type: ArrayRef[Str]
+
+=head2 charge
+
+Reader: charge
+
+Type: Maybe[Str]
+
+=head2 created
+
+Reader: created
+
+Type: Maybe[Int]
+
+=head2 currency
+
+Reader: currency
+
+Type: Maybe[Str]
+
+=head2 description
+
+Reader: description
+
+Type: Maybe[Str]
+
+=head2 id
+
+Reader: id
+
+Type: Maybe[Str]
+
+=head2 metadata
+
+Reader: metadata
+
+Type: Maybe[HashRef]
+
+=head2 reason
+
+Reader: reason
+
+Type: Maybe[Str]
+
+=head2 receipt_number
+
+Reader: receipt_number
+
+Type: Maybe[Str]
+
+=head2 refund_application_fee
+
+Reader: refund_application_fee
+
+Type: Maybe[Bool|Object]
+
+=head2 status
+
+Reader: status
+
+Type: Maybe[Str]
 
 =head1 AUTHORS
 

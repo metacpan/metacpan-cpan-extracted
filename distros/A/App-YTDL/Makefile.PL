@@ -63,8 +63,8 @@ WriteMakefile(
         'Term::ANSIScreen'          => 0,
         'Term::Choose'              => '1.710',
         'Term::Choose::LineFold'    => '1.710',
-        'Term::Choose::Util'        => '0.114',
-        'Term::Form'                => '0.526',
+        'Term::Choose::Util'        => '0.117',
+        'Term::Form'                => '0.527',
         %prereqs_os_specific,
     },
     dist  => {

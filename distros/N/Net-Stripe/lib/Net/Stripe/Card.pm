@@ -1,5 +1,5 @@
 package Net::Stripe::Card;
-$Net::Stripe::Card::VERSION = '0.39';
+$Net::Stripe::Card::VERSION = '0.41';
 use Moose;
 use Kavorka;
 use Net::Stripe::Token;
@@ -16,7 +16,7 @@ has 'address_zip'     => (is => 'ro', isa => 'Maybe[Str]');
 has 'address_city'    => (is => 'ro', isa => 'Maybe[Str]');
 has 'address_state'   => (is => 'ro', isa => 'Maybe[Str]');
 has 'address_country' => (is => 'ro', isa => 'Maybe[Str]');
-has 'metadata'        => (is => 'rw', isa => 'Maybe[HashRef]');
+has 'metadata'        => (is => 'ro', isa => 'Maybe[HashRef]');
 
 # Both input and output
 has 'exp_month'       => (is => 'ro', isa => 'Maybe[Int]', required => 1);
@@ -65,7 +65,133 @@ Net::Stripe::Card - represent a Card object from Stripe
 
 =head1 VERSION
 
-version 0.39
+version 0.41
+
+=head1 ATTRIBUTES
+
+=head2 address_city
+
+Reader: address_city
+
+Type: Maybe[Str]
+
+=head2 address_country
+
+Reader: address_country
+
+Type: Maybe[Str]
+
+=head2 address_line1
+
+Reader: address_line1
+
+Type: Maybe[Str]
+
+=head2 address_line1_check
+
+Reader: address_line1_check
+
+Type: Maybe[Str]
+
+=head2 address_line2
+
+Reader: address_line2
+
+Type: Maybe[Str]
+
+=head2 address_state
+
+Reader: address_state
+
+Type: Maybe[Str]
+
+=head2 address_zip
+
+Reader: address_zip
+
+Type: Maybe[Str]
+
+=head2 address_zip_check
+
+Reader: address_zip_check
+
+Type: Maybe[Str]
+
+=head2 brand
+
+Reader: brand
+
+Type: Maybe[Str]
+
+=head2 country
+
+Reader: country
+
+Type: Maybe[Str]
+
+=head2 cvc
+
+Reader: cvc
+
+Type: Maybe[Int]
+
+=head2 cvc_check
+
+Reader: cvc_check
+
+Type: Maybe[Str]
+
+=head2 exp_month
+
+Reader: exp_month
+
+Type: Maybe[Int]
+
+This attribute is required.
+
+=head2 exp_year
+
+Reader: exp_year
+
+Type: Maybe[Int]
+
+This attribute is required.
+
+=head2 fingerprint
+
+Reader: fingerprint
+
+Type: Maybe[Str]
+
+=head2 id
+
+Reader: id
+
+Type: Maybe[Str]
+
+=head2 last4
+
+Reader: last4
+
+Type: Maybe[Str]
+
+=head2 metadata
+
+Reader: metadata
+
+Type: Maybe[HashRef]
+
+=head2 name
+
+Reader: name
+
+Type: Maybe[Str]
+
+=head2 number
+
+Reader: number
+
+Type: Maybe[Str]
 
 =head1 AUTHORS
 

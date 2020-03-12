@@ -1,6 +1,9 @@
 Revision history for Math-SlideRule. Notable things I remember to put here,
 anyways. The git log may be more informative?
 
+1.10    Still March 2020
+        Update pod tests.
+
 1.09    Also March 2020
         "Fix" more floating point rounding errors with sprintf. Switch
         to Module::Build.

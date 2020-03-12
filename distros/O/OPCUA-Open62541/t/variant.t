@@ -2,47 +2,64 @@ use strict;
 use warnings;
 use OPCUA::Open62541 qw(:type :limit);
 
-use Test::More tests => 75;
+use Test::More tests => 84;
+use Test::Exception;
 use Test::LeakTrace;
 use Test::NoWarnings;
 use Test::Warn;
 
-no_leaks_ok {
-    my $variant = OPCUA::Open62541::Variant->new();
-} "leak variant new";
-
-my $variant = OPCUA::Open62541::Variant->new();
-ok($variant, "variant new");
+ok(my $variant = OPCUA::Open62541::Variant->new(), "variant new");
+no_leaks_ok { OPCUA::Open62541::Variant->new() } "variant new leak";
 ok($variant->isEmpty(), "variant empty");
 ok(!$variant->isScalar(), "variant not scalar");
 ok(!defined($variant->getType()), "type undef");
 ok(!defined($variant->getScalar()), "scalar undef");
 
-$variant->setScalar(1, TYPES_SBYTE);
+no_leaks_ok { $variant->setScalar(1, TYPES_SBYTE) } "scalar set leak";
 ok(!$variant->isEmpty(), "variant not empty");
+no_leaks_ok { $variant->isEmpty() } "empty leak";
 ok($variant->isScalar(), "variant scalar");
+no_leaks_ok { $variant->isScalar() } "scalar leak";
 ok(defined($variant->getType()), "type defined");
+no_leaks_ok { $variant->getType() } "type get leak";
 ok(defined($variant->getScalar()), "scalar defined");
+no_leaks_ok { $variant->getScalar() } "scalar get leak";
 
 warnings_like { $variant->setScalar(undef, TYPES_SBYTE) }
     (qr/Use of uninitialized value in subroutine entry/, "value undef warn");
+no_leaks_ok {
+    no warnings 'uninitialized';
+    $variant->setScalar(undef, TYPES_SBYTE);
+} "value undef leak";
 
 warnings_like { $variant->setScalar(1, undef) }
     (qr/Use of uninitialized value in subroutine entry/, "type undef warn");
+no_leaks_ok {
+    no warnings 'uninitialized';
+    $variant->setScalar(1, undef)
+} "type undef leak";
 
 warnings_like { $variant->setScalar("", TYPES_SBYTE) }
     (qr/Argument "" isn't numeric in subroutine entry/, "value string warn");
+no_leaks_ok {
+    no warnings 'numeric';
+    $variant->setScalar("", TYPES_SBYTE);
+} "value string leak";
 
 warnings_like { $variant->setScalar(1, "") }
     (qr/Argument "" isn't numeric in subroutine entry/, "type string warn");
+no_leaks_ok {
+    no warnings 'numeric';
+     $variant->setScalar(1, "")
+} "type string leak";
 
 eval { $variant->setScalar("", OPCUA::Open62541::TYPES_COUNT) };
 ok($@, "scalar TYPES_COUNT");
 like($@, qr/Unsigned value .* not below UA_TYPES_COUNT /, "not below COUNT");
 
-eval { $variant->setScalar("", -1) };
-ok($@, "scalar type -1");
-like($@, qr/Unsigned value .* not below UA_TYPES_COUNT /, "not below -1");
+throws_ok { $variant->setScalar("", -1) }
+    (qr/Unsigned value .* not below UA_TYPES_COUNT /, "scalar type -1");
+no_leaks_ok { eval { $variant->setScalar("", -1) } } "scalar type -1 leak";
 
 $variant->setScalar(TRUE, TYPES_BOOLEAN);
 is($variant->getScalar(), 1, "scalar TYPES_BOOLEAN TRUE");

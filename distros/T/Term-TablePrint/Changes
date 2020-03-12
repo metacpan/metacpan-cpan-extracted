@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.122   2020-03-12
+        - Term::Choose::Util minimum version 0.117.
+
 0.121   2020-03-08
         - Adapt the code to the updated Term::Choose.
 

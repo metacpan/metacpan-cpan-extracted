@@ -1,44 +1,104 @@
-package OPCUA::Open62541::Test::Client;
-
 use strict;
 use warnings;
-use OPCUA::Open62541 ':statuscode';
+
+package OPCUA::Open62541::Test::Client;
+use OPCUA::Open62541::Test::Logger;
+use OPCUA::Open62541 qw(:statuscode :clientstate);
+use Carp 'croak';
+use Time::HiRes qw(sleep);
 
 use Test::More;
 
 sub planning {
     # number of ok() and is() calls in this code
-    return 5;
+    return OPCUA::Open62541::Test::Logger::planning() + 11;
 }
 
 sub new {
     my $class = shift;
-    my %args = @_;
-    my $self = {};
-    $self->{port} = $args{port};
-    $self->{timeout} = $args{timeout} || 10;
+    my $self = { @_ };
+    $self->{port}
+	or croak "no port given";
+    $self->{timeout} ||= 10;
 
-    ok($self->{client} = OPCUA::Open62541::Client->new(), "client new");
-    ok($self->{config} = $self->{client}->getConfig(), "client get config");
-    is($self->{config}->setDefault(), "Good", "client config set default");
+    ok($self->{client} = OPCUA::Open62541::Client->new(), "client: new");
+    ok($self->{config} = $self->{client}->getConfig(), "client: get config");
 
     return bless($self, $class);
 }
 
-sub start {
-    my $self = shift;
+sub url {
+    my OPCUA::Open62541::Test::Client $self = shift;
+    $self->{url} = shift if @_;
+    return $self->{url};
+}
 
-    my $url = "opc.tcp://localhost";
-    $url .= ":$self->{port}" if $self->{port};
-    note("going to connect client");
-    is($self->{client}->connect($url), STATUSCODE_GOOD, "client connect");
+sub start {
+    my OPCUA::Open62541::Test::Client $self = shift;
+
+    is($self->{config}->setDefault(), "Good", "client: set default config");
+    $self->{url} = "opc.tcp://localhost";
+    $self->{url} .= ":$self->{port}" if $self->{port};
+
+    ok($self->{logger} = $self->{config}->getLogger(), "client: get logger");
+    ok($self->{log} = OPCUA::Open62541::Test::Logger->new(
+	logger => $self->{logger},
+	ident => "OPC UA client",
+    ), "client: test logger");
+    ok($self->{log}->file("client.log"), "client: log file");
+
+    return $self;
+}
+
+sub run {
+    my OPCUA::Open62541::Test::Client $self = shift;
+
+    note("going to connect client to url $self->{url}");
+    is($self->{client}->connect($self->{url}), STATUSCODE_GOOD,
+	"client: connect");
+    is($self->{client}->getState(), CLIENTSTATE_SESSION,
+	"client: state session");
+    # check client did connect(2)
+    ok($self->{log}->loggrep(qr/TCP connection established/, 5),
+	"client: log grep connected");
+
+    return $self;
+}
+
+sub iterate {
+    my OPCUA::Open62541::Test::Client $self = shift;
+
+    my ($end, $ident) = @_;
+    my $i;
+    # loop should not take longer than 5 seconds
+    for ($i = 50; $i > 0; $i--) {
+	my $sc = $self->{client}->run_iterate(0);
+	if ($sc != STATUSCODE_GOOD) {
+	    fail "client: $ident iterate" or diag "run_iterate failed: $sc"
+		if $ident;
+	    last;
+	}
+	if ($$end) {
+	    pass "client: $ident iterate" if $ident;
+	    last;
+	}
+	note "client: $ident iteration $i" if $ident;
+	sleep .1;
+    }
+    if ($i == 0) {
+	fail "client: $ident iterate" or diag "loop timeout" if $ident;
+    }
 }
 
 sub stop {
-    my $self = shift;
+    my OPCUA::Open62541::Test::Client $self = shift;
 
     note("going to disconnect client");
-    is($self->{client}->disconnect(), STATUSCODE_GOOD, "client disconnect");
+    is($self->{client}->disconnect(), STATUSCODE_GOOD, "client: disconnect");
+    is($self->{client}->getState, CLIENTSTATE_DISCONNECTED,
+	"client: state disconnected");
+
+    return $self;
 }
 
 1;
@@ -85,7 +145,7 @@ Create a new test client instance.
 
 =item $args{port}
 
-Port number of the server.
+Required port number of the server.
 
 =item $args{timeout}
 
@@ -94,9 +154,30 @@ Defaults to 10 seconds.
 
 =back
 
+=item $client->url($url)
+
+Optionally set the url.
+Returns the url created from localhost and port.
+Must be called after start() for that.
+
 =item $client->start()
 
+Configure the client.
+
+=item $client->run()
+
 Connect the client to the open62541 server.
+
+=item $client->iterate(\$end, $ident)
+
+Run the iterate function of the client for up to 5 seconds.
+This has to be done to complete asynchronous calls.
+The scalar reference to $end is used to finish the iteration loop
+successfully when set to true in a callback.
+Otherwise the loop terminates with failure if the status of client
+run_iterate() is not good or after calling it 50 times.
+If $ident is set, it is used to identify a passed or failed test.
+This one test is not included in planning().
 
 =item $client->stop()
 
@@ -107,7 +188,8 @@ Disconnect the client from the open62541 server.
 =head1 SEE ALSO
 
 OPCUA::Open62541,
-OPCUA::Open62541::Test::Server
+OPCUA::Open62541::Test::Server,
+OPCUA::Open62541::Test::Logger
 
 =head1 AUTHORS
 

@@ -27,13 +27,95 @@
 
 //#define DEBUG
 #ifdef DEBUG
-# define DPRINTF(format, args...)					\
-	do {								\
-		fprintf(stderr, "%s: " format "\n", __func__, ##args);	\
-	} while (0)
+# define DPRINTF(fmt, args...)						\
+	fprintf(stderr, "%s: " fmt "\n", __func__, ##args)
 #else
-# define DPRINTF(format, x...)
+# define DPRINTF(fmt, x...)
 #endif
+
+static void croak_func(const char *, char *, ...)
+    __attribute__noreturn__
+    __attribute__format__null_ok__(__printf__,2,3);
+static void croak_errno(const char *, char *, ...)
+    __attribute__noreturn__
+    __attribute__format__null_ok__(__printf__,2,3);
+static void croak_status(const char *, UA_StatusCode, char *, ...)
+    __attribute__noreturn__
+    __attribute__format__null_ok__(__printf__,3,4);
+
+static void
+croak_func(const char *func, char *pat, ...)
+{
+	va_list args;
+	SV *sv;
+
+	sv = sv_2mortal(newSV(126));
+
+	if (pat == NULL) {
+	    sv_setpv(sv, func);
+	    croak_sv(sv);
+	} else {
+	    sv_setpvf(sv, "%s: ", func);
+	    va_start(args, pat);
+	    sv_vcatpvf(sv, pat, &args);
+	    croak_sv(sv);
+	    NOT_REACHED; /* NOTREACHED */
+	    va_end(args);
+	}
+	NORETURN_FUNCTION_END;
+}
+
+static void
+croak_errno(const char *func, char *pat, ...)
+{
+	va_list args;
+	SV *sv;
+	int sverrno;
+
+	sverrno = errno;
+	sv = sv_2mortal(newSV(126));
+
+	if (pat == NULL) {
+	    sv_setpvf(sv, "%s: %s", func, strerror(sverrno));
+	    croak_sv(sv);
+	} else {
+	    sv_setpvf(sv, "%s: ", func);
+	    va_start(args, pat);
+	    sv_vcatpvf(sv, pat, &args);
+	    sv_catpvf(sv, ": %s", strerror(sverrno));
+	    croak_sv(sv);
+	    NOT_REACHED; /* NOTREACHED */
+	    va_end(args);
+	}
+	NORETURN_FUNCTION_END;
+}
+
+static void
+croak_status(const char *func, UA_StatusCode status, char *pat, ...)
+{
+	va_list args;
+	SV *sv;
+
+	sv = sv_2mortal(newSV(126));
+
+	if (pat == NULL) {
+	    sv_setpvf(sv, "%s: %s", func, UA_StatusCode_name(status));
+	    croak_sv(sv);
+	} else {
+	    sv_setpvf(sv, "%s: ", func);
+	    va_start(args, pat);
+	    sv_vcatpvf(sv, pat, &args);
+	    sv_catpvf(sv, ": %s", UA_StatusCode_name(status));
+	    croak_sv(sv);
+	    NOT_REACHED; /* NOTREACHED */
+	    va_end(args);
+	}
+	NORETURN_FUNCTION_END;
+}
+
+#define CROAK(pat, args...)	croak_func(__func__, pat, ##args)
+#define CROAKE(pat, args...)	croak_errno(__func__, pat, ##args)
+#define CROAKS(sc, pat, args...)	croak_status(__func__, sc, pat, ##args)
 
 /* types.h */
 typedef UA_UInt32 *		OPCUA_Open62541_UInt32;
@@ -60,6 +142,15 @@ typedef struct {
 	SV *			clc_client;
 } *				OPCUA_Open62541_ClientConfig;
 typedef UA_ClientState		OPCUA_Open62541_ClientState;
+
+/* plugin/log.h */
+typedef struct {
+	UA_Logger *		lg_logger;
+	SV *			lg_log;
+	SV *			lg_context;
+	SV *			lg_clear;
+	SV *			lg_storage;
+} *				OPCUA_Open62541_Logger;
 
 static void XS_pack_OPCUA_Open62541_DataType(SV *, OPCUA_Open62541_DataType)
     __attribute__((unused));
@@ -351,25 +442,25 @@ XS_unpack_UA_NodeId(SV *in)
 		return XS_unpack_OPCUA_Open62541_DataType(in)->typeId;
 	}
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("is not a HASH reference");
+		CROAK("Not a HASH reference");
 	}
 	UA_NodeId_init(&out);
 	hv = (HV*)SvRV(in);
 
 	svp = hv_fetch(hv, "NodeId_namespaceIndex", 21, 0);
 	if (svp == NULL)
-		croak("%s: No NodeId_namespaceIndex in HASH", __func__);
+		CROAK("No NodeId_namespaceIndex in HASH");
 	out.namespaceIndex = XS_unpack_UA_UInt16(*svp);
 
 	svp = hv_fetch(hv, "NodeId_identifierType", 21, 0);
 	if (svp == NULL)
-		croak("%s: No NodeId_identifierType in HASH", __func__);
+		CROAK("No NodeId_identifierType in HASH");
 	type = SvIV(*svp);
 	out.identifierType = type;
 
 	svp = hv_fetch(hv, "NodeId_identifier", 17, 0);
 	if (svp == NULL)
-		croak("%s: No NodeId_identifier in HASH", __func__);
+		CROAK("No NodeId_identifier in HASH");
 	switch (type) {
 	case UA_NODEIDTYPE_NUMERIC:
 		out.identifier.numeric = XS_unpack_UA_UInt32(*svp);
@@ -384,8 +475,7 @@ XS_unpack_UA_NodeId(SV *in)
 		out.identifier.byteString = XS_unpack_UA_ByteString(*svp);
 		break;
 	default:
-		croak("%s: NodeId_identifierType %ld unknown",
-		    __func__, type);
+		CROAK("NodeId_identifierType %ld unknown", type);
 	}
 	return out;
 }
@@ -420,8 +510,8 @@ XS_pack_UA_NodeId(SV *out, UA_NodeId in)
 		XS_pack_UA_ByteString(sv, in.identifier.byteString);
 		break;
 	default:
-		croak("%s: NodeId_identifierType %d unknown",
-		    __func__, (int)in.identifierType);
+		CROAK("NodeId_identifierType %d unknown",
+		    (int)in.identifierType);
 	}
 	hv_stores(hv, "NodeId_identifier", sv);
 
@@ -440,7 +530,7 @@ XS_unpack_UA_ExpandedNodeId(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_ExpandedNodeId_init(&out);
 	hv = (HV*)SvRV(in);
@@ -494,7 +584,7 @@ XS_unpack_UA_QualifiedName(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("is not a HASH reference");
+		CROAK("Not a HASH reference");
 	}
 	UA_QualifiedName_init(&out);
 	hv = (HV*)SvRV(in);
@@ -540,7 +630,7 @@ XS_unpack_UA_LocalizedText(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("is not a HASH reference");
+		CROAK("Not a HASH reference");
 	}
 	UA_LocalizedText_init(&out);
 	hv = (HV*)SvRV(in);
@@ -589,8 +679,8 @@ OPCUA_Open62541_Variant_setScalar(OPCUA_Open62541_Variant variant, SV *sv,
 
 	scalar = UA_new(type);
 	if (scalar == NULL) {
-		croak("%s: UA_new type %d, name %s",
-		    __func__, type->typeIndex, type->typeName);
+		CROAKE("UA_new type %d, name %s",
+		    type->typeIndex, type->typeName);
 	}
 	(unpack_UA_table[type->typeIndex])(sv, scalar);
 	UA_Variant_setScalar(variant, scalar, type);
@@ -607,31 +697,29 @@ XS_unpack_UA_Variant(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_Variant_init(&out);
 	hv = (HV*)SvRV(in);
 
 	svp = hv_fetchs(hv, "Variant_type", 0);
 	if (svp == NULL)
-		croak("%s: No Variant_type in HASH", __func__);
+		CROAK("No Variant_type in HASH");
 	type = XS_unpack_OPCUA_Open62541_DataType(*svp);
 
 	scalar = hv_fetchs(hv, "Variant_scalar", 0);
 	array = hv_fetchs(hv, "Variant_array", 0);
 	if (scalar != NULL && array != NULL) {
-		croak("%s: Both Variant_scalar and Variant_array in HASH",
-		    __func__);
+		CROAK("Both Variant_scalar and Variant_array in HASH");
 	}
 	if (scalar == NULL && array == NULL) {
-		croak("%s: Neither Variant_scalar not Variant_array in HASH",
-		    __func__);
+		CROAK("Neither Variant_scalar not Variant_array in HASH");
 	}
 	if (scalar != NULL) {
 		OPCUA_Open62541_Variant_setScalar(&out, *scalar, type);
 	}
 	if (array != NULL) {
-		croak("%s: Variant_array not implemented", __func__);
+		CROAK("Variant_array not implemented");
 	}
 	return out;
 }
@@ -664,7 +752,7 @@ XS_pack_UA_Variant(SV *out, UA_Variant in)
 		OPCUA_Open62541_Variant_getScalar(&in, sv);
 		hv_stores(hv, "Variant_scalar", sv);
 	} else {
-		croak("%s: Variant_array not implemented", __func__);
+		CROAK("Variant_array not implemented");
 	}
 
 	sv_setsv(out, sv_2mortal(newRV_noinc((SV*)hv)));
@@ -685,22 +773,22 @@ XS_unpack_UA_ExtensionObject(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("is not a HASH reference");
+		CROAK("Not a HASH reference");
 	}
 	UA_ExtensionObject_init(&out);
 	hv = (HV*)SvRV(in);
 
 	svp = hv_fetchs(hv, "ExtensionObject_encoding", 0);
 	if (svp == NULL)
-		croak("%s: No ExtensionObject_encoding in HASH", __func__);
+		CROAK("No ExtensionObject_encoding in HASH");
 	encoding = SvIV(*svp);
 	out.encoding = encoding;
 
 	svp = hv_fetchs(hv, "ExtensionObject_content", 0);
 	if (svp == NULL)
-		croak("%s: No ExtensionObject_content in HASH", __func__);
+		CROAK("No ExtensionObject_content in HASH");
 	if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVHV)
-		croak("%s: ExtensionObject_content is not a HASH", __func__);
+		CROAK("ExtensionObject_content is not a HASH");
 	content = (HV*)SvRV(*svp);
 
 	switch (encoding) {
@@ -709,12 +797,12 @@ XS_unpack_UA_ExtensionObject(SV *in)
 	case UA_EXTENSIONOBJECT_ENCODED_XML:
 		svp = hv_fetchs(content, "ExtensionObject_content_typeId", 0);
 		if (svp == NULL)
-			croak("%s: No ExtensionObject_content_typeId in HASH", __func__);
+			CROAK("No ExtensionObject_content_typeId in HASH");
 		out.content.encoded.typeId = XS_unpack_UA_NodeId(*svp);
 
 		svp = hv_fetchs(content, "ExtensionObject_content_body", 0);
 		if (svp == NULL)
-			croak("%s: No ExtensionObject_content_body in HASH", __func__);
+			CROAK("No ExtensionObject_content_body in HASH");
 		out.content.encoded.body = XS_unpack_UA_ByteString(*svp);
 
 		break;
@@ -722,25 +810,24 @@ XS_unpack_UA_ExtensionObject(SV *in)
 	case UA_EXTENSIONOBJECT_DECODED_NODELETE:
 		svp = hv_fetchs(content, "ExtensionObject_content_type", 0);
 		if (svp == NULL)
-			croak("%s: No ExtensionObject_content_type in HASH", __func__);
+			CROAK("No ExtensionObject_content_type in HASH");
 		type = XS_unpack_OPCUA_Open62541_DataType(*svp);
 		out.content.decoded.type = type;
 
 		svp = hv_fetchs(content, "ExtensionObject_content_data", 0);
 		if (svp == NULL)
-			croak("%s: No ExtensionObject_content_data in HASH", __func__);
+			CROAK("No ExtensionObject_content_data in HASH");
 
 		data = UA_new(type);
 		if (data == NULL) {
-			croak("%s: UA_new type %d, name %s",
-			    __func__, type->typeIndex, type->typeName);
+			CROAK("UA_new type %d, name %s",
+			    type->typeIndex, type->typeName);
 		}
 		(unpack_UA_table[type->typeIndex])(*svp, data);
 
 		break;
 	default:
-		croak("%s: ExtensionObject_encoding %ld unknown",
-		    __func__, encoding);
+		CROAK("ExtensionObject_encoding %ld unknown", encoding);
 	}
 	return out;
 }
@@ -776,13 +863,13 @@ XS_pack_UA_ExtensionObject(SV *out, UA_ExtensionObject in)
 		hv_stores(hv, "ExtensionObject_content_type", sv);
 
 		sv = newSV(0);
-		(pack_UA_table[in.content.decoded.type->typeIndex])(sv, in.content.decoded.data);
+		(pack_UA_table[in.content.decoded.type->typeIndex])(sv,
+		    in.content.decoded.data);
 		hv_stores(hv, "ExtensionObject_content_data", sv);
 
 		break;
 	default:
-		croak("%s: ExtensionObject_encoding %d unknown",
-		    __func__, (int)in.encoding);
+		CROAK("ExtensionObject_encoding %d unknown", (int)in.encoding);
 	}
 
 	sv_setsv(out, sv_2mortal(newRV_noinc((SV*)hv)));
@@ -797,8 +884,7 @@ XS_unpack_OPCUA_Open62541_DataType(SV *in)
 	UV index = SvUV(in);
 
 	if (index >= UA_TYPES_COUNT) {
-		croak("%s: Unsigned value %li not below UA_TYPES_COUNT",
-		    __func__,  index);
+		CROAK("Unsigned value %li not below UA_TYPES_COUNT", index);
 	}
 	return &UA_TYPES[index];
 }
@@ -822,7 +908,7 @@ XS_unpack_UA_DataValue(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DataValue_init(&out);
 	hv = (HV*)SvRV(in);
@@ -948,7 +1034,7 @@ XS_unpack_UA_DiagnosticInfo(SV *in)
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
-		croak("%s: Not a HASH reference", __func__);
+		CROAK("Not a HASH reference");
 	}
 	UA_DiagnosticInfo_init(&out);
 	hv = (HV*)SvRV(in);
@@ -1101,70 +1187,82 @@ static MGVTBL server_run_mgvtbl = { 0, server_run_mgset, 0, 0, 0, 0, 0, 0 };
 /* Open62541 C callback handling */
 
 typedef struct {
-	SV *			pcc_callback;
-	SV *			pcc_client;
-	SV *			pcc_data;
-}				PerlClientCallback;
+	SV *			ccd_callback;
+	SV *			ccd_client;
+	SV *			ccd_data;
+}				ClientCallbackData;
 
-static PerlClientCallback*
-prepareClientCallback(SV *callback, SV *client, SV *data)
+static ClientCallbackData *
+newClientCallbackData(SV *callback, SV *client, SV *data)
 {
-	PerlClientCallback *pcc;
+	ClientCallbackData *ccd;
 
 	if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
-		croak("callback is not a CODE reference");
+		CROAK("Callback '%s' is not a CODE reference",
+		    SvPV_nolen(callback));
 
-	pcc = malloc(sizeof(PerlClientCallback));
-	if (pcc == NULL)
-		croak("malloc");
+	ccd = malloc(sizeof(*ccd));
+	if (ccd == NULL)
+		CROAKE("malloc");
+	DPRINTF("ccd %p", ccd);
 
-	pcc->pcc_callback = callback;
-	pcc->pcc_client = client;
-	pcc->pcc_data = data;
+	/*
+	 * XXX should we make a copy of the callback?
+	 * see perlguts, Using call_sv, newSVsv()
+	 */
+	ccd->ccd_callback = callback;
+	ccd->ccd_client = client;
+	ccd->ccd_data = data;
 
 	SvREFCNT_inc(callback);
 	SvREFCNT_inc(client);
 	SvREFCNT_inc(data);
 
-	return pcc;
+	return ccd;
+}
+
+static void
+deleteClientCallbackData(ClientCallbackData *ccd)
+{
+	DPRINTF("ccd %p", ccd);
+
+	SvREFCNT_dec(ccd->ccd_callback);
+	SvREFCNT_dec(ccd->ccd_client);
+	SvREFCNT_dec(ccd->ccd_data);
+
+	free(ccd);
 }
 
 static void
 clientCallbackPerl(UA_Client *client, void *userdata, UA_UInt32 requestId,
     SV *response) {
 	dTHX;
-	PerlClientCallback *pcc = (PerlClientCallback*) userdata;
-	SV * callback = pcc->pcc_callback;
-	SV * cl = pcc->pcc_client;
-	SV * data = pcc->pcc_data;
-
 	dSP;
+	ClientCallbackData *ccd = (ClientCallbackData *)userdata;
+
+	DPRINTF("client %p, ccd %p", client, ccd);
 
 	ENTER;
 	SAVETMPS;
 
 	PUSHMARK(SP);
 	EXTEND(SP, 4);
-	PUSHs(cl);
-	PUSHs(data);
+	PUSHs(ccd->ccd_client);
+	PUSHs(ccd->ccd_data);
 	mPUSHu(requestId);
 	mPUSHs(response);
 	PUTBACK;
 
-	call_sv(callback, G_DISCARD);
+	call_sv(ccd->ccd_callback, G_VOID | G_DISCARD);
 
 	FREETMPS;
 	LEAVE;
 
-	SvREFCNT_dec(callback);
-	SvREFCNT_dec(cl);
-	SvREFCNT_dec(data);
-
-	free(pcc);
+	deleteClientCallbackData(ccd);
 }
 
 static void
-clientAsyncServiceCallbackPerl(UA_Client *client, void *userdata,
+clientAsyncServiceCallback(UA_Client *client, void *userdata,
     UA_UInt32 requestId, void *response)
 {
 	dTHX;
@@ -1178,7 +1276,7 @@ clientAsyncServiceCallbackPerl(UA_Client *client, void *userdata,
 }
 
 static void
-clientAsyncBrowseCallbackPerl(UA_Client *client, void *userdata,
+clientAsyncBrowseCallback(UA_Client *client, void *userdata,
     UA_UInt32 requestId, UA_BrowseResponse *response)
 {
 	dTHX;
@@ -1191,10 +1289,183 @@ clientAsyncBrowseCallbackPerl(UA_Client *client, void *userdata,
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
+/* 16.4 Logging Plugin API, log and clear callbacks */
+
+static void XS_pack_UA_LogLevel(SV *, UA_LogLevel) __attribute__((unused));
+static UA_LogLevel XS_unpack_UA_LogLevel(SV *) __attribute__((unused));
+
+static UA_LogLevel
+XS_unpack_UA_LogLevel(SV *in)
+{
+	dTHX;
+	return SvIV(in);
+}
+
+#define LOG_LEVEL_COUNT		6
+const char *logLevelNames[LOG_LEVEL_COUNT] = {
+	"trace",
+	"debug",
+	"info",
+	"warn",
+	"error",
+	"fatal",
+};
+
+static void
+XS_pack_UA_LogLevel(SV *out, UA_LogLevel in)
+{
+	dTHX;
+
+	/* SV out contains number and string, like $! does. */
+	sv_setnv(out, in);
+	if (in >= 0 && in < LOG_LEVEL_COUNT)
+		sv_setpv(out, logLevelNames[in]);
+	else
+		sv_setuv(out, in);
+	SvNOK_on(out);
+}
+
+static void XS_pack_UA_LogCategory(SV *, UA_LogCategory)
+	__attribute__((unused));
+static UA_LogCategory XS_unpack_UA_LogCategory(SV *) __attribute__((unused));
+
+static UA_LogCategory
+XS_unpack_UA_LogCategory(SV *in)
+{
+	dTHX;
+	return SvIV(in);
+}
+
+#define LOG_CATEGORY_COUNT	7
+const char *logCategoryNames[LOG_CATEGORY_COUNT] = {
+	"network",
+	"channel",
+	"session",
+	"server",
+	"client",
+	"userland",
+	"securitypolicy",
+};
+
+static void
+XS_pack_UA_LogCategory(SV *out, UA_LogCategory in)
+{
+	dTHX;
+
+	/* SV out contains number and string, like $! does. */
+	sv_setnv(out, in);
+	if (in >= 0 && in < LOG_CATEGORY_COUNT)
+		sv_setpv(out, logCategoryNames[in]);
+	else
+		sv_setuv(out, in);
+	SvNOK_on(out);
+}
+
+static void
+loggerLogCallback(void *logContext, UA_LogLevel level, UA_LogCategory category,
+    const char *msg, va_list args)
+{
+	dTHX;
+	dSP;
+	OPCUA_Open62541_Logger	logger = logContext;
+	SV *			levelName;
+	SV *			categoryName;
+	SV *			message;
+	va_list			vp;
+
+	if (!SvOK(logger->lg_log))
+		return;
+
+	ENTER;
+	SAVETMPS;
+
+	levelName = newSV(5);
+	XS_pack_UA_LogLevel(levelName, level);
+	categoryName = newSV(14);
+	XS_pack_UA_LogCategory(categoryName, category);
+	/* Perl expects a pointer to va_list, so we have to copy it. */
+	va_copy(vp, args);
+	message = newSV(0);
+	sv_vsetpvf(message, msg, &vp);
+	va_end(vp);
+
+	PUSHMARK(SP);
+	EXTEND(SP, 4);
+	PUSHs(logger->lg_context);
+	mPUSHs(levelName);
+	mPUSHs(categoryName);
+	mPUSHs(message);
+	PUTBACK;
+
+	call_sv(logger->lg_log, G_VOID | G_DISCARD);
+
+	FREETMPS;
+	LEAVE;
+}
+
+static void
+loggerClearCallback(void *context)
+{
+	dTHX;
+	dSP;
+	OPCUA_Open62541_Logger	logger = context;
+
+	if (!SvOK(logger->lg_clear))
+		return;
+
+	ENTER;
+	SAVETMPS;
+
+	PUSHMARK(SP);
+	EXTEND(SP, 1);
+	PUSHs(logger->lg_context);
+	PUTBACK;
+
+	call_sv(logger->lg_clear, G_VOID | G_DISCARD);
+
+	FREETMPS;
+	LEAVE;
+}
+
 /*#########################################################################*/
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541
 
 PROTOTYPES: DISABLE
+
+# just for testing
+
+void
+test_croak(sv)
+	SV *			sv
+    CODE:
+	if (SvOK(sv)) {
+		CROAK("%s", SvPV_nolen(sv));
+	} else {
+		CROAK(NULL);
+	}
+
+void
+test_croake(sv, errnum)
+	SV *			sv
+	int			errnum
+    CODE:
+	errno = errnum;
+	if (SvOK(sv)) {
+		CROAKE("%s", SvPV_nolen(sv));
+	} else {
+		CROAKE(NULL);
+	}
+
+void
+test_croaks(sv, status)
+	SV *			sv
+	UA_StatusCode		status
+    CODE:
+	if (SvOK(sv)) {
+		CROAKS(status, "%s", SvPV_nolen(sv));
+	} else {
+		CROAKS(status, NULL);
+	}
 
 INCLUDE: Open62541-types.xsh
 
@@ -1524,12 +1795,12 @@ UA_LocalizedText_new(class)
 	char *				class
     INIT:
 	if (strcmp(class, "OPCUA::Open62541::LocalizedText") != 0)
-		croak("class '%s' is not OPCUA::Open62541::LocalizedText",
+		CROAK("Class '%s' is not OPCUA::Open62541::LocalizedText",
 		    class);
     CODE:
 	RETVAL = UA_LocalizedText_new();
 	if (RETVAL == NULL)
-		croak("%s: UA_LocalizedText_new", __func__);
+		CROAKE("UA_LocalizedText_new");
 	DPRINTF("localizedText %p", RETVAL);
     OUTPUT:
 	RETVAL
@@ -1551,11 +1822,11 @@ UA_Variant_new(class)
 	char *				class
     INIT:
 	if (strcmp(class, "OPCUA::Open62541::Variant") != 0)
-		croak("class '%s' is not OPCUA::Open62541::Variant", class);
+		CROAK("Class '%s' is not OPCUA::Open62541::Variant", class);
     CODE:
 	RETVAL = UA_Variant_new();
 	if (RETVAL == NULL)
-		croak("%s: UA_Variant_new", __func__);
+		CROAKE("UA_Variant_new");
 	DPRINTF("variant %p", RETVAL);
     OUTPUT:
 	RETVAL
@@ -1619,14 +1890,18 @@ UA_Variant_getScalar(variant)
 #############################################################################
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::Server		PREFIX = UA_Server_
 
+# 11.2 Server Lifecycle
+
 OPCUA_Open62541_Server
 UA_Server_new(class)
 	char *				class
     INIT:
 	if (strcmp(class, "OPCUA::Open62541::Server") != 0)
-		croak("class '%s' is not OPCUA::Open62541::Server", class);
+		CROAK("Class '%s' is not OPCUA::Open62541::Server", class);
     CODE:
 	RETVAL = UA_Server_new();
+	if (RETVAL == NULL)
+		CROAKE("UA_Server_new");
 	DPRINTF("class %s, server %p", class, RETVAL);
     OUTPUT:
 	RETVAL
@@ -1637,11 +1912,13 @@ UA_Server_newWithConfig(class, config)
 	OPCUA_Open62541_ServerConfig	config
     INIT:
 	if (strcmp(class, "OPCUA::Open62541::Server") != 0)
-		croak("class '%s' is not OPCUA::Open62541::Server", class);
+		CROAK("Class '%s' is not OPCUA::Open62541::Server", class);
     CODE:
 	RETVAL = UA_Server_newWithConfig(config->svc_serverconfig);
-	DPRINTF("class %s, config %p, server %p", class,
-	    config->svc_serverconfig, RETVAL);
+	if (RETVAL == NULL)
+		CROAKE("UA_Server_newWithConfig");
+	DPRINTF("class %s, config %p, svc_serverconfig %p, server %p",
+	    class, config, config->svc_serverconfig, RETVAL);
     OUTPUT:
 	RETVAL
 
@@ -1658,9 +1935,10 @@ UA_Server_getConfig(server)
     CODE:
 	RETVAL = malloc(sizeof(*RETVAL));
 	if (RETVAL == NULL)
-		croak("malloc");
+		CROAKE("malloc");
 	RETVAL->svc_serverconfig = UA_Server_getConfig(server);
-	DPRINTF("server %p, config %p", server, RETVAL->svc_serverconfig);
+	DPRINTF("server %p, config %p, svc_serverconfig %p",
+	    server, RETVAL, RETVAL->svc_serverconfig);
 	if (RETVAL->svc_serverconfig == NULL) {
 		free(RETVAL);
 		XSRETURN_UNDEF;
@@ -1737,7 +2015,6 @@ UA_ServerConfig_setMinimal(config, portNumber, certificate)
 	UA_UInt16			portNumber
 	UA_ByteString			certificate;
     CODE:
-	DPRINTF("config %p, port %hu", config->svc_serverconfig, portNumber);
 	RETVAL = UA_ServerConfig_setMinimal(config->svc_serverconfig,
 	    portNumber, &certificate);
     OUTPUT:
@@ -1747,7 +2024,6 @@ void
 UA_ServerConfig_clean(config)
 	OPCUA_Open62541_ServerConfig	config
     CODE:
-	DPRINTF("config %p", config->svc_serverconfig);
 	UA_ServerConfig_clean(config->svc_serverconfig);
 
 void
@@ -1755,22 +2031,39 @@ UA_ServerConfig_setCustomHostname(config, customHostname)
 	OPCUA_Open62541_ServerConfig	config
 	UA_String			customHostname
     CODE:
-	DPRINTF("config %p, data %p, length %zu", config->svc_serverconfig,
-	    customHostname.data, customHostname.length);
 	UA_ServerConfig_setCustomHostname(config->svc_serverconfig,
 	    customHostname);
 
+OPCUA_Open62541_Logger
+UA_ServerConfig_getLogger(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = calloc(1, sizeof(*RETVAL));
+	if (RETVAL == NULL)
+		CROAKE("calloc");
+	RETVAL->lg_logger = &config->svc_serverconfig->logger;
+	DPRINTF("config %p, logger %p, lg_logger %p",
+	    config, RETVAL, RETVAL->lg_logger);
+	/* When config gets out of scope, logger still uses its memory. */
+	RETVAL->lg_storage = SvREFCNT_inc(SvRV(ST(0)));
+    OUTPUT:
+	RETVAL
+
 #############################################################################
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::Client		PREFIX = UA_Client_
+
+# 12.2 Client Lifecycle
 
 OPCUA_Open62541_Client
 UA_Client_new(class)
 	char *				class
     INIT:
 	if (strcmp(class, "OPCUA::Open62541::Client") != 0)
-		croak("class '%s' is not OPCUA::Open62541::Client", class);
+		CROAK("Class '%s' is not OPCUA::Open62541::Client", class);
     CODE:
 	RETVAL = UA_Client_new();
+	if (RETVAL == NULL)
+		CROAKE("UA_Client_new");
 	DPRINTF("class %s, client %p", class, RETVAL);
     OUTPUT:
 	RETVAL
@@ -1788,9 +2081,10 @@ UA_Client_getConfig(client)
     CODE:
 	RETVAL = malloc(sizeof(*RETVAL));
 	if (RETVAL == NULL)
-		croak("malloc");
+		CROAKE("malloc");
 	RETVAL->clc_clientconfig = UA_Client_getConfig(client);
-	DPRINTF("client %p, config %p", client, RETVAL->clc_clientconfig);
+	DPRINTF("client %p, config %p, clc_clientconfig %p",
+	    client, RETVAL, RETVAL->clc_clientconfig);
 	if (RETVAL->clc_clientconfig == NULL) {
 		free(RETVAL);
 		XSRETURN_UNDEF;
@@ -1812,14 +2106,26 @@ UA_Client_connect_async(client, endpointUrl, callback, data)
 	SV *				callback
 	SV *				data
     CODE:
-	if (!SvOK(callback)) {
+	/*
+	 * If the client is already connecting, it will immediately return
+	 * a good status code.  In this case, the callback is never called.
+	 * We must not allocate its data structure to avoid a memory leak.
+	 * The socket API is smarter in this case, connect(2) fails with
+	 * EINPROGRESS which can be detected by the caller.
+	 */
+	if (UA_Client_getState(client) >= UA_CLIENTSTATE_WAITING_FOR_ACK ||
+	    !SvOK(callback)) {
 		/* ignore callback and data if no callback is defined */
 		RETVAL = UA_Client_connect_async(client, endpointUrl, NULL,
 		    NULL);
 	} else {
+		ClientCallbackData *ccd;
+
+		ccd = newClientCallbackData(callback, ST(0), data);
 		RETVAL = UA_Client_connect_async(client, endpointUrl,
-		    clientAsyncServiceCallbackPerl,
-		    prepareClientCallback(callback, ST(0), data));
+		    clientAsyncServiceCallback, ccd);
+		if (RETVAL != UA_STATUSCODE_GOOD)
+			deleteClientCallbackData(ccd);
 	}
     OUTPUT:
 	RETVAL
@@ -1844,11 +2150,18 @@ UA_Client_sendAsyncBrowseRequest(client, request, callback, data, reqId)
 	SV *				callback
 	SV *				data
 	OPCUA_Open62541_UInt32		reqId
+    INIT:
+	ClientCallbackData *		ccd;
+
+	if (SvOK(ST(4)) && !(SvROK(ST(4)) && SvTYPE(SvRV(ST(4))) < SVt_PVAV))
+		CROAK("reqId is not a scalar reference");
     CODE:
+	ccd = newClientCallbackData(callback, ST(0), data);
 	RETVAL = UA_Client_sendAsyncBrowseRequest(client, &request,
-	    clientAsyncBrowseCallbackPerl,
-	    prepareClientCallback(callback, ST(0), data), reqId);
-	if (reqId && SvROK(ST(4)) && SvTYPE(SvRV(ST(4))) < SVt_PVAV)
+	    clientAsyncBrowseCallback, ccd, reqId);
+	if (RETVAL != UA_STATUSCODE_GOOD)
+		deleteClientCallbackData(ccd);
+	if (reqId != NULL)
 		XS_pack_UA_UInt32(SvRV(ST(4)), *reqId);
     OUTPUT:
 	RETVAL
@@ -1858,10 +2171,13 @@ UA_Client_readDisplayNameAttribute(client, nodeId, outDisplayName)
 	OPCUA_Open62541_Client		client
 	UA_NodeId			nodeId
 	OPCUA_Open62541_LocalizedText	outDisplayName
+    INIT:
+	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
+		CROAK("outDisplayName is not a scalar reference");
     CODE:
 	RETVAL = UA_Client_readDisplayNameAttribute(client, nodeId,
 	    outDisplayName);
-	if (SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV)
+	if (outDisplayName != NULL)
 		XS_pack_UA_LocalizedText(SvRV(ST(2)), *outDisplayName);
     OUTPUT:
 	RETVAL
@@ -1871,10 +2187,13 @@ UA_Client_readDescriptionAttribute(client, nodeId, outDescription)
 	OPCUA_Open62541_Client		client
 	UA_NodeId			nodeId
 	OPCUA_Open62541_LocalizedText	outDescription
+    INIT:
+	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
+		CROAK("outDescription is not a scalar reference");
     CODE:
 	RETVAL = UA_Client_readDescriptionAttribute(client, nodeId,
 	    outDescription);
-	if (SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV)
+	if (outDescription != NULL)
 		XS_pack_UA_LocalizedText(SvRV(ST(2)), *outDescription);
     OUTPUT:
 	RETVAL
@@ -1884,9 +2203,12 @@ UA_Client_readValueAttribute(client, nodeId, outValue)
 	OPCUA_Open62541_Client		client
 	UA_NodeId			nodeId
 	OPCUA_Open62541_Variant		outValue
+    INIT:
+	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
+		CROAK("outValue is not a scalar reference");
     CODE:
 	RETVAL = UA_Client_readValueAttribute(client, nodeId, outValue);
-	if (SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV)
+	if (outValue != NULL)
 		XS_pack_UA_Variant(SvRV(ST(2)), *outValue);
     OUTPUT:
 	RETVAL
@@ -1899,10 +2221,10 @@ UA_Client_readDataTypeAttribute(client, nodeId, outDataType)
     INIT:
 	UA_NodeId			outNodeId;
 	UV				index;
+
+	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
+		CROAK("outDataType is not a scalar reference");
     CODE:
-	if (!SvROK(outDataType) || SvTYPE(SvRV(outDataType)) >= SVt_PVAV) {
-		croak("%s: outDataType is not a scalar reference", __func__);
-	}
 	RETVAL = UA_Client_readDataTypeAttribute(client, nodeId, &outNodeId);
 	/*
 	 * Convert NodeId to DataType, see XS_unpack_UA_NodeId() for
@@ -1933,7 +2255,172 @@ UA_StatusCode
 UA_ClientConfig_setDefault(config)
 	OPCUA_Open62541_ClientConfig	config
     CODE:
-	DPRINTF("config %p", config->clc_clientconfig);
 	RETVAL = UA_ClientConfig_setDefault(config->clc_clientconfig);
     OUTPUT:
 	RETVAL
+
+OPCUA_Open62541_Logger
+UA_ClientConfig_getLogger(config)
+	OPCUA_Open62541_ClientConfig	config
+    CODE:
+	RETVAL = calloc(1, sizeof(*RETVAL));
+	if (RETVAL == NULL)
+		CROAKE("calloc");
+	RETVAL->lg_logger = &config->clc_clientconfig->logger;
+	DPRINTF("config %p, logger %p, lg_logger %p",
+	    config, RETVAL, RETVAL->lg_logger);
+	/* When config gets out of scope, logger still uses its memory. */
+	RETVAL->lg_storage = SvREFCNT_inc(SvRV(ST(0)));
+    OUTPUT:
+	RETVAL
+
+#############################################################################
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::Logger	PREFIX = UA_Logger_
+
+# 16.4 Logging Plugin API, plugin/log.h
+
+OPCUA_Open62541_Logger
+UA_Logger_new(class)
+	char *				class
+    INIT:
+	if (strcmp(class, "OPCUA::Open62541::Logger") != 0)
+		CROAK("Class '%s' is not OPCUA::Open62541::Logger", class);
+    CODE:
+	RETVAL = calloc(1, sizeof(*RETVAL));
+	if (RETVAL == NULL)
+		CROAKE("calloc");
+	RETVAL->lg_logger = calloc(1, sizeof(*RETVAL->lg_logger));
+	if (RETVAL->lg_logger == NULL) {
+		free(RETVAL);
+		CROAKE("calloc");
+	}
+	DPRINTF("class %s, logger %p, lg_logger %p",
+	    class, RETVAL, RETVAL->lg_logger);
+    OUTPUT:
+	RETVAL
+
+void
+UA_Logger_DESTROY(logger)
+	OPCUA_Open62541_Logger		logger
+    CODE:
+	DPRINTF("logger %p, lg_logger %p", logger, logger->lg_logger);
+	if (logger->lg_logger->clear != NULL)
+		(logger->lg_logger->clear)(logger->lg_logger->context);
+	logger->lg_logger->log = NULL;
+	logger->lg_logger->clear = NULL;
+	SvREFCNT_dec(logger->lg_log);
+	SvREFCNT_dec(logger->lg_context);
+	SvREFCNT_dec(logger->lg_clear);
+	if (logger->lg_storage == NULL)
+		free(logger->lg_logger);
+	else
+		SvREFCNT_dec(logger->lg_storage);
+	free(logger);
+
+void
+UA_Logger_setCallback(logger, log, context, clear)
+	OPCUA_Open62541_Logger		logger
+	SV *				log
+	SV *				context
+	SV *				clear
+    INIT:
+	if (SvOK(log) && !(SvROK(log) && SvTYPE(SvRV(log)) == SVt_PVCV))
+		CROAK("Log '%s' is not a CODE reference",
+		    SvPV_nolen(log));
+	if (SvOK(clear) && !(SvROK(clear) && SvTYPE(SvRV(clear)) == SVt_PVCV))
+		CROAK("Clear '%s' is not a CODE reference",
+		    SvPV_nolen(clear));
+    CODE:
+	logger->lg_logger->log = SvOK(log) ? loggerLogCallback : NULL;
+	logger->lg_logger->context = logger;
+	logger->lg_logger->clear = SvOK(clear) ? loggerClearCallback : NULL;
+
+	if (logger->lg_log == NULL)
+		logger->lg_log = newSV(0);
+	SvSetSV_nosteal(logger->lg_log, log);
+
+	if (logger->lg_context == NULL)
+		logger->lg_context = newSV(0);
+	SvSetSV_nosteal(logger->lg_context, context);
+
+	if (logger->lg_clear == NULL)
+		logger->lg_clear = newSV(0);
+	SvSetSV_nosteal(logger->lg_clear, clear);
+
+void
+UA_Logger_logTrace(logger, category, msg, ...)
+	OPCUA_Open62541_Logger		logger
+	UA_LogCategory			category
+	SV *				msg
+    INIT:
+	SV *				message;
+    CODE:
+	message = sv_newmortal();
+	sv_vsetpvfn(message, SvPV_nolen(msg), SvCUR(msg), NULL,
+	    &ST(3), items - 3, NULL);
+	UA_LOG_TRACE(logger->lg_logger, category, "%s", SvPV_nolen(message));
+
+void
+UA_Logger_logDebug(logger, category, msg, ...)
+	OPCUA_Open62541_Logger		logger
+	UA_LogCategory			category
+	SV *				msg
+    INIT:
+	SV *				message;
+    CODE:
+	message = sv_newmortal();
+	sv_vsetpvfn(message, SvPV_nolen(msg), SvCUR(msg), NULL,
+	    &ST(3), items - 3, NULL);
+	UA_LOG_DEBUG(logger->lg_logger, category, "%s", SvPV_nolen(message));
+
+void
+UA_Logger_logInfo(logger, category, msg, ...)
+	OPCUA_Open62541_Logger		logger
+	UA_LogCategory			category
+	SV *				msg
+    INIT:
+	SV *				message;
+    CODE:
+	message = sv_newmortal();
+	sv_vsetpvfn(message, SvPV_nolen(msg), SvCUR(msg), NULL,
+	    &ST(3), items - 3, NULL);
+	UA_LOG_INFO(logger->lg_logger, category, "%s", SvPV_nolen(message));
+
+void
+UA_Logger_logWarning(logger, category, msg, ...)
+	OPCUA_Open62541_Logger		logger
+	UA_LogCategory			category
+	SV *				msg
+    INIT:
+	SV *				message;
+    CODE:
+	message = sv_newmortal();
+	sv_vsetpvfn(message, SvPV_nolen(msg), SvCUR(msg), NULL,
+	    &ST(3), items - 3, NULL);
+	UA_LOG_WARNING(logger->lg_logger, category, "%s", SvPV_nolen(message));
+
+void
+UA_Logger_logError(logger, category, msg, ...)
+	OPCUA_Open62541_Logger		logger
+	UA_LogCategory			category
+	SV *				msg
+    INIT:
+	SV *				message;
+    CODE:
+	message = sv_newmortal();
+	sv_vsetpvfn(message, SvPV_nolen(msg), SvCUR(msg), NULL,
+	    &ST(3), items - 3, NULL);
+	UA_LOG_ERROR(logger->lg_logger, category, "%s", SvPV_nolen(message));
+
+void
+UA_Logger_logFatal(logger, category, msg, ...)
+	OPCUA_Open62541_Logger		logger
+	UA_LogCategory			category
+	SV *				msg
+    INIT:
+	SV *				message;
+    CODE:
+	message = sv_newmortal();
+	sv_vsetpvfn(message, SvPV_nolen(msg), SvCUR(msg), NULL,
+	    &ST(3), items - 3, NULL);
+	UA_LOG_FATAL(logger->lg_logger, category, "%s", SvPV_nolen(message));

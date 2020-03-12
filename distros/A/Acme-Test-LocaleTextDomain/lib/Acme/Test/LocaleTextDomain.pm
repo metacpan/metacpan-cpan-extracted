@@ -3,7 +3,7 @@ package Acme::Test::LocaleTextDomain;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2019-12-26'; # DATE
 our $DIST = 'Acme-Test-LocaleTextDomain'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -32,7 +32,7 @@ Acme::Test::LocaleTextDomain - Test Locale::TextDomain
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::Test::LocaleTextDomain (from Perl distribution Acme-Test-LocaleTextDomain), released on 2019-12-26.
+This document describes version 0.003 of Acme::Test::LocaleTextDomain (from Perl distribution Acme-Test-LocaleTextDomain), released on 2019-12-26.
 
 =head1 DESCRIPTION
 

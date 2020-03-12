@@ -10,7 +10,7 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 ########################################################################
 #

@@ -1,104 +1,108 @@
 use strict;
 use warnings;
 use OPCUA::Open62541 ':all';
-use POSIX qw(sigaction SIGALRM);
-
 use Scalar::Util qw(looks_like_number);
+
 use OPCUA::Open62541::Test::Server;
-use Test::More tests => 31;
+use OPCUA::Open62541::Test::Client;
+use Test::More tests =>
+    OPCUA::Open62541::Test::Server::planning() +
+    OPCUA::Open62541::Test::Client::planning() * 2 + 11;
+use Test::Exception;
 use Test::NoWarnings;
 use Test::LeakTrace;
 
 my $server = OPCUA::Open62541::Test::Server->new();
 $server->start();
-my $port = $server->port();
+my $client = OPCUA::Open62541::Test::Client->new(port => $server->port());
+$client->start();
+$server->run();
 
-my @testdesc = (
-    ['client', 'client creation'],
-    ['config', 'config creation'],
-    ['config_default', 'set default config'],
-    ['connect_async', 'call to connect_async'],
-    ['iterate', 'calls to run_iterate'],
-    ['state_session', 'client state SESSION after connect'],
-    ['cb_client', 'client in callback'],
-    ['cb_data', 'data in callback'],
-    ['cb_after', 'callback called after connect'],
-    ['cb_afterreq', 'reqID in callback called after connect'],
-    ['cb_afterresp', 'response in callback called after connect'],
-    ['disconnect', 'client disconnected'],
-    ['state_disconnected', 'client state DISCONNECTED after disconnect'],
-);
-my %testok = map { $_ => 0 } map { $_->[0] } @testdesc;
+my $data = ['foo'];
+my $connected = 0;
+is($client->{client}->connect_async(
+    $client->url(),
+    sub {
+	my ($c, $d, $i, $r) = @_;
 
+	is($c->getState(), CLIENTSTATE_SESSION, "callback client state");
+	is($d->[0], "foo", "callback data in");
+	push @$d, 'bar';
+	ok(looks_like_number $i, "callback request id")
+	    or diag "request id not a number: $i";
+	is($r, STATUSCODE_GOOD, "callback response");
+
+	$connected = 1;
+    },
+    $data
+), STATUSCODE_GOOD, "client connect_async");
+$client->iterate(\$connected, "connect");
+is($client->{client}->getState(), CLIENTSTATE_SESSION, "client state");
+is($data->[1], "bar", "callback data out");
+
+$client->stop();
+
+$client = OPCUA::Open62541::Test::Client->new(port => $server->port());
+$client->start();
+
+# Run the test again, check for leaks, no check within leak detection.
+# Although no_leaks_ok runs the code block multiple times, the callback
+# is only called once.
+$connected = 0;
 no_leaks_ok {
-    my $c;
-    my $r;
-    my $data = ['foo'];
-    {
-	$c = OPCUA::Open62541::Client->new();
-	$testok{client} = 1 if $c;
+    $client->{client}->connect_async(
+	$client->url(),
+	sub {
+	    my ($c, $d, $i, $r) = @_;
+	    $connected = 1;
+	},
+	$data
+    );
+    $client->iterate(\$connected);
+} "client connect_async leak";
 
-	my $cc = $c->getConfig();
-	$testok{config} = 1 if $cc;
-
-	$r = $cc->setDefault();
-	$testok{config_default} = 1 if $r == STATUSCODE_GOOD;
-
-	$r = $c->connect_async(
-	    "opc.tcp://localhost:$port",
-	    sub {
-		my ($c, $d, $i, $r) = @_;
-		$testok{cb_client} = 1 if $c->getState == CLIENTSTATE_SESSION;
-		$testok{cb_data} = 1 if $d->[0] eq 'foo';
-		push(@$data, 'bar', $i, $r);
-	    },
-	    $data
-	);
-	$testok{connect_async} = 1 if $r == STATUSCODE_GOOD;
-
-	my $maxloop = 1000;
-	my $failed_iterate = 0;
-	while($c->getState != CLIENTSTATE_SESSION && $maxloop-- > 0) {
-	    $r = $c->run_iterate(0);
-	    $failed_iterate = 1 if $r != STATUSCODE_GOOD;
-	}
-	$testok{iterate} = 1 if not $failed_iterate and $maxloop > 0;
-
-	$testok{state_session} = 1 if $c->getState == CLIENTSTATE_SESSION;
-	$testok{cb_after} = 1 if $data->[1] eq "bar";
-	$testok{cb_afterreq} = 1 if looks_like_number $data->[2];
-	$testok{cb_afterresp} = 1 if $data->[3] == STATUSCODE_GOOD;
-
-	$r = $c->disconnect();
-	$testok{disconnect} = 1 if $r == STATUSCODE_GOOD;
-	$testok{state_disconnected} = 1
-	    if $c->getState == CLIENTSTATE_DISCONNECTED;
-    }
-} "leak connect_async callback/data";
-
-ok($testok{$_->[0]}, $_->[1]) for (@testdesc);
+$client->stop();
 
 $server->stop();
 
-my $c = OPCUA::Open62541::Client->new();
-ok($c, "client new");
+# connect to invalid url fails, check that it does not leak
+$data = "foo";
+is($client->{client}->connect_async(
+    "opc.tcp://localhost:",
+    sub {
+	my ($c, $d, $i, $r) = @_;
+	fail "callback called";
+    },
+    \$data,
+), STATUSCODE_BADCONNECTIONCLOSED, "connect_async fail");
+is($data, "foo", "data fail");
+no_leaks_ok {
+    $client->{client}->connect_async(
+	"opc.tcp://localhost:",
+	sub {
+	    my ($c, $d, $i, $r) = @_;
+	},
+	\$data,
+    );
+} "connect_async fail leak";
 
-my $cc = $c->getConfig();
-ok($cc, "client config");
+throws_ok { $client->{client}->connect_async($client->url(), "foo", undef) }
+    (qr/Callback 'foo' is not a CODE reference /,
+    "callback not reference");
+no_leaks_ok {
+    eval { $client->{client}->connect_async($client->url(), "foo", undef) }
+} "callback not reference leak";
 
-my $r = $cc->setDefault();
-is($r, STATUSCODE_GOOD, "client config default");
-
-eval { $c->connect_async("opc.tcp://localhost:$port", "", undef) };
-ok($@, "callback not a reference");
-like($@, qr/callback is not a CODE reference/, "callback not a reference error");
-
-eval { $c->connect_async("opc.tcp://localhost:$port", [], undef) };
-ok($@, "callback not a code reference");
-like($@, qr/callback is not a CODE reference/,
-    "callback not a code reference error");
+throws_ok { $client->{client}->connect_async($client->url(), [], undef) }
+    (qr/Callback 'ARRAY.*' is not a CODE reference /,
+    "callback not code reference");
+no_leaks_ok {
+    eval { $client->{client}->connect_async($client->url(), [], undef) }
+} "callback not code reference leak";
 
 # the connection itself gets established in run_iterate. so this call should
 # also succeed if no server is running
-$r = $c->connect_async("opc.tcp://localhost:$port", undef, undef);
-is($r, STATUSCODE_GOOD, "connect_async no callback");
+is($client->{client}->connect_async($client->url(), undef, undef),
+    STATUSCODE_GOOD, "connect_async no callback");
+no_leaks_ok { $client->{client}->connect_async($client->url(), undef, undef) }
+    "connect_async no callback leak";

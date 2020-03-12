@@ -1,6 +1,16 @@
 Revision history for Perl extension Acme-LSD
 
+0.04 2020-03-12T17:06:57Z
+    - Localize $\
+
+0.03 2020-03-12T12:21:05Z
+    - Fix say (issue reported by tobyink)
+
+0.02 2020-03-12T10:22:33Z
+ 
+    - Generate README.md from pod
+    - Add picture to metacpan (not only github)
+ 
 0.01 2019-11-22T10:01:31Z
-
-    - original version
-
+  
+    - Original version

@@ -61,7 +61,7 @@ sub _show_info {
     if ( $opt->{ffprobe} ) {
         $info .= '    ' . $opt->{ffprobe} . ": " . ( $ffprobe_version // '?' ) . "\n";
     }
-    choose( [ 'Close' ], { prompt => "\n$info" } );
+    choose( [ 'Close' ], { prompt => $info } );
 }
 
 

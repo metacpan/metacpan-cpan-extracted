@@ -6,7 +6,7 @@ use strict;
 use vars qw( $VERSION @ISA );
 
 BEGIN {
-    $VERSION = '1.67';
+    $VERSION = '1.68';
     @ISA     = qw( Archive::Zip );
 
     if ($^O eq 'MSWin32') {
@@ -103,7 +103,7 @@ sub new {
     # headers, regardless of whether the member has an zip64
     # extended information extra field or not:
     #
-    #   version made by: 
+    #   version made by:
     #     30
     #
     #   version needed to extract:
@@ -248,7 +248,7 @@ sub fileName {
     my $self    = shift;
     my $newName = shift;
     if (defined $newName) {
-        $newName =~ s{[\\/]+}{/}g;    # deal with dos/windoze problems
+        $newName =~ y{\\/}{/}s;    # deal with dos/windoze problems
         $self->{'fileName'} = $newName;
     }
     return $self->{'fileName'};
@@ -779,7 +779,7 @@ sub _dosToUnixTime {
 
 # Note, this is not exactly UTC 1980, it's 1980 + 12 hours and 1
 # minute so that nothing timezoney can muck us up.
-my $safe_epoch = 31.676060;
+my $safe_epoch = 31.686060;
 
 # convert a unix time to DOS date/time
 # NOT AN OBJECT METHOD!
@@ -876,7 +876,7 @@ sub _writeLocalFileHeader {
 
         $localExtraField .= pack('S< S< Q< Q<',
                                  0x0001, 16,
-                                 $zip64UncompressedSize, 
+                                 $zip64UncompressedSize,
                                  $zip64CompressedSize);
     }
 
@@ -892,7 +892,7 @@ sub _writeLocalFileHeader {
            $versionNeededToExtract,
            $self->{'bitFlag'},
            $self->desiredCompressionMethod(),
-           $self->lastModFileDateTime(), 
+           $self->lastModFileDateTime(),
            $crc32,
            $compressedSize,
            $uncompressedSize,
@@ -1057,7 +1057,7 @@ sub _writeCentralDirectoryFileHeader {
     return
       (AZ_OK,
        CENTRAL_DIRECTORY_FILE_HEADER_LENGTH +
-       SIGNATURE_LENGTH + 
+       SIGNATURE_LENGTH +
        $fileNameLength +
        $extraFieldLength +
        $fileCommentLength)
@@ -1280,7 +1280,7 @@ sub contents {
             : undef;
 
         # Now call the subclass contents method
-        my $retval = 
+        my $retval =
           $self->contents(pack('C0a*', $newContents)); # in case of Unicode
 
         return wantarray ? ($retval, AZ_OK) : $retval;

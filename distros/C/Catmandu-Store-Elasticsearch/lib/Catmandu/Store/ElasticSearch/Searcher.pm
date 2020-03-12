@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Searcher;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0201';
+our $VERSION = '1.0202';
 
 use Moo;
 use namespace::clean;
@@ -18,7 +18,8 @@ has sort  => (is => 'ro');
 
 sub _paging_generator {
     my ($self) = @_;
-    my $es     = $self->bag->store->es;
+    my $store  = $self->bag->store;
+    my $es     = $store->es;
     my $id_key = $self->bag->id_key;
     my $index  = $self->bag->index;
     my $type   = $self->bag->type;
@@ -39,8 +40,11 @@ sub _paging_generator {
             }
             my $body = {query => $query, from => $start, size => $limit,};
             $body->{sort} = $sort if defined $sort;
-            my $res
-                = $es->search(index => $index, type => $type, body => $body,);
+            my %args = (index => $index, body => $body,);
+            if ($store->is_es_1_or_2) {
+                $args{type} = $self->type;
+            }
+            my $res = $es->search(%args);
 
             $hits = $res->{hits}{hits};
             $start += $limit;
@@ -77,12 +81,14 @@ sub generator {
             $body->{sort} = $self->sort if $self->sort;
             my %args = (
                 index => $bag->index,
-                type  => $bag->type,
                 size  => $bag->buffer_size,  # TODO divide by number of shards
                 body  => $body,
             );
             if (!$self->sort && $store->is_es_1_or_2) {
                 $args{search_type} = 'scan';
+            }
+            if ($store->is_es_1_or_2) {
+                $args{type} = $self->type;
             }
             $store->es->scroll_helper(%args);
         };
@@ -115,12 +121,13 @@ sub slice {    # TODO constrain total?
 
 sub count {
     my ($self) = @_;
-    my $bag = $self->bag;
-    $bag->store->es->count(
-        index => $bag->index,
-        type  => $bag->type,
-        body  => {query => $self->query,},
-    )->{count};
+    my $bag    = $self->bag;
+    my $store  = $bag->store;
+    my %args   = (index => $bag->index, body => {query => $self->query,},);
+    if ($store->is_es_1_or_2) {
+        $args{type} = $self->type;
+    }
+    $store->es->count(%args)->{count};
 }
 
 1;

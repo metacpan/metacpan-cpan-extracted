@@ -1,5 +1,5 @@
 package Net::Stripe::Subscription;
-$Net::Stripe::Subscription::VERSION = '0.39';
+$Net::Stripe::Subscription::VERSION = '0.41';
 use Moose;
 use Kavorka;
 use Net::Stripe::Token;
@@ -33,11 +33,8 @@ has 'cancel_at_period_end' => (is => 'rw', isa => 'Maybe[Bool]');
 
 
 method form_fields {
-    return (
-        $self->fields_for('card'),
-        $self->fields_for('plan'),
-        map { ($_ => $self->$_) }
-            grep { defined $self->$_ } qw/coupon prorate trial_end quantity/
+    return $self->form_fields_for(
+        qw/coupon prorate trial_end quantity card plan cancel_at_period_end/
     );
 }
 
@@ -54,7 +51,125 @@ Net::Stripe::Subscription - represent a Subscription object from Stripe
 
 =head1 VERSION
 
-version 0.39
+version 0.41
+
+=head1 ATTRIBUTES
+
+=head2 boolean_attributes
+
+Reader: boolean_attributes
+
+Type: ArrayRef[Str]
+
+=head2 cancel_at_period_end
+
+Reader: cancel_at_period_end
+
+Writer: cancel_at_period_end
+
+Type: Maybe[Bool]
+
+=head2 canceled_at
+
+Reader: canceled_at
+
+Type: Maybe[Int]
+
+=head2 card
+
+Reader: card
+
+Writer: card
+
+Type: Maybe[Net::Stripe::Card|Net::Stripe::Token|Str]
+
+=head2 coupon
+
+Reader: coupon
+
+Writer: coupon
+
+Type: Maybe[Net::Stripe::Coupon|Str]
+
+=head2 current_period_end
+
+Reader: current_period_end
+
+Type: Maybe[Int]
+
+=head2 current_period_start
+
+Reader: current_period_start
+
+Type: Maybe[Int]
+
+=head2 customer
+
+Reader: customer
+
+Type: Maybe[Str]
+
+=head2 ended_at
+
+Reader: ended_at
+
+Type: Maybe[Int]
+
+=head2 id
+
+Reader: id
+
+Type: Maybe[Str]
+
+=head2 plan
+
+Reader: plan
+
+Writer: plan
+
+Type: Maybe[Net::Stripe::Plan|Str]
+
+=head2 prorate
+
+Reader: prorate
+
+Writer: prorate
+
+Type: Maybe[Bool|Object]
+
+=head2 quantity
+
+Reader: quantity
+
+Writer: quantity
+
+Type: Maybe[Int]
+
+=head2 start
+
+Reader: start
+
+Type: Maybe[Int]
+
+=head2 status
+
+Reader: status
+
+Type: Maybe[Str]
+
+=head2 trial_end
+
+Reader: trial_end
+
+Writer: trial_end
+
+Type: Maybe[Int|Str]
+
+=head2 trial_start
+
+Reader: trial_start
+
+Type: Maybe[Str]
 
 =head1 AUTHORS
 

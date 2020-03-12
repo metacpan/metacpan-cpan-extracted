@@ -1,5 +1,5 @@
 package Net::Stripe::List;
-$Net::Stripe::List::VERSION = '0.39';
+$Net::Stripe::List::VERSION = '0.41';
 use Moose;
 use Kavorka;
 
@@ -27,6 +27,32 @@ method last {
     return $self->get(scalar($self->elements)-1);
 }
 
+method _next_page_args() {
+    return (
+        starting_after => $self->get(-1)->id,
+    );
+}
+
+method _previous_page_args() {
+    return (
+        ending_before => $self->get(0)->id,
+    );
+}
+
+fun _merge_lists(
+    ArrayRef[Net::Stripe::List] :$lists!,
+) {
+    my $has_count = defined( $lists->[-1]->count );
+    my $url = $lists->[-1]->url;
+    my %list_args = (
+        count => $has_count ? scalar( map { $_->elements } @$lists ) : undef,
+        data => [ map { $_->elements } @$lists ],
+        has_more => 0,
+        url => $url,
+    );
+    return Net::Stripe::List->new( %list_args );
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -40,7 +66,39 @@ Net::Stripe::List - represent a list of objects from Stripe
 
 =head1 VERSION
 
-version 0.39
+version 0.41
+
+=head1 ATTRIBUTES
+
+=head2 count
+
+Reader: count
+
+Type: Maybe[Int]
+
+=head2 data
+
+Reader: data
+
+Type: ArrayRef
+
+This attribute is required.
+
+=head2 has_more
+
+Reader: has_more
+
+Type: Bool|Object
+
+This attribute is required.
+
+=head2 url
+
+Reader: url
+
+Type: Str
+
+This attribute is required.
 
 =head1 AUTHORS
 

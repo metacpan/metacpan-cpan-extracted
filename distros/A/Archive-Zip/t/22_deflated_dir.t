@@ -1,27 +1,20 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
+# See https://github.com/redhotpenguin/perl-Archive-Zip/blob/master/t/README.md
+# for a short documentation on the Archive::Zip test infrastructure.
 
-use Archive::Zip qw( :ERROR_CODES );
-use File::Spec;
+use strict;
+
+BEGIN { $^W = 1; }
+
+use Test::More tests => 8;
+
+use Archive::Zip qw();
+
 use lib 't';
 use common;
 
-use Test::More tests => 4;
-
 my $zip = Archive::Zip->new();
-isa_ok( $zip, 'Archive::Zip' );
-is( $zip->read(File::Spec->catfile('t', 'data', 'jar.zip')), AZ_OK, 'Read file' );
-
-my $ret = eval { $zip->writeToFileNamed(OUTPUTZIP) };
-
-is($ret, AZ_OK, 'Wrote file');
-
-my ($status, $zipout) = testZip();
-# STDERR->print("status= $status, out=$zipout\n");
-SKIP: {
-    skip( "test zip doesn't work", 1 ) if $testZipDoesntWork;
-    is( $status, 0, "output zip isn't corrupted" )
-        or diag "status=$status, out='$zipout'\n";
-}
+isa_ok($zip, 'Archive::Zip');
+azok($zip->read(dataPath('jar.zip')), 'Read file');
+azwok($zip, name => 'Wrote file');

@@ -1,5 +1,21 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.005 2020-03-12
+    - Plug memory leaks in connect_async() in sendAsyncBrowseRequest(),
+      which were found by the tests.
+    - Allow to iterate client from test framework.
+    - Croak if wrong output variable type, make API stricter.
+    - Print log level and category as string with magic variables.
+    - Write client log files to debug tests.
+    - Improve leak ckecks in tests.
+    - Refactor client and server tests.
+    - Avoid posix signal handler in test server.
+    - Grep for server startup in server log to avoid races in tests.
+    - Test server writes log file.
+    - Implement Logger class.
+    - Refactor client callback.
+    - In XS croak() print function name and errno strings.
+
 0.004 2020-02-27
     - Use perlcritic and perltidy.
     - Test that adding a node in the server and reading its value

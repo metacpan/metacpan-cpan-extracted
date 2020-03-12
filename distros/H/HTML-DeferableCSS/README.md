@@ -4,7 +4,7 @@ HTML::DeferableCSS - Simplify management of stylesheets in your HTML
 
 # VERSION
 
-version v0.3.1
+version v0.3.2
 
 # SYNOPSIS
 
@@ -303,6 +303,13 @@ embed them.  Otherwise it will return the appropriate markup,
 depending on ["defer\_css"](#defer_css).
 
 # KNOWN ISSUES
+
+## Content-Security-Policy (CSP)
+
+If a web site configures a
+[Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
+setting to disable all inlined JavaScript, then the JavaScript shim will
+not work.
 
 ## XHTML Support
 

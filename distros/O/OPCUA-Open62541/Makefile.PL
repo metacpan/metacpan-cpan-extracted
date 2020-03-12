@@ -32,6 +32,7 @@ WriteMakefile(
 	'-Wmissing-prototypes -Wunused -Wsign-compare -Wshadow',
     SIGN		=> 1,
     TEST_REQUIRES	=> {
+	'Test::Deep'		=> 0,
 	'Test::Exception'	=> 0,
 	'Test::LeakTrace'	=> 0,
 	'Test::NoWarnings'	=> 0,

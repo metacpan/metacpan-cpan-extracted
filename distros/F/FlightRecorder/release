@@ -1,0 +1,49 @@
+#!/bin/bash
+
+export V=$1
+export DZIL_RELEASE=1
+
+# Ensure release version is explicit
+if [ ! -n "$V" ]; then
+  echo 'No release version!' && exit 0;
+fi
+
+# Check the repo is in ready-state
+if ! git diff-index --quiet HEAD --; then
+  echo "Uncommitted changes!" && exit 0;
+fi
+
+# Test fake build before release
+if ! dzil test; then
+  echo "Build test failed!" && exit 0;
+fi
+
+# Cleanup the mess
+dzil clean
+
+# Delete existing release tag (if exists)
+git tag -d latest $V 2> /dev/null
+git push origin :refs/tags/latest :refs/tags/$V 2> /dev/null
+
+# Persist Release VERSION
+echo $V > VERSION
+
+# Delete existing POD documents
+find lib -type f -name \*.pod -exec rm {} \;
+
+# Regenerate all necessary POD documents
+testauto -o lib -t TEMPLATE
+
+# Push generated POD changes
+if ! git diff-index --quiet HEAD --; then
+  git add . && git commit -m 'Added release updates'
+fi
+
+# Build, Tag, and Push Package Release
+dzil release
+
+# Tag as CPAN for releasing
+git tag latest 2> /dev/null
+
+# Re-push all tags (just in case)
+git push --tags 2> /dev/null

@@ -20,7 +20,7 @@ use Types::Standard qw/ Bool CodeRef HashRef Maybe Tuple /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.3.2';
 
 
 
@@ -327,7 +327,7 @@ HTML::DeferableCSS - Simplify management of stylesheets in your HTML
 
 =head1 VERSION
 
-version v0.3.1
+version v0.3.2
 
 =head1 SYNOPSIS
 
@@ -621,6 +621,13 @@ depending on L</defer_css>.
 =for Pod::Coverage PATH NAME SIZE
 
 =head1 KNOWN ISSUES
+
+=head2 Content-Security-Policy (CSP)
+
+If a web site configures a
+L<Content-Security-Policy|https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP>
+setting to disable all inlined JavaScript, then the JavaScript shim will
+not work.
 
 =head2 XHTML Support
 

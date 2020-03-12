@@ -4,7 +4,7 @@ use strict;
 use vars qw( $VERSION @ISA );
 
 BEGIN {
-    $VERSION = '1.67';
+    $VERSION = '1.68';
     @ISA     = qw ( Archive::Zip::FileMember );
 }
 
@@ -206,8 +206,8 @@ sub _skipLocalFileHeader {
           if ( $oldCrc32 != $self->{'crc32'}
             || $oldUncompressedSize != $self->{'uncompressedSize'});
 
-        $self->{'crc32'} = 0 
-            if $self->compressionMethod() == COMPRESSION_STORED ; 
+        $self->{'crc32'} = 0
+            if $self->compressionMethod() == COMPRESSION_STORED ;
     }
 
     return AZ_OK;

@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0201';
+our $VERSION = '1.0202';
 
 use Catmandu::Hits;
 use Cpanel::JSON::XS qw(encode_json decode_json);
@@ -118,12 +118,12 @@ sub generator {
         state $scroll = do {
             my %args = (
                 index => $self->index,
-                type  => $self->type,
                 size  => $self->buffer_size, # TODO divide by number of shards
                 body => {query => {match_all => {}},},
             );
             if ($self->store->is_es_1_or_2) {
                 $args{search_type} = 'scan';
+                $args{type}        = $self->type;
             }
             $self->store->es->scroll_helper(%args);
         };
@@ -139,8 +139,12 @@ sub generator {
 
 sub count {
     my ($self) = @_;
-    $self->store->es->count(index => $self->index, type => $self->type,)
-        ->{count};
+    my $store  = $self->store;
+    my %args   = (index => $self->index,);
+    if ($store->is_es_1_or_2) {
+        $args{type} = $self->type;
+    }
+    $store->es->count(%args)->{count};
 }
 
 sub get {
@@ -239,11 +243,11 @@ sub search {
         $res = $self->store->es->scroll(%es_args);
     }
     else {
-        my %es_args = (
-            index => $self->index,
-            type  => $self->type,
-            body  => {%args, size => $limit,},
-        );
+        my %es_args
+            = (index => $self->index, body => {%args, size => $limit,},);
+        if ($self->store->is_es_1_or_2) {
+            $es_args{type} = $self->type;
+        }
         if ($bag) {
             $es_args{body}{fields} = [];
         }
@@ -360,7 +364,7 @@ sub normalize_query {
 sub normalize_sort {
     my ($self, $sort) = @_;
     return $sort if ref $sort;
-    return if !$sort;
+    return       if !$sort;
     decode_json($sort);
 }
 

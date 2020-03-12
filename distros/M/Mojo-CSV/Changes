@@ -1,5 +1,8 @@
 Revision history for Mojo-CSV
 
+1.001004  2020-03-12
+  - Removed use of deprecated Mojo::Collection->slice method (#5)
+
 1.001003  2017-04-26
   - Fix test failures on latest Mojolicious
   - Bump Mojolicious prereq version

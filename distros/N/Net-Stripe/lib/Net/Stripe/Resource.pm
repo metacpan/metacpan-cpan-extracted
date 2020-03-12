@@ -1,9 +1,11 @@
 package Net::Stripe::Resource;
-$Net::Stripe::Resource::VERSION = '0.39';
+$Net::Stripe::Resource::VERSION = '0.41';
 # ABSTRACT: represent a Resource object from Stripe
 
 use Moose;
 use Kavorka;
+
+has 'boolean_attributes' => (is => 'ro', isa => 'ArrayRef[Str]');
 
 around BUILDARGS => sub {
     my $orig = shift;
@@ -14,6 +16,12 @@ around BUILDARGS => sub {
     for my $field (keys %args) {
         if (ref($args{$field}) =~ /^(JSON::XS::Boolean|JSON::PP::Boolean)$/) {
             $args{$field} = $args{$field} ? 1 : 0;
+        }
+    }
+
+    if (my $s = $args{source}) {
+        if (ref($s) eq 'HASH' && $s->{object} eq 'source') {
+            $args{source} = Net::Stripe::Source->new($s);
         }
     }
 
@@ -44,25 +52,73 @@ around BUILDARGS => sub {
         }
     }
 
+    for my $attr ($class->meta()->get_all_attributes()) {
+      next if !($attr->type_constraint && (
+          $attr->type_constraint eq 'Bool' ||
+          $attr->type_constraint eq 'Maybe[Bool]' ||
+          $attr->type_constraint eq 'Maybe[Bool|Object]'
+      ));
+      push @{$args{boolean_attributes}}, $attr->name;
+    }
+
     $class->$orig(%args);
 };
 
-method form_fields_for_metadata {
-    my $metadata = $self->metadata();
-    my @metadata = ();
-    while( my($k,$v) = each(%$metadata) ) {
-      push @metadata, 'metadata['.$k.']';
-      push @metadata, $v;
+fun form_fields_for_hashref (
+    Str $field_name!,
+    HashRef $hashref!,
+) {
+    my @field_values;
+    foreach my $key (sort keys %$hashref) {
+        my $value = $hashref->{$key};
+        my $nested_field_name = sprintf( '%s[%s]', $field_name, $key );
+        if ( ref( $value ) eq 'HASH' ) {
+            push @field_values, form_fields_for_hashref( $nested_field_name, $value );
+        } else {
+            push @field_values, ( $nested_field_name => $value );
+        }
     }
-    return @metadata;
+    return @field_values;
+}
+
+fun form_fields_for_arrayref (
+    Str $field_name!,
+    ArrayRef $arrayref!,
+) {
+    my $nested_field_name = sprintf( '%s[]', $field_name );
+    return $nested_field_name => $arrayref;
 }
 
 method fields_for($for) {
     return unless $self->can($for);
     my $thingy = $self->$for;
-    return unless $thingy;
+    return unless defined( $thingy );
+    return ($for => $thingy->id) if $for eq 'card' && ref($thingy) eq 'Net::Stripe::Token';
+    return ($for => $thingy->id) if $for eq 'source' && ref($thingy) eq 'Net::Stripe::Token';
     return $thingy->form_fields if ref($thingy) =~ m/^Net::Stripe::/;
-    return ($for => $thingy);
+    return form_fields_for_hashref( $for, $thingy ) if ref( $thingy ) eq 'HASH';
+    return form_fields_for_arrayref( $for, $thingy ) if ref( $thingy ) eq 'ARRAY';
+
+    my $token_id_type = Moose::Util::TypeConstraints::find_type_constraint( 'StripeTokenId' );
+    return form_fields_for_hashref( $for, { token => $thingy } )
+        if $self->isa( 'Net::Stripe::PaymentMethod' ) && $for eq 'card' && $token_id_type->check( $thingy );
+
+    return ( $for => $self->get_form_field_value( $for ) );
+}
+
+method form_fields_for(@fields!) {
+  return map { $self->fields_for( $_ ) } @fields;
+}
+
+method is_a_boolean(Str $attr!) {
+  my %boolean_attributes = map { $_ => 1 } @{$self->boolean_attributes() || []};
+  return exists( $boolean_attributes{$attr} );
+}
+
+method get_form_field_value(Str $attr!) {
+  my $value = $self->$attr;
+  return $value if ! $self->is_a_boolean( $attr );
+  return ( defined( $value ) && $value ) ? 'true' : 'false';
 }
 
 1;
@@ -77,7 +133,15 @@ Net::Stripe::Resource - represent a Resource object from Stripe
 
 =head1 VERSION
 
-version 0.39
+version 0.41
+
+=head1 ATTRIBUTES
+
+=head2 boolean_attributes
+
+Reader: boolean_attributes
+
+Type: ArrayRef[Str]
 
 =head1 AUTHORS
 

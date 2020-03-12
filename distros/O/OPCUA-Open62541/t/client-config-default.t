@@ -2,23 +2,24 @@ use strict;
 use warnings;
 use OPCUA::Open62541;
 
-use Test::More tests => 8;
+use Test::More tests => 9;
+use Test::Exception;
+use Test::LeakTrace;
 use Test::NoWarnings;
 
-my $s = OPCUA::Open62541::Client->new();
-ok($s, "client new");
+ok(my $client = OPCUA::Open62541::Client->new(), "client new");
+ok(my $config = $client->getConfig(), "config get");
+is($config->setDefault(), "Good", "default set");
+no_leaks_ok { $config->setDefault() } "default set leak";
 
-my $c = $s->getConfig();
-ok($c, "config get");
+throws_ok { OPCUA::Open62541::ClientConfig::setDefault() }
+    (qr/OPCUA::Open62541::ClientConfig::setDefault\(config\) /,
+    "config missing");
+no_leaks_ok { eval { OPCUA::Open62541::ClientConfig::setDefault() } }
+    "config missing leak";
 
-is($c->setDefault(), "Good", "default status");
-
-eval { OPCUA::Open62541::ClientConfig::setDefault() };
-ok($@, "config missing");
-like($@, qr/OPCUA::Open62541::ClientConfig::setDefault\(config\) /,
-    "config missing error");
-
-eval { OPCUA::Open62541::ClientConfig::setDefault(1) };
-ok($@, "config type");
-like($@, qr/config is not of type OPCUA::Open62541::ClientConfig /,
-    "config type error");
+throws_ok { OPCUA::Open62541::ClientConfig::setDefault(1) }
+    (qr/config is not of type OPCUA::Open62541::ClientConfig /,
+    "config type");
+no_leaks_ok { eval { OPCUA::Open62541::ClientConfig::setDefault(1) } }
+    "config type leak";

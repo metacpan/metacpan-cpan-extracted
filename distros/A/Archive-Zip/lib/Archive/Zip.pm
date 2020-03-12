@@ -14,7 +14,7 @@ use FileHandle          ();
 use vars qw( $VERSION @ISA );
 
 BEGIN {
-    $VERSION = '1.67';
+    $VERSION = '1.68';
 
     require Exporter;
     @ISA = qw( Exporter );
@@ -593,7 +593,7 @@ sub _asZipDirName {
     my ($volume, $directories, $file) =
       File::Spec->splitpath(File::Spec->canonpath($name), $forceDir);
     $$volReturn = $volume if (ref($volReturn));
-    my @dirs = map { $_ =~ s{/}{_}g; $_ } File::Spec->splitdir($directories);
+    my @dirs = map { $_ =~ y{/}{_}; $_ } File::Spec->splitdir($directories);
     if (@dirs > 0) { pop(@dirs) unless $dirs[-1] }    # remove empty component
     push(@dirs, defined($file) ? $file : '');
 
@@ -769,7 +769,7 @@ COMPRESSION_STORED COMPRESSION_DEFLATED IFA_TEXT_FILE_MASK
 IFA_TEXT_FILE IFA_BINARY_FILE COMPRESSION_LEVEL_NONE
 COMPRESSION_LEVEL_DEFAULT COMPRESSION_LEVEL_FASTEST
 COMPRESSION_LEVEL_BEST_COMPRESSION
-ZIP64_AS_NEEDED ZIP64_EOCD ZIP64_HEADERS
+ZIP64_SUPPORTED ZIP64_AS_NEEDED ZIP64_EOCD ZIP64_HEADERS
 
 =item :MISC_CONSTANTS
 
@@ -2006,6 +2006,10 @@ Returns AZ_OK on success.
 
 Returns true if I am a directory.
 
+=item isSymbolicLink()
+
+Returns true if I am a symbolic link.
+
 =item writeLocalHeaderRelativeOffset()
 
 Returns the file offset in bytes the last time I was written.
@@ -2182,10 +2186,10 @@ easier to use and factors out archive-specific functionality.
 
 =head2 Zip64 Format Support
 
-Since version 1.67 Archive::Zip supports the so-called zip64
+Since version 1.66 Archive::Zip supports the so-called zip64
 format, which overcomes various limitations in the original zip
 file format.  On some Perl interpreters, however, even version
-1.67 and newer of Archive::Zip cannot support the zip64 format.
+1.66 and newer of Archive::Zip cannot support the zip64 format.
 Among these are all Perl interpreters that lack 64-bit support
 and those older than version 5.10.0.
 
@@ -2279,11 +2283,11 @@ have to re-read the entire archive to try again with the correct password.
 
 =head1 SUPPORT
 
-Bugs should be reported via the CPAN bug tracker
+Bugs should be reported on GitHub
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Archive-Zip>
+L<https://github.com/redhotpenguin/perl-Archive-Zip/issues>
 
-For other issues contact the maintainer
+For other issues contact the maintainer.
 
 =head1 AUTHOR
 

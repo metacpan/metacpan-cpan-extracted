@@ -25,20 +25,13 @@
             "Alien::Build" : "1.41",
             "Alien::Build::MM" : "1.41",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
-            "Alien::MSYS" : "0.07",
+            "Alien::MSYS" : "0",
+            "Alien::curl" : "0.07",
             "Alien::sqlite" : "0",
-            "Archive::Tar" : "0",
-            "Env::ShellWords" : "0.01",
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
-            "HTTP::Tiny" : "0.044",
-            "IO::Zlib" : "0",
-            "Mojo::DOM" : "0",
-            "Mojolicious" : "7.00",
             "PkgConfig" : "0.19026",
-            "Sort::Versions" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0"
+            "Sort::Versions" : "0"
          }
       },
       "configure" : {
@@ -48,6 +41,7 @@
             "Alien::Build::Plugin::Build::SearchDep" : "0.53",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::MSYS" : "0",
+            "Alien::curl" : "0.07",
             "Alien::sqlite" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
@@ -79,12 +73,13 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-proj"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 1.85",
+      "generated_by" : "Alien::Build::MM version 2.08",
       "requires" : {
          "share" : {
             "Alien::MSYS" : "0.07",
+            "Alien::curl" : "0",
             "Alien::sqlite" : "0",
             "Archive::Tar" : "0",
             "Env::ShellWords" : "0.01",

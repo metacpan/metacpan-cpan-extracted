@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/thibaultduponchelle/Acme-LSD.svg?branch=master)](https://travis-ci.org/thibaultduponchelle/Acme-LSD) [![Kritika Status](https://kritika.io/users/thibaultduponchelle/repos/thibaultduponchelle+Acme-LSD/heads/master/status.svg)](https://kritika.io/users/thibaultduponchelle/repos/thibaultduponchelle+Acme-LSD)
 # NAME
 
 Acme::LSD - A dumb module that colorize your prints
@@ -13,7 +14,31 @@ Acme::LSD - A dumb module that colorize your prints
 
 # DESCRIPTION
 
-Acme::LSD is a module that overrides the CORE::GLOBAL::print function.
+Acme::LSD is a module that overrides the **CORE::GLOBAL::print** function.
+
+## EXAMPLE
+
+For instance the code...
+
+    #!/usr/bin/env perl 
+
+    use Acme::LSD;
+    print `man man`;
+
+... will produce 
+
+<div>
+    <div style="display: flex">
+    <div style="margin: 3px; flex: 1 1 50%">
+    <img alt="Screenshot of Acme::LSD sample output" src="https://raw.githubusercontent.com/thibaultduponchelle/Acme-LSD/master/acmelsd.png" style="max-width: 100%" width="600">
+    </div>
+    </div>
+</div>
+
+# REFERENCES
+
+- [How can I hook into Perl's print?](https://stackoverflow.com/questions/387702/how-can-i-hook-into-perls-print/388211#388211)
+- My [C version](https://github.com/thibaultduponchelle/lsd)
 
 # LICENSE
 

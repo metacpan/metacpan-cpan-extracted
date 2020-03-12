@@ -4,12 +4,11 @@ author:
   - 'Ned Konz <perl@bike-nomad.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::MockModule: '0'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +33,7 @@ requires:
   Time::Local: '0'
   perl: '5.006'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Zip
+  bugtracker: https://github.com/redhotpenguin/perl-Archive-Zip/issues
   repository: https://github.com/redhotpenguin/perl-Archive-Zip.git
-version: '1.67'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '1.68'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

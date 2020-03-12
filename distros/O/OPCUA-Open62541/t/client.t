@@ -3,29 +3,29 @@ use warnings;
 use OPCUA::Open62541;
 
 use Test::More tests => 11;
+use Test::Exception;
+use Test::LeakTrace;
 use Test::NoWarnings;
 use Test::Warn;
 
-my $s = OPCUA::Open62541::Client->new();
-ok(defined($s), "client defined");
-ok($s, "client new");
-is(ref($s), "OPCUA::Open62541::Client", "class");
+ok(my $client = OPCUA::Open62541::Client->new(), "client new");
+is(ref($client), "OPCUA::Open62541::Client", "client new class");
+no_leaks_ok { OPCUA::Open62541::Client->new() } "client new leak";
 
-eval { OPCUA::Open62541::Client::new() };
-ok($@, "class missing");
-like($@, qr/OPCUA::Open62541::Client::new\(class\) /, "class missing error");
+throws_ok { OPCUA::Open62541::Client::new() }
+    (qr/OPCUA::Open62541::Client::new\(class\) /, "class missing");
+no_leaks_ok { eval { OPCUA::Open62541::Client::new() } } "class missing leak";
 
-warnings_like { eval { OPCUA::Open62541::Client::new(undef) } }
-    (qr/uninitialized value in subroutine entry /, "class undef warning");
-
-eval {
+warnings_like {
+    throws_ok { OPCUA::Open62541::Client::new(undef) }
+	(qr/Class '' is not OPCUA::Open62541::Client /, "class undef");
+} (qr/uninitialized value in subroutine entry /, "class undef warn");
+no_leaks_ok {
     no warnings 'uninitialized';
-    OPCUA::Open62541::Client::new(undef)
-};
-ok($@, "class undef");
-like($@, qr/class '' is not OPCUA::Open62541::Client /, "class undef error");
+    eval { OPCUA::Open62541::Client::new(undef) };
+} "class undef leak";
 
-eval { OPCUA::Open62541::Client::new("subclass") };
-ok($@, "class subclass");
-like($@, qr/class 'subclass' is not OPCUA::Open62541::Client /,
-    "class subclass error");
+throws_ok { OPCUA::Open62541::Client::new("subclass") }
+    (qr/Class 'subclass' is not OPCUA::Open62541::Client /, "subclass");
+no_leaks_ok { eval { OPCUA::Open62541::Client::new("subclass") } }
+    "subclass leak";

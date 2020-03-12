@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.245    2020-03-12
+        - Term::Choose::Util minimum version is '0.117'.
+        - Small format output fixes.
+
 2.244    2020-03-11
         - SQLite plugin: sort databases.
         - Option 'Data source': different settings for 'Insert' and 'Create table'.

@@ -21,8 +21,7 @@ WriteMakefile1(
                 type => 'git',
             },
             bugtracker => {
-                mailto => 'bug-Archive-Zip@rt.cpan.org',
-                web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Zip',
+                web => 'https://github.com/redhotpenguin/perl-Archive-Zip/issues',
             },
         },
     },
@@ -51,20 +50,9 @@ WriteMakefile1(
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',
-        'Test::MockModule' => 0,
     },
     clean => {
-        FILES => join( ' ', qw{
-                test.log
-                testdir/*
-                testdir/
-                extracted/testdir/*
-                extracted/testdir
-                extracted/
-                testin.zip
-                testout.zip
-                test2.zip
-                } ),
+        FILES => 'testdir',
     },
     dist => {
         COMPRESS => 'gzip',

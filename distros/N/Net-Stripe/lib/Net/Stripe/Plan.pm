@@ -1,5 +1,5 @@
 package Net::Stripe::Plan;
-$Net::Stripe::Plan::VERSION = '0.39';
+$Net::Stripe::Plan::VERSION = '0.41';
 use Moose;
 use Moose::Util::TypeConstraints qw(subtype as where message);
 use Kavorka;
@@ -7,25 +7,26 @@ extends 'Net::Stripe::Resource';
 
 # ABSTRACT: represent a Plan object from Stripe
 
-subtype 'StatementDescription',
+subtype 'StatementDescriptor',
     as 'Str',
     where { !defined($_) || $_ =~ /^[^<>"']{0,15}$/ },
-    message { "The statement description you provided '$_' must be 15 characters or less and not contain <>\"'." };
+    message { "The statement descriptor you provided '$_' must be 15 characters or less and not contain <>\"'." };
 
 has 'id'                => (is => 'ro', isa => 'Maybe[Str]', required => 1);
 has 'amount'            => (is => 'ro', isa => 'Maybe[Int]', required => 1);
 has 'currency'          => (is => 'ro', isa => 'Maybe[Str]', required => 1);
 has 'interval'          => (is => 'ro', isa => 'Maybe[Str]', required => 1);
 has 'interval_count'    => (is => 'ro', isa => 'Maybe[Int]', required => 0);
-has 'name'              => (is => 'ro', isa => 'Maybe[Str]', required => 1);
+has 'name'              => (is => 'ro', isa => 'Maybe[Str]');
 has 'trial_period_days' => (is => 'ro', isa => 'Maybe[Int]');
-has 'statement_description' => ('is' => 'ro', isa => 'Maybe[StatementDescription]', required => 0);
+has 'statement_descriptor' => (is => 'ro', isa => 'Maybe[StatementDescriptor]', required => 0);
+has 'metadata'          => (is => 'ro', isa => 'Maybe[HashRef]');
+has 'product'           => (is => 'ro', isa => 'Maybe[StripeProductId|Str]');
 
 method form_fields {
-    return (
-        map { $_ => $self->$_ }
-            grep { defined $self->$_ }
-                qw/id amount currency interval interval_count name statement_description trial_period_days/
+    return $self->form_fields_for(
+        qw/id amount currency interval interval_count name statement_descriptor
+            trial_period_days metadata product/
     );
 }
 
@@ -42,7 +43,83 @@ Net::Stripe::Plan - represent a Plan object from Stripe
 
 =head1 VERSION
 
-version 0.39
+version 0.41
+
+=head1 ATTRIBUTES
+
+=head2 amount
+
+Reader: amount
+
+Type: Maybe[Int]
+
+This attribute is required.
+
+=head2 boolean_attributes
+
+Reader: boolean_attributes
+
+Type: ArrayRef[Str]
+
+=head2 currency
+
+Reader: currency
+
+Type: Maybe[Str]
+
+This attribute is required.
+
+=head2 id
+
+Reader: id
+
+Type: Maybe[Str]
+
+This attribute is required.
+
+=head2 interval
+
+Reader: interval
+
+Type: Maybe[Str]
+
+This attribute is required.
+
+=head2 interval_count
+
+Reader: interval_count
+
+Type: Maybe[Int]
+
+=head2 metadata
+
+Reader: metadata
+
+Type: Maybe[HashRef]
+
+=head2 name
+
+Reader: name
+
+Type: Maybe[Str]
+
+=head2 product
+
+Reader: product
+
+Type: Maybe[Str|StripeProductId]
+
+=head2 statement_descriptor
+
+Reader: statement_descriptor
+
+Type: Maybe[StatementDescriptor]
+
+=head2 trial_period_days
+
+Reader: trial_period_days
+
+Type: Maybe[Int]
 
 =head1 AUTHORS
 

@@ -1,34 +1,34 @@
-package OPCUA::Open62541::Test::Server;
-
 use strict;
 use warnings;
-use Net::EmptyPort qw(empty_port);
+
+package OPCUA::Open62541::Test::Server;
+use OPCUA::Open62541::Test::Logger;
 use OPCUA::Open62541 ':statuscode';
-use POSIX qw(sigaction SIGTERM SIGALRM SIGKILL);
 use Carp 'croak';
+use Net::EmptyPort qw(empty_port);
+use POSIX qw(SIGTERM SIGALRM SIGKILL);
 
 use Test::More;
 
 sub planning {
     # number of ok() and is() calls in this code
-    return 8;
+    return OPCUA::Open62541::Test::Logger::planning() + 13;
 }
 
 sub new {
     my $class = shift;
-    my %args = @_;
-    my $self = {};
-    $self->{timeout} = $args{timeout} || 10;
+    my $self = { @_ };
+    $self->{timeout} ||= 10;
 
-    ok($self->{server} = OPCUA::Open62541::Server->new(), "server new");
-    ok($self->{config} = $self->{server}->getConfig(), "server get config");
+    ok($self->{server} = OPCUA::Open62541::Server->new(), "server: new");
+    ok($self->{config} = $self->{server}->getConfig(), "server: get config");
 
     return bless($self, $class);
 }
 
 sub DESTROY {
     local($., $@, $!, $^E, $?);
-    my $self = shift;
+    my OPCUA::Open62541::Test::Server $self = shift;
     if ($self->{pid}) {
 	diag "running server destroyed, please call server stop()";
 	kill(SIGKILL, $self->{pid});
@@ -37,18 +37,31 @@ sub DESTROY {
 }
 
 sub port {
-    my $self = shift;
-
+    my OPCUA::Open62541::Test::Server $self = shift;
+    $self->{port} = shift if @_;
     return $self->{port};
 }
 
 sub start {
-    my $self = shift;
+    my OPCUA::Open62541::Test::Server $self = shift;
 
-    ok($self->{port} = empty_port(), "empty port");
-    note("going to configure server");
+    ok($self->{port} ||= empty_port(), "server: empty port");
+    note("going to configure server on port $self->{port}");
     is($self->{config}->setMinimal($self->{port}, ""), STATUSCODE_GOOD,
-	"set minimal server config port $self->{port}");
+	"server: set minimal config");
+
+    ok($self->{logger} = $self->{config}->getLogger(), "server: get logger");
+    ok($self->{log} = OPCUA::Open62541::Test::Logger->new(
+	logger => $self->{logger},
+	ident => "OPC UA server",
+    ), "server: test logger");
+    ok($self->{log}->file("server.log"), "server: log file");
+
+    return $self;
+}
+
+sub run {
+    my OPCUA::Open62541::Test::Server $self = shift;
 
     $self->{pid} = fork();
     if (defined($self->{pid})) {
@@ -61,44 +74,46 @@ sub start {
 	fail("fork server") or diag "Fork failed: $!";
     }
 
-    # XXX should way until server did bind(2) the port,
-    # may grep for 'TCP network layer listening on' in server log
+    ok($self->{log}->pid($self->{pid}), "server: log set pid");
+
+    # wait until server did bind(2) the port
+    ok($self->{log}->loggrep(qr/TCP network layer listening on /, 10),
+	"server: log grep listening");
+    return $self;
 }
 
 sub child {
-    my $self = shift;
+    my OPCUA::Open62541::Test::Server $self = shift;
 
     my $running = 1;
-    my $handler = sub {
+    local $SIG{ALRM} = local $SIG{TERM} = sub {
 	$running = 0;
     };
-
-    # Perl signal handler only works between perl statements.
-    # Use the real signal handler to interrupt the OPC UA server.
-    # This is not signal safe, best effort is good enough for a test.
-    my $sigact = POSIX::SigAction->new($handler)
-	or croak "could not create POSIX::SigAction";
-    sigaction(SIGTERM, $sigact)
-	or croak "sigaction SIGTERM failed: $!";
-    sigaction(SIGALRM, $sigact)
-	or croak "sigaction SIGALRM failed: $!";
     defined(alarm($self->{timeout}))
 	or croak "alarm failed: $!";
 
     # run server and stop after ten seconds or due to kill
     note("going to startup server");
-    $self->{server}->run($running);
+    my $status_code;
+    $status_code = $self->{server}->run_startup()
+	or croak "server run_startup failed: $status_code";
+    while ($running) {
+	# for signal handling we have to return to Perl regulary
+	$self->{server}->run_iterate(1);
+    }
+    $self->{server}->run_shutdown()
+	or croak "server run_shutdown failed: $status_code";
 }
 
 sub stop {
-    my $self = shift;
+    my OPCUA::Open62541::Test::Server $self = shift;
 
     note("going to shutdown server");
-    ok(kill(SIGTERM, $self->{pid}), "kill server");
-    is(waitpid($self->{pid}, 0), $self->{pid}, "waitpid");
-    is($?, 0, "server finished");
-
+    ok(kill(SIGTERM, $self->{pid}), "server: kill server");
+    is(waitpid($self->{pid}, 0), $self->{pid}, "server: waitpid");
+    is($?, 0, "server: finished");
     delete $self->{pid};
+    return $self;
 }
 
 1;
@@ -155,12 +170,18 @@ Defaults to 10 seconds.
 Will reap the server process if it is still running.
 Better call stop() to shutdown the server and check its exit code.
 
-=item $server->port()
+=item $server->port($port)
 
-Returns the dynamically chosen port number of the server.
-Must be called after start().
+Optionally set the port number.
+If port is not given, returns the dynamically chosen port number
+of the server.
+Must be called after start() for that.
 
 =item $server->start()
+
+Configure the server.
+
+=item $server->run()
 
 Startup the open62541 server as a background process.
 The function will return immediately.
@@ -174,7 +195,8 @@ Stop the background server and check its exit code.
 =head1 SEE ALSO
 
 OPCUA::Open62541,
-OPCUA::Open62541::Test::Client
+OPCUA::Open62541::Test::Client,
+OPCUA::Open62541::Test::Logger
 
 =head1 AUTHORS
 

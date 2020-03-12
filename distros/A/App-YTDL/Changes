@@ -1,6 +1,9 @@
 Revision history for App-YTDL
 
 
+0.309   2020-03-12
+        - Term::Choose::Util minimum version is "0.117".
+
 0.308   2020-03-11
         - Update youtube regexes.
         - Update manual format userinterface.
@@ -25,7 +28,7 @@ Revision history for App-YTDL
 
 0.302   2018-07-02
         - "Term::Choose" minimum version is "1.600".
-        - "Term::Choose-Util" minimum version is "0.064".
+        - "Term::Choose::Util" minimum version is "0.064".
 
 0.301   2018-06-23
         - Bugfix in video quality "manually".

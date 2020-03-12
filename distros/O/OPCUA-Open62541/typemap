@@ -32,6 +32,9 @@ OPCUA_Open62541_Client			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ClientConfig		T_PTROBJ_SPECIAL
 OPCUA_Open62541_ClientState		T_ENUM
 OPCUA_Open62541_BrowseResultMask	T_ENUM
+OPCUA_Open62541_Logger			T_PTROBJ_SPECIAL
+UA_LogLevel				T_PACKED
+UA_LogCategory				T_PACKED
 
 #############################################################################
 INPUT
@@ -47,12 +50,12 @@ T_PTROBJ_OPTIONAL
 		/* Scalar reference, set referenced variable to pointer. */
 		$var = UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new();
 		if ($var == NULL)
-			croak(\"UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new\");
+			CROAK(\"UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new\");
 		DPRINTF(\"${(my $ntt=lc(${ntype}))=~s/.*_//g;\$ntt} %p\", $var);
 		sv_setref_pv(SvRV($arg),
 		    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\", $var);
 	} else {
-		croak(\"%s: %s is not a scalar reference\",
+		CROAK(\"%s: %s is not a scalar reference\",
 		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\");
 	}
 T_PTROBJ_REFERENCE
@@ -64,12 +67,12 @@ T_PTROBJ_REFERENCE
 		/* Scalar reference, set referenced variable to pointer. */
 		$var = UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new();
 		if ($var == NULL)
-			croak(\"UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new\");
+			CROAK(\"UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new\");
 		DPRINTF(\"${(my $ntt=lc(${ntype}))=~s/.*_//g;\$ntt} %p\", $var);
 		sv_setref_pv(SvRV($arg),
 		    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\", $var);
 	} else {
-		croak(\"%s: %s is not a scalar reference\",
+		CROAK(\"%s: %s is not a scalar reference\",
 		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\");
 	}
 T_PTROBJ_SPECIAL
@@ -77,7 +80,7 @@ T_PTROBJ_SPECIAL
 	    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\")) {
 		$var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
 	} else {
-		croak(\"%s: %s is not of type %s\",
+		CROAK(\"%s: %s is not of type %s\",
 		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 		    \"$var\", \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\");
 		/* NOTREACHED, but cppcheck does not know this. */

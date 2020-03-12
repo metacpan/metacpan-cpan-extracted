@@ -1,34 +1,31 @@
 use strict;
 use warnings;
 use OPCUA::Open62541 ':all';
-use POSIX qw(sigaction SIGALRM);
 
 use OPCUA::Open62541::Test::Server;
-use Test::More tests => 16;
+use OPCUA::Open62541::Test::Client;
+use Test::More tests =>
+    OPCUA::Open62541::Test::Server::planning() +
+    OPCUA::Open62541::Test::Client::planning() + 1;
 use Test::NoWarnings;
 use Test::Warn;
 
 my $server = OPCUA::Open62541::Test::Server->new();
 $server->start();
-my $port = $server->port();
+my $client = OPCUA::Open62541::Test::Client->new(port => $server->port());
+$client->start();
+$server->run();
 
-my $c = OPCUA::Open62541::Client->new();
-ok($c, "client");
+is($client->{client}->connect($client->url()), STATUSCODE_GOOD,
+    "client connect");
+is($client->{client}->getState, CLIENTSTATE_SESSION,
+    "client state connected");
+# check client did connect(2)
+ok($client->{log}->loggrep(qr/TCP connection established/, 5),
+    "client loggrep connected");
 
-my $cc = $c->getConfig();
-ok($c, "config client");
-
-my $r = $cc->setDefault();
-is($r, STATUSCODE_GOOD, "default client config");
-
-$r = $c->connect("opc.tcp://localhost:$port");
-is($r, STATUSCODE_GOOD, "client connected");
-
-is($c->getState, CLIENTSTATE_SESSION, "client state connected");
-
-$r = $c->disconnect();
-is($r, STATUSCODE_GOOD, "client disconnected");
-
-is($c->getState, CLIENTSTATE_DISCONNECTED, "client state disconnected");
+is($client->{client}->disconnect(), STATUSCODE_GOOD, "client disconnect");
+is($client->{client}->getState, CLIENTSTATE_DISCONNECTED,
+    "client state disconnected");
 
 $server->stop();

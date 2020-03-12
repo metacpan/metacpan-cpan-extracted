@@ -38,22 +38,22 @@ sub test_query {
     my ($dq) = @_;
 
     is(
-        $dq->sql('SELECT west FROM movie WHERE open = ?')->run('Jul 1, 2011')->value(),
+        $dq->sql('SELECT west FROM movie WHERE open = ?')->run('Jul 1, 2011')->value,
         'Raising Arizona',
         '$dq->sql(...)->run(...)->value()',
     );
     is(
-        $dq->get( 'movie', ['west'], { 'open' => 'Jul 1, 2011' } )->run()->value(),
+        $dq->get( 'movie', ['west'], { 'open' => 'Jul 1, 2011' } )->run->value,
         'Raising Arizona',
         '$dq->get(...)->run(...)->value()',
     );
     is(
-        $dq->sql_uncached('SELECT west FROM movie WHERE open = ?')->run('Jul 1, 2011')->value(),
+        $dq->sql_uncached('SELECT west FROM movie WHERE open = ?')->run('Jul 1, 2011')->value,
         'Raising Arizona',
         '$dq->sql_uncached(...)->run(...)->value()',
     );
     is(
-        $dq->get_uncached( 'movie', ['west'], { 'open' => 'Jul 1, 2011' } )->run()->value(),
+        $dq->get_uncached( 'movie', ['west'], { 'open' => 'Jul 1, 2011' } )->run->value,
         'Raising Arizona',
         '$dq->get_uncached(...)->run(...)->value()',
     );
@@ -76,7 +76,7 @@ sub test_crud {
         'add() succeeds and returns a primary key',
     );
     is(
-        $dq->get( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run()->value(),
+        $dq->get( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run->value,
         'Vertigo',
         'add() data verified being in the database',
     );
@@ -84,7 +84,7 @@ sub test_crud {
     my $rv = $dq->update( 'movie', { 'west' => 'Another Earth' }, { 'open' => 'Jun 14, 2013' } );
     isa_ok( $rv, MODULE . '::db' );
     is(
-        $dq->get( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run()->value(),
+        $dq->get( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run->value,
         'Another Earth',
         'update() data verified being in the database',
     );
@@ -92,7 +92,7 @@ sub test_crud {
     $rv = $dq->rm( 'movie', { 'open' => 'Jun 14, 2013' } );
     isa_ok( $rv, MODULE . '::db' );
     is(
-        $dq->get( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run()->value(),
+        $dq->get( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run->value,
         undef,
         'rm() data verified being not in the database',
     );
@@ -102,7 +102,7 @@ sub test_where {
     my ($dq) = @_;
 
     is_deeply(
-        $dq->get('movie')->where( 'final' => 'Aug 7, 2011' )->run()->all({}),
+        $dq->get('movie')->where( 'final' => 'Aug 7, 2011' )->run->all({}),
         [{
             'open'  => 'Aug 5, 2011',
             'final' => 'Aug 7, 2011',
@@ -115,7 +115,7 @@ sub test_where {
     is_deeply(
         $dq
             ->get('movie', undef, { 'final' => 'Aug 7, 2011' } )
-            ->where( 'final' => 'Jul 17, 2011' )->run()->all({}),
+            ->where( 'final' => 'Jul 17, 2011' )->run->all({}),
         [{
             'open'  => 'Jul 15, 2011',
             'final' => 'Jul 17, 2011',
@@ -128,7 +128,7 @@ sub test_where {
     is_deeply(
         $dq
             ->get('movie', undef, { 'final' => 'Aug 7, 2011' } )
-            ->where( '"open"' => 'Aug 5, 2011' )->run()->all({}),
+            ->where( '"open"' => 'Aug 5, 2011' )->run->all({}),
         [{
             'open'  => 'Aug 5, 2011',
             'final' => 'Aug 7, 2011',
@@ -141,7 +141,7 @@ sub test_where {
     is_deeply(
         $dq
             ->get('movie', undef, { 'final' => 'Aug 7, 2011' } )
-            ->where( '"open"' => 'Jul 15, 2011' )->run()->all({}),
+            ->where( '"open"' => 'Jul 15, 2011' )->run->all({}),
         [],
         '$db->get( $table, undef, $where )->where($where_addition)',
     );
@@ -198,7 +198,7 @@ sub test_run {
             undef,
             undef,
             ['Jul 1, 2011'],
-        )->run()->all({}),
+        )->run->all({}),
         [
             {
                 'west' => 'Raising Arizona',
@@ -219,7 +219,7 @@ sub test_run {
         '$dq->sql($sql)->run($variable)->all({})',
     );
     is_deeply(
-        $dq->get( 'movie', [ 'west', 'east' ], { 'open' => 'Jul 1, 2011' } )->run()->all({}),
+        $dq->get( 'movie', [ 'west', 'east' ], { 'open' => 'Jul 1, 2011' } )->run->all({}),
         [
             {
                 'west' => 'Raising Arizona',
@@ -233,10 +233,10 @@ sub test_run {
 sub test_row_set_methods {
     my ($dq) = @_;
 
-    my $row_set = $dq->sql('SELECT * FROM movie')->run();
+    my $row_set = $dq->sql('SELECT * FROM movie')->run;
 
     is_deeply(
-        $row_set->next()->data(),
+        $row_set->next->data,
         {
             'open' => 'Jun 17, 2011',
             'final' => 'Jun 19, 2011',
@@ -247,7 +247,7 @@ sub test_row_set_methods {
     );
 
     is_deeply(
-        $row_set->next(2)->data(),
+        $row_set->next(2)->data,
         {
             'open' => 'Jul 8, 2011',
             'final' => 'Jul 10, 2011',
@@ -258,7 +258,7 @@ sub test_row_set_methods {
     );
 
     is_deeply(
-        $dq->sql('SELECT west, east FROM movie WHERE east LIKE ?')->run('%he%')->all(),
+        $dq->sql('SELECT west, east FROM movie WHERE east LIKE ?')->run('%he%')->all,
         [
             [ 'Raising Arizona', 'There Be Dragons' ],
             [ 'Gladiator', 'The Trip' ],
@@ -284,7 +284,7 @@ sub test_row_set_methods {
     my @rows;
     $dq
         ->sql('SELECT west, east FROM movie WHERE east LIKE ?')->run('%he%')
-        ->each( sub { push( @rows, $_[0]->data() ) } );
+        ->each( sub { push( @rows, $_[0]->data ) } );
     is_deeply(
         \@rows,
         [
@@ -301,19 +301,19 @@ sub test_row_set_methods {
     );
 
     is(
-        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('Jane Eyre')->value(),
+        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('Jane Eyre')->value,
         'Hunt for Red October',
         '$dq->sql(...)->run(...)->value() in scalar context',
     );
 
     is_deeply(
-        [ $dq->sql('SELECT west, east FROM movie WHERE east = ?')->run('Jane Eyre')->value() ],
+        [ $dq->sql('SELECT west, east FROM movie WHERE east = ?')->run('Jane Eyre')->value ],
         [ 'Hunt for Red October', 'Jane Eyre' ],
         '$dq->sql(...)->run(...)->value() in list context',
     );
 
     is_deeply(
-        [ $dq->sql('SELECT * FROM movie')->run()->first ],
+        [ $dq->sql('SELECT * FROM movie')->run->first ],
         [ [
             'Jun 17, 2011',
             'Jun 19, 2011',
@@ -324,7 +324,7 @@ sub test_row_set_methods {
     );
 
     is_deeply(
-        [ $dq->sql('SELECT * FROM movie')->run()->first({}) ],
+        [ $dq->sql('SELECT * FROM movie')->run->first({}) ],
         [ {
             east  => 'Jane Eyre',
             final => 'Jun 19, 2011',
@@ -349,13 +349,13 @@ sub test_row_set_methods {
     ];
 
     is_deeply(
-        [ $dq->sql('SELECT west FROM movie')->run()->column() ],
+        [ $dq->sql('SELECT west FROM movie')->run->column ],
         $titles,
         'column() array context',
     );
 
     is_deeply(
-        scalar( $dq->sql('SELECT west FROM movie')->run()->column() ),
+        scalar( $dq->sql('SELECT west FROM movie')->run->column ),
         $titles,
         'column() scalar context',
     );
@@ -367,13 +367,13 @@ sub test_row_methods {
     is(
         $dq
             ->sql('SELECT * FROM movie WHERE east = ?')
-            ->run('There Be Dragons')->next()->cell('west')->value(),
+            ->run('There Be Dragons')->next->cell('west')->value,
         'Raising Arizona',
         q{$dq->sql('SELECT * FROM ...')->run(...)->next()->cell($name)->value()},
     );
 
     is(
-        $dq->get('movie')->run()->next(2)->cell('west')->value(),
+        $dq->get('movie')->run->next(2)->cell('west')->value,
         'Raising Arizona',
         '$dq->get(...)->run(...)->next(2)->cell($name)->value()',
     );
@@ -381,13 +381,13 @@ sub test_row_methods {
     is(
         $dq
             ->sql('SELECT east, west FROM movie WHERE east = ?')
-            ->run('There Be Dragons')->next()->cell(1)->value(),
+            ->run('There Be Dragons')->next->cell(1)->value,
         'Raising Arizona',
         q{$dq->sql('SELECT a, b FROM ...')->run($name)->next()->cell($integer)->value()},
     );
 
     is(
-        $dq->get('movie')->run()->next(2)->cell( 'west', 'New Value' )->value(),
+        $dq->get('movie')->run->next(2)->cell( 'west', 'New Value' )->value,
         'New Value',
         '$dq->get(...)->run(...)->next(2)->cell( $name, $new_value )->value()',
     );
@@ -395,7 +395,7 @@ sub test_row_methods {
     my @titles;
     $dq
         ->sql('SELECT east, west FROM movie WHERE east = ?')
-        ->run('There Be Dragons')->next()->each( sub { push @titles, $_[0]->value() } );
+        ->run('There Be Dragons')->next->each( sub { push @titles, $_[0]->value } );
     is_deeply(
         \@titles,
         [ 'There Be Dragons', 'Raising Arizona' ],
@@ -403,7 +403,7 @@ sub test_row_methods {
     );
 
     is_deeply(
-        $dq->sql('SELECT east, west FROM movie')->run()->next()->data(),
+        $dq->sql('SELECT east, west FROM movie')->run->next->data,
         {
             'west' => 'Hunt for Red October',
             'east' => 'Jane Eyre',
@@ -412,7 +412,7 @@ sub test_row_methods {
     );
 
     is_deeply(
-        $dq->sql('SELECT east, west FROM movie')->run()->next()->row(),
+        $dq->sql('SELECT east, west FROM movie')->run->next->row,
         [
             'Jane Eyre',
             'Hunt for Red October',
@@ -421,30 +421,30 @@ sub test_row_methods {
     );
 
     is(
-        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value(),
+        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value,
         'Raising Arizona',
         '$db->sql(...)->run(...)->value() test original value',
     );
 
     my $sth = $dq->sql('SELECT "open", west FROM movie WHERE "open" = ?');
-    $sth->run('Jul 1, 2011')->next()->cell( 'west', 'Iron Man' )->up()->save('"open"');
+    $sth->run('Jul 1, 2011')->next->cell( 'west', 'Iron Man' )->up->save('"open"');
 
     is(
-        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value(),
+        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value,
         'Iron Man',
         '$db->sql(...)->run(...)->value() test changed value 1',
     );
 
-    $sth->run('Jul 1, 2011')->next()->save( '"open"', { 'west' => 'Star Wars' }, 0 );
+    $sth->run('Jul 1, 2011')->next->save( '"open"', { 'west' => 'Star Wars' }, 0 );
     is(
-        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value(),
+        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value,
         'Star Wars',
         '$db->sql(...)->run(...)->value() test changed value 2',
     );
 
-    $sth->run('Jul 1, 2011')->next()->save( '"open"', { 'west' => 'Raising Arizona' } );
+    $sth->run('Jul 1, 2011')->next->save( '"open"', { 'west' => 'Raising Arizona' } );
     is(
-        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value(),
+        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value,
         'Raising Arizona',
         '$db->sql(...)->run(...)->value() reset original value',
     );
@@ -455,36 +455,36 @@ sub test_cell_methods {
 
     my $cell = $dq
         ->sql('SELECT "open", final, west FROM movie WHERE east = ?')
-        ->run('There Be Dragons')->next()->cell('west');
+        ->run('There Be Dragons')->next->cell('west');
 
     is(
-        $cell->name(),
+        $cell->name,
         'west',
         '$dq->sql(...)->run(...)->next()->cell(...)->name()',
     );
 
     is(
-        $cell->value(),
+        $cell->value,
         'Raising Arizona',
         '$dq->sql(...)->run(...)->next()->cell(...)->value()',
     );
 
     is(
-        $cell->index(),
+        $cell->index,
         2,
         '$dq->sql(...)->run(...)->next()->cell(...)->index()',
     );
 
     my $row = $cell->save( '"open"', { 'west' => 'Star Wars' } );
     is(
-        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value(),
+        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value,
         'Star Wars',
         '$db->sql(...)->run(...)->next()->cell(...)->save() test changed value',
     );
 
     $row->cell('west')->save( '"open"', { 'west' => 'Raising Arizona' } );
     is(
-        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value(),
+        $dq->sql('SELECT west FROM movie WHERE east = ?')->run('There Be Dragons')->value,
         'Raising Arizona',
         '$db->sql(...)->run(...)->next()->cell(...)->save() reset original value',
     );

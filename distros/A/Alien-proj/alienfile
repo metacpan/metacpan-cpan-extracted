@@ -14,11 +14,18 @@ my $on_automated_rig
 use Cwd;
 my $base_dir = getcwd();
 
-#  make libtool noisy for debug purposes
-#$ENV{LTFLAGS} = "--debug --verbose" if $on_windows;
+use Env qw( @PATH );
+ 
+use Alien::sqlite;
+use Alien::curl;
+my $sep_char = $on_windows ? ';' : ':';
+unshift @PATH, Alien::sqlite->bin_dir, Alien::curl->bin_dir;
+  #  we should just add to the package config env var 
+$ENV{SQLITE3_CFLAGS} = Alien::sqlite->cflags;
+$ENV{SQLITE3_LIBS} = Alien::sqlite->libs;
 
 plugin 'Build::SearchDep' => (
-  aliens   => ['Alien::sqlite'],
+  aliens   => ['Alien::sqlite', 'Alien::curl'],
   public_I => 1,
   public_l => 1,
 );
@@ -39,8 +46,8 @@ share {
   start_url 'http://download.osgeo.org/proj/';
   #start_url "file://$base_dir";  #  debug
   plugin Download => (
-    filter  => qr/^proj-([0-9\.]+)\.tar\.gz$/,
-    version => qr/^proj-([0-9\.]+)\.tar\.gz$/,
+    filter  => qr/^proj-6.([0-9\.]+)\.tar\.gz$/,
+    version => qr/^proj-6.([0-9\.]+)\.tar\.gz$/,
   );
 
   my $proj_version = get_proj_version() // 'not yet defined';
@@ -92,21 +99,26 @@ share {
     plugin 'Cleanse::BuildDir';
   }
   
+  my $config_args = $ENV{ALIEN_PROJ_CONFIG_ARGS} // '';
+  $config_args =~ s/[^-\s\w,=]//g;  #  overkill?
+  $config_args = "$with_local $with_cpp11 $build_static $config_args";
+  
   build [
     \&update_pkg_conf_path,
-    "%{configure} $with_local $with_cpp11 $build_static",
+    "%{configure} $config_args",
     \&pause,
     $make_cmd,
     $make_inst_cmd,
-    #@make_clean
+    #@make_clean,
+    \&rename_la_files,
   ];
 
 };
 
-gather [
-    \&rename_la_files,
-];
-
+#gather [
+#    \&rename_la_files,
+#];
+#
 sub update_pkg_conf_path {
     return if !$on_windows;
     use Env qw /@PKG_CONFIG_PATH/;
@@ -122,9 +134,9 @@ sub rename_la_files {
     my @la_files
       = File::Find::Rule->file()
                         ->name( '*.la' )
-                        ->in( '.' );
+                        ->in( $base_dir );
     foreach my $file (@la_files) {
-        say "Renaming $file so it will not intefere with gdal compilation";
+        say "Renaming $file so it will not interfere with gdal compilation";
         rename $file, $file . '.bak';
     }
 

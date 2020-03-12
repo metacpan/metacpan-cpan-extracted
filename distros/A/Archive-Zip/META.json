@@ -4,13 +4,13 @@
       "Ned Konz <perl@bike-nomad.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Archive-Zip",
    "no_index" : {
@@ -49,7 +49,6 @@
       },
       "test" : {
          "requires" : {
-            "Test::MockModule" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -57,8 +56,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Archive-Zip@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Zip"
+         "web" : "https://github.com/redhotpenguin/perl-Archive-Zip/issues"
       },
       "repository" : {
          "type" : "git",
@@ -66,6 +64,6 @@
          "web" : "https://github.com/redhotpenguin/perl-Archive-Zip"
       }
    },
-   "version" : "1.67",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "1.68",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
 }

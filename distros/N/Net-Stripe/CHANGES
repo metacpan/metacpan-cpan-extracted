@@ -1,10 +1,925 @@
 ==================================================
-Changes from 2018-07-15 00:00:00 +0000 to present.
+Changes from 2019-03-13 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.39 at 2019-07-15 21:38:26 +0000
+version 0.41 at 2020-03-12 18:40:08 +0000
 -----------------------------------------
+
+  Change: 423fbd9166eb4450a52363dcd4abde53f97f2770
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-12 12:26:41 +0000
+
+    Merge pull request #201 from sherrardb/fix-get-invoiceitems
+
+    get_invoiceitems() not passing customer id 
+
+  Change: 5d82542a3cf2c66aa041b72402e732c715ec2883
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-12 16:13:13 +0000
+
+    get_invoiceitems() not passing customer id
+
+    * pass customer id in get_invoiceitems()
+
+    * add failing unit tests
+
+    * closes <https://github.com/lukec/stripe-perl/issues/187> 
+
+  Change: fc95fe52ac5c0db1fed00bd67522b2bb8b517e26
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-12 11:18:56 +0000
+
+    Merge pull request #199 from
+    sherrardb/add-payment-methods-and-payment-intents
+
+    add PaymentMethod and PaymentIntent 
+
+  Change: a16aad24ebd925f811a7b34745adfe1440f22671
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-12 12:58:21 +0000
+
+    add PaymentMethod and PaymentIntent
+
+    * added PaymentMethod object, methods and unit tests
+
+    * added PaymentIntent object, methods and unit tests
+
+    * updated POD
+
+    * closes <https://github.com/lukec/stripe-perl/issues/115> 
+
+  Change: b82aa508ee70a02a3731b86c4b3e1888355d05e5
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-11 14:39:58 +0000
+
+    fix oversight in _get_all()
+
+    * _get_all() throws an error attempting to get the next/prev page if
+    the first page of results is empty
+
+    * ensure that we only process the looping code if there are results
+    in the first page 
+
+  Change: 1cec4304ea1aa77b1b303ebb82dad6a732c8ded1
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-07 00:35:56 +0000
+
+    fix typo in test data structures 
+
+  Change: fb96be8f2da633395249eba9d5ee5d2146b9cf6f
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-06 14:25:28 +0000
+
+    Merge pull request #197 from sherrardb/re-add-customer-to-invoice
+
+    re-add customer to Invoice 
+
+  Change: 1c8c2ac6d089a4c413986943249c1944e9143228
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-06 19:23:53 +0000
+
+    re-add customer to Invoice
+
+    * re-add customer attribute accidentally removed during 30a702b
+
+    * update unit tests to detect this regression
+
+    * closes <https://github.com/lukec/stripe-perl/issues/196> 
+
+  Change: 28507b715bc5a171a1ced6bbdad9606fc8b6f596
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-05 18:44:25 +0000
+
+    Merge pull request #130 from sherrardb/f-make-api-versionable
+
+    allow API pinning for Net::Stripe object 
+
+  Change: 4fcbca20cdbf1e2e6f61ad16ded3cfcbe0c31b6a
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-05 23:38:56 +0000
+
+    allow API pinning for Net::Stripe object
+
+    * allow users to specify the API version when creating a new
+    Net::Stripe object, per
+    <https://stripe.com/docs/api/versioning#versioning>
+
+    * add api_version argument and method for Net::Stripe object
+
+    * add force_api_version argument and method for Net::Stripe object
+
+    * update POD
+
+    * closes <https://github.com/lukec/stripe-perl/issues/80> and
+    <https://github.com/lukec/stripe-perl/pull/127> 
+
+  Change: 6c462e9d08cc9f4d609e55885ae5631b6b2e369c
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-04 20:12:38 +0000
+
+    Merge pull request #191 from sherrardb/add-product
+
+    add Product 
+
+  Change: 735ecee1b1552342ad714b73c314749d1fd8c5c6
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-05 01:05:12 +0000
+
+    add Product
+
+    * add Product object, methods and unit tests
+
+    * update Plan object and tests to be compatible post 2018-02-05
+    <https://stripe.com/docs/upgrades#2018-02-05>
+
+    * update POD 
+
+  Change: 8cff90fae49e915691fea4073a26f063aa9d3536
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-04 09:43:05 +0000
+
+    Merge pull request #192 from sherrardb/add-get-all
+
+    add _get_all() 
+
+  Change: da68023152a983c711b34160fbf01db0b768d823
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-04 14:41:15 +0000
+
+    add _get_all()
+
+    * allow for retrieval of all objects of a given type without local
+    pagination code
+
+    * add unit tests for related utility methods
+
+    * update existing list-retrieval methods
+
+    * update POD 
+
+  Change: 2789400ef18bd462729c7abb541b2b777cea5ba0
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-28 18:45:13 +0000
+
+    Merge pull request #195 from sherrardb/update-invoice
+
+    update Invoice 
+
+  Change: 30a702b758465231ef06176fdbf92c1a361ab0d3
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-28 23:16:47 +0000
+
+    update Invoice
+
+    * add backwards-compatible 'auto_advance' attribute, per
+    <https://stripe.com/docs/upgrades#2018-11-08>
+
+    * add backwards-compatible 'created' attribute, per
+    <https://stripe.com/docs/upgrades#2019-03-14>
+
+    * remove required constraints for 'closed' and 'date' attributes
+
+    * update POD 
+
+  Change: 908b5e997da68ce5fd7b612b1ded6575c3fababb
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-28 16:12:22 +0000
+
+    Merge pull request #194 from
+    sherrardb/add-subscription-cancel-at-period-end-argument
+
+    update post_subscription() 
+
+  Change: 291e8c175d4fc548095a7a87ba9f927222f9d0f1
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-28 21:10:58 +0000
+
+    update post_subscription()
+
+    * add 'cancel_at_period_end' to post_subscription()
+
+    * add 'cancel_at_period_end' to form_fields() for Subscription object
+
+    * update unit tests to use 'cancel_at_period_end' for pending
+    cancelations
+
+    * update POD 
+
+  Change: c989d301006e3099a6f5fc25948ad78bd3d9ede4
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-28 10:36:50 +0000
+
+    Merge pull request #193 from
+    sherrardb/update-customer-balance-attribute
+
+    add balance for Customer 
+
+  Change: c312a62e4aefea3b8158124c0ff079a475c88882
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-28 15:35:18 +0000
+
+    add balance for Customer
+
+    * add backwards-compatible 'balance' attribute for Customer objects
+
+    * add 'balance' argument for post_customer()
+
+    * add unit tests
+
+    * update POD
+
+    * addresses API update 2019-10-17
+    <https://stripe.com/docs/upgrades#2019-10-17> 
+
+  Change: 3779df9d82f154ebe3db428d9d3c4976cdcb4f61
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-28 15:28:18 +0000
+
+    fix typo in README.pod 
+
+  Change: 03cd1edc635c2dc2aab75fdafde7d225f1768a36
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-25 04:23:34 +0000
+
+    update t/local.t
+
+    * remove temporary naming for static encoding tests, per
+    <https://github.com/lukec/stripe-perl/issues/189>
+
+    * add hashref tests for convert_to_form_fields()
+
+    * label object tests for convert_to_form_fields() 
+
+  Change: b7063845610a8abcdf87856bfe50c7504391edc6
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-25 01:13:31 +0000
+
+    update README.pod
+
+    * move update_card() documentation to more-appropriate section
+
+    * add documentation for Source changes in `1370e49` 
+
+  Change: 38e68b348af077e9a549ce484e59dac320d45994
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-22 17:57:41 +0000
+
+    update fake metadata keys to reflect their generic usage 
+
+  Change: eaded860861a380ea972a8377aa51d19eb06ef47
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-18 22:03:01 +0000
+
+    Merge pull request #188 from
+    sherrardb/add-source-to-charge-and-customer
+
+    Add source to charge and customer 
+
+  Change: 1370e4966d85d0d4f12f1fb7555379fe34651dc9
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-19 03:00:07 +0000
+
+    add source for Charge and Customer
+
+    * add Source object, methods and unit tests
+
+    * add backward-compatible source attributes and parameters for Charge
+    and Customer
+
+    * update unit tests to pass 'source' instead of 'card' where the
+    calling form is not germane to the test
+
+    * update POD 
+
+  Change: 23a5ae5b827ee61baf009c3da1bbef88b39572a5
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-18 21:57:51 +0000
+
+    Merge pull request #175 from sherrardb/remove-manual-serialization
+
+    remove manual serialization in _get_collections() and
+    _get_with_args() 
+
+  Change: 8b3b33d67b9dc9a8b7316dab65670bf4fc113f09
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-19 02:20:38 +0000
+
+    remove manual serialization in _get_collections() and
+    _get_with_args()
+
+    * update convert_to_form_fields() to handle objects
+
+    * use convert_to_form_fields() for processing passed data and URI for
+    encoding, elminating _get_collections() and _get_with_args()
+
+    * remove manual serialization in _delete()
+
+    * add unit tests for code path to be deprecated later
+
+    * closes <https://github.com/lukec/stripe-perl/issues/167> 
+
+  Change: ddcf010cb824b65a92f3254a4084df2641db4f09
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-17 04:39:49 +0000
+
+    move static unit tests to t/local.t 
+
+  Change: 079e182a206cfe8ac2b0959ef5bc5359c96c168a
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-14 04:33:05 +0000
+
+    fix typo in TypeConstraint unit tests 
+
+  Change: 8a64af05dada7c6daf484d17e587ddf7a65fbcff
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-13 22:51:23 +0000
+
+    Merge pull request #185 from sherrardb/add-coupon-metadata
+
+    add metadata for Coupon 
+
+  Change: cb271ac345633e48bf30266fff82e655a9955af2
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-14 03:50:18 +0000
+
+    add metadata for Coupon
+
+    * clean up and augment unit tests
+
+    * update POD 
+
+  Change: df4b926311b45b7ca6c7e9768f2c829ceeff2389
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-13 22:29:53 +0000
+
+    Merge pull request #184 from sherrardb/add-plan-metadata
+
+    add metadata for Plan 
+
+  Change: 9f922f9175dc6783da87836e68cb2c1b5cbe7af2
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-14 03:17:45 +0000
+
+    add metadata for Plan
+
+    * clean up and augment unit tests
+
+    * update POD
+
+    * closes <https://github.com/lukec/stripe-perl/issues/70> 
+
+  Change: f3f67224ded02d14d3cf8654a6d39cf748586a43
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-11 22:45:48 +0000
+
+    Merge pull request #182 from
+    sherrardb/unit-tests-for-type-constraints
+
+    add unit tests for TypeConstraints 
+
+  Change: eb71d321bbc85493a714fa1e6ac24220b94e97c6
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-12 03:42:50 +0000
+
+    add unit tests for TypeConstraints 
+
+  Change: 793b4663e10b1ecae5074afd83459e826bc2e5ad
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-11 16:33:38 +0000
+
+    Merge pull request #181 from sherrardb/update-default-card
+
+    default_card not updating in post_customer() 
+
+  Change: 8d01f02787e08a7b1086b2ccfb933b267d498be5
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-11 17:35:33 +0000
+
+    default_card not updating in post_customer()
+
+    * add default_card to form_fields()
+
+    * update attribute to 'rw'
+
+    * update unit tests
+
+    * update POD
+
+    * closes <https://github.com/lukec/stripe-perl/issues/158> 
+
+  Change: 00c6a02e6457a81f72e5c11e36faebd98020a05b
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-11 10:46:42 +0000
+
+    Merge pull request #180 from
+    sherrardb/remove-unnecessary-token-creation
+
+    remove unnecessary token object creation 
+
+  Change: 8fea47428017d5128b4dceecc1860cdeee04864c
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-11 15:44:59 +0000
+
+    remove unnecessary token object creation
+
+    * pass the test token directly where there is no further
+    introspection of $token
+
+    * remove cases where introspection of $token is not germane to the
+    current unit test
+
+    * leave cases where we are expressly testing passing of a token
+    object or where $token is needed for other reasons
+
+    * closes <https://github.com/lukec/stripe-perl/issues/172> 
+
+  Change: e8b157b372e98209be4e9b3079d7791e1374efed
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-11 09:38:42 +0000
+
+    Merge pull request #179 from sherrardb/capture-partial-charge
+
+    capture partial charge 
+
+  Change: 6e931cad976d3eb5f087a17b146bb04814000be9
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-11 14:36:53 +0000
+
+    capture partial charge
+
+    * update capture_charge() to allow for partial capture
+
+    * add refunds attribute to charge object
+
+    * add unit tests for partial capture
+
+    * closes <https://github.com/lukec/stripe-perl/issues/144> 
+
+  Change: 49d450f1a61d642a10500e6deb57b3acdf0548c2
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-10 16:10:30 +0000
+
+    Merge pull request #178 from sherrardb/test-delete-card
+
+    add unit tests for delete_card() 
+
+  Change: 560b30021aac51708d9fbb012e9e207d01e89933
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-10 21:08:05 +0000
+
+    add unit tests for delete_card() 
+
+  Change: 64957919b3bc4cee94154a7ecdffe6c674142992
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-10 15:44:38 +0000
+
+    Merge pull request #177 from
+    sherrardb/remove-duplicate-post-charge-tests
+
+    remove duplicate post_charge() tests 
+
+  Change: fa3594db56ba4b3a1279b02dc36c760ac3affec3
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-10 20:38:50 +0000
+
+    remove duplicate post_charge() tests
+
+    * closes <https://github.com/lukec/stripe-perl/issues/169> 
+
+  Change: 3683687ac812912f4e7d82cc140307b1681e2555
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-10 15:26:38 +0000
+
+    Merge pull request #176 from sherrardb/update-token-attributes
+
+    update Token attributes 
+
+  Change: 79ab847529e4fd4698f0eb418d214c14943404cb
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-10 20:25:37 +0000
+
+    update Token attributes
+
+    * add type attribute and add test
+
+    * add client_ip attribute
+
+    * fix typo in token retrieval test
+
+    * closes <https://github.com/lukec/stripe-perl/issues/170> and
+    <https://github.com/lukec/stripe-perl/issues/174> 
+
+  Change: 678ed9f28bd48524c4a408fad505891d781d59ae
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-06 04:36:25 +0000
+
+    fix pod 
+
+  Change: 0e0cd19ce71526528892615e21a9a1fdb3a05cba
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-05 23:26:42 +0000
+
+    Merge pull request #164 from sherrardb/fix-pan-deprecation-oversight
+
+    remove card hash handling code in post_card() 
+
+  Change: 116198f7a8accecddf5e2a2a7bc8c0c1d9c47ff2
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-06 04:22:15 +0000
+
+    remove card hash handling code in post_card()
+
+    * fix oversight from `5ad870c`
+
+    * this conditional is not needed since `card` no longer accepts
+    HashRef
+
+    * closes <https://github.com/lukec/stripe-perl/issues/163> 
+
+  Change: 53b3b0c166a9ba9b7d16e8b878044107d14bea74
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-04 13:00:23 +0000
+
+    Merge pull request #161 from sherrardb/deprecate-pan-handling-wip
+
+    deprecate direct handling of PANs 
+
+  Change: 5ad870c499e24f82882a99c44f74d862e0ac5f70
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-02-04 17:59:44 +0000
+
+    deprecate direct handling of PANs:
+
+    * Stripe strongly discourages direct handling of PANs (primary
+    account numbers), even in test mode
+
+    * accounts created after October 2017 return an invalid_request_error
+    when passing PANs
+
+    * removed the methods and parameter constraints that allow direct
+    handling of PANs and their associated unit tests
+
+    * updated the unit tests to use test tokens instead of card numbers 
+
+  Change: ae52948f225920492aadb8cd396d9c1e7b000481
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-31 02:39:43 +0000
+
+    fix typo in Net::Stripe::Resource::form_fields_for_hashref()
+
+    * correct incomplete transition of method name after copying code
+
+    * add trivial unit test as a placeholder
+
+    * closes <https://github.com/lukec/stripe-perl/issues/162> 
+
+  Change: b19eb742b77061578195483a71912b3d0c76eb80
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-30 22:19:40 +0000
+
+    create release notes sub-sections in README.pod 
+
+  Change: 265846a491f0bedb6c7f120fe0f1bb0599ed7b0a
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-28 08:29:00 +0000
+
+    Merge pull request #160 from
+    sherrardb/consolidate-form-serialization-wip
+
+    consolidate logic for serializing form fields 
+
+  Change: b5fb6f5725e1226d903c6c772b95e943bf2e195c
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-28 03:25:22 +0000
+
+    consolidate logic for serializing form fields 
+
+  Change: 61db3862ade431b7a7b46b9641edfa3b43d717e6
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-27 21:23:44 +0000
+
+    Merge pull request #159 from sherrardb/update-charge-status
+
+    update unit tests for Charge->status 
+
+  Change: 4ee0872e9be3ae04b1bc51497102e7071644c3d8
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-28 02:22:49 +0000
+
+    update unit tests for Charge->status:
+
+    * check for either of the valid succesful values, 'paid' for Stripe
+    API versions before 2015-02-18 or 'succeeded' for versions after
+    <https://stripe.com/docs/upgrades#2015-02-18> 
+
+  Change: 43da122fa129d3a096c816e45c9742027797912d
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-26 02:57:58 +0000
+
+    update dist.ini:
+
+    * generate META.json
+    <https://cpants.cpanauthors.org/kwalitee/has_meta_json> 
+
+  Change: 3151556f52b21465c547862f740fa6f21ff25743
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-21 21:32:33 +0000
+
+    Merge pull request #153 from sherrardb/fix-post-customer-args
+
+    fix post_customer() arguments 
+
+  Change: ff84dd7143f0374cacced7215a276cdb1278ba6c
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-22 01:59:59 +0000
+
+    fix post_customer() arguments:
+
+    * updated Kavorka signature to remove non-functional or illegitimate
+    argument types
+
+    * removed Net::Stripe::Card and disallowed card id for card, as
+    neither form is valid conceptually
+    <https://github.com/lukec/stripe-perl/issues/138>
+
+    * always create a Net::Stripe::Customer object before _post() to take
+    advantage of argument coercion during objectification
+    <https://github.com/lukec/stripe-perl/issues/148>
+
+    * include omitted arguments in object creation
+
+    * clean up and centralize Net::Stripe:Token coercion code, since we
+    always need the token id
+
+    * added unit tests to exercise all allowed argument forms for
+    customer creation and customer update
+    <https://github.com/lukec/stripe-perl/issues/139>
+
+    * closes <https://github.com/lukec/stripe-perl/issues/138> 
+
+  Change: e0d2a992da492406c23bcd8afc45b393aac80822
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-21 20:15:18 +0000
+
+    Merge pull request #151 from sherrardb/fix-post-card-args
+
+    cleanup post_card() 
+
+  Change: ec48dd338c3fd60a2bbfb0af0a473ef449d6f411
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-22 01:11:22 +0000
+
+    cleanup post_card():
+
+    * remove invalid argument types from post_card(), per
+    <https://github.com/lukec/stripe-perl/issues/138>
+
+    * remove dead code paths from post_card() and make conditional
+    structure more explicit, per discussion in
+    <https://github.com/lukec/stripe-perl/pull/133>
+
+    * add unit tests for all calling forms, per
+    <https://github.com/lukec/stripe-perl/issues/139>
+
+    * update the POD 
+
+  Change: 1c242e98e43ec61b96c5d2f50d2a769f23c01691
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-21 21:54:08 +0000
+
+    Update README.pod
+
+    * remove the hyperlink formatting markers from our custom Moose
+    TypeConstraints
+
+    * regenerate README.pod 
+
+  Change: a341c803a8dc29a522f2243a599c1c392500ac70
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-21 21:33:44 +0000
+
+    Update README.pod
+
+    * add capture_charge()
+
+    * regenerate README.pod 
+
+  Change: 11b29bda97f3ce2517195005c3b8ffcd06998af7
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-21 19:08:31 +0000
+
+    Update README.pod
+
+    * update POD oversights from fd8e79e0
+
+    * regenerate README.pod 
+
+  Change: b9f0d4adedea6bef4a7622a9cfa378077a6e8b23
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-21 13:01:18 +0000
+
+    Merge pull request #150 from sherrardb/f-cannot-update-existing-card
+
+    allow updates to existing cards 
+
+  Change: 7ff3208c56c5b388c36fc2a4b719942917bf8085
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-21 17:58:54 +0000
+
+    allow updates to existing cards:
+
+    * add update_card() method to allow updates to card address,
+    expiration, metadata, etc for existing customer cards
+
+    * update convert_to_form_fields() to handle customer card metadata
+
+    * add unit tests to confirm card metdata update
+
+    * correct errant 'rw' on metadata attribute in `Net::Stripe::Card` 
+
+  Change: 646861d829729d6d2c649ae1b426618d50f84914
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-18 14:45:17 +0000
+
+    Merge pull request #147 from sherrardb/fix-post-charge-args
+
+    fix post_charge() arguments 
+
+  Change: fd8e79e031839a094a37b4b9976da2e0e2df745e
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-18 19:44:25 +0000
+
+    fix post_charge() arguments:
+
+    * updated Kavorka signature to remove non-functional argument types
+
+    * removed Net::Stripe::Customer and HashRef for customer, as neither
+    form was being serialized correctly for passing to the API call
+
+    * removed Net::Stripe::Card and Net::Stripe::Token for card, as
+    neither form was being serialized correctly for passing to the API
+    call
+
+    * added in-method validation and unit tests for the different
+    combinations of the allowed argument types
+
+    * updated and reorganized failing unit tests
+
+    * closes <https://github.com/lukec/stripe-perl/issues/94> and
+    <https://github.com/lukec/stripe-perl/issues/137> 
+
+  Change: b3ffb02692aa4259351f3512837ca64b2820b96e
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-16 22:26:56 +0000
+
+    Merge pull request #143 from sherrardb/defined-arguments-unnecessary
+
+    _defined_arguments() is unnecessary 
+
+  Change: eb386908918bf0e14418647b6f3d405c8d9f29cb
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-17 03:23:03 +0000
+
+    _defined_arguments() is unnecessary:
+
+    * only called in post_customer() for hashref argument to _post()
+
+    * _post() calls convert_to_form_fields() for hashrefs
+
+    * convert_to_form_fields() skips hashref keys with undefined values
+
+    * closes <https://github.com/lukec/stripe-perl/issues/136> 
+
+  Change: a297a1aa2606ebb89f6abcab1ba22f960ad1ff9c
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-16 22:17:49 +0000
+
+    Merge pull request #142 from sherrardb/remove-redundant-token-tests
+
+    remove redundant Token tests 
+
+  Change: 2d0022d58ac3ee5d726ad900ae6e67214d5fef98
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-17 03:16:51 +0000
+
+    remove redundant Token tests: The tests on `$no_amount` became
+    redundant when the Token tests were reworked in `8ca8bcc` to remove
+    `amount` and `currency`, and should have been removed at that time.
+    Closes <https://github.com/lukec/stripe-perl/issues/126>. 
+
+  Change: dffa55624020f119dbff28fd4bb068a4d0049b01
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-16 22:09:40 +0000
+
+    Merge pull request #131 from sherrardb/coerce-old-lists
+
+    make Net::Stripe compatible with API back to 2011-06-21 
+
+  Change: 3d76661d362011b77e3057009348185f74a810b4
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-17 03:06:44 +0000
+
+    coerce old-style lists and collections into Net::Stripe::List format:
+    In older Stripe API versions, some list-type data structures were
+    returned as arrayrefs. We now coerce those old-style lists and
+    collections into the hashref format that newer versions of the API
+    return, with metadata stored top-level keys and the list elements in
+    an arrayref with the key `data`, which is the format that
+    Net::Stripe::List expects. This makes the SDK compatible with the
+    Stripe API back to the earliest documented API version
+    https://stripe.com/docs/upgrades#2011-06-21. 
+
+  Change: b765c69195966a05c0b24dcdd275821c7755690f
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-16 21:45:20 +0000
+
+    Merge pull request #132 from sherrardb/update-statement-description
+
+    update statement_description to statement_descriptor 
+
+  Change: 71c4e9fa15c73f2f4dbe48e125c728e16f477612
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-17 02:40:41 +0000
+
+    update statement_description to statement_descriptor:
+
+    * add failing test to detect ignored attribute `statement_descriptor`
+    in Net::Stripe::Charge
+
+    * add missing `statement_descriptor` attribute in Net::Stripe::Charge
+
+    * update `statement_description` to `statement_descriptor`
+    Net::Stripe::Plan
+
+    * API docs <https://stripe.com/docs/upgrades#2014-12-17> indicate
+    that this change is backwards-compatible 
+
+  Change: 76f96f3c0b193ae1391a20cb90fb3145b7ddd0b9
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-17 02:33:37 +0000
+
+    Merge pull request #141 from sherrardb/add-release-notes
+
+    add RELEASE NOTES section to POD 
+
+  Change: f4c00a86fad00c6f8c6bf60223f3a23e0020f583
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-17 02:33:21 +0000
+
+    add RELEASE NOTES section to POD. any breaking changes,
+    non-backwards-compatible changes or other 'gotchas' should be
+    documented in this section, with additional details in the commit
+    message and code if necessary. 
+
+  Change: 2d417c804b8ae0456453a29877de0d3285cd9897
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-17 02:33:06 +0000
+
+    Merge pull request #140 from sherrardb/fix-pod-oversights
+
+    fix POD oversights 
+
+  Change: ecb906029486cdfb714a5c20075b7ae20363f90f
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-01-17 02:32:52 +0000
+
+    update POD, dist.ini and weaver.ini:
+
+    * add encoding declaration to POD to fix unsafe character warning.
+    this was fixed directly in README.pod during a previous commit, but
+    was overwritten during the dzil regeneration of README.pod.
+
+    * add missing section for Discount methods in weaver.ini
+
+    * remove trailing period from copyright_holder in dist.ini.
+    apparently dzil adds a period when regenerating README.pod.
+
+    * regenerate README.pod 
+
+  Change: b091f06825bdef4c895383c990c9e1187849331a
+  Author: Luke Closs <lukec@users.noreply.github.com>
+  Date : 2019-12-14 11:22:30 +0000
+
+    Create CODE_OF_CONDUCT.md 
+
+  Change: 5a5483dc0bf2a777327860265132e3d3d4fb5a5e
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2019-12-12 11:42:36 +0000
+
+    Update README.pod 
+
+  Change: 29fec4341f75e5aa8b866c9ea49bed7f964bec29
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2019-12-01 14:07:25 +0000
+
+    Centralise boolean post parameter generation - Sherrard Burton 
+
+  Change: 2ea471d951914950f02adc211d981378e0a3c52b
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2019-07-15 22:41:18 +0000
+
+    Update README.pod 
 
   Change: cfe23170652ee8738e5cfcace84a1882836eff35
   Author: Andrew Solomon <andrew@geekuni.com>

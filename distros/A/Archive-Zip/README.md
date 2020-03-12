@@ -1,6 +1,6 @@
 # Archive-Zip
 
-The Archive::Zip module allows a Perl program to create, manipulate, read, 
+The Archive::Zip module allows a Perl program to create, manipulate, read,
 and write Zip archive files.
 
 See https://metacpan.org/pod/Archive::Zip for more information.
@@ -26,11 +26,11 @@ perldoc command.
 
 # SUPPORT
 
-Bugs should be reported via the CPAN bug tracker
+Bugs should be reported on GitHub
 
-http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Archive-Zip
+https://github.com/redhotpenguin/perl-Archive-Zip/issues
 
-For other issues contact the maintainer
+For other issues contact the maintainer.
 
 
 # AUTHOR
@@ -54,5 +54,5 @@ Some parts copyright 2005 Steve Peters.
 
 Original work copyright 2000 - 2004 Ned Konz.
 
-This program is free software; you can redistribute it and/or modify it 
+This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

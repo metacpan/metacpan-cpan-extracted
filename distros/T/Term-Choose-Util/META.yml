@@ -26,12 +26,12 @@ requires:
   File::Basename: '0'
   File::HomeDir: '0'
   File::Spec::Functions: '0'
-  List::Util: '0'
+  List::Util: '1.33'
   Term::Choose: '1.710'
   perl: '5.008003'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Choose-Util
-version: '0.116'
+version: '0.117'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

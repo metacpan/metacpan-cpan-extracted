@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,14 +26,14 @@ no_index:
 provides:
   Acme::LSD:
     file: lib/Acme/LSD.pm
-    version: '0.01'
+    version: '0.04'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/thibaultduponchelle/Acme-LSD/issues
   homepage: https://github.com/thibaultduponchelle/Acme-LSD
   repository: git://github.com/thibaultduponchelle/Acme-LSD.git
-version: '0.01'
+version: '0.04'
 x_contributors:
   - 'Thibault DUPONCHELLE <thibault.duponchelle@amadeus.com>'
   - 'thibaultduponchelle <580360+thibaultduponchelle@users.noreply.github.com>'

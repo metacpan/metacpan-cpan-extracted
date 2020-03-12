@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0201';
+our $VERSION = '1.0202';
 
 use Search::Elasticsearch;
 use Catmandu::Util qw(is_instance);
@@ -71,6 +71,8 @@ Catmandu::Store::ElasticSearch - A searchable store backed by Elasticsearch
     use Catmandu;
 
     my $store = Catmandu->store('ElasticSearch');
+    # options will be passed to the underlying Search::Elasticsearch client
+    my $store = Catmandu->store('ElasticSearch', nodes => ['server.example.com:9200']);
 
     my $obj1 = $store->bag('catmandu')->add({ name => 'Patrick' });
 

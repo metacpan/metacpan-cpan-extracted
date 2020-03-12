@@ -7,6 +7,7 @@ author:
   - 'Marvin Knoblauch <mknob@genua.de>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Deep: '0'
   Test::Exception: '0'
   Test::LeakTrace: '0'
   Test::NoWarnings: '0'
@@ -29,5 +30,5 @@ no_index:
     - t
     - inc
 requires: {}
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

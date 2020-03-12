@@ -8,6 +8,7 @@ t/src/test.exe
 t/src/test.o
 
 ^Alien-gdal-
+^Alien-proj-
 
 t-disabled
 

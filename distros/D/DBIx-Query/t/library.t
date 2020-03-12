@@ -124,7 +124,7 @@ sub test_sql {
     my $sth = $dq->sql( 'SELECT * FROM data', clone($sponge_data) );
 
     is( ref($sth), MODULE . '::st', 'ref( $dq->sql() )' );
-    is( $sth->structure()->{'table_names'}->[0], 'data', '$dq->sql()->structure()' );
+    is( $sth->structure->{'table_names'}->[0], 'data', '$dq->sql()->structure()' );
 }
 
 sub test_get {
@@ -138,7 +138,7 @@ sub test_get {
         clone($sponge_data),
     );
 
-    is( $row_set->sql(), 'SELECT a, b, c FROM data WHERE ( id = ? )', '$row_set->sql()' );
+    is( $row_set->sql, 'SELECT a, b, c FROM data WHERE ( id = ? )', '$row_set->sql()' );
 }
 
 sub test_sql_uncached {
@@ -158,7 +158,7 @@ sub test_get_uncached {
         clone($sponge_data),
     );
 
-    is( $row_set->sql(), 'SELECT a, b, c FROM data WHERE ( id = ? )', '$dq->get_cached()->sql()' );
+    is( $row_set->sql, 'SELECT a, b, c FROM data WHERE ( id = ? )', '$dq->get_cached()->sql()' );
 }
 
 sub test_add {
@@ -210,7 +210,7 @@ sub test_get_run {
 
     isa_ok( $sth, MODULE . '::st' );
     is_deeply(
-        $sth->fetchrow_hashref(),
+        $sth->fetchrow_hashref,
         {
             'open'  => 'Jun 17, 2011',
             'final' => 'Jun 19, 2011',
@@ -247,7 +247,7 @@ sub test_statement_handle_methods {
         { 'final' => 'Jun 19, 2011' },
         undef,
         clone($sponge_data),
-    )->run();
+    )->run;
     isa_ok( $rs, MODULE . '::_Dq::RowSet' );
 
     is(
@@ -257,7 +257,7 @@ sub test_statement_handle_methods {
             { 'final' => 'Jun 19, 2011' },
             undef,
             clone($sponge_data),
-        )->sql(),
+        )->sql,
         'SELECT west, east FROM movies WHERE ( final = ? )',
         '$dq->get(...)->sql() returns SQL',
     );
@@ -269,7 +269,7 @@ sub test_statement_handle_methods {
             { 'final' => 'Jun 19, 2011' },
             undef,
             clone($sponge_data),
-        )->structure(),
+        )->structure,
         {
             'original_string' => 'SELECT west, east FROM movies WHERE ( final = ? )',
             'org_table_names' => ['movies'],
@@ -323,7 +323,7 @@ sub test_statement_handle_methods {
             { 'final' => 'Jun 19, 2011' },
             undef,
             clone($sponge_data),
-        )->table(),
+        )->table,
         'movies',
         '$dq->get(...)->table() returns primary table',
     );
@@ -335,7 +335,7 @@ sub test_statement_handle_methods {
             { 'final' => 'Jun 19, 2011' },
             undef,
             clone($sponge_data),
-        )->up(),
+        )->up,
         MODULE . '::db',
     );
 }
@@ -350,7 +350,7 @@ sub test_up_methods {
             { 'final' => 'Jun 19, 2011' },
             undef,
             clone($sponge_data),
-        )->run()->up(),
+        )->run->up,
         MODULE . '::st',
     );
 
@@ -361,7 +361,7 @@ sub test_up_methods {
             { 'final' => 'Jun 19, 2011' },
             undef,
             clone($sponge_data),
-        )->run()->next()->up(),
+        )->run->next->up,
         MODULE . '::_Dq::RowSet',
     );
 
@@ -372,7 +372,7 @@ sub test_up_methods {
             { 'final' => 'Jun 19, 2011' },
             undef,
             clone($sponge_data),
-        )->run()->next()->cell('west')->up(),
+        )->run->next->cell('west')->up,
         MODULE . '::_Dq::Row',
     );
 }

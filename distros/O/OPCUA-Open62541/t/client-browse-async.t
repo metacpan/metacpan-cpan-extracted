@@ -1,194 +1,419 @@
 use strict;
 use warnings;
 use OPCUA::Open62541 ':all';
-use POSIX qw(sigaction SIGALRM);
+use OPCUA::Open62541::NS0ID;
 
 use OPCUA::Open62541::Test::Server;
-use Test::More tests => OPCUA::Open62541::Test::Server::planning() + 31;
+use OPCUA::Open62541::Test::Client;
+use Test::More tests =>
+    OPCUA::Open62541::Test::Server::planning() +
+    OPCUA::Open62541::Test::Client::planning() + 28;
+use Test::Deep;
+use Test::Exception;
 use Test::NoWarnings;
 use Test::LeakTrace;
 
 my $server = OPCUA::Open62541::Test::Server->new();
+$server->port(4840);
 $server->start();
-my $port = $server->port();
+my $client = OPCUA::Open62541::Test::Client->new(port => $server->port());
+$client->start();
+$server->run();
+$client->run();
 
-my @testdesc = (
-    ['client', 'client creation'],
-    ['config', 'config creation'],
-    ['config_default', 'set default config'],
-    ['connect_async', 'call to connect_async'],
-    ['iterate', 'calls to run_iterate'],
-    ['state_session', 'client state SESSION after connect'],
-    ['iterate2', 'calls to second run_iterate'],
-    ['browse_data', 'data in browseresponse callback'],
-    ['browse_code', 'statuscode of browseresult'],
-    ['browse_result_count', 'number of results'],
-    ['browse_refs_count', 'number of references'],
-    ['browse_refs_foldertype', 'foldertype reference'],
-    ['browse_refs_objects_displayname', 'objects reference displayname'],
-    ['browse_refs_objects_browsename', 'objects reference browsename'],
-    ['browse_refs_types', 'types reference'],
-    ['browse_refs_views', 'views reference'],
-    ['iterate3', 'calls to third run_iterate'],
-    ['browse2_code', 'statuscode of seconds browseresult'],
-    ['browse2_result_count', 'number of second results'],
-    ['browse2_refs_count', 'number of second references'],
-    ['browse2_refs_objects_displayname', 'second objects reference displayname'],
-    ['browse2_refs_objects_browsename', 'second objects reference browsename'],
-    ['disconnect', 'client disconnected'],
-    ['state_disconnected', 'client state DISCONNECTED after disconnect'],
-    ['reqid_ref', 'request reference contains a number'],
-    ['reqid_sub', 'request reference is the same as request in callback'],
-    ['response1', 'first response result is good'],
-    ['response2', 'seconnd response result is good'],
-);
-my %testok = map { $_ => 0 } map { $_->[0] } @testdesc;
+my $request = {
+    BrowseRequest_requestedMaxReferencesPerNode => 0,
+    BrowseRequest_nodesToBrowse => [
+	{
+	    BrowseDescription_nodeId => {
+		NodeId_namespaceIndex => 0,
+		NodeId_identifierType => 0,
+		NodeId_identifier => OPCUA::Open62541::NS0ID::ROOTFOLDER,
+	    },
+	    BrowseDescription_resultMask => BROWSERESULTMASK_ALL,
+	}
+    ],
+};
+
+my $response = {
+  'BrowseResponse_diagnosticInfos' => [],
+  'BrowseResponse_results' => [
+    {
+      'BrowseResult_references' => [
+	{
+	  'ReferenceDescription_nodeId' => {
+	    'ExpandedNodeId_serverIndex' => 0,
+	    'ExpandedNodeId_nodeId' => {
+	      'NodeId_identifier' => 61,
+	      'NodeId_identifierType' => 0,
+	      'NodeId_namespaceIndex' => 0
+	    },
+	    'ExpandedNodeId_namespaceUri' => undef
+	  },
+	  'ReferenceDescription_isForward' => 1,
+	  'ReferenceDescription_displayName' => {
+	    'LocalizedText_text' => 'FolderType',
+	    'LocalizedText_locale' => ''
+	  },
+	  'ReferenceDescription_nodeClass' => 8,
+	  'ReferenceDescription_referenceTypeId' => {
+	    'NodeId_identifier' => 40,
+	    'NodeId_identifierType' => 0,
+	    'NodeId_namespaceIndex' => 0
+	  },
+	  'ReferenceDescription_typeDefinition' => {
+	    'ExpandedNodeId_nodeId' => {
+	      'NodeId_identifierType' => 0,
+	      'NodeId_identifier' => 0,
+	      'NodeId_namespaceIndex' => 0
+	    },
+	    'ExpandedNodeId_namespaceUri' => undef,
+	    'ExpandedNodeId_serverIndex' => 0
+	  },
+	  'ReferenceDescription_browseName' => {
+	    'name' => 'FolderType',
+	    'namespaceIndex' => 0
+	  }
+	},
+	{
+	  'ReferenceDescription_referenceTypeId' => {
+	    'NodeId_identifier' => 35,
+	    'NodeId_identifierType' => 0,
+	    'NodeId_namespaceIndex' => 0
+	  },
+	  'ReferenceDescription_typeDefinition' => {
+	    'ExpandedNodeId_serverIndex' => 0,
+	    'ExpandedNodeId_namespaceUri' => undef,
+	    'ExpandedNodeId_nodeId' => {
+	      'NodeId_identifier' => 61,
+	      'NodeId_identifierType' => 0,
+	      'NodeId_namespaceIndex' => 0
+	    }
+	  },
+	  'ReferenceDescription_browseName' => {
+	    'name' => 'Objects',
+	    'namespaceIndex' => 0
+	  },
+	  'ReferenceDescription_nodeId' => {
+	    'ExpandedNodeId_serverIndex' => 0,
+	    'ExpandedNodeId_nodeId' => {
+	      'NodeId_identifier' => 85,
+	      'NodeId_identifierType' => 0,
+	      'NodeId_namespaceIndex' => 0
+	    },
+	    'ExpandedNodeId_namespaceUri' => undef
+	  },
+	  'ReferenceDescription_isForward' => 1,
+	  'ReferenceDescription_nodeClass' => 1,
+	  'ReferenceDescription_displayName' => {
+	    'LocalizedText_locale' => '',
+	    'LocalizedText_text' => 'Objects'
+	  }
+	},
+	{
+	  'ReferenceDescription_browseName' => {
+	    'namespaceIndex' => 0,
+	    'name' => 'Types'
+	  },
+	  'ReferenceDescription_referenceTypeId' => {
+	    'NodeId_identifierType' => 0,
+	    'NodeId_identifier' => 35,
+	    'NodeId_namespaceIndex' => 0
+	  },
+	  'ReferenceDescription_typeDefinition' => {
+	    'ExpandedNodeId_serverIndex' => 0,
+	    'ExpandedNodeId_namespaceUri' => undef,
+	    'ExpandedNodeId_nodeId' => {
+	      'NodeId_identifier' => 61,
+	      'NodeId_identifierType' => 0,
+	      'NodeId_namespaceIndex' => 0
+	    }
+	  },
+	  'ReferenceDescription_isForward' => 1,
+	  'ReferenceDescription_displayName' => {
+	    'LocalizedText_text' => 'Types',
+	    'LocalizedText_locale' => ''
+	  },
+	  'ReferenceDescription_nodeClass' => 1,
+	  'ReferenceDescription_nodeId' => {
+	    'ExpandedNodeId_serverIndex' => 0,
+	    'ExpandedNodeId_namespaceUri' => undef,
+	    'ExpandedNodeId_nodeId' => {
+	      'NodeId_identifier' => 86,
+	      'NodeId_identifierType' => 0,
+	      'NodeId_namespaceIndex' => 0
+	    }
+	  }
+	},
+	{
+	  'ReferenceDescription_nodeId' => {
+	    'ExpandedNodeId_nodeId' => {
+	      'NodeId_namespaceIndex' => 0,
+	      'NodeId_identifier' => 87,
+	      'NodeId_identifierType' => 0
+	    },
+	    'ExpandedNodeId_namespaceUri' => undef,
+	    'ExpandedNodeId_serverIndex' => 0
+	  },
+	  'ReferenceDescription_nodeClass' => 1,
+	  'ReferenceDescription_displayName' => {
+	    'LocalizedText_text' => 'Views',
+	    'LocalizedText_locale' => ''
+	  },
+	  'ReferenceDescription_isForward' => 1,
+	  'ReferenceDescription_typeDefinition' => {
+	    'ExpandedNodeId_namespaceUri' => undef,
+	    'ExpandedNodeId_nodeId' => {
+	      'NodeId_identifier' => 61,
+	      'NodeId_identifierType' => 0,
+	      'NodeId_namespaceIndex' => 0
+	    },
+	    'ExpandedNodeId_serverIndex' => 0
+	  },
+	  'ReferenceDescription_referenceTypeId' => {
+	    'NodeId_namespaceIndex' => 0,
+	    'NodeId_identifierType' => 0,
+	    'NodeId_identifier' => 35
+	  },
+	  'ReferenceDescription_browseName' => {
+	    'name' => 'Views',
+	    'namespaceIndex' => 0
+	  }
+	}
+      ],
+      'BrowseResult_continuationPoint' => undef,
+      'BrowseResult_statusCode' => 'Good'
+    }
+  ],
+  'BrowseResponse_responseHeader' => {
+    'ResponseHeader_stringTable' => [],
+    'ResponseHeader_timestamp' => re(qr/^\d+$/),  # '132282586240806600',
+    'ResponseHeader_requestHandle' => re(qr/^\d+$/),  # 5,
+    'ResponseHeader_serviceDiagnostics' => {
+      'DiagnosticInfo_hasSymbolicId' => '',
+      'DiagnosticInfo_locale' => 0,
+      'DiagnosticInfo_localizedText' => 0,
+      'DiagnosticInfo_additionalInfo' => undef,
+      'DiagnosticInfo_hasInnerStatusCode' => '',
+      'DiagnosticInfo_namespaceUri' => 0,
+      'DiagnosticInfo_hasAdditionalInfo' => '',
+      'DiagnosticInfo_hasNamespaceUri' => '',
+      'DiagnosticInfo_hasLocalizedText' => '',
+      'DiagnosticInfo_hasLocale' => '',
+      'DiagnosticInfo_innerStatusCode' => 'Good',
+      'DiagnosticInfo_hasInnerDiagnosticInfo' => '',
+      'DiagnosticInfo_symbolicId' => 0
+    },
+    'ResponseHeader_serviceResult' => 'Good',
+    'ResponseHeader_additionalHeader' => {
+      'ExtensionObject_content_typeId' => {
+	'NodeId_identifier' => 0,
+	'NodeId_identifierType' => 0,
+	'NodeId_namespaceIndex' => 0
+      },
+      'ExtensionObject_content_body' => undef,
+      'ExtensionObject_encoding' => 0
+    }
+  }
+};
+
+### deep
+
+my $data = "foo",
+my $reqid;
+my $browsed = 0;
+is($client->{client}->sendAsyncBrowseRequest(
+    $request,
+    sub {
+	my ($c, $d, $i, $r) = @_;
+
+	is($c, $client->{client}, "client");
+	is($$d, "foo", "data in");
+	$$d = "bar";
+	is($i, $reqid, "reqid");
+	cmp_deeply($r, $response, "response");
+
+	$browsed = 1;
+    },
+    \$data,
+    \$reqid,
+), STATUSCODE_GOOD, "sendAsyncBrowseRequest");
+is($data, "foo", "data unchanged");
+like($reqid, qr/^\d+$/, "reqid number");
+$client->iterate(\$browsed, "browse deep");
+is($data, 'bar', "data out");
 
 no_leaks_ok {
-    my $c;
-    my $r;
-    my $data = ['foo'];
-    my $reqid;
-    {
-	$c = OPCUA::Open62541::Client->new();
-	$testok{client} = 1 if $c;
+    $browsed = 0;
+    $client->{client}->sendAsyncBrowseRequest(
+	$request,
+	sub {
+	    my ($c, $d, $i, $r) = @_;
+	    $browsed = 1;
+	},
+	$data,
+	\$reqid,
+    );
+    $client->iterate(\$browsed);
+} "sendAsyncBrowseRequest leak";
 
-	my $cc = $c->getConfig();
-	$testok{config} = 1 if $cc;
+### data reqid undef
 
-	$r = $cc->setDefault();
-	$testok{config_default} = 1 if $r == STATUSCODE_GOOD;
+$browsed = 0;
+is($client->{client}->sendAsyncBrowseRequest(
+    $request,
+    sub {
+	my ($c, $d, $i, $r) = @_;
 
-	$r = $c->connect_async("opc.tcp://localhost:$port", undef, undef);
-	$testok{connect_async} = 1 if $r == STATUSCODE_GOOD;
+	is($d, undef, "data undef");
+	like($reqid, qr/^\d+$/, "reqid number");
 
-	my $maxloop = 1000;
-	my $failed_iterate = 0;
-	while($c->getState != CLIENTSTATE_SESSION && $maxloop-- > 0) {
-	    $r = $c->run_iterate(0);
-	    $failed_iterate = 1 if $r != STATUSCODE_GOOD;
-	}
-	$testok{iterate} = 1 if not $failed_iterate and $maxloop > 0;
+	$browsed = 1;
+    },
+    undef,
+    undef,
+), STATUSCODE_GOOD, "sendAsyncBrowseRequest undef");
+$client->iterate(\$browsed, "browse undef");
 
-	$testok{state_session} = 1 if $c->getState == CLIENTSTATE_SESSION;
+no_leaks_ok {
+    $browsed = 0;
+    $client->{client}->sendAsyncBrowseRequest(
+	$request,
+	sub {
+	    my ($c, $d, $i, $r) = @_;
+	    $browsed = 1;
+	},
+	undef,
+	undef,
+    );
+    $client->iterate(\$browsed);
+} "sendAsyncBrowseRequest undef leak";
 
-	my $browsed = 0;
-	$c->sendAsyncBrowseRequest(
-	    {
-		BrowseRequest_requestedMaxReferencesPerNode => 0,
-		BrowseRequest_nodesToBrowse => [
-		    {
-			BrowseDescription_nodeId => {
-			    NodeId_namespaceIndex => 0,
-			    NodeId_identifierType => 0,
-			    NodeId_identifier => 84,		# UA_NS0ID_ROOTFOLDER
-			},
-			BrowseDescription_resultMask => BROWSERESULTMASK_ALL,
-		    }
-		],
-	    },
-	    sub {
-		my ($c, $d, $i, $r) = @_;
-		$testok{response1} = 1 if $r->{BrowseResponse_results}[0] &&
-		    $r->{BrowseResponse_results}[0]{BrowseResult_statusCode} eq
-		    'Good';
-		$testok{reqid_sub} = 1 if $reqid == $i;
-		$browsed = 1;
-		push(@$data, $d, $i, $r);
-	    },
-	    "test",
-	    \$reqid,
-	);
+### reqid bad ref
 
-	$testok{reqid_ref} = 1 if $reqid =~ qr/^\d+$/;
+throws_ok {
+    $client->{client}->sendAsyncBrowseRequest(
+	$request,
+	sub {
+	    my ($c, $d, $i, $r) = @_;
+	},
+	undef,
+	[],
+    );
+} (qr/reqId is not a scalar reference /, "sendAsyncBrowseRequest ref reqid");
 
-	$maxloop = 1000;
-	$failed_iterate = 0;
-	while(not $browsed && $maxloop-- > 0) {
-	    $r = $c->run_iterate(0);
-	    $failed_iterate = 1 if $r != STATUSCODE_GOOD;
-	}
-	$testok{iterate2} = 1 if not $failed_iterate and $maxloop > 0;
+no_leaks_ok { eval {
+    $client->{client}->sendAsyncBrowseRequest(
+	$request,
+	sub {
+	    my ($c, $d, $i, $r) = @_;
+	},
+	undef,
+	[],
+    );
+} } "sendAsyncBrowseRequest ref reqid leak";
 
-	$testok{browse_data} = 1 if $data->[1] eq "test";
+### client undef
 
-	my $result_code = $data->[3]{BrowseResponse_responseHeader}{ResponseHeader_serviceResult};
-	$testok{browse_code} = 1 if $result_code == STATUSCODE_GOOD;
+throws_ok {
+    OPCUA::Open62541::Client::sendAsyncBrowseRequest(
+	undef,
+	$request,
+	sub {
+	    my ($c, $d, $i, $r) = @_;
+	},
+	undef,
+	undef,
+    );
+} (qr/client is not of type OPCUA::Open62541::Client /,
+    "sendAsyncBrowseRequest undef client");
 
-	my $results = $data->[3]{BrowseResponse_results};
-	$testok{browse_result_count} = 1 if @$results == 1;
-	my $refs = $results->[0]{BrowseResult_references};
-	$testok{browse_refs_count} = 1 if @$refs == 4;
+no_leaks_ok { eval {
+    OPCUA::Open62541::Client::sendAsyncBrowseRequest(
+	undef,
+	$request,
+	sub {
+	    my ($c, $d, $i, $r) = @_;
+	},
+	undef,
+	undef,
+    );
+} } "sendAsyncBrowseRequest undef client leak";
 
-	$testok{browse_refs_foldertype} = 1
-	    if $refs->[0]{ReferenceDescription_displayName}{LocalizedText_text} eq 'FolderType';
-	$testok{browse_refs_objects_displayname} = 1
-	    if $refs->[1]{ReferenceDescription_displayName}{LocalizedText_text} eq 'Objects';
-	$testok{browse_refs_objects_browsename} = 1
-	    if $refs->[1]{ReferenceDescription_browseName}{name} eq 'Objects';
-	$testok{browse_refs_types} = 1
-	    if $refs->[2]{ReferenceDescription_displayName}{LocalizedText_text} eq 'Types';
-	$testok{browse_refs_views} = 1
-	    if $refs->[3]{ReferenceDescription_displayName}{LocalizedText_text} eq 'Views';
+### request undef
 
-	# make a request for only browse names
-	$c->sendAsyncBrowseRequest(
-	    {
-		BrowseRequest_requestedMaxReferencesPerNode => 0,
-		BrowseRequest_nodesToBrowse => [
-		    {
-			BrowseDescription_nodeId => {
-			    NodeId_namespaceIndex => 0,
-			    NodeId_identifierType => 0,
-			    NodeId_identifier => 84,		# UA_NS0ID_ROOTFOLDER
-			},
-			BrowseDescription_resultMask => BROWSERESULTMASK_BROWSENAME,
-		    }
-		],
-	    },
-	    sub {
-		my ($c, $d, $i, $r) = @_;
-		$testok{response2} = 1 if $r->{BrowseResponse_results}[0] &&
-		    $r->{BrowseResponse_results}[0]{BrowseResult_statusCode} eq
-		    'Good';
-		$browsed = 1;
-		push(@$data, $d, $i, $r);
-	    },
-	    "test",
-	    undef,
-	);
+throws_ok {
+    $client->{client}->sendAsyncBrowseRequest(
+	undef,
+	sub {
+	    my ($c, $d, $i, $r) = @_;
+	},
+	undef,
+	undef,
+    );
+} (qr/XS_unpack_UA_BrowseRequest: Not a HASH reference /,
+    "sendAsyncBrowseRequest undef request");
 
-	$maxloop = 1000;
-	$failed_iterate = 0;
-	$browsed = 0;
-	while(not $browsed && $maxloop-- > 0) {
-	    $r = $c->run_iterate(0);
-	    $failed_iterate = 1 if $r != STATUSCODE_GOOD;
-	}
-	$testok{iterate3} = 1 if not $failed_iterate and $maxloop > 0;
+no_leaks_ok { eval {
+    $client->{client}->sendAsyncBrowseRequest(
+	undef,
+	sub {
+	    my ($c, $d, $i, $r) = @_;
+	},
+	undef,
+	undef,
+    );
+} } "sendAsyncBrowseRequest undef request leak";
 
-	my $result2_code = $data->[6]{BrowseResponse_responseHeader}{ResponseHeader_serviceResult};
-	$testok{browse2_code} = 1 if $result2_code == STATUSCODE_GOOD;
+### callback undef
 
-	my $results2 = $data->[6]{BrowseResponse_results};
-	$testok{browse2_result_count} = 1 if @$results2 == 1;
-	my $refs2 = $results2->[0]{BrowseResult_references};
-	$testok{browse2_refs_count} = 1 if @$refs2 == 4;
+throws_ok {
+    $client->{client}->sendAsyncBrowseRequest(
+	$request,
+	"foobar",
+	undef,
+	undef,
+    );
+} (qr/Callback 'foobar' is not a CODE reference /,
+    "sendAsyncBrowseRequest bad callback");
 
-	$testok{browse2_refs_objects_displayname} = 1
-	    if not defined $refs2->[1]{ReferenceDescription_displayName}{text};
-	$testok{browse2_refs_objects_browsename} = 1
-	    if $refs2->[1]{ReferenceDescription_browseName}{name} eq 'Objects';
+no_leaks_ok { eval {
+    $client->{client}->sendAsyncBrowseRequest(
+	$request,
+	"foobar",
+	undef,
+	undef,
+    );
+} } "sendAsyncBrowseRequest bad callback leak";
 
-	$r = $c->disconnect();
-	$testok{disconnect} = 1 if $r == STATUSCODE_GOOD;
-	$testok{state_disconnected} = 1
-	    if $c->getState == CLIENTSTATE_DISCONNECTED;
-    }
-} "leak browse_service callback/data";
+$client->stop();
 
-ok(delete($testok{$_->[0]}), $_->[1]) for (@testdesc);
+### status fail
 
-is(keys %testok, 0, "no remaining tests");
+# browse with closed client fails, check that it does not leak
+$data = "foo";
+undef $reqid;
+is($client->{client}->sendAsyncBrowseRequest(
+    $request,
+    sub {
+	my ($c, $d, $i, $r) = @_;
+	fail "callback called";
+    },
+    \$data,
+    \$reqid,
+), STATUSCODE_BADSERVERNOTCONNECTED, "sendAsyncBrowseRequest fail");
+is($data, "foo", "data fail");
+is($reqid, 0, "reqid zero");
+
+no_leaks_ok {
+    $client->{client}->sendAsyncBrowseRequest(
+	$request,
+	sub {
+	    my ($c, $d, $i, $r) = @_;
+	},
+	\$data,
+	\$reqid,
+    );
+} "sendAsyncBrowseRequest fail leak";
 
 $server->stop();

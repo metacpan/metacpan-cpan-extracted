@@ -1,5 +1,11 @@
 Revision history for Alien::proj
 
+1.05 2020-03-07
+    - Add support for user defined args for the configure script
+      under share builds
+    - Limit max Proj version to 6.x on share installs until we
+      get curl and libtiff integration working.
+
 1.04 2019-09-08
     - pkgconfig workaround to find sqlite3 on
       windows share builds, gh#2

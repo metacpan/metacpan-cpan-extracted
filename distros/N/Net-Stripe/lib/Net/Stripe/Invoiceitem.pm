@@ -1,5 +1,5 @@
 package Net::Stripe::Invoiceitem;
-$Net::Stripe::Invoiceitem::VERSION = '0.39';
+$Net::Stripe::Invoiceitem::VERSION = '0.41';
 use Moose;
 use Kavorka;
 extends 'Net::Stripe::Resource';
@@ -17,12 +17,9 @@ has 'invoice'           => (is => 'ro', isa => 'Maybe[Str]');
 has 'metadata'          => (is => 'rw', isa => 'Maybe[HashRef]');
 
 method form_fields {
-    return (
-        $self->form_fields_for_metadata(),
-        map { $_ => $self->$_ }
-            grep { defined $self->$_ }
-                qw/amount currency description invoice/,
-                ($self->id ? () : qw/customer/)
+    return $self->form_fields_for(
+        qw/amount currency description invoice metadata/,
+        ($self->id ? () : qw/customer/)
     );
 }
 
@@ -39,7 +36,77 @@ Net::Stripe::Invoiceitem - represent an Invoice Item object from Stripe
 
 =head1 VERSION
 
-version 0.39
+version 0.41
+
+=head1 ATTRIBUTES
+
+=head2 amount
+
+Reader: amount
+
+Writer: amount
+
+Type: Maybe[Int]
+
+This attribute is required.
+
+=head2 boolean_attributes
+
+Reader: boolean_attributes
+
+Type: ArrayRef[Str]
+
+=head2 currency
+
+Reader: currency
+
+Writer: currency
+
+Type: Maybe[Str]
+
+This attribute is required.
+
+=head2 customer
+
+Reader: customer
+
+Type: Maybe[Str]
+
+This attribute is required.
+
+=head2 date
+
+Reader: date
+
+Type: Maybe[Int]
+
+=head2 description
+
+Reader: description
+
+Writer: description
+
+Type: Maybe[Str]
+
+=head2 id
+
+Reader: id
+
+Type: Maybe[Str]
+
+=head2 invoice
+
+Reader: invoice
+
+Type: Maybe[Str]
+
+=head2 metadata
+
+Reader: metadata
+
+Writer: metadata
+
+Type: Maybe[HashRef]
 
 =head1 AUTHORS
 

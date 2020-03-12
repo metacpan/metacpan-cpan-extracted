@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.526';
+our $VERSION = '0.527';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -1345,7 +1345,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.526
+Version 0.527
 
 =cut
 

@@ -21,15 +21,15 @@ requires:
   Carp: '0'
   Data::Dumper: '0'
   Exporter: '0'
-  List::Util: '0'
+  List::Util: '1.33'
   Scalar::Util: '0'
   Term::Choose: '1.710'
-  Term::Choose::Util: '0.114'
+  Term::Choose::Util: '0.117'
   constant: '0'
   perl: '5.008003'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-TablePrint.git
-version: '0.121'
+version: '0.122'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

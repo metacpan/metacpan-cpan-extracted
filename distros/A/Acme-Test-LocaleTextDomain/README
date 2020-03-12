@@ -2,7 +2,7 @@ NAME
     Acme::Test::LocaleTextDomain - Test Locale::TextDomain
 
 VERSION
-    This document describes version 0.002 of Acme::Test::LocaleTextDomain
+    This document describes version 0.003 of Acme::Test::LocaleTextDomain
     (from Perl distribution Acme-Test-LocaleTextDomain), released on
     2019-12-26.
 

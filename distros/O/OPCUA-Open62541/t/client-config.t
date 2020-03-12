@@ -2,12 +2,24 @@ use strict;
 use warnings;
 use OPCUA::Open62541;
 
-use Test::More tests => 4;
+use Test::More tests => 9;
+use Test::Exception;
+use Test::LeakTrace;
 use Test::NoWarnings;
 
-my $s = OPCUA::Open62541::Client->new();
-ok($s, "client new");
+ok(my $client = OPCUA::Open62541::Client->new(), "client new");
 
-my $c = $s->getConfig();
-ok($c, "config get");
-is(ref($c), "OPCUA::Open62541::ClientConfig", "class");
+ok(my $config = $client->getConfig(), "config get");
+is(ref($config), "OPCUA::Open62541::ClientConfig", "config class");
+no_leaks_ok { $client->getConfig() } "config leak";
+
+throws_ok { OPCUA::Open62541::Client::getConfig() }
+    (qr/Usage: OPCUA::Open62541::Client::getConfig\(client\) /,
+    "config missing");
+no_leaks_ok { eval { OPCUA::Open62541::Client::getConfig() } }
+    "config missing leak";
+throws_ok { OPCUA::Open62541::Client::getConfig(undef) }
+    (qr/client is not of type OPCUA::Open62541::Client /,
+    "config undef");
+no_leaks_ok { eval { OPCUA::Open62541::Client::getConfig(undef) } }
+    "config undef leak";

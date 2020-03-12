@@ -38,8 +38,8 @@ requires:
   Term::ANSIScreen: '0'
   Term::Choose: '1.710'
   Term::Choose::LineFold: '1.710'
-  Term::Choose::Util: '0.114'
-  Term::Form: '0.526'
+  Term::Choose::Util: '0.117'
+  Term::Form: '0.527'
   constant: '0'
   if: '0'
   parent: '0'
@@ -49,5 +49,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-YTDL.git
-version: '0.308'
+version: '0.309'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
