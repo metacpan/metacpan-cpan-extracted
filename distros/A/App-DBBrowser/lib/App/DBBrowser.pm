@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.245';
+our $VERSION = '2.246';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -594,45 +594,54 @@ sub __browse_the_table {
 
 sub __create_drop_or_attach {
     my ( $sf, $table ) = @_;
-    my $old_idx = exists $sf->{old_idx_hidden} ? delete $sf->{old_idx_hidden} : 0;
+    my $old_idx = exists $sf->{old_idx_hidden} ? delete $sf->{old_idx_hidden} : 1;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
 
-    HIDDEN: while ( 1 ) {
+    CREATE_DROP_ATTACH: while ( 1 ) {
+        my $hidden = $sf->{d}{db_string};
         my ( $create_table,    $drop_table,      $create_view,    $drop_view,      $attach_databases, $detach_databases ) = (
           '- Create TABLE', '- Drop   TABLE', '- Create VIEV', '- Drop   VIEW', '- Attach DB',     '- Detach DB',
         );
-        my @choices;
-        push @choices, $create_table if $sf->{o}{enable}{create_table};
-        push @choices, $drop_table   if $sf->{o}{enable}{drop_table};
-        push @choices, $create_view  if $sf->{o}{enable}{create_view};
-        push @choices, $drop_view    if $sf->{o}{enable}{drop_view};
+        my @entries;
+        push @entries, $create_table if $sf->{o}{enable}{create_table};
+        push @entries, $drop_table   if $sf->{o}{enable}{drop_table};
+        push @entries, $create_view  if $sf->{o}{enable}{create_view};
+        push @entries, $drop_view    if $sf->{o}{enable}{drop_view};
         if ( $sf->{i}{driver} eq 'SQLite' ) {
-            push @choices, $attach_databases;
-            push @choices, $detach_databases if $sf->{db_attached};
+            push @entries, $attach_databases;
+            push @entries, $detach_databases if $sf->{db_attached};
         }
-        if ( ! @choices ) {
+        if ( ! @entries ) {
             return;
         }
-        my @pre = ( undef );
+        my @pre = ( $hidden, undef );
+        my $choices = [ @pre, @entries ];
         # Choose
         my $idx = $tc->choose(
-            [ @pre, @choices ],
-            { %{$sf->{i}{lyt_v_clear}}, prompt => $sf->{d}{db_string}, index => 1, default => $old_idx, undef => '  <=' }
+            $choices,
+            { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx, undef => '  <=' }
         );
-        if ( ! $idx ) {
+        if ( ! defined $idx || ! defined $choices->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
             if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx = 0;
-                next HIDDEN;
+                $old_idx = 1;
+                next CREATE_DROP_ATTACH;
             }
             $old_idx = $idx;
         }
-        die if $idx < @pre;
-        my $choice = $choices[$idx-@pre];
-        if ( $choice =~ /^-\ Create/i ) {
+        my $choice = $choices->[$idx];
+        if ( $choice eq $hidden ) {
+            require App::DBBrowser::Opt::Set;
+            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+            my $groups = [ { name => 'group_insert', text => '' } ];
+            my $options = [ { name => '_data_source', text => "- Data source", section => 'insert' } ];
+            $opt_set->set_options( $groups, $options );
+            next CREATE_DROP_ATTACH;
+        }
+        elsif ( $choice =~ /^-\ Create/i ) {
             require App::DBBrowser::CreateTable;
             my $ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $create_table ) {
@@ -672,17 +681,17 @@ sub __create_drop_or_attach {
             if ( $choice eq $attach_databases ) {
                 if ( ! eval { $changed = $att->attach_db(); 1 } ) {
                     $ax->print_error_message( $@ );
-                    next HIDDEN;
+                    next CREATE_DROP_ATTACH;
                 }
             }
             elsif ( $choice eq $detach_databases ) {
                 if ( ! eval { $changed = $att->detach_db(); 1 } ) {
                     $ax->print_error_message( $@ );
-                    next HIDDEN;
+                    next CREATE_DROP_ATTACH;
                 }
             }
             if ( ! $changed ) {
-                next HIDDEN;
+                next CREATE_DROP_ATTACH;
             }
         }
         $sf->{old_idx_hidden} = $old_idx;
@@ -738,7 +747,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.245
+Version 2.246
 
 =head1 DESCRIPTION
 

@@ -5,22 +5,16 @@ use Test;
 use Tcl::pTk;
 
 
-my %images = (
-    'Tk.xbm' => 'xbm',
-    'Xcamel.gif' => 'gif'
-);
+# Test image formats supported by Tk without Img extension
+
+my %images = ('Xcamel.gif' => 'gif');
 my $image_count = keys %images;
 
 # Formats supported by Tk 8.4-8.5 without extensions
 my %kind_is_supported = (
     'gif'  => 1,
     'ppm'  => 1,
-    'bmp'  => 0,
-    'jpeg' => 0,
     'png'  => 0,
-    'tiff' => 0,
-    'xbm'  => 0,
-    'xpm'  => 0,
 );
 my $kind_count = keys %kind_is_supported;
 
@@ -29,31 +23,15 @@ plan tests => ($image_count*($kind_count * 5 + 1) + 2);
 my $mw  = MainWindow->new();
 $mw->geometry('+100+100');
 
-my $Img_version = $mw->interp->pkg_require('Img');
-if ($Img_version) {
-    # Add formats supported by Img extension
-    foreach my $kind (qw(bmp jpeg png tiff xbm xpm)){
-        $kind_is_supported{$kind} = 1;
-    }
-} elsif (
+# Check for PNG support (TkPNG or Tk 8.6+)
+if (
     ($mw->interp->Eval('package vcompare $tk_version 8.6') != -1)
     or $mw->interp->pkg_require('tkpng')
 ) {
-    # Add png (supported by TkPNG or Tk 8.6+)
     $kind_is_supported{'png'} = 1;
-}
-
-# Say whether PNG is supported first
-# since there are multiple ways to support it…
-if (not $kind_is_supported{'png'}) {
-    print "# PNG support not found (requires Img, TkPNG, or Tk 8.6+).\n"
+} else {
+    print "# PNG support not found (requires TkPNG or Tk 8.6+).\n"
         . "# PNG tests will be skipped.\n";
-}
-# …then say whether Img is present
-# (without needing to mention PNG again) 
-if (not $Img_version) {
-    print "# Tk Img extension not found.\n"
-        . "# BMP, JPEG, TIFF, XBM, and XPM tests will be skipped.\n";
 }
 
 # Check that the width/height methods work
@@ -89,6 +67,15 @@ foreach my $leaf (sort keys %images) {
             if (not $kind_is_supported{$kind}) {
                 for (1..5) {
                     skip uc($kind) . ' support not found';
+                }
+            } elsif (
+                $kind eq 'png' and
+                $mw->interp->GetVar('tcl_patchLevel') =~ m/^8\.6\.(?:5|6)$/
+            ) {
+                # Tcl/Tk 8.6.5 and 8.6.6 output invalid PNG files
+                # See https://rt.cpan.org/Ticket/Display.html?id=128803
+                for (1..5) {
+                    skip 'Tcl/Tk 8.6.5 and 8.6.6 output invalid PNG files (RT #128803)';
                 }
             } else {
                 push(@files,$f);

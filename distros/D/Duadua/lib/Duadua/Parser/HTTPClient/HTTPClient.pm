@@ -95,6 +95,26 @@ sub _perl {
             $h->{version} = $version if $version;
         }
     }
+    elsif ( index($d->ua, 'SOAP::Lite/Perl/') > -1 ) {
+        $h = {
+            name => 'SOAP::Lite Perl',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!^SOAP::Lite/Perl/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+    }
+    elsif ( index($d->ua, 'MT::Plugin::BadLinkFinder/') > -1 ) {
+        $h = {
+            name => 'MT::Plugin::BadLinkFinder',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!^MT::Plugin::BadLinkFinder/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+    }
 
     return $h;
 }
@@ -144,6 +164,16 @@ sub _python {
             $h->{version} = $version if $version;
         }
     }
+    elsif ( index($d->ua, 'python-requests/') > -1 ) {
+        $h = {
+            name => 'python-requests',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!^python-requests/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+    }
 
     return $h;
 }
@@ -182,6 +212,11 @@ sub _php {
             my ($version) = ($d->ua =~ m! PHP/([\d.]+)!);
             $h->{version} = $version if $version;
         }
+    }
+    elsif ( $d->ua eq 'Zend_XmlRpc_Client' ) {
+        $h = {
+            name => 'Zend_XmlRpc_Client',
+        };
     }
 
     return $h;
@@ -256,6 +291,18 @@ sub _golang {
 
         if ($d->opt_version) {
             my ($version) = ($d->ua =~ m!^Go-http-client/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+
+        return $h;
+    }
+    elsif ( index($d->ua, 'Go ') > -1 && index($d->ua, ' package http') > -1 ) {
+        my $h = {
+            name => 'Go http-client',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!^Go ([\d.]+) !);
             $h->{version} = $version if $version;
         }
 

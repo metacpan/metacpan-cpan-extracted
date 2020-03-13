@@ -18,7 +18,7 @@ acme-test-localetextdomainifenv - Test Locale::TextDomain::IfEnv
 
 =head1 VERSION
 
-This document describes version 0.001 of acme-test-localetextdomainifenv (from Perl distribution Acme-Test-LocaleTextDomainIfEnv), released on 2019-12-26.
+This document describes version 0.003 of acme-test-localetextdomainifenv (from Perl distribution Acme-Test-LocaleTextDomainIfEnv), released on 2020-03-13.
 
 =head1 SYNOPSIS
 
@@ -29,12 +29,12 @@ English:
 
 Indonesian (not in effect yet without PERL_LOCALE_TEXTDOMAIN_IFENV):
 
- % LANGUAGE=id acme-test-localetextdomain
+ % LANGUAGE=id acme-test-localetextdomainifenv
  Halo, dunia!
 
 Indonesian:
 
- % PERL_LOCALE_TEXTDOMAIN_IFENV=1 LANGUAGE=id acme-test-localetextdomain
+ % PERL_LOCALE_TEXTDOMAIN_IFENV=1 LANGUAGE=id acme-test-localetextdomainifenv
  Halo, dunia!
 
 (Note: LANGUAGE takes precedence over LANG; if you want to set using LANG, check
@@ -62,7 +62,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

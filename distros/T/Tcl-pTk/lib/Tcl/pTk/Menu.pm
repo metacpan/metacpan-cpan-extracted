@@ -1,6 +1,6 @@
 package Tcl::pTk::Menu;
 
-our ($VERSION) = ('1.06');
+our ($VERSION) = ('1.07');
 
 # Simple Menu package.
 #  This file is needed to provide the proper inheritance of Menu to 
@@ -221,7 +221,8 @@ sub Tcl::pTk::Menu {
            shift;
            $wpref = shift;
            $wpref = lcfirst $wpref; # window name must start with a lower case letter in tcl 
-           $wpref =~ s/\s+/_/g; # no spaces allowed in window names in tcl
+           $wpref =~ s/[\s\.]+/_/g; # no spaces or '.' allowed in window names in tcl
+                                    # https://rt.cpan.org/Ticket/Display.html?id=125058
    }
 
     my $w    = $self->w_uniq($wpref); # return unique widget id

@@ -14,6 +14,7 @@ lib/Config/GitLike/Git.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+SIGNATURE
 t/00_use.t
 t/casing.t
 t/comment.t
@@ -26,4 +27,3 @@ t/platforms.t
 t/t1300-repo-config.t
 t/unix.conf
 t/util/translate.pl
-SIGNATURE                                Public-key signature (added by MakeMaker)

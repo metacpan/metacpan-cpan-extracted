@@ -1,6 +1,6 @@
 package Tcl::pTk::Bitmap;
 
-our ($VERSION) = ('1.06');
+our ($VERSION) = ('1.07');
 
 use warnings;
 use strict;

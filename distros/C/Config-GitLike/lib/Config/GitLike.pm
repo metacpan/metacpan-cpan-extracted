@@ -8,7 +8,7 @@ use Scalar::Util qw(openhandle);
 use Fcntl qw(O_CREAT O_EXCL O_WRONLY);
 use 5.008;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 
 has 'confname' => (
@@ -1682,7 +1682,9 @@ precedence, you'll need to override L<"load"> as well.
 =head2 dir_file
 
 Return a string containing the path to a configuration file with the
-name C<confname> in a directory. The directory isn't specified here.
+name C<confname> in a directory.  Called with no arguments,
+returns the path for a generic directory; if called with a
+directory as an argument, returns the path for I<that> directory.
 
 =head2 global_file
 

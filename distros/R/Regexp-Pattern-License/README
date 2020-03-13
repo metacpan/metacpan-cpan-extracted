@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.2.0
+    Version v3.3.0
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -229,6 +229,12 @@ PATTERNS
 
     *   gpl
 
+    *   gpl_1
+
+    *   gpl_2
+
+    *   gpl_3
+
     *   isc
 
     *   icu
@@ -363,6 +369,18 @@ PATTERNS
     Each of these patterns has the tag type:trait .
 
     *   any_of
+
+    *   by
+
+    *   by_apache
+
+    *   by_fsf
+
+    *   by_james_clark
+
+    *   by_psf
+
+    *   by_sam_hocevar
 
     *   clause_retention
 
@@ -527,6 +545,18 @@ STRUCTURE
 
         License is commonly granted by stating the whole license.
 
+    *   license:published:*
+
+        License grant may include an "as published by..." reference.
+
+        Third part is the key to corresponding trait pattern.
+
+    *   type:trait:publisher:*
+
+        Pattern covers an "as published by ..." license grant phrase.
+
+        Third part (optional) is the key to corresponding license pattern.
+
     *   type:usage:*:*
 
         Pattern covers a specific usage of a license.
@@ -561,10 +591,6 @@ STRUCTURE
     *   type:versioned:decimal
 
         Pattern covers a license using decimal number versioning scheme.
-
-   DEPRECATED TAGS
-    Tags not documented in this POD, specifically non-hierarchical tags, are
-    deprecated and will be dropped in a future release.
 
 AUTHOR
     Jonas Smedegaard `<dr@jones.dk>`

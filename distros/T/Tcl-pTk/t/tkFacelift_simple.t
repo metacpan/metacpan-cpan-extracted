@@ -17,6 +17,7 @@ my $top = MainWindow->new( -title => "Hijack Test" );
 # This will skip if Tile widgets not available
 unless ($Tcl::pTk::_Tile_available) {
     print "1..0 # Skipped: Tile unavailable\n";
+    $top->destroy;
     exit;
 }
  
@@ -25,6 +26,7 @@ my $retVal = $top->interp->pkg_require('Tix');
 
 unless( $retVal){
     print "1..0 # Skipped: Tix Tcl package not available\n";
+    $top->destroy;
     exit;
 }
 

@@ -57,6 +57,26 @@ has cookie_secure => (
     },
 );
 
+has cookie_httponly => (
+    is      => 'rw',
+    isa     => 'Bool',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        $self->class_config->{cookie_httponly} || 0;
+    },
+);
+
+has cookie_samesite => (
+    is      => 'rw',
+    isa     => 'Str',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        $self->class_config->{cookie_samesite} || '';
+    },
+);
+
 has cookie_remove_marker => (
     is      => 'rw',
     isa     => 'Bool',
@@ -131,11 +151,13 @@ sub make_cookie {
     my ($self, $sid, $attrs) = @_;
 
     my $cookie = {
-        value   => $sid,
-        expires => $self->cookie_expires,
-        secure  => $self->cookie_secure,
-        $self->cookie_domain ? (domain => $self->cookie_domain) : (),
-        $self->cookie_path   ? (path   => $self->cookie_path) : (),
+        value    => $sid,
+        expires  => $self->cookie_expires,
+        secure   => $self->cookie_secure,
+        httponly => $self->cookie_httponly,
+        $self->cookie_samesite ? (samesite => $self->cookie_samesite) : (),
+        $self->cookie_domain   ? (domain => $self->cookie_domain) : (),
+        $self->cookie_path     ? (path   => $self->cookie_path) : (),
         %{ $attrs || {} },
     };
 }

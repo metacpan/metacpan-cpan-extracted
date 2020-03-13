@@ -7,7 +7,7 @@ use Ark::Response;
 
 use Exporter::AutoClean;
 use Path::Class qw/file dir/;
-use Path::AttrRouter;
+use Path::AttrRouter 0.03;
 
 extends 'Class::Data::Inheritable';
 

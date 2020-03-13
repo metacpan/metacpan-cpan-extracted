@@ -2,7 +2,7 @@ package App::PAUSE::Comaint;
 
 use strict;
 use 5.008_001;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use App::PAUSE::Comaint::PackageScanner;
 use WWW::Mechanize;
@@ -38,11 +38,16 @@ sub run {
 sub get_credentials {
     my $self = shift;
 
-    open my $in, "<", "$ENV{HOME}/.pause"
-        or die "Can't open ~/.pause: $!";
     my %rc;
-    while (<$in>) {
-        /^(\S+)\s+(.*)/ and $rc{$1} = $2;
+    my $file = "$ENV{HOME}/.pause";
+    if (eval { require Config::Identity }) {
+        %rc = Config::Identity->load($file);
+    } else {
+        open my $in, "<", $file
+            or die "Can't open $file: $!";
+        while (<$in>) {
+            /^(\S+)\s+(.*)/ and $rc{$1} = $2;
+        }
     }
 
     return @rc{qw(user password)};
@@ -97,7 +102,7 @@ sub make_comaint {
 
     $self->mech->click_button(value => 'Make Co-Maintainer');
 
-    if (my @results = ($self->mech->content =~ /<p>(Added .*? to co-maint.*?|\w+ was already a co-maint.*?: skipping)<\/p>/g)) {
+    if (my @results = ($self->mech->content =~ /<p class="(?:result|warning)">(Added .*? to co-maint.*?|\w+ was already a co-maint.*?: skipping)<\/p>/g)) {
         print "\n", join("\n", @results), "\n";
     } else {
         warn "Something's wrong: ", $self->mech->content;

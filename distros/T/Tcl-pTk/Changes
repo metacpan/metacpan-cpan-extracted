@@ -1,5 +1,23 @@
 Summary of Changes to Tcl::pTk
 
+Release 1.07:  2020-03-13
+
+ * Allow '.' in Cascade labels (RT #125058)
+
+Release 1.06_01:  2020-03-12
+
+ * ttkTixNoteBook (RT #132075):
+   - add method _identify_unavailable to check if Tile version is too old
+     (needs Tcl/Tk 8.5.9 or later, or Tile 0.8.4.0 for Tcl/Tk 8.4)
+   - use _identify_unavailable to show error when identify method is called
+     and to skip tests in ttkTixNoteBook.t and tkFacelife_notebook.t
+     when Tile version is too old
+ * Split photo.t into photoTk.t and photoImg.t to separately test formats
+   supported either natively by Tk or TkPNG, and those supported by TkImg
+   (as photo.t does in Perl/Tk and Tcl::pTk < 0.95)
+   - photoTk.t: skip PNG output tests for Tcl/Tk 8.6.5-8.6.6
+     (which output invalid PNG files: RT #128803)
+
 Release 1.06:  2020-03-10
 
  * Mark wmStackorder.t as TODO due to unresolved failures (RT #132100)

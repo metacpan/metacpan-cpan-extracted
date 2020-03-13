@@ -1,9 +1,9 @@
 package Acme::Test::LocaleTextDomainIfEnv;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-26'; # DATE
+our $DATE = '2020-03-13'; # DATE
 our $DIST = 'Acme-Test-LocaleTextDomainIfEnv'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ sub hello {
 }
 
 1;
-# ABSTRACT: Text Locale::TextDomain::IfEnv
+# ABSTRACT: Test Locale::TextDomain::IfEnv
 
 __END__
 
@@ -28,11 +28,11 @@ __END__
 
 =head1 NAME
 
-Acme::Test::LocaleTextDomainIfEnv - Text Locale::TextDomain::IfEnv
+Acme::Test::LocaleTextDomainIfEnv - Test Locale::TextDomain::IfEnv
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::Test::LocaleTextDomainIfEnv (from Perl distribution Acme-Test-LocaleTextDomainIfEnv), released on 2019-12-26.
+This document describes version 0.003 of Acme::Test::LocaleTextDomainIfEnv (from Perl distribution Acme-Test-LocaleTextDomainIfEnv), released on 2020-03-13.
 
 =head1 DESCRIPTION
 
@@ -66,7 +66,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

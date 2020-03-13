@@ -23,7 +23,7 @@
    "provides" : {
       "App::perluse" : {
          "file" : "lib/App/perluse.pm",
-         "version" : "0.0201"
+         "version" : "0.0301"
       }
    },
    "release_status" : "stable",
@@ -38,6 +38,6 @@
          "url" : "http://github.com/dex4er/perluse"
       }
    },
-   "version" : "0.0201",
+   "version" : "0.0301",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -104,6 +104,7 @@ t/plugin_default.t
 t/plugin_session.t
 t/plugin_session_expire.t
 t/plugin_session_model.t
+t/plugin_session_state_cookie.t
 t/plugin_session_state_opensocial.t
 t/plugin_session_state_uri.t
 t/plugin_session_state_uri_for.t

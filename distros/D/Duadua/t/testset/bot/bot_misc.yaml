@@ -119,3 +119,29 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+- ua: "The Knowledge AI"
+  name: 'The Knowledge AI'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+- ua: "Mozilla/5.0 (compatible; FlipboardProxy/1.2; +http://flipboard.com/browserproxy)"
+  name: 'FlipboardProxy'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.2'
+- ua: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko; compatible; BuiltWith/1.0; +http://builtwith.com/biup) Chrome/60.0.3112.101 Safari/537.36"
+  name: 'BuiltWith'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'

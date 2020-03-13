@@ -2,14 +2,15 @@ package Sim::OPT::Modish;
 #NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE ERASED OR TURNED INTO A COMMENT.
 #!/usr/bin/perl
 # Modish
-$VERSION = '0.287.';
+$VERSION = '0.289.';
 # Author: Gian Luca Brunetti, Politecnico di Milano - gianluca.brunetti@polimi.it.
 # The subroutine createconstrdbfile has been modified by ESRU (2018), University of Strathclyde, Glasgow to adapt it to the new ESP-r construction database format.
-# All rights reserved, 2015-19.
+# All rights reserved, 2015-20.
 # This is free software.  You can redistribute it and/or modify it under the terms of the
 # GNU General Public License, version 3, as published by the Free Software Foundation.
 
 # In version 0.287: added the possibility to decouple the diffuse resolution from the direct resolution.
+# In version 0.289 (13.03.2020): added the ability to work with ESP-r versions more recent than 13.3.2. Last version tested: 13.3.8.
 
 use v5.14;
 use Exporter;
@@ -589,9 +590,8 @@ sub getconffilenames
   if ( "getweather" ~~ @calcprocedures )
   {
     if ( not ( -e $clmfilea ) )
-    {
-`prj -file $conffile -mode script<<YYY
-b
+    {# THE CALL DOES NOT WORK WITH MODELS FLATTENED INTO ONE ROOT DIRECTORY. FIX THIS.
+`cd $path/cfg \n prj -file $conffile -mode script<<YYY
 b
 a
 f
@@ -1628,14 +1628,14 @@ sub treatshdfile
 
 sub readshdfile
 { # THIS READS THE RELEVANT CONTENT OF THE SHDA FILE.
-  my ( $shdfile, $calcprocedures_ref, $conffile, $message ) = @_;
+  my ( $shdfile, $calcprocedures_ref, $conffile, $paths_ref, $message ) = @_;
+  my %paths = %{ $paths_ref };
   my @calcprocedures = @{ $calcprocedures_ref };
   my $shdafile = $shdfile . "a";
 
   if ( ( "keepdirshdf" ~~ @calcprocedures ) and ( $message eq "go" ) )
   {
-`prj -file $conffile -mode script<<YYY
-b
+`cd $paths{cfgpath} \n prj -file $paths{rootconffile} -mode script<<YYY
 m
 c
 f
@@ -1651,8 +1651,7 @@ a
 YYY
 `;
 
-say REPORT "prj -file $conffile -mode script<<YYY
-b
+say REPORT "cd $paths{cfgpath} \n prj -file $paths{rootconffile} -mode script<<YYY
 m
 c
 f
@@ -2185,14 +2184,15 @@ sub setroot
     $debugstr = "";
   }
 
+  $paths{rootconffile} = $rootname . ".cfg";
+
   if ( not ( -e "$paths{cfgpath}/fix.sh" ) ) { `cp ./fix.sh $paths{cfgpath}/fix.sh`; }
   if ( not ( -e "$paths{cfgpath}/perlfix.pl" ) ) { `cp ./perlfix.pl $paths{cfgpath}/perlfix.pl`; }
   if ( not ( -e "$paths{radpath}/fix.sh" ) ) { `cp ./fix.sh $paths{radpath}/fix.sh`; }
   if ( not ( -e "$paths{radpath}/perlfix.pl" ) ) { `cp ./perlfix.pl $paths{radpath}/perlfix.pl`; }
 
-print REPORT "cd $paths{radpath}
-prj -file $conffile -mode text $debugstr <<YYY
-b
+print REPORT "cd $paths{cfgpath}
+prj -file $paths{rootconffile} -mode text $debugstr <<YYY
 
 s
 
@@ -2210,9 +2210,8 @@ y
 
 YYY
 ";
-`cd $paths{radpath}
-prj -file $conffile -mode text $debugstr <<YYY
-b
+`cd $paths{cfgpath}
+prj -file $paths{rootconffile} -mode text $debugstr <<YYY
 
 s
 
@@ -4239,7 +4238,7 @@ sub modifyshda
         last;
       }
 
-      my ( $insertlines_ref ) = readshdfile( $shdfile, \@calcprocedures, $conffile_f2, "go" );
+      my ( $insertlines_ref ) = readshdfile( $shdfile, \@calcprocedures, $conffile_f2, \%paths, "go" );
       @insertlines = @{ $insertlines_ref };
 
       foreach my $lin ( @insertlines )
@@ -5821,12 +5820,21 @@ sub modish
   my $launchfile = shift( @things );
 
   my $path = $launchfile;
+
   $path =~ s/\.cfg$// ;
+
+
   while ( not ( $path =~ /\/$/ ) )
   {
     $path =~ s/(\w+)$// ;
   }
   $path =~ s/\/$// ;
+
+
+  if ( $path =~ /cfg$/ )
+  {
+    $path =~ s/\/cfg$// ;
+  }
 
   if ( $path =~ /\/cfg$/ )
   {
@@ -6273,7 +6281,7 @@ sub modish
       @dirgridpoints = adjustgrid( \@dirgridpoints_newtransitional, $distgrid );
     }
 
-    my ( $treatedlinesref, $filearrayref, $monthsref ) = readshdfile( $shdfile, \@calcprocedures, $conffile_f2 );
+    my ( $treatedlinesref, $filearrayref, $monthsref ) = readshdfile( $shdfile, \@calcprocedures, $conffile_f2, \%paths );
     @treatedlines = @$treatedlinesref;
     my @shdfilearray = @$filearrayref;
     my @months = @$monthsref;
@@ -6548,18 +6556,8 @@ In calculating the irradiance ratios, the program defaults to: 5 direction vecto
 
 For the program to work correctly, the ESP-r model materials, construction and optics databases must be local to the model.
 
-Here below is an example of configuration file. Explanations are written in the comments at the beginning of the source code.
+Included in the example folder there is there is an example of configuration file "modish_defaults.pl". Explanations are written in the comments at the beginning of the source code.
 
-
-___
-
-
-@defaults = ( [ 2, 2 ], 5, 2, 7, 0.01 );
-@calcprocedures = ( "diluted", "gendaylit", "composite", "alldiff" );
-%skycondition = ( 1=> "clear", 2=> "clear", 3=> "clear", 4=> "clear", 5=> "clear", 6=> "clear", 7=> "clear", 8=> "clear", 9=> "clear", 10=> "clear", 11=> "clear", 12=> "clear" );
-$parproc = 6; # NUMBER OF PARALLEL PROCESSORS. NOT MANDATORY.
-@boundbox = ( -20, 40, -20, 40, -20, 40 );# RADIANCE MODEL BOUNDING BOX SIZE.
-$add = " -ad 512 -aa 0.5 -dc .25 -dr 2 -ss 1 -st .05 -ds .04 -dt .02 -bv "; #RADIANCE ADDITIONAL PARAMETERS
 
 
 =head2 EXPORT

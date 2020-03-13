@@ -4,6 +4,38 @@ use strict;
 use warnings;
 use XS::Install::Payload;
 
+sub linearize_dependent {
+    my $modules = shift;
+    my %modules = map { $_ => 1 } @$modules;
+    # make list of all dependent
+    my %dependent;
+    for my $module (@$modules) {
+        my $info = XS::Install::Payload::binary_module_info($module) or next;
+        my $dependent = $info->{BIN_DEPENDENT} || [];
+        for my $d_module (@$dependent) {
+            next unless $modules{$d_module};
+            push @{ $dependent{$module} }, $d_module;
+        }
+    }
+
+    my $get_score; $get_score = sub {
+        my $module = shift;
+        my $score = 1; # initial value for myself
+        my $dependent = $dependent{$module} || [];
+        for my $d_module (@$dependent) {
+            $score += $get_score->($d_module);
+        }
+        return $score;
+    };
+    my %scores = map { $_ => $get_score->($_) } @$modules;
+    my @ordered_modules = sort {
+           $scores{$a} <=> $scores{$b}
+        ||          $a cmp $b
+    } @$modules;
+
+    return \@ordered_modules;
+}
+
 sub cmd_sync_bin_deps {
     my $myself = shift @ARGV;
     my @modules = @ARGV;
@@ -12,7 +44,7 @@ sub cmd_sync_bin_deps {
         my $dependent = $info->{BIN_DEPENDENT} || [];
         my %tmp = map {$_ => 1} grep {$_ ne $module} @$dependent;
         $tmp{$myself} = 1;
-        $info->{BIN_DEPENDENT} = [sort keys %tmp];
+        $info->{BIN_DEPENDENT} = linearize_dependent([keys %tmp]);
         delete $info->{BIN_DEPENDENT} unless @{$info->{BIN_DEPENDENT}};
         my $file = XS::Install::Payload::binary_module_info_file($module);
         my $ok  = eval { module_info_write($file, $info); 1 };
@@ -24,9 +56,9 @@ sub cmd_sync_bin_deps {
 
 sub cmd_check_dependencies {
     require XS::Install::Deps;
-    
+
     my $objext = shift @ARGV;
-    
+
     my (@inc, @cfiles, @xsfiles);
     my $curlist = \@cfiles;
     foreach my $arg (@ARGV) {
@@ -40,7 +72,7 @@ sub cmd_check_dependencies {
             push @$curlist, $arg;
         }
     }
-    
+
     my @touch_list = (
         _check_mtimes(
             XS::Install::Deps::find_header_deps({
@@ -57,7 +89,7 @@ sub cmd_check_dependencies {
         ),
         _check_mtimes(XS::Install::Deps::find_xsi_deps(\@xsfiles))
     );
-    
+
     if (@touch_list) {
         my $now = time();
         utime($now, $now, @touch_list);
@@ -80,7 +112,7 @@ sub _check_mtimes {
             last;
         }
     }
-    
+
     return @touch_list;
 }
 
@@ -102,7 +134,7 @@ sub module_info_write {
     open my $fh, '>', $file or die "Cannot open $file for writing: $!, binary data could not be written\n";
     print $fh $content;
     close $fh;
-    
+
     chmod $restore_mode, $file if $restore_mode; # restore old perms if we changed it
 }
 

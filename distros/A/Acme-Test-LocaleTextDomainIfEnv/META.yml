@@ -1,5 +1,5 @@
 ---
-abstract: 'Text Locale::TextDomain::IfEnv'
+abstract: 'Test Locale::TextDomain::IfEnv'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-Test-LocaleTextDomainIfEnv
   homepage: https://metacpan.org/release/Acme-Test-LocaleTextDomainIfEnv
   repository: git://github.com/perlancar/perl-Acme-Test-LocaleTextDomainIfEnv.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -153,7 +153,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -289,7 +289,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.07'
+              version: '0.081'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -303,7 +303,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

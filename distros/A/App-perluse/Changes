@@ -1,3 +1,11 @@
+0.0301  2020-03-13      Piotr Roszatycki <dexter@cpan.org>
+
+* Fix `VIRTUAL_ENV` for perlbrew session.
+
+0.0300  2020-03-13      Piotr Roszatycki <dexter@cpan.org>
+
+* Set a `VIRTUAL_ENV` environment variable for a `perluse` session.
+
 0.0201  2020-03-11      Piotr Roszatycki <dexter@cpan.org>
 
 * Check if perlbrew's bashrc is installed.

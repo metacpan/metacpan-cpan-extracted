@@ -13,12 +13,12 @@ name: App-perluse
 provides:
   App::perluse:
     file: lib/App/perluse.pm
-    version: '0.0201'
+    version: '0.0301'
 recommends:
   App::perlbrew: '0'
 resources:
   bugtracker: http://github.com/dex4er/perluse/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/dex4er/perluse
-version: '0.0201'
+version: '0.0301'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

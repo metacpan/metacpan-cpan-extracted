@@ -1,10 +1,22 @@
 # Change Log
 
+## [1.0.0] - 2020-03-12
+
+### Fixed
+
+- Tidied SYNOPSIS example code.
+
+- Bumped to version 1.0.0.
+
 ## [0.0.18] - 2020-03-11
+
+### Fixed
 
 - Fix problem with nested objects of same type (Github #23)
 
 ## [0.0.17] - 2020-03-10
+
+### Fixed
 
 - Fix problem with arrays of objects (Github #22)
 

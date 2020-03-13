@@ -1,5 +1,11 @@
 Revision history for Perl module Ark
 
+1.22 2020-03-13T11:56:42Z
+    - fix dependencies
+
+1.21 2020-03-13T06:48:52Z
+    - support HttpOnly and SameSite in Plugin::Session::State::Cookie (mackee)
+
 1.20 2013-11-20T07:41:04Z
     - [INCOMPATIBLE] rename X-JSON-Status to X-API-Status in View::JSON (hisaichi5518)
     - add View::JSON#status_code_header attribute

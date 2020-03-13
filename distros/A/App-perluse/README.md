@@ -46,6 +46,11 @@ or
 
     $ wget -O- http://git.io/dXVJCg | sh
 
+# ENVIRONMENT
+
+The script sets `VIRTUAL_ENV` and `debian_chroot` environment variables so
+shell prompt line should mark current Perl environment used.
+
 # SEE ALSO
 
 [perlbrew](https://metacpan.org/pod/perlbrew).

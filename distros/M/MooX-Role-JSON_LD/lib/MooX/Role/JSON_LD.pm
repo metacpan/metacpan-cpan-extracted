@@ -11,9 +11,18 @@ MooX::Role::JSON_LD - Easily provide JSON-LD mark-up for your objects.
     with 'MooX::Role::JSON_LD';
 
     # define your attributes
-    has first_name => ( ... );
-    has last_name  => ( ... );
-    has birth_date => ( ... );
+    has first_name => (
+      is => 'ro',
+      # Various other properties
+    );
+    has last_name  => (
+      is => 'ro',
+      # Various other properties
+    );
+    has birth_date => (
+      is => 'ro',
+      # Various other properties
+    );
 
     # Add two required methods
     sub json_ld_type { 'Person' };
@@ -151,7 +160,7 @@ use MRO::Compat;
 use Types::Standard qw[ArrayRef HashRef InstanceOf Str is_CodeRef is_HashRef
   is_ArrayRef is_Ref is_Object];
 
-our $VERSION = '0.0.18';
+our $VERSION = '1.0.0';
 
 requires qw[json_ld_type json_ld_fields];
 

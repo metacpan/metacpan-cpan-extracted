@@ -1,3 +1,8 @@
+1.2.16   13.02.2020
+           - improve CLIB->FILE section. Now FILE can be an array ref
+           - fix xsubpp param suffix
+           - [RT#131830] more correctly ordered list of bin_dependent modules, which needed to be reinstalled
+           - [RT#131829] change reinstallation hint from "cpanm -f" to "cpanm --reinstall"
 1.2.15   16.02.2020
            - fix Makefile for various BSD systems
            - change internal rules (.xs -> _xsgen.cc? instead of .xs -> .xs.cc?)

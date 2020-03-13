@@ -15,6 +15,7 @@ my $version = $top->tclVersion;
 # Skip if Tcl/pTk version is < 8.5
 if( $version < 8.5 ){
     print "1..0 # Skipped: iconimage only works for Tcl >= 8.5\n";
+    $top->destroy;
     exit;
 }
 

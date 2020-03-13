@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.2.0
+Version v3.3.0
 
 =cut
 
-our $VERSION = version->declare("v3.2.0");
+our $VERSION = version->declare("v3.3.0");
 
 =head STATUS
 

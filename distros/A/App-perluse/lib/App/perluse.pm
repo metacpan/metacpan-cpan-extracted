@@ -34,7 +34,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.0201';
+our $VERSION = '0.0301';
 
 
 1;
@@ -57,6 +57,11 @@ or
 or
 
   $ wget -O- http://git.io/dXVJCg | sh
+
+=head1 ENVIRONMENT
+
+The script sets C<VIRTUAL_ENV> and C<debian_chroot> environment variables so
+shell prompt line should mark current Perl environment used.
 
 =head1 SEE ALSO
 

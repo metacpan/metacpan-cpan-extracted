@@ -31,7 +31,7 @@ no_index:
 provides:
   Duadua:
     file: lib/Duadua.pm
-    version: '0.13'
+    version: '0.14'
   Duadua::CLI:
     file: lib/Duadua/CLI.pm
   Duadua::Parser:
@@ -78,6 +78,8 @@ provides:
     file: lib/Duadua/Parser/Bot/Huawei.pm
   Duadua::Parser::Bot::Inoreader:
     file: lib/Duadua/Parser/Bot/Inoreader.pm
+  Duadua::Parser::Bot::LetsEncrypt:
+    file: lib/Duadua/Parser/Bot/LetsEncrypt.pm
   Duadua::Parser::Bot::MailRUBot:
     file: lib/Duadua/Parser/Bot/MailRUBot.pm
   Duadua::Parser::Bot::Msnbot:
@@ -143,5 +145,5 @@ resources:
   bugtracker: http://github.com/bayashi/Duadua/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/bayashi/Duadua
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

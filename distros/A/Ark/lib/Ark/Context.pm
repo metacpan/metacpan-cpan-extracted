@@ -2,7 +2,7 @@ package Ark::Context;
 use Mouse;
 
 use Scalar::Util ();
-use Try::Tiny;
+use Try::Tiny 0.02;
 use URI::WithBase;
 
 our $DETACH    = 'ARK_DETACH';

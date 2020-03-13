@@ -90,7 +90,7 @@ my $file = $menubar->cascade(qw/-label File -underline 0 -menuitems/ =>
         ], # end cascade menuitems
       ], # end view cascade
       '',
-      [command    => '~Quit', -command => sub{ exit }],
+      [command    => '~Quit', -command => sub{ $MW->destroy }],
     ]);
 
 my $help = $menubar->cascade(qw/-label Help -underline 0 -menuitems/ =>

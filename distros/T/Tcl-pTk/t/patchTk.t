@@ -21,6 +21,7 @@ my $tk_version = $interp->GetVar('tk_version');
 # check if old Aqua Tk and incorrect bindings are present
 unless ($interp->Eval('tk windowingsystem') eq 'aqua') {
     print "1..0 # Skipped: Not using Aqua Tk\n";
+    $interp->Eval('destroy .');
     exit;
 } else {
     # Check for affected versions of Tk
@@ -35,6 +36,7 @@ unless ($interp->Eval('tk windowingsystem') eq 'aqua') {
         )
     ) {
         print "1..0 # Skipped: Version of Tk present is not affected\n";
+        $interp->Eval('destroy .');
         exit;
     } else {
         plan tests => 2;
@@ -51,6 +53,9 @@ unless ($interp->Eval('tk windowingsystem') eq 'aqua') {
             '<ButtonRelease-3>',
             'Verify that Tk was successfully patched by Tcl::pTk',
         );
+
+        $interp->Eval('destroy .');
+        $TOP->destroy;
     }
 }
 

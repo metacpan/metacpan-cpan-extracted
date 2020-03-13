@@ -2,13 +2,13 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PL_FILES' => {},
+  'PREREQ_PM' => {},
   'NAME' => 'App::perluse',
-  'INSTALLDIRS' => 'site',
   'VERSION_FROM' => 'lib/App/perluse.pm',
+  'INSTALLDIRS' => 'site',
+  'PL_FILES' => {},
   'EXE_FILES' => [
                    'script/perluse.sh'
-                 ],
-  'PREREQ_PM' => {}
+                 ]
 )
 ;

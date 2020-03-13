@@ -1,5 +1,5 @@
 {
-   "abstract" : "Text Locale::TextDomain::IfEnv",
+   "abstract" : "Test Locale::TextDomain::IfEnv",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -57,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-Test-LocaleTextDomainIfEnv"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -218,7 +218,7 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
@@ -387,7 +387,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.07"
+                        "version" : "0.081"
                      }
                   ]
                }
@@ -408,7 +408,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",

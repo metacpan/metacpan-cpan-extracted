@@ -16,6 +16,7 @@ my $folder = $mw->Getimage('folder');
 
 if (!$mw->interp->pkg_require('Img')) {
     print "1..0 # skip: no Img extension available ($@)\n";
+    $mw->destroy;
     exit;
 }
 

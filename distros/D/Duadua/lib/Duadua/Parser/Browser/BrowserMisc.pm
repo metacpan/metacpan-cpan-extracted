@@ -85,6 +85,18 @@ sub try {
 
         return Duadua::Util->set_os($d, $h);
     }
+    elsif ( index($d->ua, ' UBrowser/') > -1 && index($d->ua, 'Win') > -1 ) {
+        my $h = {
+            name => 'UBrowser',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m! UBrowser/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+
+        return Duadua::Util->set_os($d, $h);
+    }
 }
 
 1;

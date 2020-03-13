@@ -12,6 +12,7 @@ use Term::TablePrint   qw();
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
 #use App::DBBrowser::GetContent; # required
+#use App::DBBrowser::Opt::Set;   # required
 use App::DBBrowser::Table::Substatements;
 
 
@@ -43,15 +44,35 @@ sub table_write_access {
     if ( ! @stmt_types ) {
         return;
     }
+    my $old_idx = 1;
 
     STMT_TYPE: while ( 1 ) {
+        my $hidden = 'Choose SQL type:';
+        my @pre = ( $hidden, undef );
+        my $choices = [ @pre, map( "- $_", @stmt_types ) ];
         # Choose
-        my $stmt_type = $tc->choose(
-            [ undef, map( "- $_", @stmt_types ) ],
-            { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose SQL type:' }
+        my $idx = $tc->choose(
+            $choices,
+            { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx }
         );
-        if ( ! defined $stmt_type ) {
+        if ( ! defined $idx || ! defined $choices->[$idx] ) {
             return;
+        }
+        if ( $sf->{o}{G}{menu_memory} ) {
+            if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $old_idx = 1;
+                next STMT_TYPE;
+            }
+            $old_idx = $idx;
+        }
+        my $stmt_type = $choices->[$idx];
+        if ( $stmt_type eq $hidden ) {
+            require App::DBBrowser::Opt::Set;
+            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+            my $groups = [ { name => 'group_insert', text => '' } ];
+            my $options = [ { name => '_data_source', text => "- Data source", section => 'insert' } ];
+            $opt_set->set_options( $groups, $options );
+            next STMT_TYPE;
         }
         $stmt_type =~ s/^-\ //;
         $sf->{i}{stmt_types} = [ $stmt_type ];

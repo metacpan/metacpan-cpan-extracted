@@ -1,11 +1,11 @@
 package Ark;
 use 5.008001;
-use Mouse;
+use Mouse 1.00;
 use Mouse::Exporter;
 
 use Ark::Core;
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 do {
     my %EXPORTS;

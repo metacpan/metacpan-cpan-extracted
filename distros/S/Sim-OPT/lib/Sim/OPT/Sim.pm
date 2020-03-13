@@ -1,5 +1,5 @@
 package Sim::OPT::Sim;
-# Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2020 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Sim of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -38,7 +38,7 @@ use warnings::unused;
 
 our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
-$VERSION = '0.073'; # our $VERSION = '';
+$VERSION = '0.075'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.';
 
 #########################################################################################
@@ -208,7 +208,7 @@ sub sim
 
           if ( $tooltype eq "esp-r" )
           {
-            my $launchline = "-file $simelt/cfg/$fileconfig -mode script";
+            my $launchline = "cd $simelt/cfg/ \n bps -file $fileconfig -mode script";
 
 
 
@@ -256,7 +256,7 @@ sub sim
                   {
                     say "#Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep for tool $tooltype. Instance $countinstance: writing $resfile and $flfile." ;
                     my $printthis =
-"bps $launchline<<XXX
+"$launchline<<XXX
 
 c
 $resfile
@@ -293,7 +293,7 @@ XXX
                   {
                     say "#Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep for tool $tooltype. Instance $countinstance: writing $resfile. " ;
                     my $printthis =
-"bps $launchline<<XXX
+"$launchline<<XXX
 
 c
 $resfile

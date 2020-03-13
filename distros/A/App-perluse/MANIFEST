@@ -22,13 +22,11 @@ xt/dist_manifest.t
 xt/distribution.t
 xt/eol.t
 xt/kwalitee.t
-xt/minimumversion.t
 xt/no_tabs.t
 xt/pod_coverage.t
 xt/pod_spell.t
 xt/pod_spellrc
 xt/pod_syntax.t
 xt/portability_files.t
-xt/ppport.t
 xt/signature.t
 SIGNATURE    Added here by Module::Build

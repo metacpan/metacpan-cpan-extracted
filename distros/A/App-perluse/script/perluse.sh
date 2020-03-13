@@ -40,7 +40,7 @@ directory: F</opt/ActivePerl-VERSION> or F<$HOME/opt/ActivePerl-VESION>.
 POD
 
 
-VERSION=0.0201
+VERSION=0.0301
 
 PERLBREW_ROOT=${PERLBREW_ROOT:-$HOME/perl5/perlbrew}
 
@@ -94,6 +94,7 @@ case "$version" in
         for d in $HOME/opt/ActivePerl-* /opt/ActivePerl-*; do
             test -d "$d" || continue
             PATH="$d/site/bin:$d/bin:${PATH:-/usr/bin:/bin}"
+            VIRTUAL_ENV="$version"
             debian_chroot="$version"
             break
         done
@@ -106,10 +107,11 @@ case "$version" in
 
         PATH="$PERLBREW_PATH:${PATH:-/usr/bin:/bin}"
         PERL5LIB=$(perl -le 'print join ":", grep { /site_perl/ } @INC')
+        VIRTUAL_ENV="$PERLBREW_PERL"
         debian_chroot="$PERLBREW_PERL"
 esac
 
-export PATH PERL5LIB debian_chroot
+export PATH PERL5LIB VIRTUAL_ENV debian_chroot
 
 if [ $# -gt 0 ]; then
     "$@"
@@ -139,6 +141,11 @@ or
 or
 
   $ wget -O- http://git.io/dXVJCg | sh
+
+=head1 ENVIRONMENT
+
+The script sets C<VIRTUAL_ENV> and C<debian_chroot> environment variables so
+shell prompt line should mark current Perl environment used.
 
 =head1 SEE ALSO
 

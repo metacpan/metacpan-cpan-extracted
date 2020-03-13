@@ -28,7 +28,7 @@ my $id;
 
 my @commands;
 
-# Number of '::perl::CODE*' sub-refs that are created in TCL-land at the begining of the script,
+# Number of '::perl::CODE*' sub-refs that are created in TCL-land at the beginning of the script,
 #  after running a lot of repeat commands, and after widget destruction
 my ($initialCommands, $afterCommands);
 
@@ -54,7 +54,7 @@ $id = $tk->repeat(
                            # print "Number of commands = ".scalar(@commands)."\n"; 
                            $afterCommands = scalar(@commands);
                            $tk->destroy;
-                           $top->after(1000, [$top, 'destroy']);
+                           $top->after(100, [$top, 'destroy']);
 
                    }
            }

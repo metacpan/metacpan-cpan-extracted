@@ -60,3 +60,12 @@
   is_windows: true
   is_chromeos: false
   version: '5.12.6'
+- ua: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 UBrowser/6.2.3964.2 Safari/537.36'
+  name: 'UBrowser'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: true
+  is_chromeos: false
+  version: '6.2.3964.2'

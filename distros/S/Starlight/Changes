@@ -1,3 +1,7 @@
+0.0400  2020-03-12      Piotr Roszatycki <dexter@cpan.org>
+
+* New options `--ssl-ca-file` and `--ssl-verify-mode`.
+
 0.0306  2016-10-30      Piotr Roszatycki <dexter@cpan.org>
 
 * Workaround for missing TCP_NODELAY on Android.

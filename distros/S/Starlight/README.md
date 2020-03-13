@@ -23,7 +23,7 @@ package.
 
 Starlight was started as a fork of [Thrall](https://metacpan.org/pod/Thrall) server which is a fork of
 [Starlet](https://metacpan.org/pod/Starlet) server. It has almost the same code as [Thrall](https://metacpan.org/pod/Thrall) and [Starlet](https://metacpan.org/pod/Starlet) and
-it was adapted to doesn't use any other modules than [Plack](https://metacpan.org/pod/Plack).
+it was adapted to not use any other modules than [Plack](https://metacpan.org/pod/Plack).
 
 Starlight is created for Unix-like systems but it should also work on Windows
 with some limitations.
@@ -75,7 +75,7 @@ in main process so it doesn't consume all CPU. (default: 0.1)
 
 ## --ssl
 
-Enables SSL support. The [IO::Socket::SSL](https://metacpan.org/pod/IO::Socket::SSL) module is required. (default: 0)
+Enables SSL support. The [IO::Socket::SSL](https://metacpan.org/pod/IO%3A%3ASocket%3A%3ASSL) module is required. (default: 0)
 
 ## --ssl-key-file
 
@@ -85,13 +85,23 @@ Specifies the path to SSL key file. (default: none)
 
 Specifies the path to SSL certificate file. (default: none)
 
+## --ssl-ca-file
+
+Specifies the path to SSL CA certificate file used when verification mode is
+enabled. (default: none)
+
+## --ssl-verify-mode
+
+Sets the verification mode for the peer certificate. See
+["SSL\_verify\_mode" in IO::Socket::SSL](https://metacpan.org/pod/IO%3A%3ASocket%3A%3ASSL#SSL_verify_mode). (default: 0)
+
 ## --ipv6
 
-Enables IPv6 support. The [IO::Socket::IP](https://metacpan.org/pod/IO::Socket::IP) module is required. (default: 0)
+Enables IPv6 support. The [IO::Socket::IP](https://metacpan.org/pod/IO%3A%3ASocket%3A%3AIP) module is required. (default: 0)
 
 ## --socket
 
-Enables UNIX socket support. The [IO::Socket::UNIX](https://metacpan.org/pod/IO::Socket::UNIX) module is required. The
+Enables UNIX socket support. The [IO::Socket::UNIX](https://metacpan.org/pod/IO%3A%3ASocket%3A%3AUNIX) module is required. The
 socket file have to be not yet created. The first character `@` or `\0` in
 the socket file name means that abstract socket address will be created.
 (default: none)
@@ -154,7 +164,7 @@ It might be better option to use on this system the server with explicit
 [threads](https://metacpan.org/pod/threads) implementation, i.e. [Thrall](https://metacpan.org/pod/Thrall).
 
 For Cygwin the `perl-libwin32` package is highly recommended, because of
-[Win32::Process](https://metacpan.org/pod/Win32::Process) module which helps to terminate stalled worker processes.
+[Win32::Process](https://metacpan.org/pod/Win32%3A%3AProcess) module which helps to terminate stalled worker processes.
 
 # BUGS
 
@@ -226,7 +236,7 @@ Paul Seamons <paul@seamons.com>
 
 # LICENSE
 
-Copyright (c) 2013-2016 Piotr Roszatycki <dexter@cpan.org>.
+Copyright (c) 2013-2016, 2020 Piotr Roszatycki <dexter@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as perl itself.

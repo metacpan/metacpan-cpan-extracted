@@ -21,8 +21,8 @@ if ($^O eq 'MSWin32' and $] >= 5.016 and $] < 5.019005 and not $ENV{PERL_TEST_BR
     exit 0;
 }
 
-if ($^O eq 'cygwin' and not $ENV{PERL_TEST_BROKEN}) {
-    plan skip_all => 'Broken on cygwin';
+if ($^O eq 'cygwin' and not eval { require Win32::Process; }) {
+    plan skip_all => 'Win32::Process required';
     exit 0;
 }
 
@@ -53,8 +53,6 @@ test_tcp(
             verify_SSL => 1,
             SSL_options => {
                 SSL_ca_file   => $ca_crt,
-                SSL_cert_file => $server_crt,
-                SSL_key_file  => $server_key,
            }
         );
         my $res = $ua->get("https://127.0.0.1:$port/");

@@ -4,7 +4,7 @@ use Mouse;
 extends 'Object::Container';
 
 use Exporter::AutoClean;
-use Path::Class qw/file dir/;
+use Path::Class 0.16 qw/file dir/;
 
 has registered_namespaces => (
     is      => 'rw',

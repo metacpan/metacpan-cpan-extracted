@@ -1,5 +1,5 @@
 package Sim::OPT::Morph;
-# Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2020 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Morph of Sim::OPT.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -47,7 +47,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.115'; # our $VERSION = '';
+$VERSION = '0.117'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
@@ -492,7 +492,7 @@ sub morph
 								`cd $to`;
 								say $tee "cd $to\n";
 
-								my $launchline = " -file $to/cfg/$fileconfig -mode script"; say $tee "SO, LAUNCHLINE! " . dump( $launchline );
+								my $launchline = "cd $to/cfg/ \n prj -file $fileconfig -mode script"; say $tee "SO, LAUNCHLINE! " . dump( $launchline );
 
 								if ( ( $stepsvar > 0 ) and ( not ( eval ( $skip ) ) ) )
 								{
@@ -1337,8 +1337,7 @@ sub translate
 		$z_value = sprintf( "%.3f", $z_value );
 
 my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -1477,8 +1476,7 @@ sub translate_surfaces
 
 
 				my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -1567,8 +1565,7 @@ $printthis";
 				$z_value = sprintf( "%.3f", $z_value );
 
 				my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -1662,8 +1659,7 @@ sub rotate_surface
 		if (  ( $swingrotate != 0 ) and ( $stepsvar > 1 ) )
 		{
 			my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -1819,8 +1815,7 @@ sub translate_vertices
 		$z_new = sprintf( "%.3f", $z_new );
 
 		my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -1904,8 +1899,7 @@ sub shift_vertices
 				$vertex2 = ( $pairs_of_vertices[ 1 + ( 2 * $countthis ) ] );
 
 				my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -1948,8 +1942,7 @@ $printthis";
 			foreach my $shift_swing (@shift_swings)
 			{
 				my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -2040,8 +2033,7 @@ sub rotate    # generic zone rotation
 	{
 
 		my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -2329,8 +2321,7 @@ sub reassign_construction
 		my $construction = $group_to_choose->[1];
 
 		my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -2421,8 +2412,7 @@ sub change_thickness
 
 				if ( not( ref( $entrypair_to_change ) ) )
 				{
-				  $printthis = "prj $launchline<<YYY
-b
+				  $printthis = "$launchline<<YYY
 b
 e
 a
@@ -2445,8 +2435,7 @@ YYY
 		    }
 				else
 				{
-					$printthis = "prj $launchline<<YYY
-b
+					$printthis = "$launchline<<YYY
 b
 e
 a
@@ -2640,8 +2629,7 @@ sub obs_modify
 				$z_value = sprintf( "%.3f", $z_value );
 
 				my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -2700,8 +2688,7 @@ $printthis"; say  "\$printthis : " . dump( $printthis );
 				my $zory_value = ($zory_base + ( $zory_end - ( $zory_pace * ( $countstep - 1 ) ) ));
 
 				my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -2741,8 +2728,7 @@ YYY
 				my @alternatives = @{ $values_ref };
 				my $alternative = $alternatives[ $countstep - 1 ];
 				my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -2784,8 +2770,7 @@ YYY
 				my $constr = $constrs[ $countstep - 1 ];
 
 				my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -2866,8 +2851,7 @@ YYY
 				$z_value = ( $z_end - ( $z_pace * ( $countstep - 1 ) ) );
 
 				my $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -2906,8 +2890,7 @@ YYY
 			{
 
 				my $printthis = #THIS IS WHAT HAPPEN INSIDE SUB KEEP_SOME_OBSTRUCTIONS
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 a
@@ -2972,8 +2955,7 @@ sub recalculateish
 	if ( $whatto eq "y" )
 	{
 	  $printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 f
@@ -2994,8 +2976,7 @@ YYY
 	  foreach my $el ( @things )
 	  {
 		$printthis =
-"prj $launchline<<YYY
-b
+"$launchline<<YYY
 m
 c
 f
@@ -3080,10 +3061,9 @@ sub daylightcalc # IT WORKS ONLY IF THE "RAD" DIRECTORY IS EMPTY
 
 		if ( ifempty ( "$to/rad/" ) )
 		{
+			$launchline =~ s/\/cfg\/ \\n prj /\/cfg\/ \\n e2r / ;
 			$printthis =
-"
-cd $to/cfg/
-e2r $launchline<<YYY
+"$launchline<<YYY
 a
 
 d
@@ -3124,9 +3104,7 @@ cd $mypath
 		else
 		{
 			$printthis =
-"
-cd $to/cfg/
-e2r $launchline<<YYY
+"$launchline<<YYY
 
 a
 
@@ -3159,9 +3137,7 @@ cd $mypath
 		if ( ifempty ( "$to\\rad\\" ) )
 		{
 			$printthis =
-"
-cd $to\\cfg\\
-e2r $launchline<<YYY
+"$launchline<<YYY
 a
 
 d
@@ -3202,9 +3178,7 @@ cd $mypath
 		else
 		{
 			$printthis =
-"
-cd $to\\cfg\\
-e2r $launchline<<YYY
+"$launchline<<YYY
 
 a
 
@@ -3552,7 +3526,6 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 			{
 				my $printthis =
 "prj $launchline<<YYY
-b
 m
 e
 c
@@ -3600,7 +3573,6 @@ $printthis";
 				{
 					my $printthis =
 "prj $launchline<<YYY
-b
 m
 e
 c
@@ -3651,7 +3623,6 @@ $printthis";
 		{
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 e
 c
@@ -3693,7 +3664,6 @@ $printthis";
 		{
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 e
 c
@@ -4077,7 +4047,6 @@ sub apply_constraints
 
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -4129,7 +4098,6 @@ YYY
 
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -4161,7 +4129,6 @@ c
 YYY
 
 prj $launchline<<YYY
-b
 m
 c
 a
@@ -4209,8 +4176,7 @@ YYY
 			if ($new_type eq "a" ) # IF NODES ARE INTERNAL
 			{
 				my $printthis =
-"prj -file $to/cfg/$fileconfig -mode script<<YYY
-b
+"prj $launchline<<YYY
 m
 e
 c
@@ -4246,8 +4212,7 @@ YYY
 			if ($new_type eq "e" ) # IF NODES ARE BOUNDARY ONES, WIND-INDUCED
 			{
 				my $printthis =
-"prj -file $to/cfg/$fileconfig -mode script<<YYY
-b
+"prj $launchline<<YYY
 m
 e
 c
@@ -4299,8 +4264,7 @@ YYY
 			if ($new_type eq "k" ) # IF THE COMPONENT IS A GENERIC OPENING
 			{
 				my $printthis =
-"prj -file $to/cfg/$fileconfig -mode script<<YYY
-b
+"prj $launchline<<YYY
 m
 e
 c
@@ -4331,8 +4295,7 @@ YYY
 			if ($new_type eq "l" ) # IF THE COMPONENT IS A CRACK
 			{
 				my $printthis =
-"prj -file $to/cfg/$fileconfig -mode script<<YYY
-b
+"prj $launchline<<YYY
 m
 e
 c
@@ -4363,8 +4326,7 @@ YYY
 			if ($new_type eq "m" ) # IF THE COMPONENT IS A DOOR
 			{
 				my $printthis =
-"prj -file $to/cfg/$fileconfig -mode script<<YYY
-b
+"prj $launchline<<YYY
 m
 e
 c
@@ -4526,7 +4488,6 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 						{
 							my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -4623,7 +4584,6 @@ sub warp #
 		{
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -4722,7 +4682,6 @@ $printthis";
 
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -4796,7 +4755,6 @@ sub export_toenergyplus
 
 	my $printthis =
 "prj $launchline<<YYY
-b
 
 o
 g
@@ -5607,7 +5565,6 @@ sub change_groundreflectance
 
 	my $printthis =
 "prj $launchline<<YYY
-b
 m
 b
 d
@@ -6195,7 +6152,6 @@ sub apply_loopcontrol_changes
 		{
 			my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
-b
 m
 j
 
@@ -6265,7 +6221,6 @@ sub apply_flowcontrol_changes
 		{
 			my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
-b
 m
 l
 

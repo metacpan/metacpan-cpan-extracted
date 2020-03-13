@@ -10,7 +10,7 @@ use XS::Install::Deps;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.2.15';
+our $VERSION = '1.2.16';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -314,18 +314,22 @@ sub process_binary {
     my %xsi;
     foreach my $xsfile (keys %{$params->{XS}}, map { _scan_files($xs_mask, $_) } @{$params->{SRC}}) {
         my $cfile = $params->{XS}{$xsfile};
+        my $suffix;
         unless ($cfile) {
             my $cext = $params->{CPLUS} ? 'cc' : 'c';
             if ($xsfile =~ /\.xs$/) {
                 $cfile = $xsfile;
                 $cfile =~ s/\.xs$/_xsgen.$cext/;
+                $suffix = "_xsgen.$cext";
             } else {
                 $cfile = "$xsfile.$cext";
             }
             $params->{XS}{$xsfile} = $cfile;
         }
-        my $suffix = $cfile;
-        $suffix =~ s/^[^.]+//;
+        unless ($suffix) {
+            $suffix = $cfile;
+            $suffix =~ s/^[^.]+//;
+        }
         
         my $xsi_deps = XS::Install::Deps::find_xsi_deps([$xsfile])->{$xsfile} || [];
         map { $xsi{$_} = $xsfile } @$xsi_deps;
@@ -401,14 +405,19 @@ sub process_CLIB {
             $build_cmd = "$make $info->{FLAGS} $info->{TARGET}";
             $clean_cmd = "$make clean";
         }
-        
-        my $static = $info->{FILE} =~ /\.l?a$/ ? 1 : 0;
-        my $path = $info->{DIR}.'/'.$info->{FILE};
-        $clibs .= "$path ";
+        $info->{FILE} = [$info->{FILE}] if exists $info->{FILE} && ref $info->{FILE} ne 'ARRAY';
+        my $path = '';
+        my $static = 0;
+        for my $f (@{$info->{FILE} || []}) {
+            next unless $f;
+            $static = 1 if $f =~ /\.l?a$/;
+            $path .= $info->{DIR}.'/'.$f.' ';
+        }
+        $clibs .= $path;
         
         push @{$params->{postamble}}, "$path : ; cd $info->{DIR} && $build_cmd\n";
         push @{$params->{postamble}}, "clean :: ; cd $info->{DIR} && $clean_cmd\n" if $clean_cmd;
-        if ($info->{FILE} =~ /\.l?a$/) {
+        if ($static) {
             push @{$params->{MODULE_INFO}{STATIC_LIBS}}, "$wa_open $path $wa_close";
         } else {
             push @{$params->{MODULE_INFO}{SHARED_LIBS}}, $path;

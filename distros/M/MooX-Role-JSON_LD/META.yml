@@ -29,7 +29,7 @@ requires:
 resources:
   bugtracker: https://github.com/davorg/moox-role-json_ld/issues
   repository: git://github.com/davorg/moox-role-json_ld.git
-version: v0.0.18
+version: v1.0.0
 x_contributors:
   - 'Robert Rothenberg <rrwo@cpan.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

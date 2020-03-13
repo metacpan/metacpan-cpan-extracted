@@ -6,7 +6,7 @@
 
 package Tcl::pTk::Widget;
 
-our ($VERSION) = ('1.06');
+our ($VERSION) = ('1.07');
 
 use IO::Handle; 
 
@@ -1355,7 +1355,7 @@ sub create_ptk_widget_sub {
             if( $_[0] and $_[0] eq 'Name'){
                     shift;
                     $wpref = lcfirst shift;
-                    $wpref =~ s/\s+/_/g; # no spaces allowed in window names in tcl
+                    $wpref =~ s/[\s\.]+/_/g; # no spaces or '.' allowed in window names in tcl
             }
             
 	    my $w    = w_uniq($self, $wpref); # create uniq pref's widget id
@@ -1390,7 +1390,7 @@ sub create_ptk_widget_sub {
         if( $_[0] and $_[0] eq 'Name'){
             shift;
             $wpref = lcfirst shift;
-            $wpref =~ s/\s+/_/g; # no spaces allowed in window names in tcl
+            $wpref =~ s/[\s\.]+/_/g; # no spaces or '.' allowed in window names in tcl
         }
 
         my $w    = w_uniq($self, $wpref); # create uniq pref's widget id
@@ -1414,7 +1414,7 @@ sub create_ptk_widget_sub {
         if( $_[0] and $_[0] eq 'Name'){
             shift;
             $wpref = lcfirst shift;
-            $wpref =~ s/\s+/_/g; # no spaces allowed in window names in tcl
+            $wpref =~ s/[\s\.]+/_/g; # no spaces or '.' allowed in window names in tcl
         }
 
         my %args = @_;

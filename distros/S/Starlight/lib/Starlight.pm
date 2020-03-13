@@ -36,7 +36,7 @@ use 5.008_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.0306';
+our $VERSION = '0.0400';
 
 1;
 
@@ -72,7 +72,7 @@ Tatsuhiko Miyagawa
 
 =head1 LICENSE
 
-Copyright (c) 2013-2016 Piotr Roszatycki <dexter@cpan.org>.
+Copyright (c) 2013-2016, 2020 Piotr Roszatycki <dexter@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as perl itself.

@@ -15,6 +15,7 @@ my $top = MainWindow->new();
 # This will skip if Tile widgets not available
 unless ($Tcl::pTk::_Tile_available) {
     print "1..0 # Skipped: Tile unavailable\n";
+    $top->destroy;
     exit;
 }
 
@@ -88,12 +89,17 @@ $focus = $n->info('active');
 #print "pages ".join(",", @pages)."\n";
 ok( $focus, 'address', "info(active) method check");
 
-my $identify = $top->windowingsystem ne 'aqua'
-  ? $n->identify(10,10)
-  : $n->identify(230,20) # tabs are centered on macOS aqua
-;
-#print "pages ".join(",", @pages)."\n";
-ok( $identify, 'address', "identify method check");
+if ($n->_identify_unavailable) {
+    skip 'identify method requires Tcl/Tk 8.5.9 or later, '
+       . 'or Tile 0.8.4.0 for Tcl/Tk 8.4';
+} else {
+    my $identify = $top->windowingsystem ne 'aqua'
+      ? $n->identify(10,10)
+      : $n->identify(230,20) # tabs are centered on macOS aqua
+    ;
+    #print "pages ".join(",", @pages)."\n";
+    ok( $identify, 'address', "identify method check");
+}
 
 # Raised widget should be the first one added
 $n->raise('pref');

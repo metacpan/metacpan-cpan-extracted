@@ -60,7 +60,7 @@
    "provides" : {
       "Duadua" : {
          "file" : "lib/Duadua.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Duadua::CLI" : {
          "file" : "lib/Duadua/CLI.pm"
@@ -130,6 +130,9 @@
       },
       "Duadua::Parser::Bot::Inoreader" : {
          "file" : "lib/Duadua/Parser/Bot/Inoreader.pm"
+      },
+      "Duadua::Parser::Bot::LetsEncrypt" : {
+         "file" : "lib/Duadua/Parser/Bot/LetsEncrypt.pm"
       },
       "Duadua::Parser::Bot::MailRUBot" : {
          "file" : "lib/Duadua/Parser/Bot/MailRUBot.pm"
@@ -225,6 +228,6 @@
          "url" : "http://github.com/bayashi/Duadua"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

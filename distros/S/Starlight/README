@@ -21,7 +21,7 @@ DESCRIPTION
 
     Starlight was started as a fork of Thrall server which is a fork of
     Starlet server. It has almost the same code as Thrall and Starlet and
-    it was adapted to doesn't use any other modules than Plack.
+    it was adapted to not use any other modules than Plack.
 
     Starlight is created for Unix-like systems but it should also work on
     Windows with some limitations.
@@ -113,7 +113,7 @@ AUTHORS
 
 LICENSE
 
-    Copyright (c) 2013-2016 Piotr Roszatycki <dexter@cpan.org>.
+    Copyright (c) 2013-2016, 2020 Piotr Roszatycki <dexter@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as perl itself.

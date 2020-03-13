@@ -1,0 +1,37 @@
+1
+    - Initial release to an unsuspecting world
+    - This is mostly a testing release and not yet recommended for normal use.
+
+2
+    - Fix download and self-update command
+
+3
+    - Download less during builds by using `--git-cache-dir` rakudo option on
+      newer rakudos
+    - Add `rakubrew-version` command to list version and some debug info
+    - Fix `download` and `self-upgrade` commands
+    - Don't error on startup when a broken version is present (e.g. a failed
+      build)
+    - Fix `shim` mode on Windows
+    - Accept "moar-2020.01" style versions in addition to "moar 2020.01" in
+      `build` and `download` commands
+
+4
+    - Hopefully make it run on older MacOS as well by switching to a different
+      Perl distribution. (#3)
+    - Enable building Rakudos on MacOS even though Rakudo currently doesn't
+      support building in a folder with spaces. This only works with new enough
+      Rakudos.
+
+5
+    - Change default installation directory to ~/.rakubrew and C:\rakubrew.
+    - Better detect Configure.pl options. This should increase compatibility
+      with older Rakudo releases.
+    - Warn user when installing to a folder with spaces in its path.
+    - Add some minimal testing of rakubrew.
+    - Fix build version shell auto completion.
+
+6
+    - Move to Dist::Zilla as packaging tool.
+    - Tune documentation a bit.
+

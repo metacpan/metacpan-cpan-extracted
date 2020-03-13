@@ -177,6 +177,15 @@
   is_windows: false
   is_chromeos: false
   version: '1.1'
+- ua: 'Go 1.1 package http'
+  name: 'Go http-client'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.1'
 - ua: 'Apache-HttpClient/4.5.2 (Java/1.8.0_171)'
   name: 'Apache-HttpClient'
   is_bot: false
@@ -222,3 +231,38 @@
   is_windows: false
   is_chromeos: false
   version: '3.11.0'
+- ua: 'SOAP::Lite/Perl/1.27'
+  name: 'SOAP::Lite Perl'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: flase
+  is_windows: false
+  is_chromeos: false
+  version: '1.27'
+- ua: 'python-requests/2.22.0'
+  name: 'python-requests'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: flase
+  is_windows: false
+  is_chromeos: false
+  version: '2.22.0'
+- ua: 'MT::Plugin::BadLinkFinder/0.9'
+  name: 'MT::Plugin::BadLinkFinder'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: flase
+  is_windows: false
+  is_chromeos: false
+  version: '0.9'
+- ua: 'Zend_XmlRpc_Client'
+  name: 'Zend_XmlRpc_Client'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: flase
+  is_windows: false
+  is_chromeos: false

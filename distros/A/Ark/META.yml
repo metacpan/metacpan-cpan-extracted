@@ -3,19 +3,20 @@ abstract: 'light weight Catalyst-ish web application framework'
 author:
   - 'Daisuke Murase <typester@cpan.org>'
 build_requires:
-  Test::More: 0.98
-  Test::Output: 0
-  Test::Requires: 0
+  File::Temp: '0'
+  HTTP::Request::Common: '0'
+  Test::More: '0.98'
+  Test::Output: '0'
+  Test::Requires: '0'
+  URI: '0'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  Module::Build: 0.38
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v0.8.2, CPAN::Meta::Converter version 2.132510'
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Ark
 no_index:
   directory:
@@ -30,7 +31,7 @@ no_index:
 provides:
   Ark:
     file: lib/Ark.pm
-    version: 1.20
+    version: '1.22'
   Ark::Action:
     file: lib/Ark/Action.pm
   Ark::ActionClass::Form:
@@ -102,52 +103,54 @@ provides:
   Ark::View::Xslate:
     file: lib/Ark/View/Xslate.pm
 recommends:
-  JSON: 0
-  Text::MicroTemplate::Extended: 0.09
-  Text::Xslate: 0
+  Text::MicroTemplate::Extended: '0.09'
+  Text::Xslate: '0'
 requires:
-  Class::Data::Inheritable: 0
-  Clone: 0
-  Data::UUID: 0
-  Data::Util: 0
-  Devel::StackTrace: 0
-  Digest::SHA1: 0
-  Exporter::AutoClean: 0
-  FormValidator::Lite: 0
-  HTML::Escape: 0
-  HTML::Shakan: 2.00
-  HTTP::Cookies: 0
-  HTTP::Message: 0
-  Module::Pluggable::Object: 0
-  Mouse: 1.0
-  Object::Container: 0.08
-  Path::AttrRouter: 0.03
-  Path::Class: 0.16
-  Plack: 0.9910
-  Plack::Request::WithEncoding: 0.10
-  Plack::Response: 0
-  Text::MicroTemplate: 0
-  Text::SimpleTable: 0
-  Try::Tiny: 0.02
-  URI: 0
-  URI::WithBase: 0
-  perl: 5.008001
+  Class::Data::Inheritable: '0'
+  Clone: '0'
+  Cookie::Baker: '0.11'
+  Data::UUID: '0'
+  Devel::StackTrace: '0'
+  Digest::SHA1: '0'
+  Exporter::AutoClean: '0'
+  FormValidator::Lite: '0'
+  HTML::Escape: '0'
+  HTML::Shakan: '2.00'
+  HTTP::Cookies: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  Mouse: '1.00'
+  Object::Container: '0.08'
+  Path::AttrRouter: '0.03'
+  Path::Class: '0.16'
+  Plack: '0.9910'
+  Plack::Request::WithEncoding: '0.10'
+  Text::MicroTemplate: '0'
+  Text::SimpleTable: '0'
+  Try::Tiny: '0.02'
+  URI::WithBase: '0'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/ark-framework/ark/issues
   homepage: https://github.com/ark-framework/ark
   repository: git://github.com/ark-framework/ark.git
-version: 1.20
+version: '1.22'
+x_authority: cpan:SONGMU
 x_contributors:
-  - 'Masakazu Ohtsuka <o.masakazu@gmail.com>'
-  - 'mattn <mattn.jp@gmail.com>'
-  - 'Ryo Miyake <ryo.studiom@gmail.com>'
-  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
-  - 'Shinichiro Sei <sei@kayac.com>'
-  - 'hisaichi5518 <info@moe-project.com>'
-  - 'ichirin2501 <ichirin.2501@gmail.com>'
   - 'Daisuke Murase <typester@gmail.com>'
   - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+  - 'Masakazu Ohtsuka <o.masakazu@gmail.com>'
   - 'Masatoshi Kawazoe (acidlemon) <kawazoe-masatoshi@kayac.com>'
-  - 'tei-you <tei-you@kayac.com>'
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+  - 'Ryo Miyake <ryo.studiom@gmail.com>'
+  - 'Shinichiro Sei <sei@kayac.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'hisaichi5518 <hisaichi5518@gmail.com>'
-  - 'Songmu <y.songmu@gmail.com>'
+  - 'hisaichi5518 <info@moe-project.com>'
+  - 'ichirin2501 <ichirin.2501@gmail.com>'
+  - 'mackee <macopy123@gmail.com>'
+  - 'mattn <mattn.jp@gmail.com>'
+  - 'tei-you <tei-you@kayac.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

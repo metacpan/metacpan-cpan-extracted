@@ -5,18 +5,29 @@ MooX::JSON_LD - Extend Moo to provide JSON-LD mark-up for your objects.
 =head1 SYNOPSIS
 
     # Your Moo (or Moose) Class
-    package::My::Moo::Class
+    package My::Moo::Class;
 
     use Moo;
 
     use MooX::JSON_LD 'Person';
 
-    has first_name => ( ... json_ld => 1 );
-    has last_name  => ( ... json_ld => 1 );
+    has first_name => (
+      is => 'ro',
+      # various other properties...
+      json_ld => 1,
+    );
 
-    has birth_date => ( ...
-        json_ld => 'birthDate',
-        json_ld_serializer => sub { shift->birth_date->ymd },
+    has last_name  => (
+      is => 'ro',
+      # various other properties...
+      json_ld => 1,
+    );
+
+    has birth_date => (
+      is => 'ro',
+      # various other properties...
+      json_ld => 'birthDate',
+      json_ld_serializer => sub { shift->birth_date },
     );
 
     # Then, in a program somewhere...

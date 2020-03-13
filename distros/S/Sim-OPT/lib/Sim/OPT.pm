@@ -1,8 +1,8 @@
 package Sim::OPT;
-# Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2020 by Gian Luca Brunetti and Politecnico di Milano.
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by overlapping block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-$VERSION = '0.463';
+$VERSION = '0.469';
 use v5.14;
 # use v5.20;
 use Exporter;
@@ -156,6 +156,79 @@ sub countnetarray
 	}
 	@bag = uniq( @bag );
 	return scalar( @bag );
+}
+
+
+sub distr
+{
+  my ( $elts_res, $num ) = @_;
+  my @elts = @{ $elts_res };
+
+  if ( ( $num eq "" ) or ( $num == 0 ) )
+  {
+    $num = 100;
+  }
+
+  my $min = min( @elts );
+  my $max = max( @elts );
+  my $ext = ( $max - $min );
+  my $incr = ( $ext / $num ); #say "INCR $incr";
+
+  my $count = 0;
+  my $low = $min;
+  my $newlow;
+  my ( @vals, @ranks, @alls, @allnums, @percnums );
+  while ( $count < $num  )
+  { #say "COUNT $count";
+    $newlow = ( $low + $incr );
+    my $middle = ( ( $low + $newlow ) / 2 );
+    push( @vals, $middle );
+    push( @ranks, ( $count + 1 ) );
+
+    foreach my $elt ( @elts )
+    {
+      if ( ( $elt < $max ) and ( ( $elt >= $low ) and ( $elt < $newlow ) ) )
+      {
+        push ( @{ $alls[$count] }, $elt );
+      }
+      elsif ( ( $elt == $max ) and ( ( $elt >= $low ) and ( $elt <= $newlow ) ) )
+      {
+        push ( @{ $alls[$count] }, $elt );
+      }
+    }
+
+
+
+    $low = ( $low + $incr );
+    $count++;
+  }
+  #say "ALLS: " . dump( @alls );
+  #die;
+
+
+  my $scalaralls = scalar( @alls );
+  my $co = 0;
+  while ( $co < $scalaralls )
+  {
+    push( @allnums, scalar( @{ $alls[$co] } ) );
+    $co++
+  }
+
+  my $total = 0;
+  foreach my $allnum ( @allnums )
+  {
+    $total = $total + $allnum;
+  }
+
+  my $reduction = ( 100 / $total );
+
+  foreach my $allnum ( @allnums )
+  {
+    my $scalednum = ( $allnum * $reduction );
+    push ( @percnums, $scalednum );
+  }
+
+  return( \@percnums, \@vals, \@ranks)
 }
 
 

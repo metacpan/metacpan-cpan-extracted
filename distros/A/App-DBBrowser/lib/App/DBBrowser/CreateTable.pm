@@ -488,7 +488,7 @@ sub __guess_data_type {
     my ( $sf, $sql ) = @_;
     require SQL::Type::Guess;
     my $g = SQL::Type::Guess->new();
-    my $header = $sql->{insert_into_cols};
+    my $header = $sql->{insert_into_cols}; #
     my $table  = $sql->{insert_into_args};
     my @aoh;
     for my $row ( @$table ) {

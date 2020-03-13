@@ -23,6 +23,7 @@ t/10-bin_share.t
 t/11-nonxs.t
 t/12-parsexs.t
 t/12-parsexs.txt
+t/13-dependent.t
 t/testmod/data/ccdat/ccdata1.bin
 t/testmod/data/ccdat/ccdata2.bin
 t/testmod/data/data.txt

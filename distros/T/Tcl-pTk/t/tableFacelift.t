@@ -21,6 +21,7 @@ my $retVal = $mw->interp->pkg_require('Tktable');
 
 unless( $retVal){
     print "1..0 # Skipped: Tktable Tcl package not available\n";
+    $mw->destroy;
     exit;
 }
 

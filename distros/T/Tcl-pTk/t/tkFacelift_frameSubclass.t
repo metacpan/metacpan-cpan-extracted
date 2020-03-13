@@ -34,6 +34,7 @@ my $top = MainWindow->new( -title => "Hijack Test" );
 # This will skip if Tile widgets not available
 unless ($Tcl::pTk::_Tile_available) {
     print "1..0 # Skipped: Tile unavailable\n";
+    $top->destroy;
     exit;
 }
  

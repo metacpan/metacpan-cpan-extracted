@@ -7,6 +7,38 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.3.0	2020-03-13
+
+ [ Bug Fixes ]
+ - fix tag object llgpl as license:contains:license:lgpl_2_1 (not bogus
+   license:contains:license:llgpl_2_1)
+ - fix: avoid synthesizing pattern grant from ambiguous name BSD for
+   objects bsd_2_clause bsd_3_clause
+ - fix: synthesize patterns in deterministic order
+ - fix: tighten object zpl_2 pattern license to disambiguate from bsd
+
+ [ Other ]
+ - add license patterns gpl-1 gpl-2 gpl-3
+ - add trait patterns by by_apache by_fsf by_james_clark by_psf
+   by_sam_hocevar
+ - add trove caption for mpl_1 mpl_1_1 mpl_2
+ - add unofficial option anchorleft
+ - drop deprecated tags bsd cc mit zlib trait combo (replaced since v3.1.0
+   by family:* type:*)
+ - enable RE2 strict mode
+ - enable re::engine::RE2 greedy mode
+ - extend license object apache_2 to cover a few rare grant patterns
+ - extend license pattern agpl-3 to mask more licensed_under
+ - extend synthesized subject pattern name to include optional publisher
+ - extend trait pattern licensed_under to cover "under _either_ ..."
+ - extend trait pattern version to cover a trailing 'of' (needed when
+   prepended)
+ - introduce tags license:published:*
+ - simplify synthesized versioned grant pattern
+ - tighten license patterns agpl-1 agpl-3 to avoid wildcard
+ - tighten trait object version_number to not grab first digit of a larger
+   number
+
 v3.2.0	2020-02-21
 
  [ Bug Fixes ]

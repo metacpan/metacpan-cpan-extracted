@@ -3,6 +3,7 @@ use Mouse;
 
 use HTTP::Request;
 use HTTP::Cookies;
+use Plack 0.9910; # only for declare dep version
 use Plack::Test;
 
 use FindBin;

@@ -1,5 +1,8 @@
 Revision history for Perl extension App::PAUSE::Comaint
 
+0.08  2020-03-13 09:19:43 PDT
+        - Update scraping code to handle PAUSE HTML changes (Songmu) #10
+
 0.07  2017-03-20 11:38:21 PDT
         - Handle users who already have comaints (ilmari) #7
 

@@ -13,6 +13,17 @@ has '+compatible' => (
     default => 1,
 );
 
+sub dir_file {
+    my $self = shift;
+    return ".git/config" unless @_;
+    my $path = shift;
+    my $dir = $self->is_git_dir( $path );
+    return File::Spec->catfile( $dir, "config" ) if $dir;
+
+    $path = File::Spec->rel2abs( $path );
+    return File::Spec->catfile( $path, ".git/config");
+}
+
 sub is_git_dir {
     my $self = shift;
     my $path = File::Spec->rel2abs( shift );
@@ -83,7 +94,9 @@ This module overrides these methods from C<Config::GitLike>:
 
 =head2 dir_file
 
-The per-directory configuration file is F<.git/config>
+The per-directory configuration file is F<.git/config>.  With an
+optional directory argument, will return a fully-qualified path to the
+configuration file, as git would edit with C<git config --local -C path>.
 
 =head2 user_file
 

@@ -1,6 +1,6 @@
 package Tcl::pTk::ttkTixNoteBook;
 
-our ($VERSION) = ('1.06');
+our ($VERSION) = ('1.07');
 
 =head1 NAME 
 
@@ -404,12 +404,25 @@ sub raised{
         return $widgetLookup->{"$raisedWidget"};
 }
 
+# identify method requires `identify tab`, available in
+# Tcl/Tk 8.5.9 or later, or Tile 0.8.4.0 for Tcl/Tk 8.4
+# https://rt.cpan.org/Ticket/Display.html?id=132075
+sub _identify_unavailable {
+    my $cw = shift;
+    return $cw->interp->Eval("package vcompare $Tcl::pTk::_Tile_available 0.8.4.0") == -1;
+}
+
 #----------------------------------------------
 # identify method
 #   This uses the identify tab method of the ttkNotebook widget
 sub identify{
 	my ($cw, $x, $y ) = @_;
-	
+
+	if ($cw->_identify_unavailable) {
+		die 'identify method requires Tcl/Tk 8.5.9 or later, '
+		  . 'or Tile 0.8.4.0 for Tcl/Tk 8.4';
+	}
+
 	# Get ttkNotebook subwidget that is implementing the widget
         my $nb = $cw->Subwidget('ttkNotebook');
         
