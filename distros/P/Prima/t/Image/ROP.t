@@ -4,8 +4,6 @@ use warnings;
 use Test::More;
 use Prima::Test;
 
-plan tests => 503;
-
 my @alu = qw(
    Blackness
    NotOr
@@ -264,19 +262,19 @@ sub test_rop
  		my $subname = ($bytes * 8) . ' bits ';
 
 		my $src = Prima::Icon->new(
-			width    => 8,
-			height   => 1,
-			data     => join('', map { chr } @q, @q),
-			mask     => join('', map { chr } @q, @q),
+			width    => 4,
+			height   => 5,
+			data     => join('', map { chr } @q, @q, @q, @q, @q),
+			mask     => join('', map { chr } @q, @q, @q, @q, @q),
 			type     => im::Byte,
 			maskType => im::Byte,
 		);
 
 		my $dst = Prima::Icon->new(
-			width    => 8,
-			height   => 1,
-			data     => join('', map { chr } @q, reverse @q),
-			mask     => join('', map { chr } @q, reverse @q),
+			width    => 4,
+			height   => 5,
+			data     => join('', map { chr } @q, reverse(@q), @q, reverse(@q), @q),
+			mask     => join('', map { chr } @q, reverse(@q), @q, reverse(@q), @q),
 			type     => im::Byte,
 			maskType => im::Byte,
 		);
@@ -286,7 +284,10 @@ sub test_rop
 			$dst->type(im::RGB);
 		}
 
-		$dst->put_image(0,0,$src,$rop);
+		$dst->put_image_indirect($src,0,0,0,0,4,2,4,2,$rop);
+		$dst->put_image_indirect($src,0,2,0,2,4,1,4,1,rop::alpha( $rop, 128 ));
+		$dst->put_image_indirect($src,0,3,0,3,4,1,4,1,rop::alpha( $rop, undef, 128 ));
+		$dst->put_image_indirect($src,0,4,0,4,4,1,4,1,$rop | rop::Premultiply);
 
 		my ( $cc, $aa ) = $dst->split;
 		$cc->type(im::Byte);
@@ -298,16 +299,40 @@ sub test_rop
 			my $a = pd_alpha( $rop, $q, $q );
 			my $pc = $cc->pixel($i, 0);
 			my $pa = $aa->pixel($i, 0);
-			is( $pc, $c, "C(($q/$q) $name ($q/$q)) = $c $subname");
-			is( $pa, $a, "A(($q/$q) $name ($q/$q)) = $a $subname");
+			is( $pc, $c, "C (($q/$q) $name ($q/$q)) = $c $subname");
+			is( $pa, $a, "A (($q/$q) $name ($q/$q)) = $a $subname");
 
 			my $q2 = 255 - $q[$i];
 			$c = pd_color( $rop, $q, $q, $q2, $q2 );
 			$a = pd_alpha( $rop, $q, $q2 );
-			$pc = $cc->pixel($i + 4, 0);
-			$pa = $aa->pixel($i + 4, 0);
-			is( $pc, $c, "C(($q/$q) $name ($q2/$q2)) = $c $subname");
-			is( $pa, $a, "A(($q/$q) $name ($q2/$q2)) = $a $subname");
+			$pc = $cc->pixel($i, 1);
+			$pa = $aa->pixel($i, 1);
+			is( $pc, $c, "C (($q/$q) $name ($q2/$q2)) = $c $subname");
+			is( $pa, $a, "A (($q/$q) $name ($q2/$q2)) = $a $subname");
+			
+			my $q_half = int( $q / 2 + .5);
+			$c = pd_color( $rop, $q, $q_half, $q, $q);
+			$a = pd_alpha( $rop, $q_half, $q);
+			$pc = $cc->pixel($i, 2);
+			$pa = $aa->pixel($i, 2);
+			is( $pc, $c, "C (($q/{$q/2}) $name ($q/$q)) = $c $subname");
+			is( $pa, $a, "A (($q/{$q/2}) $name ($q/$q)) = $a $subname");
+			
+			my $q2_half = int( $q2 / 2 + .5);
+			$c = pd_color( $rop, $q, $q, $q2, $q2_half);
+			$a = pd_alpha( $rop, $q, $q2_half);
+			$pc = $cc->pixel($i, 3);
+			$pa = $aa->pixel($i, 3);
+			is( $pc, $c, "C (($q/$q) $name ($q/{$q/2})) = $c $subname");
+			is( $pa, $a, "A (($q/$q) $name ($q/{$q/2})) = $a $subname");
+
+			my $qm = int($q * $q / 255 + .5);
+			$c = pd_color( $rop, $qm, $q, $q, $q );
+			$a = pd_alpha( $rop, $q, $q );
+			$pc = $cc->pixel($i, 4);
+			$pa = $aa->pixel($i, 4);
+			is( $pc, $c, "C*(($q/$q) $name ($q/$q)) = $c $subname");
+			is( $pa, $a, "A*(($q/$q) $name ($q/$q)) = $a $subname");
 		}
 	}
 }
@@ -316,3 +341,5 @@ test_rop( $_ ) for qw(
 	SrcOver DstOver DstCopy Clear  SrcIn  DstIn
 	SrcOut DstOut SrcAtop DstAtop Xor    SrcCopy
 );
+
+done_testing;

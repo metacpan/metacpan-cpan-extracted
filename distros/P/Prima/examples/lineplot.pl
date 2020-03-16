@@ -19,16 +19,19 @@ my $prelight;
 my @points;
 @points = (100,200,200,200,200,100,50,10);
 
-sub menu($$)
+sub group
 {
-	my ( $class, $id ) = @_;
-	"$class\:\:$id" => "~$id" => sub {
-		$_[0]->menu->uncheck($opt{$class . 'p'});
-		$_[0]->menu->check($_[1]);
-		$opt{$class . 'p'} = $_[1];
-		$opt{$class} = eval $_[1];
-		$_[0]->repaint;
-	}
+	my $class = shift;
+	my @items = map {[
+		"$class\:\:$_" => "~$_" => sub {
+			$opt{$class . 'p'} = $_[1];
+			$opt{$class} = eval $_[1];
+			$_[0]->repaint;
+		}
+	]} @_;
+	$items[0][0]  = "(" . $items[0][0]; 
+	$items[-1][0] = ")" . $items[-1][0]; 
+	return @items;
 }
 
 my $mw;
@@ -45,15 +48,15 @@ $mw = Prima::MainWindow->new(
 	designScale => [ 7, 16 ],
 	menuItems => [
 		['~Options' => [ 
-			[ 'closed' => '~Closed' => sub { $_[0]->menu->toggle($_[1]); $_[0]->repaint } ],
-			[ compare => '~Compare' => sub { $_[0]->menu->toggle($_[1]); $_[0]->repaint } ],
-			[ '*hairline' => '~Hairline' => sub { $_[0]->menu->toggle($_[1]); $_[0]->repaint } ],
+			[ '@closed'    => '~Closed'   => sub{shift->repaint} ],
+			[ '@compare'   => '~Compare'  => sub{shift->repaint} ],
+			[ '@*hairline' => '~Hairline' => sub{shift->repaint} ],
 			[],
 			[ 'E~xit' => sub { $_[0]->destroy } ],
 		]],
-		[ '~End' => [ map { [ menu le => $_ ] } qw(Flat Square Round) ]],
+		[ '~End' => [ group le => qw(Flat Square Round) ]],
 		[ '~Join' => [
-			(map { [ menu lj => $_ ] } qw(Round Bevel Miter)),
+			group(lj => qw(Round Bevel Miter)),
 			[],
 			['~Set limit..' => sub {
 				while ( 1 ) {
@@ -73,7 +76,7 @@ $mw = Prima::MainWindow->new(
 				}
 			}],
 		]],
-		[ '~Pattern' => [ map { [ menu lp => $_ ] } qw(
+		[ '~Pattern' => [ group lp => qw(
 			Null Solid Dash LongDash ShortDash
 			Dot DotDot DashDot DashDotDot
 		) ]],

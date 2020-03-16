@@ -1,10 +1,10 @@
 # git
-.git*
+/.git*
 
 # common
-data/
-wiki/
+/data/
+/wiki/
 
 # app
-app/*
-!app/www/
+/app/*
+!/app/www/

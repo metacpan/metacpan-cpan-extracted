@@ -22,7 +22,7 @@ use Time::HiRes;
 use List::Util 'min';
 
 use vars '$VERSION';
-$VERSION = 14;
+$VERSION = 15;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;

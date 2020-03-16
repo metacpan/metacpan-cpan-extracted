@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014;
+use 5.012;
 
 use ExtUtils::MakeMaker;
 
@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
     "bin/n50.bak"
   ],
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.014",
+  "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Proch::N50",
   "PREREQ_PM" => {
     "FASTX::Reader" => "0.32",
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Pod::Usage" => "1.64",
     "Text::ASCIITable" => 0
   },
-  "VERSION" => "0.92",
+  "VERSION" => "1.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

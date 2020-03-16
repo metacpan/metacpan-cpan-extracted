@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2017, 2018 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2017, 2018, 2020 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -19,7 +19,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 25;
+use Test::More tests => 28;
 
 use lib 't';
 use MyTestHelpers;
@@ -42,10 +42,35 @@ BEGIN {
 
 use App::Chart::Yahoo;
 
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
 if ($have_test_mocktime) {
   diag "Test::MockTime version ", Test::MockTime->VERSION;
   diag "Test::MockTime::DateCalc version ", Test::MockTime::DateCalc->VERSION;
 }
+
+#------------------------------------------------------------------------------
+# tdate_to_unix()
+
+# 1 Jan 1970  Thu   0*secsperday
+# 2 Jan 1970  Fri   1
+# 3 Jan 1970  Sat   2
+# 4 Jan 1970  Sun   3
+# 5 Jan 1970  Mon   4
+#
+is (App::Chart::Yahoo::tdate_to_unix(0), 4*86400,
+    "tdate 0 is 5 Jan 1970");
+
+{
+  my $base_adate = App::Chart::ymd_to_adate(1970,1,1);
+  is ($base_adate, -4, "adate of 1 Jan 1970");
+  my $tdate = 12345;
+  my $got = App::Chart::Yahoo::tdate_to_unix($tdate);
+  my $want = (App::Chart::tdate_to_adate($tdate) - $base_adate) * 86400;
+  is ($got, $want, 'tdate_to_unix()');
+}
+
 
 #------------------------------------------------------------------------------
 # round_decimals()

@@ -1,0 +1,13 @@
+<catalog version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xi="http://www.w3.org/2001/XInclude">
+   <book id="bk101">
+     <author>Chromatic</author>
+     <title>Modern Perl</title>
+   </book>
+
+   <xi:include href="inc.xml"/>
+
+   <book id="bk112">
+     <author>Damian Conway</author>
+     <title>Perl Best Practices</title>
+   </book>
+</catalog>

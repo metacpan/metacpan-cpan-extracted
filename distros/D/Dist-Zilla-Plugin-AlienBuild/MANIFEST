@@ -19,12 +19,14 @@ lib/Dist/Zilla/Plugin/AlienBase/Wrapper.pm
 lib/Dist/Zilla/Plugin/AlienBase/Wrapper/Bundle.pm
 lib/Dist/Zilla/Plugin/AlienBuild.pm
 maint/cip-before-install
+perlcriticrc
 t/00_diag.t
 t/01_use.t
 t/dist_zilla_plugin_alienbase_doc.t
 t/dist_zilla_plugin_alienbase_wrapper.t
 t/dist_zilla_plugin_alienbase_wrapper_bundle.t
 t/dist_zilla_plugin_alienbuild.t
+xt/author/critic.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

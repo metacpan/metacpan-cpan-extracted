@@ -153,10 +153,10 @@ sub __parse_with_template {
         my @irs = ( "\\n", "\\r", "\\r\\n" );
         my $reparse = '  Reparse';
         my @pre = ( undef );
-        my $choices = [ @pre, map( '  "' . $_ . '"', @irs ), $reparse ];
+        my $menu = [ @pre, map( '  "' . $_ . '"', @irs ), $reparse ];
         # Choose
         my $idx = $tc->choose(
-            $choices,
+            $menu,
             { prompt => $prompt, index => 1, default => $old_idx, layout => 3, undef => '  <=', clear_screen => 1, info => $info }
         );
         if ( ! $idx ) {
@@ -169,7 +169,7 @@ sub __parse_with_template {
             }
             $old_idx = $idx;
         }
-        if ( $choices->[$idx] eq $reparse ) {
+        if ( $menu->[$idx] eq $reparse ) {
             require App::DBBrowser::Opt::Set;
             require App::DBBrowser::GetContent;
             my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o} );
@@ -297,18 +297,18 @@ sub __parse_with_Spreadsheet_Read {
     else {
         my @sheets = map { '- ' . ( length $book->[$_]{label} ? $book->[$_]{label} : 'sheet_' . $_ ) } 1 .. $#$book;
         my @pre = ( undef );
-        my $choices = [ @pre, @sheets ];
+        my $menu = [ @pre, @sheets ];
         $sf->{i}{S_R}{$file_fs}{old_idx} //= 0;
         my $old_idx = $sf->{i}{S_R}{$file_fs}{old_idx};
 
         SHEET: while ( 1 ) {
             # Choose
             my $idx = $tc->choose(
-                $choices,
+                $menu,
                 { %{$sf->{i}{lyt_v}}, prompt => 'Choose a sheet', index => 1, default => $old_idx,
                 undef => '  <=' }
             );
-            if ( ! defined $idx || ! defined $choices->[$idx] ) {
+            if ( ! defined $idx || ! defined $menu->[$idx] ) {
                 return;
             }
             if ( $sf->{o}{G}{menu_memory} ) {

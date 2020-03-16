@@ -2,7 +2,7 @@
 # ABSTRACT: A script to calculate N50 from one or multiple FASTA/FASTQ files.
 # PODNAME: n50
 
-use 5.014;
+use 5.012;
 use warnings;
 use Pod::Usage;
 use Term::ANSIColor qw(:constants colorvalid colored);
@@ -21,7 +21,7 @@ our %program = (
     'NAME'    => 'FASTX N50',
     'AUTHOR'  => 'Andrea Telatin',
     'MAIL'    => 'andrea@telatin.com',
-    'VERSION' => '3.0',
+    'VERSION' => '3.1.0',
 );
 my $hasJSON = undef;
 our $t;
@@ -133,9 +133,10 @@ unless ( defined $ARGV[0] or $opt_version ) {
 # Shot output formats
 die "Error: Please specify either -x (--screen) or -j (--json)\n"
   if ( $opt_format_screen and $opt_format_json );
+
 die "Error: -x (--screen) or -j (--json) are incompatible with -f (--format)\n"
-  if ( $opt_format ne 'default'
-    and ( $opt_format_screen or $opt_format_json ) );
+  if ( $opt_format ne 'default' and ( $opt_format_screen or $opt_format_json ) );
+
 $opt_format = 'screen' if ($opt_format_screen);
 $opt_format = 'json'   if ($opt_format_json);
 
@@ -160,6 +161,7 @@ my %sorters = (
 
 my $sorting_order;
 if ( $opt_sort_by eq 'path' ) {
+
     $sorting_order = 'string_asc';
     $sorting_order = 'string_desc' if ($opt_reverse_sort);
 }
@@ -178,8 +180,7 @@ if ( defined $opt_format ) {
     if ( !$formats{$opt_format} ) {
         my @list = sort keys(%formats);
 
-        die
-" FATAL ERROR:\n Output format not valid (--format '$opt_format').\n Use one of the following: "
+        die " FATAL ERROR:\n Output format not valid (--format '$opt_format').\n Use one of the following: "
           . join( ', ', @list ) . ".\n";
     }
 
@@ -191,8 +192,7 @@ if ( defined $opt_format ) {
             JSON::PP->import();
             1;
         };
-        die
-"FATAL ERROR: Please install perl module JSON::PP first [e.g. cpanm JSON::PP]\n"
+        die "FATAL ERROR: Please install perl module JSON::PP first [e.g. cpanm JSON::PP]\n"
           unless ($hasJSON);
     }
 
@@ -224,6 +224,7 @@ if ( defined $opt_format ) {
     }
 
 }
+
 
 foreach my $file (@ARGV) {
 
@@ -287,15 +288,24 @@ foreach my $file (@ARGV) {
 " WARNING: Overwriting '$file': multiple items with the same filename. Try not using -b/--basename.\n";
     }
     $output_object{$file} = \%metrics;
+    $output_print{$file}  = {};
 
-    if ( $opt_thousand_separator or $opt_format eq 'screen' ) {
-        for my $key ( keys %metrics ) {
-            $metrics{$key} = thousands( $metrics{$key} );
-        }
+    
+    for my $key ( keys %{ $output_object{$file} } ) {
+
+            if ( $opt_thousand_separator or $opt_format eq 'screen' ) {
+                $output_print{$file}{$key} = thousands($output_object{$file}{$key}  );
+            }   else {
+                $output_print{$file}{$key} = $output_object{$file}{$key}  ;
+            }
+        
     }
-    $output_print{$file} = \%metrics;
+    
 
 }
+
+
+
 
 my $file_num = scalar keys %output_object;
 
@@ -326,8 +336,8 @@ if ( not $opt_format or $opt_format eq 'default' ) {
         foreach my $r ( sort $sort_function keys %output_object ) {
             say $r, $opt_separator,
               $opt_thousand_separator
-              ? thousands( $output_object{$r}{'N50'} )
-              : $output_object{$r}{'N50'};
+              ? thousands( $output_print{$r}{'N50'} )
+              : $output_print{$r}{'N50'};
         }
     }
 }
@@ -545,7 +555,7 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 0.92
+version 1.0.0
 
 =head1 SYNOPSIS
 
@@ -751,7 +761,7 @@ Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Andrea Telatin.
+This software is Copyright (c) 2018-2020 by Andrea Telatin.
 
 This is free software, licensed under:
 

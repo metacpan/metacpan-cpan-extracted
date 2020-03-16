@@ -382,7 +382,10 @@ fcpattern2font( FcPattern * pattern, PFont font)
 		XFTdebug("size unknown");
 	}
 
-	FcPatternGetBool( pattern, FC_SCALABLE, 0, &font-> vector);
+	/* fvBitmap is 0, fvOutline is 1 */
+	font-> vector = fvOutline;
+	if ( FcPatternGetBool( pattern, FC_SCALABLE, 0, &font-> vector) == FcResultMatch) 
+		font-> undef. vector = 0;
 
 	font-> firstChar = 32; font-> lastChar = 255;
 	font-> breakChar = 32; font-> defaultChar = 32;
@@ -435,9 +438,10 @@ xft_build_font_key( PFontKey key, PFont f, Bool bySize)
 {
 	bzero( key, sizeof( FontKey));
 	key-> height = bySize ? -f-> size : f-> height;
-	key-> width = f-> width;
-	key-> style = f-> style & ~(fsUnderlined|fsOutline|fsStruckOut) & fsMask;
-	key-> pitch = f-> pitch & fpMask;
+	key-> width  = f-> width;
+	key-> style  = f-> style & ~(fsUnderlined|fsOutline|fsStruckOut) & fsMask;
+	key-> pitch  = f-> pitch & fpMask;
+	key-> vector = (f-> vector == fvBitmap) ? 0 : 1;
 	key-> direction = ROUGHLY(f-> direction);
 	strcpy( key-> name, f-> name);
 }
@@ -624,7 +628,7 @@ prima_xft_font_pick( Handle self, Font * source, Font * dest, double * size, Xft
 	/* see if the font is not present in xft - the hashed negative matches
 			are stored with width=0, as the width alterations are derived */
 	xft_build_font_key( &key, &requested_font, by_size);
-	XFTdebug("want %dx%d.%s.%s.%s/%s^%g", key.height, key. width, _F_DEBUG_STYLE(key.style), _F_DEBUG_PITCH(key.pitch), key.name, requested_font.encoding, ROUGHLY(requested_font.direction));
+	XFTdebug("want %dx%d.%s.%s.%s/%s^%g.%d", key.height, key. width, _F_DEBUG_STYLE(key.style), _F_DEBUG_PITCH(key.pitch), key.name, requested_font.encoding, ROUGHLY(requested_font.direction), requested_font.vector);
 
 	key. width = 0;
 	if ( hash_fetch( mismatch, &key, sizeof( FontKey))) {
@@ -721,7 +725,7 @@ prima_xft_font_pick( Handle self, Font * source, Font * dest, double * size, Xft
 	FcPatternAddInteger( request, FC_WEIGHT,
 				( requested_font. style & fsBold) ? FC_WEIGHT_BOLD :
 				( requested_font. style & fsThin) ? FC_WEIGHT_THIN : FC_WEIGHT_NORMAL);
-	FcPatternAddBool( request, FC_SCALABLE, 1);
+	FcPatternAddBool( request, FC_SCALABLE, requested_font. vector > fvBitmap );
 	if ( !IS_ZERO(requested_font. direction) || requested_font. width != 0) {
 		FcMatrix mat;
 		FcMatrixInit(&mat);
@@ -832,7 +836,7 @@ prima_xft_font_pick( Handle self, Font * source, Font * dest, double * size, Xft
 
 	/* Check if the matched font is scalable -- see comments in the beginning
 		of the file about non-scalable fonts in Xft */
-	{
+	if ( requested_font. vector > fvBitmap ) {
 		FcBool scalable;
 		if (( FcPatternGetBool( match, FC_SCALABLE, 0, &scalable) == FcResultMatch) && !scalable) {
 			xft_build_font_key( &key, &requested_font, by_size);
@@ -1200,9 +1204,10 @@ xft_text2ucs4( const unsigned char * text, int len, Bool utf8, uint32_t * map8)
 }
 
 int
-prima_xft_get_text_width( PCachedFont self, const char * text, int len, Bool addOverhang,
-								Bool utf8, uint32_t * map8, Point * overhangs)
-{
+prima_xft_get_text_width(
+	PCachedFont self, const char * text, int len, Bool addOverhang,
+	Bool utf8, uint32_t * map8, Point * overhangs
+) {
 	int i, ret = 0, bytelen, div;
 	XftFont * font = self-> xft_base;
 
@@ -1242,17 +1247,13 @@ prima_xft_get_text_width( PCachedFont self, const char * text, int len, Bool add
 		ret += glyph. xOff;
 		if ( addOverhang || overhangs) {
 			if ( i == 0) {
-				if ( glyph. x > 0) {
-					if ( addOverhang) ret += glyph. x;
-					if ( overhangs)   overhangs-> x = glyph. x;
-				}
+				if ( addOverhang && glyph. x > 0) ret += glyph. x;
+				if ( overhangs) overhangs-> x = glyph. x;
 			}
 			if ( i == len - 1) {
 				int c = glyph. xOff - glyph. width + glyph. x;
-				if ( c < 0) {
-					if ( addOverhang) ret -= c;
-					if ( overhangs)   overhangs-> y = -c;
-				}
+				if ( addOverhang && c < 0) ret -= c;
+				if ( overhangs) overhangs-> y = -c;
 			}
 		}
 	}
@@ -1270,6 +1271,8 @@ prima_xft_get_text_box( Handle self, const char * text, int len, Bool utf8)
 
 	width = prima_xft_get_text_width( XX-> font, text, len,
 		false, utf8, X(self)-> xft_map8, &ovx);
+	if ( ovx.x < 0 ) ovx.x = 0;
+	if ( ovx.y < 0 ) ovx.y = 0;
 
 	pt[0].y = pt[2]. y = XX-> font-> font. ascent - 1;
 	pt[1].y = pt[3]. y = - XX-> font-> font. descent;
@@ -1663,6 +1666,8 @@ prima_xft_text_out( Handle self, const char * text, int x, int y, int len, Bool 
 		if ( lw != 1)
 			apc_gp_set_line_width( self, 1);
 
+		if ( ovx.x < 0 ) ovx.x = 0;
+		if ( ovx.y < 0 ) ovx.y = 0;
 		if ( PDrawable( self)-> font. style & fsUnderlined) {
 			ay = d;
 			x1 = x - ovx.x * c - ay * s + 0.5;
@@ -1829,7 +1834,7 @@ prima_xft_parse( char * ppFontNameSize, Font * font)
 	Font f, def = guts. default_font;
 
 	bzero( &f, sizeof( Font));
-	f. undef. height = f. undef. width = f. undef. size = 1;
+	f. undef. height = f. undef. width = f. undef. size = f. undef. vector = f. undef. pitch = 1;
 	fcpattern2font( p, &f);
 	f. undef. width = 1;
 	FcPatternGetCharSet( p, FC_CHARSET, 0, &c);
@@ -1935,6 +1940,7 @@ store_command( OutlineStorage * storage, int cmd, const FT_Vector * p1, const FT
 		storage-> size = 256;
 		if ( !( storage-> buffer = malloc(sizeof(int) * storage->size)))
 			return 1;
+
 	} else if ( storage-> count + 7 >= storage->size ) {
 		int * r;
 		storage-> size *= 2;
@@ -1945,6 +1951,7 @@ store_command( OutlineStorage * storage, int cmd, const FT_Vector * p1, const FT
 			storage-> count = 0;
 			return 1;
 		}
+		storage-> buffer = r;
 	}
 
 	if ( 

@@ -1,0 +1,59 @@
+MODULE = Protocol::HTTP                PACKAGE = Protocol::HTTP::Response
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__);
+    s.inherit("Protocol::HTTP::Message");
+    xs::exp::create_constants(s, {
+        {"COOKIE_SAMESITE_DISABLED", int(Response::Cookie::SameSite::disabled)},
+        {"COOKIE_SAMESITE_STRICT",   int(Response::Cookie::SameSite::Strict)},
+        {"COOKIE_SAMESITE_LAX",      int(Response::Cookie::SameSite::Lax)},
+        {"COOKIE_SAMESITE_NONE",     int(Response::Cookie::SameSite::None)},
+    });
+    xs::exp::autoexport(s);
+}
+
+ResponseSP Response::new (Hash params = Hash()) {
+    RETVAL = make_backref<Response>();
+    if (params) fill(RETVAL, params);
+}
+
+int Response::code (SV* newval = NULL) {
+    if (newval) {
+        THIS->code = SvIV(newval);
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->code;
+}
+
+string Response::message (SV* newval = NULL) {
+    if (newval) {
+        THIS->message = xs::in<string>(newval);
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->message;
+}
+
+Hash Response::cookies (Hash new_cookies = Hash()) {
+    if (new_cookies) {
+        set_response_cookies(THIS, new_cookies);
+        XSRETURN_UNDEF;
+    }
+
+    RETVAL = Hash::create(THIS->cookies.size());
+    for (const auto& elem : THIS->cookies.fields) RETVAL.store(elem.name, xs::out(elem.value));
+}
+
+Response::Cookie Response::cookie (string_view name, SV* val = nullptr) {
+    if (val) {
+        if (!SvOK(val)) THIS->cookies.remove(name);
+        else            THIS->cookies.set(string(name), xs::in<Response::Cookie>(val));
+        XSRETURN_UNDEF;
+    }
+
+    auto it = THIS->cookies.find(name);
+    if (it == THIS->cookies.end()) XSRETURN_UNDEF;
+    RETVAL = it->value;
+}
+
+string Response::to_string (Request* req = nullptr)

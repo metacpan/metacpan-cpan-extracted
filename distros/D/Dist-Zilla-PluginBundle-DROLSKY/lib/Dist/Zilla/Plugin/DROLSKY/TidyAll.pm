@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Code::TidyAll::Config::INI::Reader 0.44;
 use List::Util 1.45 qw( uniqstr );
@@ -306,7 +306,7 @@ Dist::Zilla::Plugin::DROLSKY::TidyAll - Creates default tidyall.ini, perltidyrc,
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for Pod::Coverage .*
 
@@ -326,7 +326,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2019 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

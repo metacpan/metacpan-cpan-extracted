@@ -9,9 +9,12 @@ namespace panda { namespace log {
 namespace details {
     std::unique_ptr<ILogger> ilogger;
 
-    static thread_local std::ostringstream os;
+    static thread_local struct {
+        std::ostringstream os;
+    } tls;
+    static thread_local std::ostringstream* os = &tls.os;
 
-    std::ostream& _get_os () { return os; }
+    std::ostream& _get_os () { return *os; }
 
     bool _do_log (std::ostream& _stream, const CodePoint& cp, Level level) {
         std::ostringstream& stream = static_cast<std::ostringstream&>(_stream);

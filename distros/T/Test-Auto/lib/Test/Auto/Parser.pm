@@ -13,7 +13,7 @@ with 'Data::Object::Role::Stashable';
 
 require Carp;
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 # ATTRIBUTES
 

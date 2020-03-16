@@ -1,3 +1,5 @@
+3.0.4  14.02.2020
+        - better freebsd thread_local workaround
 3.0.3  31.01.2020
         - renamings related changes
 3.0.2  24.01.2020

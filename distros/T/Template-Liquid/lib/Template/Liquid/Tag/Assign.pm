@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Assign;
-our $VERSION = '1.0.18';
+our $VERSION = '1.0.19';
 use strict;
 use warnings;
 require Template::Liquid::Error;
@@ -9,16 +9,21 @@ sub import { Template::Liquid::register_tag('assign') }
 
 sub new {
     my ($class, $args) = @_;
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing template argument',
-                                   fatal   => 1
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing template argument',
+                                   fatal    => 1
         }
         if !defined $args->{'template'};
-    raise Template::Liquid::Error {type => 'Context',
-                             message => 'Missing parent argument', fatal => 1}
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing parent argument',
+                                   fatal    => 1
+        }
         if !defined $args->{'parent'};
     raise Template::Liquid::Error {
-                   type    => 'Syntax',
+                   type     => 'Syntax',
+                   template => $args->{template},
                    message => 'Missing argument list in ' . $args->{'markup'},
                    fatal   => 1
         }
@@ -62,7 +67,8 @@ sub render {
                     next FILTER;
                 }
                 raise Template::Liquid::Error {
-                                        type    => 'Filter',
+                                        template => $s->{template},
+                                        type     => 'Filter',
                                         message => "Filter '$name' not found",
                                         fatal   => 1
                 };

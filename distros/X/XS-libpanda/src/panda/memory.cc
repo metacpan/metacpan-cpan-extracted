@@ -2,14 +2,14 @@
 #include "string.h"
 #include <map>
 #include <mutex>
+#include <thread>
+#include <sstream>
 #include <string.h>
 
 namespace panda {
 
 static std::map<string, void*> global_ptrs;
 static std::mutex              global_ptrs_mutex;
-
-static thread_local std::map<string, void*> global_tls_ptrs;
 
 static const int START_SIZE = 16;
 
@@ -31,10 +31,17 @@ void* detail::__get_global_tls_ptr (const std::type_info& ti, const char* name, 
     string key(ti.name());
     if (name) key += name;
 
-    auto it = global_tls_ptrs.find(key);
-    if (it != global_tls_ptrs.end()) return it->second;
+    std::ostringstream ss;
+    ss << "~~~" << std::this_thread::get_id();
+    auto tid_str = ss.str();
 
-    global_tls_ptrs.emplace(key, val);
+    key += string(tid_str.data(), tid_str.length());
+
+    std::lock_guard<std::mutex> guard(global_ptrs_mutex);
+    auto it = global_ptrs.find(key);
+    if (it != global_ptrs.end()) return it->second;
+
+    global_ptrs.emplace(key, val);
     return val;
 }
 

@@ -17,6 +17,9 @@ along with Upfiles.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 15, March 2020
+    - Makefile.PL declare Time::Local 1.27 for timegm_modern()
+
 Version 14, January 2020
     - fix for Time::Local use, didn't intend its century guessing,
       symptom is another MKD of directories already created

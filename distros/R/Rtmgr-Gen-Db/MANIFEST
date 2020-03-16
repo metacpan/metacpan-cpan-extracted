@@ -1,8 +1,15 @@
+.github/workflows/linux.yml
+.github/workflows/macos.yml
 Changes
+cpanfile
+lib/Rtmgr.pm
+lib/Rtmgr/Gen.pm
 lib/Rtmgr/Gen/Db.pm
 Makefile.PL
 MANIFEST			This list of files
 README
+README.md
+run.sh
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t

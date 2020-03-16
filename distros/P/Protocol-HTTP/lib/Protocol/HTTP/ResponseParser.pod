@@ -1,0 +1,112 @@
+=head1 NAME
+
+Protocol::HTTP::ResponseParser - HTTP response parser
+
+=head1 SYNOPSIS
+
+    use Protocol::HTTP::ResponseParser;
+
+    my $parser = Protocol::HTTP::ResponseParser->new;
+    $parser->set_context_request(Protocol::HTTP::Request->new({method => METHOD_GET}));
+    my $buffer =
+        "HTTP/1.0 200 OK\r\n".
+        "Host: host1\r\n".
+        "Content-Length: 0\r\n".
+        "\r\n";
+
+    my ($res, $state, $pos, $err) = $parser->parse($buffer);
+    if ($err) {
+        die "http error: $err";
+    }
+    
+    if ($state < Protocol::HTTP::Message::STATE_DONE) {
+        # wait for more data
+    }
+    
+    process($req);
+
+
+
+=head1 DESCRIPTION
+
+This class represents client HTTP request parser. Parser is incremental so that you don't need to pass the whole http packet at once.
+
+Parser is an FSM so it's really fast.
+
+The context request should be set to help parser on validation, for example
+if the request method was C<HEAD> and the response contains B<chunks>,
+this is violation of HTTP protocol and error is emitted, despite the
+fact that the response by itself is valid.
+
+
+
+=head1 METHODS
+
+=head2 new()
+
+Constructs new response parser instance.
+
+
+=head2 set_context_request($request)
+
+Sets context request for which response will be parsed. This property is automatically cleared after each sucessfull parsing (STATE_DONE)
+so that you need to set next context request before you start parsing next response.
+
+
+=head2 context_request()
+
+Returns current context request.
+
+
+=head2 parse($buffer)
+
+=head2 parse_shift($buffer)
+
+    $parser->set_context_request($request);
+    my ($res, $state, $pos, $err) = $parser->parse($buffer);
+
+The behaviour is the same as for request parser, see L<Protocol::HTTP::RequestParser>.
+
+You must set a context request via C<set_context_request()> after each successfull parsing (STATE_DONE) and before you start parsing next response.
+
+
+=head2 reset()
+
+Resets internal parser state, so it is ready to parse new responses.
+
+Parser automatically resets itself after each successfully parsed message, so you only need to call this method if you plan to re-use parser after
+errors, or you decided to stop parsing not yet fully parsed message and begin parsing another one.
+
+C<reset()> drops current context request as well, so that you need to set another context request before you start parsing next response.
+
+
+=head2 eof()
+
+    my ($res, $state, $err) = $parser->eof();
+    
+Tells the parser that peer (server) has closed the connection and no more data should be awaited.
+
+The result may be either success or fail.
+
+If we were parsing a message without C<Content-Length> header and not chunked (that is "read-body-until-eof" message),
+and we were in "parsing body" state, then the result would be success, C<$state> == STATE_DONE, C<$err> is absent, and C<$res> would contain a complete
+L<Protocol::HTTP::Response> object.
+
+If we were not expecting a response (i.e. we were between "request-response" series: nothing was parsing at the moment, and no context request was set),
+the result would be success, C<$state> == STATE_HEADERS (initial state), C<$err> is absent and C<$res> would contain an empty L<Protocol::HTTP::Response> object.
+
+Otherwise the result is a fail, C<$state> == STATE_ERROR, C<$err> == Protocol::HTTP::errc::unexpected_eof and C<$res> will contain
+a non-complete L<Protocol::HTTP::Response> object.
+
+
+=head1 SEE ALSO
+
+L<Protocol::HTTP>
+
+L<Protocol::HTTP::Message>
+
+L<Protocol::HTTP::Request>
+
+L<Protocol::HTTP::Response>
+
+=cut

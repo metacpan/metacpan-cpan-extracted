@@ -7,7 +7,7 @@ use Path::Tiny ();
 use Config;
 
 # ABSTRACT: Interface to Microsoft Vcpkg
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub root
@@ -99,7 +99,7 @@ Win32::Vcpkg - Interface to Microsoft Vcpkg
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -155,9 +155,9 @@ If set to true, will link against debug libraries.
 
 =over 4
 
-=item L<Win32:Vcpkg::List>
+=item L<Win32::Vcpkg::List>
 
-=item L<Win32:Vcpkg::Package>
+=item L<Win32::Vcpkg::Package>
 
 =back
 

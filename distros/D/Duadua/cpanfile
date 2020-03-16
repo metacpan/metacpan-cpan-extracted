@@ -20,7 +20,7 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
-    requires 'Module::Build' , '0.40';
+    requires 'Module::Build' , '0.42';
     requires 'Module::Build::Pluggable';
     requires 'Module::Build::Pluggable::CPANfile';
 };

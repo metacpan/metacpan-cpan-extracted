@@ -170,6 +170,8 @@ t/typemap/object/avhv.xsi
 t/typemap/object/backref-threads.t
 t/typemap/object/backref.t
 t/typemap/object/backref.xsi
+t/typemap/object/casting.t
+t/typemap/object/casting.xsi
 t/typemap/object/child.t
 t/typemap/object/child.xsi
 t/typemap/object/foreign.t

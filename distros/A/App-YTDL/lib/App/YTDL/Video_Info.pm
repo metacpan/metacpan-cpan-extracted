@@ -11,7 +11,6 @@ our @EXPORT_OK = qw( gather_video_infos );
 use List::MoreUtils        qw( none );
 use Term::ANSIScreen       qw( :cursor :screen );
 use Term::Choose::LineFold qw( line_fold );
-use Term::Choose           qw( choose );
 use Term::Choose::Util     qw( get_term_size );
 
 use App::YTDL::GetData qw( get_download_info );

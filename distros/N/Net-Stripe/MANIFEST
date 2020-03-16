@@ -9,7 +9,6 @@ Makefile.PL
 README
 dist.ini
 lib/Net/Stripe.pm
-lib/Net/Stripe.pm.orig
 lib/Net/Stripe/BalanceTransaction.pm
 lib/Net/Stripe/Card.pm
 lib/Net/Stripe/Charge.pm

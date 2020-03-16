@@ -38,7 +38,6 @@
       },
       "develop" : {
          "requires" : {
-            "File::Spec" : "0",
             "FindBin" : "0",
             "Perl::Critic" : "0",
             "Test2::Require::Module" : "0.000060",
@@ -99,7 +98,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.12",
+   "version" : "2.15",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",

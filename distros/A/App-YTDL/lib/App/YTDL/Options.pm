@@ -15,7 +15,7 @@ use FindBin               qw( $RealBin $RealScript );
 use Pod::Usage            qw( pod2usage );
 
 use Term::Choose       qw( choose );
-use Term::Choose::Util qw( choose_a_dir choose_a_file choose_a_number settings_menu insert_sep );
+use Term::Choose::Util qw( choose_a_directory choose_a_file choose_a_number settings_menu insert_sep );
 use Term::Form         qw();
 
 use App::YTDL::ChooseVideos qw( set_sort_videolist );
@@ -61,7 +61,11 @@ sub _show_info {
     if ( $opt->{ffprobe} ) {
         $info .= '    ' . $opt->{ffprobe} . ": " . ( $ffprobe_version // '?' ) . "\n";
     }
-    choose( [ 'Close' ], { prompt => $info } );
+    # Choose
+    choose(
+        [ 'Close' ],
+        { prompt => $info }
+    );
 }
 
 
@@ -230,6 +234,7 @@ sub set_options {
                     say "List extractors: $@";
                 }
                 if ( @capture ) {
+                    # Choose
                     choose(
                         [ map { "  $_" } @capture ],
                         { layout => 3 }
@@ -243,6 +248,7 @@ sub set_options {
                     say "Extractor descriptions: $@";
                 }
                 if ( @capture ) {
+                    # Choose
                     choose(
                         [ map { '  ' . decode( 'UTF-8', $_ ) } @capture ],
                         { layout => 3 }
@@ -305,7 +311,7 @@ sub set_options {
                 _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
             }
             elsif ( $choice eq "retries" ) {
-                my $digits = 3;
+                my $digits = 2;
                 my $info = sprintf "Download retries\nNow: %${digits}s", insert_sep( $opt->{$choice} );
                 my $name = 'New: ';
                 _opt_number_range( $opt, $choice, $name, $info, $digits );
@@ -411,6 +417,7 @@ sub set_options {
 
 sub _opt_settings_menu {
     my ( $opt, $sub_menu, $current, $prompt ) = @_;
+    # Settings_menu
     my $changed = settings_menu( $sub_menu, $current, { prompt => $prompt } );
     return if ! $changed;
     for my $key ( keys %$current ) {
@@ -422,7 +429,8 @@ sub _opt_settings_menu {
 
 sub _opt_choose_a_directory {
     my( $opt, $choice, $info, $name ) = @_;
-    my $new_dir = choose_a_dir( { dir => $opt->{$choice}, name => $name, info => $info } );
+    # Choose_a_directory
+    my $new_dir = choose_a_directory( { init_dir => $opt->{$choice}, cs_label => $name, info => $info } );
     return if ! defined $new_dir;
     if ( $new_dir ne $opt->{$choice} ) {
         if ( ! eval {
@@ -430,7 +438,11 @@ sub _opt_choose_a_directory {
             1 }
         ) {
             print "$@";
-            choose( [ 'Press Enter:' ], { prompt => '' } );
+            # Choose
+            choose(
+                [ 'Press Enter:' ],
+                { prompt => '' }
+            );
         }
         else {
             $opt->{$choice} = $new_dir;
@@ -442,7 +454,8 @@ sub _opt_choose_a_directory {
 
 sub _opt_choose_a_file {
     my( $opt, $choice, $info, $name ) = @_;
-    my $file = choose_a_file( { name => $name, info => $info } );
+    # Choose_a_file
+    my $file = choose_a_file( { cs_label => $name, info => $info } );
     return if ! defined $file;
     $opt->{$choice} = $file;
     $opt->{change}++;
@@ -451,10 +464,11 @@ sub _opt_choose_a_file {
 
 sub _local_readline {
     my ( $opt, $section, $prompt, $list ) = @_;
+    # Fill_form
     my $trs = Term::Form->new();
     my $new_list = $trs->fill_form(
         $list,
-        { prompt => $prompt, auto_up => 2, confirm => '  CONFIRM', back => '  BACK' }
+        { prompt => $prompt, auto_up => 2, confirm => 'CONFIRM', back => 'BACK   ' }
     );
     if ( $new_list ) {
         for my $i ( 0 .. $#$new_list ) {
@@ -468,7 +482,7 @@ sub _local_readline {
 sub _opt_number_range {
     my ( $opt, $section, $name, $info, $digits ) = @_;
     # Choose_a_number
-    my $choice = choose_a_number( $digits, { name => $name, info => $info } );
+    my $choice = choose_a_number( $digits, { cs_label => $name, info => $info } );
     return if ! defined $choice;
     $opt->{$section} = $choice eq '--' ? undef : $choice;
     $opt->{change}++;
@@ -484,6 +498,7 @@ sub _opt_choose_from_list_idx {
     my $choices = [ @pre, map { "- $_" } @$list ];
     while ( 1 ) {
         my $local_prompt = $prompt . ': [' . ( $list->[$opt->{$section}] // '--' ) . ']';
+        # Choose
         my $idx = choose(
             $choices,
             { prompt => $local_prompt, layout => 3, undef => '  BACK', index => 1 }
@@ -510,6 +525,7 @@ sub _opt_choose_from_list_value {
     my @pre = ( undef, $confirm );
     while ( 1 ) {
         my $local_prompt = $prompt . ': [' . ( $opt->{$section} // '--' ) . ']';
+        # Choose
         my $choice = choose(
             [ @pre,  map { "- $_" } @$list ],
             { prompt => $local_prompt, layout => 3, undef => '  BACK', index => 0 }

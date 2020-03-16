@@ -19,6 +19,14 @@ This module requires these other modules and libraries:
 
  Regexp::Grammars
 
+SEE ALSO
+
+JavaScript implementation of pod6
+  
+I highly recommend see pod6 implementation https://github.com/zag/js-pod6.
+That is modern implementation of pod6. 
+Also check project site https://pod6.in for latest information about pod6.
+
 AUTHOR 
 
 Zahatski Aliaksandr, <zag@cpan.org>
@@ -29,7 +37,7 @@ Ivan Baidakou, <dmol@cpan.org>
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2009-2015 by Zahatski Aliaksandr
+Copyright (C) 2009-2020 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

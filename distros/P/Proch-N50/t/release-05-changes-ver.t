@@ -8,11 +8,11 @@ BEGIN {
 
 use 5.012;
 use Test::More;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use_ok('Proch::N50');
 my $last_ver = $Proch::N50::VERSION;
-my $changes_file = "$Bin/../Changes";
-open my $out, '>', "$Bin/Changes.clean";
+my $changes_file = "$RealBin/../Changes";
+open my $out, '>', "$RealBin/Changes.clean";
 
 if (-e "$changes_file") {
 	my $version_found = 0;

@@ -56,7 +56,7 @@ sub input_filter {
     FILTER: while ( 1 ) {
         my $count_static_rows = 5; # prompt and 4 menu rows (fix width)
         $sf->__print_filter_info( $sql, $count_static_rows, undef );
-        my $choices = [
+        my $menu = [
             undef,    $choose_cols,   $choose_rows,  $range_rows, $row_groups,
             $confirm, $remove_cell,   $insert_cell,  $append_col, $split_column,
             $reset,   $s_and_replace, $split_table,  $merge_rows, $join_columns,
@@ -64,7 +64,7 @@ sub input_filter {
         ];
         # Choose
         my $idx = $tc->choose(
-            $choices,
+            $menu,
             { prompt => 'Filter:', layout => 0, order => 0, max_width => 78, index => 1, default => $old_idx,
               undef => $back }
         );
@@ -80,7 +80,7 @@ sub input_filter {
             }
             $old_idx = $idx;
         }
-        my $filter = $choices->[$idx];
+        my $filter = $menu->[$idx];
         my $filter_str = sprintf( "Filter: %s", $filter );
         if ( $filter eq $reset ) {
             $sf->__print_filter_info( $sql, $count_static_rows, undef ); #
@@ -838,7 +838,7 @@ sub __choose_a_column_idx {
     my @pre = ( undef );
     # Choose
     my $col_idx = $tc->choose(
-        [ @pre, map { defined $_ ? $_ : '' } @$columns ],
+        [ @pre, map( defined $_ ? $_ : '', @$columns ) ],
         { layout => 0, order => 0, index => 1, undef => '<<', info => $filter_str, prompt => $prompt, empty => '--', busy_string => $sf->{i}{working} } #
     );
     if ( ! $col_idx ) {

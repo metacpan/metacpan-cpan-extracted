@@ -1,0 +1,167 @@
+=head1 NAME
+
+Protocol::HTTP::Request - HTTP request class
+
+=head1 SYNOPSIS
+
+    use Protocol::HTTP::Request;
+
+    # construction of new request
+    my $req = Protocol::HTTP::Request->new({
+        method       => METHOD_POST,
+        uri          => "http://crazypanda.ru/hello/world",
+        http_version => 10,
+        headers      => {MyHeader => "my value"},
+        cookies      => {Lorem => 'ipsum'},
+        body         => "my body",
+    });
+
+    $req->method();             # => METHOD_POST
+    $req->uri();                # => isa 'URI::XS'
+    $req->uri->to_string;       # => 'http://crazypanda.ru/hello/world'
+
+    $req->uri('/something');
+    $req->uri->to_string;       # => '/something'
+
+    # we accept GZIP-compressed replies
+    $req->allow_compression(Protocol::HTTP::Compression::gzip);
+
+    $req->cookie('Location', 'Earth');
+    $req->cookie('Location');           # => 'Earth'
+    $req->cookies;                      # => is_deeply {Location => 'Earth', 'Lorem' => 'ipsum'}
+
+    # main serialization method
+    $req->to_string;        # like qr/GET.*HTTP/1.0.*MyHeader.*my body/sm
+
+    # we are crazy enough to send compressed request
+    $req->compress(Protocol::HTTP::Compression::gzip, Protocol::HTTP::Compression::LEVEL_OPTIMAL);
+    # now $req->to_string would return a little bit different result
+
+
+
+=head1 DESCRIPTION
+
+This class represents client HTTP request, which is specialization of
+L<Protocol::HTTP::Message>. An instance of the class can be constructed
+either direcly via C<new> method to send a new request (clients), or
+via parsing incoming request with L<Protocol::HTTP::RequestParser> (servers).
+
+If it is acceptable to have a server reply with compressed
+payload, then C<allow_compression> method should be invoked. It will setup
+C<Accept-Encoding> header in a request.
+
+When a new request is ready it can be serialized via C<to_string> method into
+byte octets.
+
+=head1 METHODS
+
+=head2 new([\%params])
+
+Constructs new request from hashref of properties, i.e. C<method>, C<uri>,
+C<allow_compression>, C<headers>, C<body>, C<http_version>, C<chunked>,
+C<compress>.
+
+See corresponding methods documentation below and in L<Protocol::HTTP::Message> to find out what these parameters support.
+
+C<allow_compression> should be an array ref if multiple values are passed.
+
+
+=head2 method([$method])
+
+Get/set HTTP request method, e.g. C<GET>, C<POST> etc. in the first line of the request
+
+Possible values:
+
+=over
+
+=item METHOD_GET
+
+=item METHOD_POST
+
+=item METHOD_PUT
+
+=item METHOD_DELETE
+
+=item METHOD_OPTIONS
+
+=item METHOD_HEAD
+
+=item METHOD_TRACE
+
+=item METHOD_CONNECT
+
+=back
+
+
+=head2 uri([$uri])
+
+Set/get uri as L<URI::XS>. C<$uri> argument can be anything that one-argument constructor of L<URI::XS> supports (for example, string).
+
+
+=head2 cookies([\%cookies])
+
+Set/get all cookies at once as a hashref.
+
+    $req->cookies({coo1 => "val1", coo2 => "val2", ... });
+
+Please note, this is request cookies, i.e. set by client-side, and they
+have different API than response cookies.
+
+
+=head2 cookie($name, [$value])
+
+Set/get single cookie.
+
+
+=head2 allow_compression($compression1, [$compression2, ...])
+
+Sets acceptable compression methods in the responce of the request, i.e.
+C<Accept-Encoding> header. Order of compression methods might be important.
+
+    $request->allow_compression(Protocol::HTTP::Compression::gzip);
+
+See L<Protocol::HTTP::Compression> for the list of available compressions.
+
+
+=head2 allowed_compression()
+
+Returns the bit mask of desirable compression methods (i.e. specified at
+C<Accept-Encoding> header).
+
+    if ($request->allowed_compression & Protocol::HTTP::Compression::gzip) {
+        ...;
+    }
+
+See L<Protocol::HTTP::Compression> for the list of available compressions.
+
+
+=head2 to_string()
+
+Serializes a request into string for sending via network. If the compression
+was requested (see L<Protocol::HTTP::Message>), then it will be applied here.
+
+
+=head2 method_str()
+
+Returns stringified HTTP request method, e.g. C<"GET">, C<"POST"> etc.
+
+
+=head1 FUNCTIONS
+
+=head2 method_str($method)
+
+Returns corresponding string for a constant C<METHOD_*>, i.e. C<"GET">, C<"POST"> etc.
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::HTTP>
+
+L<Protocol::HTTP::Message>
+
+L<Protocol::HTTP::Compression>
+
+L<URI::XS>
+
+=cut

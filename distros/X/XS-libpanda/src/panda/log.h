@@ -84,8 +84,8 @@ struct Module {
     Level   level;
     string  name;
 
-    Module(const string& name, Level level = Level::Debug);
-    Module(const string& name, Module* parent, Level level = Level::Debug);
+    Module(const string& name, Level level = Level::Warning);
+    Module(const string& name, Module* parent, Level level = Level::Warning);
 
     Module(const Module&) = delete;
     Module(Module&&) = delete;

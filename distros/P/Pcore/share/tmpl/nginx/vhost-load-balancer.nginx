@@ -1,5 +1,5 @@
-upstream <: $name :> {
-    server unix:<: $load_balancer_sock_dir :>/<: $name :>.sock;
+upstream <: $vhost_name :> {
+    server unix:<: $load_balancer_sock :>;
 
     keepalive 180; # TODO set from variable
 }
@@ -12,14 +12,14 @@ server {
     server_name               <: $name | raw :>;
 : }
 
-    # error_log                 /var/local/nginx/data/<: $name :>-nginx-error.log info;
-    # access_log                /var/local/nginx/data/<: $name :>-nginx-access.log default;
+    # error_log                 /var/local/nginx/data/<: $vhost_name :>-nginx-error.log info;
+    # access_log                /var/local/nginx/data/<: $vhost_name :>-nginx-access.log default;
 
     keepalive_timeout         70;
     client_max_body_size      10M;
 
     location @backend {
-        proxy_pass http://<: $name :>;
+        proxy_pass http://<: $vhost_name :>;
 
         proxy_read_timeout 60s;
 

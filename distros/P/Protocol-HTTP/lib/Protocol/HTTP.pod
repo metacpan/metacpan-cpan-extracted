@@ -1,0 +1,176 @@
+=head1 NAME
+
+Protocol::HTTP - very fast HTTP protocol incremental parser and serializer
+
+
+=head1 SYNOPSIS
+
+    use Protocol::HTTP;
+    
+    # client api - make request
+    my $request = Protocol::HTTP::Request->new({
+        uri     => "http://crazypanda.ru/hello/world",
+        headers => {MyHeader => "my value"},
+        cookies => {coo1 => "val1", coo2 => "val2"},
+        body    => "my body",
+    });
+    
+    my $req_str = $request->to_string; # => like qr|GET /hello/world HTTP/1.1|
+
+    # server api - parse request
+    my ($state, $position, $error);
+    my $req_parser = Protocol::HTTP::RequestParser->new;
+    ($request, $state, $position, $error) = $req_parser->parse($req_str);
+    
+    if ($state == Protocol::HTTP::Message::STATE_DONE) {
+        say $request->uri;
+        say $request->method;
+        say $request->body;
+    }
+
+    # server api - make response
+    my $response = Protocol::HTTP::Response->new({
+        code    => 200,
+        headers => {Lang => 'Perl'},
+        body    => "Lorem ipsum dolor",
+    });
+    
+    my $res_str = $response->to_string($request);
+
+    # client api - parse response
+    my $res_parser = Protocol::HTTP::ResponseParser->new;
+    $res_parser->set_context_request($request);
+    ($response, $state, $position, $error) = $res_parser->parse($res_str);
+    say $response->code;
+    say $response->status;
+    say $response->body;
+    
+    
+    # compression with chunks
+
+    use Protocol::HTTP::Request 'METHOD_POST';
+    
+    $request = Protocol::HTTP::Request->new({
+        method   => METHOD_POST,
+        uri      => "https://images.example.com/upload",
+        chunked  => 1,
+        compress => Protocol::HTTP::Compression::gzip,
+    });
+    say $request->to_string;                    # only http headers
+    say $request->make_chunk('hello-world');    # outputs first chunk
+    say $request->final_chunk();                # outputs final chunk
+
+
+
+=head1 DESCRIPTION
+
+The C<Protocol::HTTP> is a port of C<panda::protocol::http> library, an RFC-compiant very fast HTTP protocol implementation, written in C++
+with XS-adapters in perl. The module has dual Perl/C++ interface (see L<XS::Manifesto>) so futher XS-bindings can be written on the top of
+C<Protocol::HTTP>.
+
+The following features are supported in the C<Protocol::HTTP>: cookies, transparent (un)compression with C<Gzip> or C<Brotli>,
+transparent chunked transfer encoding for body streaming, respecting request's preferences when making response.
+
+The module is a protocol implementation, by itself it does not perform any I/O activity.
+
+Currenly supported HTTP versions are 1.0 and 1.1
+
+
+
+=head1 REFERENCE
+
+L<Protocol::HTTP::Request>
+
+L<Protocol::HTTP::Response>
+
+L<Protocol::HTTP::Message>
+
+L<Protocol::HTTP::RequestParser>
+
+L<Protocol::HTTP::ResponseParser>
+
+L<Protocol::HTTP::Compression>
+
+L<Protocol::HTTP::errc>
+
+
+
+=head1 CONSTANTS
+
+=head2 error_category
+
+The error category that all of L<Protocol::HTTP::errc> errors have.
+
+
+
+=head1 PERFORMANCE
+
+Tests were performed on Xeon v3 2.9Ghz, Debian 10.
+
+We can't make a fair benchmark because C<Protocol::HTTP> is a complete HTTP protocol solution,
+while L<HTTP::Parser::XS> only parses http header.
+
+Nevertheless, <Protocol::HTTP> still runs significantly faster.
+
+Benchmark script can be found in C<misc/bench.pl>
+
+    ==================== request with few headers
+                          Rate     HTTP::Parser HTTP::Parser::XS   Protocol::HTTP
+    HTTP::Parser       19548/s               --             -97%             -99%
+    HTTP::Parser::XS  601510/s            2977%               --             -57%
+    Protocol::HTTP   1390157/s            7011%             131%               --
+    
+    ==================== request with many headers
+                         Rate     HTTP::Parser HTTP::Parser::XS   Protocol::HTTP
+    HTTP::Parser       7657/s               --             -97%             -98%
+    HTTP::Parser::XS 240040/s            3035%               --             -53%
+    Protocol::HTTP   508970/s            6547%             112%               --
+    
+    ==================== response with many headers
+                         Rate     HTTP::Parser HTTP::Parser::XS   Protocol::HTTP
+    HTTP::Parser       8295/s               --             -97%             -98%
+    HTTP::Parser::XS 289616/s            3391%               --             -45%
+    Protocol::HTTP   529329/s            6281%              83%               --
+    
+    ==================== response with many headers and 10KB body (only for Protocol::HTTP)
+    timethis for 1:  1 wallclock secs ( 1.08 usr +  0.00 sys =  1.08 CPU) @ 424769.44/s (n=458751)
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::HTTP::Compression::Brotli>
+
+L<URI::XS>
+
+L<Protocol::WebSocket::XS>
+
+L<rfc2616 (http 1.1) |https://tools.ietf.org/html/rfc2616>
+
+L<rfc6265 (HTTP State Management Mechanism)| https://tools.ietf.org/html/rfc6265>
+
+L<rfc7932 (brotli compression) |https://tools.ietf.org/html/rfc7932>
+
+L<rfc1952 (gzip compression) |https://tools.ietf.org/html/rfc1952>
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org> 
+
+Ivan Baidakou <dmol@cpan.org>
+
+Grigory Smorkalov <g.smorkalov@crazypanda.ru>
+
+Andrew Selivanov <andrew.selivanov@gmail.com>
+
+Crazy Panda LTD
+
+
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

@@ -1,5 +1,5 @@
 package Template::Liquid::Context;
-our $VERSION = '1.0.18';
+our $VERSION = '1.0.19';
 require Template::Liquid::Utility;
 require Template::Liquid::Error;
 use strict;
@@ -16,16 +16,22 @@ sub new {
 
 sub push {
     my ($s, $context) = @_;
-    return raise Template::Liquid::Error {type => 'Stack',
-                                          message => 'Cannot push new scope!'}
+    return
+        raise Template::Liquid::Error {type     => 'Stack',
+                                       template => $s->{template},
+                                       message  => 'Cannot push new scope!'
+        }
         if scalar @{$s->{'scopes'}} == 100;
     return push @{$s->{'scopes'}}, (defined $context ? $context : {});
 }
 
 sub pop {
     my ($s) = @_;
-    return raise Template::Liquid::Error {type => 'Stack',
-                                          message => 'Cannot pop scope!'}
+    return
+        raise Template::Liquid::Error {type     => 'Stack',
+                                       template => $s->{template},
+                                       message  => 'Cannot pop scope!'
+        }
         if scalar @{$s->{'scopes'}} == 1;
     return pop @{$s->{'scopes'}};
 }

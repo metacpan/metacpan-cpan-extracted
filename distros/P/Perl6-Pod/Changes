@@ -4,6 +4,10 @@ TODO:
     - Formatting code: P<>, S<>, M<>, 
     - Config: :margin, :formatted
 
+0.74 2020-03-15
+    * fix detect numbering =items
+    * update pod
+
 0.73 2019-12-07
     * fix =code's raw content
 

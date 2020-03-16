@@ -310,9 +310,9 @@ sub profile_default
 				['Redo' => 'Ctrl+R' => '^R' => sub { $_[0]-> Editor-> redo }],
 			]],
 			['~Selection' => [
-				[ 'bt-0', '~Normal'     => q(blockType)],
+				[ '(bt-0', '~Normal'     => q(blockType)],
 				[ 'bt-1', '~Vertical'   => q(blockType)],
-				[ 'bt-2', '~Horizontal' => q(blockType)],
+				[ ')bt-2', '~Horizontal' => q(blockType)],
 				[],
 				[ '~Remove'        => 'Alt+U' => '@U' => sub { $_[0]-> Editor-> cancel_block }],
 				[ '~Mark vertical' => 'Alt+B' => '@B' => sub {
@@ -327,9 +327,9 @@ sub profile_default
 				['Over~write block' => 'Alt+O' => '@O' => sub { $_[0]-> Editor-> overtype_block }],
 			]],
 			['~Options' => [
-				[ '*syntaxHilite'   => '~Syntax hilite'     => q(bool_set)],
-				[ '*autoIndent'      => '~Auto indent'      => q(bool_set)],
-				[ 'persistentBlock' => '~Presistent blocks' => q(bool_set)],
+				[ '@*syntaxHilite'   => '~Syntax hilite'     => q(bool_set)],
+				[ '@*autoIndent'     => '~Auto indent'       => q(bool_set)],
+				[ '@persistentBlock' => '~Presistent blocks' => q(bool_set)],
 				[],
 				[ 'Set ~font' => q(setfont)],
 			]],
@@ -392,16 +392,14 @@ sub setfont
 
 sub bool_set
 {
-	my ( $self, $var) = @_;
-	$self-> Editor-> set( $var, $self-> menu-> toggle($var));
+	my ( $self, $var, $val) = @_;
+	$self-> Editor-> set($var, $val);
 }
 
 sub blockType
 {
 	my ( $self, $var) = @_;
 	return unless $var =~ /^bt-(\d)$/;
-	$self-> menu-> uncheck( 'bt-' . $self-> Editor-> blockType);
-	$self-> menu-> check( $var);
 	$self-> Editor-> blockType($1);
 }
 

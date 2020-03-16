@@ -8,6 +8,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "XSParseSublike.h"
+
 #ifndef av_top_index
 #define av_top_index(av)       AvFILL(av)
 #endif
@@ -36,10 +38,7 @@
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
-#if HAVE_PERL_VERSION(5, 31, 3)
-#  define HAVE_PARSE_SUBSIGNATURE
-#elif HAVE_PERL_VERSION(5, 26, 0)
-#  include "parse_subsignature.c.inc"
+#if HAVE_PERL_VERSION(5, 26, 0)
 #  define HAVE_PARSE_SUBSIGNATURE
 #endif
 
@@ -698,7 +697,13 @@ static int keyword_class(pTHX_ OP **op_ptr)
   }
 
   if(packagever) {
-    Perl_package_version(aTHX_ newSVOP(OP_CONST, 0, packagever));
+    /* stolen from op.c because Perl_package_version isn't exported */
+    U32 savehints = PL_hints;
+    PL_hints &= ~HINT_STRICT_VARS;
+
+    sv_setsv(GvSV(gv_fetchpvs("VERSION", GV_ADDMULTI, SVt_PV)), packagever);
+
+    PL_hints = savehints;
   }
 
   AV *isa;
@@ -849,27 +854,8 @@ static int keyword_has(pTHX_ OP **op_ptr)
   return KEYWORD_PLUGIN_STMT;
 }
 
-static int keyword_method(pTHX_ OP **op_ptr)
+static void parse_post_blockstart(pTHX)
 {
-  if(!have_compclassmeta)
-    croak("Cannot 'method' outside of 'class'");
-
-  lex_read_space(0);
-  SV *name = lex_scan_ident();
-  lex_read_space(0);
-
-  I32 floor_ix = start_subparse(FALSE, name ? 0 : CVf_ANON);
-  SAVEFREESV(PL_compcv);
-
-  OP *attrs = NULL;
-  if(lex_peek_unichar(0) == ':') {
-    lex_read_unichar(0);
-
-    attrs = lex_scan_attrs(PL_compcv);
-  }
-
-  I32 save_ix = block_start(TRUE);
-
   /* Splice in the slot scope CV in */
   CvOUTSIDE(compclassmeta->slotscope) = CvOUTSIDE(PL_compcv);
   CvOUTSIDE(PL_compcv) = compclassmeta->slotscope;
@@ -888,121 +874,72 @@ static int keyword_method(pTHX_ OP **op_ptr)
 
     intro_my();
   }
+}
 
-#ifdef HAVE_PARSE_SUBSIGNATURE
-  OP *sigop = NULL;
-  if(lex_peek_unichar(0) == '(') {
-    lex_read_unichar(0);
+static OP *parse_pre_blockend(pTHX_ OP *body)
+{
+  SLOTOFFSET offset = compclassmeta->offset;
+  CV *slotscope = compclassmeta->slotscope;
+  PADNAMELIST *slotnames = PadlistNAMES(CvPADLIST(slotscope));
+  I32 nslots = AvFILLp(PadlistARRAY(CvPADLIST(slotscope))[1]);
+  PADNAME **snames = PadnamelistARRAY(slotnames);
+  PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
+  OP *slotops = NULL;
 
-    sigop = parse_subsignature(0);
-    lex_read_space(0);
+  slotops = op_append_list(OP_LINESEQ, slotops,
+    newMETHSTARTOP(compclassmeta->repr)
+  );
 
-    if(PL_parser->error_count)
-      return 0;
-
-    if(lex_peek_unichar(0) != ')')
-      croak("Expected ')'");
-    lex_read_unichar(0);
-    lex_read_space(0);
-  }
-#endif
-
-  OP *body = parse_block(0);
-  SvREFCNT_inc(PL_compcv);
-
-#ifdef HAVE_PARSE_SUBSIGNATURE
-  if(sigop)
-    body = op_append_list(OP_LINESEQ, sigop, body);
-#endif
-
-  if(PL_parser->error_count) {
-    /* parse_block() still sometimes returns a valid body even if a parse
-     * error happens.
-     * We need to destroy this partial body before returning a valid(ish)
-     * state to the keyword hook mechanism, so it will find the error count
-     * correctly
-     *   See https://rt.cpan.org/Ticket/Display.html?id=130417
-     */
-#ifdef HAVE_PARSE_SUBSIGNATURE
-    if(sigop)
-      op_free(sigop);
-#endif
-    op_free(body);
-    *op_ptr = newOP(OP_NULL, 0);
-    return name ? KEYWORD_PLUGIN_STMT : KEYWORD_PLUGIN_EXPR;
-  }
-
-  {
-    SLOTOFFSET offset = compclassmeta->offset;
-    CV *slotscope = compclassmeta->slotscope;
-    PADNAMELIST *slotnames = PadlistNAMES(CvPADLIST(slotscope));
-    I32 nslots = AvFILLp(PadlistARRAY(CvPADLIST(slotscope))[1]);
-    PADNAME **snames = PadnamelistARRAY(slotnames);
-    PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
-    OP *slotops = NULL;
-
-    slotops = op_append_list(OP_LINESEQ, slotops,
-      newMETHSTARTOP(compclassmeta->repr)
-    );
-
-    int i;
-    for(i = 0; i < nslots; i++) {
-      PADNAME *slotname = snames[i + 1];
-      if(!slotname
+  int i;
+  for(i = 0; i < nslots; i++) {
+    PADNAME *slotname = snames[i + 1];
+    if(!slotname
 #if HAVE_PERL_VERSION(5, 22, 0)
-        /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
-         * slots are actually being used
-         */
-         || PadnameREFCNT(slotname) < 2
+      /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
+       * slots are actually being used
+       */
+       || PadnameREFCNT(slotname) < 2
 #endif
-        )
-          continue;
+      )
+        continue;
 
-      SLOTOFFSET slotix = offset + i;
-      PADOFFSET padix = pad_findmy_pv(PadnamePV(slotname), 0);
+    SLOTOFFSET slotix = offset + i;
+    PADOFFSET padix = pad_findmy_pv(PadnamePV(slotname), 0);
 
-      U8 private;
-      switch(PadnamePV(slotname)[0]) {
-        case '$': private = OPpSLOTPAD_SV; break;
-        case '@': private = OPpSLOTPAD_AV; break;
-        case '%': private = OPpSLOTPAD_HV; break;
-      }
-
-      slotops = op_append_list(OP_LINESEQ, slotops,
-        /* alias the padix from the slot */
-        newSLOTPADOP(0, private, padix, slotix));
-
-#if HAVE_PERL_VERSION(5, 22, 0)
-      /* Unshare the padname so the one in the scopeslot returns to refcount 1 */
-      PADNAME *newpadname = newPADNAMEpvn(PadnamePV(slotname), PadnameLEN(slotname));
-      PadnameREFCNT_dec(padnames[padix]);
-      padnames[padix] = newpadname;
-#endif
+    U8 private;
+    switch(PadnamePV(slotname)[0]) {
+      case '$': private = OPpSLOTPAD_SV; break;
+      case '@': private = OPpSLOTPAD_AV; break;
+      case '%': private = OPpSLOTPAD_HV; break;
     }
 
-    body = op_append_list(OP_LINESEQ, slotops, body);
+    slotops = op_append_list(OP_LINESEQ, slotops,
+      /* alias the padix from the slot */
+      newSLOTPADOP(0, private, padix, slotix));
+
+#if HAVE_PERL_VERSION(5, 22, 0)
+    /* Unshare the padname so the one in the scopeslot returns to refcount 1 */
+    PADNAME *newpadname = newPADNAMEpvn(PadnamePV(slotname), PadnameLEN(slotname));
+    PadnameREFCNT_dec(padnames[padix]);
+    padnames[padix] = newpadname;
+#endif
   }
 
-  body = block_end(save_ix, body);
+  return op_append_list(OP_LINESEQ, slotops, body);
+}
 
-  CV *cv = newATTRSUB(floor_ix,
-    name ? newSVOP(OP_CONST, 0, SvREFCNT_inc(name)) : NULL,
-    NULL,
-    attrs,
-    body);
+static int keyword_method(pTHX_ OP **op_ptr)
+{
+  struct XSParseSublikeHooks hooks = { 0 };
+  hooks.post_blockstart = parse_post_blockstart;
+  hooks.pre_blockend    = parse_pre_blockend;
 
-  if(name) {
-    *op_ptr = newOP(OP_NULL, 0);
+  if(!have_compclassmeta)
+    croak("Cannot 'method' outside of 'class'");
 
-    SvREFCNT_dec(name);
-    return KEYWORD_PLUGIN_STMT;
-  }
-  else {
-    *op_ptr = newUNOP(OP_REFGEN, 0,
-      newSVOP(OP_ANONCODE, 0, (SV *)cv));
+  lex_read_space(0);
 
-    return KEYWORD_PLUGIN_EXPR;
-  }
+  return xs_parse_sublike(&hooks, op_ptr);
 }
 
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
@@ -1048,3 +985,5 @@ BOOT:
   Perl_custom_op_register(aTHX_ &pp_slotpad, &xop_slotpad);
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
+
+  boot_xs_parse_sublike();

@@ -430,6 +430,7 @@ sub _build_dockerignore ( $self, $path ) {
 
             # remove leading "/"
             $line =~ s[\A/][]sm;
+            $line =~ s[\A!/][!]sm;
 
             # skip empty line
             next if $line eq $EMPTY;

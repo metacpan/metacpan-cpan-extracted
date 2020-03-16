@@ -1,0 +1,49 @@
+---
+name: QQ-weixin-work
+version: '0.03'
+author:
+  - 'yourself <admz@mail.scuec.edu.cn>'
+abstract: 'QQ::weixin::work - api for 腾讯企业微信'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+provides:
+  QQ::weixin::work:
+    file: lib/QQ/weixin/work.pm
+    version: 0.03
+  QQ::weixin::work::user:
+    file: lib/QQ/weixin/work/user.pm
+    version: 0.03
+  QQ::weixin::work::department:
+    file: lib/QQ/weixin/work/department.pm
+    version: 0.03
+  QQ::weixin::work::tag:
+    file: lib/QQ/weixin/work/tag.pm
+    version: 0.03
+  QQ::weixin::work::message:
+    file: lib/QQ/weixin/work/message.pm
+    version: 0.03
+  QQ::weixin::work::agent:
+    file: lib/QQ/weixin/work/agent.pm
+    version: 0.03
+  QQ::weixin::work::menu:
+    file: lib/QQ/weixin/work/menu.pm
+    version: 0.03
+  QQ::weixin::work::checkin:
+    file: lib/QQ/weixin/work/checkin.pm
+    version: 0.03
+  QQ::weixin::work::oa:
+    file: lib/QQ/weixin/work/oa.pm
+    version: 0.03
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'

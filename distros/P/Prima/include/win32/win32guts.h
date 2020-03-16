@@ -57,6 +57,7 @@ typedef HANDLE SOCKETHANDLE;
 #define WM_FILE                           ( WM_USER + 19)
 #define WM_CROAK                          ( WM_USER + 20)
 #define WM_REPAINT_LAYERED                ( WM_USER + 21)
+#define WM_DRAG_RESPONSE                  ( WM_USER + 22)
 #define WM_TERMINATE                      ( WM_USER + 99)
 #define WM_FIRST_USER_MESSAGE             ( WM_USER +100)
 #define WM_LAST_USER_MESSAGE              ( WM_USER +900)
@@ -91,7 +92,7 @@ typedef HANDLE SOCKETHANDLE;
 
 #define apcWarn \
 	if (debug) \
-		warn( "win32 error %d: '%s' at line %d in %s\n", (int)rc, \
+		warn( "win32 error 0x%x: '%s' at line %d in %s\n", (unsigned int)rc, \
 			err_msg( rc, nil), __LINE__, __FILE__);   \
 	else \
 		err_msg( rc, nil)
@@ -150,6 +151,9 @@ typedef struct _HandleOptions_ {
 	unsigned aptIgnoreSizeMessages   : 1;       // during window recreation
 } HandleOptions;
 
+#define CLIPBOARD_MAIN 0
+#define CLIPBOARD_DND  1
+
 typedef struct _WinGuts
 {
 	HINSTANCE      instance;           // application instance
@@ -199,6 +203,15 @@ typedef struct _WinGuts
 	Bool           dont_xlate_message; // one-time stopper to TranslateMessage() call
 	int            utf8_prepend_0x202D;// newer windows do automatic bidi conversion, this is to cancel it
 	WCHAR *      (*alloc_utf8_to_wchar_visual)(const char*,int,int*);
+	Handle         clipboards[2];
+	Bool           ole_initialized;
+	void*          dndDataSender;      // IDropTarget.DragEnter.DataObject dnd storage object
+	void*          dndDataReceiver;    // CLIPBOARD_DND storage object
+	Bool           dndInsideEvent;     // to distinguish whether the clipboard is read-only or not
+	Bool           dndDefaultCursors;
+	void*          dragSource;         // not null if dragging
+	Handle         dragSourceWidget;   //
+	Handle         dragTarget;         // last successful drop
 } WinGuts, *PWinGuts;
 
 typedef struct _WindowData
@@ -217,6 +230,11 @@ typedef struct _TimerData
 {
 	int  timeout;
 } TimerData;
+
+typedef struct _MenuItemData
+{
+	int  saved_dc;
+} MenuItemData;
 
 typedef struct _FileData
 {
@@ -430,6 +448,9 @@ typedef struct _DrawableData
 	Point          extraPos;                // used in region calculations
 	Point          layeredPos;              // delayed layered window positioning
 
+	/* Widget DND stuff */
+	void*          dropTarget;
+
 	/* Layered subpaint */
 	Point          layeredPaintOffset;
 	HDC            layeredPaintSurface;
@@ -443,6 +464,7 @@ typedef struct _DrawableData
 		FileData      file;
 		ImageData     image;
 		RegionData    region;
+		MenuItemData  menuitem;
 	} s;
 } DrawableData, *PDrawableData;
 
@@ -544,7 +566,8 @@ extern PHash        regnodeMan;
 extern Handle       lastMouseOver;
 extern int          timeDefsCount;
 extern PItemRegRec  timeDefs;
-
+extern PHash        menuBitmapMan;
+extern HBITMAP      uncheckedBitmap;
 
 LRESULT CALLBACK    generic_app_handler      ( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2);
 LRESULT CALLBACK    generic_frame_handler    ( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2);
@@ -552,7 +575,7 @@ LRESULT CALLBACK    layered_frame_handler    ( HWND win, UINT  msg, WPARAM mp1, 
 LRESULT CALLBACK    generic_view_handler     ( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2);
 
 extern int          arc_completion( double * angleStart, double * angleEnd, int * needFigure);
-extern Bool         add_font_to_hash( const PFont key, const PFont font, int vectored, Bool addSizeEntry);
+extern Bool         add_font_to_hash( const PFont key, const PFont font, Bool addSizeEntry);
 extern void         adjust_line_end( int  x1, int  y1, int * x2, int * y2, Bool forth);
 extern void         cm_squeeze_palette( PRGBColor source, int srcColors, PRGBColor dest, int destColors);
 extern Bool         create_font_hash( void);
@@ -572,7 +595,7 @@ extern void         font_free( PDCFont res, Bool permanent);
 extern void         font_logfont2font( LOGFONT * lf, Font * font, Point * resolution);
 extern void         font_pp2font( char * presParam, Font * font);
 extern void         font_textmetric2font( TEXTMETRICW * tm, Font * fm, Bool readOnly);
-extern Bool         get_font_from_hash( PFont font, int *vectored, Bool bySize);
+extern Bool         get_font_from_hash( PFont font, Bool bySize);
 extern Point        get_window_borders( int borderStyle);
 extern Bool         hwnd_check_limits( int x, int y, Bool uint);
 extern void         hwnd_enter_paint( Handle self);
@@ -584,7 +607,9 @@ extern Handle       hwnd_layered_top_level( Handle self);
 extern Bool         hwnd_repaint_layered( Handle self, Bool now);
 extern HICON        image_make_icon_handle( Handle img, Point size, Point * hotSpot);
 extern void         image_query_bits( Handle self, Bool forceNewImage);
-extern HBITMAP      image_create_bitmap( Handle self, HPALETTE pal, XBITMAPINFO * bitmapinfo, int bm_type);
+extern void         image_argb_query_bits( Handle self);
+extern HBITMAP      image_create_bitmap_by_type( Handle self, HPALETTE pal, XBITMAPINFO * bitmapinfo, int bm_type);
+extern HBITMAP      image_create_bitmap( Handle self );
 extern HBITMAP      image_create_argb_dib_section( HDC dc, int w, int h, uint32_t ** ptr);
 extern HPALETTE     image_create_palette( Handle self);
 extern void         image_destroy_cache( Handle self);
@@ -618,6 +643,21 @@ extern void         reset_system_fonts(void);
 extern void         dpi_change(void);
 extern Bool         set_dwm_blur( HWND win, int enable, HRGN mask, int transition_on_maximized);
 extern Bool         is_dwm_enabled(void);
+extern Bool         dnd_clipboard_create(void);
+extern void         dnd_clipboard_destroy(void);
+extern Bool         dnd_clipboard_open(void);
+extern Bool         dnd_clipboard_close(void);
+extern Bool         dnd_clipboard_clear(void);
+extern PList        dnd_clipboard_get_formats(void);
+extern Bool         dnd_clipboard_get_data( Handle id, PClipboardDataRec c);
+extern Bool         dnd_clipboard_has_format( Handle id);
+extern Bool         dnd_clipboard_set_data( Handle id, PClipboardDataRec c);
+extern PList        dnd_clipboard_get_formats();
+extern char *       cf2name( UINT cf );
+extern Bool         clipboard_get_data(int cfid, PClipboardDataRec c, void * p1, void * p2);
+extern void *       image_create_dib(Handle image, Bool global_alloc);
+extern Bool         HWND_lock( Bool lock);
+extern Bool         process_msg( MSG * msg);
 
 /* compatibility to MSVC 6 */
 #ifndef GWLP_USERDATA

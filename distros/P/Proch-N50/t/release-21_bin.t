@@ -10,10 +10,10 @@ use strict;
 use warnings;
 use Proch::N50;
 use Test::More;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 
-my $file = "$Bin/../data/sim2.fa";
-my $script = "$Bin/../bin/n50";
+my $file = "$RealBin/../data/sim2.fa";
+my $script = "$RealBin/../bin/n50";
 
 if (-e "$file" and -e "$script") {
 	my $output = `perl "$script" "$file" 2>/dev/null`;

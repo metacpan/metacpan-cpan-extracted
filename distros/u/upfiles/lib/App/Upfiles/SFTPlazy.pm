@@ -25,7 +25,7 @@ use Net::SFTP::Foreign;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 14;
+our $VERSION = 15;
 
 # Have croaks from Net::SFTP reported against the caller (App::Upfiles)
 # rather than here.

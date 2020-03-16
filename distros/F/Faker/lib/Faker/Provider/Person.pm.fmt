@@ -1,8 +1,0 @@
-@@ format_for_name
-{{first_name}} {{last_name}}
-
-@@ format_for_username
-{{last_name}}.{{first_name}}
-{{first_name}}.{{last_name}}
-{{first_name}}##
-?{{last_name}}

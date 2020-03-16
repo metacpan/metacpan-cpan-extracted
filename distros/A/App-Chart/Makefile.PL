@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2020 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -204,6 +204,8 @@ my %PREREQ_PM
     # my Tie-TZ
     'Tie::TZ'  => 1,
     'Time::TZ' => 6, # new in version 6
+
+    'Time::Local' => 1.27,  # for timegm_modern()
 
     # builtin in perl 5.10 (and 5.8 up), but also separate on cpan;
     # think any version ok

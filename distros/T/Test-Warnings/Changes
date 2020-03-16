@@ -1,5 +1,9 @@
 Revision history for Test-Warnings
 
+0.029     2020-03-14 05:27:59Z
+          - new :report_warnings feature, for printing all of the (unexpected)
+            warning content when had_no_warnings() is called (Tina Mueller, PR#10)
+
 0.028     2019-12-21 20:16:01Z
           - allow for calling warnings->import being called after importing
             the "warnings" sub

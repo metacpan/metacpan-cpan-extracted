@@ -15,17 +15,17 @@ name: Proch-N50
 provides:
   Proch::N50:
     file: lib/Proch/N50.pm
-    version: '0.92'
+    version: v1.0.0
 requires:
   FASTX::Reader: '0.32'
   Getopt::Long: '2.45'
   JSON::PP: '2.27'
   Pod::Usage: '1.64'
   Text::ASCIITable: '0'
-  perl: '5.014'
+  perl: '5.012'
 resources:
   homepage: https://metacpan.org/release/Proch-N50
-  repository: https://github.com/telatin/bioinfo.git
-version: '0.92'
+  repository: https://github.com/quadram-institute-bioscience/seqfu.git
+version: 1.0.0
 x_generated_by_perl: v5.22.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

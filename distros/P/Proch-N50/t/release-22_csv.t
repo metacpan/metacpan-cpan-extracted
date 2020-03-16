@@ -10,11 +10,11 @@ use strict;
 use warnings;
 use Proch::N50;
 use Test::More;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use File::Basename;
 
-my $file = "$Bin/../data/sim2.fa";
-my $script = "$Bin/../bin/n50";
+my $file = "$RealBin/../data/sim2.fa";
+my $script = "$RealBin/../bin/n50";
 # #path,seqs,size,N50,min,max
 # data/sim2.fa,21,7530,493,68,989
 if (-e "$file" and -e "$script") {

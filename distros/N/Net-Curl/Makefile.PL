@@ -4,6 +4,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 use ExtUtils::MakeMaker::Config;
 use File::Find;
+use Config;
 
 # you can set those manually if curl-config is not working for you
 my %curl = (
@@ -152,7 +153,7 @@ WriteMakefile(
 	VERSION_FROM	=> 'lib/Net/Curl.pm',
 	ABSTRACT_FROM	=> 'lib/Net/Curl.pm',
 	AUTHOR		=> "Przemys${l_}aw Iskra <sparky at pld-linux.org>",
-	CCFLAGS		=> $devel_cflags . ' ' . $curl{cflags} . $bits,
+	CCFLAGS		=> $devel_cflags . ' ' . $curl{cflags} . $bits . " $Config::Config{ccflags}",
 	LIBS		=> $curl{libs},
 	SIGN		=> 1,
 	LICENSE		=> 'mit',
@@ -327,7 +328,7 @@ sub get_constants_headers
 
 	my @out;
 	foreach my $e (sort keys %syms) {
-		if ( $e =~ /(OBSOLETE|^CURL_EXTERN|_LAST\z|_LASTENTRY\z|^CURL_FORMAT_OFF_T$|^CURL_ISOCPP$)/ ) {
+		if ( $e =~ /(OBSOLETE|^CURL_EXTERN|_LAST\z|_LASTENTRY\z|^CURL_FORMAT_OFF_T$|^CURL_ISOCPP$|^CURLOPT$)/ ) {
 			next;
 		}
 		push @out, $e;

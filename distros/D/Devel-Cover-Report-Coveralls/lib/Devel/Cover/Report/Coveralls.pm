@@ -2,7 +2,7 @@ package Devel::Cover::Report::Coveralls;
 use strict;
 use warnings;
 use 5.008005;
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 our $CONFIG_FILE = '.coveralls.yml';
 our $API_ENDPOINT = 'https://coveralls.io/api/v1/jobs';
@@ -93,7 +93,7 @@ sub get_config {
         $json->{service_name} = 'jenkins';
         $json->{service_number} = $ENV{BUILD_NUM};
     } elsif ($ENV{GITHUB_ACTIONS} && $ENV{GITHUB_SHA}) {
-        $json->{service_name}   = 'github-actions';
+        $json->{service_name}   = 'github';
         $json->{service_number} = substr($ENV{GITHUB_SHA}, 0, 9);
     } else {
         $is_travis = 0;

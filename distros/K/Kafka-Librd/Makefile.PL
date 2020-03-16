@@ -5,6 +5,7 @@ use Config;
 use ExtUtils::MakeMaker 6.64;
 use Alien::Librdkafka 0.9.3;
 use Alien::Base::Wrapper qw( Alien::Librdkafka !export );
+use File::Spec ();
 
 WriteMakefile(
     NAME                => 'Kafka::Librd',
@@ -44,6 +45,6 @@ WriteMakefile(
 );
 
 sub MY::postamble {
-    "const_xs.inc : utils/generate_const.pl\n" .
-    "\t\$(FULLPERL) utils/generate_const.pl\n";
+    "const_xs.inc : @{[ File::Spec->catfile(qw( utils generate_const.pl )) ]}\n" .
+    "\t\$(FULLPERL) @{[ File::Spec->catfile(qw( utils generate_const.pl )) ]}\n";
 }

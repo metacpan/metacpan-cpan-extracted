@@ -122,6 +122,7 @@ sub uploader_history_menu {
 
             STICKY: while ( 1 ) {
                 my @pre = ( undef );
+                # Choose
                 my $idx = choose(
                     [ @pre, map( "+ $_", @$sticky ), map( "- $_", @$history ) ],
                     { prompt => 'Stickify:', layout => 3, index => 1, undef => '  <<' }

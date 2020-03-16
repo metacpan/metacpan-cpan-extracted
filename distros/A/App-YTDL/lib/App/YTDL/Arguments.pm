@@ -254,7 +254,11 @@ sub _youtube_list_info {
     if ( ! defined $a_ref ) {
         push @{$opt->{error_get_download_infos}}, sprintf "%s: %s", $type, $list_id;
         #my $prompt = "Error list-info: $url";
-        #choose( [ 'ENTER to continue' ], { prompt => $prompt } );
+        # Choose
+        #choose(
+        #    [ 'ENTER to continue' ],
+        #    { prompt => $prompt }
+        #);
         return;
     }
     for my $entry ( @{$a_ref} ) {
@@ -273,7 +277,11 @@ sub _youtube_list_info {
     }
     if ( ! keys %{$tmp_info->{$ex}} ) {
         my $prompt = "No videos found: $type - $url";
-        choose( [ 'Continue with ENTER' ], { prompt => $prompt } );
+        # Choose
+        choose(
+            [ 'Continue with ENTER' ],
+            { prompt => $prompt }
+        );
     }
     my $up = keys %{$tmp_info->{$ex}};
     print up( $up + 2 ), cldown;
@@ -283,7 +291,7 @@ sub _youtube_list_info {
 
 sub _vimeo_list_info {
     my( $opt, $list_id ) = @_;
-    printf "Fetching info ... \n";
+    say "Fetching info ... ";
     my $page_nr = 1;
     my $ex = 'vimeo';
     my $tmp_info = {};
@@ -299,7 +307,7 @@ sub _vimeo_list_info {
         if ( ! @$a_ref ) {
             push @{$opt->{error_get_download_infos}}, sprintf "%s: no videos found.", $url;
         }
-        for my $entry ( @{$a_ref} ) {
+        for my $entry ( @$a_ref ) {
             my $video_id = $entry->{video_id};
             $tmp_info->{$ex}{$video_id} = {
                 video_id    => $video_id,
@@ -310,14 +318,18 @@ sub _vimeo_list_info {
             };
             prepare_info( $opt, $tmp_info, $ex, $video_id );
         }
-        $videos += @{$a_ref};
+        $videos += @$a_ref;
         last if $opt->{list_type_vimeo} == 2 && $videos >= 48;
         last if ! $next;
         $page_nr++;
     }
     if ( ! keys %{$tmp_info->{$ex}} ) {
         my $prompt = "No videos found: $url";
-        choose( [ 'Continue with ENTER' ], { prompt => $prompt } );
+        # Choose
+        choose(
+            [ 'Continue with ENTER' ],
+            { prompt => $prompt }
+        );
     }
     my $up = keys %{$tmp_info->{$ex}};
     print up( $up + 2 ), cldown;

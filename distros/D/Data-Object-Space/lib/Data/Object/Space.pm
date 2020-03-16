@@ -8,7 +8,7 @@ use routines;
 
 use parent 'Data::Object::Name';
 
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 # METHODS
 
@@ -192,6 +192,11 @@ method id() {
   return $self->label;
 }
 
+method inherits() {
+
+  return $self->array('ISA');
+}
+
 my $loaded_spaces = {};
 
 method load() {
@@ -217,7 +222,7 @@ method load() {
   do {
     require Carp;
 
-    my $message = lc $error || "cause unknown";
+    my $message = $error || "cause unknown";
 
     Carp::confess "Error attempting to load $class: $message";
   }
@@ -391,6 +396,11 @@ method variables() {
   return [map [$_, [sort @{$self->$_}]], qw(arrays hashes scalars)];
 }
 
+method version() {
+
+  return $self->scalar('VERSION');
+}
+
 1;
 
 =encoding utf8
@@ -420,6 +430,22 @@ Namespace Class for Perl 5
 =head1 DESCRIPTION
 
 This package provides methods for parsing and manipulating package namespaces.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Data::Object::Name>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Types::Standard>
 
 =cut
 
@@ -867,6 +893,51 @@ The id method returns the fully-qualified package name as a label.
   $space->id
 
   # Foo_Bar
+
+=back
+
+=cut
+
+=head2 inherits
+
+  inherits() : ArrayRef
+
+The inherits method returns the list of superclasses the target package is
+derived from.
+
+=over 4
+
+=item inherits example #1
+
+  package Bar;
+
+  package main;
+
+  my $space = Data::Object::Space->new('bar');
+
+  $space->inherits
+
+  # []
+
+=back
+
+=over 4
+
+=item inherits example #2
+
+  package Foo;
+
+  package Bar;
+
+  use base 'Foo';
+
+  package main;
+
+  my $space = Data::Object::Space->new('bar');
+
+  $space->inherits
+
+  # ['Foo']
 
 =back
 
@@ -1416,6 +1487,53 @@ their names.
   #   ['hashes', ['sets']],
   #   ['scalars', ['func', 'init']],
   # ]
+
+=back
+
+=cut
+
+=head2 version
+
+  version() : Maybe[Str]
+
+The version method returns the C<VERSION> declared on the target package, if
+any.
+
+=over 4
+
+=item version example #1
+
+  package Foo::Boo;
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/boo');
+
+  $space->version
+
+  # undef
+
+=back
+
+=over 4
+
+=item version example #2
+
+  package Foo::Boo;
+
+  our $VERSION = 0.01;
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/boo');
+
+  $space->version
+
+  # '0.01'
 
 =back
 

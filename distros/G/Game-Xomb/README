@@ -30,12 +30,20 @@
     we call this foe. Do you now seek the stone
     below of Dragon born to call your own?
 
-Xomb is a terminal-based roguelike. Assuming that the development tools,
-perl, App::cpanminus, and possibly also local::lib are installed and
-setup, in a suitable terminal install and run the game via:
+Xomb is a terminal-based roguelike. Assuming that the development tools
+(C99 support is required), perl, App::cpanminus, and optionally
+local::lib are installed and setup in a suitable terminal install and
+run the game via:
 
     cpanm Game::Xomb
     xomb
+
+NOTE the 7DRL 2020 version is 1.00; anything released after that is
+post-challenge fixes and improvements. The 7DRL version may be
+installed via:
+
+    cpanm JMATES/Game-Xomb-1.00.tar.gz
+
 
 Documentation is available in xomb(1) or by running:
 

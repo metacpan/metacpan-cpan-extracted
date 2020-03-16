@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
@@ -474,14 +474,14 @@ sub _meta_resources {
 
     unless ( $self->use_github_homepage ) {
         $resources{homepage}
-            = sprintf( 'http://metacpan.org/release/%s', $self->dist );
+            = sprintf( 'https://metacpan.org/release/%s', $self->dist );
     }
 
     unless ( $self->use_github_issues ) {
         %resources = (
             %resources,
             'bugtracker.web' => sprintf(
-                'http://rt.cpan.org/Public/Dist/Display.html?Name=%s',
+                'https://rt.cpan.org/Public/Dist/Display.html?Name=%s',
                 $self->dist
             ),
             'bugtracker.mailto' =>
@@ -860,7 +860,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -958,9 +958,9 @@ This is more or less equivalent to the following F<dist.ini>:
     homepage = 0
 
     [MetaResources]
-    homepage = http://metacpan.org/release/My-Module
+    homepage = https://metacpan.org/release/My-Module
     ; RT bits are omitted if use_github_issue is true
-    bugtracker.web  = http://rt.cpan.org/Public/Dist/Display.html?Name=My-Module
+    bugtracker.web  = https://rt.cpan.org/Public/Dist/Display.html?Name=My-Module
     bugtracker.mail = bug-My-Module@rt.cpan.org
 
     [MetaProvides::Pckage]
@@ -1163,7 +1163,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 
 =head1 AUTHOR
 
@@ -1177,7 +1177,7 @@ Mark Fowler <mark@twoshortplanks.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2019 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

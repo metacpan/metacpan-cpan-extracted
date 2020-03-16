@@ -32,12 +32,12 @@ sub polyline_to_points
 		if ( $dx > 0 ) {
 			my $dy = ($y2 - $y1) / $dx;
 			my $y = $y1;
-			for ( my $x = $x1; $x <= $x2; $x++) {
+			for ( my $x = int($x1); $x <= int($x2); $x++) {
 				$map[$x] = $y;
 				$y += $dy;
 			}
 		} else {
-			$map[$x1] = $y1;
+			$map[int($x1)] = $y1;
 		}
 	}
 	return \@map;
@@ -270,7 +270,7 @@ adding C<new_gradient> function.
 		palette => [ cl::White, cl::Blue, cl::White ],
 	)-> sector(50,50,100,100,0,360);
 
-=for podview <img src="gradient.gif">
+=for podview <img src="Prima/gradient.gif">
 
 =for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/gradient.gif">
 

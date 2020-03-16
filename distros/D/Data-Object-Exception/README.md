@@ -43,6 +43,28 @@ The package allows objects to be instantiated with a single argument.
 
 The package allows objects to be instantiated with key-value arguments.
 
+# ATTRIBUTES
+
+This package has the following attributes:
+
+## context
+
+    context(Any)
+
+This attribute is read-only, accepts `(Any)` values, and is optional.
+
+## id
+
+    id(Str)
+
+This attribute is read-only, accepts `(Str)` values, and is optional.
+
+## message
+
+    message(Str)
+
+This attribute is read-only, accepts `(Str)` values, and is optional.
+
 # METHODS
 
 This package implements the following methods:
@@ -63,17 +85,33 @@ The explain method returns an error message with stack trace.
 
 ## throw
 
-    throw(Str $class, Any $context, Maybe[Number] $offset) : Any
+    throw(Tuple[Str, Str] | Str $message, Any $context, Maybe[Number] $offset) : Any
 
-The throw method throws an error with message.
+The throw method throws an error with message (and optionally, an ID).
 
 - throw example #1
+
+        use Data::Object::Exception;
+
+        my $exception = Data::Object::Exception->new;
+
+        $exception->throw('Oops!')
+
+- throw example #2
 
         use Data::Object::Exception;
 
         my $exception = Data::Object::Exception->new('Oops!');
 
         $exception->throw
+
+- throw example #3
+
+        use Data::Object::Exception;
+
+        my $exception = Data::Object::Exception->new;
+
+        $exception->throw(['E001', 'Oops!'])
 
 ## trace
 

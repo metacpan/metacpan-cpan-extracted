@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBuild 0.29 {
+package Dist::Zilla::Plugin::AlienBuild 0.30 {
 
   use 5.014;
   use Moose;
@@ -248,7 +248,7 @@ Dist::Zilla::Plugin::AlienBuild - Use Alien::Build with Dist::Zilla
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 

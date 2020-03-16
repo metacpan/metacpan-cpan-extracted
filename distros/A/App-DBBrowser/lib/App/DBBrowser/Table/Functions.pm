@@ -128,10 +128,10 @@ sub __prepare_col_func {
             '  ****************   Micro-Second',
             '  *************      Milli-Second',
             '  **********               Second' );
-        my $choices = [ undef, $microseconds, $milliseconds, $seconds ];
+        my $menu = [ undef, $microseconds, $milliseconds, $seconds ];
         # Choose
         my $interval = $tc->choose(
-            $choices,
+            $menu,
             { %{$sf->{i}{lyt_v}}, prompt => $prompt }
         );
         return if ! defined $interval;

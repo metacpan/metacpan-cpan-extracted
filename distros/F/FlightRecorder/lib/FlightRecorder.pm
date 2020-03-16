@@ -14,7 +14,7 @@ use Data::Object::ClassHas;
 with 'Data::Object::Role::Pluggable';
 with 'Data::Object::Role::Throwable';
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 # ATTRIBUTES
 
@@ -413,6 +413,14 @@ L<Data::Object::Role::Throwable>
 
 =cut
 
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Types::Standard>
+
+=cut
+
 =head1 ATTRIBUTES
 
 This package has the following attributes:
@@ -691,8 +699,8 @@ a C<hashref>.
 
   succinct() : Object
 
-The succinct method loads and returns the L<FlightRecorder::Plugin::Succinct>
-report plugin.
+The succinct method loads and returns the
+L<FlightRecorder::Plugin::ReportSuccinct> report plugin.
 
 =over 4
 
@@ -729,8 +737,8 @@ provided.
 
   verbose() : Object
 
-The verbose method loads and returns the L<FlightRecorder::Plugin::Verbose>
-report plugin.
+The verbose method loads and returns the
+L<FlightRecorder::Plugin::ReportVerbose> report plugin.
 
 =over 4
 

@@ -32,6 +32,12 @@ This package integrates behaviors from:
 
 [Data::Object::Role::Throwable](https://metacpan.org/pod/Data::Object::Role::Throwable)
 
+# LIBRARIES
+
+This package uses type constraints from:
+
+[Types::Standard](https://metacpan.org/pod/Types::Standard)
+
 # ATTRIBUTES
 
 This package has the following attributes:
@@ -224,8 +230,8 @@ a `hashref`.
 
     succinct() : Object
 
-The succinct method loads and returns the [FlightRecorder::Plugin::Succinct](https://metacpan.org/pod/FlightRecorder::Plugin::Succinct)
-report plugin.
+The succinct method loads and returns the
+[FlightRecorder::Plugin::ReportSuccinct](https://metacpan.org/pod/FlightRecorder::Plugin::ReportSuccinct) report plugin.
 
 - succinct example #1
 
@@ -250,8 +256,8 @@ provided.
 
     verbose() : Object
 
-The verbose method loads and returns the [FlightRecorder::Plugin::Verbose](https://metacpan.org/pod/FlightRecorder::Plugin::Verbose)
-report plugin.
+The verbose method loads and returns the
+[FlightRecorder::Plugin::ReportVerbose](https://metacpan.org/pod/FlightRecorder::Plugin::ReportVerbose) report plugin.
 
 - verbose example #1
 

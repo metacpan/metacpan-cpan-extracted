@@ -15,7 +15,7 @@ package API::GitForge::GitLab;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$API::GitForge::GitLab::VERSION = '0.003';
+$API::GitForge::GitLab::VERSION = '0.004';
 
 use 5.028;
 use strict;
@@ -151,7 +151,7 @@ API::GitForge::GitLab - common git forge operations using the GitLab API
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

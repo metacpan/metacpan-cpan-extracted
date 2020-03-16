@@ -209,6 +209,7 @@ flags = fcntl(tac_fd, F_GETFL, 0);
 if( flags < 0 ) {
 	//fprintf( stderr, "fcntl: %s\n", strerror(errno) );
 	tac_err = "socket error";
+	close(tac_fd);
 	return -1;
 }
 
@@ -217,6 +218,7 @@ res = fcntl( tac_fd, F_SETFL, flags | O_NONBLOCK );
 if( res < 0 ) {
 	//fprintf( stderr, "fcntl: %s\n", strerror(errno) );
 	tac_err = "socket error";
+	close(tac_fd);
 	return -1;
 }
 
@@ -226,6 +228,7 @@ res = connect (tac_fd, (struct sockaddr *) &tac_port, sizeof tac_port);
 // connection not established, but in progress
 if( res < 0 && (errno != EINPROGRESS) ) {
 	tac_err = "connection failed";
+	close(tac_fd);
 	return -1;
 }
 
@@ -239,10 +242,12 @@ if( res != 0 ) {
 	res = select( tac_fd+1, NULL, &wset, NULL, &tv );
 	if( res < 0 ) {
 		tac_err = "select failed";
+		close(tac_fd);
 		return -1;
 	}
 	else if( res == 0 ) {
 		tac_err = "timeout";
+		close(tac_fd);
 		return -1;
 	}
 	if( res > 0 ) {
@@ -251,10 +256,12 @@ if( res != 0 ) {
 		len = sizeof(optval);
 		if( getsockopt( tac_fd, SOL_SOCKET, SO_ERROR, (void *)&optval, &len ) > 0 ) {
 			tac_err = "getsockopt failed";
+			close(tac_fd);
 			return -1;
 		}
 		if( optval != 0 ) {
 			tac_err = "connection failed";
+			close(tac_fd);
 			return -1;
 		}
 		// optval == 0 --> no error, connection established

@@ -1,20 +1,21 @@
-#include <xs/xs.h>
-#include <xs/lib/merge.h>
+#include <xs.h>
+#include <xs/merge.h>
+
+using xs::Sv;
+using xs::merge;
 
 typedef OP* (*opcheck_t) (pTHX_ OP* op);
 static opcheck_t orig_opcheck = NULL;
 
 static OP* pp_sassign (pTHX) {
     dSP;
-    SV* left = *SP; SV* right = *(SP-1);
+    Sv left  = *SP;
+    Sv right = *(SP-1);
 
-    if (PL_op->op_private & OPpASSIGN_BACKWARDS) {
-        SV*const temp = left;
-        left = right; right = temp;
-    }
+    if (PL_op->op_private & OPpASSIGN_BACKWARDS) swap(left, right);
     
-    if (SvROK(left) && SvROK(right) && SvTYPE(SvRV(left)) == SvTYPE(SvRV(right)) && SvTYPE(SvRV(left)) == SVt_PVHV) {
-        xs::lib::merge(aTHX_ left, right);
+    if (left.is_hash_ref() && right.is_hash_ref()) {
+        xs::merge(left, right);
         POPs; SETs(left);
         return NORMAL;
     }

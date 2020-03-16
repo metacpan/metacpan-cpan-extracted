@@ -17,10 +17,7 @@
       "directory" : [
          "t",
          "xt",
-         "inc"
-      ],
-      "namespace" : [
-         "Duadua::Parser"
+         "share"
       ]
    },
    "prereqs" : {
@@ -31,7 +28,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40",
+            "Module::Build" : "0.42",
             "Module::Build::Pluggable" : "0",
             "Module::Build::Pluggable::CPANfile" : "0.05"
          }
@@ -57,165 +54,6 @@
          }
       }
    },
-   "provides" : {
-      "Duadua" : {
-         "file" : "lib/Duadua.pm",
-         "version" : "0.14"
-      },
-      "Duadua::CLI" : {
-         "file" : "lib/Duadua/CLI.pm"
-      },
-      "Duadua::Parser" : {
-         "file" : "lib/Duadua/Parser.pm"
-      },
-      "Duadua::Parser::Bot::AdIdxBot" : {
-         "file" : "lib/Duadua/Parser/Bot/AdIdxBot.pm"
-      },
-      "Duadua::Parser::Bot::Applebot" : {
-         "file" : "lib/Duadua/Parser/Bot/Applebot.pm"
-      },
-      "Duadua::Parser::Bot::Baiduspider" : {
-         "file" : "lib/Duadua/Parser/Bot/Baiduspider.pm"
-      },
-      "Duadua::Parser::Bot::Barkrowler" : {
-         "file" : "lib/Duadua/Parser/Bot/Barkrowler.pm"
-      },
-      "Duadua::Parser::Bot::BingPreview" : {
-         "file" : "lib/Duadua/Parser/Bot/BingPreview.pm"
-      },
-      "Duadua::Parser::Bot::Bingbot" : {
-         "file" : "lib/Duadua/Parser/Bot/Bingbot.pm"
-      },
-      "Duadua::Parser::Bot::BotMisc" : {
-         "file" : "lib/Duadua/Parser/Bot/BotMisc.pm"
-      },
-      "Duadua::Parser::Bot::DuckDuckBot" : {
-         "file" : "lib/Duadua/Parser/Bot/DuckDuckBot.pm"
-      },
-      "Duadua::Parser::Bot::FacebookCrawler" : {
-         "file" : "lib/Duadua/Parser/Bot/FacebookCrawler.pm"
-      },
-      "Duadua::Parser::Bot::Fastladder" : {
-         "file" : "lib/Duadua/Parser/Bot/Fastladder.pm"
-      },
-      "Duadua::Parser::Bot::Feedbin" : {
-         "file" : "lib/Duadua/Parser/Bot/Feedbin.pm"
-      },
-      "Duadua::Parser::Bot::Feedeen" : {
-         "file" : "lib/Duadua/Parser/Bot/Feedeen.pm"
-      },
-      "Duadua::Parser::Bot::Feedly" : {
-         "file" : "lib/Duadua/Parser/Bot/Feedly.pm"
-      },
-      "Duadua::Parser::Bot::GoogleRead" : {
-         "file" : "lib/Duadua/Parser/Bot/GoogleRead.pm"
-      },
-      "Duadua::Parser::Bot::Googlebot" : {
-         "file" : "lib/Duadua/Parser/Bot/Googlebot.pm"
-      },
-      "Duadua::Parser::Bot::GooglebotAd" : {
-         "file" : "lib/Duadua/Parser/Bot/GooglebotAd.pm"
-      },
-      "Duadua::Parser::Bot::GooglebotMisc" : {
-         "file" : "lib/Duadua/Parser/Bot/GooglebotMisc.pm"
-      },
-      "Duadua::Parser::Bot::GooglebotMobile" : {
-         "file" : "lib/Duadua/Parser/Bot/GooglebotMobile.pm"
-      },
-      "Duadua::Parser::Bot::HatenaBot" : {
-         "file" : "lib/Duadua/Parser/Bot/HatenaBot.pm"
-      },
-      "Duadua::Parser::Bot::Huawei" : {
-         "file" : "lib/Duadua/Parser/Bot/Huawei.pm"
-      },
-      "Duadua::Parser::Bot::Inoreader" : {
-         "file" : "lib/Duadua/Parser/Bot/Inoreader.pm"
-      },
-      "Duadua::Parser::Bot::LetsEncrypt" : {
-         "file" : "lib/Duadua/Parser/Bot/LetsEncrypt.pm"
-      },
-      "Duadua::Parser::Bot::MailRUBot" : {
-         "file" : "lib/Duadua/Parser/Bot/MailRUBot.pm"
-      },
-      "Duadua::Parser::Bot::Msnbot" : {
-         "file" : "lib/Duadua/Parser/Bot/Msnbot.pm"
-      },
-      "Duadua::Parser::Bot::Netcraft" : {
-         "file" : "lib/Duadua/Parser/Bot/Netcraft.pm"
-      },
-      "Duadua::Parser::Bot::OracleGrapeshotCrawler" : {
-         "file" : "lib/Duadua/Parser/Bot/OracleGrapeshotCrawler.pm"
-      },
-      "Duadua::Parser::Bot::SMTBot" : {
-         "file" : "lib/Duadua/Parser/Bot/SMTBot.pm"
-      },
-      "Duadua::Parser::Bot::Sakura" : {
-         "file" : "lib/Duadua/Parser/Bot/Sakura.pm"
-      },
-      "Duadua::Parser::Bot::Slackbot" : {
-         "file" : "lib/Duadua/Parser/Bot/Slackbot.pm"
-      },
-      "Duadua::Parser::Bot::Twitterbot" : {
-         "file" : "lib/Duadua/Parser/Bot/Twitterbot.pm"
-      },
-      "Duadua::Parser::Bot::YahooJapanBot" : {
-         "file" : "lib/Duadua/Parser/Bot/YahooJapanBot.pm"
-      },
-      "Duadua::Parser::Bot::YahooSlurp" : {
-         "file" : "lib/Duadua/Parser/Bot/YahooSlurp.pm"
-      },
-      "Duadua::Parser::Bot::YandexBot" : {
-         "file" : "lib/Duadua/Parser/Bot/YandexBot.pm"
-      },
-      "Duadua::Parser::Browser::AppleSafari" : {
-         "file" : "lib/Duadua/Parser/Browser/AppleSafari.pm"
-      },
-      "Duadua::Parser::Browser::BrowserMisc" : {
-         "file" : "lib/Duadua/Parser/Browser/BrowserMisc.pm"
-      },
-      "Duadua::Parser::Browser::DuckDuckGo" : {
-         "file" : "lib/Duadua/Parser/Browser/DuckDuckGo.pm"
-      },
-      "Duadua::Parser::Browser::GoogleChrome" : {
-         "file" : "lib/Duadua/Parser/Browser/GoogleChrome.pm"
-      },
-      "Duadua::Parser::Browser::MicrosoftEdge" : {
-         "file" : "lib/Duadua/Parser/Browser/MicrosoftEdge.pm"
-      },
-      "Duadua::Parser::Browser::MicrosoftInternetExplorer" : {
-         "file" : "lib/Duadua/Parser/Browser/MicrosoftInternetExplorer.pm"
-      },
-      "Duadua::Parser::Browser::MozillaFirefox" : {
-         "file" : "lib/Duadua/Parser/Browser/MozillaFirefox.pm"
-      },
-      "Duadua::Parser::Browser::Opera" : {
-         "file" : "lib/Duadua/Parser/Browser/Opera.pm"
-      },
-      "Duadua::Parser::Browser::PaleMoon" : {
-         "file" : "lib/Duadua/Parser/Browser/PaleMoon.pm"
-      },
-      "Duadua::Parser::Browser::UCBrowser" : {
-         "file" : "lib/Duadua/Parser/Browser/UCBrowser.pm"
-      },
-      "Duadua::Parser::Browser::Vivaldi" : {
-         "file" : "lib/Duadua/Parser/Browser/Vivaldi.pm"
-      },
-      "Duadua::Parser::Browser::Xiaomi" : {
-         "file" : "lib/Duadua/Parser/Browser/Xiaomi.pm"
-      },
-      "Duadua::Parser::Browser::Yandex" : {
-         "file" : "lib/Duadua/Parser/Browser/Yandex.pm"
-      },
-      "Duadua::Parser::FeaturePhone::FeaturePhone" : {
-         "file" : "lib/Duadua/Parser/FeaturePhone/FeaturePhone.pm"
-      },
-      "Duadua::Parser::HTTPClient::HTTPClient" : {
-         "file" : "lib/Duadua/Parser/HTTPClient/HTTPClient.pm"
-      },
-      "Duadua::Util" : {
-         "file" : "lib/Duadua/Util.pm"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -228,6 +66,6 @@
          "url" : "http://github.com/bayashi/Duadua"
       }
    },
-   "version" : "0.14",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

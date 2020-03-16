@@ -21,7 +21,6 @@ my %WriteMakefileArgs = (
     "Params::ValidationCompiler" => 0,
     "Test2::API" => 0,
     "Types::Standard" => 0,
-    "base" => 0,
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
@@ -30,7 +29,7 @@ my %WriteMakefileArgs = (
     "Module::Metadata" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +45,6 @@ my %FallbackPrereqs = (
   "Test2::API" => 0,
   "Test::More" => 0,
   "Types::Standard" => 0,
-  "base" => 0,
   "namespace::autoclean" => 0
 );
 

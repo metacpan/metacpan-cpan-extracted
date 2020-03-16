@@ -22,7 +22,7 @@ You can write your driver with the same interface, but with a different implemen
 
 package WebService::CEPH::NetAmazonS3;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use strict;
 use warnings;
@@ -116,17 +116,19 @@ Parameters:
 
 4) Content-Type, optional
 
-Upload an object for one request (non-multipart upload), put a private ACL, add a custom x-amz-meta-md5 header, which equals md5 hex from the file
+5) ACL, optional
+
+Upload an object for one request (non-multipart upload), put a custom or private ACL, add a custom x-amz-meta-md5 header, which equals md5 hex from the file
 
 =cut
 
 sub upload_single_request {
-    my ($self, $key) = (shift, shift); # after shifts: $_[0] - value, $_[1] - content-type
+    my ($self, $key) = (shift, shift); # after shifts: $_[0] - value, $_[1] - content-type, $_[2] - acl
 
     my $md5 = md5_hex($_[0]);
     my $object = $self->_request_object->object(
         key => $key,
-        acl_short => 'private',
+        acl_short => $_[2] || 'private',
         $_[1] ? ( content_type => $_[1] ) : ()
     );
     $object->user_metadata->{'md5'} = $md5;
@@ -228,17 +230,21 @@ Parameters:
 
 3) md5 from data
 
+4) Content-type, optional
+
+5) ACL, optional
+
 Initiates multipart upload, sets x-amz-meta-md5 to md5 value of the file (needs to be calculated in advance and pass it as a parameter).
 Returns a reference to a structure of an undocumented nature, which should be used later to work with this multipart upload
 
 =cut
 
 sub initiate_multipart_upload {
-    my ($self, $key, $md5, $content_type) = @_;
+    my ($self, $key, $md5, $content_type, $acl) = @_;
 
     confess "Missing bucket" unless $self->{bucket};
 
-    my $object = $self->_request_object->object( key => $key, acl_short => 'private' );
+    my $object = $self->_request_object->object( key => $key, acl_short => $acl || 'private' );
 
     my $http_request = Net::Amazon::S3::Request::InitiateMultipartUpload->new(
         s3     => $self->{client}->s3,

@@ -58,6 +58,7 @@
             "Module::Load" : "0",
             "Regexp::Common" : "0",
             "Regexp::Common::Emacs" : "0",
+            "Time::Local" : "1.27",
             "URI" : "0",
             "perl" : "5.010"
          },
@@ -74,6 +75,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : 14,
+   "version" : 15,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

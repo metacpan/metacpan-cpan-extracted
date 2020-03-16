@@ -1,36 +1,28 @@
-upstream <: $name :> {
+upstream <: $vhost_name :> {
     server <: $upstream :>;
 
     keepalive 180; # TODO set from variable
 }
 
-: if $default_server {
-# default server
-server {
-    listen                    *:80 default_server;
-    listen                    [::]:80 default_server;
-    server_name               "";
-    return                    444;
-}
-: }
-
-: for $host.keys() -> $host_name {
 server {
     listen                    *:80;
     listen                    [::]:80;
+: if $load_balancer_sock {
     listen                    unix:<: $load_balancer_sock :>;
-    server_name               <: $host_name | raw :>;
+: }
+: for $server_name -> $name {
+    server_name               <: $name | raw :>;
+: }
 
     keepalive_timeout         70;
-    # root                      <: $root_dir :>; # TODO
 
-    error_log                 <: $data_dir :>/nginx-error.log info;
-    access_log                <: $data_dir :>/nginx-access.log default;
+    # error_log                 <: $data_dir :>/nginx-error.log info;
+    # access_log                <: $data_dir :>/nginx-access.log default;
 
     client_max_body_size      10M;
 
     location @backend {
-        proxy_pass http://<: $name :>;
+        proxy_pass http://<: $vhost_name :>;
 
         proxy_read_timeout 60s;
 
@@ -45,8 +37,7 @@ server {
         proxy_set_header Connection $connection_upgrade;
     }
 
-: for $host[$host_name]["location"] -> $location {
+: for $locations -> $location {
 <: $location | raw :>
 : }
 }
-: }

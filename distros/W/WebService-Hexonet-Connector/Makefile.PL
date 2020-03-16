@@ -9,16 +9,16 @@ WriteMakefile(
     VERSION_FROM => 'lib/WebService/Hexonet/Connector.pm',
     PREREQ_PM    => {
         'LWP::Protocol::https' => 6.07,
-        'LWP::UserAgent'       => 6.35,
+        'LWP::UserAgent'       => 6.43,
         'Time::Local'          => 0,
         'MIME::Base64'         => 0,
-        'Data::Dumper'         => 2.161,
+        'Data::Dumper'         => 0,
         'utf8'                 => 0,
         'Readonly'             => 2.05,
         'Carp'                 => 0,
         'POSIX'                => 0,
-        'List::MoreUtils'      => 0.416,
-        'version'              => 0.9917,
+        'List::MoreUtils'      => 0.428,
+        'version'              => 0.9924,
         'Config'               => 0
     },
     TEST_REQUIRES => {
@@ -27,7 +27,7 @@ WriteMakefile(
         'Test::RequiresInternet' => 0.05,
         'Scalar::Util'           => 0,
         'Readonly'               => 2.05,
-        'version'                => 0.9917,
+        'version'                => 0.9924,
         'POSIX'                  => 0,
         'Config'                 => 0
     },

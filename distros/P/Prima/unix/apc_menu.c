@@ -6,7 +6,7 @@
 
 #include "unix/guts.h"
 #include "Menu.h"
-#include "Image.h"
+#include "Icon.h"
 #include "Window.h"
 #include "Application.h"
 #define XK_MISCELLANY
@@ -15,6 +15,9 @@
 #include <X11/keysymdef.h>
 
 #define TREE            (PAbstractMenu(self)->tree)
+
+#define MAX_BITMAP_HEIGHT (guts.displaySize.y / 4)
+#define MAX_BITMAP_WIDTH  (guts.displaySize.x / 4)
 
 static PMenuWindow
 get_menu_window( Handle self, XWindow xw)
@@ -104,14 +107,30 @@ item_count( PMenuWindow w)
 }
 
 static void
+kill_menu_bitmap( PMenuBitmap bm )
+{
+	if ( bm-> xor ) {
+		prima_refcnt_dec(bm->xor);
+		unprotect_object(bm->xor);
+		Object_destroy( bm->xor);
+	}
+	if ( bm-> and ) {
+		prima_refcnt_dec(bm->and);
+		unprotect_object(bm->and);
+		Object_destroy( bm->and);
+	}
+}
+
+static void
 free_unix_items( PMenuWindow w)
 {
-	int i;
 	if ( w-> um) {
 		if ( w-> first < 0) {
-			for ( i = 0; i < w->num; i++)
-				if ( w-> um[i].pixmap)
-					XFreePixmap( DISP, w-> um[i].pixmap);
+			int i;
+			for ( i = 0; i < w->num; i++) {
+				kill_menu_bitmap( &w->um[i].icon  );
+				kill_menu_bitmap( &w->um[i].bitmap);
+			}
 			free( w-> um);
 		}
 		w-> um = nil;
@@ -150,9 +169,6 @@ menu_window_delete_downlinks( PMenuSysData XX, PMenuWindow wx)
 	XX-> focused = wx;
 	XFlush(DISP);
 }
-
-#define MENU_XOFFSET 5
-#define MENU_CHECK_XOFFSET 10
 
 static int
 get_text_width( PCachedFont font, const char * text, int byte_length, Bool utf8, uint32_t * xft_map8)
@@ -194,8 +210,10 @@ get_font_abc( PCachedFont font, char * index, Bool utf8, FontABC * rec, MenuDraw
 #ifdef USE_XFT
 	if ( font-> xft) {
 		Point ovx;
-		rec-> b = prima_xft_get_text_width( font, index, 1, false,
-														utf8, data-> xft_map8, &ovx);
+		rec-> b = prima_xft_get_text_width(
+			font, index, 1, false,
+			utf8, data-> xft_map8, &ovx
+		);
 		/* not really abc, but enough for its single invocation */
 		rec-> a = -ovx. x;
 		rec-> c = -ovx. y;
@@ -237,26 +255,191 @@ text_out( PCachedFont font, const char * text, int length, int x, int y,
 }
 
 static void
+convert_to_lowres(Handle src)
+{
+	int i, colors = 0;
+	RGBColor palette[256];
+
+	for ( i = 0; i < guts. palSize; i++) {
+		if ( guts. palette[i]. rank <= RANK_LOCKED) continue;
+		palette[colors]. r = guts. palette[i]. r;
+		palette[colors]. g = guts. palette[i]. g;
+		palette[colors]. b = guts. palette[i]. b;
+		if ( ++colors > 255) break;
+	}
+
+	CImage(src)->reset( src, guts.qdepth, palette, colors);
+}
+
+static Bool
+create_menu_bitmap(Handle src, PMenuBitmap dst, Bool layered, Bool disabled, int * w, int * h)
+{
+	Bool dispose_src = false;
+	PIcon i = (PIcon) src;
+
+	if ( i == NULL || i-> stage >= csDead)
+		return false;
+
+	bzero(dst, sizeof(MenuBitmap));
+
+	/* XXX check for dynamic colors and layered env */
+#define USE_ARGB_SHADING 1
+
+	if ( i-> w > MAX_BITMAP_WIDTH || i-> h > MAX_BITMAP_HEIGHT ) {
+		Handle dup;
+		int w = i-> w, h = i-> h;
+		if ( w > MAX_BITMAP_WIDTH  ) w = MAX_BITMAP_WIDTH;
+		if ( h > MAX_BITMAP_HEIGHT ) h = MAX_BITMAP_HEIGHT;
+
+		dup = i-> self-> dup(src);
+		Object_destroy(dup);
+		dispose_src = true;
+		src = dup;
+
+		i = (PIcon) src;
+		i-> self-> stretch(src, w, h);
+	}
+	*w = i->w;
+	*h = i->h;
+
+	/* menu is special around 1-bit/1-bit icons, for win32 compat - these should be treated as bitmaps
+	to paint with menu colors */
+	if ( XT_IS_ICON(X(src)) && ((i->type & imBPP) == 1) && (i->maskType == 1)) {
+		IconHandle split = i->self->split(src);
+		dst->is_mono = true;
+		dst->xor  = CImage(split.xorMask)->bitmap(split.xorMask);
+		Object_destroy( split.xorMask );
+		Object_destroy( split.andMask );
+	}
+
+	/* as-is image */
+	else if ( !( XT_IS_ICON(X(src))) && !disabled ) {
+		goto FALLBACK;
+	}
+
+	/* as-is icon */
+	else if ( XT_IS_ICON(X(src)) && !disabled && (i->maskType == 1)) {
+		IconHandle split = i->self->split(src);
+		if ( guts.dynamicColors )
+			convert_to_lowres(split.xorMask);
+		dst->xor = CImage(split.xorMask)->bitmap(split.xorMask);
+		dst->and = CImage(split.andMask)->bitmap(split.andMask);
+		Object_destroy( split.xorMask );
+		Object_destroy( split.andMask );
+	}
+
+	/* layering is available -- use it */
+	else if (
+		guts. argb_depth &&
+		(
+			layered ||
+			( disabled && USE_ARGB_SHADING ) ||
+			( XT_IS_ICON(X(src)) && (i->maskType == 8))
+		)
+	) {
+		/* convert input to rgba */
+		if ( XT_IS_ICON(X(src))) {
+			if ( !dispose_src ) {
+				i = (PIcon)(src = i->self->dup(src));
+				dispose_src = true;
+			}
+			if ( i-> maskType == 1 ) 
+				i->self->set_maskType(src, 8);
+			if ( disabled ) {
+				int sz = i-> maskSize;
+				Byte * p = i-> mask;
+				while (sz--) *(p++) /= 2;
+			}
+			i-> autoMasking = amNone;
+			i-> self-> set_type( src, imRGB );
+			i-> self-> premultiply_alpha(src, NULL);
+			dst->xor  = CImage(src)->bitmap(src);
+		} else {
+			Handle dup = (Handle) create_object("Prima::Icon", "iiiii",
+				"width", i->w,
+				"height", i-> h,
+				"type", i->type,
+				"maskType", 8,
+				"autoMasking", amNone
+			);
+			PImage(dup)->palSize = i->palSize;
+			memcpy( PImage(dup)->palette, i->palette, i->palSize * 3);
+			memcpy( PImage(dup)->data, i->data, i->dataSize);
+			CImage(dup)->set_type(dup, imRGB);
+			memset( PIcon(dup)->mask, disabled ? 0x80 : 0xff, PIcon(dup)->maskSize);
+			if ( disabled )
+				CImage(dup)->premultiply_alpha(dup, NULL);
+			dst->xor = CImage(dup)->bitmap(dup);
+			Object_destroy(dup);
+		}
+
+	} else if ( XT_IS_ICON(X(src))) {
+		/* argb icon over non-argb surface */
+		IconHandle split;
+		if ( !dispose_src ) {
+			i = (PIcon)(src = i->self->dup(src));
+			dispose_src = true;
+		}
+		if ( i->maskType == 8 ) {
+			i->self->set_type(src, imRGB);
+			i->self->premultiply_alpha(src, NULL);
+			i->self->set_maskType(src, 1);
+		}
+		split = i->self->split(src);
+		dst->use_stippling = disabled;
+		dst->xor = CImage(split.xorMask)->bitmap(split.xorMask);
+		dst->and = CImage(split.andMask)->bitmap(split.andMask);
+		Object_destroy( split.xorMask );
+		Object_destroy( split.andMask );
+	} else {
+		dst-> use_stippling = disabled;
+	FALLBACK:
+		if ( guts.dynamicColors ) {
+			Handle dup = i-> self-> dup(src);
+			if ( dispose_src ) Object_destroy(src);
+			dispose_src = true;
+			convert_to_lowres(dup);
+			i = (PIcon) (src = dup);
+		}
+		dst->xor = i->self->bitmap(src);
+	}
+
+	if ( dispose_src )
+		Object_destroy( src );
+	if ( dst->xor ) {
+		prima_refcnt_inc(dst->xor);
+		protect_object(dst->xor);
+	}
+	if ( dst->and ) {
+		prima_refcnt_inc(dst->and);
+		protect_object(dst->and);
+	}
+
+	return true;
+#undef USE_ARGB_SHADING
+}
+
+static void
 update_menu_window( PMenuSysData XX, PMenuWindow w)
 {
-	int x, y = 2 + 2, startx;
-	Bool vertical = w != &XX-> wstatic;
+	int x, y = 2 + 2, startx, icon_width;
+	Bool vertical = w != &XX-> wstatic, layered;
 	PMenuItemReg m = w->m;
 	PUnixMenuItem ix;
 	int lastIncOk = 1;
 	PCachedFont kf = XX-> font;
 	uint32_t *xft_map8 = nil;
+	PWindow owner = ( PWindow)(PComponent( w-> self)-> owner);
 
 #ifdef USE_XFT
 	{
-		PWindow owner = ( PWindow)(PComponent( w-> self)-> owner);
 		const char * encoding = ( XX-> type. popup) ?
 			owner-> popupFont. encoding :
 			owner-> menuFont. encoding;
 		xft_map8 = prima_xft_map8( encoding);
 	}
 #endif
-
+	layered = vertical ? false : X(owner)->flags. layered;
 
 	free_unix_items( w);
 	w-> num = item_count( w);
@@ -264,15 +447,39 @@ update_menu_window( PMenuSysData XX, PMenuWindow w)
 	if ( !ix) return;
 	bzero( w-> um, sizeof( UnixMenuItem) * w-> num);
 
-	startx = x = vertical ? MENU_XOFFSET * 4 + MENU_CHECK_XOFFSET * 2 : 0;
+	m = w->m;
+	if ( vertical ) {
+		icon_width = MENU_CHECK_XOFFSET;
+		while (m) {
+			if ( m-> icon && PObject( m-> icon)-> stage < csDead) {
+				PImage i = ( PImage) m-> icon;
+				if ( i-> w > icon_width ) icon_width = i-> w;
+			}
+			m = m-> next;
+		}
+		startx = x = MENU_XOFFSET * 4 + MENU_CHECK_XOFFSET + icon_width;
+	} else {
+		startx = x = icon_width = 0;
+	}
 
 	if ( vertical) w-> last = -1;
 	w-> selected = -100;
+	m = w->m;
 	while ( m) {
-		if ( m-> flags. divider) {
+		ix-> icon_width = icon_width;
+
+		if ( m-> flags. custom_draw ) {
+			Event ev = { cmMenuItemMeasure };
+			ev.gen.P.x = 0;
+			ev.gen.P.y = 0;
+			ev.gen.i = m-> id;
+			CComponent(w-> self)-> message(w-> self,&ev);
+			ix-> width  = ev.gen.P.x;
+			ix-> height = ev.gen.P.y + MENU_ITEM_GAP * 2;
+		} else if ( m-> flags. divider) {
 			ix-> height = vertical ? MENU_ITEM_GAP * 2 : 0;
 		} else {
-			int l = 0;
+			int l = 0, w, h;
 			if ( m-> text) {
 				int i, ntildas = 0;
 				char * t = m-> text;
@@ -288,18 +495,20 @@ update_menu_window( PMenuSysData XX, PMenuWindow w)
 					m-> flags. utf8_text, xft_map8);
 				if ( ntildas)
 					ix-> width -= ntildas * get_text_width( kf, "~", 1, false, xft_map8);
-			} else if ( m-> bitmap && PObject( m-> bitmap)-> stage < csDead) {
-				Pixmap px = prima_std_pixmap( m-> bitmap, CACHE_LOW_RES);
-				if ( px) {
-					PImage i = ( PImage) m-> bitmap;
-					ix-> height += ( i-> h < kf-> font. height) ?  kf-> font. height : i-> h +
-						MENU_ITEM_GAP * 2;
-					if ( ix-> height > guts. displaySize. y - kf-> font. height - MENU_ITEM_GAP * 3 - 4)
-					ix-> height = guts. displaySize. y - kf-> font. height - MENU_ITEM_GAP * 3 - 4;
-					ix-> width  += i-> w + startx;
-					ix-> pixmap = px;
-				}
+			} else if ( create_menu_bitmap(m->bitmap, &ix->bitmap, layered, m->flags.disabled, &w, &h)) {
+				ix-> height += (( h < kf-> font. height) ?  kf-> font. height : h) +
+					MENU_ITEM_GAP * 2;
+				ix-> width  += w + startx;
 			}
+
+			if (  create_menu_bitmap(m->icon, &ix->icon, layered, m->flags.disabled, &w, &h)) {
+				int    y = h + MENU_ITEM_GAP * 2;
+				if ( ix-> height < y ) ix-> height = y;
+			}
+
+			if ( ix-> height > MAX_BITMAP_HEIGHT )
+				ix-> height = MAX_BITMAP_HEIGHT;
+
 			if ( m-> accel && ( l = strlen( m-> accel))) {
 				ix-> accel_width = get_text_width( kf, m-> accel, l,
 					m-> flags. utf8_accel, xft_map8);
@@ -644,696 +853,984 @@ store_char( char * src, int srclen, int * srcptr, char * dst, int * dstptr, Bool
 	}
 }
 
-void
-prima_handle_menu_event( XEvent *ev, XWindow win, Handle self)
+#define DECL_DRAW(name) \
+static Bool \
+menuitem_draw_##name( \
+	Handle self, XWindow win, PMenuWindow w, Region rgn, \
+	PMenuItemReg m, PUnixMenuItem ix, \
+	int x, int y, int *str_size, char ** str_ptr, \
+	MenuDrawRec * draw, \
+	Bool vertical, Bool selected, int descent, unsigned long clr, Color rgb, int index, void* param \
+)
+
+#define DRAW(name) menuitem_draw_ ## name( \
+	self, win, w, rgn, m, ix, x, y, \
+	&sz, &s, &draw, vertical, selected, descent, clr, rgb, last, NULL \
+)
+
+DECL_DRAW(text)
 {
-	switch ( ev-> type) {
-	case Expose: {
-		DEFMM;
-		PMenuWindow w;
-		PUnixMenuItem ix;
-		PMenuItemReg m;
-		int mx, my;
-		Bool vertical;
-		int sz = 1024, l, i, slen, x, y;
-		char *s;
-		char *t;
-		int right, last = 0;
-		int xtoffs, descent;
-		PCachedFont kf;
-		MenuDrawRec draw;
-		unsigned long clr;
-		Color rgb;
-		PWindow owner;
+	DEFMM;
+	PCachedFont kf = XX->font;
+	int lineStart, lineEnd = 0, haveDash = 0;
+	int ay = y + (ix->height + kf-> font. height) / 2 - kf-> font. descent;
+	int text_len = strlen(m-> text);
+	int l, i, slen;
+	char * t = m-> text;
+	x += MENU_XOFFSET + (vertical ? ix-> icon_width : 0);
 
-		kf = XX-> font;
-		XX-> paint_pending = false;
-		if ( XX-> wstatic. w == win) {
-			w = XX-> w;
-			vertical = false;
-		} else {
-			if ( !( w = get_menu_window( self, win))) return;
-			vertical = true;
+	for (;;) {
+		l = i = slen = lineEnd = haveDash = 0;
+		lineStart = -1;
+		while ( l < *str_size - 1 && t[i]) {
+			if (t[i] == '~' && t[i+1]) {
+				if ( t[i+1] == '~') {
+					int dummy = 0;
+					store_char( "~", strlen("~"), &dummy, *str_ptr, &l, false, draw);
+					i += 2;
+					slen++;
+				} else {
+					if ( !haveDash) {
+						haveDash = 1;
+						lineEnd = lineStart + 1 +
+							get_text_width( kf, t + i + 1, 1,
+								m-> flags. utf8_text, draw-> xft_map8);
+					}
+					i++;
+				}
+			} else {
+				if ( !haveDash) {
+					FontABC abc;
+					get_font_abc( kf, t+i, m-> flags. utf8_text, &abc, draw);
+					if ( lineStart < 0)
+						lineStart = ( abc.a < 0) ? -abc.a : 0;
+					lineStart += abc.a + abc.b + abc.c;
+				}
+				store_char( t, text_len, &i, *str_ptr, &l, m-> flags. utf8_text, draw);
+				slen++;
+			}
 		}
-		right  = vertical ? 0 : w-> right;
-		xtoffs = vertical ? MENU_CHECK_XOFFSET : 0;
-		m  = w-> m;
-		mx = w-> sz.x - 1;
-		my = w-> sz.y - 1;
-		ix = w-> um;
-		if ( !ix) return;
-
-		owner = ( PWindow)(PComponent( w-> self)-> owner);
-		bzero( &draw, sizeof( draw));
-		draw. win = win;
-		draw. layered = vertical ? false : X(owner)->flags. layered;
-		if ( draw.layered ) {
-			XGCValues gcv;
-			gcv. graphics_exposures = false;
-			draw. gc = XCreateGC( DISP, X(owner)->gdrawable, GCGraphicsExposures, &gcv);
-			draw. c  = XX->argb_c;
-		} else {
-			draw. gc = guts. menugc;
-			draw. c  = XX->c;
-		}
-#ifdef USE_XFT
-		if ( kf-> xft) {
-			char * encoding = ( XX-> type. popup) ?
-				owner-> popupFont. encoding :
-				owner-> menuFont. encoding;
-			draw. xft_map8 = prima_xft_map8( encoding);
-			draw. xft_drawable = XftDrawCreate( DISP, win,
-				draw.layered ? guts. argb_visual. visual : guts. visual. visual,
-				draw.layered ? guts. argbColormap : guts. defaultColormap);
-			descent = kf-> xft-> descent;
+		if ( t[i]) {
+			free(*str_ptr);
+			if ( !( *str_ptr = malloc(( *str_size) *= 2))) return false;
 		} else
-#endif
-		descent = kf-> fs->max_bounds.descent;
-
-		{
-			XRectangle r;
-			Region rgn;
-			r. x = ev-> xexpose. x;
-			r. y = ev-> xexpose. y;
-			r. width = ev-> xexpose. width;
-			r. height = ev-> xexpose. height;
-			rgn = XCreateRegion();
-			XUnionRectWithRegion( &r, rgn, rgn);
-			XSetRegion( DISP, draw.gc, rgn);
-#ifdef USE_XFT
-			if ( draw. xft_drawable) XftDrawSetClip(( XftDraw*) draw.xft_drawable, rgn);
-#endif
-			XDestroyRegion( rgn);
+			break;
+	}
+	if ( m-> flags. disabled && !selected) {
+		draw-> pixel = draw->c[ciLight3DColor];
+		draw-> rgb   = XX->rgb[ciLight3DColor];
+		text_out( kf, *str_ptr, slen, x+1, ay+1,
+			m-> flags. utf8_text, draw);
+	}
+	draw-> pixel = clr;
+	draw-> rgb   = rgb;
+	text_out( kf, *str_ptr, slen, x, ay, m-> flags. utf8_text, draw);
+	if ( haveDash) {
+		if ( m-> flags. disabled && !selected) {
+			XSetForeground( DISP, draw->gc, draw->c[ciLight3DColor]);
+			XDrawLine( DISP, win, draw->gc, x+lineStart+1, ay+descent-1+1,
+				x+lineEnd+1, ay+descent-1+1);
 		}
+		XSetForeground( DISP, draw->gc, clr);
+		XDrawLine( DISP, win, draw->gc, x+lineStart, ay+descent-1,
+			x+lineEnd, ay+descent-1);
+	}
+
+	return true;
+}
+
+DECL_DRAW(accel)
+{
+	DEFMM;
+	PCachedFont kf = XX->font;
+	int i, ul = 0, sl = 0, dl = 0;
+	int zx = vertical ?
+		w->sz.x - 1 - MENU_XOFFSET - MENU_CHECK_XOFFSET - ix-> accel_width :
+		x + MENU_XOFFSET/2;
+	int zy = vertical ?
+		y + ( ix->height + kf-> font. height) / 2 - kf-> font. descent:
+		y + ix->height - MENU_ITEM_GAP - kf-> font. descent;
+	int accel_len = strlen(m-> accel);
+
+	if ( m-> flags. utf8_accel)
+		ul = prima_utf8_length( m-> accel);
+	else
+		ul = accel_len;
+	if (( ul * 4 + 4) > *str_size) {
+		free(*str_ptr);
+		if ( !( *str_ptr = malloc((*str_size) = (ul * 4 + 4)))) return false;
+	}
+	for ( i = 0; i < ul; i++)
+		store_char( m-> accel, accel_len, &sl, *str_ptr, &dl, m-> flags. utf8_accel, draw);
+
+	if ( m-> flags. disabled && !selected) {
+		draw-> pixel = draw-> c[ciLight3DColor];
+		draw-> rgb   = XX->rgb[ciLight3DColor];
+		text_out( kf, *str_ptr, ul, zx + 1, zy + 1,
+			m-> flags. utf8_accel, draw);
+	}
+	draw-> pixel = clr;
+	draw-> rgb   = rgb;
+	text_out( kf, *str_ptr, ul, zx, zy,
+		m-> flags. utf8_accel, draw);
+	return true;
+}
+
+DECL_DRAW(submenu)
+{
+	DEFMM;
+	PCachedFont kf = XX->font;
+	int ave    = kf-> font. height * 0.4;
+	int center = y + ix->height / 2;
+	int mx = w->sz.x - 1;
+	XPoint p[3];
+	p[0].x = mx - MENU_CHECK_XOFFSET/2;
+	p[0].y = center;
+	p[1].x = mx - ave - MENU_CHECK_XOFFSET/2;
+	p[1].y = center - ave * 0.6;
+	p[2].x = mx - ave - MENU_CHECK_XOFFSET/2;
+	p[2].y = center + ave * 0.6 + 1;
+	if ( m-> flags. disabled && !selected) {
+		int i;
+		XSetForeground( DISP, draw->gc, draw->c[ciLight3DColor]);
+		for ( i = 0; i < 3; i++) {
+			p[i].x++;
+			p[i].y++;
+		}
+		XFillPolygon( DISP, win, draw->gc, p, 3, Nonconvex, CoordModeOrigin);
+		for ( i = 0; i < 3; i++) {
+			p[i].x--;
+			p[i].y--;
+		}
+	}
+	XSetForeground( DISP, draw->gc, clr);
+	XFillPolygon( DISP, win, draw->gc, p, 3, Nonconvex, CoordModeOrigin);
+	return true;
+}
+
+DECL_DRAW(check)
+{
+	int bottom = y + ix->height - MENU_ITEM_GAP - ix-> height * 0.2;
+	int ax = x + MENU_XOFFSET / 2;
+	XGCValues gcv;
+	gcv. line_width = 3;
+	XChangeGC( DISP, draw->gc, GCLineWidth, &gcv);
+	if ( m-> flags. disabled && !selected) {
+		XSetForeground( DISP, draw->gc, draw->c[ciLight3DColor]);
+		XDrawLine( DISP, win, draw->gc, ax + 1 + 1 , y + ix->height / 2 + 1, ax + MENU_XOFFSET - 2 + 1, bottom - 1);
+		XDrawLine( DISP, win, draw->gc, ax + MENU_XOFFSET - 2 + 1, bottom + 1, ax + MENU_CHECK_XOFFSET + 1, y + MENU_ITEM_GAP + ix-> height * 0.2);
+	}
+	XSetForeground( DISP, draw->gc, clr);
+	XDrawLine( DISP, win, draw->gc, ax + 1, y + ix->height / 2, ax + MENU_XOFFSET - 2, bottom);
+	XDrawLine( DISP, win, draw->gc, ax + MENU_XOFFSET - 2, bottom, ax + MENU_CHECK_XOFFSET, y + MENU_ITEM_GAP + ix-> height * 0.2);
+	gcv. line_width = 1;
+	XChangeGC( DISP, draw->gc, GCLineWidth, &gcv);
+
+	return true;
+}
+
+DECL_DRAW(checkbox)
+{
+	int 
+		x1 = x  + MENU_XOFFSET / 2 + 1, 
+		y1 = y  + (ix-> height/2) - MENU_CHECK_XOFFSET/2 + 1,
+		x2 = x1 + MENU_CHECK_XOFFSET - 2,
+		y2 = y1 + MENU_CHECK_XOFFSET - 2;
+
+	XSetForeground( DISP, draw->gc, draw->c[m->flags.disabled ? ciLight3DColor : (MENU_PALETTE_SIZE-1)]);
+	XDrawLine( DISP, win, draw->gc, x1, y2, x2 + 1, y2);
+	XDrawLine( DISP, win, draw->gc, x2, y2, x2, y1);
+	XSetForeground( DISP, draw->gc, draw->c[ m->flags.disabled ? ciDisabledText : ciDark3DColor] );
+	XDrawLine( DISP, win, draw->gc, x2, y1, x1, y1);
+	XDrawLine( DISP, win, draw->gc, x1, y1, x1, y2);
+
+	x1++; y1++; x2--; y2--;
+	XSetForeground( DISP, draw->gc, draw->c[ m->flags.disabled ? ciDisabledText : ciDark3DColor] );
+	XDrawLine( DISP, win, draw->gc, x1, y2, x2 + 1, y2);
+	XDrawLine( DISP, win, draw->gc, x2, y2, x2, y1);
+	XSetForeground( DISP, draw->gc, draw->c[ciLight3DColor]);
+	XDrawLine( DISP, win, draw->gc, x2, y1, x1, y1);
+	XDrawLine( DISP, win, draw->gc, x1, y1, x1, y2);
+
+	return true;
+}
+
+DECL_DRAW(guillemots)
+{
+	DEFMM;
+	PCachedFont kf = XX->font;
+	char buf[8];
+	int s = 0, d = 0;
+
+	x += MENU_XOFFSET + (vertical ? ix-> icon_width : 0);
+	draw-> pixel = clr;
+	draw-> rgb   = rgb;
+	store_char( ">", strlen(">"), &s, buf, &d, 0, draw);
+	s = 0;
+	store_char( ">", strlen(">"), &s, buf, &d, 0, draw);
+	text_out( kf, buf, 2,
+			x,
+			y + MENU_ITEM_GAP + kf-> font. height - kf-> font. descent,
+			false, draw);
+	return true;
+}
+
+DECL_DRAW(divider)
+{
+	int mx = w-> sz.x - 1;
+	if ( vertical) {
+		y += MENU_ITEM_GAP - 1;
+		XSetForeground( DISP, draw->gc, draw->c[ciDark3DColor]);
+		XDrawLine( DISP, win, draw->gc, 1, y, mx-1, y);
+		y++;
+		XSetForeground( DISP, draw->gc, draw->c[ciLight3DColor]);
+		XDrawLine( DISP, win, draw->gc, 1, y, mx-1, y);
+		y += MENU_ITEM_GAP;
+	}
+	return true;
+}
+
+DECL_DRAW(image)
+{
+	DEFMM;
+	int Y, H, W;
+	PMenuBitmap bm = (PMenuBitmap) param;
+	Drawable   dummy_p;
+	UnixSysData dummy_s;
+
+	if ( !bm-> xor )
+		return true;
+	W = X(bm->xor)->size.x;
+	H = X(bm->xor)->size.y;
+	Y = y + ( ix->height - H ) / 2;
+
+	bzero(&dummy_p, sizeof(dummy_p));
+	bzero(&dummy_s, sizeof(dummy_s));
+	dummy_p.sysData = &dummy_s;
+	dummy_s.component.type.drawable = 1;
+	dummy_s.component.type.widget   = 1;
+	dummy_s.drawable.flags.paint    = 1;
+	dummy_s.drawable.gc             = draw->gc;
+	dummy_s.drawable.gdrawable      = win;
+	dummy_s.drawable.size           = w->sz;
+	dummy_s.drawable.current_region = rgn;
+	if ( draw->layered ) {
+		dummy_s.drawable.flags.layered = 1;
+#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
+		dummy_s.drawable.argb_picture = w-> argb_picture;
+#endif
+	}
+
+	if ( bm-> is_mono ) {
+		if ( m-> flags. disabled ) {
+			dummy_s.drawable.back.primary = 0x00000000;
+			dummy_s.drawable.fore.primary = XX->c[ciLight3DColor];
+			apc_gp_put_image((Handle) &dummy_p, bm->xor, x + 1, w-> sz.y - H - Y - 1, 0, 0, W, H, ropOrPut);
+		}
+		dummy_s.drawable.fore.primary = 0x00000000;
+		dummy_s.drawable.back.primary = 0xffffffff;
+		apc_gp_put_image((Handle) &dummy_p, bm->xor, x, w-> sz.y - H - Y, 0, 0, W, H, ropAndPut);
+		dummy_s.drawable.back.primary = 0x00000000;
+		dummy_s.drawable.fore.primary = clr;
+		apc_gp_put_image((Handle) &dummy_p, bm->xor, x, w-> sz.y - H - Y, 0, 0, W, H, ropXorPut);
+	} else {
+		dummy_s.drawable.fore.primary = 0x00000000;
+		dummy_s.drawable.back.primary = 0xffffffff;
+		if ( bm-> and ) {
+			XSetPlaneMask( DISP, draw-> gc,
+				guts.argb_bits.red_mask|
+				guts.argb_bits.green_mask|
+				guts.argb_bits.blue_mask
+			);
+			apc_gp_put_image((Handle) &dummy_p, bm->and,
+				x, w-> sz.y - H - Y,
+				0, 0, W, H, ropAndPut);
+			apc_gp_put_image((Handle) &dummy_p, bm->xor,
+				x, w-> sz.y - H - Y,
+				0, 0, W, H, ropXorPut);
+			XSetPlaneMask( DISP, draw-> gc, AllPlanes);
+		} else {
+			apc_gp_put_image((Handle) &dummy_p, bm->xor,
+				x, w-> sz.y - H - Y,
+				0, 0, W, H, ropSrcOver);
+		}
+		if ( bm-> use_stippling ) {
+			XSetStipple   ( DISP, draw-> gc, prima_get_hatch( &fillPatterns[fpSimpleDots] ));
+			XSetFillStyle ( DISP, draw-> gc, FillOpaqueStippled);
+			XSetFunction  ( DISP, draw-> gc, GXand );
+			XSetForeground( DISP, draw-> gc, 0x00000000);
+			XSetBackground( DISP, draw-> gc, 0xffffffff);
+			XFillRectangle( DISP, win, draw-> gc, x, Y, W, H);
+			XSetFunction  ( DISP, draw-> gc, GXcopy );
+			XSetFillStyle ( DISP, draw-> gc, FillSolid);
+		}
+	}
+
+	return true;
+}
+
+DECL_DRAW(bitmap)
+{
+	x += MENU_XOFFSET + (vertical ? ix-> icon_width : 0);
+	return menuitem_draw_image(self,win,w,rgn,m,ix,x,y,str_size,str_ptr,draw,vertical,selected,descent,clr,rgb,index,&ix->bitmap);
+}
+
+DECL_DRAW(icon)
+{
+	x += MENU_XOFFSET;
+	return menuitem_draw_image(self,win,w,rgn,m,ix,x,y,str_size,str_ptr,draw,vertical,selected,descent,clr,rgb,index,&ix->icon);
+}
+
+DECL_DRAW(background)
+{
+	XSetForeground( DISP, draw->gc, draw->c[ciBack]);
+	XSetBackground( DISP, draw->gc, draw->c[ciBack]);
+	if ( vertical) {
+		int mx = w->sz.x - 1;
+		int my = w->sz.y - 1;
+		XFillRectangle( DISP, win, draw->gc, 2, 2, mx-1, my-1);
+		XSetForeground( DISP, draw->gc, draw->c[ciDark3DColor]);
+		XDrawLine( DISP, win, draw->gc, 0, 0, 0, my);
+		XDrawLine( DISP, win, draw->gc, 0, 0, mx-1, 0);
+		XDrawLine( DISP, win, draw->gc, mx-1, my-1, 2, my-1);
+		XDrawLine( DISP, win, draw->gc, mx-1, my-1, mx-1, 1);
+		XSetForeground( DISP, draw->gc, guts. monochromeMap[0]);
+		XDrawLine( DISP, win, draw->gc, mx, my, 1, my);
+		XDrawLine( DISP, win, draw->gc, mx, my, mx, 0);
+		XSetForeground( DISP, draw->gc, draw->c[ciLight3DColor]);
+		XDrawLine( DISP, win, draw->gc, 1, 1, 1, my-1);
+		XDrawLine( DISP, win, draw->gc, 1, 1, mx-2, 1);
+	} else
+		XFillRectangle( DISP, win, draw->gc, 0, 0, w-> sz.x, w-> sz.y);
+
+	return true;
+}
+
+typedef struct {
+	XWindow win;
+	Bool layered;
+	Handle self;
+} PaintEvent;
+
+DECL_DRAW(custom)
+{
+	Point offset, size;
+	Event ev = { cmMenuItemPaint };
+	PaintEvent rec = { win, draw-> layered, self };
+
+	offset = menu_item_offset( M(self), w, index);
+	size   = menu_item_size( M(self), w, index);
+	ev.gen.P = w-> sz;
+	ev.gen.i = m-> id;
+	offset.y = w-> sz.y - offset.y - 1;
+	ev.gen.R.left   = offset.x;
+	ev.gen.R.bottom = offset.y - size.y + 1;
+	ev.gen.R.right  = offset.x + size.x - 1;
+	ev.gen.R.top    = offset.y;
+	ev.gen.p        = &rec;
+	ev.gen.B        = selected;
+	CComponent(w->self)-> message(w->self,&ev);
+
+	return true;
+}
+
+#undef DECL_DRAW
+
+static void
+handle_menu_expose( XEvent *ev, XWindow win, Handle self)
+{
+	DEFMM;
+	PMenuWindow w;
+	PUnixMenuItem ix;
+	PMenuItemReg m;
+	Bool vertical;
+	int sz = 1024, x, y;
+	char *s;
+	int right, last = 0;
+	int descent;
+	PCachedFont kf;
+	MenuDrawRec draw;
+	unsigned long clr = 0;
+	Color rgb = 0;
+	PWindow owner;
+	Bool selected = false;
+	XRectangle r;
+	Region rgn;
+
+	kf = XX-> font;
+	XX-> paint_pending = false;
+	if ( XX-> wstatic. w == win) {
+		w = XX-> w;
+		vertical = false;
+	} else {
+		if ( !( w = get_menu_window( self, win))) return;
+		vertical = true;
+	}
+	ix = w-> um;
+	right  = vertical ? 0 : w-> right;
+	m  = w-> m;
+	if ( !ix) return;
+
+	owner = ( PWindow)(PComponent( w-> self)-> owner);
+	bzero( &draw, sizeof( draw));
+	draw. win = win;
+	draw. layered = vertical ? false : X(owner)->flags. layered;
+	if ( draw.layered ) {
+		XGCValues gcv;
+		gcv. graphics_exposures = false;
+		draw. gc = XCreateGC( DISP, X(owner)->gdrawable, GCGraphicsExposures, &gcv);
+		draw. c  = XX->argb_c;
+	} else {
+		draw. gc = guts. menugc;
+		draw. c  = XX->c;
+	}
+#ifdef USE_XFT
+	if ( kf-> xft) {
+		char * encoding = ( XX-> type. popup) ?
+			owner-> popupFont. encoding :
+			owner-> menuFont. encoding;
+		draw. xft_map8 = prima_xft_map8( encoding);
+		draw. xft_drawable = XftDrawCreate( DISP, win,
+			draw.layered ? guts. argb_visual. visual : guts. visual. visual,
+			draw.layered ? guts. argbColormap : guts. defaultColormap);
+		descent = kf-> xft-> descent;
+	} else
+#endif
+	descent = kf-> fs->max_bounds.descent;
+
+	r. x = ev-> xexpose. x;
+	r. y = ev-> xexpose. y;
+	r. width = ev-> xexpose. width;
+	r. height = ev-> xexpose. height;
+	rgn = XCreateRegion();
+	XUnionRectWithRegion( &r, rgn, rgn);
+	XSetRegion( DISP, draw.gc, rgn);
+#ifdef USE_XFT
+	if ( draw. xft_drawable) XftDrawSetClip(( XftDraw*) draw.xft_drawable, rgn);
+#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
+	if ( w-> argb_picture ) XRenderSetPictureClipRegion(DISP, w->argb_picture, rgn);
+#endif
+#endif
 
 #ifdef USE_XFT
-		if ( !kf-> xft)
+	if ( !kf-> xft)
 #endif
-			XSetFont( DISP, draw.gc, kf-> id);
-		XSetForeground( DISP, draw.gc, draw.c[ciBack]);
-		XSetBackground( DISP, draw.gc, draw.c[ciBack]);
-		if ( vertical) {
-			XFillRectangle( DISP, win, draw.gc, 2, 2, mx-1, my-1);
-			XSetForeground( DISP, draw.gc, draw.c[ciDark3DColor]);
-			XDrawLine( DISP, win, draw.gc, 0, 0, 0, my);
-			XDrawLine( DISP, win, draw.gc, 0, 0, mx-1, 0);
-			XDrawLine( DISP, win, draw.gc, mx-1, my-1, 2, my-1);
-			XDrawLine( DISP, win, draw.gc, mx-1, my-1, mx-1, 1);
-			XSetForeground( DISP, draw.gc, guts. monochromeMap[0]);
-			XDrawLine( DISP, win, draw.gc, mx, my, 1, my);
-			XDrawLine( DISP, win, draw.gc, mx, my, mx, 0);
-			XSetForeground( DISP, draw.gc, draw.c[ciLight3DColor]);
-			XDrawLine( DISP, win, draw.gc, 1, 1, 1, my-1);
-			XDrawLine( DISP, win, draw.gc, 1, 1, mx-2, 1);
-		} else
-			XFillRectangle( DISP, win, draw.gc, 0, 0, w-> sz.x, w-> sz.y);
-		y = vertical ? 2 : 0;
-		x = 0;
-		if ( !( s = malloc( sz))) goto EXIT;
-		while ( m) {
-			Bool selected = false;
+		XSetFont( DISP, draw.gc, kf-> id);
 
-			/* printf("%d %d %d %s\n", last, w-> selected, w-> last, m-> text); */
-			if ( last == w-> selected) {
+	y = vertical ? 2 : 0;
+	x = 0;
+	if ( !( s = malloc( sz))) goto EXIT;
+	DRAW(background);
+	while ( m) {
+		int deltaY = ix-> height;
+
+		/* printf("%d %d %d %s\n", last, w-> selected, w-> last, m-> text); */
+		selected = last == w-> selected;
+		if ( selected ) {
+			if ( !m-> flags. custom_draw ) {
 				Point sz = menu_item_size( XX, w, last);
 				Point p = menu_item_offset( XX, w, last);
 				XSetForeground( DISP, draw.gc, draw.c[ciHilite]);
 				XFillRectangle( DISP, win, draw.gc, p.x, p.y, sz. x, sz.y);
-				clr = draw.c[ciHiliteText];
-				rgb = XX-> rgb[ciHiliteText];
-				selected = true;
-			} else {
-				clr = draw.c[ciFore];
-				rgb = XX-> rgb[ciFore];
 			}
-
-			if ( last > w-> last) {
-				char buf[8];
-				int s = 0, d = 0;
-				draw. pixel = clr;
-				draw. rgb   = rgb;
-				store_char( ">", strlen(">"), &s, buf, &d, 0, &draw);
-				s = 0;
-				store_char( ">", strlen(">"), &s, buf, &d, 0, &draw);
-				text_out( kf, buf, 2,
-						x + MENU_XOFFSET + xtoffs,
-						y + MENU_ITEM_GAP + kf-> font. height - kf-> font. descent,
-						false, &draw);
-				break;
-			}
-
-			if ( m-> flags. divider) {
-				if ( vertical) {
-					y += MENU_ITEM_GAP - 1;
-					XSetForeground( DISP, draw.gc, draw.c[ciDark3DColor]);
-					XDrawLine( DISP, win, draw.gc, 1, y, mx-1, y);
-					y++;
-					XSetForeground( DISP, draw.gc, draw.c[ciLight3DColor]);
-					XDrawLine( DISP, win, draw.gc, 1, y, mx-1, y);
-					y += MENU_ITEM_GAP;
-				} else if ( right > 0) {
-					x += right;
-					right = 0;
-				}
-			} else {
-				int deltaY = 0;
-
-				if ( m-> flags. disabled) {
-					clr = draw.c[ciDisabledText];
-					rgb = XX-> rgb[ ciDisabledText];
-				}
-
-				deltaY = ix-> height;
-				if ( m-> text) {
-					int lineStart, lineEnd = 0, haveDash = 0;
-					int ay = y + deltaY - MENU_ITEM_GAP - kf-> font. descent;
-					int text_len = strlen(m-> text);
-
-					t = m-> text;
-					for (;;) {
-						l = i = slen = lineEnd = haveDash = 0;
-						lineStart = -1;
-						while ( l < sz - 1 && t[i]) {
-							if (t[i] == '~' && t[i+1]) {
-								if ( t[i+1] == '~') {
-									int dummy = 0;
-									store_char( "~", strlen("~"), &dummy, s, &l, false, &draw);
-									i += 2;
-									slen++;
-								} else {
-									if ( !haveDash) {
-										haveDash = 1;
-										lineEnd = lineStart +
-											get_text_width( kf, t + i + 1, 1,
-												m-> flags. utf8_text, draw. xft_map8);
-									}
-									i++;
-								}
-							} else {
-								if ( !haveDash) {
-									FontABC abc;
-									get_font_abc( kf, t+i, m-> flags. utf8_text, &abc, &draw);
-									if ( lineStart < 0)
-										lineStart = ( abc.a < 0) ? -abc.a : 0;
-									lineStart += abc.a + abc.b + abc.c;
-								}
-								store_char( t, text_len, &i, s, &l, m-> flags. utf8_text, &draw);
-								slen++;
-							}
-						}
-						if ( t[i]) {
-							free(s);
-							if ( !( s = malloc( sz *= 2))) goto EXIT;
-						} else
-							break;
-					}
-					if ( m-> flags. disabled && !selected) {
-						draw. pixel = draw.c[ciLight3DColor];
-						draw. rgb   = XX->rgb[ciLight3DColor];
-						text_out( kf, s, slen, x+MENU_XOFFSET+xtoffs+1, ay+1,
-							m-> flags. utf8_text, &draw);
-					}
-					draw. pixel = clr;
-					draw. rgb   = rgb;
-					text_out( kf, s, slen, x+MENU_XOFFSET+xtoffs, ay, m-> flags. utf8_text, &draw);
-					if ( haveDash) {
-						if ( m-> flags. disabled && !selected) {
-							XSetForeground( DISP, draw.gc, draw.c[ciLight3DColor]);
-							XDrawLine( DISP, win, draw.gc, x+MENU_XOFFSET+xtoffs+lineStart+1, ay+descent-1+1,
-								x+MENU_XOFFSET+xtoffs+lineEnd+1, ay+descent-1+1);
-						}
-						XSetForeground( DISP, draw.gc, clr);
-						XDrawLine( DISP, win, draw.gc, x+MENU_XOFFSET+xtoffs+lineStart, ay+descent-1,
-							x+MENU_XOFFSET+xtoffs+lineEnd, ay+descent-1);
-					}
-				} else if ( m-> bitmap && ix-> pixmap) {
-					if ( selected) XSetFunction( DISP, draw.gc, GXcopyInverted);
-					XCopyArea( DISP, ix-> pixmap, win, draw.gc, 0, 0, ix-> width, ix-> height, x+MENU_XOFFSET+xtoffs, y + MENU_ITEM_GAP);
-					if ( selected) XSetFunction( DISP, draw.gc, GXcopy);
-				}
-				if ( !vertical) x += ix-> width + MENU_XOFFSET;
-
-				if ( m-> accel) {
-					int i, ul = 0, sl = 0, dl = 0;
-					int zx = vertical ?
-						mx - MENU_XOFFSET - MENU_CHECK_XOFFSET - ix-> accel_width :
-						x + MENU_XOFFSET/2;
-					int zy = vertical ?
-						y + ( deltaY + kf-> font. height) / 2 - kf-> font. descent:
-						y + deltaY - MENU_ITEM_GAP - kf-> font. descent;
-					int accel_len = strlen(m-> accel);
-
-					if ( m-> flags. utf8_accel)
-						ul = prima_utf8_length( m-> accel);
-					else
-						ul = accel_len;
-					if (( ul * 4 + 4) > sz) {
-						free(s);
-						if ( !( s = malloc( sz = (ul * 4 + 4)))) goto EXIT;
-					}
-					for ( i = 0; i < ul; i++)
-						store_char( m-> accel, accel_len, &sl, s, &dl, m-> flags. utf8_accel, &draw);
-					if ( m-> flags. disabled && !selected) {
-						draw. pixel = draw.c[ciLight3DColor];
-						draw. rgb   = XX->rgb[ciLight3DColor];
-						text_out( kf, s, ul, zx + 1, zy + 1,
-							m-> flags. utf8_accel, &draw);
-					}
-					draw. pixel = clr;
-					draw. rgb   = rgb;
-					text_out( kf, s, ul, zx, zy,
-						m-> flags. utf8_accel, &draw);
-					if ( !vertical)
-						x += ix-> accel_width + MENU_XOFFSET/2;
-				}
-				if ( !vertical) x += MENU_XOFFSET;
-
-				if ( vertical && m-> down) {
-					int ave    = kf-> font. height * 0.4;
-					int center = y + deltaY / 2;
-					XPoint p[3];
-					p[0].x = mx - MENU_CHECK_XOFFSET/2;
-					p[0].y = center;
-					p[1].x = mx - ave - MENU_CHECK_XOFFSET/2;
-					p[1].y = center - ave * 0.6;
-					p[2].x = mx - ave - MENU_CHECK_XOFFSET/2;
-					p[2].y = center + ave * 0.6 + 1;
-					if ( m-> flags. disabled && !selected) {
-						int i;
-						XSetForeground( DISP, draw.gc, draw.c[ciLight3DColor]);
-						for ( i = 0; i < 3; i++) {
-							p[i].x++;
-							p[i].y++;
-						}
-						XFillPolygon( DISP, win, draw.gc, p, 3, Nonconvex, CoordModeOrigin);
-						for ( i = 0; i < 3; i++) {
-							p[i].x--;
-							p[i].y--;
-						}
-					}
-					XSetForeground( DISP, draw.gc, clr);
-					XFillPolygon( DISP, win, draw.gc, p, 3, Nonconvex, CoordModeOrigin);
-				}
-				if ( m-> flags. checked && vertical) {
-					/* don't draw check marks on horizontal menus - they look ugly */
-					int bottom = y + deltaY - MENU_ITEM_GAP - ix-> height * 0.2;
-					int ax = x + MENU_XOFFSET / 2;
-					XGCValues gcv;
-					gcv. line_width = 3;
-					XChangeGC( DISP, draw.gc, GCLineWidth, &gcv);
-					if ( m-> flags. disabled && !selected) {
-						XSetForeground( DISP, draw.gc, draw.c[ciLight3DColor]);
-						XDrawLine( DISP, win, draw.gc, ax + 1 + 1 , y + deltaY / 2 + 1, ax + MENU_XOFFSET - 2 + 1, bottom - 1);
-						XDrawLine( DISP, win, draw.gc, ax + MENU_XOFFSET - 2 + 1, bottom + 1, ax + MENU_CHECK_XOFFSET + 1, y + MENU_ITEM_GAP + ix-> height * 0.2);
-					}
-					XSetForeground( DISP, draw.gc, clr);
-					XDrawLine( DISP, win, draw.gc, ax + 1, y + deltaY / 2, ax + MENU_XOFFSET - 2, bottom);
-					XDrawLine( DISP, win, draw.gc, ax + MENU_XOFFSET - 2, bottom, ax + MENU_CHECK_XOFFSET, y + MENU_ITEM_GAP + ix-> height * 0.2);
-					gcv. line_width = 1;
-					XChangeGC( DISP, draw.gc, GCLineWidth, &gcv);
-				}
-				if ( vertical) y += deltaY;
-			}
-			m = m-> next;
-			ix++;
-			last++;
+			clr = draw.c[ciHiliteText];
+			rgb = XX-> rgb[ciHiliteText];
+		} else {
+			clr = draw.c[ciFore];
+			rgb = XX-> rgb[ciFore];
 		}
-		free(s);
-	EXIT:;
-#ifdef USE_XFT
-		if ( draw. xft_drawable)
-			XftDrawDestroy( draw. xft_drawable);
-#endif
-		if ( draw. layered ) XFreeGC( DISP, draw. gc);
-		XFlush(DISP);
+
+		if ( last > w-> last) {
+			DRAW(guillemots);
+			break;
+		}
+
+		if ( m-> flags. disabled) {
+			clr = draw.c[ciDisabledText];
+			rgb = XX-> rgb[ ciDisabledText];
+		}
+
+		if ( m-> flags. custom_draw ) {
+			if ( vertical ) {
+				y += ix-> height;
+				if (m-> down) DRAW(submenu);
+			}
+			DRAW(custom);
+			if ( !vertical )
+				x += ix-> width + 2 * MENU_XOFFSET;
+		} else if ( m-> flags. divider) {
+			DRAW(divider);
+			if ( vertical )
+				y += MENU_ITEM_GAP * 2;
+			else if ( right > 0) {
+				x += right;
+				right = 0;
+			}
+		} else {
+			if ( vertical ) {
+				/* don't draw check marks on horizontal menus - they look ugly */
+				if ( m-> icon )
+					DRAW(icon);
+				else if ( m-> flags. checked)
+					DRAW(check);
+				else if ( m-> flags. autotoggle)
+					DRAW(checkbox);
+			}
+
+			if ( m-> text) {
+				if ( !DRAW(text)) goto EXIT;
+			} else if ( m-> bitmap)
+				DRAW(bitmap);
+			if ( !vertical)
+				x += ix-> width + MENU_XOFFSET;
+
+			if ( m-> accel) {
+				if ( !DRAW(accel))
+					goto EXIT;
+				if ( !vertical)
+					x += ix-> accel_width + MENU_XOFFSET/2;
+			}
+			if ( !vertical)
+				x += MENU_XOFFSET;
+
+			if ( vertical && m-> down)
+				DRAW(submenu);
+
+			if ( vertical) y += deltaY;
+		}
+		m = m-> next;
+		ix++;
+		last++;
 	}
-	break;
-	case ConfigureNotify: {
-		DEFMM;
-		if ( XX-> wstatic. w == win) {
-			PMenuWindow  w = XX-> w;
-			PMenuItemReg m;
-			PUnixMenuItem ix;
-			int x = 0;
-			int stage = 0;
-			if ( w-> sz. x == ev-> xconfigure. width &&
-				w-> sz. y == ev-> xconfigure. height) return;
-			if ( guts. currentMenu == self) prima_end_menu();
-			w-> sz. x = ev-> xconfigure. width;
-			w-> sz. y = ev-> xconfigure. height;
-			XClearArea( DISP, win, 0, 0, 0, 0, true);
+	free(s);
+	EXIT:;
+
+	XDestroyRegion( rgn);
+#ifdef USE_XFT
+	if ( draw. xft_drawable)
+		XftDrawDestroy( draw. xft_drawable);
+#endif
+	if ( draw. layered ) XFreeGC( DISP, draw. gc);
+	XFlush(DISP);
+}
+
+#undef DRAW
+
+static void
+handle_menu_configure( XEvent *ev, XWindow win, Handle self)
+{
+	DEFMM;
+	if ( XX-> wstatic. w == win) {
+		PMenuWindow  w = XX-> w;
+		PMenuItemReg m;
+		PUnixMenuItem ix;
+		int x = 0;
+		int stage = 0;
+		if ( w-> sz. x == ev-> xconfigure. width &&
+			w-> sz. y == ev-> xconfigure. height) return;
+		if ( guts. currentMenu == self) prima_end_menu();
+		w-> sz. x = ev-> xconfigure. width;
+		w-> sz. y = ev-> xconfigure. height;
+		XClearArea( DISP, win, 0, 0, 0, 0, true);
 
 AGAIN:
-			w-> last = -1;
-			m = w-> m;
-			ix = w-> um;
+		w-> last = -1;
+		m = w-> m;
+		ix = w-> um;
+		while ( m) {
+			int dx = 0;
+			if ( !m-> flags. divider) {
+				dx += MENU_XOFFSET * 2 + ix-> width;
+				if ( m-> accel) dx += MENU_XOFFSET / 2 + ix-> accel_width;
+			}
+			if ( x + dx >= w-> sz.x) {
+				if ( stage == 0) { /* now we are sure that >> should be drawn - check again */
+					x = MENU_XOFFSET * 2 + XX-> guillemots;
+					stage++;
+					goto AGAIN;
+				}
+				break;
+			}
+			x += dx;
+			w-> last++;
+			m = m-> next;
+			ix++;
+		}
+		m = w-> m;
+		ix = w-> um;
+		w-> right = 0;
+		if ( w-> last >= w-> num - 1) {
+			Bool hit = false;
+			x = 0;
 			while ( m) {
-				int dx = 0;
-				if ( !m-> flags. divider) {
-					dx += MENU_XOFFSET * 2 + ix-> width;
-					if ( m-> accel) dx += MENU_XOFFSET / 2 + ix-> accel_width;
-				}
-				if ( x + dx >= w-> sz.x) {
-					if ( stage == 0) { /* now we are sure that >> should be drawn - check again */
-						x = MENU_XOFFSET * 2 + XX-> guillemots;
-						stage++;
-						goto AGAIN;
-					}
+				if ( m-> flags. divider) {
+					hit = true;
 					break;
+				} else {
+					x += MENU_XOFFSET * 2 + ix-> width;
+					if ( m-> accel) x += MENU_XOFFSET / 2 + ix-> accel_width;
 				}
-				x += dx;
-				w-> last++;
 				m = m-> next;
 				ix++;
 			}
-			m = w-> m;
-			ix = w-> um;
-			w-> right = 0;
-			if ( w-> last >= w-> num - 1) {
-				Bool hit = false;
-				x = 0;
+			if ( hit) {
+				w-> right = 0;
 				while ( m) {
-					if ( m-> flags. divider) {
-						hit = true;
-						break;
-					} else {
-						x += MENU_XOFFSET * 2 + ix-> width;
-						if ( m-> accel) x += MENU_XOFFSET / 2 + ix-> accel_width;
+					if ( !m-> flags. divider) {
+						w-> right += MENU_XOFFSET * 2 + ix-> width;
+						if ( m-> accel) w-> right += MENU_XOFFSET / 2 + ix-> accel_width;
 					}
 					m = m-> next;
 					ix++;
 				}
-				if ( hit) {
-					w-> right = 0;
-					while ( m) {
-						if ( !m-> flags. divider) {
-							w-> right += MENU_XOFFSET * 2 + ix-> width;
-							if ( m-> accel) w-> right += MENU_XOFFSET / 2 + ix-> accel_width;
-						}
-						m = m-> next;
-						ix++;
-					}
-					w-> right = w-> sz.x - w-> right - x;
-				}
+				w-> right = w-> sz.x - w-> right - x;
 			}
 		}
 	}
-	break;
-	case ButtonPress:
-	case ButtonRelease: {
-		DEFMM;
-		int px, first = 0;
-		PMenuWindow w;
-		XWindow focus = nilHandle;
-		if ( prima_no_input( X(PComponent(self)->owner), false, true)) return;
-		if ( ev-> xbutton. button != Button1) return;
+}
 
-		if ( XX-> wstatic. w == win) {
-			Handle x = guts. focused, owner = PComponent(self)-> owner;
-			while ( x && !X(x)-> type. window) x = PComponent( x)-> owner;
-			if ( x != owner) {
-				XSetInputFocus( DISP, focus = PComponent( owner)-> handle,
-					RevertToNone, ev-> xbutton. time);
-			}
-		}
 
-		if ( !( w = get_menu_window( self, win))) {
-			prima_end_menu();
-			return;
-		}
-		px = menu_point2item( XX, w, ev-> xbutton. x, ev-> xbutton.y, nil);
-		if ( px < 0) {
-			if ( XX-> wstatic. w == win)
-				prima_end_menu();
-			return;
-		}
-		if ( guts. currentMenu != self) {
-			int rev;
-			if ( ev-> type == ButtonRelease) return;
-			if ( guts. currentMenu)
-				prima_end_menu();
-			if ( focus)
-				XX-> focus = focus;
-			else
-				XGetInputFocus( DISP, &XX-> focus, &rev);
-			if ( !XX-> type. popup) {
-				Handle topl = PComponent( self)-> owner;
-				Handle who  = ( Handle) hash_fetch( guts.windows, (void*)&XX-> focus, sizeof(XX-> focus));
-				while ( who) {
-					if ( XT_IS_WINDOW(X(who))) {
-						if ( who != topl) XX-> focus = PComponent( topl)-> handle;
-						break;
-					}
-					who = PComponent( who)-> owner;
-				}
-			}
-			first = 1;
-		}
-		XSetInputFocus( DISP, XX-> w-> w, RevertToNone, CurrentTime);
-		guts. currentMenu = self;
-		if ( first && ( ev-> type == ButtonPress) && ( !send_cmMenu( self, nil)))
-			return;
-		if ( !first && ( ev-> type == ButtonPress)) return;
-		apc_timer_stop( MENU_TIMER);
-		menu_select_item( XX, w, px);
-		if ( !ev-> xbutton. send_event) {
-			if ( !menu_enter_item( XX, w, px, ( ev-> type == ButtonPress) ? 0 : 1))
-				return;
-		} else
+static void
+handle_menu_motion( XEvent *ev, XWindow win, Handle self)
+{
+	DEFMM;
+	PMenuItemReg m;
+	PMenuWindow w;
+	int px;
+	if ( guts. currentMenu != self) return;
+
+	w = get_menu_window( self, win);
+	px = menu_point2item( XX, w, ev-> xmotion.x, ev-> xmotion.y, nil);
+	menu_select_item( XX, w, px);
+	m = w-> m;
+	if ( px >= 0) {
+		int x = px;
+		while ( x--) m = m-> next;
+		if ( px != w-> last + 1) m = m-> down;
+		if ( !w-> next || w-> next-> m != m) {
+			apc_timer_set_timeout( MENU_TIMER, (XX-> wstatic. w == win) ? 2 : guts. menu_timeout);
 			XX-> focused = w;
-
-		ev-> xbutton. x += w-> pos. x;
-		ev-> xbutton. y += w-> pos. y;
-		if ( w-> next &&
-			ev-> xbutton. x >= w-> next-> pos.x &&
-			ev-> xbutton. y >= w-> next-> pos.y &&
-			ev-> xbutton. x <  w-> next-> pos.x + w-> next-> sz.x &&
-			ev-> xbutton. y <  w-> next-> pos.y + w-> next-> sz.y)
-			{ /* simulate mouse move, as X are stupid enough to not do it  */
-			int x = ev-> xbutton.x, y = ev-> xbutton. y;
-			ev-> xmotion. x = x - w-> next-> pos. x;
-			ev-> xmotion. y = y - w-> next-> pos. y;
-			win = w-> next-> w;
-			goto MOTION_NOTIFY;
 		}
 	}
-	break;
-	MOTION_NOTIFY:
-	case MotionNotify: if ( guts. currentMenu == self) {
-		DEFMM;
-		PMenuItemReg m;
-		PMenuWindow w = get_menu_window( self, win);
-		int px = menu_point2item( XX, w, ev-> xmotion.x, ev-> xmotion.y, nil);
-		menu_select_item( XX, w, px);
-		m = w-> m;
-		if ( px >= 0) {
-			int x = px;
-			while ( x--) m = m-> next;
-			if ( px != w-> last + 1) m = m-> down;
-			if ( !w-> next || w-> next-> m != m) {
-				apc_timer_set_timeout( MENU_TIMER, (XX-> wstatic. w == win) ? 2 : guts. menu_timeout);
-				XX-> focused = w;
-			}
-		}
-		while ( w-> next) {
-			menu_select_item( XX, w-> next, -1);
-			w = w-> next;
+	while ( w-> next) {
+		menu_select_item( XX, w-> next, -1);
+		w = w-> next;
+	}
+}
+
+static void
+handle_menu_button( XEvent *ev, XWindow win, Handle self)
+{
+	DEFMM;
+	int px, first = 0;
+	PMenuWindow w;
+	XWindow focus = nilHandle;
+	if ( prima_no_input( X(PComponent(self)->owner), false, true)) return;
+	if ( ev-> xbutton. button != Button1) return;
+
+	if ( XX-> wstatic. w == win) {
+		Handle x = guts. focused, owner = PComponent(self)-> owner;
+		while ( x && !X(x)-> type. window) x = PComponent( x)-> owner;
+		if ( x != owner) {
+			XSetInputFocus( DISP, focus = PComponent( owner)-> handle,
+				RevertToNone, ev-> xbutton. time);
 		}
 	}
-	break;
-	case FocusOut:
-		if ( self == guts. currentMenu) {
-			switch ( ev-> xfocus. detail) {
-			case NotifyVirtual:
-			case NotifyPointer:
-			case NotifyPointerRoot:
-			case NotifyDetailNone:
-			case NotifyNonlinearVirtual:
-				return;
-			}
-			apc_timer_stop( MENU_UNFOCUS_TIMER);
-			apc_timer_start( MENU_UNFOCUS_TIMER);
-			guts. unfocusedMenu = self;
-		}
-		break;
-	case FocusIn:
-		if ( guts. unfocusedMenu && self == guts. unfocusedMenu && self == guts. currentMenu) {
-			switch ( ev-> xfocus. detail) {
-			case NotifyVirtual:
-			case NotifyPointer:
-			case NotifyPointerRoot:
-			case NotifyDetailNone:
-			case NotifyNonlinearVirtual:
-				return;
-			}
-			apc_timer_stop( MENU_UNFOCUS_TIMER);
-			guts. unfocusedMenu = nilHandle;
-		}
-		break;
-	case KeyPress: {
-		DEFMM;
-		char str_buf[ 256];
-		KeySym keysym;
-		int str_len, d = 0, piles = 0;
-		PMenuWindow w;
-		PMenuItemReg m;
 
-		str_len = XLookupString( &ev-> xkey, str_buf, 256, &keysym, nil);
-		if ( prima_handle_menu_shortcuts( PComponent(self)-> owner, ev, keysym) != 0)
-			return;
-
-		if ( self != guts. currentMenu) return;
-		apc_timer_stop( MENU_TIMER);
-		if ( !XX-> focused) return;
-		/* navigation */
-		w = XX-> focused;
-		m = w-> m;
-		switch (keysym) {
-		case XK_Left:
-		case XK_KP_Left:
-			if ( w == &XX-> wstatic) { /* horizontal menu */
-				d--;
-			} else if ( w != XX-> w) { /* not a popup root */
-				if ( w-> prev) menu_window_delete_downlinks( XX, w-> prev);
-				if ( w-> prev == &XX-> wstatic) {
-					d--;
-					piles = 1;
-				} else
-					return;
-			}
-			break;
-		case XK_Right:
-		case XK_KP_Right:
-			if ( w == &XX-> wstatic) { /* horizontal menu */
-				d++;
-			} else if ( w-> selected >= 0) {
-				int sel;
-				sel = w-> selected;
-				if ( sel >= 0) {
-					while ( sel--) m = m-> next;
-				}
-				if ( m-> down || w-> selected == w-> last + 1) {
-					if ( menu_enter_item( XX, w, w-> selected, 1) && w-> next)
-						menu_select_item( XX, w-> next, 0);
-				} else if ( w-> prev == &XX-> wstatic) {
-					menu_window_delete_downlinks( XX, XX-> w);
-					piles = 1;
-					d++;
-				} else
-					return;
-			}
-			break;
-		case XK_Up:
-		case XK_KP_Up:
-			if ( w != &XX-> wstatic) d--;
-			break;
-		case XK_Down:
-		case XK_KP_Down:
-			if ( w == &XX-> wstatic) {
-				int sel = w-> selected;
-				if ( sel >= 0) {
-					while ( sel--) m = m-> next;
-				}
-				if ( m-> down || w-> selected == w-> last + 1) {
-					if ( menu_enter_item( XX, w, w-> selected, 1) && w-> next)
-						menu_select_item( XX, w-> next, 0);
-				}
-			} else
-				d++;
-			break;
-		case XK_KP_Enter:
-		case XK_Return:
-			menu_enter_item( XX, w, w-> selected, 1);
-			return;
-		case XK_Escape:
-			if ( w-> prev)
-				menu_window_delete_downlinks( XX, w-> prev);
-			else
-				prima_end_menu();
-			return;
-		default:
-			goto NEXT_STAGE;
-		}
-
-		if ( piles) w = XX-> focused = w-> prev;
-
-		if ( d != 0) {
-			int sel = w-> selected;
-			PMenuItemReg m;
-			int z, last = w-> last + (( w-> num == w-> last + 1) ? 0 : 1);
-
-			if ( sel < -1) sel = -1;
-			while ( 1) {
-				if ( d > 0) {
-					sel = ( sel >= last) ? 0 : sel + 1;
-				} else {
-					sel = ( sel <= 0) ? last : sel - 1;
-				}
-				m = w-> m;
-				z = sel;
-				while ( z--) m = m-> next;
-				if ( sel == w-> last + 1 || !m-> flags. divider) {
-					menu_select_item( XX, w, sel);
-					menu_window_delete_downlinks( XX, w);
-					if ( piles) {
-						if ( menu_enter_item( XX, w, sel, 0) && w-> next)
-							menu_select_item( XX, w-> next, 0);
-					}
+	if ( !( w = get_menu_window( self, win))) {
+		prima_end_menu();
+		return;
+	}
+	px = menu_point2item( XX, w, ev-> xbutton. x, ev-> xbutton.y, nil);
+	if ( px < 0) {
+		if ( XX-> wstatic. w == win)
+			prima_end_menu();
+		return;
+	}
+	if ( guts. currentMenu != self) {
+		int rev;
+		if ( ev-> type == ButtonRelease) return;
+		if ( guts. currentMenu)
+			prima_end_menu();
+		if ( focus)
+			XX-> focus = focus;
+		else
+			XGetInputFocus( DISP, &XX-> focus, &rev);
+		if ( !XX-> type. popup) {
+			Handle topl = PComponent( self)-> owner;
+			Handle who  = ( Handle) hash_fetch( guts.windows, (void*)&XX-> focus, sizeof(XX-> focus));
+			while ( who) {
+				if ( XT_IS_WINDOW(X(who))) {
+					if ( who != topl) XX-> focus = PComponent( topl)-> handle;
 					break;
 				}
+				who = PComponent( who)-> owner;
 			}
-
 		}
+		first = 1;
+	}
+	XSetInputFocus( DISP, XX-> w-> w, RevertToNone, CurrentTime);
+	guts. currentMenu = self;
+	if ( first && ( ev-> type == ButtonPress) && ( !send_cmMenu( self, nil)))
 		return;
+	if ( !first && ( ev-> type == ButtonPress)) return;
+	apc_timer_stop( MENU_TIMER);
+	menu_select_item( XX, w, px);
+	if ( !ev-> xbutton. send_event) {
+		if ( !menu_enter_item( XX, w, px, ( ev-> type == ButtonPress) ? 0 : 1))
+			return;
+	} else
+		XX-> focused = w;
+
+	ev-> xbutton. x += w-> pos. x;
+	ev-> xbutton. y += w-> pos. y;
+	if ( w-> next &&
+		ev-> xbutton. x >= w-> next-> pos.x &&
+		ev-> xbutton. y >= w-> next-> pos.y &&
+		ev-> xbutton. x <  w-> next-> pos.x + w-> next-> sz.x &&
+		ev-> xbutton. y <  w-> next-> pos.y + w-> next-> sz.y
+	) {
+		/* simulate mouse move, as X are stupid enough to not do it  */
+		int x = ev-> xbutton.x, y = ev-> xbutton. y;
+		ev-> xmotion. x = x - w-> next-> pos. x;
+		ev-> xmotion. y = y - w-> next-> pos. y;
+		win = w-> next-> w;
+		handle_menu_motion(ev, win, self);
+	}
+}
+
+static void
+handle_menu_focus_out( XEvent *ev, XWindow win, Handle self)
+{
+	if ( self != guts. currentMenu) return;
+
+	switch ( ev-> xfocus. detail) {
+	case NotifyVirtual:
+	case NotifyPointer:
+	case NotifyPointerRoot:
+	case NotifyDetailNone:
+	case NotifyNonlinearVirtual:
+		return;
+	}
+	apc_timer_stop( MENU_UNFOCUS_TIMER);
+	apc_timer_start( MENU_UNFOCUS_TIMER);
+	guts. unfocusedMenu = self;
+}
+
+static void
+handle_menu_focus_in( XEvent *ev, XWindow win, Handle self)
+{
+	if ( guts. unfocusedMenu && self == guts. unfocusedMenu && self == guts. currentMenu) {
+		switch ( ev-> xfocus. detail) {
+		case NotifyVirtual:
+		case NotifyPointer:
+		case NotifyPointerRoot:
+		case NotifyDetailNone:
+		case NotifyNonlinearVirtual:
+			return;
+		}
+		apc_timer_stop( MENU_UNFOCUS_TIMER);
+		guts. unfocusedMenu = nilHandle;
+	}
+}
+
+static void
+handle_menu_key( XEvent *ev, XWindow win, Handle self)
+{
+	DEFMM;
+	char str_buf[ 256];
+	KeySym keysym;
+	int str_len, d = 0, piles = 0;
+	PMenuWindow w;
+	PMenuItemReg m;
+
+	str_len = XLookupString( &ev-> xkey, str_buf, 256, &keysym, nil);
+	if ( prima_handle_menu_shortcuts( PComponent(self)-> owner, ev, keysym) != 0)
+		return;
+
+	if ( self != guts. currentMenu) return;
+	apc_timer_stop( MENU_TIMER);
+	if ( !XX-> focused) return;
+	/* navigation */
+	w = XX-> focused;
+	m = w-> m;
+	switch (keysym) {
+	case XK_Left:
+	case XK_KP_Left:
+		if ( w == &XX-> wstatic) { /* horizontal menu */
+			d--;
+		} else if ( w != XX-> w) { /* not a popup root */
+			if ( w-> prev) menu_window_delete_downlinks( XX, w-> prev);
+			if ( w-> prev == &XX-> wstatic) {
+				d--;
+				piles = 1;
+			} else
+				return;
+		}
+		break;
+	case XK_Right:
+	case XK_KP_Right:
+		if ( w == &XX-> wstatic) { /* horizontal menu */
+			d++;
+		} else if ( w-> selected >= 0) {
+			int sel;
+			sel = w-> selected;
+			if ( sel >= 0) {
+				while ( sel--) m = m-> next;
+			}
+			if ( m-> down || w-> selected == w-> last + 1) {
+				if ( menu_enter_item( XX, w, w-> selected, 1) && w-> next)
+					menu_select_item( XX, w-> next, 0);
+			} else if ( w-> prev == &XX-> wstatic) {
+				menu_window_delete_downlinks( XX, XX-> w);
+				piles = 1;
+				d++;
+			} else
+				return;
+		}
+		break;
+	case XK_Up:
+	case XK_KP_Up:
+		if ( w != &XX-> wstatic) d--;
+		break;
+	case XK_Down:
+	case XK_KP_Down:
+		if ( w == &XX-> wstatic) {
+			int sel = w-> selected;
+			if ( sel >= 0) {
+				while ( sel--) m = m-> next;
+			}
+			if ( m-> down || w-> selected == w-> last + 1) {
+				if ( menu_enter_item( XX, w, w-> selected, 1) && w-> next)
+					menu_select_item( XX, w-> next, 0);
+			}
+		} else
+			d++;
+		break;
+	case XK_KP_Enter:
+	case XK_Return:
+		menu_enter_item( XX, w, w-> selected, 1);
+		return;
+	case XK_Escape:
+		if ( w-> prev)
+			menu_window_delete_downlinks( XX, w-> prev);
+		else
+			prima_end_menu();
+		return;
+	default:
+		goto NEXT_STAGE;
+	}
+
+	if ( piles) w = XX-> focused = w-> prev;
+
+	if ( d != 0) {
+		int sel = w-> selected;
+		PMenuItemReg m;
+		int z, last = w-> last + (( w-> num == w-> last + 1) ? 0 : 1);
+
+		if ( sel < -1) sel = -1;
+		while ( 1) {
+			if ( d > 0) {
+				sel = ( sel >= last) ? 0 : sel + 1;
+			} else {
+				sel = ( sel <= 0) ? last : sel - 1;
+			}
+			m = w-> m;
+			z = sel;
+			while ( z--) m = m-> next;
+			if ( sel == w-> last + 1 || !m-> flags. divider) {
+				menu_select_item( XX, w, sel);
+				menu_window_delete_downlinks( XX, w);
+				if ( piles) {
+					if ( menu_enter_item( XX, w, sel, 0) && w-> next)
+						menu_select_item( XX, w-> next, 0);
+				}
+				break;
+			}
+		}
+
+	}
+	return;
 NEXT_STAGE:
 
-		if ( str_len == 1) {
-			int i;
-			char c = tolower( str_buf[0]);
-			for ( i = 0; i <= w-> last; i++) {
-				if ( m-> text) {
-					int j = 0;
-					char * t = m-> text, z = 0;
-					while ( t[j]) {
-						if ( t[j] == '~' && t[j+1]) {
-							if ( t[j+1] == '~')
-								j += 2;
-							else {
-								z = tolower(t[j+1]);
-								break;
-							}
+	if ( str_len == 1) {
+		int i;
+		char c = tolower( str_buf[0]);
+		for ( i = 0; i <= w-> last; i++) {
+			if ( m-> text) {
+				int j = 0;
+				char * t = m-> text, z = 0;
+				while ( t[j]) {
+					if ( t[j] == '~' && t[j+1]) {
+						if ( t[j+1] == '~')
+							j += 2;
+						else {
+							z = tolower(t[j+1]);
+							break;
 						}
-						j++;
 					}
-					if ( z == c) {
-						if ( menu_enter_item( XX, w, i, 1) && w-> next)
-							menu_select_item( XX, w, i);
-						return;
-					}
+					j++;
 				}
-				m = m-> next;
+				if ( z == c) {
+					if ( menu_enter_item( XX, w, i, 1) && w-> next)
+						menu_select_item( XX, w, i);
+					return;
+				}
 			}
+			m = m-> next;
 		}
 	}
-	break;
-	case MenuTimerMessage:
-	if ( self == guts. currentMenu) {
-		DEFMM;
-		PMenuWindow w;
-		PMenuItemReg m;
-		int s;
+}
+	
+static void
+handle_menu_timer( XEvent *ev, XWindow win, Handle self)
+{
+	DEFMM;
+	PMenuWindow w;
+	PMenuItemReg m;
+	int s;
+	if ( self != guts. currentMenu) return;
 
-		if ( !( w = XX-> focused)) return;
-		m = w-> m;
-		s = w-> selected;
-		if ( s < 0) return;
-		while ( s--) m = m-> next;
-		if ( m-> down || w-> selected == w-> last + 1)
-			menu_enter_item( XX, w, w-> selected, 0);
-		else
-			menu_window_delete_downlinks( XX, w);
-	}
-	break;
+	if ( !( w = XX-> focused)) return;
+	m = w-> m;
+	s = w-> selected;
+	if ( s < 0) return;
+	while ( s--) m = m-> next;
+	if ( m-> down || w-> selected == w-> last + 1)
+		menu_enter_item( XX, w, w-> selected, 0);
+	else
+		menu_window_delete_downlinks( XX, w);
+}
+
+void
+prima_handle_menu_event( XEvent *ev, XWindow win, Handle self)
+{
+	switch ( ev-> type) {
+	case Expose: 
+		handle_menu_expose(ev, win, self);
+		break;
+	case ConfigureNotify:
+		handle_menu_configure(ev, win, self);
+		break;
+	case ButtonPress:
+	case ButtonRelease:
+		handle_menu_button(ev, win, self);
+		break;
+	case MotionNotify:
+		handle_menu_motion(ev, win, self);
+		break;
+	case FocusOut:
+		handle_menu_focus_out(ev, win, self);
+		break;
+	case FocusIn:
+		handle_menu_focus_in(ev, win, self);
+		break;
+	case KeyPress:
+		handle_menu_key(ev, win, self);
+		break;
+	case MenuTimerMessage:
+		handle_menu_timer(ev, win, self);
+		break;
 	}
 }
 
@@ -1638,6 +2135,38 @@ menubar_repaint( Handle self)
 	}
 }
 
+static void
+menu_update_item( Handle self, PMenuItemReg m)
+{
+	DEFMM;
+	PUnixMenuItem ix;
+	PMenuWindow w;
+	PMenuItemReg mm;
+	Handle owner;
+	Bool layered;
+
+	if ( !PMenu(self)-> handle) return; /* horizontal updates only */
+
+	w       = XX-> w;
+	ix      = w-> um;
+	mm      = w->m;
+	owner   = PComponent( w-> self)-> owner;
+	layered = X(owner)->flags. layered;
+	while (mm) {
+		int w, h;
+		if ( mm != m ) {
+			ix++;
+			mm = mm->next;
+			continue;
+		}
+		kill_menu_bitmap( &ix->icon);
+		kill_menu_bitmap( &ix->bitmap);
+		create_menu_bitmap(m->bitmap, &ix->bitmap, layered, m->flags.disabled, &w, &h);
+		create_menu_bitmap(m->icon, &ix->icon, layered, m->flags.disabled, &w, &h);
+		break;
+	}
+}
+
 Bool
 apc_menu_update( Handle self, PMenuItemReg oldBranch, PMenuItemReg newBranch)
 {
@@ -1682,6 +2211,13 @@ apc_menu_item_set_accel( Handle self, PMenuItemReg m)
 }
 
 Bool
+apc_menu_item_set_autotoggle( Handle self, PMenuItemReg m)
+{
+	menu_touch( self, m, false);
+	return true;
+}
+
+Bool
 apc_menu_item_set_check( Handle self, PMenuItemReg m)
 {
 	menu_touch( self, m, false);
@@ -1692,14 +2228,26 @@ Bool
 apc_menu_item_set_enabled( Handle self, PMenuItemReg m)
 {
 	menu_touch( self, m, false);
+	menu_update_item(self, m);
 	menubar_repaint( self);
 	return true;
 }
 
 Bool
+apc_menu_item_set_icon( Handle self, PMenuItemReg m)
+{
+	menu_touch( self, m, false);
+	menu_update_item(self, m);
+	menubar_repaint( self);
+	return true;
+}
+
+
+Bool
 apc_menu_item_set_image( Handle self, PMenuItemReg m)
 {
 	menu_touch( self, m, false);
+	menu_update_item(self, m);
 	menubar_repaint( self);
 	return true;
 }
@@ -1815,6 +2363,12 @@ apc_window_set_menu( Handle self, Handle menu)
 		PMenuWindow w = M(m)-> w;
 		if ( m-> handle == guts. currentMenu) prima_end_menu();
 		hash_delete( guts. menu_windows, &w-> w, sizeof( w-> w), false);
+#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
+		if ( w->argb_picture ) {
+			XRenderFreePicture( DISP, w->argb_picture);
+			w->argb_picture = 0;
+		}
+#endif
 		XDestroyWindow( DISP, w-> w);
 		free_unix_items( w);
 		m-> handle = nilHandle;
@@ -1844,6 +2398,10 @@ apc_window_set_menu( Handle self, Handle menu)
 		M(m)-> w-> w = m-> handle = XCreateWindow( DISP, X_WINDOW,
 			0, 0, 1, 1, 0, CopyFromParent,
 			InputOutput, CopyFromParent, valuemask, &attrs);
+#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
+		if ( XF_LAYERED(XX) )
+			M(m)->w->argb_picture = XRenderCreatePicture( DISP, M(m)->w->w, guts. xrender_argb_pic_format, 0, NULL);
+#endif
 		hash_store( guts. menu_windows, &m-> handle, sizeof( m-> handle), m);
 		XResizeWindow( DISP, m-> handle, XX-> size.x, y);
 		XMapRaised( DISP, m-> handle);
@@ -1865,14 +2423,49 @@ apc_window_set_menu( Handle self, Handle menu)
 			M(menu)-> c[i] = prima_allocate_color( self,
 				prima_map_color( PWindow(self)-> menuColor[i], nil), nil);
 		}
+		i = MENU_PALETTE_SIZE - 1;
+		M(menu)-> c[i] = prima_allocate_color( self, 0x404040, nil);
 		XX->flags.layered = layered;
 		M(menu)-> layered = XX->flags. layered;
 		if ( M(menu)-> layered ) {
-			for ( i = 0; i <= ciMaxId; i++)
+			for ( i = 0; i <= ciMaxId; i++) 
 				M(menu)-> argb_c[i] = argb_color(
 					prima_map_color( PWindow(self)-> menuColor[i], nil)
 				);
+			i = MENU_PALETTE_SIZE - 1;
+			M(menu)-> argb_c[i] = prima_allocate_color( self, 0x404040, nil);
 		}
 	}
+	return true;
+}
+
+Bool
+apc_menu_item_begin_paint( Handle self, PEvent event)
+{
+	PaintEvent * pe = (PaintEvent*) event-> gen.p;
+	PDrawableSysData YY = X(event->gen.H);
+
+	YY-> type.drawable = 1;
+	YY-> type.widget   = 1;
+	YY-> flags.paint   = 1;
+	YY-> flags.layered = pe->layered;
+#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
+	if ( pe-> layered )
+		YY-> argb_picture = M(pe->self)->w->argb_picture;
+#endif
+	YY-> gdrawable     = pe->win;
+	YY-> size          = event-> gen.P;
+	YY-> visual        = pe->layered ? &guts. argb_visual : &guts. visual;
+	YY-> colormap      = pe->layered ? guts. argbColormap : guts. defaultColormap;
+	prima_prepare_drawable_for_painting(event-> gen.H, false );
+
+	return true;
+
+}
+
+Bool
+apc_menu_item_end_paint( Handle self, PEvent event)
+{
+	prima_cleanup_drawable_after_painting(event->gen.H);
 	return true;
 }

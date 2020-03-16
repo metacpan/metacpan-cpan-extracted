@@ -1,0 +1,29 @@
+---
+abstract: 'XS functions to assist in parsing C<sub>-like syntax'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XS-Parse-Sublike
+provides:
+  XS::Parse::Sublike:
+    file: lib/XS/Parse/Sublike.pm
+    version: '0.01'
+  XS::Parse::Sublike::Builder:
+    file: lib/XS/Parse/Sublike/Builder.pm
+    version: '0.01'
+requires:
+  perl: '5.016'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

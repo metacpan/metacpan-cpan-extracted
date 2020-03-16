@@ -1,3 +1,9 @@
+1.0.0	2020-03-16
+	* First stable release (stable APIs)
+	* Switched to semantic versioning
+	* Moved repository in the 'seqfu' package
+	* FIXED sorting bug in 'n50'
+
 0.92	2020-01-31
 	* Downgrading requisite to perl 5.14
 

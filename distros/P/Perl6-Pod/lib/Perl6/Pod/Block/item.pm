@@ -167,7 +167,7 @@ use Data::Dumper;
 use Perl6::Pod::Block;
 use base 'Perl6::Pod::Block';
 use Perl6::Pod::Utl;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
     my $class = shift;
@@ -175,7 +175,7 @@ sub new {
 
     #check if item numbered
     #    my $content = $self->{content}->[0];
-    if ( $self->{content}->[0] =~ s/^(\s*\#\s*)// ) {
+    if ( $self->{content}->[0] =~ s/^(\s*\#\s+)// ) {
 
         #set numbered attr
         #TODO $self->set_attr;

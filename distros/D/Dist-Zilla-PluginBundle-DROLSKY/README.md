@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 1.05
+version 1.06
 
 # SYNOPSIS
 
@@ -102,9 +102,9 @@ This is more or less equivalent to the following `dist.ini`:
     homepage = 0
 
     [MetaResources]
-    homepage = http://metacpan.org/release/My-Module
+    homepage = https://metacpan.org/release/My-Module
     ; RT bits are omitted if use_github_issue is true
-    bugtracker.web  = http://rt.cpan.org/Public/Dist/Display.html?Name=My-Module
+    bugtracker.web  = https://rt.cpan.org/Public/Dist/Display.html?Name=My-Module
     bugtracker.mail = bug-My-Module@rt.cpan.org
 
     [MetaProvides::Pckage]
@@ -305,7 +305,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHOR
 
@@ -317,7 +317,7 @@ Mark Fowler <mark@twoshortplanks.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2019 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

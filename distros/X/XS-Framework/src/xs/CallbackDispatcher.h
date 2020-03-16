@@ -189,7 +189,7 @@ namespace xs {
     using XSCallbackDispatcher = callback_dispatcher::XSCallbackDispatcher;
 
     template <> struct Typemap<XSCallbackDispatcher*> : TypemapObject<XSCallbackDispatcher*, XSCallbackDispatcher*, ObjectTypePtr, ObjectStorageMG> {
-       static std::string package () { return "XS::Framework::CallbackDispatcher"; }
+       static panda::string_view package () { return "XS::Framework::CallbackDispatcher"; }
     };
 
     template <typename Ret, class...Args> struct Typemap<panda::CallbackDispatcher<Ret(Args...)>*> {

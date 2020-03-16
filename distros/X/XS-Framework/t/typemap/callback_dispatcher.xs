@@ -37,15 +37,15 @@ struct DispatchingObject {
 
 namespace xs {
     template <class TYPE> struct Typemap<DispatchingObject*,TYPE> : TypemapObject<DispatchingObject*, TYPE, ObjectTypePtr, ObjectStorageMG> {
-        static std::string package () { return "MyTest::DispatchingObject"; }
+        static panda::string_view package () { return "MyTest::DispatchingObject"; }
     };
 
     template <class TYPE> struct Typemap<SomeClass*,TYPE> : TypemapObject<SomeClass*, TYPE, ObjectTypePtr, ObjectStorageMG> {
-        static std::string package () { return "MyTest::SomeClass"; }
+        static panda::string_view package () { return "MyTest::SomeClass"; }
     };
 
     template <class TYPE> struct Typemap<SomeClass2*,TYPE> : TypemapObject<SomeClass2*, TYPE, ObjectTypePtr, ObjectStorageMG> {
-        static std::string package () { return "MyTest::SomeClass2"; }
+        static panda::string_view package () { return "MyTest::SomeClass2"; }
     };
 }
 

@@ -2,8 +2,8 @@ package kateb;
 
 use strict;
 use warnings;
-use 5.016;
-our $VERSION = '00.98.13';
+use 5.012;
+our $VERSION = '01.00.10';
 
 
 1;
@@ -19,7 +19,7 @@ kateb - tools for install and update farsi free fonts
 
 =head1 VERSION
 
-This document describes L<kateb> version B<00.98.12>.
+This document describes L<kateb> version B<01.00.10>.
 
 
 =head1 kateb
@@ -28,9 +28,17 @@ kateb comes with a command-line application which you can use to install and upd
 
  $ cpanm kateb # Install
 
- $ kateb       # install fonts in ~/.local/share/fonts/farsifreefonts
+ $ kateb install [font name |or| all]      # install fonts in ~/.local/share/fonts/farsifreefonts
+ 
+ $ kateb reinstall [font name |or| all]
+ 
+ $ kateb update [font name |or| all]
+ 
+ $ kateb list                                        # list of installed fonts
+ 
+ $ kateb fonts                                    # list of available fonts
 
- $ sudo kateb  # install fonts in /usr/share/fonts/farsifreefonts
+ $ sudo kateb install/reinstall/update [font name |or| all] # install fonts in /usr/share/fonts/farsifreefonts
 
 
 =head1 Author
@@ -46,5 +54,108 @@ kateb is free software: you can redistribute it and/or modify it under the terms
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with this program. If not, see LL<http://www.gnu.org/licenses/>.
+
+=head1 فارسی
+
+# کاتب
+
+نصب کننده‌ی فونت‌های آزاد فارسی
+
+‫کاتب یک نصب کننده و به روز رسان برای فونت‌های آزاد فارسی است.
+
+## نصب
+
+	sudo cpan kateb
+	
+### پیش‌نیازها
+- ‫در صورتی‌که از اوبونتو و یا سایر نسخه‌های بر پایه دبیان استفاده می‌کنید و openssl بر روس سیستم شما نصب نیست
+
+``` bash
+sudo apt install openssl libssl-dev
+```
+
+- آرچ و نسخه‌های بر پایه‌ی آن مانند مانجارو
+
+> نیازی به نصب پیش نیاز ندارید
+
+## استفاده
+
+### fonts
+نمایش فونت‌های پشتیبانی شده توسط کاتب
+
+	kateb fonts
+
+### install
+نصب یک فونت جدید یا تمام فونت‌های پشتیبانی شده
+
+	kateb install [font name]
+	
+	kateb install vazir
+	#or
+	kateb install all
+
+### update
+به روز رسانی فونت نصب شده
+
+	kateb update shabnam
+	#or
+	kateb update all
+
+### reinstall
+دوباره نصب کردن فونت نصب شده
+
+	kateb reinstall behdad
+	#or
+	kateb reinstall all
+
+### list
+لیست نام و نسخه‌ی فونت‌های نصب شده توسط کاتب
+
+	kateb list
+
+## مسیر نصب
+‫**۱-** نصب در دایرکتوری خانه کاربر:
+
+‫پس از نصب در ترمینال تنها کافی است تایپ کنید:
+
+	kateb
+
+در صورتیکه فونت‌های پشتیبانی شده را قبلا در آدرس
+
+	~/.local/share/fonts/
+
+‫یا سایر مسیرهایی که به عنوان شاخه‌های فونت توسط سیستم‌عامل شما در دایرکتوری خانه پشتیبانی می‌شوند، کپی کرده‌اید ابتدا فونت‌های کپی شده را پاک کنید.
+
+‫مسیر نصب فونت‌ها توسط کاتب در پوشه‌ی خانه کاربر:
+
+	~/.local/share/fonts/farsifreefont
+
+‫**۲-** نصب سیستمی:
+
+	sudo kateb
+
+‫مسیر نصب سیستمی فونت:
+
+	/usr/share/fonts/truetype/farsifreefont
+
+## فونت‌های پشتیبانی شده
+لیست فونت‌هایی که در حال حاضر پشتیبانی می‌شوند
+
+	gandom
+	vazir
+	farbod
+	tanha
+	vazir-code
+	nika
+	mikhak
+	pfont
+	sahel
+	ganjnameh
+	samim
+	shabnam
+	parastoo
+	nahid
+	behdad
+
 
 =cut

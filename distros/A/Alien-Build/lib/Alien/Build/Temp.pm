@@ -5,9 +5,10 @@ use warnings;
 use Carp ();
 use Path::Tiny ();
 use File::Temp ();
+use File::Spec ();
 
 # ABSTRACT: Temp Dir support for Alien::Build
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.15'; # VERSION
 
 
 # problem with vanilla File::Temp is that is often uses
@@ -23,6 +24,8 @@ my %root;
 
 sub _root
 {
+  return File::Spec->tmpdir if $^O eq 'MSWin32';
+
   my $root = Path::Tiny->new(-d "_alien" ? "_alien/tmp" : ".tmp")->absolute;
   unless(-d $root)
   {
@@ -79,7 +82,7 @@ Alien::Build::Temp - Temp Dir support for Alien::Build
 
 =head1 VERSION
 
-version 2.12
+version 2.15
 
 =head1 DESCRIPTION
 

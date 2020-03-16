@@ -8,13 +8,15 @@ namespace xs { namespace exp {
 using panda::string;
 using panda::string_view;
 
-static thread_local panda::optional<Hash>  clists;
-static thread_local panda::optional<Stash> self_stash;
+static PERL_THREAD_LOCAL struct {
+    Hash  clists;
+    Stash self_stash = Stash("Export::XS", GV_ADD);
+} tls;
 
 static bool _init () {
     xs::at_perl_destroy([]{
-        clists.reset();
-        self_stash.reset();
+        tls.clists     = nullptr;
+        tls.self_stash = nullptr;
     });
     return true;
 }
@@ -23,8 +25,8 @@ static bool __init = _init();
 static void throw_noname (Stash s) { throw std::logic_error(string("Export::XS: can't define a constant with an empty name in '") + s.name() + "'"); }
 
 Array constants_list (const Stash& stash) {
-    if (!clists) clists = Hash::create();
-    auto clist = (*clists)[stash.name()];
+    if (!tls.clists) tls.clists = Hash::create();
+    auto clist = tls.clists[stash.name()];
     if (!clist.defined()) clist = Ref::create(Array::create());
     return Array(clist);
 }
@@ -85,8 +87,7 @@ void export_constants (const Stash& from, Stash to) {
 }
 
 void autoexport (Stash stash) {
-    if (!self_stash) self_stash = Stash("Export::XS", GV_ADD);
-    auto gv = (*self_stash)["import"];
+    auto gv = tls.self_stash["import"];
     auto dsub = stash.sub("import");
     if (dsub && dsub != gv.sub() && (!dsub.stash() || dsub.stash().name() != "UNIVERSAL")) {
         throw std::logic_error(string("Export::XS: can't make autoexport for stash '") + stash.name() + "' - you already have import() sub");

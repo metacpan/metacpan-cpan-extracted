@@ -42,7 +42,7 @@ This parameter is needed if you want to change the host for return to clients (y
 
 package WebService::CEPH;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use strict;
 use warnings;
@@ -91,9 +91,6 @@ sub new {
     $self;
 }
 
-
-
-
 =head2 upload
 
 Uploads the file into CEPH. If the file already exists, it is replaced. If the data is larger than a certain size, multipart upload is started. Returns nothing
@@ -108,11 +105,13 @@ Parameters:
 
 3-rd - Content-type. If undef, the default binary / octet-stream is used
 
+4-th - ACL. If undef, the default private is used
+
 =cut
 
 sub upload {
-    my ($self, $key) = (shift, shift); #  after these params: $_[0] - data, $_[1] - Content-type
-    $self->_upload($key, sub { substr($_[0], $_[1], $_[2]) }, length($_[0]), md5_hex($_[0]), $_[1], $_[0]);
+    my ($self, $key) = (shift, shift); #  after these params: $_[0] - data, $_[1] - Content-type, $_[2] - ACL
+    $self->_upload($key, sub { substr($_[0], $_[1], $_[2]) }, length($_[0]), md5_hex($_[0]), $_[1], $_[2], $_[0]);
 }
 
 =head2 upload_from_file
@@ -129,12 +128,15 @@ Parameters:
 
 3-rd - Content-type. If undef, the default binary / octet-stream is used
 
+4-th - ACL. If undef, the default private is used
+
 Double walks through the file, calculating md5. The file should not be a pipe, its size should not vary.
 
 =cut
 
 sub upload_from_file {
-    my ($self, $key, $fh_or_filename, $content_type) = @_;
+    my ($self, $key, $fh_or_filename, $content_type, $acl ) = @_;
+
     my $fh = do {
         if (ref $fh_or_filename) {
             $fh_or_filename
@@ -153,7 +155,11 @@ sub upload_from_file {
     $self->_upload(
         $key,
         sub { read($_[0], my $data, $_[2]) // confess "Error reading data $!\n"; $data },
-        -s $fh, $md5->hexdigest, $content_type, $fh
+        -s $fh,
+        $md5->hexdigest,
+        $content_type,
+        $acl,
+        $fh
     );
 }
 
@@ -175,21 +181,23 @@ Parameters
 
 6) Content-type. If undef, the default binary / octet-stream is used
 
-7) data. or a scalar. or filehandle
+7) ACL. If undef, the default private is used
+
+8) data. or a scalar. or filehandle
 
 =cut
 
 
 sub _upload {
     # after that $_[0] is data (scalar or filehandle)
-    my ($self, $key, $iterator, $length, $md5_hex, $content_type) = (shift, shift, shift, shift, shift, shift);
+    my ($self, $key, $iterator, $length, $md5_hex, $content_type, $acl) = (shift, shift, shift, shift, shift, shift, shift);
 
     confess "Bucket name is required" unless $self->{bucket};
 
     _check_ascii_key($key);
 
     if ($length > $self->{multipart_threshold}) {
-        my $multipart = $self->{driver}->initiate_multipart_upload($key, $md5_hex, $content_type);
+        my $multipart = $self->{driver}->initiate_multipart_upload($key, $md5_hex, $content_type, $acl);
 
         my $len = $length;
         my $offset = 0;
@@ -204,7 +212,7 @@ sub _upload {
         $self->{driver}->complete_multipart_upload($multipart);
     }
     else {
-        $self->{driver}->upload_single_request($key, $iterator->($_[0], 0, $length), $content_type);
+        $self->{driver}->upload_single_request($key, $iterator->($_[0], 0, $length), $content_type, $acl);
     }
 
     return;

@@ -1,0 +1,40 @@
+use strict;
+use XS::Install;
+
+my %params = (
+    NAME      => 'Protocol::HTTP',
+    CPLUS     => 14,
+    BIN_DEPS  => ['URI::XS', 'Date', 'Export::XS', 'XS::libboost::mini', 'XS::librangeV3'],
+    DEFINE    => $ENV{DEBUG} ? '-DDEBUG' : '',
+    SRC       => ['src'],
+    INC       => '-Isrc',
+    LIBS      => [qw/-lz/],
+    BIN_SHARE => {INCLUDE  => {'src' => '/'}},
+    CCFLAGS   => '-Wall -Wextra -Wno-implicit-fallthrough -Wno-unused-const-variable',
+    test      => {
+        SRC                  => 't',
+        RECURSIVE_TEST_FILES => 1,
+        BIN_DEPS             => 'Test::Catch',
+    },
+);
+
+if ($ENV{SANITIZE}) {
+    ($params{CCFLAGS}||='') .= ' -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer';
+    push $params{LIBS}->@*, qw/-lubsan -lasan/
+}
+
+if ($ENV{DEV}) {
+    my $postamble = '';
+    my $gentype = "-G2";
+    for (qw/MessageParser.rl CookieParser.rl/) {
+        my $file = "src/panda/protocol/http/$_";
+        my $cfile = $file;
+        $cfile =~ s/\.rl/.cc/;
+        $postamble .= "parser : $cfile\n\n";
+        $postamble .= "$cfile : $file\n".
+                      "\t ragel -C $gentype $file -o $cfile\n\n";
+    }
+    $params{postamble} .= $postamble;
+}
+
+write_makefile(%params);

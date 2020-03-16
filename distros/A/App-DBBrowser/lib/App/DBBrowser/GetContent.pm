@@ -62,7 +62,7 @@ sub get_content {
     my $cp = App::DBBrowser::GetContent::Parse->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my @cu = (
+    my @choices = (
         [ 'plain', '- Plain' ],
         [ 'copy',  '- Copy & Paste' ],
         [ 'file',  '- From File' ],
@@ -75,13 +75,13 @@ sub get_content {
             if ( $data_source_choice == 3 ) {
                 my $hidden = "Choose type of data source:";
                 my @pre = ( $hidden, undef );
-                my $choices = [ @pre, map { $_->[1] } @cu ];
+                my $menu = [ @pre, map( $_->[1], @choices ) ];
                 # Choose
                 my $idx = $tc->choose(
-                    $choices,
+                    $menu,
                     { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx, undef => '  <=' }
                 );
-                if ( ! defined $idx || ! defined $choices->[$idx] ) {
+                if ( ! defined $idx || ! defined $menu->[$idx] ) {
                     return;
                 }
                 if ( $sf->{o}{G}{menu_memory} ) {
@@ -91,16 +91,16 @@ sub get_content {
                     }
                     $old_idx = $idx;
                 }
-                if ( $choices->[$idx] eq $hidden ) {
+                if ( $menu->[$idx] eq $hidden ) {
                     require App::DBBrowser::Opt::Set;
                     my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
                     $opt_set->set_options( $sf->__setting_menu_entries( 1 ) );
                     next MENU;
                 }
-                $sf->{i}{gc}{source_type} = $cu[$idx-@pre][0];
+                $sf->{i}{gc}{source_type} = $choices[$idx-@pre][0];
             }
             else {
-                $sf->{i}{gc}{source_type} = $cu[ $data_source_choice ][0];
+                $sf->{i}{gc}{source_type} = $choices[ $data_source_choice ][0];
             }
         }
 

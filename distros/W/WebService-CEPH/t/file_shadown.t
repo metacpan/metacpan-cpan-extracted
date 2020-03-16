@@ -95,13 +95,23 @@ describe "FS Shadow" => sub {
         };
         it "should work in s3 mode" => sub {
             $ceph->{mode} = 's3';
-            WebService::CEPH->expects('upload')->with('mykey', 'mydata', undef)->once;
+            WebService::CEPH->expects('upload')->with('mykey', 'mydata', undef, undef)->once;
             $ceph->upload('mykey', 'mydata');
         };
         it "should work in s3 mode with content-type" => sub {
             $ceph->{mode} = 's3';
-            WebService::CEPH->expects('upload')->with('mykey', 'mydata', 'text/plain')->once;
+            WebService::CEPH->expects('upload')->with('mykey', 'mydata', 'text/plain', undef)->once;
             $ceph->upload('mykey', 'mydata', 'text/plain');
+        };
+        it "should work in s3 mode with acl" => sub {
+            $ceph->{mode} = 's3';
+            WebService::CEPH->expects('upload')->with('mykey', 'mydata', undef, 'public-read')->once;
+            $ceph->upload('mykey', 'mydata', undef, 'public-read');
+        };
+        it "should work in s3 mode with content-type and acl" => sub {
+            $ceph->{mode} = 's3';
+            WebService::CEPH->expects('upload')->with('mykey', 'mydata', 'text/plain', 'public-read')->once;
+            $ceph->upload('mykey', 'mydata', 'text/plain', 'public-read');
         };
         it "should work in fs mode" => sub {
             $ceph->{mode} = 'fs';
@@ -111,7 +121,7 @@ describe "FS Shadow" => sub {
         };
         it "should work in s3-fs mode" => sub {
             $ceph->{mode} = 's3-fs';
-            WebService::CEPH->expects('upload')->with('mykey', 'mydata', undef)->once;
+            WebService::CEPH->expects('upload')->with('mykey', 'mydata', undef, undef)->once;
             $ceph->upload('mykey', 'mydata');
             check_object_file($object_file, 'mydata');
         };
@@ -131,13 +141,23 @@ describe "FS Shadow" => sub {
         };
         it "should work in s3 mode" => sub {
             $ceph->{mode} = 's3';
-            WebService::CEPH->expects('upload_from_file')->with('mykey', $localfile, undef)->once;
+            WebService::CEPH->expects('upload_from_file')->with('mykey', $localfile, undef, undef)->once;
             $ceph->upload_from_file('mykey', $localfile);
         };
         it "should work in s3 mode with content-type" => sub {
             $ceph->{mode} = 's3';
-            WebService::CEPH->expects('upload_from_file')->with('mykey', $localfile, 'text/plain')->once;
+            WebService::CEPH->expects('upload_from_file')->with('mykey', $localfile, 'text/plain', undef)->once;
             $ceph->upload_from_file('mykey', $localfile, 'text/plain');
+        };
+        it "should work in s3 mode with acl" => sub {
+            $ceph->{mode} = 's3';
+            WebService::CEPH->expects('upload_from_file')->with('mykey', $localfile, undef, 'public-read')->once;
+            $ceph->upload_from_file('mykey', $localfile, undef, 'public-read');
+        };
+        it "should work in s3 mode with content-type and acl" => sub {
+            $ceph->{mode} = 's3';
+            WebService::CEPH->expects('upload_from_file')->with('mykey', $localfile, 'text/plain', 'public-read')->once;
+            $ceph->upload_from_file('mykey', $localfile, 'text/plain', 'public-read');
         };
         it "should work in fs mode" => sub {
             $ceph->{mode} = 'fs';
@@ -155,7 +175,7 @@ describe "FS Shadow" => sub {
         };
         it "should work in s3-fs mode" => sub {
             $ceph->{mode} = 's3-fs';
-            WebService::CEPH->expects('upload_from_file')->with('mykey', $localfile, undef)->once;
+            WebService::CEPH->expects('upload_from_file')->with('mykey', $localfile, undef, undef)->once;
             $ceph->upload_from_file('mykey', $localfile);
             check_object_file($object_file, 'MyFileData');
         };

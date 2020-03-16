@@ -2,6 +2,7 @@
 #include "base.h"
 #include "../Ref.h"
 #include "../Stash.h"
+#include "../catch.h"
 #include "../Backref.h"
 #include <typeinfo>
 #include <panda/refcnt.h>
@@ -26,7 +27,9 @@ namespace typemap { namespace object {
         PANDA_GLOBAL_MEMBER_PTR(TypemapMarker, svt_clear_t, get, &func);
     };
 
-    void _throw_no_package (const std::type_info&);
+    panda::string type_details(const std::type_info&);
+    [[ noreturn ]] void _throw_incorrect_arg(SV* arg, const std::type_info& expected, panda::string_view package);
+    [[ noreturn ]] void _throw_no_package (const std::type_info&);
 }}
 
 template <class TYPEMAP, class TYPE>
@@ -315,7 +318,11 @@ struct TypemapObject : TypemapBase<TYPEMAP, TYPE> {
             }
         }
 
-        throw "arg is an incorrect or corrupted object";
+        // it's definitely developer bug, there is no known way to determine real object tyep
+        // from void*, see https://stackoverflow.com/questions/1718412/find-out-type-of-c-void-pointer
+        auto package = Typemap<TYPE>::package();
+        auto package_view = panda::string_view{ package.data(),  package.length() };
+        typemap::object::_throw_incorrect_arg(arg, typeid (TYPE), package_view);
     }
 
     static Sv out (const TYPE& var, const Sv& proto = Sv()) { return IStorage::out(var, proto); }
@@ -342,10 +349,15 @@ struct TypemapObject : TypemapBase<TYPEMAP, TYPE> {
                 rv = proto;
                 base = SvRV(proto);
             }
-            else if (proto.type() < SVt_PVMG) { // class name
-                base = newSV_type(SVt_PVMG);
-                rv = Sv::noinc(newRV_noinc(base));
-                sv_bless(rv, gv_stashsv(proto, GV_ADD));
+            else if (proto.type() <= SVt_PVMG) { // class name
+                if (SvOBJECT(proto)) {
+                    base = proto;
+                    rv = Sv::noinc(newRV_noinc(base));
+                } else {
+                    base = newSV_type(SVt_PVMG);
+                    rv = Sv::noinc(newRV_noinc(base));
+                    sv_bless(rv, gv_stashsv(proto, GV_ADD));
+                }
                 goto ATTACH; // skip optional blessing
             }
             else if (proto.type() == SVt_PVHV && HvNAME(proto)) { // stash

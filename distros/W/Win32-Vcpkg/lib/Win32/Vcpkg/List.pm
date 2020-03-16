@@ -8,7 +8,7 @@ use Path::Tiny ();
 use Storable qw( dclone );
 
 # ABSTRACT: Interface to Microsoft Vcpkg List of Packages
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub new
@@ -16,6 +16,14 @@ sub new
   my($class, %args) = @_;
 
   my $root = defined $args{root} ? Path::Tiny->new($args{root}) : Win32::Vcpkg->root;
+
+  my $vcpkg_exe = $root->child('vcpkg.exe');
+  if(-x $vcpkg_exe)
+  {
+    # TODO: this is a bit flaky, the root directory might
+    # not have vcpkg.exe.
+    `$vcpkg_exe list`;  # force a rebuild of the status file
+  }
 
   my $status = $root->child('installed', 'vcpkg', 'status');
 
@@ -74,7 +82,8 @@ sub search
     next unless $status->{Architecture} eq $triplet
     &&          $status->{Package} eq $name
     &&          !defined $status->{Feature}
-    &&          $status->{Version};
+    &&          $status->{Version}
+    &&          $status->{Status} eq 'install ok installed';
 
     my $version = $status->{Version};
     my $file_list = $self->root->child('installed','vcpkg','info',sprintf("%s_%s_%s.list", $name, $version, $triplet));
@@ -130,7 +139,7 @@ Win32::Vcpkg::List - Interface to Microsoft Vcpkg List of Packages
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -197,7 +206,7 @@ If set to true, the C<$package> object will use debug libraries.
 
 =over 4
 
-=item L<Win32:Vcpkg>
+=item L<Win32::Vcpkg>
 
 =item L<Win32::Vcpkg::Package>
 

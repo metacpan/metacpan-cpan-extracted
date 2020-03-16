@@ -229,6 +229,11 @@ t/47-aggregate-names.d/5.json
 t/47-aggregate-names.d/5.txt
 t/47-aggregate-names.d/5.yaml
 t/47-aggregate-names.t
+t/48-line-wrapped-plans.d/1.expect
+t/48-line-wrapped-plans.d/1.plan
+t/48-line-wrapped-plans.d/2.expect
+t/48-line-wrapped-plans.d/2.plan
+t/48-line-wrapped-plans.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

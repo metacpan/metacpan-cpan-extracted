@@ -20,7 +20,7 @@ my %module_build_args = (
     "Aleksandr Babenko <babenko\@reg.ru>"
   ],
   "dist_name" => "WebService-CEPH",
-  "dist_version" => "0.016",
+  "dist_version" => "0.017",
   "license" => "perl",
   "module_name" => "WebService::CEPH",
   "recursive_test_files" => 1,

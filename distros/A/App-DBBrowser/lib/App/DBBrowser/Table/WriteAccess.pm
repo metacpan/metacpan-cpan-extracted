@@ -49,13 +49,13 @@ sub table_write_access {
     STMT_TYPE: while ( 1 ) {
         my $hidden = 'Choose SQL type:';
         my @pre = ( $hidden, undef );
-        my $choices = [ @pre, map( "- $_", @stmt_types ) ];
+        my $menu = [ @pre, map( "- $_", @stmt_types ) ];
         # Choose
         my $idx = $tc->choose(
-            $choices,
+            $menu,
             { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx }
         );
-        if ( ! defined $idx || ! defined $choices->[$idx] ) {
+        if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
@@ -65,7 +65,7 @@ sub table_write_access {
             }
             $old_idx = $idx;
         }
-        my $stmt_type = $choices->[$idx];
+        my $stmt_type = $menu->[$idx];
         if ( $stmt_type eq $hidden ) {
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
@@ -96,17 +96,17 @@ sub table_write_access {
         my $old_idx = 0;
 
         CUSTOMIZE: while ( 1 ) {
-            my $choices = [ undef, @cu{@{$sub_stmts->{$stmt_type}}} ];
+            my $menu = [ undef, @cu{@{$sub_stmts->{$stmt_type}}} ];
             $ax->print_sql( $sql );
             # Choose
             my $idx = $tc->choose(
-                $choices,
+                $menu,
                 { %{$sf->{i}{lyt_v}}, prompt => 'Customize:', index => 1, default => $old_idx }
             );
-            if ( ! defined $idx || ! defined $choices->[$idx] ) {
+            if ( ! defined $idx || ! defined $menu->[$idx] ) {
                 next STMT_TYPE;
             }
-            my $custom = $choices->[$idx];
+            my $custom = $menu->[$idx];
             if ( $sf->{o}{G}{menu_memory} ) {
                 if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
                     $old_idx = 0;

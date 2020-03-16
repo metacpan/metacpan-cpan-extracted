@@ -53,6 +53,12 @@ method: warn
 
 =cut
 
+=libraries
+
+Types::Standard
+
+=cut
+
 =attributes
 
 head: rw, opt, Str
@@ -269,8 +275,8 @@ serialize() : HashRef
 
 =method succinct
 
-The succinct method loads and returns the L<FlightRecorder::Plugin::Succinct>
-report plugin.
+The succinct method loads and returns the
+L<FlightRecorder::Plugin::ReportSuccinct> report plugin.
 
 =signature succinct
 
@@ -303,8 +309,8 @@ switch(Str $name) : Object
 
 =method verbose
 
-The verbose method loads and returns the L<FlightRecorder::Plugin::Verbose>
-report plugin.
+The verbose method loads and returns the
+L<FlightRecorder::Plugin::ReportVerbose> report plugin.
 
 =signature verbose
 

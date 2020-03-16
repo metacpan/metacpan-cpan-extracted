@@ -73,22 +73,22 @@
    "provides" : {
       "WebService::CEPH" : {
          "file" : "lib/WebService/CEPH.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "WebService::CEPH::FileShadow" : {
          "file" : "lib/WebService/CEPH/FileShadow.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "WebService::CEPH::NetAmazonS3" : {
          "file" : "lib/WebService/CEPH/NetAmazonS3.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "https://metacpan.org/release/WebService-CEPH"
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

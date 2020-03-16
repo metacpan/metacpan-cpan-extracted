@@ -34,19 +34,48 @@ void init () {
     PL_destroyhook = destroy_hook; // needed for correct operation of Typemap Storage MG with Backref feature enabled
 }
 
-void _throw_no_package (const std::type_info& ti) {
-    panda::string exc("no default perl class defined for typemap '");
-
+panda::string type_details(const std::type_info& ti) {
     int status;
+    panda::string r;
     char* class_name = abi::__cxa_demangle(ti.name(), nullptr, nullptr, &status);
-    if (status != 0) exc += "[abi::__cxa_demangle error]";
+    if (status != 0) {
+        r += "[abi::__cxa_demangle error] ";
+        r += ti.name();
+    }
     else {
-        exc += class_name;
+        r += class_name;
         free(class_name);
     }
+    return r;
+}
 
+[[ noreturn ]] void _throw_no_package (const std::type_info& ti) {
+    panda::string exc("no default perl class defined for typemap '");
+    exc += type_details(ti);
     exc += "', either define it or explicitly bless PROTO on output";
     throw exc;
+}
+
+[[ noreturn ]] void _throw_incorrect_arg(SV* arg, const std::type_info& expected, panda::string_view package) {
+    //"arg is an incorrect or corrupted object";
+    panda::string arg_type;
+    if (!arg) { arg_type = "NULL"; }
+    else {
+        Sv sv{arg};
+        if (!sv.is_object() && !sv.is_object_ref()) {
+            arg_type = "not an object";
+        }
+        else {
+            Object obj(sv);
+            arg_type = obj.stash().name();
+        }
+    }
+    panda::string ex_details = "cannot convert arg '";
+    ex_details += arg_type;
+    ex_details += "' to expected '";
+    ex_details += package;
+    ex_details += "' (C++ type '" + type_details(expected) + "')";
+    throw ex_details;
 }
 
 }}}

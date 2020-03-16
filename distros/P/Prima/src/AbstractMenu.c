@@ -85,19 +85,60 @@ AbstractMenu_dispose_menu( Handle self, void * menu)
 	free( m-> variable);
 	free( m-> perlSub);
 	if ( m-> code) sv_free( m-> code);
-	if ( m-> data) sv_free( m-> data);
+	if ( m-> options) sv_free( m-> options);
 	if ( m-> bitmap) {
 		if ( PObject( m-> bitmap)-> stage < csDead)
 			SvREFCNT_dec( SvRV(( PObject( m-> bitmap))-> mate));
 		unprotect_object( m-> bitmap);
+	}
+	if ( m-> icon) {
+		if ( PObject( m-> icon)-> stage < csDead)
+			SvREFCNT_dec( SvRV(( PObject( m-> icon))-> mate));
+		unprotect_object( m-> icon);
 	}
 	my-> dispose_menu( self, m-> next);
 	my-> dispose_menu( self, m-> down);
 	free( m);
 }
 
+
+static Bool
+register_image(Handle c_object)
+{
+	if (
+		( c_object == nilHandle) || !( kind_of( c_object, CImage)) ||
+		((( PImage) c_object)-> w == 0) || ((( PImage) c_object)-> h == 0)
+	) {
+		warn("menu build error: invalid image passed");
+		return false;
+	}
+	protect_object( c_object);
+	SvREFCNT_inc( SvRV(( PObject( c_object))-> mate));
+	return true;
+}
+
+typedef struct {
+	int max_group, curr_group;
+	int max_group_initialized;
+} AVTraverse;
+
+static Bool
+avt_init( Handle self, PMenuItemReg m, AVTraverse * avt)
+{
+	if ( m-> group > avt-> max_group ) {
+		if ( m-> group < INT_MAX)
+			avt-> max_group = m-> group;
+		else {
+			avt-> max_group = -1;
+			warn("Cannot deduce next group id - don't use large numbers for it");
+			return true;
+		}
+	}
+	return false;
+}
+
 void *
-AbstractMenu_new_menu( Handle self, SV * sv, int level)
+AbstractMenu_new_menu( Handle self, SV * sv, int level, void * _avt)
 {
 	AV * av;
 	int i, count;
@@ -105,6 +146,7 @@ AbstractMenu_new_menu( Handle self, SV * sv, int level)
 	PMenuItemReg m    = nil;
 	PMenuItemReg curr = nil;
 	Bool rightAdjust = false;
+	AVTraverse avt_dummy, *avt;
 
 	if ( level == 0)
 	{
@@ -124,6 +166,12 @@ AbstractMenu_new_menu( Handle self, SV * sv, int level)
 		return nil;
 	}
 
+	if ( _avt == NULL ) {
+		avt = &avt_dummy;
+		bzero(avt, sizeof(AVTraverse));
+	} else
+		avt = _avt;
+
 	/* cycling the list of items */
 	for ( i = 0; i <= n; i++)
 	{
@@ -138,7 +186,9 @@ AbstractMenu_new_menu( Handle self, SV * sv, int level)
 		int l_sub   = -1;
 		int l_accel = -1;
 		int l_key   = -1;
-		int l_data  = -1;
+		int l_options  = -1;
+		Bool last_item_is_a_hash;
+		Bool stop_group = false;
 
 		if ( itemHolder == nil)
 		{
@@ -165,22 +215,46 @@ AbstractMenu_new_menu( Handle self, SV * sv, int level)
 		}
 		r-> key = kbNoKey;
 
+		holder = av_fetch( item, count - 1, 0);
+		last_item_is_a_hash = holder && SvOK(*holder) && SvROK(*holder) && SvTYPE(SvRV(*holder)) == SVt_PVHV;
+
 		if ( count < 2) {          /* empty or 1 means line divisor, no matter of text */
 			r-> flags. divider = true;
 			rightAdjust = (( level == 0) && ( var-> anchored));
-			if ( count == 1) l_var = 0;
+			if ( count == 1)
+				l_var = 0;
+			else /* auto-grouping ends with a divider */
+				stop_group = true;
 		} else if ( count == 2) {
-			l_text = 0;
-			l_sub  = 1;
+			if ( last_item_is_a_hash ) {
+				l_var  = 0;
+				l_options = 1;
+			} else {
+				l_text = 0;
+				l_sub  = 1;
+			}
 		} else if ( count == 3) {
-			l_var  = 0;
-			l_text = 1;
-			l_sub  = 2;
+			if ( last_item_is_a_hash ) {
+				l_text = 0;
+				l_sub  = 1;
+				l_options = 2;
+			} else {
+				l_var  = 0;
+				l_text = 1;
+				l_sub  = 2;
+			}
 		} else if ( count == 4) {
-			l_text  = 0;
-			l_accel = 1;
-			l_key   = 2;
-			l_sub   = 3;
+			if ( last_item_is_a_hash ) {
+				l_var  = 0;
+				l_text = 1;
+				l_sub  = 2;
+				l_options = 3;
+			} else {
+				l_text  = 0;
+				l_accel = 1;
+				l_key   = 2;
+				l_sub   = 3;
+			}
 		} else if ( count == 5) {
 			l_var   = 0;
 			l_text  = 1;
@@ -193,7 +267,7 @@ AbstractMenu_new_menu( Handle self, SV * sv, int level)
 			l_accel = 2;
 			l_key   = 3;
 			l_sub   = 4;
-			l_data  = 5;
+			l_options  = 5;
 		}
 
 		if ( m) curr = curr-> next = r; else curr = m = r; /* adding to list */
@@ -230,35 +304,59 @@ AbstractMenu_new_menu( Handle self, SV * sv, int level)
 		if ( r-> variable)
 		{
 			#define s r-> variable
+			#define PARSE(name)                  \
+				if ( r-> flags. divider )    \
+					warn("warning: " #name " flag ignored on a divider menu");\
+				else                         \
+					r-> flags. name = 1; \
+				decr++;                      \
+				break;
 			int i, decr = 0;
-			for ( i = 0; i < 2; i++) {
+			for ( i = 0; ; i++) {
 				switch ( s[i]) {
-				case '-':
-					r-> flags. disabled = 1;
-					decr++;
-					break;
-				case '*':
-					r-> flags. checked = 1;
-					decr++;
-					break;
-				case '@':
+				case '-': PARSE(disabled);
+				case '*': PARSE(checked);
+				case '@': PARSE(autotoggle);
+				case '?': PARSE(custom_draw);
+				case '(':
+					if ( !avt-> max_group_initialized ) {
+						my-> first_that( self, (void*) &avt_init, avt, true);
+						avt-> max_group_initialized = true;
+					}
 					if ( r-> flags. divider )
-						warn("warning: auto-toggle flag @ ignored on a divider menu");
-					else
-						r-> flags. autotoggle = 1;
+						/* variable name hinted , continue */
+						stop_group = false;
+					else if ( avt-> curr_group != 0) {
+						/* that's okay, reuse the last group */
+					} else if ( avt-> max_group >= 0 )
+						avt-> curr_group = ++avt-> max_group;
 					decr++;
 					break;
-				default:
+				case ')':
+					if ( avt-> curr_group == 0 ) {
+						warn("group closing outside parantheses, ignoring");
+					} else {
+						r-> group = avt->curr_group;
+						avt-> curr_group = 0;
+					}
+					decr++;
 					break;
+				default : goto STOP;
 				}
 			}
+			STOP:
 			if ( decr) memmove( s, s + decr, strlen( s) + 1 - decr);
 			if ( strlen( s) == 0 || is_var_id_name( s) != 0) {
-				free( r-> variable);
-				r-> variable = nil;
+				free( s);
+				s = nil;
 			}
 			#undef s
 		}
+
+		if ( stop_group )
+			avt-> curr_group = 0;
+		if ( avt-> curr_group != 0 && !r-> flags. divider)
+			r-> group = avt-> curr_group;
 
 		/* parsing text */
 		if ( l_text >= 0)
@@ -273,19 +371,9 @@ AbstractMenu_new_menu( Handle self, SV * sv, int level)
 
 			if ( SvROK( subItem)) {
 				Handle c_object = gimme_the_mate( subItem);
-				if (( c_object == nilHandle) || !( kind_of( c_object, CImage)))
-				{
-					warn("menu build error: not an image passed");
+				if ( !register_image(c_object))
 					goto TEXT;
-				}
-				if (((( PImage) c_object)-> w == 0)
-					|| ((( PImage) c_object)-> h == 0))
-				{
-					warn("menu build error: invalid image passed");
-					goto TEXT;
-				}
-				protect_object( r-> bitmap = c_object);
-				SvREFCNT_inc( SvRV(( PObject( r-> bitmap))-> mate));
+				r-> bitmap = c_object;
 			} else {
 			TEXT:
 				r-> text = duplicate_string( SvPV_nolen( subItem));
@@ -304,15 +392,18 @@ AbstractMenu_new_menu( Handle self, SV * sv, int level)
 			}
 			subItem = *holder;
 
-			if ( SvROK( subItem))
-			{
-				if ( SvTYPE( SvRV( subItem)) == SVt_PVCV)
-				{
+			if ( SvROK( subItem)) {
+				if ( SvTYPE( SvRV( subItem)) == SVt_PVCV) {
 					r-> code = newSVsv( subItem);
 				} else {
-					r-> down = ( PMenuItemReg) my-> new_menu( self, subItem, level + 1);
-					if ( r-> down == nil)
-					{
+					int save;
+
+					save = avt-> curr_group;
+					avt-> curr_group = 0;
+					r-> down = ( PMenuItemReg) my-> new_menu( self, subItem, level + 1, avt);
+					avt-> curr_group = save;
+
+					if ( r-> down == nil) {
 						/* seems error was occured inside this call */
 						my-> dispose_menu( self, m);
 						return nil;
@@ -328,16 +419,32 @@ AbstractMenu_new_menu( Handle self, SV * sv, int level)
 			}
 		}
 
-		/* parsing data */
-		if ( l_data >= 0)
+		/* parsing options */
+		if ( l_options >= 0)
 		{
-			holder = av_fetch( item, l_data, 0);
+			holder = av_fetch( item, l_options, 0);
 			if ( !holder) {
 				warn("menu build error: array panic");
 				my-> dispose_menu( self, m);
 				return nil;
 			}
-			r-> data = newSVsv( *holder);
+			if (!( SvOK( *holder) && SvROK( *holder) && SvTYPE( SvRV( *holder)) == SVt_PVHV)) {
+				warn("menu build error: options is not a hashref");
+			} else {
+				dPROFILE;
+				HV * profile = (HV*) SvRV(*holder);
+				if ( pexist( icon )) {
+					Handle c_object = pget_H(icon);
+					if ( register_image(c_object))
+						r-> icon = c_object;
+					pdelete(icon);
+				}
+				if ( pexist( group )) {
+					r-> group = pget_i(group);
+					pdelete(group);
+				}
+			}
+			r-> options = newSVsv( *holder);
 		}
 	}
 	return m;
@@ -370,6 +477,7 @@ AbstractMenu_validate_owner( Handle self, Handle * owner, HV * profile)
 {
 	dPROFILE;
 	*owner = pget_H( owner);
+	if ( !*owner ) return !var-> system;
 	if ( !kind_of( *owner, CWidget)) return false;
 	return inherited validate_owner( self, owner, profile);
 }
@@ -395,95 +503,116 @@ AbstractMenu_set( Handle self, HV * profile)
 }
 
 static SV *
-new_av(  PMenuItemReg m, int level)
+new_av(  PMenuItemReg m, int level, Bool fullTree);
+
+static SV *
+new_av_entry(  PMenuItemReg m, int level, Bool fullTree)
+{
+	AV * loc = newAV();
+	if ( !m-> flags. divider) {
+		if ( m-> variable) { /* has name */
+			SV * sv;
+			int shift =
+				( m-> flags. checked     ? 1 : 0) +
+				( m-> flags. disabled    ? 1 : 0) +
+				( m-> flags. autotoggle  ? 1 : 0) +
+				( m-> flags. custom_draw ? 1 : 0)
+				;
+			if ( shift > 0) { /* has flags */
+				int len = (int) strlen( m-> variable);
+				char * name = allocs( len + shift);
+				if ( name) {
+					int slen = len + shift;
+					memcpy( name + shift, m-> variable, len);
+					if ( m-> flags. disabled)   name[ --shift] = '-'; 
+					if ( m-> flags. checked)    name[ --shift] = '*';
+					if ( m-> flags. autotoggle) name[ --shift] = '@';
+					if ( m-> flags. custom_draw)name[ --shift] = '?';
+					sv = newSVpv( name, slen);
+					free(name);
+				} else
+					sv = newSVpv( m-> variable, len);
+			} else /* has name but no flags */
+				sv = newSVpv( m-> variable, 0);
+
+			if ( m-> flags. utf8_variable)
+				SvUTF8_on( sv);
+			av_push( loc, sv);
+		} else { /* has flags but no name - autogenerate */
+			int len;
+			char buffer[20];
+			len = sprintf( buffer, "%s%s%s%s#%d",
+				m-> flags. disabled   ? "-" : "",
+				m-> flags. checked    ? "*" : "",
+				m-> flags. autotoggle ? "@" : "",
+				m-> flags. custom_draw ? "?" : "",
+				m-> id);
+			av_push( loc, newSVpv( buffer, ( STRLEN) len));
+		}
+
+		if ( m-> bitmap) {
+			if ( PObject( m-> bitmap)-> stage < csDead)
+				av_push( loc, newRV( SvRV((( PObject)( m-> bitmap))-> mate)));
+			else
+				av_push( loc, newSVpv( "", 0));
+		} else {
+			SV * sv = newSVpv( m-> text, 0);
+			if ( m-> flags. utf8_text) SvUTF8_on( sv);
+			av_push( loc, sv);
+		}
+
+		if ( m-> accel) {
+			SV * sv = newSVpv( m-> accel, 0);
+			av_push( loc, sv);
+			if ( m-> flags. utf8_accel) SvUTF8_on( sv);
+		} else {
+			av_push( loc, newSVpv( "", 0));
+		}
+		av_push( loc, newSViv( m-> key));
+
+		if ( m-> down) {
+			av_push( loc, fullTree ? 
+				new_av( m-> down, level + 1, true) :
+				newRV_noinc(( SV *) newAV())
+			);
+		} else if ( m-> code) {
+			av_push( loc, newSVsv( m-> code));
+		} else if ( m-> perlSub) {
+			SV * sv = newSVpv( m-> perlSub, 0);
+			if ( m-> flags. utf8_perlSub) SvUTF8_on( sv);
+			av_push( loc, sv);
+		} else {
+			av_push( loc, newSVpv( "", 0));
+		}
+
+		if ( m-> options)
+			av_push( loc, newSVsv(m->options));
+	} else {
+		/* divider */
+		if ( m-> variable) {
+			SV * sv = newSVpv( m-> variable, 0);
+			if ( m-> flags. utf8_perlSub) SvUTF8_on( sv);
+			av_push( loc, sv);
+		} else {
+			int len;
+			char buffer[20];
+			len = sprintf( buffer, "#%d", m-> id);
+			av_push( loc, newSVpv( buffer, ( STRLEN) len));
+		}
+	}
+
+	return newRV_noinc(( SV *) loc);
+}
+
+static SV *
+new_av(  PMenuItemReg m, int level, Bool fullTree)
 {
 	AV * glo;
 	if ( m == nil) return nilSV;
 	glo = newAV();
 	while ( m)
 	{
-		AV * loc = newAV();
-		if ( !m-> flags. divider) {
-			if ( m-> variable) { /* has name */
-				SV * sv;
-				int shift = ( m-> flags. checked ? 1 : 0) + ( m-> flags. disabled ? 1 : 0);
-				if ( shift > 0) { /* has flags */
-					int len = (int) strlen( m-> variable);
-					char * name = allocs( len + shift);
-					if ( name) {
-						int slen = len + shift;
-						memcpy( name + shift, m-> variable, len);
-						if ( m-> flags. disabled)   name[ --shift] = '-';
-						if ( m-> flags. checked)    name[ --shift] = '*';
-						if ( m-> flags. autotoggle) name[ --shift] = '@';
-						sv = newSVpv( name, slen);
-					} else
-						sv = newSVpv( m-> variable, len);
-				} else /* has name but no flags */
-					sv = newSVpv( m-> variable, 0);
-
-				if ( m-> flags. utf8_variable)
-					SvUTF8_on( sv);
-				av_push( loc, sv);
-			} else { /* has flags but no name - autogenerate */
-				int len;
-				char buffer[20];
-				len = sprintf( buffer, "%s%s%s#%d",
-					m-> flags. disabled   ? "-" : "",
-					m-> flags. checked    ? "*" : "",
-					m-> flags. autotoggle ? "@" : "",
-					m-> id);
-				av_push( loc, newSVpv( buffer, ( STRLEN) len));
-			}
-
-			if ( m-> bitmap) {
-				if ( PObject( m-> bitmap)-> stage < csDead)
-					av_push( loc, newRV( SvRV((( PObject)( m-> bitmap))-> mate)));
-				else
-					av_push( loc, newSVpv( "", 0));
-			} else {
-				SV * sv = newSVpv( m-> text, 0);
-				if ( m-> flags. utf8_text) SvUTF8_on( sv);
-				av_push( loc, sv);
-			}
-
-			if ( m-> accel) {
-				SV * sv = newSVpv( m-> accel, 0);
-				av_push( loc, sv);
-				if ( m-> flags. utf8_accel) SvUTF8_on( sv);
-			} else {
-				av_push( loc, newSVpv( "", 0));
-			}
-			av_push( loc, newSViv( m-> key));
-
-			if ( m-> down) {
-				av_push( loc, new_av( m-> down, level + 1));
-			} else if ( m-> code) {
-				av_push( loc, newSVsv( m-> code));
-			} else if ( m-> perlSub) {
-				SV * sv = newSVpv( m-> perlSub, 0);
-				if ( m-> flags. utf8_perlSub) SvUTF8_on( sv);
-				av_push( loc, sv);
-			} else {
-				av_push( loc, newSVpv( "", 0));
-			}
-
-			if ( m-> data)
-				av_push( loc, newSVsv( m-> data));
-		} else {
-			/* divider */
-			if ( m-> variable) {
-				SV * sv = newSVpv( m-> variable, 0);
-				if ( m-> flags. utf8_perlSub) SvUTF8_on( sv);
-				av_push( loc, sv);
-			} else {
-				int len;
-				char buffer[20];
-				len = sprintf( buffer, "#%d", m-> id);
-				av_push( loc, newSVpv( buffer, ( STRLEN) len));
-			}
-		}
-		av_push( glo, newRV_noinc(( SV *) loc));
+		av_push( glo, new_av_entry(m, level, fullTree));
 		m = m-> next;
 	}
 	return newRV_noinc(( SV *) glo);
@@ -505,7 +634,7 @@ id_match( Handle self, PMenuItemReg m, void * params)
 static Bool
 key_match( Handle self, PMenuItemReg m, void * params)
 {
-	return (( m-> key == *(( int*) params)) && ( m-> key != kbNoKey) && !( m-> flags. disabled));
+	return (( m-> key == *(( int*) params)) && ( m-> key != kbNoKey) && !m-> flags. disabled);
 }
 
 static PMenuItemReg
@@ -537,14 +666,26 @@ AbstractMenu_make_id_context( Handle self, int id, char * buffer)
 }
 
 SV *
-AbstractMenu_get_items( Handle self, char * varName)
+AbstractMenu_get_item( Handle self, char * varName, Bool fullTree)
+{
+	PMenuItemReg m;
+	if ( var-> stage > csFrozen) return nilSV;
+	m = find_menuitem( self, varName, true);
+	if ( !m ) return nilSV;
+	return new_av_entry( m, 1, fullTree);
+}
+
+SV *
+AbstractMenu_get_items( Handle self, char * varName, Bool fullTree)
 {
 	if ( var-> stage > csFrozen) return nilSV;
 	if ( strlen( varName))
 	{
 		PMenuItemReg m = find_menuitem( self, varName, true);
 		if ( m && m-> down) {
-			return new_av( m-> down, 1);
+			return fullTree ? 
+				new_av( m-> down, 1, true) :
+				newRV_noinc(( SV *) newAV());
 		} else if ( m) {
 			return newRV_noinc(( SV *) newAV());
 		} else {
@@ -552,9 +693,61 @@ AbstractMenu_get_items( Handle self, char * varName)
 		}
 	} else {
 		return var-> tree ?
-			new_av( var-> tree, 0) :
+			new_av( var-> tree, 0, fullTree) :
 			newRV_noinc(( SV *) newAV());
 	}
+}
+
+SV *
+AbstractMenu_get_children( Handle self, char * varName)
+{
+	PMenuItemReg m;
+	AV * av;
+
+	if ( var-> stage > csFrozen) return nilSV;
+	if ( strlen( varName)) {
+		if ( !( m = find_menuitem( self, varName, true)))
+			return nilSV;
+		m = m->down;
+	} else
+		m = var-> tree;
+	if ( !m ) return nilSV;
+
+	av = newAV();
+	while ( m != NULL ) {
+		if ( m-> variable) {
+			SV * sv = newSVpv( m-> variable, 0);
+			if ( m-> flags. utf8_perlSub) SvUTF8_on( sv);
+			av_push( av, sv);
+		} else {
+			int len;
+			char buffer[20];
+			len = sprintf( buffer, "#%d", m-> id);
+			av_push( av, newSVpv( buffer, ( STRLEN) len));
+		}
+		m = m-> next;
+	}
+
+	return newRV_noinc(( SV *) av);
+}
+
+static void
+notify( Handle self, char * format, ...)
+{
+	va_list args;
+
+	if ( var-> stage != csNormal) return;
+	va_start( args, format);
+	protect_object( self);
+	my-> push_event( self);
+	ENTER;
+	SAVETMPS;
+	call_perl_indirect( self, "notify", format, true, false, args);
+	va_end( args);
+	FREETMPS;
+	LEAVE;
+	my-> pop_event( self);
+	unprotect_object( self);
 }
 
 void
@@ -562,10 +755,11 @@ AbstractMenu_set_items( Handle self, SV * items)
 {
 	PMenuItemReg oldBranch = var-> tree;
 	if ( var-> stage > csFrozen) return;
-	var-> tree = ( PMenuItemReg) my-> new_menu( self, items, 0);
+	var-> tree = ( PMenuItemReg) my-> new_menu( self, items, 0, NULL);
 	if ( var-> stage <= csNormal && var-> system)
 		apc_menu_update( self, oldBranch, var-> tree);
 	my-> dispose_menu( self, oldBranch);
+	notify( self, "<sss", "Change", "items", "");
 }
 
 
@@ -574,7 +768,7 @@ do_link( Handle self, PMenuItemReg m, PMenuProc p, void * params, Bool useDisabl
 {
 	while( m)
 	{
-		if ( !m->  flags. disabled || useDisabled)
+		if ( !m-> flags. disabled || useDisabled)
 		{
 			if ( m-> down)
 			{
@@ -619,12 +813,16 @@ AbstractMenu_accel( Handle self, Bool set, char * varName, SV * accel)
 	m-> accel = duplicate_string( SvPV_nolen( accel));
 	m-> flags. utf8_accel = prima_is_utf8_sv( accel);
 
-	if ( m-> id > 0)
+	if ( m-> id > 0) {
 		if ( var-> stage <= csNormal && var-> system)
 			apc_menu_item_set_accel( self, m);
+		notify( self, "<ssUS", "Change", "accel", 
+			m->variable ? m-> variable      : varName, 
+			m->variable ? m-> flags.utf8_variable : 0, 
+			accel);
+	}
 	return nilSV;
 }
-
 
 SV *
 AbstractMenu_action( Handle self, Bool set, char * varName, SV * action)
@@ -667,6 +865,52 @@ AbstractMenu_action( Handle self, Bool set, char * varName, SV * action)
 }
 
 Bool
+AbstractMenu_autoToggle( Handle self, Bool set, char * varName, Bool autotoggle)
+{
+	PMenuItemReg m;
+	if ( var-> stage > csFrozen) return false;
+	m = find_menuitem( self, varName, true);
+	if ( m == nil) return false;
+	if ( !set)
+		return m ? m-> flags. autotoggle : false;
+	if ( m-> flags. divider || m-> down) return false;
+	m-> flags. autotoggle = autotoggle ? 1 : 0;
+	if ( m-> id > 0) {
+		if ( var-> stage <= csNormal && var-> system)
+			apc_menu_item_set_autotoggle( self, m);
+		notify( self, "<ssUi", "Change", "autoToggle", 
+			m->variable ? m-> variable      : varName, 
+			m->variable ? m-> flags.utf8_variable : 0,
+			autotoggle);
+	}
+	return autotoggle;
+}
+
+static void
+set_check( Handle self, char * varName, PMenuItemReg m, Bool checked)
+{
+	char buffer[16];
+
+	m-> flags. checked = checked ? 1 : 0;
+	if ( var-> stage <= csNormal && var-> system)
+		apc_menu_item_set_check( self, m);
+	if ( varName == NULL )
+		varName = AbstractMenu_make_var_context( self, m, buffer);
+	notify( self, "<ssUi", "Change", "checked",
+		varName,
+		m->variable ? m-> flags.utf8_variable : 0,
+		checked);
+}
+
+static Bool
+update_group( Handle self, PMenuItemReg m, PMenuItemReg src)
+{
+	if ( m-> group == src->group && m != src && m->flags.checked )
+		set_check(self, NULL, m, 0);
+	return false;
+}
+
+Bool
 AbstractMenu_checked( Handle self, Bool set, char * varName, Bool checked)
 {
 	PMenuItemReg m;
@@ -676,26 +920,31 @@ AbstractMenu_checked( Handle self, Bool set, char * varName, Bool checked)
 	if ( !set)
 		return m ? m-> flags. checked : false;
 	if ( m-> flags. divider || m-> down) return false;
-	m-> flags. checked = checked ? 1 : 0;
-	if ( m-> id > 0)
-		if ( var-> stage <= csNormal && var-> system)
-			apc_menu_item_set_check( self, m);
+	if ( m-> id > 0 && !m->flags.checked ) {
+		set_check(self, varName, m, checked);
+		if ( checked && m-> group != 0 )
+			my-> first_that( self, (void*)update_group, m, true);
+	}
 	return checked;
 }
 
-SV *
-AbstractMenu_data( Handle self, Bool set, char * varName, SV * data)
+int
+AbstractMenu_group( Handle self, Bool set, char * varName, int group)
 {
 	PMenuItemReg m;
-	if ( var-> stage > csFrozen) return nilSV;
+	if ( var-> stage > csFrozen) return 0;
 	m = find_menuitem( self, varName, true);
-	if ( m == nil) return nilSV;
-	if ( !set)
-		return m-> data ? newSVsv( m-> data) : nilSV;
-	sv_free( m-> data);
-	m-> data = newSVsv( data);
-	return nilSV;
+	if ( m == nil) return 0;
+	if ( !set) return m-> group;
+	if ( m-> group == group ) return group;
+	m-> group = group;
+	notify( self, "<ssUS", "Change", "group",
+		m->variable ? m-> variable      : varName,
+		m->variable ? m-> flags.utf8_variable : 0,
+		group);
+	return group;
 }
+
 
 Bool
 AbstractMenu_enabled( Handle self, Bool set, char * varName, Bool enabled)
@@ -705,21 +954,57 @@ AbstractMenu_enabled( Handle self, Bool set, char * varName, Bool enabled)
 	m = find_menuitem( self, varName, true);
 	if ( m == nil) return false;
 	if ( !set)
-		return m ? !m->  flags. disabled : false;
+		return m ? !m-> flags. disabled : false;
 	if (m-> flags. divider) return false;
-	m->  flags. disabled = ( enabled ? 0 : 1 ) ;
-	if ( m-> id > 0)
+
+	m-> flags. disabled = !enabled;
+	if ( m-> id > 0) {
 		if ( var-> stage <= csNormal && var-> system)
 			apc_menu_item_set_enabled( self, m);
+		notify( self, "<ssUi", "Change", "enabled", 
+			m->variable ? m-> variable      : varName, 
+			m->variable ? m-> flags.utf8_variable : 0,
+			enabled);
+	}
 	return enabled;
+}
+
+Handle
+AbstractMenu_icon( Handle self, Bool set, char * varName, Handle icon)
+{
+	PMenuItemReg m;
+	if ( var-> stage > csFrozen) return nilHandle;
+
+	m = find_menuitem( self, varName, true);
+	if ( m == nil) return nilHandle;
+	if ( !m-> icon) return nilHandle;
+	if ( !set) {
+		if ( PObject( m-> icon)-> stage == csDead) return nilHandle;
+		return m-> icon;
+	}
+	if ( !register_image(icon))
+		return nilHandle;
+	if ( m-> icon ) {
+		if ( PObject( m-> icon)-> stage < csDead)
+			SvREFCNT_dec( SvRV(( PObject( m-> icon))-> mate));
+		unprotect_object( m-> icon);
+	}
+	m-> icon = icon;
+	if ( m-> id > 0) {
+		if ( var-> stage <= csNormal && var-> system)
+			apc_menu_item_set_icon( self, m);
+		notify( self, "<ssUH", "Change", "icon",
+			m->variable ? m-> variable      : varName,
+			m->variable ? m-> flags.utf8_variable : 0,
+			icon);
+	}
+	return nilHandle;
 }
 
 Handle
 AbstractMenu_image( Handle self, Bool set, char * varName, Handle image)
 {
 	PMenuItemReg m;
-	PImage i = ( PImage) image;
-
 	if ( var-> stage > csFrozen) return nilHandle;
 
 	m = find_menuitem( self, varName, true);
@@ -729,26 +1014,99 @@ AbstractMenu_image( Handle self, Bool set, char * varName, Handle image)
 		if ( PObject( m-> bitmap)-> stage == csDead) return nilHandle;
 		return m-> bitmap;
 	}
-
-	if (( image == nilHandle) || !( kind_of( image, CImage))) {
-		warn("invalid object passed to ::image");
+	if ( !register_image(image))
 		return nilHandle;
-	}
-	if ( i-> w == 0 || i-> h == 0) {
-		warn("invalid object passed to ::image");
-		return nilHandle;
-	}
-
-	SvREFCNT_inc( SvRV(( PObject( image))-> mate));
-	protect_object( image);
 	if ( PObject( m-> bitmap)-> stage < csDead)
 		SvREFCNT_dec( SvRV(( PObject( m-> bitmap))-> mate));
 	unprotect_object( m-> bitmap);
 	m-> bitmap = image;
-	if ( m-> id > 0)
+	if ( m-> id > 0) {
 		if ( var-> stage <= csNormal && var-> system)
 			apc_menu_item_set_image( self, m);
+		notify( self, "<ssUH", "Change", "image", 
+			m->variable ? m-> variable      : varName, 
+			m->variable ? m-> flags.utf8_variable : 0,
+			image);
+	}
 	return nilHandle;
+}
+
+SV *
+AbstractMenu_options( Handle self, Bool set, char * varName, SV * options)
+{
+	HV * profile;
+	PMenuItemReg m;
+	if ( var-> stage > csFrozen) return nilSV;
+	m = find_menuitem( self, varName, true);
+	if ( m == nil) return nilSV;
+	if ( !set) {
+		HV * profile;
+		if ( m->options )
+			return newSVsv( m-> options);
+		profile = newHV();
+		if ( m-> icon )       pset_H(icon,  m->icon);
+		if ( m-> group != 0 ) pset_i(group, m->group);
+		return newRV_noinc((SV*)profile);
+	}
+
+	if (SvTYPE( SvRV( options)) == SVt_NULL) {
+		sv_free( m-> options);
+		m-> options = nilSV;
+	} else {
+		dPROFILE;
+		if (!(SvROK( options) && SvTYPE( SvRV( options)) == SVt_PVHV)) {
+			warn("options is not a hashref");
+			return nilSV;
+		}
+		sv_free( m-> options);
+		m-> options = newSVsv( options);
+		profile = (HV*)SvRV(options);
+		if ( pexist(icon)) {
+			if ( m-> flags. divider )
+				warn("Cannot set icon on a divider item");
+			else
+				my->icon(self, true, varName, pget_H(icon));
+			pdelete(icon);
+		}
+		if ( pexist(group)) {
+			if ( m-> flags. divider )
+				warn("Cannot set group on a divider item");
+			else
+				my->group(self, true, varName, pget_i(group));
+			pdelete(icon);
+		}
+	}
+	notify( self, "<ssUS", "Change", "options",
+		m->variable ? m-> variable      : varName,
+		m->variable ? m-> flags.utf8_variable : 0,
+		options);
+	return nilSV;
+}
+
+
+SV *
+AbstractMenu_submenu( Handle self, Bool set, char * varName, SV * submenu)
+{
+	PMenuItemReg m;
+	if ( var-> stage > csFrozen) return nilSV;
+	if ( !set)
+		return my-> get_items( self, varName, true);
+
+	m = find_menuitem( self, varName, true);
+	if ( !m || !m-> down) return nilSV;
+
+	if ( var-> stage <= csNormal && var-> system)
+		apc_menu_item_delete( self, m-> down);
+	my-> dispose_menu( self, m-> down);
+
+	m-> down = ( PMenuItemReg) my-> new_menu( self, submenu, 1, NULL);
+	if ( var-> stage <= csNormal && var-> system)
+		apc_menu_update( self, m-> down, m-> down);
+	notify( self, "<ssU", "Change", "submenu", 
+		m->variable ? m-> variable      : varName, 
+		m->variable ? m-> flags.utf8_variable : 0);
+
+	return nilSV;
 }
 
 SV *
@@ -768,9 +1126,14 @@ AbstractMenu_text( Handle self, Bool set, char * varName, SV * text)
 	m-> text = nil;
 	m-> text = duplicate_string( SvPV_nolen( text));
 	m-> flags. utf8_accel = prima_is_utf8_sv( text);
-	if ( m-> id > 0)
+	if ( m-> id > 0) {
 		if ( var-> stage <= csNormal && var-> system)
 			apc_menu_item_set_text( self, m);
+		notify( self, "<ssUS", "Change", "text", 
+			m->variable ? m-> variable      : varName, 
+			m->variable ? m-> flags.utf8_variable : 0,
+			text);
+	}
 	return nilSV;
 }
 
@@ -786,9 +1149,14 @@ AbstractMenu_key( Handle self, Bool set, char * varName, SV * key)
 		return newSViv( m-> key);
 
 	m-> key = key_normalize( SvPV_nolen( key));
-	if ( m-> id > 0)
+	if ( m-> id > 0) {
 		if ( var-> stage <= csNormal && var-> system)
 			apc_menu_item_set_key( self, m);
+		notify( self, "<ssUi", "Change", "key", 
+			m->variable ? m-> variable      : varName, 
+			m->variable ? m-> flags.utf8_variable : 0,
+			m->key);
+	}
 	return nilSV;
 }
 
@@ -799,6 +1167,12 @@ AbstractMenu_set_variable( Handle self, char * varName, SV * newName)
 	if ( var-> stage > csFrozen) return;
 	m = find_menuitem( self, varName, true);
 	if ( m == nil) return;
+
+	notify( self, "<ssUS", "Change", "rename", 
+		m->variable ? m-> variable      : varName, 
+		m->variable ? m-> flags.utf8_variable : 0,
+		newName);
+
 	free( m-> variable);
 	if ( SvTYPE(newName) != SVt_NULL) {
 		STRLEN len;
@@ -817,31 +1191,41 @@ AbstractMenu_set_variable( Handle self, char * varName, SV * newName)
 Bool
 AbstractMenu_sub_call( Handle self, PMenuItemReg m)
 {
+	Handle owner;
 	char buffer[16], *context;
 	if ( m == nil) return false;
+
 	context = AbstractMenu_make_var_context( self, m, buffer);
-	if ( m-> flags. autotoggle ) {
-		m-> flags. checked = m-> flags. checked ? 0 : 1;
-		apc_menu_item_set_check( self, m);
-	}
+	if ( m-> group != 0 ) {
+		if ( !m->flags.checked )
+			set_check(self, context, m, 1);
+		else if ( m-> flags. autotoggle )
+			set_check(self, context, m, 0);
+		my-> first_that( self, (void*)update_group, m, true);
+	} else if ( m-> flags. autotoggle )
+		set_check(self, context, m, m-> flags. checked ? 0 : 1);
+	owner = var-> owner;
+	if ( owner == nilHandle ) return false;
 	if ( m-> code) {
 		if ( m-> flags. utf8_variable) {
 			SV * sv = newSVpv( context, 0);
 			SvUTF8_on( sv);
-			cv_call_perl((( PComponent) var-> owner)-> mate, SvRV( m-> code), "Si", sv, m-> flags. checked);
+			cv_call_perl((( PComponent) owner)-> mate, SvRV( m-> code), "Si", sv, m-> flags. checked);
 			sv_free( sv);
 		} else
-			cv_call_perl((( PComponent) var-> owner)-> mate, SvRV( m-> code), "si", context, m-> flags. checked);
+			cv_call_perl((( PComponent) owner)-> mate, SvRV( m-> code), "si", context, m-> flags. checked);
+		return true;
 	} else if ( m-> perlSub) {
 		if ( m-> flags. utf8_variable) {
 			SV * sv = newSVpv( context, 0);
 			SvUTF8_on( sv);
-			call_perl( var-> owner, m-> perlSub, "Si", sv, m-> flags. checked);
+			call_perl( owner, m-> perlSub, "Si", sv, m-> flags. checked);
 			sv_free( sv);
 		} else
-			call_perl( var-> owner, m-> perlSub, "si", context, m-> flags. checked);
+			call_perl( owner, m-> perlSub, "si", context, m-> flags. checked);
+		return true;
 	}
-	return true;
+	return false;
 }
 
 Bool
@@ -864,33 +1248,21 @@ AbstractMenu_sub_call_key ( Handle self, int key)
 	return my-> sub_call( self, ( PMenuItemReg) my-> first_that( self, (void*)key_match, &key, false));
 }
 
-typedef struct _Kmcc
+SV *
+AbstractMenu_find_item_by_key ( Handle self, int key)
 {
-	int  key;
-	Bool enabled;
-} Kmcc, *PKmcc;
+	PMenuItemReg m;
+	SV * sv;
+	char buffer[16], *context;
+	keyRealize( key);
+	m = ( PMenuItemReg) my-> first_that( self, (void*)key_match, &key, false);
+	if ( m == NULL ) return nilSV;
 
-static Bool
-kmcc ( Handle self, PMenuItemReg m, void * params)
-{
-	if ((( PKmcc) params)-> key == m-> key)
-	{
-		m-> flags. disabled = ((( PKmcc) params)-> enabled ? 0 : 1);
-		if ( m-> id > 0)
-			if ( var-> stage <= csNormal && var-> system)
-				apc_menu_item_set_enabled( self, m);
-	}
-	return false;
-}
-
-void
-AbstractMenu_set_command( Handle self, char * key, Bool enabled)
-{
-	Kmcc mcc;
-	mcc. key = key_normalize( key);
-	mcc. enabled = enabled;
-	if ( var-> stage > csFrozen) return;
-	my-> first_that( self, (void*)kmcc, &mcc, true);
+	context = AbstractMenu_make_var_context( self, m, buffer);
+	sv = newSVpv( context, 0 );
+	if ( m-> flags. utf8_variable)
+		SvUTF8_on( sv);
+	return sv;
 }
 
 Bool AbstractMenu_selected( Handle self, Bool set, Bool selected)
@@ -959,6 +1331,9 @@ AbstractMenu_remove( Handle self, char * varName)
 	if ( prev) prev-> next = m-> next;
 	if ( m == var-> tree) var-> tree = m-> next;
 	m-> next = nil;
+	notify( self, "<ssU", "Change", "remove", 
+			m->variable ? m-> variable      : varName, 
+			m->variable ? m-> flags.utf8_variable : 0);
 	my-> dispose_menu( self, m);
 }
 
@@ -976,9 +1351,10 @@ AbstractMenu_insert( Handle self, SV * menuItems, char * rootName, int index)
 	{
 		if ( var-> tree == nil)
 		{
-			var-> tree = ( PMenuItemReg) my-> new_menu( self, menuItems, 0);
+			var-> tree = ( PMenuItemReg) my-> new_menu( self, menuItems, 0, NULL);
 			if ( var-> stage <= csNormal && var-> system)
 				apc_menu_update( self, nil, var-> tree);
+			notify( self, "<sss", "Change", "insert", "");
 			return;
 		}
 		branch = m = var-> tree;
@@ -994,7 +1370,7 @@ AbstractMenu_insert( Handle self, SV * menuItems, char * rootName, int index)
 	}
 
 	/* the level is 0 or 1 for the sake of rightAdjust */
-	addFirst = ( PMenuItemReg) my-> new_menu( self, menuItems, level);
+	addFirst = ( PMenuItemReg) my-> new_menu( self, menuItems, level, NULL);
 	if ( !addFirst) return; /* error in menuItems */
 
 	addLast = addFirst;
@@ -1024,6 +1400,80 @@ AbstractMenu_insert( Handle self, SV * menuItems, char * rootName, int index)
 
 	if ( var-> stage <= csNormal && var-> system)
 		apc_menu_update( self, branch, branch);
+	notify( self, "<ssU", "Change", "insert", rootName, branch->flags.utf8_variable);
+}
+
+Bool
+AbstractMenu_is_custom( Handle self, char * varName)
+{
+	PMenuItemReg m = find_menuitem( self, varName, true);
+	return m && m-> flags. custom_draw;
+}
+
+Bool
+AbstractMenu_is_separator( Handle self, char * varName)
+{
+	PMenuItemReg m = find_menuitem( self, varName, true);
+	return m && m-> flags. divider;
+}
+
+Bool
+AbstractMenu_is_submenu( Handle self, char * varName)
+{
+	PMenuItemReg m = find_menuitem( self, varName, true);
+	return m && m-> down;
+}
+
+Bool
+AbstractMenu_execute( Handle self, char * varName) 
+{
+	PMenuItemReg m = find_menuitem( self, varName, true);
+	if ( !m ) return false;
+	return my->sub_call(self, m);
+}
+
+void
+AbstractMenu_handle_event( Handle self, PEvent event)
+{
+	inherited handle_event ( self, event);
+	if ( var-> stage > csNormal) return;
+
+	if ( event-> cmd == cmMenuItemMeasure || event-> cmd == cmMenuItemPaint) {
+		char buffer[16], *context;
+		PMenuItemReg m;
+		m = ( PMenuItemReg) my-> first_that( self, (void*)id_match, &event->gen.i, false);
+		if ( m == NULL ) return;
+
+		context = AbstractMenu_make_var_context( self, m, buffer);
+		if ( event-> cmd == cmMenuItemMeasure ) {
+			AV * pt = newAV();
+			SV * ref = newRV_noinc((SV*)pt);
+			av_push(pt, newSViv(event->gen.P.x));
+			av_push(pt, newSViv(event->gen.P.y));
+			my->notify( self, "<sUS", "ItemMeasure",
+				context, m-> flags.utf8_variable, ref );
+			if ( !prima_read_point( ref, (int*)&event->gen.P, 2, NULL))
+				warn("bad size array returned from onItemMeasure");
+			sv_free(ref);
+		} else {
+			Handle drawable = (Handle) create_object("Prima::Drawable", "");
+			++SvREFCNT( SvRV((( PAnyObject) drawable)-> mate));
+			PDrawable(drawable)-> w = event->gen.P.x;
+			PDrawable(drawable)-> h = event->gen.P.y;
+			protect_object(drawable);
+
+			event-> gen.H = drawable;
+			if ( apc_menu_item_begin_paint(self, event)) {
+				PComponent(self)->self->notify( self, "<sUHiR", "ItemPaint",
+					context, m->flags.utf8_variable, event->gen.H, event->gen.B, event->gen.R);
+				apc_menu_item_end_paint(self, event);
+			}
+
+			--SvREFCNT( SvRV((( PAnyObject) drawable)-> mate));
+			unprotect_object(drawable);
+			Object_destroy(event->gen.H);
+		}
+	}
 }
 
 

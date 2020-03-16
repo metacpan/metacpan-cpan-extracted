@@ -41,6 +41,7 @@ struct Hash : Sv {
 
     Hash& operator= (SV* val)         { Sv::operator=(val); _validate(); return *this; }
     Hash& operator= (HV* val)         { Sv::operator=(val); return *this; }
+    Hash& operator= (std::nullptr_t)  { Sv::operator=(nullptr); return *this; }
     Hash& operator= (const Hash& oth) { Sv::operator=(oth); return *this; }
     Hash& operator= (Hash&& oth)      { Sv::operator=(std::move(oth)); return *this; }
     Hash& operator= (const Sv& oth)   { return operator=(oth.get()); }

@@ -1,0 +1,42 @@
+---
+abstract: "It's a configurable XML minifier."
+author:
+  - 'Thibault DUPONCHELLE'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Minify
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  XML::Minify:
+    file: lib/XML/Minify.pm
+    version: '1.00'
+requires:
+  XML::LibXML: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/thibaultduponchelle/XML-Minify/issues
+  homepage: https://github.com/thibaultduponchelle/XML-Minify
+  repository: git://github.com/thibaultduponchelle/XML-Minify.git
+version: '1.00'
+x_contributors:
+  - 'Thibault DUPONCHELLE <thibault.duponchelle@gmail.com>'
+  - 'thibaultduponchelle <580360+thibaultduponchelle@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

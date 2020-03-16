@@ -42,10 +42,11 @@ sub build_having_col {
         $quote_aggr          =       $aggr . "(";
         my $tc = Term::Choose->new( $sf->{i}{tc_default} );
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        my @pre = ( undef );
         $ax->print_sql( $sql );
         # Choose
         my $quote_col = $tc->choose(
-            [ undef, @{$sql->{cols}} ],
+            [ @pre, @{$sql->{cols}} ],
             { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $quote_col ) {

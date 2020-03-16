@@ -67,6 +67,7 @@ struct Stash : Hash {
 
     Stash& operator= (SV* val)          { Hash::operator=(val); _validate(); return *this; }
     Stash& operator= (HV* val)          { Hash::operator=(val); _validate(); return *this; }
+    Stash& operator= (std::nullptr_t)   { Hash::operator=(nullptr); return *this; }
     Stash& operator= (const Stash& oth) { Hash::operator=(oth); return *this; }
     Stash& operator= (Stash&& oth)      { Hash::operator=(std::move(oth)); return *this; }
     Stash& operator= (const Hash& oth)  { Hash::operator=(oth); _validate(); return *this; }

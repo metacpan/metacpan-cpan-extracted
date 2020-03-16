@@ -1,0 +1,95 @@
+MODE: INLINE
+#include <xs/uri.h>
+
+struct XSRequest : Request, Backref {
+    using Request::Request;
+    
+    ResponseSP new_response () const override { return make_backref<Response>(); }
+    
+    ~XSRequest () { Backref::dtor(); }
+};
+
+MODULE = Protocol::HTTP              PACKAGE = Protocol::HTTP::Request
+PROTOTYPES: DISABLE
+
+BOOT {
+    using M = Request::Method;
+    Stash s(__PACKAGE__);
+    s.inherit("Protocol::HTTP::Message");
+    xs::exp::create_constants(s, {
+        {"METHOD_OPTIONS", int(M::OPTIONS)},
+        {"METHOD_GET",     int(M::GET)    },
+        {"METHOD_HEAD",    int(M::HEAD)   },
+        {"METHOD_POST",    int(M::POST)   },
+        {"METHOD_PUT",     int(M::PUT)    },
+        {"METHOD_DELETE",  int(M::DELETE) },
+        {"METHOD_TRACE",   int(M::TRACE)  },
+        {"METHOD_CONNECT", int(M::CONNECT)},
+    });
+    xs::exp::autoexport(s);
+}
+
+RequestSP Request::new (Hash params = Hash()) {
+    RETVAL = new XSRequest();
+    if (params) fill(RETVAL, params);
+}
+
+int Request::method (SV* newval = NULL) {
+    if (newval) {
+        set_method(THIS, newval);
+        XSRETURN_UNDEF;
+    }
+    RETVAL = int(THIS->method);
+}
+
+string method_str (Sv item) {
+    int value = -1;
+    if (item.is_simple()) {
+        value = Simple(item).as_number<int>();
+    } else {
+        auto req = xs::in<Request*>(item);
+        value = static_cast<int>(req->method);
+    }
+    RETVAL = Request::method_str(static_cast<Request::Method>(value));
+}
+
+URISP Request::uri (URISP newval = NULL) {
+    if (newval) {
+        THIS->uri = newval;
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->uri;
+}
+
+Hash Request::cookies (Hash new_cookies = Hash()) {
+    if (new_cookies) {
+        set_request_cookies(THIS, new_cookies);
+        XSRETURN_UNDEF;
+    }
+
+    RETVAL = Hash::create(THIS->cookies.size());
+    for (const auto& elem : THIS->cookies.fields) RETVAL.store(elem.name, xs::out(elem.value));
+}
+
+string Request::cookie (string_view name, SV* val = nullptr) {
+    if (val) {
+        if (!SvOK(val)) THIS->cookies.remove(name);
+        else            THIS->cookies.set(string(name), xs::in<string>(val));
+        XSRETURN_UNDEF;
+    }
+
+    auto it = THIS->cookies.find(name);
+    if (it == THIS->cookies.end()) XSRETURN_UNDEF;
+    RETVAL = it->value;
+}
+
+void Request::allow_compression (SV*, ...) {
+    for (int i = 1; i < items; ++i) {
+        uint8_t val = SvIV(ST(i));
+        if (is_valid_compression(val)) THIS->allow_compression((Compression::Type)val);
+    }
+}
+
+int Request::allowed_compression (bool inverse = false)
+
+string Request::to_string ()

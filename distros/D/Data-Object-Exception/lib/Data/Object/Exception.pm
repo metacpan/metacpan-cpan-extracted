@@ -14,7 +14,7 @@ use overload (
   fallback => 1
 );
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 has id => (
   is => 'ro'
@@ -64,12 +64,15 @@ fun BUILDARGS($class, @args) {
 # FUNCTIONS
 
 fun throw($self, $message, $context, $offset) {
+  my $id;
+
   my $class = ref $self || $self;
 
-  my $id;
-  my $frames;
-
   my $args = {};
+
+  if (ref $message eq 'ARRAY') {
+    ($id, $message) = @$message;
+  }
 
   if (ref $self) {
     for my $name (keys %$self) {
@@ -77,6 +80,7 @@ fun throw($self, $message, $context, $offset) {
     }
   }
 
+  $args->{id} = $id if $id;
   $args->{message} = $message if $message;
   $args->{context} = $context if $context;
 
@@ -188,6 +192,36 @@ The package allows objects to be instantiated with key-value arguments.
 
 =cut
 
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 context
+
+  context(Any)
+
+This attribute is read-only, accepts C<(Any)> values, and is optional.
+
+=cut
+
+=head2 id
+
+  id(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 message
+
+  message(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
 =head1 METHODS
 
 This package implements the following methods:
@@ -216,9 +250,9 @@ The explain method returns an error message with stack trace.
 
 =head2 throw
 
-  throw(Str $class, Any $context, Maybe[Number] $offset) : Any
+  throw(Tuple[Str, Str] | Str $message, Any $context, Maybe[Number] $offset) : Any
 
-The throw method throws an error with message.
+The throw method throws an error with message (and optionally, an ID).
 
 =over 4
 
@@ -226,9 +260,33 @@ The throw method throws an error with message.
 
   use Data::Object::Exception;
 
+  my $exception = Data::Object::Exception->new;
+
+  $exception->throw('Oops!')
+
+=back
+
+=over 4
+
+=item throw example #2
+
+  use Data::Object::Exception;
+
   my $exception = Data::Object::Exception->new('Oops!');
 
   $exception->throw
+
+=back
+
+=over 4
+
+=item throw example #3
+
+  use Data::Object::Exception;
+
+  my $exception = Data::Object::Exception->new;
+
+  $exception->throw(['E001', 'Oops!'])
 
 =back
 

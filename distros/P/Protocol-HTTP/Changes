@@ -1,0 +1,7 @@
+1.0.2    16.02.2020
+           - add benchmarks to docs
+           - bugfix: cookies/custom headeres do not affect generic headers
+1.0.1    14.02.2020
+           - make subpackages indexable
+1.0.0    14.02.2020
+           - first release

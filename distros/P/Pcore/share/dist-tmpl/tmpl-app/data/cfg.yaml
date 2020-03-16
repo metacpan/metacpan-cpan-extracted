@@ -2,10 +2,11 @@
 db: sqlite:<: "<: $DATA_DIR :>/db.sqlite" | raw :>
 # db: pgsql://postgres:1@devel?db=test
 
-# load_balancer:
-#     server_name:
-#         - devel
-#         - domain.com
+# server:
+#     default:
+#         listen: //0.0.0.0:80
+#         server_name:
+#             - devel
 
 # smtp:
 #     username: no-reply@softvisio.net

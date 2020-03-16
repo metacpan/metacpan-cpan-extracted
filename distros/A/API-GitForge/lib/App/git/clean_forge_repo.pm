@@ -15,7 +15,7 @@ package App::git::clean_forge_repo;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$App::git::clean_forge_repo::VERSION = '0.003';
+$App::git::clean_forge_repo::VERSION = '0.004';
 use 5.028;
 use strict;
 use warnings;
@@ -77,7 +77,7 @@ App::git::clean_forge_repo - create repos on git forges with optional features d
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 FUNCTIONS
 

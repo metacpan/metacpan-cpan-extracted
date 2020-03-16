@@ -25,7 +25,7 @@ use Locale::TextDomain ('App-Upfiles');
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 14;
+our $VERSION = 15;
 
 # Have croaks from Net::FTP reported against the caller (App::Upfiles)
 # rather than here.

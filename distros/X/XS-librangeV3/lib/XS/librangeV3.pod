@@ -1,0 +1,35 @@
+=head1 NAME
+
+XS::librangeV3 - C++ range v3 library for XS
+
+=head1 SYNOPSIS
+
+In your Makefile.PL
+
+    use XS::Install;
+
+    write_makefile(
+        ...makemaker args
+        BIN_DEPS => 'XS::librangeV3',
+        ...
+    );
+
+=head1 DESCRIPTION
+
+This module makes available range v3 library for XS modules.
+
+No perl interface.
+
+=head1 SEE ALSO
+
+L<XS::Install>
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

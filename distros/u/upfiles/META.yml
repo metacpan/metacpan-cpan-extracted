@@ -36,10 +36,11 @@ requires:
   Module::Load: '0'
   Regexp::Common: '0'
   Regexp::Common::Emacs: '0'
+  Time::Local: '1.27'
   URI: '0'
   perl: '5.010'
 resources:
   homepage: http://user42.tuxfamily.org/upfiles/index.html
   license: http://www.gnu.org/licenses/gpl.html
-version: '14'
+version: '15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

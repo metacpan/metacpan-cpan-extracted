@@ -1,5 +1,5 @@
 package Net::Stripe::TypeConstraints;
-$Net::Stripe::TypeConstraints::VERSION = '0.41';
+$Net::Stripe::TypeConstraints::VERSION = '0.42';
 use strict;
 use Moose::Util::TypeConstraints qw/subtype as where message enum/;
 
@@ -130,7 +130,7 @@ Net::Stripe::TypeConstraints - Custom Moose TypeConstraints for Net::Stripe obje
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 AUTHORS
 

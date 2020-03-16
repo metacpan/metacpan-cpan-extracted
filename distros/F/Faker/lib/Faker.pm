@@ -1,852 +1,1748 @@
-# ABSTRACT: Extensible Fake Data Generator
 package Faker;
 
-use Faker::Base;
-use Faker::Function qw(confess tryload);
+use 5.014;
 
-our $VERSION = '0.12'; # VERSION
+use strict;
+use warnings;
 
-has locale => (
-    is      => 'ro',
-    isa     => STRING,
-    default => 'en_US',
-);
+use registry;
+use routines;
 
-has namespace => (
-    is      => 'ro',
-    isa     => STRING,
-    default => 'Faker::Provider',
-);
+use Data::Object::Class;
+use Data::Object::ClassHas;
 
-has providers => (
-    is      => 'ro',
-    isa     => HASH,
-    default => fun {{}},
-);
+with 'Data::Object::Role::Pluggable';
+with 'Data::Object::Role::Proxyable';
+with 'Data::Object::Role::Throwable';
 
-method provider (STRING $name) {
-    my $providers = $self->providers;
-    my $namespace = $self->namespace;
-    my $locale    = $self->locale;
-    my $default   = 'en_US';
+with 'Faker::Process';
 
-    return $providers->{$name}
-        if $providers->{$name};
+our $VERSION = '1.01'; # VERSION
 
-    my @classes;
-    my $explicit  = $locale && $locale ne $default;
+# METHODS
 
-    push @classes, join '::', $namespace, $locale, $name if $explicit;
-    push @classes, join '::', $namespace, $default, $name;
-    push @classes, join '::', $namespace, $name;
+method address_city_name(%args) {
+  $args{faker} = $self;
 
-    for my $class (@classes) {
-        next unless tryload $class;
-        return $providers->{$name} = $class->new(factory => $self);
-    }
-
-    my $classes = join ' or ', @classes;
-    confess "Unable to locate or load provider $classes";
+  return $self->plugin('address_city_name', %args)->execute;
 }
 
-method address_city_name (@args) {
-    $self->provider('Address')->city_name(@args);
+method address_city_prefix(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_city_prefix', %args)->execute;
 }
 
-method address_city_prefix (@args) {
-    $self->provider('Address')->city_prefix(@args);
+method address_city_suffix(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_city_suffix', %args)->execute;
 }
 
-method address_city_suffix (@args) {
-    $self->provider('Address')->city_suffix(@args);
+method address_country_name(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_country_name', %args)->execute;
 }
 
-method address_country_name (@args) {
-    $self->provider('Address')->country_name(@args);
+method address_latitude(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_latitude', %args)->execute;
 }
 
-method address_latitude (@args) {
-    $self->provider('Address')->latitude(@args);
+method address_line1(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_line1', %args)->execute;
 }
 
-method address_line1 (@args) {
-    $self->provider('Address')->line1(@args);
+method address_line2(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_line2', %args)->execute;
 }
 
-method address_line2 (@args) {
-    $self->provider('Address')->line2(@args);
+method address_lines(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_lines', %args)->execute;
 }
 
-method address_lines (@args) {
-    $self->provider('Address')->lines(@args);
+method address_longitude(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_longitude', %args)->execute;
 }
 
-method address_longitude (@args) {
-    $self->provider('Address')->longitude(@args);
+method address_number(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_number', %args)->execute;
 }
 
-method address_number (@args) {
-    $self->provider('Address')->number(@args);
+method address_postal_code(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_postal_code', %args)->execute;
 }
 
-method address_postal_code (@args) {
-    $self->provider('Address')->postal_code(@args);
+method address_state_abbr(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_state_abbr', %args)->execute;
 }
 
-method address_state_abbr (@args) {
-    $self->provider('Address')->state_abbr(@args);
+method address_state_name(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_state_name', %args)->execute;
 }
 
-method address_state_name (@args) {
-    $self->provider('Address')->state_name(@args);
+method address_street_name(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_street_name', %args)->execute;
 }
 
-method address_street_name (@args) {
-    $self->provider('Address')->street_name(@args);
+method address_street_suffix(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('address_street_suffix', %args)->execute;
 }
 
-method address_street_suffix (@args) {
-    $self->provider('Address')->street_suffix(@args);
+method build_proxy($package, $method, %args) {
+  $args{faker} = $self;
+
+  my $under = delete $args{under};
+
+  $method = "$under/$method" if $under;
+
+  if (my $plugin = eval { $self->plugin($method, %args) }) {
+
+    return sub { $plugin->execute };
+  }
+
+  return undef;
 }
 
-method color_hex_code (@args) {
-    $self->provider('Color')->hex_code(@args);
+method color_hex_code(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('color_hex_code', %args)->execute;
 }
 
-method color_name (@args) {
-    $self->provider('Color')->name(@args);
+method color_name(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('color_name', %args)->execute;
 }
 
-method color_rgbcolors (@args) {
-    $self->provider('Color')->rgbcolors(@args);
+method color_rgbcolors(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('color_rgbcolors', %args)->execute;
 }
 
-method color_rgbcolors_array (@args) {
-    $self->provider('Color')->rgbcolors_array(@args);
+method color_rgbcolors_array(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('color_rgbcolors_array', %args)->execute;
 }
 
-method color_rgbcolors_css (@args) {
-    $self->provider('Color')->rgbcolors_css(@args);
+method color_rgbcolors_css(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('color_rgbcolors_css', %args)->execute;
 }
 
-method color_safe_hex_code (@args) {
-    $self->provider('Color')->safe_hex_code(@args);
+method color_safe_hex_code(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('color_safe_hex_code', %args)->execute;
 }
 
-method color_safe_name (@args) {
-    $self->provider('Color')->safe_name(@args);
+method color_safe_name(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('color_safe_name', %args)->execute;
 }
 
-method company_buzzword_type1 (@args) {
-    $self->provider('Company')->buzzword_type1(@args);
+method company_buzzword_type1(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('company_buzzword_type1', %args)->execute;
 }
 
-method company_buzzword_type2 (@args) {
-    $self->provider('Company')->buzzword_type2(@args);
+method company_buzzword_type2(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('company_buzzword_type2', %args)->execute;
 }
 
-method company_buzzword_type3 (@args) {
-    $self->provider('Company')->buzzword_type3(@args);
+method company_buzzword_type3(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('company_buzzword_type3', %args)->execute;
 }
 
-method company_description (@args) {
-    $self->provider('Company')->description(@args);
+method company_description(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('company_description', %args)->execute;
 }
 
-method company_jargon_buzz_word (@args) {
-    $self->provider('Company')->jargon_buzz_word(@args);
+method company_jargon_buzz_word(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('company_jargon_buzz_word', %args)->execute;
 }
 
-method company_jargon_edge_word (@args) {
-    $self->provider('Company')->jargon_edge_word(@args);
+method company_jargon_edge_word(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('company_jargon_edge_word', %args)->execute;
 }
 
-method company_jargon_prop_word (@args) {
-    $self->provider('Company')->jargon_prop_word(@args);
+method company_jargon_prop_word(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('company_jargon_prop_word', %args)->execute;
 }
 
-method company_name (@args) {
-    $self->provider('Company')->name(@args);
+method company_name(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('company_name', %args)->execute;
 }
 
-method company_name_suffix (@args) {
-    $self->provider('Company')->name_suffix(@args);
+method company_name_suffix(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('company_name_suffix', %args)->execute;
 }
 
-method company_tagline (@args) {
-    $self->provider('Company')->tagline(@args);
+method company_tagline(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('company_tagline', %args)->execute;
 }
 
-method internet_domain_name (@args) {
-    $self->provider('Internet')->domain_name(@args);
+method internet_domain_name(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('internet_domain_name', %args)->execute;
 }
 
-method internet_domain_word (@args) {
-    $self->provider('Internet')->domain_word(@args);
+method internet_domain_word(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('internet_domain_word', %args)->execute;
 }
 
-method internet_email_address (@args) {
-    $self->provider('Internet')->email_address(@args);
+method internet_email_address(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('internet_email_address', %args)->execute;
 }
 
-method internet_email_domain (@args) {
-    $self->provider('Internet')->email_domain(@args);
+method internet_email_domain(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('internet_email_domain', %args)->execute;
 }
 
-method internet_ip_address (@args) {
-    $self->provider('Internet')->ip_address(@args);
+method internet_ip_address(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('internet_ip_address', %args)->execute;
 }
 
-method internet_ip_address_v4 (@args) {
-    $self->provider('Internet')->ip_address_v4(@args);
+method internet_ip_address_v4(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('internet_ip_address_v4', %args)->execute;
 }
 
-method internet_ip_address_v6 (@args) {
-    $self->provider('Internet')->ip_address_v6(@args);
+method internet_ip_address_v6(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('internet_ip_address_v6', %args)->execute;
 }
 
-method internet_root_domain (@args) {
-    $self->provider('Internet')->root_domain(@args);
+method internet_root_domain(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('internet_root_domain', %args)->execute;
 }
 
-method internet_url (@args) {
-    $self->provider('Internet')->url(@args);
+method internet_url(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('internet_url', %args)->execute;
 }
 
-method lorem_paragraph (@args) {
-    $self->provider('Lorem')->paragraph(@args);
+method lorem_paragraph(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('lorem_paragraph', %args)->execute;
 }
 
-method lorem_paragraphs (@args) {
-    $self->provider('Lorem')->paragraphs(@args);
+method lorem_paragraphs(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('lorem_paragraphs', %args)->execute;
 }
 
-method lorem_sentence (@args) {
-    $self->provider('Lorem')->sentence(@args);
+method lorem_sentence(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('lorem_sentence', %args)->execute;
 }
 
-method lorem_sentences (@args) {
-    $self->provider('Lorem')->sentences(@args);
+method lorem_sentences(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('lorem_sentences', %args)->execute;
 }
 
-method lorem_word (@args) {
-    $self->provider('Lorem')->word(@args);
+method lorem_word(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('lorem_word', %args)->execute;
 }
 
-method lorem_words (@args) {
-    $self->provider('Lorem')->words(@args);
+method lorem_words(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('lorem_words', %args)->execute;
 }
 
-method person_first_name (@args) {
-    $self->provider('Person')->first_name(@args);
+method payment_card_expiration(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('payment_card_expiration', %args)->execute;
 }
 
-method person_last_name (@args) {
-    $self->provider('Person')->last_name(@args);
+method payment_card_number(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('payment_card_number', %args)->execute;
 }
 
-method person_name (@args) {
-    $self->provider('Person')->name(@args);
+method payment_vendor(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('payment_vendor', %args)->execute;
 }
 
-method person_name_prefix (@args) {
-    $self->provider('Person')->name_prefix(@args);
+method person_first_name(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('person_first_name', %args)->execute;
 }
 
-method person_name_suffix (@args) {
-    $self->provider('Person')->name_suffix(@args);
+method person_last_name(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('person_last_name', %args)->execute;
 }
 
-method person_username (@args) {
-    $self->provider('Person')->username(@args);
+method person_name(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('person_name', %args)->execute;
 }
 
-method telephone_number (@args) {
-    $self->provider('Telephone')->number(@args);
+method person_name_prefix(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('person_name_prefix', %args)->execute;
+}
+
+method person_name_suffix(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('person_name_suffix', %args)->execute;
+}
+
+method person_username(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('person_username', %args)->execute;
+}
+
+method telephone_number(%args) {
+  $args{faker} = $self;
+
+  return $self->plugin('telephone_number', %args)->execute;
 }
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Faker - Extensible Fake Data Generator
+Faker
 
-=head1 VERSION
+=cut
 
-version 0.12
+=head1 ABSTRACT
+
+Extensible Fake Data Generator
+
+=cut
 
 =head1 SYNOPSIS
 
-    use Faker;
+  package main;
 
-    my $faker = Faker->new;
+  use Faker;
 
-    my $address   = $faker->provider('Address');
-    my $color     = $faker->provider('Color');
-    my $company   = $faker->provider('Company');
-    my $internet  = $faker->provider('Internet');
-    my $lorem     = $faker->provider('Lorem');
-    my $payment   = $faker->provider('Payment');
-    my $person    = $faker->provider('Person');
-    my $telephone = $faker->provider('Telephone');
+  my $f = Faker->new;
 
-    say $address->lines;
-    say $color->name;
-    say $company->name;
-    say $internet->ip_address;
-    say $lorem->sentences;
-    say $payment->card_number;
-    say $person->username;
-    say $telephone->number;
-
-    # or
-
-    say $faker->address_lines;
-    say $faker->color_name;
-    say $faker->company_name;
-    say $faker->internet_ip_address;
-    say $faker->lorem_sentences;
-    say $faker->payment_card_number;
-    say $faker->person_username;
-    say $faker->telephone_number;
+=cut
 
 =head1 DESCRIPTION
 
-Faker is a Perl library that generates fake data for you. Whether you need to
+This package provides generates fake data for you. Whether you need to
 bootstrap your database, create good-looking XML documents, fill-in your
 persistence to stress test it, or anonymize data taken from a production
-service, Faker makes it easy to generate fake data. B<Note: This is an early
-release available for testing and feedback and as such is subject to change.>
+service, Faker makes it easy to generate fake data.
 
-=head1 ATTRIBUTES
+=cut
 
-=head2 namespace
+=head1 INTEGRATES
 
-    $faker->namespace('MyApp::FakeData');
+This package integrates behaviors from:
 
-The namespace attribute contains the namespace from which providers will be
-loaded. This attribute defaults to Faker::Provider.
+L<Data::Object::Role::Pluggable>
 
-=head2 locale
+L<Data::Object::Role::Proxyable>
 
-    $faker->locale('en_US');
+L<Data::Object::Role::Throwable>
 
-The locale attribute contains the locale string which is concatenated with the
-namespace attribute to load fake data which is locale-specific.
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Types::Standard>
+
+=cut
+
+=head1 SCENARIOS
+
+This package supports the following scenarios:
+
+=cut
+
+=head2 autoloading
+
+  package Faker::Plugin::FileExt;
+
+  use Data::Object::Class;
+  use Data::Object::ClassHas;
+
+  has 'faker';
+
+  sub execute {
+    'video/mpeg'
+  }
+
+  package main;
+
+  use Faker;
+
+  my $f = Faker->new;
+
+  $f->_file_ext
+
+This package supports the auto-loading of plugins, which means that anyone can
+create non-core plugins (fake data generators) and load and control them using
+Faker.
+
+=cut
+
+=head2 autoloading-under
+
+  package Faker::Plugin::JaJp::PersonName;
+
+  use Data::Object::Class;
+  use Data::Object::ClassHas;
+
+  has 'faker';
+
+  sub execute {
+    '鈴木 陽一'
+  }
+
+  package main;
+
+  use Faker;
+
+  my $f = Faker->new;
+
+  $f->_person_name(under => 'ja_jp')
+
+This package also supports auto-loading plugins under a specific sub-namespace
+which is typical in creating fake data plugins for locales.
+
+=cut
 
 =head1 METHODS
 
-=head2 provider
+This package implements the following methods:
 
-    $faker->provider('Company'); # Faker::Provider::en_US::Company
-
-The provider method uses the namespace and locale attributes to load a
-particular provider which provides methods to generate fake data.
+=cut
 
 =head2 address_city_name
 
-    $faker->address_city_name; # Leathaville
+  address_city_name(Any %args) : Str
 
-The address_city_name method generates a random ficticious city name. This
-method is a proxy method which is the equivilent of calling the C<city_name>
-method on the L<Faker::Provider::Address> class.
-
-=head2 address_city_prefix
-
-    $faker->address_city_prefix; # East
-
-The address_city_prefix method generates a random ficticious city prefix. This
-method is a proxy method which is the equivilent of calling the C<city_prefix>
-method on the L<Faker::Provider::en_US::Address> class.
-
-=head2 address_city_suffix
-
-    $faker->address_city_suffix; # town
-
-The address_city_suffix method generates a random ficticious city suffix. This
-method is a proxy method which is the equivilent of calling the C<city_suffix>
-method on the L<Faker::Provider::Address> class.
-
-=head2 address_country_name
-
-    $faker->address_country_name; # Maldives
-
-The address_country_name method generates a random ficticious country name.
-This method is a proxy method which is the equivilent of calling the
-C<country_name> method on the L<Faker::Provider::en_US::Address> class.
-
-=head2 address_latitude
-
-    $faker->address_latitude; # 71.339800
-
-The address_latitude method generates a random ficticious latitude point. This
-method is a proxy method which is the equivilent of calling the C<latitude>
-method on the L<Faker::Provider::Address> class.
-
-=head2 address_line1
-
-    $faker->address_line1; # 55 Wolf Street
-
-The address_line1 method generates a random ficticious street address. This
-method is a proxy method which is the equivilent of calling the C<line1> method
-on the L<Faker::Provider::Address> class.
-
-=head2 address_line2
-
-    $faker->address_line2; # Apt. 097
-
-The address_line2 method generates a random ficticious address line2. This
-method is a proxy method which is the equivilent of calling the C<line2> method
-on the L<Faker::Provider::en_US::Address> class.
-
-=head2 address_lines
-
-    $faker->address_lines; # 23 West Parkway, Antoinetteford, 57654-9772
-
-The address_lines method generates a random ficticious stree address. This
-method is a proxy method which is the equivilent of calling the C<lines> method
-on the L<Faker::Provider::Address> class.
-
-=head2 address_longitude
-
-    $faker->address_longitude; # 40.987408
-
-The address_longitude method generates a random ficticious longitude point.
-This method is a proxy method which is the equivilent of calling the
-C<longitude> method on the L<Faker::Provider::Address> class.
-
-=head2 address_number
-
-    $faker->address_number; # 5
-
-The address_number method generates a random ficticious street number. This
-method is a proxy method which is the equivilent of calling the C<number>
-method on the L<Faker::Provider::Address> class.
-
-=head2 address_postal_code
-
-    $faker->address_postal_code; # 54708-5923
-
-The address_postal_code method generates a random ficticious postal code. This
-method is a proxy method which is the equivilent of calling the C<postal_code>
-method on the L<Faker::Provider::Address> class.
-
-=head2 address_state_abbr
-
-    $faker->address_state_abbr; # MT
-
-The address_state_abbr method generates a random ficticious state abbr. This
-method is a proxy method which is the equivilent of calling the C<state_abbr>
-method on the L<Faker::Provider::en_US::Address> class.
-
-=head2 address_state_name
-
-    $faker->address_state_name; # Missouri
-
-The address_state_name method generates a random ficticious state name. This
-method is a proxy method which is the equivilent of calling the C<state_name>
-method on the L<Faker::Provider::en_US::Address> class.
-
-=head2 address_street_name
-
-    $faker->address_street_name; # Gottlieb Avenue
-
-The address_street_name method generates a random ficticious street name. This
-method is a proxy method which is the equivilent of calling the C<street_name>
-method on the L<Faker::Provider::Address> class.
-
-=head2 address_street_suffix
-
-    $faker->address_street_suffix; # Street
-
-The address_street_suffix method generates a random ficticious street suffix.
-This method is a proxy method which is the equivilent of calling the
-C<street_suffix> method on the L<Faker::Provider::Address> class.
-
-=head2 color_hex_code
-
-    $faker->color_hex_code; # #f69e17
-
-The color_hex_code method generates a random ficticious hex color. This method
-is a proxy method which is the equivilent of calling the C<hex_code> method on
-the L<Faker::Provider::Color> class.
-
-=head2 color_name
-
-    $faker->color_name; # DarkBlue
-
-The color_name method generates a random ficticious color name. This method is
-a proxy method which is the equivilent of calling the C<name> method on the
-L<Faker::Provider::Color> class.
-
-=head2 color_rgbcolors
-
-    $faker->color_rgbcolors; # 191,5,180
-
-The color_rgbcolors method generates a random ficticious rgb colors. This
-method is a proxy method which is the equivilent of calling the C<rgbcolors>
-method on the L<Faker::Provider::Color> class.
-
-=head2 color_rgbcolors_array
-
-    $faker->color_rgbcolors_array; # [217,103,213]
-
-The color_rgbcolors_array method generates a random ficticious rgb colors. This
-method is a proxy method which is the equivilent of calling the
-C<rgbcolors_array> method on the L<Faker::Provider::Color> class.
-
-=head2 color_rgbcolors_css
-
-    $faker->color_rgbcolors_css; # rgb(173,240,91)
-
-The color_rgbcolors_css method generates a random ficticious rgbcolors for css.
-This method is a proxy method which is the equivilent of calling the
-C<rgbcolors_css> method on the L<Faker::Provider::Color> class.
-
-=head2 color_safe_hex_code
-
-    $faker->color_safe_hex_code; # #ff003e
-
-The color_safe_hex_code method generates a random ficticious safe hex color.
-This method is a proxy method which is the equivilent of calling the
-C<safe_hex_code> method on the L<Faker::Provider::Color> class.
-
-=head2 color_safe_name
-
-    $faker->color_safe_name; # fuchsia
-
-The color_safe_name method generates a random ficticious safe color name. This
-method is a proxy method which is the equivilent of calling the C<safe_name>
-method on the L<Faker::Provider::Color> class.
-
-=head2 company_buzzword_type1
-
-    $faker->company_buzzword_type1; # synergize
-
-The company_buzzword_type1 method generates a random ficticious buzzword type1.
-This method is a proxy method which is the equivilent of calling the
-C<buzzword_type1> method on the L<Faker::Provider::en_US::Company> class.
-
-=head2 company_buzzword_type2
-
-    $faker->company_buzzword_type2; # vertical
-
-The company_buzzword_type2 method generates a random ficticious buzzword type2.
-This method is a proxy method which is the equivilent of calling the
-C<buzzword_type2> method on the L<Faker::Provider::en_US::Company> class.
-
-=head2 company_buzzword_type3
-
-    $faker->company_buzzword_type3; # methodologies
-
-The company_buzzword_type3 method generates a random ficticious buzzword type3.
-This method is a proxy method which is the equivilent of calling the
-C<buzzword_type3> method on the L<Faker::Provider::en_US::Company> class.
-
-=head2 company_description
-
-    $faker->company_description; # Delivers discrete processimprovement
-
-The company_description method generates a random ficticious description. This
-method is a proxy method which is the equivilent of calling the C<description>
-method on the L<Faker::Provider::en_US::Company> class.
-
-=head2 company_jargon_buzz_word
-
-    $faker->company_jargon_buzz_word; # encryption
-
-The company_jargon_buzz_word method generates a random ficticious jargon buzz
-word. This method is a proxy method which is the equivilent of calling the
-C<jargon_buzz_word> method on the L<Faker::Provider::en_US::Company> class.
-
-=head2 company_jargon_edge_word
-
-    $faker->company_jargon_edge_word; # Public-key
-
-The company_jargon_edge_word method generates a random ficticious jargon edge
-word. This method is a proxy method which is the equivilent of calling the
-C<jargon_edge_word> method on the L<Faker::Provider::en_US::Company> class.
-
-=head2 company_jargon_prop_word
-
-    $faker->company_jargon_prop_word; # upward-trending
-
-The company_jargon_prop_word method generates a random ficticious jargon
-proposition word. This method is a proxy method which is the equivilent of
-calling the C<jargon_prop_word> method on the
-L<Faker::Provider::en_US::Company> class.
-
-=head2 company_name
-
-    $faker->company_name; # Quitzon Inc.
-
-The company_name method generates a random ficticious company name. This method
-is a proxy method which is the equivilent of calling the C<name> method on the
-L<Faker::Provider::Company> class.
-
-=head2 company_name_suffix
-
-    $faker->company_name_suffix; # Inc.
-
-The company_name_suffix method generates a random ficticious company name
-suffix. This method is a proxy method which is the equivilent of calling the
-C<name_suffix> method on the L<Faker::Provider::Company> class.
-
-=head2 company_tagline
-
-    $faker->company_tagline; # mindshare customized seize
-
-The company_tagline method generates a random ficticious tagline. This method
-is a proxy method which is the equivilent of calling the C<tagline> method on
-the L<Faker::Provider::en_US::Company> class.
-
-=head2 internet_domain_name
-
-    $faker->internet_domain_name; # bauch-co.net
-
-The internet_domain_name method generates a random ficticious domain name. This
-method is a proxy method which is the equivilent of calling the C<domain_name>
-method on the L<Faker::Provider::Internet> class.
-
-=head2 internet_domain_word
-
-    $faker->internet_domain_word; # jerde-gulgowski
-
-The internet_domain_word method generates a random ficticious domain word. This
-method is a proxy method which is the equivilent of calling the C<domain_word>
-method on the L<Faker::Provider::Internet> class.
-
-=head2 internet_email_address
-
-    $faker->internet_email_address; # jessy.kunze\@brekke-cartwright.net
-
-The internet_email_address method generates a random ficticious email address.
-This method is a proxy method which is the equivilent of calling the
-C<email_address> method on the L<Faker::Provider::Internet> class.
-
-=head2 internet_email_domain
-
-    $faker->internet_email_domain; # gmail.com
-
-The internet_email_domain method generates a random ficticious email domain.
-This method is a proxy method which is the equivilent of calling the
-C<email_domain> method on the L<Faker::Provider::Internet> class.
-
-=head2 internet_ip_address
-
-    $faker->internet_ip_address; # 151.127.26.209
-
-The internet_ip_address method generates a random ficticious ip address. This
-method is a proxy method which is the equivilent of calling the C<ip_address>
-method on the L<Faker::Provider::Internet> class.
-
-=head2 internet_ip_address_v4
-
-    $faker->internet_ip_address_v4; # 165.132.192.226
-
-The internet_ip_address_v4 method generates a random ficticious ip address v4.
-This method is a proxy method which is the equivilent of calling the
-C<ip_address_v4> method on the L<Faker::Provider::Internet> class.
-
-=head2 internet_ip_address_v6
-
-    $faker->internet_ip_address_v6; # 8ae5:e9ac:e5fb:4fc2:7763:fa5e:aaf4:8120
-
-The internet_ip_address_v6 method generates a random ficticious ip address v6.
-This method is a proxy method which is the equivilent of calling the
-C<ip_address_v6> method on the L<Faker::Provider::Internet> class.
-
-=head2 internet_root_domain
-
-    $faker->internet_root_domain; # org
-
-The internet_root_domain method generates a random ficticious root domain. This
-method is a proxy method which is the equivilent of calling the C<root_domain>
-method on the L<Faker::Provider::Internet> class.
-
-=head2 internet_url
-
-    $faker->internet_url; # http://bauch-runte-and-ondricka.info/
-
-The internet_url method generates a random ficticious url. This method is a
-proxy method which is the equivilent of calling the C<url> method on the
-L<Faker::Provider::Internet> class.
-
-=head2 lorem_paragraph
-
-    $faker->lorem_paragraph;
-    # velit vitae molestiae ut dolores. amet est qui rem placeat accusamus
-    # accusamus labore. qui quidem expedita non.\n\n
-
-The lorem_paragraph method generates a random ficticious paragraph. This method
-is a proxy method which is the equivilent of calling the C<paragraph> method on
-the L<Faker::Provider::Lorem> class.
-
-=head2 lorem_paragraphs
-
-    $faker->lorem_paragraphs;
-    # nobis minus aut nam. odio autem fuga et reprehenderit. magnam eius et
-    # possimus.\n\nvelit nam vel nam harum maxime id dolorum. sed ut molestiae
-    # cumque voluptas aspernatur quidem aut dicta. officia laborum dolorem ab
-    # ipsa deleniti.\n\n
-
-The lorem_paragraphs method generates a random ficticious paragraphs. This
-method is a proxy method which is the equivilent of calling the C<paragraphs>
-method on the L<Faker::Provider::Lorem> class.
-
-=head2 lorem_sentence
-
-    $faker->lorem_sentence; # animi iure quo assumenda est.
-
-The lorem_sentence method generates a random ficticious sentence. This method
-is a proxy method which is the equivilent of calling the C<sentence> method on
-the L<Faker::Provider::Lorem> class.
-
-=head2 lorem_sentences
-
-    $faker->lorem_sentences;
-    # placeat beatae qui aliquid. distinctio quasi repudiandae hic id.
-    # explicabo culpa debitis excepturi aliquam quo ea.
-
-The lorem_sentences method generates a random ficticious sentences. This method
-is a proxy method which is the equivilent of calling the C<sentences> method on
-the L<Faker::Provider::Lorem> class.
-
-=head2 lorem_word
-
-    $faker->lorem_word; # quidem
-
-The lorem_word method generates a random ficticious word. This method is a
-proxy method which is the equivilent of calling the C<word> method on the
-L<Faker::Provider::Lorem> class.
-
-=head2 lorem_words
-
-    $faker->lorem_words; # voluptatibus officia delectus unde sed
-
-The lorem_words method generates a random ficticious words. This method
-is a proxy method which is the equivilent of calling the C<words> method on
-the L<Faker::Provider::Lorem> class.
-
-=head2 payment_card_expiration
-
-    $faker->payment_card_expiration; # 02/17
-
-The payment_card_expiration method generates a random ficticious credit card
-expiration date. This method is a proxy method which is the equivilent of
-calling the C<card_expiration> method on the L<Faker::Provider::Payment> class.
-
-=head2 payment_card_number
-
-    $faker->payment_card_number; # 37814449158323
-
-The payment_card_number method generates a random ficticious credit card
-number. This method is a proxy method which is the equivilent of calling the
-C<card_number> method on the L<Faker::Provider::Payment> class.
-
-=head2 payment_vendor
-
-    $faker->payment_vendor; # MasterCard
-
-The payment_vendor method generates a random ficticious credit card vendor.
-This method is a proxy method which is the equivilent of calling the C<vendor>
-method on the L<Faker::Provider::Payment> class.
-
-=head2 person_first_name
-
-    $faker->person_first_name; # John
-
-The person_first_name method generates a random ficticious first name. This
-method is a proxy method which is the equivilent of calling the C<first_name>
-method on the L<Faker::Provider::Person> class.
-
-=head2 person_last_name
-
-    $faker->person_last_name; # Doe
-
-The person_last_name method generates a random ficticious last name. This
-method is a proxy method which is the equivilent of calling the C<last_name>
-method on the L<Faker::Provider::Person> class.
-
-=head2 person_name
-
-    $faker->person_name; # Jane Doe
-
-The person_name method generates a random ficticious full name. This method is
-a proxy method which is the equivilent of calling the C<name> method on the
-L<Faker::Provider::Person> class.
-
-=head2 person_name_prefix
-
-    $faker->person_name_prefix; # Miss
-
-The person_name_prefix method generates a random ficticious name prefix. This
-method is a proxy method which is the equivilent of calling the C<name_prefix>
-method on the L<Faker::Provider::en_US::Person> class.
-
-=head2 person_name_suffix
-
-    $faker->person_name_suffix; # III
-
-The person_name_suffix method generates a random ficticious name suffix. This
-method is a proxy method which is the equivilent of calling the C<name_suffix>
-method on the L<Faker::Provider::en_US::Person> class.
-
-=head2 person_username
-
-    $faker->person_username; # Jane.Doe
-
-The person_username method generates a random ficticious username. This method
-is a proxy method which is the equivilent of calling the C<username> method on
-the L<Faker::Provider::Person> class.
-
-=head2 telephone_number
-
-    $faker->telephone_number; # (111) 456-1127
-
-The telephone_number method generates a random ficticious telephone number.
-This method is a proxy method which is the equivilent of calling the C<number>
-method on the L<Faker::Provider::Telephone> class.
-
-=head1 ACKNOWLEDGEMENTS
-
-Some parts of this library were adopted from the following implementations.
+The address_city_name method returns a random fake address city name. See the
+L<Faker::Plugin::AddressCityName> plugin for more information.
 
 =over 4
 
-=item *
+=item address_city_name example #1
 
-JS Faker L<https://github.com/Marak/faker.js>
+  # given: synopsis
 
-=item *
+  $f->address_city_name
 
-PHP Faker L<https://github.com/fzaninotto/Faker>
-
-=item *
-
-Python Faker L<https://github.com/joke2k/faker>
-
-=item *
-
-Ruby Faker L<https://github.com/stympy/faker>
+  # Lolastad
 
 =back
 
+=cut
+
+=head2 address_city_prefix
+
+  address_city_prefix(Any %args) : Str
+
+The address_city_prefix method returns a random fake address city prefix. See
+the L<Faker::Plugin::AddressCityPrefix> plugin for more information.
+
+=over 4
+
+=item address_city_prefix example #1
+
+  # given: synopsis
+
+  $f->address_city_prefix
+
+  # South
+
+=back
+
+=cut
+
+=head2 address_city_suffix
+
+  address_city_suffix(Any %args) : Str
+
+The address_city_suffix method returns a random fake address city suffix. See
+the L<Faker::Plugin::AddressCitySuffix> plugin for more information.
+
+=over 4
+
+=item address_city_suffix example #1
+
+  # given: synopsis
+
+  $f->address_city_suffix
+
+  # berg
+
+=back
+
+=cut
+
+=head2 address_country_name
+
+  address_country_name(Any %args) : Str
+
+The address_country_name method returns a random fake address country name. See
+the L<Faker::Plugin::AddressCountryName> plugin for more information.
+
+=over 4
+
+=item address_country_name example #1
+
+  # given: synopsis
+
+  $f->address_country_name
+
+  # Iraq
+
+=back
+
+=cut
+
+=head2 address_latitude
+
+  address_latitude(Any %args) : Str
+
+The address_latitude method returns a random fake address latitude. See the
+L<Faker::Plugin::Address::Latitude> plugin for more information.
+
+=over 4
+
+=item address_latitude example #1
+
+  # given: synopsis
+
+  $f->address_latitude
+
+  # 2338952
+
+=back
+
+=cut
+
+=head2 address_line1
+
+  address_line1(Any %args) : Str
+
+The address_line1 method returns a random fake address line1. See the
+L<Faker::Plugin::AddressLine1> plugin for more information.
+
+=over 4
+
+=item address_line1 example #1
+
+  # given: synopsis
+
+  $f->address_line1
+
+  # 4 Schaefer Parkway
+
+=back
+
+=cut
+
+=head2 address_line2
+
+  address_line2(Any %args) : Str
+
+The address_line2 method returns a random fake address line2. See the
+L<Faker::Plugin::AddressLine2> plugin for more information.
+
+=over 4
+
+=item address_line2 example #1
+
+  # given: synopsis
+
+  $f->address_line2
+
+  # Apt. 092
+
+=back
+
+=cut
+
+=head2 address_lines
+
+  address_lines(Any %args) : Str
+
+The address_lines method returns a random fake address lines. See the
+L<Faker::Plugin::AddressLines> plugin for more information.
+
+=over 4
+
+=item address_lines example #1
+
+  # given: synopsis
+
+  $f->address_lines
+
+  # 3587 Thiel Avenue
+  # Suite 335
+  # Tobinmouth, ME 96440-0239
+
+=back
+
+=cut
+
+=head2 address_longitude
+
+  address_longitude(Any %args) : Str
+
+The address_longitude method returns a random fake address longitude. See the
+L<Faker::Plugin::AddressLongitude> plugin for more information.
+
+=over 4
+
+=item address_longitude example #1
+
+  # given: synopsis
+
+  $f->address_longitude
+
+  # -28.920235
+
+=back
+
+=cut
+
+=head2 address_number
+
+  address_number(Any %args) : Str
+
+The address_number method returns a random fake address number. See the
+L<Faker::Plugin::AddressNumber> plugin for more information.
+
+=over 4
+
+=item address_number example #1
+
+  # given: synopsis
+
+  $f->address_number
+
+  # 67
+
+=back
+
+=cut
+
+=head2 address_postal_code
+
+  address_postal_code(Any %args) : Str
+
+The address_postal_code method returns a random fake address postal code. See
+the L<Faker::Plugin::AddressPostalCode> plugin for more information.
+
+=over 4
+
+=item address_postal_code example #1
+
+  # given: synopsis
+
+  $f->address_postal_code
+
+  # 02475
+
+=back
+
+=cut
+
+=head2 address_state_abbr
+
+  address_state_abbr(Any %args) : Str
+
+The address_state_abbr method returns a random fake address state abbr. See the
+L<Faker::Plugin::AddressStateAbbr> plugin for more information.
+
+=over 4
+
+=item address_state_abbr example #1
+
+  # given: synopsis
+
+  $f->address_state_abbr
+
+  # OH
+
+=back
+
+=cut
+
+=head2 address_state_name
+
+  address_state_name(Any %args) : Str
+
+The address_state_name method returns a random fake address state name. See the
+L<Faker::Plugin::AddressStateName> plugin for more information.
+
+=over 4
+
+=item address_state_name example #1
+
+  # given: synopsis
+
+  $f->address_state_name
+
+  # Georgia
+
+=back
+
+=cut
+
+=head2 address_street_name
+
+  address_street_name(Any %args) : Str
+
+The address_street_name method returns a random fake address street name. See
+the L<Faker::Plugin::AddressStreetName> plugin for more information.
+
+=over 4
+
+=item address_street_name example #1
+
+  # given: synopsis
+
+  $f->address_street_name
+
+  # Reyna Avenue
+
+=back
+
+=cut
+
+=head2 address_street_suffix
+
+  address_street_suffix(Any %args) : Str
+
+The address_street_suffix method returns a random fake address street suffix.
+See the L<Faker::Plugin::AddressStreetSuffix> plugin for more information.
+
+=over 4
+
+=item address_street_suffix example #1
+
+  # given: synopsis
+
+  $f->address_street_suffix
+
+  # Avenue
+
+=back
+
+=cut
+
+=head2 color_hex_code
+
+  color_hex_code(Any %args) : Str
+
+The color_hex_code method returns a random fake color hex code. See the
+L<Faker::Plugin::ColorHexCode> plugin for more information.
+
+=over 4
+
+=item color_hex_code example #1
+
+  # given: synopsis
+
+  $f->color_hex_code
+
+  # #b9fe40
+
+=back
+
+=cut
+
+=head2 color_name
+
+  color_name(Any %args) : Str
+
+The color_name method returns a random fake color name. See the
+L<Faker::Plugin::ColorName> plugin for more information.
+
+=over 4
+
+=item color_name example #1
+
+  # given: synopsis
+
+  $f->color_name
+
+  # LightSteelBlue
+
+=back
+
+=cut
+
+=head2 color_rgbcolors
+
+  color_rgbcolors(Any %args) : Str
+
+The color_rgbcolors method returns a random fake color rgbcolors. See the
+L<Faker::Plugin::ColorRgbcolors> plugin for more information.
+
+=over 4
+
+=item color_rgbcolors example #1
+
+  # given: synopsis
+
+  $f->color_rgbcolors
+
+  # 77,186,28
+
+=back
+
+=cut
+
+=head2 color_rgbcolors_array
+
+  color_rgbcolors_array(Any %args) : ArrayRef
+
+The color_rgbcolors_array method returns a random fake color rgbcolors array.
+See the L<Faker::Plugin::ColorRgbcolorsArray> plugin for more information.
+
+=over 4
+
+=item color_rgbcolors_array example #1
+
+  # given: synopsis
+
+  $f->color_rgbcolors_array
+
+  # [77,186,28]
+
+=back
+
+=cut
+
+=head2 color_rgbcolors_css
+
+  color_rgbcolors_css(Any %args) : Str
+
+The color_rgbcolors_css method returns a random fake color rgbcolors css. See
+the L<Faker::Plugin::ColorRgbcolorsCss> plugin for more information.
+
+=over 4
+
+=item color_rgbcolors_css example #1
+
+  # given: synopsis
+
+  $f->color_rgbcolors_css
+
+  # rgb(115,98,44)
+
+=back
+
+=cut
+
+=head2 color_safe_hex_code
+
+  color_safe_hex_code(Any %args) : Str
+
+The color_safe_hex_code method returns a random fake color safe hex code. See
+the L<Faker::Plugin::ColorSafeHexCode> plugin for more information.
+
+=over 4
+
+=item color_safe_hex_code example #1
+
+  # given: synopsis
+
+  $f->color_safe_hex_code
+
+  # #ff0078
+
+=back
+
+=cut
+
+=head2 color_safe_name
+
+  color_safe_name(Any %args) : Str
+
+The color_safe_name method returns a random fake color safe name. See the
+L<Faker::Plugin::ColorSafeName> plugin for more information.
+
+=over 4
+
+=item color_safe_name example #1
+
+  # given: synopsis
+
+  $f->color_safe_name
+
+  # blue
+
+=back
+
+=cut
+
+=head2 company_buzzword_type1
+
+  company_buzzword_type1(Any %args) : Str
+
+The company_buzzword_type1 method returns a random fake company buzzword type1.
+See the L<Faker::Plugin::CompanyBuzzwordType1> plugin for more information.
+
+=over 4
+
+=item company_buzzword_type1 example #1
+
+  # given: synopsis
+
+  $f->company_buzzword_type1
+
+  # implement
+
+=back
+
+=cut
+
+=head2 company_buzzword_type2
+
+  company_buzzword_type2(Any %args) : Str
+
+The company_buzzword_type2 method returns a random fake company buzzword type2.
+See the L<Faker::Plugin::CompanyBuzzwordType2> plugin for more information.
+
+=over 4
+
+=item company_buzzword_type2 example #1
+
+  # given: synopsis
+
+  $f->company_buzzword_type2
+
+  # interactive
+
+=back
+
+=cut
+
+=head2 company_buzzword_type3
+
+  company_buzzword_type3(Any %args) : Str
+
+The company_buzzword_type3 method returns a random fake company buzzword type3.
+See the L<Faker::Plugin::CompanyBuzzwordType3> plugin for more information.
+
+=over 4
+
+=item company_buzzword_type3 example #1
+
+  # given: synopsis
+
+  $f->company_buzzword_type3
+
+  # bandwidth
+
+=back
+
+=cut
+
+=head2 company_description
+
+  company_description(Any %args) : Str
+
+The company_description method returns a random fake company description. See
+the L<Faker::Plugin::CompanyDescription> plugin for more information.
+
+=over 4
+
+=item company_description example #1
+
+  # given: synopsis
+
+  $f->company_description
+
+  # Excels at impactful pre-emptive decisions
+
+=back
+
+=cut
+
+=head2 company_jargon_buzz_word
+
+  company_jargon_buzz_word(Any %args) : Str
+
+The company_jargon_buzz_word method returns a random fake company jargon buzz
+word. See the L<Faker::Plugin::CompanyJargonBuzzWord> plugin for more
+information.
+
+=over 4
+
+=item company_jargon_buzz_word example #1
+
+  # given: synopsis
+
+  $f->company_jargon_buzz_word
+
+  # parallelism
+
+=back
+
+=cut
+
+=head2 company_jargon_edge_word
+
+  company_jargon_edge_word(Any %args) : Str
+
+The company_jargon_edge_word method returns a random fake company jargon edge
+word. See the L<Faker::Plugin::CompanyJargonEdgeWord> plugin for more
+information.
+
+=over 4
+
+=item company_jargon_edge_word example #1
+
+  # given: synopsis
+
+  $f->company_jargon_edge_word
+
+  # Customer-focused
+
+=back
+
+=cut
+
+=head2 company_jargon_prop_word
+
+  company_jargon_prop_word(Any %args) : Str
+
+The company_jargon_prop_word method returns a random fake company jargon prop
+word. See the L<Faker::Plugin::CompanyJargonPropWord> plugin for more
+information.
+
+=over 4
+
+=item company_jargon_prop_word example #1
+
+  # given: synopsis
+
+  $f->company_jargon_prop_word
+
+  # upward-trending
+
+=back
+
+=cut
+
+=head2 company_name
+
+  company_name(Any %args) : Str
+
+The company_name method returns a random fake company name. See the
+L<Faker::Plugin::CompanyName> plugin for more information.
+
+=over 4
+
+=item company_name example #1
+
+  # given: synopsis
+
+  $f->company_name
+
+  # Boehm, Rutherford and Roberts
+
+=back
+
+=cut
+
+=head2 company_name_suffix
+
+  company_name_suffix(Any %args) : Str
+
+The company_name_suffix method returns a random fake company name suffix. See
+the L<Faker::Plugin::CompanyNameSuffix> plugin for more information.
+
+=over 4
+
+=item company_name_suffix example #1
+
+  # given: synopsis
+
+  $f->company_name_suffix
+
+  # Group
+
+=back
+
+=cut
+
+=head2 company_tagline
+
+  company_tagline(Any %args) : Str
+
+The company_tagline method returns a random fake company tagline. See the
+L<Faker::Plugin::CompanyTagline> plugin for more information.
+
+=over 4
+
+=item company_tagline example #1
+
+  # given: synopsis
+
+  $f->company_tagline
+
+  # cultivate end-to-end partnerships
+
+=back
+
+=cut
+
+=head2 internet_domain_name
+
+  internet_domain_name(Any %args) : Str
+
+The internet_domain_name method returns a random fake internet domain name. See
+the L<Faker::Plugin::InternetDomainName> plugin for more information.
+
+=over 4
+
+=item internet_domain_name example #1
+
+  # given: synopsis
+
+  $f->internet_domain_name
+
+  # kassulke-cruickshank.biz
+
+=back
+
+=cut
+
+=head2 internet_domain_word
+
+  internet_domain_word(Any %args) : Str
+
+The internet_domain_word method returns a random fake internet domain word. See
+the L<Faker::Plugin::InternetDomainWord> plugin for more information.
+
+=over 4
+
+=item internet_domain_word example #1
+
+  # given: synopsis
+
+  $f->internet_domain_word
+
+  # raynor-beier
+
+=back
+
+=cut
+
+=head2 internet_email_address
+
+  internet_email_address(Any %args) : Str
+
+The internet_email_address method returns a random fake internet email address.
+See the L<Faker::Plugin::InternetEmailAddress> plugin for more information.
+
+=over 4
+
+=item internet_email_address example #1
+
+  # given: synopsis
+
+  $f->internet_email_address
+
+  # rose@maggio-pfannerstill-and-marquardt.com
+
+=back
+
+=cut
+
+=head2 internet_email_domain
+
+  internet_email_domain(Any %args) : Str
+
+The internet_email_domain method returns a random fake internet email domain.
+See the L<Faker::Plugin::InternetEmailDomain> plugin for more information.
+
+=over 4
+
+=item internet_email_domain example #1
+
+  # given: synopsis
+
+  $f->internet_email_domain
+
+  # gmail.com
+
+=back
+
+=cut
+
+=head2 internet_ip_address
+
+  internet_ip_address(Any %args) : Str
+
+The internet_ip_address method returns a random fake internet ip address. See
+the L<Faker::Plugin::InternetIpAddress> plugin for more information.
+
+=over 4
+
+=item internet_ip_address example #1
+
+  # given: synopsis
+
+  $f->internet_ip_address
+
+  # 193.199.217.87
+
+=back
+
+=cut
+
+=head2 internet_ip_address_v4
+
+  internet_ip_address_v4(Any %args) : Str
+
+The internet_ip_address_v4 method returns a random fake internet ip address v4.
+See the L<Faker::Plugin::InternetIpAddressV4> plugin for more information.
+
+=over 4
+
+=item internet_ip_address_v4 example #1
+
+  # given: synopsis
+
+  $f->internet_ip_address_v4
+
+  # 45.212.129.22
+
+=back
+
+=cut
+
+=head2 internet_ip_address_v6
+
+  internet_ip_address_v6(Any %args) : Str
+
+The internet_ip_address_v6 method returns a random fake internet ip address v6.
+See the L<Faker::Plugin::InternetIpAddressV6> plugin for more information.
+
+=over 4
+
+=item internet_ip_address_v6 example #1
+
+  # given: synopsis
+
+  $f->internet_ip_address_v6
+
+  # 4024:40e9:b107:681d:8ce1:bb12:3380:b476
+
+=back
+
+=cut
+
+=head2 internet_root_domain
+
+  internet_root_domain(Any %args) : Str
+
+The internet_root_domain method returns a random fake internet root domain. See
+the L<Faker::Plugin::InternetRootDomain> plugin for more information.
+
+=over 4
+
+=item internet_root_domain example #1
+
+  # given: synopsis
+
+  $f->internet_root_domain
+
+  # biz
+
+=back
+
+=cut
+
+=head2 internet_url
+
+  internet_url(Any %args) : Str
+
+The internet_url method returns a random fake internet url. See the
+L<Faker::Plugin::InternetUrl> plugin for more information.
+
+=over 4
+
+=item internet_url example #1
+
+  # given: synopsis
+
+  $f->internet_url
+
+  # https://krajcik-goyette.biz/
+
+=back
+
+=cut
+
+=head2 lorem_paragraph
+
+  lorem_paragraph(Any %args) : Str
+
+The lorem_paragraph method returns a random fake lorem paragraph. See the
+L<Faker::Plugin::LoremParagraph> plugin for more information.
+
+=over 4
+
+=item lorem_paragraph example #1
+
+  # given: synopsis
+
+  $f->lorem_paragraph
+
+  # id tempore eum. vitae optio rerum enim nihil perspiciatis omnis et. ut
+  # voluptates dicta qui culpa. a nam at nemo fugiat.
+
+=back
+
+=cut
+
+=head2 lorem_paragraphs
+
+  lorem_paragraphs(Any %args) : Str
+
+The lorem_paragraphs method returns a random fake lorem paragraphs. See the
+L<Faker::Plugin::LoremParagraphs> plugin for more information.
+
+=over 4
+
+=item lorem_paragraphs example #1
+
+  # given: synopsis
+
+  $f->lorem_paragraphs
+
+  # modi minus pariatur accusamus possimus eaque id velit porro. voluptatum
+  # natus saepe. non in quas est. ut quos autem occaecati quo.
+
+  # saepe quae unde. vel hic consequuntur. quia aut ut nostrum amet. et
+  # consequuntur occaecati.
+
+=back
+
+=cut
+
+=head2 lorem_sentence
+
+  lorem_sentence(Any %args) : Str
+
+The lorem_sentence method returns a random fake lorem sentence. See the
+L<Faker::Plugin::LoremSentence> plugin for more information.
+
+=over 4
+
+=item lorem_sentence example #1
+
+  # given: synopsis
+
+  $f->lorem_sentence
+
+  # amet id id culpa reiciendis minima id corporis illum quas.
+
+=back
+
+=cut
+
+=head2 lorem_sentences
+
+  lorem_sentences(Any %args) : Str
+
+The lorem_sentences method returns a random fake lorem sentences. See the
+L<Faker::Plugin::LoremSentences> plugin for more information.
+
+=over 4
+
+=item lorem_sentences example #1
+
+  # given: synopsis
+
+  $f->lorem_sentences
+
+  # laboriosam ipsam ipsum. animi accusantium quisquam repellendus. occaecati
+  # itaque reiciendis perferendis exercitationem.
+
+=back
+
+=cut
+
+=head2 lorem_word
+
+  lorem_word(Any %args) : Str
+
+The lorem_word method returns a random fake lorem word. See the
+L<Faker::Plugin::LoremWord> plugin for more information.
+
+=over 4
+
+=item lorem_word example #1
+
+  # given: synopsis
+
+  $f->lorem_word
+
+  # quos
+
+=back
+
+=cut
+
+=head2 lorem_words
+
+  lorem_words(Any %args) : Str
+
+The lorem_words method returns a random fake lorem words. See the
+L<Faker::Plugin::LoremWords> plugin for more information.
+
+=over 4
+
+=item lorem_words example #1
+
+  # given: synopsis
+
+  $f->lorem_words
+
+  # autem assumenda commodi eum dolor
+
+=back
+
+=cut
+
+=head2 payment_card_expiration
+
+  payment_card_expiration(Any %args) : Str
+
+The payment_card_expiration method returns a random fake payment card
+expiration. See the L<Faker::Plugin::PaymentCardExpiration> plugin for more
+information.
+
+=over 4
+
+=item payment_card_expiration example #1
+
+  # given: synopsis
+
+  $f->payment_card_expiration
+
+  # 01/21
+
+=back
+
+=cut
+
+=head2 payment_card_number
+
+  payment_card_number(Any %args) : Str
+
+The payment_card_number method returns a random fake payment card number. See
+the L<Faker::Plugin::PaymentCardNumber> plugin for more information.
+
+=over 4
+
+=item payment_card_number example #1
+
+  # given: synopsis
+
+  $f->payment_card_number
+
+  # 544772628796996
+
+=back
+
+=cut
+
+=head2 payment_vendor
+
+  payment_vendor(Any %args) : Str
+
+The payment_vendor method returns a random fake payment vendor. See the
+L<Faker::Plugin::PaymentVendor> plugin for more information.
+
+=over 4
+
+=item payment_vendor example #1
+
+  # given: synopsis
+
+  $f->payment_vendor
+
+  # Visa
+
+=back
+
+=cut
+
+=head2 person_first_name
+
+  person_first_name(Any %args) : Str
+
+The person_first_name method returns a random fake person first name. See the
+L<Faker::Plugin::PersonFirstName> plugin for more information.
+
+=over 4
+
+=item person_first_name example #1
+
+  # given: synopsis
+
+  $f->person_first_name
+
+  # Sandrine
+
+=back
+
+=cut
+
+=head2 person_last_name
+
+  person_last_name(Any %args) : Str
+
+The person_last_name method returns a random fake person last name. See the
+L<Faker::Plugin::PersonLastName> plugin for more information.
+
+=over 4
+
+=item person_last_name example #1
+
+  # given: synopsis
+
+  $f->person_last_name
+
+  # Langosh
+
+=back
+
+=cut
+
+=head2 person_name
+
+  person_name(Any %args) : Str
+
+The person_name method returns a random fake person name. See the
+L<Faker::Plugin::PersonName> plugin for more information.
+
+=over 4
+
+=item person_name example #1
+
+  # given: synopsis
+
+  $f->person_name
+
+  # Eveline Wintheiser
+
+=back
+
+=cut
+
+=head2 person_name_prefix
+
+  person_name_prefix(Any %args) : Str
+
+The person_name_prefix method returns a random fake person name prefix. See the
+L<Faker::Plugin::PersonNamePrefix> plugin for more information.
+
+=over 4
+
+=item person_name_prefix example #1
+
+  # given: synopsis
+
+  $f->person_name_prefix
+
+  # Ms.
+
+=back
+
+=cut
+
+=head2 person_name_suffix
+
+  person_name_suffix(Any %args) : Str
+
+The person_name_suffix method returns a random fake person name suffix. See the
+L<Faker::Plugin::PersonNameSuffix> plugin for more information.
+
+=over 4
+
+=item person_name_suffix example #1
+
+  # given: synopsis
+
+  $f->person_name_suffix
+
+  # Sr.
+
+=back
+
+=cut
+
+=head2 person_username
+
+  person_username(Any %args) : Str
+
+The person_username method returns a random fake person username. See the
+L<Faker::Plugin::PersonUsername> plugin for more information.
+
+=over 4
+
+=item person_username example #1
+
+  # given: synopsis
+
+  $f->person_username
+
+  # Cayla25
+
+=back
+
+=cut
+
+=head2 telephone_number
+
+  telephone_number(Any %args) : Str
+
+The telephone_number method returns a random fake telephone number. See the
+L<Faker::Plugin::TelephoneNumber> plugin for more information.
+
+=over 4
+
+=item telephone_number example #1
+
+  # given: synopsis
+
+  $f->telephone_number
+
+  # 549-844-2061
+
+=back
+
+=cut
+
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk, C<awncorp@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+Copyright (C) 2011-2019, Al Newkirk, et al.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/faker/blob/master/LICENSE>.
+
+=head1 ACKNOWLEDGEMENTS
+
+Parts of this library were inspired by the following implementations:
+
+L<PHP Faker|https://github.com/fzaninotto/Faker>
+
+L<Ruby Faker|https://github.com/stympy/faker>
+
+L<Python Faker|https://github.com/joke2k/faker>
+
+L<JS Faker|https://github.com/Marak/faker.js>
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/faker/wiki>
+
+L<Project|https://github.com/iamalnewkirk/faker>
+
+L<Initiatives|https://github.com/iamalnewkirk/faker/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/faker/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/faker/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/faker/issues>
 
 =cut

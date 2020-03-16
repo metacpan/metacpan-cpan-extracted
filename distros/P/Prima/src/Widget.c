@@ -87,6 +87,7 @@ Widget_init( Handle self, HV * profile)
 	my-> set_buffered           ( self, pget_B( buffered));
 	my-> set_clipChildren       ( self, pget_B( clipChildren));
 	my-> set_cursorVisible      ( self, pget_B( cursorVisible));
+	my-> set_dndAware           ( self, pget_sv( dndAware));
 	my-> set_growMode           ( self, pget_i( growMode));
 	my-> set_helpContext        ( self, pget_sv( helpContext));
 	my-> set_hint               ( self, pget_sv( hint));
@@ -253,6 +254,10 @@ Widget_update_sys_handle( Handle self, HV * profile)
 void
 Widget_done( Handle self)
 {
+	if ( var-> dndAware != NULL ) {
+		free( var-> dndAware );
+		var-> dndAware = NULL;
+	}
 	if ( var-> text ) sv_free( var->text);
 	var-> text = nil;
 	apc_widget_destroy( self);
@@ -376,11 +381,17 @@ Widget_cleanup( Handle self)
 			Object_destroy( var-> widgets. items[i]);
 	}
 
-	my-> detach( self, var-> accelTable, true);
-	var-> accelTable = nilHandle;
+	if ( var-> accelTable) {
+		unprotect_object(var-> accelTable);
+		//my-> detach( self, var-> accelTable, true);
+		var-> accelTable = nilHandle;
+	}
 
-	my-> detach( self, var-> popupMenu, true);
-	var-> popupMenu = nilHandle;
+	if ( var-> popupMenu ) {
+		unprotect_object(var-> popupMenu);
+		//my-> detach( self, var-> popupMenu, true);
+		var-> popupMenu = nilHandle;
+	}
 
 	inherited-> cleanup( self);
 }
@@ -423,6 +434,14 @@ Widget_detach( Handle self, Handle objectHandle, Bool kill)
 			my-> set_currentWidget( self, nilHandle);
 	}
 	inherited-> detach( self, objectHandle, kill);
+}
+	
+DNDResp
+Widget_dnd_start(Handle self, int dnd_actions, Bool default_pointers)
+{
+	DNDResp ret;
+	ret.action = apc_dnd_start( self, dnd_actions, default_pointers, &ret.counterpart);
+	return ret;
 }
 
 /*::e */
@@ -538,11 +557,361 @@ Widget_first_that( Handle self, void * actionProc, void * params)
 
 /*::h */
 
+#define evOK ( var-> evStack[ var-> evPtr - 1])
+#define objCheck if ( var-> stage > csNormal) return
+
+static Bool
+dnd_event_wanted(Handle self, PEvent event)
+{
+	Bool r;
+	SV * ret;
+	if ( var-> dndAware == NULL) return false;
+	if ( strcmp(var->dndAware, "1") == 0) return true;
+	ENTER;
+	SAVETMPS;
+	ret = call_perl( event->dnd.clipboard, "has_format", "<s", var->dndAware);
+	r = ret ? SvTRUE( ret) : false;
+	FREETMPS;
+	LEAVE;
+	return r;
+}
+
+static void
+handle_drag_begin( Handle self, PEvent event)
+{
+	enter_method;
+	if ( !dnd_event_wanted(self, event)) {
+		opt_clear(optDropSession);
+		return;
+	}
+	opt_set(optDropSession);
+	my-> notify( self, "<sHiiPH", "DragBegin",
+		event-> dnd. clipboard,
+		event-> dnd. action,
+		event-> dnd. modmap,
+		event-> dnd. where,
+		event-> dnd. counterpart
+	);
+}
+
+static void
+handle_drag_over( Handle self, PEvent event)
+{
+	dPROFILE;
+	enter_method;
+	HV * profile;
+	SV * ref;
+
+	if ( !is_opt(optDropSession)) {
+		Point size = apc_widget_get_size(self);
+		event-> dnd.allow      = 0;
+		event-> dnd.pad.x      = event-> dnd.pad.y = 0;
+		event-> dnd.pad.width  = size.x;
+		event-> dnd.pad.height = size.y;
+		return;
+	}
+
+	profile = newHV();
+	ref = newRV_noinc((SV*) profile);
+
+	pset_i(allow,1);
+	pset_i(action,dndCopy);
+	my-> notify( self, "<sHiiPHS", "DragOver",
+		event-> dnd. clipboard,
+		event-> dnd. action,
+		event-> dnd. modmap,
+		event-> dnd. where,
+		event-> dnd. counterpart,
+		ref
+	);
+
+	event-> dnd. allow  = pexist(allow)  ? pget_i(allow)  : 1;
+	event-> dnd. action = pexist(action) ? pget_i(action) : dndCopy;
+	memset( &event-> dnd.pad, 0, sizeof(Rect));
+	if ( pexist(pad)) {
+		int rect[4];
+		prima_read_point( pget_sv(pad), rect, 4, "Array panic on 'pad'");
+		event->dnd.pad.x      = rect[0];
+		event->dnd.pad.y      = rect[1];
+		event->dnd.pad.width  = rect[2];
+		event->dnd.pad.height = rect[3];
+	}
+
+	sv_free(ref);
+}
+
+static void
+handle_drag_end( Handle self, PEvent event)
+{
+	dPROFILE;
+	enter_method;
+	HV * profile;
+	SV * ref;
+
+	if ( !is_opt(optDropSession)) {
+		event-> dnd. allow = 0;
+		return;
+	}
+	opt_clear(optDropSession);
+
+	profile = newHV();
+	ref = newRV_noinc((SV*) profile);
+
+	pset_i(allow, 1);
+	pset_i(action, event->dnd.action);
+	my-> notify( self, "<sHiiPHS", "DragEnd", 
+		event-> dnd. allow ? event-> dnd.clipboard : nilHandle, 
+		event-> dnd. action,
+		event-> dnd. modmap,
+		event-> dnd. where,
+		event-> dnd. counterpart,
+		ref
+	);
+	event-> dnd. allow  = pexist(allow)  ? pget_i(allow)  : 1;
+	event-> dnd. action = pexist(action) ? pget_i(action) : dndCopy;
+
+	sv_free(ref);
+}
+
+static void
+handle_drag_query( Handle self, PEvent event)
+{
+	dPROFILE;
+	enter_method;
+	HV * profile = newHV();
+	SV * ref = newRV_noinc((SV*) profile);
+	pset_i(allow, event->dnd.allow);
+	my-> notify( self, "<siHS", "DragQuery", event->dnd.modmap, event->dnd.counterpart, ref);
+	if (pexist(allow))
+		event-> dnd.allow = pget_i(allow);
+	event-> dnd.action = pexist(action) ? pget_i(action) : 0;
+	sv_free(ref);
+}
+
+static void
+handle_key_down( Handle self, PEvent event)
+{
+	enter_method;
+	int i;
+	int rep = event-> key. repeat;
+	Handle next = nilHandle;
+	if ( is_opt( optBriefKeys))
+		rep = 1;
+	else
+		event-> key. repeat = 1;
+	for ( i = 0; i < rep; i++) {
+		my-> notify( self, "<siiii", "KeyDown",
+			event-> key.code, event-> key. key, event-> key. mod, event-> key. repeat);
+		objCheck;
+		if ( evOK) {
+			Event ev = *event;
+			ev. key. source = self;
+			ev. cmd         = var-> owner ? cmDelegateKey : cmTranslateAccel;
+			ev. key. subcmd = 0;
+			if ( !my-> message( self, &ev)) {
+				my-> clear_event( self);
+				return;
+			}
+			objCheck;
+		}
+		if ( !evOK) break;
+
+		switch( event-> key. key) {
+		case kbF1:
+		case kbHelp:
+			my-> help( self);
+			my-> clear_event( self);
+			return;
+		case kbLeft:
+			next = my-> next_positional( self, -1, 0);
+			break;
+		case kbRight:
+			next = my-> next_positional( self, 1, 0);
+			break;
+		case kbUp:
+			next = my-> next_positional( self, 0, 1);
+			break;
+		case kbDown:
+			next = my-> next_positional( self, 0, -1);
+			break;
+		case kbTab:
+			next = my-> next_tab( self, true);
+			break;
+		case kbBackTab:
+			next = my-> next_tab( self, false);
+			break;
+		default:;
+		}
+		if ( next) {
+			CWidget( next)-> set_selected( next, true);
+			objCheck;
+			my-> clear_event( self);
+			return;
+		}
+	}
+}
+
+static void
+handle_delegate_key( Handle self, PEvent event)
+{
+	enter_method;
+	switch ( event-> key. subcmd) {
+		case 0: {
+			Event ev = *event;
+			ev. cmd         = cmTranslateAccel;
+			if ( !my-> message( self, &ev)) {
+				my-> clear_event( self);
+				return;
+			}
+			objCheck;
+
+			if ( my-> first_that( self, (void*)prima_accel_notify, &ev)) {
+				my-> clear_event( self);
+				return;
+			}
+			objCheck;
+			ev. cmd         = cmDelegateKey;
+			ev. key. subcmd = 1;
+			if ( my-> first_that( self, (void*)prima_accel_notify, &ev)) {
+				my-> clear_event( self);
+				return;
+			}
+			if ( var-> owner && my->can_propagate_key(self))
+			{
+				if ( var-> owner == application)
+					ev. cmd = cmTranslateAccel;
+				else
+					ev. key. subcmd = 0;
+				ev. key. source = self;
+				if (!(((( PWidget) var-> owner)-> self)-> message( var-> owner, &ev))) {
+					objCheck;
+					my-> clear_event( self);
+					return;
+				}
+			}
+		}
+		break;
+		case 1: {
+			Event ev = *event;
+			ev. cmd  = cmTranslateAccel;
+			if ( my-> first_that( self, (void*)prima_accel_notify, &ev)) {
+				my-> clear_event( self);
+				return;
+			}
+			objCheck;
+			ev = *event;
+			if ( my-> first_that( self, (void*)prima_accel_notify, &ev)) {
+				my-> clear_event( self);
+				return;
+			}
+		}
+		break;
+	}
+}
+
+static void
+handle_move( Handle self, PEvent event)
+{
+	enter_method;
+	Bool doNotify = false;
+	Point oldP;
+	if ( var-> stage == csNormal && var-> evQueue == nil) {
+		doNotify = true;
+	} else if ( var-> stage > csNormal) {
+		return;
+	} else if ( var-> evQueue != nil) {
+		int i = list_first_that( var-> evQueue, (void*)find_dup_msg, &event-> cmd);
+		PEvent n;
+		if ( i < 0) {
+			if ( !( n = alloc1( Event))) goto MOVE_EVENT;
+			memcpy( n, event, sizeof( Event));
+			n-> gen. B = 1;
+			n-> gen. R. left = n-> gen. R. bottom = 0;
+			list_add( var-> evQueue, ( Handle) n);
+		} else
+			n = ( PEvent) list_at( var-> evQueue, i);
+		n-> gen. P = event-> gen. P;
+	}
+MOVE_EVENT:;
+	if ( !event-> gen. B)
+		my-> first_that( self, (void*) Widget_move_notify, &event-> gen. P);
+	if ( doNotify) oldP = var-> pos;
+	var-> pos = event-> gen. P;
+	if ( doNotify &&
+		(oldP. x != event-> gen. P. x ||
+			oldP. y != event-> gen. P. y)) {
+		my-> notify( self, "<sPP", "Move", oldP, event-> gen. P);
+		objCheck;
+		if ( var->geometry == gtGrowMode && var-> growMode & gmCenter)
+			my-> set_centered( self, var-> growMode & gmXCenter, var-> growMode & gmYCenter);
+	}
+}
+
+static void
+handle_popup( Handle self, PEvent event)
+{
+	enter_method;
+	Handle org = self;
+	my-> notify( self, "<siP", "Popup", event-> gen. B, event-> gen. P. x, event-> gen. P. y);
+	objCheck;
+	if ( evOK) {
+		while ( self) {
+			PPopup p = ( PPopup) CWidget( self)-> get_popup( self);
+			if ( p && p-> self-> get_autoPopup(( Handle) p)) {
+				Point px = event-> gen. P;
+				apc_widget_map_points( org,  true,  1, &px);
+				apc_widget_map_points( self, false, 1, &px);
+				p-> self-> popup(( Handle) p, px. x, px. y ,0,0,0,0);
+				CWidget( org)-> clear_event( org);
+				return;
+			}
+			self = var-> owner;
+		}
+	}
+}
+
+static void
+handle_size( Handle self, PEvent event)
+{
+	enter_method;
+	/* expecting new size in P, old & new size in R. */
+	Bool doNotify = false;
+	if ( var-> stage == csNormal && var-> evQueue == nil) {
+		doNotify = true;
+	} else if ( var-> stage > csNormal) {
+		return;
+	} else if ( var-> evQueue != nil) {
+		int i = list_first_that( var-> evQueue, (void*)find_dup_msg, &event-> cmd);
+		PEvent n;
+		if ( i < 0) {
+			if ( !( n = alloc1( Event))) goto SIZE_EVENT;
+			memcpy( n, event, sizeof( Event));
+			n-> gen. B = 1;
+			n-> gen. R. left = n-> gen. R. bottom = 0;
+			list_add( var-> evQueue, ( Handle) n);
+		} else
+			n = ( PEvent) list_at( var-> evQueue, i);
+		n-> gen. P. x = n-> gen. R. right  = event-> gen. P. x;
+		n-> gen. P. y = n-> gen. R. top    = event-> gen. P. y;
+	}
+SIZE_EVENT:;
+	if ( var->geometry == gtGrowMode && var-> growMode & gmCenter)
+		my-> set_centered( self, var-> growMode & gmXCenter, var-> growMode & gmYCenter);
+	if ( !event-> gen. B)
+		my-> first_that( self, (void*) Widget_size_notify, &event-> gen. R);
+	if ( doNotify) {
+		Point oldSize;
+		oldSize. x = event-> gen. R. left;
+		oldSize. y = event-> gen. R. bottom;
+		my-> notify( self, "<sPP", "Size", oldSize, event-> gen. P);
+	}
+	Widget_pack_slaves( self);
+	Widget_place_slaves( self) ;
+}
+
 void Widget_handle_event( Handle self, PEvent event)
 {
 	enter_method;
-#define evOK ( var-> evStack[ var-> evPtr - 1])
-#define objCheck if ( var-> stage > csNormal) return
 	inherited-> handle_event ( self, event);
 	objCheck;
 	switch ( event-> cmd)
@@ -683,121 +1052,11 @@ void Widget_handle_event( Handle self, PEvent event)
 			my-> notify( self, "<s", "MouseLeave");
 			break;
 		case cmKeyDown:
-		{
-			int i;
-			int rep = event-> key. repeat;
-			Handle next = nilHandle;
-			if ( is_opt( optBriefKeys))
-				rep = 1;
-			else
-				event-> key. repeat = 1;
-			for ( i = 0; i < rep; i++) {
-				my-> notify( self, "<siiii", "KeyDown",
-					event-> key.code, event-> key. key, event-> key. mod, event-> key. repeat);
-				objCheck;
-				if ( evOK) {
-					Event ev = *event;
-					ev. key. source = self;
-					ev. cmd         = var-> owner ? cmDelegateKey : cmTranslateAccel;
-					ev. key. subcmd = 0;
-					if ( !my-> message( self, &ev)) {
-						my-> clear_event( self);
-						return;
-					}
-					objCheck;
-				}
-				if ( !evOK) break;
-
-				switch( event-> key. key) {
-				case kbF1:
-				case kbHelp:
-					my-> help( self);
-					my-> clear_event( self);
-					return;
-				case kbLeft:
-					next = my-> next_positional( self, -1, 0);
-					break;
-				case kbRight:
-					next = my-> next_positional( self, 1, 0);
-					break;
-				case kbUp:
-					next = my-> next_positional( self, 0, 1);
-					break;
-				case kbDown:
-					next = my-> next_positional( self, 0, -1);
-					break;
-				case kbTab:
-					next = my-> next_tab( self, true);
-					break;
-				case kbBackTab:
-					next = my-> next_tab( self, false);
-					break;
-				default:;
-				}
-				if ( next) {
-					CWidget( next)-> set_selected( next, true);
-					objCheck;
-					my-> clear_event( self);
-					return;
-				}
-			}
-		}
-		break;
+			handle_key_down(self, event);
+			break;
 		case cmDelegateKey:
-		switch ( event-> key. subcmd)
-		{
-			case 0: {
-				Event ev = *event;
-				ev. cmd         = cmTranslateAccel;
-				if ( !my-> message( self, &ev)) {
-					my-> clear_event( self);
-					return;
-				}
-				objCheck;
-
-				if ( my-> first_that( self, (void*)prima_accel_notify, &ev)) {
-					my-> clear_event( self);
-					return;
-				}
-				objCheck;
-				ev. cmd         = cmDelegateKey;
-				ev. key. subcmd = 1;
-				if ( my-> first_that( self, (void*)prima_accel_notify, &ev)) {
-					my-> clear_event( self);
-					return;
-				}
-				if ( var-> owner && my->can_propagate_key(self))
-				{
-					if ( var-> owner == application)
-						ev. cmd = cmTranslateAccel;
-					else
-						ev. key. subcmd = 0;
-					ev. key. source = self;
-					if (!(((( PWidget) var-> owner)-> self)-> message( var-> owner, &ev))) {
-						objCheck;
-						my-> clear_event( self);
-						return;
-					}
-				}
-			}
+			handle_delegate_key( self, event );
 			break;
-			case 1: {
-				Event ev = *event;
-				ev. cmd  = cmTranslateAccel;
-				if ( my-> first_that( self, (void*)prima_accel_notify, &ev)) {
-					my-> clear_event( self);
-					return;
-				}
-				objCheck;
-				ev = *event;
-				if ( my-> first_that( self, (void*)prima_accel_notify, &ev)) {
-					my-> clear_event( self);
-					return;
-				}
-			}
-			break;
-		}
-		break;
 		case cmTranslateAccel:
 		{
 			int key = CAbstractMenu-> translate_key( nilHandle, event-> key. code, event-> key. key, event-> key. mod);
@@ -806,112 +1065,52 @@ void Widget_handle_event( Handle self, PEvent event)
 				return;
 			}
 			objCheck;
+			my-> notify( self, "<siii", "TranslateAccel",
+				event-> key.code, event-> key. key, event-> key. mod);
+			break;
 		}
-		my-> notify( self, "<siii", "TranslateAccel",
-			event-> key.code, event-> key. key, event-> key. mod);
-		break;
 		case cmKeyUp:
-		my-> notify( self, "<siii", "KeyUp",
+			my-> notify( self, "<siii", "KeyUp",
 			event-> key.code, event-> key. key, event-> key. mod);
-		break;
+			break;
 		case cmMenuCmd:
-		if ( event-> gen. source)
-			((( PAbstractMenu) event-> gen. source)-> self)-> sub_call_id( event-> gen. source, event-> gen. i);
-		break;
+			if ( event-> gen. source)
+				((( PAbstractMenu) event-> gen. source)-> self)-> 
+					sub_call_id( event-> gen. source, event-> gen. i);
+			break;
 		case cmMove:
-			{
-				Bool doNotify = false;
-				Point oldP;
-				if ( var-> stage == csNormal && var-> evQueue == nil) {
-					doNotify = true;
-				} else if ( var-> stage > csNormal) {
-					break;
-				} else if ( var-> evQueue != nil) {
-				int i = list_first_that( var-> evQueue, (void*)find_dup_msg, &event-> cmd);
-				PEvent n;
-				if ( i < 0) {
-					if ( !( n = alloc1( Event))) goto MOVE_EVENT;
-					memcpy( n, event, sizeof( Event));
-					n-> gen. B = 1;
-					n-> gen. R. left = n-> gen. R. bottom = 0;
-					list_add( var-> evQueue, ( Handle) n);
-				} else
-					n = ( PEvent) list_at( var-> evQueue, i);
-				n-> gen. P = event-> gen. P;
-				}
-			MOVE_EVENT:;
-				if ( !event-> gen. B)
-					my-> first_that( self, (void*) Widget_move_notify, &event-> gen. P);
-				if ( doNotify) oldP = var-> pos;
-				var-> pos = event-> gen. P;
-				if ( doNotify &&
-					(oldP. x != event-> gen. P. x ||
-						oldP. y != event-> gen. P. y)) {
-					my-> notify( self, "<sPP", "Move", oldP, event-> gen. P);
-					objCheck;
-					if ( var->geometry == gtGrowMode && var-> growMode & gmCenter)
-						my-> set_centered( self, var-> growMode & gmXCenter, var-> growMode & gmYCenter);
-				}
-			}
+			handle_move(self, event);
 			break;
 		case cmPopup:
-		{
-			Handle org = self;
-			my-> notify( self, "<siP", "Popup", event-> gen. B, event-> gen. P. x, event-> gen. P. y);
-			objCheck;
-			if ( evOK) {
-				while ( self) {
-					PPopup p = ( PPopup) CWidget( self)-> get_popup( self);
-					if ( p && p-> self-> get_autoPopup(( Handle) p)) {
-						Point px = event-> gen. P;
-						apc_widget_map_points( org,  true,  1, &px);
-						apc_widget_map_points( self, false, 1, &px);
-						p-> self-> popup(( Handle) p, px. x, px. y ,0,0,0,0);
-						CWidget( org)-> clear_event( org);
-						return;
-					}
-					self = var-> owner;
-				}
-			}
+			handle_popup(self, event);
 			break;
-		}
 		case cmSize:
-		/* expecting new size in P, old & new size in R. */
-		{
-			Bool doNotify = false;
-			if ( var-> stage == csNormal && var-> evQueue == nil) {
-				doNotify = true;
-			} else if ( var-> stage > csNormal) {
+			handle_size( self, event);
+			break;
+		case cmDragBegin       :
+			handle_drag_begin( self, event );
+			break;
+		case cmDragOver       :
+			handle_drag_over( self, event );
+			break;
+		case cmDragEnd        :
+			handle_drag_end( self, event );
+			break;
+		case cmDragQuery       :
+			handle_drag_query( self, event );
+			break;
+		case cmDragResponse     :
+			my-> notify( self, "<siiH", "DragResponse", 
+				event->dnd.allow, event->dnd.action, event->dnd.counterpart);
+			break;
+		case cmMenuItemMeasure  :
+		case cmMenuItemPaint    :
+			{
+				Handle menu = event->gen.H;
+				event->gen.H = self;
+				PComponent(menu)->self->handle_event(menu, event);
 				break;
-			} else if ( var-> evQueue != nil) {
-				int i = list_first_that( var-> evQueue, (void*)find_dup_msg, &event-> cmd);
-				PEvent n;
-				if ( i < 0) {
-					if ( !( n = alloc1( Event))) goto SIZE_EVENT;
-					memcpy( n, event, sizeof( Event));
-					n-> gen. B = 1;
-					n-> gen. R. left = n-> gen. R. bottom = 0;
-					list_add( var-> evQueue, ( Handle) n);
-				} else
-					n = ( PEvent) list_at( var-> evQueue, i);
-				n-> gen. P. x = n-> gen. R. right  = event-> gen. P. x;
-				n-> gen. P. y = n-> gen. R. top    = event-> gen. P. y;
 			}
-		SIZE_EVENT:;
-			if ( var->geometry == gtGrowMode && var-> growMode & gmCenter)
-				my-> set_centered( self, var-> growMode & gmXCenter, var-> growMode & gmYCenter);
-			if ( !event-> gen. B)
-				my-> first_that( self, (void*) Widget_size_notify, &event-> gen. R);
-			if ( doNotify) {
-				Point oldSize;
-				oldSize. x = event-> gen. R. left;
-				oldSize. y = event-> gen. R. bottom;
-				my-> notify( self, "<sPP", "Size", oldSize, event-> gen. P);
-			}
-			Widget_pack_slaves( self);
-			Widget_place_slaves( self);
-		}
-		break;
 	}
 }
 
@@ -1725,7 +1924,6 @@ Widget_get_handle( Handle self)
 	return newSVpv( buf, 0);
 }
 
-
 SV *
 Widget_get_parent_handle( Handle self)
 {
@@ -2068,7 +2266,7 @@ Widget_accelItems( Handle self, Bool set, SV * accelItems)
 	if ( var-> stage > csFrozen) return nilSV;
 	if ( !set)
 		return var-> accelTable ?
-			CAbstractMenu( var-> accelTable)-> get_items( var-> accelTable, "") : nilSV;
+			CAbstractMenu( var-> accelTable)-> get_items( var-> accelTable, "", true) : nilSV;
 	if ( var-> accelTable == nilHandle) {
 		HV * profile = newHV();
 		if ( SvTYPE( accelItems)) pset_sv( items, accelItems);
@@ -2083,16 +2281,14 @@ Widget_accelItems( Handle self, Bool set, SV * accelItems)
 Handle
 Widget_accelTable( Handle self, Bool set, Handle accelTable)
 {
-	enter_method;
 	if ( var-> stage > csFrozen) return nilHandle;
 	if ( !set)
 		return var-> accelTable;
 	if ( accelTable && !kind_of( accelTable, CAbstractMenu)) return nilHandle;
-	if ( accelTable && (( PAbstractMenu) accelTable)-> owner != self)
-		my-> set_accelItems( self, CAbstractMenu( accelTable)-> get_items( accelTable, ""));
-	else
-		var-> accelTable = accelTable;
-	return accelTable;
+	if ( var->accelTable ) unprotect_object(var-> accelTable);
+	var-> accelTable = accelTable;
+	if ( var->accelTable ) protect_object(var-> accelTable);
+	return nilHandle;
 }
 
 Color
@@ -2289,6 +2485,30 @@ Widget_cursorVisible( Handle self, Bool set, Bool cursorVisible)
 	if ( !set)
 		return apc_cursor_get_visible( self);
 	return apc_cursor_set_visible( self, cursorVisible);
+}
+
+SV *
+Widget_dndAware( Handle self, Bool set, SV * dndAware)
+{
+	if ( !set) {
+		if ( var->dndAware == NULL)
+			return &PL_sv_undef;
+		else if ( strcmp(var->dndAware, "1") == 0)
+			return newSViv(1);
+		else
+			return newSVpv(var->dndAware, 0);
+	} else if ( var->dndAware == NULL && SvBOOL(dndAware)) {
+		if ( apc_dnd_set_aware( self, true))
+			var-> dndAware = duplicate_string( SvPV_nolen( dndAware));
+	} else if ( var->dndAware != NULL ) {
+		free(var-> dndAware);
+		if ( !SvBOOL(dndAware)) {
+			var->dndAware = NULL;
+			apc_dnd_set_aware( self, false);
+		} else
+			var-> dndAware = duplicate_string( SvPV_nolen( dndAware));
+	}
+	return &PL_sv_undef;
 }
 
 Bool
@@ -2594,16 +2814,14 @@ Widget_pointerPos( Handle self, Bool set, Point p)
 Handle
 Widget_popup( Handle self, Bool set, Handle popup)
 {
-	enter_method;
 	if ( var-> stage > csFrozen) return nilHandle;
 	if ( !set)
 		return var-> popupMenu;
 
 	if ( popup && !kind_of( popup, CPopup)) return nilHandle;
-	if ( popup && PAbstractMenu( popup)-> owner != self)
-		my-> set_popupItems( self, CAbstractMenu( popup)-> get_items( popup, ""));
-	else
-		var-> popupMenu = popup;
+	if ( var->popupMenu ) unprotect_object(var-> popupMenu);
+	var-> popupMenu = popup;
+	if ( var->popupMenu ) protect_object(var-> popupMenu);
 	return nilHandle;
 }
 
@@ -2626,10 +2844,10 @@ Widget_popupItems( Handle self, Bool set, SV * popupItems)
 	if ( var-> stage > csFrozen) return nilSV;
 	if ( !set)
 		return var-> popupMenu ?
-			CAbstractMenu( var-> popupMenu)-> get_items( var-> popupMenu, "") : nilSV;
+			CAbstractMenu( var-> popupMenu)-> get_items( var-> popupMenu, "", true) : nilSV;
 
 	if ( var-> popupMenu == nilHandle) {
-	if ( SvTYPE( popupItems)) {
+		if ( SvTYPE( popupItems)) {
 			HV * profile = newHV();
 			pset_sv( items, popupItems);
 			pset_H ( owner, self);
@@ -2638,7 +2856,7 @@ Widget_popupItems( Handle self, Bool set, SV * popupItems)
 		}
 	}
 	else
-		CAbstractMenu( var-> popupMenu)-> set_items( var-> popupMenu, popupItems);
+		CAbstractMenu(var-> popupMenu)-> set_items(var-> popupMenu, popupItems);
 	return popupItems;
 }
 

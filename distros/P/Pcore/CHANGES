@@ -1,3 +1,19 @@
+v0.124.1 2020-03-16T01:09:45Z
+ - app->start_nginx -> run_nginx
+
+v0.124.0 2020-03-16T00:55:19Z
+ - app config refactored
+
+v0.123.1 2020-03-15T21:53:00Z
+ - nginx poll on demand
+
+v0.123.0 2020-03-15T21:42:42Z
+ - app routing refactored
+ - perl-5.30.2
+
+v0.122.2 2020-03-15T09:27:05Z
+ - dockerignore builder updated
+
 v0.122.1 2020-03-11T12:18:35Z
  - proxy server on accept hook
 

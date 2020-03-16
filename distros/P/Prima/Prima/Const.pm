@@ -41,27 +41,25 @@ package
 package
     rop; *AUTOLOAD = \&Prima::Const::AUTOLOAD;	# raster operations
 
-sub blend($)
-{
-   my $alpha = 255 - shift;
-   $alpha = 0 if $alpha < 0;
-   $alpha = 255 if $alpha > 255;
-   return rop::DstAtop | rop::ConstantAlpha | ( $alpha << rop::SrcAlphaShift ) | ($alpha << rop::DstAlphaShift);
-}
+sub blend($) { alpha(rop::DstAtop, (255 - $_[0]) x 2) }
 
 sub alpha($;$$)
 {
-   my ($rop, $src_alpha, $dst_alpha) = @_;
-   $src_alpha //= 255;
-   $src_alpha = 0 if $src_alpha < 0;
-   $src_alpha = 255 if $src_alpha > 255;
-   my $ret = $rop | rop::SrcAlpha | ( $src_alpha << rop::SrcAlphaShift );
-   if (defined $dst_alpha) {
-      $dst_alpha = 0 if $dst_alpha < 0;
-      $dst_alpha = 255 if $dst_alpha > 255;
-      $ret |= rop::DstAlpha | ( $dst_alpha << rop::DstAlphaShift );
-   }
-   return $ret;
+	my ($rop, $src_alpha, $dst_alpha) = @_;
+
+	if (defined $src_alpha) {
+		$src_alpha =   0 if $src_alpha < 0;
+		$src_alpha = 255 if $src_alpha > 255;
+		$rop |= rop::SrcAlpha | ( $src_alpha << rop::SrcAlphaShift );
+	}
+
+	if (defined $dst_alpha) {
+		$dst_alpha =   0 if $dst_alpha < 0;
+		$dst_alpha = 255 if $dst_alpha > 255;
+		$rop |= rop::DstAlpha | ( $dst_alpha << rop::DstAlphaShift );
+	}
+
+	return $rop;
 }
 
 package
@@ -138,6 +136,43 @@ package
     fm; *AUTOLOAD = \&Prima::Const::AUTOLOAD;# fill modes
 package
     ggo; *AUTOLOAD = \&Prima::Const::AUTOLOAD;# glyph outline codes
+package
+    fv; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# font vector constants
+package
+    dnd; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# drag-and-drop constants
+
+sub is_one_action { 1 == grep { $_[0] == $_ } (dnd::Copy, dnd::Move, dnd::Link) }
+
+sub pointer
+{
+	my $action = shift;
+	if ( $action == dnd::Copy ) {
+		return cr::DragCopy;
+	} elsif ( $action == dnd::Move ) {
+		return cr::DragMove;
+	} elsif ( $action == dnd::Link ) {
+		return cr::DragLink;
+	} else {
+		return cr::DragNone;
+	}
+}
+
+sub to_one_action
+{
+	my $actions = shift;
+	return dnd::Copy if $actions & dnd::Copy;
+	return dnd::Move if $actions & dnd::Move;
+	return dnd::Link if $actions & dnd::Link;
+	return dnd::None;
+}
+
+sub keymod
+{
+	my $dnd = shift;
+	return km::Ctrl  if $dnd == dnd::Move;
+	return km::Shift if $dnd == dnd::Link;
+	return 0;
+}
 
 1;
 
@@ -343,6 +378,10 @@ See L<Prima::Widget/pointerType>
 	cr::SizeNE                  up-left move action pointer
 	cr::SizeSW                  down-right move action pointer
 	cr::Invalid                 invalid action pointer
+	cr::DragNone                pointer for an invalid dragging target
+	cr::DragCopy                pointer to show that a dnd::Copy action can be accepted
+	cr::DragMove                pointer to show that a dnd::Move action can be accepted
+	cr::DragLink                pointer to show that a dnd::Link action can be accepted
 	cr::User                    user-defined icon
 
 =head2 dbt::  - device bitmap types
@@ -350,6 +389,36 @@ See L<Prima::Widget/pointerType>
         dbt::Bitmap                 monochrome 1 bit bitmap
         dbt::Pixmap                 bitmap compatible with display format
         dbt::Layered                bitmap compatible with display format with alpha channel
+
+=head2 dnd::  - drag and drop action constants and functions
+
+        dnd::None                   no DND action was selected or performed
+        dnd::Copy                   copy action
+        dnd::Move                   move action
+        dnd::Link                   link action
+        dnd::Mask                   combination of all valid actions
+
+=over
+
+=item is_one_action ACTIONS
+
+Returns true if C<ACTIONS> is not a combination of C<dnd::> constants.
+
+=item pointer ACTION
+
+Returns a C<cr::> constant corresponding to the C<ACTION>
+
+=item to_one_action ACTIONS
+
+Selects a best single action from combination of allowes C<ACTIONS>
+
+=item keymod ACTION
+
+Returns a C<km::> keyboard modifier constant the C<ACTION> will be selected,
+when possible, if the user presses that modifier. Return 0 for C<dnd::Copy>
+that is a standard action to be performed without any modifiers.
+
+=back
 
 =head2 dt::  - drive types
 

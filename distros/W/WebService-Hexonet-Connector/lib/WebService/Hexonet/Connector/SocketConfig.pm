@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-use version 0.9917; our $VERSION = version->declare('v2.2.5');
+use version 0.9917; our $VERSION = version->declare('v2.3.0');
 
 
 sub new {

@@ -73,10 +73,10 @@ namespace string_detail {
     };
 
     enum class State : uint8_t {
+        LITERAL,  // shares external data, no Buffer, no _storage.dtor (literal data is immortal)
+        SSO,      // owns small string, no Buffer, no _storage.dtor
         INTERNAL, // has InternalBuffer, may have _storage.dtor in case of basic_string<A,B,X> <-> basic_string<A,B,Y> convertations
         EXTERNAL, // has ExternalShared, shares external data, _storage.dtor present, _storage.external->dtor present
-        LITERAL,  // shares external data, no Buffer, no _storage.dtor (literal data is immortal)
-        SSO       // owns small string, no Buffer, no _storage.dtor
     };
 
     template <class CharT>
@@ -176,17 +176,17 @@ public:
     static const size_type MAX_SSO_CHARS = (MAX_SSO_BYTES / sizeof(CharT));
     static const size_type MAX_SIZE      = npos / sizeof(CharT) - BUF_CHARS;
 
-    constexpr basic_string () : _str_literal(&TERMINAL), _length(0), _state(State::LITERAL) {}
+    constexpr basic_string () noexcept : _str_literal(&TERMINAL), _length(0), _state(State::LITERAL) {}
 
     template <size_type SIZE> // implicit constructor for literals, literals are expected to be null-terminated
-    constexpr basic_string (const CharT (&str)[SIZE]) : _str_literal(str), _length(SIZE-1), _state(State::LITERAL) {}
+    constexpr basic_string (const CharT (&str)[SIZE]) noexcept : _str_literal(str), _length(SIZE-1), _state(State::LITERAL) {}
 
     template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
     // GCC < 6 has a bug determining return value type for literals, so this ctor must be implicitly available
     #if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 6
     explicit
     #endif
-    basic_string (const _CharT* const& str) : basic_string(str, traits_type::length(str)) {}
+    basic_string (const _CharT* const& str) noexcept : basic_string(str, traits_type::length(str)) {}
 
     explicit
     basic_string (size_type capacity) : _length(0) {
@@ -1474,10 +1474,10 @@ private:
     // leaves object in invalid state
     void _release () {
         switch (_state) {
-            case State::INTERNAL: _release_internal(); break;
-            case State::EXTERNAL: _release_external(); break;
-            case State::LITERAL:
-            case State::SSO: break;
+            case State::LITERAL  :
+            case State::SSO      : break;
+            case State::INTERNAL : _release_internal(); break;
+            case State::EXTERNAL : _release_external(); break;
         }
     }
 

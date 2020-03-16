@@ -1,7 +1,7 @@
 package XS::libdwarf;
 use 5.012;
 
-our $VERSION = "20200114.5";
+our $VERSION = "20200114.6";
 
 use XS::Loader;
 
@@ -32,7 +32,7 @@ No perl interface.
 
 =head1 SEE ALSO
 
-L<DWARF library|https://sourceforge.net/projects/libdwarf/>й
+L<DWARF library|https://sourceforge.net/projects/libdwarf/>
 
 =head1 AUTHOR
 

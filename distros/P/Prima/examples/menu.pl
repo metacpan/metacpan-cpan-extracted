@@ -17,42 +17,138 @@ Note the "Edit/Kill menu" realisation.
 
 use strict;
 use warnings;
-use Prima qw( InputLine Label Application);
+use Prima qw( InputLine Label Application StdBitmap );
+use Prima::Menus;
 
 package TestWindow;
 use vars qw(@ISA);
-@ISA = qw(Prima::Window);
+@ISA = qw(Prima::MainWindow);
 
-#    Menu item must be an array with up to 5 items in -
-# [variable, text or image, accelerator text, shortcut key, sub or command]
-# if there are 0 or 1 items, it's treated as divisor line;
-# same divisor in main level of menu makes next part right-adjacent.
-# The priority is: text(2), then sub(5), then variable(1), then accelerator(3)
-# and shortcut(4). So, if there are 2 items, they are text and sub,
-# 3 - variable, text and sub, 4 - text, accelerator, key and sub
-# ( because of accelerator and key must be present both and never separately),
-# and 5 - all of the above.
-# See example below.
-# Notes:
-#   1. When adding image, scalar must be object derived from Image component
-#  or Image component by itself.
-#   2. You cannot assign to shortcut key modificator keys.
+sub create_images_menu
+{
+	my @ret;
+	my $template = shift;
+
+	my $sub = sub {
+		my $img = $_[0]-> menu-> icon( $_[1]);
+		my @r = @{$img-> palette};
+		$img-> palette( [reverse @r]) if @r;
+		$_[0]-> menu-> icon( $_[1], $img);
+	};
+
+	push @ret, [ $template, $sub ], [];
+
+	my $mono = $template->dup;
+	$mono->conversion(ict::None);
+	$mono->type(im::BW);
+
+	my $monox = $mono->clone(type => 1);
+	$monox->colormap(cl::Yellow, cl::Blue);
+	push @ret, [ '1-bit image', $sub, { icon => $monox } ];
+	push @ret, [ '-', '1-bit image disabled', $sub, { icon => $monox } ];
+
+	my $mask1 = $template->dup;
+	$mask1->set( color => cl::White, backColor => cl::Black, rop2 => rop::CopyPut );
+	$mask1->map( $mask1->pixel(0,0) );
+	$mask1->conversion(ict::None);
+	$mask1->type(im::BW);
+
+	my $mono2 = Prima::Icon->create_combined( $mono, $mask1);
+	push @ret, [ '1-bit icon', $sub, { icon => $mono2 } ];
+	push @ret, [ '-', '1-bit icon disabled', $sub, { icon => $mono2 } ];
+
+	push @ret, [];
+	push @ret, [ 'Color image', $sub, { icon => $template } ];
+	push @ret, [ '-', 'Color image disabled', $sub, { icon => $template } ];
+	my $color = Prima::Icon->create_combined( $template, $mask1);
+	$color->maskColor($color->pixel(0,0));
+	$color->autoMasking(am::MaskColor);
+	push @ret, [ 'Color icon', $sub, { icon => $color } ];
+	push @ret, [ '-', 'Color icon disabled', $sub, { icon => $color } ];
+	push @ret, [];
+
+	my $mask8 = $template->dup;
+	$mask8->type(im::Byte);
+	$mask8->set( color => cl::Black, backColor => 0x808080, rop2 => rop::CopyPut );
+	$mask8->map( 0x10101 * $mask8->pixel(0,0) );
+	my $argb = Prima::Icon->create_combined( $template, $mask8);
+	push @ret, [ 'ARGB icon', $sub, { icon => $argb } ];
+	push @ret, [ '-', 'ARGB icon disabled', $sub, { icon => $argb } ];
+
+	return @ret;
+}
+
+sub create_custom_menu
+{
+	my @icons = map { Prima::StdBitmap::image($_) } sbmp::CheckBoxUnchecked, sbmp::CheckBoxChecked;
+	return [ '@?' => "~Custom" => sub { print "Custom\n" } => {
+		onMeasure => sub {
+			my ( $self, $menu, $ref) = @_;
+			my ($w, $h) = ( $self->owner->get_text_width( $menu-> text, 1 ), $self->owner->popupFont->height );
+			my $i = $icons[ $menu->checked ];
+			my $isz = $menu-> check_icon_size;
+			my $dx = ( $isz > $i-> width ) ? $isz : $i-> width;
+			@$ref = ($w + 20 + $dx, $h + 20);
+		},
+		onPaint => sub {
+			my ( $self, $menu, $canvas, $selected, $x1, $y1, $x2, $y2) = @_;
+			my @p = ( cl::Black, cl::White );
+			@p = reverse @p if $selected;
+			$canvas-> new_gradient(palette => \@p)->bar($x1, $y1, $x2, $y2, 1);
+			$canvas-> font( $self-> owner->popupFont );
+			$canvas-> color(cl::Yellow);
+
+			my $i = $icons[ $menu->checked ];
+			my $isz = $menu-> check_icon_size;
+			my $dx = ( $isz > $i-> width ) ? $isz : $i-> width;
+			$canvas-> draw_text( $menu->text, $x1 + 2 + $dx, $y1, $x2, $y2, dt::VCenter|dt::DrawMnemonic);
+			$canvas-> put_image(
+				$x1 + (( $isz > $i-> width ) ? ( $menu-> check_icon_size - $i-> width) / 2 : 0),
+				($y2 + $y1 - $i->height) / 2, $i);
+		},
+	} ];
+}
+
+my $img = Prima::Image-> create;
+$0 =~ /^(.*)(\\|\/)[^\\\/]+$/;
+$img-> load(( $1 || '.') . '/Hand.gif');
+
+sub test_toplevels
+{
+	my @img = map { ((ref($$_[-1]) // '') eq 'HASH') ? $$_[-1]->{icon} : () } create_images_menu($img);
+	my $i;
+	my @menu;
+	push @menu, [ '@?', 'Layered', sub {$_[0]->layered( $_[2] ); },  create_custom_menu->[-1] ];
+
+	for ( $i = 0; $i < @img; $i+=2) {
+		push @menu, [ "\@t1-$i", $img[$i], sub {
+			my $id = $_[1];
+			$id =~ s/1/2/;
+			my $m = Prima::MenuItem->new( $_[0]->menu, $id);
+			$m->enabled(!$m->enabled);
+		}];
+		push @menu, [ "-\@t2-$i", $img[$i], sub {}];
+	};
+	TestWindow->new(
+		menuItems => \@menu,
+		size => [ 600, $::application->font->height ],
+		text => 'Toplevel images',
+	);
+}
+
+#    Menu item must be an array with up to 6 items in -
+# [variable, text or image, accelerator text, shortcut key, sub or command, data]
+# see exact rules how these are parsed in L<"Prima::Menu" / "Menu items">.
 
 sub create_menu
 {
-	my $img = Prima::Image-> create;
-	$0 =~ /^(.*)(\\|\/)[^\\\/]+$/;
-	$img-> load(( $1 || '.') . '/Hand.gif');
 	return [
-		[ "~File" => [
+		[ "~Window" => [
 			[ "Anonymous" => "Ctrl+D" => '^d' => sub { print "sub!\n";}],   # anonymous sub
-			[ $img => sub {
-				my $img = $_[0]-> menu-> image( $_[1]);
-				my @r = @{$img-> palette};
-				$img-> palette( [reverse @r]);
-				$_[0]-> menu-> image( $_[1], $img);
-			}],                        # image
+			[ '~Images' => [ create_images_menu($img) ]],
+			create_custom_menu,
 			[],                                       # division line
+			[ 'Test toplevels' => 'test_toplevels' ],
 			[ "E~xit" => "Exit"    ]    # calling named function of menu owner
 		]],
 		[ ef => "~Edit" => [                  # example of system commands usage
@@ -70,7 +166,7 @@ sub create_menu
 					}],
 				]);
 			}],
-			["~Duplicate menu"=>sub{ TestWindow-> create( menu=>$_[0]-> menu)}],
+			["~Duplicate menu"=>sub{ TestWindow-> new( menu=>$_[0]-> menu)}],
 		]],
 		[ "~Input line" => [
 			[ "Print ~text" => "Text"],
@@ -85,8 +181,13 @@ sub create_menu
 		[],                             # divisor in main menu opens
 		[ "~Clusters" => [              # right-adjacent part
 		[ "*".checker =>  "Checking Item"   => "Check"     ],
+		[ "@" =>  "Auto Checking Item"   => sub {print "new state: $_[2]\n" } ],
 		[],
-		[ "-".slave   =>  "Disabled state"   => "PrintText"],
+		[ '*(' => 'one' => sub {} ],
+		[ '' => 'two' => sub {} ],
+		[ ')' => 'three' => sub {} ],
+		[],
+		[ "-@".slave   =>  "Disabled state"   => "PrintText"],
 		[ master  =>  "~Enable item above" => "Enable"     ]   # enable/disable and text sample
 		]]
 	];
@@ -171,10 +272,14 @@ package UserInit;
 my $w = TestWindow-> create(
 	text      => "Menu and input line example",
 	bottom    => 300,
-	size      => [ 360, 120],
+	size      => [ 360, 160],
 	menuItems => TestWindow::create_menu,
 	designScale => [ 7, 16 ],
-	onDestroy => sub {$::application-> close},
+);
+
+$w-> insert( "Prima::Menu::Bar",
+	pack  => { pady => 20, padx => 20, fill => 'x', expand => 1},
+	menu  => $w->menu,
 );
 $w-> insert( "InputLine",
 	pack      => { pady => 20, padx => 20, fill => 'x', side => 'bottom'},
@@ -195,4 +300,5 @@ $w-> insert( "Label",
 	valignment => ta::Center,
 	focusLink => $w-> InputLine1,
 );
+
 run Prima;

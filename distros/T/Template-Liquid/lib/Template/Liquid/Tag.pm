@@ -1,5 +1,5 @@
 package Template::Liquid::Tag;
-our $VERSION = '1.0.18';
+our $VERSION = '1.0.19';
 use strict;
 use warnings;
 use base 'Template::Liquid::Document';
@@ -11,7 +11,8 @@ sub conditional_tag { return $_[0]->{'conditional_tag'} || undef; }
 sub new {
     return
         Template::Liquid::Error->new(
-                         {type    => 'Subclass',
+                         {type     => 'Subclass',
+                          template => $_[0]->{template},
                           message => 'Please define a constructor in ' . $_[0]
                          }
         );
@@ -20,7 +21,8 @@ sub new {
 sub push_block {
     return
         Template::Liquid::Error->new(
-         {type => 'Subclass',
+         {type     => 'Subclass',
+          template => $_[0]->{template},
           message =>
               'Please define a push_block method (for conditional tags) in ' .
               $_[0]
@@ -156,9 +158,10 @@ Here's an example...
     sub new {
         my ($class, $args) = @_;
         raise Template::Liquid::Error {
-                   type    => 'Syntax',
-                   message => 'Missing argument list in ' . $args->{'markup'},
-                   fatal   => 1
+				   template => $s->{template},
+                   type     => 'Syntax',
+                   message  => 'Missing argument list in ' . $args->{'markup'},
+                   fatal    => 1
             }
             if !defined $args->{'attrs'} || $args->{'attrs'} !~ m[\S$]o;
         my $s = bless {odds     => $args->{'attrs'},

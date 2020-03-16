@@ -676,7 +676,7 @@ sub compile_and_run
 	unlink $tmpo if -w $tmpo;
 	my $ret = '';
 	if ( -x $tmpexe ) {
-		`$tmpexe`;
+		$ret = `$tmpexe`;
 		chomp $ret;
 	}
 	unlink $tmpexe if -w $tmpexe;
@@ -979,7 +979,7 @@ MSCVER
 		'include/generic',
 	);
 
-	push @LIBS, qw(gdi32 mpr winspool comdlg32 msimg32) if $Win32; # add more when appropriate
+	push @LIBS, qw(gdi32 mpr winspool comdlg32 msimg32 ole32 uuid) if $Win32; # add more when appropriate
 	push @LIBPATH, '/usr/lib/w32api' if $cygwin;
 	if ($^O eq 'solaris') {
 		push @LIBPATH, '/opt/csw/lib';

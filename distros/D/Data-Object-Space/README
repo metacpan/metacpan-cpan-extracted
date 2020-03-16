@@ -19,6 +19,18 @@ DESCRIPTION
     This package provides methods for parsing and manipulating package
     namespaces.
 
+INHERITS
+
+    This package inherits behaviors from:
+
+    Data::Object::Name
+
+LIBRARIES
+
+    This package uses type constraints from:
+
+    Types::Standard
+
 METHODS
 
     This package implements the following methods:
@@ -374,6 +386,41 @@ METHODS
         $space->id
       
         # Foo_Bar
+
+ inherits
+
+      inherits() : ArrayRef
+
+    The inherits method returns the list of superclasses the target package
+    is derived from.
+
+    inherits example #1
+
+        package Bar;
+      
+        package main;
+      
+        my $space = Data::Object::Space->new('bar');
+      
+        $space->inherits
+      
+        # []
+
+    inherits example #2
+
+        package Foo;
+      
+        package Bar;
+      
+        use base 'Foo';
+      
+        package main;
+      
+        my $space = Data::Object::Space->new('bar');
+      
+        $space->inherits
+      
+        # ['Foo']
 
  load
 
@@ -794,6 +841,43 @@ METHODS
         #   ['hashes', ['sets']],
         #   ['scalars', ['func', 'init']],
         # ]
+
+ version
+
+      version() : Maybe[Str]
+
+    The version method returns the VERSION declared on the target package,
+    if any.
+
+    version example #1
+
+        package Foo::Boo;
+      
+        package main;
+      
+        use Data::Object::Space;
+      
+        my $space = Data::Object::Space->new('foo/boo');
+      
+        $space->version
+      
+        # undef
+
+    version example #2
+
+        package Foo::Boo;
+      
+        our $VERSION = 0.01;
+      
+        package main;
+      
+        use Data::Object::Space;
+      
+        my $space = Data::Object::Space->new('foo/boo');
+      
+        $space->version
+      
+        # '0.01'
 
 AUTHOR
 

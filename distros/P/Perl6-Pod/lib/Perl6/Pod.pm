@@ -191,7 +191,7 @@ This option specifies that a block or config has the same formatting properties 
 
 =head4 :allow
 
-This option expects a list of formatting codes that are to be recognized within any V<> codes that appear in (or are implicitly applied to) the current block. The option is most often used on =code blocks to allow mark-up within those otherwise verbatim blocks, though it can be used in any block that contains verbatim text. See Formatting within code blocks. 
+This option expects a list of formatting codes that are to be recognized within any C<V <>> codes that appear in (or are implicitly applied to) the current block. The option is most often used on =code blocks to allow mark-up within those otherwise verbatim blocks, though it can be used in any block that contains verbatim text. See Formatting within code blocks. 
 
 =head2 Blocks 
 
@@ -217,7 +217,7 @@ The suite contain the following classes:
 
 =cut
 
-$Perl6::Pod::VERSION = '0.73';
+$Perl6::Pod::VERSION = '0.74';
 
 use warnings;
 use strict;
@@ -346,9 +346,20 @@ __END__
 
 =head1 SEE ALSO
 
-L<http://zag.ru/perl6-pod/S26.html>,
-Perldoc Pod to HTML converter: L<http://zag.ru/perl6-pod/>,
-Perl6::Pod::Lib
+=over 
+
+=item * L<S26-documentation.pod6|https://github.com/zag/js-pod6/blob/master/doc/S26-documentation.pod6>
+
+=item * Pod6 to HTML converter: L<http://pod6.in/>
+
+=back 
+
+=head2 JavaScript implementation of pod6
+
+I highly recommend see L<pod6 implementation|https://github.com/zag/js-pod6>. That is modern
+implementation of pod6. Also check project site L<https://pod6.in> for latest information 
+about pod6.
+
 
 =head1 AUTHOR
 
@@ -362,7 +373,7 @@ Ivan Baidakou, <dmol@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2015 by Zahatski Aliaksandr
+Copyright (C) 2009-2020 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

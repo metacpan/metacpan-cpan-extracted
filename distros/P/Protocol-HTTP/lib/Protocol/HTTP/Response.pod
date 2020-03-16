@@ -1,0 +1,225 @@
+=head1 NAME
+
+Protocol::HTTP::Response - HTTP response class
+
+
+
+=head1 SYNOPSIS
+
+    use Protocol::HTTP::Response;
+
+    # construction of new response
+    my $res = Protocol::HTTP::Response->new({
+        code    => 200,
+        message => 'Have a good day',
+        headers => {Lang => 'Perl'},
+        body    => "Lorem ipsum dolor",
+        cookies => {session => {
+            value     => "sit amen",
+            domain    => "perl.crazypanda.ru",
+            path      => "/",
+            max_age   => 1000,
+            secure    => 1,
+            http_only => 1,
+            same_site => COOKIE_SAMESITE_NONE,
+        }},
+    });
+
+    $res->code;
+    $res->message;
+    $res->body;
+
+    $res->to_string;
+
+    # in real world it should be in connection with request
+    my $req = Protocol::HTTP::Request->new({
+        method       => METHOD_POST,
+        uri          => "/hello/world",
+        http_version => 10,
+    });
+    $res = Protocol::HTTP::Response->new({
+        code    => 200,
+        body    => "Lorem ipsum dolor",
+    });
+    $res->cookie('session' => { value => 'some-id', path => '/some/path'});
+
+    # just a hint, no real compression occurs here
+    $res->compress(Protocol::HTTP::Compression::gzip);
+
+    # passing $request is crucial, as it accounts the http_version,
+    # compression preferences etc.
+    $res->to_string($req);
+
+
+
+=head1 DESCRIPTION
+
+This class represents client HTTP response, which is specialization of
+L<Protocol::HTTP::Message>. An instance of the class can be constructed
+either direcly via C<new> method to send a new response (server-side), or
+via parsing incoming request with L<Protocol::HTTP::ResponseParser>
+(client-side).
+
+When a message is ready it can be serialized via C<to_string> method.
+It is important to pass the original request to it, as some properties
+of the request will be accounted. For example, if client requested
+C<HTTP 1.0>, the response will also be C<HTTP 1.0> (despite the default
+C<HTTP 1.1>). Another example is compression settings: if client
+does not prefer to have compressed response (e.g. it does not support
+C<brotli> compression), then the response will I<not> be compressed.
+That's way there is no need to have multiple boilerplate code checks.
+
+
+
+=head1 METHODS
+
+=head2 new([\%params])
+
+Constructs new response from the hash of properties, i.e. C<code>, C<message>, C<cookies>,
+C<headers>, C<body>, C<http_version>, C<chunked>, C<compressed>
+
+See corresponding methods documentation below and in L<Protocol::HTTP::Message> to find out what these parameters support.
+
+
+=head2 code([$value])
+
+Get/set HTTP status code, e.g. C<200>, C<404> etc.
+By default, response will have status code 200 if you don't set one.
+
+
+=head2 message([$message])
+
+Get/set HTTP reason message in the status line.
+By default, response will have default status message for selected status code ("OK" for 200, "Not found" for 404, etc) if you don't set one.
+
+
+=head2 cookies([\%cookies])
+
+Get/set multiple response cookies.
+
+Please note, this is response cookies, i.e. set by server-side, and they
+have different API than request cookies.
+
+Setting response cookies will emit one or more "Set-Cookie" headers on serialization.
+
+The hash key is cookie name, and value is a hashref with properties. See C<cookie> method below for properties list.
+
+    $res->cookies({
+        Sit => {
+            value     => 'amen',
+            domain    => "crazypanda.ru",
+            path      => "/some/path",
+            max_age   => 3600,
+        },
+        hello => {
+            value     => "world",
+            domain    => "crazypanda.ru",
+            path      => "/some/path",
+            secure    => 1,
+            http_only => 1,
+            same_site => Protocol::HTTP::Response::COOKIE_SAMESITE_STRICT,
+        },
+    });
+
+
+=head2 cookie($name, [\%properties])
+
+Returns (as hashref) or sets single cookie with name C<$name>. 
+
+Available properties:
+
+=over
+
+=item value
+
+string
+
+=item domain
+
+string
+
+=item path
+
+string
+
+=item expires
+
+An expiration date after which cookie should no longer be sent by client.
+Can be a L<Date> object or anything that its one-argument constructor supports (UNIX timestamp, string in various formats, etc)
+
+=item max_age
+
+An amount of seconds from now after which cookie should no longer be sent by client.
+If both C<expires> and C<max_age> are present then C<max_age> takes precedence
+
+=item secure
+
+If set to true, client should send the cookie only via secure connection.
+
+=item http_only
+
+If set to true, the cookie cannot be accessed through client side script
+
+=item same_site
+
+Allows servers to assert that a cookie ought not to be sent along with cross-site requests, which provides some protection against cross-site request forgery attacks
+
+Available values are
+
+=over
+
+=item COOKIE_SAMESITE_DISABLED
+
+=item COOKIE_SAMESITE_STRICT
+
+=item COOKIE_SAMESITE_LAX
+
+=item COOKIE_SAMESITE_NONE
+
+=back
+
+=back
+
+    $response->cookie('MyCookie' => {
+        value     => 'MyValue',
+        domain    => "crazypanda.ru",
+        path      => '/my/path',
+        expires   => "2020-06-01 23:59:59",
+        secure    => 1,
+        http_only => 1,
+        same_site => Protocol::HTTP::Response::COOKIE_SAMESITE_LAX,
+    });
+    
+    my $coo = $respone->cookie('MyCookie');
+    say $coo->{value};
+
+
+=head2 to_string($request)
+
+Serialize response for the given request. Request preferences will be taken into account.
+This one should be used in production.
+
+
+=head2 to_string()
+
+Serialize response to string without any context request.
+This will disable compression, assume that the client is capable of parsing HTTP 1.1, etc..., i.e. make a number of assumptions.
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::HTTP>
+
+L<Protocol::HTTP::Message>
+
+L<Protocol::HTTP::Compression>
+
+L<URI::XS>
+
+
+
+=head1 CONSTANTS
+
+
+=cut

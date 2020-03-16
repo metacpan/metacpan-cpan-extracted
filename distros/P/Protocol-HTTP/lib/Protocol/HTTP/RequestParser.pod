@@ -1,0 +1,161 @@
+=head1 NAME
+
+Protocol::HTTP::RequestParser - HTTP request parser
+
+
+
+=head1 SYNOPSIS
+
+    use Protocol::HTTP::RequestParser;
+
+    my $parser = Protocol::HTTP::RequestParser->new;
+    my $buffer =
+        "GET / HTTP/1.0\r\n".
+        "Host: crazypanda.ru\r\n".
+        "Langs: Perl, c++\r\n".
+        "\r\n";
+
+    my ($req, $state, $pos, $err) = $parser->parse($buffer);
+    
+    if ($err) {
+        die "http error: $err";
+    }
+    
+    if ($state < Protocol::HTTP::Message::STATE_DONE) {
+        # wait for more data
+    }
+    
+    process($req);
+
+
+
+=head1 DESCRIPTION
+
+This class represents client HTTP request parser. Parser is incremental so that you don't need to pass the whole http packet at once.
+
+Parser is an FSM so it's really fast.
+
+
+
+=head1 METHODS
+
+=head2 new()
+
+Constructs new request parser instance.
+
+
+=head2 parse($buffer)
+
+    my ($request, $state, $position, $error) = $parser->parse($buffer);
+
+Parses (possibly partial) HTTP request.
+
+The first value returned is a L<Protocol::HTTP::Request> object. Regardless of whether parsing the request is completed or not yet, this object will
+always be returned. Properties of this object will be partially or fully (depending on the state of parsing) filled with values.
+
+The second value returned is a state of parsing. State may be
+
+=over
+
+=item Protocol::HTTP::Message::STATE_HEADERS
+
+This is initial state and parsing process won't leave this state until all headers arrive.
+After leaving this state properties C<uri()>, C<method()> (or C<code()> and C<message()> in case of parsing response),
+C<http_version()> and C<headers()> are fully completed.
+
+The next state after this may be either C<STATE_BODY>, C<STATE_CHUNK> or C<STATE_DONE> depending on the headers received
+
+=item Protocol::HTTP::Message::STATE_BODY
+
+Parser wants more data for message body (for messages without http chunks). During this state property C<body> gets filled. 
+You don't have to wait until all the body arrives to process it. It is okay to read whatever is there, process it, clear and wait for next data part.
+
+    my $data_part = $message->body;
+    # process or write $data_part somewhere
+    $message->body(""); # if you don't do this, next time you'll get the previous data part plus the one just arrived
+    
+
+=item Protocol::HTTP::Message::STATE_CHUNK
+
+Parser is waiting for chunk header (for messages with http chunks).
+
+=item Protocol::HTTP::Message::STATE_CHUNK_BODY
+
+Parser wants more data for message chunk body (for messages with http chunks).
+Parser acts exactly like in C<STATE_BODY> case, continuously collecting C<body> property. 
+
+=item Protocol::HTTP::Message::STATE_CHUNK_TRAILER
+
+Parser is waiting for chunk trailer (for messages with http chunks).
+
+=item Protocol::HTTP::Message::STATE_DONE
+
+Parser has finished parsing current message
+
+=item Protocol::HTTP::Message::STATE_ERROR
+
+Parser encountered an http protocol error.
+In this case the message object is still valid and its properties are left as they were at the moment the error occured. So you can still inspect what
+this message might look like (for example, if the error was in headers, C<uri()> would be ok).
+
+=back
+
+Next value returned is position in C<$buffer> at which parsing process stopped.
+
+In case of error, position will be the character that caused that error.
+
+In case of C<STATE_DONE>, position will be the next character after the end of the message. Everything that is left after this position should probably
+be passed to C<parse()> again (http pipelining).
+
+Otherwise (no errors and not yet done), position will always be equal to the length of C<$buffer>.
+
+The last, 4th value is optional and is only returned if there was an error during parsing process.
+It is an L<XS::STL::ErrorCode> object which represents Perl API for convenient C++ C<std::error_code> subsystem.
+Possible errors are described in L<Protocol::HTTP::errc>
+
+
+
+=head2 parse_shift($buffer)
+
+    my ($request, $state, $err) = $parser->parse_shift($buffer);
+    
+Parses HTTP request (same as C<parse()>) and after that deletes from C<$buffer> everything that have been consumed during parsing.
+
+The effect is similar to
+
+    my ($request, $state, $position, $error) = $parser->parse($buffer);
+    substr($buffer, 0, $position, '');
+    
+and thus C<$buffer> can't be a read-only value, for example
+
+    $parser->parse_shift("constant string"); # WRONG! will die with "modification of read-only value ..."
+
+The meaning and the behaviour of all other parameters are the same as in C<parse()>
+
+
+
+=head2 reset()
+
+Resets internal parser state, so it is ready to parse new requests.
+
+Parser automatically resets itself after each successfully parsed message, so you only need to call this method if you plan to re-use parser after
+errors, or you decided to stop parsing not yet fully parsed message and begin parsing another one.
+
+
+
+=head1 NOTE
+
+Internally (in C++ API) it is also a zero-copy parser, however as it is not convenient and not efficient for Perl to use vectorized strings,
+one single copying occurs on XS->Perl border when you get body as a single string.
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::HTTP>
+
+L<Protocol::HTTP::Message>
+
+L<Protocol::HTTP::Request>
+
+=cut

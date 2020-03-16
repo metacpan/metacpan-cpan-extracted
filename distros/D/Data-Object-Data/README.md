@@ -38,6 +38,12 @@ This attribute is read-only, accepts `(Str)` values, and is optional.
 
 This attribute is read-only, accepts `(Str)` values, and is optional.
 
+## from
+
+    from(Str)
+
+This attribute is read-only, accepts `(Str)` values, and is optional.
+
 # METHODS
 
 This package implements the following methods:

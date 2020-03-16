@@ -1,4 +1,4 @@
-#
+
 #  Created by:
 #     Anton Berezin  <tobez@tobez.org>
 #     Dmitry Karasik <dmitry@karasik.eu.org>
@@ -143,7 +143,7 @@ sub set
 	$o-> $w( \%pr);
 }
 
-for ( qw( size name width height direction style pitch encoding)) {
+for ( qw( size name width height direction style pitch encoding vector)) {
 	eval <<GENPROC;
    sub $_
    {
@@ -155,8 +155,8 @@ GENPROC
 }
 
 for ( qw( ascent descent family weight maximalWidth internalLeading externalLeading
-			xDeviceRes yDeviceRes firstChar lastChar breakChar defaultChar vector
-	)) {
+	xDeviceRes yDeviceRes firstChar lastChar breakChar defaultChar 
+)) {
 	eval <<GENPROC;
    sub $_
    {
@@ -311,35 +311,35 @@ sub profile_default
 	return $def;
 }
 
-sub text
+sub has_format
 {
-	if ($#_) {
-		my ( $self, $text ) = @_;
-		$self-> open;
-		$self-> clear;
-		$::application-> notify( 'CopyText', $self, $text );
-		$self-> close;
-	} else {
-		my $text;
-		$::application-> notify( 'PasteText', $_[0], \$text);
-		return $text;
-	}
+	my ( $self, $format ) = @_;
+	$self-> open;
+	my $exists = 0;
+	$::application-> notify( 'FormatExists', $format, $self, \$exists );
+	$self-> close;
+	return $exists ? 1 : 0;
 }
 
-sub image
+sub copy
 {
-	if ($#_) {
-		my ( $self, $image ) = @_;
-		$self-> open;
-		$self-> clear;
-		$::application-> notify( 'CopyImage', $self, $image);
-		$self-> close;
-	} else {
-		my $image;
-		$::application-> notify( 'PasteImage', $_[0], \$image);
-		return $image;
-	}
+	my ( $self, $format, $data ) = @_;
+	$self-> open;
+	$self-> clear;
+	$::application-> notify( 'Copy', $format, $self, $data );
+	$self-> close;
 }
+
+sub paste
+{
+	my ( $self, $format ) = @_;
+	my $data;
+	$::application-> notify( 'Paste', $format, $_[0], \$data);
+	return $data;
+}
+
+sub text  { $#_ ? $_[0]->copy('Text',  $_[1]) : $_[0]->paste('Text') }
+sub image { $#_ ? $_[0]->copy('Image', $_[1]) : $_[0]->paste('Image') }
 
 package Prima::Region;
 use vars qw(@ISA);
@@ -404,9 +404,9 @@ sub profile_default
 			width       => 0,
 			pitch       => fp::Default,
 			style       => fs::Normal,
-			aspect      => 1,
 			direction   => 0,
-			name        => "Helv",
+			vector      => fv::Default,
+			name        => "Default",
 			encoding    => "",
 		},
 		lineEnd         => le::Round,
@@ -602,6 +602,8 @@ sub ui_scale
 
 sub to_region { Prima::Region->new( image => shift ) }
 
+sub shear { $_[0]->transform(1,@_[2,1],1) }
+
 package Prima::Icon;
 use vars qw( @ISA);
 @ISA = qw(Prima::Image);
@@ -639,18 +641,9 @@ sub mirror
         $self->combine($xor, $and);
 }
 
-sub rotate
-{
-        my ($self, $degrees) = @_;
-        my ($xor, $and) = $self->split;
-        $and->preserveType(1);
-        $_->rotate($degrees) for $xor, $and;
-        $self->combine($xor, $and);
-}
-
 sub create_combined
 {
-	my $self = shift->new;
+	my $self = shift->new( autoMasking => am::None );
 	$self->combine(@_);
 	return $self;
 }
@@ -790,10 +783,12 @@ my %RNT = (
 	Close          => nt::Command,
 	ColorChanged   => nt::Default,
 	Disable        => nt::Default,
-	DragDrop       => nt::Default,
-	DragOver       => nt::Default,
+	DragBegin      => nt::Command,
+	DragOver       => nt::Command,
+	DragEnd        => nt::Command,
+	DragQuery      => nt::Command,
+	DragResponse   => nt::Command,
 	Enable         => nt::Default,
-	EndDrag        => nt::Default,
 	Enter          => nt::Default,
 	FontChanged    => nt::Default,
 	Hide           => nt::Default,
@@ -842,6 +837,7 @@ sub notification_types { return \%RNT; }
 	dark3DColor       => cl::Dark3DColor,
 	disabledBackColor => cl::Disabled,
 	disabledColor     => cl::DisabledText,
+	dndAware          => 0,
 	enabled           => 1,
 	firstClick        => 1,
 	focused           => 0,
@@ -1281,11 +1277,11 @@ sub rect_bevel
 	# 2 - upper left         -- outer square
 	# 3 - lower right
 	if ( $opt{concave}) {
-		push @c3d, 0x404040, $back;
+		push @c3d, 0x404040, $c3d[0];
 	} elsif ( $opt{panel}) {
 		@c3d = ( 0x404040, $self-> disabledBackColor, $c3d[0], $c3d[1]);
 	} else {
-		push @c3d, $back, 0x404040;
+		push @c3d, $c3d[1], 0x404040;
 	}
 
 	$fill = $fill->clone( widgetClass => $self->widgetClass ) if $fill && ref($fill);
@@ -1296,6 +1292,196 @@ sub rect_bevel
 }
 
 sub has_alpha_layer { $_[0]-> layered && $_[0]-> is_surface_layered }
+
+sub begin_drag
+{
+	my ( $self, @opt ) = @_;
+	my %opt;
+	if ( 1 != @opt ) {
+		%opt = @opt;
+	} elsif ( ref($opt[0]) && $opt[0]->isa('Prima::Image')) {
+		$opt{image} = $opt[0];
+	} else {
+		$opt{text} = $opt[0];
+	}
+
+	my $actions = ($opt{actions} // dnd::Copy) & dnd::Mask;
+	unless ( $actions ) {
+		Carp::carp("bad actions");
+		return -1;
+	}
+
+	# don't start dragging immediately
+	if ( $opt{track} // 1 ) {
+		my @start_pos = $self->pointerPos;
+		my $offset = $opt{track} // 5;
+		my $break  = 0;
+		my @id;
+		push @id, $self-> add_notification( MouseMove => sub {
+			my ( undef, undef, $x, $y ) = @_;
+			$break = 1 if
+				abs( $start_pos[0] - $x ) > $offset || 
+				abs( $start_pos[1] - $y ) > $offset;
+		});
+		push @id, 
+			map { $self-> add_notification( $_ => sub { $break = -1 }) }
+			qw(MouseLeave MouseClick MouseDown MouseUp Destroy);
+		1 while !$break && $::application->yield(1);
+		return dnd::None unless $self->alive;
+		$self->remove_notification($_) for @id;
+		return -1 if $break < 0;
+	}
+
+	# data
+	my $clipboard = $::application->get_dnd_clipboard;
+	if ( exists $opt{text}) {
+		$clipboard->text($opt{text});
+		$opt{preview} //= $opt{text};
+	} elsif ( exists $opt{image}) {
+		$clipboard->image($opt{image});
+		$opt{preview} //= $opt{image};
+	} elsif ( exists $opt{format} and exists $opt{data}) {
+		$clipboard->copy($opt{format}, $opt{data});
+	} # or else you fill the clipboard yourself
+
+	my @id;
+	my %pointers;
+	my $last_action = -1;
+	$opt{preview} = undef unless $::application->get_system_value(sv::ColorPointer);
+
+	my @max = map { $_ / 8 } $::application->size;
+	if ( $opt{preview} && !ref($opt{preview}) ) {
+		my @lines = split "\n", $opt{preview};
+		my $fh    = $self->font->height;
+		my @sz = ( 0, 10 + $fh * @lines );
+		for my $text ( @lines ) {
+			my $tw = $self->get_text_width($text, 1);
+			$sz[0] = $tw if $sz[0] < $tw;
+		}
+		$sz[0] += 10;
+		$sz[0] = $max[0] if $sz[0] > $max[0];
+		$sz[1] = $max[1] if $sz[1] > $max[1];
+		my $i = Prima::Icon->new(
+			size      => \@sz,
+			type      => im::RGB,
+			color     => $self->color,
+			backColor => $self->backColor,
+			font      => $self->font,
+			autoMasking => am::None,
+			maskType    => im::bpp8,
+		);
+		$i->begin_paint;
+		$i->clear;
+		my $y = $i->height - $fh - 5;
+		for my $text ( @lines ) {
+			$i->text_out( $text, 5, $y);
+			$y -= $fh;
+		}
+		$i->end_paint;
+		$i->alpha(160, 0, 0, $i->size);
+		$opt{preview} = $i;
+	}
+
+	if ( my $p = $opt{preview}) {
+		my @sz = $p->size;
+		$opt{preview} = $p->extract(0, 0,
+			($sz[0] > $max[0]) ? $max[0] : $sz[0],
+			($sz[1] > $max[1]) ? $max[1] : $sz[1],
+		) if $sz[0] > $max[0] || $sz[1] > $max[1];
+	}
+
+	# select multi actions
+	unless (dnd::is_one_action($actions)) {
+		my $default_action = dnd::to_one_action($actions);
+		push @id, $self-> add_notification( DragQuery => sub {
+			my ( $self, $modmap, $counterpart, $ref ) = @_;
+			if ( $modmap & km::Ctrl and $actions & dnd::Move ) {
+				$ref->{action} = dnd::Move;
+			} elsif ( $modmap & km::Shift and $actions & dnd::Link ) {
+				$ref->{action} = dnd::Link;
+			} else {
+				$ref->{action} = $default_action;
+			}
+		});
+	}
+
+	# update pointers
+	push @id, $self-> add_notification( DragResponse => sub {
+		my ( undef, $allow, $action, $counterpart ) = @_;
+
+		unless ($pointers{$action}) {
+			$self->pointer(dnd::pointer($action));
+			my $p = $opt{preview};
+			my $i = $self->pointerIcon;
+			my @hs = $self->pointerHotSpot;
+			$hs[1] += $p->height;
+			my $n = Prima::Icon->new(
+				type     => im::RGB,
+				maskType => im::bpp8,
+				autoMasking => am::None,
+				size     => [ $i->width + $p->width, $i-> height + $p-> height ],
+			);
+			$i->autoMasking(am::None);
+			$i->type(im::RGB);
+			$i->maskType(8);
+			$p->maskType(8)
+				if $p->isa('Prima::Icon');
+			$n->put_image( 0, $p->height, $i, rop::SrcCopy);
+			$n->put_image( $i->width, 0, $p, rop::SrcCopy);
+			$n->alpha(0xff, $i->width, 0, $i->width + $p->width - 1, $p->height - 1)
+				if !$p->isa('Prima::Icon');
+			$n->{__pointerHotSpot} = \@hs;
+			$pointers{$action} = $n;
+		}
+		if ($action != $last_action) {
+			$last_action = $action;
+			$self->pointer($pointers{$action});
+		}
+	}) if $opt{preview};
+
+	my $old_dndAware;
+	if ( !( $opt{self_aware} // 1) ) {
+		$old_dndAware = $self->dndAware;
+		$self->dndAware(0);
+	}
+	my $pointer = $self->pointer;
+	my @opp = $::application->pointerPos;
+	my ($ret, $counterpart) = $self->dnd_start($actions, !$opt{preview});
+	if ( $self->alive ) {
+		if ( $ret == dnd::None && $opt{preview} ) {
+			my @npp = $::application->pointerPos;
+			my $paint_flag = 0;
+			my $flyback = Prima::Widget->new(
+				size      => [ $opt{preview}->size ],
+				origin    => \@npp,
+				layered   => 1,
+				backColor => 0,
+				syncPaint => 1,
+				onPaint   => sub {
+					$_[0]->clear;
+					$_[0]->put_image(0,0,$opt{preview});
+					$paint_flag = 1;
+				}
+			);
+			$flyback->bring_to_front;
+			my @targ = map { $_ / 2 } $flyback->size;
+			while (abs( $npp[0] - $opp[0]) > $targ[0] || abs($npp[1] - $opp[1]) > $targ[1]) {
+				@npp = map { ( $npp[$_] + $opp[$_] ) / 2 } 0, 1;
+				my $max_wait = 10;
+				$::application->yield while !$paint_flag && $max_wait--;
+				$paint_flag = 0;
+				CORE::select(undef, undef, undef, 0.1);
+				$flyback->origin(@npp);
+				$flyback->bring_to_front;
+			}
+			$flyback->destroy;
+		}
+		$self->pointer($pointer); # dnd_start doesn't affect children pointers and doesn't restore them
+		$self->remove_notification($_) for @id;
+		$self->dndAware($old_dndAware) if $old_dndAware;
+	}
+	return wantarray ? ($ret, $counterpart) : $ret;
+}
 
 package Prima::Window;
 use vars qw(@ISA);
@@ -1466,14 +1652,21 @@ sub create
 	return $self;
 }
 
+sub new { shift-> create(@_) }
+sub menu    { $_[0]->{menu} }
+
 sub accel   { my $self = shift;return $self-> {menu}-> accel( $self-> {id}, @_);}
 sub action  { my $self = shift;return $self-> {menu}-> action ( $self-> {id}, @_);}
+sub autoToggle { my $self = shift;return $self-> {menu}-> autoToggle( $self-> {id}, @_);}
 sub checked { my $self = shift;return $self-> {menu}-> checked( $self-> {id}, @_);}
 sub enabled { my $self = shift;return $self-> {menu}-> enabled( $self-> {id}, @_);}
-sub data    { my $self = shift;return $self-> {menu}-> data   ( $self-> {id}, @_);}
+sub options { my $self = shift;return $self-> {menu}-> options( $self-> {id}, @_);}
 sub image   { my $self = shift;return $self-> {menu}-> image  ( $self-> {id}, @_);}
+sub icon    { my $self = shift;return $self-> {menu}-> icon   ( $self-> {id}, @_);}
 sub key     { my $self = shift;return $self-> {menu}-> key    ( $self-> {id}, @_);}
+sub submenu { my $self = shift;return $self-> {menu}-> submenu( $self-> {id}, @_);}
 sub text    { my $self = shift;return $self-> {menu}-> text   ( $self-> {id}, @_);}
+sub group   { my $self = shift;return $self-> {menu}-> group  ( $self-> {id}, @_);}
 sub items   { my $i = shift; ( @_) ? $i-> { menu}-> set_items  ( $i-> { id}, @_):return $i-> {menu}-> get_items  ( $i-> { id}); }
 sub enable  { $_[0]-> {menu}-> enabled( $_[0]-> { id}, 1) };
 sub disable { $_[0]-> {menu}-> enabled( $_[0]-> { id}, 0) };
@@ -1485,10 +1678,32 @@ sub toggle  {
 	$_[0]-> { menu}-> checked($_[0]-> { id}, $i);
 	return $i
 }
+sub id {
+	return $_[0]->{id} unless $#_;
+	$_[0]->menu->set_variable( $_[0]->{id}, $_[1] );
+	$_[0]->{id} = $_[1];
+}
+sub execute  { $_[0]->{menu}->execute($_[0]->{id}) }
+sub children { $_[0]->{menu}->get_children($_[0]->{id}) }
+sub is_separator { $_[0]->{menu}->is_separator($_[0]->{id}) }
+sub is_submenu   { $_[0]->{menu}->is_submenu($_[0]->{id}) }
+
+sub check_icon_size { $::application->get_system_value(sv::MenuCheckSize) }
 
 package Prima::AbstractMenu;
 use vars qw(@ISA);
 @ISA = qw(Prima::Component);
+
+{
+my %RNT = (
+	%{Prima::Component-> notification_types()},
+	Change      => nt::Default,
+	ItemMeasure => nt::Action,
+	ItemPaint   => nt::Action,
+);
+
+sub notification_types { return \%RNT; }
+}
 
 sub profile_default
 {
@@ -1526,6 +1741,28 @@ sub AUTOLOAD
 		unless defined $itemName && $self-> has_item( $itemName);
 	return Prima::MenuItem-> create( $self, $itemName);
 }
+sub on_itemmeasure
+{
+	my ( $self, $id, $ref) = @_;
+	my $opt = $self->options($id) or return;
+	return if ref($opt) ne 'HASH';
+	if ( defined( my $cb = $opt->{onMeasure})) {
+		$cb->($self, Prima::MenuItem->new($self, $id), $ref);
+		$self->clear_event;
+	}
+}
+
+sub on_itempaint
+{
+	my ( $self, $id, @r) = @_;
+	my $opt = $self->options($id) or return;
+	return if ref($opt) ne 'HASH';
+	if ( defined( my $cb = $opt->{onPaint})) {
+		$cb->($self, Prima::MenuItem->new($self, $id), @r);
+		$self->clear_event;
+	}
+}
+
 
 package Prima::AccelTable;
 use vars qw(@ISA);
@@ -1608,11 +1845,10 @@ use vars qw(@ISA @startupNotifications);
 {
 my %RNT = (
 	%{Prima::Widget-> notification_types()},
-	CopyText    => nt::Action,
-	PasteText   => nt::Action,
-	CopyImage   => nt::Action,
-	PasteImage  => nt::Action,
-	Idle        => nt::Default,
+	FormatExists => nt::Action,
+	Copy         => nt::Action,
+	Paste        => nt::Action,
+	Idle         => nt::Default,
 );
 
 sub notification_types { return \%RNT; }
@@ -1755,56 +1991,73 @@ sub open_help
 	return $self-> {HelpClass}-> open($link);
 }
 
-sub on_copytext
+sub on_copy
 {
-	my ( $self, $clipboard, $text ) = @_;
-	$clipboard-> store( 'Text',  $text);
-}
-
-sub on_copyimage
-{
-	my ( $self, $clipboard, $image) = @_;
-	$clipboard-> store( 'Image',  $image);
-	if ( my $formats = $self-> {GTKImageClipboardFormats} ) {
-		my ($bmp, $data, $handle) = ($formats->[0], '');
-		if (open( $handle, '>', \$data) and $image->save($handle, codecID => $bmp->{id})) {
-			$clipboard->store($bmp->{mime}, $data);
+	my ( $self, $format, $clipboard, $data ) = @_;
+	$clipboard-> store( $format, $data);
+	if ( $format eq 'Image') {
+		if ( my $formats = $self-> {GTKImageClipboardFormats} ) {
+			my ($bmp, $bits, $handle) = ($formats->[0], '');
+			if (open( $handle, '>', \$bits) and $data->save($handle, codecID => $bmp->{id})) {
+				$clipboard->store($bmp->{mime}, $bits);
+			}
 		}
 	}
 }
 
-sub on_pastetext
+sub on_formatexists
 {
-	my ( $self, $clipboard, $ref) = @_;
-	if ( $self-> wantUnicodeInput) {
-		return if defined ( $$ref = $clipboard-> fetch( 'UTF8'));
+	my ( $self, $format, $clipboard, $ref) = @_;
+	
+	if ( $format eq 'Text') {
+		if ( $self-> wantUnicodeInput) {
+			return $$ref = 'UTF8' if $clipboard-> format_exists( 'UTF8');
+		}
+		$$ref = $clipboard-> format_exists( $format ) ? $format : undef;
+	} elsif ( $format eq 'Image') {
+		$$ref = undef;
+		return $$ref = 'Image' if $clipboard-> format_exists( 'Image');
+		my $codecs = $self-> {GTKImageClipboardFormats} or return;
+		my %formats = map { $_ => 1 } $clipboard-> get_formats;
+		my @codecs  = grep { $formats{$_->{mime}} } @$codecs or return;
+		$$ref = $codecs[0]->{mime} if $clipboard-> format_exists($codecs[0]->{mime});
+	} else {
+		$$ref = $clipboard-> format_exists( $format ) ? $format : undef;
 	}
-	$$ref = $clipboard-> fetch( 'Text');
 	undef;
 }
 
-sub on_pasteimage
+sub on_paste
 {
-	my ( $self, $clipboard, $ref) = @_;
-	$$ref = $clipboard-> fetch( 'Image');
-	return if defined $$ref;
+	my ( $self, $format, $clipboard, $ref) = @_;
+	
+	if ( $format eq 'Text') {
+		if ( $self-> wantUnicodeInput) {
+			return if defined ( $$ref = $clipboard-> fetch( 'UTF8'));
+		}
+		$$ref = $clipboard-> fetch( 'Text');
+	} elsif ( $format eq 'Image') {
+		$$ref = $clipboard-> fetch( 'Image');
+		return if defined $$ref;
 
-	my $codecs = $self-> {GTKImageClipboardFormats};
-	return unless $codecs;
+		my $codecs = $self-> {GTKImageClipboardFormats};
+		return unless $codecs;
 
-	my %formats = map { $_ => 1 } $clipboard-> get_formats;
-	my @codecs  = grep { $formats{$_->{mime}} } @$codecs;
-	return unless @codecs;
+		my %formats = map { $_ => 1 } $clipboard-> get_formats;
+		my @codecs  = grep { $formats{$_->{mime}} } @$codecs;
+		return unless @codecs;
 
-	my $data = $clipboard-> fetch($codecs[0]->{mime});
-	return unless defined $data;
+		my $data = $clipboard-> fetch($codecs[0]->{mime});
+		return unless defined $data;
 
-	my $handle;
-	open( $handle, '<', \$data) or return;
+		my $handle;
+		open( $handle, '<', \$data) or return;
 
-	local $@;
-	$$ref = Prima::Image-> load($handle, loadExtras => 1 );
-
+		local $@;
+		$$ref = Prima::Image-> load($handle, loadExtras => 1 );
+	} else {
+		$$ref = $clipboard-> fetch( $format);
+	}
 	undef;
 }
 

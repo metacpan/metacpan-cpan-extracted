@@ -48,7 +48,7 @@ struct VarIntStack {
     VarIntStack& operator=(VarIntStack&&) = default;
 
     void push(int32_t val) {
-        storage = varint_encode_s(val) + storage;
+        storage.insert(0, varint_encode_s(val));
     }
     void pop() {
         storage.offset(size_of_first());
@@ -65,6 +65,10 @@ struct VarIntStack {
             }
         }
         return res;
+    }
+
+    void clear () {
+        storage.clear();
     }
 
     bool empty() const {

@@ -1,4 +1,0 @@
-@@ format_for_name
-{{Person.last_name}} {{name_suffix}}
-{{Person.last_name}}-{{Person.last_name}}
-{{Person.last_name}}, {{Person.last_name}} and {{Person.last_name}}

@@ -6,32 +6,20 @@ use 5.24.0;
 use warnings;
 use Getopt::Long qw(GetOptions);
 use Game::Xomb;
+use POSIX qw(strftime);
+
+$0 = 'xomb';
 
 GetOptions(
-    'help|h|?' => sub {
-        warn <<'TLDR';
-Usage: xomb [options]
-
-  --err     - send STDERR to this file if not already redirected
-  --delay   - sleep delay for when player may want to take notice
-  --seed    - set the game seed
-  --version - shows xomb version and then quits
-
-xomb hides STDERR by default to not show warning or error messages;
-debug with a command similar to
-
-  xomb 2>log
-  xomb --err=log
-
-and then inspect the log file when things do go awry
-
-TLDR
-        exit 64;
-    },
-    'delay=f'   => \$Game::Xomb::Draw_Delay,
-    'err=s'     => \my $err,
-    'seed=i'    => \$Game::Xomb::Seed,
-    'version|v' => sub { say $Game::Xomb::VERSION; exit 1 },
+    'delay=f'        => \$Game::Xomb::Draw_Delay,
+    'err=s'          => \my $err,
+    'help|h|?'       => \&emit_help,
+    'replay-delay=f' => \$Game::Xomb::Replay_Delay,
+    'replay=s'       => \my $replay,
+    'save=s'         => \my $save,
+    'seed=i'         => \$Game::Xomb::Seed,
+    'today|daily'    => \my $Flag_Today,
+    'version|v'      => sub { say $Game::Xomb::VERSION; exit 1 },
 ) or exit 64;
 
 if (-t STDERR) {
@@ -45,14 +33,69 @@ if (-t STDERR) {
     }
 }
 
-# NOTE this is not really portable and will likely be replaced by a
-# custom pRNG as time permits
-$Game::Xomb::Seed = srand unless defined $Game::Xomb::Seed;
-srand $Game::Xomb::Seed;
+if (defined $replay) {
+    open $Game::Xomb::Replay_FH, '<', $replay
+      or die "could not read '$replay': $!\n";
+    my $header = readline $Game::Xomb::Replay_FH;
+    chomp $header;
+    # NOTE version information is ignored for now
+    $Game::Xomb::Seed = (split ':', $header, 2)[1];
+    $Game::Xomb::RKFN = \&Game::Xomb::replay;
+} else {
+    $Game::Xomb::RKFN = \&Game::Xomb::getkey;
+    unless (defined $Game::Xomb::Seed) {
+        # the daily seed is a tradition from Brogue
+        if ($Flag_Today) {
+            $Game::Xomb::Seed = strftime '%Y%m%d', localtime;
+        } else {
+            # eh, it's a game
+            # https://flak.tedunangst.com/post/random-in-the-wild
+            $Game::Xomb::Seed = time();
+        }
+    }
+}
+
+# jsf.c takes a uint32_t; ensure that the Perl variable matches what
+# that code internalizes
+$Game::Xomb::Seed = unpack 'L', pack 'L', $Game::Xomb::Seed;
+
+if (defined $save) {
+    open $Game::Xomb::Save_FH, '>', $save or die "could not write to '$save': $!\n";
+    $Game::Xomb::Save_FH->autoflush(1);
+    say $Game::Xomb::Save_FH $Game::Xomb::VERSION . ':' . $Game::Xomb::Seed;
+}
 
 Game::Xomb::game_loop;
 
 exit(1);    # NOTREACHED
+
+sub emit_help {
+    warn <<'TLDR';
+Usage: xomb [options]
+
+  --err=file     - send STDERR to this file if not already redirected
+  --version      - shows xomb version and then quits
+
+  --seed         - set the game seed to a particular value
+  --today        - set the game seed to YYYYMMDD in the local timezone
+
+  --save=file    - save the seed+keystrokes used to this file
+  --replay=file  - replay from a saved game file
+
+  --delay=f         - delay for when player may want to take notice
+  --replay-delay=f  - delay between moves on replay 
+
+xomb hides STDERR by default to not show warning or error messages;
+debug with a command similar to
+
+  xomb 2>log
+  xomb --err=log
+
+and then inspect the log file when things do go awry
+
+TLDR
+    exit 64;
+}
 
 __END__
 =encoding utf8
@@ -63,38 +106,83 @@ B<xomb> - a game featuring @ versus the Xarci Bedo
 
 =head1 SYNOPSIS
 
-B<xomb> I<--delay=f> I<--err=file> I<--seed=i> I<--version>
+Without arguments a new game with a seed based on the current epoch will
+be started. The I<--today> flag will set the seed to YYYYMMDD in the
+local timezone.
+
+  xomb --delay=f --err=file --save=file [ --seed=i | --today ] 
+
+  xomb --delay=f --err=file --replay-delay=f --replay=file --save=file
+
+  xomb --version
 
 =head1 DESCRIPTION
 
-B<xomb> is a computer fantasy game. The object of the game is to survive
-the attacks of the Xarci Bedo and obtain a lot of gems. To win the game
-you must locate the Dragonstone and get it out.
-
-A game should take under 15 minutes to complete.
+                                                         .
+                                                         ..      #
+  Xomb is a computer fantasy game. The object of          ..#   ~#
+  the game is to survive the attacks of the                ... ..#
+  Xarci Bedo and to obtain a lot of gems. To win            #.#.#
+  the game you must locate the Dragonstone which             #@#
+  is somewhere below the 3rd level of the                   ..#.~
+  dungeon and get it out.                                  ... ~.~
+                                                         ....   ..~.
+  A game should take under 15 minutes to complete.      ....     ~.^~
+                                                         . .     ...
+                                                                  ~
 
 =head2 Options
 
+Abbreviations of these options may be possible unless the
+C<POSIXLY_CORRECT> environment variable is set.
+
 =over 4
 
-=item --delay=seconds
+=item I<--delay=seconds>
 
-Floating point value to sleep after events the player may wish to take
-notice of. Probably should be much lower than C<1.0>. Default is
+Floating point value to sleep for after events the player may wish to
+take notice of, such as when damage is taken or between updates while
+running. Probably should be much lower than C<1.0>. Default is
 C<0.15> seconds.
 
-=item --err=file
+=item I<--err=file>
 
-Send STDERR to this file if not already redirected.
+Send STDERR to this file if not already redirected. Otherwise STDERR
+is closed by default.
 
-=item --seed=i
+=item I<--help> I<-h> I<-?>
 
-Start the game with the seed set to the given integer value. The RNG
-algorithm will very likely change in future releases of the game.
+Shows the options available and then quits the game.
 
-=item --version
+=item I<--replay-delay=seconds>
 
-Shows the B<xomb> version and quits the game.
+Floating point value to sleep for after a move is replayed.
+
+=item I<--replay=file>
+
+Replays a game from I<--save> file output. Causes I<--seed> and other
+flags to be ignored.
+
+Hitting the escape key while replaying a game will stop the replay and
+turn control over to standard input.
+
+=item I<--save=file>
+
+Saves the keystrokes used (plus the version and seed as a header line) to
+the given I<file>.
+
+=item I<--seed=i>
+
+Start the game with the seed set to the given integer (32-bit, unsigned).
+
+=item I<--today>
+
+Set the seed to YYYYMMDD in the local timezone. I<--seed> has priority
+if both are set.
+
+=item I<--version> I<-v>
+
+Shows the B<xomb> module version and then quits the game.
 
 =back
 
@@ -103,7 +191,7 @@ Shows the B<xomb> version and quits the game.
 The most recent message is shown at the top of the screen. More of these
 can be viewed using the C<M> command. The status bar at the bottom
 
-    Level 01 T10 SP[=========================-         ][ .][*] 121B
+    Level 01 t10 SP[=========================-         ][ .][*] 121B
 
 shows the level (C<1>), the time or cost of the last energy-consuming
 move (C<10>), shield points remaining, the item and ground tile of the
@@ -121,23 +209,108 @@ view of the FOV scanner. Range and coordinate details are also provided.
 
 =head2 Commands
 
-With numlock enabled a numeric keypad may be able to be used to
-navigate.
+=head3 Motion
 
-     y  k  u     Motion is traditional to rogue(6) as shown in the
-      \ | /      compass to the left. Other commands, of which some
-    h - @ - l    take time to complete, include:
-      / | \             
-     b  j  n                . - wait a turn      x - examine board
-                          g , - pick up item     i - show inventory
-    M - show messages     < > - activate gate    E - equip a gem
-    p - clear PKC code    C-l - redraw screen    R - remove a gem
-    ? - show help         v   - show version     d - drop a gem
-    @ - show location     Q   - quit the game
+Movement is like that of L<rogue(6)>. With numlock enabled a numeric
+keypad may be able to be used. With the shift key the direction will be
+run towards, for better or worse, up to a maximum of four cells.
 
-    Esc or q will exit from sub-displays such as this one. Prompts
-    must be answered with Y to carry out the action; N or n or Esc
-    will reject the action.
+   y  k  u
+    \ | /
+  h - @ - l
+    / | \
+   b  j  n
+
+Unlike in L<rogue(6)> diagonal moves take more time (C<14> versus
+C<10>). Ranged attacks are likewise calculated using Pythagorean
+distances. The FOV by contrast degrades randomly over Chebyshev
+distance. Various weapon effects also use the Chebyshev distance.
+
+=head3 Other
+
+=over 4
+
+=item C<,> C<g>
+
+Pick up the item in the current cell. Takes some amount of time
+to complete (takes energy).
+
+=item C<.> C< >
+
+Wait a turn. Takes energy.
+
+=item C<< < >>
+
+Activate a gate for ascent. Only possible while carrying the
+Dragonstone. Takes energy.
+
+=item C<< > >>
+
+Activate a gate for descent. Takes energy.
+
+=item C<?>
+
+Show the in-game help screen of available commands. Esc or C<q> will
+exit the submenu. Does not take energy.
+
+=item C<@>
+
+Reports the current position of the player in the level map. Does not
+take energy.
+
+=item C<E>
+
+Equips an item in the inventory. Does not take energy.
+
+=item C<M>
+
+Show recent messages. Esc or C<q> will exit the submenu. Does not
+take energy.
+
+=item C<Q>
+
+Quit the game. This will issue an "are you sure" prompt that takes
+C<Y> or C<N> to complete or escape that action.
+
+=item C<R>
+
+Remove an equipped item. Does not take energy.
+
+=item C<S>
+
+Snooze until shield recharged or the gem breaks. Care should be
+taken that nothing outside the FOV scanner array view can acquire a
+target lock.
+
+=item C<d>
+
+Drop an item from inventory. Does not take energy.
+
+=item C<i>
+
+Show the inventory. Does not take energy. Esc or C<q> will exit the
+submenu, and other commands may be available within this menu.
+
+=item C<p>
+
+Clear the PKC error code. See L</"DIAGNOSTICS"> for more details on
+these codes.
+
+=item C<v> C<~>
+
+Show the game version, seed, and current turn count. Does not
+take energy.
+
+=item C<x> C<TAB>
+
+Examine the level map. Esc or C<q> will exit the submenu. Use the
+L</"Motion"> commands to move the cursor. Holding down the shift key
+will move the cursor four times faster. Does not take energy.
+
+C<TAB> will enter examine mode with the cursor placed on some monster.
+Repeat C<TAB> to cycle through the visible monsters.
+
+=back
 
 =head2 Symbols
 
@@ -224,6 +397,15 @@ Dragonstone is required for vertical ascent module gate activation.
 
 Gate is out of service, or was never enabled by the contractors.
 
+=head2 PKC-0063
+
+Shield module REST status error.
+
+=head2 PKC-0065
+
+Continuous operation mode disabled due to positive return on
+proximity sensor or FOV scanner array.
+
 =head2 PKC-007E
 
 Environmental hazard proximity alarm.
@@ -295,6 +477,12 @@ Jeremy Mates
 
 B<xomb> assumes that the terminal used supports various ANSI or XTerm
 Control Sequences. Given certain time constraints (7DRL 2020) not much
-portability testing has been done.
+portability testing has been done (beyond OpenBSD 6.6 and Mac OS X
+10.11). It should work where any suitable unix terminal is available
+and where the game (and required modules) can be compiled and run
+without issue.
+
+Numpad support is limited and does not support running nor leaps in
+examine mode.
 
 =cut

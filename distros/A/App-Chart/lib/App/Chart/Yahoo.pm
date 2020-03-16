@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -337,7 +337,8 @@ sub latest_parse {
 #     "CrumbStore":{"crumb":"hdDX\u002FHGsZ0Q"}
 #
 # The \u002F is backslash character (etc) which is script string for "/"
-# character.  The crumb is included in a CSV download query like
+# character.  The crumb is included in a CSV download query like (alas can't
+# use http, it redirects to https)
 #
 #     https://query1.finance.yahoo.com/v7/finance/download/AMP.AX?period1=1503810440&period2=1504415240&interval=1d&events=history&crumb=hdDX/HGsZ0Q
 #
@@ -436,7 +437,7 @@ sub daily_download {
                       ['div',    \&daily_parse_div],
                       ['split',  \&daily_parse_split]) {
       my ($events,$parse) = @$elem;
-      my $url = "http://query1.finance.yahoo.com/v7/finance/download/"
+      my $url = "https://query1.finance.yahoo.com/v7/finance/download/"
         . URI::Escape::uri_escape($symbol)
         . "?period1=$lo_timet&period2=$hi_timet&interval=1d&events=$events&crumb=$crumb";
 
@@ -585,8 +586,11 @@ sub daily_parse_split {
   my $body = $resp->decoded_content (raise_error => 1);
   my @line_list = App::Chart::Download::split_lines($body);
 
-  # GXY.AX split so $10 shares become $2
+  # For example GXY.AX split so $10 shares become $2
   # Date,Stock Splits
+  # 2017-05-22,1:5
+  #
+  # In the past it was a "/" instad of ":"
   # 2017-05-22,1/5
 
   unless ($line_list[0] =~ /^Date,Stock Splits/) {
@@ -597,7 +601,7 @@ sub daily_parse_split {
 
   foreach my $line (@line_list) {
     my ($date, $ratio) = split (/,/, $line);
-    my ($old, $new) = split m{/}, $ratio;
+    my ($old, $new) = split m{[:/]}, $ratio;
 
     push @splits, { symbol  => $symbol,
                     date    => daily_date_fixup ($symbol, $date),
@@ -756,9 +760,8 @@ sub timezone_gmtoffset_at_ymd {
 # Return seconds since 00:00:00, 1 Jan 1970 GMT.
 sub tdate_to_unix {
   my ($tdate) = @_;
-  my ($year, $month, $day) = App::Chart::tdate_to_ymd ($tdate);
-  require Time::Local;
-  return Time::Local::timegm (0, 0, 0, $day, $month-1, $year-1900);
+  my $adate = App::Chart::tdate_to_adate ($tdate);
+  return ($adate + 4)*86400;
 }
 
 # $str is a string from previous HTTP::Cookies ->as_string()

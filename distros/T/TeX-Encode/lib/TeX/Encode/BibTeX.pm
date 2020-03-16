@@ -1,6 +1,6 @@
 package TeX::Encode::BibTeX;
 
-our $VERSION = '2.007'; # VERSION
+our $VERSION = '2.008'; # VERSION
 
 use 5.008;
 use strict;
@@ -85,7 +85,7 @@ TeX::Encode::BibTeX - Encode/decode Perl utf-8 strings into BibTeX
 
 =head1 DESCRIPTION
 
-This module provides encoding to LaTeX escapes from utf8 using mapping tables in L<Pod::LaTeX> and L<HTML::Entities>. This covers only a subset of the Unicode character table (undef warnings will occur for non-mapped chars). This module is intentionally vague about what it will handle, see Caveats below.
+This module provides encoding to LaTeX escapes from utf8 using mapping tables. This covers only a subset of the Unicode character table (undef warnings will occur for non-mapped chars). This module is intentionally vague about what it will handle, see Caveats below.
 
 Mileage will vary when decoding (converting TeX to utf8), as TeX is in essence a programming language, and this module does not implement TeX.
 

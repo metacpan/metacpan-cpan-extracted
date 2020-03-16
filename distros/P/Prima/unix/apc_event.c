@@ -1058,6 +1058,13 @@ prima_handle_event( XEvent *ev, XEvent *next_event)
 
 	switch ( ev-> type) {
 	case KeyPress:
+		if ( guts.xdnds_widget && !guts.xdnds_escape_key ) {
+			char str_buf[ 256];
+			KeySym keysym = 0;
+			XLookupString( &ev-> xkey, str_buf, 256, &keysym, nil);
+			if ( keysym == XK_Escape )
+				guts. xdnds_escape_key = true;
+		}
 	case KeyRelease: {
 		guts. last_time = ev-> xkey. time;
 		if ( !ev-> xkey. send_event && self != guts. focused && guts. focused) {
@@ -1276,9 +1283,7 @@ prima_handle_event( XEvent *ev, XEvent *next_event)
 	case EnterNotify: {
 		if (( guts. pointer_invisible_count == 0) && XX-> flags. pointer_obscured) {
 			XX-> flags. pointer_obscured = 0;
-			XDefineCursor( DISP, XX-> udrawable,
-			( XX-> pointer_id == crUser) ? XX-> user_pointer :
-			XX-> actual_pointer);
+			XDefineCursor( DISP, XX-> udrawable, prima_get_cursor(self));
 		} else if (( guts. pointer_invisible_count < 0) && !XX-> flags. pointer_obscured) {
 			XX-> flags. pointer_obscured = 1;
 			XDefineCursor( DISP, XX-> udrawable, guts. null_pointer);
@@ -1602,6 +1607,7 @@ prima_handle_event( XEvent *ev, XEvent *next_event)
 			e. cmd = cmSetup;
 		} else {
 			wm_event( self, ev, &e);
+			prima_handle_dnd_event( self, ev);
 		}
 		break;
 	}
@@ -1615,7 +1621,7 @@ prima_handle_event( XEvent *ev, XEvent *next_event)
 		guts. handled_events++;
 		cmd = e. cmd;
 		SELF_MESSAGE(e);
-		if ( PObject( self)-> stage == csDead) return;
+		if ( PObject( self)-> stage == csDead ) return;
 		if ( e. cmd) {
 			switch ( cmd) {
 			case cmClose:

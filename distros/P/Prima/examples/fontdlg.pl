@@ -46,11 +46,13 @@ my $displayRes;
 my $fs = 0;
 my $fd = 0;
 my $fpitch = fp::Default;
+my $fvector = fv::Default;
 my $fwidth = 0;
 
 my $re_sample = sub {
 	return if $w-> {exampleFontSet};
-	my $fn = $fontList{ $w-> NameList-> get_item_text($w-> NameList-> focusedItem)}{name};
+	my $fid = $w-> NameList-> get_item_text( $w-> NameList-> focusedItem);
+	my $fn = ($fid =~ /not defined/) ? 'Default' : $fontList{$fid}{name};
 	$w-> {exampleFontSet} = 1;
 	my $i = $w-> SizeList-> focusedItem;
 	my $enc = $w-> Encoding-> get_item_text( $w-> Encoding-> focusedItem);
@@ -63,6 +65,7 @@ my $re_sample = sub {
 		style       => $fs,
 		direction   => $fd,
 		pitch       => $fpitch,
+		vector      => $fvector,
 		encoding    => $enc,
 	);
 
@@ -84,15 +87,18 @@ my $lastEncSel = "";
 
 my $re_size = sub {
 	my $name_changed = $_[0];
-	my $fn = $fontList{ $w-> NameList-> get_item_text( $w-> NameList-> focusedItem)}{name};
+	my $fid = $w-> NameList-> get_item_text( $w-> NameList-> focusedItem);
+	my $fn = ($fid =~ /not defined/) ? undef : $fontList{$fid}{name};
 	my @sizes = ();
 	my $current_encoding = ( $lastEncSel eq '(any)' || $name_changed) ? '' : $lastEncSel;
-	my @list = @{$::application-> fonts( $fn, $name_changed ? '' : $current_encoding)};
+	my @list = $fn ? 
+		@{$::application-> fonts( $fn, $name_changed ? '' : $current_encoding)} :
+		({vector => 1});
 
 	if ( $name_changed) {
 		my %enc;
 		my @enc_items;
-		for ( map { $_-> {encoding}} @list) {
+		for ( grep { defined } map { $_-> {encoding}} @list) {
 			next if $enc{$_};
 			push ( @enc_items, $_ );
 			$enc{$_} = 1;
@@ -147,7 +153,7 @@ my $re_size = sub {
 
 $w = Prima::MainWindow-> create( text => "Font Window",
 	origin => [ 200, 200],
-	size   => [ 500, 530],
+	size   => [ 500, 590],
 	designScale => [7,16],
 	borderStyle => bs::Dialog,
 );
@@ -236,6 +242,7 @@ sub create_info_window
 			$p-> text_out( 'internal leading    : '.$m-> {internalLeading}, 2, $sd); $sd -= $fh;
 			$p-> text_out( 'external leading    : '.$m-> {externalLeading}, 2, $sd); $sd -= $fh;
 			$p-> text_out( 'maximal width       : '.$m-> {maximalWidth}, 2, $sd); $sd -= $fh;
+			$p-> text_out( 'vector              : '.$m-> {vector}, 2, $sd); $sd -= $fh;
 			$p-> text_out( 'horizontal dev.res. : '.$m-> {xDeviceRes}, 2, $sd); $sd -= $fh;
 			$p-> text_out( 'vertical dev.res.   : '.$m-> {yDeviceRes}, 2, $sd); $sd -= $fh;
 			$p-> text_out( 'first char          : '.$m-> {firstChar}, 2, $sd); $sd -= $fh;
@@ -258,7 +265,7 @@ sub create_info_window
 		backColor => cl::White,
 		#buffered => 1,
 		name    => 'Glyph',
-		textOutBaseline => 0,
+		textOutBaseline => 1,
 		onPaint => sub {
 			my $self = shift;
 			$self-> clear;
@@ -279,7 +286,7 @@ sub create_info_window
 			$dy -= $d if $d < 0;
 
 			my $fh = $self-> font->height;
-			$self-> text_out( $C, $dx, $dy );
+			$self-> text_out( $C, $dx, $dy + $self->font-> descent);
 
 			$dx = abs($a);
 			$dy = abs($d);
@@ -292,6 +299,13 @@ sub create_info_window
 			$self-> line(0, $dy, $self->width, $dy);
 			$dy = (( $d < 0 ) ? 0 : $d) + $e + (( $f < 0 ) ? 0 : $f) - abs($f);
 			$self-> line(0, $dy, $self->width, $dy);
+
+			$self-> linePattern(lp::Solid);
+			$self-> color(cl::LightRed);
+			my $path = $self-> new_path;
+			$path->translate( -$a, 0 ) if $a < 0;
+			$path-> text( $C, baseline => 0 );
+			$path->stroke;
 		},
 	);
 
@@ -359,7 +373,7 @@ $displayRes = ($w-> resolution)[1];
 
 my $load_fonts = sub {
 	%fontList = ();
-	@fontItems = ();
+	@fontItems = ("<not defined>");
 	for ( sort { $a-> {name} cmp $b-> {name}} @{$::application-> fonts})
 	{
 		$fontList{$_-> {name}} = $_;
@@ -513,7 +527,7 @@ $csl-> insert( Button =>
 );
 
 my $rg = $w-> insert( RadioGroup =>
-	origin      => [ 25, 460],
+	origin      => [ 25, 525],
 	size        => [ 445, 58],
 	name        => 'Pitch',
 );
@@ -538,6 +552,34 @@ $rg-> insert( Radio =>
 	font    => { style => fs::Bold|fs::Italic, pitch => fp::Variable},
 	onClick =>  sub { $fpitch = fp::Variable; &$re_sample; },
 );
+
+my $rg2 = $w-> insert( RadioGroup =>
+	origin      => [ 25, 460],
+	size        => [ 445, 58],
+	name        => 'Vector',
+);
+
+$rg2-> insert( Radio =>
+	name   => 'Default',
+	origin => [ 15, 5],
+	onClick =>  sub { $fvector = fv::Default;  &$re_sample; },
+	checked => 1,
+);
+
+$rg2-> insert( Radio =>
+	name   => 'Bitmap',
+	origin => [ 160, 5],
+	onClick =>  sub { $fvector = fv::Bitmap;  &$re_sample; },
+	font    => { style => fs::Bold, pitch => fp::Fixed}, # yes, fixed
+);
+
+$rg2-> insert( Radio =>
+	name   => 'Outline',
+	origin => [ 305, 5],
+	font    => { vector => fv::Outline, style => fs::Italic },
+	onClick =>  sub { $fvector = fv::Outline; &$re_sample; },
+);
+
 
 $w-> insert( Slider =>
 	name     => 'Stretcher',

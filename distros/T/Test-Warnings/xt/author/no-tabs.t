@@ -41,6 +41,7 @@ my @files = (
     't/20-propagate-stub.t',
     't/21-fail-on-warning.t',
     't/22-warnings-bareword.t',
+    't/23-report-warnings.t',
     't/lib/SilenceStderr.pm',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',

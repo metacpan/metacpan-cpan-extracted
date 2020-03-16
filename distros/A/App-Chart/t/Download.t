@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016, 2020 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -124,7 +124,7 @@ is (App::Chart::Download::crunch_time('9:10:12AM'), '09:10:12');
 is (App::Chart::Download::timestamp_to_timet
     (App::Chart::Download::timet_to_timestamp(0)),
     0,
-    'time_t 0 to timestamp and back');
+    'time_t=0 to timestamp and back');
 
 is (App::Chart::Download::date_parse_to_iso('2007-10-26'),  '2007-10-26');
 is (App::Chart::Download::date_parse_to_iso('26 Oct 2007'), '2007-10-26');

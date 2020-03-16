@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBase::Doc 0.29 {
+package Dist::Zilla::Plugin::AlienBase::Doc 0.30 {
 
   use 5.014;
   use Moose;
@@ -205,7 +205,7 @@ Dist::Zilla::Plugin::AlienBase::Doc - Generate boilerplate documentation for Ali
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -294,45 +294,42 @@ the same terms as the Perl 5 programming language system itself.
 __DATA__
 
 __[ __SYNOPSIS_LIBRARY__ ]__
+In your Makefile.PL:
+
+ use ExtUtils::MakeMaker;
+ use Alien::Base::Wrapper ();
+
+ WriteMakefile(
+   Alien::Base::Wrapper->new('{{ $class }}')->mm_args2(
+     # MakeMaker args
+     NAME => 'Kafka::Librd',
+     ...
+   ),
+ );
+
 In your Build.PL:
 
  use Module::Build;
- use {{ $class }};
+ use Alien::Base::Wrapper qw( {{ $class }} !export );
+
  my $builder = Module::Build->new(
    ...
    configure_requires => {
      '{{ $class }}' => '{{ $version }}',
      ...
    },
-   extra_compiler_flags => {{ $class }}->cflags,
-   extra_linker_flags   => {{ $class }}->libs,
+   Alien::Base::Wrapper->mb_args,
    ...
  );
- 
+
  $build->create_build_script;
-
-In your Makefile.PL:
-
- use ExtUtils::MakeMaker;
- use Config;
- use {{ $class }};
- 
- WriteMakefile(
-   ...
-   CONFIGURE_REQUIRES => {
-     '{{ $class }}' => '{{ $version }}',
-   },
-   CCFLAGS => {{ $class }}->cflags . " $Config{ccflags}",
-   LIBS    => [ {{ $class }}->libs ],
-   ...
- );
 
 __[ __SYNOPSIS_FFI__ ]__
 In your L<FFI::Platypus> script or module:
 
  use FFI::Platypus;
  use {{ $class }}{{ $optversion }};
- 
+
  my $ffi = FFI::Platypus->new(
    lib => [ {{ $class }}->dynamic_libs ],
  );
@@ -342,7 +339,7 @@ In your script or module:
 
  use {{ $class }}{{ $optversion }};
  use Env qw( @PATH );
- 
+
  unshift @PATH, {{ $class }}->bin_dir;
 
 __[ __DESCRIPTION__ ]__

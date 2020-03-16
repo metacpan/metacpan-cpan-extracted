@@ -17,11 +17,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 0.93
+Version 0.94
 
 =cut
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 =head1 SYNOPSIS
 
@@ -264,6 +264,9 @@ Generally, for each
 
 sub check_for_parallelism {
     my $self = shift;
+
+    # Safeguard against endless loop in some edge cases.
+    return unless defined $self->{ 'top_node' };
 
     # There is no point in checking if the plan is not analyzed.
     return unless $self->top_node->is_analyzed;

@@ -46,7 +46,7 @@ use Regexp::Common 'no_defaults','Emacs';
 use FindBin;
 my $progname = $FindBin::Script;
 
-our $VERSION = 14;
+our $VERSION = 15;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

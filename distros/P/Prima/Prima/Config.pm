@@ -44,7 +44,7 @@ use vars qw(%Config %Config_inst);
 	inline                => 'inline',
 	dl_load_flags         => 1,
 	optimize              => '-O2 -g -Wall',
-	openmp                => '',
+	openmp                => '-fopenmp',
 
 	inc                   => '-I/home/dk/src/Prima/include -I/home/dk/src/Prima/include/generic -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/x86_64-linux-gnu',
 	define                => '',

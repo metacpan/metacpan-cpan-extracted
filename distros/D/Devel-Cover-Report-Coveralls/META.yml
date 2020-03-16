@@ -27,7 +27,7 @@ no_index:
 provides:
   Devel::Cover::Report::Coveralls:
     file: lib/Devel/Cover/Report/Coveralls.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Devel::Cover: '1.02'
   HTTP::Tiny: '0.043'
@@ -41,12 +41,6 @@ resources:
   bugtracker: https://github.com/kan/coveralls-perl/issues
   homepage: https://github.com/kan/coveralls-perl
   repository: git://github.com/kan/coveralls-perl.git
-version: '0.13'
-x_contributors:
-  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
-  - 'Graham Knop <haarg@haarg.org>'
-  - 'James Raspass <jraspass@gmail.com>'
-  - 'Masayuki Matsuki <y.songmu@gmail.com>'
-  - 'bayashi <bayashi@cpan.org>'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

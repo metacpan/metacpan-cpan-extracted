@@ -1,5 +1,5 @@
 package Net::Stripe;
-$Net::Stripe::VERSION = '0.41';
+$Net::Stripe::VERSION = '0.42';
 use Moose;
 use Class::Load;
 use Type::Tiny 1.008004;
@@ -1800,7 +1800,7 @@ Net::Stripe - API client for Stripe.com
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/hexonet/perl-sdk/compare/v2.2.5...v2.3.0) (2020-03-16)
+
+
+### Features
+
+* **apiclient:** support bulk parameter through nested array in api command, see README.md ([8a0f0e1](https://github.com/hexonet/perl-sdk/commit/8a0f0e1e245c03019c2d402fc5bf4c4af16347de))
+
 ## [2.2.5](https://github.com/hexonet/perl-sdk/compare/v2.2.4...v2.2.5) (2019-10-04)
 
 

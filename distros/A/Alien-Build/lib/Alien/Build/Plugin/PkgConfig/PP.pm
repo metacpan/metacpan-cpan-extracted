@@ -8,7 +8,7 @@ use File::Which ();
 use Env qw( @PKG_CONFIG_PATH );
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig.pm
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.15'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -188,7 +188,7 @@ Alien::Build::Plugin::PkgConfig::PP - Probe system and determine library or tool
 
 =head1 VERSION
 
-version 2.12
+version 2.15
 
 =head1 SYNOPSIS
 
@@ -199,7 +199,7 @@ version 2.12
 
 =head1 DESCRIPTION
 
-Note: in most case you will want to use L<Alien::Build::Plugin::Download::Negotiate>
+Note: in most case you will want to use L<Alien::Build::Plugin::PkgConfig::Negotiate>
 instead.  It picks the appropriate fetch plugin based on your platform and environment.
 In some cases you may need to use this plugin directly instead.
 

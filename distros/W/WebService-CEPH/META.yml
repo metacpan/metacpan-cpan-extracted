@@ -26,13 +26,13 @@ name: WebService-CEPH
 provides:
   WebService::CEPH:
     file: lib/WebService/CEPH.pm
-    version: '0.016'
+    version: '0.017'
   WebService::CEPH::FileShadow:
     file: lib/WebService/CEPH/FileShadow.pm
-    version: '0.016'
+    version: '0.017'
   WebService::CEPH::NetAmazonS3:
     file: lib/WebService/CEPH/NetAmazonS3.pm
-    version: '0.016'
+    version: '0.017'
 requires:
   Carp: '0'
   Digest::MD5: '0'
@@ -49,5 +49,5 @@ requires:
   warnings: '0'
 resources:
   homepage: https://metacpan.org/release/WebService-CEPH
-version: '0.016'
+version: '0.017'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,12 @@
-Revision history for Rtmgr-Gen-Db
+Revision history for Rtmgr-Gen
 
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.02	March 24 2020 / 2:46 PM
+	Switched to a more compact module.
+	Changed from Berkley DB to SQLite
+	Created a get_db_table sub.
+	Created a get_hash sub.
+	Created a get_name sub.
+	Created a get_tracker sub.

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Module::Build;
+use XS::Parse::Sublike::Builder;
 
 my $build = Module::Build->new(
    module_name => 'Object::Pad',
@@ -16,6 +17,7 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
+      'XS::Parse::Sublike::Builder' => 0,
    },
    license => 'perl',
    create_license => 1,
@@ -23,5 +25,7 @@ my $build = Module::Build->new(
 
    extra_compiler_flags => [qw( -Ihax )],
 );
+
+XS::Parse::Sublike::Builder->extend_module_build( $build );
 
 $build->create_build_script;

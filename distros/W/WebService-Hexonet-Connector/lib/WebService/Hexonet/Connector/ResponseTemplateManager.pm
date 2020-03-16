@@ -6,7 +6,7 @@ use warnings;
 use WebService::Hexonet::Connector::ResponseTemplate;
 use WebService::Hexonet::Connector::ResponseParser;
 
-use version 0.9917; our $VERSION = version->declare('v2.2.5');
+use version 0.9917; our $VERSION = version->declare('v2.3.0');
 
 my $instance = undef;
 
@@ -100,7 +100,7 @@ To be used in the way:
 
     # get (singleton) instance of this class
     $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getIstance();
-  
+
     # add a template
     $rtm->addTemplate('mytemplate ID', "[RESPONSE]\r\nCODE=200\r\nDESCRIPTION=Command completed successfully\r\nEOF\r\n");
 

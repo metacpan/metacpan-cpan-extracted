@@ -1,7 +1,8 @@
 package Template::Liquid::Utility;
+use experimental 'signatures';
 use strict;
 use warnings;
-our $VERSION         = '1.0.18';
+our $VERSION         = '1.0.19';
 our $FilterSeparator = qr[\s*\|\s*]o;
 my $ArgumentSeparator = qr[,]o;
 our $FilterArgumentSeparator    = qr[\s*:\s*]o;
@@ -14,7 +15,7 @@ our $VariableStart = qr[(?:\s*\{\{-\s*|\{\{-?\s*)]o;
 our $VariableEnd   = qr[(?:\s*-?}}\s*?|\s*}})]o;
 my $VariableIncompleteEnd = qr[(?:\s*-}}?\s*|}})];
 my $QuotedString          = qr/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/o;
-my $QuotedFragment = qr/${QuotedString}|(?:[^\s,\|'"]|${QuotedString})+/o;
+our $QuotedFragment = qr/${QuotedString}|(?:[^\s,\|'"]|${QuotedString})+/o;
 my $StrictQuotedFragment = qr/"[^"]+"|'[^']+'|[^\s,\|,\:,\,]+/o;
 my $FirstFilterArgument
     = qr/${FilterArgumentSeparator}(?:${StrictQuotedFragment})/o;

@@ -3,7 +3,7 @@ NAME
     Acme::CPANAuthors
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     App::lcpan::CmdBundle::cpanauthors (from Perl distribution
     App-lcpan-CmdBundle-cpanauthors), released on 2019-12-26.
 

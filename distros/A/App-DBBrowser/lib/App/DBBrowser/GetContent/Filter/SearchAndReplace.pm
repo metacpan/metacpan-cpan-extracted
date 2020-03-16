@@ -62,22 +62,22 @@ sub __search_and_replace {
                 push @$available, $e;
             }
         }
-        my $choices = [ @pre, map { '- ' . $_->[1] } @$available ];
-        my $count_static_rows = @info + @$choices; # @info and @$choices
+        my $menu = [ @pre, map( '- ' . $_->[1], @$available ) ];
+        my $count_static_rows = @info + @$menu; # @info and @$menu
         $cf->__print_filter_info( $sql, $count_static_rows, undef );
         # Choose
         my $idx = $tc->choose(
-            $choices,
+            $menu,
             { %{$sf->{i}{lyt_v}}, info => join( "\n", @info ), prompt => '', default => 1, index => 1, undef => '  <=' }
         );
-        if ( ! defined $idx || ! defined $choices->[$idx] ) {
+        if ( ! defined $idx || ! defined $menu->[$idx] ) {
             if ( @bu ) {
                 ( $used_names, $available, $all_sr ) = @{pop @bu};
                 next;
             }
             return;
         }
-        my $choice = $choices->[$idx];
+        my $choice = $menu->[$idx];
         if ( $choice eq $hidden ) {
             $sf->__history( $sql );
             $saved = $ax->read_json( $sf->{i}{f_search_and_replace} ) // [];
@@ -88,8 +88,8 @@ sub __search_and_replace {
                 return;
             }
             my $ok = $sf->__apply_to_cols( $sql, \@info, $header, $all_sr );
-            for my $col_name ( @{$sql->{insert_into_args}[0]} ) {
-                if ( any { $_ ne $col_name } @$header ) {
+            for my $i ( 0 .. $#$header ) {
+                if ( $header->[$i] ne $sql->{insert_into_args}[0][$i] ) {
                     $header_changed = 1;
                     last;
                 }
@@ -230,14 +230,14 @@ sub __history {
         push @info, map { ' ' . $_->[1] } @$saved;
         push @info, ' ';
         my ( $add, $edit, $remove ) = ( '- Add    s_&_r', '- Edit   s_&_r', '- Remove s_&_r' );
-        my $choices = [ undef, $add, $edit, $remove ];
+        my $menu = [ undef, $add, $edit, $remove ];
         # Choose
         my $idx = $tc->choose(
-            $choices,
+            $menu,
             { %{$sf->{i}{lyt_v}}, clear_screen => 1, info => join( "\n", @info ), undef => '  <=',
               index => 1, default => $old_idx_menu }
         );
-        if ( ! defined $idx || ! defined $choices->[$idx] ) {
+        if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
@@ -247,7 +247,7 @@ sub __history {
             }
             $old_idx_menu = $idx;
         }
-        my $choice = $choices->[$idx];
+        my $choice = $menu->[$idx];
         if ( $choice eq $add || $choice eq $edit) {
             my ( $prompt, $pattern, $replacement, $modifiers, $name, $spliced );
             my $old_idx_edit = 0;
@@ -259,14 +259,14 @@ sub __history {
                     }
                     $prompt = 'Edit s_&_r:';
                     my @pre = ( undef );
-                    my $choices = [ @pre, map { '- ' . $_->[1] } @$saved ];
+                    my $menu = [ @pre, map( '- ' . $_->[1], @$saved ) ];
                     # Choose
                     my $idx = $tc->choose(
-                        $choices,
+                        $menu,
                         { %{$sf->{i}{lyt_v}}, clear_screen => 1, prompt => $prompt, index => 1,
                           undef => '  <=', default => $old_idx_edit }
                     );
-                    if ( ! defined $idx || ! defined $choices->[$idx] ) {
+                    if ( ! defined $idx || ! defined $menu->[$idx] ) {
                         next MENU;
                     }
                     if ( $sf->{o}{G}{menu_memory} ) {
@@ -369,9 +369,7 @@ sub __history {
             if ( ! defined $col_idx ) {
                 next;
             }
-            for my $i ( reverse @$col_idx ) {
-                splice @$saved, $i, 1;
-            }
+            splice @$saved, $_, 1 for sort { $b <=> $a } @$col_idx;
             $ax->write_json( $sf->{i}{f_search_and_replace}, [ sort { $a->[1] cmp $b->[1] } @$saved ] );
         }
     }

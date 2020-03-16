@@ -1,3 +1,10 @@
+1.3.12   13.02.2020
+           - bad_expected_access<ErrorCode> specialization for better error messages
+           - remove copy ctor and copy= from excepted(), throw exc if copy= to object with not checked error
+           - workaround thread_local global dtor bug in freebsd 
+           - improve ErrorCode
+           - add noexcept to some basic_string ctors
+           - global tls ptr storage is now destroyed with statics, not with thread_locals
 1.3.11   22.02.2020
            - additional log macro
            - remove std::optional to prevent binary incompatibility

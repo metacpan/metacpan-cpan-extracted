@@ -2,7 +2,7 @@
 
 # my-deb.sh -- make .deb
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # my-deb.sh is shared by several distributions.
 #
@@ -45,12 +45,13 @@ if test -z "$DISTVNAME"; then
   exit 1
 fi
 DISTVNAME=`echo "$DISTVNAME" | sed "s/[$][(]VERSION[)]/$VERSION/"`
+DISTVNAME=`echo "$DISTVNAME" | sed "s/[$][(]DISTNAME[)]/$DISTNAME/"`
 echo "DISTVNAME  $DISTVNAME"
 
 XS_FILES=`sed -n 's/^XS_FILES = \(.*\)/\1/p' Makefile`
 EXE_FILES=`sed -n 's/^EXE_FILES = \(.*\)/\1/p' Makefile`
 
-if test "$DISTNAME" = pngtextadd
+if test "$DISTNAME" = pngtextadd -o "$DISTNAME" = x2gpm
 then DPKG_ARCH=`dpkg --print-architecture`
 elif test -n "$XS_FILES"
 then DPKG_ARCH=`dpkg --print-architecture`
@@ -62,13 +63,20 @@ echo "DPKG_ARCH  $DPKG_ARCH"
 # gtk2-ex-splash and wx-perl-podbrowser programs are lib too though
 DEBNAME=`echo $DISTNAME | tr A-Z a-z`
 DEBNAME=`echo $DEBNAME | sed 's/app-//'`
-if test "$DISTNAME" = pngtextadd
-then :
-elif test "$DISTNAME" = gtk2-ex-splash || test "$DISTNAME" = wx-perl-podbrowser
-then DEBNAME="lib${DEBNAME}-perl"
-elif test -n "$EXE_FILES"
-then :
-else DEBNAME="lib${DEBNAME}-perl"
+IS_PERL_LIB=0
+if test -f Makefile.PL; then     # Perl modules
+  IS_PERL_LIB=1
+fi
+if test -n "$EXE_FILES"; then    # Perl programs
+  IS_PERL_LIB=0
+fi
+case $DISTNAME in
+  # these have EXE_FILES programs but still named lib...-perl
+  Gtk2-Ex-Splash|Wx-Perl-PodBrowser)
+    IS_PERL_LIB=1 ;;
+esac
+if test $IS_PERL_LIB = 1; then
+  DEBNAME="lib${DEBNAME}-perl"
 fi
 echo "DEBNAME    $DEBNAME"
 
@@ -131,7 +139,7 @@ rm -rf $DEBNAME-$VERSION
 
 lintian -I -i \
   --suppress-tags new-package-should-close-itp-bug,desktop-entry-contains-encoding-key,command-in-menu-file-and-desktop-file,emacsen-common-without-dh-elpa,bugs-field-does-not-refer-to-debian-infrastructure \
-  $DEBFILE
+  ${DEBNAME}_${VERSION}*_$DPKG_ARCH.deb
 
 lintian -I -i \
   --suppress-tags maintainer-upload-has-incorrect-version-number,changelog-should-mention-nmu,empty-debian-diff,debian-rules-uses-deprecated-makefile,testsuite-autopkgtest-missing *.dsc

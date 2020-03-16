@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Panda-Config-Perl",
    "no_index" : {
@@ -21,25 +21,26 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "6.76",
-            "ExtUtils::ParseXS" : "3.24"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.76",
-            "Panda::Install" : "v1.2.6",
-            "Panda::Lib" : "v1.3.0",
-            "Panda::XS" : "v2.1.5"
+            "Data::Recursive" : "v1.0.0",
+            "Export::XS" : "v3.0.4",
+            "XS::Framework" : "v1.2.8",
+            "XS::Install" : "v1.2.16",
+            "XS::libpanda" : "v1.3.12",
+            "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "Panda::Install" : "v1.2.6",
-            "Panda::Lib" : "v1.3.0",
-            "Panda::XS" : "v2.1.5",
-            "perl" : "5.010000"
+            "Data::Recursive" : "v1.0.0",
+            "Export::XS" : "v3.0.4",
+            "XS::Framework" : "v1.2.8",
+            "XS::Install" : "v1.2.16",
+            "XS::libpanda" : "v1.3.12",
+            "next::XS" : "v1.0.7"
          }
       },
       "test" : {
@@ -51,5 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.7"
+   "version" : "v1.1.8",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

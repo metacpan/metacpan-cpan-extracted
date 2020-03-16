@@ -33,6 +33,12 @@ INTEGRATES
 
     Data::Object::Role::Throwable
 
+LIBRARIES
+
+    This package uses type constraints from:
+
+    Types::Standard
+
 ATTRIBUTES
 
     This package has the following attributes:
@@ -228,7 +234,7 @@ METHODS
       succinct() : Object
 
     The succinct method loads and returns the
-    FlightRecorder::Plugin::Succinct report plugin.
+    FlightRecorder::Plugin::ReportSuccinct report plugin.
 
     succinct example #1
 
@@ -254,7 +260,7 @@ METHODS
       verbose() : Object
 
     The verbose method loads and returns the
-    FlightRecorder::Plugin::Verbose report plugin.
+    FlightRecorder::Plugin::ReportVerbose report plugin.
 
     verbose example #1
 

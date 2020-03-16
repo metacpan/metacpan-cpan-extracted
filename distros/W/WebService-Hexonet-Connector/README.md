@@ -128,6 +128,39 @@ my $description = $response->getDescription();
 print "$code $description";
 ```
 
+#### Using bulk parameters [SINCE 2.3.0]
+
+Using the below is supported to improve using commands. It will automatically be converted to parameters `DOMAIN0` and `DOMAIN1` accordingly.
+This of course works for all commands and all such parameters.
+
+```perl
+use 5.026_000;
+use strict;
+use warnings;
+use WebService::Hexonet::Connector;
+
+my $cl = WebService::Hexonet::Connector::APIClient->new();
+$cl->useOTESystem();
+$cl->setCredentials('test.user', 'test.passw0rd');
+$cl->setRemoteIPAddress('1.2.3.4');
+# in case of 2FA use:
+# $cl->setOTP("12345678")
+
+# Call a command
+my $response = $cl->request(
+    {
+        COMMAND => 'QueryDomainOptions',
+        DOMAIN => ['example1.com', 'example2.com']
+    }
+);
+
+# get the response code and the response description
+my $code = $response->getCode();
+my $description = $response->getDescription();
+
+print "$code $description";
+```
+
 ## Contributing
 
 Please read [our development guide](https://github.com/hexonet/perl-sdk/wiki/Development-Guide) for details on our code of conduct, and the process for submitting pull requests to us.

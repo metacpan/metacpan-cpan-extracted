@@ -63,7 +63,6 @@ CROAK:
 }
 
 AV* krd_expand_topic_partition_list(pTHX_ rd_kafka_topic_partition_list_t* tpar) {
-    char errstr[ERRSTR_SIZE];
     AV* tplist = newAV();
     int i;
     for (i = 0; i < tpar->cnt; i++) {
@@ -78,10 +77,6 @@ AV* krd_expand_topic_partition_list(pTHX_ rd_kafka_topic_partition_list_t* tpar)
         av_push(tplist, newRV_noinc((SV*)tp));
     }
     return tplist;
-
-CROAK:
-    croak("%s", errstr);
-    return NULL;
 }
 
 rd_kafka_conf_t* krd_parse_config(pTHX_ rdkafka_t *krd, HV* params) {
@@ -144,13 +139,11 @@ rd_kafka_topic_conf_t* krd_parse_topic_config(pTHX_ HV *params, char* errstr) {
                 strval,
                 errstr,
                 ERRSTR_SIZE);
-        if (res != RD_KAFKA_CONF_OK)
-            goto ERROR;
+        if (res != RD_KAFKA_CONF_OK) {
+            rd_kafka_topic_conf_destroy(topconf);
+            return NULL;
+        }
     }
 
     return topconf;
-
-ERROR:
-    rd_kafka_topic_conf_destroy(topconf);
-    return NULL;
 }

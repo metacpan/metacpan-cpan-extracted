@@ -1,12 +1,9 @@
 use strict;
-use Panda::Install;
+use XS::Install;
 
 write_makefile(
-    NAME          => 'Catalyst::Plugin::Config::Perl',
-    VERSION_FROM  => 'lib/Catalyst/Plugin/Config/Perl.pm',
-    ABSTRACT_FROM => 'lib/Catalyst/Plugin/Config/Perl.pod',
-    PREREQ_PM     => {
-        'Panda::Lib'                     => 0,
+    NAME      => 'Catalyst::Plugin::Config::Perl',
+    PREREQ_PM => {
         'Panda::Config::Perl'            => 0,
         'Class::Accessor::Inherited::XS' => '0.07',
         'Catalyst::Runtime'              => 0,

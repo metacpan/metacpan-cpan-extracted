@@ -3,7 +3,7 @@ package Specio::PartialDump;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use Scalar::Util qw( looks_like_number reftype blessed );
 
@@ -213,7 +213,7 @@ Specio::PartialDump - A partially rear-ended copy of Devel::PartialDump without 
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -237,13 +237,6 @@ stringified in a sane way.
 
 =for Pod::Coverage partial_dump
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2008 by יובל קוג'מן (Yuval Kogman).
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Specio/issues>.
@@ -260,13 +253,9 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
+This software is copyright (c) 2008 by יובל קוג'מן (Yuval Kogman).
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
-The full text of the license can be found in the
-F<LICENSE> file included with this distribution.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

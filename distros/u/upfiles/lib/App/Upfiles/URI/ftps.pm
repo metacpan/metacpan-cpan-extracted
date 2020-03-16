@@ -23,6 +23,6 @@ use warnings;
 use URI::ftp;
 use base 'URI::ftp';
 
-our $VERSION = 14;
+our $VERSION = 15;
 sub default_port { 990 }
 1;

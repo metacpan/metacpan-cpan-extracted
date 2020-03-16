@@ -1,0 +1,37 @@
+MODE: INLINE
+
+struct ObjectA {};
+struct ObjectB {};
+
+namespace xs {
+    template <> struct Typemap<ObjectA*> : TypemapObject<ObjectA*, ObjectA*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::ObjectA"; }
+    };
+
+    template <> struct Typemap<ObjectB*> : TypemapObject<ObjectB*, ObjectB*, ObjectTypePtr, ObjectStorageMG> {
+        static std::string package () { return "MyTest::ObjectB"; }
+    };
+
+}
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::ObjectA
+PROTOTYPES: DISABLE
+
+ObjectA* ObjectA::new() { RETVAL = new ObjectA(); }
+
+bool check(Sv obj) {
+    auto me = xs::in<ObjectA*>(obj);
+    (void)me;
+    RETVAL = true;
+}
+
+MODULE = MyTest::Typemap::Object                PACKAGE = MyTest::ObjectB
+PROTOTYPES: DISABLE
+
+ObjectB* ObjectB::new() { RETVAL = new ObjectB(); }
+
+bool check(Sv obj) {
+    auto me = xs::in<ObjectB*>(obj);
+    (void)me;
+    RETVAL = true;
+}

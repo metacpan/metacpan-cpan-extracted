@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Increment;
-our $VERSION = '1.0.18';
+our $VERSION = '1.0.19';
 use strict;
 use warnings;
 require Template::Liquid::Error;
@@ -9,16 +9,21 @@ sub import { Template::Liquid::register_tag('increment') }
 
 sub new {
     my ($class, $args) = @_;
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing template argument',
-                                   fatal   => 1
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing template argument',
+                                   fatal    => 1
         }
         if !defined $args->{'template'};
-    raise Template::Liquid::Error {type => 'Context',
-                             message => 'Missing parent argument', fatal => 1}
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing parent argument',
+                                   fatal    => 1
+        }
         if !defined $args->{'parent'};
     raise Template::Liquid::Error {
-                    type    => 'Syntax',
+                    type     => 'Syntax',
+                    template => $args->{template},
                     message => 'Unused argument list in ' . $args->{'markup'},
                     fatal   => 1
         }
@@ -33,7 +38,8 @@ sub new {
     }
     else {
         raise Template::Liquid::Error {
-                     type => 'Syntax',
+                     template => $s->{template},
+                     type     => 'Syntax',
                      message =>
                          sprintf(
                          q[Syntax Error in '%s %s' - Valid syntax: %s [name]],

@@ -23,6 +23,7 @@ Podish Parser for Perl 5
 
 data: ro, opt, Str
 file: ro, opt, Str
+from: ro, opt, Str
 
 =cut
 

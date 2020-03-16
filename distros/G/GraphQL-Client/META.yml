@@ -1,0 +1,71 @@
+---
+abstract: 'A GraphQL client'
+author:
+  - 'Charles McGarvey <chazmcgarvey@brokenzipper.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Future: '0'
+  HTTP::AnyUA::Backend: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GraphQL-Client
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  GraphQL::Client:
+    file: lib/GraphQL/Client.pm
+    version: '0.601'
+  GraphQL::Client::Error:
+    file: lib/GraphQL/Client.pm
+    version: '0.601'
+  GraphQL::Client::http:
+    file: lib/GraphQL/Client/http.pm
+    version: '0.601'
+  GraphQL::Client::https:
+    file: lib/GraphQL/Client/https.pm
+    version: '0.601'
+recommends:
+  HTTP::Tiny: '0'
+  Pod::Usage: '0'
+requires:
+  Carp: '0'
+  Getopt::Long: '0'
+  HTTP::AnyUA: '0'
+  HTTP::AnyUA::Util: '0'
+  JSON::MaybeXS: '0'
+  Module::Load: '0'
+  Scalar::Util: '0'
+  namespace::clean: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/chazmcgarvey/graphql-client/issues
+  homepage: https://github.com/chazmcgarvey/graphql-client
+  repository: https://github.com/chazmcgarvey/graphql-client.git
+version: '0.601'
+x_authority: cpan:CCM
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

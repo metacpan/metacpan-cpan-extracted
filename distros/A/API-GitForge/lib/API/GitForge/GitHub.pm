@@ -15,7 +15,7 @@ package API::GitForge::GitHub;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$API::GitForge::GitHub::VERSION = '0.003';
+$API::GitForge::GitHub::VERSION = '0.004';
 
 use 5.028;
 use strict;
@@ -155,7 +155,7 @@ API::GitForge::GitHub - common git forge operations using the GitHub API
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

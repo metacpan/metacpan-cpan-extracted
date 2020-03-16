@@ -3,7 +3,7 @@ package Specio::Constraint::ObjectCan;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use List::Util 1.33 ();
 use Role::Tiny::With;
@@ -62,7 +62,7 @@ Specio::Constraint::ObjectCan - A class for constraints which require an object 
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -119,7 +119,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

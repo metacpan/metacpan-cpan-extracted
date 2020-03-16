@@ -15,7 +15,7 @@ package API::GitForge::Role::GitForge;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$API::GitForge::Role::GitForge::VERSION = '0.003';
+$API::GitForge::Role::GitForge::VERSION = '0.004';
 
 use 5.028;
 use strict;
@@ -73,7 +73,15 @@ sub clean_fork {
     $git->add("README.md");
     $git->commit({ message => "Temporary fork for pull request(s)" });
 
-    $git->push($fork_uri, "master:gitforge");
+    # We should be able to just say
+    #
+    #     $git->push($fork_uri, "master:gitforge");
+    #
+    # but that hangs indefinitely when pushing to (at least) Debian's
+    # GitLab instance.  So just bypass Git::Wrapper and do the push
+    # ourselves for now
+    system qw(git -C), $git->dir, "push", $fork_uri, "master:gitforge";
+
     $self->_clean_config_fork($_[0]);
 
     # assume that if we had to create the gitforge branch, we just
@@ -114,7 +122,7 @@ API::GitForge::Role::GitForge - role implementing generic git forge operations
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

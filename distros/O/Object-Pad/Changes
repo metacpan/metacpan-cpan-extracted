@@ -1,5 +1,13 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.13    2020-03-15
+        [CHANGES]
+         * Use XS::Parse::Sublike for the bulk of the `method` parsing work
+
+        [BUGFIXES]
+         * Inline the code for Perl_package_version() because it isn't
+           exported API so not actually visible on non-ELF platforms
+
 0.12    2020-03-10
         [CHANGES]
          * Minor adjustments to order of operations in method keyword parsing

@@ -33,7 +33,7 @@ git-clean-forge-repo - create repos on git forges with optional features disable
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

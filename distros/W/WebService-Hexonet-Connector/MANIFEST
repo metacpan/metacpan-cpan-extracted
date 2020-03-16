@@ -1,3 +1,4 @@
+.dependabot/config.yml
 .perltidyrc
 .releaserc.json
 Changes
@@ -32,6 +33,7 @@ scripts/buildrelease.sh
 scripts/coverage.sh
 scripts/generatedocs.sh
 scripts/perltidy.sh
+scripts/podchecker.sh
 scripts/rebuild.sh
 scripts/upload.sh
 t/Hexonet-connector.t

@@ -4,8 +4,8 @@
 using panda::excepted;
 
 TEST_CASE("excepted", "[excepted]") {
-    SECTION("copyable") {
+    SECTION("moveable") {
         excepted<int, double> a;
-        excepted<int, double> b(a);
+        excepted<int, double> b(std::move(a));
     }
 }

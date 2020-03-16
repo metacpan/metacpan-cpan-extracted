@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011, 2012, 2014, 2015, 2017 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2014, 2015, 2017, 2020 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -40,6 +40,7 @@ WriteMakefile
                     'Module::Load'          => 0,
                     'Regexp::Common'        => 0,
                     'Regexp::Common::Emacs' => 0,  # mine
+                    'Time::Local'           => 1.27,  # for timegm_modern()
                     'URI'                   => 0,
                    },
    MIN_PERL_VERSION => '5.010',

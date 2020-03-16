@@ -17,9 +17,8 @@ END { print SHOW_CURSOR }
 
 
 sub _choose_fmt {
-    my ( $opt, $info, $ex, $video_id ) = @_;
+    my ( $opt, $info, $ex, $video_id, $title ) = @_;
     my $fmt_to_info = $info->{$ex}{$video_id}{fmt_to_info};
-    my $title = "\n" . '"' . $info->{$ex}{$video_id}{title} . '"';
     my ( @choices, @format_ids );
     if ( $ex eq 'youtube' ) {
         for my $fmt ( sort { $a <=> $b } keys %$fmt_to_info ) {
@@ -39,12 +38,14 @@ sub _choose_fmt {
         }
     }
     my @fmt_str;
-    my @pre = ( undef );
+
     while ( 1 ) {
+        my $prompt = ' Fmt: ';
+        my @pre = ( undef );
         # Choose
         my $idx = choose(
             [ @pre, @choices ],
-            { prompt => 'fmt: ' . join( '', @fmt_str ), index => 1, order => 1, undef => '<<', info => $title }
+            { prompt => $prompt . join( '', @fmt_str ), index => 1, order => 1, undef => '<<', info => $title }
         );
         if ( ! $idx ) {
             return if ! @fmt_str;
@@ -53,17 +54,27 @@ sub _choose_fmt {
             next;
         }
         push @fmt_str, @format_ids[ $idx - @pre ];
-        my $enough = 'OK';
-        my @ops = ( undef, $enough, '+', ',', '/', );
-        my $op = choose( \@ops, { prompt => 'fmt: ' . join( '', @fmt_str ), undef => '<<', info => $title } );
-        if ( ! defined $op ) { #
+        my $enough = 'CONFIRM';
+        @pre = ( undef, $enough );
+        my $ops = [
+            [ '+', "  +  " ],
+            [ ',', "  ,  " ],
+            [ '/', "  /  " ],
+        ];
+        my $menu =  [ @pre, map( $_->[1], @$ops ) ];
+        # Choose
+        my $idx_op = choose(
+            $menu,
+            { prompt => $prompt . join( '', @fmt_str ), undef => 'SKIP', info => $title, layout => 3, index => 1 }
+        );
+        if ( ! defined $idx_op || ! defined $menu->[$idx_op] ) {
             pop @fmt_str;
             next;
         }
-        if ( $op eq $enough ) {
+        if ( $menu->[$idx_op] eq $enough ) {
             return join '', @fmt_str;
         }
-        push @fmt_str, $op;
+        push @fmt_str, $ops->[$idx_op - @pre][0];
     }
 }
 
@@ -95,10 +106,21 @@ sub download_youtube {
         my @sorted_video_ids = sort { $info->{$ex}{$a}{count} <=> $info->{$ex}{$b}{count} } keys %{$info->{$ex}};
         my $ask_fmt_for_each_video = 0;
         if ( $qty eq 'manually' && @sorted_video_ids > 1 ) {
+            my ( $yes, $no ) = (  '- YES', '- NO' );
             my $prompt = 'Keep format choices for all videos?';
-            my $choice = choose( [ undef, 'YES' ], { prompt => $prompt, undef => 'NO' } );
+            # Choose
+            my $choice = choose(
+                [ undef, $yes, $no ],
+                { prompt => $prompt, undef => 'EXIT', layout => 3 }
+            );
             if ( ! defined $choice ) {
+                exit;
+            }
+            elsif ( $choice eq $no ) {
                 $ask_fmt_for_each_video = 1;
+            }
+            else {
+                $ask_fmt_for_each_video = 0;
             }
         }
         my $fmt_str;
@@ -108,7 +130,11 @@ sub download_youtube {
             #push @cmd, '--skip-download';
             if ( $qty eq 'manually' ) {
                 if ( $ask_fmt_for_each_video || ! $fmt_str ) {
-                    $fmt_str = _choose_fmt( $opt, $info, $ex, $video_id );
+                    my $title;
+                    if ( $ask_fmt_for_each_video ) {
+                        $title = "\n" . '"' . $info->{$ex}{$video_id}{title} . '"';
+                    }
+                    $fmt_str = _choose_fmt( $opt, $info, $ex, $video_id, $title );
                     if ( ! defined $fmt_str ) {
                         print $info->{$ex}{$video_id}{count} . '/' . $total . ' skipped' . "\n";
                         next VIDEO;

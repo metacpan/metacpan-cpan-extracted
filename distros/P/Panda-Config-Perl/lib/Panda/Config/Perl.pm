@@ -1,11 +1,10 @@
 package Panda::Config::Perl;
 use 5.012;
-use Panda::Lib(); # XS code needs xs::lib::merge
+use Data::Recursive(); # XS code needs xs::merge
 
-our $VERSION = '1.1.7';
+our $VERSION = '1.1.8';
 
-require Panda::XSLoader;
-Panda::XSLoader::load();
+XS::Loader::load();
 
 sub process {
     my ($class, $file, $initial_cfg) = @_;
@@ -18,7 +17,7 @@ sub process {
         $nsstash = \%{"NS::"};
     }
 
-    _apply_initial_cfg('', Panda::Lib::fclone($initial_cfg)) if $initial_cfg;
+    _apply_initial_cfg('', Data::Recursive::clone($initial_cfg)) if $initial_cfg;
     _process_file($file);
 
     my $ret = {};

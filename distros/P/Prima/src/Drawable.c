@@ -205,6 +205,7 @@ Drawable_font_add( Handle self, Font * source, Font * dest)
 	Bool useStyle  = !source-> undef. style;
 	Bool useDir    = !source-> undef. direction;
 	Bool useName   = !source-> undef. name;
+	Bool useVec    = !source-> undef. vector;
 	Bool useEnc    = !source-> undef. encoding;
 
 	/* assignning values */
@@ -216,6 +217,7 @@ Drawable_font_add( Handle self, Font * source, Font * dest)
 		if ( useStyle ) dest-> style     = source-> style;
 		if ( usePitch ) dest-> pitch     = source-> pitch;
 		if ( useSize  ) dest-> size      = source-> size;
+		if ( useVec   ) dest-> vector    = source-> vector;
 		if ( useName  ) strcpy( dest-> name, source-> name);
 		if ( useEnc   ) strcpy( dest-> encoding, source-> encoding);
 	}
@@ -241,12 +243,14 @@ Drawable_font_add( Handle self, Font * source, Font * dest)
 		else if ( dest-> size   > 16383 ) dest-> size   = 16383;
 	if ( dest-> name[0] == 0)
 		strcpy( dest-> name, "Default");
-	if ( dest-> pitch < fpDefault || dest-> pitch > fpFixed)
+	if ( dest-> undef.pitch || dest-> pitch < fpDefault || dest-> pitch > fpFixed)
 		dest-> pitch = fpDefault;
 	if ( dest-> undef. direction )
 		dest-> direction = 0;
 	if ( dest-> undef. style )
 		dest-> style = 0;
+	if ( dest-> undef. vector || dest-> vector < fvBitmap || dest-> vector > fvDefault)
+		dest-> vector = fvDefault;
 	memset(&dest->undef, 0, sizeof(dest->undef));
 
 	return useSize && !useHeight;
@@ -805,10 +809,10 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 			/* primitive line detection */
 			tangent = tangent_detect( rendered-1, rendered);
 			if ( tangent == 0 ) continue;
-			if ( i > 1 && tangent > 0 && tangent == last_tangent) {
+			if ( final_size > 1 && tangent > 0 && tangent == last_tangent) {
 				tangent_apply( tangent, rendered-1);
 				continue;
-			} else if ( cut_corner(last_tangent, tangent, rendered-2, rendered-1)) {
+			} else if ( final_size > 1 && cut_corner(last_tangent, tangent, rendered-2, rendered-1)) {
 			/* primitive corner detection - convert 4-connectivity into 8- */
 				*(rendered-1) = *rendered;
 				tangent = -1;
@@ -1038,7 +1042,7 @@ Drawable_do_text_wrap( Handle self, TextWrapRec * t)
 	float width[256];
 	FontABC abc[256];
 	int start = 0, utf_start = 0, split_start = -1, split_end = -1, i, utf_p, utf_split = -1;
-	float w = 0, inc = 0;
+	float w = 0, inc = 0, initial_overhang = 0;
 	char **ret;
 	Bool wasTab = 0, reassign_w = 1;
 	Bool doWidthBreak = t-> width >= 0;
@@ -1091,7 +1095,7 @@ Drawable_do_text_wrap( Handle self, TextWrapRec * t)
 		if ( uv / 256 != base)
 			if ( !precalc_abc_buffer( query_abc_range( self, t, base = uv / 256), width, abc))
 				return ret;
-		if ( reassign_w) w = abc[ uv & 0xff]. a;
+		if ( reassign_w) w = initial_overhang = abc[ uv & 0xff]. a;
 		reassign_w = 0;
 
 		switch ( uv ) {
@@ -1136,7 +1140,7 @@ Drawable_do_text_wrap( Handle self, TextWrapRec * t)
 			continue;
 		case '~':
 			if ( p == tildeIndex ) {
-				tildeOffset = w;
+				tildeOffset = w - initial_overhang;
 				inc = winc = 0;
 				break;
 			}
@@ -1198,16 +1202,36 @@ Drawable_do_text_wrap( Handle self, TextWrapRec * t)
 
 	/* removing ~ and determining it's location */
 	if ( tildeIndex >= 0 && !(t-> options & twReturnChunks)) {
-		PFontABC abc;
+		UV uv;
+		PFontABC abcc;
 		char *l = ret[ tildeLine];
+		float start, end;
 		t-> t_char = t-> text + tildePos + 1;
 		if ( t-> options & twCollapseTilde)
 			memmove( l + tildePos, l + tildePos + 1, strlen( l) - tildePos);
-		abc = query_abc_range( self, t, 0) + '~';
-		w = tildeOffset;
-		t-> t_start = w - 1;
-		t-> t_end   = w + abc->a + abc->b + abc->c;
+		if ( t-> utf8_text) {
+			STRLEN len;
+#if PERL_PATCHLEVEL >= 16
+			uv = utf8_to_uvchr_buf(( U8*) t-> t_char, ( U8*) t-> text + t-> textLen, &len);
+#else
+			uv = utf8_to_uvchr(( U8*) t-> t_char, &len);
+#endif
+			if ( len == 0 ) goto NO_TILDE;
+		} else
+			uv = *(t->t_char);
+
+		abcc = query_abc_range( self, t, base = uv / 256) + (uv & 0xff);
+		start = tildeOffset;
+		end   = start + abcc-> b - 1.0;
+		if ( abcc-> a < 0.0 ) {
+			start += abcc->a;
+			end += abcc->a;
+		}
+		t-> t_start = start + .5 * (( start < 0 ) ? -1 : 1);
+		t-> t_end   = end   + .5 * (( end   < 0 ) ? -1 : 1);
+
 	} else {
+	NO_TILDE:
 		t-> t_start = t-> t_end = t-> t_line = C_NUMERIC_UNDEF;
 	}
 

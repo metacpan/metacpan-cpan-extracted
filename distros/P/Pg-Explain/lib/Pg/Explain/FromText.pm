@@ -10,11 +10,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 0.93
+Version 0.94
 
 =cut
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 =head1 SYNOPSIS
 
@@ -44,6 +44,41 @@ Get/Set master explain object.
 
 sub explain { my $self = shift; $self->{ 'explain' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'explain' }; }
 
+=head2 split_into_lines
+
+Splits source into lines, while fixing (well, trying to fix) cases where input has been force-wrapped to some length.
+
+=cut
+
+sub split_into_lines {
+    my $self   = shift;
+    my $source = shift;
+
+    my @lines = split /\r?\n/, $source;
+
+    my @out = ();
+    push @out, shift @lines;
+    for my $l ( @lines ) {
+        if ( $l =~ m{\A \( \d+ \s+ rows? \)}xms ) {
+            push @out, $l;
+        }
+        elsif ( $l =~ m{ \A Trigger \s+ }xms ) {
+            push @out, $l;
+        }
+        elsif ( $l =~ m{ \A (?: Total \s+ runtime | Planning \s+ time | Execution \s+ time ): }xmsi ) {
+            push @out, $l;
+        }
+        elsif ( $l =~ m{\A\S} ) {
+            $out[ -1 ] .= $l;
+        }
+        else {
+            push @out, $l;
+        }
+    }
+
+    return @out;
+}
+
 =head2 parse_source
 
 Function which parses actual plan, and constructs Pg::Explain::Node objects
@@ -60,7 +95,7 @@ sub parse_source {
     my $top_node         = undef;
     my %element_at_depth = ();      # element is hashref, contains 2 keys: node (Pg::Explain::Node) and subelement-type, which can be: subnode, initplan or subplan.
 
-    my @lines = split /\r?\n/, $source;
+    my @lines = $self->split_into_lines( $source );
 
     my $costs_re   = qr{ \( cost=(?<estimated_startup_cost>\d+\.\d+)\.\.(?<estimated_total_cost>\d+\.\d+) \s+ rows=(?<estimated_rows>\d+) \s+ width=(?<estimated_row_width>\d+) \) }xms;
     my $analyze_re = qr{ \(

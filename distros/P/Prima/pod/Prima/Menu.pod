@@ -89,11 +89,44 @@ items to be copied change their IDs, but explicitly set names are preserved.
 Since the anonymous menu items do not have name, their auto-generated names
 change also.
 
-If the name is prepended by '-', '*', or '@' characters, the characters are not
-treated as part of the name but as indicator that the item is disabled  ( '-'
-character ), checked ( '*' character ), or has an auto-toggle flag ('@').
-This syntax is valid only for C<::items> and C<insert()> functions, not for
-C<set_variable()> method.
+If the name is prepended by special characters ( see below ), these characters
+are not treated as part of the name but as an item modifier.  This syntax is
+valid only for C<::items> and C<insert()> functions, not for C<set_variable()>
+method.
+
+=over
+
+=item C<-> - item is disabled
+
+=item C<*> - item is checked
+
+=item C<@> - item is using auto-toggling
+
+=item C<?> - item is customly drawn
+
+Expects C<onMeasure> and C<onPaint> callbacks in C<options>
+
+=item C<(> and C<)> - radio group
+
+Items marked with parentheses are treated as a part of a group, where only a
+single item can be checked. Checking and unchecking happens automatically.
+
+A group is only valid for the same level where it was opened on (i.e. submenus
+don't inherit it).  A group is automatically terminated on a separator item. If
+that is not desired, mark it as C<(> too (consequent C<(> are allowed):
+
+    [ '(one' ... ]
+    [ 'two' ... ]
+    [ '(' ],
+    [ ')last' ... ] 
+
+When user hits an already checked item, nothing happens. However, when combined with
+auto-toggling (i.e. marked with C<(@>), a checked item becomes unchecked, thus the
+group can present a state where no items are checked, too.
+
+See also: C<group>
+
+=back
 
 =item Menu text / menu image
 
@@ -104,6 +137,9 @@ with with ~ ( tilde ) quoting for a shortcut character, that the
 system uses as a hot key during menu navigation.
 Menu image is a L<Prima::Image> object of no particular color
 space and dimensions.
+
+Note: tilde-marked character is also used in navigation for custom drawn menu
+items, even though they not necessarily draw the text itself.
 
 Menu text in menu item is accessible via the C<::text> property,
 and menu image via the C<::image> property. These can not accept
@@ -184,15 +220,34 @@ an explicit call
 
 To achieve this, add '@' character to the menu item name (see L<"Menu item name">).
 
-=item User data
+=item Options
 
-At last, a non-separator and non-submenu menu item can hold
-an arbitrary scalar value, the 'user data' field.
-The toolkit does not use this field, leaving that to
-the programmer.
+At last, non-separator menu items can hold an extra hash in C<options> property.
+The toolkit reserves the following keys for internal use:
 
-User data scalar in menu item is accessible via C<::data>
-property.
+=over
+
+=item group INTEGER
+
+Same as C<group> property.
+
+=item icon HANDLE
+
+Uses to replace default check mark bitmap on a menu item
+
+=item onMeasure MENUITEM, REF
+
+Required when custom painting is set. It is called when system needs to query
+menu item dimensions. C<REF> is a 2-item arrayref that needs to be set with
+pixel dimension.
+
+=item onPaint MENUITEM, CANVAS, SELECTED, X1, Y1, X2, Y2
+
+Required when custom painting is set. It is called whenever system needs to
+draw a menu item. X1 - Y2 are coordinates of the rectangle where the drawing is
+allowed.
+
+=back
 
 =back
 
@@ -259,21 +314,34 @@ All fields correspond to the described above scalars.
 Same as six-scalar syntax, but without DATA field.
 If DATA is skipped it is C<undef> by default.
 
-=item four [ TEXT/IMAGE, ACCEL, KEY, ACTION/SUBMENU ]
+=item four [ TEXT/IMAGE, ACCEL, KEY, ACTION/SUBMENU ] or [ NAME, TEXT/IMAGE, ACTION/SUBMENU, DATA ]
 
-Same as five-scalar syntax, but without NAME field.
+One of two, depending whether last item is a hashref or not.
+
+If not, same as five-scalar syntax, but without NAME field.
 When NAME is skipped it is assigned to an unique string
 within menu object.
 
-=item three [ NAME, TEXT/IMAGE, ACTION/SUBMENU ]
+Otherwise same as three-scalar plus DATA hashref.
 
-Same as five-scalar syntax, but without ACCEL and KEY fields.
+=item three [ NAME, TEXT/IMAGE, ACTION/SUBMENU ] or [ TEXT/IMAGE, ACTION/SUBMENU, DATA ]
+
+One of two, depending whether last item is a hashref or not.
+
+In not, same as five-scalar syntax, but without ACCEL and KEY fields.
 KEY is C<kb::NoKey> by default, so no keyboard combination
 is bound to the item. Default ACCEL value is an empty string.
 
-=item two [ TEXT/IMAGE, ACTION/SUBMENU ]
+Otherwise same as two-scalar plus DATA hashref.
 
-Same as three-scalar syntax, but without NAME field.
+=item two [ TEXT/IMAGE, ACTION/SUBMENU ] or [ NAME, DATA ]
+
+One of two, depending whether last item is a hashref or not.
+
+If not, same as three-scalar syntax, but without NAME field.
+
+Otherwise name with data reference. Useful for custom menu items that need at
+least the C<'?'> flag in the NAME.
 
 =item one and zero [ ]
 
@@ -441,6 +509,13 @@ If 0, the pop-up menu can not be executed implicitly.
 
 Default value: 1
 
+=item autoToggle NAME, SCALAR / Prima::MenuItem::autoToggle SCALAR.
+
+Manages autoToggle flag for a menu item. When set, C<checked> option is flipped
+when user selects the item. Also, un the unchecked state the system displays an
+empty check box icon where normally a check icon would appear, to hint the user
+that an item is a toggle, despite being unchecked.
+
 =item checked NAME, BOOLEAN / Prima::MenuItem::checked BOOLEAN
 
 Manages 'checked' state of a menu item. If 'checked',
@@ -460,12 +535,19 @@ not use this property internally.
 
 =item enabled NAME, BOOLEAN / Prima::MenuItem::enabled BOOLEAN
 
-Manages 'enabled' state of a menu item. If 'enabled' is 0,
-a menu item visualized with grayed or otherwise dimmed color
-palette. If a sub-menu item is disabled, whole sub-menu
-is inaccessible.
+Manages 'enabled' state of a menu item. If 'enabled' is C<me::Grayed>, a menu
+item visualized with grayed or otherwise dimmed color palette. If
+C<me::Passive>, then the item is still disabled, but not grayed.  If a sub-menu
+item is disabled, whole sub-menu is inaccessible.
+
+Default: C<me::Enabled>
 
 NAME is name of the menu item.
+
+=item group NAME, INTEGER / Prima::MenuItem::group INTEGER
+
+If not 0, treated as a member of radio group with that number when checked.
+I.e. if one of the group is checked, others are unchecked.
 
 =item image NAME, OBJECT / Prima::MenuItem::image OBJECT
 
@@ -521,6 +603,14 @@ implicit hot-key lookup when on C<KeyDown> event.
 
 Default value: 1
 
+=item submenu NAME, ARRAY / Prima::MenuItem::submeny ARRAY
+
+Manages submenu, if present on the item. On reading, is equivalent
+to C<get_items(NAME, 1)>. On writing, removes all items under NAME
+and inserts new ones.
+
+See also: L<is_submenu>.
+
 =item text NAME, STRING / Prima::MenuItem::text STRING
 
 Manages the text, bound with a menu item. STRING
@@ -547,13 +637,21 @@ Sets menu item in checked state.
 
 =item disable NAME / Prima::MenuItem::disable
 
-Alias for C<enabled(0)>.
+Alias for C<enabled(me::Grayed)>.
 Sets menu item in disabled state.
 
 =item enabled NAME / Prima::MenuItem::enabled
 
-Alias for C<enabled(1)>.
+Alias for C<enabled(me::Enabled)>.
 Sets menu item in enabled state.
+
+=item execute NAME
+
+Calls the action associated with the menu item
+
+=item find_item_by_key KEY
+
+Finds items by the associated hot key combination
 
 =item get_handle
 
@@ -561,6 +659,20 @@ Returns a system-dependent menu handle.
 
 NB: Prima::AccelTable use no system resources, and
 this method returns its object handle instead.
+
+=item get_children NAME
+
+Returns list of NAME's children
+
+=item get_item NAME, FULL_TREE = 0
+
+Returns items entry corresponding to NAME, with or without eventual full tree
+of children items, depending on FULL_TREE flag.
+
+=item get_item NAMES, FULL_TREE = 0
+
+Returns immediate children items entries that have NAME as a parent, with or
+without eventual full tree of children items, depending on FULL_TREE flag.
 
 =item has_item NAME
 
@@ -579,6 +691,14 @@ would possess after the insertion. INDEX 0 indicates
 the beginning, thus.
 
 Returns no value.
+
+=item is_separator NAME
+
+Returns true if the item is a separator, false otherwise
+
+=item is_submenu NAME
+
+Returns true if the item has submenu, false otherwise
 
 =item popup X_OFFSET, Y_OFFSET, [ LEFT = 0, BOTTOM = 0, RIGHT = 0, TOP = 0 ]
 
@@ -605,11 +725,6 @@ its sub-menus if the item is a sub-menu item.
 
 Alias for C<selected(1)>.
 Sets menu object in selected state.
-
-=item set_command KEY, ENABLED
-
-Disables or enables menu items, associated with
-key combinations KEY.
 
 =item set_variable NAME, NEW_NAME
 
@@ -652,6 +767,33 @@ The method can be called with no object.
 
 Alias for C<checked(0)>.
 Sets menu item in unchecked state.
+
+=back
+
+=head2 Events
+
+=over
+
+=item Change ACTION [, NAME [, VALUE ]]
+
+Triggered when structure of the menu tree is changed. ACTION is the method call that triggered that action, and NAME
+is the menu item namem, when applicable. If empty string, means root. VALUE is the new value, if applicable.
+
+=item ItemMeasure ITEMID, REF
+
+Called when system needs to query dimensions of a menu item that has custom
+painting bit set. C<REF> is a 2-item arrayref that needs to be set with pixel
+dimension.
+
+See also: L<Options>
+
+=item ItemPaint CANVAS, ITEMID, SELECTED, X1, Y1, X2, Y2
+
+Called whenever system needs to draw a menu item that has custom painting bit
+set. X1 - Y2 are coordinates of the rectangle where the drawing is allowed.
+
+See also: L<Options>
+
 
 =back
 

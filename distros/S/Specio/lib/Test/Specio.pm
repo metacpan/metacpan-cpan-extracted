@@ -3,7 +3,7 @@ package Test::Specio;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use IO::File;
 use Scalar::Util qw( blessed looks_like_number openhandle );
@@ -223,7 +223,7 @@ BEGIN {
     }
 }
 
-our @EXPORT_OK = ( @vars, qw( builtins_tests describe test_constraint ) );
+our @EXPORT_OK   = ( @vars, qw( builtins_tests describe test_constraint ) );
 our %EXPORT_TAGS = ( vars => \@vars );
 
 sub builtins_tests {
@@ -1298,7 +1298,7 @@ Test::Specio - Test helpers for Specio
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -1548,7 +1548,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

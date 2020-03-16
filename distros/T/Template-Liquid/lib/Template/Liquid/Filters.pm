@@ -1,5 +1,5 @@
 package Template::Liquid::Filters;
-our $VERSION = '1.0.18';
+our $VERSION = '1.0.19';
 use strict;
 use warnings;
 
@@ -674,7 +674,7 @@ Removes every occurrence of the specified substring from a string.
 
 =cut
 
-sub remove { my ($x, $y) = @_; $x =~ s{$y}{}g; return $x }
+sub remove { my ($x, $y) = @_; $y = quotemeta($y); $x =~ s{$y}{}g; return $x }
 
 =head2 C<remove_first>
 
@@ -687,7 +687,12 @@ Remove the first occurrence of a string.
 
 =cut
 
-sub remove_first { my ($x, $y) = @_; $x =~ s{$y}{}; return $x }
+sub remove_first {
+    my ($x, $y) = @_;
+    $y = quotemeta($y);
+    $x =~ s{$y}{};
+    return $x;
+}
 
 =head2 C<replace>
 
@@ -708,6 +713,7 @@ The replacement value is optional and defaults to an empty string (C<''>).
 sub replace {
     my ($x, $y, $z) = @_;
     $z = defined $z ? $z : '';
+    $y = quotemeta($y);
     $x =~ s{$y}{$z}g if $y;
     return $x;
 }
@@ -729,6 +735,7 @@ The replacement value is optional and defaults to an empty string (C<''>).
 sub replace_first {
     my ($x, $y, $z) = @_;
     $z = defined $z ? $z : '';
+    $y = quotemeta($y);
     $x =~ s{$y}{$z};
     return $x;
 }

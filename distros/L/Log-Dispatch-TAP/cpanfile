@@ -5,7 +5,6 @@ requires "Log::Dispatch::Output" => "0";
 requires "Params::ValidationCompiler" => "0";
 requires "Test2::API" => "0";
 requires "Types::Standard" => "0";
-requires "base" => "0";
 requires "namespace::autoclean" => "0";
 requires "perl" => "v5.10.0";
 

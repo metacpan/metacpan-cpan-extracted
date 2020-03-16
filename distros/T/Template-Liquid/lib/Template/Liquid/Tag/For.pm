@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::For;
-our $VERSION = '1.0.18';
+our $VERSION = '1.0.19';
 use strict;
 use warnings;
 require Template::Liquid::Error;
@@ -10,23 +10,29 @@ sub import { Template::Liquid::register_tag('for') }
 
 sub new {
     my ($class, $args) = @_;
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing template argument',
-                                   fatal   => 1
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing template argument',
+                                   fatal    => 1
         }
         if !defined $args->{'template'};
-    raise Template::Liquid::Error {type => 'Context',
-                             message => 'Missing parent argument', fatal => 1}
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing parent argument',
+                                   fatal    => 1
+        }
         if !defined $args->{'parent'};
     raise Template::Liquid::Error {
-                   type    => 'Syntax',
+                   type     => 'Syntax',
+                   template => $args->{template},
                    message => 'Missing argument list in ' . $args->{'markup'},
                    fatal   => 1
         }
         if !defined $args->{'attrs'};
     if ($args->{'attrs'} !~ qr[^([\w\.]+)\s+in\s+(.+?)(?:\s+(.*)\s*?)?$]o) {
         raise Template::Liquid::Error {
-                       type    => 'Syntax',
+                       template => $args->{template},
+                       type     => 'Syntax',
                        message => 'Bad argument list in ' . $args->{'markup'},
                        fatal   => 1
         };

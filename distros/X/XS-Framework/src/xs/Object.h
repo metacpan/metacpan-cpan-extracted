@@ -24,6 +24,7 @@ struct Object : Sv {
 
     template <class T, typename = enable_if_rawsv_t<T>>
     Object& operator= (T* val)            { _ref.reset(); Sv::operator=(val); _validate(); return *this; }
+    Object& operator= (std::nullptr_t)    { _ref.reset(); Sv::operator=(nullptr); return *this; }
     Object& operator= (const Object& oth) { Sv::operator=(oth); _ref = oth._ref; return *this; }
     Object& operator= (Object&& oth)      { Sv::operator=(std::move(oth)); _ref = std::move(oth._ref); return *this; }
     Object& operator= (const Sv& oth)     { _ref.reset(); Sv::operator=(oth); _validate(); return *this; }

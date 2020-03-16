@@ -1,0 +1,15 @@
+Changes
+lib/Net/OpenVAS.pm
+lib/Net/OpenVAS/Error.pm
+lib/Net/OpenVAS/OMP.pm
+lib/Net/OpenVAS/OMP/Request.pm
+lib/Net/OpenVAS/OMP/Response.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+t/00-load.t
+t/10-response.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

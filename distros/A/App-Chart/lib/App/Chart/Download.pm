@@ -1,6 +1,6 @@
 # Download functions.
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2015, 2016, 2017, 2018, 2020 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -1200,8 +1200,8 @@ sub timestamp_to_timet {
   my ($year, $month, $day, $hour, $minute, $second) 
     = timestamp_to_ymdhms($timestamp);
   require Time::Local;
-  return Time::Local::timegm
-    ($second, $minute, $hour, $day, $month-1, $year-1900);
+  return Time::Local::timegm_modern
+    ($second, $minute, $hour, $day, $month-1, $year);
 }
 
 

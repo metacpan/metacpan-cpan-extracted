@@ -5,17 +5,6 @@
 #include <panda/exception.h>
 #include <panda/error.h>
 
-// hack to get private access to panda::ErrorCode
-namespace panda {
-    namespace private_tags {
-        struct ErrorCodeXsIn {};
-        struct ErrorCodeXsOut {};
-    }
-
-    template<> private_tags::ErrorCodeXsIn ErrorCode::private_access<private_tags::ErrorCodeXsIn, const xs::Sv&>(const xs::Sv& arg);
-    template<> xs::Simple ErrorCode::private_access<xs::Simple, private_tags::ErrorCodeXsOut>(private_tags::ErrorCodeXsOut) const;
-}
-
 namespace xs {
     
 template <> struct Typemap<const std::error_category*> : TypemapObject<const std::error_category*, const std::error_category*, ObjectTypeForeignPtr, ObjectStorageMG> {
@@ -40,52 +29,24 @@ template <> struct Typemap<std::error_code> : TypemapBase<std::error_code> {
     }
 };
 
-template <> struct Typemap<panda::ErrorCode> : TypemapBase<panda::ErrorCode> {
-    static PERL_THREAD_LOCAL HV* stash;
+template <> struct Typemap<panda::ErrorCode*> : TypemapObject<panda::ErrorCode*, panda::ErrorCode*, ObjectTypePtr, ObjectStorageMG> {
+    static panda::string_view package () { return "XS::ErrorCode"; }
+};
+
+template <> struct Typemap<panda::ErrorCode> : Typemap<panda::ErrorCode*> {
+    using Super = Typemap<panda::ErrorCode*>;
 
     static panda::ErrorCode in (const Sv& arg) {
         if (!arg.defined()) return {};
-        if (!arg.is_object_ref()) throw panda::exception("invalid panda::ErrorCode ref");
-
-        panda::ErrorCode ret;
-        ret.private_access<panda::private_tags::ErrorCodeXsIn, const Sv&>(SvRV(arg));
-        return ret;
+        if (!arg.is_object_ref()) throw panda::exception("invalid XS::ErrorCode object");
+        if (Object(arg).stash() == Typemap<std::error_code>::stash) return xs::in<std::error_code>(arg);
+        return *Super::in(arg);
     }
 
-    static Sv out (const panda::ErrorCode& var, const Sv& = {}) {
+    static Sv out (const panda::ErrorCode& var, const Sv& proto = {}) {
         if (!var) return Sv::undef;
-        auto ret = var.private_access<Simple>(panda::private_tags::ErrorCodeXsOut{});
-        return Stash(stash).bless(ret).ref();
+        return Super::out(new panda::ErrorCode(var), proto);
     }
 };
-
-}
-
-namespace panda {
-
-template<> inline private_tags::ErrorCodeXsIn ErrorCode::private_access<private_tags::ErrorCodeXsIn, const xs::Sv&>(const xs::Sv& sv) {
-    static const size_t CAT_SIZE = sizeof(const error::NestedCategory*);
-    static const size_t CODES_SIZE = 1;
-    if (!SvPOK(sv) || SvCUR(sv) < CAT_SIZE + CODES_SIZE) throw panda::exception("invalid panda::ErrorCode");
-
-    char* data = SvPVX(sv);
-
-    cat = *reinterpret_cast<const error::NestedCategory**>(data);
-    codes.storage = string(data + CAT_SIZE, SvCUR(sv) - CAT_SIZE);
-    return {};
-}
-
-template<> inline xs::Simple ErrorCode::private_access<xs::Simple, private_tags::ErrorCodeXsOut>(private_tags::ErrorCodeXsOut) const {
-    static const size_t CAT_SIZE = sizeof(const error::NestedCategory*);
-    size_t size = CAT_SIZE + codes.storage.size();
-    auto base = xs::Simple::create(size);
-
-    char* data = SvPVX(base);
-
-    memcpy(data, &cat, CAT_SIZE);
-    memcpy(data + CAT_SIZE, codes.storage.data(), codes.storage.size());
-    SvCUR_set(base, size);
-    return base;
-}
 
 }

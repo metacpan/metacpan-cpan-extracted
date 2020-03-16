@@ -1,9 +1,0 @@
-@@ format_for_email
-{{Person.username}}@{{domain_name}}
-{{Person.username}}@{{email_domain}}
-
-@@ format_for_url
-https://www.{{domain_name}}/
-https://{{domain_name}}/
-http://www.{{domain_name}}/
-http://{{domain_name}}/

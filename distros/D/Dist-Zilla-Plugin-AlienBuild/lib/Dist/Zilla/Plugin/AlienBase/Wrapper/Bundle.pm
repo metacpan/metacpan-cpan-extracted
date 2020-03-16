@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle 0.29 {
+package Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle 0.30 {
 
   use 5.014;
   use Moose;
@@ -147,7 +147,7 @@ Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle - Bundle a copy of Alien::Base::
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -159,7 +159,7 @@ version 0.29
  
  system       = | # use libfoo!
  system       = | $WriteMakefileArgs{LIBS} = [ '-lfoo' ];
-
+ 
  alien        = Alien::libfoo
 
 =head1 DESCRIPTION

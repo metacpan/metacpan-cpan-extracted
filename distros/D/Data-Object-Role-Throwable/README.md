@@ -30,15 +30,23 @@ This package implements the following methods:
 
 ## throw
 
-    throw(Str $message) : Object
+    throw(Tuple[Str, Str] | Str $message, Maybe[Number] $offset) : Any
 
-The throw method throws an exception with the object and the given message.
+The throw method throws an exception with the object and the given message. The
+object is thrown as the exception context. See [Data::Object::Exception](https://metacpan.org/pod/Data::Object::Exception) for
+more information.
 
 - throw example #1
 
         # given: synopsis
 
         $example->throw('Oops!');
+
+- throw example #2
+
+        # given: synopsis
+
+        $example->throw(['E001', 'Oops!']);
 
 # AUTHOR
 

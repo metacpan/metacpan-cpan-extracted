@@ -1,4 +1,5 @@
 #include "win32\win32guts.h"
+#include <ole2.h>
 #ifndef _APRICOT_H_
 #include "apricot.h"
 #endif
@@ -27,6 +28,7 @@ PHash   menuMan      = nil; // HMENU manager
 PHash   imageMan     = nil; // HBITMAP manager
 PHash   regnodeMan   = nil; // cache for apc_widget_user_profile
 PHash   myfontMan    = nil; // hash of calls to apc_font_load
+PHash   menuBitmapMan= nil; // HBITMAP manager for SetMenuItemBitmaps 
 HPEN    hPenHollow;
 HBRUSH  hBrushHollow;
 PatResource hPatHollow;
@@ -46,6 +48,7 @@ WCHAR lastDeadKey = 0;
 int          timeDefsCount = 0;
 PItemRegRec  timeDefs = NULL;
 Bool debug = false;
+HBITMAP uncheckedBitmap = NULL;
 
 BOOL APIENTRY
 DllMain( HINSTANCE hInstance, DWORD reason, LPVOID reserved)
@@ -246,6 +249,7 @@ window_subsystem_init( char * error_buf)
 	imageMan   = hash_create();
 	regnodeMan = hash_create();
 	myfontMan  = hash_create();
+	menuBitmapMan = hash_create();
 	create_font_hash();
 	{
 		LOGBRUSH b = { BS_HOLLOW, 0, 0};
@@ -381,6 +385,11 @@ window_subsystem_init( char * error_buf)
 	guts. smDblClk. x = GetSystemMetrics( SM_CXDOUBLECLK);
 	guts. smDblClk. y = GetSystemMetrics( SM_CYDOUBLECLK);
 
+	{
+		HRESULT r = OleInitialize(NULL);
+		guts. ole_initialized = (r == S_OK || r == S_FALSE );
+	}
+
 	return true;
 }
 
@@ -405,14 +414,25 @@ window_subsystem_set_option( char * option, char * value)
 	return false;
 }
 
-static Bool myfont_cleaner( void * value, int keyLen, void * key, void * dummy) {
+static Bool
+myfont_cleaner( void * value, int keyLen, void * key, void * dummy)
+{
 	RemoveFontResource((LPCTSTR)key);
+	return false;
+}
+
+static Bool
+menu_bitmap_cleaner( void * value, int keyLen, void * key, void * dummy)
+{
+	DeleteObject((HBITMAP) value);
 	return false;
 }
 
 void
 window_subsystem_done()
 {
+	if (guts. ole_initialized)
+		OleUninitialize();
 	free( timeDefs);
 	timeDefs = NULL;
 	list_destroy( &guts. files);
@@ -436,10 +456,15 @@ window_subsystem_done()
 	hash_destroy( stylusMan,  true);
 	hash_destroy( regnodeMan, false);
 
+	hash_first_that( menuBitmapMan, menu_bitmap_cleaner, nil, nil, nil);
+	hash_destroy( menuBitmapMan,  false);
+
 	hash_first_that( myfontMan, myfont_cleaner, nil, nil, nil);
 	hash_destroy( myfontMan,  false);
 	DeleteObject( hPenHollow);
 	DeleteObject( hBrushHollow);
+	if ( uncheckedBitmap && uncheckedBitmap != (HBITMAP)-1)
+		DeleteObject( uncheckedBitmap);
 	SetErrorMode( guts. errorMode);
 }
 
@@ -569,6 +594,11 @@ zorder_sync( Handle self, HWND me, LPWINDOWPOS lp)
 	}
 }
 
+static Bool
+id_match( Handle self, PMenuItemReg m, void * params)
+{
+	return m-> id == *(( int*) params);
+}
 
 LRESULT CALLBACK generic_view_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2)
 {
@@ -634,6 +664,30 @@ LRESULT CALLBACK generic_view_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM m
 			MapWindowPoints( NULL, win, &a, 1);
 			ev. gen. P. x = a. x;
 			ev. gen. P. y = sys lastSize. y - a. y - 1;
+		}
+		break;
+	case WM_DRAG_RESPONSE:
+		SetCursor( sys pointer );
+		break;
+	case WM_DRAWITEM:
+		{
+			DRAWITEMSTRUCT *dis = (DRAWITEMSTRUCT*) mp2;
+			if ( dis-> CtlType == ODT_MENU && dis-> itemData != 0) {
+				RECT r;
+				self = (Handle) dis-> itemData;
+				v = (PWidget) self;
+				GetClientRect(WindowFromDC(dis->hDC), &r);
+				ev.cmd          = cmMenuItemPaint;
+				ev.gen.i        = (Handle) dis-> itemID - MENU_ID_AUTOSTART;
+				ev.gen.p        = (void*) dis->hDC;
+				ev.gen.B        = ((dis-> itemState & ODS_SELECTED) != 0);
+				ev.gen.P.x      = r.right;
+				ev.gen.P.y      = r.bottom;
+				ev.gen.R.left   = dis-> rcItem.left;
+				ev.gen.R.bottom = r.bottom - dis-> rcItem.bottom;
+				ev.gen.R.right  = dis-> rcItem.right - 1;
+				ev.gen.R.top    = r.bottom - dis-> rcItem.top - 1;
+			}
 		}
 		break;
 	case WM_ENABLE:
@@ -937,11 +991,24 @@ AGAIN:
 		apc_pointer_get_state(self)
 		;
 		break;
+	case WM_MEASUREITEM:
+		{
+			MEASUREITEMSTRUCT *mis = (MEASUREITEMSTRUCT*) mp2;
+			if ( mis-> CtlType == ODT_MENU && mis-> itemData != 0) {
+				ev.cmd     = cmMenuItemMeasure;
+				self = (Handle) mis-> itemData;
+				v = (PWidget) self;
+				ev.gen.i   = (Handle) mis-> itemID - MENU_ID_AUTOSTART;
+				ev.gen.P.x = ev.gen.P.y = 0;
+			}
+		}
+		break;
 	case WM_MENUCHAR:
 		{
 			int key;
+			PMenuWndData mwd;
 			ev. key. key    = ctx_remap_def( mp1, ctx_kb2VK2, false, kbNoKey);
-			ev. key. code   = mp1;
+			ev. key. code   = LOWORD(mp1);
 			ev. key. mod   |=
 				(( GetKeyState( VK_SHIFT)   < 0) ? kmShift : 0) |
 				(( GetKeyState( VK_CONTROL) < 0) ? kmCtrl  : 0) |
@@ -951,6 +1018,24 @@ AGAIN:
 			key = CAbstractMenu-> translate_key( nilHandle, ev. key. code, ev. key. key, ev. key. mod);
 			if ( v-> self-> process_accel( self, key))
 				return MAKELONG( 0, MNC_CLOSE);
+
+			ev.key.code = tolower(ev.key.code);
+			if (( mwd = (MenuWndData*) hash_fetch(menuMan, &mp2, sizeof(mp2))) != NULL) {
+				int pos = 0;
+				PMenuItemReg m = CAbstractMenu(mwd->menu)-> first_that(mwd->menu, (void*)id_match, &mwd->id, false);
+				while ( m != NULL ) {
+					if ( m-> flags.custom_draw && m-> text != NULL ) {
+						char * t = m-> text;
+						while (*t) {
+							if ( t[0] == '~' && tolower(t[1]) == ev.key.code )
+								return MAKELONG( pos, MNC_EXECUTE);
+							t++;
+						}
+					}
+					m = m-> next;
+					pos++;
+				}
+			}
 		}
 		break;
 	case WM_SYNCMOVE:
@@ -991,12 +1076,17 @@ AGAIN:
 			( list_index_of( &guts. transp, self) >= 0)
 			)
 			return 0;
-		if ( is_apt( aptLayered )) {
+
+		if (
+			( var self->get_locked(self) > 0) || /* or WM_PAINT bashing occurs */
+			is_apt( aptLayered )
+		) {
 			PAINTSTRUCT ps;
 			BeginPaint(win, &ps);
 			EndPaint(win, &ps);
 			return 0;
 		}
+
 		break;
 	case WM_QUERYNEWPALETTE:
 		return palette_change( self);
@@ -1100,6 +1190,13 @@ AGAIN:
 	if ( v-> stage > csNormal) orgMsg = 0; // protect us from dead body
 
 	switch ( orgMsg) {
+	case WM_DRAWITEM:
+		{
+			DRAWITEMSTRUCT *dis = (DRAWITEMSTRUCT*) mp2;
+			if ( dis-> CtlType == ODT_MENU && dis-> itemData != 0)
+				return (LRESULT) 1;
+		}
+		break;
 	case WM_DESTROY:
 		v-> handle = nilHandle;       // tell apc not to kill this HWND
 		SetWindowLongPtr( win, GWLP_USERDATA, 0);
@@ -1113,6 +1210,16 @@ AGAIN:
 		break;
 	case WM_SYSKEYUP:
 		// ev. cmd = 1; // forced call DefWindowProc superseded for test reasons
+		break;
+	case WM_MEASUREITEM:
+		{
+			MEASUREITEMSTRUCT *mis = (MEASUREITEMSTRUCT*) mp2;
+			if ( mis-> CtlType == ODT_MENU && mis-> itemData != 0) {
+				mis-> itemWidth  = ev.gen.P.x;
+				mis-> itemHeight = ev.gen.P.y;
+				return (LRESULT) 1;
+			}
+		}
 		break;
 	case WM_MOUSEMOVE:
 		if ( is_apt( aptEnabled)) SetCursor( sys pointer);
@@ -1179,8 +1286,10 @@ LRESULT CALLBACK generic_frame_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM 
 		ev. cmd = cmClose;
 		break;
 	case WM_COMMAND:
+	case WM_DRAWITEM:
 	case WM_INITMENUPOPUP:
 	case WM_INITMENU:
+	case WM_MEASUREITEM:
 	case WM_MENUCHAR:
 	case WM_KEYDOWN:
 	case WM_KEYUP:

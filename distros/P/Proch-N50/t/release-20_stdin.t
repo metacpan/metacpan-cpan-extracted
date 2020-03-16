@@ -10,12 +10,14 @@ use strict;
 use warnings;
 use Proch::N50;
 use Test::More;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 
-my $file = "$Bin/../data/small_test.fa";
-my $script = "$Bin/../bin/n50";
+my $file = "$RealBin/../data/small_test.fa";
+my $script = "$RealBin/../bin/n50";
 
 if (-e "$file" and -e "$script") {
+	print STDERR "Testing: $script\n";
+	print STDERR "\$ cat \"$file\" | perl \"$script\" - 2>/dev/null\n";
 	my $output = `cat "$file" | perl "$script" - 2>/dev/null`;
 	ok($? == 0, '"n50" script executed');
 	

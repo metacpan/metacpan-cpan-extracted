@@ -1,0 +1,16 @@
+2020-03-07 QQ::weixin::work v0.01
+1）创建QQ::weixin::work
+2) 创建QQ::weixin::work::agent
+3) 创建QQ::weixin::work::checkin
+4) 创建QQ::weixin::work::department
+5) 创建QQ::weixin::work::menu
+6) 创建QQ::weixin::work::message
+7) 创建QQ::weixin::work::oa
+8) 创建QQ::weixin::work::tag
+9) 创建QQ::weixin::work::user
+
+2020-03-16 QQ::weixin::work v0.02
+更新部分参数可以为空
+
+2020-03-16 QQ::weixin::work v0.03
+更新压缩文件版本

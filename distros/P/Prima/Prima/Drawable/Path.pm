@@ -114,7 +114,7 @@ sub shear
 {
 	my ( $self, $x, $y ) = @_;
 	$y //= $x;
-	$self-> matrix(1,$x,$y,1,0,0);
+	$self-> matrix(1,$y,$x,1,0,0);
 }
 
 
@@ -166,11 +166,13 @@ sub glyph
 	return unless $outline;
 	my $size = scalar(@$outline);
 	my @p;
+	my $fill = delete $opt{fill};
 	for ( my $i = 0; $i < $size; ) {
 		my $cmd = $outline->[$i++];
 		my $pts = $outline->[$i++] * 2;
 		my @pts = map { $outline->[$i++] / 64.0 } 0 .. $pts - 1;
 		if ( $cmd == ggo::Move ) {
+			$self->close unless $fill;
 			$self->moveto(@pts);
 		} elsif ( $cmd == ggo::Line ) {
 			$self->line([ @p, @pts ]);
@@ -192,6 +194,9 @@ sub text
 	unless ($state) {
 		return unless $c->begin_paint_info;
 	}
+
+	$self->translate( 0, $c->font->descent )
+		unless $opt{baseline} // $c->textOutBaseline;
 	my $cache   = $opt{cache} || {};
 	my $unicode = utf8::is_utf8($text);
 	for my $char ( split //, $text ) {
@@ -1036,7 +1041,7 @@ to be used for drawing or clipping shapes.
 		arc( 0, 0, $d1 + $dx * 4, $d1 + $dx * 3, 270, 360)->
 	stroke;
 
-=for podview <img src="path.gif">
+=for podview <img src="Prima/path.gif">
 
 =for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/path.gif">
 
@@ -1085,7 +1090,8 @@ Adds full ellipse to the path.
 =item glyph INDEX, %OPTIONS
 
 Adds glyph outline to the path. C<%OPTIONS> are passed as is to L<Prima::Drawable/renger_glyph>.
-Note that filled glyphs require C<fillMode> without the C<fm::Overlay> bit set.
+Note that filled glyphs require C<fillMode> without the C<fm::Overlay> bit set and C<fill> option set
+to generate proper shapes with holes.
 
 =item line, rline @POINTS
 
@@ -1122,7 +1128,7 @@ Adds B-spline to path. See L<Prima::Drawable/spline> for C<%OPTIONS> description
 Adds C<TEXT> to the path. C<%OPTIONS> are same as in L<Prima::Drawable/render_glyph>, 
 except that C<unicode> is deduced automatically based on whether C<TEXT> has utf8 bit
 on or off; and an extra option C<cache> with a hash can be used to speed up the function
-with subsequent calls.
+with subsequent calls. C<baseline> option is same as L<Prima::Drawable/textOutBaseline>.
 
 =back
 

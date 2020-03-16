@@ -1,5 +1,8 @@
 Revision history for Perl module Net::ACME2
 
+0.34 13 March 2020
+- Fix warning in error objects if there is no “status”.
+
 0.33 10 September 2019
 - Fix documentation of base class for exception objects. (No code changes.)
 

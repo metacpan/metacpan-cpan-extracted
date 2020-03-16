@@ -1,31 +1,29 @@
 #include "test.h"
 #include <panda/error.h>
 
-using panda::ErrorCode;
+#define TEST(name) TEST_CASE("error: " name, "[error]")
+
+using namespace panda;
 
 enum MyErr {
     Err1 = 1,
     Err2
 };
 
-class MyCategory : public std::error_category
-{
-public:
+struct MyCategory : std::error_category {
     const char * name() const noexcept override {return "MyCategory";}
-    std::string message(int ev) const override {return std::string("MyErr:") + std::to_string(ev);}
+    std::string message(int ev) const override {return std::string("MyErr") + std::to_string(ev);}
 };
 
-const MyCategory my_category;
+static const MyCategory my_category;
 
 namespace std {
-template <> struct is_error_code_enum<MyErr> : std::true_type {};
+    template <> struct is_error_code_enum<MyErr> : std::true_type {};
 }
 
-std::error_code make_error_code(MyErr err) noexcept {
-    return std::error_code(err, my_category);
-}
+std::error_code make_error_code (MyErr err) noexcept { return std::error_code(err, my_category); }
 
-TEST_CASE("ErrorCode ctor", "[error]") {
+TEST("ErrorCode ctor") {
     SECTION("default") {
         ErrorCode code;
         CHECK_FALSE(code);
@@ -49,23 +47,66 @@ TEST_CASE("ErrorCode ctor", "[error]") {
         CHECK(code);
         REQUIRE(code.next());
         CHECK_FALSE(code.next().next());
-        CHECK(code.what() == "MyErr:2, preceded by:\n"
-                             "MyErr:1");
+        CHECK(code.what() == "MyErr2 (2:MyCategory) -> MyErr1 (1:MyCategory)");
         nested_code.clear();
         CHECK(code.next() == Err1); // check it was copy and no sharing
     }
 }
 
-TEST_CASE("ErrorCode methods", "[error]") {
+TEST("ErrorCode methods") {
     ErrorCode e1(Err1);
     ErrorCode e2;
     e2 = e1;
     REQUIRE(e2 == e1);
 }
 
-TEST_CASE("ErrorCode defctor", "[error]") {
+TEST("ErrorCode defctor") {
     ErrorCode orig;
     ErrorCode wrap(Err1, orig);
     CHECK(wrap == Err1);
     CHECK(wrap.next().code().value() == 0);
+}
+
+TEST("comparisons") {
+    SECTION("ErrorCode to ErrorCode") {
+        CHECK(ErrorCode() == ErrorCode());
+        CHECK(ErrorCode(MyErr::Err1) == ErrorCode(MyErr::Err1));
+        CHECK(ErrorCode(MyErr::Err1) != ErrorCode());
+        (void)(ErrorCode() < ErrorCode());
+    }
+    SECTION("ErrorCode to error_code") {
+        CHECK(ErrorCode() == std::error_code());
+        CHECK(std::error_code() == ErrorCode());
+        CHECK(ErrorCode(MyErr::Err1) != std::error_code());
+        CHECK(std::error_code() != ErrorCode(MyErr::Err1));
+        (void)(ErrorCode() < std::error_code());
+        (void)(std::error_code() < ErrorCode());
+    }
+    SECTION("ErrorCode to error code enum") {
+        CHECK(ErrorCode(MyErr::Err1) == MyErr::Err1);
+        CHECK(MyErr::Err1 == ErrorCode(MyErr::Err1));
+        CHECK(ErrorCode(MyErr::Err1) != MyErr::Err2);
+        CHECK(MyErr::Err1 != ErrorCode(MyErr::Err2));
+        (void)(ErrorCode() < MyErr::Err1);
+        (void)(MyErr::Err1 < ErrorCode());
+    }
+    SECTION("ErrorCode to error cond enum") {
+        CHECK(ErrorCode(make_error_code(std::errc::operation_canceled)) == std::errc::operation_canceled);
+        CHECK(std::errc::operation_canceled == ErrorCode(make_error_code(std::errc::operation_canceled)));
+        CHECK(ErrorCode() != std::errc::operation_canceled);
+        CHECK(std::errc::operation_canceled != ErrorCode());
+        (void)(ErrorCode() < std::errc::operation_canceled);
+        (void)(std::errc::operation_canceled < ErrorCode());
+    }
+}
+
+TEST("bad_expected_access") {
+    string what;
+    try {
+        expected<int, ErrorCode> exp = make_unexpected(ErrorCode(MyErr::Err1));
+        exp.value();
+    } catch (bad_expected_access<ErrorCode>& e) {
+        what = e.what();
+    }
+    REQUIRE(what == "Bad expected access: MyErr1 (1:MyCategory)");
 }

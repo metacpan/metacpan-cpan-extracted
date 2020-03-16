@@ -4,7 +4,7 @@
       "Przemysław Iskra <sparky at pld-linux.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -57,7 +57,7 @@
          "url" : "git://github.com/sparky/perl-Net-Curl.git"
       }
    },
-   "version" : 0.43,
+   "version" : "0.44",
    "x_contributors" : [
       "Bálint Szilakszi",
       "Felipe Gasper",

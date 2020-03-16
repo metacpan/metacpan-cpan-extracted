@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.010000';
+	$Types::Standard::VERSION   = '1.010001';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -1156,7 +1156,7 @@ This module also exports a C<slurpy> function, which can be used as
 follows.
 
 It can cause additional trailing values in a B<Tuple> to be slurped
-into a structure and validated. For example, slurping into an arrayfef:
+into a structure and validated. For example, slurping into an arrayref:
 
    my $type = Tuple[Str, slurpy ArrayRef[Int]];
    

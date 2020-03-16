@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2020 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -23,20 +23,30 @@ use strict;
 use warnings;
 use Test::More;
 
-if (! eval 'use Test::Compile 0.08; 1') {
-  plan skip_all => "due to Test::Compile not available -- $@";
+if (! eval 'use Test::Compile::Internal 0.08; 1') {
+  plan skip_all => "due to Test::Compile::Internal not available -- $@";
+}
+
+foreach my $dir (@INC) {
+  if (ref $dir) {
+    plan skip_all => "due to a coderef in \@INC not enjoyed by Test::Compile::Internal";
+  }
 }
 
 use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
+my $tc = Test::Compile::Internal->new();
+# $tc->verbose(1);
+
+my @plfiles = ('chart');
 my @pmdirs = ('blib');
-my @pmfiles = all_pm_files (@pmdirs);
+my @pmfiles = $tc->all_pm_files (@pmdirs);
 
 @pmfiles = grep { ! m{Perl/Critic}
-                  && ! m{App/Chart/Gtk2/RawDialog}
-                  && ! m{App/Chart/Gtk2/IndicatorModelGenerated} } @pmfiles;
+                    && ! m{App/Chart/Gtk2/RawDialog}
+                    && ! m{App/Chart/Gtk2/IndicatorModelGenerated} } @pmfiles;
 
 unless (eval {require GT::Prices}) {
   diag "skip GT modules, GT::Prices not available -- $@";
@@ -51,11 +61,13 @@ unless (eval {require Finance::Quote}) {
   @pmfiles = grep { !m{Finance/Quote} } @pmfiles;
 }
 
-my @plfiles = ('chart');
-
 plan tests => scalar(@plfiles) + scalar(@pmfiles);
 
-foreach my $filename (@plfiles) { pl_file_ok($filename); }
-foreach my $filename (@pmfiles) { pm_file_ok($filename); }
+foreach my $filename (@plfiles) {
+  ok($tc->pl_file_compiles($filename));
+}
+foreach my $filename (@pmfiles) {
+  ok($tc->pm_file_compiles($filename));
+}
 
 exit 0;

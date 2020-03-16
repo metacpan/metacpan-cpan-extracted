@@ -1,5 +1,5 @@
 package Template::Liquid;
-our $VERSION = '1.0.18';
+our $VERSION = '1.0.19';
 use strict;
 use warnings;
 our (%tags, %filters);
@@ -32,8 +32,13 @@ use Template::Liquid::Filters;
 #
 sub new {
     my ($class) = @_;
-    my $s = bless {break => 0, continue => 0, tags => {}, filters => {}},
-        $class;
+    my $s = bless {break    => 0,
+                   continue => 0,
+                   tags     => {},
+                   filters  => {},
+                   line     => 1,
+                   column   => 0
+    }, $class;
     return $s;
 }
 

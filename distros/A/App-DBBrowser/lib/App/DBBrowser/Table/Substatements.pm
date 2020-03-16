@@ -42,15 +42,15 @@ sub select {
     my $clause = 'select';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $choices = [];
+    my $menu = [];
     my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
     my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
     my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );
     if ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
-        $choices = [ @pre, @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
+        $menu = [ @pre, @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
     }
     else {
-        $choices = [ @pre, @{$sql->{cols}} ];
+        $menu = [ @pre, @{$sql->{cols}} ];
     }
     $sql->{select_cols} = [];
     #$sql->{alias} = { %{$sql->{alias}} };
@@ -60,7 +60,7 @@ sub select {
         $ax->print_sql( $sql );
         # Choose
         my @idx = $tc->choose(
-            $choices,
+            $menu,
             { %{$sf->{i}{lyt_h}}, meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ], include_highlighted => 2,
               index => 1 }
         );
@@ -72,12 +72,12 @@ sub select {
             return;
         }
         push @bu, [ [ @{$sql->{select_cols}} ], { %{$sql->{alias}} } ];
-        if ( $choices->[$idx[0]] eq $sf->{i}{ok} ) {
+        if ( $menu->[$idx[0]] eq $sf->{i}{ok} ) {
             shift @idx;
-            push @{$sql->{select_cols}}, @{$choices}[@idx];
+            push @{$sql->{select_cols}}, @{$menu}[@idx];
             return 1;
         }
-        elsif ( $choices->[$idx[0]] eq $expand_sign ) {
+        elsif ( $menu->[$idx[0]] eq $expand_sign ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( ! defined $ext_col ) {
@@ -88,7 +88,7 @@ sub select {
             }
             next COLUMNS;
         }
-        push @{$sql->{select_cols}}, @{$choices}[@idx];
+        push @{$sql->{select_cols}}, @{$menu}[@idx];
     }
 }
 
@@ -101,11 +101,11 @@ sub distinct {
     $sql->{distinct_stmt} = '';
 
     DISTINCT: while ( 1 ) {
-        my $choices = [ @pre, $sf->{distinct}, $sf->{all} ];
+        my $menu = [ @pre, $sf->{distinct}, $sf->{all} ];
         $ax->print_sql( $sql );
         # Choose
         my $select_distinct = $tc->choose(
-            $choices,
+            $menu,
             { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $select_distinct ) {
@@ -355,14 +355,14 @@ sub group_by {
     my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
     my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
     my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );
-    my $choices = [ @pre, @{$sql->{cols}} ];
+    my $menu = [ @pre, @{$sql->{cols}} ];
 
     GROUP_BY: while ( 1 ) {
         $sql->{group_by_stmt} = "GROUP BY " . join ', ', @{$sql->{group_by_cols}};
         $ax->print_sql( $sql );
         # Choose
         my @idx = $tc->choose(
-            $choices,
+            $menu,
             { %{$sf->{i}{lyt_h}}, meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ], include_highlighted => 2,
               index => 1 }
         );
@@ -374,9 +374,9 @@ sub group_by {
             $sql->{group_by_stmt} = "GROUP BY " . join ', ', @{$sql->{group_by_cols}};
             return;
         }
-        elsif ( $choices->[$idx[0]] eq $sf->{i}{ok} ) {
+        elsif ( $menu->[$idx[0]] eq $sf->{i}{ok} ) {
             shift @idx;
-            push @{$sql->{group_by_cols}}, @{$choices}[@idx];
+            push @{$sql->{group_by_cols}}, @{$menu}[@idx];
             if ( ! @{$sql->{group_by_cols}} ) {
                 $sql->{group_by_stmt} = '';
             }
@@ -385,7 +385,7 @@ sub group_by {
             }
             return 1;
         }
-        elsif ( $choices->[$idx[0]] eq $expand_sign ) {
+        elsif ( $menu->[$idx[0]] eq $expand_sign ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( defined $ext_col ) {
@@ -393,7 +393,7 @@ sub group_by {
             }
             next GROUP_BY;
         }
-        push @{$sql->{group_by_cols}}, @{$choices}[@idx];
+        push @{$sql->{group_by_cols}}, @{$menu}[@idx];
     }
 }
 

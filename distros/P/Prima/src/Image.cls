@@ -15,6 +15,8 @@ object Prima::Image( Prima::Drawable)
 	int            eventMask1;
 	int            eventMask2;
 	PRegionRec     regionData;
+	int            updateLock;
+	int            extraROP;
 
 	property Rect   clipRect;
 	property int    conversion;
@@ -25,6 +27,7 @@ object Prima::Image( Prima::Drawable)
 	property Bool   preserveType;
 	property Handle region;
 	property Point  resolution;
+	property int    rop;
 	property int    scaling;
 	property Point  size;
 	property double stats( int index);
@@ -70,7 +73,7 @@ object Prima::Image( Prima::Drawable)
 	method void   premultiply_alpha(SV * alpha);
 	method Bool   put_image_indirect( Handle image, int x, int y, int xFrom, int yFrom, int xDestLen, int yDestLen, int xLen, int yLen, int rop);
 	method void   remove_notification( UV id);
-	method void   rotate( int degrees );
+	method Bool   rotate( double degrees );
 	method Bool   rectangle(int x1, int y1, int x2, int y2);
 	method void   resample( double srcLo, double srcHi, double dstLo, double dstHi);
 	weird  int    save( SV *className, char *filename, HV * profile);
@@ -78,5 +81,6 @@ object Prima::Image( Prima::Drawable)
 	method void   set( HV * profile);
 	c_only void   reset( int type, RGBColor * palette, int palSize);
 	c_only void   stretch( int width, int height);
+	method Bool   transform( double a, double b, double c, double d );
 	c_only void   update_change();
 }

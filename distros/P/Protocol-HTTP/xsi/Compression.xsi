@@ -1,0 +1,17 @@
+MODULE = Protocol::HTTP                PACKAGE = Protocol::HTTP
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash compr_stash("Protocol::HTTP::Compression", GV_ADD);
+    xs::exp::create_constants(compr_stash, {
+        {"gzip",        (int)Compression::GZIP},
+        {"deflate",     (int)Compression::DEFLATE},
+        {"brotli",      (int)Compression::BROTLI},
+        {"identity",    (int)Compression::IDENTITY},
+        {"LEVEL_MIN",     (int)Compression::Level::min},
+        {"LEVEL_OPTIMAL", (int)Compression::Level::optimal},
+        {"LEVEL_MAX",     (int)Compression::Level::max},
+    });
+    compr_stash.mark_as_loaded("Protocol::HTTP");
+    xs::exp::autoexport(compr_stash);
+}

@@ -101,10 +101,10 @@ sub from_col_by_col {
             $sf->__print_args( $aoa );
             my ( $add, $del ) = ( 'Add', 'Del' );
             my @pre = ( undef, $sf->{i}{ok} );
-            my $choices = [ @pre, $add, $del ];
+            my $menu = [ @pre, $add, $del ];
             # Choose
             my $add_row = $tc->choose(
-                $choices,
+                $menu,
                 { %{$sf->{i}{lyt_h}}, prompt => '', default => $default }
             );
             if ( ! defined $add_row ) {
@@ -207,13 +207,13 @@ sub from_file {
         FILE: while ( 1 ) {
             my $hidden = 'Choose File:';
             my @pre = ( $hidden, undef );
-            my $choices = [ @pre, @files ];
+            my $menu = [ @pre, @files ];
             # Choose
             my $idx = $tc->choose(
-                $choices,
+                $menu,
                 { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $sf->{i}{gc}{old_file_idx}, undef => '  <=' }
             );
-            if ( ! defined $idx || ! defined $choices->[$idx] ) {
+            if ( ! defined $idx || ! defined $menu->[$idx] ) {
                 return if $sf->{o}{insert}{history_dirs} == 1;
                 next DIR;
             }
@@ -224,7 +224,7 @@ sub from_file {
                 }
                 $sf->{i}{gc}{old_file_idx} = $idx;
             }
-            if ( $choices->[$idx] eq $hidden ) {
+            if ( $menu->[$idx] eq $hidden ) {
                 require App::DBBrowser::Opt::Set;
                 my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
                 say "Settings";
@@ -270,13 +270,13 @@ sub __directory {
         my $hidden = "Choose a dir:";
         my $new_search = '  NEW search';
         my @pre = ( $hidden, undef, $new_search );
-        my $choices = [ @pre, map( '- ' . $_, @dirs ) ];
+        my $menu = [ @pre, map( '- ' . $_, @dirs ) ];
         # Choose
         my $idx = $tc->choose(
-            $choices,
+            $menu,
             { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $sf->{i}{gc}{old_dir_idx}, undef => '  <=' }
         );
-        if ( ! defined $idx || ! defined $choices->[$idx] ) {
+        if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
@@ -287,14 +287,14 @@ sub __directory {
             $sf->{i}{gc}{old_dir_idx} = $idx;
         }
         my $dir_fs;
-        if ( $choices->[$idx] eq $hidden ) {
+        if ( $menu->[$idx] eq $hidden ) {
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
             say "Settings";
             $opt_set->set_options( $sf->__file_setting_menu_entries() );
             next DIR;
         }
-        elsif ( $choices->[$idx] eq $new_search ) {
+        elsif ( $menu->[$idx] eq $new_search ) {
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
             $opt_set->__new_dir_search();

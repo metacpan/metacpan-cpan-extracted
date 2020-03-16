@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.247    2020-03-14
+        - Bugfixes in search&replace.
+        - Code refactoring.
+
 2.246    2020-03-13
         - Allow to change data source settings when creating a table or when inserting data.
 

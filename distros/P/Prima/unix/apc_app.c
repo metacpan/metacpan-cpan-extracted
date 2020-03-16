@@ -217,11 +217,29 @@ init_x11( char * error_buf )
 		"_NET_WM_STATE_MODAL",
 		"_NET_SUPPORTED",
 		"_NET_WM_STATE_MAXIMIZED_HORIZ",
-		"text/plain;charset=UTF-8",
+		"text/plain;charset=utf-8",
 		"_NET_WM_STATE_STAYS_ON_TOP",
 		"_NET_CURRENT_DESKTOP",
 		"_NET_WORKAREA",
-		"_NET_WM_STATE_ABOVE"
+		"_NET_WM_STATE_ABOVE",
+		"XdndEnter",
+		"XdndPosition",
+		"XdndStatus",
+		"XdndTypeList",
+		"XdndActionCopy",
+		"XdndDrop",
+		"XdndLeave",
+		"XdndFinished",
+		"XdndSelection",
+		"XdndProxy",
+		"XdndAware",
+		"XdndActionMove",
+		"XdndActionLink",
+		"XdndActionAsk",
+		"XdndActionPrivate",
+		"XdndActionList",
+	 	"XdndActionDescription",
+		"text/plain"
 	};
 	char hostname_buf[256], *hostname = hostname_buf, *env;
 
@@ -624,7 +642,18 @@ free_gc_pool( struct gc_head *head)
 void
 window_subsystem_done( void)
 {
+	int i;
 	if ( !DISP) return;
+
+	for ( i = 0; i < sizeof(guts.xdnd_pointers) / sizeof(CustomPointer); i++) {
+		CustomPointer *cp = guts.xdnd_pointers + i;
+		if ( cp-> cursor )
+			XFreeCursor( DISP, cp->cursor);
+#ifdef HAVE_X11_XCURSOR_XCURSOR_H
+		if ( cp-> xcursor != NULL)
+			XcursorImageDestroy(cp-> xcursor);
+#endif
+	}
 
 	if ( guts. hostname. value) {
 		XFree( guts. hostname. value);
@@ -658,6 +687,7 @@ window_subsystem_done( void)
 	if (guts.clipboards)         hash_destroy( guts.clipboards, false);
 	if (guts.clipboard_xfers)    hash_destroy( guts.clipboard_xfers, false);
 	prima_cleanup_font_subsystem();
+	bzero(&guts, sizeof(guts));
 }
 
 static int

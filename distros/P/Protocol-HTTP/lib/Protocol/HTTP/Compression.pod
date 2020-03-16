@@ -1,0 +1,47 @@
+=head1 NAME
+
+Protocol::HTTP::Compression - HTTP parser compression constants
+
+=head1 SYNOPSIS
+
+    use Protocol::HTTP;
+
+    $request->allow_compression(Protocol::HTTP::Compression::gzip);
+
+=head1 DESCRIPTION
+
+Contains constants for compression methods and levels.
+
+=head1 CONSTANTS
+
+=head2 identity
+
+No compression. This is the default value if no compressions are specified.
+
+=head2 gzip
+
+Gzip compression
+
+=head2 brotli
+
+L<Brotli|https://en.wikipedia.org/wiki/Brotli> compression.
+Implementation is not included in C<Protocol::HTTP>. To use it, you need to install L<Protocol::HTTP::Compression::Brotli>
+
+=head2 deflate
+
+LZ77 compression. Implementation is not included in C<Protocol::HTTP>
+
+
+=head2 LEVEL_MIN
+
+Minimal level of compression (faster)
+
+=head2 LEVEL_OPTIMAL
+
+Optimal level of compression
+
+=head2 LEVEL_MAX
+
+Maximum level of compression (slower)
+
+=cut

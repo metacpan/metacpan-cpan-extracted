@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean -also => ['_exp'];
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Dist::Zilla::Plugin::PodWeaver;
 use List::Util qw( first );
@@ -52,7 +52,7 @@ sub configure {
     my @weaver_config = (
         '@CorePrep',
         [ '-SingleEncoding' => { encoding => 'UTF-8' } ],
-        [ '-Transformer' => List     => { transformer => 'List' } ],
+        [ '-Transformer'    => List => { transformer => 'List' } ],
         [ '-Transformer' => Verbatim => { transformer => 'Verbatim' } ],
         [ 'Region'       => 'header' ],
         'Name',
@@ -70,7 +70,7 @@ sub configure {
         [ $self->_support_section ],
         [
             'AllowOverride' => 'allow override SUPPORT' => {
-                header_re      => '^(SUPPORT|BUGS)\b',
+                header_re      => '^(?:SUPPORT|BUGS)\b',
                 action         => 'prepend',
                 match_anywhere => 0,
             },
@@ -96,6 +96,13 @@ sub configure {
                 header       => 'COPYRIGHT AND ' . $license_filename,
                 license_file => $license_filename,
             }
+        ],
+        [
+            'AllowOverride' => 'allow override Legal' => {
+                header_re      => '^(?:COPYRIGHT(?: AND LICEN[CS]E)?)\b',
+                action         => 'replace',
+                match_anywhere => 0,
+            },
         ],
         [ 'Region' => 'footer' ],
     );
@@ -214,7 +221,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 DONATIONS
             ]
         },
@@ -315,7 +322,7 @@ Pod::Weaver::PluginBundle::DROLSKY - A plugin bundle for pod woven by DROLSKY
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -507,7 +514,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2019 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

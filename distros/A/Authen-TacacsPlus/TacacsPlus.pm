@@ -17,7 +17,7 @@ require DynaLoader;
 @EXPORT_OK = qw(
 	TACPLUS_CLIENT
 );
-$VERSION = '0.27';
+$VERSION = '0.28';
 
 sub new
 {
@@ -50,10 +50,10 @@ if ($res<0) {
                                $h{'Key'},
                                $h{'Timeout'} ? $h{'Timeout'} : 15
                               );
-	$self->{'open'} = 1 if ($res >= 0);
         last if ($res >= 0);
     }
 }
+$self->{'open'} = 1 if ($res >= 0);
 undef $self if ($res < 0);
 $self;
 }
@@ -146,15 +146,15 @@ Authen::TacacsPlus - Perl extension for authentication using tacacs+ server
 
   $tac = new Authen::TacacsPlus(Host=>$server,
 			Key=>$key,
-			[Port=>'tacacs'],
-			[Timeout=>15]);
+			Port=>'tacacs',
+			Timeout=>15);
 
   or
 
   $tac = new Authen::TacacsPlus(
-     [ Host=>$server1, Key=>$key1, [Port=>'tacacs'], [Timeout=>15] ],
-     [ Host=>$server2, Key=>$key2, [Port=>'tacacs'], [Timeout=>15] ],
-     [ Host=>$server3, Key=>$key3, [Port=>'tacacs'], [Timeout=>15] ],
+     [ Host=>$server1, Key=>$key1, Port=>'tacacs', Timeout=>15 ],
+     [ Host=>$server2, Key=>$key2, Port=>'tacacs', Timeout=>15 ],
+     [ Host=>$server3, Key=>$key3, Port=>'tacacs', Timeout=>15 ],
      ...  );
 
   $tac->authen($username,$passwords);
@@ -170,8 +170,8 @@ Authen::TacacsPlus allows you to authenticate using tacacs+ server.
 
   $tac = new Authen::TacacsPlus(Host=>$server,      
  	                Key=>$key,          
-                        [Port=>'tacacs'],   
-                        [Timeout=>15]);     
+                        Port=>'tacacs',   
+                        Timeout=>15);     
 
 Opens new session with tacacs+ server on host $server, encrypted
 with key $key. Undefined object is returned if something wrong

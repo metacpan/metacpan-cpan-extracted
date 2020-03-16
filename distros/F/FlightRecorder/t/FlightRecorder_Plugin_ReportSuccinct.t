@@ -43,6 +43,12 @@ method: generate
 
 =cut
 
+=libraries
+
+Types::Standard
+
+=cut
+
 =attributes
 
 level: rw, opt, Enum[qw(debug info warn error fatal)]
@@ -106,6 +112,7 @@ $subs->example(-1, 'generate', 'method', fun($tryable) {
   my $year = qr/\d{4}/;
   my $context = qr/\[\d{4}\]/;
   my $level = qr/\@debug/;
+  my $quote = qr/['"]*/;
   my $process = qr/\[\d+\]/;
   my $begin = qr/BEGIN/;
 
@@ -132,7 +139,7 @@ $subs->example(-1, 'generate', 'method', fun($tryable) {
     qr/\{\n\s\scontext: 'main',\n\s\smessage: 'main ended'\n\}/;
 
   unlike $result, qr/package: 'main'/;
-  unlike $result, qr/process: \d+/;
+  unlike $result, qr/process: $quote\d+$quote/;
   unlike $result, qr/subroutine: \(eval\)/;
   unlike $result, qr/timestamp: \d+/;
   unlike $result, qr/version: 'no-version'/;

@@ -12,7 +12,7 @@ use WebService::Hexonet::Connector::ResponseTemplate;
 use WebService::Hexonet::Connector::ResponseTemplateManager;
 use WebService::Hexonet::Connector::SocketConfig;
 
-use version 0.9917; our $VERSION = version->declare('v2.2.5');
+use version 0.9917; our $VERSION = version->declare('v2.3.0');
 
 1;
 
@@ -37,7 +37,7 @@ WebService::Hexonet::Connector - Connector library for the insanely fast L<HEXON
 	# NOTE: We suggest to use cpanm (App::cpanminus) for several reasons.
 
 Check the Example provided at L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient>.
-	
+
 =head1 DESCRIPTION
 
 This module is used as namespace.

@@ -1,0 +1,9 @@
+Revision history for GraphQL-Client.
+
+0.601     2020-03-15 20:38:38-06:00 MST7MDT
+  * Rename "class" attribute to "transport_class".
+  * Minor pod fixups.
+
+0.600     2020-03-15 18:08:57-06:00 MST7MDT
+  * Initial public release.
+

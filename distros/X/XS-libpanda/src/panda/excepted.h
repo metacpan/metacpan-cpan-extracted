@@ -27,27 +27,11 @@ struct excepted {
         ::new (&_val) T();
     }
 
-    excepted (const excepted& ex) {
-        if (ex._has_val) construct_val(ex._val);
-        else {
-            construct_err(ex._err);
-            ex._checked = true;
-        }
-    }
-
     excepted (excepted&& ex) {
         if (ex._has_val) construct_val(std::move(ex._val));
         else {
             construct_err(std::move(ex._err));
-            ex._checked = true;
-        }
-    }
-
-    template <class T2, class E2>
-    explicit excepted (const excepted<T2,E2>& ex) {
-        if (ex._has_val) construct_val(ex._val);
-        else {
-            construct_err(ex._err);
+            _checked = ex._checked;
             ex._checked = true;
         }
     }
@@ -57,6 +41,7 @@ struct excepted {
         if (ex._has_val) construct_val(std::move(ex._val));
         else {
             construct_err(std::move(ex._err));
+            _checked = ex._checked;
             ex._checked = true;
         }
     }
@@ -86,19 +71,12 @@ struct excepted {
         }
     }
 
-    excepted& operator= (const excepted& ex) {
-        if (ex._has_val) set_val(ex._val);
-        else {
-            set_err(ex._err);
-            ex._checked = true;
-        }
-        return *this;
-    }
-
     excepted& operator= (excepted&& ex) {
+        if (!_has_val && !_checked) exthrow(_err);
         if (ex._has_val) set_val(std::move(ex._val));
         else {
             set_err(std::move(ex._err));
+            _checked = ex._checked;
             ex._checked = true;
         }
         return *this;
@@ -293,27 +271,11 @@ struct excepted<void, E> {
 
     excepted () { _has_val = true; }
 
-    excepted (const excepted& ex) {
-        if (ex._has_val) _has_val = true;
-        else {
-            construct_err(ex._err);
-            ex._checked = true;
-        }
-    }
-
     excepted (excepted&& ex) {
         if (ex._has_val) _has_val = true;
         else {
             construct_err(std::move(ex._err));
-            ex._checked = true;
-        }
-    }
-
-    template <class E2>
-    explicit excepted (const excepted<void,E2>& ex) {
-        if (ex._has_val) _has_val = true;
-        else {
-            construct_err(ex._err);
+            _checked = ex._checked;
             ex._checked = true;
         }
     }
@@ -323,6 +285,7 @@ struct excepted<void, E> {
         if (ex._has_val) _has_val = true;
         else {
             construct_err(std::move(ex._err));
+            _checked = ex._checked;
             ex._checked = true;
         }
     }
@@ -347,19 +310,12 @@ struct excepted<void, E> {
         }
     }
 
-    excepted& operator= (const excepted& ex) {
-        if (ex._has_val) set_val();
-        else {
-            set_err(ex._err);
-            ex._checked = true;
-        }
-        return *this;
-    }
-
     excepted& operator= (excepted&& ex) {
+        if (!_has_val && !_checked) exthrow(_err);
         if (ex._has_val) set_val();
         else {
             set_err(std::move(ex._err));
+            _checked = ex._checked;
             ex._checked = true;
         }
         return *this;

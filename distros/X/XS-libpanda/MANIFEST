@@ -7,6 +7,7 @@ lib/XS/libpanda.pod
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+misc/mytest.pl
 misc/trun.plx
 src/panda/basic_string.h
 src/panda/basic_string_view.h

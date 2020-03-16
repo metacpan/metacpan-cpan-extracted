@@ -33,6 +33,7 @@ t/release-03-minimum-standards.t
 t/release-04-check-cpan-version.t
 t/release-05-changes-ver.t
 t/release-05-changes.t
+t/release-06-fastx-reader.t
 t/release-20_stdin.t
 t/release-21_bin.t
 t/release-22_csv.t

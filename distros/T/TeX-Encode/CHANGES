@@ -1,9 +1,33 @@
 ==================================================
-Changes from 2019-01-09 00:00:00 +0000 to present.
+Changes from 2019-03-16 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 2.007 at 2020-01-09 00:53:12 +0000
+version 2.008 at 2020-03-15 08:18:30 +0000
+------------------------------------------
+
+  Change: c75c5294b659a65046b78bfbde44a36dc8452018
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2020-03-14 23:22:00 +0000
+
+    Remove actually unused prerequisites
+
+    We haven't been using HTML::Entities, HTML::Parser or Pod::LaTeX
+    since v1.2. Remove them.
+
+    Fixes #8. 
+
+  Change: 53077862a86d17882d2e67fda400b958af5668f8
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2020-03-14 23:19:49 +0000
+
+    Delete README
+
+    We generate a README out of the POD, so no need to keep a separate
+    out-of-date README 
+
+------------------------------------------
+version 2.007 at 2020-01-09 00:50:27 +0000
 ------------------------------------------
 
   Change: 3aa926c801a0d5431245cddeb7d1341fb252cd41
@@ -24,22 +48,6 @@ version 2.006 at 2019-06-02 07:28:48 +0000
 
     Add dotless i and fix eth 
 
-------------------------------------------
-version 2.005 at 2019-01-28 21:11:26 +0000
-------------------------------------------
-
-  Change: f40732bcff481eac53d7594454c7ec02c8ab7d84
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2019-01-28 22:11:26 +0000
-
-    don't fail if $check eq ""
-
-    First reported in #4, Encode 2.99 now calls us with a $check = "" for
-    some reason..
-
-    As a temporary work around, treat $check eq "" as if it were $check
-    == 0. 
-
 =================================================
-Plus 15 releases after 2019-01-09 00:00:00 +0000.
+Plus 16 releases after 2019-03-16 00:00:00 +0000.
 =================================================

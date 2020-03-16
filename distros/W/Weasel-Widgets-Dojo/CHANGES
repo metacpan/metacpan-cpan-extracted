@@ -1,3 +1,7 @@
+0.06  2020-03-14
+  - Move 01-critic.t to xt/ in order to stop CPANtesters
+    from failing
+
 0.05  2019-09-20
   - Add missing dependency declarations as reported by Kwalitee
 

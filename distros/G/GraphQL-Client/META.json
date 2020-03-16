@@ -1,0 +1,150 @@
+{
+   "abstract" : "A GraphQL client",
+   "author" : [
+      "Charles McGarvey <chazmcgarvey@brokenzipper.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GraphQL-Client",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "App::FatPacker" : "0",
+            "CPAN::Meta" : "0",
+            "Capture::Tiny" : "0",
+            "Config" : "0",
+            "File::pushd" : "0",
+            "Getopt::Long" : "0",
+            "MetaCPAN::API" : "0",
+            "Module::CoreList" : "0",
+            "Path::Tiny" : "0",
+            "Perl::Strip" : "0"
+         },
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::ConsistentVersionTest" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::RemovePhasedPrereqs" : "0",
+            "Dist::Zilla::Plugin::Run::Release" : "0",
+            "Dist::Zilla::PluginBundle::Author::CCM" : "0",
+            "Dist::Zilla::PluginBundle::Filter" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::ConsistentVersion" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "HTTP::Tiny" : "0",
+            "Pod::Usage" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::AnyUA" : "0",
+            "HTTP::AnyUA::Util" : "0",
+            "JSON::MaybeXS" : "0",
+            "Module::Load" : "0",
+            "Scalar::Util" : "0",
+            "namespace::clean" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         },
+         "suggests" : {
+            "Data::Dumper" : "0",
+            "Text::CSV" : "0",
+            "Text::Table::Any" : "0",
+            "YAML" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Future" : "0",
+            "HTTP::AnyUA::Backend" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "GraphQL::Client" : {
+         "file" : "lib/GraphQL/Client.pm",
+         "version" : "0.601"
+      },
+      "GraphQL::Client::Error" : {
+         "file" : "lib/GraphQL/Client.pm",
+         "version" : "0.601"
+      },
+      "GraphQL::Client::http" : {
+         "file" : "lib/GraphQL/Client/http.pm",
+         "version" : "0.601"
+      },
+      "GraphQL::Client::https" : {
+         "file" : "lib/GraphQL/Client/https.pm",
+         "version" : "0.601"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chazmcgarvey/graphql-client/issues"
+      },
+      "homepage" : "https://github.com/chazmcgarvey/graphql-client",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/chazmcgarvey/graphql-client.git",
+         "web" : "https://github.com/chazmcgarvey/graphql-client"
+      }
+   },
+   "version" : "0.601",
+   "x_authority" : "cpan:CCM",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.15",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

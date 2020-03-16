@@ -526,7 +526,7 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 0.92
+version 1.0.0
 
 =head1 SYNOPSIS
 
@@ -732,7 +732,7 @@ Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Andrea Telatin.
+This software is Copyright (c) 2018-2020 by Andrea Telatin.
 
 This is free software, licensed under:
 

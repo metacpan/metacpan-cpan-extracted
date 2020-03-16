@@ -1,6 +1,20 @@
-7DRL 2020 - start time 2020-02-29 18:00 UTC
+Revision history for Game::Xomb
 
-1.00    2020-03-07 15:45
+1.01    2020-03-14 03:25 UTC
+    * switch RNG to Jenkins Small Fast -- "A small noncryptographic PRNG"
+    * save keystrokes to file and support replay from that
+    * cleanup map generation logic. now possible for gems to
+      generate on top of gates, in acid, monsters atop rubble, the
+      player in acid, etc
+    * add some map generation sanity tests (t/mapgen.t)
+    * custom features for (the optional) level 5 instead of simply
+      duplicating level 4 (L5 is now more difficult)
+    * rework Fungi due to $iters and distance() differences; Fungi
+      splash confines itself to FOV; Fungi cannot zap through walls
+    * various other fixes, improvements, and regressions
+
+1.00    2020-03-07 15:45 UTC
+    * 7DRL 2020 release version
     * bugfix: remove debug logfile redirect
     * examine mode shows range and coordinate details
     * make Fungi more relevant by having them camp resources
@@ -14,3 +28,5 @@
 
 0.20    2020-03-06 17:56 UTC
     * the first at least not hopelessly buggy release
+
+7DRL 2020 - start time 2020-02-29 18:00 UTC

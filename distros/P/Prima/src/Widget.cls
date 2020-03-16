@@ -2,6 +2,12 @@
 #  Main widget description
 #
 
+local @DNDResp
+{
+	int action;
+	Handle counterpart;
+}
+
 object Prima::Widget( Prima::Drawable)
 {
 #	user variables
@@ -9,6 +15,7 @@ object Prima::Widget( Prima::Drawable)
 	Handle    currentWidget;	    # current widget pointer
 	int       cursorLock;               # cursor lock count
 	NPoint    designScale;              # font width and height for view design
+	char   *  dndAware;                 # NULL for no, "1" for all formats, other for selected
 	char   *  helpContext;              # help context string
 	SV     *  hint;                     # hint tag text
 	int       lockCount;                # lock count
@@ -57,6 +64,7 @@ object Prima::Widget( Prima::Drawable)
 	property  Point  cursorSize;
 	property  Bool   cursorVisible;
 	property  NPoint designScale;
+	property  SV*    dndAware;
 	property  Bool   enabled;
 	property  int    geometry;
 	property  int    geomHeight;
@@ -122,6 +130,7 @@ object Prima::Widget( Prima::Drawable)
 	c_only   Bool     custom_paint();
 	method   void     detach( Handle objectHandle, Bool kill);
 	method   void     done();
+	method   DNDResp  dnd_start(int dnd_actions = dndCopy, Bool default_pointers = 1);
 	method   void     end_paint();
 	method   void     end_paint_info();
 	method   Bool     exposed()                       => apc_widget_is_exposed;

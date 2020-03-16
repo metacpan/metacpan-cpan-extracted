@@ -1,15 +1,16 @@
 package Template::Liquid::Document;
-our $VERSION = '1.0.18';
-require Template::Liquid::Variable;
-require Template::Liquid::Utility;
+our $VERSION = '1.0.19';
 use strict;
 use warnings;
+use Template::Liquid::Variable;
+use Template::Liquid::Utility;
 #
 sub new {
     my ($class, $args) = @_;
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing template argument',
-                                   fatal   => 1
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => (),
+                                   message  => 'Missing template argument',
+                                   fatal    => 1
         }
         if !defined $args->{'template'};
     return
@@ -73,8 +74,11 @@ NODE: while (my $token = shift @{$tokens}) {
                 );
             }
             else {
-                raise Template::Liquid::Error {type => 'Syntax',
-                                         message => 'Unknown tag: ' . $token};
+                raise Template::Liquid::Error {
+                                           type     => 'Syntax',
+                                           template => $s->{template},
+                                           message => 'Unknown tag: ' . $token
+                };
             }
         }
         elsif ($token =~ $Template::Liquid::Utility::VarMatch) {
@@ -106,6 +110,14 @@ NODE: while (my $token = shift @{$tokens}) {
         }
         else {
             push @{$s->{'nodelist'}}, $token;
+        }
+        {    # Move the cursor
+            my $x  = ($token =~ m[(\n)]g);
+            my $nl = $token =~ tr/\n//;
+            $s->{template}{line} += $nl;
+            $s->{template}{column} = $nl
+                ? rindex $token, "\n"
+                : $s->{template}{column} + length $token;
         }
     }
     return $s;

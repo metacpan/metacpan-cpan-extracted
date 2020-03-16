@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.246';
+our $VERSION = '2.247';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -162,15 +162,15 @@ sub run {
             print clear_screen();
         }
         else {
-            my $choices_plugins = [ undef, map { "- $_" } @{$sf->{o}{G}{plugins}} ];
+            my $menu_plugins = [ undef, map( "- $_", @{$sf->{o}{G}{plugins}} ) ];
             # Choose
             my $idx_plugin = $tc->choose(
-                $choices_plugins,
+                $menu_plugins,
                 { %{$sf->{i}{lyt_v_clear}}, prompt => 'DB Plugin: ', index => 1, default => $old_idx_plugin,
                   undef => $sf->{i}{_quit} }
             );
             if ( defined $idx_plugin ) {
-                $plugin = $choices_plugins->[$idx_plugin];
+                $plugin = $menu_plugins->[$idx_plugin];
             }
             if ( ! defined $plugin ) {
                 last PLUGIN;
@@ -248,15 +248,15 @@ sub run {
                     $back = $auto_one ? $sf->{i}{quit} : $sf->{i}{back};
                 }
                 my $prompt = 'Choose Database:';
-                my $choices_db = [ undef, @databases ];
+                my $menu_db = [ undef, @databases ];
                 # Choose
                 my $idx_db = $tc->choose(
-                    $choices_db,
+                    $menu_db,
                     { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $old_idx_db, undef => $back }
                 );
                 $db = undef;
                 if ( defined $idx_db ) {
-                    $db = $choices_db->[$idx_db];
+                    $db = $menu_db->[$idx_db];
                 }
                 if ( ! defined $db ) {
                     next PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
@@ -357,14 +357,14 @@ sub run {
                 else {
                     my $back   = $auto_one == 2 ? $sf->{i}{_quit} : $sf->{i}{_back};
                     my $prompt = $db_string . ' - choose Schema:';
-                    my $choices_schema = [ undef, @schemas ];
+                    my $menu_schema = [ undef, @schemas ];
                     # Choose
                     my $idx_sch = $tc->choose(
-                        $choices_schema,
+                        $menu_schema,
                         { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $old_idx_sch, undef => $back }
                     );
                     if ( defined $idx_sch ) {
-                        $schema = $choices_schema->[$idx_sch];
+                        $schema = $menu_schema->[$idx_sch];
                     }
                     if ( ! defined $schema ) {
                         $dbh->disconnect();
@@ -434,20 +434,20 @@ sub run {
                         $table = delete $sf->{redo_table};
                     }
                     else {
-                        my $choices_table = [ $hidden, undef, map( "- $_", sort @$user_tables ) ];
-                        push @$choices_table, map( "  $_", sort @$sys_tables ) if $sf->{o}{G}{metadata};
-                        push @$choices_table, $from_subquery                   if $sf->{o}{enable}{m_derived};
-                        push @$choices_table, $join                            if $sf->{o}{enable}{join};
-                        push @$choices_table, $union                           if $sf->{o}{enable}{union};
-                        push @$choices_table, $db_setting                      if $sf->{o}{enable}{db_settings};
+                        my $menu_table = [ $hidden, undef, map( "- $_", sort @$user_tables ) ];
+                        push @$menu_table, map( "  $_", sort @$sys_tables ) if $sf->{o}{G}{metadata};
+                        push @$menu_table, $from_subquery                   if $sf->{o}{enable}{m_derived};
+                        push @$menu_table, $join                            if $sf->{o}{enable}{join};
+                        push @$menu_table, $union                           if $sf->{o}{enable}{union};
+                        push @$menu_table, $db_setting                      if $sf->{o}{enable}{db_settings};
                         my $back = $auto_one == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
                         # Choose
                         my $idx_tbl = $tc->choose(
-                            $choices_table,
+                            $menu_table,
                             { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
                         );
                         if ( defined $idx_tbl ) {
-                            $table = $choices_table->[$idx_tbl];
+                            $table = $menu_table->[$idx_tbl];
                         }
                         if ( ! defined $table ) {
                             next SCHEMA         if @schemas                > 1;
@@ -616,13 +616,13 @@ sub __create_drop_or_attach {
             return;
         }
         my @pre = ( $hidden, undef );
-        my $choices = [ @pre, @entries ];
+        my $menu = [ @pre, @entries ];
         # Choose
         my $idx = $tc->choose(
-            $choices,
+            $menu,
             { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx, undef => '  <=' }
         );
-        if ( ! defined $idx || ! defined $choices->[$idx] ) {
+        if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
@@ -632,7 +632,7 @@ sub __create_drop_or_attach {
             }
             $old_idx = $idx;
         }
-        my $choice = $choices->[$idx];
+        my $choice = $menu->[$idx];
         if ( $choice eq $hidden ) {
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
@@ -747,7 +747,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.246
+Version 2.247
 
 =head1 DESCRIPTION
 

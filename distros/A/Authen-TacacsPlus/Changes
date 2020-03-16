@@ -69,3 +69,14 @@ Revision history for Perl extension Authen::TacacsPlus.
 0.27 2020-02-09  Mike McCauley
      - Patch from Jacob Farkas via RT to allow building under on Alpine Linux
      under Docker on armv7l, and possibly others
+
+0.28 2020-03-14 Mike McCauley
+     - Patch from Heikki Vatiainen:
+     - File descriptor leak introduced in release 0.25 where check for open 
+     connection was added to TacacsPlus::close() before calling tacpluslib's 
+     deinit_tac_session()
+     - File descriptor leak in tacpluslib's init_tac_session where close() 
+     was not called for the newly created socket if, for example, destination 
+     host was unreachable
+     - Port and Timeout TacacsPlus::new() parameters were documented 
+     incorrectly. The are not passed within array references.

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -18,7 +18,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 54;
+use Test::More tests => 56;
 use Locale::TextDomain ('App-Chart');
 
 use lib 't';
@@ -28,7 +28,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 require App::Chart;
 
 
-my $want_version = 267;
+my $want_version = 269;
 is ($App::Chart::VERSION, $want_version, 'VERSION variable');
 is (App::Chart->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { App::Chart->VERSION($want_version); 1 },
@@ -37,6 +37,16 @@ is (App::Chart->VERSION,  $want_version, 'VERSION class method');
   ok (! eval { App::Chart->VERSION($check_version); 1 },
       "VERSION class check $check_version");
 }
+
+#------------------------------------------------------------------------------
+# adate_to_ymd()
+# tdate_to_ymd()
+
+is_deeply ([App::Chart::adate_to_ymd(0)], [1970,1,5],
+           "adate 0 is 5 Jan 1970");
+is_deeply ([App::Chart::tdate_to_ymd(0)], [1970,1,5],
+           "tdate 0 is 5 Jan 1970");
+
 
 #------------------------------------------------------------------------------
 # min_maybe()
@@ -139,5 +149,7 @@ is (App::Chart::count_decimals('.50'), 2);
   my $n2 = App::Chart::number_formatter();
   is ($n1, $n2);
 }
+
+#------------------------------------------------------------------------------
 
 exit 0;

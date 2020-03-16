@@ -5,8 +5,6 @@ use Env qw/@PATH/;
 use XS::Install;
 use Alien::cmake3;
 
-print "The module expects zlib and libelf (i.e. libelf-dev debian package) to be installed\n";
-
 my $tag     = '20200114';
 my $src_dir = "libdwarf";
 my $bdir    = "$src_dir/build";

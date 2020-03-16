@@ -16,7 +16,7 @@ use POSIX;
 
 Readonly my $SOCKETTIMEOUT => 300;    # 300s or 5 min
 
-use version 0.9917; our $VERSION = version->declare('v2.2.5');
+use version 0.9917; our $VERSION = version->declare('v2.3.0');
 
 my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance();
 
@@ -56,9 +56,19 @@ sub getPOSTData {
     if ( ( ref $cmd ) eq 'HASH' ) {
         foreach my $key ( sort keys %{$cmd} ) {
             if ( defined $cmd->{$key} ) {
-                my $val = $cmd->{$key};
-                $val =~ s/[\r\n]//gmsx;
-                $tmp .= "${key}=${val}\n";
+                if ( ref( $cmd->{$key} ) eq 'ARRAY' ) {
+                    my @val = @{ $cmd->{$key} };
+                    my $idx = 0;
+                    for my $str (@val) {
+                        $str =~ s/[\r\n]//gmsx;
+                        $tmp .= "${key}${idx}=${str}\n";
+                        $idx++;
+                    }
+                } else {
+                    my $val = $cmd->{$key};
+                    $val =~ s/[\r\n]//gmsx;
+                    $tmp .= "${key}=${val}\n";
+                }
             }
         }
     }
@@ -594,11 +604,13 @@ Usage may lead to costs. BUT - are system is a prepaid system.
 As long as you don't have charged your account, you cannot order.
 This is the default!
 Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining.
- 
+
 =item C<_toUpperCaseKeys( $hash )>
 
 Private method. Converts all keys of the given hash into upper case letters.
 Returns a hash.
+
+=back
 
 =head1 LICENSE AND COPYRIGHT
 

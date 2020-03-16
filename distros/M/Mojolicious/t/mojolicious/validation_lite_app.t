@@ -82,6 +82,11 @@ ok !$v->in('c')->is_valid, 'not valid';
 is_deeply $v->output, {}, 'right result';
 ok $v->has_error, 'has error';
 
+# Empty string
+$v = $t->app->validation->input({foo => ''});
+ok $v->optional('foo')->is_valid, 'valid';
+is_deeply $v->output, {foo => ''}, 'right result';
+
 # Equal to
 $v = $t->app->validation->input({foo => 'bar', baz => 'bar', yada => 'yada'});
 ok $v->optional('foo')->equal_to('baz')->is_valid, 'valid';
@@ -179,6 +184,11 @@ ok $v->has_error('baz'), 'has error';
 is_deeply $v->output, {foo => 'bar'}, 'right result';
 ok $v->has_error, 'has error';
 is_deeply $v->error('yada'), [qw(size 1 5 10)], 'right error';
+ok $v->required('foo')->size(1, undef)->is_valid, 'valid';
+ok !$v->required('foo')->size(4, undef)->is_valid, 'not valid';
+ok $v->required('foo')->size(undef, 4)->is_valid, 'valid';
+ok $v->required('foo')->size(undef, 3)->is_valid, 'valid';
+ok !$v->required('foo')->size(undef, 2)->is_valid, 'not valid';
 
 # Upload
 $v = $t->app->validation->input({
@@ -220,8 +230,8 @@ ok !$v->optional('missing', 'trim')->is_valid, 'not valid';
 ok $v->optional('baz', 'trim')->like(qr/^\d$/)->is_valid, 'valid';
 is_deeply $v->output, {foo => 'bar', baz => [0, 1]}, 'right result';
 $v = $t->app->validation->input({nothing => '  ', more => [undef]});
-ok !$v->required('nothing', 'trim')->is_valid, 'not valid';
-is_deeply $v->output, {}, 'right result';
+ok $v->required('nothing', 'trim')->is_valid, 'valid';
+is_deeply $v->output, {nothing => ''}, 'right result';
 ok $v->required('nothing')->is_valid, 'valid';
 is_deeply $v->output, {nothing => '  '}, 'right result';
 ok !$v->optional('more', 'trim')->is_valid, 'not valid';
@@ -236,12 +246,13 @@ is_deeply $v->output, {foo => ['foo="bar"', 'foo="baz"']}, 'right result';
 # Multiple empty values
 $v = $t->app->validation;
 ok !$v->has_data, 'no data';
-$v->input({foo => ['', 'bar', ''], bar => ['', 'baz', '']});
+$v->input({foo => ['', 'bar', ''], bar => ['', 'baz', undef]});
 ok $v->has_data, 'has data';
-ok !$v->required('foo')->is_valid, 'not valid';
-is_deeply $v->output, {}, 'right result';
+ok $v->required('foo')->is_valid, 'valid';
+ok !$v->required('bar')->is_valid, 'not valid';
+is_deeply $v->output, {foo => ['', 'bar', '']}, 'right result';
 ok $v->has_error, 'has error';
-is_deeply $v->error('foo'), ['required'], 'right error';
+is_deeply $v->error('bar'), ['required'], 'right error';
 
 # "0"
 $v = $t->app->validation->input({0 => 0});

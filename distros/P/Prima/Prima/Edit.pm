@@ -114,6 +114,7 @@ sub profile_default
 		cursorX           => 0,
 		cursorY           => 0,
 		cursorWrap        => 0,
+		dndAware          => "Text",
 		insertMode        => 0,
 		hiliteNumbers     => cl::Green,
 		hiliteQStrings    => cl::LightBlue,
@@ -478,6 +479,10 @@ sub reset_syntaxer
 			\$_[2] = \\\@a;
 		};
 SYNTAXER
+		if ( $@) {
+			warn "Error compiling highlighting regexes: $@\n";
+			$self-> {syntaxer} = sub { $_[2] = [ length($_[1]), cl::Fore ] };
+		}
 	}
 }
 
@@ -513,28 +518,58 @@ sub _syntax_entry
 
 sub draw_colorchunk
 {
-	my ( $self, $canvas, $chunk, $i, $x, $y, $clr) = @_;
-	my $sd = $self-> {syntax}-> [$i];
-	unless ( defined $sd) {
-		$self-> notify(q(ParseSyntax), $chunk, $sd);
-		$sd = $self-> {syntax}-> [$i] = $self->_syntax_entry($chunk, $sd);
+	my ( $self, $canvas, $text, $i, $x, $y, $clr) = @_;
+
+	my ($cut_ofs, $cut_len);
+	if ( $self->{wordWrap} ) {
+		my $cm = $self-> {chunkMap};
+		my $i3 = $i * 3;
+		$cut_ofs = $$cm[$i3];
+		$cut_len = $$cm[$i3 + 1] + $cut_ofs;
+		$i = $$cm[$i3 + 2];
+		$text = $self->{lines}->[$i];
+	} else {
+		$cut_ofs = 0;
+		$cut_len = length($text);
 	}
 
-	my $visual = $sd->[0] // $chunk;
+	my $sd = $self-> {syntax}-> [$i];
+	unless ( defined $sd) {
+		$self-> notify(q(ParseSyntax), $text, $sd);
+		$sd = $self-> {syntax}-> [$i] = $self->_syntax_entry($text, $sd);
+	}
+	$text = $sd->[0] if defined $sd->[0];
+
+	if (1 == @$sd) {
+		$canvas-> color($clr);
+		$canvas-> text_out( substr($text, $cut_ofs, $cut_len - $cut_ofs), $x, $y);
+		return;
+	}
 
 	my $ofs = 0;
 	for ( my $j = 1; $j <= $#$sd; $j += 2) {
 		my $len     = $$sd[$j];
-		my $substr  = substr( $visual, $ofs, $len);
-		$substr    =~ s/\t/$self->{tabs}/g;
-		my $width  = $self-> {fixed} ?
-			( length( $substr) * $self-> {averageWidth}) :
-			$self-> get_text_width( $substr);
+		if ( $ofs + $len > $cut_ofs ) {
+			if ( $ofs + $len > $cut_len ) {
+				$len = $cut_len - $ofs;
+				last if $len <= 0;
+			}
+			if ( $ofs < $cut_ofs ) {
+				$len -= $cut_ofs - $ofs;
+				$ofs = $cut_ofs;
+			}
+			my $substr  = substr( $text, $ofs, $len);
+			$substr    =~ s/\t/$self->{tabs}/g;
+			my $width  = $self-> {fixed} ?
+				( length( $substr) * $self-> {averageWidth}) :
+				$self-> get_text_width( $substr);
 
-		$canvas-> color(( $$sd[$j+1] == cl::Fore) ? $clr : $$sd[$j+1]);
-		$canvas-> text_out( $substr, $x, $y);
-		$x   += $width;
+			$canvas-> color(( $$sd[$j+1] == cl::Fore) ? $clr : $$sd[$j+1]);
+			$canvas-> text_out( $substr, $x, $y);
+			$x   += $width;
+		}
 		$ofs += $len;
+		last if $ofs >= $cut_len;
 	}
 }
 
@@ -714,6 +749,11 @@ sub on_paint
 		}
 		$y -= $fh;
 	}
+
+	if ( my $dt = $self->{drop_transaction}) {
+		$self->color(cl::Fore);
+		$self-> bar(@$dt[0,1], $dt->[2]-1,$dt->[3]-1);
+	}
 }
 
 sub point2xy
@@ -759,9 +799,9 @@ sub on_mousedown
 	return if $btn != mb::Left && $btn != mb::Middle;
 	my @xy = $self-> point2xy( $x, $y);
 	return unless $xy[2];
-	$self-> cursor( @xy);
 
 	if ( $btn == mb::Middle) {
+		$self-> cursor( @xy);
 		my $cp = $::application-> bring('Primary');
 		return if !$cp || $self-> {readOnly};
 		$self-> insert_text( $cp-> text, 0);
@@ -769,7 +809,30 @@ sub on_mousedown
 		return;
 	}
 
+	my @sel = $self->selection;
+	if (
+		$self->has_selection &&
+		!$self->{drag_transaction} && 
+		!$self->{drop_transaction} && (
+			($sel[1] == $sel[3] && $xy[1] == $sel[1] && $xy[0] >= $sel[0] && $xy[0] < $sel[2]) ||
+			($xy[1] == $sel[1] && $xy[1] < $sel[3] && $xy[0] >= $sel[0]) ||
+			($xy[1] == $sel[3] && $xy[1] > $sel[1] && $xy[0] < $sel[2]) ||
+			($xy[1] > $sel[1] && $xy[1] < $sel[3])
+		)
+	) {
+		$self-> {drag_transaction} = 1;
+		my $act = $self-> begin_drag(
+			text       => $self->get_selected_text,
+			actions    => dnd::Copy|( $self->{readOnly} ? 0 : dnd::Move),
+			self_aware => 0,
+		);
+		$self-> {drag_transaction} = 0;
+		$self-> delete_block if !$self->{readOnly} && $act == dnd::Move;
+		$self-> cancel_block if $act < 0;
+		return;
+	}
 
+	$self-> cursor( @xy);
 	$self-> {mouseTransaction} = 1;
 	if ( $self-> {persistentBlock} && $self-> has_selection) {
 		$self-> {mouseTransaction} = 2;
@@ -961,6 +1024,40 @@ sub on_change { $_[0]-> {modified} = 1;}
 
 sub on_parsesyntax { $_[0]-> {syntaxer}-> (@_); }
 
+sub on_dragbegin
+{
+	my $self = shift;
+	$self->{drop_transaction} = [];
+}
+
+sub on_dragover
+{
+	my ($self, $clipboard, $action, $mod, $x, $y, $ref) = @_;
+	$ref->{allow} = 1;
+	my $dt;
+	if ( $dt = $self->{drop_transaction} and @$dt) {
+		$self-> invalidate_rect(@$dt);
+	}
+	$self-> cursor( $self-> point2xy( $x, $y));
+	my @cp = $self->cursorPos;
+	my @cs = $self->cursorSize;
+	$self->{drop_transaction} = [@cp, $cp[0] + $self->{defcw}, $cp[1] + $cs[1]];
+	$self-> invalidate_rect(@{ $self->{drop_transaction} });
+}
+
+sub on_dragend
+{
+	my ($self, $clipboard, $action, $mod, $x, $y, $ref) = @_;
+	my $dt;
+	if ( $dt = $self->{drop_transaction} and @$dt ) {
+		$self-> invalidate_rect(@$dt);
+	}
+	delete $self->{drop_transaction};
+	return unless $clipboard;
+	my $cap = $clipboard->text;
+	$self->insert_text($cap) if defined $cap;
+}
+
 sub set_block_type
 {
 	my ( $self, $bt) = @_;
@@ -1020,7 +1117,8 @@ sub get_chunk
 	Carp::confess($index) if $index > $self-> {maxChunk};
 	if ( $self-> {wordWrap}) {
 		my $cm = $self-> {chunkMap};
-		return substr( $$ck[ $$cm[ $index * 3 + 2]], $$cm[ $index * 3], $$cm[ $index * 3 + 1]);
+		$index *= 3;
+		return substr( $$ck[ $$cm[$index + 2] ], $$cm[$index], $$cm[$index + 1]);
 	} else {
 		return $$ck[ $index];
 	}
@@ -1048,7 +1146,7 @@ sub get_line_dimension
 	return $y, 1 unless $self-> {wordWrap};
 	( undef, $y) = $self-> physical_to_logical( 0, $y);
 	my ($ret, $ix, $cm) = ( 0, $y * 3 + 2, $self-> {chunkMap});
-	$ret++, $ix += 3 while $$cm[ $ix] == $y;
+	$ret++, $ix += 3 while $ix < @$cm && $$cm[$ix] == $y;
 	return $y, $ret;
 }
 
@@ -1430,7 +1528,6 @@ sub set_word_wrap
 	my ( $self, $ww) = @_;
 	return if $ww == $self-> {wordWrap};
 	$self-> {wordWrap} = $ww;
-	$self-> syntaxHilite(0) if $ww;
 	$self-> reset;
 	$self-> reset_scrolls;
 	$self-> repaint;
@@ -1568,6 +1665,7 @@ sub visual_to_physical
 		my ( $lx, $ly ) = $self-> visual_to_logical($x, $y);
 		$x = $lx;
 		my $cm = $self->{chunkMap};
+		return 0 unless @$cm;
 		$l = substr($l, $offset = $$cm[$ly * 3], $$cm[$ly * 3 + 1]);
 	}
 
@@ -1586,6 +1684,7 @@ sub logical_to_physical
 	$y = $self-> {maxChunk} if $y > $self-> {maxChunk};
 	$y = 0  if $y < 0;
 	my $cm = $self-> {chunkMap};
+	return 0 unless @$cm;
 	my ( $ofs, $l, $nY) = ( $$cm[ $y * 3], $$cm[ $y * 3 + 1], $$cm[ $y * 3 + 2]);
 	$x = 0  if $x < 0;
 	$x = $l if $x > $l;
@@ -1608,6 +1707,7 @@ sub logical_to_visual
 	$y = $self-> {maxChunk} if $y > $self-> {maxChunk};
 	$y = 0  if $y < 0;
 	my $cm = $self-> {chunkMap};
+	return (0,0) unless @$cm;
 	my ( $ofs, $l, $nY) = ( $$cm[ $y * 3], $$cm[ $y * 3 + 1], $$cm[ $y * 3 + 2]);
 	$x = $l if $x < 0 || $x > $l;
 	return $x + $ofs, $nY;
@@ -2660,6 +2760,7 @@ sub find
 	my ( $self, $line, $x, $y, $replaceLine, $options) = @_;
 	$x ||= 0;
 	$y ||= 0;
+	$options //= 0;
 	my $maxY = $self-> {maxLine};
 	return if $y > $maxY || $maxY < 0;
 
@@ -2910,6 +3011,51 @@ a color value.
 Array of scalar pairs, that define character patterns to be highlighted.
 The first item in the pair is a perl regular expression; the second item is
 a color value.
+
+Note: these are tricky. Generally, they assume that whatever is captured in (),
+is highlighted, and that capturing parentheses match from the first character
+onwards.  So for simple matches like C< (\d+) > (digits) or C< (#.*) > this
+works fine. Things become more interesting if you need to check text after, or
+especially before the capture.  For this you need to make sure that whatever
+text is matched by a regexp, need not move C<pos> pointer as the regexes are
+looped over with C<\G> anchor prepended (i.e. starting each time from the
+position the previous regex left off), and with C</gc> flags (advancing C< pos
+> to the match length). Advancing the C<pos> will skip color highlighting on text after the
+capture but before end of the match - so you'll need look-ahead assertions, C< (?=pattern) >
+and C< (?!pattern) > (see L<perlre/"Lookaround Assertions"> ).
+
+For example, we have a string C< ABC123abc >, and we want to match 123 followed by abc.
+This won't work
+
+	hiliteREs => [
+		'(123)abc',cl::LightRed,
+		'(abc)', cl::LightGreen 
+	]
+
+while this will:
+
+	hiliteREs => [
+		'(123)(?=abc)',cl::LightRed,
+		'(abc)', cl::LightGreen 
+	]
+
+If you need to look behind, the corresponding assertions C< (?<=pattern) > and
+C< (?<!pattern) > could be used, but these are even more restrictive in that
+they only support fixed-width looks-behinds (NB: C< \K > won't work because of
+C< \G > either). That way, if we want to match 123 that follow ABC, this won't
+work:
+
+	hiliteREs =>  [
+		'(ABC)',cl::LightBlue,
+		'(?<=[ABC]+)(123)',cl::LightRed,
+	]
+
+while this will:
+
+	hiliteREs =>  [
+		'(ABC)',cl::LightBlue,
+		'(?<=[ABC]{3})(123)',cl::LightRed,
+	]
 
 =item mark MARK [ BLOCK_TYPE ]
 

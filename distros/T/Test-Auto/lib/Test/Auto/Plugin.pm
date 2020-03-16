@@ -9,7 +9,7 @@ use Data::Object::Attributes;
 use registry 'Test::Auto::Types';
 use routines;
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 # ATTRIBUTES
 

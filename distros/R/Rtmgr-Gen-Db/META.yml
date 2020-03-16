@@ -19,6 +19,9 @@ no_index:
     - t
     - inc
 requires:
+  DBI: '1.643'
+  Data::Dump: '1.23'
+  XML::RPC: '1.1'
   perl: '5.006'
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -288,7 +288,7 @@ You can write
     };
 
 All assigment operations in config files merge hashrefs if both left and right operands are hashrefs.
-Merge is done by L<Panda::Lib>'s C<merge> function with default flags, which does hash merging extremely fast.
+Merge is done by L<Data::Recursive>'s C<merge> function with default flags, which does hash merging extremely fast.
 
 If you really need to completely overwrite an existing hashref with a new value, use list assigment operator, because merging
 is only done for OP_SASSIGN, not for OP_AASSIGN.

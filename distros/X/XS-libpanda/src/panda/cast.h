@@ -14,8 +14,8 @@ namespace detail { namespace cast {
     DynCastCacheMap& get_map () {
         thread_local DynCastCacheMap* map;
         if (!map) {
-            thread_local DynCastCacheMap _map;
-            map = &_map;
+            thread_local struct { DynCastCacheMap map; } wrp;
+            map = &wrp.map;
         }
         return *map;
     }

@@ -4,13 +4,13 @@
       "hexonet <middleware@hexonet.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "WebService-Hexonet-Connector",
    "no_index" : {
@@ -34,17 +34,17 @@
          "requires" : {
             "Carp" : "0",
             "Config" : "0",
-            "Data::Dumper" : "2.161",
+            "Data::Dumper" : "0",
             "LWP::Protocol::https" : "6.07",
-            "LWP::UserAgent" : "6.35",
-            "List::MoreUtils" : "0.416",
+            "LWP::UserAgent" : "6.43",
+            "List::MoreUtils" : "0.428",
             "MIME::Base64" : "0",
             "POSIX" : "0",
             "Readonly" : "2.05",
             "Time::Local" : "0",
             "perl" : "5.026000",
             "utf8" : "0",
-            "version" : "0.9917"
+            "version" : "0.9924"
          }
       },
       "test" : {
@@ -56,11 +56,11 @@
             "Test::Exception" : "0.43",
             "Test::More" : "0",
             "Test::RequiresInternet" : "0.05",
-            "version" : "0.9917"
+            "version" : "0.9924"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v2.2.5",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v2.3.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

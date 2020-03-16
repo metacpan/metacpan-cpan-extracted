@@ -1,0 +1,237 @@
+=head1 NAME
+
+Protocol::HTTP::Message - base class for HTTP request and response
+
+
+
+=head1 SYNOPSIS
+
+    $message->headers(); # as hash ref
+    $message->headers($hashref); # set headers
+    $message->headers_size();
+
+    $message->header('Host'); # header value
+    $message->header('host'); # header names are case-insensitive, same value
+    $message->header('not_existing_header');  # undef
+    $message->header('Host', 'crazypanda.ru'); # set single header
+
+    $message->body();         # string
+    $message->http_version(); # 10 or 11
+    $message->http_version(11);
+
+    $message->multiheader('X-Lang', 'C++', 'Perl'); # add multiple values
+    my @vals = $message->multiheader('x-lang'); # ("C++", "Perl")
+
+    $message->body(); # body as string
+    $message->body('some-payload'); # set body
+
+    $message->compress(Protocol::HTTP::Compression::gzip, Protocol::HTTP::Compression::LEVEL_MAX);
+    my $type = $message->compression();
+    my ($type, $level) = $message->compression();
+
+    # making chunks example
+    $message = Protocol::HTTP::Response->new({
+        chunked => 1,
+    });
+    # response can now be sent via $message->to_string;
+
+    $message->chunked();
+    $message->chunked(1);
+    my $chunk1 = $message->make_chunk('loper ipsum dolor');
+    my $chunk2 = $message->make_chunk('sit amet');
+    my $final_chunk = $message->final_chunk();
+
+
+
+=head1 DESCRIPTION
+
+This class is base class for L<Protocol::HTTP::Request> and
+L<Protocol::HTTP::Response> designed to share common code
+between them. It is an abstract class and cannot be constructed directly.
+
+A message with payload can be serialized and send to network
+two ways: either as a single string or as a split into multiple
+pieces. When the whole payload is available upfront, it is
+convenient to sent it as a message I<body>, i.e. the message is
+serialized as a single string.
+
+Otherwise, when the complete payload is not ready, it can be
+serialized and send to network later or/and by pieces. This
+is I<chunked> message transfer. The final (empty) chunk have
+to be sent to mark message end.
+
+The I<body> and I<chunked> message transfers are mutually
+exclusive.
+
+
+
+=head1 METHODS
+
+
+=head2 new([\%params])
+
+C<params> are the common parameters passed to either L<Protocol::HTTP::Request>'s new L<Protocol::HTTP::Response>'s new.
+
+Valid parameters are: C<headers>, C<body>, C<chunked>, C<compress>, C<http_version>.
+
+See corresponding methods documentation for more info.
+
+C<body> and C<chunked> are mutually exclusive.
+
+C<compress> is either a compression type constant or an array ref of compression type and compression level. See L<Protocol::HTTP::Compression>.
+
+This method can't be called directly. 
+
+
+=head2 headers([\%headers])
+
+Get/set hash-ref of message headers. In case of the getter all
+header names are lower-cased for convenience.
+
+
+=head2 header($name, [$value])
+
+As a getter, returns header's value. If header C<$name> has multiple values, returns the last value.
+
+As a setter, sets new single value for a header. If this header previously had multiple values, then all of them get replaced with a new single value.
+
+If C<$value> is undef, then removes header C<$name> from headers.
+
+C<$name> is case-insensitive.
+
+    $message->header("Header1", "val");
+    say $message->header("header1"); # "val"
+
+    $message->header("Header2", "");
+
+    # Header1: val
+    # Header2: 
+
+    $message->header("header1", undef);
+
+    # Header2: 
+
+
+=head2 multiheader($name, [$value1, $value2, ...])
+
+As a getter, returns a list of values for header C<$name>.
+
+As a setter, adds a header with the same name for each supplied value. Does not remove any previously defined values for header C<$name>
+
+C<$name> is case-insensitive.
+
+    $message->multiheader('lang', 'C++', 'Perl');
+    
+    # lang: C++
+    # lang: Perl
+    
+    $message->multiheader('lang', 'PHP');
+
+    # lang: C++
+    # lang: Perl
+    # lang: PHP
+    
+    my @vals = $message->multiheader('Lang'); # "C++", "Perl", "PHP"
+    my $val  = $message->header('lang'); # "PHP"
+    
+    $message->header('Lang', "Java");
+    my @vals = $message->multiheader('Lang'); # "Java"
+
+
+=head2 headers_size()
+
+Returns the number of headers in the message
+
+
+=head2 body([$string])
+
+Get/set body.
+
+Performance note on the getter: underhood the body might arrive fragmented,
+and in Perl interface the body must be presented as single string, it is
+concatenated on the fly in XS from the underlying pieces. In other words,
+it is ineffective to call the method C<body> multiple times, and it is
+adviced to cache it.
+
+
+=head2 http_version([$value])
+
+Get/set HTTP protocol version. Possible values are C<10> or C<11>. If you don't set anything then C<11> (HTTP 1.1) will be used.
+
+
+=head2 compress($method, [$level])
+
+Marks newly created message for compression with the provided I<method> and
+I<level>. If I<level> is not specified, it is defaulted to C<LEVEL_MIN>,
+which is optimal for server-side applications.
+
+Calling this method only makes sense for newly created messages, not for parsed ones.
+
+See L<Protocol::HTTP::Compression> for available constants.
+
+
+=head2 compression()
+
+Returns compression used in the message.
+In scalar context returns only compression method. In list context, returns compression method and compression level.
+
+See L<Protocol::HTTP::Compression> for available constants.
+
+
+=head2 chunked([$value])
+
+Getter and setter for the chunked marker of a message. On serialization the
+C<Transfer-Encoding> header will be set to C<chunked>.
+
+
+=head2 make_chunk($string)
+
+Wraps a string into chunk, which is ready to send. Compression may occur at this time if configured.
+
+
+=head2 final_chunk()
+
+Finalizes chunked HTTP message, i.e. final (empty) chunk is returned; it is
+ready to be send over network.
+
+
+
+=head1 CONSTANTS
+
+The following constants are available when request or response
+are parsed and reflect the parsing state. The parsing state
+by itself is I<not> part of the message.
+
+=over
+
+=item STATE_HEADERS
+
+=item STATE_BODY
+
+=item STATE_CHUNK
+
+=item STATE_CHUNK_BODY
+
+=item STATE_CHUNK_TRAILER
+
+=item STATE_DONE
+
+=item STATE_ERROR
+
+=back
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::HTTP>
+
+L<Protocol::HTTP::Request>
+
+L<Protocol::HTTP::Response>
+
+L<Protocol::HTTP::Compression>
+
+
+
+=cut

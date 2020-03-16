@@ -26,13 +26,13 @@ sub on_mousemove
 	my ( $self, $owner, $mod, $x, $y) = @_;
 	my $r = ( $self-> contains( $x, $y) >= 0) ? 0 : 1;
 	if ( $r != $owner-> {lastLinkPointer}) {
-		$owner-> pointer( $r ? cr::Text : $Prima::PodView::handIcon);
+		$owner-> pointer( $r ? cr::Text : cr::Hand);
 		$owner-> {lastLinkPointer} = $r;
 	}
 }
 
 package Prima::PodView;
-use vars qw(@ISA %HTML_Escapes $OP_LINK $handIcon);
+use vars qw(@ISA %HTML_Escapes $OP_LINK);
 @ISA = qw(Prima::TextView);
 
 use constant DEF_INDENT => 4;
@@ -71,26 +71,6 @@ use constant FORMAT_LINES    => 100;
 use constant FORMAT_TIMEOUT  => 300;
 
 $OP_LINK = tb::opcode(1, 'link');
-
-# init a 'hand' pointer
-	$handIcon = Prima::Icon-> create( width=>19, height=>24, type => im::bpp4,
-	scaling => ist::None, conversion => ict::None,
-	palette => [ 0,0,0,0,0,128,0,128,0,0,128,128,128,0,0,128,0,128,128,128,0,128,128,128,192,192,192,0,0,255,0,255,0,0,255,255,255,0,0,0,0,0,255,255,0,255,255,255],
-	data => <<XDATA);
-3333\x00\x00\x00\x0330\x00\x003330\xff\xff\xff\x0330\x00\x003330\xff\xff\xff\x0330\x00\x00333\x0f\xff\xff\xff\xf030\x00\x00330\xff\xff\xff\xff\xf030\x00\x0033\x0f\xff\xff\xff\xff\xff\x030\x00\x0033\x0f\xff\xff\xff\xff\xff\x030\x00\x0030\xff\xff\xff\xff\xff\xff\x030\x00\x0030\xff\xff\xff\xff\xff\xff\xf00\x00\x003\x0f\xff\xff\xff\xff\xff\xff\xf00\x00\x003\x0f\xf0\xff\xff\xff\xff\xff\xf00\x00\x000\xff\x00\xff\xff\xff\xff\xff\xf00\x00\x000\xf00\xff\xff\xff\xff\xf0\xf00\x00\x00\x0f\x030\xff\xf0\xff\x0f\x0f\xf00\x00\x00\x0030\xff\x0f\xf0\xff\x0f\xf00\x00\x00330\xff\x0f\xf0\xff\x00\x030\x00\x00330\xff\x0f\xf0\xff\x0330\x00\x00330\xff\x0f\xf0\x00330\x00\x00330\xff\x00\x033330\x00\x00330\xff\x0333330\x00\x00330\xff\x0333330\x00\x00330\xff\x0333330\x00\x00330\xff\x0333330\x00\x00333\x00333330\x00\x00
-XDATA
-	my ( $xor, $and) = $handIcon-> split;
-	if ( Prima::Application->get_system_value( sv::FixedPointerSize )) {
-		my @sz = map { Prima::Application-> get_system_value($_)} ( sv::XPointer, sv::YPointer);
-		$xor-> size( @sz);
-		$and-> rop( rop::Invert);
-		$and-> put_image( 0, 0, $and);
-		$and-> size( @sz);
-		$and-> put_image( 0, 0, $and);
-	}
-	$xor-> type(1);
-	$handIcon-> combine( $xor, $and);
-	$handIcon-> {__pointerHotSpot} = [ 8, 23 ];
 
 {
 my %RNT = (
@@ -1946,6 +1926,26 @@ The 'up' string returns a bookmark to the upper level of the manpage.
 The 'next' and 'prev' return a bookmark to the next or the previous topics in a manpage.
 
 If the location cannot be stored or defined, C<undef> is returned.
+
+=back
+
+=head2 Events
+
+=over
+
+=item Bookmark BOOKMARK
+
+When a new topic is navigated to by the user, this event is triggered with the
+current topic to have it eventually stored in bookmarks or history.
+
+=item Link LINK_REF, BUTTON, MOD, X, Y
+
+When the user clicks on a link, this event is called with the link address,
+mouse button, modificator keys, and coordinates.
+
+=item NewPage
+
+Called after new content is loaded
 
 =back
 

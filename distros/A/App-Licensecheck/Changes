@@ -7,6 +7,60 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.46	2020-03-13
+
+ [ Bug Fixes ]
+ - atomic: tighten grant patterns to include licensed_under prefix
+
+ [ Documentation ]
+ - relicense project as AGPL-3-or-newer; add Purism SPC as copyright holder
+ - update git repository URL
+
+ [ Test Suite ]
+ - mark 3 flawed author tests as such
+ - mark 4 bogusly versioned tests as such
+ - update author test related to gpl_* patterns covered since
+   Regexp::Pattern::License v3.3.0
+ - update author test related to rare apache_2 pattern covered since
+   Regexp::Pattern::License v3.3.0
+
+ [ Packaging ]
+ - require Regexp::Pattern::License 3.3.0
+
+ [ Other ]
+ - add FIXME comments where (mostly custom) patterns lack test coverage
+ - atomic: consult coverage from stepwise scan to avoid duplicate match
+ - atomic: explicitly (regardless of list @L_tidy) skip cc-by when
+   cc_by_sa_3 is detected
+ - avoid finalize in custom scan for GPL fulltext
+ - avoid wildcard in local bsd pattern
+ - detect vague grant for license group
+ - extend clean_comments() to strip escaped newline
+ - improve detection of GNU 'or-newer' usage grant version
+ - improve logging and comments
+ - logging: avoid undefined version for custom agpl grant detection
+ - logging: generally resolve positions
+ - logging: stepwise: log whole version string (not only number)
+ - logging: stepwise: resolve positions
+ - optimize: atomic: skip a few scans if grant already detected
+ - optimize: track incomplete patterns (not subset of complete ones) -
+   speed boost of %25!
+ - optimize: use optimized regex with /g (apparently supported by
+   re::engine::RE2)
+ - pre-compile left-anchored trait pattern version
+ - scan for GNU 'or-newer' usage version before singleversion grant version
+ - sort or'ed parts of expressions
+ - stepwise: detect 'or-later' usage grant also as versioned grant
+ - stepwise: detect prepended version
+ - stepwise: explicitly (regardless of list @L_tidy) avoid gpl
+ - stepwise: relax to use wider window for license name
+ - stepwise: track start and end position, and a moving current position
+   (not additional static ones)
+ - stepwise: use named (not numbered) capture for version
+ - track examined files
+ - use both custom and atomic patterns (not only custom) for agpl fsful
+   fsfullr gpl lgpl
+
 v3.0.45	2020-02-21
 
  [ Bug Fixes ]

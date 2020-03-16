@@ -67,6 +67,7 @@ examples/edit.pl
 examples/editor.pl
 examples/extlist.pl
 examples/eyes.pl
+examples/fading_text.pl
 examples/fontdlg.pl
 examples/frames.pl
 examples/f_fill.pl
@@ -177,6 +178,7 @@ pod/Prima/linejoins.gif
 pod/Prima/linepats.gif
 pod/Prima/markup.gif
 pod/Prima/Menu.pod
+pod/Prima/menu.gif
 pod/Prima/mdi.gif
 pod/Prima/miterlimit.gif
 pod/Prima/msgbox.gif
@@ -258,6 +260,7 @@ Prima/IntUtils.pm
 Prima/KeySelector.pm
 Prima/Label.pm
 Prima/Lists.pm
+Prima/Menus.pm
 Prima/MDI.pm
 Prima/MsgBox.pm
 Prima/noARGV.pm
@@ -405,6 +408,7 @@ t/misc/syntax.t
 t/misc/cpan.t
 unix/apc_app.c
 unix/apc_clipboard.c
+unix/apc_dnd.c
 unix/apc_event.c
 unix/apc_font.c
 unix/apc_graphics.c
@@ -433,12 +437,16 @@ win32/apc.c
 win32/clip.c
 win32/cursor.c
 win32/dev.c
+win32/dnd.c
 win32/files.c
 win32/global.c
 win32/gp.c
+win32/image.c
+win32/menu.c
 win32/misc.c
 win32/region.c
 win32/stock.c
 win32/timers.c
+win32/widgets.c
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

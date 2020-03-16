@@ -12,7 +12,7 @@ use Data::Object::Class;
 
 extends 'FlightRecorder::Plugin::Report';
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 # METHODS
 
@@ -94,6 +94,14 @@ into a printable report.
 This package inherits behaviors from:
 
 L<FlightRecorder::Plugin::Report>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Types::Standard>
 
 =cut
 

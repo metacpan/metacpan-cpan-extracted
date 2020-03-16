@@ -144,10 +144,10 @@ sub set_options {
         }
         else {
             my @pre  = ( undef, $sf->{i}{_continue} );
-            my $choices = [ @pre, map( $_->{text}, @$groups ) ];
+            my $menu = [ @pre, map( $_->{text}, @$groups ) ];
             # Choose
             my $grp_idx = $tc->choose(
-                $choices,
+                $menu,
                 { %{$sf->{i}{lyt_v}}, index => 1, default => $grp_old_idx, undef => $sf->{i}{_quit} }
             );
             if ( ! $grp_idx ) {
@@ -170,7 +170,7 @@ sub set_options {
                     next GROUP;
                 }
             }
-            if ( $choices->[$grp_idx] eq $sf->{i}{_continue} ) {
+            if ( $menu->[$grp_idx] eq $sf->{i}{_continue} ) {
                 if ( $sf->{write_config} ) {
                     $sf->__write_config_files();
                     delete $sf->{write_config};
@@ -196,10 +196,10 @@ sub set_options {
             }
             else {
                 my @pre  = ( undef );
-                my $choices = [ @pre, map( $_->{text}, @$options ) ];
+                my $menu = [ @pre, map( $_->{text}, @$options ) ];
                 # Choose
                 my $opt_idx = $tc->choose(
-                    $choices,
+                    $menu,
                     { %{$sf->{i}{lyt_v}}, index => 1, default => $opt_old_idx, undef => '  <=' }
                 );
                 if ( ! $opt_idx ) {

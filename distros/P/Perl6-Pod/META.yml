@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Perl6-Pod
 provides:
   Perl6::Pod:
     file: lib/Perl6/Pod.pm
-    version: '0.73'
+    version: '0.74'
   Perl6::Pod::Block:
     file: lib/Perl6/Pod/Block.pm
     version: '0.01'
@@ -36,7 +36,7 @@ provides:
     version: '0.01'
   Perl6::Pod::Block::item:
     file: lib/Perl6/Pod/Block/item.pm
-    version: '0.01'
+    version: '0.02'
   Perl6::Pod::Block::nested:
     file: lib/Perl6/Pod/Block/nested.pm
     version: '0.01'
@@ -191,5 +191,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Perl6::Pod
   license: http://dev.perl.org/licenses/
   repository: git://github.com/zag/p5-Perl6-Pod.git
-version: '0.73'
+version: '0.74'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

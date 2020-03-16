@@ -120,7 +120,7 @@ sub subproblems {
 sub to_string {
     my ($self) = @_;
 
-    my $str = $self->status() . ' ' . $self->type();
+    my $str = join( q< >, grep { defined } $self->status(), $self->type() );
 
     for my $attribute ( qw( title description detail instance ) ) {
         my $value = $self->$attribute();

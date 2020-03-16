@@ -1,23 +1,28 @@
 package Template::Liquid::Variable;
-our $VERSION = '1.0.18';
-require Template::Liquid::Error;
+our $VERSION = '1.0.19';
 use strict;
 use warnings;
 use base 'Template::Liquid::Document';
+use Template::Liquid::Error;
 
 sub new {
     my ($class, $args) = @_;
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing template argument',
-                                   fatal   => 1
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing template argument',
+                                   fatal    => 1
         }
         if !defined $args->{'template'} ||
         !$args->{'template'}->isa('Template::Liquid');
-    raise Template::Liquid::Error {type => 'Context',
-                             message => 'Missing parent argument', fatal => 1}
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing parent argument',
+                                   fatal    => 1
+        }
         if !defined $args->{'parent'};
     raise Template::Liquid::Error {
-                   type    => 'Syntax',
+                   template => $args->{template},
+                   type     => 'Syntax',
                    message => 'Missing variable name in ' . $args->{'markup'},
                    fatal   => 1
         }
@@ -48,8 +53,11 @@ sub render {
             #warn sprintf 'After  %s(%s): %s', $name, dump($args), dump($val);
                     next FILTER;
                 }
-                raise Template::Liquid::Error {type => 'UnknownFilter',
-                                               message => $name, fatal => 0};
+                raise Template::Liquid::Error {type     => 'UnknownFilter',
+                                               template => $s->{template},
+                                               message  => $name,
+                                               fatal    => 0
+                };
             }
         }
     }

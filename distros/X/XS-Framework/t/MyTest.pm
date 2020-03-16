@@ -21,7 +21,7 @@ sub import {
     my $caller = caller();
     foreach my $sym_name (qw/
         Config is cmp_deeply ok like done_testing skip isnt Dumper noclass subtest bag dies_ok new_ok isa_ok pass dies_ok
-        is_deeply ignore note cmp_ok
+        is_deeply ignore note cmp_ok throws_ok
     /) {
         no strict 'refs';
         *{"${caller}::$sym_name"} = *$sym_name;

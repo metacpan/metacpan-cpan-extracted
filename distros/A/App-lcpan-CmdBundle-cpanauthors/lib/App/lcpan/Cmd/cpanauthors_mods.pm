@@ -3,7 +3,7 @@ package App::lcpan::Cmd::cpanauthors_mods;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2019-12-26'; # DATE
 our $DIST = 'App-lcpan-CmdBundle-cpanauthors'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ sub handle_cmd {
 
     for (@{$res->[2]}) {
         if ($args{detail}) {
-            $_->{name} =~ s/^Acme::CPANAuthors:://;
+            ($_->{name} = $_->{module}) =~ s/^Acme::CPANAuthors:://;
         } else {
             s/^Acme::CPANAuthors:://;
         }
@@ -63,7 +63,7 @@ App::lcpan::Cmd::cpanauthors_mods - List Acme::CPANAuthors modules available on 
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::Cmd::cpanauthors_mods (from Perl distribution App-lcpan-CmdBundle-cpanauthors), released on 2019-12-26.
+This document describes version 0.002 of App::lcpan::Cmd::cpanauthors_mods (from Perl distribution App-lcpan-CmdBundle-cpanauthors), released on 2019-12-26.
 
 =head1 DESCRIPTION
 

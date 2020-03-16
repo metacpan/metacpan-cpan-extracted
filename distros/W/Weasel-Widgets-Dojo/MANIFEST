@@ -12,5 +12,5 @@ lib/Weasel/Widgets/Dojo.pm
 lib/Weasel/Widgets/Dojo/Option.pm
 lib/Weasel/Widgets/Dojo/Select.pm
 t/00-load.t
-t/01-critic.t
 t/perlcriticrc
+xt/01-critic.t

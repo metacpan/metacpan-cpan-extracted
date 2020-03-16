@@ -6,7 +6,6 @@ use Pcore::App::API::Auth;
 extends qw[Pcore::HTTP::Server::Request];
 
 has app  => ( required => 1 );    # Pcore::App
-has host => ( required => 1 );
 has path => ( required => 1 );
 
 has _auth => ( init_arg => undef );    # request authentication result

@@ -1,5 +1,5 @@
 package Net::Stripe::Constants;
-$Net::Stripe::Constants::VERSION = '0.41';
+$Net::Stripe::Constants::VERSION = '0.42';
 # ABSTRACT: Constants for use in validation and unit tests
 
 use strict;
@@ -19,7 +19,7 @@ Net::Stripe::Constants - Constants for use in validation and unit tests
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 AUTHORS
 

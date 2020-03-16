@@ -713,6 +713,21 @@ sub screen2point
 	return $x, $y;
 }
 
+sub point2screen
+{
+	my ( $self, $x, $y, @size) = @_;
+
+	@size = $self-> size unless @size;
+	my @aa = $self-> get_active_area( 0, @size);
+
+	$y -= $self-> {topLine};
+	$x -= $self-> {offset};
+	$x += $aa[0];
+	$y  = $aa[3] - $y;
+
+	return $x, $y;
+}
+
 sub text2xoffset
 {
 	my ( $self, $x, $bid) = @_;
@@ -731,10 +746,9 @@ sub text2xoffset
 			return if $x < $offset;
 
 			if ( $x < $offset + $length ) {
-				$pos[0] += $self-> get_text_width( substr( $text, 0, $x - $offset), 1);
+				$pos[0] += $self-> get_text_width( substr( $text, 0, $x - $offset), 1) - $width;
 				$self-> block_walk_abort;
 			} elsif ( $x == $offset + $length ) {
-				$pos[0] += $width;
 				$self-> block_walk_abort;
 			}
 		},
@@ -850,15 +864,34 @@ sub on_mousedown
 	}
 
 	return if $btn != mb::Left;
-
-	my ( $text_offset, $bid) = $self-> xy2info( $x, $y);
-
-	$self-> {mouseTransaction} = 1;
-	$self-> {mouseAnchor} = [ $text_offset, $bid ];
-	$self-> selection( -1, -1, -1, -1);
-
-	$self-> capture(1);
 	$self-> clear_event;
+
+	my @xy = $self-> xy2info( $x, $y);
+	my @sel = $self->selection;
+	if (
+		$self->has_selection &&
+		!$self->{drag_transaction} && 
+		(
+			($sel[1] == $sel[3] && $xy[1] == $sel[1] && $xy[0] >= $sel[0] && $xy[0] < $sel[2]) ||
+			($xy[1] == $sel[1] && $xy[1] < $sel[3] && $xy[0] >= $sel[0]) ||
+			($xy[1] == $sel[3] && $xy[1] > $sel[1] && $xy[0] < $sel[2]) ||
+			($xy[1] > $sel[1] && $xy[1] < $sel[3])
+		)
+	) {
+		$self-> {drag_transaction} = 1;
+		my $act = $self-> begin_drag(
+			text       => $self->get_selected_text,
+			actions    => dnd::Copy,
+		);
+		$self-> {drag_transaction} = 0;
+		$self-> clear_selection if $act < 0;
+	} else {
+		$self-> {mouseTransaction} = 1;
+		$self-> {mouseAnchor} = \@xy;
+		$self-> clear_selection;
+
+		$self-> capture(1);
+	}
 }
 
 sub on_mouseclick
@@ -1137,6 +1170,8 @@ sub selection
 	$self->invalidate_rect(@$_) for @invalid_rects;
 }
 
+sub clear_selection { shift->selection(-1,-1,-1,-1) }
+
 sub get_selected_text
 {
 	my $self = $_[0];
@@ -1318,10 +1353,11 @@ Below different coordinate system converters are described
 
 =over
 
-=item screen2point X, Y
+=item screen2point, point2screen X, Y
 
-Accepts (X,Y) in the screen coordinates ( O is a lower left widget corner ),
-returns (X,Y) in document coordinates ( O is upper left corner of a document ).
+C<screen2point> accepts (X,Y) in the screen coordinates ( O is a lower left
+widget corner ), returns (X,Y) in document coordinates ( O is upper left corner
+of a document ).  C<point2screen> does the reverse.
 
 =item xy2info X, Y
 

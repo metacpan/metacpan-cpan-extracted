@@ -10,7 +10,7 @@ use Moo;
 
 require Carp;
 
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 # BUILD
 
@@ -206,6 +206,14 @@ This attribute is read-only, accepts C<(Str)> values, and is optional.
 =head2 file
 
   file(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 from
+
+  from(Str)
 
 This attribute is read-only, accepts C<(Str)> values, and is optional.
 

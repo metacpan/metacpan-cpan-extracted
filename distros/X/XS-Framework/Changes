@@ -1,3 +1,6 @@
+1.2.8  14.02.2020
+           - add operator=(nullptr_t) to various SVAPI classes to resolve ambiguity
+           - more details on xs::in<TYPE>() failure
 1.2.7  16.02.2020
            - remove std::io_errc and std::iostream_category as they are not present on certain systems
            - fix leak in Simple::shared() and Stash::inherit()

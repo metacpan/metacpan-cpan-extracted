@@ -28,3 +28,5 @@ INCLUDE: avhv.xsi
 INCLUDE: threads.xsi
 
 INCLUDE: foreign.xsi
+
+INCLUDE: casting.xsi

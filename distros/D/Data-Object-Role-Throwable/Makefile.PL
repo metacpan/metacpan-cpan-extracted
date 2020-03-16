@@ -17,21 +17,21 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Data::Object::Role::Throwable",
   "PREREQ_PM" => {
-    "Data::Object::Exception" => "2.01",
+    "Data::Object::Exception" => "2.02",
     "Moo" => 0,
     "routines" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Object::Exception" => "2.01",
+    "Data::Object::Exception" => "2.02",
     "Moo" => 0,
     "Test::Auto" => "0.05",
     "routines" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.00",
+  "VERSION" => "2.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Object::Exception" => "2.01",
+  "Data::Object::Exception" => "2.02",
   "Moo" => 0,
   "Test::Auto" => "0.05",
   "routines" => 0,

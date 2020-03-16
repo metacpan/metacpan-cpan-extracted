@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Exporter';
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use Carp qw( croak );
 use Specio::Coercion;
@@ -345,7 +345,7 @@ Specio::Declare - Specio declaration subroutines
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -684,7 +684,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2019 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

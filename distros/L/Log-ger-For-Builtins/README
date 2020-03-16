@@ -1,0 +1,46 @@
+NAME
+    Log::ger::For::Builtins - Add logging to Perl builtins
+
+VERSION
+    This document describes version 0.001 of Log::ger::For::Builtins (from
+    Perl distribution Log-ger-For-Builtins), released on 2020-03-14.
+
+SYNOPSIS
+     use Log::ger::For::Builtins qw(
+         readpipe
+         rename
+         system
+     );
+
+DESCRIPTION
+    This module exports wrappers for Perl builtins with added logging.
+    Logging is produced using Log::ger at the trace level and can be seen by
+    using one of output plugins e.g. Log::ger::Output::Screen.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-For-Builtins>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-For-Builtins>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-For-Builtins>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Log::ger
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

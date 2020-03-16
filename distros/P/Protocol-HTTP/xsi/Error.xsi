@@ -1,0 +1,23 @@
+MODULE = Protocol::HTTP                PACKAGE = Protocol::HTTP
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__);
+    
+    Stash ecstash("Protocol::HTTP::errc", GV_ADD);
+    xs::exp::create_constants(ecstash, {
+        {"lexical_error",                   xs::out(make_error_code(errc::lexical_error))},
+        {"multiple_content_length",         xs::out(make_error_code(errc::multiple_content_length))},
+        {"headers_too_large",               xs::out(make_error_code(errc::headers_too_large))},
+        {"body_too_large",                  xs::out(make_error_code(errc::body_too_large))},
+        {"unexpected_body",                 xs::out(make_error_code(errc::unexpected_body))},
+        {"unexpected_eof",                  xs::out(make_error_code(errc::unexpected_eof))},
+        {"unexpected_continue",             xs::out(make_error_code(errc::unexpected_continue))},
+        {"unsupported_transfer_encoding",   xs::out(make_error_code(errc::unsupported_transfer_encoding))},
+        {"unsupported_compression",         xs::out(make_error_code(errc::unsupported_compression))},
+        {"uncompression_failure",           xs::out(make_error_code(errc::uncompression_failure))},
+    });
+    xs::exp::autoexport(ecstash);
+    
+    s.add_const_sub("error_category", xs::out<const std::error_category*>(&error_category));
+}

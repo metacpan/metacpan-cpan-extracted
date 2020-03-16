@@ -56,21 +56,21 @@ sub union_tables {
             }
         }
         my $prompt = 'Choose UNION table:';
-        my $choices  = [ @pre, @tmp_tables, @post ];
+        my $menu  = [ @pre, @tmp_tables, @post ];
         $ax->print_sql( $union );
         # Choose
         my $idx_tbl = $tc->choose(
-            $choices,
+            $menu,
             { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1 }
         );
-        if ( ! defined $idx_tbl || ! defined $choices->[$idx_tbl] ) {
+        if ( ! defined $idx_tbl || ! defined $menu->[$idx_tbl] ) {
             if ( @bu ) {
                 ( $union->{used_tables}, $union->{subselect_data}, $union->{saved_cols} ) = @{pop @bu};
                 next UNION_TABLE;
             }
             return;
         }
-        my $union_table = $choices->[$idx_tbl];
+        my $union_table = $menu->[$idx_tbl];
         my $qt_union_table;
         if ( $union_table eq $enough_tables ) {
             if ( ! @{$union->{subselect_data}} ) {
@@ -187,21 +187,21 @@ sub __union_all_tables {
         }
         push @tables_union_auto, $table;
     }
-    my $choices  = [ undef, map( "- $_", @tables_union_auto ) ];
+    my $menu = [ undef, map( "- $_", @tables_union_auto ) ];
 
     while ( 1 ) {
         $union->{subselect_data} = [ map { [ $_, [ '?' ] ] } @tables_union_auto ];
         $ax->print_sql( $union );
         # Choose
         my $idx_tbl = $tc->choose(
-            $choices,
+            $menu,
             { %{$sf->{i}{lyt_v}}, prompt => 'One UNION table for cols:', index => 1 }
         );
-        if ( ! defined $idx_tbl || ! defined $choices->[$idx_tbl] ) {
+        if ( ! defined $idx_tbl || ! defined $menu->[$idx_tbl] ) {
             $union->{subselect_data} = [];
             return;
         }
-        ( my $union_table = $choices->[$idx_tbl] ) =~ s/^-\s//;
+        ( my $union_table = $menu->[$idx_tbl] ) =~ s/^-\s//;
         my $qt_union_table = $ax->quote_table( $sf->{d}{tables_info}{$union_table} );
         my $ok = $sf->__union_table_columns( $union, $union_table, $qt_union_table );
         if ( $ok ) {

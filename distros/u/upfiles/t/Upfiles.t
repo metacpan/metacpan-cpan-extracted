@@ -28,7 +28,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 14;
+  my $want_version = 15;
   is ($App::Upfiles::VERSION, $want_version, 'VERSION variable');
   is (App::Upfiles->VERSION,  $want_version, 'VERSION class method');
   ok (eval { App::Upfiles->VERSION($want_version); 1 },

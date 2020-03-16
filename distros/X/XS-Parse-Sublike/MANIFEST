@@ -1,0 +1,14 @@
+Build.PL
+hax/lexer-additions.c.inc
+hax/parse_subsignature.c.inc
+lib/XS/Parse/Sublike.pm
+lib/XS/Parse/Sublike.xs
+lib/XS/Parse/Sublike/Builder.pm
+MANIFEST			This list of files
+t/00use.t
+t/99pod.t
+XSParseSublike.h
+README
+LICENSE
+META.yml
+META.json

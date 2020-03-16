@@ -2,18 +2,6 @@ package Image::Synchronize;
 
 use v5.13.2;
 
-# TODO: 20180908-wereldhavendagen: pictures taken with my smartphone
-# camera always claim to need modification but do not report which
-# modification
-
-# TODO: 20181008-5-restaurant-fanaria-oia/signal-2018-10-08-205102.jpg
-# has TimeSource=Other where I expected User, because I set the time
-# using --time.  Also, its EXIF:ModifyDate isn't set, which may be the
-# reason why the image isn't displayed in the proper order.
-
-# TODO: 2018-10-11-2-chania seems to switch between taking positions
-# from different segments in the same gpx file
-
 =head1 NAME
 
 Image::Synchronize - a module for synchronizing filesystem
@@ -91,7 +79,10 @@ use YAML::Any qw(
   LoadFile
 );
 
-our $VERSION = '1.4.2';
+# always use x.yyy version numbering, so that string comparison and
+# numeric comparison give the same ordering, to avoid trouble due to
+# different ways of interpreting version numbers.
+our $VERSION = '2.000';
 
 my $CASE_TOLERANT;
 
@@ -2029,9 +2020,9 @@ my %convert_for_writing = (
   GPSLatitude => sub {
     my ( $tag, $in, $out ) = @_;
 
-    # don't set latitude to abs($in).  If the latitude is writting to
-    # XMP rather than EXIF, then there is no GPSLatitudeRef so then
-    # the sign on GPSLatitude is needed.
+    # don't set coordinates to abs($in).  If the coordinate is
+    # writting to XMP rather than EXIF, then there is no GPSxRef so
+    # then the sign on GPSx is needed.
     $out->{"${tag}#"} = $in;
     $out->{"${tag}Ref#"} = ( $in > 0 ) ? 'N' : 'S';
   },

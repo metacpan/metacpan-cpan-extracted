@@ -407,6 +407,14 @@ typedef struct { double r,  ph; } TrigDComplex;
 #define false FALSE
 #endif
 
+typedef struct _List
+{
+	Handle * items;
+	int    count;
+	int    size;
+	int    delta;
+} List, *PList;
+
 /* Event structures */
 
 #ifdef KeyEvent
@@ -437,6 +445,21 @@ typedef struct _PositionalEvent {
 	Bool   dblclk;
 } PositionalEvent, *PPositionalEvent;
 
+#ifdef DNDEvent
+#undef DNDEvent
+#endif
+
+typedef struct _DNDEvent {
+	int    cmd;
+	int    allow;
+	int    action;
+	int    modmap;
+	Handle clipboard;
+	Point  where;
+	Box    pad;
+	Handle counterpart;
+} DNDEvent, *PDNDEvent;
+
 #ifdef GenericEvent
 #undef GenericEvent
 #endif
@@ -459,6 +482,7 @@ typedef union _Event {
 	GenericEvent    gen;
 	PositionalEvent pos;
 	KeyEvent        key;
+	DNDEvent        dnd;
 } Event, *PEvent;
 
 typedef struct _PostMsg {
@@ -725,20 +749,28 @@ CM(Execute)
 CM(Setup)
 #define cmHint           0x00000023                /* hint show/hide message */
 CM(Hint)
-#define cmDragDrop       0x00000024                /* Drag'n'drop aware */
-CM(DragDrop)
+#define cmDragBegin      0x00000024                /* Drag'n'drop aware */
+CM(DragBegin)
 #define cmDragOver       0x00000025                /*         constants */
 CM(DragOver)
-#define cmEndDrag        0x00000026                /* * */
-CM(EndDrag)
-#define cmMenu          (0x00000027|ctDiscardable) /* send when menu going to be activated */
+#define cmDragEnd        0x00000026                /* * */
+CM(DragEnd)
+#define cmDragQuery      0x00000027                /* * */
+CM(DragQuery)
+#define cmDragResponse   0x00000028                /* * */
+CM(DragResponse)
+#define cmMenu          (0x00000029|ctDiscardable) /* send when menu going to be activated */
 CM(Menu)
-#define cmEndModal       0x00000028                /* dialog execution end */
+#define cmEndModal       0x0000002A                /* dialog execution end */
 CM(EndModal)
-#define cmSysHandle      0x00000029                /* system handle recreated */
+#define cmSysHandle      0x0000002B                /* system handle recreated */
 CM(SysHandle)
-#define cmIdle           0x0000002A                /* idle handler */
+#define cmIdle           0x0000002C                /* idle handler */
 CM(Idle)
+#define cmMenuItemMeasure 0x0000002D               /* query custom menu item size */
+CM(MenuItemMeasure)
+#define cmMenuItemPaint  0x0000002E                /* menu item custom paint */
+CM(MenuItemPaint)
 
 #define cmMenuCmd        0x00000050                /* interactive menu command */
 CM(MenuCmd)
@@ -867,6 +899,8 @@ KM(Shift)
 KM(Ctrl)
 #define kmAlt           0x08000000
 KM(Alt)
+#define kmEscape        0x10000000
+KM(Escape)
 #define kmUnicode       0x10000000
 KM(Unicode)
 #define kmKeyPad        0x40000000
@@ -1274,6 +1308,12 @@ extern void
 unprotect_object( Handle obj);
 
 extern void
+prima_refcnt_inc( Handle obj);
+
+extern void
+prima_refcnt_dec( Handle obj);
+
+extern void
 prima_kill_zombies( void);
 
 /*
@@ -1371,6 +1411,8 @@ SvBOOL( SV *sv)
 #define CApplication(h)                 (PApplication(h)-> self)
 #define PComponent(h)                   TransmogrifyHandle(Component,(h))
 #define CComponent(h)                   (PComponent(h)-> self)
+#define PClipboard(h)                   TransmogrifyHandle(Clipboard,(h))
+#define CClipboard(h)                   (PClipboard(h)-> self)
 #define PDrawable(h)                    TransmogrifyHandle(Drawable,(h))
 #define CDrawable(h)                    (PDrawable(h)-> self)
 #define PFile(h)                        TransmogrifyHandle(File,(h))
@@ -1413,14 +1455,6 @@ extern char *
 duplicate_string( const char *);
 
 /* lists support */
-
-typedef struct _List
-{
-	Handle * items;
-	int    count;
-	int    size;
-	int    delta;
-} List, *PList;
 
 typedef Bool ListProc ( Handle item, void * params);
 typedef ListProc *PListProc;
@@ -1575,7 +1609,7 @@ DT(NoWordWrap)
 DT(WordWrap)
 #define dtBidiText                 0x8000
 DT(BidiText)
-#define dtDefault                  (dtNewLineBreak|dtWordBreak|dtExpandTabs|dtUseExternalLeading)
+#define dtDefault                  (dtNewLineBreak|dtWordBreak|dtExpandTabs|dtUseExternalLeading|dtBidiText)
 DT(Default)
 
 END_TABLE(dt,UV)
@@ -1604,6 +1638,7 @@ typedef struct _ObjectOptions_ {
 	unsigned optAutoEnableChildren  : 1;   /* Widget */
 	unsigned optBriefKeys           : 1;
 	unsigned optBuffered            : 1;
+	unsigned optDropSession         : 1;
 	unsigned optModalHorizon        : 1;
 	unsigned optOwnerBackColor      : 1;
 	unsigned optOwnerColor          : 1;
@@ -1863,6 +1898,8 @@ SV(LayeredWidgets)
 SV(DWM)
 #define   svFixedPointerSize 35
 SV(FixedPointerSize)
+#define   svMenuCheckSize   36
+SV(MenuCheckSize)
 END_TABLE(sv,UV)
 #undef SV
 
@@ -2282,7 +2319,23 @@ CR(SizeNE)
 CR(SizeSW)
 #define crInvalid      15
 CR(Invalid)
-#define crUser         16
+#define crDragNone     16
+CR(DragNone)
+#define crDragCopy     17
+CR(DragCopy)
+#define crDragMove     18
+CR(DragMove)
+#define crDragLink     19
+CR(DragLink)
+#define crCrosshair    20
+CR(Crosshair)
+#define crUpArrow      21
+CR(UpArrow)
+#define crQuestionArrow 22
+CR(QuestionArrow)
+#define crHand         23
+CR(Hand)
+#define crUser         24
 CR(User)
 END_TABLE(cr,UV)
 #undef CR
@@ -2373,14 +2426,17 @@ apc_clipboard_close( Handle self);
 extern Bool
 apc_clipboard_clear( Handle self);
 
-extern Bool
-apc_clipboard_has_format( Handle self, Handle id);
+extern PList
+apc_clipboard_get_formats( Handle self);
 
 extern Bool
 apc_clipboard_get_data( Handle self, Handle id, PClipboardDataRec c);
 
 extern ApiHandle
 apc_clipboard_get_handle( Handle self);
+
+extern Bool
+apc_clipboard_has_format( Handle self, Handle id);
 
 extern Bool
 apc_clipboard_set_data( Handle self, Handle id, PClipboardDataRec c);
@@ -2390,6 +2446,38 @@ apc_clipboard_register_format( Handle self, const char *format);
 
 extern Bool
 apc_clipboard_deregister_format( Handle self, Handle id);
+
+extern Bool
+apc_clipboard_is_dnd( Handle self);
+
+/* Drag and drop */
+
+#define DND(const_name) CONSTANT(dnd,const_name)
+START_TABLE(dnd,UV)
+#define    dndNone               0x00
+DND(None)
+#define    dndCopy               0x01
+DND(Copy)
+#define    dndMove               0x02
+DND(Move)
+#define    dndLink               0x04
+DND(Link)
+#define    dndMask               0x07
+DND(Mask)
+END_TABLE(dnd,UV)
+#undef DND
+
+extern Bool
+apc_dnd_get_aware( Handle self );
+
+extern Bool
+apc_dnd_set_aware( Handle self, Bool is_target );
+
+extern int
+apc_dnd_start( Handle self, int actions, Bool default_pointers, Handle * counterpart);
+
+extern Handle
+apc_dnd_get_clipboard( Handle self );
 
 /* Menus & popups */
 
@@ -2402,12 +2490,14 @@ typedef struct _MenuItemReg {   /* Menu item registration record */
 	char * perlSub;              /* sub name */
 	Handle bitmap;               /* bitmap if not nil */
 	SV *   code;                 /* code if not nil */
-	SV *   data;                 /* use data if not nil */
+	SV *   options;              /* use options if not nil */
+	Handle icon;                 /* custom checked bitmap */
+	int    group;                /* radio group */
 	struct _MenuItemReg* down;   /* pointer to submenu */
 	struct _MenuItemReg* next;   /* pointer to next item */
 	struct {
 		unsigned int checked       : 1;  /* true if item is checked */
-		unsigned int disabled      : 1;  /* true if item is disabled */
+		unsigned int disabled      : 1;
 		unsigned int rightAdjust   : 1;  /* true if right adjust ordered */
 		unsigned int divider       : 1;  /* true if it's line divider */
 		unsigned int utf8_variable : 1;
@@ -2415,6 +2505,7 @@ typedef struct _MenuItemReg {   /* Menu item registration record */
 		unsigned int utf8_accel    : 1;
 		unsigned int utf8_perlSub  : 1;
 		unsigned int autotoggle    : 1;  /* true if menu is toggled automatially */
+		unsigned int custom_draw   : 1;  /* true if menu item is drawn through onMenuItemPaint */
 	} flags;
 } MenuItemReg, *PMenuItemReg;
 
@@ -2443,16 +2534,28 @@ extern Bool
 apc_menu_set_font( Handle self, PFont font);
 
 extern Bool
+apc_menu_item_begin_paint( Handle self, PEvent event);
+
+extern Bool
+apc_menu_item_end_paint( Handle self, PEvent event);
+
+extern Bool
 apc_menu_item_delete( Handle self, PMenuItemReg m);
 
 extern Bool
 apc_menu_item_set_accel( Handle self, PMenuItemReg m);
 
 extern Bool
+apc_menu_item_set_autotoggle( Handle self, PMenuItemReg m);
+
+extern Bool
 apc_menu_item_set_check( Handle self, PMenuItemReg m);
 
 extern Bool
 apc_menu_item_set_enabled( Handle self, PMenuItemReg m);
+
+extern Bool
+apc_menu_item_set_icon( Handle self, PMenuItemReg m);
 
 extern Bool
 apc_menu_item_set_image( Handle self, PMenuItemReg m);
@@ -2672,7 +2775,8 @@ typedef enum {
 	ropSrcAlphaShift      = 8,
 	ropDstAlpha           = 0x2000000,
 	ropDstAlphaShift      = 16,
-	ropConstantAlpha      = 0x3000000  /* these are only for Prima's own Image.put */
+	ropConstantAlpha      = 0x3000000,
+	ropPremultiply        = 0x4000000
 } ROP;
 
 
@@ -2698,6 +2802,7 @@ ROP(HardLight) ROP(SoftLight) ROP(Difference) ROP(Exclusion)
 ROP(SrcAlpha) ROP(SrcAlphaShift)
 ROP(DstAlpha) ROP(DstAlphaShift)
 ROP(PorterDuffMask) ROP(ConstantAlpha) ROP(AlphaCopy)
+ROP(Premultiply)
 END_TABLE(rop,UV)
 #undef ROP
 
@@ -2830,6 +2935,22 @@ FP(Critters)
 FP(MaxId)
 END_TABLE(fp,UV)
 #undef FP
+
+/* font vector constants */
+#define FV(const_name) CONSTANT(fv,const_name)
+START_TABLE(fv,UV)
+#define    fvBitmap         0x0000
+FV(Bitmap)
+#define    fvOutline        0x0001
+FV(Outline)
+#define    fvDefault        0x0002
+FV(Default)
+#define    fvScalableBitmap 0x0003
+FV(ScalableBitmap)
+#define    fvMask           0x0003
+END_TABLE(fv,UV)
+#undef FV
+
 
 /* font weigths */
 #define FW(const_name) CONSTANT(fw,const_name)
@@ -3416,8 +3537,8 @@ apc_gp_flood_fill( Handle self, int x, int y, Color borderColor, Bool singleBord
 #define GGO(const_name) CONSTANT(ggo,const_name)
 START_TABLE(ggo,UV)
 #define ggoGlyphIndex   0x01
-#define ggoUseHints     0x02 
-#define ggoUnicode      0x03
+#define ggoUseHints     0x02
+#define ggoUnicode      0x04
 
 #define ggoMove         0
 GGO(Move)

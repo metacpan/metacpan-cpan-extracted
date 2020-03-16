@@ -1,5 +1,5 @@
-requires 'perl',           v5.30.1;
-requires 'common::header', v0.1.2;
+requires 'perl',           v5.30;
+requires 'common::header', v0.3.2;
 
 feature windows => sub {
     requires 'Win32::Console';

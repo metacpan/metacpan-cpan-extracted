@@ -1,0 +1,18 @@
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:16:14 GMT
+Expires: -1
+Cache-Control: private, max-age=0
+Content-Type: text/html; charset=windows-1251
+P3P: CP="This is not a P3P policy! See g.co/p3phelp for more info."
+Server: gws
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Set-Cookie: 1P_JAR=2018-03-14-16; expires=Fri, 13-Apr-2018 16:16:14 GMT; path=/; domain=.google.ru
+Set-Cookie: NID=125=LuvjRtlbKpKI5wXIJyuSzN9xMUY3YJdWDLO4ObGZSm_2mIhIWJg2-t-N_F940sNG93vFuW5j-GiesFPl5zPe1KRkDlXHjH2rD4JBkwSofsOrHm3VbDid10gENjUmBA-l; expires=Thu, 13-Sep-2018 16:16:14 GMT; path=/; domain=.google.ru; HttpOnly
+Alt-Svc: hq=":443"; ma=2592000; quic=51303431; quic=51303339; quic=51303335,quic=":443"; ma=2592000; v="41,39,35"
+Accept-Ranges: none
+Vary: Accept-Encoding
+Transfer-Encoding: chunked
+
+71f1
+<!doctype html><html itemscope="" itemtype="http://schema.org/WebPage" lang="ru"><head><meta content="Поиск информации в интернете: веб страницы, картинки, видео и многое другое." name="description"><meta content="noodp" name="robots"><meta content="text/html; charset=UTF-8" http-equiv="Content-Type"><meta content="/logos/doodles/2018/30th-anniversary-of-pi-day-6741047248945152.4-l.png" itemprop="image"><meta content="30-я годовщина Дня числа пи" property="twitter:title"><meta content="30-я годовщина Дня числа пи. #GoogleDoodle" property="twitter:description"><meta content="30

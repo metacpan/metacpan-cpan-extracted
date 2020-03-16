@@ -8,16 +8,18 @@ use routines;
 
 use Moo::Role;
 
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 # METHODS
 
-method throw($message) {
+method throw(@args) {
   require Data::Object::Exception;
 
   my $class = 'Data::Object::Exception';
 
-  @_ = ($class => ($message, $self));
+  @args = ($args[0], $self, @args[1..$#args]);
+
+  @_ = ($class, @args);
 
   goto $class->can('throw');
 }
@@ -68,9 +70,11 @@ This package implements the following methods:
 
 =head2 throw
 
-  throw(Str $message) : Object
+  throw(Tuple[Str, Str] | Str $message, Maybe[Number] $offset) : Any
 
-The throw method throws an exception with the object and the given message.
+The throw method throws an exception with the object and the given message. The
+object is thrown as the exception context. See L<Data::Object::Exception> for
+more information.
 
 =over 4
 
@@ -79,6 +83,16 @@ The throw method throws an exception with the object and the given message.
   # given: synopsis
 
   $example->throw('Oops!');
+
+=back
+
+=over 4
+
+=item throw example #2
+
+  # given: synopsis
+
+  $example->throw(['E001', 'Oops!']);
 
 =back
 

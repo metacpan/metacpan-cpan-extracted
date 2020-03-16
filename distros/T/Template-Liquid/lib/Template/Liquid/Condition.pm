@@ -1,5 +1,5 @@
 package Template::Liquid::Condition;
-our $VERSION = '1.0.18';
+our $VERSION = '1.0.19';
 require Template::Liquid::Error;
 use base 'Template::Liquid::Block';
 use strict;
@@ -10,13 +10,17 @@ use overload 'bool' => \&is_true, fallback => 1;
 
 sub new {
     my ($class, $args) = @_;
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing template argument',
-                                   fatal   => 1
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing template argument',
+                                   fatal    => 1
         }
         if !defined $args->{'template'};
-    raise Template::Liquid::Error {type => 'Context',
-                             message => 'Missing parent argument', fatal => 1}
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing parent argument',
+                                   fatal    => 1
+        }
         if !defined $args->{'parent'};
     my ($lval, $condition, $rval)
         = ((defined $args->{'attrs'} ? $args->{'attrs'} : '')
@@ -37,7 +41,9 @@ sub new {
             $condition = 'gt'   if $condition eq '>';
             $condition = 'lt'   if $condition eq '<';
             $condition = '_and' if $condition eq '&&';
+            $condition = '_and' if $condition eq 'and';
             $condition = '_or'  if $condition eq '||';
+            $condition = '_or'  if $condition eq 'or';
             return
                 bless {lvalue    => $lval,
                        condition => $condition,
@@ -46,15 +52,20 @@ sub new {
                        parent    => $args->{'parent'}
                 }, $class;
         }
+        else {
+            ...;
+        }
         raise Template::Liquid::Error {
-             type    => 'Context',
-             message => 'Unknown operator "' . $condition . '" in ' .
+             template => $args->{template},
+             type     => 'Context',
+             message  => 'Unknown operator "' . $condition . '" in ' .
                  $lval . ' ' . $condition . ' ' . (defined $rval ? $rval : '')
         };
     }
     return
         Template::Liquid::Error->new(
-                   type    => 'Context',
+                   template => $args->{template},
+                   type     => 'Context',
                    message => 'Bad conditional statement: ' . $args->{'attrs'}
         );
 }
@@ -196,7 +207,8 @@ sub is_true {
     }
     my $condition = $s->can($s->{'condition'});
     raise Template::Liquid::Error {
-                              type    => 'Context',
+                              template => $s->{template},
+                              type     => 'Context',
                               message => 'Bad condition ' . $s->{'condition'},
                               fatal   => 1
         }

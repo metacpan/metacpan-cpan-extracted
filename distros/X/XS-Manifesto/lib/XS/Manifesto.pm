@@ -1,6 +1,6 @@
 package XS::Manifesto;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 =head1 NAME
 
@@ -15,24 +15,24 @@ C/C++ language for it to be both fast and be available from Perl via tools
 like L<ExtUtils::MakeMaker>.
 
 This approach works well, however it has B<limited extensibility>. First, it's
-hard to call C/XS-code from other C/XS-code; while it I<can> be done, it's 
+hard to call C/XS-code from other C/XS-code; while it I<can> be done, it's
 possible only via a I<Perl layer> which has a huge performance penalty compared
 to a direct C/C++ function call. Type safety is also lost, which is quite
-important for early compile-time error detection with C/C++. Second, there is 
-no way to share I<source code>, e.g. header files and 
-native-type-to-Perl-type mappings (aka I<typemaps>). Without that information, 
+important for early compile-time error detection with C/C++. Second, there is
+no way to share I<source code>, e.g. header files and
+native-type-to-Perl-type mappings (aka I<typemaps>). Without that information,
 C/C++ types and templates from one module cannot be reused in another C/C++
 module.
 
-There is an alternative approach on CPAN - L<Alien>, which tries to make 
+There is an alternative approach on CPAN - L<Alien>, which tries to make
 non-Perl libraries available for Perl. The approach I<reuses> system libraries
 or downloads and builds them. It successfully solves I<sharing native code>
 issue, i.e. C/C++ headers, but not sharing XS-code. One could argue that it's
 Perl own fault that it ships no mechanism to share typemaps. Maybe it's even
-not possible to implement this at all with pure C-layer. 
+not possible to implement this at all with pure C-layer.
 
-The L<Alien>-specific issue is that it doesn't aim for 
-B<sharing binary (executable) code> (see 
+The L<Alien>-specific issue is that it doesn't aim for
+B<sharing binary (executable) code> (see
 L<Alien CAVEATS | https://metacpan.org/pod/Alien#CAVEATS>).
 While this approach has benefits, like the requirement of an Alien-library to
 be a build-only (compile-only) dependency, the ease of module upgrades (without
@@ -40,7 +40,7 @@ rebuilding dependencies), etc., it has it's own limitations:
 
 First, the non-sharing of library code means duplication of it in a processes'
 memory. Let's say, there is an C<Alien::libX> and XS-libraries C<My::libA>
-and C<My::libB>, which both use C-interface of C<libX>. Statically compiled 
+and C<My::libB>, which both use C-interface of C<libX>. Statically compiled
 C<Alien::libX> will be duplicated in the both of XS-libraries. While memory is
 considered to be cheap nowadays, it can still be an issue.
 
@@ -67,7 +67,7 @@ impossible to have cross-dependent binary B<hierarchy> of XS-modules, like:
 as the modules are statically compiled, there is no runtime dependency between
 C<xs::libA> (C<libA.a>) and C<xs::libB> (C<libB.a>); the C<libB.a> just embeds
 (copies) C<libA.a> directly into own code. The object code copying propagates
-through all further dependecies, upto C<xs::libD>. The opposite approach is 
+through all further dependecies, upto C<xs::libD>. The opposite approach is
 to have shared libraries, without any duplication.
 
 
@@ -79,7 +79,7 @@ handlers, etc.) written in C/C++, while being able to access as much as
 possible of their functions from Perl. The middleware components (like
 application servers, session managers, etc.) can be written in Perl or in
 C/C++ for performance-critical parts. The higher level application logic
-is suitable mostly for Perl, with the exception of very limited 
+is suitable mostly for Perl, with the exception of very limited
 performance-critical parts.
 
 There is an exception from the last rule: if the application models/code
@@ -104,7 +104,7 @@ solutions like "let's rewrite everything in Go!".
 =item 1. B<Share binary code>
 
 It's like L<Alien> modules build with system modules or with shared libraries
-support. 
+support.
 
 Provided by L<XS::Install>.
 
@@ -112,7 +112,7 @@ Provided by L<XS::Install>.
 
 If C<XS::libraryX> had been compiled with the C<XS::libraryY v1.0> dependency,
 but when loaded it finds out that the actual version of C<XS::libraryY> is
-different (e.g. C<v1.1>), it by default refuses to load and asks for 
+different (e.g. C<v1.1>), it by default refuses to load and asks for
 recompilation with the actual dependency verison C<XS::libraryY v1.1>.
 
 Provided by L<XS::Install>.
@@ -123,7 +123,7 @@ Perl itself does not guarantees ABI-compatibility between major releases.
 Maintaining ABI-compatibility has it's own costs, as well as possible
 performance penalty, e.g. instead of a direct access of a public property
 of a C-structure it now must be accessed via a function, preventing inlines
-from a C/C++ compiler. 
+from a C/C++ compiler.
 
 Usually C++ libraries do not maintain ABI-compatibility, so let it be. As the
 drawback/consequence, if a base C<libraryX> is upgraded, all other modules
@@ -149,7 +149,7 @@ Provided by L<XS::Framework>.
 Every XS-module should have Perl interface to make it possible to use it as
 self-contained module from Perl. It should also have a C/C++ interface to make
 it possible to use it from other XS-module from theirs C/C++ code, i.e. embed
-as a type or use in inheritance. 
+as a type or use in inheritance.
 
 C<C++ typemap> should also be provided for easy using of the module. It is
 considered as a part of C/C++ interface of a XS-module.
@@ -161,23 +161,23 @@ considered as a part of C/C++ interface of a XS-module.
 
 There is a module L<Date>, which provides methods for serialization and parsing
 dates in various formats. It is very fast, and when C<Date.pm> is loaded it
-loads it's C++ XS backend as C<Date.so> (or C<Date.dll> on Windows). 
+loads it's C++ XS backend as C<Date.so> (or C<Date.dll> on Windows).
 It depends on L<XS::Framework>, so C<Framework.so> is also loaded and it's C++
 functions are used directly from C<Date.so>.
 
-There is a module L<URI::XS> (say C<uri.so>), which parses/serializes URIs. 
+There is a module L<URI::XS> (say C<uri.so>), which parses/serializes URIs.
 It also depends on L<XS::Framework>.
 
-Now there is a module C<Protocol::HTTP>. When its C<http.so> is loaded, it
+Now there is a module L<Protocol::HTTP>. When its C<http.so> is loaded, it
 also loads C<Framework.so>, C<uri.so> and C<Date.so>. So when date or URIs are
-parsed/serialized from Perl code using C<Protocol::HTTP>, it directly invokes
-code from C<uri.so> or C<Date.so>, without routing via Perl (which isn't fast). 
+parsed/serialized from Perl code using L<Protocol::HTTP>, it directly invokes
+code from C<uri.so> or C<Date.so>, without routing via Perl (which isn't fast).
 
-When URI/Date objects are returned to Perl layer from the C<Protocol::HTTP> XS
+When URI/Date objects are returned to Perl layer from the L<Protocol::HTTP> XS
 API, they're exactly the same C++ objects (i.e. no any additional memory
 allocations for C++ objects) just wrapped into Perl SV (scalars) and it's
 possible to simply use them in Perl APIs of the corresponding modules
-(L<URI::XS> or L<Date>), which exists completely outside of C<Protocol::HTTP>
+(L<URI::XS> or L<Date>), which exists completely outside of L<Protocol::HTTP>
 space.
 
 L<XS::Install> (tooling support) and L<XS::Framework> (XS/C++ support) makes

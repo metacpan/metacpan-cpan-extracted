@@ -4,7 +4,7 @@ use 5.026_000;
 use strict;
 use warnings;
 
-use version 0.9917; our $VERSION = version->declare('v2.2.5');
+use version 0.9917; our $VERSION = version->declare('v2.3.0');
 
 
 sub parse {
@@ -87,7 +87,7 @@ To be used in the way:
 
     # specify the API plain-text response (this is just an example that won't fit to the command above)
     $plain = "[RESPONSE]\r\nCODE=200\r\nDESCRIPTION=Command completed successfully\r\nEOF\r\n";
-  
+
     # parse a plain-text response into hash
     $hash = WebService::Hexonet::Connector::ResponseParser::parse($plain);
 

@@ -7,7 +7,7 @@ use Win32::Vcpkg;
 use Path::Tiny ();
 
 # ABSTRACT: Interface to Microsoft Vcpkg Packages
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub new
@@ -80,7 +80,7 @@ Win32::Vcpkg::Package - Interface to Microsoft Vcpkg Packages
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -172,7 +172,7 @@ The linker flags needed to link against the package.
 
 =over 4
 
-=item L<Win32:Vcpkg>
+=item L<Win32::Vcpkg>
 
 =item L<Win32::Vcpkg::List>
 

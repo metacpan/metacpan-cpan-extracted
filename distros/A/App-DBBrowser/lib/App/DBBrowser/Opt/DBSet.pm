@@ -41,13 +41,13 @@ sub database_setting {
                 $plugin = $sf->{o}{G}{plugins}[0];
             }
             else {
-                my $choices = [ undef, map( "- $_", @{$sf->{o}{G}{plugins}} ) ];
+                my $menu = [ undef, map( "- $_", @{$sf->{o}{G}{plugins}} ) ];
                 # Choose
                 my $idx_sec = $tc->choose(
-                    $choices,
+                    $menu,
                     { %{$sf->{i}{lyt_v_clear}}, index => 1, default => $old_idx_sec, undef => '  <=' }
                 );
-                if ( ! defined $idx_sec || ! defined $choices->[$idx_sec] ) {
+                if ( ! defined $idx_sec || ! defined $menu->[$idx_sec] ) {
                     return;
                 }
                 if ( $sf->{o}{G}{menu_memory} ) {
@@ -57,7 +57,7 @@ sub database_setting {
                     }
                     $old_idx_sec = $idx_sec;
                 }
-                $plugin = $choices->[$idx_sec];
+                $plugin = $menu->[$idx_sec];
                 $plugin =~ s/^-\ //;
             }
             $plugin = 'App::DBBrowser::DB::' . $plugin;
@@ -107,14 +107,14 @@ sub database_setting {
         GROUP: while ( 1 ) {
             my $reset = '  Reset DB';
             my @pre = ( undef );
-            my $choices = [ @pre, map( $_->[1], @groups ) ];
-            push @$choices, $reset if ! defined $db;
+            my $menu = [ @pre, map( $_->[1], @groups ) ];
+            push @$menu, $reset if ! defined $db;
             # Choose
             my $idx_group = $tc->choose(
-                $choices,
+                $menu,
                 { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $old_idx_group, undef => '  <=' }
             );
-            if ( ! defined $idx_group || ! defined $choices->[$idx_group] ) {
+            if ( ! defined $idx_group || ! defined $menu->[$idx_group] ) {
                 if ( $sf->{write_config} ) {
                     $sf->__write_db_config_files( $db_opt );
                     delete $sf->{write_config};
@@ -130,7 +130,7 @@ sub database_setting {
                 }
                 $old_idx_group = $idx_group;
             }
-            if ( $choices->[$idx_group] eq $reset ) {
+            if ( $menu->[$idx_group] eq $reset ) {
                 my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
                 my @databases;
                 for my $section ( keys %$db_opt ) {
@@ -143,14 +143,14 @@ sub database_setting {
                     );
                     next GROUP;
                 }
-                my $choices = $tu->choose_a_subset(
+                my $menu = $tu->choose_a_subset(
                     [ sort @databases ],
                     { cs_label => 'Reset DB: ' }
                 );
-                if ( ! $choices->[0] ) {
+                if ( ! $menu->[0] ) {
                     next GROUP;
                 }
-                for my $db ( @$choices ) {
+                for my $db ( @$menu ) {
                     delete $db_opt->{$db};
                 }
                 $sf->{write_config}++;

@@ -9,7 +9,7 @@ BOOT {
     register_error_constants();
 }
 
-std::error_code new (Sv, int ec, const std::error_category* category) {
+std::error_code new (SV*, int ec, const std::error_category* category) {
     if (!category) throw "category required";
     RETVAL = std::error_code(ec, *category);
 }
@@ -76,7 +76,7 @@ bool std::error_category::_op_eq (const std::error_category* oth, ...) : const {
 MODULE = XS::Framework                PACKAGE = XS::ErrorCode
 PROTOTYPES: DISABLE
 
-ErrorCode new (Sv, std::error_code c, ErrorCode next = {}) {
+ErrorCode new (SV*, std::error_code c, ErrorCode next = ErrorCode()) {
     if (next) RETVAL = ErrorCode(c, next);
     else RETVAL = ErrorCode(c);
 }
@@ -103,18 +103,7 @@ ErrorCode next (ErrorCode ec) {
 
 std::string _op_string (ErrorCode ec, ...) {
     if (!ec) XSRETURN_UNDEF;
-    int i = 0;
-    while (ec) {
-        if (i) RETVAL += ", preceded by:\n";
-        RETVAL += ec.message();
-        RETVAL += " (";
-        RETVAL += std::to_string(ec.value());
-        RETVAL += ":";
-        RETVAL += ec.category().name();
-        RETVAL += ")";
-        ec = ec.next();
-        ++i;
-    }
+    RETVAL = ec.what();
 }
 
 bool _op_bool (ErrorCode ec, ...) {

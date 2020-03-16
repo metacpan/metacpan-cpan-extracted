@@ -3,7 +3,7 @@ package App::lcpan::CmdBundle::cpanauthors;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2019-12-26'; # DATE
 our $DIST = 'App-lcpan-CmdBundle-cpanauthors'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: lcpan subcommands related to Acme::CPANAuthors
@@ -20,7 +20,7 @@ App::lcpan::CmdBundle::cpanauthors - lcpan subcommands related to Acme::CPANAuth
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::CmdBundle::cpanauthors (from Perl distribution App-lcpan-CmdBundle-cpanauthors), released on 2019-12-26.
+This document describes version 0.002 of App::lcpan::CmdBundle::cpanauthors (from Perl distribution App-lcpan-CmdBundle-cpanauthors), released on 2019-12-26.
 
 =head1 SYNOPSIS
 

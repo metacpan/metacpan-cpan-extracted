@@ -35,6 +35,7 @@ method: functions
 method: hash
 method: hashes
 method: id
+method: inherits
 method: load
 method: methods
 method: name
@@ -51,6 +52,19 @@ method: sibling
 method: siblings
 method: used
 method: variables
+method: version
+
+=cut
+
+=inherits
+
+Data::Object::Name
+
+=cut
+
+=libraries
+
+Types::Standard
 
 =cut
 
@@ -470,6 +484,45 @@ id() : Str
   $space->id
 
   # Foo_Bar
+
+=cut
+
+=method inherits
+
+The inherits method returns the list of superclasses the target package is
+derived from.
+
+=signature inherits
+
+inherits() : ArrayRef
+
+=example-1 inherits
+
+  package Bar;
+
+  package main;
+
+  my $space = Data::Object::Space->new('bar');
+
+  $space->inherits
+
+  # []
+
+=example-2 inherits
+
+  package Foo;
+
+  package Bar;
+
+  use base 'Foo';
+
+  package main;
+
+  my $space = Data::Object::Space->new('bar');
+
+  $space->inherits
+
+  # ['Foo']
 
 =cut
 
@@ -954,6 +1007,47 @@ variables() : ArrayRef[Tuple[Str, ArrayRef]]
 
 =cut
 
+=method version
+
+The version method returns the C<VERSION> declared on the target package, if
+any.
+
+=signature version
+
+version() : Maybe[Str]
+
+=example-1 version
+
+  package Foo::Boo;
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/boo');
+
+  $space->version
+
+  # undef
+
+=example-2 version
+
+  package Foo::Boo;
+
+  our $VERSION = 0.01;
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('foo/boo');
+
+  $space->version
+
+  # '0.01'
+
+=cut
+
 package main;
 
 my $test = testauto(__FILE__);
@@ -1091,6 +1185,20 @@ $subs->example(-1, 'hashes', 'method', fun($tryable) {
 $subs->example(-1, 'id', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is $result, 'Foo_Bar';
+
+  $result
+});
+
+$subs->example(-1, 'inherits', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+$subs->example(-2, 'inherits', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, ['Foo'];
 
   $result
 });
@@ -1271,6 +1379,20 @@ $subs->example(-1, 'variables', 'method', fun($tryable) {
   my $scalars = ['scalars', ['func', 'init']];
 
   is_deeply $result, [$arrays, $hashes, $scalars];
+
+  $result
+});
+
+$subs->example(-1, 'version', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+  is $result, undef;
+
+  $result
+});
+
+$subs->example(-2, 'version', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, '0.01';
 
   $result
 });

@@ -37,6 +37,6 @@
          "url" : "https://github.com/basiliscos/p5-XS-Manifesto"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.0.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -103,7 +103,7 @@ sub join_tables {
             my @pre = ( undef, $enough_tables );
             # Choose
             my $join_type = $tc->choose(
-                [ @pre, map { "- $_" } @{$sf->{join_types}} ],
+                [ @pre, map( "- $_", @{$sf->{join_types}} ) ],
                 { %{$sf->{i}{lyt_v}}, prompt => 'Choose Join Type:' }
             );
             if ( ! defined $join_type ) {

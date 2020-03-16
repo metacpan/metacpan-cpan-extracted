@@ -17,8 +17,9 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'XML::RPC'		=> '1.1',
+        'Data::Dump' 		=> '1.23',
+	'DBI' 			=> '1.643',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Rtmgr-Gen-Db-*' },

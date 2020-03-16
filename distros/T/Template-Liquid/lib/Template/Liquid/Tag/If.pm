@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::If;
-our $VERSION = '1.0.18';
+our $VERSION = '1.0.19';
 use strict;
 use warnings;
 require Template::Liquid::Error;
@@ -9,16 +9,21 @@ sub import { Template::Liquid::register_tag('if') }
 
 sub new {
     my ($class, $args) = @_;
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing template argument',
-                                   fatal   => 1
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing template argument',
+                                   fatal    => 1
         }
         if !defined $args->{'template'};
-    raise Template::Liquid::Error {type => 'Context',
-                             message => 'Missing parent argument', fatal => 1}
+    raise Template::Liquid::Error {type     => 'Context',
+                                   template => $args->{template},
+                                   message  => 'Missing parent argument',
+                                   fatal    => 1
+        }
         if !defined $args->{'parent'};
     raise Template::Liquid::Error {
-                   type    => 'Syntax',
+                   type     => 'Syntax',
+                   template => $args->{template},
                    message => 'Missing argument list in ' . $args->{'markup'},
                    fatal   => 1
         }
@@ -56,7 +61,7 @@ sub push_block {
 sub render {
     my ($s) = @_;
     for my $block (@{$s->{'blocks'}}) {
-        return $block->render() if grep { $_ || 0 } @{$block->{'conditions'}};
+        return $block->render() if grep {$_} @{$block->{'conditions'}};
     }
 }
 1;

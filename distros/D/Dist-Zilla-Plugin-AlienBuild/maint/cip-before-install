@@ -2,4 +2,4 @@
 
 set -ex
 
-cip exec cpanm Alien::Build::MB
+cip exec cpanm -n Alien::Build::MB

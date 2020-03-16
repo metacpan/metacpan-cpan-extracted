@@ -59,7 +59,11 @@ sub add_schema_patch ( $self, $id, $module, $sql = undef ) {
 sub load_schema ( $self, $path, $module = $DEFAULT_MODULE ) {
     $path = P->path($path);
 
-    for my $patch ( $path->read_dir->@* ) {
+    my $patches = $path->read_dir;
+
+    return if !$patches;
+
+    for my $patch ( $patches->@* ) {
         my ($id) = $patch =~ /\A(\d+)/sm;
 
         my $sql = P->cfg->read("$path/$patch");

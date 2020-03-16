@@ -54,4 +54,6 @@ t/0300_basics/03002_render_context.t
 t/0400_classes/04001_context.t
 t/0500_bugs/05001_conditions.t
 t/0500_bugs/05002_issue_7.t
+t/0500_bugs/05004_case_conditions.t
+t/0500_bugs/05005_filter_with_metachars.t
 META.yml

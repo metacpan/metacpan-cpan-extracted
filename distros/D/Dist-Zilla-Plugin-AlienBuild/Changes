@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-AlienBuild
 
+0.30      2020-03-15 03:00:26 -0600
+  - [AlienBase::Doc] uses Alien::Base::Wrapper instead of manual
+    intervention.
+
 0.29      2019-05-22 08:13:23 -0400
   - bump requirement for clean_install to AB 1.74 to avoid
     bug in 1.73.

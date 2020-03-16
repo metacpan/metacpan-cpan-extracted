@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
 
@@ -56,9 +56,9 @@ ENVIRONMENT
 
 SEE ALSO
 
-    Win32:Vcpkg::List
+    Win32::Vcpkg::List
 
-    Win32:Vcpkg::Package
+    Win32::Vcpkg::Package
 
 AUTHOR
 

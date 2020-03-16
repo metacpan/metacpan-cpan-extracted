@@ -11,43 +11,19 @@ use overload    #
   },
   fallback => undef;
 
-has app   => ( required => 1 );    # ConsumerOf ['Pcore::App']
-has hosts => ( required => 1 );    # HashRef
+has app       => ( required => 1 );    # ConsumerOf ['Pcore::App']
+has namespace => ( required => 1 );    # HashRef
 
-has map           => ();           # HashRef, router path -> class name
-has host_re       => ();           # HashRef, router path -> class name
-has host_api_path => ();           # HashRef
+has map        => ( init_arg => undef );    # HashRef, router path -> class name
+has api_path   => ( init_arg => undef );
+has path_ctrl  => ( init_arg => undef );    # HashRef, router path -> sigleton cache
+has class_ctrl => ( init_arg => undef );    # HashRef, class name -> sigleton cache
+has path_re    => ( init_arg => undef );
 
-has path_ctrl  => ();              # HashRef, router path -> sigleton cache
-has class_ctrl => ();              # HashRef, class name -> sigleton cache
+sub init ( $self ) {
+    $self->{namespace} //= ref $self->{app};
 
-sub BUILD ( $self, $args ) {
-
-    # init hosts
-    $self->{hosts} //= {};
-
-    # add default router
-    $self->{hosts}->{'*'} = ref $self->{app} if !keys $self->{hosts}->%*;
-
-    return;
-}
-
-sub init ($self) {
-    my $map;
-
-    for my $host ( keys $self->{hosts}->%* ) {
-        my $ns = $self->{hosts}->{$host} // ref $self->{app};
-
-        $map->{$host} = $self->_get_host_map( $host, $ns );
-    }
-
-    $self->{map} = $map;
-
-    return;
-}
-
-sub _get_host_map ( $self, $host, $ns ) {
-    my $index_class = "${ns}::Index";
+    my $index_class = "$self->{namespace}::Index";
 
     my $index_path = $index_class =~ s[::][/]smgr;
 
@@ -98,27 +74,28 @@ sub _get_host_map ( $self, $host, $ns ) {
 
         my $obj = $class->new( {
             app  => $self->{app},
-            host => $host,
             path => $route,
         } );
 
-        die qq[Controller path "$route" is not unique] if exists $self->{path_ctrl}->{$host}->{$route};
+        die qq[Controller path "$route" is not unique] if exists $self->{path_ctrl}->{$route};
 
         $map->{ $route eq '/' ? '/' : "$route/" } = $class;
 
-        $self->{class_ctrl}->{$class} = $self->{path_ctrl}->{$host}->{$route} = $obj;
+        $self->{class_ctrl}->{$class} = $self->{path_ctrl}->{$route} = $obj;
 
+        # api controller
         if ( $class->does('Pcore::App::Controller::API') ) {
-
-            # api controller
-            $self->{host_api_path}->{$host} = $obj->{path};
+            $self->{api_path} = $obj->{path};
         }
     }
 
-    my $re = '\A(' . ( join '|', map {quotemeta} reverse sort { length $a <=> length $b } keys $map->%* ) . ')(.*)\z';
-    $self->{host_re}->{$host} = qr/$re/sm;
+    $self->{map} = $map;
 
-    return $map;
+    my $re = '\A(' . ( join '|', map {quotemeta} reverse sort { length $a <=> length $b } keys $map->%* ) . ')(.*)\z';
+
+    $self->{path_re} = qr/$re/sm;
+
+    return;
 }
 
 sub run ( $self, $req ) {
@@ -128,47 +105,25 @@ sub run ( $self, $req ) {
 
     my $env = $req->{env};
 
-    my $host = $env->{HTTP_HOST} // '*';
-
     my $map = $self->{map};
-
-    if ( !exists $map->{$host} ) {
-
-        # use default host, if possible
-        if ( exists $map->{'*'} ) {
-            $host = '*';
-        }
-
-        # unknown HTTP host
-        else {
-            return 421;    # 421 - misdirected request
-        }
-    }
 
     my $path = P->path("/$env->{PATH_INFO}");
 
     $path .= '/' if $path ne '/' && !defined $path->{filename};
 
-    if ( $path =~ $self->{host_re}->{$host} ) {
+    if ( $path =~ $self->{path_re} ) {
 
         # extend HTTP request
         $req->{app}  = $self->{app};
-        $req->{host} = $host;
         $req->{path} = P->path($2) if $2 ne $EMPTY;
 
-        my $ctrl = $self->{class_ctrl}->{ $map->{$host}->{$1} };
+        my $ctrl = $self->{class_ctrl}->{ $map->{$1} };
 
         return $ctrl->run($req);
     }
     else {
         return 404;
     }
-}
-
-sub get_host_api_path ( $self, $host ) {
-    return if !$self->{host_api_path};
-
-    return $self->{host_api_path}->{$host};
 }
 
 1;
