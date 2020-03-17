@@ -4,11 +4,10 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.117';
+our $VERSION = '0.119';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
-                     insert_sep get_term_size get_term_width get_term_height unicode_sprintf
-                     choose_a_dir choose_dirs ); # 21.09.2019    # after transition -> remove
+                     insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
 
 use Carp                  qw( croak );
 use Cwd                   qw( realpath );
@@ -67,58 +66,18 @@ sub __prepare_opt {
         $opt = {};
     }
     croak "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
-
-    ############################################################### 21.09.2019 # after transition -> remove,
-    if ( ! defined $opt->{add_dirs} && defined $opt->{add_dir} ) {
-        $opt->{add_dirs} = $opt->{add_dir};
-    }
-    if ( ! defined $opt->{init_dir} && defined $opt->{dir} ) {
-        $opt->{init_dir} = $opt->{dir};
-    }
-    if ( ! defined $opt->{parent_dir} && defined $opt->{up} ) {
-        $opt->{parent_dir} = $opt->{up};
-    }
-    if ( ! defined $opt->{current_selection_label} && defined $opt->{name} ) {
-        $opt->{current_selection_label} = $opt->{name};
-    }
-    if ( ! defined $opt->{alignment} && defined $opt->{justify} ) {
-        $opt->{alignment} = $opt->{justify};
-    }
-    if ( ! defined $opt->{thousands_separator} && defined $opt->{thsd_sep} ) {
-        $opt->{thousands_separator} = $opt->{thsd_sep};
-    }
-    if ( ! defined $opt->{current_selection_begin} && defined $opt->{sofar_begin} ) {
-        $opt->{current_selection_begin} = $opt->{sofar_begin};
-    }
-    if ( ! defined $opt->{current_selection_separator} && defined $opt->{sofar_separator} ) {
-        $opt->{current_selection_separator} = $opt->{sofar_separator};
-    }
-    if ( ! defined $opt->{current_selection_end} && defined $opt->{sofar_end} ) {
-        $opt->{current_selection_end} = $opt->{sofar_end};
-    }
-    ###############################################################
-
-    ############################################################### 19.11.2019 # after transition -> remove,
-    if ( ! defined $opt->{cs_label} && defined $opt->{current_selection_label} ) {
-        $opt->{cs_label} = $opt->{current_selection_label};
-    }
-    if ( ! defined $opt->{cs_begin} && defined $opt->{current_selection_begin} ) {
-        $opt->{cs_begin} = $opt->{current_selection_begin};
-    }
-    if ( ! defined $opt->{cs_separator} && defined $opt->{current_selection_separator} ) {
-        $opt->{cs_separator} = $opt->{current_selection_separator};
-    }
-    if ( ! defined $opt->{cs_end} && defined $opt->{current_selection_end} ) {
-        $opt->{cs_end} = $opt->{current_selection_end};
-    }
-    ###############################################################
-
     if ( %$opt ) {
         my $sub =  ( caller( 1 ) )[3];
         $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
         validate_options( _valid_options( $sub ), $opt );
+        my $defaults = _defaults();
         for my $key ( keys %$opt ) {
-            $self->{$key} = $opt->{$key} if defined $opt->{$key};
+            if ( ! defined $opt->{$key} && defined $defaults->{$key} ) {
+                $self->{$key} = $defaults->{$key};
+            }
+            else {
+                $self->{$key} = $opt->{$key};
+            }
         }
     }
 }
@@ -162,25 +121,6 @@ sub _valid_options {
         cs_label            => 'Str',
         cs_separator        => 'Str',
         thousands_separator => 'Str',
-
-        ####################### 21.09.2019    # after transition -> remove
-        dir             => 'Str',
-        name            => 'Str',
-        up              => 'Str',
-        justify         => '[ 0 1 2 ]',
-        thsd_sep        => 'Str',
-        sofar_begin     => 'Str',
-        sofar_end       => 'Str',
-        sofar_separator => 'Str',
-        #######################
-
-        ####################### 19.11.2019    # after transition -> remove
-        current_selection_label     => 'Str',
-        current_selection_begin     => 'Str',
-        current_selection_end       => 'Str',
-        current_selection_separator => 'Str',
-        add_dir         => 'Str',
-        #######################
     );
     my $options;
     if ( $caller eq 'new' ) {
@@ -196,7 +136,7 @@ sub _valid_options {
 sub _defaults {
     return {
         alignment      => 0,
-        all_by_default => 1,
+        all_by_default => 0,
         #busy_string   => undef,
         clear_screen   => 0,
         color          => 0,
@@ -211,7 +151,7 @@ sub _defaults {
         layout         => 1,
         #tabs_info     => undef,
         #tabs_prompt   => undef,
-        add_dirs       => '[Add-Dirs]',
+        add_dirs       => '[Choose-Dirs]',
         back           => 'BACK',
         show_files     => '[Show-Files]',
         confirm        => 'CONFIRM',
@@ -236,11 +176,7 @@ sub _defaults {
 
 sub _routine_options {
     my ( $caller ) = @_;
-    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color tabs_info tabs_prompt cs_label
-
-                  dir name justify up thsd_sep sofar_begin sofar_end sofar_separator add_dir
-                  current_selection_label current_selection_begin current_selection_end current_selection_separator ) );
-                  # 21.09.2019    # after transition remove: dir name ...
+    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color tabs_info tabs_prompt cs_label ) );
     my $options;
     if ( $caller eq 'choose_directories' ) {
         $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden parent_dir decoded add_dirs ) ];
@@ -291,22 +227,6 @@ sub __prepare_path {
     }
     return $init_dir_fs;
 }
-
-
-############################################################################# 21.09.2019    # after transition -> remove
-sub choose_dirs {
-    croak "'choose_dirs' is not a method and deprecated. Use 'choose_directories' instead." if ref $_[0] eq __PACKAGE__;
-    my $ob = __PACKAGE__->new();
-    delete $ob->{backup_instance_defaults};
-    return $ob->choose_directories( @_ );
-}
-sub choose_a_dir {
-    croak "'choose_a_dir' is not a method and deprecated. Use 'choose_a_directory' instead." if ref $_[0] eq __PACKAGE__;
-    my $ob = __PACKAGE__->new();
-    delete $ob->{backup_instance_defaults};
-    return $ob->choose_a_directory( @_ );
-}
-########################################################################################################################
 
 
 sub __available_dirs {
@@ -391,7 +311,7 @@ sub choose_directories {
                 $self->{cs_label} . join( ', ', map { decode 'locale_fs', $_ } @$chosen_dirs_fs ), get_term_width(),
                 { subseq_tab => ' ' x $cs_label_w, color => $self->{color}, join => 1 }
             );
-            my $prompt = 'Choose directories:' . "\n>" . decode( 'locale_fs', $dir_fs );
+            my $prompt = "\n" . 'CHOOSE directories in "' . decode( 'locale_fs', $dir_fs ) . '":' . "\n";
             my $bu_opt;
             my @used_options = qw(info prompt back confirm cs_label cs_begin index);
             for my $o ( @used_options ) {
@@ -400,7 +320,7 @@ sub choose_directories {
             my $idxs = $self->choose_a_subset(
                 [ sort map { decode 'locale_fs', $_ } @$avail_dirs_fs ],
                 {   info => $info, prompt => $prompt, back => '<<', confirm => 'OK',
-                    cs_label => '', cs_begin => '+ ',
+                    cs_begin => '+ ', cs_label => undef,
                     index => 1
                 }
             );
@@ -471,7 +391,7 @@ sub __choose_a_path {
         @pre = ( undef, $self->{confirm}, $self->{add_dirs}, $self->{parent_dir} );
         $enchanted_idx = 3;
     }
-    my $default_idx = $self->{enchanted}  ? $enchanted_idx : 0;
+    my $default_idx = $self->{enchanted} ? $enchanted_idx : 0;
     my $prev_dir_fs = $dir_fs;
     my $wildcard = ' ? ';
 
@@ -506,8 +426,8 @@ sub __choose_a_path {
                 $self->{cs_label} . join( ', ', map { decode 'locale_fs', $_ } @{$opt->{chosen_dirs_fs}} ), get_term_width(),
                 { subseq_tab => ' ' x $cs_label_w, color => $self->{color}, join => 0 }
             );
-            my $prompt = defined $self->{prompt} ? $self->{prompt} : 'Browse directories:';
-            push @tmp, $prompt . "\n>" . decode( 'locale_fs', $dir_fs );
+            my $prompt = defined $self->{prompt} ? $self->{prompt} : 'BROWSE directories';
+            push @tmp, "\n" . $prompt . ' in "' . decode( 'locale_fs', $dir_fs ) . '":' . "\n";
         }
         else {
             push @tmp, $self->{cs_label} . decode( 'locale_fs', $dir_fs );
@@ -549,7 +469,7 @@ sub __choose_a_path {
             $default_idx = 0;
         }
         else {
-            $default_idx = $self->{enchanted}  ? $enchanted_idx : 0;
+            $default_idx = $self->{enchanted} ? $enchanted_idx : 0;
         }
         $prev_dir_fs = $dir_fs;
     }
@@ -626,6 +546,10 @@ sub __a_file {
               undef => $self->{back} }
         );
         if ( ! length $chosen_file ) {
+            if ( length $prev_dir_fs ) {
+                $prev_dir_fs = '';
+                next;
+            }
             return;
         }
         elsif ( $chosen_file eq $self->{confirm} ) {
@@ -680,18 +604,21 @@ sub choose_a_number {
     }
     my %numbers;
     my $result;
-    if ( ! defined $self->{cs_label} ) {
-        $self->{cs_label} = '> ';
-    }
 
     NUMBER: while ( 1 ) {
-
-        my $new_result = length $result ? $result : '';
-        my $row = sprintf(  "%s%*s", $self->{cs_label}, $longest, $new_result );
-        if ( print_columns( $row ) > get_term_width() ) {
-            $row = $new_result;
+        my $cs_row;
+        if ( defined $self->{cs_label} || length $result ) {
+            my $tmp_result = length $result ? $result : '';
+            my $tmp_cs_label = defined $self->{cs_label} ? $self->{cs_label} : '';
+            $cs_row = sprintf(  "%s%*s", $tmp_cs_label, $longest, $tmp_result );
+            if ( print_columns( $cs_row ) > get_term_width() ) {
+                $cs_row = $tmp_result;
+            }
         }
-        my @tmp = ( $row );
+        my @tmp;
+        if ( defined $cs_row ) {
+            push @tmp, $cs_row;
+        }
         if ( length $self->{prompt} ) {
             push @tmp, $self->{prompt};
         }
@@ -770,18 +697,18 @@ sub choose_a_subset {
 
     while ( 1 ) {
         my @tmp;
-        my $sofar;
+        my $cs;
         if ( defined $self->{cs_label} ) {
-            $sofar .= $self->{cs_label};
+            $cs .= $self->{cs_label};
         }
         if ( @$new_idx ) {
-            $sofar .= $self->{cs_begin} . join( $self->{cs_separator}, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] ) . $self->{cs_end};
+            $cs .= $self->{cs_begin} . join( $self->{cs_separator}, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] ) . $self->{cs_end};
         }
         elsif ( $opt->{all_by_default} ) {
-            $sofar .= $self->{cs_begin} . '*' . $self->{cs_end};
+            $cs .= $self->{cs_begin} . '*' . $self->{cs_end};
         }
-        if ( defined $sofar ) {
-            @tmp = ( $sofar );
+        if ( defined $cs ) {
+            @tmp = ( $cs );
         }
         if ( length $self->{prompt} ) {
             push @tmp, $self->{prompt};
@@ -838,7 +765,10 @@ sub choose_a_subset {
             }
         }
         push @$bu, [ [ @$curr_avail ], [ @$new_idx ] ];
-        my $ok = $idx[0] == 1 ? shift @idx : 0; ##
+        my $ok;
+        if ( $idx[0] == $#pre ) {
+            $ok = shift @idx;
+        }
         my @tmp_idx;
         for my $i ( reverse @idx ) {
             $i -= @pre;
@@ -1056,7 +986,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.117
+Version 0.119
 
 =cut
 
@@ -1145,10 +1075,8 @@ cs_label
 
 The value of I<cs_label> (current selection label) is a string which is placed in front of the current selection.
 
-With C<settings_menu> the current selection is only shown if I<cs_label> is defined.
-
-Defaults: C<choose_directories>: 'Dirs: ', C<choose_a_directory>: 'Dir: ', C<choose_a_file>: 'File: ', C<choose_a_number>: ' >',
-C<choose_a_subset>: '', C<settings_menu>: undef
+Defaults: C<choose_directories>: 'Dirs: ', C<choose_a_directory>: 'Dir: ', C<choose_a_file>: 'File: '. For
+C<choose_a_number>, C<choose_a_subset> and C<settings_menu> the default is undefined.
 
 The current selection output is placed between the I<info> string and the I<prompt> string.
 
@@ -1210,7 +1138,8 @@ Options:
 
 alignment
 
-Elements in columns are aligned to the left if set to 0, aligned to the right if set to 1 and centered if set to 2.
+Elements in columns are aligned to the left if set to C<0>, aligned to the right if set to C<1> and centered if set to
+C<2>.
 
 Values: [0],1,2.
 
@@ -1226,10 +1155,10 @@ Values: 0,[1].
 
 enchanted
 
-If set to 1, the default cursor position is on the "I<parent_dir>" menu entry. If the directory name remains the same after an
+If set to C<1>, the default cursor position is on the "I<parent_dir>" menu entry. If the directory name remains the same after an
 user input, the default cursor position changes to "I<back>".
 
-If set to 0, the default cursor position is on the "I<back>" menu entry.
+If set to C<0>, the default cursor position is on the "I<back>" menu entry.
 
 Values: 0,[1].
 
@@ -1253,9 +1182,9 @@ Values: 0,[1],2,3.
 
 order
 
-If set to 1, the items are ordered vertically else they are ordered horizontally.
+If set to C<1>, the items are ordered vertically else they are ordered horizontally.
 
-This option has no meaning if I<layout> is set to 3.
+This option has no meaning if I<layout> is set to C<3>.
 
 Values: 0,[1].
 
@@ -1310,7 +1239,7 @@ Default: C<[Show-Files]>
 
 C<choose_directories> is similar to C<choose_a_directory> but it is possible to return multiple directories.
 
-Selecting the  "I<add_dirs>" menu entry opens the add-directories sub menu: there one can add directories from the
+Selecting the  "I<add_dirs>" menu entry opens the add-directories sub menu: one can add there directories from the
 current working directory to the list of chosen directories.
 
 To return the list of chosen directories (as an array reference) select the "I<confirm>" entry in main menu.
@@ -1328,7 +1257,7 @@ add_dirs
 
 Customize the string of the menu entry "I<add_dirs>".
 
-Default: C<[Add-Dir]>
+Default: C<[Choose-Dirs]>
 
 =back
 
@@ -1361,6 +1290,8 @@ Default: C<,>
 
 =back
 
+The I<current-selection> line is shown if I<cs_label> is defined or as soon as a number has been chosen.
+
 =head2 choose_a_subset
 
     $subset = choose_a_subset( \@available_items, { cs_label => 'new> ', ... } )
@@ -1379,13 +1310,14 @@ all_by_default
 
 If enabled, all elements are selected if CONFIRM is chosen without any selected elements.
 
-Values: 0,[1].
+Values: [0],1.
 
 =item
 
 alignment
 
-Elements in columns are aligned to the left if set to 0, aligned to the right if set to 1 and centered if set to 2.
+Elements in columns are aligned to the left if set to C<0>, aligned to the right if set to C<1> and centered if set to
+C<2>.
 
 Values: [0],1,2.
 
@@ -1424,7 +1356,7 @@ C<choose_a_subset> is called.
 
 order
 
-If set to 1, the items are ordered vertically else they are ordered horizontally.
+If set to C<1>, the items are ordered vertically else they are ordered horizontally.
 
 This option has no meaning if I<layout> is set to 3.
 
@@ -1465,6 +1397,8 @@ Current selection: as soon as elements have been chosen the I<cs_end> string is 
 Default: empty string
 
 =back
+
+The current-selection line is shown if I<cs_label> is defined or as soon as elements have been chosen.
 
 To return the chosen subset (as an array reference) select the "I<confirm>" menu entry.
 
@@ -1528,112 +1462,6 @@ If the "I<back>" menu entry is chosen, C<settings_menu> does not apply the made 
 hash-reference (second argument) and returns the number of made changes.
 
 Setting the option I<cs_label> to a defined value adds an info output line.
-
-=head1 DEPRECATIONS
-
-=head2 Functions
-
-=over
-
-=item
-
-choose_a_dir
-
-The function C<choose_a_dir> is deprecated. Use C<choose_a_directory> instead.
-
-=item
-
-choose_dirs
-
-The function C<choose_dirs> is deprecated. Use C<choose_directories> instead.
-
-=back
-
-=head2 Options
-
-=over
-
-=item
-
-justify
-
-The option I<justify> is deprecated. Use I<alignment> instead.
-
-=item
-
-dir
-
-The option I<dir> is deprecated. Use I<init_dir> instead.
-
-=item
-
-up
-
-The option I<up> is deprecated. Use I<parent_dir> instead.
-
-=item
-
-name
-
-The option I<name> is deprecated. Use I<cs_label> instead.
-
-=item
-
-current_selection_label
-
-The option I<current_selection_label> is deprecated. Use I<cs_label> instead.
-
-=item
-
-thsd_sep
-
-The option I<thsd_sep> is deprecated. Use I<thousands_separator> instead.
-
-=item
-
-sofar_begin
-
-The option I<sofar_begin> is deprecated. Use I<cs_begin> instead.
-
-=item
-
-current_selection_begin
-
-The option I<current_selection_begin> is deprecated. Use I<cs_begin> instead.
-
-=item
-
-sofar_separator
-
-The option I<sofar_separator> is deprecated. Use I<cs_separator> instead.
-
-=item
-
-current_selection_separator
-
-The option I<current_selection_separator> is deprecated. Use I<cs_separator> instead.
-
-=item
-
-sofar_end
-
-The option I<sofar_end> is deprecated. Use I<cs_end> instead.
-
-=item
-
-current_selection_end
-
-The option I<current_selection_end> is deprecated. Use I<cs_end> instead.
-
-=item
-
-add_dir
-
-The option I<add_dir> is deprecated. Use I<add_dirs> instead.
-
-=back
-
-Deprecated functions and options will be removed.
 
 =head1 REQUIREMENTS
 

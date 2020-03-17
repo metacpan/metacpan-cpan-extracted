@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.13.5 2020-03-17T03:27:33Z
+
+    - Update sdif default color for *FILE.
+
 4.13.4 2020-02-27T06:29:08Z
 
     - Set $Getopt::EX::Colormap::NO_RESET_EL not to produce ERASE LINE

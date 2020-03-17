@@ -12,7 +12,7 @@ if($@) {
 }
 else {print "ok 1\n"}
 
-if($List::Uniqnum::VERSION eq '0.07') { print "ok 2\n" }
+if($List::Uniqnum::VERSION eq '0.08') { print "ok 2\n" }
 else {
   warn "\nVersion is $List::Uniqnum::VERSION\n";
   print "not ok 2\n";

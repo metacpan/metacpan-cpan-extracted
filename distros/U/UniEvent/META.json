@@ -1,0 +1,74 @@
+{
+   "abstract" : "Object-oriented, fast and extendable event loop abstraction framework with Perl and C++ interface.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "UniEvent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "Export::XS" : "v3.0.4",
+            "Net::SockAddr" : "v1.0.1",
+            "Test::Catch" : "v1.0.13",
+            "XS::Framework" : "v1.2.8",
+            "XS::Install" : "v1.2.16",
+            "XS::libcares" : "v1.1.1.6",
+            "XS::libcatch" : "v1.1.0",
+            "XS::libpanda" : "v1.3.12",
+            "XS::libuv" : "v1.34.2.1",
+            "next::XS" : "v1.0.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Export::XS" : "v3.0.4",
+            "Net::SockAddr" : "v1.0.1",
+            "XS::Framework" : "v1.2.8",
+            "XS::Install" : "v1.2.16",
+            "XS::libcares" : "v1.1.1.6",
+            "XS::libpanda" : "v1.3.12",
+            "XS::libuv" : "v1.34.2.1",
+            "next::XS" : "v1.0.7"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Export::XS" : "v3.0.4",
+            "Net::SSLeay" : "0",
+            "Net::SockAddr" : "v1.0.1",
+            "Test::Catch" : "v1.0.13",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.96",
+            "XS::Framework" : "v1.2.8",
+            "XS::libcares" : "v1.1.1.6",
+            "XS::libcatch" : "v1.1.0",
+            "XS::libpanda" : "v1.3.12",
+            "XS::libuv" : "v1.34.2.1",
+            "next::XS" : "v1.0.7"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

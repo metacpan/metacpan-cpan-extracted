@@ -48,7 +48,6 @@ static void read_kex_algos(void);
 /* helper function for gen_new_keys */
 static void hashkeys(unsigned char *out, unsigned int outlen, 
 		const hash_state * hs, const unsigned char X);
-static void finish_kexhashbuf(void);
 
 
 /* Send our list of algorithms we can use */
@@ -391,6 +390,14 @@ int is_compress_recv() {
 			&& ses.keys->recv.algo_comp == DROPBEAR_COMP_ZLIB_DELAY);
 }
 
+static void* dropbear_zalloc(void* UNUSED(opaque), uInt items, uInt size) {
+	return m_calloc(items, size);
+}
+
+static void dropbear_zfree(void* UNUSED(opaque), void* ptr) {
+	m_free(ptr);
+}
+
 /* Set up new zlib compression streams, close the old ones. Only
  * called from gen_new_keys() */
 static void gen_new_zstream_recv() {
@@ -399,8 +406,8 @@ static void gen_new_zstream_recv() {
 	if (ses.newkeys->recv.algo_comp == DROPBEAR_COMP_ZLIB
 			|| ses.newkeys->recv.algo_comp == DROPBEAR_COMP_ZLIB_DELAY) {
 		ses.newkeys->recv.zstream = (z_streamp)m_malloc(sizeof(z_stream));
-		ses.newkeys->recv.zstream->zalloc = Z_NULL;
-		ses.newkeys->recv.zstream->zfree = Z_NULL;
+		ses.newkeys->recv.zstream->zalloc = dropbear_zalloc;
+		ses.newkeys->recv.zstream->zfree = dropbear_zfree;
 		
 		if (inflateInit(ses.newkeys->recv.zstream) != Z_OK) {
 			dropbear_exit("zlib error");
@@ -423,8 +430,8 @@ static void gen_new_zstream_trans() {
 	if (ses.newkeys->trans.algo_comp == DROPBEAR_COMP_ZLIB
 			|| ses.newkeys->trans.algo_comp == DROPBEAR_COMP_ZLIB_DELAY) {
 		ses.newkeys->trans.zstream = (z_streamp)m_malloc(sizeof(z_stream));
-		ses.newkeys->trans.zstream->zalloc = Z_NULL;
-		ses.newkeys->trans.zstream->zfree = Z_NULL;
+		ses.newkeys->trans.zstream->zalloc = dropbear_zalloc;
+		ses.newkeys->trans.zstream->zfree = dropbear_zfree;
 	
 		if (deflateInit2(ses.newkeys->trans.zstream, Z_DEFAULT_COMPRESSION,
 					Z_DEFLATED, DROPBEAR_ZLIB_WINDOW_BITS, 
@@ -640,7 +647,7 @@ void kexdh_comb_key(struct kex_dh_param *param, mp_int *dh_pub_them,
 	finish_kexhashbuf();
 }
 
-#ifdef DROPBEAR_ECDH
+#if DROPBEAR_ECDH
 struct kex_ecdh_param *gen_kexecdh_param() {
 	struct kex_ecdh_param *param = m_malloc(sizeof(*param));
 	if (ecc_make_key_ex(NULL, dropbear_ltc_prng, 
@@ -687,12 +694,15 @@ void kexecdh_comb_key(struct kex_ecdh_param *param, buffer *pub_them,
 	/* K, the shared secret */
 	buf_putmpint(ses.kexhashbuf, ses.dh_K);
 
+	ecc_free(Q_them);
+	m_free(Q_them);
+
 	/* calculate the hash H to sign */
 	finish_kexhashbuf();
 }
 #endif /* DROPBEAR_ECDH */
 
-#ifdef DROPBEAR_CURVE25519
+#if DROPBEAR_CURVE25519
 struct kex_curve25519_param *gen_kexcurve25519_param () {
 	/* Per http://cr.yp.to/ecdh.html */
 	struct kex_curve25519_param *param = m_malloc(sizeof(*param));
@@ -714,7 +724,7 @@ void free_kexcurve25519_param(struct kex_curve25519_param *param)
 	m_free(param);
 }
 
-void kexcurve25519_comb_key(struct kex_curve25519_param *param, buffer *buf_pub_them,
+void kexcurve25519_comb_key(const struct kex_curve25519_param *param, const buffer *buf_pub_them,
 	sign_key *hostkey) {
 	unsigned char out[CURVE25519_LEN];
 	const unsigned char* Q_C = NULL;
@@ -761,8 +771,7 @@ void kexcurve25519_comb_key(struct kex_curve25519_param *param, buffer *buf_pub_
 #endif /* DROPBEAR_CURVE25519 */
 
 
-
-static void finish_kexhashbuf(void) {
+void finish_kexhashbuf(void) {
 	hash_state hs;
 	const struct ltc_hash_descriptor *hash_desc = ses.newkeys->algo_kex->hash_desc;
 
@@ -774,7 +783,7 @@ static void finish_kexhashbuf(void) {
 	hash_desc->done(&hs, buf_getwriteptr(ses.hash, hash_desc->hashsize));
 	buf_setlen(ses.hash, hash_desc->hashsize);
 
-#if defined(DEBUG_KEXHASH) && defined(DEBUG_TRACE)
+#if defined(DEBUG_KEXHASH) && DEBUG_TRACE
 	if (!debug_trace) {
 		printhex("kexhashbuf", ses.kexhashbuf->data, ses.kexhashbuf->len);
 		printhex("kexhash", ses.hash->data, ses.hash->len);
@@ -814,7 +823,7 @@ static void read_kex_algos() {
 	int allgood = 1; /* we AND this with each goodguess and see if its still
 						true after */
 
-#ifdef USE_KEXGUESS2
+#if DROPBEAR_KEXGUESS2
 	enum kexguess2_used kexguess2 = KEXGUESS2_LOOK;
 #else
 	enum kexguess2_used kexguess2 = KEXGUESS2_NO;
@@ -942,6 +951,12 @@ static void read_kex_algos() {
 		ses.newkeys->recv.algo_comp = c2s_comp_algo->val;
 		ses.newkeys->trans.algo_comp = s2c_comp_algo->val;
 	}
+
+#if DROPBEAR_FUZZ
+	if (fuzz.fuzzing) {
+		fuzz_kex_fakealgos();
+	}
+#endif
 
 	/* reserved for future extensions */
 	buf_getint(ses.payload);

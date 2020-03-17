@@ -1,0 +1,30 @@
+use strict;
+use warnings;
+use lib 't'; use PETest;
+use UniEvent::Error;
+use UniEvent::TCP;
+use Test::More;
+use CommonStream;
+use Talkers;
+use UniClient;
+
+my $tcp = new UniEvent::TCP;
+my $port = CommonStream::regular_bind($tcp);
+
+my $magic_token = "MAGIC";
+
+diag 'BUG HERE!!!';
+# uncomment next to see BUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# exit 0 if (!fork);
+
+sub connect_writer_remote {
+    my ($port, $line) = @_;
+    UniClient::connect_remote($port, Talkers::make_writer($line));
+}
+
+ok(
+    CommonStream::test_serv_reading($tcp, sub {$port}, $magic_token, \&connect_writer_remote),
+    "Recieving what was robustly sent. (bind - Perl)"
+   );
+
+done_testing();

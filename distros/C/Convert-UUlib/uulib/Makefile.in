@@ -75,14 +75,15 @@ libuu.a:	$(UULIB_OBJ)
 .c.o:
 	$(CC) -c $(CFLAGS) $(VDEF) $<
 
-uuencode.o:	uuencode.c uudeview.h uuint.h uustring.h fptools.h config.h
-uulib.o:	uulib.c uudeview.h uuint.h uustring.h fptools.h config.h safealloc.c
-uunconc.o:	uunconc.c uudeview.h uuint.h uustring.h fptools.h config.h
-uucheck.o:	uucheck.c uudeview.h uuint.h uustring.h fptools.h config.h
-uuutil.o:	uuutil.c  uudeview.h uuint.h uustring.h fptools.h config.h
-uuscan.o:	uuutil.c  uudeview.h uuint.h uustring.h fptools.h config.h
-uustring.o:	uustring.c uudeview.h uuint.h uustring.h config.h
-fptools.o:	fptools.c fptools.h config.h
+uuencode.o:	uuencode.c uudeview.h uuint.h uustring.h fptools.h config.h ecb.h
+uulib.o:	uulib.c uudeview.h uuint.h uustring.h fptools.h config.h safealloc.c ecb.h
+uunconc.o:	uunconc.c uudeview.h uuint.h uustring.h fptools.h config.h ecb.h
+uucheck.o:	uucheck.c uudeview.h uuint.h uustring.h fptools.h config.h ecb.h
+uuutil.o:	uuutil.c  uudeview.h uuint.h uustring.h fptools.h config.h ecb.h
+uuscan.o:	uuutil.c  uudeview.h uuint.h uustring.h fptools.h config.h ecb.h
+uustring.o:	uustring.c uudeview.h uuint.h uustring.h config.h ecb.h
+fptools.o:	fptools.c fptools.h config.h ecb.h
+crc32.o:	ecb.h
 
 uustring.h:	uustring.c
 	awk -f uustring.awk < uustring.c > uustring.h

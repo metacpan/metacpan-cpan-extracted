@@ -22,7 +22,7 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "XS::Parse::Sublike::Builder" : "0"
+            "XS::Parse::Sublike::Builder" : "0.02"
          }
       },
       "runtime" : {
@@ -41,7 +41,7 @@
    "provides" : {
       "Object::Pad" : {
          "file" : "lib/Object/Pad.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

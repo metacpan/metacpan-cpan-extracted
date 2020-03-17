@@ -11,16 +11,14 @@ using Method = Request::Method;
 TEST("small body compress/uncompress") {
     auto req = Request::Builder()
         .method(Method::POST)
-        .uri("http://crazypanda.ru/hello/world")
         .body("my body")
         .compress(Compression::BROTLI)
         .build();
 
     auto data = req->to_string();
     REQUIRE_THAT(data, StartsWith(
-        "POST /hello/world HTTP/1.1\r\n"
+        "POST / HTTP/1.1\r\n"
         "Content-Length: 11\r\n"
-        "Host: crazypanda.ru\r\n"
         "Content-Encoding: br\r\n"
         "\r\n"
     ));
@@ -56,16 +54,14 @@ Nullam quis tempus lectus. Quisque purus est, venenatis at auctor a, laoreet in 
     string body_sample(body_raw);
     auto req = Request::Builder()
         .method(Method::POST)
-        .uri("http://crazypanda.ru/hello/world")
         .body(body_sample)
         .compress(Compression::BROTLI, Compression::Level::max)
         .build();
 
     auto data = req->to_string();
     REQUIRE_THAT(data, StartsWith(
-        "POST /hello/world HTTP/1.1\r\n"
+        "POST / HTTP/1.1\r\n"
         "Content-Length: 1469\r\n"
-        "Host: crazypanda.ru\r\n"
         "Content-Encoding: br\r\n"
         "\r\n"
     ));
@@ -188,8 +184,8 @@ TEST("chunked") {
     auto data = req->to_string();
     REQUIRE_THAT(data, StartsWith(
         "POST / HTTP/1.1\r\n"
-        "Transfer-Encoding: chunked\r\n"
         "Content-Encoding: br\r\n"
+        "Transfer-Encoding: chunked\r\n"
         "\r\n"
     ));
     RequestParser p;

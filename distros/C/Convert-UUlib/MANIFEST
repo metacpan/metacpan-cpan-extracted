@@ -12,6 +12,8 @@ example-decoder
 t/cb.t
 doc/library.pdf
 doc/HISTORY
+perlmulticore.h
+uulib/ecb.h
 uulib/safealloc.c
 uulib/Makefile.in
 uulib/acconfig.h

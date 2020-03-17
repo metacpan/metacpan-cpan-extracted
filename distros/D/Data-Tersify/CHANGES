@@ -1,4 +1,14 @@
-1.000 FIXME WHEN
+1.001 2020-03-11
+
+    [Bug fixes]
+    
+        Survive repeated calls to tersify with reused data structures.
+        This is https://github.com/skington/data-tersify/issues/4
+        - thanks Slaven Rezić for the tip-off.
+        
+        Have all the test objects compile under perl 5.8.9.
+
+1.000 2020-03-09
 
     [Features]
     

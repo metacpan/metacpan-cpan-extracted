@@ -9,16 +9,17 @@
 #endif
 #endif
 
+#include "ecb.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef unsigned int crc32_t;
-#define Z_NULL  0
+typedef uint32_t crc32_t;
 
-#define crc32 uulib_crc32
+#define CRC32_INIT ((crc32_t)0)
 
-crc32_t crc32 _ANSI_ARGS_((crc32_t crc, const unsigned char *buf, unsigned int len));
+crc32_t uu_crc32 _ANSI_ARGS_((crc32_t prev, const void *data, unsigned int len));
 /*
      Update a running crc with the bytes buf[0..len-1] and return the updated
    crc. If buf is NULL, this function returns the required initial value
@@ -26,13 +27,15 @@ crc32_t crc32 _ANSI_ARGS_((crc32_t crc, const unsigned char *buf, unsigned int l
    within this function so it shouldn't be done by the application.
    Usage example:
 
-     uLong crc = crc32(0L, Z_NULL, 0);
+     uLong crc = CRC32_INIT;
 
      while (read_buffer(buffer, length) != EOF) {
        crc = crc32(crc, buffer, length);
      }
      if (crc != original_crc) error();
 */
+
+uint32_t uu_crc32_combine(uint32_t crcA, uint32_t crcB, size_t lengthB);
 
 #ifdef __cplusplus
 }

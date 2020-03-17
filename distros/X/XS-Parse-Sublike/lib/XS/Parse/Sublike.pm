@@ -8,7 +8,7 @@ package XS::Parse::Sublike;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -56,16 +56,37 @@ return value and C<op_ptr> can be used directly from the keyword plugin
 function. It is intended this function be invoked from it, and the result
 returned directly.
 
-I<hooks> should be a structure that can provide optional function pointers
-used to customise the parsing process at various stages. The structure should
-be declared using the following:
+For a more automated handling of keywords, see L</register_xs_parse_sublike>.
 
-   struct XSParseSublikeHooks hooks = { 0 };
+I<hooks> should be a structure that can provide optional function pointers
+used to customise the parsing process at various stages.
+
+=head2 register_xs_parse_sublike
+
+   register_xs_parse_sublike(keyword, &hooks)
+
+This function installs a set of parsing hooks to be associated with the given
+keyword. Such a keyword will then be handled automatically by a keyword parser
+installed by C<XS::Parse::Sublike> itself.
+
+When the keyword is encountered, the hook's C<permit> function is first tested
+to see if the keyword is permitted at this point. If the function returns true
+then the keyword is consumed and parsed as per L</xs_parse_sublike>.
 
 =head1 PARSE HOOKS
 
 The C<XSParseSublikeHooks> structure provides the following hook stages, in
 the given order:
+
+=head2 permit
+
+   bool (*permit)(pTHX)
+
+Called by the installed keyword parser hook which is used to handle keywords
+registered by L</register_xs_parse_sublike>. This hook stage should inspect
+whether the keyword is permitted at this time (typically by inspecting the
+hints hash C<GvHV(PL_hintgv)> for some imported key) and return true only if
+the keyword is permitted.
 
 =head2 post_blockstart
 

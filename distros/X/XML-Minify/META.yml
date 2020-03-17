@@ -1,5 +1,5 @@
 ---
-abstract: "It's a configurable XML minifier."
+abstract: 'A configurable XML minifier.'
 author:
   - 'Thibault DUPONCHELLE'
 build_requires:
@@ -26,7 +26,7 @@ no_index:
 provides:
   XML::Minify:
     file: lib/XML/Minify.pm
-    version: '1.00'
+    version: '1.01'
 requires:
   XML::LibXML: '0'
   perl: '5.010000'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/thibaultduponchelle/XML-Minify/issues
   homepage: https://github.com/thibaultduponchelle/XML-Minify
   repository: git://github.com/thibaultduponchelle/XML-Minify.git
-version: '1.00'
+version: '1.01'
 x_contributors:
   - 'Thibault DUPONCHELLE <thibault.duponchelle@gmail.com>'
   - 'thibaultduponchelle <580360+thibaultduponchelle@users.noreply.github.com>'

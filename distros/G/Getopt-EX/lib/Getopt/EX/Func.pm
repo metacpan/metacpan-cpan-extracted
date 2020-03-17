@@ -11,7 +11,6 @@ our @EXPORT_OK   = qw(parse_func callable);
 our %EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
 
 use Data::Dumper;
-use Getopt::EX::Module;
 
 use Scalar::Util qw(blessed);
 sub callable {

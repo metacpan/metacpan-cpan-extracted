@@ -3,7 +3,7 @@ use 5.010000;
 use strict;
 use warnings;
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 use XML::LibXML; # To be installed from CPAN : sudo cpanm XML::LibXML 
 # CPAN rules !
@@ -440,11 +440,11 @@ __END__
 
 =head1 NAME
 
-XML::Minify - It's a configurable XML minifier.
+XML::Minify - A configurable XML minifier.
 
 =head1 WARNING
 
-THIS IS A BETA VERSION, API (OPTION NAMES) IS NOT FULLY STABILIZED AND MAY CHANGE WITHOUT NOTICE.
+The API (option names) is almost stabilized (but not fully) and can therefore still change a bit.
 
 =head1 SYNOPSIS
 
@@ -460,7 +460,11 @@ But a typical use would include some parameters like this :
     use XML::Minify qw(minify);
 
     my $maxi = "<person>   <name>tib   </name>   <level>  42  </level>  </person>";
-    my $mini = minify($maxi), no_prolog => 1, aggressive => 1);
+    my $mini = minify($maxi, no_prolog => 1, aggressive => 1);
+
+That will produce :
+
+    <person><name>tib</name><level>42</level></person>
 
 B<aggressive>, B<destructive> and B<insane> are shortcuts that define a set of parameters. 
 
@@ -469,7 +473,9 @@ You can set indivually with :
     use XML::Minify qw(minify);
 
     my $maxi = "<person>   <name>tib   </name>   <level>  42  </level>  </person>";
-    my $mini = minify($maxi), no_prolog => 1, aggressive => 1, keep_comments => 1, remove_indent => 1);
+    my $mini = minify($maxi, no_prolog => 1, aggressive => 1, keep_comments => 1, remove_indent => 1);
+
+The code above means "minify this string with aggressive mode BUT keep comments and in addition remove indent".
 
 Not every parameter has a B<keep_> neither a B<remove_>, please see below for detailed list.
 
@@ -497,7 +503,7 @@ In addition, the minifier will drop every blanks between the first level childre
 What you can find between first level children is not supposed to be meaningful data then we we can safely remove formatting here. 
 For instance we can remove a carriage return between prolog and a processing instruction (or even inside a DTD).
 
-In addition again, the minifier will I<smartly> remove blanks between tags. By I<smart> I mean that it will not remove blanks if we are in a leaf (more chances to be meaningful blanks) or if the node contains something that will persist (a I<not removed> comment/cdata/PI, or a piece of text not empty). The meaningfulness of blanks is given by a DTD if present and we respect obviously respect this (except if you decide the contrary with ignore_dtd).
+In addition again, the minifier will I<smartly> remove blanks between tags. By I<smart> I mean that it will not remove blanks if we are in a leaf (more chances to be meaningful blanks) or if the node contains something that will persist (a I<not removed> comment/cdata/PI, or a piece of text not empty). The meaningfulness of blanks can be given by a DTD. Then if a DTD is present and *protects some nodes*, we oviously respect this. But you can decide to change this behaviour with **ignore_dtd** option.
 
 If there is no DTD (very often), we are blind and simply use the approach I just described above (keep blanks in leafs, remove blanks in nodes if all siblings contains only blanks).
 

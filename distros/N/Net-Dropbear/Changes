@@ -1,5 +1,12 @@
 Revision history for Net-Dropbear
 
+0.11  2020-03-16 22:51:07 EDT
+        * Stop attempting to listen on port 22 by default
+        * Prevent loading keys from default locations by default
+        * Update to Dropbear 2019.78
+        * Add skip_exist option to gen_key to match Dropbear's new option to
+          signkey_generate
+
 0.10  2016-08-10 01:03:01 EDT
         * Fix tests for GNU/kFreeBSD
         * Up the minimum perl requirement back up to 5.10

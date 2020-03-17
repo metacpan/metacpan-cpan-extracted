@@ -1,14 +1,22 @@
 Build.PL
+Changes
+hax/block_end.c.inc
+hax/block_start.c.inc
+hax/COP_SEQ_RANGE_HIGH_set.c.inc
 hax/lexer-additions.c.inc
+hax/pad_block_start.c.inc
+hax/pad_leavemy.c.inc
 hax/parse_subsignature.c.inc
+hax/scalarseq.c.inc
+hax/wrap_keyword_plugin.c.inc
 lib/XS/Parse/Sublike.pm
 lib/XS/Parse/Sublike.xs
 lib/XS/Parse/Sublike/Builder.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/99pod.t
 XSParseSublike.h
-README
-LICENSE
-META.yml
-META.json

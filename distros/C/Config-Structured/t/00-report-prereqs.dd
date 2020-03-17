@@ -1,0 +1,51 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Data::DPath' => '0',
+                                      'File::Basename' => '0',
+                                      'IO::All' => '0',
+                                      'JSON' => '0',
+                                      'List::Util' => '0',
+                                      'Mojo::DynamicMethods' => '0',
+                                      'Moose' => '0',
+                                      'Moose::Util::TypeConstraints' => '0',
+                                      'Readonly' => '0',
+                                      'Syntax::Keyword::Junction' => '0',
+                                      'Syntax::Keyword::Try' => '0',
+                                      'YAML::XS' => '0',
+                                      'experimental' => '0',
+                                      'perl' => '5.022',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Slurp' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Warn' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

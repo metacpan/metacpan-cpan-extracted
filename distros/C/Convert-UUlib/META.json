@@ -30,8 +30,13 @@
             "Canary::Stability" : "0",
             "ExtUtils::MakeMaker" : "6.52"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "common::sense" : "3.74"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : 1.62
+   "version" : 1.71
 }

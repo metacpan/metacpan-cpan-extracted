@@ -291,19 +291,13 @@ sub ansi_pair {
     ($start, $end);
 }
 
-my %colorcache;
-my $reset_re;
-BEGIN {
-    $reset_re = qr{ \e\[[0;]*m (?: \e\[[0;]*[Km] )* }x;
-}
-
 sub colorize {
-    cached_colorize(\%colorcache, @_);
+    cached_colorize(state $cache = {}, @_);
 }
 
 sub colorize24 {
     local $RGB24 = 1;
-    cached_colorize(\%colorcache, @_);
+    cached_colorize(state $cache = {}, @_);
 }
 
 sub cached_colorize {
@@ -327,7 +321,8 @@ sub apply_color {
     }
     else {
 	my($s, $e) = @{ $cache->{$color} //= [ ansi_pair($color) ] };
-	$text =~ s/(^|$reset_re)([^\e\r\n]*)/${1}${s}${2}${e}/mg;
+	state $reset = qr{ \e\[[0;]*m (?: \e\[[0;]*[Km] )* }x;
+	$text =~ s/(^|$reset)([^\e\r\n]*)/${1}${s}${2}${e}/mg;
 	return $text;
     }
 }
@@ -548,7 +543,9 @@ the same spec, all indicators are produced in the order of their
 presence.  Consequently, the last one takes effect.
 
 If the character is preceded by tilde (C<~>), it means negation of
-following effect; C<~D> reset the effect of C<D>.
+following effect; C<~S> reset the effect of C<S>.  There is a
+discussion about negation of C<D> (Track Wikipedia link in SEE ALSO),
+and Apple_Terminal (v2.10 433) does not reset at least.
 
 If the spec start with plus (C<+>) or minus (C<->) character,
 following characters are appneded/deleted from previous value. Reset

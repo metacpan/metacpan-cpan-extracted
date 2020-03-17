@@ -375,7 +375,7 @@ our @EXPORT = qw(
 	POINT_CONVERSION_UNCOMPRESSED
 );
 
-our $VERSION = '1.31';
+our $VERSION = '1.32';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -541,7 +541,7 @@ Sets the parameter of a ec over GFp defined by y^2 = x^3 + a*x + b
   a      BIGNUM with parameter a of the equation
   b      BIGNUM with parameter b of the equation
   ctx    BN_CTX object (optional)
- return 1 on success and 0 if an error occured
+ return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_GROUP::method_of($group);
 
@@ -570,7 +570,7 @@ Gets the parameter of the ec over GFp defined by y^2 = x^3 + a*x + b
   a      BIGNUM for parameter a of the equation
   b      BIGNUM for parameter b of the equation
   ctx    BN_CTX object (optional)
- return 1 on success and 0 if an error occured
+ return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_GROUP::set_curve_GF2m($group, $p, $a, $b, $ctx);
 
@@ -583,7 +583,7 @@ Sets the parameter of a ec over GF2m defined by y^2 + x*y = x^3 + a*x^2 + b
   a      BIGNUM with parameter a of the equation
   b      BIGNUM with parameter b of the equation
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_GROUP::get_curve_GF2m($group, $p, $a, $b, $ctx);
 
@@ -595,7 +595,7 @@ Gets the parameter of the ec over GF2m defined by y^2 + x*y = x^3 + a*x^2 + b
   a      BIGNUM for parameter a of the equation
   b      BIGNUM for parameter b of the equation
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 
 =item Crypt::OpenSSL::EC::print_errs();
@@ -626,7 +626,7 @@ library are auto-destroyed when they become unreferenced.
 Copies EC_POINT object
   dst  destination EC_POINT object
   src  source EC_POINT object
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::dup($src, $group);
 
@@ -641,7 +641,7 @@ EC_POINT
 Sets a point to infinity (neutral element)
   group  underlying EC_GROUP object
   point  EC_POINT to set to infinity
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::get_Jprojective_coordinates_GFp($group, $p, $x, $y, $z, $ctx);
 
@@ -652,7 +652,7 @@ Gets the jacobian projective coordinates of a EC_POINT over GFp
   y      BIGNUM for the y-coordinate
   z      BIGNUM for the z-coordinate
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::set_affine_coordinates_GFp($group, $p, $x, $y, $ctx);
 
@@ -662,7 +662,7 @@ Sets the affine coordinates of a EC_POINT over GFp
   x      BIGNUM with the x-coordinate
   y      BIGNUM with the y-coordinate
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::get_affine_coordinates_GFp($group, $p, $x, $y, $ctx);
 
@@ -672,7 +672,7 @@ Gets the affine coordinates of a EC_POINT over GFp
   x      BIGNUM for the x-coordinate
   y      BIGNUM for the y-coordinate
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::set_compressed_coordinates_GFp($group, $p, $x, $y_bit, $ctx);
 
@@ -682,7 +682,7 @@ Sets the x9.62 compressed coordinates of a EC_POINT over GFp
   x      BIGNUM with x-coordinate
   y_bit  integer with the y-Bit (either 0 or 1)
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::set_affine_coordinates_GF2m($group, $p, $x, $y, $ctx);
 
@@ -694,7 +694,7 @@ Sets the affine coordinates of a EC_POINT over GF2m
   x      BIGNUM with the x-coordinate
   y      BIGNUM with the y-coordinate
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::get_affine_coordinates_GF2m($group, $p, $x, $y, $ctx);
 
@@ -706,7 +706,7 @@ Gets the affine coordinates of a EC_POINT over GF2m
   x      BIGNUM for the x-coordinate
   y      BIGNUM for the y-coordinate
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::set_compressed_coordinates_GF2m($group, $p, $x, $y_bit, $ctx);
 
@@ -718,7 +718,7 @@ Sets the x9.62 compressed coordinates of a EC_POINT over GF2m
   x      BIGNUM with x-coordinate
   y_bit  integer with the y-Bit (either 0 or 1)
   ctx    BN_CTX object (optional)
-  \return 1 on success and 0 if an error occured
+  \return 1 on success and 0 if an error occurred
 
 
 =item Crypt::OpenSSL::EC::EC_POINT::is_at_infinity($group, $p);
@@ -744,7 +744,7 @@ Decodes a EC_POINT from a octet string
   p      EC_POINT object
   buf    buffer with the encoded ec point
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::point2bn($group, $p, $form, $bn, $ctx);
 
@@ -763,7 +763,7 @@ Decodes a EC_POINT from a octet string
   a      EC_POINT object with the first summand
   b      EC_POINT object with the second summand
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::dbl($group, $r, $a, $ctx);
 
@@ -772,7 +772,7 @@ Computes the double of a EC_POINT
   r      EC_POINT object for the result (r = 2 * a)
   a      EC_POINT object 
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::invert($group, $a, $ctx);
 
@@ -780,7 +780,7 @@ Computes the inverse of a EC_POINT
   group  underlying EC_GROUP object
   a      EC_POINT object to be inverted (it's used for the result as well)
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_POINT::is_on_curve($group, $point, $ctx));
 
@@ -817,7 +817,7 @@ Sets the generator and it's order/cofactor of a EC_GROUP object.
   order      the order of the group generated by the generator.
   cofactor   the index of the sub-group generated by the generator
            in the group of all points on the elliptic curve.
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_GROUP::get0_generator($group);
 
@@ -899,7 +899,7 @@ Gets the order of a EC_GROUP
   group  EC_GROUP object
   order  BIGNUM to which the order is copied
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_GROUP::get_cofactor($group, $cofactopr, $ctx)
 
@@ -908,7 +908,7 @@ Gets the cofactor of a EC_GROUP
   group     EC_GROUP object
   cofactor  BIGNUM to which the cofactor is copied
   ctx       BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item Crypt::OpenSSL::EC::EC_GROUP::set_curve_name($group, $nid);
 
@@ -936,7 +936,7 @@ Sets the point conversion form.
 
 =item    Crypt::OpenSSL::EC::EC_GROUP::get_point_conversion_form($group);
 
-Retuns the point conversion for for the group
+Returns the point conversion for for the group
 
 =item    Crypt::OpenSSL::EC::EC_GROUP::get0_seed($group);
 
@@ -959,14 +959,14 @@ Computes r = generator * n + q * m
   q      EC_POINT object with the first factor of the second summand
   m      BIGNUM with the second factor of the second summand
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item    Crypt::OpenSSL::EC::EC_GROUP::precompute_mult($group, $ctx);
 
 Stores multiples of generator for faster point multiplication
   group  EC_GROUP object
   ctx    BN_CTX object (optional)
-  return 1 on success and 0 if an error occured
+  return 1 on success and 0 if an error occurred
 
 =item    Crypt::OpenSSL::EC::EC_GROUP::have_precompute_mult($group);
 

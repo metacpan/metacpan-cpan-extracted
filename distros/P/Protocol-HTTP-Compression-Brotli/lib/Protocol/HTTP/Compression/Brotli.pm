@@ -1,7 +1,7 @@
 package Protocol::HTTP::Compression::Brotli;
 use Protocol::HTTP;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 XS::Loader::bootstrap;
 
@@ -9,7 +9,7 @@ XS::Loader::bootstrap;
 
 =head1 NAME
 
-Protocol::HTTP::Compression::Brotli - Broli compression plugin for Protocol::HTTP
+Protocol::HTTP::Compression::Brotli - Brotli compression plugin for Protocol::HTTP
 
 =cut
 
@@ -35,7 +35,5 @@ Ivan Baidakou <dmol@cpan.org>, Crazy Panda LTD
 =head1 LICENSE
 
 You may distribute this code under the same terms as Perl itself.
-
-
 
 =cut

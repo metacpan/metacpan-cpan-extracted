@@ -1,5 +1,5 @@
 {
-   "abstract" : "Broli compression plugin for Protocol::HTTP",
+   "abstract" : "Brotli compression plugin for Protocol::HTTP",
    "author" : [
       "unknown"
    ],
@@ -27,7 +27,7 @@
          "requires" : {
             "Date" : "v5.0.2",
             "Export::XS" : "v3.0.4",
-            "Protocol::HTTP" : "v1.0.1",
+            "Protocol::HTTP" : "v1.0.2",
             "Test::Catch" : "v1.0.13",
             "URI::XS" : "v2.0.1",
             "XS::Framework" : "v1.2.8",
@@ -44,7 +44,7 @@
          "requires" : {
             "Date" : "v5.0.2",
             "Export::XS" : "v3.0.4",
-            "Protocol::HTTP" : "v1.0.1",
+            "Protocol::HTTP" : "v1.0.2",
             "URI::XS" : "v2.0.1",
             "XS::Framework" : "v1.2.8",
             "XS::Install" : "v1.2.16",
@@ -59,7 +59,7 @@
          "requires" : {
             "Date" : "v5.0.2",
             "Export::XS" : "v3.0.4",
-            "Protocol::HTTP" : "v1.0.1",
+            "Protocol::HTTP" : "v1.0.2",
             "Test::Catch" : "v1.0.13",
             "Test::Deep" : "0",
             "Test::More" : "0",
@@ -76,6 +76,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

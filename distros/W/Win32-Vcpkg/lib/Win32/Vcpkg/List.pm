@@ -8,7 +8,7 @@ use Path::Tiny ();
 use Storable qw( dclone );
 
 # ABSTRACT: Interface to Microsoft Vcpkg List of Packages
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub new
@@ -111,6 +111,7 @@ sub search
         root     => $self->root,
         triplet  => $triplet,
         debug    => $debug,
+        include  => $options{include},
         lib      => \@lib,
       );
     }
@@ -139,7 +140,7 @@ Win32::Vcpkg::List - Interface to Microsoft Vcpkg List of Packages
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -195,6 +196,10 @@ L<Win32::Vcpkg::Package>.  If no package is found then C<undef> is returned.  Op
 
 The architecture triplet to search under.  The C<Vcpkg> triplet.  By default this
 is what C<perl_triplet> from L<Win32::Vcpkg> returns.
+
+=item include
+
+Any header subdirectory names.
 
 =item debug
 

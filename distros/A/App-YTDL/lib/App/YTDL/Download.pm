@@ -40,7 +40,7 @@ sub _choose_fmt {
     my @fmt_str;
 
     while ( 1 ) {
-        my $prompt = ' Fmt: ';
+        my $prompt = 'Fmt: ';
         my @pre = ( undef );
         # Choose
         my $idx = choose(
@@ -54,7 +54,7 @@ sub _choose_fmt {
             next;
         }
         push @fmt_str, @format_ids[ $idx - @pre ];
-        my $enough = 'CONFIRM';
+        my $enough = '  OK';
         @pre = ( undef, $enough );
         my $ops = [
             [ '+', "  +  " ],
@@ -65,7 +65,7 @@ sub _choose_fmt {
         # Choose
         my $idx_op = choose(
             $menu,
-            { prompt => $prompt . join( '', @fmt_str ), undef => 'SKIP', info => $title, layout => 3, index => 1 }
+            { prompt => $prompt . join( '', @fmt_str ), undef => '  <<', info => $title, layout => 3, index => 1 }
         );
         if ( ! defined $idx_op || ! defined $menu->[$idx_op] ) {
             pop @fmt_str;
@@ -130,13 +130,14 @@ sub download_youtube {
             #push @cmd, '--skip-download';
             if ( $qty eq 'manually' ) {
                 if ( $ask_fmt_for_each_video || ! $fmt_str ) {
+                    my $count_of_total = $info->{$ex}{$video_id}{count} . '/' . $total;
                     my $title;
                     if ( $ask_fmt_for_each_video ) {
-                        $title = "\n" . '"' . $info->{$ex}{$video_id}{title} . '"';
+                        $title = "\n" . $count_of_total . ' "' . $info->{$ex}{$video_id}{title} . '"';
                     }
                     $fmt_str = _choose_fmt( $opt, $info, $ex, $video_id, $title );
                     if ( ! defined $fmt_str ) {
-                        print $info->{$ex}{$video_id}{count} . '/' . $total . ' skipped' . "\n";
+                        print $count_of_total . ' skipped' . "\n";
                         next VIDEO;
                     }
                 }

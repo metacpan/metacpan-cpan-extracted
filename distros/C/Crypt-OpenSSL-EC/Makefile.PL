@@ -1,8 +1,30 @@
 use 5.008005;
 use ExtUtils::MakeMaker;
+use Config;
 
-# You might need to set this if your openssl headers and libs anre in an unusual place:
-my $openssl_prefix = $ENV{OPENSSL_PREFIX} || '/usr';
+# This is similar to what Crypt::OpenSSL::Bignum does.
+my $lib = '-lcrypto';
+my $inc = '';
+my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
+if (my $dir = $ENV{OPENSSL_PREFIX}) {
+  $lib = "-L$dir/lib -lcrypto";
+  $inc = "-I$dir/include";
+}
+elsif ($ENV{OPENSSL_LIB}) {
+  $lib = $ENV{OPENSSL_LIB};
+  $inc = $ENV{OPENSSL_INCLUDE};
+}
+elsif (`pkg-config --modversion libcrypto 2>$nul`) {
+  $lib = `pkg-config --libs libcrypto 2> $nul`;
+  $inc = `pkg-config --cflags libcrypto 2> $nul`;
+}
+elsif ($^O eq 'MSWin32') {
+  $lib = '-llibeay32' if $Config{cc} =~ /cl/;
+  $lib = '-leay32'    if $Config{cc} =~ /gcc/;
+}
+
+$lib =~ s/[\r\n]+/ /g;
+$inc =~ s/[\r\n]+/ /g;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -14,9 +36,9 @@ WriteMakefile(
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Crypt/OpenSSL/EC.pm', # retrieve abstract from module
        AUTHOR         => 'Mike McCauley <mikem@airspayce.com>') : ()),
-    LIBS              => ["-L$openssl_prefix/lib -lcrypto"], # e.g., '-lm'
+    LIBS              => [ $lib ],
     DEFINE            => '-DPERL5 -DOPENSSL_NO_KRB5',
-    INC               => "-I. -I$openssl_prefix/include", 
+    INC               => $inc,
 );
 if  (eval {require ExtUtils::Constant; 1}) {
   # If you edit these definitions to change the constants used by this module,

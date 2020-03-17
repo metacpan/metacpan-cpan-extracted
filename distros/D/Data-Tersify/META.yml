@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/skington/data-tersify/issues
   repository: git://github.com/skington/data-tersify.git
-version: '1.000'
+version: '1.001'
 x_serialization_backend: 'YAML::Tiny version 1.70'

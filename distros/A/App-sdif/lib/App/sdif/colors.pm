@@ -45,7 +45,7 @@ option --dark  --dark-green
 
 option	--green \
 	--cm ?COMMAND=555/010;		\
-	--cm    ?FILE=555/010;D		\
+	--cm    ?FILE=551/010;D		\
 	--cm    ?MARK=010/444		\
 	--cm    UMARK=			\
 	--cm    ?LINE=220		\
@@ -56,24 +56,24 @@ define <C> 033
 define <M> 303
 define <Y> 330
 option	--cmy \
-	--cm OCOMMAND=<C>/555;S		\
-	--cm NCOMMAND=<M>/555;S		\
-	--cm MCOMMAND=<Y>/555;S		\
-	--cm    OFILE=<C>/555;SD	\
-	--cm    NFILE=<M>/555;SD	\
-	--cm    MFILE=<Y>/555;SD	\
-	--cm    OMARK=<C>/444		\
-	--cm    NMARK=<M>/444		\
-	--cm    MMARK=<Y>/444		\
-	--cm    UMARK=/444		\
-	--cm    ?LINE=220		\
-	--cm    ?TEXT=K/554		\
+	--cm OCOMMAND=555/<C>	\
+	--cm NCOMMAND=555/<M>	\
+	--cm MCOMMAND=555/<Y>	\
+	--cm    OFILE=550/<C>;D	\
+	--cm    NFILE=550/<M>;D	\
+	--cm    MFILE=550/<Y>;D	\
+	--cm    OMARK=<C>/444	\
+	--cm    NMARK=<M>/444	\
+	--cm    MMARK=<Y>/444	\
+	--cm    UMARK=/444	\
+	--cm    ?LINE=220	\
+	--cm    ?TEXT=K/554	\
 	--cm    UTEXT=
 
 option	--mono \
-	--cm ?COMMAND=111;S	\
-	--cm    ?FILE=111;DS	\
-	--cm    ?MARK=000/333	\
+	--cm ?COMMAND=L24/111;	\
+	--cm    ?FILE=L25/111;D	\
+	--cm    ?MARK=L00/333	\
 	--cm    UMARK=		\
 	--cm    ?LINE=222	\
 	--cm    ?TEXT=000/L24	\

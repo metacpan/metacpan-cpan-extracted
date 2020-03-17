@@ -3,7 +3,7 @@ package CLI::Driver::Option;
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
-use Method::Signatures;
+use Kavorka '-all';
 use Data::Printer alias => 'pdump';
 
 use Getopt::Long 'GetOptionsFromArray';

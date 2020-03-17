@@ -1,5 +1,7 @@
 Revision history for CLI-Driver
 
+0.40 - converted from Method::Signatures to Kavorka
+
 0.30 - added feature to detect extraneous args (and die with message)
 
 0.20 - fixed PREREQ_PM for YAML::Tiny

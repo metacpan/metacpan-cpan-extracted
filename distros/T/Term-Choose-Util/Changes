@@ -1,6 +1,15 @@
 Revision history for Term::Choose::Util
 
 
+0.119   2020-03-17
+        - Code refactoring.
+
+0.118   2020-03-17
+        - Removed deprecated functions and deprecated options.
+        - choose_a_subset: option 'all_by_default' disabled by default.
+        - Update UI 'choose_directories'.
+        - Update option 'cs_label'.
+
 0.117   2020-03-12
         - List::Util::any requires List::Util minimum version '1.33'.
 

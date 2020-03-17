@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-our $VERSION = '1.012';
+our $VERSION = '1.013';
 
 1;
 
@@ -23,16 +23,16 @@ In your C<Makefile.PL>:
 
     use ExtUtils::MakeMaker;
     use Config;
-    use Alien::libuv;
+    use Alien::Base::Wrapper ();
 
     WriteMakefile(
-      ...
-      CONFIGURE_REQUIRES => {
-        'Alien::libuv' => '1.000',
-      },
-      CCFLAGS => Alien::libuv->cflags . " $Config{ccflags}",
-      LIBS    => [ Alien::libuv->libs ],
-      ...
+      Alien::Base::Wrapper->new('Alien::libuv')->mm_args2(
+        ...
+        CONFIGURE_REQUIRES => {
+          'Alien::libuv' => '1.000',
+        },
+        ...
+      ),
     );
 
 =head1 DESCRIPTION

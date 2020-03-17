@@ -1,5 +1,10 @@
 Revision history for Perl extension Getopt-EX
 
+v1.15.5 2020-03-17T02:00:00Z
+
+    - Remove inconsistent dependency.
+    - Use different cache for colorize24().
+
 v1.15.4 2020-02-28T00:52:18Z
 
     - Support negation of effect in Colormap.pm.

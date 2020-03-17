@@ -1,0 +1,157 @@
+=head1 NAME
+
+Exception::Backtrace - Get C and Perl backtraces
+
+=cut
+
+=head1 SYNOPSIS
+
+    use Exception::Backtrace;
+
+    # sets/overrides SIG{__DIE__} interceptor
+    Exception::Backtrace::install();
+
+    eval { die("what-ever"); }
+    my $ex = @$;
+
+    # Returns C and Perl backtraces string like:
+    my $bt1 = Exception::Backtrace::get_backtrace_string($ex);
+    # C backtrace:
+    # 0x7f4097db604e in panda::Backtrace::Backtrace at src/panda/exception.cc:27
+    # 0x7f4097ab7b77 in xs::safe_wrap_exception at src/xs/backtrace.cc:214
+    # 0x7f4097ac16bf in XS_Exception__Backtrace_safe_wrap_exception at Backtrace.xs.cc:262
+    # 0x55f8085ba453 in Perl_pp_entersub at pp_hot.c:5237
+    # 0x55f808576d62 in Perl_runops_debug at dump.c:2537
+    # 0x55f8084d5707 in Perl_call_sv at perl.c:3026
+    # 0x55f808580328 in S_invoke_exception_hook at util.c:1578
+    # 0x55f80858209a in Perl_croak_sv at util.c:1677
+    # 0x55f8085820de in Perl_die_sv at util.c:1602
+    # 0x55f80863f90e in Perl_pp_die at pp_sys.c:509
+    # 0x55f808576d62 in Perl_runops_debug at dump.c:2537
+    # 0x55f8084e028f in perl_run at perl.c:2711
+    # 0x55f8084a8282 in main at perlmain.c:72
+    # 0x7f40983c8deb in __libc_start_main at ../sysdeps/x86/libc-start.c:129
+    # 0x55f8084a82ca from /home/b/perl5/perlbrew/perls/perl-debug-5.30.1/bin/perl
+    # Perl backtrace:
+    # main::__ANON__ at t/05-perl-exceptions.t:124
+    # main::(eval) at t/05-perl-exceptions.t:124
+    # Test::Builder::__ANON__ at /home/b/perl5/perlbrew/perls/perl-debug-5.30.1/lib/site_perl/5.30.1/Test/Builder.pm:334
+    # Test::Builder::(eval) at /home/b/perl5/perlbrew/perls/perl-debug-5.30.1/lib/site_perl/5.30.1/Test/Builder.pm:334
+    # Test::More::subtest at /home/b/perl5/perlbrew/perls/perl-debug-5.30.1/lib/site_perl/5.30.1/Test/More.pm:809
+    # main::subtest at t/05-perl-exceptions.t:134
+
+    # Returns just Perl backtrace
+    my $bt2 = Exception::Backtrace::get_backtrace_string_pp($ex);
+
+    # Programmatic API
+
+    my $bt3 = Exception::Backtrace::get_backtrace($@);
+    say $bt3->to_string;
+
+    # perl trace
+    my $perl_trace = $bt->perl_trace;
+    say $perl_trace->to_string; # stringifies just perl backtrace
+    my $frames = $perl_trace->get_frames;
+    for my $frame (@$frames) {
+        say $frame->to_string;  # stringifies just single frame
+        say
+            $frame->library,    # aka perl package
+            $frame->file,
+            $frame->line_no,
+            $frame->name        # function name
+            ;
+    }
+
+    # C/C++ trace
+    my $c_trace = $bt->c_trace;
+    say $c_trace->to_string;
+    my $frames = $c_trace->get_frames;
+    for my $frame (@$frames) {
+        say $frame->to_string;  # stringifies just single frame
+        say
+            $frame->library,    # path to .so-file
+            $frame->file,
+            $frame->line_no,
+            $frame->name,       # function name
+            $frame->address,
+            $frame->offset
+            ;
+    }
+
+=head1 DESCRIPTION
+
+Complex applications can be developed as mixture of layers of C++ and Perl code.
+When something abnormal is happen (i.e. exception is thrown) it is desirable to
+figure out what was wrong and on what layer.
+
+If an application is written in pure Perl then the module probably useless, and
+L<Devel::StackTrace> should be considered to use.
+
+In the application it is possible to throw either C++ or Perl exception. If
+C<Perl> exception is thrown then it is handled via C<SIG{__DIE__}> where
+Perl and C++ backtraces are attached to it. As there was no C++ exception,
+the C++ backtrace is gathered from the point of C<SIG{__DIE__}> handler.
+
+If C<C++> exception is thrown then it's backtrace should be already available
+via C<panda::Backtrace> object. The C++ to Perl exception conversion is performed
+by L<XS::Framework>; the C++ backtrace is preserved and Perl backtrace is constructed
+and attached to the exception.
+
+The package can be seen as the thin bridge for backtraces between L<XS::libpanda>
+(the collection of general purpose C++ classes a-la STL) and L<XS::Framework>
+(which makes it easy for C++ classes adoption into Perl).
+
+If C<C++> backtrace consists from two parts: the backtraces gathering (done by
+C<panda::Backtrace>) and converting them into symbolic information (done by
+C<Exception::Backtrace>). As the second part is quite slow and heavy, it is
+performed only on demand.
+
+=head1 LIMITATIONS
+
+Currently the package works only on *nix. Its work on Windows should be possible,
+but additional patches are need (namely, a patch for gathering Instruction Pointer
+addresses, and a patch to get list of loaded DLLs and their range of addresses).
+
+To gather C/C++ backtrace the sources must be compiled with B<debug info>(aka
+C<-g> flag for C<cc>). It is possible to have a mixture of .so compiled with
+and without debug info; in the last case the symbol information will be not
+available, there will just address and .so name.
+
+It is recommended to have C<Perl> itself to be compiled with debug info, i.e.
+C<perl -V> / C<Compiler> / C<optimize> should contain C<-g>; this will allow
+to automatically add debug info for all XS-extensions.
+
+NB: debug info has B<zero runtime overhead>. The C<debug_*> sections in elf files
+are not loaded by Operating System at all. So, it takes only disk space, which
+is quite cheap nowadays.
+
+C++ symbolic information resolution (i.e. gathering source file, file line etc.),
+happens on demand, i.e. when C<Backtrace> object is created. During the resolution
+the C<.so> files are loaded from disk. That means, if the shared libraries on disk
+are different from shared libraries loaded in the process, the reconstructed
+backtraces will be wrong.
+
+To have full trace for C++ exceptions, they must be inherited from C<panda::Backtrace>.
+
+The thrown C<Perl> exception should be either object or scalar (i.e. not reference to
+scalar) to be able to attach backtraces to it.
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::libpanda>
+
+L<Devel::StackTrace>
+
+L<http://dwarfstd.org/>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

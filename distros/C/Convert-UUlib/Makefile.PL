@@ -35,4 +35,7 @@ WriteMakefile(
        "ExtUtils::MakeMaker" => 6.52,
        "Canary::Stability"   => 0,
     },
+    PREREQ_PM => {
+       "common::sense"       => 3.74,
+    },
 );

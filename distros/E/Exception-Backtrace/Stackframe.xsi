@@ -1,0 +1,18 @@
+MODULE = Exception::Backtrace       PACKAGE = Exception::Backtrace::Stackframe
+PROTOTYPES: DISABLE
+
+string Stackframe::file()              { RETVAL = THIS->file; }
+
+string Stackframe::library()           { RETVAL = THIS->library; }
+
+string Stackframe::name()              { RETVAL = THIS->name; }
+
+string Stackframe::mangled_name()      { RETVAL = THIS->mangled_name; }
+
+std::uint64_t Stackframe::address()    { RETVAL = THIS->address; }
+
+std::uint64_t Stackframe::offset()     { RETVAL = THIS->offset; }
+
+std::uint64_t Stackframe::line_no()    { RETVAL = THIS->line_no; }
+
+std::vector<string> Stackframe::args() { RETVAL = THIS->args; }

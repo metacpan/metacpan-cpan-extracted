@@ -7,7 +7,7 @@ use Win32::Vcpkg;
 use Path::Tiny ();
 
 # ABSTRACT: Interface to Microsoft Vcpkg Packages
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub new
@@ -19,11 +19,21 @@ sub new
   my @lib     = @{ $args{lib} || [] };
   my $debug   = defined $args{debug} ? $args{debug} : $ENV{PERL_WIN32_VCPKG_DEBUG};
 
-  my $cflags = "-I@{[ $root->child('installed', $triplet, 'include') ]}";
-
   my $libdir = $root->child('installed', $triplet, 'lib');
   $libdir    = $libdir->parent->child('debug','lib') if $debug;
   my $libs   = "-LIBPATH:$libdir";
+
+  my $cflags = "-I@{[ $root->child('installed', $triplet, 'include') ]}";
+
+  my @include =
+    defined $args{include}
+    ? (ref $args{include} eq 'ARRAY' ? @{$args{include}} : ($args{include}))
+    : ();
+
+  foreach my $include (@include)
+  {
+    $cflags .= " -I@{[ $root->child('installed', $triplet, 'include', $include) ]}";
+  }
 
   foreach my $lib (@lib)
   {
@@ -80,7 +90,7 @@ Win32::Vcpkg::Package - Interface to Microsoft Vcpkg Packages
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -123,6 +133,11 @@ The C<Vcpkg> triplet.  By default this is what C<perl_triplet> from L<Win32::Vcp
 Array reference of library names.  Do not include the C<.lib> extension.  If not provided, then
 no libraries will be linked against, but this might be useful to get the compiler flags (C<cflags>)
 and linker flags (C<libs>) needed for C<Vcpkg>.
+
+=item include
+
+Array reference of include names.  Some packages put their header files in a subdirectory, here
+you can specify the name of the subdirectory so that it will be included in C<cflags>.
 
 =item debug
 

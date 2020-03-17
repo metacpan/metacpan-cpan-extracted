@@ -1,5 +1,14 @@
 See the git repository. In particular:
 
+1.06    Also March 2020
+    * re-add necessary dependencies to Build.PL
+
+1.05    March 2020
+    * add pod-coverage tests and fiddle with the docs as a result
+    * require File::Cmp and better log the file contents when the fcmp
+      check goes awry
+    * switch to Module::Build
+
 1.04 add abs2rel and rel2abs methods, & other cleanups.
 
 1.00 converted module internals to Moo. This changed the return value

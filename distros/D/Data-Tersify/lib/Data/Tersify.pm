@@ -8,7 +8,7 @@ use parent 'Exporter';
 our @EXPORT_OK = qw(tersify tersify_many);
 
 # Have you updated the version number in the POD below?
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -22,7 +22,7 @@ Data::Tersify - generate terse equivalents of complex data structures
 
 =head1 VERSION
 
-This is version 1.000 of Data::Tersify.
+This is version 1.001 of Data::Tersify.
 
 =head1 SYNOPSIS
 
@@ -120,8 +120,9 @@ my (%seen_refaddr, %refaddr_tersified_as, %safe_to_mess_with_refaddr);
 sub tersify {
     my ($data_structure) = @_;
 
-    %seen_refaddr         = ();
-    %refaddr_tersified_as = ();
+    %seen_refaddr              = ();
+    %refaddr_tersified_as      = ();
+    %safe_to_mess_with_refaddr = ();
     ($data_structure) = _tersify($data_structure);
     while (%refaddr_tersified_as) {
         my @known_refaddrs = keys %refaddr_tersified_as;

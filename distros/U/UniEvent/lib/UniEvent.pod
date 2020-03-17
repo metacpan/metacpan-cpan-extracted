@@ -1,0 +1,31 @@
+=head1 NAME
+
+UniEvent - Object-oriented, fast and extendable event loop abstraction framework with Perl and C++ interface.
+
+=cut
+
+=head1 DESCRIPTION
+
+UniEvent is an extendable object-oriented event loop framework. It's also an abstraction layer on top of event loop which
+provides engine-independent API (like L<Any::Event>). It's written fully in C++ and is very fast.
+
+The main feature is that it supports implementing third-party plugins (protocol adapters) in C++ (XS) and therefore without any
+perfomance penalties. UniEvent support multiple backends (libuv is the only implemented at the moment).
+
+=head1 SYNOPSIS
+
+Documentation will be available later
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>
+
+Grigory Smorkalov <g.smorkalov@crazypanda.ru>
+
+Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

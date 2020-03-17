@@ -1,0 +1,84 @@
+use strict;
+use warnings;
+use Test::More;
+use Test::Warnings;
+use lib 't';
+
+use Exception::Backtrace;
+use MyTest;
+
+Exception::Backtrace::install();
+
+subtest "backtraceable exception is thrown" => sub {
+    my $ok = eval { MyTest::throw_backtrace(); };
+    ok !$ok;
+    note $@;
+    like "$@", qr/\Q[panda::exception] my-error at \E/;
+
+    my $bt = Exception::Backtrace::get_backtrace_string($@);
+    note $bt;
+    if ($bt =~ /panda::Backtrace::Backtrace/) {
+        like $bt, qr/panda::exception/;
+        like $bt, qr/main at/;
+    }
+    else {
+        like $bt, qr/libpanda\./;
+        like $bt, qr/MyTest\./;
+    }
+};
+
+subtest "std::logic_error is thrown" => sub {
+    my $ok = eval { MyTest::throw_logic_error(); };
+    ok !$ok;
+    note $@;
+    like "$@", qr/\Q[std::logic_error] my-logic-error at \E/;
+
+    my $bt = Exception::Backtrace::get_backtrace_string($@);
+    note $bt;
+    if ($bt =~ /panda::Backtrace::Backtrace/) {
+        unlike $bt, qr/panda::exception/;
+        like $bt, qr/main at/;
+    }
+    else {
+        like $bt, qr/libpanda\./;
+        like $bt, qr/MyTest\./;
+    }
+};
+
+subtest "perl exception is thrown from C code" => sub {
+    my $ok = eval { MyTest::call( sub { die "zzz" }) };
+    ok !$ok;
+    note $@;
+    like "$@", qr/^zzz at /;
+
+    my $bt = Exception::Backtrace::get_backtrace_string($@);
+    note $bt;
+    if ($bt =~ /panda::Backtrace::Backtrace/) {
+        like $bt, qr/xs::Sub::_call/;
+        unlike $bt, qr/panda::exception/;
+        like $bt, qr/main at/;
+    }
+    else {
+        like $bt, qr/libpanda\./;
+        like $bt, qr/MyTest\./;
+    }
+};
+
+subtest "exception with newline is thrown" => sub {
+    my $ok = eval { MyTest::throw_with_newline(); };
+    ok !$ok;
+    note $@;
+    like "$@", qr/^\Q[std::logic_error] my-error\E$/;
+
+    my $bt = Exception::Backtrace::get_backtrace_string($@);
+    note $bt;
+    if ($bt =~ /panda::Backtrace::Backtrace/) {
+        like $bt, qr/main at/;
+    }
+    else {
+        like $bt, qr/libpanda\./;
+        like $bt, qr/MyTest\./;
+    }
+};
+
+done_testing;

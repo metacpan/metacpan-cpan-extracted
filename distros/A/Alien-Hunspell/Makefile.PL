@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Alien::Build"                          => "0.51",
     "Alien::Build::MM"                      => "0.40",
     "Alien::Build::Plugin::Build::Autoconf" => "0.41",
+    "Alien::Build::Plugin::Probe::Vcpkg"    => "2.14",
     "ExtUtils::MakeMaker"                   => "6.52"
   },
   "DISTNAME"         => "Alien-Hunspell",
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"          => "0.000060",
     "Test::Alien::CPP"   => 0
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.16",
   "test"    => {
     "TESTS" => "t/*.t"
   }

@@ -21,28 +21,14 @@
 typedef signed char schar;
 typedef unsigned char uchar;
 
+#include "ecb.h"
+
 #ifndef TOOLEXPORT
 #define TOOLEXPORT
 #endif
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-/* relicensed from libecb with permission */
-#if 1
-
-#define ECB_GCC_VERSION(major,minor) (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-
-#if ECB_GCC_VERSION(3,1)
-  #define ecb_expect(expr,value)         __builtin_expect ((expr),(value))
-#else
-  #define ecb_expect(expr,value)         (expr)
-#endif
-
-#define ecb_expect_false(expr) ecb_expect (!!(expr), 0)
-#define ecb_expect_true(expr)  ecb_expect (!!(expr), 1)
-
 #endif
 
 #define _FP_free	FP_free

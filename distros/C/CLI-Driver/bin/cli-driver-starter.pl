@@ -35,7 +35,6 @@ $Driver = CLI::Driver->new(file => CLI_DRIVER_FILE);
 parse_cmd_line();
 
 my $action = $Driver->get_action( name => $Action );
-
 if ($action) {
     $action->do;
 }

@@ -292,9 +292,9 @@ BOOT:
 }
 
 void
-gen_key(const char* filename, enum signkey_type keytype=DROPBEAR_SIGNKEY_RSA, int bits=2048)
+gen_key(const char* filename, enum signkey_type keytype=DROPBEAR_SIGNKEY_RSA, int bits=2048, int skip_exist=0)
     CODE:
-        dropbear_gen_key(keytype, bits, filename);
+        dropbear_gen_key(keytype, bits, filename, skip_exist);
 
 void
 svr_main(CLASS)
@@ -311,7 +311,12 @@ setup_svr_opts(CLASS, options)
     PROTOTYPE: $$
     CODE:
         dropbear_init();
-#ifdef DEBUG_TRACE
+
+        /* Always clear the default options */
+        svr_opts.ports[0] = 0;
+        m_free(svr_opts.addresses[0]);
+        svr_opts.portcount = 0;
+#if DEBUG_TRACE
         debug_trace             = _get_bool(options, "debug");
 #endif
         svr_opts.forkbg         = _get_bool(options, "forkbg");
@@ -322,7 +327,7 @@ setup_svr_opts(CLASS, options)
         svr_opts.norootpass     = _get_bool(options, "norootpass");
         svr_opts.allowblankpass = _get_bool(options, "allowblankpass");
         svr_opts.delay_hostkey  = _get_bool(options, "delay_hostkey");
-#ifdef DO_MOTD
+#if DO_MOTD
         svr_opts.domotd = _get_bool(options, "domotd");
 #endif
 #ifdef ENABLE_SVR_REMOTETCPFWD

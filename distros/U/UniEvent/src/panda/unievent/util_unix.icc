@@ -1,0 +1,28 @@
+#include <unistd.h>
+
+namespace panda { namespace unievent {
+
+void setsockopt (sock_t sock, int level, int optname, const void* optval, int optlen) {
+    if (::setsockopt(sock, level, optname, optval, (socklen_t)optlen)) throw last_sys_code_error();
+}
+
+std::error_code sys_code_error (int syserr) {
+    // that appears to be a bug in gcc (well, in libstdc++); per 1.9.5.1p4 it should map POSIX error codes to generic_category
+    return std::error_code(syserr, std::generic_category());
+}
+
+std::error_code last_sys_code_error () {
+    return sys_code_error(errno);
+}
+
+fd_t file_dup (fd_t src) {
+    auto ret = ::dup(src);
+    if (ret == -1) throw last_sys_code_error();
+    return ret;
+}
+
+sock_t sock_dup (sock_t sock) {
+    return file_dup(sock);
+}
+
+}}

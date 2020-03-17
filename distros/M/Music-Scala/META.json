@@ -3,31 +3,21 @@
    "author" : [
       "Jeremy Mates <jmates@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "Music-Scala",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "CPAN::Meta" : "2.142060",
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
@@ -36,23 +26,35 @@
             "File::Basename" : "0",
             "Moo" : "0",
             "Scalar::Util" : "0",
-            "Test::Exception" : "0",
-            "Test::More" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.01"
+            "perl" : "v5.10.0",
+            "strict" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Cmp" : "1.07",
+            "Test::More" : "0.88",
+            "Test::Most" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Music::Scala" : {
+         "file" : "lib/Music/Scala.pm",
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://github.com/thrig/Music-Scala",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
-         "url" : "http://github.com/thrig/Music-Scala"
+         "url" : "https://github.com/thrig/Music-Scala"
       }
    },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -2,139 +2,67 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "perlmulticore.h"
+
 #include "uulib/fptools.h"
 #include "uulib/uudeview.h"
 #include "uulib/uuint.h"
 
-static int
-not_here (char *s)
-{
-  croak("%s not implemented", s);
-  return -1;
-}
+static int perlinterp_released;
 
-static int
-constant (char *name)
-{
-  errno = 0;
-  switch (*name)
-    {
-      case 'A':
-        if (strEQ(name, "ACT_COPYING")) return UUACT_COPYING;
-        if (strEQ(name, "ACT_DECODING")) return UUACT_DECODING;
-        if (strEQ(name, "ACT_ENCODING")) return UUACT_ENCODING;
-        if (strEQ(name, "ACT_IDLE")) return UUACT_IDLE;
-        if (strEQ(name, "ACT_SCANNING")) return UUACT_SCANNING;
-      case 'F':
-        if (strEQ(name, "FILE_DECODED")) return UUFILE_DECODED;
-        if (strEQ(name, "FILE_ERROR")) return UUFILE_ERROR;
-        if (strEQ(name, "FILE_MISPART")) return UUFILE_MISPART;
-        if (strEQ(name, "FILE_NOBEGIN")) return UUFILE_NOBEGIN;
-        if (strEQ(name, "FILE_NODATA")) return UUFILE_NODATA;
-        if (strEQ(name, "FILE_NOEND")) return UUFILE_NOEND;
-        if (strEQ(name, "FILE_OK")) return UUFILE_OK;
-        if (strEQ(name, "FILE_READ")) return UUFILE_READ;
-        if (strEQ(name, "FILE_TMPFILE")) return UUFILE_TMPFILE;
-        break;
-      case 'M':
-        if (strEQ(name, "MSG_ERROR")) return UUMSG_ERROR;
-        if (strEQ(name, "MSG_FATAL")) return UUMSG_FATAL;
-        if (strEQ(name, "MSG_MESSAGE")) return UUMSG_MESSAGE;
-        if (strEQ(name, "MSG_NOTE")) return UUMSG_NOTE;
-        if (strEQ(name, "MSG_PANIC")) return UUMSG_PANIC;
-        if (strEQ(name, "MSG_WARNING")) return UUMSG_WARNING;
-      case 'O':
-        if (strEQ(name, "OPT_VERSION")) return UUOPT_VERSION;
-        if (strEQ(name, "OPT_FAST")) return UUOPT_FAST;
-        if (strEQ(name, "OPT_DUMBNESS")) return UUOPT_DUMBNESS;
-        if (strEQ(name, "OPT_BRACKPOL")) return UUOPT_BRACKPOL;
-        if (strEQ(name, "OPT_VERBOSE")) return UUOPT_VERBOSE;
-        if (strEQ(name, "OPT_DESPERATE")) return UUOPT_DESPERATE;
-        if (strEQ(name, "OPT_IGNREPLY")) return UUOPT_IGNREPLY;
-        if (strEQ(name, "OPT_OVERWRITE")) return UUOPT_OVERWRITE;
-        if (strEQ(name, "OPT_SAVEPATH")) return UUOPT_SAVEPATH;
-        if (strEQ(name, "OPT_IGNMODE")) return UUOPT_IGNMODE;
-        if (strEQ(name, "OPT_DEBUG")) return UUOPT_DEBUG;
-        if (strEQ(name, "OPT_ERRNO")) return UUOPT_ERRNO;
-        if (strEQ(name, "OPT_PROGRESS")) return UUOPT_PROGRESS;
-        if (strEQ(name, "OPT_USETEXT")) return UUOPT_USETEXT;
-        if (strEQ(name, "OPT_PREAMB")) return UUOPT_PREAMB;
-        if (strEQ(name, "OPT_TINYB64")) return UUOPT_TINYB64;
-        if (strEQ(name, "OPT_ENCEXT")) return UUOPT_ENCEXT;
-        if (strEQ(name, "OPT_REMOVE")) return UUOPT_REMOVE;
-        if (strEQ(name, "OPT_MOREMIME")) return UUOPT_MOREMIME;
-        if (strEQ(name, "OPT_DOTDOT")) return UUOPT_DOTDOT;
-        if (strEQ(name, "OPT_RBUF")) return UUOPT_RBUF;
-        if (strEQ(name, "OPT_WBUF")) return UUOPT_WBUF;
-        if (strEQ(name, "OPT_AUTOCHECK")) return UUOPT_AUTOCHECK;
-      case 'R':
-        if (strEQ(name, "RET_CANCEL")) return UURET_CANCEL;
-        if (strEQ(name, "RET_CONT")) return UURET_CONT;
-        if (strEQ(name, "RET_EXISTS")) return UURET_EXISTS;
-        if (strEQ(name, "RET_ILLVAL")) return UURET_ILLVAL;
-        if (strEQ(name, "RET_IOERR")) return UURET_IOERR;
-        if (strEQ(name, "RET_NODATA")) return UURET_NODATA;
-        if (strEQ(name, "RET_NOEND")) return UURET_NOEND;
-        if (strEQ(name, "RET_NOMEM")) return UURET_NOMEM;
-        if (strEQ(name, "RET_OK")) return UURET_OK;
-        if (strEQ(name, "RET_UNSUP")) return UURET_UNSUP;
-      case 'B':
-        if (strEQ(name, "B64_ENCODED")) return B64ENCODED;
-        if (strEQ(name, "BH_ENCODED")) return BH_ENCODED;
-      case 'P':
-        if (strEQ(name, "PT_ENCODED")) return PT_ENCODED;
-      case 'Q':
-        if (strEQ(name, "QP_ENCODED")) return QP_ENCODED;
-      case 'U':
-        if (strEQ(name, "UU_ENCODED")) return UU_ENCODED;
-      case 'X':
-        if (strEQ(name, "XX_ENCODED")) return XX_ENCODED;
-      case 'Y':
-        if (strEQ(name, "YENC_ENCODED")) return YENC_ENCODED;
-    }
+#define RELEASE do { perlinterp_released = 1; perlinterp_release (); } while (0)
+#define ACQUIRE do { perlinterp_acquire (); perlinterp_released = 0; } while (0)
 
-  errno = EINVAL;
-  return 0;
-}
+#define TEMP_ACQUIRE if (perlinterp_released) perlinterp_acquire ();
+#define TEMP_RELEASE if (perlinterp_released) perlinterp_release ();
 
 static void
 uu_msg_callback (void *cb, char *msg, int level)
 {
-  dSP;
- 
-  ENTER; SAVETMPS; PUSHMARK (SP); EXTEND (SP, 2);
+  TEMP_ACQUIRE {
 
-  PUSHs (sv_2mortal (newSVpv (msg, 0)));
-  PUSHs (sv_2mortal (newSViv (level)));
+    dSP;
+   
+    ENTER; SAVETMPS; PUSHMARK (SP); EXTEND (SP, 2);
 
-  PUTBACK; (void) perl_call_sv ((SV *)cb, G_VOID|G_DISCARD); SPAGAIN;
-  PUTBACK; FREETMPS; LEAVE;
+    PUSHs (sv_2mortal (newSVpv (msg, 0)));
+    PUSHs (sv_2mortal (newSViv (level)));
+
+    PUTBACK; (void) perl_call_sv ((SV *)cb, G_VOID|G_DISCARD); SPAGAIN;
+    PUTBACK; FREETMPS; LEAVE;
+
+  } TEMP_RELEASE;
 }
 
 static int
 uu_busy_callback (void *cb, uuprogress *uup)
 {
-  dSP;
-  int count;
   int retval;
- 
-  ENTER; SAVETMPS; PUSHMARK (SP); EXTEND (SP, 6);
 
-  PUSHs (sv_2mortal (newSViv (uup->action)));
-  PUSHs (sv_2mortal (newSVpv (uup->curfile, 0)));
-  PUSHs (sv_2mortal (newSViv (uup->partno)));
-  PUSHs (sv_2mortal (newSViv (uup->numparts)));
-  PUSHs (sv_2mortal (newSViv (uup->fsize)));
-  PUSHs (sv_2mortal (newSViv (uup->percent)));
+  TEMP_ACQUIRE {
 
-  PUTBACK; count = perl_call_sv ((SV *)cb, G_SCALAR); SPAGAIN;
+    dSP;
+    int count;
+   
+    ENTER; SAVETMPS; PUSHMARK (SP); EXTEND (SP, 6);
 
-  if (count != 1)
-    croak ("busycallback perl callback returned more than one argument");
+    PUSHs (sv_2mortal (newSViv (uup->action)));
+    PUSHs (sv_2mortal (newSVpv (uup->curfile, 0)));
+    PUSHs (sv_2mortal (newSViv (uup->partno)));
+    PUSHs (sv_2mortal (newSViv (uup->numparts)));
+    PUSHs (sv_2mortal (newSViv (uup->fsize)));
+    PUSHs (sv_2mortal (newSViv (uup->percent)));
 
-  retval = POPi;
+    PUTBACK; count = perl_call_sv ((SV *)cb, G_SCALAR); SPAGAIN;
 
-  PUTBACK; FREETMPS; LEAVE;
+    if (count != 1)
+      croak ("busycallback perl callback returned more than one argument");
+
+    retval = POPi;
+
+    PUTBACK; FREETMPS; LEAVE;
+
+  } TEMP_RELEASE;
 
   return retval;
 }
@@ -142,22 +70,27 @@ uu_busy_callback (void *cb, uuprogress *uup)
 static char *
 uu_fnamefilter_callback (void *cb, char *fname)
 {
-  dSP;
-  int count;
   static char *str;
- 
-  ENTER; SAVETMPS; PUSHMARK (SP); EXTEND (SP, 1);
 
-  PUSHs (sv_2mortal (newSVpv (fname, 0)));
+  TEMP_ACQUIRE {
 
-  PUTBACK; count = perl_call_sv ((SV *)cb, G_SCALAR); SPAGAIN;
+    dSP;
+    int count;
+   
+    ENTER; SAVETMPS; PUSHMARK (SP); EXTEND (SP, 1);
 
-  if (count != 1)
-    croak ("fnamefilter perl callback MUST return a single filename exactly");
+    PUSHs (sv_2mortal (newSVpv (fname, 0)));
 
-  _FP_free (str); str = _FP_strdup (SvPV_nolen (TOPs));
+    PUTBACK; count = perl_call_sv ((SV *)cb, G_SCALAR); SPAGAIN;
 
-  PUTBACK; FREETMPS; LEAVE;
+    if (count != 1)
+      croak ("fnamefilter perl callback MUST return a single filename exactly");
+
+    _FP_free (str); str = _FP_strdup (SvPV_nolen (TOPs));
+
+    PUTBACK; FREETMPS; LEAVE;
+
+  } TEMP_RELEASE;
 
   return str;
 }
@@ -165,26 +98,31 @@ uu_fnamefilter_callback (void *cb, char *fname)
 static int
 uu_file_callback (void *cb, char *id, char *fname, int retrieve)
 {
-  dSP;
-  int count;
   int retval;
-  SV *xfname = newSVpv ("", 0);
- 
-  ENTER; SAVETMPS; PUSHMARK (SP); EXTEND (SP, 3);
 
-  PUSHs (sv_2mortal (newSVpv (id, 0)));
-  PUSHs (sv_2mortal (xfname));
-  PUSHs (sv_2mortal (newSViv (retrieve)));
+  TEMP_ACQUIRE {
 
-  PUTBACK; count = perl_call_sv ((SV *)cb, G_SCALAR); SPAGAIN;
+    dSP;
+    int count;
+    SV *xfname = newSVpv ("", 0);
+   
+    ENTER; SAVETMPS; PUSHMARK (SP); EXTEND (SP, 3);
 
-  if (count != 1)
-    croak ("filecallback perl callback must return a single return status");
+    PUSHs (sv_2mortal (newSVpv (id, 0)));
+    PUSHs (sv_2mortal (xfname));
+    PUSHs (sv_2mortal (newSViv (retrieve)));
 
-  strcpy (fname, SvPV_nolen (xfname));
-  retval = POPi;
+    PUTBACK; count = perl_call_sv ((SV *)cb, G_SCALAR); SPAGAIN;
 
-  PUTBACK; FREETMPS; LEAVE;
+    if (count != 1)
+      croak ("filecallback perl callback must return a single return status");
+
+    strcpy (fname, SvPV_nolen (xfname));
+    retval = POPi;
+
+    PUTBACK; FREETMPS; LEAVE;
+
+  } TEMP_RELEASE;
 
   return retval;
 }
@@ -192,29 +130,33 @@ uu_file_callback (void *cb, char *id, char *fname, int retrieve)
 static char *
 uu_filename_callback (void *cb, char *subject, char *filename)
 {
-  dSP;
-  int count;
- 
-  ENTER; SAVETMPS; PUSHMARK (SP); EXTEND (SP, 2);
+  TEMP_ACQUIRE {
 
-  PUSHs (sv_2mortal(newSVpv(subject, 0)));
-  PUSHs (filename ? sv_2mortal(newSVpv(filename, 0)) : &PL_sv_undef);
+    dSP;
+    int count;
+   
+    ENTER; SAVETMPS; PUSHMARK (SP); EXTEND (SP, 2);
 
-  PUTBACK; count = perl_call_sv ((SV *)cb, G_ARRAY); SPAGAIN;
+    PUSHs (sv_2mortal(newSVpv(subject, 0)));
+    PUSHs (filename ? sv_2mortal(newSVpv(filename, 0)) : &PL_sv_undef);
 
-  if (count > 1)
-    croak ("filenamecallback perl callback must return nothing or a single filename");
+    PUTBACK; count = perl_call_sv ((SV *)cb, G_ARRAY); SPAGAIN;
 
-  if (count)
-    {
-      _FP_free (filename);
+    if (count > 1)
+      croak ("filenamecallback perl callback must return nothing or a single filename");
 
-      filename = SvOK (TOPs)
-         ? _FP_strdup (SvPV_nolen (TOPs))
-         : 0;
-    }
+    if (count)
+      {
+        _FP_free (filename);
 
-  PUTBACK; FREETMPS; LEAVE;
+        filename = SvOK (TOPs)
+           ? _FP_strdup (SvPV_nolen (TOPs))
+           : 0;
+      }
+
+    PUTBACK; FREETMPS; LEAVE;
+
+  } TEMP_RELEASE;
 
   return filename;
 }
@@ -226,22 +168,27 @@ static SV *uu_msg_sv, *uu_busy_sv, *uu_file_sv, *uu_fnamefilter_sv, *uu_filename
 static int
 uu_info_file (void *cb, char *info)
 {
-  dSP;
-  int count;
   int retval;
- 
-  ENTER; SAVETMPS; PUSHMARK(SP); EXTEND(SP,1);
 
-  PUSHs(sv_2mortal(newSVpv(info,0)));
+  TEMP_ACQUIRE {
 
-  PUTBACK; count = perl_call_sv ((SV *)cb, G_SCALAR); SPAGAIN;
+    dSP;
+    int count;
+   
+    ENTER; SAVETMPS; PUSHMARK(SP); EXTEND(SP,1);
 
-  if (count != 1)
-    croak ("info_file perl callback returned more than one argument");
+    PUSHs(sv_2mortal(newSVpv(info,0)));
 
-  retval = POPi;
+    PUTBACK; count = perl_call_sv ((SV *)cb, G_SCALAR); SPAGAIN;
 
-  PUTBACK; FREETMPS; LEAVE;
+    if (count != 1)
+      croak ("info_file perl callback returned more than one argument");
+
+    retval = POPi;
+
+    PUTBACK; FREETMPS; LEAVE;
+
+  } TEMP_RELEASE;
 
   return retval;
 }
@@ -260,37 +207,24 @@ uu_opt_isstring (int opt)
     }
 }
 
-static int uu_initialized;
+static void
+initialise (void)
+{
+  int retval = UUInitialize ();
+
+  if (retval != UURET_OK)
+    croak ("unable to initialize uudeview library (%s)", UUstrerror (retval));
+}
 
 MODULE = Convert::UUlib		PACKAGE = Convert::UUlib		PREFIX = UU
 
 PROTOTYPES: ENABLE
 
-int
-constant (name)
-	char *		name
-
-
-void
-UUInitialize ()
-	CODE:
-        if (!uu_initialized)
-          {
-            int retval;
-
-            if ((retval = UUInitialize ()) != UURET_OK)
-              croak ("unable to initialize uudeview library (%s)", UUstrerror (retval));
- 
-            uu_initialized = 1;
-          }
-
 void
 UUCleanUp ()
 	CODE:
-	if (uu_initialized)
-          UUCleanUp ();
-
-        uu_initialized = 0;
+        UUCleanUp ();
+        initialise ();
 
 SV *
 UUGetOption (opt)
@@ -378,8 +312,13 @@ UULoadFile (fname, id = 0, delflag = 0, partno = -1)
         PPCODE:
 {
 	int count;
+        IV ret;
 
-	XPUSHs (sv_2mortal (newSViv (UULoadFileWithPartNo (fname, id, delflag, partno, &count))));
+        RELEASE;
+        ret = UULoadFileWithPartNo (fname, id, delflag, partno, &count);
+        ACQUIRE;
+
+	XPUSHs (sv_2mortal (newSViv (ret)));
         if (GIMME_V == G_ARRAY)
           XPUSHs (sv_2mortal (newSViv (count)));
 }
@@ -468,6 +407,16 @@ uulist *
 UUGetFileListItem (num)
 	int	num
 
+void
+GetFileList ()
+	PPCODE:
+{
+	uulist *iter;
+
+        for (iter = UUGlobalFileList; iter; iter = iter->NEXT)
+	  XPUSHs (sv_setref_pv (sv_newmortal (), "Convert::UUlib::Item", iter));
+}
+
 MODULE = Convert::UUlib		PACKAGE = Convert::UUlib::Item
 
 int
@@ -483,7 +432,9 @@ int
 decode_temp (item)
 	uulist *item
         CODE:
+        RELEASE;
         RETVAL = UUDecodeToTemp (item);
+        ACQUIRE;
 	OUTPUT:
         RETVAL
 
@@ -491,7 +442,9 @@ int
 remove_temp (item)
 	uulist *item
         CODE:
+        RELEASE;
         RETVAL = UURemoveTemp (item);
+        ACQUIRE;
 	OUTPUT:
         RETVAL
 
@@ -500,7 +453,9 @@ decode (item, target = 0)
 	uulist *item
 	char *	target
         CODE:
+        RELEASE;
         RETVAL = UUDecodeFile (item, target);
+        ACQUIRE;
 	OUTPUT:
         RETVAL
 
@@ -509,7 +464,9 @@ info (item, func)
 	uulist *item
 	SV *	func
         CODE:
-        UUInfoFile (item,(void *)func, uu_info_file);
+        RELEASE;
+        UUInfoFile (item, (void *)func, uu_info_file);
+        ACQUIRE;
 
 short
 state(li)
@@ -605,22 +562,14 @@ parts (li)
           {
             HV *pi = newHV ();
 
-            hv_store (pi, "partno"  , 6, newSViv (p->partno)         , 0);
-
-            if (p->filename)
-              hv_store (pi, "filename", 8, newSVpv (p->filename, 0)    , 0);
-            if(p->subfname)
-              hv_store (pi, "subfname", 8, newSVpv (p->subfname, 0)    , 0);
-            if(p->mimeid)
-              hv_store (pi, "mimeid"  , 6, newSVpv (p->mimeid  , 0)    , 0);
-            if(p->mimetype)
-              hv_store (pi, "mimetype", 8, newSVpv (p->mimetype, 0)    , 0);
-            if (p->data->subject)
-              hv_store (pi, "subject" , 7, newSVpv (p->data->subject,0), 0);
-            if (p->data->origin)
-              hv_store (pi, "origin"  , 6, newSVpv (p->data->origin ,0), 0);
-            if (p->data->sfname)
-              hv_store (pi, "sfname"  , 6, newSVpv (p->data->sfname ,0), 0);
+                                  hv_store (pi, "partno"  , 6, newSViv (p->partno)         , 0);
+            if (p->filename     ) hv_store (pi, "filename", 8, newSVpv (p->filename, 0)    , 0);
+            if (p->subfname     ) hv_store (pi, "subfname", 8, newSVpv (p->subfname, 0)    , 0);
+            if (p->mimeid       ) hv_store (pi, "mimeid"  , 6, newSVpv (p->mimeid  , 0)    , 0);
+            if (p->mimetype     ) hv_store (pi, "mimetype", 8, newSVpv (p->mimetype, 0)    , 0);
+            if (p->data->subject) hv_store (pi, "subject" , 7, newSVpv (p->data->subject,0), 0);
+            if (p->data->origin ) hv_store (pi, "origin"  , 6, newSVpv (p->data->origin ,0), 0);
+            if (p->data->sfname ) hv_store (pi, "sfname"  , 6, newSVpv (p->data->sfname ,0), 0);
 
             XPUSHs (sv_2mortal (newRV_noinc ((SV *)pi)));
 
@@ -629,9 +578,85 @@ parts (li)
 }
 
 BOOT:
+{
+  HV *stash = GvSTASH (CvGV (cv));
+
+  static const struct {
+    const char *name;
+    IV iv;
+  } *civ, const_iv[] = {
+#   define const_iv(name, value) { # name, (IV) value },
+    const_iv (ACT_COPYING  , UUACT_COPYING)
+    const_iv (ACT_DECODING , UUACT_DECODING)
+    const_iv (ACT_ENCODING , UUACT_ENCODING)
+    const_iv (ACT_IDLE     , UUACT_IDLE)
+    const_iv (ACT_SCANNING , UUACT_SCANNING)
+    const_iv (FILE_DECODED , UUFILE_DECODED)
+    const_iv (FILE_ERROR   , UUFILE_ERROR)
+    const_iv (FILE_MISPART , UUFILE_MISPART)
+    const_iv (FILE_NOBEGIN , UUFILE_NOBEGIN)
+    const_iv (FILE_NODATA  , UUFILE_NODATA)
+    const_iv (FILE_NOEND   , UUFILE_NOEND)
+    const_iv (FILE_OK      , UUFILE_OK)
+    const_iv (FILE_READ    , UUFILE_READ)
+    const_iv (FILE_TMPFILE , UUFILE_TMPFILE)
+    const_iv (MSG_ERROR    , UUMSG_ERROR)
+    const_iv (MSG_FATAL    , UUMSG_FATAL)
+    const_iv (MSG_MESSAGE  , UUMSG_MESSAGE)
+    const_iv (MSG_NOTE     , UUMSG_NOTE)
+    const_iv (MSG_PANIC    , UUMSG_PANIC)
+    const_iv (MSG_WARNING  , UUMSG_WARNING)
+    const_iv (OPT_VERSION  , UUOPT_VERSION)
+    const_iv (OPT_FAST     , UUOPT_FAST)
+    const_iv (OPT_DUMBNESS , UUOPT_DUMBNESS)
+    const_iv (OPT_BRACKPOL , UUOPT_BRACKPOL)
+    const_iv (OPT_VERBOSE  , UUOPT_VERBOSE)
+    const_iv (OPT_DESPERATE, UUOPT_DESPERATE)
+    const_iv (OPT_IGNREPLY , UUOPT_IGNREPLY)
+    const_iv (OPT_OVERWRITE, UUOPT_OVERWRITE)
+    const_iv (OPT_SAVEPATH , UUOPT_SAVEPATH)
+    const_iv (OPT_IGNMODE  , UUOPT_IGNMODE)
+    const_iv (OPT_DEBUG    , UUOPT_DEBUG)
+    const_iv (OPT_ERRNO    , UUOPT_ERRNO)
+    const_iv (OPT_PROGRESS , UUOPT_PROGRESS)
+    const_iv (OPT_USETEXT  , UUOPT_USETEXT)
+    const_iv (OPT_PREAMB   , UUOPT_PREAMB)
+    const_iv (OPT_TINYB64  , UUOPT_TINYB64)
+    const_iv (OPT_ENCEXT   , UUOPT_ENCEXT)
+    const_iv (OPT_REMOVE   , UUOPT_REMOVE)
+    const_iv (OPT_MOREMIME , UUOPT_MOREMIME)
+    const_iv (OPT_DOTDOT   , UUOPT_DOTDOT)
+    const_iv (OPT_RBUF     , UUOPT_RBUF)
+    const_iv (OPT_WBUF     , UUOPT_WBUF)
+    const_iv (OPT_AUTOCHECK, UUOPT_AUTOCHECK)
+    const_iv (RET_CANCEL   , UURET_CANCEL)
+    const_iv (RET_CONT     , UURET_CONT)
+    const_iv (RET_EXISTS   , UURET_EXISTS)
+    const_iv (RET_ILLVAL   , UURET_ILLVAL)
+    const_iv (RET_IOERR    , UURET_IOERR)
+    const_iv (RET_NODATA   , UURET_NODATA)
+    const_iv (RET_NOEND    , UURET_NOEND)
+    const_iv (RET_NOMEM    , UURET_NOMEM)
+    const_iv (RET_OK       , UURET_OK)
+    const_iv (RET_UNSUP    , UURET_UNSUP)
+    const_iv (B64_ENCODED  , B64ENCODED)
+    const_iv (BH_ENCODED   , BH_ENCODED)
+    const_iv (PT_ENCODED   , PT_ENCODED)
+    const_iv (QP_ENCODED   , QP_ENCODED)
+    const_iv (UU_ENCODED   , UU_ENCODED)
+    const_iv (XX_ENCODED   , XX_ENCODED)
+    const_iv (YENC_ENCODED , YENC_ENCODED)
+  };
+
+  for (civ = const_iv + sizeof (const_iv) / sizeof (const_iv [0]); civ > const_iv; civ--)
+    newCONSTSUB (stash, (char *)civ[-1].name, newSViv (civ[-1].iv));
+
   uu_msg_sv		= newSVsv (&PL_sv_undef);
   uu_busy_sv		= newSVsv (&PL_sv_undef);
   uu_file_sv		= newSVsv (&PL_sv_undef);
   uu_fnamefilter_sv	= newSVsv (&PL_sv_undef);
   uu_filename_sv	= newSVsv (&PL_sv_undef);
+
+  initialise ();
+}
 

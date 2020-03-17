@@ -10,7 +10,13 @@ no warnings 'uninitialized';
 use overload '""' => sub {
     my ($self) = @_;
 
-    return 'An object which was passed ' . ($self->{param} // 'nothing');
+    # Grrr, can't use $self->{param} // 'nothing' because that doesn't work
+    # on archaic Perls like 5.8.9.
+    my $param = $self->{param};
+    if (!defined $param) {
+        $param = 'nothing';
+    }
+    return "An object which was passed $param";
 };
 
 sub new {

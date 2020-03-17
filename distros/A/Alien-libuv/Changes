@@ -1,5 +1,13 @@
 Revision history for Alien-libuv
 
+1.013     2020-03-16
+  - Update documentation and build to use Alien::Base::Wrapper
+    This handles edge cases of prereqs that we didn't get manually
+    prior to this update
+  - Bump prereq to Alien::Build v2.15 to get Probe::Vcpkg
+  - Move testing phase to the correct place for the library on non-Windows
+  - Update to the libuv v1.34.2 release
+
 1.012     2019-08-31
   - Update to the libuv v1.31.0 release
   - Run make check on non-windows environments

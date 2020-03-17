@@ -1,6 +1,9 @@
 Revision history for App-YTDL
 
 
+0.311   2020-03-17
+        - UI tweaking.
+
 0.310   2020-03-15
         - UI tweaking.
         - Term::Choose::Util: replace deprecated functions and deprecated options.

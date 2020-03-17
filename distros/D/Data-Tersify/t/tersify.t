@@ -31,6 +31,7 @@ subtest 'But we update references'       => \&test_update_references;
 subtest 'Overloaded stringification'     => \&test_stringification;
 subtest 'Tersify many values'            => \&test_tersify_many;
 subtest 'Cannot tersify weird things'    => \&test_cannot_tersify_weird_things;
+subtest 'Can reuse the same RAM address' => \&test_reuse_same_ram_address;
 
 done_testing();
 
@@ -487,6 +488,26 @@ sub test_cannot_tersify_weird_things {
     # Assume that the same sort of thing goes for coderefs etc.
     my $coderef = sub { TestObject->new('This will never get run') };
     is(tersify($coderef), $coderef, 'Coderefs are also unaffected');
+}
+
+# Even if Perl reuses the same refaddr for a data structure that we modified
+# in previous runs, that doesn't faze us.
+
+sub test_reuse_same_ram_address {
+    my $num_counts = 10;
+    for my $count (1..$num_counts) {
+        my $original = {
+            hashref_containing => {
+                object => TestObject->new(123),
+            }
+        };
+        my $tersified = tersify($original);
+        isnt(
+            refaddr($tersified->{hashref_containing}),
+            refaddr($original->{hashref_containing}),
+            "Count $count of $num_counts: we replace a hashref",
+        );
+    }    
 }
 
 

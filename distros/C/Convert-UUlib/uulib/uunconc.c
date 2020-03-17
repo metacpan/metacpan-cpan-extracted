@@ -300,14 +300,10 @@ UUValidData (char *ptr, int encoding, int *bhflag)
     return 0;              /* bad string */
   }
 
-  while (*s) {
-    s++;
-    len++;
-    i++;
-  }
+  if (encoding == YENC_ENCODED)
+    return YENC_ENCODED;
 
-  if (i == 0)
-    return 0;
+  i = strlen (s);
 
   switch (encoding) {
   case UU_ENCODED:
@@ -318,8 +314,6 @@ UUValidData (char *ptr, int encoding, int *bhflag)
     goto _t_B64;
   case BH_ENCODED:
     goto _t_Binhex;
-  case YENC_ENCODED:
-    return YENC_ENCODED;
   }
 
  _t_Binhex:                 /* Binhex Test */
@@ -961,15 +955,15 @@ UUDecodePart (FILE *datain, FILE *dataout, int *state,
   int warning=0, vlc=0, lc[2], hadct=0;
   int tc=0, tf=0, vflag, haddata=0, haddh=0;
   long yefilesize=0, yepartends=0, yenotlastpart=0;
-  crc32_t yepartcrc=crc32(0L, Z_NULL, 0);
-  static crc32_t yefilecrc=0;
+  crc32_t yepartcrc=CRC32_INIT;
+  static crc32_t yefilecrc;
   static int bhflag=0;
   size_t count=0;
   size_t yepartsize=0;
   char *ptr;
 
   if (datain == NULL || dataout == NULL) {
-    yefilecrc = crc32(0L, Z_NULL, 0);
+    yefilecrc = CRC32_INIT;
     bhflag = 0;
     return UURET_OK;
   }
@@ -1145,14 +1139,22 @@ UUDecodePart (FILE *datain, FILE *dataout, int *state,
 
     if (*state == DATA && method == YENC_ENCODED &&
 	strncmp (line, "=yend ", 6) == 0) {
+      int lastpart = !yenotlastpart && (yepartends == 0 || yepartends >= yefilesize);
+      yefilecrc = uu_crc32_combine(yefilecrc, yepartcrc, yepartsize);
       if ((ptr = _FP_strstr (line, " pcrc32=")) != NULL) {
 	crc32_t pcrc32 = strtoul (ptr + 8, NULL, 16);
 	if (pcrc32 != yepartcrc) {
 	  UUMessage (uunconc_id, __LINE__, UUMSG_WARNING,
 		     uustring (S_PCRC_MISMATCH), progress.curfile, progress.partno);
 	}
+      } else if ((ptr = _FP_strstr (line, " pcrc=")) != NULL) {
+	crc32_t pcrc32 = strtoul (ptr + 6, NULL, 16);
+	if (pcrc32 != yepartcrc) {
+	  UUMessage (uunconc_id, __LINE__, UUMSG_WARNING,
+		     uustring (S_PCRC_MISMATCH), progress.curfile, progress.partno);
+	}
       }
-      if ((ptr = _FP_strstr (line, " crc32=")) != NULL)
+      if (lastpart && (ptr = _FP_strstr (line, " crc32=")) != NULL)
       {
 	crc32_t fcrc32 = strtoul (ptr + 7, NULL, 16);
 	if (fcrc32 != yefilecrc) {
@@ -1174,7 +1176,7 @@ UUDecodePart (FILE *datain, FILE *dataout, int *state,
 		       yepartsize, size);
 	}
       }
-      if (!yenotlastpart && (yepartends == 0 || yepartends >= yefilesize)) {
+      if (lastpart) {
 	*state = DONE;
       }
       break;
@@ -1202,8 +1204,7 @@ UUDecodePart (FILE *datain, FILE *dataout, int *state,
 	if (tf) {
 	  count  = UUDecodeLine (line, oline, method);
 	  if (method == YENC_ENCODED) {
-	    yepartcrc = crc32(yepartcrc, oline, count);
-	    yefilecrc = crc32(yefilecrc, oline, count);
+	    yepartcrc = uu_crc32(yepartcrc, oline, count);
 	    yepartsize += count;
 	  }
 	  vlc++; lc[1]++;

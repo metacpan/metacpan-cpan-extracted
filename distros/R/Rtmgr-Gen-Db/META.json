@@ -1,10 +1,10 @@
 {
-   "abstract" : "Connect to rTorrent/ruTorrent installation and get a list of torrents, storing them to a database.!",
+   "abstract" : "Connect to rTorrent/ruTorrent installation and get a list of torrents, storing them to a database.",
    "author" : [
       "Clem Morton <clem@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Config::File" : "1.51",
+            "DBD::SQLite" : "1.64",
             "DBI" : "1.643",
             "Data::Dump" : "1.23",
             "XML::RPC" : "1.1",
@@ -45,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

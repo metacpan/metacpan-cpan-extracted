@@ -1,9 +1,8 @@
+Build.PL
 Changes
 LICENSE
 MANIFEST
-Makefile.PL
 README
-SIGNATURE
 carlos_super.scl
 eg/README
 eg/fitness
@@ -14,9 +13,12 @@ equal.scl
 groenewald_bach.scl
 lib/Music/Scala.pm
 slen_pel16.scl
+t/00-load.t
 t/Music-Scala.t
+t/pod-coverage.t
 t/pod.t
 valid-pitch-lines.scl
 xylophone2.scl
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

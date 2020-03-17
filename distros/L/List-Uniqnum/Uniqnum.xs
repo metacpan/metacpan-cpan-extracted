@@ -89,13 +89,10 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
 
         /* for NaN, use the platform's normal stringification */
         else if (nv_arg != nv_arg) sv_setpvf(keysv, "%" NVgf, nv_arg);
-
 #ifdef NV_IS_DOUBLEDOUBLE
-
-        /* If the least significant double is zero, it could be     *
-         * either 0.0 or -0.0. We should therefore ignore the least *
-         * significant double and assign to keysv only the bytes    *
-         * of the most significant double.                          */
+        /* If the least significant double is zero, it could be either 0.0     *
+         * or -0.0. We therefore ignore the least significant double and       *
+         * assign to keysv the bytes of the most significant double only.      */
         else if(nv_arg == (double)nv_arg) {
             double double_arg = (double)nv_arg;
             sv_setpvn(keysv, (char *) &double_arg, 8);
@@ -109,40 +106,56 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
              * never used. For all other NV types ACTUAL_NVSIZE == sizeof(NV). */
             sv_setpvn(keysv, (char *) &nv_arg, ACTUAL_NVSIZE);  
         }
-#else                                       /* $Config{nvsize} == $Config{ivsize} == 8 */ 
+#else                                    /* $Config{nvsize} == $Config{ivsize} == 8 */ 
         if( SvIOK(arg) || !SvOK(arg) ) {
-            IV iv = SvIV(arg);   /* Doesn't matter if SvUOK(arg) is TRUE */
-            int uok = SvUOK(arg);
-            int sign = ( iv > 0 || uok ) ? 1 : -1;
 
-            /* use "0" for all zeros */
+           /* It doesn't matter if SvUOK(arg) is TRUE */
+            IV iv = SvIV(arg);
+
+           /* use "0" for all zeros */
             if(iv == 0) sv_setpvs(keysv, "0");
+
             else {
+                int uok = SvUOK(arg);
+                int sign = ( iv > 0 || uok ) ? 1 : -1;
 
-                /* Set keysv to the bytes of SvNV(arg) if and only if *
-                 * the integer value held by arg can be represented   *
-                 * exactly as a double.                               *
-                 * We use the solution provided by roboticus at:      *
-                 * https://www.perlmonks.org/?node_id=11113490        *
-                 * as it's the most efficient way I could find.       *
-                 * First we need to identify the lowest bit set       */
-                IV last_set = iv & -iv;
+                /* Set keysv to the bytes of SvNV(arg) if and only if the integer value  *
+                 * held by arg can be represented exactly as a double - ie if there are  *
+                 * no more than 51 bits between its least significant set bit and its    *
+                 * most significant set bit.                                             *
+                 * The neatest approach I could find was provided by roboticus at:       *
+                 *     https://www.perlmonks.org/?node_id=11113490                       *
+                 * First, identify the lowest set bit and assign its value to an IV.     *
+                 * Note that this value will always be > 0, and always a power of 2.     */
+                IV lowest_set = iv & -iv;
 
-                /* Shift it left 53 bits to get location of lowest invalid bit         *
-                 * NOTE: If smallest invalid bit is far enough left, then this will    *
-                 * turn into 0 making the invalid bits also 0, which happens to be OK! */
-                UV valid_bits = (last_set << 53) - 1; /* last_set always >= 0 */
+                /* Second, shift it left 53 bits to get location of arg's highest        *
+                 * "allowed" set bit.                                                    *
+                 * NOTE: If lowest set bit is initially far enough left, then this left  *
+                 * shift operation will result in a value of 0, which is fine.           *
+                 * Then subtract 1 so that all of the ("allowed") bits below the set bit *
+                 * are 1 && all other ("disallowed") bits are set to 0.                  *
+                 * (If the value prior to subtraction was 0, then subtracing 1 will set  *
+                 * all bits - which is also fine.)                                       */ 
+                UV valid_bits = (lowest_set << 53) - 1;
 
-               /* The value of arg can be exactly represented by a double *
-                * unless one of the upper-order invalid bits are set.     */
-                if(!((iv * sign) & (~valid_bits))) {
+                /* The value of arg can be exactly represented by a double unless one    *
+                 * or more of its "disallowed" bits are set - ie if iv & (~valid_bits)   *
+                 * is untrue. However, if (iv < 0 && !SvUOK(arg)) we need to multiply it *
+                 * by -1 prior to performing that '&' operation.                         */
+                if( !((iv * sign) & (~valid_bits)) ) {
                     nv_arg = SvNV(arg);
                     sv_setpvn(keysv, (char *) &nv_arg, 8);
                 }          
-                else if(uok) sv_setpvf(keysv, "%" UVuf, iv);
-                else sv_setpvf(keysv, "%" IVdf, iv);
+                else {
+                    sv_setpvn(keysv, (char *) &iv, 8);
+                   /* We add an extra byte to distinguish between IV/UV and an NV.       *
+                    * We also use that byte to distinguish between a -ve IV and a UV.    *
+                    * This is more efficient than reading in the value of the IV/UV.     */
+                    if(uok) sv_catpvn(keysv, "U", 1);
+                    else    sv_catpvn(keysv, "I", 1);
+                }
             }
-
         }
         else {
             nv_arg = SvNV(arg);

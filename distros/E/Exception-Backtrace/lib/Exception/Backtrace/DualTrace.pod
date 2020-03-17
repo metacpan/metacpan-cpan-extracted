@@ -1,0 +1,24 @@
+=head1 NAME
+
+Exception::Backtrace::DualTrace - container for Perl and C/C++ stack frames
+
+=head1 METHODS
+
+=head2 $bt->to_string()
+
+Stringifies Perl and C/C++ stack frames
+
+=head2 $bt->c_trace()
+
+Returns container of C/C++ stack frames
+
+=head2 $bt->perl_trace()
+
+Returns container of C/C++ perl frames
+
+=head1 REFERENCE
+
+L<Exception::Backtrace>
+
+=cut
+

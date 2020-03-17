@@ -1,10 +1,15 @@
-0.01    2016-02-26 (PERLANCAR)
+0.020   2019-12-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Column name was not defined.
+
+
+0.01    2016-02-26  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [dist] Use Pod::Weaver plugin PWP:App::lcpan.
 
 
-0.00    2016-02-26 (PERLANCAR)
+0.00    2016-02-26  Released-By: PERLANCAR
 
         - First early release.

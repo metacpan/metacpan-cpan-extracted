@@ -9,6 +9,8 @@
 package Music::Scala;
 
 use 5.010000;
+use strict;
+use warnings;
 
 use Carp qw/croak/;
 use File::Basename qw/basename/;
@@ -16,7 +18,7 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw/looks_like_number reftype/;
 
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 ##############################################################################
 #
@@ -29,9 +31,8 @@ our $VERSION = '1.04';
 # or ratios), (notes as) cents, (notes as) ratios).
 
 has binmode => (
-    is => 'rw',
-
-    predicate => 1,
+    is        => 'rw',
+    predicate => 1,               # has_binmode
     reader    => 'get_binmode',
     writer    => 'set_binmode',
 );
@@ -85,7 +86,7 @@ has MAX_LINES => (
 has notes => (
     is        => 'rw',
     clearer   => 1,
-    predicate => 1,
+    predicate => 1,      # has_notes
 );
 
 ##############################################################################
@@ -93,16 +94,16 @@ has notes => (
 # METHODS
 
 sub BUILD {
-    my ( $self, $param ) = @_;
+    my ($self, $param) = @_;
 
-    if ( exists $param->{file} and exists $param->{fh} ) {
+    if (exists $param->{file} and exists $param->{fh}) {
         die "new accepts only one of the 'file' or 'fh' arguments\n";
     }
 
-    if ( exists $param->{file} ) {
-        $self->read_scala( file => $param->{file} );
-    } elsif ( exists $param->{fh} ) {
-        $self->read_scala( fh => $param->{fh} );
+    if (exists $param->{file}) {
+        $self->read_scala(file => $param->{file});
+    } elsif (exists $param->{fh}) {
+        $self->read_scala(fh => $param->{fh});
     }
 }
 
@@ -111,8 +112,8 @@ sub abs2rel {
     my $self = shift;
     return if !@_;
     my @result = $_[0];
-    if ( @_ > 1 ) {
-        for my $i ( 1 .. $#_ ) {
+    if (@_ > 1) {
+        for my $i (1 .. $#_) {
             push @result, $_[$i] - $_[ $i - 1 ];
         }
     }
@@ -120,9 +121,9 @@ sub abs2rel {
 }
 
 sub cents2ratio {
-    my ( $self, $cents, $precision ) = @_;
+    my ($self, $cents, $precision) = @_;
     croak 'cents must be a number' if !looks_like_number $cents;
-    if ( defined $precision ) {
+    if (defined $precision) {
         croak 'precision must be a positive integer'
           if !looks_like_number $precision or $precision < 0;
         $precision = int $precision;
@@ -130,12 +131,12 @@ sub cents2ratio {
         $precision = 2;
     }
 
-    return sprintf "%.*f", $precision, 10**( $cents / 3986.31371386484 );
+    return sprintf "%.*f", $precision, 10**($cents / 3986.31371386484);
 }
 
 # MIDI calculation, for easy comparison to scala results
 sub freq2pitch {
-    my ( $self, $freq ) = @_;
+    my ($self, $freq) = @_;
     croak 'frequency must be a positive number'
       if !looks_like_number $freq
       or $freq <= 0;
@@ -143,13 +144,13 @@ sub freq2pitch {
     # no precision, as assume pitch numbers are integers
     return sprintf '%.0f',
       $self->get_concertpitch +
-      12 * ( log( $freq / $self->get_concertfreq ) / 0.693147180559945 );
+      12 * (log($freq / $self->get_concertfreq) / 0.693147180559945);
 }
 
 sub get_cents {
     my ($self) = @_;
     croak 'no scala loaded' if !$self->has_notes;
-    return $self->notes2cents( @{ $self->notes } );
+    return $self->notes2cents(@{ $self->notes });
 }
 
 sub get_notes {
@@ -161,18 +162,18 @@ sub get_notes {
 sub get_ratios {
     my ($self) = @_;
     croak 'no scala loaded' if !$self->has_notes;
-    return $self->notes2ratios( @{ $self->notes } );
+    return $self->notes2ratios(@{ $self->notes });
 }
 
 sub interval2freq {
     my $self = shift;
     croak 'no scala loaded' if !$self->has_notes;
 
-    my @ratios = $self->notes2ratios( @{ $self->notes } );
+    my @ratios = $self->notes2ratios(@{ $self->notes });
 
     my @freqs;
-    for my $i ( ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_ ) {
-        if ( $i == 0 ) {    # special case for unison (ratio 1/1)
+    for my $i (ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_) {
+        if ($i == 0) {    # special case for unison (ratio 1/1)
             push @freqs, $self->get_concertfreq;
         } else {
             my $is_dsc = $i < 0 ? 1 : 0;
@@ -190,16 +191,16 @@ sub interval2freq {
             # backtrack to the proper frequency
             $octave_count++ if $is_dsc and $offset != 0;
 
-            if ( $octave_count > 0 ) {
+            if ($octave_count > 0) {
                 my $octaves_ratio = $ratios[-1]**$octave_count;
                 $octaves_ratio = 1 / $octaves_ratio if $is_dsc;
-                $octave_freq = $self->get_concertfreq * $octaves_ratio;
+                $octave_freq   = $self->get_concertfreq * $octaves_ratio;
             }
 
             my $remainder_freq = 0;
-            if ( $offset != 0 ) {
+            if ($offset != 0) {
                 $remainder_freq =
-                  ( $octave_freq || $self->get_concertfreq ) * $ratios[ $offset - 1 ];
+                  ($octave_freq || $self->get_concertfreq) * $ratios[ $offset - 1 ];
 
                 # zero as remainder is based from $octave_freq, if
                 # relevant, so already includes such
@@ -217,7 +218,7 @@ sub is_octavish {
     my $self = shift;
     croak 'no scala loaded' if !$self->has_notes;
 
-    my @ratios = $self->notes2ratios( @{ $self->notes } );
+    my @ratios = $self->notes2ratios(@{ $self->notes });
 
     # not octave bounded (double the frequency, e.g. 440 to 880)
     return 0 if $ratios[-1] != 2;
@@ -242,10 +243,9 @@ sub notes2cents {
     my $self = shift;
 
     my @cents;
-    for my $n ( ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_ ) {
-        if ( $n =~ m{([0-9]+)/([1-9][0-9]*)} ) {
-            push @cents,
-              1200 * ( ( log( $1 / $2 ) / 2.30258509299405 ) / 0.301029995663981 );
+    for my $n (ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_) {
+        if ($n =~ m{([0-9]+)/([1-9][0-9]*)}) {
+            push @cents, 1200 * ((log($1 / $2) / 2.30258509299405) / 0.301029995663981);
         } else {
             push @cents, $n;
         }
@@ -258,11 +258,11 @@ sub notes2ratios {
     my $self = shift;
 
     my @ratios;
-    for my $n ( ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_ ) {
-        if ( $n =~ m{([0-9]+)/([1-9][0-9]*)} ) {
+    for my $n (ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_) {
+        if ($n =~ m{([0-9]+)/([1-9][0-9]*)}) {
             push @ratios, $1 / $2;    # ratio, as marked with /
         } else {
-            push @ratios, 10**( $n / 3986.31371386484 );
+            push @ratios, 10**($n / 3986.31371386484);
         }
     }
 
@@ -271,19 +271,18 @@ sub notes2ratios {
 
 # MIDI for comparison, the other way
 sub pitch2freq {
-    my ( $self, $pitch ) = @_;
+    my ($self, $pitch) = @_;
     croak "pitch must be MIDI number"
       if !looks_like_number $pitch
       or $pitch < 0;
 
-    return $self->get_concertfreq *
-      ( 2**( ( $pitch - $self->get_concertpitch ) / 12 ) );
+    return $self->get_concertfreq * (2**(($pitch - $self->get_concertpitch) / 12));
 }
 
 sub ratio2cents {
-    my ( $self, $ratio, $precision ) = @_;
+    my ($self, $ratio, $precision) = @_;
     croak 'ratio must be a number' if !looks_like_number $ratio;
-    if ( defined $precision ) {
+    if (defined $precision) {
         croak 'precision must be a positive integer'
           if !looks_like_number $precision or $precision < 0;
         $precision = int $precision;
@@ -292,34 +291,34 @@ sub ratio2cents {
     }
 
     return sprintf "%.*f", $precision,
-      1200 * ( ( log($ratio) / 2.30258509299405 ) / 0.301029995663981 );
+      1200 * ((log($ratio) / 2.30258509299405) / 0.301029995663981);
 }
 
 sub read_scala {
     my $self = shift;
     my %param;
-    if ( @_ == 1 ) {
+    if (@_ == 1) {
         $param{file} = $_[0];
     } else {
         %param = @_;
     }
 
     my $fh;
-    if ( exists $param{file} ) {
-        open( $fh, '<', $param{file} ) or croak 'open failed: ' . $!;
-    } elsif ( exists $param{fh} ) {
+    if (exists $param{file}) {
+        open($fh, '<', $param{file}) or croak 'open failed: ' . $!;
+    } elsif (exists $param{fh}) {
         $fh = $param{fh};
     } else {
         croak 'must specify file or fh parameter to read_scala';
     }
-    if ( exists $param{binmode} ) {
+    if (exists $param{binmode}) {
         binmode $fh, $param{binmode} or croak 'binmode failed: ' . $!;
-    } elsif ( $self->has_binmode ) {
+    } elsif ($self->has_binmode) {
         binmode $fh, $self->get_binmode or croak 'binmode failed: ' . $!;
     }
 
-    my ( @scala, $line_count );
-    while ( !eof($fh) ) {
+    my (@scala, $line_count);
+    while (!eof($fh)) {
         my $line = readline $fh;
         croak 'readline failed: ' . $! unless defined $line;
         croak 'input exceeds MAX_LINES' if ++$line_count >= $self->MAX_LINES;
@@ -331,13 +330,13 @@ sub read_scala {
         last if @scala == 2;
     }
     # but as might hit the MAX_LINES or eof() instead check again...
-    if ( @scala != 2 ) {
+    if (@scala != 2) {
         croak 'missing description or note count lines';
     }
 
-    $self->set_description( shift @scala );
+    $self->set_description(shift @scala);
     my $NOTECOUNT;
-    if ( $scala[-1] =~ m/^\s*([0-9]+)/ ) {
+    if ($scala[-1] =~ m/^\s*([0-9]+)/) {
         $NOTECOUNT = $1;
     } else {
         croak 'could not parse note count';
@@ -345,7 +344,7 @@ sub read_scala {
 
     my @notes;
     my $cur_note = 1;
-    while ( !eof($fh) ) {
+    while (!eof($fh)) {
         my $line = readline $fh;
         croak 'readline failed: ' . $! unless defined $line;
         croak 'input exceeds MAX_LINES' if ++$line_count >= $self->MAX_LINES;
@@ -359,12 +358,12 @@ sub read_scala {
         # period), or if they have a slash, it is followed by another
         # number (so no "42/" cases). Checked via various greps on the
         # file contents.
-        if ( $line =~ m/^\s* ( -?[0-9]+\. [0-9]* ) /x ) {
+        if ($line =~ m/^\s* ( -?[0-9]+\. [0-9]* ) /x) {
             push @notes, $1;    # cents
-        } elsif ( $line =~ m{^\s* -[0-9] }x ) {
+        } elsif ($line =~ m{^\s* -[0-9] }x) {
             # specification says these "should give a read error"
             croak 'invalid negative ratio in note list';
-        } elsif ( $line =~ m{^\s* ( [1-9][0-9]* (?:/[0-9]+)? ) }x ) {
+        } elsif ($line =~ m{^\s* ( [1-9][0-9]* (?:/[0-9]+)? ) }x) {
             my $ratio = $1;
             $ratio .= '/1' if $ratio !~ m{/};    # implicit qualify of ratios
             push @notes, $ratio;
@@ -380,15 +379,15 @@ sub read_scala {
 
         last if $cur_note++ >= $NOTECOUNT;
     }
-    if ( @notes != $NOTECOUNT ) {
+    if (@notes != $NOTECOUNT) {
         croak 'expected ' . $NOTECOUNT . ' notes but got ' . scalar(@notes) . " notes";
     }
 
     # edge case: remove any 1/1 (zero cents) at head of the list, as
     # this implementation treats that as implicit
-    shift @notes if sprintf( "%.0f", $self->notes2cents( $notes[0] ) ) == 0;
+    shift @notes if sprintf("%.0f", $self->notes2cents($notes[0])) == 0;
 
-    $self->notes( \@notes );
+    $self->notes(\@notes);
 
     return $self;
 }
@@ -398,8 +397,8 @@ sub rel2abs {
     my $self = shift;
     return if !@_;
     my @result = $_[0];
-    if ( @_ > 1 ) {
-        for my $i ( 1 .. $#_ ) {
+    if (@_ > 1) {
+        for my $i (1 .. $#_) {
             push @result, $result[-1] + $_[$i];
         }
     }
@@ -410,23 +409,23 @@ sub rel2abs {
 # convert the remainder of the frequencies to cents against that first
 # frequency.
 sub set_by_frequency {
-    my $self = shift;
+    my $self  = shift;
     my $freqs = ref $_[0] eq 'ARRAY' ? $_[0] : \@_;
     croak 'need both root and other frequencies' if @$freqs < 2;
-    croak 'root frequency must not be zero' if $freqs->[0] == 0;
+    croak 'root frequency must not be zero'      if $freqs->[0] == 0;
 
     my @notes;
-    for my $i ( 1 .. $#{$freqs} ) {
+    for my $i (1 .. $#{$freqs}) {
         push @notes,
-          1200 * (
-            ( log( $freqs->[$i] / $freqs->[0] ) / 2.30258509299405 ) / 0.301029995663981 );
+          1200 *
+          ((log($freqs->[$i] / $freqs->[0]) / 2.30258509299405) / 0.301029995663981);
     }
 
     # edge case: remove any 1/1 (zero cents) at head of the list, as
     # this implementation treats that as implicit
-    shift @notes if sprintf( "%.0f", $self->notes2cents( $notes[0] ) ) == 0;
+    shift @notes if sprintf("%.0f", $self->notes2cents($notes[0])) == 0;
 
-    $self->notes( \@notes );
+    $self->notes(\@notes);
 
     return $self;
 }
@@ -434,10 +433,10 @@ sub set_by_frequency {
 sub set_notes {
     my $self = shift;
     my @notes;
-    for my $n ( ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_ ) {
-        if ( $n =~ m{^ -?[0-9]+\. (?:[0-9]+)? $}x ) {
+    for my $n (ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_) {
+        if ($n =~ m{^ -?[0-9]+\. (?:[0-9]+)? $}x) {
             push @notes, $n;
-        } elsif ( $n =~ m{^ [1-9][0-9]* (?:/[0-9]+)? $}x ) {
+        } elsif ($n =~ m{^ [1-9][0-9]* (?:/[0-9]+)? $}x) {
             my $ratio = $n;
             $ratio .= '/1' if $ratio !~ m{/};    # implicit qualify of ratios
             push @notes, $ratio;
@@ -448,9 +447,9 @@ sub set_notes {
 
     # edge case: remove any 1/1 (zero cents) at head of the list, as
     # this implementation treats that as implicit
-    shift @notes if sprintf( "%.0f", $self->notes2cents( $notes[0] ) ) == 0;
+    shift @notes if sprintf("%.0f", $self->notes2cents($notes[0])) == 0;
 
-    $self->notes( \@notes );
+    $self->notes(\@notes);
     return $self;
 }
 
@@ -459,27 +458,27 @@ sub write_scala {
     croak 'no scala loaded' if !$self->has_notes;
 
     my %param;
-    if ( @_ == 1 ) {
+    if (@_ == 1) {
         $param{file} = $_[0];
     } else {
         %param = @_;
     }
 
     my $fh;
-    if ( exists $param{file} ) {
-        open( $fh, '>', $param{file} ) or croak 'open failed: ' . $!;
-    } elsif ( exists $param{fh} ) {
+    if (exists $param{file}) {
+        open($fh, '>', $param{file}) or croak 'open failed: ' . $!;
+    } elsif (exists $param{fh}) {
         $fh = $param{fh};
     } else {
         croak 'must specify file or fh parameter to write_scala';
     }
-    if ( exists $param{binmode} ) {
+    if (exists $param{binmode}) {
         binmode $fh, $param{binmode} or croak 'binmode failed: ' . $!;
-    } elsif ( $self->has_binmode ) {
+    } elsif ($self->has_binmode) {
         binmode $fh, $self->get_binmode or croak 'binmode failed: ' . $!;
     }
 
-    my $filename = basename( $param{file} )
+    my $filename = basename($param{file})
       if exists $param{file};
     my $note_count = @{ $self->notes } || 0;
 
@@ -491,7 +490,7 @@ sub write_scala {
     say $fh ' ', $note_count;
     say $fh '!';    # conventional comment between note count and notes
 
-    for my $note ( @{ $self->notes } ) {
+    for my $note (@{ $self->notes }) {
         say $fh ' ', $note;
     }
 
@@ -593,9 +592,9 @@ versions of this module. These may also be specified to B<new>:
 
 =over 4
 
-=item B<binmode> (B<get_binmode>, B<set_binmode>(I<binmode_layer>))
+=item B<binmode>
 
-Gets or sets the default C<binmode> layer used in the B<read_scala> and
+Holds the default C<binmode> layer used in the B<read_scala> and
 B<write_scala> methods (unless a custom I<binmode> argument is passed to
 those calls). The scala scale files from C<www.huygens-fokker.org> tend
 to be in the ISO 8859-1 encoding, mostly for the description and other
@@ -608,19 +607,20 @@ set might be:
 
 Though this module does nothing by default for encoding.
 
-=item B<concertfreq> (B<get_concertfreq>, B<set_concertfreq>(I<frequency>))
+=item B<concertfreq>
 
-Gets or sets the concert frequency. C<440> (Hz) is the default.
+The concert frequency. C<440> (Hz) is the default. Use
+B<get_concertfreq> or B<set_concertfreq> to obtain or change it.
 
-=item B<concertpitch> (B<get_concertpitch>, B<set_concertpitch>(I<pitch>))
+=item B<concertpitch>
 
-Gets or sets the MIDI pitch number that the I<concertfreq> maps to.
+Holds the MIDI pitch number that the I<concertfreq> maps to.
 C<69> by default (as that is the MIDI number of A440).
 
-=item B<description> (B<get_description>, B<set_description>("blah blah"))
+=item B<description>
 
-Gets or sets the description of the scala data. This will be the empty
-string if no description was read or set prior.
+Holds the description of the scala data. This will be the empty string
+if no description was read or set prior.
 
 =item B<MAX_LINES>
 
@@ -667,6 +667,10 @@ from B<interval2freq>.
 This method *is not* influenced by the scala scale data, and always uses
 equal temperament. See also B<pitch2freq>.
 
+=item B<get_binmode>
+
+Returns the current value of the B<binmode> attribute.
+
 =item B<get_cents>
 
 Returns, as a list, the "notes" of the scala scale data, except
@@ -675,6 +679,18 @@ cents; this method ensures that they are all represented in cents).
 Throws an exception if the notes have not been set by some previous
 method call (one of the B<read_scala>, B<set_by_frequency>, or
 B<set_notes> methods).
+
+=item B<get_concertfreq>
+
+Returns the current concert frequency (440 Hz by default).
+
+=item B<get_concertpitch>
+
+Returns the current concert pitch (69 by default, MIDI number).
+
+=item B<get_description>
+
+Returns the description of the scala scale data, if any.
 
 =item B<get_notes>
 
@@ -786,12 +802,28 @@ I<binmode> as in the B<new> method:
 Takes a list of relative intervals and returns a list of absolute
 intervals. Scala scale files use absolute intervals.
 
+=item B<set_binmode> I<layer>
+
+Sets the current value of the B<bindmode> attribute.
+
 =item B<set_by_frequency> I<root_frequency>, I<frequencies...>
 
 Given a root frequency as the first argument, performs the equivalent of
 B<set_notes> except that it creates the intervals on the fly based on
 the I<root_frequency> supplied. Handy if you have a list of frequencies,
 and need those converted to cents or ratios.
+
+=item B<set_concertfreq> I<frequency>
+
+Set the concert frequency.
+
+=item B<set_concertpitch> I<midi-number>
+
+Set the concert pitch.
+
+=item B<set_description> I<string>
+
+Set the description of the scala scale data.
 
 =item B<set_notes> I<array_or_array_ref>
 
@@ -865,7 +897,7 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2017 by Jeremy Mates
+Copyright (C) 2013 by Jeremy Mates
 
 This module is free software; you can redistribute it and/or modify it
 under the Artistic License (2.0).

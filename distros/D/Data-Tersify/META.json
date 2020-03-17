@@ -54,7 +54,7 @@
          "web" : "https://github.com/skington/data-tersify"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

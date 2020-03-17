@@ -10,3 +10,14 @@ Revision history for Rtmgr-Gen
 	Created a get_hash sub.
 	Created a get_name sub.
 	Created a get_tracker sub.
+0.03
+	Fixed Missing Dependencies.
+0.04
+	Massive code rewrite and refactoring.
+	Checks for missing entries in database.
+	Removes extraneous reccords from database.
+	Populates database with torrent names.
+	Populates database with trackers.
+0.05
+	Added methods to Rtmgr::Gen to be called from a script.
+	Added ability to use a .config file.

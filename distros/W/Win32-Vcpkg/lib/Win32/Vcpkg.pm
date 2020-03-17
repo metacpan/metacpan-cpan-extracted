@@ -7,7 +7,7 @@ use Path::Tiny ();
 use Config;
 
 # ABSTRACT: Interface to Microsoft Vcpkg
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub root
@@ -99,7 +99,7 @@ Win32::Vcpkg - Interface to Microsoft Vcpkg
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

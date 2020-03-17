@@ -22,4 +22,8 @@
 0.07 - Alteration to the way we determine whether a UV or IV can be
        represented exactly by a double.
      - Fix handling of "DoubleDouble" NVs whose least significant double
-       could be either 0.0 or -0.0  
+       could be either 0.0 or -0.0
+
+0.08 - On perls whose nvsize == ivsize, assign the bytes of the IV/UV to the hash keys,
+       instead of the value. This is more efficient, despite the need to perform an
+       additional sv_catpvn() of an extra byte.

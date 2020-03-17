@@ -1,5 +1,9 @@
 use alienfile;
 
+plugin 'Probe::Vcpkg' => (
+  name     => 'hunspell',
+  ffi_name => 'libhunspell',
+);
 plugin 'PkgConfig' => (
   pkg_name => 'hunspell',
 );

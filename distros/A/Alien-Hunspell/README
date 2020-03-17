@@ -4,48 +4,45 @@ NAME
 
 VERSION
 
-    version 0.15
+    version 0.16
 
 SYNOPSIS
+
+    In your Makefile.PL:
+
+     use ExtUtils::MakeMaker;
+     use Alien::Base::Wrapper ();
+    
+     WriteMakefile(
+       Alien::Base::Wrapper->new('Alien::Hunspell')->mm_args2(
+         # MakeMaker args
+         NAME => 'Kafka::Librd',
+         ...
+       ),
+     );
 
     In your Build.PL:
 
      use Module::Build;
-     use Alien::Hunspell;
+     use Alien::Base::Wrapper qw( Alien::Hunspell !export );
+    
      my $builder = Module::Build->new(
        ...
        configure_requires => {
          'Alien::Hunspell' => '0',
          ...
        },
-       extra_compiler_flags => Alien::Hunspell->cflags,
-       extra_linker_flags   => Alien::Hunspell->libs,
+       Alien::Base::Wrapper->mb_args,
        ...
      );
-     
+    
      $build->create_build_script;
-
-    In your Makefile.PL:
-
-     use ExtUtils::MakeMaker;
-     use Config;
-     use Alien::Hunspell;
-     
-     WriteMakefile(
-       ...
-       CONFIGURE_REQUIRES => {
-         'Alien::Hunspell' => '0',
-       },
-       CCFLAGS => Alien::Hunspell->cflags . " $Config{ccflags}",
-       LIBS    => [ Alien::Hunspell->libs ],
-       ...
-     );
 
     In your FFI::Platypus script or module:
 
      use FFI::Platypus;
      use Alien::Hunspell;
-     
+    
      my $ffi = FFI::Platypus->new(
        lib => [ Alien::Hunspell->dynamic_libs ],
      );

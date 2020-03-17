@@ -9,16 +9,16 @@ SYNOPSIS
 
         use ExtUtils::MakeMaker;
         use Config;
-        use Alien::libuv;
+        use Alien::Base::Wrapper ();
 
         WriteMakefile(
-          ...
-          CONFIGURE_REQUIRES => {
-            'Alien::libuv' => '1.000',
-          },
-          CCFLAGS => Alien::libuv->cflags . " $Config{ccflags}",
-          LIBS    => [ Alien::libuv->libs ],
-          ...
+          Alien::Base::Wrapper->new('Alien::libuv')->mm_args2(
+            ...
+            CONFIGURE_REQUIRES => {
+              'Alien::libuv' => '1.000',
+            },
+            ...
+          ),
         );
 
 DESCRIPTION

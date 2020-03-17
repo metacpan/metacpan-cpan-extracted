@@ -40,16 +40,39 @@ XS FUNCTIONS
     the keyword plugin function. It is intended this function be invoked
     from it, and the result returned directly.
 
-    hooks should be a structure that can provide optional function pointers
-    used to customise the parsing process at various stages. The structure
-    should be declared using the following:
+    For a more automated handling of keywords, see
+    "register_xs_parse_sublike".
 
-       struct XSParseSublikeHooks hooks = { 0 };
+    hooks should be a structure that can provide optional function pointers
+    used to customise the parsing process at various stages.
+
+ register_xs_parse_sublike
+
+       register_xs_parse_sublike(keyword, &hooks)
+
+    This function installs a set of parsing hooks to be associated with the
+    given keyword. Such a keyword will then be handled automatically by a
+    keyword parser installed by XS::Parse::Sublike itself.
+
+    When the keyword is encountered, the hook's permit function is first
+    tested to see if the keyword is permitted at this point. If the
+    function returns true then the keyword is consumed and parsed as per
+    "xs_parse_sublike".
 
 PARSE HOOKS
 
     The XSParseSublikeHooks structure provides the following hook stages,
     in the given order:
+
+ permit
+
+       bool (*permit)(pTHX)
+
+    Called by the installed keyword parser hook which is used to handle
+    keywords registered by "register_xs_parse_sublike". This hook stage
+    should inspect whether the keyword is permitted at this time (typically
+    by inspecting the hints hash GvHV(PL_hintgv) for some imported key) and
+    return true only if the keyword is permitted.
 
  post_blockstart
 

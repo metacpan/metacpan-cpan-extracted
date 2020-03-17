@@ -1,0 +1,10 @@
+{
+  db => {
+    user => {
+      isa => 'Str',
+    },
+    pass => {
+      isa => 'Str',
+    }
+  }
+}

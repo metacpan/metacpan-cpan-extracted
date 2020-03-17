@@ -1,0 +1,59 @@
+=head1 NAME
+
+Exception::Backtrace::Stackframe - Stack Frame Information
+
+=head1 DESCRIPTION
+
+The generic class for representing Perl and C/C++ stack frame.
+
+The object of the class cannot be constructed directly. All properties
+are read only.
+
+=head1 METHODS
+
+=head2 $frame->to_string()
+
+Stringifies frame. For perl frame it mimics L<Carp> output, for
+C/C++ frame it mimics C<gdb> output.
+
+=head2 $frame->address()
+
+An IP (instruction ponter aka Program Counter) of the stack frame.
+
+As it has sense only for C/C++ frame, for Perl frame it is zero.
+
+=head2 $frame->offset()
+
+The difference between frame address and the base shared object (.so)
+address.
+
+As it has sense only for C/C++ frame, for Perl frame it is zero.
+
+=head2 $frame->library()
+
+For Perl frame it is the package name, for C/C++ frame it is the path
+of the loaded share object (.so)
+
+=head2 $frame->name()
+
+The name of the function of a stack frame. As for C/C++ it might be
+impossible to determine (i.e. as there are no debug info), it might
+be empty string.
+
+=head2 $frame->file()
+
+The source file of a stack frame. As for C/C++ it might be
+impossible to determine (i.e. as there are no debug info), it might
+be empty string.
+
+=head2 $frame->line_no()
+
+The line of the source file of a stack frame. As for C/C++ it might be
+impossible to determine (i.e. as there are no debug info), it might
+be empty string.
+
+=head1 REFERENCE
+
+L<Exception::Backtrace>
+
+=cut

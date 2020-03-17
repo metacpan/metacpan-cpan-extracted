@@ -20,6 +20,8 @@ my %WriteMakefileArgs = (
         'XML::RPC'		=> '1.1',
         'Data::Dump' 		=> '1.23',
 	'DBI' 			=> '1.643',
+	'DBD::SQLite'		=> '1.64',
+	'Config::File'		=> '1.51',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Rtmgr-Gen-Db-*' },

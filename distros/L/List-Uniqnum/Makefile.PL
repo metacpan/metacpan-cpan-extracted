@@ -4,8 +4,10 @@ use Config;
 $defines = '';
 
 # Detect 'DoubleDouble' build
-$nv = (2 ** 200) + (2 ** -200);
-$defines .= '-DNV_IS_DOUBLEDOUBLE' if $nv != 2 ** 200;
+if($Config{nvtype} eq 'long double') {
+  $nv = (2 ** 200) + (2 ** -200);
+  $defines .= ' -DNV_IS_DOUBLEDOUBLE' if $nv != 2 ** 200;
+}
 
 my %options = %{
 {

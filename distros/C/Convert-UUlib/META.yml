@@ -18,4 +18,6 @@ no_index:
   directory:
     - t
     - inc
-version: 1.62
+requires:
+  common::sense: '3.74'
+version: 1.71

@@ -1,5 +1,15 @@
 Revision history for Perl extension Crypt::OpenSSL::EC.
 
+1.32	 2020-03-18
+	Fixed some spelling errors reported by lintian via Xavier Guimard.
+	Patch from Heikki Vatiainen:
+	updates Makefile.PL to work the same as 
+	Crypt::OpenSSL::Bignum does. This allows, for example, 
+	Crypt::OpenSSL::EC to link after compile on Strawberry Perl. Without the 
+	patch it compiles but does not find libcrypt during linking.
+	This patch also removes hints/MSWin32.pl and does away the need for 
+	hints directory. The hints are now incorporated directly in Makefile.PL.
+	
 1.3	 2017-06-01
 	 Fixed test failures in t/prime-field.t if EC2M is not available in OpenSSL
 	 

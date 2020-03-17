@@ -18,7 +18,7 @@ WriteMakefile(
 		'Test::More' => '0',
 	},
 	PREREQ_PM => {
-		'Method::Signatures' => 0,
+        'Kavorka'            => 0,
 		'Modern::Perl'       => 0,
 		'Moose'              => 0,
 		'Data::Printer'      => 0,

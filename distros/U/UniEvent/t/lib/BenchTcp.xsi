@@ -1,0 +1,67 @@
+MODE: INLINE
+
+static int read_cnt;
+static double packets;
+static int loopit_cnt;
+static size_t bytes;
+
+MODULE = MyTest                PACKAGE = MyTest::BenchTcp
+PROTOTYPES: DISABLE
+
+void start_server (uint16_t port, int len) {
+    TcpSP srv = new Tcp();
+    srv->retain();
+    srv->bind("127.0.0.1", port);
+    srv->listen();
+    srv->connection_event.add([len](auto&, auto& client, auto& err) {
+        warn("server: connection");
+        if (err) throw err;
+        
+        client->read_event.add([len](auto& client, auto& buf, auto& err) {
+            if (err) throw err;
+            client->write(buf);
+            ++read_cnt;
+            packets += (double)buf.length() / len;
+            
+            bytes += buf.length();
+        });
+        
+        client->eof_event.add([client](auto) {
+            warn("server: eof");
+            client->eof_event.remove_all();
+        });
+    });
+    
+    auto timer = Timer::start(1000, [](auto) {
+        warn("server receive reads: %d, pps: %d, bytes: %lu, avg reads per loop: %.2f", read_cnt, (int)packets, bytes, (double)read_cnt / loopit_cnt);
+        packets = loopit_cnt = read_cnt = bytes = 0;
+    });
+    timer->retain();
+    
+    PrepareSP p = new Prepare();
+    p->event.add([](auto&){ ++loopit_cnt; });
+    p->start();
+    p->retain();
+}
+
+void start_client (uint16_t port, string data) {
+    TcpSP client = new Tcp();
+    client->retain();
+    client->set_nodelay(true);
+    client->connect("127.0.0.1", port);
+    client->connect_event.add([](auto&, auto& err, auto&) {
+        warn("client: connected");
+        if (err) throw err;
+    });
+    
+    client->read_event.add([data](auto&, auto&, auto& err) {
+        if (err) throw err;
+    });
+    
+    client->write(data);
+    
+    auto timer = Timer::start(1, [client, data](auto) {
+        client->write(data);
+    });
+    timer->retain();
+}

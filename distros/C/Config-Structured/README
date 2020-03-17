@@ -1,0 +1,89 @@
+NAME
+
+    Config::Structured - Provides generalized and structured configuration
+    value access
+
+VERSION
+
+    version 2.000
+
+SYNOPSIS
+
+      use Config::Structured;
+    
+      my $conf = Config::Structured->new(
+        structure    => { ... },
+        config       => { ... }
+      );
+    
+      say $conf->some->nested->value();
+
+DESCRIPTION
+
+      L<Config::Structured> provides a structured method of accessing configuration values
+    
+      This is predicated on the use of a configuration C<structure> (required), This structure
+      provides a hierarchical structure of configuration branches and leaves. Each branch becomes
+      a L<Config::Structured> method which returns a new L<Config::Structured> instance rooted at
+      that node, while each leaf becomes a method which returns the configuration value.
+    
+      The configuration value is normally provided in the C<config> hash. However, a C<config> node
+      for a non-Hash value can be a hash containing the "source" and "ref" keys. This permits sourcing
+      the config value from a file (when source="file") whose filesystem location is given in the "ref"
+      value, or an environment variable (when source="env") whose name is given in the "ref" value.
+    
+      I<Structure Leaf Nodes> are required to include an "isa" key, whose value is a type 
+      (see L<Moose::Util::TypeConstraints>). If typechecking is not required, use isa => 'Any'.
+      There are a few other keys that L<Config::Structured> respects in a leaf node:
+    
+      =over
+    
+      =item C<default>
+    
+      This key's value is the default configuration value if a data source or value is not provided by
+      the configuation.
+    
+      =item C<description>
+    
+      =item C<notes>
+    
+      A human-readable description and implementation notes, respectively, of the configuration node. 
+      L<Config::Structured> does not do anything with these values at present, but they provides inline 
+      documentation of configuration directivess within the structure (particularly useful in the common 
+      case where the structure is read from a file)
+    
+      =back
+
+METHODS
+
+ get($name?)
+
+    Class method.
+
+    Returns a registered Config::Structured instance. If $name is not
+    provided, returns the default instance. Instances can be registered
+    with __register_default or __register_as. This mechanism is used to
+    provide global access to a configuration, even from code contexts that
+    otherwise cannot share data.
+
+ __register_default()
+
+    Call on a Config::Structured instance to set the instance as the
+    default.
+
+ __register_as($name)
+
+    Call on a Config::Structured instance to register the instance as the
+    provided name.
+
+AUTHOR
+
+    Mark Tyrrell <mtyrrell@concertpharma.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2019 by Concert Pharmaceuticals, Inc..
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

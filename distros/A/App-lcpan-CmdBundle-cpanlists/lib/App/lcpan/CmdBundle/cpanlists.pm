@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::cpanlists;
 
-our $DATE = '2017-01-20'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2019-12-26'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 1;
 # ABSTRACT: lcpan subcommands related to Acme::CPANLists
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::cpanlists - lcpan subcommands related to Acme::CPANLists
 
 =head1 VERSION
 
-This document describes version 0.01 of App::lcpan::CmdBundle::cpanlists (from Perl distribution App-lcpan-CmdBundle-cpanlists), released on 2017-01-20.
+This document describes version 0.020 of App::lcpan::CmdBundle::cpanlists (from Perl distribution App-lcpan-CmdBundle-cpanlists), released on 2019-12-26.
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

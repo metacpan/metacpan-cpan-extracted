@@ -54,6 +54,7 @@ Kurihara
 Latypoff
 Lee
 MFONTANI
+Mahdi
 Marco
 Maros
 McGregor
@@ -95,6 +96,7 @@ Wilson
 WinNT
 Wu
 Yoshiki
+Zarei
 adm
 ahrefs
 alexchorny
@@ -224,3 +226,4 @@ yandex
 yandexbot
 yandeximages
 yeahoffline
+ymgsmz

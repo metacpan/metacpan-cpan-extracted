@@ -3,7 +3,7 @@ package CLI::Driver::CommonRole;
 use Modern::Perl;
 use Moose::Role;
 use namespace::autoclean;
-use Method::Signatures;
+use Kavorka '-all';
 use Data::Printer alias => 'pdump';
 use Devel::Confess;
 use Capture::Tiny 'capture';

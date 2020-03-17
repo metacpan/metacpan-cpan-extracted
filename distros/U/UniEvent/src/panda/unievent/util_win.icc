@@ -1,0 +1,58 @@
+#include <io.h>
+#include <Windows.h>
+#include <process.h>
+#include <Winsock2.h>
+
+namespace panda { namespace unievent {
+
+void setsockopt (sock_t sock, int level, int optname, const void* optval, int optlen) {
+    if (::setsockopt(sock, level, optname, (const char*)optval, optlen)) throw last_sys_code_error();
+}
+
+std::error_code sys_code_error (int syserr) {
+    return std::error_code(syserr, std::system_category());
+}
+
+std::error_code last_sys_code_error () {
+    return sys_code_error(WSAGetLastError());
+}
+
+fd_t file_dup (fd_t src) {
+    HANDLE h = (HANDLE)_get_osfhandle(src);
+    if (h == INVALID_HANDLE_VALUE) throw last_sys_code_error();
+    
+    HANDLE proc = GetCurrentProcess();
+    HANDLE dup_h;
+    
+    auto ok = DuplicateHandle(proc, h, proc, &dup_h, 0, false, DUPLICATE_SAME_ACCESS);
+    if (!ok) throw last_sys_code_error();
+    
+    int mode = 0; // TODO: ????
+    int dup_fd = _open_osfhandle((intptr_t)dup_h, mode);
+    if (dup_fd < 0) {
+        CloseHandle(dup_h);
+        throw last_sys_code_error();
+    }
+    
+    return dup_fd;
+}
+
+sock_t sock_dup (sock_t sock) {
+    WSAPROTOCOL_INFOW info;
+    if (WSADuplicateSocketW(sock, GetCurrentProcessId(), &info)) throw last_sys_code_error();
+    
+    auto new_sock = WSASocketW(
+        FROM_PROTOCOL_INFO,
+        FROM_PROTOCOL_INFO,
+        FROM_PROTOCOL_INFO,
+        &info,
+        0,
+        WSA_FLAG_OVERLAPPED
+    );
+
+    if (new_sock == INVALID_SOCKET) throw last_sys_code_error();
+    
+    return new_sock;
+}
+
+}}

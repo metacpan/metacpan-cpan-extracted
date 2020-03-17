@@ -1,5 +1,8 @@
 Revision history for Win32-Vcpkg},
 
+0.04      2020-03-16 14:57:04 -0600
+  - Added include option for Win32::Vcpkg::Package and Win32::Vcpkg::List (gh#7)
+
 0.03      2020-03-16 07:51:37 -0600
   - Better synchronization with status file (gh#6)
 

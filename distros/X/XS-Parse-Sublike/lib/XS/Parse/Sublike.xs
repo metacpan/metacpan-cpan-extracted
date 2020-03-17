@@ -20,17 +20,18 @@
 #  define HAVE_PARSE_SUBSIGNATURE
 #endif
 
-#ifndef block_end
-#define block_end(a,b)         Perl_block_end(aTHX_ a,b)
+#if !HAVE_PERL_VERSION(5, 22, 0)
+#  include "block_start.c.inc"
+#  include "block_end.c.inc"
 #endif
 
-#ifndef block_start
-#define block_start(a)         Perl_block_start(aTHX_ a)
+#ifndef wrap_keyword_plugin
+#  include "wrap_keyword_plugin.c.inc"
 #endif
 
 #include "lexer-additions.c.inc"
 
-static int IMPL_xs_parse_sublike(pTHX_ struct XSParseSublikeHooks *hooks, OP **op_ptr)
+static int IMPL_xs_parse_sublike(pTHX_ const struct XSParseSublikeHooks *hooks, OP **op_ptr)
 {
   SV *name = lex_scan_ident();
   lex_read_space(0);
@@ -137,7 +138,43 @@ static int IMPL_xs_parse_sublike(pTHX_ struct XSParseSublikeHooks *hooks, OP **o
   }
 }
 
+static HV *registered_hooks;
+
+static void IMPL_register_xs_parse_sublike(pTHX_ const char *kw, const struct XSParseSublikeHooks *hooks)
+{
+  if(!registered_hooks)
+    registered_hooks = newHV();
+
+  /* TODO: Check for clashes */
+  hv_store(registered_hooks, kw, strlen(kw), newSVuv(PTR2UV(hooks)), 0);
+}
+
+static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
+
+static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
+{
+  SV **svp;
+  const struct XSParseSublikeHooks *hooks;
+
+  if(!registered_hooks ||
+     !(svp = hv_fetch(registered_hooks, kw, kwlen, 0)))
+    return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
+
+  hooks = INT2PTR(const struct XSParseSublikeHooks *, SvUV(*svp));
+
+  if(hooks->permit && !(*hooks->permit)(aTHX))
+    return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
+
+  lex_read_space(0);
+
+  return IMPL_xs_parse_sublike(aTHX_ hooks, op_ptr);
+}
+
 MODULE = XS::Parse::Sublike    PACKAGE = XS::Parse::Sublike
 
 BOOT:
-  sv_setuv(get_sv("XS::Parse::Sublike::PARSE", GV_ADD), PTR2UV(&IMPL_xs_parse_sublike));
+  sv_setiv(get_sv("XS::Parse::Sublike::ABIVERSION", GV_ADD), XSPARSESUBLIKE_ABI_VERSION);
+  sv_setuv(get_sv("XS::Parse::Sublike::PARSE",      GV_ADD), PTR2UV(&IMPL_xs_parse_sublike));
+  sv_setuv(get_sv("XS::Parse::Sublike::REGISTER",   GV_ADD), PTR2UV(&IMPL_register_xs_parse_sublike));
+
+  wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);

@@ -3,6 +3,10 @@
 # decode all the files in the directory uusrc/ and copy
 # the resulting files to uudst/
 
+#use Coro::Multicore;
+
+use strict;
+
 use Convert::UUlib ':all';
 
 sub namefilter {
@@ -87,37 +91,31 @@ Smerge -1;
 SetOption OPT_SAVEPATH, "uudst/";
 
 # now wade through all files and their source parts
-$i = 0;
-while ($uu = GetFileListItem $i) {
-   $i++;
-   print "file nr. $i";
-   print " state ", $uu->state;
-   print " mode ", $uu->mode;
-   print " uudet ", strencoding $uu->uudet;
-   print " size ", $uu->size;
-   print " filename ", $uu->filename;
-   print " subfname ", $uu->subfname;
-   print " mimeid ", $uu->mimeid;
-   print " mimetype ", $uu->mimetype;
-   print "\n";
+for my $uu (GetFileList) {
+   print "file ", $uu->filename, "\n";
+   print " state ", $uu->state, "\n";
+   print " mode ", $uu->mode, "\n";
+   print " uudet ", strencoding $uu->uudet, "\n";
+   print " size ", $uu->size, "\n";
+   print " subfname ", $uu->subfname, "\n";
+   print " mimeid ", $uu->mimeid, "\n";
+   print " mimetype ", $uu->mimetype, "\n";
 
    # print additional info about all parts
+   print " parts";
    for ($uu->parts) {
-      while (my ($k, $v) = each %$_) {
-         print "$k > $v, ";
+      for my $k (sort keys %$_) {
+         print " $k=$_->{$k}";
       }
       print "\n";
    }
 
-   print $uu->filename;
-
    $uu->remove_temp;
 
-   print "<s", $uu->state, ">";#d#
    if (my $err = $uu->decode) {
-      print ", ", strerror $err, "\n";
+      print " ERROR ", strerror $err, "\n";
    } else {
-      print ", saved as uudst/", $uu->filename, "\n";
+      print " successfully saved as uudst/", $uu->filename, "\n";
    }
 }
 

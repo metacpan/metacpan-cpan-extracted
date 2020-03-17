@@ -1,0 +1,228 @@
+use strict;
+use warnings;
+use Test::More;
+use Test::Warnings;
+use Exception::Backtrace;
+
+use lib 't';
+use MyTest;
+
+Exception::Backtrace::install();
+
+subtest "perl exception thrown" => sub {
+    my $ex_line;
+    my $ok = eval { $ex_line = __LINE__;  die("abc"); 1; };
+    ok !$ok;
+    like "$@", qr/^abc/;
+
+    my $bt = Exception::Backtrace::get_backtrace($@);
+    note "$bt";
+    ok $bt;
+
+    subtest "perl trace" => sub {
+        my $perl_trace = $bt->perl_trace;
+        ok $perl_trace;
+        note "perl trace: ", $perl_trace->to_string;
+        isnt index($bt->to_string, $perl_trace->to_string), -1, "whole backtrace contains perl trace";
+        my $frames = $perl_trace->get_frames;
+        ok $frames;
+        ok (scalar(@$frames) > 2);
+
+        subtest "main frame" => sub {
+            my ($f_main) = grep { $_->library eq 'main' } @$frames;
+            ok $f_main;
+            is $f_main->library, 'main';
+            is $f_main->file, __FILE__;
+            is $f_main->line_no, $ex_line;
+        };
+
+        subtest "Test::More frame" => sub {
+            my ($f_more) = grep { $_->library eq 'Test::More' } @$frames;
+            ok $f_more;
+            is $f_more->library, 'Test::More';
+            like $f_more->file, qr|Test/More.pm$|;
+            ok $f_more->line_no;
+        };
+    };
+
+    subtest "C trace" => sub {
+        my $c_trace = $bt->c_trace;
+        ok $c_trace;
+        note "c trace:\n", $c_trace->to_string;
+        isnt index($bt->to_string, $c_trace->to_string), -1, "whole backtrace contains C trace";
+        my $frames = $c_trace->get_frames;
+        ok $frames;
+        ok (scalar(@$frames) > 2);
+
+        subtest "sample frame" => sub {
+            my ($f) = grep { $_->name =~ /xs::safe_wrap_exception/} @$frames;
+            if ($f) {
+                like $f->library, qr/Backtrace.so/;
+                like $f->name, qr/xs::safe_wrap_exception/;
+                like $f->file, qr/backtrace.cc/;
+                ok $f->line_no;
+                ok $f->address;
+                ok $f->offset;
+            }
+            else {
+                my ($f1) = grep { $_->library =~ /Backtrace\./} @$frames;
+                my ($f2) = grep { $_->library =~ /libpanda\./} @$frames;
+                ok $f1;
+                ok $f2;
+                ok $f1->address;
+                ok $f1->offset;
+                ok $f2->address;
+                ok $f2->offset;
+            }
+        };
+    };
+};
+
+subtest "C exception thrown" => sub {
+    my $ex_line;
+    my $ok = eval { $ex_line = __LINE__;  MyTest::throw_backtrace(); 1; };
+    ok !$ok;
+    like "$@", qr/panda::exception/;
+
+    my $bt = Exception::Backtrace::get_backtrace($@);
+    note "$bt";
+    ok $bt;
+
+    subtest "perl trace" => sub {
+        my $perl_trace = $bt->perl_trace;
+        ok $perl_trace;
+        note "perl trace: ", $perl_trace->to_string;
+        isnt index($bt->to_string, $perl_trace->to_string), -1, "whole backtrace contains perl trace";
+        my $frames = $perl_trace->get_frames;
+        ok $frames;
+        ok (scalar(@$frames) > 2);
+
+        subtest "main frame" => sub {
+            my ($f_main) = grep { $_->library eq 'main' } @$frames;
+            ok $f_main;
+            is $f_main->library, 'main';
+            is $f_main->file, __FILE__;
+            is $f_main->line_no, $ex_line;
+        };
+
+        subtest "Test::More frame" => sub {
+            my ($f_more) = grep { $_->library eq 'Test::More' } @$frames;
+            ok $f_more;
+            is $f_more->library, 'Test::More';
+            like $f_more->file, qr|Test/More.pm$|;
+            ok $f_more->line_no;
+        };
+    };
+
+    subtest "C trace" => sub {
+        my $c_trace = $bt->c_trace;
+        ok $c_trace;
+        note "c trace:\n", $c_trace->to_string;
+        isnt index($bt->to_string, $c_trace->to_string), -1, "whole backtrace contains C trace";
+        my $frames = $c_trace->get_frames;
+        ok $frames;
+        ok (scalar(@$frames) > 2);
+
+        subtest "sample frame" => sub {
+            my ($f) = grep { $_->name =~ /panda::exception::exception/} @$frames;
+            if ($f) {
+                like $f->library, qr/libpanda.so/;
+                like $f->name, qr/panda::exception::exception/;
+                like $f->file, qr/exception.cc/;
+                ok $f->line_no;
+                ok $f->address;
+                ok $f->offset;
+            }
+            else {
+                my ($f1) = grep { $_->library =~ /MyTest\./} @$frames;
+                my ($f2) = grep { $_->library =~ /libpanda\./} @$frames;
+                ok $f1;
+                ok $f2;
+                ok $f1->address;
+                ok $f1->offset;
+                ok $f2->address;
+                ok $f2->offset;
+            }
+        };
+    };
+};
+
+subtest "create backtrace" => sub {
+    my $bt;
+    my $fn0 = sub { $bt = Exception::Backtrace::create_backtrace(); };
+    my $fn1 = sub { $fn0->(@_); };
+    $fn1->(5, 'str', \6, [], {}, undef, $fn0, (bless {} => 'Some::Package'));
+
+    note "$bt";
+    ok $bt;
+
+    subtest "perl trace" => sub {
+        my $perl_trace = $bt->perl_trace;;
+        ok $perl_trace;
+        note "perl trace: ", $perl_trace->to_string;
+        isnt index($bt->to_string, $perl_trace->to_string), -1, "whole backtrace contains perl trace";
+        my $frames = $perl_trace->get_frames;
+        ok $frames;
+        ok (scalar(@$frames) > 2);
+
+        subtest "main frame" => sub {
+            my ($f_main) = grep { $_->library eq 'main' } @$frames;
+            ok $f_main;
+            is $f_main->library, 'main';
+            is $f_main->file, __FILE__;
+            ok $f_main->line_no;
+
+            subtest "check args" => sub {
+                my $args = $f_main->args;
+                ok $args;
+                is scalar(@$args), 8;
+                is $args->[0], '5';
+                is $args->[1], "'str'";
+                like $args->[2], qr/SCALAR/;
+                like $args->[3], qr/ARRAY/;
+                like $args->[4], qr/HASH/;
+                is $args->[5], 'undef';
+                like $args->[6], qr/CODE/;
+                like $args->[7], qr/Some::Package=HASH/;
+            };
+        };
+
+        subtest "Test::More frame" => sub {
+            my ($f_more) = grep { $_->library eq 'Test::More' } @$frames;
+            ok $f_more;
+            is $f_more->library, 'Test::More';
+            like $f_more->file, qr|Test/More.pm$|;
+            ok $f_more->line_no;
+        };
+    };
+
+    subtest "C trace" => sub {
+        my $c_trace = $bt->c_trace;
+        ok $c_trace;
+        note "c trace:\n", $c_trace->to_string;
+        isnt index($bt->to_string, $c_trace->to_string), -1, "whole backtrace contains C trace";
+        my $frames = $c_trace->get_frames;
+        ok $frames;
+        ok (scalar(@$frames) > 2);
+
+        subtest "sample frame" => sub {
+            my ($f) = grep { $_->name =~ /panda::Backtrace::Backtrace/} @$frames;
+            if ($f) {
+                like $f->library, qr/libpanda.so/;
+                like $f->name, qr/panda::Backtrace::Backtrace/;
+                like $f->file, qr/exception.cc/;
+                ok $f->line_no;
+                ok $f->address;
+                ok $f->offset;
+            }
+            else {
+                my ($f1) = grep { $_->library =~ /libpanda\./} @$frames;
+                ok $f1;
+                ok $f1->address;
+                ok $f1->offset;
+            }
+        };
+    };
+};
+
+done_testing;

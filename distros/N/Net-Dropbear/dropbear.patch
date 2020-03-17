@@ -1,9 +1,9 @@
-# ( cd dropbear/ ; make distclean ; rm config.log config.status ) ; ( cd dropbear-2016.74 ; rm .hg* .tra* ; find * -exec touch -r {} ../dropbear/{} \; )
-# diff -uN dropbear-2016.74/ dropbear/ | grep -v '^Binary files' > dropbear.patch
-diff -uN dropbear-2016.74/common-channel.c dropbear/common-channel.c
---- dropbear-2016.74/common-channel.c	2016-07-21 11:17:09.000000000 -0400
-+++ dropbear/common-channel.c	2016-07-21 11:17:09.000000000 -0400
-@@ -36,6 +36,7 @@
+# ( cd dropbear/ ; make distclean ; rm config.log config.status ) ; ( cd dropbear-2019.78 ; rm .hg* .tra* .git* ; find * -exec touch -r {} ../dropbear/{} \; )
+# diff -uN dropbear-2019.78/ dropbear/ | grep -v '^Binary files' > dropbear.patch
+diff -uN dropbear-2019.78/common-channel.c dropbear/common-channel.c
+--- dropbear-2019.78/common-channel.c	2019-03-27 10:15:23.000000000 -0400
++++ dropbear/common-channel.c	2019-03-27 10:15:23.000000000 -0400
+@@ -35,6 +35,7 @@
  #include "listener.h"
  #include "runopts.h"
  #include "netio.h"
@@ -11,7 +11,7 @@ diff -uN dropbear-2016.74/common-channel.c dropbear/common-channel.c
  
  static void send_msg_channel_open_failure(unsigned int remotechan, int reason,
  		const char *text, const char *lang);
-@@ -973,6 +974,24 @@
+@@ -961,6 +962,24 @@
  		goto failure;
  	}
  
@@ -36,9 +36,9 @@ diff -uN dropbear-2016.74/common-channel.c dropbear/common-channel.c
  	if (channel->type->inithandler) {
  		ret = channel->type->inithandler(channel);
  		if (ret == SSH_OPEN_IN_PROGRESS) {
-diff -uN dropbear-2016.74/common-session.c dropbear/common-session.c
---- dropbear-2016.74/common-session.c	2016-07-21 11:17:09.000000000 -0400
-+++ dropbear/common-session.c	2016-07-21 11:17:09.000000000 -0400
+diff -uN dropbear-2019.78/common-session.c dropbear/common-session.c
+--- dropbear-2019.78/common-session.c	2019-03-27 10:15:23.000000000 -0400
++++ dropbear/common-session.c	2019-03-27 10:15:23.000000000 -0400
 @@ -35,6 +35,7 @@
  #include "channel.h"
  #include "runopts.h"
@@ -47,7 +47,7 @@ diff -uN dropbear-2016.74/common-session.c dropbear/common-session.c
  
  static void checktimeouts(void);
  static long select_timeout(void);
-@@ -594,6 +595,78 @@
+@@ -616,6 +617,78 @@
  	if (ses.authstate.pw_passwd)
  		m_free(ses.authstate.pw_passwd);
  
@@ -126,10 +126,10 @@ diff -uN dropbear-2016.74/common-session.c dropbear/common-session.c
  	pw = getpwnam(username);
  	if (!pw) {
  		return;
-Common subdirectories: dropbear-2016.74/debian and dropbear/debian
-diff -uN dropbear-2016.74/dropbear.h dropbear/dropbear.h
---- dropbear-2016.74/dropbear.h	1969-12-31 19:00:00.000000000 -0500
-+++ dropbear/dropbear.h	2016-08-03 01:02:06.000000000 -0400
+Common subdirectories: dropbear-2019.78/debian and dropbear/debian
+diff -uN dropbear-2019.78/dropbear.h dropbear/dropbear.h
+--- dropbear-2019.78/dropbear.h	1969-12-31 19:00:00.000000000 -0500
++++ dropbear/dropbear.h	2020-03-10 23:38:13.220324964 -0400
 @@ -0,0 +1,16 @@
 +
 +#ifndef _DROPBEAR_H_
@@ -147,9 +147,9 @@ diff -uN dropbear-2016.74/dropbear.h dropbear/dropbear.h
 +void main_noinetd();
 +
 +#endif
-diff -uN dropbear-2016.74/libdropbear.h dropbear/libdropbear.h
---- dropbear-2016.74/libdropbear.h	1969-12-31 19:00:00.000000000 -0500
-+++ dropbear/libdropbear.h	2016-08-03 01:02:06.000000000 -0400
+diff -uN dropbear-2019.78/libdropbear.h dropbear/libdropbear.h
+--- dropbear-2019.78/libdropbear.h	1969-12-31 19:00:00.000000000 -0500
++++ dropbear/libdropbear.h	2020-03-10 23:38:13.220324964 -0400
 @@ -0,0 +1,50 @@
 +#ifndef _LIBDROPBEAR_H_
 +#define _LIBDROPBEAR_H_
@@ -194,73 +194,70 @@ diff -uN dropbear-2016.74/libdropbear.h dropbear/libdropbear.h
 +
 +void dropbear_add_svr_addr(char* spec);
 +void dropbear_add_svr_key(const char *keyfile);
-+void dropbear_gen_key(enum signkey_type keytype, int bits, const char* filename);
++void dropbear_gen_key(enum signkey_type keytype, int bits, const char* filename, int skip_exist);
 +
 +void dropbear_run();
 +
 +#define ENABLE_LIBDROPBEAR
 +
 +#endif /* _LIBDROPBEAR_H_ */
-Common subdirectories: dropbear-2016.74/libtomcrypt and dropbear/libtomcrypt
-Common subdirectories: dropbear-2016.74/libtommath and dropbear/libtommath
-diff -uN dropbear-2016.74/svr-authpasswd.c dropbear/svr-authpasswd.c
---- dropbear-2016.74/svr-authpasswd.c	2016-07-21 11:17:09.000000000 -0400
-+++ dropbear/svr-authpasswd.c	2016-07-21 11:17:09.000000000 -0400
+Common subdirectories: dropbear-2019.78/libtomcrypt and dropbear/libtomcrypt
+Common subdirectories: dropbear-2019.78/libtommath and dropbear/libtommath
+diff -uN dropbear-2019.78/svr-authpasswd.c dropbear/svr-authpasswd.c
+--- dropbear-2019.78/svr-authpasswd.c	2019-03-27 10:15:23.000000000 -0400
++++ dropbear/svr-authpasswd.c	2019-03-27 10:15:23.000000000 -0400
 @@ -30,6 +30,7 @@
  #include "dbutil.h"
  #include "auth.h"
  #include "runopts.h"
 +#include "libdropbear.h"
  
- #ifdef ENABLE_SVR_PASSWORD_AUTH
+ #if DROPBEAR_SVR_PASSWORD_AUTH
  
-@@ -74,8 +75,32 @@
- 
- 	password = buf_getstring(ses.payload, &passwordlen);
- 
--	/* the first bytes of passwdcrypt are the salt */
--	testcrypt = crypt(password, passwdcrypt);
+@@ -68,7 +69,30 @@
+ 	if (valid_user && passwordlen <= DROPBEAR_MAX_PASSWORD_LEN) {
+ 		/* the first bytes of passwdcrypt are the salt */
+ 		passwdcrypt = ses.authstate.pw_passwd;
+-		testcrypt = crypt(password, passwdcrypt);
 +#ifdef ENABLE_LIBDROPBEAR
-+	if (hooks.on_crypt_passwd != NULL)
-+	{
-+		char * tmp_passwd = m_strdup(password);
-+		char** output = &tmp_passwd;
++		if (hooks.on_crypt_passwd != NULL)
++		{
++			char * tmp_passwd = m_strdup(password);
++			char** output = &tmp_passwd;
 +
-+		int ret = hooks.on_crypt_passwd(output, passwdcrypt, ses.authstate.pw_name);
-+		if ( ret == LIBDROPBEAR_HOOK_COMPLETE)
-+		{
-+			testcrypt = *output;
++			int ret = hooks.on_crypt_passwd(output, passwdcrypt, ses.authstate.pw_name);
++			if ( ret == LIBDROPBEAR_HOOK_COMPLETE)
++			{
++				testcrypt = *output;
++			}
++
++			if (testcrypt != tmp_passwd)
++			{
++				m_burn(tmp_passwd, strlen(tmp_passwd));
++				m_free(tmp_passwd);
++			}
 +		}
-+		
-+		if (testcrypt != tmp_passwd)
-+		{
-+		        m_burn(tmp_passwd, strlen(tmp_passwd));
-+		        m_free(tmp_passwd);
-+		}
-+	}
 +#endif
 +
-+ 	/* the first bytes of passwdcrypt are the salt */
-+	if (testcrypt == NULL)
-+	{
-+		testcrypt = crypt((char*)password, passwdcrypt);
-+	}
-+
++		if (testcrypt == NULL)
++		{
++			testcrypt = crypt((char*)password, passwdcrypt);
++		}
+ 	}
  	m_burn(password, passwordlen);
  	m_free(password);
- 
-diff -uN dropbear-2016.74/svr-authpubkey.c dropbear/svr-authpubkey.c
---- dropbear-2016.74/svr-authpubkey.c	2016-07-21 11:17:09.000000000 -0400
-+++ dropbear/svr-authpubkey.c	2016-07-21 11:17:09.000000000 -0400
+diff -uN dropbear-2019.78/svr-authpubkey.c dropbear/svr-authpubkey.c
+--- dropbear-2019.78/svr-authpubkey.c	2019-03-27 10:15:23.000000000 -0400
++++ dropbear/svr-authpubkey.c	2019-03-27 10:15:23.000000000 -0400
 @@ -64,6 +64,7 @@
  #include "ssh.h"
  #include "packet.h"
  #include "algo.h"
 +#include "libdropbear.h"
  
- #ifdef ENABLE_SVR_PUBKEY_AUTH
+ #if DROPBEAR_SVR_PUBKEY_AUTH
  
-@@ -212,6 +213,43 @@
+@@ -332,6 +333,43 @@
  		goto out;
  	}
  
@@ -304,7 +301,7 @@ diff -uN dropbear-2016.74/svr-authpubkey.c dropbear/svr-authpubkey.c
  	/* check file permissions, also whether file exists */
  	if (checkpubkeyperms() == DROPBEAR_FAILURE) {
  		TRACE(("bad authorized_keys permissions, or file doesn't exist"))
-@@ -234,6 +272,10 @@
+@@ -371,6 +409,10 @@
  	}
  	TRACE(("checkpubkey: opened authorized_keys OK"))
  
@@ -315,9 +312,9 @@ diff -uN dropbear-2016.74/svr-authpubkey.c dropbear/svr-authpubkey.c
  	line = buf_new(MAX_AUTHKEYS_LINE);
  	line_num = 0;
  
-diff -uN dropbear-2016.74/svr-chansession.c dropbear/svr-chansession.c
---- dropbear-2016.74/svr-chansession.c	2016-07-21 11:17:09.000000000 -0400
-+++ dropbear/svr-chansession.c	2016-07-21 11:17:09.000000000 -0400
+diff -uN dropbear-2019.78/svr-chansession.c dropbear/svr-chansession.c
+--- dropbear-2019.78/svr-chansession.c	2019-03-27 10:15:23.000000000 -0400
++++ dropbear/svr-chansession.c	2019-03-27 10:15:23.000000000 -0400
 @@ -37,6 +37,7 @@
  #include "agentfwd.h"
  #include "runopts.h"
@@ -326,9 +323,9 @@ diff -uN dropbear-2016.74/svr-chansession.c dropbear/svr-chansession.c
  
  /* Handles sessions (either shells or programs) requested by the client */
  
-@@ -76,7 +77,17 @@
+@@ -78,7 +79,17 @@
  
- static int sesscheckclose(struct Channel *channel) {
+ static int sesscheckclose(const struct Channel *channel) {
  	struct ChanSess *chansess = (struct ChanSess*)channel->typedata;
 -	TRACE(("sesscheckclose, pid is %d", chansess->exit.exitpid))
 +	if (chansess->pid <= 0)
@@ -345,7 +342,7 @@ diff -uN dropbear-2016.74/svr-chansession.c dropbear/svr-chansession.c
  	return chansess->exit.exitpid != -1;
  }
  
-@@ -574,6 +585,13 @@
+@@ -596,6 +607,13 @@
  		return DROPBEAR_FAILURE;
  	}
  
@@ -359,7 +356,7 @@ diff -uN dropbear-2016.74/svr-chansession.c dropbear/svr-chansession.c
  	/* allocate the pty */
  	if (chansess->master != -1) {
  		dropbear_exit("Multiple pty requests");
-@@ -588,9 +606,6 @@
+@@ -610,9 +628,6 @@
  		dropbear_exit("Out of memory"); /* TODO disconnect */
  	}
  
@@ -369,20 +366,22 @@ diff -uN dropbear-2016.74/svr-chansession.c dropbear/svr-chansession.c
  	pty_setowner(pw, chansess->tty);
  
  	/* Set up the rows/col counts */
-@@ -671,6 +686,117 @@
+@@ -692,7 +707,117 @@
+ 			}
  		}
  	}
- 	
+-	
++
 +#ifdef ENABLE_LIBDROPBEAR
 +#define FD_CLOSED (-1)
 +
-+	if (hooks.on_chansess_command != NULL)
-+	{
++       if (hooks.on_chansess_command != NULL)
++       {
 +		struct dropbear_chansess_accept csa;
-+                memset(&csa, 0, sizeof(csa));
++		memset(&csa, 0, sizeof(csa));
 +
 +		if (chansess->cmd != NULL)
-+			csa.cmd = m_strdup(chansess->cmd);
++		       csa.cmd = m_strdup(chansess->cmd);
 +
 +		csa.channel_index = channel->index;
 +		csa.pid = 0;
@@ -398,7 +397,7 @@ diff -uN dropbear-2016.74/svr-chansession.c dropbear/svr-chansession.c
 +		if (ret == LIBDROPBEAR_HOOK_FAILURE)
 +		{
 +			if (csa.cmd != NULL)
-+			  m_free(csa.cmd);
++			 m_free(csa.cmd);
 +			return DROPBEAR_FAILURE;
 +		}
 +
@@ -446,8 +445,8 @@ diff -uN dropbear-2016.74/svr-chansession.c dropbear/svr-chansession.c
 +		issubsys = csa.issubsys;
 +
 +		channel->writefd = csa.writefd;
-+		channel->readfd  = csa.readfd;
-+		channel->errfd   = csa.errfd;
++		channel->readfd	= csa.readfd;
++		channel->errfd	= csa.errfd;
 +
 +		channel->prio = DROPBEAR_CHANNEL_PRIO_BULK;
 +		update_channel_prio();
@@ -483,13 +482,12 @@ diff -uN dropbear-2016.74/svr-chansession.c dropbear/svr-chansession.c
 +	}
 +
 +#endif /* ENABLE_LIBDROPBEAR */
-+
- 	/* take public key option 'command' into account */
- 	svr_pubkey_set_forced_command(chansess);
  
-diff -uN dropbear-2016.74/svr-main.c dropbear/svr-main.c
---- dropbear-2016.74/svr-main.c	2016-07-21 11:17:09.000000000 -0400
-+++ dropbear/svr-main.c	2016-07-21 11:17:09.000000000 -0400
+ 	/* take global command into account */
+ 	if (svr_opts.forced_command) {
+diff -uN dropbear-2019.78/svr-main.c dropbear/svr-main.c
+--- dropbear-2019.78/svr-main.c	2019-03-27 10:15:23.000000000 -0400
++++ dropbear/svr-main.c	2019-03-27 10:15:23.000000000 -0400
 @@ -30,6 +30,7 @@
  #include "runopts.h"
  #include "dbrandom.h"
@@ -498,7 +496,7 @@ diff -uN dropbear-2016.74/svr-main.c dropbear/svr-main.c
  
  static size_t listensockets(int *sock, size_t sockcount, int *maxfd);
  static void sigchld_handler(int dummy);
-@@ -167,6 +168,13 @@
+@@ -174,6 +175,13 @@
  		fprintf(pidfile, "%d\n", getpid());
  		fclose(pidfile);
  	}
@@ -512,7 +510,7 @@ diff -uN dropbear-2016.74/svr-main.c dropbear/svr-main.c
  
  	/* incoming connection select loop */
  	for(;;) {
-@@ -331,6 +339,49 @@
+@@ -338,6 +346,49 @@
  }
  #endif /* NON_INETD_MODE */
  
@@ -537,9 +535,9 @@ diff -uN dropbear-2016.74/svr-main.c dropbear/svr-main.c
 +	svr_getopts(argc, argv);
 +}
 +
-+void dropbear_gen_key(enum signkey_type keytype, int bits, const char* filename)
++void dropbear_gen_key(enum signkey_type keytype, int bits, const char* filename, int skip_exist)
 +{
-+	if (signkey_generate(keytype, bits, filename) == DROPBEAR_FAILURE)
++	if (signkey_generate(keytype, bits, filename, skip_exist) == DROPBEAR_FAILURE)
 +	{
 +		dropbear_exit("Failed to generate key.\n");
 +	}
@@ -562,18 +560,43 @@ diff -uN dropbear-2016.74/svr-main.c dropbear/svr-main.c
  
  /* catch + reap zombie children */
  static void sigchld_handler(int UNUSED(unused)) {
-diff -uN dropbear-2016.74/svr-runopts.c dropbear/svr-runopts.c
---- dropbear-2016.74/svr-runopts.c	2016-07-21 11:17:09.000000000 -0400
-+++ dropbear/svr-runopts.c	2016-07-21 11:17:09.000000000 -0400
+diff -uN dropbear-2019.78/svr-runopts.c dropbear/svr-runopts.c
+--- dropbear-2019.78/svr-runopts.c	2019-03-27 10:15:23.000000000 -0400
++++ dropbear/svr-runopts.c	2019-03-27 10:15:23.000000000 -0400
 @@ -29,6 +29,7 @@
  #include "dbutil.h"
  #include "algo.h"
  #include "ecdsa.h"
 +#include "libdropbear.h"
  
- svr_runopts svr_opts; /* GLOBAL */
+ #include <grp.h>
  
-@@ -556,3 +557,17 @@
+@@ -538,6 +539,12 @@
+ 		loadhostkey(hostkey_file, 1);
+ 		m_free(hostkey_file);
+ 	}
++#ifdef ENABLE_LIBDROPBEAR
++	/* Don't load any host keys if we're not root */
++	uid_t uid=getuid(), euid=geteuid();
++	if (uid<=0 || uid!=euid)
++	{
++#endif
+ 
+ 	/* Only load default host keys if a host key is not specified by the user */
+ 	if (svr_opts.num_hostkey_files == 0) {
+@@ -552,6 +559,11 @@
+ #if DROPBEAR_ECDSA
+ 		loadhostkey(ECDSA_PRIV_FILENAME, 0);
+ #endif
++
++#ifdef ENABLE_LIBDROPBEAR
++	}
++#endif
++
+ 	}
+ 
+ #if DROPBEAR_RSA
+@@ -619,3 +631,17 @@
  		dropbear_exit("No hostkeys available. 'dropbear -R' may be useful or run dropbearkey.");
  	}
  }
@@ -591,18 +614,18 @@ diff -uN dropbear-2016.74/svr-runopts.c dropbear/svr-runopts.c
 +}
 +
 +#endif
-diff -uN dropbear-2016.74/svr-session.c dropbear/svr-session.c
---- dropbear-2016.74/svr-session.c	2016-07-21 11:17:09.000000000 -0400
-+++ dropbear/svr-session.c	2016-07-21 11:17:09.000000000 -0400
+diff -uN dropbear-2019.78/svr-session.c dropbear/svr-session.c
+--- dropbear-2019.78/svr-session.c	2019-03-27 10:15:23.000000000 -0400
++++ dropbear/svr-session.c	2019-03-27 10:15:23.000000000 -0400
 @@ -40,6 +40,7 @@
  #include "auth.h"
  #include "runopts.h"
  #include "crypto_desc.h"
 +#include "libdropbear.h"
+ #include "fuzz.h"
  
  static void svr_remoteclosed(void);
- 
-@@ -211,6 +212,13 @@
+@@ -222,6 +223,13 @@
  	}
  #endif
  
@@ -615,4 +638,4 @@ diff -uN dropbear-2016.74/svr-session.c dropbear/svr-session.c
 +
  	/* if we are using DEBUG_TRACE, we want to print to stderr even if
  	 * syslog is used, so it is included in error reports */
- #ifdef DEBUG_TRACE
+ #if DEBUG_TRACE

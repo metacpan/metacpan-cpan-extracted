@@ -424,9 +424,9 @@ UUEncodeStream (FILE *outfile, FILE *infile, int encoding, long linperfile, crc3
       }
 
       if (pcrc)
-	*pcrc = crc32(*pcrc, itemp, count);
+	*pcrc = uu_crc32(*pcrc, itemp, count);
       if (crc)
-	*crc = crc32(*crc, itemp, count);
+	*crc = uu_crc32(*crc, itemp, count);
 
       line++;
 
@@ -721,7 +721,7 @@ UUEncodeMulti (FILE *outfile, FILE *infile, char *infname, int encoding,
 	     eolstring);
   }
   else if (encoding == YENC_ENCODED) {
-    crc = crc32(0L, Z_NULL, 0);
+    crc = CRC32_INIT;
     crcptr = &crc;
     if (progress.fsize == -1) {
       fprintf (outfile, "=ybegin line=128 name=%s%s",
@@ -914,7 +914,7 @@ UUEncodePartial (FILE *outfile, FILE *infile,
     }
   }
   if (encoding == YENC_ENCODED) {
-    pcrc = crc32(0L, Z_NULL, 0);
+    pcrc = CRC32_INIT;
     pcrcptr = &pcrc;
     if (numparts != 1) {
       if (progress.totsize == -1) {
@@ -1118,7 +1118,7 @@ UUEncodeToStream (FILE *outfile, FILE *infile,
 	     eolstring);
   }
   else if (encoding == YENC_ENCODED) {
-    crc = crc32(0L, Z_NULL, 0);
+    crc = CRC32_INIT;
     crcptr = &crc;
     if (progress.fsize == -1) {
       fprintf (outfile, "=ybegin line=128 name=%s%s",
@@ -1387,10 +1387,10 @@ UUEncodeToFile (FILE *infile, char *infname, int encoding,
     }
     else if (encoding == YENC_ENCODED) {
       if (!crcptr) {
-        crc = crc32(0L, Z_NULL, 0);
+        crc = CRC32_INIT;
         crcptr = &crc;
       }
-      pcrc = crc32(0L, Z_NULL, 0);
+      pcrc = CRC32_INIT;
       pcrcptr = &pcrc;
       if (numparts != 1) {
 	if (progress.totsize == -1) {
@@ -1729,7 +1729,7 @@ UUE_PrepPartialExt (FILE *outfile, FILE *infile,
 
   if (encoding == YENC_ENCODED) {
     if (partno == 1)
-      crc = crc32(0L, Z_NULL, 0);
+      crc = CRC32_INIT;
     crcptr = &crc;
     if (subject)
       sprintf (subline, "- %s - %s (%03d/%03d)", oname, subject,

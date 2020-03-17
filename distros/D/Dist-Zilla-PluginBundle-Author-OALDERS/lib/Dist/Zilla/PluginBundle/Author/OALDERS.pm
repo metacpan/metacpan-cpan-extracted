@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::Author::OALDERS;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use feature qw( say );
 
@@ -201,7 +201,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000027
+version 0.000028
 
 =head2 configure
 

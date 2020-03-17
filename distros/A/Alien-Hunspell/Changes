@@ -1,5 +1,8 @@
 Revision history for Alien-Hunspell
 
+0.16      2020-03-16 12:37:15 -0600
+  - Add support for Visual C++ Perl + vcpkg (gh#9)
+
 0.15      2020-02-18 10:57:19 -0500
   - Blacklist 1.7.0 on Windows only, where it seems to be broken (gh#8)
 

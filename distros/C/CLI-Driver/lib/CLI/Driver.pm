@@ -3,14 +3,14 @@ package CLI::Driver;
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
-use Method::Signatures;
+use Kavorka '-all';
 use Data::Printer alias => 'pdump';
 use YAML::Tiny;
 use CLI::Driver::Action;
 
 with 'CLI::Driver::CommonRole';
 
-our $VERSION = 0.3;
+our $VERSION = 0.4;
 
 =head1 NAME
 

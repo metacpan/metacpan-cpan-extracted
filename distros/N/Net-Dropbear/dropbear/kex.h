@@ -34,23 +34,24 @@ void recv_msg_kexinit(void);
 void send_msg_newkeys(void);
 void recv_msg_newkeys(void);
 void kexfirstinitialise(void);
+void finish_kexhashbuf(void);
 
 struct kex_dh_param *gen_kexdh_param(void);
 void free_kexdh_param(struct kex_dh_param *param);
 void kexdh_comb_key(struct kex_dh_param *param, mp_int *dh_pub_them,
 		sign_key *hostkey);
 
-#ifdef DROPBEAR_ECDH
+#if DROPBEAR_ECDH
 struct kex_ecdh_param *gen_kexecdh_param(void);
 void free_kexecdh_param(struct kex_ecdh_param *param);
 void kexecdh_comb_key(struct kex_ecdh_param *param, buffer *pub_them,
 		sign_key *hostkey);
 #endif
 
-#ifdef DROPBEAR_CURVE25519
+#if DROPBEAR_CURVE25519
 struct kex_curve25519_param *gen_kexcurve25519_param(void);
 void free_kexcurve25519_param(struct kex_curve25519_param *param);
-void kexcurve25519_comb_key(struct kex_curve25519_param *param, buffer *pub_them,
+void kexcurve25519_comb_key(const struct kex_curve25519_param *param, const buffer *pub_them,
 		sign_key *hostkey);
 #endif
 
@@ -88,13 +89,13 @@ struct kex_dh_param {
 	mp_int priv; /* x */
 };
 
-#ifdef DROPBEAR_ECDH
+#if DROPBEAR_ECDH
 struct kex_ecdh_param {
 	ecc_key key;
 };
 #endif
 
-#ifdef DROPBEAR_CURVE25519
+#if DROPBEAR_CURVE25519
 #define CURVE25519_LEN 32
 struct kex_curve25519_param {
 	unsigned char priv[CURVE25519_LEN];
@@ -104,8 +105,5 @@ struct kex_curve25519_param {
 /* No header file for curve25519_donna */
 int curve25519_donna(unsigned char *out, const unsigned char *secret, const unsigned char *other);
 #endif
-
-
-#define MAX_KEXHASHBUF 2000
 
 #endif /* DROPBEAR_KEX_H_ */

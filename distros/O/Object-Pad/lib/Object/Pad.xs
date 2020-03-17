@@ -854,6 +854,19 @@ static int keyword_has(pTHX_ OP **op_ptr)
   return KEYWORD_PLUGIN_STMT;
 }
 
+static bool parse_permit(pTHX)
+{
+  HV *hints = GvHV(PL_hintgv);
+
+  if(!hv_fetchs(hints, "Object::Pad/method", 0))
+    return false;
+
+  if(!have_compclassmeta)
+    croak("Cannot 'method' outside of 'class'");
+
+  return true;
+}
+
 static void parse_post_blockstart(pTHX)
 {
   /* Splice in the slot scope CV in */
@@ -928,19 +941,11 @@ static OP *parse_pre_blockend(pTHX_ OP *body)
   return op_append_list(OP_LINESEQ, slotops, body);
 }
 
-static int keyword_method(pTHX_ OP **op_ptr)
-{
-  struct XSParseSublikeHooks hooks = { 0 };
-  hooks.post_blockstart = parse_post_blockstart;
-  hooks.pre_blockend    = parse_pre_blockend;
-
-  if(!have_compclassmeta)
-    croak("Cannot 'method' outside of 'class'");
-
-  lex_read_space(0);
-
-  return xs_parse_sublike(&hooks, op_ptr);
-}
+static struct XSParseSublikeHooks parse_method_hooks = {
+  .permit          = parse_permit,
+  .post_blockstart = parse_post_blockstart,
+  .pre_blockend    = parse_pre_blockend,
+};
 
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
 
@@ -959,10 +964,6 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
   if(kwlen == 3 && strEQ(kw, "has") &&
       hv_fetchs(hints, "Object::Pad/has", 0))
     return keyword_has(aTHX_ op_ptr);
-
-  if(kwlen == 6 && strEQ(kw, "method") &&
-      hv_fetchs(hints, "Object::Pad/method", 0))
-    return keyword_method(aTHX_ op_ptr);
 
   return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
 }
@@ -987,3 +988,5 @@ BOOT:
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
 
   boot_xs_parse_sublike();
+
+  register_xs_parse_sublike("method", &parse_method_hooks);

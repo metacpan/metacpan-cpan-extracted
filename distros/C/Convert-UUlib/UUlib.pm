@@ -1,14 +1,13 @@
 package Convert::UUlib;
 
-no warnings;
-use strict;
+use common::sense;
 
 use Carp;
 
 require Exporter;
 require DynaLoader;
 
-our $VERSION = 1.62;
+our $VERSION = 1.71;
 
 our @ISA = qw(Exporter DynaLoader);
 
@@ -36,7 +35,7 @@ our @_consts = qw(
 our @_funcs = qw(
         Initialize CleanUp GetOption SetOption strerror SetMsgCallback
         SetBusyCallback SetFileCallback SetFNameFilter SetFileNameCallback
-        FNameFilter LoadFile GetFileListItem RenameFile DecodeToTemp
+        FNameFilter LoadFile GetFileListItem GetFileList RenameFile DecodeToTemp
         RemoveTemp DecodeFile InfoFile Smerge QuickDecode EncodeMulti
         EncodePartial EncodeToStream EncodeToFile E_PrepSingle
         E_PrepPartial
@@ -50,16 +49,8 @@ our %EXPORT_TAGS = (all => [@_consts,@_funcs], constants => \@_consts);
 
 bootstrap Convert::UUlib $VERSION;
 
-Initialize();
-
-# not when < 5.005_6x
-# END { CleanUp() }
-
-for (@_consts) {
-   my $constant = constant($_);
-   no strict 'refs';
-   *$_ = sub () { $constant };
-}
+# dummy function for compatiiblity with pre-1.7 versions
+sub Initialize { }
 
 # action code -> string mapping
 sub straction($) {
@@ -107,7 +98,8 @@ Convert::UUlib - Perl interface to the uulib library (a.k.a. uudeview/uuenview).
  # read all the files named on the commandline and decode them
  # into the CURRENT directory. See below for a longer example.
  LoadFile $_ for @ARGV;
- for (my $i = 0; my $uu = GetFileListItem $i; $i++) {
+
+ for my $uu (GetFileList) {
     if ($uu->state & FILE_OK) {
       $uu->decode;
       print $uu->filename, "\n";
@@ -216,22 +208,18 @@ again.
 On my machine, a fairly complete decode with DBI backend needs about 10MB
 RSS to decode 20000 files.
 
-=over 4
-
-=item Initialize
-
-Not normally necessary, (re-)initializes the library.
+=over
 
 =item CleanUp
 
-Not normally necessary, could be called at the end to release memory
-before starting a new decoding round.
+Release memory, file items and clean up files. Should be called after a
+decoidng run, if you want to start a new one.
 
 =back
 
 =head2 Setting and querying options
 
-=over 4
+=over
 
 =item $option = GetOption OPT_xxx
 
@@ -243,7 +231,7 @@ See the C<OPT_xxx> constants above to see which options exist.
 
 =head2 Setting various callbacks
 
-=over 4
+=over
 
 =item SetMsgCallback [callback-function]
 
@@ -257,7 +245,7 @@ See the C<OPT_xxx> constants above to see which options exist.
 
 =head2 Call the currently selected FNameFilter
 
-=over 4
+=over
 
 =item $file = FNameFilter $file
 
@@ -265,7 +253,7 @@ See the C<OPT_xxx> constants above to see which options exist.
 
 =head2 Loading sourcefiles, optionally fuzzy merge and start decoding
 
-=over 4
+=over
 
 =item ($retval, $count) = LoadFile $fname, [$id, [$delflag, [$partno]]]
 
@@ -300,13 +288,21 @@ The first file has number C<0>, and the series has no holes, so you can
 iterate over all files by starting with zero and incrementing until you
 hit C<undef>.
 
+This function has to walk the linear list of fils on each access, so
+if you want to iterate over all items, it is usually faster to use
+C<GetFileList>.
+
+=item @items = GetFileList
+
+Similar to C<GetFileListItem>, but returns all files in one go.
+
 =back
 
 =head2 Decoding files
 
-=over 4
+=over
 
-=item $retval = $item->rename($newname)
+=item $retval = $item->rename ($newname)
 
 Change the ondisk filename where the decoded file will be saved.
 
@@ -319,27 +315,27 @@ retrieve the temporary filename.
 
 Remove the temporarily decoded file again.
 
-=item $retval = $item->decode([$target_path])
+=item $retval = $item->decode ([$target_path])
 
-Decode the file to it's destination, or the given target path.
+Decode the file to its destination, or the given target path.
 
-=item $retval = $item->info(callback-function)
+=item $retval = $item->info (callback-function)
 
 =back
 
 =head2 Querying (and setting) item attributes
 
-=over 4
+=over
 
 =item $state    = $item->state
 
-=item $mode     = $item->mode([newmode])
+=item $mode     = $item->mode ([newmode])
 
 =item $uudet    = $item->uudet
 
 =item $size     = $item->size
 
-=item $filename = $item->filename([newfilename})
+=item $filename = $item->filename ([newfilename})
 
 =item $subfname = $item->subfname
 
@@ -353,7 +349,7 @@ Decode the file to it's destination, or the given target path.
 
 =head2 Information about source parts
 
-=over 4
+=over
 
 =item $parts = $item->parts
 
@@ -377,7 +373,7 @@ and C<filename> members.
 
 =back
 
-=head2 Functions below not documented and not very well tested
+=head2 Functions below are not documented and not very well tested - feedback welcome
 
   QuickDecode
   EncodeMulti
@@ -391,7 +387,7 @@ and C<filename> members.
 
 Functions found in this module but not documented in the uulib documentation:
 
-=over 4
+=over
 
 =item $msg = straction ACT_xxx
 
@@ -442,8 +438,24 @@ This is a slightly more useful callback:
 
 =head1 LARGE EXAMPLE DECODER
 
-This is the file C<example-decoder> from the distribution, put here
-instead of more thorough documentation.
+The general workflow for decoding is like this:
+
+=over
+
+=item 1. Configure options with C<SetOption> or C<SetXXXCallback>.
+
+=item 2. Load all source files with C<LoadFile>.
+
+=item 3. Optionally C<Smerge>.
+
+=item 4. Iterate over all C<GetFileList> items (i.e. result files).
+
+=item 5. C<CleanUp> to delete files and free items.
+
+=back
+
+What follows is the file C<example-decoder> from the distribution that
+illustrates the above worklfow in a non-trivial example.
 
    #!/usr/bin/perl
 
@@ -515,7 +527,7 @@ instead of more thorough documentation.
    };
 
    # now read all files in the directory uusrc/*
-   for(<uusrc/*>) {
+   for (<uusrc/*>) {
       my ($retval, $count) = LoadFile ($_, $_, 1);
       print "file($_), status(", strerror $retval, ") parts($count)\n";
    }
@@ -523,42 +535,73 @@ instead of more thorough documentation.
    SetOption OPT_SAVEPATH, "uudst/";
 
    # now wade through all files and their source parts
-   $i = 0;
-   while ($uu = GetFileListItem $i) {
-      $i++;
-      print "file nr. $i";
-      print " state ", $uu->state;
-      print " mode ", $uu->mode;
-      print " uudet ", strencoding $uu->uudet;
-      print " size ", $uu->size;
-      print " filename ", $uu->filename;
-      print " subfname ", $uu->subfname;
-      print " mimeid ", $uu->mimeid;
-      print " mimetype ", $uu->mimetype;
-      print "\n";
+   for my $uu (GetFileList) {
+      print "file ", $uu->filename, "\n";
+      print " state ", $uu->state, "\n";
+      print " mode ", $uu->mode, "\n";
+      print " uudet ", strencoding $uu->uudet, "\n";
+      print " size ", $uu->size, "\n";
+      print " subfname ", $uu->subfname, "\n";
+      print " mimeid ", $uu->mimeid, "\n";
+      print " mimetype ", $uu->mimetype, "\n";
 
       # print additional info about all parts
+      print " parts";
       for ($uu->parts) {
-         while (my ($k, $v) = each %$_) {
-            print "$k > $v, ";
+         for my $k (sort keys %$_) {
+            print " $k=$_->{$k}";
          }
          print "\n";
       }
 
-      print $uu->filename;
-
       $uu->remove_temp;
 
-      if (my $err = $uu->decode ()) {
-         print ", ", strerror $err, "\n";
+      if (my $err = $uu->decode) {
+         print " ERROR ", strerror $err, "\n";
       } else {
-         print ", saved as uudst/", $uu->filename, "\n";
+         print " successfully saved as uudst/", $uu->filename, "\n";
       }
    }
 
    print "cleanup...\n";
 
    CleanUp;
+
+=head1 PERLMULTICORE SUPPORT
+
+This module supports the perlmulticore standard (see
+L<http://perlmulticore.schmorp.de/> for more info) for the following
+functions - generally these are functions accessing the disk and/or using
+considerable CPU time:
+
+   LoadFile
+   $item->decode
+   $item->decode_temp
+   $item->remove_temp
+   $item->info
+
+The perl interpreter will be reacquired/released on every callback
+invocation, so for performance reasons, callbacks should be avoided if
+that is costly.
+
+Future versions might enable multicore support for more functions.
+
+=head1 BUGS AND LIMITATIONS
+
+The original uulib library this module uses was written at a time where
+main memory of measured in megabytes and buffer overflows as a security
+thign didn't exist. While a lot of security fixes have been applied over
+the years (includign some defense in depth mechanism that can shield
+against a lot of as-of-yet undetected bugs), using this library for
+security purposes requires care.
+
+Likewise, file sizes when the uulib library was written were tiny compared
+to today, so do not expect this library to handle files larger than 2GB.
+
+Lastly, this module uses a very "C-like" interface, which means it doesn't
+protect you from invalid points as you might expect from "more perlish"
+modules - for example, accessing a file item object after callinbg
+C<CleanUp> will likely result in crashes, memory corruption, or worse.
 
 =head1 AUTHOR
 
@@ -568,6 +611,7 @@ bugfixed by Marc Lehmann.
 
 =head1 SEE ALSO
 
-perl(1), uudeview homepage at http://www.uni-frankfurt.de/~fp/uudeview/.
+perl(1), uudeview homepage at L<http://www.fpx.de/fp/Software/UUDeview/>.
 
 =cut
+

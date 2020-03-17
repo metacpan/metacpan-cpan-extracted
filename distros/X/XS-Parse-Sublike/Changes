@@ -1,0 +1,9 @@
+Revision history for XS-Parse-Sublike
+
+0.02    2020-03-17
+        [CHANGES]
+         * Added `register_xs_parse_sublike()` and the `permit` hook stage
+         * Added toplevel PL_keyword_hook parser function
+
+0.01    2020-03-15
+        First version, released on an unsuspecting world.

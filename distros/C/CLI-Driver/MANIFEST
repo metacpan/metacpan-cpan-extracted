@@ -1,4 +1,3 @@
-.includepath
 .project
 bin/cli-driver-starter.pl
 build.sh
