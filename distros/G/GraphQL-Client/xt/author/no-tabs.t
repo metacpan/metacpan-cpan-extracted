@@ -9,11 +9,13 @@ use Test::NoTabs;
 my @files = (
     'bin/graphql',
     'lib/GraphQL/Client.pm',
+    'lib/GraphQL/Client/CLI.pm',
     'lib/GraphQL/Client/http.pm',
     'lib/GraphQL/Client/https.pm',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/cli.t',
     't/client.t',
     't/http.t',
     't/https.t',

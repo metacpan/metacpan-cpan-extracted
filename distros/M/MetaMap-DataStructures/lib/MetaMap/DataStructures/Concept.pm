@@ -73,6 +73,7 @@ sub new {
     $self->{involvesHead} = shift;
     $self->{isOvermatch} = shift;
     $self->{matchMapText} = shift;
+    $self->{positionalSegments} = shift;
     $self->{isNegated} = 0;
 
     return $self;
@@ -103,7 +104,7 @@ ev\((-*\d+)        #score $1
 ([a-zA-Z]+),       #involvesHead 
 ([a-zA-Z]+),       #isOvermatch
 \[([^\]\[]+)\],    #uniqueSources
-\[[\d\/,]+\],      #   skip
+(\[[\d\/,]+\]),    #positional information
 \d+,               #   skip
 \d+/x;             #   skip
 
@@ -121,6 +122,7 @@ ev\((-*\d+)        #score $1
     my $involvesHead = $7;
     my $isOvermatch = $8;
     my $uniqueSources = $9;
+    my $positionalInformation = $10;
 
     #TODO delete this - once you are SURE everything works, will quit if values are not being properly parsed with the regex
     #check if everythingis defined
@@ -132,7 +134,8 @@ ev\((-*\d+)        #score $1
 	&& defined $matchMapText
 	&& defined $involvesHead
 	&& defined $isOvermatch
-	&& defined $uniqueSources) {
+	&& defined $uniqueSources
+        && defined $positionalInformation) {
 	#DO NOTHING
    }
    else {
@@ -147,6 +150,7 @@ ev\((-*\d+)        #score $1
 	print "9 - $involvesHead\n";
 	print "10 - $isOvermatch\n";
 	print "11 - $uniqueSources\n";
+	print "$12 - $positionalInformation";
 	exit;
    }
 
@@ -196,6 +200,16 @@ ev\((-*\d+)        #score $1
 	    }
 	}
     }
+  
+    #PosInfo is a list of terms of the form StartPos/Length, identifying the starting character
+    #position within the input text and and character length of each word in the string
+    #positional information is stored as a comma seperated list of word
+    # fragments and their length. E.G [32/3,39/4]
+    #strip leading and trailing []
+    $positionalInformation =~ s/\[//;
+    $positionalInformation =~ s/\]//;
+    my @positionalSegments = split(/,/,$positionalInformation);
+
 
     #TODO delete this (for debugging)
     #----------------------------------------------
@@ -220,7 +234,7 @@ ev\((-*\d+)        #score $1
     return MetaMap::DataStructures::Concept->new($cui, $string, $preferredName,
 			$score, $uniqueSources, $semanticTypes, 
 			\@associatedTokens, $involvesHead, 
-			$isOvermatch, $matchMapText);
+			$isOvermatch, $matchMapText, \@positionalSegments);
     
 }
 
@@ -320,6 +334,7 @@ sub toString {
 
     return $string;
 }
+
 
 1;
 

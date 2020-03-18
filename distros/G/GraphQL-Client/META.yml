@@ -1,5 +1,5 @@
 ---
-abstract: 'A GraphQL client'
+abstract: 'Command-line GraphQL client'
 author:
   - 'Charles McGarvey <chazmcgarvey@brokenzipper.com>'
 build_requires:
@@ -33,27 +33,31 @@ no_index:
 provides:
   GraphQL::Client:
     file: lib/GraphQL/Client.pm
-    version: '0.601'
+    version: '0.602'
+  GraphQL::Client::CLI:
+    file: lib/GraphQL/Client/CLI.pm
+    version: '0.602'
   GraphQL::Client::Error:
     file: lib/GraphQL/Client.pm
-    version: '0.601'
+    version: '0.602'
   GraphQL::Client::http:
     file: lib/GraphQL/Client/http.pm
-    version: '0.601'
+    version: '0.602'
   GraphQL::Client::https:
     file: lib/GraphQL/Client/https.pm
-    version: '0.601'
+    version: '0.602'
 recommends:
   HTTP::Tiny: '0'
   Pod::Usage: '0'
 requires:
   Carp: '0'
-  Getopt::Long: '0'
+  Getopt::Long: '2.39'
   HTTP::AnyUA: '0'
   HTTP::AnyUA::Util: '0'
   JSON::MaybeXS: '0'
   Module::Load: '0'
   Scalar::Util: '0'
+  Text::ParseWords: '0'
   namespace::clean: '0'
   overload: '0'
   parent: '0'
@@ -64,7 +68,7 @@ resources:
   bugtracker: https://github.com/chazmcgarvey/graphql-client/issues
   homepage: https://github.com/chazmcgarvey/graphql-client
   repository: https://github.com/chazmcgarvey/graphql-client.git
-version: '0.601'
+version: '0.602'
 x_authority: cpan:CCM
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -8,7 +8,7 @@ package XS::Parse::Sublike;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -30,23 +30,25 @@ for you.
 
 This module is also highly experimental, consisting currently of pieces of
 code extracted and refactored from L<Future::AsyncAwait> and L<Object::Pad>.
-It is hoped eventually this will be useful for other modules too, as well as
-providing a potential mechanism by which multiple of these kinds of modules
-can coöperate when parsing the same file, and combine their effects. As yet
-this part of the mechanism does not exist.
+It is hoped eventually this will be useful for other modules too.
 
 =head1 XS FUNCTIONS
 
 =head2 boot_xs_parse_sublike
 
-   boot_xs_parse_sublike()
+  void boot_xs_parse_sublike(double ver)
 
 Call this function from your C<BOOT> section in order to initialise the module
 and parsing hooks.
 
+I<ver> should either be 0 or a decimal number for the module version
+requirement; e.g.
+
+   boot_xs_parse_sublike(0.04);
+
 =head2 xs_parse_sublike
 
-   int result = xs_parse_sublike(&hooks, op_ptr)
+   int xs_parse_sublike(const struct XSParseSublikeHooks *hooks, OP **op_ptr)
 
 This function performs the actual parsing of a C<sub>-like keyword. It expects
 the lexer to be at a position just after the introduction keyword has been
@@ -63,7 +65,8 @@ used to customise the parsing process at various stages.
 
 =head2 register_xs_parse_sublike
 
-   register_xs_parse_sublike(keyword, &hooks)
+   void register_xs_parse_sublike(const char *keyword,
+     const struct XSParseSublikeHooks *hooks)
 
 This function installs a set of parsing hooks to be associated with the given
 keyword. Such a keyword will then be handled automatically by a keyword parser
@@ -72,6 +75,27 @@ installed by C<XS::Parse::Sublike> itself.
 When the keyword is encountered, the hook's C<permit> function is first tested
 to see if the keyword is permitted at this point. If the function returns true
 then the keyword is consumed and parsed as per L</xs_parse_sublike>.
+
+=head2 xs_parse_sublike_any
+
+   int xs_parse_sublike_any(const struct XSParseSublikeHooks *hooks, OP **op_ptr)
+
+This function expects to consume an introduction keyword at the lexer position
+which is either C<sub> or the name of another C<sub>-like keyword, which has
+been previously registered using L</register_xs_parse_sublike>. It then
+proceeds to parse the subsequent syntax similar to how it would have parsed if
+encountered by the module's own keyword parser plugin, except that the second
+set of hooks given here also take effect.
+
+If a regular C<sub> is encountered, then this is parsed using the I<hooks> in
+a similar way to C<xs_parse_sublike()>.
+
+If a different registered C<sub>-like keyword is encountered, then parsing is
+performed using B<both> sets of hooks - the ones given to this function as
+well as the ones registered with the keyword. This allows their effects to
+combined. The hooks given by the I<hooks> argument are considered to be on the
+"outside" from those of the registered keyword "inside". The outside ones run
+first for all stages, except C<pre_blockend> which runs them inside-out.
 
 =head1 PARSE HOOKS
 

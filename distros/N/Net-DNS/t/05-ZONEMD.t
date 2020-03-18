@@ -1,4 +1,4 @@
-# $Id: 05-ZONEMD.t 1761 2020-01-01 11:58:34Z willem $	-*-perl-*-
+# $Id: 05-ZONEMD.t 1771 2020-02-25 14:23:23Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 20;
@@ -8,11 +8,11 @@ use Net::DNS;
 my $name = 'ZONEMD.example';
 my $type = 'ZONEMD';
 my $code = 63;
-my @attr = qw( serial digtype parameter digest);
-my @data = ( 12345, 1, 2, '2bb183af5f22588179a53b0a98631fad1a292118' );
+my @attr = qw( serial scheme algorithm digest);
+my @data = ( 12345, 1, 1, '2bb183af5f22588179a53b0a98631fad1a292118' );
 my @also = qw( digestbin );
 
-my $wire = join '', qw( 00003039 01 02 2BB183AF5F22588179A53B0A98631FAD1A292118 );
+my $wire = join '', qw( 00003039 01 01 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 
 
 {
@@ -63,7 +63,7 @@ my $wire = join '', qw( 00003039 01 02 2BB183AF5F22588179A53B0A98631FAD1A292118 
 
 
 {
-	my $rr = new Net::DNS::RR( type => $type, digtype => 1 );
+	my $rr = new Net::DNS::RR( type => $type, scheme => 1 );
 	ok( $rr->string, 'string method with default values' );
 	is( $rr->string, Net::DNS::RR->new( $rr->string )->string, 'parse $rr->string' );
 	$rr->digestbin('');

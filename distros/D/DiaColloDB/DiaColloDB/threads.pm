@@ -29,15 +29,21 @@ BEGIN {
     }
     $MODULE //= '';
   }
-  *import = $MODULE ? UNIVERSAL::can($MODULE,'import') : sub {}
-    if (!UNIVERSAL::can(__PACKAGE__,'import'));
+}
+
+sub import {
+  if ($MODULE) {
+    #my $that   = shift;
+    my $caller = caller;
+    my $sub = eval qq{sub { package $caller; $MODULE->import(); } };
+    $sub->(@_);
+  }
 }
 
 ## $threadid = CLASS->tid()
 sub tid {
   return $MODULE ? threads->tid() : 0;
 }
-
 
 
 1; ##-- be happy

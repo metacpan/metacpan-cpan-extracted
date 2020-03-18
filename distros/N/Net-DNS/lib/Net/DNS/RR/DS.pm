@@ -1,9 +1,9 @@
 package Net::DNS::RR::DS;
 
 #
-# $Id: DS.pm 1741 2019-04-16 13:10:38Z willem $
+# $Id: DS.pm 1774 2020-03-18 07:49:22Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1774 $)[1];
 
 
 use strict;
@@ -66,7 +66,7 @@ my %digest = (
 	my %algbyval = reverse @algbyname;
 
 	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
-	my %algbyname = @algrehash;    # work around broken cperl
+	my %algbyname = @algrehash;				# work around broken cperl
 
 	sub _algbyname {
 		my $arg = shift;
@@ -140,8 +140,8 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	$self->_annotation( $self->babble ) if BABBLE && $self->{algorithm};
-	my @digest = split /(\S{64})/, $self->digest || '-';
-	my @rdata = ( @{$self}{qw(keytag algorithm digtype)}, @digest );
+	my @param = @{$self}{qw(keytag algorithm digtype)};
+	my @rdata = ( @param, split /(\S{64})/, $self->digest || '-' );
 }
 
 
@@ -219,14 +219,13 @@ sub create {
 
 	my ($type) = reverse split '::', $class;
 
-	my $kname = $keyrr->name;
 	my $flags = $keyrr->flags;
 	croak "Unable to create $type record for non-DNSSEC key" unless $keyrr->protocol == 3;
 	croak "Unable to create $type record for non-authentication key" if $flags & 0x8000;
 	croak "Unable to create $type record for non-ZONE key" unless ( $flags & 0x300 ) == 0x100;
 
 	my $self = new Net::DNS::RR(
-		name	  => $kname,				# per definition, same as keyrr
+		owner	  => $keyrr->owner,			# per definition, same as keyrr
 		type	  => $type,
 		class	  => $keyrr->class,
 		keytag	  => $keyrr->keytag,
@@ -235,14 +234,12 @@ sub create {
 		%args
 		);
 
-	my $owner = $self->{owner}->encode();
-	my $data = pack 'a* a*', $owner, $keyrr->_encode_rdata;
-
 	my $arglist = $digest{$self->digtype};
 	croak join ' ', 'digtype', $self->digtype('MNEMONIC'), 'not supported' unless $arglist;
 	my ( $object, @argument ) = @$arglist;
 	my $hash = $object->new(@argument);
-	$hash->add($data);
+	$hash->add( $keyrr->{owner}->canonical );
+	$hash->add( $keyrr->_encode_rdata );
 	$self->digestbin( $hash->digest );
 
 	return $self;

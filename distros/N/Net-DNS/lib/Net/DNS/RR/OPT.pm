@@ -1,9 +1,9 @@
 package Net::DNS::RR::OPT;
 
 #
-# $Id: OPT.pm 1754 2019-08-19 14:12:28Z willem $
+# $Id: OPT.pm 1773 2020-03-17 08:40:55Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1754 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1773 $)[1];
 
 
 use strict;
@@ -116,12 +116,8 @@ sub version {
 
 sub size {
 	my $self = shift;
-	for ( $self->{size} ) {
-		my $UDP_size = 0;
-		( $UDP_size, $_ ) = ( shift || 0 ) if scalar @_;
-		return $UDP_size < 512 ? 512 : ( $_ = $UDP_size ) unless $_;
-		return $_ > 512 ? $_ : 512;
-	}
+	$self->{size} = shift if scalar @_;
+	return ( $self->{size} || 0 ) > 512 ? $self->{size} : 512;
 }
 
 
@@ -143,8 +139,8 @@ sub flags {
 
 sub options {
 	my ($self) = @_;
-	my $options = $self->{option} || {};
-	my @options = sort { $a <=> $b } keys %$options;
+	my $option = $self->{option} || {};
+	my @option = sort { $a <=> $b } keys %$option;
 }
 
 sub option {
@@ -251,9 +247,8 @@ my @field8 = qw(FAMILY SOURCE-PREFIX-LENGTH SCOPE-PREFIX-LENGTH ADDRESS);
 sub _compose {
 	my ( $class, %argument ) = @_;
 	my $address = bless( {}, $family{$argument{FAMILY}} )->address( $argument{ADDRESS} );
-	my $preamble = pack 'nC2', map $_ || 0, @argument{@field8};
-	my $bitmask  = $argument{'SOURCE-PREFIX-LENGTH'};
-	pack "a* B$bitmask", $preamble, unpack 'B*', $address;
+	my $bitmask = $argument{'SOURCE-PREFIX-LENGTH'};
+	pack "a* B$bitmask", pack( 'nC2', map $_ || 0, @argument{@field8} ), unpack 'B*', $address;
 }
 
 sub _decompose {

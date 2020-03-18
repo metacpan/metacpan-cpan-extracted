@@ -32,6 +32,10 @@ our @ISA = qw(DiaColloDB::Relation);
 ##    dmax    => $maxDistance,         ##-- default distance for near() queries (default=5; 1=immediate adjacency; ~ ddc CQNear.Dist+1)
 ##    cfmin   => $minFreq,             ##-- default minimum frequency for count() queries (default=2)
 ##    ##
+##    ##-- logging options
+##    #logProfile => $level,           ##-- log-level for verbose profiling (from $coldb)
+##    logTrunc => $nchars,             ##-- max length of query string to log (default=256)
+##    ##
 ##    ##-- low-level data
 ##    dclient   => $ddcClient,         ##-- a DDC::Client::Distributed object
 ##   )
@@ -45,6 +49,8 @@ sub new {
 			       ddcSample  => -1,
 			       dmax       => 5,
 			       cfmin      => 2,
+			       #logProfile => 'trace',
+			       logTrunc   => 256,
 			       @_
 			      );
   $rel->{class} = ref($rel);
@@ -127,17 +133,11 @@ sub profile {
   my ($that,$coldb,%opts) = @_;
   my $rel = $that->fromDB($coldb,%opts)
     or $that->logconfess($coldb->{error}="profile(): initialization failed (did you forget to set the 'ddcServer' option?)");
+  $opts{coldb} = $coldb;
 
   ##-- get count-query, count-by expressions, titles
-  my $qcount = $rel->countQuery($coldb,\%opts);
-
-  ##-- get count-by expressions, titles
-  my $cbexprs = $qcount->getKeys->getExprs;
-  my @titles  = map {
-    $coldb->attrTitle($_->can('getIndexName')
-		      ? $_->getIndexName
-		      : do { (my $label=$_->toString) =~ s{\'((?:\\.|[^\'])*)\'}{$1}; $label =~ s{ ~ s/}{~s/}g; $label })
-  } @$cbexprs[1..$#$cbexprs];
+  my $qcount  = $rel->countQuery($coldb,\%opts);
+  my $gbtitles = $opts{gbtitles};
 
   ##-- get raw f12 results and parse into slice-wise profiles
   my $result12 = $rel->ddcQuery($coldb, $qcount, limit=>$opts{limit}, logas=>'f12');
@@ -150,79 +150,81 @@ sub profile {
   }
   undef $result12; ##-- save some memory
 
-  ##-- check whether count-query uses any token-attributes
-  my $needKeys = grep {UNIVERSAL::can($_,'getMatchId') && $_->getMatchId==2} @{$qcount->getKeys->getExprs};
-
-  ##-- get raw g2 results and update slice-wise profiles
-  my $fcoef  = $opts{fcoef};
-  my ($qcount2);
-  if ($needKeys) {
-    my $qkeys2 = DDC::Any::CQKeys->new($qcount);
-    $qkeys2->setOptions($qcount->getDtr->getOptions);
-    $qkeys2->SetMatchId(2);
-    $qcount2 = DDC::Any::CQCount->new($qkeys2, $qcount->getKeys, $qcount->getSample, $qcount->getSort, $qcount->getLo, $qcount->getHi);
+  ##-- get raw f2 counts & propagate to profiles in %$y2prf
+  ##  + iterate over all queries in @qcounts2 (for multi-pass mode)
+  my $qcounts2 = $rel->collocateCountQueries($qcount,\%y2prf, \%opts);
+  my $fcoef    = $opts{fcoef};
+  foreach my $qc2i (0..$#$qcounts2) {
+    my $qcount2 = $qcounts2->[$qc2i];
+    my $result2 = $rel->ddcQuery($coldb, $qcount2, limit=>-1, logTrunc=>128, logas=>("f2[".($qc2i+1).'/'.scalar(@$qcounts2)."]"));
+    foreach (@{$result2->{counts_}}) {
+      next if (!defined($prf=$y2prf{$y=$_->[1]}));
+      $key = join("\t", @$_[2..$#$_]);
+      $prf->{f2}{$key} += $_->[0]*$fcoef if (exists $prf->{f12}{$key});
+    }
   }
-  else {
-    my $qdtr2 = DDC::Any::CQTokAny->new;
-    $qdtr2->setOptions($qcount->getDtr->getOptions);
-    ($qcount2 = $qcount->clone())->setDtr($qdtr2);
-  }
-  my $result2 = $rel->ddcQuery($coldb, $qcount2, limit=>-1, logas=>'f2');
-  foreach (@{$result2->{counts_}}) {
-    next if (!defined($prf=$y2prf{$y=$_->[1]}));
-    $key = join("\t", @$_[2..$#$_]);
-    $prf->{f2}{$key} += $_->[0]*$fcoef if (exists $prf->{f12}{$key});
-  }
-  undef $result2; ##-- save some memory
 
   ##-- query independent f1 and update slice-wise profiles
-  if ($needKeys) {
-    ##-- not sure why we're using count(keys(...)) #by[$l=1] here
-    my $qcount1 = $qcount2->clone();
-    $_->setMatchId(1) foreach (grep {UNIVERSAL::isa($_,'DDC::Any::CQCountKeyExprToken') && $_->getMatchId==2}
-			       @{$qcount1->getDtr->getQCount->getKeys->getExprs},
-			       @{$qcount1->getKeys->getExprs},
-			      );
-    $qcount1->getDtr->setMatchId(1);
+  if ($opts{qcount1} && !$opts{onepass}) {
+    ##-- f1 : via direct pre-generated $opts{qcount1} (DiaColloDB >= v0.12.017)
+    my $qcount1 = $opts{qcount1};
     my $result1 = $rel->ddcQuery($coldb, $qcount1, limit=>-1, logas=>'f1');
     foreach (@{$result1->{counts_}}) {
       next if (!defined($prf=$y2prf{$y=$_->[1]}));
-      $prf->{f1} += $_->[0]*$fcoef;
+      $prf->{f1} += $_->[0]*($opts{fcoef1}//1);
     }
-    undef $result1; ##-- save some memory (but not much)
   }
-  elsif (grep {UNIVERSAL::isa($_,'DDC::Any::CQToken') && $_->getMatchId==2 && !UNIVERSAL::isa($_,'DDC::Any::CQTokAny')} @{$qcount->Descendants}) {
-    ##-- no item2 keys in groupby clause, but real item2 restriction: count f1 anyways
-    my $qcount1 = $qcount->clone();
-    my $qdtr1    = $qcount1->getDtr;
-    my ($nod,$newnod);
-    $qdtr1->mapTraverse(sub {
-			  $nod = shift;
-			  if (UNIVERSAL::isa($nod,'DDC::Any::CQToken') && $nod->getMatchId==2 && !UNIVERSAL::isa($nod,'DDC::Any::CQTokAny')) {
-			    $newnod = DDC::Any::CQTokAny->new();
-			    $newnod->setMatchId('2');
-			    $newnod->setOptions($nod->getOptions);
-			    $nod->setOptions(undef);
-			    return $newnod;
-			  }
-			  return $nod;
-			});
-    $qcount1->getKeys->setExprs([grep
-				 {!(UNIVERSAL::isa($_,'DDC::Any::CQCountKeyExprToken') && $_->getMatchId==2)}
-				 @{$qcount1->getKeys->getExprs}]);
-    my $result1 = $rel->ddcQuery($coldb, $qcount1, limit=>-1, logas=>'f1');
-    foreach (@{$result1->{counts_}}) {
-      next if (!defined($prf=$y2prf{$y=$_->[1]}));
-      $prf->{f1} += $_->[0];
+  else { #if ($opts{onepass}
+    ##-- f1 : 1-pass (~ DiaColloDB <= v0.12.016)
+    if ($opts{needCountsByToken}) {
+      ##-- not sure why we're using count(keys(...)) #by[$l=1] here
+      my $qcount1 = $qcounts2->[0]->clone();
+      $_->setMatchId(1) foreach (grep {UNIVERSAL::isa($_,'DDC::Any::CQCountKeyExprToken') && $_->getMatchId==2}
+				 @{$qcount1->getDtr->getQCount->getKeys->getExprs},
+				 @{$qcount1->getKeys->getExprs},
+				);
+      $qcount1->getDtr->setMatchId(1);
+      my $result1 = $rel->ddcQuery($coldb, $qcount1, limit=>-1, logas=>'f1');
+      foreach (@{$result1->{counts_}}) {
+	next if (!defined($prf=$y2prf{$y=$_->[1]}));
+	$prf->{f1} += $_->[0]*$fcoef;
+      }
+      undef $result1; ##-- save some memory (but not much)
     }
-    undef $result1; ##-- save some memory (but not much)
-  }
-  else {
-    ##-- no f1 query required (item2 is universal wildcard)
-    foreach $prf (values %y2prf) {
-      my $f1=0;
-      $f1 += $_ foreach (values %{$prf->{f12}});
-      $prf->{f1} = $f1*$fcoef;
+    elsif (grep {UNIVERSAL::isa($_,'DDC::Any::CQToken') && $_->getMatchId==2 && !UNIVERSAL::isa($_,'DDC::Any::CQTokAny')} @{$qcount->Descendants}) {
+      ##-- no item2 keys in groupby clause, but real item2 restriction: count f1 anyways
+      my $qcount1 = $qcount->clone();
+      my $qdtr1    = $qcount1->getDtr;
+      my ($nod,$newnod);
+      $qdtr1->mapTraverse(sub {
+			    $nod = shift;
+			    if (UNIVERSAL::isa($nod,'DDC::Any::CQToken') && $nod->getMatchId==2 && !UNIVERSAL::isa($nod,'DDC::Any::CQTokAny')) {
+			      $newnod = DDC::Any::CQTokAny->new();
+			      $newnod->setMatchId('2');
+			      $newnod->setOptions($nod->getOptions);
+			      $nod->setOptions(undef);
+			      return $newnod;
+			    }
+			    return $nod;
+			  });
+      $qcount1->getKeys->setExprs([grep
+				   {!(UNIVERSAL::isa($_,'DDC::Any::CQCountKeyExprToken') && $_->getMatchId==2)}
+				   @{$qcount1->getKeys->getExprs}]);
+
+      my $result1 = $rel->ddcQuery($coldb, $qcount1, limit=>-1, logas=>'f1');
+      foreach (@{$result1->{counts_}}) {
+	next if (!defined($prf=$y2prf{$y=$_->[1]}));
+	$prf->{f1} += $_->[0];
+      }
+      undef $result1; ##-- save some memory (but not much)
+    }
+    else {
+      ##-- no f1 query required (item2 is universal wildcard)
+      foreach $prf (values %y2prf) {
+	my $f1=0;
+	$f1 += $_ foreach (values %{$prf->{f12}});
+	$prf->{f1} = $f1*$fcoef;
+      }
     }
   }
 
@@ -239,7 +241,7 @@ sub profile {
   ##-- finalize sub-profiles: label, titles, N, compile
   my ($f1);
   foreach $prf (values %y2prf) {
-    $prf->{titles} = \@titles;
+    $prf->{titles} = $gbtitles;
 
     if (!($f1=$prf->{f1})) {
       $f1  = 0;
@@ -256,7 +258,7 @@ sub profile {
   if ($opts{fill}) {
     for ($y=$opts{dslo}; $y <= $opts{dshi}; $y += ($opts{slice}||1)) {
       next if (exists($y2prf{$y}));
-      $prf = $y2prf{$y} = DiaColloDB::Profile->new(N=>($fN{$y}||$N||0),f1=>0,label=>$y,titles=>\@titles)->compile($opts{score},eps=>$opts{eps});
+      $prf = $y2prf{$y} = DiaColloDB::Profile->new(N=>($fN{$y}||$N||0),f1=>0,label=>$y,titles=>$gbtitles)->compile($opts{score},eps=>$opts{eps});
     }
   }
 
@@ -276,7 +278,7 @@ sub profile {
   $rel->vlog($coldb->{logProfile}, "profile(): collect and trim");
   my $mp = DiaColloDB::Profile::Multi->new(
 					   profiles => [@y2prf{sort {$a<=>$b} keys %y2prf}],
-					   titles   => \@titles,
+					   titles   => $gbtitles,
 					   qinfo    => $qinfo,
 					  );
   $mp->trim(%opts, empty=>!$opts{fill});
@@ -289,13 +291,60 @@ sub profile {
 ## Relation API: extend
 
 ## $mprf = $rel->extend($coldb, %opts)
-## + get f12,f2 frequencies for selected items as a DiaColloDB::Profile::Multi object
+## + get f2 frequencies (and ONLY f2 frequencies) for selected items as a DiaColloDB::Profile::Multi object
 ## + requires 'query' option for correct estimation of 'fcoef'
-## + %opts: as for profile()
+## + %opts: as for DiaColloDB::Relation::extend()
 sub extend {
-  my $that = shift;
-  $that->debug("extend() method not supported - returning empty profile");
-  return DiaColloDB::Profile::Multi->new();
+  my ($that,$coldb,%opts) = @_;
+  my $rel = $that->fromDB($coldb,%opts)
+    or $that->logconfess($coldb->{error}="extend(): initialization failed (did you forget to set the 'ddcServer' option?)");
+
+  ##-- common variables
+  $opts{coldb}   = $coldb;
+  my $opts       = \%opts;
+  my $logProfile = $coldb->{logProfile};
+
+  ##-- sanity check(s)
+  my ($slice2keys);
+  if (!($slice2keys=$opts{slice2keys})) {
+    $rel->warn($coldb->{error}="extend(): no 'slice2keys' parameter specified!");
+    return undef;
+  }
+  elsif (!UNIVERSAL::isa($slice2keys,'HASH')) {
+    $rel->warn($coldb->{error}="extend(): failed to parse 'slice2keys' parameter");
+    return undef;
+  }
+
+  ##-- get "real" count-query, count-by expressions, titles, fcoef, ...
+  my $qcount = $rel->countQuery($coldb,\%opts);
+
+  ##-- create %y2pf
+  my %y2prf;
+  my ($y,$ykeys, $prf);
+  while (($y,$ykeys) = each %$slice2keys) {
+    $prf = ($y2prf{$y} //= DiaColloDB::Profile->new(label=>$y, titles=>$opts{gbtitles}));
+    $prf->{f12}{$_} = 0 foreach (UNIVERSAL::isa($ykeys,'HASH') ? keys(%$ykeys) : @$ykeys);
+  }
+
+  ##-- get raw f2 counts & propagate to profiles in %$y2prf (copy+pasted from profile())
+  ##  + iterate over all queries in @qcounts2 (for multi-pass mode)
+  my $qcounts2 = $rel->collocateCountQueries($qcount,\%y2prf, \%opts);
+  my $fcoef    = $opts{fcoef};
+  my ($key);
+  foreach my $qc2i (0..$#$qcounts2) {
+    my $qcount2 = $qcounts2->[$qc2i];
+    my $result2 = $rel->ddcQuery($coldb, $qcount2, limit=>-1, logTrunc=>128, logas=>("f2[".($qc2i+1).'/'.scalar(@$qcounts2)."]"));
+    foreach (@{$result2->{counts_}}) {
+      next if (!defined($prf=$y2prf{$y=$_->[1]}));
+      $key = join("\t", @$_[2..$#$_]);
+      $prf->{f2}{$key} += $_->[0]*$fcoef if (exists $prf->{f12}{$key});
+    }
+  }
+
+  ##-- finalize: collect multi-profile (don't trim)
+  my $mp = DiaColloDB::Profile::Multi->new(profiles => [@y2prf{sort {$a<=>$b} keys %y2prf}], N=>0,f1=>0);
+  $mp->trim(empty=>0, extend=>$slice2keys);
+  return $mp;
 }
 
 
@@ -361,7 +410,7 @@ sub ddcQuery {
   my ($rel,$coldb,$query,%opts) = @_;
   my $logas = $opts{logas} // 'ddcQuery';
   my $level = exists($opts{loglevel}) ? $opts{loglevel} : $coldb->{logProfile};
-  my $trunc = $opts{logTrunc} // -1;
+  my $trunc = $opts{logTrunc} // (ref($rel) ? $rel->{logTrunc} : undef) // -1;
 
   my $qstr = ref($query) ? $query->toStringFull : $query;
   my $cli  = $rel->ddcClient();
@@ -421,6 +470,7 @@ sub fcoef {
 ##    gbexprs => $gbexprs,      ##-- groupby expressions (DDC::Any::CQCountKeyExprList)
 ##    gbrestr => $gbrestr,      ##-- groupby item2 restrictions (DDC::Any::CQWith conjunction of token expressions)
 ##    gbfilters => \@gbfilters, ##-- groupby filter restrictions (ARRAY-ref of DDC::Any::CQFilter)
+##    gbtitles => \@titles,     ##-- groupby column titles (ARRAY-ref of strings)
 ##    limit  => $limit,		##-- hit return limit for ddc query
 ##    dslo   => $dslo,          ##-- minimum date-slice, from @opts{qw(date slice fill)}
 ##    dshi   => $dshi,          ##-- maximum date-slice, from @opts{qw(date slice fill)}
@@ -428,6 +478,8 @@ sub fcoef {
 ##    dhi    => $dhi,           ##-- maximum date request (ddc)
 ##    fcoef  => $fcoef,		##-- frequency coefficient, parsed from "#coef[N]", auto-generated for near() queries
 ##    qtemplate => $qtemplate,  ##-- query template for ddc hit link-up
+##    qcount1 => $qcount1,      ##-- count-query for f1 acquisition
+##    fcoef1 => $fcoef1,        ##-- f1 coefficient for qcount1
 ##   )
 sub countQuery {
   my ($rel,$coldb,$opts) = @_;
@@ -448,8 +500,10 @@ sub countQuery {
   $qdtr->setOptions(undef);
 
   ##-- get target query nodes (item1 ~ matchid =1, item2 ~ matchid =2)
+  ##  + propagate explicit match-id from parent CQWith into CQToken nodes
   my (@qnodes1,@qnodes2);
-  foreach (grep {UNIVERSAL::can($_,'getMatchId')} @{$qdtr->Descendants}) {
+  $rel->propagateMatchIds($qdtr);
+  foreach (grep {UNIVERSAL::isa($_,'DDC::Any::CQToken')} @{$qdtr->Descendants}) {
     push(@qnodes1,$_) if ($_->getMatchId<=1);
     push(@qnodes2,$_) if ($_->getMatchId==2);
   }
@@ -464,7 +518,7 @@ sub countQuery {
     $qany->setMatchId(2);
     $dmax = 1 if ($dmax < 1);
     my $qnear = DDC::Any::CQNear->new($dmax-1,$qdtr,$qany);
-    @qnodes2  = ($qany);
+    #@qnodes2  = ($qany); ##-- unused
     $qdtr     = $qnear;
   }
   elsif ($gbrestr) {
@@ -484,13 +538,14 @@ sub countQuery {
 			       });
   }
 
-  ##-- maybe guess fcoef
-  $fcoef //= $rel->fcoef($qdtr);
-  $rel->vlog($coldb->{logProfile}, "guessed fcoef=$fcoef");
-
   ##-- qdtr options
   $qopts->setSeparateHits(1) if ($opts->{query} !~ /\#(?:sep(?:arate)?|nojoin)(?:_hits)?\b/i);
   $qdtr->setOptions($qopts);
+
+  ##-- maybe guess fcoef
+  my $fcoef_user = $fcoef;
+  $fcoef //= $rel->fcoef($qdtr);
+  $rel->vlog($coldb->{logProfile}, "guessed fcoef=$fcoef");
 
   ##-- date clause
   my ($dfilter,$dslo,$dshi,$dlo,$dhi) = $coldb->parseDateRequest(@$opts{qw(date slice fill)},1);
@@ -567,12 +622,254 @@ sub countQuery {
   ##-- cleanup coldb parser (so we're using "real" refcounts)
   $coldb->qcompiler->CleanParser();
 
-  ##-- finalize: construct count query & set options
+  ##-- construct count query
   $cfmin = '' if (($cfmin//1) <= 1);
   my $qcount = DDC::Any::CQCount->new($qdtr, $gbexprs, $sample, DDC::Any::GreaterByCountValue(), $cfmin);
+
+  ##-- contruct f1 count-query
+  my $qcount1 = $opts->{qcount1} = $rel->collocantCountQuery($qcount, 1);
+  $opts->{fcoef1} = $fcoef_user // ($fcoef / $rel->fcoef($qcount1->getDtr));
+
+  ##-- set count-by expressions, titles
+  my $gbexprs_array = $qcount->getKeys->getExprs;
+  my $gbtitles = $opts->{gbtitles} = [map {
+    $coldb->attrTitle($_->can('getIndexName')
+		      ? $_->getIndexName
+		      : do { (my $label=$_->toString) =~ s{\'((?:\\.|[^\'])*)\'}{$1}; $label =~ s{ ~ s/}{~s/}g; $label })
+  } @$gbexprs_array[1..$#$gbexprs_array]];
+
+  ##-- set options
   @$opts{qw(limit sample dslo dshi dlo dhi fcoef cfmin qtemplate)} = ($limit,$sample,$dslo,$dshi,$dlo,$dhi,$fcoef,$cfmin,$qtemplate->toStringFull);
   return $qcount;
 }
+
+##--------------------------------------------------------------
+## $nod = $rel->propagateMatchIds($nod,$parentMatchId=0)
+sub propagateMatchIds {
+  my $that = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+  my ($nod,$matchid) = @_;
+  return if (!UNIVERSAL::isa($nod,'DDC::Any::CQuery'));
+  $matchid //= 0;
+
+  if ($nod->isa('DDC::Any::CQWith') || $nod->isa('DDC::Any::CQToken')) {
+    $matchid = $nod->getMatchId
+      if ($nod->toString =~ /=[0-9]+$/); ##-- test for local match-id (hack)
+  }
+  $nod->setMatchId($matchid)
+    if ($nod->isa('DDC::Any::CQToken') && !$nod->HasMatchId);
+
+  $that->propagateMatchIds($_,$matchid)
+    foreach (@{$nod->Children});
+
+  return $nod;
+}
+
+##--------------------------------------------------------------
+## $qcount1 = $rel->collocantCountQuery($qcount,$matchId)
+##  + maps count-queries returned by countQuery() to ${matchId}-item queries (default $matchid=1)
+sub collocantCountQuery {
+  my $that = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+  my ($qcount,$matchid) = @_;
+  $matchid //= 1;
+
+  ##-- map item-conditions
+  my $qdtr = $qcount->getDtr;
+  my $idtr = $that->itemCountNode($qdtr, $matchid);
+  if (!$idtr) {
+    $idtr = DDC::Any::CQTokAny->new();
+    $idtr->setMatchId($matchid) if ($matchid != 1);
+  }
+
+  ##-- inherit options
+  $idtr->setOptions($qdtr->getOptions->clone);
+
+  ##-- get count-query
+  my $icount = $qcount->clone;
+  my $iexprs = [ grep {!UNIVERSAL::can($_,'getMatchId') || $_->getMatchId==$matchid} @{$icount->getKeys->getExprs()} ];
+  $icount->setDtr($idtr);
+  $icount->getKeys->setExprs($iexprs);
+
+  return $icount;
+}
+
+##--------------------------------------------------------------
+## $nod2_or_undef = $rel->itemCountNode($nod,$matchId)
+##  + maps countQuery() nodes to ${matchId}-query nodes only
+##  + simplifies by removing extraneous CQBinOp, CQNear, and CQSeq nodes
+sub itemCountNode {
+  my $that = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+  my ($nod,$matchid) = @_;
+  $matchid //= 1;
+  return undef if (!defined($nod));
+
+  if (UNIVERSAL::can($nod,'getMatchId') && ($nod->getMatchId//0) != $matchid) {
+    return undef;
+  }
+  elsif (UNIVERSAL::isa($nod,'DDC::Any::CQBinOp')) {
+    my $dtr1 = $that->itemCountNode($nod->getDtr1,$matchid);
+    my $dtr2 = $that->itemCountNode($nod->getDtr2,$matchid);
+    if ($dtr1 && $dtr2) {
+      my $nod2 = $nod->clone;
+      $nod2->setDtr1($dtr1);
+      $nod2->setDtr2($dtr2);
+      return $nod2;
+    }
+    elsif ($dtr1 || $dtr2) {
+      my $nod2    = $dtr1 ? $dtr1 : $dtr2;
+      my $negated = $nod->Negated;
+      $negated = !$negated if (UNIVERSAL::isa($nod,'DDC::Any::CQWithout') && $nod2 eq $dtr2);
+      $nod2->Negate() if ($negated);
+      return $nod2;
+    }
+    return undef;
+  }
+  elsif (UNIVERSAL::isa($nod,'DDC::Any::CQSeq')) {
+    my @items = map {$that->itemCountNode($_,$matchid)} @{$nod->getItems};
+    my $nitems = scalar(grep {defined($_)} @items);
+    if ($nitems == 0) {
+      ##-- no items in phrase: skip it
+      return undef;
+    }
+    elsif ($nitems == 1) {
+      ##-- singleton phrase: simplify
+      my $nod2 = (grep {defined($_)} @items)[0]->clone;
+      $nod2->Negate() if ($nod->Negated);
+      return $nod2;
+    }
+    else {
+      ##-- multiple items in phrase: keep it a CQSeq, but insert wildcards
+      my $nod2 = $nod->clone;
+      @items = map {defined($_) ? $_ : DDC::Any::CQTokAny->new} @items;
+      $nod2->setItems(\@items);
+      return $nod2;
+    }
+  }
+  elsif (UNIVERSAL::isa($nod,'DDC::Any::CQNear')) {
+    my @dtrs = grep {defined($_)} map {$that->itemCountNode($_,$matchid)} ($nod->getDtr1, $nod->getDtr2, $nod->getDtr3);
+    if (!@dtrs) {
+      return undef;
+    }
+    elsif (@dtrs == 1) {
+      my $nod2 = $dtrs[0];
+      $nod2->Negate() if ($nod->Negated);
+      return $nod2;
+    }
+    else {
+      my $nod2 = $nod->clone;
+      $nod2->setDtr1($dtrs[0]);
+      $nod2->setDtr2($dtrs[1]);
+      $nod2->setDtr3($dtrs[2]);
+      return $nod2;
+    }
+  }
+  return $nod->clone; ##-- default
+}
+
+##--------------------------------------------------------------
+## %ATTR_SPECIFICITY = ($tokenAttributeName => $specificity, ...)
+##  + hack for estimating most-specific attrigbute for collocateCountQueries()
+##  + "proper" way to do this would be to query DDC info and compute domain sizes
+our (%ATTR_SPECIFICITY);
+BEGIN {
+  %ATTR_SPECIFICITY =
+    (
+     (map {($_=>1000)} qw(Utf8 u)),
+     (map {($_=> 900)} qw(Token w CanonicalToken v)),
+     (map {($_=> 500)} qw(Lemma l)),
+     (map {($_=>   5)} qw(Pos p)),
+     'DEFAULT' => 0,
+    );
+}
+
+##--------------------------------------------------------------
+## \@qcounts2 = $rel->collocateCountQueries($qcount,\%slice2prf,\%opts)
+## + gets a list of DDC::Any::CQCount object(s) for f2-acquisition given profile() options %opts
+## + %opts: as for countQuery(), DiaColloDB::Relation::DDC::profile(), etc.
+## + sets following keys in %opts:
+##   (
+##    needCountsByToken => $bool, ##-- see needCountsByToken()
+##   )
+sub collocateCountQueries {
+  my ($rel,$qcount,$y2prf,$opts) = @_;
+
+  ##-- check whether we're grouping by any token attributes for match-id =2
+  $opts->{needCountsByToken} //= $rel->needCountsByToken($qcount);
+
+  ##-- construct f2-queries
+  my (@qcounts2);
+  if ($opts->{needCountsByToken} && $opts->{onepass}) {
+    ##-- count-by token attributes, 1-pass mode (~ DiaColloDB <= v0.12.016)
+    my $qkeys2 = DDC::Any::CQKeys->new($qcount);
+    $qkeys2->setOptions($qcount->getDtr->getOptions);
+    $qkeys2->SetMatchId(2);
+    @qcounts2 = (DDC::Any::CQCount->new($qkeys2, $qcount->getKeys, $qcount->getSample, $qcount->getSort, $qcount->getLo, $qcount->getHi));
+  }
+  elsif ($opts->{needCountsByToken}) {
+    ##-- count-by token attributes, multi-pass mode (DiaColloDB >= v0.12.017)
+    #my $template = $rel->collocateQueryTemplate($qcount);
+    my @gbattrs  = map { UNIVERSAL::can($_,'getIndexName') ? $_->getIndexName : 'DEFAULT' } @{$opts->{gbexprs}->getExprs};
+    shift(@gbattrs); ##-- 1st projected attribute is ALWAYS date-slice
+
+    ##-- get "most-specific projected attribute" (MSPA): that projected attribute with most diverse value domain
+    ## + via hack using %ATTR_SPECIFICITY
+    ## + see also Cofreqs::subprofile2()
+    my $mspai = (sort {$b->[1]<=>$a->[1]} map {[$_,$ATTR_SPECIFICITY{$gbattrs[$_]}//0]} (0..$#gbattrs))[0][0];
+    my $mspa  = $gbattrs[$mspai];
+    $rel->logconfess("collocateCountQueries(): can't determine most specific projected attribute for f2 acquisition")
+      if ($mspa eq 'DEFAULT');
+
+    ##-- extract all MSPA-values
+    my %mspvals = qw();
+    foreach my $prf (values %$y2prf) {
+      $mspvals{(split(/\t/,$_,scalar(@gbattrs)))[$mspai]} = undef
+	foreach (keys %{$prf->{f12}});
+    }
+    my @mspvals = sort keys %mspvals;
+
+    ##-- construct daughter queries
+    my $max_qlen = 2048; ##-- ddc max = 4096
+    my ($val2);
+    my @qvals2 = qw();
+    my $qlen2  = 0;
+    while (defined($val2=shift(@mspvals))) {
+      push(@qvals2, $val2);
+      $qlen2 += (length($val2)+3); ##-- ",'${val}'"
+      if (!@mspvals || $qlen2 >= $max_qlen) {
+	my $qdtr2   = DDC::Any::CQTokSet->new($mspa,'',\@qvals2);
+	$qdtr2->setMatchId(2);
+	$qdtr2->setOptions($qcount->getDtr->getOptions);
+	push(@qcounts2,$qcount->clone);
+	$qcounts2[$#qcounts2]->setDtr($qdtr2);
+	@qvals2 = qw();
+	$qlen2 = 0;
+      }
+    }
+  }
+  else {
+    ##-- count-by file attributes only
+    my $qdtr2 = DDC::Any::CQTokAny->new;
+    #$qdtr2->SetMatchId(2); ##-- not needed here, file-attributes only
+    $qdtr2->setOptions($qcount->getDtr->getOptions);
+    my $qcount2 = $qcount->clone();
+    $qcount2->setDtr($qdtr2);
+    @qcounts2 = ($qcount->clone);
+  }
+
+  return \@qcounts2;
+}
+
+
+##--------------------------------------------------------------
+## $bool = $CLASS_OR_OBJECT->needCountsByToken($qcount)
+##  + returns true iff $qcount groups by any token attributes for match-id =2
+sub needCountsByToken {
+  my $that   = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+  my $qcount = shift;
+
+  ##-- check whether count-query uses any token-attributes
+  return grep {UNIVERSAL::can($_,'getMatchId') && $_->getMatchId==2} @{$qcount->getKeys->getExprs};
+}
+
 
 ##==============================================================================
 ## Pacakge Alias(es)

@@ -1,3 +1,9 @@
+0.495   2020-03-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump generated prereq version Log::ger 0.033 -> 0.037 (including
+	  in generated).
+
+
 0.494   2020-03-08  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump generated prereq version Log::ger 0.027 -> 0.033.

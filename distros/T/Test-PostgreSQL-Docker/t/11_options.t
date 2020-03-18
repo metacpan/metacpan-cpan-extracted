@@ -1,22 +1,25 @@
 use strict;
 use warnings;
+use lib qw(t/lib);
 use Test::More;
-use Test::PostgreSQL::Docker;
+use t::Util;
 
 my %opt = (
-    tag    => '12-alpine',
     dbname => 'testdb',
-    user   => 'foobar',
+    dbowner=> 'foobar',
 );
 
-my $server = Test::PostgreSQL::Docker->new(%opt);
+my $server = t::Util->new_server(%opt);
 
-ok $server->run(), "server is runing";
+unless ( $server->docker_is_running ) {
+    plan skip_all => "docker is not running.";
+    exit;
+}
 
 my $dsn = $server->dsn;
 
 
-is $server->{user}, 'foobar';
+is $server->{dbowner}, 'foobar';
 like $dsn, qr/dbname=testdb/;
 
 

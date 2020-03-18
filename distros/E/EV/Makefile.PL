@@ -373,7 +373,7 @@ EOF
 
 my $enable_assertions = 0;
 $enable_assertions = 0 + (prompt ("Make sure assertions are enabled? (y/n)?", $enable_assertions ? "y" : "n") =~ /[yY]/);
-$DEFINE .= " -DEV_ENABLE_ASERTIONS=1" if $enable_assertions;
+$DEFINE .= " -DEV_ENABLE_ASSERTIONS=1" if $enable_assertions;
 
 print <<EOF;
 

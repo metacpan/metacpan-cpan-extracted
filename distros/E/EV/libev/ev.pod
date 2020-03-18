@@ -1843,10 +1843,10 @@ starting an io watcher watching for no events you should do so.
 
 =item ev_io_modify (ev_io *, int events)
 
-Similar to C<ev_io_set>, but only changes the event mask. Using this might
-be faster with some backends, as libev can assume that the C<fd> still
-refers to the same underlying file description, something it cannot do
-when using C<ev_io_set>.
+Similar to C<ev_io_set>, but only changes the requested events. Using this
+might be faster with some backends, as libev can assume that the C<fd>
+still refers to the same underlying file description, something it cannot
+do when using C<ev_io_set>.
 
 =item int fd [no-modify]
 

@@ -1,5 +1,8 @@
 See the git repository. In particular:
 
+1.07    Still March 2020
+    * disable the problematic test on Windows systems
+
 1.06    Also March 2020
     * re-add necessary dependencies to Build.PL
 

@@ -9,7 +9,6 @@ README
 dist.ini
 lib/Form/Diva.pm
 lib/Form/Diva.pod
-presentation.html
 t/101_initialization.t
 t/102_fieldbits.t
 t/103_pieces.t

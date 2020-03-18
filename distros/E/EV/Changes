@@ -3,6 +3,13 @@ Revision history for Perl extension EV
 Changes marked with (libev) are changes in libev, and might have more
 documentation in the libev Changes file.
 
+4.33 Wed Mar 18 13:31:12 CET 2020
+	- the enable assertion makefile question failed to enable
+          assertions due to a typo.
+	- try harder to avoid perl's assert () which does not actually
+          behave correctly.
+        - updated libecb to make it compile under more windows environments.
+
 4.32 Fri Jan 24 14:21:35 CET 2020
 	- (libev) fixed a bug introduced in 4.31 when timerfds and signalfds were
           used at the same time.

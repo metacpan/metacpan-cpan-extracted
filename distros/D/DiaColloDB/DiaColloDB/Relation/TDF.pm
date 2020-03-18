@@ -1076,10 +1076,12 @@ sub vprofile {
 
   ##-- sanity checks: null-query
   my ($ti,$ci) = @$vq{qw(ti ci)};
-  if (defined($ti) && !$ti->nelem) {
-    $vs->logconfess($coldb->{error}="no index term(s) matched user query \`$opts->{query}'");
-  } elsif (defined($ci) && !$ci->nelem) {
-    $vs->logconfess($coldb->{error}="no index document(s) matched user query \`$opts->{query}'");
+  if (!$opts->{fill}) {
+    if (defined($ti) && !$ti->nelem) {
+      $vs->logconfess($coldb->{error}="no index term(s) matched user query \`$opts->{query}'");
+    } elsif (defined($ci) && !$ci->nelem) {
+      $vs->logconfess($coldb->{error}="no index document(s) matched user query \`$opts->{query}'");
+    }
   }
 
   ##-- get query-vector

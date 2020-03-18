@@ -131,6 +131,9 @@ L<DiaColloDB::Relation|DiaColloDB::Relation>.
  dmax       => $maxDistance,      ##-- default distance for near() queries (default=5; 1=immediate adjacency; ~ ddc CQNear.Dist+1)
  cfmin      => $minFreq,          ##-- default minimum frequency for count() queries (default=2)
  ##
+ ##-- logging options
+logTrunc => $nchars,              ##-- max length of query strings to log (default=256)
+ ##
  ##-- low-level data
  dclient   => $ddcClient,         ##-- a DDC::Client::Distributed object
 
@@ -206,8 +209,8 @@ get a relation profile for selected items as a DiaColloDB::Profile::Multi object
  $mprf = $rel->extend($coldb, %opts);
 
 Get independent f2 frequencies for C<$opts{slice2keys}> as a L<DiaColloDB::Profile::Multi|DiaColloDB::Profile::Multi>
-object.  Override generates a large approximate DDC batch-query and filters results.  May fail for large extension sets
-if the DDC server's request length limit (CHost.m_maxReceiveBytes = DDC_STATC_BUFLEN ?= 4096) is exceeded.
+object. May generate multiple DDC requests for large extension sets to avoid exceeding the underlying DDC server's
+request length limit (CHost.m_maxReceiveBytes = DDC_STATC_BUFLEN ?= 4096).
 
 =item compare
 
@@ -272,13 +275,55 @@ The default implementation should provide reasonable guesses for common query ty
 creates a L<DDC::XS::CQCount|DDC::XS::CQCount> object for profile() options %opts.
 sets following keys in %opts:
 
+ gbexprs => $gbexprs,      ##-- groupby expressions (DDC::Any::CQCountKeyExprList)
+ gbrestr => $gbrestr,      ##-- groupby item2 restrictions (DDC::Any::CQWith conjunction of token expressions)
+ gbfilters => \@gbfilters, ##-- groupby filter restrictions (ARRAY-ref of DDC::Any::CQFilter)
+ gbtitles => \@gbtitles,   ##-- groupby column titles (ARRAY-ref of strings)
  limit  => $limit,         ##-- hit return limit for ddc query
  dslo   => $dslo,          ##-- minimum date-slice, from @opts{qw(date slice fill)}
  dshi   => $dshi,          ##-- maximum date-slice, from @opts{qw(date slice fill)}
  dlo    => $dlo,           ##-- minimum date request (ddc)
  dhi    => $dhi,           ##-- maximum date request (ddc)
- fcoef  => $fcoef,         ##-- frequency coefficient, parsed from "#coef[N]", auto-generated if not set
+ fcoef  => $fcoef,         ##-- frequency coefficient, parsed from "#coef[N]", auto-generated for near() queries
  qtemplate => $qtemplate,  ##-- query template for ddc hit link-up
+ qcount1 => $qcount1,      ##-- count-query for f1 acquisition
+ fcoef1 => $fcoef1,        ##-- f1 coefficient for qcount1
+
+
+=item collocantCountQuery
+
+ $qcount1 = $rel->collocantCountQuery($qcount,$matchId)
+
+maps count-queries returned by L<countQuery()|/countQuery> to ${matchId}-item queries (default $matchid=1).
+
+=item itemCountNode
+
+ $nod2_or_undef = $rel->itemCountNode($nod,$matchId)
+
+Guts for L<collocantCountQuery()|/collocantCountQuery>:
+maps countQuery() nodes to ${matchId}-query nodes only;
+simplifies by removing extraneous CQBinOp, CQNear, and CQSeq nodes.
+
+=item collocateCountQueries
+
+ \@qcounts2 = $rel->collocateCountQueries($qcount,\%slice2prf,\%opts)
+
+Gets a list of DDC::Any::CQCount object(s) for f2-acquisition given profile() options %opts,
+which are as for L<countQuery()|/countQuery>,
+L<DiaColloDB::Relation::DDC::profile()|DDC::Relation/profile>, etc.
+Sets following keys in %opts:
+
+ needCountsByToken => $bool, ##-- see needCountsByToken()
+
+If $opts{onepass} option is set, generates a single large batch-query as for DiaColloDB E<lt>= v0.12.016,
+otherwise uses an overgenerating MSPA ("most specific projected attribute")
+query strategy which may return more than 1 query.
+
+=item needCountsByToken
+
+ $bool = $CLASS_OR_OBJECT->needCountsByToken($qcount)
+
+Returns true iff $qcount groups by any token attributes for match-id =2.
 
 =back
 

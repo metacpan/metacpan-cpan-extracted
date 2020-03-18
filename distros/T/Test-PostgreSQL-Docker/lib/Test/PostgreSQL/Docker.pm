@@ -2,18 +2,19 @@ package Test::PostgreSQL::Docker;
 use 5.014;
 use strict;
 use warnings;
-use Guard qw/guard/;
 use DBI;
 use DBD::Pg;
 use Sub::Retry qw/retry/;
 use Net::EmptyPort qw/empty_port/;
+use IPC::Run ();
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 our $DEBUG;
 
 sub new {
     my ($class, %opts) = @_;
     my $self = bless {
+        docker  => undef,
         pgname  => "postgres",
         tag     => 'latest',
         port    => empty_port(),
@@ -21,54 +22,114 @@ sub new {
         dbowner => "postgres",
         password=> "postgres",
         dbname  => "test",
+        print_docker_error => 1,
+        _orig_address => '',
         %opts,
     }, $class;
+    $self->{docker} = $self->_search_docker_path() unless $self->docker;
     $self->oid;
     return $self;
+}
+
+sub _search_docker_path {
+    my $self = shift;
+    my @paths = qw( /usr/bin /usr/local/bin );
+    my $decided;
+    for my $path ( @paths ) {
+        if ( -x "$path/docker" ) {
+            $decided = "$path/docker";
+            last;
+        }
+    }
+    return $decided;
+}
+
+sub _address {
+    my $self = shift;
+    ("$self" =~ /HASH\(0x([0-9a-f]+)\)/)[0];
 }
 
 sub oid {
     my ( $self ) = @_;
     return $self->{oid} if defined $self->{oid};
-    $self->{oid} = ("$self" =~ /HASH\(0x([0-9a-f]+)\)/)[0];
+    $self->{oid} = $self->_address;
 }
 
 sub pull {
     my ($self) = @_;
     my $image = $self->image_name();
-    $self->docker_cmd(pull => '--quiet', $image);
+    $self->docker_cmd(pull => ['--quiet', $image]);
     $self;
 }
 
 sub run {
     my ($self, %opt) = @_;
+
+    return $self unless $self->docker_daemon_is_accessible;
+    return $self if $self->docker_is_running;
+
     $self->pull() unless (exists $opt{skip_pull} ? $opt{skip_pull} : 1);
 
     my $image = $self->image_name();
     my $ctname = $self->container_name();
     my $class  = ref($self);
-    $self->{cleanup} = guard {
-        $self->{dbh}->disconnect() if defined $self->{dbh};
-        $class->docker_cmd(kill => $ctname); # $self is undef?
-    };
 
     my $host = $self->{host};
     my $user = $self->{dbowner};
     my $pass = $self->{password};
     my $port = $self->{port};
     my $dbname = $self->{dbname};
-    $self->docker_cmd(run => "--rm --name $ctname -p $host:$port:5432 -e POSTGRES_USER=$user -e POSTGRES_PASSWORD=$pass -e POSTGRES_DB=$dbname -d $image");
+    my @envs   = map { ('-e', $_) } "POSTGRES_USER=$user", "POSTGRES_PASSWORD=$pass", "POSTGRES_DB=$dbname";
+    my ( $out, $err ) = $self->docker_cmd(run => ['--rm', '--name', $ctname, '-p', "$host:$port:5432", @envs, '-d', "$image"]);
 
-    $self->dbh unless $opt{skip_connect};
+    if ( !$err or $err =~ /Status: Downloaded newer image for/) { # for auto pulling
+        $self->{docker_is_running} = 1;
+        $self->{_orig_address} = $self->_address;
+        $self->dbh unless $opt{skip_connect};
+    }
+
     $self;
 }
 
+sub DESTROY {
+    my ( $self ) = @_;
+    $self->{dbh}->disconnect() if defined $self->{dbh};
+    return if $self->_address ne $self->{_orig_address};
+    $self->docker_cmd(kill => [$self->container_name]) if $self->docker_is_running;
+}
+
+sub docker {
+    shift->{docker};
+}
+
+sub docker_is_running {
+    shift->{docker_is_running};
+}
+
+sub docker_daemon_is_accessible {
+    my ( $self ) = @_;
+    return unless -x $self->docker;
+    my ( $out, $err ) = $self->docker_cmd('ps');
+    $err ? 0 : 1;
+}
+
 sub docker_cmd {
-    my ( $self, $action, @args  ) = @_;
-    my $cmd = join(' ', 'docker', $action, @args);
-    $DEBUG && print STDERR $cmd,"\n";
-    `$cmd`;
-    $self;
+    my ( $self, $action, $args, $io ) = @_;
+    $args //= [];
+    my @cmds = ($self->docker, $action, @$args);
+    $DEBUG && print STDERR join(' ', @cmds),"\n";
+
+    my ( $in, $out, $err );
+    if ( $io ) {
+        IPC::Run::run( \@cmds, '<', ($io->{in} ? $io->{in} : \$in), '>', ($io->{out} ? $io->{out} : \$out), '2>', ($io->{err} ? $io->{err} : \$err) );
+    }
+    else {
+        IPC::Run::run \@cmds, \$in, \$out, \$err;
+    }
+
+    $self->{print_docker_error} && $err && print STDERR $err, "\n";
+
+    return ($out, $err);
 }
 
 sub psql_args {
@@ -77,19 +138,23 @@ sub psql_args {
         $self->{psql_args} = $_[0];
     }
     $self->{psql_args}
-        ||= sprintf('-h %s -p %s -U %s -d %s', $self->{host}, 5432, $self->{dbowner}, $self->{dbname});
+        ||= ['-h', $self->{host}, '-p', 5432, '-U', $self->{dbowner}, '-d',  $self->{dbname}];
 }
 
 sub run_psql {
     my ($self, @args) = @_;
+    my %io;
+    if ( ref($args[-1]) eq 'HASH' ) {
+        %io = %{ (pop @args) };
+    }
     $self->dbh(); ## waiting for DB connection
-    $self->docker_cmd( exec => '-i', $self->container_name, 'psql', $self->psql_args, @args );
+    $self->docker_cmd( exec => ['-i', $self->container_name, 'psql', @{$self->psql_args}, @args], \%io );
 }
 
 sub run_psql_scripts {
     my ($self, @scripts) = @_;
     for my $script ( @scripts ) {
-        $self->run_psql("< $script");
+        $self->run_psql({ in => $script });
     }
     $self;
 }
@@ -121,7 +186,9 @@ sub port {
 
 sub container_name {
     my ($self) = @_;
-    sprintf "%s-%s-%s", $self->{pgname}, $self->{tag}, $self->oid;
+    my $pgname = $self->{pgname};
+    $pgname =~ s/[^a-zA-Z0-9_.-]/__/g;
+    sprintf "%s-%s-%s", $pgname, $self->{tag}, $self->oid;
 }
 
 sub image_name {
@@ -172,7 +239,7 @@ Test::PostgreSQL::Docker - A Postgresql mock server for testing perl programs
 
 Test::PostgreSQL::Docker run the postgres container on the Docker, for testing your perl programs.
 
-B<**NOTE**> Maybe this module doesn't work on the Windows, because this module uses some backticks for use the Docker.
+B<**NOTE**> Maybe this module doesn't work on the Windows, because we don't any test on Windows machine.
 
 
 =head1 METHODS
@@ -182,6 +249,10 @@ B<**NOTE**> Maybe this module doesn't work on the Windows, because this module u
     $server = Test::PostgreSQL::Docker->new(%opt)
 
 =over 2
+
+=item docker (str)
+
+The path to C<docker>. Default is C</usr/bin/docker>.
 
 =item pgname (str)
 
@@ -206,6 +277,10 @@ Default is C<postgres>.
 =item dbname (str)
 
 Default is C<test>.
+
+=item print_docker_error (bool)
+
+Show docker error. Default is C<true value>.
 
 =back
 
@@ -279,12 +354,26 @@ Default is C<sprintf('-h %s -p %s -U %s -d %s', $self->{host}, 5432, $self->{dbo
 
     $server = $server->run_psql(@args)
 
-    $server->run_psql('-c', q|"INSERT INTO foo (bar) VALUES ('baz')"|);
+    $server->run_psql('-c', q|INSERT INTO foo (bar) VALUES ('baz')|);
 
 
 =head2 run_psql_scripts
 
     $server = $server->run_psql_scripts($path)
+
+
+=head2 docker_is_running
+
+    $server = $server->docker_is_running()
+
+Return true if docker container is running.
+
+
+=head2 docker_daemon_is_accessible
+
+    $server = $server->docker_daemon_is_accessible()
+
+Return true if docker daemon is accessible.
 
 
 =head1 REQUIREMENT
@@ -310,6 +399,7 @@ Satoshi Azuma E<lt>ytnobody@gmail.comE<gt>
 
 =head1 SEE ALSO
 
+L<Test::PostgreSQL>
 L<https://hub.docker.com/_/postgres>
 
 =cut

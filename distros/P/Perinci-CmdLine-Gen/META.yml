@@ -22,7 +22,7 @@ requires:
   Data::Dump: '0'
   Exporter: '5.57'
   File::Which: '0'
-  Log::ger: '0.033'
+  Log::ger: '0.037'
   Perinci::Access: '0'
   String::Indent: '0.03'
   perl: '5.010001'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Gen
   homepage: https://metacpan.org/release/Perinci-CmdLine-Gen
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Gen.git
-version: '0.494'
+version: '0.495'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

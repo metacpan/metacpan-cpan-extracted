@@ -26,11 +26,11 @@ no_index:
 provides:
   Test::PostgreSQL::Docker:
     file: lib/Test/PostgreSQL/Docker.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   DBD::Pg: '0'
   DBI: '0'
-  Guard: '0'
+  IPC::Run: '0'
   Net::EmptyPort: '0'
   Sub::Retry: '0'
   perl: '5.014'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/ytnobody/p5-Test-PostgreSQL-Docker/issues
   homepage: https://github.com/ytnobody/p5-Test-PostgreSQL-Docker
   repository: git://github.com/ytnobody/p5-Test-PostgreSQL-Docker.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:YTURTLE
 x_contributors:
   - 'makamaka <makamaka.donzoko@gmail.com>'

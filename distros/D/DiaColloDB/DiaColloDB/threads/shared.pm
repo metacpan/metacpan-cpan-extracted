@@ -32,8 +32,15 @@ BEGIN {
     }
     $MODULE //= '';
   }
-  *import = $MODULE ? UNIVERSAL::can($MODULE,'import') : sub {}
-    if (!UNIVERSAL::can(__PACKAGE__,'import'));
+}
+
+sub import {
+  if ($MODULE) {
+    #my $that   = shift;
+    my $caller = caller;
+    my $sub = eval qq{sub { package $caller; $MODULE->import(); } };
+    $sub->(@_);
+  }
 }
 
 1; ##-- be happy

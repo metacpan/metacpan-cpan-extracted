@@ -7,9 +7,11 @@ cpanfile
 lib/Test/PostgreSQL/Docker.pm
 minil.toml
 t/00_compile.t
+t/01_no_docker.t
 t/10_run.t
 t/11_options.t
 t/12_duplicated_run.t
 t/data/fixture.sql
+t/lib/t/Util.pm
 META.yml
 MANIFEST

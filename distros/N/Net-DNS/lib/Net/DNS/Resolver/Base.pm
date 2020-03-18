@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1762 2020-02-02 21:39:02Z willem $
+# $Id: Base.pm 1771 2020-02-25 14:23:23Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1762 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1771 $)[1];
 
 
 #
@@ -430,10 +430,11 @@ sub _send_tcp {
 	my $timeout = $self->{tcp_timeout};
 
 	foreach my $ip (@ns) {
-		my $socket = $self->_create_tcp_socket($ip) || next;
-		my $select = IO::Select->new($socket);
-
 		$self->_diag( 'tcp send', "[$ip]" );
+
+		my $socket = $self->_create_tcp_socket($ip);
+		$self->errorstring($!);
+		my $select = IO::Select->new( $socket || next );
 
 		$socket->send($tcp_packet);
 		$self->errorstring($!);
@@ -565,9 +566,11 @@ sub _bgsend_tcp {
 	my $tcp_packet = pack 'n a*', length($packet_data), $packet_data;
 
 	foreach my $ip ( $self->nameservers ) {
-		my $socket = $self->_create_tcp_socket($ip) || next;
-
 		$self->_diag( 'bgsend', "[$ip]" );
+
+		my $socket = $self->_create_tcp_socket($ip);
+		$self->errorstring($!);
+		next unless $socket;
 
 		$socket->blocking(0);
 		$socket->send($tcp_packet);
@@ -756,15 +759,16 @@ sub _axfr_start {
 	my $content = $request->data;
 	my $TCP_msg = pack 'n a*', length($content), $content;
 
-	$self->_diag("axfr_start( $dname @class )");
+	$self->_diag("axfr( $dname @class )");
 
 	my ( $select, $reply, $rcode );
 	foreach my $ns ( $self->nameservers ) {
-		my $socket = $self->_create_tcp_socket($ns) || next;
+		$self->_diag("axfr send [$ns]");
 
-		$self->_diag("axfr_start nameserver [$ns]");
+		my $socket = $self->_create_tcp_socket($ns);
+		$self->errorstring($!);
+		$select = IO::Select->new( $socket || next );
 
-		$select = IO::Select->new($socket);
 		$socket->send($TCP_msg);
 		$self->errorstring($!);
 

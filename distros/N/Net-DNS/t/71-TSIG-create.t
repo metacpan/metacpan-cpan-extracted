@@ -1,4 +1,4 @@
-# $Id: 71-TSIG-create.t 1748 2019-07-15 07:57:00Z willem $	-*-perl-*-
+# $Id: 71-TSIG-create.t 1774 2020-03-18 07:49:22Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -49,12 +49,6 @@ close KEY;
 {
 	my $tsig = create $class($keyrr);
 	is( ref($tsig), $class, 'create TSIG from KEY RR' );
-}
-
-
-{
-	my $tsig = create $class( $keyrr->owner, $keyrr->key );
-	is( ref($tsig), $class, 'create TSIG from argument list' );
 }
 
 
@@ -148,6 +142,15 @@ close KEY;
 	eval { create $class($dnskey); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "unrecognised public key\t[$exception]" );
+}
+
+
+{
+	my @warning;
+	local $SIG{__WARN__} = sub { @warning = @_ };
+	create $class( $keyrr->owner, $keyrr->key );
+	my ($warning) = split /\n/, "@warning\n";
+	ok( $warning, "2-argument create:\t[$warning]" );
 }
 
 

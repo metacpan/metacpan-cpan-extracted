@@ -1,7 +1,7 @@
 /*
  * libev event processing core, watcher management
  *
- * Copyright (c) 2007-2019 Marc Alexander Lehmann <libev@schmorp.de>
+ * Copyright (c) 2007-2020 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -651,7 +651,7 @@ struct signalfd_siginfo
 
 #include <string.h> /* for memcpy */
 
-#ifdef _WIN32
+#if defined (_WIN32) && !defined (__MINGW32__)
   typedef   signed char   int8_t;
   typedef unsigned char  uint8_t;
   typedef   signed char   int_fast8_t;

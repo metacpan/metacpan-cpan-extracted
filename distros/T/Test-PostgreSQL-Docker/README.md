@@ -36,13 +36,17 @@ Test::PostgreSQL::Docker - A Postgresql mock server for testing perl programs
 
 Test::PostgreSQL::Docker run the postgres container on the Docker, for testing your perl programs.
 
-**\*\*NOTE\*\*** Maybe this module doesn't work on the Windows, because this module uses some backticks for use the Docker.
+**\*\*NOTE\*\*** Maybe this module doesn't work on the Windows, because we don't any test on Windows machine.
 
 # METHODS
 
 ## new
 
     $server = Test::PostgreSQL::Docker->new(%opt)
+
+- docker (str)
+
+    The path to `docker`. Default is `/usr/bin/docker`.
 
 - pgname (str)
 
@@ -67,6 +71,10 @@ Test::PostgreSQL::Docker run the postgres container on the Docker, for testing y
 - dbname (str)
 
     Default is `test`.
+
+- print\_docker\_error (bool)
+
+    Show docker error. Default is `true value`.
 
 ## run
 
@@ -130,11 +138,23 @@ Default is `sprintf('-h %s -p %s -U %s -d %s', $self-`{host}, 5432, $self->{dbow
 
     $server = $server->run_psql(@args)
 
-    $server->run_psql('-c', q|"INSERT INTO foo (bar) VALUES ('baz')"|);
+    $server->run_psql('-c', q|INSERT INTO foo (bar) VALUES ('baz')|);
 
 ## run\_psql\_scripts
 
     $server = $server->run_psql_scripts($path)
+
+## docker\_is\_running
+
+    $server = $server->docker_is_running()
+
+Return true if docker container is running.
+
+## docker\_daemon\_is\_accessible
+
+    $server = $server->docker_daemon_is_accessible()
+
+Return true if docker daemon is accessible.
 
 # REQUIREMENT
 
@@ -155,4 +175,5 @@ Satoshi Azuma <ytnobody@gmail.com>
 
 # SEE ALSO
 
+[Test::PostgreSQL](https://metacpan.org/pod/Test::PostgreSQL)
 [https://hub.docker.com/\_/postgres](https://hub.docker.com/_/postgres)

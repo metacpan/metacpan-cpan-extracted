@@ -43,7 +43,7 @@
    "provides" : {
       "Music::Scala" : {
          "file" : "lib/Music/Scala.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "url" : "https://github.com/thrig/Music-Scala"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

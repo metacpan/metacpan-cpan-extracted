@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'GraphQL/Client.pm',
+    'GraphQL/Client/CLI.pm',
     'GraphQL/Client/http.pm',
     'GraphQL/Client/https.pm'
 );

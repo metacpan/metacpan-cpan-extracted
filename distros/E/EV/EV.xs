@@ -23,8 +23,13 @@ sv_fileno (SV *fh)
 
 #if EV_ENABLE_ASSERTIONS
 # undef NDEBUG
-# include <assert.h>
+#else
+# define NDEBUG 1
 #endif
+
+/* make sure we get a real assert, not perl's incompatible version */
+#undef assert
+#include <assert.h>
 
 #define EV_STANDALONE 1
 #define EV_PROTOTYPES 1

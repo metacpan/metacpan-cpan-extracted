@@ -145,7 +145,7 @@ sub addUtterance {
     my $self = shift;
     my $newUtterance = shift;
 
-    if($newUtterance->{id} =~ /((ti|ab)\.[\d]+)/) {
+    if($newUtterance->{id} =~ /((ti|ab|tx)\.[\d]+)/) {
 	$self->{utterances}{$1} = $newUtterance;
     }
     else {

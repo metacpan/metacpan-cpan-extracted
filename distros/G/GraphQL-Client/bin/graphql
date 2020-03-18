@@ -1,220 +1,18 @@
 #! perl
-# PODNAME: graphql
 # ABSTRACT: Command-line GraphQL client
+# PODNAME: graphql
+
 
 # FATPACK - Do not remove this line.
 
 use warnings;
 use strict;
 
-use Getopt::Long;
-use GraphQL::Client;
-use JSON::MaybeXS;
+use GraphQL::Client::CLI;
 
-our $VERSION = '0.601'; # VERSION
+our $VERSION = '0.602'; # VERSION
 
-my $version;
-my $help;
-my $manual;
-my $url;
-my $transport       = {};
-my $query           = '-';
-my $variables       = {};
-my $operation_name;
-my $format          = 'json:pretty';
-my $unpack          = 0;
-my $outfile;
-GetOptions(
-    'version'               => \$version,
-    'help|h|?'              => \$help,
-    'manual|man'            => \$manual,
-    'url|u=s'               => \$url,
-    'query|mutation=s'      => \$query,
-    'variables|vars|V=s'    => \$variables,
-    'variable|var|d=s%'     => \$variables,
-    'operation-name|n=s'    => \$operation_name,
-    'transport|t=s%'        => \$transport,
-    'format|f=s'            => \$format,
-    'unpack!'               => \$unpack,
-    'output|o=s'            => \$outfile,
-) or pod2usage(2);
-
-if ($version) {
-    print "graphql $VERSION\n";
-    exit 0;
-}
-if ($help) {
-    pod2usage(-exitval => 0, -verbose => 99, -sections => [qw(NAME SYNOPSIS OPTIONS)]);
-}
-if ($manual) {
-    pod2usage(-exitval => 0, -verbose => 2);
-}
-
-$url    = shift if !$url;
-$query  = shift if !$query || $query eq '-';
-
-if (!$url) {
-    print STDERR "The <URL> or --url option argument is required.\n";
-    pod2usage(2);
-}
-
-$transport = expand_vars($transport);
-
-if (ref $variables) {
-    $variables = expand_vars($variables);
-}
-else {
-    $variables = JSON::MaybeXS->new->decode($variables);
-}
-
-my $client = GraphQL::Client->new(url => $url);
-
-eval { $client->transport };
-if (my $err = $@) {
-    warn $err if $ENV{GRAPHQL_CLIENT_DEBUG};
-    print STDERR "Could not construct a transport for URL: $url\n";
-    print STDERR "Is this URL correct?\n";
-    pod2usage(2);
-}
-
-if (!$query || $query eq '-') {
-    print STDERR "Interactive mode engaged! Waiting for a query on <STDIN>...\n"
-        if -t STDIN; ## no critic (InputOutput::ProhibitInteractiveTest)
-    $query = do { local $/; <> };
-}
-
-my $resp = $client->execute($query, $variables, $operation_name, $transport);
-my $err  = $resp->{errors};
-$unpack = 0 if $err;
-my $data = $unpack ? $resp->{data} : $resp;
-
-if ($outfile) {
-    open(my $out, '>', $outfile) or die "Open $outfile failed: $!";
-    *STDOUT = $out;
-}
-
-print_data($data, $format);
-
-exit($unpack && $err ? 1 : 0);
-
-sub print_data {
-    my ($data, $format) = @_;
-    $format = lc($format || 'json:pretty');
-    if ($format eq 'json' || $format eq 'json:pretty') {
-        my %opts = (canonical => 1, utf8 => 1);
-        $opts{pretty} = 1 if $format eq 'json:pretty';
-        print JSON::MaybeXS->new(%opts)->encode($data);
-    }
-    elsif ($format eq 'yaml') {
-        eval { require YAML } or die "Missing dependency: YAML\n";
-        print YAML::Dump($data);
-    }
-    elsif ($format eq 'csv' || $format eq 'tsv' || $format eq 'table') {
-        my $sep = $format eq 'tsv' ? "\t" : ',';
-
-        my $unpacked = $data;
-        $unpacked = $data->{data} if !$unpack && !$err;
-
-        # check the response to see if it can be formatted
-        my @columns;
-        my $rows = [];
-        if (keys %$unpacked == 1) {
-            my ($val) = values %$unpacked;
-            if (ref $val eq 'ARRAY') {
-                my $first = $val->[0];
-                if ($first && ref $first eq 'HASH') {
-                    @columns = sort keys %$first;
-                    $rows = [
-                        map { [@{$_}{@columns}] } @$val
-                    ];
-                }
-                elsif ($first) {
-                    @columns = keys %$unpacked;
-                    $rows = [map { [$_] } @$val];
-                }
-            }
-        }
-
-        if (@columns) {
-            if ($format eq 'table') {
-                eval { require Text::Table::Any } or die "Missing dependency: Text::Table::Any\n";
-                my $table = Text::Table::Any::table(
-                    header_row  => 1,
-                    rows        => [[@columns], @$rows],
-                    backend     => $ENV{PERL_TEXT_TABLE},
-                );
-                print $table;
-            }
-            else {
-                eval { require Text::CSV } or die "Missing dependency: Text::CSV\n";
-                my $csv = Text::CSV->new({binary => 1, sep => $sep, eol => $/});
-                $csv->print(*STDOUT, [@columns]);
-                for my $row (@$rows) {
-                    $csv->print(*STDOUT, $row);
-                }
-            }
-        }
-        else {
-            print_data($data);
-            print STDERR sprintf("Error: Response could not be formatted as %s.\n", uc($format));
-            exit 3;
-        }
-    }
-    elsif ($format eq 'perl') {
-        eval { require Data::Dumper } or die "Missing dependency: Data::Dumper\n";
-        print Data::Dumper::Dumper($data);
-    }
-    else {
-        print STDERR "Error: Format not supported: $format\n";
-        print_data($data);
-        exit 3;
-    }
-}
-
-sub expand_vars {
-    my $vars = shift;
-
-    my %out;
-    while (my ($key, $value) = each %$vars) {
-        my $var = $value;
-        my @segments = split(/\./, $key);
-        for my $segment (reverse @segments) {
-            my $saved = $var;
-            if ($segment =~ /^(\d+)$/) {
-                $var = [];
-                $var->[$segment] = $saved;
-            }
-            else {
-                $var = {};
-                $var->{$segment} = $saved;
-            }
-        }
-        %out = (%out, %$var);
-    }
-
-    return \%out;
-}
-
-sub pod2usage {
-    eval { require Pod::Usage };
-    if ($@) {
-        my $ref  = $VERSION eq '999.999' ? 'master' : "v$VERSION";
-        my $exit = (@_ == 1 && $_[0] =~ /^\d+$/ && $_[0]) //
-                   (@_ % 2 == 0 && {@_}->{'-exitval'})    // 2;
-        print STDERR <<END;
-Online documentation is available at:
-
-  https://github.com/chazmcgarvey/graphql-client/blob/$ref/README.md
-
-Tip: To enable inline documentation, install the Pod::Usage module.
-
-END
-        exit $exit;
-    }
-    else {
-        goto &Pod::Usage::pod2usage;
-    }
-}
+GraphQL::Client::CLI->main(@ARGV);
 
 __END__
 
@@ -228,7 +26,7 @@ graphql - Command-line GraphQL client
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -299,7 +97,8 @@ Aliases: C<--vars>, C<-V>
 
 =head2 C<--variable KEY=VALUE>
 
-An alternative way to provide variables. Repeat this option to provide multiple variables.
+An alternative way to provide variables one at a time. This option can be repeated to provide
+multiple variables.
 
 If used in combination with L</"--variables JSON">, this option is silently ignored.
 
@@ -485,6 +284,10 @@ C<GRAPHQL_CLIENT_HTTP_USER_AGENT> - Set the HTTP user agent string.
 
 =item *
 
+C<GRAPHQL_CLIENT_OPTIONS> - Set the default set of options.
+
+=item *
+
 C<PERL_TEXT_TABLE> - Set table format backend; see L</FORMAT>.
 
 =back
@@ -510,6 +313,16 @@ C<2> - Option usage is wrong
 =item *
 
 C<3> - Could not format the response as requested
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<GraphQL::Client> - Programmatic interface
 
 =back
 

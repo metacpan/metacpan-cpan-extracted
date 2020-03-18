@@ -8,3 +8,6 @@ Revision history for Mojolicious::Command::scaffold
 
 0.0.3   2019-09-30
         When creating migrations, check if the rollback statement is needed
+
+0.0.4   2020-03-18
+        Bugfix for template stub

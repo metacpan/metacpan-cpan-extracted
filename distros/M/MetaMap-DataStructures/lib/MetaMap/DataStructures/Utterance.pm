@@ -57,6 +57,8 @@ sub new {
     $self->{inputText} = shift;
     $self->{id} = shift;
     $self->{text} = shift;
+    $self->{startPosInfo} = shift;
+    $self->{length} = shift;
     $self->{phrases} = shift;
    
     return $self;
@@ -83,9 +85,11 @@ sub createFromText {
     }
 
     #grab the id and text
-    $inputText =~ /utterance\('(.*)',"(.*)",/;
+    $inputText =~ /utterance\('(.*)',"(.*)",(\d+)\/(\d+)/;
     my $id = $1;
     my $text = $2;
+    my $startPosInfo = $3;
+    my $length = $4;
 
     #create the phrases list
     my @phraseTexts = split /phrase\(/, $inputText;
@@ -105,7 +109,7 @@ sub createFromText {
 
     #create and return the new utterance
     return MetaMap::DataStructures::Utterance->new(
-	$inputText, $id, $text, \@phrases);
+	$inputText, $id, $text, $startPosInfo, $length, \@phrases);
 }
 
 #  method creates and returns an utterance from text 
@@ -137,9 +141,11 @@ sub createFromTextWithId {
     }
 
     #grab the id and text
-    $inputText =~ /utterance\('(.*)',"(.*)",/;
+    $inputText =~ /utterance\('(.*)',"(.*)",(\d+)\/(\d+)/;
     my $aid = $1;
     my $text = $2;
+    my $startPosInfo = $3;
+    my $length = $4;
 
     #create the phrases list
     my @phraseTexts = split /phrase\(/, $inputText;
@@ -159,7 +165,7 @@ sub createFromTextWithId {
 
     #create and return the new utterance
     return MetaMap::DataStructures::Utterance->new(
-	$inputText, $id, $text, \@phrases);
+	$inputText, $id, $text, $startPosInfo, $length, \@phrases);
 }
 
 #----------------------------------------
@@ -174,6 +180,8 @@ sub toString {
     my $string = "utterance:\n";
     $string .= "   $self->{id}\n";
     $string .= "   $self->{text}\n";
+    $string .= "   $self->{startPosInfo}\n";
+    $string .= "   $self->{length}\n";
     
     #add each phrase to the string
     foreach my $phrase(@{$self->{phrases}}) {

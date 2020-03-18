@@ -323,13 +323,26 @@ sub profile {
   my ($cli,$rel,%opts) = @_;
 
   ##-- kludge: ddc metaserver dispatch
+  ## + BUG 2020-03-13a: incorrect f2 values (too low) from %xkeys-like situations for metacorpora
+  ##   - f2 values are queried with COUNT(KEYS(...)), so f2 gets overlooked for physical subcorpora whenever f12=0 but f2>0
+  ##   - "proper" workaround would be iterative f2-acquisition in Relation::DDC (beware of ddc query size limit = 4kB)
+  ##      * maybe via dynamic "groupby" clause generation?
+  ##      * maybe by passing literal groupby-tuples to DDC (e.g. COUNT( $(l,p)={[Haus,NN],[laufen,VVFIN],...} ) ?
+  ##      * maybe by post-filtering DDC counts?
+  ##   - "hacky" workaround might use lexdb (if present ... another infrastructure variable to worry about)
+  ## + BUG 2020-03-13b: disabling this to force default %xkeys strategy doesn't help
+  ##   - b/c "ddcServer" option isn't set for list-client daughters --> no DDC relation for daughters
+  ##   - even if we tweaked *that* in, we'd still have (f12=0,f2>0) cases in physical subcorpora, which would get mis-counted
+  ##   - best overall workaround is probably to ditch KEYS() and do full iterative f2-acquisition in Relation::DDC,
+  ##     then re-implement DDC::extend() as iterative profile()
   return $cli->ddcMeta('profile',$rel,%opts) if ($rel eq 'ddc' && $cli->{ddcServer});
 
   ##-- defaults
   DiaColloDB->profileOptions(\%opts);
 
   ##-- fudge coefficient
-  my $fudge  = ($rel eq 'ddc' ? -1 : $cli->{fudge}) // 0; ##-- ddc relation always stringifies: fetch full sub-results in 1st pass (disable extend())
+  ## + disabled for ddc relation always stringifies: fetch full f12 sub-results in 1st pass (b/c DDC::extend() only updates f2)
+  my $fudge  = ($rel eq 'ddc' ? -1 : $cli->{fudge}) // 0;
   my $kbest  = $opts{kbest} // 0;
   my $kfudge = ($fudge < 0 ? -1
                 : ($fudge == 0 ? $kbest
@@ -339,14 +352,24 @@ sub profile {
   ##-- query clients
   my @mps = $cli->subcall(sub {
 			    my $sub = $_[0]->client($_[1]);
-			    $sub->profile($rel,%opts,strings=>1,kbest=>$kfudge,cutoff=>0,fill=>1)
+			    $sub->profile($rel,%opts,strings=>1,kbest=>$kfudge,cutoff=>'',fill=>1)
 			      or $_[0]->logconfess("profile() failed for client URL $sub->{url}: $sub->{error}");
 			  });
 
-  if ($cli->{extend} && @mps > 1 && $rel ne 'ddc') {
+  if ($cli->{extend} && @mps > 1) {
     $cli->vlog($cli->{logFudge}, "profile(): extending sub-profiles");
 
-    ##-- fill-out multi-profiles (ensure compatible slice-partitioning & find "missing" keys)
+    ##-- extend: delayed fudge-coefficient for DDC profiles
+    if ($rel eq 'ddc' && ($cli->{fudge}//0) > 0) {
+      $cli->vlog($cli->{logFudge}, "profile(): fudging DDC sub-profiles");
+      $fudge  = $cli->{fudge}//0;
+      $kfudge = ($fudge == 0 ? $kbest : ($fudge * $kbest));
+      foreach my $mp (@mps) {
+	$mp->compile($opts{score}, eps=>$opts{eps})->trim(global=>$opts{global}, drop=>[''], kbest=>$kfudge, cutoff=>$opts{cutoff}, empty=>0);
+      }
+    }
+
+    ##-- extend: fill-out multi-profiles (ensure compatible slice-partitioning & find "missing" keys)
     DiaColloDB::Profile::Multi->xfill(\@mps);
     my $xkeys = DiaColloDB::Profile::Multi->xkeys(\@mps);
     #$cli->trace("extend(): xkeys=", DiaColloDB::Utils::saveJsonString($xkeys, utf8=>0));
@@ -356,9 +379,10 @@ sub profile {
     my @mpx = $cli->subcall(sub {
 			      #return undef if (!$xkeys->[$_[1]] || !grep {@$_} values(%{$xkeys->[$_[1]]})); ##-- don't need extend here
 			      my $sub = $_[0]->client($_[1]);
-			      $sub->extend($rel,%opts,strings=>1,score=>'f',cutoff=>0,fill=>1,slice2keys=>JSON::to_json($xkeys->[$_[1]], {allow_nonref=>1}))
+			      $sub->extend($rel,%opts,strings=>1,score=>'f',cutoff=>'',fill=>1,slice2keys=>JSON::to_json($xkeys->[$_[1]], {allow_nonref=>1}))
 				or $_[0]->logconfess("extend() failed for client url $sub->{url}: $sub->{error}");
 			    });
+
     foreach (0..$#mpx) {
       $mps[$_]->_add($mpx[$_], N=>0,f1=>0) if (defined($mpx[$_]));
     }
@@ -456,8 +480,11 @@ sub ddcMeta {
   $cli->vlog('trace', "ddcMeta(): dispatching to $cli->{ddcServer}");
 
   ##-- create temporary dummy DiaColloDB object
+  ## + force sort attributes, otherwise we get different default attribute orders for different clients
   my $dbinfo = $cli->dbinfo();
-  my $coldb  = DiaColloDB->new( attrs=>$dbinfo->{attrs}, ddcServer=>$cli->{ddcServer} )
+  my $coldb  = DiaColloDB->new(ddcServer=>$cli->{ddcServer},
+                               attrs=>[sort map {$_->{name}} @{$dbinfo->{attrs}}],
+                              )
     or $cli->logconfess("ddcMeta(): failed to create DiaColloDB wrapper object");
   $coldb->{ddc} = DiaColloDB::Relation::DDC->create($coldb);
 

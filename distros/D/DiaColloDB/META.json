@@ -4,7 +4,7 @@
       "Bryan Jurish <moocow@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
    "license" : [
       "perl_5"
    ],
@@ -69,6 +69,5 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "v0.12.016",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "v0.12.017"
 }

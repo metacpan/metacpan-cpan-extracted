@@ -9,7 +9,7 @@ use HTTP::AnyUA::Util qw(www_form_urlencode);
 use HTTP::AnyUA;
 use namespace::clean;
 
-our $VERSION = '0.601'; # VERSION
+our $VERSION = '0.602'; # VERSION
 
 sub _croak { require Carp; goto &Carp::croak }
 
@@ -90,6 +90,8 @@ sub _handle_error {
     my $reason  = $resp->{reason}  // '';
     my $message = "HTTP transport returned $resp->{status} ($reason): $content";
 
+    chomp $message;
+
     return {
         error       => $message,
         response    => $data,
@@ -169,7 +171,7 @@ GraphQL::Client::http - GraphQL over HTTP
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -279,8 +281,8 @@ See L</ATTRIBUTES>.
 
 Get a response from the GraphQL server.
 
-The C<%data> structure must have a C<query> key whose value is the query or mutation string. It may
-optionally have a C<variables> hashref and an C<operationName> string.
+The C<%request> structure must have a C<query> key whose value is the query or mutation string. It
+may optionally have a C<variables> hashref and an C<operationName> string.
 
 The C<%options> structure is optional and may contain options passed through to the user agent. The
 only useful options are C<headers> (which should have a hashref value) and C<method> and C<url> to
@@ -294,7 +296,7 @@ such a hashref:
             data   => {...},
             errors => [...],
         },
-        error       => 'Something happened',    # may be ommitted if no error occurred
+        error       => 'Something happened',    # omitted if no error occurred
         details     => {    # optional information which may aide troubleshooting
         },
     }

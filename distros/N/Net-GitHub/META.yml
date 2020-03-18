@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/fayland/perl-net-github/issues
   homepage: https://github.com/fayland/perl-net-github
   repository: https://github.com/fayland/perl-net-github.git
-version: '0.96'
+version: '0.97'
 x_contributors:
   - 'Alan Berndt <alan@eatabrick.org>'
   - 'Alex Muntada <alexm@alexm.org>'
@@ -82,6 +82,7 @@ x_contributors:
   - 'sunnavy <sunnavy@bestpractical.com>'
   - 'Tim Vroom <vroom@blockstackers.com>'
   - 'Todd Rinaldo <toddr@cpanel.net>'
+  - 'Todd Rinaldo <toddr@cpan.org>'
   - 'unknown <Administrator@.(none)>'
   - 'Vincent Lequertier <sky@riseup.net>'
   - 'Will Orr <will@worrbase.com>'

@@ -96,12 +96,13 @@ static OP *S_parse_sigelem(pTHX)
     lex_read_unichar(0);
     while(isALNUM_uni(lex_peek_unichar(0)))
       lex_read_unichar(0);
-    lex_read_space(0);
 
     varop = newUNOP_AUX(OP_ARGELEM, 0, NULL, INT2PTR(UNOP_AUX_item *, (parser->sig_elems)));
     varop->op_private |= flags;
 
     varop->op_targ = pad_add_name_pvn(lexname, PL_parser->bufptr - lexname, 0, NULL, NULL);
+
+    lex_read_space(0);
   }
 
   if(c == '$') {

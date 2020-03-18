@@ -1,9 +1,9 @@
 package Net::DNS::RR::ZONEMD;
 
 #
-# $Id: ZONEMD.pm 1761 2020-01-01 11:58:34Z willem $
+# $Id: ZONEMD.pm 1771 2020-02-25 14:23:23Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1761 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1771 $)[1];
 
 
 use strict;
@@ -27,14 +27,14 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset ) = @_;
 
 	my $rdata = substr $$data, $offset, $self->{rdlength};
-	@{$self}{qw(serial digtype parameter digestbin)} = unpack 'NC2a*', $rdata;
+	@{$self}{qw(serial scheme algorithm digestbin)} = unpack 'NC2a*', $rdata;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'NC2a*', @{$self}{qw(serial digtype parameter digestbin)};
+	pack 'NC2a*', @{$self}{qw(serial scheme algorithm digestbin)};
 }
 
 
@@ -42,7 +42,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my @digest = split /(\S{64})/, $self->digest || qq("");
-	my @rdata  = ( @{$self}{qw(serial digtype parameter)}, @digest );
+	my @rdata  = ( @{$self}{qw(serial scheme algorithm)}, @digest );
 }
 
 
@@ -50,8 +50,8 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
 	$self->serial(shift);
-	$self->digtype(shift);
-	$self->parameter(shift);
+	$self->scheme(shift);
+	$self->algorithm(shift);
 	$self->digest(@_);
 }
 
@@ -59,7 +59,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
-	$self->_parse_rdata( 0, 1, 0, '' );
+	$self->_parse_rdata( 0, 1, 1, '' );
 }
 
 
@@ -71,19 +71,19 @@ sub serial {
 }
 
 
-sub digtype {
+sub scheme {
 	my $self = shift;
 
-	$self->{digtype} = 0 + shift if scalar @_;
-	$self->{digtype} || 0;
+	$self->{scheme} = 0 + shift if scalar @_;
+	$self->{scheme} || 0;
 }
 
 
-sub parameter {
+sub algorithm {
 	my $self = shift;
 
-	$self->{parameter} = 0 + shift if scalar @_;
-	$self->{parameter} || 0;
+	$self->{algorithm} = 0 + shift if scalar @_;
+	$self->{algorithm} || 0;
 }
 
 
@@ -109,7 +109,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR("zone. ZONEMD 2018121500 1 0
+    $rr = new Net::DNS::RR("example.com. ZONEMD 2018031500 1 1
 	FEBE3D4CE2EC2FFA4BA99D46CD69D6D29711E55217057BEE
 	7EB1A7B641A47BA7FED2DD5B97AE499FAFA4F22C6BD647DE");
 
@@ -134,19 +134,22 @@ other unpredictable behaviour.
 
 Unsigned 32-bit integer zone serial number.
 
-=head2 digtype
+=head2 scheme
 
-    $digtype = $rr->digtype;
-    $rr->digtype( $digtype );
+    $scheme = $rr->scheme;
+    $rr->scheme( $scheme );
 
-8-bit integer digest type field.
+The scheme field is an 8-bit unsigned integer that identifies the
+methods by which data is collated and presented as input to the
+hashing function.
 
-=head2 parameter
+=head2 algorithm
 
-    $parameter = $rr->parameter;
-    $rr->parameter( $parameter );
+    $algorithm = $rr->algorithm;
+    $rr->algorithm( $algorithm );
 
-Digest algorithm parameter field.
+The algorithm field is an 8-bit unsigned integer that identifies
+the cryptographic hash algorithm used to construct the digest.
 
 =head2 digest
 

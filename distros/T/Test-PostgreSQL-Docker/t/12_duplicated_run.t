@@ -1,21 +1,22 @@
 use strict;
 use warnings;
+use lib qw(t/lib);
 use Test::More;
-use Test::PostgreSQL::Docker;
+use t::Util;
 
-my %opt = (
-    tag    => '12-alpine',
-);
 
-my $server1 = Test::PostgreSQL::Docker->new(%opt);
+my $server1 = t::Util->new_server();
 
-ok $server1->run(), "server1 is runing";
+unless ( $server1->docker_is_running ) {
+    plan skip_all => "docker is not running.";
+    exit;
+}
 
 my $dsn1 = $server1->dsn;
 my $dbh1 = DBI->connect($server1->dsn(dbname => 'template1'), '', '', {});
 ok $dbh1, 'create dbh by DBI';
 
-my $server2 = Test::PostgreSQL::Docker->new(%opt);
+my $server2 = Test::PostgreSQL::Docker->new( t::Util->default_args_for_new );
 
 ok $server2->run(), "server2 is runing";
 

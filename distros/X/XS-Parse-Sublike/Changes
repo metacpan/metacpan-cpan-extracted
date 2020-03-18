@@ -1,5 +1,20 @@
 Revision history for XS-Parse-Sublike
 
+0.04    2020-03-18
+        [CHANGES]
+         * Pass a required module version number to boot_xs_parse_sublike()
+         * Added lots of unit tests
+
+0.03    2020-03-18
+        [CHANGES]
+         * Added xs_parse_sublike_any() allowing custom keywords to combine
+           with registered hooks
+
+        [BUGFIXES]
+         * Avoid double-free of sigops in case of parse failure
+         * Fix hax/parse_subsignature.c.inc for named parameters with default
+           expressions
+
 0.02    2020-03-17
         [CHANGES]
          * Added `register_xs_parse_sublike()` and the `permit` hook stage

@@ -2,6 +2,18 @@
 ##
 ## Change log for perl distribution DiaColloDB
 
+v0.12.017 Wed, 18 Mar 2020 16:05:32 +0100 moocow
+	* disabled null-query sanity checks in TDF ("no index documents(s) matched user query") if "fill" option is active
+	  (used by diff profiles and list clients)
+	* fixed attribute resolution bug in Client::list::ddcMeta()
+	* fixed import snafu for DiaColloDB::threads::shared
+	* fixed xkeys-like bug on physical subcorpus level for Relation::DDC
+	  - workaround may generate multiple f2 queries using Cofreqs-style MSPA (most-specific-projected-attribute) strategy
+	  - old code still in place, activated by setting the (onepass=>1) request option
+	* re-implemented Relation::DDC::extend() - f2 acquisition only
+	* fixed (cutoff=>0) override in list-client subcalls; now correctly disables cutoff pruning with (cutoff=>'')
+	* added post-hoc 'fudge' for list-client multi-DDC profiles (avoid too many f2 items)
+
 v0.12.016 Wed, 11 Mar 2020 14:05:15 +0100 moocow
 	* added DiaColloDB::threads, DiaColloDB::threads::shared - attempt to wrap threads/forks support
 	* updated $TDF_MGOOD_DEFAULT regex (added fields country|region|party|role)

@@ -4,7 +4,7 @@ no warnings 'uninitialized';
 
 package Form::Diva;
 
-our $VERSION='1.02';
+our $VERSION='1.03';
 
 # use Data::Printer;
 
@@ -423,7 +423,7 @@ Form::Diva - Generate HTML5 form label and input fields
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 AUTHOR
 

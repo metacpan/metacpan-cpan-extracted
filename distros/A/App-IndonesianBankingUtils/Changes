@@ -1,3 +1,8 @@
+0.144   2020-03-18  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with updated Log::ger* modules.
+
+
 0.143   2019-10-15  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Add missing dependencies:
@@ -77,7 +82,7 @@
 	  requirement.
 
 
-0.04    2015-08-17 (PERLANCAR) - happy belated 20th CPAN day & dirgahayu 70th kemerdekaan RI!
+0.04    2015-08-17  Released-By: PERLANCAR; Message: happy belated 20th CPAN day & dirgahayu 70th kemerdekaan RI!
 
         - Add scripts from other dists: list-id-bank-cards, list-id-banks,
           list-bca-branches, parse-bca-account, list-mandiri-branches,

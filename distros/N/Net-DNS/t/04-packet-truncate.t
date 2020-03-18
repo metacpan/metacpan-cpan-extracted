@@ -1,4 +1,4 @@
-# $Id: 04-packet-truncate.t 1449 2016-02-01 12:27:12Z willem $ -*-perl-*-
+# $Id: 04-packet-truncate.t 1774 2020-03-18 07:49:22Z willem $ -*-perl-*-
 
 use strict;
 use Test::More tests => 33;
@@ -54,7 +54,9 @@ my @rr = $source->read;
 	$packet->push( authority  => @rr );
 	$packet->push( additional => @rr );
 
-	my $tsig = eval { $packet->sign_tsig( 'tsig.example', 'ARDJZgtuTDzAWeSGYPAu9uJUkX0=' ) };
+	my $keyrr = new Net::DNS::RR('tsig.example KEY 512 3 157 ARDJZgtuTDzAWeSGYPAu9uJUkX0=');
+
+	my $tsig = eval { $packet->sign_tsig($keyrr) };
 
 	my $unlimited = length $packet->data;
 	my %before    = map { ( $_, scalar $packet->$_ ) } qw(answer authority additional);

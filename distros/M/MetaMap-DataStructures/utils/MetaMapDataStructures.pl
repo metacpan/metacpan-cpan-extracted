@@ -144,16 +144,22 @@ open (OUT, ">$outFileName") ||  die "Could not open output file: $outFileName\n"
 
 #read each utterance
 my $input = '';
-print STDERR "Reading Input\n";
+my $idCount = 1;
+my @citationOrder = ();
 while(<IN>) {
     #build a string until the utterance has been read in
     chomp $_;
     $input .= $_;
     if ($_ eq "\'EOU\'.") {
-	$datastructures->createFromText($input); 
+	my $id = 'ab.'.$idCount;
+	$datastructures->createFromTextWithId($input,$id); 
 	$input = '';
+	$idCount++;
+	push @citationOrder, $id;
     }
 }
+close IN;
+
 
 my $citations = $datastructures->getCitations(); 
 

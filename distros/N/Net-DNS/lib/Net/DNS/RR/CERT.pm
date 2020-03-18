@@ -1,9 +1,9 @@
 package Net::DNS::RR::CERT;
 
 #
-# $Id: CERT.pm 1729 2019-01-28 09:45:47Z willem $
+# $Id: CERT.pm 1773 2020-03-17 08:40:55Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1729 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1773 $)[1];
 
 
 use strict;
@@ -69,7 +69,7 @@ my %certtype = (
 	my %algbyval = reverse @algbyname;
 
 	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
-	my %algbyname = @algrehash;    # work around broken cperl
+	my %algbyname = @algrehash;				# work around broken cperl
 
 	sub _algbyname {
 		my $arg = shift;
@@ -106,8 +106,8 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my @base64 = split /\s+/, encode_base64( $self->{certbin} );
-	my @rdata = ( $self->certtype, $self->keytag, $self->algorithm, @base64 );
+	my @param = ( $self->certtype, $self->keytag, $self->algorithm );
+	my @rdata = ( @param, split /\s+/, encode_base64( $self->{certbin} ) );
 }
 
 

@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A GraphQL client",
+  "ABSTRACT" => "Command-line GraphQL client",
   "AUTHOR" => "Charles McGarvey <chazmcgarvey\@brokenzipper.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -21,12 +21,13 @@ my %WriteMakefileArgs = (
   "NAME" => "GraphQL::Client",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Getopt::Long" => 0,
+    "Getopt::Long" => "2.39",
     "HTTP::AnyUA" => 0,
     "HTTP::AnyUA::Util" => 0,
     "JSON::MaybeXS" => 0,
     "Module::Load" => 0,
     "Scalar::Util" => 0,
+    "Text::ParseWords" => 0,
     "namespace::clean" => 0,
     "overload" => 0,
     "parent" => 0,
@@ -46,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.601",
+  "VERSION" => "0.602",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,7 +60,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "FindBin" => 0,
   "Future" => 0,
-  "Getopt::Long" => 0,
+  "Getopt::Long" => "2.39",
   "HTTP::AnyUA" => 0,
   "HTTP::AnyUA::Backend" => 0,
   "HTTP::AnyUA::Util" => 0,
@@ -71,6 +72,7 @@ my %FallbackPrereqs = (
   "Test::Deep" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Text::ParseWords" => 0,
   "lib" => 0,
   "namespace::clean" => 0,
   "overload" => 0,

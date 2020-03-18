@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::cpanmodules;
 
-our $DATE = '2019-11-19'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-12-26'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: lcpan subcommands related to Acme::CPANModules
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::cpanmodules - lcpan subcommands related to Acme::CPANModu
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::CmdBundle::cpanmodules (from Perl distribution App-lcpan-CmdBundle-cpanmodules), released on 2019-11-19.
+This document describes version 0.002 of App::lcpan::CmdBundle::cpanmodules (from Perl distribution App-lcpan-CmdBundle-cpanmodules), released on 2019-12-26.
 
 =head1 SYNOPSIS
 

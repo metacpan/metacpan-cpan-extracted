@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::cpanmodules_mods;
 
-our $DATE = '2019-11-19'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-12-26'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ sub handle_cmd {
 
     for (@{$res->[2]}) {
         if ($args{detail}) {
-            $_->{name} =~ s/^Acme::CPANModules:://;
+            ($_->{name} = $_->{module}) =~ s/^Acme::CPANModules:://;
         } else {
             s/^Acme::CPANModules:://;
         }
@@ -61,7 +61,7 @@ App::lcpan::Cmd::cpanmodules_mods - List Acme::CPANModules modules available on 
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::Cmd::cpanmodules_mods (from Perl distribution App-lcpan-CmdBundle-cpanmodules), released on 2019-11-19.
+This document describes version 0.002 of App::lcpan::Cmd::cpanmodules_mods (from Perl distribution App-lcpan-CmdBundle-cpanmodules), released on 2019-12-26.
 
 =head1 DESCRIPTION
 

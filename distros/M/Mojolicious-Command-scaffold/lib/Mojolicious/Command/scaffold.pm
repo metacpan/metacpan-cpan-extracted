@@ -5,7 +5,7 @@ use Getopt::Long;
 use List::Util qw(any);
 use Mojo::File 'path';
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 # Short description
 has 'description' => <<EOF;
@@ -323,7 +323,7 @@ sub template {
 
 
     # Template
-    $self->process('templates/' . $self->piling->{ template_path }, $self->options->{ action } . '.html.ep', $self->stub('stubs/template.html.ep', [
+    $self->process('templates/' . $self->piling->{ template_path }, $self->options->{ action } . '.html.ep', $self->stub('stubs/template.html.ep.stub', [
         Stub    => $self->piling->{ package_name },
     ]));
 }

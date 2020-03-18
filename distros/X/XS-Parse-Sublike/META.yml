@@ -17,13 +17,13 @@ name: XS-Parse-Sublike
 provides:
   XS::Parse::Sublike:
     file: lib/XS/Parse/Sublike.pm
-    version: '0.02'
+    version: '0.04'
   XS::Parse::Sublike::Builder:
     file: lib/XS/Parse/Sublike/Builder.pm
-    version: '0.02'
+    version: '0.04'
 requires:
   perl: '5.016'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

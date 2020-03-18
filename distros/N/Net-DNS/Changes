@@ -1,4 +1,17 @@
-$Id: Changes 1770 2020-02-13 10:42:04Z willem $                       -*-text-*-
+$Id: Changes 1776 2020-03-18 14:39:38Z willem $                       -*-text-*-
+
+
+**** 1.23 Mar 18, 2020
+
+	Deprecate 2-argument form of TSIG create().
+
+Fix rt.cpan.org #132170
+
+	[Documentation] Problems with TSIG on ddns update.
+
+Fix rt.cpan.org #131906
+
+	Undefined errorstring/warning when axfr fails
 
 
 **** 1.22 Feb 13, 2020

@@ -8,7 +8,7 @@ use Module::Load qw(load);
 use Scalar::Util qw(reftype);
 use namespace::clean;
 
-our $VERSION = '0.601'; # VERSION
+our $VERSION = '0.602'; # VERSION
 
 sub _croak { require Carp; goto &Carp::croak }
 sub _throw { GraphQL::Client::Error->throw(@_) }
@@ -171,7 +171,7 @@ GraphQL::Client - A GraphQL client
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 

@@ -3,8 +3,11 @@ Revision history for libev, a high-performance and full-featured event loop.
 TODO: for next ABI/API change, consider moving EV__IOFDSSET into io->fd instead and provide a getter.
 TODO: document EV_TSTAMP_T
 
+4.33 Wed Mar 18 13:22:29 CET 2020
+	- no changes w.r.t. 4.32.
+
 4.32 (EV only)
-	- the 4.31 timerfd code wrongly changes the priority of the signal
+	- the 4.31 timerfd code wrongly changed the priority of the signal
           fd watcher, which is usually harmless unless signal fds are
           also used (found via cpan tester service).
         - the documentation wrongly claimed that user may modify fd and events

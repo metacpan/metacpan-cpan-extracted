@@ -31,7 +31,11 @@
 
 #include "lexer-additions.c.inc"
 
-static int IMPL_xs_parse_sublike(pTHX_ const struct XSParseSublikeHooks *hooks, OP **op_ptr)
+/* Support two sets of hooks so we can handle xs_parse_sublike_any() with one
+ * set which then finds a custom keyword which provides a second
+ * Either or both may be NULL
+ */
+static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct XSParseSublikeHooks *hooksB, OP **op_ptr)
 {
   SV *name = lex_scan_ident();
   lex_read_space(0);
@@ -52,8 +56,10 @@ static int IMPL_xs_parse_sublike(pTHX_ const struct XSParseSublikeHooks *hooks, 
   PL_hints |= HINT_LOCALIZE_HH;
   I32 save_ix = block_start(TRUE);
 
-  if(hooks->post_blockstart)
-    (*hooks->post_blockstart)(aTHX);
+  if(hooksA && hooksA->post_blockstart)
+    (*hooksA->post_blockstart)(aTHX);
+  if(hooksB && hooksB->post_blockstart)
+    (*hooksB->post_blockstart)(aTHX);
 
 #ifdef HAVE_PARSE_SUBSIGNATURE
   OP *sigop = NULL;
@@ -91,10 +97,6 @@ static int IMPL_xs_parse_sublike(pTHX_ const struct XSParseSublikeHooks *hooks, 
      * correctly
      *   See https://rt.cpan.org/Ticket/Display.html?id=130417
      */
-#ifdef HAVE_PARSE_SUBSIGNATURE
-    if(sigop)
-      op_free(sigop);
-#endif
     op_free(body);
     *op_ptr = newOP(OP_NULL, 0);
     if(name) {
@@ -108,8 +110,10 @@ static int IMPL_xs_parse_sublike(pTHX_ const struct XSParseSublikeHooks *hooks, 
     }
   }
 
-  if(hooks->pre_blockend)
-    body = (*hooks->pre_blockend)(aTHX_ body);
+  if(hooksB && hooksB->pre_blockend)
+    body = (*hooksB->pre_blockend)(aTHX_ body);
+  if(hooksA && hooksA->pre_blockend)
+    body = (*hooksA->pre_blockend)(aTHX_ body);
 
   body = block_end(save_ix, body);
 
@@ -119,8 +123,10 @@ static int IMPL_xs_parse_sublike(pTHX_ const struct XSParseSublikeHooks *hooks, 
     attrs,
     body);
 
-  if(hooks->post_newcv)
-    (*hooks->post_newcv)(aTHX_ cv);
+  if(hooksA && hooksA->post_newcv)
+    (*hooksA->post_newcv)(aTHX_ cv);
+  if(hooksB && hooksB->post_newcv)
+    (*hooksB->post_newcv)(aTHX_ cv);
 
   LEAVE_with_name("parse_block");
 
@@ -138,36 +144,95 @@ static int IMPL_xs_parse_sublike(pTHX_ const struct XSParseSublikeHooks *hooks, 
   }
 }
 
-static HV *registered_hooks;
+static int IMPL_xs_parse_sublike(pTHX_ const struct XSParseSublikeHooks *hooks, OP **op_ptr)
+{
+  return parse2(aTHX_ hooks, NULL, op_ptr);
+}
+
+struct Registration;
+struct Registration {
+  struct Registration *next;
+  const char *kw;
+  STRLEN      kwlen;
+  const struct XSParseSublikeHooks *hooks;
+};
+
+#define REGISTRATIONS_LOCK   OP_CHECK_MUTEX_LOCK
+#define REGISTRATIONS_UNLOCK OP_CHECK_MUTEX_UNLOCK
+
+static struct Registration *registrations;
 
 static void IMPL_register_xs_parse_sublike(pTHX_ const char *kw, const struct XSParseSublikeHooks *hooks)
 {
-  if(!registered_hooks)
-    registered_hooks = newHV();
+  struct Registration *reg;
+  Newx(reg, 1, struct Registration);
 
-  /* TODO: Check for clashes */
-  hv_store(registered_hooks, kw, strlen(kw), newSVuv(PTR2UV(hooks)), 0);
+  reg->kw = savepv(kw);
+  reg->kwlen = strlen(kw);
+  reg->hooks = hooks;
+
+  REGISTRATIONS_LOCK;
+  {
+    reg->next = registrations;
+    registrations = reg;
+  }
+  REGISTRATIONS_UNLOCK;
+}
+
+static const struct XSParseSublikeHooks *find_permitted(pTHX_ const char *kw, STRLEN kwlen)
+{
+  struct Registration *reg;
+  for(reg = registrations; reg; reg = reg->next) {
+    if(reg->kwlen != kwlen || !strEQ(reg->kw, kw))
+      continue;
+
+    if(reg->hooks->permit &&
+       !(*reg->hooks->permit)(aTHX))
+       continue;
+
+    return reg->hooks;
+  }
+
+  return NULL;
+}
+
+static int IMPL_xs_parse_sublike_any(pTHX_ const struct XSParseSublikeHooks *hooksA, OP **op_ptr)
+{
+  SV *kwsv = lex_scan_ident();
+  if(!kwsv || !SvCUR(kwsv))
+    croak("Expected a keyword to introduce a sub or sub-like construction");
+
+  const char *kw = SvPV_nolen(kwsv);
+  STRLEN kwlen = SvCUR(kwsv);
+
+  lex_read_space(0);
+
+  const struct XSParseSublikeHooks *hooksB = NULL;
+  /* We permit 'sub' as a NULL set of hooks; anything else should be a registered keyword */
+  if(kwlen != 3 || !strEQ(kw, "sub")) {
+    hooksB = find_permitted(aTHX_ kw, kwlen);
+    if(!hooksB)
+      croak("Expected a keyword to introduce a sub or sub-like construction, found \"%.*s\"",
+        kwlen, kw);
+  }
+
+  SvREFCNT_dec(kwsv);
+
+  return parse2(aTHX_ hooksA, hooksB, op_ptr);
 }
 
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
 
 static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 {
-  SV **svp;
-  const struct XSParseSublikeHooks *hooks;
+  const struct XSParseSublikeHooks *hooks = find_permitted(aTHX_ kw, kwlen);
 
-  if(!registered_hooks ||
-     !(svp = hv_fetch(registered_hooks, kw, kwlen, 0)))
-    return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
-
-  hooks = INT2PTR(const struct XSParseSublikeHooks *, SvUV(*svp));
-
-  if(hooks->permit && !(*hooks->permit)(aTHX))
+  if(!hooks)
     return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
 
   lex_read_space(0);
 
-  return IMPL_xs_parse_sublike(aTHX_ hooks, op_ptr);
+  return parse2(aTHX_ NULL, hooks, op_ptr);
 }
 
 MODULE = XS::Parse::Sublike    PACKAGE = XS::Parse::Sublike
@@ -176,5 +241,6 @@ BOOT:
   sv_setiv(get_sv("XS::Parse::Sublike::ABIVERSION", GV_ADD), XSPARSESUBLIKE_ABI_VERSION);
   sv_setuv(get_sv("XS::Parse::Sublike::PARSE",      GV_ADD), PTR2UV(&IMPL_xs_parse_sublike));
   sv_setuv(get_sv("XS::Parse::Sublike::REGISTER",   GV_ADD), PTR2UV(&IMPL_register_xs_parse_sublike));
+  sv_setuv(get_sv("XS::Parse::Sublike::PARSEANY",   GV_ADD), PTR2UV(&IMPL_xs_parse_sublike_any));
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);

@@ -1,9 +1,9 @@
 package Net::DNS::RR::DNSKEY;
 
 #
-# $Id: DNSKEY.pm 1741 2019-04-16 13:10:38Z willem $
+# $Id: DNSKEY.pm 1773 2020-03-17 08:40:55Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1773 $)[1];
 
 
 use strict;
@@ -55,7 +55,7 @@ use constant BASE64 => defined eval 'require MIME::Base64';
 	my %algbyval = reverse @algbyname;
 
 	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
-	my %algbyname = @algrehash;    # work around broken cperl
+	my %algbyname = @algrehash;				# work around broken cperl
 
 	sub _algbyname {
 		my $arg = shift;
@@ -96,8 +96,8 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $algorithm = $self->{algorithm};
 	$self->_annotation( 'Key ID =', $self->keytag ) if $algorithm;
 	return $self->SUPER::_format_rdata() unless BASE64;
-	my @base64 = split /\s+/, MIME::Base64::encode( $self->{keybin} ) || '-';
-	my @rdata = ( @{$self}{qw(flags protocol)}, $algorithm, @base64 );
+	my @param = ( @{$self}{qw(flags protocol)}, $algorithm );
+	my @rdata = ( @param, split /\s+/, MIME::Base64::encode( $self->{keybin} ) || '-' );
 }
 
 

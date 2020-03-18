@@ -1,188 +1,270 @@
 NAME
 
-    GraphQL::Client - A GraphQL client
+    graphql - Command-line GraphQL client
 
 VERSION
 
-    version 0.601
+    version 0.602
 
 SYNOPSIS
 
-        my $graphql = GraphQL::Client->new(url => 'http://localhost:4000/graphql');
+        graphql <URL> <QUERY> [ [--variables JSON] | [--variable KEY=VALUE]... ]
+                [--operation-name NAME] [--transport KEY=VALUE]...
+                [--[no-]unpack] [--format json|json:pretty|yaml|perl|csv|tsv|table]
+                [--output FILE]
     
-        # Example: Hello world!
-    
-        my $response = $graphql->execute('{hello}');
-    
-        # Example: Kitchen sink
-    
-        my $query = q[
-            query GetHuman {
-                human(id: $human_id) {
-                    name
-                    height
-                }
-            }
-        ];
-        my $variables = {
-            human_id => 1000,
-        };
-        my $operation_name = 'GetHuman';
-        my $transport_options = {
-            headers => {
-                authorization => 'Bearer s3cr3t',
-            },
-        };
-        my $response = $graphql->execute($query, $variables, $operation_name, $transport_options);
-    
-        # Example: Asynchronous with Mojo::UserAgent (promisify requires Future::Mojo)
-    
-        my $ua = Mojo::UserAgent->new;
-        my $graphql = GraphQL::Client->new(ua => $ua, url => 'http://localhost:4000/graphql');
-    
-        my $future = $graphql->execute('{hello}');
-    
-        $future->promisify->then(sub {
-            my $response = shift;
-            ...
-        });
+        graphql --version|--help|--manual
 
 DESCRIPTION
 
-    GraphQL::Client provides a simple way to execute GraphQL
-    <https://graphql.org/> queries and mutations on a server.
+    graphql is a command-line program for executing queries and mutations
+    on a GraphQL <https://graphql.org/> server.
 
-    This module is the programmatic interface. There is also a "CLI
-    program".
+INSTALL
 
-    GraphQL servers are usually served over HTTP. The provided transport,
-    GraphQL::Client::http, lets you plug in your own user agent, so this
-    client works naturally with HTTP::Tiny, Mojo::UserAgent, and more. You
-    can also use HTTP::AnyUA middleware.
+    There are several ways to install graphql to your system.
 
-ATTRIBUTES
+ from CPAN
 
- url
+    You can install graphql using cpanm:
 
-    The URL of a GraphQL endpoint, e.g. "http://myapiserver/graphql".
+        cpanm GraphQL::Client
 
- unpack
+ from GitHub
 
-    Whether or not to "unpack" the response, which enables a different
-    style for error-handling.
+    You can also choose to download graphql as a self-contained executable:
 
-    Default is 0.
+        curl -OL https://raw.githubusercontent.com/chazmcgarvey/graphql-client/solo/graphql
+        chmod +x graphql
 
-    See "ERROR HANDLING".
+    To hack on the code, clone the repo instead:
 
- transport_class
+        git clone https://github.com/chazmcgarvey/graphql-client.git
+        cd graphql-client
+        make bootstrap      # installs dependencies; requires cpanm
 
-    The package name of a transport.
+OPTIONS
 
-    This is optional if the correct transport can be correctly determined
-    from the "url".
+ --url URL
 
- transport
+    The URL of the GraphQL server endpoint.
 
-    The transport object.
+    If no --url option is given, the first argument is assumed to be the
+    URL.
 
-    By default this is automatically constructed based on "transport_class"
-    or "url".
+    This option is required.
 
-METHODS
+    Alias: -u
 
- new
+ --query STR
 
-        $graphql = GraphQL::Client->new(%attributes);
+    The query or mutation to execute.
 
-    Construct a new client.
+    If no --query option is given, the next argument (after URL) is assumed
+    to be the query.
 
- execute
+    If the value is "-" (which is the default), the query will be read from
+    STDIN.
 
-        $response = $graphql->execute($query);
-        $response = $graphql->execute($query, \%variables);
-        $response = $graphql->execute($query, \%variables, $operation_name);
-        $response = $graphql->execute($query, \%variables, $operation_name, \%transport_options);
-        $response = $graphql->execute($query, \%variables, \%transport_options);
+    See: https://graphql.org/learn/queries/
 
-    Execute a request on a GraphQL server, and get a response.
+    Alias: --mutation
 
-    By default, the response will either be a hashref with the following
-    structure or a Future that resolves to such a hashref, depending on the
-    transport and how it is configured.
+ --variables JSON
+
+    Provide the variables as a JSON object.
+
+    Aliases: --vars, -V
+
+ --variable KEY=VALUE
+
+    An alternative way to provide variables one at a time. This option can
+    be repeated to provide multiple variables.
+
+    If used in combination with "--variables JSON", this option is silently
+    ignored.
+
+    See: https://graphql.org/learn/queries/#variables
+
+    Aliases: --var, -d
+
+ --operation-name NAME
+
+    Inform the server which query/mutation to execute.
+
+    Alias: -n
+
+ --output FILE
+
+    Write the response to a file instead of STDOUT.
+
+    Alias: -o
+
+ --transport KEY=VALUE
+
+    Key-value pairs for configuring the transport (usually HTTP).
+
+    Alias: -t
+
+ --format STR
+
+    Specify the output format to use. See "FORMAT".
+
+    Alias: -f
+
+ --unpack
+
+    Enables unpack mode.
+
+    By default, the response structure is printed as-is from the server,
+    and the program exits 0.
+
+    When unpack mode is enabled, if the response completes with no errors,
+    only the data section of the response is printed and the program exits
+    0. If the response has errors, the whole response structure is printed
+    as-is and the program exits 1.
+
+    See "EXAMPLES".
+
+FORMAT
+
+    The argument for "--format STR" can be one of:
+
+      * csv - Comma-separated values (requires Text::CSV)
+
+      * json:pretty - Human-readable JSON (default)
+
+      * json - JSON
+
+      * perl - Perl code (requires Data::Dumper)
+
+      * table - Table (requires Text::Table::Any)
+
+      * tsv - Tab-separated values (requires Text::CSV)
+
+      * yaml - YAML (requires YAML)
+
+    The csv, tsv, and table formats will only work if the response has a
+    particular shape:
 
         {
-            data   => {
-                field1  => {...}, # or [...]
-                ...
-            },
-            errors => [
-                { message => 'some error message blah blah blah' },
-                ...
-            ],
+            "data" : {
+                "onefield" : [
+                    {
+                        "key" : "value",
+                        ...
+                    },
+                    ...
+                ]
+            }
         }
 
-    Note: Setting the "unpack" attribute affects the response shape.
-
-ERROR HANDLING
-
-    There are two different styles for handling errors.
-
-    If "unpack" is 0 (off, the default), every response -- whether success
-    or failure -- is enveloped like this:
+    or
 
         {
-            data   => {...},
-            errors => [...],
+            "data" : {
+                "onefield" : [
+                    "value",
+                    ...
+                ]
+            }
         }
 
-    where data might be missing or undef if errors occurred (though not
-    necessarily) and errors will be missing if the response completed
-    without error.
+    If the response cannot be formatted, the default format will be used
+    instead, an error message will be printed to STDERR, and the program
+    will exit 3.
 
-    It is up to you to check for errors in the response, so your code might
-    look like this:
+    Table formatting can be done by one of several different modules, each
+    with its own features and bugs. The default module is
+    Text::Table::Tiny, but this can be overridden using the PERL_TEXT_TABLE
+    environment variable if desired, like this:
 
-        my $response = $graphql->execute(...);
-        if (my $errors = $response->{errors}) {
-            # handle $errors
+        PERL_TEXT_TABLE=Text::Table::HTML graphql ... -f table
+
+    The list of supported modules is at "@BACKENDS" in Text::Table::Any.
+
+EXAMPLES
+
+    Different ways to provide the query/mutation to execute:
+
+        graphql http://myserver/graphql {hello}
+    
+        echo {hello} | graphql http://myserver/graphql
+    
+        graphql http://myserver/graphql <<END
+        > {hello}
+        > END
+    
+        graphql http://myserver/graphql
+        Interactive mode engaged! Waiting for a query on <STDIN>...
+        {hello}
+        ^D
+
+    Execute a query with variables:
+
+        graphql http://myserver/graphql <<END --var episode=JEDI
+        > query HeroNameAndFriends($episode: Episode) {
+        >   hero(episode: $episode) {
+        >     name
+        >     friends {
+        >       name
+        >     }
+        >   }
+        > }
+        > END
+    
+        graphql http://myserver/graphql --vars '{"episode":"JEDI"}'
+
+    Configure the transport:
+
+        graphql http://myserver/graphql {hello} -t headers.authorization='Basic s3cr3t'
+
+    This example shows the effect of "--unpack":
+
+        graphql http://myserver/graphql {hello}
+    
+        # Output:
+        {
+            "data" : {
+                "hello" : "Hello world!"
+            }
         }
-        else {
-            my $data = $response->{data};
-            # do something with $data
+    
+        graphql http://myserver/graphql {hello} --unpack
+    
+        # Output:
+        {
+            "hello" : "Hello world!"
         }
 
-    If unpack is 1 (on), then "execute" will return just the data if there
-    were no errors, otherwise it will throw an exception. So your code
-    would instead look like this:
+ENVIRONMENT
 
-        my $data = eval { $graphql->execute(...) };
-        if (my $error = $@) {
-            my $resp = $error->{response};
-            # handle errors
-        }
-        else {
-            # do something with $data
-        }
+    Some environment variables affect the way graphql behaves:
 
-    Or if you want to handle errors in a different stack frame, your code
-    is simply this:
+      * GRAPHQL_CLIENT_DEBUG - Set to 1 to print diagnostic messages to
+      STDERR.
 
-        my $data = $graphql->execute(...);
-        # do something with $data
+      * GRAPHQL_CLIENT_HTTP_USER_AGENT - Set the HTTP user agent string.
 
-    Both styles map to Future responses intuitively. If unpack is 0, the
-    response always resolves to the envelope structure. If unpack is 1,
-    successful responses will resolve to just the data and errors will
-    fail/reject.
+      * GRAPHQL_CLIENT_OPTIONS - Set the default set of options.
+
+      * PERL_TEXT_TABLE - Set table format backend; see "FORMAT".
+
+EXIT STATUS
+
+    Here is a consolidated summary of what exit statuses mean:
+
+      * 0 - Success
+
+      * 1 - Client or server errors
+
+      * 2 - Option usage is wrong
+
+      * 3 - Could not format the response as requested
 
 SEE ALSO
 
-      * graphql - CLI program
-
-      * GraphQL - Perl implementation of a GraphQL server
-
-      * https://graphql.org/ - GraphQL project website
+      * GraphQL::Client - Programmatic interface
 
 BUGS
 

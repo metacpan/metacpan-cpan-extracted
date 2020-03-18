@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '1.049';
+our $VERSION = '1.050';
 
 =head1 NAME
 
@@ -35,6 +35,7 @@ use File::Temp qw( tempfile );
 use Module::ScanDeps ();
 use PAR ();
 use PAR::Filter ();
+use PAR::Filter::PodStrip ();
 
 use constant OPTIONS => {
     'a|addfile:s@'   => 'Additional files to pack',
@@ -821,8 +822,9 @@ sub pack_manifest_hash {
     # generate a selective set of filters from the options passed in via -F
     my $mod_filter = _generate_filter($opt, 'F');
 
-    (my $privlib = $Config{privlib}) =~ s{\\}{/}g;
-    (my $archlib = $Config{archlib}) =~ s{\\}{/}g;
+    my ($privlib, $archlib) = map { (my $lib = $_) =~ s{\\}{/}g; $lib } 
+                                  @Config{qw(privlibexp archlibexp)};
+
     foreach my $pfile (sort grep length $map{$_}, keys %map) {
         next if !$opt->{B} and (
             ($map{$pfile} eq "$privlib/$pfile") or
@@ -957,7 +959,6 @@ sub _generate_filter {
             filter => PAR::Filter->new($filter)
         };
     }
-    my $podstrip = PAR::Filter->new('PodStrip');
 
     my $filtersub = sub {
         my $ref = shift;
@@ -975,7 +976,7 @@ sub _generate_filter {
 
         # PodStrip by default, overridden by -F or $ENV{PAR_VERBATIM}
         if ($filtered == 1 and not $verbatim) {
-            $ref = $podstrip->apply($ref, $name);
+            $ref = PAR::Filter::PodStrip->apply($ref, '');
         }
         return $ref;
     };

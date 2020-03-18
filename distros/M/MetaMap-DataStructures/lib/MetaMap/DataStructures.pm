@@ -91,7 +91,7 @@ use MetaMap::DataStructures::Concept;
 
 
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 my $debug = 0; 
  
@@ -265,7 +265,7 @@ example:
 sub getOrderedConcepts { 
     my $self = shift;
     my $citation = shift; 
-    
+
     return $citation->getOrderedConcepts(); 
 }
 
@@ -463,6 +463,9 @@ sub createFromText {
     my $pmid = $1;
     
     if($debug) { print STDERR "  Processing $pmid\n"; }
+
+    print "pmid = $pmid\n";
+
 
     #create a new citation (if needed)
     if (!(exists $self->{citations}{$pmid})) {

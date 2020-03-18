@@ -60,7 +60,7 @@ subtest 'request to transport' => sub {
     $req = ($mock->requests)[-1];
     is_deeply($req->[1], {
         baz => 'qux',
-    }, 'operation name can be ommitted with transport options');
+    }, 'operation name can be omitted with transport options');
 };
 
 subtest 'success response' => sub {

@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 
-use Module::Build;
+use lib 'inc';
+use Module::Build::with::XSTests;
 
-my $build = Module::Build->new(
+my $build = Module::Build::with::XSTests->new(
    module_name => 'XS::Parse::Sublike',
    requires => {
       'perl' => '5.016', # pad_add_name_pvn
