@@ -4,7 +4,7 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.08
+Version 2.09
 
 # SYNOPSIS
 
@@ -168,12 +168,24 @@ directory and accessed by **--exdict** option.
         https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf
 
 - **--exdict** sccc2.dict
+- **--exdict** jtf-style-guide-3.dict
+- **--jtf-style-guide**
+
+    Created from following guideline document.
+
+        JTF日本語標準スタイルガイド（翻訳用）
+        第3.0版
+        2019年8月20日
+        一般社団法人 日本翻訳連盟（JTF）
+        翻訳品質委員会
+        https://www.jtf.jp/jp/style_guide/pdf/jtf_style_guide.pdf
+
 - **--sccc2**
 
     Dictionary used for "C/C++ セキュアコーディング 第2版" published in
     2014.
 
-    https://www.jpcert.or.jp/securecoding\_book\_2nd.html
+        https://www.jpcert.or.jp/securecoding_book_2nd.html
 
 # INSTALL
 
@@ -183,19 +195,24 @@ directory and accessed by **--exdict** option.
     or
     $ curl -sL http://cpanmin.us | perl - App::Greple::subst
 
-# LICENSE
-
-Copyright (C) Kazumasa Utashiro.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
 # SEE ALSO
 
 [https://github.com/kaz-utashiro/greple](https://github.com/kaz-utashiro/greple)
 
 [https://github.com/kaz-utashiro/greple-subst](https://github.com/kaz-utashiro/greple-subst)
 
+https://www.jtca.org/standardization/katakana\_guide\_3\_20171222.pdf
+
+https://www.jtf.jp/jp/style\_guide/styleguide\_top.html,
+https://www.jtf.jp/jp/style\_guide/pdf/jtf\_style\_guide.pdf
+
 # AUTHOR
 
 Kazumasa Utashiro
+
+# LICENSE
+
+Copyright (C) 2017-2020 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

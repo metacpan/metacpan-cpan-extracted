@@ -1,5 +1,13 @@
 Revision history for Object-Pad
 
+0.15    2020-03-19
+        [CHANGES]
+         * Use XS::Parse::Sublike 0.04
+            + Provides bugfixes for parameters in sub signatures with defaults
+
+        [BUGFIXES]
+         * Handle class-scoped regular lexicals and outer captures
+
 0.14    2020-03-17
         [CHANGES]
          * Use XS::Parse::Sublike 0.02's `register_xs_parse_sublike()` ability

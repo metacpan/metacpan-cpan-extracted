@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl extension for SSL and TLS using MatrixSSL.org v3.7.2b",
+   "abstract" : "Perl extension for SSL and TLS using MatrixSSL.org v3.9.3",
    "author" : [
       "C. N. Drake <christopher@pobox.com>"
    ],
@@ -68,27 +68,27 @@
    "provides" : {
       "Crypt::MatrixSSL3" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.2"
+         "version" : "v3.9.3"
       },
       "Crypt::MatrixSSL3::Client" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.2"
+         "version" : "v3.9.3"
       },
       "Crypt::MatrixSSL3::HelloExt" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.2"
+         "version" : "v3.9.3"
       },
       "Crypt::MatrixSSL3::Keys" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.2"
+         "version" : "v3.9.3"
       },
       "Crypt::MatrixSSL3::Server" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.2"
+         "version" : "v3.9.3"
       },
       "Crypt::MatrixSSL3::SessID" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.2"
+         "version" : "v3.9.3"
       }
    },
    "release_status" : "stable",
@@ -103,11 +103,12 @@
          "web" : "https://github.com/powerman/perl-Crypt-MatrixSSL3"
       }
    },
-   "version" : "v3.9.2",
+   "version" : "v3.9.3",
    "x_contributors" : [
       "Alex Efros <powerman@cpan.org>",
+      "Chris Drake <cnd@geek.net.au>",
       "vonydev <vony@teamevolve.ro>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_serialization_backend" : "JSON::XS version 4.02"
 }
 

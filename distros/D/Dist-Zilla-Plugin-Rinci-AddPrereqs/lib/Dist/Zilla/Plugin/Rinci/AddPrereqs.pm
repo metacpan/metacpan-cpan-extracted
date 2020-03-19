@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Rinci::AddPrereqs;
 
 our $DATE = '2019-12-28'; # DATE
-our $VERSION = '0.143'; # VERSION
+our $VERSION = '0.144'; # VERSION
 
 use 5.010001;
 use strict;
@@ -234,7 +234,7 @@ Dist::Zilla::Plugin::Rinci::AddPrereqs - Add prerequisites from Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.143 of Dist::Zilla::Plugin::Rinci::AddPrereqs (from Perl distribution Dist-Zilla-Plugin-Rinci-AddPrereqs), released on 2019-12-28.
+This document describes version 0.144 of Dist::Zilla::Plugin::Rinci::AddPrereqs (from Perl distribution Dist-Zilla-Plugin-Rinci-AddPrereqs), released on 2019-12-28.
 
 =head1 SYNOPSIS
 
@@ -244,40 +244,97 @@ In C<dist.ini>:
 
 =head1 DESCRIPTION
 
-This plugin will search Rinci metadata in all modules and add prereqs for the
-following:
+This plugin will first collect L<Rinci> metadata from the following:
 
 =over
 
-=item *
+=item * %SPEC variable in all modules of the distribution
 
-For every dependency mentioned in C<deps> property in function metadata, will
-add a prereq to C<Perinci::Sub::Dep::NAME>.
+=item * Perinci::CmdLine scripts
+
+This plugin will also search all L<Perinci::CmdLine>-based scripts, request
+Rinci function metadata from all local Riap URI's used by the scripts. Plus,
+will add a dependency to the module mentioned in the local Riap URI. For
+example, in Perinci::CmdLine-based script:
+
+ url => '/MyApp/myfunc',
+
+The plugin will retrieve the Rinci metadata in C<MyApp> module as well as add a
+runtime-requires dependency to the C<MyApp> module (unless C<MyApp> is in the
+same/current distribution).
 
 =back
 
-This plugin will also search all Perinci::CmdLine-based scripts, request
-metadata from all local Riap URI's used by the scripts, and add prereqs for the
-above plus:
+=head2 Prereqs from Rinci function metadata
+
+The following prereqs will be added according to information in Rinci L<function
+metadata|Rinci::function>.
 
 =over
 
-=item *
+=item * Additional property module
 
-Add prereq for the module specified in the Riap URL. So for example if script
-refers to C</Perinci/Examples/some_func>, then a prerequisite will be added for
-C<Perinci::Examples> (unless it's from the same distribution).
+If the Rinci metadata contains non-standard properties, which require
+corresponding C<Perinci::Sub::Property::NAME> modules, then these modules will
+be added as prereqs.
 
-=item *
+=item * schema
+
+Currently will only do this for Rinci metadata for CLI scripts.
+
+The plugin will compile every schema of function argument using L<Data::Sah>,
+then add a prereq to each module required by the generated argument validator
+produced by Data::Sah. For example, in Rinci metadata:
+
+ args => {
+     arg1 => {
+         schema => 'color::rgb24*',
+         ...
+     },
+     ...
+ }
+
+When the C<color::rgb24> schema is compiled, the following modules are required:
+L<Sah::Schema::color::rgb24>,
+L<Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code>.
+The generated validator code requires these modules: L<strict>, L<warnings>,
+L<Graphics::ColorNames>, L<Graphics::ColorNames::X>. All of which will be added
+as prereq.
+
+=item * x.schema.entity, x.schema.element_entity
+
+Currently will only do this for Rinci metadata for CLI scripts.
 
 For every entity mentioned in C<x.schema.entity> or C<x.schema.element_entity>
-in function metadata, will add a prereq to C<Perinci::Sub::ArgEntity::NAME>.
+in argument specification in function metadata, the plugin will add a prereq to
+C<Perinci::Sub::ArgEntity::NAME>. For example, in
+Rinci metadata:
 
-=item *
+ args => {
+     arg1 => {
+         'x.schema.entity' => 'dirname',
+          ...
+     },
+     ...
+ }
+
+(Note that C<x.schema.entity> is deprecated.)
+
+=item * x.completion, x.element_completion
 
 For every completion mentioned in C<x.completion> or C<x.element_completion> in
-function metadata (which have the value of C<[NAME, ARGS]>), will add a prereq
-to corresponding C<Perinci::Sub::XCompletion::NAME>.
+argument specification in function metadata, which can have the value of C<NAME>
+or C<[NAME, ARGS]>, the plugin will add a prereq to corresponding
+C<Perinci::Sub::XCompletion::NAME>. For example, in Rinci metadata:
+
+ args => {
+     arg1 => {
+         'schema' => 'str*',
+         'x.completion' => 'colorname',
+         ...
+     },
+     ...
+ }
 
 =back
 

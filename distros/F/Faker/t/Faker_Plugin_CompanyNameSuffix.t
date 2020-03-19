@@ -53,7 +53,7 @@ Data::Object::Plugin
 
 =attributes
 
-faker: ro, req, InstanceOf["Faker"]
+faker: ro, req, ConsumerOf["Faker::Maker"]
 
 =cut
 

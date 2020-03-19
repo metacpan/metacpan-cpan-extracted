@@ -3,65 +3,69 @@ package Test::Auto;
 use strict;
 use warnings;
 
-use Data::Object::Class;
-use Data::Object::Attributes;
-use Data::Object::Data;
-use Data::Object::Try;
+use Moo;
 
 use Exporter;
+use Test::Auto::Data;
+use Test::Auto::Try;
+use Test::Auto::Types ();
 use Test::More;
 use Type::Registry;
-
-use registry 'Test::Auto::Types';
-use routines;
 
 use base 'Exporter';
 
 our @EXPORT = 'testauto';
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 # ATTRIBUTES
 
 has file => (
   is => 'ro',
-  isa => 'Str',
-  req => 1
+  isa => Test::Auto::Types::Str(),
+  required => 1
 );
 
 has data => (
   is => 'ro',
-  isa => 'Data',
-  opt => 1
+  isa => Test::Auto::Types::Data(),
+  required => 0
 );
 
 # EXPORTS
 
-fun testauto($file) {
+sub testauto {
+  my ($file) = @_;
 
   return Test::Auto->new($file)->subtests;
 }
 
 # BUILDS
 
-method BUILD($args) {
+sub BUILD {
+  my ($self, $args) = @_;
+
   my $data = $self->data;
   my $file = $self->file;
 
-  $self->{data} = Data::Object::Data->new(file => $file) if !$data;
+  $self->{data} = Test::Auto::Data->new(file => $file) if !$data;
 
   return $self;
 }
 
-around BUILDARGS(@args) {
+around BUILDARGS => sub {
+  my ($orig, $self, @args) = @_;
+
   @args = (file => $args[0]) if @args == 1 && !ref $args[0];
 
   $self->$orig(@args);
-}
+};
 
 # METHODS
 
-method parser() {
+sub parser {
+  my ($self) = @_;
+
   require Test::Auto::Parser;
 
   return Test::Auto::Parser->new(
@@ -69,7 +73,9 @@ method parser() {
   );
 }
 
-method document() {
+sub document {
+  my ($self) = @_;
+
   require Test::Auto::Document;
 
   return Test::Auto::Document->new(
@@ -77,7 +83,9 @@ method document() {
   );
 }
 
-method subtests() {
+sub subtests {
+  my ($self) = @_;
+
   require Test::Auto::Subtests;
 
   return Test::Auto::Subtests->new(
@@ -664,7 +672,9 @@ powerful hooks into the framework for manual testing.
 
   my $subtests = $test->subtests;
 
-  $subtests->synopsis(fun($tryable) {
+  $subtests->synopsis(sub {
+    my ($tryable) = @_;
+
     ok my $result = $tryable->result, 'result ok';
 
     $result; # for automated testing after the callback
@@ -672,12 +682,14 @@ powerful hooks into the framework for manual testing.
 
 The code examples documented can be automatically evaluated (evaled) and
 returned using a callback you provide for further testing. Because the code
-examples are returned as L<Data::Object::Try> objects, this makes capturing and
-testing exceptions simple, for example:
+examples are returned as C<Test::Auto::Try> objects (see L<Data::Object::Try>),
+this makes capturing and testing exceptions simple, for example:
 
   my $subtests = $test->subtests;
 
-  $subtests->synopsis(fun($tryable) {
+  $subtests->synopsis(sub {
+    my ($tryable) = @_;
+
     # catch exception thrown by the synopsis
     $tryable->catch('Path::Find::Error', sub {
       return $_[0];
@@ -691,12 +703,14 @@ testing exceptions simple, for example:
 
 Additionally, another manual testing hook (with some automation) is the
 C<example> method. This hook evaluates (evals) a given example and returns the
-result as a L<Data::Object::Try> object. The first argument is the example ID
-(or number), for example:
+result as a C<Test::Auto::Try> object (see L<Data::Object::Try>). The first
+argument is the example ID (or number), for example:
 
   my $subtests = $test->subtests;
 
-  $subtests->example(-1, 'children', 'method', fun($tryable) {
+  $subtests->example(-1, 'children', 'method', sub {
+    my ($tryable) = @_;
+
     ok my $result = $tryable->result, 'result ok';
 
     $result; # for automated testing after the callback
@@ -704,11 +718,13 @@ result as a L<Data::Object::Try> object. The first argument is the example ID
 
 Finally, the lesser-used but useful manual testing hook is the C<scenario>
 method. This hook evaluates (evals) a documented scenario and returns the
-result as a L<Data::Object::Try> object, for example:
+result as a C<Test::Auto::Try> object (see L<Data::Object::Try>), for example:
 
   my $subtests = $test->subtests;
 
-  $subtests->scenario('export-path-make', fun($tryable) {
+  $subtests->scenario('export-path-make', sub {
+    my ($tryable) = @_;
+
     ok my $result = $tryable->result, 'result ok';
 
     $result; # for automated testing after the callback

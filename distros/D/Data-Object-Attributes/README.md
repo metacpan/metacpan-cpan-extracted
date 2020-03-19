@@ -91,7 +91,7 @@ details.
 
     has data => (
       is => 'ro',
-      crc => fun($arg){'0'}
+      crc => sub {'0'}
     );
 
     package main;
@@ -205,7 +205,7 @@ details.
 
     has data => (
       is => 'ro',
-      def => fun(){time},
+      def => sub {time},
       lzy => 1
     );
 

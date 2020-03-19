@@ -2,13 +2,21 @@ package App::Yath::Command::failed;
 use strict;
 use warnings;
 
-our $VERSION = '1.000011';
+our $VERSION = '1.000013';
 
 use Test2::Util::Table qw/table/;
 use Test2::Harness::Util::File::JSONL;
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase qw{<log_file};
+
+use App::Yath::Options;
+
+option brief => (
+    prefix => 'display',
+    category => 'Display Options',
+    description => 'Show only files that failed, newline separated, no other output. If a file dailed once but passed on a retry it will NOT be shown.',
+);
 
 sub summary { "Replay a test run from an event log" }
 
@@ -61,8 +69,15 @@ sub run {
 
     my $rows = [];
     while (my ($job_id, $ends) = each %failed) {
-        push @$rows => [$job_id, scalar(@$ends), $ends->[-1]->{rel_file}, $ends->[-1]->{fail} ? "NO" : "YES"];
+        if ($settings->display->brief) {
+            print $ends->[-1]->{rel_file}, "\n" if $ends->[-1]->{fail};
+        }
+        else {
+            push @$rows => [$job_id, scalar(@$ends), $ends->[-1]->{rel_file}, $ends->[-1]->{fail} ? "NO" : "YES"];
+        }
     }
+
+    return 0 if $settings->display->brief;
 
     print "\nThe following jobs failed at least once:\n";
     print join "\n" => table(
@@ -225,6 +240,19 @@ Can be specified multiple times
 
 =head2 COMMAND OPTIONS
 
+=head3 Display Options
+
+=over 4
+
+=item --brief
+
+=item --no-brief
+
+Show only files that failed, newline separated, no other output. If a file dailed once but passed on a retry it will NOT be shown.
+
+
+=back
+
 =head3 Help and Debugging
 
 =over 4
@@ -258,15 +286,6 @@ exit after showing help information
 =item --no-keep-dirs
 
 Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
-
-
-=item --summary
-
-=item --summary=/path/to/summary.json
-
-=item --no-summary
-
-Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extension is added automatically if omitted.
 
 
 =back

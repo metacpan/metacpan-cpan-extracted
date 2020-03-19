@@ -1,7 +1,14 @@
+0.144   2019-12-28  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Update documentation.
+
+
 0.143   2019-12-28  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] x.completion and x.element_completion do not need to be
-	  array; it can also be coderef or scalar.
+	  array; they can also be coderef or scalar.
 
 
 0.142   2018-06-11  Released-By: PERLANCAR

@@ -15,7 +15,7 @@ package App::annex_review_unused;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$App::annex_review_unused::VERSION = '0.003';
+$App::annex_review_unused::VERSION = '0.004';
 use 5.028;
 use strict;
 use warnings;
@@ -100,9 +100,9 @@ sub main {
             unless ($just_print) {
                 # truncate log output if necessary to ensure user's
                 # terminal does not scroll
-                my (undef, $height) = GetTerminalSize();
-                splice @log_lines, (($height - 5) - @log_lines)
-                  if @log_lines > ($height - 5);
+                my (undef, $height) = GetTerminalSize;
+                splice @log_lines, $height - (5 + @log_lines)
+                  if 5 + @log_lines > $height;
             }
             print "\n";
             say for @log_lines;
@@ -112,7 +112,7 @@ sub main {
                     # before prompting, clear out stdin, to avoid
                     # registered a keypress more than once
                     ReadMode 4;
-                    1 while defined ReadKey(-1);
+                    1 while defined ReadKey -1;
 
                     my @opts = ('y', 'n');
                     push @opts, 'o' if $contentlocation;
@@ -127,7 +127,7 @@ sub main {
                     ReadMode 0;
 
                     # respond to C-c
-                    exit 0 if ord($response) == 3;
+                    exit 0 if ord $response == 3;
 
                     say $response;
                     $response = lc($response);
@@ -198,7 +198,7 @@ App::annex_review_unused - interactively process 'git annex unused' output
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 FUNCTIONS
 

@@ -13,13 +13,13 @@ use Data::Object::ClassHas;
 
 extends 'Data::Object::Plugin';
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 # ATTRIBUTES
 
 has 'faker' => (
   is => 'ro',
-  isa => 'InstanceOf["Faker"]',
+  isa => 'ConsumerOf["Faker::Maker"]',
   req => 1,
 );
 

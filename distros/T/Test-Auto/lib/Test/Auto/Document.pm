@@ -3,40 +3,39 @@ package Test::Auto::Document;
 use strict;
 use warnings;
 
-use Data::Object::Class;
-use Data::Object::Attributes;
-use Type::Registry;
+use Moo;
+use Test::Auto::Types ();
 use Test::More;
-
-use registry 'Test::Auto::Types';
-use routines;
+use Type::Registry;
 
 require Carp;
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 # ATTRIBUTES
 
 has content => (
   is => 'ro',
-  isa => 'Strings'
+  isa => Test::Auto::Types::Strings()
 );
 
 has template => (
   is => 'ro',
-  isa => 'Maybe[Str]',
-  def => $ENV{TEST_AUTO_TEMPLATE}
+  isa => Test::Auto::Types::Maybe([Test::Auto::Types::Str()]),
+  default => $ENV{TEST_AUTO_TEMPLATE}
 );
 
 has parser => (
   is => 'ro',
-  isa => 'Parser',
-  req => 1
+  isa => Test::Auto::Types::Parser(),
+  required => 1
 );
 
 # BUILD
 
-method BUILD($args) {
+sub BUILD {
+  my ($self, $args) = @_;
+
   # build content from parser data
   $self->{content} = $self->construct if !$args->{content};
 
@@ -45,7 +44,9 @@ method BUILD($args) {
 
 # METHODS
 
-method construct() {
+sub construct {
+  my ($self) = @_;
+
   my $content = [];
 
   push @$content, $self->construct_name;
@@ -67,36 +68,45 @@ method construct() {
   return $content;
 }
 
+sub construct_name {
+  my ($self) = @_;
 
-method construct_name() {
   my $parser = $self->parser;
   my $name = $parser->name;
 
   return $self->head1('name', $name);
 }
 
-method construct_abstract() {
+sub construct_abstract {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $abstract = $parser->abstract;
 
   return $self->head1('abstract', $abstract);
 }
 
-method construct_synopsis() {
+sub construct_synopsis {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $synopsis = $parser->synopsis;
 
   return $self->head1('synopsis', $synopsis);
 }
 
-method construct_description() {
+sub construct_description {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $description = $parser->description;
 
   return $self->head1('description', $description);
 }
 
-method construct_inherits() {
+sub construct_inherits {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $inherits = $parser->inherits;
 
@@ -112,7 +122,9 @@ method construct_inherits() {
   return join("\n", @content);
 }
 
-method construct_integrates() {
+sub construct_integrates {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $integrates = $parser->integrates;
 
@@ -128,7 +140,9 @@ method construct_integrates() {
   return join("\n", @content);
 }
 
-method construct_libraries() {
+sub construct_libraries {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $libraries = $parser->libraries;
 
@@ -144,7 +158,9 @@ method construct_libraries() {
   return join("\n", @content);
 }
 
-method construct_constraints() {
+sub construct_constraints {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $types = $parser->types;
 
@@ -163,7 +179,9 @@ method construct_constraints() {
   return join("\n", @content);
 }
 
-method construct_constraints_item($name) {
+sub construct_constraints_item {
+  my ($self, $name) = @_;
+
   my $label = lc $name;
   my $parser = $self->parser;
   my $types = $parser->types;
@@ -216,7 +234,9 @@ method construct_constraints_item($name) {
   return $self->head2($name, [@content]);
 }
 
-method construct_scenarios() {
+sub construct_scenarios {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $scenarios = $parser->scenarios;
 
@@ -235,7 +255,9 @@ method construct_scenarios() {
   return join("\n", @content);
 }
 
-method construct_scenarios_item($name) {
+sub construct_scenarios_item {
+  my ($self, $name) = @_;
+
   my $parser = $self->parser;
   my $scenarios = $parser->scenarios;
   my $scenario = $scenarios->{$name} or return ();
@@ -246,7 +268,9 @@ method construct_scenarios_item($name) {
   return $self->head2($name, [@$example, "", @$usage]);
 }
 
-method construct_attributes() {
+sub construct_attributes {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $attributes = $parser->attributes;
 
@@ -263,7 +287,9 @@ method construct_attributes() {
   return join("\n", @content);
 }
 
-method construct_attributes_item($name) {
+sub construct_attributes_item {
+  my ($self, $name) = @_;
+
   my $parser = $self->parser;
   my $attributes = $parser->stash('attributes');
   my $attribute = $attributes->{$name} or return ();
@@ -284,7 +310,9 @@ method construct_attributes_item($name) {
   ]);
 }
 
-method construct_headers() {
+sub construct_headers {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $headers = $parser->headers;
 
@@ -293,7 +321,9 @@ method construct_headers() {
   return join("\n", "", @$headers);
 }
 
-method construct_functions() {
+sub construct_functions {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $functions = $parser->functions;
 
@@ -312,7 +342,9 @@ method construct_functions() {
   return join("\n", @content);
 }
 
-method construct_functions_item($name) {
+sub construct_functions_item {
+  my ($self, $name) = @_;
+
   my $parser = $self->parser;
   my $functions = $parser->functions;
   my $function = $functions->{$name} or return ();
@@ -331,7 +363,9 @@ method construct_functions_item($name) {
   return $self->head2($name, ["  $$signature[0]", "", @$usage, @examples]);
 }
 
-method construct_routines() {
+sub construct_routines {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $routines = $parser->routines;
 
@@ -350,7 +384,9 @@ method construct_routines() {
   return join("\n", @content);
 }
 
-method construct_routines_item($name) {
+sub construct_routines_item {
+  my ($self, $name) = @_;
+
   my $parser = $self->parser;
   my $routines = $parser->routines;
   my $routine = $routines->{$name} or return ();
@@ -369,7 +405,9 @@ method construct_routines_item($name) {
   return $self->head2($name, ["  $$signature[0]", "", @$usage, @examples]);
 }
 
-method construct_methods() {
+sub construct_methods {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $methods = $parser->methods;
 
@@ -388,7 +426,9 @@ method construct_methods() {
   return join("\n", @content);
 }
 
-method construct_methods_item($name) {
+sub construct_methods_item {
+  my ($self, $name) = @_;
+
   my $parser = $self->parser;
   my $methods = $parser->methods;
   my $method = $methods->{$name} or return ();
@@ -407,7 +447,9 @@ method construct_methods_item($name) {
   return $self->head2($name, ["  $$signature[0]", "", @$usage, @examples]);
 }
 
-method construct_footers() {
+sub construct_footers {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $footers = $parser->footers;
 
@@ -416,7 +458,9 @@ method construct_footers() {
   return join("\n", "", @$footers);
 }
 
-method render() {
+sub render {
+  my ($self) = @_;
+
   my $content = $self->content;
 
   $content = join "\n", @$content;
@@ -433,7 +477,9 @@ method render() {
   return "\n$content";
 }
 
-method templated($content) {
+sub templated {
+  my ($self, $content) = @_;
+
   my $template = $self->template || $ENV{TEST_AUTO_TEMPLATE};
 
   return $content unless $template;
@@ -449,19 +495,27 @@ method templated($content) {
   return $output;
 }
 
-method over(@items) {
+sub over {
+  my ($self, @items) = @_;
+
   return join("\n", "", "=over 4", "", @items, "=back");
 }
 
-method item($name, $data) {
+sub item {
+  my ($self, $name, $data) = @_;
+
   return ("=item $name\n", "$data\n");
 }
 
-method head1($name, $data) {
+sub head1 {
+  my ($self, $name, $data) = @_;
+
   return join("\n", "", "=head1 \U$name", "", @{$data}, "", "=cut");
 }
 
-method head2($name, $data) {
+sub head2 {
+  my ($self, $name, $data) = @_;
+
   return join("\n", "", "=head2 \L$name", "", @{$data}, "", "=cut");
 }
 

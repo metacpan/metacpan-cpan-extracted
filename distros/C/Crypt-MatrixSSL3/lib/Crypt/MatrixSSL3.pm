@@ -8,7 +8,7 @@ use Scalar::Util qw( dualvar );
 use XSLoader;
 
 BEGIN {
-    use version 0.77 (); our $VERSION = 'v3.9.2';
+    use version 0.77 (); our $VERSION = 'v3.9.3';
     XSLoader::load(__PACKAGE__,$VERSION);
 }
 
@@ -322,12 +322,12 @@ __END__
 
 =head1 NAME
 
-Crypt::MatrixSSL3 - Perl extension for SSL and TLS using MatrixSSL.org v3.7.2b
+Crypt::MatrixSSL3 - Perl extension for SSL and TLS using MatrixSSL.org v3.9.3
 
 
 =head1 VERSION
 
-This document describes Crypt::MatrixSSL3 version v3.9.2
+This document describes Crypt::MatrixSSL3 version v3.9.3
 
 
 =head1 SYNOPSIS

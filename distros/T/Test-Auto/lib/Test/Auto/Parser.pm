@@ -3,96 +3,93 @@ package Test::Auto::Parser;
 use strict;
 use warnings;
 
-use Data::Object::Class;
-use Data::Object::Attributes;
-
-use registry 'Test::Auto::Types';
-use routines;
-
-with 'Data::Object::Role::Stashable';
+use Moo;
+use Test::Auto::Types ();
 
 require Carp;
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 # ATTRIBUTES
 
 has name => (
   is => 'ro',
-  isa => 'Strings',
-  opt => 1
+  isa => Test::Auto::Types::Strings(),
+  required => 0
 );
 
 has abstract => (
   is => 'ro',
-  isa => 'Strings',
-  opt => 1
+  isa => Test::Auto::Types::Strings(),
+  required => 0
 );
 
 has synopsis => (
   is => 'ro',
-  isa => 'Strings',
-  opt => 1
+  isa => Test::Auto::Types::Strings(),
+  required => 0
 );
 
 has includes => (
   is => 'ro',
-  isa => 'Strings',
-  opt => 1
+  isa => Test::Auto::Types::Strings(),
+  required => 0
 );
 
 has description => (
   is => 'ro',
-  isa => 'Strings',
-  opt => 1
+  isa => Test::Auto::Types::Strings(),
+  required => 0
 );
 
 has inherits => (
   is => 'ro',
-  isa => 'Strings',
-  opt => 1
+  isa => Test::Auto::Types::Strings(),
+  required => 0
 );
 
 has integrates => (
   is => 'ro',
-  isa => 'Strings',
-  opt => 1
+  isa => Test::Auto::Types::Strings(),
+  required => 0
 );
 
 has attributes => (
   is => 'ro',
-  isa => 'Strings',
-  opt => 1
+  isa => Test::Auto::Types::Strings(),
+  required => 0
 );
 
 has libraries => (
   is => 'ro',
-  isa => 'Strings',
-  opt => 1
+  isa => Test::Auto::Types::Strings(),
+  required => 0
 );
 
 has headers => (
   is => 'ro',
-  isa => 'Strings',
-  opt => 1
+  isa => Test::Auto::Types::Strings(),
+  required => 0
 );
 
 has footers => (
   is => 'ro',
-  isa => 'Strings',
-  opt => 1
+  isa => Test::Auto::Types::Strings(),
+  required => 0
 );
 
 has source => (
   is => 'ro',
-  isa => 'Source',
-  req => 1
+  isa => Test::Auto::Types::Source(),
+  required => 1
 );
 
 # BUILD
 
-around BUILD($args) {
-  $self->$orig($args);
+sub BUILD {
+  my  ($self, $args) = @_;
+
+  $self->{'$stash'} = {} if !$self->{'$stash'};
 
   my $source = $self->source->data;
 
@@ -118,20 +115,26 @@ around BUILD($args) {
 
 # METHODS
 
-method build_name() {
+sub build_name {
+  my ($self) = @_;
+
   $self->parse_name;
   $self->check_name or Carp::confess 'build name failed';
 
   return $self->name;
 }
 
-method parse_name() {
+sub parse_name {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   return $self->{name} = $source->content('name');
 }
 
-method check_name() {
+sub check_name {
+  my ($self) = @_;
+
   my $name = $self->name;
 
   return 1 if !$name;
@@ -141,20 +144,26 @@ method check_name() {
   return 1;
 }
 
-method build_abstract() {
+sub build_abstract {
+  my ($self) = @_;
+
   $self->parse_abstract;
   $self->check_abstract or Carp::confess 'build abstract failed';
 
   return $self->abstract;
 }
 
-method parse_abstract() {
+sub parse_abstract {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   return $self->{abstract} = $source->content('abstract');
 }
 
-method check_abstract() {
+sub check_abstract {
+  my ($self) = @_;
+
   my $abstract = $self->abstract;
 
   return 1 if !$abstract;
@@ -164,20 +173,26 @@ method check_abstract() {
   return 1;
 }
 
-method build_synopsis() {
+sub build_synopsis {
+  my ($self) = @_;
+
   $self->parse_synopsis;
   $self->check_synopsis or Carp::confess 'build synopsis failed';
 
   return $self->synopsis;
 }
 
-method parse_synopsis() {
+sub parse_synopsis {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   return $self->{synopsis} = $source->content('synopsis');
 }
 
-method check_synopsis() {
+sub check_synopsis {
+  my ($self) = @_;
+
   my $synopsis = $self->synopsis;
 
   return 1 if !$synopsis;
@@ -187,20 +202,26 @@ method check_synopsis() {
   return 1;
 }
 
-method build_includes() {
+sub build_includes {
+  my ($self) = @_;
+
   $self->parse_includes;
   $self->check_includes or Carp::confess 'build includes failed';
 
   return $self->includes;
 }
 
-method parse_includes() {
+sub parse_includes {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   return $self->{includes} = $source->content('includes');
 }
 
-method check_includes() {
+sub check_includes {
+  my ($self) = @_;
+
   my $includes = $self->includes;
 
   return 1 if !$includes;
@@ -216,40 +237,52 @@ method check_includes() {
   return 1;
 }
 
-method build_description() {
+sub build_description {
+  my ($self) = @_;
+
   $self->parse_description;
   $self->check_description or Carp::confess 'build description failed';
 
   return $self->description;
 }
 
-method parse_description() {
+sub parse_description {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   return $self->{description} = $source->content('description');
 }
 
-method check_description() {
+sub check_description {
+  my ($self) = @_;
+
   my $description = $self->description;
 
   return 0 if !$description;
   return 1;
 }
 
-method build_inherits() {
+sub build_inherits {
+  my ($self) = @_;
+
   $self->parse_inherits;
   $self->check_inherits or Carp::confess 'build inherits failed';
 
   return $self->inherits;
 }
 
-method parse_inherits() {
+sub parse_inherits {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   return $self->{inherits} = $source->content('inherits');
 }
 
-method check_inherits() {
+sub check_inherits {
+  my ($self) = @_;
+
   my $inherits = $self->inherits;
 
   return 1 if !$inherits;
@@ -261,20 +294,26 @@ method check_inherits() {
   return 1;
 }
 
-method build_integrates() {
+sub build_integrates {
+  my ($self) = @_;
+
   $self->parse_integrates;
   $self->check_integrates or Carp::confess 'build integrates failed';
 
   return $self->integrates;
 }
 
-method parse_integrates() {
+sub parse_integrates {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   return $self->{integrates} = $source->content('integrates');
 }
 
-method check_integrates() {
+sub check_integrates {
+  my ($self) = @_;
+
   my $integrates = $self->integrates;
 
   return 1 if !$integrates;
@@ -286,14 +325,18 @@ method check_integrates() {
   return 1;
 }
 
-method build_attributes() {
+sub build_attributes {
+  my ($self) = @_;
+
   $self->parse_attributes;
   $self->check_attributes or Carp::confess 'build attributes failed';
 
   return $self->attributes;
 }
 
-method parse_attributes() {
+sub parse_attributes {
+  my ($self) = @_;
+
   my $source = $self->source->data;
   my $lines = $source->content('attributes');
 
@@ -311,7 +354,9 @@ method parse_attributes() {
   return $self->{attributes} = $lines;
 }
 
-method check_attributes() {
+sub check_attributes {
+  my ($self) = @_;
+
   my $attributes = $self->attributes;
 
   return 1 if !@$attributes;
@@ -335,20 +380,26 @@ method check_attributes() {
   return 1;
 }
 
-method build_libraries() {
+sub build_libraries {
+  my ($self) = @_;
+
   $self->parse_libraries;
   $self->check_libraries or Carp::confess 'build libraries failed';
 
   return $self->libraries;
 }
 
-method parse_libraries() {
+sub parse_libraries {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   return $self->{libraries} = $source->content('libraries');
 }
 
-method check_libraries() {
+sub check_libraries {
+  my ($self) = @_;
+
   my $libraries = $self->libraries;
 
   return 1 if !$libraries;
@@ -360,20 +411,26 @@ method check_libraries() {
   return 1;
 }
 
-method build_headers() {
+sub build_headers {
+  my ($self) = @_;
+
   $self->parse_headers;
   $self->check_headers or Carp::confess 'build headers failed';
 
   return $self->headers;
 }
 
-method parse_headers() {
+sub parse_headers {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   return $self->{headers} = $source->content('headers');
 }
 
-method check_headers() {
+sub check_headers {
+  my ($self) = @_;
+
   my $headers = $self->headers;
 
   return 1 if !$headers;
@@ -383,20 +440,26 @@ method check_headers() {
   return 1;
 }
 
-method build_footers() {
+sub build_footers {
+  my ($self) = @_;
+
   $self->parse_footers;
   $self->check_footers or Carp::confess 'build footers failed';
 
   return $self->footers;
 }
 
-method parse_footers() {
+sub parse_footers {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   return $self->{footers} = $source->content('footers');
 }
 
-method check_footers() {
+sub check_footers {
+  my ($self) = @_;
+
   my $footers = $self->footers;
 
   return 1 if !$footers;
@@ -406,14 +469,18 @@ method check_footers() {
   return 1;
 }
 
-method build_scenarios() {
+sub build_scenarios {
+  my ($self) = @_;
+
   $self->parse_scenarios;
   $self->check_scenarios or Carp::confess 'build scenarios failed';
 
   return $self->stash('scenarios');
 }
 
-method parse_scenarios() {
+sub parse_scenarios {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   my $scenarios = {};
@@ -433,7 +500,9 @@ method parse_scenarios() {
   return $self->stash(scenarios => $scenarios);
 }
 
-method check_scenarios() {
+sub check_scenarios {
+  my ($self) = @_;
+
   my $scenarios = $self->stash('scenarios');
 
   return 1 if !%$scenarios;
@@ -446,7 +515,9 @@ method check_scenarios() {
   return 1;
 }
 
-method build_methods() {
+sub build_methods {
+  my ($self) = @_;
+
   return if !$self->includes;
 
   $self->parse_methods;
@@ -455,7 +526,9 @@ method build_methods() {
   return $self->stash('methods');
 }
 
-method parse_methods() {
+sub parse_methods {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   my $methods = {};
@@ -483,7 +556,9 @@ method parse_methods() {
   return $self->stash(methods => $methods);
 }
 
-method check_methods() {
+sub check_methods {
+  my ($self) = @_;
+
   my $methods = $self->stash('methods');
 
   return 1 if !%$methods;
@@ -497,7 +572,9 @@ method check_methods() {
   return 1;
 }
 
-method build_functions() {
+sub build_functions {
+  my ($self) = @_;
+
   return if !$self->includes;
 
   $self->parse_functions;
@@ -506,7 +583,9 @@ method build_functions() {
   return $self->stash('functions');
 }
 
-method parse_functions() {
+sub parse_functions {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   my $functions = {};
@@ -534,7 +613,9 @@ method parse_functions() {
   return $self->stash(functions => $functions);
 }
 
-method check_functions() {
+sub check_functions {
+  my ($self) = @_;
+
   my $functions = $self->stash('functions');
 
   return 1 if !%$functions;
@@ -548,7 +629,9 @@ method check_functions() {
   return 1;
 }
 
-method build_routines() {
+sub build_routines {
+  my ($self) = @_;
+
   return if !$self->includes;
 
   $self->parse_routines;
@@ -557,7 +640,9 @@ method build_routines() {
   return $self->stash('routines');
 }
 
-method parse_routines() {
+sub parse_routines {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   my $routines = {};
@@ -585,7 +670,9 @@ method parse_routines() {
   return $self->stash(routines => $routines);
 }
 
-method check_routines() {
+sub check_routines {
+  my ($self) = @_;
+
   my $routines = $self->stash('routines');
 
   return 1 if !%$routines;
@@ -599,14 +686,18 @@ method check_routines() {
   return 1;
 }
 
-method build_types() {
+sub build_types {
+  my ($self) = @_;
+
   $self->parse_types;
   $self->check_types or Carp::confess 'build types failed';
 
   return $self->stash('types');
 }
 
-method parse_types() {
+sub parse_types {
+  my ($self) = @_;
+
   my $source = $self->source->data;
 
   my $types = {};
@@ -644,7 +735,9 @@ method parse_types() {
   return $self->stash(types => $types);
 }
 
-method check_types() {
+sub check_types {
+  my ($self) = @_;
+
   my $types = $self->stash('types');
 
   return 1 if !%$types;
@@ -658,7 +751,9 @@ method check_types() {
   return 1;
 }
 
-method scenarios($name, $attr) {
+sub scenarios {
+  my ($self, $name, $attr) = @_;
+
   my $scenarios = $self->stash('scenarios');
 
   return $scenarios if !$name;
@@ -670,7 +765,9 @@ method scenarios($name, $attr) {
   return $result->{$attr};
 }
 
-method methods($name, $attr) {
+sub methods {
+  my ($self, $name, $attr) = @_;
+
   my $methods = $self->stash('methods');
 
   return $methods if !$name;
@@ -682,7 +779,9 @@ method methods($name, $attr) {
   return $result->{$attr};
 }
 
-method functions($name, $attr) {
+sub functions {
+  my ($self, $name, $attr) = @_;
+
   my $functions = $self->stash('functions');
 
   return $functions if !$name;
@@ -694,7 +793,9 @@ method functions($name, $attr) {
   return $result->{$attr};
 }
 
-method routines($name, $attr) {
+sub routines {
+  my ($self, $name, $attr) = @_;
+
   my $routines = $self->stash('routines');
 
   return $routines if !$name;
@@ -706,7 +807,9 @@ method routines($name, $attr) {
   return $result->{$attr};
 }
 
-method types($name, $attr) {
+sub types {
+  my ($self, $name, $attr) = @_;
+
   my $types = $self->stash('types');
 
   return $types if !$name;
@@ -718,12 +821,26 @@ method types($name, $attr) {
   return $result->{$attr};
 }
 
-method render($method, @args) {
+sub render {
+  my ($self, $method, @args) = @_;
+
   my $newline = "\n";
 
   my $results = $self->$method(@args) or return "";
 
   return join $newline, @$results;
+}
+
+sub stash {
+  my ($self, $key, $value) = @_;
+
+  return $self->{'$stash'} if !exists $_[1];
+
+  return $self->{'$stash'}->{$key} if !exists $_[2];
+
+  $self->{'$stash'}->{$key} = $value;
+
+  return $value;
 }
 
 1;

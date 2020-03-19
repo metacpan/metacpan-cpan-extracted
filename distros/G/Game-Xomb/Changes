@@ -1,5 +1,15 @@
 Revision history for Game::Xomb
 
+1.02    2020-03-19 16:15 UTC
+    * only check for passive effects on MINERAL not also VEGGIE.
+      simplify the passive_* calls a bit
+    * remove unused load_map()
+    * report Amulet proximity after any environmental effects
+    * rework scoring function to use exact AMULET value, more points for
+      visiting deeper levels, more points if actually win
+    * tests of more of the code, and fix various broken tests
+    * tweak gems and some other things too
+
 1.01    2020-03-14 03:25 UTC
     * switch RNG to Jenkins Small Fast -- "A small noncryptographic PRNG"
     * save keystrokes to file and support replay from that

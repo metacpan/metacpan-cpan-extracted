@@ -31,6 +31,8 @@ This package integrates behaviors from:
 
 [Data::Object::Role::Throwable](https://metacpan.org/pod/Data::Object::Role::Throwable)
 
+[Faker::Maker](https://metacpan.org/pod/Faker::Maker)
+
 # LIBRARIES
 
 This package uses type constraints from:
@@ -984,6 +986,8 @@ Parts of this library were inspired by the following implementations:
 [Python Faker](https://github.com/joke2k/faker)
 
 [JS Faker](https://github.com/Marak/faker.js)
+
+[Elixir Faker](https://github.com/elixirs/faker)
 
 # PROJECT
 

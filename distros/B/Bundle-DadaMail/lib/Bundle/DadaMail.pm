@@ -1,6 +1,6 @@
 package Bundle::DadaMail;
 
-$VERSION = '0.0.10';
+$VERSION = '0.0.11';
 
 1;
 
@@ -54,6 +54,8 @@ DateTime::Event::Recurrence - used for scheduled mass mailings
 
 DateTime - same
 
+File::Copy::Recursive - used in the installer 
+
 File::Find::Rule - used for the Perl connector in KCFInder
 
 HTML::Tree - used for Dada Mail's "Magic" templates, as well as manipulating HTML documents
@@ -65,6 +67,8 @@ HTML::TreeBuilder - same
 HTTP::BrowserDetect - Makes reporting of user agents prettier
 
 Google::reCAPTCHA
+
+Google::reCAPTCHA::v3
 
 Gravatar::URL
 

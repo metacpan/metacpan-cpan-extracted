@@ -2,7 +2,7 @@
 #
 # is the map (and player) generation doing sane things?
 #
-# expensive checks for things that should not be:
+# expensive check for things that should not be:
 #
 #   AUTHOR_TEST_JMATES=1 prove t/mapgen.t
 #
@@ -15,7 +15,7 @@
 #   XOMB_AMULET=1 XOMB_MAPGEN_MINLVL=3 XOMB_MAPGEN_MAXLVL=3 \
 #     XOMB_MAPGEN_TRIALS=100 prove t/mapgen.t
 #
-# mixing XOMB_MAPGEN_TRIALS and AUTHOR_TEST_JMATES=1 is probably
+# setting both XOMB_MAPGEN_TRIALS and AUTHOR_TEST_JMATES=1 is probably
 # no bueno
 
 use 5.24.0;
@@ -25,9 +25,26 @@ use Game::Xomb;
 use Statistics::Lite qw(statshash);
 use Test::Most;
 
-my $deeply = \&eq_or_diff;
+my $trials = $ENV{XOMB_MAPGEN_TRIALS} || 1;
+BAIL_OUT("trials must be positive") if $trials < 1;
+
+my $minlvl = Game::Xomb::between(1, 5, $ENV{XOMB_MAPGEN_MINLVL} || 1);
+my $maxlvl = Game::Xomb::between(1, 5, $ENV{XOMB_MAPGEN_MAXLVL} || 5);
+BAIL_OUT("maxlvl must be >= minlvl") if $maxlvl < $minlvl;
 
 Game::Xomb::init_jsf(int rand 2**32);
+
+# do they have the amulet?
+{
+    no warnings 'redefine';
+    if ($ENV{XOMB_AMULET}) {
+        *Game::Xomb::has_amulet = sub { 1 }
+    } else {
+        *Game::Xomb::has_amulet = sub { 0 }
+    }
+}
+
+my $deeply = \&eq_or_diff;
 
 ok @Game::Xomb::LMap == 0;
 Game::Xomb::init_map;
@@ -35,15 +52,8 @@ $deeply->($Game::Xomb::LMap[1][1][Game::Xomb::WHERE], [ 1, 1 ]);
 
 my ($col, $row) = Game::Xomb::make_player;
 
-if ($ENV{XOMB_AMULET}) {
-    no warnings 'redefine';
-    *Game::Xomb::has_amulet = sub { 1 }
-}
-
-ok $Game::Xomb::LMap[$row][$col][Game::Xomb::ANIMAL][Game::Xomb::SPECIES] ==
+is $Game::Xomb::LMap[$row][$col][Game::Xomb::ANIMAL][Game::Xomb::SPECIES],
   Game::Xomb::HERO;
-
-my $trials = $ENV{XOMB_MAPGEN_TRIALS} || 1;
 
 # how often is something good (gate, gem) being camped?
 my @camping;
@@ -53,23 +63,25 @@ my @camping;
 # close point to some other point...)
 my @seeds;
 
-# NOTE more monsters (but fewer gems) will spawn when the player has
-# the amulet...
-my $minlvl = $ENV{XOMB_MAPGEN_MINLVL} || 1;
-my $maxlvl = $ENV{XOMB_MAPGEN_MAXLVL} || 5;
-lives_ok sub {
-    for my $level ($minlvl .. $maxlvl) {
-        for (1 .. $trials) {
-            my ($seedsleft, $camps) = Game::Xomb::generate_map;
-            push @seeds, $seedsleft;
-            push @camping, $camps;
-            audit_map() if $ENV{AUTHOR_TEST_JMATES};
-        }
-    }
-};
+my @GGV;
 
-report('camping', \@camping); 
-report('free map seeds', \@seeds); 
+for my $level ($minlvl .. $maxlvl) {
+    $Game::Xomb::Level = $level;
+    for (1 .. $trials) {
+        my ($ammie, $gemcount, $gemvalue, $left, $camps) = Game::Xomb::generate_map;
+        # amulet only generated on levels 4 and 5 and only if player
+        # does not already have it
+        is $ammie, ($level > 3 and !$ENV{XOMB_AMULET}) ? 1 : 0;
+        push @camping, $camps;
+        push @seeds,   $left;
+        push @GGV,     $gemvalue;
+        audit_map() if $ENV{AUTHOR_TEST_JMATES};
+    }
+}
+
+report('camping',        \@camping);
+report('free map seeds', \@seeds);
+report('GGV',            \@GGV);
 
 done_testing;
 
@@ -95,7 +107,7 @@ sub audit_map {
 
 sub report {
     my ($prefix, $values) = @_;
-my %stats = statshash $values->@*;
-diag $prefix . sprintf " %.2f sd %.2f min,max %d,%d",
-  map { $stats{$_} } qw/mean stddev min max/;
+    my %stats = statshash $values->@*;
+    diag $prefix . sprintf " %.2f sd %.2f min,max %d,%d",
+      map { $stats{$_} } qw/mean stddev min max/;
 }

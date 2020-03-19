@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Install the C libxml2 library on your system
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 
@@ -24,60 +24,58 @@ Alien::Libxml2 - Install the C libxml2 library on your system
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
+
+In your Makefile.PL:
+
+ use ExtUtils::MakeMaker;
+ use Alien::Base::Wrapper ();
+
+ WriteMakefile(
+   Alien::Base::Wrapper->new('Alien::Libxml2')->mm_args2(
+     # MakeMaker args
+     NAME => 'Kafka::Librd',
+     ...
+   ),
+ );
 
 In your Build.PL:
 
  use Module::Build;
- use Alien::Libxml2;
+ use Alien::Base::Wrapper qw( Alien::Libxml2 !export );
+
  my $builder = Module::Build->new(
    ...
    configure_requires => {
      'Alien::Libxml2' => '0',
      ...
    },
-   extra_compiler_flags => Alien::Libxml2->cflags,
-   extra_linker_flags   => Alien::Libxml2->libs,
+   Alien::Base::Wrapper->mb_args,
    ...
  );
- 
+
  $build->create_build_script;
-
-In your Makefile.PL:
-
- use ExtUtils::MakeMaker;
- use Config;
- use Alien::Libxml2;
- 
- WriteMakefile(
-   ...
-   CONFIGURE_REQUIRES => {
-     'Alien::Libxml2' => '0',
-   },
-   CCFLAGS => Alien::Libxml2->cflags . " $Config{ccflags}",
-   LIBS    => [ Alien::Libxml2->libs ],
-   ...
- );
 
 In your L<FFI::Platypus> script or module:
 
  use FFI::Platypus;
  use Alien::Libxml2;
- 
+
  my $ffi = FFI::Platypus->new(
    lib => [ Alien::Libxml2->dynamic_libs ],
  );
 
 =head1 DESCRIPTION
 
-This module provides libxml2 for other modules to use.  There was an
-already existing L<Alien::LibXML>, but it uses the older
-L<Alien::Build::ModuleBuild> and has not been actively maintained for a
-while.
+This module provides C<libxml2> for other modules to use.
 
 =head1 CAVEATS
+
+There was an older existing L<Alien::LibXML>, but it uses the older
+L<Alien::Build::ModuleBuild> and the author prefers this version which
+is based on the more robust L<alienfile> system.
 
 C<libxml2> has some optional prereqs, including C<zlib> and C<iconv>.
 For a C<share> install you will want to make sure that these are installed
@@ -96,7 +94,11 @@ or C<zlib.h>, then this is likely the reason.
 
 =item L<Alien::LibXML>
 
-Unmaintained Alien for the same library.
+Older Alien for the same library.
+
+=item L<XML::LibXML>
+
+Perl interface to C<libxml2>, which uses this L<Alien>
 
 =back
 

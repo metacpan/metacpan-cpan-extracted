@@ -58,6 +58,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util::Numeric" => 0,
     "Sort::Naturally" => 0,
     "String::Util" => 0,
+    "Time::HiRes" => 0,
     "Time::Local" => 0,
     "Time::ParseDate" => 0,
     "Time::localtime" => 0,
@@ -72,7 +73,7 @@ my %WriteMakefileArgs = (
     "Test2::Plugin::DieOnFail" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.025",
+  "VERSION" => "0.026",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -114,6 +115,7 @@ my %FallbackPrereqs = (
   "String::Util" => 0,
   "Test2::Plugin::DieOnFail" => 0,
   "Test2::V0" => 0,
+  "Time::HiRes" => 0,
   "Time::Local" => 0,
   "Time::ParseDate" => 0,
   "Time::localtime" => 0,

@@ -26,6 +26,7 @@ checkLocalDateTime();
 checkLocalDateTimeIsValid();
 checkLocalDateTimeToEpoch();
 checkLocalDateTimeAdd();
+checkTimeMs();
 
 done_testing;
 
@@ -78,4 +79,9 @@ sub checkLocalDateTimeIsValid {
 		
 	ok( !$DateTime->localDateTimeIsValid('foobar') );
 	ok( !$DateTime->localDateTimeIsValid('0000-88-00 88:00:00') );
+}
+
+sub checkTimeMs {
+	
+	ok($DateTime->timeMs > time);	
 }

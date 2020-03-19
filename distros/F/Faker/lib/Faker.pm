@@ -11,13 +11,10 @@ use routines;
 use Data::Object::Class;
 use Data::Object::ClassHas;
 
-with 'Data::Object::Role::Pluggable';
 with 'Data::Object::Role::Proxyable';
-with 'Data::Object::Role::Throwable';
+with 'Faker::Maker';
 
-with 'Faker::Process';
-
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 # METHODS
 
@@ -422,6 +419,8 @@ L<Data::Object::Role::Pluggable>
 L<Data::Object::Role::Proxyable>
 
 L<Data::Object::Role::Throwable>
+
+L<Faker::Maker>
 
 =cut
 
@@ -1730,6 +1729,8 @@ L<Ruby Faker|https://github.com/stympy/faker>
 L<Python Faker|https://github.com/joke2k/faker>
 
 L<JS Faker|https://github.com/Marak/faker.js>
+
+L<Elixir Faker|https://github.com/elixirs/faker>
 
 =head1 PROJECT
 

@@ -4,7 +4,6 @@ use lib 't/lib';
 
 use strict;
 use warnings;
-use routines;
 
 use Test::Auto;
 use Test::More;
@@ -32,7 +31,7 @@ method: tests
   sub tests {
     my ($self, @args) = @_;
 
-    subtest "testing example plugin", fun () {
+    subtest "testing example plugin", sub {
 
       ok 1;
     };
@@ -98,13 +97,17 @@ my $subs = testauto(__FILE__);
 
 $subs = $subs->standard;
 
-$subs->synopsis(fun($tryable) {
+$subs->synopsis(sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'tests', 'method', fun($tryable) {
+$subs->example(-1, 'tests', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
   ok $result->isa('Test::Auto::Plugin::ShortDescription');
   ok $result->isa('Test::Auto::Plugin');

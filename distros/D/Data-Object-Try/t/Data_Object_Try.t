@@ -107,6 +107,8 @@ call(Str | CodeRef $arg) : Object
 
 =example-1 call
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -127,6 +129,8 @@ callback(Str | CodeRef $arg) : CodeRef
 
 =example-1 callback
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->callback(fun (@args) {
@@ -139,6 +143,7 @@ callback(Str | CodeRef $arg) : CodeRef
   package Example;
 
   use Moo;
+  use routines;
 
   fun test(@args) {
 
@@ -167,6 +172,8 @@ catch(Str $isa, Str | CodeRef $arg) : Any
 
 =example-1 catch
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -191,6 +198,8 @@ C<catch> conditions match the exception thrown.
 default(Str | CodeRef $arg) : Object
 
 =example-1 default
+
+  use routines;
 
   my $try = Data::Object::Try->new;
 
@@ -219,6 +228,8 @@ execute(CodeRef $arg, Any @args) : Any
 
 =example-1 execute
 
+  use routines;
+
   my $try = Data::Object::Try->new(
     invocant => Example->new,
     arguments => [1,2,3]
@@ -244,6 +255,8 @@ arguments were provided by the invocant.
 finally(Str | CodeRef $arg) : Object
 
 =example-1 finally
+
+  use routines;
 
   my $try = Data::Object::Try->new(
     invocant => Example->new,
@@ -273,6 +286,8 @@ maybe() : Object
 
 =example-1 maybe
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -294,6 +309,8 @@ object.
 no_catch() : Object
 
 =example-1 no_catch
+
+  use routines;
 
   my $try = Data::Object::Try->new;
 
@@ -322,6 +339,8 @@ no_default() : Object
 
 =example-1 no_default
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -348,6 +367,8 @@ object.
 no_finally() : Object
 
 =example-1 no_finally
+
+  use routines;
 
   my $try = Data::Object::Try->new(
     invocant => Example->new,
@@ -379,6 +400,8 @@ no_try() : Object
 
 =example-1 no_try
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -407,6 +430,8 @@ result(Any @args) : Any
 
 =example-1 result
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -417,6 +442,8 @@ result(Any @args) : Any
   $try->result;
 
 =example-2 result
+
+  use routines;
 
   my $try = Data::Object::Try->new;
 

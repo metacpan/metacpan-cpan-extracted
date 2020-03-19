@@ -1,5 +1,8 @@
 Revision history for Prometheus-Tiny-Shared
 
+0.012     2020-03-19 14:35:01+11:00 Australia/Melbourne
+- Disable SQLite synchronous writes, and note that the backing store is not intended to be persistent or durable.
+
 0.011     2020-02-27 16:17:58+11:00 Australia/Melbourne
 - Make it work under Perl < 5.24 again (no postderef)
 - Add init_file option to recreate the underlying file at object construction.

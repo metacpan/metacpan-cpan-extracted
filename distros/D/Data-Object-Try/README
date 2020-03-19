@@ -110,6 +110,8 @@ METHODS
 
     call example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new;
       
         $try->call(fun (@args) {
@@ -127,6 +129,8 @@ METHODS
 
     callback example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new;
       
         $try->callback(fun (@args) {
@@ -139,6 +143,7 @@ METHODS
         package Example;
       
         use Moo;
+        use routines;
       
         fun test(@args) {
       
@@ -163,6 +168,8 @@ METHODS
 
     catch example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new;
       
         $try->call(fun (@args) {
@@ -184,6 +191,8 @@ METHODS
 
     default example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new;
       
         $try->call(fun (@args) {
@@ -208,6 +217,8 @@ METHODS
 
     execute example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new(
           invocant => Example->new,
           arguments => [1,2,3]
@@ -230,6 +241,8 @@ METHODS
 
     finally example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new(
           invocant => Example->new,
           arguments => [1,2,3]
@@ -254,6 +267,8 @@ METHODS
 
     maybe example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new;
       
         $try->call(fun (@args) {
@@ -272,6 +287,8 @@ METHODS
 
     no_catch example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new;
       
         $try->call(fun (@args) {
@@ -295,6 +312,8 @@ METHODS
 
     no_default example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new;
       
         $try->call(fun (@args) {
@@ -318,6 +337,8 @@ METHODS
 
     no_finally example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new(
           invocant => Example->new,
           arguments => [1,2,3]
@@ -344,6 +365,8 @@ METHODS
 
     no_try example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new;
       
         $try->call(fun (@args) {
@@ -369,6 +392,8 @@ METHODS
 
     result example #1
 
+        use routines;
+      
         my $try = Data::Object::Try->new;
       
         $try->call(fun (@args) {
@@ -380,6 +405,8 @@ METHODS
 
     result example #2
 
+        use routines;
+      
         my $try = Data::Object::Try->new;
       
         $try->call(fun (@args) {

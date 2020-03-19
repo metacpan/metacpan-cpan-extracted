@@ -9,7 +9,7 @@ use routines;
 use Moo;
 use Try::Tiny ();
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 # ATTRIBUTES
 
@@ -296,6 +296,8 @@ the invocant.
 
 =item call example #1
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -318,6 +320,8 @@ registration. If a coderef is provided this method is mostly a passthrough.
 
 =item callback example #1
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->callback(fun (@args) {
@@ -334,6 +338,7 @@ registration. If a coderef is provided this method is mostly a passthrough.
   package Example;
 
   use Moo;
+  use routines;
 
   fun test(@args) {
 
@@ -364,6 +369,8 @@ callback.
 
 =item catch example #1
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -390,6 +397,8 @@ C<catch> conditions match the exception thrown.
 =over 4
 
 =item default example #1
+
+  use routines;
 
   my $try = Data::Object::Try->new;
 
@@ -420,6 +429,8 @@ constructor, and whatever arguments were passed directly to this method.
 
 =item execute example #1
 
+  use routines;
+
   my $try = Data::Object::Try->new(
     invocant => Example->new,
     arguments => [1,2,3]
@@ -447,6 +458,8 @@ arguments were provided by the invocant.
 =over 4
 
 =item finally example #1
+
+  use routines;
 
   my $try = Data::Object::Try->new(
     invocant => Example->new,
@@ -478,6 +491,8 @@ i.e. an empty string, if an exception is encountered.
 
 =item maybe example #1
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -501,6 +516,8 @@ object.
 =over 4
 
 =item no_catch example #1
+
+  use routines;
 
   my $try = Data::Object::Try->new;
 
@@ -531,6 +548,8 @@ object.
 
 =item no_default example #1
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -559,6 +578,8 @@ object.
 =over 4
 
 =item no_finally example #1
+
+  use routines;
 
   my $try = Data::Object::Try->new(
     invocant => Example->new,
@@ -592,6 +613,8 @@ object.
 
 =item no_try example #1
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -622,6 +645,8 @@ arguments were passed directly to this method.
 
 =item result example #1
 
+  use routines;
+
   my $try = Data::Object::Try->new;
 
   $try->call(fun (@args) {
@@ -636,6 +661,8 @@ arguments were passed directly to this method.
 =over 4
 
 =item result example #2
+
+  use routines;
 
   my $try = Data::Object::Try->new;
 

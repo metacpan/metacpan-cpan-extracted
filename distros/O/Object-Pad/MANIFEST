@@ -20,6 +20,7 @@ t/11method-signatures.t
 t/20slots-private.t
 t/21slots-capture.t
 t/30unit-class.t
+t/31pad-outside.t
 t/50croak-method.t
 t/51pragmata.t
 t/52croak-scope.t

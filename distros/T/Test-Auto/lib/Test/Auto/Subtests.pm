@@ -5,29 +5,29 @@ use warnings;
 
 use feature 'state';
 
-use Data::Object::Class;
-use Data::Object::Attributes;
+use Moo;
+use Test::Auto::Try;
+use Test::Auto::Types ();
 use Test::More;
 use Type::Registry;
 
-use registry 'Test::Auto::Types';
-use routines;
-
 require Carp;
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 # ATTRIBUTES
 
 has parser => (
   is => 'ro',
-  isa => 'Parser',
-  req => 1
+  isa => Test::Auto::Types::Parser(),
+  required => 1
 );
 
 # METHODS
 
-method standard() {
+sub standard {
+  my ($self) = @_;
+
   $self->package;
   $self->document;
   $self->libraries;
@@ -41,10 +41,12 @@ method standard() {
   return $self;
 }
 
-method package() {
+sub package {
+  my ($self) = @_;
+
   my $parser = $self->parser;
 
-  subtest "testing package", fun () {
+  subtest "testing package", sub {
     my $package = $parser->render('name')
       or plan skip_all => "no package";
 
@@ -52,12 +54,14 @@ method package() {
   };
 }
 
-method plugin($name) {
+sub plugin {
+  my ($self, $name) = @_;
+
   my $package = join '::', map ucfirst, (
     'test', 'auto', 'plugin', $name
   );
 
-  subtest "testing plugin ($name)", fun () {
+  subtest "testing plugin ($name)", sub {
     use_ok $package
       or plan skip_all => "$package not loaded";
 
@@ -69,10 +73,12 @@ method plugin($name) {
   return $instance;
 }
 
-method libraries() {
+sub libraries {
+  my ($self) = @_;
+
   my $parser = $self->parser;
 
-  subtest "testing libraries", fun () {
+  subtest "testing libraries", sub {
     my $packages = $parser->libraries
       or plan skip_all => "no libraries";
 
@@ -80,10 +86,12 @@ method libraries() {
   };
 }
 
-method inherits() {
+sub inherits {
+  my ($self) = @_;
+
   my $parser = $self->parser;
 
-  subtest "testing inherited", fun () {
+  subtest "testing inherited", sub {
     my $inherited = $parser->inherits
       or plan skip_all => "no inherited";
 
@@ -91,10 +99,12 @@ method inherits() {
   };
 }
 
-method document() {
+sub document {
+  my ($self) = @_;
+
   my $parser = $self->parser;
 
-  subtest "testing document", fun () {
+  subtest "testing document", sub {
     ok $parser->render($_), "pod $_" for qw(
       name
       abstract
@@ -105,10 +115,12 @@ method document() {
   };
 }
 
-method attributes() {
+sub attributes {
+  my ($self) = @_;
+
   my $parser = $self->parser;
 
-  subtest "testing attributes", fun () {
+  subtest "testing attributes", sub {
     my $package = $parser->render('name')
       or plan skip_all => "no package";
 
@@ -116,7 +128,7 @@ method attributes() {
     plan skip_all => 'no attributes' if !$attributes || !%$attributes;
 
     for my $name (sort keys %$attributes) {
-      subtest "testing attribute $name", fun () {
+      subtest "testing attribute $name", sub {
         my $attribute = $attributes->{$name};
 
         ok $package->can($name), 'can ok';
@@ -131,10 +143,12 @@ method attributes() {
   };
 }
 
-method methods() {
+sub methods {
+  my ($self) = @_;
+
   my $parser = $self->parser;
 
-  subtest "testing methods", fun () {
+  subtest "testing methods", sub {
     my $package = $parser->render('name')
       or plan skip_all => "no package";
 
@@ -142,7 +156,7 @@ method methods() {
     plan skip_all => 'no methods' if !$methods || !%$methods;
 
     for my $name (sort keys %$methods) {
-      subtest "testing method $name", fun () {
+      subtest "testing method $name", sub {
         my $method = $methods->{$name};
 
         ok $package->can($name), 'can ok';
@@ -154,10 +168,12 @@ method methods() {
   };
 }
 
-method routines() {
+sub routines {
+  my ($self) = @_;
+
   my $parser = $self->parser;
 
-  subtest "testing routines", fun () {
+  subtest "testing routines", sub {
     my $package = $parser->render('name')
       or plan skip_all => "no package";
 
@@ -165,7 +181,7 @@ method routines() {
     plan skip_all => 'no routines' if !$routines || !%$routines;
 
     for my $name (sort keys %$routines) {
-      subtest "testing routine $name", fun () {
+      subtest "testing routine $name", sub {
         my $routine = $routines->{$name};
 
         ok $package->can($name), 'can ok';
@@ -177,10 +193,12 @@ method routines() {
   };
 }
 
-method functions() {
+sub functions {
+  my ($self) = @_;
+
   my $parser = $self->parser;
 
-  subtest "testing functions", fun () {
+  subtest "testing functions", sub {
     my $package = $parser->render('name')
       or plan skip_all => "no package";
 
@@ -188,7 +206,7 @@ method functions() {
     plan skip_all => 'no functions' if !$functions || !%$functions;
 
     for my $name (sort keys %$functions) {
-      subtest "testing function $name", fun () {
+      subtest "testing function $name", sub {
         my $function = $functions->{$name};
 
         ok $package->can($name), 'can ok';
@@ -200,15 +218,17 @@ method functions() {
   };
 }
 
-method types() {
+sub types {
+  my ($self) = @_;
+
   my $parser = $self->parser;
 
-  subtest "testing types", fun () {
+  subtest "testing types", sub {
     my $types = $parser->types;
     plan skip_all => 'no types' if !$types || !%$types;
 
     for my $name (sort keys %$types) {
-      subtest "testing type $name", fun () {
+      subtest "testing type $name", sub {
         my $type = $types->{$name};
 
         my $library = $type->{library}[0][0]
@@ -227,7 +247,7 @@ method types() {
             my $example = $type->{examples}{$number};
             my $context = join "\n", @{$example->[0]};
 
-            subtest "testing example-$number ($name)", fun () {
+            subtest "testing example-$number ($name)", sub {
               my $tryable = $self->tryable($context)->call('evaluator');
               my $result = $tryable->result;
 
@@ -239,7 +259,7 @@ method types() {
             my $coercion = $type->{coercions}{$number};
             my $context = join "\n", @{$coercion->[0]};
 
-            subtest "testing coercion-$number ($name)", fun () {
+            subtest "testing coercion-$number ($name)", sub {
               my $tryable = $self->tryable($context)->call('evaluator');
               my $result = $tryable->result;
 
@@ -253,20 +273,24 @@ method types() {
   };
 }
 
-method synopsis($callback) {
+sub synopsis {
+  my ($self, $callback) = @_;
+
   my $parser = $self->parser;
 
   my $context = $parser->render('synopsis');
   my $tryable = $self->tryable($context);
 
-  subtest "testing synopsis", fun () {
+  subtest "testing synopsis", sub {
     my @results = $callback->($tryable->call('evaluator'));
 
     ok scalar(@results), 'called ok';
   };
 }
 
-method scenario($name, $callback) {
+sub scenario {
+  my ($self, $name, $callback) = @_;
+
   my $parser = $self->parser;
 
   my @results;
@@ -280,7 +304,7 @@ method scenario($name, $callback) {
 
   my $tryable = $self->tryable(join "\n", @content);
 
-  subtest "testing scenario ($name)", fun () {
+  subtest "testing scenario ($name)", sub {
     unless (@content) {
       BAIL_OUT "unknown scenario $name";
 
@@ -292,7 +316,9 @@ method scenario($name, $callback) {
   };
 }
 
-method example($number, $name, $type, $callback) {
+sub example {
+  my ($self, $number, $name, $type, $callback) = @_;
+
   my $parser = $self->parser;
 
   my $context;
@@ -329,7 +355,7 @@ method example($number, $name, $type, $callback) {
 
   my $tryable = $self->tryable(join "\n", @content);
 
-  subtest "testing example-$number ($name)", fun () {
+  subtest "testing example-$number ($name)", sub {
     unless (@content) {
       BAIL_OUT "unknown $type $name for example-$number";
 
@@ -340,7 +366,7 @@ method example($number, $name, $type, $callback) {
     ok scalar(@results), 'called ok';
   };
 
-  subtest "testing example-$number ($name) results", fun () {
+  subtest "testing example-$number ($name) results", sub {
     unless (@content) {
       BAIL_OUT "unknown $type $name for example-$number";
 
@@ -356,7 +382,9 @@ method example($number, $name, $type, $callback) {
   };
 }
 
-method evaluator($context) {
+sub evaluator {
+  my ($self, $context) = @_;
+
   local $@;
 
   my $returned = eval "$context";
@@ -369,15 +397,19 @@ method evaluator($context) {
   return $returned;
 }
 
-method tryable(@passed) {
+sub tryable {
+  my ($self, @passed) = @_;
+
   my @arguments = (invocant => $self);
 
   push @arguments, arguments => [@passed] if @passed;
 
-  return Data::Object::Try->new(@arguments);
+  return Test::Auto::Try->new(@arguments);
 }
 
-method registry() {
+sub registry {
+  my ($self) = @_;
+
   my $parser = $self->parser;
   my $libraries = $parser->libraries;
   my $package = $parser->name;
@@ -533,9 +565,9 @@ or raises an exception.
   example(Num $number, Str $name, Str $type, CodeRef $callback) : Any
 
 This method finds and evaluates (using C<eval>) the documented example and
-returns a L<Data::Object::Try> object. The C<try> object can be used to trap
-exceptions using the C<catch> method, and/or execute the code and return the
-result using the C<result> method.
+returns a C<Test::Auto::Try> object (see L<Data::Object::Try>). The C<try>
+object can be used to trap exceptions using the C<catch> method, and/or execute
+the code and return the result using the C<result> method.
 
 =over 4
 
@@ -713,9 +745,9 @@ routines.
   scenario(Str $name, CodeRef $callback) : Any
 
 This method finds and evaluates (using C<eval>) the documented scenario example
-and returns a L<Data::Object::Try> object. The C<try> object can be used to
-trap exceptions using the C<catch> method, and/or execute the code and return
-the result using the C<result> method.
+and returns a C<Test::Auto::Try> object (see L<Data::Object::Try>). The C<try>
+object can be used to trap exceptions using the C<catch> method, and/or execute
+the code and return the result using the C<result> method.
 
 =over 4
 
@@ -778,10 +810,10 @@ standard subtests.
 
   synopsis(CodeRef $callback) : Any
 
-This method evaluates (using C<eval>) the documented synopsis and
-returns a L<Data::Object::Try> object. The C<try> object can be used to trap
-exceptions using the C<catch> method, and/or execute the code and return the
-result using the C<result> method.
+This method evaluates (using C<eval>) the documented synopsis and returns a
+C<Test::Auto::Try> object (see L<Data::Object::Try>). The C<try> object can be
+used to trap exceptions using the C<catch> method, and/or execute the code and
+return the result using the C<result> method.
 
 =over 4
 
@@ -791,6 +823,7 @@ result using the C<result> method.
 
   $subtests->synopsis(sub {
     my ($tryable) = @_;
+
     ok my $result = $tryable->result, 'result ok';
     is ref($result), 'Test::Auto::Subtests', 'isa ok';
 
@@ -803,7 +836,7 @@ result using the C<result> method.
 
 =head2 tryable
 
-  tryable(Any @arguments) : InstanceOf["Data::Object::Try"]
+  tryable(Any @arguments) : InstanceOf["Test::Auto::Try"]
 
 This method returns a tryable object which can be used to defer code execution
 with a try/catch construct.

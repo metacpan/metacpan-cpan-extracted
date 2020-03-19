@@ -4,7 +4,6 @@ use lib 't/lib';
 
 use strict;
 use warnings;
-use routines;
 
 use Test::Auto;
 use Test::More;
@@ -129,7 +128,9 @@ my $test = Test::Auto->new(__FILE__);
 
 my $subs = $test->subtests->standard;
 
-$subs->synopsis(fun($tryable) {
+$subs->synopsis(sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;

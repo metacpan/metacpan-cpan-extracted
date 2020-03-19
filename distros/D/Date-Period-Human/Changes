@@ -1,5 +1,9 @@
 Changes for Date-Period-Human
 
+0.4.7  2020-03-18 19:40:38 CET
+		- Move translation to package variable, so it's easier to make small
+		changes to the languages
+
 0.4.6  2018-03-09 07:33:14 CET
 		- Support "en_short" language, for shorthand relative dates (Thanks
 		bigpresh)

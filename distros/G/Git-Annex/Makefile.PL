@@ -32,6 +32,7 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "File::Path" => 0,
     "File::Spec::Functions" => 0,
+    "File::Temp" => 0,
     "File::chdir" => 0,
     "File::chmod" => 0,
     "Getopt::Long" => 0,
@@ -54,13 +55,12 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => 0,
     "Exporter" => 0,
     "File::Slurp" => 0,
-    "File::Temp" => 0,
     "Scalar::Util" => 0,
     "Test::More" => 0,
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }

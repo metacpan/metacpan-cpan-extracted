@@ -13,6 +13,8 @@ ppport.h
 src/jsf.c
 src/jsf.h
 t/00-load.t
+t/10-xs.t
+t/20-misc.t
 t/damage-stats.t
 t/jsf.t
 t/mapgen.t

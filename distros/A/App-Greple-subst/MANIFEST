@@ -5,9 +5,12 @@ META.json
 README.md
 cpanfile
 lib/App/Greple/subst.pm
+lib/App/Greple/subst/Dict.pm
 minil.toml
 share/jtca-katakana-guide-3.dict
 share/jtca-katakana-guide-3.pl
+share/jtf-style-guide-3.dict
+share/jtf-style-guide-3.pl
 share/sccc2.dict
 t/00_compile.t
 META.yml

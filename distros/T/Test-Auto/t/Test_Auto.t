@@ -4,7 +4,6 @@ use lib 't/lib';
 
 use strict;
 use warnings;
-use routines;
 
 use Test::Auto;
 use Test::More;
@@ -533,7 +532,9 @@ powerful hooks into the framework for manual testing.
 
   my $subtests = $test->subtests;
 
-  $subtests->synopsis(fun($tryable) {
+  $subtests->synopsis(sub {
+    my ($tryable) = @_;
+
     ok my $result = $tryable->result, 'result ok';
 
     $result; # for automated testing after the callback
@@ -541,12 +542,14 @@ powerful hooks into the framework for manual testing.
 
 The code examples documented can be automatically evaluated (evaled) and
 returned using a callback you provide for further testing. Because the code
-examples are returned as L<Data::Object::Try> objects, this makes capturing and
-testing exceptions simple, for example:
+examples are returned as C<Test::Auto::Try> objects (see L<Data::Object::Try>),
+this makes capturing and testing exceptions simple, for example:
 
   my $subtests = $test->subtests;
 
-  $subtests->synopsis(fun($tryable) {
+  $subtests->synopsis(sub {
+    my ($tryable) = @_;
+
     # catch exception thrown by the synopsis
     $tryable->catch('Path::Find::Error', sub {
       return $_[0];
@@ -560,12 +563,14 @@ testing exceptions simple, for example:
 
 Additionally, another manual testing hook (with some automation) is the
 C<example> method. This hook evaluates (evals) a given example and returns the
-result as a L<Data::Object::Try> object. The first argument is the example ID
-(or number), for example:
+result as a C<Test::Auto::Try> object (see L<Data::Object::Try>). The first
+argument is the example ID (or number), for example:
 
   my $subtests = $test->subtests;
 
-  $subtests->example(-1, 'children', 'method', fun($tryable) {
+  $subtests->example(-1, 'children', 'method', sub {
+    my ($tryable) = @_;
+
     ok my $result = $tryable->result, 'result ok';
 
     $result; # for automated testing after the callback
@@ -573,11 +578,13 @@ result as a L<Data::Object::Try> object. The first argument is the example ID
 
 Finally, the lesser-used but useful manual testing hook is the C<scenario>
 method. This hook evaluates (evals) a documented scenario and returns the
-result as a L<Data::Object::Try> object, for example:
+result as a C<Test::Auto::Try> object (see L<Data::Object::Try>), for example:
 
   my $subtests = $test->subtests;
 
-  $subtests->scenario('export-path-make', fun($tryable) {
+  $subtests->scenario('export-path-make', sub {
+    my ($tryable) = @_;
+
     ok my $result = $tryable->result, 'result ok';
 
     $result; # for automated testing after the callback
@@ -596,41 +603,54 @@ package main;
 my $subs = testauto(__FILE__);
 
 $subs = $subs->standard;
+
 $subs->plugin('ShortDescription')->tests;
 
-$subs->synopsis(fun($tryable) {
+$subs->synopsis(sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
   is ref($result), 'Test::Auto', 'isa ok';
 
   $result;
 });
 
-$subs->scenario('exports', fun($tryable) {
+$subs->scenario('exports', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'testauto', 'function', fun($tryable) {
+$subs->example(-1, 'testauto', 'function', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
   isa_ok $result, 'Test::Auto::Subtests';
 
   $result;
 });
 
-$subs->example(-1, 'document', 'method', fun($tryable) {
+$subs->example(-1, 'document', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'parser', 'method', fun($tryable) {
+$subs->example(-1, 'parser', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'subtests', 'method', fun($tryable) {
+$subs->example(-1, 'subtests', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;

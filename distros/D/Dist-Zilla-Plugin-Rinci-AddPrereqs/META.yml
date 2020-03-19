@@ -35,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Rinci-AddPrereqs
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Rinci-AddPrereqs
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-Rinci-AddPrereqs.git
-version: '0.143'
+version: '0.144'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -308,7 +308,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.143'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

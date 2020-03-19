@@ -15,7 +15,7 @@ package App::annex_to_annex_reinject;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$App::annex_to_annex_reinject::VERSION = '0.003';
+$App::annex_to_annex_reinject::VERSION = '0.004';
 use 5.028;
 use strict;
 use warnings;
@@ -29,6 +29,7 @@ use File::Path qw(rmtree);
 use File::Spec::Functions qw(rel2abs);
 use File::Find;
 use Try::Tiny;
+use File::Temp qw(tempdir);
 
 exit main() unless caller;
 
@@ -144,7 +145,7 @@ App::annex_to_annex_reinject - annex-to-annex-reinject
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 FUNCTIONS
 

@@ -1,0 +1,44 @@
+---
+abstract: 'A simple Perl API for Google reCAPTCHA v3'
+author:
+  - 'Justin Simoni'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-reCAPTCHA-v3
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Google::reCAPTCHA::v3:
+    file: lib/Google/reCAPTCHA/v3.pm
+    version: v0.1.0
+requires:
+  Carp: '0'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/justingit/Google-reCAPTCHA-v3/issues
+  homepage: https://github.com/justingit/Google-reCAPTCHA-v3
+  repository: git://github.com/justingit/Google-reCAPTCHA-v3.git
+version: 0.1.0
+x_contributors:
+  - 'justingit <perl@justinsimoni.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

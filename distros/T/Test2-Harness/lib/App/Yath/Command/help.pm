@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::Util qw/pkg_to_file/;
 
-our $VERSION = '1.000011';
+our $VERSION = '1.000013';
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase qw/<_command_info_hash/;
@@ -268,15 +268,6 @@ exit after showing help information
 =item --no-keep-dirs
 
 Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
-
-
-=item --summary
-
-=item --summary=/path/to/summary.json
-
-=item --no-summary
-
-Write out a summary json file, if no path is provided 'summary.json' will be used. The .json extension is added automatically if omitted.
 
 
 =back

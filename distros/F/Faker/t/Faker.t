@@ -102,6 +102,7 @@ Types::Standard
 Data::Object::Role::Pluggable
 Data::Object::Role::Proxyable
 Data::Object::Role::Throwable
+Faker::Maker
 
 =cut
 

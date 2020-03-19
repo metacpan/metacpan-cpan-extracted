@@ -5,7 +5,7 @@
 
 package Game::Xomb;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use 5.24.0;
 use warnings;
@@ -31,7 +31,7 @@ sub CLEAR_LINE ()   { "\e[2K" }
 sub CLEAR_RIGHT ()  { "\e[K" }
 sub CLEAR_SCREEN () { "\e[1;1H\e[2J" }
 sub HIDE_CURSOR ()  { "\e[?25l" }        # this gets toggled on/off
-sub HIDE_POINTER () { "\e[>3p" }         # remove screen gnat
+sub HIDE_POINTER () { "\e[>2p" }         # hide screen gnat
 sub SHOW_CURSOR ()  { "\e[?25h" }
 sub TERM_NORM ()    { "\e[m" }
 sub UNALT_SCREEN () { "\e[?1049l" }
@@ -91,7 +91,7 @@ sub RUBBLE ()  { 12 }
 sub WALL ()    { 13 }
 
 sub AMULET_NAME ()  { 'Dragonstone' }
-sub AMULET_REGEN () { 5 }               # slow so less likely to burn out
+sub AMULET_REGEN () { 6 }               # slow so less likely to burn out
 sub AMULET_VALUE () { 1000 }
 
 # for ANIMALS (shared with VEGGIES and MINERALS for the first few slots)
@@ -148,6 +148,7 @@ our @LMap;        # level map. array of array of array of ...
 our $Draw_Delay   = 0.15;
 our $Energy_Spent = 0;
 our $Level        = 1;      # current level
+our $Level_Max    = 1;
 our $RKFN;                  # function handling key reads
 our $Replay_Delay = 0.2;
 our $Replay_FH;
@@ -375,7 +376,13 @@ sub apply_damage {
             $ani->[DISPLAY] = '&';                 # the @ got unravelled
             $ani->[UPDATE]  = \&update_gameover;
         } else {
-            log_message($Descript{ $ani->[SPECIES] } . ' destroyed.');
+            log_message($Descript{ $ani->[SPECIES] }
+                  . ' destroyed by '
+                  . $Descript{ $rest[0]->[SPECIES] });
+            if ($ani->[SPECIES] == FUNGI and $ani->[LMC][MINERAL] != GATE and onein(20)) {
+                reify($ani->[LMC], MINERAL,
+                    passive_msg_maker('Broken rainbow conduits jut up from the regolith.'));
+            }
             $ani->[BLACK_SPOT] = 1;
             undef $ani->[LMC][ANIMAL];
         }
@@ -392,12 +399,12 @@ sub apply_damage {
     }
 }
 
+# this used to pass along more information to the passive_* calls
 sub apply_passives {
-    my ($ani, $duration, $newcell) = @_;
-    for my $i (grep defined $ani->[LMC][$_], VEGGIE, MINERAL) {
-        my $fn = $ani->[LMC][$i][UPDATE];
-        $fn->($ani, $ani->[LMC][$i], $duration, $newcell) if defined $fn;
-    }
+    my ($ani, $duration, $isnewcell) = @_;
+    my $fn = $ani->[LMC][MINERAL][UPDATE] // return;
+    push @_, $ani->[LMC][MINERAL];
+    goto $fn->&*;
 }
 
 sub await_quit { $RKFN->({ "\033" => 1, 'q' => 1 }) }
@@ -520,14 +527,16 @@ sub game_loop {
         }
         if ($new_level != 0) {
             $Level += $new_level;
+            $Level_Max = max($Level, $Level_Max);
             has_won() if $Level <= 0;
-            generate_map();
+            my $ammie = (generate_map())[0];
             $Violent_Sleep_Of_Reason = 1;
             # NOTE other half of this is applied in the Bump-into-HOLE
             # logic, elsewhere. this last half happens here as the new
             # level is not yet available prior to the fall
             apply_passives($Animates[HERO], $Animates[HERO][STASH][ECOST] / 2, 1);
             show_status_bar();
+            log_message('Proximal ' . AMULET_NAME . ' readings detected.') if $ammie;
             next GLOOP;
         }
         @Animates = grep { !$_->[BLACK_SPOT] } @Animates;
@@ -542,17 +551,16 @@ sub game_over {
 }
 
 sub generate_map {
-    splice @Animates, 1;
-
     my $findex    = min($Level, scalar @Level_Features) - 1;
     my $has_ammie = has_amulet();
 
+    splice @Animates, 1;
     my $herop = $Animates[HERO][LMC][WHERE];
     my ($col, $row) = $herop->@[ PCOL, PROW ];
 
     # reset to bare ground plus some white noise seed points
     my @seeds;
-    my $left  = 100;        # hopefully overkill
+    my $left  = 80;         # hopefully overkill
     my $total = MAP_SIZE;
     for my $r (0 .. MAP_ROWS - 1) {
         for my $c (0 .. MAP_COLS - 1) {
@@ -603,13 +611,14 @@ sub generate_map {
         bail_out("Conditions on Minos III proved too harsh.") unless @seeds;
     }
 
+    my $put_ammie = 0;
     if (exists $Level_Features[$findex]{ AMULET, } and !$has_ammie) {
         my $gem   = (make_amulet())[0];
         my $point = extract(\@seeds);
         ($col, $row) = $point->@[ PCOL, PROW ];
         push @goodp, $point;
         $LMap[$row][$col][VEGGIE] = $gem;
-        log_message('Proximal ' . AMULET_NAME . ' readings detected.');
+        $put_ammie = 1;
     }
 
     # gems no longer generate during the climb out
@@ -617,31 +626,28 @@ sub generate_map {
     my $GGV    = 0;
     my $gcount = 0;
     while (!$has_ammie) {
-        my ($gem, $value) = make_gem();
+        my ($gem, $value, $bonus) = make_gem();
         my $point = extract(\@seeds);
         ($col, $row) = $point->@[ PCOL, PROW ];
         push @goodp, $point;
         $LMap[$row][$col][VEGGIE] = $gem;
         # influences max score and how much shield repair is possible
-        $GGV += $value;
+        $GGV  += $value;
+        $gmax += $bonus;
         $gcount++;
         last if $GGV > $gmax;
     }
 
-    # pick a point and ensure that there is a walkable path between all
-    # of the good points and that (mostly) hidden point. this provides
-    # some hints on the final level due to the lack of rubble there
+    # ensure that the good points (gems, gates) and the hero are all
+    # connected. this may provide some hints on the final level due to
+    # the lack of rubble
     ($col, $row) = extract(\@seeds)->@[ PCOL, PROW ];
-    $LMap[$row][$col][MINERAL] = $Thingy{ onein(10) ? RUBBLE : FLOOR };
+    $LMap[$row][$col][MINERAL] = $Thingy{ onein(100) ? RUBBLE : FLOOR };
+    if (onein(4)) {
+        reify($LMap[$row][$col], MINERAL,
+            passive_msg_maker("Something was written here, but you can't make it out.", 1));
+    }
     pathable($col, $row, $herop, @goodp);
-    reify(
-        $LMap[$row][$col],
-        MINERAL,
-        coinflip()
-        ? passive_msg_maker(
-            'Something is written here, but you can\'t quite make it out.', 1)
-        : ()
-    );
 
     # and now an assortment of monsters
     for (1 .. $Level + roll(3, 3) + $has_ammie * 4) {
@@ -690,7 +696,7 @@ sub generate_map {
         pathable($col, $row, $herop);
     }
 
-    return scalar(@seeds), $camping;
+    return $put_ammie, $gcount, $GGV, scalar(@seeds), $camping;
 }
 
 sub getkey {
@@ -815,34 +821,6 @@ sub init_map {
     }
 }
 
-# mostly for FOV and level design playtesting to see what the various
-# t/maps/* files look like. could be extended to load pre-made levels
-# easily enough
-sub load_map {
-    my ($mapf) = @_;
-    open my $fh, '<', $mapf or bail_out("could not open '$mapf': $!\n");
-
-    my %charid = map { $Thingy{$_}->[DISPLAY] => $_ } keys %Thingy;
-
-    while (my $line = readline $fh) {
-        chomp $line;
-        my $len = length $line;
-        bail_out("$mapf:$. wrong number columns $len\n") if $len != MAP_COLS;
-        my $colnum = 0;
-        for my $ch (split //, $line) {
-            my $id = $charid{$ch}
-              // bail_out("$mapf:$. unknown character $ch at index $colnum\n");
-            my $point = [ $colnum++, $. - 1 ];
-            if ($Thingy{$id}->[GENUS] == MINERAL) {
-                push $LMap[ $. - 1 ]->@*, [ $point, $Thingy{$id} ];
-            } else {
-                bail_out("This section of Minos III is still under construction.\n");
-            }
-        }
-    }
-    bail_out("$mapf:$. incorrect row count\n") if $. != MAP_ROWS;
-}
-
 {
     my $lc  = 1;
     my @log = ('Welcome to Xomb.');
@@ -875,14 +853,10 @@ sub load_map {
 }
 
 sub loot_value {
-    my ($won) = @_;
-    my $value = $won ? 1000 : 0;
+    my $value = 0;
     for my $item ($Animates[HERO][STASH][LOOT]->@*) {
-        if ($item->[SPECIES] == AMULET) {
-            $value += 1000;
-        } elsif ($item->[SPECIES] == GEM) {
-            $value += $item->[STASH][GEM_VALUE];
-        }
+        # AMULET considered as gem as they might have burned it up a bit
+        $value += $item->[STASH][GEM_VALUE];
     }
     # they probably won't need to charge their shield after the game
     # is over?
@@ -903,36 +877,38 @@ sub make_amulet {
 sub make_gem {
     my ($name, $value, $regen);
     # lower regen is better and thus more rare. higher value makes for a
-    # higher score, or more shield that can be repaired. rare gems could
-    # be a curse as there will be fewer to find on a given level
+    # higher score, or more shield that can be repaired
     if (onein(100)) {
         $name  = "Bloodstone";
-        $value = 100 + roll(2, 10);
+        $value = 90 + roll(2, 10);
         $regen = 3;
     } elsif (onein(20)) {
         $name  = "Sunstone";
-        $value = 60 + roll(2, 12);
+        $value = 60 + roll(2, 10);
         $regen = 4;
     } else {
         $name  = "Moonstone";
-        $value = 30 + roll(2, 20);
+        $value = 40 + roll(2, 10);
         $regen = 4;
     }
     # flavor text makes things better
-    my @adj = qw/Imperial Mystic Rose Smoky Warped/;
+    my $bonus = 0;
     if (onein(1000)) {
-        $name  = 'Pearl ' . $name;
+        $name = 'Pearl ' . $name;
+        $value += 90 + roll(2, 10);
         $regen = 2;
-        $value += 40 + roll(2, 10);
+        $bonus = 100;
     } elsif (onein(3)) {
+        my @adj = qw/Imperial Mystic Rose Smoky Warped/;
         $name = pick(\@adj) . ' ' . $name;
-        $value += 50 + roll(2, 10);
+        $value += 40 + roll(2, 10);
+        $bonus = irand(30);
     }
     my $gem;
     $gem->@[ GENUS, SPECIES, DISPLAY ] = $Thingy{ GEM, }->@*;
     $gem->[STASH]->@[ GEM_NAME, GEM_VALUE, GEM_REGEN ] =
       ($name, $value, $regen);
-    return $gem, $value;
+    return $gem, $value, $bonus;
 }
 
 sub make_monster {
@@ -1038,7 +1014,7 @@ sub manage_inventory {
                 last CMD if $use eq "\033" or $use eq 'q';
                 my $i = ord($use) - 65;
                 if ($i < $loot->@*) {
-                    use_item($loot, $i, $Animates[HERO][STASH]);
+                    use_item($loot, $i, $Animates[HERO][STASH]) and print display_shieldup();
                     last CMD;
                 }
             }
@@ -1316,21 +1292,20 @@ sub nope_regarding {
     return $ret;
 }
 
+# only to the hero; map generation must place rubble/floor under monsters
 sub passive_burn {
-    my ($ani, $obj, $duration, $newcell) = @_;
-    pkc_log_code('007E') if $ani->[SPECIES] == HERO;
+    my ($ani, $duration, $isnewcell, $obj) = @_;
+    pkc_log_code('007E');
     log_message('Acid intrusion reported by shield module.')
       unless $Warned_About{acidburn}++;
-    my $src;
-    $src->[SPECIES] = ACID;
-    apply_damage($ani, 'acidburn', $src, $duration);
+    apply_damage($ani, 'acidburn', $obj, $duration);
 }
 
 sub passive_msg_maker {
     my ($message, $oneshot) = @_;
     sub {
-        my ($ani, $obj, $duration, $newcell) = @_;
-        if ($newcell) {
+        my ($ani, $duration, $isnewcell, $obj) = @_;
+        if ($isnewcell) {
             log_message($message);
             undef $obj->[UPDATE] if $oneshot;
         }
@@ -1344,8 +1319,10 @@ sub pathable {
             sub {
                 my ($c, $r) = @_;
                 my $cell = $LMap[$r][$c][MINERAL];
-                if ($cell->[SPECIES] == WALL or $cell->[SPECIES] == HOLE) {
-                    $LMap[$r][$c][MINERAL] = $Thingy{ onein(10) ? RUBBLE : FLOOR };
+                if (   $cell->[SPECIES] == WALL
+                    or $cell->[SPECIES] == HOLE
+                    or ($cell->[SPECIES] == ACID and onein(4))) {
+                    $LMap[$r][$c][MINERAL] = $Thingy{ onein(7) ? RUBBLE : FLOOR };
                 }
             },
             $col,
@@ -1648,7 +1625,7 @@ sub rubble_delay {
 
 sub score {
     my ($won) = @_;
-    my $score = loot_value($won);
+    my $score = loot_value() + ($won ? 10000 : 0) + 10 * int exp $Level_Max;
     return "Score: $score in $Turn_Count turns (v$VERSION:$Seed)";
 }
 
@@ -2063,14 +2040,14 @@ sub use_item {
     my ($loot, $i, $stash) = @_;
     if (!($loot->[$i][SPECIES] == GEM or $loot->[$i][SPECIES] == AMULET)) {
         pkc_log_code('0111');
-        return;
+        return 0;
     }
     if (defined $stash->[SHIELDUP]) {
         ($stash->[SHIELDUP], $loot->[$i]) = ($loot->[$i], $stash->[SHIELDUP]);
     } else {
         $stash->[SHIELDUP] = splice $loot->@*, $i, 1;
     }
-    print display_shieldup();
+    return 1;
 }
 
 sub veggie_name {

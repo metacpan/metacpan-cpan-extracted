@@ -4,7 +4,6 @@ use lib 't/lib';
 
 use strict;
 use warnings;
-use routines;
 
 use Test::Auto;
 use Test::More;
@@ -64,6 +63,7 @@ package main;
 my $subs = testauto(__FILE__);
 
 $subs = $subs->standard;
+
 $subs->plugin('ShortDescription')->tests(length => 200);
 
 ok 1 and done_testing;

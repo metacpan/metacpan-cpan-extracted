@@ -4,7 +4,6 @@ use lib 't/lib';
 
 use strict;
 use warnings;
-use routines;
 
 use Test::Auto;
 use Test::More;
@@ -108,16 +107,21 @@ package main;
 my $subs = testauto(__FILE__);
 
 $subs = $subs->standard;
+
 $subs->plugin('ShortDescription')->tests;
 
-$subs->synopsis(fun($tryable) {
+$subs->synopsis(sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
   is ref($result), 'Test::Auto::Document', 'isa ok';
 
   $result;
 });
 
-$subs->example(-1, 'render', 'method', fun($tryable) {
+$subs->example(-1, 'render', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
   like $result, qr/=head1 NAME/, 'has =head1 name';
   like $result, qr/=head1 ABSTRACT/, 'has =head1 abstract';
@@ -129,7 +133,9 @@ $subs->example(-1, 'render', 'method', fun($tryable) {
   $result;
 });
 
-$subs->example(-2, 'render', 'method', fun($tryable) {
+$subs->example(-2, 'render', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
   like $result, qr/=head1 NAME/, 'has =head1 name';
   like $result, qr/=head1 ABSTRACT/, 'has =head1 abstract';
@@ -141,7 +147,9 @@ $subs->example(-2, 'render', 'method', fun($tryable) {
   $result;
 });
 
-$subs->example(-3, 'render', 'method', fun($tryable) {
+$subs->example(-3, 'render', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
   like $result, qr/=head1 NAME/, 'has =head1 name';
   like $result, qr/=head1 ABSTRACT/, 'has =head1 abstract';

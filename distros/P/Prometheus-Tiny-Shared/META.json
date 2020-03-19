@@ -56,7 +56,7 @@
          "web" : "https://github.com/robn/Prometheus-Tiny-Shared"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -238,7 +238,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.011",
+                  "tag" : "0.012",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

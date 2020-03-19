@@ -1,5 +1,10 @@
 Revision history for Git::Annex
 
+0.004     2020-03-18 17:08:57-07:00 America/Phoenix
+    - annex-to-annex-dropunused: Fix attempt to call wrong main()
+      routine.
+    - annex-to-annex-reinject: Add missing import of File::Temp.
+
 0.003     2020-03-11 14:35:04-07:00 America/Phoenix
     - annex-to-annex: Fix path passed to git-annex-find(1) when
       looking for missing files.

@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-subst
 
+2.09 2020-03-19T09:48:31Z
+
+    - Implement Dict.pm
+    - Add share/jtf-style-guide-3.{pl,dict}
+
 2.08 2020-03-06T00:43:45Z
 
     - Update jtca rule.

@@ -1,6 +1,6 @@
 package Net::GitHub::V3::Query;
 
-our $VERSION = '0.97';
+our $VERSION = '0.98';
 our $AUTHORITY = 'cpan:FAYLAND';
 
 use URI;
@@ -52,9 +52,12 @@ has 'alternate_url'   => ( is => 'rw', isa => Str );
 has 'RaiseError' => ( is => 'rw', isa => Bool, default => 1 );
 
 # Rate limits
-has 'rate_limit'           => ( is => 'rw', isa => Int, default => sub { shift->update_rate_limit('rate_limit') } );
-has 'rate_limit_remaining' => ( is => 'rw', isa => Int, default => sub { shift->update_rate_limit('rate_limit_remaining') } );
-has 'rate_limit_reset'     => ( is => 'rw', isa => Str, default => sub { shift->update_rate_limit('rate_limit_reset') } );
+# has 'rate_limit'           => ( is => 'rw', isa => Int, default => sub { shift->update_rate_limit('rate_limit') } );
+# has 'rate_limit_remaining' => ( is => 'rw', isa => Int, default => sub { shift->update_rate_limit('rate_limit_remaining') } );
+# has 'rate_limit_reset'     => ( is => 'rw', isa => Str, default => sub { shift->update_rate_limit('rate_limit_reset') } );
+has 'rate_limit'           => ( is => 'rw', isa => Int, default => sub { 0 } );
+has 'rate_limit_remaining' => ( is => 'rw', isa => Int, default => sub { 0 } );
+has 'rate_limit_reset'     => ( is => 'rw', isa => Str, default => sub { 0 } );
 
 # optional
 has 'u'  => (is => 'rw', isa => Str);
@@ -444,13 +447,13 @@ sub __build_methods {
         my $preview_version = $v->{preview};
         my $paginate = $v->{paginate};
 
+        # count how much %s inside u
+        my $n = 0; while ($url =~ /\%s/g) { $n++ }
+
         no strict 'refs';
         no warnings 'once';
         *{"${package}::${m}"} = sub {
             my $self = shift;
-
-            # count how much %s inside u
-            my $n = 0; while ($url =~ /\%s/g) { $n++ }
 
             ## if is_u_repo, both ($user, $repo, @args) or (@args) should be supported
             if ( ($is_u_repo or index($url, '/repos/%s/%s') > -1) and @_ < $n + $args) {
@@ -493,7 +496,7 @@ sub __build_methods {
                 }
 
                 # make url, replace %s with real args
-                my @uargs = splice(@_, 0, $n);
+                my @uargs = map { defined $_ ? $_ : '' } splice(@_, 0, $n);
                 my $u = sprintf($url, @uargs);
 
                 # if preview API, set preview version

@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.43';
+our $VERSION = '1.45';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -73,6 +73,7 @@ my %translation = (
 	64 => 'Weichenstörung',
 	65 => 'Erdrutsch',
 	66 => 'Hochwasser',
+	67 => 'Behördliche Anordnung',
 	70 => 'WLAN nicht verfügbar',
 	71 => 'WLAN in einzelnen Wagen nicht verfügbar',
 	72 => 'Info/Entertainment nicht verfügbar',
@@ -669,8 +670,9 @@ sub info {
 sub line {
 	my ($self) = @_;
 
-	return
-	  sprintf( '%s %s', $self->{type}, $self->{line_no} // $self->{train_no} );
+	return sprintf( '%s %s',
+		$self->{type} // 'Zug',
+		$self->{line_no} // $self->{train_no} // '-' );
 }
 
 sub route_pre {
@@ -839,7 +841,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.43
+version 1.45
 
 =head1 DESCRIPTION
 
@@ -1353,6 +1355,10 @@ Source: correlation between IRIS and DB RIS (bahn.de).
 =item d 66 : "Hochwasser"
 
 Source: correlation between IRIS and DB RIS (bahn.de).
+
+=item d 67 : "BehE<ouml>rdliche Anordnung"
+
+Source: L<https://twitter.com/DodoMedia/status/1238816272240070659>.
 
 =item q 70 : "WLAN nicht verfE<uuml>gbar"
 

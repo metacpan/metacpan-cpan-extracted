@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/iamalnewkirk/faker/issues
   homepage: http://metacpan.org/release/Faker/
   repository: git://github.com/iamalnewkirk/faker.git
-version: '1.01'
+version: '1.03'
 x_authority: cpan:AWNCORP
 x_contributors:
   - 'Al Newkirk <anewkirk@ana.io>'

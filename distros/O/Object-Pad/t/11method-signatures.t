@@ -26,4 +26,24 @@ class List {
       '$l->nshift yields values' );
 }
 
+class Greeter {
+   has $_who;
+
+   method BUILD(%args) {
+      $_who = $args{who};
+   }
+
+   method greet($message = "Hello, $_who") {
+      return $message;
+   }
+}
+
+{
+   my $g = Greeter->new(who => "unit test");
+
+   is( $g->greet, "Hello, unit test",
+      'subroutine signature default exprs can see instance slots'
+   );
+}
+
 done_testing;

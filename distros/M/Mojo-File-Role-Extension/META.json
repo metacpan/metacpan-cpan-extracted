@@ -1,0 +1,59 @@
+{
+   "abstract" : "Access Mojo::File filename extensions",
+   "author" : [
+      "Roy Storey <kiwiroy@users.noreply.github.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-File-Role-Extension",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "8.23",
+            "Role::Tiny" : "2.000001",
+            "perl" : "v5.20.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kiwiroy/mojo-file-role-extension/issues"
+      },
+      "homepage" : "https://github.com/kiwiroy/mojo-file-role-extension",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kiwiroy/mojo-file-role-extension.git",
+         "web" : "https://github.com/kiwiroy/mojo-file-role-extension"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

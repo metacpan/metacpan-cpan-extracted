@@ -13,13 +13,13 @@ use Data::Object::ClassHas;
 
 extends 'Data::Object::Plugin';
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 # ATTRIBUTES
 
 has 'faker' => (
   is => 'ro',
-  isa => 'InstanceOf["Faker"]',
+  isa => 'ConsumerOf["Faker::Maker"]',
   req => 1,
 );
 
@@ -95,9 +95,9 @@ This package has the following attributes:
 
 =head2 faker
 
-  faker(InstanceOf["Faker"])
+  faker(ConsumerOf["Faker::Maker"])
 
-This attribute is read-only, accepts C<(InstanceOf["Faker"])> values, and is required.
+This attribute is read-only, accepts C<(ConsumerOf["Faker::Maker"])> values, and is required.
 
 =cut
 
@@ -148,6 +148,8 @@ L<Ruby Faker|https://github.com/stympy/faker>
 L<Python Faker|https://github.com/joke2k/faker>
 
 L<JS Faker|https://github.com/Marak/faker.js>
+
+L<Elixir Faker|https://github.com/elixirs/faker>
 
 =head1 PROJECT
 

@@ -1,5 +1,5 @@
 package App::gimpgitbuild::API::GitBuild;
-$App::gimpgitbuild::API::GitBuild::VERSION = '0.12.0';
+$App::gimpgitbuild::API::GitBuild::VERSION = '0.12.1';
 use strict;
 use warnings;
 use 5.014;
@@ -80,8 +80,13 @@ sub new_env
         ),
         ( $ENV{LD_LIBRARY_PATH} // '' )
     );
-    my $XDG_DATA_DIRS =
-"$gegl_p/share:$mypaint_p/share:$mypaint_p/share/pkgconfig:$babl_p/share:$ENV{XDG_DATA_DIRS}";
+    my $xdg_prefix =
+"$gegl_p/share:$mypaint_p/share:$mypaint_p/share/pkgconfig:$babl_p/share";
+    my $XDG_DATA_DIRS = (
+        exists( $ENV{XDG_DATA_DIRS} )
+        ? "$xdg_prefix:$ENV{XDG_DATA_DIRS}"
+        : $xdg_prefix
+    );
     return +{
         LD_LIBRARY_PATH => $LD_LIBRARY_PATH,
         PATH            => "$gegl_p/bin:$ENV{PATH}",
@@ -104,7 +109,7 @@ App::gimpgitbuild::API::GitBuild - common API
 
 =head1 VERSION
 
-version 0.12.0
+version 0.12.1
 
 =head1 METHODS
 

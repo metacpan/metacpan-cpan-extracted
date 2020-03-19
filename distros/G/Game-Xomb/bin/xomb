@@ -485,4 +485,14 @@ without issue.
 Numpad support is limited and does not support running nor leaps in
 examine mode.
 
+The screen gnat (mouse pointer) should be hidden by B<xomb> though
+terminals may ignore the escape code. Terminal configuration may be
+necessary to hide the gnat, e.g. in C<~/.Xdefaults>:
+
+  URxvt*pointerBlank:true
+
+  xterm*pointerMode:2
+
+See L<xterm(1)> or as appropriate for the terminal in question.
+
 =cut

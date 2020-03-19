@@ -2,7 +2,7 @@ package App::Yath;
 use strict;
 use warnings;
 
-our $VERSION = '1.000011';
+our $VERSION = '1.000013';
 
 use Test2::Harness::Util::HashBase qw{
     -config
@@ -212,6 +212,7 @@ sub _command_from_argv {
             return 'help';
         }
 
+        last if $arg eq '::';
         next if $arg =~ /^-/;
 
         if ($arg =~ m/\.jsonl(\.bz2|\.gz)?$/) {

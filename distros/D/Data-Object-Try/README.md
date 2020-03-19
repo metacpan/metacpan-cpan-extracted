@@ -104,6 +104,8 @@ the invocant.
 
 - call example #1
 
+        use routines;
+
         my $try = Data::Object::Try->new;
 
         $try->call(fun (@args) {
@@ -120,6 +122,8 @@ registration. If a coderef is provided this method is mostly a passthrough.
 
 - callback example #1
 
+        use routines;
+
         my $try = Data::Object::Try->new;
 
         $try->callback(fun (@args) {
@@ -132,6 +136,7 @@ registration. If a coderef is provided this method is mostly a passthrough.
         package Example;
 
         use Moo;
+        use routines;
 
         fun test(@args) {
 
@@ -156,6 +161,8 @@ callback.
 
 - catch example #1
 
+        use routines;
+
         my $try = Data::Object::Try->new;
 
         $try->call(fun (@args) {
@@ -176,6 +183,8 @@ The default method takes a method name or coderef and is triggered if no
 `catch` conditions match the exception thrown.
 
 - default example #1
+
+        use routines;
 
         my $try = Data::Object::Try->new;
 
@@ -200,6 +209,8 @@ constructor, and whatever arguments were passed directly to this method.
 
 - execute example #1
 
+        use routines;
+
         my $try = Data::Object::Try->new(
           invocant => Example->new,
           arguments => [1,2,3]
@@ -221,6 +232,8 @@ the default `arguments` if any were provided to the constructor, and whatever
 arguments were provided by the invocant.
 
 - finally example #1
+
+        use routines;
 
         my $try = Data::Object::Try->new(
           invocant => Example->new,
@@ -246,6 +259,8 @@ i.e. an empty string, if an exception is encountered.
 
 - maybe example #1
 
+        use routines;
+
         my $try = Data::Object::Try->new;
 
         $try->call(fun (@args) {
@@ -263,6 +278,8 @@ The no\_catch method removes any configured catch conditions and returns the
 object.
 
 - no\_catch example #1
+
+        use routines;
 
         my $try = Data::Object::Try->new;
 
@@ -287,6 +304,8 @@ object.
 
 - no\_default example #1
 
+        use routines;
+
         my $try = Data::Object::Try->new;
 
         $try->call(fun (@args) {
@@ -309,6 +328,8 @@ The no\_finally method removes any configured finally condition and returns the
 object.
 
 - no\_finally example #1
+
+        use routines;
 
         my $try = Data::Object::Try->new(
           invocant => Example->new,
@@ -336,6 +357,8 @@ object.
 
 - no\_try example #1
 
+        use routines;
+
         my $try = Data::Object::Try->new;
 
         $try->call(fun (@args) {
@@ -360,6 +383,8 @@ arguments were passed directly to this method.
 
 - result example #1
 
+        use routines;
+
         my $try = Data::Object::Try->new;
 
         $try->call(fun (@args) {
@@ -370,6 +395,8 @@ arguments were passed directly to this method.
         $try->result;
 
 - result example #2
+
+        use routines;
 
         my $try = Data::Object::Try->new;
 

@@ -5,7 +5,6 @@
 use 5.24.0;
 use warnings;
 use Game::Xomb;
-#use Statistics::Lite qw(statshash);
 use Test::Most;
 
 plan tests => 1;

@@ -870,7 +870,9 @@ static bool parse_permit(pTHX)
 static void parse_post_blockstart(pTHX)
 {
   /* Splice in the slot scope CV in */
-  CvOUTSIDE(compclassmeta->slotscope) = CvOUTSIDE(PL_compcv);
+  CvOUTSIDE    (compclassmeta->slotscope) = CvOUTSIDE    (PL_compcv);
+  CvOUTSIDE_SEQ(compclassmeta->slotscope) = CvOUTSIDE_SEQ(PL_compcv);
+
   CvOUTSIDE(PL_compcv) = compclassmeta->slotscope;
 
   {
@@ -894,7 +896,7 @@ static OP *parse_pre_blockend(pTHX_ OP *body)
   SLOTOFFSET offset = compclassmeta->offset;
   CV *slotscope = compclassmeta->slotscope;
   PADNAMELIST *slotnames = PadlistNAMES(CvPADLIST(slotscope));
-  I32 nslots = AvFILLp(PadlistARRAY(CvPADLIST(slotscope))[1]);
+  I32 nslots = av_count(compclassmeta->slots);
   PADNAME **snames = PadnamelistARRAY(slotnames);
   PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
   OP *slotops = NULL;
@@ -987,6 +989,6 @@ BOOT:
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
 
-  boot_xs_parse_sublike();
+  boot_xs_parse_sublike(0.04);
 
   register_xs_parse_sublike("method", &parse_method_hooks);

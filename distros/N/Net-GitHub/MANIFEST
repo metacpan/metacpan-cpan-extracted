@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 cpanfile
+cpanfile.ci
 dist.ini
 examples/add_team_repos.pl
 examples/create_utf8_repo.pl

@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use routines;
 
 use feature 'say';
 
@@ -10,11 +9,10 @@ use File::Basename;
 use File::Find;
 use File::Spec::Functions;
 use Getopt::Long;
-use Data::Object::Name;
 
 use File::Path 'make_path';
 
-fun options() {
+sub options {
   my $data = {};
 
   GetOptions(
@@ -28,7 +26,9 @@ fun options() {
   return $data;
 }
 
-method helptext() {
+sub helptext {
+  my ($self) = @_;
+
   return join "\n", "testauto [options]", <<"EOF";
 
   -h --help      Display help text.
@@ -41,7 +41,9 @@ e.g. testauto -i t -o lib -t ./template.pod
 EOF
 }
 
-fun main($helptext, $options) {
+sub main {
+  my ($helptext, $options) = @_;
+
   require Test::Auto;
 
   my @files;
@@ -60,7 +62,7 @@ fun main($helptext, $options) {
     $ENV{TEST_AUTO_TEMPLATE} = $template;
   }
 
-  find fun() {
+  find sub {
     push @files, $File::Find::name if -f && /\.t$/
   }, $input;
 
@@ -68,7 +70,6 @@ fun main($helptext, $options) {
     my $test = Test::Auto->new($file);
     my $parser = $test->parser;
     my $package = $parser->render('name');
-    my $namer = Data::Object::Name->new($package);
 
     my $podfile = $package;
        $podfile =~ s/::/\//g;

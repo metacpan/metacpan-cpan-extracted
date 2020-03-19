@@ -17,7 +17,8 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Sublike::Builder' => '0.02',
+      'XS::Parse::Sublike::Builder' => 0,
+      'XS::Parse::Sublike' => '0.04',
    },
    license => 'perl',
    create_license => 1,

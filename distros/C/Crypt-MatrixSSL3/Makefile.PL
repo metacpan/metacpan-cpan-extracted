@@ -451,10 +451,10 @@ WriteMakefile(
     NAME                => 'Crypt::MatrixSSL3',
     VERSION_FROM        => 'lib/Crypt/MatrixSSL3.pm', # finds $VERSION
 VERSION_FROM       => undef,
-  'ABSTRACT' => 'Perl extension for SSL and TLS using MatrixSSL.org v3.7.2b',
+  'ABSTRACT' => 'Perl extension for SSL and TLS using MatrixSSL.org v3.9.3',
   'AUTHOR' => 'C. N. Drake <christopher@pobox.com>',
   'LICENSE' => 'gpl',
-  'VERSION' => 'v3.9.2',
+  'VERSION' => 'v3.9.3',
   'CONFIGURE_REQUIRES' => {
     'Archive::Tar' => '0',
     'ExtUtils::Constant' => '0',

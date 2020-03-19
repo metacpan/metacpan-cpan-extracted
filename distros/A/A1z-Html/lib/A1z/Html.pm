@@ -5,9 +5,9 @@ use vars qw($NAME);
 
 # ABSTRACT: Web Utilities
 
-sub NAME { my $self = shift; $NAME = "Fast and Easy Web Apps"; return $NAME; }
+sub NAME { my $self = shift; $NAME = "Web Utilities"; return $NAME; }
 
-our $VERSION = '0.003';
+our $VERSION = '0.04';
 
 sub new {
 	my $class = shift;
@@ -16,8 +16,7 @@ sub new {
 }
 
 sub welcome {
-	print qq{Content-Type: text/html;charset=utf-8\n\n};
-	print qq{Welcome};
+	return qq{Welcome to Web Utilities};
 }
 
 1;
@@ -34,12 +33,14 @@ Web Utilities - A1z::Html
 
 =head1 VERSION
 
-version 0.003
+version 0.04
 
 =head1 SYNOPSIS
 
-use A1z::HTML5::Template;
-    my $h = A1z::HTML5::Template->new();
+use A1z::Html;
+    my $h = A1z::Html->new();
+	my $welcome = A1z::Html->welcome();
+	print $welcome;
 
 =head1 AUTHOR
 

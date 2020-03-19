@@ -4,7 +4,6 @@ use lib 't/lib';
 
 use strict;
 use warnings;
-use routines;
 
 use Test::Auto;
 use Test::More;
@@ -123,9 +122,9 @@ evaluator(Str $context) : Any
 =method example
 
 This method finds and evaluates (using C<eval>) the documented example and
-returns a L<Data::Object::Try> object. The C<try> object can be used to trap
-exceptions using the C<catch> method, and/or execute the code and return the
-result using the C<result> method.
+returns a C<Test::Auto::Try> object (see L<Data::Object::Try>). The C<try>
+object can be used to trap exceptions using the C<catch> method, and/or execute
+the code and return the result using the C<result> method.
 
 =signature example
 
@@ -294,9 +293,9 @@ standard() : Subtests
 =method scenario
 
 This method finds and evaluates (using C<eval>) the documented scenario example
-and returns a L<Data::Object::Try> object. The C<try> object can be used to
-trap exceptions using the C<catch> method, and/or execute the code and return
-the result using the C<result> method.
+and returns a C<Test::Auto::Try> object (see L<Data::Object::Try>). The C<try>
+object can be used to trap exceptions using the C<catch> method, and/or execute
+the code and return the result using the C<result> method.
 
 =signature scenario
 
@@ -324,10 +323,10 @@ scenario(Str $name, CodeRef $callback) : Any
 
 =method synopsis
 
-This method evaluates (using C<eval>) the documented synopsis and
-returns a L<Data::Object::Try> object. The C<try> object can be used to trap
-exceptions using the C<catch> method, and/or execute the code and return the
-result using the C<result> method.
+This method evaluates (using C<eval>) the documented synopsis and returns a
+C<Test::Auto::Try> object (see L<Data::Object::Try>). The C<try> object can be
+used to trap exceptions using the C<catch> method, and/or execute the code and
+return the result using the C<result> method.
 
 =signature synopsis
 
@@ -339,6 +338,7 @@ synopsis(CodeRef $callback) : Any
 
   $subtests->synopsis(sub {
     my ($tryable) = @_;
+
     ok my $result = $tryable->result, 'result ok';
     is ref($result), 'Test::Auto::Subtests', 'isa ok';
 
@@ -352,7 +352,7 @@ with a try/catch construct.
 
 =signature tryable
 
-tryable(Any @arguments) : InstanceOf["Data::Object::Try"]
+tryable(Any @arguments) : InstanceOf["Test::Auto::Try"]
 
 =example-1 tryable
 
@@ -383,112 +383,149 @@ package main;
 my $subs = testauto(__FILE__);
 
 $subs = $subs->standard;
+
 $subs->plugin('ShortDescription')->tests;
 
-$subs->synopsis(fun($tryable) {
+$subs->synopsis(sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
   is ref($result), 'Test::Auto::Subtests', 'isa ok';
 
   $result;
 });
 
-$subs->example(-1, 'attributes', 'method', fun($tryable) {
+$subs->example(-1, 'attributes', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'document', 'method', fun($tryable) {
+$subs->example(-1, 'document', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'evaluator', 'method', fun($tryable) {
+$subs->example(-1, 'evaluator', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'example', 'method', fun($tryable) {
+$subs->example(-1, 'example', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'functions', 'method', fun($tryable) {
+$subs->example(-1, 'functions', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'inherits', 'method', fun($tryable) {
+$subs->example(-1, 'inherits', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'libraries', 'method', fun($tryable) {
+$subs->example(-1, 'libraries', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'methods', 'method', fun($tryable) {
+$subs->example(-1, 'methods', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'package', 'method', fun($tryable) {
+$subs->example(-1, 'package', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'plugin', 'method', fun($tryable) {
+$subs->example(-1, 'plugin', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'registry', 'method', fun($tryable) {
+$subs->example(-1, 'registry', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'routines', 'method', fun($tryable) {
+$subs->example(-1, 'routines', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'standard', 'method', fun($tryable) {
+$subs->example(-1, 'standard', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'scenario', 'method', fun($tryable) {
+$subs->example(-1, 'scenario', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'synopsis', 'method', fun($tryable) {
+$subs->example(-1, 'synopsis', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-1, 'tryable', 'method', fun($tryable) {
+$subs->example(-1, 'tryable', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;
 });
 
-$subs->example(-2, 'tryable', 'method', fun($tryable) {
+$subs->example(-2, 'tryable', 'method', sub {
+  my ($tryable) = @_;
+
   ok my $result = $tryable->result, 'result ok';
 
   $result;

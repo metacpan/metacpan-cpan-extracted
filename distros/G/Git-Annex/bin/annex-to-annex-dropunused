@@ -19,7 +19,7 @@
 
 
 use App::annex_to_annex_dropunused;
-exit App::annex_to_annex->main;
+exit App::annex_to_annex_dropunused->main;
 
 __END__
 
@@ -33,7 +33,7 @@ annex-to-annex-dropunused - drop old hardlinks migrated by annex-to-annex
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

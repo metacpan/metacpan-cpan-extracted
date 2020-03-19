@@ -1,5 +1,5 @@
 package Prometheus::Tiny::Shared;
-$Prometheus::Tiny::Shared::VERSION = '0.011';
+$Prometheus::Tiny::Shared::VERSION = '0.012';
 # ABSTRACT: A tiny Prometheus client with a shared database behind it
 
 use warnings;
@@ -67,6 +67,8 @@ sub _connect {
                       AutoInactiveDestroy => 1,
                     }
   );
+
+  $self->{dbh}->do('PRAGMA synchronous = OFF');
 
   $self->{dbh}->do(<<SQL);
     CREATE TABLE IF NOT EXISTS pts_store (
@@ -239,6 +241,10 @@ C<filename>, if provided, will name an on-disk file to use as the backing store.
 C<init_file>, if set to true, will overwrite any existing data file with the given name. If you do this while you already have existing C<Prometheus::Tiny::Shared> objects using the old file, strange things will probably happen. Don't do that.
 
 The C<cache_args> argument will cause the constructor to croak. Code using this arg in previous versions of Prometheus::Tiny::Shared no longer work, and needs to be updated to use the C<filename> argument instead.
+
+=head1 NOTES
+
+The on-disk backing store file is not intended to be a persistent, durable store (Prometheus will handle metrics resetting to zero correctly). For best performance, store it on some kind of memory-backed filesystem (eg Linux C<tmpfs>).
 
 =head1 SUPPORT
 
