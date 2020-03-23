@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has adverse_outcome => (
@@ -30,14 +30,6 @@ has contraindication => (
     is        => 'rw',
     predicate => '_has_contraindication',
     json_ld   => 'contraindication',
-);
-
-
-
-has indication => (
-    is        => 'rw',
-    predicate => '_has_indication',
-    json_ld   => 'indication',
 );
 
 
@@ -66,14 +58,6 @@ has procedure => (
 
 
 
-has purpose => (
-    is        => 'rw',
-    predicate => '_has_purpose',
-    json_ld   => 'purpose',
-);
-
-
-
 has serious_adverse_outcome => (
     is        => 'rw',
     predicate => '_has_serious_adverse_outcome',
@@ -98,7 +82,7 @@ SemanticWeb::Schema::MedicalDevice - Any object used in a medical capacity
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -146,26 +130,6 @@ A contraindication should be one of the following types:
 =head2 C<_has_contraindication>
 
 A predicate for the L</contraindication> attribute.
-
-=head2 C<indication>
-
-A factor that indicates use of this therapy for treatment and/or prevention
-of a condition, symptom, etc. For therapies such as drugs, indications can
-include both officially-approved indications as well as off-label uses.
-These can be distinguished by using the ApprovedIndication subtype of
-MedicalIndication.
-
-A indication should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::MedicalIndication']>
-
-=back
-
-=head2 C<_has_indication>
-
-A predicate for the L</indication> attribute.
 
 =head2 C<post_op>
 
@@ -221,24 +185,6 @@ A procedure should be one of the following types:
 =head2 C<_has_procedure>
 
 A predicate for the L</procedure> attribute.
-
-=head2 C<purpose>
-
-A goal towards an action is taken. Can be concrete or abstract.
-
-A purpose should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::MedicalDevicePurpose']>
-
-=item C<InstanceOf['SemanticWeb::Schema::Thing']>
-
-=back
-
-=head2 C<_has_purpose>
-
-A predicate for the L</purpose> attribute.
 
 =head2 C<serious_adverse_outcome>
 

@@ -17,8 +17,8 @@ t/21-strings.t
 t/22-regexps.t
 t/30-records.t
 t/31-objects.t
-t/40-lonehash.t
 t/50-nested.t
+t/60-nested-dpath.t
 t/lib/TestInfo.pm
 t/lib/TestUtils.pm
 t/lib/TestObject.pm

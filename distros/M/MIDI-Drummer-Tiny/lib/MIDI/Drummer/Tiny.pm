@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.0802';
+our $VERSION = '0.0803';
 
 use Moo;
 use MIDI::Simple;
@@ -139,7 +139,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.0802
+version 0.0803
 
 =head1 SYNOPSIS
 
@@ -286,9 +286,7 @@ B<beats>/B<divisions>
 
 Return a new C<MIDI::Drummer::Tiny> object.
 
-=head2 BUILD()
-
-Initialize the score.
+=for Pod::Coverage BUILD
 
 =head2 note()
 

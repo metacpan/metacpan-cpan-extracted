@@ -8,6 +8,7 @@ my %WriteMakefileArgs = (
   ABSTRACT_FROM  => 'lib/App/git/ship.pm',
   VERSION_FROM   => 'lib/App/git/ship.pm',
   EXE_FILES      => [qw(script/git-ship)],
+  OBJECT         => '',
   BUILD_REQUIRES => {}
 ,
   TEST_REQUIRES  => {

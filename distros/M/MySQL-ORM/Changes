@@ -1,5 +1,7 @@
 Revision history for MySQL-ORM
 
+0.13    - added --no-fq-table-names option
+
 0.12	- added an additional primary key check to avoid errors when primary 
 		  key does not exist.
 	 	  

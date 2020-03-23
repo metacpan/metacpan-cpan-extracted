@@ -25,21 +25,21 @@
             "issue-1253"
          ],
          "schema:domainIncludes" : [
+            "schema:DatedMoneySpecification",
+            "schema:MoneyTransfer",
             "schema:MonetaryGrant",
             "schema:InvestmentOrDeposit",
-            "schema:MoneyTransfer",
-            "schema:LoanOrCredit",
-            "schema:DatedMoneySpecification"
+            "schema:LoanOrCredit"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:Number"
          ]
       },
       "schema:beneficiaryBank" : {
          "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A bank or bankâs branch, financial institution or international financial institution operating the beneficiaryâs bank account or releasing funds for the beneficiary",
@@ -48,8 +48,8 @@
          "schema:domainIncludes" : "schema:MoneyTransfer",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:BankOrCreditUnion",
-            "schema:Text"
+            "schema:Text",
+            "schema:BankOrCreditUnion"
          ]
       }
    }

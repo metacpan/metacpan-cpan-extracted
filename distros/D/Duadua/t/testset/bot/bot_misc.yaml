@@ -145,3 +145,30 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+- ua: 'Mozilla/5.0 zgrab/0.x'
+  name: 'ZGrab'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '0.x'
+- ua: 'Mozilla/5.0 (compatible; RyowlEngine/1.0; +https://ryowl.org)'
+  name: 'RyowlEngine'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'
+- ua: 'Mozilla/5.0 (compatible; DataXu/1.0; +http://dataxu.com)'
+  name: 'DataXu'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'

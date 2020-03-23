@@ -1,10 +1,8 @@
 package PYX::Parser;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Encode qw(decode);
 use Error::Pure qw(err);
@@ -13,8 +11,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -214,6 +211,7 @@ PYX::Parser - PYX parser with callbacks.
 =head1 SYNOPSIS
 
  use PYX::Parser;
+
  my $obj = PYX::Parser->new(%parameters);
  my $line = $obj->line;
  $obj->parse($pyx, $out);
@@ -356,11 +354,9 @@ PYX::Parser - PYX parser with callbacks.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use PYX::Parser;
 
  # Open file.
@@ -420,21 +416,22 @@ Install the PYX modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/PYX>
+L<https://github.com/michal-josef-spacek/PYX>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2016 Michal Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

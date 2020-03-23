@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the affinity between two people
 
-our $VERSION = '0.0106';
+our $VERSION = '0.0109';
 
 use Moo;
 use strictures 2;
@@ -100,7 +100,7 @@ Acme::Affinity - Compute the affinity between two people
 
 =head1 VERSION
 
-version 0.0106
+version 0.0109
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ version 0.0106
 =head1 DESCRIPTION
 
 An C<Acme::Affinity> object computes the relationship affinity between two
-people based on a common list of questions and answers and their weighted
+people based on a common list of questions, answers and their weighted
 importance.
 
 =head1 ATTRIBUTES
@@ -127,8 +127,7 @@ A list of hash references with question keys and answer array references.
 Example:
 
   [ { 'how messy are you' => [ 'very messy', 'average', 'very organized' ] },
-    { 'do you like to be the center of attention' => [ 'yes', 'no' ] },
-  ]
+    { 'do you like to be the center of attention' => [ 'yes', 'no' ] }, ]
 
 =head2 importance
 
@@ -136,35 +135,33 @@ A hash reference with importance level keys and weight values.
 
 Default:
 
-  { 'irrelevant'         => 0,
-    'a little important' => 1,
-    'somewhat important' => 10,
-    'very important'     => 50,
-    'mandatory'          => 250,
-  }
+  irrelevant         => 0
+  a little important => 1
+  somewhat important => 10
+  very important     => 50
+  mandatory          => 250
 
 =head2 me
 
 An array reference triple of question responses, desired responses and
-importance levels for person A.
+importance levels of person A for each of the given B<questions>.
 
 Example:
 
-  [ # Me                You               Importance
-    [ 'very organized', 'very organized', 'very important' ],
-    [ 'no',             'no',             'a little important' ],
-  ]
+  #   Person A           Person B           Importance
+  [ [ 'very organized',  'very organized',  'very important' ],
+    [ 'no',              'no',              'a little important' ], ]
 
 =head2 you
 
 An array reference triple of question responses, desired responses and
-importance levels for person B.
+importance levels of person B for each of the given B<questions>.
 
 Example:
 
-  [ [ 'very organized', 'average', 'a little important' ],
-    [ 'yes',            'no',      'somewhat important' ],
-  ]
+  #   Person B           Person A    Importance
+  [ [ 'very organized',  'average',  'a little important' ],
+    [ 'yes',             'no',       'somewhat important' ], ]
 
 =head1 METHODS
 
@@ -181,6 +178,8 @@ Create a new C<Acme::Affinity> object.
 Compute the affinity score for the two given people.
 
 =head1 SEE ALSO
+
+The F<eg/*> and F<t/01-methods.t> programs in this distribution.
 
 L<Moo>
 

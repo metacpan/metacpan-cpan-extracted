@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use IO::Barf qw(barf);
+
      barf($file_or_handler, 'CONTENT');
 
 SUBROUTINES
@@ -123,7 +124,6 @@ EXAMPLE4
      my $temp2 = File::Temp->new->filename;
      my $temp3 = File::Temp->new->filename;
      my $temp4 = File::Temp->new->filename;
-     my $temp5 = File::Temp->new->filename;
 
      # Some data.
      my $data = 'x' x 1000;
@@ -132,13 +132,8 @@ EXAMPLE4
      cmpthese(-10, {
              'File::Slurp' => sub {
                      require File::Slurp;
-                     File::Slurp::write_file($temp3, $data);
-                     unlink $temp3;
-             },
-             'IO::All' => sub {
-                     require IO::All;
-                     $data > io($temp4);
-                     unlink $temp4;
+                     File::Slurp::write_file($temp1, $data);
+                     unlink $temp1;
              },
              'IO::Any' => sub {
                      require IO::Any;
@@ -147,18 +142,23 @@ EXAMPLE4
              },
              'IO::Barf' => sub {
                      require IO::Barf;
-                     barf($temp1, $data);
-                     unlink $temp1;
+                     IO::Barf::barf($temp3, $data);
+                     unlink $temp3;
              },
              'Path::Tiny' => sub {
                      require Path::Tiny;
-                     path($temp5)->spew($data);
-                     unlink $temp5;
+                     Path::Tiny::path($temp4)->spew($data);
+                     unlink $temp4;
              },
      });
 
      # Output like this:
-     # TODO
+     # T460s, Intel(R) Core(TM) i7-6600U CPU @ 2.60GHz
+     #                Rate     IO::Any  Path::Tiny File::Slurp    IO::Barf
+     # IO::Any      8692/s          --        -20%        -65%        -77%
+     # Path::Tiny  10926/s         26%          --        -56%        -71%
+     # File::Slurp 24669/s        184%        126%          --        -34%
+     # IO::Barf    37193/s        328%        240%         51%          --
 
 DEPENDENCIES
     Error::Pure, Exporter, Readonly, Scalar::Util.
@@ -174,7 +174,7 @@ SEE ALSO
         Implements the Perl 6 'slurp' built-in
 
 REPOSITORY
-    <https://github.com/tupinek/IO-Barf>
+    <https://github.com/michal-josef-spacek/IO-Barf>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -182,9 +182,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2009-2020 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2009-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

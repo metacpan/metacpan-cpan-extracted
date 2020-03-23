@@ -25,6 +25,6 @@ resources:
   bugtracker: https://github.com/kiwiroy/mojo-file-role-extension/issues
   homepage: https://github.com/kiwiroy/mojo-file-role-extension
   repository: https://github.com/kiwiroy/mojo-file-role-extension.git
-version: '0.01'
+version: '0.02'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

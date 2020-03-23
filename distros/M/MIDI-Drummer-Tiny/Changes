@@ -1,10 +1,10 @@
 Revision history for MIDI-Drummer
 
+0.0803 2020-03-21 19:05:07
+    - Do not document the ->BUILD method.
+
 0.0802 2019-12-05 07:50:28
     - Improve documentation.
-
-~
-
 
 0.0801 2019-01-29 18:11:06
     - Fix weird syntax in the test that was making cpantesters unhappy.

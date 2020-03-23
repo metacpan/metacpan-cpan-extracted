@@ -31,8 +31,8 @@
             "schema:Place"
          ],
          "schema:rangeIncludes" : [
-            "schema:GeospatialGeometry",
-            "schema:Place"
+            "schema:Place",
+            "schema:GeospatialGeometry"
          ]
       },
       "schema:geoCovers" : {
@@ -40,12 +40,12 @@
          "rdfs:comment" : "Represents a relationship between two geometries (or the places they represent), relating a covering geometry to a covered geometry. \"Every point of b is a point of (the interior or boundary of) a\". As defined in <a href=\"https://en.wikipedia.org/wiki/DE-9IM\">DE-9IM</a>.",
          "rdfs:label" : "geoCovers",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
+            "schema:GeospatialGeometry",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
+            "schema:GeospatialGeometry",
+            "schema:Place"
          ]
       },
       "schema:geoCrosses" : {
@@ -70,8 +70,8 @@
             "schema:GeospatialGeometry"
          ],
          "schema:rangeIncludes" : [
-            "schema:GeospatialGeometry",
-            "schema:Place"
+            "schema:Place",
+            "schema:GeospatialGeometry"
          ]
       },
       "schema:geoEquals" : {
@@ -79,12 +79,12 @@
          "rdfs:comment" : "Represents spatial relations in which two geometries (or the places they represent) are topologically equal, as defined in <a href=\"https://en.wikipedia.org/wiki/DE-9IM\">DE-9IM</a>. \"Two geometries are topologically equal if their interiors intersect and no part of the interior or boundary of one geometry intersects the exterior of the other\" (a symmetric relationship)",
          "rdfs:label" : "geoEquals",
          "schema:domainIncludes" : [
-            "schema:GeospatialGeometry",
-            "schema:Place"
+            "schema:Place",
+            "schema:GeospatialGeometry"
          ],
          "schema:rangeIncludes" : [
-            "schema:GeospatialGeometry",
-            "schema:Place"
+            "schema:Place",
+            "schema:GeospatialGeometry"
          ]
       },
       "schema:geoIntersects" : {
@@ -92,12 +92,12 @@
          "rdfs:comment" : "Represents spatial relations in which two geometries (or the places they represent) have at least one point in common. As defined in <a href=\"https://en.wikipedia.org/wiki/DE-9IM\">DE-9IM</a>.",
          "rdfs:label" : "geoIntersects",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
+            "schema:GeospatialGeometry",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
+            "schema:GeospatialGeometry",
+            "schema:Place"
          ]
       },
       "schema:geoOverlaps" : {
@@ -105,8 +105,8 @@
          "rdfs:comment" : "Represents a relationship between two geometries (or the places they represent), relating a geometry to another that geospatially overlaps it, i.e. they have some but not all points in common. As defined in <a href=\"https://en.wikipedia.org/wiki/DE-9IM\">DE-9IM</a>.",
          "rdfs:label" : "geoOverlaps",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
+            "schema:GeospatialGeometry",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : [
             "schema:GeospatialGeometry",
@@ -131,8 +131,8 @@
          "rdfs:comment" : "Represents a relationship between two geometries (or the places they represent), relating a geometry to one that contains it, i.e. it is inside (i.e. within) its interior. As defined in <a href=\"https://en.wikipedia.org/wiki/DE-9IM\">DE-9IM</a>.",
          "rdfs:label" : "geoWithin",
          "schema:domainIncludes" : [
-            "schema:GeospatialGeometry",
-            "schema:Place"
+            "schema:Place",
+            "schema:GeospatialGeometry"
          ],
          "schema:rangeIncludes" : [
             "schema:GeospatialGeometry",

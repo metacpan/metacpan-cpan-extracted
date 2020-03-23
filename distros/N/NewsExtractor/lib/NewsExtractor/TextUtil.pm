@@ -1,6 +1,7 @@
 package NewsExtractor::TextUtil;
 use strict;
 use warnings;
+use Encode qw(is_utf8 decode_utf8);
 use Mojo::DOM;
 
 our @EXPORT = (
@@ -11,8 +12,7 @@ our @EXPORT = (
 
 sub u($) {
     my $v = "".$_[0];
-    utf8::upgrade($v) unless utf8::is_utf8($v);
-    return $v;
+    return is_utf8($v) ? $v : decode_utf8($v);
 }
 
 sub normalize_whitespace {

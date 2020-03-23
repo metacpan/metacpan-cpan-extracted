@@ -16,14 +16,6 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:AnatomicalStructure"
       },
-      "schema:source" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The anatomical or organ system that the artery originates from.",
-         "rdfs:label" : "source",
-         "schema:domainIncludes" : "schema:Artery",
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:AnatomicalStructure"
-      },
       "schema:supplyTo" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The area to which the artery supplies blood.",

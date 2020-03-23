@@ -9,8 +9,8 @@ has default_gravatar       => ();
 has default_gravatar_image => ();
 has read_root              => undef;
 
-has max_limit        => 100;
-has default_order_by => sub { [ [ 'name', 'DESC' ] ] };
+has read_max_limit        => 100;
+has read_default_order_by => sub { [ [ 'name', 'DESC' ] ] };
 
 sub API_read ( $self, $auth, $args ) {
     my $where = WHERE;

@@ -15,15 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
-
-
-has phase => (
-    is        => 'rw',
-    predicate => '_has_phase',
-    json_ld   => 'phase',
-);
-
+our $VERSION = 'v7.0.0';
 
 
 has trial_design => (
@@ -50,7 +42,7 @@ SemanticWeb::Schema::MedicalTrial - A medical trial is a type of medical study t
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -60,22 +52,6 @@ procedures. In general, medical trials are controlled and subjects are
 allocated at random to the different treatment and/or control groups.
 
 =head1 ATTRIBUTES
-
-=head2 C<phase>
-
-The phase of the clinical trial.
-
-A phase should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
-=head2 C<_has_phase>
-
-A predicate for the L</phase> attribute.
 
 =head2 C<trial_design>
 

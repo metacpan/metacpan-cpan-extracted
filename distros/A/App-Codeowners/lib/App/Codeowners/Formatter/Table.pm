@@ -5,12 +5,11 @@ package App::Codeowners::Formatter::Table;
 use warnings;
 use strict;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 use parent 'App::Codeowners::Formatter';
 
 use App::Codeowners::Util qw(stringify);
-use Encode qw(encode);
 
 sub finish {
     my $self    = shift;
@@ -23,7 +22,7 @@ sub finish {
         rows        => [$self->columns, map { [map { stringify($_) } @$_] } @$results],
         backend     => $ENV{PERL_TEXT_TABLE},
     );
-    print { $self->handle } encode('UTF-8', $table);
+    print { $self->handle } $table;
 }
 
 1;
@@ -40,7 +39,7 @@ App::Codeowners::Formatter::Table - Format codeowners output as a table
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 DESCRIPTION
 

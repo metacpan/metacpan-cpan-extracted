@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 $VERSION = eval $VERSION;
 
 use Grep::Query::Parser;
@@ -116,36 +116,6 @@ sub __qgrep
 	#
 	return(wantarray() ? () : 0) unless @_;
 	
-	# try to make sure all items in the list have the same structure...
-	#
-	if (@_ > 1)
-	{
-		my $fp = __fingerprint(Digest::MD5->new(), $_[0])->hexdigest();
-		foreach my $entry (@_)
-		{
-			croak("layout of datastructures in query list are not the same") unless $fp eq __fingerprint(Digest::MD5->new(), $entry)->hexdigest();
-		}
-	}
-	
-	# a special case:
-	# if there is only one argument AND it is a hash ref, we can let loose a query on it
-	# assuming we restructure the incoming data as a list of individual key/value pairs
-	#
-	# for this, we must have a fieldaccessor 
-	#
-	my $lonehash = 0;
-	if (scalar(@_) == 1 && ref($_[0]) eq 'HASH')
-	{
-		croak("a lone hash used in query; first argument must be a field accessor") unless $fieldAccessor;
-		my @eachList;
-		while (my @kv = each %{$_[0]})
-		{
-			push(@eachList, \@kv);
-		}
-		@_ = @eachList;
-		$lonehash = 1;
-	} 
-	
 	# the list we were given needs to be made into a hash with unique keys so we
 	# identify 'rows' while evaluating the query
 	# 
@@ -168,42 +138,18 @@ sub __qgrep
 	# fix up an array with the matches 
 	#	
 	my @matched;
-	if ($lonehash)
+
+	# keep the (relative) order they we're given to us by sorting on the artificial
+	# key index we gave them
+	#
+	foreach my $k (sort { $a <=> $b } (keys(%data)))
 	{
-		# we started with a hash, so that is what should be returned
-		#
-		my %h;
-		$h{${$data{$_}}->[0]} = ${$data{$_}}->[1] foreach (keys(%data));
-		push(@matched, \%h);
-	}
-	else
-	{
-		# keep the (relative) order they we're given to us by sorting on the artificial
-		# key index we gave them
-		#
-		foreach my $k (sort { $a <=> $b } (keys(%data)))
-		{
-			push(@matched, ${$data{$k}});
-		} 
-	}
+		push(@matched, ${$data{$k}});
+	} 
 		
 	# now return the result list
 	#
 	return @matched;
-}
-
-sub __fingerprint
-{
-	my $digest = shift;
-	my $obj = shift;
-
-	my $type = ref($obj);
-	$digest->add($type);
-	if 		($type eq 'ARRAY')	{ __fingerprint($digest, $_) foreach (@$obj) }
-	elsif 	($type eq 'HASH')	{ __fingerprint($digest, $obj->{$_}) foreach (sort(keys(%$obj))) }
-	else						{ $digest->add($digest->digest()) }
-	
-	return $digest;	
 }
 
 1;
@@ -214,7 +160,7 @@ Grep::Query - Query logic for lists of scalars/objects
 
 =head1 VERSION
 
-Version 1.010
+Version 1.011
 
 =head1 SYNOPSIS
 
@@ -260,21 +206,6 @@ Version 1.010
   #
   # @result contains a list of person objects that has a name starting with 'A' and an age greater than or equal to 42
   
-  # If what you have is a single hash (rather than a list of them) and you wish to query it and pick out key/values
-  # that matches, the query is special cased for passing just a single hash.
-  # A field accessor is necessary, and it will receive individual key/value pairs as small lists.
-  # 
-  # Assume a %videos hash, keyed by video name, and value is another hash with at least the key 'length' holding the video
-  # length in seconds...:
-  #
-  my $fieldAccessor = Grep::Query::FieldAccessor->new();
-  $fieldAccessor->add('key', sub { $_[0]->[0] });
-  $fieldAccessor->add('length', sub { $_[0]->[1]->{length} });
-  my $videoQuery = Grep::Query->new('key.REGEXP(^Alias) AND length.gt(2500)');
-  @result = $videoQuery->qgrep($fieldAccessor, \%videos);
-  #
-  # $result[0] contains a hash ref with all videos with name starting with 'Alias' and at least 2500 seconds long
-    
 =head1 BACKGROUND
 
 Why use this module when you could easily write a grep BLOCK or plain regexp
@@ -492,11 +423,28 @@ These operators always evaluate to true and false respectively. They take no arg
 
 This matches if the value is defined (i.e. not 'undef'). It takes no argument.
 
-=item * B<SIZE>
+=item * B<PATH>
+
+This is different from the others. It is intended for searching through datastructures,
+not just strings. As such the use of it B<implies> a field name (you can not give a field name
+to it so it is not relevant as such, but if you use other operators, they need to be prefixed
+with a field name). Also, it implies that the search is done through field accessor (the default
+is ok).
+
+Ordinarily, the 'value' to compare with is a static value, but for the C<PATH> operator, it should
+be a L<Data::DPath> expression, typically a query expression (e.g. using a 'filter', C</foo/*/bar[value eq 'brum']>.
+If the expression generates a result, it is considered to match.
+Use this with care - know your data, and try to craft your queries well as performance may suffer a lot
+if the queries are very 'wide'.
+
+=item * B<SIZEE<lt>opE<gt>>
 
 This matches if the value has the given 'size' argument, where the size depends on the
 data type - a scalar is simply the (text) length, an array is the array size, and a hash
-is the number of pairs.  
+is the number of pairs.
+
+This is slightly different from the others in that an C<op> must be given, i.e. how to
+compare the value - B<==>, B<!=>, B<E<lt>>, B<E<lt>=>, B<E<gt>>, B<E<gt>=>
 
 =item * B<TYPE>
 

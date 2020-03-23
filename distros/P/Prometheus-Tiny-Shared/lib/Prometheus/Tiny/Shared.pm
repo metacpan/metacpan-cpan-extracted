@@ -1,5 +1,5 @@
 package Prometheus::Tiny::Shared;
-$Prometheus::Tiny::Shared::VERSION = '0.012';
+$Prometheus::Tiny::Shared::VERSION = '0.020';
 # ABSTRACT: A tiny Prometheus client with a shared database behind it
 
 use warnings;
@@ -8,9 +8,10 @@ use strict;
 use Prometheus::Tiny 0.004;
 use parent 'Prometheus::Tiny';
 
-use DBI;
-use DBD::SQLite;
-use Sereal qw(encode_sereal decode_sereal);
+use Hash::SharedMem qw(shash_open shash_get shash_set shash_cset shash_group_get_hash);
+use JSON::XS qw(encode_json decode_json);
+use File::Temp qw(tempdir);
+use File::Path qw(rmtree);
 use Carp qw(croak);
 
 sub new {
@@ -23,117 +24,50 @@ Read the docs for more info, and switch to the 'filename' argument.
 EOF
   }
 
-  my $filename = delete $args{filename} // ':memory:';
+  my $filename = delete $args{filename};
   my $init_file = delete $args{init_file} // 0;
 
   my $self = $class->SUPER::new(%args);
 
-  $self->{filename} = $filename;
-  $self->_connect($init_file);
+  if ($filename) {
+    rmtree($filename) if $init_file;
+  }
+  else {
+    $filename = tempdir('pts-XXXXXXXX', TMPDIR => 1, CLEANUP => 1);
+  }
+
+  $self->{_shash} = shash_open($filename, 'rwc');
 
   return $self;
-}
-
-sub _dbh {
-  my ($self) = @_;
-
-  if ($self->{pid} != $$) {
-    delete $self->{dbh};
-    $self->_connect;
-  }
-
-  return $self->{dbh};
-}
-
-sub _connect {
-  my ($self, $init_file) = @_;
-
-  if ($self->{dbh}) {
-    $self->{dbh}->disconnect;
-    delete $self->{dbh};
-  }
-  $self->{pid} = $$;
-
-  if ($init_file && -e $self->{filename}) {
-    unlink $self->{filename}
-      or die "couldn't delete data file '$self->{filename}': $!";
-  }
-
-  $self->{dbh} = DBI->connect(
-                    "dbi:SQLite:dbname=$self->{filename}", "", "",
-                    {
-                      RaiseError => 1,
-                      AutoCommit => 1,
-                      AutoInactiveDestroy => 1,
-                    }
-  );
-
-  $self->{dbh}->do('PRAGMA synchronous = OFF');
-
-  $self->{dbh}->do(<<SQL);
-    CREATE TABLE IF NOT EXISTS pts_store (
-      name TEXT NOT NULL,
-      labels TEXT NOT NULL,
-      value TEXT NOT NULL,
-      timestamp INTEGER,
-      PRIMARY KEY (name, labels)
-    );
-SQL
-
-  $self->{dbh}->do(<<SQL);
-    CREATE TABLE IF NOT EXISTS pts_meta (
-      name TEXT NOT NULL PRIMARY KEY,
-      meta BLOB NOT NULL
-    );
-SQL
-}
-
-sub DESTROY {
-  my ($self) = @_;
-
-  if ($self->{dbh}) {
-    $self->{dbh}->disconnect;
-  }
 }
 
 sub set {
   my ($self, $name, $value, $labels, $timestamp) = @_;
 
-  my $sth = $self->_dbh->prepare_cached(<<SQL);
-    REPLACE INTO pts_store
-      (name, labels, value, timestamp)
-    VALUES
-      (?, ?, ?, ?);
-SQL
-
-  $sth->execute($name, $self->_format_labels($labels), $value, $timestamp);
+  my $key = join('-', 'k', $name, $self->_format_labels($labels));
+  shash_set($self->{_shash}, $key, encode_json([$value, $timestamp]));
 
   return;
 }
 
 sub add {
-  my ($self, $name, $value, $labels) = @_;
+  my ($self, $name, $diff, $labels) = @_;
 
-  # UPSERT would be better here, but not available in older SQLites
+  my $key = join('-', 'k', $name, $self->_format_labels($labels));
 
-  my $insert_sth = $self->_dbh->prepare_cached(<<SQL);
-    INSERT OR IGNORE INTO pts_store
-      (name, labels, value)
-    VALUES
-      (?, ?, 0);
-SQL
-  my $update_sth = $self->_dbh->prepare_cached(<<SQL);
-    UPDATE pts_store
-    SET value = value + ?
-    WHERE name = ? AND labels = ?;
-SQL
+  my ($ov, $nv);
 
-  my $fmt = $self->_format_labels($labels);
-
-  $self->_dbh->begin_work;
-  $insert_sth->execute($name, $fmt);
-  $update_sth->execute($value, $name, $fmt);
-  $self->_dbh->commit;
+  do {
+    $ov = shash_get($self->{_shash}, $key);
+    if ($ov) {
+      my $ar = decode_json($ov);
+      $ar->[0] += $diff;
+      $nv = encode_json($ar);
+    }
+    else {
+      $nv = encode_json([$diff]);
+    }
+  } until shash_cset($self->{_shash}, $key, $ov, $nv);
 
   return;
 }
@@ -141,14 +75,8 @@ SQL
 sub declare {
   my ($self, $name, %meta) = @_;
 
-  my $sth = $self->_dbh->prepare_cached(<<SQL);
-    REPLACE INTO pts_meta
-      (name, meta)
-    VALUES
-      (?, ?);
-SQL
-
-  $sth->execute($name, encode_sereal(\%meta));
+  my $key = join('-', 'm', $name);
+  shash_set($self->{_shash}, $key, encode_json(\%meta));
 
   return;
 }
@@ -157,16 +85,9 @@ sub histogram_observe {
   my $self = shift;
   my ($name) = @_;
 
-  my $sth = $self->_dbh->prepare_cached(<<SQL);
-    SELECT meta FROM pts_meta
-    WHERE name = ?;
-SQL
+  my $key = join('-', 'm', $name);
 
-  $sth->execute($name);
-  my ($meta) = $sth->fetchrow_array;
-  $sth->finish;
-
-  $self->{meta}{$name} = decode_sereal($meta) if $meta;
+  $self->{meta}{$name} = decode_json(shash_get($self->{_shash}, $key) || '{}');
 
   return $self->SUPER::histogram_observe(@_);
 }
@@ -176,28 +97,16 @@ sub format {
 
   my (%metrics, %meta);
 
-  my $metrics_sth = $self->_dbh->prepare_cached(<<SQL);
-    SELECT name, labels, value, timestamp FROM pts_store;
-SQL
-
-  $metrics_sth->execute;
-  for my $row (@{$metrics_sth->fetchall_arrayref}) {
-    my ($name, $labels, $value, $timestamp) = @$row;
-    $metrics{$name}{$labels} = [ $value, $timestamp ];
+  my $hash = shash_group_get_hash($self->{_shash});
+  while ( my ($k, $v) = each %$hash ) {
+    my ($t, $name, $fmt) = split '-', $k, 3;
+    if ($t eq 'k') {
+      $metrics{$name}{$fmt} = decode_json($v);
+    }
+    else {
+      $meta{$name} = decode_json($v);
+    }
   }
-  $metrics_sth->finish;
-
-  my $meta_sth = $self->_dbh->prepare_cached(<<SQL);
-    SELECT name, meta FROM pts_meta;
-SQL
-
-  $meta_sth->execute;
-  for my $row (@{$meta_sth->fetchall_arrayref}) {
-    my ($name, $meta) = @$row;
-    $meta{$name} = decode_sereal($meta);
-  }
-  $meta_sth->finish;
-
   $self->{metrics} = \%metrics;
   $self->{meta} = \%meta;
 
@@ -226,7 +135,7 @@ Prometheus::Tiny::Shared - A tiny Prometheus client with a shared database behin
 
 =head1 DESCRIPTION
 
-C<Prometheus::Tiny::Shared> is a wrapper around L<Prometheus::Tiny> that instead of storing metrics data in a hashtable, stores them in a shared database (provided by SQLite, though this may change in the future). This lets you keep a single set of metrics in a multithreaded app.
+C<Prometheus::Tiny::Shared> is a wrapper around L<Prometheus::Tiny> that instead of storing metrics data in a hashtable, stores them in a shared datastore (provided by L<Hash::SharedMem>, though this may change in the future). This lets you keep a single set of metrics in a multithreaded app.
 
 C<Prometheus::Tiny::Shared> should be a drop-in replacement for C<Prometheus::Tiny>. Any differences in behaviour is a bug, and should be reported.
 
@@ -236,15 +145,11 @@ C<Prometheus::Tiny::Shared> should be a drop-in replacement for C<Prometheus::Ti
 
     my $prom = Prometheus::Tiny::Shared->new(filename => ...);
 
-C<filename>, if provided, will name an on-disk file to use as the backing store. If not supplied, an in-memory store will be used, which is suitable for testing purposes.
+C<filename>, if provided, will name an on-disk location to store the backing store. If not supplied, a temporary location will be created and destroyed when your program ends, so suitable for testing purposes. For best performance, this should be stored on some kind of memory-backed filesystem (eg Linux C<tmpfs>). The store is not intended to be a persistant, durable store (Prometheus will handle metrics resetting to zero correctly), so you don't need to worry about backing it up or any other maintenance.
 
 C<init_file>, if set to true, will overwrite any existing data file with the given name. If you do this while you already have existing C<Prometheus::Tiny::Shared> objects using the old file, strange things will probably happen. Don't do that.
 
 The C<cache_args> argument will cause the constructor to croak. Code using this arg in previous versions of Prometheus::Tiny::Shared no longer work, and needs to be updated to use the C<filename> argument instead.
-
-=head1 NOTES
-
-The on-disk backing store file is not intended to be a persistent, durable store (Prometheus will handle metrics resetting to zero correctly). For best performance, store it on some kind of memory-backed filesystem (eg Linux C<tmpfs>).
 
 =head1 SUPPORT
 

@@ -1,13 +1,12 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'A perl module for PYX handling.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.07;
 author_requires 'Test::More' => 0;
@@ -27,8 +26,8 @@ requires 'Readonly' => 0;
 requires 'perl' => '5.6.0';
 resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=PYX';
-resources 'homepage' => 'https://github.com/tupinek/PYX';
-resources 'repository' => 'git://github.com/tupinek/PYX';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/PYX';
+resources 'repository' => 'git://github.com/michal-josef-spacek/PYX';
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0.16;
 test_requires 'File::Object' => 0.07;
@@ -36,7 +35,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 1.02;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

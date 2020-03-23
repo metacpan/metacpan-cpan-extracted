@@ -22,8 +22,8 @@
          "rdfs:label" : "lowPrice",
          "schema:domainIncludes" : "schema:AggregateOffer",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       },
       "schema:offerCount" : {
@@ -41,13 +41,13 @@
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:MenuItem",
+            "schema:Product",
             "schema:Event",
             "schema:Trip",
+            "schema:CreativeWork",
             "schema:EducationalOccupationalProgram",
-            "schema:AggregateOffer",
             "schema:Service",
-            "schema:Product",
-            "schema:CreativeWork"
+            "schema:AggregateOffer"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [

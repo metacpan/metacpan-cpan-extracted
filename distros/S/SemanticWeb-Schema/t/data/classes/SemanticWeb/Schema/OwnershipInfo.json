@@ -14,8 +14,8 @@
          "rdfs:label" : "acquiredFrom",
          "schema:domainIncludes" : "schema:OwnershipInfo",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:ownedFrom" : {
@@ -40,8 +40,8 @@
          "rdfs:comment" : "The product that this structured value is referring to.",
          "rdfs:label" : "typeOfGood",
          "schema:domainIncludes" : [
-            "schema:OwnershipInfo",
-            "schema:TypeAndQuantityNode"
+            "schema:TypeAndQuantityNode",
+            "schema:OwnershipInfo"
          ],
          "schema:rangeIncludes" : [
             "schema:Product",

@@ -1,7 +1,12 @@
 Revision history for Music-FretboardDiagram
 
+0.1205 2020-03-21 17:27:21
+    - Do not document the ->BUILD method.
+
 0.1204 2019-12-23 06:33:59
-    - Use List::SomeUtils, not List::More::Utils.
+    - Use List::SomeUtils, not List::MoreUtils.
+    - Fix HTML in POD.
+    - Fix github repo in dist.
 
 0.1203 2019-04-30 22:16:26
     - My distribution went AWOL from metacpan. Hopefully re-uploading will fix it...

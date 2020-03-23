@@ -16,7 +16,7 @@ use Encode qw(encode);
 
 Apache::TestRequest::user_agent( reset => 1, requests_redirectable => 0 );
 
-plan tests => 34, need_lwp;
+plan tests => 36, need_lwp;
 
 ok 1, 'Test initialized';
 
@@ -446,10 +446,10 @@ subtest 'XSS: no embedded HTML in destination' => sub {
     plan tests => 1;
 
     my $r = POST('/LOGIN', [
-        destination  => '"><form method="post">Embedded Form</form>'
+        destination  => '/"><form method="post">Embedded Form</form>'
     ]);
 
-    like $r->content, qr{"%22%3E%3Cform method=%22post%22%3EEmbedded Form%3C/form%3E"};
+    like $r->content, qr{"/%22%3E%3Cform method=%22post%22%3EEmbedded Form%3C/form%3E"};
 };
 
 # embedded script tags
@@ -535,6 +535,33 @@ subtest 'recognize user' => sub {
         Cookie => 'Sample::AuthCookieHandler_WhatEver=programmer:Hero');
 
     is $body, 'programmer';
+};
+
+# Test DefaultDestination
+subtest 'DefaultDestination' => sub {
+    plan tests => 1;
+
+    my $r = POST('/LOGIN', [
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    is($r->header('Location'), '/docs/protected/index.html',
+       'redirected to default destination');
+};
+
+# Test EnforceLocalDestination
+subtest 'EnforceLocalDestination' => sub {
+    plan tests => 1;
+
+    my $r = POST('/LOGIN', [
+        destination  => "http://metacpan.org/",
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    is($r->header('Location'), '/docs/protected/index.html',
+       'enforced local destination, redirected to default destination');
 };
 
 # remove CR's from a string.  Win32 apache apparently does line ending

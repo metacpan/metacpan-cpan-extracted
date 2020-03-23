@@ -7,14 +7,6 @@
       "schema:isPartOf" : "http:health-lifesci.schema.org"
    },
    "properties" : {
-      "schema:action" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Obsolete term for <a class=\"localLink\" href=\"http://schema.org/muscleAction\">muscleAction</a>. Not to be confused with <a class=\"localLink\" href=\"http://schema.org/potentialAction\">potentialAction</a>.",
-         "rdfs:label" : "action",
-         "schema:domainIncludes" : "schema:Muscle",
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
-      },
       "schema:antagonist" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The muscle whose action counteracts the specified muscle.",
@@ -54,14 +46,6 @@
          "schema:domainIncludes" : "schema:Muscle",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Nerve"
-      },
-      "schema:origin" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The place or point where a muscle arises.",
-         "rdfs:label" : "origin",
-         "schema:domainIncludes" : "schema:Muscle",
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:AnatomicalStructure"
       }
    }
 }

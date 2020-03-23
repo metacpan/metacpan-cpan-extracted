@@ -1,0 +1,196 @@
+NAME
+    App::VivaldiUtils - Utilities related to the Vivaldi browser
+
+VERSION
+    This document describes version 0.002 of App::VivaldiUtils (from Perl
+    distribution App-VivaldiUtils), released on 2019-12-09.
+
+SYNOPSIS
+DESCRIPTION
+    This distribution includes several utilities related to the Vivaldi
+    browser:
+
+    *   kill-vivaldi
+
+    *   pause-vivaldi
+
+    *   ps-vivaldi
+
+    *   terminate-vivaldi
+
+    *   unpause-vivaldi
+
+    *   vivaldi-is-paused
+
+FUNCTIONS
+  pause_vivaldi
+    Usage:
+
+     pause_vivaldi(%args) -> [status, msg, payload, meta]
+
+    Pause (kill -STOP) Vivaldi.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  ps_vivaldi
+    Usage:
+
+     ps_vivaldi(%args) -> [status, msg, payload, meta]
+
+    List Vivaldi processes.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  terminate_vivaldi
+    Usage:
+
+     terminate_vivaldi(%args) -> [status, msg, payload, meta]
+
+    Terminate (kill -KILL) Vivaldi.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  unpause_vivaldi
+    Usage:
+
+     unpause_vivaldi(%args) -> [status, msg, payload, meta]
+
+    Unpause (resume, continue, kill -CONT) Vivaldi.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  vivaldi_is_paused
+    Usage:
+
+     vivaldi_is_paused(%args) -> [status, msg, payload, meta]
+
+    Check whether Vivaldi is paused.
+
+    Vivaldi is defined as paused if *all* of its processes are in 'stop'
+    state.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quiet => *true*
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-VivaldiUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-VivaldiUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-VivaldiUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Some other CLI utilities related to Vivaldi: dump-vivaldi-history (from
+    App::DumpVivaldiHistory).
+
+    App::ChromeUtils
+
+    App::FirefoxUtils
+
+    App::OperaUtils
+
+    App::BrowserUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

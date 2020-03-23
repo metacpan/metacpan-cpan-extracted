@@ -364,16 +364,6 @@ Aliases: I<find_all>, I<findall>
 
 =cut
 
-=head2 contain
-
-String.contain() -> I<Obj>
-
-Return the
-
-Aliases: I<include>, I<contains>, I<includes>
-
-=cut
-
 =head2 count
 
 String.count() -> I<Obj>
@@ -644,6 +634,16 @@ Aliases: I<replace_all>
 
 =cut
 
+=head2 has
+
+String.has() -> I<Obj>
+
+Return the
+
+Aliases: I<contain>, I<include>, I<contains>, I<includes>
+
+=cut
+
 =head2 hex
 
 String.hex() -> I<Obj>
@@ -895,6 +895,8 @@ Aliases: I<call>
 String.num() -> I<Obj>
 
 Return the
+
+Aliases: I<to_n>, I<to_num>
 
 =cut
 
@@ -1157,16 +1159,6 @@ String.to_i() -> I<Obj>
 Return the
 
 Aliases: I<to_int>
-
-=cut
-
-=head2 to_n
-
-String.to_n() -> I<Obj>
-
-Return the
-
-Aliases: I<to_num>
 
 =cut
 

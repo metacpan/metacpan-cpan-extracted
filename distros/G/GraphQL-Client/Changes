@@ -1,5 +1,12 @@
 Revision history for GraphQL-Client.
 
+0.604     2020-03-22 03:44:44-06:00 MST7MDT
+  * Add --filter JSONPATH argument to CLI.
+
+0.603     2020-03-22 02:01:32-06:00 MST7MDT
+  * Allow deep formatting with csv,tsv,table.
+  * Fix Unicode issues.
+
 0.602     2020-03-17 18:27:46-06:00 MST7MDT
   * Add support for GRAPHQL_CLIENT_OPTIONS environment variable.
   * Fix a slew of CLI option problems.

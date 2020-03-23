@@ -27,14 +27,13 @@ WriteMakefile
 		   },
 
  PREREQ_PM      => {
-		    'App::Packager' => 1.430,
-		    'PDF::API2'   => 2.020,
-		    'Font::TTF'   => 1.04,
-		    'JSON::PP'	  => 2.27203,
+		    'App::Packager'              => 1.430,
+		    'PDF::API2'			 => 2.020,
+		    'Text::Layout'		 => 0.018,
+		    'JSON::PP'			 => 2.27203,
 		    'String::Interpolate::Named' => 0.05,
-		    'File::LoadLines' => 0.02,
-		    'IO::String'  => 1.08,
-		    'Image::Info' => 1.41,
+		    'File::LoadLines'		 => 0.02,
+		    'Image::Info'		 => 1.41,
 		   },
 
  CONFIGURE_REQUIRES => {

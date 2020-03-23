@@ -3,7 +3,7 @@ package Grep::Query::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -13,6 +13,7 @@ use Grep::Query::Parser::QOPS;
 use Parse::RecDescent;
 use IO::Scalar;
 use Scalar::Util qw(blessed reftype looks_like_number);
+use Data::DPath qw(dpath);
 
 my $PARSER;
 
@@ -130,6 +131,11 @@ sub __preprocessParsedQuery
 					{
 						$parsedQuery->{$k}->{op} = sub { defined($_[0]) ? 1 : 0 };						
 					}
+					elsif ($op eq 'path')
+					{
+						my $key = $parsedQuery->{$k}->{value};
+						$parsedQuery->{$k}->{op} = sub { scalar(dpath($key)->match($_[2]) ) };						
+					}
 					elsif ($op eq 'exists')
 					{
 						my $key = $parsedQuery->{$k}->{value};
@@ -243,6 +249,11 @@ unary:
 field_op_value_test:
 		/
 				(?:(?<field>[^.\s]+)\.)?(?<op>(?i)true|false|defined)
+			|	(?<op>(?i)path)\((?<value>[^)]*)\)																									# allow paired '()' delimiters
+			|	(?<op>(?i)path)\{(?<value>[^}]*)\}																									# allow paired '{}' delimiters
+			|	(?<op>(?i)path)\[(?<value>[^\]]*)\]																									# allow paired '[]' delimiters
+			|	(?<op>(?i)path)<(?<value>[^>]*)>																									# allow paired '<>' delimiters
+			|	(?<op>(?i)path)(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}																		# allow arbitrary delimiter
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size(?:[=!<>]=|<|>))\((?<value>[^)]*)\)															# allow paired '()' delimiters
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size(?:[=!<>]=|<|>))\{(?<value>[^)]*)\}															# allow paired '{}' delimiters
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size(?:[=!<>]=|<|>))\[(?<value>[^)]*)\]															# allow paired '[]' delimiters
@@ -253,7 +264,7 @@ field_op_value_test:
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\[(?<value>[^\]]*)\]								# allow paired '[]' delimiters
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)<(?<value>[^>]*)>								# allow paired '<>' delimiters
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}	# allow arbitrary delimiter
-		/ix { bless( { field => $+{field}, op => lc($+{op}), value => $+{value} }, "Grep::Query::Parser::QOPS::$item[0]" ) }
+		/ix { bless( { field => (lc($+{op}) eq 'path' ? '***path***' : $+{field}), op => lc($+{op}), value => $+{value} }, "Grep::Query::Parser::QOPS::$item[0]" ) }
 
 or:
 		/or|\|\|/i { 1 }

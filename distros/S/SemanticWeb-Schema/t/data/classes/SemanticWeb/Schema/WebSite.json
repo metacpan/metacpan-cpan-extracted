@@ -16,8 +16,8 @@
          "schema:domainIncludes" : [
             "schema:Dataset",
             "schema:CreativeWorkSeries",
-            "schema:Blog",
-            "schema:WebSite"
+            "schema:WebSite",
+            "schema:Blog"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

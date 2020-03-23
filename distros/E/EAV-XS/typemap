@@ -1,0 +1,3 @@
+TYPEMAP
+const char *	T_PV
+EAV::XS		T_PTROBJ

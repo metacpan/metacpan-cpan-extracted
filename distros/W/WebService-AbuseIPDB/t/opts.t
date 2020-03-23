@@ -3,7 +3,7 @@
 #
 #         FILE: opts.t
 #
-#  DESCRIPTION: Check options
+#  DESCRIPTION: Check options and exceptions
 #
 #       AUTHOR: Pete Houston (pete), cpan@openstrike.co.uk
 # ORGANIZATION: Openstrike
@@ -13,7 +13,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 use Test::Fatal;
 use Test::MockModule;
 
@@ -80,6 +80,11 @@ like (
 	$res->errors->[0]->{detail},
 	qr/could not connect/,
 	'Error is "could not connect"'
+);
+
+like (exception { $ipdb->_send_receive ('PUT', 'foo') },
+	qr/Unrecognised method 'PUT'/,
+	'Non GET/POST thrown'
 );
 
 done_testing ();

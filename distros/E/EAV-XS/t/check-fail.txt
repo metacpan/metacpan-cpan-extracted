@@ -1,0 +1,6 @@
+invalid
+space invalid@valid.domain.com
+alias@domain
+bad@☕.de
+idn2003@I♥NY.de
+idn2003@日本⒈co．jp

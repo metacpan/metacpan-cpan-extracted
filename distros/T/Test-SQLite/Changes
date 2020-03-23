@@ -1,5 +1,15 @@
 Revision history for Test-SQLite
 
+0.0409 2020-03-20 20:49:43
+    - Do not document the BUILD method.
+
+0.0408 2020-03-20 20:28:41
+    - Re-add crucial but removed SYNOPSIS bits.
+
+0.0407 2020-03-20 20:21:47
+    - Simplify SYNOPSIS.
+    - Improve documentation.
+
 0.0406 2020-02-14 00:28:46
     - Add various comment styles to the eg/test.sql file.
     - Remove incorrect caveat about c-style commenting.

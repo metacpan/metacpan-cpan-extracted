@@ -7,14 +7,6 @@
       "schema:isPartOf" : "http:health-lifesci.schema.org"
    },
    "properties" : {
-      "schema:phase" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The phase of the clinical trial.",
-         "rdfs:label" : "phase",
-         "schema:domainIncludes" : "schema:MedicalTrial",
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
-      },
       "schema:trialDesign" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Specifics about the trial design (enumerated).",

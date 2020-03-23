@@ -28,6 +28,7 @@ use vars qw(
   $Only
   %Dispatch
   $Action
+  $NoFqTableNames
 );
 
 %Dispatch = ( generate => \&generate, );
@@ -49,30 +50,32 @@ else {
 sub generate {
 
 	my %new;
-	$new{dbh} = get_dbh();				
-	$new{dir} = $Dir if $Dir;
-	$new{namespace} = $Namespace if $Namespace;
-	$new{ignore_tables} = parse_csv($Ignore) if $Ignore;
-	$new{only_tables} = parse_csv($Only) if $Only;
-	
+	$new{dbh}                = get_dbh();
+	$new{dir}                = $Dir if $Dir;
+	$new{namespace}          = $Namespace if $Namespace;
+	$new{ignore_tables}      = parse_csv($Ignore) if $Ignore;
+	$new{only_tables}        = parse_csv($Only) if $Only;
+	$new{use_fq_table_names} = 0 if $NoFqTableNames;
+
 	my $gen = MySQL::ORM::Generate->new(%new);
 	$gen->generate;
 }
 
 sub parse_csv {
 
-	my $str = shift;
-	my @list = split(/,/, $str);
-	return \@list;	
+	my $str  = shift;
+	my @list = split( /,/, $str );
+	return \@list;
 }
 
 sub get_dbh {
 
-	my @dsn = ("DBI:mysql:database=$DbName", "host=$Host");
+	my @dsn = ( "DBI:mysql:database=$DbName", "host=$Host" );
 	push @dsn, "port=$Port" if $Port;
-	my $dsn = join(';', @dsn);
-		
-	my $dbh = DBI->connect($dsn, $User, $Pass, { PrintError => 0, RaiseError => 1 });
+	my $dsn = join( ';', @dsn );
+
+	my $dbh =
+	  DBI->connect( $dsn, $User, $Pass, { PrintError => 0, RaiseError => 1 } );
 }
 
 sub check_required {
@@ -86,16 +89,17 @@ sub parse_cmd_line {
 	my $help;
 
 	GetOptions(
-		'd=s'    => \$DbName,
-		'h=s'    => \$Host,
-		'u=s'    => \$User,
-		'p=s'    => \$Pass,
-		'D=s'    => \$Dir,
-		'i=s'    => \$Ignore,
-		'n=s'    => \$Namespace,
-		'o=s' => \$Only,
-		'P=s'    => \$Port,
-		"help|?" => \$help
+		'd=s'               => \$DbName,
+		'h=s'               => \$Host,
+		'u=s'               => \$User,
+		'p=s'               => \$Pass,
+		'D=s'               => \$Dir,
+		'i=s'               => \$Ignore,
+		'n=s'               => \$Namespace,
+		'o=s'               => \$Only,
+		'P=s'               => \$Port,
+		'no-fq-table-names' => \$NoFqTableNames,
+		"help|?"            => \$help
 	);
 
 	print_usage("usage:") if $help;
@@ -119,7 +123,7 @@ sub print_usage {
 	print STDERR "@_\n";
 
 	my $basename = basename $0;
-	
+
 	print <<"HERE";
 
 $basename <action> -d <dbname> -u <user> [opts]
@@ -139,6 +143,7 @@ $basename <action> -d <dbname> -u <user> [opts]
       [ -o <only tables> ]      
       [ -p <password> ]
       [ -P <port> ]    
+      [ --no-fq-table-names ]
       [-?] (usage)
      
 HERE

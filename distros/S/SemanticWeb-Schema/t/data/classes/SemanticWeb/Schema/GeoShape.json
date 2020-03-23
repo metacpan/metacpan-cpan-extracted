@@ -13,9 +13,9 @@
          "rdfs:label" : "address",
          "schema:domainIncludes" : [
             "schema:Organization",
-            "schema:GeoShape",
-            "schema:Place",
             "schema:GeoCoordinates",
+            "schema:Place",
+            "schema:GeoShape",
             "schema:Person"
          ],
          "schema:rangeIncludes" : [
@@ -28,9 +28,9 @@
          "rdfs:comment" : "The country. For example, USA. You can also provide the two-letter <a href=\"http://en.wikipedia.org/wiki/ISO_3166-1\">ISO 3166-1 alpha-2 country code</a>.",
          "rdfs:label" : "addressCountry",
          "schema:domainIncludes" : [
-            "schema:GeoCoordinates",
+            "schema:PostalAddress",
             "schema:GeoShape",
-            "schema:PostalAddress"
+            "schema:GeoCoordinates"
          ],
          "schema:rangeIncludes" : [
             "schema:Country",

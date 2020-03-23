@@ -2,7 +2,7 @@ package Test2::Harness::UI;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use Router::Simple;
 use Text::Xslate(qw/mark_raw/);
@@ -15,6 +15,7 @@ use Test2::Harness::UI::Controller::Upload;
 use Test2::Harness::UI::Controller::User;
 use Test2::Harness::UI::Controller::Run;
 use Test2::Harness::UI::Controller::Job;
+use Test2::Harness::UI::Controller::Download;
 
 use Test2::Harness::UI::Controller::Query;
 use Test2::Harness::UI::Controller::Runs;
@@ -65,6 +66,8 @@ sub init {
     $router->connect('/durations/:project'                          => {controller => 'Test2::Harness::UI::Controller::Durations'});
     $router->connect('/durations/:project/:short/:medium'           => {controller => 'Test2::Harness::UI::Controller::Durations'});
     $router->connect('/durations/:project/:short/:medium/:state_id' => {controller => 'Test2::Harness::UI::Controller::Durations'});
+
+    $router->connect('/download/:id' => {controller => 'Test2::Harness::UI::Controller::Download'});
 }
 
 sub to_app {
@@ -180,13 +183,13 @@ This package provides a web UI for yath logs.
 =head1 SYNOPSIS
 
 The easiest thing to do is use the C<yath ui path/to/logfile> command, which
-will create a temporary postgresql db, load your lgo into it, then launch the
+will create a temporary postgresql db, load your log into it, then launch the
 app in starman on a local port that you can visit in your browser.
 
 =head1 SOURCE
 
 The source code repository for Test2-Harness-UI can be found at
-F<http://github.com/Test-More/Test2-Harness-UI/>.
+F<https://github.com/Test-More/Test2-Harness-UI/>.
 
 =head1 MAINTAINERS
 

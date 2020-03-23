@@ -3,7 +3,7 @@ package Ryu::Node;
 use strict;
 use warnings;
 
-our $VERSION = '1.011'; # VERSION
+our $VERSION = '1.012'; # VERSION
 
 =head1 NAME
 
@@ -15,6 +15,9 @@ This is a common base class for all sources, sinks and other related things.
 It does very little.
 
 =cut
+
+use Future;
+use Scalar::Util qw(refaddr);
 
 =head1 METHODS
 
@@ -36,11 +39,13 @@ Does nothing useful.
 =cut
 
 sub pause {
-    use Scalar::Util qw(refaddr);
     my ($self, $src) = @_;
     my $k = refaddr($src) // 0;
 
     my $was_paused = $self->{is_paused} && keys %{$self->{is_paused}};
+    unless($was_paused) {
+        delete $self->{unblocked} if $self->{unblocked} and $self->{unblocked}->is_ready;
+    }
     ++$self->{is_paused}{$k};
     if(my $parent = $self->parent) {
         $parent->pause($self) if $self->{pause_propagation};
@@ -58,11 +63,12 @@ Is about as much use as L</pause>.
 =cut
 
 sub resume {
-    use Scalar::Util qw(refaddr);
     my ($self, $src) = @_;
     my $k = refaddr($src) // 0;
     delete $self->{is_paused}{$k} unless --$self->{is_paused}{$k} > 0;
     unless($self->{is_paused} and keys %{$self->{is_paused}}) {
+        my $f = $self->unblocked;
+        $f->done unless $f->is_ready;
         if(my $parent = $self->parent) {
             $parent->resume($self) if $self->{pause_propagation};
         }
@@ -73,6 +79,24 @@ sub resume {
     $self
 }
 
+=head2 unblocked
+
+Returns a L<Future> representing the current flow control state of this node.
+
+It will be L<pending|Future/is_pending> if this node is currently paused,
+otherwise L<ready|Future/is_ready>.
+
+=cut
+
+sub unblocked {
+    my ($self) = @_;
+    $self->{unblocked} //= do {
+        $self->is_paused
+        ? $self->{new_future}->()
+        : Future->done
+    };
+}
+
 =head2 is_paused
 
 Might return 1 or 0, but is generally meaningless.
@@ -80,7 +104,6 @@ Might return 1 or 0, but is generally meaningless.
 =cut
 
 sub is_paused {
-    use Scalar::Util qw(refaddr);
     my ($self, $obj) = @_;
     return keys %{ $self->{is_paused} } ? 1 : 0 unless defined $obj;
     my $k = refaddr($obj);

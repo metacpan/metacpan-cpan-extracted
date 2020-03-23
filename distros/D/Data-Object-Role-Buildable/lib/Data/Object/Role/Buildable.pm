@@ -4,6 +4,8 @@ use 5.014;
 
 use Moo::Role;
 
+our $VERSION = '0.03'; # VERSION
+
 sub BUILD {
 
   return $_[0];

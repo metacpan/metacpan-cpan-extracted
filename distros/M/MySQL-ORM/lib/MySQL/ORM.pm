@@ -9,7 +9,7 @@ use Data::Printer alias => 'pdump';
 use SQL::Abstract::Complete;
 use MySQL::Util::Lite;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -317,6 +317,7 @@ method prune_ddl_args (ArrayRef $args) {
 ##############################################################################
 
 method _fq_table(Str $table){
+	
     return $self->schema_name . "." . $table;
 }
 

@@ -4,6 +4,7 @@ author:
   - 'Jörg Sommrey <git@sommrey.de>'
 build_requires:
   Test2::V0: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -18,6 +19,7 @@ no_index:
     - t
     - inc
 requires:
+  B: '0'
   Data::Dumper: '0'
   Exporter::Tiny: '0.025'
   Filter::Simple: '0.76'
@@ -27,4 +29,4 @@ requires:
 resources:
   bugtracker: https://github.com/jo-37/debug-filter-printexpr/issues
   repository: git://github.com/jo-37/debug-filter-printexpr.git
-version: '0.18'
+version: '0.19'

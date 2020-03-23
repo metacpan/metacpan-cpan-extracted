@@ -58,6 +58,6 @@ requires:
   perl: v5.16.0
   vars: '0'
   warnings: '0'
-version: '0.026'
+version: '0.027'
 x_generated_by_perl: v5.16.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

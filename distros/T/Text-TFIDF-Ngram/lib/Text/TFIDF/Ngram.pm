@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the TF-IDF measure for ngram phrases
 
-our $VERSION = '0.0501';
+our $VERSION = '0.0502';
 
 use Moo;
 use strictures 2;
@@ -87,7 +87,7 @@ sub _process_ngrams {
 
     for my $p ( keys %$phrase ) {
         next if $self->stopwords
-            && grep { $stop->{$_} } split /\s/, $p;  # Exclude stopwords
+            && grep { $stop->{$_} } split /\s+/, $p;  # Exclude stopwords
 
         my $pat = $self->punctuation;
         $p =~ s/$pat//g if $pat; # Remove unwanted punctuation
@@ -96,7 +96,7 @@ sub _process_ngrams {
         my @p = grep { $_ } split /\s+/, $p;
         next unless @p == $size;
 
-        # Skip a lone single quote (allowed by the default punctuation)
+        # Skip an ngram with a lone single quote (allowed by the default punctuation)
         next if grep { $_ eq "'" } @p;
 
         $p = lc $p if $self->lowercase;
@@ -173,7 +173,7 @@ Text::TFIDF::Ngram - Compute the TF-IDF measure for ngram phrases
 
 =head1 VERSION
 
-version 0.0501
+version 0.0502
 
 =head1 SYNOPSIS
 
@@ -250,9 +250,7 @@ attribute - providing it in the constructor will be ignored.
 Create a new C<Text::TFIDF::Ngram> object.  If the B<files> argument is passed
 in, the ngrams of each file are stored in the B<counts>.
 
-=head2 BUILD
-
-Load the given file phrase counts.
+=for Pod::Coverage BUILD
 
 =head2 tf
 

@@ -1,5 +1,9 @@
 Revision history for CLI-Driver
 
+0.50 - introduced v2 of the cli-driver file
+
+0.41 - added sharedir example
+
 0.40 - converted from Method::Signatures to Kavorka
 
 0.30 - added feature to detect extraneous args (and die with message)

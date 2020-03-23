@@ -13,10 +13,10 @@
          "rdfs:comment" : "An active ingredient, typically chemical compounds and/or biologic substances.",
          "rdfs:label" : "activeIngredient",
          "schema:domainIncludes" : [
-            "schema:Substance",
-            "schema:DietarySupplement",
             "schema:Drug",
-            "schema:DrugStrength"
+            "schema:DietarySupplement",
+            "schema:DrugStrength",
+            "schema:Substance"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -70,14 +70,6 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
       },
-      "schema:cost" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Cost per unit of the drug, as reported by the source being tagged.",
-         "rdfs:label" : "cost",
-         "schema:domainIncludes" : "schema:Drug",
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:DrugCost"
-      },
       "schema:dosageForm" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A dosage form in which this drug/supplement is available, e.g. 'tablet', 'suspension', 'injection'.",
@@ -91,8 +83,8 @@
          "rdfs:comment" : "A dosing schedule for the drug for a given population, either observed, recommended, or maximum dose based on the type used.",
          "rdfs:label" : "doseSchedule",
          "schema:domainIncludes" : [
-            "schema:TherapeuticProcedure",
-            "schema:Drug"
+            "schema:Drug",
+            "schema:TherapeuticProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:DoseSchedule"
@@ -110,8 +102,8 @@
          "rdfs:comment" : "The unit in which the drug is measured, e.g. '5 mg tablet'.",
          "rdfs:label" : "drugUnit",
          "schema:domainIncludes" : [
-            "schema:DrugCost",
-            "schema:Drug"
+            "schema:Drug",
+            "schema:DrugCost"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -155,8 +147,8 @@
          "rdfs:comment" : "True if this item's name is a proprietary/brand name (vs. generic name).",
          "rdfs:label" : "isProprietary",
          "schema:domainIncludes" : [
-            "schema:Drug",
-            "schema:DietarySupplement"
+            "schema:DietarySupplement",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Boolean"
@@ -174,15 +166,15 @@
          "rdfs:comment" : "The drug or supplement's legal status, including any controlled substance schedules that apply.",
          "rdfs:label" : "legalStatus",
          "schema:domainIncludes" : [
-            "schema:Drug",
             "schema:DietarySupplement",
-            "schema:MedicalEntity"
+            "schema:MedicalEntity",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:MedicalEnumeration",
-            "schema:DrugLegalStatus"
+            "schema:DrugLegalStatus",
+            "schema:Text"
          ]
       },
       "schema:manufacturer" : {
@@ -190,9 +182,9 @@
          "rdfs:comment" : "The manufacturer of the product.",
          "rdfs:label" : "manufacturer",
          "schema:domainIncludes" : [
-            "schema:Product",
             "schema:DietarySupplement",
-            "schema:Drug"
+            "schema:Drug",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -201,10 +193,10 @@
          "rdfs:comment" : "Recommended intake of this supplement for a given population as defined by a specific recommending authority.",
          "rdfs:label" : "maximumIntake",
          "schema:domainIncludes" : [
-            "schema:Drug",
-            "schema:Substance",
+            "schema:DietarySupplement",
             "schema:DrugStrength",
-            "schema:DietarySupplement"
+            "schema:Substance",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MaximumDoseSchedule"
@@ -214,8 +206,8 @@
          "rdfs:comment" : "The specific biochemical interaction through which this drug or supplement produces its pharmacological effect.",
          "rdfs:label" : "mechanismOfAction",
          "schema:domainIncludes" : [
-            "schema:Drug",
-            "schema:DietarySupplement"
+            "schema:DietarySupplement",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -225,8 +217,8 @@
          "rdfs:comment" : "The generic name of this drug or supplement.",
          "rdfs:label" : "nonProprietaryName",
          "schema:domainIncludes" : [
-            "schema:Drug",
-            "schema:DietarySupplement"
+            "schema:DietarySupplement",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"

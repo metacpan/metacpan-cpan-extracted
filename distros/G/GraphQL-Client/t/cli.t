@@ -8,9 +8,12 @@ use Test::More;
 
 use GraphQL::Client::CLI;
 
+delete $ENV{GRAPHQL_CLIENT_OPTIONS};
+
 subtest 'get_options' => sub {
     my $expected = {
         format          => 'json:pretty',
+        filter          => undef,
         help            => undef,
         manual          => undef,
         operation_name  => undef,
@@ -31,6 +34,14 @@ subtest 'get_options' => sub {
 
     $r = GraphQL::Client::CLI->_get_options(qw{foo bar});
     is_deeply($r, $expected, '--query is also optional') or diag explain $r;
+
+    {
+        local $ENV{GRAPHQL_CLIENT_OPTIONS} = '--url asdf --query "baz qux" --unpack';
+        local $expected->{query} = 'baz qux';
+        local $expected->{unpack} = 1;
+        $r = GraphQL::Client::CLI->_get_options(qw{--url foo});
+        is_deeply($r, $expected, 'options can come from GRAPHQL_CLIENT_OPTIONS') or diag explain $r;
+    }
 };
 
 subtest 'expand_vars' => sub {

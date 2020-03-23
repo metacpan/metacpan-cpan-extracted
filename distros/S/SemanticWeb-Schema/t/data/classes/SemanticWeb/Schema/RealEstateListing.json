@@ -14,8 +14,8 @@
          "rdfs:comment" : "Publication date of an online listing.",
          "rdfs:label" : "datePosted",
          "schema:domainIncludes" : [
-            "schema:RealEstateListing",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:RealEstateListing"
          ],
          "schema:rangeIncludes" : "schema:Date"
       },
@@ -26,9 +26,9 @@
          "rdfs:label" : "leaseLength",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:Accommodation",
-            "schema:RealEstateListing"
+            "schema:RealEstateListing",
+            "schema:Offer"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [

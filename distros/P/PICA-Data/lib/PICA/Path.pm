@@ -2,7 +2,7 @@ package PICA::Path;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);

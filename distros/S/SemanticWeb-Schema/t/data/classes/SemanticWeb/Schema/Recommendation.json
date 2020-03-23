@@ -10,24 +10,29 @@
    },
    "properties" : {
       "schema:category" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1741",
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1741",
+            "https://github.com/schemaorg/schemaorg/issues/2490"
+         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.",
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:Product",
-            "schema:Recommendation",
-            "schema:PhysicalActivity",
             "schema:ActionAccessSpecification",
             "schema:Invoice",
-            "schema:Offer"
+            "schema:PhysicalActivity",
+            "schema:Offer",
+            "schema:URL",
+            "schema:Product",
+            "schema:SpecialAnnouncement",
+            "schema:Recommendation",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : [
+            "schema:Thing",
             "schema:PhysicalActivityCategory",
-            "schema:Text",
-            "schema:Thing"
+            "schema:Text"
          ]
       }
    }

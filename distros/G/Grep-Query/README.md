@@ -1,4 +1,4 @@
-# Grep::Query 1.010
+# Grep::Query 1.011
 
 This module implements a limited query language for logical expressions
 (AND, OR, NOT, parenthesized, ...etc) and apply it to lists of data for

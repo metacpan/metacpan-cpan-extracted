@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Warnings; # git description: v0.028-5-ged07d93
+package Test::Warnings; # git description: v0.029-2-g97d1c9f
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Test for warnings and the lack of them
 # KEYWORDS: testing tests warnings
 
-our $VERSION = '0.029';
+our $VERSION = '0.030';
 
 use parent 'Exporter';
 use Test::Builder;
@@ -178,7 +178,7 @@ Test::Warnings - Test for warnings and the lack of them
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 SYNOPSIS
 

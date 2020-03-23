@@ -2,8 +2,10 @@ package Term::ANSIColor::Conditional;
 
 ## no critic (Modules::ProhibitAutomaticExportation)
 
-our $DATE = '2018-12-02'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-21'; # DATE
+our $DIST = 'Term-ANSIColor-Conditional'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -12,6 +14,7 @@ use Exporter qw(import);
 use Term::ANSIColor (); # XXX color() & colored() still imported?
 no warnings 'redefine';
 
+if ($^O =~ /^(MSWin32)$/) { require Win32::Console::ANSI }
 
 our $COLOR;
 
@@ -72,7 +75,7 @@ Term::ANSIColor::Conditional - Colorize text only if color is enabled
 
 =head1 VERSION
 
-This document describes version 0.006 of Term::ANSIColor::Conditional (from Perl distribution Term-ANSIColor-Conditional), released on 2018-12-02.
+This document describes version 0.007 of Term::ANSIColor::Conditional (from Perl distribution Term-ANSIColor-Conditional), released on 2020-03-21.
 
 =head1 SYNOPSIS
 
@@ -143,7 +146,7 @@ L<Term::ANSIColor::Patch::Conditional>, patch version for this module.
 
 These modules also respect the C<NO_COLOR> and/or the C<COLOR> environment
 variable: L<Color::ANSI::Util>, L<Text::ANSITable>, L<Data::Dump::Color>,
-L<JSON::Color>, L<YAML::Tiny::Color>, L<App::diffwc>, L<App::rsynccolor>.
+L<App::diffwc>, L<App::rsynccolor>.
 
 =head1 AUTHOR
 
@@ -151,7 +154,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

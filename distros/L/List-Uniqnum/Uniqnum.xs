@@ -20,6 +20,16 @@
 #define ACTUAL_NVSIZE NVSIZE
 #endif
 
+/* Detect "DoubleDouble" nvtype */
+
+#if defined(USE_LONG_DOUBLE) && LDBL_MANT_DIG == 106
+#  define NV_IS_DOUBLEDOUBLE
+#endif
+
+#ifndef SvUOK
+# define SvUOK SvIsUV
+#endif 
+
 int uv_fits_double(UV arg) {
 
   /* This function is no longer used.                   *
@@ -82,7 +92,10 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
 #endif
         }
 #if NVSIZE > IVSIZE                          /* $Config{nvsize} > $Config{ivsize} */
-        nv_arg = SvNV(arg);
+        /* Avoid altering arg's flags */ 
+        if(SvUOK(arg))      nv_arg = (NV)SvUV(arg);
+        else if(SvIOK(arg)) nv_arg = (NV)SvIV(arg);
+        else                nv_arg = SvNV(arg);
 
         /* use 0 for all zeros */
         if(nv_arg == 0) sv_setpvs(keysv, "0");
@@ -108,8 +121,7 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
         }
 #else                                    /* $Config{nvsize} == $Config{ivsize} == 8 */ 
         if( SvIOK(arg) || !SvOK(arg) ) {
-
-           /* It doesn't matter if SvUOK(arg) is TRUE */
+           /* It doesn't matter if uok is TRUE */
             IV iv = SvIV(arg);
 
            /* use "0" for all zeros */
@@ -141,17 +153,19 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
 
                 /* The value of arg can be exactly represented by a double unless one    *
                  * or more of its "disallowed" bits are set - ie if iv & (~valid_bits)   *
-                 * is untrue. However, if (iv < 0 && !SvUOK(arg)) we need to multiply it *
-                 * by -1 prior to performing that '&' operation.                         */
+                 * is untrue. However, if (iv < 0 && !SvUOK(arg)) we need to multiply iv *
+                 * by -1 prior to performing that '&' operation - so multiply iv by sign.*/
                 if( !((iv * sign) & (~valid_bits)) ) {
-                    nv_arg = SvNV(arg);
+                    /* Avoid altering arg's flags */
+                    nv_arg = uok ? (NV)SvUV(arg) : (NV)SvIV(arg); 
                     sv_setpvn(keysv, (char *) &nv_arg, 8);
                 }          
                 else {
+                    /* Read in the bytes, rather than the numeric value of the IV/UV as  *
+                     * this is more efficient, despite having to sv_catpvn an extra byte.*/
                     sv_setpvn(keysv, (char *) &iv, 8);
-                   /* We add an extra byte to distinguish between IV/UV and an NV.       *
-                    * We also use that byte to distinguish between a -ve IV and a UV.    *
-                    * This is more efficient than reading in the value of the IV/UV.     */
+                    /* We add an extra byte to distinguish between an IV/UV and an NV.   *
+                     * We also use that byte to distinguish between a -ve IV and a UV.   */
                     if(uok) sv_catpvn(keysv, "U", 1);
                     else    sv_catpvn(keysv, "I", 1);
                 }

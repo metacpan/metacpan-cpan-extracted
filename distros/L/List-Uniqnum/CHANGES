@@ -27,3 +27,7 @@
 0.08 - On perls whose nvsize == ivsize, assign the bytes of the IV/UV to the hash keys,
        instead of the value. This is more efficient, despite the need to perform an
        additional sv_catpvn() of an extra byte.
+
+0.09 - Move definition of NV_IS_DOUBLEDOUBLE from Makefile.PL to Uniqnum.xs.
+     - No longer mess with the flags of the inputs.
+     - Accommodate absence of SvUOK in perl-5.6

@@ -1,0 +1,38 @@
+---
+abstract: 'A handy cli interface for MySQL::Util'
+author:
+  - 'John Gravatt <gravattj@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MySQL-Util-CLI
+requires:
+  CLI::Driver: '0.50'
+  Carp: '0'
+  Data::Printer: '0'
+  File::Basename: '0'
+  File::ShareDir: '0'
+  Getopt::Long: '0'
+  Kavorka: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  MySQL::Util: '0'
+  Text::ASCIITable: '0'
+  Util::Medley::Roles::Attributes::List: '0'
+  Util::Medley::Roles::Attributes::Logger: '0'
+  Util::Medley::Roles::Attributes::String: '0'
+  constant: '0'
+  namespace::autoclean: '0'
+  vars: '0'
+  warnings: '0'
+version: '0.002'
+x_generated_by_perl: v5.16.3
+x_serialization_backend: 'YAML::Tiny version 1.73'

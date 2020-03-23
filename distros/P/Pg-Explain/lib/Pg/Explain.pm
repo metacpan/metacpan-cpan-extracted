@@ -17,11 +17,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 0.94
+Version 0.96
 
 =cut
 
-our $VERSION = '0.94';
+our $VERSION = '0.96';
 
 =head1 SYNOPSIS
 
@@ -232,7 +232,7 @@ sub parse_source {
         $self->{ 'source_format' } = 'XML';
         $parser = Pg::Explain::FromXML->new();
     }
-    elsif ( $source =~ m{ ^ \s* \[ .*? \] \s* }xms ) {
+    elsif ( $source =~ m{ ^ \s* \[ \s* \{ \s* "Plan" \s* : \s* \{ }xms ) {
         $self->{ 'source_format' } = 'JSON';
         $parser = Pg::Explain::FromJSON->new();
     }

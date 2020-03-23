@@ -1,5 +1,5 @@
 package Util::Medley::Roles::Attributes::Logger;
-$Util::Medley::Roles::Attributes::Logger::VERSION = '0.026';
+$Util::Medley::Roles::Attributes::Logger::VERSION = '0.027';
 use Modern::Perl;
 use Moose::Role;
 use Util::Medley::Logger;
@@ -10,7 +10,7 @@ Util::Medley::Roles::Attributes::Logger
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =cut
 

@@ -157,3 +157,43 @@ test10:
       required: 
         hard: 
           m: myarg                       
+          
+test11:
+  desc: "test cli-driver-v2 with optionals"
+  class:
+    name: CLI::Driver::Test3
+    attr:
+      required:
+        h: reqattr
+      optional:
+        o: optattr
+      flags: 
+  method:
+    name: test11_method
+    args:
+      required: 
+        a: reqarg
+      optional:
+        b: optarg
+      flags:   
+                
+test12:
+  desc: "test cli-driver-v2 without optionals"
+  class:
+    name: CLI::Driver::Test3
+    attr:
+      required:
+        h: reqattr
+      optional:
+        o: optattr
+      flags: 
+  method:
+    name: test12_method
+    args:
+      required: 
+        a: reqarg
+      optional:
+        b: optarg
+      flags:       
+          
+          

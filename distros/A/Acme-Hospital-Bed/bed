@@ -1,3 +1,3 @@
 #!perl
 use Acme::Hospital::Bed;
-Acme::Hospital::Bed->new;
+Acme::Hospital::Bed->start;

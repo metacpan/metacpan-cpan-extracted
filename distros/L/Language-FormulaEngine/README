@@ -1,9 +1,9 @@
 This archive contains the distribution Language-FormulaEngine,
-version 0.03:
+version 0.04:
 
   Evaluator for spreadsheet-style function expressions
 
-This software is copyright (c) 2019 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2020 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

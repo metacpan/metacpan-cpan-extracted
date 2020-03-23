@@ -12,46 +12,24 @@
          "rdfs:comment" : "Specifying the health condition(s) of a patient, medical study, or other target audience.",
          "rdfs:label" : "healthCondition",
          "schema:domainIncludes" : [
+            "schema:Patient",
             "schema:PeopleAudience",
-            "schema:MedicalStudy",
-            "schema:Patient"
+            "schema:MedicalStudy"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalCondition"
-      },
-      "schema:outcome" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Expected or actual outcomes of the study.",
-         "rdfs:label" : "outcome",
-         "schema:domainIncludes" : [
-            "schema:MedicalStudy",
-            "schema:MedicalProcedure"
-         ],
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:MedicalEntity"
-         ]
-      },
-      "schema:population" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Any characteristics of the population used in the study, e.g. 'males under 65'.",
-         "rdfs:label" : "population",
-         "schema:domainIncludes" : "schema:MedicalStudy",
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
       },
       "schema:sponsor" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A person or organization that supports a thing through a pledge, promise, or financial contribution. e.g. a sponsor of a Medical Study or a corporate sponsor of an event.",
          "rdfs:label" : "sponsor",
          "schema:domainIncludes" : [
+            "schema:Event",
             "schema:CreativeWork",
             "schema:MedicalStudy",
             "schema:Grant",
-            "schema:Organization",
-            "schema:Event",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",
@@ -63,15 +41,15 @@
          "rdfs:comment" : "The status of the study (enumerated).",
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
+            "schema:MedicalStudy",
             "schema:MedicalProcedure",
-            "schema:MedicalStudy"
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:EventStatusType",
             "schema:MedicalStudyStatus",
-            "schema:EventStatusType"
+            "schema:Text"
          ]
       },
       "schema:studyLocation" : {

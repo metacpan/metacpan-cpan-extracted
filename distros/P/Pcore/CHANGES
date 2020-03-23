@@ -1,3 +1,11 @@
+v0.126.0 2020-03-22T20:05:05Z
+ - build-cordova config
+
+v0.125.0 2020-03-21T13:53:52Z
+ - resources updated
+ - api read role refactored
+ - upload role refactored
+
 v0.124.1 2020-03-16T01:09:45Z
  - app->start_nginx -> run_nginx
 

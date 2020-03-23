@@ -7,18 +7,8 @@ use Time::ParseDate;
 
 use vars qw($STDERR);
 
-#####################################
-# constructor
-#####################################
 
 my $log = Util::Medley::Logger->new;
-ok($log);
-
-#####################################
-#
-#####################################
-
-$log = Util::Medley::Logger->new;
 ok($log);
 
 ok( my @levels = $log->getLogLevels );
@@ -96,7 +86,7 @@ sub check_log_msg {
 		logDetailLevel => $log_detail
 	);
 	
-	my $msg = 'foobar';	
+	my $msg = ' foobar '; # this should get trimmed
 	my $bool = $log->$write_level($msg);
 	
 	if ($log->_logLevelToInt($log_level) <= $log->_logLevelToInt($write_level)) {

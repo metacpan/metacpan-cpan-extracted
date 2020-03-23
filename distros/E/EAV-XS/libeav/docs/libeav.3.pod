@@ -1,0 +1,332 @@
+=pod
+
+=encoding iso8859-1
+
+=head1 NAME
+
+libeav - Email Address Validation Library
+
+=head1 SYNOPSIS
+
+#include <eav.h>
+
+=over
+
+=item B<void eav_init(eav_t *>I<eav>B<);>
+
+=item B<void eav_free(eav_t *>I<eav>B<);>
+
+=item B<int eav_setup(eav_t *>I<eav>B<);>
+
+=item B<int eav_is_email(eav_t *>I<eav>B<, const char *>I<email>B<, size_t>
+I<length>B<);>
+
+=item B<const char * eav_errstr(eav_t *>I<eav>B<);>
+
+=back
+
+Link with I<-leav> { I<-lidn2> | I<-lidn> | I<-lidnkit> }.
+
+When linking with B<idnkit> compile with I<-DHAVE_IDNKIT>.
+
+=head1 DESCRIPTION
+
+libeav is a small library which allows applications to validate
+email addresses. An email address consists two parts separated
+by "@" symbol: local-part "@" domain. The local-part usually identifies
+a user and the domain is usually represents a Fully Qualified Domain Name
+(FQDN).
+
+The details of the API are described below. Also, the information may be
+found in the header file.
+
+=head1 HIGH-LEVEL API
+
+First of all, you have to create the B<eav_t> structure. This structure
+may be created on the stack or via B<malloc>(3). Then, you have to call
+the B<eav_init>() function to initialize this structure.
+
+After that you may use default settings or change them on
+your decision. To confirm your choice you have to call
+the B<eav_setup>() function.
+
+You may change the settings in the B<eav_t> structure at any moment 
+and later call again the B<eav_setup>() function. For details 
+about possible options please look at the section 
+L</HIGH-LEVEL API OPTIONS> below.
+
+To check an email address call the B<eav_is_email>() function.
+If this function returns false, that is, the specified email
+address is invalid you may get an error message string 
+by calling the B<eav_errstr>() function.
+
+When you have finished working with libeav you have to call
+the B<eav_free>() function.
+
+The details about each of the mentioned functions above
+are described in the section L</HIGH-LEVEL API FUNCTIONS>
+below.
+
+See examples below in the section L</HIGH-LEVEL API EXAMPLES>.
+
+=head1 HIGH-LEVEL API OPTIONS
+
+libeav is able to work in different modes, which represents
+the implementation of the specific RFC. By default the 
+high-level API is using the mode, which conforms to B<RFC 6531>.
+
+The list of fields in the B<eav_t> structure you are able to change
+is described below:
+
+=over
+
+=item *
+
+B<rfc> - represents a mode to be used to. The possible values are:
+B<EAV_RFC_822>, B<EAV_RFC_5321>, B<EAV_RFC_5322> and B<EAV_RFC_6531>.
+
+Default value is: B<EAV_RFC_6531>.
+
+=item *
+
+B<tld_check> - enable/disable the TLD check. Also this options
+enables or disables the FQDN check, because without it such 
+a check became useless. The possible values are:
+B<true> (enabled) and B<false> (disabled).
+
+Default value is: B<true>.
+
+=item *
+
+B<allow_tld> - the list of TLD types, which will be considered good
+or acceptable. That is, the B<eav_is_email>() function will return
+true if a TLD type is listed in B<allow_tld>,
+otherwise it will return false.
+
+Note that this option will work only if the B<tld_check> option
+is enabled.
+
+libeav uses Top Level Domains (TLD for short) and their types,
+which can be found at L<https://www.iana.org/domains/root/db>.
+The list of possible values and their descriptions are present below:
+
+=over
+
+=item *
+
+B<EAV_TLD_COUNTRY_CODE> - country-code TLDs.
+
+=item *
+
+B<EAV_TLD_GENERIC> - generic TLDs.
+
+=item *
+
+B<EAV_TLD_GENERIC_RESTRICTED> - generic-restricted TLDs.
+
+=item *
+
+B<EAV_TLD_INFRASTRUCTURE> - infrastructure TLDs.
+
+=item *
+
+B<EAV_TLD_NOT_ASSIGNED> - not assigned TLDs. At IANA website they are listed
+as "Not assigned" in the "Sponsoring Organisation" field.
+
+=item *
+
+B<EAV_TLD_SPONSORED> - sponsored TLDs.
+
+=item *
+
+B<EAV_TLD_TEST> - test TLDs.
+
+=item *
+
+B<EAV_TLD_SPECIAL> - special & restricted TLDs
+(B<RFC 2606>, B<RFC 6761> and B<RFC 7686>).
+
+=back
+
+This list must constructed by using the bitwise "OR" operator.
+
+Default value is:
+B<EAV_TLD_COUNTRY_CODE> |
+B<EAV_TLD_GENERIC> |
+B<EAV_TLD_GENERIC_RESTRICTED> |
+B<EAV_TLD_INFRASTRUCTURE> |
+B<EAV_TLD_SPONSORED> |
+B<EAV_TLD_SPECIAL>.
+
+=back
+
+=head1 HIGH-LEVEL API FUNCTIONS
+
+This section describes the high-level API functions:
+
+=over
+
+=item B<void eav_init(eav_t *>I<eav>B<);>
+
+Initialize the I<eav> structure and set default values into its
+fields.
+
+=item B<void eav_free(eav_t *>I<eav>B<);>
+
+Destroy neccessary internal libeav structures. Note that B<eav_free>()
+does not free passed to it the I<eav> structure itself. If this
+structure was allocated by B<malloc>(3) you have to free it yourself
+I<after> calling this function.
+
+=item B<int eav_setup(eav_t *>I<eav>B<);>
+
+Calling this function confirms options chosen by you. Returns 0
+on success. Otherwise, returns B<EEAV_INVALID_RFC> if an invalid
+B<rfc> value was set. You have I<always> call this function before 
+checking email addresses.
+
+=item B<int eav_is_email(eav_t *>I<eav>B<, const char *>I<email>B<, size_t>
+I<length>B<);>
+
+Validates the email address passed as I<email>. The I<length> is
+the length of the I<email> string. Returns 1 on success, that is,
+the I<email> is a valid email address. Otherwise, the function
+returns 0.
+
+=item B<const char * eav_errstr(eav_t *>I<eav>B<);>
+
+Returns an error message string for the last checked email
+address via the B<eav_is_email>() function.
+
+=back
+
+=head1 HIGH-LEVEL API EXAMPLES
+
+This is a basic usage of libeav:
+
+    #include <stdio.h>
+    #include <string.h>
+    #include <eav.h>
+
+    int
+    main(void)
+    {
+        eav_t eav;
+        const char *emails[] = {
+            "valid@example.org",
+            "invalid@123",
+            NULL
+        };
+        const char *cp;
+
+        /* initialize eav structure */
+        eav_init(&eav);
+
+        /* confirm default settings */
+        eav_setup(&eav);
+
+        for (cp = emails; *cp != NULL; cp++) {
+            if (eav_is_email(&eav, *cp, strlen(*cp)))
+                printf("%s is valid\n", *cp);
+            else
+                printf("error: %s: %s\n", *cp, eav_errstr(&eav));
+        }
+
+        /* free libeav resources */
+        eav_free(&eav);
+
+        return 0;
+    }
+
+
+A more complex example:
+
+    #include <stdio.h>
+    #include <string.h>
+    #include <stdlib.h>
+    #include <eav.h>
+
+    int
+    main(void)
+    {
+        eav_t *eav = NULL;
+        const char *emails[] = {
+            "valid@example.org",
+            "invalid@123",
+            NULL
+        };
+        const char *cp;
+
+        /* allocate eav_t structure */
+        eav = malloc(sizeof(*eav));
+
+        if (eav == NULL) {
+            fprintf(stderr, "malloc: out of memory\n");
+            return 1;
+        }
+
+        /* initialize eav structure */
+        eav_init(eav);
+
+        /* use RFC 822 mode */
+        eav->rfc = EAV_RFC_822;
+
+        /* forbid special & restricted TLDs */
+        eav->allow_tld &= ~EAV_TLD_SPECIAL;
+
+        /* confirm our settings */
+        eav_setup(eav);
+
+        for (cp = emails; *cp != NULL; cp++) {
+            if (eav_is_email(eav, *cp, strlen(*cp)))
+                printf("PASS: %s\n", *cp);
+            else
+                printf("FAIL: %s: %s\n", *cp, eav_errstr(eav));
+        }
+
+        /* free libeav resources */
+        eav_free(eav);
+
+        /* Note that eav_free does not free eav structure, because it
+         * might be allocated on the stack. Free it by themselves.
+         */
+        free(eav);
+
+        return 0;
+    }
+
+
+=head1 FILES
+
+eav.h
+    libeav include file
+
+libeav.so
+    libeav shared library file
+
+libeav.a
+    libeav static library file
+
+=head1 LEGAL NOTICE
+
+libeav is released under BSD 2-clause "Simplified" License. For details
+please read LICENSE files in the distribution.
+
+=head1 REPORTING BUGS
+
+Report bugs using L<https://github.com/gh0stwizard/libeav/issues>.
+
+=head1 AUTHORS
+
+libeav was originally designed and implemented by Vitaliy V. Tokarev
+E<lt>vitaliy.tokarev@gmail.comE<gt>.
+
+Parts of libeav contains the code written by Wietse Venema
+and JSON.org.
+
+=head1 AVAILABILITY
+
+You can obtain the latest version from
+L<https://github.com/gh0stwizard/libeav/>.
+
+=cut

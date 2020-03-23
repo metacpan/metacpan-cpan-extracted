@@ -25,22 +25,14 @@
          "schema:domainIncludes" : "schema:Diet",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:expertConsiderations" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Medical expert advice related to the plan.",
          "rdfs:label" : "expertConsiderations",
-         "schema:domainIncludes" : "schema:Diet",
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
-      },
-      "schema:overview" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Descriptive information establishing the overarching theory/philosophy of the plan. May include the rationale for the name, the population where the plan first came to prominence, etc.",
-         "rdfs:label" : "overview",
          "schema:domainIncludes" : "schema:Diet",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"

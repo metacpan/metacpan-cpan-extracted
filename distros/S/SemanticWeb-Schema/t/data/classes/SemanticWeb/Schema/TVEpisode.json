@@ -24,9 +24,9 @@
          "rdfs:label" : "partOfTVSeries",
          "rdfs:subPropertyOf" : "schema:isPartOf",
          "schema:domainIncludes" : [
-            "schema:TVSeason",
             "schema:TVEpisode",
-            "schema:TVClip"
+            "schema:TVClip",
+            "schema:TVSeason"
          ],
          "schema:rangeIncludes" : "schema:TVSeries",
          "schema:supersededBy" : "schema:partOfSeries"
@@ -38,15 +38,15 @@
          "rdfs:label" : "subtitleLanguage",
          "schema:category" : "issue-2110",
          "schema:domainIncludes" : [
-            "schema:TVEpisode",
-            "schema:BroadcastEvent",
             "schema:Movie",
+            "schema:BroadcastEvent",
+            "schema:TVEpisode",
             "schema:ScreeningEvent"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Language",
-            "schema:Text"
+            "schema:Text",
+            "schema:Language"
          ]
       }
    }

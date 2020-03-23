@@ -26,17 +26,25 @@ elsif ( !check_connection() ) {
 	plan skip_all => 'unable to connect to mysql';
 }
 else {
-	drop_db();
-	remove_tmp();
-	load_db();
-	generate();
-	check();
-	done_testing();
-	drop_db();
-	remove_tmp();
+	run(1);  # default
+	run(0);
 }
 
+done_testing();
+
 ##################################
+
+sub run {
+	my $use_fq_table_names = shift;
+	
+	remove_tmp();
+	drop_db();
+	load_db();
+	generate($use_fq_table_names);
+	check();
+	drop_db();
+	remove_tmp();	
+}
 
 sub check {
 
@@ -135,14 +143,17 @@ sub constructor {
 }
 
 sub generate {
-
+	
+	my $use_fq_table_names = shift;
+	
 	return if $ENV{SKIP_GENERATE};
 	
 	my %new;
 	$new{dbh}       = get_dbh();
 	$new{dir}       = 'tmp';
 	$new{namespace} = 'Foo';
-
+	$new{use_fq_table_names} = $use_fq_table_names;
+	
 	my $orm = MySQL::ORM::Generate->new(%new);
 	$orm->generate;
 }

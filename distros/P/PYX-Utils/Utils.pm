@@ -1,11 +1,9 @@
 package PYX::Utils;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use HTML::Entities qw(decode_entities);
 use Readonly;
 
@@ -18,8 +16,7 @@ Readonly::Hash our %ENTITIES => (
 );
 Readonly::Scalar our $ENTITIES => join q{}, keys %ENTITIES;
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 
 # Decode chars.
 sub decode {
@@ -61,6 +58,8 @@ __END__
 PYX::Utils - A perl module for PYX common utilities.
 
 =head1 SYNOPSIS
+
+ use PYX::Utils;
 
  my $decoded_text = decode($text);
  my $encoded_text = encode($text);
@@ -104,11 +103,9 @@ PYX::Utils - A perl module for PYX common utilities.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use PYX::Utils qw(decode);
 
  # Text.
@@ -128,11 +125,9 @@ PYX::Utils - A perl module for PYX common utilities.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use PYX::Utils qw(encode);
 
  # Text.
@@ -152,11 +147,9 @@ PYX::Utils - A perl module for PYX common utilities.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use PYX::Utils qw(entity_decode);
 
  # Text.
@@ -175,11 +168,9 @@ PYX::Utils - A perl module for PYX common utilities.
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use PYX::Utils qw(entity_encode);
 
  # Text.
@@ -214,19 +205,20 @@ Install the PYX modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/PYX-Utils>
+L<https://github.com/michal-josef-spacek/PYX-Utils>
 
 =head1 AUTHOR
 
-Michal Špaček L<skim@cpan.org>
+Michal Josef Špaček L<skim@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2015 Michal Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.06
 
 =cut

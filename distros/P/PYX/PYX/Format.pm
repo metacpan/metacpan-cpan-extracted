@@ -1,11 +1,9 @@
 package PYX::Format;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 1;
 
@@ -71,21 +69,22 @@ Install the PYX modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/PYX>
+L<https://github.com/michal-josef-spacek/PYX>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2016 Michal Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

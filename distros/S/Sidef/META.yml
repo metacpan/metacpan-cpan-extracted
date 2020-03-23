@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '3.90'
+    version: '3.95'
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -48,10 +48,8 @@ provides:
     file: lib/Sidef/Sys/Sig.pm
   Sidef::Sys::Sys:
     file: lib/Sidef/Sys/Sys.pm
-  Sidef::Time::Gmtime:
-    file: lib/Sidef/Time/Gmtime.pm
-  Sidef::Time::Localtime:
-    file: lib/Sidef/Time/Localtime.pm
+  Sidef::Time::Date:
+    file: lib/Sidef/Time/Date.pm
   Sidef::Time::Time:
     file: lib/Sidef/Time/Time.pm
   Sidef::Types::Array::Array:
@@ -147,6 +145,7 @@ requires:
   Socket: '0'
   Term::ReadLine: '0'
   Time::HiRes: '0'
+  Time::Piece: '0'
   parent: '0'
   perl: v5.18.0
   utf8: '0'
@@ -155,5 +154,5 @@ resources:
   homepage: https://github.com/trizen/sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef
-version: '3.90'
+version: '3.95'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

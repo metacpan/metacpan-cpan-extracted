@@ -1,5 +1,10 @@
 Revision history for Ryu
 
+1.012     2020-03-22 13:35:42+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ->unblocked returns a Future which can be used to await a paused source/sink.
+
 1.011     2020-01-07 11:24:46+08:00 Asia/Kuala_Lumpur
     No new features.
 

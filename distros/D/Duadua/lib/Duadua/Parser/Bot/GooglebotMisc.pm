@@ -48,6 +48,13 @@ sub try {
             is_bot => 1,
         };
     }
+
+    if ( index($d->ua, ' AppEngine-Google;') > -1 ) {
+        return {
+            name   => 'AppEngine-Google',
+            is_bot => 1,
+        };
+    }
 }
 
 1;

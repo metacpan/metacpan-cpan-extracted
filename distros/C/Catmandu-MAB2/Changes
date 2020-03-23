@@ -1,5 +1,11 @@
 Changelog for Catmandu-MAB2
 
+0.24  2020-03-23 12:05:17 CET
+ - merge pr#11 in master
+
+0.23  2020-03-23 11:52:57 CET
+ - gh#13 fix SRU test
+
 0.22  2019-03-08 17:35:44 CET
  - gh#10 fix parsing of subfields
 

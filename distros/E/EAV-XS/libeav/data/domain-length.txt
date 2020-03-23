@@ -1,0 +1,15 @@
+# PASS: label == 63 characters (ascii)
+PASSefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-0123456789.com
+# FAIL: label >= 64 chars
+FAILefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZover-63chars.com
+# PASS: domain == 253 characters (without ending period)
+PASSefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789.abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789.abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.253-chars.wodot
+# PASS: domain == 253 characters (with ending period, totally 254 chars)
+PASSefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789.abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789.abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.253-chars.w-dot.
+# FAIL: domain == 254 characters (without ending period)
+# Note: libidn2 handle this case internally, while idnkit is not.
+FAILefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789.abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789.abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ.254-chars.wo-dot
+# PASS: the length of the first label is 63 characters (punycode)
+абвгдеёжзийклмнопрстуфхцшщчыьъюя12345678.рф
+# FAIL: the length of the first label is over 63 characters (punycode)
+абвгдеёжзийклмнопрстуфхцшщчыьъюя123456789.рф

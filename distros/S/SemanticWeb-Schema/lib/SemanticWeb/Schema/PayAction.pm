@@ -15,15 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
-
-
-has purpose => (
-    is        => 'rw',
-    predicate => '_has_purpose',
-    json_ld   => 'purpose',
-);
-
+our $VERSION = 'v7.0.0';
 
 
 has recipient => (
@@ -50,31 +42,13 @@ SemanticWeb::Schema::PayAction - An agent pays a price to a participant.
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
 An agent pays a price to a participant.
 
 =head1 ATTRIBUTES
-
-=head2 C<purpose>
-
-A goal towards an action is taken. Can be concrete or abstract.
-
-A purpose should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::MedicalDevicePurpose']>
-
-=item C<InstanceOf['SemanticWeb::Schema::Thing']>
-
-=back
-
-=head2 C<_has_purpose>
-
-A predicate for the L</purpose> attribute.
 
 =head2 C<recipient>
 

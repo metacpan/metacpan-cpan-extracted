@@ -20,15 +20,15 @@
             "issue-1253"
          ],
          "schema:domainIncludes" : [
+            "schema:DatedMoneySpecification",
+            "schema:MoneyTransfer",
             "schema:MonetaryGrant",
             "schema:InvestmentOrDeposit",
-            "schema:MoneyTransfer",
-            "schema:LoanOrCredit",
-            "schema:DatedMoneySpecification"
+            "schema:LoanOrCredit"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:Number"
          ]
       }
    }

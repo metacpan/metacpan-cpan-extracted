@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has additional_property => (
@@ -202,6 +202,14 @@ has global_location_number => (
 
 
 
+has has_drive_through_service => (
+    is        => 'rw',
+    predicate => '_has_has_drive_through_service',
+    json_ld   => 'hasDriveThroughService',
+);
+
+
+
 has has_map => (
     is        => 'rw',
     predicate => '_has_has_map',
@@ -354,6 +362,14 @@ has telephone => (
 
 
 
+has tour_booking_page => (
+    is        => 'rw',
+    predicate => '_has_tour_booking_page',
+    json_ld   => 'tourBookingPage',
+);
+
+
+
 
 
 1;
@@ -370,7 +386,7 @@ SemanticWeb::Schema::Place - Entities that have a somewhat fixed
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -859,6 +875,32 @@ A global_location_number should be one of the following types:
 
 A predicate for the L</global_location_number> attribute.
 
+=head2 C<has_drive_through_service>
+
+C<hasDriveThroughService>
+
+=for html <p>Indicates whether some facility (e.g. <a class="localLink"
+href="http://schema.org/FoodEstablishment">FoodEstablishment</a>, <a
+class="localLink"
+href="http://schema.org/CovidTestingFacility">CovidTestingFacility</a>)
+offers a service that can be used by driving through in a car. In the case
+of <a class="localLink"
+href="http://schema.org/CovidTestingFacility">CovidTestingFacility</a> such
+facilities could potentially help with social distancing from other
+potentially-infected users.<p>
+
+A has_drive_through_service should be one of the following types:
+
+=over
+
+=item C<Bool>
+
+=back
+
+=head2 C<_has_has_drive_through_service>
+
+A predicate for the L</has_drive_through_service> attribute.
+
 =head2 C<has_map>
 
 C<hasMap>
@@ -1202,6 +1244,29 @@ A telephone should be one of the following types:
 =head2 C<_has_telephone>
 
 A predicate for the L</telephone> attribute.
+
+=head2 C<tour_booking_page>
+
+C<tourBookingPage>
+
+=for html <p>A page providing information on how to book a tour of some <a
+class="localLink" href="http://schema.org/Place">Place</a>, such as an <a
+class="localLink" href="http://schema.org/Accommodation">Accommodation</a>
+or <a class="localLink"
+href="http://schema.org/ApartmentComplex">ApartmentComplex</a> in a real
+estate setting, as well as other kinds of tours as appropriate.<p>
+
+A tour_booking_page should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_tour_booking_page>
+
+A predicate for the L</tour_booking_page> attribute.
 
 =head1 SEE ALSO
 

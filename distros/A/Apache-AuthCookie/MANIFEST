@@ -20,6 +20,7 @@ lib/Apache2/AuthCookie.pm
 lib/Apache2/AuthCookie/Base.pm
 lib/Apache2/AuthCookie/Params.pm
 lib/Apache2_4/AuthCookie.pm
+scripts/docker-smoke
 scripts/perlbrew-smoke
 t/Skeleton/AuthCookieHandler.pm
 t/TEST.PL

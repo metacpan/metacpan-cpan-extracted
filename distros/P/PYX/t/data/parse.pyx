@@ -1,7 +1,7 @@
-(tag
+(element
 Apar val
-)tag
+)element
 -data
 _comment
 ?target data
-Bad tag
+Bad element

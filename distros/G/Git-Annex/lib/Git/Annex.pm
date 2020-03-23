@@ -15,7 +15,7 @@ package Git::Annex;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$Git::Annex::VERSION = '0.004';
+$Git::Annex::VERSION = '0.005';
 
 use 5.028;
 use strict;
@@ -213,7 +213,7 @@ sub _git_path {
 }
 
 package Git::Annex::Wrapper {
-$Git::Annex::Wrapper::VERSION = '0.004';
+$Git::Annex::Wrapper::VERSION = '0.005';
 AUTOLOAD {
         my $self = shift;
         (my $subcommand = our $AUTOLOAD) =~ s/.+:://;
@@ -246,7 +246,7 @@ Git::Annex - Perl interface to git-annex repositories
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

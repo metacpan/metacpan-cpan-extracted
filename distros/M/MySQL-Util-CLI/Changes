@@ -1,0 +1,39 @@
+==================================================
+Changes from 2019-03-22 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2020-03-21 18:00:15 +0000
+------------------------------------------
+
+  Change: 8c729d82768f63441e05b3a26c00c95139c82616
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-03-21 13:00:06 +0000
+
+    fixed some bugs 
+
+  Change: d8f2eee1650643d817cc23f78600bc53c9bfc975
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-03-21 11:51:54 +0000
+
+    cleanup for dist zilla 
+
+------------------------------------------
+version 0.001 at 2020-03-21 16:50:43 +0000
+------------------------------------------
+
+  Change: 053cf58d5078a95d6ab77a7b08fa252a6e9f9d6d
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-03-21 11:50:43 +0000
+
+    v0.001 
+
+  Change: b15e2777bf1190ebbe21d844e2f2ed84a4974d9b
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-03-21 11:44:11 +0000
+
+    first 
+
+================
+End of releases.
+================

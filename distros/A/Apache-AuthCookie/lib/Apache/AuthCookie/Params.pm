@@ -1,5 +1,5 @@
 package Apache::AuthCookie::Params;
-$Apache::AuthCookie::Params::VERSION = '3.28';
+$Apache::AuthCookie::Params::VERSION = '3.29';
 # ABSTRACT: AuthCookie Params Driver for mod_perl 1.x
 
 use strict;
@@ -42,7 +42,7 @@ Apache::AuthCookie::Params - AuthCookie Params Driver for mod_perl 1.x
 
 =head1 VERSION
 
-version 3.28
+version 3.29
 
 =head1 SYNOPSIS
 

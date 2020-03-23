@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use PYX qw(attribute char comment end_element instruction start_element);
 
 # Example output.

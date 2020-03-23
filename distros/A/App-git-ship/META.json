@@ -61,7 +61,7 @@
          "web" : "https://github.com/jhthorsen/app-git-ship"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
       "mohawk2 <mohawk2@users.noreply.github.com>",

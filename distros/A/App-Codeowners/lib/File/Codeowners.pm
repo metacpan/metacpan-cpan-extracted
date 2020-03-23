@@ -10,7 +10,7 @@ use Path::Tiny 0.089;
 use Scalar::Util qw(openhandle);
 use Text::Gitignore qw(build_gitignore_matcher);
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 sub _croak { require Carp; Carp::croak(@_); }
 sub _usage { _croak("Usage: @_\n") }
@@ -137,31 +137,33 @@ sub write_to_filepath {
     my $self = shift;
     my $path = shift or _usage(q{$codeowners->write_to_filepath($filepath)});
 
-    path($path)->spew_utf8([map { "$_\n" } @{$self->write_to_array('')}]);
+    path($path)->spew_utf8([map { "$_\n" } @{$self->write_to_array}]);
 }
 
 
 sub write_to_fh {
-    my $self = shift;
-    my $fh   = shift or _usage(q{$codeowners->write_to_fh($fh)});
+    my $self    = shift;
+    my $fh      = shift or _usage(q{$codeowners->write_to_fh($fh)});
+    my $charset = shift;
 
-    for my $line (@{$self->write_to_array}) {
+    for my $line (@{$self->write_to_array($charset)}) {
         print $fh "$line\n";
     }
 }
 
 
 sub write_to_string {
-    my $self = shift;
+    my $self    = shift;
+    my $charset = shift;
 
-    my $str = join("\n", @{$self->write_to_array}) . "\n";
+    my $str = join("\n", @{$self->write_to_array($charset)}) . "\n";
     return \$str;
 }
 
 
 sub write_to_array {
     my $self    = shift;
-    my $charset = shift // 'UTF-8';
+    my $charset = shift;
 
     my @format;
 
@@ -187,7 +189,7 @@ sub write_to_array {
         }
     }
 
-    if ($charset) {
+    if (defined $charset) {
         $_ = encode($charset, $_) for @format;
     }
     return \@format;
@@ -316,6 +318,29 @@ sub update_owners_by_project {
 }
 
 
+sub rename_owner {
+    my $self        = shift;
+    my $old_owner   = shift;
+    my $new_owner   = shift;
+    $old_owner && $new_owner or _usage(q{$codeowners->rename_owner($owner => $new_owner)});
+
+    $self->_clear;
+
+    my $count = 0;
+
+    for my $line (@{$self->_lines}) {
+        next if !exists $line->{owners};
+        for (my $i = 0; $i < @{$line->{owners}}; ++$i) {
+            next if $line->{owners}[$i] ne $old_owner;
+            $line->{owners}[$i] = $new_owner;
+            ++$count;
+        }
+    }
+
+    return $count;
+}
+
+
 sub rename_project {
     my $self        = shift;
     my $old_project = shift;
@@ -405,7 +430,7 @@ File::Codeowners - Read and write CODEOWNERS files
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 METHODS
 
@@ -524,6 +549,14 @@ Nothing happens if the file does not already have at least one such pattern.
 Set a new set of owners for all patterns under the given project.
 
 Nothing happens if the file does not have a project with the given name.
+
+=head2 rename_owner
+
+    $codeowners->rename_owner($old_name => $new_name);
+
+Rename an owner.
+
+Nothing happens if the file does not have an owner with the old name.
 
 =head2 rename_project
 

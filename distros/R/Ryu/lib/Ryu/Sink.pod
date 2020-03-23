@@ -33,7 +33,7 @@ Given a source, will attach it as the input for this sink.
 
 =item L<Ryu::Node>
 
-L<flow_control|Ryu::Node/flow_control>, L<is_paused|Ryu::Node/is_paused>, L<label|Ryu::Node/label>, L<parent|Ryu::Node/parent>, L<pause|Ryu::Node/pause>, L<resume|Ryu::Node/resume>
+L<flow_control|Ryu::Node/flow_control>, L<is_paused|Ryu::Node/is_paused>, L<label|Ryu::Node/label>, L<parent|Ryu::Node/parent>, L<pause|Ryu::Node/pause>, L<resume|Ryu::Node/resume>, L<unblocked|Ryu::Node/unblocked>
 
 =back
 

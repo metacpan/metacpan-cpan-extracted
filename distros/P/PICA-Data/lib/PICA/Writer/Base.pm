@@ -2,7 +2,7 @@ package PICA::Writer::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 use Scalar::Util qw(blessed openhandle reftype);
 use Carp qw(croak);
@@ -41,16 +41,6 @@ sub write_record {
     $record = $record->{record} if reftype $record eq 'HASH';
 
     my $fh = $self->{fh};
-
-    my $i = 0;
-    my $pica_sort = sub {
-        my $f = shift;
-        my $oc  = (!defined $f->[1] or $f->[1] eq '') ? '00' : $f->[1];
-        $oc = ($f->[0] eq '101@') ? ++$i . $oc : $i . $oc;
-        return [$oc.$f->[0], $f];
-    };
-    
-    @$record = map $_->[1], sort { $a->[0] cmp $b->[0] } map { $pica_sort->($_) } @$record;
 
     foreach my $field (@$record) {
         $fh->print($field->[0]);

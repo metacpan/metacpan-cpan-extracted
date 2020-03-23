@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has occupational_category => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::WorkBasedProgram - A program with both an educational and e
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 

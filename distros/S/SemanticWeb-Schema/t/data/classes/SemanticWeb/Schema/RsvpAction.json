@@ -18,8 +18,8 @@
          "rdfs:comment" : "Comments, typically from users.",
          "rdfs:label" : "comment",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:RsvpAction"
+            "schema:RsvpAction",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : "schema:Comment"
       },

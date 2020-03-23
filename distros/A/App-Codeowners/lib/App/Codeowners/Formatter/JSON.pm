@@ -5,7 +5,7 @@ package App::Codeowners::Formatter::JSON;
 use warnings;
 use strict;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 use parent 'App::Codeowners::Formatter';
 
@@ -21,7 +21,7 @@ sub finish {
     my %options;
     $options{pretty} = 1 if lc($self->format) eq 'pretty';
 
-    my $json = JSON::MaybeXS->new(canonical => 1, utf8 => 1, %options);
+    my $json = JSON::MaybeXS->new(canonical => 1, %options);
 
     my $columns = $self->columns;
     $results = [map { +{zip @$columns, @$_} } @$results];
@@ -42,7 +42,7 @@ App::Codeowners::Formatter::JSON - Format codeowners output as JSON
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 DESCRIPTION
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has actionable_feedback_policy => (
@@ -530,7 +530,7 @@ SemanticWeb::Schema::Organization - An organization such as a school
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -1306,6 +1306,8 @@ A location should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =item C<InstanceOf['SemanticWeb::Schema::PostalAddress']>
+
+=item C<InstanceOf['SemanticWeb::Schema::VirtualLocation']>
 
 =item C<Str>
 

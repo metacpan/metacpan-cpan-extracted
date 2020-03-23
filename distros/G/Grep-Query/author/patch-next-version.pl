@@ -17,7 +17,7 @@ chdir($toplevel) or die("Failed to chdir to $toplevel: $!\n");
 my %files = 
 	(
 		'README.md' => [1],
-		'lib/Grep/Query.pm' => [8, 217],
+		'lib/Grep/Query.pm' => [8, 163],
 		'lib/Grep/Query/Parser.pm' => [6],
 		'lib/Grep/Query/FieldAccessor.pm' => [8],
 		'lib/Grep/Query/Parser/QOPS.pm' => [6],
@@ -113,7 +113,7 @@ if (lc($a) eq 'yes')
 	system("git commit -a -F $msgfile2 2>&1");
 	die("Failed commit") if $?;
 
-	system("git tag $nextTag 2>&1");
+	system("git tag -a -m rel $nextTag 2>&1");
 	die("Failed tag\n") if $?;
 	
 	system("git push origin $br[0] $nextTag 2>&1");

@@ -133,3 +133,12 @@
   is_windows: true
   is_chromeos: false
   version: '11.0'
+- ua: 'Windows-RSS-Platform/2.0 (IE 11.0; Windows NT 10.0)'
+  name: 'Windows RSS Platform'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: true
+  is_chromeos: false
+  version: '2.0'

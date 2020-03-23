@@ -256,6 +256,61 @@ package Sidef::Types::Range::Range {
     *for     = \&each;
     *foreach = \&each;
 
+    sub each_cons {
+        my ($self, $n, $block) = @_;
+
+        $n = CORE::int($n);
+        $n > 0 or return $self;
+
+        my @values;
+        my $count = 0;
+        my $iter  = $self->iter;
+
+        for (; ;) {
+            my $value = $iter->run() // last;
+
+            if (++$count > $n) {
+                shift @values;
+                --$count;
+            }
+
+            push @values, $value;
+
+            if ($count == $n) {
+                $block->run(@values);
+            }
+        }
+
+        $self;
+    }
+
+    sub each_slice {
+        my ($self, $n, $block) = @_;
+
+        $n = CORE::int($n);
+        $n > 0 or return $self;
+
+        my @values;
+        my $count = 0;
+        my $iter  = $self->iter;
+
+        for (; ;) {
+            my $value = $iter->run() // do {
+                $block->run(@values) if @values;
+                return $self;
+            };
+
+            push @values, $value;
+
+            if (++$count == $n) {
+                $count = 0;
+                $block->run(splice(@values));
+            }
+        }
+
+        $self;
+    }
+
     sub map {
         my ($self, $block) = @_;
 
@@ -270,6 +325,20 @@ package Sidef::Types::Range::Range {
 
         Sidef::Types::Array::Array->new(\@values);
     }
+
+    sub map_cons {
+        my ($self, $n, $block) = @_;
+        $self->to_a->map_cons($n, $block);
+    }
+
+    *cons = \&map_cons;
+
+    sub map_slice {
+        my ($self, $n, $block) = @_;
+        $self->to_a->map_slice($n, $block);
+    }
+
+    *slices = \&map_slice;
 
     sub grep {
         my ($self, $block) = @_;

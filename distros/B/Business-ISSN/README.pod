@@ -10,7 +10,7 @@
 
 =for HTML <a href="https://github.com/briandfoy/business-issn/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Business-ISSN.svg" /></a>
 
-=for HTML <a href="http://www.metacpan.org/module/Business::ISSN"><img src="https://img.shields.io/cpan/v/Business-ISSN.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/Business::ISSN"><img src="https://img.shields.io/cpan/v/Business-ISSN.svg" /></A>
 
 =head1 The Business::ISSN module
 
@@ -23,7 +23,7 @@ for any Perl module.
 
 To read about L<Business::ISSN>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|http://perldoc.perl.org/perldoc.html>:
+with L<perldoc|https://perldoc.perl.orgperldoc.html>:
 
 	% perldoc lib/Business/ISSN.pm
 
@@ -32,17 +32,8 @@ name instead of the file location:
 
 	% perldoc Business::ISSN
 
-You can read the documentation and inspect the meta data on one of the
-CPAN web interfaces, such as L<CPAN Search|http://search.cpan.org/dist/Business-ISSN> or
-L<MetaCPAN|http://www.metacpan.org/module/Business::ISSN>:
-
-=over 4
-
-=item *	L<http://search.cpan.org/dist/Business-ISSN>
-
-=item *	L<http://www.metacpan.org/module/Business::ISSN>
-
-=back
+You can read the documentation and inspect the meta data at
+L<MetaCPAN|https://metacpan.org/pod/Business::ISSN>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's

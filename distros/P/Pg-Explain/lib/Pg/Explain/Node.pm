@@ -12,11 +12,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 0.94
+Version 0.96
 
 =cut
 
-our $VERSION = '0.94';
+our $VERSION = '0.96';
 
 =head1 SYNOPSIS
 
@@ -220,7 +220,13 @@ sub new {
 
     @{ $self }{ keys %args } = values %args;
 
-    if ( $self->type =~ m{ \A ( (?: Parallel \s+ )? (?: Seq \s Scan | Bitmap \s+ Heap \s+ Scan | Foreign \s+ Scan | Update | Insert | Delete ) ) \s on \s (\S+) (?: \s+ (\S+) ) ? \z }xms ) {
+    if (
+        $self->type =~ m{ \A (
+            (?: Parallel \s+ )?
+            (?: Seq \s Scan | Tid \s+ Scan | Bitmap \s+ Heap \s+ Scan | Foreign \s+ Scan | Update | Insert | Delete )
+        ) \s on \s (\S+) (?: \s+ (\S+) ) ? \z }xms
+       )
+    {
         $self->type( $1 );
         $self->scan_on( { 'table_name' => $2, } );
         $self->scan_on->{ 'table_alias' } = $3 if defined $3;

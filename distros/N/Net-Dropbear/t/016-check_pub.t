@@ -81,7 +81,7 @@ needed_output(
       $ok_str => 'Got into the passwd hook',
     },
     $pty, {
-      'Permission denied (publickey,password).' =>
+      '/Permission denied (publickey,password).' =>
           'A unusable key is unusable',
     }
   );

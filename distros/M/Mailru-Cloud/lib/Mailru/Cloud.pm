@@ -14,7 +14,7 @@ use Encode;
 use IO::Socket::SSL;
 use base qw/Mailru::Cloud::Auth/;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 my $BUFF_SIZE = 512;
 
@@ -37,29 +37,29 @@ sub uploadFile {
         $path .= '/';
     }
 
-    my $request = 'https://cloclo18-upload.cloud.mail.ru/upload/?' .'cloud_domain=2&x-email=' . uri_escape($self->{email});
+    my $request = 'https://cld-upload10.cloud.mail.ru/upload/?' .'cloud_domain=2&x-email=' . uri_escape($self->{email});
 
     my ($file_hash, $size) = $self->__upload_file($request, $upload_file) or return;
     $self->{file_hash} = $file_hash;
-    
+
     #Опубликуем файл
     my %param = (
             'api'       => '2',
             'build'     => $self->{build},
             'conflict'  => $conflict_mode,
             'email'     => $self->{email},
-            'hash'      => $file_hash,    
-            'home'      => $path . basename($upload_file), 
+            'hash'      => $file_hash,
+            'home'      => $path . basename($upload_file),
             'size'      => $size,
-            'token'     => $self->{authToken},   
+            'token'     => $self->{authToken},
             'x-email'   => $self->{email},
             'x-page-id' => $self->{'x-page-id'},
-        );
+    );
     my $res = $self->{ua}->post('https://cloud.mail.ru/api/v2/file/add', \%param);
 
     my $code = $res->code;
     if ($code eq '200') {
-        my $json = JSON::XS::decode_json($res->content); 
+        my $json = JSON::XS::decode_json($res->content);
         my $new_fname = $json->{body};
         return $new_fname;
     }
@@ -76,6 +76,7 @@ sub downloadFile {
 
     my $FL;
     my $ua = $self->{ua};
+    $DB::single = 1;
     my $url = 'https://cloclo5.datacloudmail.ru/get/' . uri_escape($cloud_file) . '?x-email=' . uri_escape($self->{email});
     my $res = $ua->get($url, ':read_size_hint' => $BUFF_SIZE, ':content_cb' => sub {
                                                                                         if (not $FL) {
@@ -156,10 +157,10 @@ sub emptyTrash {
     my  %param = (
         'api'       => '2',
         'build'     => $self->{build},
-        'email'     => $self->{email},      
-        'token'     => $self->{authToken},   
-        'x-email'   => $self->{email}, 
-        'x-page-id' => $self->{'x-page-id'},   
+        'email'     => $self->{email},
+        'token'     => $self->{authToken},
+        'x-email'   => $self->{email},
+        'x-page-id' => $self->{'x-page-id'},
     );
 
     my $res = $self->{ua}->post('https://cloud.mail.ru/api/v2/trashbin/empty', \%param);
@@ -183,7 +184,7 @@ sub listFiles {
     if ($res->is_success) {
         my $json_parsed = decode_json($res->content);
         my @list_files;
-        
+
         for my $item (@{$json_parsed->{body}->{list}}) {
             my $h = {
                                 'type'      => $item->{type},
@@ -200,7 +201,7 @@ sub listFiles {
     if ($code eq '404') {
         croak "Folder $orig_path not exists";
     }
-    croak "Cant get file list for path: $orig_path. Code: $code"; 
+    croak "Cant get file list for path: $orig_path. Code: $code";
 }
 
 sub shareResource {
@@ -213,10 +214,10 @@ sub shareResource {
     my %param = (
                     'api'           => '2',
                     'build'         => $self->{build},
-                    'email'         => $self->{email},   
+                    'email'         => $self->{email},
                     'home'          => $path,
                     'token'         => $self->{authToken},
-                    'x-email'       => $self->{email}, 
+                    'x-email'       => $self->{email},
                     'x-page-id'     => $self->{'x-page-id'},
     );
 
@@ -324,13 +325,13 @@ __END__
 B<Mailru::Cloud> - Simple REST API cloud mail.ru client
 
 =head1 VERSION
-    version 0.06
+    version 0.08
 
 =head1 SYNOPSYS
-    
+
     use Mailru::Cloud;
     my $cloud = Mailru::Cloud->new;
-    
+
     #Authorize on cloud.mail.ru
     $cloud->login(-login => 'test', -password => '12345') or die "Cant login on mail.ru";
 
@@ -361,7 +362,7 @@ Login on cloud.mail.ru server.Return csrf token if success. Die on error
 =head2 info()
 
 Return hashref to info with keys: used_space, total_space, file_size_limit
-    
+
     my $info = $cloud->info() || die "Can't get info";
     print "Used_space: $info->{used_space}\nTotal space: $info->{total_space}\nFile size limit: $info->{file_size_limit}\n";
 
@@ -419,7 +420,7 @@ Return struct (arrayref) of files and folders. Die on error
     Example output:
     [
         {
-            type    => 'folder',                                         # Type file/folder  
+            type    => 'folder',                                         # Type file/folder
             name    => 'Temp',                                           # Name of resource
             size    => 12221,                                            # Size in bytes
             weblink => 'https://cloud.mail.ru/public/4L8/K343',          # Weblink to resource, if resource shared

@@ -126,6 +126,18 @@ diff -uN dropbear-2019.78/common-session.c dropbear/common-session.c
  	pw = getpwnam(username);
  	if (!pw) {
  		return;
+diff -uN dropbear-2019.78/configure dropbear/configure
+--- dropbear-2019.78/configure	2019-03-27 10:15:23.000000000 -0400
++++ dropbear/configure	2019-03-27 10:15:23.000000000 -0400
+@@ -3255,7 +3255,7 @@
+ 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Checking for available hardened build flags:" >&5
+ $as_echo "$as_me: Checking for available hardened build flags:" >&6;}
+ 	# relocation flags don't make sense for static builds
+-	if test "$STATIC" -ne 1; then
++	if false; then
+ 		# pie
+ 		{
+ 		OLDFLAGS="$CFLAGS"
 Common subdirectories: dropbear-2019.78/debian and dropbear/debian
 diff -uN dropbear-2019.78/dropbear.h dropbear/dropbear.h
 --- dropbear-2019.78/dropbear.h	1969-12-31 19:00:00.000000000 -0500

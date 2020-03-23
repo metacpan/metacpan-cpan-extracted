@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw fretboard chord diagrams
 
-our $VERSION = '0.1204';
+our $VERSION = '0.1205';
 
 use Moo;
 use strictures 2;
@@ -485,7 +485,7 @@ Music::FretboardDiagram - Draw fretboard chord diagrams
 
 =head1 VERSION
 
-version 0.1204
+version 0.1205
 
 =head1 SYNOPSIS
 
@@ -718,9 +718,7 @@ Default: 0
 
 Create a new C<Music::FretboardDiagram> object.
 
-=head2 BUILD
-
-Construct the B<fretboard> attribute from the B<tuning>.
+=for Pod::Coverage BUILD
 
 =head2 draw
 

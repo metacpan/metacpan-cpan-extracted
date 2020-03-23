@@ -1,5 +1,5 @@
 package Util::Medley::Logger;
-$Util::Medley::Logger::VERSION = '0.026';
+$Util::Medley::Logger::VERSION = '0.027';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -16,6 +16,7 @@ use File::Basename;
 
 
 with 'Util::Medley::Roles::Attributes::DateTime';
+with 'Util::Medley::Roles::Attributes::String';
 
 =head1 NAME
 
@@ -23,7 +24,7 @@ Util::Medley::Logger - Yet another class for logging.
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =cut
 
@@ -819,7 +820,7 @@ method _assembleMsg (Str 	   :$type!,
 		push @msg, sprintf '[line %d]', ( caller($frames) )[2];
 	}
 
-	push @msg, $msg;
+	push @msg, $self->String->trim($msg);
 
 	return join( ' ', @msg );
 }

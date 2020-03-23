@@ -69,3 +69,12 @@
   is_windows: true
   is_chromeos: false
   version: '6.2.3964.2'
+- ua: 'Mozilla/5.0 (Linux; U; Android 5.1; zh-CN; MZ-m2 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/57.0.2987.108 MZBrowser/7.13.110-2019112819 UWS/2.15.0.4 Mobile Safari/537.36'
+  name: 'MZBrowser'
+  is_bot: false
+  is_ios: false
+  is_android: true
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+  version: '7.13.110-2019112819'

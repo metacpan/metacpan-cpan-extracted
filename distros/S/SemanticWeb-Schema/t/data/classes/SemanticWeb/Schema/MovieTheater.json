@@ -4,8 +4,8 @@
       "rdfs:comment" : "A movie theater.",
       "rdfs:label" : "MovieTheater",
       "rdfs:subClassOf" : [
-         "schema:CivicStructure",
-         "schema:EntertainmentBusiness"
+         "schema:EntertainmentBusiness",
+         "schema:CivicStructure"
       ]
    },
    "properties" : {

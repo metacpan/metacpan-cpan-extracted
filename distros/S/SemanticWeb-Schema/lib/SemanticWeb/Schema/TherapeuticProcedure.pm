@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has adverse_outcome => (
@@ -42,14 +42,6 @@ has drug => (
 
 
 
-has indication => (
-    is        => 'rw',
-    predicate => '_has_indication',
-    json_ld   => 'indication',
-);
-
-
-
 
 
 1;
@@ -66,7 +58,7 @@ SemanticWeb::Schema::TherapeuticProcedure - A medical procedure intended primari
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -131,26 +123,6 @@ A drug should be one of the following types:
 =head2 C<_has_drug>
 
 A predicate for the L</drug> attribute.
-
-=head2 C<indication>
-
-A factor that indicates use of this therapy for treatment and/or prevention
-of a condition, symptom, etc. For therapies such as drugs, indications can
-include both officially-approved indications as well as off-label uses.
-These can be distinguished by using the ApprovedIndication subtype of
-MedicalIndication.
-
-A indication should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::MedicalIndication']>
-
-=back
-
-=head2 C<_has_indication>
-
-A predicate for the L</indication> attribute.
 
 =head1 SEE ALSO
 

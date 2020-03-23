@@ -1,4 +1,10 @@
+0.04 - 2020-03-22
+  - Fix bug where IFERROR would clobber $@
+  - Deparse of parse nodes is now handled with method calls,
+    making it easier to implement new parse nodes.
+
 0.03 - 2019-05-28
+  - Add hexidecimal numbers to Parser grammar
   - Fixed bugs in default namespace functions for perl < 5.16
   - Documentation updates
 

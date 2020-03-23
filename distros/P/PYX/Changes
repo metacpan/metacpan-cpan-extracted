@@ -1,3 +1,14 @@
+0.06 2020-03-23T11:23:38+01:00
+ [Common]
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Improve SYNOPSIS section in doc.
+ - Rewrite tag to better element (in XML terminology) in tests and data.
+ - Update LICENSE AND COPYRIGHT sections in doc.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.05 2016-02-20T23:27:55+01:00
  [Common]
  - Update copyright years.

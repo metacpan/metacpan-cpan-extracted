@@ -1,4 +1,9 @@
-0.006   2018-12-02 (PERLANCAR)
+0.007   2020-03-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Load Win32::Console::ANSI on Windows, for convenience.
+
+
+0.006   2018-12-02  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -8,19 +13,19 @@
 	- [doc] Mention Term::ANSIColor::Patch::Conditional.
 
 
-0.005   2018-12-02 (PERLANCAR)
+0.005   2018-12-02  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Fix mentioned module.
 
 
-0.004   2018-12-02 (PERLANCAR)
+0.004   2018-12-02  Released-By: PERLANCAR
 
 	- Observe NO_COLOR (see https://no-color.org).
 
 
-0.003   2018-11-29 (PERLANCAR)
+0.003   2018-11-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -28,13 +33,13 @@
 	  environment variable.
 
 
-0.002   2018-11-29 (PERLANCAR)
+0.002   2018-11-29  Released-By: PERLANCAR
 
         - [bugfix] Handle the case where colored() is called with ($text,
           $color) instead of ([$color], $text). Also handle ([$color], $text,
           $moretext, ...). (thanks Alexander Karelas).
 
 
-0.001   2017-10-28 (PERLANCAR)
+0.001   2017-10-28  Released-By: PERLANCAR
 
         - First release.

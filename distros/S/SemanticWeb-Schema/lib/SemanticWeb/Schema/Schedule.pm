@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has by_day => (
@@ -46,6 +46,14 @@ has duration => (
     is        => 'rw',
     predicate => '_has_duration',
     json_ld   => 'duration',
+);
+
+
+
+has end_date => (
+    is        => 'rw',
+    predicate => '_has_end_date',
+    json_ld   => 'endDate',
 );
 
 
@@ -82,6 +90,14 @@ has schedule_timezone => (
 
 
 
+has start_date => (
+    is        => 'rw',
+    predicate => '_has_start_date',
+    json_ld   => 'startDate',
+);
+
+
+
 
 
 1;
@@ -98,7 +114,7 @@ SemanticWeb::Schema::Schedule - A schedule defines a repeating time period used 
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -199,6 +215,25 @@ A duration should be one of the following types:
 
 A predicate for the L</duration> attribute.
 
+=head2 C<end_date>
+
+C<endDate>
+
+=for html <p>The end date and time of the item (in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).<p>
+
+A end_date should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_end_date>
+
+A predicate for the L</end_date> attribute.
+
 =head2 C<except_date>
 
 C<exceptDate>
@@ -294,6 +329,25 @@ A schedule_timezone should be one of the following types:
 =head2 C<_has_schedule_timezone>
 
 A predicate for the L</schedule_timezone> attribute.
+
+=head2 C<start_date>
+
+C<startDate>
+
+=for html <p>The start date and time of the item (in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).<p>
+
+A start_date should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_start_date>
+
+A predicate for the L</start_date> attribute.
 
 =head1 SEE ALSO
 

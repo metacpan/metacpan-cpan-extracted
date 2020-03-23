@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has about => (
@@ -114,6 +114,14 @@ has end_date => (
 
 
 
+has event_attendance_mode => (
+    is        => 'rw',
+    predicate => '_has_event_attendance_mode',
+    json_ld   => 'eventAttendanceMode',
+);
+
+
+
 has event_schedule => (
     is        => 'rw',
     predicate => '_has_event_schedule',
@@ -166,6 +174,22 @@ has maximum_attendee_capacity => (
     is        => 'rw',
     predicate => '_has_maximum_attendee_capacity',
     json_ld   => 'maximumAttendeeCapacity',
+);
+
+
+
+has maximum_physical_attendee_capacity => (
+    is        => 'rw',
+    predicate => '_has_maximum_physical_attendee_capacity',
+    json_ld   => 'maximumPhysicalAttendeeCapacity',
+);
+
+
+
+has maximum_virtual_attendee_capacity => (
+    is        => 'rw',
+    predicate => '_has_maximum_virtual_attendee_capacity',
+    json_ld   => 'maximumVirtualAttendeeCapacity',
 );
 
 
@@ -322,7 +346,7 @@ SemanticWeb::Schema::Event - An event happening at a certain time and location
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -547,6 +571,25 @@ A end_date should be one of the following types:
 
 A predicate for the L</end_date> attribute.
 
+=head2 C<event_attendance_mode>
+
+C<eventAttendanceMode>
+
+The eventAttendanceMode of an event indicates whether it occurs online,
+offline, or a mix.
+
+A event_attendance_mode should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::EventAttendanceModeEnumeration']>
+
+=back
+
+=head2 C<_has_event_attendance_mode>
+
+A predicate for the L</event_attendance_mode> attribute.
+
 =head2 C<event_schedule>
 
 C<eventSchedule>
@@ -675,6 +718,8 @@ A location should be one of the following types:
 
 =item C<InstanceOf['SemanticWeb::Schema::PostalAddress']>
 
+=item C<InstanceOf['SemanticWeb::Schema::VirtualLocation']>
+
 =item C<Str>
 
 =back
@@ -700,6 +745,56 @@ A maximum_attendee_capacity should be one of the following types:
 =head2 C<_has_maximum_attendee_capacity>
 
 A predicate for the L</maximum_attendee_capacity> attribute.
+
+=head2 C<maximum_physical_attendee_capacity>
+
+C<maximumPhysicalAttendeeCapacity>
+
+=for html <p>The maximum physical attendee capacity of an <a class="localLink"
+href="http://schema.org/Event">Event</a> whose <a class="localLink"
+href="http://schema.org/eventAttendanceMode">eventAttendanceMode</a> is <a
+class="localLink"
+href="http://schema.org/OfflineEventAttendanceMode">OfflineEventAttendanceM
+ode</a> (or the offline aspects, in the case of a <a class="localLink"
+href="http://schema.org/MixedEventAttendanceMode">MixedEventAttendanceMode<
+/a>).<p>
+
+A maximum_physical_attendee_capacity should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=back
+
+=head2 C<_has_maximum_physical_attendee_capacity>
+
+A predicate for the L</maximum_physical_attendee_capacity> attribute.
+
+=head2 C<maximum_virtual_attendee_capacity>
+
+C<maximumVirtualAttendeeCapacity>
+
+=for html <p>The maximum physical attendee capacity of an <a class="localLink"
+href="http://schema.org/Event">Event</a> whose <a class="localLink"
+href="http://schema.org/eventAttendanceMode">eventAttendanceMode</a> is <a
+class="localLink"
+href="http://schema.org/OnlineEventAttendanceMode">OnlineEventAttendanceMod
+e</a> (or the online aspects, in the case of a <a class="localLink"
+href="http://schema.org/MixedEventAttendanceMode">MixedEventAttendanceMode<
+/a>).<p>
+
+A maximum_virtual_attendee_capacity should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=back
+
+=head2 C<_has_maximum_virtual_attendee_capacity>
+
+A predicate for the L</maximum_virtual_attendee_capacity> attribute.
 
 =head2 C<offers>
 

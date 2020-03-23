@@ -13,8 +13,8 @@
          "schema:domainIncludes" : "schema:HowToItem",
          "schema:rangeIncludes" : [
             "schema:Text",
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       }
    }

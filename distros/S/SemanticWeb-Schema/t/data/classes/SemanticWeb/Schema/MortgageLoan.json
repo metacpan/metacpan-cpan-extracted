@@ -1,8 +1,8 @@
 {
    "class" : {
       "dc:source" : [
-         "schemadotorgsources:FIBO",
-         "https://github.com/schemaorg/schemaorg/issues/1253"
+         "https://github.com/schemaorg/schemaorg/issues/1253",
+         "schemadotorgsources:FIBO"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A loan in which property or real estate is used as collateral. (A loan securitized against some real estate.)",
@@ -14,8 +14,8 @@
    "properties" : {
       "schema:domiciledMortgage" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "schemadotorgsources:FIBO"
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Whether borrower is a resident of the jurisdiction where the property is located.",
@@ -27,8 +27,8 @@
       },
       "schema:loanMortgageMandateAmount" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "schemadotorgsources:FIBO"
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Amount of mortgage mandate that can be converted into a proper mortgage at a later stage.",

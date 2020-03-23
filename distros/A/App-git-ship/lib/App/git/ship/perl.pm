@@ -28,7 +28,7 @@ sub build {
   $self->_update_version_info;
   $self->_render_readme;
   $self->_make('manifest');
-  $self->_make('dist');
+  $self->_make('dist', '-e');
   $self->run_hook('after_build');
   $self;
 }
@@ -155,7 +155,7 @@ sub _build_config_param_contributors {
   return decode 'UTF-8', $ENV{GIT_SHIP_CONTRIBUTORS} if $ENV{GIT_SHIP_CONTRIBUTORS};
 
   my @contributors;
-  my $module = decode 'UTF-8', $self->config('main_module_path')->slurp;
+  my $module = decode 'UTF-8', path($self->config('main_module_path'))->slurp;
   my $contrib_block;
   for my $line (split /\n/, $module) {
     if ($line =~ $CONTRIB_START_RE) {
@@ -206,7 +206,7 @@ PATH_PART:
 
 sub _build_config_param_project_name {
   my $self = shift;
-  my @name = @{$self->config('main_module_path')};
+  my @name = @{path($self->config('main_module_path'))};
   shift @name if $name[0] eq 'lib';
   $name[-1] =~ s!\.pm$!!;
   return join '::', @name;
@@ -323,7 +323,7 @@ sub _render_readme {
   open my $README, '>:encoding(UTF-8)', 'README.md' or die "Write README.md: $!";
   my $parser = Pod::Markdown->new;
   $parser->output_fh($README);
-  $parser->parse_string_document($self->config('main_module_path')->slurp);
+  $parser->parse_string_document(path($self->config('main_module_path'))->slurp);
   say '# Generated README.md' unless $self->SILENT;
 }
 

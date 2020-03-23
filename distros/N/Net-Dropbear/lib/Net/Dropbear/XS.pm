@@ -3,7 +3,7 @@ package Net::Dropbear::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 require XSLoader;
 XSLoader::load( 'Net::Dropbear', $VERSION );

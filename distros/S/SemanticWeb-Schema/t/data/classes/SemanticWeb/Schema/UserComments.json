@@ -30,8 +30,8 @@
          "rdfs:comment" : "The creator/author of this CreativeWork. This is the same as the Author property for CreativeWork.",
          "rdfs:label" : "creator",
          "schema:domainIncludes" : [
-            "schema:UserComments",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:UserComments"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",

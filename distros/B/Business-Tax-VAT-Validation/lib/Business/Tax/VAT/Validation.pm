@@ -29,7 +29,7 @@ package Business::Tax::VAT::Validation;
 use strict;
 
 BEGIN {
-    $Business::Tax::VAT::Validation::VERSION = '1.11';
+    $Business::Tax::VAT::Validation::VERSION = '1.12';
     use HTTP::Request::Common qw(POST);
     use LWP::UserAgent;
 }
@@ -82,7 +82,7 @@ input that could never be valid.
 sub new {
     my ( $class, %arg ) = @_;
     my $self = {
-        baseurl      => $arg{baseurl} || 'http://ec.europa.eu/taxation_customs/vies/services/checkVatService',
+        baseurl      => $arg{baseurl} || 'https://ec.europa.eu/taxation_customs/vies/services/checkVatService',
         error        => '',
         error_code   => 0,
         response     => '',

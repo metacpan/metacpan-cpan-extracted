@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Build::Log );
 
 # ABSTRACT: Default Alien::Build log class
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 
 sub log
@@ -31,7 +31,7 @@ Alien::Build::Log::Default - Default Alien::Build log class
 
 =head1 VERSION
 
-version 2.15
+version 2.17
 
 =head1 SYNOPSIS
 

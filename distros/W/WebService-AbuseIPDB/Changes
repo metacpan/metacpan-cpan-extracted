@@ -1,5 +1,26 @@
 Revision history for WebService-AbuseIPDB
 
+0.03 2020-03-23
+    - No changes from 0.02_04
+
+0.02_04 2020-03-21
+    - Fix tests for backwards compatibility to pre-5.14 perls
+    - Minor doc fix
+
+0.02_03 2020-03-20
+    - Add agent string
+    - Remove $data conditions in _send_receive as it is always present
+    - List new modules in "provides" and rebuild MANIFEST
+
+0.02_02 2020-03-20
+    - Add support for blacklist endpoint
+
+0.02_01 2020-03-19
+    - Add test for non-GET/POST REST method
+    - Add remaining categories
+    - Add test that Category only accepts correct class for instantiation.
+    - Remove version from POD
+
 0.02 2020-01-23
     - Add tests for version numbers
 

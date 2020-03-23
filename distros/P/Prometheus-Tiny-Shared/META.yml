@@ -4,7 +4,6 @@ author:
   - 'Rob N ★ <robn@robn.io>'
 build_requires:
   Data::Random: '0'
-  File::Temp: '0'
   File::stat: '0'
   HTTP::Request::Common: '0'
   Plack::Test: '0'
@@ -22,10 +21,11 @@ meta-spec:
 name: Prometheus-Tiny-Shared
 requires:
   Carp: '0'
-  DBD::SQLite: '0'
-  DBI: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  Hash::SharedMem: '0'
+  JSON::XS: '0'
   Prometheus::Tiny: '0.004'
-  Sereal: '0'
   parent: '0'
   strict: '0'
   warnings: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/robn/Prometheus-Tiny-Shared/issues
   homepage: https://github.com/robn/Prometheus-Tiny-Shared
   repository: https://github.com/robn/Prometheus-Tiny-Shared.git
-version: '0.012'
+version: '0.020'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -176,7 +176,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.012'
+          tag: '0.020'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

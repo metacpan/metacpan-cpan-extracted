@@ -1,15 +1,9 @@
 package Sah::SchemaR::twitter::username;
 
-our $DATE = '2017-01-22'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-03-11'; # DATE
+our $VERSION = '0.002'; # VERSION
 
-our $rschema = [
-  "cistr",
-  [
-    { match => "\\A[0-9A-Za-z_]{1,15}\\z", summary => "Twitter username" },
-  ],
-  ["cistr"],
-];
+our $rschema = ["cistr",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{summary=>"Too long",valid=>0,value=>"f2345678901234567"}],match=>"\\A[0-9A-Za-z_]{1,15}\\z",summary=>"Twitter username"}],["cistr"]];
 
 1;
 # ABSTRACT: Twitter username
@@ -26,7 +20,7 @@ Sah::SchemaR::twitter::username - Twitter username
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::twitter::username (from Perl distribution Sah-Schemas-Twitter), released on 2017-01-22.
+This document describes version 0.002 of Sah::SchemaR::twitter::username (from Perl distribution Sah-Schemas-Twitter), released on 2020-03-11.
 
 =head1 DESCRIPTION
 
@@ -56,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

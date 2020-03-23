@@ -15,9 +15,9 @@
             "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
-            "schema:PriceSpecification",
+            "schema:Number",
             "schema:MonetaryAmount",
-            "schema:Number"
+            "schema:PriceSpecification"
          ]
       },
       "schema:salaryCurrency" : {

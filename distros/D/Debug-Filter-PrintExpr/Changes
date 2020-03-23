@@ -1,4 +1,12 @@
 Revision history for Debug-Filter-PrintExpr
+0.19	Sun Mar 22 15:39:11 2020 +0100
+		[feature]
+		replace XS code with B
+
+0.18	Thu Feb 27 22:55:40 2020 +0100
+		[fix]
+		really remove IO::String from tests
+
 0.17	Thu Feb 27 22:43:50 2020 +0100
 		[fix]
 		remove IO::String from tests

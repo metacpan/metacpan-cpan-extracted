@@ -16,28 +16,18 @@
          "rdfs:label" : "inLanguage",
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
             "schema:WriteAction",
-            "schema:LinkRole",
             "schema:BroadcastService",
-            "schema:CommunicateAction",
             "schema:Event",
-            "schema:PronounceableText"
+            "schema:CommunicateAction",
+            "schema:PronounceableText",
+            "schema:CreativeWork",
+            "schema:LinkRole"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
             "schema:Language"
          ]
-      },
-      "schema:phoneticText" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2108",
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Representation of a text <a class=\"localLink\" href=\"http://schema.org/textValue\">textValue</a> using the specified <a class=\"localLink\" href=\"http://schema.org/speechToTextMarkup\">speechToTextMarkup</a>. For example the city name of Houston in IPA: /ËhjuËstÉn/.",
-         "rdfs:label" : "phoneticText",
-         "schema:category" : "issue-2108",
-         "schema:domainIncludes" : "schema:PronounceableText",
-         "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
       },
       "schema:speechToTextMarkup" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2108",

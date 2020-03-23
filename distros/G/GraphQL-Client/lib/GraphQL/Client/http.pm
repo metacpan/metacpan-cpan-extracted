@@ -9,7 +9,7 @@ use HTTP::AnyUA::Util qw(www_form_urlencode);
 use HTTP::AnyUA;
 use namespace::clean;
 
-our $VERSION = '0.602'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 sub _croak { require Carp; goto &Carp::croak }
 
@@ -42,7 +42,7 @@ sub execute {
         my $encoded_data = $self->json->encode($data);
         $options->{content} = $encoded_data;
         $options->{headers}{'content-length'} = length $encoded_data;
-        $options->{headers}{'content-type'}   = 'application/json';
+        $options->{headers}{'content-type'}   = 'application/json;charset=UTF-8';
     }
 
     return $self->_handle_response($self->any_ua->request($method, $url, $options));
@@ -171,7 +171,7 @@ GraphQL::Client::http - GraphQL over HTTP
 
 =head1 VERSION
 
-version 0.602
+version 0.604
 
 =head1 SYNOPSIS
 

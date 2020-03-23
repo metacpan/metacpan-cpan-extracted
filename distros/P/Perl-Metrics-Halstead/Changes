@@ -1,5 +1,12 @@
 Revision history for Perl-Metrics-Halstead
 
+0.0610 2020-03-22 20:21:35
+    - Reinstate the MinimumPerl plugin.
+
+0.0609 2020-03-21 18:31:41
+    - Clean up module code a bit.
+    - Don't document the ->BUILD method.
+
 0.0608 2019-06-08 08:44:11
     - Add missing POD section for --precision to bin/halstead.
 

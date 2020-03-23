@@ -32,12 +32,13 @@ my %WriteMakefileArgs = (
     "HTTP::Body" => 0,
     "Hash::MultiValue" => 0,
     "Test::More" => "0.94",
+    "URI" => "1.36",
     "WWW::Form::UrlEncoded" => 0
   },
   "TEST_REQUIRES" => {
     "URI::Escape" => "1.31"
   },
-  "VERSION" => "3.28",
+  "VERSION" => "3.29",
   "clean" => {
     "FILES" => [
       "t/TEST"
@@ -55,6 +56,7 @@ my %FallbackPrereqs = (
   "HTTP::Body" => 0,
   "Hash::MultiValue" => 0,
   "Test::More" => "0.94",
+  "URI" => "1.36",
   "URI::Escape" => "1.31",
   "WWW::Form::UrlEncoded" => 0
 );

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has associated_pathophysiology => (
@@ -46,14 +46,6 @@ has diagram => (
     is        => 'rw',
     predicate => '_has_diagram',
     json_ld   => 'diagram',
-);
-
-
-
-has function => (
-    is        => 'rw',
-    predicate => '_has_function',
-    json_ld   => 'function',
 );
 
 
@@ -106,7 +98,7 @@ SemanticWeb::Schema::AnatomicalStructure - Any part of the human body
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -187,22 +179,6 @@ A diagram should be one of the following types:
 =head2 C<_has_diagram>
 
 A predicate for the L</diagram> attribute.
-
-=head2 C<function>
-
-Function of the anatomical structure.
-
-A function should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
-=head2 C<_has_function>
-
-A predicate for the L</function> attribute.
 
 =head2 C<part_of_system>
 

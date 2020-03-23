@@ -7,20 +7,23 @@
    },
    "properties" : {
       "schema:endDate" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2486",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The end date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "endDate",
+         "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalProgram",
             "schema:CreativeWorkSeason",
-            "schema:Role",
-            "schema:CreativeWorkSeries",
+            "schema:EducationalOccupationalProgram",
             "schema:DatedMoneySpecification",
-            "schema:Event"
+            "schema:Role",
+            "schema:Schedule",
+            "schema:Event",
+            "schema:CreativeWorkSeries"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:namedPosition" : {
@@ -29,8 +32,8 @@
          "rdfs:label" : "namedPosition",
          "schema:domainIncludes" : "schema:Role",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ],
          "schema:supersededBy" : "schema:roleName"
       },
@@ -40,21 +43,24 @@
          "rdfs:label" : "roleName",
          "schema:domainIncludes" : "schema:Role",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:startDate" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2486",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The start date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "startDate",
+         "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:Role",
             "schema:CreativeWorkSeason",
+            "schema:EducationalOccupationalProgram",
             "schema:CreativeWorkSeries",
-            "schema:DatedMoneySpecification",
             "schema:Event",
-            "schema:EducationalOccupationalProgram"
+            "schema:DatedMoneySpecification",
+            "schema:Role",
+            "schema:Schedule"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",

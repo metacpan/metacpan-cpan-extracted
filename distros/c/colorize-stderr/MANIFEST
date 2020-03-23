@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/colorize/#stderr.pm#
 lib/colorize/handle.pm
 lib/colorize/stderr.pm
 t/00-compile.t

@@ -12,12 +12,15 @@
       "schema:webFeed" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/373",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The URL for the feed associated with the podcast series. This is usually RSS or Atom.",
+         "rdfs:comment" : "The URL for a feed, e.g. associated with a podcast series, blog, or series of date-stamped updates. This is usually RSS or Atom.",
          "rdfs:label" : "webFeed",
          "schema:category" : "issue-373",
          "schema:domainIncludes" : "schema:PodcastSeries",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:URL"
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:DataFeed"
+         ]
       }
    }
 }

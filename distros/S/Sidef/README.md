@@ -39,7 +39,7 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
 
 ## EXAMPLES
 
-### The [Y combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator#Fixed_point_combinators_in_lambda_calculus):
+### The [Y combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator#Fixed-point_combinators_in_lambda_calculus):
 ```ruby
 var y = ->(f) {->(g) {g(g)}(->(g) { f(->(*args) {g(g)(args...)})})}
 
@@ -55,9 +55,9 @@ say 10.of { |i| y(fib)(i) }     #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 define ℯ = Num.e
 define τ = Num.tau
 
-func Γ(t, r=50) {
-    t < r ? (__FUNC__(t + 1) / t)
-           : (sqrt(τ*t) * pow(t/ℯ + 1/(12*ℯ*t), t) / t)
+func Γ(x, r=50) {
+    x < r ? (__FUNC__(x+1, r) / x)
+          : (sqrt(τ*x) * pow(x/ℯ + 1/(12*ℯ*x), x) / x)
 }
 
 for i in (1..10) {
@@ -180,7 +180,7 @@ Output:
 
 ### LICENSE AND COPYRIGHT
 
-* Copyright (C) 2013-2019 Daniel Șuteu, Ioana Fălcușan
+* Copyright (C) 2013-2020 Daniel Șuteu, Ioana Fălcușan
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the *Artistic License (2.0)*. You may obtain a copy

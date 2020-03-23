@@ -1,5 +1,9 @@
 Revision history for Grep-Query
 
+1.011	2020-03-22
+
+	Add support for 'path(...)' operator using Data::DPath
+
 1.010	2020-01-19
 
 	Added several operators

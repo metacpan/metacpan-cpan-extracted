@@ -2,7 +2,7 @@ package Test2::Harness::UI::Importer;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use Carp qw/croak/;
 
@@ -66,8 +66,6 @@ sub process {
         1;
     };
     my $err = $@;
-
-    unlink($run->log_file);
 
     my $total = time - $start;
 

@@ -10,11 +10,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 0.94
+Version 0.96
 
 =cut
 
-our $VERSION = '0.94';
+our $VERSION = '0.96';
 
 =head1 SYNOPSIS
 
@@ -57,19 +57,26 @@ sub split_into_lines {
     my @lines = split /\r?\n/, $source;
 
     my @out = ();
-    push @out, shift @lines;
     for my $l ( @lines ) {
-        if ( $l =~ m{\A \( \d+ \s+ rows? \)}xms ) {
+
+        # Ignore certain lines
+        next if $l =~ m{\A \s* \( \d+ \s+ rows? \) \s* \z}xms;
+        next if $l =~ m{\A \s* query \s plan \s* \z}xmsi;
+        next if $l =~ m{\A \s* (?: -+ | ─+ ) \s* \z}xms;
+
+        if ( $l =~ m{ \A Trigger \s+ }xms ) {
             push @out, $l;
         }
-        elsif ( $l =~ m{ \A Trigger \s+ }xms ) {
-            push @out, $l;
-        }
-        elsif ( $l =~ m{ \A (?: Total \s+ runtime | Planning \s+ time | Execution \s+ time ): }xmsi ) {
+        elsif ( $l =~ m{ \A (?: Total \s+ runtime | Planning \s+ time | Execution \s+ time | Time | Filter | Output ): }xmsi ) {
             push @out, $l;
         }
         elsif ( $l =~ m{\A\S} ) {
-            $out[ -1 ] .= $l;
+            if ( 0 < scalar @out ) {
+                $out[ -1 ] .= $l;
+            }
+            else {
+                push @out, $l;
+            }
         }
         else {
             push @out, $l;
@@ -112,13 +119,15 @@ sub parse_source {
     for my $line ( @lines ) {
 
         # Remove trailing whitespace - it makes next line matches MUCH faster.
-        $line =~ s/\s*\z//;
+        $line =~ s/\s+\z//;
 
         # There could be stray " at the end. No idea why, but some people paste such explains on explain.depesz.com
         $line =~ s/\s*"\z//;
 
         if (
-            $line =~ m{
+            ( $line =~ m{\(} )
+            && (
+                $line =~ m{
                 \A
                 (?<prefix>\s* -> \s* | \s* )
                 (?<type>\S.*?)
@@ -133,6 +142,7 @@ sub parse_source {
                 \s*
                 \z
             }xms
+               )
            )
         {
             my $new_node = Pg::Explain::Node->new( %+ );
@@ -148,7 +158,7 @@ sub parse_source {
             my $prefix_length = length $prefix;
 
             if ( 0 == scalar keys %element_at_depth ) {
-                $element_at_depth{ $prefix_length } = $element;
+                $element_at_depth{ '0' } = $element;
                 $top_node = $new_node;
                 next LINE;
             }

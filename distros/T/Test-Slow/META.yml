@@ -1,23 +1,42 @@
 ---
-abstract: 'Skip test that are too slow to run frequently'
+abstract: 'Skip test(s) that are too slow to run frequently'
 author:
-  - 'Tomáš Znamenáček <zoul@fleuron.cz>'
+  - '-2020 Tomáš Znamenáček, zoul@fleuron.cz'
+build_requires:
+  Test::More: '0.98'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3601'
-license: perl
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-Slow
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
 provides:
   Test::Slow:
     file: lib/Test/Slow.pm
-    version: 0.03
+    version: '0.04'
 requires:
-  Test::More: 0
-  perl: 5.008
+  perl: '5.008001'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/zoul/Test-Slow
-version: 0.03
+  bugtracker: https://github.com/thibaultduponchelle/Test-Slow/issues
+  homepage: https://github.com/thibaultduponchelle/Test-Slow
+  repository: git://github.com/thibaultduponchelle/Test-Slow.git
+version: '0.04'
+x_contributors:
+  - 'Thibault DUPONCHELLE <thibault.duponchelle@gmail.com>'
+  - 'Tomáš Znamenáček <tomas.znamenacek@gmail.com>'
+  - 'thibaultduponchelle <580360+thibaultduponchelle@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

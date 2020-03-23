@@ -2,6 +2,8 @@ NAME
     PYX::Utils - A perl module for PYX common utilities.
 
 SYNOPSIS
+     use PYX::Utils;
+
      my $decoded_text = decode($text);
      my $encoded_text = encode($text);
      my $decoded_text = entity_decode($text);
@@ -34,11 +36,9 @@ SUBROUTINES
              Returns encoded text.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use PYX::Utils qw(decode);
 
      # Text.
@@ -57,11 +57,9 @@ EXAMPLE1
      # Decoded text: foo\nbar
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use PYX::Utils qw(encode);
 
      # Text.
@@ -80,11 +78,9 @@ EXAMPLE2
      # bar
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use PYX::Utils qw(entity_decode);
 
      # Text.
@@ -102,11 +98,9 @@ EXAMPLE3
      # Decoded entities: foo<&"bar
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use PYX::Utils qw(entity_encode);
 
      # Text.
@@ -131,15 +125,16 @@ SEE ALSO
         Install the PYX modules.
 
 REPOSITORY
-    <https://github.com/tupinek/PYX-Utils>
+    <https://github.com/michal-josef-spacek/PYX-Utils>
 
 AUTHOR
-    Michal Špaček skim@cpan.org
+    Michal Josef Špaček skim@cpan.org
 
 LICENSE AND COPYRIGHT
-     © 2005-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2005-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.06
 

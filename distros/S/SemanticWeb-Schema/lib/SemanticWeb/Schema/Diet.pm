@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has diet_features => (
@@ -38,14 +38,6 @@ has expert_considerations => (
     is        => 'rw',
     predicate => '_has_expert_considerations',
     json_ld   => 'expertConsiderations',
-);
-
-
-
-has overview => (
-    is        => 'rw',
-    predicate => '_has_overview',
-    json_ld   => 'overview',
 );
 
 
@@ -82,7 +74,7 @@ SemanticWeb::Schema::Diet - A strategy of regulating the intake of food to achie
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -147,24 +139,6 @@ A expert_considerations should be one of the following types:
 =head2 C<_has_expert_considerations>
 
 A predicate for the L</expert_considerations> attribute.
-
-=head2 C<overview>
-
-Descriptive information establishing the overarching theory/philosophy of
-the plan. May include the rationale for the name, the population where the
-plan first came to prominence, etc.
-
-A overview should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
-=head2 C<_has_overview>
-
-A predicate for the L</overview> attribute.
 
 =head2 C<physiological_benefits>
 

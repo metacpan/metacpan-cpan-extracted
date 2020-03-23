@@ -23,19 +23,25 @@ no_index:
 provides:
   WebService::AbuseIPDB:
     file: lib/WebService/AbuseIPDB.pm
-    version: '0.02'
+    version: '0.03'
+  WebService::AbuseIPDB::BlacklistMember:
+    file: lib/WebService/AbuseIPDB/BlacklistMember.pm
+    version: '0.03'
+  WebService::AbuseIPDB::BlacklistResponse:
+    file: lib/WebService/AbuseIPDB/BlacklistResponse.pm
+    version: '0.03'
   WebService::AbuseIPDB::Category:
     file: lib/WebService/AbuseIPDB/Category.pm
-    version: '0.02'
+    version: '0.03'
   WebService::AbuseIPDB::CheckResponse:
     file: lib/WebService/AbuseIPDB/CheckResponse.pm
-    version: '0.02'
+    version: '0.03'
   WebService::AbuseIPDB::ReportResponse:
     file: lib/WebService/AbuseIPDB/ReportResponse.pm
-    version: '0.02'
+    version: '0.03'
   WebService::AbuseIPDB::Response:
     file: lib/WebService/AbuseIPDB/Response.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Carp: '1.11'
   IO::Socket::SSL: '1.31'
@@ -48,4 +54,4 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-AbuseIPDB
   repository: git://gitlab.com/openstrike/abuseipdb-client.git
-version: '0.02'
+version: '0.03'

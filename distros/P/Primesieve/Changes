@@ -1,0 +1,23 @@
+Revision history for Perl extension Primesieve.
+
+0.05  Mon Mar 23 13:23:55 2020 
+	- support primesieve versions without
+		primesieve_prev_prime (5.7.3)
+		reported by SREZIC@cpan.org
+	- removed illegal character in pod documentation
+
+0.04  Sun Mar 22 17:53:42 2020
+	- added iterator functions
+
+0.03  Sat Mar 21 19:02:33 2020
+	- added print-functions
+
+0.02  Sat Mar 21 11:02:33 2020
+	- fixed pkg-config stuff - reported by SREZIC@cpan.org
+	- removed minimal perl version check - reported by SREZIC@cpan.org
+	- tested on Ubuntu with libprimesieve-dev
+
+0.01  Fri Mar 20 15:26:39 2020
+	- original version; created by h2xs 1.23 with options
+		primesieve
+

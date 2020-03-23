@@ -1,0 +1,26 @@
+{
+    'type'                   => 'Seq Scan',
+    'estimated_startup_cost' => 0.00,
+    'estimated_total_cost'   => 496.95,
+    'estimated_rows'         => 60,
+    'estimated_row_width'    => 61,
+    'is_analyzed'            => 0,
+    'scan_on'                => {
+        'table_name'  => 'wm_inoutbound_ext',
+    },
+    'subplans' => [
+        {
+            'type'                   => 'Index Scan',
+            'estimated_startup_cost' => 0.00,
+            'estimated_total_cost'   => 8.27,
+            'estimated_rows'         => 1,
+            'estimated_row_width'    => 6,
+            'extra_info'             => [ 'Index Cond: ((ad_pinstance_id = 1530094::numeric) AND (t_selection_id = wm_inoutbound_ext.wm_inoutbound_ext_id))', ],
+            'is_analyzed'            => 0,
+            'scan_on'                => {
+                'index_name'  => 't_selection_pkey',
+                'table_name'  => 't_selection'
+            },
+        },
+    ]
+}

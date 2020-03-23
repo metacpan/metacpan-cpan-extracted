@@ -15,21 +15,13 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has active_ingredient => (
     is        => 'rw',
     predicate => '_has_active_ingredient',
     json_ld   => 'activeIngredient',
-);
-
-
-
-has background => (
-    is        => 'rw',
-    predicate => '_has_background',
-    json_ld   => 'background',
 );
 
 
@@ -130,7 +122,7 @@ SemanticWeb::Schema::DietarySupplement - A product taken by mouth that contains 
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -159,24 +151,6 @@ A active_ingredient should be one of the following types:
 =head2 C<_has_active_ingredient>
 
 A predicate for the L</active_ingredient> attribute.
-
-=head2 C<background>
-
-Descriptive information establishing a historical perspective on the
-supplement. May include the rationale for the name, the population where
-the supplement first came to prominence, etc.
-
-A background should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
-=head2 C<_has_background>
-
-A predicate for the L</background> attribute.
 
 =head2 C<is_proprietary>
 

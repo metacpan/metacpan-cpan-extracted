@@ -1,0 +1,192 @@
+# vim: tabstop=2 softtabstop=2 expandtab
+
+---
+
+############################################################################
+# template
+############################################################################
+
+# my-action-name:
+#  is_deprecated: false
+#  class:
+#    name: "My::Class::Name"
+#    attr:
+#      required:
+#         a: abc
+#         b: xyz
+#      optional:
+#        f: foo
+#      flags:
+#        dry-run: dry_run_flag
+#  method:
+#    name: my_method_name
+#    args:
+#      required:
+#      optional:                   
+#      flags:
+
+create-db:
+  class:
+    name: MySQL::Util::CLI
+    attr:
+      required:
+      optional:
+        u: user
+        p: pass
+        h: host
+        P: port
+      flags:
+  method:
+    name: createDatabase
+    attr:
+      required:
+        d: dbName
+    
+create-user:
+  class:
+    name: MySQL::Util::CLI::Exec
+    attr:
+      required:
+      optional:
+        u: user
+        p: pass      
+        h: host
+        P: port
+      flags:
+        dry-run: dryRun
+  method:
+    name: createUser
+    args:
+      required:
+        C: createPass
+        c: createUser
+      optional:
+        H: forHosts
+      flags:    
+           
+drop-user:
+  class:
+    name: MySQL::Util::CLI::Exec
+    attr:
+      required:
+      optional:
+        u: user
+        p: pass
+        h: host
+        P: port
+      flags:
+        dry-run: dryRun
+  method:
+    name: dropUser
+    args:
+      required:
+        U: dropUser
+      optional:
+        H: dropHosts
+        K: keepHosts
+      flags:    
+
+get-mysql-cli:
+  class:
+    name: MySQL::Util::CLI
+    attr:
+      required:
+      optional:
+        u: user
+        p: pass      
+        h: host
+        P: port
+        d: dbName
+      flags:
+  method:
+    name: printMysqlCli
+    
+grant-privileges:
+  class:
+    name: MySQL::Util::CLI::Exec
+    attr:
+      required:
+      optional:
+        u: user
+        p: pass      
+        h: host
+        P: port
+      flags:
+        dry-run: dryRun
+  method:
+    name: grantPrivileges
+    args:
+      required:
+        U: grantUser
+      optional:
+        R: privileges
+        D: forDbName
+        H: forHosts
+        T: forTables
+      flags:    
+
+revoke-privileges:
+  class:
+    name: MySQL::Util::CLI::Exec
+    attr:
+      required:
+      optional:
+        u: user
+        p: pass      
+        h: host
+        P: port
+      flags:
+        dry-run: dryRun
+  method:
+    name: revokePrivileges
+    args:
+      required:
+        U: revokeUser
+      optional:
+        R: privileges
+        D: forDbName
+        H: forHosts
+        T: forTables
+      flags: 
+      
+show-dbs:
+  class:
+    name: MySQL::Util::CLI::Exec
+  method:
+    name: showDatabases
+    
+show-grants:   
+  class:
+    name: MySQL::Util::CLI::Exec
+    attr:
+      required:
+      optional:
+        u: user
+        h: host
+        p: pass
+        P: port    
+  method:
+    name: showGrants
+    args:
+      required:
+      optional:
+        U: forUser
+        H: forHost
+    
+show-users:   
+  class:
+    name: MySQL::Util::CLI::Exec
+    attr:
+      required:
+      optional:
+        u: user
+        h: host
+        p: pass
+        P: port    
+  method:
+    name: showUsers
+         
+    
+    
+    
+                     

@@ -69,6 +69,7 @@ lib/Perl/gen/perly-5.29.10.h
 lib/Perl/gen/perly-5.30.0.h
 lib/Perl/gen/perly-5.31.0.h
 lib/Perl/gen/perly-5.31.1.h
+lib/Perl/gen/perly-5.31.10.h
 lib/Perl/gen/perly-5.31.2.h
 lib/Perl/gen/perly-5.31.3.h
 lib/Perl/gen/perly-5.31.5.h
@@ -133,6 +134,7 @@ lib/Perl/gen/token_info-5.29.10.h
 lib/Perl/gen/token_info-5.30.0.h
 lib/Perl/gen/token_info-5.31.0.h
 lib/Perl/gen/token_info-5.31.1.h
+lib/Perl/gen/token_info-5.31.10.h
 lib/Perl/gen/token_info-5.31.2.h
 lib/Perl/gen/token_info-5.31.3.h
 lib/Perl/gen/token_info-5.31.5.h

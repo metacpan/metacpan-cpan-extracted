@@ -13,8 +13,8 @@
          "rdfs:label" : "arrivalTime",
          "schema:domainIncludes" : "schema:Trip",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Time"
+            "schema:Time",
+            "schema:DateTime"
          ]
       },
       "schema:departureTime" : {
@@ -23,8 +23,8 @@
          "rdfs:label" : "departureTime",
          "schema:domainIncludes" : "schema:Trip",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Time"
+            "schema:Time",
+            "schema:DateTime"
          ]
       },
       "schema:itinerary" : {
@@ -36,8 +36,8 @@
          "schema:domainIncludes" : "schema:Trip",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Place",
-            "schema:ItemList"
+            "schema:ItemList",
+            "schema:Place"
          ]
       },
       "schema:offers" : {
@@ -48,13 +48,13 @@
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:MenuItem",
+            "schema:Product",
             "schema:Event",
             "schema:Trip",
+            "schema:CreativeWork",
             "schema:EducationalOccupationalProgram",
-            "schema:AggregateOffer",
             "schema:Service",
-            "schema:Product",
-            "schema:CreativeWork"
+            "schema:AggregateOffer"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [
@@ -81,16 +81,16 @@
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:Invoice",
-            "schema:ParcelDelivery",
             "schema:Trip",
-            "schema:EducationalOccupationalProgram",
+            "schema:Reservation",
+            "schema:ParcelDelivery",
             "schema:Service",
-            "schema:CreativeWork",
-            "schema:Reservation"
+            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:subTrip" : {

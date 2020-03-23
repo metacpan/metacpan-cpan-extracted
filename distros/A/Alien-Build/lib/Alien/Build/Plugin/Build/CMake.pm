@@ -8,7 +8,7 @@ use Alien::Build::Plugin;
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: CMake plugin for Alien::Build
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 
 sub cmake_generator
@@ -128,7 +128,7 @@ Alien::Build::Plugin::Build::CMake - CMake plugin for Alien::Build
 
 =head1 VERSION
 
-version 2.15
+version 2.17
 
 =head1 SYNOPSIS
 

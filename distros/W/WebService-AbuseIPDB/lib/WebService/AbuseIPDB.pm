@@ -11,7 +11,7 @@ use Carp;
 use JSON::XS;
 use URI;    # The GET requests need URI-escaping
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
 	my ($class, %opts) = @_;
@@ -26,6 +26,7 @@ sub new {
 		ua => REST::Client->new (
 			{   host    => 'https://api.abuseipdb.com',
 				timeout => $opts{timeout} // 20,
+				agent   => "WebService::AbuseIPDB/$VERSION",
 
 #			useragent => LWP::UserAgent->new (ssl_opts => {
 #					verify_hostname => 1,
@@ -51,7 +52,7 @@ sub _send_receive {
 		Accept => 'application/json',
 		Key    => $self->{key}
 	};
-	if ($meth eq 'GET' && $data) {
+	if ($meth eq 'GET') {
 		my $u = URI->new ($path);
 		$u->query_form (%$data);
 		$path = $u->as_string;
@@ -79,7 +80,7 @@ sub _send_receive {
 	}
 
 	carp "Problem with $meth $path";
-	carp "Data was " . encode_json ($data) if defined $data;
+	carp "Data was " . encode_json ($data);
 	carp "Client warning: ", $self->{ua}->responseHeader ('Client-Warning');
 	return undef;
 }
@@ -130,6 +131,48 @@ sub report {
 		$self->_send_receive ('POST', 'report', $data));
 }
 
+sub blacklist {
+	my ($self, %args) = @_;
+	my $data = {
+		limit => 1000,
+		confidenceMinimum => 75
+	};
+
+	if (exists $args{limit}) {
+		unless ($args{limit} =~ /^[0-9]+$/) {
+			carp "limit must be a whole number";
+			return;
+		}
+		if ($args{limit} < 1) {
+			carp "limit must be greater than zero";
+			return;
+		}
+		$data->{limit} = $args{limit};
+	}
+
+	if (exists $args{min_abuse}) {
+		unless ($args{min_abuse} =~ /^[0-9]+$/) {
+			carp "min_abuse must be a whole number";
+			return;
+		}
+		if ($args{min_abuse} < 25) {
+			carp "min_abuse is $args{min_abuse} but must be greater than 24";
+			return;
+		}
+		if ($args{min_abuse} > 100) {
+			carp "min_abuse is $args{min_abuse} but must be less than 100";
+			return;
+		}
+		$data->{confidenceMinimum} = $args{min_abuse};
+	}
+
+	require WebService::AbuseIPDB::BlacklistResponse;
+	require WebService::AbuseIPDB::BlacklistMember;
+	return WebService::AbuseIPDB::BlacklistResponse->new (
+		$self->_send_receive ('GET', 'blacklist', $data));
+
+}
+
 1;
 
 __END__
@@ -142,10 +185,6 @@ __END__
 =head1 NAME
 
 WebService::AbuseIPDB - Client for the API (version 2) of AbuseIPDB
-
-=head1 VERSION
-
-Version 0.00
 
 =head1 SYNOPSIS
 
@@ -169,7 +208,7 @@ as a client for Version 2 of the API.
 
 =head2 new
 
-	my $ipdb = WebService::AbuseIPDB->new (%opts);
+    my $ipdb = WebService::AbuseIPDB->new (%opts);
 
 The constructor takes a hash of configuration details.
 
@@ -199,7 +238,7 @@ The number of times to retry on timeout or network error. Defaults to 0
 
 =head2 check
 
-	my $res = $ipdb->check (ip => '127.0.0.2', max_age => 90);
+    my $res = $ipdb->check (ip => '127.0.0.2', max_age => 90);
 
 This uses the C<check> endpoint and returns a
 L<WebService::AbuseIPDB::CheckResponse> object to access the data held
@@ -259,6 +298,39 @@ and should be decoded.
 The method will return undef on client error and a
 WebService::AbuseIPDB::ReportResponse object otherwise.
 
+=head2 blacklist
+
+    my $res = $ipdb->blacklist (
+        min_abuse   => 90,
+        limit       => 1000
+    );
+    print "As at " . $res->as_at . "\n";
+    for my $bad ($res->list) {
+        printf "Address %s has score %i%%\n", $bad->ip, $bad->score;
+    }
+
+This uses the C<blacklist> endpoint to retrieve a list of abusive
+addresses. It takes a single hash as the only argument with these
+elements:
+
+=over 4
+
+=item min_abuse
+
+Only include addresses with an abuse confidence score of this level or
+higher. Minimum is 25, maximum is 100 and default is 75.
+
+=item limit
+
+An integer giving the maximum quantity of addresses to return. Minimum
+is 1, maximum is 10,000 for non-subscribers and default is 1000.
+
+=back
+
+The method will return undef on client error and a
+WebService::AbuseIPDB::BlacklistResponse object otherwise.
+
+
 =head1 STABILITY
 
 This is currently alpha software. Be aware that both the internals and
@@ -268,7 +340,8 @@ the interface are liable to change.
 
 Implement the C<verbose> option on the check method.
 
-Add the other API endpoints: check-block, bulk-report, blacklist.
+Add the other API endpoints: check-block and bulk-report. Allow for fast
+blacklist-as-string response too.
 
 More validation/sanitation of inputs.
 

@@ -1,0 +1,97 @@
+{
+    'estimated_row_width' => '84',
+    'estimated_rows' => '320',
+    'estimated_startup_cost' => '11561.09',
+    'estimated_total_cost' => '1087419.09',
+    'is_analyzed' => 0,
+    'scan_on' => {
+        'table_name' => 'employe'
+    },
+    'subplans' => [
+        {
+            'estimated_row_width' => '4',
+            'estimated_rows' => '211200',
+            'estimated_startup_cost' => '11561.09',
+            'estimated_total_cost' => '14395.09',
+            'extra_info' => [
+                'Output: public.employe.nuempl'
+            ],
+            'is_analyzed' => 0,
+            'sub_nodes' => [
+                {
+                    'estimated_row_width' => '4',
+                    'estimated_rows' => '211200',
+                    'estimated_startup_cost' => '51.29',
+                    'estimated_total_cost' => '10627.89',
+                    'extra_info' => [
+                        'Output: public.employe.nuempl',
+                        'Join Filter: (NOT (hashed SubPlan 1))'
+                    ],
+                    'is_analyzed' => 0,
+                    'sub_nodes' => [
+                        {
+                            'estimated_row_width' => '4',
+                            'estimated_rows' => '660',
+                            'estimated_startup_cost' => '0',
+                            'estimated_total_cost' => '16.6',
+                            'extra_info' => [
+                                'Output: projet.nuproj, projet.nomproj, projet.resp'
+                            ],
+                            'is_analyzed' => 0,
+                            'scan_on' => {
+                                'table_name' => 'projet'
+                            },
+                            'type' => 'Seq Scan'
+                        },
+                        {
+                            'estimated_row_width' => '4',
+                            'estimated_rows' => '640',
+                            'estimated_startup_cost' => '17.04',
+                            'estimated_total_cost' => '23.44',
+                            'extra_info' => [
+                                'Output: public.employe.nuempl'
+                            ],
+                            'is_analyzed' => 0,
+                            'sub_nodes' => [
+                                {
+                                    'estimated_row_width' => '4',
+                                    'estimated_rows' => '640',
+                                    'estimated_startup_cost' => '0',
+                                    'estimated_total_cost' => '16.4',
+                                    'extra_info' => [
+                                        'Output: public.employe.nuempl'
+                                    ],
+                                    'is_analyzed' => 0,
+                                    'scan_on' => {
+                                        'table_name' => 'employe'
+                                    },
+                                    'type' => 'Seq Scan'
+                                }
+                            ],
+                            'type' => 'Materialize'
+                        }
+                    ],
+                    'subplans' => [
+                        {
+                            'estimated_row_width' => '8',
+                            'estimated_rows' => '1940',
+                            'estimated_startup_cost' => '0',
+                            'estimated_total_cost' => '29.4',
+                            'extra_info' => [
+                                'Output: travail.nuempl, travail.nuproj'
+                            ],
+                            'is_analyzed' => 0,
+                            'scan_on' => {
+                                'table_name' => 'travail'
+                            },
+                            'type' => 'Seq Scan'
+                        }
+                    ],
+                    'type' => 'Nested Loop'
+                }
+            ],
+            'type' => 'Materialize'
+        }
+    ],
+    'type' => 'Seq Scan'
+}

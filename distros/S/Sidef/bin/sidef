@@ -55,14 +55,16 @@ if (defined $args{v}) {
     exit 0;
 }
 
-# Warnings
+# Warnings stack backtrace
 if (defined $args{w}) {
     $SIG{__WARN__} = sub {
         require Carp;
         Carp::cluck(@_);
     };
 }
-elsif (defined $args{W}) {
+
+# Fatal warnings stack backtrace
+if (defined $args{W}) {
     $SIG{__DIE__} = $SIG{__WARN__} = sub {
         require Carp;
         Carp::confess(@_);
@@ -480,7 +482,7 @@ sub code_interactive {
             }
             elsif ($line eq 'copyright') {
                 print <<'EOT';
-Copyright © 2013-2019 Daniel Șuteu, Ioana Fălcușan
+Copyright © 2013-2020 Daniel Șuteu, Ioana Fălcușan
 All Rights Reserved.
 EOT
                 redo MAINLOOP;

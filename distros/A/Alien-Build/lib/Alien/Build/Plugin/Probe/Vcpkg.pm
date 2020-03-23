@@ -5,18 +5,23 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Probe for system libraries using Vcpkg
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 
 has '+name';
 has 'lib';
 has 'ffi_name';
+has 'include';
 
 sub init
 {
   my($self, $meta) = @_;
 
-  if(defined $self->ffi_name)
+  if(defined $self->include)
+  {
+    $meta->add_requires('configure' => 'Alien::Build::Plugin::Probe::Vcpkg' => '2.16' );
+  }
+  elsif(defined $self->ffi_name)
   {
     $meta->add_requires('configure' => 'Alien::Build::Plugin::Probe::Vcpkg' => '2.14' );
   }
@@ -46,11 +51,11 @@ sub init
         if($self->name)
         {
           $package = Win32::Vcpkg::List->new
-                                       ->search($self->name);
+                                       ->search($self->name, include => $self->include);
         }
         elsif($self->lib)
         {
-          $package = eval { Win32::Vcpkg::Package->new( lib => $self->lib ) };
+          $package = eval { Win32::Vcpkg::Package->new( lib => $self->lib, include => $self->include) };
           return 'share' if $@;
         }
         else
@@ -101,7 +106,7 @@ Alien::Build::Plugin::Probe::Vcpkg - Probe for system libraries using Vcpkg
 
 =head1 VERSION
 
-version 2.15
+version 2.17
 
 =head1 SYNOPSIS
 

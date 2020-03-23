@@ -97,6 +97,18 @@ sub try {
 
         return Duadua::Util->set_os($d, $h);
     }
+    elsif ( index($d->ua, ' MZBrowser/') > -1 && index($d->ua, 'UWS') > -1 ) {
+        my $h = {
+            name => 'MZBrowser',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m! MZBrowser/([\d.\-]+)!);
+            $h->{version} = $version if $version;
+        }
+
+        return Duadua::Util->set_os($d, $h);
+    }
 }
 
 1;

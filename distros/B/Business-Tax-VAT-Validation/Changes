@@ -1,5 +1,8 @@
 Revision history for Business::Tax::VAT::Validation
 
+1.12  20/03/20
+    - Use https:// base_url to avoid a redirect (fgehring)
+
 1.11  13/03/2017
     - Add get_last_response accessor, to return the last response we got
       (pvoglhofer)

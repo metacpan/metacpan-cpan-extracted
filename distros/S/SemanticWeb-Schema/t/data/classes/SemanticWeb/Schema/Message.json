@@ -13,8 +13,8 @@
          "rdfs:subPropertyOf" : "schema:recipient",
          "schema:domainIncludes" : "schema:Message",
          "schema:rangeIncludes" : [
-            "schema:ContactPoint",
             "schema:Person",
+            "schema:ContactPoint",
             "schema:Organization"
          ]
       },
@@ -25,9 +25,9 @@
          "rdfs:subPropertyOf" : "schema:recipient",
          "schema:domainIncludes" : "schema:Message",
          "schema:rangeIncludes" : [
-            "schema:Organization",
+            "schema:ContactPoint",
             "schema:Person",
-            "schema:ContactPoint"
+            "schema:Organization"
          ]
       },
       "schema:dateRead" : {
@@ -67,21 +67,21 @@
          "rdfs:label" : "recipient",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:SendAction",
-            "schema:CommunicateAction",
             "schema:GiveAction",
-            "schema:PayAction",
+            "schema:Message",
             "schema:DonateAction",
             "schema:ReturnAction",
-            "schema:Message",
+            "schema:PayAction",
+            "schema:CommunicateAction",
+            "schema:SendAction",
             "schema:TipAction",
             "schema:AuthorizeAction"
          ],
          "schema:rangeIncludes" : [
             "schema:Audience",
+            "schema:ContactPoint",
             "schema:Person",
-            "schema:Organization",
-            "schema:ContactPoint"
+            "schema:Organization"
          ]
       },
       "schema:sender" : {
@@ -90,8 +90,8 @@
          "rdfs:label" : "sender",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:ReceiveAction",
-            "schema:Message"
+            "schema:Message",
+            "schema:ReceiveAction"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",
@@ -106,10 +106,10 @@
          "rdfs:subPropertyOf" : "schema:recipient",
          "schema:domainIncludes" : "schema:Message",
          "schema:rangeIncludes" : [
-            "schema:Person",
             "schema:ContactPoint",
-            "schema:Organization",
-            "schema:Audience"
+            "schema:Person",
+            "schema:Audience",
+            "schema:Organization"
          ]
       }
    }

@@ -1,15 +1,15 @@
 {
    "class" : {
       "dc:source" : [
-         "https://github.com/schemaorg/schemaorg/issues/1525",
-         "schemadotorgsources2:TP"
+         "schemadotorgsources2:TP",
+         "https://github.com/schemaorg/schemaorg/issues/1525"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A <a class=\"localLink\" href=\"http://schema.org/NewsArticle\">NewsArticle</a> and <a class=\"localLink\" href=\"http://schema.org/CriticReview\">CriticReview</a> providing a professional critic's assessment of a service, product, performance, or artistic or literary work.",
       "rdfs:label" : "ReviewNewsArticle",
       "rdfs:subClassOf" : [
-         "schema:CriticReview",
-         "schema:NewsArticle"
+         "schema:NewsArticle",
+         "schema:CriticReview"
       ],
       "schema:category" : "issue-1525",
       "schema:isPartOf" : "http:pending.schema.org"

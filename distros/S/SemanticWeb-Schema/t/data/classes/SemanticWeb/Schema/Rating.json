@@ -45,8 +45,8 @@
          "rdfs:label" : "ratingValue",
          "schema:domainIncludes" : "schema:Rating",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Number"
+            "schema:Number",
+            "schema:Text"
          ]
       },
       "schema:reviewAspect" : {
@@ -68,8 +68,8 @@
          "rdfs:label" : "worstRating",
          "schema:domainIncludes" : "schema:Rating",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Number"
+            "schema:Number",
+            "schema:Text"
          ]
       }
    }

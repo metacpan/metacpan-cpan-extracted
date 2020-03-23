@@ -13,12 +13,13 @@ WriteMakefile(
     LICENSE          => 'Perl_5',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.010,
-	XS		=> {'PrintExpr.xs' => 'PrintExpr.c'},
-	OBJECT	=> 'PrintExpr$(OBJ_EXT)',
+	#XS		=> {'PrintExpr.xs' => 'PrintExpr.c'},
+	#OBJECT	=> 'PrintExpr$(OBJ_EXT)',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
+		'Test::More' => 0,
 		'Test2::V0' => 0,
     },
     PREREQ_PM => {
@@ -27,6 +28,7 @@ WriteMakefile(
 		'Data::Dumper' => 0,
 		'Scalar::Util' => 1.26,
 		'List::Util' => 1.29,
+		'B' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Debug-Filter-PrintExpr-*' },

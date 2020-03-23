@@ -13,8 +13,8 @@
          "rdfs:label" : "associatedPathophysiology",
          "schema:domainIncludes" : [
             "schema:SuperficialAnatomy",
-            "schema:AnatomicalSystem",
-            "schema:AnatomicalStructure"
+            "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -46,14 +46,6 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:ImageObject"
       },
-      "schema:function" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Function of the anatomical structure.",
-         "rdfs:label" : "function",
-         "schema:domainIncludes" : "schema:AnatomicalStructure",
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
-      },
       "schema:partOfSystem" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The anatomical or organ system that this structure is part of.",
@@ -67,9 +59,9 @@
          "rdfs:comment" : "A medical condition associated with this anatomy.",
          "rdfs:label" : "relatedCondition",
          "schema:domainIncludes" : [
-            "schema:SuperficialAnatomy",
             "schema:AnatomicalStructure",
-            "schema:AnatomicalSystem"
+            "schema:AnatomicalSystem",
+            "schema:SuperficialAnatomy"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalCondition"
@@ -79,9 +71,9 @@
          "rdfs:comment" : "A medical therapy related to this anatomy.",
          "rdfs:label" : "relatedTherapy",
          "schema:domainIncludes" : [
+            "schema:AnatomicalStructure",
             "schema:SuperficialAnatomy",
-            "schema:AnatomicalSystem",
-            "schema:AnatomicalStructure"
+            "schema:AnatomicalSystem"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalTherapy"

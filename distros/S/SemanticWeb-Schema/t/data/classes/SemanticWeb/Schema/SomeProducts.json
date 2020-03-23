@@ -13,8 +13,8 @@
          "rdfs:comment" : "The current approximate inventory level for the item or items.",
          "rdfs:label" : "inventoryLevel",
          "schema:domainIncludes" : [
-            "schema:Demand",
             "schema:SomeProducts",
+            "schema:Demand",
             "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"

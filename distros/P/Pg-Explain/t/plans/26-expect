@@ -1,0 +1,29 @@
+{
+    'actual_loops' => '1',
+    'actual_rows' => '1',
+    'actual_time_first' => '0.015',
+    'actual_time_last' => '0.016',
+    'estimated_row_width' => '1990',
+    'estimated_rows' => '1',
+    'estimated_startup_cost' => '0',
+    'estimated_total_cost' => '0.21',
+    'is_analyzed' => 1,
+    'sub_nodes' => [
+        {
+            'actual_loops' => '1',
+            'actual_rows' => '1',
+            'actual_time_first' => '0.014',
+            'actual_time_last' => '0.014',
+            'estimated_row_width' => '1990',
+            'estimated_rows' => '111292',
+            'estimated_startup_cost' => '0',
+            'estimated_total_cost' => '23701.92',
+            'is_analyzed' => 1,
+            'type' => 'Seq Scan',
+            'scan_on' => {
+                'table_name' => 'product_item'
+            }
+        }
+    ],
+    'type' => 'Limit'
+}

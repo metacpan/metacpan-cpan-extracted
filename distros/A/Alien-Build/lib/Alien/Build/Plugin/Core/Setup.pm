@@ -7,7 +7,7 @@ use Config;
 use File::Which qw( which );
 
 # ABSTRACT: Core setup plugin
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 
 sub init
@@ -84,7 +84,7 @@ Alien::Build::Plugin::Core::Setup - Core setup plugin
 
 =head1 VERSION
 
-version 2.15
+version 2.17
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,43 @@
+prettyandsimple
+very.common
+disposable.style.email.with+symbol
+other.email-with-dash
+"much.more unusual"
+"very.unusual.@.unusual.com"
+"very.(),:;<>[]\".VERY.\"very@\\\ \"very\".unusual"
+example-indeed
+!#$%&'*+-/=?^_`{}|~
+"()<>[]:,;@\\\"!#$%&'-/=?^_`{}|~.a"
+"multi"."quote"."is-allowed"
+this_is.also."valid"
+" "
+"next-char-is-tab:	"
+" abc"
+"abc "
+"  abc  "
+"abc. "
+//
+"\abc"
+-abc
+;abc
+A@b@c
+a"b(c)d,e:f;g<h>i[j\k]l
+just"not"right
+this is"not\allowed
+this\ still\"not\\allowed
+john..doe
+.
+.abc
+abc.
+abc.@
+abc. space-before
+	tab-before
+"\"
+"\ 
+# next is empty line
+
+ space-before
+\
+\\
+"CR:"
+"DEL:"

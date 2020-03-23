@@ -13,8 +13,8 @@
          "rdfs:comment" : "The upper value of some characteristic or property.",
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
-            "schema:PropertyValueSpecification",
             "schema:QuantitativeValue",
+            "schema:PropertyValueSpecification",
             "schema:PropertyValue",
             "schema:MonetaryAmount"
          ],
@@ -23,16 +23,12 @@
       "schema:measurementTechnique" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1425",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A technique or technology used in a <a class=\"localLink\" href=\"http://schema.org/Dataset\">Dataset</a> (or <a class=\"localLink\" href=\"http://schema.org/DataDownload\">DataDownload</a>, <a class=\"localLink\" href=\"http://schema.org/DataCatalog\">DataCatalog</a>),\ncorresponding to the method used for measuring the corresponding variable(s) (described using <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a>). This is oriented towards scientific and scholarly dataset publication but may have broader applicability; it is not intended as a full representation of measurement, but rather as a high level summary for dataset discovery.<br/><br/>\n\nFor example, if <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> is: molecule concentration, <a class=\"localLink\" href=\"http://schema.org/measurementTechnique\">measurementTechnique</a> could be: \"mass spectrometry\" or \"nmr spectroscopy\" or \"colorimetry\" or \"immunofluorescence\".<br/><br/>\n\nIf the <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> is \"depression rating\", the <a class=\"localLink\" href=\"http://schema.org/measurementTechnique\">measurementTechnique</a> could be \"Zung Scale\" or \"HAM-D\" or \"Beck Depression Inventory\".<br/><br/>\n\nIf there are several <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> properties recorded for some given data object, use a <a class=\"localLink\" href=\"http://schema.org/PropertyValue\">PropertyValue</a> for each <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> and attach the corresponding <a class=\"localLink\" href=\"http://schema.org/measurementTechnique\">measurementTechnique</a>.",
+         "rdfs:comment" : "A technique or technology used in a <a class=\"localLink\" href=\"http://schema.org/Dataset\">Dataset</a> (or <a class=\"localLink\" href=\"http://schema.org/DataDownload\">DataDownload</a>, <a class=\"localLink\" href=\"http://schema.org/DataCatalog\">DataCatalog</a>),\ncorresponding to the method used for measuring the corresponding variable(s) (described using <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a>). This is oriented towards scientific and scholarly dataset publication but may have broader applicability; it is not intended as a full representation of measurement, but rather as a high level summary for dataset discovery.<br/><br/>\n\nFor example, if <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> is: molecule concentration, <a class=\"localLink\" href=\"http://schema.org/measurementTechnique\">measurementTechnique</a> could be: \"mass spectrometry\" or \"nmr spectroscopy\" or \"colorimetry\" or \"immunofluorescence\".<br/><br/>\n\nIf the <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> is \"depression rating\", the <a class=\"localLink\" href=\"http://schema.org/measurementTechnique\">measurementTechnique</a> could be \"Zung Scale\" or \"HAM-D\" or \"Beck Depression Inventory\".<br/><br/>\n\nIf there are several <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> properties recorded for some given data object, use a <a class=\"localLink\" href=\"http://schema.org/PropertyValue\">PropertyValue</a> for each <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> and attach the corresponding <a class=\"localLink\" href=\"http://schema.org/measurementTechnique\">measurementTechnique</a>.]]></rdfs:comment>\n    <schema:domainIncludes rdf:resource=\"http://schema.org/Dataset\"/>\n    <schema:isPartOf rdf:resource=\"http://pending.schema.org\"/>\n    <schema:domainIncludes rdf:resource=\"http://schema.org/DataDownload\"/>\n    <schema:category>issue-1425</schema:category>\n  </rdf:Property>\n  <schema:HealthAspectEnumeration rdf:about=\"http://schema.org/LivingWithHealthAspect\">\n    <schema:isPartOf rdf:resource=\"http://pending.schema.org\"/>\n    <rdfs:label>LivingWithHealthAspect</rdfs:label>\n    <schema:category>issue-2374</schema:category>\n    <rdfs:comment>Information about coping or life related to the topic.</rdfs:comment>\n    <dct:source rdf:resource=\"https://github.com/schemaorg/schemaorg/issues/2374\"/>\n  </schema:HealthAspectEnumeration>\n  <rdf:Property rdf:about=\"http://schema.org/termsOfService\">\n    <rdfs:comment>Human-readable terms of service documentation.</rdfs:comment>\n    <schema:isPartOf rdf:resource=\"http://pending.schema.org\"/>\n    <schema:category>issue-1423</schema:category>\n    <dct:source rdf:resource=\"https://github.com/schemaorg/schemaorg/issues/1423\"/>\n    <schema:domainIncludes rdf:resource=\"http://schema.org/Service\"/>\n    <schema:rangeIncludes rdf:resource=\"http://schema.org/URL\"/>\n    <schema:rangeIncludes rdf:resource=\"http://schema.org/Text\"/>\n    <rdfs:label>termsOfService</rdfs:label>\n  </rdf:Property>\n  <schema:ReturnFeesEnumeration rdf:about=\"http://schema.org/OriginalShippingFees\">\n    <rdfs:comment>OriginalShippingFees ...</rdfs:comment>\n    <rdfs:label>OriginalShippingFees</rdfs:label>\n    <schema:isPartOf rdf:resource=\"http://pending.schema.org\"/>\n    <schema:category>issue-2288</schema:category>\n    <dct:source rdf:resource=\"https://github.com/schemaorg/schemaorg/issues/2288\"/>\n  </schema:ReturnFeesEnumeration>\n  <rdf:Property rdf:about=\"http://schema.org/timeToComplete\">\n    <dct:source rdf:resource=\"https://github.com/schemaorg/schemaorg/issues/2289\"/>\n    <schema:rangeIncludes rdf:resource=\"http://schema.org/Duration\"/>\n    <rdfs:label>timeToComplete</rdfs:label>\n    <schema:domainIncludes rdf:resource=\"http://schema.org/EducationalOccupationalProgram\"/>\n    <schema:category>issue-2289</schema:category>\n    <rdfs:comment>The expected length of time to complete the program if attending full-time.</rdfs:comment>\n    <schema:isPartOf rdf:resource=\"http://pending.schema.org\"/>\n  </rdf:Property>\n  <rdfs:Class rdf:about=\"http://schema.org/PodcastSeason\">\n    <rdfs:subClassOf rdf:resource=\"http://schema.org/CreativeWorkSeason\"/>\n    <dct:source rdf:resource=\"https://github.com/schemaorg/schemaorg/issues/373\"/>\n    <schema:category>issue-373</schema:category>\n    <schema:isPartOf rdf:resource=\"http://pending.schema.org\"/>\n    <rdfs:comment>A single season of a podcast. Many podcasts do not break down into separate seasons. In that case, PodcastSeries should be used.</rdfs:comment>\n    <rdfs:label>PodcastSeason</rdfs:label>\n  </rdfs:Class>\n  <rdf:Property rdf:about=\"http://schema.org/phoneticText\">\n    <dct:source rdf:resource=\"https://github.com/schemaorg/schemaorg/issues/2108\"/>\n    <schema:domainIncludes rdf:resource=\"http://schema.org/PronounceableText\"/>\n    <rdfs:label>phoneticText</rdfs:label>\n    <schema:rangeIncludes rdf:resource=\"http://schema.org/Text\"/>\n    <schema:category>issue-2108</schema:category>\n    <schema:isPartOf rdf:resource=\"http://pending.schema.org\"/>\n    <rdfs:comment><![CDATA[Representation of a text <a class=\"localLink\" href=\"http://schema.org/textValue\">textValue</a> using the specified <a class=\"localLink\" href=\"http://schema.org/speechToTextMarkup\">speechToTextMarkup</a>. For example the city name of Houston in IPA: /ËhjuËstÉn/.",
          "rdfs:label" : "measurementTechnique",
-         "schema:category" : "issue-1425",
          "schema:domainIncludes" : [
-            "schema:DataDownload",
-            "schema:Dataset",
             "schema:PropertyValue",
             "schema:DataCatalog"
          ],
-         "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
             "schema:Text",
             "schema:URL"
@@ -44,10 +40,10 @@
          "rdfs:comment" : "The lower value of some characteristic or property.",
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
+            "schema:PropertyValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValueSpecification",
             "schema:QuantitativeValue",
-            "schema:PropertyValue"
+            "schema:PropertyValueSpecification"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -68,13 +64,13 @@
          "rdfs:label" : "unitCode",
          "schema:domainIncludes" : [
             "schema:PropertyValue",
-            "schema:UnitPriceSpecification",
             "schema:TypeAndQuantityNode",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:UnitPriceSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:unitText" : {
@@ -82,9 +78,9 @@
          "rdfs:comment" : "A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for\n<a href='unitCode'>unitCode</a>.",
          "rdfs:label" : "unitText",
          "schema:domainIncludes" : [
+            "schema:TypeAndQuantityNode",
             "schema:PropertyValue",
             "schema:UnitPriceSpecification",
-            "schema:TypeAndQuantityNode",
             "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : "schema:Text"
@@ -95,15 +91,15 @@
          "rdfs:comment" : "The value of the quantitative value or property value node.<br/><br/>\n\n<ul>\n<li>For <a class=\"localLink\" href=\"http://schema.org/QuantitativeValue\">QuantitativeValue</a> and <a class=\"localLink\" href=\"http://schema.org/MonetaryAmount\">MonetaryAmount</a>, the recommended type for values is 'Number'.</li>\n<li>For <a class=\"localLink\" href=\"http://schema.org/PropertyValue\">PropertyValue</a>, it can be 'Text;', 'Number', 'Boolean', or 'StructuredValue'.</li>\n<li>Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.</li>\n<li>Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.</li>\n</ul>\n",
          "rdfs:label" : "value",
          "schema:domainIncludes" : [
-            "schema:QuantitativeValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValue"
+            "schema:PropertyValue",
+            "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
+            "schema:Number",
             "schema:Boolean",
             "schema:Text",
-            "schema:StructuredValue",
-            "schema:Number"
+            "schema:StructuredValue"
          ]
       },
       "schema:valueReference" : {
@@ -112,16 +108,16 @@
          "rdfs:comment" : "A pointer to a secondary value that provides additional information on the original value, e.g. a reference temperature.",
          "rdfs:label" : "valueReference",
          "schema:domainIncludes" : [
-            "schema:PropertyValue",
-            "schema:QualitativeValue",
-            "schema:QuantitativeValue"
-         ],
-         "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
             "schema:QualitativeValue",
-            "schema:Enumeration",
-            "schema:StructuredValue",
             "schema:PropertyValue"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:StructuredValue",
+            "schema:QuantitativeValue",
+            "schema:PropertyValue",
+            "schema:Enumeration",
+            "schema:QualitativeValue"
          ]
       }
    }

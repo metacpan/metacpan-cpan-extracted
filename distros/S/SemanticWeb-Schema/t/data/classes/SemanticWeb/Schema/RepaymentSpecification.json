@@ -24,14 +24,14 @@
          "schema:domainIncludes" : "schema:RepaymentSpecification",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:Number"
          ]
       },
       "schema:earlyPrepaymentPenalty" : {
          "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount to be paid as a penalty in the event of early payment of the loan.",
@@ -56,8 +56,8 @@
       },
       "schema:loanPaymentFrequency" : {
          "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Frequency of payments due, i.e. number of months between payments. This is defined as a frequency, i.e. the reciprocal of a period of time.",
@@ -69,8 +69,8 @@
       },
       "schema:numberOfLoanPayments" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "schemadotorgsources:FIBO"
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of payments contractually required at origination to repay the loan. For monthly paying loans this is the number of months from the contractual first payment date to the maturity date.",

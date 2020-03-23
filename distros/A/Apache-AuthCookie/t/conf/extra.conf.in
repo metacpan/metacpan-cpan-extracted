@@ -23,6 +23,8 @@ PerlSetVar AuthCookieDebug 3
 PerlSetVar WhatEverCookieName Sample::AuthCookieHandler_WhatEver
 PerlSetVar WhatEverEncoding UTF-8
 PerlSetVar WhatEverRequiresEncoding UTF-8
+PerlSetVar WhatEverDefaultDestination /docs/protected/index.html
+PerlSetVar WhatEverEnforceLocalDestination On
 
 <Directory @ServerRoot@>
   AllowOverride All

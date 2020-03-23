@@ -4,6 +4,8 @@ package Plack::Middleware::Statsd;
 
 # RECOMMEND PREREQ:  Net::Statsd::Tiny v0.3.0
 # RECOMMEND PREREQ:  HTTP::Status 6.16
+# RECOMMEND PREREQ:  List::Util::XS
+# RECOMMEND PREREQ:  Ref::Util::XS
 
 use v5.10;
 
@@ -12,18 +14,67 @@ use warnings;
 
 use parent qw/ Plack::Middleware /;
 
+use List::Util qw/ first /;
 use Plack::Util;
-use Plack::Util::Accessor qw/ client sample_rate /;
+use Plack::Util::Accessor
+    qw/ client sample_rate histogram increment set_add /;
+use Ref::Util qw/ is_coderef /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.3.10';
+our $VERSION = 'v0.4.3';
+
+# Note: You may be able to omit the client if there is a client
+# defined in the environment hash at C<psgix.monitor.statsd>, and the
+# L</histogram>, L</increment> and L</attributes> are set.  But that
+# is a strange case and unsupported.
+
+sub prepare_app {
+    my ($self) = @_;
+
+    if ( my $client = $self->client ) {
+        foreach my $init (
+            [qw/ histogram timing_ms timing /],
+            [qw/ increment increment /],
+            [qw/ set_add   set_add   /],
+          )
+        {
+            my ( $attr, @methods ) = @$init;
+            next if defined $self->$attr;
+            my $method = first { $client->can($_) } @methods;
+            warn "No $attr method found for client " . ref($client)
+                unless defined $method;
+            $self->$attr(
+                sub {
+                    my ($env, @args) = @_;
+                    return unless defined $method;
+                    try {
+                        $client->$method( grep { defined $_ } @args );
+                    }
+                    catch {
+                        if (my $logger = $env->{'psgix.logger'}) {
+                            $logger->( { message => $_, level => 'error' } );
+                        }
+                        else {
+                            $env->{'psgi.errors'}->print($_);
+                        }
+                    };
+
+                }
+            );
+        }
+    }
+
+    if (my $attr = first { !is_coderef($self->$_) } qw/ histogram increment set_add /) {
+        die "$attr is not a coderef";
+    }
+
+}
 
 sub call {
     my ( $self, $env ) = @_;
 
-    my $client = $self->client // $env->{'psgix.monitor.statsd'};
-    $env->{'psgix.monitor.statsd'} //= $client;
+    my $client = ( $env->{'psgix.monitor.statsd'} //= $self->client );
 
     my $start = [Time::HiRes::gettimeofday];
     my $res   = $self->app->($env);
@@ -39,61 +90,36 @@ sub call {
 
             $rate = undef if ( defined $rate ) && ( $rate >= 1 );
 
-            my $histogram = $client->can('timing') // $client->can('timing_ms');
-            my $increment = $client->can('increment');
-            my $set_count = $client->can('set_add');
-
-            my $logger  = $env->{'psgix.logger'};
-            my $measure = sub {
-                my ( $method, @args ) = @_;
-                try {
-                    return unless defined $method;
-                    $client->$method( grep { defined $_ } @args );
-                }
-                catch {
-                    if ($logger) {
-                        $logger->( { message => $_, level => 'error' } );
-                    }
-                    else {
-                        $env->{'psgi.errors'}->print($_);
-                    }
-                };
-            };
+            my $histogram = $self->histogram;
+            my $increment = $self->increment;
+            my $set_add   = $self->set_add;
 
             my $elapsed = Time::HiRes::tv_interval($start);
 
-            $measure->(
-                $histogram, 'psgi.response.time', $elapsed * 1000, $rate
-            );
+            $histogram->( $env, 'psgi.response.time', $elapsed * 1000, $rate );
 
             if ( defined $env->{CONTENT_LENGTH} ) {
-                $measure->(
-                    $histogram, 'psgi.request.content-length',
+                $histogram->( $env,
+                    'psgi.request.content-length',
                     $env->{CONTENT_LENGTH}, $rate
                 );
             }
 
             if ( my $method = $env->{REQUEST_METHOD} ) {
-                $measure->(
-                    $increment, 'psgi.request.method.' . $method, $rate
-                );
+                $increment->( $env, 'psgi.request.method.' . $method, $rate );
             }
 
             if ( my $type = $env->{CONTENT_TYPE} ) {
                 $type =~ s#\.#-#g;
                 $type =~ s#/#.#g;
                 $type =~ s/;.*$//;
-                $measure->(
-                    $increment, 'psgi.request.content-type.' . $type, $rate
-                );
-
+                $increment->( $env, 'psgi.request.content-type.' . $type, $rate );
             }
 
-            $measure->(
-                $set_count, 'psgi.request.remote_addr', $env->{REMOTE_ADDR}
-            ) if $env->{REMOTE_ADDR};
+            $set_add->( $env, 'psgi.request.remote_addr', $env->{REMOTE_ADDR} )
+                if $env->{REMOTE_ADDR};
 
-            $measure->( $set_count, 'psgi.worker.pid', $$ );
+            $set_add->( $env, 'psgi.worker.pid', $$ );
 
             my $h = Plack::Util::headers( $res->[1] );
 
@@ -103,27 +129,22 @@ sub call {
               || 'X-Sendfile';
 
             if ( $h->exists($xsendfile) ) {
-                $measure->( $increment, 'psgi.response.x-sendfile' );
+                $increment->( $env, 'psgi.response.x-sendfile', $rate );
             }
 
             if ( $h->exists('Content-Length') ) {
                 my $length = $h->get('Content-Length') || 0;
-                $measure->(
-                    $histogram, 'psgi.response.content-length', $length
-                );
+                $histogram->( $env, 'psgi.response.content-length', $length );
             }
 
             if ( my $type = $h->get('Content-Type') ) {
                 $type =~ s#\.#-#g;
                 $type =~ s#/#.#g;
                 $type =~ s/;.*$//;
-                $measure->(
-                    $increment, 'psgi.response.content-type.' . $type, $rate
-                );
+                $increment->( $env, 'psgi.response.content-type.' . $type, $rate );
             }
 
-            $measure->( $increment, 'psgi.response.status.' . $res->[0],
-                $rate );
+            $increment->( $env, 'psgi.response.status.' . $res->[0], $rate );
 
             if (
                   $env->{'psgix.harakiri.supported'}
@@ -131,10 +152,10 @@ sub call {
                 : $env->{'psgix.harakiri.commit'}
               )
             {
-                $measure->( $increment, 'psgix.harakiri' );    # rate == 1
+                $increment->( $env, 'psgix.harakiri' );    # rate == 1
             }
 
-            $measure->( $client->can('flush') );
+            $client->flush if $client->can('flush');
 
             return;
         }
@@ -157,7 +178,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.3.10
+version v0.4.3
 
 =head1 SYNOPSIS
 
@@ -183,7 +204,6 @@ version v0.3.10
 
       }
 
-
     };
 
   };
@@ -199,8 +219,7 @@ to a statsd server.
 
 This is a statsd client, such as an instance of L<Net::Statsd::Tiny>.
 
-If one is omitted, then it will default to one defined in the
-environment hash at C<psgix.monitor.statsd>.
+It is required.
 
 C<psgix.monitor.statsd> will be set to the current client if it is not
 set.
@@ -237,6 +256,34 @@ The default sampling rate to be used, which should be a value between
 there is one.
 
 The default is C<1>.
+
+=head2 histogram
+
+This is a code reference to a wrapper around the L</client> C<timing>
+method.  You do not need to set this unless you want to override it.
+
+It takes as arguments the Plack environment and the arguments to pass
+to the client method, and calls that method.  If there are errors then
+it attempts to log them.
+
+=head2 increment
+
+This is a code reference to a wrapper around the L</client>
+C<increment> method.  You do not need to set this unless you want to
+override it.
+
+It takes as arguments the Plack environment and the arguments to pass
+to the client method, and calls that method.  If there are errors then
+it attempts to log them.
+
+=head2 set_add
+
+This is a code reference to a wrapper around the L</client> C<set_add>
+method.  You do not need to set this unless you want to override it.
+
+It takes as arguments the Plack environment and the arguments to pass
+to the client method, and calls that method.  If there are errors then
+it attempts to log them.
 
 =head1 METRICS
 
@@ -325,8 +372,6 @@ You can access the configured statsd client from L<Catalyst>:
 
     if (my $statsd = $c->req->env->{'psgix.monitor.statsd'}) {
       ...
-
-
     }
 
     $c->next::method(@_);
@@ -372,7 +417,7 @@ Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

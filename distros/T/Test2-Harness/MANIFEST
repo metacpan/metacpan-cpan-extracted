@@ -47,6 +47,7 @@ lib/App/Yath/Plugin.pm
 lib/App/Yath/Plugin/Git.pm
 lib/App/Yath/Plugin/Notify.pm
 lib/App/Yath/Plugin/SysInfo.pm
+lib/App/Yath/Plugin/YathUI.pm
 lib/App/Yath/Tester.pm
 lib/App/Yath/Util.pm
 lib/Test2/Formatter/QVF.pm

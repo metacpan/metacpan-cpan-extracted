@@ -1,0 +1,43 @@
+localpart-only
+invalid@ [10.0.0.1]
+invalid@ test.com
+invalid@ test
+invalid@
+invalid@@
+"invalid@"
+"invalid@"@
+"invalid@"[
+invalid@[
+invalid@[]
+invalid@a[10.0.0.1]
+invalid.ipv4@[0.1.2.3]
+invalid.ipv6@[IPv6:ge80:1::]
+not-tld@exampleA
+not-tld@testB
+not-tld@invalidC
+not-tld@onionD
+not-tld@aaa.onionE
+not-tld@Flocalhost
+# FAIL: spaces not allowed in localpart
+invalid localpart@nic.ru
+# FAIL: localpart > 64 chars
+FAILefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZover-64-chars@gh0stwizard.tk
+# FAIL: label > 63 chars
+f@FAILefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZover64-chars.label.com
+# FAIL: domain == 254 chars without ending period
+f@FAILefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZwith63char.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZwith63-char.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZwith63char.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZover-254.com
+;abc@fail.net
+A@b@c@toobad.com
+a"b(c)d,e:f;g<h>i[j\k]l@nonono.com
+just"not"right@no.com
+this is"not\allowed@nope.org
+this\ still\"not\\allowed@nenenene.com
+john..doe@imposible.ru
+.@no.com
+.abc@no.com
+abc.@@no.com
+"\"@fail.com
+"\ @fail.com
+abc..@rfc822.com
+\@no.com
+\\@no.com

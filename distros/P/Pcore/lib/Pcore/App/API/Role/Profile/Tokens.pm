@@ -4,8 +4,8 @@ use Pcore -role, -sql, -res;
 
 with qw[Pcore::App::API::Role::Read];
 
-has max_limit        => undef;
-has default_order_by => sub { [ [ 'created', 'DESC' ] ] };
+has read_max_limit        => undef;
+has read_default_order_by => sub { [ [ 'created', 'DESC' ] ] };
 
 sub API_read ( $self, $auth, $args ) {
     my $where = WHERE [ '"user_id" =', \$auth->{user_id} ];

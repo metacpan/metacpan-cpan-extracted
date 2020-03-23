@@ -4,14 +4,14 @@ NAME
 
 VERSION
 
-    version 0.602
+    version 0.604
 
 SYNOPSIS
 
         graphql <URL> <QUERY> [ [--variables JSON] | [--variable KEY=VALUE]... ]
                 [--operation-name NAME] [--transport KEY=VALUE]...
-                [--[no-]unpack] [--format json|json:pretty|yaml|perl|csv|tsv|table]
-                [--output FILE]
+                [--[no-]unpack] [--filter JSONPATH]
+                [--format json|json:pretty|yaml|perl|csv|tsv|table] [--output FILE]
     
         graphql --version|--help|--manual
 
@@ -122,9 +122,19 @@ OPTIONS
     When unpack mode is enabled, if the response completes with no errors,
     only the data section of the response is printed and the program exits
     0. If the response has errors, the whole response structure is printed
-    as-is and the program exits 1.
+    as-is and the program exits 1. See "EXAMPLES" to see what this looks
+    like in practice.
 
-    See "EXAMPLES".
+    Use --no-unpack to disable if unpack mode was enabled via
+    GRAPHQL_CLIENT_OPTIONS.
+
+ --filter JSONPATH
+
+    Filter the response based on a JSONPath expression.
+
+    Requires JSON::Path.
+
+    Alias: -p
 
 FORMAT
 

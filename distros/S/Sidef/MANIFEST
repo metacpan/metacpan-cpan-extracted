@@ -28,10 +28,8 @@ lib/Sidef/Sys/Sig.pm
 lib/Sidef/Sys/Sig.pod
 lib/Sidef/Sys/Sys.pm
 lib/Sidef/Sys/Sys.pod
-lib/Sidef/Time/Gmtime.pm
-lib/Sidef/Time/Gmtime.pod
-lib/Sidef/Time/Localtime.pm
-lib/Sidef/Time/Localtime.pod
+lib/Sidef/Time/Date.pm
+lib/Sidef/Time/Date.pod
 lib/Sidef/Time/Time.pm
 lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
@@ -110,7 +108,6 @@ scripts/ackermann_function.sf
 scripts/add_a_variable_to_a_class_instance_at_runtime.sf
 scripts/aks_test_for_primes.sf
 scripts/align_columns.sf
-scripts/Applications/any2mp3.sf
 scripts/Applications/fdf.sf
 'scripts/Applications/Gift match/giftmatch.sf'
 'scripts/Applications/Gift match/input.txt'
@@ -143,6 +140,7 @@ scripts/Expensive/benford_s_law.sf
 scripts/Expensive/binary_multiplier.sf
 scripts/Expensive/calendar.sf
 scripts/Expensive/calendar_all_uppercase.sf
+scripts/Expensive/chebyshev_factorization_method.sf
 scripts/Expensive/closed_form_fibonacci.sf
 scripts/Expensive/coin_change.sf
 scripts/Expensive/concurrent_computing.sf
@@ -686,6 +684,7 @@ scripts/Tests/class_attr_inheritance.sf
 scripts/Tests/class_attributes.sf
 scripts/Tests/class_field_inheritance.sf
 scripts/Tests/class_global_variables.sf
+scripts/Tests/class_has_variables_with_prefix_methods.sf
 scripts/Tests/class_inheritance.sf
 scripts/Tests/class_inside_module.sf
 scripts/Tests/class_redefinition.sf
@@ -709,6 +708,7 @@ scripts/Tests/cyclic_dclone.sf
 scripts/Tests/cyclic_references_eq_cmp.sf
 scripts/Tests/data_digging.sf
 scripts/Tests/data_handle.sf
+scripts/Tests/date_time.sf
 scripts/Tests/dec_2016_changes.sf
 scripts/Tests/def_primitive_type.sf
 scripts/Tests/def_primitive_type_2.sf
@@ -721,6 +721,7 @@ scripts/Tests/draw_grid_of_squares_multi_2.sf
 scripts/Tests/dump_cyclic_references.sf
 scripts/Tests/dynamic_block_scoping.sf
 scripts/Tests/dynamic_constants.sf
+scripts/Tests/each_prime.sf
 scripts/Tests/echo.sf
 scripts/Tests/enumerator_object.sf
 scripts/Tests/eq_g2.sf
@@ -776,7 +777,7 @@ scripts/Tests/iban.sf
 scripts/Tests/if_elsif_else.sf
 scripts/Tests/ilog.sf
 scripts/Tests/implicit_method_call_on_var_.sf
-scripts/Tests/implicit_numberic_conversions.sf
+scripts/Tests/implicit_numeric_conversions.sf
 scripts/Tests/infix_methods.sf
 scripts/Tests/inherited_blocks.sf
 scripts/Tests/integer_limits.sf
@@ -806,6 +807,7 @@ scripts/Tests/longest_common_prefix.sf
 scripts/Tests/longest_common_subsequence.sf
 scripts/Tests/longest_common_subsequence_2.sf
 scripts/Tests/loops.sf
+scripts/Tests/lucas_sequences.sf
 scripts/Tests/luhn_test_of_credit_card_numbers.sf
 scripts/Tests/lvalues.sf
 scripts/Tests/lwp_module.sf
@@ -929,6 +931,7 @@ scripts/Tests/run_length_encoding.sf
 scripts/Tests/run_length_encoding_2.sf
 scripts/Tests/run_length_encoding_3.sf
 scripts/Tests/same_fringe.sf
+scripts/Tests/scalar_context.sf
 scripts/Tests/script.sf
 scripts/Tests/selection_sort.sf
 scripts/Tests/set_any_all.sf
@@ -946,6 +949,7 @@ scripts/Tests/sierpinski_penta.sf
 scripts/Tests/sierpinski_sidef.sf
 scripts/Tests/sierpinski_triangle_90.sf
 scripts/Tests/sierpinski_x.sf
+scripts/Tests/slices_cons.sf
 scripts/Tests/slurpy_const.sf
 scripts/Tests/slurpy_define.sf
 scripts/Tests/slurpy_static.sf
@@ -956,6 +960,7 @@ scripts/Tests/soundex.sf
 scripts/Tests/special_methods.sf
 scripts/Tests/split_collapse.sf
 scripts/Tests/square_free_count.sf
+scripts/Tests/squarefree.sf
 scripts/Tests/static_const_lazy_init.sf
 scripts/Tests/string_encodings.sf
 scripts/Tests/string_escapes.sf

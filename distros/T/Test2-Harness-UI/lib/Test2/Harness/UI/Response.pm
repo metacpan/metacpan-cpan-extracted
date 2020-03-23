@@ -2,7 +2,7 @@ package Test2::Harness::UI::Response;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use Carp qw/croak/;
 use Time::HiRes qw/sleep/;
@@ -155,6 +155,18 @@ sub add_error {
     push @{$self->{errors} ||= []} => @_;
 
     return;
+}
+
+sub as_json {
+    my $self = shift;
+    $self->content_type('application/json');
+
+    my $data = {
+        messages => $self->{messages},
+        errors => $self->{errors},
+    };
+
+    $self->raw_body($data);
 }
 
 sub add_css {

@@ -1,5 +1,49 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.4.3    2020-03-23 08:59:39+00:00 Europe/London
+  - No changes since v0.4.2.
+
+v0.4.2    2020-03-21 18:28:31+00:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Emit warnings if the client does not support expected methods.
+
+  - Die if the histogram, increment or set_add attributes are not
+    coderefs.
+
+  [Tests]
+  - Added tests for how errors are trapped and logged.
+
+  - Add Test::Pod::LinkCheck author test.
+
+  [Other]
+  - Explicitly declare List::Util and Time::HiRes as prereqs.
+
+v0.4.1    2020-03-21 17:15:30+00:00 Europe/London (TRIAL RELEASE)
+  [Bug Fixes]
+  - Apply sample_rate to psgi.response.x-sendfile.
+
+v0.4.0    2020-03-21 00:24:40+00:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Some initialisation is done beforehand, which should result in a
+    slight performance improvement.
+
+  - Added histogram, increment and set_count attributes which are
+    code references for methods that do the actual logging.
+
+  [Incompatabilities]
+  - The client is required, and not initialised from the
+    psgix.monitor.statsd key in the environment.
+
+  [Documentation]
+  - Made better use of Pod::Weaver commands.
+
+  - Bumped copyright year
+
+  [Other]
+  - Renamed internal variables for consistency.
+
+  - Show more module versions in test diagnostics.
+
 v0.3.10   2019-12-18 23:45:32+00:00 Europe/London
   [Enhancements]
   - Added psgi.worker.pid metric for tracking the number of active workers, #4.

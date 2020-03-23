@@ -65,7 +65,7 @@ has _db_name => (
 method generate {
 
 	$self->trace;
-	
+
 	my @attr;
 	push @attr,
 	  $self->attribute_maker->make_attribute(
@@ -79,17 +79,18 @@ method generate {
 	foreach my $table ( @{ $self->tables } ) {
 
 		my $t = MySQL::ORM::Generate::Class::Table->new(
-			table         => $table,
-			db_class_name => $self->get_class_name,
-			schema        => $self->schema,
-			dir           => $self->dir,
-			namespace     => $self->namespace,
+			table              => $table,
+			db_class_name      => $self->get_class_name,
+			schema             => $self->schema,
+			dir                => $self->dir,
+			namespace          => $self->namespace,
+			use_fq_table_names => $self->use_fq_table_names,
 		);
 		$t->generate;
 
 		push @attr,
 		  $self->attribute_maker->make_attribute(
-			name        => $self->camelize($table->name),
+			name        => $self->camelize( $table->name ),
 			is          => 'rw',
 			isa         => $t->get_class_name,
 			no_init_arg => 1,
@@ -113,12 +114,12 @@ method generate {
 			'namespace::autoclean',           'Method::Signatures',
 			"Data::Printer alias => 'pdump'", 'Module::Load'
 		],
-		extends => ['MySQL::ORM'],
-		attribs => \@attr,
-		methods => \@methods,
+		extends   => ['MySQL::ORM'],
+		attribs   => \@attr,
+		methods   => \@methods,
 		overwrite => 1,
 	);
-	
+
 	$self->trace('exit');
 }
 

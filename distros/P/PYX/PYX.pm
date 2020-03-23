@@ -1,11 +1,9 @@
 package PYX;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use PYX::Utils qw(decode);
 use Readonly;
 
@@ -13,8 +11,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(attribute char comment end_element instruction
 	start_element);
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Encode attribute as PYX.
 sub attribute {
@@ -81,6 +78,7 @@ PYX - A perl module for PYX handling.
 =head1 SYNOPSIS
 
  use PYX qw(attribute char comment end_element instruction start_element);
+
  my @data = attribute(@attr);
  my @data = char($char);
  my @data = comment($comment);
@@ -126,11 +124,9 @@ PYX - A perl module for PYX handling.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use PYX qw(attribute char comment end_element instruction start_element);
 
  # Example output.
@@ -172,21 +168,22 @@ Install the PYX modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/PYX>
+L<https://github.com/michal-josef-spacek/PYX>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2016 Michal Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

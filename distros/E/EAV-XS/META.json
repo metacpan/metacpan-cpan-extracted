@@ -1,0 +1,48 @@
+{
+   "abstract" : "Email Address Validation Library",
+   "author" : [
+      "Vitaliy V. Tokarev <vitaliy.tokarev@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "EAV-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "5.62",
+            "ExtUtils::PkgConfig" : "1.16"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.3.3",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

@@ -5,10 +5,11 @@ use v5.10.1;
 use warnings;
 use strict;
 
+use Encode qw(decode);
 use Getopt::Long 2.39 ();
 use Path::Tiny;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 sub pod2usage {
     eval { require Pod::Usage };
@@ -81,6 +82,9 @@ sub options {
 sub new {
     my $class = shift;
     my @args  = @_;
+
+    # assume UTF-8 args if non-ASCII
+    @args = map { decode('UTF-8', $_) } @args if grep { /\P{ASCII}/ } @args;
 
     my $self = bless {}, $class;
 
@@ -299,7 +303,7 @@ App::Codeowners::Options - Getopt and shell completion for App::Codeowners
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 METHODS
 

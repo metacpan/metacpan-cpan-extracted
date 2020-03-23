@@ -266,3 +266,29 @@
   is_linux: flase
   is_windows: false
   is_chromeos: false
+- ua: 'http.rb/4.0.0'
+  name: 'http.rb'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: flase
+  is_windows: false
+  is_chromeos: false
+  version: '4.0.0'
+- ua: 'Mozilla/4.0 (compatible; Win32; WinHttp.WinHttpRequest.5)'
+  name: 'WinHttpRequest'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: flase
+  is_windows: true
+  is_chromeos: false
+  version: '5'
+- ua: 'EventMachine HttpClient'
+  name: 'EventMachine'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: flase
+  is_windows: false
+  is_chromeos: false

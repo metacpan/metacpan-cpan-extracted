@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has accommodation_category => (
@@ -74,6 +74,14 @@ has number_of_bathrooms_total => (
 
 
 
+has number_of_bedrooms => (
+    is        => 'rw',
+    predicate => '_has_number_of_bedrooms',
+    json_ld   => 'numberOfBedrooms',
+);
+
+
+
 has number_of_full_bathrooms => (
     is        => 'rw',
     predicate => '_has_number_of_full_bathrooms',
@@ -114,6 +122,14 @@ has pets_allowed => (
 
 
 
+has tour_booking_page => (
+    is        => 'rw',
+    predicate => '_has_tour_booking_page',
+    json_ld   => 'tourBookingPage',
+);
+
+
+
 has year_built => (
     is        => 'rw',
     predicate => '_has_year_built',
@@ -138,7 +154,7 @@ SemanticWeb::Schema::Accommodation - An accommodation is a place that can accomm
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -307,6 +323,30 @@ A number_of_bathrooms_total should be one of the following types:
 
 A predicate for the L</number_of_bathrooms_total> attribute.
 
+=head2 C<number_of_bedrooms>
+
+C<numberOfBedrooms>
+
+=for html <p>The total integer number of bedrooms in a some <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>, <a
+class="localLink"
+href="http://schema.org/ApartmentComplex">ApartmentComplex</a> or <a
+class="localLink" href="http://schema.org/FloorPlan">FloorPlan</a>.<p>
+
+A number_of_bedrooms should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<Num>
+
+=back
+
+=head2 C<_has_number_of_bedrooms>
+
+A predicate for the L</number_of_bedrooms> attribute.
+
 =head2 C<number_of_full_bathrooms>
 
 C<numberOfFullBathrooms>
@@ -414,6 +454,29 @@ A pets_allowed should be one of the following types:
 =head2 C<_has_pets_allowed>
 
 A predicate for the L</pets_allowed> attribute.
+
+=head2 C<tour_booking_page>
+
+C<tourBookingPage>
+
+=for html <p>A page providing information on how to book a tour of some <a
+class="localLink" href="http://schema.org/Place">Place</a>, such as an <a
+class="localLink" href="http://schema.org/Accommodation">Accommodation</a>
+or <a class="localLink"
+href="http://schema.org/ApartmentComplex">ApartmentComplex</a> in a real
+estate setting, as well as other kinds of tours as appropriate.<p>
+
+A tour_booking_page should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_tour_booking_page>
+
+A predicate for the L</tour_booking_page> attribute.
 
 =head2 C<year_built>
 

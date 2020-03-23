@@ -2,7 +2,7 @@ package App::Yath::Command::auditor;
 use strict;
 use warnings;
 
-our $VERSION = '1.000013';
+our $VERSION = '1.000014';
 
 use File::Spec;
 use Scalar::Util qw/blessed/;
@@ -225,6 +225,82 @@ exit after showing help information
 =item --no-keep-dirs
 
 Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
+
+
+=back
+
+=head3 YathUI Options
+
+=over 4
+
+=item --yathui-api-key ARG
+
+=item --yathui-api-key=ARG
+
+=item --no-yathui-api-key
+
+Yath-UI API key. This is not necessary if your Yath-UI instance is set to single-user
+
+
+=item --yathui-grace
+
+=item --no-yathui-grace
+
+If yath cannot connect to yath-ui it normally throws an error, use this to make it fail gracefully. You get a warning, but things keep going.
+
+
+=item --yathui-long-duration 10
+
+=item --no-yathui-long-duration
+
+Minimum duration length (seconds) before a test goes from MEDIUM to LONG
+
+
+=item --yathui-medium-duration 5
+
+=item --no-yathui-medium-duration
+
+Minimum duration length (seconds) before a test goes from SHORT to MEDIUM
+
+
+=item --yathui-mode summary
+
+=item --yathui-mode qvf
+
+=item --yathui-mode qvfd
+
+=item --yathui-mode complete
+
+=item --no-yathui-mode
+
+Set the upload mode (default 'qvfd')
+
+
+=item --yathui-project ARG
+
+=item --yathui-project=ARG
+
+=item --no-yathui-project
+
+The Yath-UI project for your test results
+
+
+=item --yathui-retry
+
+=item --no-yathui-retry
+
+How many times to try an operation before giving up
+
+Can be specified multiple times
+
+
+=item --yathui-url http://my-yath-ui.com/...
+
+=item --uri http://my-yath-ui.com/...
+
+=item --no-yathui-url
+
+Yath-UI url
 
 
 =back

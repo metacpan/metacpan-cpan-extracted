@@ -18,14 +18,14 @@
          "rdfs:label" : "availabilityEnds",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
+            "schema:Offer",
             "schema:Demand",
-            "schema:Offer"
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
-            "schema:Time",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Time"
          ]
       },
       "schema:availabilityStarts" : {
@@ -43,30 +43,35 @@
             "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
+            "schema:Time",
             "schema:Date",
-            "schema:Time"
+            "schema:DateTime"
          ]
       },
       "schema:category" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1741",
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1741",
+            "https://github.com/schemaorg/schemaorg/issues/2490"
+         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.",
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:Product",
-            "schema:Recommendation",
-            "schema:PhysicalActivity",
             "schema:ActionAccessSpecification",
             "schema:Invoice",
-            "schema:Offer"
+            "schema:PhysicalActivity",
+            "schema:Offer",
+            "schema:URL",
+            "schema:Product",
+            "schema:SpecialAnnouncement",
+            "schema:Recommendation",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : [
+            "schema:Thing",
             "schema:PhysicalActivityCategory",
-            "schema:Text",
-            "schema:Thing"
+            "schema:Text"
          ]
       },
       "schema:eligibleRegion" : {
@@ -80,15 +85,15 @@
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:Demand",
             "schema:DeliveryChargeSpecification",
+            "schema:Offer",
             "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
             "schema:Text",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:Place"
          ]
       },
       "schema:expectsAcceptanceOf" : {
@@ -99,8 +104,8 @@
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
             "schema:ActionAccessSpecification",
-            "schema:ConsumeAction",
-            "schema:MediaSubscription"
+            "schema:MediaSubscription",
+            "schema:ConsumeAction"
          ],
          "schema:rangeIncludes" : "schema:Offer"
       },
@@ -111,16 +116,16 @@
          "rdfs:label" : "ineligibleRegion",
          "schema:category" : "issue-2242",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:Demand",
             "schema:DeliveryChargeSpecification",
-            "schema:ActionAccessSpecification"
+            "schema:ActionAccessSpecification",
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:GeoShape",
+            "schema:Place",
             "schema:Text",
-            "schema:Place"
+            "schema:GeoShape"
          ]
       },
       "schema:requiresSubscription" : {
@@ -134,8 +139,8 @@
             "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Boolean",
-            "schema:MediaSubscription"
+            "schema:MediaSubscription",
+            "schema:Boolean"
          ]
       }
    }

@@ -1,5 +1,5 @@
 package Apache2::AuthCookie;
-$Apache2::AuthCookie::VERSION = '3.28';
+$Apache2::AuthCookie::VERSION = '3.29';
 # ABSTRACT: Perl Authentication and Authorization via cookies
 
 use strict;
@@ -118,7 +118,7 @@ Apache2::AuthCookie - Perl Authentication and Authorization via cookies
 
 =head1 VERSION
 
-version 3.28
+version 3.29
 
 =head1 SYNOPSIS
 
@@ -175,6 +175,14 @@ MethodHandlers, Authen, and Authz compiled in.
 
  # optional: enable decoding of httpd.conf "Requires" directives
  PerlSetVar WhatEverRequiresEncoding UTF-8
+
+ # optional: enforce that the destination argument from the login form is
+ # local to the server
+ PerlSetVar WhatEverEnforceLocalDestination 1
+
+ # optional: specify a default destination for when the destination argument
+ # of the login form is invalid or unspecified
+ PerlSetVar WhatEverDefaultDestination /protected/user/
 
  # These documents require user to be logged in.
  <Location /protected>

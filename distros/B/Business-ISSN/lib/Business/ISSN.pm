@@ -12,7 +12,7 @@ use Exporter qw(import);
 our @EXPORT    = qw();
 our @EXPORT_OK = qw(is_valid_checksum);
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 sub new {
 	my $class       = shift;

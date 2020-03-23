@@ -4,7 +4,7 @@
       "Sawyer X <xsawyerx@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "Log::Dispatch::Screen::Gentoo" : {
          "file" : "lib/Log/Dispatch/Screen/Gentoo.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,8 @@
          "web" : "https://github.com/xsawyerx/log-dispatch-screen-gentoo"
       }
    },
-   "version" : "0.002",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "0.003",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "JSON::XS version 4.02"
 }
 

@@ -1,5 +1,9 @@
 Revision history for Test-Warnings
 
+0.030     2020-03-21 16:56:30Z
+          - fix tests that can fail when there is already an installed module
+            named Foo::Bar::Baz (RT#132140)
+
 0.029     2020-03-14 05:27:59Z
           - new :report_warnings feature, for printing all of the (unexpected)
             warning content when had_no_warnings() is called (Tina Mueller, PR#10)

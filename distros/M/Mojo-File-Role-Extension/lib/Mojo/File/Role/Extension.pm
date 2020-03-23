@@ -3,7 +3,7 @@ package Mojo::File::Role::Extension;
 use Mojo::Base -role, -signatures;
 use Mojo::Collection 'c';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 requires 'path';
 

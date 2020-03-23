@@ -33,7 +33,7 @@ annex-to-annex-reinject - use 'git annex reinject' to redo annex-to-annex
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -135,6 +135,58 @@ method get_module_path {
 # private methods
 ##############################################################################
 
+method _get_table_name {
+
+	if ( $self->use_fq_table_names ) {
+		return $self->table->get_fq_name;
+	}
+
+	return $self->table->name;
+}
+
+#method _get_table_name (MySQL::Util::Lite::Table $table) {
+#
+#	if ( $self->use_fq_table_names ) {
+#		return $table->get_fq_name;
+#	}
+#
+#	my $parent_schema = $table->schema_name;
+#	my $child_schema  = $self->_get_schema_name;
+#
+#	if ( $parent_schema ne $child_schema ) {
+#
+#		# must fully qualify it
+#		return $table->get_fq_name;
+#	}
+#
+#	return $table->name;
+#}
+
+method _get_parent_table_name (Str :$schema_name!,
+						 	   Str :$table_name!) {
+
+	my $parent_fq_name = sprintf '%s.%s', $schema_name, $table_name;
+
+	if ( $self->use_fq_table_names ) {
+		return $parent_fq_name;
+	}
+
+	my $child_schema_name = $self->_get_schema_name;
+
+	if ( $schema_name ne $child_schema_name ) {
+
+		# must fully qualify it
+		return $parent_fq_name;
+	}
+
+	return $table_name;
+}
+
+method _get_schema_name {
+
+	return $self->table->schema_name;
+}
+
 method _get_use_modules {
 
 	my @use = (
@@ -313,8 +365,7 @@ method _get_method_insert {
 
 	return $self->method_maker->make_method(
 		name => 'insert',
-		sig =>
-		  $self->_get_method_sig( exclude_autoinc => 1 ),
+		sig  => $self->_get_method_sig( exclude_autoinc => 1 ),
 		body => $body
 	);
 }
@@ -430,18 +481,17 @@ method _get_table2alias_map {
 	my $num = 1;
 
 	my %map;
+	$map{ $self->_get_table_name } = 't' . $num;
 
-	$map{ $self->table->get_fq_name } = 't' . $num;
-
-	#$map{ $self->table->name } = 't' . $num;
 	$num++;
 
 	foreach my $t ( $self->table->get_parent_tables ) {
 
-		$map{ $t->get_fq_name } = 't' . $num;
-
-		#$map{ $t->name } = 't' . $num;
-
+		my $parent_table_name = $self->_get_parent_table_name(
+			schema_name => $t->schema_name,
+			table_name  => $t->name
+		);
+		$map{$parent_table_name} = 't' . $num;
 		$num++;
 	}
 
@@ -461,35 +511,42 @@ method _get_method_selectx {
 
 	foreach my $col ( $self->table->get_columns ) {
 		push @select, sprintf( "t1.%s", $col->name );
-		$arg2table{ $col->name } = $self->table->get_fq_name;
+		$arg2table{ $col->name } = $self->_get_table_name;
 	}
 
 	foreach my $t ( $self->table->get_parent_tables ) {
+		my $parent_table_name = $self->_get_parent_table_name(
+			schema_name => $t->schema_name,
+			table_name  => $t->name
+		);
+
 		foreach my $c ( $t->get_columns ) {
 			if ( !$arg2table{ $c->name } ) {
 				push @select,
-				  sprintf( "%s.%s", $table2alias{ $t->get_fq_name }, $c->name );
-				$arg2table{ $c->name } = $t->get_fq_name;
+				  sprintf( "%s.%s",
+					$table2alias{$parent_table_name}, $c->name );
+				$arg2table{ $c->name } = $parent_table_name;
 			}
 		}
 	}
 
-	my @from = ( sprintf( '%s %s', $self->table->get_fq_name, 't1' ) );
-
-	#my @from = ( sprintf( '%s %s', $self->table->name, 't1' ) );
+	my @from =
+	  ( sprintf( '%s %s', $self->_get_table_name, 't1' ) );
 
 	foreach my $fk ( $self->table->get_foreign_keys ) {
 		foreach my $con ( $fk->get_column_constraints ) {
 
-			my $con_parent_fq =
-			  $con->parent_schema_name . "." . $con->parent_table_name;
+			my $parent_table_name = $self->_get_parent_table_name(
+				schema_name => $con->parent_schema_name,
+				table_name  => $con->parent_table_name
+			);
 
 			push @from, 'left join';
 			push @from,
 			  sprintf(
 				"%s %s on (t1.%s = %s.%s)",
-				$con_parent_fq,    $table2alias{$con_parent_fq},
-				$con->column_name, $table2alias{$con_parent_fq},
+				$parent_table_name, $table2alias{$parent_table_name},
+				$con->column_name,  $table2alias{$parent_table_name},
 				$con->parent_column_name,
 			  );
 		}
@@ -565,7 +622,7 @@ method _get_method_selectx {
 
 method _sql_beautify (ArrayRef $sql) {
 
-	my $b = SQL::Beautify->new( query => join( "\n", @$sql ) );
+	my $b      = SQL::Beautify->new( query => join( "\n", @$sql ) );
 	my $pretty = $b->beautify;
 
 	my @indented;
@@ -597,9 +654,9 @@ method _get_method_get_id {
 					push @ak_cols, $ak_cols{$col_name};
 				}
 			}
-			
+
 			@ak_cols = uniq @ak_cols;
-			
+
 			my $sig = $self->_get_method_sig(
 				columns         => \@ak_cols,
 				exclude_autoinc => 1
@@ -643,7 +700,7 @@ method _get_method_sig_array (
 	  				    Bool :$want_order_by = 0,
 	MySQL::Util::Lite::Table :$table
 ) {
-	
+
 	if ( !$table ) {
 		$table = $self->table;
 	}
@@ -676,7 +733,7 @@ method _get_method_sig_array (
 		my $line = sprintf '    %s :%s%s', 'ArrayRef', '$', 'order_by';
 		push @sig, $line;
 	}
-	
+
 	return @sig;
 }
 

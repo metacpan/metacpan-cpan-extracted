@@ -1,0 +1,62 @@
+NAME
+
+    Mojolicious::Plugin::Config::Structured - Mojolicious Plugin for
+    Config::Structured: locates and reads config and definition files and
+    loads them into a Config::Structured instance, made available globally
+    as 'conf'
+
+VERSION
+
+    version 1.001
+
+SYNOPSIS
+
+      # For a full Mojo app
+      $self->plugin('Config::Structured' => {config_file => $filename});
+    
+      ...
+    
+      if ($c->conf->feature->enabled) {
+        ...
+      }
+    
+      say $c->conf->email->recipient->{some_feature};
+
+DESCRIPTION
+
+    Initializes Config::Structured from two files:
+
+    definition
+
+      pulled from $app_home/$moniker.conf.def
+
+    config_values
+
+      pulled from the first existent, readable file from:
+
+        config_file parameter value
+      
+        $app_home/$moniker.$mode.conf
+      
+        $app_home/$moniker.conf
+
+      These files are expected to contain perl hashref structures
+
+METHODS
+
+ conf()
+
+    Returns an Config::Structured instance initialized to the root of the
+    configuration definition
+
+AUTHOR
+
+    Mark Tyrrell <mtyrrell@concertpharma.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2019 by Concert Pharmaceuticals, Inc.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

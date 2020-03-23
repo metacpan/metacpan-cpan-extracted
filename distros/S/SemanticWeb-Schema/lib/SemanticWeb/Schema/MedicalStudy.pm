@@ -15,29 +15,13 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has health_condition => (
     is        => 'rw',
     predicate => '_has_health_condition',
     json_ld   => 'healthCondition',
-);
-
-
-
-has outcome => (
-    is        => 'rw',
-    predicate => '_has_outcome',
-    json_ld   => 'outcome',
-);
-
-
-
-has population => (
-    is        => 'rw',
-    predicate => '_has_population',
-    json_ld   => 'population',
 );
 
 
@@ -90,7 +74,7 @@ SemanticWeb::Schema::MedicalStudy - A medical study is an umbrella type covering
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -124,41 +108,6 @@ A health_condition should be one of the following types:
 =head2 C<_has_health_condition>
 
 A predicate for the L</health_condition> attribute.
-
-=head2 C<outcome>
-
-Expected or actual outcomes of the study.
-
-A outcome should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::MedicalEntity']>
-
-=item C<Str>
-
-=back
-
-=head2 C<_has_outcome>
-
-A predicate for the L</outcome> attribute.
-
-=head2 C<population>
-
-Any characteristics of the population used in the study, e.g. 'males under
-65'.
-
-A population should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
-=head2 C<_has_population>
-
-A predicate for the L</population> attribute.
 
 =head2 C<sponsor>
 

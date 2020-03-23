@@ -13,8 +13,8 @@
          "rdfs:label" : "healthPlanNetworkId",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : [
-            "schema:MedicalOrganization",
-            "schema:HealthPlanNetwork"
+            "schema:HealthPlanNetwork",
+            "schema:MedicalOrganization"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -34,10 +34,10 @@
          "rdfs:comment" : "A medical specialty of the provider.",
          "rdfs:label" : "medicalSpecialty",
          "schema:domainIncludes" : [
-            "schema:Hospital",
-            "schema:MedicalClinic",
+            "schema:MedicalOrganization",
             "schema:Physician",
-            "schema:MedicalOrganization"
+            "schema:Hospital",
+            "schema:MedicalClinic"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalSpecialty"

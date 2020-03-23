@@ -26,35 +26,40 @@
          "rdfs:comment" : "An entity that arranges for an exchange between a buyer and a seller.  In most cases a broker never acquires or releases ownership of a product or service involved in an exchange.  If it is not clear whether an entity is a broker, seller, or buyer, the latter two terms are preferred.",
          "rdfs:label" : "broker",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order",
             "schema:Reservation",
-            "schema:Service"
+            "schema:Service",
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:category" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1741",
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1741",
+            "https://github.com/schemaorg/schemaorg/issues/2490"
+         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.",
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:Product",
-            "schema:Recommendation",
-            "schema:PhysicalActivity",
             "schema:ActionAccessSpecification",
             "schema:Invoice",
-            "schema:Offer"
+            "schema:PhysicalActivity",
+            "schema:Offer",
+            "schema:URL",
+            "schema:Product",
+            "schema:SpecialAnnouncement",
+            "schema:Recommendation",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : [
+            "schema:Thing",
             "schema:PhysicalActivityCategory",
-            "schema:Text",
-            "schema:Thing"
+            "schema:Text"
          ]
       },
       "schema:confirmationNumber" : {
@@ -63,8 +68,8 @@
          "rdfs:label" : "confirmationNumber",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -73,12 +78,12 @@
          "rdfs:comment" : "Party placing the order or paying the invoice.",
          "rdfs:label" : "customer",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:minimumPaymentDue" : {
@@ -87,8 +92,8 @@
          "rdfs:label" : "minimumPaymentDue",
          "schema:domainIncludes" : "schema:Invoice",
          "schema:rangeIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount"
          ]
       },
       "schema:paymentDue" : {
@@ -96,8 +101,8 @@
          "rdfs:comment" : "The date that payment is due.",
          "rdfs:label" : "paymentDue",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:DateTime",
          "schema:supersededBy" : "schema:paymentDueDate"
@@ -111,8 +116,8 @@
             "schema:Order"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:paymentMethod" : {
@@ -120,8 +125,8 @@
          "rdfs:comment" : "The name of the credit card or other method of payment for the order.",
          "rdfs:label" : "paymentMethod",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:PaymentMethod"
       },
@@ -153,16 +158,16 @@
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:Invoice",
-            "schema:ParcelDelivery",
             "schema:Trip",
-            "schema:EducationalOccupationalProgram",
+            "schema:Reservation",
+            "schema:ParcelDelivery",
             "schema:Service",
-            "schema:CreativeWork",
-            "schema:Reservation"
+            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:referencesOrder" : {

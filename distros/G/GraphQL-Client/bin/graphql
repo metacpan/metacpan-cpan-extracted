@@ -10,7 +10,7 @@ use strict;
 
 use GraphQL::Client::CLI;
 
-our $VERSION = '0.602'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 GraphQL::Client::CLI->main(@ARGV);
 
@@ -26,14 +26,14 @@ graphql - Command-line GraphQL client
 
 =head1 VERSION
 
-version 0.602
+version 0.604
 
 =head1 SYNOPSIS
 
     graphql <URL> <QUERY> [ [--variables JSON] | [--variable KEY=VALUE]... ]
             [--operation-name NAME] [--transport KEY=VALUE]...
-            [--[no-]unpack] [--format json|json:pretty|yaml|perl|csv|tsv|table]
-            [--output FILE]
+            [--[no-]unpack] [--filter JSONPATH]
+            [--format json|json:pretty|yaml|perl|csv|tsv|table] [--output FILE]
 
     graphql --version|--help|--manual
 
@@ -138,9 +138,18 @@ By default, the response structure is printed as-is from the server, and the pro
 
 When unpack mode is enabled, if the response completes with no errors, only the data section of
 the response is printed and the program exits 0. If the response has errors, the whole response
-structure is printed as-is and the program exits 1.
+structure is printed as-is and the program exits 1. See L</EXAMPLES> to see what this looks like in
+practice.
 
-See L</EXAMPLES>.
+Use C<--no-unpack> to disable if unpack mode was enabled via C<GRAPHQL_CLIENT_OPTIONS>.
+
+=head2 C<--filter JSONPATH>
+
+Filter the response based on a L<JSONPath|JSON::Path/SYNOPSIS> expression.
+
+Requires L<JSON::Path>.
+
+Alias: C<-p>
 
 =head1 FORMAT
 

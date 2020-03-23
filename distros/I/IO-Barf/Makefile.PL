@@ -24,8 +24,8 @@ requires 'Scalar::Util' => 0;
 requires 'perl' => '5.6.2';
 resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=IO-Barf';
-resources 'homepage' => 'https://github.com/tupinek/IO-Barf';
-resources 'repository' => 'git://github.com/tupinek/IO-Barf';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/IO-Barf';
+resources 'repository' => 'git://github.com/michal-josef-spacek/IO-Barf';
 test_requires 'Digest' => 0;
 test_requires 'Digest::SHA' => 0;
 test_requires 'English' => 0;
@@ -37,7 +37,7 @@ test_requires 'IO::File' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

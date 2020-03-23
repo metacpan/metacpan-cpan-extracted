@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has application_deadline => (
@@ -90,6 +90,14 @@ has number_of_credits => (
 
 
 
+has occupational_category => (
+    is        => 'rw',
+    predicate => '_has_occupational_category',
+    json_ld   => 'occupationalCategory',
+);
+
+
+
 has occupational_credential_awarded => (
     is        => 'rw',
     predicate => '_has_occupational_credential_awarded',
@@ -110,6 +118,14 @@ has program_prerequisites => (
     is        => 'rw',
     predicate => '_has_program_prerequisites',
     json_ld   => 'programPrerequisites',
+);
+
+
+
+has program_type => (
+    is        => 'rw',
+    predicate => '_has_program_type',
+    json_ld   => 'programType',
 );
 
 
@@ -162,10 +178,10 @@ has time_of_day => (
 
 
 
-has time_to_complete => (
+has training_salary => (
     is        => 'rw',
-    predicate => '_has_time_to_complete',
-    json_ld   => 'timeToComplete',
+    predicate => '_has_training_salary',
+    json_ld   => 'trainingSalary',
 );
 
 
@@ -194,7 +210,7 @@ SemanticWeb::Schema::EducationalOccupationalProgram - A program offered by an in
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -386,6 +402,34 @@ A number_of_credits should be one of the following types:
 
 A predicate for the L</number_of_credits> attribute.
 
+=head2 C<occupational_category>
+
+C<occupationalCategory>
+
+=for html <p>A category describing the job, preferably using a term from a taxonomy
+such as <a href="http://www.onetcenter.org/taxonomy.html">BLS
+O*NET-SOC</a>, <a
+href="https://www.ilo.org/public/english/bureau/stat/isco/isco08/">ISCO-08<
+/a> or similar, with the property repeated for each applicable value.
+Ideally the taxonomy should be identified, and both the textual label and
+formal code for the category should be provided.<br/><br/> Note: for
+historical reasons, any textual label and formal code provided as a literal
+may be assumed to be from O*NET-SOC.<p>
+
+A occupational_category should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CategoryCode']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_occupational_category>
+
+A predicate for the L</occupational_category> attribute.
+
 =head2 C<occupational_credential_awarded>
 
 C<occupationalCredentialAwarded>
@@ -458,6 +502,27 @@ A program_prerequisites should be one of the following types:
 =head2 C<_has_program_prerequisites>
 
 A predicate for the L</program_prerequisites> attribute.
+
+=head2 C<program_type>
+
+C<programType>
+
+The type of educational or occupational program. For example, classroom,
+internship, alternance, etc..
+
+A program_type should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::DefinedTerm']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_program_type>
+
+A predicate for the L</program_type> attribute.
 
 =head2 C<provider>
 
@@ -575,23 +640,23 @@ A time_of_day should be one of the following types:
 
 A predicate for the L</time_of_day> attribute.
 
-=head2 C<time_to_complete>
+=head2 C<training_salary>
 
-C<timeToComplete>
+C<trainingSalary>
 
-The expected length of time to complete the program if attending full-time.
+The estimated salary earned while in the program.
 
-A time_to_complete should be one of the following types:
+A training_salary should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Duration']>
+=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmountDistribution']>
 
 =back
 
-=head2 C<_has_time_to_complete>
+=head2 C<_has_training_salary>
 
-A predicate for the L</time_to_complete> attribute.
+A predicate for the L</training_salary> attribute.
 
 =head2 C<typical_credits_per_term>
 

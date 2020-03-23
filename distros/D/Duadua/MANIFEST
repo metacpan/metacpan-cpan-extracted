@@ -17,6 +17,7 @@ lib/Duadua/Parser/Bot/Fastladder.pm
 lib/Duadua/Parser/Bot/Feedbin.pm
 lib/Duadua/Parser/Bot/Feedeen.pm
 lib/Duadua/Parser/Bot/Feedly.pm
+lib/Duadua/Parser/Bot/Feedspot.pm
 lib/Duadua/Parser/Bot/Googlebot.pm
 lib/Duadua/Parser/Bot/GooglebotAd.pm
 lib/Duadua/Parser/Bot/GooglebotMisc.pm
@@ -29,6 +30,7 @@ lib/Duadua/Parser/Bot/LetsEncrypt.pm
 lib/Duadua/Parser/Bot/MailRUBot.pm
 lib/Duadua/Parser/Bot/Msnbot.pm
 lib/Duadua/Parser/Bot/Netcraft.pm
+lib/Duadua/Parser/Bot/OldReader.pm
 lib/Duadua/Parser/Bot/OracleGrapeshotCrawler.pm
 lib/Duadua/Parser/Bot/Sakura.pm
 lib/Duadua/Parser/Bot/Slackbot.pm
@@ -46,6 +48,7 @@ lib/Duadua/Parser/Browser/MicrosoftInternetExplorer.pm
 lib/Duadua/Parser/Browser/MozillaFirefox.pm
 lib/Duadua/Parser/Browser/Opera.pm
 lib/Duadua/Parser/Browser/PaleMoon.pm
+lib/Duadua/Parser/Browser/SamsungInternetBrowser.pm
 lib/Duadua/Parser/Browser/UCBrowser.pm
 lib/Duadua/Parser/Browser/Vivaldi.pm
 lib/Duadua/Parser/Browser/Xiaomi.pm
@@ -78,6 +81,7 @@ t/testset/bot/fastladder.yaml
 t/testset/bot/feedbin.yaml
 t/testset/bot/feedeen.yaml
 t/testset/bot/feedly.yaml
+t/testset/bot/feedspot.yaml
 t/testset/bot/google_read.yaml
 t/testset/bot/googlebot.yaml
 t/testset/bot/googlebot_ad.yaml
@@ -90,6 +94,7 @@ t/testset/bot/letsencrypt.yaml
 t/testset/bot/mail_ru_bot.yaml
 t/testset/bot/msnbot.yaml
 t/testset/bot/netcraft.yaml
+t/testset/bot/oldreader.yaml
 t/testset/bot/oracle_grapeshotcrawler.yaml
 t/testset/bot/sakura.yaml
 t/testset/bot/slackbot.yaml
@@ -107,6 +112,7 @@ t/testset/browser/microsoft_internet_explorer.yaml
 t/testset/browser/mozilla_firefox.yaml
 t/testset/browser/opera.yaml
 t/testset/browser/palemoon.yaml
+t/testset/browser/samsung_browser.yaml
 t/testset/browser/uc_browser.yaml
 t/testset/browser/vivaldi.yaml
 t/testset/browser/xiaomi.yaml

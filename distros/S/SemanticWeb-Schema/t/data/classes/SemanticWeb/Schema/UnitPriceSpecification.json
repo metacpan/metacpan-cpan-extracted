@@ -25,8 +25,8 @@
       },
       "schema:referenceQuantity" : {
          "dc:source" : [
-            "schemadotorgsources:source_GoodRelationsTerms",
-            "schemadotorgsources:source_GoodRelationsProperties"
+            "schemadotorgsources:source_GoodRelationsProperties",
+            "schemadotorgsources:source_GoodRelationsTerms"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The reference quantity for which a certain price applies, e.g. 1 EUR per 4 kWh of electricity. This property is a replacement for unitOfMeasurement for the advanced cases where the price does not relate to a standard unit.",
@@ -41,13 +41,13 @@
          "rdfs:label" : "unitCode",
          "schema:domainIncludes" : [
             "schema:PropertyValue",
-            "schema:UnitPriceSpecification",
             "schema:TypeAndQuantityNode",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:UnitPriceSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:unitText" : {
@@ -55,9 +55,9 @@
          "rdfs:comment" : "A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for\n<a href='unitCode'>unitCode</a>.",
          "rdfs:label" : "unitText",
          "schema:domainIncludes" : [
+            "schema:TypeAndQuantityNode",
             "schema:PropertyValue",
             "schema:UnitPriceSpecification",
-            "schema:TypeAndQuantityNode",
             "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : "schema:Text"

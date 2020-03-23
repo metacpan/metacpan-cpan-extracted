@@ -132,7 +132,7 @@ my %WriteMakefileArgs = (
     "Test2::API" => "1.302096",
     "Test2::V0"  => "0.000060"
   },
-  "VERSION" => "2.15",
+  "VERSION" => "2.17",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -169,7 +169,7 @@ $WriteMakefileArgs{clean} = { FILES => ".tmp" };
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.036
 if ( do { use Config; $^O eq 'MSWin32' && $Config{ccname} eq 'cl' } ) {
-  requires( 'Win32::Vcpkg' => '0.02' );
+  requires( 'Win32::Vcpkg' => '0.04' );
 }
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

@@ -72,6 +72,7 @@ sub needed_output
 SELECT:
     while ( my @fds = $s->can_read(4) )
     {
+      my $had_output;
       foreach my $fd (@fds)
       {
         my $fileno = $fd->fileno;
@@ -81,6 +82,7 @@ SELECT:
           while ( my $line = $fd->getline )
           {
             note(" #$fd#$fileno# $line");
+            $had_output = 1;
           }
           next;
         }
@@ -92,6 +94,7 @@ SELECT:
         while ( my $line = $fd->getline )
         {
           note(" #$fd#$fileno# $line");
+          $had_output = 1;
 
           $result .= $line;
           chomp $line;
@@ -107,7 +110,10 @@ SELECT:
           }
           foreach my $key ( keys %$match )
           {
-            if ( $line =~ m/^ \Q$key\E/xms )
+            my $re = $key;
+            my $unanchored = $re =~ s[^/][];
+            $re = $unanchored ? qr/ \Q$re\E /xms : qr/^ \Q$re\E /xms;
+            if ( $line =~ $re )
             {
               ok( 1, delete $match->{$key} );
             }
@@ -120,7 +126,8 @@ SELECT:
         last SELECT;
       }
 
-      alarm 4;
+      alarm 4
+        if $had_output;
     }
     alarm 0;
   }

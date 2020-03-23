@@ -5,12 +5,11 @@ package App::Codeowners::Formatter::CSV;
 use warnings;
 use strict;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 use parent 'App::Codeowners::Formatter';
 
 use App::Codeowners::Util qw(stringify);
-use Encode qw(encode);
 
 sub start {
     my $self = shift;
@@ -22,7 +21,7 @@ sub stream {
     my $self    = shift;
     my $result  = shift;
 
-    $self->text_csv->print($self->handle, [map { encode('UTF-8', stringify($_)) } @$result]);
+    $self->text_csv->print($self->handle, [map { stringify($_) } @$result]);
 }
 
 
@@ -63,7 +62,7 @@ App::Codeowners::Formatter::CSV - Format codeowners output as comma-separated va
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 DESCRIPTION
 

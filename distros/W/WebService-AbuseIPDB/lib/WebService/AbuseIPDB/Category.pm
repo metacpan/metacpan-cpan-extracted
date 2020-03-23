@@ -21,6 +21,8 @@ use WebService::AbuseIPDB;
 our $VERSION = $WebService::AbuseIPDB::VERSION;
 
 my %by_id = (
+	1 	=> 'DNS Compromise',
+	2 	=> 'DNS Poisoning',
 	3 	=> 'Fraud Orders',
 	4 	=> 'DDoS Attack',
 	5 	=> 'FTP Brute-Force',

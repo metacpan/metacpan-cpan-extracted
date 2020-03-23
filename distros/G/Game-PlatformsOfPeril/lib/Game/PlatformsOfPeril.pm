@@ -28,7 +28,7 @@
 
 package Game::PlatformsOfPeril;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use 5.24.0;
 use warnings;
@@ -38,14 +38,16 @@ use List::Util qw(first);
 use List::UtilsBy 0.06 qw(nsort_by rev_nsort_by);
 use Scalar::Util qw(weaken);
 use Term::ReadKey qw(GetTerminalSize ReadKey ReadMode);
-use Time::HiRes qw(gettimeofday sleep tv_interval);
+use Time::HiRes qw(sleep);
 use POSIX qw(STDIN_FILENO TCIFLUSH tcflush);
 
 # ANSI or XTerm control sequences
 sub at              { "\e[" . $_[1] . ';' . $_[0] . 'H' }
+sub at_col          { "\e[" . $_[0] . 'G' }
 sub alt_screen ()   { "\e[?1049h" }
-sub clear_screen () { "\e[1;1H\e[2J" }
+sub clear_line ()   { "\e[2K" }
 sub clear_right ()  { "\e[K" }
+sub clear_screen () { "\e[1;1H\e[2J" }
 sub hide_cursor ()  { "\e[?25l" }
 sub hide_pointer () { "\e[>3p" }
 sub show_cursor ()  { "\e[?25h" }
@@ -162,6 +164,7 @@ our @Menagerie = (
     # and some not-plosives for reasons lost in the mists of time
     'Gruesome Goose',
     'Sinister Swan',
+    'Xenophobic Xarci',
 );
 $Monst_Name = $Menagerie[ rand @Menagerie ];
 
@@ -369,12 +372,13 @@ sub apply_gravity {
 }
 
 sub bad_terminal {
-    ($TCols, $TRows) = (GetTerminalSize * STDOUT)[ 0, 1 ];
+    ($TCols, $TRows) = (GetTerminalSize(*STDOUT))[ 0, 1 ];
     return (not defined $TCols or $TCols < MSG_COLS_MAX or $TRows < MSG_MAX);
 }
 
 sub bail_out {
     restore_term();
+    print "\n", at_col(0), clear_line;
     warn $_[0] if @_;
     game_over("Suddenly, the platforms collapse about you.");
 }
@@ -499,7 +503,7 @@ sub game_loop {
         apply_gravity();
         @Animates = grep { !$_->[BLACK_SPOT] } @Animates;
         redraw_movers() if @RedrawA;
-        next if $Animates[HERO][UPDATE]->() == MOVE_NEWLVL;
+        next            if $Animates[HERO][UPDATE]->() == MOVE_NEWLVL;
         track_hero();
         for my $ent (@Animates[ 1 .. $#Animates ]) {
             $ent->[UPDATE]->($ent) if !$ent->[BLACK_SPOT] and defined $ent->[UPDATE];
@@ -600,8 +604,8 @@ sub graph_shaft {
             if ($weight == 1) {
                 graph_udlink($g, $c, $x, $c, $r, 1, [ $c, $x ]);
             } else {
-                graph_udlink($g, $c, $x,     $c, $x + 1, 1,           [ $c, $x ]);
-                graph_udlink($g, $c, $x + 1, $c, $r,     $weight - 2, [ $c, $r ]);
+                graph_udlink($g, $c, $x, $c, $x + 1, 1, [ $c, $x ]);
+                graph_udlink($g, $c, $x + 1, $c, $r, $weight - 2, [ $c, $r ]);
             }
             last;
         }
@@ -613,8 +617,8 @@ sub graph_shaft {
                     and $LMap->[ $x + 1 ][ $c - 1 ][GROUND][WHAT] == WALL)
             )
         ) {
-            graph_udlink($g, $c - 1, $x, $c, $x, 1,           [ $c, $x ]);
-            graph_udlink($g, $c,     $x, $c, $r, $weight - 1, [ $c, $r ]);
+            graph_udlink($g, $c - 1, $x, $c, $x, 1, [ $c, $x ]);
+            graph_udlink($g, $c, $x, $c, $r, $weight - 1, [ $c, $r ]);
         }
         if ($c != COLS - 1
             and (
@@ -623,8 +627,8 @@ sub graph_shaft {
                     and $LMap->[ $x + 1 ][ $c + 1 ][GROUND][WHAT] == WALL)
             )
         ) {
-            graph_udlink($g, $c + 1, $x, $c, $x, $weight,     [ $c, $x ]);
-            graph_udlink($g, $c,     $x, $c, $r, $weight - 1, [ $c, $r ]);
+            graph_udlink($g, $c + 1, $x, $c, $x, $weight, [ $c, $x ]);
+            graph_udlink($g, $c, $x, $c, $r, $weight - 1, [ $c, $r ]);
         }
     }
 }
@@ -662,7 +666,7 @@ sub kill_animate {
 
 sub load_level {
     my $file = catfile($Level_Path, 'level' . $Level++);
-    game_over('No more levels.', 0) unless -e $file;
+    game_over('You have completed all the levels.', 0) unless -e $file;
 
     open(my $fh, '<', $file) or game_over("Failed to open '$file': $!");
 
@@ -804,11 +808,7 @@ sub move_nop { return MOVE_OK }
 
 sub move_player {
     my ($cols, $rows) = @_;
-    return sub {
-        my ($status, $msg) = move_animate($Animates[HERO], $cols, $rows);
-        post_message($msg) if $msg;
-        return $status;
-    };
+    sub { move_animate($Animates[HERO], $cols, $rows) }
 }
 
 sub post_help {
@@ -968,11 +968,10 @@ sub update_hero {
         while (1) {
             $key = ReadKey(0);
             last if exists $Key_Commands{$key};
-            post_message(sprintf "Illegal command \\%03o", ord $key);
+            #post_message(sprintf "Illegal command \\%03o", ord $key);
         }
-        ($ret, my $msg) = $Key_Commands{$key}->();
-        post_message($msg) if defined $msg;
-        last if $ret == MOVE_OK or $ret == MOVE_NEWLVL;
+        $ret = $Key_Commands{$key}->();
+        last if $ret != MOVE_FAILED;
     }
     return $ret;
 }
@@ -1133,6 +1132,8 @@ bombs are from Bomberman but behave more like animate-sensing landmines.
 One idea is that a gem plus a bomb could make a smartbomb which, being
 smart, tracks the player. However bombs lack limbs so have trouble with
 the ladders, and that idea is otherwise presently tied up in committee.
+
+L<Game::Xomb> - 7DRL 2020 based on this module's code.
 
 L<Game::TextPatterns> may help draw candidate level maps:
 

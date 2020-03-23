@@ -33,7 +33,7 @@ annex-to-annex - use hardlinks to migrate files between git annex repos
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -73,7 +73,7 @@ my %WriteMakefileArgs = (
     "Test2::Plugin::DieOnFail" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.026",
+  "VERSION" => "0.027",
   "test" => {
     "TESTS" => "t/*.t"
   }

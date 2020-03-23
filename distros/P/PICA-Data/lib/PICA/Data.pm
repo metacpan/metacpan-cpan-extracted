@@ -2,7 +2,7 @@ package PICA::Data;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct

@@ -1,0 +1,9 @@
+- ua: 'Mozilla/5.0 (compatible; Feedspot/1.0 (+https://www.feedspot.com/fs/fetcher; like FeedFetcher-Google)'
+  name: 'Feedspot'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'

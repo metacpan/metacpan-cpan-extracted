@@ -17,7 +17,7 @@ use Sub::Util 'subname', 'set_subname';
 use namespace::clean;
 
 # ABSTRACT: Compile a parse tree into perl code
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 *_clean_eval= *Language::FormulaEngine::Compiler::_CleanEval::_clean_eval;
 
@@ -171,7 +171,7 @@ Language::FormulaEngine::Compiler - Compile a parse tree into perl code
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -258,7 +258,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2020 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

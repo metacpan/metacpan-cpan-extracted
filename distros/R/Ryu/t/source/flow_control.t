@@ -6,17 +6,23 @@ use Test::Fatal;
 use Ryu;
 
 subtest 'simple pair pause/resume' => sub {
-    my $first = new_ok('Ryu::Node');
+    my $first = new_ok('Ryu::Node' => [
+        new_future => sub { Future->new },
+    ]);
     my $second = new_ok('Ryu::Node' => [
-        parent => $first
+        parent => $first,
+        new_future => sub { Future->new },
     ]);
     ok(!$first->is_paused, 'starts off active (not paused)');
+    ok($first->unblocked->is_done, '->unblocked is ok');
     ok(!$second->is_paused, 'starts off active (not paused)');
     is(exception {
         $first->pause;
     }, undef, 'can pause without issues');
     ok($first->is_paused, 'after pausing, ->is_paused is true');
+    ok(!$first->unblocked->is_ready, '->unblocked is ok');
     ok(!$second->is_paused, '... but child is not affected');
+    ok($second->unblocked->is_ready, '->unblocked is ok');
     is(exception {
         $first->resume
     }, undef, 'can resume without issues');

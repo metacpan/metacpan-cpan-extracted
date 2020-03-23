@@ -57,7 +57,7 @@ subtest 'POST request' => sub {
 
     is($req->[0], 'POST', 'method is POST');
     is($req->[2]{content}, '{"query":"{hello}"}', 'encoded body as JSON');
-    is($req->[2]{headers}{'content-type'}, 'application/json', 'set content-type to json');
+    is($req->[2]{headers}{'content-type'}, 'application/json;charset=UTF-8', 'set content-type to json');
 };
 
 subtest 'GET request' => sub {

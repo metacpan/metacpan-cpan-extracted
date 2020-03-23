@@ -1,5 +1,15 @@
 Revision history for Acme-Affinity
 
+0.0109 2020-03-22 00:08:27
+    - Improved the eg/q_and_a program.
+
+0.0108 2020-03-21 23:45:08
+    - Improve documentation.
+    - Add the eg/q_and_a program to illustrate how this module might be used.
+
+0.0107 2020-03-21 21:26:22
+    - Improve documentation.
+
 0.0106 2020-02-14 16:04:06
     - Remove accidental eg file.
 

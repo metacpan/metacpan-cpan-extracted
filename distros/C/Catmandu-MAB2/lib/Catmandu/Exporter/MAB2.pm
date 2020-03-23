@@ -1,6 +1,6 @@
 package Catmandu::Exporter::MAB2;
 
-our $VERSION = '0.22';
+our $VERSION = '0.24';
 
 use Catmandu::Sane;
 use MAB2::Writer::Disk;

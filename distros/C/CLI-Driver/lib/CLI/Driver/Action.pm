@@ -165,9 +165,6 @@ method _new_class {
     load $class_name;
     my $obj = $class_name->new(%attr);
 
-    #
-    # validate soft attrs are populated
-    #
     my @soft_req = $class->find_req_attrs( hard => 0, soft => 1 );
 
     foreach my $opt (@soft_req) {
@@ -178,7 +175,7 @@ method _new_class {
             confess "failed to determine $attr";
         }
     }
-
+    
     return $obj;
 }
 

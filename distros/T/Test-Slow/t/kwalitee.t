@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 use Test::More;
 
 if (not $ENV{TEST_AUTHOR}) {

@@ -1,0 +1,9 @@
+{
+    'scan_on'                => { 'table_name' => 'ws_catalog_product' },
+    'estimated_startup_cost' => '0',
+    'estimated_rows'         => '783',
+    'type'                   => 'Seq Scan',
+    'estimated_total_cost'   => '19.83',
+    'estimated_row_width'    => '42',
+    'is_analyzed'            => 0,
+}

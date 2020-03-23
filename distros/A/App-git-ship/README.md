@@ -4,11 +4,11 @@ App::git::ship - Git command for shipping your project
 
 # VERSION
 
-0.35
+0.36
 
 # SYNOPSIS
 
-See ["SYNOPSIS" in App::git::ship::perl](https://metacpan.org/pod/App::git::ship::perl#SYNOPSIS) for how to build Perl projects.
+See ["SYNOPSIS" in App::git::ship::perl](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship%3A%3Aperl#SYNOPSIS) for how to build Perl projects.
 
 Below is a list of useful git aliases:
 
@@ -24,20 +24,20 @@ Below is a list of useful git aliases:
 
 # DESCRIPTION
 
-[App::git::ship](https://metacpan.org/pod/App::git::ship) is a [git](http://git-scm.com/) command for building and
+[App::git::ship](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship) is a [git](http://git-scm.com/) command for building and
 shipping your project.
 
 The main focus is to automate away the boring steps, but at the same time not
 get in your (or any random contributor's) way. Problems should be solved with
 sane defaults according to standard rules instead of enforcing more rules.
 
-[App::git::ship](https://metacpan.org/pod/App::git::ship) differs from other tools like [dzil](https://metacpan.org/pod/Dist::Zilla) by _NOT_
+[App::git::ship](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship) differs from other tools like [dzil](https://metacpan.org/pod/Dist%3A%3AZilla) by _NOT_
 requiring any configuration except for a file containing the credentials for
 uploading to CPAN.
 
 ## Supported project types
 
-Currently, only [App::git::ship::perl](https://metacpan.org/pod/App::git::ship::perl) is supported.
+Currently, only [App::git::ship::perl](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship%3A%3Aperl) is supported.
 
 # ENVIRONMENT VARIABLES
 
@@ -52,7 +52,7 @@ Any of the keys are the lower case version of ["ENVIRONMENT VARIABLES"](#environ
 without the "GIT\_SHIP\_" prefix.
 
 Note however that all environment variables are optional, and in many cases
-[App::git::ship](https://metacpan.org/pod/App::git::ship) will simply do the right thing, without any configuration.
+[App::git::ship](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship) will simply do the right thing, without any configuration.
 
 ## GIT\_SHIP\_AFTER\_SHIP
 
@@ -83,8 +83,8 @@ URL to the bugtracker for this project.
 
 This class is used to build the object that runs all the actions on your
 project. This is autodetected by looking at the structure and files in
-your project. For now this value can be [App::git::ship](https://metacpan.org/pod/App::git::ship) or
-[App::git::ship::perl](https://metacpan.org/pod/App::git::ship::perl), but any customization is allowed.
+your project. For now this value can be [App::git::ship](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship) or
+[App::git::ship::perl](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship%3A%3Aperl), but any customization is allowed.
 
 ## GIT\_SHIP\_CONTRIBUTORS
 
@@ -108,8 +108,8 @@ Setting this variable will make "git ship" output less information.
 
 # METHODS
 
-These methods are interesting in case you want to extend [App::git::ship](https://metacpan.org/pod/App::git::ship) with
-your own functionality. [App::git::ship::perl](https://metacpan.org/pod/App::git::ship::perl) does exactly this.
+These methods are interesting in case you want to extend [App::git::ship](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship) with
+your own functionality. [App::git::ship::perl](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship%3A%3Aperl) does exactly this.
 
 ## abort
 
@@ -129,13 +129,13 @@ Needs to be overridden in the subclass.
 
     $bool = $class->can_handle_project($file);
 
-This method is called by ["detect" in App::git::ship](https://metacpan.org/pod/App::git::ship#detect) and should return boolean
+This method is called by ["detect" in App::git::ship](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship#detect) and should return boolean
 true if this module can handle the given git project.
 
 This is a class method which gets a file as input to detect or have to
 auto-detect from current working directory.
 
-All the modules in the [App::git::ship](https://metacpan.org/pod/App::git::ship) namespace will be loaded and asked if
+All the modules in the [App::git::ship](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship) namespace will be loaded and asked if
 they can handle the given project you are in or trying to create.
 
 ## config
@@ -154,16 +154,16 @@ settings in `.ship.conf` has priority.
     $class = $ship->detect;
     $class = $ship->detect($file);
 
-Will detect the sub class in the [App::git::ship::perl](https://metacpan.org/pod/App::git::ship::perl) namespace which can be
+Will detect the sub class in the [App::git::ship::perl](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship%3A%3Aperl) namespace which can be
 used to handle a project. Will first check ["GIT\_SHIP\_CLASS"](#git_ship_class) or call
-["can\_handle\_project"](#can_handle_project) on all the classes in the [App::git::ship::perl](https://metacpan.org/pod/App::git::ship::perl)
+["can\_handle\_project"](#can_handle_project) on all the classes in the [App::git::ship::perl](https://metacpan.org/pod/App%3A%3Agit%3A%3Aship%3A%3Aperl)
 namespace if not.
 
 ## dump
 
     $str = $ship->dump($any);
 
-Will serialize `$any` into a perl data structure, using [Data::Dumper](https://metacpan.org/pod/Data::Dumper).
+Will serialize `$any` into a perl data structure, using [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper).
 
 ## new
 
@@ -211,7 +211,7 @@ Same as perl's `system()`, but provides error handling and logging.
 
 # SEE ALSO
 
-- [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla)
+- [Dist::Zilla](https://metacpan.org/pod/Dist%3A%3AZilla)
 
     This project can probably get you to the moon.
 

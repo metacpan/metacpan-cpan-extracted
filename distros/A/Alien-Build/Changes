@@ -1,5 +1,13 @@
 Revision history for Alien-Build
 
+2.17      2020-03-19 21:03:39 -0600
+  - Production release identical to 2.16_01
+
+2.16_01   2020-03-17 13:56:13 -0600
+  - Probe::Vcpkg adds include property (gh#184)
+  - Build::Autoconf will now copy .dll files from bin to dynamic
+    directory on MSWin32 (gh#183)
+
 2.15      2020-03-16 06:53:31 -0600
   - Tests on Windows will use the system temp directory rather than
     a temp directory under the install directory. A temp directory

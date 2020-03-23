@@ -1,5 +1,15 @@
 Revision history for Pg-Explain
 
+0.96    2020/03/23
+        - Performance optimizations
+        - Fix handling of certains misaligned plans
+        - Fix heuristics to detect JSON plans
+        - Fix some errors in parsing plans
+
+0.95    2020/03/16
+        - Add parsing/anonymization of Tid Scans,
+        per gripe from Chris West.
+
 0.94    2020/03/16
         - Add initial handling of plans with hard line wraps.
 

@@ -15,21 +15,13 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has arterial_branch => (
     is        => 'rw',
     predicate => '_has_arterial_branch',
     json_ld   => 'arterialBranch',
-);
-
-
-
-has source => (
-    is        => 'rw',
-    predicate => '_has_source',
-    json_ld   => 'source',
 );
 
 
@@ -58,7 +50,7 @@ SemanticWeb::Schema::Artery - A type of blood vessel that specifically carries b
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -83,22 +75,6 @@ A arterial_branch should be one of the following types:
 =head2 C<_has_arterial_branch>
 
 A predicate for the L</arterial_branch> attribute.
-
-=head2 C<source>
-
-The anatomical or organ system that the artery originates from.
-
-A source should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::AnatomicalStructure']>
-
-=back
-
-=head2 C<_has_source>
-
-A predicate for the L</source> attribute.
 
 =head2 C<supply_to>
 

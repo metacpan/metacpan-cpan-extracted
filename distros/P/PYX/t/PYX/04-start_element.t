@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use PYX qw(start_element);
 use Test::More 'tests' => 6;
 use Test::NoWarnings;

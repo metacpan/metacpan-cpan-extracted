@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the Hooktheory API
 
-our $VERSION = '0.0406';
+our $VERSION = '0.0407';
 
 use Moo;
 use strictures 2;
@@ -121,7 +121,7 @@ WebService::Hooktheory - Access to the Hooktheory API
 
 =head1 VERSION
 
-version 0.0406
+version 0.0407
 
 =head1 SYNOPSIS
 
@@ -166,12 +166,7 @@ The user agent.
 
 Create a new C<WebService::Hooktheory> object.
 
-=head2 BUILD()
-
-Authenticate and set the B<activkey> attribute if given a valid username and
-password.
-
-Skip this step if given an B<activkey> in the constructor.
+=for Pod::Coverage BUILD
 
 =head2 fetch()
 

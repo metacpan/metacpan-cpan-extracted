@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "GraphQL::Client",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Encode" => 0,
     "Getopt::Long" => "2.39",
     "HTTP::AnyUA" => 0,
     "HTTP::AnyUA::Util" => 0,
@@ -47,7 +48,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.602",
+  "VERSION" => "0.604",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Encode" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "FindBin" => 0,

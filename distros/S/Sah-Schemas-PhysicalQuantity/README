@@ -1,0 +1,43 @@
+NAME
+    Sah::Schemas::PhysicalQuantity - Various Sah schemas to represent
+    physical quantities (length/distance, mass, etc)
+
+VERSION
+    This document describes version 0.001 of Sah::Schemas::PhysicalQuantity
+    (from Perl distribution Sah-Schemas-PhysicalQuantity), released on
+    2020-03-11.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sah-Schemas-PhysicalQuantity>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sah-Schemas-PhysicalQuantity>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-PhysicalQ
+    uantity>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah - specification
+
+    Data::Sah
+
+    Physics::Unit - the backend
+
+    MooseX::Types::NumUnit
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

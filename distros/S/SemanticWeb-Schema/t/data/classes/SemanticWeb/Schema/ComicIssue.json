@@ -14,9 +14,9 @@
          "rdfs:label" : "artist",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicIssue",
             "schema:ComicStory",
-            "schema:VisualArtwork"
+            "schema:VisualArtwork",
+            "schema:ComicIssue"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -27,9 +27,9 @@
          "rdfs:label" : "colorist",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicStory",
             "schema:ComicIssue",
-            "schema:VisualArtwork"
+            "schema:VisualArtwork",
+            "schema:ComicStory"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -41,8 +41,8 @@
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
             "schema:VisualArtwork",
-            "schema:ComicIssue",
-            "schema:ComicStory"
+            "schema:ComicStory",
+            "schema:ComicIssue"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -53,8 +53,8 @@
          "rdfs:label" : "letterer",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:VisualArtwork",
             "schema:ComicIssue",
+            "schema:VisualArtwork",
             "schema:ComicStory"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
@@ -66,9 +66,9 @@
          "rdfs:label" : "penciler",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
+            "schema:ComicStory",
             "schema:ComicIssue",
-            "schema:VisualArtwork",
-            "schema:ComicStory"
+            "schema:VisualArtwork"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"

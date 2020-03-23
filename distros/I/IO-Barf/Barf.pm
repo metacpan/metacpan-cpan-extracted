@@ -11,8 +11,7 @@ use Scalar::Util qw(blessed);
 # Constants.
 Readonly::Array our @EXPORT => qw(barf);
 
-# Version.
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Barf content to file.
 sub barf {
@@ -59,6 +58,7 @@ IO::Barf - Barfing content to output file.
 =head1 SYNOPSIS
 
  use IO::Barf qw(barf);
+
  barf($file_or_handler, 'CONTENT');
 
 =head1 SUBROUTINES
@@ -253,7 +253,7 @@ Implements the Perl 6 'slurp' built-in
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/IO-Barf>
+L<https://github.com/michal-josef-spacek/IO-Barf>
 
 =head1 AUTHOR
 
@@ -263,11 +263,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2009-2020 Michal Josef Špaček
- BSD 2-Clause License
+© 2009-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

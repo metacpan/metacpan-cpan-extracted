@@ -13,8 +13,8 @@
          "rdfs:comment" : "A possible complication and/or side effect of this therapy. If it is known that an adverse outcome is serious (resulting in death, disability, or permanent damage; requiring hospitalization; or is otherwise life-threatening or requires immediate medical attention), tag it as a seriouseAdverseOutcome instead.",
          "rdfs:label" : "adverseOutcome",
          "schema:domainIncludes" : [
-            "schema:TherapeuticProcedure",
-            "schema:MedicalDevice"
+            "schema:MedicalDevice",
+            "schema:TherapeuticProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalEntity"
@@ -24,8 +24,8 @@
          "rdfs:comment" : "A dosing schedule for the drug for a given population, either observed, recommended, or maximum dose based on the type used.",
          "rdfs:label" : "doseSchedule",
          "schema:domainIncludes" : [
-            "schema:TherapeuticProcedure",
-            "schema:Drug"
+            "schema:Drug",
+            "schema:TherapeuticProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:DoseSchedule"
@@ -35,25 +35,13 @@
          "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
             "schema:Patient",
+            "schema:TherapeuticProcedure",
             "schema:DrugClass",
-            "schema:TherapeuticProcedure"
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"
-      },
-      "schema:indication" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A factor that indicates use of this therapy for treatment and/or prevention of a condition, symptom, etc. For therapies such as drugs, indications can include both officially-approved indications as well as off-label uses. These can be distinguished by using the ApprovedIndication subtype of MedicalIndication.",
-         "rdfs:label" : "indication",
-         "schema:domainIncludes" : [
-            "schema:MedicalProcedure",
-            "schema:TherapeuticProcedure",
-            "schema:MedicalDevice"
-         ],
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:MedicalIndication"
       }
    }
 }

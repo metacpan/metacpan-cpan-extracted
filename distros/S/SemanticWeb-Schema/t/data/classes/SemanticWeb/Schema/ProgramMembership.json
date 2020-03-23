@@ -23,8 +23,8 @@
          ],
          "schema:inverseOf" : "schema:memberOf",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:members" : {
@@ -32,12 +32,12 @@
          "rdfs:comment" : "A member of this organization.",
          "rdfs:label" : "members",
          "schema:domainIncludes" : [
-            "schema:ProgramMembership",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:ProgramMembership"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ],
          "schema:supersededBy" : "schema:member"
       },
@@ -57,8 +57,8 @@
          "schema:domainIncludes" : "schema:ProgramMembership",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:programName" : {

@@ -21,11 +21,12 @@ no_index:
     - t
     - inc
 requires:
+  Data::DPath: '0'
   Digest::MD5: '0'
   IO::Scalar: '0'
   Parse::RecDescent: '0'
   perl: '5.01'
 resources:
   repository: https://github.com/kenneth-olwing/Grep-Query.git
-version: '1.010'
+version: '1.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

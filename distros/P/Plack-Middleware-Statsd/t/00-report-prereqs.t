@@ -60,7 +60,7 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
-
+  Plack
 );
 
 my @exclude = qw(

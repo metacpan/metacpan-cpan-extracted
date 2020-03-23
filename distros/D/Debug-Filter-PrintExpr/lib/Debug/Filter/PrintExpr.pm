@@ -4,31 +4,24 @@ use strict;
 use warnings;
  
 use 5.010;
-use Exporter::Tiny;
 use Filter::Simple;
 use Scalar::Util qw(isdual blessed);
 use List::Util 'pairs';
 use Data::Dumper;
+use B qw(svref_2object SVf_IOK SVp_IOK SVf_NOK SVp_NOK);
 
 our
-$VERSION = '0.18';
-
-our @EXPORT_OK = qw(isnumeric isstring);
-our @ISA = qw(Exporter::Tiny);
-our %EXPORT_TAGS = (
-	debug => [],
-	nofilter => [],
-	all	=> [qw(isnumeric isstring)],
-);
-
-require XSLoader;
-XSLoader::load('Debug::Filter::PrintExpr', $VERSION);
-
-# Make Exporter::Tiny::import ours, so this will be called by Filter::Simple
-BEGIN {*import = \&Exporter::Tiny::import;}
+$VERSION = '0.19';
 
 # variable is exposed and my be overwritten by caller
 our $handle = *STDERR;
+
+# helper function: tests if given variable has data
+# in it's "numeric slot"
+sub _isnumeric {
+	return svref_2object(\$_[0])->FLAGS & 
+		(SVf_IOK | SVp_IOK | SVf_NOK | SVp_NOK);
+}
 
 # generate a prefix containing line number or custom label
 # consume first three args, return number of printed chars
@@ -45,7 +38,7 @@ sub _genprefix {
 sub _singlevalue {
 	my ($val, $str, $num) = shift;
 	my $isdual = isdual($val);
-	my $isnumeric = isnumeric($val);
+	my $isnumeric = _isnumeric($val);
 	$str = "$val" if defined $val;
 	$num = $val + 0 if $isnumeric;
 	if (!defined $val) {
@@ -157,14 +150,8 @@ sub _gen_print {
 # source code processing happens here
 FILTER {
 	my ($self, @args) = @_;
-	my ($nofilter, $debug);
-	if (ref($_[1]) eq 'HASH') {
-		my $global = $_[1];
-		$debug = $global->{debug};
-		$nofilter = $global->{nofilter};
-	}
+	my $debug;
 	$debug ||= grep /^-debug$/, @args;
-	$nofilter ||= grep /^-nofilter$/, @args;
 	s/
 		^\h*+\#
 		(?<type>[%@\$\\#"])
@@ -173,8 +160,7 @@ FILTER {
 		\h*+
 		(?<expr>\V*[^\s])?\h*
 		\}\h*+\r?$
-	/ _gen_print($+{type}, $+{label}, $+{expr}) /gmex
-		unless $nofilter;
+	/ _gen_print($+{type}, $+{label}, $+{expr}) /gmex;
 	print STDERR if $debug;
 };
 
@@ -250,7 +236,7 @@ disabling it partially by
 
 	no Debug::Filter::PrintExpr;
 
-or making the usage conditional (e.g. on an environment variable)
+or making the usage conditional (e.g. on environment variable DEBUG)
 by
 
 	use if $ENV{DEBUG}, 'Debug::Filter::PrintExpr';
@@ -397,56 +383,14 @@ about a useless use of something in void context.
 =head2 Usage
 
 The C<use> statement for C<Debug::Filter::PrintExpr> may contain
-arguments as described in L<Exporter::Tiny::Manual::Importing>.
-Importable functions are C<isnumeric> and C<isstring> as well
-as the import tag C<:all> for both of them.
-
-The (optional) global options hash may contain
-these module specific entries:
+following arguments:
 
 =over 4
 
-=item debug => 1
+=item -debug
 
 This option causes the resulting source code after comment
 transformation to be written to C<STDERR>.
-This option may also be specified as C<-debug> in the
-C<use> statement.
-
-=item nofilter => 1
-
-This options disables source code filtering if only the import
-of functions is desired.
-This option may also be specified as C<-nofilter> in the
-C<use> statement.
-
-=back
-
-=head2 Functions
-
-=over
-
-=item C<isstring(I<$var>)>
-
-This function returns true if the "string slot" of I<$var> has a value.
-This is the case when a string value was assigned to the variable,
-the variable has been used (recently) in a string context
-or when the variable is dual-valued.
-
-It will return false for undefined variables, references and
-variables with a numeric value that have never been used in a
-string context.
-
-=item C<isnumeric(I<$var>)>
-
-This function returns true if the "numeric slot" if I<$var> has a
-value.
-This is the case when a numeric value (integer or floating point) was
-assigned to the variable, the variable has been used (recently) in a
-numeric context or when the variable is dual-valued.
-
-It will return false for undefined variables, references and variables
-with a string value that have never been used in numeric context.
 
 =back
 
@@ -461,7 +405,6 @@ printing the generated output.
 The default is STDERR and may be changed by the caller.
 
 =back
-
 
 =head1 SEE ALSO
 
@@ -511,10 +454,6 @@ and a specific context is not enforced by the module.
 
 All in all, the module presented here is not much more than a
 programming exercise.
-
-Importing the functions C<isstring> and C<isnumeric> is done
-by L<Exporter::Tiny>.
-For extended options see L<Exporter::Tiny::Manual::Importing>.
 
 Other related modules: L<Scalar::Util>, L<Data::Dumper>
 

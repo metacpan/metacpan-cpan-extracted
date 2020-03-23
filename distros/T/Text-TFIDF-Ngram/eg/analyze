@@ -36,7 +36,6 @@ pod2usage(1) if $opts{help} || !$opts{dir};
 pod2usage( -exitval => 0, -verbose => 2 ) if $opts{man};
 
 my @files;
-
 for my $dir ( @{ $opts{dir} } ) {
     push @files, File::Find::Rule->file()->name( '*.' . $opts{type} )->in($dir);
 }

@@ -1,0 +1,4 @@
+[SQL] EXPLAIN select * from ws_catalog_product
+
+Seq Scan on ws_catalog_product  (cost=0.00..19.83 rows=783 width=42)
+Time: 0.016s

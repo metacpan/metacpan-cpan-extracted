@@ -1,7 +1,7 @@
 package colorize::stderr;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-03-21'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -37,7 +37,7 @@ colorize::stderr - Colorize STDERR
 
 =head1 VERSION
 
-This document describes version 0.001 of colorize::stderr (from Perl distribution colorize-stderr), released on 2017-07-10.
+This document describes version 0.002 of colorize::stderr (from Perl distribution colorize-stderr), released on 2020-03-21.
 
 =head1 SYNOPSIS
 
@@ -48,6 +48,11 @@ If you want to customize color:
 
  use colorize::stderr 'red on_white';
  warn "blah!";
+
+Use in command-line, nifty for debugging (making it easy to notice whether an
+output to terminal is to STDOUT or STDERR):
+
+ % perl -Mcolorize::stderr ...
 
 =head1 DESCRIPTION
 
@@ -102,7 +107,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

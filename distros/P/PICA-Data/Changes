@@ -1,5 +1,11 @@
 Revision history for PICA::Data
 
+1.05  2020-03-23 10:59:47 CET
+    - fix version numbers
+
+1.04  2020-03-23 10:47:47 CET
+    - remove faulty sorting from PICA::Writer modules
+
 1.03  2020-02-11 12:47:52 CET
     - Fix zero items/holdings bug
     - Add pica-validate command line script

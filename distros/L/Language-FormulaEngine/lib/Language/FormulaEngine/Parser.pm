@@ -8,7 +8,7 @@ use Language::FormulaEngine::Parser::ContextUtil
 use namespace::clean;
 
 # ABSTRACT: Create parse tree from an input string
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 has parse_tree   => ( is => 'rw' );
@@ -46,22 +46,11 @@ sub reset {
 	$self;
 }
 
-sub _str_escape {
-	my $str= shift;
-	$str =~ s/'/''/g;
-	"'$str'";
-}
-
 
 sub deparse {
 	my ($self, $node)= @_;
-	$node ||= $self->parse_tree;
-	return _str_escape($node->string_value) if $node->can('string_value');
-	return $node->number_value if $node->can('number_value');
-	return $node->symbol_name if $node->can('symbol_name');
-	return $node->function_name . (@{$node->parameters}? '( ' .join(', ', map $self->deparse($_), @{$node->parameters}). ' )' : '()')
-		if $node->can('function_name');
-	croak "Don't know how to deparse node type ".ref($node);
+	$node= $self->parse_tree unless @_ > 1;
+	$node->deparse($self);
 }
 
 
@@ -327,6 +316,13 @@ sub Language::FormulaEngine::Parser::Node::Call::evaluate {
 	my ($self, $namespace)= @_;
 	$namespace->evaluate_call($self);
 }
+sub Language::FormulaEngine::Parser::Node::Call::deparse {
+	my ($node, $parser)= @_;
+	return $node->function_name . (
+		!@{$node->parameters}? '()'
+		: '( ' .join(', ', map $parser->deparse($_), @{$node->parameters}). ' )'
+	)
+}
 
 sub new_call {
 	my ($self, $fn, $params)= @_;
@@ -340,6 +336,9 @@ sub Language::FormulaEngine::Parser::Node::Symbol::evaluate {
 	my ($self, $namespace)= @_;
 	$namespace->get_value($$self);
 }
+sub Language::FormulaEngine::Parser::Node::Symbol::deparse {
+	shift->symbol_name;
+}
 
 sub new_symbol  {
 	my ($self, $name)= @_;
@@ -350,6 +349,14 @@ sub new_symbol  {
 
 sub Language::FormulaEngine::Parser::Node::String::string_value { ${$_[0]} }
 sub Language::FormulaEngine::Parser::Node::String::evaluate { ${$_[0]} }
+sub _str_escape {
+	my $str= shift;
+	$str =~ s/'/''/g;
+	"'$str'";
+}
+sub Language::FormulaEngine::Parser::Node::String::deparse {
+	_str_escape(shift->string_value);
+}
 
 sub new_string {
 	my ($self, $text)= @_;
@@ -359,6 +366,7 @@ sub new_string {
 
 sub Language::FormulaEngine::Parser::Node::Number::number_value { ${$_[0]} }
 sub Language::FormulaEngine::Parser::Node::Number::evaluate { ${$_[0]} }
+sub Language::FormulaEngine::Parser::Node::Number::deparse { shift->number_value }
 
 sub new_number {
 	my $value= $_[1]+0;
@@ -387,7 +395,7 @@ Language::FormulaEngine::Parser - Create parse tree from an input string
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -657,7 +665,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2020 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

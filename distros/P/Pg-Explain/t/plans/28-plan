@@ -1,0 +1,6 @@
+Seq Scan on wm_inoutbound_ext  (cost=0.00..496.95 rows=60 width=61)
+Filter: (SubPlan 1)
+  SubPlan 1
+    ->  Index Scan using t_selection_pkey on t_selection  (cost=0.00..8.27 rows=1 width=6)
+          Index Cond: ((ad_pinstance_id = 1530094::numeric) AND (t_selection_id = wm_inoutbound_ext.wm_inoutbound_ext_id))
+

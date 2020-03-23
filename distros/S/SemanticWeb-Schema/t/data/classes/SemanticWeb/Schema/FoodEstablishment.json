@@ -12,9 +12,9 @@
          "rdfs:label" : "acceptsReservations",
          "schema:domainIncludes" : "schema:FoodEstablishment",
          "schema:rangeIncludes" : [
+            "schema:Boolean",
             "schema:Text",
-            "schema:URL",
-            "schema:Boolean"
+            "schema:URL"
          ]
       },
       "schema:hasMenu" : {
@@ -23,9 +23,9 @@
          "rdfs:label" : "hasMenu",
          "schema:domainIncludes" : "schema:FoodEstablishment",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:Menu",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:menu" : {
@@ -53,8 +53,8 @@
          "rdfs:comment" : "An official rating for a lodging business or food establishment, e.g. from national associations or standards bodies. Use the author property to indicate the rating organization, e.g. as an Organization with name such as (e.g. HOTREC, DEHOGA, WHR, or Hotelstars).",
          "rdfs:label" : "starRating",
          "schema:domainIncludes" : [
-            "schema:FoodEstablishment",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:FoodEstablishment"
          ],
          "schema:rangeIncludes" : "schema:Rating"
       }

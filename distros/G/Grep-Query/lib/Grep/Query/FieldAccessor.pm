@@ -5,7 +5,7 @@ package Grep::Query::FieldAccessor;
 use strict;
 use warnings;
 
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 $VERSION = eval $VERSION;
 
 use Carp;

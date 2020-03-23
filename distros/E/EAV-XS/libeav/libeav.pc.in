@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+includedir=@includedir@
+libdir=@libdir@
+
+Name: libeav
+Description: Email address validation library
+Version: @version@
+Cflags: @cflags@
+Libs: -L${libdir} -leav
+Requires.private: @requires_private@
+Libs.private: @libs_private@

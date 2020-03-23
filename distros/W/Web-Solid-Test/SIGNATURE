@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 668f71a860dddf8a58ab0b5bd2d5a259e11a37eea9e2c70aa464f7b8805885fb COPYRIGHT
+SHA256 07bbc00d72285ef453492c3677d6d1be52c236f25b0ec5d2e965237f565393df CREDITS
+SHA256 677c2b8fde14e80089804a0b6227f390daf9dd91c696dc3a642fe6dc52c62a17 Changes
+SHA256 37ee977c26a3c7998b8c7b70ba068c33a64777ff5076c08de29da3c434d329d3 Dockerfile
+SHA256 265b5542354a8576295388beab7bebda37171db90c9b33ba1bb1475213d491a6 INSTALL
+SHA256 b90e5ee8ac6aa5503fafe671ac7ee2e705d75157d8137d1fe640c93083a67a5f LICENSE
+SHA256 73a789d06de0bf706f5a8ad762baf78e833bc92a1764e001fafbdcd9fde6fe23 MANIFEST
+SHA256 3ae183c7e2596be2a401a5073424dd45d5f594e4bf118cd623e7b5ab4c41da86 META.json
+SHA256 e34fbde2042a8a7937828f32e903aa5e9dcb6bd7d49c55f4108910e63b7a01c9 META.yml
+SHA256 7e36dbe802f74074930cd578943a612f3b06c0924b11c219feb8361e6970094e Makefile.PL
+SHA256 29fd82298c209224ccb4bb81d279e767b1f982c5d4887573b194c3e2916b707e README
+SHA256 3c9f252df080f35be756ad4342e6d822eeaa8c01495383373e49c81fef6120dd README.md
+SHA256 8fe950bfd48a0fda38e5d3fcadc2b6dc0dd7aa10bb567a608bc3e1ce4cc237ac dist.ini
+SHA256 e6fc282096259d5c30de5d28106392a58e07d55177d2524a38d9ec70758e92da doap.ttl
+SHA256 177ee7575bb2cbb32d3cdce7d8fd7a2cd72c831a5046c17d0865b7cc6eb82721 lib/Web/Solid/Test.pm
+SHA256 029354c68039c614092db1d3320b6e2cf7bb84ef6cd9d592a41f4724ea63ca47 lib/Web/Solid/Test/Basic.pm
+SHA256 f21809b0b71cc1bd4833f4d7c9edb1e1bf26a5299eb8782d6b815f3f368ef8b6 lib/Web/Solid/Test/HTTPLists.pm
+SHA256 407f4177c8892cc0435229e8e260ada023150c7c22f5ea23ee47030cee1a554a t/01basic.t
+SHA256 4228a038bb8c092c6ad43f3d9cae40f97463fcd13b830680561f834e3f2d0d3f t/data/alice-token
+SHA256 c2ef4d94f359c7fb4d66f22b52550a38aecdb5c5ad26ed1c84a7e0be9aa7cbf3 t/data/http-basic.ttl
+SHA256 290cca5f76ef07e4b712471a5bea00ebd1663f54d24002cbef24c7561b8b1f0d t/data/http-put-check-acl.ttl
+SHA256 b46f373ca48155e2b322e90ce50483c592972a6ad3723b54ba007c22b8e81616 t/integration-stateful.t
+SHA256 102e537279b3b4e0490c9bc45bb0e6d0698472c58c65bd9c084dca672b4c3fd6 t/integration-stateless.t
+SHA256 817927a221ea6aef7004c7e326922b8335567e5aad469098dcd801c04207b904 t/lib/MockServer.pm
+SHA256 3cdc1fdff926f10383ee952ae0b91cf4327d362e6ef44b0e3fd36859d7db73bd t/lib/MockSolid.pm
+SHA256 ace217a4ae499f9126da7ee07c9d2209f8a349791d1a20acdb8299f6eb368bbf t/unit-get-token-network.t
+SHA256 bfe42da728ff6a42bc6a88a1c4fe40a16f78626af92b2340b477de6771ddfd8b t/unit-get-token.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEDsyLxtCi6bk7pBcmf77o3zqeSqUFAl51Py4ACgkQf77o3zqe
+SqW/Iw//WBOS/XBVe61/EFQ+ZL4GcFiXMxieXPYY16fY5xzurhmziMs1Ib/te1sj
+qPvvQ4v+PBQXPPhKuvaTTdiGwF0MWRPT/h9+xfDNxIvr35CXQ9sSRiKp/hvfsYV2
+P5f4CG0Cs20+FCj3i4zQq9JBqUpW7qxX2JUwnQ4+mGZOfLKjbbYN/4ahPwOUv046
+fVk7W25VfaMAu2yvRn3MyVtP58O+TGfWn+fniSpLTOdK+CbJPIacjA1U62AwKeo1
+zunsJ8RLBFOpBzixX8maMxQBZ0gmR1tomWMqkiEvLnX0RaD5eo5uXBOVEJ73f60/
+MktBCygXujG7zJiqZXR/viQswEdc12Q+h0X8R28By/vaddG2q/AhDfTt519a7tJg
+Pk+fu8KZsDaFoCcyBEtK5Ir7CnTKPtUP4nA+xD0/Do9PRWW20azdEOFTLnjpjfPH
+SHJ84s4nzGjcbyVwvqoNBRJ5NgcsLuMvA7Z+byRlq1uT69l3joudwuYpdVeCVbk5
+lVdnZRdAxT7Qqk6Xr3h8UW21M9Q4PUoterRuusu7S8nnKjpIl3qUxaO+Ryj3z0rG
+zG5gXMjgnpcZ1RxzF2t/Y/TeGDFqTMHxswmIQr/Ryb9dI6WzVjPYV3+RtiQv8DBj
+i0naOS7DFDViKwuJyjFDvK4hWm5LJ5EwHaigaKOJglAx/kOYGwc=
+=gNSi
+-----END PGP SIGNATURE-----

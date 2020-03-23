@@ -233,7 +233,10 @@ t/48-line-wrapped-plans.d/1.expect
 t/48-line-wrapped-plans.d/1.plan
 t/48-line-wrapped-plans.d/2.expect
 t/48-line-wrapped-plans.d/2.plan
+t/48-line-wrapped-plans.d/4.expect
+t/48-line-wrapped-plans.d/4.plan
 t/48-line-wrapped-plans.t
+t/49-tid-scans.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc
@@ -287,3 +290,11 @@ t/plans/24-expect
 t/plans/24-plan
 t/plans/25-expect
 t/plans/25-plan
+t/plans/26-expect
+t/plans/26-plan
+t/plans/27-expect
+t/plans/27-plan
+t/plans/28-expect
+t/plans/28-plan
+t/plans/29-expect
+t/plans/29-plan

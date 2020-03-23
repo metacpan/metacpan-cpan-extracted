@@ -93,6 +93,7 @@ package Sidef::Parser {
                      | Perl\b                         (?{ state $x = bless({}, 'Sidef::Perl::Perl') })
                      | Math\b                         (?{ state $x = bless({}, 'Sidef::Math::Math') })
                      | Time\b                         (?{ state $x = Sidef::Time::Time->new })
+                     | Date\b                         (?{ state $x = Sidef::Time::Date->new })
                      | \$\.                           (?{ state $x = bless({name => '$.'}, 'Sidef::Variable::Magic') })
                      | \$\?                           (?{ state $x = bless({name => '$?'}, 'Sidef::Variable::Magic') })
                      | \$\$                           (?{ state $x = bless({name => '$$'}, 'Sidef::Variable::Magic') })
@@ -215,6 +216,7 @@ package Sidef::Parser {
                   Sig
                   Regex Regexp
                   Time
+                  Date
                   Perl
                   Sidef
                   Object
@@ -1192,7 +1194,7 @@ package Sidef::Parser {
             # "has" class attributes
             if (exists($self->{current_class}) and /\Ghas\b\h*/gc) {
 
-                local $self->{allow_class_variable} = 1;
+                local $self->{allow_class_variable} = 0;
 
                 my $vars = $self->parse_init_vars(
                                                   code    => $opt{code},
@@ -1882,7 +1884,7 @@ package Sidef::Parser {
                     $obj->{catch} = $self->parse_block(code => $opt{code}, with_vars => 1);
                 }
                 else {
-                    $self->backtrack_whitespace();
+                    $self->backtrack_whitespace(code => $opt{code});
                 }
 
                 return $obj;
@@ -3431,6 +3433,8 @@ package Sidef::Parser {
                 redo;
             }
 
+            my $obj;
+
             # Ternary operator
             if (%struct && /\G\?/gc) {
                 $self->parse_whitespace(code => $opt{code});
@@ -3446,7 +3450,7 @@ package Sidef::Parser {
                 /\G:/gc
                   || $self->fatal_error(
                                         code   => $_,
-                                        pos    => pos($_) - 1,
+                                        pos    => pos($_),
                                         error  => "invalid usage of the ternary operator",
                                         reason => "expected ':'",
                                        );
@@ -3459,20 +3463,18 @@ package Sidef::Parser {
                              : $self->parse_obj(code => $opt{code})
                             );
 
-                my $tern = bless(
-                                 {
-                                  cond  => scalar {$self->{class} => [pop @{$struct{$self->{class}}}]},
-                                  true  => $true,
-                                  false => $false
-                                 },
-                                 'Sidef::Types::Bool::Ternary'
-                                );
-
-                push @{$struct{$self->{class}}}, {self => $tern};
-                redo MAIN;
+                $obj = bless(
+                             {
+                              cond  => scalar {$self->{class} => [pop @{$struct{$self->{class}}}]},
+                              true  => $true,
+                              false => $false
+                             },
+                             'Sidef::Types::Bool::Ternary'
+                            );
             }
-
-            my $obj = $self->parse_obj(code => $opt{code});
+            else {
+                $obj = $self->parse_obj(code => $opt{code});
+            }
 
             if (defined $obj) {
                 push @{$struct{$self->{class}}}, {self => $obj};

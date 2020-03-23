@@ -1,0 +1,8 @@
+- ua: 'Mozilla/5.0 (compatible; theoldreader.com; 1 subscribers; feed-id=109af)'
+  name: 'The Old Reader'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: flase
+  is_windows: false
+  is_chromeos: false

@@ -14,8 +14,8 @@
          "rdfs:label" : "annualPercentageRate",
          "schema:domainIncludes" : "schema:FinancialProduct",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:feesAndCommissionsSpecification" : {
@@ -28,8 +28,8 @@
             "schema:FinancialService"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:interestRate" : {

@@ -11,8 +11,8 @@
          "rdfs:comment" : "'carrier' is an out-dated term indicating the 'provider' for parcel delivery and flights.",
          "rdfs:label" : "carrier",
          "schema:domainIncludes" : [
-            "schema:Flight",
-            "schema:ParcelDelivery"
+            "schema:ParcelDelivery",
+            "schema:Flight"
          ],
          "schema:rangeIncludes" : "schema:Organization",
          "schema:supersededBy" : "schema:provider"
@@ -37,8 +37,8 @@
          "rdfs:label" : "expectedArrivalFrom",
          "schema:domainIncludes" : "schema:ParcelDelivery",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:expectedArrivalUntil" : {
@@ -47,8 +47,8 @@
          "rdfs:label" : "expectedArrivalUntil",
          "schema:domainIncludes" : "schema:ParcelDelivery",
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:hasDeliveryMethod" : {
@@ -90,16 +90,16 @@
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:Invoice",
-            "schema:ParcelDelivery",
             "schema:Trip",
-            "schema:EducationalOccupationalProgram",
+            "schema:Reservation",
+            "schema:ParcelDelivery",
             "schema:Service",
-            "schema:CreativeWork",
-            "schema:Reservation"
+            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:trackingNumber" : {

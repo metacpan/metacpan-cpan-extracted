@@ -1,5 +1,10 @@
 package Sah::Schemas::Twitter;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-11'; # DATE
+our $DIST = 'Sah-Schemas-Twitter'; # DIST
+our $VERSION = '0.002'; # VERSION
+
 1;
 # ABSTRACT: Sah schemas related to Twitter
 
@@ -15,7 +20,7 @@ Sah::Schemas::Twitter - Sah schemas related to Twitter
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::Twitter (from Perl distribution Sah-Schemas-Twitter), released on 2017-01-22.
+This document describes version 0.002 of Sah::Schemas::Twitter (from Perl distribution Sah-Schemas-Twitter), released on 2020-03-11.
 
 =head1 SYNOPSIS
 
@@ -51,7 +56,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

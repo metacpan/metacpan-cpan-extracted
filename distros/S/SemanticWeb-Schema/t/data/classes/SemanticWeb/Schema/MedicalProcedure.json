@@ -35,32 +35,6 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
       },
-      "schema:indication" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A factor that indicates use of this therapy for treatment and/or prevention of a condition, symptom, etc. For therapies such as drugs, indications can include both officially-approved indications as well as off-label uses. These can be distinguished by using the ApprovedIndication subtype of MedicalIndication.",
-         "rdfs:label" : "indication",
-         "schema:domainIncludes" : [
-            "schema:MedicalProcedure",
-            "schema:TherapeuticProcedure",
-            "schema:MedicalDevice"
-         ],
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:MedicalIndication"
-      },
-      "schema:outcome" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Expected or actual outcomes of the study.",
-         "rdfs:label" : "outcome",
-         "schema:domainIncludes" : [
-            "schema:MedicalStudy",
-            "schema:MedicalProcedure"
-         ],
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:MedicalEntity"
-         ]
-      },
       "schema:preparation" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Typical preparation that a patient must undergo before having the procedure performed.",
@@ -68,8 +42,8 @@
          "schema:domainIncludes" : "schema:MedicalProcedure",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:MedicalEntity",
-            "schema:Text"
+            "schema:Text",
+            "schema:MedicalEntity"
          ]
       },
       "schema:procedureType" : {
@@ -85,15 +59,15 @@
          "rdfs:comment" : "The status of the study (enumerated).",
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
+            "schema:MedicalStudy",
             "schema:MedicalProcedure",
-            "schema:MedicalStudy"
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:EventStatusType",
             "schema:MedicalStudyStatus",
-            "schema:EventStatusType"
+            "schema:Text"
          ]
       }
    }

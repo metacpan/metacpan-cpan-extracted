@@ -15,15 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
-
-
-has action => (
-    is        => 'rw',
-    predicate => '_has_action',
-    json_ld   => 'action',
-);
-
+our $VERSION = 'v7.0.0';
 
 
 has antagonist => (
@@ -66,14 +58,6 @@ has nerve => (
 
 
 
-has origin => (
-    is        => 'rw',
-    predicate => '_has_origin',
-    json_ld   => 'origin',
-);
-
-
-
 
 
 1;
@@ -90,7 +74,7 @@ SemanticWeb::Schema::Muscle - A muscle is an anatomical structure consisting of 
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -98,25 +82,6 @@ A muscle is an anatomical structure consisting of a contractile form of
 tissue that animals use to effect movement.
 
 =head1 ATTRIBUTES
-
-=head2 C<action>
-
-=for html <p>Obsolete term for <a class="localLink"
-href="http://schema.org/muscleAction">muscleAction</a>. Not to be confused
-with <a class="localLink"
-href="http://schema.org/potentialAction">potentialAction</a>.<p>
-
-A action should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
-=head2 C<_has_action>
-
-A predicate for the L</action> attribute.
 
 =head2 C<antagonist>
 
@@ -201,22 +166,6 @@ A nerve should be one of the following types:
 =head2 C<_has_nerve>
 
 A predicate for the L</nerve> attribute.
-
-=head2 C<origin>
-
-The place or point where a muscle arises.
-
-A origin should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::AnatomicalStructure']>
-
-=back
-
-=head2 C<_has_origin>
-
-A predicate for the L</origin> attribute.
 
 =head1 SEE ALSO
 

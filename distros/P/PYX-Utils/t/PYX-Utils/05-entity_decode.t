@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use PYX::Utils qw(entity_decode);
 use Test::More 'tests' => 5;
 use Test::NoWarnings;

@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test2::V0" : "0"
+            "Test2::V0" : "0",
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -32,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "B" : "0",
             "Data::Dumper" : "0",
             "Exporter::Tiny" : "0.025",
             "Filter::Simple" : "0.76",
@@ -52,5 +54,5 @@
          "web" : "https://github.com/jo-37/debug-filter-printexpr"
       }
    },
-   "version" : "0.18"
+   "version" : "0.19"
 }

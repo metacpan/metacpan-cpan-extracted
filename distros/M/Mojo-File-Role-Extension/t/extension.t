@@ -31,7 +31,7 @@ is_deeply $file->extension_parts, ['.d'], 'collection';
 $file = path('./Mojo-File-Role-Extension-0_1.tar')->with_roles('+Extension');
 my $no_ext = $file->switch_extension;
 is $no_ext->extension, '', 'empty';
-is $no_ext, './Mojo-File-Role-Extension-0_1', 'full name';
+is $no_ext->basename, 'Mojo-File-Role-Extension-0_1', 'base name';
 my $tar_gz = $file->switch_extension('.tar.gz');
 is $tar_gz->extension, '.tar.gz', 'correct extension';
 is $no_ext->switch_extension('.tar.gz'), $tar_gz, 'same';
@@ -43,6 +43,6 @@ my $parts = $file->extension_parts;
 is $parts->size, 3, 'correct no of parts';
 is_deeply $parts, ['.genome', '.unsorted', '.bam'], 'collection';
 is $file->switch_extension($parts->tap(sub { $_->[1] = '.sorted' })->join),
-  '/tmp/alignments.genome.sorted.bam', 'sorted version';
+  path('/tmp')->child('alignments.genome.sorted.bam'), 'sorted version';
 
 done_testing;

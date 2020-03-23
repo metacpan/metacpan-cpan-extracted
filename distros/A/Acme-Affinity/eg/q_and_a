@@ -1,0 +1,141 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib '/Users/gene/sandbox/Acme-Affinity/lib';
+use Acme::Affinity;
+
+use List::Util 'shuffle';
+use Term::Choose;
+use Term::Clear ();
+
+# https://www.eharmony.com/dating-advice/first-dates/15-great-first-date-questions/
+my $questions = [
+    { i => 1,
+      q => 'Who are the most important people in your life?',
+      a => ['parents', 'kids', 'friends'] },
+    { i => 2,
+      q => 'What makes you laugh?',
+      a => ['jokes', 'comedies', 'pranks', 'accidents'] },
+    { i => 3,
+      q => 'Where is "home"?',
+      a => ['here', 'across the country', 'in another country'] },
+    { i => 4,
+      q => 'Do you read reviews, or just go with your gut?',
+      a => ['reviews', 'gut'] },
+    { i => 5,
+      q => "Do you have a dream you're pursuing?",
+      a => ['yes', 'maybe', 'no'] },
+    { i => 6,
+      q => 'What do your Saturdays usually look like?',
+      a => ['staying home', 'partying'] },
+    { i => 7,
+      q => 'Where did you grow up?',
+      a => ['here', 'across the country', 'in another country'] },
+    { i => 8,
+      q => 'What is your family like?',
+      a => ['nice', 'mean', 'n/a'] },
+    { i => 9,
+      q => "What's your big passion?",
+      a => ['hiking', 'programming', 'music'] },
+    { i => 10,
+      q => "What's the most interesting job you've ever had?",
+      a => ['stripper', 'sales', 'diver'] },
+    { i => 11,
+      q => 'Do you have a special place you like to visit regularly?',
+      a => ['desert', 'river', 'ocean', 'forest'] },
+    { i => 12,
+      q => "What's your signature drink?",
+      a => ['vodka', 'whiskey', 'beer', 'wine'] },
+    { i => 13,
+      q => "What's the best meal you've ever had?",
+      a => ['french', 'italian', 'indian'] },
+    { i => 14,
+      q => "What's on your bucket list?",
+      a => ['sky dive', 'swim with dolphins'] },
+    { i => 15,
+      q => 'What toppings are needed to create the perfect burger?',
+      a => ['lettuce, tomato, onion', 'cheese', 'spinach'] },
+    { i => 16,
+      q => "What's the best concert you've ever attended?",
+      a => ['Black Sabbath', 'Barry Manilow', 'Wu Tang Clan'] },
+    { i => 17,
+      q => "What's your most valuable possession?",
+      a => ['guitar', 'vase', 'necklace'] },
+    { i => 18,
+      q => "Who's the most fascinating person you know?",
+      a => ['mom', 'dad', 'friend'] },
+    { i => 19,
+      q => "What's the hardest thing you've ever done?",
+      a => ['say I love you', 'meet the in-laws'] },
+    { i => 20,
+      q => "What's the scariest thing you've ever done?",
+      a => ['say I love you', 'meet the in-laws'] },
+];
+
+my $you = [
+    ['parents', 'parents', 'mandatory'],
+    ['jokes', 'jokes', 'mandatory'],
+    ['here', 'here', 'mandatory'],
+    ['reviews', 'reviews', 'mandatory'],
+    ['yes', 'yes', 'mandatory'],
+    ['staying home', 'staying home', 'mandatory'],
+    ['here', 'here', 'mandatory'],
+    ['nice', 'nice', 'mandatory'],
+    ['hiking', 'hiking', 'mandatory'],
+    ['stripper', 'stripper', 'mandatory'],
+    ['desert', 'desert', 'mandatory'],
+    ['vodka', 'vodka', 'mandatory'],
+    ['french', 'french', 'mandatory'],
+    ['sky dive', 'sky dive', 'mandatory'],
+    ['lettuce, tomato, onion', 'lettuce, tomato, onion', 'mandatory'],
+    ['Black Sabbath', 'Black Sabbath', 'mandatory'],
+    ['guitar', 'guitar', 'mandatory'],
+    ['mom', 'mom', 'mandatory'],
+    ['say I love you', 'say I love you', 'mandatory'],
+    ['say I love you', 'say I love you', 'mandatory'],
+];
+
+my %answers = (); # Bucket for the indexed answers
+
+my $affinity = Acme::Affinity->new;
+
+my @importance = sort { $affinity->importance->{$a} <=> $affinity->importance->{$b} } keys %{ $affinity->importance };
+
+for my $question (shuffle @$questions) {
+    my @answer = ();
+
+    my $tc = Term::Choose->new({
+        prompt       => $question->{q},
+        clear_screen => 1,
+    });
+    my $choice = $tc->choose($question->{a});
+    push @answer, $choice;
+
+    print "\n\n\n";
+
+    $tc = Term::Choose->new({ prompt => 'You want:' });
+    $choice = $tc->choose($question->{a});
+    push @answer, $choice;
+
+    print "\n\n\n";
+
+    $tc = Term::Choose->new({ prompt => 'How important is this to you?' });
+    $choice = $tc->choose(\@importance);
+    push @answer, $choice;
+
+    $answers{ $question->{i} } = \@answer;
+}
+
+Term::Clear::clear();
+
+# Sorted me answers
+my $me = [ map { $answers{$_} } sort { $a <=> $b } keys %answers ];
+
+$affinity = Acme::Affinity->new(
+    questions => [ map { { $_->{q} => $_->{a} } } @$questions ],
+    me        => $me,
+    you       => $you,
+);
+
+print 'Score: ', $affinity->score, "\n";

@@ -1,6 +1,6 @@
 package Log::Dispatch::Screen::Gentoo;
 # ABSTRACT: Gentoo-colored screen logging output
-$Log::Dispatch::Screen::Gentoo::VERSION = '0.002';
+$Log::Dispatch::Screen::Gentoo::VERSION = '0.003';
 use strict;
 use warnings;
 use parent 'Log::Dispatch::Screen';
@@ -41,7 +41,7 @@ sub log_message {
     my $message
         = $self->{'utf8'}
         ? $encode->( $p{'message'} )
-        : $encode->( $p{'message'} );
+        : $p{'message'};
 
     my $print_func = $FUNCTION_MAP{$level} //= $FUNCTION_MAP{''};
 
@@ -68,7 +68,7 @@ Log::Dispatch::Screen::Gentoo - Gentoo-colored screen logging output
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ Sawyer X <xsawyerx@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Sawyer X.
+This software is Copyright (c) 2020 by Sawyer X.
 
 This is free software, licensed under:
 

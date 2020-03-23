@@ -1,6 +1,6 @@
-(tag
+(element
 Aattribute value
 Aattribute2 value2
 _comment
-)tag
+)element
 _comment

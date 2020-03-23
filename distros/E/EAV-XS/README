@@ -1,0 +1,208 @@
+NAME
+    EAV::XS - Email Address Validator
+
+SYNOPSIS
+        use EAV::XS;
+
+        my $eav = EAV::XS->new();
+
+        if ($eav->is_email ('valid@example.com')) {
+            print "This is a valid email address.\n";
+        } else {
+            printf "The email address is not valid: %s\n",
+                    $eav->get_error();
+        }
+
+DESCRIPTION
+    The purpose of this module is a validation of the specified Email
+    Address <https://en.wikipedia.org/wiki/Email_address>.
+
+    The core part of the module is written in C and can be found in the
+    libeav directory.
+
+    The module conforms to:
+
+    *   RFC 822 <https://tools.ietf.org/html/rfc822> - allows control
+        characters.
+
+    *   RFC 5321 <https://tools.ietf.org/html/rfc5321> - does not allow any
+        control characters.
+
+    *   RFC 5322 <https://tools.ietf.org/html/rfc5322> - allows some control
+        characters and not allows SPACE and TAB characters without
+        quoted-pairs.
+
+    *   RFC 6531 <https://tools.ietf.org/html/rfc6531> - allows
+        Internationalized Email Addresses encoded in UTF-8. See also RFC
+        3629 <https://tools.ietf.org/html/rfc3629>). The RFC 6531 is based
+        on the rules of the RFC 5321.
+
+    You may change the behavior of the RFC 6531 mode when building the
+    module and enable support of the RFC 20
+    <https://tools.ietf.org/html/rfc20> and RFC 5322
+    <https://tools.ietf.org/html/rfc5322>. By default, neither RFC 5322 nor
+    RFC 20 is enabled.
+
+    The RFC 20 disallows the next characters within local-part: "`", "#",
+    "^", "{", "}", "~" and "|". They must be in double-quotes.
+
+    The default behavior of the module also includes the check of:
+
+    *   Special and Reserved domains as mentioned in RFC 6761
+        <https://tools.ietf.org/html/rfc6761>
+
+    *   FQDN - if the domain contains only alias and it is not a special or
+        reserved domain, then the result is negative, that is, such an email
+        address is considered as invalid.
+
+    *   TLD - the module checks that domain is a Top Level Domain (TLD). The
+        list of TLDs has been taken from IANA's Root Zone Database
+        <https://www.iana.org/domains/root/db>. See the "TLD INFORMATION"
+        section below for details.
+
+DEPENDENCIES
+    You have to install one of IDN libraries on your choice:
+
+    *   libidn2 <https://github.com/libidn/libidn2>
+
+    *   libidn <https://www.gnu.org/software/libidn/>
+
+    *   libidnkit <https://jprs.co.jp/idn/index-e.html>
+
+    When run Makefile.PL, you will be asked to configure EAV::XS and at this
+    stage you may select the IDN library to build with.
+
+METHODS
+    *   $eav = new ( [%options] )
+
+        Creates a new EAV::XS object, if something goes wrong a message will
+        be thrown via croak().
+
+        Possible options includes:
+
+        *   rfc - use this RFC specification. Possible values are: *RFC822*,
+            *RFC5321*, *RFC5322* or *RFC6531*. Default is *RFC6531*.
+
+        *   tld_check - enable or disable TLD check. Also, this controls
+            FQDN check. Enabled by default.
+
+        *   allow_tld - list of TLD types which considered be good. You have
+            to specify this list via logical OR ("|"). Information about
+            possible values described below in section "TLD INFORMATION".
+
+            Default value is: *TLD_COUNTRY_CODE* | *TLD_GENERIC* |
+            *TLD_GENERIC_RESTRICTED* | *TLD_INFRASTRUCTURE* |
+            *TLD_SPONSORED* | *TLD_SPECIAL*.
+
+    *   $yes_no = is_email ( $email )
+
+        Validates the specified email. Returns true if the email is valid,
+        otherwise returns false.
+
+    *   $error_message = get_error ()
+
+        Returns an error message for the last email address tested by
+        is_email() method.
+
+  TLD INFORMATION
+    The current list of all TLDs can be found on IANA Root Zone Database
+    <https://www.iana.org/domains/root/db> website.
+
+    The allow_tld option accepts the next values:
+
+    *   TLD_NOT_ASSIGNED - allow not assigned TLDs. On IANA website they are
+        listed as "Not assigned" in the "TLD Manager" field.
+
+    *   TLD_COUNTRY_CODE - allow county-code TLDs.
+
+    *   TLD_GENERIC - allow generic TLDs.
+
+    *   TLD_GENERIC_RESTRICTED - allow generic-restricted TLDs.
+
+    *   TLD_INFRASTRUCTURE - allow infrastructure TLDs.
+
+    *   TLD_SPONSORED - allow sponsored TLDs.
+
+    *   TLD_TEST - allow test TLDs.
+
+    *   TLD_SPECIAL - allow Special & Restricted TLDs. See RFC 2606
+        <https://tools.ietf.org/html/rfc2606>, RFC 6761
+        <https://tools.ietf.org/html/rfc6761> and RFC 7686
+        <https://tools.ietf.org/html/rfc7686> for details. Currently, this
+        includes the next TLDs: "test.", "invalid.", "localhost.",
+        "example.", "onion." and also Second Level Domains, such as,
+        "example.com.", "example.net." and "example.org.".
+
+    For instance, to allow only country-code and generic TLDs you have to
+    write this:
+
+        my $eav = EAV::XS->new(
+            allow_tld => EAV::XS::TLD_COUNTRY_CODE | EAV::XS::TLD_GENERIC
+        );
+
+        if (not $eav->is_email ('test@example.biz')) {
+            print ".biz is generic-restricted TLD and not allowed.\n";
+        }
+
+SEE ALSO
+    References:
+
+    *   RFC 20 <https://tools.ietf.org/html/rfc20>
+
+    *   RFC 822 <https://tools.ietf.org/html/rfc822>
+
+    *   RFC 5321 <https://tools.ietf.org/html/rfc5321>
+
+    *   RFC 5322 <https://tools.ietf.org/html/rfc5322>
+
+    *   RFC 6530 <https://tools.ietf.org/html/rfc6530>
+
+    *   RFC 6531 <https://tools.ietf.org/html/rfc6531>
+
+    Other implementations:
+
+    *   Email::Valid
+
+    *   String::Validator::Email
+
+    *   Data::Validate::Email
+
+    *   Email::Address
+
+    *   Email::IsEmail
+
+AUTHOR
+    Vitaliy V. Tokarev, <vitaliy.tokarev@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2017 Vitaliy V. Tokarev
+
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+    IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+AVAILABILITY
+    You can obtain the latest version from
+    <https://github.com/gh0stwizard/p5-EAV-XS/>.
+

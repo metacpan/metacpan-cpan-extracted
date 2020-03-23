@@ -6,42 +6,27 @@
       "rdfs:subClassOf" : "schema:TradeAction"
    },
    "properties" : {
-      "schema:purpose" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A goal towards an action is taken. Can be concrete or abstract.",
-         "rdfs:label" : "purpose",
-         "schema:domainIncludes" : [
-            "schema:PayAction",
-            "schema:MedicalDevice",
-            "schema:AllocateAction"
-         ],
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : [
-            "schema:MedicalDevicePurpose",
-            "schema:Thing"
-         ]
-      },
       "schema:recipient" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A sub property of participant. The participant who is at the receiving end of the action.",
          "rdfs:label" : "recipient",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:SendAction",
-            "schema:CommunicateAction",
             "schema:GiveAction",
-            "schema:PayAction",
+            "schema:Message",
             "schema:DonateAction",
             "schema:ReturnAction",
-            "schema:Message",
+            "schema:PayAction",
+            "schema:CommunicateAction",
+            "schema:SendAction",
             "schema:TipAction",
             "schema:AuthorizeAction"
          ],
          "schema:rangeIncludes" : [
             "schema:Audience",
+            "schema:ContactPoint",
             "schema:Person",
-            "schema:Organization",
-            "schema:ContactPoint"
+            "schema:Organization"
          ]
       }
    }

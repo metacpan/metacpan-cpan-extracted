@@ -5,7 +5,7 @@ use Try::Tiny;
 use Module::Runtime 'require_module';
 
 # ABSTRACT: Parser/Interpreter/Compiler for simple spreadsheet formula language
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 has parser => (
@@ -81,7 +81,7 @@ Language::FormulaEngine - Parser/Interpreter/Compiler for simple spreadsheet for
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -292,7 +292,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2020 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

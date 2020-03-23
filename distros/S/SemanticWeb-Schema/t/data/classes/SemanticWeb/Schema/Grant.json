@@ -11,9 +11,9 @@
    "properties" : {
       "schema:fundedItem" : {
          "dc:source" : [
-            "schemadotorgsources2:TP",
             "https://github.com/schemaorg/schemaorg/issues/1950",
-            "https://github.com/schemaorg/schemaorg/issues/383"
+            "https://github.com/schemaorg/schemaorg/issues/383",
+            "schemadotorgsources2:TP"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates an item funded or sponsored through a <a class=\"localLink\" href=\"http://schema.org/Grant\">Grant</a>.",
@@ -31,12 +31,12 @@
          "rdfs:comment" : "A person or organization that supports a thing through a pledge, promise, or financial contribution. e.g. a sponsor of a Medical Study or a corporate sponsor of an event.",
          "rdfs:label" : "sponsor",
          "schema:domainIncludes" : [
+            "schema:Event",
             "schema:CreativeWork",
             "schema:MedicalStudy",
             "schema:Grant",
-            "schema:Organization",
-            "schema:Event",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",

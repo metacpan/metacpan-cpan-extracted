@@ -1,0 +1,50 @@
+NAME
+    Term::ANSIColor::WithWin32 - Use Term::ANSIColor and load
+    Win32::Console::ANSI on Windows
+
+VERSION
+    This document describes version 0.002 of Term::ANSIColor::WithWin32
+    (from Perl distribution Term-ANSIColor-WithWin32), released on
+    2020-03-21.
+
+SYNOPSIS
+    Use as you would Term::ANSIColor.
+
+DESCRIPTION
+    This module is a thin wrapper for Term::ANSIColor. It loads
+    Win32::Console::ANSI on Windows (an extra step needed to make ANSI
+    escape codes work). The rest is identical with Term::ANSIColor.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Term-ANSIColor-WithWin32>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Term-ANSIColor-WithWin32>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Term-ANSIColor-WithWi
+    n32>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Term::ANSIColor
+
+    Win32::Console::ANSI
+
+    Term::ANSIColor::Conditional now also tries to load Win32::Console::ANSI
+    on Windows.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

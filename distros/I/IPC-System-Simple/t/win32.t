@@ -21,13 +21,13 @@ use constant BIG_EXIT => 1000;
 use constant HUGE_EXIT => 100_000;
 
 # This command should allow us to exit with a specific value.
-use constant EXIT_CMD => [ @{ &IPC::System::Simple::WINDOWS_SHELL }, 'exit'];
+use constant CMD => join ' ', @{ &IPC::System::Simple::WINDOWS_SHELL };
 
 # These are used in the testing of commands in paths which contain spaces.
 use constant CMD_WITH_SPACES        => 'dir with spaces\hello.exe';
 use constant CMD_WITH_SPACES_OUTPUT => "Hello World\n";
 
-plan tests => 33;
+plan tests => 37;
 
 my $perl_path = $Config{perlpath};
 $perl_path .= $Config{_exe} unless $perl_path =~ m/$Config{_exe}$/i;
@@ -45,17 +45,20 @@ chdir("t");
 foreach my $big_exitval (SMALL_EXIT, BIG_EXIT, HUGE_EXIT) {
 
     my $exit;
+    # XXX Ideally, we would find a way to test the multi-argument form, too,
+    # but cmd.exe no longer works with that form, because all args are quoted,
+    # and /x/d/c must not be.
     eval {
-        $exit = run([$big_exitval], @{&EXIT_CMD}, $big_exitval);
+        $exit = run([$big_exitval], CMD . qq{ "exit $big_exitval"});
     };
 
     is($@,"","Running with $big_exitval ok");
     is($exit,$big_exitval,"$big_exitval exit value");
 
     my $capture;
-    
+
     eval {
-	$capture = capture([$big_exitval], @{&EXIT_CMD}, $big_exitval);
+	$capture = capture([$big_exitval], CMD . qq{ exit $big_exitval"});
     };
 
     is($@,"","Capturing with $big_exitval ok");
@@ -123,29 +126,29 @@ ok(1,"raw perl found in multi-part path");
 
 my $output = capture(
 	$^X, '-MIPC::System::Simple=capture',
-	q(-e"print 1; eval { capture(q(nosuchcmd)); }; print 2; exit 0;")
+	'-e', q(print 1; eval { capture(q(nosuchcmd)); }; print 2; exit 0;)
 );
 
 is($output,"12","RT #48319 - Check for STDOUT replumbing");
 
-# Check to ensure we can run commands that include spaces.
-
 SKIP: {
-
-    # CMD_WITH_SPACES is not currently distributed with IPC::System::Simple,
-    # effectively making this an author test for now. -- PJF, Dec 4, 2009
-
-    skip(CMD_WITH_SPACES." not implemented", 4);
-    # skip(CMD_WITH_SPACES." not available", 4) unless -x CMD_WITH_SPACES;
-
-    my $output = eval { capturex(CMD_WITH_SPACES); };
-
-    is($@, "", "command with spaces should not error (capturex)");
+	skip("Inconsistent results between AppVeyor and CPANtesters", 8)
+        unless $ENV{AUTHOR_TESTING};
+     
+    # Check to ensure we can run commands that include spaces.
+    $output = eval { capturex(CMD_WITH_SPACES, 'ignore'); };
+    is($@, "", "command with spaces should not error (capturex multi)");
     is($output, CMD_WITH_SPACES_OUTPUT, "...and give correct output");
 
-    $output = eval { capture(CMD_WITH_SPACES); };
-
-    is($@, "", "command with spaces should not error (capture)");
+    $output = eval { capturex(CMD_WITH_SPACES); };
+    is($@, "", "command with spaces should not error (capturex single)");
     is($output, CMD_WITH_SPACES_OUTPUT, "...and give correct output");
 
-}
+    $output = eval { capture(CMD_WITH_SPACES, 'ignore'); };
+    is($@, "", "command with spaces should not error (capture multi)");
+    is($output, CMD_WITH_SPACES_OUTPUT, "...and give correct output");
+
+    $output = eval { capture('"' . CMD_WITH_SPACES . '"'); };
+    is($@, "", "command with spaces should not error (capture quoted)");
+    is($output, CMD_WITH_SPACES_OUTPUT, "...and give correct output");
+} # End SKIP block

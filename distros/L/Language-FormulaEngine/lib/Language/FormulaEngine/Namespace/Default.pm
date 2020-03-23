@@ -15,7 +15,7 @@ use DateTime::Format::Flexible;
 use namespace::clean;
 
 # ABSTRACT: Default spreadsheet-like set of functions and behavior
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 # No official versioned namespace yet, but this code is for when I publish one.
 
@@ -175,7 +175,7 @@ sub nodeval_iferror {
 sub perlgen_iferror {
 	my ($self, $compiler, $node)= @_;
 	my @arg_code= map $compiler->perlgen($_), @{$node->parameters};
-	return '(do { my $x; eval { $x=('.$arg_code[0].'); 1 }? $x : ('.$arg_code[1].') })';
+	return '(do { local $@; my $x; eval { $x=('.$arg_code[0].'); 1 }? $x : ('.$arg_code[1].') })';
 }
 
 sub nodeval_ifs {
@@ -448,7 +448,7 @@ Language::FormulaEngine::Namespace::Default - Default spreadsheet-like set of fu
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -775,7 +775,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2020 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

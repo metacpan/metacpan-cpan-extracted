@@ -1,0 +1,18 @@
+Seq Scan on employe  (cost=11561.09..1087419.09 rows=320 width=84)
+Output: public.employe.nomempl
+Filter: (NOT (SubPlan 2))
+ SubPlan 2
+    ->  Materialize  (cost=11561.09..14395.09 rows=211200 width=4)
+          Output: public.employe.nuempl
+          ->  Nested Loop  (cost=51.29..10627.89 rows=211200 width=4)
+                Output: public.employe.nuempl
+                Join Filter: (NOT (hashed SubPlan 1))
+                ->  Seq Scan on projet  (cost=0.00..16.60 rows=660 width=4)
+                      Output: projet.nuproj, projet.nomproj, projet.resp
+                ->  Materialize  (cost=17.04..23.44 rows=640 width=4)
+                      Output: public.employe.nuempl
+                      ->  Seq Scan on employe  (cost=0.00..16.40 rows=640 width=4)
+                            Output: public.employe.nuempl
+                SubPlan 1
+                  ->  Seq Scan on travail  (cost=0.00..29.40 rows=1940 width=8)
+                        Output: travail.nuempl, travail.nuproj

@@ -1,5 +1,8 @@
 Revision history for Prometheus-Tiny-Shared
 
+0.020     2020-03-23 12:57:16+11:00 Australia/Melbourne
+- Rewrite to use Hash::SharedMem for the backend
+
 0.012     2020-03-19 14:35:01+11:00 Australia/Melbourne
 - Disable SQLite synchronous writes, and note that the backing store is not intended to be persistent or durable.
 

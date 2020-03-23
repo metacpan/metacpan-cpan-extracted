@@ -18,6 +18,7 @@ lib/Test2/Harness/UI/CPANImporter.pm
 lib/Test2/Harness/UI/Config.pm
 lib/Test2/Harness/UI/Controller.pm
 lib/Test2/Harness/UI/Controller/Dashboard.pm
+lib/Test2/Harness/UI/Controller/Download.pm
 lib/Test2/Harness/UI/Controller/Durations.pm
 lib/Test2/Harness/UI/Controller/Events.pm
 lib/Test2/Harness/UI/Controller/Job.pm
@@ -65,6 +66,7 @@ share/img/close.png
 share/img/close_red.png
 share/img/data.png
 share/img/dotdotdot.png
+share/img/download.png
 share/img/error.png
 share/img/favicon.ico
 share/img/goto.png

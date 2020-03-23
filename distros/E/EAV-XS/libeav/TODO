@@ -1,0 +1,2 @@
+* Verisign IDNA support
+* fix error messages for ".@ha.com", current errmsg is wrong: local-part has too many dots

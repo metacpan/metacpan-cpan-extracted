@@ -73,11 +73,12 @@ method generate {
 	@tables = $self->_prune_tables( \@tables );
 
 	my %new;
-	$new{tables}    = \@tables;
-	$new{namespace} = $self->namespace if $self->namespace;
-	$new{dir}       = $self->dir;
-	$new{dbname}    = $schema->name;
-	$new{schema}    = $schema;
+	$new{tables}             = \@tables;
+	$new{namespace}          = $self->namespace if $self->namespace;
+	$new{dir}                = $self->dir;
+	$new{dbname}             = $schema->name;
+	$new{schema}             = $schema;
+	$new{use_fq_table_names} = $self->use_fq_table_names;
 
 	my $db = MySQL::ORM::Generate::Class::Db->new(%new);
 	$db->generate;

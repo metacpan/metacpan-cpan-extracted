@@ -11,11 +11,11 @@ Pg::Explain::Analyzer - Some helper methods to analyze explains
 
 =head1 VERSION
 
-Version 0.94
+Version 0.96
 
 =cut
 
-our $VERSION = '0.94';
+our $VERSION = '0.96';
 
 =head1 SYNOPSIS
 

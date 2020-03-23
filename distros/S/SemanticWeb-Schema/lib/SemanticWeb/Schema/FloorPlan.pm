@@ -15,7 +15,23 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
+
+
+has amenity_feature => (
+    is        => 'rw',
+    predicate => '_has_amenity_feature',
+    json_ld   => 'amenityFeature',
+);
+
+
+
+has floor_size => (
+    is        => 'rw',
+    predicate => '_has_floor_size',
+    json_ld   => 'floorSize',
+);
+
 
 
 has is_plan_for_apartment => (
@@ -50,6 +66,14 @@ has number_of_bathrooms_total => (
 
 
 
+has number_of_bedrooms => (
+    is        => 'rw',
+    predicate => '_has_number_of_bedrooms',
+    json_ld   => 'numberOfBedrooms',
+);
+
+
+
 has number_of_full_bathrooms => (
     is        => 'rw',
     predicate => '_has_number_of_full_bathrooms',
@@ -74,6 +98,14 @@ has number_of_rooms => (
 
 
 
+has pets_allowed => (
+    is        => 'rw',
+    predicate => '_has_pets_allowed',
+    json_ld   => 'petsAllowed',
+);
+
+
+
 
 
 1;
@@ -90,7 +122,7 @@ SemanticWeb::Schema::FloorPlan - A FloorPlan is an explicit representation of a 
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -112,6 +144,47 @@ indicated using <a class="localLink"
 href="http://schema.org/image">image</a>.<p>
 
 =head1 ATTRIBUTES
+
+=head2 C<amenity_feature>
+
+C<amenityFeature>
+
+An amenity feature (e.g. a characteristic or service) of the Accommodation.
+This generic property does not make a statement about whether the feature
+is included in an offer for the main accommodation or available at extra
+costs.
+
+A amenity_feature should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::LocationFeatureSpecification']>
+
+=back
+
+=head2 C<_has_amenity_feature>
+
+A predicate for the L</amenity_feature> attribute.
+
+=head2 C<floor_size>
+
+C<floorSize>
+
+The size of the accommodation, e.g. in square meter or squarefoot. Typical
+unit code(s): MTK for square meter, FTK for square foot, or YDK for square
+yard
+
+A floor_size should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=back
+
+=head2 C<_has_floor_size>
+
+A predicate for the L</floor_size> attribute.
 
 =head2 C<is_plan_for_apartment>
 
@@ -210,6 +283,30 @@ A number_of_bathrooms_total should be one of the following types:
 
 A predicate for the L</number_of_bathrooms_total> attribute.
 
+=head2 C<number_of_bedrooms>
+
+C<numberOfBedrooms>
+
+=for html <p>The total integer number of bedrooms in a some <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>, <a
+class="localLink"
+href="http://schema.org/ApartmentComplex">ApartmentComplex</a> or <a
+class="localLink" href="http://schema.org/FloorPlan">FloorPlan</a>.<p>
+
+A number_of_bedrooms should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<Num>
+
+=back
+
+=head2 C<_has_number_of_bedrooms>
+
+A predicate for the L</number_of_bedrooms> attribute.
+
 =head2 C<number_of_full_bathrooms>
 
 C<numberOfFullBathrooms>
@@ -278,6 +375,27 @@ A number_of_rooms should be one of the following types:
 =head2 C<_has_number_of_rooms>
 
 A predicate for the L</number_of_rooms> attribute.
+
+=head2 C<pets_allowed>
+
+C<petsAllowed>
+
+Indicates whether pets are allowed to enter the accommodation or lodging
+business. More detailed information can be put in a text value.
+
+A pets_allowed should be one of the following types:
+
+=over
+
+=item C<Bool>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_pets_allowed>
+
+A predicate for the L</pets_allowed> attribute.
 
 =head1 SEE ALSO
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has web_feed => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::PodcastSeries - A podcast is an episodic series of digital 
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -55,12 +55,14 @@ user can download and listen to.
 
 C<webFeed>
 
-The URL for the feed associated with the podcast series. This is usually
-RSS or Atom.
+The URL for a feed, e.g. associated with a podcast series, blog, or series
+of date-stamped updates. This is usually RSS or Atom.
 
 A web_feed should be one of the following types:
 
 =over
+
+=item C<InstanceOf['SemanticWeb::Schema::DataFeed']>
 
 =item C<Str>
 

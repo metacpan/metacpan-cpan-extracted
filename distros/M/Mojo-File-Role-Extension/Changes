@@ -1,4 +1,8 @@
 Revision history for perl distribution Mojo-File-Role-Extension
 
+0.02 2020-03-21T01:09:19+1300
+ - Fix test errors on windows
+ - remove pax headers
+
 0.01 2020-03-19T09:58:00+1300
  - Started project

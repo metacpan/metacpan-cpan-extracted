@@ -1,10 +1,21 @@
+Revision history for Perl extension Test::Slow
+
+0.04 2020-03-21T11:05:18Z
+
+        - Change maintainer (from ZOUL to CONTRA). Thank you ZOUL for this great module !
+        - Add parameter to skip test by default
+        - Some more tests
+
 0.03    1/19/2010
+
         - META.yml compatible with latest Module::Build
 
 0.02    1/19/2010
+
         - Added link to the Github repository.
         - Better test planning in t/00-load.t.
         - Added POD and Kwalitee tests.
 
 0.01    1/16/2010
+
         First version, released on an unsuspecting world.

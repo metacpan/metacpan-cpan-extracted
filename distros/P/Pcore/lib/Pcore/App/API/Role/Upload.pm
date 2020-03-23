@@ -5,6 +5,10 @@ use Pcore::Util::UUID qw[uuid_v4_str];
 
 has upload_idle_timeout => 60;
 
+has upload_chunk_size           => 1024 * 1024;         # 1 Mb
+has upload_max_size             => 1024 * 1024 * 50;    # 50 Mb
+has upload_filename_is_required => 1;
+
 has _uploads      => ( init_arg => undef );
 has _upload_timer => ( init_arg => undef );
 
@@ -14,6 +18,12 @@ sub _upload ( $self, $auth, $args, $on_start, $on_finish, $on_hash = undef ) {
     if ( !$args->{id} ) {
 
         return [ 400, q[File size is required] ] if !$args->{size};
+
+        # check upload size
+        return [ 400, 'File is too large' ] if $self->{upload_max_size} && $args->{size} > $self->{upload_max_size};
+
+        # filename is required
+        return [ 400, 'File name is required' ] if $self->{upload_filename_is_required} && !defined $args->{name};
 
         # generate upload id
         my $id = $args->{id} = uuid_v4_str;
@@ -36,6 +46,7 @@ sub _upload ( $self, $auth, $args, $on_start, $on_finish, $on_hash = undef ) {
 
             return 200,
               { id               => $id,
+                chunk_size       => $self->{upload_chunk_size},
                 hash_is_required => $args->{hash_is_required}
               };
         }
@@ -144,9 +155,11 @@ sub _set_upload_timer ( $self, $upload_id ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 11                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 15                   | Subroutines::ProhibitExcessComplexity - Subroutine "_upload" with high complexity score (21)                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 11                   | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_upload' declared but not used      |
+## |    3 | 15                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 15                   | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_upload' declared but not used      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

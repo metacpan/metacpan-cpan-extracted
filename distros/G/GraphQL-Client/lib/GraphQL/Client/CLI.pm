@@ -4,13 +4,16 @@ package GraphQL::Client::CLI;
 use warnings;
 use strict;
 
-use Text::ParseWords;
+use Encode qw(decode);
 use Getopt::Long 2.39 qw(GetOptionsFromArray);
 use GraphQL::Client;
 use JSON::MaybeXS;
+use Text::ParseWords;
 use namespace::clean;
 
-our $VERSION = '0.602'; # VERSION
+our $VERSION = '0.604'; # VERSION
+
+my $JSON = JSON::MaybeXS->new(canonical => 1);
 
 sub _croak { require Carp; goto &Carp::croak }
 
@@ -67,6 +70,7 @@ sub main {
     if ($query eq '-') {
         print STDERR "Interactive mode engaged! Waiting for a query on <STDIN>...\n"
             if -t STDIN; ## no critic (InputOutput::ProhibitInteractiveTest)
+        binmode(STDIN, 'encoding(UTF-8)');
         $query = do { local $/; <STDIN> };
     }
 
@@ -80,6 +84,18 @@ sub main {
         *STDOUT = $out;
     }
 
+    if (my $filter = $options->{filter}) {
+        eval { require JSON::Path::Evaluator } or die "Missing dependency: JSON::Path\n";
+        my @values = JSON::Path::Evaluator::evaluate_jsonpath($data, $filter);
+        if (@values == 1) {
+            $data = $values[0];
+        }
+        else {
+            $data = \@values;
+        }
+    }
+
+    binmode(STDOUT, 'encoding(UTF-8)');
     _print_data($data, $format);
 
     exit($unpack && $err ? 1 : 0);
@@ -90,6 +106,9 @@ sub _get_options {
     my @args = @_;
 
     unshift @args, shellwords($ENV{GRAPHQL_CLIENT_OPTIONS} || '');
+
+    # assume UTF-8 args if non-ASCII
+    @args = map { decode('UTF-8', $_) } @args if grep { /\P{ASCII}/ } @args;
 
     my %options = (
         format  => 'json:pretty',
@@ -107,6 +126,7 @@ sub _get_options {
         'operation-name|n=s'    => \$options{operation_name},
         'transport|t=s%'        => \$options{transport},
         'format|f=s'            => \$options{format},
+        'filter|p=s'            => \$options{filter},
         'unpack!'               => \$options{unpack},
         'output|o=s'            => \$options{outfile},
     ) or _pod2usage(2);
@@ -124,18 +144,29 @@ sub _get_options {
         die "Two or more --variable keys are incompatible.\n" if $@;
     }
     elsif ($options{variables}) {
-        $options{variables} = eval { JSON::MaybeXS->new->decode($options{variables}) };
+        $options{variables} = eval { $JSON->decode($options{variables}) };
         die "The --variables JSON does not parse.\n" if $@;
     }
 
     return \%options;
 }
 
+sub _stringify {
+    my ($item) = @_;
+    if (ref($item) eq 'ARRAY') {
+        my $first = @$item && $item->[0];
+        return join(',', @$item) if !ref($first);
+        return join(',', map { $JSON->encode($_) } @$item);
+    }
+    return $JSON->encode($item) if ref($item) eq 'HASH';
+    return $item;
+}
+
 sub _print_data {
     my ($data, $format) = @_;
     $format = lc($format || 'json:pretty');
     if ($format eq 'json' || $format eq 'json:pretty') {
-        my %opts = (allow_nonref => 1, canonical => 1, utf8 => 1);
+        my %opts = (allow_nonref => 1, canonical => 1);
         $opts{pretty} = 1 if $format eq 'json:pretty';
         print JSON::MaybeXS->new(%opts)->encode($data);
     }
@@ -148,25 +179,40 @@ sub _print_data {
 
         my $unpacked = $data;
         # $unpacked = $data->{data} if !$unpack && !$err;
-        $unpacked = $data->{data} if $data && $data->{data};
+        $unpacked = $data->{data} if ref $data eq 'HASH' && $data->{data};
 
         # check the response to see if it can be formatted
         my @columns;
         my $rows = [];
-        if (keys %$unpacked == 1) {
-            my ($val) = values %$unpacked;
-            if (ref $val eq 'ARRAY') {
-                my $first = $val->[0];
-                if ($first && ref $first eq 'HASH') {
-                    @columns = sort keys %$first;
-                    $rows = [
-                        map { [@{$_}{@columns}] } @$val
-                    ];
+        if (ref $unpacked eq 'HASH') {
+            if (keys %$unpacked == 1) {
+                my ($val) = values %$unpacked;
+                if (ref $val eq 'ARRAY') {
+                    my $first = $val->[0];
+                    if ($first && ref $first eq 'HASH') {
+                        @columns = sort keys %$first;
+                        $rows = [
+                            map { [map { _stringify($_) } @{$_}{@columns}] } @$val
+                        ];
+                    }
+                    elsif ($first) {
+                        @columns = keys %$unpacked;
+                        $rows = [map { [map { _stringify($_) } $_] } @$val];
+                    }
                 }
-                elsif ($first) {
-                    @columns = keys %$unpacked;
-                    $rows = [map { [$_] } @$val];
-                }
+            }
+        }
+        elsif (ref $unpacked eq 'ARRAY') {
+            my $first = $unpacked->[0];
+            if ($first && ref $first eq 'HASH') {
+                @columns = sort keys %$first;
+                $rows = [
+                    map { [map { _stringify($_) } @{$_}{@columns}] } @$unpacked
+                ];
+            }
+            elsif ($first) {
+                @columns = qw(column);
+                $rows = [map { [map { _stringify($_) } $_] } @$unpacked];
             }
         }
 
@@ -195,13 +241,26 @@ sub _print_data {
             exit 3;
         }
     }
+    elsif ($format eq 'string') {
+        if (!ref $data) {
+            print $data, "\n";
+        }
+        elsif (ref $data eq 'ARRAY') {
+            print join("\n", @$data);
+        }
+        else {
+            _print_data($data);
+            print STDERR sprintf("Error: Response could not be formatted as %s.\n", $format);
+            exit 3;
+        }
+    }
     elsif ($format eq 'perl') {
         eval { require Data::Dumper } or die "Missing dependency: Data::Dumper\n";
         print Data::Dumper::Dumper($data);
     }
     else {
-        print STDERR "Error: Format not supported: $format\n";
         _print_data($data);
+        print STDERR "Error: Format not supported: $format\n";
         exit 3;
     }
 }
@@ -309,7 +368,7 @@ GraphQL::Client::CLI - Implementation of the graphql CLI program
 
 =head1 VERSION
 
-version 0.602
+version 0.604
 
 =head1 DESCRIPTION
 

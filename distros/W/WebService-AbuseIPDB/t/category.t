@@ -13,11 +13,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2 + 21 * 11;
+use Test::More tests => 3 + 23 * 11;
 
 use WebService::AbuseIPDB::Category;
+use WebService::AbuseIPDB::Response;
 
-for my $cid (3 .. 23) {
+for my $cid (1 .. 23) {
 	my @cat = WebService::AbuseIPDB::Category->new ($cid);
 	ok ($cat[0], "Category for id $cid defined");
 	isa_ok ($cat[0], 'WebService::AbuseIPDB::Category', 'Class matches');
@@ -38,3 +39,6 @@ my $cat = WebService::AbuseIPDB::Category->new ();
 is ($cat, undef, 'Undef cat returns undef');
 $cat = WebService::AbuseIPDB::Category->new ('Not a cat');
 is ($cat, undef, 'Unrecognised cat returns undef');
+$cat = WebService::AbuseIPDB::Category->new
+	(WebService::AbuseIPDB::Response->new);
+is ($cat, undef, 'Arg of wrong class returns undef');

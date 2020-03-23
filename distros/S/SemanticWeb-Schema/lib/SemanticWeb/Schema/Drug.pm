@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v7.0.0';
 
 
 has active_ingredient => (
@@ -70,14 +70,6 @@ has clinical_pharmacology => (
     is        => 'rw',
     predicate => '_has_clinical_pharmacology',
     json_ld   => 'clinicalPharmacology',
-);
-
-
-
-has cost => (
-    is        => 'rw',
-    predicate => '_has_cost',
-    json_ld   => 'cost',
 );
 
 
@@ -290,7 +282,7 @@ SemanticWeb::Schema::Drug - A chemical or biologic substance
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -433,22 +425,6 @@ A clinical_pharmacology should be one of the following types:
 =head2 C<_has_clinical_pharmacology>
 
 A predicate for the L</clinical_pharmacology> attribute.
-
-=head2 C<cost>
-
-Cost per unit of the drug, as reported by the source being tagged.
-
-A cost should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::DrugCost']>
-
-=back
-
-=head2 C<_has_cost>
-
-A predicate for the L</cost> attribute.
 
 =head2 C<dosage_form>
 

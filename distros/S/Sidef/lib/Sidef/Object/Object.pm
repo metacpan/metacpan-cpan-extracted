@@ -310,6 +310,7 @@ package Sidef::Object::Object {
             $str;
         };
 
+        no warnings 'redefine';
         local *Sidef::Object::Object::dump = $sub;
         $sub->($_[0]);
     }
@@ -349,6 +350,7 @@ package Sidef::Object::Object {
 
             my %alias;
             my %methods;
+
             my $ref = CORE::ref($self) || $self;
 
             foreach my $method (grep { $_ !~ /^[(_]/ and defined(&{$ref . '::' . $_}) } keys %{$ref . '::'}) {
@@ -364,7 +366,7 @@ package Sidef::Object::Object {
                                     );
             }
 
-            Sidef::Types::Hash::Hash->new(%methods);
+            Sidef::Types::Hash::Hash->new(\%methods);
         }
 
         # Pipeline operator

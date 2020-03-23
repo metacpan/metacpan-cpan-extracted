@@ -1,0 +1,16 @@
+Web-Solid-Test
+==============
+
+Created:      2019-04-24
+Home page:    <https://metacpan.org/release/Web-Solid-Test>
+Bug tracker:  <https://github.com/kjetilk/p5-web-solid-test-basic/issues>
+Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+
+0.021	2020-03-20	Rename the distribution
+
+ - Another attempt at renaming the distribution.
+
+0.020	2020-03-16	Rename the distribution
+
+ - Added: Add a POD for the main documentation
+ - Rename the distribution.

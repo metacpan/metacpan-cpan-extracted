@@ -3,7 +3,7 @@ package Grep::Query::Parser::QOPS;
 use strict;
 use warnings;
 
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 $VERSION = eval $VERSION;
 
 sub __union
@@ -137,7 +137,7 @@ sub xeq
 		{
 			my $rv = $data->{$_};
 			my $v = defined($fieldAccessor) ? $fieldAccessor->access($self->{field}, $$rv) : $$rv;
-			$answer{$_} = $rv if $self->{op}->($v, $self->{value});
+			$answer{$_} = $rv if $self->{op}->($v, $self->{value}, $$rv);
 			0;
 		} keys(%$data);
 	

@@ -7,7 +7,7 @@ use Path::Tiny ();
 use Alien::Build::Util qw( _mirror );
 
 # ABSTRACT: Core download plugin
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 
 sub _hook
@@ -125,7 +125,7 @@ Alien::Build::Plugin::Core::Download - Core download plugin
 
 =head1 VERSION
 
-version 2.15
+version 2.17
 
 =head1 SYNOPSIS
 

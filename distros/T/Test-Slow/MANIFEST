@@ -1,11 +1,18 @@
 Build.PL
 Changes
+LICENSE
+META.json
+README.md
+cpanfile
 lib/Test/Slow.pm
-MANIFEST			This list of files
-META.yml
-README
+minil.toml
 t/00-load.t
+t/01-skip.t
+t/02-skipforced.t
+t/03-quick.t
+t/04-quickforced.t
 t/kwalitee.t
 t/pod-coverage.t
 t/pod.t
-Makefile.PL
+META.yml
+MANIFEST

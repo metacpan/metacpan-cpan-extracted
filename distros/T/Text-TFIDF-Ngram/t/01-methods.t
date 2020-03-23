@@ -195,7 +195,9 @@ $expected = {
 $x = $obj->counts->{$filename};
 is_deeply $x, $expected, 'counts';
 
-$obj = Text::TFIDF::Ngram->new( files => ['t/4.txt'], size => 2, stopwords => 0, punctuation => '' );
+$filename = 't/4.txt';
+
+$obj = Text::TFIDF::Ngram->new( files => [$filename], size => 2, stopwords => 0, punctuation => '' );
 isa_ok $obj, 'Text::TFIDF::Ngram';
 $expected = {
     'lamb .'      => 1,
@@ -211,10 +213,10 @@ $expected = {
     'white as'    => 1,
     'fleece was'  => 1
 };
-$x = $obj->counts->{'t/4.txt'};
+$x = $obj->counts->{$filename};
 is_deeply $x, $expected, 'counts';
 
-$obj = Text::TFIDF::Ngram->new( files => ['t/4.txt'], size => 2, stopwords => 0, lowercase => 1 );
+$obj = Text::TFIDF::Ngram->new( files => [$filename], size => 2, stopwords => 0, lowercase => 1 );
 isa_ok $obj, 'Text::TFIDF::Ngram';
 $expected = {
     'was white'   => 1,
@@ -227,7 +229,7 @@ $expected = {
     'white as'    => 1,
     'fleece was'  => 1
 };
-$x = $obj->counts->{'t/4.txt'};
+$x = $obj->counts->{$filename};
 is_deeply $x, $expected, 'counts';
 
 done_testing();

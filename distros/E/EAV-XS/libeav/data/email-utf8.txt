@@ -1,0 +1,34 @@
+good@почта.рф
+good@ПоЧтА.РФ
+good@微博.微博
+good@ею.ею
+test-tld@δοκιμή.δοκιμή
+test-tld@آزمایشی.آزمایشی
+not-assigned@טעסט.טעסט
+#
+# invalid email addresses
+#
+НЕрабочий@адрес.оф
+时尚@微博
+
+பரிட்சை.பரிட்சை
+@ελ.ελ
+lpart-only@
+no@	[1.2.3.4]
+no@[]
+no@[
+no@[1.2.3.4 ]
+no@[ 1.2.3.4]
+#
+# prohibited idna2008 symbols
+#
+invalid@I♥NY.de
+invalid@☕.de
+#
+# extra chars
+#
+{rfc20}@example.com
+#rfc20#@example.net
+|rfc20|@example.org
+^rfc20^@localhost
+`rfc20`@localhost

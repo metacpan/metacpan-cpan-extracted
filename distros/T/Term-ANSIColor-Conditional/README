@@ -2,9 +2,9 @@ NAME
     Term::ANSIColor::Conditional - Colorize text only if color is enabled
 
 VERSION
-    This document describes version 0.006 of Term::ANSIColor::Conditional
+    This document describes version 0.007 of Term::ANSIColor::Conditional
     (from Perl distribution Term-ANSIColor-Conditional), released on
-    2018-12-02.
+    2020-03-21.
 
 SYNOPSIS
     Use as you would Term::ANSIColor.
@@ -66,13 +66,13 @@ SEE ALSO
 
     These modules also respect the "NO_COLOR" and/or the "COLOR" environment
     variable: Color::ANSI::Util, Text::ANSITable, Data::Dump::Color,
-    JSON::Color, YAML::Tiny::Color, App::diffwc, App::rsynccolor.
+    App::diffwc, App::rsynccolor.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

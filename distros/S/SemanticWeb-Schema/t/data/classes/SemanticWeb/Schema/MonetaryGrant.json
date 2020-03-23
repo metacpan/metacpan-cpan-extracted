@@ -22,15 +22,15 @@
             "issue-1253"
          ],
          "schema:domainIncludes" : [
+            "schema:DatedMoneySpecification",
+            "schema:MoneyTransfer",
             "schema:MonetaryGrant",
             "schema:InvestmentOrDeposit",
-            "schema:MoneyTransfer",
-            "schema:LoanOrCredit",
-            "schema:DatedMoneySpecification"
+            "schema:LoanOrCredit"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:Number"
          ]
       },
       "schema:funder" : {
@@ -39,15 +39,15 @@
          "rdfs:label" : "funder",
          "rdfs:subPropertyOf" : "schema:sponsor",
          "schema:domainIncludes" : [
-            "schema:Person",
-            "schema:MonetaryGrant",
             "schema:CreativeWork",
             "schema:Organization",
+            "schema:MonetaryGrant",
+            "schema:Person",
             "schema:Event"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       }
    }

@@ -13,12 +13,12 @@
          "rdfs:label" : "caption",
          "schema:domainIncludes" : [
             "schema:VideoObject",
-            "schema:ImageObject",
-            "schema:AudioObject"
+            "schema:AudioObject",
+            "schema:ImageObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:MediaObject",
-            "schema:Text"
+            "schema:Text",
+            "schema:MediaObject"
          ]
       },
       "schema:exifData" : {

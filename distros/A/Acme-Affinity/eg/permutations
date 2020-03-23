@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+# WARNING: Running this could take a very long time...
+
 use Acme::Affinity;
 use Algorithm::Combinatorics qw/ variations_with_repetition /;
 

@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,5 +52,9 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+if ( $^O eq 'MSWin32' ) {
+	$WriteMakefileArgs{PREREQ_PM}{'Win32::Console::ANSI'} = '0';
+}
 
 WriteMakefile(%WriteMakefileArgs);

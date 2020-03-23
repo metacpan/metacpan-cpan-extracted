@@ -1,6 +1,7 @@
 package Duadua::Parser::Browser::MicrosoftInternetExplorer;
 use strict;
 use warnings;
+use Duadua::Util qw//;
 
 sub try {
     my ($class, $d) = @_;
@@ -34,6 +35,19 @@ sub try {
         }
 
         return $h;
+    }
+
+    if ( index($d->ua, 'Windows-RSS-Platform/') > -1 ) {
+        my $h = {
+            name => 'Windows RSS Platform',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!^Windows-RSS-Platform/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+
+        return Duadua::Util->set_os($d, $h);
     }
 }
 

@@ -11,35 +11,48 @@
    "properties" : {
       "schema:occupationalCategory" : {
          "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2460",
             "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/2192",
-            "https://github.com/schemaorg/schemaorg/issues/2289"
+            "https://github.com/schemaorg/schemaorg/issues/2289",
+            "https://github.com/schemaorg/schemaorg/issues/2192"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A category describing the job, preferably using a term from a taxonomy such as <a href=\"http://www.onetcenter.org/taxonomy.html\">BLS O*NET-SOC</a>, <a href=\"https://www.ilo.org/public/english/bureau/stat/isco/isco08/\">ISCO-08</a> or similar, with the property repeated for each applicable value. Ideally the taxonomy should be identified, and both the textual label and formal code for the category should be provided.<br/><br/>\n\nNote: for historical reasons, any textual label and formal code provided as a literal may be assumed to be from O*NET-SOC.",
          "rdfs:label" : "occupationalCategory",
          "schema:category" : [
-            "issue-2289",
+            "issue-1698",
             "issue-2192",
-            "issue-1698"
+            "issue-2460",
+            "issue-2289"
          ],
          "schema:domainIncludes" : [
+            "schema:EducationalOccupationalProgram",
             "schema:JobPosting",
             "schema:WorkBasedProgram",
             "schema:Occupation"
          ],
+         "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:CategoryCode",
-            "schema:Text"
+            "schema:Text",
+            "schema:CategoryCode"
          ]
       },
       "schema:trainingSalary" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2289",
+            "https://github.com/schemaorg/schemaorg/issues/2460"
+         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The estimated salary earned while in the program.",
          "rdfs:label" : "trainingSalary",
-         "schema:category" : "issue-2289",
-         "schema:domainIncludes" : "schema:WorkBasedProgram",
+         "schema:category" : [
+            "issue-2289",
+            "issue-2460"
+         ],
+         "schema:domainIncludes" : [
+            "schema:WorkBasedProgram",
+            "schema:EducationalOccupationalProgram"
+         ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:MonetaryAmountDistribution"
       }

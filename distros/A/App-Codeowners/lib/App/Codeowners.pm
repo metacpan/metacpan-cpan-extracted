@@ -10,11 +10,10 @@ use App::Codeowners::Formatter;
 use App::Codeowners::Options;
 use App::Codeowners::Util qw(find_codeowners_in_directory run_git git_ls_files git_toplevel);
 use Color::ANSI::Util 0.03 qw(ansifg);
-use Encode qw(encode);
 use File::Codeowners;
 use Path::Tiny;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 
 sub main {
@@ -29,6 +28,8 @@ sub main {
     my $command = $opts->command;
     my $handler = $self->can("_command_$command")
         or die "Unknown command: $command\n";
+
+    binmode(STDOUT, ':encoding(UTF-8)');
     $self->$handler($opts);
 
     exit 0;
@@ -218,7 +219,7 @@ App::Codeowners - A tool for managing CODEOWNERS files
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 DESCRIPTION
 

@@ -82,6 +82,9 @@ package Sidef::Deparse::Perl {
                   Sidef::Sys::Sys                         Sidef::Sys::Sys
                   Sidef::Perl::Perl                       Sidef::Perl::Perl
                   Sidef::Math::Math                       Sidef::Math::Math
+
+                  Sidef::Time::Time                       Sidef::Time::Time
+                  Sidef::Time::Date                       Sidef::Time::Date
                   )
             },
 
@@ -101,6 +104,14 @@ use ${\($] <= 5.026 ? $] : 5.026)};
 local \$| = 1;   # autoflush
 
 HEADER
+
+        if (defined $opts{opt}{w}) {
+            $opts{header} .= '$SIG{__WARN__} = sub { require Carp; Carp::cluck(@_) };';
+        }
+
+        if (defined $opts{opt}{W}) {
+            $opts{header} .= '$SIG{__DIE__} = $SIG{__WARN__} = sub { require Carp; Carp::confess(@_) };';
+        }
 
         if (exists $opts{opt}{P}) {
             my $precision = abs(int($opts{opt}{P}));
@@ -1369,9 +1380,6 @@ HEADER
                 \$Sidef::PARSER->parse_script(code => do{my\$o=~ . $self->deparse_args($obj->{expr}) . qq~;\\"\$o"});
             })}~;
         }
-        elsif ($ref eq 'Sidef::Time::Time') {
-            $code = $ref . '->new';
-        }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
             my ($real, $imag) = $obj->reals;
             my $name = "Complex$refaddr";
@@ -1449,7 +1457,9 @@ HEADER
                   . "my \$a$refaddr = do{$args[0]};"
                   . "my \$b$refaddr = do{$args[1]};"
                   . ($obj->{act} eq 'assert_ne' ? qq{!(\$a$refaddr eq \$b$refaddr)} : qq{\$a$refaddr eq \$b$refaddr})
-                  . qq~ or CORE::die((do{$args[2]} // ('$obj->{act}('.~
+                  . qq~ or CORE::die((~
+                  . (defined($args[2]) ? "do{$args[2]}" : "undef")
+                  . qq~// ('$obj->{act}('.~
                   . qq~join(', ',map{UNIVERSAL::can(\$_,'dump') ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr)) . ')'))~
                   . qq~." failed at \Q$obj->{file}\E line $obj->{line}\\n")}~;
             }
@@ -1670,7 +1680,7 @@ HEADER
                         }
 
                         if ($method eq '+') {
-                            $code = $self->deparse_args(@{$call->{arg}});
+                            $code = 'scalar' . $self->deparse_args(@{$call->{arg}});
                             next;
                         }
 

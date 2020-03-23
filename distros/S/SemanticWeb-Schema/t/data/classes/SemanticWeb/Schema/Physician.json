@@ -4,8 +4,8 @@
       "rdfs:comment" : "A doctor's office.",
       "rdfs:label" : "Physician",
       "rdfs:subClassOf" : [
-         "schema:MedicalBusiness",
-         "schema:MedicalOrganization"
+         "schema:MedicalOrganization",
+         "schema:MedicalBusiness"
       ]
    },
    "properties" : {
@@ -14,9 +14,9 @@
          "rdfs:comment" : "A medical service available from this provider.",
          "rdfs:label" : "availableService",
          "schema:domainIncludes" : [
-            "schema:Physician",
+            "schema:MedicalClinic",
             "schema:Hospital",
-            "schema:MedicalClinic"
+            "schema:Physician"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
@@ -38,10 +38,10 @@
          "rdfs:comment" : "A medical specialty of the provider.",
          "rdfs:label" : "medicalSpecialty",
          "schema:domainIncludes" : [
-            "schema:Hospital",
-            "schema:MedicalClinic",
+            "schema:MedicalOrganization",
             "schema:Physician",
-            "schema:MedicalOrganization"
+            "schema:Hospital",
+            "schema:MedicalClinic"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalSpecialty"

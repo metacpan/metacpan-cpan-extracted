@@ -23,8 +23,8 @@
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
             "schema:ActionAccessSpecification",
-            "schema:ConsumeAction",
-            "schema:MediaSubscription"
+            "schema:MediaSubscription",
+            "schema:ConsumeAction"
          ],
          "schema:rangeIncludes" : "schema:Offer"
       }

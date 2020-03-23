@@ -15,15 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.1';
-
-
-has cause => (
-    is        => 'rw',
-    predicate => '_has_cause',
-    json_ld   => 'cause',
-);
-
+our $VERSION = 'v7.0.0';
 
 
 has possible_treatment => (
@@ -50,7 +42,7 @@ SemanticWeb::Schema::MedicalSignOrSymptom - Any feature associated or not with a
 
 =head1 VERSION
 
-version v6.0.1
+version v7.0.0
 
 =head1 DESCRIPTION
 
@@ -58,24 +50,6 @@ Any feature associated or not with a medical condition. In medicine a
 symptom is generally subjective while a sign is objective.
 
 =head1 ATTRIBUTES
-
-=head2 C<cause>
-
-Specifying a cause of something in general. e.g in medicine , one of the
-causative agent(s) that are most directly responsible for the
-pathophysiologic process that eventually results in the occurrence.
-
-A cause should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::MedicalCause']>
-
-=back
-
-=head2 C<_has_cause>
-
-A predicate for the L</cause> attribute.
 
 =head2 C<possible_treatment>
 

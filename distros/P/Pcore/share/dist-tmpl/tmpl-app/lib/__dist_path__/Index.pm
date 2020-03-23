@@ -4,7 +4,7 @@ use Pcore -class;
 
 with qw[Pcore::App::Controller::Webpack];
 
-has app_dist => ( "@{[ $ENV->dist->{root} ]}/app/www", init_arg => undef );
+has app_dist => ( "@{[ $ENV->dist->{root} ]}/app/dist", init_arg => undef );
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----

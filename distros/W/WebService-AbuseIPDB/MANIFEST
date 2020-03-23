@@ -3,6 +3,8 @@ Changes
 CONTRIBUTING.md
 examples/check.pl
 lib/WebService/AbuseIPDB.pm
+lib/WebService/AbuseIPDB/BlacklistMember.pm
+lib/WebService/AbuseIPDB/BlacklistResponse.pm
 lib/WebService/AbuseIPDB/Category.pm
 lib/WebService/AbuseIPDB/CheckResponse.pm
 lib/WebService/AbuseIPDB/ReportResponse.pm
@@ -12,6 +14,7 @@ Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
+t/blacklist.t
 t/category.t
 t/check.t
 t/opts.t

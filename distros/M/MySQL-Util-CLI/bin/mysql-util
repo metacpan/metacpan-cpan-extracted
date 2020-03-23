@@ -1,0 +1,154 @@
+#!/usr/bin/env perl
+
+# vim: tabstop=4 expandtab
+
+=head1 NAME
+
+mysql-util - a cli utility for MySQL::Util
+
+=head1 VERSION
+
+version 0.002
+
+=cut
+
+###### PACKAGES ######
+
+use Modern::Perl;
+use warnings FATAL      => 'all';
+use Data::Printer alias => 'pdump';
+use CLI::Driver;
+use File::ShareDir 'dist_file';
+use File::Basename;
+use Getopt::Long;
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('pass_through');
+Getopt::Long::Configure('no_auto_abbrev');
+
+###### CONSTANTS ######
+
+use constant DIST_NAME => 'MySQL-Util-CLI';
+
+###### GLOBALS ######
+
+use vars qw(
+  $Action
+  $CliDriver
+);
+
+###### MAIN ######
+
+$| = 1;
+
+$CliDriver = CLI::Driver->new( path => get_cli_driver_path() );
+
+parse_cmd_line();
+
+my $action = $CliDriver->get_action( name => $Action );
+
+if ($action) {
+	$action->do;
+}
+else {
+	$CliDriver->fatal("failed to find action in config file");
+}
+
+###### END MAIN ######
+
+sub get_repo_dir {
+	
+	my $bindir = dirname $0;
+	my $devdir = dirname $bindir;		
+	
+	return $devdir;
+}
+
+sub get_cli_driver_path {
+
+	#
+	# first attempt to find the driver file in the git repo location
+	#
+	my $sharedir = sprintf "%s/share", get_repo_dir();
+	if ( -f "$sharedir/cli-driver.yml" ) {
+		# local development location
+		return $sharedir;
+	}
+
+	#
+	# try the installed location
+	#
+	my $file = dist_file( DIST_NAME(), 'cli-driver.yml' );
+
+	return dirname $file;
+}
+
+sub check_required {
+	my $opt = shift;
+	my $arg = shift;
+
+	print_usage("missing arg $opt") if !$arg;
+}
+
+sub parse_cmd_line {
+
+	my $help;
+	GetOptions( "help|?" => \$help );
+
+	if ( !@ARGV ) {
+		print_usage();
+	}
+	elsif (@ARGV) {
+		$Action = shift @ARGV;
+	}
+
+	if ($help) {
+		if ($Action) {
+			help_action();
+		}
+		else {
+			print_usage();
+		}
+	}
+}
+
+sub help_action {
+
+	my $action = $CliDriver->get_action( name => $Action );
+	$action->usage;
+}
+
+sub print_actions {
+
+	my $actions = $CliDriver->get_actions;
+	my @list;
+
+	foreach my $action (@$actions) {
+
+		next if $action->name =~ /dummy/i;
+		my $display = $action->name;
+
+		if ( $action->is_deprecated ) {
+			$display .= " (deprecated)";
+		}
+
+		push @list, $display;
+	}
+
+	say "\tACTIONS:";
+
+	foreach my $action ( sort @list ) {
+		print "\t\t$action\n";
+	}
+}
+
+sub print_usage {
+	print STDERR "@_\n\n" if @_;
+
+	my $basename = basename($0);
+
+	printf "\nusage: %s <action> [opts] [-?]\n\n", basename($0);
+	print_actions();
+	print "\n";
+
+	exit 1;
+}

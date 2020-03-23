@@ -4,13 +4,14 @@ use 5.006;
 use strict;
 use warnings;
 use feature qw/say/;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
 	my ($package, %args) = @_;
 	$args{total_num_of_rooms} ||= 20;
 	$args{lifes} ||= 3;
-	$args{rooms} ||= {};
+	$args{rooms} ||= [];
+	$args{max_length_of_stay} ||= $args{total_num_of_rooms}*2;
 	my $self = bless \%args, $package;
 	unless ($self->{names}) {
 		$self->{names} = [
@@ -61,40 +62,60 @@ sub new {
 			]
 		];
 	}
-	return $self->next_patient;
+	return $self;
+}
+
+sub start { 
+	my $self = shift;
+	unless (ref $self) {
+		$self = __PACKAGE__->new;
+	}
+	$self->next_patient; 
 }
 
 sub available_rooms {
-	return $_[0]->{total_num_of_rooms} - keys %{$_[0]->{rooms}};
-}
-
-sub generate_random_name {
-	my @names = @{$_[0]->{names}};
-	return sprintf '%s %s', map { $names[int(rand($#names))] } 0 .. 1;
+	return $_[0]->{total_num_of_rooms} - scalar @{$_[0]->{rooms}};
 }
 
 sub next_patient {
-	my $patient = int(rand(10));
-	my $name = $_[0]->generate_random_name;
-	my @phrases = @{ $_[0]->{phrases}->[$patient] };
-	my $phrase = $phrases[int(rand($#phrases))];
-	say sprintf 'You have %s available rooms', $_[0]->available_rooms;
-	say 'The next patients name is: ' . $name;
-	say $phrase;
-	my $ans = wait_answer();
-	if ($ans eq 'y') {
-		$patient < 6 ? do {
-			$_[0]->lose_a_life();
-		} : do {
-			$_[0]->{rooms}->{keys %{$_[0]->{rooms}}} = $name;
-		};
-	} elsif ($patient > 5) {
-		$_[0]->lose_a_life();
+	$_[0]->check_patients_out;
+	my $available = $_[0]->available_rooms;
+	if ($available == 0) {
+		say 'You won this time.';
+		exit;
 	}
-	$_[0]->next_patient();
+	my %patient = $_[0]->_generate_patient();
+	my @phrases = @{ $_[0]->{phrases}->[$patient{level}] };
+	my $phrase = $phrases[int(rand(@phrases))];
+	say sprintf 'You have %s available rooms', $_[0]->available_rooms;
+	say sprintf('The next patients name is: %s. The patient will stay for: %s.', $patient{name}, $patient{length});
+	say $phrase;
+	my $ans = _wait_answer();
+	if ($ans eq 'y') {
+		$patient{level} < 6 ? do {
+			$_[0]->_lose_a_life();
+		} : do {
+			push @{$_[0]->{rooms}}, \%patient;
+		};
+	} elsif ($patient{level} > 5) {
+		$_[0]->_lose_a_life();
+	}
+	$_[0]->next_patient() unless $_[1];
 }
 
-sub lose_a_life {
+sub check_patients_out {
+	my $i = 0;
+	for (@{$_[0]->{rooms}}) {
+		$_->{length}--;
+		if ($_->{length} == 0) {
+			splice @{$_[0]->{rooms}}, $i, 1; 
+			say 'Patient checked out: ' . $_->{name};
+		}
+		$i++;
+	}
+}
+
+sub _lose_a_life {
 	if ($_[0]->{lifes}-- == 0) {
 		say 'GAME OVER!';
 		exit;
@@ -102,14 +123,23 @@ sub lose_a_life {
 	say sprintf 'You lose a life, %s lifes remaining.', $_[0]->{lifes};
 }
 
-sub wait_answer {
+sub _wait_answer {
 	say 'Should they go to hospital? (y/n) ';
 	my $answer = <STDIN>;
 	chomp $answer;
 	if ($answer !~ m/y|n/) {
-		return wait_answer();
+		return _wait_answer();
 	}
 	return $answer;
+}
+
+sub _generate_patient {
+	my @names = @{$_[0]->{names}};
+	return (
+		name => sprintf('%s %s', map { $names[int(rand(@names))] } 0 .. 1),
+		level => int(rand(10)),
+		length => int(rand($_[0]->{max_length_of_stay})) || 1
+	);
 }
 
 1;
@@ -122,7 +152,7 @@ Acme::Hospital::Bed - The great new Acme::Hospital::Bed!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -134,11 +164,13 @@ Perhaps a little code snippet.
 
 	use Acme::Hospital::Bed;
 
-	Acme::Hospital::Bed->new();
+	Acme::Hospital::Bed->start;
 
 	...
 
 	Acme::Hospital::Bed->new(
+		total_num_of_beds => 30,
+		lifes => 5,
 		names => [qw/tom richard harry/],
 		phrases => [
 			[
@@ -156,7 +188,97 @@ Perhaps a little code snippet.
 				'Level 10 phrase'
 			]
 		]	
-	);
+	)->start;
+
+=head1 DESCRIPTION
+
+Acme::Hospital::Bed is a simple command line Q/A game. 
+
+The basic gameplay is the following:
+
+A patient is generated with a random 'illness' level of 1 to 10 and a phrase that is associated to this level.
+
+The player then decides y(yes) or n(no) to check the patient into a hospital bed.
+
+If they guess correctly then the patient will be allocated a bed for the specified time, else the player will lose a life.
+
+A correct guess is when the player decides yes and the patients level is greater than 5.
+
+An incorrect guess is when the player decides yes and the patients level is lower than 5 or when the player decides no and the patients level is greater than 5.
+
+During each turn, all rooms are deducted 1 nights stay. If a room reaches 0 then the patient is checked out and that room becomes available again.
+
+=head1 METHODS
+
+=head2 new
+
+To instantiate a new Acme::Hospital::Bed object.
+
+	Acme::Hospital::Bed->new(
+		total_num_of_beds => 30,
+		lifes => 5,
+		names => [qw/tom richard harry/],
+		phrases => [
+			[
+				'Level 1 phrase'
+			],
+			[...],
+			[...],
+			[...],
+			[...],
+			[...],
+			[...],
+			[...],
+			[...],
+			[
+				'Level 10 phrase'
+			]
+		]	
+	)
+
+=head3 total_num_of_beds
+
+Configure the total number of beds needed to win the game. The default is 20.
+
+=head3 lifes
+
+Configure the total number of lifes the player is allowed. The default is 3.
+
+=head3 names
+
+Configure the list of names used to generate patients. This is expected as an ArrayRef. 
+
+=head3 phrases
+
+Configure the list of phrases for each 'health' level. This is expected as an ArrayRefs of ArraysRefs(aoa); 
+
+=head2 start
+
+This method can be used to Start the game. You can either call this directly or after new.
+
+	Acme::Hospital::Bed->start;
+	
+	Acme::Hospital::Bed->new(%options)->start;
+
+=head2 next_patient
+
+This method can also be used to start the game. If passed a true param it will return after the first itteration else it will loop untill the game is finished.
+	
+	Acme::Hospital::Bed->new(%options)->next_patient();	
+	...
+	Acme::Hospital::Bed->new(%options)->next_patient(1);	
+
+=head2 available_rooms
+
+This method will return the number of available rooms left for the current game.
+
+	$ahb->available_rooms;
+
+=head2 check_patients_out
+
+This method will itterate the current rooms arrayref, deducting the length of stay by 1 day and will remove (check out) any patients that have reached 0.
+
+	$ahb->check_patients_out
 
 =head1 AUTHOR
 

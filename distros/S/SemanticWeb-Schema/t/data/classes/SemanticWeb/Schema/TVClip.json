@@ -12,9 +12,9 @@
          "rdfs:label" : "partOfTVSeries",
          "rdfs:subPropertyOf" : "schema:isPartOf",
          "schema:domainIncludes" : [
-            "schema:TVSeason",
             "schema:TVEpisode",
-            "schema:TVClip"
+            "schema:TVClip",
+            "schema:TVSeason"
          ],
          "schema:rangeIncludes" : "schema:TVSeries",
          "schema:supersededBy" : "schema:partOfSeries"

@@ -2,12 +2,9 @@ Changes
 lib/Debug/Filter/PrintExpr.pm
 Makefile.PL
 MANIFEST			This list of files
-PrintExpr.xs
 README
 t/00-load.t
-t/export.t
 t/manifest.t
-t/nofilter.t
 t/pod.t
 t/printexpr.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

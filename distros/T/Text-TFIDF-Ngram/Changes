@@ -1,5 +1,8 @@
 Revision history for Text-TFIDF-Ngram
 
+0.0502 2020-03-21 18:35:26
+    - Don't document the ->BUILD method.
+
 0.0501 2019-01-26 12:22:33
     - Fix a documentation line!
 

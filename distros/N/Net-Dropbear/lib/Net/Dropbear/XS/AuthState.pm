@@ -3,7 +3,7 @@ package Net::Dropbear::XS::AuthState;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 1;
 __END__

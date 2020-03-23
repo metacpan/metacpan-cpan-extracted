@@ -41,3 +41,11 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+- ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36 AppEngine-Google; (+http://code.google.com/appengine; appid: s~foo)'
+  name: 'AppEngine-Google'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false

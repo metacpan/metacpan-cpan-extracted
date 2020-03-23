@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0608';
+our $VERSION = '0.0610';
 
 use PPI::Document;
 use PPI::Dumper;
@@ -165,42 +165,42 @@ sub BUILD {
 sub report {
     my ( $self, $precision ) = @_;
 
-    $precision ||= 3;
+    $precision //= 2;
 
     printf "Total operators: %d + Total operands: %d = Program length: %d\n",
         $self->n_operators, $self->n_operands, $self->prog_length;
     printf "Distinct operators: %d + Distinct operands: %d = Program vocabulary: %d\n",
         $self->n_distinct_operators, $self->n_distinct_operands, $self->prog_vocab;
-    printf "Estimated program length: %.*f\n", $precision, $self->est_prog_length;
-    printf "Program volume: %.*f\n", $precision, $self->volume;
-    printf "Program difficulty: %.*f\n", $precision, $self->difficulty;
-    printf "Program level: %.*f\n", $precision, $self->level;
-    printf "Program language level: %.*f\n", $precision, $self->lang_level;
+    printf "Estimated program length: %.*f\n",     $precision, $self->est_prog_length;
+    printf "Program volume: %.*f\n",               $precision, $self->volume;
+    printf "Program difficulty: %.*f\n",           $precision, $self->difficulty;
+    printf "Program level: %.*f\n",                $precision, $self->level;
+    printf "Program language level: %.*f\n",       $precision, $self->lang_level;
     printf "Program intelligence content: %.*f\n", $precision, $self->intel_content;
-    printf "Program effort: %.*f\n", $precision, $self->effort;
-    printf "Time to program: %.*f\n", $precision, $self->time_to_program;
-    printf "Delivered bugs: %.*f\n", $precision, $self->delivered_bugs;
+    printf "Program effort: %.*f\n",               $precision, $self->effort;
+    printf "Time to program: %.*f\n",              $precision, $self->time_to_program;
+    printf "Delivered bugs: %.*f\n",               $precision, $self->delivered_bugs;
 }
 
 
 sub dump {
     my ($self) = @_;
     return {
-        n_operators => $self->n_operators,
-        n_operands => $self->n_operands,
+        n_operators          => $self->n_operators,
+        n_operands           => $self->n_operands,
         n_distinct_operators => $self->n_distinct_operators,
-        n_distinct_operands => $self->n_distinct_operands,
-        prog_vocab => $self->prog_vocab,
-        prog_length => $self->prog_length,
-        est_prog_length => $self->est_prog_length,
-        volume => $self->volume,
-        difficulty => $self->difficulty,
-        level => $self->level,
-        lang_level => $self->lang_level,
-        intel_content => $self->intel_content,
-        effort => $self->effort,
-        time_to_program => $self->time_to_program,
-        delivered_bugs => $self->delivered_bugs,
+        n_distinct_operands  => $self->n_distinct_operands,
+        prog_vocab           => $self->prog_vocab,
+        prog_length          => $self->prog_length,
+        est_prog_length      => $self->est_prog_length,
+        volume               => $self->volume,
+        difficulty           => $self->difficulty,
+        level                => $self->level,
+        lang_level           => $self->lang_level,
+        intel_content        => $self->intel_content,
+        effort               => $self->effort,
+        time_to_program      => $self->time_to_program,
+        delivered_bugs       => $self->delivered_bugs,
     };
 }
 
@@ -232,7 +232,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0608
+version 0.0610
 
 =head1 SYNOPSIS
 
@@ -365,9 +365,7 @@ Delivered bugs.
 
 Create a new C<Perl::Metrics::Halstead> object given the B<file> argument.
 
-=head2 BUILD
-
-Process the given B<file> into the computed metrics.
+=for Pod::Coverage BUILD
 
 =head2 report
 
@@ -375,7 +373,7 @@ Process the given B<file> into the computed metrics.
   $halstead->report($precision);
 
 Print the computed metrics to C<STDOUT>.  Optionally provide a number for the
-decimal precision.  Default: 3 digits
+decimal precision.  Default: 2 digits
 
 =head2 dump
 
@@ -409,7 +407,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

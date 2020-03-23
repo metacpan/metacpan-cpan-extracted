@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienAuthor - Alien author documentation
 
 =head1 VERSION
 
-version 2.15
+version 2.17
 
 =head1 SYNOPSIS
 

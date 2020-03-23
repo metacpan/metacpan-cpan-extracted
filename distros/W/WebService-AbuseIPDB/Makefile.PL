@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-my $release = '0.02';
+my $release = '0.03';
 my %MF = (
 	NAME             => 'WebService::AbuseIPDB',
 	AUTHOR           => 'Pete Houston <cpan@openstrike.co.uk>',
@@ -26,6 +26,14 @@ my %MF = (
 		provides => {
 			'WebService::AbuseIPDB' => {
 				file    => 'lib/WebService/AbuseIPDB.pm',
+				version => $release
+			},
+			'WebService::AbuseIPDB::BlacklistMember' => {
+				file    => 'lib/WebService/AbuseIPDB/BlacklistMember.pm',
+				version => $release
+			},
+			'WebService::AbuseIPDB::BlacklistResponse' => {
+				file    => 'lib/WebService/AbuseIPDB/BlacklistResponse.pm',
 				version => $release
 			},
 			'WebService::AbuseIPDB::Category' => {
@@ -93,16 +101,15 @@ WriteMakefile (%MF);
 unless (exists $ENV{AIPDB_KEY}) {
 	print <<EOT;
 
-It is highly recommended that you set the environment variable
-AIPDB_KEY to be your v2 key for the API prior to running "make
-test". Doing so allows the full suite of tests to be run. See
-https://www.abuseipdb.com/account/api for details of the API and to
-obtain a key if you do not yet have one.
+It is recommended that you set the environment variable AIPDB_KEY to be
+your v2 key for the API prior to running "make test". Doing so allows the
+full suite of tests to be run. See https://www.abuseipdb.com/account/api
+for details of the API and to obtain a key if you do not yet have one.
 
 Note that the full test suite currently creates a report for a private
 IP. There is no way to undo this in the API, so please remove it via
 the web interface at https://www.abuseipdb.com/account/reports when you
-are done.
+are done. The tests will necessarily use up some of your daily quota.
 
 EOT
 }

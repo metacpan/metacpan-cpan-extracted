@@ -10,7 +10,7 @@ use Capture::Tiny qw( capture );
 use File::chdir;
 
 # ABSTRACT: Plugin for fetching files using wget
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 
 has wget_command => sub { defined $ENV{WGET} ? which($ENV{WGET}) : which('wget') };
@@ -106,7 +106,7 @@ Alien::Build::Plugin::Fetch::Wget - Plugin for fetching files using wget
 
 =head1 VERSION
 
-version 2.15
+version 2.17
 
 =head1 SYNOPSIS
 

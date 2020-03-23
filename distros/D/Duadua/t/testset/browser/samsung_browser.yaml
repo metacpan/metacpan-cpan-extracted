@@ -1,0 +1,9 @@
+- ua: 'Mozilla/5.0 (Linux; Android 10; SAMSUNG SM-N960F) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/11.1 Chrome/75.0.3770.143 Mobile Safari/537.36'
+  name: 'Samsung Internet Browser'
+  is_bot: false
+  is_ios: false
+  is_android: true
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+  version: '11.1'

@@ -1,7 +1,11 @@
 package colorize::handle;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-21'; # DATE
+our $DIST = 'colorize-stderr'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+BEGIN { if ($^O =~ /^(MSWin32)$/) { require Win32::Console::ANSI } }
 
 use strict;
 use warnings;
@@ -55,7 +59,7 @@ colorize::handle - Colorize a filehandle
 
 =head1 VERSION
 
-This document describes version 0.001 of colorize::handle (from Perl distribution colorize-stderr), released on 2017-07-10.
+This document describes version 0.002 of colorize::handle (from Perl distribution colorize-stderr), released on 2020-03-21.
 
 =head1 SYNOPSIS
 
@@ -116,7 +120,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

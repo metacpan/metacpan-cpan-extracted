@@ -1,0 +1,78 @@
+@prefix test: <http://ontologi.es/doap-tests#> .
+@prefix deps: <http://ontologi.es/doap-deps#>.
+@prefix httph:<http://www.w3.org/2007/ont/httph#> .
+@prefix http: <http://www.w3.org/2007/ont/http#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix nfo:  <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix dqm:  <http://purl.org/dqm-vocabulary/v1/dqm#> .
+@prefix :     <http://example.org/test#> .
+
+:test_list a test:FixtureTable ;
+    test:fixtures (
+        :public_writeread_unauthn_alt
+        :public_cors_origin_set
+    ) .
+
+<http://example.org/httplist#http_req_res_list>
+    a nfo:SoftwareItem ;
+    deps:test-requirement "Web::Solid::Test::HTTPLists"^^deps:CpanId ;
+    nfo:definesFunction "http_req_res_list" .
+
+
+:public_writeread_unauthn_alt a test:AutomatedTest ;
+    test:purpose "A simple test for PUT then GET"@en ;
+    test:test_script <http://example.org/httplist#http_req_res_list> ;
+    test:params [
+        test:steps (
+            [
+                test:request :public_writeread_unauthn_alt_put_req ;
+                test:response_assertion :public_writeread_unauthn_alt_put_res
+            ]
+            [
+                test:request :public_writeread_unauthn_alt_get_req ;
+                test:response_assertion :public_writeread_unauthn_alt_get_res
+            ]
+        )
+    ] .
+
+
+:public_writeread_unauthn_alt_put_req a http:RequestMessage ;
+    http:method "PUT" ;
+    httph:content_type "text/turtle" ;
+    http:content "</public/verypublic/foobar.ttl#dahut> a <http://example.org/Cryptid> ." ;
+    http:requestURI </public/verypublic/foobar.ttl> .
+
+:public_writeread_unauthn_alt_put_res a http:ResponseMessage ;
+    http:status "201|204"^^dqm:regex .
+
+
+:public_writeread_unauthn_alt_get_req a http:RequestMessage ;
+    http:method "GET" ;
+    http:requestURI </public/verypublic/foobar.ttl> .
+
+:public_writeread_unauthn_alt_get_res a http:ResponseMessage ;
+    httph:content_type "text/turtle" .
+
+
+:public_cors_origin_set a test:AutomatedTest ;
+    test:purpose "Testing CORS header when Origin is supplied by client"@en ;
+    rdfs:isDefinedBy <https://www.w3.org/TR/cors/#syntax>, <https://github.com/solid/solid-spec/blob/master/recommendations-server.md#cors---cross-origin-resource-sharing> ;
+    test:test_script <http://example.org/httplist#http_req_res_list> ;
+    test:params [
+        test:steps (
+            [
+                test:request :public_cors_origin_set_req ;
+                test:response_assertion :public_cors_origin_set_res
+            ]
+        )
+    ] .
+
+:public_cors_origin_set_req a http:RequestMessage ;
+    http:method "GET" ;
+    httph:origin <https://app.example> ;
+    http:requestURI </public/verypublic/foobar.ttl> .
+
+:public_cors_origin_set_res a http:ResponseMessage ;
+    http:status 200 ;
+    httph:access_control_allow_origin <https://app.example> .
+

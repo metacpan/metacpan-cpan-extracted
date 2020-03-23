@@ -1,5 +1,14 @@
 Revision history for Net-Dropbear
 
+0.13  2020-03-21 10:49:42 EDT
+        * Improve tests to avoid infinte hangs on bad tests
+        * Handle newer versions of openssh that print extra information
+          on some errors
+
+0.12  2020-03-19 22:31:16 EDT
+        * Disable the new -fPIE addition to Dropbear's configure to enable
+          build on amd64 again
+
 0.11  2020-03-16 22:51:07 EDT
         * Stop attempting to listen on port 22 by default
         * Prevent loading keys from default locations by default

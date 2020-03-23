@@ -1,5 +1,11 @@
 Revision history for perl distribution App-git-ship
 
+0.36 2020-03-23T11:56:56+0900
+ - Fix reading main_module_path from the config file
+   Contributor: Roy Storey
+ - Allow env vars to precede makefile e.g. TAR=gnutar
+   Contributor: Roy Storey
+
 0.35 2019-12-13T11:28:23+0100
  - Fix bad release with .bak files
 

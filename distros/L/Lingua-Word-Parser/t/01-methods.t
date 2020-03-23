@@ -6,16 +6,17 @@ use Test::More;
 
 use_ok 'Lingua::Word::Parser';
 
-my $p = eval { Lingua::Word::Parser->new };
-isa_ok $p, 'Lingua::Word::Parser';
-ok !$@, 'created with no arguments';
-ok !ref $p->{lex}, 'no lex';
+my $p = new_ok 'Lingua::Word::Parser';
+
+ok !$p->{lex}, 'no lex';
 
 $p = Lingua::Word::Parser->new(
     file => 'eg/lexicon.dat',
     word => 'abioticaly',
 );
-is ref $p->{lex}, 'HASH', 'lex';
+
+isa_ok $p->{lex}, 'HASH';
+ok keys %{ $p->{lex} }, 'lex';
 
 my ($known) = $p->knowns;
 is keys %$known, 10, 'known';
@@ -24,8 +25,9 @@ is @$power, 215, 'power';
 
 my $score = $p->score_parts( '[', ']' );
 my $mask = '1111111111';
+my $x = $score->{$mask}[0];
 is @{ $score->{$mask} }, 2, 'score N';
-is_deeply $score->{$mask}[0]{score},
+is_deeply $x->{score},
     {
         knownc   => 10,
         unknownc => 40,
@@ -33,24 +35,35 @@ is_deeply $score->{$mask}[0]{score},
         unknowns => 8
     },
     'score';
-is_deeply $score->{$mask}[0]{familiarity}, [1,1], 'familiarity';
-is_deeply $score->{$mask}[0]{partition},
-    [
-        '[a]bioticaly',
-        'a[bio]ticaly',
-        'abio[tic]aly',
-        'abiotic[a]ly',
-        'abiotica[ly]'
-    ],
+is_deeply $x->{familiarity}, [1,1], 'familiarity';
+is_deeply $x->{partition},
+    [qw/
+        [a]bioticaly
+        a[bio]ticaly
+        abio[tic]aly
+        abiotic[a]ly
+        abiotica[ly]
+    /],
     'partition';
-is_deeply $score->{$mask}[0]{definition},
-    [
-        'opposite',
-        'life',
-        'possessing',
-        'opposite',
-        'like'
-    ],
+is_deeply $x->{definition},
+    [qw/
+        opposite
+        life
+        possessing
+        opposite
+        like
+    /],
+    'definition';
+
+$score = $p->score;
+my $x = $score->{$mask}[-1];
+is $x->{score}, '6:10 chunks / 10:50 chars', 'score';
+is $x->{familiarity}, '1.00 chunks / 1.00 chars', 'familiarity';
+is $x->{partition},
+    '<a>bioticaly, a<bi>oticaly, abi<o>ticaly, abio<tic>aly, abiotic<a>ly, abiotica<ly>',
+    'partition';
+is $x->{definition},
+    'opposite, two, combining, possessing, opposite, like',
     'definition';
 
 done_testing();

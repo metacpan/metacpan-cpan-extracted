@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use PYX qw(attribute char comment end_element instruction start_element);
+
      my @data = attribute(@attr);
      my @data = char($char);
      my @data = comment($comment);
@@ -36,11 +37,9 @@ SUBROUTINES
              Returns array of encoded lines.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use PYX qw(attribute char comment end_element instruction start_element);
 
      # Example output.
@@ -72,17 +71,18 @@ SEE ALSO
         Install the PYX modules.
 
 REPOSITORY
-    <https://github.com/tupinek/PYX>
+    <https://github.com/michal-josef-spacek/PYX>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2005-2016 Michal Špaček
-     BSD 2-Clause License
+    © 2005-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: SQLite setup/teardown for tests
 
-our $VERSION = '0.0406';
+our $VERSION = '0.0409';
 
 use DBI;
 use File::Copy;
@@ -130,36 +130,31 @@ Test::SQLite - SQLite setup/teardown for tests
 
 =head1 VERSION
 
-version 0.0406
+version 0.0409
 
 =head1 SYNOPSIS
 
   use DBI;
   use Test::SQLite;
 
-  # Start with an empty test db:
+  # An empty test db:
   my $sqlite = Test::SQLite->new;
   my $dbh = $sqlite->dbh;
   # Fiddle with the test database...
   $dbh->disconnect;
 
-  # Use an in-memory database:
+  # Use an in-memory test db:
   $sqlite = Test::SQLite->new(memory => 1);
-  $dbh = $sqlite->dbh;
-  # Fiddle with the test database...
-  $dbh->disconnect;
 
   # Copy a database file to the test db:
   $sqlite = Test::SQLite->new(database => '/some/where/database.db');
-  $dbh = $sqlite->dbh;
-  # Fiddle with the test database...
-  $dbh->disconnect;
 
   # Use a schema file to create the test db:
   $sqlite = Test::SQLite->new(
     schema   => '/some/where/schema.sql',
     db_attrs => { RaiseError => 1, AutoCommit => 0 },
   );
+
   # Explicitly use the dsn and db_attrs to connect:
   $dbh = DBI->connect($sqlite->dsn, '', '', $sqlite->db_attrs);
   # Fiddle with the test database...
@@ -213,11 +208,14 @@ Default: { RaiseError => 1, AutoCommit => 1 }
 
 =head2 dsn
 
-The database connection string.
+The database connection string.  This is a computed attribute and an
+argument given to the constructor will be ignored.
 
 =head2 dbh
 
-A connected database handle based on the B<dsn> and B<db_attrs>.
+A connected database handle based on the B<dsn> and B<db_attrs>.  This
+is a computed attribute and an argument given to the constructor will
+be ignored.
 
 =head1 METHODS
 
@@ -228,10 +226,7 @@ A connected database handle based on the B<dsn> and B<db_attrs>.
 
 Create a new C<Test::SQLite> object.
 
-=head2 BUILD
-
-Ensure that we are only given one of B<database>, B<schema> or
-B<memory> in the constructor.
+=for Pod::Coverage BUILD
 
 =head1 SEE ALSO
 

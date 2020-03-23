@@ -15,7 +15,7 @@ package Git::Annex::BatchCommand;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$Git::Annex::BatchCommand::VERSION = '0.004';
+$Git::Annex::BatchCommand::VERSION = '0.005';
 
 use 5.028;
 use strict;
@@ -96,7 +96,7 @@ Git::Annex::BatchCommand - Perl interface to git-annex --batch commands
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

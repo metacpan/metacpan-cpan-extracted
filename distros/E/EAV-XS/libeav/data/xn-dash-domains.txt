@@ -1,0 +1,12 @@
+xn--p1ai.com
+test-.com
+-test.com
+com.com-
+# fail: xn---[a-z]
+xn---abc.com
+# fail: xn----[a-z]
+xn----abc.com
+# fail: xn---[0-9]
+xn---123.com
+# XXX
+xn----123abc.com

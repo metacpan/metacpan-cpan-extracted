@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2490",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A CovidTestingFacility is a <a class=\"localLink\" href=\"http://schema.org/MedicalClinic\">MedicalClinic</a> where testing for the COVID-19 Coronavirus\n      disease is available. If the facility is being made available from an established <a class=\"localLink\" href=\"http://schema.org/Pharmacy\">Pharmacy</a>, <a class=\"localLink\" href=\"http://schema.org/Hotel\">Hotel</a>, or other\n      non-medical organization, multiple types can be listed. This makes it easier to re-use existing schema.org information\n      about that place e.g. contact info, address, opening hours. Note that in an emergency, such information may not always be reliable.",
+      "rdfs:label" : "CovidTestingFacility",
+      "rdfs:subClassOf" : "schema:MedicalClinic",
+      "schema:category" : "issue-2490",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

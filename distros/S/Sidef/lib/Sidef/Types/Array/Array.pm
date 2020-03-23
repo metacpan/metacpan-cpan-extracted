@@ -54,6 +54,7 @@ package Sidef::Types::Array::Array {
             $addr{$refaddr};
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Array::Array::get_value = $sub;
         $sub->($_[0]);
     }
@@ -492,32 +493,57 @@ package Sidef::Types::Array::Array {
     sub or {
         my ($self, $array) = @_;
 
-        if (ref($array) eq 'Sidef::Types::Set::Set') {
-            return $self->to_set->or($array);
-        }
-
-        if (ref($array) eq 'Sidef::Types::Set::Bag') {
-            return $self->to_bag->or($array);
-        }
-
         if (ref($array) ne ref($self)) {
             $array = $array->to_a;
         }
 
         #$self->and($array)->concat($self->xor($array));
-        $self->concat($array)->uniq;
+        #$self->concat($array)->uniq;
+
+        my @x = CORE::sort { $a cmp $b } @$self;
+        my @y = CORE::sort { $a cmp $b } @$array;
+
+        my $endx = $#x;
+        my $endy = $#y;
+
+        my $i = 0;
+        my $j = 0;
+
+        my ($cmp, @new);
+
+        while (1) {
+
+            $cmp = CORE::int($x[$i] cmp $y[$j]);
+
+            if ($cmp < 0) {
+                CORE::push @new, $x[$i];
+                ++$i;
+            }
+            elsif ($cmp > 0) {
+                CORE::push @new, $y[$j];
+                ++$j;
+            }
+            else {
+                CORE::push @new, $x[$i];
+                ++$i;
+                ++$j;
+            }
+
+            if ($i > $endx) {
+                CORE::push @new, @y[$j .. $endy];
+                last;
+            }
+            elsif ($j > $endy) {
+                CORE::push @new, @x[$i .. $endx];
+                last;
+            }
+        }
+
+        bless \@new;
     }
 
     sub xor {
         my ($self, $array) = @_;
-
-        if (ref($array) eq 'Sidef::Types::Set::Set') {
-            return $self->to_set->xor($array);
-        }
-
-        if (ref($array) eq 'Sidef::Types::Set::Bag') {
-            return $self->to_bag->xor($array);
-        }
 
         if (ref($array) ne ref($self)) {
             $array = $array->to_a;
@@ -539,25 +565,28 @@ package Sidef::Types::Array::Array {
             $cmp = CORE::int($x[$i] cmp $y[$j]);
 
             if ($cmp < 0) {
-                push @new, $x[$i];
+                CORE::push @new, $x[$i];
                 ++$i;
             }
             elsif ($cmp > 0) {
-                push @new, $y[$j];
+                CORE::push @new, $y[$j];
                 ++$j;
             }
             else {
-                my $k = $i;
-                do { ++$i } while ($i <= $endx and $x[$i] eq $y[$j]);
-                do { ++$j } while ($j <= $endy and $x[$k] eq $y[$j]);
+                #my $k = $i;
+                #do { ++$i } while ($i <= $endx and $x[$i] eq $y[$j]);
+                #do { ++$j } while ($j <= $endy and $x[$k] eq $y[$j]);
+
+                ++$i;
+                ++$j;
             }
 
             if ($i > $endx) {
-                push @new, @y[$j .. $endy];
+                CORE::push @new, @y[$j .. $endy];
                 last;
             }
             elsif ($j > $endy) {
-                push @new, @x[$i .. $endx];
+                CORE::push @new, @x[$i .. $endx];
                 last;
             }
         }
@@ -568,14 +597,6 @@ package Sidef::Types::Array::Array {
     sub and {
         my ($self, $array) = @_;
 
-        if (ref($array) eq 'Sidef::Types::Set::Set') {
-            return $self->to_set->and($array);
-        }
-
-        if (ref($array) eq 'Sidef::Types::Set::Bag') {
-            return $self->to_bag->and($array);
-        }
-
         if (ref($array) ne ref($self)) {
             $array = $array->to_a;
         }
@@ -601,58 +622,10 @@ package Sidef::Types::Array::Array {
                 ++$j;
             }
             else {
-                push @new, $x[$i];
+                CORE::push @new, $x[$i];
                 ++$i;
                 ++$j;
             }
-        }
-
-        bless \@new;
-    }
-
-    sub sub {
-        my ($self, $array) = @_;
-
-        if (ref($array) eq 'Sidef::Types::Set::Set') {
-            return $self->to_set->sub($array);
-        }
-
-        if (ref($array) eq 'Sidef::Types::Set::Bag') {
-            return $self->to_bag->sub($array);
-        }
-
-        if (ref($array) ne ref($self)) {
-            $array = $array->to_a;
-        }
-
-        my @x = CORE::sort { $a cmp $b } @$self;
-        my @y = CORE::sort { $a cmp $b } @$array;
-
-        my $i = 0;
-        my $j = 0;
-
-        my $end1 = @x;
-        my $end2 = @y;
-
-        my ($cmp, @new);
-        while ($i < $end1 and $j < $end2) {
-
-            $cmp = CORE::int($x[$i] cmp $y[$j]);
-
-            if ($cmp < 0) {
-                push @new, $x[$i];
-                ++$i;
-            }
-            elsif ($cmp > 0) {
-                ++$j;
-            }
-            else {
-                1 while (++$i < $end1 and $x[$i] eq $y[$j]);
-            }
-        }
-
-        if ($i < $end1) {
-            push @new, @x[$i .. $#x];
         }
 
         bless \@new;
@@ -661,14 +634,6 @@ package Sidef::Types::Array::Array {
     sub diff {
         my ($self, $array) = @_;
 
-        if (ref($array) eq 'Sidef::Types::Set::Set') {
-            return $self->to_set->sub($array);
-        }
-
-        if (ref($array) eq 'Sidef::Types::Set::Bag') {
-            return $self->to_bag->sub($array);
-        }
-
         if (ref($array) ne ref($self)) {
             $array = $array->to_a;
         }
@@ -688,24 +653,27 @@ package Sidef::Types::Array::Array {
             $cmp = CORE::int($x[$i] cmp $y[$j]);
 
             if ($cmp < 0) {
-                push @new, $x[$i];
+                CORE::push @new, $x[$i];
                 ++$i;
             }
             elsif ($cmp > 0) {
                 ++$j;
             }
             else {
+                # 1 while (++$i < $end1 and $x[$i] eq $y[$j]);
                 ++$i;
                 ++$j;
             }
         }
 
         if ($i < $end1) {
-            push @new, @x[$i .. $#x];
+            CORE::push @new, @x[$i .. $#x];
         }
 
         bless \@new;
     }
+
+    *sub = \&diff;
 
     sub concat {
         my ($self, $arg) = @_;
@@ -898,6 +866,8 @@ package Sidef::Types::Array::Array {
         };
 
         no strict 'refs';
+        no warnings 'redefine';
+
         local *Sidef::Types::Array::Array::cmp = $sub;
         local *{'Sidef::Types::Array::Array::<=>'} = $sub;
         $sub->($self, $array);
@@ -969,6 +939,8 @@ package Sidef::Types::Array::Array {
         };
 
         no strict 'refs';
+        no warnings 'redefine';
+
         local *Sidef::Types::Array::Array::eq = $sub;
         local *{'Sidef::Types::Array::Array::=='} = $sub;
         $sub->($self, $array);
@@ -1273,6 +1245,7 @@ package Sidef::Types::Array::Array {
             @flat;
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Array::Array::flatten = $sub;
         $sub->($_[0]);
     }
@@ -1389,14 +1362,9 @@ package Sidef::Types::Array::Array {
 
         $n = CORE::int($n);
 
-        my $end = @$self;
-        for (my $i = $n - 1 ; $i < $end ; $i += $n) {
-            $block->run(@$self[$i - ($n - 1) .. $i]);
-        }
-
-        my $mod = $end % $n;
-        if ($mod != 0) {
-            $block->run(@$self[$end - $mod .. $end - 1]);
+        my @copy = @$self;
+        while (my @slice = CORE::splice(@copy, 0, $n)) {
+            $block->run(@slice);
         }
 
         $self;
@@ -1430,48 +1398,25 @@ package Sidef::Types::Array::Array {
         bless [map { bless($_) } @new];
     }
 
-    sub slices {
-        my ($self, $n) = @_;
-
-        $n = CORE::int($n);
-
-        $n <= 0
-          && return bless([]);
-
-        my @slices;
-        my $end = @$self;
-        for (my $i = $n - 1 ; $i < $end ; $i += $n) {
-            CORE::push(@slices, bless([@$self[$i - ($n - 1) .. $i]]));
-        }
-
-        my $mod = $end % $n;
-        if ($mod != 0) {
-            CORE::push(@slices, bless([@$self[$end - $mod .. $end - 1]]));
-        }
-
-        bless \@slices;
-    }
-
-    sub cons {
-        my ($self, $n) = @_;
-
-        $n = CORE::int($n);
-
-        my @array;
-        foreach my $i ($n - 1 .. $#$self) {
-            CORE::push(@array, bless([@$self[$i - $n + 1 .. $i]]));
-        }
-
-        bless \@array;
-    }
-
     sub each_cons {
         my ($self, $n, $block) = @_;
 
         $n = CORE::int($n);
 
-        foreach my $i ($n - 1 .. $#$self) {
-            $block->run(@$self[$i - $n + 1 .. $i]);
+        my @values;
+        my $count = 0;
+
+        foreach my $item (@$self) {
+            if (++$count > $n) {
+                CORE::shift(@values);
+                --$count;
+            }
+
+            CORE::push(@values, $item);
+
+            if ($count == $n) {
+                $block->run(@values);
+            }
         }
 
         $self;
@@ -1484,32 +1429,46 @@ package Sidef::Types::Array::Array {
 
         $n = CORE::int($n);
 
-        my @array;
-        foreach my $i ($n - 1 .. $#$self) {
-            CORE::push(@array, $block->run(@$self[$i - $n + 1 .. $i]));
+        my @result;
+        my @values;
+        my $count = 0;
+
+        foreach my $item (@$self) {
+            if (++$count > $n) {
+                CORE::shift(@values);
+                --$count;
+            }
+
+            CORE::push(@values, $item);
+
+            if ($count == $n) {
+                CORE::push(@result, $block->run(@values));
+            }
         }
 
-        bless \@array;
+        bless \@result;
     }
+
+    *cons = \&map_cons;
 
     sub map_slice {
         my ($self, $n, $block) = @_;
 
+        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+
         $n = CORE::int($n);
 
-        my @array;
-        my $end = @$self;
-        for (my $i = $n - 1 ; $i < $end ; $i += $n) {
-            CORE::push(@array, $block->run(@$self[$i - ($n - 1) .. $i]));
+        my @result;
+        my @copy = @$self;
+
+        while (my @slice = CORE::splice(@copy, 0, $n)) {
+            CORE::push(@result, $block->run(@slice));
         }
 
-        my $mod = $end % $n;
-        if ($mod != 0) {
-            CORE::push(@array, $block->run(@$self[$end - $mod .. $end - 1]));
-        }
-
-        bless \@array;
+        bless \@result;
     }
+
+    *slices = \&map_slice;
 
     sub each_index {
         my ($self, $block) = @_;
@@ -1681,7 +1640,11 @@ package Sidef::Types::Array::Array {
             CORE::push(@{$hash{$block->run($item)}}, $item);
         }
 
-        Sidef::Types::Hash::Hash->new(map { $_ => bless($hash{$_}) } CORE::keys(%hash));
+        foreach my $value (CORE::values(%hash)) {
+            bless $value;
+        }
+
+        Sidef::Types::Hash::Hash->new(\%hash);
     }
 
     *group_by = \&group;
@@ -1774,6 +1737,7 @@ package Sidef::Types::Array::Array {
             Sidef::Types::Bool::Bool::FALSE;
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Array::Array::match = $sub;
         $sub->($_[0]);
     }
@@ -1811,7 +1775,7 @@ package Sidef::Types::Array::Array {
             @freq{@{$r->{items}}} = ($n) x scalar(@{$r->{items}});
         }
 
-        Sidef::Types::Hash::Hash->new(%freq);
+        Sidef::Types::Hash::Hash->new(\%freq);
     }
 
     sub freq {
@@ -1826,11 +1790,11 @@ package Sidef::Types::Array::Array {
             $hash{$item}++;
         }
 
-        foreach my $key (CORE::keys %hash) {
+        foreach my $key (CORE::keys(%hash)) {
             $hash{$key} = Sidef::Types::Number::Number->_set_uint($hash{$key});
         }
 
-        Sidef::Types::Hash::Hash->new(%hash);
+        Sidef::Types::Hash::Hash->new(\%hash);
     }
 
     sub first_by {
@@ -2700,7 +2664,7 @@ package Sidef::Types::Array::Array {
             $table{$word} = $item;
         }
 
-        Sidef::Types::Hash::Hash->new(%table);
+        Sidef::Types::Hash::Hash->new(\%table);
     }
 
     *abbreviations = \&abbrev;
@@ -2778,6 +2742,7 @@ package Sidef::Types::Array::Array {
         (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *has      = \&contains;
     *contain  = \&contains;
     *include  = \&contains;
     *includes = \&contains;
@@ -3734,6 +3699,7 @@ package Sidef::Types::Array::Array {
               . CORE::join(', ', map { ref($_) && ($s = UNIVERSAL::can($_, 'dump')) ? $s->($_) : ($_ // 'nil') } @$obj) . ']';
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Array::Array::dump = $sub;
         $sub->($_[0]);
     }
@@ -3798,7 +3764,7 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '+'}   = \&add;
-        *{__PACKAGE__ . '::' . '-'}   = \&sub;
+        *{__PACKAGE__ . '::' . '-'}   = \&diff;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '<'}   = \&lt;
         *{__PACKAGE__ . '::' . '<='}  = \&le;

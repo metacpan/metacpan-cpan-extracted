@@ -1,3 +1,9 @@
+0.09 2020-03-23T17:25:17+01:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update .travis.yml to reality.
+ - Update author github username.
+
 0.08 2020-01-18T15:30:37+01:00
  - Add test for binary file.
  - Add another usage to benchamrk.

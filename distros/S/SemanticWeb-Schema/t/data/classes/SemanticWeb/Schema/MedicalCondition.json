@@ -17,21 +17,10 @@
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:AnatomicalSystem",
             "schema:SuperficialAnatomy",
+            "schema:AnatomicalSystem",
             "schema:AnatomicalStructure"
          ]
-      },
-      "schema:cause" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Specifying a cause of something in general. e.g in medicine , one of the causative agent(s) that are most directly responsible for the pathophysiologic process that eventually results in the occurrence.",
-         "rdfs:label" : "cause",
-         "schema:domainIncludes" : [
-            "schema:MedicalSignOrSymptom",
-            "schema:MedicalCondition"
-         ],
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:MedicalCause"
       },
       "schema:differentialDiagnosis" : {
          "rdf:type" : "rdf:Property",
@@ -46,10 +35,10 @@
          "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
             "schema:Patient",
+            "schema:TherapeuticProcedure",
             "schema:DrugClass",
-            "schema:TherapeuticProcedure"
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"
@@ -86,8 +75,8 @@
          "rdfs:comment" : "Changes in the normal mechanical, physical, and biochemical functions that are associated with this activity or condition.",
          "rdfs:label" : "pathophysiology",
          "schema:domainIncludes" : [
-            "schema:PhysicalActivity",
-            "schema:MedicalCondition"
+            "schema:MedicalCondition",
+            "schema:PhysicalActivity"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -156,24 +145,16 @@
          "rdfs:comment" : "The status of the study (enumerated).",
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
+            "schema:MedicalStudy",
             "schema:MedicalProcedure",
-            "schema:MedicalStudy"
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:EventStatusType",
             "schema:MedicalStudyStatus",
-            "schema:EventStatusType"
+            "schema:Text"
          ]
-      },
-      "schema:subtype" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A more specific type of the condition, where applicable, for example 'Type 1 Diabetes', 'Type 2 Diabetes', or 'Gestational Diabetes' for Diabetes.",
-         "rdfs:label" : "subtype",
-         "schema:domainIncludes" : "schema:MedicalCondition",
-         "schema:isPartOf" : "http:health-lifesci.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
       },
       "schema:typicalTest" : {
          "rdf:type" : "rdf:Property",

@@ -1,0 +1,68 @@
+pass.ipv4@[8.8.8.8]
+pass.ipv6@[IPv6:2001:0db8:0000:0000:0000:ff00:0042:8329]
+pass.ipv6-ipv4@[IPv6:::ffff:192.0.2.128]
+pass.ipv6@[IPv6:2001:db8:0:1:1:1:1:1]
+pass.legacy.valid.ipv6@[IPv6:2001:db8::1:1:1:1:1]
+xxx.ipv6@[2001:db8:1:1:1:1:1:1]
+simple@test.com
+simple.with.period@test.com
+special@localhost
+special@example
+special@test
+special@invalid
+special@onion
+special@example.org
+special@ExAmPle
+special@This.Is.Test
+special@go.Onion
+special@eXample.COM
+# pass: localpart = 64 chars
+PASSefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ-0123456789@example.ru
+# pass: domain = 254 chars (253 chars without ending period)
+p@PASSefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZwith63char.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZwith63-char.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZwith63char.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZover253.com
+disposable.style.email.with+plus@ok.com
+other.email-with-dash@ok.com
+"very.unusual.@.unusual.com"@ok.com
+"multi"."quote"."is-allowed"@ok.com
+this_is.also."valid"@ok.com
+" "@hmmm.com
+" abc"@ok.com
+"abc "@ok.com
+"  abc  "@ok.com
+"abc. "@ok.com
+//@ok.com
+#                  CONTROLS CHECK
+# RFC 822:  PASS
+# RFC 5321: FAIL (no controls allowed)
+# RFC 5322: PASS (allowed %d1-8 / %d11 / %d12 / %d14-31 / %d127)
+"BS-in-the-end"@ctrl-check.com
+"CR-in-the-end"@ugly.com
+"DEL-in-the-end"@ugly.com
+#                  SPACE CHECK
+# RFC 822:  PASS
+# RFC 5321: PASS
+# RFC 5322: PASS if qpair or next/after dquote
+"much.more unusual"@ok.com
+"much.more\ unusual"@ok.com
+"space-in-the-end "@ok.com
+#                  TAB CHECK
+# RFC 822:  PASS
+# RFC 5321: FAIL
+# RFC 5322: PASS if qpair or next/after dquote
+"tab	test"@ok.com
+"tab\	test"@ok.com
+"tab-in-the-end	"@ok.com
+#                  GRAPHICS CHECK
+# RFC 822:  PASS
+# RFC 5321: PASS
+# RFC 5322: PASS
+"()<>@,;:\\\".[]"@rfc-822-specials.com
+"!\"#$%&'()*+,-./:;<=>?@[]^_`{|}~".graphics@ok.com
+"very.(),:;<>[]\".VERY.\"very@\\\ \"very\".unusual"@ok.com
+"\abc"@rfc822.net
+-abc@rfc822.net
+abc.@rfc822.com
+#
+#
+#
+!#$%&'*+-/=?^_`{}|~@ok.com
