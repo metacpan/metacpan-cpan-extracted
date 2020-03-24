@@ -1,16 +1,7 @@
-Net-DNS-DomainController-Discovery
+Net-DNS-DomainController-Discovery version 1.00
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
-
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
-
+Issues DNS requests to provide a list of hostnames and IP addresses of the
+Microsoft Active Directory domain controllers.
 
 INSTALLATION
 
@@ -23,6 +14,18 @@ To install this module, run the following commands:
 
 SUPPORT AND DOCUMENTATION
 
+Microsoft has a documentation how the Active Directory domain controllers
+should register themselves in the DNS:
+
+Microsoft Active Directory Technical Specifications [MS-ADTS]
+Section 6.3.2.3 SRV Records
+    Published 14 February 2019 at
+        https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/c1987d42-1847-4cc9-acf7-aab2136d6952
+
+    Archived on 23 March 2020
+        http://archive.today/6NUSR
+
+
 After installing, you can find documentation for this module with the
 perldoc command.
 
@@ -30,14 +33,11 @@ perldoc command.
 
 You can also look for information at:
 
+    Source code repository
+        https://repo.or.cz/Net-DNS-DomainController-Discovery.git
+  
     RT, CPAN's request tracker (report bugs here)
         https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-DNS-DomainController-Discovery
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Net-DNS-DomainController-Discovery
-
-    CPAN Ratings
-        https://cpanratings.perl.org/d/Net-DNS-DomainController-Discovery
 
     Search CPAN
         https://metacpan.org/release/Net-DNS-DomainController-Discovery

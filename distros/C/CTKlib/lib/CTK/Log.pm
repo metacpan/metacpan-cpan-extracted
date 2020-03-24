@@ -1,4 +1,4 @@
-package CTK::Log; # $Id: Log.pm 243 2019-05-08 12:17:21Z minus $
+package CTK::Log; # $Id: Log.pm 276 2020-03-22 16:53:04Z minus $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Log - CTK Logging
 
 =head1 VERSION
 
-Version 2.62
+Version 2.63
 
 =head1 SYNOPSIS
 
@@ -164,7 +164,7 @@ Allowed formats, examples:
     socketopts => ["unix"]
     socketopts => { type => "tcp", port => 2486 }
 
-Default: C<unix>
+Default: C<native>
 
 =item B<syslogopts>
 
@@ -318,7 +318,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 
 use vars qw/$VERSION %EXPORT_TAGS @EXPORT_OK/;
-$VERSION = '2.62';
+$VERSION = '2.63';
 
 use base qw/Exporter/;
 
@@ -420,9 +420,10 @@ sub new {
             Sys::Syslog::setlogsock(@$socketopts);
         } elsif ($socketopts && (!ref($socketopts) || ref($socketopts) eq 'HASH')) {
             Sys::Syslog::setlogsock($socketopts);
-        } elsif (!MSWIN) {
-            Sys::Syslog::setlogsock('unix');
         }
+        #elsif (!MSWIN) {
+        #    Sys::Syslog::setlogsock('unix');
+        #}
         my $ident = $args{ident} || scalar(caller(0));
         try { # ignore errors
             Sys::Syslog::openlog($ident, $syslogopts, $facility);

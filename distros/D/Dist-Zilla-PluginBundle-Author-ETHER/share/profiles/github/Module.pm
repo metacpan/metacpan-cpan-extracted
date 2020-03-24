@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+no if "$]" >= 5.031008, feature => 'indirect';
 package {{ $name }};
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: ...

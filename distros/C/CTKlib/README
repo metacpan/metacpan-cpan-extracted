@@ -4,11 +4,11 @@ NAME
 
 VERSION
 
-    Version 2.01
+    Version 2.03
 
 NOTE
 
-    The 2.00 version of this library is not compatible with earlier
+    The 2.00+ versions of this library is not compatible with earlier
     versions
 
 SYNOPSIS

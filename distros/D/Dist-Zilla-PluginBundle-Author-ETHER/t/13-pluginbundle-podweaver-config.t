@@ -7,7 +7,6 @@ use Test::Deep;
 use Test::DZil;
 use Test::Fatal;
 use Path::Tiny;
-use File::pushd 'pushd';
 use JSON::MaybeXS;
 use List::Util 'max';
 use Pod::Weaver::PluginBundle::Default;

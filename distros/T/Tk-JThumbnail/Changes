@@ -10,3 +10,38 @@ Revision history for Perl extension Tk::JThumbnail.
 	- Fix segfault if clear() called followed by configure(-images => \@files).
 	- Touch up the docs a bit.
 	- Include proper license files.
+2.1   Thu Mar 19, 2020
+	- (Hopefully) FIX all remaining SegFaults on bad/non image files.
+	- Fix some selection-issues.
+	- Add default bindings for <space> and <Shift-space> to make work
+	  like <Button-1> and <Shift-Button-1>.
+	- Add selectionIncludes() and selectionAnchor() functions to match
+	  those found in Tk::*MListbox widgets.
+2.2
+	- Add Balloon option (-iballoons => 1|0) to specify show popup balloons
+	  showing the file-name when mousing over an image.
+	- Add -iborder, -ihighlightthickness, -irelief, -iactiverelief, and
+	  -ianchor options to specify the border, relief, etc. values for the 
+	  icon buttons.
+	- Add -iwrap option (-iwrap => -1,0,1,2,3,4,64..., default -1) to cause
+	  the text labels to be wrapped (requires -ilabels => 1(true)).
+	  -1 (default) - no wrapping, 0 - calculate sensible default, 1-4: wrap
+	  width is 1x..4x the icon width, 64+:set the wrap width to that many
+	  pixels.  5-63: set wrap to 64 pixels.
+	- Add -font option to specify the font to use.  Default is the
+	  proportional sans font selected by Perl/Tk.
+	- Add "-state" option, can be either "normal" or "disabled":
+	  (In other words add ability to disable the entire widget).
+	- Add a '-1' option value to the -columns parameter to have
+	  JThumbnail calculate the number of columns based on the window-size
+	  and the widths of the icon buttons (including wrapped file-name
+	  text labels, if -ilabels => 1(true) specified such that the window is
+	  filled horizontally without the need for horizontal scrolling.
+	  (NOTE:  -iwidth => (>0), and either -iwrap => (>=0) or -ilabels => 0
+	  must also be specified for this to work!
+	- Properly initialize anchor and selecting/deselecting mode for more 
+	  consistant multi-selecting/deselecting.
+	- Enable drag-selecting to scroll the visible window!
+	- Make the "default" (-command => undef) mouse-button down function
+	  work more user-friendly when selecting/deselecting.
+	- Misc. code cleanups.

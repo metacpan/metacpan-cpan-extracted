@@ -22,7 +22,7 @@ LinkEmbedder - Embed / expand oEmbed resources and other URL / links
 [LinkEmbedder](https://metacpan.org/pod/LinkEmbedder) is a module that can expand an URL into a rich HTML snippet or
 simply to extract information about the URL.
 
-This module replaces [Mojolicious::Plugin::LinkEmbedder](https://metacpan.org/pod/Mojolicious::Plugin::LinkEmbedder).
+This module replaces [Mojolicious::Plugin::LinkEmbedder](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ALinkEmbedder).
 
 Go to [https://thorsen.pm/linkembedder](https://thorsen.pm/linkembedder) to see a demo of how it works.
 
@@ -87,13 +87,13 @@ This attribute is EXPERIMENTAL. Feeback appreciated.
 
     $ua = $self->ua;
 
-Holds a [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent) object.
+Holds a [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent) object.
 
 ## url\_to\_link
 
     $hash_ref = $self->url_to_link;
 
-Holds a mapping between host names and [link class](https://metacpan.org/pod/LinkEmbedder::Link) to use.
+Holds a mapping between host names and [link class](https://metacpan.org/pod/LinkEmbedder%3A%3ALink) to use.
 
 # METHODS
 
@@ -101,13 +101,13 @@ Holds a mapping between host names and [link class](https://metacpan.org/pod/Lin
 
     $self = $self->get_p($url, sub { my ($self, $link) = @_ });
 
-Same as ["get\_p"](#get_p), but takes a callback instead of returning a [Mojo::Promise](https://metacpan.org/pod/Mojo::Promise).
+Same as ["get\_p"](#get_p), but takes a callback instead of returning a [Mojo::Promise](https://metacpan.org/pod/Mojo%3A%3APromise).
 
 ## get\_p
 
     $promise = $self->get_p($url)->then(sub { my $link = shift });
 
-Used to construct a new [LinkEmbedder::Link](https://metacpan.org/pod/LinkEmbedder::Link) object and retrieve information
+Used to construct a new [LinkEmbedder::Link](https://metacpan.org/pod/LinkEmbedder%3A%3ALink) object and retrieve information
 about the URL.
 
 ## serve
@@ -115,7 +115,7 @@ about the URL.
     $self = $self->serve(Mojolicious::Controller->new, $url);
 
 Used as a helper for [Mojolicious](https://metacpan.org/pod/Mojolicious) web applications to reply to an oEmbed
-request. Will also set ["name" in Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo::UserAgent::Transactor#name) for ["ua"](#ua) if
+request. Will also set ["name" in Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo%3A%3AUserAgent%3A%3ATransactor#name) for ["ua"](#ua) if
 the incoming request contains a "User-Agent" header.
 
 # AUTHOR

@@ -158,11 +158,12 @@ int mmc_unmap_memory(mmap_cache* cache) {
   return res;
 }
 
-int mmc_lock_page(mmap_cache* cache, MU32 p_offset) {
+int mmc_lock_page(mmap_cache* cache, MU64 p_offset) {
     OVERLAPPED lock;
     DWORD lock_res, bytesTransfered;
     memset(&lock, 0, sizeof(lock));
-    lock.Offset = p_offset;
+    lock.Offset = (DWORD)(p_offset & 0xffffffff);
+    lock.OffsetHigh = (DWORD)((p_offset >> 32) & 0xffffffff);
     lock.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
   
     if (LockFileEx(cache->fh, 0, 0, cache->c_page_size, 0, &lock) == 0) {
@@ -213,7 +214,7 @@ int _mmc_set_error(mmap_cache *cache, int err, char * error_string, ...) {
 
   /* Add system error code if passed */
   if (err) {
-    strncat(errbuf, ": ", 1024);
+    strncat(errbuf, ": ", 1023);
     FormatMessage(
         FORMAT_MESSAGE_ALLOCATE_BUFFER | 
         FORMAT_MESSAGE_FROM_SYSTEM,
@@ -231,6 +232,6 @@ int _mmc_set_error(mmap_cache *cache, int err, char * error_string, ...) {
 
   va_end(ap);
 
-  return 0;
+  return -1;
 }
 

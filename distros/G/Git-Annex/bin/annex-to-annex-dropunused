@@ -33,7 +33,7 @@ annex-to-annex-dropunused - drop old hardlinks migrated by annex-to-annex
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

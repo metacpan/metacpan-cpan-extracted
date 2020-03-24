@@ -100,11 +100,15 @@ sub _get_p {
 
 sub _learn {
   my ($self, $tx) = @_;
-  my $ct = $tx->res->headers->content_type || '';
+  my $h = $tx->res->headers;
 
+  my $name = $h->header('X-Provider-Name');
+  $self->provider_name($name) if $name;
+
+  my $ct = $h->content_type || '';
   $self->type('photo')->_learn_from_url               if $ct =~ m!^image/!;
   $self->type('video')->_learn_from_url               if $ct =~ m!^video/!;
-  $self->type('rich')->_learn_from_url                if $ct =~ m!^text/plain!;
+  $self->type('rich')->_learn_from_text($tx)          if $ct =~ m!^text/plain!;
   $self->type('rich')->_learn_from_dom($tx->res->dom) if $ct =~ m!^text/html!;
 
   return $self;
@@ -131,10 +135,22 @@ sub _learn_from_json {
 
   warn "[LinkEmbedder] " . $tx->res->text . "\n" if DEBUG;
   $self->{$_} ||= $json->{$_} for keys %$json;
-  $self->{error} = {message => $self->{error}} if defined $self->{error} and !ref $self->{error};
-  $self->{error}{code} = $self->{status} if $self->{status} and $self->{status} =~ /^\d+$/;
+  $self->{error}       = {message => $self->{error}} if defined $self->{error} and !ref $self->{error};
+  $self->{error}{code} = $self->{status}             if $self->{status}        and $self->{status} =~ /^\d+$/;
 
   return $self;
+}
+
+sub _learn_from_text {
+  my ($self, $tx) = @_;
+  $self->_learn_from_url;
+
+  $self->{paste} = $tx->res->text;
+  $self->template->[1] = 'paste.html.ep';
+
+  my $title = substr $self->{paste}, 0, 20;
+  $title =~ s![\r\n]+! !g;
+  $self->title($title);
 }
 
 sub _learn_from_url {

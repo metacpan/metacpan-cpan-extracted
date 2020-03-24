@@ -1,10 +1,11 @@
 use strict;
 use warnings;
+no if "$]" >= 5.031008, feature => 'indirect';
 package Pod::Weaver::PluginBundle::Author::ETHER;
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.151';
+our $VERSION = '0.152';
 
 use namespace::autoclean -also => ['_exp'];
 use Pod::Weaver::Config::Assembler;
@@ -78,7 +79,7 @@ sub configure
         : (),
 
     ($distmeta->{x_authority} // '') eq 'cpan:ETHER'
-    ? "I am also usually active on irc, as 'ether' at C<irc.perl.org>."
+    ? "I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>."
     : (),
 ) }}
 SUPPORT
@@ -184,7 +185,7 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.151
+version 0.152
 
 =head1 SYNOPSIS
 
@@ -370,7 +371,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
 
 =head1 AUTHOR
 

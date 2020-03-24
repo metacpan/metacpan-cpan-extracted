@@ -1,4 +1,4 @@
-package CTK::Daemon; # $Id: Daemon.pm 259 2019-05-16 17:12:56Z minus $
+package CTK::Daemon; # $Id: Daemon.pm 277 2020-03-22 18:09:31Z minus $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Daemon - Abstract class to implement Daemons
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 SYNOPSIS
 
@@ -377,13 +377,13 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/$VERSION @EXPORT $DEV_DEBUG/;
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 use Carp;
 use File::Spec;
 use POSIX qw/ :sys_wait_h /;
 use Try::Tiny;
-use Sys::Syslog qw//;
+use Sys::Syslog ();
 
 use CTKx;
 use CTK::Util qw/ :API :CORE /;
@@ -516,8 +516,8 @@ sub new {
         return 0;
     };
 
-	my $self = bless {
-	    name        => $name,
+    my $self = bless {
+        name        => $name,
         ctk         => $ctk,
         ppid        => 0,
         pidfile     => $pidfile,
@@ -535,6 +535,8 @@ sub new {
         debug       => $debug,
         loglevel    => $loglevel,
         logger      => undef,
+        socketopts  => $params{socketopts},
+        syslogopts  => $params{syslogopts},
 
         lsbstop     => $lsbstop,
         lsbreload   => $lsbreload,
@@ -545,7 +547,7 @@ sub new {
         exception   => 0, # For exceptions
         hangup      => 0, # For reloading
         skip        => 0, # For skipping of subprocesses
-	}, $class;
+    }, $class;
 
     $logger = $self->logger();
 
@@ -682,15 +684,31 @@ sub start {
     my $self = shift;
     my $logger = $self->logger;
 
-    # Set GID and UID
+    # Load GID and UID
+    my ($uid, $gid);
+    if (my $uidstr = $self->{uid}) {
+        $uid = getpwnam($uidstr) || croak "getpwnam failed - $!\n";
+    }
     if (my $gidstr = $self->{gid}) {
-        my $gid = getgrnam($gidstr) || croak "getgrnam failed - $!\n";
+        $gid = getgrnam($gidstr) || croak "getgrnam failed - $!\n";
+    }
+
+    # PidFile prepare
+    if (defined($uid) or defined($gid)) {
+        my $pidfile = $self->{pidfile};
+        unless (-e $pidfile) {
+            CTK::Util::fsave($pidfile, "0\n");
+            chown($uid, $gid, $pidfile) if -e $pidfile;
+        }
+    }
+
+    # Set GID and UID
+    if (defined($gid)) {
         POSIX::setgid($gid) || croak "setgid $gid failed - $!\n";
         $) = "$gid $gid"; # this calls setgroups
         croak "detected strange gid\n" if !($( eq "$gid $gid" && $) eq "$gid $gid"); # just to be sure
     }
-    if (my $uidstr = $self->{uid}) {
-        my $uid = getpwnam($uidstr) || croak "getpwnam failed - $!\n";
+    if (defined($uid)) {
         POSIX::setuid($uid) || croak "setuid $uid failed - $!\n";
         croak "detected strange uid\n" if !($< == $uid && $> == $uid); # just to be sure
     }
@@ -704,13 +722,14 @@ sub start {
 
     # Start master process
     my $pid = myfork();
+    print("Started\n") if $pid;
     if ($pid && $self->{debug}) {
-        printf("Master process (pid=%d) successfully started\n", $pid);
+        #printf("Master process (pid=%d) successfully started\n", $pid);
         $logger->log_debug("Master process (pid=%d) successfully started", $pid) if $logger;
     }
     $self->logger_close;
 
-    if ( defined $pid && $pid == 0 ) { # The master child runs here.
+    if ( defined($pid) && $pid == 0 ) { # The master child runs here.
         $pidf->pid(isostype('Windows') ? $save_pid : $$);
         $self->{masterpid} = $pidf->pid;
         $pidf->write;
@@ -731,7 +750,7 @@ sub start {
         my (@pids, %pidh);
         for (my $j = 1; $j <= $self->{forkers}; $j++) {
             my $cpid = myfork();
-            if ( defined $cpid && $cpid == 0 ) { # Here the second child is running.
+            if ( defined($cpid) && $cpid == 0 ) { # Here the second child is running.
                 # Close all file handles and descriptors the user does not want to preserve.
                 my $devnull = File::Spec->devnull;
                 unless ($DEV_DEBUG || ($self->{debug} && isostype('Windows'))) {
@@ -774,7 +793,7 @@ sub start {
 
 
         if ($self->{debug}) {
-            printf("Master process (pid=%d) successfully finished\n", $$);
+            #printf("Master process (pid=%d) successfully finished\n", $$);
             $self->logger->log_info("Master process (pid=%d) successfully finished", $$) if $self->logger;
         }
         $pidf->remove;
@@ -819,11 +838,13 @@ sub logger {
     my $self = shift;
     return $self->{logger} if $self->{logger};
     my $ctk = $self->{ctk};
-    return $ctk->logger if $ctk && $ctk->can("logger");
+    return $ctk->logger if $ctk && $ctk->can("logger") && $ctk->logger;
     my $logger = new CTK::Log(
         level => $self->{loglevel},
         ident => $self->{name},
         facility => Sys::Syslog::LOG_DAEMON,
+        socketopts => $self->{socketopts},
+        syslogopts => $self->{syslogopts},
     );
     $self->{logger} = $logger;
     return $logger;

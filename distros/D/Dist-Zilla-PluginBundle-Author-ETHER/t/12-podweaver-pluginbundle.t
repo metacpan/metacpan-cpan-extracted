@@ -7,7 +7,6 @@ use Test::DZil;
 use Test::Fatal;
 use Test::Deep;
 use Path::Tiny;
-use File::pushd 'pushd';
 
 use lib 't/lib';
 use Helper;

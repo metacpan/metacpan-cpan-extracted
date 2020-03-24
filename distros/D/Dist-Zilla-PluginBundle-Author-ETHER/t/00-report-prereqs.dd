@@ -10,7 +10,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.151',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.152',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -175,6 +175,7 @@ do { my $x = {
                                       'Test::Spelling' => '0.19',
                                       'Text::Tabs' => '2013.0426',
                                       'Try::Tiny' => '0',
+                                      'if' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => '5.010',
                                       'strict' => '0',
@@ -206,7 +207,6 @@ do { my $x = {
                                    'Test::More' => '0.96',
                                    'Test::Needs' => '0',
                                    'Test::Warnings' => '0.009',
-                                   'if' => '0',
                                    'lib' => '0',
                                    'namespace::clean' => '0',
                                    'parent' => '0',

@@ -1,5 +1,10 @@
-Revision history for Net-DNS-DomainController-Discovery
+Revision history for perl module Net::DNS::DomainController::Discovery
 
-0.01    Date/time
+1.00    2020-03-24
+        Check multiple domain names
+        Do not stop if some domain names being discovered do not contain service records       
+        Do not stop if some domain controller servers do not have IP addressed anymore
+
+0.02    2020-02-17
         First version, released on an unsuspecting world.
 

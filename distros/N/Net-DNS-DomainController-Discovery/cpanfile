@@ -1,0 +1,8 @@
+on 'develop' => sub {
+	requires 'Test::Pod', '>= 1.22';
+	requires 'Test::Pod::Coverage', '>= 1.08';
+	requires 'Pod::Coverage', '>= 0.18';
+	requires 'Test::Perl::Critic';
+	requires 'Test::CPAN::Changes';
+	requires 'Test::CPAN::README';
+} 

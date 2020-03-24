@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-12-24'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-12-26'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,7 @@ cpanmodules - The Acme::CPANModules CLI
 
 =head1 VERSION
 
-This document describes version 0.004 of cpanmodules (from Perl distribution App-cpanmodules), released on 2019-12-24.
+This document describes version 0.005 of cpanmodules (from Perl distribution App-cpanmodules), released on 2019-12-26.
 
 =head1 SYNOPSIS
 
@@ -323,6 +323,11 @@ feature.
 L<Acme::CPANModules>
 
 C<Acme::CPANModules::*> modules
+
+L<App::CPANModulesUtils> provides some other CLI's related to Acme::CPANModules.
+
+L<lcpan> also has some subcommands (supplied by
+L<App::lcpan::CmdBundle::cpanmodules>) to query Acme::CPANModules modules.
 
 =head1 AUTHOR
 

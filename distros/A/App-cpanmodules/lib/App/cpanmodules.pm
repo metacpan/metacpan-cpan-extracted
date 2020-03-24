@@ -1,9 +1,9 @@
 package App::cpanmodules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-24'; # DATE
+our $DATE = '2019-12-26'; # DATE
 our $DIST = 'App-cpanmodules'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -244,7 +244,7 @@ App::cpanmodules - The Acme::CPANModules CLI
 
 =head1 VERSION
 
-This document describes version 0.004 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2019-12-24.
+This document describes version 0.005 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2019-12-26.
 
 =head1 SYNOPSIS
 
@@ -407,6 +407,15 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<Acme::CPANModules>
+
+L<App::CPANModulesUtils> provides some other CLI's related to Acme::CPANModules.
+
+L<lcpan> also has some subcommands (supplied by
+L<App::lcpan::CmdBundle::cpanmodules>) to query Acme::CPANModules modules.
 
 =head1 AUTHOR
 

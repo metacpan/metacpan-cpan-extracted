@@ -154,3 +154,7 @@
     * CTK::DBI: Bug fixed - undef value returns in list-context
     - CTK::DBI: Has been removed deprecated functions
     + CTK::DBI: Added error() method
+
+2.03 Thu 19 Mar 19:01:02 MSK 2020
+    * CTK::Daemon: Bug fixed - pid file must be saved with root permissions
+    * CTK::Log: Bug fixed! Has been deleted the unix value from socket options defaults

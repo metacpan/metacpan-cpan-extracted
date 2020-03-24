@@ -2,8 +2,8 @@ NAME
     App::cpanmodules - The Acme::CPANModules CLI
 
 VERSION
-    This document describes version 0.004 of App::cpanmodules (from Perl
-    distribution App-cpanmodules), released on 2019-12-24.
+    This document describes version 0.005 of App::cpanmodules (from Perl
+    distribution App-cpanmodules), released on 2019-12-26.
 
 SYNOPSIS
     Use the included script cpanmodules.
@@ -134,6 +134,15 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules
+
+    App::CPANModulesUtils provides some other CLI's related to
+    Acme::CPANModules.
+
+    lcpan also has some subcommands (supplied by
+    App::lcpan::CmdBundle::cpanmodules) to query Acme::CPANModules modules.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

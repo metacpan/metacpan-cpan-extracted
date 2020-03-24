@@ -64,6 +64,6 @@
          "web" : "https://github.com/pjf/ipc-system-simple"
       }
    },
-   "version" : "1.29",
+   "version" : "1.30",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

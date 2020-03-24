@@ -1,5 +1,9 @@
 Revision history for Git::Annex
 
+0.006     2020-03-23 17:02:28-07:00 America/Phoenix
+    - annex-review-unused: Check whether unused files still exist earlier.
+      Avoids misleading output when --just-print is supplied.
+
 0.005     2020-03-23 11:55:48-07:00 America/Phoenix
     - annex-review-unused: Add missing prompt_yn subroutine.
     - annex-review-unused: Always pass --force to 'git annex dropunused'.

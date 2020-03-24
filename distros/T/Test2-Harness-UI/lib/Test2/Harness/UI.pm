@@ -2,7 +2,7 @@ package Test2::Harness::UI;
 use strict;
 use warnings;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000025';
 
 use Router::Simple;
 use Text::Xslate(qw/mark_raw/);
@@ -102,6 +102,9 @@ sub wrap {
         $controller = $class->new(request => $req, config => $self->{+CONFIG});
         $res = $controller->handle($r);
 
+        use Data::Dumper;
+        print Dumper($class, $res) unless blessed($res);
+
         1;
     };
     my $err = $@ || 'Internal Error';
@@ -117,9 +120,10 @@ sub wrap {
         }
     }
 
-    my $ct = $res->content_type();
-    $ct ||= do { $res->content_type('text/html'); 'text/html' };
+    my $ct = blessed($res) ? $res->content_type() : 'text/html';
+    $ct ||= 'text/html';
     $ct = lc($ct);
+    $res->content_type('text/html') if blessed($res);
 
     if (my $stream = $res->stream) {
         return $stream;

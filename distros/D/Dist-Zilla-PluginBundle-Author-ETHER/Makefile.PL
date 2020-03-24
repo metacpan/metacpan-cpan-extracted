@@ -210,6 +210,7 @@ my %WriteMakefileArgs = (
     "Test::Spelling" => "0.19",
     "Text::Tabs" => "2013.0426",
     "Try::Tiny" => 0,
+    "if" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -235,12 +236,11 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Needs" => 0,
     "Test::Warnings" => "0.009",
-    "if" => 0,
     "lib" => 0,
     "namespace::clean" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.151",
+  "VERSION" => "0.152",
   "test" => {
     "TESTS" => "t/*.t"
   }

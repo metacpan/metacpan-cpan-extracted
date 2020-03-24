@@ -17,8 +17,7 @@ SIMPLEZONE
 $Net::DNS::DomainController::Discovery::TestResolver = $resolver;
 
 {
-	#my $todo = todo 'Not yet implemented';
-	my @dc = Net::DNS::DomainController::Discovery->domain_controllers( 'fabrikam.com' );
+	my @dc = Net::DNS::DomainController::Discovery::domain_controllers( 'fabrikam.com' );
 	is(\@dc, array {
 		item [
 			'fabrikam.com',

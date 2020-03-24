@@ -11,12 +11,11 @@ Net::DNS::DomainController::Discovery - Discover Microsoft Active Directory doma
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =cut
 
-our $VERSION = '0.02';
-
+our $VERSION = '1.00';
 
 =head1 SYNOPSIS
 
@@ -25,8 +24,14 @@ Active Directory domain controllers.
 
     use Net::DNS::DomainController::Discovery;
 
-    my $foo = Net::DNS::DomainController::Discovery->domain_controllers('fabrikam.com');
+    my $foo = Net::DNS::DomainController::Discovery::domain_controllers('fabrikam.com');
     ...
+
+Multiple domain names can be specified:
+
+    my $foo = Net::DNS::DomainController::Discovery::domain_controllers('fabrikam.com', 'contoso.com');
+
+This module works only if the Active Directory domain controllers are registed with the domain name system (DNS).
 
 =cut
 
@@ -37,11 +42,53 @@ use Net::DNS::Resolver;
 
 our $TestResolver;
 
-=head1 SUBROUTINES/METHODS
+=head2 domain_controllers
+
+Use this function to obtain a list of Active Domain controllers registered in the DNS
+for the domain names given as arguments.
+
+Returns a nested array of (domain name, hostname, ip address) tuples that contain all 
+the Active Directory domain controllers serving the domain name if registered in the DNS.
+
+If the domain does not contain any Active Domain domain controller service records,
+no entries for the domain are returned.
+
+No records are returned for the domain controller names which do resolve neither
+to an IPv4 nor IPv6 address.
+
+=cut
+
+sub domain_controllers {
+
+	croak "Active Directory domain name not provided" unless (@_);
+
+	my $resolver;
+
+	# uncoverable branch false
+	if (defined $TestResolver) {
+		$resolver = $TestResolver;	
+	} else {
+		$resolver = Net::DNS::Resolver->new();
+	}
+
+	my @dc; 
+	foreach my $domain_name (@_) {
+		foreach my $fqdn (srv_fqdn_list( $resolver, dc_to_srv( $domain_name ))) {
+			foreach my $addr (fqdn_ipaddr_list( $resolver, 'AAAA', $fqdn )) {
+				push @dc, [ $domain_name, $fqdn, $addr ];
+			}
+			foreach my $addr (fqdn_ipaddr_list( $resolver, 'A', $fqdn )) {
+				push @dc, [ $domain_name, $fqdn, $addr ];
+			}
+		}
+	}
+	return @dc;
+}
+=head1 INTERNAL SUBROUTINES
 
 =head2 srv_to_name
 
-Extract server name from the SRV response
+Extract server name from the SRV response.
 
 =cut
 
@@ -58,6 +105,8 @@ sub srv_to_name {
 
 =head2 srv_fqdn_list
 
+Query SRV records and return server names if any.
+
 =cut
 
 sub srv_fqdn_list {
@@ -65,13 +114,16 @@ sub srv_fqdn_list {
 	my $resp = $resolver->query( $domain_name, 'SRV' );
 	my @dc_name_list;
 
-	if ( ! $resp ) {
-		croak "No SRV records in \"$domain_name\"";
+	if ( $resp ) {
+		return map {  srv_to_name($_) }  $resp->answer;
+	} else {
+		return ();
 	}
-	@dc_name_list = map {  srv_to_name($_) }  $resp->answer;
 }
 
 =head2 fqdn_to_ipaddr
+
+Extract IP addresses from the resolver response.
 
 =cut
 
@@ -88,53 +140,34 @@ sub fqdn_to_ipaddr {
 
 =head2 fqdn_ipaddr_list
 
+Resolver server names using the appropriate record for the address family requested.
+C<$type> parameter should be set C<A> for IPv4, C<AAAA> for IPv6).
+
 =cut
 
 sub fqdn_ipaddr_list {
-	my ($resolver, $fqdn) = @_;
-	my $resp = $resolver->query( $fqdn, 'A' );
+	my ($resolver, $type, $fqdn) = @_;
+	my $resp = $resolver->query( $fqdn, $type );
 	my @dc_ip_list;
-
-	if ( ! $resp ) {
-		croak "No A records in \"$fqdn\"";
+	
+	if ( $resp ) {
+		return map {  fqdn_to_ipaddr($_) }  $resp->answer;
+	} else {
+		return ()
 	}
-	@dc_ip_list= map {  fqdn_to_ipaddr($_) }  $resp->answer;
 }
 
 =head2 dc_to_srv
 
+Validate the domain name and add the magic string for the Active Directory domain controllers.
+
 =cut
 
 sub dc_to_srv {
+	croak "Active Directory domain name not provided" unless (@_);
+	croak "Active Directory domain name not defined" unless $_[0];
+	croak "Invalid domain name: \"$_[0]\"" unless $_[0] =~ /\A\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\Z/;
 	return '_ldap._tcp.dc._msdcs.' . $_[0] . '.'
-}
-
-=head2 domain_controllers
-
-=cut
-
-sub domain_controllers {
-
-	croak "Active Directory domain name not provided ($#_)" if $#_ < 1;
-
-	shift;
-	my $domain_name = shift;
-
-	my $resolver;
-	if (defined $TestResolver) {
-		$resolver = $TestResolver;	
-	} else {
-		$resolver = Net::DNS::Resolver->new();
-	}
-
-	my @dc; 
-		
-	foreach my $fqdn (srv_fqdn_list( $resolver, dc_to_srv( $domain_name ))) {
-		foreach my $addr (fqdn_ipaddr_list( $resolver, $fqdn )) {
-			push @dc, [ $domain_name, $fqdn, $addr ];
-		}
-	}
-	return @dc;
 }
 
 =head1 AUTHOR
@@ -149,6 +182,14 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
+Microsoft has a documentation how the Active Directory domain controllers should register themselves in the DNS:
+
+Microsoft Active Directory Technical Specifications [MS-ADTS]
+Section 6.3.2.3 SRV Records
+Published 14 February 2019 at L<https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/c1987d42-1847-4cc9-acf7-aab2136d6952>
+
+Archived on 23 March 2020: L<http://archive.today/6NUSR>
+
 You can find documentation for this module with the perldoc command.
 
     perldoc Net::DNS::DomainController::Discovery
@@ -156,6 +197,10 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
+
+=item * Source code repository
+
+L<https://repo.or.cz/Net-DNS-DomainController-Discovery.git>
 
 =item * RT: CPAN's request tracker (report bugs here)
 

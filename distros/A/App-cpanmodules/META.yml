@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanmodules
   homepage: https://metacpan.org/release/App-cpanmodules
   repository: git://github.com/perlancar/perl-App-cpanmodules.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

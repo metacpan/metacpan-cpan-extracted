@@ -23,6 +23,19 @@ my %WriteMakefileArgs = (
         'Net::DNS' => '1.21',
         'Exporter' => '5.57',
     },
+    META_MERGE => {
+        resources => {
+            license     => 'https://dev.perl.org/licenses/artistic.html',
+            homepage    => 'https://metacpan.org/release/Net-DNS-DomainController-Discovery',
+            bugtracker  => {
+                'url'  => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-DNS-DomainController-Discovery',
+            },
+            repository  => {
+                'url'  => 'http://repo.or.cz/Net-DNS-DomainController-Discovery',
+                'type' => 'git',
+            },
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Net-DNS-DomainController-Discovery-*' },
 );

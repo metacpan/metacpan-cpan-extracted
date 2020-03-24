@@ -87,15 +87,20 @@ cmp_deeply(
 )
 or diag 'got distmeta: ', explain $tzil->distmeta;
 
+SKIP: {
+skip '$cwd needs to be $zilla->root for this test', 1 if not eval { Dist::Zilla->VERSION('6.003') };
+
+my $git_commit = first { $_->isa('Dist::Zilla::Plugin::Git::Commit') } @{ $tzil->plugins };
 cmp_deeply(
-    (first { $_->isa('Dist::Zilla::Plugin::Git::Commit') } @{ $tzil->plugins }),
+    $git_commit,
     methods(
         allow_dirty => [ map str($_), 'Changes', 'cpanfile' ],
     ),
     'payload for [Git::NextVersion] is passed along to [Git::Commit] that performs the release snapshot',
 )
 or diag 'got allow_dirty payload: ',
-    explain (first { $_->isa('Dist::Zilla::Plugin::Git::Commit') } @{ $tzil->plugins })->allow_dirty;
+    explain $git_commit->allow_dirty;
+}
 
 diag 'got log messages: ', explain $tzil->log_messages
     if not Test::Builder->new->is_passing;

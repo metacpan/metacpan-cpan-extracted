@@ -9,7 +9,5 @@ unless ( $ENV{RELEASE_TESTING} ) {
     plan( skip_all => "Author tests not required for installation" );
 }
 
-plan tests => 2;
+plan tests => 1;
 is_deeply [ ExtUtils::Manifest::manicheck() ], [], 'missing';
-is_deeply [ ExtUtils::Manifest::filecheck() ], ['xt/boilerplate.t'], 'extra';
-

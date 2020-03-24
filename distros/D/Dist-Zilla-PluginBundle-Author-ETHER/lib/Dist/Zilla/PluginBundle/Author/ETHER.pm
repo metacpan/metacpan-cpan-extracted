@@ -1,11 +1,12 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.150-2-g816cee2
+no if "$]" >= 5.031008, feature => 'indirect';
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.151-6-g21b7ca6
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.151';
+our $VERSION = '0.152';
 
 use Moose;
 with
@@ -641,7 +642,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.151
+version 0.152
 
 =head1 SYNOPSIS
 
@@ -1295,7 +1296,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
 
 =head1 AUTHOR
 

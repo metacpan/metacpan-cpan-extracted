@@ -4,13 +4,13 @@
       "Marcin CIESLAK <saperski@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-DNS-DomainController-Discovery",
    "no_index" : {
@@ -47,5 +47,12 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "resources" : {
+      "homepage" : "https://metacpan.org/release/Net-DNS-DomainController-Discovery",
+      "license" : [
+         "https://dev.perl.org/licenses/artistic.html"
+      ]
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -63149,3 +63149,15 @@ K/KJ/KJETILK/Web-Solid-Test-0.021.tar.gz
 H/HO/HOUSTON/WebService-AbuseIPDB-0.03.tar.gz
 G/GE/GENE/WebService-Hooktheory-0.0407.tar.gz
 P/PE/PETERCJ/Win32-Mechanize-NotepadPlusPlus-0.002.tar.gz
+S/SP/SPWHITTON/Git-Annex-0.006.tar.gz
+P/PE/PERLANCAR/App-cpanmodules-0.005.tar.gz
+E/EX/EXODIST/Test2-Harness-1.000015.tar.gz
+E/EX/EXODIST/Test2-Harness-UI-0.000025.tar.gz
+R/RO/ROBM/Cache-FastMmap-1.49.tar.gz
+A/AB/ABALAMA/CTKlib-2.03.tar.gz
+E/ET/ETHER/Dist-Zilla-PluginBundle-Author-ETHER-0.152.tar.gz
+J/JK/JKEENAN/IPC-System-Simple-1.30.tar.gz
+J/JH/JHTHORSEN/Mojolicious-Plugin-OpenAPI-3.30.tar.gz
+J/JH/JHTHORSEN/LinkEmbedder-1.12.tar.gz
+S/SA/SAPERSKI/Net-DNS-DomainController-Discovery-1.00.tar.gz
+T/TU/TURNERJW/Tk-JThumbnail-2.2.tar.gz

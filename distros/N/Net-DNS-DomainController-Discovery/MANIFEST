@@ -1,3 +1,4 @@
+cpanfile
 Changes
 lib/Net/DNS/DomainController/Discovery.pm
 LICENSE
@@ -16,8 +17,14 @@ t/09-one-dc.t
 t/10-two-dc.t
 t/11-cname-dc.t
 t/12-cname-on-srv.t
+t/13-two-domain-names.t
+t/14-punycode.t
+t/15-missing-records.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/perl-critic.t
+t/perlcriticrc
+t/readme.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

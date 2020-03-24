@@ -15,7 +15,7 @@ package App::annex_to_annex_dropunused;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$App::annex_to_annex_dropunused::VERSION = '0.005';
+$App::annex_to_annex_dropunused::VERSION = '0.006';
 use 5.028;
 use strict;
 use warnings;
@@ -79,7 +79,7 @@ App::annex_to_annex_dropunused - drop old hardlinks migrated by annex-to-annex
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 FUNCTIONS
 

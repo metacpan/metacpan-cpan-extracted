@@ -21,7 +21,7 @@ $Net::DNS::DomainController::Discovery::TestResolver = $resolver;
 
 {
 	like( dies {
-			Net::DNS::DomainController::Discovery->domain_controllers( 'fabrikam.com' );
+			Net::DNS::DomainController::Discovery::domain_controllers( 'fabrikam.com' );
 		}, qr/Need Net::DNS::RR::A /,
 		"A domain controller should not be identified via its CNAME record" );
 }

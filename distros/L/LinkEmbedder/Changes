@@ -1,5 +1,9 @@
 Revision history for perl distribution LinkEmbedder
 
+1.12 2020-03-24T12:12:10+0900
+ - Add support for reading X-Provider-Name from headers
+ - Will serve plain text as a paste
+
 1.11 2020-01-07T09:24:53+0900
  - Add support for fortunecowsay.com
 
