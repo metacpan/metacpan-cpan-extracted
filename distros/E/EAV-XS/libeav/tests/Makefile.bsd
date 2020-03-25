@@ -5,7 +5,7 @@ RM ?= rm -rf
 DEFS += -I../include -I. ${_defs}
 
 # used for test the library only
-LIB_PATH != realpath ..
+LIB_PATH != cd ${.CURDIR}/.. && pwd
 
 #----------------------------------------------------------#
 
@@ -35,7 +35,7 @@ LIBS = ${_libs} -L.. -leav
 
 CPPFLAGS = $(DEFS) $(INCLUDES)
 
-LD_LIBRARY_PATH = $(LIB_PATH)
+LD_LIBRARY_PATH = ${LIB_PATH}
 
 
 all: ${TARGETS} ${PARTIAL_TRT}
@@ -48,13 +48,13 @@ all: ${TARGETS} ${PARTIAL_TRT}
 .SUFFIXES: .o
 .c.o:
 	# === tests -> compile $<
-	${CC} -c ${CPPFLAGS} ${CFLAGS} -o $@ $<
+	${CC} -c ${CPPFLAGS} ${DEFS} ${INCLUDES} ${CFLAGS} -o $@ $<
 
 .PATH: ${PARTIAL_PATH}
 .SUFFIXES: .o
 .c.o:
 	# === tests -> compile $<
-	${CC} -c ${CPPFLAGS} ${CFLAGS} -o $@ $<
+	${CC} -c ${CPPFLAGS} ${DEFS} ${INCLUDES} ${CFLAGS} -o $@ $<
 
 clean:
 	# === tests -> cleanup

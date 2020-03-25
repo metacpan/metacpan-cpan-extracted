@@ -1,0 +1,19 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'name' => [
+                                                      'key'
+                                                    ]
+                                        }, 'OPTIMADE::Filter::Property' ),
+                                 bless( {
+                                          'name' => [
+                                                      'value'
+                                                    ]
+                                        }, 'OPTIMADE::Filter::Property' )
+                               ],
+                 'operator' => '='
+               }, 'OPTIMADE::Filter::Comparison' );
+== Filter ==
+(key = value)
+== SQL ==
+('key' = 'value')

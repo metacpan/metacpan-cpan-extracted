@@ -1,0 +1,1 @@
+list LENGTH < 5 AND list LENGTH = "four" AND list LENGTH >= max_length_of_the_list

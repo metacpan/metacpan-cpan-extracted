@@ -43,7 +43,7 @@ use Future;
    ok( !$fail_f->is_ready, 'on_fail chained future not ready after cancel' );
    is( $future->state, "cancelled", '$future->state after ->cancel' );
 
-   like( exception { $future->get }, qr/cancelled/, '$future->get throws exception by cancel' );
+   like( exception { $future->result }, qr/cancelled/, '$future->result throws exception by cancel' );
 
    is( exception { $future->cancel }, undef,
       '$future->cancel a second time is OK' );
@@ -158,7 +158,7 @@ use Future;
    $f1->done( "result" );
 
    ok( $f3->is_ready, '$f3 ready when $f1 is' );
-   is_deeply( [ $f3->get ], [ "result" ], 'result of $f3' );
+   is_deeply( [ $f3->result ], [ "result" ], 'result of $f3' );
    is_oneref( $f1, '$f1 has one reference after done' );
 }
 

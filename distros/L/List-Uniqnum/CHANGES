@@ -31,3 +31,7 @@
 0.09 - Move definition of NV_IS_DOUBLEDOUBLE from Makefile.PL to Uniqnum.xs.
      - No longer mess with the flags of the inputs.
      - Accommodate absence of SvUOK in perl-5.6
+
+0.11 - Test, in t/01uniqnum.t, that uniqnum():
+         1) does not alter the numeric flags of any of its numeric arguments;
+         2) copies flags of numeric arguments to the corresponding returned values.

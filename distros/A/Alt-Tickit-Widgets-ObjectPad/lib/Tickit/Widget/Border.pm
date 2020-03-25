@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.09;
 
@@ -63,7 +63,7 @@ has $_bottom_border = 0;
 has $_left_border   = 0;
 has $_right_border  = 0;
 
-method BUILDALL
+method BUILD
 {
    my %params = @_;
 
@@ -74,18 +74,16 @@ method BUILDALL
    );
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    my $child = $self->child;
    return $self->top_border +
           ( $child ? $child->requested_lines : 0 ) +
           $self->bottom_border;
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
    my $child = $self->child;
    return $self->left_border +
           ( $child ? $child->requested_cols : 0 ) +
@@ -197,12 +195,10 @@ method set_border
 }
 
 ## This should come from Tickit::ContainerWidget
-sub children_changed { shift->reshape }
+method children_changed { $self->reshape }
 
-sub reshape
+method reshape
 {
-   my $self = shift;
-
    my $window = $self->window or return;
    my $child  = $self->child  or return;
 
@@ -228,9 +224,8 @@ sub reshape
    }
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    my $win = $self->window or return;

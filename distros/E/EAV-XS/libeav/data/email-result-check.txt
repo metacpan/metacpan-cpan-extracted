@@ -1,0 +1,25 @@
+valid.ipv4@[8.8.8.8]
+valid.ipv4@[10.10.250.155]
+valid.ipv6@[IPv6:2001:0db8:0000:0000:0000:ff00:0042:8329]
+valid.ipv6+ipv4@[IPv6:::ffff:192.0.2.128]
+valid.domain@iana.org
+valid.domain@почта.рф
+valid.domain@大众汽车.大众汽车
+invalid.ipv4@a[10.0.0.1]
+invalid.ipv4@ [10.0.0.1]
+invalid.ipv4@[0.1.2.3]
+invalid.ipv6@[IPv6:ge80:1::]
+invalid.ipv6+ipv4@[IPv6:::ffff:0.100.200.128]
+special@localhost
+special@example
+special@test
+special@invalid
+special@onion
+special@example.org
+special@example.net
+special@example.com
+invalid.domain@pppppp
+invalid.domain@неправильный.домен
+invalid.domain@ iana.org
+invalid.email@
+invalid.email

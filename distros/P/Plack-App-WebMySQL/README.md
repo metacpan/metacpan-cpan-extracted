@@ -19,7 +19,7 @@ Standalone:
 
     plackup
     
-The browse to [http://localhost:5000/app](http://localhost:5000/app)
+The browse to [http://localhost:5000/app](http://localhost:5000/)
     
 ## Customising
 

@@ -71,6 +71,13 @@ struct ErrorCode : AllocatedObject<ErrorCode> {
 
     string what () const;
 
+    bool contains (const std::error_code& c) const {
+        if (!data) {
+            return !c;
+        }
+        return contains_impl(c);
+    }
+
     // any user can add specialization for his own result and get any data
     template <typename T = void, typename... Args>
     T private_access(Args...);
@@ -97,6 +104,7 @@ private:
     void set  (const std::error_code& ec, const std::error_code& next);
     void set  (const std::error_code& ec, const ErrorCode& next);
     void push (const std::error_code&);
+    bool contains_impl (const std::error_code& c) const;
 };
 
 inline bool operator== (const ErrorCode& lhs, const ErrorCode& rhs) noexcept { return lhs.code() == rhs.code(); }

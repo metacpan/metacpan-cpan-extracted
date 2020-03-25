@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
 package Future::AsyncAwait;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Carp;
 
@@ -147,9 +147,9 @@ with futures.
 
 =head1 STABILITY WARNING
 
-This module is still relatively new and under active development. While it now
-seems relatively stable enough for most use-cases, there may still be a number
-of memory leaks left in it, especially if still-pending futures are abandoned.
+This module is still under active development. While it now seems relatively
+stable enough for most use-cases, there may still be a number of memory leaks
+left in it, especially if still-pending futures are abandoned.
 
 While it seems stable enough for small-scale development and experimental
 testing, take care when using this module in production, as some growth in
@@ -353,6 +353,26 @@ assert that the C<dynamically> correctly works across an C<await> boundary.
       await func();
 
       say "Var is still $var";
+   }
+
+=head2 Object::Pad
+
+As of L<Future::AsyncAwait> version 0.38 and L<Object::Pad> version 0.15, both
+modules now use L<XS::Parse::Sublike> to parse blocks of code. Because of this
+the two modules can operate together and allow class methods to be written as
+async subs which await expressions:
+
+   use Future::AsyncAwait;
+   use Object::Pad;
+
+   class Example
+   {
+      async method perform($block)
+      {
+         say "$self is performing code";
+         await $block->();
+         say "code finished";
+      }
    }
 
 =cut

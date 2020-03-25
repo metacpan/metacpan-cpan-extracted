@@ -1,0 +1,176 @@
+=head1 NAME
+
+Encode::Base2N - fast base64, base32, base16 encode/decode functions
+
+=head1 SYNOPSIS
+
+    use Encode::Base2N qw/encode_base64 decode_base64 encode_base64url encode_base64pad encode_base32 decode_base32 encode_base32low encode_base16 decode_base16 encode_base16low/;
+    
+    encode_base64("hello");           # => "aGVsbG8"
+    encode_base64pad("hello");        # => "aGVsbG8="
+    encode_base64('%$#@!~AM<K>?');    # => "JSQjQCF+QU08Sz4/"
+    encode_base64url('%$#@!~AM<K>?'); # => "JSQjQCF-QU08Sz4_"
+    decode_base64("aGVsbG8");         # => "hello"
+    
+    encode_base32("hello");    # => "NBSWY3DP"
+    encode_base32low("hello"); # => "nbswy3dp"
+    decode_base32("nbswy3dp"); # => "hello"
+    
+    encode_base16("hello");      # => "68656C6C6F"
+    encode_base16low("hello");   # => "68656c6c6f"
+    decode_base16("68656C6C6F"); # => "hello"
+
+
+
+=head1 DESCRIPTION
+
+Encode::Base2N supports Base64/32/16 encodings with or without url mode and padding. It's written in C++ and has also a C++ interface.
+
+
+
+=head1 FUNCTIONS
+
+
+=head3 Base64
+
+=head4 encode_base64($input)
+
+Does Base64 encoding without padding
+
+=head4 encode_base64url($input)
+
+Does Base64 encoding without padding using so-called 'url' mode ('-' instead of '+' and '_' instead of '/')
+
+=head4 encode_base64pad($input)
+
+ Does Base64 encoding with padding
+ 
+=head4 decode_base64($encoded)
+ 
+ Decodes Base64 (all possible variants)
+ 
+ 
+=head3 Base32
+
+=head4 encode_base32($input)
+ 
+ Does Base32 encoding
+ 
+=head4 encode_base32low($input)
+ 
+ Does Base32 encoding using lowercase alphabet
+ 
+=head4 decode_base32($encoded)
+ 
+ Decodes Base32 (all possible variants)
+ 
+ 
+=head3 Base16
+
+=head4 encode_base16($input)
+ 
+ Does Base16 encoding
+ 
+=head4 encode_base16low($input)
+ 
+ Does Base16 encoding using lowercase alphabet
+ 
+=head4 decode_base16($encoded)
+ 
+ Decodes Base16 (all possible variants)
+ 
+ 
+ 
+=head1 PERFORMANCE
+ 
+Tests were performed on AMD Ryzen 9 3950X, Debian 10.
+ 
+Benchmark code can be found in C<misc/mytest.plx>
+ 
+    my $short = 'hello world hello world';
+    my $long = 'hello ' x 1000;
+ 
+=head3 BASE64 url mode
+ 
+    ==== encode short ===
+                        Rate   MIME::Base64 Encode::Base2N
+    MIME::Base64   1622942/s             --           -83%
+    Encode::Base2N 9466311/s           483%             --
+    ==== encode long ===
+                       Rate   MIME::Base64 Encode::Base2N
+    MIME::Base64   123675/s             --           -54%
+    Encode::Base2N 270491/s           119%             --
+    ==== decode short ===
+                        Rate   MIME::Base64 Encode::Base2N
+    MIME::Base64   2633983/s             --           -67%
+    Encode::Base2N 7957942/s           202%             --
+    ==== decode long ===
+                       Rate   MIME::Base64 Encode::Base2N
+    MIME::Base64    76560/s             --           -33%
+    Encode::Base2N 113778/s            49%             --
+
+=head3 BASE64 classic
+
+    ==== encode short ===
+                        Rate   MIME::Base64 Encode::Base2N
+    MIME::Base64   8655697/s             --            -8%
+    Encode::Base2N 9379463/s             8%             --
+    ==== encode long ===
+                       Rate   MIME::Base64 Encode::Base2N
+    MIME::Base64   247350/s             --            -9%
+    Encode::Base2N 270491/s             9%             --
+    ==== decode short ===
+                        Rate Encode::Base2N   MIME::Base64
+    Encode::Base2N 7301092/s             --            -7%
+    MIME::Base64   7851342/s             8%             --
+    ==== decode long ===
+                       Rate Encode::Base2N   MIME::Base64
+    Encode::Base2N  98303/s             --            -8%
+    MIME::Base64   106626/s             8%             --
+
+=head3 BASE32
+
+    ==== encode short ===
+                          Rate     MIME::Base32 MIME::Base32::XS   Encode::Base2N
+    MIME::Base32       64576/s               --             -99%             -99%
+    MIME::Base32::XS 8498074/s           13060%               --             -14%
+    Encode::Base2N   9910034/s           15246%              17%               --
+    ==== encode long ===
+                         Rate     MIME::Base32 MIME::Base32::XS   Encode::Base2N
+    MIME::Base32        255/s               --            -100%            -100%
+    MIME::Base32::XS 180326/s           70743%               --             -24%
+    Encode::Base2N   236307/s           92735%              31%               --
+    ==== decode short ===
+                          Rate     MIME::Base32 MIME::Base32::XS   Encode::Base2N
+    MIME::Base32       91022/s               --             -96%             -99%
+    MIME::Base32::XS 2572440/s            2726%               --             -73%
+    Encode::Base2N   9532509/s           10373%             271%               --
+    ==== decode long ===
+                         Rate     MIME::Base32 MIME::Base32::XS   Encode::Base2N
+    MIME::Base32        408/s               --             -97%            -100%
+    MIME::Base32::XS  13963/s            3324%               --             -92%
+    Encode::Base2N   185679/s           45436%            1230%               --
+
+=head3 BASE16
+
+    I found no module to compare with. Just testing this module's speed.
+
+    Benchmark: running decode_long, decode_short, encode_long, encode_short for at least 1 CPU seconds...
+    encode_short: 0 wallclock secs ( 1.04 usr +  0.00 sys =  1.04 CPU) @ 9624167.31/s (n=10009134)
+    decode_short: 1 wallclock secs ( 1.08 usr +  0.00 sys =  1.08 CPU) @ 9466311.11/s (n=10223616)
+    encode_long:  2 wallclock secs ( 1.09 usr +  0.00 sys =  1.09 CPU) @ 263045.87/s (n=286720)
+    decode_long:  1 wallclock secs ( 1.04 usr +  0.00 sys =  1.04 CPU) @ 300754.81/s (n=312785)
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

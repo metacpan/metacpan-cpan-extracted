@@ -152,7 +152,7 @@ has $_on_toggle;
 has $_value;
 has $_group;
 
-method BUILDALL
+method BUILD
 {
    my %params = @_;
 
@@ -163,9 +163,8 @@ method BUILDALL
    $_group = $params{group} || Tickit::Widget::RadioButton::Group->new;
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    return 1;
 }
 
@@ -280,16 +279,13 @@ Returns true if this button is the active button of the group.
 
 =cut
 
-sub is_active
+method is_active
 {
-   my $self = shift;
    return $self->group->active == $self;
 }
 
-sub reshape
+method reshape
 {
-   my $self = shift;
-
    my $win = $self->window or return;
 
    my $tick = $self->get_style_values( "tick" );
@@ -313,9 +309,8 @@ method render_to_rb
    $rb->erase_to( $rect->right );
 }
 
-sub on_mouse
+method on_mouse
 {
-   my $self = shift;
    my ( $args ) = @_;
 
    return unless $args->type eq "press" and $args->button == 1;
@@ -324,8 +319,7 @@ sub on_mouse
    $self->activate;
 }
 
-package # hide from indexer
-   Tickit::Widget::RadioButton::Group;
+class Tickit::Widget::RadioButton::Group;
 use Scalar::Util qw( weaken refaddr );
 
 =head1 GROUPS
@@ -345,11 +339,8 @@ Returns a new group.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   return bless [ undef, undef ], $class;
-}
+has $_active;
+has $_on_changed;
 
 =head2 $radiobutton = $group->active
 
@@ -357,28 +348,19 @@ Returns the button which is currently active in the group
 
 =cut
 
-sub active
-{
-   my $self = shift;
-   return $self->[0];
-}
+method active { $_active }
 
-sub set_active
+method set_active
 {
-   my $self = shift;
-   ( $self->[0] ) = @_;
-   $self->[1]->( $self->active, $self->active->value ) if $self->[1];
+   ( $_active ) = @_;
+   $_on_changed->( $self->active, $self->active->value ) if $_on_changed;
 }
 
 =head2 $on_changed = $group->on_changed
 
 =cut
 
-sub on_changed
-{
-   my $self = shift;
-   return $self->[1];
-}
+method on_changed { $_on_changed }
 
 =head2 $group->set_on_changed( $on_changed )
 
@@ -392,10 +374,9 @@ The callback is passed the currently-active button, and its C<value>.
 
 =cut
 
-sub set_on_changed
+method set_on_changed
 {
-   my $self = shift;
-   ( $self->[1] ) = @_;
+   ( $_on_changed ) = @_;
 }
 
 =head1 AUTHOR

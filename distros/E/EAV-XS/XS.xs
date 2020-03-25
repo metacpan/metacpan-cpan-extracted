@@ -136,3 +136,72 @@ get_error(self)
             RETVAL = newSVpv("", 0);
     OUTPUT:
         RETVAL
+
+#
+# Returns local-part after is_email() call.
+#
+SV *
+get_lpart(self)
+        EAV::XS     self
+    PREINIT:
+        const char *lpart;
+    CODE:
+        lpart = self->result.lpart;
+
+        if (lpart != NULL)
+            RETVAL = newSVpv(lpart, 0);
+        else
+            RETVAL = newSVpv("", 0);
+    OUTPUT:
+        RETVAL
+
+#
+# Returns domain-part after is_email() call.
+#
+SV *
+get_domain(self)
+        EAV::XS     self
+    PREINIT:
+        const char *domain;
+    CODE:
+        domain = self->result.domain;
+
+        if (domain != NULL)
+            RETVAL = newSVpv(domain, 0);
+        else
+            RETVAL = newSVpv("", 0);
+    OUTPUT:
+        RETVAL
+
+#
+# Return if the email is an IPv4 address after is_email() call.
+#
+bool
+get_is_ipv4(self)
+        EAV::XS     self
+    CODE:
+        RETVAL = self->result.is_ipv4;
+    OUTPUT:
+        RETVAL
+
+#
+# Return if the email is an IPv6 address after is_email() call.
+#
+bool
+get_is_ipv6(self)
+        EAV::XS     self
+    CODE:
+        RETVAL = self->result.is_ipv6;
+    OUTPUT:
+        RETVAL
+
+#
+# Return if the email is an domain after is_email() call.
+#
+bool
+get_is_domain(self)
+        EAV::XS     self
+    CODE:
+        RETVAL = self->result.is_domain;
+    OUTPUT:
+        RETVAL

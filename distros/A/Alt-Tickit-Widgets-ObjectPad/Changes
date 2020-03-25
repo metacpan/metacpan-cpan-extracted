@@ -1,3 +1,9 @@
+Revision history for Alt-Tickit-Widgets-ObjectPad
+
+0.30    2020-03-24
+        [CHANGES]
+         * Rewrite actual widget classes to use Object::Pad
+
 Revision history for Tickit-Widgets
 
 0.29    2018-03-13 13:49:27

@@ -17,6 +17,7 @@ my $build = Module::Build->new(
       'Object::Pad' => '0.09',
       'Parser::MGC' => 0,
       'Struct::Dumb' => 0,
+      'Syntax::Keyword::Dynamically' => 0,
       'Tickit::Event' => '0.63',
       'Tickit::RenderBuffer' => 0,
       'Tickit::Utils' => '0.29',
@@ -31,6 +32,12 @@ my $build = Module::Build->new(
    license => 'perl',
    create_license => 1,
    create_readme  => 1,
+   meta_merge => {
+      no_index => {
+         # Don't the actual Alt implementations of widgets
+         directory => [ "lib/Tickit" ],
+      },
+   }
 );
 
 $build->create_build_script;

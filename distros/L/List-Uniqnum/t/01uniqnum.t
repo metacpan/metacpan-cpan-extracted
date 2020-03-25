@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 use Config; # to determine nvsize
-use Test::More tests => 27;
+use Test::More tests => 29;
 use List::Uniqnum qw( uniqnum );
+use B qw(svref_2object);
 #use List::Util qw( uniqnum );
 
 
@@ -348,46 +349,45 @@ SKIP: {
              'uniqnum recognizes -100000000000000016 and -100000000000000016.0 as the same' );
 }
 
+
+@in = ( 17, -17, 2.3, -2.3, ~0, ~0 - 4, 1 << $ls, 1 << ($ls - 1), -(1 << ($ls - 1)),
+        1 << ($ls - 8), -(1 << ($ls - 8)), 1 << ($ls - 13), -(1 << ($ls - 13)),
+        (1 << ($ls - 1))  + 255, -(1 << ($ls - 1))  + 255,
+        (1 << ($ls - 8))  + 255, -(1 << ($ls - 8))  + 255,
+        (1 << ($ls - 13)) + 255, -(1 << ($ls - 13)) + 255,
+        (2 ** 30) + 7.5, -(2 ** 30) + 7.5,
+      );
+
+my @incremented = ();
+
+for(@in) { push @incremented, $_ + 1 }
+{
+  no warnings 'void';
+  "$_" for @incremented; # add POK and pPOK flags to elements of @incremented;
+}
+push @in, @incremented;
+
+my @pre_call  = map {svref_2object(\$_)->FLAGS} @in;
+my @u = uniqnum(@in);
+my @post_call = map {svref_2object(\$_)->FLAGS} @in;
+my @u_flags = map {svref_2object(\$_)->FLAGS} @u;
+
+  # uniqnum() can alter the numeric flags of a string argument. 
+  # Don't worry about that as it's acceptable behaviour.
+  # But check that the flags of uniqnum's numeric arguments
+  # are not altered.
+
+is_deeply( [ @pre_call  ],
+           [ @post_call ],
+           'uniqnum does not alter the flags of its numeric arguments' );
+
+SKIP: {
+    skip ("Perl's stringification of values is broken for this perl-5.6 configuration", 1) 
+      if ( $] < 5.008 && $Config{ivsize} == $Config{nvsize} );
+is_deeply( [@pre_call],
+           [@u_flags],
+           'uniqnum copies flags of numeric arguments to returned values' );
+}
+
 __END__
-
-At time of writing this (27th Jan 2020), current version of List::Util is 1.53.
-If, instead of using List::Uniqnum, you instead load List::Util at the beginning of this script, it's likely
-you'll see the following errors with List-Util-1.53:
-
-not ok 5 - uniqnum preserves uniqueness of high precision floats
-#   Failed test 'uniqnum preserves uniqueness of high precision floats'
-#   at 01uniqnum.t line 97.
-#          got: '1'
-#     expected: '2'
-not ok 6 - uniqnum preserves uniqueness of high precision floats (stringified)
-#   Failed test 'uniqnum preserves uniqueness of high precision floats (stringif
-ied)'
-#   at 01uniqnum.t line 98.
-#          got: '1'
-#     expected: '2'
-
-This happens because List::Util::uniqnum regards the 2 distinct values provided by test 5 (and by test 6) as
-being duplicates - even though they differ by 1 ULP.
-(IIRC, some values that differ by more than 1 ULP can also be regarded as duplicates by List-Util-1.53)
-
-The next failure you're likely to see is:
-
-not ok 8 - uniqnum correctly compares UV/IVs that don't overflow NVs
-#   Failed test 'uniqnum correctly compares UV/IVs that don't overflow NVs'
-#   at 01uniqnum.t line 151.
-#     Structures begin differing at:
-#          $got->[1] = '9.22337203685478e+018'
-#     $expected->[1] = '1152921504606846976'
-
-(Values will differ depending upon $Config{nvsize})
-
-Whereas tests 5 and 6 fail because unique values are regarded as duplicates, test 8 fails because duplicate
-values are regarded as unique.
-For example, the IV 1 << 63 is regarded as being different to the NV 2 ** 63.
-
-Finally, expect test 16 to fail because 0.0 and -0.0 are deemed to be different values.
-
-Expect extra test failures against older versions of List::Util.
-
-
 

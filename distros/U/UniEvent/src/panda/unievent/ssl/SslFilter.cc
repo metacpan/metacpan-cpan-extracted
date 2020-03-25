@@ -18,12 +18,12 @@
 namespace panda { namespace unievent { namespace ssl {
 
 log::Module ssllog("UniEvent::SSL", log::Warning);
-static log::Module* panda_log_module = &ssllog;
+static auto& panda_log_module = ssllog;
 
 #define _ESSL(fmt, ...) do { \
     char _log_buf_[1000]; \
     int _log_size_ = snprintf(_log_buf_, 1000, "%s(): [%s] {%p} " fmt "\n", __func__, profile == Profile::CLIENT ? "client" : (profile == Profile::SERVER ? "server" : "no profile"), this->handle, ##__VA_ARGS__); \
-    panda_mlog_debug(ssllog, string_view(_log_buf_, _log_size_)); \
+    panda_log_debug(string_view(_log_buf_, _log_size_)); \
 } while(0)
 
 const void* SslFilter::TYPE = &typeid(SslFilter);
@@ -224,7 +224,7 @@ void SslFilter::negotiation_finished (const ErrorCode& err) {
 }
 
 void SslFilter::handle_read (string& encbuf, const ErrorCode& err) {
-    _ESSL("got %lu bytes, state: %d", encbuf.length(), (int)state);
+    _ESSL("got %zu bytes, state: %d", encbuf.length(), (int)state);
     if (state == State::error) {
         NextFilter::handle_read(encbuf, err);
         return;
@@ -285,7 +285,7 @@ void SslFilter::handle_read (string& encbuf, const ErrorCode& err) {
         #ifdef RENEGOTIATION_DISABLED
             panda_log_warn("SSL_ERROR_WANT_WRITE on_read when renegotiation is blocked. This warning means that SSL_ERROR_WANT_WRITE is normal case, just remove this warning from code");
         #endif
-        _ESSL("write %lu", wbuf.length());
+        _ESSL("write %zu", wbuf.length());
         WriteRequestSP req = new SslWriteRequest();
         req->bufs.push_back(wbuf);
         subreq_write(source_request, req);

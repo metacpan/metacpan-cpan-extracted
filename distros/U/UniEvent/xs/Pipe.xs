@@ -3,8 +3,18 @@
 
 using namespace xs;
 using namespace xs::unievent;
-using namespace panda::unievent;
 using panda::string;
+using panda::ErrorCode;
+using panda::unievent::Pipe;
+using panda::unievent::Loop;
+using panda::unievent::Error;
+using panda::unievent::Stream;
+using panda::unievent::LoopSP;
+using panda::unievent::PipeSP;
+using panda::unievent::StreamSP;
+using panda::unievent::Ownership;
+using panda::unievent::last_sys_error;
+using panda::unievent::ConnectRequestSP;
 
 static inline PipeSP create_pipe (const LoopSP& loop, bool ipc) {
     PipeSP ret = make_backref<Pipe>(loop, ipc);
@@ -78,7 +88,7 @@ void pair (Sv arg1 = Sv(), Sv arg2 = Sv()) {
     if (reader->ipc() || writer->ipc()) throw "both reader and writer must be created with ipc = false";
     
     int fds[2];
-    if (PerlProc_pipe(fds) < 0) throw last_sys_code_error();
+    if (PerlProc_pipe(fds) < 0) throw Error(last_sys_error());
     
     try {
         reader->read_start();

@@ -6,7 +6,7 @@ using panda::string;
 namespace panda { namespace unievent { namespace ssl {
 
 using membuf_t = SslBio::membuf_t;
-static log::Module* panda_log_module = &ssllog;
+static const auto& panda_log_module = ssllog;
 
 static int bio_new (BIO* bio) {
     membuf_t* b = new membuf_t();

@@ -41,7 +41,7 @@ use Future;
    $f2->done( results => "here" );
 
    ok( $fseq->is_ready, '$fseq is done after $f2 done' );
-   is_deeply( [ $fseq->get ], [ results => "here" ], '$fseq->get returns results' );
+   is_deeply( [ $fseq->result ], [ results => "here" ], '$fseq->result returns results' );
 
    undef $f2;
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
@@ -107,7 +107,7 @@ use Future;
    $f2->done( "Final" );
 
    ok( $fseq->is_ready, '$fseq already ready for immediate done' );
-   is( scalar $fseq->get, "Final", '$fseq->get for immediate done' );
+   is( scalar $fseq->result, "Final", '$fseq->result for immediate done' );
 }
 
 # immediately fail
@@ -130,7 +130,7 @@ use Future;
    $f1->done( "fallthrough result" );
 
    ok( $fseq->is_ready, '$fseq is ready' );
-   is( scalar $fseq->get, "fallthrough result", '->then done fallthrough' );
+   is( scalar $fseq->result, "fallthrough result", '->then done fallthrough' );
 }
 
 # fail fallthrough
@@ -238,7 +238,7 @@ use Future;
    $f2->done( "f2 result" );
 
    ok( $fseq->is_ready, '$fseq is done after $f2 done' );
-   is( scalar $fseq->get, "f2 result", '$fseq->get returns results' );
+   is( scalar $fseq->result, "f2 result", '$fseq->result returns results' );
 }
 
 # then_done
@@ -250,12 +250,12 @@ use Future;
    $f1->done( first => );
 
    ok( $fseq->is_ready, '$fseq done after $f1 done' );
-   is_deeply( [ $fseq->get ], [ second => "result" ], '$fseq->get returns result for then_done' );
+   is_deeply( [ $fseq->result ], [ second => "result" ], '$fseq->result returns result for then_done' );
 
    my $fseq2 = $f1->then_done( third => "result" );
 
    ok( $fseq2->is_ready, '$fseq2 done after ->then_done on immediate' );
-   is_deeply( [ $fseq2->get ], [ third => "result" ], '$fseq2->get returns result for then_done on immediate' );
+   is_deeply( [ $fseq2->result ], [ third => "result" ], '$fseq2->result returns result for then_done on immediate' );
 
    my $f2 = Future->new;
    $fseq = $f2->then_done( "result" );

@@ -36,7 +36,6 @@ lib/Tickit/Widget/HBox.pm
 lib/Tickit/Widget/HSplit.pm
 lib/Tickit/Widget/LinearBox.pm
 lib/Tickit/Widget/LinearSplit.pm
-lib/Tickit/Widget/LinearSplit.pm+OBJECT-PAD
 lib/Tickit/Widget/Placegrid.pm
 lib/Tickit/Widget/RadioButton.pm
 lib/Tickit/Widget/Spinner.pm

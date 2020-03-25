@@ -1,10 +1,10 @@
 {
-   "abstract" : "General-Purpose API Client Abstraction",
+   "abstract" : "HTTP API Thin-Client Abstraction",
    "author" : [
-      "Al Newkirk <anewkirk@ana.io>"
+      "Al Newkirk <awncorp@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,30 +21,51 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Object" : "0.55",
-            "Mojolicious" : "6.08",
-            "perl" : "v5.14.0"
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Role::Buildable" : "0.03",
+            "Data::Object::Role::Stashable" : "2.01",
+            "Data::Object::Role::Throwable" : "2.01",
+            "FlightRecorder" : "0.03",
+            "Mojolicious" : "8.35",
+            "perl" : "5.014",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "perl" : "v5.14.0"
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Role::Buildable" : "0.03",
+            "Data::Object::Role::Stashable" : "2.01",
+            "Data::Object::Role::Throwable" : "2.01",
+            "FlightRecorder" : "0.03",
+            "Mojolicious" : "8.35",
+            "Test::Auto" : "0.10",
+            "perl" : "5.014",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/alnewkirk/API-Client/issues"
-      },
-      "homepage" : "http://metacpan.org/release/API-Client/",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/alnewkirk/API-Client.git",
-         "web" : "https://github.com/alnewkirk/API-Client"
+         "url" : "git://github.com/iamalnewkirk/API-Client.git",
+         "web" : "https://github.com/iamalnewkirk/API-Client"
       }
    },
-   "version" : "0.04",
-   "x_authority" : "cpan:AWNCORP"
+   "version" : "0.10",
+   "x_authority" : "cpan:AWNCORP",
+   "x_contributors" : [
+      "Al Newkirk <anewkirk@ana.io>"
+   ],
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

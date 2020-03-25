@@ -157,6 +157,7 @@ libuv/test/benchmark-million-async.c
 libuv/test/benchmark-million-timers.c
 libuv/test/benchmark-multi-accept.c
 libuv/test/benchmark-ping-pongs.c
+libuv/test/benchmark-ping-udp.c
 libuv/test/benchmark-pound.c
 libuv/test/benchmark-pump.c
 libuv/test/benchmark-sizes.c
@@ -310,6 +311,7 @@ libuv/test/test-timer-from-check.c
 libuv/test/test-timer.c
 libuv/test/test-tmpdir.c
 libuv/test/test-tty-duplicate-key.c
+libuv/test/test-tty-escape-sequence-processing.c
 libuv/test/test-tty.c
 libuv/test/test-udp-alloc-cb-fail.c
 libuv/test/test-udp-bind.c

@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2020-03-17 15:35:17 */
+/* this file was auto-generated at 2020-03-24 13:10:53 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -1342,7 +1342,7 @@ const tld_t tld_list[] = {
     { "visa", 5, TLD_TYPE_GENERIC },
     { "vision", 7, TLD_TYPE_GENERIC },
     { "vista", 6, TLD_TYPE_NOT_ASSIGNED },
-    { "vistaprint", 11, TLD_TYPE_GENERIC },
+    { "vistaprint", 11, TLD_TYPE_NOT_ASSIGNED },
     { "viva", 5, TLD_TYPE_GENERIC },
     { "vivo", 5, TLD_TYPE_GENERIC },
     { "vlaanderen", 11, TLD_TYPE_GENERIC },
@@ -1588,6 +1588,6 @@ const tld_t tld_list[] = {
     { "zone", 5, TLD_TYPE_GENERIC },
     { "zuerich", 8, TLD_TYPE_GENERIC },
     { "zw", 3, TLD_TYPE_COUNTRY_CODE },
-    { NULL }
+    { NULL, 0, 0 }
 }; /* const tld_t tld_list[] */
 

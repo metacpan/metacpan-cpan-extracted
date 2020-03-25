@@ -1,0 +1,19 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'name' => [
+                                                      'te'
+                                                    ]
+                                        }, 'OPTIMADE::Filter::Property' ),
+                                 bless( {
+                                          'name' => [
+                                                      'st'
+                                                    ]
+                                        }, 'OPTIMADE::Filter::Property' )
+                               ],
+                 'operator' => '<'
+               }, 'OPTIMADE::Filter::Comparison' );
+== Filter ==
+(te < st)
+== SQL ==
+('te' < 'st')

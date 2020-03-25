@@ -15,7 +15,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
   perl: 5.008_001
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,7 @@ no_index:
 provides:
   Teng:
     file: lib/Teng.pm
-    version: '0.31'
+    version: '0.32'
   Teng::Iterator:
     file: lib/Teng/Iterator.pm
   Teng::Plugin::BulkInsert:
@@ -84,42 +84,43 @@ resources:
   bugtracker: https://github.com/nekokak/p5-Teng/issues
   homepage: https://github.com/nekokak/p5-Teng
   repository: git://github.com/nekokak/p5-Teng.git
-version: '0.31'
+version: '0.32'
 x_authority: cpan:NEKOKAK
 x_contributors:
-  - 'Yuki Ibe <yibe@yibe.org>'
-  - 'libkenta <libkenta@gmail.com>'
-  - 'Masahiro Honma <hiratara@cpan.org>'
-  - 'makamaka <makamaka.donzoko@gmail.com>'
-  - 'Nishibayashi Takuji <takuji@senchan.jp>'
-  - 'zentooo <ankerasoy@gmail.com>'
-  - 'Atsushi Kobayashi <nekokak _at_ gmail dot com>'
-  - 'Tomohiro Hosaka <bokutin@bokut.in>'
-  - 'issm <issmxx@gmail.com>'
-  - 'Atsushi Kato <ktat@cpan.org>'
-  - 'Kazuhiro Osawa <yappo@shibuya.pl>'
-  - 'Masahiro Chiba <chiba@everqueue.com>'
-  - 'Jun Kuriyama <kuriyama@s2factory.co.jp>'
-  - 'Masahiro Nagano <kazeburo@gmail.com>'
-  - 'k-sato <k-sato@mfac.jp>'
   - 'Asato Wakisaka <caaov627@hcn.zaq.ne.jp>'
-  - 'ITO Nobuaki <daydream.trippers@gmail.com>'
-  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
-  - 'Geraud CONTINSOUZAS <geraud@hyaku.nijuu.nana>'
-  - 'moznion <moznion@gmail.com>'
-  - 'nobuoka <nobuoka@vividcode.info>'
-  - 'Kazuho Oku <kazuhooku@gmail.com>'
-  - 'Ichito Nagata <i.nagata110@gmail.com>'
+  - 'Atsushi Kato <ktat@cpan.org>'
+  - 'Atsushi Kobayashi <nekokak _at_ gmail dot com>'
   - 'Atsushi Kobayashi <nekokak@gmail.com>'
-  - 'kawamuray <kawamuray.dadada@gmail.com>'
-  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
-  - 'Songmu <y.songmu@gmail.com>'
-  - 'aereal <aereal@aereal.org>'
   - 'Daisuke Maki <lestrrat+github@gmail.com>'
-  - 'Takuji Nishibayashi <takuji31@gmail.com>'
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Geraud CONTINSOUZAS <geraud@hyaku.nijuu.nana>'
+  - 'ITO Nobuaki <daydream.trippers@gmail.com>'
+  - 'Ichito Nagata <i.nagata110@gmail.com>'
+  - 'Jun Kuriyama <kuriyama@s2factory.co.jp>'
+  - 'Kazuhiro Osawa <yappo@shibuya.pl>'
+  - 'Kazuho Oku <kazuhooku@gmail.com>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Masahiro Chiba <chiba@everqueue.com>'
+  - 'Masahiro Honma <hiratara@cpan.org>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
   - 'Mihyaeru <mihyaeru21@gmail.com>'
-  - 'ktat <ktat.is@gmail.com>'
-  - 'karupanerura <karupa@cpan.org>'
+  - 'Nishibayashi Takuji <takuji@senchan.jp>'
   - 'Satoh, Hiroh <cho45@lowreal.net>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  - 'Songmu <y.songmu@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Takuji Nishibayashi <takuji31@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'Tomohiro Hosaka <bokutin@bokut.in>'
+  - 'Yuki Ibe <yibe@yibe.org>'
+  - 'aereal <aereal@aereal.org>'
+  - 'issm <issmxx@gmail.com>'
+  - 'k-sato <k-sato@mfac.jp>'
+  - 'karupanerura <karupa@cpan.org>'
+  - 'kawamuray <kawamuray.dadada@gmail.com>'
+  - 'ktat <ktat.is@gmail.com>'
+  - 'libkenta <libkenta@gmail.com>'
+  - 'makamaka <makamaka.donzoko@gmail.com>'
+  - 'moznion <moznion@gmail.com>'
+  - 'nipotan <nipotan@gmail.com>'
+  - 'nobuoka <nobuoka@vividcode.info>'
+  - 'zentooo <ankerasoy@gmail.com>'
+x_static_install: 1

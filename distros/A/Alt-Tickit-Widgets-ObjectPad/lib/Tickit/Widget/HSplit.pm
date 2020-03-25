@@ -3,15 +3,13 @@
 #
 #  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::HSplit;
+use Object::Pad 0.09;
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget::LinearSplit );
+class Tickit::Widget::HSplit 0.29
+   extends Tickit::Widget::LinearSplit;
+
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE CAP_BOTH );
-
-our $VERSION = '0.29';
 
 use Carp;
 
@@ -111,36 +109,29 @@ Child widgets to use
 
 =cut
 
-sub new
+method BUILD
 {
-   my $class = shift;
    my %args = @_;
-
-   my $self = $class->SUPER::new( %args );
 
    $self->set_top_child   ( $args{top_child}    ) if $args{top_child};
    $self->set_bottom_child( $args{bottom_child} ) if $args{bottom_child};
-
-   return $self;
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    my $spacing = $self->get_style_values( "spacing" );
    return sum(
-      $self->{A_child} ? $self->{A_child}->requested_lines : 1,
+      $self->top_child    ? $self->top_child->requested_lines    : 1,
       $spacing,
-      $self->{B_child} ? $self->{B_child}->requested_lines : 1,
+      $self->bottom_child ? $self->bottom_child->requested_lines : 1,
    );
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
    return max(
-      $self->{A_child} ? $self->{A_child}->requested_cols : 1,
-      $self->{B_child} ? $self->{B_child}->requested_cols : 1,
+      $self->top_child    ? $self->top_child->requested_cols    : 1,
+      $self->bottom_child ? $self->bottom_child->requested_cols : 1,
    );
 }
 
@@ -170,38 +161,36 @@ Accessor for the child widget used in the bottom half of the display.
 *bottom_child     = __PACKAGE__->can( "B_child" );
 *set_bottom_child = __PACKAGE__->can( "set_B_child" );
 
-sub _make_child_geom
+method _make_child_geom
 {
-   my $self = shift;
    my ( $start, $len ) = @_;
    return ( $start, 0, $len, $self->window->cols );
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
-   my $split_len = $self->{split_len};
+   my $split_len = $self->_split_len;
+   my $split_at  = $self->_split_at;
 
    my $cols = $self->window->cols;
 
    $rb->setpen( $self->get_style_pen( "split" ) );
 
-   $rb->hline_at( $self->{split_at}, 0, $cols-1, LINE_SINGLE, undef, CAP_BOTH );
+   $rb->hline_at( $split_at, 0, $cols-1, LINE_SINGLE, undef, CAP_BOTH );
 
    foreach my $line ( $rect->linerange( 1, $split_len-2 ) ) {
-      $rb->erase_at( $self->{split_at} + $line, 0, $cols );
+      $rb->erase_at( $split_at + $line, 0, $cols );
    }
 
    if( $split_len > 1 ) {
-      $rb->hline_at( $self->{split_at} + $split_len - 1, 0, $cols-1, LINE_SINGLE, undef, CAP_BOTH );
+      $rb->hline_at( $split_at + $split_len - 1, 0, $cols-1, LINE_SINGLE, undef, CAP_BOTH );
    }
 }
 
-sub on_mouse
+method on_mouse
 {
-   my $self = shift;
    my ( $args ) = @_;
 
    if( $args->type ne "wheel" and $args->button == 1 ) {

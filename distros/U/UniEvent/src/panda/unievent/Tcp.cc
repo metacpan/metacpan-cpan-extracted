@@ -26,7 +26,7 @@ void Tcp::open (sock_t sock, Ownership ownership) {
     impl()->open(sock);
     if (peeraddr()) {
         auto err = set_connect_result(true);
-        if (err) throw err;
+        if (err) throw Error(err);
     }
 }
 

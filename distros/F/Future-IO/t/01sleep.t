@@ -36,4 +36,13 @@ time_about sub {
    $f2->get;
 }, 0.3, 'Future::IO->sleep can be cancelled';
 
+{
+   my $f1 = Future::IO->sleep( 0.1 );
+   my $f2 = Future::IO->sleep( 0.3 );
+
+   is( $f2->await, $f2, '->await returns Future' );
+   ok( $f2->is_ready, '$f2 is ready after ->await' );
+   ok( $f1->is_ready, '$f1 is also ready after ->await' );
+}
+
 done_testing;

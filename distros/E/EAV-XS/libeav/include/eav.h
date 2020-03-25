@@ -35,11 +35,14 @@ typedef struct eav_result_s {
     bool is_ipv6;
     bool is_domain;
     int rc;
-    const char *at;
 #ifdef HAVE_IDNKIT
     idn_result_t idn_rc;
 #else
     int idn_rc;
+#endif
+#ifdef EAV_EXTRA
+    char *lpart;
+    char *domain;
 #endif
 } eav_result_t;
 
@@ -278,6 +281,5 @@ is_6531_email  (const char *email,
                 size_t length,
                 bool tld_check);
 #endif /* HAVE_IDNKIT */
-
 
 #endif /* EAV_H */

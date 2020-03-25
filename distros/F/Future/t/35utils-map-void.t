@@ -31,7 +31,7 @@ use Future::Utils qw( fmap_void );
    $subf[2]->done;
 
    ok( $future->is_ready, '$future now ready after subs done' );
-   is_deeply( [ $future->get ], [], '$future->get empty for fmap_void' );
+   is_deeply( [ $future->result ], [], '$future->result empty for fmap_void' );
 }
 
 # fmap_void from CODE

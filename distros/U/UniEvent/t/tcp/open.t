@@ -3,6 +3,7 @@ use warnings;
 use lib 't/lib'; use MyTest;
 use Net::SockAddr;
 use UniEvent;
+use Socket 'IPPROTO_IP';
 
 my $loop = UniEvent::Loop->default_loop;
 
@@ -13,7 +14,7 @@ $s->connection_callback(sub {
     my (undef, $client) = @_;
     $client->read_callback(sub {
         my (undef, $data) = @_;
-        pass "server: read";
+        pass "server: read $data";
         $client->write($data+1);
         $client = undef;
     });
@@ -21,14 +22,15 @@ $s->connection_callback(sub {
 });
 my $sa = $s->sockaddr;
 
-socket my $sock, AF_INET, SOCK_STREAM, 0;
-connect($sock, $sa->get) or die "$!";
+my $sock = MyTest::create_socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+MyTest::connect_socket($sock, $sa);
 
 my $client = new UniEvent::Tcp;
 $client->open($sock);
-close $sock;
-undef $sock;
+MyTest::close_socket($sock);
+
 $client->write('1');
+
 $client->read_callback(sub {
     my (undef, $data) = @_;
     pass "client: read";

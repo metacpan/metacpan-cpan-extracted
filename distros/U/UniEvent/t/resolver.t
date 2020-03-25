@@ -3,13 +3,6 @@ use lib 't/lib';
 use MyTest;
 use UniEvent::Error;
 
-#use Panda::Lib::Logger;
-#set_log_level(LOG_VERBOSE_DEBUG);
-#set_native_logger(sub {
-#    my ($level, $cp, $msg) = @_;
-#    warn "$cp $msg";
-#});
-
 catch_run('[resolver]');
 
 my $l = UniEvent::Loop->default_loop();
@@ -61,7 +54,7 @@ sub test_resolve {
         hints      => {family => UniEvent::AF_INET},
         on_resolve => sub {
             my ($addr, $err, $req) = @_;
-            ok !$err;
+            is $err, undef;
             ok $addr, "@$addr";
             ok $req;
             is $addr->[0]->ip, "127.0.0.1";

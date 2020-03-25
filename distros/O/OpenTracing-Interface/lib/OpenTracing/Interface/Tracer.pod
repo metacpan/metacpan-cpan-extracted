@@ -22,6 +22,14 @@ OpenTracing::Interface::Tracer - A role that defines the Tracer interface
         ...
     }
     
+    sub inject_context {
+        ...
+    }
+    
+    sub extract_context {
+        ...
+    }
+    
     BEGIN {
         use Role::Tiny::With;
         with 'OpenTracing::Interface::Tracer'
@@ -36,26 +44,27 @@ OpenTracing::Interface::Tracer - A role that defines the Tracer interface
 
 This 'role' describes the interface for any OpenTracing Tracer implementation.
 
-This description is using C<around> method modifiers that basically wraps them
-around the real implementation. These method modifiers provide a 'readable' and
-reusable interface, describing the inputs and outputs, using type constraints.
-
-Consumers of this role, or implementors of the interface are MUST implement each
-method mentioned below. Not doing so will result in compilation errors.
-
-Since this role does nothing else than checking input and output, it is useful
-during development. Most likely it can be switched off safely in production
-environments.
+Tracer is the entry point API between instrumentation code and the tracing
+implementation.
 
 
-
-=head1 METHODS
+=head1 INSTANCE METHODS
 
 
 
 =head2 get_scope_manager
 
-Returns the current L<ScopeManager>, which may be a noop but may not be null.
+Returns the current C<ScopeManager>, which may be a NoOp but may not be null.
+
+    my $scope_manager = $tracer->get_scope_manager;
+
+=head3 Parameters
+
+None
+
+=head3 Returns
+
+An object of type C<ScopeManager> from L<OpenTracing::Types>.
 
 
 
@@ -63,13 +72,37 @@ Returns the current L<ScopeManager>, which may be a noop but may not be null.
 
 This will return the 'active' span.
 
-A shorthand for C<< $tracer->get_scope_manager->get_active_scope->get_span >>
+    my $span = $tracer->get_active_span;
 
-It will return C<undef> if there is no active scope.
+A shorthand for C<< $tracer->get_scope_manager->get_active_scope->get_span >>.
+
+=head3 Parameters
+
+None
+
+=head3 Returns
+
+An object of type C<Span> from L<OpenTracing::Types> OR C<undef> if there is no
+active C<Scope>.
 
 
 
-=head2 start_active_span
+=head2 start_active_span( $operation_name, %options )
+
+Starts AND activates a C<Span> and returns its C<Scope>.
+
+    my $scope = $tracer->start_active_span( 'some work needs to be done',
+        child_of                => $span_context,
+        references              => [
+            Reference->new_follows_from( $some_context ),
+        ],
+        tags                    => {
+            tag_key_1               => 'tag_value_1',
+        },
+        start_time              => now(),           # default
+        ignore_active_span      => 0,               # default
+        finish_span_on_close    => 1,               # default
+    );
 
 =head3 Required Positional Parameters
 
@@ -79,7 +112,7 @@ It will return C<undef> if there is no active scope.
 
 =back
 
-=head3 Optional Dictionairy with Named Options
+=head3 Named Options
 
 =over
 
@@ -87,15 +120,15 @@ It will return C<undef> if there is no active scope.
 
 either
 
-an object that does L<OpenTracing::Interface::Span>
+An object of type C<Span> from L<OpenTracing::Types>.
 
 or
 
-an object that does L<OpenTracing::Interface::SpanContext>
+An object of type C<SpanContext> from L<OpenTracing::Types>.
 
 =item references
 
-an C<ArrayRef> of 'references' ... # XXX Don't ask me now!
+an C<ArrayRef> of C<Reference> type objects.
 
 =item tags
 
@@ -103,8 +136,8 @@ a C<HashRef> of tags, the values must be a C<Str>
 
 =item start_time
 
-A C<Num>, that is the number off seconds since epoch, and can have decimals, for
-example, up to nana-seconds accuracy
+A C<PositiveOrZeroNum>, that is the number off seconds since epoch, and can have
+decimals, for example, up to nano-seconds accuracy.
 
 =item ignore_active_span
 
@@ -121,11 +154,29 @@ out of scope. This is 'true' by default.
 
 =head3 Returns
 
-An object that implements the L<Scope> interface.
+An object of type C<Scope> from L<OpenTracing::Types>.
+
+=head3 Note
+
+C<child_of> and C<references> are mutual exclusive.
 
 
 
-=head2 start_span
+=head2 start_span( $operation_name, %options )
+
+Starts, but does not activate a C<Span>
+
+    my $scope = $tracer->start_active_span( 'some work needs to be done',
+        child_of                => $span_context,
+        references              => [
+            Reference->new_follows_from( $some_context ),
+        ],
+        tags                    => {
+            tag_key_1               => 'tag_value_1',
+        },
+        start_time              => now(),           # default
+        ignore_active_span      => 0,               # default
+    );
 
 =head3 Required Positional Parameters
 
@@ -135,7 +186,7 @@ An object that implements the L<Scope> interface.
 
 =back
 
-=head3 Optional Dictionairy with Named Options
+=head3 Named Options
 
 =over
 
@@ -143,15 +194,15 @@ An object that implements the L<Scope> interface.
 
 either
 
-an object that does L<OpenTracing::Interface::Span>
+An object of type C<Span> from L<OpenTracing::Types>.
 
 or
 
-an object that does L<OpenTracing::Interface::SpanContext>
+An object of type C<SpanContex> from L<OpenTracing::Types>.
 
 =item references
 
-an C<ArrayRef> of 'references' ... # XXX Don't ask me now!
+an C<ArrayRef> of C<Reference> type objects.
 
 =item tags
 
@@ -159,8 +210,8 @@ a C<HashRef> of tags, the values must be a C<Str>
 
 =item start_time
 
-A C<Num>, that is the number off seconds since epoch, and can have decimals, for
-example, up to nana-seconds accuracy
+A C<PositiveOrZeroNum>, that is the number off seconds since epoch, and can have
+decimals, for example, up to nano-seconds accuracy.
 
 =item ignore_active_span
 
@@ -172,7 +223,141 @@ used.
 
 =head3 Returns
 
-An object that implements the L<OpenTracing::Interface::Span> interface.
+An object of type C<Span> from L<OpenTracing::Types>.
 
+=head3 Note
+
+C<child_of> and C<references> are mutual exclusive.
+
+
+
+=head2 inject_context( OPENTRACING_CARRIER_FORMAT => $carrier, $span_context )
+
+Takes a C<SpanContext> and takes the bits that are of interest, and injects them
+into a B<cloned> C<$carrier>.
+
+    my $span_context = $tracer->get_active_span->get_context;
+    
+    use HTTP::Headers;
+    my $http_headers = HTTP::Headers->new( ... );
+    
+    my $cntx_headers =
+        $tracer->inject_context(
+            OPENTRACING_FORMAT_HTTP_HEADERS => $http_headers,
+            $opentracing_spancontext
+    );
+    
+    my $request = HTTP::Request->new(
+        GET => 'https://...', $cntx_headers
+    );
+    my response = LWP::UserAgent->request( $request );
+
+The C<$carier> will be a best effort clone, because immutable object should be
+the right thing to have.
+
+Depending on the implementation items that will be injected are things like
+C<trace_id>, C<span_id> and possibly all the C<BaggageItems>.
+
+=head3 Required Positional Parameters
+
+=over
+
+=item OPENTRACING_FORMAT
+
+A way to specify the format of the carrier.
+
+=item $carrier
+
+Most likely, a 'object' but the specs describe plain text map too. and binary
+data.
+
+=item $span_context
+
+The C<SpanContext> containing the the information that needs to be added to the
+C<$carrier>.
+
+=back
+
+=head3 Returns
+
+A B<cloned> version of the C<$carrier> with the - for the implementation
+relevent - injected context items.
+
+
+
+=head2 extract_context( OPENTRACING_CARRIER_FORMAT => $carrier )
+
+Extract the tracer relevant information from a C<$carrier> and return it as a
+C<SpanContext>.
+
+    get '/some_service' => sub {
+        my $http_headers = YourFramework->request->headers;
+        
+        my $opentracing_context = $TRACER->extract_context(
+            OPENTRACING_FORMAT_HTTP_HEADERS => $http_headers
+        );
+        
+        ...
+        
+    }
+
+This may return C<undef> iff the C<$carrier> can be understood, based on the
+given C<OPENTRACING_CARRIER_FORMAT>, but no relevant information could be
+detected. This usually happens at incomming request that are not part of a
+ditributed service.
+
+=head3 Required Positional Parameters
+
+=over
+
+=item OPENTRACING_CARRIER_FORMAT
+
+A way to specify the format of the carrier.
+
+=item $carrier
+
+Most likely, a 'object' but the specs describe plain text map too. and binary
+data.
+
+=back
+
+=head3 Returns
+
+An object of type C<SpanContext> from L<OpenTracing::Types>.
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Interface>
+
+Describes the API definition for OpenTransport implementations written in the
+Perl5 language.
+
+=item L<OpenTracing::Types>
+
+A library of L<Type::Tiny> type constraints that provides Duck Type checks for
+all common elements that conform L<OpenTracing::Interface>
+
+=back
+
+=cut
+
+
+
+=head1 CAVEATS
+
+This description is using C<around> method modifiers that basically wraps them
+around the real implementation. These method modifiers provide a 'readable' and
+reusable interface, describing the inputs and outputs, using type constraints.
+
+Consumers of this role, or implementors of the interface are MUST implement each
+method mentioned below. Not doing so will result in compilation errors.
+
+Since this role does nothing else than checking input and output, it is useful
+during development. Most likely it can be switched off safely in production
+environments.
 
 =cut

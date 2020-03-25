@@ -114,13 +114,13 @@ bool Fs::FStat::operator== (const Fs::FStat& oth) const {
    =================================== SYNC API ==================================================
    =============================================================================================== */
 
-#define UEFS_SYNC(call_code, result_code) {                                 \
-    uv_fs_t uvr;                                                            \
-    uvr.loop = nullptr;                                                     \
-    call_code                                                               \
-    if (uvr.result < 0) return make_unexpected(uvx_code_error(uvr.result)); \
-    result_code                                                             \
-    uv_fs_req_cleanup(&uvr);                                                \
+#define UEFS_SYNC(call_code, result_code) {                             \
+    uv_fs_t uvr;                                                        \
+    uvr.loop = nullptr;                                                 \
+    call_code                                                           \
+    if (uvr.result < 0) return make_unexpected(uvx_error(uvr.result));  \
+    result_code                                                         \
+    uv_fs_req_cleanup(&uvr);                                            \
 }
 
 ex<void> Fs::mkdir (string_view path, int mode) {

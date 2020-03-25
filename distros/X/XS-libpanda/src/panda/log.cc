@@ -4,6 +4,8 @@
 #include <iomanip>
 #include <sstream>
 
+panda::log::Module panda_log_module("", nullptr);
+
 namespace panda { namespace log {
 
 namespace details {
@@ -29,14 +31,14 @@ namespace details {
 
 void set_level (Level val, const string& module) {
     if (module) {
-        auto& modules = ::panda_log_module->children;
+        auto& modules = ::panda_log_module.children;
         auto iter = modules.find(module);
         if (iter == modules.end()) {
             throw std::invalid_argument("unknown module");
         }
         iter->second->set_level(val);
     } else {
-        panda_log_module->set_level(val);
+        panda_log_module.set_level(val);
     }
 
 }
@@ -100,11 +102,4 @@ void Module::set_level(Level level) {
     }
 }
 
-}
-}
-
-static panda::log::Module* panda_log_root_module() {
-    static panda::log::Module inst("", nullptr);
-    return &inst;
-}
-panda::log::Module* panda_log_module = panda_log_root_module();
+}}

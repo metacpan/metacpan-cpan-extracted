@@ -3,18 +3,39 @@
 #include "error.h"
 #include "Handle.h"
 #include "AddrInfo.h"
+#include <array>
 #include <vector>
+#include <panda/excepted.h>
 #include <panda/net/sockaddr.h>
+
+#undef socketpair
 
 namespace panda { namespace unievent {
 
 AddrInfo      sync_resolve   (backend::Backend* be, string_view host, uint16_t port = 0, const AddrInfoHints& hints = {}, bool use_cache = true);
 net::SockAddr broadcast_addr (uint16_t port, const AddrInfoHints& = {});
 
-void setsockopt (sock_t sock, int level, int optname, const void* optval, int optlen);
 
-fd_t   file_dup (fd_t fd);
-sock_t sock_dup (sock_t);
+fd_t   file_dup  (fd_t);
+sock_t sock_dup  (sock_t);
+sock_t fd2sock   (fd_t);
+fd_t   sock2fd   (sock_t);
+bool   is_socket (fd_t);
+
+excepted<sock_t, std::error_code> socket      (int domain, int type, int protocol);
+excepted<void,   std::error_code> connect     (sock_t sock, const net::SockAddr&);
+excepted<void,   std::error_code> bind        (sock_t sock, const net::SockAddr&);
+excepted<void,   std::error_code> listen      (sock_t sock, int backlog);
+excepted<sock_t, std::error_code> accept      (sock_t srv, net::SockAddr* = nullptr);
+excepted<void,   std::error_code> setsockopt  (sock_t sock, int level, int optname, const void* optval, int optlen);
+excepted<void,   std::error_code> setblocking (sock_t sock, bool val);
+excepted<void,   std::error_code> close       (sock_t sock);
+
+excepted<net::SockAddr, std::error_code> getsockname (sock_t sock);
+excepted<net::SockAddr, std::error_code> getpeername (sock_t sock);
+
+excepted<std::array<sock_t,2>, std::error_code> socketpair      (int domain, int type, int protocol);
+excepted<std::array<sock_t,2>, std::error_code> inet_socketpair (int type, int protocol);
 
 int           getpid           ();
 int           getppid          ();
@@ -73,9 +94,10 @@ ResourceUsage get_rusage ();
 
 const HandleType& guess_type (fd_t);
 
-std::error_code sys_code_error      (int syserr);
-std::error_code last_sys_code_error ();
-std::error_code uvx_code_error      (int uverr);
+std::error_code sys_error           (int syserr);
+std::error_code last_sys_error      ();
+std::error_code last_sys_sock_error ();
+std::error_code uvx_error           (int uverr);
 
 struct Wsl {
     enum Version {

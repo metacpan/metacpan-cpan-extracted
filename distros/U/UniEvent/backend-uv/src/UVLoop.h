@@ -18,7 +18,7 @@ struct UVLoop : LoopImpl {
             case Type::DEFAULT:
                 uvloop = &_uvloop_body;
                 int err = uv_loop_init(uvloop);
-                if (err) throw uvx_code_error(err);
+                if (err) throw Error(uvx_error(err));
         }
         uvloop->data = this;
     }
@@ -55,7 +55,7 @@ struct UVLoop : LoopImpl {
 
     void handle_fork () override {
         int err = uv_loop_fork(uvloop);
-        if (err) throw uvx_code_error(err);
+        if (err) throw Error(uvx_error(err));
     }
 
     TimerImpl*   new_timer     (ITimerImplListener*)              override;

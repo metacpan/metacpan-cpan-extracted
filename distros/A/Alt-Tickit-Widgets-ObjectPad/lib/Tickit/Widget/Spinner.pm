@@ -70,7 +70,7 @@ has $_state = 0;
 has $_interval;
 has $_cols;
 
-method BUILDALL
+method BUILD
 {
    my %params = @_;
 
@@ -90,7 +90,7 @@ has $_rect;
 
 =cut
 
-sub lines
+method lines
 {
    return 1;
 }
@@ -124,9 +124,8 @@ method stop
    $_running = 0;
 }
 
-sub window_gained
+method window_gained
 {
-   my $self = shift;
    $self->SUPER::window_gained( @_ );
    $self->start;
 }

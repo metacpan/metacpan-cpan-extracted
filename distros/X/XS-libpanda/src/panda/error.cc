@@ -30,6 +30,17 @@ void ErrorCode::push (const std::error_code& ec) {
     data->cat = &get_nested_category(ec.category(), data->cat);
 }
 
+bool ErrorCode::contains_impl(const std::error_code &c) const {
+    const NestedCategory* cat = data->cat;
+    for (auto v : data->codes) {
+        if (v == c.value() && cat->self == c.category()) {
+            return true;
+        }
+        cat = cat->next;
+    }
+    return false;
+}
+
 void ErrorCode::set (const std::error_code& ec) {
     init();
     push(ec);

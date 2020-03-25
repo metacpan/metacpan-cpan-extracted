@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.311';
+our $VERSION = '0.314';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -22,9 +22,9 @@ use Term::Form       qw();
 use App::YTDL::Arguments  qw( from_arguments_to_choices );
 use App::YTDL::Download   qw( download_youtube );
 use App::YTDL::Helper     qw( uni_capture );
-use App::YTDL::History    qw( add_uploaders_to_history read_history_files uploader_history_menu );
+use App::YTDL::History    qw( add_uploaders_to_history read_history_files choose_videos_from_saved_uploaders edit_sticky_file );
 use App::YTDL::Video_Info qw( gather_video_infos );
-use App::YTDL::Options    qw( read_config_file set_options );
+use App::YTDL::Options    qw( read_config_file set_options get_defaults );
 
 binmode STDIN,  ':encoding(utf-8)';
 binmode STDOUT, ':encoding(utf-8)';
@@ -71,74 +71,45 @@ my $config_dir = catdir $config_home, 'getvideo';
 make_path $config_dir;
 
 
-my $opt = {
+my $set = {
     ffmpeg                      => which( 'ffmpeg' ),
     ffprobe                     => which( 'ffprobe' ),
 
-    config_dir                  => $config_dir,
     config_file                 => catfile( $config_dir, 'config.json' ),
-    log_file                    => catfile( $config_dir, 'download_info.log' ),
     history_file                => catfile( $config_dir, 'uploader_history.json' ),
     sticky_file                 => catfile( $config_dir, 'uploader_sticky.json' ),
 
-    video_dir                   => $my_videos,
-    use_extractor_dir           => 1,
-    use_uploader_dir            => 1,
-
-    quality                     => ' 720 or less',
-    no_height_ok                => 1,
-    prefer_free_formats         => 1,
-
-    useragent                   => 'Mozilla/5.0',
-    retries                     => 7,
-    timeout                     => 60,
-
-    max_info_width              => 120,
-    no_warnings                 => 0,
     right_margin                => $^O eq 'MSWin32' ? 1 : 2,
-
-    max_size_history            => 50,
-    sort_history_by_timestamp   => 1,
-
-    list_type_vimeo             => 2,
-    list_type_youtube           => 2,
-
-    list_sort_item              => 'upload_date',
     list_sort_order             => 'Desc',
-    show_view_count             => 0,
-
-    yt_dl_config_location       => undef,
-    reset_yt_dl_config_location => 0,
-    yt_dl_ignore_config         => 0,
-
-    no_upload_datetime          => '0000-00-00T00:00:00',
-    error_get_download_infos    => [], ##
+    error_get_download_infos    => [],
 };
+
+my $opt = get_defaults();
 
 my $youtube_dl = which( 'youtube-dl' );
 if ( ! $youtube_dl ) {
     say "Could not find 'youtube-dl' - 'youtube-dl' is required - http://rg3.github.io/youtube-dl/.";
     exit 1;
 };
-$opt->{youtube_dl} = [ $youtube_dl ];
+$set->{youtube_dl} = [ $youtube_dl ];
 
-read_config_file( $opt, $opt->{config_file} );
-set_options( $opt ) if $help;
+read_config_file( $opt, $set->{config_file} );
+set_options( $set, $opt ) if $help;
 
-push @{$opt->{youtube_dl}}, '--config-location', $opt->{yt_dl_config_location}  if $opt->{yt_dl_config_location};
-push @{$opt->{youtube_dl}}, '--ignore-config',                                  if $opt->{yt_dl_ignore_config};
-push @{$opt->{youtube_dl}}, '--no-warnings'                                     if $opt->{no_warnings};
-push @{$opt->{youtube_dl}}, '--user-agent',      $opt->{useragent}              if defined $opt->{useragent};
-push @{$opt->{youtube_dl}}, '--retries',         $opt->{retries}                if defined $opt->{retries};
-push @{$opt->{youtube_dl}}, '--socket-timeout',  $opt->{timeout}                if defined $opt->{timeout};
-push @{$opt->{youtube_dl}}, '--prefer-free-formats'                             if $opt->{prefer_free_formats};
+push @{$set->{youtube_dl}}, '--config-location', $opt->{yt_dl_config_location}  if $opt->{yt_dl_config_location};
+push @{$set->{youtube_dl}}, '--ignore-config',                                  if $opt->{yt_dl_ignore_config};
+push @{$set->{youtube_dl}}, '--no-warnings'                                     if $opt->{no_warnings};
+push @{$set->{youtube_dl}}, '--user-agent',      $opt->{useragent}              if defined $opt->{useragent};
+push @{$set->{youtube_dl}}, '--retries',         $opt->{retries}                if defined $opt->{retries};
+push @{$set->{youtube_dl}}, '--socket-timeout',  $opt->{timeout}                if defined $opt->{timeout};
+push @{$set->{youtube_dl}}, '--prefer-free-formats'                             if $opt->{prefer_free_formats};
 
 
 local $| = 1;
 print locate( 1, 1 ), cldown;
 
 
-read_history_files( $opt );
+read_history_files( $set, $opt );
 
 
 my @ids = @ARGV;
@@ -161,27 +132,62 @@ if ( ! @ids ) {
     print up( 1 ), cldown;
 }
 
-if ( ! @ids && ( %{$opt->{history}} || %{$opt->{sticky}} ) ) {
-    @ids = uploader_history_menu( $opt );
+if ( @ids ) {
+    my $data = from_arguments_to_choices( $set, $opt, @ids );
+    gather_video_infos( $set, $opt, $data );
+    download_youtube( $set, $opt, $data, 0 );
+    add_uploaders_to_history( $set, $opt, $data ) if $opt->{max_size_history};
 }
+elsif ( ! @ids && ( %{$set->{history}} || %{$set->{sticky}} ) ) {
+    my $old_idx = 0;
+
+    MENU: while ( 1 ) {
+        #my @list_size = ( '  ALL', '  50' );
+        #my $list_size_regexp = join '|', map { quotemeta } @list_size;
+        my ( $uploader, $sticky ) = ( '- Uploader', '  Sticky' );
+        my $menu = [ undef, $uploader, $sticky ];
+        # Choose
+        my $idx = choose(
+            $menu,                                  # , $list_size[$set->{small_list_size}
+            { prompt => 'Choose:', layout => 3, undef => '  QUIT', clear_screen => 1, index => 1, default => $old_idx }
+        );
+        if ( ! defined $idx || ! defined $menu->[$idx] ) {
+            exit;
+        }
+        #if ( $opt->{menu_memory} ) {
+        #    if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+        #        $old_idx = 0;
+        #        next MENU;
+        #    }
+        #    $old_idx = $idx;
+        #}
+        if ( $menu->[$idx] eq $uploader ) {
+            my @chosen_ids = choose_videos_from_saved_uploaders( $set, $opt );
+            next if ! @chosen_ids;
+            my $data = from_arguments_to_choices( $set, $opt, @chosen_ids );
+            gather_video_infos( $set, $opt, $data );
+            download_youtube( $set, $opt, $data, 1 );
+        }
+        elsif ( $menu->[$idx] eq $sticky ) {
+           edit_sticky_file( $set, $opt );
+        }
+        #if ( $menu->[$idx] =~ /^$list_size_regexp\z/ ) {
+        #    $set->{small_list_size}++;
+        #    $set->{small_list_size} = 0 if $set->{small_list_size} > $#list_size;
+        #    next MENU;
+        #}
+    }
+}
+
 
 if ( ! @ids ) {
     say "No arguments" and exit;
 }
 
 
-my $info = from_arguments_to_choices( $opt, @ids );
-
-gather_video_infos( $opt, $info );
-
-download_youtube( $opt, $info );
-
-add_uploaders_to_history( $opt, $info ) if $opt->{max_size_history};
-
-
-if ( @{$opt->{error_get_download_infos}} ) { ##
+if ( @{$set->{error_get_download_infos}} ) { ##
     say "\nError fetching download infos:";
-    for my $video_id ( @{$opt->{error_get_download_infos}} ) {
+    for my $video_id ( @{$set->{error_get_download_infos}} ) {
         say '  ' . $video_id;
     }
 }
@@ -200,7 +206,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.311
+Version 0.314
 
 =cut
 
@@ -218,8 +224,8 @@ Version 0.311
 
 Download single videos or choose videos from a playlist or an uploader.
 
-Call C<getvideo> followed by the space separated urls or enter the urls after calling C<getviedo>. If the urls are
-entered after calling C<getvideo> shell metacharacters are escaped automatically.
+Call C<getvideo> followed by the space separated urls or enter the urls after calling C<getvideo>. If the urls are
+entered after calling C<getvideo>, shell metacharacters are escaped automatically.
 
 The urls can also be passed with a file: C<getvideo -f|--file filename>. The urls in the file have to be space separated.
 
@@ -231,7 +237,7 @@ see L<Term::Choose/USAGE-AND-RETURN-VALUES>.
 The different options of C<getvideo> can be reached by calling C<getvideo -h>.
 
 C<App::YTDL> uses L<youtube-dl|http://rg3.github.io/youtube-dl/> to get the info data and to download the videos. To
-list the extractors supported by C<youtube-dl> call C<getvideo -h> and select the entry I<Extractors>.
+list the extractors supported by C<youtube-dl> call C<getvideo -h> and select the entry I<List extractors>.
 
 =head1 Options
 
@@ -268,7 +274,7 @@ Create/use uploader directories
 
 - if chosen from an uploader or a playlist
 
-=head2 Quality
+=head2 Video format
 
 =head3 Resolution
 
@@ -332,7 +338,7 @@ Sort the history
 
 - by timestamp
 
-=head2 Uploader videos
+=head2 Uploader video list
 
 =head3 List type
 
@@ -373,7 +379,7 @@ Fallback is used, if the chosen entry is not available.
 
 - always
 
-=head2 Info Output
+=head2 Info output
 
 =head3 Disable warnings
 
@@ -393,13 +399,11 @@ Location of the C<youtube-dl> configuration file (I<--config-location>).
 
 Do not read C<youtube-dl> configuration files (I<--ignore-config>).
 
-=head2 Available extractors
-
-=head3 List Extractors
+=head2 List extractors
 
 List the extractors supported by C<youtube-dl>.
 
-=head3 Extractor descriptions
+=head2 Extractor descriptions
 
 Output descriptions of supported extractors.
 

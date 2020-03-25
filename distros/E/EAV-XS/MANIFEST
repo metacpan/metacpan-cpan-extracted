@@ -1,6 +1,7 @@
 Changes
 examples/count-domains-with-dns.pl
 examples/count-domains.pl
+examples/email-info.pl
 lib/EAV/XS.pm
 libeav/bin/main.c
 libeav/bin/main.h
@@ -10,6 +11,7 @@ libeav/bin/utf8_decode.c
 libeav/bin/utf8_decode.h
 libeav/data/domain-length.txt
 libeav/data/email-reg.ru.txt
+libeav/data/email-result-check.txt
 libeav/data/email-utf8.txt
 libeav/data/fail-email-ascii.txt
 libeav/data/localpart-ascii.txt
@@ -19,7 +21,6 @@ libeav/data/pass-email-ascii.txt
 libeav/data/punycode.csv
 libeav/data/raw.csv
 libeav/data/tld-domains.txt
-libeav/data/tld.csv
 libeav/data/xn-dash-domains.txt
 libeav/docs/libeav.3.gz
 libeav/docs/libeav.3.pod
@@ -84,6 +85,7 @@ libeav/tests/t-822-email.c
 libeav/tests/t-822-localpart.c
 libeav/tests/t-eav-all-modes.c
 libeav/tests/t-eav.c
+libeav/tests/t-result.c
 libeav/TODO
 libeav/util/gen_utf8_pass_test.pl
 libeav/util/gentld.pl
@@ -108,6 +110,9 @@ t/11-rfc5322.t
 t/13-not-tld.t
 t/14-error.t
 t/15-tld.t
+t/16-get-lpart.t
+t/17-get-domain.t
+t/18-get-domain-type.t
 t/check-fail.txt
 t/check-pass.txt
 typemap

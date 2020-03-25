@@ -20,6 +20,17 @@ my %used_mtimes;
 init();
 
 sub init {
+    if ($ENV{LOGGER}) {
+        require Panda::Lib::Logger;
+        Panda::Lib::Logger::set_native_logger(sub {
+            my ($level, $code, $msg) = @_;
+            say "$level $code $msg";
+        });
+        Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_VERBOSE_DEBUG());
+        Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_DEBUG(), "UniEvent::Backend");
+        Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_INFO(), "UniEvent::SSL");
+    }    
+    
     # for file tests
     UniEvent::Fs::remove_all($rdir) if -d $rdir;
     UniEvent::Fs::mkpath($rdir);
@@ -36,7 +47,7 @@ sub import {
     foreach my $sym_name (qw/
         linux freebsd win32 darwin winWSL netbsd openbsd dragonfly
         is cmp_deeply ok done_testing skip isnt time_mark check_mark pass fail cmp_ok like isa_ok unlike diag plan variate variate_catch
-        var create_file create_dir move change_file_mtime change_file unlink_file remove_dir subtest new_ok dies_ok catch_run any
+        var pipe create_file create_dir move change_file_mtime change_file unlink_file remove_dir subtest new_ok dies_ok catch_run any
     /) {
         no strict 'refs';
         *{"${caller}::$sym_name"} = \&{$sym_name};
@@ -100,6 +111,14 @@ sub variate_catch {
 }
 
 sub var ($) { return "$rdir/$_[0]" }
+
+sub pipe ($) {
+    if (win32()) {
+        return "\\\\.\\pipe\\$_[0]";
+    } else {
+        return var "pipe_$_[0]";
+    }
+}
 
 END { # clean up after file tests
     UniEvent::Fs::remove_all($rdir) if -d $rdir;

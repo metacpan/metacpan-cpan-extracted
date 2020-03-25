@@ -3,24 +3,21 @@
 use strict;
 use warnings;
 
-use IO::All;
+use IO::All qw/ io /;
 
 my ($version) =
-    (map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
-    io->file('lib/Config/IniFiles.pm')->getlines()
-    )
-    ;
+    ( map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
+        io->file('lib/Config/IniFiles.pm')->getlines() );
 
-if (!defined ($version))
+if ( !defined($version) )
 {
     die "Version is undefined!";
 }
 
 my @cmd = (
-    "git", "tag", "-m",
-    "Tagging the Config-IniFiles release as $version",
+    "git", "tag", "-m", "Tagging the Config-IniFiles release as $version",
     "releases/$version",
 );
 
-print join(" ", map { /\s/ ? qq{"$_"} : $_ } @cmd), "\n";
+print join( " ", map { /\s/ ? qq{"$_"} : $_ } @cmd ), "\n";
 exec(@cmd);

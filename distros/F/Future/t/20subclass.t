@@ -109,14 +109,15 @@ use Test::Identity;
    $f->failure;
 }
 
+# ->get calls the correct block_until_ready
 {
    my $f = t::Future::Subclass->new;
 
    my $called;
    no warnings 'once';
-   local *t::Future::Subclass::block_until_ready = sub {
+   local *t::Future::Subclass::await = sub {
       $called++;
-      identical( $_[0], $f, '->block_until_ready is called on $f' );
+      identical( $_[0], $f, '->await is called on $f' );
       $_[0]->done( "Result here" );
    };
 
@@ -124,25 +125,7 @@ use Test::Identity;
               [ "Result here" ],
               'Result from ->get' );
 
-   ok( $called, '$f->block_until_ready called' );
-}
-
-{
-   my $f = t::Future::Subclass->new;
-
-   my $count = 0;
-   no warnings 'once';
-   local *t::Future::Subclass::await = sub {
-      $count++;
-      identical( $_[0], $f, '->await is called on $f' );
-      $_[0]->done( "Result here" ) if $count == 2;
-   };
-
-   is_deeply( [ $f->get ],
-              [ "Result here" ],
-              'Result from ->get' );
-
-   is( $count, 2, '$f->await called twice' );
+   ok( $called, '$f->await called' );
 }
 
 done_testing;

@@ -27,7 +27,7 @@ main (int argc, char *argv[])
         return 2;
     }
 
-    setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "en_US.UTF-8");
     eav_init (&eav);
     eav_setup (&eav);
 

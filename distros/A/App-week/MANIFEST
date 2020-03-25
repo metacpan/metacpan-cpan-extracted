@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/week.pm
+lib/App/week/colors.pm
+lib/App/week/default.pm
+lib/App/week/teams.pm
+minil.toml
+script/week
+t/00_compile.t
+META.yml
+MANIFEST

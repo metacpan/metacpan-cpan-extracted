@@ -1,0 +1,47 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'name' => [
+                                                                               '_cod_melting_point'
+                                                                             ]
+                                                                 }, 'OPTIMADE::Filter::Property' ),
+                                                          '300'
+                                                        ],
+                                          'operator' => '<'
+                                        }, 'OPTIMADE::Filter::Comparison' ),
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'operands' => [
+                                                                                   bless( {
+                                                                                            'name' => [
+                                                                                                        'nelements'
+                                                                                                      ]
+                                                                                          }, 'OPTIMADE::Filter::Property' ),
+                                                                                   '4'
+                                                                                 ],
+                                                                   'operator' => '='
+                                                                 }, 'OPTIMADE::Filter::Comparison' ),
+                                                          bless( {
+                                                                   'operands' => [
+                                                                                   bless( {
+                                                                                            'name' => [
+                                                                                                        'elements'
+                                                                                                      ]
+                                                                                          }, 'OPTIMADE::Filter::Property' ),
+                                                                                   'Si,O2'
+                                                                                 ],
+                                                                   'operator' => '='
+                                                                 }, 'OPTIMADE::Filter::Comparison' )
+                                                        ],
+                                          'operator' => 'AND'
+                                        }, 'OPTIMADE::Filter::AndOr' )
+                               ],
+                 'operator' => 'AND'
+               }, 'OPTIMADE::Filter::AndOr' );
+== Filter ==
+((_cod_melting_point < "300") AND ((nelements = "4") AND (elements = "Si,O2")))
+== SQL ==
+(('_cod_melting_point' < "300") AND (('nelements' = "4") AND ('elements' = "Si,O2")))

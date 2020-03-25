@@ -131,10 +131,10 @@ DESCRIPTION
 
 STABILITY WARNING
 
-    This module is still relatively new and under active development. While
-    it now seems relatively stable enough for most use-cases, there may
-    still be a number of memory leaks left in it, especially if
-    still-pending futures are abandoned.
+    This module is still under active development. While it now seems
+    relatively stable enough for most use-cases, there may still be a
+    number of memory leaks left in it, especially if still-pending futures
+    are abandoned.
 
     While it seems stable enough for small-scale development and
     experimental testing, take care when using this module in production,
@@ -335,6 +335,26 @@ WITH OTHER MODULES
           await func();
     
           say "Var is still $var";
+       }
+
+ Object::Pad
+
+    As of Future::AsyncAwait version 0.38 and Object::Pad version 0.15,
+    both modules now use XS::Parse::Sublike to parse blocks of code.
+    Because of this the two modules can operate together and allow class
+    methods to be written as async subs which await expressions:
+
+       use Future::AsyncAwait;
+       use Object::Pad;
+    
+       class Example
+       {
+          async method perform($block)
+          {
+             say "$self is performing code";
+             await $block->();
+             say "code finished";
+          }
        }
 
 SEE ALSO

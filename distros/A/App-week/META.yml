@@ -1,0 +1,47 @@
+---
+abstract: 'colorful calender command'
+author:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-week
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::week:
+    file: lib/App/week.pm
+    version: '0.01'
+  App::week::colors:
+    file: lib/App/week/colors.pm
+  App::week::default:
+    file: lib/App/week/default.pm
+  App::week::teams:
+    file: lib/App/week/teams.pm
+requires:
+  Getopt::EX: v1.14.0
+  Text::ANSI::Fold: '0.05'
+  Text::VisualWidth::PP: '0.05'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/kaz-utashiro/App-week/issues
+  homepage: https://github.com/kaz-utashiro/App-week
+  repository: git://github.com/kaz-utashiro/App-week.git
+version: '0.01'
+x_authority: cpan:UTASHIRO
+x_static_install: 1

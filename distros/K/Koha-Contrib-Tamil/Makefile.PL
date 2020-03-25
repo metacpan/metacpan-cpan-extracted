@@ -77,6 +77,7 @@ my %WriteMakefileArgs = (
     "MooseX::RW::Writer::File" => 0,
     "Path::Tiny" => 0,
     "Pod::Usage" => 0,
+    "Search::Elasticsearch" => 0,
     "Text::Xslate" => 0,
     "Try::Tiny" => 0,
     "XML::Simple" => 0,
@@ -93,7 +94,7 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.063",
+  "VERSION" => "0.064",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -143,6 +144,7 @@ my %FallbackPrereqs = (
   "MooseX::RW::Writer::File" => 0,
   "Path::Tiny" => 0,
   "Pod::Usage" => 0,
+  "Search::Elasticsearch" => 0,
   "Test::More" => 0,
   "Text::Xslate" => 0,
   "Try::Tiny" => 0,

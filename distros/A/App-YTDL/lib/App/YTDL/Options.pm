@@ -6,10 +6,11 @@ use strict;
 use 5.010000;
 
 use Exporter qw( import );
-our @EXPORT_OK = qw( read_config_file set_options );
+our @EXPORT_OK = qw( read_config_file set_options get_defaults );
 
 use Encode;
-use File::Spec::Functions qw( catfile );
+use File::HomeDir         qw();
+use File::Spec::Functions qw( catfile curdir );
 use File::Temp            qw();
 use FindBin               qw( $RealBin $RealScript );
 use Pod::Usage            qw( pod2usage );
@@ -23,14 +24,14 @@ use App::YTDL::Helper       qw( write_json read_json uni_capture HIDE_CURSOR SHO
 
 
 sub _show_info {
-    my ( $opt ) = @_;
+    my ( $set, $opt ) = @_;
     my ( $youtube_dl_version, $ffmpeg_version, $ffprobe_version );
-    if ( ! eval { $youtube_dl_version = uni_capture( @{$opt->{youtube_dl}}, '--version' ); 1 } ) {
+    if ( ! eval { $youtube_dl_version = uni_capture( @{$set->{youtube_dl}}, '--version' ); 1 } ) {
         $youtube_dl_version = $@;
     }
     chomp $youtube_dl_version;
     eval {
-        $ffmpeg_version = uni_capture( $opt->{ffmpeg}, '-version' );
+        $ffmpeg_version = uni_capture( $set->{ffmpeg}, '-version' );
         if ( $ffmpeg_version && $ffmpeg_version =~ /^ffmpeg version (\S+)/m ) {
             $ffmpeg_version = $1;
         }
@@ -39,7 +40,7 @@ sub _show_info {
         }
     };
     eval {
-        $ffprobe_version = uni_capture( $opt->{ffprobe}, '-version' );
+        $ffprobe_version = uni_capture( $set->{ffprobe}, '-version' );
         if ( $ffprobe_version && $ffprobe_version =~ /^ffprobe version (\S+)/m ) {
             $ffprobe_version = $1;
         }
@@ -47,44 +48,74 @@ sub _show_info {
             $ffprobe_version = '';
         }
     };
-    my $info = "INFO\n\n";
-    $info .= "Directories:\n";
-    $info .= "    Video : $opt->{video_dir}"   . "\n";
-    $info .= "    Config: $opt->{config_file}" . "\n";
-    $info .= "\n";
-    $info .= "Versions:\n";
-    $info .= '    ' . catfile( $RealBin, $RealScript ) . ": " . $main::VERSION                 . "\n";
-    $info .= '    ' . $opt->{youtube_dl}[0]            . ": " . ( $youtube_dl_version // '?' ) . "\n";
-    if ( $opt->{ffmpeg} ) {
-        $info .= '    ' . $opt->{ffmpeg} . " : " . ( $ffmpeg_version // '?' ) . "\n";
+    my $prompt = "INFO\n\n";
+    $prompt .= "Directories:\n";
+    $prompt .= "    Video : $opt->{video_dir}"   . "\n";
+    $prompt .= "    Config: $set->{config_file}" . "\n";
+    $prompt .= "\n";
+    $prompt .= "Versions:\n";
+    $prompt .= '    ' . catfile( $RealBin, $RealScript ) . ": " . $main::VERSION                 . "\n";
+    $prompt .= '    ' . $set->{youtube_dl}[0]            . ": " . ( $youtube_dl_version // '?' ) . "\n";
+    if ( $set->{ffmpeg} ) {
+        $prompt .= '    ' . $set->{ffmpeg} . " : " . ( $ffmpeg_version // '?' ) . "\n";
     }
-    if ( $opt->{ffprobe} ) {
-        $info .= '    ' . $opt->{ffprobe} . ": " . ( $ffprobe_version // '?' ) . "\n";
+    if ( $set->{ffprobe} ) {
+        $prompt .= '    ' . $set->{ffprobe} . ": " . ( $ffprobe_version // '?' ) . "\n";
     }
     # Choose
     choose(
         [ 'Close' ],
-        { prompt => $info }
+        { prompt => $prompt }
     );
 }
 
 
-sub _menus {
-    my $menus = {
-        main => [
-            [ 'show_help_text',             "  HELP"              ],
-            [ 'show_info',                  "  INFO"              ],
-            [ 'group_directory',            "- Directory"         ],
-            [ 'group_quality',              "- Quality"           ],
-            [ 'group_download',             "- Download"          ],
-            [ 'group_output',               "- Info Output"       ],
-            [ 'group_history',              "- History"           ],
-            [ 'group_list_menu',            "- Uploader Videos"   ],
-            [ 'group_yt_dl_config_file',    "- yt-dl config file" ],
-            [ 'group_avail_extractors',     "- Extractors"        ],
-        ],
-        group_avail_extractors => [
-        ],
+
+sub get_defaults {
+    return {
+        max_info_width               => 120,
+        max_size_history             => 50,
+        no_height_ok                 => 1,
+        no_warnings                  => 0,
+        list_download_pause          => 1, ##
+        list_sort_item               => 'upload_date',
+        list_type_vimeo              => 2,
+        list_type_youtube            => 2,
+        prefer_free_formats          => 1,
+        quality                      => ' 720 or less',
+        retries                      => 7,
+        show_view_count              => 0,
+        sort_history_by_timestamp    => 1,
+        timeout                      => 60,
+        useragent                    => 'Mozilla/5.0',
+        use_extractor_dir            => 1,
+        use_uploader_dir             => 1,
+        video_dir                    => File::HomeDir->my_videos() // File::HomeDir->my_home() // curdir,
+        yt_dl_config_location        => undef,
+        yt_dl_ignore_config          => 0,
+    };
+}
+
+
+sub _main {
+    return [
+        [ 'show_help_text',          "  HELP"                   ],
+        [ 'show_info',               "  INFO"                   ],
+        [ 'group_directory',         "- Directories"            ],
+        [ 'group_quality',           "- Video format"           ],
+        [ 'group_download',          "- Download"               ],
+        [ 'group_history',           "- History"                ],
+        [ 'group_list_menu',         "- Uploader video list"    ],
+        [ 'group_output',            "- Info output"            ],
+        [ 'group_yt_dl_config_file', "- Youtube-dl config file" ],
+        [ 'avail_extractors',        "  List extractors"        ],
+        [ 'extractor_descriptions',  "  Extractor descriptions" ],
+    ];
+}
+
+
+sub _groups {
+    return {
         group_directory => [
             [ 'video_dir',         "- Main video directory" ],
             [ 'use_extractor_dir', "- Extractor directory"  ],
@@ -96,141 +127,87 @@ sub _menus {
             [ 'prefer_free_formats', "- Prefer free formats" ],
         ],
         group_download => [
-            [ 'useragent',           "- UserAgent"        ],
-            [ 'retries',             "- Download retries" ],
-            [ 'timeout',             "- Timeout"          ],
-
+            [ 'useragent',  "- UserAgent"        ],
+            [ 'retries',    "- Download retries" ],
+            [ 'timeout',    "- Timeout"          ],
         ],
         group_output => [
-            [ 'no_warnings',     "- Disable warnings" ],
-            [ 'max_info_width',  "- Max info width"   ],
+            [ 'no_warnings',    "- Disable warnings" ],
+            [ 'max_info_width', "- Max info width"   ],
         ],
         group_history => [
             [ 'max_size_history',          "- Size history" ],
             [ 'sort_history_by_timestamp', "- History sort" ],
         ],
         group_list_menu => [
-            [ '_type_listmenu',  "- List type" ],
-            [ 'list_sort_item',  "- Sort order"          ],
-            [ 'show_view_count', "- Show view count"     ],
+            [ '_submenu_type_listmenu',  "- List type"       ],
+            [ 'list_sort_item',          "- Sort order"      ],
+            [ 'show_view_count',         "- Show view count" ],
+           # [ 'list_download_pause',     "- View download log" ], ##
+           #=head3 View download log
+           #Pause after download from uploader list to see the download log.
+           #- no
+           #- yes
         ],
-
         group_yt_dl_config_file => [
-            [ 'yt_dl_config_location',       "- set yt-dl config location"   ],
-            [ 'reset_yt_dl_config_location', "- reset yt-dl config location" ],
-            [ 'yt_dl_ignore_config',         "- Ignore yt-dl config file" ],
-        ],
-        group_avail_extractors => [
-            [ '_avail_extractors',        "  List Extractors"        ],
-            [ '_extractor_descriptions',  "  Extractor descriptions" ],
-
+            [ 'yt_dl_config_location',        "- set yt-dl config location"   ],
+            [ '_reset_yt_dl_config_location', "- reset yt-dl config location" ],
+            [ 'yt_dl_ignore_config',          "- Ignore yt-dl config file"    ],
         ],
     };
-    return $menus;
-}
-
-
-sub _sub_menus {
-    my ( $key ) = @_;
-    my $sub_menus = {
-        _type_listmenu => [
-            [ 'list_type_vimeo',   "- vimeo",   [ 'all standard', 'all fast', 'latest fast' ] ],
-            [ 'list_type_youtube', "- youtube", [ 'all standard', 'all fast', 'latest fast' ] ],
-        ],
-    };
-    return $sub_menus->{$key} if $key;
-    return $sub_menus;
-}
-
-
-sub _group_prompt {
-    my ( $group ) = @_;
-    my $group_prompt = {
-        group_directory             => "Directories:",
-        group_quality               => "Video format:",
-        group_download              => "Download:",
-        group_history               => "History:",
-        group_list_menu             => "Uploader video list:",
-        group_output                => "Info Outpupt:",
-        group_youtube_dl            => "youtube_dl:",
-        group_yt_dl_config_file     => "Youtube-dl config file:",
-        group_avail_extractors      => "Available extractors:",
-    };
-    return $group_prompt->{$group};
 }
 
 
 sub set_options {
-    my ( $opt ) = @_;
-    my $menus     = _menus();
-    my $sub_menus = _sub_menus();
-    my @keys;
-    for my $group ( keys %$menus ) {
-        next if $group eq 'main';
-        push @keys, grep { ! /^_/ } map { $_->[0] } @{$menus->{$group}};
-    }
-    for my $key ( keys %$sub_menus ) {
-        push @keys, map { $_->[0] } @{$sub_menus->{$key}};
-    }
-    my $group = 'main';
-    my $backup_old_idx = 0;
-    my $old_idx = 0;
+    my ( $set, $opt ) = @_;
+    my $main = _main();
+    my $old_idx_main = 0;
 
-    GROUP: while ( 1 ) {
-        my $menu = $menus->{$group};
-
-        OPTION: while ( 1 ) {
-            my $back     = $group eq 'main' ? '  QUIT' : '  <<';
-            my $continue = '  CONTINUE';
-            my @pre  = ( undef, $group eq 'main' ? $continue : () );
-            my @real = map( $_->[1], @$menu );
-            my $prompt = _group_prompt( $group ) // 'Options:';
-            # Choose
-            my $idx = choose(
-                [ @pre, @real ],
-                { prompt => $prompt, layout => 3, index => 1, clear_screen => 1, undef => $back, default => $old_idx }
-            );
-            if ( ! $idx ) {
-                if ( $group eq 'main' ) {
-                    _write_config_file( $opt, $opt->{config_file}, @keys );
-                    exit;
-                }
-                else {
-                    $old_idx = $backup_old_idx;
-                    $group = 'main';
-                    next GROUP;
-                }
+    MAIN_MENU: while ( 1 ) {
+        my $back_main     = '  QUIT';
+        my $continue_main = '  CONTINUE';
+        my @pre  = ( undef, $continue_main );
+        my @choices_main = map( $_->[1], @$main );
+        my $menu_main = [ @pre, @choices_main ];
+        # Choose
+        my $idx_main = choose(
+            $menu_main,
+            { prompt => 'Options:', layout => 3, index => 1, clear_screen => 1,
+              undef => $back_main, default => $old_idx_main }
+        );
+        if ( ! defined $idx_main || ! defined $menu_main->[$idx_main] ) {
+            if ( $set->{change} ) {
+                _write_config_file( $opt, $set->{config_file} );
+                delete $set->{change};
             }
-            if ( $old_idx == $idx ) {
-                $old_idx = 0;
-                next OPTION;
+            exit;
+        }
+        if ( $old_idx_main == $idx_main ) {
+            $old_idx_main = 0;
+            next MAIN_MENU;
+        }
+        $old_idx_main = $idx_main;
+        my $choice = $menu_main->[$idx_main];
+        if ( $choice eq $continue_main ) {
+            if ( $set->{change} ) {
+                _write_config_file( $opt, $set->{config_file} );
+                delete $set->{change};
             }
-            $old_idx = $idx;
-            my $choice = $idx <= $#pre ? $pre[$idx] : $menu->[$idx - @pre][0];
-            if ( $choice =~ /^group_/ ) {
-                $backup_old_idx = $old_idx;
-                $old_idx = 0;
-                $group = $choice;
-                redo GROUP;
-            }
-            if ( $choice eq $continue ) {
-                if ( $group =~ /^group_/ ) {
-                    $group = 'main';
-                    redo GROUP;
-                }
-                _write_config_file( $opt, $opt->{config_file}, @keys );
-                last GROUP;
-            }
-            if ( $choice eq "show_help_text" ) {
+            last MAIN_MENU;
+        }
+        my ( $main_key, $main_prompt ) = @{$main->[$idx_main-@pre]};
+        $main_prompt =~ s/^-\s//;
+        if ( $main_key !~ /^group_/ ) {
+            if ( $main_key eq "show_help_text" ) {
                 pod2usage( { -exitval => 'NOEXIT', -verbose => 2 } );
             }
-            elsif ( $choice eq "show_info" ) {
-                _show_info( $opt );
+            elsif ( $main_key eq "show_info" ) {
+                _show_info( $set, $opt );
             }
-            elsif ( $choice eq "_avail_extractors" ) {
+            elsif ( $main_key eq "avail_extractors" ) {
                 say 'Close with ENTER';
                 my @capture;
-                if ( ! eval { @capture = uni_capture( @{$opt->{youtube_dl}}, '--list-extractors' ); 1 } ) {
+                if ( ! eval { @capture = uni_capture( @{$set->{youtube_dl}}, '--list-extractors' ); 1 } ) {
                     say "List extractors: $@";
                 }
                 if ( @capture ) {
@@ -241,10 +218,10 @@ sub set_options {
                     );
                 }
             }
-            elsif ( $choice eq "_extractor_descriptions" ) {
+            elsif ( $main_key eq "extractor_descriptions" ) {
                 say 'Close with ENTER';
                 my @capture;
-                if ( ! eval { @capture = uni_capture( @{$opt->{youtube_dl}}, '--extractor-descriptions' ); 1 } ) {
+                if ( ! eval { @capture = uni_capture( @{$set->{youtube_dl}}, '--extractor-descriptions' ); 1 } ) {
                     say "Extractor descriptions: $@";
                 }
                 if ( @capture ) {
@@ -255,34 +232,64 @@ sub set_options {
                     );
                 }
             }
-            elsif ( $choice eq "video_dir" ) {
-                my $info = "Video Directory\nNow: " . $opt->{$choice} // 'current directory';
-                my $name = 'New: ';
-                _opt_choose_a_directory( $opt, $choice, $info, $name );
+            next MAIN_MENU;
+        }
+        my $groups = _groups();
+        my $group = $groups->{$main_key};
+        my $old_idx_group = 0;
+
+        GROUP: while ( 1 ) {
+            my $back_group     = '  <<';
+            my $continue_group = '  CONTINUE';
+            my @pre  = ( undef );
+            my @choices_group = map( $_->[1], @$group );
+            my $menu_group = [ @pre, @choices_group ];
+            # Choose
+            my $idx_group = choose(
+                $menu_group,
+                { prompt => $main_prompt, layout => 3, index => 1, clear_screen => 1, undef => $back_group, default => $old_idx_group }
+            );
+            if ( ! defined $idx_group || ! defined $menu_group->[$idx_group] ) {
+                next MAIN_MENU;
             }
-            elsif ( $choice eq "use_extractor_dir" ) {
+            if ( $old_idx_group == $idx_group ) {
+                $old_idx_group = 0;
+                next GROUP;
+            }
+            $old_idx_group = $idx_group;
+            my $choice = $menu_group->[$idx_group];
+            if ( $choice eq $continue_group ) {
+                next MAIN_MENU;
+            }
+            my $key = $group->[$idx_group-@pre][0];
+            if ( $key eq "video_dir" ) {
+                my $info = "Video Directory\nNow: " . $opt->{$key} // 'current directory';
+                my $name = 'New: ';
+                _opt_choose_a_directory( $set, $opt, $key, $info, $name );
+            }
+            elsif ( $key eq "use_extractor_dir" ) {
                 my $prompt = 'Use extractor directories';
                 my $list = [ qw( no yes ) ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
-            elsif ( $choice eq "use_uploader_dir" ) {
+            elsif ( $key eq "use_uploader_dir" ) {
                 my $prompt = 'Use uploader directories';
                 my $list = [
                     'no',
                     'yes',
                     'if from list-menu',
                 ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
-            elsif ( $choice eq "useragent" ) {
+            elsif ( $key eq "useragent" ) {
                 my $prompt = 'Set the UserAgent';
                 my $list = [
                     [ 'UserAgent', $opt->{useragent} ]
                 ];
-                _local_readline( $opt, $choice, $prompt, $list );
+                _local_readline( $set, $opt, $key, $prompt, $list );
                 $opt->{useragent} = '' if $opt->{useragent} eq '""';
             }
-            elsif ( $choice eq "quality" ) {
+            elsif ( $key eq "quality" ) {
                 my $prompt = 'Video resolution';
                 my $list = [
                     ' 180 or less',
@@ -300,85 +307,96 @@ sub set_options {
                     '2160 or better',
                     'best'
                 ];
-                _opt_choose_from_list_value( $opt, $choice, $prompt, $list );
+                _opt_choose_from_list_value( $set, $opt, $key, $prompt, $list );
             }
-            elsif ( $choice eq "no_height_ok" ) {
+            elsif ( $key eq "no_height_ok" ) {
                 my $prompt = 'Download videos with unkown height';
                 my $list = [
                     'no',
                     'yes'
                 ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
-            elsif ( $choice eq "retries" ) {
+            elsif ( $key eq "retries" ) {
                 my $digits = 2;
-                my $info = sprintf "Download retries\nNow: %${digits}s", insert_sep( $opt->{$choice} );
+                my $info = sprintf "Download retries\nNow: %${digits}s", insert_sep( $opt->{$key} );
                 my $name = 'New: ';
-                _opt_number_range( $opt, $choice, $name, $info, $digits );
+                _opt_number_range( $set, $opt, $key, $name, $info, $digits );
             }
-            elsif ( $choice eq "timeout" ) {
+            elsif ( $key eq "timeout" ) {
                 my $digits = 3;
-                my $info = sprintf "Connection timeout (s)\nNow: %${digits}s", insert_sep( $opt->{$choice} );
+                my $info = sprintf "Connection timeout (s)\nNow: %${digits}s", insert_sep( $opt->{$key} );
                 my $name = 'New: ';
-                _opt_number_range( $opt, $choice, $name, $info, $digits );
+                _opt_number_range( $set, $opt, $key, $name, $info, $digits );
             }
-            elsif ( $choice eq "no_warnings" ) {
+            elsif ( $key eq "no_warnings" ) {
                 my $prompt = 'Disable youtube-dl warnings';
                 my $list = [
                     'no',
                     'yes'
                 ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
-            elsif ( $choice eq "prefer_free_formats" ) {
+            elsif ( $key eq "prefer_free_formats" ) {
                 my $prompt = 'Prefer free formats';
                 my $list = [
                     'no',
                     'yes'
                 ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
-            elsif ( $choice eq "max_size_history" ) {
+            elsif ( $key eq "max_size_history" ) {
                 my $digits = 3;
-                my $info = sprintf "Max size of history\nNow: %${digits}s", insert_sep( $opt->{$choice} );
+                my $info = sprintf "Max size of history\nNow: %${digits}s", insert_sep( $opt->{$key} );
                 my $name = 'New: ';
-                _opt_number_range( $opt, $choice, $name, $info, $digits );
+                _opt_number_range( $set, $opt, $key, $name, $info, $digits );
             }
-            elsif ( $choice eq "sort_history_by_timestamp" ) {
+            elsif ( $key eq "sort_history_by_timestamp" ) {
                 my $prompt = 'Sort history by';
                 my $list = [
                     'by name',
                     'by timestamp'
                 ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
-            elsif ( $choice eq "_type_listmenu" ) {
-                my $sub_menu = _sub_menus( $choice );
+            elsif ( $key eq "_submenu_type_listmenu" ) {
+                my $sub_menu = [
+                    [ 'list_type_vimeo',   "- vimeo",   [ 'all standard', 'all fast', 'latest fast' ] ],
+                    [ 'list_type_youtube', "- youtube", [ 'all standard', 'all fast', 'latest fast' ] ],
+                ];
                 my $current = { map { $_->[0] => $opt->{$_->[0]} } @$sub_menu };
                 my $prompt = 'Uploader/Playlist video list type';
-                _opt_settings_menu( $opt, $sub_menu, $current, $prompt );
+                _opt_settings_menu( $set, $opt, $sub_menu, $current, $prompt );
             }
-            elsif ( $choice eq "list_sort_item" ) {
-                set_sort_videolist( $opt );
+            elsif ( $key eq "list_sort_item" ) {
+                set_sort_videolist( $set, $opt );
             }
-            elsif ( $choice eq "show_view_count" ) {
+            elsif ( $key eq "show_view_count" ) {
                 my $prompt = 'Show view count in list-menus';
                 my $list = [
                     'if sorted by "view count"',
                     'always',
                 ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
-            elsif ( $choice eq "max_info_width" ) {
+            elsif ( $key eq "list_download_pause" ) {
+                my $prompt = 'Pause after download from uploader list to see the download log:';
+                my $list = [
+                    'no',
+                    'yes'
+                ];
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
+            }
+            elsif ( $key eq "max_info_width" ) {
                 my $digits = 3;
-                my $info = sprintf "Max Info width\nNow: %${digits}s", insert_sep( $opt->{$choice} );
+                my $info = sprintf "Max Info width\nNow: %${digits}s", insert_sep( $opt->{$key} );
                 my $name = 'New: ';
-                _opt_number_range( $opt, $choice, $name, $info, $digits );
+                _opt_number_range( $set, $opt, $key, $name, $info, $digits );
             }
-            elsif ( $choice eq "yt_dl_config_location" ) {
+            elsif ( $key eq "yt_dl_config_location" ) {
                 my $info = "Youtube-dl Config File\nNow: ";
-                if ( defined $opt->{$choice} ) {
-                    $info .= $opt->{$choice};
+                if ( defined $opt->{$key} ) {
+                    $info .= $opt->{$key};
                 }
                 else {
                     $info .= 'default (';
@@ -386,29 +404,30 @@ sub set_options {
                     $info .= ')';
                 }
                 my $name = 'New: ';
-                _opt_choose_a_file( $opt, $choice, $info, $name );
+                _opt_choose_a_file( $set, $opt, $key, $info, $name );
             }
-            elsif ( $choice eq "reset_yt_dl_config_location" ) {
+            elsif ( $key eq "_reset_yt_dl_config_location" ) {
                 my $prompt = 'Reset the youtube-dl config location to default';
                 my $list = [
                     'no',
                     'yes'
                 ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
-                if ( $opt->{reset_yt_dl_config_location} ) {
+                $opt->{_reset_yt_dl_config_location} = 0;
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
+                if ( $opt->{_reset_yt_dl_config_location} ) {
                     $opt->{yt_dl_config_location} = undef;
-                    $opt->{reset_yt_dl_config_location} = 0;
                 }
+                delete $opt->{_reset_yt_dl_config_location};
             }
-            elsif ( $choice eq "yt_dl_ignore_config" ) {
+            elsif ( $key eq "yt_dl_ignore_config" ) {
                 my $prompt = 'Ignore youtube-dl config file';
                 my $list = [
                     'no',
                     'yes'
                 ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
-            else { die $choice }
+            else { die $key }
         }
     }
     return;
@@ -416,23 +435,23 @@ sub set_options {
 
 
 sub _opt_settings_menu {
-    my ( $opt, $sub_menu, $current, $prompt ) = @_;
+    my ( $set, $opt, $sub_menu, $current, $prompt ) = @_;
     # Settings_menu
     my $changed = settings_menu( $sub_menu, $current, { prompt => $prompt } );
     return if ! $changed;
     for my $key ( keys %$current ) {
         $opt->{$key} = $current->{$key};
     }
-    $opt->{change}++;
+    $set->{change}++;
 }
 
 
 sub _opt_choose_a_directory {
-    my( $opt, $choice, $info, $name ) = @_;
+    my( $set, $opt, $key, $info, $name ) = @_;
     # Choose_a_directory
-    my $new_dir = choose_a_directory( { init_dir => $opt->{$choice}, cs_label => $name, info => $info } );
+    my $new_dir = choose_a_directory( { init_dir => $opt->{$key}, cs_label => $name, info => $info } );
     return if ! defined $new_dir;
-    if ( $new_dir ne $opt->{$choice} ) {
+    if ( $new_dir ne $opt->{$key} ) {
         if ( ! eval {
             my $fh = File::Temp->new( TEMPLATE => 'XXXXXXXXXXXXXXX', UNLINK => 1, DIR => $new_dir ); ##
             1 }
@@ -445,25 +464,25 @@ sub _opt_choose_a_directory {
             );
         }
         else {
-            $opt->{$choice} = $new_dir;
-            $opt->{change}++;
+            $opt->{$key} = $new_dir;
+            $set->{change}++;
         }
     }
 }
 
 
 sub _opt_choose_a_file {
-    my( $opt, $choice, $info, $name ) = @_;
+    my( $set, $opt, $key, $info, $name ) = @_;
     # Choose_a_file
     my $file = choose_a_file( { cs_label => $name, info => $info } );
     return if ! defined $file;
-    $opt->{$choice} = $file;
-    $opt->{change}++;
+    $opt->{$key} = $file;
+    $set->{change}++;
 }
 
 
 sub _local_readline {
-    my ( $opt, $section, $prompt, $list ) = @_;
+    my ( $set, $opt, $key, $prompt, $list ) = @_;
     # Fill_form
     my $trs = Term::Form->new();
     my $new_list = $trs->fill_form(
@@ -472,100 +491,97 @@ sub _local_readline {
     );
     if ( $new_list ) {
         for my $i ( 0 .. $#$new_list ) {
-            $opt->{$section} = $new_list->[$i][1];
+            $opt->{$key} = $new_list->[$i][1];
         }
-        $opt->{change}++;
+        $set->{change}++;
     }
 }
 
 
 sub _opt_number_range {
-    my ( $opt, $section, $name, $info, $digits ) = @_;
+    my ( $set, $opt, $key, $name, $info, $digits ) = @_;
     # Choose_a_number
     my $choice = choose_a_number( $digits, { cs_label => $name, info => $info } );
     return if ! defined $choice;
-    $opt->{$section} = $choice eq '--' ? undef : $choice;
-    $opt->{change}++;
+    $opt->{$key} = $choice eq '--' ? undef : $choice;
+    $set->{change}++;
     return;
 }
 
 
 sub _opt_choose_from_list_idx {
-    my ( $opt, $section, $prompt, $list ) = @_;
-    my $backup = $opt->{$section};
+    my ( $set, $opt, $key, $prompt, $list ) = @_;
+    my $backup = $opt->{$key};
     my $confirm = '  CONFIRM';
     my @pre = ( undef, $confirm );
     my $choices = [ @pre, map { "- $_" } @$list ];
     while ( 1 ) {
-        my $local_prompt = $prompt . ': [' . ( $list->[$opt->{$section}] // '--' ) . ']';
+        my $local_prompt = $prompt . ': [' . ( $list->[$opt->{$key}] // '--' ) . ']';
         # Choose
         my $idx = choose(
             $choices,
             { prompt => $local_prompt, layout => 3, undef => '  BACK', index => 1 }
         );
         if ( ! defined $idx || $idx == 0 ) {
-            $opt->{$section} = $backup;
+            $opt->{$key} = $backup;
             return;
         }
         elsif ( $choices->[$idx] eq $confirm ) {
-            $opt->{change}++;
+            $set->{change}++;
             return;
         }
         else {
-            $opt->{$section} = $idx - @pre;
+            $opt->{$key} = $idx - @pre;
         }
     }
 }
 
 
 sub _opt_choose_from_list_value {
-    my ( $opt, $section, $prompt, $list ) = @_;
-    my $backup = $opt->{$section};
+    my ( $set, $opt, $key, $prompt, $list ) = @_;
+    my $backup = $opt->{$key};
     my $confirm = '  CONFIRM';
     my @pre = ( undef, $confirm );
     while ( 1 ) {
-        my $local_prompt = $prompt . ': [' . ( $opt->{$section} // '--' ) . ']';
+        my $local_prompt = $prompt . ': [' . ( $opt->{$key} // '--' ) . ']';
         # Choose
         my $choice = choose(
             [ @pre,  map { "- $_" } @$list ],
             { prompt => $local_prompt, layout => 3, undef => '  BACK', index => 0 }
         );
         if ( ! defined $choice ) {
-            $opt->{$section} = $backup;
+            $opt->{$key} = $backup;
             return;
         }
         elsif ( $choice eq $confirm ) {
-            $opt->{change}++;
+            $set->{change}++;
             return;
         }
         else {
             $choice =~ s/^-\s//;
-            $opt->{$section} = $choice;
+            $opt->{$key} = $choice;
         }
     }
 }
 
 
 sub _write_config_file {
-    my ( $opt, $file, @keys ) = @_;
-    return if ! $opt->{change};
+    my ( $opt, $file ) = @_;
     my $tmp = {};
-    for my $section ( sort @keys ) {
-        $tmp->{$section} = $opt->{$section};
+    for my $key ( sort keys %{ get_defaults() } ) {
+        $tmp->{$key} = $opt->{$key};
     }
-    write_json( $opt, $file, $tmp );
-    delete $opt->{change};
+    write_json( $file, $tmp );
 }
 
 
 sub read_config_file {
     my ( $opt, $file ) = @_;
-    my $tmp = read_json( $opt, $file ) // {};
+    my $tmp = read_json( $file ) // {};
     my @keys = keys %$tmp;
-    for my $section ( @keys ) {
-        $opt->{$section} = $tmp->{$section} if defined $tmp->{$section};
+    for my $key ( @keys ) {
+        $opt->{$key} = $tmp->{$key} if defined $tmp->{$key};
     }
-    return @keys;
 }
 
 

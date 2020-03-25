@@ -32,9 +32,12 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Role::MethodReturns" : "0",
+            "Type::Library" : "0",
+            "Type::Tiny" : "1.006",
+            "Type::Utils" : "0",
             "Types::Common::Numeric" : "0",
-            "Types::Interface" : "0",
             "Types::Standard" : "0"
          }
       },
@@ -45,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

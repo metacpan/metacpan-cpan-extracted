@@ -1,0 +1,428 @@
+#!/usr/bin/env perl
+
+=encoding utf8
+
+=head1 NAME
+
+week - colorful calender command
+
+=head1 SYNOPSIS
+
+B<week> [ -MI<module> ] [ option ] [ date ]
+
+Options:
+
+    -n      Display n months surronding today (default 3).
+    -A n    Display n months after current month.
+    -B n    Display n months before current month (default 1).
+    -C[n]   Display n months before and after current month (default 4).
+    -y      Display year calender.
+    -Y n    Display n years of calender
+    -c n    Display calendar in n column (default 3).
+
+    --colormap  FIELD=COLOR
+
+Module options:
+
+    --mono
+    --lavender
+    --green
+    --pastel
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 DESCRIPTION
+
+By default, B<week> command display the previous, current and next
+month surrounding today, just like B<-3> option of B<cal> command.
+
+Number of month can be given with dash.
+
+    $ week -12
+
+Before and after months can be specified with B<-B> and B<-A> option,
+and B<-C> for both.
+
+    $ week -B4 -A4
+    $ week -C4
+
+Date can given like:
+
+    $ week 2019/9/23
+    $ week 9/23        # 9/23 of current year
+    $ week 23          # 23rd of current month
+
+Greater number is handled as year.  Next command display calender of
+year 1752.
+
+    $ week 1752
+
+Use option B<-y> to show one year calender.  Number of years can be
+specified by B<-Y> option, and implicitly set B<-y> option.
+
+    $ week -y          # display this year's calender
+
+    $ week -Y2c6       # display 2 years calender in 6 column
+
+    $ week -Y 1752     # display 1752 years of calender (takes long)
+
+=head1 COLORMAP
+
+Each field is labled by names.
+
+    FRAME       Enclosing frame
+    MONTH       Month name
+    WEEK        Day of the week
+    DAYS        Calender
+    THISMONTH   Target month name
+    THISWEEK    Target day of the week
+    THISDAYS    Target calender
+    THISDAY     Target date
+
+Color for each field can be specified by B<--colormap> (B<--cm>)
+option with B<LABEL>=I<colorspec> syntax.  Default color is:
+
+    --colormap      DAYS=L05/335 \
+    --colormap      WEEK=L05/445 \
+    --colormap     FRAME=L05/445 \
+    --colormap     MONTH=L05/335 \
+    --colormap   THISDAY=522/113 \
+    --colormap  THISDAYS=555/113 \
+    --colormap  THISWEEK=L05/445 \
+    --colormap THISMONTH=555/113
+
+Colormap is handled by L<Getopt::EX::Colormap> module; use `perldoc
+Getopt::EX::Colormap` for detail.
+
+You can add special effect afterward.  For example, put next line in
+your F<~/.weekrc> to blink today.  C<< $<move> >> indicates to move
+all following arguments here, so that insert this option at the end.
+
+    option default $<move> --cm 'THISDAY=+F'
+
+=head1 FILES
+
+=over 4
+
+=item F<~/.weekrc>
+
+Start up file.
+
+=back
+
+=head1 MODULES
+
+Currently two modules are included in the distribution.  These options
+can be used without any special action, because they are defined to
+load appropriate module automatically in default start up module
+(L<App::week::default>).
+
+=over 4
+
+=item B<-Mcolors>
+
+    --mono
+    --lavender
+    --green
+    --pastel
+
+=item B<-Mteams>
+
+    --tigers
+    --giants
+    --lions
+
+=back
+
+Feel free to update these modules and send pull request to github
+site.
+
+=head1 SEE ALSO
+
+L<github|http://kaz-utashiro.github.io/App-week/>
+
+L<Getopt::EX::Colormap>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+You can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=head1 COPYRIGHT
+
+The following copyright notice applies to all the files provided in
+this distribution, including binary files, unless explicitly noted
+otherwise.
+
+Copyright 2018- Kazumasa Utashiro
+
+=cut
+
+use v5.14;
+use strict;
+use warnings;
+
+use App::week;
+our $VERSION = $App::week::VERSION;
+
+use utf8;
+use Time::localtime;
+use List::Util qw(max);
+use Pod::Usage;
+use Data::Dumper;
+
+use open IO => ':utf8', ':std';
+
+my($sec, $min, $hour, $mday, $mon, $year) = CORE::localtime(time);
+$mon++;
+$year += 1900;
+
+my %colormap = (
+	     DAYS => "L05/335",
+	     WEEK => "L05/445",
+	    FRAME => "L05/445",
+	    MONTH => "L05/335",
+	  THISDAY => "522/113",
+	 THISDAYS => "555/113",
+	 THISWEEK => "L05/445",
+	THISMONTH => "555/113",
+    );
+
+my $months = 0;
+my $opt_A;
+my $opt_B = 1;
+my $opt_C;
+my $opt_column = 3;
+my $opt_colordump;
+my @opt_colormap;
+my $opt_year;
+my $opt_Y;
+my $opt_usage;
+my @opt_catch_all;
+
+my %month = do {
+    my $i;
+    map { $_ => ++$i } qw(JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC)
+};
+
+my @optargs = (
+    "after|A:1"     => \$opt_A,
+    "before|B:1"    => \$opt_B,
+    "C:4"           => sub { $opt_A = $opt_B = $_[1] },
+    "year|y"        => \$opt_year,
+    "Y:n"           => \$opt_Y,
+    "column|c=n"    => \$opt_column,
+    "colormap|cm=s" => \@opt_colormap,
+    "colordump"     => \$opt_colordump,
+    "usage:s"       => \$opt_usage,
+    "<>" => sub {
+	local $_ = $_[0];
+	if (/^-+([0-9]+)$/) {
+	    $months = $1;
+	}
+	elsif (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i) {
+	    $mon = $month{uc($1)}
+	}
+	elsif (/^-/) {
+	    die "@_: Unknown option\n";
+	}
+	else {
+	    $mday = $1 if s/\/*(\d+)$//;
+	    $mon  = $1 if s/\/*(\d+)$//;
+	    $year = $1 if m/(\d+)$/;
+	    if ($mday > 31) {
+		$year = $mday;
+		undef $mday;
+		$opt_year++;
+	    }
+	}
+    },
+    );
+
+sub usage {
+    pod2usage(-verbose => 0, -exitval => "NOEXIT");
+    print "Version: $VERSION\n";
+    exit 2;
+}
+
+##
+## Getopt staff
+##
+use Getopt::EX::Long qw(:DEFAULT Configure);
+Configure qw(bundling no_getopt_compat no_ignore_case pass_through);
+GetOptions(@optargs) || usage({status => 1});
+
+use Getopt::EX::Colormap;
+my $cm = Getopt::EX::Colormap
+    ->new(HASH => \%colormap)
+    ->load_params(@opt_colormap);
+
+sub color {
+    $cm->color(@_);
+}
+
+if ($opt_colordump) {
+    print $cm->colormap(name => '--changeme', option => '--colormap');
+    exit;
+}
+
+if ($months == 1) {
+    $opt_B = $opt_A = 0;
+}
+elsif ($months > 1) {
+    if (defined $opt_B) {
+	$opt_A = $months - $opt_B - 1;
+    } elsif (defined $opt_A) {
+	$opt_B = $months - $opt_A - 1;
+    } else {
+	use integer;
+	$opt_B = ($months - 1) / 2;
+	$opt_A = $months - $opt_B - 1;
+	warn Dumper $opt_B, $opt_A;
+    }
+}
+elsif ($opt_year or defined $opt_Y) {
+    $months = 12 * ($opt_Y // 1);
+    $opt_B = $mon - 1;
+    $opt_A = $months - $mon;
+}
+else {
+    $opt_B //= 1;
+    $opt_A //= max(0, $opt_column - $opt_B - 1);
+    $months = $opt_B + $opt_A + 1;
+}
+
+$opt_B //= 1;
+$opt_A //= 1;
+
+$year += $year < 50 ? 2000 : $year < 100 ? 1900 : 0;
+
+calender(
+    (map { calref($year, $mon + $_) } -$opt_B .. -1),
+    calref($year, $mon, $mday),
+    (map { calref($year, $mon + $_) } 1 .. $opt_A)
+    );
+
+exit;
+
+######################################################################
+
+sub calender {
+    my $cols = $opt_column;
+    my $row = 0;
+    my @refs;
+    my $cal_width = 24;
+    my $hr1 = " " x $cal_width;
+    my $gap = "  ";
+    while (@_) {
+	@refs = splice @_, 0, $cols;
+	do {
+	    my $n = $row++ ? $cols : @refs;
+	    print color(FRAME => join('', ' ', ($hr1) x $n, ' '));
+	}
+	and print "\n";
+	for (my $i = 0; 1; $i++) {
+	    my @cols;
+	    for my $ref (@refs) {
+		push @cols, $$ref[$i];
+	    }
+	    last if !grep(defined, @cols);
+	    print join(color(FRAME => $gap), '', @cols, ''), "\n";
+	}
+    }
+    do {
+	print color(FRAME => join('', ' ', ($hr1) x @refs, ' '));
+    }
+    and print "\n";
+}
+
+######################################################################
+
+my @calyear;
+
+sub calref {
+    my($y, $m, $d) = @_;
+
+    while ($m > 12) { $y += 1; $m -= 12 }
+    while ($m <= 0) { $y -= 1; $m += 12 }
+
+    my @cal = @{$calyear[$y][$m]};
+
+    my %label = (
+	month => $d ? "THISMONTH" : "MONTH",
+	week  => $d ? "THISWEEK"  : "WEEK",
+	days  => $d ? "THISDAYS"  : "DAYS",
+	);
+
+    $cal[0] = color($label{month}, $cal[0]);
+    $cal[1] = color($label{week}, $cal[1]) if $label{week};
+    map {
+	s/(?= \d\b|\d\d\b)( ?$d\b)/color("THISDAY", $1)/e if $d;
+	$_ = color($label{days}, $_);
+    } @cal[2..$#cal];
+
+    return \@cal;
+}
+
+package App::week::CalYear {
+    use Encode;
+    use open IO => ':utf8';
+    use List::Util qw(max);
+    use Text::ANSI::Fold;
+    sub TIEARRAY {
+	my $pkg = shift;
+	bless {}, $pkg;
+    }
+    sub FETCH {
+	my($obj, $year) = @_;
+	$obj->{$year} //= [ CalYear($year) ];
+    }
+    sub CalYear {
+	my $year = shift;
+	my @cal = `cal -h $year`;
+	my @month = ( [ $cal[0] ], map [], 1..12 );
+	my @monthline = do {
+	    map  { $_ - 2 }		    # 2 lines up
+	    grep { $cal[$_] =~ /\s 1 \s/x } # find 1st day
+	    0 .. $#cal;
+	};
+	@monthline == 4 or die "cal(1) command format error.\n";
+	sub fields {
+	    state $fold = new Text::ANSI::Fold
+		width => [20, 2, 20, 2, 20], padding => 1;
+	    ($fold->text(shift)->chops)[0, 2, 4];
+	}
+	for my $i (0..$#monthline) {
+	    my $start = $monthline[$i];
+	    for my $n (0..7) {
+		my @m = fields $cal[$start + $n];
+		push @{$month[$i * 3 + 1]}, $m[0];
+		push @{$month[$i * 3 + 2]}, $m[1];
+		push @{$month[$i * 3 + 3]}, $m[2];
+	    }
+	}
+	for my $month (@month[1..12]) {
+	    for (@{$month}) {
+		$_ = " $_ ";
+	    }
+	    for ($month->[0]) {
+		## Need to handle cal(1) command bug.
+		while (/^ (( +)\S+( +))$/ and length($2) > length($3)) {
+		    $_ = "${1} ";
+		}
+	    }
+	}
+	$month[1][0] =~ s/(?<=^ ) {4}| {4}(?= $)/$year/g;
+	@month;
+    }
+}
+
+BEGIN {
+    tie @calyear, 'App::week::CalYear';
+}

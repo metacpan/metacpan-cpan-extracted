@@ -33,7 +33,7 @@ use Future;
    is( $ready, 1, '$future is now ready' );
 
    ok( $future->is_ready, '$future now ready after f1 ready' );
-   is_deeply( [ $future->get ], [ one => 1 ], 'results from $future->get' );
+   is_deeply( [ $future->result ], [ one => 1 ], 'results from $future->result' );
 
    is_deeply( [ $future->pending_futures ],
               [],
@@ -83,7 +83,7 @@ use Future;
    $f2->done( two => 2 );
 
    ok( $future->is_ready, '$future now ready after $f2 done' );
-   is_deeply( [ $future->get ], [ two => 2 ], '$future->get after $f2 done' );
+   is_deeply( [ $future->result ], [ two => 2 ], '$future->result after $f2 done' );
 
    is_deeply( [ $future->done_futures ],
               [ $f2 ],
@@ -116,7 +116,7 @@ use Future;
    is( $future->failure, "It fails", '$future->failure yields exception' );
    my $file = __FILE__;
    my $line = __LINE__ + 1;
-   like( exception { $future->get }, qr/^It fails at \Q$file line $line\E\.?\n$/, '$future->get throws exception' );
+   like( exception { $future->result }, qr/^It fails at \Q$file line $line\E\.?\n$/, '$future->result throws exception' );
 
    is_deeply( [ $future->failed_futures ],
               [ $f1, $f2 ],
@@ -194,7 +194,7 @@ use Future;
 
    ok( $f->is_ready, 'needs_any on no Futures already done' );
    is( scalar $f->failure, "Cannot ->needs_any with no subfutures",
-       '->get on empty needs_any is empty' );
+       '->result on empty needs_any is empty' );
 }
 
 # weakself retention (RT120468)

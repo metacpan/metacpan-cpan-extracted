@@ -21,9 +21,8 @@ $tty_in->set_mode(UniEvent::Tty::MODE_RAW);
 UniEvent::Tty::reset_mode();
 
 my ($w, $h) = $tty_out->get_winsize();
-diag "$w x $h";
-cmp_ok $w, '>=', 1, "Term width is natural";
-cmp_ok $h, '>=', 1, "Term height is natural";
+cmp_ok $w, '>=', 1, "Term width is natural: $w";
+cmp_ok $h, '>=', 1, "Term height is natural: $h";
 
 sub logo {
     local $/;

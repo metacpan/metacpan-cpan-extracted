@@ -12,7 +12,7 @@ Exception::Backtrace::install();
 sub check_c_trace {
     my $bt = shift;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    like $bt, qr/(panda::Backtrace::Backtrace)|(from.*Backtrace\.)/;
+    like $bt, qr/(panda::Backtrace::Backtrace)|(from.*Backtrace\.)|(from.*libpanda)/;
 }
 
 subtest "primitive is thrown" => sub {

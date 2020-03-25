@@ -17,7 +17,7 @@ use Future;
 
    $f1->done( 1, 2, 3 );
 
-   is_deeply( [ $future->get ], [ result => 1, 2, 3 ], '->transform result' );
+   is_deeply( [ $future->result ], [ result => 1, 2, 3 ], '->transform result' );
 }
 
 # Failure transformation

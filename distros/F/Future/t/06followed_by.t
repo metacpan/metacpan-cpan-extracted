@@ -34,7 +34,7 @@ use Future;
    is( $called, 1, '$called after $f1 done' );
 
    ok( $fseq->is_ready, '$fseq is done after $f1 done' );
-   is_deeply( [ $fseq->get ], [ results => "here" ], '$fseq->get returns results' );
+   is_deeply( [ $fseq->result ], [ results => "here" ], '$fseq->result returns results' );
 
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
    is_oneref( $f1, '$f1 has refcount 1 before EOF' );
@@ -62,7 +62,7 @@ use Future;
    is( $called, 1, '$called after $f1 failed' );
 
    ok( $fseq->is_ready, '$fseq is ready after $f1 failed' );
-   is_deeply( [ $fseq->failure ], [ "failure\n" ], '$fseq->get returns failure' );
+   is_deeply( [ $fseq->failure ], [ "failure\n" ], '$fseq->failure returns failure' );
 
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
 }

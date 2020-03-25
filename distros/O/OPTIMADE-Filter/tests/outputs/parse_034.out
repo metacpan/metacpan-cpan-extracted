@@ -1,0 +1,16 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'name' => [
+                                                      'species',
+                                                      'chemical_symbols'
+                                                    ]
+                                        }, 'OPTIMADE::Filter::Property' ),
+                                 'Ti'
+                               ],
+                 'operator' => '='
+               }, 'OPTIMADE::Filter::Comparison' );
+== Filter ==
+(species.chemical_symbols = "Ti")
+== SQL ==
+('species'.'chemical_symbols' = "Ti")

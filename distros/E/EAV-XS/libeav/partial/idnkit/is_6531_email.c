@@ -13,6 +13,10 @@ is_6531_email  (idn_resconf_t ctx,
                 bool tld_check)
 {
     eav_result_t result = INIT_EAV_RESULT_T();
+#ifdef EAV_EXTRA
+    result.lpart = NULL;
+    result.domain = NULL;
+#endif
     char *ch = NULL;
     char *brs = NULL;
     char *bre = NULL;
@@ -40,6 +44,10 @@ is_6531_email  (idn_resconf_t ctx,
 
         if (result.rc >= 0) {
             result.is_domain = true;
+#ifdef EAV_EXTRA
+            result.lpart = strndup (email, brs - email - 1);
+            result.domain = strndup (brs, end - brs);
+#endif
         }
 
         return result;
@@ -47,6 +55,13 @@ is_6531_email  (idn_resconf_t ctx,
 
     /* seems to be an ip address */
     check_ip(); /* see private_email.h */
+
+#ifdef EAV_EXTRA
+    if (result.rc == EEAV_NO_ERROR) {
+        result.lpart = strndup (email, brs - email - 1);
+        result.domain = strndup (brs + 1, bre - brs - 1);
+    }
+#endif
 
     return result;
 }

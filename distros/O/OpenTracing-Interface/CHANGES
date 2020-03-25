@@ -1,6 +1,17 @@
 CHANGE LOG
 ==========
 
+2020-03-25 v0.12
+----------------
+
+- introduce `OpenTracing::Types` and simplify `OpenTracing::Interface`
+- add `References` to create "casual span references"
+- define `inject_context` and `extract_context`
+- ensure we pass on all parameters, and fix those that did not
+- make `child_of` and `references` mutual exclusive options
+- add more than 150 tests
+- update POD and README so everybody can read it
+
 
 2020-01-29 v0.11
 ----------------

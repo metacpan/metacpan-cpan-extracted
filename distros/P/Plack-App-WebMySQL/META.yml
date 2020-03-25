@@ -9,7 +9,7 @@ configure_requires:
   Module::Build: '0.42'
   Module::Build::Pluggable::CPANfile: '0.05'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ name: Plack-App-WebMySQL
 provides:
   Plack::App::WebMySQL:
     file: lib/Plack/App/WebMySQL.pm
-    version: '3.02'
+    version: '3.03'
   Plack::App::WebMySQL::General:
     file: lib/Plack/App/WebMySQL/General.pm
   Plack::App::WebMySQL::Key:
@@ -41,4 +41,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/thedumbterminal/Plack-App-WebMySQL
-version: '3.02'
+version: '3.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

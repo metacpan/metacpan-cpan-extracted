@@ -19,7 +19,7 @@ use Future::Utils qw( call_with_escape );
    $ret_f->done( "result" );
 
    ok( $f->is_ready, 'call_with_escape ready after returned future ready' );
-   is( scalar $f->get, "result", 'result of call_with_escape' );
+   is( scalar $f->result, "result", 'result of call_with_escape' );
 
    $f = call_with_escape {
       return $ret_f = Future->new;
@@ -42,7 +42,7 @@ use Future::Utils qw( call_with_escape );
    };
 
    ok( $f->is_ready, 'call_with_escape ready after synchronous escape' );
-   is( scalar $f->get, "escaped", 'result of call_with_escape' );
+   is( scalar $f->result, "escaped", 'result of call_with_escape' );
 }
 
 # call_with_escape delayed escape
@@ -62,7 +62,7 @@ use Future::Utils qw( call_with_escape );
    $ret_f->done;
 
    ok( $f->is_ready, 'call_with_escape ready after deferral' );
-   is( scalar $f->get, "later escape", 'result of call_with_escape' );
+   is( scalar $f->result, "later escape", 'result of call_with_escape' );
 
    ok( $inner_f->is_cancelled, 'code-returned future cancelled after escape' );
 }

@@ -136,6 +136,15 @@ METHODS
     it as soon as possible on program startup, before any of the main
     Future::IO methods may have been called.
 
+ await
+
+       $f = $f->await
+
+    Since version 0.07.
+
+    Blocks until this future is ready (either by success or failure). Does
+    not throw an exception if failed.
+
 THE $IMPL VARIABLE
 
     Since version 0.02.

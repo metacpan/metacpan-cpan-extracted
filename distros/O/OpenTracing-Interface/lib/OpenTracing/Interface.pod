@@ -12,21 +12,139 @@ and
 L<terminology|http://opentracing.io/documentation/pages/spec>
 more generally.
 
+
+
 =head1 SYNOPSIS
 
-=head2 Singleton Initialization
+Initialize the Tracer Singleton
 
-    use Package::Alias 'OpenTracing' => 'Perceptyx::OpenTracing';
+    use OpenTracing::Implementation qw/YourTracingService/;
+
+Access the Tracer Singleton
+
+    use OpenTracing::GlobalTracer qw/$TRACER/;
+
+Direct control over Tracing instead of using singletons
+
+    use YourImplementation::Tracer;
     
-    OpenTracing->set_global_tracer( Some::Tracer::Implementation->new( ... ) );
+    my $TRACER = YourImplementation::Tracer->new( %options );
+
+Add a new span inside a subroutine
+
+    sub some_work {
+        my $opentracing_scope =
+            $TRACER->start_active_span( 'some_operation_name' );
+        
+        ...
+        
+        $opentracing_scope->close
+        
+        return ...
+    }
+
+Inject a SpanContext into an outgoing request:
+
+    my $opentracing_spancontext = $TRACER->get_active_span->get_context;
     
-=cut
+    use HTTP::Headers;
+    my $http_headers = HTTP::Headers->new( ... );
+    
+    my $cntx_headers = $TRACER->inject_context(
+        OPENTRACING_FORMAT_HTTP_HEADERS => $http_headers,
+        $opentracing_spancontext,
+    );
+    
+    my $request = HTTP::Request->new(
+        GET => 'https://...', $cntx_headers
+    );
+    my response = LWP::UserAgent->request( $request );
 
-=head1 ABOUT
+Extract a SpanContext from an incoming request
 
-The interfaces are being defined as roles ( using L<Role::Tiny> ) and use
-C<around> method modifiers, instead of C<require>, we do want to wrap the method
-in type checking ( using L<Type::Tiny> and friends ).
+    use YourFramework;
+    
+    get '/some_service' => sub {
+        my $http_headers = YourFramework->request->headers;
+        
+        my $opentracing_context = $TRACER->extract_context(
+            OPENTRACING_FORMAT_HTTP_HEADERS => $http_headers
+        );
+        
+        ...
+        
+    }
+
+
+
+=head1 DESCRIPTION
+
+This package - C<OpenTracing::Interface> - describes the API definition for
+OpenTransport implementations written in the Perl5 language.
+
+This being Perl, and strongly influenced by TIMTOWDI principals, this package
+does not intent to be a base class that tracer implementors need to subclass.
+Moreover, the specification is written as POD. Write your own implementation
+however you want as long as it adheres to the written POD specification.
+
+A set of L<Role::Tiny> roles are provided, that can be consumed into your own
+implementations that will ensure that required methods are present. Those roles
+also do type checking ( using L<Type::Tiny> and friends ) on input params and
+returned values. Other than that, those roles do nothing and can be ignored.
+
+For convenience and those that desire type-checks, there is also a
+L<OpenTracing::Types> library build upon L<Type::Libray> using
+L<"Duck Typing"|Type::Tiny::Duck>.
+
+=head1 INDEX
+
+=over
+
+=item L<OpenTracing::Interface::Reference>
+
+References are used by C<Tracer> methods C<start_span> and C<start_active_span>
+to create "casual span references"
+
+=item L<OpenTracing::Interface::Scope>
+
+A C<Scope> formalizes the activation and deactivation of a C<Span>, usually from
+a CPU standpoint.
+
+=item L<OpenTracing::Interface::ScopeManger>
+
+The C<ScopeManager> interface abstracts both the activation of C<Span> instances
+via C<activate_span> and access to an active C<Scope> via C<get_active_scope>.
+
+=item L<OpenTracing::Interface::Span>
+
+A C<Span> represents a unit of work executed on behalf of a C<Trace>.
+
+=item L<OpenTracing::Interface::SpanContext>
+
+A C<SpanContext> represents C<Span> state that must be propagated to descendant
+C<Span>'s and across process boundaries.
+
+=item L<OpenTracing::Interface::Tracer>
+
+The C<Tracer> is the entry point API between instrumentation code and the
+tracing implementation.
+
+=back
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Types>
+
+This library of L<Type::Tiny> type constraints provide Duck Type checks for all
+common elements that conform this L<OpenTracing::Interface>
+
+=back
+
+
 
 =head1 AUTHOR
 
@@ -34,7 +152,7 @@ Theo van Hoesel <tvanhoesel@perceptyx.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-'OpenTracing API for Perl' is Copyright (C) 2019, Perceptyx Inc
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0.

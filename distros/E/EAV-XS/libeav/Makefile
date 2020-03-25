@@ -31,6 +31,7 @@ LIB_EXT ?= a
 DLL_TARGET = libeav.$(DLL_EXT)
 LIB_TARGET = libeav.$(LIB_EXT)
 BIN_TARGET = eav
+BIN_TARGET_STATIC = eav.static
 
 TARGETS = $(BIN_TARGET) $(DLL_TARGET) $(LIB_TARGET)
 bin_SOURCES = $(wildcard bin/*.c)
@@ -47,6 +48,7 @@ WITH_IDN = idnkit
 IDNKIT_DIR ?= /usr/local
 DEFS = -DHAVE_IDNKIT -I$(IDNKIT_DIR)/include
 LIBS = -L$(IDNKIT_DIR)/lib -lidnkit
+LIBS_STATIC = -L$(IDNKIT_DIR)/lib -lidnkit
 PARTIAL = $(wildcard partial/idnkit/*.c)
 OBJECTS += $(patsubst  partial/idnkit/%.c,  partial/idnkit/%.o, $(PARTIAL))
 else ifeq ($(FORCE_IDN),idn2)
@@ -54,12 +56,14 @@ $(info > Force using libidn2)
 WITH_IDN = idn2
 DEFS = -DHAVE_LIBIDN2 $(shell $(PKG_CONFIG) --cflags libidn2)
 LIBS = $(shell $(PKG_CONFIG) --libs libidn2)
+LIBS_STATIC = $(shell $(PKG_CONFIG) --static --libs libidn2)
 PARTIAL = $(wildcard partial/idn2/*.c)
 OBJECTS += $(patsubst  partial/idn2/%.c,  partial/idn2/%.o, $(PARTIAL))
 else ifeq ($(FORCE_IDN),idn)
 $(info > Force using libidn)
 WITH_IDN = idn
 DEFS = -DHAVE_LIBIDN $(shell $(PKG_CONFIG) --cflags libidn)
+LIBS_STATIC = $(shell $(PKG_CONFIG) --static --libs libidn)
 LIBS = $(shell $(PKG_CONFIG) --libs libidn)
 PARTIAL = $(wildcard partial/idn/*.c)
 OBJECTS += $(patsubst  partial/idn/%.c,  partial/idn/%.o, $(PARTIAL))
@@ -73,6 +77,7 @@ $(info > Found libidn2)
 WITH_IDN = idn2
 DEFS = -DHAVE_LIBIDN2 $(shell $(PKG_CONFIG) --cflags libidn2)
 LIBS = $(shell $(PKG_CONFIG) --libs libidn2)
+LIBS_STATIC = $(shell $(PKG_CONFIG) --static --libs libidn2)
 PARTIAL = $(wildcard partial/idn2/*.c)
 OBJECTS += $(patsubst  partial/idn2/%.c,  partial/idn2/%.o, $(PARTIAL))
 else ifeq ($(shell $(PKG_CONFIG) --exists 'libidn' || echo NO),)
@@ -80,6 +85,7 @@ $(info > Found libidn)
 WITH_IDN = idn
 DEFS = -DHAVE_LIBIDN $(shell $(PKG_CONFIG) --cflags libidn)
 LIBS = $(shell $(PKG_CONFIG) --libs libidn)
+LIBS_STATIC = $(shell $(PKG_CONFIG) --static --libs libidn)
 PARTIAL = $(wildcard partial/idn/*.c)
 OBJECTS += $(patsubst  partial/idn/%.c,  partial/idn/%.o, $(PARTIAL))
 else
@@ -88,6 +94,7 @@ WITH_IDN = idnkit
 IDNKIT_DIR ?= /usr/local
 DEFS = -DHAVE_IDNKIT -I$(IDNKIT_DIR)/include
 LIBS = -L$(IDNKIT_DIR)/lib -lidnkit
+LIBS_STATIC = -L$(IDNKIT_DIR)/lib -lidnkit
 PARTIAL = $(wildcard partial/idnkit/*.c)
 OBJECTS += $(patsubst  partial/idnkit/%.c,  partial/idnkit/%.o, $(PARTIAL))
 endif
@@ -112,6 +119,7 @@ LIB_PATH = $(shell realpath .)
 
 export _defs = $(DEFS)
 export _libs = $(LIBS)
+export _libs_static = $(LIBS_STATIC)
 export _pkg_config = $(PKG_CONFIG)
 export _install = $(INSTALL)
 export _idnkit_dir = $(IDNKIT_DIR)
@@ -132,9 +140,13 @@ shared: $(DLL_TARGET)
 static: $(LIB_TARGET)
 
 app: $(BIN_TARGET)
+app-static: $(BIN_TARGET_STATIC)
 
 $(BIN_TARGET): $(DLL_TARGET)
 	$(MAKE) -C bin
+
+$(BIN_TARGET_STATIC): $(LIB_TARGET)
+	$(MAKE) -C bin static
 
 $(DLL_TARGET): depend $(OBJECTS)
 	# library -> shared linkage
@@ -158,7 +170,7 @@ auto:
 	$(PERL) util/gentld.pl include/eav/auto_tld.h src/auto_tld.c \
 		data/punycode.csv
 
-all-tld:
+tld-domains:
 	$(PERL) util/gen_utf8_pass_test.pl data/tld-domains.txt data/raw.csv
 
 #----------------------------------------------------------#
@@ -198,8 +210,11 @@ clean-tests:
 clean-bin:
 	$(MAKE) -C bin clean
 
-strip: $(TARGETS)
+strip: app
 	$(MAKE) -C bin strip
+
+strip-static: app-static
+	$(MAKE) -C bin strip-static
 
 #----------------------------------------------------------#
 

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.09;
 use 5.010; # //
@@ -51,12 +51,11 @@ style_redraw_keys qw( text skew );
 
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
-sub lines { 1 }
-sub cols  { 1 }
+method lines { 1 }
+method cols  { 1 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    my ( $text, $skew ) = $self->get_style_values(qw( text skew ));

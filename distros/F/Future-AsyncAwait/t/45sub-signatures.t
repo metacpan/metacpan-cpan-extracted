@@ -50,6 +50,13 @@ use Future::AsyncAwait;
 
    $f = firstandthird(qw( a b c ));
    is( $f->get, "ac", 'parsed unnamed parameter' );
+
+   async sub withdefault($one = 1, $two = 2) {
+      return $one + $two;
+   }
+
+   $f = withdefault();
+   is( $f->get, 3, 'parsed parameters with default expr' );
 }
 
 # RT131571

@@ -10,7 +10,7 @@ our @EXPORT_OK = qw( sec_to_time write_json read_json uni_capture uni_system HID
 
 use Fcntl              qw( LOCK_EX LOCK_SH SEEK_END );
 
-use IPC::System::Simple    qw( capture system );
+use IPC::System::Simple    qw( capture system EXIT_ANY );
 use JSON                   qw();
 
 use if $^O eq 'MSWin32', 'Win32::ShellQuote';
@@ -48,12 +48,14 @@ sub uni_capture {
 
 sub uni_system {
     my ( @cmd ) = @_;
+    my $exit_value;
     if ( $^O eq 'MSWin32' ) {
-        system( Win32::ShellQuote::quote_native( @cmd ) );
+        $exit_value = system( EXIT_ANY, Win32::ShellQuote::quote_native( @cmd ) );
     }
     else {
-        system( @cmd );
+        $exit_value = system( EXIT_ANY, @cmd );
     }
+    return $exit_value;
 }
 
 
@@ -78,7 +80,7 @@ sub sec_to_time {
 
 
 sub write_json {
-    my ( $opt, $file, $ref ) = @_;
+    my ( $file, $ref ) = @_;
     my $json = JSON->new->pretty->canonical->utf8->encode( $ref );
     open my $fh, '>', $file or die $file . " $!";
     flock $fh, LOCK_EX     or die $!;
@@ -89,7 +91,7 @@ sub write_json {
 
 
 sub read_json {
-    my ( $opt, $file ) = @_;
+    my ( $file ) = @_;
     return if ! -f $file;
     open my $fh, '<', $file or die $file . " $!";
     flock $fh, LOCK_SH or die $!;

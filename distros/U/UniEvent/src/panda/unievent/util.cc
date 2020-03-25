@@ -39,6 +39,100 @@ net::SockAddr broadcast_addr (uint16_t port, const AddrInfoHints& hints) {
     else                          return SockAddr::Inet4(SockAddr::Inet4::addr_any, port);
 }
 
+bool is_socket (fd_t fd) {
+    return Fs::stat(fd).value().type() == Fs::FileType::SOCKET;
+}
+
+excepted<void, std::error_code> connect (sock_t sock, const net::SockAddr& sa) {
+    auto status = ::connect(sock, sa.get(), sa.length());
+    if (status != 0) return make_unexpected(last_sys_sock_error());
+    return {};
+}
+
+excepted<void, std::error_code> bind (sock_t sock, const net::SockAddr& sa) {
+    auto status = ::bind(sock, sa.get(), sa.length());
+    if (status != 0) return make_unexpected(last_sys_sock_error());
+    return {};
+}
+
+excepted<void, std::error_code> listen (sock_t sock, int backlog) {
+    auto status = ::listen(sock, backlog);
+    if (status != 0) return make_unexpected(last_sys_sock_error());
+    return {};
+}
+
+excepted<std::array<sock_t,2>, std::error_code> inet_socketpair (int type, int protocol) {
+    std::array<sock_t,2> socks;
+    int domain = AF_INET;
+    auto rets = socket(domain, type, protocol);
+    if (!rets) return make_unexpected(rets.error());
+    auto lsock = rets.value();
+
+    auto ret = bind(lsock, net::SockAddr::Inet4::sa_loopback);
+    if (!ret) {
+        close(lsock).nevermind();
+        return make_unexpected(ret.error());
+    }
+
+    ret = listen(lsock, 1);
+    if (!ret) {
+        close(lsock).nevermind();
+        return make_unexpected(ret.error());
+    }
+
+    auto retsa = getsockname(lsock);
+    if (!retsa) {
+        close(lsock).nevermind();
+        return make_unexpected(retsa.error());
+    }
+    auto sa = retsa.value();
+
+    rets = socket(domain, type, protocol);
+    if (!rets) {
+        close(lsock).nevermind();
+        return make_unexpected(rets.error());
+    }
+    auto csock = socks[1] = rets.value();
+
+    ret = setblocking(csock, false);
+    if (!ret) {
+        close(lsock).nevermind();
+        close(csock).nevermind();
+        return make_unexpected(ret.error());
+    }
+
+    ret = connect(csock, sa);
+    if (!ret && ret.error() != std::errc::resource_unavailable_try_again) {
+        close(lsock).nevermind();
+        close(csock).nevermind();
+        return make_unexpected(ret.error());
+    }
+
+    rets = accept(lsock);
+    if (!rets) {
+        close(lsock).nevermind();
+        close(csock).nevermind();
+        return make_unexpected(ret.error());
+    }
+    auto ssock = socks[0] = rets.value();
+
+    ret = close(lsock);
+    if (!ret) {
+        close(csock).nevermind();
+        close(ssock).nevermind();
+        return make_unexpected(ret.error());
+    }
+
+    ret = setblocking(csock, true);
+    if (!ret) {
+        close(csock).nevermind();
+        close(ssock).nevermind();
+        return make_unexpected(ret.error());
+    }
+
+    return socks;
+}
+
 int getpid  () { return uv_os_getpid(); }
 int getppid () { return uv_os_getppid(); }
 
@@ -46,7 +140,7 @@ TimeVal gettimeofday () {
     TimeVal ret;
     uv_timeval64_t tv;
     auto err = uv_gettimeofday(&tv);
-    if (err) throw uvx_code_error(err);
+    if (err) throw Error(uvx_error(err));
     ret.sec  = tv.tv_sec;
     ret.usec = tv.tv_usec;
     return ret;
@@ -57,10 +151,10 @@ string hostname () {
     size_t len = ret.capacity();
     int err = uv_os_gethostname(ret.buf(), &len);
     if (err) {
-        if (err != UV_ENOBUFS) throw uvx_code_error(err);
+        if (err != UV_ENOBUFS) throw Error(uvx_error(err));
         ret.reserve(len);
         err = uv_os_gethostname(ret.buf(), &len);
-        if (err) throw uvx_code_error(err);
+        if (err) throw Error(uvx_error(err));
     }
     ret.length(len);
     return ret;
@@ -69,7 +163,7 @@ string hostname () {
 size_t get_rss () {
     size_t rss;
     int err = uv_resident_set_memory(&rss);
-    if (err) throw uvx_code_error(err);
+    if (err) throw Error(uvx_error(err));
     return rss;
 }
 
@@ -85,7 +179,7 @@ std::vector<InterfaceAddress> interface_info () {
     uv_interface_address_t* uvlist;
     int cnt;
     int err = uv_interface_addresses(&uvlist, &cnt);
-    if (err) throw uvx_code_error(err);
+    if (err) throw Error(uvx_error(err));
 
     std::vector<InterfaceAddress> ret;
     ret.reserve(cnt);
@@ -109,7 +203,7 @@ std::vector<CpuInfo> cpu_info () {
     uv_cpu_info_t* uvlist;
     int cnt;
     int err = uv_cpu_info(&uvlist, &cnt);
-    if (err) throw uvx_code_error(err);
+    if (err) throw Error(uvx_error(err));
 
     std::vector<CpuInfo> ret;
     ret.reserve(cnt);
@@ -134,7 +228,7 @@ std::vector<CpuInfo> cpu_info () {
 ResourceUsage get_rusage () {
     uv_rusage_t d;
     int err = uv_getrusage(&d);
-    if (err) throw uvx_code_error(err);
+    if (err) throw Error(uvx_error(err));
 
     ResourceUsage ret;
     ret.utime.sec  = d.ru_utime.tv_sec;
@@ -171,7 +265,7 @@ const HandleType& guess_type (fd_t file) {
     }
 }
 
-std::error_code uvx_code_error (int uverr) {
+std::error_code uvx_error (int uverr) {
     assert(uverr);
     switch (uverr) {
         case UV_E2BIG          : return make_error_code(std::errc::argument_list_too_long);

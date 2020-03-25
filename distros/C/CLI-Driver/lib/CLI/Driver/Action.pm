@@ -55,10 +55,11 @@ method parse (HashRef :$href!) {
     }
 
     if ( $href->{method} ) {
-
+        
         my $method = CLI::Driver::Method->new;
         my $success = $method->parse( href => $href->{method} );
         if ( !$success ) {
+        	$self->warn("error parsing action: " . $self->name);
             return 0;
         }
 

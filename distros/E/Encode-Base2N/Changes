@@ -1,0 +1,7 @@
+1.0.2    25.03.2020
+          - add MIME::Base32::XS to benchmarks
+          - remove Test::Warnings usage from tests
+1.0.1    24.03.2020
+          - add benchmarks to docs
+1.0.0    24.03.2020
+           - first release

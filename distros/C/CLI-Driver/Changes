@@ -1,5 +1,7 @@
 Revision history for CLI-Driver
 
+0.51 - improved error message when parsing invalid actions
+
 0.50 - introduced v2 of the cli-driver file
 
 0.41 - added sharedir example

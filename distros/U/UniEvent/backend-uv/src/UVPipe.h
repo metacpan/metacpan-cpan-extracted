@@ -10,7 +10,7 @@ static inline optional<string> uvx_sockname (const uv_pipe_t* uvhp, Func&& f) {
     int err = f(uvhp, nullptr, &len);
     if (err) {
         if (err == UV_EBADF || err == UV_ENOTCONN) return {};
-        if (err != UV_ENOBUFS) throw uvx_code_error(err);
+        if (err != UV_ENOBUFS) throw Error(uvx_error(err));
     }
     panda::string ret(len);
     uvx_strict(f(uvhp, ret.buf(), &len));

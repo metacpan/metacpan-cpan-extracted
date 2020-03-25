@@ -89,7 +89,7 @@ For more details see the accessors below.
 has @_lines;
 has $_on_click;
 
-method BUILDALL
+method BUILD
 {
    my %params = @_;
 

@@ -1,5 +1,12 @@
 Revision history for Future-AsyncAwait
 
+0.38    2020-03-24
+        [CHANGES]
+         * Use XS::Parse::Sublike for `async sub` parsing. This makes it
+           possible to coöperate with other sub-like keyword modules
+         * Add cross-module test sthat module works correctly with Object::Pad,
+           and additionally Syntax::Keyword::Dynamically as well
+
 0.37    2020-03-10
         [CHANGES]
          * Minor reärrangement of internal stages to closer match core's

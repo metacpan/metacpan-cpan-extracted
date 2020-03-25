@@ -16,22 +16,23 @@ namespace panda { namespace log {
 #  define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #endif
 
-#define _panda_log_code_point_ panda::log::CodePoint{__FILENAME__, __LINE__, panda_log_module}
+#define _panda_log_code_point_(module) panda::log::CodePoint{__FILENAME__, __LINE__, &module}
 
-#define panda_should_log(level) panda::log::should_log(level, _panda_log_code_point_)
+#define panda_should_mlog(mod, lvl) (lvl >= mod.level && panda::log::details::ilogger && panda::log::details::ilogger->should_log(lvl, _panda_log_code_point_(mod)))
+#define panda_should_log(lvl)       panda_should_mlog(panda_log_module, lvl)
 
-#define panda_elog_m(module, level, code) do {                                \
-    if (panda::log::should_log(level, _panda_log_code_point_, module)) {    \
-        std::ostream& log = panda::log::details::_get_os();                 \
-        code;                                                               \
-        panda::log::details::_do_log(log, _panda_log_code_point_, level);   \
-    }                                                                       \
-} while (0);
+#define panda_elog_m(mod, lvl, code) do {                                       \
+    if (panda_should_mlog(mod, lvl)) {                                          \
+        std::ostream& log = panda::log::details::_get_os();                     \
+        code;                                                                   \
+        panda::log::details::_do_log(log, _panda_log_code_point_(mod), lvl);    \
+    }                                                                           \
+} while (0)
 
 #define panda_log_m(module, level, msg) panda_elog_m(module, level, { log << msg; })
 
-#define panda_elog(level, code) panda_elog_m(*panda_log_module, level, code)
-#define panda_log(level, msg)  panda_log_m (*panda_log_module, level, msg)
+#define panda_elog(level, code) panda_elog_m(panda_log_module, level, code)
+#define panda_log(level, msg)   panda_log_m(panda_log_module, level, msg)
 
 #define panda_log_verbose_debug(msg)   panda_log(panda::log::VerboseDebug, msg)
 #define panda_log_debug(msg)           panda_log(panda::log::Debug, msg)
@@ -85,6 +86,7 @@ struct Module {
     string  name;
 
     Module(const string& name, Level level = Level::Warning);
+    Module(const string& name, Module& parent, Level level = Level::Warning) : Module(name, &parent, level) {}
     Module(const string& name, Module* parent, Level level = Level::Warning);
 
     Module(const Module&) = delete;
@@ -97,9 +99,9 @@ struct Module {
 };
 
 struct CodePoint {
-    string_view file;
-    uint32_t    line;
-    Module*     module;
+    string_view   file;
+    uint32_t      line;
+    const Module* module;
 
     std::string to_string () const;
 };
@@ -132,16 +134,12 @@ void set_logger (ILogger*);
 template <class Func, typename = std::enable_if_t<!std::is_base_of<ILogger, std::remove_cv_t<std::remove_pointer_t<Func>>>::value>>
 void set_logger (const Func& f) { set_logger(new details::CallbackLogger<Func>(f)); }
 
-inline bool should_log (Level level, const CodePoint& cp, const Module& module) {
-    return level >= module.level && details::ilogger && details::ilogger->should_log(level, cp);
-}
-
 struct escaped {
     string_view src;
 };
 std::ostream& operator<< (std::ostream&, const escaped&);
 
-}
-}
-extern panda::log::Module* panda_log_module;
+}}
+
+extern panda::log::Module panda_log_module;
 

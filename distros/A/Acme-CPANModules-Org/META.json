@@ -41,10 +41,14 @@
       "x_mentions" : {
          "x_mentions" : {
             "App::OrgUtils" : "0",
+            "App::org2wp" : "0",
             "App::orgsel" : "0",
             "Data::CSel" : "0",
+            "Data::Dmp::Org" : "0",
             "Org::Dump" : "0",
+            "Org::Examples" : "0",
             "Org::Parser" : "0",
+            "Org::Parser::Tiny" : "0",
             "Org::To::HTML" : "0",
             "Org::To::HTML::WordPress" : "0",
             "Org::To::Pod" : "0",
@@ -66,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-Org"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -159,6 +163,11 @@
             "version" : "6.009"
          },
          {
+            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
+            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
+            "version" : "6.009"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.009"
@@ -166,7 +175,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.594"
+            "version" : "0.599"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -217,7 +226,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.003"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -250,9 +259,9 @@
             "version" : "0.02"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion",
-            "name" : "@Author::PERLANCAR/PERLANCAR::OurPkgVersion",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::OurPkgVersion",
+            "name" : "@Author::PERLANCAR/OurPkgVersion",
+            "version" : "0.15"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -371,7 +380,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.77"
+                        "version" : "0.780"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
@@ -391,12 +400,12 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.06"
+                        "version" : "0.07"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Acme::CPANModules",
                         "name" : "-Acme::CPANModules",
-                        "version" : "0.002"
+                        "version" : "0.003"
                      }
                   ]
                }
@@ -417,17 +426,17 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
             "name" : "@Author::PERLANCAR/Rinci::AddToDb",
-            "version" : "0.01"
+            "version" : "0.020"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Rinci::Validate",
-            "name" : "@Author::PERLANCAR/Rinci::Validate",
-            "version" : "0.24"
+            "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
+            "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
+            "version" : "0.250"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",
@@ -457,14 +466,21 @@
             "version" : "2.054"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
-            "name" : "@Author::PERLANCAR/Test::Perl::Critic",
-            "version" : "3.001"
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic::Subset",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
+                  "finder" : [
+                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                  ]
+               }
+            },
+            "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
+            "version" : "3.001.003"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
             "name" : "@Author::PERLANCAR/Test::Rinci",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::StaticInstall",

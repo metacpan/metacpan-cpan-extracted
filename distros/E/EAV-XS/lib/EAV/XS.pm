@@ -121,7 +121,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = ();
 
-our $VERSION = "0.3.3";
+our $VERSION = "0.4.2";
 
 require XSLoader;
 XSLoader::load('EAV::XS', $VERSION);
@@ -168,6 +168,20 @@ L<libidnkit|https://jprs.co.jp/idn/index-e.html>
 
 When run Makefile.PL, you will be asked to configure EAV::XS and
 at this stage you may select the IDN library to build with.
+
+B<Makefile.PL> requirements:
+
+=over 4
+
+=item *
+
+L<ExtUtils::MakeMaker> B<5.62> or newer
+
+=item *
+
+L<ExtUtils::PkgConfig> B<1.16> or newer
+
+=back
 
 =head1 METHODS
 
@@ -221,6 +235,46 @@ $error_message = B<get_error> ()
 
 Returns an error message for the last email address tested
 by B<is_email()> method.
+
+=item *
+
+$lpart = B<get_lpart> ()
+
+Returns local-part of the email B<after> the B<is_email> method call.
+If the email address is invalid, then B<get_lpart> returns nothing.
+
+=item *
+
+$domain = B<get_domain> ()
+
+Returns domain-part of the email B<after> the B<is_email> method call.
+If the email address is invalid, then B<get_domain> returns nothing.
+The returned value $domain could be an IPv4 address either IPv6 one,
+depending on the specified email address passed to B<is_email> ().
+
+=item *
+
+$bool = B<get_is_ipv4> ()
+
+Returns whether or not the domain-part of the email contains an IPv4
+address, B<after> the B<is_email> method call.
+If the email address is invalid, then B<get_is_ipv4> returns false.
+
+=item *
+
+$bool = B<get_is_ipv6> ()
+
+Returns whether or not the domain-part of the email contains an IPv6
+address, B<after> the B<is_email> method call.
+If the email address is invalid, then B<get_is_ipv6> returns false.
+
+=item *
+
+$bool = B<get_is_domain> ()
+
+Returns whether or not the domain-part of the email contains an domain
+name, B<after> the B<is_email> method call.
+If the email address is invalid, then B<get_is_domain> returns false.
 
 =back
 

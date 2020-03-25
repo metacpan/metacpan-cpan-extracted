@@ -35,7 +35,8 @@ struct UVStream : UVHandle<Base, UvReq> {
     }
 
     std::error_code read_start () override {
-        return uvx_ce(uv_read_start(uvsp(), _buf_alloc, on_read));
+        auto ret = uv_read_start(uvsp(), _buf_alloc, on_read);
+        return uvx_ce(ret);
     }
 
     void read_stop () override {
@@ -46,7 +47,7 @@ struct UVStream : UVHandle<Base, UvReq> {
         auto req = static_cast<UVWriteRequest*>(_req);
         UVX_FILL_BUFS(bufs, uvbufs);
         auto err = uv_write(&req->uvr, uvsp(), uvbufs, bufs.size(), on_write);
-        if (err) return uvx_code_error(err);
+        if (err) return uvx_error(err);
         req->active = true;
         if (!uvsp()->write_queue_size) req->handle_event({}); // written synchronously
         return {};
@@ -55,7 +56,7 @@ struct UVStream : UVHandle<Base, UvReq> {
     void shutdown (ShutdownRequestImpl* _req) override {
         auto req = static_cast<UVShutdownRequest*>(_req);
         int err = uv_shutdown(&req->uvr, uvsp(), on_shutdown);
-        if (err) return req->handle_event(uvx_code_error(err));
+        if (err) return req->handle_event(uvx_error(err));
         req->active = true;
     }
 

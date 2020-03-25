@@ -1,0 +1,31 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'name' => [
+                                                                               'prototype_formula'
+                                                                             ]
+                                                                 }, 'OPTIMADE::Filter::Property' ),
+                                                          'B2'
+                                                        ],
+                                          'operator' => 'STARTS'
+                                        }, 'OPTIMADE::Filter::Comparison' ),
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'name' => [
+                                                                               'prototype_formula'
+                                                                             ]
+                                                                 }, 'OPTIMADE::Filter::Property' ),
+                                                          'D2'
+                                                        ],
+                                          'operator' => 'ENDS WITH'
+                                        }, 'OPTIMADE::Filter::Comparison' )
+                               ],
+                 'operator' => 'AND'
+               }, 'OPTIMADE::Filter::AndOr' );
+== Filter ==
+((prototype_formula STARTS "B2") AND (prototype_formula ENDS WITH "D2"))
+== SQL ==
+(('prototype_formula' LIKE "B2%") AND ('prototype_formula' LIKE "%D2"))

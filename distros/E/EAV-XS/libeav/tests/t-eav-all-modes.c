@@ -81,7 +81,7 @@ main (int argc, char *argv[])
         EAV_RFC_6531
     };
 
-    setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "en_US.UTF-8");
 
     if (argc >= 5 || argc < 4) {
         msg_warn ("usage: %s PASS_COUNT FAIL_COUNT FILE\n", argv[0]);

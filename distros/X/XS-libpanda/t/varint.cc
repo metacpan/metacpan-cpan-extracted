@@ -13,12 +13,13 @@ TEST_CASE("varint encode", "[varint]") {
 }
 
 TEST_CASE("varint decode", "[varint]") {
-    CHECK(varint_decode(string("\0")) == 0);
-    CHECK(varint_decode(string("\1")) == 1);
-    CHECK(varint_decode(string("\x7f")) == 127);
+    string start = GENERATE(string(""), string("\0"), string("\x80"));
+    CHECK(varint_decode(start + string("\0"), start.length()) == 0);
+    CHECK(varint_decode(start + string("\1"), start.length()) == 1);
+    CHECK(varint_decode(start + string("\x7f"), start.length()) == 127);
 
-    CHECK(varint_decode(string("\x80\1")) == 128);
-    CHECK(varint_decode(string("\x81\1")) == 129);
+    CHECK(varint_decode(start + string("\x80\1"), start.length()) == 128);
+    CHECK(varint_decode(start + string("\x81\1"), start.length()) == 129);
 }
 
 TEST_CASE("varint cross check", "[varint]") {
@@ -58,4 +59,22 @@ TEST_CASE("VarIntStack", "[varint]") {
     CHECK(stack.top() == 400);
     stack.pop();
     CHECK(stack.top() == 300);
+}
+
+TEST_CASE("VarIntStack iterator", "[varint]") {
+    VarIntStack stack;
+    SECTION("empty") {
+        REQUIRE(stack.begin() == stack.end());
+    }
+    SECTION("simple") {
+        using vec = std::vector<int>;
+        vec src = GENERATE(vec{0}, vec{1}, vec{0,1}, vec{1,128,0,100000, 0xFFFFFF});
+        for (int v : src) {
+            stack.push(v);
+        }
+        vec res;
+        std::copy(stack.begin(), stack.end(), std::back_inserter(res));
+        std::reverse(res.begin(), res.end()); // Stack reverses order
+        REQUIRE(src == res);
+    }
 }

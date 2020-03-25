@@ -40,8 +40,8 @@ use Future;
    ok( $future->is_done, '$future is done' );
    ok( !$future->is_failed, '$future is not failed' );
    is( $future->state, "done", '$future->state after done' );
-   is_deeply( [ $future->get ], [ result => "here" ], 'Results from $future->get' );
-   is( scalar $future->get, "result", 'Result from scalar $future->get' );
+   is_deeply( [ $future->result ], [ result => "here" ], 'Results from $future->result' );
+   is( scalar $future->result, "result", 'Result from scalar $future->result' );
 
    is_oneref( $future, '$future has refcount 1 at end of test' );
 }
@@ -56,14 +56,14 @@ use Future;
    isa_ok( $future, "Future", 'Future->wrap(Future)' );
 
    $f->done( "Wrapped Future" );
-   is( scalar $future->get, "Wrapped Future", 'Future->wrap(Future)->get' );
+   is( scalar $future->result, "Wrapped Future", 'Future->wrap(Future)->result' );
 
    $future = Future->wrap( "Plain string" );
 
    ok( defined $future, 'Future->wrap(string) defined' );
    isa_ok( $future, "Future", 'Future->wrap(string)' );
 
-   is( scalar $future->get, "Plain string", 'Future->wrap(string)->get' );
+   is( scalar $future->result, "Plain string", 'Future->wrap(string)->result' );
 }
 
 # done chaining
@@ -107,10 +107,10 @@ use Future;
 
    ok( $f1->is_ready, 'Chained ->on_done for immediate future' );
    ok( $f1->is_done, 'Chained ->on_done is done for immediate future' );
-   is_deeply( [ $f1->get ], [ already => "done" ], 'Results from chained via ->on_done for immediate future' );
+   is_deeply( [ $f1->result ], [ already => "done" ], 'Results from chained via ->on_done for immediate future' );
    ok( $f2->is_ready, 'Chained ->on_ready for immediate future' );
    ok( $f2->is_done, 'Chained ->on_ready is done for immediate future' );
-   is_deeply( [ $f2->get ], [ already => "done" ], 'Results from chained via ->on_ready for immediate future' );
+   is_deeply( [ $f2->result ], [ already => "done" ], 'Results from chained via ->on_ready for immediate future' );
 }
 
 # fail
@@ -131,7 +131,7 @@ use Future;
    is( scalar $future->failure, "Something broke", '$future->failure yields exception' );
    my $file = __FILE__;
    my $line = __LINE__ + 1;
-   like( exception { $future->get }, qr/^Something broke at \Q$file line $line\E\.?\n$/, '$future->get throws exception' );
+   like( exception { $future->result }, qr/^Something broke at \Q$file line $line\E\.?\n$/, '$future->result throws exception' );
 
    is( $failure, "Something broke", 'Exception passed to on_fail' );
 }
@@ -208,7 +208,7 @@ use Future;
    ok( $future->is_ready, '$future->die marks future ready' );
 
    is( scalar $future->failure, "Something broke at $file line $line\n", '$future->failure yields exception' );
-   is( exception { $future->get }, "Something broke at $file line $line\n", '$future->get throws exception' );
+   is( exception { $future->result }, "Something broke at $file line $line\n", '$future->result throws exception' );
 
    is( $failure, "Something broke at $file line $line\n", 'Exception passed to on_fail' );
 }
@@ -220,7 +220,7 @@ use Future;
    $future = Future->call( sub { Future->done( @_ ) }, 1, 2, 3 );
 
    ok( $future->is_ready, '$future->is_ready from immediate Future->call' );
-   is_deeply( [ $future->get ], [ 1, 2, 3 ], '$future->get from immediate Future->call' );
+   is_deeply( [ $future->result ], [ 1, 2, 3 ], '$future->result from immediate Future->call' );
 
    $future = Future->call( sub { die "argh!\n" } );
 
@@ -280,10 +280,17 @@ use Future;
    }
 }
 
-# block_until_ready
+# await
 {
    my $future = Future->done( "result" );
-   identical( $future->block_until_ready, $future, '->block_until_ready returns invocant' );
+   identical( $future->await, $future, '->await returns invocant' );
+}
+
+# ->result while pending
+{
+   like( exception { Future->new->result; },
+      qr/^Future=HASH\(0x[0-9a-f]+\) is not yet ready /,
+      '->result while pending raises exception' );
 }
 
 done_testing;

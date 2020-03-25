@@ -29,7 +29,7 @@ use Future::Utils qw( repeat try_repeat try_repeat_until_success );
    $trial_f->done( "one" );
 
    ok( defined $arg, '$arg defined for while test' );
-   is( scalar $arg->get, "one", '$arg->get for first' );
+   is( scalar $arg->result, "one", '$arg->result for first' );
 
    identical( $previous_trial, $first_f, 'code block is passed previous trial' );
 
@@ -37,7 +37,7 @@ use Future::Utils qw( repeat try_repeat try_repeat_until_success );
    $trial_f->done( "two" );
 
    ok( $future->is_ready, '$future is now ready after second attempt ->done' );
-   is( scalar $future->get, "two", '$future->get' );
+   is( scalar $future->result, "two", '$future->result' );
 }
 
 # return keyword
@@ -87,13 +87,13 @@ use Future::Utils qw( repeat try_repeat try_repeat_until_success );
    $trial_f->done( "three" );
 
    ok( defined $arg, '$arg defined for while test' );
-   is( scalar $arg->get, "three", '$arg->get for first' );
+   is( scalar $arg->result, "three", '$arg->result for first' );
 
    $accept = 1;
    $trial_f->done( "four" );
 
    ok( $future->is_ready, '$future is now ready after second attempt ->done' );
-   is( scalar $future->get, "four", '$future->get' );
+   is( scalar $future->result, "four", '$future->result' );
 }
 
 # body code dies
@@ -147,7 +147,7 @@ use Future::Utils qw( repeat try_repeat try_repeat_until_success );
    } while => sub { shift->failure };
 
    ok( $future->is_ready, '$future is now ready for try_repeat' );
-   is( scalar $future->get, 3, '$future->get' );
+   is( scalar $future->result, 3, '$future->result' );
 }
 
 {
@@ -162,7 +162,7 @@ use Future::Utils qw( repeat try_repeat try_repeat_until_success );
    };
 
    ok( $future->is_ready, '$future is now ready for try_repeat_until_success' );
-   is( scalar $future->get, 3, '$future->get' );
+   is( scalar $future->result, 3, '$future->result' );
 }
 
 # repeat prints a warning if asked to retry a failure

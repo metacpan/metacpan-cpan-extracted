@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Module::Build::Pluggable (
-    'CPANfile'
+	'CPANfile'
 );
 my $build = Module::Build::Pluggable->new(
 	module_name => 'Plack::App::WebMySQL',

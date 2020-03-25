@@ -16,7 +16,7 @@ use Future::Queue;
 
    my $f = $queue->shift;
    ok( $f->is_done, '$queue->shift already ready' );
-   is( $f->get, "ITEM", '$queue->shift->get' );
+   is( $f->result, "ITEM", '$queue->shift->result' );
 }
 
 # shift before push
@@ -29,7 +29,7 @@ use Future::Queue;
    $queue->push( "ITEM" );
 
    ok( $f->is_done, '$queue->shift now ready after push' );
-   is( $f->get, "ITEM", '$queue->shift->get' );
+   is( $f->result, "ITEM", '$queue->shift->result' );
 }
 
 done_testing;

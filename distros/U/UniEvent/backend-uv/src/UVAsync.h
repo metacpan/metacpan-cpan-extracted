@@ -9,12 +9,12 @@ struct UVAsync : UVHandle<AsyncImpl, uv_async_t> {
         int err = uv_async_init(loop->uvloop, &uvh, [](uv_async_t* p){
             get_handle<UVAsync*>(p)->handle_async();
         });
-        if (err) throw uvx_code_error(err);
+        if (err) throw Error(uvx_error(err));
     }
 
     void send () override {
         int err = uv_async_send(&uvh);
-        if (err) throw uvx_code_error(err);
+        if (err) throw Error(uvx_error(err));
     }
 };
 

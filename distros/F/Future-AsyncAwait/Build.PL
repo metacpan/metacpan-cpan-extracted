@@ -3,6 +3,7 @@ use warnings;
 
 use Config;
 use Module::Build;
+use XS::Parse::Sublike::Builder;
 
 my @extra_compiler_flags = qw( -std=c89 -Ihax );
 
@@ -31,6 +32,8 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
+      'XS::Parse::Sublike' => '0.04', # xs_parse_sublike_any
+      'XS::Parse::Sublike::Builder' => 0,
    },
    license => 'perl',
    create_license => 1,
@@ -43,6 +46,8 @@ my $build = Module::Build->new(
 
    extra_compiler_flags => \@extra_compiler_flags,
 );
+
+XS::Parse::Sublike::Builder->extend_module_build( $build );
 
 if( eval { require Devel::MAT::Dumper::Helper } ) {
    Devel::MAT::Dumper::Helper->extend_module_build( $build );

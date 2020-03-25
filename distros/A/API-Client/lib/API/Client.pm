@@ -1,562 +1,746 @@
-# ABSTRACT: General-Purpose API Client Abstraction
 package API::Client;
 
+use 5.014;
+
+use strict;
+use warnings;
+
+use registry;
+use routines;
+
 use Data::Object::Class;
-use Data::Object::Signatures;
+use Data::Object::ClassHas;
+use FlightRecorder;
+use Mojo::Transaction;
+use Mojo::UserAgent;
+use Mojo::URL;
 
-use Data::Object::Library qw(
-    InstanceOf
-    Int
-    Str
-);
+with 'Data::Object::Role::Buildable';
+with 'Data::Object::Role::Stashable';
+with 'Data::Object::Role::Throwable';
 
-extends 'API::Client::Core';
-
-use Carp ();
-use Scalar::Util ();
-
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 # ATTRIBUTES
 
-has casing => (
-    is       => 'rw',
-    isa      => Str,
-    default  => 'lowercase',
-    required => 0,
+has 'debug' => (
+  is => 'ro',
+  isa => 'Bool',
+  def => 0,
 );
 
-has credentials => (
-    is       => 'ro',
-    isa      => InstanceOf['API::Client::Credentials'],
-    required => 0,
+has 'fatal' => (
+  is => 'ro',
+  isa => 'Bool',
+  def => 0,
 );
 
-has identifier => (
-    is       => 'rw',
-    isa      => Str,
-    default  => 'API::Client (Perl)',
-    required => 0,
+has 'logger' => (
+  is => 'ro',
+  isa => 'InstanceOf["FlightRecorder"]',
+  new => 1,
 );
 
-has version => (
-    is       => 'rw',
-    isa      => Str,
-    default  => 0,
-    required => 0,
-);
-
-# METHOD-RESOLUTION
-
-method AUTOLOAD () {
-
-    my @words = split /::/, our $AUTOLOAD;
-
-    my $method  = pop @words;
-    my $package = join '::', @words;
-
-    Carp::croak("Undefined subroutine &${package}::$method called")
-        unless Scalar::Util::blessed($self) && $self->isa(__PACKAGE__);
-
-    my @segments = @_;
-    my @results  = ();
-
-    # attempt to automate path casing
-    while (my ($path, $param) = splice @segments, 0, 2) {
-        my $casing = $self->casing;
-
-        if (defined $param and $casing eq 'lowercase') {
-            $path = lc $path;
-        }
-        elsif (defined $param and $casing eq 'snakecase') {
-            my ($first, @remaining) = split /_/, $path;
-            $path = join '', $first, map ucfirst, @remaining;
-        }
-        elsif (defined $param and $casing eq 'camelcase') {
-            my ($first, @remaining) = split /_/, $path;
-            $path = join '', $first, map ucfirst, @remaining;
-        }
-        elsif (defined $param and $casing eq 'pascalcase') {
-            $path = join '', map ucfirst, split /_/, $path;
-        }
-        elsif (defined $param and $casing eq 'uppercase') {
-            $path = uc $path;
-        }
-
-        push @results, $path, defined $param ? $param : ();
-    }
-
-    # return new resource instance dynamically
-    return $self->resource($method, @results);
-
+fun new_logger($self) {
+  FlightRecorder->new
 }
 
-# CONSTRUCTION
+has 'name' => (
+  is => 'ro',
+  isa => 'Str',
+  new => 1,
+);
 
-method BUILD () {
+fun new_name($self) {
+  "@{[ref($self)]} (@{[$self->version]})"
+}
 
-    my $ident = $self->identifier;
-    my $agent = $self->user_agent;
+has 'retries' => (
+  is => 'ro',
+  isa => 'Int',
+  def => 0,
+);
 
-    # identify the API client
-    $agent->transactor->name($ident);
+has 'timeout' => (
+  is => 'ro',
+  isa => 'Int',
+  def => 10,
+);
 
-    return $self;
+has 'url' => (
+  is => 'ro',
+  isa => 'InstanceOf["Mojo::URL"]',
+  req => 1,
+);
 
+has 'user_agent' => (
+  is => 'ro',
+  isa => 'InstanceOf["Mojo::UserAgent"]',
+  new => 1,
+);
+
+fun new_user_agent($self) {
+  Mojo::UserAgent->new
+}
+
+has 'version' => (
+  is => 'ro',
+  isa => 'Str',
+  new => 1,
+);
+
+fun new_version($self) {
+  $self->VERSION || 0.01
+}
+
+# BUILD
+
+method build_args($args) {
+  if (!$args->{url}) {
+    $args->{url} = join('/', @{$self->base(%$args)}) if $self->can('base');
+  }
+  if (!ref $args->{url}) {
+    $args->{url} = Mojo::URL->new($args->{url}) if $args->{url};
+  }
+
+  return $args;
 }
 
 # METHODS
 
-method PREPARE ($ua, $tx, %args) {
+method create(Any %args) {
 
-    if (my $credentials = $self->credentials) {
+  return $self->dispatch(%args, method => 'post');
+}
 
-        # process credentials
-        $credentials->process($tx);
+method delete(Any %args) {
 
+  return $self->dispatch(%args, method => 'delete');
+}
+
+method dispatch(Str :$method = 'get', Any %args) {
+  my $log = $self->logger->info("@{[uc($method)]} @{[$self->url->to_string]}");
+
+  my $result = $self->execute(%args, method => $method);
+
+  $log->end;
+
+  return $result;
+}
+
+method fetch(Any %args) {
+
+  return $self->dispatch(%args, method => 'get');
+}
+
+method patch(Any %args) {
+
+  return $self->dispatch(%args, method => 'patch');
+}
+
+method update(Any %args) {
+
+  return $self->dispatch(%args, method => 'put');
+}
+
+method prepare(Object $ua, Object $tx, Any %args) {
+  $self->set_auth($ua, $tx, %args);
+  $self->set_headers($ua, $tx, %args);
+  $self->set_identity($ua, $tx, %args);
+
+  return $self;
+}
+
+method process(Object $ua, Object $tx, Any %args) {
+
+  return $self;
+}
+
+method resource(Str @segments) {
+  my $object = ref($self)->new($self->serialize);
+
+  $object->url->path(join '/', @segments) if @segments;
+
+  return $object;
+}
+
+method serialize() {
+
+  return {
+    debug => $self->debug,
+    fatal => $self->fatal,
+    name => $self->name,
+    retries => $self->retries,
+    timeout => $self->timeout,
+    url => $self->url->to_string,
+  };
+}
+
+method set_auth($ua, $tx, %args) {
+  if ($self->can('auth')) {
+    $tx->req->url->userinfo(join ':', @{$self->auth});
+  }
+
+  return $self;
+}
+
+method set_headers($ua, $tx, %args) {
+  if ($self->can('headers')) {
+    $tx->req->headers->header(@$_) for @{$self->headers};
+  } else {
+    $tx->req->headers->header('Content-Type' => 'application/json');
+  }
+
+  return $self;
+}
+
+method set_identity($ua, $tx, %args) {
+  $tx->req->headers->header('User-Agent' => $self->name);
+
+  return $self;
+}
+
+method execute(Str :$method = 'get', Str :$path = '', Any %args) {
+  delete $args{method};
+
+  my $ua = $self->user_agent;
+  my $url = $self->url->clone;
+
+  my $query = $args{query} || {};
+  my $headers = $args{headers} || {};
+
+  $url->path(join '/', $url->path, $path) if $path;
+  $url->query($url->query->merge(%$query)) if keys %$query;
+
+  my @args;
+
+  # data handlers
+  for my $type (sort keys %{$ua->transactor->generators}) {
+    push @args, $type, delete $args{$type} if $args{$type};
+  }
+
+  # handle raw body value
+  push @args, delete $args{body} if exists $args{body};
+
+  # transaction prepare hook
+  $ua->on(prepare => fun ($ua, $tx) {
+    $self->prepare($ua, $tx, %args);
+  });
+
+  # client timeouts
+  $ua->max_redirects(0);
+  $ua->connect_timeout($self->timeout);
+  $ua->request_timeout($self->timeout);
+
+  # transaction
+  my ($ok, $tx, $req, $res);
+
+  # times to retry failures
+  my $retries = $self->retries;
+
+  # transaction retry loop
+  for (my $i = 0; $i < ($retries || 1); $i++) {
+    # execute transaction
+    $tx = $ua->start($ua->build_tx($method, $url, $headers, @args));
+    $self->process($ua, $tx, %args);
+
+    # transaction objects
+    $req = $tx->req;
+    $res = $tx->res;
+
+    # determine success/failure
+    $ok = $res->code ? $res->code !~ /(4|5)\d\d/ : 0;
+
+    # log activity
+    if ($req && $res) {
+      my $log = $self->logger;
+      my $msg = join " ", "attempt", ("#".($i+1)), ": $method", $url->to_string;
+
+      $log->debug("req: $msg")->data({
+        request => $req->to_string =~ s/\s*$/\n\n\n/r
+      });
+
+      $log->debug("res: $msg")->data({
+        response => $res->to_string =~ s/\s*$/\n\n\n/r
+      });
+
+      # output to the console where applicable
+      $log->info("res: $msg [@{[$res->code]}]");
+      $log->output if $self->debug;
     }
 
-    my $headers = $tx->req->headers;
-    my $url     = $tx->req->url;
+    # no retry necessary
+    last if $ok;
+  }
 
-    # default headers
-    $headers->header('Content-Type' => 'application/json');
+  # throw exception if fatal is truthy
+  if ($req && $res && $self->fatal && !$ok) {
+    my $code = $res->code;
 
-    return $self;
+    $self->stash(tx => $tx);
+    $self->throw([$code, uc "${code}_http_response"]);
+  }
 
-}
-
-method action ($method, %args) {
-
-    $method = uc($method || 'get');
-
-    # execute transaction and return response
-    return $self->$method(%args);
-
-}
-
-method create (%args) {
-
-    # execute transaction and return response
-    return $self->POST(%args);
-
-}
-
-method delete (%args) {
-
-    # execute transaction and return response
-    return $self->DELETE(%args);
-
-}
-
-method fetch (%args) {
-
-    # execute transaction and return response
-    return $self->GET(%args);
-
-}
-
-method resource (@segments) {
-
-    my $class = ref($self);
-
-    # build new resource instance
-    my $instance = $class->new(
-        debug      => $self->debug,
-        fatal      => $self->fatal,
-        retries    => $self->retries,
-        timeout    => $self->timeout,
-        user_agent => $self->user_agent,
-        identifier => $self->identifier,
-        version    => $self->version,
-        # attempt to deduce other attributes
-        %$self
-    );
-
-    # resource locator
-    my $url = $instance->url;
-
-    # modify resource locator if possible
-    $url->path(join '/', $self->url->path, @segments);
-
-    # return resource instance
-    return $instance;
-
-}
-
-method update (%args) {
-
-    # execute transaction and return response
-    return $self->PUT(%args);
-
+  # return transaction
+  return $tx;
 }
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-API::Client - General-Purpose API Client Abstraction
+API::Client
 
-=head1 VERSION
+=cut
 
-version 0.04
+=head1 ABSTRACT
+
+HTTP API Thin-Client Abstraction
+
+=cut
 
 =head1 SYNOPSIS
 
-    use API::Client;
+  package main;
 
-    my $client = API::Client->new(url => "https://api.example.com");
+  use API::Client;
 
-    $client->debug(1);
-    $client->fatal(1);
+  my $client = API::Client->new(url => 'https://httpbin.org');
 
-    my $resource = $client->resource;
-    my $results  = $resource->fetch;
+  # $client->resource('post');
 
-    # after some introspection
+  # $client->update(json => {...});
 
-    $resource->update(...);
+=cut
 
 =head1 DESCRIPTION
 
-This distribution provides an API client abstraction for rapidly developing
-client to interact with web services. Although this module can be used to
-interact with APIs directly, API::Client was designed to be consumed
-(subclassed) by higher-level purpose-specific API client code.
+This package provides an abstraction and method for rapidly developing HTTP API
+clients.
 
-=head1 THIN CLIENT
+=cut
 
-The thin api-client library is advantageous as it has complete API coverage and
-can easily adapt to changes in the API with minimal effort. As a thin-client
-library, this module does not map specific HTTP requests to specific routines,
-nor does it provide parameter validation, pagination, or other conventions
-found in typical API client implementations; Instead, it simply provides a
-simple and consistent mechanism for dynamically generating HTTP requests.
-Additionally, this module has support for debugging and retrying API calls as
-well as throwing exceptions when 4xx and 5xx server response codes are
-returned.
+=head1 INTEGRATES
 
-=head2 Building
+This package integrates behaviors from:
 
-    my $user = $client->users('c09e91a');
+L<Data::Object::Role::Buildable>
 
-    $user->action; # GET /users/c09e91a
-    $user->action('head'); # HEAD /users/c09e91a
-    $user->action('patch'); # PATCH /users/c09e91a
+L<Data::Object::Role::Stashable>
 
-Building up an HTTP request object is extremely easy, simply call method names
-which correspond to the API's path segments in the resource you wish to execute
-a request against. This module uses autoloading and returns a new instance with
-each method call. The following is the equivalent:
+L<Data::Object::Role::Throwable>
 
-=head2 Chaining
+=cut
 
-    my $user = $client->resource('users', 'c09e91a');
+=head1 LIBRARIES
 
-    # or
+This package uses type constraints from:
 
-    my $users = $client->users;
-    my $user  = $users->resource('c09e91a');
+L<Types::Standard>
 
-    # then
-
-    $user->action('put', %args); # PUT /users/c09e91a
-
-Because each call returns a new API instance configured with a resource locator
-based on the supplied parameters, reuse and request isolation are made simple,
-i.e., you will only need to configure the client once in your application.
-
-=head2 Fetching
-
-    my $users = $client->users;
-
-    # query-string parameters
-
-    $users->fetch( query => { ... } );
-
-    # equivalent to
-
-    my $users = $client->resource('users');
-
-    $users->action( get => ( query => { ... } ) );
-
-This example illustrates how you might fetch an API resource.
-
-=head2 Creating
-
-    my $users = $client->users;
-
-    # content-body parameters
-
-    $users->create( data => { ... } );
-
-    # query-string parameters
-
-    $users->create( query => { ... } );
-
-    # equivalent to
-
-    $client->resource('users')->action(
-        post => ( query => { ... }, data => { ... } )
-    );
-
-This example illustrates how you might create a new API resource.
-
-=head2 Updating
-
-    my $users = $client->users;
-    my $user  = $users->resource('c09e91a');
-
-    # content-body parameters
-
-    $user->update( data => { ... } );
-
-    # query-string parameters
-
-    $user->update( query => { ... } );
-
-    # or
-
-    my $user = $client->users('c09e91a');
-
-    $user->update(...);
-
-    # equivalent to
-
-    $client->resource('users')->action(
-        put => ( query => { ... }, data => { ... } )
-    );
-
-This example illustrates how you might update a new API resource.
-
-=head2 Deleting
-
-    my $users = $client->users;
-    my $user  = $users->resource('c09e91a');
-
-    # content-body parameters
-
-    $user->delete( data => { ... } );
-
-    # query-string parameters
-
-    $user->delete( query => { ... } );
-
-    # or
-
-    my $user = $client->users('c09e91a');
-
-    $user->delete(...);
-
-    # equivalent to
-
-    $client->resource('users')->action(
-        delete => ( query => { ... }, data => { ... } )
-    );
-
-This example illustrates how you might delete an API resource.
-
-=head2 Transacting
-
-    my $users = $client->resource('users', 'c09e91a');
-
-    my ($results, $transaction) = $users->action( ... );
-
-    my $request  = $transaction->req;
-    my $response = $transaction->res;
-
-    my $headers;
-
-    $headers = $request->headers;
-    $headers = $response->headers;
-
-    # etc
-
-This example illustrates how you can access the transaction object used to
-represent and process the HTTP transaction.
-
-=head2 Casing
-
-    $client->casing('lowercase');
-
-    my $settings = $client->users('c09e91a')->profile_settings;
-
-    # given casing as 'lowercase'
-    $settings->fetch( ... ); # GET /users/c09e91a/profile_settings
-
-    # given casing as 'uppercase'
-    $settings->fetch( ... ); # GET /USERS/C09E91A/PROFILE_SETTINGS
-
-    # given casing as 'camelcase'
-    $settings->fetch( ... ); # GET /users/c09e91a/profileSettings
-
-    # given casing as 'snakecase'
-    $settings->fetch( ... ); # GET /users/c09e91a/profileSettings
-
-    # given casing as 'pascalcase'
-    $settings->fetch( ... ); # GET /Users/c09e91a/ProfileSettings
-
-This example illustrates how you can configure the client to automatically
-handle the casing of path segments while continuing to use lowercase-userscore 
-separated string in your code. This is useful when interacting with an API that
-uses convetions foreign to that of your codebase.
+=cut
 
 =head1 ATTRIBUTES
 
-=head2 casing
+This package has the following attributes:
 
-    $client->casing;
-    $client->casing('lowercase');
-
-The casing attribute should be set to either C<lowercase>, C<snakecase>,
-C<camelcase>, C<pascalcase>, or C<uppercase>, which determines how URL segments
-should be formatted.
-
-=head2 credentials
-
-    $client->credentials;
-    $client->credentials(API::Client::Credentials->new(...));
-
-The credentials attribute sets the pre-configured Credentials object
-that, if defined, will be used to modify the Transaction object to include
-authentication credentials. This attribute expects an object derived from the
-L<API::Client::Credentials> class.
-
-=head2 identifier
-
-    $client->identifier;
-    $client->identifier('API::Client (Perl)');
-
-The identifier attribute should be set to a string that identifies your
-application.
+=cut
 
 =head2 debug
 
-    $client->debug;
-    $client->debug(1);
+  debug(Bool)
 
-The debug attribute if true prints HTTP requests and responses to standard out.
+This attribute is read-only, accepts C<(Bool)> values, and is optional.
+
+=cut
 
 =head2 fatal
 
-    $client->fatal;
-    $client->fatal(1);
+  fatal(Bool)
 
-The fatal attribute if true promotes 4xx and 5xx server response codes to
-exceptions, a L<API::Client::Exception> object.
+This attribute is read-only, accepts C<(Bool)> values, and is optional.
+
+=cut
+
+=head2 logger
+
+  logger(InstanceOf["FlightRecorder"])
+
+This attribute is read-only, accepts C<(InstanceOf["FlightRecorder"])> values, and is optional.
+
+=cut
+
+=head2 name
+
+  name(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
 
 =head2 retries
 
-    $client->retries;
-    $client->retries(10);
+  retries(Int)
 
-The retries attribute determines how many times an HTTP request should be
-retried if a 4xx or 5xx response is received. This attribute defaults to 0.
+This attribute is read-only, accepts C<(Int)> values, and is optional.
+
+=cut
 
 =head2 timeout
 
-    $client->timeout;
-    $client->timeout(5);
+  timeout(Int)
 
-The timeout attribute determines how long an HTTP connection should be kept
-alive. This attribute defaults to 10.
+This attribute is read-only, accepts C<(Int)> values, and is optional.
+
+=cut
 
 =head2 url
 
-    $client->url;
-    $client->url(Mojo::URL->new('https://api.example.com'));
+  url(InstanceOf["Mojo::URL"])
 
-The url attribute sets the base/pre-configured URL object that will be used in
-all HTTP requests. This attribute expects a L<Mojo::URL> object.
+This attribute is read-only, accepts C<(InstanceOf["Mojo::URL"])> values, and is optional.
+
+=cut
 
 =head2 user_agent
 
-    $client->user_agent;
-    $client->user_agent(Mojo::UserAgent->new);
+  user_agent(InstanceOf["Mojo::UserAgent"])
 
-The user_agent attribute sets the pre-configured UserAgent object that will be
-used in all HTTP requests. This attribute expects a L<Mojo::UserAgent> object.
+This attribute is read-only, accepts C<(InstanceOf["Mojo::UserAgent"])> values, and is optional.
+
+=cut
+
+=head2 version
+
+  version(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
 
 =head1 METHODS
 
-=head2 action
+This package implements the following methods:
 
-    my $result = $client->action($verb, %args);
-
-    # e.g.
-
-    $client->action('head', %args);    # HEAD request
-    $client->action('options', %args); # OPTIONS request
-    $client->action('patch', %args);   # PATCH request
-
-The action method issues a request to the API resource represented by the
-object. The first parameter will be used as the HTTP request method. The
-arguments, expected to be a list of key/value pairs, will be included in the
-request if the key is either C<data> or C<query>.
+=cut
 
 =head2 create
 
-    my $results = $client->create(%args);
-
-    # or
-
-    $client->POST(%args);
+  create(Any %args) : InstanceOf["Mojo::Transaction"]
 
 The create method issues a C<POST> request to the API resource represented by
-the object. The arguments, expected to be a list of key/value pairs, will be
-included in the request if the key is either C<data> or C<query>.
+the object.
+
+=over 4
+
+=item create example #1
+
+  # given: synopsis
+
+  $client->resource('post')->create(
+    json => {active => 1}
+  );
+
+=back
+
+=cut
 
 =head2 delete
 
-    my $results = $client->delete(%args);
-
-    # or
-
-    $client->DELETE(%args);
+  delete(Any %args) : InstanceOf["Mojo::Transaction"]
 
 The delete method issues a C<DELETE> request to the API resource represented by
-the object. The arguments, expected to be a list of key/value pairs, will be
-included in the request if the key is either C<data> or C<query>.
+the object.
+
+=over 4
+
+=item delete example #1
+
+  # given: synopsis
+
+  $client->resource('delete')->delete;
+
+=back
+
+=cut
+
+=head2 dispatch
+
+  dispatch(Str :$method = 'get', Any %args) : InstanceOf["Mojo::Transaction"]
+
+The dispatch method issues a request to the API resource represented by the
+object.
+
+=over 4
+
+=item dispatch example #1
+
+  # given: synopsis
+
+  $client->resource('get')->dispatch;
+
+=back
+
+=over 4
+
+=item dispatch example #2
+
+  # given: synopsis
+
+  $client->resource('post')->dispatch(
+    method => 'post', body => 'active=1'
+  );
+
+=back
+
+=over 4
+
+=item dispatch example #3
+
+  # given: synopsis
+
+  $client->resource('get')->dispatch(
+    method => 'get', query => {active => 1}
+  );
+
+=back
+
+=over 4
+
+=item dispatch example #4
+
+  # given: synopsis
+
+  $client->resource('post')->dispatch(
+    method => 'post', json => {active => 1}
+  );
+
+=back
+
+=over 4
+
+=item dispatch example #5
+
+  # given: synopsis
+
+  $client->resource('post')->dispatch(
+    method => 'post', form => {active => 1}
+  );
+
+=back
+
+=over 4
+
+=item dispatch example #6
+
+  # given: synopsis
+
+  $client->resource('put')->dispatch(
+    method => 'put', json => {active => 1}
+  );
+
+=back
+
+=over 4
+
+=item dispatch example #7
+
+  # given: synopsis
+
+  $client->resource('patch')->dispatch(
+    method => 'patch', json => {active => 1}
+  );
+
+=back
+
+=over 4
+
+=item dispatch example #8
+
+  # given: synopsis
+
+  $client->resource('delete')->dispatch(
+    method => 'delete', json => {active => 1}
+  );
+
+=back
+
+=cut
 
 =head2 fetch
 
-    my $results = $client->fetch(%args);
-
-    # or
-
-    $client->GET(%args);
+  fetch(Any %args) : InstanceOf["Mojo::Transaction"]
 
 The fetch method issues a C<GET> request to the API resource represented by the
-object. The arguments, expected to be a list of key/value pairs, will be
-included in the request if the key is either C<data> or C<query>.
+object.
+
+=over 4
+
+=item fetch example #1
+
+  # given: synopsis
+
+  $client->resource('get')->fetch;
+
+=back
+
+=cut
+
+=head2 patch
+
+  patch(Any %args) : InstanceOf["Mojo::Transaction"]
+
+The patch method issues a C<PATCH> request to the API resource represented by
+the object.
+
+=over 4
+
+=item patch example #1
+
+  # given: synopsis
+
+  $client->resource('patch')->patch(
+    json => {active => 1}
+  );
+
+=back
+
+=cut
+
+=head2 prepare
+
+  prepare(Object $ua, Object $tx, Any %args) : Object
+
+The prepare method acts as a C<before> hook triggered before each request where
+you can modify the transactor objects.
+
+=over 4
+
+=item prepare example #1
+
+  # given: synopsis
+
+  require Mojo::UserAgent;
+  require Mojo::Transaction::HTTP;
+
+  $client->prepare(
+    Mojo::UserAgent->new,
+    Mojo::Transaction::HTTP->new
+  );
+
+=back
+
+=cut
+
+=head2 process
+
+  process(Object $ua, Object $tx, Any %args) : Object
+
+The process method acts as an C<after> hook triggered after each response where
+you can modify the transactor objects.
+
+=over 4
+
+=item process example #1
+
+  # given: synopsis
+
+  require Mojo::UserAgent;
+  require Mojo::Transaction::HTTP;
+
+  $client->process(
+    Mojo::UserAgent->new,
+    Mojo::Transaction::HTTP->new
+  );
+
+=back
+
+=cut
+
+=head2 resource
+
+  resource(Str @segments) : Object
+
+The resource method returns a new instance of the object for the API resource
+endpoint specified.
+
+=over 4
+
+=item resource example #1
+
+  # given: synopsis
+
+  $client->resource('status', 200);
+
+=back
+
+=cut
+
+=head2 serialize
+
+  serialize() : HashRef
+
+The serialize method serializes and returns the object as a C<hashref>.
+
+=over 4
+
+=item serialize example #1
+
+  # given: synopsis
+
+  $client->serialize;
+
+=back
+
+=cut
 
 =head2 update
 
-    my $results = $client->update(%args);
-
-    # or
-
-    $client->PUT(%args);
+  update(Any %args) : InstanceOf["Mojo::Transaction"]
 
 The update method issues a C<PUT> request to the API resource represented by
-the object. The arguments, expected to be a list of key/value pairs, will be
-included in the request if the key is either C<data> or C<query>.
+the object.
+
+=over 4
+
+=item update example #1
+
+  # given: synopsis
+
+  $client->resource('put')->update(
+    json => {active => 1}
+  );
+
+=back
+
+=cut
 
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk, C<awncorp@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+Copyright (C) 2011-2019, Al Newkirk, et al.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/api-client/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/api-client/wiki>
+
+L<Project|https://github.com/iamalnewkirk/api-client>
+
+L<Initiatives|https://github.com/iamalnewkirk/api-client/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/api-client/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/api-client/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/api-client/issues>
 
 =cut

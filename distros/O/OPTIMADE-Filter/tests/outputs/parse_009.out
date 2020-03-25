@@ -1,0 +1,15 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'name' => [
+                                                      'author'
+                                                    ]
+                                        }, 'OPTIMADE::Filter::Property' ),
+                                 ' someone '
+                               ],
+                 'operator' => '='
+               }, 'OPTIMADE::Filter::Comparison' );
+== Filter ==
+(author = " someone ")
+== SQL ==
+('author' = " someone ")

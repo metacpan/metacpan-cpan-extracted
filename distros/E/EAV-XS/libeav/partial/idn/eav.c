@@ -53,6 +53,18 @@ eav_is_email (eav_t *eav, const char *email, size_t length)
     if (eav->idnmsg)
         eav->idnmsg = NULL;
 
+#ifdef EAV_EXTRA
+    if (eav->result.lpart != NULL) {
+        free (eav->result.lpart);
+        eav->result.lpart = NULL;
+    }
+
+    if (eav->result.domain != NULL) {
+        free (eav->result.domain);
+        eav->result.domain = NULL;
+    }
+#endif
+
     if (eav->utf8)
         eav->result = eav->utf8_cb (email, length, eav->tld_check);
     else
@@ -137,13 +149,28 @@ eav_init (eav_t *eav)
     eav->ascii_cb = NULL;
     eav->initialized = false;
     eav->errcode = EEAV_NO_ERROR;
+
+#ifdef EAV_EXTRA
+    eav->result.lpart = NULL;
+    eav->result.domain = NULL;
+#endif
 }
 
 
 extern void
 eav_free (eav_t *eav)
 {
+#ifdef EAV_EXTRA
+    if (eav->result.lpart != NULL) {
+        free (eav->result.lpart);
+        eav->result.lpart = NULL;
+    }
+
+    if (eav->result.domain != NULL) {
+        free (eav->result.domain);
+        eav->result.domain = NULL;
+    }
+#else
     (void)(eav);
+#endif
 }
-
-

@@ -1,0 +1,50 @@
+{
+   "abstract" : "fast base64, base32, base16 encode/decode functions",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Encode-Base2N",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "XS::Install" : "v1.2.16",
+            "XS::libpanda" : "v1.3.13"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Export::XS" : "0",
+            "XS::Install" : "v1.2.16",
+            "XS::libpanda" : "v1.3.13"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

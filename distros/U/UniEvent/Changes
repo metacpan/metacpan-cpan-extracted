@@ -1,2 +1,7 @@
+1.0.1     24.03.2020
+           - fix UB with static logging module
+           - fix Poll for windows
+           - fix tests for windows
+           - fix socketpair for windows
 1.0.0     17.03.2020
            - first time uploaded to cpan (no docs yet)

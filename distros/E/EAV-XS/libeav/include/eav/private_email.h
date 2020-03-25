@@ -10,7 +10,6 @@
     .is_ipv6 = false, \
     .is_domain = false, \
     .rc = 0, \
-    .at = NULL, \
     .idn_rc = idn_success \
 }
 #else
@@ -19,7 +18,6 @@
     .is_ipv6 = false, \
     .is_domain = false, \
     .rc = 0, \
-    .at = NULL, \
     .idn_rc = 0 \
 }
 #endif
@@ -32,14 +30,12 @@
 \
     ch = strrchr ((e), '@'); \
 \
-    if (ch == NULL || ch == end) { \
-        result.at = NULL; \
+    if (ch == NULL || ch + 1 == end) { \
         result.rc = inverse(EEAV_DOMAIN_EMPTY); \
         return result; \
     } \
 \
     if (ch - (e) > VALID_LPART_LEN) { \
-        result.at = ch; \
         result.rc = inverse(EEAV_LPART_TOO_LONG); \
         return result; \
     } \

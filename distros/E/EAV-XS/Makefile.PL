@@ -13,7 +13,7 @@ sub myconfigure() {
     if (prompt("Use default options (y/n)?", "y") =~ /^y/i) {
         my $cfg = &build_auto();
 
-        if ($^O eq "freebsd") {
+        if ($^O =~ /bsd/) {
             $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.bsd";
         }
 
@@ -52,7 +52,7 @@ EOF
     my $rfc_opts = join(" ", &set_rfc_options());
     $cfg->{'macro'}->{'LIBEAV_OPTIONS'} .= " ${rfc_opts}";
 
-    if ($^O eq "freebsd") {
+    if ($^O =~ /bsd/) {
         $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.bsd";
     }
 
@@ -84,6 +84,7 @@ WriteMakefile(
     AUTHOR            => 'Vitaliy V. Tokarev <vitaliy.tokarev@gmail.com>',
     LICENSE           => 'freebsd',
     INC               => '-Ilibeav/include',
+    DEFINE            => '-DEAV_EXTRA',
     OBJECT            => '$(O_FILES)',
     MYEXTLIB          => 'libeav/libeav.a',
     depend => {
@@ -106,13 +107,16 @@ sub MY::subdir_x {
 sub MY::postamble {
     return <<'EOL';
 $(MYEXTLIB): libeav/Makefile
-	$(MAKE) -C libeav static $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE)
+	$(MAKE) -C libeav static $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE) \
+		INCLUDES=$(DEFINE)
 
 clean-libeav:
-	$(MAKE) -C libeav clean $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE)
+	$(MAKE) -C libeav clean $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE) \
+		INCLUDES=$(DEFINE)
 
 check-libeav:
-	$(MAKE) -C libeav check $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE)
+	$(MAKE) -C libeav check $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE) \
+		INCLUDES=$(DEFINE)
 
 EOL
 }
@@ -198,7 +202,7 @@ for instance, /opt/local.
 EOF
             my $retry = prompt
                 "Would you try to set idnkit install directory (y/n)?",
-                "y";
+                "n";
 
             if ($retry =~ /^[nN]/) {
                 print <<'EOF';

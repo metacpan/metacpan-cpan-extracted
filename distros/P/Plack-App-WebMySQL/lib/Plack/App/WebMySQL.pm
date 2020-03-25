@@ -12,7 +12,7 @@ use File::Share ':all';
 use File::Spec;
 our %form;	#data from the previous page
 our $error = "";	#error flag
-our $VERSION ="3.02";	#version of this software
+our $VERSION ="3.03";	#version of this software
 our @ISA = qw(Exporter);
 our @EXPORT = qw(%form $error $VERSION);
 ###############################################################################
@@ -26,8 +26,8 @@ sub new{
 	my $staticApp = Plack::App::MCCS->new(root => $staticDir)->to_app;
 		
 	my $builder = Plack::Builder->new();
-	$builder->mount("/app" => $app);	
-	$builder->mount("/" => $staticApp);
+	$builder->mount("/" => $app);
+	$builder->mount("/static" => $staticApp);
 	return $builder;
 }
 ###############################################################################

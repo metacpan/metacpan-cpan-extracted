@@ -1,7 +1,7 @@
 #include "lib/test.h"
 
 TEST_CASE("work", "[work]") {
-    AsyncTest test(1000);
+    AsyncTest test(10000);
     WorkSP w = new Work(test.loop);
 
     SECTION("main") {
@@ -26,7 +26,7 @@ TEST_CASE("work", "[work]") {
         w->cancel();
         test.run(); // noop
         // can't test active work because it starts executing immediately if there are free workers and thus
-        // there is probability that it can't be canceled 
+        // there is probability that it can't be canceled
     }
 
     SECTION("factory") {

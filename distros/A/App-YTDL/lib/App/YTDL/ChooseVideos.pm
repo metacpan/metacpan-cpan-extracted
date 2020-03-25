@@ -31,7 +31,7 @@ sub _my_sort {
 
 
 sub choose_videos {
-    my ( $opt, $info, $tmp, $ex, $prompt ) = @_;
+    my ( $set, $opt, $data, $tmp, $ex, $prompt ) = @_;
     my $length_view_count  = 0;
     my $length_video_id    = 0;
     my $length_upload_date = 0;
@@ -39,12 +39,12 @@ sub choose_videos {
     my $has_view_count     = 0;
     my $has_duration       = 0;
     for my $video_id ( keys %{$tmp->{$ex}} ) {
-        $has_duration++   if $tmp->{$ex}{$video_id}{duration} ne '-:--:--';
-        $has_date_sort++  if $tmp->{$ex}{$video_id}{date_sort};
-        $has_view_count++ if $tmp->{$ex}{$video_id}{view_count};
-        $length_video_id    = length $video_id                           if length $video_id > $length_video_id;
-        $length_view_count  = length $tmp->{$ex}{$video_id}{view_count}  if length $tmp->{$ex}{$video_id}{view_count} > $length_view_count;
-        $length_upload_date = length $tmp->{$ex}{$video_id}{upload_date} if length $tmp->{$ex}{$video_id}{upload_date} > $length_upload_date;
+        $has_duration++                                                  if defined $tmp->{$ex}{$video_id}{duration} && $tmp->{$ex}{$video_id}{duration} ne '-:--:--';
+        $has_date_sort++                                                 if defined $tmp->{$ex}{$video_id}{date_sort};
+        $has_view_count++                                                if defined $tmp->{$ex}{$video_id}{view_count};
+        $length_video_id    = length $video_id                           if                                                length $video_id                           > $length_video_id;
+        $length_view_count  = length $tmp->{$ex}{$video_id}{view_count}  if defined $tmp->{$ex}{$video_id}{view_count}  && length $tmp->{$ex}{$video_id}{view_count}  > $length_view_count;
+        $length_upload_date = length $tmp->{$ex}{$video_id}{upload_date} if defined $tmp->{$ex}{$video_id}{upload_date} && length $tmp->{$ex}{$video_id}{upload_date} > $length_upload_date;
     }
     if ( $length_upload_date && $length_upload_date < 10 ) {
         $length_upload_date = 10;
@@ -64,7 +64,7 @@ sub choose_videos {
         my $index = $#pre;
         my $mark = [];
         my $sort_item  = $opt->{list_sort_item};
-        my $sort_order = $opt->{list_sort_order};
+        my $sort_order = $set->{list_sort_order};
         if ( $sort_item eq 'view_count_raw' && ! $has_view_count ) {
             $sort_item = 'upload_date';
         }
@@ -112,29 +112,29 @@ sub choose_videos {
             $index++;
             push @$mark, $index if any { $video_id eq $_ } keys %chosen_video_ids;
         }
-        my $choices = [ @pre, @videos ];
+        my $menu = [ @pre, @videos ];
         # Choose
         my @idx = choose(
-            $choices,
+            $menu,
             { prompt => $prompt . ':', layout => 3, index => 1, clear_screen => 1, mark => $mark,
               undef => $back, meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
         );
-        if ( ! defined $idx[0] || ! defined $choices->[$idx[0]] ) {
+        if ( ! defined $idx[0] || ! defined $menu->[$idx[0]] ) {
             if ( length $regexp ) {
-                delete @{$info->{$ex}}{ @last_chosen_video_ids };
+                delete @{$data->{$ex}}{ @last_chosen_video_ids };
                 $regexp = '';
                 next FILTER;
             }
-            delete @{$info->{$ex}}{ keys %chosen_video_ids };
+            delete @{$data->{$ex}}{ keys %chosen_video_ids };
             return;
         }
-        my $choice = $choices->[$idx[0]];
+        my $choice = $menu->[$idx[0]];
         if ( $choice eq $filter ) {
             shift @idx;
             @last_chosen_video_ids = ();
             for my $i ( @idx ) {
                 my $video_id = $tmp_video_ids[$i - @pre];
-                $info->{$ex}{$video_id} = $tmp->{$ex}{$video_id};
+                $data->{$ex}{$video_id} = $tmp->{$ex}{$video_id};
                 $chosen_video_ids{$video_id}++;
                 push @last_chosen_video_ids, $video_id;
             }
@@ -142,7 +142,7 @@ sub choose_videos {
                 if ( none { $m == $_ } @idx ) {
                     my $video_id = $tmp_video_ids[$m - @pre];
                     delete $chosen_video_ids{$video_id};
-                    delete $info->{$ex}{$video_id};
+                    delete $data->{$ex}{$video_id};
                 }
             }
             my $trs = Term::Form->new();
@@ -159,7 +159,7 @@ sub choose_videos {
             @last_chosen_video_ids = ();
             for my $i ( @idx ) {
                 my $video_id = $tmp_video_ids[$i - @pre];
-                $info->{$ex}{$video_id} = $tmp->{$ex}{$video_id};
+                $data->{$ex}{$video_id} = $tmp->{$ex}{$video_id};
                 $chosen_video_ids{$video_id}++;
                 push @last_chosen_video_ids, $video_id;
             }
@@ -167,7 +167,7 @@ sub choose_videos {
                 if ( none { $m == $_ } @idx ) {
                     my $video_id = $tmp_video_ids[$m - @pre];
                     delete $chosen_video_ids{$video_id};
-                    delete $info->{$ex}{$video_id};
+                    delete $data->{$ex}{$video_id};
                 }
             }
             if ( length $regexp ) {
@@ -183,13 +183,13 @@ sub choose_videos {
 
 
 sub set_sort_videolist {
-    my ( $opt ) = @_;
+    my ( $set, $opt ) = @_;
     my $backup_item  = $opt->{list_sort_item};
-    my $backup_order = $opt->{list_sort_order};
+    my $backup_order = $set->{list_sort_order};
     my $sort_items = [ 'upload_date', 'title', 'view_count_raw', 'duration' ];
     my $confirm = '  CONFIRM';
     my @pre = ( undef, $confirm );
-    my $choices = [ @pre, map { my $s = $_; $s =~ s/_raw\z//; $s =~ s/_/ /g; '- ' . $s } @$sort_items ];
+    my $menu = [ @pre, map { my $s = $_; $s =~ s/_raw\z//; $s =~ s/_/ /g; '- ' . $s } @$sort_items ];
 
     ITEM: while ( 1 ) {
         my $current = $opt->{list_sort_item};
@@ -197,14 +197,14 @@ sub set_sort_videolist {
         $current =~ s/_/ /g;
         my $prompt = sprintf 'Sort item: [%s]', $current;
         my $idx = choose (
-            $choices,
+            $menu,
             { prompt => $prompt, clear_screen => 0, layout => 3, index => 1, undef => '  BACK' }
         );
-        if ( ! defined $idx || ! defined $choices->[$idx] ) {
+        if ( ! defined $idx || ! defined $menu->[$idx] ) {
             $opt->{list_sort_item} = $backup_item;
             return;
         }
-        if ( $choices->[$idx] eq $confirm ) {
+        if ( $menu->[$idx] eq $confirm ) {
             last ITEM;
         }
         $idx -= @pre;
@@ -215,21 +215,21 @@ sub set_sort_videolist {
         my $curr_sort_item = $opt->{list_sort_item};
         $curr_sort_item =~ s/_raw\z//;
         $curr_sort_item =~ s/_/ /g;
-        my $order_prompt = sprintf 'Sort order "%s": [%s]', $curr_sort_item, $opt->{list_sort_order};
+        my $order_prompt = sprintf 'Sort order "%s": [%s]', $curr_sort_item, $set->{list_sort_order};
         my $choice = choose (
             [ @pre, '- Asc', '- Desc' ],
             { prompt => $order_prompt, clear_screen => 0, layout => 3, undef => '  BACK' }
         );
         if ( ! defined $choice ) {
-            $opt->{list_sort_order} = $backup_order;
+            $set->{list_sort_order} = $backup_order;
             return;
         }
         if ( $choice eq $confirm ) {
-            $opt->{change}++;
+            $set->{change}++;
             return;
         }
         $choice =~ s/^-\s//;
-        $opt->{list_sort_order} = $choice;
+        $set->{list_sort_order} = $choice;
     }
 }
 

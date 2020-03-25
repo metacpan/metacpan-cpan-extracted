@@ -19,7 +19,7 @@ perl:
 
 before_install:
     - eval $(curl https://travis-perl.github.io/init) --auto
-    - cpanm ExtUtils::MakeMaker
+    - cpanm --notest ExtUtils::MakeMaker
 
 matrix:
   include:

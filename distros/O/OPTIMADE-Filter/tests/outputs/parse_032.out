@@ -1,0 +1,15 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'name' => [
+                                                      'list'
+                                                    ]
+                                        }, 'OPTIMADE::Filter::Property' ),
+                                 'string"with"quotes'
+                               ],
+                 'operator' => 'CONTAINS'
+               }, 'OPTIMADE::Filter::Comparison' );
+== Filter ==
+(list CONTAINS "string\"with\"quotes")
+== SQL ==
+('list' LIKE "%string""with""quotes%")

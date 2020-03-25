@@ -72,6 +72,12 @@ DEPENDENCIES
     When run Makefile.PL, you will be asked to configure EAV::XS and at this
     stage you may select the IDN library to build with.
 
+    Makefile.PL requirements:
+
+    *   ExtUtils::MakeMaker 5.62 or newer
+
+    *   ExtUtils::PkgConfig 1.16 or newer
+
 METHODS
     *   $eav = new ( [%options] )
 
@@ -103,6 +109,36 @@ METHODS
 
         Returns an error message for the last email address tested by
         is_email() method.
+
+    *   $lpart = get_lpart ()
+
+        Returns local-part of the email after the is_email method call. If
+        the email address is invalid, then get_lpart returns nothing.
+
+    *   $domain = get_domain ()
+
+        Returns domain-part of the email after the is_email method call. If
+        the email address is invalid, then get_domain returns nothing. The
+        returned value $domain could be an IPv4 address either IPv6 one,
+        depending on the specified email address passed to is_email ().
+
+    *   $bool = get_is_ipv4 ()
+
+        Returns whether or not the domain-part of the email contains an IPv4
+        address, after the is_email method call. If the email address is
+        invalid, then get_is_ipv4 returns false.
+
+    *   $bool = get_is_ipv6 ()
+
+        Returns whether or not the domain-part of the email contains an IPv6
+        address, after the is_email method call. If the email address is
+        invalid, then get_is_ipv6 returns false.
+
+    *   $bool = get_is_domain ()
+
+        Returns whether or not the domain-part of the email contains an
+        domain name, after the is_email method call. If the email address is
+        invalid, then get_is_domain returns false.
 
   TLD INFORMATION
     The current list of all TLDs can be found on IANA Root Zone Database

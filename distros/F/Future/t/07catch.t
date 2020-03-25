@@ -23,7 +23,7 @@ use Future;
 
    $f1->done( results => "here" );
 
-   is_deeply( [ $fseq->get ], [ results => "here" ], '$fseq succeeds when $f1 succeeds' );
+   is_deeply( [ $fseq->result ], [ results => "here" ], '$fseq succeeds when $f1 succeeds' );
 
    undef $f1;
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
@@ -78,7 +78,7 @@ use Future;
          sub { Future->done( default => "handler" ) },
       );
 
-   is_deeply( [ $fseq->get ], [ default => "handler" ],
+   is_deeply( [ $fseq->result ], [ default => "handler" ],
       '->catch accepts a default handler' );
 }
 
@@ -107,7 +107,7 @@ use Future;
    is( scalar ( Future->fail( "message", test => )
             ->then( sub { die "then &done should not be invoked" },
                test => sub { Future->done( 1234 ) },
-               sub { die "then &fail should not be invoked" } )->get ),
+               sub { die "then &fail should not be invoked" } )->result ),
       1234, 'catch semantics via ->then' );
 }
 

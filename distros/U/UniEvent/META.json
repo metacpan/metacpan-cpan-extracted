@@ -28,12 +28,12 @@
             "Export::XS" : "v3.0.4",
             "Net::SockAddr" : "v1.0.1",
             "Test::Catch" : "v1.0.13",
-            "XS::Framework" : "v1.2.8",
+            "XS::Framework" : "v1.2.9",
             "XS::Install" : "v1.2.16",
             "XS::libcares" : "v1.1.1.6",
             "XS::libcatch" : "v1.1.0",
-            "XS::libpanda" : "v1.3.12",
-            "XS::libuv" : "v1.34.2.1",
+            "XS::libpanda" : "v1.3.13",
+            "XS::libuv" : "v1.35.0.0",
             "next::XS" : "v1.0.7"
          }
       },
@@ -41,11 +41,11 @@
          "requires" : {
             "Export::XS" : "v3.0.4",
             "Net::SockAddr" : "v1.0.1",
-            "XS::Framework" : "v1.2.8",
+            "XS::Framework" : "v1.2.9",
             "XS::Install" : "v1.2.16",
             "XS::libcares" : "v1.1.1.6",
-            "XS::libpanda" : "v1.3.12",
-            "XS::libuv" : "v1.34.2.1",
+            "XS::libpanda" : "v1.3.13",
+            "XS::libuv" : "v1.35.0.0",
             "next::XS" : "v1.0.7"
          }
       },
@@ -59,16 +59,16 @@
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "XS::Framework" : "v1.2.8",
+            "XS::Framework" : "v1.2.9",
             "XS::libcares" : "v1.1.1.6",
             "XS::libcatch" : "v1.1.0",
-            "XS::libpanda" : "v1.3.12",
-            "XS::libuv" : "v1.34.2.1",
+            "XS::libpanda" : "v1.3.13",
+            "XS::libuv" : "v1.35.0.0",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

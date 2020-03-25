@@ -136,6 +136,12 @@ To have full trace for C++ exceptions, they must be inherited from C<panda::Back
 The thrown C<Perl> exception should be either object or scalar (i.e. not reference to
 scalar) to be able to attach backtraces to it.
 
+=head1 PORTABILITIY ISSUES
+
+It seems that underlying C<backtrace> call from L<XS::libpanda> does not always return
+correct/full backtrace. That means, that C/C++ backtrace does not works reliable.
+If you know workaround, please submit a patch.
+
 =head1 SEE ALSO
 
 L<XS::Framework>

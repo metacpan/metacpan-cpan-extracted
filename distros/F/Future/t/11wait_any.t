@@ -59,7 +59,7 @@ use Future;
    undef @on_ready_args;
 
    ok( $future->is_ready, '$future now ready after f1 ready' );
-   is_deeply( [ $future->get ], [ one => 1 ], 'results from $future->get' );
+   is_deeply( [ $future->result ], [ one => 1 ], 'results from $future->result' );
 
    is_refcount( $future, 1, '$future has refcount 1 at end of test' );
    undef $future;
@@ -81,7 +81,7 @@ use Future;
 
    is( $future->failure, "It fails\n", '$future->failure yields exception' );
 
-   is( exception { $future->get }, "It fails\n", '$future->get throws exception' );
+   is( exception { $future->result }, "It fails\n", '$future->result throws exception' );
 
    ok( $f2->is_cancelled, '$f2 cancelled after a failure' );
 }
@@ -146,7 +146,7 @@ use Future;
 
    ok( $f->is_ready, 'wait_any on no Futures already done' );
    is( scalar $f->failure, "Cannot ->wait_any with no subfutures",
-       '->get on empty wait_any is empty' );
+       '->result on empty wait_any is empty' );
 }
 
 # wait_any instance disappearing partway through cancellation (RT120468)

@@ -8,10 +8,10 @@ use Test::Fatal;
 
 use Future;
 
-# ->get throws an object
+# ->result throws an object
 {
    my $f = Future->fail( "message\n", category => qw( a b ) );
-   my $e = exception { $f->get };
+   my $e = exception { $f->result };
 
    # TODO: some sort of predicate test function to check this
    is( $e->message,  "message\n", '$e->message from exceptional get' );
@@ -42,7 +42,7 @@ use Future;
 {
    my $f1 = Future->fail( "message\n", category => qw( e f ) );
    my $f2 = Future->call( sub {
-      $f1->get;
+      $f1->result;
    });
 
    ok( $f2->is_failed, '$f2 failed' );

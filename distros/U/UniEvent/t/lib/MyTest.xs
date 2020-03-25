@@ -4,6 +4,19 @@
 MODULE = MyTest                PACKAGE = MyTest
 PROTOTYPES: DISABLE
 
+int create_socket (int domain, int type, int protocol) {
+    auto sock = unievent::socket(domain, type, protocol).value();
+    RETVAL = sock2fd(sock);
+}
+
+void connect_socket (int fd, net::SockAddr sa) {
+    unievent::connect(fd2sock(fd), sa);
+}
+
+void close_socket (int fd) {
+    unievent::close(fd2sock(fd));
+}
+
 void core_dump () { abort(); }
 
 bool variate_ssl (bool val = false) {

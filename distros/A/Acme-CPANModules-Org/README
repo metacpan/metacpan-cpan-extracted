@@ -2,34 +2,57 @@ NAME
     Acme::CPANModules::Org - Modules related to Org format
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::Org (from
-    Perl distribution Acme-CPANModules-Org), released on 2019-01-27.
+    This document describes version 0.003 of Acme::CPANModules::Org (from
+    Perl distribution Acme-CPANModules-Org), released on 2020-01-12.
 
 DESCRIPTION
     Modules related to Org format.
 
 INCLUDED MODULES
-    *   Org::Parser
-
-    *   Org::Dump
-
-    *   App::OrgUtils
-
-    *   Org::To::HTML
-
-    *   Org::To::Pod
-
-    *   Org::To::VCF
-
-    *   Org::To::HTML::WordPress
-
-    *   Org::To::Text
+    *   App::org2wp
 
     *   App::orgsel
 
-    *   Text::Table::Org
+    *   App::OrgUtils
 
     *   Data::CSel
+
+    *   Data::Dmp::Org
+
+    *   Org::Dump
+
+    *   Org::Examples
+
+    *   Org::Parser
+
+    *   Org::Parser::Tiny
+
+    *   Org::To::HTML
+
+    *   Org::To::HTML::WordPress
+
+    *   Org::To::Pod
+
+    *   Org::To::Text
+
+    *   Org::To::VCF
+
+    *   Text::Table::Org
+
+FAQ
+  What are ways to use this module?
+    Aside from reading it, you can install all the listed modules using
+    cpanmodules:
+
+        % cpanmodules ls-entries Org | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=Org -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    This module also helps lcpan produce a more meaningful result for "lcpan
+    related-mods" when it comes to finding related modules for the modules
+    listed in this Acme::CPANModules module.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -57,7 +80,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

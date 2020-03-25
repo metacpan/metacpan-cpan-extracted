@@ -1,6 +1,6 @@
 =head1 NAME
 
-OpenTracing::Interface::Scope - A role that defines the SpanContext interface
+OpenTracing::Interface::Scope - A role that defines the Scope interface
 
 =head1 SYNOPSIS
 
@@ -27,27 +27,29 @@ OpenTracing::Interface::Scope - A role that defines the SpanContext interface
 This 'role' describes the interface for any OpenTracing Scope
 implementation.
 
-A L<Scope> formalizes the activation and deactivation of a L<Span>, usually
+A C<Scope> formalizes the activation and deactivation of a C<Span>, usually
 from a CPU standpoint.
 
-Many times a L<Span> will be extant (in that L<finish()> has not been called)
+Many times a C<Span> will be extant (in that C<finish()> has not been called)
 despite being in a non-runnable state from a CPU/scheduler standpoint. For
-instance, a L<Span> representing the client side of an RPC will be unfinished
-but blocked on IO while the RPC is still outstanding. A L<Scope> defines
-when a given L<Span> B<is> scheduled and on the path.
+instance, a C<Span> representing the client side of an RPC will be unfinished
+but blocked on IO while the RPC is still outstanding. A C<Scope> defines
+when a given C<Span> B<is> scheduled and on the path.
 
 
 
-=head1 METHODS
+=head1 INSTANCE METHODS
 
 
 
 =head2 close
 
 Mark the end of the active period for the current thread and L<Scope>,
-updating the L<ScopeManager::active()> in the process.
+updating the C<ScopeManager::active()> in the process.
 
-NOTE: Calling L<close> more than once on a single L<Scope> instance leads
+    $scope->close;
+
+NOTE: Calling C<close> more than once on a single C<Scope> instance leads
 to undefined behavior.
 
 =head3 Parameters
@@ -56,13 +58,16 @@ none
 
 =head3 Returns
 
-nothing, <undef> or what ever is appropriate for the calling context.
+The C<Scope> instance <$self>, for ease of chaining (although the usefulness is
+doubtfull).
 
 
 
 =head2 get_span
 
-Returns the L<Span> that's been scoped by this L<Scope>
+Returns the C<Span> that's been scoped by this C<Scope>
+
+    my $span = $scope->get_span
 
 =head3 Parameters
 
@@ -70,7 +75,27 @@ none
 
 =head3 Returns
 
-The L<Span> that's been scoped by this L<Scope>
+The C<Span> that's been scoped by this C<Scope>.
+
+=cut
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Interface>
+
+Describes the API definition for OpenTransport implementations written in the
+Perl5 language.
+
+=item L<OpenTracing::Types>
+
+A library of L<Type::Tiny> type constraints that provides Duck Type checks for
+all common elements that conform L<OpenTracing::Interface>
+
+=back
 
 =cut
 

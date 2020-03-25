@@ -13,7 +13,7 @@ struct VarDir {
     string dir;
 
     VarDir () {
-        dir = root_vdir + "/" + string::from_number(panda::unievent::getpid());
+        dir = root_vdir + "/" + string::from_number(panda::unievent::getpid()) + "-" + string::from_number(rand());
         Fs::mkpath(dir.c_str(), 0755);
     }
 
@@ -388,7 +388,7 @@ TEST_CASE("fs-sync", "[fs]") {
 
 TEST_CASE("fs-async", "[fs]") {
     VarDir vdir;
-    AsyncTest test(3000, 1);
+    AsyncTest test(10000, 1);
     auto l       = test.loop;
     auto p       = [&](string_view s) { return vdir.path(s); };
     auto file    = p("file");

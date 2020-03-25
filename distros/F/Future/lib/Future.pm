@@ -9,7 +9,7 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
@@ -132,8 +132,8 @@ instance.
       return $self;
    }
 
-If an instance overrides the L</block_until_ready> method, this will be called
-by C<get> and C<failure> if the instance is still pending.
+If an instance overrides the L</await> method, this will be called by C<get>
+and C<failure> if the instance is still pending.
 
 In most cases this should allow future-returning modules to be used as if they
 were blocking call/return-style modules, by simply appending a C<get> call to
@@ -395,8 +395,8 @@ sub _mark_ready
    my $fail      = defined $self->{failure};
    my $done      = !$fail && !$cancelled;
 
-   my @result  = $done ? $self->get :
-                 $fail ? $self->failure :
+   my @result  = $done ? @{ $self->{result} } :
+                 $fail ? @{ $self->{failure} } :
                          ();
 
    foreach my $cb ( @$callbacks ) {
@@ -828,8 +828,8 @@ sub on_ready
 
       $self->{reported} = 1 if $fail;
 
-      $is_future ? ( $done ? $code->done( $self->get ) :
-                     $fail ? $code->fail( $self->failure ) :
+      $is_future ? ( $done ? $code->done( @{ $self->{result} } ) :
+                     $fail ? $code->fail( @{ $self->{failure} } ) :
                              $code->cancel )
                  : $code->( $self );
    }
@@ -848,11 +848,13 @@ sub AWAIT_ON_READY
    push @{ $self->{callbacks} }, [ CB_ALWAYS|CB_SELF, $self->wrap_cb( on_ready => $code ) ];
 }
 
-=head2 get
+=head2 result
 
-   @result = $future->get
+   @result = $future->result
 
-   $result = $future->get
+   $result = $future->result
+
+I<Since version 0.44.>
 
 If the future is ready and completed successfully, returns the list of
 results that had earlier been given to the C<done> method on a leaf future,
@@ -864,17 +866,15 @@ failure that was given to the C<fail> method. If additional details were given
 to the C<fail> method, an exception object is constructed to wrap them of type
 L<Future::Exception>.
 
-If the future was cancelled an exception is thrown.
-
-If it is not yet ready then L</block_until_ready> is invoked to wait for a
-ready state.
+If the future was cancelled or is not yet ready an exception is thrown.
 
 =cut
 
-sub get
+sub result
 {
    my $self = shift;
-   $self->block_until_ready unless $self->{ready};
+   $self->{ready} or
+      Carp::croak( "${\$self->__selfstr} is not yet ready" );
    if( my $failure = $self->{failure} ) {
       $self->{reported} = 1;
       my $exception = $failure->[0];
@@ -886,15 +886,35 @@ sub get
    return @{ $self->{result} };
 }
 
-# TODO: For efficiency we can implement a better version of this because it
-#   is only invoked on ready futures
-*AWAIT_GET = \&get;
+# TODO do we want to rename this AWAIT_RESULT ?
+*AWAIT_GET = \&result;
 
-=head2 block_until_ready
+=head2 get
 
-   $f = $f->block_until_ready
+   @result = $future->get
 
-I<Since version 0.40.>
+   $result = $future->get
+
+If the future is ready, returns the result or throws the failure exception as
+per L</result>.
+
+If it is not yet ready then L</block_until_ready> is invoked to wait for a
+ready state, and the result returned as above.
+
+=cut
+
+sub get
+{
+   my $self = shift;
+   $self->await unless $self->{ready};
+   return $self->result;
+}
+
+=head2 await
+
+   $f = $f->await
+
+I<Since version 0.44.>
 
 Blocks until the future instance is no longer pending.
 
@@ -906,30 +926,36 @@ method is useful in cases where the exception-throwing part of C<get> is not
 required, perhaps because other code will be testing the result using
 L</is_done> or similar.
 
-   if( $f->block_until_ready->is_done ) {
+   if( $f->await->is_done ) {
       ...
    }
 
-This method is intended for subclasses to override, but a default
-implementation for back-compatibility purposes is provided which calls the
-C<await> method. If the future is not yet ready, attempts to wait for an
-eventual result by using the underlying C<await> method, which subclasses
-should provide. The default implementation will throw an exception if called
-on a still-pending instance that does not provide an C<await> method.
+This method is intended for subclasses to override. The default implementation
+will throw an exception if called on a still-pending instance.
 
 =cut
 
 sub await
 {
    my $self = shift;
+   return $self if $self->{ready};
    Carp::croak "$self is not yet complete and does not provide ->await";
 }
+
+=head2 block_until_ready
+
+   $f = $f->block_until_ready
+
+I<Since version 0.40.>
+
+Now a synonym for L</await>. New code should invoke C<await> directly.
+
+=cut
 
 sub block_until_ready
 {
    my $self = shift;
-   until( $self->{ready} ) { $self->await }
-   return $self;
+   return $self->await;
 }
 
 =head2 unwrap
@@ -942,7 +968,7 @@ If given a single argument which is a C<Future> reference, this method will
 call C<get> on it and return the result. Otherwise, it returns the list of
 values directly in list context, or the first value in scalar. Since it
 involves an implicit blocking wait, this method can only be used on immediate
-futures or subclasses that implement L</block_until_ready>.
+futures or subclasses that implement L</await>.
 
 This will ensure that an outgoing argument is definitely not a C<Future>, and
 may be useful in such cases as adapting synchronous code to fit asynchronous
@@ -996,8 +1022,8 @@ sub on_done
    if( $self->{ready} ) {
       return $self if $self->{failure} or $self->{cancelled};
 
-      $is_future ? $code->done( $self->get ) 
-                 : $code->( $self->get );
+      $is_future ? $code->done( @{ $self->{result} } ) 
+                 : $code->( @{ $self->{result} } );
    }
    else {
       push @{ $self->{callbacks} }, [ CB_DONE|CB_RESULT, $self->wrap_cb( on_done => $code ) ];
@@ -1015,8 +1041,7 @@ sub on_done
 If the future is ready, returns the exception passed to the C<fail> method or
 C<undef> if the future completed successfully via the C<done> method.
 
-If it is not yet ready then L</block_until_ready> is invoked to wait for a
-ready state.
+If it is not yet ready then L</await> is invoked to wait for a ready state.
 
 If called in list context, will additionally yield the category name and list
 of the details provided to the C<fail> method.
@@ -1028,7 +1053,7 @@ statement:
       ...
    }
    else {
-      my @result = $future->get;
+      my @result = $future->result;
       ...
    }
 
@@ -1037,7 +1062,7 @@ statement:
 sub failure
 {
    my $self = shift;
-   $self->block_until_ready unless $self->{ready};
+   $self->await unless $self->{ready};
    return unless $self->{failure};
    $self->{reported} = 1;
    return $self->{failure}->[0] if !wantarray;
@@ -1083,8 +1108,8 @@ sub on_fail
       return $self if not $self->{failure};
       $self->{reported} = 1;
 
-      $is_future ? $code->fail( $self->failure )
-                 : $code->( $self->failure );
+      $is_future ? $code->fail( @{ $self->{failure} } )
+                 : $code->( @{ $self->{failure} } );
    }
    else {
       push @{ $self->{callbacks} }, [ CB_FAIL|CB_RESULT, $self->wrap_cb( on_fail => $code ) ];
@@ -1167,8 +1192,8 @@ sub _sequence
 
    if( $f1->is_ready ) {
       # Take a shortcut
-      return $f1 if $f1->is_done and not( $flags & CB_SEQ_ONDONE ) or
-                    $f1->failure and not( $flags & CB_SEQ_ONFAIL );
+      return $f1 if $f1->is_done   and not( $flags & CB_SEQ_ONDONE ) or
+                    $f1->{failure} and not( $flags & CB_SEQ_ONFAIL );
 
       if( $flags & CB_SEQ_IMDONE ) {
          return Future->done( @$code );
@@ -1179,8 +1204,8 @@ sub _sequence
 
       my @args = (
          ( $flags & CB_SELF ? $f1 : () ),
-         ( $flags & CB_RESULT ? $f1->is_done ? $f1->get :
-                                $f1->failure ? $f1->failure :
+         ( $flags & CB_RESULT ? $f1->is_done   ? @{ $f1->{result} } :
+                                $f1->{failure} ? @{ $f1->{failure} } :
                                                () : () ),
       );
 
@@ -1273,15 +1298,15 @@ my $make_donecatchfail_sub = sub {
 
       if( !$self->{failure} ) {
          return $self unless $done_code;
-         return $done_code->( @maybe_self, $self->get );
+         return $done_code->( @maybe_self, @{ $self->{result} } );
       }
       else {
          my $name = $self->{failure}[1];
          if( defined $name and $catch_handlers{$name} ) {
-            return $catch_handlers{$name}->( @maybe_self, $self->failure );
+            return $catch_handlers{$name}->( @maybe_self, @{ $self->{failure} } );
          }
          return $self unless $fail_code;
-         return $fail_code->( @maybe_self, $self->failure );
+         return $fail_code->( @maybe_self, @{ $self->{failure} } );
       }
    };
 };
@@ -1415,12 +1440,12 @@ sub transform
       my $self = shift;
       if( !$self->{failure} ) {
          return $self unless $xfrm_done;
-         my @result = $xfrm_done->( $self->get );
+         my @result = $xfrm_done->( @{ $self->{result} } );
          return $self->new->done( @result );
       }
       else {
          return $self unless $xfrm_fail;
-         my @failure = $xfrm_fail->( $self->failure );
+         my @failure = $xfrm_fail->( @{ $self->{failure} } );
          return $self->new->fail( @failure );
       }
    }, CB_SEQ_ONDONE|CB_SEQ_ONFAIL|CB_SELF );
@@ -1610,11 +1635,11 @@ sub without_cancel
 
    $self->on_ready( sub {
       my $self = shift;
-      if( $self->failure ) {
-         $new->fail( $self->failure );
+      if( $self->{failure} ) {
+         $new->fail( @{ $self->{failure} } );
       }
       else {
-         $new->done( $self->get );
+         $new->done( @{ $self->{result} } );
       }
    });
 
@@ -1797,10 +1822,10 @@ sub wait_any
       }
 
       if( $immediate_ready->{failure} ) {
-         $self->{failure} = [ $immediate_ready->failure ];
+         $self->{failure} = [ @{ $immediate_ready->{failure} } ];
       }
       else {
-         $self->{result} = [ $immediate_ready->get ];
+         $self->{result} = [ @{ $immediate_ready->{result} } ];
       }
       $self->_mark_ready( "wait_any" );
       return $self;
@@ -1819,10 +1844,10 @@ sub wait_any
          $self->{failure} = [ "All component futures were cancelled" ];
       }
       elsif( $_[0]->{failure} ) {
-         $self->{failure} = [ $_[0]->failure ];
+         $self->{failure} = [ @{ $_[0]->{failure} } ];
       }
       else {
-         $self->{result}  = [ $_[0]->get ];
+         $self->{result}  = [ @{ $_[0]->{result} } ];
       }
 
       foreach my $sub ( @subs ) {
@@ -1888,7 +1913,7 @@ sub needs_all
          $sub->{ready} or $sub->cancel;
       }
 
-      $self->{failure} = [ $immediate_fail->failure ];
+      $self->{failure} = [ @{ $immediate_fail->{failure} } ];
       $self->_mark_ready( "needs_all" );
       return $self;
    }
@@ -1898,7 +1923,7 @@ sub needs_all
 
    # Look for immediate done
    if( !$pending ) {
-      $self->{result} = [ map { $_->get } @subs ];
+      $self->{result} = [ map { @{ $_->{result} } } @subs ];
       $self->_mark_ready( "needs_all" );
       return $self;
    }
@@ -1915,8 +1940,8 @@ sub needs_all
          }
          $self->_mark_ready( "needs_all" );
       }
-      elsif( my @failure = $_[0]->failure ) {
-         $self->{failure} = \@failure;
+      elsif( $_[0]->{failure} ) {
+         $self->{failure} = [ @{ $_[0]->{failure} } ];
          foreach my $sub ( @subs ) {
             $sub->cancel if !$sub->{ready};
          }
@@ -1926,7 +1951,7 @@ sub needs_all
          $pending--;
          $pending and return;
 
-         $self->{result} = [ map { $_->get } @subs ];
+         $self->{result} = [ map { @{ $_->{result} } } @subs ];
          $self->_mark_ready( "needs_all" );
       }
    };
@@ -1992,7 +2017,7 @@ sub needs_any
          $sub->{ready} ? $sub->{reported} = 1 : $sub->cancel;
       }
 
-      $self->{result} = [ $immediate_done->get ];
+      $self->{result} = [ @{ $immediate_done->{result} } ];
       $self->_mark_ready( "needs_any" );
       return $self;
    }
@@ -2022,14 +2047,14 @@ sub needs_any
          $self->{failure} = [ "All component futures were cancelled" ];
          $self->_mark_ready( "needs_any" );
       }
-      elsif( my @failure = $_[0]->failure ) {
+      elsif( $_[0]->{failure} ) {
          $pending and return;
 
-         $self->{failure} = \@failure;
+         $self->{failure} = [ @{ $_[0]->{failure} } ];
          $self->_mark_ready( "needs_any" );
       }
       else {
-         $self->{result} = [ $_[0]->get ];
+         $self->{result} = [ @{ $_[0]->{result} } ];
          foreach my $sub ( @subs ) {
             $sub->cancel if !$sub->{ready};
          }
@@ -2316,7 +2341,7 @@ method, and obtain the result using C<get>.
 
    $f->on_ready( sub {
       my $f = shift;
-      say "The operation returned: ", $f->get;
+      say "The operation returned: ", $f->result;
    } );
 
 =head2 Indicating Success or Failure
@@ -2330,7 +2355,7 @@ failure.
    $f->on_ready( sub {
       my $f = shift;
       if( not my $e = $f->failure ) {
-         say "The operation succeeded with: ", $f->get;
+         say "The operation succeeded with: ", $f->result;
       }
       else {
          say "The operation failed with: ", $e;
@@ -2349,7 +2374,7 @@ called I<Exception Hoisting>).
    $f->on_ready( sub {
       my $f = shift;
       try {
-         say "The operation succeeded with: ", $f->get;
+         say "The operation succeeded with: ", $f->result;
       }
       catch {
          say "The operation failed with: ", $_;
@@ -2425,8 +2450,8 @@ for multiple concurrent operations to finish.
 
    $f->on_ready( sub {
       say "Operations are ready:";
-      say "  foo: ", $f1->get;
-      say "  bar: ", $f2->get;
+      say "  foo: ", $f1->result;
+      say "  bar: ", $f2->result;
    } );
 
 This provides an ability somewhat similar to C<CPS::kpar()> or

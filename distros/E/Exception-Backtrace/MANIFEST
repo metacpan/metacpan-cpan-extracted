@@ -11,7 +11,6 @@ lib/Exception/Backtrace/DualTrace.pod
 lib/Exception/Backtrace/Stackframe.pm
 lib/Exception/Backtrace/Stackframe.pod
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 misc/devel-trace.pl
 misc/exception-bactrace.pl

@@ -9,6 +9,10 @@ extern eav_result_t
 is_5321_email (const char *email, size_t length, bool tld_check)
 {
     eav_result_t result = INIT_EAV_RESULT_T();
+#ifdef EAV_EXTRA
+    result.lpart = NULL;
+    result.domain = NULL;
+#endif
     char *ch = NULL;
     char *brs = NULL;
     char *bre = NULL;
@@ -29,6 +33,10 @@ is_5321_email (const char *email, size_t length, bool tld_check)
 
         if (result.rc == EEAV_NO_ERROR) {
             result.is_domain = true;
+#ifdef EAV_EXTRA
+            result.lpart = strndup (email, brs - email - 1);
+            result.domain = strndup (brs, end - brs);
+#endif
             check_tld();
         }
 
@@ -37,6 +45,13 @@ is_5321_email (const char *email, size_t length, bool tld_check)
 
     /* seems to be an ip address */
     check_ip(); /* see private_email.h */
+
+#ifdef EAV_EXTRA
+    if (result.rc == EEAV_NO_ERROR) {
+        result.lpart = strndup (email, brs - email - 1);
+        result.domain = strndup (brs + 1, bre - brs - 1);
+    }
+#endif
 
     return result;
 }

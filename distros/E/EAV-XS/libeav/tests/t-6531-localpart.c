@@ -22,7 +22,7 @@ main (int argc, char *argv[])
     int expect_fail = -1;
 
 
-    setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "en_US.UTF-8");
 
     if (argc >= 5 || argc < 4) {
         msg_warn ("usage: %s PASS_CHECKS FAIL_CHECKS FILE\n", argv[0]);

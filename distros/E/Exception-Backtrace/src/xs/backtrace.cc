@@ -107,61 +107,44 @@ static std::vector<string> get_args(const PERL_CONTEXT* cx) {
 
 static PerlTrace* get_trace() noexcept {
     dTHX;
-    const PERL_SI* top_si = PL_curstackinfo;
-    const PERL_CONTEXT* ccstack = cxstack;
-    I32 cxix = __dopoptosub_at(ccstack, cxstack_ix);
-
     std::vector<StackframePtr> frames;
-    for (;;) {
-        while (cxix < 0 && top_si->si_type != PERLSI_MAIN) {
-            top_si = top_si->si_prev;
-            ccstack = top_si->si_cxstack;
-            cxix = __dopoptosub_at(ccstack, top_si->si_cxix);
-        }
-        if (cxix < 0) {
-            break;
-        }
-
-        if (PL_DBsub && GvCV(PL_DBsub)) {
-            if (ccstack[cxix].blk_sub.cv == GvCV(PL_DBsub)) {
-                cxix = __dopoptosub_at(ccstack, cxix - 1);
-                continue;
-            }
-            const I32 dbcxix = __dopoptosub_at(ccstack, cxix - 1);
-            if (dbcxix >= 0 && ccstack[dbcxix].blk_sub.cv == GvCV(PL_DBsub)) {
-                if (CxTYPE((PERL_CONTEXT*)(&ccstack[dbcxix])) != CXt_SUB) {
-                    cxix = dbcxix;
-                    continue;
-                }
-            }
-        }
-
-        auto* cx = &ccstack[cxix];
-
-        auto pv = CopSTASHPV(cx->blk_oldcop);
+    I32 level = 0;
+    const PERL_CONTEXT *dbcx = nullptr;
+    const PERL_CONTEXT* cx = caller_cx(level, &dbcx);
+    while (cx) {
+        auto pv_raw = CopSTASHPV(cx->blk_oldcop);
         auto file = CopFILE(cx->blk_oldcop);
         auto line = CopLINE(cx->blk_oldcop);
-        //string name;
-        auto name_raw = (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT)
-                ? (CvHASGV(cx->blk_sub.cv) ? xs::Sub(cx->blk_sub.cv).name()
-                                           : "(unknown)" )
-                : ("(eval)");
 
-        string name(name_raw);
+        xs::Sub sub;
+        string name;
+        string library;
+        if ((CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT)) {
+            if (CvHASGV(dbcx->blk_sub.cv)) {
+                xs::Sub sub(dbcx->blk_sub.cv);
+                name = sub.name();
+                library = sub.stash().name();
+            } else {
+                name = "(unknown)";
+            }
+        } else {
+            name = "(eval)";
+        }
+
+        if (!library && pv_raw) { library = pv_raw; };
+
         auto args = get_args(cx);
 
-        bool add_frame = true;
+        StackframePtr frame(new Stackframe());
+        frame->library = library;
+        frame->file = file;
+        frame->line_no = line;
+        frame->name = name;
+        frame->args = std::move(args);
+        frames.emplace_back(std::move(frame));
 
-        if (add_frame) {
-            StackframePtr frame(new Stackframe());
-            frame->library = pv;
-            frame->file = file;
-            frame->line_no = line;
-            frame->name = name;
-            frame->args = std::move(args);
-            frames.emplace_back(std::move(frame));
-        }
-        cxix = __dopoptosub_at(ccstack, cxix - 1);
+        ++level;
+        cx = caller_cx(level, &dbcx);
     }
     return new PerlTrace(std::move(frames));
 }

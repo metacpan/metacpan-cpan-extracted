@@ -303,6 +303,7 @@ methods defined (and aren’t even defined Perl namespaces).
 =over
 
 =item * Use plain Perl scalars to represent all numeric and string types.
+Strings B<MUST> be encoded to UTF-8.
 
 =item * Use plain Perl filehandle objects to represent UNIX_FDs.
 

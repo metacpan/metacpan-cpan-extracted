@@ -3,6 +3,8 @@ use warnings;
 use lib 't/lib'; use MyTest;
 use Net::SockAddr;
 
+plan skip_all => "windows doesn't have fork()" if win32();
+
 my $loop = UniEvent::Loop::default_loop();
 
 my $server = UE::Tcp->new($loop);

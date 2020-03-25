@@ -110,3 +110,22 @@ TEST("bad_expected_access") {
     }
     REQUIRE(what == "Bad expected access: MyErr1 (1:MyCategory)");
 }
+
+TEST("contains") {
+    REQUIRE_FALSE(ErrorCode().contains(make_error_code(MyErr::Err1)));
+    REQUIRE_FALSE(ErrorCode(MyErr::Err1).contains({make_error_code(MyErr::Err2)}));
+
+    REQUIRE(ErrorCode().contains({}));
+    REQUIRE(ErrorCode(MyErr::Err1).contains({make_error_code(MyErr::Err1)}));
+
+    ErrorCode nested_code(Err1);
+    ErrorCode code(Err2, nested_code);
+    REQUIRE(code.contains(MyErr::Err1));
+    REQUIRE(code.contains(MyErr::Err2));
+
+    ErrorCode triple(make_error_code(std::errc::operation_canceled), code);
+    REQUIRE(triple.contains(MyErr::Err1));
+    REQUIRE(triple.contains(MyErr::Err2));
+    REQUIRE(triple.contains(make_error_code(std::errc::operation_canceled)));
+    REQUIRE_FALSE(triple.contains(make_error_code(std::errc::broken_pipe)));
+}

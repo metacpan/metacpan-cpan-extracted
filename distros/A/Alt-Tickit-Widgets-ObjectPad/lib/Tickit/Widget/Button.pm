@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.09;
 
@@ -133,7 +133,7 @@ Optional. Callback function to invoke when the button is clicked.
 has $_label;
 has $_on_click;
 
-method BUILDALL
+method BUILD
 {
    my %params = @_;
 
@@ -144,16 +144,14 @@ method BUILDALL
    $self->set_valign( $params{valign} // 0.5 );
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    my $has_border = ( $self->get_style_values( "linetype" ) ) ne "none";
    return 1 + 2*$has_border;
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
    my $has_border = ( $self->get_style_values( "linetype" ) ) ne "none";
    return 4 + textwidth( $self->label ) + 2*$has_border;
 }
@@ -214,9 +212,8 @@ method click
 
 # Activation by key should "flash" the button briefly on the screen as a
 # visual feedback
-sub key_click
+method key_click
 {
-   my $self = shift;
    $self->click;
    if( my $window = $self->window ) {
       $self->set_style_tag( active => 1 );
@@ -225,9 +222,8 @@ sub key_click
    return 1;
 }
 
-sub _activate
+method _activate
 {
-   my $self = shift;
    my ( $active ) = @_;
    $self->{active} = $active;
    $self->set_style_tag( active => $active );
@@ -249,10 +245,8 @@ the button area. See also L<Tickit::WidgetRole::Alignable>.
 use Tickit::WidgetRole::Alignable name => "align",  style => "h";
 use Tickit::WidgetRole::Alignable name => "valign", style => "v";
 
-sub reshape
+method reshape
 {
-   my $self = shift;
-
    my $win = $self->window or return;
    my $lines = $win->lines;
    my $cols  = $win->cols;
@@ -271,9 +265,8 @@ sub reshape
    $win->cursor_at( $self->{label_line}, $self->{label_col} );
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    my $win = $self->window or return;
@@ -310,9 +303,8 @@ sub render_to_rb
    $rb->text_at( $self->{label_line}, $self->{label_col}, $self->label );
 }
 
-sub on_mouse
+method on_mouse
 {
-   my $self = shift;
    my ( $args ) = @_;
 
    my $type = $args->type;

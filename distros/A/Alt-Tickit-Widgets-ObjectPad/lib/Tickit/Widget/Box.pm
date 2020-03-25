@@ -1,20 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Box;
+use Object::Pad 0.09;
 
-use strict;
-use warnings;
-use 5.010; # //
-use base qw( Tickit::SingleChildWidget );
+class Tickit::Widget::Box 0.52
+   extends Tickit::SingleChildWidget;
+
 use Tickit::Style;
 use Tickit::RenderBuffer;
 
 use Tickit::Utils qw( bound );
-
-our $VERSION = '0.52';
 
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
@@ -99,11 +96,24 @@ Initial values for alignment options.
 
 =cut
 
-sub new
-{
+# Hack 'child' - needs to be later
+my $new = __PACKAGE__->can( "new" );
+*new = sub {
    my $class = shift;
    my %args = @_;
-   my $self = $class->SUPER::new( @_ );
+
+   my $child = delete $args{child};
+
+   my $self = $class->$new( %args );
+
+   $self->set_child( $child ) if $child;
+
+   return $self;
+};
+
+method BUILD
+{
+   my %args = @_;
 
    foreach (qw( child_lines_min child_lines_max child_cols_min child_cols_max
                 child_lines                     child_cols )) {
@@ -112,27 +122,22 @@ sub new
 
    $self->set_align ( $args{align}  // 0.5 );
    $self->set_valign( $args{valign} // 0.5 );
-
-   return $self;
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    my $child = $self->child;
    return $child ? bound( $self->child_lines_min, $child->requested_lines, $self->child_lines_max ) : 1;
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
    my $child = $self->child;
    return $child ? bound( $self->child_cols_min, $child->requested_cols, $self->child_cols_max ) : 1;
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    $rb->eraserect( $rect );
@@ -178,16 +183,22 @@ the same value. This has the effect of forcing the size of the child widget.
 
 =cut
 
+has $_child_lines_max; method _child_lines_max :lvalue { $_child_lines_max }
+has $_child_lines_min; method _child_lines_min :lvalue { $_child_lines_min }
+has $_child_cols_max;  method _child_cols_max  :lvalue { $_child_cols_max  }
+has $_child_cols_min;  method _child_cols_min  :lvalue { $_child_cols_min  }
+
 # Because I hate copying code 4 times
 foreach my $dir (qw( lines cols )) {
    my %subs;
 
    foreach my $lim (qw( max min )) {
+      my $slotmeth = "_child_${dir}_${lim}";
       my $name = "child_${dir}_${lim}";
 
       $subs{$name} = sub {
          my $self = shift;
-         my $value = $self->{$name};
+         my $value = $self->$slotmeth;
          if( !defined $value ) {
             return undef;
          }
@@ -202,7 +213,7 @@ foreach my $dir (qw( lines cols )) {
 
       $subs{"set_$name"} = sub {
          my $self = shift;
-         ( $self->{$name} ) = @_;
+         ( $self->$slotmeth ) = @_;
          $self->resized;
       };
    }
@@ -223,10 +234,8 @@ foreach my $dir (qw( lines cols )) {
 use Tickit::WidgetRole::Alignable name =>  "align", dir => "h", reshape => 1;
 use Tickit::WidgetRole::Alignable name => "valign", dir => "v", reshape => 1;
 
-sub reshape
+method reshape
 {
-   my $self = shift;
-
    my $window = $self->window or return;
    my $child  = $self->child or return;
 
@@ -244,9 +253,8 @@ sub reshape
    $self->redraw;
 }
 
-sub window_lost
+method window_lost
 {
-   my $self = shift;
    my $child = $self->child or return;
    $child->set_window( undef );
 }

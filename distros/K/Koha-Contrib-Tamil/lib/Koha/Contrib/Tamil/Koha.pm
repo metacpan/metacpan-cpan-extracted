@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Koha;
 #ABSTRACT: Class exposing info about a Koha instance.
-$Koha::Contrib::Tamil::Koha::VERSION = '0.063';
+$Koha::Contrib::Tamil::Koha::VERSION = '0.064';
 use Moose;
 
 use Modern::Perl;
@@ -12,6 +12,7 @@ use MARC::Record;
 use MARC::File::XML;
 use YAML;
 use C4::Biblio;
+use Search::Elasticsearch;
 
 
 
@@ -28,6 +29,9 @@ has conf => ( is => 'rw' );
 
 has _zconn => ( is => 'rw', isa => 'HashRef' );
 
+has es => ( is => 'rw' );
+
+has es_index => ( is=> 'rw' );
 
 has _old_marc_biblio_sub => ( is => 'rw', isa => 'Bool', default => 0 );
 
@@ -62,6 +66,16 @@ sub BUILD {
 
     # Zebra connections 
     $self->_zconn( { biblio => undef, auth => undef } );
+
+    # ElasticSearch
+    if ( my $param = $c->{elasticsearch} ) {
+        my $es = Search::Elasticsearch->new( nodes => $param->{server} );
+        $self->es( $es );
+        $self->es_index( {
+            biblios     => $param->{index_name} . '_biblios',
+            authorities => $param->{index_name} . '_authorities',
+        } );
+    }
 
     my $version = C4::Context->preference('Version');
     if ( $version =~ /^([0-9]{2})\.([0-9]{2})/ ) {
@@ -196,7 +210,7 @@ Koha::Contrib::Tamil::Koha - Class exposing info about a Koha instance.
 
 =head1 VERSION
 
-version 0.063
+version 0.064
 
 =head1 ATTRIBUTES
 

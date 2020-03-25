@@ -6,9 +6,11 @@ examples/lib/App/Foo/types.pm
 examples/lib/App/Interface.pm
 lib/OpenTracing/Interface.pm
 lib/OpenTracing/Interface.pod
+lib/OpenTracing/Types.pm
 lib/OpenTracing/Interface/Scope.pm
 lib/OpenTracing/Interface/Scope.pod
 lib/OpenTracing/Interface/ScopeManager.pm
+lib/OpenTracing/Interface/ScopeManager.pod
 lib/OpenTracing/Interface/Span.pm
 lib/OpenTracing/Interface/Span.pod
 lib/OpenTracing/Interface/SpanContext.pm
@@ -27,5 +29,26 @@ examples/MyTracer/Tracer.pm
 examples/README.txt
 README.md
 t/00_use_ok.t
+t/lib/MockUtils.pm
+t/lib/TestUtils.pm
+t/Interface/Reference/00_use_ok.t
+t/Interface/Reference/07_pass_on_unmodified.t
+t/Interface/Scope/00_use_ok.t
+t/Interface/Scope/07_pass_on_unmodified.t
+t/Interface/ScopeManager/00_use_ok.t
+t/Interface/ScopeManager/07_pass_on_unmodified.t
+t/Interface/Span/00_use_ok.t
+t/Interface/Span/07_pass_on_unmodified.t
+t/Interface/SpanContext/00_use_ok.t
+t/Interface/SpanContext/07_pass_on_unmodified.t
+t/Interface/Tracer/00_use_ok.t
+t/Interface/Tracer/07_pass_on_unmodified.t
+t/Types/00_use_ok.t
+t/Types/10_reference.t
+t/Types/10_scope.t
+t/Types/10_scope_manager.t
+t/Types/10_span_context.t
+t/Types/10_span.t
+t/Types/10_tracer.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

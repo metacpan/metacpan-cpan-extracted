@@ -86,7 +86,6 @@ TEST_CASE("immediate disconnect", "[tcp][v-ssl][v-buf]") {
         sa2 = server2->sockaddr();
     }
 
-
     TcpSP client = make_client(test.loop);
     string body;
     for (size_t i = 0; i < 100; ++i) body += "0123456789";

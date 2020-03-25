@@ -1,2 +1,9 @@
+1.0.1    24.03.2020
+    - bugfix: the library in perl call is called sub package, not callee
+    - disable some tests on NetBSD
+    - disable some tests on FreeBSD (i386 arch)
+    - fix/generalize tests on Linux
+    - min perl version 5.22.0 (required for CvHASGV)
+
 1.0.0    16.03.2020
     - first release

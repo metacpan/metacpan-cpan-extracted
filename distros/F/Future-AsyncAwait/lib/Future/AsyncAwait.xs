@@ -14,15 +14,10 @@
 #  include "DMD_helper.h"
 #endif
 
+#include "XSParseSublike.h"
+
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
-
-#if HAVE_PERL_VERSION(5, 31, 3)
-#  define HAVE_PARSE_SUBSIGNATURE
-#elif HAVE_PERL_VERSION(5, 26, 0)
-#  include "parse_subsignature.c.inc"
-#  define HAVE_PARSE_SUBSIGNATURE
-#endif
 
 #if !HAVE_PERL_VERSION(5, 24, 0)
   /* On perls before 5.24 we have to do some extra work to save the itervar
@@ -54,9 +49,6 @@
 #endif
 
 #if !HAVE_PERL_VERSION(5, 22, 0)
-#  include "block_start.c.inc"
-#  include "block_end.c.inc"
-
 #  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
 #endif
 
@@ -2051,101 +2043,16 @@ static void check_optree(pTHX_ OP *op, int forbid, COP **last_cop)
  * Keyword plugins
  */
 
-static int async_keyword_plugin(pTHX_ OP **op_ptr)
+static void parse_post_blockstart(pTHX)
 {
-  lex_read_space(0);
-
-  /* At this point we want to parse the sub NAME BLOCK or sub BLOCK
-   * We can't just call parse_fullstmt because that will do too much that we
-   *   can't hook into. We'll have to go a longer way round.
-   */
-
-  /* async must be immediately followed by 'sub' */
-  if(!lex_consume("sub"))
-    croak("Expected async to be followed by sub");
-  lex_read_space(0);
-
-  /* Might be named or anonymous */
-  SV *name = lex_scan_ident();
-  lex_read_space(0);
-
-  ENTER_with_name("parse_block");
-  /* From here onwards any `return` must be prefixed by LEAVE_with_name() */
-
-  I32 floor_ix = start_subparse(FALSE, name ? 0 : CVf_ANON);
-  SAVEFREESV(PL_compcv);
-
-  OP *attrs = NULL;
-  if(lex_peek_unichar(0) == ':') {
-    lex_read_unichar(0);
-
-    attrs = lex_scan_attrs(PL_compcv);
-  }
-
-  PL_hints |= HINT_LOCALIZE_HH;
-  I32 save_ix = block_start(TRUE);
-
   /* Save the identity of the currently-compiling sub so that 
    * await_keyword_plugin() can check
    */
   hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", newSVuv(PTR2UV(PL_compcv)));
+}
 
-#ifdef HAVE_PARSE_SUBSIGNATURE
-  OP *sigop = NULL;
-  if(lex_peek_unichar(0) == '(') {
-    lex_read_unichar(0);
-
-    sigop = parse_subsignature(0);
-    lex_read_space(0);
-
-    if(PL_parser->error_count) {
-      LEAVE_with_name("parse_block");
-      return 0;
-    }
-
-    if(lex_peek_unichar(0) != ')')
-      croak("Expected ')'");
-    lex_read_unichar(0);
-    lex_read_space(0);
-  }
-#endif
-
-  if(lex_peek_unichar(0) != '{')
-    croak("Expected async sub %sto be followed by '{'", name ? "NAME " : "");
-
-  OP *body = parse_block(0);
-  SvREFCNT_inc(PL_compcv);
-
-#ifdef HAVE_PARSE_SUBSIGNATURE
-  if(sigop)
-    body = op_append_list(OP_LINESEQ, sigop, body);
-#endif
-
-  if(PL_parser->error_count) {
-    /* parse_block() still sometimes returns a valid body even if a parse
-     * error happens.
-     * We need to destroy this partial body before returning a valid(ish)
-     * state to the keyword hook mechanism, so it will find the error count
-     * correctly
-     *   See https://rt.cpan.org/Ticket/Display.html?id=130417
-     */
-    op_free(body);
-#ifdef HAVE_PARSE_SUBSIGNATURE
-    if(sigop)
-      op_free(sigop);
-#endif
-    *op_ptr = newOP(OP_NULL, 0);
-    if(name) {
-      SvREFCNT_dec(name);
-      LEAVE_with_name("parse_block");
-      return KEYWORD_PLUGIN_STMT;
-    }
-    else {
-      LEAVE_with_name("parse_block");
-      return KEYWORD_PLUGIN_EXPR;
-    }
-  }
-
+static OP *parse_pre_blockend(pTHX_ OP *body)
+{
   /* body might be NULL if an error happened; we check that below so for now
    * just be defensive
    */
@@ -2168,31 +2075,26 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   op = op_append_elem(OP_LINESEQ, op, newLEAVEASYNCOP(OPf_WANT_SCALAR));
   body = op;
 
-  body = block_end(save_ix, body);
+  return body;
+}
 
-  CV *cv = newATTRSUB(floor_ix,
-    name ? newSVOP(OP_CONST, 0, SvREFCNT_inc(name)) : NULL,
-    NULL,
-    attrs,
-    body);
-
+static void parse_post_newcv(pTHX_ CV *cv)
+{
   if(CvLVALUE(cv))
     warn("Pointless use of :lvalue on async sub");
+}
 
-  LEAVE_with_name("parse_block");
+static struct XSParseSublikeHooks parse_asyncsub_hooks = {
+  .post_blockstart = parse_post_blockstart,
+  .pre_blockend    = parse_pre_blockend,
+  .post_newcv      = parse_post_newcv,
+};
 
-  if(name) {
-    *op_ptr = newOP(OP_NULL, 0);
+static int async_keyword_plugin(pTHX_ OP **op_ptr)
+{
+  lex_read_space(0);
 
-    SvREFCNT_dec(name);
-    return KEYWORD_PLUGIN_STMT;
-  }
-  else {
-    *op_ptr = newUNOP(OP_REFGEN, 0,
-      newSVOP(OP_ANONCODE, 0, (SV *)cv));
-
-    return KEYWORD_PLUGIN_EXPR;
-  }
+  return xs_parse_sublike_any(&parse_asyncsub_hooks, op_ptr);
 }
 
 static int await_keyword_plugin(pTHX_ OP **op_ptr)
@@ -2274,3 +2176,5 @@ BOOT:
 #ifdef HAVE_DMD_HELPER
   DMD_SET_MAGIC_HELPER(&vtbl, dumpmagic);
 #endif
+
+  boot_xs_parse_sublike(0.04);

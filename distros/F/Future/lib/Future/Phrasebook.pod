@@ -212,7 +212,7 @@ passed to the C<while> condition function.
  my $f = repeat {
     F_FUNC()
        ->followed_by( sub { F_COND(); } );
- } while => sub { shift->get };
+ } while => sub { shift->result };
 
 The condition can be negated by using C<until> instead
 
@@ -416,7 +416,7 @@ Z<>
  my $f = Future->wait_all( FIRST_A(), FIRST_B() )
     ->then( sub {
        my ( $f_a, $f_b ) = @_
-       SECOND( $f_a->get, $f_b->get );
+       SECOND( $f_a->result, $f_b->result );
     } );
 
 Because the C<get> method will re-raise an exception caused by a failure of

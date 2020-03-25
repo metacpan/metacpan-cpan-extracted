@@ -14,6 +14,7 @@ my %params = (
     test          => {
         SRC => 't',
     },
+    MIN_PERL_VERSION => '5.22.0', # required for CvHASGV
 );
 
 if ($ENV{SANITIZE}) {

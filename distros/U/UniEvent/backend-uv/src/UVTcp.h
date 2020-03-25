@@ -11,7 +11,8 @@ struct UVTcp : UVStream<TcpImpl, uv_tcp_t> {
     }
 
     void open (sock_t sock) override {
-        uvx_strict(uv_tcp_open(&uvh, sock));
+        auto ret = uv_tcp_open(&uvh, sock);
+        uvx_strict(ret);
     }
 
     std::error_code bind (const net::SockAddr& addr, unsigned flags) override {

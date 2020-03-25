@@ -1,0 +1,27 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'is_known' => 1,
+                                          'property' => bless( {
+                                                                 'name' => [
+                                                                             'chemical_formula_hill'
+                                                                           ]
+                                                               }, 'OPTIMADE::Filter::Property' )
+                                        }, 'OPTIMADE::Filter::Known' ),
+                                 bless( {
+                                          'inner' => bless( {
+                                                              'is_known' => 0,
+                                                              'property' => bless( {
+                                                                                     'name' => [
+                                                                                                 'chemical_formula_anonymous'
+                                                                                               ]
+                                                                                   }, 'OPTIMADE::Filter::Property' )
+                                                            }, 'OPTIMADE::Filter::Known' )
+                                        }, 'OPTIMADE::Filter::Negation' )
+                               ],
+                 'operator' => 'AND'
+               }, 'OPTIMADE::Filter::AndOr' );
+== Filter ==
+(chemical_formula_hill IS KNOWN AND (NOT chemical_formula_anonymous IS UNKNOWN))
+== SQL ==
+('chemical_formula_hill' IS NOT NULL AND (NOT 'chemical_formula_anonymous' IS NULL))

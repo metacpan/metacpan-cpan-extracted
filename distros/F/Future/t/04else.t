@@ -25,7 +25,7 @@ use Future;
 
    $f1->done( results => "here" );
 
-   is_deeply( [ $fseq->get ], [ results => "here" ], '$fseq succeeds when $f1 succeeds' );
+   is_deeply( [ $fseq->result ], [ results => "here" ], '$fseq succeeds when $f1 succeeds' );
 
    undef $f1;
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
@@ -62,7 +62,7 @@ use Future;
    $f2->done( results => "here" );
 
    ok( $fseq->is_ready, '$fseq is done after $f2 done' );
-   is_deeply( [ $fseq->get ], [ results => "here" ], '$fseq->get returns results' );
+   is_deeply( [ $fseq->result ], [ results => "here" ], '$fseq->result returns results' );
 
    undef $f2;
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
@@ -123,7 +123,7 @@ use Future;
    );
 
    ok( $fseq->is_ready, '$fseq already ready for immediate done' );
-   is( scalar $fseq->get, "It works", '$fseq->get for immediate done' );
+   is( scalar $fseq->result, "It works", '$fseq->result for immediate done' );
 }
 
 # else cancel
@@ -207,7 +207,7 @@ use Future;
    $f2->done( "f2 result" );
 
    ok( $fseq->is_ready, '$fseq is done after $f2 done' );
-   is( scalar $fseq->get, "f2 result", '$fseq->get returns results' );
+   is( scalar $fseq->result, "f2 result", '$fseq->result returns results' );
 }
 
 # else_done
@@ -219,18 +219,18 @@ use Future;
    $f1->fail( first => );
 
    ok( $fseq->is_ready, '$fseq done after $f1 done' );
-   is_deeply( [ $fseq->get ], [ second => "result" ], '$fseq->get returns result for else_done' );
+   is_deeply( [ $fseq->result ], [ second => "result" ], '$fseq->result returns result for else_done' );
 
    my $fseq2 = $f1->else_done( third => "result" );
 
    ok( $fseq2->is_ready, '$fseq2 done after ->else_done on immediate' );
-   is_deeply( [ $fseq2->get ], [ third => "result" ], '$fseq2->get returns result for else_done on immediate' );
+   is_deeply( [ $fseq2->result ], [ third => "result" ], '$fseq2->result returns result for else_done on immediate' );
 
    my $f2 = Future->new;
    $fseq = $f2->else_done( "result2" );
    $f2->done( "result" );
 
-   is( scalar $fseq->get, "result", '->else_done ignores success' );
+   is( scalar $fseq->result, "result", '->else_done ignores success' );
 }
 
 # else_fail
@@ -253,7 +253,7 @@ use Future;
    $fseq = $f2->else_fail( "failure" );
    $f2->done( "result" );
 
-   is( scalar $fseq->get, "result", '->else_fail ignores success' );
+   is( scalar $fseq->result, "result", '->else_fail ignores success' );
 }
 
 done_testing;

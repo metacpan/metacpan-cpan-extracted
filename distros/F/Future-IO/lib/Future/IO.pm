@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
 package Future::IO;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010;  # //
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 
@@ -352,10 +352,8 @@ sub _done_at
    return $self;
 }
 
-sub await
+sub _await_once
 {
-   shift;
-
    die "Cowardly refusing to sit idle and do nothing" unless @alarms || @readers || @writers;
 
    # If we always select() then problematic platforms like MSWin32 would
@@ -428,6 +426,24 @@ sub await
    while( @alarms and $alarms[0]->time <= $now ) {
       ( shift @alarms )->f->done;
    }
+}
+
+=head2 await
+
+   $f = $f->await
+
+I<Since version 0.07.>
+
+Blocks until this future is ready (either by success or failure). Does not
+throw an exception if failed.
+
+=cut
+
+sub await
+{
+   my $self = shift;
+   _await_once until $self->is_ready;
+   return $self;
 }
 
 # TODO: Consider implementing the _exactly variants of sysread/syswrite for

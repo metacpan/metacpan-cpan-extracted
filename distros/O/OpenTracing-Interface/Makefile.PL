@@ -7,7 +7,7 @@ WriteMakefile(
     'LICENSE'       => 'artistic2',
     
     test => {
-        'TESTS'         => 't/*.t',
+        'TESTS'         => 't/*.t t/Interface/*/*.t t/Types/*.t',
     },
     
 );

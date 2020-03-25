@@ -40,7 +40,7 @@ subtest "perl exception thrown" => sub {
             my ($f_more) = grep { $_->library eq 'Test::More' } @$frames;
             ok $f_more;
             is $f_more->library, 'Test::More';
-            like $f_more->file, qr|Test/More.pm$|;
+            is $f_more->file, __FILE__;
             ok $f_more->line_no;
         };
     };
@@ -109,7 +109,7 @@ subtest "C exception thrown" => sub {
             my ($f_more) = grep { $_->library eq 'Test::More' } @$frames;
             ok $f_more;
             is $f_more->library, 'Test::More';
-            like $f_more->file, qr|Test/More.pm$|;
+            is $f_more->file, __FILE__;
             ok $f_more->line_no;
         };
     };
@@ -191,7 +191,7 @@ subtest "create backtrace" => sub {
             my ($f_more) = grep { $_->library eq 'Test::More' } @$frames;
             ok $f_more;
             is $f_more->library, 'Test::More';
-            like $f_more->file, qr|Test/More.pm$|;
+            is $f_more->file, __FILE__;
             ok $f_more->line_no;
         };
     };

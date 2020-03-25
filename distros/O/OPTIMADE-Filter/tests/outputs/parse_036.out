@@ -1,0 +1,223 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'name' => [
+                                                                               'a'
+                                                                             ]
+                                                                 }, 'OPTIMADE::Filter::Property' ),
+                                                          '12345'
+                                                        ],
+                                          'operator' => '='
+                                        }, 'OPTIMADE::Filter::Comparison' ),
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'operands' => [
+                                                                                   bless( {
+                                                                                            'name' => [
+                                                                                                        'b'
+                                                                                                      ]
+                                                                                          }, 'OPTIMADE::Filter::Property' ),
+                                                                                   '+12'
+                                                                                 ],
+                                                                   'operator' => '='
+                                                                 }, 'OPTIMADE::Filter::Comparison' ),
+                                                          bless( {
+                                                                   'operands' => [
+                                                                                   bless( {
+                                                                                            'operands' => [
+                                                                                                            bless( {
+                                                                                                                     'name' => [
+                                                                                                                                 'c'
+                                                                                                                               ]
+                                                                                                                   }, 'OPTIMADE::Filter::Property' ),
+                                                                                                            '-34'
+                                                                                                          ],
+                                                                                            'operator' => '='
+                                                                                          }, 'OPTIMADE::Filter::Comparison' ),
+                                                                                   bless( {
+                                                                                            'operands' => [
+                                                                                                            bless( {
+                                                                                                                     'operands' => [
+                                                                                                                                     bless( {
+                                                                                                                                              'name' => [
+                                                                                                                                                          'd'
+                                                                                                                                                        ]
+                                                                                                                                            }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                     '1.2'
+                                                                                                                                   ],
+                                                                                                                     'operator' => '='
+                                                                                                                   }, 'OPTIMADE::Filter::Comparison' ),
+                                                                                                            bless( {
+                                                                                                                     'operands' => [
+                                                                                                                                     bless( {
+                                                                                                                                              'operands' => [
+                                                                                                                                                              bless( {
+                                                                                                                                                                       'name' => [
+                                                                                                                                                                                   'e'
+                                                                                                                                                                                 ]
+                                                                                                                                                                     }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                                              '.2E7'
+                                                                                                                                                            ],
+                                                                                                                                              'operator' => '='
+                                                                                                                                            }, 'OPTIMADE::Filter::Comparison' ),
+                                                                                                                                     bless( {
+                                                                                                                                              'operands' => [
+                                                                                                                                                              bless( {
+                                                                                                                                                                       'operands' => [
+                                                                                                                                                                                       bless( {
+                                                                                                                                                                                                'name' => [
+                                                                                                                                                                                                            'f'
+                                                                                                                                                                                                          ]
+                                                                                                                                                                                              }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                                                                       '-.2E+7'
+                                                                                                                                                                                     ],
+                                                                                                                                                                       'operator' => '='
+                                                                                                                                                                     }, 'OPTIMADE::Filter::Comparison' ),
+                                                                                                                                                              bless( {
+                                                                                                                                                                       'operands' => [
+                                                                                                                                                                                       bless( {
+                                                                                                                                                                                                'operands' => [
+                                                                                                                                                                                                                bless( {
+                                                                                                                                                                                                                         'name' => [
+                                                                                                                                                                                                                                     'g'
+                                                                                                                                                                                                                                   ]
+                                                                                                                                                                                                                       }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                                                                                                '+10.01E-10'
+                                                                                                                                                                                                              ],
+                                                                                                                                                                                                'operator' => '='
+                                                                                                                                                                                              }, 'OPTIMADE::Filter::Comparison' ),
+                                                                                                                                                                                       bless( {
+                                                                                                                                                                                                'operands' => [
+                                                                                                                                                                                                                bless( {
+                                                                                                                                                                                                                         'operands' => [
+                                                                                                                                                                                                                                         bless( {
+                                                                                                                                                                                                                                                  'name' => [
+                                                                                                                                                                                                                                                              'h'
+                                                                                                                                                                                                                                                            ]
+                                                                                                                                                                                                                                                }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                                                                                                                         '6.03e23'
+                                                                                                                                                                                                                                       ],
+                                                                                                                                                                                                                         'operator' => '='
+                                                                                                                                                                                                                       }, 'OPTIMADE::Filter::Comparison' ),
+                                                                                                                                                                                                                bless( {
+                                                                                                                                                                                                                         'operands' => [
+                                                                                                                                                                                                                                         bless( {
+                                                                                                                                                                                                                                                  'operands' => [
+                                                                                                                                                                                                                                                                  bless( {
+                                                                                                                                                                                                                                                                           'name' => [
+                                                                                                                                                                                                                                                                                       'i'
+                                                                                                                                                                                                                                                                                     ]
+                                                                                                                                                                                                                                                                         }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                                                                                                                                                  '.1E1'
+                                                                                                                                                                                                                                                                ],
+                                                                                                                                                                                                                                                  'operator' => '='
+                                                                                                                                                                                                                                                }, 'OPTIMADE::Filter::Comparison' ),
+                                                                                                                                                                                                                                         bless( {
+                                                                                                                                                                                                                                                  'operands' => [
+                                                                                                                                                                                                                                                                  bless( {
+                                                                                                                                                                                                                                                                           'operands' => [
+                                                                                                                                                                                                                                                                                           bless( {
+                                                                                                                                                                                                                                                                                                    'name' => [
+                                                                                                                                                                                                                                                                                                                'j'
+                                                                                                                                                                                                                                                                                                              ]
+                                                                                                                                                                                                                                                                                                  }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                                                                                                                                                                           '-.1e1'
+                                                                                                                                                                                                                                                                                         ],
+                                                                                                                                                                                                                                                                           'operator' => '='
+                                                                                                                                                                                                                                                                         }, 'OPTIMADE::Filter::Comparison' ),
+                                                                                                                                                                                                                                                                  bless( {
+                                                                                                                                                                                                                                                                           'operands' => [
+                                                                                                                                                                                                                                                                                           bless( {
+                                                                                                                                                                                                                                                                                                    'operands' => [
+                                                                                                                                                                                                                                                                                                                    bless( {
+                                                                                                                                                                                                                                                                                                                             'name' => [
+                                                                                                                                                                                                                                                                                                                                         'k'
+                                                                                                                                                                                                                                                                                                                                       ]
+                                                                                                                                                                                                                                                                                                                           }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                                                                                                                                                                                                    '1.e-12'
+                                                                                                                                                                                                                                                                                                                  ],
+                                                                                                                                                                                                                                                                                                    'operator' => '='
+                                                                                                                                                                                                                                                                                                  }, 'OPTIMADE::Filter::Comparison' ),
+                                                                                                                                                                                                                                                                                           bless( {
+                                                                                                                                                                                                                                                                                                    'operands' => [
+                                                                                                                                                                                                                                                                                                                    bless( {
+                                                                                                                                                                                                                                                                                                                             'operands' => [
+                                                                                                                                                                                                                                                                                                                                             bless( {
+                                                                                                                                                                                                                                                                                                                                                      'name' => [
+                                                                                                                                                                                                                                                                                                                                                                  'l'
+                                                                                                                                                                                                                                                                                                                                                                ]
+                                                                                                                                                                                                                                                                                                                                                    }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                                                                                                                                                                                                                             '-.1e-12'
+                                                                                                                                                                                                                                                                                                                                           ],
+                                                                                                                                                                                                                                                                                                                             'operator' => '='
+                                                                                                                                                                                                                                                                                                                           }, 'OPTIMADE::Filter::Comparison' ),
+                                                                                                                                                                                                                                                                                                                    bless( {
+                                                                                                                                                                                                                                                                                                                             'operands' => [
+                                                                                                                                                                                                                                                                                                                                             bless( {
+                                                                                                                                                                                                                                                                                                                                                      'name' => [
+                                                                                                                                                                                                                                                                                                                                                                  'm'
+                                                                                                                                                                                                                                                                                                                                                                ]
+                                                                                                                                                                                                                                                                                                                                                    }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                                                                                                                                                                                                                             '1000000000.E1000000000'
+                                                                                                                                                                                                                                                                                                                                           ],
+                                                                                                                                                                                                                                                                                                                             'operator' => '='
+                                                                                                                                                                                                                                                                                                                           }, 'OPTIMADE::Filter::Comparison' )
+                                                                                                                                                                                                                                                                                                                  ],
+                                                                                                                                                                                                                                                                                                    'operator' => 'AND'
+                                                                                                                                                                                                                                                                                                  }, 'OPTIMADE::Filter::AndOr' )
+                                                                                                                                                                                                                                                                                         ],
+                                                                                                                                                                                                                                                                           'operator' => 'AND'
+                                                                                                                                                                                                                                                                         }, 'OPTIMADE::Filter::AndOr' )
+                                                                                                                                                                                                                                                                ],
+                                                                                                                                                                                                                                                  'operator' => 'AND'
+                                                                                                                                                                                                                                                }, 'OPTIMADE::Filter::AndOr' )
+                                                                                                                                                                                                                                       ],
+                                                                                                                                                                                                                         'operator' => 'AND'
+                                                                                                                                                                                                                       }, 'OPTIMADE::Filter::AndOr' )
+                                                                                                                                                                                                              ],
+                                                                                                                                                                                                'operator' => 'AND'
+                                                                                                                                                                                              }, 'OPTIMADE::Filter::AndOr' )
+                                                                                                                                                                                     ],
+                                                                                                                                                                       'operator' => 'AND'
+                                                                                                                                                                     }, 'OPTIMADE::Filter::AndOr' )
+                                                                                                                                                            ],
+                                                                                                                                              'operator' => 'AND'
+                                                                                                                                            }, 'OPTIMADE::Filter::AndOr' )
+                                                                                                                                   ],
+                                                                                                                     'operator' => 'AND'
+                                                                                                                   }, 'OPTIMADE::Filter::AndOr' )
+                                                                                                          ],
+                                                                                            'operator' => 'AND'
+                                                                                          }, 'OPTIMADE::Filter::AndOr' )
+                                                                                 ],
+                                                                   'operator' => 'AND'
+                                                                 }, 'OPTIMADE::Filter::AndOr' )
+                                                        ],
+                                          'operator' => 'AND'
+                                        }, 'OPTIMADE::Filter::AndOr' )
+                               ],
+                 'operator' => 'AND'
+               }, 'OPTIMADE::Filter::AndOr' );
+== Filter ==
+((a = "12345") AND ((b = "+12") AND ((c = "-34") AND ((d = "1.2") AND ((e = ".2E7") AND ((f = "-.2E+7") AND ((g = "+10.01E-10") AND ((h = "6.03e23") AND ((i = ".1E1") AND ((j = "-.1e1") AND ((k = "1.e-12") AND ((l = "-.1e-12") AND (m = "1000000000.E1000000000")))))))))))))
+== SQL ==
+(('a' = ?) AND (('b' = ?) AND (('c' = ?) AND (('d' = ?) AND (('e' = ?) AND (('f' = ?) AND (('g' = ?) AND (('h' = ?) AND (('i' = ?) AND (('j' = ?) AND (('k' = ?) AND (('l' = ?) AND ('m' = ?)))))))))))))
+=== Values ===
+$VAR1 = [
+          '12345',
+          '+12',
+          '-34',
+          '1.2',
+          '.2E7',
+          '-.2E+7',
+          '+10.01E-10',
+          '6.03e23',
+          '.1E1',
+          '-.1e1',
+          '1.e-12',
+          '-.1e-12',
+          '1000000000.E1000000000'
+        ];

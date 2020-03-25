@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.514';
+our $VERSION   = '0.516';
 
 use Keyword::Simple ();
 use PPR;
@@ -366,13 +366,13 @@ our $GRAMMAR = qr{
 			)?
 			(?&PerlOWS)
 			(?:
-				extends
+				(?: extends | isa | is )
 				(?&PerlOWS)
 				(?: (?&MxpCompactRoleList) )               # CAPTURE:compact_extends
 				(?&PerlOWS)
 			)?
 			(?:
-				with
+				(?: with | does )
 				(?&PerlOWS)
 				(?: (?&MxpCompactRoleList) )               # CAPTURE:compact_with
 				(?&PerlOWS)
@@ -404,13 +404,13 @@ our $GRAMMAR = qr{
 			)?
 			(?&PerlOWS)
 			(?:
-				extends
+				(?: extends | isa | is )
 				(?&PerlOWS)
 				(?: (?&MxpCompactRoleList) )               # CAPTURE:compact_extends
 				(?&PerlOWS)
 			)?
 			(?:
-				with
+				(?: with | does )
 				(?&PerlOWS)
 				(?: (?&MxpCompactRoleList) )               # CAPTURE:compact_with
 				(?&PerlOWS)
@@ -439,7 +439,7 @@ our $GRAMMAR = qr{
 			)?
 			(?&PerlOWS)
 			(?:
-				with
+				(?: with | does )
 				(?&PerlOWS)
 				(?: (?&MxpCompactRoleList) )               # CAPTURE:compact_with
 				(?&PerlOWS)
@@ -640,10 +640,9 @@ our $GRAMMAR = qr{
 			(?: (?&MxpSimpleIdentifier) )                 # CAPTURE:name
 			(?&PerlOWS)
 			(?:
-				(: via )
-				(?:                                        # CAPTURE:via
-					(?&PerlBlock)|(?&PerlIdentifier)|(?&PerlString)
-				)
+				(?: via )
+				(?&PerlOWS)
+				(?: (?&MxpSimpleIdentifier) )              # CAPTURE:via
 			)?
 			(?&PerlOWS)
 		)#</MxpFactoryViaSyntax>
@@ -798,13 +797,25 @@ sub _handle_signature_list {
 		elsif ($sig =~ /^=((?&PerlOWS))((?&PerlScalarExpression)) $GRAMMAR/xso) {
 			my ($ws, $default) = ($1, $2);
 			$parsed[-1]{default} = $default;
+			
 			$sig =~ s/^=\Q$ws$default//xs;
 			$sig =~ s/^((?&PerlOWS)) $GRAMMAR//xso;
+			
+			if ($default =~ / \$ (?: class|self) /xso) {
+				require PadWalker;
+				$default = sprintf('do { my $invocants = PadWalker::peek_my(2)->{q[@invocants]}||PadWalker::peek_my(1)->{q[@invocants]}; my $self=$invocants->[-1]; my $class=ref($self)||$self; %s }', $default);
+				$parsed[-1]{default} = $default;
+			}
 		}
 		
 		if ($sig) {
-			$sig =~ /^,/ or die "WEIRD SIGNATURE??? $sig";
-			$sig =~ s/^,//;
+			if ($sig =~ /^,/) {
+				$sig =~ s/^,//;
+			}
+			else {
+				require Carp;
+				Carp::croak(sprintf "Could not parse signature (%s), remaining: %s", $_[0], $sig);
+			}
 		}
 	}
 	
@@ -848,7 +859,10 @@ sub _handle_signature_list {
 	while (my $p = shift @parsed) {
 		$type_params_stuff .= B::perlstring($p->{name}) . ',' if $seen_named;
 		if ($p->{name} =~ /^[\@\%]/) {
-			die "Cannot have slurpy in non-final position" if @parsed;
+			if (@parsed) {
+				require Carp;
+				Carp::croak("Cannot have slurpy parameter $p->{name} in non-final position");
+			}
 			$extra .= sprintf(
 				'my (%s) = (@_==%d ? %s{$_[-1]} : ());',
 				$p->{name},
@@ -927,11 +941,15 @@ sub _handle_role_list {
 			$rolelist =~ s/^\s+//xs;
 		}
 		else {
-			die "expected role name, got $rolelist";
+			require Carp;
+			Carp::croak("Expected role name, got $rolelist");
 		}
 		
 		if ($rolelist =~ /^\?/xs) {
-			die 'unexpected question mark' if $kind eq 'class';
+			if ($kind eq 'class') {
+				require Carp;
+				Carp::croak("Unexpected question mark suffix in class list");
+			}
 			$suffix = '?';
 			$rolelist =~ s/^\?\s*//xs;
 		}
@@ -953,8 +971,13 @@ sub _handle_role_list {
 		
 		$rolelist =~ s/^\s+//xs;
 		if (length $rolelist) {
-			$rolelist =~ /^,/ or die "expected comma, got $rolelist";
-			$rolelist =~ s/^\,\s*//;
+			if ($rolelist =~ /^,/) {
+				$rolelist =~ s/^\,\s*//;
+			}
+			else {
+				require Carp;
+				Carp::croak(sprintf "Could not parse role list (%s), remaining: %s", $_[0], $rolelist);
+			}
 		}
 	}
 	
@@ -1607,7 +1630,8 @@ sub import {
 					push @processed_imports, sprintf('%sX::%s', $name, $next);
 				}
 				else {
-					die "Expected package name, got $next";
+					require Carp;
+					Carp::croak("Expected package name, got $next");
 				}
 				$imports[0] eq ',' and shift @imports;
 			}
@@ -1841,6 +1865,7 @@ sub import {
 		
 		my ($pos, $name, $via) = ($+[0], $+{name}, $+{via});
 		$via ||= 'new';
+		
 		$me->_inject($ref, $pos, $me->_handle_factory_keyword($name, $via, undef, undef, undef, []));
 	} if $want{factory};
 	
@@ -2236,7 +2261,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.514';
+#	our $VERSION   = '0.516';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2247,7 +2272,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.514';
+#	our $VERSION   = '0.516';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2260,12 +2285,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.514';
+#	our $VERSION   = '0.516';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.514';
+#	our $VERSION   = '0.516';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2279,7 +2304,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.514';
+#	our $VERSION   = '0.516';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;

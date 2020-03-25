@@ -1,0 +1,30 @@
+no SQL representation
+$VAR1 = bless( {
+                 'operator' => 'HAS ONLY',
+                 'property' => bless( {
+                                        'name' => [
+                                                    'elements'
+                                                  ]
+                                      }, 'OPTIMADE::Filter::Property' ),
+                 'values' => [
+                               [
+                                 '=',
+                                 'H'
+                               ],
+                               [
+                                 '=',
+                                 'He'
+                               ],
+                               [
+                                 '=',
+                                 'Ga'
+                               ],
+                               [
+                                 '=',
+                                 'Ta'
+                               ]
+                             ]
+               }, 'OPTIMADE::Filter::ListComparison' );
+== Filter ==
+(elements HAS ONLY = "H", = "He", = "Ga", = "Ta")
+== SQL ==

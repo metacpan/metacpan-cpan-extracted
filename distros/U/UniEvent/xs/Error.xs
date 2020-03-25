@@ -24,9 +24,10 @@ BOOT {
     
     Stash("UniEvent")["SystemError::"] = Stash("XS::STL")["errc::"];
     
-    error_stash.add_const_sub("category", xs::out<const std::error_category*>(&error_category));
-    error_stash.add_const_sub("system_category", xs::out<const std::error_category*>(&make_error_code(std::errc::timed_out).category()));
-    error_stash.add_const_sub("ssl_category", xs::out<const std::error_category*>(&ssl_error_category));
+    error_stash.add_const_sub("system_category",  xs::out<const std::error_category*>(&make_error_code(std::errc::timed_out).category()));
+    error_stash.add_const_sub("category",         xs::out<const std::error_category*>(&error_category));
+    error_stash.add_const_sub("resolve_category", xs::out<const std::error_category*>(&resolve_error_category));
+    error_stash.add_const_sub("ssl_category",     xs::out<const std::error_category*>(&ssl_error_category));
     error_stash.add_const_sub("openssl_category", xs::out<const std::error_category*>(&openssl_error_category));
     
     create_error_constants(error_stash, {
@@ -54,6 +55,29 @@ BOOT {
         {"transport_endpoint_shutdown",                 errc::transport_endpoint_shutdown},
         {"host_down",                                   errc::host_down},
         {"remote_io",                                   errc::remote_io},
+    });
+    
+    Stash resolve_error_stash("UniEvent::ResolveError", GV_ADD);
+    create_error_constants(resolve_error_stash, {
+        {"host_not_found",        resolve_errc::host_not_found},
+        {"not_implemented",       resolve_errc::not_implemented},
+        {"service_not_found",     resolve_errc::service_not_found},
+        {"no_data",               resolve_errc::no_data},
+        {"bad_format",            resolve_errc::bad_format},
+        {"server_failed",         resolve_errc::server_failed},
+        {"refused",               resolve_errc::refused},
+        {"bad_query",             resolve_errc::bad_query},
+        {"bad_name",              resolve_errc::bad_name},
+        {"bad_response",          resolve_errc::bad_response},
+        {"eof",                   resolve_errc::eof},
+        {"file_read_error",       resolve_errc::file_read_error},
+        {"bad_string",            resolve_errc::bad_string},
+        {"bad_flags",             resolve_errc::bad_flags},
+        {"noname",                resolve_errc::noname},
+        {"bad_hints",             resolve_errc::bad_hints},
+        {"not_initialized",       resolve_errc::not_initialized},
+        {"iphlpapi_load_error",   resolve_errc::iphlpapi_load_error},
+        {"no_get_network_params", resolve_errc::no_get_network_params},
     });
 }
 

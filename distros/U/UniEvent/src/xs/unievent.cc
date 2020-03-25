@@ -20,6 +20,25 @@ static bool _init () {
 }
 static bool __init = _init();
 
+IoInfo sv_io_info (const Sv& sv) {
+    IoInfo ret;
+    ret.is_sock = false;
+
+    if (sv.is_ref() || sv.type() > SVt_PVMG) { // if we have a perl IO, get its type for free
+        Io io(sv);
+        ret.is_sock = io.iotype() == IoTYPE_SOCKET;
+        ret.fd      = io.fileno();
+    }
+    else if (!SvOK(sv)) throw std::invalid_argument("fd must be defined");
+    else { // otherwise we have to check the type
+        ret.fd      = SvIV(sv);
+        ret.is_sock = Fs::stat(ret.fd).value().type() == Fs::FileType::SOCKET;
+    }
+
+    if (ret.is_sock) ret.sock = fd2sock(ret.fd);
+    return ret;
+}
+
 string sv2buf (const Sv& sv) {
     string buf;
     if (sv.is_array_ref()) { // [$str1, $str2, ...]

@@ -1,5 +1,13 @@
 Revision history for Future
 
+0.44    2020-03-25
+        [CHANGES]
+         * Added ->result; use that in unit tests and docs where appropriate
+         * Slight performance boost in internals by direct field access rather
+           than accessor methods
+         * Document ->await properly; make it wait until ready
+         * Discourage ->block_until_ready
+
 0.43    2020-01-07
         [CHANGES]
          * Implement the Future::AsyncAwait::Awaitable API methods directly

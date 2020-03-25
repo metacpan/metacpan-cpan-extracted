@@ -8,7 +8,7 @@ package Future::Queue;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 =head1 NAME
 

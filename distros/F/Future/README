@@ -106,8 +106,8 @@ DESCRIPTION
           return $self;
        }
 
-    If an instance overrides the "block_until_ready" method, this will be
-    called by get and failure if the instance is still pending.
+    If an instance overrides the "await" method, this will be called by get
+    and failure if the instance is still pending.
 
     In most cases this should allow future-returning modules to be used as
     if they were blocking call/return-style modules, by simply appending a
@@ -374,11 +374,13 @@ USER METHODS
 
     Returns the $future.
 
- get
+ result
 
-       @result = $future->get
+       @result = $future->result
     
-       $result = $future->get
+       $result = $future->result
+
+    Since version 0.44.
 
     If the future is ready and completed successfully, returns the list of
     results that had earlier been given to the done method on a leaf
@@ -391,16 +393,25 @@ USER METHODS
     were given to the fail method, an exception object is constructed to
     wrap them of type Future::Exception.
 
-    If the future was cancelled an exception is thrown.
+    If the future was cancelled or is not yet ready an exception is thrown.
+
+ get
+
+       @result = $future->get
+    
+       $result = $future->get
+
+    If the future is ready, returns the result or throws the failure
+    exception as per "result".
 
     If it is not yet ready then "block_until_ready" is invoked to wait for
-    a ready state.
+    a ready state, and the result returned as above.
 
- block_until_ready
+ await
 
-       $f = $f->block_until_ready
+       $f = $f->await
 
-    Since version 0.40.
+    Since version 0.44.
 
     Blocks until the future instance is no longer pending.
 
@@ -412,17 +423,21 @@ USER METHODS
     not required, perhaps because other code will be testing the result
     using "is_done" or similar.
 
-       if( $f->block_until_ready->is_done ) {
+       if( $f->await->is_done ) {
           ...
        }
 
-    This method is intended for subclasses to override, but a default
-    implementation for back-compatibility purposes is provided which calls
-    the await method. If the future is not yet ready, attempts to wait for
-    an eventual result by using the underlying await method, which
-    subclasses should provide. The default implementation will throw an
-    exception if called on a still-pending instance that does not provide
-    an await method.
+    This method is intended for subclasses to override. The default
+    implementation will throw an exception if called on a still-pending
+    instance.
+
+ block_until_ready
+
+       $f = $f->block_until_ready
+
+    Since version 0.40.
+
+    Now a synonym for "await". New code should invoke await directly.
 
  unwrap
 
@@ -434,8 +449,7 @@ USER METHODS
     will call get on it and return the result. Otherwise, it returns the
     list of values directly in list context, or the first value in scalar.
     Since it involves an implicit blocking wait, this method can only be
-    used on immediate futures or subclasses that implement
-    "block_until_ready".
+    used on immediate futures or subclasses that implement "await".
 
     This will ensure that an outgoing argument is definitely not a Future,
     and may be useful in such cases as adapting synchronous code to fit
@@ -468,8 +482,8 @@ USER METHODS
     If the future is ready, returns the exception passed to the fail method
     or undef if the future completed successfully via the done method.
 
-    If it is not yet ready then "block_until_ready" is invoked to wait for
-    a ready state.
+    If it is not yet ready then "await" is invoked to wait for a ready
+    state.
 
     If called in list context, will additionally yield the category name
     and list of the details provided to the fail method.
@@ -481,7 +495,7 @@ USER METHODS
           ...
        }
        else {
-          my @result = $future->get;
+          my @result = $future->result;
           ...
        }
 
@@ -1052,7 +1066,7 @@ EXAMPLES
     
        $f->on_ready( sub {
           my $f = shift;
-          say "The operation returned: ", $f->get;
+          say "The operation returned: ", $f->result;
        } );
 
  Indicating Success or Failure
@@ -1066,7 +1080,7 @@ EXAMPLES
        $f->on_ready( sub {
           my $f = shift;
           if( not my $e = $f->failure ) {
-             say "The operation succeeded with: ", $f->get;
+             say "The operation succeeded with: ", $f->result;
           }
           else {
              say "The operation failed with: ", $e;
@@ -1086,7 +1100,7 @@ EXAMPLES
        $f->on_ready( sub {
           my $f = shift;
           try {
-             say "The operation succeeded with: ", $f->get;
+             say "The operation succeeded with: ", $f->result;
           }
           catch {
              say "The operation failed with: ", $_;
@@ -1164,8 +1178,8 @@ EXAMPLES
     
        $f->on_ready( sub {
           say "Operations are ready:";
-          say "  foo: ", $f1->get;
-          say "  bar: ", $f2->get;
+          say "  foo: ", $f1->result;
+          say "  bar: ", $f2->result;
        } );
 
     This provides an ability somewhat similar to CPS::kpar() or

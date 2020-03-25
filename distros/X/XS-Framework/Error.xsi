@@ -58,6 +58,10 @@ bool _op_eq (std::error_code ec1, Sv sv_ec2, ...) {
     }
 }
 
+bool _op_and(std::error_code e1, std::error_code e2, ...) {
+    RETVAL = (e1 == e2);
+}
+
 MODULE = XS::Framework                PACKAGE = XS::STL::ErrorCategory
 PROTOTYPES: DISABLE
 
@@ -128,3 +132,12 @@ bool _op_eq (ErrorCode ec1, Sv sv_ec2, ...) {
         RETVAL = false;
     }
 }
+
+bool contains(ErrorCode ec, std::error_code c) {
+    RETVAL = ec.contains(c);
+}
+
+bool _op_and(ErrorCode ec, std::error_code c, ...) {
+    RETVAL = ec.contains(c);
+}
+

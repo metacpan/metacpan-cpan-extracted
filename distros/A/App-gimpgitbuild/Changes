@@ -1,5 +1,10 @@
 Revision history for App-gimpgitbuild
 
+0.14.0   2020-03-25
+    - Avoid calling the meson build directories "build" and allow
+    for customisation.
+    - Add the PAR_JOBS customisation.
+
 0.12.1   2020-03-19
     - Avoid "undefined" warning for an environment variable.
 

@@ -142,10 +142,11 @@ syntax as the C<class> keyword.
   package Farming {
     use Zydeco;
     role Milkable;
+    role Wooly;
     
     class Cow with Milkable;
-    class Goat with Milkable;
-    class Sheep with Milkable;
+    class Goat with Milkable, Wooly;
+    class Sheep with Milkable, Wooly;
   }
 
 Roles cannot be instantiated like classes can. You can create a new "Cow"
@@ -243,6 +244,23 @@ Extending anonymous classes is much like consuming anonymous roles.
     extends { "::" . "Pig" };
   }
 
+Multiple inheritance is supported though it is often considered bad
+design.
+
+  # potentially a bad idea
+  
+  class Car;
+  class Plane;
+  class FlyingCar extends Car, Plane;
+  
+  # usually a better idea
+  
+  role RoadVehicle;
+  role AirVehicle;
+  class Car with RoadVehicle;
+  class Plane with AirVehicle;
+  class FlyingCar with RoadVehicle, AirVehicle;
+
 =head2 Abstract Classes
 
 It it possible to mark a class as abstract. An abstract class is one that,
@@ -308,6 +326,168 @@ This even works with C<extends>.
     class +Bar extends Foo;  # class name is "MyApp::Foo::Bar"
   }
 
+=head2 Versioning
+
+You can specify a version number for a class or role.
+
+  role Foo 1.0;
+  class Bar 1.1 with Foo;
+
+If it's not just a simple decimal number, you may use the C<version> keyword
+inside the class or role block.
+
+  role Foo {
+    version "1.0.0";
+  }
+  class Bar with Foo {
+    version "1.1.0";
+  }
+
+You can check a class or role's version using the C<VERSION> method:
+
+  my $daisy = MyApp->new_cow;
+  
+  say MyApp::Cow->VERSION;
+  say $daisy->VERSION;
+  
+  $daisy->VERSION('0.5');   # will die if version is too low
+
+You can give a default version when you load Zydeco.
+
+  package MyApp {
+    use Zydeco version => '1.0';
+    class Foo;
+    class Bar 1.1;
+  }
+
+=head2 Authority
+
+Zydeco allows you to specify the authority/author of a class or role.
+
+  class Foo {
+    authority "cpan:TOBYINK";
+  }
+  
+  role Bar {
+    authority "github:tobyink";
+  }
+
+  abstract class Baz {
+    authority "mailto:tobyink@cpan.org";
+  }
+
+Authorities should be URLs, though "cpan:" and "github:" pseudo-URLs are
+also allowed.
+
+  say $Foo::AUTHORITY;
+
+You can give a default authority when you load Zydeco.
+
+  package MyApp {
+    use Zydeco version => '1.0', authority => 'cpan:TOBYINK';
+    class Foo;
+    class Bar 1.1;
+  }
+
+=head2 Class and Role Blocks
+
+Although it has been rather glossed over, two ways of expressing inheritance
+and composition have been shown; one where they are declared inside a block,
+and one where they are declared outside the block.
+
+  class Foo::Bar {
+    extends Foo;
+    with Bar;
+    ...;
+  }
+
+  class Foo::Bar extends Foo with Bar {
+    ...;
+  }
+
+By and large, they are equivalent, however, the form where they are inside
+the block allows C<extends> or C<with> to accept a block of code instead
+of a bareword.
+
+  class Foo::Bar {
+    extends { join "o" => "F", "o" };
+    with { $ENV{USE_BAZ} ? "Baz" : "Bar" };
+    ...;
+  }
+
+It also allows them to occur multiple times in any order.
+
+  class Foo::Bar {
+    extends Foo1;
+    with Bar;
+    ...;
+    with Baz;
+    extends Foo2;
+  }
+
+The form where they are outside the block allows C<is> or C<isa> to be
+used as synonyms for C<extends>, and C<does> as a synonym for C<with>.
+
+  class Foo::Bar is Foo does Bar {
+    ...;
+  }
+
+This is less Moose-like and more Raku-like.
+
+Although the syntax is more limited, they may still be used to inherit
+from multiple base classes, or compose multiple roles, using commas.
+
+  class Foo::Bar extends Foo1, Foo2 with Bar, Baz {
+    ...;
+  }
+
+=head2 Specifying the Backend Toolkit
+
+Zydeco uses L<Moo> to build your classes and roles by default, and all
+classes ultimately inherit from Moo::Object.
+
+  my $daisy = MyApp->new_cow;
+  
+  if ( $daisy->isa('Moo::Object') ) {
+    ...;
+  }
+
+You can use L<Moose> or L<Mouse> as an alternative to Moo.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Foo {
+      toolkit Moose;
+    }
+    role Bar {
+      toolkit Mouse;
+    }
+  }
+
+Extensions for Moo, Moose, and Mouse can be loaded by putting them in
+parentheses afterwards.
+
+  class Foo {
+    toolkit Moose (StrictConstructor, BuildArgs);
+  }
+
+This will load L<Moose>, L<MooseX::StrictConstructor>, and
+L<MooseX::BuildArgs> in your class. The names in the parentheses are prefixed
+with "MooX::", "MooseX::", or "MouseX::" as appropriate. If you wish to avoid
+prefixing, prefix them with "::".
+
+  class Foo {
+    toolkit Mouse ( ::MooseX::StrictConstructor );
+  }
+  # I don't know why you'd want to use MooseX::StrictConstructor
+  # in a Mouse class, but Zydeco doesn't stop you!
+
+Not all extensions to Moo, Moose, and Mouse will work well with Zydeco.
+Extensions that export additional keywords or install wrappers around
+already-exported keywords are unlikely to work. Extensions that poke at
+their caller via the metaobject protocol will usually work.
+
 =head1 KEYWORDS
 
 In this chapter, we looked at the following keywords:
@@ -324,11 +504,13 @@ In this chapter, we looked at the following keywords:
 
 =item C<< abstract class >>
 
+=item C<< version >>
+
+=item C<< authority >>
+
+=item C<< toolkit >>
+
 =back
-
-=head1 TODO
-
-This page should probably detail C<version>, C<authority>, and C<toolkit>.
 
 =head1 NEXT STEPS
 

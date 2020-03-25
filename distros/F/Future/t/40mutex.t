@@ -74,7 +74,7 @@ use Future::Mutex;
 {
    my $mutex = Future::Mutex->new;
 
-   is( $mutex->enter( sub { Future->done( "result" ) } )->get,
+   is( $mutex->enter( sub { Future->done( "result" ) } )->result,
        "result",
        '$mutex->enter returns immediate result' );
 

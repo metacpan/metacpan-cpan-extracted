@@ -1,0 +1,67 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'name' => [
+                                                                               '_exmpl_aax'
+                                                                             ]
+                                                                 }, 'OPTIMADE::Filter::Property' ),
+                                                          '+.1e8'
+                                                        ],
+                                          'operator' => '<='
+                                        }, 'OPTIMADE::Filter::Comparison' ),
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'operands' => [
+                                                                                   bless( {
+                                                                                            'name' => [
+                                                                                                        'nelements'
+                                                                                                      ]
+                                                                                          }, 'OPTIMADE::Filter::Property' ),
+                                                                                   '10'
+                                                                                 ],
+                                                                   'operator' => '>='
+                                                                 }, 'OPTIMADE::Filter::Comparison' ),
+                                                          bless( {
+                                                                   'inner' => bless( {
+                                                                                       'operands' => [
+                                                                                                       bless( {
+                                                                                                                'operands' => [
+                                                                                                                                bless( {
+                                                                                                                                         'name' => [
+                                                                                                                                                     '_exmpl_x'
+                                                                                                                                                   ]
+                                                                                                                                       }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                'Some string'
+                                                                                                                              ],
+                                                                                                                'operator' => '!='
+                                                                                                              }, 'OPTIMADE::Filter::Comparison' ),
+                                                                                                       bless( {
+                                                                                                                'inner' => bless( {
+                                                                                                                                    'operands' => [
+                                                                                                                                                    bless( {
+                                                                                                                                                             'name' => [
+                                                                                                                                                                         '_exmpl_a'
+                                                                                                                                                                       ]
+                                                                                                                                                           }, 'OPTIMADE::Filter::Property' ),
+                                                                                                                                                    '7'
+                                                                                                                                                  ],
+                                                                                                                                    'operator' => '='
+                                                                                                                                  }, 'OPTIMADE::Filter::Comparison' )
+                                                                                                              }, 'OPTIMADE::Filter::Negation' )
+                                                                                                     ],
+                                                                                       'operator' => 'OR'
+                                                                                     }, 'OPTIMADE::Filter::AndOr' )
+                                                                 }, 'OPTIMADE::Filter::Negation' )
+                                                        ],
+                                          'operator' => 'AND'
+                                        }, 'OPTIMADE::Filter::AndOr' )
+                               ],
+                 'operator' => 'OR'
+               }, 'OPTIMADE::Filter::AndOr' );
+== Filter ==
+((_exmpl_aax <= "+.1e8") OR ((nelements >= "10") AND (NOT ((_exmpl_x != "Some string") OR (NOT (_exmpl_a = "7"))))))
+== SQL ==
+(('_exmpl_aax' <= "+.1e8") OR (('nelements' >= "10") AND (NOT (('_exmpl_x' != "Some string") OR (NOT ('_exmpl_a' = "7"))))))

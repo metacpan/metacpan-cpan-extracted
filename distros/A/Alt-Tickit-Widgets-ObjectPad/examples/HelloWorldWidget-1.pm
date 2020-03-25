@@ -1,12 +1,13 @@
-package HelloWorldWidget;
-use base 'Tickit::Widget';
+use Object::Pad 0.08;
 
-sub lines {  1 }
-sub cols  { 12 }
+class HelloWorldWidget
+   extends Tickit::Widget;
 
-sub render_to_rb
+method lines {  1 }
+method cols  { 12 }
+
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    $rb->eraserect( $rect );

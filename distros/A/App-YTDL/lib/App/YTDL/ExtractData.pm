@@ -15,7 +15,7 @@ use App::YTDL::Helper qw( sec_to_time );
 
 
 sub json_to_hash {
-    my ( $opt, $json_all ) = @_;
+    my ( $json_all ) = @_;
     my $tmp = {};
     for my $json ( split /\n+/, $json_all ) {
         my $h_ref = decode_json( $json );
@@ -42,55 +42,55 @@ sub json_to_hash {
         }
         $tmp->{$ex}{$video_id}{video_id}    = $video_id;
         $tmp->{$ex}{$video_id}{fmt_to_info} = $formats;
-        prepare_info( $opt, $tmp, $ex, $video_id );
+        prepare_info( $tmp, $ex, $video_id );
     }
     return $tmp;
 }
 
 
 sub prepare_info {
-    my ( $opt, $info, $ex, $video_id ) = @_;
-    if ( $info->{$ex}{$video_id}{upload_date} ) {
-        if ( $info->{$ex}{$video_id}{upload_date} =~ /^(\d{4})(\d{2})(\d{2})\z/ ) {
-            $info->{$ex}{$video_id}{upload_date}     = $1 . '-' . $2 . '-' . $3;
-            $info->{$ex}{$video_id}{upload_datetime} = $1 . '-' . $2 . '-' . $3 . 'T00:00:00';
+    my ( $data, $ex, $video_id ) = @_;
+    if ( $data->{$ex}{$video_id}{upload_date} ) {
+        if ( $data->{$ex}{$video_id}{upload_date} =~ /^(\d{4})(\d{2})(\d{2})\z/ ) {
+            $data->{$ex}{$video_id}{upload_date}     = $1 . '-' . $2 . '-' . $3;
+            $data->{$ex}{$video_id}{upload_datetime} = $1 . '-' . $2 . '-' . $3 . 'T00:00:00';
         }
-        if ( $info->{$ex}{$video_id}{upload_date} =~ /^(\d\d\d\d-\d\d-\d\d)T(\d\d:\d\d:\d\d)/ ) {
-            $info->{$ex}{$video_id}{upload_date} = $1;
-            $info->{$ex}{$video_id}{upload_datetime} = $1 . 'T' . $2;
+        if ( $data->{$ex}{$video_id}{upload_date} =~ /^(\d\d\d\d-\d\d-\d\d)T(\d\d:\d\d:\d\d)/ ) {
+            $data->{$ex}{$video_id}{upload_date} = $1;
+            $data->{$ex}{$video_id}{upload_datetime} = $1 . 'T' . $2;
         }
     }
-    if ( ! $info->{$ex}{$video_id}{upload_date} && $info->{$ex}{$video_id}{upload_date_rel} ) {
-        $info->{$ex}{$video_id}{upload_date} = $info->{$ex}{$video_id}{upload_date_rel};
+    if ( ! $data->{$ex}{$video_id}{upload_date} && $data->{$ex}{$video_id}{upload_date_rel} ) {
+        $data->{$ex}{$video_id}{upload_date} = $data->{$ex}{$video_id}{upload_date_rel};
     }
-    $info->{$ex}{$video_id}{title}           ||= sprintf 'no_title_%s', $video_id;
-    $info->{$ex}{$video_id}{duration}        ||= '-:--:--';
-    $info->{$ex}{$video_id}{upload_date}     ||= '';
-    $info->{$ex}{$video_id}{upload_datetime} ||= $opt->{no_upload_datetime}; # '0000-00-00T00:00:00';
-    $info->{$ex}{$video_id}{playlist_id} //= '';
-    $info->{$ex}{$video_id}{uploader_id} //= $info->{$ex}{$video_id}{uploader} // '';
-    $info->{$ex}{$video_id}{uploader}    //= $info->{$ex}{$video_id}{uploader_id};
-    $info->{$ex}{$video_id}{title_filename} = $info->{$ex}{$video_id}{title};
-    if ( $info->{$ex}{$video_id}{duration} =~ /^[0-9]+\z/ ) {
-        $info->{$ex}{$video_id}{duration} = sec_to_time( $info->{$ex}{$video_id}{duration}, 1 );
+    $data->{$ex}{$video_id}{title}           ||= sprintf 'no_title_%s', $video_id;
+    $data->{$ex}{$video_id}{duration}        ||= '-:--:--';
+    $data->{$ex}{$video_id}{upload_date}     ||= '';
+    $data->{$ex}{$video_id}{upload_datetime} ||= '0000-00-00T00:00:00';
+    $data->{$ex}{$video_id}{playlist_id} //= '';
+    $data->{$ex}{$video_id}{uploader_id} //= $data->{$ex}{$video_id}{uploader} // '';
+    $data->{$ex}{$video_id}{uploader}    //= $data->{$ex}{$video_id}{uploader_id};
+    $data->{$ex}{$video_id}{title_filename} = $data->{$ex}{$video_id}{title};
+    if ( $data->{$ex}{$video_id}{duration} =~ /^[0-9]+\z/ ) {
+        $data->{$ex}{$video_id}{duration} = sec_to_time( $data->{$ex}{$video_id}{duration}, 1 );
     }
-    if ( $info->{$ex}{$video_id}{like_count} && $info->{$ex}{$video_id}{dislike_count} ) {
-        $info->{$ex}{$video_id}{raters}         ||= $info->{$ex}{$video_id}{like_count} + $info->{$ex}{$video_id}{dislike_count};
-        $info->{$ex}{$video_id}{average_rating}
-        ||= ( $info->{$ex}{$video_id}{like_count} * 5 + $info->{$ex}{$video_id}{dislike_count} ) / $info->{$ex}{$video_id}{raters}; #
+    if ( $data->{$ex}{$video_id}{like_count} && $data->{$ex}{$video_id}{dislike_count} ) {
+        $data->{$ex}{$video_id}{raters}         ||= $data->{$ex}{$video_id}{like_count} + $data->{$ex}{$video_id}{dislike_count};
+        $data->{$ex}{$video_id}{average_rating}
+        ||= ( $data->{$ex}{$video_id}{like_count} * 5 + $data->{$ex}{$video_id}{dislike_count} ) / $data->{$ex}{$video_id}{raters}; #
     }
-    if ( $info->{$ex}{$video_id}{average_rating} ) {
-        $info->{$ex}{$video_id}{average_rating} = sprintf "%.2f", $info->{$ex}{$video_id}{average_rating};
+    if ( $data->{$ex}{$video_id}{average_rating} ) {
+        $data->{$ex}{$video_id}{average_rating} = sprintf "%.2f", $data->{$ex}{$video_id}{average_rating};
     }
-    if ( $info->{$ex}{$video_id}{raters} ) {
-        $info->{$ex}{$video_id}{raters} = insert_sep( $info->{$ex}{$video_id}{raters} );
+    if ( $data->{$ex}{$video_id}{raters} ) {
+        $data->{$ex}{$video_id}{raters} = insert_sep( $data->{$ex}{$video_id}{raters} );
     }
-    if ( $info->{$ex}{$video_id}{view_count} ) {
-        $info->{$ex}{$video_id}{view_count_raw} = $info->{$ex}{$video_id}{view_count};
-        $info->{$ex}{$video_id}{view_count} = insert_sep( $info->{$ex}{$video_id}{view_count} );
+    if ( $data->{$ex}{$video_id}{view_count} ) {
+        $data->{$ex}{$video_id}{view_count_raw} = $data->{$ex}{$video_id}{view_count};
+        $data->{$ex}{$video_id}{view_count} = insert_sep( $data->{$ex}{$video_id}{view_count} );
     }
     else {
-        $info->{$ex}{$video_id}{view_count} = 0;
+        $data->{$ex}{$video_id}{view_count} = 0;
     }
 }
 

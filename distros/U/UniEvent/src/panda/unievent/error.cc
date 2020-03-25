@@ -1,14 +1,19 @@
 #include "error.h"
+#include <ares.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 
 namespace panda { namespace unievent {
 
 const ErrorCategory        error_category;
+const ResolveErrorCategory resolve_error_category;
 const SslErrorCategory     ssl_error_category;
 const OpenSslErrorCategory openssl_error_category;
 
-const char* ErrorCategory::name () const throw() { return "unievent"; }
+const char* ErrorCategory::name        () const throw() { return "unievent"; }
+const char* ResolveErrorCategory::name () const throw() { return "unievent-resolve"; }
+const char* SslErrorCategory::name     () const throw() { return "unievent-ssl"; }
+const char* OpenSslErrorCategory::name () const throw() { return "unievent-openssl"; }
 
 std::string ErrorCategory::message (int condition) const throw() {
     switch ((errc)condition) {
@@ -17,10 +22,8 @@ std::string ErrorCategory::message (int condition) const throw() {
         case errc::ssl_error                                : return "ssl error";
         case errc::bind_error                               : return "bind error";
         case errc::listen_error                             : return "listen error";
-
-
-
         case errc::resolve_error                            : return "resolve error";
+        // see header file for comments on errors below
         case errc::ai_address_family_not_supported          : return "address family not supported";
         case errc::ai_temporary_failure                     : return "temporary failure";
         case errc::ai_bad_flags                             : return "bad ai_flags value";
@@ -44,15 +47,13 @@ std::string ErrorCategory::message (int condition) const throw() {
     return {};
 }
 
-
-const char* SslErrorCategory::name () const throw() { return "unievent-ssl"; }
+std::string ResolveErrorCategory::message (int condition) const throw() {
+    return std::string(ares_strerror(condition));
+}
 
 std::string SslErrorCategory::message (int) const throw() {
     return "generic ssl error";
 }
-
-
-const char* OpenSslErrorCategory::name () const throw() { return "unievent-openssl"; }
 
 std::string OpenSslErrorCategory::message (int condition) const throw() {
     char buf[120];

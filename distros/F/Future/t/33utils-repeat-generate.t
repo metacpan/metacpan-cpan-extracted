@@ -33,7 +33,7 @@ use Future::Utils qw( repeat );
    $trial_f->done( "result" );
 
    ok( $future->is_ready, '$future now ready' );
-   is( scalar $future->get, "result", '$future->get' );
+   is( scalar $future->result, "result", '$future->result' );
 }
 
 # generate otherwise
@@ -49,7 +49,7 @@ use Future::Utils qw( repeat );
      };
 
    is( scalar $future->failure, "Nothing succeeded\n", '$future returns otherwise failure' );
-   is( scalar $last_trial_f->get, "ignore me 3", '$last_trial_f->get' );
+   is( scalar $last_trial_f->result, "ignore me 3", '$last_trial_f->result' );
 
    $future = repeat {
       Future->done( "ignore me" );

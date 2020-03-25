@@ -17,8 +17,8 @@ use App::YTDL::GetData      qw( get_vimeo_list_info get_download_info get_youtub
 
 
 sub from_arguments_to_choices {
-    my ( $opt, @ids ) = @_;
-    my $info = {};
+    my ( $set, $opt, @ids ) = @_;
+    my $data = {};
     for my $webpage_url ( @ids ) {
         if ( $webpage_url =~ /^u#([\p{PerlWord}-]+)\z/ ) {
             $webpage_url = sprintf 'https://www.youtube.com/user/%s/', $1;
@@ -31,68 +31,68 @@ sub from_arguments_to_choices {
         }
         if ( my $video_id = _youtube_video_id( $opt, $webpage_url ) ) {
             my $ex = 'youtube';
-            $info->{$ex}{$video_id}{extractor}   = $ex;
-            $info->{$ex}{$video_id}{webpage_url} = sprintf 'https://www.youtube.com/watch?v=%s', $video_id;
-            prepare_info( $opt, $info, $ex, $video_id );
+            $data->{$ex}{$video_id}{extractor}   = $ex;
+            $data->{$ex}{$video_id}{webpage_url} = sprintf 'https://www.youtube.com/watch?v=%s', $video_id;
+            prepare_info( $data, $ex, $video_id );
         }
         elsif ( my $playlist_id = _youtube_playlist_id( $opt, $webpage_url ) ) {
-            _generic( $opt, $info, $webpage_url );
+            _generic( $set, $opt, $data, $webpage_url );
         }
         elsif ( my $channel_id = _youtube_channel_id( $opt, $webpage_url ) ) {
             my $ex = 'youtube';
             my $type = 'Channel';
-            my $tmp = _youtube_list_info( $opt, $type, $channel_id );
+            my $tmp = _youtube_list_info( $set, $opt, $type, $channel_id );
             next if ! defined $tmp;
-            my ( $vi ) = keys %{$tmp->{$ex}};
-            my $prompt = $tmp->{$ex}{$vi}{uploader};
-            choose_videos( $opt, $info, $tmp, $ex, $prompt );
+            my ( $v_id ) = keys %{$tmp->{$ex}};
+            my $prompt = $tmp->{$ex}{$v_id}{uploader};
+            choose_videos( $set, $opt, $data, $tmp, $ex, $prompt );
         }
         #elsif ( my $user_id = _youtube_user_id( $opt, $webpage_url ) ) {
         #    my $ex = 'youtube';
-        #    my $tmp = _youtube_list_info( $opt, 'User', $user_id );
+        #    my $tmp = _youtube_list_info( $set, $opt, 'User', $user_id );
         #    next if ! defined $tmp;
-        #    my ( $vi ) = keys %{$tmp->{$ex}};
-        #    my $prompt = $tmp->{$ex}{$vi}{uploader};
-        #    choose_videos( $opt, $info, $tmp, $ex, $prompt );
+        #    my ( $v_id ) = keys %{$tmp->{$ex}};
+        #    my $prompt = $tmp->{$ex}{$v_id}{uploader};
+        #    choose_videos( $set, $opt, $data, $tmp, $ex, $prompt );
         #}
         elsif ( my ( $type, $user_id ) = _youtube_user_id( $opt, $webpage_url ) ) {
             my $ex = 'youtube';
-            my $tmp = _youtube_list_info( $opt, $type, $user_id );
+            my $tmp = _youtube_list_info( $set, $opt, $type, $user_id );
             next if ! defined $tmp;
-            my ( $vi ) = keys %{$tmp->{$ex}};
-            my $prompt = $tmp->{$ex}{$vi}{uploader};
-            choose_videos( $opt, $info, $tmp, $ex, $prompt );
+            my ( $v_id ) = keys %{$tmp->{$ex}};
+            my $prompt = $tmp->{$ex}{$v_id}{uploader};
+            choose_videos( $set, $opt, $data, $tmp, $ex, $prompt );
         }
         elsif ( my $vimeo_uploader_id = _vimeo_uploader_id( $opt, $webpage_url )  ) {
             my $ex = 'vimeo';
-            my $tmp = _vimeo_list_info( $opt, $vimeo_uploader_id );
+            my $tmp = _vimeo_list_info( $set, $opt, $vimeo_uploader_id );
             next if ! defined $tmp;
-            my ( $vi ) = keys %{$tmp->{$ex}};
-            my $prompt = $tmp->{$ex}{$vi}{uploader} || $vimeo_uploader_id;
-            choose_videos( $opt, $info, $tmp, $ex, $prompt );
+            my ( $v_id ) = keys %{$tmp->{$ex}};
+            my $prompt = $tmp->{$ex}{$v_id}{uploader} || $vimeo_uploader_id;
+            choose_videos( $set, $opt, $data, $tmp, $ex, $prompt );
         }
         else {
-            _generic( $opt, $info, $webpage_url );
+            _generic( $set, $opt, $data, $webpage_url );
         }
     }
-    return $info;
+    return $data;
 }
 
 
 sub _generic {
-    my ( $opt, $info, $webpage_url ) = @_;
+    my ( $set, $opt, $data, $webpage_url ) = @_;
     my $message = "** GET download info: ";
-    my $tmp = get_download_info( $opt, $webpage_url, $message );
+    my $tmp = get_download_info( $set, $opt, $webpage_url, $message );
     return if ! defined $tmp;
     my ( $ex ) = keys %$tmp;
     my @keys = keys %{$tmp->{$ex}};
     if ( @keys == 1 ) {
         my $video_id = $keys[0];
-        $info->{$ex}{$video_id} = $tmp->{$ex}{$video_id};
+        $data->{$ex}{$video_id} = $tmp->{$ex}{$video_id};
     }
     else {
         my $prompt = $tmp->{$ex}{$keys[0]}{uploader} || $webpage_url;
-        choose_videos( $opt, $info, $tmp, $ex, $prompt );
+        choose_videos( $set, $opt, $data, $tmp, $ex, $prompt );
     }
 }
 
@@ -244,96 +244,116 @@ sub _vimeo_uploader_id {
 
 
 sub _youtube_list_info {
-    my( $opt, $type, $list_id ) = @_;
-    say "Fetching info data ... ";
-    #my $url = sprintf 'https://www.youtube.com/user/%s/videos?sort=dd&view=0&flow=list', $list_id;
-    my $url = sprintf 'https://www.youtube.com/%s/%s/videos', lc $type, $list_id;
-    my $ex = 'youtube';
-    my $tmp_info = {};
-    my $a_ref = get_youtube_list_info( $opt, $url );
-    if ( ! defined $a_ref ) {
-        push @{$opt->{error_get_download_infos}}, sprintf "%s: %s", $type, $list_id;
-        #my $prompt = "Error list-info: $url";
-        # Choose
-        #choose(
-        #    [ 'ENTER to continue' ],
-        #    { prompt => $prompt }
-        #);
-        return;
+    my( $set, $opt, $type, $list_id ) = @_;
+    my $count = 0;
+
+    GET_DATA: while ( 1 ) {
+        say "Fetching info data ... ";
+        #my $url = sprintf 'https://www.youtube.com/user/%s/videos?sort=dd&view=0&flow=list', $list_id;
+        my $url = sprintf 'https://www.youtube.com/%s/%s/videos', lc $type, $list_id;
+        my $ex = 'youtube';
+        my $tmp_data = {};
+        my $a_ref = get_youtube_list_info( $opt, $url );
+        if ( ! defined $a_ref ) {
+            push @{$set->{error_get_download_infos}}, sprintf "%s: %s", $type, $list_id;
+            #my $prompt = "Error list-info: $url";
+            # Choose
+            #choose(
+            #    [ 'ENTER to continue' ],
+            #    { prompt => $prompt }
+            #);
+            return;
+        }
+        for my $entry ( @{$a_ref} ) {
+            my $video_id = $entry->{video_id};
+            $tmp_data->{$ex}{$video_id} = {
+                video_id        => $video_id,
+                title           => $entry->{title},
+                upload_date_rel => $entry->{upload_date_rel},
+                uploader        => $entry->{uploader},
+                view_count      => $entry->{view_count},
+                duration        => $entry->{duration},
+                date_sort       => $entry->{date_sort},
+                webpage_url     => $entry->{webpage_url},
+            };
+            prepare_info( $tmp_data, $ex, $video_id );
+        }
+        if ( ! keys %{$tmp_data->{$ex}} ) {
+            $count++;
+            if ( $count > $opt->{retries} ) {
+                my $prompt = "No videos found: $type - $url";
+                # Choose
+                choose(
+                    [ 'Continue with ENTER' ],
+                    { prompt => $prompt }
+                );
+                return;
+            }
+            sleep $count;
+            redo GET_DATA;
+        }
+        my $up = keys %{$tmp_data->{$ex}};
+        print up( $up + 2 ), cldown;
+        return $tmp_data;
     }
-    for my $entry ( @{$a_ref} ) {
-        my $video_id = $entry->{video_id};
-        $tmp_info->{$ex}{$video_id} = {
-            video_id        => $video_id,
-            title           => $entry->{title},
-            upload_date_rel => $entry->{upload_date_rel},
-            uploader        => $entry->{uploader},
-            view_count      => $entry->{view_count},
-            duration        => $entry->{duration},
-            date_sort       => $entry->{date_sort},
-            webpage_url     => $entry->{webpage_url},
-        };
-        prepare_info( $opt, $tmp_info, $ex, $video_id );
-    }
-    if ( ! keys %{$tmp_info->{$ex}} ) {
-        my $prompt = "No videos found: $type - $url";
-        # Choose
-        choose(
-            [ 'Continue with ENTER' ],
-            { prompt => $prompt }
-        );
-    }
-    my $up = keys %{$tmp_info->{$ex}};
-    print up( $up + 2 ), cldown;
-    return $tmp_info;
 }
 
 
 sub _vimeo_list_info {
-    my( $opt, $list_id ) = @_;
-    say "Fetching info ... ";
-    my $page_nr = 1;
-    my $ex = 'vimeo';
-    my $tmp_info = {};
-    my $videos = 0;
-    my $url;
-    while ( 1 ) {
-        $url = sprintf 'https://vimeo.com/%s/videos/page:%d/sort:date', $list_id, $page_nr;
-        my ( $a_ref, $next ) = get_vimeo_list_info( $opt, $url );
-        if ( ! defined $a_ref ) {
-            push @{$opt->{error_get_download_infos}}, sprintf "%s: error", $list_id;
-            return;
+    my( $set, $opt, $list_id ) = @_;
+    my $count = 0;
+
+    GET_DATA: while ( 1 ) {
+        say "Fetching info ... ";
+        my $page_nr = 1;
+        my $ex = 'vimeo';
+        my $tmp_data = {};
+        my $videos = 0;
+        my $url;
+        PAGE: while ( 1 ) {
+            $url = sprintf 'https://vimeo.com/%s/videos/page:%d/sort:date', $list_id, $page_nr;
+            my ( $a_ref, $next ) = get_vimeo_list_info( $opt, $url );
+            if ( ! defined $a_ref ) {
+                push @{$set->{error_get_download_infos}}, sprintf "%s: error", $list_id;
+                return;
+            }
+            if ( ! @$a_ref ) {
+                push @{$set->{error_get_download_infos}}, sprintf "%s: no videos found.", $url;
+            }
+            for my $entry ( @$a_ref ) {
+                my $video_id = $entry->{video_id};
+                $tmp_data->{$ex}{$video_id} = {
+                    video_id    => $video_id,
+                    title       => $entry->{title},
+                    upload_date => $entry->{upload_date},
+                    uploader    => $entry->{uploader},
+                    webpage_url => $entry->{webpage_url},
+                };
+                prepare_info( $opt, $tmp_data, $ex, $video_id );
+            }
+            $videos += @$a_ref;
+            last PAGE if $opt->{list_type_vimeo} == 2 && $videos >= 48;
+            last PAGE if ! $next;
+            $page_nr++;
         }
-        if ( ! @$a_ref ) {
-            push @{$opt->{error_get_download_infos}}, sprintf "%s: no videos found.", $url;
+        if ( ! keys %{$tmp_data->{$ex}} ) {
+            $count++;
+            if ( $count > $opt->{retries} ) {
+                my $prompt = "No videos found: $url";
+                # Choose
+                choose(
+                    [ 'Continue with ENTER' ],
+                    { prompt => $prompt }
+                );
+                return;
+            }
+            sleep $count;
+            redo GET_DATA;
         }
-        for my $entry ( @$a_ref ) {
-            my $video_id = $entry->{video_id};
-            $tmp_info->{$ex}{$video_id} = {
-                video_id    => $video_id,
-                title       => $entry->{title},
-                upload_date => $entry->{upload_date},
-                uploader    => $entry->{uploader},
-                webpage_url => $entry->{webpage_url},
-            };
-            prepare_info( $opt, $tmp_info, $ex, $video_id );
-        }
-        $videos += @$a_ref;
-        last if $opt->{list_type_vimeo} == 2 && $videos >= 48;
-        last if ! $next;
-        $page_nr++;
+        my $up = keys %{$tmp_data->{$ex}};
+        print up( $up + 2 ), cldown;
+        return $tmp_data;
     }
-    if ( ! keys %{$tmp_info->{$ex}} ) {
-        my $prompt = "No videos found: $url";
-        # Choose
-        choose(
-            [ 'Continue with ENTER' ],
-            { prompt => $prompt }
-        );
-    }
-    my $up = keys %{$tmp_info->{$ex}};
-    print up( $up + 2 ), cldown;
-    return $tmp_info;
 }
 
 

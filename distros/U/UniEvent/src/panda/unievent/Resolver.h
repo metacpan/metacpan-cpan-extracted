@@ -20,7 +20,7 @@ struct Resolver : Refcnt, private backend::ITimerImplListener {
     static constexpr uint64_t DEFAULT_RESOLVE_TIMEOUT       = 5000;  // [ms]
     static constexpr uint32_t DEFAULT_CACHE_EXPIRATION_TIME = 20*60; // [s]
     static constexpr size_t   DEFAULT_CACHE_LIMIT           = 10000; // [records]
-    static constexpr uint32_t DEFAULT_QUERY_TIMEOUT         = 5000;  // [ms]
+    static constexpr uint32_t DEFAULT_QUERY_TIMEOUT         = 500;   // [ms]
     static constexpr uint32_t DEFAULT_WORKERS               = 5;
     static constexpr size_t   MAX_WORKER_POLLS              = 3;
 
@@ -163,7 +163,8 @@ private:
 
     void add_worker ();
 
-    void finish_resolve (const RequestSP&, const AddrInfo&, const std::error_code&);
+    void resolve_localhost (const RequestSP&);
+    void finish_resolve    (const RequestSP&, const AddrInfo&, const std::error_code&);
 
     void handle_timer () override;
 

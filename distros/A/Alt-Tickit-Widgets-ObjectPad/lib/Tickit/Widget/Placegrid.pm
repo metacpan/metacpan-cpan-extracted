@@ -70,15 +70,15 @@ dimensions in the centre of the grid.
 
 has $_title;
 
-method BUILDALL
+method BUILD
 {
    my %params = @_;
 
    $_title = $params{title};
 }
 
-sub lines { 1 }
-sub cols  { 1 }
+method lines { 1 }
+method cols  { 1 }
 
 method render_to_rb
 {

@@ -1,0 +1,43 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'name' => [
+                                                                               'a'
+                                                                             ]
+                                                                 }, 'OPTIMADE::Filter::Property' ),
+                                                          '5'
+                                                        ],
+                                          'operator' => '>'
+                                        }, 'OPTIMADE::Filter::Comparison' ),
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'operands' => [
+                                                                                   bless( {
+                                                                                            'name' => [
+                                                                                                        'b'
+                                                                                                      ]
+                                                                                          }, 'OPTIMADE::Filter::Property' ),
+                                                                                   '2'
+                                                                                 ],
+                                                                   'operator' => '<'
+                                                                 }, 'OPTIMADE::Filter::Comparison' ),
+                                                          bless( {
+                                                                   'operands' => [
+                                                                                   bless( {
+                                                                                            'name' => [
+                                                                                                        'c'
+                                                                                                      ]
+                                                                                          }, 'OPTIMADE::Filter::Property' ),
+                                                                                   '10'
+                                                                                 ],
+                                                                   'operator' => '>'
+                                                                 }, 'OPTIMADE::Filter::Comparison' )
+                                                        ],
+                                          'operator' => 'AND'
+                                        }, 'OPTIMADE::Filter::AndOr' )
+                               ],
+                 'operator' => 'OR'
+               }, 'OPTIMADE::Filter::AndOr' );

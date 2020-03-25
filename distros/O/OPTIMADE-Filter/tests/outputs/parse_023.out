@@ -1,0 +1,11 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 '5',
+                                 '7'
+                               ],
+                 'operator' => '<'
+               }, 'OPTIMADE::Filter::Comparison' );
+== Filter ==
+("5" < "7")
+== SQL ==
+("5" < "7")

@@ -1,13 +1,74 @@
-Revision history for Perl extension Sys::CpuLoad
+Revision history for Perl extension Sys-CpuLoad:
+
+0.21      2020-03-25 13:03:11+00:00 Europe/London
+  [Bug Fixes]
+  - Actually use system getloadavg for NetBSD and Solaris.
+
+0.20      2020-03-25 12:35:33+00:00 Europe/London
+  [Enhancements]
+  - Add support for NetBSD #2 and Solaris.
+
+  - Return a single undef when the load function fails.
+
+  [Bug Fixes]
+  - The return value of getloadavg is now checked, #4.
+
+  - The load method is set up in a BEGIN block instead of import, #5.
+
+  [Documentation]
+  - Update POD about changes in version 0.12.
+
+0.12      2020-03-24 23:22:57+00:00 Europe/London
+  [Enhancements]
+  - Use getloadavg system call in Linux.
+
+  - Port changes for Cygwin from Sys::CpuLoadX.
+
+  [Tests]
+  - Show diagnostics.
+
+0.11      2020-03-24 22:57:02+00:00 Europe/London
+  [Enhancements]
+  - Added support for OS/X, thanks to Vincent Lefèvre, RT#14034/GH#3.
+
+0.10      2020-03-24 22:41:56+00:00 Europe/London
+  - Maintenance taken over by Robert Rothenberg.
+
+  [Enhancements]
+  - Modernised code style.
+
+  - The load average method is determined during module import.
+
+  - Use XSLoader instead of DynaLoader.
+
+  [Bug Fixes]
+  - Fixed VERSION.
+
+  - Removed unnecessary use of AutoLoader.
+
+  [Incompatabilities]
+  - Minimum version is v5.6.
+
+  - Renamed `getbsdload` to `_getbsdload`.
+
+  [Documentation]
+  - Reformatted Changes to conform to CPAN::Changes::Spec.
+
+  [Tests]
+  - Modernised the test, and added a test of the load function.
+
+  [Other]
+  - Reorganised files for modern CPAN distributions.
+
+  - Distribution is minted with Dist::Zilla.
 
 0.03 Mon Mar 18 15:02:33 PST 2002
-	- LC_NUMERIC patch from Victor Wagner
-	- Added cache support to remember how we got the system load
-	- Restricted getloadavg() to FreeBSD/OpenBSD for now
+  - LC_NUMERIC patch from Victor Wagner
+  - Added cache support to remember how we got the system load
+  - Restricted getloadavg() to FreeBSD/OpenBSD for now
 
 0.02 Sun Feb 17 23:43:26 PST 2002
-	- bsd getloadavg() support with help from Dmitry Dorofeev
+  - bsd getloadavg() support with help from Dmitry Dorofeev
 
 0.01 Wed Aug 11 15:44:55 PDT 1999
-	- original version; created by h2xs 1.16
-
+  - original version; created by h2xs 1.16

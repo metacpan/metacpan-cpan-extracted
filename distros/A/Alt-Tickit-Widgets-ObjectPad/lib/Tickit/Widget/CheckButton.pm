@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.09;
 
@@ -140,7 +140,7 @@ has $_on_toggle;
 
 has $_active;
 
-method BUILDALL
+method BUILD
 {
    my %params = @_;
 
@@ -148,9 +148,8 @@ method BUILDALL
    $self->set_on_toggle( $params{on_toggle} ) if $params{on_toggle};
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    return 1;
 }
 
@@ -233,9 +232,8 @@ method deactivate
 }
 
 *key_toggle = \&toggle;
-sub toggle
+method toggle
 {
-   my $self = shift;
    $self->is_active ? $self->deactivate : $self->activate;
    return 1;
 }
@@ -248,10 +246,8 @@ Returns this button's active state.
 
 method is_active { !!$_active }
 
-sub reshape
+method reshape
 {
-   my $self = shift;
-
    my $win = $self->window or return;
 
    my $check = $self->get_style_values( "check" );
@@ -259,9 +255,8 @@ sub reshape
    $win->cursor_at( 0, ( textwidth( $check )-1 ) / 2 );
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    $rb->clear;
@@ -276,9 +271,8 @@ sub render_to_rb
    $rb->erase_to( $rect->right );
 }
 
-sub on_mouse
+method on_mouse
 {
-   my $self = shift;
    my ( $args ) = @_;
 
    return unless $args->type eq "press" and $args->button == 1;

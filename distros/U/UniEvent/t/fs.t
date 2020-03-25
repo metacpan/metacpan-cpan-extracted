@@ -35,7 +35,7 @@ my $async_mode;
                 $expected = undef;
             }
             
-            Fs::remove_all($vdir) if -d $vdir;
+            UniEvent::Fs::remove_all($vdir) if -d $vdir;
         });
     }
 }

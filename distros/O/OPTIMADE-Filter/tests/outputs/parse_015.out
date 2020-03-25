@@ -1,0 +1,39 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'inner' => bless( {
+                                                              'operands' => [
+                                                                              bless( {
+                                                                                       'name' => [
+                                                                                                   'a'
+                                                                                                 ]
+                                                                                     }, 'OPTIMADE::Filter::Property' ),
+                                                                              bless( {
+                                                                                       'name' => [
+                                                                                                   'b'
+                                                                                                 ]
+                                                                                     }, 'OPTIMADE::Filter::Property' )
+                                                                            ],
+                                                              'operator' => '>'
+                                                            }, 'OPTIMADE::Filter::Comparison' )
+                                        }, 'OPTIMADE::Filter::Negation' ),
+                                 bless( {
+                                          'inner' => bless( {
+                                                              'operands' => [
+                                                                              bless( {
+                                                                                       'name' => [
+                                                                                                   'x'
+                                                                                                 ]
+                                                                                     }, 'OPTIMADE::Filter::Property' ),
+                                                                              '0'
+                                                                            ],
+                                                              'operator' => '>'
+                                                            }, 'OPTIMADE::Filter::Comparison' )
+                                        }, 'OPTIMADE::Filter::Negation' )
+                               ],
+                 'operator' => 'AND'
+               }, 'OPTIMADE::Filter::AndOr' );
+== Filter ==
+((NOT (a > b)) AND (NOT (x > "0")))
+== SQL ==
+((NOT ('a' > 'b')) AND (NOT ('x' > "0")))

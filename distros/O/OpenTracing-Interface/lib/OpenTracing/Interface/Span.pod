@@ -50,38 +50,34 @@ OpenTracing::interface::Span - A role that defines the Span interface
 
 This 'role' describes the interface for any OpenTracing Span implementation.
 
-This description is using C<around> method modifiers that basically wraps them
-around the real implementation. These method modifiers provide a 'readable' and
-reusable interface, describing the inputs and outputs, using type constraints.
+C<Span> represents a unit of work executed on behalf of a trace.
 
-Consumers of this role, or implementors of the interface are MUST implement each
-method mentioned below. Not doing so will result in compilation errors.
-
-Since this role does nothing else than checking input and output, it is useful
-during development. Most likely it can be switched off safely in production
-environments.
+Examples of spans include a remote procedure call, or a in-process method call
+to a sub-component. Every span in a trace may have zero or more causal parents,
+and these relationships transitively form a DAG. It is common for spans to have
+at most one parent, and thus most traces are merely tree structures.
 
 
 
-=head1 METHODS
+=head1 INSTANCE METHODS
 
 
 =head2 get_context
 
-Yields the SpanContext for this Span. Note that the return value of 
+Yields the C<SpanContext> for this C<Span>. Note that the return value of 
 C<get_context()> is still valid after a call to L<finish()>, as is a call to
 L<get_context()> after a call to L<finish()>.
 
-    my $context = $span->get_context;
-    
+    my $span_context = $span->get_context;
 
-=head3 Prameters
+
+=head3 Parameters
 
 none
 
 =head3 Returns
 
-An object that does the L<OpenTracing::Interface::SpanContext> role.
+An object of type C<SpanContext> from L<OpenTracing::Types>.
 
 
 
@@ -90,7 +86,6 @@ An object that does the L<OpenTracing::Interface::SpanContext> role.
 Changes the operation name.
 
     $span->overwrite_operation_name( $operation_name );
-    
 
 =head3 Required Positional Parameters
 
@@ -108,7 +103,7 @@ The span itself, for chaining purposes.
 
 
 
-=head2 finish( <none> | undef | $epoch )
+=head2 finish( <none> | $epoch_timestamp )
 
 Sets the end timestamp and finalizes Span state.
 
@@ -124,29 +119,20 @@ leads to undefined behavior (but not returning an exception).
 
 If the span is already finished, a warning should be logged.
 
-=head3 Required Positional Parameters
-
-none
-
 =head3 Optional Positional Params
 
 =over
 
 =item $epoch_timestamp
 
-An explicit finish timestamp for the Span; if omitted, the current walltime is
-used implicitly.
-
-Note: Because the way these roles are designed, if the method has been called
-with no arguments at all, the next method, the one this is being wrapped around,
-will get called with 1 single argument, C<undef>. For most cases, this is okay,
-unless an implementationwould count the number of arguments.
+An explicit finish timestamp for the C<Span>; if omitted, the current walltime
+is used implicitly.
 
 =back
 
 =head3 Returns
 
-The (finished) span itself, for chaining purposes.
+The (finished) C<Span> itself, for chaining purposes.
 
 
 
@@ -155,13 +141,12 @@ The (finished) span itself, for chaining purposes.
 Adds a tag to the span
 
     $span->set_tag( $tag_key => $tag_value );
-    
 
-If there is a pre-existing tag set for tag_key, it is overwritten.
+If there is a pre-existing tag set for C<tag_key>, it is overwritten.
 
 As an implementor, consider using "standard tags" listed in OpenTracing.io
 
-If the span is already finished, a warning should be logged.
+If the C<Span> is already finished, a warning should be logged.
 
 =head3 Required Positional Parameters
 
@@ -183,7 +168,7 @@ The span itself, for chaining purposes.
 
 
 
-=head2 log_data
+=head2 log_data( $key => $value .. )
 
 Adds a log record to the span
 
@@ -209,7 +194,7 @@ The span itself, for chaining purposes.
 
 
 
-=head2 set_baggage_item
+=head2 set_baggage_item( $key => $value )
 
 Sets a key:value pair on this Span and its SpanContext that also propagates to
 descendants of this Span.
@@ -247,7 +232,7 @@ The span itself, for chaining purposes.
 
 
 
-=head2 get_baggage_item
+=head2 get_baggage_item( $key )
 
 Returns either the corresponding baggage value, or C<undef> when such a value
 was missing.
@@ -270,4 +255,37 @@ The value or C<undef> when such a value was missing.
 
 
 
-1;
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Interface>
+
+Describes the API definition for OpenTransport implementations written in the
+Perl5 language.
+
+=item L<OpenTracing::Types>
+
+A library of L<Type::Tiny> type constraints that provides Duck Type checks for
+all common elements that conform L<OpenTracing::Interface>
+
+=back
+
+=cut
+
+
+
+=head1 CAVEATS
+
+This description is using C<around> method modifiers that basically wraps them
+around the real implementation. These method modifiers provide a 'readable' and
+reusable interface, describing the inputs and outputs, using type constraints.
+
+Consumers of this role, or implementors of the interface are MUST implement each
+method mentioned below. Not doing so will result in compilation errors.
+
+Since this role does nothing else than checking input and output, it is useful
+during development. Most likely it can be switched off safely in production
+environments.
+
+=cut

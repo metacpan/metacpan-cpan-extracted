@@ -17,7 +17,7 @@ enum class errc {
     listen_error,
     ssl_error,
     resolve_error,
-    // i dunno if we need errors below
+    // errors below are used only for UV error translation (absent in std::errc). Not sure if they may happen really
     ai_address_family_not_supported,
     ai_temporary_failure,
     ai_bad_flags,
@@ -39,7 +39,33 @@ enum class errc {
     remote_io,
 };
 
+enum class resolve_errc {
+    host_not_found = 1,
+    not_implemented,
+    service_not_found,
+    no_data,
+    bad_format,
+    server_failed,
+    refused,
+    bad_query,
+    bad_name,
+    bad_response,
+    eof,
+    file_read_error,
+    bad_string,
+    bad_flags,
+    noname,
+    bad_hints,
+    not_initialized,
+    iphlpapi_load_error,
+    no_get_network_params,
+};
+
 struct ErrorCategory : std::error_category {
+    const char* name () const throw() override;
+    std::string message (int condition) const throw() override;
+};
+struct ResolveErrorCategory : std::error_category {
     const char* name () const throw() override;
     std::string message (int condition) const throw() override;
 };
@@ -53,10 +79,12 @@ struct OpenSslErrorCategory : std::error_category {
 };
 
 extern const ErrorCategory        error_category;
+extern const ResolveErrorCategory resolve_error_category;
 extern const SslErrorCategory     ssl_error_category;
 extern const OpenSslErrorCategory openssl_error_category;
 
-inline std::error_code make_error_code (errc code) { return std::error_code((int)code, error_category); }
+inline std::error_code make_error_code (errc         code) { return std::error_code((int)code, error_category); }
+inline std::error_code make_error_code (resolve_errc code) { return std::error_code((int)code, resolve_error_category); }
 
 std::error_code make_ssl_error_code (int ssl_code);
 
@@ -82,5 +110,6 @@ protected:
 }}
 
 namespace std {
-    template <> struct is_error_code_enum<panda::unievent::errc> : true_type {};
+    template <> struct is_error_code_enum<panda::unievent::errc>         : true_type {};
+    template <> struct is_error_code_enum<panda::unievent::resolve_errc> : true_type {};
 }

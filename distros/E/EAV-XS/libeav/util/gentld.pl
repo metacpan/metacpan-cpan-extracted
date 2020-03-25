@@ -103,7 +103,7 @@ sub gen_tld_c(@) {
                     length ($row->[0]) + 1,
                     $type;
     }
-    printf $cfh "    { NULL }\n";
+    printf $cfh "    { NULL, 0, 0 }\n";
     print $cfh "}; /* const tld_t tld_list[] */\n\n";
 
     close ($io)

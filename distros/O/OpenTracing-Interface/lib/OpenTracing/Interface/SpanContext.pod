@@ -31,16 +31,14 @@ OpenTracing::Interface::SpanContext - A role that defines the SpanContext interf
 This 'role' describes the interface for any OpenTracing SpanContext
 implementation.
 
-This description is using C<around> method modifiers that basically wraps them
-around the real implementation. These method modifiers provide a 'readable' and
-reusable interface, describing the inputs and outputs, using type constraints.
+SpanContext represents C<Span> state that must propagate to descendant C<Span>'s
+and across process boundaries.
 
-Consumers of this role, or implementors of the interface are MUST implement each
-method mentioned below. Not doing so will result in compilation errors.
-
-Since this role does nothing else than checking input and output, it is useful
-during development. Most likely it can be switched off safely in production
-environments.
+SpanContext is logically divided into two pieces: the user-level "Baggage" (see
+L<with_baggage_item> and L<get_baggage_item>) that propagates across C<Span>
+boundaries and any tracer-implementation-specific fields that are needed to
+identify or otherwise contextualize the associated L<Span> (e.g., a C<trace_id>,
+C<span_id>, C<sampled>).
 
 
 
@@ -53,6 +51,8 @@ environments.
 =head2 get_baggage_item
 
 This will return the value of a baggage item, based on its key.
+
+    my $value = $span_context->get_baggage_item( 'baggage_key' );
 
 It will return C<undef> if there is no value for the given key.
 
@@ -68,9 +68,13 @@ C<undef> if no matching key value is found.
 
 
 
-=head2 with_baggage_item
+=head2 with_baggage_item( $key => $value )
 
-Creates a cloned L<SpanContext> object with the new key => value pair.
+Creates a cloned C<SpanContext> object with the new key => value pair.
+
+    my $new_span_context = $old_span_context->with_baggage_item(
+        baggage_key => $value,
+    );
 
 =head3 Required Positional Parameters
 
@@ -89,5 +93,42 @@ must be a string
 =head3 Returns
 
 A cloned object that MUST implement this interface.
+
+=cut
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Interface>
+
+Describes the API definition for OpenTransport implementations written in the
+Perl5 language.
+
+=item L<OpenTracing::Types>
+
+A library of L<Type::Tiny> type constraints that provides Duck Type checks for
+all common elements that conform L<OpenTracing::Interface>
+
+=back
+
+=cut
+
+
+
+=head1 CAVEATS
+
+This description is using C<around> method modifiers that basically wraps them
+around the real implementation. These method modifiers provide a 'readable' and
+reusable interface, describing the inputs and outputs, using type constraints.
+
+Consumers of this role, or implementors of the interface are MUST implement each
+method mentioned below. Not doing so will result in compilation errors.
+
+Since this role does nothing else than checking input and output, it is useful
+during development. Most likely it can be switched off safely in production
+environments.
 
 =cut

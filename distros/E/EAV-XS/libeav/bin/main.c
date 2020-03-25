@@ -20,6 +20,8 @@ parse_file (const char *file, eav_t *eav)
     int failed = 0;
 
 
+    setlocale(LC_ALL, "en_US.UTF-8");
+
     fh = fopen (file, "r");
 
     if (fh == NULL) {

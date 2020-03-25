@@ -1,3 +1,5 @@
+1.2.9  24.03.2020
+           - add method ErrorCode::contains and operator& as alias
 1.2.8  14.02.2020
            - add operator=(nullptr_t) to various SVAPI classes to resolve ambiguity
            - more details on xs::in<TYPE>() failure

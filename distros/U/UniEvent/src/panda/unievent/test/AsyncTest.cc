@@ -11,12 +11,6 @@ using panda::net::SockAddr;
 
 static int refused_port = 10000;
 
-static TcpSP make_refuse_tcp () {
-    TcpSP ret = new Tcp();
-    ret->bind("127.0.0.1", 0);
-    return ret;
-}
-
 SockAddr AsyncTest::get_refused_addr () {
     ++refused_port;
     if (refused_port > 40000) refused_port = 10000;
@@ -25,7 +19,11 @@ SockAddr AsyncTest::get_refused_addr () {
     #elif defined(__APPLE__) || defined(__NetBSD__)
         return SockAddr::Inet4("0.0.0.0", refused_port);
     #else
-        static TcpSP rs = make_refuse_tcp();
+        static TcpSP rs;
+        if (!rs) {
+            rs = new Tcp();
+            rs->bind("127.0.0.1", 0);
+        }
         return rs->sockaddr();
     #endif
 }

@@ -10,8 +10,8 @@ TARGETS = eav eav.static
 SOURCES = $(wildcard *.c)
 OBJECTS = $(patsubst %.c, %.o, $(SOURCES))
 
-LIBS = ${_libs}
-LIBS += -L.. -leav
+LIBS = -L.. -leav ${_libs}
+LIBS_STATIC = -L.. -leav ${_libs_static}
 
 #----------------------------------------------------------#
 
@@ -32,7 +32,7 @@ eav: $(OBJECTS)
 eav.static: LDFLAGS = -static
 eav.static: $(OBJECTS)
 	# bin -> static linkage
-	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS_STATIC)
 
 %.o: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
@@ -40,7 +40,11 @@ eav.static: $(OBJECTS)
 
 strip: shared
 	# bin -> strip
-	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag $(TARGETS)
+	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav
+
+strip-static: static
+	# bin -> strip
+	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav.static
 
 #----------------------------------------------------------#
 

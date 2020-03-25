@@ -8,6 +8,8 @@ build_requires:
   Test::Refcount: '0.09'
 configure_requires:
   Module::Build: '0.4004'
+  XS::Parse::Sublike: '0.04'
+  XS::Parse::Sublike::Builder: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -18,18 +20,18 @@ name: Future-AsyncAwait
 provides:
   Future::AsyncAwait:
     file: lib/Future/AsyncAwait.pm
-    version: '0.37'
+    version: '0.38'
   Future::AsyncAwait::Awaitable:
     file: lib/Future/AsyncAwait/Awaitable.pm
-    version: '0.37'
+    version: '0.38'
   Test::Future::AsyncAwait::Awaitable:
     file: lib/Test/Future/AsyncAwait/Awaitable.pm
-    version: '0.37'
+    version: '0.38'
 requires:
   Future: '0'
   perl: '5.016'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.37'
+version: '0.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

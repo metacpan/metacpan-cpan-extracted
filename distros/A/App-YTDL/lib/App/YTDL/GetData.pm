@@ -48,6 +48,7 @@ sub get_youtube_list_info {
             if ( $more_button ) {
                 $load_more_widget_html = $more_button->to_string;
             }
+            my $redo_count = {};
 
             PAGE: while ( $load_more_widget_html ) {
                 my $url;
@@ -58,7 +59,15 @@ sub get_youtube_list_info {
                 $ua->{page}++;
                 my $next_res = $ua->get( $url );
                 my $h_ref = decode_json( $next_res->decoded_content );
-                last PAGE if $h_ref->{content_html} !~ /\S/;
+                if ( ! defined $h_ref->{content_html} || $h_ref->{content_html} !~ /\S/ ) { # ?
+                    my $page = $ua->{page};
+                    $redo_count->{$page}++;
+                    if ( $redo_count->{$page} > $opt->{retries} ) {
+                        last PAGE;
+                    }
+                    sleep $redo_count->{$page};
+                    redo PAGE;
+                }
                 my $content = '<!DOCTYPE html><html>' . $h_ref->{content_html} . '</html>';
                 _parse_yt_list_html( $content, $uploader, $tmp );
                 if ( $opt->{list_type_youtube} == 2 ) {
@@ -73,8 +82,10 @@ sub get_youtube_list_info {
             return $tmp;
         }
         else {
+            if ( $count > $opt->{retries} ) {
+                return;
+            }
             say "$count/$opt->{retries}  $@";
-            return if $count == $opt->{retries};
             sleep $opt->{retries} * 3;
         }
     }
@@ -188,8 +199,10 @@ sub get_vimeo_list_info {
             return $tmp, $next;
         }
         else {
+            if ( $count > $opt->{retries} ) {
+                return;
+            }
             say "$count/$opt->{retries}  $@";
-            return if $count == $opt->{retries};
             sleep $opt->{retries} * 3;
         }
     }
@@ -197,8 +210,8 @@ sub get_vimeo_list_info {
 
 
 sub get_download_info {
-    my ( $opt, $webpage_url, $message ) = @_;
-    my @cmd = @{$opt->{youtube_dl}};
+    my ( $set, $opt, $webpage_url, $message ) = @_;
+    my @cmd = @{$set->{youtube_dl}};
     push @cmd, '--youtube-skip-dash-manifest';
     push @cmd, '--dump-json', '--', $webpage_url;
     my $json_all;
@@ -220,16 +233,16 @@ sub get_download_info {
         }
         else {
             print SHOW_CURSOR;
-            say "$count/$opt->{retries}  $webpage_url: $@"; #
-            if ( $count == $opt->{retries} ) {
-                push @{$opt->{error_get_download_infos}}, $webpage_url; # $ex
+            if ( $count > $opt->{retries} ) {
+                push @{$set->{error_get_download_infos}}, $webpage_url; # $ex
                 return;
             }
+            say "$count/$opt->{retries}  $webpage_url: $@";
             sleep $opt->{retries} * 3;
         }
     }
-    $opt->{up}++;
-    my $tmp = json_to_hash( $opt, $json_all );
+    $set->{up}++;
+    my $tmp = json_to_hash( $json_all );
     return $tmp
 }
 

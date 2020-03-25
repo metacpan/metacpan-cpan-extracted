@@ -1,0 +1,140 @@
+=head1 NAME
+
+OpenTracing::Interface::ScopeManager - A role that defines the ScopeManager
+
+=head1 SYNOPSIS
+
+    package OpenTracing::Implementation::MyBackendService::ScopeManager;
+        
+    sub activate_span {
+        ...
+    }
+    
+    sub get_active_scope {
+        ...
+    }
+    
+    BEGIN {
+        use Role::Tiny::With;
+        with 'OpenTracing::Interface::ScopeManager'
+            if $ENV{OPENTRACING_INTERFACE};
+    } # check at compile time, perl -c will work
+    
+    1;
+
+=head1 DESCRIPTION
+
+This 'role' describes the interface for any OpenTracing ScopeManager
+implementation.
+
+The C<ScopeManager> interface abstracts both the activation of C<Span> instances
+via L<activate_Span> and access to an active C<Scope> via L<get_active_scope>.
+
+
+
+=head1 INSTANCE METHODS
+
+
+
+=head2 activate_span( $span, %options )
+
+Set the specified C<Span> as the active instance for the current context
+(usually a thread).
+
+    my $span = $tracer->start_span( 'some operation'
+        ignore_active_span => 1
+    );
+    
+    my $manager = $tracer->get_scope_manager;
+    
+    my $scope = $manager->activate_span( $span,
+        finish_span_on_close => 0
+    );
+
+The returned C<Scope> represents the active state for the span. Once its active
+period is due, C<< $scope->close() >> ought to be called.
+Observe the span will be automatically finished when C<< $scope->close() >> is
+called.
+
+=head3 Required Positional Parameters
+
+=over
+
+=item Span
+
+An object that does the C<Span> interface.
+
+=back
+
+=head3 Named Options
+
+=over
+
+=item finish_span_on_close
+
+A C<Bool> when set to false, the C<Span> will not be automatically finished when
+the C<Scope> has been closed. This is 'true' by default.
+
+=back
+
+=head3 Returns
+
+An object that implements the C<Scope> interface.
+
+
+
+=head2 get_active_scope
+
+Return the currently active C<Scope> which can be used to access the
+currently active C<Span>, using C<< $scope->get_span >>.
+
+    my $manager = $tracer->get_scope_manager;
+    
+    my $scope = $manager->get_activate_scope;
+
+=head3 Parameters
+
+none
+
+=head3 Returns
+
+The C<Scope> that is currently active.
+
+=cut
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Interface>
+
+Describes the API definition for OpenTransport implementations written in the
+Perl5 language.
+
+=item L<OpenTracing::Types>
+
+A library of L<Type::Tiny> type constraints that provides Duck Type checks for
+all common elements that conform L<OpenTracing::Interface>
+
+=back
+
+=cut
+
+
+
+=head1 CAVEATS
+
+This description is using C<around> method modifiers that basically wraps them
+around the real implementation. These method modifiers provide a 'readable' and
+reusable interface, describing the inputs and outputs, using type constraints.
+
+Consumers of this role, or implementors of the interface are MUST implement each
+method mentioned below. Not doing so will result in compilation errors.
+
+Since this role does nothing else than checking input and output, it is useful
+during development. Most likely it can be switched off safely in production
+environments.
+
+=cut

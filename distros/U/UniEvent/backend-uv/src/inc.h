@@ -7,8 +7,8 @@
 
 namespace panda { namespace unievent { namespace backend { namespace uv {
 
-static inline void            uvx_strict (int err) { if (err) throw Error(uvx_code_error(err)); }
-static inline std::error_code uvx_ce     (int err) { return err ? uvx_code_error(err) : std::error_code(); }
+static inline void            uvx_strict (int err) { if (err) throw Error(uvx_error(err)); }
+static inline std::error_code uvx_ce     (int err) { return err ? uvx_error(err) : std::error_code(); }
 
 template <class T = HandleImpl*, class X>
 static inline T get_handle (X* uvhp) {
@@ -63,7 +63,7 @@ static inline net::SockAddr uvx_sockaddr (Handle uvhp, Func&& f) {
     int err = f(uvhp, ret.get(), &sz);
     if (err) {
         if (err == UV_ENOTCONN || err == UV_EBADF || err == UV_EINVAL) return {};
-        throw uvx_code_error(err);
+        throw Error(uvx_error(err));
     }
     return ret;
 }
@@ -73,7 +73,7 @@ static inline optional<fh_t> uvx_fileno (const uv_handle_t* p) {
     int err = uv_fileno(p, &fd);
     if (!err) return {fd};
     if (err == UV_EBADF) return {};
-    throw uvx_code_error(err);
+    throw Error(uvx_error(err));
 }
 
 static inline int uvx_recv_buffer_size (const uv_handle_t* p) {

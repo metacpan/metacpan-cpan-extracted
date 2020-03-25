@@ -58,9 +58,9 @@ use Future;
    undef @on_ready_args;
 
    ok( $future->is_ready, '$future now ready after f2 ready' );
-   my @results = $future->get;
-   identical( $results[0], $f1, 'Results[0] from $future->get is f1' );
-   identical( $results[1], $f2, 'Results[1] from $future->get is f2' );
+   my @results = $future->result;
+   identical( $results[0], $f1, 'Results[0] from $future->result is f1' );
+   identical( $results[1], $f2, 'Results[1] from $future->result is f2' );
    undef @results;
 
    is_deeply( [ $future->pending_futures ],
@@ -89,8 +89,8 @@ use Future;
    my $future = Future->wait_all( $f1 );
 
    ok( $future->is_ready, '$future of already-ready sub already ready' );
-   my @results = $future->get;
-   identical( $results[0], $f1, 'Results from $future->get of already ready' );
+   my @results = $future->result;
+   identical( $results[0], $f1, 'Results from $future->result of already ready' );
 }
 
 # one immediately done
@@ -105,8 +105,8 @@ use Future;
    $f2->done;
 
    ok( $future->is_ready, '$future of completely-done subs already ready' );
-   my @results = $future->get;
-   identical( $results[0], $f1, 'Results from $future->get of already ready' );
+   my @results = $future->result;
+   identical( $results[0], $f1, 'Results from $future->result of already ready' );
 }
 
 # cancel propagation
@@ -154,7 +154,7 @@ use Future;
    my $f = Future->wait_all( () );
 
    ok( $f->is_ready, 'wait_all on no Futures already done' );
-   is_deeply( [ $f->get ], [], '->get on empty wait_all is empty' );
+   is_deeply( [ $f->result ], [], '->result on empty wait_all is empty' );
 }
 
 done_testing;

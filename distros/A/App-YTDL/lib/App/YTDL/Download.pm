@@ -17,8 +17,8 @@ END { print SHOW_CURSOR }
 
 
 sub _choose_fmt {
-    my ( $opt, $info, $ex, $video_id, $title ) = @_;
-    my $fmt_to_info = $info->{$ex}{$video_id}{fmt_to_info};
+    my ( $data, $ex, $video_id, $title ) = @_;
+    my $fmt_to_info = $data->{$ex}{$video_id}{fmt_to_info};
     my ( @choices, @format_ids );
     if ( $ex eq 'youtube' ) {
         for my $fmt ( sort { $a <=> $b } keys %$fmt_to_info ) {
@@ -42,17 +42,19 @@ sub _choose_fmt {
     while ( 1 ) {
         my $prompt = 'Fmt: ';
         my @pre = ( undef );
+        my $menu = [ @pre, @choices ];
         # Choose
         my $idx = choose(
-            [ @pre, @choices ],
+            $menu,
             { prompt => $prompt . join( '', @fmt_str ), index => 1, order => 1, undef => '<<', info => $title }
         );
-        if ( ! $idx ) {
+        if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return if ! @fmt_str;
             pop @fmt_str;
             pop @fmt_str;
             next;
         }
+
         push @fmt_str, @format_ids[ $idx - @pre ];
         my $enough = '  OK';
         @pre = ( undef, $enough );
@@ -61,7 +63,7 @@ sub _choose_fmt {
             [ ',', "  ,  " ],
             [ '/', "  /  " ],
         ];
-        my $menu =  [ @pre, map( $_->[1], @$ops ) ];
+        $menu = [ @pre, map( $_->[1], @$ops ) ];
         # Choose
         my $idx_op = choose(
             $menu,
@@ -79,7 +81,7 @@ sub _choose_fmt {
 }
 
 sub download_youtube {
-    my ( $opt, $info ) = @_;
+    my ( $set, $opt, $data, $from_list ) = @_;
     my $qty;
     if ( $opt->{quality} =~ /^\s*(\d+) or less$/ ) {
         $qty = '<=';
@@ -96,14 +98,14 @@ sub download_youtube {
     }
     my $nr = 0;
     my $total = 0;
-    for my $ex ( keys %$info ) {
-        $total += keys %{$info->{$ex}};
+    for my $ex ( keys %$data ) {
+        $total += keys %{$data->{$ex}};
     }
     print up( 2 ) if $total == 0;
     print HIDE_CURSOR;
 
-    EX: for my $ex ( sort keys %$info ) {
-        my @sorted_video_ids = sort { $info->{$ex}{$a}{count} <=> $info->{$ex}{$b}{count} } keys %{$info->{$ex}};
+    EX: for my $ex ( sort keys %$data ) {
+        my @sorted_video_ids = sort { $data->{$ex}{$a}{count} <=> $data->{$ex}{$b}{count} } keys %{$data->{$ex}};
         my $ask_fmt_for_each_video = 0;
         if ( $qty eq 'manually' && @sorted_video_ids > 1 ) {
             my ( $yes, $no ) = (  '- YES', '- NO' );
@@ -124,18 +126,19 @@ sub download_youtube {
             }
         }
         my $fmt_str;
+        my $count = {};
 
         VIDEO: for my $video_id ( @sorted_video_ids ) {
-            my @cmd = @{$opt->{youtube_dl}};
+            my @cmd = @{$set->{youtube_dl}};
             #push @cmd, '--skip-download';
             if ( $qty eq 'manually' ) {
                 if ( $ask_fmt_for_each_video || ! $fmt_str ) {
-                    my $count_of_total = $info->{$ex}{$video_id}{count} . '/' . $total;
+                    my $count_of_total = $data->{$ex}{$video_id}{count} . '/' . $total;
                     my $title;
                     if ( $ask_fmt_for_each_video ) {
-                        $title = "\n" . $count_of_total . ' "' . $info->{$ex}{$video_id}{title} . '"';
+                        $title = "\n" . $count_of_total . ' "' . $data->{$ex}{$video_id}{title} . '"';
                     }
-                    $fmt_str = _choose_fmt( $opt, $info, $ex, $video_id, $title );
+                    $fmt_str = _choose_fmt( $data, $ex, $video_id, $title );
                     if ( ! defined $fmt_str ) {
                         print $count_of_total . ' skipped' . "\n";
                         next VIDEO;
@@ -151,13 +154,28 @@ sub download_youtube {
             }
             my $output = $opt->{video_dir};
             $output .= '/%(extractor)s' if $opt->{use_extractor_dir};
-            $output .= '/%(uploader)s'  if $opt->{use_uploader_dir} == 1 || $opt->{use_uploader_dir} == 2 && $info->{$ex}{$video_id}{from_list};
+            $output .= '/%(uploader)s'  if $opt->{use_uploader_dir} == 1 || $opt->{use_uploader_dir} == 2 && $data->{$ex}{$video_id}{from_list};
             $output .= '/%(title)s_%(height)s.%(ext)s';
             push @cmd, '-o', $output;
-            push @cmd, '--', $info->{$ex}{$video_id}{webpage_url};
-            print $info->{$ex}{$video_id}{count} . '/' . $total . ' ';
-            uni_system( @cmd );
+            push @cmd, '--', $data->{$ex}{$video_id}{webpage_url};
+            print $data->{$ex}{$video_id}{count} . '/' . $total . ' ';
+            my $exit_value = uni_system( @cmd );
+            if ( $exit_value != 0 ) {
+                $count->{$video_id}++;
+                if ( $count->{$video_id} > $opt->{retries} ) {
+                    next VIDEO;
+                }
+                sleep $count->{$video_id};
+                $fmt_str = undef;
+                redo VIDEO;
+            }
         }
+    }
+    if ( $from_list && $total && $opt->{list_download_pause} ) {
+        choose(
+            [ " " ],
+            { prompt => "Press Enter:" }
+        );
     }
     print SHOW_CURSOR;
     return;

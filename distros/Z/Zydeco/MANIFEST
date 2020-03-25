@@ -53,6 +53,7 @@ t/51mixedsigs.t
 t/52lists.t
 t/53outsiders.t
 t/80lines.t
+t/96box.t
 t/97defaults.t
 t/98geom.t
 t/99anonclass.t

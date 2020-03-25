@@ -1,3 +1,21 @@
-0.001   2019-01-27 (PERLANCAR)
+0.003   2020-01-12  Released-By: PERLANCAR; Urgency: high
+
+        - Merge duplicate releases 0.002 and 0.002.1.
+
+
+0.002.1 2020-01-04  Released-By: PERLANCAR; Urgency: medium
+
+        - UPDATE 2019-01-12: rename from 0.002 to 0.002.1 due to duplicate.
+
+	- Add modules: Org::Parser::Tiny, Org::Examples, App::org2wp,
+	  Data::Dmp::Org.
+
+
+0.002   2019-12-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Add Org::Parser::Tiny.
+
+
+0.001   2019-01-27  Released-By: PERLANCAR
 
         - First release.

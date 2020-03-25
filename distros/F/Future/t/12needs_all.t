@@ -32,7 +32,7 @@ use Future;
    is( $ready, 1, '$future is now ready' );
 
    ok( $future->is_ready, '$future now ready after f2 ready' );
-   is_deeply( [ $future->get ], [ one => 1, two => 2 ], '$future->get after f2 ready' );
+   is_deeply( [ $future->result ], [ one => 1, two => 2 ], '$future->result after f2 ready' );
 
    is_refcount( $future, 1, '$future has refcount 1 at end of test' );
    undef $future;
@@ -63,7 +63,7 @@ use Future;
    is( $future->failure, "It fails", '$future->failure yields exception' );
    my $file = __FILE__;
    my $line = __LINE__ + 1;
-   like( exception { $future->get }, qr/^It fails at \Q$file line $line\E\.?\n$/, '$future->get throws exception' );
+   like( exception { $future->result }, qr/^It fails at \Q$file line $line\E\.?\n$/, '$future->result throws exception' );
 
    is( $c2, 1, 'Unfinished child future cancelled on failure' );
 
@@ -141,7 +141,7 @@ use Future;
    my $f = Future->needs_all( () );
 
    ok( $f->is_ready, 'needs_all on no Futures already done' );
-   is_deeply( [ $f->get ], [], '->get on empty needs_all is empty' );
+   is_deeply( [ $f->result ], [], '->result on empty needs_all is empty' );
 }
 
 # weakself retention (RT120468)

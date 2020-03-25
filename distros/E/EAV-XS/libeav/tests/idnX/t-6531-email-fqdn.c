@@ -28,7 +28,7 @@ main (int argc, char *argv[])
         return 2;
     }
 
-    setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "en_US.UTF-8");
 
     file = argv[3];
     expect_pass = atoi (argv[1]);

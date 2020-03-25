@@ -1,0 +1,15 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'name' => [
+                                                      'field'
+                                                    ]
+                                        }, 'OPTIMADE::Filter::Property' ),
+                                 '!#$%&\'()*+,-./:;<=>?@[]^`{|}~%'
+                               ],
+                 'operator' => '='
+               }, 'OPTIMADE::Filter::Comparison' );
+== Filter ==
+(field = "!#$%&'()*+,-./:;<=>?@[]^`{|}~%")
+== SQL ==
+('field' = "!#$%&'()*+,-./:;<=>?@[]^`{|}~%")

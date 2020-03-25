@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::build;
-$App::gimpgitbuild::Command::build::VERSION = '0.12.1';
+$App::gimpgitbuild::Command::build::VERSION = '0.14.0';
 use strict;
 use warnings;
 use 5.014;
@@ -73,10 +73,13 @@ sub _git_build
     # https://github.com/libfuse/libfuse/issues/212
     # Ubuntu/etc. places it under $prefix/lib/$arch by default.
     my $UBUNTU_MESON_LIBDIR_OVERRIDE = "-D libdir=lib";
+    my $MESON_BUILD_DIR              = ( $ENV{GIMPGITBUILD__MESON_BUILD_DIR}
+            // "to-del--gimpgitbuild--meson-build" );
+    my $PAR_JOBS = ( $ENV{GIMPGITBUILD__PAR_JOBS_FLAGS} // '-j4' );
     my $meson1 =
-qq#mkdir -p "build" && cd build && meson --prefix="$args->{prefix}" $UBUNTU_MESON_LIBDIR_OVERRIDE .. && ninja -j4 && ninja -j4 test && ninja -j4 install#;
+qq#mkdir -p "$MESON_BUILD_DIR" && cd "$MESON_BUILD_DIR" && meson --prefix="$args->{prefix}" $UBUNTU_MESON_LIBDIR_OVERRIDE .. && ninja $PAR_JOBS && ninja $PAR_JOBS test && ninja $PAR_JOBS install#;
     my $autoconf1 =
-qq#NOCONFIGURE=1 ./autogen.sh && ./configure --prefix="$args->{prefix}" && make -j4 && @{[_check()]} && make install#;
+qq#NOCONFIGURE=1 ./autogen.sh && ./configure --prefix="$args->{prefix}" && make $PAR_JOBS && @{[_check()]} && make install#;
     _do_system(
         {
             cmd => [
@@ -173,7 +176,7 @@ __END__
 
 =head1 VERSION
 
-version 0.12.1
+version 0.14.0
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

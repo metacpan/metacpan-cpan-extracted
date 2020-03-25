@@ -36,15 +36,11 @@ BOOT {
     xs::at_perl_destroy([]() { cbn.on_poll = nullptr; });
 }
 
-Poll* Poll::new (Sv _fd, LoopSP loop = {}) {
+Poll* Poll::new (Sv fd, LoopSP loop = {}) {
     if (!loop) loop = Loop::default_loop();
-    bool is_sock = false;
-    fd_t fd = sv2fd(_fd);
-    if (_fd.is_ref() || _fd.type() > SVt_PVMG) is_sock = Io(_fd).iotype()            == IoTYPE_SOCKET;        // if we have a perl IO, get its type for free
-    else                                       is_sock = Fs::stat(fd).value().type() == Fs::FileType::SOCKET; // otherwise we have to check the type
-    
-    if (is_sock) RETVAL = make_backref<Poll>(Poll::Socket{(sock_t)fd}, loop);
-    else         RETVAL = make_backref<Poll>(Poll::Fd    {        fd}, loop);
+    auto info = sv_io_info(fd);
+    if (info.is_sock) RETVAL = make_backref<Poll>(Poll::Socket{info.sock}, loop);
+    else              RETVAL = make_backref<Poll>(Poll::Fd    {info.fd  }, loop);
 }
 
 XSCallbackDispatcher* Poll::event () {

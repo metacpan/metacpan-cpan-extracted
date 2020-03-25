@@ -3,7 +3,7 @@ use warnings;
 use Socket;
 use lib 't/lib'; use MyTest;
 
-use constant PIPE_PATH => MyTest::var 'pipe';
+use constant PIPE_PATH => MyTest::pipe "pipe1";
 
 subtest 'client-server' => sub {
     my $l = UniEvent::Loop->new;
@@ -12,7 +12,7 @@ subtest 'client-server' => sub {
     $srv->bind(PIPE_PATH);
     $srv->listen();
     
-    like($srv->sockname, qr#/pipe#);
+    like($srv->sockname, qr#pipe1#);
     is $srv->peername, undef;
     
     my $conn;
@@ -84,6 +84,6 @@ subtest 'open connected socket' => sub {
     $l->run;
     
     is $res, "epta";
-} if $^O ne 'MSWin32';
+} unless win32();
 
 done_testing();

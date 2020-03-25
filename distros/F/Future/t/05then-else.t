@@ -30,7 +30,7 @@ use Future;
    $fdone->done( results => "here" );
 
    ok( $fseq->is_ready, '$fseq is done after $fdone done' );
-   is_deeply( [ $fseq->get ], [ results => "here" ], '$fseq->get returns results' );
+   is_deeply( [ $fseq->result ], [ results => "here" ], '$fseq->result returns results' );
 }
 
 # then fail
@@ -55,7 +55,7 @@ use Future;
    $ffail->done( fallback => "result" );
 
    ok( $fseq->is_ready, '$fseq is done after $ffail fail' );
-   is_deeply( [ $fseq->get ], [ fallback => "result" ], '$fseq->get returns results' );
+   is_deeply( [ $fseq->result ], [ fallback => "result" ], '$fseq->result returns results' );
 }
 
 # then done fails doesn't trigger fail block

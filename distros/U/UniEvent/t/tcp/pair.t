@@ -34,12 +34,6 @@ subtest 'custom handles' => sub {
     };
 };
 
-subtest 'error' => sub {
-    subtest 'wrong domain' => sub {
-        dies_ok { spair({domain => AF_INET}) };
-    };
-};
-
 sub test_pair {
     my ($h1, $h2, $loop) = @_;
     my $cnt;

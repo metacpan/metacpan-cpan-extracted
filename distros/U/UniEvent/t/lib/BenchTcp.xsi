@@ -33,7 +33,7 @@ void start_server (uint16_t port, int len) {
     });
     
     auto timer = Timer::start(1000, [](auto) {
-        warn("server receive reads: %d, pps: %d, bytes: %lu, avg reads per loop: %.2f", read_cnt, (int)packets, bytes, (double)read_cnt / loopit_cnt);
+        printf("server receive reads: %d, pps: %d, bytes: %zu, avg reads per loop: %.2f\n", read_cnt, (int)packets, bytes, (double)read_cnt / loopit_cnt);
         packets = loopit_cnt = read_cnt = bytes = 0;
     });
     timer->retain();

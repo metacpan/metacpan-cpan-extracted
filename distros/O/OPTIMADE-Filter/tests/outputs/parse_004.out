@@ -1,0 +1,31 @@
+$VAR1 = bless( {
+                 'operands' => [
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'name' => [
+                                                                               '_mp_bandgap'
+                                                                             ]
+                                                                 }, 'OPTIMADE::Filter::Property' ),
+                                                          '5.0'
+                                                        ],
+                                          'operator' => '>'
+                                        }, 'OPTIMADE::Filter::Comparison' ),
+                                 bless( {
+                                          'operands' => [
+                                                          bless( {
+                                                                   'name' => [
+                                                                               '_cod_molecular_weight'
+                                                                             ]
+                                                                 }, 'OPTIMADE::Filter::Property' ),
+                                                          '350'
+                                                        ],
+                                          'operator' => '<'
+                                        }, 'OPTIMADE::Filter::Comparison' )
+                               ],
+                 'operator' => 'AND'
+               }, 'OPTIMADE::Filter::AndOr' );
+== Filter ==
+((_mp_bandgap > "5.0") AND (_cod_molecular_weight < "350"))
+== SQL ==
+(('_mp_bandgap' > "5.0") AND ('_cod_molecular_weight' < "350"))

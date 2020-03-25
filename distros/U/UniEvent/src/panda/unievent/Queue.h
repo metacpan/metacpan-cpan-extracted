@@ -4,6 +4,8 @@
 
 namespace panda { namespace unievent {
 
+static constexpr const int SPLIT_RECURSION = 300;
+
 struct ExceptionKeeper {
     template <class F>
     void etry (F&& f) {
@@ -51,7 +53,7 @@ struct Queue {
             f();
         };
 
-        if (resume_recursion > 1000) {
+        if (resume_recursion > SPLIT_RECURSION) {
             finalized_requests.push_back(req);
             req->delay([=] {
                 delay_fn();

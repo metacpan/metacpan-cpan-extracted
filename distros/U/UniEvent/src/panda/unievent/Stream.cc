@@ -5,7 +5,7 @@ namespace panda { namespace unievent {
 
 using ssl::SslFilter;
 
-static log::Module* panda_log_module = &uelog;
+static const auto& panda_log_module = uelog;
 
 #define HOLD_ON(what) StreamSP __hold = what; (void)__hold;
 

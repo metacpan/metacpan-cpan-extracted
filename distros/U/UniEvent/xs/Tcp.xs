@@ -1,6 +1,7 @@
 #include <xs/export.h>
 #include <xs/function.h>
 #include <xs/unievent/Tcp.h>
+#include <panda/unievent/util.h>
 #include <xs/unievent/Resolver.h>
 #include <sstream>
 
@@ -195,8 +196,9 @@ void pair (Sv arg = Sv()) {
     if (!h1) h1 = create_tcp(loop);
     if (!h2) h2 = create_tcp(loop);
     
-    int fds[2];
-    if (Perl_my_socketpair(domain, type, protocol, fds) < 0) throw last_sys_code_error();
+    auto ret = panda::unievent::socketpair(domain, type, protocol);
+    if (!ret) throw Error(ret.error());
+    auto fds = ret.value();
     
     try {
         h1->open(fds[0]);
@@ -204,8 +206,8 @@ void pair (Sv arg = Sv()) {
     } catch (...) {
         h1->reset();
         h2->reset();
-        PerlLIO_close(fds[0]);
-        PerlLIO_close(fds[1]);
+        panda::unievent::close(fds[0]).nevermind();
+        panda::unievent::close(fds[1]).nevermind();
         throw;
     }
     

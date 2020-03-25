@@ -1,8 +1,19 @@
 #pragma once
 #include <xs.h>
 #include <panda/unievent/inc.h>
+#include <panda/unievent/util.h>
 
 namespace xs { namespace unievent {
+
+struct IoInfo {
+    bool is_sock;
+    union {
+        panda::unievent::sock_t sock;
+        panda::unievent::fd_t   fd;
+    };
+};
+
+IoInfo sv_io_info (const Sv&);
 
 inline panda::unievent::fd_t sv2fd (const Sv& sv) {
     if (!sv) throw std::invalid_argument("fd must be defined");
@@ -11,7 +22,9 @@ inline panda::unievent::fd_t sv2fd (const Sv& sv) {
     return SvIV(sv);
 }
 
-inline panda::unievent::sock_t sv2sock (const Sv& sv) { return (panda::unievent::sock_t)sv2fd(sv); }
+inline panda::unievent::sock_t sv2sock (const Sv& sv) {
+    return panda::unievent::fd2sock(sv2fd(sv));
+}
 
 panda::string sv2buf (const Sv& sv);
 

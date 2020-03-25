@@ -4,7 +4,7 @@ require 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '3.000002';
+our $VERSION = '3.000003';
 use Carp;
 use Symbol 'gensym', 'qualify_to_ref';    # For the 'any data type' hack
 use Fcntl qw( SEEK_SET SEEK_CUR );
@@ -158,7 +158,7 @@ sub new
         $self->{php_compat} = $v ? 1 : 0;
     }
 
-    $self->{comment_char} = '#' unless exists $self->{comment_char};
+    $self->{comment_char}         = '#' unless exists $self->{comment_char};
     $self->{allowed_comment_char} = ';'
         unless exists $self->{allowed_comment_char};
 
@@ -193,7 +193,7 @@ sub _caseify
 
     if ( $self->_nocase )
     {
-        foreach my $ref (grep { defined } @refs[0..1])
+        foreach my $ref ( grep { defined } @refs[ 0 .. 1 ] )
         {
             ${$ref} = lc( ${$ref} );
         }
@@ -201,18 +201,19 @@ sub _caseify
 
     if ( $self->{php_compat} )
     {
-        foreach my $ref (grep { defined } @refs[1..1])
+        foreach my $ref ( grep { defined } @refs[ 1 .. 1 ] )
         {
             ${$ref} =~ s{\[\]$}{};
         }
-        foreach my $ref (grep { defined } @refs[2..$#refs])
+        foreach my $ref ( grep { defined } @refs[ 2 .. $#refs ] )
         {
-            if (length(${$ref}) >= 2)
+            if ( length( ${$ref} ) >= 2 )
             {
-                my $quote = substr(${$ref}, 0, 1);
-                if (($quote eq q{"} or $quote eq q{'}) and substr(${$ref}, -1, 1) eq $quote)
+                my $quote = substr( ${$ref}, 0, 1 );
+                if ( ( $quote eq q{"} or $quote eq q{'} )
+                    and substr( ${$ref}, -1, 1 ) eq $quote )
                 {
-                    ${$ref} = substr(${$ref}, 1, -1);
+                    ${$ref} = substr( ${$ref}, 1, -1 );
                     ${$ref} =~ s{$quote$quote}{}g;
                     ${$ref} =~ s{\\$quote}{$quote}g if $quote eq q{"};
                 }
@@ -446,7 +447,7 @@ sub _nextline
                 $nextchar = <$fh>;
                 return undef if ( !defined $nextchar );
                 $s .= $nextchar;
-            } until ($s =~ m/((\015|\012|\025|\n)$)/s);
+            } until ( $s =~ m/((\015|\012|\025|\n)$)/s );
             $self->{line_ends} = $1;
             if ( $nextchar eq "\x0d" )
             {
@@ -487,7 +488,7 @@ sub _rollback
     # an open handle, then just roll back to the start
     if ( !ref( $self->{cf} ) )
     {
-        close($fh);
+        close($fh) or Carp::confess("close failed: $!");
     }
     else
     {
@@ -962,8 +963,12 @@ sub ReadConfig
 # also check if it's a real file (could have been a filehandle made from a scalar).
     if ( ref($fh) ne "IO::Scalar" && -e $fh )
     {
-        my @stats = stat $fh;
-        $self->{file_mode} = sprintf( "%04o", $stats[2] ) if defined $stats[2];
+        if ( not exists $self->{file_mode} )
+        {
+            my @stats = stat $fh;
+            $self->{file_mode} = sprintf( "%04o", $stats[2] )
+                if defined $stats[2];
+        }
     }
 
     # The first lines of the file must be blank, comments or start with [
@@ -1319,8 +1324,11 @@ sub _write_config_to_filename
             #carp "File $filename is not writable.  Refusing to write config";
             return undef;
         }
-        my $mode = ( stat $filename )[2];
-        $self->{file_mode} = sprintf "%04o", ( $mode & 0777 );
+        if ( not exists $self->{file_mode} )
+        {
+            my $mode = ( stat $filename )[2];
+            $self->{file_mode} = sprintf "%04o", ( $mode & 0777 );
+        }
 
         #carp "Using mode $self->{file_mode} for file $file";
     }
@@ -1353,7 +1361,7 @@ sub _write_config_to_filename
     }
 
     $self->OutputConfigToFileHandle( $fh, $parms{-delta} );
-    close($fh);
+    close($fh) or Carp::confess("close failed: $!");
     if ( !rename( $new_file, $filename ) )
     {
         carp "Unable to rename temp config file ($new_file) to ${filename}: $!";
@@ -1361,7 +1369,10 @@ sub _write_config_to_filename
     }
     if ( exists $self->{file_mode} )
     {
-        chmod oct( $self->{file_mode} ), $filename;
+        if ( not chmod( oct( $self->{file_mode} ), $filename ) )
+        {
+            carp "Unable to chmod $filename!";
+        }
     }
 
     return 1;
@@ -1475,7 +1486,7 @@ sub _calc_eot_mark
     my $eotmark = $self->{EOT}{$sect}{$parm} || 'EOT';
 
     # Make sure the $eotmark does not occur inside the string.
-    my @letters = ( 'A' .. 'Z' );
+    my @letters    = ( 'A' .. 'Z' );
     my $joined_val = join( q{ }, @$val );
     while ( index( $joined_val, $eotmark ) >= 0 )
     {
@@ -1613,7 +1624,7 @@ sub _output_section
         }
         return;
     }
-    return if not defined $self->{v}{$sect};
+    return          if not defined $self->{v}{$sect};
     $print_line->() if ( $position > 0 );
     $self->_output_comments( $print_line, $self->{sCMT}{$sect} );
 
@@ -1983,7 +1994,8 @@ sub FETCH
     $self->_caseify( \$key );
     return if ( !$self->{v}{$key} );
 
-    return $self->{_section_cache}->{$key} if exists $self->{_section_cache}->{$key};
+    return $self->{_section_cache}->{$key}
+        if exists $self->{_section_cache}->{$key};
 
     my %retval;
     tie %retval, 'Config::IniFiles::_section', $self, $key;
@@ -2381,7 +2393,7 @@ Config::IniFiles - A module for reading .ini-style configuration files.
 
 =head1 VERSION
 
-version 3.000002
+version 3.000003
 
 =head1 SYNOPSIS
 
@@ -2395,10 +2407,6 @@ version 3.000002
 Config::IniFiles provides a way to have readable configuration files outside
 your Perl script. Configurations can be imported (inherited, stacked,...),
 sections can be grouped, and settings can be accessed from a tied hash.
-
-=head1 VERSION
-
-version 3.000002
 
 =head1 FILE FORMAT
 
@@ -3348,7 +3356,7 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -3375,35 +3383,11 @@ L<https://metacpan.org/release/Config-IniFiles>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Config-IniFiles>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config-IniFiles>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Config-IniFiles>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Config-IniFiles>
 
 =item *
 

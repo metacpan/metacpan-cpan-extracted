@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.09;
 
@@ -181,7 +181,7 @@ has $_overwrite     = 0;
 has %_keybindings;
 has $_on_enter;
 
-method BUILDALL
+method BUILD
 {
    my %params = @_;
 
@@ -223,8 +223,8 @@ method BUILDALL
    $self->take_focus;
 }
 
-sub lines { 1 }
-sub cols  { 5 }
+method lines { 1 }
+method cols  { 5 }
 
 method char2col
 {
@@ -239,9 +239,8 @@ method pretext_width
    return textwidth( $self->get_style_values( "more_left" ) );
 }
 
-sub pretext_render
+method pretext_render
 {
-   my $self = shift;
    my ( $rb ) = @_;
 
    $rb->text_at( 0, 0, $self->get_style_values( "more_left" ), $self->get_style_pen( "more" ) );
@@ -253,9 +252,8 @@ method posttext_width
    return textwidth( $self->get_style_values( "more_right" ) );
 }
 
-sub posttext_render
+method posttext_render
 {
-   my $self = shift;
    my ( $rb ) = @_;
 
    $rb->text_at( 0, 0, $self->get_style_values( "more_right" ), $self->get_style_pen( "more" ) );
@@ -569,9 +567,8 @@ Insert the given text at the given character position.
 
 =cut
 
-sub text_insert
+method text_insert
 {
-   my $self = shift;
    my ( $text, $pos_ch ) = @_;
 
    $self->text_splice( $pos_ch, 0, $text );
@@ -583,9 +580,8 @@ Delete the given section of text. Returns the deleted text.
 
 =cut
 
-sub text_delete
+method text_delete
 {
-   my $self = shift;
    my ( $pos_ch, $len_ch ) = @_;
 
    return $self->text_splice( $pos_ch, $len_ch, "" );
@@ -640,9 +636,8 @@ C<$else>.
 
 =cut
 
-sub find_bow_forward
+method find_bow_forward
 {
-   my $self = shift;
    my ( $pos, $else ) = @_;
 
    my $posttext = substr( $self->text, $pos );
@@ -658,9 +653,8 @@ the string.
 
 =cut
 
-sub find_eow_forward
+method find_eow_forward
 {
-   my $self = shift;
    my ( $pos ) = @_;
 
    my $posttext = substr( $self->text, $pos );
@@ -677,9 +671,8 @@ returns 0.
 
 =cut
 
-sub find_bow_backward
+method find_bow_backward
 {
-   my $self = shift;
    my ( $pos ) = @_;
 
    my $pretext = substr( $self->text, 0, $pos );
@@ -695,9 +688,8 @@ C<undef>.
 
 =cut
 
-sub find_eow_backward
+method find_eow_backward
 {
-   my $self = shift;
    my ( $pos ) = @_;
 
    my $pretext = substr( $self->text, 0, $pos + 1 ); # +1 to allow if cursor is on the space

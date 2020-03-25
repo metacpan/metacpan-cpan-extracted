@@ -1,0 +1,49 @@
+{
+   "abstract" : "OPTIMADE filter language parser/composer",
+   "author" : [
+      "Andrius Merkys <merkys@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "lgpl_3_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OPTIMADE-Filter",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "Module::Build::Parse::Yapp" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "Module::Build::Parse::Yapp" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Parse::Yapp" : "0",
+            "Scalar::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Compare" : "0",
+            "Data::Dumper" : "0",
+            "File::Spec" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.8.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

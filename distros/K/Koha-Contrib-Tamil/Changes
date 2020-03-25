@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
+0.064 2020-03-24
+
+  - ElasticSearch
+
 0.063 2020-02-20
 
  - Indexing availability (999$x not-onloan-count)

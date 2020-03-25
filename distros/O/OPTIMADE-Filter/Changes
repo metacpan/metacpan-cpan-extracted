@@ -1,0 +1,82 @@
+0.8.0 2020-03-25
+
+    - Renaming package from OPTiMaDe::Filter to OPTIMADE::Filter.
+    - Allowing uppercase characters in properties, however, they are
+      lowercased prior to filter string generation.
+
+0.7.3 2020-03-09
+
+    - Implementing the validation of property's syntax.
+
+0.7.2 2020-03-01
+
+    - Readding tests.
+
+0.7.1 2020-02-25
+
+    - Switching from ExtUtils::MakeMaker to Module::Build-based build
+      system thus making the build process more portable.
+
+0.7.0 2020-01-12
+
+    - Acknowledging conformance to OPTiMaDe specification v1.0.0-rc.1.
+    - Validating objects prior to generating their representations in
+      order not to produce erroneous representations.
+    - Fixing the build system as it did not build the Yapp parser properly.
+    - Adding repository metadata (thanks Mohammad S Anwar).
+
+0.6.1 2020-01-30
+
+    - Fixing the build system to create source-only tarballs, and to
+      build the parser via 'perl Makefile.PL && make'.
+
+0.6.0 2019-12-12
+
+    - Changing the syntax of 'LENGTH' comparison as per
+      Materials-Consortia/OPTiMaDe#221.
+
+0.5.0 2019-12-09
+
+    - Renaming package from OPTiMaDe::FilterParser to OPTiMaDe::Filter.
+    - Implementing right-hand side properties as per
+      Materials-Consortia/OPTiMaDe#178.
+    - Properties of three or more identifiers have no SQL representation.
+    - Replacing OPTiMaDe::Filter::Comparison::set_operator() with
+      operator().
+    - Replacing OPTiMaDe::Filter::ListComparison::set_<attribute>() with
+      <attribute>().
+    - Replacing OPTiMaDe::Filter::Zip::set_<attribute>() with <attribute>().
+
+0.4.1 2019-12-05
+
+    - Fixing SQL placeholders for fuzzy search of strings.
+
+0.4.0 2019-12-05
+
+    - Adding overloads for OPTiMaDe::FilterParser::Property. Replacing
+      push_identifier() via direct push to object.
+    - Adding convenience methods left() and right() for
+      OPTiMaDe::FilterParser::Comparison.
+    - Introducing classes OPTiMaDe::FilterParser::Negation,
+      OPTiMaDe::FilterParser::AndOr and OPTiMaDe::FilterParser::Known.
+    - Changing the way the delimiter is passed to to_SQL() methods.
+    - Implementing SQL output with placeholders instead of values.
+
+0.3.0 2019-08-19
+
+    - Introducing method modify(), which traverses and modifies the built
+      filter tree.
+    - Modifying the constructor for OPTiMaDe::FilterParser::Property.
+    - Adding 'Changes' (this file) to MANIFEST.
+
+0.2.0 2019-08-12
+ 
+    - Combining 'IS' and 'KNOWN'/'UNKNOWN' lexems together.
+    - Fixing 'IS KNOWN'/'IS UNKNOWN' translation to SQL.
+    - Implementing backwards translation to the string representation.
+    - Unifying layout of parsed lists.
+    - Adding roundtrip tests.
+ 
+0.1.0 2019-07-20
+
+    - Initial release.

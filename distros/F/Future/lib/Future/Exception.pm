@@ -8,7 +8,7 @@ package Future::Exception;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 =head1 NAME
 
@@ -21,7 +21,7 @@ C<Future::Exception> - an exception type for failed L<Future>s
 
    try {
       my $f = ...;
-      my @result = $f->get;
+      my @result = $f->result;
       ...
    }
    catch {
