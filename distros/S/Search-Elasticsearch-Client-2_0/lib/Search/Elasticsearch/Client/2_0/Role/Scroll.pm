@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::2_0::Role::Scroll;
-$Search::Elasticsearch::Client::2_0::Role::Scroll::VERSION = '5.02';
+$Search::Elasticsearch::Client::2_0::Role::Scroll::VERSION = '6.80';
 use Moo::Role;
 requires 'finish';
 use Search::Elasticsearch::Util qw(parse_params throw);
@@ -64,15 +64,15 @@ Search::Elasticsearch::Client::2_0::Role::Scroll - Provides common functionality
 
 =head1 VERSION
 
-version 5.02
+version 6.80
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

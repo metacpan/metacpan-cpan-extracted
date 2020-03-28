@@ -1,9 +1,59 @@
 ==================================================
-Changes from 2017-11-21 00:00:00 +0000 to present.
+Changes from 2018-03-28 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 7.5 at 2019-11-21 21:39:39 +0000
+version 7.6 at 2020-03-27 22:47:21 +0000
+----------------------------------------
+
+  Change: 6cb7406e8cf4b112efe4fffd0a0138089d841597
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-03-27 15:43:58 +0000
+
+    Release Version 7.6
+
+    * In `::Query`, the `fields` element was deprecated a long time ago, so
+
+    overload it as a source filter. * `es-search.pl`
+
+    * Ensure `--missing` and `--exists` can be specified more than once
+
+    * Enable source filtering when the user specifies `--show`
+
+    * Honor `--max-batch-size` when `--all` is specified 
+
+  Change: 8ef098984362da46348bec5bbb66de15f57c07a7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-03-09 17:20:26 +0000
+
+    Added es-index-blocks.pl to manage index blocks 
+
+  Change: 7804940e5562e5edc9e4472c7e9dcb3c9eeeb97e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-12-31 11:05:36 +0000
+
+    Ensure error message isn't blank 
+
+  Change: 6743298fac9c15c55ea719e61eb63d5397e2f60e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-12-31 11:00:24 +0000
+
+    Change aggregation ID and make debug output more useful.
+
+    The debug output is now in a better format to paste to a Kibana instance
+    for debugging. 
+
+  Change: cc0f7b846e85d6a8397dea24ff4102083990cd3e
+  Author: Vitaly Shupak <vitaly.shupak@deshaw.com>
+  Date : 2019-12-09 18:03:10 +0000
+
+    use LWP::UserAgent request instead of simple_request
+
+    simple_request does not handle authentication responses, which breaks in
+    environments where ElasticSearch requires Kerberos authentication. 
+
+----------------------------------------
+version 7.5 at 2019-11-21 21:39:18 +0000
 ----------------------------------------
 
   Change: eef552859755c3b446755232ef5cdab4fe39713f
@@ -907,82 +957,6 @@ version 5.6 at 2018-04-13 18:20:03 +0000
 
     Get es-storage-data.pl working on modern ElasticSearch 
 
-----------------------------------------
-version 5.5 at 2018-03-17 06:01:25 +0000
-----------------------------------------
-
-  Change: 757dec9e648d077759da9a19ebdf3ed343df82f1
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-03-16 23:01:25 +0000
-
-    Remove no longer necessary test 
-
-  Change: d63a1b823fcd72116e731cbfc45387290b60e769
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-03-16 22:49:15 +0000
-
-    Documentation updated for 5.5 release 
-
-  Change: b1709e428bf9031e99b196ed6c865b02535ddb66
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-03-16 22:43:04 +0000
-
-    Bugfix and better replica management
-
-    * BUGFIX: es_index_strip_date() now removes everything after the date
-
-    string.
-
-    es-daily-index-maintenance.pl
-
-    * --replicas-* options aliased to --replica-* * Smarter handling of math
-    around replica calculation * Disable --bloom option entirely as it's
-    deprecated by Elastic 
-
-  Change: aabba5ad9a1c26ee5aa631f4ea81d887bf98463a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-21 23:04:18 +0000
-
-    Pod and Perl::Critic fixes 
-
-  Change: 1dcaaa7ea8b7b8b89387692dd969a18fd385bd23
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-21 20:58:15 +0000
-
-    Conversion to Ref::Util and Types::Tiny
-
-    Fix paths for the shebang line so the installer will be able to install the
-    scripts with the correct Perl binary path. Add a first pass at nested query
-    syntax 
-
-  Change: 722e812a7365f9a81aa0d1df5d61a3a1dcb695ed
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-02-21 20:52:06 +0000
-
-    Update the QS::IP expander to make it more intelligent.
-
-    If a field ends in *_ip, allow CIDR queries against the field. This skips
-    renaming the field from "src_ip" to "src_ip_numeric" and is now an inline
-    replacement. This enhances simplifies the CLI queries.
-
-    The docs were not accurate, so now the example and documentation are valid. 
-
-  Change: 8e7e34fe1690349a0485ec271c85e966c699b0d9
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-12-03 23:42:00 +0000
-
-    Disallow tabs in my files. 
-
-  Change: 938d5f9e9bf387d304388bf524348dd4b0d51fac
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-10-25 17:07:47 +0000
-
-    Allow --show to be more flexible
-
-    * Unbind from the index fields since this operates on the source
-
-    document * Change to an array so you can add multiple --show's 
-
 =================================================
-Plus 61 releases after 2017-11-21 00:00:00 +0000.
+Plus 62 releases after 2018-03-28 00:00:00 +0000.
 =================================================

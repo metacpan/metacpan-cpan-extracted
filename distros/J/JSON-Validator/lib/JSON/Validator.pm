@@ -24,7 +24,7 @@ use constant RECURSION_LIMIT   => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 use constant YAML_SUPPORT      => eval 'use YAML::XS 0.67;1';
 
-our $VERSION = '3.24';
+our $VERSION = '3.25';
 our @EXPORT_OK = qw(joi validate_json);
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -779,15 +779,17 @@ sub _validate_type_array {
     }
   }
 
-  if ($schema->{contains}) {
+  if (exists $schema->{contains}) {
     my @e;
     for my $i (0 .. @$data - 1) {
       my @tmp = $self->_validate($data->[$i], "$path/$i", $schema->{contains});
       push @e, \@tmp if @tmp;
     }
     push @errors, map {@$_} @e if @e >= @$data;
+    push @errors, E $path, [array => 'contains'] if not @$data;
   }
-  elsif (ref $schema->{items} eq 'ARRAY') {
+
+  if (ref $schema->{items} eq 'ARRAY') {
     my $additional_items = $schema->{additionalItems} // {type => 'any'};
     my @rules            = @{$schema->{items}};
 
@@ -929,7 +931,7 @@ sub _validate_type_object {
   }
   elsif (my @k = grep { !$rules{$_} } @dkeys) {
     local $" = ', ';
-    return E $path, [object => additionalProperties => join '/', @k];
+    return E $path, [object => additionalProperties => join ', ', sort @k];
   }
 
   for my $k (sort { $a cmp $b } uniq @{$schema->{required} || []}) {
@@ -1137,6 +1139,23 @@ This specification is still EXPERIMENTAL.
 =item * Swagger Petstore
 
 This is used for unit tests, and should not be relied on by external users.
+
+=back
+
+=head2 Optional modules
+
+=over 2
+
+=item * Sereal::Encoder
+
+Installing L<Sereal::Encoder> v4.00 (or later) will make
+L<JSON::Validator::Util/data_checksum> significantly faster. This function is
+used both when parsing schemas and validating data.
+
+=item * Format validators
+
+See the documentation in L<JSON::Validator::Formats> for other optional modules
+to do validation of specific "format", such as "hostname", "ipv4" and others.
 
 =back
 

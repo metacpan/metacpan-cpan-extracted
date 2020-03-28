@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::5_0::Role::API;
-$Search::Elasticsearch::Client::5_0::Role::API::VERSION = '6.00';
+$Search::Elasticsearch::Client::5_0::Role::API::VERSION = '6.80';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::API';
 
@@ -47,11 +47,12 @@ sub api {
     },
     'bulk.update' => {
         params => [
-            '_source',         '_source_include',
-            '_source_exclude', 'detect_noop',
-            'doc',             'doc_as_upsert',
-            'fields',          'scripted_upsert',
-            'script',          'upsert',
+            '_retry_on_conflict', '_source',
+            '_source_include',    '_source_exclude',
+            'detect_noop',        'doc',
+            'doc_as_upsert',      'fields',
+            'scripted_upsert',    'script',
+            'upsert',
         ]
     },
     'bulk.required' => { params => [ 'index', 'type' ] },
@@ -2713,7 +2714,7 @@ Search::Elasticsearch::Client::5_0::Role::API - This class contains the spec for
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -2783,11 +2784,11 @@ L<Search::Elasticsearch::Client::5_0::Direct>
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

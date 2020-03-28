@@ -51,9 +51,9 @@ subtest "pass on arguments for 'start_active_span'" => sub {
     
     undef @test_params;
     
-    my $span_context = bless {}, 'MyDuck::SpanContext';
-    my $reference_1  = bless {}, 'MyDuck::Reference';
-    my $reference_2  = bless {}, 'MyDuck::Reference';
+    my $span_context         = bless {}, 'MyDuck::SpanContext';
+    my $context_reference_1  = bless {}, 'MyDuck::ContextReference';
+    my $context_reference_2  = bless {}, 'MyDuck::ContextReference';
     
     # the options 'child_of' and 'references' are mutual exclusive
     # so we test those separatly
@@ -66,7 +66,10 @@ subtest "pass on arguments for 'start_active_span'" => sub {
     
     lives_ok {
         $test_object->start_active_span( 'here is an operation name' =>
-            references           => [ $reference_1, $reference_2 ],
+            references           => [
+                $context_reference_1,
+                $context_reference_2,
+            ],
         )
     } "Can call method 'start_active_span' with option 'references'";
     
@@ -97,8 +100,8 @@ subtest "pass on arguments for 'start_active_span'" => sub {
                 'here is an operation name',
                 'references',
                 [
-                    $reference_1,
-                    $reference_2,
+                    $context_reference_1,
+                    $context_reference_2,
                 ],
             ],
             [
@@ -143,9 +146,9 @@ subtest "pass on arguments for 'start_span'" => sub {
     
     undef @test_params;
     
-    my $span_context = bless {}, 'MyDuck::SpanContext';
-    my $reference_1  = bless {}, 'MyDuck::Reference';
-    my $reference_2  = bless {}, 'MyDuck::Reference';
+    my $span_context         = bless {}, 'MyDuck::SpanContext';
+    my $context_reference_1  = bless {}, 'MyDuck::ContextReference';
+    my $context_reference_2  = bless {}, 'MyDuck::ContextReference';
     
     # the options 'child_of' and 'references' are mutual exclusive
     # so we test those separatly
@@ -158,7 +161,10 @@ subtest "pass on arguments for 'start_span'" => sub {
     
     lives_ok {
         $test_object->start_span( 'here is an operation name' =>
-            references           => [ $reference_1, $reference_2 ],
+            references           => [
+                $context_reference_1,
+                $context_reference_2,
+            ],
         )
     } "Can call method 'start_span' with option 'references'";
     
@@ -188,8 +194,8 @@ subtest "pass on arguments for 'start_span'" => sub {
                 'here is an operation name',
                 'references',
                 [
-                    $reference_1,
-                    $reference_2,
+                    $context_reference_1,
+                    $context_reference_2,
                 ],
             ],
             [
@@ -496,7 +502,7 @@ BEGIN {
 
 
 
-package MyDuck::Reference;
+package MyDuck::ContextReference;
 
 sub new_child_of;
 sub new_follows_from;

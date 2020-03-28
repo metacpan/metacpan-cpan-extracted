@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::1_0::Role::API;
-$Search::Elasticsearch::Client::1_0::Role::API::VERSION = '5.02';
+$Search::Elasticsearch::Client::1_0::Role::API::VERSION = '6.80';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::API';
 
@@ -2031,12 +2031,12 @@ Search::Elasticsearch::Client::1_0::Role::API - This class contains the spec for
 
 =head1 VERSION
 
-version 5.02
+version 6.80
 
 =head1 DESCRIPTION
 
 All of the Elasticsearch APIs are defined in this role. The example given below
-is the definition for the L<Search::Elasticsearch::Client::5_0::Direct/index()> method:
+is the definition for the L<Search::Elasticsearch::Client::1_0::Direct/index()> method:
 
     'index' => {
         body   => { required => 1 },
@@ -2101,11 +2101,11 @@ L<Search::Elasticsearch::Client::1_0::Direct>
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

@@ -8,7 +8,7 @@ use Data::Dumper;
 use Exporter qw(import);
 our @EXPORT_OK = qw[login GuiCred];
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 require XSLoader;
 XSLoader::load('credsman', $VERSION);
@@ -27,7 +27,8 @@ my $validator = validation_for(
         target    => { type => Str },
         subref    => { type => CodeRef },
         limit     => { type => Int, optional => 1, default => 3 },
-        debug     => { type => Int, optional => 1, default => 0 }
+        debug     => { type => Int, optional => 1, default => 0 },
+        holder    => { optional => 1, default => undef },
     }
 );
 #-------------------------------------------------------------------------------------------#
@@ -41,6 +42,7 @@ sub login{
         password => undef,
         user     => undef,
         target   => $arg{target},
+        holder   => $arg{holder}
     );
     # Concat Target Name - This is the name to be stored 
     my $TargetName = work_name($arg{program},$arg{target});

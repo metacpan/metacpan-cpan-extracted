@@ -8,21 +8,28 @@ $ cpanm -i Masscan::Scanner
 ```perl
 use Masscan::Scanner;
 
-my $mas = Masscan::Scanner->new();
-$mas->hosts(['199.232.32.174', '199.232.33.194']);
-$mas->ports(['22', '80', '443']);
-my @hosts     = qw('::1', '127.0.0.1');
-my @ports     = qw('22', '80', '443', '1-100');
-my @arguments = qw('--banners');
+my @hosts     = qw(::1 127.0.0.1);
+my @ports     = qw(22 80 443 1-100);
+my @arguments = qw(--banners);
 
 my $mas = Masscan::Scanner->new(hosts => \@hosts, ports => \@ports, arguments => \@arguments);
 
 # Add extra hosts or ports
 $mas->add_host('10.0.0.1');
 $mas->add_host('10.0.0.0/24');
+$mas->add_port(25);
+$mas->add_port(110);
 
-# Can add domains but will incur performance penalty hence IP(s) and CIDR(s) recommended.
+# Can add port ranges too
+$mas->add_port('1024-2048');
+$mas->add_port('3000-65535');
+
+# Can add domains but will incur a performance penalty hence IP(s) and CIDR(s) recommended.
+# When a domain is added to the list of hosts to be scanned this module will attempt to
+# resolve all of the A records for the domain name provided and then add the IP(s) to the
+# scan list.
 $mas->add_host('averna.id.au');
+$mas->add_host('duckduckgo.com');
 
 $mas->add_port(25);
 

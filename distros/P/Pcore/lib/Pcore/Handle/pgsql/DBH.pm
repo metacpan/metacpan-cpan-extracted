@@ -471,7 +471,7 @@ sub _ON_DATA_ROW ( $self, $dataref ) {
                 elsif ( looks_like_number $col) {
                     no warnings;    ## no critic qw[TestingAndDebugging::ProhibitNoWarnings]
 
-                    0+ $col;
+                    $col += 0;
                 }
 
                 # decode text value

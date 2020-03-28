@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.249    2020-03-28
+        - The sheet name is the default table name if sheet_count > 1.
+
+2.248    2020-03-27
+        - If autoincrement is disabled: fixed UI bug.
+        - Update 'CreateTable'.
+
 2.247    2020-03-14
         - Bugfixes in search&replace.
         - Code refactoring.

@@ -47,13 +47,20 @@ DESCRIPTION
 
        https://www.w3.org/TR/webdriver1/
 
-    Mozilla's "geckodriver" has had webdriver for a long time, while
+    Mozilla's "geckodriver" has had webdriver support for a long time, while
     "chromedriver" only has basic and mostly undocumented webdriver support
     as of release 77.
 
+    In Debian GNU/Linux, you can install the chromedriver for chromium via
+    the "chromium-driver" package. Unfortunately, there is no (working)
+    package for geckodriver, but you can download it from github
+    <https://github.com/mozilla/geckodriver/releases>.
+
   CONVENTIONS
     Unless otherwise stated, all delays and time differences in this module
-    are represented as an integer number of milliseconds.
+    are represented as an integer number of milliseconds, which is perhaps
+    surprising to users of my other modules but is what the WebDriver spec
+    uses.
 
   WEBDRIVER OBJECTS
     new AnyEvent::WebDriver key => value...
@@ -72,7 +79,7 @@ DESCRIPTION
             The proxy to use (same as the "proxy" argument used by
             AnyEvent::HTTP). The default is "undef", which disables proxies.
             To use the system-provided proxy (e.g. "http_proxy" environment
-            variable), specify a value of "default".
+            variable), specify the string "default".
 
         autodelete => $boolean
             If true (the default), then automatically execute
@@ -500,17 +507,46 @@ DESCRIPTION
 
    SCREEN CAPTURE
     $wd->take_screenshot
-        Create a screenshot, returning it as a PNG image in a "data:" URL.
+        Create a screenshot, returning it as a PNG image. To decode and
+        save, you could do something like:
+
+           use MIME::Base64 ();
+
+           my $screenshot = $wd->take_screenshot;
+
+           open my $fh, ">", "screenshot.png" or die "screenshot.png: $!\n";
+
+           syswrite $fh, MIME::Base64::decode_base64 $screenshot;
 
     $wd->take_element_screenshot ($element)
         Similar to "take_screenshot", but only takes a screenshot of the
         bounding box of a single element.
 
+        Compatibility note: As of chrome version 80, I found that the
+        screenshot scaling is often wrong (the screenshot is much smaller
+        than the element normally displays) unless chrome runs in headless
+        mode. The spec does allow for any form of scaling, so this is not
+        strictly a bug in chrome, but of course it diminishes trhe
+        screenshot functionality.
+
+   PRINT
+    $wd->print_page (key => value...)
+        Create a printed version of the document, returning it as a PDF
+        document encoded as base64. See "take_screenshot" for an example on
+        how to decode and save such a string.
+
+        This command takes a lot of optional parameters, see the print
+        section <https://www.w3.org/TR/webdriver2/#print> of the WebDriver
+        specification for details.
+
+        This command is taken from a draft document, so it might change in
+        the future.
+
   ACTION LISTS
     Action lists can be quite complicated. Or at least it took a while for
     me to twist my head around them. Basically, an action list consists of a
     number of sources representing devices (such as a finger, a mouse, a pen
-    or a keyboard) and a list of actions for each source.
+    or a keyboard) and a list of actions for each source, in a timeline.
 
     An action can be a key press, a pointer move or a pause (time delay).
 
@@ -525,8 +561,8 @@ DESCRIPTION
     actions object, to simplify multiple calls.
 
     Also, while actions from different sources can happen "at the same time"
-    in the WebDriver protocol, this class ensures that actions will execute
-    in the order specified.
+    in the WebDriver protocol, this class by default ensures that actions
+    will execute in the order specified.
 
     For example, to simulate a mouse click to an input element, followed by
     entering some text and pressing enter, you can use this:
@@ -537,9 +573,9 @@ DESCRIPTION
           ->key ("{Enter}")
           ->perform;
 
-    By default, keyboard and mouse input sources are provided. You can
-    create your own sources and use them when adding events. The above
-    example could be more verbosely written like this:
+    By default, "keyboard" and "mouse" input sources are provided and used.
+    You can create your own sources and use them when adding events. The
+    above example could be more verbosely written like this:
 
        $wd->actions
           ->source ("mouse", "pointer", pointerType => "mouse")
@@ -552,7 +588,8 @@ DESCRIPTION
     When you specify the event source explicitly it will switch the current
     "focus" for this class of device (all keyboards are in one class, all
     pointer-like devices such as mice/fingers/pens are in one class), so you
-    don't have to specify the source for subsequent actions.
+    don't have to specify the source for subsequent actions that are on the
+    same class.
 
     When you use the sources "keyboard", "mouse", "touch1".."touch3", "pen"
     without defining them, then a suitable default source will be created
@@ -601,24 +638,27 @@ DESCRIPTION
         action pairs in a row, with no unnecessary delay between them.
         $button defaults to 0.
 
-    $al = $al->move ($button, $origin, $x, $y, $duration, $source)
+    $al = $al->move ($origin, $x, $y, $duration, $source)
         Moves a pointer to the given position, relative to origin (either
-        "viewport", "pointer" or an element object.
+        "viewport", "pointer" or an element object. The coordinates will be
+        truncated to integer values.
 
     $al = $al->cancel ($source)
         Executes a pointer cancel action.
 
-    $al = $al->keyDown ($key, $source)
-    $al = $al->keyUp ($key, $source)
+    $al = $al->key_down ($key, $source)
+    $al = $al->key_up ($key, $source)
         Press or release the given key.
 
     $al = $al->key ($key, $source)
-        Peess and release the given key, without unnecessary delay.
+        Peess and release the given key in one go, without unnecessary
+        delay.
 
         A special syntax, "{keyname}" can be used for special keys - all the
-        special key names from section 17.4.2
+        special key names from the second table in section 17.4.2
         <https://www.w3.org/TR/webdriver1/#keyboard-actions> of the
-        WebDriver recommendation can be used.
+        WebDriver recommendation can be used - prefix with "Shift-Space". to
+        get the shifted version, as in "Shift-"
 
         Example: press and release "a".
 

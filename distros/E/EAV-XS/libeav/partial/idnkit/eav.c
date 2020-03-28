@@ -203,5 +203,5 @@ eav_free (eav_t *eav)
         free (eav->result.domain);
         eav->result.domain = NULL;
     }
-#else
+#endif
 }

@@ -113,6 +113,9 @@ has schema => sub {
             module => {
                 type => 'string'
             },
+            unlisted => {
+                type => 'boolean'
+            },
             map { 
                 $_ => {
                     type => 'string',
@@ -213,6 +216,16 @@ has checkAccess => sub {
     my $self = shift;
     my $userId = $self->user->userId;
     return (defined $userId and $userId eq '__CONFIG' or $userId =~ /^\d+$/);
+};
+
+=head2 mayAnonymous
+
+may this gui plugin run for unauthenticated users ?
+
+=cut
+
+has mayAnonymous => sub {
+    return 0;
 };
 
 =head2 stateFiles
@@ -468,10 +481,10 @@ has template => sub {
             return Mojo::File->new($filename)->slurp;
         };
     monkey_patch $mt->namespace,
-        cfgHash => sub { $self->user->app->config->cfgHash };
+        cfgHash => sub { $self->app->config->cfgHash };
     monkey_patch $mt->namespace,
         pluginCfg => sub { my $instance = shift;
-            $self->user->app->config->cfgHash->{PLUGIN}{prototype}{$instance}->config
+            $self->app->config->cfgHash->{PLUGIN}{prototype}{$instance}->config
         };
     return $mt;
 };

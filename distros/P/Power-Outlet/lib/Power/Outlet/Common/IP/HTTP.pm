@@ -5,7 +5,7 @@ use URI qw{};
 use HTTP::Tiny qw{};
 use base qw{Power::Outlet::Common::IP};
 
-our $VERSION='0.16';
+our $VERSION='0.21';
 
 =head1 NAME
 

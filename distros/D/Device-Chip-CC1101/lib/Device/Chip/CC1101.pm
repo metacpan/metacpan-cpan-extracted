@@ -1,21 +1,20 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::CC1101;
+use Object::Pad 0.16;
+use 5.026; # postfix-deref, signatures
 
-use strict;
-use warnings;
-use 5.024; # postfix-deref
-use base qw( Device::Chip );
+package Device::Chip::CC1101 0.03 { } 
+
+class Device::Chip::CC1101
+   extends Device::Chip;
 
 use Carp;
 use Data::Bitfield 0.04 qw( bitfield boolfield enumfield intfield signed_intfield );
 use Future::AsyncAwait;
 use Future::IO;
-
-our $VERSION = '0.02';
 
 use constant PROTOCOL => "SPI";
 
@@ -66,20 +65,16 @@ Interval in seconds to poll the chip status after transmitting. A default of
 
 =cut
 
-sub new
+has $_fosc;
+has $_poll_interval;
+
+method BUILD ( %opts )
 {
-   my $class = shift;
-   my %opts = @_;
-
-   my $self = $class->SUPER::new( %opts );
-
-   $self->{fosc} = $opts{fosc} // 26E6; # presets presume 26MHz XTAL
-   $self->{poll_interval} = $opts{poll_interval} // 0.05;
-
-   return $self;
+   $_fosc          = $opts{fosc} // 26E6; # presets presume 26MHz XTAL
+   $_poll_interval = $opts{poll_interval} // 0.05;
 }
 
-sub SPI_options
+method SPI_options
 {
    return (
       mode        => 0,
@@ -87,7 +82,7 @@ sub SPI_options
    );
 }
 
-sub power { shift->protocol->power( @_ ) }
+method power { $self->protocol->power( @_ ) }
 
 =head1 METHODS
 
@@ -133,11 +128,8 @@ C<$addr> should be between 0 and 0x3D, giving the register address.
 
 =cut
 
-async sub read_register
+async method read_register ( $addr )
 {
-   my $self = shift;
-   my ( $addr ) = @_;
-
    $addr >= 0 and $addr <= 0x3D or
       croak "Invalid register address";
    $addr |= REG_BURST if $addr >= 0x30;
@@ -287,6 +279,12 @@ bitfield { format => "bytes-BE" }, CONFIG =>
    # The remaining registers are test registers not for user use
    ;
 
+# Not used directly by this code, but helpful for unit tests, etc..
+use constant CONFIG_DEFAULT =>
+   "\x29\x2E\x3F\x07\xD3\x91\xFF\x04\x45\x00\x00\x0F\x00\x1E\xC4\xEC" .
+   "\x8C\x22\x02\x22\xF8\x47\x07\x30\x04\x36\x6C\x03\x40\x91\x87\x6B" .
+   "\xF8\x56\x10\xA9\x0A\x20\x0D\x41\x00";
+
 =head2 read_config
 
    $config = $chip->read_config->get
@@ -319,23 +317,33 @@ values as a convenience.
 sub _tohex   { return sprintf "%v02X", $_[0] }
 sub _fromhex { return pack "H*", $_[0] =~ s/\.//gr }
 
-async sub read_config
+async method _read_CONFIG
 {
-   my $self = shift;
+   return await $self->protocol->write_then_read(
+      pack( "C", REG_READ | REG_BURST | 0 ), 41
+   );
+}
 
+async method _read_PATABLE
+{
+   return await $self->protocol->write_then_read(
+      pack( "C", REG_READ | REG_BURST | REG_PATABLE ), 8
+   );
+}
+
+has $_config;
+has $_patable;
+has %_cached_config;
+
+async method read_config
+{
    my %config = (
-      unpack_CONFIG(
-         $self->{CONFIG} //= await $self->protocol->write_then_read(
-            pack( "C", REG_READ | REG_BURST | 0 ), 41
-         )
-      ),
-      PATABLE => _tohex $self->{PATABLE} //= await $self->protocol->write_then_read(
-         pack( "C", REG_READ | REG_BURST | REG_PATABLE ), 8
-      ),
+      unpack_CONFIG( $_config //= await $self->_read_CONFIG ),
+      PATABLE => _tohex $_patable //= await $self->_read_PATABLE,
    );
 
    # Post-convert some derived fields just for user convenience
-   my $fosc = $self->{fosc};
+   my $fosc = $_fosc;
 
    my $channel_spacing = $fosc * ( 256 + $config{CHANSPC_M} ) * 2 ** $config{CHANSPC_E} / 2**18;
 
@@ -353,7 +361,7 @@ async sub read_config
    $config{data_rate} = sprintf "%.1fkbps",
       $fosc * ( 256 + $config{DRATE_M} ) * 2 ** $config{DRATE_E} / 2**28 / 1E3;
 
-   $self->{"CONFIG_$_"} = $config{$_} for @CACHED_CONFIG;
+   $_cached_config{$_} = $config{$_} for @CACHED_CONFIG;
    return %config;
 }
 
@@ -393,14 +401,25 @@ supplied with the module. The names of these presets are
 
 =cut
 
-async sub change_config
+async method _write_CONFIG ( $addr, $bytes )
 {
-   my $self = shift;
-   my %changes = @_;
+   await $self->protocol->write(
+      pack "C a*", REG_WRITE | REG_BURST | $addr, $bytes
+   );
+}
 
-   defined $self->{CONFIG} or await $self->read_config;
+async method _write_PATABLE ( $bytes )
+{
+   await $self->protocol->write(
+      pack "C a*", REG_WRITE | REG_BURST | REG_PATABLE, $bytes
+   );
+}
+
+async method change_config ( %changes )
+{
+   defined $_config or await $self->read_config;
    # Use unpack_CONFIG() directly to avoid the derived keys
-   my %config = unpack_CONFIG( $self->{CONFIG} );
+   my %config = unpack_CONFIG( $_config );
 
    if( defined( my $mode = delete $changes{mode} ) ) {
       $PRESET_MODES{$mode} or
@@ -420,7 +439,7 @@ async sub change_config
    my $newpatable = delete $config{PATABLE};
    $newpatable = _fromhex $newpatable if defined $newpatable;
 
-   my $oldconfig = $self->{CONFIG};
+   my $oldconfig = $_config;
    my $newconfig = pack_CONFIG( %config );
 
    my $addr = 0;
@@ -432,22 +451,16 @@ async sub change_config
       substr( $newconfig, $until-1, 1 ) eq substr( $oldconfig, $until-1, 1 );
 
    if( my $len = $until - $addr ) {
-      await $self->protocol->write(
-         pack "C a*", REG_WRITE | REG_BURST | $addr, substr( $newconfig, $addr, $len )
-      );
-
-      $self->{CONFIG} = $newconfig;
+      await $self->_write_CONFIG( $addr, substr( $newconfig, $addr, $len ) );
+      $_config = $newconfig;
    }
 
-   if( defined $newpatable and $newpatable ne $self->{PATABLE} ) {
-      await $self->protocol->write(
-         pack "C a*", REG_WRITE | REG_BURST | REG_PATABLE, $newpatable
-      );
-
-      $self->{PATABLE} = $newpatable;
+   if( defined $newpatable and $newpatable ne $_patable ) {
+      await $self->_write_PATABLE( $newpatable );
+      $_patable = $newpatable;
    }
 
-   defined $config{$_} and $self->{"CONFIG_$_"} = $config{$_} for @CACHED_CONFIG;
+   defined $config{$_} and $_cached_config{$_} = $config{$_} for @CACHED_CONFIG;
 }
 
 =head2 read_marcstate
@@ -464,10 +477,8 @@ my @MARCSTATE = qw(
    TXRX_SWITCH RXFIFO_OVERFLOW FSTXON TX TXEND RXTX_SWITCH TXFIFO_UNDERFLOW
 );
 
-async sub read_marcstate
+async method read_marcstate
 {
-   my $self = shift;
-
    my $marcstate = await $self->read_register( REG_MARCSTATE );
    return $MARCSTATE[$marcstate] // $marcstate;
 }
@@ -488,16 +499,13 @@ following:
 
 =cut
 
-sub read_chipstatus_rx { shift->_read_chipstatus( REG_READ ) }
-sub read_chipstatus_tx { shift->_read_chipstatus( REG_WRITE ) }
+method read_chipstatus_rx { $self->_read_chipstatus( REG_READ ) }
+method read_chipstatus_tx { $self->_read_chipstatus( REG_WRITE ) }
 
 my @STATES = qw( IDLE RX TX FSTXON CALIBRATE SETTLINE RXFIFO_OVERFLOW TXFIFO_UNDERFLOW );
 
-async sub _read_chipstatus
+async method _read_chipstatus ( $rw )
 {
-   my $self = shift;
-   my ( $rw ) = @_;
-
    my $status = unpack "C", await $self->protocol->readwrite(
       pack "C", $rw | CMD_SNOP
    );
@@ -519,10 +527,8 @@ boolean fields of the following names:
 
 =cut
 
-async sub read_pktstatus
+async method read_pktstatus
 {
-   my $self = shift;
-
    my $pktstatus = unpack "C", await $self->protocol->write_then_read(
       pack( "C", REG_READ|REG_BURST | REG_PKTSTATUS ), 1
    );
@@ -538,11 +544,8 @@ async sub read_pktstatus
    };
 }
 
-async sub command
+async method command ( $cmd )
 {
-   my $self = shift;
-   my ( $cmd ) = @_;
-
    $cmd >= 0x30 and $cmd <= 0x3D or
       croak "Invalid command byte";
 
@@ -557,10 +560,8 @@ Command the chip to perform a software reset.
 
 =cut
 
-async sub reset
+async method reset
 {
-   my $self = shift;
-
    await $self->command( CMD_SRES );
 }
 
@@ -572,10 +573,8 @@ Command the chip to flush the RX and TX FIFOs.
 
 =cut
 
-async sub flush_fifos
+async method flush_fifos
 {
-   my $self = shift;
-
    await $self->command( CMD_SFRX );
    await $self->command( CMD_SFTX );
 }
@@ -588,10 +587,8 @@ Command the chip to enter RX mode.
 
 =cut
 
-async sub start_rx
+async method start_rx
 {
-   my $self = shift;
-
    await $self->command( CMD_SIDLE );
    1 until ( await $self->read_marcstate ) eq "IDLE";
 
@@ -607,10 +604,8 @@ Command the chip to enter TX mode.
 
 =cut
 
-async sub start_tx
+async method start_tx
 {
-   my $self = shift;
-
    await $self->command( CMD_SIDLE );
    1 until ( await $self->read_marcstate ) eq "IDLE";
 
@@ -626,10 +621,8 @@ Command the chip to enter IDLE mode.
 
 =cut
 
-async sub idle
+async method idle
 {
-   my $self = shift;
-
    await $self->command( CMD_SIDLE );
 }
 
@@ -641,11 +634,8 @@ Reads the given number of bytes from the RX FIFO.
 
 =cut
 
-async sub read_rxfifo
+async method read_rxfifo ( $len )
 {
-   my $self = shift;
-   my ( $len ) = @_;
-
    await( $self->read_register( REG_RXBYTES ) ) >= $len or
       croak "RX UNDERFLOW - not enough bytes available";
 
@@ -662,11 +652,8 @@ Writes the given bytes into the TX FIFO.
 
 =cut
 
-async sub write_txfifo
+async method write_txfifo ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
    await $self->protocol->write(
       pack "C a*", REG_WRITE | REG_BURST | REG_TXFIFO, $bytes
    );
@@ -699,17 +686,15 @@ them available.
 
 =cut
 
-async sub receive
+async method receive
 {
-   my $self = shift;
-
    # TODO: Check for RX UNDERFLOW somehow?
 
-   my $fixedlen = $self->{CONFIG_LENGTH_CONFIG} eq "fixed";
-   my $append_status = $self->{CONFIG_APPEND_STATUS};
+   my $fixedlen = $_cached_config{LENGTH_CONFIG} eq "fixed";
+   my $append_status = $_cached_config{APPEND_STATUS};
 
    my $len = $fixedlen ?
-      $self->{CONFIG_PACKET_LENGTH} :
+      $_cached_config{PACKET_LENGTH} :
       unpack "C", await $self->read_rxfifo( 1 );
 
    $len += 2 if $append_status;
@@ -744,17 +729,14 @@ configured in variable-length packet mode.
 
 =cut
 
-async sub transmit
+async method transmit ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
-   my $fixedlen = $self->{CONFIG_LENGTH_CONFIG} eq "fixed";
+   my $fixedlen = $_cached_config{LENGTH_CONFIG} eq "fixed";
 
    my $pktlen = length $bytes;
    if( $fixedlen ) {
-      $pktlen == $self->{CONFIG_PACKET_LENGTH} or
-         croak "Expected a packet $self->{CONFIG_PACKET_LENGTH} bytes long";
+      $pktlen == $_cached_config{PACKET_LENGTH} or
+         croak "Expected a packet $_cached_config{PACKET_LENGTH} bytes long";
    }
    else {
       # Ensure we can't overflow either TX or RX FIFO
@@ -771,12 +753,12 @@ async sub transmit
    my $timeout = 20; # TODO: configuration
    while( await( $self->read_chipstatus_tx )->{STATE} eq "TX" ) {
       $timeout-- or croak "Timed out waiting for TX to complete";
-      await Future::IO->sleep( $self->{poll_interval} );
+      await Future::IO->sleep( $_poll_interval );
    }
 }
 
 {
-   while( <DATA> ) {
+   while( readline DATA ) {
       chomp;
       next if m/^#/;
       my ( $name, $fields ) = split m/\|/, $_;

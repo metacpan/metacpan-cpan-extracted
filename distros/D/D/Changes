@@ -1,12 +1,20 @@
+0.04 2020-03-21
+
+  - add dustr, dwstr, dnstr function. This function logic is move from du, dw, dn.
+
 0.03 2020-02-21
+
   - fix a test.
+
 0.02 2019-12-21
+
   - sort data keys in du, dw output.
   - remove "$VAR1 = " from du, dw output.
   - remove no needed indent. indent width become 2.
   - add warnings line number and file name to du, dw output.
   - add dn function. This function is similar as du, dw, but don't encode data.
   - don't send __WARN__ signal. only print dump data to STDERR.
+
 0.01 2019-11-09
 
   - First release.

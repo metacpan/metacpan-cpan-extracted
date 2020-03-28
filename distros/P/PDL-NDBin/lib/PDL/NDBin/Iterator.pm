@@ -1,6 +1,6 @@
 package PDL::NDBin::Iterator;
 # ABSTRACT: Iterator object for PDL::NDBin
-$PDL::NDBin::Iterator::VERSION = '0.018';
+$PDL::NDBin::Iterator::VERSION = '0.019';
 use strict;
 use warnings;
 use Carp;
@@ -112,7 +112,7 @@ PDL::NDBin::Iterator - Iterator object for PDL::NDBin
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 DESCRIPTION
 
@@ -268,7 +268,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Edward Baudrez.
+This software is copyright (c) 2020 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

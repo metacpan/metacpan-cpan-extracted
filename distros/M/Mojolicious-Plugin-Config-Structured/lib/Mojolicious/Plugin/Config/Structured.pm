@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Config::Structured;
-$Mojolicious::Plugin::Config::Structured::VERSION = '1.001';
+$Mojolicious::Plugin::Config::Structured::VERSION = '1.002';
 # ABSTRACT: Mojolicious Plugin for Config::Structured: locates and reads config and definition files and loads them into a Config::Structured instance, made available globally as 'conf'
 
 use 5.022;
@@ -17,26 +17,29 @@ Readonly::Scalar our $DEF_FILE_SUFFIX  => q{def};
 sub register ($self, $app, $params) {
   my @search = (
     $params->{config_file},
-    $app->home->rel_file(join($PERIOD, $app->moniker, $app->mode, $CONF_FILE_SUFFIX)),
-    $app->home->rel_file(join($PERIOD, $app->moniker, $CONF_FILE_SUFFIX))
+    $app->home->child(join($PERIOD, $app->moniker, $app->mode, $CONF_FILE_SUFFIX))->to_string,
+    $app->home->child(join($PERIOD, $app->moniker, $CONF_FILE_SUFFIX))->to_string
   );
   my ($conf_file) = grep {defined && -r -f} @search;    #get the first existent, readable file
   unless (defined($conf_file)) {
     $app->log->error('[Config::Structured] Initializing with empty configuration');
   }
 
-  @search = ($params->{structure_file}, $app->home->rel_file(join($PERIOD, $app->moniker, $CONF_FILE_SUFFIX, $DEF_FILE_SUFFIX)));
+  @search =
+    ($params->{structure_file}, $app->home->child(join($PERIOD, $app->moniker, $CONF_FILE_SUFFIX, $DEF_FILE_SUFFIX))->to_string);
   my ($def_file) = grep {defined && -r -f} @search;
   unless (defined($def_file) && -r -f $def_file) {
     $app->log->error("[Config::Structured] No configuration definition found (tried to read from `$def_file`)");
   }
 
+  my $conf = Config::Structured->new(
+    config    => $conf_file,
+    structure => $def_file
+  )->__register_default;
+
   $app->helper(
     conf => sub {
-      Config::Structured->get() // Config::Structured->new(
-        config    => $conf_file,
-        structure => $def_file
-      )->__register_default;
+      return $conf;
     }
   );
 
@@ -57,7 +60,7 @@ Mojolicious::Plugin::Config::Structured - Mojolicious Plugin for Config::Structu
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 

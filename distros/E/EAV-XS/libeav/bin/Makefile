@@ -2,7 +2,7 @@ CFLAGS ?= -O2 -Wall -Wextra -std=c99 -pedantic
 DESTDIR ?= ${_destdir}
 INSTALL ?= ${_install}
 
-DEFS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=500 -D_SVID_SOURCE
+DEFS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_SVID_SOURCE -D__EXTENSIONS__
 DEFS += -I../include
 DEFS += ${_defs}
 

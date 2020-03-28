@@ -1,4 +1,4 @@
-requires "Mojolicious"                => 0;
+requires "Mojolicious"                => "7.55";
 requires "Mojo::JSON"                 => 0;
 requires "IO::Handle"                 => 0;
 requires "Role::Tiny"                 => 0;

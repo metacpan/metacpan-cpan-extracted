@@ -32,6 +32,7 @@ All the methods of L<CallBackery::GuiPlugin::AbstractTable> plus:
 
 has tableCfg => sub {
     my $self = shift;
+    my $admin = ( not $self->user or $self->user->may('admin'));
     return [
         {
             label => trm('UserId'),
@@ -69,12 +70,12 @@ has tableCfg => sub {
             width => '8*',
             key => 'cbuser_cbrights',
         },
-        {
+        $admin ? ({
             label => trm('Note'),
             type => 'string',
             width => '8*',
             key => 'cbuser_note',
-        },
+        }):(),
      ]
 };
 
@@ -111,8 +112,12 @@ has actionCfg => sub {
                 my $self = shift;
                 my $args = shift;
                 my $id = $args->{selection}{cbuser_id};
-                die mkerror(393,"You have to select a user first")
+                die mkerror(393,trm('You have to select a user first'))
                     if not $id;
+            },
+            set => {
+                height => 340,
+                width => 500
             },
             backend => {
                 plugin => 'UserForm',
@@ -131,9 +136,9 @@ has actionCfg => sub {
                 my $self = shift;
                 my $args = shift;                
                 my $id = $args->{selection}{cbuser_id};
-                die mkerror(4992,"You have to select a user first")
+                die mkerror(4992,trm("You have to select a user first"))
                     if not $id;
-                die mkerror(4993,"You can not delete the user you are logged in with")
+                die mkerror(4993,trm("You can not delete the user you are logged in with"))
                     if $id == $self->user->userId;
                 my $db = $self->user->db;
 
@@ -142,7 +147,7 @@ has actionCfg => sub {
                          action => 'reload',
                     };
                 }
-                die mkerror(4993,"Faild to remove user $id");
+                die mkerror(4993,trm("Faild to remove user %1",$id));
             }
         }) : (),
     ];

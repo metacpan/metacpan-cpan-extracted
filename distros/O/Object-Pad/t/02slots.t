@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Refcount;
 
 use Object::Pad;
 
@@ -58,6 +59,24 @@ class AllTheTypes {
    is( pp($instance),
       q(bless([123, [456], { 789 => 10 }], "AllTheTypes")),
       'pp($instance) sees slot data' );
+}
+
+# Variant of RT132228 about individual slot lexicals
+class Holder {
+   has $slot;
+   method slot :lvalue { $slot }
+}
+
+{
+   my $datum = [];
+   is_oneref( $datum, '$datum initially' );
+
+   my $holder = Holder->new;
+   $holder->slot = $datum;
+   is_refcount( $datum, 2, '$datum while held by Holder' );
+
+   undef $holder;
+   is_oneref( $datum, '$datum finally' );
 }
 
 done_testing;

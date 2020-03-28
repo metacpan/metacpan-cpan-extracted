@@ -39,6 +39,7 @@
       "test" : {
          "requires" : {
             "Test::Deep" : "0",
+            "Test::EOL" : "0",
             "Test::Exception" : "0",
             "Test::LeakTrace" : "0",
             "Test::NoWarnings" : "0",
@@ -51,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

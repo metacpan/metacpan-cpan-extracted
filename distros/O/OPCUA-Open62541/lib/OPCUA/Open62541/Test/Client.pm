@@ -3,7 +3,7 @@ use warnings;
 
 package OPCUA::Open62541::Test::Client;
 use OPCUA::Open62541::Test::Logger;
-use OPCUA::Open62541 qw(:statuscode :clientstate);
+use OPCUA::Open62541 qw(STATUSCODE_GOOD :CLIENTSTATE);
 use Carp 'croak';
 use Time::HiRes qw(sleep);
 
@@ -104,6 +104,8 @@ sub stop {
 1;
 
 __END__
+
+=pod
 
 =head1 NAME
 

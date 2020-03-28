@@ -10,7 +10,7 @@ OpenTracing::Types - Type constraints for checking Interfaces
 
 
 
-our $VERSION = '0.12';
+our $VERSION = '0.16';
 
 
 
@@ -57,7 +57,7 @@ use Type::Utils qw/duck_type/;
 # The OpenTracing::Interface::*.pod files are leading, not the code.
 #
 use constant {
-    REQUIRED_METHODS_FOR_REFERENCE => [ qw(
+    REQUIRED_METHODS_FOR_CONTEXT_REFERENCE => [ qw(
         new_child_of
         new_follows_from
         get_referenced_context
@@ -68,7 +68,7 @@ use constant {
         close
         get_span
     ) ],
-    REQUIRED_METHODS_FOR_SCOPEMANAGER => [ qw(
+    REQUIRED_METHODS_FOR_SCOPE_MANAGER => [ qw(
         activate_span
         get_active_scope
     ) ],
@@ -81,7 +81,7 @@ use constant {
         set_baggage_item
         get_baggage_item
     ) ],
-    REQUIRED_METHODS_FOR_SPANCONTEXT => [ qw(
+    REQUIRED_METHODS_FOR_SPAN_CONTEXT => [ qw(
         get_baggage_item
         with_baggage_item
     ) ],
@@ -97,12 +97,12 @@ use constant {
 
 # XXX DO NOT COPY PASTE FROM CODE, READ THE POD
 
-duck_type Reference    => REQUIRED_METHODS_FOR_REFERENCE;
-duck_type Scope        => REQUIRED_METHODS_FOR_SCOPE;
-duck_type ScopeManager => REQUIRED_METHODS_FOR_SCOPEMANAGER;
-duck_type Span         => REQUIRED_METHODS_FOR_SPAN;
-duck_type SpanContext  => REQUIRED_METHODS_FOR_SPANCONTEXT;
-duck_type Tracer       => REQUIRED_METHODS_FOR_TRACER;
+duck_type ContextReference => REQUIRED_METHODS_FOR_CONTEXT_REFERENCE;
+duck_type Scope            => REQUIRED_METHODS_FOR_SCOPE;
+duck_type ScopeManager     => REQUIRED_METHODS_FOR_SCOPE_MANAGER;
+duck_type Span             => REQUIRED_METHODS_FOR_SPAN;
+duck_type SpanContext      => REQUIRED_METHODS_FOR_SPAN_CONTEXT;
+duck_type Tracer           => REQUIRED_METHODS_FOR_TRACER;
 
 
 
@@ -114,7 +114,7 @@ The following Duck Types are being defined with the mentioned required methods:
 
 
 
-=head2 C<< Reference >>
+=head2 C<< ContextReference >>
 
 =over
 
@@ -130,8 +130,8 @@ The following Duck Types are being defined with the mentioned required methods:
 
 =back
 
-See also L<OpenTracing::Interface::Reference/"INSTANCE METHODS">
-and L<OpenTracing::Interface::Reference/"CONSTRUCTOR METHODS">.
+See also L<OpenTracing::Interface::ContextReference/"INSTANCE METHODS">
+and L<OpenTracing::Interface::ContextReference/"CONSTRUCTOR METHODS">.
 
 
 

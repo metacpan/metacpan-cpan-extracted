@@ -2,7 +2,7 @@ use strict;
 use warnings qw(all);
 use 5.022;
 
-use Test::More tests => 5;
+use Test::More tests => 4;
 use Test::Warn;
 
 use Config::Structured;
@@ -35,8 +35,6 @@ my $conf = Config::Structured->new(
 );
 
 is(ref($conf->labels), 'ARRAY', 'Conf value is array');
-warning_like {$conf->authz}{carped => qr/[[]Config::Structured\] Value 'HASH[(].*[)]' does not conform to type 'Str'/},
-  'Conf value is not hash';
 
 warning_is {$conf->other} undef, 'Conf value is any';
 

@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::5_0::Direct;
-$Search::Elasticsearch::Client::5_0::Direct::VERSION = '6.00';
+$Search::Elasticsearch::Client::5_0::Direct::VERSION = '6.80';
 use Moo;
 with 'Search::Elasticsearch::Client::5_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -79,7 +79,7 @@ Search::Elasticsearch::Client::5_0::Direct - Thin client with full support for E
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 SYNOPSIS
 
@@ -1640,7 +1640,10 @@ The C<put_script()> method is used to store a script in the cluster state. For i
         lang => 'painless',
         id   => 'hello_world',
         body => {
-          script => q(return "hello world");
+          script => {
+            lang   => 'painless',
+            source => q(return "hello world")
+          }
         }
     );
 
@@ -1749,11 +1752,11 @@ See the L<indexed search template docs|http://www.elastic.co/guide/en/elasticsea
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

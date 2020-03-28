@@ -5,7 +5,7 @@ package App::ElasticSearch::Utilities::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '7.5'; # VERSION
+our $VERSION = '7.6'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:output);
@@ -172,7 +172,7 @@ sub request {
     my $req = App::ElasticSearch::Utilities::HTTPRequest->new( $method => $uri->as_string );
     $req->content($body) if defined $body;
 
-    return $self->ua->simple_request( $req );
+    return $self->ua->request( $req );
 }
 
 
@@ -225,7 +225,7 @@ App::ElasticSearch::Utilities::Connection - Abstract the connection element
 
 =head1 VERSION
 
-version 7.5
+version 7.6
 
 =head1 SYNOPSIS
 
@@ -313,7 +313,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Brad Lhotsky.
+This software is Copyright (c) 2020 by Brad Lhotsky.
 
 This is free software, licensed under:
 

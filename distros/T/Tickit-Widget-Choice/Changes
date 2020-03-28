@@ -1,5 +1,9 @@
 Revision history for Tickit-Widget-Choice
 
+0.03    2020-03-27
+        [CHANGES]
+         * Use Object::Pad
+
 0.02    [BUGFIXES]
          * Set WIDGET_PEN_FROM_STYLE to keep Tickit 0.50 happy (RT103397)
 

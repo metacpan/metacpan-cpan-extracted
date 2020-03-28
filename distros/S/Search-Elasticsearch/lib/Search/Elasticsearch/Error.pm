@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Error;
-$Search::Elasticsearch::Error::VERSION = '6.00';
+$Search::Elasticsearch::Error::VERSION = '6.80';
 our $DEBUG = 0;
 
 @Search::Elasticsearch::Error::Internal::ISA     = __PACKAGE__;
@@ -179,7 +179,7 @@ Search::Elasticsearch::Error - Errors thrown by Search::Elasticsearch
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -312,11 +312,11 @@ this module.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::0_90::TestServer;
-$Search::Elasticsearch::Client::0_90::TestServer::VERSION = '5.02';
+$Search::Elasticsearch::Client::0_90::TestServer::VERSION = '6.80';
 use strict;
 use warnings;
 
@@ -42,15 +42,15 @@ Search::Elasticsearch::Client::0_90::TestServer - Client-specific backend for Se
 
 =head1 VERSION
 
-version 5.02
+version 6.80
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

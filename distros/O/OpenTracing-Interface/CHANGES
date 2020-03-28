@@ -1,6 +1,30 @@
 CHANGE LOG
 ==========
 
+2020-03-26 v0.16
+----------------
+
+set pinned version on `Role::MethodReturns`
+
+
+2020-03-26 v0.15
+----------------
+
+Fixed al sorts off issues during PAUSE / MetaCPAN indexing
+
+
+2020-03-25 v0.14
+----------------
+
+Renamed to "ContextReference"
+
+
+2020-03-25 v0.13
+----------------
+
+improved indexing capabilities
+
+
 2020-03-25 v0.12
 ----------------
 

@@ -1,7 +1,7 @@
 package Search::Elasticsearch::Client::0_90;
 
-our $VERSION='5.02';
-use Search::Elasticsearch 5.02 ();
+our $VERSION='6.80';
+use Search::Elasticsearch 6.00 ();
 
 1;
 
@@ -15,7 +15,7 @@ Search::Elasticsearch::Client::0_90 - Thin client with full support for Elastics
 
 =head1 VERSION
 
-version 5.02
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -32,11 +32,11 @@ about how to use the client itself.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

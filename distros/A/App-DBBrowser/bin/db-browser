@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.247';
+our $VERSION = '2.249';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.247
+Version 2.249
 
 =head1 SYNOPSIS
 
@@ -225,7 +225,7 @@ enabled in L</Extensions>.
 I<Attache DB> is available for C<SQLite> databases. I<Attach DB> can be used to attach databases to the
 current database. The menu entry I<Detach DB> is available if a C<SQLite> database has attached databases.
 
-By selecting the prompt line of this menu (the database name) one can change the I<Data source> settings.
+By selecting the prompt line of this menu (the database name) one can change the I<Source type of input data> settings.
 
 =head3 Tables Entries
 
@@ -283,7 +283,7 @@ Delete
 
 See L</WRITE ACCESS>. These entries are available if enabled in L</Extensions>.
 
-By selecting the prompt line of this menu (I<Choose SQL type:>) one can change the I<Data source> settings.
+By selecting the prompt line of this menu (I<Choose SQL type:>) one can change the I<Source type of input data> settings.
 
 =head3 Print TABLE
 
@@ -335,46 +335,33 @@ Reset the SQL statement.
 I<Create/Drop Table/View> can be reached by selecting the prompt-line in the L</Tables Menu> if the respective option is
 activated.
 
+Selecting the prompt line of the I<Create/Drop Table/View> sub-menu allows one to set the parse settings described in
+L</Insert Data>.
+
 =head3 Create Table
 
-Selecting I<Create Table> opens a sub-menu where one can choose the type of the data source.
+If the option I<Source type of input data> is set to I<menu>, selecting I<Create Table> opens a sub-menu where one can choose the
+type of the data source. If I<Source type of input data> is set to I<plain>, I<copy&paste> or I<file>, the set data source type is
+used automatically without showing a menu.
+
+For the meaning of the different data source types see L<Source type of input data>.
+
+After the data has been read the user can apply different input filters (See L<Input filters>). When the input filters
+are confirmed the user is asked
 
 =over
 
-=item Prompt line
+=item - for the table name
 
-Selecting the prompt line of this sub-menu allows one to set the parse settings described in L</Insert Data>.
+=item - if the first data row should be used as header
 
-=item Plain
+=item - if an auto increment column should be added (if the option L<Auto increment> is enabled)
 
-Insert the data cell by cell.
+=item - to edit the column names
 
-=item Copy and Paste
+=item - to edit the column data types
 
-Reads from STDIN until the end of input.
-
-The input filter L</Reparse> allows one to change the parse-settings.
-
-=item From File
-
-The data is read from a chosen file.
-
-The input filter L</Reparse> allows one to change the parse-settings.
-
-Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
-
-Selecting I<From File> opens a menu where one can choose the directory which should be searched for files.
-
-If I<Dir history> is set to 1 and a directory has already been saved, this menu is skipped and the directory is chosen
-automatically.
-
-After a directory has been chosen a sub-menu is opened where one can choose the source file.
-
-Selecting the prompt line of the directory sub-menu or the prompt line of the file sub-menu allows one to set the
-different directory- and file-settings described in L</Insert Data>.
-
-If the directory is chosen automatically, the prompt line sub-menu of the file sub-menu offers also the possibility to
-select a new directory.
+=item - to confirm the creating of the table
 
 =back
 
@@ -388,23 +375,79 @@ Before creating a view: print the required select-statement to make it available
 
 =head3 Drop View
 
+Drop a view. The whole view is shown before the user confirms to drop the view.
+
 =head2 Insert Into/Update/Delete
 
-I<Insert Into>, I<Update> and I<Delete> can be reached by selecting the prompt-line in the L</SQL Menu> if the respective
-option is activated.
+I<Insert Into>, I<Update> and I<Delete> can be reached by selecting the prompt-line in the L</SQL Menu> if the
+respective option is activated.
 
 I<Delete>, I<Update> or I<Insert Into>  may not be available with C<JOIN> and C<UNION> statements.
 
+Selecting the prompt line of the I<Insert Into/Update/Delete> sub-menu allows one to set the parse settings described in
+L</Insert Data>.
+
 =head3 Insert Into
 
-Selecting I<Insert Into> opens a sub-menu where one can choose the type of the data source.
+If the option I<Source type of input data> is set to I<menu>, selecting I<Insert Into> opens a sub-menu where one can
+choose the type of the data source. If I<Source type of input data> is set to I<plain>, I<copy&paste> or I<file>, the
+set data source type is used without showing a menu.
 
-See L<Create Table> for the different types of data sources.
+For the meaning of the different data source types see L<Source type of input data>.
+
+After the data has been read the user can apply different input filters (See L<Input filters>).
 
 If the first column of a table is an auto-increment column, the C<INSERT INTO> statement is build without this first
 column. This feature is available if supported by the database plugin.
 
-=head4 Input filters
+=head3 Update
+
+Update records. The affected (and not yet updated) records are shown shown before the user confirms the update.
+
+See also I<Subqueries> in L</Extensions>
+
+=head3 Delete
+
+Delete records. The affected records are shown before the user confirms the deletion.
+
+=head2 Data Input
+
+=head3 Source type of input data
+
+=over
+
+=item Plain
+
+Insert the data cell by cell.
+
+=item Copy and Paste
+
+Reads from STDIN until the end of input.
+
+=item From File
+
+The data is read from a chosen file.
+
+Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
+
+Selecting I<From File> opens the I<Source file directory> sub-menu where one can choose the directory which should be
+searched for files.
+
+If L<Directory history> is set to C<1> and a directory has been saved, this menu is skipped and the directory is chosen
+automatically.
+
+After a directory has been chosen a sub-menu is opened where one can choose the source file.
+
+Selecting the prompt line of the source file sub-menu allows one to set the parse settings described in L</Insert Data>.
+If the previous sub-menu I<Source file directory> is not shown due to the settings described before, additionally to the
+parse settings it is also possible the change the source file directory in this sub-menu by selecting I<NEW search>.
+
+=back
+
+See also the input filter L</Reparse> in I<Input filters>, which allows one to change the parse-settings and then
+re-read the data.
+
+=head3 Input filters
 
 =over
 
@@ -549,16 +592,6 @@ Change the parse settings and reparse the data with the new settings.
 
 =back
 
-=head3 Update
-
-Update records.
-
-See also I<Subqueries> in L</Extensions>
-
-=head3 Delete
-
-Delete records.
-
 =head1 OPTIONS
 
 The options menu is called with C<db-browser -h>.
@@ -625,7 +658,7 @@ If enabled: saves the menu position while entering in a sub menu.
 
 Show the table header on top of each page.
 
-=head3 Table expand
+=head3 Expand table
 
 Expand table rows:
 
@@ -645,9 +678,9 @@ do not expand the first row if the cursor auto-jumped to the first row.
 
 =back
 
-=head3 Info expand
+=head3 Expand info table
 
-Before records are deleted/updated or before a table is dropped the affected records are shown in an info-table.
+Before records are deleted/updated and before a table or a view is dropped the affected records are shown in an info-table.
 
 Expand info tables rows:
 
@@ -938,7 +971,7 @@ Enter a string which should be automatically put in front of all view names.
 Setting I<Auto increment> to a value which is not the empty string enables the option to set an auto increment column
 when creating a table. The value set here is then used as the default name for the auto increment column.
 
-=head3 Data types
+=head3 Col data types
 
 If this option is enabled and a table is created, C<SQL::Type::Guess> is used to detect the data types. These data types
 are then used as default values when the user is asked for the data types.
@@ -952,17 +985,17 @@ To disable the automatic limit set I<Auto Limit> to C<0>.
 
 =head2 Output
 
-=head3 Colwidth
+=head3 Col width
 
 Columns with a width below or equal I<Colwidth> are only trimmed if it is still required to lower the row width despite
 all columns wider than I<Colwidth> have been trimmed to I<Colwidth>.
 
-=head3 ProgressBar
+=head3 Progress bar
 
 Set the progress bar threshold. If the number of fields (rows x columns) is higher than the threshold, a progress bar is
 shown while preparing the data for the output.
 
-=head3 Tabwidth
+=head3 Tab width
 
 Set the number of spaces between columns.
 
@@ -1021,7 +1054,7 @@ Enable/disable C<File::Find> warnings when searching for C<SQLite> databases.
 
 =head2 Insert Data
 
-=head3 Parse file
+=head3 Parse tool for 'file'
 
 Set how to parse text files. Files where C<-T $filename> returns true are considered text files.
 
@@ -1122,13 +1155,43 @@ Auto-detects the separation character for csv-files
 
 =back
 
-=head3 Parse Copy & Paste
+=head3 Parse tool for 'copy & paste'
 
 Set how to parse the "multi row" input.
 
 Same options as in I<Parse file>.
 
-=head3 split settings
+=head3 csv settings-a
+
+Set the Text::CSV options
+
+=over
+
+=item
+
+sep_char
+
+=item
+
+quote_char
+
+=item
+
+escape_char
+
+=item
+
+eol
+
+=back
+
+=head3 csv settings-b
+
+Set Text::CSV options not mentioned in I<csv settings-a>:
+
+For the meaning of the different options see L<Text::CSV>.
+
+=head3 'split' settings
 
 =over
 
@@ -1170,36 +1233,6 @@ Expects a regex pattern. If set, removes trailing characters matching regexp fro
 
 =back
 
-=head3 CSV settings-a
-
-Set the Text::CSV options
-
-=over
-
-=item
-
-sep_char
-
-=item
-
-quote_char
-
-=item
-
-escape_char
-
-=item
-
-eol
-
-=back
-
-=head3 CSV settings-b
-
-Set Text::CSV options not mentioned in I<CSV settings-a>:
-
-For the meaning of the different options see L<Text::CSV>.
-
 =head3 Empty to Null
 
 Set the I<empty_to_null> defaults for the different data source types.
@@ -1208,20 +1241,32 @@ Set the I<empty_to_null> defaults for the different data source types.
 
 How to decode text files.
 
-=head3 Data source
+=head3 Source type of input data
 
-Set the data source to C<plain>, C<copy&paste>, C<file> or C<plain/copy&paste/file> for C<Insert Into> and for
+Set the data source type to C<plain>, C<copy&paste>, C<file> or C<menu> for C<Insert Into> and for
 C<Create Table>.
 
-If this option is set to C<plain/copy&paste/file>, a menu is offered where the user can choose the data source.
+If this option is set to C<menu>, a menu is offered where the user can choose the type of the data source.
 
-=head3 Dir history
+=head3 Directory history
 
-Set how many searched directories should be saved.
+Set how many searched directories should be saved in the directory history.
 
 A value of C<0> disables the history.
 
-If I<Dir history> is set to C<1> and a directory has already been saved, the directory is chosen automatically.
+If I<Directory history> is set to C<1> and a directory has been saved, the directory is chosen automatically without
+showing the history menu.
+
+=head3 File filter
+
+This option expects as its value a string. The string is used as a glob pattern.
+
+If I<file> is selected as the data source type, only files matching this glob pattern are part of the available files.
+
+=head3 Show hidden files
+
+If I<file> is selected as the data source type, this setting determines if hidden files are part of the available files
+or not.
 
 =head1 CONFIGURATION FILES
 

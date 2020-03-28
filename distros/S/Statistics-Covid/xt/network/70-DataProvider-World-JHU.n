@@ -1,0 +1,65 @@
+#!perl -T
+use 5.006;
+
+use strict;
+use warnings;
+
+use Statistics::Covid::DataProvider::World::JHU;
+use Statistics::Covid::Datum;
+use Statistics::Covid::Utils;
+
+use File::Temp;
+use File::Spec;
+use File::Basename;
+
+my $dirname = dirname(__FILE__);
+
+use Test::More;
+
+my $num_tests = 0;
+
+my ($ret, $count, $io, $schema, $da);
+
+my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+# .data.pl and .data.json will be the 2 files created for this specific data provider
+my $tmpbasename = File::Spec->catfile($tmpdir, "afile");
+my $configfile = File::Spec->catfile($dirname, 'example-config.json');
+my $confighash = Statistics::Covid::Utils::configfile2perl($configfile);
+ok(defined($confighash), "config json file parsed."); $num_tests++;
+
+$confighash->{'fileparams'}->{'datafiles-dir'} = $tmpdir;
+
+my $providerObj = Statistics::Covid::DataProvider::World::JHU->new({
+	'config-hash' => $confighash,
+	'debug' => 1,
+});
+ok(defined $providerObj, "Statistics::Covid::DataProvider::World::JHU->new() called"); $num_tests++;
+
+# fetch something
+unlink "$tmpbasename.data.pl", "$tmpbasename.data.json";
+my $datas = $providerObj->fetch();
+ok(defined($datas), "fetch() data from remote data provider"); $num_tests++;
+
+# save to local file
+$ret = $providerObj->save_fetched_data_to_localfile($datas, $tmpbasename);
+ok(defined($ret), "save fetched data to local file '$tmpbasename'."); $num_tests++;
+ok($ret eq $tmpbasename, "output basename returned '$tmpbasename'."); $num_tests++;
+ok((-f "$tmpbasename.data.pl")&&(-f "$tmpbasename.data.json"), "output files exist '$tmpbasename.data.pl' and '$tmpbasename.data.json'."); $num_tests++;
+
+# create Datum objects
+my $datumObjs = $providerObj->create_Datums_from_fetched_data($datas);
+ok(defined($datumObjs) && (ref($datumObjs) eq 'ARRAY') && (scalar(@$datumObjs)>0), "Convert fetched data to Datum objects."); $num_tests++;
+my $num_datumObjs = scalar @$datumObjs;
+
+# read data back from local file
+my $datas2 = $providerObj->load_fetched_data_from_localfile($tmpbasename);
+ok(defined($datas2), "load_fetched_data_from_localfile() called."); $num_tests++;
+# create Datum objects from that data
+my $datumObjs2 = $providerObj->create_Datums_from_fetched_data($datas2);
+ok(defined($datumObjs2) && (ref($datumObjs2) eq 'ARRAY') && (scalar(@$datumObjs2)>0), "Convert fetched data to Datum objects."); $num_tests++;
+my $num_datumObjs2 = scalar @$datumObjs2;
+ok($num_datumObjs == $num_datumObjs2, "same number of datum objects read from file and fetched."); $num_tests++;
+# compare the Datum objects;
+is(Statistics::Covid::Utils::objects_equal($datumObjs, $datumObjs2), 1, "exact same content of datum objects read from file and fetched."); $num_tests++;
+
+done_testing($num_tests);

@@ -24,9 +24,10 @@ use Mojo::Exception;
 use Mojo::Util qw(dumper);
 use Mojo::Loader qw(data_section);
 use YAML::XS qw(LoadFile Load);
-use Mojo::JSON qw(false);
+use Mojo::JSON qw(true false);
 use CallBackery::Translate qw(trm);
 
+$YAML::XS::Boolean = 'JSON::PP';
 
 =head2 cfgHash
 
@@ -90,18 +91,26 @@ sub postProcessCfg ($self,$cfg) {
     my $schema = $self->schema;
     my @items;
     my %pluginMap;
+    my @fullPluginList;
+    my @pluginList;
     for my $item (@{$cfg->{PLUGIN}}) {
         my ($name) = keys %$item;
+        push @fullPluginList, $name;
+        push @pluginList, $name
+            if not $item->{$name}{unlisted};
         Mojo::Exception->throw("Duplicated plugin instance $name")
-         if exists $pluginMap{$name};
+          if exists $pluginMap{$name};
         my $obj = eval { 
             $self->loadAndNewPlugin($item->{$name}{module});
         };
-        $pluginMap{$name} = $obj;
         if ($@){
             warn "Failed to load Plugin $_[0]: $@";
             next;
         }
+        $obj->config($item->{$name});
+        $obj->name($name);
+        $obj->app($self->app);
+        $pluginMap{$name} = $obj;
         push @items, {
             type => 'object',
             properties => {
@@ -109,28 +118,46 @@ sub postProcessCfg ($self,$cfg) {
             },
             required => [ $name ],
             additionalProperties => false,
-        }
+        };
+        
     }
     
     $schema->{properties}{PLUGIN}{items} = {
         anyOf => \@items
     };
+
+    $schema->{properties}{FRONTEND}{properties}{$_.'_popup'}
+        {properties}{plugin}{enum} = \@fullPluginList 
+            for qw(registration passwordreset);
+
+    # warn YAML::XS::Dump $schema;
     # second pass with data structures from plugins integrated
     if (my @errors = $self->validator->validate($cfg)){
         Mojo::Exception->throw(join "\n",@errors);
     }
-    my @pluginOrder;
-    my $PLUGIN = delete $cfg->{PLUGIN};
-    $cfg->{PLUGIN}{prototype} = \%pluginMap;
-    for my $item (@$PLUGIN) {
-        my ($name) = keys %$item;
-        push @{$cfg->{PLUGIN}{list}}, $name;
-        my $obj = $pluginMap{$name};
-        $obj->config($item->{$name});
-        $obj->name($name);
-        $obj->app($self->app);
-        $obj->massageConfig($cfg);
+    
+    
+    $cfg->{PLUGIN} = {
+        prototype => \%pluginMap,
+        list => \@pluginList
+    };
+
+    for (qw(registration passwordreset)) {
+        if (my $popup = $cfg->{FRONTEND}{$_.'_popup'}){
+            my $plugin = delete $popup->{plugin};
+            my $obj = $pluginMap{$plugin};
+            $cfg->{FRONTEND}{$_.'_popup'} = {
+                popupTitle => $obj->config->{'tab-name'},
+                name => $plugin,
+                %$popup,
+            };
+        }
     }
+    #warn YAML::XS::Dump($cfg->{FRONTEND})
+    for my $name (@fullPluginList) {
+        $pluginMap{$name}->massageConfig($cfg);
+    }
+
     $cfg->{FRONTEND}{TRANSLATIONS} = $self->getTranslations();
     return $cfg;
 }
@@ -143,6 +170,18 @@ __DATA__
 
 $id: https://callbackery.org/config-schema.yaml
 $schema: http://json-schema.org/draft-07/schema#
+definitions:
+  plugin:
+    type: object
+    additionalProperties: false
+    required:
+      - plugin
+    properties:
+      plugin:
+        type: string
+      set:
+        type: object
+
 type: object
 properties:
   BACKEND:
@@ -205,6 +244,11 @@ properties:
       hide_company:
         type: boolean
         description: hide company string on login screen
+      registration_popup:
+        $ref: "#/definitions/plugin"
+      passwordreset_popup:
+        $ref: "#/definitions/plugin"
+          
     PLUGIN:
       type: array
       items:
@@ -217,7 +261,10 @@ properties:
               - module
               properties:
                 module:
-                type: string
+                  type: string
+                unlisted:
+                  description: do not add this plugin to the plugin list.
+                  type: boolean
 
 
 

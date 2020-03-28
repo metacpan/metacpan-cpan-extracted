@@ -36,10 +36,10 @@ my %allow = (
     logout => 1,
     ping => 1,
     getUserConfig => 2,
-    getPluginConfig => 2,
-    validatePluginData => 2,
-    processPluginData => 2,
-    getPluginData => 2,
+    getPluginConfig => 3,
+    validatePluginData => 3,
+    processPluginData => 3,
+    getPluginData => 3,
     getSessionCookie => 2
 );
 
@@ -64,8 +64,23 @@ has pluginMap => sub {
 sub allow_rpc_access {
     my $self = shift;
     my $method = shift;
-    return (exists $allow{$method} and ($allow{$method} == 1 or $self->user->isUserAuthenticated));
-}
+    
+    if (not exists $allow{$method}){
+        return 0;
+    }
+
+    for ($allow{$method}){
+        /1/ && return 1;
+        /3/ && do {
+            my $plugin = $self->rpcParams->[0];
+            if ($self->instantiatePlugin($plugin)->mayAnonymous){
+                return 1;    
+            }
+        };
+        return $self->user->isUserAuthenticated;
+    }
+    return 0;
+};
 
 # dataCleaner($data)
 

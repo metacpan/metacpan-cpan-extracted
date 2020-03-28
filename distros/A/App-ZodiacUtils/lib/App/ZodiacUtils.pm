@@ -1,9 +1,9 @@
 package App::ZodiacUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-01'; # DATE
+our $DATE = '2020-01-31'; # DATE
 our $DIST = 'App-ZodiacUtils'; # DIST
-our $VERSION = '0.111'; # VERSION
+our $VERSION = '0.113'; # VERSION
 
 use 5.010001;
 use strict;
@@ -141,7 +141,7 @@ App::ZodiacUtils - CLI utilities related to zodiac
 
 =head1 VERSION
 
-This document describes version 0.111 of App::ZodiacUtils (from Perl distribution App-ZodiacUtils), released on 2020-01-01.
+This document describes version 0.113 of App::ZodiacUtils (from Perl distribution App-ZodiacUtils), released on 2020-01-31.
 
 =head1 DESCRIPTION
 
@@ -197,6 +197,7 @@ Arguments ('*' denotes required arguments):
 
 Dates.
 
+
 =back
 
 Return value:  (any)
@@ -241,6 +242,7 @@ Arguments ('*' denotes required arguments):
 =item * B<dates>* => I<array[date]>
 
 Dates.
+
 
 =back
 

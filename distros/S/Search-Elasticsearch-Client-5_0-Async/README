@@ -3,7 +3,7 @@ NAME
     support for Elasticsearch 5.x APIs
 
 VERSION
-    version 6.00
+    version 6.80
 
 DESCRIPTION
     The Search::Elasticsearch::Client::5_0::Async package provides a client
@@ -31,10 +31,10 @@ PREVIOUS VERSIONS OF ELASTICSEARCH
     *   Search::Elasticsearch::Client::0_90::Async
 
 AUTHOR
-    Clinton Gormley <drtech@cpan.org>
+    Enrico Zimuel <enrico.zimuel@elastic.co>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2017 by Elasticsearch BV.
+    This software is Copyright (c) 2020 by Elasticsearch BV.
 
     This is free software, licensed under:
 

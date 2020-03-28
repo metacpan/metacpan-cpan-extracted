@@ -1,14 +1,26 @@
 #ifndef __XS_PARSE_SUBLIKE_H__
 #define __XS_PARSE_SUBLIKE_H__
 
-#define XSPARSESUBLIKE_ABI_VERSION 1
+#define XSPARSESUBLIKE_ABI_VERSION 2
+
+struct XSParseSublikeContext {
+  SV *name;  /* may be NULL for anon subs */
+  /* STAGE pre_subparse */
+  OP *attrs; /* may be NULL */
+  /* STAGE post_blockstart */
+  OP *body;
+  /* STAGE pre_blockend */
+  CV *cv;
+  /* STAGE post_newcv */
+};
 
 struct XSParseSublikeHooks {
   U32  flags;   /* undocumented but reserved for ABI back-compat later */
   bool (*permit)         (pTHX);
-  void (*post_blockstart)(pTHX);
-  OP * (*pre_blockend)   (pTHX_ OP *body);
-  void (*post_newcv)     (pTHX_ CV *cv);
+  void (*pre_subparse)   (pTHX_ struct XSParseSublikeContext *ctx);
+  void (*post_blockstart)(pTHX_ struct XSParseSublikeContext *ctx);
+  void (*pre_blockend)   (pTHX_ struct XSParseSublikeContext *ctx);
+  void (*post_newcv)     (pTHX_ struct XSParseSublikeContext *ctx);
 };
 
 static int (*parse_func)(pTHX_ const struct XSParseSublikeHooks *hooks, OP **op_ptr);

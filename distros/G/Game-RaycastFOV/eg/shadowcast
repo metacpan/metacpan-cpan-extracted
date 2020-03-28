@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+#
+# Field of View (FOV) via shadowcast
+
+use 5.24.0;
+use warnings;
+use Data::Dumper;
+use Game::RaycastFOV v2.00 qw(shadowcast);
+
+sub at              { "\e[" . (1 + $_[1]) . ';' . (1 + $_[0]) . 'H' }
+sub clear_screen () { "\e[1;1H\e[2J" }
+sub t_norm ()       { "\e[m" }
+
+our $MAX_X = 78;
+our $MAX_Y = 23;
+
+my $radius = shift || 7;
+
+# center
+my $x = 60;
+my $y = 12;
+
+*STDOUT->autoflush(1);
+print clear_screen, t_norm;
+
+# some random fill in a map to restrict FOV with, mirrored
+my @map;
+for my $r (0 .. 23) {
+    for my $c (0 .. 40) {
+        my $ch = rand() > 0.5 ? '#' : '.';
+        $map[$r][$c] = $ch;
+        $map[$r][ $c + 40 ] = $ch;
+    }
+}
+
+$map[$y][$x] = '@';
+
+my $radius_sq = $radius**2;
+
+shadowcast(
+    $x, $y, $radius,
+    sub {
+        my ($curx, $cury) = @_;
+        return $map[$cury][$curx] eq '#';
+    },
+    sub {
+        my ($curx, $cury, $dx, $dy) = @_;
+        print at($curx, $cury), $map[$cury][$curx];
+    },
+    sub {
+        my ($dx, $dy) = @_;
+        return ($dx**2 + $dy**2) < $radius_sq;
+    }
+);
+
+$x = 20;
+$map[$y][$x] = '@';
+
+shadowcast(
+    $x, $y, $radius,
+    sub { return 0 },    # not blocked
+    sub {
+        my ($curx, $cury, $dx, $dy) = @_;
+        print at($curx, $cury), $map[$cury][$curx];
+    },
+    sub {
+        my ($dx, $dy) = @_;
+        return ($dx**2 + $dy**2) < $radius_sq;
+    }
+);
+
+print at(0, $MAX_Y);

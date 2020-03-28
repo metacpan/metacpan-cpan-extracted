@@ -1,8 +1,9 @@
 NAME
-    Log::Any::Adapter::Callback - Send Log::Any logs to a subroutine
+    Log::Any::Adapter::Callback - (DEPRECATED) Send Log::Any logs to a
+    subroutine
 
 VERSION
-    This document describes version 0.100 of Log::Any::Adapter::Callback
+    This document describes version 0.101 of Log::Any::Adapter::Callback
     (from Perl distribution Log-Any-Adapter-Callback), released on
     2020-01-14.
 

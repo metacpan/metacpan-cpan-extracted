@@ -40,13 +40,13 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
                     width => 14,
                     align => 1,
                 },
-                latest_release => {
-                    title => "LATEST\nRELEASE",
+                current_release => {
+                    title => "CURRENT\nRELEASE",
                     width => 14,
                     align => 1,
                 },
-                parent_release => {
-                    title => "PARENT\nRELEASE",
+                latest_release => {
+                    title => "LATEST\nRELEASE",
                     width => 14,
                     align => 1,
                 },
@@ -199,14 +199,7 @@ sub _render_dist ( $self, $tbl, $dist, $data ) {
     # latest release
     my $latest_release = $data->{releases} ? $data->{releases}->[-1] : undef;
 
-    if ($latest_release) {
-        push @row, $latest_release;
-    }
-    else {
-        push @row, $WHITE . $ON_RED . ' v0.0.0 ' . $RESET;
-    }
-
-    # parent release
+    # current release
     if ( defined $dist_id->{release} ) {
         if ( $dist_id->{release} eq $latest_release ) {
             push @row, $dist_id->{release};
@@ -214,6 +207,13 @@ sub _render_dist ( $self, $tbl, $dist, $data ) {
         else {
             push @row, $WHITE . $ON_RED . " $dist_id->{release} " . $RESET;
         }
+    }
+    else {
+        push @row, $WHITE . $ON_RED . ' v0.0.0 ' . $RESET;
+    }
+
+    if ($latest_release) {
+        push @row, $latest_release;
     }
     else {
         push @row, $WHITE . $ON_RED . ' v0.0.0 ' . $RESET;

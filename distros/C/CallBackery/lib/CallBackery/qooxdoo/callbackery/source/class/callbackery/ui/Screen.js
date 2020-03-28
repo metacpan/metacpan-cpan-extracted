@@ -100,7 +100,9 @@ qx.Class.define("callbackery.ui.Screen", {
                 else {
                     that.debug('Invalid plugin type:"' + type + '"');
                 }
-            },'getPluginConfig',cfg.name,getParentFormDataCallBack ? getParentFormDataCallBack() : null);
+            },'getPluginConfig',cfg.name,
+                getParentFormDataCallBack ? getParentFormDataCallBack() : null
+            );
         }
     }
 

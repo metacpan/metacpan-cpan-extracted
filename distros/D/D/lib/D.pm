@@ -14,11 +14,15 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our @EXPORT = qw(du dw dn);
+our @EXPORT = qw(du dw dn dustr dwstr dnstr);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub du {
+  print STDERR dustr(@_);
+}
+
+sub dustr {
   my ($ref_data) = @_;
   $ref_data = _encode('UTF-8', $ref_data);
   my $d = Data::Dumper->new([$ref_data]);
@@ -26,10 +30,15 @@ sub du {
   my $ret = $d->Dump;
   chomp $ret;
   my $carp_short_message = Carp::shortmess($ret);
-  print STDERR $carp_short_message;
+
+  return $carp_short_message;
 }
 
 sub dw {
+  print STDERR dwstr(@_);
+}
+
+sub dwstr {
   my ($ref_data) = @_;
   $ref_data = _encode("cp932",$ref_data);
   my $d = Data::Dumper->new([$ref_data]);
@@ -37,17 +46,23 @@ sub dw {
   my $ret = $d->Dump;
   chomp $ret;
   my $carp_short_message = Carp::shortmess($ret);
-  print STDERR $carp_short_message;
+
+  return $carp_short_message;
 }
 
 sub dn {
+  print STDERR dnstr(@_);
+}
+
+sub dnstr {
   my ($ref_data) = @_;
   my $d = Data::Dumper->new([$ref_data]);
   $d->Sortkeys(1)->Indent(1)->Terse(1);
   my $ret = $d->Dump;
   chomp $ret;
   my $carp_short_message = Carp::shortmess($ret);
-  print STDERR $carp_short_message;
+
+  return $carp_short_message;
 }
 
 # Copy from Data::Recursive::Encode
@@ -122,19 +137,28 @@ D - Provides utility functions to encode data and dump it to STDERR.
   
   use utf8;
   
-  # Export du and dw functions
+  # Export du, dw, dn, dustr, dwstr, dnstr functions
   use D;
   
   # Reference data that contains decoded strings
   my $data = [{name => 'あ'}, {name => 'い'}];
   
-  # Encode all strings in reference data to UTF-8 and dump the reference data to STDERR
+  # Encode all strings in reference data to UTF-8 and return string the reference data.
+  my $str = dustr $data;
+
+  # Encode all strings in reference data to cp932 and return string the reference data.
+  my $str = dwstr $data;
+
+  # Return string the reference data to without encoding.
+  my $str = dnstr $data;
+
+  # Dump the result of dustr function to STDERR.
   du $data;
   
-  # Encode all strings in reference data to cp932 and dump the reference data.
+  # Dump the result of dwstr function to STDERR.
   dw $data;
 
-  # Dump reference data to STDERR without encoding.
+  # Dump the result of dnstr function to STDERR.
   dn $data;
 
 =head1 DESCRIPTION
@@ -145,9 +169,9 @@ D module provides utility functions to encode data and dump it to STDERR.
 
 =over 2
 
-=item * Export C<du> and C<dw> and C<dn> functions. Don't conflict debug command such as 'p' because these function names are consist of two characters.
+=item * Export C<du> and C<dw> and C<dn> and C<dustr> and C<dwstr> and C<dnstr> functions. Don't conflict debug command such as 'p' because these function names are consist of two characters.
 
-=item * Encode all strings in reference data in C<du> and C<dw> function.
+=item * Encode all strings in reference data in C<dustr> and C<dwstr> function.
 
 =item * C<du> is a short name of "dump UTF-8"
 
@@ -169,29 +193,39 @@ D module provides utility functions to encode data and dump it to STDERR.
 
 =head1 EXPORT
 
-Export C<du> and C<dw> and C<dn> functions.
+Export C<du> and C<dw> and C<dn> and C<dustr> and C<dwstr> and C<dnstr> functions.
 
 =head1 FUNCTIONS
 
-=head2 du
+=head2 dustr
 
-  du $data;
-
-Encode all strings in reference data to UTF-8 and dump the reference data to STDERR with file name and line number.
+Encode all strings in reference data to UTF-8 and return string the reference data with file name and line number.
 
 If the argument is not reference data such as a string, it is also dumped in the same way as reference data.
 
-=head2 dw
+=head2 du
+
+Dump the result of dustr function to STDERR.
+
+=head2 dwstr
 
 Encode all strings in reference data to cp932 and dump the reference data to STDERR with file name and line number.
 
 If the argument is not reference data such as a string, it is also dumped in the same way as reference data.
 
-=head2 dn
+=head2 dw
+
+Dump the result of dwstr function to STDERR.
+
+=head2 dnstr
 
 Dump reference data to STDERR without encoding with file name and line number.
 
 If the argument is not reference data such as a string, it is also dumped in the same way as reference data.
+
+=head2 dn
+
+Dump the result of dnstr function to STDERR.
 
 =head1 Bug Report
 
@@ -203,13 +237,13 @@ L<Data::Dumper>, L<Carp>, L<Data::Recursive::Encode>
 
 =head1 AUTHOR
 
-yoshiyuki ito, E<lt>yoshiyuki.ito.biz@gmail.comE<gt>
+Yoshiyuki Ito, E<lt>yoshiyuki.ito.biz@gmail.comE<gt>
 
 Yuki Kimoto, E<lt>kimoto.yuki@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2019 by yoshi, Yuki Kimoto
+Copyright (C) 2019 by Yoshiyuki Ito, Yuki Kimoto
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.08.7 or,

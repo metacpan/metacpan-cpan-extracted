@@ -2,6 +2,24 @@ Revision history for AnyEvent::WebDriver
 
 TODO: investigate modifer key usage/special key usage in send_element_keys
 TODO: geckodriver/chromedriver autostart classes
+TODO: enforce duration values ot be integers
+TODO: more move/source/duration examples
+
+1.2  Sat Mar 28 18:05:59 CET 2020
+	- INCOMPATIBLE CHANGE: screenshots are now decoded and are no longer
+          in base64 (or data urls), but a biary png image.
+        - INCOMPAITBLE CHANGE: this module now uses the second key table
+          from the spec which contains shifted variants of the keys, which
+          allows for shifted characters and to distinguish between e.g.
+          left and right Alt keys, but causes some key names to change.
+	- docfix: ->move does not have a button argument.
+        - docfix: keyUp/keyDown are really key_up and key_down.
+	- ->move now truncates coordinates to integers.
+	- clarify documentation here and there.
+        - added untested print method from webdriver2 draft.
+        - parse the special keys at runtime, only when required, directly.
+          from a pasted copy form the spec, to ease maintenance and reduce
+          initial memory usage.
 
 1.01 Fri Sep 27 05:30:40 CEST 2019
 	- autodelete property was ignored.

@@ -310,7 +310,8 @@ sub _build_id ($self) {
 sub _build_releases ($self) {
     return if !$self->git;
 
-    my $res = $self->git->git_run('tag --merged master');
+    # my $res = $self->git->git_run('tag --merged master');
+    my $res = $self->git->git_run('tag');
 
     return if !$res;
 

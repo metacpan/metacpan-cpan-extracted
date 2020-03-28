@@ -30,7 +30,7 @@ void
 bypair (callback, ...)
     SV *callback;
     PREINIT:
-        int answer, count, i;
+        int answer, i;
         SV *x, *y;
     PROTOTYPE: &@
     PPCODE:
@@ -43,8 +43,7 @@ bypair (callback, ...)
             PUSHs(x);
             PUSHs(y);
             PUTBACK;
-            count = call_sv(callback, G_SCALAR);
-            if (count != 1) croak("multiple return values from callback");
+            call_sv(callback, G_SCALAR);
             SPAGAIN;
             answer = POPi;
             TWOUPDONE;
@@ -117,7 +116,7 @@ void
 line (callback, int x0, int y0, int x1, int y1)
     SV *callback;
     PREINIT:
-        int answer, count, dx, dy, err, e2, sx, sy;
+        int answer, dx, dy, err, e2, sx, sy;
     PROTOTYPE: &$$$$
     PPCODE:
         dSP;
@@ -131,8 +130,7 @@ line (callback, int x0, int y0, int x1, int y1)
             mPUSHs(newSViv(x0));
             mPUSHs(newSViv(y0));
             PUTBACK;
-            count = call_sv(callback, G_SCALAR);
-            if (count != 1) croak("multiple return values from callback");
+            call_sv(callback, G_SCALAR);
             SPAGAIN;
             answer = POPi;
             TWOUPDONE;

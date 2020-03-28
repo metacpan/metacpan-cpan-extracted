@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.17';
 
 use Carp;
 
@@ -226,6 +226,57 @@ find any new restrictions to be majorly problematic. Either the code will
 continue to run unaffected, or you may have to make some small alterations to
 bring it into a conforming style.
 
+=head1 STYLE SUGGESTIONS
+
+While in no way required, the following suggestions of code style should be
+noted in order to establish a set of best practices, and encourage consistency
+of code which uses this module.
+
+=head2 File Layout
+
+Begin the file with a C<use Object::Pad> line; ideally including a
+minimum-required version. This should be followed by the toplevel C<class>
+declaration for the file. As it is at toplevel there is no need to use the
+block notation; it can be a unit class.
+
+There is no need to C<use strict> or apply other usual pragmata; these will
+be implied by the C<class> keyword.
+
+   use Object::Pad 0.16;
+
+   class My::Classname 1.23;
+
+   # other use statements
+
+   # has, methods, etc.. can go here
+
+=head2 Slot Names
+
+Slot names should follow similar rules to regular lexical variables in code -
+lowercase, name components separated by underscores. For tiny examples such as
+"dumb record" structures this may be sufficient.
+
+   class Tag {
+      has $name;  method name  :lvalue { $name }
+      has $value; method value :lvalue { $value }
+   }
+
+In larger examples with lots of non-trivial method bodies, it can get
+confusing to remember where the slot variables come from (because we no longer
+have the C<< $self->{ ... } >> visual clue). In these cases it is suggested to
+prefix the slot names with a leading underscore, to make them more visually
+distinct.
+
+   class Spudger {
+      has $_grapefruit;
+
+      ...
+
+      method mangle {
+         $_grapefruit->peel; # The leading underscore reminds us this is a slot
+      }
+   }
+
 =cut
 
 sub import
@@ -261,6 +312,50 @@ sub Object::Pad::UNIVERSAL::BUILDALL
       $self->$meth( @_ );
    }
 }
+
+=head1 WITH OTHER MODULES
+
+=head2 Syntax::Keyword::Dynamically
+
+A cross-module integration test asserts that C<dynamically> works correctly
+on object instance slots:
+
+   use Object::Pad;
+   use Syntax::Keyword::Dynamically;
+
+   class Container {
+      has $value = 1;
+
+      method example {
+         dynamically $value = 2;
+         ,..
+         # value is restored to 1 on return from this method
+      }
+   }
+
+=head2 Future::AsyncAwait
+
+As of L<Future::AsyncAwait> version 0.38 and L<Object::Pad> version 0.15, both
+modules now use L<XS::Parse::Sublike> to parse blocks of code. Because of this
+the two modules can operate together and allow class methods to be written as
+async subs which await expressions:
+
+   use Future::AsyncAwait;
+   use Object::Pad;
+
+   class Example
+   {
+      async method perform($block)
+      {
+         say "$self is performing code";
+         await $block->();
+         say "code finished";
+      }
+   }
+
+These three modules combine; there is additionally a cross-module test to
+ensure that object instance slots can be C<dynamically> set during a suspended
+C<async method>.
 
 =head1 DESIGN TODOs
 
@@ -315,6 +410,12 @@ A way to request generated accessors - ro or rw.
 =item *
 
 Work out why C<no indirect> doesn't appear to work properly before perl 5.20.
+
+=item *
+
+Work out why we don't get a C<Subroutine new redefined at ...> warning if we
+
+  sub new { ... }
 
 =item *
 

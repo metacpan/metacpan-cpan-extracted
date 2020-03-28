@@ -14,3 +14,11 @@
 
 2020-03-16 QQ::weixin::work v0.03
 更新压缩文件版本
+
+2020-03-25 QQ::weixin::work v0.04
+1) 创建QQ::weixin::work::batch
+2) 创建QQ::weixin::work::corp
+3) 创建QQ::weixin::work::appchat
+4) 创建QQ::weixin::work::dial
+5) 创建QQ::weixin::work::oa::calendar
+6) 创建QQ::weixin::work::oa::schedule

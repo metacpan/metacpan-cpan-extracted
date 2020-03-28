@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Util;
-$Search::Elasticsearch::Util::VERSION = '6.00';
+$Search::Elasticsearch::Util::VERSION = '6.80';
 use Moo;
 use Search::Elasticsearch::Error();
 use Scalar::Util qw(blessed);
@@ -119,15 +119,15 @@ Search::Elasticsearch::Util - A utility class for internal use by Search::Elasti
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

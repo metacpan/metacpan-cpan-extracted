@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-use OPCUA::Open62541 ':all';
-use OPCUA::Open62541::NS0ID;
+use OPCUA::Open62541 qw(BROWSERESULTMASK_ALL :STATUSCODE);
 
 use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
@@ -28,7 +27,7 @@ my $request = {
 	    BrowseDescription_nodeId => {
 		NodeId_namespaceIndex => 0,
 		NodeId_identifierType => 0,
-		NodeId_identifier => OPCUA::Open62541::NS0ID::ROOTFOLDER,
+		NodeId_identifier => OPCUA::Open62541::NS0ID_ROOTFOLDER,
 	    },
 	    BrowseDescription_resultMask => BROWSERESULTMASK_ALL,
 	}

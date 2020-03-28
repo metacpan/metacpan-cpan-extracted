@@ -1,0 +1,15 @@
+#title Pagerefs
+
+Test me
+
+#here
+** This is the chapter
+
+#there
+** Another
+
+          * * * * * 
+
+
+Here on [[#here][page ??]] we talk,
+and [[#there][on page ??]] of another.

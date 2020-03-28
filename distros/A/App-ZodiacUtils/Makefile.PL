@@ -28,7 +28,6 @@ my %WriteMakefileArgs = (
     "DateTime::Format::Natural" => 0,
     "List::Util" => "1.45",
     "Scalar::Util" => 0,
-    "Time::Local" => 0,
     "Zodiac::Chinese::Table" => 0,
     "Zodiac::Tiny" => 0,
     "strict" => 0,
@@ -40,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.111",
+  "VERSION" => "0.113",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,7 +56,6 @@ my %FallbackPrereqs = (
   "List::Util" => "1.45",
   "Scalar::Util" => 0,
   "Test::More" => 0,
-  "Time::Local" => 0,
   "Zodiac::Chinese::Table" => 0,
   "Zodiac::Tiny" => 0,
   "strict" => 0,

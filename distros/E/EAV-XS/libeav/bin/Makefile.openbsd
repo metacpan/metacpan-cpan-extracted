@@ -1,0 +1,71 @@
+CFLAGS = -O2 -Wall -Wextra -std=c99 -pedantic
+LDFLAGS ?= 
+DESTDIR ?= ${_destdir}
+INSTALL ?= ${_install}
+RM ?= rm -rf
+
+DEFS = -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
+DEFS += -I../include ${_defs}
+
+TARGETS = eav eav.static
+SOURCES != ls *.c
+OBJECTS = ${SOURCES:.c=.o}
+
+LIBS = -L.. -leav ${_libs}
+LIBS_STATIC = -L.. -leav ${_libs_static}
+
+#----------------------------------------------------------#
+
+CPPFLAGS += ${DEFS}
+
+all: shared
+
+debug: DEFS += -g -D_DEBUG
+debug: all
+
+static: eav.static
+shared: eav
+
+eav: ${OBJECTS}
+	# bin -> shared linkage
+	${CC} ${LDFLAGS} -o $@ ${OBJECTS} ${LIBS}
+
+eav.static: ${OBJECTS}
+	# bin -> static linkage
+	${CC} -static -o $@ ${OBJECTS} ${LIBS_STATIC}
+
+.c.o: depend
+	${CC} ${CPPFLAGS} ${DEFS} ${INCLUDES} ${CFLAGS} -o $@ -c $<
+
+
+strip: shared
+	# bin -> strip
+	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav
+
+strip-static: static
+	# bin -> strip
+	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav.static
+
+#----------------------------------------------------------#
+
+clean:
+	# bin -> cleanup
+	${RM} ${TARGETS} ${OBJECTS} Makefile.depend
+
+#----------------------------------------------------------#
+
+install: shared
+	${INSTALL} -d ${DESTDIR}/bin
+	${INSTALL} -m 0755 eav ${DESTDIR}/bin
+
+#----------------------------------------------------------#
+
+.PHONY: all clean debug
+
+depend: Makefile.depend
+Makefile.depend:
+	$(CC) $(CPPFLAGS) $(CFLAGS) -MM -MG $(SOURCES) > $@
+
+-include "Makefile.depend"
+
+.DELETE_ON_ERROR:

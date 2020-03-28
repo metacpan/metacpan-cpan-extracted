@@ -5,7 +5,7 @@ author:
 build_requires:
   Test::More: '0.88'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,13 +14,16 @@ name: Tickit-Widget-Choice
 provides:
   Tickit::Widget::Choice:
     file: lib/Tickit/Widget/Choice.pm
-    version: '0.02'
+    version: '0.03'
 requires:
+  Object::Pad: '0.17'
   Tickit::RenderBuffer: '0'
   Tickit::Style: '0'
   Tickit::Widget: '0'
   Tickit::Widget::Menu: '0.09'
+  perl: '5.026'
 resources:
   IRC: irc://irc.freenode.net/#tickit
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

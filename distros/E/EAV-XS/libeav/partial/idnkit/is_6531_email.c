@@ -25,7 +25,6 @@ is_6531_email  (idn_resconf_t ctx,
     /* see "private_email.h" */
     basic_email_check (email);
 
-    result.at = ch;
     result.rc = is_6531_local (email, ch);
 
     if (result.rc != EEAV_NO_ERROR)

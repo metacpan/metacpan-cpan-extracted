@@ -14,45 +14,55 @@
 #  include "wrap_keyword_plugin.c.inc"
 #endif
 
-static void func_post_blockstart(pTHX)
+static void func_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
+{
+  sv_catpvs(get_sv("main::LOG", 0), "Sf");
+}
+
+static void func_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
 {
   sv_catpvs(get_sv("main::LOG", 0), "Ef");
 }
 
-static OP *func_pre_blockend(pTHX_ OP *body)
+static void func_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
 {
   sv_catpvs(get_sv("main::LOG", 0), "Lf");
-  return body;
 }
 
-static void func_post_newcv(pTHX_ CV *cv)
+static void func_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
 {
   sv_catpvs(get_sv("main::LOG", 0), "Nf");
 }
 
 static const struct XSParseSublikeHooks parse_func_hooks = {
+  .pre_subparse    = func_pre_subparse,
   .post_blockstart = func_post_blockstart,
   .pre_blockend    = func_pre_blockend,
   .post_newcv      = func_post_newcv,
 };
 
-static void prefixed_post_blockstart(pTHX)
+static void prefixed_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
+{
+  sv_catpvs(get_sv("main::LOG", 0), "Sp");
+}
+
+static void prefixed_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
 {
   sv_catpvs(get_sv("main::LOG", 0), "Ep");
 }
 
-static OP *prefixed_pre_blockend(pTHX_ OP *body)
+static void prefixed_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
 {
   sv_catpvs(get_sv("main::LOG", 0), "Lp");
-  return body;
 }
 
-static void prefixed_post_newcv(pTHX_ CV *cv)
+static void prefixed_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
 {
   sv_catpvs(get_sv("main::LOG", 0), "Np");
 }
 
 static const struct XSParseSublikeHooks parse_prefixed_hooks = {
+  .pre_subparse    = prefixed_pre_subparse,
   .post_blockstart = prefixed_post_blockstart,
   .pre_blockend    = prefixed_pre_blockend,
   .post_newcv      = prefixed_post_newcv,

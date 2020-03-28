@@ -1,0 +1,65 @@
+{
+   "abstract" : "secret module by Ded MedVed",
+   "author" : [
+      "Ded MedVed <dedmedved@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "TSQL-FlatFile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::Diff" : "0",
+            "Carp" : "0",
+            "Clone" : "0",
+            "Data::Dumper" : "0",
+            "English" : "0",
+            "File::Basename" : "0",
+            "Getopt::Euclid" : "0",
+            "IO::File" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Modern::Perl" : "0",
+            "Readonly" : "0",
+            "Smart::Comments" : "0",
+            "Spreadsheet::ParseExcel" : "0",
+            "Spreadsheet::WriteExcel" : "0",
+            "Storable" : "0",
+            "Test::More" : "0",
+            "Text::CSV" : "0",
+            "Text::Diff" : "0",
+            "Try::Tiny" : "0",
+            "autodie" : "0",
+            "indirect" : "0",
+            "perl" : "5.010000",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

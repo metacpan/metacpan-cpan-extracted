@@ -1,18 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Choice;
+use Object::Pad 0.17;
+use 5.026; # signatures
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget );
-use Tickit::Style;
-
-our $VERSION = '0.02';
+class Tickit::Widget::Choice 0.03
+   extends Tickit::Widget;
 
 use Carp;
+
+use Tickit::Style;
 
 use Tickit::RenderBuffer qw( LINE_SINGLE LINE_DOUBLE CAP_START CAP_END );
 use Tickit::Utils qw( textwidth );
@@ -76,34 +75,27 @@ event handler.
 
 =cut
 
-sub new
+has @_choices;
+has $_on_changed;
+
+has $_chosen;
+
+method BUILD( %params )
 {
-   my $class = shift;
-   my %params = @_;
-
-   my $self = $class->SUPER::new( %params );
-
-   $self->{choices} = [];
-
    $self->push_choice( @$_ ) for @{ $params{choices} || [] };
 
    $self->set_on_changed( $params{on_changed} ) if $params{on_changed};
-
-   return $self;
 }
 
-sub lines { 1 }
+method lines { 1 }
 
-sub cols
+method cols
 {
-   my $self = shift;
-   return 4 + max( 1, map { textwidth $_->[1] } @{ $self->{choices} } );
+   return 4 + max( 1, map { textwidth $_->[1] } @_choices );
 }
 
-sub window_gained
+method window_gained( $window )
 {
-   my $self = shift;
-   my ( $window ) = @_;
    $self->SUPER::window_gained( $window );
 
    $window->cursor_at( 0, 1 );
@@ -119,11 +111,7 @@ sub window_gained
 
 =cut
 
-sub on_changed
-{
-   my $self = shift;
-   return $self->{on_changed};
-}
+method on_changed { $_on_changed }
 
 =head2 set_on_changed
 
@@ -136,11 +124,7 @@ changed.
 
 =cut
 
-sub set_on_changed
-{
-   my $self = shift;
-   ( $self->{on_changed} ) = @_;
-}
+method set_on_changed( $new ) { $_on_changed = $new }
 
 =head1 METHODS
 
@@ -155,13 +139,10 @@ display caption.
 
 =cut
 
-sub push_choice
+method push_choice( $value, $caption )
 {
-   my $self = shift;
-   my ( $value, $caption ) = @_;
-
-   push @{ $self->{choices} }, [ $value, $caption ];
-   $self->{chosen} = 0 if !defined $self->{chosen};
+   push @_choices, [ $value, $caption ];
+   $_chosen = 0 if !defined $_chosen;
 
    $self->resized;
    $self->redraw;
@@ -177,10 +158,9 @@ Returns the value of the currently-chosen choice.
 
 =cut
 
-sub chosen_value
+method chosen_value
 {
-   my $self = shift;
-   return $self->{choices}[ $self->{chosen} ]->[0];
+   return $_choices[ $_chosen ]->[0];
 }
 
 =head2 choose_by_idx
@@ -192,17 +172,14 @@ previously-chosen one, invokes the C<on_changed> event.
 
 =cut
 
-sub choose_by_idx
+method choose_by_idx( $idx )
 {
-   my $self = shift;
-   my ( $idx ) = @_;
+   return if $_chosen == $idx;
 
-   return if $self->{chosen} == $idx;
-
-   $self->{chosen} = $idx;
+   $_chosen = $idx;
    $self->redraw;
 
-   $self->{on_changed}->( $self, $self->chosen_value ) if $self->{on_changed};
+   $_on_changed->( $self, $self->chosen_value ) if $_on_changed;
 }
 
 =head2 choose_by_value
@@ -215,14 +192,10 @@ event.
 
 =cut
 
-sub choose_by_value
+method choose_by_value( $value )
 {
-   my $self = shift;
-   my ( $value ) = @_;
-
-   my $choices = $self->{choices};
-   $choices->[$_][0] eq $value and return $self->choose_by_idx( $_ )
-      for 0 .. $#$choices;
+   $_choices[$_][0] eq $value and return $self->choose_by_idx( $_ )
+      for 0 .. $#_choices;
 
    croak "No such choice with value '$value'";
 }
@@ -235,21 +208,21 @@ Display the popup menu in a modal float until a choice is made.
 
 =cut
 
-sub popup_menu
-{
-   my $self = shift;
+has $_menu;
 
-   my $menu = $self->{menu} = Tickit::Widget::Menu->new(
+method popup_menu
+{
+   my $menu = $_menu = Tickit::Widget::Menu->new(
       items => [ map {
          my ( $value, $caption ) = @$_;
          Tickit::Widget::Menu::Item->new(
             name        => $caption,
             on_activate => sub {
-               undef $self->{menu};
+               undef $_menu;
                $self->choose_by_value( $value );
             },
          )
-      } @{ $self->{choices} } ],
+      } @_choices ],
    );
 
    my $top = -1;
@@ -257,18 +230,15 @@ sub popup_menu
 
    $menu->popup( $self->window, $top, 0 );
 
-   $menu->highlight_item( $self->{chosen} );
+   $menu->highlight_item( $_chosen );
 }
 
-sub render_to_rb
+method render_to_rb( $rb, $rect )
 {
-   my $self = shift;
-   my ( $rb, $rect ) = @_;
-
    my $border_pen = $self->get_style_pen( 'border' );
    my $linestyle  = $self->get_style_values( 'border_linestyle' );
 
-   my $chosen = $self->{choices}[ $self->{chosen} ];
+   my $chosen = $_choices[ $_chosen ];
 
    my $right = $self->window->cols - 3;
 
@@ -283,19 +253,16 @@ sub render_to_rb
    $rb->vline_at( 0, 0, $right+2, $linestyle, $border_pen, CAP_START|CAP_END );
 }
 
-sub key_first_choice { my $self = shift; $self->choose_by_idx( 0 ); 1 }
-sub key_last_choice  { my $self = shift; $self->choose_by_idx( $#{ $self->{choices} } ); 1 }
+method key_first_choice { $self->choose_by_idx( 0 ); 1 }
+method key_last_choice  { $self->choose_by_idx( $#_choices ); 1 }
 
-sub key_next_choice  { my $self = shift; $self->choose_by_idx( $self->{chosen}+1 ) if $self->{chosen} < $#{ $self->{choices} }; 1 }
-sub key_prev_choice  { my $self = shift; $self->choose_by_idx( $self->{chosen}-1 ) if $self->{chosen} > 0; 1 }
+method key_next_choice  { $self->choose_by_idx( $_chosen+1 ) if $_chosen < $#_choices; 1 }
+method key_prev_choice  { $self->choose_by_idx( $_chosen-1 ) if $_chosen > 0; 1 }
 
-sub key_popup { my $self = shift; $self->popup_menu; 1 }
+method key_popup { $self->popup_menu; 1 }
 
-sub on_mouse
+method on_mouse( $ev )
 {
-   my $self = shift;
-   my ( $ev ) = @_;
-
    return unless $ev->type eq "press" and $ev->button == 1;
 
    my $win = $self->window;

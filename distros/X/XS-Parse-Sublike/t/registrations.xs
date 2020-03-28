@@ -18,11 +18,11 @@ static bool red_permit(pTHX)
   return true;
 }
 
-static OP *red_pre_blockend(pTHX_ OP *body)
+static void red_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
 {
   /* Throw away the entire function body; replace it with a constant */
-  op_free(body);
-  return newSVOP(OP_CONST, 0, newSVpv("red", 0));
+  op_free(ctx->body);
+  ctx->body = newSVOP(OP_CONST, 0, newSVpv("red", 0));
 }
 
 static const struct XSParseSublikeHooks parse_red_hooks = {
@@ -38,11 +38,11 @@ static bool blue_permit(pTHX)
   return true;
 }
 
-static OP *blue_pre_blockend(pTHX_ OP *body)
+static void blue_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
 {
   /* Throw away the entire function body; replace it with a constant */
-  op_free(body);
-  return newSVOP(OP_CONST, 0, newSVpv("blue", 0));
+  op_free(ctx->body);
+  ctx->body = newSVOP(OP_CONST, 0, newSVpv("blue", 0));
 }
 
 static const struct XSParseSublikeHooks parse_blue_hooks = {

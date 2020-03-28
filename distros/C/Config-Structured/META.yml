@@ -28,13 +28,14 @@ no_index:
 provides:
   Config::Structured:
     file: lib/Config/Structured.pm
-    version: '2.000'
+    version: '2.001'
   Config::Structured::Deserializer:
     file: lib/Config/Structured/Deserializer.pm
-    version: '2.000'
+    version: '2.001'
 requires:
   Carp: '0'
   Data::DPath: '0'
+  Data::Printer: '0'
   File::Basename: '0'
   IO::All: '0'
   JSON: '0'
@@ -50,10 +51,10 @@ requires:
   perl: '5.022'
   strict: '0'
   warnings: '0'
-version: '2.000'
+version: '2.001'
 x_Dist_Zilla:
   perl:
-    version: '5.020000'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::PkgVersion
@@ -257,7 +258,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Filter/MetaProvides::Package'
       version: '2.004003'
@@ -318,5 +319,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.20.0
-x_serialization_backend: 'YAML::Tiny version 1.63'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

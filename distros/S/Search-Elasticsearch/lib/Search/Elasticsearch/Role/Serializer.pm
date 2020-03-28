@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Serializer;
-$Search::Elasticsearch::Role::Serializer::VERSION = '6.00';
+$Search::Elasticsearch::Role::Serializer::VERSION = '6.80';
 use Moo::Role;
 
 requires qw(encode decode encode_pretty encode_bulk mime_type);
@@ -20,7 +20,7 @@ Search::Elasticsearch::Role::Serializer - An interface for Serializer modules
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -55,11 +55,11 @@ See L<Search::Elasticsearch::Serializer::JSON> for more.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

@@ -28,13 +28,13 @@ no_index:
 provides:
   Mojolicious::Plugin::Config::Structured:
     file: lib/Mojolicious/Plugin/Config/Structured.pm
-    version: '1.001'
+    version: '1.002'
 requires:
   Config::Structured: '0'
   Mojo::Base: '0'
   Readonly: '0'
   perl: '5.022'
-version: '1.001'
+version: '1.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

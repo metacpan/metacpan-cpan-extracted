@@ -1,7 +1,7 @@
 CFLAGS = -O2 -Wall -Wextra -std=c99 -pedantic
 RM ?= rm -rf
 
-#DEFS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=500 -D_SVID_SOURCE
+DEFS = -D_BSD_SOURCE -D_XOPEN_SOURCE=700
 DEFS += -I../include -I. ${_defs}
 
 # used for test the library only
@@ -43,18 +43,18 @@ all: ${TARGETS} ${PARTIAL_TRT}
 .SUFFIXES: .bin
 .o.bin: depend
 	# === tests -> linkage
-	${CC} ${LDFLAGS} -o $@ $< ${DEP_OBJ} ${LIBS}
+	${CC} ${LDFLAGS} ${CPPFLAGS} ${CFLAGS} -o $@ $< ${DEP_OBJ} ${LIBS}
 
 .SUFFIXES: .o
 .c.o:
 	# === tests -> compile $<
-	${CC} -c ${CPPFLAGS} ${DEFS} ${INCLUDES} ${CFLAGS} -o $@ $<
+	${CC} -c ${CPPFLAGS} ${CFLAGS} -o $@ $<
 
 .PATH: ${PARTIAL_PATH}
 .SUFFIXES: .o
 .c.o:
 	# === tests -> compile $<
-	${CC} -c ${CPPFLAGS} ${DEFS} ${INCLUDES} ${CFLAGS} -o $@ $<
+	${CC} -c ${CPPFLAGS} ${CFLAGS} -o $@ $<
 
 clean:
 	# === tests -> cleanup

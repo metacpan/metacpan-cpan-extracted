@@ -21,7 +21,7 @@ use Scalar::Util qw{ refaddr };
 
 use vars qw{ $VERSION };
 
-$VERSION = '0.070';
+$VERSION = '0.071';
 
 my %opt = (
     default_modifiers => [],
@@ -39,7 +39,7 @@ GetOptions( \%opt,
         default_modifiers|default-modifiers=s@
 	encoding=s explain! files!
 	indent=i locations! margin=i objectify! ordinal! perl_version!
-	postderef! ppi! significant! strict!
+	postderef! ppi! short! significant! strict!
 	test! tokens! trace+ unescape! verbose+
     } )
     and @ARGV
@@ -261,6 +261,12 @@ If true, this option specifies that the dump include only significant
 syntax elements. That is, no comments or non-significant white space.
 The default is false. This is simply passed through to
 L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
+
+=item -short
+
+If true, this option specifies that class names in the dump will have
+the leading C<'PPIx::Regexp::'> removed.  This is simply passed through
+to L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
 
 =item -test
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use OPCUA::Open62541 qw(:type :limit);
+use OPCUA::Open62541 ':TYPES';
 
 use Test::More tests => 84;
 use Test::Exception;
@@ -61,7 +61,7 @@ throws_ok { $variant->setScalar("", -1) }
     (qr/Unsigned value .* not below UA_TYPES_COUNT /, "scalar type -1");
 no_leaks_ok { eval { $variant->setScalar("", -1) } } "scalar type -1 leak";
 
-$variant->setScalar(TRUE, TYPES_BOOLEAN);
+$variant->setScalar(OPCUA::Open62541::TRUE, TYPES_BOOLEAN);
 is($variant->getScalar(), 1, "scalar TYPES_BOOLEAN TRUE");
 $variant->setScalar(1, TYPES_BOOLEAN);
 is($variant->getScalar(), 1, "scalar TYPES_BOOLEAN 1");
@@ -69,7 +69,7 @@ $variant->setScalar('1', TYPES_BOOLEAN);
 is($variant->getScalar(), 1, "scalar TYPES_BOOLEAN '1'");
 $variant->setScalar('foo', TYPES_BOOLEAN);
 is($variant->getScalar(), 1, "scalar TYPES_BOOLEAN 'foo'");
-$variant->setScalar(FALSE, TYPES_BOOLEAN);
+$variant->setScalar(OPCUA::Open62541::FALSE, TYPES_BOOLEAN);
 is($variant->getScalar(), '', "scalar TYPES_BOOLEAN FALSE");
 $variant->setScalar(undef, TYPES_BOOLEAN);
 is($variant->getScalar(), '', "scalar TYPES_BOOLEAN undef");

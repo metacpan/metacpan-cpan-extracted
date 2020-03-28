@@ -1,7 +1,12 @@
 name = "App-week"
 readme_from = "script/week"
-# badges = ["travis"]
+badges = ['travis-ci.com', 'metacpan']
 authority="cpan:UTASHIRO"
 
 module_maker="ModuleBuildTiny"
+
+[unsupported]
+os = [
+    "MSWin32",
+]
 

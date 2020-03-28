@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Masscan::Scanner",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Data::Dumper" => 0,
     "Data::Validate::Domain" => 0,
     "Data::Validate::IP" => 0,
@@ -24,20 +25,23 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "JSON" => 0,
     "Log::Log4perl" => 0,
-    "Moo" => 0,
-    "MooX::Types::MooseLike::Base" => 0,
+    "Log::Log4perl::Appender::ScreenColoredLevels::UsingMyColors" => 0,
+    "Moose" => 0,
+    "MooseX::AttributeShortcuts" => 0,
+    "MooseX::StrictConstructor" => 0,
+    "MooseX::Types::Moose" => 0,
+    "MooseX::Types::Structured" => 0,
     "Net::DNS" => 0,
     "Symbol" => 0,
-    "Term::ANSIColor" => 0,
     "Try::Catch" => 0,
-    "namespace::clean" => 0,
+    "namespace::autoclean" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "20200322.230436",
+  "VERSION" => "20200328.173827",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +49,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Data::Dumper" => 0,
   "Data::Validate::Domain" => 0,
   "Data::Validate::IP" => 0,
@@ -53,14 +58,17 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "JSON" => 0,
   "Log::Log4perl" => 0,
-  "Moo" => 0,
-  "MooX::Types::MooseLike::Base" => 0,
+  "Log::Log4perl::Appender::ScreenColoredLevels::UsingMyColors" => 0,
+  "Moose" => 0,
+  "MooseX::AttributeShortcuts" => 0,
+  "MooseX::StrictConstructor" => 0,
+  "MooseX::Types::Moose" => 0,
+  "MooseX::Types::Structured" => 0,
   "Net::DNS" => 0,
   "Symbol" => 0,
-  "Term::ANSIColor" => 0,
   "Test::More" => 0,
   "Try::Catch" => 0,
-  "namespace::clean" => 0,
+  "namespace::autoclean" => 0,
   "strict" => 0,
   "warnings" => 0
 );

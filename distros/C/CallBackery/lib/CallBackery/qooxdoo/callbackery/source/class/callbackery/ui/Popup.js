@@ -21,13 +21,22 @@ qx.Class.define("callbackery.ui.Popup", {
         this.base(arguments, this.xtr(cfg.popupTitle));
         this.set({
             layout: new qx.ui.layout.Grow(),
-            minHeight: 600,
-            minWidth: 800,
+            height: 600,
+            width: 800,
             modal: true,
             allowMinimize: false,
             showMinimize: false,
-            showStatusbar: false
+            showStatusbar: false,
+            centerOnContainerResize: true,
+            centerOnAppear: true
         });
+
+        if (cfg.set){
+            this.set(cfg.set);
+        }
+        
+        // make sure it gets added tro the translation
+        this.tr('Cancel');
         var extraAction = {
             label : 'Cancel',
             action : 'cancel'
@@ -54,13 +63,6 @@ qx.Class.define("callbackery.ui.Popup", {
                 screen.fireDataEvent('actionResponse',{action: 'cancel'});
             }
         },this);
-        this.addListener('appear',function(){
-            this.center()
-        },this);
-        screen.getApplicationRoot().addListener('resize',function(){
-            this.center()
-        },this);
-
     },
     events: {
         actionResponse: 'qx.event.type.Data'

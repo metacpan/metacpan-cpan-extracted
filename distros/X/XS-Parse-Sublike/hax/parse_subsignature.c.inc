@@ -83,7 +83,7 @@ static OP *S_parse_sigelem(pTHX)
     case '@': flags = OPpARGELEM_AV; break;
     case '%': flags = OPpARGELEM_HV; break;
     default:
-      return NULL;
+      croak("Expected a signature element at <%s>\n", parser->bufptr);
   }
 
   char *lexname = parser->bufptr;
@@ -167,6 +167,7 @@ static OP *S_parse_subsignature(pTHX_ int flags)
 
   OP *elems = NULL;
   while(lex_peek_unichar(0) != ')') {
+    lex_read_space(0);
     OP *elem = parse_sigelem();
     elems = op_append_list(OP_LINESEQ, elems, elem);
 

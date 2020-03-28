@@ -258,6 +258,7 @@ token	'\\p{Script=/Latin|Greek/}',
     note => 'Match a character with the given wildcard property value';
 m_call	perl_version_introduced => '5.029009', note => 'perl5299delta';
 m_call	perl_version_removed	=> undef;
+token	'\\p{name=/(SMILING|GRINNING) FACE/}';
 
 klass	'PPIx::Regexp::Token::Code', note => 'Code', report => 0;
 token	'{foo}', note => 'Code';

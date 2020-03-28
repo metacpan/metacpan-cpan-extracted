@@ -240,7 +240,7 @@ es-daily-index-maintenance.pl - Run to prune old indexes and optimize existing
 
 =head1 VERSION
 
-version 7.5
+version 7.6
 
 =head1 SYNOPSIS
 
@@ -377,7 +377,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Brad Lhotsky.
+This software is Copyright (c) 2020 by Brad Lhotsky.
 
 This is free software, licensed under:
 

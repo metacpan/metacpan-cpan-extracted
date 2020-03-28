@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use OPCUA::Open62541 ':all';
+use OPCUA::Open62541 'STATUSCODE_GOOD';
 
 use OPCUA::Open62541::Test::Server;
 use Test::More tests => OPCUA::Open62541::Test::Server::planning() + 12;

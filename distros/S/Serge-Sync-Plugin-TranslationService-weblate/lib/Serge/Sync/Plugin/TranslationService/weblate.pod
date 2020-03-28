@@ -1,0 +1,62 @@
+=encoding utf8
+
+=head1 NAME
+
+Serge::Sync::Plugin::TranslationService::Weblate - L<Weblate|https://weblate.org/> synchronization plugin for L<Serge|https://serge.io/> based on L<Weblate CLI|https://docs.weblate.org/en/latest/wlc.html#>
+
+=head1 SYNOPSIS
+
+    ts
+    {
+        plugin                      weblate
+
+        data
+        {
+            project                 WeblateProject
+            root_directory          ./files
+            config_file             ./.weblate
+            languages               de es fr-ca
+        }
+    }
+
+=head1 DESCRIPTION
+
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and Weblate (Web-based continuous localisation),
+implemented using the command-line tool for the Weblate API.
+
+=head1 ATTRIBUTES
+
+=over
+
+=item I<project>
+
+Weblate project.
+
+=item I<root_directory>
+
+Weblate root directory for files.
+
+=item I<config_file>
+
+Path to the Weblate configuration file.
+
+=item I<languages>
+
+List of languages.
+
+=back
+
+=head1 INSTALLATION
+
+ cpanm Serge::Sync::Plugin::TranslationService::weblate
+
+=head1 AUTHOR
+
+Dragos Varovici <dvarovici.work@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Dragos Varovici.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

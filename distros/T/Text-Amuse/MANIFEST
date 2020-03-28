@@ -238,6 +238,9 @@ t/testfiles/packing.muse
 t/testfiles/pagebreaks.exp.html
 t/testfiles/pagebreaks.exp.ltx
 t/testfiles/pagebreaks.muse
+t/testfiles/pageref.exp.html
+t/testfiles/pageref.exp.ltx
+t/testfiles/pageref.muse
 t/testfiles/prova.exp.html
 t/testfiles/prova.exp.ltx
 t/testfiles/prova.muse
@@ -271,6 +274,9 @@ t/testfiles/table-2.muse
 t/testfiles/table-captions.exp.html
 t/testfiles/table-captions.exp.ltx
 t/testfiles/table-captions.muse
+t/testfiles/table-specs.exp.html
+t/testfiles/table-specs.exp.ltx
+t/testfiles/table-specs.muse
 t/testfiles/table-square-brackets.exp.html
 t/testfiles/table-square-brackets.exp.ltx
 t/testfiles/table-square-brackets.muse

@@ -1,3 +1,21 @@
+0.31.2 2020-03-27 14:50:51 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - explicitly request the qx1 protocol for rpc as the default has changed to 2.0
+
+0.31.1 2020-03-27 13:34:43 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - make work when mounted 'non root'
+
+0.31.0 2020-03-26 17:27:54 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix login save trick to work with new compiler
+ - GuiPlugins can now have an 'mayAnonymous' property which lets them display without login
+   this is used for implementing password reset and account creation plugins
+ - hide user comment from non admin users
+ - tag more error messages for translation
+ - frontend new config options registration_popup and registration_popup they must point to an entry in the PLUGINS section
+ - plugins can be hidden from the plugin list using the 'unlisted' property.
+
 0.30.1 2020-03-05 13:54:01 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - make table context menu button track the changes
@@ -125,7 +143,7 @@
 
 0.22.1 2019-11-12 15:09:47 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
- - use the controllers log if possible to provied call context information in guiplugins
+ - use the controllers log if possible to provide call context information in guiplugins
 
 0.22.0 2019-11-06 10:18:12 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
@@ -161,7 +179,7 @@
 
 0.18.0 2019-08-16 11:34:38 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
- - add support for per-call log cleaners to prevent login call from spilling the password while loging
+ - add support for per-call log cleaners to prevent login call from spilling the password while logging
 
 0.17.4 2019-07-16 15:48:07 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
@@ -185,7 +203,7 @@
  - add the triggerFormReset key to form elements, when a widget has this key
    set the form configuration will be re-queried from the server, and the 
    current content of the form will be available in $self->args. In this
-   way it is possible to change settings of the form widgets based on the curent
+   way it is possible to change settings of the form widgets based on the current
    form content, as well as altering the content of selectboxes.
 
 0.16.0 2019-04-23 17:04:50 +0200 Tobias Oetiker <tobi@oetiker.ch>

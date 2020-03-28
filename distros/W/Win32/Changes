@@ -1,5 +1,9 @@
 Revision history for the Perl extension Win32.
 
+0.54    [2020-03-27]
+        - Skip tests that rely upon short names if these are unavailable
+          and additional docs about short filenames. Richard Leach [PR/23]
+
 0.53	[2019-08-05]
         - improve Win32::GetOSDisplayName
         - added Win2016/2019 detection and version information by

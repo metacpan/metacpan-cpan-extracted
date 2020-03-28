@@ -3,7 +3,7 @@ NAME
     Promises
 
 VERSION
-    version 6.00
+    version 6.80
 
 SYNOPSIS
         use Search::Elasticsearch::Async;
@@ -529,10 +529,10 @@ TEST SUITE
     DATA YOU WANT TO KEEP!
 
 AUTHOR
-    Clinton Gormley <drtech@cpan.org>
+    Enrico Zimuel <enrico.zimuel@elastic.co>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2017 by Elasticsearch BV.
+    This software is Copyright (c) 2020 by Elasticsearch BV.
 
     This is free software, licensed under:
 

@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/kaz-utashiro/App-week.svg?branch=master)](https://travis-ci.com/kaz-utashiro/App-week) [![MetaCPAN Release](https://badge.fury.io/pl/App-week.svg)](https://metacpan.org/release/App-week)
 # NAME
 
 week - colorful calender command
@@ -13,7 +14,7 @@ Options:
     -B n    Display n months before current month (default 1).
     -C[n]   Display n months before and after current month (default 4).
     -y      Display year calender.
-    -Y n    Display n years of calender
+    -Y[n]   Display n years of calender
     -c n    Display calendar in n column (default 3).
 
     --colormap  FIELD=COLOR
@@ -27,7 +28,7 @@ Module options:
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # DESCRIPTION
 
@@ -129,7 +130,7 @@ site.
 
 # SEE ALSO
 
-[github](http://kaz-utashiro.github.io/App-week/)
+[https://github.com/kaz-utashiro/App-week](https://github.com/kaz-utashiro/App-week)
 
 [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap)
 

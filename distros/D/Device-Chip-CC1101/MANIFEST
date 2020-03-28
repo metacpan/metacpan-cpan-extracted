@@ -1,6 +1,7 @@
 Build.PL
 Changes
 examples/cc1101.pl
+examples/generate-static-config.pl
 lib/Device/Chip/CC1101.pm
 LICENSE
 MANIFEST			This list of files

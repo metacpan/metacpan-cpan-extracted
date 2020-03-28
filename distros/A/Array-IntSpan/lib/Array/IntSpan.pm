@@ -5,7 +5,7 @@
 #
 # This is free software, licensed under:
 #
-#   The Artistic License 1.0
+#   The Artistic License 2.0 (GPL Compatible)
 #
 ##########################################################################
 #
@@ -17,20 +17,18 @@
 # Copyright 2003-2004,2010,2014 Dominique Dumont.  All rights reserved.
 # Copyright 2000 Toby Everett.  All rights reserved.
 #
-# This file is distributed under the Artistic License. See
-# http://www.ActiveState.com/corporate/artistic_license.htm or
-# the license that comes with your perl distribution.
+# This file is distributed under the Artistic 2.0 License. See
+# https://www.perlfoundation.org/artistic-license-20.html
 #
 # For comments, questions, bugs or general interest, feel free to
 # contact Dominique Dumont at ddumont@cpan.org
-# or Toby Everett at teverett@alascom.att.com
 ##########################################################################
 
 use strict;
 use warnings ;
 
 package Array::IntSpan;
-$Array::IntSpan::VERSION = '2.003';
+$Array::IntSpan::VERSION = '2.004';
 
 sub min { my @a = sort {$a <=> $b} @_ ; return $a[0] ; }
 sub max { my @a = sort {$b <=> $a} @_ ; return $a[0] ; }
@@ -636,7 +634,7 @@ Set a single value. This may split an existing range. Actually calls:
 
 =head2 set_range_as_string ( index,  string [, code ref] )
 
-Set one one several ranges specifed with a string. Ranges are separated by "-".
+Set one one several ranges specified with a string. Ranges are separated by "-".
 Several ranges can be specified with commas.
 
 Example:
@@ -749,30 +747,40 @@ Returns an array containing the Nth range element:
 
 =head2 consolidate( [ bottom, top , [ set_cb ]] )
 
-This function scan the range from the range index C<bottom> to C<top>
+This function scans the range from the range index C<bottom> to C<top>
 and compare the values held by the adjacent ranges. If the values are
 identical, the adjacent ranges are merged.
 
-The comparision is made with the C<==> operator. Objects stored in the
-range B<must> overload the C<==> operator. If not, the comparison will
-be made with the standard stringification of an object and the merge
-will never happen.
+The comparison is made with the C<==> operator. Objects stored in the
+range B<must> overload the C<==> operator. If not, the comparison is
+made with the standard stringification of an object and the merge
+never happens.
 
-If provided, the C<set_cb> will be invoked on the contained object
+If provided, the C<set_cb> is invoked on the contained object
 after 2 ranges are merged.
 
-For instance, if the C<"$obj_a" eq "$obj_b">:
+For instance, if C<"$obj_a" eq "$obj_b">:
 
- original range         : [1-4,obj_a],[5-9,obj_b]
- consolidate(0,1,\&set) : [1-9,obj_a]
+ original range is            : [1-4,obj_a],[5-9,obj_b]
+ consolidate(0,1,\&set) yields: [1-9,obj_a]
 
-And consolidate will perform this call:
+And C<consolidate> performs this call:
 
- &$set(1,9,obj_a) ;
+ $set->(1,9,obj_a) ;
 
 Consolidate the whole range when called without parameters.
 
-=head1 AUTHOR
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=back
+
+=head1 AUTHORS
 
 =over
 
@@ -787,12 +795,11 @@ Dominique Dumont, ddumont@cpan.org
 =back
 
 Copyright (c) 2000 Toby Everett.
-Copyright (c) 2003-2004,2014 Dominique Dumont.
+Copyright (c) 2003-2004,2014,2020 Dominique Dumont.
 All rights reserved.  This program is free software.
 
-This module is distributed under the Artistic License. See
-http://www.ActiveState.com/corporate/artistic_license.htm or the
-license that comes with your perl distribution.
+This module is distributed under the Artistic 2.0 License. See
+https://www.perlfoundation.org/artistic-license-20.html
 
 =cut
 

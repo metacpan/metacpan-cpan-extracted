@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT = qw/ send update_taskcard get_statistics /;
 
 =head1 FUNCTION

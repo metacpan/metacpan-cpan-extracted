@@ -1,0 +1,83 @@
+use ExtUtils::MakeMaker;
+use strict;
+use warnings;
+
+# Call 'perldoc ExtUtils::MakeMaker' for details of how to influence
+# the contents of the Makefile that is written.
+
+my %WriteMakefileArgs = (
+    NAME                => 'Net::API::REST',
+    VERSION_FROM        => 'lib/Net/API/REST.pm',
+    AUTHOR              => 'Jacques Deguest (jack@deguest.jp)',
+    ABSTRACT            => 'Implementation of RESTful API',
+    INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
+    PREREQ_PM           => {
+        'Test::More' 	=> 0,
+        'strict'		=> 0,
+        'parent'		=> 0,
+        'version'		=> 0,
+        'common::sense'	=> 0,
+        'curry'			=> '1.001000',
+        'Encode'		=> '3.01',
+		'Apache2::Const'		=> 0,
+		'Apache2::RequestRec'	=> 0,
+		'Apache2::RequestIO'	=> 0,
+		'Apache2::ServerUtil'	=> 0,
+		'Apache2::RequestUtil'	=> 0,
+		'Apache2::Request'		=> 0,
+		'Apache2::Response'		=> 0,
+		'Apache2::Reload'		=> 0,
+		'Apache2::Log'			=> 0,
+		'Apache2::Const'		=> 0,
+		'Apache2::Connection'	=> 0,
+		'Apache2::SubRequest'	=> 0,
+		'APR::Base64'			=> 0,
+		'APR::UUID'				=> 0,
+		'APR::Pool'				=> 0,
+		'APR::Socket'			=> 0,
+		'APR::Request::Cookie'	=> 0,
+		'APR::Request::Apache2'	=> 0,
+		'Cookie::Baker'			=> 0,
+		'JSON'					=> 0,
+		'Regexp::Common'		=> 0,
+		'TryCatch'				=> 0,
+		'Devel::Confess'		=> 0,
+		'Scalar::Util'			=> 0,
+		'DateTime'				=> 0,
+		'MIME::Base64'			=> '3.15',
+		'URI'					=> 0,
+		'URI::Query'			=> '0.16',
+		'URI::Escape'			=> '3.31',
+		'HTTP::AcceptLanguage'	=> '0.02',
+		'Crypt::Misc'			=> '0.064',
+		'Crypt::PK::RSA'		=> '0.064',
+		'Crypt::PK::ECC'		=> '0.064',
+		'Crypt::PRNG'			=> '0.064',
+		'Crypt::KeyWrap'		=> '0.024',
+		'Crypt::AuthEnc::GCM'	=> '0.064',
+		'Crypt::Mac::HMAC'		=> '0.064',
+		'Compress::Raw::Zlib'	=> '2.091',
+		'Test::Mock::Apache2'	=> '0.05',
+		'Test::MockObject'		=> '1.20180705',
+		'IO::File'				=> 0,
+    },
+    LICENSE				=> 'perl_5',
+    MIN_PERL_VERSION	=> 5.6.0,
+    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 1,
+        #resources => {
+        #    homepage    => undef,
+            repository  => {
+                url         => 'git@git.deguest.jp:jack/Net-API-REST.git',
+                web         => 'https://git.deguest.jp/jack/Net-API-REST',
+                type        => 'git',
+            },
+        #    bugtracker => {
+        #        web         => undef,
+        #    },
+        #},
+    })),
+);
+
+WriteMakefile(%WriteMakefileArgs);

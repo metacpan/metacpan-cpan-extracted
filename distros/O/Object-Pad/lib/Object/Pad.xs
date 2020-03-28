@@ -143,13 +143,13 @@ typedef struct {
   HV *stash;
   SLOTOFFSET offset;   /* first slot index of this partial within its instance */
   AV *slots;           /* each AV item is a raw pointer directly to a SlotMeta */
-  CV *slotscope;       /* a (partial) CV to act as a scope storing lexicals for the slots */
   enum {
     REPR_NATIVE,       /* instances are in native format - blessed AV as slots */
     REPR_FOREIGN_HASH, /* instances are blessed HASHes; our slots live in $self->{"Object::Pad/slots"} */
   } repr;
 
-  COP *tmpcop; /* a COP to use during generated constructor */
+  COP *tmpcop;         /* a COP to use during generated constructor */
+  CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
 } ClassMeta;
 
 /* The metadata on the currently-compiling class */
@@ -172,10 +172,11 @@ enum {
   PADIX_SLOTS = 2,
 };
 
-static OP *newPADSVOP(PADOFFSET padix, I32 flags)
+static OP *newPADSVOP(PADOFFSET padix, I32 flags, U32 private)
 {
   OP *op = newOP(OP_PADSV, flags);
   op->op_targ = padix;
+  op->op_private = private;
   return op;
 }
 
@@ -192,6 +193,7 @@ static OP *pp_methstart(pTHX)
   if(!sv_derived_from(self, HvNAME(classstash)))
     croak("Cannot invoke foreign method on non-derived instance");
 
+  save_clearsv(&PAD_SVl(PADIX_SELF));
   sv_setsv(PAD_SVl(PADIX_SELF), self);
 
   SV *slotsav;
@@ -216,7 +218,8 @@ static OP *pp_methstart(pTHX)
     }
   }
 
-  PAD_SVl(PADIX_SLOTS) = slotsav;
+  save_clearsv(&PAD_SVl(PADIX_SLOTS));
+  PAD_SVl(PADIX_SLOTS) = SvREFCNT_inc(slotsav);
 
   return PL_op->op_next;
 }
@@ -276,6 +279,7 @@ static OP *pp_slotpad(pTHX)
       croak("ARGH: unsure what to do with this slot type");
   }
 
+  save_clearsv(&PAD_SVl(targ));
   PAD_SVl(targ) = SvREFCNT_inc(val);
 
   return PL_op->op_next;
@@ -379,6 +383,12 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
 
   I32 save_ix = block_start(TRUE);
 
+  PL_curcop = meta->tmpcop;
+  CopLINE_set(PL_curcop, __LINE__);
+
+  ops = op_append_list(OP_LINESEQ, ops,
+    newSTATEOP(0, NULL, NULL));
+
   /* A more optimised implementation of this method would be able to generate
    * a @self lexical and OP_REFASSIGN it, but that would only work on newer
    * perls. For now we'll take the small performance hit of RV2AV every time
@@ -390,7 +400,8 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
 
   ops = op_append_list(OP_LINESEQ, ops,
     /* $self = shift */
-    newBINOP(OP_SASSIGN, 0, newOP(OP_SHIFT, 0), newPADSVOP(PADIX_SELF, OPf_MOD)));
+    newBINOP(OP_SASSIGN, 0, newOP(OP_SHIFT, 0),
+      newPADSVOP(PADIX_SELF, OPf_MOD, OPpLVAL_INTRO)));
 
   intro_my();
 
@@ -401,10 +412,15 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
     AV *isa = get_class_isa(stash);
     SV *superclass = AvARRAY(isa)[0];
 
+    CopLINE_set(PL_curcop, __LINE__);
+
+    ops = op_append_list(OP_LINESEQ, ops,
+      newSTATEOP(0, NULL, NULL));
+
     /* Build an OP_ENTERSUB for  $self->SUPER::INITSLOTS() */
     OP *op = NULL;
     op = op_append_list(OP_LIST, op,
-      newPADSVOP(PADIX_SELF, 0));
+      newPADSVOP(PADIX_SELF, 0, 0));
     op = op_append_list(OP_LIST, op,
       newMETHOD_REDIR_OP(superclass, newSVpvn_share("INITSLOTS", 9, 0), 0));
 
@@ -424,13 +440,13 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
   switch(meta->repr) {
     case REPR_NATIVE:
       /* $self->@* */
-      slotsavop = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF, newPADSVOP(PADIX_SELF, 0));
+      slotsavop = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF, newPADSVOP(PADIX_SELF, 0, 0));
       break;
     case REPR_FOREIGN_HASH:
       /* $self->{"Object::Pad/slots"}->@* */
       slotsavop = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF,
         newBINOP(OP_HELEM, OPf_MOD,
-          newUNOP(OP_RV2HV, OPf_MOD|OPf_REF, newPADSVOP(PADIX_SELF, 0)),
+          newUNOP(OP_RV2HV, OPf_MOD|OPf_REF, newPADSVOP(PADIX_SELF, 0, 0)),
           newSVOP(OP_CONST, 0, newSVpvs("Object::Pad/slots"))));
       break;
   }
@@ -438,7 +454,12 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
   AV *slots = meta->slots;
   I32 nslots = av_count(slots);
 
-  if(nslots) {
+  {
+    CopLINE_set(PL_curcop, __LINE__);
+
+    ops = op_append_list(OP_LINESEQ, ops,
+      newSTATEOP(0, NULL, NULL));
+
     OP *itemops = op_append_elem(OP_LIST, NULL, slotsavop);
 
     for(i = 0; i < nslots; i++) {
@@ -471,6 +492,10 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
         op_contextualize(op, G_SCALAR);
         itemops = op_append_elem(OP_LIST, itemops, op);
       }
+    }
+
+    if(!nslots) {
+      itemops = op_append_elem(OP_LIST, itemops, newOP(OP_STUB, OPf_PARENS));
     }
 
     ops = op_append_list(OP_LINESEQ, ops,
@@ -506,7 +531,7 @@ static XS(injected_constructor)
   switch(meta->repr) {
     case REPR_NATIVE:
       CopLINE_set(PL_curcop, __LINE__);
-      self = newRV_noinc((SV *)newAV());
+      self = sv_2mortal(newRV_noinc((SV *)newAV()));
       sv_bless(self, meta->stash);
       break;
 
@@ -670,18 +695,6 @@ static int keyword_class(pTHX_ OP **op_ptr)
   meta->tmpcop = (COP *)newSTATEOP(0, NULL, NULL);
   CopFILE_set(meta->tmpcop, __FILE__);
 
-  {
-    /* While creating the new scope CV we need to ENTER a block so as not to
-     * break any interpvars
-     */
-    ENTER;
-
-    CV *scope = meta->slotscope = MUTABLE_CV(newSV_type(SVt_PVCV));
-    CvPADLIST(scope) = pad_new(padnew_SAVE);
-
-    LEAVE;
-  }
-
   /* CARGOCULT from perl/op.c:Perl_package() */
   {
     SAVEGENERICSV(PL_curstash);
@@ -737,11 +750,6 @@ static int keyword_class(pTHX_ OP **op_ptr)
     /* Inject the constructor */
     CV *newcv = newXS("new", injected_constructor, __FILE__);
     CvXSUBANY(newcv).any_ptr = meta;
-
-    GV *gv = gv_fetchpvs("new", GV_ADD, SVt_PVCV);
-    GvMULTI_on(gv);
-
-    GvCV_set(gv, newcv);
   }
 
   {
@@ -789,12 +797,6 @@ static int keyword_has(pTHX_ OP **op_ptr)
     croak("Expected a slot name");
 
   ENTER;
-  SAVESPTR(PL_comppad);
-  SAVESPTR(PL_comppad_name);
-  SAVESPTR(PL_curpad);
-  PL_comppad = PadlistARRAY(CvPADLIST(compclassmeta->slotscope))[1];
-  PL_comppad_name = PadlistNAMES(CvPADLIST(compclassmeta->slotscope));
-  PL_curpad  = AvARRAY(PL_comppad);
 
   AV *slots = compclassmeta->slots;
 
@@ -806,10 +808,6 @@ static int keyword_has(pTHX_ OP **op_ptr)
   slotmeta->defaultop = NULL;
 
   av_push(slots, (SV *)slotmeta);
-
-  /* Claim these are all STATE variables just to quiet the "will not stay
-   * shared" warning */
-  pad_add_name_sv(name, padadd_STATE, NULL, NULL);
 
   lex_read_space(0);
 
@@ -846,9 +844,6 @@ static int keyword_has(pTHX_ OP **op_ptr)
 
   *op_ptr = newOP(OP_NULL, 0);
 
-  /* Make the new slot name visible to subsequent uses of the scope */
-  intro_my();
-
   LEAVE;
 
   return KEYWORD_PLUGIN_STMT;
@@ -867,13 +862,49 @@ static bool parse_permit(pTHX)
   return true;
 }
 
-static void parse_post_blockstart(pTHX)
+static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
+{
+  U32 i;
+  AV *slots = compclassmeta->slots;
+  U32 nslots = av_count(slots);
+
+  /* While creating the new scope CV we need to ENTER a block so as not to
+   * break any interpvars
+   */
+  ENTER;
+  SAVESPTR(PL_comppad);
+  SAVESPTR(PL_comppad_name);
+  SAVESPTR(PL_curpad);
+
+  CV *methodscope = compclassmeta->methodscope = MUTABLE_CV(newSV_type(SVt_PVCV));
+  CvPADLIST(methodscope) = pad_new(padnew_SAVE);
+
+  PL_comppad = PadlistARRAY(CvPADLIST(methodscope))[1];
+  PL_comppad_name = PadlistNAMES(CvPADLIST(methodscope));
+  PL_curpad  = AvARRAY(PL_comppad);
+
+  for(i = 0; i < nslots; i++) {
+    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
+
+    /* Claim these are all STATE variables just to quiet the "will not stay
+     * shared" warning */
+    pad_add_name_sv(slotmeta->name, padadd_STATE, NULL, NULL);
+  }
+
+  intro_my();
+
+  LEAVE;
+}
+
+static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
 {
   /* Splice in the slot scope CV in */
-  CvOUTSIDE    (compclassmeta->slotscope) = CvOUTSIDE    (PL_compcv);
-  CvOUTSIDE_SEQ(compclassmeta->slotscope) = CvOUTSIDE_SEQ(PL_compcv);
+  CV *methodscope = compclassmeta->methodscope;
 
-  CvOUTSIDE(PL_compcv) = compclassmeta->slotscope;
+  CvOUTSIDE    (methodscope) = CvOUTSIDE    (PL_compcv);
+  CvOUTSIDE_SEQ(methodscope) = CvOUTSIDE_SEQ(PL_compcv);
+
+  CvOUTSIDE(PL_compcv) = methodscope;
 
   {
     PADOFFSET padix;
@@ -891,11 +922,10 @@ static void parse_post_blockstart(pTHX)
   }
 }
 
-static OP *parse_pre_blockend(pTHX_ OP *body)
+static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
 {
   SLOTOFFSET offset = compclassmeta->offset;
-  CV *slotscope = compclassmeta->slotscope;
-  PADNAMELIST *slotnames = PadlistNAMES(CvPADLIST(slotscope));
+  PADNAMELIST *slotnames = PadlistNAMES(CvPADLIST(compclassmeta->methodscope));
   I32 nslots = av_count(compclassmeta->slots);
   PADNAME **snames = PadnamelistARRAY(slotnames);
   PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
@@ -940,11 +970,14 @@ static OP *parse_pre_blockend(pTHX_ OP *body)
 #endif
   }
 
-  return op_append_list(OP_LINESEQ, slotops, body);
+  ctx->body = op_append_list(OP_LINESEQ, slotops, ctx->body);
+
+  compclassmeta->methodscope = NULL;
 }
 
 static struct XSParseSublikeHooks parse_method_hooks = {
   .permit          = parse_permit,
+  .pre_subparse    = parse_pre_subparse,
   .post_blockstart = parse_post_blockstart,
   .pre_blockend    = parse_pre_blockend,
 };
@@ -989,6 +1022,6 @@ BOOT:
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
 
-  boot_xs_parse_sublike(0.04);
+  boot_xs_parse_sublike(0.06);
 
   register_xs_parse_sublike("method", &parse_method_hooks);

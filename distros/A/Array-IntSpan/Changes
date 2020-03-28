@@ -1,0 +1,94 @@
+2.004 2020-03-27
+
+  Main change: This module is now distributed under Artistic
+  2.0 license (instead of Artistic 1.0)
+
+  Other changes are
+    * add contributors section
+    * clarify and fix typos in documentation
+    * Added minimum perl version as suggested by CPANTS.
+      (Thanks Mohammad S Anwar)
+
+2014-12-24 v2.003
+
+    * Added set, set_range_as_string and get_range_list methods
+    * mention that consolidate can be called without arguments
+
+2010-09-28  Dominique Dumont  <ddumont@cpan.org> v2.002
+
+	* Array/IntSpan.pm (lookup): returns undef on an empty object
+	without mucking up internal data (Fixes RT 61700. Thanks to
+	Matthew Nodine for the report)
+
+2004-01-29  Dominique Dumont   v2.001
+
+	* IntSpan.pm: Updated copyright infos
+
+2003-05-26  Dominique Dumont
+
+	* IntSpan.pm, IntSpan/Fields.pm:
+	- bug fix in Fields::adapt_range_in_cb: method can be undef
+
+2003-04-17  Dominique Dumont
+
+	* IntSpan.pm, IntSpan/Fields.pm:
+	- small code refactoring and perf improvement
+
+2003-03-19  Dominique Dumont
+
+	* IntSpan.pm: - added clear function in IntSpan
+
+2003-03-07  Dominique Dumont
+
+	* IntSpan.pm: - some optimizations
+	- cannot create range with undef values.
+
+2003-03-04  Dominique Dumont
+
+	* IntSpan.pm, IntSpan/Fields.pm: - added Array::IntSpan::Fields
+	- callback signature are now (start, end, [payload])
+
+2003-02-24  Dominique Dumont
+
+	* IntSpan.pm: - various get_range bug_fixes
+
+2003-02-14  Dominique Dumont
+
+	* IntSpan.pm:
+	- get_range bug with fill: read range is now also modified
+
+2003-02-13  Dominique Dumont
+
+	* IntSpan.pm: - get_range: bug fix with filler subf
+
+	* IntSpan.pm:
+	- get_range: fill can be done with a sub ref
+	- set_*_range: copy of splitted range items can be done using a
+	sub ref. In this case the original value is passed to the sub
+	ref. It must return the new value
+
+2003-02-12  Dominique Dumont
+
+	* IntSpan.pm: - added fill parameter to get_range
+	- split tests
+
+	* IntSpan.pm: - bug fix in empty ranges
+
+2003-02-11  Dominique Dumont
+
+	* IntSpan.pm: - better get_range and set_range
+
+2003-02-06  Dominique Dumont
+
+	* IntSpan.pm: Modified version 1.02 with consolidation
+
+	* IntSpan.pm, IntSpan/IP.pm: Initial version 1.01 from Toby Everett
+
+	* IntSpan.pm, IntSpan/IP.pm: New file.
+
+
+1.01  Thu Feb 24 14:10:00 2000
+        - fixed Makefile.PL
+
+1.00  Thu Feb 24 14:00:00 2000
+        - original version

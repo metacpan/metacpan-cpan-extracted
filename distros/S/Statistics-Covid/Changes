@@ -1,0 +1,26 @@
+Revision history for Statistics-Covid
+
+0.21	XXX
+	1) Added dependency to DBIx::Class in Makefile.PL
+	after alert from SREZIC (cpan).
+0.20    2020-03-27
+	1) Fixed a bug whereas the config hash read from a
+	shared file was used for many DataProviders and each one
+	was making a change to a shared hash. I used Storable::dclone()
+	to clone the hash to each DataProvider constructor.
+	2) Moved tests which required network access to xt/network.
+	3) Added Statistics::Covid::Analysis::Plot which plots data
+	to file using Chart::Clicker and also GD::Graph.
+	Experiment with Chart::GGPlot.
+	4) added a sub datums2dataframe which converts data from
+	many Datum objects (e.g. as fetched from DB after a select)
+	into a "DataFrame" which contains the same data grouped
+	wrt one or more fields.
+0.19    2020-03-26
+	Changed the database schema for table Datum so that
+	column name 'area' is now 'real' and not 'integer'
+	as it was previously.
+	Fixed documentation issues.
+0.13    2020-03-26
+        First version, released on an unsuspecting world.
+

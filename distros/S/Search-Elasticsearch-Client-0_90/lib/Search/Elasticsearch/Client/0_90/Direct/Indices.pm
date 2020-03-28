@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::0_90::Direct::Indices;
-$Search::Elasticsearch::Client::0_90::Direct::Indices::VERSION = '5.02';
+$Search::Elasticsearch::Client::0_90::Direct::Indices::VERSION = '6.80';
 use Moo;
 with 'Search::Elasticsearch::Client::0_90::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -17,7 +17,7 @@ Search::Elasticsearch::Client::0_90::Direct::Indices - A client for running inde
 
 =head1 VERSION
 
-version 5.02
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -704,11 +704,11 @@ for more information.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

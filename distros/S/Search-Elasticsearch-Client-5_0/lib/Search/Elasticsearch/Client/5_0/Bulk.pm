@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::5_0::Bulk;
-$Search::Elasticsearch::Client::5_0::Bulk::VERSION = '6.00';
+$Search::Elasticsearch::Client::5_0::Bulk::VERSION = '6.80';
 use Moo;
 with 'Search::Elasticsearch::Client::5_0::Role::Bulk',
     'Search::Elasticsearch::Role::Is_Sync';
@@ -77,7 +77,7 @@ Search::Elasticsearch::Client::5_0::Bulk - A helper module for the Bulk API
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 SYNOPSIS
 
@@ -402,11 +402,11 @@ L<Search::Elasticsearch::Client::5_0::Direct/update()>.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

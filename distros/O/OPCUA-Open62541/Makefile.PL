@@ -33,6 +33,7 @@ WriteMakefile(
     SIGN		=> 1,
     TEST_REQUIRES	=> {
 	'Test::Deep'		=> 0,
+	'Test::EOL'		=> 0,
 	'Test::Exception'	=> 0,
 	'Test::LeakTrace'	=> 0,
 	'Test::NoWarnings'	=> 0,
@@ -42,4 +43,5 @@ WriteMakefile(
 	'Test::Requires'	=> 0,
 	'Test::Warn'		=> 0,
     },
+    clean		=> { FILES => "*.log" },
 );

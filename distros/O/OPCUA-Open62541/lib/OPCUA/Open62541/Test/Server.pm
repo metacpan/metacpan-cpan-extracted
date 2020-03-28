@@ -3,7 +3,7 @@ use warnings;
 
 package OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Logger;
-use OPCUA::Open62541 ':statuscode';
+use OPCUA::Open62541 'STATUSCODE_GOOD';
 use Carp 'croak';
 use Net::EmptyPort qw(empty_port);
 use POSIX qw(SIGTERM SIGALRM SIGKILL);
@@ -18,7 +18,7 @@ sub planning {
 sub new {
     my $class = shift;
     my $self = { @_ };
-    $self->{timeout} ||= 10;
+    $self->{timeout} //= 10;
 
     ok($self->{server} = OPCUA::Open62541::Server->new(), "server: new");
     ok($self->{config} = $self->{server}->getConfig(), "server: get config");
@@ -120,6 +120,8 @@ sub stop {
 
 __END__
 
+=pod
+
 =head1 NAME
 
 OPCUA::Open62541::Test::Server - run open62541 server for testing
@@ -162,6 +164,8 @@ Create a new test server instance.
 
 Maximum time the server will run before shutting down itself.
 Defaults to 10 seconds.
+Can be turned off with 0, but this should not be used in automatic
+tests to avoid dangling processes.
 
 =back
 

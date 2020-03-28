@@ -1,4 +1,5 @@
 use Test::More;
+use Masscan::Scanner;
 use Data::Dumper;
 
 unless ($ENV{RELEASE_TESTING})
@@ -10,12 +11,12 @@ plan(tests => 12);
 
 require_ok('Masscan::Scanner');
 
-my $mas = Masscan::Scanner->new(hosts => ['127.0.0.1'], ports => ['22'], arguments => ['--banners']);
+my $mas = Masscan::Scanner->new(hosts => ['minion001.averna.id.au', '127.0.0.1', '::1'], ports => ['80', '443'], arguments => ['--banners'], verbose => 1);
 is(ref $mas, 'Masscan::Scanner', 'Load module');
 
 ok($mas->add_argument('--rate 100000'), 'Add argument');
 
-ok($mas->add_host('::1'), 'Add host');
+ok($mas->add_host('averna.id.au'), 'Add host');
 
 ok($mas->add_host('10.0.0.0/24'), 'Add cidr');
 
@@ -27,7 +28,7 @@ ok($mas->sudo(1), 'Enable sudo');
 
 ok($mas->verbose(1), 'Enable verbose');
 
-ok($mas->hosts(['127.0.0.1', '::1', 'duckduckgo.com']), 'Reset hosts');
+ok($mas->hosts(['amazon.com', 'duckduckgo.com', 'google.com']), 'Reset hosts');
 
 ok($mas->scan, 'Run scan');
 

@@ -3,29 +3,29 @@ abstract: 'Multidimensional binning & histogramming'
 author:
   - 'Edward Baudrez <ebaudrez@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
-  File::Spec: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Module::Pluggable: 3.1
-  PDL: 2.004
-  PDL::Types: 0
-  Test::Deep: 0
-  Test::Exception: 0
-  Test::More: 0
-  Test::NoWarnings: 0
-  Test::PDL: 0.10
-  blib: 1.01
-  perl: 5.006
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Pluggable: '3.1'
+  PDL: '2.004'
+  PDL::Basic: '0'
+  PDL::Types: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  Test::PDL: '0.10'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-  PDL::Core::Dev: 0
+  ExtUtils::MakeMaker: '0'
+  PDL::Core::Dev: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PDL-NDBin
 no_index:
   directory:
@@ -33,24 +33,27 @@ no_index:
     - t
     - tools
 requires:
-  Carp: 0
-  Class::Load: 0
-  Data::Dumper: 0
-  Exporter: 0
-  List::MoreUtils: 0
-  List::Util: 0
-  Log::Any: 0
-  Math::Round: 0
-  PDL::Lite: 0
-  POSIX: 0
-  Params::Validate: 0
-  UUID::Tiny: 0
-  XSLoader: 0
-  integer: 0
-  strict: 0
-  warnings: 0
+  Carp: '0'
+  Class::Load: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Log::Any: '0'
+  Math::Round: '0'
+  PDL::Lite: '0'
+  POSIX: '0'
+  Params::Validate: '0'
+  UUID::Tiny: '0'
+  XSLoader: '0'
+  integer: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-NDBin
   homepage: https://metacpan.org/release/PDL-NDBin
   repository: git://github.com/ebaudrez/pdl-ndbin.git
-version: 0.018
+version: '0.019'
+x_generated_by_perl: v5.30.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

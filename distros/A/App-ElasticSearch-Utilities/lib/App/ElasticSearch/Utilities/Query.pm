@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '7.5'; # VERSION
+our $VERSION = '7.6'; # VERSION
 
 use App::ElasticSearch::Utilities qw(es_request);
 use CLI::Helpers qw(:output);
@@ -179,19 +179,22 @@ sub request_body {
     my $self = shift;
 
     my %body = ();
+    my %map  = qw( fields _source );
     foreach my $section (keys %REQUEST_BODY) {
+        my $val;
         eval {
-            debug({color=>'yellow'}, "request_body() - retrieving section '$section'");
             ## no critic
             no strict 'refs';
-            $body{$section} = $self->$section;
+            $val = $self->$section;
             ## use critic
-            delete $body{$section} unless defined $body{$section};
-            debug_var({color=>'cyan'},$body{$section}) if defined $body{$section} and ref $body{$section};
             1;
         } or do {
             debug({color=>'red'}, "request_body() - Failed to retrieve '$section'");
         };
+        next unless $val;
+        my $data = { $section => $val };
+        my $param = $map{$section} || $section;
+        $body{$param} = $val;
     }
     $body{query} = $self->query;
     return \%body;
@@ -344,7 +347,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 7.5
+version 7.6
 
 =head1 ATTRIBUTES
 
@@ -612,7 +615,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Brad Lhotsky.
+This software is Copyright (c) 2020 by Brad Lhotsky.
 
 This is free software, licensed under:
 

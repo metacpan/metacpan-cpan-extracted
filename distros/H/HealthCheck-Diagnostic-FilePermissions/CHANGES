@@ -1,0 +1,91 @@
+==================================================
+Changes from 2019-03-26 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v1.4.2 at 2020-03-25 19:17:28 +0000
+-------------------------------------------
+
+  Change: 6f456bc5da147a0095c1470394ea1bbd6d9c57fd
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-03-24 14:36:42 +0000
+
+    Improve documentation examples
+
+    Make it clearer that you pass in a single option and less like you
+    should be passing the same parameter multiple times. 
+
+  Change: dc2d8ed0241578e0571e8ecfe1a16a87fa8c2a0a
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-03-23 14:32:17 +0000
+
+    Convert to Dist::Zilla::PluginBundle::Author::GSG 
+
+-------------------------------------------
+version v1.4.1 at 2020-01-21 15:16:24 +0000
+-------------------------------------------
+
+  Change: 7326e1ad4083a5bd9305a1a84815a9e040292656
+  Author: Jon Dyer <jdyer@grantstreet.com>
+  Date : 2020-01-21 09:56:26 +0000
+
+    SM-2137: Add .proverc 
+
+---------------------------------------------
+version v1.4.0.1 at 2019-10-18 18:33:43 +0000
+---------------------------------------------
+
+  Change: 37a7cab13c792ec8616a413a1ff1a793ef82495a
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-18 14:33:43 +0000
+
+    Create distribution files 
+
+  Change: fd1f054fdafff3e9decf845864634f12f090e3a1
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-18 14:22:44 +0000
+
+    Convert to Bitbucket workflow 
+
+  Change: 23a1ea25107ebeddd28aa6396c5ad73e8c661574
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-18 14:22:44 +0000
+
+    Remove gitc metadata 
+
+---------------------------------------------
+version v1.4.0.0 at 2019-05-24 17:35:14 +0000
+---------------------------------------------
+
+  Change: e82bbb0a135580c6ac40c0d2b1fb4eb3fb3ae268
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-05-24 12:15:44 +0000
+
+    Allow checking of file mode bits
+
+    Plus tests that we spot them and display them 
+
+  Change: 7983013a65b22c5904a3c2aa74597599be4e2503
+  Author: Brandon Messineo <brandon.messineo@grantstreet.com>
+  Date : 2019-05-24 10:13:23 +0000
+
+    Drop the leading zero on output message
+
+    Because it can be confusing :). 
+
+-----------------------------------------------------------------------
+dist/version v0.0.0.1804_01/master/SM-1804 at 2019-05-22 22:39:21 +0000
+-----------------------------------------------------------------------
+
+  Change: 5c364576230a12c1444a9420bb15566e57d38ede
+  Author: Brandon Messineo <brandon.messineo@grantstreet.com>
+  Date : 2019-05-22 16:34:02 +0000
+
+    Use single-quotes in info message
+
+    Because JSON will not have to escape the double-quotes when rendering
+    the text. 
+
+=================================================
+Plus 10 releases after 2019-03-26 00:00:00 +0000.
+=================================================

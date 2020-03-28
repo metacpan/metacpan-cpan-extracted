@@ -4,7 +4,7 @@ use warnings;
 use Path::Class qw{file};
 use base qw{Power::Outlet::Common};
 
-our $VERSION='0.18';
+our $VERSION='0.21';
 
 =head1 NAME
 

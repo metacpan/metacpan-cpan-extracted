@@ -23,27 +23,39 @@ msgstr ""
 msgid "Version %1, %2%3"
 msgstr ""
 
-#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:110
+#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:111
 msgid "Login"
 msgstr ""
 
-#: callbackery/ui/Login.js:81
+#: callbackery/ui/Login.js:82
 msgid "User"
 msgstr ""
 
-#: callbackery/ui/Login.js:97
+#: callbackery/ui/Login.js:98
 msgid "Password"
 msgstr ""
 
-#: callbackery/ui/MsgBox.js:68 callbackery/ui/Login.js:113
+#: callbackery/ui/MsgBox.js:68 callbackery/ui/Login.js:114
 msgid "OK"
 msgstr ""
 
-#: callbackery/ui/Login.js:138
+#: callbackery/ui/Login.js:143
+msgid "Reset Password"
+msgstr ""
+
+#: callbackery/ui/Login.js:149
+msgid "Register New Account"
+msgstr ""
+
+#: callbackery/ui/Login.js:163
 msgid "release %1, %2 by %3"
 msgstr ""
 
-#: callbackery/ui/MsgBox.js:66
+#: callbackery/ui/Login.js:284
+msgid "<span style=\"text-decoration: underline;\">%1</span>"
+msgstr ""
+
+#: callbackery/ui/Popup.js:39 callbackery/ui/MsgBox.js:66
 msgid "Cancel"
 msgstr ""
 
@@ -77,54 +89,53 @@ msgstr ""
 msgid "dd.MM.yyyy"
 msgstr ""
 
-#: callbackery/ui/form/renderer/NoteForm.js:83
-msgid "%1 copied to clipboard."
-msgstr ""
-
-#: callbackery/ui/form/renderer/NoteForm.js:83
-msgid "Success"
-msgstr ""
-
+#: callbackery/ui/form/renderer/NoteForm.js:82
 #: callbackery/ui/form/renderer/NoteForm.js:84
-#: callbackery/ui/form/renderer/NoteForm.js:86
-msgid "Copy failed"
-msgstr ""
-
-#: callbackery/ui/form/renderer/NoteForm.js:84
-msgid "Select %1 and press [ctr]+[c]"
-msgstr ""
-
-#: callbackery/ui/form/renderer/NoteForm.js:86
 msgid "Select %1 and press [ctrl]+[c]"
 msgstr ""
 
-#: callbackery/ui/plugin/Action.js:102 callbackery/ui/plugin/Action.js:133
-#: callbackery/ui/plugin/Action.js:235
+#: callbackery/ui/form/renderer/NoteForm.js:90
+msgid "Success"
+msgstr ""
+
+#: callbackery/ui/form/renderer/NoteForm.js:93
+#: callbackery/ui/form/renderer/NoteForm.js:96
+msgid "Copy failed"
+msgstr ""
+
+#: callbackery/ui/plugin/Action.js:133 callbackery/ui/plugin/Action.js:164
+#: callbackery/ui/plugin/Action.js:272
 msgid "Validation Error"
 msgstr ""
 
-#: callbackery/ui/plugin/Action.js:103 callbackery/ui/plugin/Action.js:134
-#: callbackery/ui/plugin/Action.js:236
+#: callbackery/ui/plugin/Action.js:134 callbackery/ui/plugin/Action.js:165
+#: callbackery/ui/plugin/Action.js:273
 msgid ""
 "The form can only be submitted when all data fields have valid content."
 msgstr ""
 
-#: callbackery/ui/plugin/Action.js:148
+#: callbackery/ui/plugin/Action.js:179
 msgid "No Data"
 msgstr ""
 
-#: callbackery/ui/plugin/Action.js:157
+#: callbackery/ui/plugin/Action.js:188
 msgid "Download Exception"
 msgstr ""
 
-#: callbackery/ui/plugin/Action.js:268
+#: callbackery/ui/plugin/Action.js:305
 msgid "Upload Exception"
 msgstr ""
 
-#: callbackery/ui/plugin/Form.js:225
+#: callbackery/ui/plugin/Form.js:252
 msgid "Loading Form Data"
 msgstr ""
 
 #: callbackery/ui/plugin/Html.js:54
 msgid "Loading HTML Data"
 msgstr ""
+
+#~ msgid "%1 copied to clipboard."
+#~ msgstr ""
+
+#~ msgid "Select %1 and press [ctr]+[c]"
+#~ msgstr ""

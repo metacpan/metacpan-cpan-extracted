@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Data::DPath" => 0,
+    "Data::Printer" => 0,
     "File::Basename" => 0,
     "IO::All" => 0,
     "JSON" => 0,
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warn" => 0
   },
-  "VERSION" => "2.000",
+  "VERSION" => "2.001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Data::DPath" => 0,
+  "Data::Printer" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Basename" => 0,
   "File::Slurp" => 0,

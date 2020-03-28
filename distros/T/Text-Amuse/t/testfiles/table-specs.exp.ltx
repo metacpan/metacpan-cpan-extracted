@@ -1,0 +1,109 @@
+\begin{table}[htbp!]
+ \begin{minipage}[t]{\textwidth}
+\begin{tabularx}{\textwidth}{lcrX}
+\hline
+\relax   left  &  center  &  right  &  justify  \\
+\hline
+\relax   lefted  &   centered  &  righted  &  justified body with long line  \\
+\hline
+\relax   foot left  &  centerf foot  &  right foot  &  justify footer  \\
+\hline
+\end{tabularx}
+
+\caption[]{this is the legend}
+\end{minipage}
+\end{table}
+
+\begin{table}[htbp!]
+ \begin{minipage}[t]{\textwidth}
+\begin{tabularx}{\textwidth}{XX}
+\hline
+\relax  First Header   &  Second Header   \\
+\hline
+\relax  Content Cell   &  Content Cell    \\
+\relax  Content Cell   &  Content Cell    \\
+\hline
+\end{tabularx}
+
+\caption[]{legend}
+\end{minipage}
+\end{table}
+
+\bigskip
+\noindent
+ \begin{minipage}[t]{\textwidth}
+\begin{tabularx}{\textwidth}{XX}
+\hline
+\relax  First Header   &  Second Header   \\
+\hline
+\relax  Content Cell   &  Content Cell    \\
+\relax  Content Cell   &  Content Cell    \\
+\hline
+\end{tabularx}
+\end{minipage}
+\bigskip
+
+\bigskip
+\noindent
+ \begin{minipage}[t]{\textwidth}
+\begin{tabularx}{\textwidth}{XX}
+\hline
+\relax    First Header   &  Second Header   \\
+\hline
+\relax                   &  Content Cell    \\
+\relax    Content Cell   &  Content Cell    \\
+\hline
+\end{tabularx}
+\end{minipage}
+\bigskip
+
+\bigskip
+\noindent
+ \begin{minipage}[t]{\textwidth}
+\begin{tabularx}{\textwidth}{XX}
+\hline
+\relax    First Header   &  Second Header  \\
+\hline
+\relax                   &  Content Cell  \\
+\relax    Content Cell   &    \\
+\hline
+\end{tabularx}
+\end{minipage}
+\bigskip
+
+\begin{table}[htbp!]
+ \begin{minipage}[t]{\textwidth}
+\begin{tabularx}{\textwidth}{crl}
+\hline
+\relax    First Header   &  Second Header (Right)  &  Third (Left)  \\
+\hline
+\relax                   &  Content Cell   &    \\
+\relax    Content Cell (Centered)   &                 &  Here  \\
+\relax    x   &                 &  Here  \\
+\hline
+\relax    Footer  &   &    \\
+\hline
+\end{tabularx}
+
+\caption[]{legend}
+\end{minipage}
+\end{table}
+
+
+\begin{alltt}
+   First Header  \textbar{} Second Header (Right) \textbar{} Third (Left)
+   :-----------: \textbar{} ------------: \textbar{} :----
+                 \textbar{} Content Cell  \textbar{}
+   Content Cell (Centered)  \textbar{}               \textbar{} Here
+   x  \textbar{}               \textbar{} Here
+   Footer \textbar{}\textbar{}\textbar{}
+   \textbar{}+ legend +\textbar{}
+
+
+\textbar{} First Header  \textbar{} Second Header \textbar{}
+\textbar{} ------------- \textbar{} ------------- \textbar{}
+\textbar{} Content Cell  \textbar{} Content Cell  \textbar{}
+\textbar{} Content Cell  \textbar{} Content Cell  \textbar{}
+\textbar{}+ legend +\textbar{}
+\end{alltt}
+

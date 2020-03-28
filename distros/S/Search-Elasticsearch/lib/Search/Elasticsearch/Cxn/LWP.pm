@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Cxn::LWP;
-$Search::Elasticsearch::Cxn::LWP::VERSION = '6.00';
+$Search::Elasticsearch::Cxn::LWP::VERSION = '6.80';
 use Moo;
 with 'Search::Elasticsearch::Role::Cxn', 'Search::Elasticsearch::Role::Is_Sync';
 
@@ -28,13 +28,11 @@ sub perform_request {
         $headers{'Content-Encoding'} = $params->{encoding}
             if $params->{encoding};
     }
-
     my $request = HTTP::Request->new(
         $method => $uri,
         [ %headers, %{ $self->default_headers }, ],
         $params->{data}
     );
-
     my $ua = $self->handle;
     my $timeout = $params->{timeout} || $self->request_timeout;
     if ( $timeout ne $ua->timeout ) {
@@ -76,7 +74,7 @@ sub _build_handle {
         $args{ssl_opts}
             = $self->has_ssl_options
             ? $self->ssl_options
-            : { verify_hostname => 0 };
+            : { verify_hostname => 0, SSL_verify_mode => 0x00 };
     }
     return LWP::UserAgent->new( %args, %{ $self->handle_args } );
 }
@@ -97,7 +95,7 @@ Search::Elasticsearch::Cxn::LWP - A Cxn implementation which uses LWP
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -271,11 +269,11 @@ From L<Search::Elasticsearch::Role::Cxn>
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

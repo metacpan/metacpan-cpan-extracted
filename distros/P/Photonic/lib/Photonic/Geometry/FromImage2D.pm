@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromImage2D;
-$Photonic::Geometry::FromImage2D::VERSION = '0.011';
+$Photonic::Geometry::FromImage2D::VERSION = '0.014';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Geometry::FromImage2D
 
 =head1 VERSION
 
-version 0.011
+version 0.014
 
 =head1 COPYRIGHT NOTICE
 
@@ -126,12 +126,15 @@ sub _build_B {
     my $path=$self->path;
     ( $path ) = ($path =~ m|^([A-Z0-9_.-\\/]+)$|ig);
     ($ENV{PATH})=($ENV{PATH}=~m|^([A-Z0-9_.-\\/]+)$|ig);
-    croak
+    confess
 	"Only letters, numbers, underscores, dots, slashes and hyphens " .
 	"allowed in file names"
 	unless $path;
+    # Risky: use internal routine PDL::IO::Pic::chkform to get image type
+    my $canread=PDL->rpiccan(PDL::IO::Pic::chkform($path));
+    confess "Unknown image format of file $path" unless $canread;
     my $B=PDL->rpic($path);
-    croak "Please convert image $self->path to 2D monochrome B/W first"
+    confess "Please convert image $self->path to 2D monochrome B/W first"
 	if $B->ndims != 2 || (($B|!$B)!=1)->any;
     $B=!$B if $self->inverted;
     return $B;

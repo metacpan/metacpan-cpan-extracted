@@ -1,7 +1,7 @@
 # -*- perl -*-
 use strict;
 use warnings;
-use Test::More tests => 61;
+use Test::More tests => 65;
 
 BEGIN { use_ok( 'Power::Outlet' ); }
 BEGIN { use_ok( 'Power::Outlet::Common' ); }
@@ -14,6 +14,7 @@ BEGIN { use_ok( 'Power::Outlet::iBoot' ); }
 BEGIN { use_ok( 'Power::Outlet::iBootBar' ); }
 BEGIN { use_ok( 'Power::Outlet::WeMo' ); }
 BEGIN { use_ok( 'Power::Outlet::Hue' ); }
+BEGIN { use_ok( 'Power::Outlet::Tasmota' ); }
 
 {
 my $object = Power::Outlet->new(type=>"Common");
@@ -39,6 +40,13 @@ can_ok($object, qw{on off switch cycle query});
 {
 my $object = Power::Outlet->new(type=>"Hue");
 isa_ok ($object, 'Power::Outlet::Hue');
+can_ok($object, qw{new});
+can_ok($object, qw{on off switch cycle query});
+}
+
+{
+my $object = Power::Outlet->new(type=>"Tasmota");
+isa_ok ($object, 'Power::Outlet::Tasmota');
 can_ok($object, qw{new});
 can_ok($object, qw{on off switch cycle query});
 }

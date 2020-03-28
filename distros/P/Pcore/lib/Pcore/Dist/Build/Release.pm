@@ -21,9 +21,13 @@ sub run ($self) {
 
     say $EMPTY;
 
-    say "Current release version is: @{[ $self->{dist}->id->{release} // 'v0.0.0' ]}";
+    my $latest_release = $self->{dist}->releases ? $self->{dist}->{releases}->[-1] : 'v0.0.0';
+    my $current_relase = $self->{dist}->id->{release} // 'v0.0.0';
+    my $set_latest_tag = $current_relase eq $latest_release ? 1 : 0;
 
-    say "New release version will be: $new_ver\n";
+    say "Current release version is: $current_relase";
+
+    say "New release version will be: $new_ver@{[ $set_latest_tag ? ' (latest)' : $EMPTY ]}\n";
 
     return if P->term->prompt( 'Continue release process?', [qw[yes no]], enter => 1 ) ne 'yes';
 
@@ -88,8 +92,11 @@ sub run ($self) {
         my $res = $self->{dist}->git->git_run(qq[tag -a "$new_ver" -m "Released version: $new_ver" ]);
         say $res && return if !$res;
 
-        $res = $self->{dist}->git->git_run( [ 'tag', 'latest', '--force' ] );
-        say $res && return if !$res;
+        # set "latest" tag only if parent release was latest
+        if ($set_latest_tag) {
+            $res = $self->{dist}->git->git_run( [ 'tag', 'latest', '--force' ] );
+            say $res && return if !$res;
+        }
 
         say 'done';
     }
@@ -128,9 +135,7 @@ sub _can_release ($self) {
 
     # check master branch
     if ( !$id->{branch} || $id->{branch} ne 'master' ) {
-        say q[Git is not on the "master" branch.];
-
-        return;
+        return if P->term->prompt( q[Git is not on the "master" branch. Continue?], [qw[yes no]], enter => 1 ) eq 'no';
     }
 
     # check for uncommited changes
@@ -148,7 +153,7 @@ sub _can_release ($self) {
 
     # check distance from the last release
     if ( $id->{release} && !$id->{release_distance} ) {
-        return if P->term->prompt( q[No changes since last release. Continue?], [qw[yes no]], enter => 1 ) eq 'no';
+        return if P->term->prompt( q[No changes since the last release. Continue?], [qw[yes no]], enter => 1 ) eq 'no';
     }
 
     # docker
@@ -296,7 +301,7 @@ TXT
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 13                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (21)                       |
+## |    3 | 13                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (24)                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

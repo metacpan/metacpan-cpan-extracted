@@ -1,6 +1,7 @@
+
 =head1 NAME
 
-OpenTracing::interface::Span - A role that defines the Span interface
+OpenTracing::Interface::Span - A role that defines the Span interface
 
 
 

@@ -1,3 +1,17 @@
+v0.127.1 2020-03-28T08:41:16Z
+ - set latest tag on release only if parent release was latest
+ - allow to release code on any branch
+
+v0.127.0 2020-03-28T07:39:37Z
+ - master branch check removed from release
+ - git upstream updated
+ - majestic api
+ - moz api added
+
+v0.126.1 2020-03-26T10:35:17Z
+ - resources updated
+ - docker app build
+
 v0.126.0 2020-03-22T20:05:05Z
  - build-cordova config
 

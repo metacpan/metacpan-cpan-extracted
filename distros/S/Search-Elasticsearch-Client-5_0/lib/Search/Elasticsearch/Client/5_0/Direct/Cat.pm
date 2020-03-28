@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::5_0::Direct::Cat;
-$Search::Elasticsearch::Client::5_0::Direct::Cat::VERSION = '6.00';
+$Search::Elasticsearch::Client::5_0::Direct::Cat::VERSION = '6.80';
 use Moo;
 with 'Search::Elasticsearch::Client::5_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -42,7 +42,7 @@ Search::Elasticsearch::Client::5_0::Direct::Cat - A client for running cat debug
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -515,11 +515,11 @@ for more information.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

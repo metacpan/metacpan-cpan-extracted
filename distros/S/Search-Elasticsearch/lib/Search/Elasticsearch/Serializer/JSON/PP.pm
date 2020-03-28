@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Serializer::JSON::PP;
-$Search::Elasticsearch::Serializer::JSON::PP::VERSION = '6.00';
+$Search::Elasticsearch::Serializer::JSON::PP::VERSION = '6.80';
 use Moo;
 use JSON::PP;
 
@@ -23,7 +23,7 @@ Search::Elasticsearch::Serializer::JSON::PP - A JSON Serializer using JSON::PP
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 SYNOPSIS
 
@@ -56,11 +56,11 @@ This class does L<Search::Elasticsearch::Role::Serializer::JSON>.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

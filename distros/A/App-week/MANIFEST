@@ -11,5 +11,7 @@ lib/App/week/teams.pm
 minil.toml
 script/week
 t/00_compile.t
+t/01_run.t
+t/Util.pm
 META.yml
 MANIFEST

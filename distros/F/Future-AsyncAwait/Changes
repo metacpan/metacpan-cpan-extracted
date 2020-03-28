@@ -1,5 +1,9 @@
 Revision history for Future-AsyncAwait
 
+0.39    2020-03-27
+        [CHANGES]
+         * Updated for XS::Parse::Sublike 0.06 API
+
 0.38    2020-03-24
         [CHANGES]
          * Use XS::Parse::Sublike for `async sub` parsing. This makes it

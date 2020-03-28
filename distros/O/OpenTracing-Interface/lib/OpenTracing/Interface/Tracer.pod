@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 OpenTracing::Interface::Tracer - A role that defines the Tracer interface
@@ -94,7 +95,7 @@ Starts AND activates a C<Span> and returns its C<Scope>.
     my $scope = $tracer->start_active_span( 'some work needs to be done',
         child_of                => $span_context,
         references              => [
-            Reference->new_follows_from( $some_context ),
+            ContextReference->new_follows_from( $some_context ),
         ],
         tags                    => {
             tag_key_1               => 'tag_value_1',
@@ -128,7 +129,7 @@ An object of type C<SpanContext> from L<OpenTracing::Types>.
 
 =item references
 
-an C<ArrayRef> of C<Reference> type objects.
+an C<ArrayRef> of C<ContextReference> type objects.
 
 =item tags
 
@@ -169,7 +170,7 @@ Starts, but does not activate a C<Span>
     my $scope = $tracer->start_active_span( 'some work needs to be done',
         child_of                => $span_context,
         references              => [
-            Reference->new_follows_from( $some_context ),
+            ContextReference->new_follows_from( $some_context ),
         ],
         tags                    => {
             tag_key_1               => 'tag_value_1',
@@ -202,7 +203,7 @@ An object of type C<SpanContex> from L<OpenTracing::Types>.
 
 =item references
 
-an C<ArrayRef> of C<Reference> type objects.
+an C<ArrayRef> of C<ContextReference> type objects.
 
 =item tags
 

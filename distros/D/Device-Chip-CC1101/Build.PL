@@ -8,10 +8,12 @@ my $build = Module::Build->new(
    requires => {
       'Data::Bitfield' => '0.04',
       'Device::Chip' => 0,
-      'Future::AsyncAwait' => 0,
+      'Future::AsyncAwait' => '0.38', # async method
       'Future::IO' => 0,
+      'Object::Pad' => '0.16', # async method
+      'XS::Parse::Sublike' => '0.05', # parse_subsignature whitespace bugfix
 
-      'perl' => '5.024', # postfix-deref
+      'perl' => '5.026', # postfix-deref, signatures
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

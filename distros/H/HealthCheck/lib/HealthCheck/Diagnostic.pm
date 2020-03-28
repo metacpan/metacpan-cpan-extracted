@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic;
 
 # ABSTRACT: A base clase for writing health check diagnositics
 use version;
-our $VERSION = 'v1.5.3'; # VERSION: 0.01
+our $VERSION = 'v1.5.4'; # VERSION: 0.01
 
 use 5.010;
 use strict;
@@ -332,9 +332,15 @@ sub _summarize {
         }
     }
 
+    my %seen_ids;
     foreach my $i ( 0 .. $#results ) {
         my $r = $results[$i];
         $self->_summarize( $r, "$id-" . ( $r->{id} // $i ) );
+
+        # If this result has an ID we have seen already, append a number
+        if ( exists $r->{id} and my $i = $seen_ids{ $r->{id} // '' }++ ) {
+            $r->{id} .= defined $r->{id} && length $r->{id} ? "_$i" : $i;
+        }
 
         if ( defined( my $s = $r->{status} ) ) {
             $s = uc $s;
@@ -410,7 +416,7 @@ HealthCheck::Diagnostic - A base clase for writing health check diagnositics
 
 =head1 VERSION
 
-version v1.5.3
+version v1.5.4
 
 =head1 SYNOPSIS
 

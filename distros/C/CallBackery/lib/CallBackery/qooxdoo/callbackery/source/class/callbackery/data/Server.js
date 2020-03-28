@@ -18,7 +18,8 @@ qx.Class.define("callbackery.data.Server", {
         this.set( {
             timeout: 60000,
             url: 'QX-JSON-RPC/',
-            serviceName: 'default'
+            serviceName: 'default',
+            protocol: 'qx1'
         });
     },
 

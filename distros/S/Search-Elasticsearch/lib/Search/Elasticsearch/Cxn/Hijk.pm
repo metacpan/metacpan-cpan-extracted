@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Cxn::Hijk;
-$Search::Elasticsearch::Cxn::Hijk::VERSION = '6.00';
+$Search::Elasticsearch::Cxn::Hijk::VERSION = '6.80';
 use Moo;
 with 'Search::Elasticsearch::Role::Cxn', 'Search::Elasticsearch::Role::Is_Sync';
 
@@ -46,9 +46,12 @@ sub perform_request {
     if ( defined $params->{data} ) {
         $args{body} = $params->{data};
         $args{head} = [ 'Content-Type', $params->{mime_type} ];
-        push @{ $args{headers} }, ( 'Content-Encoding', $params->{encoding} )
+        push @{ $args{head} }, ( 'Content-Encoding', $params->{encoding} )
             if $params->{encoding};
     }
+
+    push @{ $args{head} }, %{$self->default_headers}
+        if %{$self->default_headers};
 
     my $response;
     try {
@@ -119,7 +122,7 @@ Search::Elasticsearch::Cxn::Hijk - A Cxn implementation which uses Hijk
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -257,11 +260,11 @@ From L<Search::Elasticsearch::Role::Cxn>
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

@@ -7,6 +7,7 @@ libeav/bin/main.c
 libeav/bin/main.h
 libeav/bin/Makefile
 libeav/bin/Makefile.bsd
+libeav/bin/Makefile.openbsd
 libeav/bin/utf8_decode.c
 libeav/bin/utf8_decode.h
 libeav/data/domain-length.txt
@@ -34,6 +35,7 @@ libeav/LICENSE
 libeav/LICENSE.postfix
 libeav/Makefile
 libeav/Makefile.bsd
+libeav/Makefile.openbsd
 libeav/partial/idn/eav.c
 libeav/partial/idn/is_6531_email.c
 libeav/partial/idn/is_utf8_domain.c
@@ -76,6 +78,7 @@ libeav/tests/idnX/t-dash-domains.c
 libeav/tests/idnX/t-domain-length.c
 libeav/tests/Makefile
 libeav/tests/Makefile.bsd
+libeav/tests/Makefile.openbsd
 libeav/tests/t-5321-email.c
 libeav/tests/t-5321-localpart.c
 libeav/tests/t-5322-email.c

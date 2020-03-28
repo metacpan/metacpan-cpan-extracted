@@ -1,0 +1,8 @@
+CHANGES
+lib/Module/Generic.pm
+Makefile.PL
+MANIFEST
+META.yml
+README.md
+t/00.load.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,9 @@
+FROM softvisio/node:latest AS build
+
+WORKDIR /var/local/build/app
+
+RUN yarn-build
+
 FROM <: $dockerhub_pcore_repo_id | raw :>:latest
 
 LABEL maintainer="<: $author | raw :>"
@@ -9,6 +15,9 @@ ENV DIST_PATH="$WORKSPACE/<: $dist_path :>"
 ADD . $DIST_PATH
 
 WORKDIR $DIST_PATH/data
+
+RUN rm -rf $DIST_PATH/app
+COPY --from=build /var/local/build/app/dist $DIST_PATH/app/dist
 
 RUN \
     # setup perl build env

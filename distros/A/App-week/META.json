@@ -57,7 +57,7 @@
    "provides" : {
       "App::week" : {
          "file" : "lib/App/week.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "App::week::colors" : {
          "file" : "lib/App/week/colors.pm"
@@ -80,7 +80,7 @@
          "web" : "https://github.com/kaz-utashiro/App-week"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:UTASHIRO",
-   "x_static_install" : 1
+   "x_static_install" : 0
 }

@@ -1,4 +1,4 @@
-pp_setversion('0.011');
+pp_setversion('0.014');
 
 pp_addpm({At=>Top},<<'EOD');
 
@@ -10,7 +10,7 @@ Photonic::ExtraUtils - Glue for utility Fortran routines
 
 =head1 VERSION
 
-version 0.011
+version 0.014
 
 =head1 COPYRIGHT NOTICE
 

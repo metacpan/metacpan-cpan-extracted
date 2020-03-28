@@ -4,7 +4,7 @@
       "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "bsd"
    ],
@@ -44,7 +44,7 @@
    "provides" : {
       "Game::RaycastFOV" : {
          "file" : "lib/Game/RaycastFOV.pm",
-         "version" : "1.01"
+         "version" : "2.00"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "url" : "https://github.com/thrig/Game-RaycastFOV"
       }
    },
-   "version" : "1.01",
+   "version" : "2.00",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

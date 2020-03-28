@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use OPCUA::Open62541 ':all';
+use OPCUA::Open62541 'STATUSCODE_GOOD';
 use POSIX qw(sigaction SIGALRM);
 
 use OPCUA::Open62541::Test::Server;

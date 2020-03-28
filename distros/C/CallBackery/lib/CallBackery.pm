@@ -34,7 +34,7 @@ use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 use CallBackery::User;
 
-our $VERSION = '0.30.1';
+our $VERSION = '0.31.2';
 use Mojo::Base 'Mojolicious';
 
 =head2 config
@@ -183,10 +183,10 @@ sub startup {
     # this is a dummy login screen, we use inside an iframe to trick the browser
     # into storing our password for auto-fill. Since there is no standard for triggering the
     # behavior, this is all a bit voodoo, sorry. -- tobi
-    $routes->get('login')->to(cb => sub {
+    $routes->get('/login')->to(cb => sub {
         my $c = shift;
         $c->render(data=><<HTML, format=>'html');
-<!DOCTYPE html><html><body><form id="cbLoginForm"  name="cbLoginForm" autocomplete="on" method="POST">
+<!DOCTYPE html><html><body><form id="cbLoginForm"  name="cbLoginForm" autocomplete="on" method="POST" >
 <input type="text" id="cbUsername"  name="cbUsername" autocomplete="on" />
 <input type="password" id="cbPassword"  name="cbPassword" autocomplete="on" />
 </form></body></html>
@@ -194,7 +194,7 @@ HTML
     });
     # second stage of the deception. the answer page for login must not be the same as the original page
     # otherwise the browser assumes the login failed and does not offer to save the password.
-    $routes->post('login')->to(cb => sub {
+    $routes->post('/login')->to(cb => sub {
         shift->render(text=>'gugus :)');
     });
 

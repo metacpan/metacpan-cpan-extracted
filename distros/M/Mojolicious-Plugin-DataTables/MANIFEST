@@ -1,0 +1,13 @@
+Changes
+lib/Mojolicious/Plugin/DataTables.pm
+lib/Mojolicious/Plugin/DataTables/SSP/Column.pm
+lib/Mojolicious/Plugin/DataTables/SSP/Params.pm
+lib/Mojolicious/Plugin/DataTables/SSP/Results.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/datatables.t
+t/load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1192,13 +1192,20 @@ sub manage_table_html {
             my $cells = shift @{$table->{$tablepart}};
 
             push @out, $map->{btr};
-            while (@$cells) {
-                my $cell = shift @$cells;
-                push @out, $map->{$tablepart}->{bcell},
+            my @cells = @$cells;
+            my $i = 0;
+            for (my $i = 0; $i < @cells; $i++) {
+                my $cell = $cells[$i];
+                my $spec;
+                if ($table->{specification}) {
+                    $spec = $table->{specification}->[$i];
+                }
+                push @out, $map->{$tablepart}->{bcell}->($spec),
                   $self->manage_regular($cell),
                     $map->{$tablepart}->{ecell},
                 }
             push @out, $map->{etr};
+            $i++;
         }
         push @out, $map->{$tablepart}->{e};
     }
@@ -1244,8 +1251,16 @@ sub manage_table_ltx {
     }
     $textable .= " \\begin{minipage}[t]{\\textwidth}\n";
     $textable .= "\\begin{tabularx}{\\textwidth}{" ;
-    $textable .= "|X" x $table->{counter};
-    $textable .= "|}\n";
+
+    if ($table->{specification}) {
+        $textable .= join('', @{$table->{specification}});
+    }
+    else {
+        # back compat
+        $textable .= "|X" x $table->{counter};
+        $textable .= "|";
+    }
+    $textable .= "}\n";
     if (my @head = @{$out->{head}}) {
         $textable .= "\\hline\n" . join("", @head);
     }
@@ -1277,6 +1292,39 @@ sub manage_table_ltx {
 
 =cut
 
+sub _table_row_specification {
+    my ($self, $cells) = @_;
+    my @spec;
+    foreach my $c (@$cells) {
+        # print "Examining $c\n";
+        if ($c =~ m/\A\s*\:?---+\:?\s*\z/) {
+            if ($c =~ m/\:-+\:/) {
+                push @spec, 'c';
+            }
+            elsif ($c =~ m/\:-/) {
+                push @spec, 'l';
+            }
+            elsif ($c =~ m/-\:/) {
+                push @spec, 'r';
+            }
+            else {
+                push @spec, 'X';
+            }
+        }
+        else {
+            # discard all and give up
+            @spec = ();
+            last;
+        }
+    }
+    if (@spec and @spec == @$cells) {
+        return @spec;
+    }
+    else {
+        return;
+    }
+}
+
 sub _split_table_in_hash {
     my ($self, $table) = @_;
     return {} unless $table;
@@ -1286,25 +1334,77 @@ sub _split_table_in_hash {
                   head => [],
                   foot => [],
                   counter => 0,
+                  specification => undef,
                  };
-    foreach my $row (split "\n", $table) {
-        if ($row =~ m/\A\s*\|\+\s*(.+?)\s*\+\|\s*\z/) {
+
+    # remove the caption
+    my @rows;
+    my $caption_done = 0;
+    foreach my $r (split(/\n/, $table)) {
+        if ($r =~ m/\A\s*\|\+\s*(.+?)\s*\+\|\s*\z/) {
             $output->{caption} = $1;
-            next
+            $caption_done++;
         }
-        my $dest;
-        my @cells = split /\|+/, $row;
+        else {
+            push @rows, $r;
+        }
+    }
+
+    my $empty_first_cell = 0;
+    my @row_cells;
+    foreach my $r (@rows) {
+        my @cells = split /\|+/, $r;
+        my $type = 'body';
+        if ($r =~ m/\|\|\|/) {
+            $type = 'foot';
+        }
+        elsif ($r =~ m/\|\|/) {
+            $type = 'head';
+        }
+        if ($cells[0] =~ /\A\s*\z/) {
+            $empty_first_cell++;
+        }
+        push @row_cells, {
+                          cells => \@cells,
+                          type => $type,
+                         };
+    }
+
+    # consistently empty first cell: nuke
+    if ($empty_first_cell == @row_cells) {
+        foreach my $r (@row_cells) {
+            shift @{$r->{cells}};
+        }
+    }
+
+  ROW:
+    for (my $i = 0; $i < @row_cells; $i++) {
+
+        my @cells = @{$row_cells[$i]{cells}};
+        my $type = $row_cells[$i]{type};
+
         if ($output->{counter} < scalar(@cells)) {
             $output->{counter} = scalar(@cells);
         }
-        if ($row =~ m/\|\|\|/) {
-            push @{$output->{foot}}, \@cells;
-        } elsif ($row =~ m/\|\|/) {
-            push @{$output->{head}}, \@cells;
-        } else {
-            push @{$output->{body}}, \@cells;
+        if (!$output->{specification}) {
+            # print Dumper(\@cells);
+            if (my @spec = $self->_table_row_specification(\@cells)) {
+                $output->{specification} = \@spec;
+                # print Dumper(\@cells);
+                # now, if we're on the second, the previous row was
+                # the header, so move it.
+                if ($i == 1) {
+                    # print Dumper($output);
+                    if (@{$output->{body}} == 1 and @{$output->{head}} == 0) {
+                        push @{$output->{head}}, shift @{$output->{body}};
+                    }
+                }
+                next ROW;
+            }
         }
+        push @{$output->{$type}}, \@cells;
     }
+
     # pad the cells with " " if their number doesn't match
     foreach my $part (qw/body head foot/) {
         foreach my $row (@{$output->{$part}}) {
@@ -1312,6 +1412,13 @@ sub _split_table_in_hash {
                 # warn "Found uneven table: " . join (":", @$row), "\n";
                 push @$row, " ";
             }
+        }
+    }
+
+    # pad the specification with X if short.
+    if (my $spec = $output->{specification}) {
+        while (@$spec < $output->{counter}) {
+            push @$spec, 'X';
         }
     }
     return $output;
@@ -1430,6 +1537,10 @@ sub format_links {
             $link = "#text-amuse-label-$linkname";
         }
         elsif ($self->is_latex) {
+            # turn ?? placeholder in the page name; the starred
+            # version is without hyperlink, because we're already
+            # inside one.
+            $desc =~ s/\?\?/\\pageref*{textamuse:$linkname}/g;
             return "\\hyperref{}{amuse}{$linkname}{$desc}";
         }
     }
@@ -1902,24 +2013,46 @@ sub url_re {
 
 =cut
 
+sub _format_table_tag {
+    my ($tag, $spec) = @_;
+    my $attrs = '';
+    if ($spec) {
+        my %specs = (
+                     c => 'center',
+                     l => 'left',
+                     r => 'right',
+                    );
+        if (my $align = $specs{$spec}) {
+            $attrs = qq{ style="text-align:$align"};
+        }
+    }
+    return '<' . $tag . $attrs . '>';
+}
+
 sub html_table_mapping {
     return {
             head => {
                      b => " <thead>",
                      e => " </thead>",
-                     bcell => "   <th>",
+                     bcell => sub {
+                         return "   " . _format_table_tag(th => @_);
+                     },
                      ecell => "   </th>",
                     },
             foot => {
                      b => " <tfoot>",
                      e => " </tfoot>",
-                     bcell => "   <td>",
+                     bcell => sub {
+                         return "   " . _format_table_tag(td => @_);
+                     },
                      ecell => "   </td>",
                     },
             body => {
                      b => " <tbody>",
                      e => " </tbody>",
-                     bcell => "   <td>",
+                     bcell => sub {
+                         return "   " . _format_table_tag(td => @_);
+                     },
                      ecell => "   </td>",
                     },
             btr => "  <tr>",

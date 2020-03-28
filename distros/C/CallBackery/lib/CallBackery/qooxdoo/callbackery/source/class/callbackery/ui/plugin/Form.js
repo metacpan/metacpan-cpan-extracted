@@ -28,15 +28,19 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         this._getParentFormData = getParentFormData;
         this._populate();
         this._addValidation();
-        this.addListener('appear',this._loadData,this);
+        this.addListener('appear',function () {
+            this._loadData();
+        }, this);
         this._actionResponseHandler = this._action.addListener('actionResponse',function(e){
             var data = e.getData();
             switch(data.action){
                 case 'reload':
                     this._loadData();
+                    this._reconfForm();
                     break;
                 case 'dataSaved':
                     this._loadData();
+                    this._reconfForm();
                     break;
                 case 'reloadStatus':
                     this._loadDataReadOnly();
@@ -106,11 +110,17 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             var cfg = this._cfg;
             var form = this._form;
             var that = this;
+            var buttonMap = this._action.getButtonMap();
             cfg.form.forEach(function(s){
+                if (s.actionSet) {
+                    for (var key in s.actionSet) {
+                        buttonMap[key].set(s.actionSet[key]);
+                    }
+                }             
+
                 if (!s.key){
                     return;
-                }
-                var control = form.getControl(s.key);
+                }                var control = form.getControl(s.key);
                 var callback = function(e){
                     var data = e.getData();
                     // handle events from selectboxes
@@ -176,8 +186,13 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         },
         _reConfFormHandler: function(formCfg){
             if (! this._form) return;
-
+            var buttonMap = this._action.getButtonMap();
             formCfg.forEach(function(s){
+                if (s.actionSet) {
+                    for (var key in s.actionSet) {
+                        buttonMap[key].set(s.actionSet[key]);
+                    }
+                }
                 if (!s.key){
                     return;
                 }

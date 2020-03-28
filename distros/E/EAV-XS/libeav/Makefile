@@ -1,4 +1,5 @@
 CFLAGS ?= -O2 -Wall -Wextra -std=c99 -pedantic -fPIC
+CPPFLAGS = -Iinclude -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_SVID_SOURCE
 PKG_CONFIG ?= pkg-config
 DESTDIR ?= /usr/local
 INSTALL ?= install
@@ -112,7 +113,7 @@ endif
 
 #----------------------------------------------------------#
 
-CPPFLAGS = -Iinclude -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=500 -D_SVID_SOURCE
+
 CPPFLAGS += $(DEFS) $(INCLUDES)
 
 LIB_PATH = $(shell realpath .)

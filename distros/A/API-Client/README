@@ -21,7 +21,22 @@ SYNOPSIS
 DESCRIPTION
 
     This package provides an abstraction and method for rapidly developing
-    HTTP API clients.
+    HTTP API clients. While this module can be used to interact with APIs
+    directly, API::Client was designed to be consumed (subclassed) by
+    higher-level purpose-specific API clients.
+
+THIN CLIENT
+
+    The thin API client library is advantageous as it has complete API
+    coverage and can easily adapt to changes in the API with minimal
+    effort. As a thin-client superclass, this module does not map specific
+    HTTP requests to specific routines, nor does it provide parameter
+    validation, pagination, or other conventions found in typical API
+    client implementations; Instead, it simply provides a simple and
+    consistent mechanism for dynamically generating HTTP requests.
+    Additionally, this module has support for debugging and retrying API
+    calls as well as throwing exceptions when 4xx and 5xx server response
+    codes are returned.
 
 INTEGRATES
 
@@ -38,6 +53,186 @@ LIBRARIES
     This package uses type constraints from:
 
     Types::Standard
+
+SCENARIOS
+
+    This package supports the following scenarios:
+
+ building
+
+      # given: synopsis
+    
+      my $resource = $client->resource('get');
+    
+      # GET /get
+      my $get = $client->resource('get')->dispatch;
+    
+      # HEAD /head
+      my $head = $client->resource('head')->dispatch(
+        method => 'head'
+      );
+    
+      # PATCH /patch
+      my $patch = $client->resource('patch')->dispatch(
+        method => 'patch'
+      );
+    
+      [$get, $head, $patch]
+
+    Building up an HTTP request is extremely easy, simply call the
+    "resource" to create a new object instance representing the API
+    endpoint you wish to issue a request against.
+
+ chaining
+
+      # given: synopsis
+    
+      # https://httpbin.org/users
+      my $users = $client->resource('users');
+    
+      # https://httpbin.org/users/c09e91a
+      my $user = $client->resource('users', 'c09e91a');
+    
+      # https://httpbin.org/users/c09e91a
+      my $new_user = $users->resource('c09e91a');
+    
+      [$users, $user, $new_user]
+
+    Because each call to "resource" returns a new object instance
+    configured with a path (resource locator) based on the supplied
+    parameters, reuse and request isolation are made simple, i.e., you will
+    only need to configure the client once in your application.
+
+ creating
+
+      # given: synopsis
+    
+      my $tx1 = $client->resource('post')->create(
+        json => {active => 1}
+      );
+    
+      # is equivalent to
+    
+      my $tx2 = $client->resource('post')->dispatch(
+        method => 'post',
+        json => {active => 1}
+      );
+    
+      [$tx1, $tx2]
+
+    This example illustrates how you might create a new API resource.
+
+ deleting
+
+      # given: synopsis
+    
+      my $tx1 = $client->resource('delete')->delete(
+        json => {active => 1}
+      );
+    
+      # is equivalent to
+    
+      my $tx2 = $client->resource('delete')->dispatch(
+        method => 'delete',
+        json => {active => 1}
+      );
+    
+      [$tx1, $tx2]
+
+    This example illustrates how you might delete a new API resource.
+
+ fetching
+
+      # given: synopsis
+    
+      my $tx1 = $client->resource('get')->fetch(
+        query => {active => 1}
+      );
+    
+      # is equivalent to
+    
+      my $tx2 = $client->resource('get')->dispatch(
+        method => 'get',
+        query => {active => 1}
+      );
+    
+      [$tx1, $tx2]
+
+    This example illustrates how you might fetch an API resource.
+
+ subclassing
+
+      package Hookbin;
+    
+      use Data::Object::Class;
+    
+      extends 'API::Client';
+    
+      sub auth {
+        ['admin', 'secret']
+      }
+    
+      sub headers {
+        [['Accept', '*/*']]
+      }
+    
+      sub base {
+        ['https://httpbin.org/get']
+      }
+    
+      package main;
+    
+      my $hookbin = Hookbin->new;
+
+    This package was designed to be subclassed and provides hooks into the
+    client building and request dispatching processes. Specifically, there
+    are three useful hooks (i.e. methods, which if present are used to
+    build up the client object and requests), which are, the auth hook,
+    which should return a Tuple[Str, Str] which is used to configure the
+    basic auth header, the base hook which should return a Tuple[Str] which
+    is used to configure the base URL, and the headers hook, which should
+    return a ArrayRef[Tuple[Str, Str]] which are used to configure the HTTP
+    request headers.
+
+ transacting
+
+      # given: synopsis
+    
+      my $tx1 = $client->resource('patch')->patch(
+        json => {active => 1}
+      );
+    
+      # is equivalent to
+    
+      my $tx2 = $client->resource('patch')->dispatch(
+        method => 'patch',
+        json => {active => 1}
+      );
+    
+      [$tx1, $tx2]
+
+    An HTTP request is only issued when the "dispatch" method is called,
+    directly or indirectly. Those calls return a Mojo::Transaction object
+    which provides access to the request and response objects.
+
+ updating
+
+      # given: synopsis
+    
+      my $tx1 = $client->resource('put')->update(
+        json => {active => 1}
+      );
+    
+      # is equivalent to
+    
+      my $tx2 = $client->resource('put')->dispatch(
+        method => 'put',
+        json => {active => 1}
+      );
+    
+      [$tx1, $tx2]
+
+    This example illustrates how you might update a new API resource.
 
 ATTRIBUTES
 

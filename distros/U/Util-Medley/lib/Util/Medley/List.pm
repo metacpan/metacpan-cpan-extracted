@@ -1,5 +1,5 @@
 package Util::Medley::List;
-$Util::Medley::List::VERSION = '0.027';
+$Util::Medley::List::VERSION = '0.028';
 #########################################################################################
 
 use v5.16;
@@ -18,7 +18,7 @@ Util::Medley::List - utility methods for working with lists
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =cut
 

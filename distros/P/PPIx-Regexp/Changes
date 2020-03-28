@@ -1,3 +1,22 @@
+0.071		2020-03-28	T. R. Wyant
+    Recognize wildcard Unicode names (Perl 5.31.10).
+
+    Try to get correct line number in derived PPI. This is done by
+    injecting "\n" as needed. The initial #line directive becomes "#line
+    2", but is suppressed if I need to generate line 1.
+
+    Improve normalization of content for ppi(). This involves the
+    un-bracketing of things like ${foo}.
+
+    Deprecate new() argument postderef. At this stage it is only
+    documented as deprecated. In the first release after October 1 2020
+    it will warn on the first use. Eventually it will be retracted, and
+    postfix dereferences will always be recognized. This is the default
+    behavior now.
+
+    Add dump argument/option 'short' which, if true, causes leading
+    'PPIx::Regexp::' to be removed from class names.
+
 0.070		2020-02-27	T. R. Wyant
     Add index_locations option to PPIx::Regexp->new(). This defaults to
     true if the regexp is specified as a PPI::Element object. The

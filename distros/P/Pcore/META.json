@@ -158,13 +158,13 @@
       "bugtracker" : {
          "web" : "https://bitbucket.org/softvisio/pcore/issues?status=new&status=open"
       },
-      "homepage" : "https://bitbucket.org/softvisio/pcore/overview",
+      "homepage" : "https://bitbucket.org/softvisio/pcore",
       "repository" : {
          "type" : "git",
          "url" : "https://bitbucket.org/softvisio/pcore",
-         "web" : "https://bitbucket.org/softvisio/pcore/overview"
+         "web" : "https://bitbucket.org/softvisio/pcore"
       }
    },
-   "version" : "v0.126.0",
+   "version" : "v0.127.1",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

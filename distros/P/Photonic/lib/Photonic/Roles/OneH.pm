@@ -1,5 +1,5 @@
 package Photonic::Roles::OneH;
-$Photonic::Roles::OneH::VERSION = '0.011';
+$Photonic::Roles::OneH::VERSION = '0.014';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::OneH
 
 =head1 VERSION
 
-version 0.011
+version 0.014
 
 =head1 COPYRIGHT NOTICE
 
@@ -56,7 +56,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =item (for developers)
 
     package Photonic::LE::NR2::OneH.pm;
-    $Photonic::LE::NR2::OneH::VERSION= '0.011';
+    $Photonic::LE::NR2::OneH::VERSION= '0.014';
     use namespace::autoclean;
     use Moose;
     has...

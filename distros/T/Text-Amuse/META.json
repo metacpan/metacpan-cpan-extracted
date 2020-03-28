@@ -4,13 +4,13 @@
       "Marco Pessotto <melmothx@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-Amuse",
    "no_index" : {
@@ -51,6 +51,6 @@
       "x_IRC" : "irc://chat.freenode.net/#amusewiki",
       "x_WebIRC" : "https://webchat.freenode.net/?channels=#amusewiki"
    },
-   "version" : "1.42",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.50",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

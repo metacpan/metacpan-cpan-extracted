@@ -39,7 +39,6 @@
             "DateTime::Format::Natural" : "0",
             "List::Util" : "1.45",
             "Scalar::Util" : "0",
-            "Time::Local" : "0",
             "Zodiac::Chinese::Table" : "0",
             "Zodiac::Tiny" : "0",
             "perl" : "5.010001",
@@ -68,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-App-ZodiacUtils"
       }
    },
-   "version" : "0.111",
+   "version" : "0.113",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

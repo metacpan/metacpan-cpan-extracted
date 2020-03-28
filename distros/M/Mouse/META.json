@@ -4,7 +4,7 @@
       "Shawn M Moore <sartak at gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.5",
+   "generated_by" : "Minilla/v3.1.9",
    "license" : [
       "perl_5"
    ],
@@ -82,7 +82,7 @@
    "provides" : {
       "Mouse" : {
          "file" : "lib/Mouse.pm",
-         "version" : "v2.5.9"
+         "version" : "v2.5.10"
       },
       "Mouse::Exporter" : {
          "file" : "lib/Mouse/Exporter.pm"
@@ -137,18 +137,18 @@
       },
       "Mouse::Role" : {
          "file" : "lib/Mouse/Role.pm",
-         "version" : "v2.5.9"
+         "version" : "v2.5.10"
       },
       "Mouse::Spec" : {
          "file" : "lib/Mouse/Spec.pm",
-         "version" : "v2.5.9"
+         "version" : "v2.5.10"
       },
       "Mouse::TypeRegistry" : {
          "file" : "lib/Mouse/TypeRegistry.pm"
       },
       "Mouse::Util" : {
          "file" : "lib/Mouse/Util.pm",
-         "version" : "v2.5.9"
+         "version" : "v2.5.10"
       },
       "Mouse::Util::MetaRole" : {
          "file" : "lib/Mouse/Util/MetaRole.pm"
@@ -180,7 +180,7 @@
          "web" : "https://github.com/xslate/p5-Mouse"
       }
    },
-   "version" : "v2.5.9",
+   "version" : "v2.5.10",
    "x_contributors" : [
       "Aleksandr Matveev <a.matveev@corp.mail.ru>",
       "Alex Solovey <a.solovey@gmail.com>",

@@ -1,0 +1,15 @@
+0.1 2019-08-26
+	- Initial version from pre-existing work done
+0.2 2019-08-28
+	- Switched from Class::Struct to inner package for management of exceptions for better granularity
+0.6.3 2019-10-23
+	- Add _set_get_hash_as_object with recursive processing
+0.6.4 2019-10-31
+	- Added handling of undef passed as a parameter to some of the _set_get_* methods
+0.6.5 2019-11-02
+	- Added an inline package Module::Generic::Boolean to handle boolean value and the _set_get_boolean method
+	- Added the use of Class::Load for loading dynamically packages as used in _instantiate_object
+	- Added the methods true, false under Module::Generic to be used in _set_get_boolean and _is_class_loaded and _load_class which are wrappers for Class::Load::is_class_loaded and Class::Load::load_class
+0.6.6 2019-11-03
+    - Adjusted the functionning of _set_get_hash_as_object so that it always returns an object even when there was no data. This is to avoid the perl error of "Can't call method "this_property" on an undefined value" when doing something like my_dynamic_hash->this_property
+    

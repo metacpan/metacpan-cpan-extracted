@@ -1,5 +1,5 @@
 package Util::Medley::DateTime;
-$Util::Medley::DateTime::VERSION = '0.027';
+$Util::Medley::DateTime::VERSION = '0.028';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -9,6 +9,8 @@ use Time::Local;
 use Kavorka '-all';
 use Time::ParseDate;
 use Time::HiRes;
+use DateTime::Format::ISO8601;
+use DateTime::Format::ISO8601::Format;
 
 use constant SECS_PER_MIN => 60;
 use constant SECS_PER_HOUR => SECS_PER_MIN() * 60;
@@ -20,7 +22,7 @@ Util::Medley::DateTime - Class with various datetime methods.
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =cut
 
@@ -57,6 +59,81 @@ used formats.
 none
 
 =head1 METHODS
+
+=head2 iso8601DateTime
+
+Returns a iso8601-date-time string.
+
+=over
+
+=item usage:
+
+ $dt->iso8601DateTime([time]);
+
+ $dt->iso8601DateTime([epoch => time]);
+ 
+=item args:
+
+=over
+
+=item time [Int]
+
+Epoch time used to generate iso8601-date-time string.  Default is now.
+
+=back
+
+=back
+
+=cut
+
+multi method iso8601DateTime (Num :$epoch = time) {
+
+	my $dt = DateTime->from_epoch(epoch => $epoch);
+	my $format = DateTime::Format::ISO8601::Format->new;
+	return $format->format_datetime($dt);
+}
+
+multi method iso8601DateTime (Num $epoch? = time) {
+
+	return $self->iso8601DateTime(epoch => $epoch);
+}
+
+=head2 iso8601DateTimeToEpoch
+
+Returns the epoch of a given iso8601-date-time string.
+
+=over
+
+=item usage:
+
+ $dt->iso8601DateTimeToEpoch([$dateTime]);
+
+ $dt->iso8601DateTime([dateTime => $dateTime]);
+ 
+=item args:
+
+=over
+
+=item dateTime [Str]
+
+An iso8601-date-time string.
+
+=back
+
+=back
+
+=cut
+
+multi method iso8601DateTimeToEpoch (Str :$dateTime!) {
+	
+    my $dt = DateTime::Format::ISO8601->parse_datetime($dateTime);
+    return $dt->epoch;
+}
+
+multi method iso8601DateTimeToEpoch (Str $dateTime!) {
+
+	return $self->iso8601DateTimeToEpoch(dateTime => $dateTime);
+}
 
 =head2 localDateTime
 

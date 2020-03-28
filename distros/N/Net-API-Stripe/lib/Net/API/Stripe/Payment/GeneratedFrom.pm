@@ -1,0 +1,107 @@
+##----------------------------------------------------------------------------
+## Stripe API - ~/lib/Net/API/Stripe/Payment/GeneratedFrom.pm
+## Version 0.1
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2019/11/02
+## Modified 2019/11/02
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
+package Net::API::Stripe::Payment::GeneratedFrom;
+BEGIN
+{
+	use strict;
+	use parent qw( Net::API::Stripe::Generic );
+	our( $VERSION ) = '0.1';
+};
+
+sub charge { return( shift->_set_get_scalar( 'charge', @_ ) ); }
+
+sub payment_method_details { return( shift->_set_get_object( 'payment_method_details', 'Net::API::Stripe::Payment::Method::Details', @_ ) ); }
+
+1;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+Net::API::Stripe::Payment::GeneratedFrom - A Stripe Payment Method Origin Object
+
+=head1 SYNOPSIS
+
+=head1 VERSION
+
+    0.1
+
+=head1 DESCRIPTION
+
+Details of the original PaymentMethod that created this object.
+
+This is used in C<Net::API::Stripe::Connect::ExternalAccount::Card> itself used in C<Net::API::Stripe::Payment::Method>
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item B<new>( %ARG )
+
+Creates a new C<Net::API::Stripe> objects.
+It may also take an hash like arguments, that also are method of the same name.
+
+=over 8
+
+=item I<verbose>
+
+Toggles verbose mode on/off
+
+=item I<debug>
+
+Toggles debug mode on/off
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<charge> string
+
+The charge that created this object.
+
+=item B<payment_method_details> hash
+
+Transaction-specific details of the payment method used in the payment.
+
+This is a C<Net::API::Stripe::Payment::Method::Details> object.
+
+=back
+
+=head1 HISTORY
+
+=head2 v0.1
+
+Initial version
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+Stripe API documentation:
+
+L<https://stripe.com/docs/api>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

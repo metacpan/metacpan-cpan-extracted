@@ -27,6 +27,7 @@ my @files = (
     'scripts/es-copy-index.pl',
     'scripts/es-daily-index-maintenance.pl',
     'scripts/es-graphite-dynamic.pl',
+    'scripts/es-index-blocks.pl',
     'scripts/es-nagios-check.pl',
     'scripts/es-nodes.pl',
     'scripts/es-open.pl',

@@ -37,29 +37,35 @@
  */
 static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct XSParseSublikeHooks *hooksB, OP **op_ptr)
 {
-  SV *name = lex_scan_ident();
+  struct XSParseSublikeContext ctx = { 0 };
+
+  ctx.name = lex_scan_ident();
   lex_read_space(0);
 
   ENTER_with_name("parse_block");
   /* From here onwards any `return` must be prefixed by LEAVE_with_name() */
 
-  I32 floor_ix = start_subparse(FALSE, name ? 0 : CVf_ANON);
+  if(hooksA && hooksA->pre_subparse)
+    (*hooksA->pre_subparse)(aTHX_ &ctx);
+  if(hooksB && hooksB->pre_subparse)
+    (*hooksB->pre_subparse)(aTHX_ &ctx);
+
+  I32 floor_ix = start_subparse(FALSE, ctx.name ? 0 : CVf_ANON);
   SAVEFREESV(PL_compcv);
 
-  OP *attrs = NULL;
   if(lex_peek_unichar(0) == ':') {
     lex_read_unichar(0);
 
-    attrs = lex_scan_attrs(PL_compcv);
+    ctx.attrs = lex_scan_attrs(PL_compcv);
   }
 
   PL_hints |= HINT_LOCALIZE_HH;
   I32 save_ix = block_start(TRUE);
 
   if(hooksA && hooksA->post_blockstart)
-    (*hooksA->post_blockstart)(aTHX);
+    (*hooksA->post_blockstart)(aTHX_ &ctx);
   if(hooksB && hooksB->post_blockstart)
-    (*hooksB->post_blockstart)(aTHX);
+    (*hooksB->post_blockstart)(aTHX_ &ctx);
 
 #ifdef HAVE_PARSE_SUBSIGNATURE
   OP *sigop = NULL;
@@ -81,12 +87,12 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
   }
 #endif
 
-  OP *body = parse_block(0);
+  ctx.body = parse_block(0);
   SvREFCNT_inc(PL_compcv);
 
 #ifdef HAVE_PARSE_SUBSIGNATURE
   if(sigop)
-    body = op_append_list(OP_LINESEQ, sigop, body);
+    ctx.body = op_append_list(OP_LINESEQ, sigop, ctx.body);
 #endif
 
   if(PL_parser->error_count) {
@@ -97,10 +103,10 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
      * correctly
      *   See https://rt.cpan.org/Ticket/Display.html?id=130417
      */
-    op_free(body);
+    op_free(ctx.body);
     *op_ptr = newOP(OP_NULL, 0);
-    if(name) {
-      SvREFCNT_dec(name);
+    if(ctx.name) {
+      SvREFCNT_dec(ctx.name);
       LEAVE_with_name("parse_block");
       return KEYWORD_PLUGIN_STMT;
     }
@@ -111,34 +117,34 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
   }
 
   if(hooksB && hooksB->pre_blockend)
-    body = (*hooksB->pre_blockend)(aTHX_ body);
+    (*hooksB->pre_blockend)(aTHX_ &ctx);
   if(hooksA && hooksA->pre_blockend)
-    body = (*hooksA->pre_blockend)(aTHX_ body);
+    (*hooksA->pre_blockend)(aTHX_ &ctx);
 
-  body = block_end(save_ix, body);
+  ctx.body = block_end(save_ix, ctx.body);
 
-  CV *cv = newATTRSUB(floor_ix,
-    name ? newSVOP(OP_CONST, 0, SvREFCNT_inc(name)) : NULL,
+  ctx.cv = newATTRSUB(floor_ix,
+    ctx.name ? newSVOP(OP_CONST, 0, SvREFCNT_inc(ctx.name)) : NULL,
     NULL,
-    attrs,
-    body);
+    ctx.attrs,
+    ctx.body);
 
   if(hooksA && hooksA->post_newcv)
-    (*hooksA->post_newcv)(aTHX_ cv);
+    (*hooksA->post_newcv)(aTHX_ &ctx);
   if(hooksB && hooksB->post_newcv)
-    (*hooksB->post_newcv)(aTHX_ cv);
+    (*hooksB->post_newcv)(aTHX_ &ctx);
 
   LEAVE_with_name("parse_block");
 
-  if(name) {
+  if(ctx.name) {
     *op_ptr = newOP(OP_NULL, 0);
 
-    SvREFCNT_dec(name);
+    SvREFCNT_dec(ctx.name);
     return KEYWORD_PLUGIN_STMT;
   }
   else {
     *op_ptr = newUNOP(OP_REFGEN, 0,
-      newSVOP(OP_ANONCODE, 0, (SV *)cv));
+      newSVOP(OP_ANONCODE, 0, (SV *)ctx.cv));
 
     return KEYWORD_PLUGIN_EXPR;
   }

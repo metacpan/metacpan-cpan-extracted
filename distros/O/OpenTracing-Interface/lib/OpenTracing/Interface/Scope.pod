@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 OpenTracing::Interface::Scope - A role that defines the Scope interface

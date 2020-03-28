@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Client;
-$Search::Elasticsearch::Role::Client::VERSION = '6.00';
+$Search::Elasticsearch::Role::Client::VERSION = '6.80';
 use Moo::Role;
 use namespace::clean;
 
@@ -28,7 +28,7 @@ Search::Elasticsearch::Role::Client - Provides common functionality for Client i
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -46,11 +46,11 @@ to L<Search::Elasticsearch::Transport/perform_request()>.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

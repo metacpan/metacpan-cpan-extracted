@@ -8,7 +8,7 @@ package XS::Parse::Sublike;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -28,8 +28,10 @@ anyone else; and highly unlikely to be any use when writing perl code using
 these. Unless you are writing a keyword plugin using XS, this module is not
 for you.
 
-This module is also highly experimental, consisting currently of pieces of
-code extracted and refactored from L<Future::AsyncAwait> and L<Object::Pad>.
+This module is also currently experimental, and the design is still evolving
+and subject to change. Later versions will likely break ABI compatibility,
+requiring changes to any module that depends on it.
+
 It is hoped eventually this will be useful for other modules too.
 
 =head1 XS FUNCTIONS
@@ -97,12 +99,20 @@ combined. The hooks given by the I<hooks> argument are considered to be on the
 "outside" from those of the registered keyword "inside". The outside ones run
 first for all stages, except C<pre_blockend> which runs them inside-out.
 
-=head1 PARSE HOOKS
+=head1 PARSE HOOKS AND CONTEXT
 
 The C<XSParseSublikeHooks> structure provides the following hook stages, in
-the given order:
+the given order. They share state about the ongoing parse process using
+various fields of the C<XSParseSublikeContext> structure.
 
-=head2 permit
+   struct XSParseSublikeContext {
+      SV *name;
+      OP *attrs;
+      OP *body;
+      CV *cv;
+   }
+
+=head2 The C<permit> Stage
 
    bool (*permit)(pTHX)
 
@@ -112,31 +122,51 @@ whether the keyword is permitted at this time (typically by inspecting the
 hints hash C<GvHV(PL_hintgv)> for some imported key) and return true only if
 the keyword is permitted.
 
-=head2 post_blockstart
+=head2 Parse Name
 
-   void (*post_blockstart)(pTHX)
+At this point, the optional name is parsed and filled into the C<name> field
+of the context.
 
-Invoked after the optional name and list of attributes have been parsed and
-the C<block_start()> function has been called. This hook stage may wish to
-perform any alterations of C<PL_compcv> or related, inspect or alter the
-lexical pad, provide hints hash values, or any other tasks before the
-signature and code body are parsed.
+=head2 The C<pre_subparse> Stage
 
-=head2 pre_blockend
+   void (*pre_subparse)(pTHX_ struct XSParseSublikeContext *ctx)
 
-   OP * (*pre_blockend)(pTHX_ OP *body)
+Invoked just before C<start_subparse()> is called.
 
-Invoked after the signature and body of the function have been parsed, just
-before the C<block_end()> function is invoked. This hook is passed the optree
-as it has been parsed. The hook stage may wish to inspect or alter the optree,
-and should return it. The return value will then be passed to C<newATTRSUB()>.
+=head2 Parse Attrs
 
-=head2 post_newcv
+At this point the optional sub attributes are parsed and filled into the
+C<attrs> field of the context, then C<block_start()> is called.
 
-   void (*post_newcv)(pTHX_ CV *cv)
+=head2 The C<post_blockstart> Stage
+
+   void (*post_blockstart)(pTHX_ struct XSParseSublikeContext *ctx)
+
+Invoked after the C<block_start()> function has been called. This hook stage
+may wish to perform any alterations of C<PL_compcv> or related, inspect or
+alter the lexical pad, provide hints hash values, or any other tasks before
+the signature and code body are parsed.
+
+=head2 Parse Body
+
+At this point, the main body of the function is parsed and the optree is
+stored in the C<body> field of the context. If the perl version supports sub
+signatures and they are enabled and found, the body will be prefixed with the
+signature ops as well.
+
+=head2 The C<pre_blockend> Stage
+
+   void (*pre_blockend)(pTHX_ struct XSParseSublikeContext *ctx)
+
+Invoked just before the C<block_end()> function is invoked. The hook stage may
+wish to inspect or alter the optree stored in the C<body> context field.
+
+=head2 The C<post_newcv> Stage
+
+   void (*post_newcv)(pTHX_ struct XSParseSublikeContext *ctx)
 
 Invoked just after C<newATTRSUB()> has been invoked on the optree. The hook
-stage may wish to inspect or alter the CV.
+stage may wish to inspect or alter the CV stored in the C<cv> context field.
 
 =cut
 

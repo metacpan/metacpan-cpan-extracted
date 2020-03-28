@@ -1,5 +1,16 @@
 Revision history for XS-Parse-Sublike
 
+0.06    2020-03-27
+        [CHANGES]
+         * Pass a standard shared context struct through the various hook
+           stages
+         * Add an early hook stage before the call to start_subparse()
+
+0.05    2020-03-26
+        [BUGFIXES]
+         * Fix hax/parse_subsignature.c.inc to cope with whitespace between
+           parameter declarations
+
 0.04    2020-03-18
         [CHANGES]
          * Pass a required module version number to boot_xs_parse_sublike()

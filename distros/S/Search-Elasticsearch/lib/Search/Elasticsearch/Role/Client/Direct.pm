@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Client::Direct;
-$Search::Elasticsearch::Role::Client::Direct::VERSION = '6.00';
+$Search::Elasticsearch::Role::Client::Direct::VERSION = '6.80';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::Client';
 use Search::Elasticsearch::Util qw(load_plugin is_compat throw);
@@ -175,7 +175,7 @@ Search::Elasticsearch::Role::Client::Direct - Request parsing for Direct clients
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -222,11 +222,11 @@ not yet supported by the released client.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

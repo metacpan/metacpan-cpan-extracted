@@ -165,7 +165,11 @@ sub stringify {
         $anchor =~ s/[^A-Za-z0-9-]//g;
         die "Bad anchor " . $string unless length($anchor);
         if ($self->is_latex) {
-            return "\\hyperdef{amuse}{$anchor}{}\%\n";
+            my $label = <<"TEX";
+\\hyperdef{amuse}{$anchor}{}%
+\\label{textamuse:$anchor}%
+TEX
+            return $label;
         }
         elsif ($self->is_html) {
             return qq{<a id="text-amuse-label-$anchor" class="text-amuse-internal-anchor"><\/a>\n}

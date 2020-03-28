@@ -105,6 +105,8 @@ sub loggrep {
 
 __END__
 
+=pod
+
 =head1 NAME
 
 OPCUA::Open62541::Test::Logger - manage open62541 log file for testing

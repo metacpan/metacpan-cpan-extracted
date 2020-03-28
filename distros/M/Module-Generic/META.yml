@@ -1,0 +1,41 @@
+---
+abstract: 'Generic Module to inherit from'
+author:
+  - 'Jacques Deguest <jack@deguest.jp>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Generic
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  B: '0'
+  Class::Load: '0.25'
+  Class::Struct: '0.62'
+  Data::Dumper: '0'
+  Data::Printer: '0'
+  Devel::StackTrace: '0'
+  Exporter: '5.73'
+  Number::Format: '1.75'
+  Scalar::Util: '1.50'
+  Test::More: '0'
+  Text::Number: '0'
+  TryCatch: '1.003002'
+  Want: '0.29'
+  common::sense: '0'
+  overload: '1.22'
+  overloading: '0.02'
+  parent: '0'
+  perl: '5.006000'
+  strict: '0'
+version: v0.11.6
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

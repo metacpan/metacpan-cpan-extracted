@@ -1,0 +1,153 @@
+##----------------------------------------------------------------------------
+## Stripe API - ~/lib/Net/API/Stripe/Payment/Intent/TransferData.pm
+## Version 0.1
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2019/11/02
+## Modified 2019/11/02
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
+package Net::API::Stripe::Payment::Intent::TransferData;
+BEGIN
+{
+    use strict;
+    use parent qw( Net::API::Stripe::Generic );
+    our( $VERSION ) = '0.1';
+};
+
+sub amount { shift->_set_get_number( 'amount', @_ ); }
+
+sub destination { shift->_set_get_scalar_or_object( 'destination', 'Net::API::Stripe::Connect::Account', @_ ); }
+
+1;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+Net::API::Stripe::Payment::Intent::TransferData - A Stripe TransferData Object
+
+=head1 SYNOPSIS
+
+=head1 VERSION
+
+    0.1
+
+=head1 DESCRIPTION
+
+The data with which to automatically create a Transfer when the payment is finalized. See the PaymentIntents use case for connected accounts for details.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item B<new>( %ARG )
+
+Creates a new C<Net::API::Stripe> objects.
+It may also take an hash like arguments, that also are method of the same name.
+
+=over 8
+
+=item I<verbose>
+
+Toggles verbose mode on/off
+
+=item I<debug>
+
+Toggles debug mode on/off
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<amount> integer
+
+A positive integer representing how much to charge in the smallest currency unit (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or equivalent in charge currency. The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99).
+
+=item B<destination> string (expandable)
+
+The account (if any) the payment will be attributed to for tax reporting, and where funds from the payment will be transferred to upon payment success.
+
+When expanded, this is a C<Net::API::Stripe::Connect::Account> object.
+
+=back
+
+=head1 API SAMPLE
+
+	{
+	  "id": "pi_1EUnBEF5IfL0eXz99dkRR60n",
+	  "object": "payment_intent",
+	  "amount": 1099,
+	  "amount_capturable": 0,
+	  "amount_received": 0,
+	  "application": null,
+	  "application_fee_amount": null,
+	  "canceled_at": null,
+	  "cancellation_reason": null,
+	  "capture_method": "automatic",
+	  "charges": {
+		"object": "list",
+		"data": [],
+		"has_more": false,
+		"url": "/v1/charges?payment_intent=pi_1EUnBEF5IfL0eXz99dkRR60n"
+	  },
+	  "client_secret": "pi_1EUnBEF5IfL0eXz99dkRR60n_secret_sqsp5vQECBqN0qTVoQwpBT0Iy",
+	  "confirmation_method": "automatic",
+	  "created": 1556596976,
+	  "currency": "jpy",
+	  "customer": null,
+	  "description": null,
+	  "invoice": null,
+	  "last_payment_error": null,
+	  "livemode": false,
+	  "metadata": {},
+	  "next_action": null,
+	  "on_behalf_of": null,
+	  "payment_method": null,
+	  "payment_method_options": {},
+	  "payment_method_types": [
+		"card"
+	  ],
+	  "receipt_email": null,
+	  "review": null,
+	  "setup_future_usage": null,
+	  "shipping": null,
+	  "statement_descriptor": null,
+	  "statement_descriptor_suffix": null,
+	  "status": "requires_payment_method",
+	  "transfer_data": null,
+	  "transfer_group": null
+	}
+
+=head1 HISTORY
+
+=head2 v0.1
+
+Initial version
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+Stripe API documentation:
+
+L<https://stripe.com/docs/api/payment_intents/object>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

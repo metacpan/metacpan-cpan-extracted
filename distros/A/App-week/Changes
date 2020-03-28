@@ -1,5 +1,10 @@
 Revision history for Perl extension App-week
 
+0.02 2020-03-27T04:09:57Z
+
+    - Set default value of -Y to one.
+    - Add simple test code.
+
 0.01 2020-03-24T12:13:33Z
 
     - original version

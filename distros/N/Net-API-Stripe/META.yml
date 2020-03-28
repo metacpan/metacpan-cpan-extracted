@@ -1,0 +1,59 @@
+---
+abstract: 'An interface to the Stripe API'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-API-Stripe
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::OpenSSL::RSA: '0.31'
+  Cwd: '3.78'
+  Data::Dumper: '2.174'
+  Data::Random: '0.13'
+  Data::UUID: '1.224'
+  DateTime: '1.51'
+  DateTime::Format::Strptime: '1.76'
+  DateTime::TimeZone: '2.36'
+  Devel::Confess: '0.009004'
+  Digest::MD5: '2.55'
+  Digest::SHA: '6.02'
+  Encode: '3.01'
+  File::Basename: '2.85'
+  File::Spec: '3.78'
+  HTTP::Cookies: '6.04'
+  HTTP::Request: '6.18'
+  IO::File: '1.41'
+  JSON: '4.02'
+  LWP::MediaTypes: '6.04'
+  LWP::UserAgent: '6.39'
+  MIME::Base64: '3.15'
+  MIME::QuotedPrint: '3.13'
+  Module::Generic: v0.11.6
+  Net::IP: '1.26'
+  Net::OAuth: '0.28'
+  Number::Format: '1.75'
+  Scalar::Util: '1.54'
+  Test::Simple: '0'
+  TryCatch: '1.003002'
+  URI::Escape: '3.31'
+  URI::Query: '0.16'
+  Want: '0.29'
+  common::sense: '0'
+  constant: '0'
+  overload: '1.30'
+  parent: '0'
+  perl: '5.006000'
+version: '0.8'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

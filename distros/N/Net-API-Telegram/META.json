@@ -1,0 +1,79 @@
+{
+   "abstract" : "Implementation of Telegram API",
+   "author" : [
+      "Jacques Deguest (jack@deguest.jp)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-API-Telegram",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Struct" : "0.65",
+            "Cwd" : "3.78",
+            "Data::Dumper" : "2.174",
+            "Data::UUID" : "1.224",
+            "DateTime" : "1.51",
+            "DateTime::TimeZone" : "2.36",
+            "Devel::Confess" : "0.009004",
+            "Devel::StackTrace" : "2.04",
+            "Encode" : "3.01",
+            "Errno" : "1.30",
+            "File::Basename" : "2.85",
+            "File::Copy" : "2.34",
+            "File::Map" : "0.66",
+            "File::Spec" : "3.78",
+            "File::Temp" : "0.2309",
+            "File::Type" : "0.22",
+            "HTTP::Daemon" : "6.06",
+            "HTTP::Daemon::SSL" : "1.04",
+            "HTTP::Headers" : "6.18",
+            "HTTP::Request" : "6.18",
+            "HTTP::Request::Common" : "6.18",
+            "HTTP::Response" : "6.18",
+            "HTTP::Status" : "6.18",
+            "IO::File" : "1.41",
+            "JSON" : "4.02",
+            "LWP::UserAgent" : "6.39",
+            "Module::Generic" : "v0.11.6",
+            "Net::IP" : "1.26",
+            "Number::Format" : "1.75",
+            "POSIX" : "1.88",
+            "Scalar::Util" : "1.54",
+            "Test::Simple" : "0.44",
+            "Time::HiRes" : "1.9760",
+            "TryCatch" : "1.003002",
+            "constant" : "0",
+            "parent" : "0",
+            "perl" : "5.006000",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.6",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

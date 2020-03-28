@@ -1,0 +1,60 @@
+##----------------------------------------------------------------------------
+## Stripe API - ~/lib/Net/API/Stripe/AddressKanji.pm
+## Version 0.1
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2019/11/02
+## Modified 2019/11/02
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
+package Net::API::Stripe::AddressKanji;
+BEGIN
+{
+    use strict;
+    use parent qw( Net::API::Stripe::Address );
+    our( $VERSION ) = '0.1';
+};
+
+1;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+Net::API::Stripe::AddressKanji - A Stripe Japanese Address Object
+
+=head1 SYNOPSIS
+
+=head1 VERSION
+
+    0.1
+
+=head1 DESCRIPTION
+
+This module inherits everything from C<Net::API::Stripe::Address>
+
+This is used to store the address in its kanji version.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+Stripe API documentation:
+
+L<https://stripe.com/docs/api>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

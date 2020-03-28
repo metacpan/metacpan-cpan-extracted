@@ -49,14 +49,21 @@ can be found L<here|https://www.w3.org/TR/webdriver1/>:
 
    https://www.w3.org/TR/webdriver1/
 
-Mozilla's C<geckodriver> has had webdriver for a long time, while
+Mozilla's C<geckodriver> has had webdriver support for a long time, while
 C<chromedriver> only has basic and mostly undocumented webdriver support
 as of release 77.
+
+In Debian GNU/Linux, you can install the chromedriver for chromium
+via the C<chromium-driver> package. Unfortunately, there is no
+(working) package for geckodriver, but you can download it from
+L<github|https://github.com/mozilla/geckodriver/releases>.
 
 =head2 CONVENTIONS
 
 Unless otherwise stated, all delays and time differences in this module
-are represented as an integer number of milliseconds.
+are represented as an integer number of milliseconds, which is perhaps
+surprising to users of my other modules but is what the WebDriver spec
+uses.
 
 =cut
 
@@ -68,7 +75,7 @@ use Carp ();
 use AnyEvent ();
 use AnyEvent::HTTP ();
 
-our $VERSION = '1.01';
+our $VERSION = '1.2';
 
 our $WEB_ELEMENT_IDENTIFIER = "element-6066-11e4-a52e-4f735466cecf";
 our $WEB_WINDOW_IDENTIFIER  =  "window-fcc6-11e5-b4f8-330a88ab9d7f";
@@ -79,6 +86,12 @@ $json = $json->new->utf8;
 
 $json->boolean_values (0, 1)
    if $json->can ("boolean_values");
+
+sub _decode_base64 {
+   require MIME::Base64;
+
+   MIME::Base64::decode_base64 (shift)
+}
 
 sub req_ {
    my ($self, $method, $ep, $body, $cb) = @_;
@@ -180,7 +193,7 @@ For remote connections, the endpoint to connect to (defaults to C<http://localho
 The proxy to use (same as the C<proxy> argument used by
 L<AnyEvent::HTTP>). The default is C<undef>, which disables proxies. To
 use the system-provided proxy (e.g. C<http_proxy> environment variable),
-specify a value of C<default>.
+specify the string C<default>.
 
 =item autodelete => $boolean
 
@@ -1078,31 +1091,74 @@ sub send_alert_text_ {
 
 =item $wd->take_screenshot
 
-Create a screenshot, returning it as a PNG image in a C<data:> URL.
+Create a screenshot, returning it as a PNG image. To decode and save, you
+could do something like:
+
+   use MIME::Base64 ();
+
+   my $screenshot = $wd->take_screenshot;
+
+   open my $fh, ">", "screenshot.png" or die "screenshot.png: $!\n";
+
+   syswrite $fh, MIME::Base64::decode_base64 $screenshot;
 
 =item $wd->take_element_screenshot ($element)
 
 Similar to C<take_screenshot>, but only takes a screenshot of the bounding
 box of a single element.
 
+Compatibility note: As of chrome version 80, I found that the screenshot
+scaling is often wrong (the screenshot is much smaller than the element
+normally displays) unless chrome runs in headless mode. The spec does
+allow for any form of scaling, so this is not strictly a bug in chrome,
+but of course it diminishes trhe screenshot functionality.
+
 =cut
 
 sub take_screenshot_ {
+   my $cb = pop; push @_, sub { $cb->($_[0], _decode_base64 $_[1]) };
    $_[0]->get_ (screenshot => $_[1]);
 }
 
 sub take_element_screenshot_ {
+   my $cb = pop; push @_, sub { $cb->($_[0], _decode_base64 $_[1]) };
    $_[0]->get_ ("element/$_[1]{$WEB_ELEMENT_IDENTIFIER}/screenshot" => $_[2]);
 }
 
 =back
+
+=head3 PRINT
+
+=over
+
+=cut
+
+=item $wd->print_page (key => value...)
+
+Create a printed version of the document, returning it as a PDF document
+encoded as base64. See C<take_screenshot> for an example on how to decode
+and save such a string.
+
+This command takes a lot of optional parameters, see L<the print
+section|https://www.w3.org/TR/webdriver2/#print> of the WebDriver
+specification for details.
+
+This command is taken from a draft document, so it might change in the
+future.
+
+=cut
+
+sub print_page {
+   my $cb = pop; push @_, sub { $cb->($_[0], _decode_base64 $_[1]) };
+   $_[0]->post_ (print => { @_ });
+}
 
 =head2 ACTION LISTS
 
 Action lists can be quite complicated. Or at least it took a while for
 me to twist my head around them. Basically, an action list consists of a
 number of sources representing devices (such as a finger, a mouse, a pen
-or a keyboard) and a list of actions for each source.
+or a keyboard) and a list of actions for each source, in a timeline.
 
 An action can be a key press, a pointer move or a pause (time delay).
 
@@ -1117,8 +1173,8 @@ Most methods here are designed to chain, i.e. they return the web actions
 object, to simplify multiple calls.
 
 Also, while actions from different sources can happen "at the same time"
-in the WebDriver protocol, this class ensures that actions will execute in
-the order specified.
+in the WebDriver protocol, this class by default ensures that actions will
+execute in the order specified.
 
 For example, to simulate a mouse click to an input element, followed by
 entering some text and pressing enter, you can use this:
@@ -1129,9 +1185,9 @@ entering some text and pressing enter, you can use this:
       ->key ("{Enter}")
       ->perform;
 
-By default, keyboard and mouse input sources are provided. You can create
-your own sources and use them when adding events. The above example could
-be more verbosely written like this:
+By default, C<keyboard> and C<mouse> input sources are provided and
+used. You can create your own sources and use them when adding events. The
+above example could be more verbosely written like this:
 
    $wd->actions
       ->source ("mouse", "pointer", pointerType => "mouse")
@@ -1144,7 +1200,8 @@ be more verbosely written like this:
 When you specify the event source explicitly it will switch the current
 "focus" for this class of device (all keyboards are in one class, all
 pointer-like devices such as mice/fingers/pens are in one class), so you
-don't have to specify the source for subsequent actions.
+don't have to specify the source for subsequent actions that are on the
+same class.
 
 When you use the sources C<keyboard>, C<mouse>, C<touch1>..C<touch3>,
 C<pen> without defining them, then a suitable default source will be
@@ -1353,10 +1410,11 @@ sub doubleclick {
       ->click ($button)
 }
 
-=item $al = $al->move ($button, $origin, $x, $y, $duration, $source)
+=item $al = $al->move ($origin, $x, $y, $duration, $source)
 
 Moves a pointer to the given position, relative to origin (either
-"viewport", "pointer" or an element object.
+"viewport", "pointer" or an element object. The coordinates will be
+truncated to integer values.
 
 =cut
 
@@ -1364,7 +1422,7 @@ sub move {
    my ($self, $origin, $x, $y, $duration, $source) = @_;
 
    $self->_add ($source, ptr => pointerMove =>
-                origin => $origin, x => $x*1, y => $y*1, duration => $duration*1)
+                origin => $origin, x => int $x*1, y => int $y*1, duration => $duration*1)
 }
 
 =item $al = $al->cancel ($source)
@@ -1379,19 +1437,21 @@ sub cancel {
    $self->_add ($source, ptr => "pointerCancel")
 }
 
-=item $al = $al->keyDown ($key, $source)
+=item $al = $al->key_down ($key, $source)
 
-=item $al = $al->keyUp ($key, $source)
+=item $al = $al->key_up ($key, $source)
 
 Press or release the given key.
 
 =item $al = $al->key ($key, $source)
 
-Peess and release the given key, without unnecessary delay.
+Peess and release the given key in one go, without unnecessary delay.
 
-A special syntax, C<{keyname}> can be used for special keys - all the special key names from
-L<section 17.4.2|https://www.w3.org/TR/webdriver1/#keyboard-actions> of the WebDriver recommendation
-can be used.
+A special syntax, C<{keyname}> can be used for special keys -
+all the special key names from L<the second table in section
+17.4.2|https://www.w3.org/TR/webdriver1/#keyboard-actions> of the
+WebDriver recommendation can be used - prefix with C<Shift-Space>. to get
+the shifted version, as in C<Shift-
 
 Example: press and release "a".
 
@@ -1414,85 +1474,143 @@ cluster. There is no syntax for special keys, everything will be typed
 
 =cut
 
-our %SPECIAL_KEY = (
-#   "NULL"           => \xE000,
-   "Unidentified"   => 0xE000,
-   "Cancel"         => 0xE001,
-   "Help"           => 0xE002,
-   "Backspace"      => 0xE003,
-   "Tab"            => 0xE004,
-   "Clear"          => 0xE005,
-   "Return"         => 0xE006,
-   "Enter"          => 0xE007,
-   "Shift"          => 0xE008,
-   "Control"        => 0xE009,
-   "Alt"            => 0xE00A,
-   "Pause"          => 0xE00B,
-   "Escape"         => 0xE00C,
-   " "              => 0xE00D,
-   "PageUp"         => 0xE00E,
-   "PageDown"       => 0xE00F,
-   "End"            => 0xE010,
-   "Home"           => 0xE011,
-   "ArrowLeft"      => 0xE012,
-   "ArrowUp"        => 0xE013,
-   "ArrowRight"     => 0xE014,
-   "ArrowDown"      => 0xE015,
-   "Insert"         => 0xE016,
-   "Delete"         => 0xE017,
-   ";"              => 0xE018,
-   "="              => 0xE019,
-   "0"              => 0xE01A,
-   "1"              => 0xE01B,
-   "2"              => 0xE01C,
-   "3"              => 0xE01D,
-   "4"              => 0xE01E,
-   "5"              => 0xE01F,
-   "6"              => 0xE020,
-   "7"              => 0xE021,
-   "8"              => 0xE022,
-   "9"              => 0xE023,
-   "*"              => 0xE024,
-   "+"              => 0xE025,
-   ","              => 0xE026,
-   "-"              => 0xE027,
-   "."              => 0xE028,
-   "/"              => 0xE029,
-   "F1"             => 0xE031,
-   "F2"             => 0xE032,
-   "F3"             => 0xE033,
-   "F4"             => 0xE034,
-   "F5"             => 0xE035,
-   "F6"             => 0xE036,
-   "F7"             => 0xE037,
-   "F8"             => 0xE038,
-   "F9"             => 0xE039,
-   "F10"            => 0xE03A,
-   "F11"            => 0xE03B,
-   "F12"            => 0xE03C,
-   "Meta"           => 0xE03D,
-   "ZenkakuHankaku" => 0xE040,
-   "Shift"          => 0xE050,
-   "Control"        => 0xE051,
-   "Alt"            => 0xE052,
-   "Meta"           => 0xE053,
-   "PageUp"         => 0xE054,
-   "PageDown"       => 0xE055,
-   "End"            => 0xE056,
-   "Home"           => 0xE057,
-   "ArrowLeft"      => 0xE058,
-   "ArrowUp"        => 0xE059,
-   "ArrowRight"     => 0xE05A,
-   "ArrowDown"      => 0xE05B,
-   "Insert"         => 0xE05C,
-   "Delete"         => 0xE05D,
-);
+# copy&paste from the spec via browser, with added MetaLeft/MetaRight aliases
+our $SPECIAL_KEY = <<'EOF';
+"`"	"~"	"Backquote"
+"\"	"|"	"Backslash"
+"\uE003"		"Backspace"
+"["	"{"	"BracketLeft"
+"]"	"}"	"BracketRight"
+","	"<"	"Comma"
+"0"	")"	"Digit0"
+"1"	"!"	"Digit1"
+"2"	"@"	"Digit2"
+"3"	"#"	"Digit3"
+"4"	"$"	"Digit4"
+"5"	"%"	"Digit5"
+"6"	"^"	"Digit6"
+"7"	"&"	"Digit7"
+"8"	"*"	"Digit8"
+"9"	"("	"Digit9"
+"="	"+"	"Equal"
+"<"	">"	"IntlBackslash"
+"a"	"A"	"KeyA"
+"b"	"B"	"KeyB"
+"c"	"C"	"KeyC"
+"d"	"D"	"KeyD"
+"e"	"E"	"KeyE"
+"f"	"F"	"KeyF"
+"g"	"G"	"KeyG"
+"h"	"H"	"KeyH"
+"i"	"I"	"KeyI"
+"j"	"J"	"KeyJ"
+"k"	"K"	"KeyK"
+"l"	"L"	"KeyL"
+"m"	"M"	"KeyM"
+"n"	"N"	"KeyN"
+"o"	"O"	"KeyO"
+"p"	"P"	"KeyP"
+"q"	"Q"	"KeyQ"
+"r"	"R"	"KeyR"
+"s"	"S"	"KeyS"
+"t"	"T"	"KeyT"
+"u"	"U"	"KeyU"
+"v"	"V"	"KeyV"
+"w"	"W"	"KeyW"
+"x"	"X"	"KeyX"
+"y"	"Y"	"KeyY"
+"z"	"Z"	"KeyZ"
+"-"	"_"	"Minus"
+"."	">"."	"Period"
+"'"	"""	"Quote"
+";"	":"	"Semicolon"
+"/"	"?"	"Slash"
+"\uE00A"		"AltLeft"
+"\uE052"		"AltRight"
+"\uE009"		"ControlLeft"
+"\uE051"		"ControlRight"
+"\uE006"		"Enter"
+"\uE03D"		"OSLeft"
+"\uE053"		"OSRight"
+"\uE008"		"ShiftLeft"
+"\uE050"		"ShiftRight"
+" "	"\uE00D"	"Space"
+"\uE004"		"Tab"
+"\uE017"		"Delete"
+"\uE010"		"End"
+"\uE002"		"Help"
+"\uE011"		"Home"
+"\uE016"		"Insert"
+"\uE00F"		"PageDown"
+"\uE00E"		"PageUp"
+"\uE015"		"ArrowDown"
+"\uE012"		"ArrowLeft"
+"\uE014"		"ArrowRight"
+"\uE013"		"ArrowUp"
+"\uE00C"		"Escape"
+"\uE031"		"F1"
+"\uE032"		"F2"
+"\uE033"		"F3"
+"\uE034"		"F4"
+"\uE035"		"F5"
+"\uE036"		"F6"
+"\uE037"		"F7"
+"\uE038"		"F8"
+"\uE039"		"F9"
+"\uE03A"		"F10"
+"\uE03B"		"F11"
+"\uE03C"		"F12"
+"\uE01A"	"\uE05C"	"Numpad0"
+"\uE01B"	"\uE056"	"Numpad1"
+"\uE01C"	"\uE05B"	"Numpad2"
+"\uE01D"	"\uE055"	"Numpad3"
+"\uE01E"	"\uE058"	"Numpad4"
+"\uE01F"		"Numpad5"
+"\uE020"	"\uE05A"	"Numpad6"
+"\uE021"	"\uE057"	"Numpad7"
+"\uE022"	"\uE059"	"Numpad8"
+"\uE023"	"\uE054"	"Numpad9"
+"\uE025"		"NumpadAdd"
+"\uE026"		"NumpadComma"
+"\uE028"	"\uE05D"	"NumpadDecimal"
+"\uE029"		"NumpadDivide"
+"\uE007"		"NumpadEnter"
+"\uE024"		"NumpadMultiply"
+"\uE027"		"NumpadSubtract"
+
+"\uE03D"		"MetaLeft"
+"\uE053"		"MetaRight"
+EOF
+
+our %SPECIAL_KEY;
+
+sub _special_key($) {
+   # parse first time
+   %SPECIAL_KEY || do {
+      for (split /\n/, $SPECIAL_KEY) {
+         s/"//g or next;
+         my ($k, $s, $name) = split /\t/;
+
+         # unescape \uXXXX, convert string to codepoint
+         $_ = /^\\u/ ? hex substr $_, 2 : ord
+            for $k, $s;
+
+         $SPECIAL_KEY{$name} = $k;
+         $SPECIAL_KEY{"Shift-$name"} = $s if $s;
+
+      }
+
+      undef $SPECIAL_KEY; # save memory
+   };
+
+   exists $SPECIAL_KEY{$_[0]}
+      ? chr $SPECIAL_KEY{$_[0]}
+      : Carp::croak "AnyEvent::WebDriver::Actions: special key '$1' not known"
+}
 
 sub _kv($) {
    $_[0] =~ /^\{(.*)\}$/s
-      ? (exists $SPECIAL_KEY{$1}
-           ? chr $SPECIAL_KEY{$1}
-           : Carp::croak "AnyEvent::WebDriver::Actions: special key '$1' not known")
+      ? _special_key $1
       : $_[0]
 }
 

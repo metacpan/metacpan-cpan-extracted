@@ -1,0 +1,57 @@
+#title Tables
+
+  left || center || right || justify
+  :--- || :---:  || ----: || -------
+  lefted |  centered | righted | justified body with long line
+  foot left ||| centerf foot ||| right foot ||| justify footer
+  |+ this is the legend +|
+
+
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+|+ legend +|
+
+ | First Header  | Second Header |
+ | ------------- | ------------- |
+ | Content Cell  | Content Cell  |
+ | Content Cell  | Content Cell  |
+
+
+   First Header  | Second Header |
+   ------------- | ------------- |
+                 | Content Cell  |
+   Content Cell  | Content Cell  |
+
+
+   First Header  | Second Header
+   ------------- | -------------
+                 | Content Cell 
+   Content Cell  |              
+
+
+   First Header  | Second Header (Right) | Third (Left)
+   :-----------: | ------------: | :----
+                 | Content Cell  |
+   Content Cell (Centered)  |               | Here
+   x  |               | Here
+   Footer |||
+   |+ legend +|
+
+{{{
+   First Header  | Second Header (Right) | Third (Left)
+   :-----------: | ------------: | :----
+                 | Content Cell  |
+   Content Cell (Centered)  |               | Here
+   x  |               | Here
+   Footer |||
+   |+ legend +|
+
+
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+|+ legend +|
+}}}

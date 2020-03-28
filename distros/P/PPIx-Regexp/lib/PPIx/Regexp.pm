@@ -10,6 +10,17 @@ PPIx::Regexp - Represent a regular expression of some sort
  PPIx::Regexp::Dumper->new( $re )
      ->print();
 
+=head1 DEPRECATION NOTICE
+
+The L<postderef|/postderef Boolean> argument to L<new()|/new> is being
+put through a deprecation cycle and retracted. After the retraction,
+postfix dereferences will always be recognized. This is the default
+behaviour now.
+
+Starting with the first release after October 1 2020, the first use of
+this argument will warn. Six months after that all uses will warn. After
+a further six months, all uses will become fatal.
+
 =head1 INHERITANCE
 
 C<PPIx::Regexp> is a L<PPIx::Regexp::Node|PPIx::Regexp::Node>.
@@ -183,7 +194,7 @@ use PPIx::Regexp::Util qw{
 use Scalar::Util qw{ refaddr };
 use Text::Tabs ();
 
-our $VERSION = '0.070';
+our $VERSION = '0.071';
 
 =head2 new
 
@@ -239,7 +250,7 @@ string before it tokenizes it. For example:
      encoding => 'iso-8859-1',
  );
 
-=item index_locations boolean
+=item index_locations Boolean
 
 This Boolean option specifies whether the locations of the elements in
 the regular expression should be indexed.
@@ -273,7 +284,10 @@ being deprecated and removed in favor of
 L<PPIx::QuoteLike|PPIx::QuoteLike>. See above for details. As of version
 0.068_01, any use of this option throws an exception.
 
-=item postderef boolean
+=item postderef Boolean
+
+B<THIS ARGUMENT IS DEPRECATED>.
+See L<DEPRECATION NOTICE|/DEPRECATION NOTICE> above for the details.
 
 This option is passed on to the tokenizer, where it specifies whether
 postfix dereferences are recognized in interpolations and code. This
@@ -291,7 +305,7 @@ Note that if L<PPI|PPI> starts unconditionally recognizing postfix
 dereferences, this argument will immediately become ignored, and will be
 put through a deprecation cycle and removed.
 
-=item strict boolean
+=item strict Boolean
 
 This option is passed on to the tokenizer and lexer, where it specifies
 whether the parse should assume C<use re 'strict'> is in effect.
@@ -670,7 +684,7 @@ sub modifier_asserted {
 # This is a kluge for both determining whether the object asserts
 # modifiers (hence the 'ductype') and determining whether the given
 # modifier is actually asserted. The signature is the invocant and the
-# modifier name, which must not be undef. The return is a boolean.
+# modifier name, which must not be undef. The return is a Boolean.
 *__ducktype_modifier_asserted = \&modifier_asserted;
 
 # As of Perl 5.21.1 you can not leave off the type of a '?'-delimited

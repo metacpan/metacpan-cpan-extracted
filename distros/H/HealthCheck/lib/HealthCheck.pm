@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: A health check for your code
 use version;
-our $VERSION = 'v1.5.3'; # VERSION: 0.01
+our $VERSION = 'v1.5.4'; # VERSION: 0.01
 
 use 5.010;
 use strict;
@@ -552,7 +552,7 @@ HealthCheck - A health check for your code
 
 =head1 VERSION
 
-version v1.5.3
+version v1.5.4
 
 =head1 SYNOPSIS
 

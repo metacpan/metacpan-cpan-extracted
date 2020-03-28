@@ -59,6 +59,40 @@ use Scalar::Util qw{ refaddr };
 	'statement() returns nothing if regexp did not come from PPI::Document';
 }
 
+{
+    note 'Normalizing content for ppi()';
+
+    use PPIx::Regexp::Tokenizer;
+    my %arg = (
+	tokenizer	=> PPIx::Regexp::Tokenizer->new( '',
+	    postderef	=> 1,	# TODO
+	),
+    );
+    foreach my $short ( qw{ Code Interpolation } ) {
+	my $class = "PPIx::Regexp::Token::$short";
+	foreach my $data (
+	    { input => '$foo' },
+	    { input => '$foo[42]' },
+	    { input => '$foo->{bar}' },
+	    { input => '$foo->*@' },
+	    { input => '$foo->*[ 2 .. 4 ]' },
+	    { input => '${foo}', Interpolation => '$foo' },
+	    { input => '${ foo }', Interpolation => '$foo' },
+	    { input => '$${foo}', Interpolation => '$$foo' },
+	    { input => '@${foo}', Interpolation => '@$foo' },
+	    { input => '@{[foo]}' },
+	    { input => '$#foo' },
+	) {
+	    my $got = $class->__new( $data->{input}, %arg )->
+		__ppi_normalize_content();
+	    my $want = defined $data->{$short} ? $data->{$short} :
+		defined $data->{want} ? $data->{want} :
+		$data->{input};
+	    is $got, $want, "$short normalizes '$data->{input}' to '$want'";
+	}
+    }
+}
+
 done_testing;
 
 1;

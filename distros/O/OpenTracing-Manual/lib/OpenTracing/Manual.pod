@@ -1,0 +1,248 @@
+
+=head1 NAME
+
+OpenTracing::Manual - A quick overview about Perl5 and OpenTracing
+
+
+
+=head1 WARNING
+
+The C<OpenTracing> module on CPAN is B<NOT COMPLIANT> with anything remotely to
+L<OpenTracing.IO|https://opentracing.io> or the L<OpenTracing::Interface>.
+
+B<DO NOT USE THE OPENTRACING PACKAGE>
+
+
+
+=head1 DESCRIPTION
+
+This Manual is a quick overview of what is available in Perl related to the
+OpenTracing API related Interface Definition.
+
+This manual targets three different audiences:
+
+=over
+
+=item Application developers and Devops
+
+Those that want to add instrumentation and tracing to their appilication or
+micro services.
+
+=item Framework or Integration Developers
+
+Those writing integrations for frameworks, such that those can easily extract
+tracing information from incoming request or inject that into outgoing requests.
+
+=item Tracing service Implementation providers
+
+Those that want to have the Perl Implementation communicate with their tracing
+service provider.
+
+=back
+
+Included is a list of Perl Modules and those that are on the horizon.
+
+
+
+=head1 INTRODUCTION
+
+From the OpenTracing IO website:
+
+OpenTracing is comprised of an API specification, frameworks and libraries
+that have implemented the specification, and documentation for the project.
+OpenTracing allows developers to add instrumentation to their application code
+using APIs that do not lock them into any one particular product or vendor.
+
+Distributed tracing, also called distributed request tracing, is a method used
+to profile and monitor applications, especially those built using a
+microservices architecture. Distributed tracing helps pinpoint where failures
+occur and what causes poor performance.
+
+See also: L<OpenTracing Overview|https://opentracing.io/docs/overview/>.
+
+
+
+=head1 THE MANUAL
+
+=head2 For Application developers and Devops
+
+=head2 For Framework or Integration Developers
+
+=head2 For Tracing service Implementation providers
+
+
+
+=head1 SEE ALSO
+
+Please have a look at the following modules or distributions to get more
+detailed information about all the puzzle pieces.
+
+=over
+
+=item L<OpenTracing::Interface>
+
+The description of the interface.
+
+=item L<OpenTracing::Types>
+
+To make type-checking more easy.
+
+=item L<Test::OpenTracing>
+
+Because we made mistakes.
+
+=item L<Test::OpenTracing::Interface>
+
+Check that the classes/objects adhere to the defined OpenTracing::Interface
+description.
+
+=item L<Test::OpenTracing::Integration>
+
+Do a C<cmp_deeply> on a testing implementation.
+
+=item L<OpenTracing::GlobalTracer>
+
+Get access to a bootstrapped implementation.
+
+=item L<OpenTracing::Roles>
+
+A generic set of attributes and methods for building implementations.
+
+=item L<OpenTracing::Implementation>
+
+Bootstrap an implementation and set a global tracer.
+
+=item L<OpenTracing::Implementation::NoOp>
+
+Prevent applications from crashing.
+
+=item L<OpenTracing::Implementation::Test>
+
+Build a data structure that can be used to do a C<cmp_deeply> variant.
+
+=item L<OpenTracing::Implementation::DataDog>
+
+Send traces and spans to the DataDog agent on the local host.
+
+=item L<OpenTracing::AutoScope>
+
+Finish a span after exiting a scope.
+
+=item L<CGI::Application::Plugin::OpenTracing>
+
+Auto generate root-span on newly started trace, and on top a setup-span, a
+run-span and more.
+
+=item L<CGI::Application::Plugin::OpenTracing::DataDog>
+
+Take care of all the specifics for DataDog.
+Comes bundled with L<CGI::Application::Plugin::OpenTracing>.
+
+=back
+
+=head2 Planned work
+
+The following modules will be needed for easier instrumentation of an
+application or better framework integration and distributed tracing.
+
+=over
+
+=item L<OpenTracing::WrapScope>
+
+Wrap full-qualified named subroutines in a scope, instead of modifying all the
+codebase.
+
+=item L<DBIx::OpenTracing>
+
+Trace all C<DBI> requests, using L<DBIx::QueryLog>.
+
+=item L<LWP::UserAgent::Plugin::OpenTracing>
+
+OpenTracing C<inject_context> method for L<LWP::UserAgent>.
+
+=item L<HTTP::Tiny::Plugin::OpenTracing>
+
+OpenTracing C<inject_context> method for L<HTTP::Tiny>.
+
+=item L<Plack::Middleware::OpenTracing>
+
+OpenTracing C<extract_context> and create initial root-spans.
+
+=item L<OpenTracing::HTTP::Headers>
+
+Inject current `SpanContext`, a drop-in replacement, or even override
+everywhere!.
+
+=back
+
+=head2 The roadmap
+
+Since all the work has been done for Peceptyx, no further development will be
+done on the following, unless ...
+
+Please contact the author!
+
+=over
+
+=item L<OpenTracing::Implementation::Zipkin>
+
+See ... .
+
+=item L<OpenTracing::Implementation::Elastic>
+
+See ... .
+
+=item L<OpenTracing::Implementation::Jaeger>
+
+See ... .
+
+=item L<OpenTracing::Implementation::XRay>
+
+See ... .
+
+=item L<OpenTracing::Implementation::NewRelic>
+
+See L<New Relic APM|https://docs.newrelic.com/docs/apm>.
+
+=item L<Dancer2::Plugin::OpenTracing>
+
+See L<Dancer2::Plugin>.
+
+=item L<Mojolicious::Plugin::OpenTracing>
+
+See L<Mojolicious::Plugin>.
+
+=item L<Catalyst::Plugin::OpenTracing>
+
+See L<Catalyst>.
+
+=item L<MooX::OpenTracing>
+
+Get access to the L<OpenTracing::GlobalTracer> a la L<MooX::LogAny>.
+
+=back
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+
+
+
+
+

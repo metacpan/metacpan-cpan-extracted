@@ -16,7 +16,7 @@ UA_StatusCode				T_PACKED
 UA_String				T_PACKED
 UA_Guid					T_PACKED
 UA_ByteString				T_PACKED
-OPCUA_Open62541_NodeIdType		T_ENUM
+enum UA_NodeIdType			T_ENUM
 UA_NodeId				T_PACKED
 UA_BrowseRequest			T_PACKED
 UA_BrowseResponse			T_PACKED
@@ -30,8 +30,7 @@ OPCUA_Open62541_Server			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ServerConfig		T_PTROBJ_SPECIAL
 OPCUA_Open62541_Client			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ClientConfig		T_PTROBJ_SPECIAL
-OPCUA_Open62541_ClientState		T_ENUM
-OPCUA_Open62541_BrowseResultMask	T_ENUM
+UA_ClientState				T_ENUM
 OPCUA_Open62541_Logger			T_PTROBJ_SPECIAL
 UA_LogLevel				T_PACKED
 UA_LogCategory				T_PACKED

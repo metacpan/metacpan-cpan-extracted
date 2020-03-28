@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT = qw/ gettemplatedetail applyevent getapprovalinfo getapprovaldetail /;
 
 =head1 FUNCTION

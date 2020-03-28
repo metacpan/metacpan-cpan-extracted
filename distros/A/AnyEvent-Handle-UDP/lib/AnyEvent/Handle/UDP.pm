@@ -1,5 +1,5 @@
 package AnyEvent::Handle::UDP;
-$AnyEvent::Handle::UDP::VERSION = '0.049';
+$AnyEvent::Handle::UDP::VERSION = '0.050';
 use strict;
 use warnings;
 
@@ -24,12 +24,14 @@ sub new {
 		receive_size => $args{receive_size} || 1500,
 		family       => $args{family}       || 0,
 		autoflush    => $args{autoflush}    || 0,
+		on_bind      => $args{on_bind}      || sub {},
+		on_connect   => $args{on_connect}   || sub {},
+		fh           => $args{fh}           || bless(Symbol::gensym(), 'IO::Socket'),
 		buffers      => [],
 	}, $class;
 	$self->{$_} = $args{$_} for grep { exists $args{$_} } qw/on_drain on_error on_timeout on_rtimeout on_wtimeout/;
 	$self->{$_} = AE::now() for qw/activity ractivity wactivity/;
 
-	$self->{fh} = bless Symbol::gensym(), 'IO::Socket';
 	$self->_bind_to($self->{fh}, $args{bind}) if exists $args{bind};
 	$self->_connect_to($self->{fh}, $args{connect}) if exists $args{connect};
 
@@ -100,7 +102,7 @@ for my $dir ('', 'r', 'w') {
 			$self->{$activity} = $now;
 			my $time = $self->{$on_timeout};
 			my $error = do { local $! = Errno::ETIMEDOUT; "$!" };
-			$time ? $time->($self) : $self->_error->(0, $error);
+			$time ? $time->($self) : $self->_error(0, $error);
 			return if not exists $self->{$timeout};
 		}
 		Scalar::Util::weaken($self);
@@ -148,7 +150,7 @@ sub bind_to {
 my $add_reader = sub {
 	my $self = shift;
 	$self->{reader} = AE::io($self->{fh}, 0, sub {
-		while (defined (my $addr = recv $self->{fh}, my ($buffer), $self->{receive_size}, 0)) {
+		while (exists $self->{reader} and defined (my $addr = recv $self->{fh}, my ($buffer), $self->{receive_size}, 0)) {
 			$self->timeout_reset;
 			$self->rtimeout_reset;
 			$self->{on_recv}->($buffer, $self, $addr);
@@ -163,19 +165,25 @@ sub _bind_to {
 	my $bind_to = sub {
 		my ($domain, $type, $proto, $sockaddr) = @_;
 		if (!Scalar::Util::openhandle($fh)) {
-			socket $fh, $domain, $type, $proto or redo;
+			socket $fh, $domain, $type, $proto or die "Could not create socket: $!";
 			AnyEvent::Util::fh_nonblocking $fh, 1;
-			setsockopt $fh, Socket::SOL_SOCKET, Socket::SO_REUSEADDR, 1 or $self->_error(1, "Couldn't set so_reuseaddr: $!") if $self->{reuse_addr};
+			setsockopt $fh, Socket::SOL_SOCKET, Socket::SO_REUSEADDR, 1 or die "Couldn't set so_reuseaddr: $!" if $self->{reuse_addr};
 			$add_reader->($self);
 		}
-		bind $fh, $sockaddr or $self->_error(1, "Could not bind: $!");
+		if (bind $fh, $sockaddr) {
+			$self->{on_bind}->();
+		}
+		else {
+			die "Could not bind: $!";
+		}
 	};
 	if (ref $addr) {
 		my ($host, $port) = @{$addr};
 		_on_addr($self, $fh, $host, $port, $bind_to);
 	}
 	else {
-		$bind_to->(Socket::sockaddr_family($addr), Socket::SOCK_DGRAM, 0, $addr);
+		eval { $bind_to->(Socket::sockaddr_family($addr), Socket::SOCK_DGRAM, 0, $addr); 1 }
+			or $self->_error(1, $@);
 	}
 	return;
 }
@@ -190,18 +198,24 @@ sub _connect_to {
 	my $connect_to = sub {
 		my ($domain, $type, $proto, $sockaddr) = @_;
 		if (!Scalar::Util::openhandle($fh)) {
-			socket $fh, $domain, $type, $proto or redo;
+			socket $fh, $domain, $type, $proto or die "Could not create socket: $!";
 			AnyEvent::Util::fh_nonblocking $fh, 1;
 			$add_reader->($self);
 		}
-		connect $fh, $sockaddr or $self->_error(1, "Could not connect: $!");
+		if (connect $fh, $sockaddr) {
+			$self->{on_connect}->();
+		}
+		else {
+			die "Could not connect: $!";
+		}
 	};
 	if (ref $addr) {
 		my ($host, $port) = @{$addr};
 		_on_addr($self, $fh, $host, $port, $connect_to);
 	}
 	else {
-		$connect_to->(Socket::sockaddr_family($addr), Socket::SOCK_DGRAM, 0, $addr);
+		eval { $connect_to->(Socket::sockaddr_family($addr), Socket::SOCK_DGRAM, 0, $addr); 1 }
+			or $self->_error(1, $@);
 	}
 	return;
 }
@@ -218,11 +232,11 @@ sub _on_addr {
 
 	AnyEvent::Socket::resolve_sockaddr($host, $port, 'udp', $get_family->($self, $fh), Socket::SOCK_DGRAM, sub {
 		my @targets = @_;
-		while (1) {
-			my $target = shift @targets or $self->_error(1, "Could not resolve $host:$port");
-			$on_success->(@{$target});
-			last;
+		while (@targets) {
+			my $target = shift @targets;
+			eval { $on_success->(@{$target}); 1 } and return;
 		}
+		$self->_error(1, "Could not resolve $host:$port")
 	});
 	return;
 }
@@ -315,7 +329,7 @@ AnyEvent::Handle::UDP - client/server UDP handles for AnyEvent
 
 =head1 VERSION
 
-version 0.049
+version 0.050
 
 =head1 SYNOPSIS
 
@@ -340,6 +354,14 @@ The callback for when a package arrives. It takes three arguments: the datagram,
 =head2 on_error
 
 The callback for when an error occurs. It takes three arguments: the handle, a boolean indicating the error is fatal or not, and the error message.
+
+=head2 on_bind
+
+The callback for when the bind has been performed (this may be after object construction if address lookup is involved).
+
+=head2 on_connect
+
+The callback for when the connect has been performed (this may be after object construction if address lookup is involved).
 
 =head2 on_drain
 

@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.10';
+our $VERSION = '0.16';
 
 
 use Role::MethodReturns;
 
-use OpenTracing::Types qw/Reference Scope ScopeManager Span SpanContext/;
+use OpenTracing::Types qw/ContextReference Scope ScopeManager Span SpanContext/;
 use Types::Standard qw/Any ArrayRef Bool Dict HashRef Optional Str/;
 use Types::Common::Numeric qw/PositiveOrZeroNum/;
 
@@ -45,7 +45,7 @@ around start_active_span => instance_method ( Str  $operation_name, @options ) {
     ( Dict[
         
         child_of                => Optional[ Span | SpanContext ],
-        references              => Optional[ ArrayRef[ Reference ]],
+        references              => Optional[ ArrayRef[ ContextReference ]],
         tags                    => Optional[ HashRef[ Str ] ],
         start_time              => Optional[ PositiveOrZeroNum ],
         ignore_active_span      => Optional[ Bool ],
@@ -69,7 +69,7 @@ around start_span => instance_method ( Str $operation_name, @options ) {
     ( Dict[
         
         child_of                => Optional[ Span | SpanContext ],
-        references              => Optional[ ArrayRef[ Reference ]],
+        references              => Optional[ ArrayRef[ ContextReference ]],
         tags                    => Optional[ HashRef[ Str ] ],
         start_time              => Optional[ PositiveOrZeroNum ],
         ignore_active_span      => Optional[ Bool ],

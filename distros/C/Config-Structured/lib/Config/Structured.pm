@@ -1,5 +1,5 @@
 package Config::Structured;
-$Config::Structured::VERSION = '2.000';
+$Config::Structured::VERSION = '2.001';
 # ABSTRACT: Provides generalized and structured configuration value access
 
 use 5.022;
@@ -17,6 +17,8 @@ use Data::DPath qw(dpath);
 use Readonly;
 
 use Config::Structured::Deserializer;
+
+use Data::Printer;
 
 use experimental qw(signatures lexical_subs);
 
@@ -98,8 +100,8 @@ sub _add_helper {
 sub BUILD ($self, $args) {
   # lexical subroutines
 
-  state sub carpp($msg) {
-    carp('[' . __PACKAGE__ . "] $msg");
+  state sub pkg_prefix($msg) {
+    '[' . __PACKAGE__ . "] $msg";
   }
 
   state sub is_hashref($node) {
@@ -147,7 +149,7 @@ sub BUILD ($self, $args) {
     if (defined($tc)) {
       return $tc->check($value);
     } else {
-      carpp("Invalid typeconstraint '$isa'. Skipping typecheck");
+      carp(pkg_prefix "Invalid typeconstraint '$isa'. Skipping typecheck");
       return 1;
     }
   }
@@ -159,7 +161,8 @@ sub BUILD ($self, $args) {
       my $isa = $el->{isa};
       my $v   = node_value($el, dpath($path)->matchr($self->_config)->[0]);
       if (defined($v)) {
-        typecheck($isa, $v) and return $v or carpp("Value '$v' does not conform to type '$isa'");
+        return $v if (typecheck($isa, $v));
+        carp(pkg_prefix "Value '" . np($v) . "' does not conform to type '$isa' for node $path");
       }
       return;
     }
@@ -178,7 +181,7 @@ sub BUILD ($self, $args) {
   foreach my $el (dpath($self->_base)->match($self->_structure)) {
     if (is_hashref($el)) {
       foreach my $def (keys(%{$el})) {
-        carpp("Reserved word '$def' used as config node name: ignored") and next if ($def eq any(@RESERVED));
+        carp(pkg_prefix "Reserved word '$def' used as config node name: ignored") and next if ($def eq any(@RESERVED));
         $self->meta->remove_method($def)
           ;    # if the config node refers to a method already defined on our instance, remove that method
         my $path = concat_path($self->_base, $def);    # construct the new directive path by concatenating with our base
@@ -264,7 +267,7 @@ Config::Structured - Provides generalized and structured configuration value acc
 
 =head1 VERSION
 
-version 2.000
+version 2.001
 
 =head1 SYNOPSIS
 
@@ -337,7 +340,7 @@ Mark Tyrrell <mtyrrell@concertpharma.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Concert Pharmaceuticals, Inc..
+This software is copyright (c) 2019 by Concert Pharmaceuticals, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

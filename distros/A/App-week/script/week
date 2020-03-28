@@ -17,7 +17,7 @@ Options:
     -B n    Display n months before current month (default 1).
     -C[n]   Display n months before and after current month (default 4).
     -y      Display year calender.
-    -Y n    Display n years of calender
+    -Y[n]   Display n years of calender
     -c n    Display calendar in n column (default 3).
 
     --colormap  FIELD=COLOR
@@ -31,7 +31,7 @@ Module options:
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 DESCRIPTION
 
@@ -141,7 +141,7 @@ site.
 
 =head1 SEE ALSO
 
-L<github|http://kaz-utashiro.github.io/App-week/>
+L<https://github.com/kaz-utashiro/App-week>
 
 L<Getopt::EX::Colormap>
 
@@ -216,7 +216,7 @@ my @optargs = (
     "before|B:1"    => \$opt_B,
     "C:4"           => sub { $opt_A = $opt_B = $_[1] },
     "year|y"        => \$opt_year,
-    "Y:n"           => \$opt_Y,
+    "Y:1"           => \$opt_Y,
     "column|c=n"    => \$opt_column,
     "colormap|cm=s" => \@opt_colormap,
     "colordump"     => \$opt_colordump,

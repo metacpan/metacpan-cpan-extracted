@@ -39,7 +39,9 @@ qx.Class.define("callbackery.ui.Login", {
             contentPaddingLeft   : 30,
             contentPaddingRight  : 30,
             contentPaddingTop    : 20,
-            contentPaddingBottom : 20
+            contentPaddingBottom : 20,
+            centerOnContainerResize: true,
+            centerOnAppear: true
         });
         this.getChildControl('captionbar').exclude();
         this.getChildControl('pane').set({
@@ -55,7 +57,6 @@ qx.Class.define("callbackery.ui.Login", {
         grid.setColumnAlign(1, 'right', 'middle');
         grid.setColumnWidth(0, 200);
         grid.setColumnWidth(2, 200);
-
         if (cfg.logo){
             this.add(new qx.ui.basic.Image(cfg.logo).set({
                 alignX : 'left'
@@ -124,7 +125,31 @@ qx.Class.define("callbackery.ui.Login", {
             column  : 0,
             colSpan : 3
         });
-
+        var extraActions = new qx.ui.container.Composite(
+            new qx.ui.layout.VBox(0).set({
+                alignX: 'right'
+            })
+        ).set({
+            paddingTop: 10
+        });
+        this.add(extraActions, {
+            row: 5,
+            column: 0,
+            colSpan: 3
+        });
+        if (cfg.passwordreset_popup) {
+            extraActions.add(
+                this.__makeExtraButton(
+                    cfg.passwordreset_popup,this.tr("Reset Password"))
+            );
+        }
+        if (cfg.registration_popup) {
+            extraActions.add(
+                this.__makeExtraButton(
+                    cfg.registration_popup,this.tr("Register New Account"))
+            );
+        }
+        
         if ( cfg.company_name && !cfg.hide_company){
             var who = '';
             if (cfg.company_url){
@@ -139,7 +164,7 @@ qx.Class.define("callbackery.ui.Login", {
                 textColor : '#444',
                 rich : true
             }), {
-                row    : 5,
+                row    : 6,
                 column : 0,
                 colSpan: 3
             });
@@ -191,10 +216,7 @@ qx.Class.define("callbackery.ui.Login", {
                 username.focus();
                 username.activate();
             }
-            this.center();
-        },this);
-        this.getApplicationRoot().addListener('resize',function(){
-            this.center();
+            this.__ensureIframe();
         },this);
     },
 
@@ -213,12 +235,13 @@ qx.Class.define("callbackery.ui.Login", {
             var iframe = document.getElementById("cbLoginIframe");
             if (!iframe) {
                 iframe = qx.dom.Element.create('iframe',{
-                        id: "cbLoginIframe",
-                        src: "login",
-                        style: "width:0px;height:0px;border:0px;"
-                    });
+                    id: "cbLoginIframe",
+                    style: "width:0px;height:0px;border:0px;"
+                });
                 document.body.appendChild(iframe);
             }
+            iframe.setAttribute('src',
+                'login?nocache='+Math.round(1000000*Math.random()).toString(16));
             return iframe;
         },
         __getIframeDocument: function(){
@@ -256,6 +279,24 @@ qx.Class.define("callbackery.ui.Login", {
                 callbackery.ui.MsgBox.getInstance().exc(exc);
                 this.setEnabled(true);
             }
+        },
+        __makeExtraButton: function(cfg,label) {
+            var ul = this.tr('<span style="text-decoration: underline;">%1</span>',label);
+            var button = new qx.ui.basic.Label(ul).set({
+                cursor: 'pointer',
+                rich: true
+            });
+            button.addListener('tap',function(e) {
+                var popup = new callbackery.ui.Popup(cfg);
+                popup.addListenerOnce('close', function(e) {
+                    this.getApplicationRoot().remove(popup);
+                    popup.dispose();
+                    this.setModal(true);
+                },this);
+                this.setModal(false);
+                popup.open();
+            },this);
+            return button;
         }
     }
 });

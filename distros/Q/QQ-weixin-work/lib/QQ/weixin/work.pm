@@ -38,7 +38,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT = qw/ gettoken getcallbackip /;
 
 =head1 FUNCTION

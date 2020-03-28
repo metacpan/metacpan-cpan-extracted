@@ -23,6 +23,7 @@ GetOptions(
 
    # Radio setup
    'band|B=s'    => \( my $BAND = "868MHz" ),
+   'mode|m=s'    => \( my $MODE = "GFSK-38.4kb" ),
    'channel|C=i' => \( my $CHANNEL = 1 ),
    'config=s'    => sub { $_[1] =~ m/(^.*?)=(.*)/ and $MORECONFIG{$1} = $2 },
    'pkt-length|L=i' => \( my $PKTLEN ),
@@ -42,11 +43,16 @@ $chip->mount(
 $chip->power(1)->get;
 sleep 0.05;
 
+$SIG{INT} = $SIG{TERM} = sub { exit };
+END {
+   $chip->power(0)->get if $chip;
+}
+
 $chip->reset->get;
 
 $chip->change_config(
    band => $BAND,
-   mode => "GFSK-38.4kb",
+   mode => $MODE,
 
    CHAN => $CHANNEL,
 

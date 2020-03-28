@@ -40,7 +40,7 @@ qx.Class.define("callbackery.ui.Busy", {
             zIndex: 10000
         });
         this.getApplicationRoot().add(this,{top:0,bottom:0,left:0,right:0});
-        this.__blocker = new qx.ui.core.Blocker(callbackery.ui.Desktop.getInstance()).set({
+        this.__blocker = new qx.ui.core.Blocker(this.getApplicationRoot()).set({
             opacity: 0.7,
             color   : '#fff',
             keepBlockerActive: true

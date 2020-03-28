@@ -1,0 +1,39 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '7.1101'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla::PluginBundle::Author::GSG' => '0',
+                                      'Dist::Zilla::PluginBundle::Author::GSG::Internal' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'HealthCheck::Diagnostic' => '0',
+                                      'parent' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'DBD::SQLite' => '0',
+                                   'DBI' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Strict' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -21,6 +21,7 @@ use Term::Choose::Util     qw( get_term_width );
 use Term::Form             qw();
 
 use App::DBBrowser::Auxil;
+#use App::DBBrowser::Opt::Set;      # required
 
 use open ':encoding(locale)';
 
@@ -262,39 +263,32 @@ sub __directory {
             return realpath encode 'locale_fs', $h_ref->{dirs}[0];
         }
     }
-    $sf->{i}{gc}{old_dir_idx} //= 1;
+    $sf->{i}{gc}{old_dir_idx} //= 0;
 
     DIR: while ( 1 ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} ) // {};
         my @dirs = sort @{$h_ref->{dirs}//[]};
-        my $hidden = "Choose a dir:";
         my $new_search = '  NEW search';
-        my @pre = ( $hidden, undef, $new_search );
+        my @pre = ( undef, $new_search );
         my $menu = [ @pre, map( '- ' . $_, @dirs ) ];
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $sf->{i}{gc}{old_dir_idx}, undef => '  <=' }
+            { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose a dir:', index => 1,
+              default => $sf->{i}{gc}{old_dir_idx}, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
             if ( $sf->{i}{gc}{old_dir_idx} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $sf->{i}{gc}{old_dir_idx} = 1;
+                $sf->{i}{gc}{old_dir_idx} = 0;
                 next DIR;
             }
             $sf->{i}{gc}{old_dir_idx} = $idx;
         }
         my $dir_fs;
-        if ( $menu->[$idx] eq $hidden ) {
-            require App::DBBrowser::Opt::Set;
-            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-            say "Settings";
-            $opt_set->set_options( $sf->__file_setting_menu_entries() );
-            next DIR;
-        }
-        elsif ( $menu->[$idx] eq $new_search ) {
+        if ( $menu->[$idx] eq $new_search ) {
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
             $opt_set->__new_dir_search();
@@ -333,21 +327,8 @@ sub __file_setting_menu_entries {
     my $groups = [
         { name => 'group_insert', text => '' }
     ];
-    my $options = [
-        { name => '_file_filter',       text => "- File filter",   section => 'insert' },
-        { name => '_show_hidden_files', text => "- Show hidden",   section => 'insert' },
-        { name => 'history_dirs',       text => "- Dir History",   section => 'insert' },
-        { name => '_file_encoding',     text => "- File Encoding", section => 'insert' },
-    ];
-    my $data_source_choice = $sf->{o}{insert}{'data_source_' . $sf->{i}{stmt_types}[0]};
-    if ( $data_source_choice == 2 ) {
-        unshift @$options,
-        { name => '_parse_file',    text => "- Parse tool for File",         section => 'insert' },
-        #{ name => '_parse_copy',    text => "- Parse tool for Copy & Paste", section => 'insert' },
-        { name => '_split_config',  text => "- Settings 'split'",            section => 'split'  },
-        { name => '_csv_char',      text => "- Settings 'CSV-a'",            section => 'csv'    },
-        { name => '_csv_options',   text => "- Settings 'CSV-b'",            section => 'csv'    };
-    }
+    require App::DBBrowser::Opt::Set;
+    my $options = App::DBBrowser::Opt::Set::_options( 'group_insert' );
     if ( $sf->{o}{insert}{history_dirs} == 1 ) {
         push @$options, { name => 'add_file_dir', text => "- NEW search", section => 'insert' };
     }

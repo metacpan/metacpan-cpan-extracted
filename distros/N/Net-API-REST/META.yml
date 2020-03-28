@@ -1,0 +1,70 @@
+---
+abstract: 'Implementation of RESTful API'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-API-REST
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  APR::Base64: '0'
+  APR::Pool: '0'
+  APR::Request::Apache2: '0'
+  APR::Request::Cookie: '0'
+  APR::Socket: '0'
+  APR::UUID: '0'
+  Apache2::Connection: '0'
+  Apache2::Const: '0'
+  Apache2::Log: '0'
+  Apache2::Reload: '0'
+  Apache2::Request: '0'
+  Apache2::RequestIO: '0'
+  Apache2::RequestRec: '0'
+  Apache2::RequestUtil: '0'
+  Apache2::Response: '0'
+  Apache2::ServerUtil: '0'
+  Apache2::SubRequest: '0'
+  Compress::Raw::Zlib: '2.091'
+  Cookie::Baker: '0'
+  Crypt::AuthEnc::GCM: '0.064'
+  Crypt::KeyWrap: '0.024'
+  Crypt::Mac::HMAC: '0.064'
+  Crypt::Misc: '0.064'
+  Crypt::PK::ECC: '0.064'
+  Crypt::PK::RSA: '0.064'
+  Crypt::PRNG: '0.064'
+  DateTime: '0'
+  Devel::Confess: '0'
+  Encode: '3.01'
+  HTTP::AcceptLanguage: '0.02'
+  IO::File: '0'
+  JSON: '0'
+  MIME::Base64: '3.15'
+  Regexp::Common: '0'
+  Scalar::Util: '0'
+  Test::Mock::Apache2: '0.05'
+  Test::MockObject: '1.20180705'
+  Test::More: '0'
+  TryCatch: '0'
+  URI: '0'
+  URI::Escape: '3.31'
+  URI::Query: '0.16'
+  common::sense: '0'
+  curry: '1.001000'
+  parent: '0'
+  perl: '5.006000'
+  strict: '0'
+  version: '0'
+version: v0.5.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

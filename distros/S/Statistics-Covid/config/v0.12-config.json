@@ -1,0 +1,33 @@
+# comments are allowed, otherwise it is json
+# this file does not get eval'ed, it is parsed
+# only double quotes!
+{
+	# general options
+	"fileparams" : {
+		# dir to store datafiles, each DataProvider class
+		# then has its own path to append
+		"datafiles-dir" : "../../v1-Statistics-Covid/data_cleaned/files"
+	},
+	# database IO options
+	"dbparams" : {
+		# which DB to use: SQLite, MySQL (case sensitive)
+		"dbtype" : "SQLite",
+		# the name of DB
+		# in the case of SQLite, this is a filepath
+		# all non-existing dirs will be created (by module, not by DBI)
+		"dbdir" : "../../v1-Statistics-Covid/data_cleaned/db",
+		"dbname" : "covid.sqlite",
+		# how to handle duplicates in DB? (duplicate=have same PrimaryKey)
+		# only-better : replace records in DB if outdated (meaning number of markers is less, e.g. terminal or confirmed)
+		# replace     : force replace irrespective of markers
+		# ignore      : if there is a duplicate in DB DONT REPLACE/DONT INSERT
+		# (see also Statistics::Covid::Datum for up-to-date info)
+		"replace-existing-db-record" : "only-better",
+		# options to pass to DBI::connect
+		# see https://metacpan.org/pod/DBI for all options
+		"dbi-connect-params" : {
+			"RaiseError" : 1, # die on error
+			"PrintError" : 0  # do not print errors or warnings
+		}
+	}
+}

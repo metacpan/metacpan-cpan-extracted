@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::2_0::Async::Bulk;
-$Search::Elasticsearch::Client::2_0::Async::Bulk::VERSION = '5.02';
+$Search::Elasticsearch::Client::2_0::Async::Bulk::VERSION = '6.80';
 use Moo;
 with 'Search::Elasticsearch::Client::2_0::Role::Bulk',
     'Search::Elasticsearch::Role::Is_Async';
@@ -209,7 +209,7 @@ Search::Elasticsearch::Client::2_0::Async::Bulk - A helper module for the Bulk A
 
 =head1 VERSION
 
-version 5.02
+version 6.80
 
 =head1 SYNOPSIS
 
@@ -738,11 +738,11 @@ the C<version> numbers from the original index, then you need the following:
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

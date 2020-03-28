@@ -14,11 +14,12 @@ my $build = Module::Build->new(
    test_requires => {
       'Data::Dump' => 0,
       'Test::More' => '0.88', # done_testing
+      'Test::Refcount' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
       'XS::Parse::Sublike::Builder' => 0,
-      'XS::Parse::Sublike' => '0.04',
+      'XS::Parse::Sublike' => '0.06',
    },
    license => 'perl',
    create_license => 1,

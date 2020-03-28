@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Cxn::Factory;
-$Search::Elasticsearch::Cxn::Factory::VERSION = '6.00';
+$Search::Elasticsearch::Cxn::Factory::VERSION = '6.80';
 use Moo;
 use Search::Elasticsearch::Util qw(parse_params load_plugin);
 use namespace::clean;
@@ -47,7 +47,7 @@ Search::Elasticsearch::Cxn::Factory - Used by CxnPools to create new Cxn instanc
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -60,11 +60,11 @@ It contains no user serviceable parts.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

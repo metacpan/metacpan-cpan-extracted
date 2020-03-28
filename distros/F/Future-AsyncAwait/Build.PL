@@ -32,7 +32,7 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Sublike' => '0.04', # xs_parse_sublike_any
+      'XS::Parse::Sublike' => '0.06', # xs_parse_sublike_any
       'XS::Parse::Sublike::Builder' => 0,
    },
    license => 'perl',

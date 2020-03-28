@@ -1,7 +1,7 @@
 package Regexp::Pattern::Git;
 
-our $DATE = '2019-10-24'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-03-26'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our %RE = (
     ref => {
@@ -30,7 +30,7 @@ manpage, reproduced below:
 
 7. They cannot end with a dot ..
 
-8. They cannot contain a sequence @{.
+8. They cannot contain a sequence: @ followed by {.
 
 9. They cannot be the single character @.
 
@@ -63,7 +63,7 @@ _
                          (?!/)
                          (?![^/]*//)
 
-                         # 8. cannot contain the sequence "@{"
+                         # 8. cannot contain the sequence: @ followed by {
                          (?![^@]*@\{)
 
                          # 9. cannot be single character @, implied by rule #2
@@ -75,6 +75,7 @@ _
 
                          # 6. (b) cannot end with a slash
                          (?<!/)
+
                          # 7. cannot end with a dot
                          (?<!\.)
                      )\z
@@ -149,7 +150,7 @@ Regexp::Pattern::Git - Regexp patterns related to git
 
 =head1 VERSION
 
-This document describes version 0.001 of Regexp::Pattern::Git (from Perl distribution Regexp-Pattern-Git), released on 2019-10-24.
+This document describes version 0.002 of Regexp::Pattern::Git (from Perl distribution Regexp-Pattern-Git), released on 2020-03-26.
 
 =head1 SYNOPSIS
 
@@ -192,7 +193,7 @@ slashes.
 
 =item 7. They cannot end with a dot ..
 
-=item 8. They cannot contain a sequence @{.
+=item 8. They cannot contain a sequence: @ followed by {.
 
 =item 9. They cannot be the single character @.
 
@@ -205,59 +206,76 @@ Examples:
 
  "foo/bar" =~ re("Git::ref");  # matches
 
- # A slash-separated component begins with dot (rule 1)
+A slash-separated component begins with dot (rule 1).
+
  ".foo/bar" =~ re("Git::ref");  # doesn't match
 
- # A slash-separated component begins with dot (rule 1)
+A slash-separated component begins with dot (rule 1).
+
  "foo/.bar" =~ re("Git::ref");  # doesn't match
 
- # A slash-separated component ends with ".lock" (rule 1)
+A slash-separated component ends with ".lock" (rule 1).
+
  "foo.lock/bar" =~ re("Git::ref");  # doesn't match
 
  "foo.locker/bar" =~ re("Git::ref");  # matches
 
- # A slash-separated component ends with ".lock" (rule 1)
+A slash-separated component ends with ".lock" (rule 1).
+
  "foo/bar.lock" =~ re("Git::ref");  # doesn't match
 
- # A slash-separated component ends with ".lock" (rule 1)
+A slash-separated component ends with ".lock" (rule 1).
+
  "foo/bar.lock/baz" =~ re("Git::ref");  # doesn't match
 
  "foo/bar.locker/baz" =~ re("Git::ref");  # matches
 
- # Does not contain at least one / (rule 2)
+Does not contain at least one E<sol> (rule 2).
+
  "foo" =~ re("Git::ref");  # doesn't match
 
- # Contains two consecutive dots (rule 3)
+Contains two consecutive dots (rule 3).
+
  "foo../bar" =~ re("Git::ref");  # doesn't match
 
- # Contains colon (rule 4)
+Contains colon (rule 4).
+
  "foo:/bar" =~ re("Git::ref");  # doesn't match
 
- # Contains question mark (rule 5)
+Contains question mark (rule 5).
+
  "foo?/bar" =~ re("Git::ref");  # doesn't match
 
- # Contains open bracket (rule 5)
+Contains open bracket (rule 5).
+
  "foo[2]/bar" =~ re("Git::ref");  # doesn't match
 
- # Begins with / (rule 6)
+Begins with E<sol> (rule 6).
+
  "/foo/bar" =~ re("Git::ref");  # doesn't match
 
- # Ends with / (rule 6)
+Ends with E<sol> (rule 6).
+
  "foo/bar/" =~ re("Git::ref");  # doesn't match
 
- # Contains multiple consecutive slashes
+Contains multiple consecutive slashes.
+
  "foo//bar" =~ re("Git::ref");  # doesn't match
 
- # Ends with . (rule 7)
+Ends with . (rule 7).
+
  "foo/bar." =~ re("Git::ref");  # doesn't match
 
- # Contains sequence @{ (rule 8)
+Contains sequence @{ (rule 8).
+
  "foo\@{/bar" =~ re("Git::ref");  # doesn't match
 
- # Contains sequence @{ (rule 8)
+Contains sequence @{ (rule 8).
+
  "foo\@{baz}/bar" =~ re("Git::ref");  # doesn't match
 
- # Cannot be single character @ (rule 9)
+Cannot be single character @ (rule 9).
+
  "\@" =~ re("Git::ref");  # doesn't match
 
 =item * release_tag
@@ -269,7 +287,8 @@ This is not defined by git, but just common convention.
 
 Examples:
 
- # Does not contain digit
+Does not contain digit.
+
  "release" =~ re("Git::release_tag");  # doesn't match
 
  1 =~ re("Git::release_tag");  # matches
@@ -302,13 +321,17 @@ feature.
 
 =head1 SEE ALSO
 
+L<Regexp::Pattern>
+
+Some utilities related to Regexp::Pattern: L<App::RegexpPatternUtils>, L<rpgrep> from L<App::rpgrep>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

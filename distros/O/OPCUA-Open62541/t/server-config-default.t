@@ -24,11 +24,6 @@ throws_ok { OPCUA::Open62541::ServerConfig::setDefault(1) }
 no_leaks_ok { eval { OPCUA::Open62541::ServerConfig::setDefault(1) } }
     "config type leak";
 
-# FIXME: Leads to double free in v1.0/1.0.1. Fixed in master, see
-# https://github.com/open62541/open62541/commit/f05bafc25d332d4571b2e42fb42221c2ec3cc98c
-# just call it, no way to test easily
-#$config->clean();
-
 lives_ok { $config->setCustomHostname("foo\0bar") }
     "custom hostname";
 no_leaks_ok { $config->setCustomHostname("foo\0bar") }

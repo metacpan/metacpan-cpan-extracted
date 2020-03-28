@@ -39,7 +39,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Log::ger" : "0.034",
+            "Log::ger" : "0.037",
             "Log::ger::Format" : "0.018",
             "Log::ger::Output" : "0.007",
             "Test::More" : "0.98",
@@ -59,7 +59,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-Format-Flogger"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

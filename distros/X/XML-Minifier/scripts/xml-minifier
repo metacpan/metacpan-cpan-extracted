@@ -1,0 +1,255 @@
+#!/usr/bin/env perl
+
+use XML::Minifier 'minify';
+
+use strict;
+use warnings;
+
+use Pod::Usage qw(pod2usage);
+use Getopt::Long;
+
+my %opt = ();
+my $opt_help;
+
+GetOptions (
+	"expand-entities" => \$opt{expand_entities},
+	"process-xincludes" => \$opt{process_xincludes},
+	"remove-blanks-start"   => \$opt{remove_blanks_start},
+	"remove-blanks-end"   => \$opt{remove_blanks_end},
+	"remove-spaces-line-start"   => \$opt{remove_spaces_line_start},
+	"remove-spaces-line-end"   => \$opt{remove_spaces_line_end},
+	"remove-indent"   => \$opt{remove_spaces_line_start},
+	"remove-empty-text"   => \$opt{remove_empty_text},
+	"remove-cr-lf-everywhere"   => \$opt{remove_cr_lf_everywhere},
+	"remove-spaces-everywhere"   => \$opt{remove_spaces_everywhere},
+	"keep-comments"   => \$opt{keep_comments},
+	"keep-cdata"   => \$opt{keep_cdatas},
+	"keep-pi"   => \$opt{keep_pi},
+	"keep-dtd"   => \$opt{keep_dtd},
+	"ignore-dtd"   => \$opt{ignore_dtd},
+	"no-prolog"   => \$opt{no_prolog},
+	"version=s"   => \$opt{version},
+	"encoding=s"   => \$opt{encoding},
+	"aggressive"   => \$opt{aggressive},
+	"agressive"   => \$opt{aggressive},
+	"destructive"   => \$opt{destructive},
+	"insane"   => \$opt{insane},
+	"help"   => \$opt_help          
+	) or die("Error in command line arguments (maybe \"$0 --help\" could help ?)\n");
+
+($opt_help) and pod2usage(1);
+
+my $string;
+
+while (<>) {
+        $string .= $_;
+}
+
+print minify($string, %opt);
+
+__END__
+
+=head1 NAME
+
+xml-minifier - Minify XML files
+
+=head1 SYNOPSIS
+
+xml-minifier file.xml 
+
+OR 
+
+cat file.xml | xml-minifier
+
+Options:
+
+--expand-entities            expand entities 
+
+--process-xincludes          process xincludes
+
+--remove-blanks-start        remove blanks before text
+
+--remove-blanks-end          remove blanks after text
+
+--remove-spaces-line-start   remove spaces/tabs before text (each line)
+
+--remove-spaces-line-end     remove spaces/tabs after text (each line)
+
+--remove-indent              remove spaces/tabs before text (each line
+
+--remove-empty-text          remove (pseudo) empty text
+
+--remove-cr-lf-everywhere    remove cr and lf everywhere
+
+--keep-comments              keep comments
+
+--keep-cdata                 keep cdata
+
+--keep-pi                    keep processing instructions
+
+--keep-dtd                   keep dtd
+
+--ignore-dtd                 ignore dtd
+
+--no-prolog                  remove prolog (version and encoding)
+
+--version                    specify version for the xml
+
+--encoding                   specify encoding for the xml
+
+--aggressive                 enable aggressive mode 
+
+--destructive                enable aggressive mode 
+
+--insane                     enable aggressive mode 
+
+--help                       brief help message
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--expand-entities>
+
+Expand entities. An entity is like &foo; 
+
+=item B<--process-xincludes>
+
+Process xicnludes. An xinclude is like <xi:include href="inc.xml"/>
+
+=item B<--remove-blanks-start>
+
+Remove blanks (spaces, carriage return, line feed...) in front of text nodes. 
+For instance <tag>    foo bar</tag> will become <tag>foo bar</tag>
+Agressive and therefore lossy compression.
+
+=item B<--remove-blanks-end>
+
+Remove blanks (spaces, carriage return, line feed...) at the end of text nodes. 
+For instance <tag>foo bar    </tag> will become <tag>foo bar</tag>
+Agressive and therefore lossy compression.
+
+=item B<--remove-spaces-line-start>
+
+Remove spaces and tabs at the start of each line of text nodes. 
+Agressive and therefore lossy compression.
+
+=item B<--remove-spaces-line-end>
+
+Remove spaces and tabs at the end of each line of text nodes. 
+Agressive and therefore lossy compression.
+
+=item B<--remove-indent>
+
+Remove spaces and tabs at the start of each line of text nodes. 
+It is actually an alias of B<--remove-spaces-line-start>
+Agressive and therefore lossy compression.
+
+=item B<--remove-empty-text>
+
+Remove (pseudo) empty text nodes (spaces, carriage return, line feed...). 
+
+=item B<--remove-cr-lf-everywhere>
+
+Remove carriage returns and line feed everywhere (inside text !). 
+For instance <tag>foo\nbar</tag> will become <tag>foobar</tag>
+Very aggressive and therefore lossy compression.
+
+=item B<--keep-comments>
+
+Keep comments, by default they are removed. A comment is like <!-- comment -->
+
+=item B<--keep-cdata>
+
+Keep cdata, by default they are removed. A CDATA is like <![CDATA[ my cdata ]]>
+
+=item B<--keep-pi>
+
+Keep processing instructions. A processing instruction is like <?xml-stylesheet href="style.css"/>
+
+=item B<--keep-dtd>
+
+Keep DTD.
+
+=item B<--ignore-dtd>
+
+Do not read DTD. The minifier reads the DTD to get informations about meaningful blanks.
+
+=item B<--no-version>
+
+Do not put any version.
+
+=item B<--version>
+
+Specify version.
+
+=item B<--encoding>
+
+Specify encoding.
+
+=item B<--aggressive>
+
+Enable aggressive mode. Enables options --remove-blanks-starts --remove-blanks-end --remove-empty-text if they are not defined only.
+Other options still keep their value.
+
+=item B<--destructive>
+
+Enable destructive mode. Enable options --remove-spaces-line-starts --remove-spaces-line-end if they are not defined only.
+Enable also aggressive mode.
+Other options still keep their value.
+
+=item B<--insane>
+
+Enable insane mode. Enables options --remove-cr-lf-everywhere --remove-spaces-everywhere if they are not defined only.
+Enable also destructive mode and insane mode.
+Other options still keep their value.
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> will read the standard input and minify
+
+=over 4
+
+=item Remove all useless formatting between nodes.
+
+=item Remove dtd.
+
+=item Remove processing instructions
+
+=item Remove comments.
+
+=item Remove CDATA.
+
+=back
+
+This is the default and should be perceived as lossyless minification in term of semantic (but it's not completely if you consider these things as data).
+If you want a full lossyless minification,  just use --keep arguments.
+
+In addition, you could be morte brutal and remove characters in the text nodes (sort of "cleaning") : 
+
+=over 4
+
+=item Remove empty text nodes.
+
+=item Remove starting blanks (carriage return, line feed, spaces...).
+
+=item Remove ending blanks (carriage return, line feed, spaces...).
+
+=item Remove carriage returns and line feed into text node everywhere.
+
+=item Remove spaces text node everywhere.
+
+=item Remove indentation in text node.
+
+=item Remove invisible spaces in text node.
+
+=back
+
+=cut
+

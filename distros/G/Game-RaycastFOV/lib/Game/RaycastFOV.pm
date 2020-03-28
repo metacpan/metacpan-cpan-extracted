@@ -1,10 +1,11 @@
 # -*- Perl -*-
 #
-# raycast field-of-view and related routines (see also the *.xs file)
+# raycast and shadowcast field-of-view and related routines (see also
+# the *.xs file)
 
 package Game::RaycastFOV;
 
-our $VERSION = '1.01';
+our $VERSION = '2.00';
 
 use strict;
 use warnings;
@@ -13,7 +14,7 @@ use Math::Trig ':pi';
 require XSLoader;
 
 our @EXPORT_OK =
-  qw(bypair bypairall cached_circle circle line raycast swing_circle %circle_points);
+  qw(bypair bypairall cached_circle circle line raycast shadowcast swing_circle %circle_points);
 
 XSLoader::load('Game::RaycastFOV', $VERSION);
 
@@ -117,6 +118,14 @@ our %circle_points = (
     ]
 );
 
+# shadowcast multipliers for transforming coordinates into other octants
+our @mult = (
+    [ 1, 0, 0,  -1, -1, 0,  0,  1 ],
+    [ 0, 1, -1, 0,  0,  -1, 1,  0 ],
+    [ 0, 1, 1,  0,  0,  -1, -1, 0 ],
+    [ 1, 0, 0,  1,  -1, 0,  0,  -1 ],
+);
+
 # the lack of checks are for speed, use at your own risk
 sub cached_circle (&$$$) {
     my ($callback, $x, $y, $radius) = @_;
@@ -129,6 +138,60 @@ sub cached_circle (&$$$) {
 sub raycast {
     my ($circle_cb, $line_cb, $x, $y, @rest) = @_;
     $circle_cb->(sub { line($line_cb, $x, $y, $_[0], $_[1]) }, $x, $y, @rest);
+}
+
+# http://www.roguebasin.com/index.php?title=FOV_using_recursive_shadowcasting
+# or in particular the Java and Ruby implementations
+sub shadowcast {
+    my ($startx, $starty, $radius, $bcb, $lcb, $rcb) = @_;
+    $lcb->($startx, $starty, 0, 0);
+    for my $octet (0 .. 7) {
+        _shadowcast($startx, $starty, $bcb, $lcb, $rcb, 1, 1.0, 0.0, $radius,
+            $mult[0][$octet], $mult[1][$octet], $mult[2][$octet], $mult[3][$octet]);
+    }
+}
+
+sub _shadowcast {
+    my ($startx, $starty, $bcb, $lcb, $rcb, $row, $light_start, $light_end,
+        $radius, $xx, $xy, $yx, $yy)
+      = @_;
+    return if $light_start < $light_end;
+    my $new_start = 0.0;
+    my $blocked   = 0;
+    for my $j ($row .. $radius) {
+        my $dy = -$j;
+        for my $dx ($dy .. 0) {
+            my $rslope = ($dx + 0.5) / ($dy - 0.5);
+            my $lslope = ($dx - 0.5) / ($dy + 0.5);
+            if    ($light_start < $rslope) { next }
+            elsif ($light_end > $lslope)   { last }
+            else {
+                my $curx = $startx + $dx * $xx + $dy * $xy;
+                my $cury = $starty + $dx * $yx + $dy * $yy;
+                $lcb->($curx, $cury, $dx, $dy) if $rcb->($dx, $dy);
+                if ($blocked) {
+                    if ($bcb->($curx, $cury)) {
+                        $new_start = $rslope;
+                        next;
+                    } else {
+                        $blocked     = 0;
+                        $light_start = $new_start;
+                    }
+                } else {
+                    if ($bcb->($curx, $cury) and $j < $radius) {
+                        $blocked = 1;
+                        _shadowcast(
+                            $startx, $starty,      $bcb,    $lcb,    $rcb,
+                            $j + 1,  $light_start, $lslope, $radius, $xx,
+                            $xy,     $yx,          $yy
+                        );
+                        $new_start = $rslope;
+                    }
+                }
+            }
+        }
+        last if $blocked;
+    }
 }
 
 sub swing_circle (&$$$$) {
@@ -245,6 +308,22 @@ B<point-fn> to handle what should happen at each raycasted point.
 Additional arguments I<...> will be passed to the I<circle-fn> following
 I<x> and I<y> (the center of the circle. L</"EXAMPLES"> may be of more help?
 
+=item B<shadowcast> I<x> I<y> I<radius> I<blockcb> I<litcb> I<radiuscb>
+
+Performs a shadow cast FOV calculation of the given I<radius> around the
+point I<x>, I<y>. The I<blockcb> is called with I<nx>, I<ny> and should
+determine whether that coordinate is blocked on the level map. The
+I<litcb> is also called with coordinates and should indicate that that
+cell is visible.
+
+The I<radius> callback is given the I<deltax>, I<deltay>, and I<radius>
+and should return true if the deltas are within the radious. This allows
+for different FOV shapes.
+
+The callbacks may be called with points outside of the level map. The
+I<radius> callback delta values may be negative so may need to be run
+through C<abs> or C<** 2> to determine the distance.
+
 =item B<swing_circle> I<callback> I<x0> I<y0> I<radius> I<swing>
 
 Constructs points around the given I<radius> by rotating a ray by
@@ -313,7 +392,10 @@ L<https://github.com/thrig/Game-RaycastFOV>
 
 =head1 SEE ALSO
 
-L<List::Util>, L<NetHack::FOV>
+L<Game::Xomb> uses a modified version of this module's raycast code to
+provide FOV.
+
+L<NetHack::FOV>
 
 L<https://github.com/thrig/ministry-of-silly-vaults/>
 

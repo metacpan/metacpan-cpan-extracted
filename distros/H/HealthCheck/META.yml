@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,16 +21,17 @@ name: HealthCheck
 provides:
   HealthCheck:
     file: lib/HealthCheck.pm
-    version: v1.5.3
+    version: v1.5.4
   HealthCheck::Diagnostic:
     file: lib/HealthCheck/Diagnostic.pm
-    version: v1.5.3
+    version: v1.5.4
 requires:
   List::Util: '1.43'
 resources:
   bugtracker: https://github.com/GrantStreetGroup/p5-HealthCheck/issues
   repository: git://github.com/GrantStreetGroup/p5-HealthCheck.git
-version: v1.5.3
+version: v1.5.4
 x_generated_by_perl: v5.18.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0
 x_static_install: 1

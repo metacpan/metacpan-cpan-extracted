@@ -1,40 +1,31 @@
 NAME
-    Search::Elasticsearch::Plugin::XPack - Plugin providing XPack APIs for
-    Search::Elasticsearch
+    Search::Elasticsearch::Plugin::XPack - NOOP for backward compatibility
+    wih XPack as plugin for Search::Elasticsearch
 
 VERSION
-    version 6.00
+    version 6.80
 
 SYNOPSIS
         use Search::Elasticsearch();
 
         my $es = Search::Elasticsearch->new(
             nodes   => \@nodes,
-            plugins => ['XPack']
+            #plugins => ['XPack']  <-- NO NEED ANYMORE!
         );
 
   DESCRIPTION
-    This class extends the Search::Elasticsearch client to add support for
-    the X-Pack commercial plugins.
+    This is a NOOP module that is present only for backward compatibility.
 
-    This plugin will detect which version of the Elasticsearch API you are
-    using and load the corresponding XPack API.
+    Starting from elasticsearch-perl 6.8 we moved the XPack endpoints into
+    Direct client.
 
-    For more details, see:
-
-    *   Search::Elasticsearch::Plugin::XPack::6_0
-
-    *   Search::Elasticsearch::Plugin::XPack::5_0
-
-    *   Search::Elasticsearch::Plugin::XPack::2_0
-
-    *   Search::Elasticsearch::Plugin::XPack::1_0
+    You don't need anymore to specify XPack as plugin.
 
 AUTHOR
-    Clinton Gormley <drtech@cpan.org>
+    Enrico Zimuel <enrico.zimuel@elastic.co>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2017 by Elasticsearch BV.
+    This software is Copyright (c) 2020 by Elasticsearch BV.
 
     This is free software, licensed under:
 

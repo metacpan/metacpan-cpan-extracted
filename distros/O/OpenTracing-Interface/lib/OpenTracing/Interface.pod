@@ -1,6 +1,11 @@
+
 =head1 NAME
 
 OpenTracing::Interface - API definition for OpenTransport implementations
+
+=head1 VERSION
+
+0.16
 
 =head1 DESCRIPTION
 
@@ -100,7 +105,7 @@ L<"Duck Typing"|Type::Tiny::Duck>.
 
 =over
 
-=item L<OpenTracing::Interface::Reference>
+=item L<OpenTracing::Interface::ContextReference>
 
 References are used by C<Tracer> methods C<start_span> and C<start_active_span>
 to create "casual span references"

@@ -35,6 +35,8 @@ my %WriteMakefileArgs = (
     "Crypt::Blowfish" => 0,
     "Crypt::CBC" => 0,
     "Data::Printer" => 0,
+    "DateTime::Format::ISO8601" => 0,
+    "DateTime::Format::ISO8601::Format" => 0,
     "Fcntl" => 0,
     "File::Basename" => 0,
     "File::LibMagic" => 0,
@@ -73,7 +75,7 @@ my %WriteMakefileArgs = (
     "Test2::Plugin::DieOnFail" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.027",
+  "VERSION" => "0.028",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -89,6 +91,8 @@ my %FallbackPrereqs = (
   "Crypt::Blowfish" => 0,
   "Crypt::CBC" => 0,
   "Data::Printer" => 0,
+  "DateTime::Format::ISO8601" => 0,
+  "DateTime::Format::ISO8601::Format" => 0,
   "Fcntl" => 0,
   "File::Basename" => 0,
   "File::LibMagic" => 0,

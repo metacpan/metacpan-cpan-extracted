@@ -1,0 +1,33 @@
+blib/arch/.exists
+blib/arch/auto/Net/API/REST/.exists
+blib/bin/.exists
+blib/lib/auto/Net/API/REST/.exists
+blib/lib/Net/API/.exists
+blib/lib/Net/API/REST.pm
+blib/lib/Net/API/REST/Cookies.pm
+blib/lib/Net/API/REST/JWT.pm
+blib/lib/Net/API/REST/Request.pm
+blib/lib/Net/API/REST/Response.pm
+blib/lib/Net/API/REST/Status.pm
+blib/man1/.exists
+blib/man3/.exists
+blib/man3/Net::API::REST.3
+blib/man3/Net::API::REST::JWT.3
+blib/script/.exists
+Changes
+lib/Net/API/REST.pm
+lib/Net/API/REST/Cookies.pm
+lib/Net/API/REST/DateTime.pm
+lib/Net/API/REST/JWT.pm
+lib/Net/API/REST/Request.pm
+lib/Net/API/REST/Response.pm
+lib/Net/API/REST/Status.pm
+LICENSE
+Makefile.PL
+MANIFEST
+pm_to_blib
+README
+t/00.load.t
+t/01.routes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

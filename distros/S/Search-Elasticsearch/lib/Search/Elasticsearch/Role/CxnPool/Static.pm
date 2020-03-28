@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::CxnPool::Static;
-$Search::Elasticsearch::Role::CxnPool::Static::VERSION = '6.00';
+$Search::Elasticsearch::Role::CxnPool::Static::VERSION = '6.80';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::CxnPool';
 requires 'next_cxn';
@@ -39,7 +39,7 @@ Search::Elasticsearch::Role::CxnPool::Static - A CxnPool role for connecting to 
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 METHODS
 
@@ -52,11 +52,11 @@ before the next time that cxn is used for a request.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

@@ -205,7 +205,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                             this.fireDataEvent('actionResponse',{action: 'cancel'});
                             break;
                         case 'popup':
-                        var popup = new callbackery.ui.Popup(btCfg,getFormData);
+                            var popup = new callbackery.ui.Popup(btCfg,getFormData);
                             popup.addListenerOnce('close',function(){
                                 // wait for stuff to happen befor we rush into
                                 // disposing the popup
@@ -218,9 +218,6 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                     this.fireDataEvent('actionResponse',{action: ( btCfg.options && btCfg.options.reloadStatusOnClose ) ? 'reloadStatus' : 'reload'});
                                 }
                             },this);
-                            if (btCfg.set){
-                                popup.set(btCfg.set);
-                            }
                             popup.open();
                             break;
                         case 'logout':

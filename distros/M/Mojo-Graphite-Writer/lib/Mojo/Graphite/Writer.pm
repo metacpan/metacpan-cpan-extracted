@@ -10,7 +10,7 @@ use Mojo::Promise;
 
 use constant DEBUG => $ENV{MOJO_GRAPHITE_WRITER_DEBUG};
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 $VERSION = eval $VERSION;
 
 has address    => sub { Carp::croak 'address is required' };
@@ -209,7 +209,7 @@ This module's development was sponsored by L<ServerCentral Turing Group|https://
 
 =head1 SOURCE REPOSITORY
 
-L<http://github.com/jberger/Mojo-Redfish-Client>
+L<http://github.com/jberger/Mojo-Graphite-Writer>
 
 =head1 AUTHOR
 

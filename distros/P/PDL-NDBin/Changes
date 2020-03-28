@@ -1,5 +1,12 @@
 Revision history for PDL::NDBin
 
+0.019     2020-03-26 10:19:45+01:00 Europe/Brussels
+
+ - fixed the test suite breaking because recent versions of PDL::Lite no longer
+   export sequence() (RT #131753) (GitHub issue #2:
+   https://github.com/ebaudrez/PDL-NDBin/issues/2). Reported by Slaven Rezić
+   and Rebecca Loiselle (thank you!).
+
 0.018     2015-09-15 15:50:41+02:00 Europe/Brussels
 
  - the PDL function propogate_badflag() has been renamed to propagate_badflag()

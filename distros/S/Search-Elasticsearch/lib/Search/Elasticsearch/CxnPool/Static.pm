@@ -1,5 +1,5 @@
 package Search::Elasticsearch::CxnPool::Static;
-$Search::Elasticsearch::CxnPool::Static::VERSION = '6.00';
+$Search::Elasticsearch::CxnPool::Static::VERSION = '6.80';
 use Moo;
 with 'Search::Elasticsearch::Role::CxnPool::Static',
     'Search::Elasticsearch::Role::Is_Sync';
@@ -50,7 +50,7 @@ Search::Elasticsearch::CxnPool::Static - A CxnPool for connecting to a remote cl
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 SYNOPSIS
 
@@ -177,11 +177,11 @@ From L<Search::Elasticsearch::Role::CxnPool>
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

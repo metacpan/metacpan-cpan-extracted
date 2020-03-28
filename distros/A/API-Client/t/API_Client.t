@@ -79,7 +79,229 @@ version: ro, opt, Str
 =description
 
 This package provides an abstraction and method for rapidly developing HTTP API
-clients.
+clients. While this module can be used to interact with APIs directly,
+API::Client was designed to be consumed (subclassed) by higher-level
+purpose-specific API clients.
+
++=head1 THIN CLIENT
+
+The thin API client library is advantageous as it has complete API coverage and
+can easily adapt to changes in the API with minimal effort. As a thin-client
+superclass, this module does not map specific HTTP requests to specific
+routines, nor does it provide parameter validation, pagination, or other
+conventions found in typical API client implementations; Instead, it simply
+provides a simple and consistent mechanism for dynamically generating HTTP
+requests.  Additionally, this module has support for debugging and retrying API
+calls as well as throwing exceptions when 4xx and 5xx server response codes are
+returned.
+
+=cut
+
+=scenario building
+
+Building up an HTTP request is extremely easy, simply call the L</resource> to
+create a new object instance representing the API endpoint you wish to issue a
+request against.
+
+=example building
+
+  # given: synopsis
+
+  my $resource = $client->resource('get');
+
+  # GET /get
+  my $get = $client->resource('get')->dispatch;
+
+  # HEAD /head
+  my $head = $client->resource('head')->dispatch(
+    method => 'head'
+  );
+
+  # PATCH /patch
+  my $patch = $client->resource('patch')->dispatch(
+    method => 'patch'
+  );
+
+  [$get, $head, $patch]
+
+=cut
+
+=scenario chaining
+
+Because each call to L</resource> returns a new object instance configured with
+a path (resource locator) based on the supplied parameters, reuse and request
+isolation are made simple, i.e., you will only need to configure the client
+once in your application.
+
+=example chaining
+
+  # given: synopsis
+
+  # https://httpbin.org/users
+  my $users = $client->resource('users');
+
+  # https://httpbin.org/users/c09e91a
+  my $user = $client->resource('users', 'c09e91a');
+
+  # https://httpbin.org/users/c09e91a
+  my $new_user = $users->resource('c09e91a');
+
+  [$users, $user, $new_user]
+
+=cut
+
+=scenario fetching
+
+This example illustrates how you might fetch an API resource.
+
+=example fetching
+
+  # given: synopsis
+
+  my $tx1 = $client->resource('get')->fetch(
+    query => {active => 1}
+  );
+
+  # is equivalent to
+
+  my $tx2 = $client->resource('get')->dispatch(
+    method => 'get',
+    query => {active => 1}
+  );
+
+  [$tx1, $tx2]
+
+=cut
+
+=scenario creating
+
+This example illustrates how you might create a new API resource.
+
+=example creating
+
+  # given: synopsis
+
+  my $tx1 = $client->resource('post')->create(
+    json => {active => 1}
+  );
+
+  # is equivalent to
+
+  my $tx2 = $client->resource('post')->dispatch(
+    method => 'post',
+    json => {active => 1}
+  );
+
+  [$tx1, $tx2]
+
+=cut
+
+=scenario updating
+
+This example illustrates how you might update a new API resource.
+
+=example updating
+
+  # given: synopsis
+
+  my $tx1 = $client->resource('put')->update(
+    json => {active => 1}
+  );
+
+  # is equivalent to
+
+  my $tx2 = $client->resource('put')->dispatch(
+    method => 'put',
+    json => {active => 1}
+  );
+
+  [$tx1, $tx2]
+
+=cut
+
+=scenario deleting
+
+This example illustrates how you might delete a new API resource.
+
+=example deleting
+
+  # given: synopsis
+
+  my $tx1 = $client->resource('delete')->delete(
+    json => {active => 1}
+  );
+
+  # is equivalent to
+
+  my $tx2 = $client->resource('delete')->dispatch(
+    method => 'delete',
+    json => {active => 1}
+  );
+
+  [$tx1, $tx2]
+
+=cut
+
+=scenario transacting
+
+An HTTP request is only issued when the L</dispatch> method is called, directly
+or indirectly. Those calls return a L<Mojo::Transaction> object which provides
+access to the C<request> and C<response> objects.
+
+=example transacting
+
+  # given: synopsis
+
+  my $tx1 = $client->resource('patch')->patch(
+    json => {active => 1}
+  );
+
+  # is equivalent to
+
+  my $tx2 = $client->resource('patch')->dispatch(
+    method => 'patch',
+    json => {active => 1}
+  );
+
+  [$tx1, $tx2]
+
+=cut
+
+=scenario subclassing
+
+This package was designed to be subclassed and provides hooks into the client
+building and request dispatching processes. Specifically, there are three
+useful hooks (i.e. methods, which if present are used to build up the client
+object and requests), which are, the C<auth> hook, which should return a
+C<Tuple[Str, Str]> which is used to configure the basic auth header, the
+C<base> hook which should return a C<Tuple[Str]> which is used to configure the
+base URL, and the C<headers> hook, which should return a
+C<ArrayRef[Tuple[Str, Str]]> which are used to configure the HTTP request
+headers.
+
+=example subclassing
+
+  package Hookbin;
+
+  use Data::Object::Class;
+
+  extends 'API::Client';
+
+  sub auth {
+    ['admin', 'secret']
+  }
+
+  sub headers {
+    [['Accept', '*/*']]
+  }
+
+  sub base {
+    ['https://httpbin.org/get']
+  }
+
+  package main;
+
+  my $hookbin = Hookbin->new;
 
 =cut
 
@@ -346,6 +568,82 @@ SKIP: {
       ok my $result = $tryable->result;
 
       $result
+    });
+
+    $subs->scenario('building', fun($tryable) {
+      require Scalar::Util;
+      ok my $result = $tryable->result;
+
+      my $get = $result->[0];
+      my $head = $result->[1];
+      my $patch = $result->[2];
+
+      isnt Scalar::Util::refaddr($get), Scalar::Util::refaddr($head);
+      isnt Scalar::Util::refaddr($get), Scalar::Util::refaddr($patch);
+      isnt Scalar::Util::refaddr($head), Scalar::Util::refaddr($patch);
+
+      is $get->req->method, 'get';
+      is $head->req->method, 'head';
+      is $patch->req->method, 'patch';
+    });
+
+    $subs->scenario('chaining', fun($tryable) {
+      require Scalar::Util;
+      ok my $result = $tryable->result;
+
+      my $users = $result->[0];
+      my $user = $result->[1];
+      my $new_user = $result->[2];
+
+      isnt Scalar::Util::refaddr($users), Scalar::Util::refaddr($user);
+      isnt Scalar::Util::refaddr($users), Scalar::Util::refaddr($new_user);
+      isnt Scalar::Util::refaddr($user), Scalar::Util::refaddr($new_user);
+
+      is $users->url->to_string, 'https://httpbin.org/users';
+      is $user->url->to_string, 'https://httpbin.org/users/c09e91a';
+      is $new_user->url->to_string, 'https://httpbin.org/users/c09e91a';
+    });
+
+    $subs->scenario('fetching', fun($tryable) {
+      ok my $result = $tryable->result;
+
+      ;
+    });
+
+    $subs->scenario('creating', fun($tryable) {
+      ok my $result = $tryable->result;
+
+      ;
+    });
+
+    $subs->scenario('updating', fun($tryable) {
+      ok my $result = $tryable->result;
+
+      ;
+    });
+
+    $subs->scenario('deleting', fun($tryable) {
+      ok my $result = $tryable->result;
+
+      ;
+    });
+
+    $subs->scenario('transacting', fun($tryable) {
+      ok my $result = $tryable->result;
+
+      ;
+    });
+
+    $subs->scenario('subclassing', fun($tryable) {
+      ok my $result = $tryable->result;
+      ok $result->isa('Hookbin');
+      ok $result->isa('API::Client');
+
+      is_deeply $result->auth, ['admin', 'secret'];
+      is_deeply $result->headers, [['Accept', '*/*']];
+      is_deeply $result->base, ['https://httpbin.org/get'];
+      is $result->url->to_string, 'https://httpbin.org/get';
+      is $result->name, 'Hookbin (0.01)';
     });
 
     $subs->example(-1, 'create', 'method', fun($tryable) {

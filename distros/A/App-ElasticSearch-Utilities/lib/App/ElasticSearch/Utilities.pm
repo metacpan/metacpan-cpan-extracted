@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '7.5'; # VERSION
+our $VERSION = '7.6'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -420,7 +420,7 @@ sub es_request {
             $msg = $resp->{message};
         };
         die sprintf "es_request(%s/%s) failed[%d]:\n%s",
-                    $index, $options->{command}, $resp->code, $msg;
+                    $index, $options->{command}, $resp->code, $msg || 'missing error message';
 
     } elsif( !defined $resp->content || ( !is_ref($resp->content) && !length $resp->content )) {
         output({color=>'yellow',stderr=>1},
@@ -884,7 +884,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 7.5
+version 7.6
 
 =head1 SYNOPSIS
 
@@ -1386,13 +1386,17 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Shatlovsky Surikov Daniel Ostermeier Jason Rojas Kang-min Liu Lisa Hare Markus Linnala Mohammad S Anwar Samit Badle Takumi Sakamoto
+=for stopwords Alexey Shatlovsky Vitaly Shupak Surikov Daniel Ostermeier Jason Rojas Kang-min Liu Lisa Hare Markus Linnala Mohammad S Anwar Samit Badle Takumi Sakamoto
 
 =over 4
 
 =item *
 
 Alexey Shatlovsky <alexey.shatlovsky@booking.com>
+
+=item *
+
+Vitaly Shupak <vitaly.shupak@deshaw.com>
 
 =item *
 
@@ -1480,7 +1484,7 @@ L<https://github.com/reyjrar/es-utils>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Brad Lhotsky.
+This software is Copyright (c) 2020 by Brad Lhotsky.
 
 This is free software, licensed under:
 

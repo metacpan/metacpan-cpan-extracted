@@ -1,5 +1,5 @@
 package kateb::Install;
-$kateb::Install::VERSION = '01.00.10';
+$kateb::Install::VERSION = '01.00.12';
 
 use strict;
 use warnings;
@@ -40,7 +40,7 @@ sub new {
 			errlist => [],
 			fonts   => '',
 		};
-	} elsif ($args[0] =~ /all|-a/) {
+	} elsif ($args[0] =~ /^all$|^-a$/) {
 		$self ={
 			error   => 0,
 			message => "ok!",
@@ -285,7 +285,7 @@ sub _unzip {
 			$zip->extractMember( $file, catfile($cache_dir, $file_name) );
 			push @extracted_fonts, catfile($cache_dir, $file_name);
 		}
-	} elsif ($font_name =~ /ganjnameh|nika|mikhak/)
+	} elsif ($font_name =~ /^ganjnameh$|^nika$|^mikhak$|^shahab$/)
 	{
 		foreach my $file (grep { m{.*\.ttf$}g } $zip->memberNames())
 		{
@@ -293,7 +293,7 @@ sub _unzip {
 			$zip->extractMember( $file, catfile($cache_dir, $file_name) );
 			push @extracted_fonts, catfile($cache_dir, $file_name);
 		}
-	} elsif ($font_name =~ /pfont/)
+	} elsif ($font_name =~ /^pfont$/)
 	{
 		foreach my $file (grep { m{(?<!__MACOSX\/)pfont/ttf/Hinted/.*\.ttf$}g } $zip->memberNames())
 		{
@@ -328,8 +328,8 @@ sub _download {
 		env_proxy  => 1,
 	);
 
-	my $file;	   # name of file we download into
-	my $length;	 # total number of bytes to download
+	my $file;	    # name of file we download into
+	my $length;	    # total number of bytes to download
 	my $flength;	# formatted length
 	my $size = 0;   # number of bytes received
 	my $start_t;	# start time of download
@@ -492,5 +492,3 @@ BEGIN {
 
 
 1;
-
-

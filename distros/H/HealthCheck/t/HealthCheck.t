@@ -4,7 +4,7 @@ use Test::More;
 
 use HealthCheck;
 
-my $nl = $] >= 5.016 ? ".\n" : "\n";
+my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 
 { note "Require instance methods";
     foreach my $method (qw( register check )) {

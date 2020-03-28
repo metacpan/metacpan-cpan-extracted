@@ -42,6 +42,14 @@ use testcase "t::func";
 
    is( withoptparam,      3, 'func with optional param missing' );
    is( withoptparam( 2 ), 4, 'func with optional param present' );
+
+   func has_whitespace (
+      $x
+   ) {
+      return $x;
+   }
+
+   is( has_whitespace( "value" ), "value", 'func with whitespace in signature' );
 }
 
 # RT131571

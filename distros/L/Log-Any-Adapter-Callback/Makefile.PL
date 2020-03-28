@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Send Log::Any logs to a subroutine",
+  "ABSTRACT" => "(DEPRECATED) Send Log::Any logs to a subroutine",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.100",
+  "VERSION" => "0.101",
   "test" => {
     "TESTS" => "t/*.t"
   }

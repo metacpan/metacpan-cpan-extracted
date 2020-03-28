@@ -27,7 +27,7 @@ GetOptions(\%OPT, qw(
     bg-filter=s
     by=s
     desc
-    exists=s
+    exists=s@
     fields
     filter
     format=s
@@ -36,7 +36,7 @@ GetOptions(\%OPT, qw(
     manual|m
     match-all
     max-batch-size=i
-    missing=s
+    missing=s@
     no-decorators|no-header
     no-implications|no-imply
     prefix=s@
@@ -169,6 +169,7 @@ if ( exists $OPT{show} && scalar @{ $OPT{show} } ) {
     foreach my $args (@{ $OPT{show} }) {
         push @SHOW, grep { defined && length } split /,/, $args;
     }
+    $q->set_fields([$CONFIG{timestamp},@SHOW]);
 }
 # How to sort
 my $SORT = [ { $CONFIG{timestamp} => $ORDER } ];
@@ -194,14 +195,13 @@ pod2usage({-exitval=>1, -verbose=>0, -sections=>'SYNOPSIS', -msg=>'Please specif
     if exists $OPT{tail} && !@SHOW;
 
 # Process extra parameters
-if( exists $OPT{exists} ) {
-    foreach my $field (split /[,:]/, $OPT{exists}) {
-        $q->add_bool( $context => { exists => { field => $field } } );
-    }
-}
-if( exists $OPT{missing} ) {
-    foreach my $field (split /[,:]/, $OPT{missing}) {
-        $q->add_bool( must_not => { exists => { field => $field } } );
+foreach my $presence ( qw( exists missing ) ) {
+    if( exists $OPT{$presence} ) {
+        my @fields = map { split /[,:]/ } (is_arrayref($OPT{$presence}) ? @{ $OPT{$presence} } : ($OPT{$presence}));
+        my $context = $presence eq 'exists' ? 'must' : 'must_not';
+        foreach my $field (@fields) {
+            $q->add_bool( $context => { exists => { field => $field } } );
+        }
     }
 }
 
@@ -245,7 +245,7 @@ if( exists $OPT{top} ) {
             # Skip invalid elements
             next unless defined $field and defined $size and $size > 0;
 
-            my $id = "$type.$field";
+            my $id = "$type-$field";
             # If a term agg and we haven't used this field name, simplify it
             if( $type =~ /terms$/ && !$sub_agg{$field} ) {
                 $id = $field;
@@ -307,6 +307,9 @@ elsif(exists $OPT{tail}) {
     $q->set_size($CONFIG{'max-batch-size'});
     @AGES = ($AGES[-1]);
 }
+elsif( $OPT{all} ) {
+    $q->set_size( $CONFIG{'max-batch-size'} );
+}
 else {
     $q->set_size( $CONFIG{size} < $CONFIG{'max-batch-size'} ? $CONFIG{size} : $CONFIG{'max-batch-size'} );
 }
@@ -347,9 +350,10 @@ AGES: while( !$DONE && @AGES ) {
         $header=0;
     }
 
-    debug("== Query");
-    debug_var($q->request_body);
+    debug("== Request Parameters");
     debug_var($q->uri_params);
+    debug("== Query");
+    debug(to_json $q->request_body,{allow_nonref=>1,canonical=>1,pretty=>1});
 
     # Execute the query
     my $result = $q->execute( $by_age{$age} );
@@ -377,8 +381,9 @@ AGES: while( !$DONE && @AGES ) {
     $displayed_indices{$_} = 1 for @{ $by_age{$age} };
     $TOTAL_HITS += $result->{hits}{total} if $result->{hits}{total};
 
-    my @always = ($CONFIG{timestamp});
-    if(!$OPT{'no-decorators'} && !$header && @SHOW) {
+    my @always = ();
+    push @always, $CONFIG{timestamp} unless $OPT{'no-decorators'};
+    if(!$header && @SHOW) {
         output({color=>'cyan'}, join("\t", @always,@SHOW));
         $header++;
     }
@@ -705,7 +710,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 7.5
+version 7.6
 
 =head1 SYNOPSIS
 
@@ -1060,6 +1065,12 @@ Then running:
 
 The number of results to show, default is 20.
 
+=item B<max-batch-size>
+
+When building result sets, this tool uses scroll searches.  This parameter
+controls how many docs are in each scroll.  It defaults to 50, but will be
+scaled down lower if C<size> is smaller.
+
 =item B<all>
 
 If specified, ignore the --size parameter and show me everything within the date range I specified.
@@ -1242,7 +1253,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Brad Lhotsky.
+This software is Copyright (c) 2020 by Brad Lhotsky.
 
 This is free software, licensed under:
 

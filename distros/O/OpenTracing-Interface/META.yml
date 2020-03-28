@@ -1,7 +1,7 @@
 ---
 abstract: 'API definition for OpenTransport implementations'
 author:
-  - unknown
+  - 'Theo van Hoesel (VANHOESEL) <tvanhoesel@perceptyx.com'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Most: '0'
@@ -9,6 +9,18 @@ configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - OpenTracing
+  - 'Distributed Tracing'
+  - 'Context Reference'
+  - Scope
+  - 'Scope Manager'
+  - Span
+  - 'Span Context'
+  - Tracer
+  - 'Micro Service'
+  - Observabillity
+  - APM
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,13 +30,35 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  OpenTracing::Interface::ContextReference:
+    file: lib/OpenTracing/Interface/ContextReference.pm
+    version: '0.16'
+  OpenTracing::Interface::Scope:
+    file: lib/OpenTracing/Interface/Scope.pm
+    version: '0.16'
+  OpenTracing::Interface::ScopeManager:
+    file: lib/OpenTracing/Interface/ScopeManager.pm
+    version: '0.16'
+  OpenTracing::Interface::Span:
+    file: lib/OpenTracing/Interface/Span.pm
+    version: '0.16'
+  OpenTracing::Interface::SpanContext:
+    file: lib/OpenTracing/Interface/SpanContext.pm
+    version: '0.16'
+  OpenTracing::Interface::Tracer:
+    file: lib/OpenTracing/Interface/Tracer.pm
+    version: '0.16'
+  OpenTracing::Types:
+    file: lib/OpenTracing/Types.pm
+    version: '0.16'
 requires:
   Carp: '0'
-  Role::MethodReturns: '0'
+  Role::MethodReturns: '0.04'
   Type::Library: '0'
   Type::Tiny: '1.006'
   Type::Utils: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '0'
-version: '0.12'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

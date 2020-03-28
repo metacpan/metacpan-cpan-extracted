@@ -206,6 +206,101 @@ IMPLIED PRAGMATA
     may have to make some small alterations to bring it into a conforming
     style.
 
+STYLE SUGGESTIONS
+
+    While in no way required, the following suggestions of code style
+    should be noted in order to establish a set of best practices, and
+    encourage consistency of code which uses this module.
+
+ File Layout
+
+    Begin the file with a use Object::Pad line; ideally including a
+    minimum-required version. This should be followed by the toplevel class
+    declaration for the file. As it is at toplevel there is no need to use
+    the block notation; it can be a unit class.
+
+    There is no need to use strict or apply other usual pragmata; these
+    will be implied by the class keyword.
+
+       use Object::Pad 0.16;
+    
+       class My::Classname 1.23;
+    
+       # other use statements
+    
+       # has, methods, etc.. can go here
+
+ Slot Names
+
+    Slot names should follow similar rules to regular lexical variables in
+    code - lowercase, name components separated by underscores. For tiny
+    examples such as "dumb record" structures this may be sufficient.
+
+       class Tag {
+          has $name;  method name  :lvalue { $name }
+          has $value; method value :lvalue { $value }
+       }
+
+    In larger examples with lots of non-trivial method bodies, it can get
+    confusing to remember where the slot variables come from (because we no
+    longer have the $self->{ ... } visual clue). In these cases it is
+    suggested to prefix the slot names with a leading underscore, to make
+    them more visually distinct.
+
+       class Spudger {
+          has $_grapefruit;
+    
+          ...
+    
+          method mangle {
+             $_grapefruit->peel; # The leading underscore reminds us this is a slot
+          }
+       }
+
+WITH OTHER MODULES
+
+ Syntax::Keyword::Dynamically
+
+    A cross-module integration test asserts that dynamically works
+    correctly on object instance slots:
+
+       use Object::Pad;
+       use Syntax::Keyword::Dynamically;
+    
+       class Container {
+          has $value = 1;
+    
+          method example {
+             dynamically $value = 2;
+             ,..
+             # value is restored to 1 on return from this method
+          }
+       }
+
+ Future::AsyncAwait
+
+    As of Future::AsyncAwait version 0.38 and Object::Pad version 0.15,
+    both modules now use XS::Parse::Sublike to parse blocks of code.
+    Because of this the two modules can operate together and allow class
+    methods to be written as async subs which await expressions:
+
+       use Future::AsyncAwait;
+       use Object::Pad;
+    
+       class Example
+       {
+          async method perform($block)
+          {
+             say "$self is performing code";
+             await $block->();
+             say "code finished";
+          }
+       }
+
+    These three modules combine; there is additionally a cross-module test
+    to ensure that object instance slots can be dynamically set during a
+    suspended async method.
+
 DESIGN TODOs
 
     The following points are details about the design of pad slot-based
@@ -242,6 +337,11 @@ IMPLEMENTATION TODOs
 
       * Work out why no indirect doesn't appear to work properly before
       perl 5.20.
+
+      * Work out why we don't get a Subroutine new redefined at ... warning
+      if we
+
+        sub new { ... }
 
       * The local modifier does not work on slot variables, because they
       appear to be regular lexicals to the parser at that point. A

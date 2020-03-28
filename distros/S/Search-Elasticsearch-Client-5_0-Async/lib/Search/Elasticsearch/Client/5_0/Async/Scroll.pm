@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::5_0::Async::Scroll;
-$Search::Elasticsearch::Client::5_0::Async::Scroll::VERSION = '6.00';
+$Search::Elasticsearch::Client::5_0::Async::Scroll::VERSION = '6.80';
 use Moo;
 use Search::Elasticsearch::Util qw(parse_params throw);
 use Search::Elasticsearch::Async::Util qw(thenable);
@@ -219,7 +219,7 @@ Search::Elasticsearch::Client::5_0::Async::Scroll - A helper module for scrolled
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 SYNOPSIS
 
@@ -535,11 +535,11 @@ This value can only be checked once the scroll has completed.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

@@ -97,17 +97,20 @@ ok(agree($g->Vec2LC_G(zeroes(11,11)->ndcoords->r2C)->re,
 	 (zeroes(11,11)->ndcoords*$g->GNorm)->sumover),
    "Vec2LC");
 ok(agree($g->LC2Vec_G(ones(11,11)->r2C)->re, $g->GNorm), "LC2Vec_G");
-##
-my $gw=Photonic::Geometry::FromImage2D->new(path=>'data/white.png');
-ok(defined $gw, "Create geometry from Image");
-ok($gw->npoints==11*11, "npoints");
-ok($gw->f==1, "filling fraction of white");
-my $gb=Photonic::Geometry::FromImage2D->new(path=>'data/black.png');
-ok($gb->f==0, "filling fraction of black");
-my $gbi=Photonic::Geometry::FromImage2D->new(
-   path=>'data/black.png', inverted=>1);
-ok($gbi->f==1, "filling fraction of inverted black");
 
+SKIP: {
+    skip "image converter not found", 5
+	unless rpiccan("PNG");
+    my $gw=Photonic::Geometry::FromImage2D->new(path=>'data/white.png');
+    ok(defined $gw, "Create geometry from Image");
+    ok($gw->npoints==11*11, "npoints");
+    ok($gw->f==1, "filling fraction of white");
+    my $gb=Photonic::Geometry::FromImage2D->new(path=>'data/black.png');
+    ok($gb->f==0, "filling fraction of black");
+    my $gbi=Photonic::Geometry::FromImage2D->new(
+	path=>'data/black.png', inverted=>1);
+    ok($gbi->f==1, "filling fraction of inverted black");
+}
 my $eps=zeroes(11,11)+0*i;
 my $ge=Photonic::Geometry::FromEpsilon->new(epsilon=>$eps);
 ok(defined $ge, "Create geometry from epsilon");

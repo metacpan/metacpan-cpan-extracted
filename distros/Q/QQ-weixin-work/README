@@ -1,4 +1,4 @@
-QQ::weixin::work v0.03
+QQ::weixin::work v0.04
 
 腾讯企业微信提供了服务端API管理方式，可以参见页面
 L<https://work.weixin.qq.com/api/doc/90000/90003/90556>
@@ -41,6 +41,10 @@ QQ::weixin::work::user::authsucc(access_token, userid);
 QQ::weixin::work::user::getuserinfo(access_token, code);
 11) 获取手机号随机串
 QQ::weixin::work::user::get_mobile_hashcode(access_token, hash);
+12) 邀请成员
+QQ::weixin::work::batch::invite(access_token, hash);
+13) 获取加入企业二维码
+QQ::weixin::work::corp::get_join_qrcode(access_token, size_type);
 2. 部门管理
 1) 创建部门
 QQ::weixin::work::department::create(access_token, hash);
@@ -88,6 +92,15 @@ QQ::weixin::work::message::send(access_token, hash);
 QQ::weixin::work::message::update_taskcard(access_token, hash);
 3. 查询应用消息发送统计
 QQ::weixin::work::message::get_statistics(access_token, hash);
+4. 发送消息到群聊会话
+1) 创建群聊会话
+QQ::weixin::work::appchat::create(access_token, hash);
+2) 修改群聊会话
+QQ::weixin::work::appchat::update(access_token, hash);
+3) 获取群聊会话
+QQ::weixin::work::appchat::get(access_token, chatid);
+4) 应用推送消息
+QQ::weixin::work::appchat::send(access_token, hash);
 五、OA数据接口
 1. 企业微信打卡应用
 1) 获取打卡数据
@@ -103,3 +116,27 @@ QQ::weixin::work::oa::applyevent(access_token, hash);
 QQ::weixin::work::oa::getapprovalinfo(access_token, hash);
 4) 获取审批申请详情
 QQ::weixin::work::oa::getapprovaldetail(access_token, hash);
+3. 企业微信公费电话
+获取公费电话拨打记录
+QQ::weixin::work::dial::get_dial_record(access_token, hash);
+六、日程
+1. 日历
+1) 创建日历
+QQ::weixin::work::oa::calendar::add(access_token, hash);
+2) 更新日历
+QQ::weixin::work::oa::calendar::update(access_token, hash);
+3) 获取日历
+QQ::weixin::work::oa::calendar::get(access_token, hash);
+4) 删除日历
+QQ::weixin::work::oa::calendar::del(access_token, hash);
+2. 日程
+1) 创建日程
+QQ::weixin::work::oa::schedule::add(access_token, hash);
+2) 更新日程
+QQ::weixin::work::oa::schedule::update(access_token, hash);
+3) 获取日程
+QQ::weixin::work::oa::schedule::get(access_token, hash);
+4) 取消日程
+QQ::weixin::work::oa::schedule::del(access_token, hash);
+5) 获取日历下的日程列表
+QQ::weixin::work::oa::schedule::get_by_calendar(access_token, hash);

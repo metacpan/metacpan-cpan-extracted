@@ -1,5 +1,5 @@
 package Test::Mojo::Role::Debug::JSON;
-$Test::Mojo::Role::Debug::JSON::VERSION = '0.003';
+$Test::Mojo::Role::Debug::JSON::VERSION = '0.005';
 # ABSTRACT: a JSON extension to Test::Mojo::Role::Debug
 
 use Mojo::Base -role;
@@ -9,23 +9,26 @@ with 'Test::Mojo::Role::Debug';
 use Carp qw/croak/;
 
 use Mojo::JSON qw{from_json};
+use Mojo::JSON::Pointer;
 use Test::More ();
 
 # VERSION
 
 sub djson {
-    my ( $self ) = @_;
-    return $self->success ? $self : $self->djsona;
+    my ( $self, $pointer ) = @_;
+    return $self->success ? $self : $self->djsona( $pointer );
 }
 
 sub djsona {
-    my ( $self ) = @_;
+    my ( $self, $pointer ) = @_;
 
     local $@;
     my $json = eval { from_json( $self->tx->res->content->asset->slurp ) };
 
-    Test::More::diag( $@ ) if $@;
-    Test::More::diag( "DEBUG JSON DUMPER:\n", Test::More::explain(  $json ) ) if ref $json;
+    Test::More::diag( $@ ) && return $self if $@;
+    Test::More::diag( "DEBUG JSON DUMPER:\n",
+      Test::More::explain( Mojo::JSON::Pointer->new($json)->get($pointer || '') )
+      ) if ref $json;
 
     return $self;
 }
@@ -44,7 +47,7 @@ Test::Mojo::Role::Debug::JSON - a JSON extension to Test::Mojo::Role::Debug
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -89,15 +92,18 @@ You have all the methods provided by L<Test::Mojo>, L<Test::Mojo::Role::Debug>, 
 
 =head2 C<djson>
 
-    $t->djson;         # print the answer as json
+    $t->djson;            # print the answer as json
+    $t->djson('/status'); # print specific node as json
 
 B<Returns> its invocant.
 On failure of previous tests (see L<Mojo::DOM/"success">),
-dumps the content output as json.
+dumps the content output as json. Optionally, takes a JSON pointer to aid subset
+larger responses.
 
 =head2 C<djsona>
 
     $t->djsona;
+    $t->djsona('/status');
 
 Same as L</djson>, except it always dumps, regardless of whether the previous
 test failed or not.

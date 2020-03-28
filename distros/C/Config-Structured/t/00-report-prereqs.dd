@@ -17,6 +17,7 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Data::DPath' => '0',
+                                      'Data::Printer' => '0',
                                       'File::Basename' => '0',
                                       'IO::All' => '0',
                                       'JSON' => '0',

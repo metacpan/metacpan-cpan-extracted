@@ -2043,7 +2043,7 @@ static void check_optree(pTHX_ OP *op, int forbid, COP **last_cop)
  * Keyword plugins
  */
 
-static void parse_post_blockstart(pTHX)
+static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
 {
   /* Save the identity of the currently-compiling sub so that 
    * await_keyword_plugin() can check
@@ -2051,14 +2051,14 @@ static void parse_post_blockstart(pTHX)
   hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", newSVuv(PTR2UV(PL_compcv)));
 }
 
-static OP *parse_pre_blockend(pTHX_ OP *body)
+static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
 {
   /* body might be NULL if an error happened; we check that below so for now
    * just be defensive
    */
-  if(body) {
+  if(ctx->body) {
     COP *last_cop = PL_curcop;
-    check_optree(aTHX_ body, NO_FORBID, &last_cop);
+    check_optree(aTHX_ ctx->body, NO_FORBID, &last_cop);
   }
 
   /* turn block into
@@ -2069,18 +2069,16 @@ static OP *parse_pre_blockend(pTHX_ OP *body)
   op = op_append_elem(OP_LINESEQ, op, newOP(OP_PUSHMARK, 0));
 
   OP *try;
-  op = op_append_elem(OP_LINESEQ, op, try = newUNOP(OP_ENTERTRY, 0, body));
+  op = op_append_elem(OP_LINESEQ, op, try = newUNOP(OP_ENTERTRY, 0, ctx->body));
   op_contextualize(try, G_ARRAY);
 
   op = op_append_elem(OP_LINESEQ, op, newLEAVEASYNCOP(OPf_WANT_SCALAR));
-  body = op;
-
-  return body;
+  ctx->body = op;
 }
 
-static void parse_post_newcv(pTHX_ CV *cv)
+static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
 {
-  if(CvLVALUE(cv))
+  if(CvLVALUE(ctx->cv))
     warn("Pointless use of :lvalue on async sub");
 }
 
@@ -2177,4 +2175,4 @@ BOOT:
   DMD_SET_MAGIC_HELPER(&vtbl, dumpmagic);
 #endif
 
-  boot_xs_parse_sublike(0.04);
+  boot_xs_parse_sublike(0.06);

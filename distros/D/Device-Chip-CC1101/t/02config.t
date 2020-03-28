@@ -19,9 +19,7 @@ $chip->mount(
    # Power-up defaults
    # CONFIG
    $adapter->expect_write_then_read( "\xC0", 41 )
-      ->returns( "\x29\x2E\x3F\x07\xD3\x91\xFF\x04\x45\x00\x00\x0F\x00\x1E\xC4\xEC" .
-                 "\x8C\x22\x02\x22\xF8\x47\x07\x30\x04\x36\x6C\x03\x40\x91\x87\x6B" .
-                 "\xF8\x56\x10\xA9\x0A\x20\x0D\x41\x00" );
+      ->returns( Device::Chip::CC1101->CONFIG_DEFAULT );
    # PATABLE
    $adapter->expect_write_then_read( "\xFE", 8 )
       ->returns( "\xC6\x00\x00\x00\x00\x00\x00\x00" );

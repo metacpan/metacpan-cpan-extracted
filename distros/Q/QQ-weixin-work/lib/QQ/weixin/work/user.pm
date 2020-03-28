@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT = qw/ create get update delete batchdelete
                   simplelist list convert_to_openid convert_to_userid authsucc
                   getuserinfo get_mobile_hashcode /;

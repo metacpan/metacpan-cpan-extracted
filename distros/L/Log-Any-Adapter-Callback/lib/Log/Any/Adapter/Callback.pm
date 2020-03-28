@@ -3,7 +3,7 @@ package Log::Any::Adapter::Callback;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-01-14'; # DATE
 our $DIST = 'Log-Any-Adapter-Callback'; # DIST
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.101'; # VERSION
 
 use strict;
 use warnings;
@@ -60,7 +60,7 @@ for my $method (Log::Any->detection_methods()) {
 }
 
 1;
-# ABSTRACT: Send Log::Any logs to a subroutine
+# ABSTRACT: (DEPRECATED) Send Log::Any logs to a subroutine
 
 __END__
 
@@ -70,11 +70,11 @@ __END__
 
 =head1 NAME
 
-Log::Any::Adapter::Callback - Send Log::Any logs to a subroutine
+Log::Any::Adapter::Callback - (DEPRECATED) Send Log::Any logs to a subroutine
 
 =head1 VERSION
 
-This document describes version 0.100 of Log::Any::Adapter::Callback (from Perl distribution Log-Any-Adapter-Callback), released on 2020-01-14.
+This document describes version 0.101 of Log::Any::Adapter::Callback (from Perl distribution Log-Any-Adapter-Callback), released on 2020-01-14.
 
 =head1 SYNOPSIS
 

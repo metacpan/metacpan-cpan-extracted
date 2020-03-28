@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Logger;
-$Search::Elasticsearch::Role::Logger::VERSION = '6.00';
+$Search::Elasticsearch::Role::Logger::VERSION = '6.80';
 use Moo::Role;
 
 use URI();
@@ -59,7 +59,7 @@ sub trace_request {
     return unless $self->is_trace;
 
     my $uri = URI->new( 'http://localhost:9200' . $params->{path} );
-    my %qs = ( %{ $params->{qs} }, pretty => 1 );
+    my %qs = ( %{ $params->{qs} }, pretty => "true" );
     $uri->query_form( [ map { $_, $qs{$_} } sort keys %qs ] );
 
     my $body
@@ -154,7 +154,7 @@ Search::Elasticsearch::Role::Logger - Provides common functionality to Logger im
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -256,11 +256,11 @@ Issues a deprecation warning to the deprecation logger.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

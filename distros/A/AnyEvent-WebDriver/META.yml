@@ -25,4 +25,4 @@ requires:
   AnyEvent::HTTP: '2.22'
   JSON::PP: '2.273'
   common::sense: '3.74'
-version: '1.01'
+version: '1.2'

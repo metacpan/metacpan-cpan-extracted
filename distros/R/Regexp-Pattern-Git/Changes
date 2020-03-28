@@ -1,3 +1,9 @@
+0.002   2020-03-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add workaround: avoid '@{' sequence in the regex that causes
+	  problem when put in a Sah schema.
+
+
 0.001   2019-10-24  Released-By: PERLANCAR
 
         - First release.

@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use OPCUA::Open62541 ':all';
+use OPCUA::Open62541;
 
 use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;

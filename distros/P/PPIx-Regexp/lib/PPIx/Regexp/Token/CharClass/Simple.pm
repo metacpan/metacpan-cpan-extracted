@@ -46,7 +46,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.070';
+our $VERSION = '0.071';
 
 use constant UNICODE_PROPERTY_LITERAL_VALUE => qr/
 		\{ \s* \^? \w [\w:=\s-]* \} |
@@ -59,12 +59,20 @@ use constant UNICODE_PROPERTY_LITERAL =>
 
 # CAVEAT: The following regular expression, despite its name, matches
 # ALL unicode property values. To actually match a wildcard property you
-# must first eliminate anything that matches UNICODE_PROPERTY_LITERAL.
+# must first eliminate anything that matches UNICODE_PROPERTY_LITERAL or
+# UNICODE_PROPERTY_NAME_MATCH
 use constant UNICODE_PROPERTY_WILDCARD =>
     qr/ \A \\ [Pp] \{ \s* [\w\s-]+ [:=] [^}]+ \} /smx;
 
+
+use constant UNICODE_PROPERTY_NAME_MATCH =>
+    qr< \A \\ [Pp] \{ \s* na (?: me? )? [:=] / [^/]+ / \} >smx;
+
+
 use constant UNICODE_PROPERTY =>
-    qr/ @{[ UNICODE_PROPERTY_LITERAL ]} | @{[ UNICODE_PROPERTY_WILDCARD ]} /smx;
+    qr/ @{[ UNICODE_PROPERTY_LITERAL ]} |
+	@{[ UNICODE_PROPERTY_NAME_MATCH ]} |
+	@{[ UNICODE_PROPERTY_WILDCARD ]} /smx;
 
 {
 
@@ -203,6 +211,8 @@ use constant UNICODE_PROPERTY =>
 #	    and return '5.011003';
 	$content  =~ UNICODE_PROPERTY_LITERAL
 	    and return '5.006001';
+	$content =~ UNICODE_PROPERTY_NAME_MATCH
+	    and return '5.031010';
 	$content =~ UNICODE_PROPERTY_WILDCARD
 	    and return '5.029009';
 	return MINIMUM_PERL;

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 26 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ElasticSearch/Utilities.pm',
@@ -32,6 +32,7 @@ my @scripts = (
     'scripts/es-copy-index.pl',
     'scripts/es-daily-index-maintenance.pl',
     'scripts/es-graphite-dynamic.pl',
+    'scripts/es-index-blocks.pl',
     'scripts/es-nagios-check.pl',
     'scripts/es-nodes.pl',
     'scripts/es-open.pl',

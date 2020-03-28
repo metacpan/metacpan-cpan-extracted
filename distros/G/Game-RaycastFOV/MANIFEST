@@ -2,7 +2,10 @@ Build.PL
 Changes
 LICENSE
 MANIFEST
+META.json
+META.yml
 README
+eg/shadowcast
 eg/show-circle
 lib/Game/RaycastFOV.pm
 lib/Game/RaycastFOV.xs
@@ -12,6 +15,5 @@ t/00-load.t
 t/pod-coverage.t
 t/pod.t
 t/raycast.t
-META.yml
-META.json
+t/shadowcast.t
 SIGNATURE    Added here by Module::Build

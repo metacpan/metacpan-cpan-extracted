@@ -4,6 +4,13 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.22 2020-03-28
+  - Updated Power::Outlet::Tasmota - Documentation
+
+0.21 2020-03-27
+  - Added Power::Outlet::Tasmota
+  - Added t/003_Tasmota_live.t
+
 0.20 2018-12-16
   - Added Power::Outlet::iBootBarGroup
 

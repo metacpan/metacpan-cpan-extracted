@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use OPCUA::Open62541 ':all';
+use OPCUA::Open62541 qw(STATUSCODE_GOOD :CLIENTSTATE);
 
 use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;

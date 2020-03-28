@@ -27,10 +27,26 @@ checkLocalDateTimeIsValid();
 checkLocalDateTimeToEpoch();
 checkLocalDateTimeAdd();
 checkTimeMs();
+checkIso8601DateTime();
+checkIso8601DateTimeToEpoch();
 
 done_testing;
 
 #######
+
+sub checkIso8601DateTime {
+	
+	ok(my $epoch = $DateTime->iso8601DateTime(time));
+}
+
+sub checkIso8601DateTimeToEpoch {
+
+	my $now = time;
+	my $iso8601_str = $DateTime->iso8601DateTime($now);
+	
+	ok(my $epoch = $DateTime->iso8601DateTimeToEpoch($iso8601_str));
+	ok($epoch == $now);
+}
 
 sub checkLocalDateTimeAdd {
 

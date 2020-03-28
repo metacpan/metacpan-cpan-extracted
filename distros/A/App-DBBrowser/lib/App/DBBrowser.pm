@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.247';
+our $VERSION = '2.249';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -637,8 +637,7 @@ sub __create_drop_or_attach {
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
             my $groups = [ { name => 'group_insert', text => '' } ];
-            my $options = [ { name => '_data_source', text => "- Data source", section => 'insert' } ];
-            $opt_set->set_options( $groups, $options );
+            $opt_set->set_options( $groups );
             next CREATE_DROP_ATTACH;
         }
         elsif ( $choice =~ /^-\ Create/i ) {
@@ -747,7 +746,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.247
+Version 2.249
 
 =head1 DESCRIPTION
 

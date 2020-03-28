@@ -28,34 +28,6 @@ sub new {
 }
 
 
-
-sub __setting_menu_entries {
-    my ( $sf, $all ) = @_;
-    my $groups = [
-        { name => 'group_insert', text => '' }
-    ];
-    my $options = [
-        { name => '_parse_file',    text => "- Parse tool for File",         section => 'insert' },
-        { name => '_parse_copy',    text => "- Parse tool for Copy & Paste", section => 'insert' },
-        { name => '_split_config',  text => "- Settings 'split'",            section => 'split'  },
-        { name => '_csv_char',      text => "- Settings 'CSV-a'",            section => 'csv'    },
-        { name => '_csv_options',   text => "- Settings 'CSV-b'",            section => 'csv'    },
-    ];
-    if ( ! $all ) {
-        if ( defined $sf->{i}{gc}{source_type} ) {
-            if ( $sf->{i}{gc}{source_type} eq 'file' ) {
-                splice @$options, 1, 1;
-            }
-            elsif ( $sf->{i}{gc}{source_type} eq 'copy' ) {
-                splice @$options, 0, 1;
-            }
-        }
-    }
-    return $groups, $options;
-}
-
-
-
 sub get_content {
     my ( $sf, $sql, $skip_to ) = @_;
     my $cr = App::DBBrowser::GetContent::Read->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -67,35 +39,29 @@ sub get_content {
         [ 'copy',  '- Copy & Paste' ],
         [ 'file',  '- From File' ],
     );
-    my $old_idx = 1;
+    my $old_idx = 0;
     my $data_source_choice = $sf->{o}{insert}{'data_source_' . $sf->{i}{stmt_types}[0]};
 
     MENU: while ( 1 ) {
         if ( ! $skip_to ) {
             if ( $data_source_choice == 3 ) {
-                my $hidden = "Choose type of data source:";
-                my @pre = ( $hidden, undef );
+                my @pre = ( undef );
                 my $menu = [ @pre, map( $_->[1], @choices ) ];
                 # Choose
                 my $idx = $tc->choose(
                     $menu,
-                    { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx, undef => '  <=' }
+                    { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose type of data source:', index => 1,
+                      default => $old_idx, undef => '  <=' }
                 );
                 if ( ! defined $idx || ! defined $menu->[$idx] ) {
                     return;
                 }
                 if ( $sf->{o}{G}{menu_memory} ) {
                     if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                        $old_idx = 1;
+                        $old_idx = 0;
                         next MENU;
                     }
                     $old_idx = $idx;
-                }
-                if ( $menu->[$idx] eq $hidden ) {
-                    require App::DBBrowser::Opt::Set;
-                    my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-                    $opt_set->set_options( $sf->__setting_menu_entries( 1 ) );
-                    next MENU;
                 }
                 $sf->{i}{gc}{source_type} = $choices[$idx-@pre][0];
             }
@@ -214,7 +180,7 @@ sub get_content {
                         #}
                         require App::DBBrowser::Opt::Set;
                         my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-                        $sf->{o} = $opt_set->set_options( $sf->__setting_menu_entries() );
+                        $opt_set->set_options( [ { name => 'group_insert', text => '' } ] );
                         next PARSE;
                     }
                     return 1;

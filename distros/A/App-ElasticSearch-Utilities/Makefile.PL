@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "scripts/es-copy-index.pl",
     "scripts/es-daily-index-maintenance.pl",
     "scripts/es-graphite-dynamic.pl",
+    "scripts/es-index-blocks.pl",
     "scripts/es-nagios-check.pl",
     "scripts/es-nodes.pl",
     "scripts/es-open.pl",
@@ -82,7 +83,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "7.5",
+  "VERSION" => "7.6",
   "test" => {
     "TESTS" => "t/*.t"
   }

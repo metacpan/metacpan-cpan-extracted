@@ -1,0 +1,297 @@
+##----------------------------------------------------------------------------
+## Stripe API - ~/lib/Net/API/Stripe/Generic.pm
+## Version 0.1
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2019/11/02
+## Modified 2019/11/02
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
+package Net::API::Stripe::Generic;
+BEGIN
+{
+	use strict;
+	use parent qw( Module::Generic );
+	use Net::API::Stripe;
+	use Net::API::Stripe::Number;
+	use Net::API::Stripe::Hash;
+	use TryCatch;
+    use Devel::Confess;
+    use Want;
+    our( $VERSION ) = '0.1';
+};
+
+sub init
+{
+    my $self = shift( @_ );
+    ## Get the init params always present and including keys like _parent and _field
+    my $init = shift( @_ );
+    $self->{_parent} = $init->{_parent};
+    $self->{_field} = $init->{_field};
+    $self->{_error} = '';
+    $self->{debug} = $init->{_debug};
+    $self->{_dbh} = $init->{_dbh} if( exists( $init->{_dbh} ) && $init->{_dbh} );
+    $self->{_init_strict_use_sub} = 1;
+    $self->SUPER::init( @_ );
+    return( $self );
+}
+
+sub field { return( shift->_set_get_scalar( '_field', @_ ) ); }
+
+sub parent { return( shift->_set_get_scalar( '_parent', @_ ) ); }
+
+sub TO_JSON
+{
+    my $self = shift( @_ );
+    return( $self->can( 'as_string' ) ? $self->as_string : $self );
+}
+
+sub _get_base_class
+{
+    my $self  = shift( @_ );
+    my $class = shift( @_ );
+    my $base  = __PACKAGE__;
+    $base =~ s/\:\:Generic$//;
+    my $pkg = ( $class =~ /^($base\:\:(?:[^\:]+)?)/ )[0];
+}
+
+## Overriding Module::Generic
+sub _instantiate_object
+{
+	my $self = shift( @_ );
+	my $field = shift( @_ );
+	return( $self->{ $field } ) if( exists( $self->{ $field } ) && Scalar::Util::blessed( $self->{ $field } ) );
+	my $class = shift( @_ );
+	# print( STDERR __PACKAGE__, "::_instantiate_object() called for name '$name' and class '$class'\n" );
+	# $self->message( 3, "called for name '$name' and class '$class'." );
+	my $this;
+	my $h = 
+	{
+		'_parent' => $self->{_parent},
+		'_field' => $field,
+		'_debug' => $self->{debug},
+	};
+	$h->{_dbh} = $self->{_dbh} if( $self->{_dbh} );
+	my $o;
+	try
+	{
+		## https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
+		# my $class_file = join( '/', split( /::/, $class ) ) . '.pm';
+		## if( CORE::exists( $INC{ $class_file } ) || defined( *{"${class}::"} ) )
+		# if( Class::Load::is_class_loaded( $class ) )
+# 		if( defined( ${"${class}::VERSION"} ) || scalar( @{"$class::ISA"} ) )
+# 		{
+# 			$self->message( 3, "Module $class seems to be already loaded." );
+# 		}
+# 		else
+# 		{
+# 			my $rc = eval( "require $class;" );
+# 			$self->message( 3, "Tried to load $class and got returned value $rc" );
+# 		}
+		my $rc = eval{ $self->_load_class( $class ); };
+		# print( STDERR __PACKAGE__, "::_instantiate_object(): Error while loading module $class? $@\n" );
+		# $self->message( 3, "Error while loading module $class? $@" );
+		return( $self->error( "Unable to load module $class: $@" ) ) if( $@ );
+		if( $class->isa( 'Module::Generic::Dynamic' ) )
+		{
+			$o = @_ ? $class->new( @_ ) : $class->new;
+			$o->{debug} = $self->{debug};
+			$o->{_parent} = $self->{_parent};
+			$o->{_field} = $field;
+		}
+		else
+		{
+			$o = @_ ? $class->new( $h, @_ ) : $class->new( $h );
+		}
+		return( $self->pass_error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
+	}
+	catch( $e ) 
+	{
+		# print( STDERR __PACKAGE__, "::_instantiate_object() An error occured while loading module $class for name '$name': $e\n" );
+		return( $self->error({ code => 500, message => $e }) );
+	}
+	# $self->message( 3, "Returning newly generated object $o with structure: ", $self->dumper( $o ) );
+	return( $o );
+}
+
+sub _object_type_to_class
+{
+	my $self = shift( @_ );
+	my $type = shift( @_ ) || return( $self->error( "No object type was provided" ) );
+	my $ref  = $Net::API::Stripe::TYPE2CLASS;
+	$self->messagef( 3, "\$TYPE2CLASS has %d elements", scalar( keys( %$ref ) ) );
+	return( $self->error( "No object type '$type' known to get its related class for field $self->{_field}" ) ) if( !exists( $ref->{ $type } ) );
+	return( $ref->{ $type } );
+}
+
+# sub _set_get_hash
+# {
+#     my $self  = shift( @_ );
+#     my $field = shift( @_ );
+#     if( @_ )
+#     {
+#     	my $val = $self->SUPER::_set_get_hash( $field, @_ ) || return;
+#         my $o = Net::API::Stripe::Hash->new({
+#         	'_parent' => $self->{_parent},
+#         	'_field' => $field,
+#         	'_debug' => $self->{debug},
+#         	'_dbh' => $self->{_dbh},
+#         }, $val );
+#         #$self->message( 3, "Setting parent to ", $self->{ '_parent' } );
+#     	#$o->{ '_parent' } = $self->{ '_parent' };
+#         $self->{ $field } = $o;
+#     }
+# 	return( $self->{ $field } );
+# }
+
+sub _set_get_hash
+{
+	my $self = shift( @_ );
+	my $field = shift( @_ );
+	my $o;
+	if( @_ || !$self->{ $field } )
+	{
+		my $class = $field;
+		$class =~ tr/-/_/;
+		$class =~ s/\_{2,}/_/g;
+		$class = ref( $self ) . '::' . join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $class ) ) );
+		# require Devel::StackTrace;
+		# my $trace = Devel::StackTrace->new;
+		# $self->message( 3, "Called for field '$field' with arguments: '", join( "', '", @_ ), "' and trace ", $trace->as_string );
+		$o = $self->_set_get_hash_as_object( $field, $class, @_ );
+		$o->debug( $self->debug );
+		$self->{ $field } = $o;
+	}
+	$o = $self->{ $field };
+	if( want( 'OBJECT' ) )
+	{
+		return( $o );
+	}
+	my $hash = $o->{_data};
+	return( $hash );
+}
+
+## Overiden
+sub _set_get_number
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    if( @_ )
+    {
+    	$self->{ $field } = Net::API::Stripe::Number->new( shift( @_ ) );
+    }
+    return( $self->{ $field } );
+}
+
+sub _set_get_object_array
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $class = shift( @_ );
+    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+    if( @_ )
+    {
+    	my $ref = shift( @_ );
+    	return( $self->error( "I was expecting an array ref, but instead got '$ref'" ) ) if( ref( $ref ) ne 'ARRAY' );
+    	my $arr = [];
+    	for( my $i = 0; $i < scalar( @$ref ); $i++ )
+    	{
+    		# $self->message( 3, "Calling method $class->$field with value '", $ref->[$i], "'" );
+			# my $o = defined( $ref->[$i] ) ? $class->new( $h, $ref->[$i] ) : $class->new( $h );
+			my $o = defined( $ref->[$i] ) ? $self->_instantiate_object( $field, $class, $ref->[$i] ) : $self->_instantiate_object( $field, $class );
+			return( $self->error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
+			push( @$arr, $o );
+    	}
+    	$self->{ $field } = $arr;
+    }
+	return( $self->{ $field } );
+}
+
+sub _set_get_object_variant
+{
+	my $self = shift( @_ );
+    my $field = shift( @_ );
+    ## The class precisely depends on what we find looking ahead
+    ## my $class = shift( @_ );
+	if( @_ )
+	{
+		local $process = sub
+		{
+			my $ref = shift( @_ );
+			my $type = $ref->{object} || return( $self->error( "No object type could be found in hash: ", sub{ $self->_dumper( $ref ) } ) );
+			my $class = $self->_object_type_to_class( $type );
+			$self->message( 3, "Object type $type has class $class" );
+			my $o = $self->_instantiate_object( $field, $class, $ref );
+			$self->{ $field } = $o;
+			## return( $class->new( %$ref ) );
+			## return( $self->_set_get_object( 'object', $class, $ref ) );
+		};
+		
+		if( ref( $_[0] ) eq 'HASH' )
+		{
+			my $o = $process->( @_ ) 
+		}
+		## AN array of objects hash
+		elsif( ref( $_[0] ) eq 'ARRAY' )
+		{
+			my $arr = shift( @_ );
+			my $res = [];
+			foreach my $data ( @$arr )
+			{
+				my $o = $process->( $data ) || return( $self->error( "Unable to create object: ", $self->error ) );
+				push( @$res, $o );
+			}
+			$self->{ $field } = $res;
+		}
+	}
+	return( $self->{ $field } );
+}
+
+sub _set_get_scalar_or_object_variant
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    if( @_ )
+    {
+    	if( ref( $_[0] ) eq 'HASH' || ref( $_[0] ) eq 'ARRAY' )
+    	{
+    		return( $self->_set_get_object_variant( $field, @_ ) );
+    	}
+    	else
+    	{
+    		return( $self->_set_get_scalar( $field, @_ ) );
+    	}
+    }
+	if( !$self->{ $field } && want( 'OBJECT' ) )
+	{
+		my $null = Module::Generic::Null->new( $o, { debug => $self->{debug}, has_error => 0 });
+		rreturn( $null );
+	}
+	return( $self->{ $field } );
+}
+
+sub _set_get_uri
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    if( @_ )
+    {
+		my $str = $self->SUPER::_set_get_uri( $field, @_ );
+		# $self->message( 3, "URI is $str, making it absolute." );
+		if( defined( $str ) && Scalar::Util::blessed( $str ) )
+		{
+			$self->{ $field } = $str->abs( $self->_parent->api_uri );
+			# $self->message( 3, "URI is now ", $self->{ $field } );
+		}
+    }
+    return( $self->{ $field } );
+}
+
+sub _will { return( shift->SUPER::will( @_ ) ); }
+
+1;
+
+__END__

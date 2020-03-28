@@ -1,5 +1,5 @@
 ---
-abstract: 'Send Log::Any logs to a subroutine'
+abstract: '(DEPRECATED) Send Log::Any logs to a subroutine'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Any-Adapter-Callback
   homepage: https://metacpan.org/release/Log-Any-Adapter-Callback
   repository: git://github.com/perlancar/perl-Log-Any-Adapter-Callback.git
-version: '0.100'
+version: '0.101'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

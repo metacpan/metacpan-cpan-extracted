@@ -1,0 +1,196 @@
+
+=head1 NAME
+
+OpenTracing::Interface::ContextReference - Defines the ContextReference
+
+=head1 SYNOPSIS
+
+    package OpenTracing::Implementation::MyBackendService::ContextReference;
+        
+    sub new_child_of {
+        ...
+    }
+    
+    sub new_follows_from {
+        ...
+    }
+    
+    sub get_referenced_context {
+        ...
+    }
+    
+    sub type_is_child_of {
+        ...
+    }
+    
+    sub type_is_follows_from {
+        ...
+    }
+    
+    BEGIN {
+        use Role::Tiny::With;
+        with 'OpenTracing::Interface::ContextReference'
+            if $ENV{OPENTRACING_INTERFACE};
+    } # check at compile time, perl -c will work
+    
+    1;
+
+=head1 DESCRIPTION
+
+This 'role' describes the interface for any OpenTracing ContextReference
+implementation.
+
+References are used by C<Tracer> methods C<start_span> and C<start_active_span>
+to create "casual span references"
+
+See L<OpenTracing References|http://opentracing.io/spec/#causal-span-references>
+
+
+
+=head1 CONSTRUCTOR METHODS
+
+
+
+=head2 new_child_of( $span_context )
+
+Creates a C<SpanContext> C<ContextReference> for which L<type_is_child_of> is
+'true'.
+
+    ContextReference->new_child_of( $span_context );
+
+=head3 Required Positional Parameter
+
+=over
+
+=item $span_context
+
+The C<SpanContext> the returned C<ContextReference> should should refer to.
+
+Must be a C<SpanContext> form L<OpenTracing::Types>.
+
+=back
+
+=head3 Returns
+
+A newly instantiated C<ContextReference>
+
+
+=head2 new_follows_from( $span_context )
+
+Creates a C<SpanContext> C<ContextReference> for which L<type_is_follows_from>
+is 'true'.
+
+    ContextReference->new_follows_from( $span_context );
+
+=head3 Required Positional Parameter
+
+=over
+
+=item $span_context
+
+The C<SpanContext> the returned C<ContextReference> should should refer to.
+
+Must be a C<SpanContext> form L<OpenTracing::Types>.
+
+=back
+
+=head3 Returns
+
+A newly instantiated C<ContextReference>
+
+
+
+=head1 INSTANCE METHODS
+
+
+
+=head2 get_referenced_context
+
+Returns the original referenced C<SpanContext>.
+
+    $span_context = $reference->get_referenced_context;
+
+=head3 Parameters
+
+none
+
+=head3 Returns
+
+C<SpanContext> being referenced.
+
+
+
+=head2 type_is_child_of
+
+Returns 'true' iff the C<ContextReference> is a C<CHILD_OF> type is, most
+likely, instantiated with the C<new_child_of> constructor.
+
+    say "I'm a CHILD_OF context reference"
+        if $context_reference->type_is_child_of;
+
+=head3 Parameters
+
+none
+
+=head3 Returns
+
+C<Bool>
+
+
+
+=head2 type_is_follows_from
+
+Returns 'true' iff the C<ContextReference> is a C<FOLLOWS_FROM> type is, most
+likely, instantiated with the C<new_follows_from> constructor.
+
+    say "I'm a FOLLOWS_FROM context reference"
+        if $context_reference->type_is_child_of;
+
+=head3 Parameters
+
+none
+
+=head3 Returns
+
+C<Bool>
+
+
+
+=cut
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Interface>
+
+Describes the API definition for OpenTransport implementations written in the
+Perl5 language.
+
+=item L<OpenTracing::Types>
+
+A library of L<Type::Tiny> type constraints that provides Duck Type checks for
+all common elements that conform L<OpenTracing::Interface>
+
+=back
+
+=cut
+
+
+
+=head1 CAVEATS
+
+This description is using C<around> method modifiers that basically wraps them
+around the real implementation. These method modifiers provide a 'readable' and
+reusable interface, describing the inputs and outputs, using type constraints.
+
+Consumers of this role, or implementors of the interface are MUST implement each
+method mentioned below. Not doing so will result in compilation errors.
+
+Since this role does nothing else than checking input and output, it is useful
+during development. Most likely it can be switched off safely in production
+environments.
+
+=cut

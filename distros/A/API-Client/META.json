@@ -59,7 +59,7 @@
          "web" : "https://github.com/iamalnewkirk/API-Client"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
       "Al Newkirk <anewkirk@ana.io>"

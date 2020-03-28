@@ -19,7 +19,7 @@ with 'Data::Object::Role::Buildable';
 with 'Data::Object::Role::Stashable';
 with 'Data::Object::Role::Throwable';
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 
@@ -70,7 +70,7 @@ has 'timeout' => (
 has 'url' => (
   is => 'ro',
   isa => 'InstanceOf["Mojo::URL"]',
-  req => 1,
+  opt => 1,
 );
 
 has 'user_agent' => (
@@ -96,14 +96,19 @@ fun new_version($self) {
 # BUILD
 
 method build_args($args) {
-  if (!$args->{url}) {
-    $args->{url} = join('/', @{$self->base(%$args)}) if $self->can('base');
-  }
   if (!ref $args->{url}) {
     $args->{url} = Mojo::URL->new($args->{url}) if $args->{url};
   }
 
   return $args;
+}
+
+method build_self($args) {
+  if (!$self->{url} && $self->can('base')) {
+    $self->{url} = Mojo::URL->new(join('/', @{$self->base($args)}));
+  }
+
+  return $self;
 }
 
 # METHODS
@@ -157,9 +162,19 @@ method process(Object $ua, Object $tx, Any %args) {
 }
 
 method resource(Str @segments) {
-  my $object = ref($self)->new($self->serialize);
+  my $url;
 
-  $object->url->path(join '/', @segments) if @segments;
+  if (@segments) {
+    $url = $self->url->clone;
+
+    $url->path->merge(
+      join '/', '', @{$self->url->path->parts}, @segments
+    );
+  }
+
+  my $object = ref($self)->new(
+    %{$self->serialize}, ($url ? ('url', $url) : ())
+  );
 
   return $object;
 }
@@ -318,7 +333,21 @@ HTTP API Thin-Client Abstraction
 =head1 DESCRIPTION
 
 This package provides an abstraction and method for rapidly developing HTTP API
-clients.
+clients. While this module can be used to interact with APIs directly,
+API::Client was designed to be consumed (subclassed) by higher-level
+purpose-specific API clients.
+
+=head1 THIN CLIENT
+
+The thin API client library is advantageous as it has complete API coverage and
+can easily adapt to changes in the API with minimal effort. As a thin-client
+superclass, this module does not map specific HTTP requests to specific
+routines, nor does it provide parameter validation, pagination, or other
+conventions found in typical API client implementations; Instead, it simply
+provides a simple and consistent mechanism for dynamically generating HTTP
+requests.  Additionally, this module has support for debugging and retrying API
+calls as well as throwing exceptions when 4xx and 5xx server response codes are
+returned.
 
 =cut
 
@@ -339,6 +368,204 @@ L<Data::Object::Role::Throwable>
 This package uses type constraints from:
 
 L<Types::Standard>
+
+=cut
+
+=head1 SCENARIOS
+
+This package supports the following scenarios:
+
+=cut
+
+=head2 building
+
+  # given: synopsis
+
+  my $resource = $client->resource('get');
+
+  # GET /get
+  my $get = $client->resource('get')->dispatch;
+
+  # HEAD /head
+  my $head = $client->resource('head')->dispatch(
+    method => 'head'
+  );
+
+  # PATCH /patch
+  my $patch = $client->resource('patch')->dispatch(
+    method => 'patch'
+  );
+
+  [$get, $head, $patch]
+
+Building up an HTTP request is extremely easy, simply call the L</resource> to
+create a new object instance representing the API endpoint you wish to issue a
+request against.
+
+=cut
+
+=head2 chaining
+
+  # given: synopsis
+
+  # https://httpbin.org/users
+  my $users = $client->resource('users');
+
+  # https://httpbin.org/users/c09e91a
+  my $user = $client->resource('users', 'c09e91a');
+
+  # https://httpbin.org/users/c09e91a
+  my $new_user = $users->resource('c09e91a');
+
+  [$users, $user, $new_user]
+
+Because each call to L</resource> returns a new object instance configured with
+a path (resource locator) based on the supplied parameters, reuse and request
+isolation are made simple, i.e., you will only need to configure the client
+once in your application.
+
+=cut
+
+=head2 creating
+
+  # given: synopsis
+
+  my $tx1 = $client->resource('post')->create(
+    json => {active => 1}
+  );
+
+  # is equivalent to
+
+  my $tx2 = $client->resource('post')->dispatch(
+    method => 'post',
+    json => {active => 1}
+  );
+
+  [$tx1, $tx2]
+
+This example illustrates how you might create a new API resource.
+
+=cut
+
+=head2 deleting
+
+  # given: synopsis
+
+  my $tx1 = $client->resource('delete')->delete(
+    json => {active => 1}
+  );
+
+  # is equivalent to
+
+  my $tx2 = $client->resource('delete')->dispatch(
+    method => 'delete',
+    json => {active => 1}
+  );
+
+  [$tx1, $tx2]
+
+This example illustrates how you might delete a new API resource.
+
+=cut
+
+=head2 fetching
+
+  # given: synopsis
+
+  my $tx1 = $client->resource('get')->fetch(
+    query => {active => 1}
+  );
+
+  # is equivalent to
+
+  my $tx2 = $client->resource('get')->dispatch(
+    method => 'get',
+    query => {active => 1}
+  );
+
+  [$tx1, $tx2]
+
+This example illustrates how you might fetch an API resource.
+
+=cut
+
+=head2 subclassing
+
+  package Hookbin;
+
+  use Data::Object::Class;
+
+  extends 'API::Client';
+
+  sub auth {
+    ['admin', 'secret']
+  }
+
+  sub headers {
+    [['Accept', '*/*']]
+  }
+
+  sub base {
+    ['https://httpbin.org/get']
+  }
+
+  package main;
+
+  my $hookbin = Hookbin->new;
+
+This package was designed to be subclassed and provides hooks into the client
+building and request dispatching processes. Specifically, there are three
+useful hooks (i.e. methods, which if present are used to build up the client
+object and requests), which are, the C<auth> hook, which should return a
+C<Tuple[Str, Str]> which is used to configure the basic auth header, the
+C<base> hook which should return a C<Tuple[Str]> which is used to configure the
+base URL, and the C<headers> hook, which should return a
+C<ArrayRef[Tuple[Str, Str]]> which are used to configure the HTTP request
+headers.
+
+=cut
+
+=head2 transacting
+
+  # given: synopsis
+
+  my $tx1 = $client->resource('patch')->patch(
+    json => {active => 1}
+  );
+
+  # is equivalent to
+
+  my $tx2 = $client->resource('patch')->dispatch(
+    method => 'patch',
+    json => {active => 1}
+  );
+
+  [$tx1, $tx2]
+
+An HTTP request is only issued when the L</dispatch> method is called, directly
+or indirectly. Those calls return a L<Mojo::Transaction> object which provides
+access to the C<request> and C<response> objects.
+
+=cut
+
+=head2 updating
+
+  # given: synopsis
+
+  my $tx1 = $client->resource('put')->update(
+    json => {active => 1}
+  );
+
+  # is equivalent to
+
+  my $tx2 = $client->resource('put')->dispatch(
+    method => 'put',
+    json => {active => 1}
+  );
+
+  [$tx1, $tx2]
+
+This example illustrates how you might update a new API resource.
 
 =cut
 

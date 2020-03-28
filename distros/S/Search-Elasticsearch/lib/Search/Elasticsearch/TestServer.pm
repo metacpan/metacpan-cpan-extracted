@@ -1,5 +1,5 @@
 package Search::Elasticsearch::TestServer;
-$Search::Elasticsearch::TestServer::VERSION = '6.00';
+$Search::Elasticsearch::TestServer::VERSION = '6.80';
 use Moo;
 use Search::Elasticsearch();
 use POSIX 'setsid';
@@ -194,7 +194,7 @@ Search::Elasticsearch::TestServer - A helper class to launch Elasticsearch nodes
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 SYNOPSIS
 
@@ -284,11 +284,11 @@ C<$server> goes out of scope or if the program receives a C<SIGINT>.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

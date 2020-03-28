@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::CxnPool;
-$Search::Elasticsearch::Role::CxnPool::VERSION = '6.00';
+$Search::Elasticsearch::Role::CxnPool::VERSION = '6.80';
 use Moo::Role;
 use Search::Elasticsearch::Util qw(parse_params);
 use List::Util qw(shuffle);
@@ -134,7 +134,7 @@ Search::Elasticsearch::Role::CxnPool - Provides common functionality to the CxnP
 
 =head1 VERSION
 
-version 6.00
+version 6.80
 
 =head1 DESCRIPTION
 
@@ -281,11 +281,11 @@ Called at the start of a new request to reset the retries count.
 
 =head1 AUTHOR
 
-Clinton Gormley <drtech@cpan.org>
+Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Elasticsearch BV.
+This software is Copyright (c) 2020 by Elasticsearch BV.
 
 This is free software, licensed under:
 

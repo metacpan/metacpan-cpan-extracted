@@ -4,13 +4,13 @@
       "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.026",
+   "generated_by" : "App::ModuleBuildTiny version 0.024",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojo-Graphite-Writer",
    "prereqs" : {
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.026"
+            "App::ModuleBuildTiny" : "0.024"
          }
       },
       "runtime" : {
@@ -34,7 +34,7 @@
    "provides" : {
       "Mojo::Graphite::Writer" : {
          "file" : "lib/Mojo/Graphite/Writer.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "url" : "http://github.com/jberger/Mojo-Graphite-Writer"
       }
    },
-   "version" : "0.04",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

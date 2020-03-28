@@ -1,0 +1,39 @@
+---
+abstract: 'Check the paths for expected permissions in a HealthCheck'
+author:
+  - 'Grant Street Group <developers@grantstreet.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.1101'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HealthCheck-Diagnostic-FilePermissions
+provides:
+  HealthCheck::Diagnostic::FilePermissions:
+    file: lib/HealthCheck/Diagnostic/FilePermissions.pm
+    version: v1.4.2
+requires:
+  Carp: '0'
+  HealthCheck::Diagnostic: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-FilePermissions/issues
+  repository: git://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-FilePermissions.git
+version: v1.4.2
+x_generated_by_perl: v5.30.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0
+x_static_install: 1

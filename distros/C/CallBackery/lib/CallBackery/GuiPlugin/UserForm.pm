@@ -56,7 +56,7 @@ has formCfg => sub {
 
         {
             key => 'cbuser_login',
-            label => trm('Login'),
+            label => trm('Username'),
             widget => 'text',
             set => {
                 required => true,
@@ -98,15 +98,15 @@ has formCfg => sub {
                 readOnly => $self->user->may('admin') ? false : true
             }
         },
+        $self->user->may('admin') ? (
         {
             key => 'cbuser_note',
             label => trm('Note'),
             widget => 'textArea',
             set => {
                 placeholder => 'some extra information about this user',
-                readOnly => $self->user->may('admin') ? false : true
             }
-        },
+        } ) : (),
         @{$self->rightsCheckBoxes}
     ];
 };
@@ -149,11 +149,11 @@ has actionCfg => sub {
 
         my @fields = $admin ? (qw(login family given note)) : ();
         my $itsMine = $args->{cbuser_id} == $self->user->userId;
-        die mkerror(2847,"You can only edit your own stuff unless you have admin permissions.")
+        die mkerror(2847,trm("You can only edit your own stuff unless you have admin permissions."))
             unless $admin  or $itsMine;
 
         if ($args->{cbuser_password} ne $DUMMY_PASSWORD){
-            die mkerror(2847,"The password instances did not match.")
+            die mkerror(2847,trm("The password instances did not match."))
                 if $args->{cbuser_password} ne $args->{cbuser_password_check};
             push @fields, 'password';
         }
@@ -252,7 +252,7 @@ sub getAllFieldValues {
     my $self = shift;
     my $args = shift;
     return {} if $self->config->{type} ne 'edit';
-    my $id = $args->{selection}{cbuser_id};
+    my $id = $args->{selection}{cbuser_id} // $self->user->userId;
 
     return {} unless $id;
 

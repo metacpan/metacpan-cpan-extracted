@@ -212,6 +212,70 @@ is_deeply(
     "Summarize looks at sub-results for a status"
 );
 
+is_deeply( HealthCheck::Diagnostic->summarize( { results => [
+    { status  => "OK" },
+    { status  => "OK", id => "foo" },
+    { status  => "OK" },
+    { status  => "OK", id => "bar" },
+    { status  => "OK" },
+    { status  => "OK", id => "foo" },
+    { status  => "OK", id => "bar" },
+    { results => [ { status => "OK", id => "foo" } ] },
+    { results => [
+        { status => "OK", id => "foo" },
+        { status => "OK", id => "foo" },
+        { status => "OK", id => "foo" }
+    ] },
+] } ), { status => "OK", results => [
+    { status  => "OK" },
+    { status  => "OK", id => "foo" },
+    { status  => "OK" },
+    { status  => "OK", id => "bar" },
+    { status  => "OK" },
+    { status  => "OK", id => "foo_1" },
+    { status  => "OK", id => "bar_1" },
+    { status  => "OK", id => "foo_2" },
+    { status => "OK", results => [
+        { status => "OK", id => "foo" },
+        { status => "OK", id => "foo_1" },
+        { status => "OK", id => "foo_2" },
+    ] },
+] }, "Summarize appends numbers to make valid ids" );
+
+{ note "Complain about invalid ID but still make unique";
+    my @warnings;
+
+    my $at = "at " . __FILE__ . " line " . ( __LINE__ + 3 );
+    my $results = do {
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
+        My::HealthCheck::Diagnostic->summarize( {
+            results => [
+                { status => "OK", id => "" },
+                { status => "OK", id => undef },
+                { status => "OK", id => "" },
+                { status => "OK", id => undef },
+                { status => "OK", id => "" },
+            ]
+        } );
+    };
+
+    is_deeply $results, { status  => 'UNKNOWN', results => [
+            { status => "UNKNOWN", id => "",  info => "invalid id ''" },
+            { status => "UNKNOWN", id => "1", info => "undefined id" },
+            { status => "UNKNOWN", id => "2", info => "invalid id ''" },
+            { status => "UNKNOWN", id => "3", info => "undefined id" },
+            { status => "UNKNOWN", id => "4", info => "invalid id ''" },
+    ] }, "Summarized additional blank results with numbers";
+
+    is_deeply( \@warnings, [ map {"Result $_ $at$nl"}
+        "0- has invalid id ''",
+        "0-1 has undefined id",
+        "0- has invalid id ''",
+        "0-3 has undefined id",
+        "0- has invalid id ''",
+    ], "Got warnings about the invalid ids" );
+}
+
 { note "Summarize validates result status";
     my @tests = (
         {

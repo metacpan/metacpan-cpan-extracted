@@ -4,7 +4,7 @@ use warnings;
 use base qw{Power::Outlet::Common::IP};
 use Net::SNMP qw{INTEGER};
 
-our $VERSION='0.20';
+our $VERSION='0.21';
 
 
 =head1 NAME

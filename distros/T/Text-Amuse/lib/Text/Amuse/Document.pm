@@ -734,6 +734,12 @@ sub _parse_string {
         $element{string} = $l;
         return %element;
     }
+    # line starting with pipe, gh-markdown style
+    if ($l =~ m/^\|+(\x{20}+|\+)/s) {
+        $element{type} = "table";
+        $element{string} = $l;
+        return %element;
+    }
     if ($l =~ m/^(\;)(\x{20}+(.*))?$/s) {
         $element{removed} = $1;
         $element{string} = $3;

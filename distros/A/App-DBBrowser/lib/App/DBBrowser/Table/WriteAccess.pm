@@ -70,8 +70,7 @@ sub table_write_access {
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
             my $groups = [ { name => 'group_insert', text => '' } ];
-            my $options = [ { name => '_data_source', text => "- Data source", section => 'insert' } ];
-            $opt_set->set_options( $groups, $options );
+            $opt_set->set_options( $groups );
             next STMT_TYPE;
         }
         $stmt_type =~ s/^-\ //;

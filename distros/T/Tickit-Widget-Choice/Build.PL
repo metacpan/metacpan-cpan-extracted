@@ -6,6 +6,9 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Tickit::Widget::Choice',
    requires => {
+      'perl' => '5.026',
+      'Object::Pad' => '0.17',
+
       'Tickit::RenderBuffer' => 0,
       'Tickit::Style' => 0,
       'Tickit::Widget' => 0,

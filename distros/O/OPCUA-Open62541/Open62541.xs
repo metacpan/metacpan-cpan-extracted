@@ -46,6 +46,7 @@ static void croak_status(const char *, UA_StatusCode, char *, ...)
 static void
 croak_func(const char *func, char *pat, ...)
 {
+	dTHX;
 	va_list args;
 	SV *sv;
 
@@ -68,6 +69,7 @@ croak_func(const char *func, char *pat, ...)
 static void
 croak_errno(const char *func, char *pat, ...)
 {
+	dTHX;
 	va_list args;
 	SV *sv;
 	int sverrno;
@@ -93,6 +95,7 @@ croak_errno(const char *func, char *pat, ...)
 static void
 croak_status(const char *func, UA_StatusCode status, char *pat, ...)
 {
+	dTHX;
 	va_list args;
 	SV *sv;
 
@@ -120,7 +123,6 @@ croak_status(const char *func, UA_StatusCode status, char *pat, ...)
 /* types.h */
 typedef UA_UInt32 *		OPCUA_Open62541_UInt32;
 typedef const UA_DataType *	OPCUA_Open62541_DataType;
-typedef enum UA_NodeIdType	OPCUA_Open62541_NodeIdType;
 typedef UA_NodeId *		OPCUA_Open62541_NodeId;
 typedef UA_LocalizedText *	OPCUA_Open62541_LocalizedText;
 
@@ -141,7 +143,6 @@ typedef struct {
 	UA_ClientConfig *	clc_clientconfig;
 	SV *			clc_client;
 } *				OPCUA_Open62541_ClientConfig;
-typedef UA_ClientState		OPCUA_Open62541_ClientState;
 
 /* plugin/log.h */
 typedef struct {
@@ -1195,6 +1196,7 @@ typedef struct {
 static ClientCallbackData *
 newClientCallbackData(SV *callback, SV *client, SV *data)
 {
+	dTHX;
 	ClientCallbackData *ccd;
 
 	if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
@@ -1224,6 +1226,7 @@ newClientCallbackData(SV *callback, SV *client, SV *data)
 static void
 deleteClientCallbackData(ClientCallbackData *ccd)
 {
+	dTHX;
 	DPRINTF("ccd %p", ccd);
 
 	SvREFCNT_dec(ccd->ccd_callback);
@@ -1467,8 +1470,6 @@ test_croaks(sv, status)
 		CROAKS(status, NULL);
 	}
 
-INCLUDE: Open62541-types.xsh
-
 UA_Boolean
 TRUE()
     CODE:
@@ -1604,160 +1605,7 @@ STATUSCODE_UNKNOWN()
     OUTPUT:
 	RETVAL
 
-# 6.1.18 NodeId, types.h
-
-OPCUA_Open62541_NodeIdType
-NODEIDTYPE_NUMERIC()
-    CODE:
-	RETVAL = UA_NODEIDTYPE_NUMERIC;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_NodeIdType
-NODEIDTYPE_STRING()
-    CODE:
-	RETVAL = UA_NODEIDTYPE_STRING;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_NodeIdType
-NODEIDTYPE_GUID()
-    CODE:
-	RETVAL = UA_NODEIDTYPE_GUID;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_NodeIdType
-NODEIDTYPE_BYTESTRING()
-    CODE:
-	RETVAL = UA_NODEIDTYPE_BYTESTRING;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_ClientState
-CLIENTSTATE_DISCONNECTED()
-    CODE:
-	RETVAL = UA_CLIENTSTATE_DISCONNECTED;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_ClientState
-CLIENTSTATE_WAITING_FOR_ACK()
-    CODE:
-	RETVAL = UA_CLIENTSTATE_WAITING_FOR_ACK;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_ClientState
-CLIENTSTATE_CONNECTED()
-    CODE:
-	RETVAL = UA_CLIENTSTATE_CONNECTED;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_ClientState
-CLIENTSTATE_SECURECHANNEL()
-    CODE:
-	RETVAL = UA_CLIENTSTATE_SECURECHANNEL;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_ClientState
-CLIENTSTATE_SESSION()
-    CODE:
-	RETVAL = UA_CLIENTSTATE_SESSION;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_ClientState
-CLIENTSTATE_SESSION_DISCONNECTED()
-    CODE:
-	RETVAL = UA_CLIENTSTATE_SESSION_DISCONNECTED;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_ClientState
-CLIENTSTATE_SESSION_RENEWED()
-    CODE:
-	RETVAL = UA_CLIENTSTATE_SESSION_RENEWED;
-    OUTPUT:
-	RETVAL
-
-INCLUDE: Open62541-statuscodes.xsh
-
-INCLUDE: Open62541-accesslevelmask.xsh
-
-# 6.5.49 BrowseResultMask, types_generated.h
-
-OPCUA_Open62541_BrowseResultMask
-BROWSERESULTMASK_NONE()
-    CODE:
-	RETVAL = UA_BROWSERESULTMASK_NONE;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_BrowseResultMask
-BROWSERESULTMASK_REFERENCETYPEID()
-    CODE:
-	RETVAL = UA_BROWSERESULTMASK_REFERENCETYPEID;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_BrowseResultMask
-BROWSERESULTMASK_ISFORWARD()
-    CODE:
-	RETVAL = UA_BROWSERESULTMASK_ISFORWARD;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_BrowseResultMask
-BROWSERESULTMASK_NODECLASS()
-    CODE:
-	RETVAL = UA_BROWSERESULTMASK_NODECLASS;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_BrowseResultMask
-BROWSERESULTMASK_BROWSENAME()
-    CODE:
-	RETVAL = UA_BROWSERESULTMASK_BROWSENAME;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_BrowseResultMask
-BROWSERESULTMASK_DISPLAYNAME()
-    CODE:
-	RETVAL = UA_BROWSERESULTMASK_DISPLAYNAME;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_BrowseResultMask
-BROWSERESULTMASK_TYPEDEFINITION()
-    CODE:
-	RETVAL = UA_BROWSERESULTMASK_TYPEDEFINITION;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_BrowseResultMask
-BROWSERESULTMASK_ALL()
-    CODE:
-	RETVAL = UA_BROWSERESULTMASK_ALL;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_BrowseResultMask
-BROWSERESULTMASK_REFERENCETYPEINFO()
-    CODE:
-	RETVAL = UA_BROWSERESULTMASK_REFERENCETYPEINFO;
-    OUTPUT:
-	RETVAL
-
-OPCUA_Open62541_BrowseResultMask
-BROWSERESULTMASK_TARGETINFO()
-    CODE:
-	RETVAL = UA_BROWSERESULTMASK_TARGETINFO;
-    OUTPUT:
-	RETVAL
+INCLUDE: Open62541-statuscode.xsh
 
 #############################################################################
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::UInt32	PREFIX = UA_UInt32_
@@ -2021,12 +1869,6 @@ UA_ServerConfig_setMinimal(config, portNumber, certificate)
 	RETVAL
 
 void
-UA_ServerConfig_clean(config)
-	OPCUA_Open62541_ServerConfig	config
-    CODE:
-	UA_ServerConfig_clean(config->svc_serverconfig);
-
-void
 UA_ServerConfig_setCustomHostname(config, customHostname)
 	OPCUA_Open62541_ServerConfig	config
 	UA_String			customHostname
@@ -2139,7 +1981,7 @@ UA_StatusCode
 UA_Client_disconnect(client)
 	OPCUA_Open62541_Client		client
 
-OPCUA_Open62541_ClientState
+UA_ClientState
 UA_Client_getState(client)
 	OPCUA_Open62541_Client		client
 

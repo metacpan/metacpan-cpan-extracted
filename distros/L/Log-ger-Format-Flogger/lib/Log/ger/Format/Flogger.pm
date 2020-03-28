@@ -1,9 +1,9 @@
 package Log::ger::Format::Flogger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-09'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Format-Flogger'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use warnings;
 use String::Flogger qw(flog);
 
 sub meta { +{
-    v => 1,
+    v => 2,
 } }
 
 sub get_hooks {
@@ -45,7 +45,7 @@ Log::ger::Format::Flogger - Use String::Flogger for formatting instead of sprint
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

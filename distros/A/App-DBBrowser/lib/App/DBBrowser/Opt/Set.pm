@@ -65,11 +65,11 @@ sub _options {
             { name => '_db_defaults', text => "- DB Settings", section => ''  },
         ],
         group_behavior => [
-            { name => '_menu_memory',  text => "- Menu memory",  section => 'G'     },
-            { name => '_keep_header',  text => "- Keep header",  section => 'table' },
-            { name => '_table_expand', text => "- Table expand", section => 'table' },
-            { name => '_info_expand',  text => "- Info expand",  section => 'G'     },
-            { name => '_mouse',        text => "- Mouse mode",   section => 'table' },
+            { name => '_menu_memory',  text => "- Menu memory",       section => 'G'     },
+            { name => '_keep_header',  text => "- Keep header",       section => 'table' },
+            { name => '_table_expand', text => "- Expand table",      section => 'table' },
+            { name => '_info_expand',  text => "- Expand info-table", section => 'G'     },
+            { name => '_mouse',        text => "- Mouse mode",        section => 'table' },
         ],
         group_enable => [
             { name => '_e_table',         text => "- Tables menu",   section => 'enable' },
@@ -86,35 +86,35 @@ sub _options {
             { name => '_sql_identifiers',        text => "- Identifiers",    section => 'G'      },
             { name => '_view_name_prefix',       text => "- View prefix",    section => 'create' },
             { name => '_autoincrement_col_name', text => "- Auto increment", section => 'create' },
-            { name => '_data_type_guessing',     text => "- Data types",     section => 'create' },
-            { name => 'max_rows',                text => "- Max Rows",       section => 'G'      },
+            { name => '_data_type_guessing',     text => "- Col data types", section => 'create' },
+            { name => 'max_rows',                text => "- Max rows",       section => 'G'      },
         ],
         group_output => [
-            { name => 'min_col_width',       text => "- Colwidth",       section => 'table' },
-            { name => 'progress_bar',        text => "- ProgressBar",    section => 'table' },
-            { name => 'tab_width',           text => "- Tabwidth",       section => 'table' },
-            { name => '_grid',               text => "- Grid",           section => 'table' },
-            { name => '_color',              text => "- Color",          section => 'table' },
-            { name => '_binary_filter',      text => "- Binary filter",  section => 'table' },
-            { name => '_squash_spaces',      text => "- Squash spaces",  section => 'table' },
-            { name => '_show_table_name',    text => "- Table name",     section => 'G'     },
-            { name => '_base_indent',        text => "- Indentation",    section => 'G'     },
-            { name => '_dots',               text => "- Truncated rows", section => 'G'     },
-            { name => '_set_string',         text => "- Set string",     section => 'table' },
-            { name => '_file_find_warnings', text => "- Warnings",       section => 'G'     },
+            { name => 'min_col_width',       text => "- Col width",       section => 'table' },
+            { name => 'progress_bar',        text => "- Progress bar",    section => 'table' },
+            { name => 'tab_width',           text => "- Tab width",       section => 'table' },
+            { name => '_grid',               text => "- Grid",            section => 'table' },
+            { name => '_color',              text => "- Color",           section => 'table' },
+            { name => '_binary_filter',      text => "- Binary filter",   section => 'table' },
+            { name => '_squash_spaces',      text => "- Squash spaces",   section => 'table' },
+            { name => '_show_table_name',    text => "- Show table name", section => 'G'     },
+            { name => '_base_indent',        text => "- Indentation",     section => 'G'     },
+            { name => '_dots',               text => "- Truncated rows",  section => 'G'     },
+            { name => '_set_string',         text => "- Set string",      section => 'table' },
+            { name => '_file_find_warnings', text => "- Warnings",        section => 'G'     },
         ],
         group_insert => [
-            { name => '_parse_file',        text => "- Parse file",     section => 'insert' },
-            { name => '_parse_copy',        text => "- Parse C & P",    section => 'insert' },
-            { name => '_split_config',      text => "- split settings", section => 'split'  },
-            { name => '_csv_char',          text => "- CSV settings-a", section => 'csv'    },
-            { name => '_csv_options',       text => "- CSV settings-b", section => 'csv'    },
-            { name => '_empty_to_null',     text => "- Empty to NULL",  section => 'insert' },
-            { name => '_file_encoding',     text => "- File encoding",  section => 'insert' },
-            { name => '_data_source',       text => "- Data source",    section => 'insert' },
-            { name => 'history_dirs',       text => "- Dir history",    section => 'insert' },
-            { name => '_file_filter',       text => "- File filter",    section => 'insert' },
-            { name => '_show_hidden_files', text => "- Show hidden",    section => 'insert' },
+            { name => '_parse_file',        text => "- Parse tool for 'file'",         section => 'insert' },
+            { name => '_parse_copy',        text => "- Parse tool for 'copy & paste'", section => 'insert' },
+            { name => '_csv_char',          text => "- csv settings-a",                section => 'csv'    },
+            { name => '_csv_options',       text => "- csv settings-b",                section => 'csv'    },
+            { name => '_split_config',      text => "- 'split' settings",              section => 'split'  },
+            { name => '_empty_to_null',     text => "- Empty to NULL",                 section => 'insert' },
+            { name => '_file_encoding',     text => "- File encoding",                 section => 'insert' },
+            { name => '_data_source_type',  text => "- Source type of input data",     section => 'insert' },
+            { name => 'history_dirs',       text => "- Directory history",             section => 'insert' },
+            { name => '_file_filter',       text => "- File filter",                   section => 'insert' },
+            { name => '_show_hidden_files', text => "- Show hidden files",             section => 'insert' },
         ],
     };
     return $groups->{$group};
@@ -268,16 +268,16 @@ sub set_options {
             }
             elsif ( $opt eq '_file_encoding' ) {
                 my $items = [
-                    { name => 'file_encoding', prompt => "file_encoding" },
+                    { name => 'file_encoding', prompt => "Input file encoding" },
                 ];
-                my $prompt = 'Encoding CSV files';
+                my $prompt = 'Encoding of input data text files';
                 $sf->__group_readline( $section, $items, $prompt );
             }
             elsif ( $opt eq '_file_filter' ) {
                 my $items = [
-                    { name => 'file_filter', prompt => "file_filter" },
+                    { name => 'file_filter', prompt => "File filter glob pattern" },
                 ];
-                my $prompt = 'Set glob file filter';
+                my $prompt = 'Set the glob pattern for the file filter';
                 $sf->__group_readline( $section, $items, $prompt );
             }
             elsif ( $opt eq '_csv_char' ) {
@@ -287,7 +287,7 @@ sub set_options {
                     { name => 'escape_char', prompt => "escape_char" },
                     { name => 'eol',         prompt => "eol        " },
                 ];
-                my $prompt = 'Text::CSV a';
+                my $prompt = 'Text::CSV-a';
                 $sf->__group_readline( $section, $items, $prompt );
             }
             elsif ( $opt eq '_split_config' ) {
@@ -344,21 +344,21 @@ sub set_options {
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits, 0 );
             }
             elsif ( $opt eq '_parse_file' ) {
-                my $prompt = 'Parsing "File"';
+                my $prompt = 'Parsing file input';
                 my $sub_menu = [
                     [ 'parse_mode_input_file', "- Use:", [ 'Text::CSV', 'split', 'Template', 'Spreadsheet::Read' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_parse_copy' ) {
-                my $prompt = 'Parsing "Copy & Paste"';
+                my $prompt = 'Parsing "copy & paste" input';
                 my $sub_menu = [
                     [ 'parse_mode_input_copy', "- Use:", [ 'Text::CSV', 'split', 'Template' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_csv_options' ) {
-                my $prompt = 'Text::CSV b';
+                my $prompt = 'Text::CSV-b';
                 my $sub_menu = [
                     [ 'allow_loose_escapes', "- allow_loose_escapes", [ $no, $yes ] ],
                     [ 'allow_loose_quotes',  "- allow_loose_quotes",  [ $no, $yes ] ],
@@ -378,11 +378,11 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq '_data_source' ) {
+            elsif ( $opt eq '_data_source_type' ) {
                 my $prompt = 'Data source options';
                 my $sub_menu = [
-                    [ 'data_source_Create_table', "- Data source \"Create table\"", [ 'plain', 'copy&paste', 'file', 'plain/copy&pase/file' ], ],
-                    [ 'data_source_Insert',       "- Data source \"Insert into\"",  [ 'plain', 'copy&paste', 'file', 'plain/copy&pase/file' ], ],
+                    [ 'data_source_Create_table', "- Data source \"Create table\"", [ 'plain', 'copy&paste', 'file', 'menu' ], ],
+                    [ 'data_source_Insert',       "- Data source \"Insert into\"",  [ 'plain', 'copy&paste', 'file', 'menu' ], ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -482,7 +482,9 @@ sub set_options {
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_info_expand' ) {
-                my $prompt = 'Choose: ';
+                my $prompt = "Info-tables show the affected rows in 'DROP table', 'DROP view', ";
+                $prompt .= "\n'UPDATE table ...' and 'DELETE FROM table ...'";
+                $prompt .= "\n\n" . 'Choose: ';
                 my $sub_menu = [
                     [ 'info_expand', "- Expand info-table rows",   [ $no, $yes . ' - fast back', $yes ] ],
                 ];

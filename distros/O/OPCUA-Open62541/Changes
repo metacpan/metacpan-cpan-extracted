@@ -1,5 +1,16 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.006 2020-03-27
+    - Remove server config clean() function from Perl API.
+    - To run a test server manually, the timeout can be disabled.
+    - Use Test::EOL to find trailing whitespace.
+    - Generate constants from defines and enum in C header file.
+    - Export constants from OPCUA::Open62541 into namespace.
+      This breaks the existing API how modules are used and imported.
+      Especially NS0ID uses underscore and new names are incompatible.
+    - Place all generated constants into a single Perl module
+      OPCUA::Open62541::Constant.
+
 0.005 2020-03-12
     - Plug memory leaks in connect_async() in sendAsyncBrowseRequest(),
       which were found by the tests.

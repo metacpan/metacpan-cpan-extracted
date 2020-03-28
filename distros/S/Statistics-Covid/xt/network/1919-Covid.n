@@ -1,0 +1,118 @@
+#!perl -T
+use 5.006;
+
+use strict;
+use warnings;
+
+use Statistics::Covid;
+
+use File::Temp;
+use File::Spec;
+use File::Basename;
+
+my $dirname = dirname(__FILE__);
+
+use Test::More;
+
+my $num_tests = 0;
+
+my ($ret, $count, $io, $schema, $da);
+
+my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+my $tmpdbfile = "adb.sqlite";
+# .data.pl and .data.json will be the 2 files created for this specific data provider
+my $configfile = File::Spec->catfile($dirname, 'example-config.json');
+my $confighash = Statistics::Covid::Utils::configfile2perl($configfile);
+ok(defined($confighash), "config json file parsed."); $num_tests++;
+
+# we need a fresh db for these tests
+unlink File::Spec->catdir($tmpdir, $tmpdbfile);
+
+$confighash->{'fileparams'}->{'datafiles-dir'} = $tmpdir;
+$confighash->{'dbparams'}->{'dbtype'} = 'SQLite';
+$confighash->{'dbparams'}->{'dbdir'} = $tmpdir;
+$confighash->{'dbparams'}->{'dbname'} = $tmpdbfile;
+
+my $covid = Statistics::Covid->new({
+	'config-hash' => $confighash,
+	'providers' => ['UK::BBC'],
+	'save-to-file' => 1,
+	'save-to-db' => 1,
+	'debug' => 2,
+});
+ok(defined $covid, "Statistics::Covid->new() called"); $num_tests++;
+
+# make sure we have a version
+my $version = $covid->version();
+ok(defined($version), "got db-version: ".$version); $num_tests++;
+
+# fetch data from remote providers and store to DB (if asked to do so, see params above)
+my $objs = $covid->fetch_and_store();
+ok(defined($objs), "fetch_and_store() called"); $num_tests++;
+
+my $objsFromDB = $covid->select_datums_from_db();
+ok(defined($objsFromDB), "select_datums_from_db() called."); $num_tests++;
+
+my $num_indb = scalar @$objsFromDB;
+my $num_inmem = scalar @$objs;
+
+ok($num_indb<=$num_inmem, "at least $num_indb objects in DB from $num_inmem objects in memory."); $num_tests++;
+
+# there may be duplicates in db which are not written
+# so do it the long way
+my ($i, $j, $objI, $num_equal);
+for($i=0;$i<$num_indb;$i++){
+	$objI = $objsFromDB->[$i];
+	$num_equal = 0;
+	for($j=0;$j<$num_inmem;$j++){
+		if( $objI->equals($objs->[$j]) ){ $num_equal++ }
+	}
+	is($num_equal, 1, "ok found exactly 1 object from db in memory"); $num_tests++;
+}
+
+# select with conditions
+$objsFromDB = $covid->select_datums_from_db({
+	'conditions' => {
+		'belongsto' => 'UK',
+		'name' => 'Hackney'
+	}
+});
+ok(defined($objsFromDB), "select_datums_from_db() with conditions called."); $num_tests++;
+for my $anobj (@$objsFromDB){
+	ok(($anobj->name() eq 'Hackney') && ($anobj->belongsto() eq 'UK'), "selected objects from DB match name and belongsto fields."); $num_tests++;
+}
+
+# retrieve a timeline for a given location
+$objsFromDB = $covid->select_datums_from_db_for_location('Hackney');
+ok(defined($objsFromDB), "select_datums_from_db() with conditions called."); $num_tests++;
+for my $anobj (@$objsFromDB){
+	ok(($anobj->name() eq 'Hackney') && ($anobj->belongsto() eq 'UK'), "selected objects from DB match name and belongsto fields."); $num_tests++;
+}
+
+# backup DB to file using SQLite:
+my $backup_file = $covid->db_backup();
+ok(defined($backup_file), "db_backup() called."); $num_tests++;
+ok(-f $backup_file, "db_backup() produced this file '$backup_file'."); $num_tests++;
+unlink $backup_file;
+
+# backup DB to file using MySQL (which it does not do anything other than
+# telling you what commands you to issue in the command line
+my $olddbtype = $covid->dbparams()->{'dbtype'};
+$covid->dbparams()->{'dbtype'} = 'MySQL';
+$backup_file = $covid->db_backup(File::Spec->catfile($tmpdir, "backup"));
+ok(defined($backup_file), "db_backup() called."); $num_tests++;
+#because no file is created
+#ok(-f $backup_file, "db_backup() produced this file '$backup_file'."); $num_tests++;
+#unlink $backup_file;
+$covid->dbparams()->{'dbtype'} = $olddbtype;
+
+# make sure we have a version, print it again as an epilogue
+my $oldversion = $covid->version();
+# faux-pas but we need to check if cached version is updated if force
+$covid->{'db-version'} = $oldversion."XXXXX";
+$version = $covid->version(1);
+ok(defined($version), "got db-version: ".$version); $num_tests++;
+ok($version eq $oldversion, "versions match after updating the cache."); $num_tests++;
+
+
+done_testing($num_tests);

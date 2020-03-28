@@ -1,5 +1,12 @@
 Revision history for perl module Text::Amuse
 
+1.50 2020-03-28
+
+ - EXPERIMENTAL feature: support GH-Markdown tables.
+
+ - EXPERIMENTAL feature: interpolate $$ to page number when linking to
+   a named anchor
+
 1.42 2020-03-02
 
  - Restore perl 5.10.1 compatibility

@@ -14,6 +14,6 @@ prefixed func example {
    BEGIN { $LOG .= "B" }
 }
 
-is( $LOG, "EpEfBLfLpNpNf", 'stages run in correct order' );
+is( $LOG, "SpSfEpEfBLfLpNpNf", 'stages run in correct order' );
 
 done_testing;

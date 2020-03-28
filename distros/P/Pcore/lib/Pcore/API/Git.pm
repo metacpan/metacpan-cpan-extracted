@@ -11,7 +11,7 @@ has upstream => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::AP
 
 our $EXPORT = {
     GIT_UPSTREAM_URL => [qw[$GIT_UPSTREAM_URL_LOCAL $GIT_UPSTREAM_URL_HTTPS $GIT_UPSTREAM_URL_SSH]],
-    GIT_UPSTREAM     => [qw[$GIT_UPSTREAM_HOST $GIT_UPSTREAM_NAME $GIT_UPSTREAM_BITBUCKET $GIT_UPSTREAM_GITHUB $GIT_UPSTREAM_GITLAB]],
+    GIT_UPSTREAM     => [qw[$GIT_UPSTREAM_NAME_HOST $GIT_UPSTREAM_HOST_NAME $GIT_UPSTREAM_BITBUCKET $GIT_UPSTREAM_GITHUB $GIT_UPSTREAM_GITLAB]],
 };
 
 const our $GIT_UPSTREAM_URL_LOCAL => 1;
@@ -22,13 +22,13 @@ const our $GIT_UPSTREAM_BITBUCKET => 'bitbucket';
 const our $GIT_UPSTREAM_GITHUB    => 'github';
 const our $GIT_UPSTREAM_GITLAB    => 'gitlab';
 
-const our $GIT_UPSTREAM_HOST => {
+const our $GIT_UPSTREAM_NAME_HOST => {
     $GIT_UPSTREAM_BITBUCKET => 'bitbucket.org',
     $GIT_UPSTREAM_GITHUB    => 'github.com',
     $GIT_UPSTREAM_GITLAB    => 'gitlab.com',
 };
 
-const our $GIT_UPSTREAM_NAME => { map { $GIT_UPSTREAM_HOST->{$_} => $_ } keys $GIT_UPSTREAM_HOST->%* };
+const our $GIT_UPSTREAM_HOST_NAME => { map { $GIT_UPSTREAM_NAME_HOST->{$_} => $_ } keys $GIT_UPSTREAM_NAME_HOST->%* };
 
 around new => sub ( $orig, $self, $path = undef, $search = undef ) {
     return $self->$orig( { root => $path } ) if !defined $path;

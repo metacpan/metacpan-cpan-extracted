@@ -3,7 +3,7 @@ NAME
     support for Elasticsearch 2.x APIs
 
 VERSION
-    version 5.02
+    version 6.80
 
 DESCRIPTION
     The Search::Elasticsearch::Client::1_0::Async package provides a client
@@ -18,10 +18,10 @@ DESCRIPTION
     how to use the client itself.
 
 AUTHOR
-    Clinton Gormley <drtech@cpan.org>
+    Enrico Zimuel <enrico.zimuel@elastic.co>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2017 by Elasticsearch BV.
+    This software is Copyright (c) 2020 by Elasticsearch BV.
 
     This is free software, licensed under:
 

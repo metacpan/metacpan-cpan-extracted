@@ -22,12 +22,12 @@ my %requestedNewNodeId = (
 my %parentNodeId = (
     NodeId_namespaceIndex	=> 0,
     NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
-    NodeId_identifier		=> 85, # UA_NS0ID_OBJECTSFOLDER
+    NodeId_identifier		=> NS0ID_OBJECTSFOLDER,
 );
 my %referenceTypeId = (
     NodeId_namespaceIndex	=> 0,
     NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
-    NodeId_identifier		=> 35, # UA_NS0ID_ORGANIZES
+    NodeId_identifier		=> NS0ID_ORGANIZES,
 );
 my %browseName = (
     QualifiedName_namespaceIndex	=> 1,
@@ -36,7 +36,7 @@ my %browseName = (
 my %typeDefinition = (
     NodeId_namespaceIndex	=> 0,
     NodeId_identifierType	=> NODEIDTYPE_NUMERIC,
-    NodeId_identifier		=> 63, # UA_NS0ID_BASEDATAVARIABLETYPE
+    NodeId_identifier		=> NS0ID_BASEDATAVARIABLETYPE,
 );
 my %attr = (
     VariableAttributes_displayName	=> {

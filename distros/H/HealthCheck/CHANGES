@@ -1,9 +1,37 @@
 ==================================================
-Changes from 2019-02-21 00:00:00 +0000 to present.
+Changes from 2019-03-26 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version v1.5.3 at 2020-02-21 18:49:29 +0000
+version v1.5.4 at 2020-03-25 19:14:57 +0000
+-------------------------------------------
+
+  Change: ac76bd2f865a411dc31f0e2bc9933bc5536d8e19
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-03-25 15:14:40 +0000
+
+    Update README 
+
+  Change: d429df398e94ceea9418ba24789dbca488b131ab
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-03-03 19:52:43 +0000
+
+    Provide unique ids in summarize
+
+    If the "id" doesn't exist, we assume a default, but if we've seen the
+    the id in the current list of sub-results, we need to make it unique. 
+
+  Change: 765922c943243b17c6948082fc93334a00610946
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-24 11:20:51 +0000
+
+    Fix test to depend on Carp, not perl, version
+
+    Because the change in output comes from Carp and that can be updated
+    separately from perl. 
+
+-------------------------------------------
+version v1.5.3 at 2020-02-21 18:26:04 +0000
 -------------------------------------------
 
   Change: df272cb38f80b7e9a27bd66fa61cbfe438718156
@@ -205,5 +233,5 @@ dist/version v0.0.0.11289_01/master/PEX-11289a at 2019-05-06 14:07:39 +0000
     exceptions 
 
 =================================================
-Plus 50 releases after 2019-02-21 00:00:00 +0000.
+Plus 50 releases after 2019-03-26 00:00:00 +0000.
 =================================================

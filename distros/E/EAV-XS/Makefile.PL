@@ -13,8 +13,15 @@ sub myconfigure() {
     if (prompt("Use default options (y/n)?", "y") =~ /^y/i) {
         my $cfg = &build_auto();
 
-        if ($^O =~ /bsd/) {
+        if ($^O =~ /^(free|net)bsd$/i) {
             $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.bsd";
+        }
+        elsif ($^O eq "openbsd") {
+            $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.openbsd";
+        }
+        elsif ($^O eq "solaris") {
+            $cfg->{'DEFINE'} = "-DEAV_EXTRA -m64";
+            $cfg->{'dynamic_lib'}->{'OTHERLDFLAGS'} = "-m64";
         }
 
         return $cfg;
@@ -52,8 +59,15 @@ EOF
     my $rfc_opts = join(" ", &set_rfc_options());
     $cfg->{'macro'}->{'LIBEAV_OPTIONS'} .= " ${rfc_opts}";
 
-    if ($^O =~ /bsd/) {
+    if ($^O =~ /^(free|net)bsd$/i) {
         $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.bsd";
+    }
+    elsif ($^O eq "openbsd") {
+        $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.openbsd";
+    }
+    elsif ($^O eq "solaris") {
+        $cfg->{'DEFINE'} = "-DEAV_EXTRA -m64";
+        $cfg->{'dynamic_lib'}->{'OTHERLDFLAGS'} = "-m64";
     }
 
     return $cfg;
@@ -108,15 +122,15 @@ sub MY::postamble {
     return <<'EOL';
 $(MYEXTLIB): libeav/Makefile
 	$(MAKE) -C libeav static $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE) \
-		INCLUDES=$(DEFINE)
+		INCLUDES="$(DEFINE)"
 
 clean-libeav:
 	$(MAKE) -C libeav clean $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE) \
-		INCLUDES=$(DEFINE)
+		INCLUDES="$(DEFINE)"
 
 check-libeav:
 	$(MAKE) -C libeav check $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE) \
-		INCLUDES=$(DEFINE)
+		INCLUDES="$(DEFINE)" LDFLAGS="$(OTHERLDFLAGS)"
 
 EOL
 }

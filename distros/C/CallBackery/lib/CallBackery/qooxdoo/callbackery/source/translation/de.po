@@ -16,34 +16,46 @@ msgid "Support"
 msgstr ""
 
 #: callbackery/ui/Footer.js:34
-msgid "Implemented by %1"
-msgstr "Implementiert von %1"
+msgid ", %1."
+msgstr ", %1."
 
 #: callbackery/ui/Footer.js:39
 msgid "Version %1, %2%3"
 msgstr ""
 
-#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:110
+#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:111
 msgid "Login"
 msgstr "Anmelden"
 
-#: callbackery/ui/Login.js:81
+#: callbackery/ui/Login.js:82
 msgid "User"
 msgstr "Benutzer"
 
-#: callbackery/ui/Login.js:97
+#: callbackery/ui/Login.js:98
 msgid "Password"
 msgstr "Passwort"
 
-#: callbackery/ui/MsgBox.js:68 callbackery/ui/Login.js:113
+#: callbackery/ui/MsgBox.js:68 callbackery/ui/Login.js:114
 msgid "OK"
 msgstr ""
 
-#: callbackery/ui/Login.js:138
+#: callbackery/ui/Login.js:143
+msgid "Reset Password"
+msgstr ""
+
+#: callbackery/ui/Login.js:149
+msgid "Register New Account"
+msgstr ""
+
+#: callbackery/ui/Login.js:163
 msgid "release %1, %2 by %3"
 msgstr "Version %1, %2 by %3"
 
-#: callbackery/ui/MsgBox.js:66
+#: callbackery/ui/Login.js:284
+msgid "<span style=\"text-decoration: underline;\">%1</span>"
+msgstr ""
+
+#: callbackery/ui/Popup.js:39 callbackery/ui/MsgBox.js:66
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -77,16 +89,17 @@ msgstr ""
 msgid "dd.MM.yyyy"
 msgstr ""
 
-#: callbackery/ui/form/renderer/NoteForm.js:83
-msgid "%1 copied to clipboard."
-msgstr "%1 in die Zwischenablage kopiert."
+#: callbackery/ui/form/renderer/NoteForm.js:82
+#: callbackery/ui/form/renderer/NoteForm.js:84
+msgid "Select %1 and press [ctrl]+[c]"
+msgstr "Selektiere %1 und drücke [ctrl]+[c]"
 
-#: callbackery/ui/form/renderer/NoteForm.js:83
+#: callbackery/ui/form/renderer/NoteForm.js:90
 msgid "Success"
 msgstr "Erfolg"
 
-#: callbackery/ui/form/renderer/NoteForm.js:84
-#: callbackery/ui/form/renderer/NoteForm.js:86
+#: callbackery/ui/form/renderer/NoteForm.js:93
+#: callbackery/ui/form/renderer/NoteForm.js:96
 msgid "Copy failed"
 msgstr "Kopie fehlgeschlagen"
 
@@ -94,39 +107,38 @@ msgstr "Kopie fehlgeschlagen"
 msgid "Select %1 and press [ctrl]+[c]"
 msgstr "Selektiere %1 und drücke [ctrl]+[c]"
 
-#: callbackery/ui/form/renderer/NoteForm.js:86
-msgid "Select %1 and press [ctrl]+[c]"
-msgstr "Selektiere %1 und drücke [ctrl]+[c]"
-
-#: callbackery/ui/plugin/Action.js:102 callbackery/ui/plugin/Action.js:133
-#: callbackery/ui/plugin/Action.js:235
+#: callbackery/ui/plugin/Action.js:133 callbackery/ui/plugin/Action.js:164
+#: callbackery/ui/plugin/Action.js:272
 msgid "Validation Error"
 msgstr "Validierungsfehler"
 
-#: callbackery/ui/plugin/Action.js:103 callbackery/ui/plugin/Action.js:134
-#: callbackery/ui/plugin/Action.js:236
+#: callbackery/ui/plugin/Action.js:134 callbackery/ui/plugin/Action.js:165
+#: callbackery/ui/plugin/Action.js:273
 msgid ""
 "The form can only be submitted when all data fields have valid content."
 msgstr ""
 "Dieses Formular kann nur abgeschickt werden, wenn alle Felder einen gültigen"
 " Inhalt haben."
 
-#: callbackery/ui/plugin/Action.js:148
+#: callbackery/ui/plugin/Action.js:179
 msgid "No Data"
 msgstr "Keine Daten."
 
-#: callbackery/ui/plugin/Action.js:157
+#: callbackery/ui/plugin/Action.js:188
 msgid "Download Exception"
 msgstr "Download Fehler."
 
-#: callbackery/ui/plugin/Action.js:268
+#: callbackery/ui/plugin/Action.js:305
 msgid "Upload Exception"
 msgstr "Upload Fehler"
 
-#: callbackery/ui/plugin/Form.js:225
+#: callbackery/ui/plugin/Form.js:252
 msgid "Loading Form Data"
 msgstr "Daten werden geladen"
 
 #: callbackery/ui/plugin/Html.js:54
 msgid "Loading HTML Data"
 msgstr "HTML Daten werde geladen"
+
+#~ msgid "%1 copied to clipboard."
+#~ msgstr "%1 in die Zwischenablage kopiert."

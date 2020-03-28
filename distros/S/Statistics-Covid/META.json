@@ -1,0 +1,59 @@
+{
+   "abstract" : "Fetch, store in DB, retrieve and analyse Covid-19 statistics from data providers",
+   "author" : [
+      "Andreas Hadjiprocopis <bliako@cpan.org> / <andreashad2@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Statistics-Covid",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Harness" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Chart::Clicker" : "0",
+            "DBIx::Class" : "0",
+            "Data::Dump" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::CookieJar::LWP" : "0",
+            "JSON::Parse" : "0",
+            "LWP::UserAgent" : "0",
+            "Storable" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 4.00"
+}

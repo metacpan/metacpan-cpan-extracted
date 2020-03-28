@@ -67,6 +67,9 @@ sub parse_options {
         my $n = shift;
         ("with-$n", \$self->{"with_$n"}, "without-$n", sub { $self->{"with_$n"} = 0 });
     };
+    my @type  = qw(requires recommends suggests);
+    my @phase = qw(configure build test runtime develop);
+
     GetOptions
         "L|local-lib-contained=s" => \($self->{local_lib}),
         "color!" => \($self->{color}),
@@ -94,8 +97,9 @@ sub parse_options {
         "reinstall" => \($self->{reinstall}),
         "pp|pureperl|pureperl-only" => \($self->{pureperl_only}),
         "static-install!" => \($self->{static_install}),
-        (map $with_option->($_), qw(requires recommends suggests)),
-        (map $with_option->($_), qw(configure build test runtime develop)),
+        "with-all" => sub { map { $self->{"with_$_"} = 1 } @type, @phase },
+        (map $with_option->($_), @type),
+        (map $with_option->($_), @phase),
         "feature=s@" => \@feature,
         "show-build-log-on-failure" => \($self->{show_build_log_on_failure}),
     or exit 1;

@@ -64,11 +64,11 @@
    "provides" : {
       "Mojolicious::Plugin::Config::Structured" : {
          "file" : "lib/Mojolicious/Plugin/Config/Structured.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       }
    },
    "release_status" : "stable",
-   "version" : "1.001",
+   "version" : "1.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

@@ -4,9 +4,8 @@ DESTDIR ?= ${_destdir}
 INSTALL ?= ${_install}
 RM ?= rm -rf
 
-#DEFS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=500 -D_SVID_SOURCE
-DEFS += -I../include
-DEFS += ${_defs}
+DEFS = -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
+DEFS += -I../include ${_defs}
 
 TARGETS = eav eav.static
 SOURCES != ls *.c

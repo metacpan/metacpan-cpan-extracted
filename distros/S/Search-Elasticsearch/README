@@ -2,7 +2,7 @@ NAME
     Search::Elasticsearch - The official client for Elasticsearch
 
 VERSION
-    version 6.00
+    version 6.80
 
 SYNOPSIS
         use Search::Elasticsearch;
@@ -413,10 +413,10 @@ TEST SUITE
         ES_CXN=Hijk ES=localhost:9200 make test
 
 AUTHOR
-    Clinton Gormley <drtech@cpan.org>
+    Enrico Zimuel <enrico.zimuel@elastic.co>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2017 by Elasticsearch BV.
+    This software is Copyright (c) 2020 by Elasticsearch BV.
 
     This is free software, licensed under:
 
