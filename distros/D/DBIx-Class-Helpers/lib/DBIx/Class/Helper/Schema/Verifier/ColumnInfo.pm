@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Schema::Verifier::ColumnInfo;
-$DBIx::Class::Helper::Schema::Verifier::ColumnInfo::VERSION = '2.035000';
+$DBIx::Class::Helper::Schema::Verifier::ColumnInfo::VERSION = '2.036000';
 # ABSTRACT: Verify that Results only use approved column_info keys
 
 use strict;

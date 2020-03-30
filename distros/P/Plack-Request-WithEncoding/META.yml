@@ -1,22 +1,23 @@
 ---
-abstract: 'Subclass of L<Plack::Request> which supports encoding.'
+abstract: 'Subclass of L<Plack::Request> which supports encoded requests.'
 author:
   - 'moznion <moznion@gmail.com>'
 build_requires:
-  HTTP::Request: 0
-  HTTP::Request::Common: 0
-  Plack::Test: 0
-  Test::More: 0.98
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  Test::More: '0.98'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  Module::Build: 0.38
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v0.8.1, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Plack-Request-WithEncoding
 no_index:
   directory:
@@ -31,17 +32,19 @@ no_index:
 provides:
   Plack::Request::WithEncoding:
     file: lib/Plack/Request/WithEncoding.pm
-    version: 0.12
+    version: '0.13'
 requires:
-  Encode: 0
-  Hash::MultiValue: 0
-  Plack::Request: 0
-  parent: 0
-  perl: 5.008001
+  Encode: '0'
+  Hash::MultiValue: '0'
+  Plack::Request: '0'
+  parent: '0'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/moznion/Plack-Request-WithEncoding/issues
   homepage: https://github.com/moznion/Plack-Request-WithEncoding
   repository: git://github.com/moznion/Plack-Request-WithEncoding.git
-version: 0.12
+version: '0.13'
 x_contributors:
   - 'Songmu <y.songmu@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

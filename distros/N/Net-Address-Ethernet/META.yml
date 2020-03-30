@@ -1,35 +1,32 @@
 ---
 abstract: 'find hardware ethernet address'
 author:
-  - "Martin 'Kingpin' Thurn, C<mthurn at cpan.org>, L<http://tinyurl.com/nn67z>."
+  - 'Martin Thurn <mthurn@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
-  Test::More: 0
+  ExtUtils::testlib: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.18'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: Net::Address::Ethernet
+  version: '1.4'
 name: Net-Address-Ethernet
-no_index:
-  directory:
-    - inc
-    - t
-recommends:
-  Data::Dumper: 0
-  Test::Pod: 0
-  Test::Pod::Coverage: 0
 requires:
-  Net::Domain: 0
-  Net::Ifconfig::Wrapper: 0
-  Regexp::Common: 0
-  Sys::Hostname: 0
-  perl: 5.004
-resources:
-  license: http://dev.perl.org/licenses/
-version: 1.126
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  Net::Domain: '0'
+  Net::Ifconfig::Wrapper: '0'
+  Regexp::Common: '0'
+  Socket: '0'
+  Sys::Hostname: '0'
+  base: '0'
+  constant: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+version: '1.129'
+x_serialization_backend: 'YAML::Tiny version 1.70'

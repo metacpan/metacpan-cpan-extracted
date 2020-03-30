@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 use Getopt::Long;
 
@@ -110,4 +110,3 @@ EXA
 	. "\nProgram by Andreas Hadjiprocopis (andreashad2\@gmail.com / bliako\@cpan.org)\n"
 	;
 }
-

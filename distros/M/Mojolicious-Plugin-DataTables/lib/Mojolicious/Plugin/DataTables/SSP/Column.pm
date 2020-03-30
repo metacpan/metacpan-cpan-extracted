@@ -3,7 +3,7 @@ package Mojolicious::Plugin::DataTables::SSP::Column;
 
 use Mojo::Base -base;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 has 'data';
 has 'database';
@@ -21,7 +21,7 @@ has 'row';
 
 =head1 NAME
 
-Mojolicious::Plugin::DataTables::SSP::Column - DataTables SSP Result Helper
+Mojolicious::Plugin::DataTables::SSP::Column - DataTables SSP Column Helper
 
 =head1 SYNOPSIS
 

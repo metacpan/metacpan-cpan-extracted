@@ -188,6 +188,28 @@ use Promise::ES6;
             ) or diag explain \@warnings;
         },
 
+        # var p = Promise.reject(789); p.finally(() => {}); p.finally(() => {}); var p2 = p.catch(e => console.debug(e));
+        sub {
+            {
+                my $rej;
+
+                my $p = Promise::ES6->new( sub { (undef, $rej) = @_ } );
+
+                $p->finally( sub { } );
+                $p->finally( sub { } );
+
+                $p->catch( sub { } );
+
+                $rej->(1234);
+            }
+
+            cmp_deeply(
+                \@warnings,
+                [ re( qr<1234> ), re( qr<1234> ) ],
+                'each finally() shoots out its own warning',
+            ) or diag explain \@warnings;
+        },
+
         sub {
             {
                 my $p = Promise::ES6->resolve(1)->then( sub { Promise::ES6->reject(789) } );
@@ -198,6 +220,18 @@ use Promise::ES6;
                 [ re( qr<789> ) ],
                 'then() shoots out a warning from a returned rejection',
             );
+        },
+
+        sub {
+            {
+                my $p = Promise::ES6->resolve(1)->finally( sub { die 789; } );
+            }
+
+            cmp_deeply(
+                \@warnings,
+                [ re( qr<789> ) ],
+                'finally() shoots out a warning from a failure in callback',
+            ) or diag explain \@warnings;
         },
 
         sub {

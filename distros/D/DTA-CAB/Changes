@@ -2,6 +2,10 @@
 ##
 ## Change log for perl distribution DTA::CAB
 
+v1.112 Mon, 30 Mar 2020 13:49:13 +0200 moocow
+	* added %DTA::CAB::Analyzer::CLOSURE_CACHE - avoid re-compiling accessClosure() subs
+	  - appears to fix memory-leak symptoms for Analyzer::Moot on debian stretch (perl 5.24.1)
+
 v1.111 Thu, 23 Jan 2020 10:15:17 +0100 moocow
 	* fixed normalized-key bug in DTA:CAB::Analyzer::DmootSub, ::MootSub
 	  - earlier versions used normalized text as type-key ($dmoot->{tag},$moot->{word})

@@ -1,0 +1,54 @@
+NAME
+    new - Object instantiation sugar for one-liners
+
+SYNOPSIS
+    Simplest possible usage:
+
+      perl -Mnew=HTTP::Tiny -E \
+        'say $O->get("http://trout.me.uk/X11/vimrc")->{content}'
+
+    With arguments:
+
+      perl -Mnew=HTTP::Tiny,max_redirects,3 -E \
+        'say $O->get("http://trout.me.uk/X11/vimrc")->{content}'
+
+    With custom object name:
+
+      perl -Mnew=HTTP::Tiny,\$H -E \
+        'say $H->get("http://trout.me.uk/X11/vimrc")->{content}'
+
+    With both:
+
+      perl -Mnew=HTTP::Tiny,\$H,max_redirects,3 -E \
+        'say $H->get("http://trout.me.uk/X11/vimrc")->{content}'
+
+DESCRIPTION
+  import
+      new->import($class, @args)
+
+    First we "require" the file for $class, then call
+
+      $class->new(@args)
+
+    then install the resulting object in $O in the calling package.
+
+    If the first argument to "import" after $class begins with "$", this is
+    treated as the name to install the object as, so
+
+      new->import($class, '$Obj', @args);
+
+    will create a variable $Obj in the calling package instead of $O.
+
+AUTHOR
+     mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    None yet - maybe this software is perfect! (ahahahahahahahahaha)
+
+COPYRIGHT
+    Copyright (c) 2020 the new "AUTHOR" and "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

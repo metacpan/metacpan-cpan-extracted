@@ -7,7 +7,7 @@ use Encode ();
 use Carp ();
 use Hash::MultiValue;
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 use constant KEY_BASE_NAME    => 'plack.request.withencoding';
 use constant DEFAULT_ENCODING => 'utf-8';
@@ -91,11 +91,11 @@ __END__
 
 =encoding utf-8
 
-=for stopwords CGI.pm-compatible $req->env->{'plack.request.withencoding.encoding'} utf-8
+=for stopwords CGI.pm-compatible $req->env->{'plack.request.withencoding.encoding'} utf-8 falsy
 
 =head1 NAME
 
-Plack::Request::WithEncoding - Subclass of L<Plack::Request> which supports encoding.
+Plack::Request::WithEncoding - Subclass of L<Plack::Request> which supports encoded requests.
 
 =head1 SYNOPSIS
 
@@ -125,44 +125,39 @@ Plack::Request::WithEncoding - Subclass of L<Plack::Request> which supports enco
 
 =head1 DESCRIPTION
 
-Plack::Request::WithEncoding is the subclass of L<Plack::Request>.
-This module supports the encoding for requests, the following attributes will return decoded request values.
+Plack::Request::WithEncoding is a subclass of L<Plack::Request> that supports encoded requests. It overrides many Plack::Request attributes to return decoded values.
+This feature allows a single application to seamlessly handle a wide variety of different language code sets. Applications that must be able to handle many different translations at once will find this extension able to quickly solve that problem.
 
-Please refer also L</"SPECIFICATION OF THE ENCODING METHOD">.
+The target attributes to be encoded are described at L</"SPECIFICATION OF THE ENCODING METHOD">.
 
-=head1 ATTRIBUTES
+=head1 ATTRIBUTES of C<Plack::Request::WithEncoding>
 
 =over 4
 
 =item * encoding
 
-Returns a encoding method to use to decode parameters.
+Returns an encoding method to decode parameters.
 
 =item * query_parameters
 
-Returns a reference to a hash containing B<decoded> query string (GET)
-parameters. This hash reference is L<Hash::MultiValue> object.
+Returns a reference of L<Hash::MultiValue> instance that contains B<decoded> query parameters.
 
 =item * body_parameters
 
-Returns a reference to a hash containing B<decoded> posted parameters in the
-request body (POST). As with C<query_parameters>, the hash
-reference is a L<Hash::MultiValue> object.
+Returns a reference of L<Hash::MultiValue> instance that contains B<decoded> request body.
 
 =item * parameters
 
-Returns a L<Hash::MultiValue> hash reference containing B<decoded> (and merged) GET
-and POST parameters.
+Returns a reference of L<Hash::MultiValue> instance that contains B<decoded> parameters. The parameters are merged with C<query_parameters> and C<body_parameters>.
 
 =item * param
 
-Returns B<decoded> GET and POST parameters with a CGI.pm-compatible param
-method. This is an alternative method for accessing parameters in
-C<$req-E<gt>parameters>. Unlike CGI.pm, it does I<not> allow
-setting or modifying query parameters.
+Returns B<decoded> parameters with a CGI.pm-compatible param method. This is an alternative method for accessing parameters in
+C<$req-E<gt>parameters>.
+Unlike CGI.pm, it does B<not> allow setting or modifying query parameters.
 
-    $value  = $req->param( 'foo' );
-    @values = $req->param( 'foo' );
+    $value  = $req->param('foo');
+    @values = $req->param('foo');
     @params = $req->param;
 
 =item * raw_query_parameters
@@ -185,18 +180,14 @@ This attribute is the same as C<param> of L<Plack::Request>.
 
 =head1 SPECIFICATION OF THE ENCODING METHOD
 
-You can specify the encoding method, like so;
+You can specify the character-encoding to decode, like so;
 
     $req->env->{'plack.request.withencoding.encoding'} = 'utf-7'; # <= set utf-7
 
-And this encoding method will be used to decode.
+When this character-encoding wasn't given through C<$req-E<gt>env-E<gt>{'plack.request.withencoding.encoding'}>, this module uses "utf-8" as the default character-encoding to decode.
+It would be better to specify this character-encoding explicitly because the readability and understandability of the code behavior would be improved.
 
-When not once substituted for C<$req-E<gt>env-E<gt>{'plack.request.withencoding.encoding'}>, this module will use "utf-8" as encoding method.
-However the behavior of a program will become unclear if this function is used. Therefore B<YOU SHOULD NOT USE THIS>.
-You should specify the encoding method explicitly.
-
-In case of false value (e.g. `undef`, 0, '') is explicitly substituted for C<$req-E<gt>env-E<gt>{'plack.request.withencoding.encoding'}>,
-then this module will return B<raw value> (with no encoding).
+Once this value was specified by falsy value (e.g. `undef`, 0 and ''), this module returns B<raw value> (i.e. never decodes).
 
 The example of a code is shown below.
 
@@ -226,3 +217,4 @@ it under the same terms as Perl itself.
 moznion E<lt>moznion@gmail.comE<gt>
 
 =cut
+

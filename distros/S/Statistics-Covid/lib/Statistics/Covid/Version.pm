@@ -12,7 +12,7 @@ use Statistics::Covid::Version::Table;
 
 use DateTime;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 # our constructor which calls parent constructor first and then does
 # things specific to us, like dates

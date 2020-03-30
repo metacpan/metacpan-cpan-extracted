@@ -1,5 +1,5 @@
 package Yancy::Backend::Mysql;
-our $VERSION = '1.045';
+our $VERSION = '1.046';
 # ABSTRACT: A backend for MySQL using Mojo::mysql
 
 #pod =head1 SYNOPSIS
@@ -121,6 +121,7 @@ our $VERSION = '1.045';
 use Mojo::Base '-base';
 use Mojo::JSON qw( encode_json );
 use Role::Tiny qw( with );
+use Yancy::Backend::Role::Relational;
 with qw( Yancy::Backend::Role::Relational Yancy::Backend::Role::MojoAsync );
 BEGIN {
     eval { require Mojo::mysql; Mojo::mysql->VERSION( 1.05 ); 1 }
@@ -160,14 +161,35 @@ sub filter_table { 1 }
 sub fixup_default {
     my ( $self, $value ) = @_;
     return undef if !defined $value;
+    return "now" if $value =~ /^(?:NOW|(?:CUR(?:RENT_)?|LOCAL|UTC_)(?:DATE|TIME(?:STAMP)?))(?:\(\))?/i;
     $value;
+}
+
+sub normalize {
+    my ( $self, $schema_name, $data ) = @_;
+    $data = Yancy::Backend::Role::Relational::normalize( @_ ) || return undef;
+    my $schema = $self->schema->{ $schema_name }{ properties };
+    my %replace;
+    for my $key ( keys %$data ) {
+        next if !defined $data->{ $key }; # leave nulls alone
+        my ( $type, $format ) = @{ $schema->{ $key } }{qw( type format )};
+        if ( is_type( $type, 'string' ) && is_format( $format, 'date-time' ) ) {
+            if ( !$data->{ $key } ) {
+                $replace{ $key } = undef;
+            }
+            elsif ( $data->{ $key } eq 'now' ) {
+                $replace{ $key } = \'NOW()';
+            }
+        }
+    }
+    return { %$data, %replace };
 }
 
 sub create {
     my ( $self, $coll, $params ) = @_;
     $params = $self->normalize( $coll, $params );
     die "No refs allowed in '$coll': " . encode_json $params
-        if grep ref, values %$params;
+        if grep ref && ref ne 'SCALAR', values %$params;
     my $id_field = $self->id_field( $coll );
     my $id = $self->mojodb->db->insert( $coll, $params )->last_insert_id;
     # Assume the id field is correct in case we're using a different
@@ -208,7 +230,7 @@ Yancy::Backend::Mysql - A backend for MySQL using Mojo::mysql
 
 =head1 VERSION
 
-version 1.045
+version 1.046
 
 =head1 SYNOPSIS
 

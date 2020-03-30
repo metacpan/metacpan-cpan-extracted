@@ -2,8 +2,8 @@ NAME
     App::DateUtils - An assortment of date-/time-related CLI utilities
 
 VERSION
-    This document describes version 0.122 of App::DateUtils (from Perl
-    distribution App-DateUtils), released on 2019-11-29.
+    This document describes version 0.123 of App::DateUtils (from Perl
+    distribution App-DateUtils), released on 2020-01-31.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -47,11 +47,35 @@ FUNCTIONS
 
     *   Convert "today" to epoch:
 
-         dateconv(date => "today"); # -> [200, "OK", 1574985600]
+         dateconv(date => "today"); # -> [200, "OK", 1580428800]
 
     *   Convert epoch to ymd:
 
          dateconv(date => 1463702400, to => "ymd"); # -> "2016-05-20"
+
+    *   Convert epoch to iso8601:
+
+         dateconv(date => 1580446441, to => "iso8601"); # -> "2020-01-31T04:54:01Z"
+
+    *   Convert iso8601 to epoch:
+
+         dateconv(date => "2020-01-31T04:54:01Z", to => "epoch"); # -> 1580446441
+
+    *   Show all possible conversions:
+
+         dateconv(date => "now", to => "ALL");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           {
+             epoch => 1580446720,
+             iso8601 => "2020-01-31T04:58:40Z",
+             ymd => "2020-01-31",
+           },
+         ]
 
     This function is not exported.
 
@@ -79,7 +103,7 @@ FUNCTIONS
     *   Example #2:
 
          datediff(
-           date1 => "2019-06-18T20:08:42",
+             date1 => "2019-06-18T20:08:42",
            date2 => "2019-06-19T06:02:03",
            as => "hms"
          );
@@ -91,7 +115,7 @@ FUNCTIONS
     *   Example #3:
 
          datediff(
-           date1 => "2019-06-18T20:08:42",
+             date1 => "2019-06-18T20:08:42",
            date2 => "2019-06-22T06:02:03",
            as => "concise_hms"
          );
@@ -103,7 +127,7 @@ FUNCTIONS
     *   Example #4:
 
          datediff(
-           date1 => "2019-06-18T20:08:42",
+             date1 => "2019-06-18T20:08:42",
            date2 => "2019-06-19T06:02:03",
            as => "seconds"
          );
@@ -174,8 +198,8 @@ FUNCTIONS
              module          => "DateTime::Format::Flexible",
              original        => "tomorrow",
              is_parseable    => 1,
-             as_epoch        => 1575072000,
-             as_datetime_obj => "2019-11-30T00:00:00",
+             as_epoch        => 1580515200,
+             as_datetime_obj => "2020-02-01T00:00:00",
            },
            {
              module       => "DateTime::Format::Flexible",
@@ -230,8 +254,8 @@ FUNCTIONS
              module          => "DateTime::Format::Alami::EN",
              original        => "23 May",
              is_parseable    => 1,
-             as_epoch        => 1558569600,
-             as_datetime_obj => "2019-05-23T00:00:00",
+             as_epoch        => 1590192000,
+             as_datetime_obj => "2020-05-23T00:00:00",
              pattern         => "p_dateymd",
            },
          ]
@@ -289,8 +313,8 @@ FUNCTIONS
              module          => "DateTime::Format::Alami::ID",
              original        => "23 Mei",
              is_parseable    => 1,
-             as_epoch        => 1558569600,
-             as_datetime_obj => "2019-05-23T00:00:00",
+             as_epoch        => 1590192000,
+             as_datetime_obj => "2020-05-23T00:00:00",
              pattern         => "p_dateymd",
            },
          ]
@@ -348,8 +372,8 @@ FUNCTIONS
              module          => "DateTime::Format::Flexible",
              original        => "23rd Jun",
              is_parseable    => 1,
-             as_epoch        => 1561248000,
-             as_datetime_obj => "2019-06-23T00:00:00",
+             as_epoch        => 1592870400,
+             as_datetime_obj => "2020-06-23T00:00:00",
            },
          ]
 
@@ -364,8 +388,8 @@ FUNCTIONS
              module          => "DateTime::Format::Flexible(de)",
              original        => "23 Dez",
              is_parseable    => 1,
-             as_epoch        => 1577059200,
-             as_datetime_obj => "2019-12-23T00:00:00",
+             as_epoch        => 1608681600,
+             as_datetime_obj => "2020-12-23T00:00:00",
            },
          ]
 
@@ -425,8 +449,8 @@ FUNCTIONS
              module          => "DateTime::Format::Natural",
              original        => "23rd Jun",
              is_parseable    => 1,
-             as_epoch        => 1561248000,
-             as_datetime_obj => "2019-06-23T00:00:00",
+             as_epoch        => 1592870400,
+             as_datetime_obj => "2020-06-23T00:00:00",
            },
          ]
 
@@ -628,8 +652,8 @@ FUNCTIONS
              is_parseable => 1,
              as_secs => 1209600,
              as_dtdur_obj => "P14D",
-             date1 => "2019-11-29T02:17:55",
-             date2 => "2019-12-13T02:17:55",
+             date2 => "2020-02-14T04:58:40",
+             date1 => "2020-01-31T04:58:40",
            },
          ]
 
@@ -644,10 +668,10 @@ FUNCTIONS
              module => "DateTime::Format::Natural",
              original => "from 23 Jun to 29 Jun",
              is_parseable => 1,
-             as_secs => 13157275,
-             as_dtdur_obj => "P5MT2H17M55S",
-             date1 => "2019-11-29T02:17:55",
-             date2 => "2019-06-29T00:00:00",
+             as_secs => 13006880,
+             as_dtdur_obj => "P4M28DT19H1M20S",
+             date1 => "2020-01-31T04:58:40",
+             date2 => "2020-06-29T00:00:00",
            },
          ]
 
@@ -755,7 +779,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    dateparse. The official CLI for DateTime::Format::Natural.
+    dateparse. Perinci::To::POD=HASH(0x55d490eec860).
 
     App::datecalc
 
@@ -763,7 +787,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

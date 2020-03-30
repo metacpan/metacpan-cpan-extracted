@@ -19,6 +19,7 @@ WriteMakefile(
     EXE_FILES    => [
                     qw{
                        scripts/power-outlet
+                       scripts/power-outlet-mqtt-listener.pl
                       }
                     ],
 );

@@ -1,5 +1,9 @@
 Revision history for Tickit-Widget-Scroller
 
+0.24    2020-03-30
+        [CHANGES]
+         * Use Object::Pad
+
 0.23    2017/05/22 13:13:40
         [CHANGES]
          * Avoid $win->clear in unit tests

@@ -22,5 +22,5 @@ requires:
   perl: '5.01'
 resources:
   repository: git://github.com/giterlizzi/perl-Mojolicious-Plugin-DataTables
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -20,19 +20,19 @@ name: App-gimpgitbuild
 provides:
   App::gimpgitbuild:
     file: lib/App/gimpgitbuild.pm
-    version: v0.14.0
+    version: v0.16.0
   App::gimpgitbuild::API::GitBuild:
     file: lib/App/gimpgitbuild/API/GitBuild.pm
-    version: v0.14.0
+    version: v0.16.0
   App::gimpgitbuild::Command::build:
     file: lib/App/gimpgitbuild/Command/build.pm
-    version: v0.14.0
+    version: v0.16.0
   App::gimpgitbuild::Command::env:
     file: lib/App/gimpgitbuild/Command/env.pm
-    version: v0.14.0
+    version: v0.16.0
   App::gimpgitbuild::Command::runenv:
     file: lib/App/gimpgitbuild/Command/runenv.pm
-    version: v0.14.0
+    version: v0.16.0
 requires:
   App::Cmd::Setup: '0'
   Git::Sync::App: '0'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/shlomif/App-gimpgitbuild/issues
   homepage: http://metacpan.org/release/App-gimpgitbuild
   repository: git://github.com/shlomif/App-gimpgitbuild.git
-version: 0.14.0
+version: 0.16.0
 x_Dist_Zilla:
   perl:
     version: '5.030002'

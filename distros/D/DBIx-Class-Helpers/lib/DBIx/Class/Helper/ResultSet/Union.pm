@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Union;
-$DBIx::Class::Helper::ResultSet::Union::VERSION = '2.035000';
+$DBIx::Class::Helper::ResultSet::Union::VERSION = '2.036000';
 use parent 'DBIx::Class::Helper::ResultSet::SetOperations';
 
 use Carp::Clan;

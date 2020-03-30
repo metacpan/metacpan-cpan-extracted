@@ -1,16 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Scroller::Item::RichText;
-
-use strict;
-use warnings;
-
-use base qw( Tickit::Widget::Scroller::Item::Text );
-
-our $VERSION = '0.23';
+use Object::Pad 0.17;
+class Tickit::Widget::Scroller::Item::RichText 0.24
+   extends Tickit::Widget::Scroller::Item::Text;
 
 use Tickit::Utils qw( textwidth );
 
@@ -21,18 +16,18 @@ attributes
 
 =head1 SYNOPSIS
 
- use Tickit::Widget::Scroller;
- use Tickit::Widget::Scroller::Item::RichText;
- use String::Tagged;
+   use Tickit::Widget::Scroller;
+   use Tickit::Widget::Scroller::Item::RichText;
+   use String::Tagged;
 
- my $str = String::Tagged->new( "An important message" );
- $str->apply_tag( 3, 9, b => 1 );
+   my $str = String::Tagged->new( "An important message" );
+   $str->apply_tag( 3, 9, b => 1 );
 
- my $scroller = Tickit::Widget::Scroller->new;
+   my $scroller = Tickit::Widget::Scroller->new;
 
- $scroller->push(
-    Tickit::Widget::Scroller::Item::RichText->new( $str )
- );
+   $scroller->push(
+      Tickit::Widget::Scroller::Item::RichText->new( $str )
+   );
 
 =head1 DESCRIPTION
 
@@ -45,11 +40,8 @@ and values.
 
 =cut
 
-sub _build_chunks_for
+method _build_chunks_for ( $str )
 {
-   my $self = shift;
-   my ( $str ) = @_;
-
    my @chunks;
 
    $str->iter_substr_nooverlap(

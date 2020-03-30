@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::NoColumns;
-$DBIx::Class::Helper::ResultSet::NoColumns::VERSION = '2.035000';
+$DBIx::Class::Helper::ResultSet::NoColumns::VERSION = '2.036000';
 # ABSTRACT: Look ma, no columns!
 
 use strict;

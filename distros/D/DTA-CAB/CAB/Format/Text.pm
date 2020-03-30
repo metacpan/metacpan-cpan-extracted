@@ -57,7 +57,7 @@ sub blockScanBody {
   my ($fmt,$bufr,$opts) = @_;
 
   ##-- scan blocks into head, body, foot
-  my $bsize  = $opts->{size};
+  my $bsize  = $opts->{bsize} // $opts->{size} // 1048576;
   my $fsize  = $opts->{ifsize};
   my $eob    = $opts->{eob} =~ /^s/i ? 's' : 'w';
   my $blocks = [];

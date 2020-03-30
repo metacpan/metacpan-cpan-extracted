@@ -1,9 +1,27 @@
 ==================================================
-Changes from 2016-10-25 00:00:00 +0000 to present.
+Changes from 2018-03-31 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.008 at 2018-10-25 03:19:56 +0000
+version 0.009 at 2020-03-30 05:14:22 +0000
+------------------------------------------
+
+  Change: 070caa77e9b124379e394ebe7d205f4a99647e27
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-03-29 22:10:11 +0000
+
+    Work with .netrc and better API support
+
+    * Allow discovery of username and password via `~/.netrc` * Replace
+    `server`, `port`, and `protocol` parameters with a single
+
+    `url` parameter. Mainly so URLs like "http://localhost:8000/airsonic"
+
+    are supported * Fix option processing to match the new `url` parameter *
+    Set ratings as integers 
+
+------------------------------------------
+version 0.008 at 2018-10-25 03:17:43 +0000
 ------------------------------------------
 
   Change: cb74de22bf9487a7097146760ab298b800055036
@@ -75,104 +93,6 @@ version 0.005 at 2018-04-13 04:02:26 +0000
 
     Make default API version match what is documented 
 
-------------------------------------------
-version 0.004 at 2018-01-18 03:55:52 +0000
-------------------------------------------
-
-  Change: 783b94ca19518ba8a57b72fe22f96c83484dadcd
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-01-17 19:55:52 +0000
-
-    Enable compatiblity with MadSonic v2 API
-
-    Allow version override in the tools and enable compatibility with the
-    MadSonic API. 
-
-  Change: 359efcccc5fc0d338491519263fc0a98fced6e43
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-11-24 11:17:31 +0000
-
-    Correct the shebang line for install. 
-
-------------------------------------------
-version 0.003 at 2017-11-24 16:47:27 +0000
-------------------------------------------
-
-  Change: 10dcef7071300f9cd257c6e3359077b13cac9033
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-11-24 08:47:27 +0000
-
-    Ready for new release, docs regenerated. 
-
-  Change: 66a5880091a6709ead4d2abe2c1bdfbbdb74aab1
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-11-22 09:06:43 +0000
-
-    Fix Import Ratings script to use the proper data structures 
-
-------------------------------------------
-version 0.002 at 2017-10-24 05:49:39 +0000
-------------------------------------------
-
-  Change: ae59b9242d80ce1f775060148b25617dffe30b55
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-10-23 22:49:39 +0000
-
-    New Version
-
-    * Generate META.yaml * Fix missing dependency in the import script 
-
-  Change: 167755935b9b998f5356cbb1b545c741473d8945
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date : 2017-08-02 12:41:34 +0000
-
-    - Autogenerate META.yml using dzil plugin [MetaYAML]. 
-
-------------------------------------------
-version 0.001 at 2017-08-02 04:30:15 +0000
-------------------------------------------
-
-  Change: 8cceab3f56b006583a110493263bcdf0ccd54733
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-08-01 21:30:15 +0000
-
-    Included two utility scripts to demonstrate the API use.
-
-    subsonic_import_ratings.pl - Using an iTunes XML Library export file,
-    import those song ratings into Subsonic as best as possible.
-
-    subsonic_sync_starred.pl - Sync all starred music by artist, album, and
-    song to a folder. Optionally provide a "--local-media-dir" where the music
-    files maybe found, otherwise they'll be downloaded from the subsonic
-    server. 
-
-  Change: d63ee2767ecc0b37d413abc208f87009d65bedc1
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-08-01 21:25:30 +0000
-
-    Early release version of the library.
-
-    Only attempt to decode JSON contents when the content-type is set from the
-    server. Otherwise, pass the body back to the client. This allows the
-    download API to work through the api_request() method.
-
-    Add documentation to the all the attributes and methods. 
-
-  Change: 69cdd949a22ef9314ec4bf18cf05e85a3c365073
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-08-01 21:25:04 +0000
-
-    Newly minted WWW::Subsonic
-
-    Update Dist::Zilla configs. Add a .gitignore to the repository. Remove
-    LICENSE file, Dist::Zilla will manage that. 
-
-  Change: beffcbb14dc70ae7ce6c6ee2cef072b93ffa28b3
-  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
-  Date : 2017-07-30 21:21:39 +0000
-
-    Initial commit 
-
-================
-End of releases.
-================
+================================================
+Plus 4 releases after 2018-03-31 00:00:00 +0000.
+================================================

@@ -26,6 +26,11 @@ is_deeply(chops($fold),
 	  [ "1", "22", "333" ],
 	  "array (short)");
 
+$fold->configure(text => "122333444455555", width => [ 1, 0, 2, 0, 3 ]);
+is_deeply(chops($fold),
+	  [ "1", "", "22", "", "333" ],
+	  "array 0-width (short)");
+
 $fold->configure(text => "122333444455555", width => [ 1..5 ]);
 is_deeply(chops($fold),
 	  [ "1", "22", "333", "4444", "55555" ],

@@ -13,6 +13,8 @@ use Encode qw(encode decode);
 use IO::File;
 use Carp;
 
+#use Devel::Cycle; ##-- debug
+
 use strict;
 
 ##==============================================================================
@@ -355,6 +357,11 @@ sub analyzeSentences {
   $moot->{notag}     = $notag;
   $moot->{use_dmoot} = $use_dmoot;
 
+  ##-- DEBUG
+  #print STDERR "find_cycle()\n";
+  #find_cycle([$moot,$doc,$acode_sub]);
+  ##--/DEBUG
+
   return $doc;
 }
 
@@ -404,12 +411,12 @@ sub analysisCodeDEBUG {
 		    ) if (!defined($mw->{text}));
       $mw->{text} = lc($mw->{text}) if ($lctext);
       $mw->{analyses} = [{tag=>"NE",details=>"NE.xp",prob=>0}] if ($xpne && ($w->{xp}//"") =~ /\b((?:pers)Name)\b/i); #place
-      $mw->{analyses} = [{tag=>$fmtag,details=>"${fmtag}.xp",prob=>0}] if ($xpfm && ($w->{xp}//"") =~ /\bforeign\b/i);
+      $mw->{analyses} = [{tag=>$fmtag,details=>"$fmtag.xp",prob=>0}] if ($xpfm && ($w->{xp}//"") =~ /\bforeign\b/i);
       $val = undef;	      ##-- temporary for _am_tagh_moota_uniq()
       $mw->{analyses} = [(map {$val && $val->{details} eq $_->{details} ? qw() : ($val=$_)} sort {($a->{details}//"") cmp ($b->{details}//"") || ($a->{prob}//0) <=> ($b->{prob}//0)} (map {{details=>$_->{hi}, prob=>($_->{w}||0), tag=>($_->{hi} =~ /\[\_?((?:[A-Za-z0-9.]+|\$[^\]]+))\]/ ? $1 : $_->{hi})} ##-- _am_tagh_fst2moota
 																							  } map {ref($_) ? $_ : {hi=>$_}} map {$_ ? @$_ : qw()}
 																						       @$w{qw(mlatin tokpp toka)},
-																						       ($use_dmoot && $w->{xlit} && !$w->{xlit}{isLatinExt} ? [qw(FM XY)] : qw()),
+																						       ($use_dmoot && $w->{xlit} && !$w->{xlit}{isLatinExt} ? [$fmtag, "XY"] : qw()),
 																						       ($use_dmoot && $w->{dmoot} ? $w->{dmoot}{morph}
 																							: ($w->{morph}, ($w->{rw} ? (map {$_->{morph}} @{$w->{rw}}) : qw())))) ##-- _am_tagh_list2moota
 			 )	##== _am_tagh_moota_uniq
@@ -427,15 +434,15 @@ sub analysisCodeDEBUG {
 
     ##-- language-guesser hack
     if ($moot_lang && ($lang=$s->{lang}) && $lang ne $moot_lang) {
-      $_->{tag} = "$fmtag.$lang" foreach (grep {$_->{tag} !~ /^(?:\$|CARD$)/} @$msent);
+      $_->{tag} = "$fmtag.$lang" foreach (grep {$_->{tag} !~ /^\$/} @$msent);
     }
 
     foreach (@$msent) {
       $_->{word}=$_->{text};
       delete($_->{text});
-      #$_->{tag}=$t if (defined($t=$tagx->{$_->{tag}//""}));	##-- don't translate output tags (breaks en-wsj, 2016-06-09)
-      $_->{tag}="NE" if ($xpne && $_->{analyses} && $_->{analyses}[0] && $_->{analyses}[0]{details} eq "NE.xp");
-      $_->{tag}="FM" if ($xpfm && $_->{analyses} && $_->{analyses}[0] && $_->{analyses}[0]{details} eq "FM.xp");
+      #$_->{tag}=$t if (defined($t=$tagx->{$_->{tag}//""})); ##-- do NOT translate output tags (breaks en-wsj, 2016-06-09)
+      $_->{tag}="NE"   if ($xpne && $_->{analyses} && $_->{analyses}[0] && $_->{analyses}[0]{details} eq "NE.xp");
+      $_->{tag}=$fmtag if ($xpfm && $_->{analyses} && $_->{analyses}[0] && $_->{analyses}[0]{details} eq "FM.xp");
       if ($prune) {
 	$t = $_->{tag}//"";
 	@{$_->{analyses}} = grep {$_->{tag} eq $t} @{$_->{analyses}};

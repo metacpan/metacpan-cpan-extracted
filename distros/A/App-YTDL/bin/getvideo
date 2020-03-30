@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.314';
+our $VERSION = '0.316';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -75,6 +75,7 @@ my $set = {
     ffmpeg                      => which( 'ffmpeg' ),
     ffprobe                     => which( 'ffprobe' ),
 
+    config_dir                  => $config_dir,
     config_file                 => catfile( $config_dir, 'config.json' ),
     history_file                => catfile( $config_dir, 'uploader_history.json' ),
     sticky_file                 => catfile( $config_dir, 'uploader_sticky.json' ),
@@ -206,7 +207,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.314
+Version 0.316
 
 =cut
 

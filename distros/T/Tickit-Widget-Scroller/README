@@ -5,23 +5,23 @@ NAME
 
 SYNOPSIS
 
-     use Tickit;
-     use Tickit::Widget::Scroller;
-     use Tickit::Widget::Scroller::Item::Text;
-     
-     my $tickit = Tickit->new;
-     
-     my $scroller = Tickit::Widget::Scroller->new;
+       use Tickit;
+       use Tickit::Widget::Scroller;
+       use Tickit::Widget::Scroller::Item::Text;
     
-     $scroller->push(
-        Tickit::Widget::Scroller::Item::Text->new( "Hello world" ),
-        Tickit::Widget::Scroller::Item::Text->new( "Here are some lines" ),
-        map { Tickit::Widget::Scroller::Item::Text->new( "<Line $_>" ) } 1 .. 50,
-     );
-     
-     $tickit->set_root_widget( $scroller );
-     
-     $tickit->run
+       my $tickit = Tickit->new;
+    
+       my $scroller = Tickit::Widget::Scroller->new;
+    
+       $scroller->push(
+          Tickit::Widget::Scroller::Item::Text->new( "Hello world" ),
+          Tickit::Widget::Scroller::Item::Text->new( "Here are some lines" ),
+          map { Tickit::Widget::Scroller::Item::Text->new( "<Line $_>" ) } 1 .. 50,
+       );
+    
+       $tickit->set_root_widget( $scroller );
+    
+       $tickit->run
 
 DESCRIPTION
 

@@ -76,6 +76,7 @@ struct quota_xs_nfs_rslt {
 int
 callaurpc(host, prognum, versnum, procnum, inproc, in, outproc, out)
   char *host;
+  int prognum, versnum, procnum;
   xdrproc_t inproc, outproc;
   char *in, *out;
 {
@@ -282,8 +283,8 @@ struct getquota_args *gqp;
 
 bool_t
 xdr_getquota_rslt(xdrs, gqp)
-XDR *xdrs;
-struct getquota_rslt *gqp;
+  XDR *xdrs;
+  struct getquota_rslt *gqp;
 {
   return (xdr_union(xdrs,
     (int *) &gqp->GQR_STATUS, (char *) &gqp->GQR_RQUOTA,
@@ -292,8 +293,8 @@ struct getquota_rslt *gqp;
 
 bool_t
 xdr_rquota(xdrs, rqp)
-XDR *xdrs;
-struct rquota *rqp;
+  XDR *xdrs;
+  struct rquota *rqp;
 {
   return (xdr_int(xdrs, &rqp->rq_bsize) &&
       xdr_bool(xdrs, &rqp->rq_active) &&
@@ -311,8 +312,8 @@ struct rquota *rqp;
 #ifdef USE_EXT_RQUOTA
 bool_t
 xdr_ext_getquota_args(xdrs, objp)
-XDR *xdrs;
-ext_getquota_args *objp;
+  XDR *xdrs;
+  ext_getquota_args *objp;
 {
   return xdr_string(xdrs, &objp->gqa_pathp, RQ_PATHLEN) &&
          xdr_int(xdrs, &objp->gqa_type) &&

@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.045';
+our $VERSION = '1.046';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -42,7 +42,7 @@ use Mojo::Util qw( xml_escape );
 use Carp qw( carp );
 
 our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs match derp fill_brackets
-    is_type order_by );
+    is_type order_by is_format );
 
 #pod =sub load_backend
 #pod
@@ -407,6 +407,25 @@ sub is_type {
         : $type eq $is_type;
 }
 
+#pod =sub is_format
+#pod
+#pod     my $bool = is_format( $schema->{properties}{myprop}{format}, 'date-time' );
+#pod
+#pod Returns true if the given JSON schema format value (a string) is the given value.
+#pod
+#pod     # true
+#pod     is_format( 'date-time', 'date-time' );
+#pod     # false
+#pod     is_format( 'email', 'date-time' );
+#pod
+#pod =cut
+
+sub is_format {
+    my ( $format, $is_format ) = @_;
+    return unless $format;
+    return $format eq $is_format;
+}
+
 #pod =sub derp
 #pod
 #pod     derp "This feature is deprecated in file '%s'", $file;
@@ -447,7 +466,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.045
+version 1.046
 
 =head1 SYNOPSIS
 
@@ -593,6 +612,17 @@ the property.
     # false
     is_type( 'string', 'boolean' );
     is_type( [qw( string null )], 'boolean' );
+
+=head2 is_format
+
+    my $bool = is_format( $schema->{properties}{myprop}{format}, 'date-time' );
+
+Returns true if the given JSON schema format value (a string) is the given value.
+
+    # true
+    is_format( 'date-time', 'date-time' );
+    # false
+    is_format( 'email', 'date-time' );
 
 =head2 derp
 

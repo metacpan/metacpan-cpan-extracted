@@ -63,6 +63,7 @@
             "Pod::Xhtml" : "0",
             "SQ" : "0",
             "Task::FreecellSolver::Testing" : "0",
+            "Task::FreecellSolver::Testing::MultiConfig" : "0",
             "Task::Sites::ShlomiFish" : "0",
             "Term::ReadLine::Gnu" : "0",
             "Test::Pod" : "0",
@@ -83,7 +84,7 @@
    "provides" : {
       "Task::BeLike::SHLOMIF" : {
          "file" : "lib/Task/BeLike/SHLOMIF.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
       }
    },
    "release_status" : "stable",
@@ -98,7 +99,7 @@
          "web" : "https://github.com/shlomif/Task-BeLike-SHLOMIF"
       }
    },
-   "version" : "0.0.5",
+   "version" : "0.0.6",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

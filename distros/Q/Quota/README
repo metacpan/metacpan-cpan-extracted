@@ -1,10 +1,10 @@
 Quota extension module for Perl
 -------------------------------
 
-Author:    Tom Zoerner (tomzo AT users.sourceforge.net)
+Author:    T. Zoerner (tomzo AT users.sourceforge.net)
 
-Version:   1.7.2
-Date:      May 2015
+Version:   1.7.3
+Date:      March 2020
 DLSIP-Code:Rcdfg
            - stable release
            - C compiler required for installation
@@ -13,7 +13,7 @@ DLSIP-Code:Rcdfg
            - licensed under the Perl Artistic License or
              (at your option) version 2 or later of the
              GNU General Public License
-Location:  http://www.perl.com/CPAN/authors/Tom_Zoerner/
+Location:  https://metacpan.org/pod/Quota
 
 Supported: SunOS 4.1.3,
            Solaris 2.4 - 2.10,
@@ -21,8 +21,8 @@ Supported: SunOS 4.1.3,
            IRIX 5.2 & 5.3 & 6.2 - 6.5,
            OSF/1 & Digital Unix 4,
            BSDi 2, FreeBSD 3.x - 4.9, OpenBSD & NetBSD (no RPC),
-           Linux - kernel 2.0.30 and later, incl. Quota API v2 and XFS,
-           AIX 4.1, 4.2 and 5.3.
+           Linux - kernel 2.0.30 and later, incl. Quota API up to v3,
+             file systems XFS, AIX 4.1, 4.2 and 5.3.
            AFS (Andrew File System) on many of the above (see INSTALL),
 	   VxFS (Veritas File System) on Solaris 2.
 
@@ -273,7 +273,7 @@ BUGS
      see INSTALL.
 
 AUTHORS
-     This module was created 1995 by Tom Zoerner
+     This module was created 1995 by T. Zoerner
      (email: tomzo AT users.sourceforge.net)
      and since then continually improved and ported to
      many operating- and file-systems. Numerous people
@@ -281,11 +281,11 @@ AUTHORS
      list of names please see the CHANGES document.
 
      The quota module was in the public domain 1995-2001. Since 2001
-     it is licensed under both the Perl Artistic License and version 2
+     it is licensed under both the Perl Artistic License and version 1
      or later of the GNU General Public License as published by the
      Free Software Foundation.  For a copy of these licenses see
      <http://www.opensource.org/licenses/>.  The respective authors
-     of the source code are it's owner in regard to copyright.
+     of the source code are its owner in regard to copyright.
 
 SEE ALSO
      perl(1), edquota(1m), quotactl(2) or quotactl(7I),

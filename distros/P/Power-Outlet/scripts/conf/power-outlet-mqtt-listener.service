@@ -1,0 +1,11 @@
+[Unit]
+Description=MQTT listener for Power::Outlet devices
+Requires=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/perl /usr/bin/power-outlet-mqtt-listener.pl
+
+[Install]
+WantedBy=multi-user.target

@@ -1,3 +1,15 @@
+0.123   2020-01-31  Released-By: PERLANCAR; Urgency: medium
+
+	[dateconv]
+
+	- Add conversion target iso8601, ALL.
+
+        - [ux] Add option -a as shortcut to --to=ALL.
+
+	- Avoid the use of From_str::alami date coercion for now as
+	  DateTime::Format::Alami is flaky.
+
+
 0.122   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update coerce rule names in Sah schemas (Data::Sah::Coerce

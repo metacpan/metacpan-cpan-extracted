@@ -2,14 +2,14 @@ Build.PL
 Changes
 examples/demo.pl
 lib/Tickit/Widget/FloatBox.pm
-LICENSE
-Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01base-child.t
 t/02float.t
 t/03hide-show.t
 t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

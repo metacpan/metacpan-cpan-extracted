@@ -1,0 +1,11 @@
+Revision history for Devel-Wherefore
+
+0.000003 - 2020-03-29
+  - Use @INC as well as 'lib' for package guessing
+
+0.000002 - 2020-03-29
+  - Work as -d:Wherefore as well as -MDevel::Wherefore
+  - Close stderr after CHECK to skip the 'syntax OK' output from minus_c
+
+0.000001 - 2020-03-29
+  - Released on an unsuspecting world

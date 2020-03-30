@@ -1,0 +1,1 @@
+Data validation failed for plugin 'Serge::Sync::Plugin::TranslationService::weblate': Can't use an undefined value as an ARRAY reference

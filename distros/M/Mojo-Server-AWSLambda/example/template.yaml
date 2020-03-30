@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  VpcId:
+      Type: AWS::EC2::VPC::Id
+  SecurityGroup:
+      Type: List<AWS::EC2::SecurityGroup::Id>
+
+Resources:
+  MojoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.handle
+      Runtime: provided
+      CodeUri: mojo.zip
+      Description: >-
+        Example mojolicious appliction as Lambda Function
+      MemorySize: 128
+      Timeout: 60
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:445285296882:layer:perl-5-28-runtime:13
+      
+  LambdaRestInterface:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing 
+      Subnets: !Ref Subnets      
+      SecurityGroups: !Ref SecurityGroup
+
+  LambdaMojoTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: LambdaPermission
+    Properties:
+      TargetType: lambda
+      Targets:
+        - Id: !GetAtt MojoFunction.Arn
+
+  RestHttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LambdaRestInterface
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - TargetGroupArn: !Ref LambdaMojoTargetGroup
+          Type: forward
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt MojoFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: elasticloadbalancing.amazonaws.com
+
+Outputs:
+  DNSName:
+    Value: !GetAtt LambdaRestInterface.DNSName

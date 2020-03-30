@@ -1,0 +1,42 @@
+NAME
+    Devel::Wherefore - Where the heck did these subroutines come from?
+
+SYNOPSIS
+      $ perl -d:Wherefore myscript.pl
+
+    will dump symbols in main from myscript.pl
+
+      $ perl -d:Wherefore=App::opan $(which opan)
+
+    will dump symbols from package App::opan in the installed opan script
+
+      $ perl -d:Wherefore lib/Foo/Bar.pm
+
+    will dump symbols from package Foo::Bar (we guess the package by
+    stripping either 'lib' or any @INC entry off the front, then assuming
+    the package name is Foo::Bar for Foo/Bar.pm etc). Which means this also
+    works:
+
+      $ perl -d:Wherefore $(perldoc -lm App::Cpan)
+
+    Note that this code uses "B::minus_c" to only compile the script so you
+    don't have to worry about it executing - does mean we'll miss runtime
+    require and import but hey, trade-offs.
+
+DESCRIPTION
+    Rage driven development rapidly released.
+
+AUTHOR
+     mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    None yet - maybe this software is perfect! (ahahahahahahahahaha)
+
+COPYRIGHT
+    Copyright (c) 2020 the Devel::Wherefore "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Test::More;
 
+our $VERSION = '0.21';
+
 plan tests => 3;
 
 sub not_in_file_ok {
@@ -50,7 +52,7 @@ TODO: {
     "placeholder date/time"       => qr(Date/time)
   );
 
-  module_boilerplate_ok('lib/Statistics/Running.pm');
+  module_boilerplate_ok('lib/Statistics/Covid/Covid.pm');
 
 
 }

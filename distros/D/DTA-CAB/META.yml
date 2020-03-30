@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,6 +40,7 @@ requires:
   Moot: '0.01'
   Pod::Usage: '0'
   RPC::XML: '0.59'
+  Scalar::Util: '0'
   Storable: '0'
   Template: '0'
   Test::More: '0'
@@ -49,5 +50,5 @@ requires:
   Unicode::String: '2.09'
   Unicruft: '0.03'
   XML::LibXML: '2.0001'
-version: '1.111'
+version: '1.112'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

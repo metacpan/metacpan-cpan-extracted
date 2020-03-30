@@ -55,7 +55,7 @@ use constant NEXT    => 4;   # link to next item in cache linked list
 use constant STAT    => 5;   # Time last stat()ed
 use constant MSWin32 => $^O eq 'MSWin32';
 
-our $VERSION = '3.007';
+our $VERSION = '3.008';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $ERROR   = '';
 
@@ -577,6 +577,10 @@ sub _load_compiled {
     # one needs to care about slash direction is when dealing
     # with Module::Name -> Module/Name.pm translation.
     my $fpath = File::Spec->rel2abs( $file );
+
+    return $self->error("compiled template missing path") unless defined $fpath;
+
+    ($fpath) = $fpath =~ /^(.*)$/s;
 
     my $compiled;
 

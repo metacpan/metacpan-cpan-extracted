@@ -33,8 +33,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Algorithm::CurveFit" : "1.0",
             "Chart::Clicker" : "0",
-            "DBIx::Class" : "0",
+            "DBD::SQLite" : "1.60",
+            "DBI" : "1.60",
+            "DBIx::Class" : "0.08",
             "Data::Dump" : "0",
             "DateTime" : "0",
             "DateTime::Format::Strptime" : "0",
@@ -43,10 +46,13 @@
             "File::Find" : "0",
             "File::Path" : "0",
             "File::Spec" : "0",
+            "File::Temp" : "0",
             "Getopt::Long" : "0",
             "HTTP::CookieJar::LWP" : "0",
             "JSON::Parse" : "0",
             "LWP::UserAgent" : "0",
+            "Math::Symbolic" : "0.6",
+            "SQL::Translator" : "0.11019",
             "Storable" : "0",
             "Try::Tiny" : "0",
             "perl" : "5.006"
@@ -54,6 +60,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.21",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

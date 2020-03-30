@@ -15,5 +15,5 @@ name: Net-Ifconfig-Wrapper
 requires:
   Net::Netmask: '0'
   POSIX: '0'
-version: '0.25'
+version: '0.26'
 x_serialization_backend: 'YAML::Tiny version 1.70'

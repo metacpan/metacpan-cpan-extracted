@@ -516,13 +516,12 @@ my $Win32List = sub($$$$)
 
 
 my $IFCONFIG = '/sbin/ifconfig';
-my $IP = '/sbin/ip';
 
 $Ifconfig{'list'} = {'solaris' => {'ifconfig' => qq/LC_ALL=C $IFCONFIG -a/,
                                    'function' => $SolarisList},
                      'openbsd' => {'ifconfig' => qq/LC_ALL=C $IFCONFIG -A/,
                                    'function' => $SolarisList},
-                     'linux'   => {'ifconfig' => -f $IFCONFIG ? qq/LC_ALL=C $IFCONFIG -a/ : qq/LC_ALL=C $IP address/,
+                     'linux'   => {'ifconfig' => qq/LC_ALL=C $IFCONFIG -a/,
                                    'function' => $LinuxList},
                      'MSWin32' => {'ifconfig' => '',
                                    'function' => $Win32List,},

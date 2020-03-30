@@ -4,13 +4,13 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tickit-Widget-FloatBox",
    "prereqs" : {
@@ -23,14 +23,16 @@
       },
       "runtime" : {
          "requires" : {
-            "Tickit::ContainerWidget" : "0"
+            "Object::Pad" : "0.17",
+            "Tickit::ContainerWidget" : "0",
+            "perl" : "5.026"
          }
       }
    },
    "provides" : {
       "Tickit::Widget::FloatBox" : {
          "file" : "lib/Tickit/Widget/FloatBox.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -39,5 +41,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

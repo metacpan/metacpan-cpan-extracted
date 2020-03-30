@@ -4,7 +4,7 @@ Statistics::Covid - Fetch, store in DB, retrieve and analyse Covid-19 statistics
 
 # VERSION
 
-Version 0.21
+Version 0.23
 
 # DESCRIPTION
 
@@ -19,13 +19,13 @@ and store it in a database (SQLite and MySQL, only SQLite was tested so far).
 Each batch of data should ideally contain information about one or more locations
 and at a given point in time. All items in this batch are extracted and stored
 in DB each with its location name and time (it was published, not fetched) as primary keys.
-Each such data item (Datum) is described in [Statistics::Covid::Datum::Table](https://metacpan.org/pod/Statistics::Covid::Datum::Table)
-and the relevant class is [Statistics::Covid::Datum](https://metacpan.org/pod/Statistics::Covid::Datum). It contains
+Each such data item (Datum) is described in [Statistics::Covid::Datum::Table](https://metacpan.org/pod/Statistics%3A%3ACovid%3A%3ADatum%3A%3ATable)
+and the relevant class is [Statistics::Covid::Datum](https://metacpan.org/pod/Statistics%3A%3ACovid%3A%3ADatum). It contains
 fields such as: `population`, `confirmed`, `unconfirmed`, `terminal`, `recovered`.
 
 Focus was on creating very high-level which distances as much as possible
-the user from the nitty-gritty details of fetching data using [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent)
-and dealing with the database using [DBI](https://metacpan.org/pod/DBI) and [DBIx::Class](https://metacpan.org/pod/DBIx::Class).
+the user from the nitty-gritty details of fetching data using [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent)
+and dealing with the database using [DBI](https://metacpan.org/pod/DBI) and [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass).
 
 This is an early release until the functionality and the table schemata
 solidify.
@@ -36,7 +36,7 @@ solidify.
         use Statistics::Covid::Datum;
         
         $covid = Statistics::Covid->new({   
-                'config-file' => 't/example-config.json',
+                'config-file' => 't/config-for-t.json',
                 'providers' => ['UK::BBC', 'UK::GOVUK', 'World::JHU'],
                 'save-to-file' => 1,
                 'save-to-db' => 1,
@@ -69,21 +69,222 @@ solidify.
         for (@$someObjs);
         
         # or for a single place (this sub sorts results wrt publication time)
-        my $timelineObjs = $covid->select_datums_from_db_for_location('Hackney');
+        my $timelineObjs = $covid->select_datums_from_db_for_specific_location_time_ascending('Hackney');
+        # or for a wildcard match
+        # $covid->select_datums_from_db_for_specific_location_time_ascending({'like'=>'Hack%'});
+        # and maybe specifying max rows
+        # $covid->select_datums_from_db_for_specific_location_time_ascending({'like'=>'Hack%'}, {'rows'=>10});
         for my $anobj (@$timelineObjs){
                 print $anobj->toString()."\n";
         }
 
         print "datum rows in DB: ".$covid->db_count_datums()."\n"
 
-        use Statistics::Covid::Analysis::Plot;
+        use Statistics::Covid;
+        use Statistics::Covid::Datum;
+        use Statistics::Covid::Utils;
+        use Statistics::Covid::Analysis::Plot::Simple;
+
+        # now read some data from DB and do things with it
+        $covid = Statistics::Covid->new({   
+                'config-file' => 't/config-for-t.json',
+                'debug' => 2,
+        }) or die "Statistics::Covid->new() failed";
+        # retrieve data from DB for selected locations (in the UK)
+        # data will come out as an array of Datum objects sorted wrt time
+        # (the 'datetimeUnixEpoch' field)
+        $objs = $covid->select_datums_from_db_for_specific_location_time_ascending(
+                #{'like' => 'Ha%'}, # the location (wildcard)
+                ['Halton', 'Havering'],
+                #{'like' => 'Halton'}, # the location (wildcard)
+                #{'like' => 'Havering'}, # the location (wildcard)
+                'UK', # the belongsto (could have been wildcarded)
+        );
+        # create a dataframe
+        $df = Statistics::Covid::Utils::datums2dataframe({
+                'datum-objs' => $objs,
+                # collect data from all those with same 'name' and same 'belongsto'
+                # and maybe plot this data as a single curve (or fit or whatever)
+                'groupby' => ['name','belongsto'],
+                # put only these values of the datum object into the dataframe
+                # one of them will be X, another will be Y
+                # if you want to plot multiple Y, then add here more dependent columns
+                # like ('unconfirmed').
+                'content' => ['confirmed', 'unconfirmed', 'datetimeUnixEpoch'],
+        });
+
+        # plot confirmed vs time
+        $ret = Statistics::Covid::Analysis::Plot::Simple::plot({
+                'dataframe' => $df,
+                # saves to this file:
+                'outfile' => 'confirmed-over-time.png',
+                # plot this column against X
+                # (which is not present and default is time ('datetimeUnixEpoch')
+                'Y' => 'confirmed',
+        });
+
+        # plot confirmed vs unconfirmed
+        # if you see a vertical line it means that your data has no 'unconfirmed'
+        $ret = Statistics::Covid::Analysis::Plot::Simple::plot({
+                'dataframe' => $df,
+                # saves to this file:
+                'outfile' => 'confirmed-vs-unconfirmed.png',
+                'X' => 'unconfirmed',
+                # plot this column against X
+                'Y' => 'confirmed',
+        });
+
+        # plot using an array of datum objects as they came
+        # out of the DB. A dataframe is created internally to the plot()
+        # but this is not recommended if you are going to make several
+        # plots because equally many dataframes must be created and destroyed
+        # internally instead of recycling them like we do here...
+        $ret = Statistics::Covid::Analysis::Plot::Simple::plot({
+                'datum-objs' => $objs,
+                # saves to this file:
+                'outfile' => 'confirmed-over-time.png',
+                # plot this column as Y
+                'Y' => 'confirmed', 
+                # X is not present so default is time ('datetimeUnixEpoch')
+                # and make several plots, each group must have 'name' common
+                'GroupBy' => ['name', 'belongsto'],
+                'date-format-x' => {
+                        # see Chart::Clicker::Axis::DateTime for all the options:
+                        format => '%m', ##<<< specify timeformat for X axis, only months
+                        position => 'bottom',
+                        orientation => 'horizontal'
+                },
+        });
+
+        use Statistics::Covid;
+        use Statistics::Covid::Datum;
+        use Statistics::Covid::Utils;
+        use Statistics::Covid::Analysis::Model::Simple;
+
+        # create a dataframe
+        my $df = Statistics::Covid::Utils::datums2dataframe({
+                'datum-objs' => $objs,
+                'groupby' => ['name'],
+                'content' => ['confirmed', 'datetimeUnixEpoch'],
+        });
+        # convert all 'datetimeUnixEpoch' data to hours, the oldest will be hour 0
+        for(sort keys %$df){
+                Statistics::Covid::Utils::discretise_increasing_sequence_of_seconds(
+                        $df->{$_}->{'datetimeUnixEpoch'}, # in-place modification
+                        3600 # seconds->hours
+                )
+        }
+
+        # do an exponential fit
+        my $ret = Statistics::Covid::Analysis::Model::Simple::fit({
+                'dataframe' => $df,
+                'X' => 'datetimeUnixEpoch', # our X is this field from the dataframe
+                'Y' => 'confirmed', # our Y is this field
+                'initial-guess' => {'c1'=>1, 'c2'=>1}, # initial values guess
+                'exponential-fit' => 1,
+                'fit-params' => {
+                        'maximum_iterations' => 100000
+                }
+        });
+
+        # fit to a polynomial of degree 10 (max power of x is 10)
+        my $ret = Statistics::Covid::Analysis::Model::Simple::fit({
+                'dataframe' => $df,
+                'X' => 'datetimeUnixEpoch', # our X is this field from the dataframe
+                'Y' => 'confirmed', # our Y is this field
+                # initial values guess (here ONLY for some coefficients)
+                'initial-guess' => {'c1'=>1, 'c2'=>1},
+                'polynomial-fit' => 10, # max power of x is 10
+                'fit-params' => {
+                        'maximum_iterations' => 100000
+                }
+        });
+
+        # fit to an ad-hoc formula in 'x'
+        # (see L<Math::Symbolic::Operator> for supported operators)
+        my $ret = Statistics::Covid::Analysis::Model::Simple::fit({
+                'dataframe' => $df,
+                'X' => 'datetimeUnixEpoch', # our X is this field from the dataframe
+                'Y' => 'confirmed', # our Y is this field
+                # initial values guess (here ONLY for some coefficients)
+                'initial-guess' => {'c1'=>1, 'c2'=>1},
+                'formula' => 'c1*sin(x) + c2*cos(x)',
+                'fit-params' => {
+                        'maximum_iterations' => 100000
+                }
+        });
+
+        # this is what fit() returns
+
+        # $ret is a hashref where key=group-name, and
+        # value=[ 3.4,  # <<<< mean squared error of the fit
+        #  [
+        #     ['c1', 0.123, 0.0005], # <<< coefficient c1=0.123, accuracy 0.00005 (ignore that)
+        #     ['c2', 1.444, 0.0005]  # <<< coefficient c1=1.444
+        #  ]
+        # and group-name in our example refers to each of the locations selected from DB
+        # in this case data from 'Halton' in 'UK' was fitted on 0.123*1.444^time with an m.s.e=3.4
+
+        # This is what the dataframe looks like:
+        #  {
+        #  Halton   => {
+        #               confirmed => [0, 0, 3, 4, 4, 5, 7, 7, 7, 8, 8, 8],
+        #               datetimeUnixEpoch => [
+        #                 1584262800,
+        #                 1584349200,
+        #                 1584435600,
+        #                 1584522000,
+        #                 1584637200,
+        #                 1584694800,
+        #                 1584781200,
+        #                 1584867600,
+        #                 1584954000,
+        #                 1585040400,
+        #                 1585126800,
+        #                 1585213200,
+        #               ],
+        #             },
+        #  Havering => {
+        #               confirmed => [5, 5, 7, 7, 14, 19, 30, 35, 39, 44, 47, 70],
+        #               datetimeUnixEpoch => [
+        #                 1584262800,
+        #                 1584349200,
+        #                 1584435600,
+        #                 1584522000,
+        #                 1584637200,
+        #                 1584694800,
+        #                 1584781200,
+        #                 1584867600,
+        #                 1584954000,
+        #                 1585040400,
+        #                 1585126800,
+        #                 1585213200,
+        #               ],
+        #             },
+        #  }
+
+        # and after converting the datetimeUnixEpoch values to hours and setting the oldest to t=0
+        #  {
+        #  Halton   => {
+        #                confirmed => [0, 0, 3, 4, 4, 5, 7, 7, 7, 8, 8, 8],
+        #                datetimeUnixEpoch => [0, 24, 48, 72, 104, 120, 144, 168, 192, 216, 240, 264],
+        #              },
+        #  Havering => {
+        #                confirmed => [5, 5, 7, 7, 14, 19, 30, 35, 39, 44, 47, 70],
+        #                datetimeUnixEpoch => [0, 24, 48, 72, 104, 120, 144, 168, 192, 216, 240, 264],
+        #              },
+        #  }
+
+
+
+        use Statistics::Covid::Analysis::Plot::Simple;
 
         # plot something
         my $objs = $io->db_select({
                 conditions => {belongsto=>'UK', name=>{'like' => 'Ha%'}}
         });
         my $outfile = 'chartclicker.png';
-        my $ret = Statistics::Covid::Analysis::Plot::plot_with_chartclicker({
+        my $ret = Statistics::Covid::Analysis::Plot::Simple::plot({
                 'datum-objs' => $objs,
                 # saves to this file:
                 'outfile' => $outfile,
@@ -103,7 +304,7 @@ specified configuration file.
 
 For a quick start:
 
-    cp t/example-config.json config.json
+    cp t/config-for-t.json config.json
     # optionally modify config.json to change the destination data dirs
     # now fetch data from some default data providers:
     script/statistics-covid-fetch-data-and-store.pl --config-file config.json
@@ -126,7 +327,7 @@ obstruct public resources. Please, Please.**
 When the database is up-to-date, analysis of data is the next step.
 
 In the synopis, it is shown how to select records from the database,
-as an array of [Statistics::Covid::Datum](https://metacpan.org/pod/Statistics::Covid::Datum) objects. Feel free to
+as an array of [Statistics::Covid::Datum](https://metacpan.org/pod/Statistics%3A%3ACovid%3A%3ADatum) objects. Feel free to
 share any modules you create on analysing this data, either
 under this namespace (for example Statistics::Covid::Analysis::XYZ)
 or any other you see appropriate.
@@ -134,7 +335,7 @@ or any other you see appropriate.
 # CONFIGURATION FILE
 
 Below is an example configuration file which is essentially JSON with comments.
-It can be found in `t/example-config.json` relative to the root directory 
+It can be found in `t/config-for-t.json` relative to the root directory 
 of this distribution.
 
         # comments are allowed, otherwise it is json
@@ -183,7 +384,7 @@ of this distribution.
 # DATABASE SUPPORT
 
 SQLite and MySQL database types are supported through the
-abstraction offered by [DBI](https://metacpan.org/pod/DBI) and [DBIx::Class](https://metacpan.org/pod/DBIx::Class).
+abstraction offered by [DBI](https://metacpan.org/pod/DBI) and [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass).
 
 **However**, only the SQLite support has been tested.
 
@@ -270,7 +471,7 @@ Almaz
 # ACKNOWLEDGEMENTS
 
 - [Perlmonks](https://www.perlmonks.org) for supporting the world with answers and programming enlightment
-- [DBIx::Class](https://metacpan.org/pod/DBIx::Class)
+- [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass)
 - the data providers:
     - [John Hopkins University](https://www.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6),
     - [UK government](https://www.gov.uk/government/publications/covid-19-track-coronavirus-cases),

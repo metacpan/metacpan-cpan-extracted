@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Schema::Verifier::C3;
-$DBIx::Class::Helper::Schema::Verifier::C3::VERSION = '2.035000';
+$DBIx::Class::Helper::Schema::Verifier::C3::VERSION = '2.036000';
 # ABSTRACT: Verify that the Results and ResultSets of your Schemata use c3
 
 use strict;

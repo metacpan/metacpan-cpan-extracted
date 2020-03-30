@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/DateUtils/dateconv
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2020-01-31'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.122'; # VERSION
+our $VERSION = '0.123'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ dateconv - Convert date to another format
 
 =head1 VERSION
 
-This document describes version 0.122 of dateconv (from Perl distribution App-DateUtils), released on 2019-11-29.
+This document describes version 0.123 of dateconv (from Perl distribution App-DateUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -50,12 +50,33 @@ Examples:
 Convert "today" to epoch:
 
  % dateconv today
- 1574985600
+ 1580428800
 
 Convert epoch to ymd:
 
  % dateconv 1463702400 --to ymd
  2016-05-20
+
+Convert epoch to iso8601:
+
+ % dateconv 1580446441 --to iso8601
+ 2020-01-31T04:54:01Z
+
+Convert iso8601 to epoch:
+
+ % dateconv 2020-01-31T04:54:01Z --to epoch
+ 1580446441
+
+Show all possible conversions:
+
+ % dateconv now --to ALL
+ +---------+----------------------+
+ | key     | value                |
+ +---------+----------------------+
+ | epoch   | 1580446720           |
+ | iso8601 | 2020-01-31T04:58:40Z |
+ | ymd     | 2020-01-31           |
+ +---------+----------------------+
 
 =head1 OPTIONS
 
@@ -75,7 +96,13 @@ Default value:
 
 Valid values:
 
- ["epoch","ymd"]
+ ["epoch","ymd","iso8601","ALL"]
+
+=item B<-a>
+
+Shortcut for --to=ALL.
+
+See C<--to>.
 
 =back
 
@@ -115,6 +142,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -188,7 +219,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

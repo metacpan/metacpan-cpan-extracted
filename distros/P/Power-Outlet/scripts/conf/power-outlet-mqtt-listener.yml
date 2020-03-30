@@ -1,0 +1,26 @@
+---
+host: mqtt
+
+directives: 
+
+- name: Smart Outlet Top Button Press
+  topic: cmnd/smartoutlet_button_topic/POWER1
+  value: TOGGLE
+  actions:
+  - name: Outside Lights
+    driver: iBootBarGroup
+    command: 'ON'
+    options:
+      outlets: '1,2,6,7'
+      host: bar
+
+- name: Smart Outlet Bottom Button Press
+  topic: cmnd/smartoutlet_button_topic/POWER2
+  value: TOGGLE
+  actions:
+  - name: Outside Lights
+    driver: iBootBarGroup
+    command: 'OFF'
+    options:
+      outlets: '1,2,6,7'
+      host: bar

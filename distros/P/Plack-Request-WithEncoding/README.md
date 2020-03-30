@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/moznion/Plack-Request-WithEncoding.png?branch=master)](https://travis-ci.org/moznion/Plack-Request-WithEncoding) [![Coverage Status](https://coveralls.io/repos/moznion/Plack-Request-WithEncoding/badge.png?branch=master)](https://coveralls.io/r/moznion/Plack-Request-WithEncoding?branch=master)
+[![Build Status](https://travis-ci.org/moznion/Plack-Request-WithEncoding.svg?branch=master)](https://travis-ci.org/moznion/Plack-Request-WithEncoding) [![Coverage Status](https://img.shields.io/coveralls/moznion/Plack-Request-WithEncoding/master.svg?style=flat)](https://coveralls.io/r/moznion/Plack-Request-WithEncoding?branch=master)
 # NAME
 
-Plack::Request::WithEncoding - Subclass of [Plack::Request](http://search.cpan.org/perldoc?Plack::Request) which supports encoding.
+Plack::Request::WithEncoding - Subclass of [Plack::Request](https://metacpan.org/pod/Plack::Request) which supports encoded requests.
 
 # SYNOPSIS
 
@@ -31,74 +31,65 @@ Plack::Request::WithEncoding - Subclass of [Plack::Request](http://search.cpan.o
 
 # DESCRIPTION
 
-Plack::Request::WithEncoding is the subclass of [Plack::Request](http://search.cpan.org/perldoc?Plack::Request).
-This module supports the encoding for requests, the following attributes will return decoded request values.
+Plack::Request::WithEncoding is a subclass of [Plack::Request](https://metacpan.org/pod/Plack::Request) that supports encoded requests. It overrides many Plack::Request attributes to return decoded values.
+This feature allows a single application to seamlessly handle a wide variety of different language code sets. Applications that must be able to handle many different translations at once will find this extension able to quickly solve that problem.
 
-Please refer also ["SPECIFICATION OF THE ENCODING METHOD"](#SPECIFICATION OF THE ENCODING METHOD).
+The target attributes to be encoded are described at ["SPECIFICATION OF THE ENCODING METHOD"](#specification-of-the-encoding-method).
 
-# ATTRIBUTES
+# ATTRIBUTES of `Plack::Request::WithEncoding`
 
 - encoding
 
-    Returns a encoding method to use to decode parameters.
+    Returns an encoding method to decode parameters.
 
 - query\_parameters
 
-    Returns a reference to a hash containing __decoded__ query string (GET)
-    parameters. This hash reference is [Hash::MultiValue](http://search.cpan.org/perldoc?Hash::MultiValue) object.
+    Returns a reference of [Hash::MultiValue](https://metacpan.org/pod/Hash::MultiValue) instance that contains **decoded** query parameters.
 
 - body\_parameters
 
-    Returns a reference to a hash containing __decoded__ posted parameters in the
-    request body (POST). As with `query_parameters`, the hash
-    reference is a [Hash::MultiValue](http://search.cpan.org/perldoc?Hash::MultiValue) object.
+    Returns a reference of [Hash::MultiValue](https://metacpan.org/pod/Hash::MultiValue) instance that contains **decoded** request body.
 
 - parameters
 
-    Returns a [Hash::MultiValue](http://search.cpan.org/perldoc?Hash::MultiValue) hash reference containing __decoded__ (and merged) GET
-    and POST parameters.
+    Returns a reference of [Hash::MultiValue](https://metacpan.org/pod/Hash::MultiValue) instance that contains **decoded** parameters. The parameters are merged with `query_parameters` and `body_parameters`.
 
 - param
 
-    Returns __decoded__ GET and POST parameters with a CGI.pm-compatible param
-    method. This is an alternative method for accessing parameters in
-    `$req->parameters`. Unlike CGI.pm, it does _not_ allow
-    setting or modifying query parameters.
+    Returns **decoded** parameters with a CGI.pm-compatible param method. This is an alternative method for accessing parameters in
+    `$req->parameters`.
+    Unlike CGI.pm, it does **not** allow setting or modifying query parameters.
 
-        $value  = $req->param( 'foo' );
-        @values = $req->param( 'foo' );
+        $value  = $req->param('foo');
+        @values = $req->param('foo');
         @params = $req->param;
 
 - raw\_query\_parameters
 
-    This attribute is the same as `query_parameters` of [Plack::Request](http://search.cpan.org/perldoc?Plack::Request).
+    This attribute is the same as `query_parameters` of [Plack::Request](https://metacpan.org/pod/Plack::Request).
 
 - raw\_body\_parameters
 
-    This attribute is the same as `body_parameters` of [Plack::Request](http://search.cpan.org/perldoc?Plack::Request).
+    This attribute is the same as `body_parameters` of [Plack::Request](https://metacpan.org/pod/Plack::Request).
 
 - raw\_parameters
 
-    This attribute is the same as `parameters` of [Plack::Request](http://search.cpan.org/perldoc?Plack::Request).
+    This attribute is the same as `parameters` of [Plack::Request](https://metacpan.org/pod/Plack::Request).
 
 - raw\_param
 
-    This attribute is the same as `param` of [Plack::Request](http://search.cpan.org/perldoc?Plack::Request).
+    This attribute is the same as `param` of [Plack::Request](https://metacpan.org/pod/Plack::Request).
 
 # SPECIFICATION OF THE ENCODING METHOD
 
-You can specify the encoding method, like so;
+You can specify the character-encoding to decode, like so;
 
     $req->env->{'plack.request.withencoding.encoding'} = 'utf-7'; # <= set utf-7
 
-And this encoding method will be used to decode.
+When this character-encoding wasn't given through `$req->env->{'plack.request.withencoding.encoding'}`, this module uses "utf-8" as the default character-encoding to decode.
+It would be better to specify this character-encoding explicitly because the readability and understandability of the code behavior would be improved.
 
-When not once substituted for `$req->env->{'plack.request.withencoding.encoding'}`, this module will use "utf-8" as encoding method.
-However the behavior of a program will become unclear if this function is used. Therefore __YOU SHOULD NOT USE THIS__.
-You should specify the encoding method explicitly.
-
-In case of false value (e.g. \`undef\`, 0, '') is explicitly substituted for `$req->env->{'plack.request.withencoding.encoding'}`,
-then this module will return __raw value__ (with no encoding).
+Once this value was specified by falsy value (e.g. \`undef\`, 0 and ''), this module returns **raw value** (i.e. never decodes).
 
 The example of a code is shown below.
 
@@ -114,7 +105,7 @@ The example of a code is shown below.
 
 # SEE ALSO
 
-[Plack::Request](http://search.cpan.org/perldoc?Plack::Request)
+[Plack::Request](https://metacpan.org/pod/Plack::Request)
 
 # LICENSE
 

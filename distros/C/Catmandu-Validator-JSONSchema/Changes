@@ -1,5 +1,8 @@
 Revision history for Catmandu-Validator-JSONSchema
 
+0.15  2020-03-30 08:52:27 CEST
+    - JSON::Validator version 3.25 changed error format for object.additionalProperties
+
 0.13  2019-12-20 13:17:05 CET
     - add key details to error object. Requires JSON::Validator 3.25 or higher
 

@@ -1,0 +1,196 @@
+NAME
+    App::OperaUtils - Utilities related to the Opera browser
+
+VERSION
+    This document describes version 0.001 of App::OperaUtils (from Perl
+    distribution App-OperaUtils), released on 2019-12-09.
+
+SYNOPSIS
+DESCRIPTION
+    This distribution includes several utilities related to the Opera
+    browser:
+
+    *   kill-opera
+
+    *   opera-is-paused
+
+    *   pause-opera
+
+    *   ps-opera
+
+    *   terminate-opera
+
+    *   unpause-opera
+
+FUNCTIONS
+  opera_is_paused
+    Usage:
+
+     opera_is_paused(%args) -> [status, msg, payload, meta]
+
+    Check whether Opera is paused.
+
+    Opera is defined as paused if *all* of its processes are in 'stop'
+    state.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quiet => *true*
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pause_opera
+    Usage:
+
+     pause_opera(%args) -> [status, msg, payload, meta]
+
+    Pause (kill -STOP) Opera.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  ps_opera
+    Usage:
+
+     ps_opera(%args) -> [status, msg, payload, meta]
+
+    List Opera processes.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  terminate_opera
+    Usage:
+
+     terminate_opera(%args) -> [status, msg, payload, meta]
+
+    Terminate (kill -KILL) Opera.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  unpause_opera
+    Usage:
+
+     unpause_opera(%args) -> [status, msg, payload, meta]
+
+    Unpause (resume, continue, kill -CONT) Opera.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-OperaUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-OperaUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-OperaUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Some other CLI utilities related to Opera: dump-opera-history (from
+    App::DumpOperaHistory).
+
+    App::ChromeUtils
+
+    App::FirefoxUtils
+
+    App::VivaldiUtils
+
+    App::BrowserUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

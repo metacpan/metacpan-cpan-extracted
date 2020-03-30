@@ -6,12 +6,7 @@ lib/Tickit/Widget/Scroller.pm
 lib/Tickit/Widget/Scroller/Item.pod
 lib/Tickit/Widget/Scroller/Item/RichText.pm
 lib/Tickit/Widget/Scroller/Item/Text.pm
-LICENSE
-Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01item-text.t
 t/02item-richtext.t
@@ -29,3 +24,8 @@ t/23pop-bottom.t
 t/23pop-top.t
 t/30indicator.t
 t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

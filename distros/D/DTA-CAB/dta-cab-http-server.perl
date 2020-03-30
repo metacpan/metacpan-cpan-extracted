@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use lib qw(.);
+use lib qw(. ./lib);
 use DTA::CAB;
 use DTA::CAB::Server::HTTP;
 use DTA::CAB::Server::HTTP::UNIX; ##-- debug

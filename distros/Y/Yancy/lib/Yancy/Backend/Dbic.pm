@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.045';
+our $VERSION = '1.046';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -256,6 +256,12 @@ sub _is_type {
         : $type eq $is_type;
 }
 
+my %fix_default = (
+    current_timestamp => "now",
+    current_time => "now",
+    current_date => "now",
+);
+
 sub read_schema {
     my ( $self, @table_names ) = @_;
     my %schema;
@@ -277,10 +283,15 @@ sub read_schema {
             # ; use Data::Dumper;
             # ; say Dumper $c;
             my $is_auto = $c->{is_auto_increment};
+            my $default = $c->{default_value};
             $schema{ $table }{ properties }{ $column } = {
                 $self->_map_type( $c ),
                 $is_auto ? ( readOnly => true ) : (),
-                defined( $c->{default_value} ) ? ( default => $c->{default_value} ) : (),
+                defined $default ? (
+                    default => exists $fix_default{ $default }
+                        ? $fix_default{ $default }
+                        : $default
+                ) : (),
                 'x-order' => $i + 1,
             };
             if ( !$c->{is_nullable} && !$is_auto && !defined $c->{default_value} ) {
@@ -397,7 +408,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.045
+version 1.046
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package Test::Compile;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.3.1");
+use version; our $VERSION = qv("v2.4.0");
 use parent 'Exporter';
 use UNIVERSAL::require;
 use Test::Compile::Internal;
@@ -315,7 +315,7 @@ Evan Giles, C<< <egiles@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2019 by the authors.
+Copyright 2007-2020 by the authors.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

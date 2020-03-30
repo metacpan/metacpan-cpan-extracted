@@ -29,6 +29,20 @@
     * Tested against Chromium Chromium/75.0.3770.100
     * Tested against Chromium Chromium/77.0.3865.120
     * Tested against Chromium Chromium/78.0.3904.108
+    * Tested against Chromium Chromium/80.0.3987.106
+
+0.46 2020-03-29
+    * Actually make transferring the cookies from/to Chrome work
+    * Add W:M:C:URLBlacklist to ease restricting what Chrome loads
+    * Document the `headless` option to run Chrome without showing a window
+      This option had been available a long time, but it only ever was
+      mentioned in passing.
+
+0.45 2020-03-28
+    * The "secure" cookie attribute now gets forced into a JSON boolean
+      in ->set_cookie. Thanks to Rub3nCT for reporting this in GH issue #53.
+    * Added ->load_jar method to import a complete HTTP::Cookies cookie jar
+      into Chrome, suggested by Rub3nCT in GH issue #53.
 
 0.44 2020-01-03
     * Fix ->get_attribute('innerHTML') and ->get_attribute('outerHTML')

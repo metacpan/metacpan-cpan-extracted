@@ -20,7 +20,6 @@ requires:
   Data::Sah::Coerce::perl::To_date::From_float::epoch: '0'
   Data::Sah::Coerce::perl::To_date::From_obj::datetime: '0'
   Data::Sah::Coerce::perl::To_date::From_obj::time_moment: '0'
-  Data::Sah::Coerce::perl::To_date::From_str::alami: '0'
   Data::Sah::Coerce::perl::To_date::From_str::iso8601: '0'
   Data::Sah::Coerce::perl::To_date::From_str::natural: '0'
   Data::Sah::Coerce::perl::To_duration::From_float::seconds: '0'
@@ -39,8 +38,9 @@ requires:
   DateTime::Format::Duration::ConciseHMS: '0'
   DateTime::Format::Duration::ISO8601: '0'
   DateTime::Format::Flexible: '0'
+  DateTime::Format::ISO8601::Format: '0'
   DateTime::Format::Natural: '0'
-  Module::Installed::Tiny: '0'
+  Module::Installed::Tiny: '0.004'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
   Time::Duration::Parse: '0'
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DateUtils
   homepage: https://metacpan.org/release/App-DateUtils
   repository: git://github.com/perlancar/perl-App-DateUtils.git
-version: '0.122'
+version: '0.123'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -226,7 +226,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -366,7 +366,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -380,7 +380,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

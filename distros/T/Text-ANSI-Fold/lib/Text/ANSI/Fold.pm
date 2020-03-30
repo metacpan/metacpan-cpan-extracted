@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -359,6 +359,10 @@ sub chops {
 
     if (ref $width eq 'ARRAY') {
 	for my $w (@{$width}) {
+	    if ($w == 0) {
+		push @chops, '';
+		next;
+	    }
 	    if ((my $chop = $obj->retrieve(width => $w)) ne '') {
 		push @chops, $chop;
 	    } else {

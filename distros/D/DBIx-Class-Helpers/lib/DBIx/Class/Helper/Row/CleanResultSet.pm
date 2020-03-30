@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Row::CleanResultSet;
-$DBIx::Class::Helper::Row::CleanResultSet::VERSION = '2.035000';
+$DBIx::Class::Helper::Row::CleanResultSet::VERSION = '2.036000';
 # ABSTRACT: Get an unfiltered ResultSet from the row
 
 use strict;

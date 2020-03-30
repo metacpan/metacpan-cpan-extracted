@@ -356,8 +356,8 @@ sub analyzeTypes {
 		       '$lab=$anl->{label}',
 		       '$wa=$opts{wa}',
 		      );
-  my $aget   = $aut->accessClosure($aget_code, pre=>$ax_pre, wa=>\@wa);
-  my $aset   = $aut->accessClosure($aset_code, pre=>$ax_pre, wa=>\@wa);
+  my $aget   = $aut->accessClosure($aget_code, pre=>$ax_pre, wa=>\@wa, cache=>0);
+  my $aset   = $aut->accessClosure($aset_code, pre=>$ax_pre, wa=>\@wa, cache=>0);
   ##
   my $apre   = $aut->{analyzePre}  ? $aut->accessClosure($aut->{analyzePre}) : undef;
   my $apost  = $aut->{analyzePost} ? $aut->accessClosure($aut->{analyzePost}) : undef;

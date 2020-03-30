@@ -55,25 +55,41 @@ sub main {
 
     # Test that the verbosity setting is honoured
     my $tests = [
-        ['default', 'success', 'no output'],
-        ['default', 'failure', 'output'],
-        ['silent',  'success', 'no output'],
-        ['silent',  'failure', 'no output'],
-        ['verbose', 'success', 'output'],
-        ['verbose', 'failure', 'output'],
+        # verbosity, script,    expect_output, expect_executing 
+        ['default', 'success', 'no output',    0],
+        ['default', 'failure', 'output',       0],
+        ['silent',  'success', 'no output',    0],
+        ['silent',  'failure', 'no output',    0],
+        ['verbose', 'success', 'output',       1],
+        ['verbose', 'failure', 'output',       1],
     ];
 
     local $ENV{PERL5LIB} = join(":",@INC);
     for my $test ( @$tests ) {
-        my $cmd = "$^X $0 $test->[0] $test->[1]";
-        my $output = `$cmd 2>&1`;
-        my $name = "verbose: $test->[0], script: $test->[1], should produce: $test->[2]";
-        if ( $test->[2] eq "output" ) {
-            isnt($output, "", $name);
+	# Given
+        my ($verbosity, $script, $expect_output, $expect_executing) = @$test;
+        my $cmd = "$^X $0 $verbosity $script";
+
+	# When
+        my @output = `$cmd 2>&1`;
+
+        my $found_executing = 0;
+        for my $line ( @output ) {
+            if ( $line =~ qr/Executing: / ) {
+                $found_executing = 1;
+            }
+        }
+
+	# Then
+        is($found_executing, $expect_executing, "$verbosity Executing: $found_executing");
+
+        if ( $expect_output eq "output" ) {
+            isnt(@output, 0, "Got output for $verbosity/$script");
         } else {
-            is($output, "", $name);
+            is(@output, 0, "no output for $verbosity/$script");
         }
     }
+
 
     done_testing();
 }

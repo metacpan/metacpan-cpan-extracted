@@ -29,7 +29,7 @@ Commands can be executed via web (HTTP) requests, for example:
   http://<ip>/cm?cmnd=Power%20off
   http://<ip>/cm?user=admin&password=joker&cmnd=Power%20Toggle
 
-Example: 
+Examples:
 
 
 Query default relay
@@ -151,6 +151,10 @@ sub _password_default {''};
 =head1 METHODS
 
 =head2 name
+
+Returns the FriendlyName from the Tasmota hardware.
+
+Note: The FriendlyName is cached for the life of the object.
 
 =cut
 

@@ -28,6 +28,8 @@
 /* definitions from sys/quota.h */
 #define USRQUOTA  0             /* element used for user quotas */
 #define GRPQUOTA  1             /* element used for group quotas */
+extern int quotactl(int, const char *, uid_t, caddr_t);
+
 
 /*
  * Command definitions for the 'quotactl' system call.

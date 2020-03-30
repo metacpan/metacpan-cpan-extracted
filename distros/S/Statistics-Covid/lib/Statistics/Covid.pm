@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 use Statistics::Covid::Utils;
 use Statistics::Covid::Datum;
@@ -56,29 +56,10 @@ sub	new {
 	$self->config($config_hash);
 
 	if( exists($params->{'providers'}) && defined($m=$params->{'providers'}) ){
-		my %providers = ();
-		for my $aprovider (@$m){
-			my $pn = 'Statistics::Covid::DataProvider::'.$aprovider;
-			my $pnf = File::Spec->catdir(split(/\:\:/, $pn)).'.pm';
-			my $loadedOK = eval {
-				require $pnf;
-				$pn->import;
-				1;
-			};
-			if( ! $loadedOK ){ warn "error, failed to load module '$pn' (file '$pnf'), most likely provider does not exist '$pn'."; return undef }
-			my $providerObj = $pn->new({
-				'config-hash' => Storable::dclone($config_hash),
-				'debug' => $debug
-			});
-			if( ! defined $providerObj ){ warn "error, call to $pn->new() has failed."; return undef }
-			# the key to the providers can be the full package or just this bit
-			# we prefer this bit (e.g. World::JHU)
-			#$providers{$pn} = $providerObj;
-			$providers{$aprovider} = $providerObj;
-			if( $debug > 0 ){ warn "provider added '$pn':\n".$providerObj->toString() }
-		}
-		$self->{'p'}->{'provider-objs'} = {%providers};
-	} else { warn "error, 'providers' was not specified, a list of provider names, e.g. 'UK::GOVUK' and/or 'World::JHU' must be provided."; return undef }
+		if( ! $self->providers($m) ){ warn "error, failed to install specified provider(s) (calling providers()) : '".join("','", @$m)."'."; return undef }
+	} else {
+		if( $debug > 0 ){ warn "warning, 'providers' (like 'UK::GOVUK' and/or 'World::JHU') was not specified, that's ok, but you must insert some before fetching any data - interacting with db will be ok." }
+	}
 
 	for(keys %$params){
 		$self->{$_} = $params->{$_} if exists $self->{$_}
@@ -108,6 +89,7 @@ sub	fetch_and_store {
 	my $debug = $self->debug();
 	my $num_fetched_total = 0;
 	my $providers = $self->providers();
+	if( ! defined $providers ){ warn "error, data providers must be inserted prior to using this, e.g. providers('World::JHU')."; return undef }
 	for my $pn (keys %$providers){
 		my $providerObj = $providers->{$pn};
 		my $datas = $providerObj->fetch();
@@ -163,22 +145,27 @@ sub	select_datums_from_db {
 	return $objs
 }
 # shortcut to selecting datum objects from db (select_datums_from_db())
-# from a single location
+# from a single location and ordering the results in time-ascending order.
 # it's useful for getting the timeline for a given place
 # if successful, it returns an array of Datum objects (sorted on time)
 # it returns undef on failure
-sub	select_datums_from_db_for_location {
+sub	select_datums_from_db_for_specific_location_time_ascending {
 	my $self = $_[0];
-	my $location_name = $_[1]; # exactly as it is stored in DB
-	my $belongsto = $_[2]; #optionally specify a 'belongsto' (e.g. UK)
+	# this can be an exact location name (case sensitive)
+	# OR it can be this {'like' => 'Ha%'}
+	# which does a wildcard search
+	my $location_condition = $_[1];
+	#optionally specify a 'belongsto' (e.g. UK)
+	# either exact or wildcard, like above
+	my $belongsto_condition = $_[2];
 
-	my $conditions = {'name'=>$location_name};
-	$conditions->{'belongsto'} = $belongsto if defined $belongsto;
+	my $conditions = {'name'=>$location_condition};
+	$conditions->{'belongsto'} = $belongsto_condition if defined $belongsto_condition;
 
 	my $results = $self->select_datums_from_db({
 		'conditions' => $conditions,
 		'attributes' => {
-			'order_by' => 'datetimeUnixEpoch'
+			'order_by' => {'-asc' => 'datetimeUnixEpoch'}
 		},
 	});
 	if( ! defined $results ){ warn "error, call to ".'select_datums_from_db()'." has failed."; return undef }
@@ -257,7 +244,9 @@ sub	read_data_from_files {
 	my @providerstrs;
 	if( ! exists($params->{'what'}) || ! defined($params->{'what'}) ){
 		# nothing was provided in the input, we use ALL our providers loaded during construction
-		@providerstrs = keys %{$self->providers()};
+		my $m = $self->providers();
+		if( ! defined $m ){ warn "error, data providers must be inserted prior to using this, e.g. providers('World::JHU')."; return undef }
+		@providerstrs = keys %$m;
 	} else {
 		# something was given at input
 		$inp = $params->{'what'};
@@ -382,12 +371,44 @@ sub     dbparams { return $_[0]->config()->{'dbparams'} }
 # if a provider id is specified at input)
 sub	providers {
 	my $self = $_[0];
-	my $pstr = $_[1];
-	if( defined $pstr ){
+	my $m = $_[1];
+
+	if( ! defined $m ){ return $self->{'p'}->{'provider-objs'} }
+
+	if( ref($m) eq '' ){
+		# we were given a string to search for that provider and return its data
 		# return the exact provider if the pstr matches an id from our providers
-		return($self->{'p'}->{'provider-objs'}->{$pstr})
-			if exists($self->{'p'}->{'provider-objs'}->{$pstr});
+		return($self->{'p'}->{'provider-objs'}->{$m})
+			if exists($self->{'p'}->{'provider-objs'}->{$m});
 		return undef # id given is not in our list
+	} elsif( ref($m) eq 'ARRAY' ){
+		my $debug = $self->debug();
+		# we were given an arrayref, presumably a list of providers
+		# we need to find the package of each provider and load it,
+		# that's why the contents of this array plus the package string below
+		# must much exactly our installed provider packages
+		my %providers = ();
+		for my $aprovider (@$m){
+			my $pn = 'Statistics::Covid::DataProvider::'.$aprovider;
+			my $pnf = File::Spec->catdir(split(/\:\:/, $pn)).'.pm';
+			my $loadedOK = eval {
+				require $pnf;
+				$pn->import;
+				1;
+			};
+			if( ! $loadedOK ){ warn "error, failed to load module '$pn' (file '$pnf'), most likely provider does not exist '$pn'."; return undef }
+			my $providerObj = $pn->new({
+				'config-hash' => Storable::dclone($self->config()),
+				'debug' => $debug
+			});
+			if( ! defined $providerObj ){ warn "error, call to $pn->new() has failed."; return undef }
+			# the key to the providers can be the full package or just this bit
+			# we prefer this bit (e.g. World::JHU)
+			#$providers{$pn} = $providerObj;
+			$providers{$aprovider} = $providerObj;
+			if( $debug > 0 ){ warn "provider added '$pn':\n".$providerObj->toString() }
+		}
+		$self->{'p'}->{'provider-objs'} = \%providers;
 	}
 	return $self->{'p'}->{'provider-objs'} # that's the hash with the providers
 }
@@ -464,7 +485,7 @@ Statistics::Covid - Fetch, store in DB, retrieve and analyse Covid-19 statistics
 
 =head1 VERSION
 
-Version 0.21
+Version 0.23
 
 =head1 DESCRIPTION
 
@@ -496,7 +517,7 @@ solidify.
 	use Statistics::Covid::Datum;
 	
 	$covid = Statistics::Covid->new({   
-		'config-file' => 't/example-config.json',
+		'config-file' => 't/config-for-t.json',
 		'providers' => ['UK::BBC', 'UK::GOVUK', 'World::JHU'],
 		'save-to-file' => 1,
 		'save-to-db' => 1,
@@ -529,21 +550,222 @@ solidify.
 	for (@$someObjs);
 	
 	# or for a single place (this sub sorts results wrt publication time)
-	my $timelineObjs = $covid->select_datums_from_db_for_location('Hackney');
+	my $timelineObjs = $covid->select_datums_from_db_for_specific_location_time_ascending('Hackney');
+	# or for a wildcard match
+	# $covid->select_datums_from_db_for_specific_location_time_ascending({'like'=>'Hack%'});
+	# and maybe specifying max rows
+	# $covid->select_datums_from_db_for_specific_location_time_ascending({'like'=>'Hack%'}, {'rows'=>10});
 	for my $anobj (@$timelineObjs){
 		print $anobj->toString()."\n";
 	}
 
 	print "datum rows in DB: ".$covid->db_count_datums()."\n"
 
-	use Statistics::Covid::Analysis::Plot;
+	use Statistics::Covid;
+	use Statistics::Covid::Datum;
+	use Statistics::Covid::Utils;
+	use Statistics::Covid::Analysis::Plot::Simple;
+
+	# now read some data from DB and do things with it
+	$covid = Statistics::Covid->new({   
+		'config-file' => 't/config-for-t.json',
+		'debug' => 2,
+	}) or die "Statistics::Covid->new() failed";
+	# retrieve data from DB for selected locations (in the UK)
+	# data will come out as an array of Datum objects sorted wrt time
+	# (the 'datetimeUnixEpoch' field)
+	$objs = $covid->select_datums_from_db_for_specific_location_time_ascending(
+		#{'like' => 'Ha%'}, # the location (wildcard)
+		['Halton', 'Havering'],
+		#{'like' => 'Halton'}, # the location (wildcard)
+		#{'like' => 'Havering'}, # the location (wildcard)
+		'UK', # the belongsto (could have been wildcarded)
+	);
+	# create a dataframe
+	$df = Statistics::Covid::Utils::datums2dataframe({
+		'datum-objs' => $objs,
+		# collect data from all those with same 'name' and same 'belongsto'
+		# and maybe plot this data as a single curve (or fit or whatever)
+		'groupby' => ['name','belongsto'],
+		# put only these values of the datum object into the dataframe
+		# one of them will be X, another will be Y
+		# if you want to plot multiple Y, then add here more dependent columns
+		# like ('unconfirmed').
+		'content' => ['confirmed', 'unconfirmed', 'datetimeUnixEpoch'],
+	});
+
+	# plot confirmed vs time
+	$ret = Statistics::Covid::Analysis::Plot::Simple::plot({
+		'dataframe' => $df,
+		# saves to this file:
+		'outfile' => 'confirmed-over-time.png',
+		# plot this column against X
+		# (which is not present and default is time ('datetimeUnixEpoch')
+		'Y' => 'confirmed',
+	});
+
+	# plot confirmed vs unconfirmed
+	# if you see a vertical line it means that your data has no 'unconfirmed'
+	$ret = Statistics::Covid::Analysis::Plot::Simple::plot({
+		'dataframe' => $df,
+		# saves to this file:
+		'outfile' => 'confirmed-vs-unconfirmed.png',
+		'X' => 'unconfirmed',
+		# plot this column against X
+		'Y' => 'confirmed',
+	});
+
+	# plot using an array of datum objects as they came
+	# out of the DB. A dataframe is created internally to the plot()
+	# but this is not recommended if you are going to make several
+	# plots because equally many dataframes must be created and destroyed
+	# internally instead of recycling them like we do here...
+	$ret = Statistics::Covid::Analysis::Plot::Simple::plot({
+		'datum-objs' => $objs,
+		# saves to this file:
+		'outfile' => 'confirmed-over-time.png',
+		# plot this column as Y
+		'Y' => 'confirmed', 
+		# X is not present so default is time ('datetimeUnixEpoch')
+		# and make several plots, each group must have 'name' common
+		'GroupBy' => ['name', 'belongsto'],
+		'date-format-x' => {
+			# see Chart::Clicker::Axis::DateTime for all the options:
+			format => '%m', ##<<< specify timeformat for X axis, only months
+			position => 'bottom',
+			orientation => 'horizontal'
+		},
+	});
+
+	use Statistics::Covid;
+	use Statistics::Covid::Datum;
+	use Statistics::Covid::Utils;
+	use Statistics::Covid::Analysis::Model::Simple;
+
+	# create a dataframe
+	my $df = Statistics::Covid::Utils::datums2dataframe({
+		'datum-objs' => $objs,
+		'groupby' => ['name'],
+		'content' => ['confirmed', 'datetimeUnixEpoch'],
+	});
+	# convert all 'datetimeUnixEpoch' data to hours, the oldest will be hour 0
+	for(sort keys %$df){
+		Statistics::Covid::Utils::discretise_increasing_sequence_of_seconds(
+			$df->{$_}->{'datetimeUnixEpoch'}, # in-place modification
+			3600 # seconds->hours
+		)
+	}
+
+	# do an exponential fit
+	my $ret = Statistics::Covid::Analysis::Model::Simple::fit({
+		'dataframe' => $df,
+		'X' => 'datetimeUnixEpoch', # our X is this field from the dataframe
+		'Y' => 'confirmed', # our Y is this field
+		'initial-guess' => {'c1'=>1, 'c2'=>1}, # initial values guess
+		'exponential-fit' => 1,
+		'fit-params' => {
+			'maximum_iterations' => 100000
+		}
+	});
+
+	# fit to a polynomial of degree 10 (max power of x is 10)
+	my $ret = Statistics::Covid::Analysis::Model::Simple::fit({
+		'dataframe' => $df,
+		'X' => 'datetimeUnixEpoch', # our X is this field from the dataframe
+		'Y' => 'confirmed', # our Y is this field
+		# initial values guess (here ONLY for some coefficients)
+		'initial-guess' => {'c1'=>1, 'c2'=>1},
+		'polynomial-fit' => 10, # max power of x is 10
+		'fit-params' => {
+			'maximum_iterations' => 100000
+		}
+	});
+
+	# fit to an ad-hoc formula in 'x'
+	# (see L<Math::Symbolic::Operator> for supported operators)
+	my $ret = Statistics::Covid::Analysis::Model::Simple::fit({
+		'dataframe' => $df,
+		'X' => 'datetimeUnixEpoch', # our X is this field from the dataframe
+		'Y' => 'confirmed', # our Y is this field
+		# initial values guess (here ONLY for some coefficients)
+		'initial-guess' => {'c1'=>1, 'c2'=>1},
+		'formula' => 'c1*sin(x) + c2*cos(x)',
+		'fit-params' => {
+			'maximum_iterations' => 100000
+		}
+	});
+
+	# this is what fit() returns
+
+	# $ret is a hashref where key=group-name, and
+	# value=[ 3.4,  # <<<< mean squared error of the fit
+	#  [
+	#     ['c1', 0.123, 0.0005], # <<< coefficient c1=0.123, accuracy 0.00005 (ignore that)
+	#     ['c2', 1.444, 0.0005]  # <<< coefficient c1=1.444
+	#  ]
+	# and group-name in our example refers to each of the locations selected from DB
+	# in this case data from 'Halton' in 'UK' was fitted on 0.123*1.444^time with an m.s.e=3.4
+
+	# This is what the dataframe looks like:
+	#  {
+	#  Halton   => {
+	#		confirmed => [0, 0, 3, 4, 4, 5, 7, 7, 7, 8, 8, 8],
+	#		datetimeUnixEpoch => [
+	#		  1584262800,
+	#		  1584349200,
+	#		  1584435600,
+	#		  1584522000,
+	#		  1584637200,
+	#		  1584694800,
+	#		  1584781200,
+	#		  1584867600,
+	#		  1584954000,
+	#		  1585040400,
+	#		  1585126800,
+	#		  1585213200,
+	#		],
+	#	      },
+	#  Havering => {
+	#		confirmed => [5, 5, 7, 7, 14, 19, 30, 35, 39, 44, 47, 70],
+	#		datetimeUnixEpoch => [
+	#		  1584262800,
+	#		  1584349200,
+	#		  1584435600,
+	#		  1584522000,
+	#		  1584637200,
+	#		  1584694800,
+	#		  1584781200,
+	#		  1584867600,
+	#		  1584954000,
+	#		  1585040400,
+	#		  1585126800,
+	#		  1585213200,
+	#		],
+	#	      },
+	#  }
+
+	# and after converting the datetimeUnixEpoch values to hours and setting the oldest to t=0
+	#  {
+	#  Halton   => {
+	#                confirmed => [0, 0, 3, 4, 4, 5, 7, 7, 7, 8, 8, 8],
+	#                datetimeUnixEpoch => [0, 24, 48, 72, 104, 120, 144, 168, 192, 216, 240, 264],
+	#              },
+	#  Havering => {
+	#                confirmed => [5, 5, 7, 7, 14, 19, 30, 35, 39, 44, 47, 70],
+	#                datetimeUnixEpoch => [0, 24, 48, 72, 104, 120, 144, 168, 192, 216, 240, 264],
+	#              },
+	#  }
+
+
+
+	use Statistics::Covid::Analysis::Plot::Simple;
 
 	# plot something
 	my $objs = $io->db_select({
 		conditions => {belongsto=>'UK', name=>{'like' => 'Ha%'}}
 	});
 	my $outfile = 'chartclicker.png';
-	my $ret = Statistics::Covid::Analysis::Plot::plot_with_chartclicker({
+	my $ret = Statistics::Covid::Analysis::Plot::Simple::plot({
         	'datum-objs' => $objs,
 		# saves to this file:
 	        'outfile' => $outfile,
@@ -563,7 +785,7 @@ specified configuration file.
 
 For a quick start:
 
-    cp t/example-config.json config.json
+    cp t/config-for-t.json config.json
     # optionally modify config.json to change the destination data dirs
     # now fetch data from some default data providers:
     script/statistics-covid-fetch-data-and-store.pl --config-file config.json
@@ -594,7 +816,7 @@ or any other you see appropriate.
 =head1 CONFIGURATION FILE
 
 Below is an example configuration file which is essentially JSON with comments.
-It can be found in C<t/example-config.json> relative to the root directory 
+It can be found in C<t/config-for-t.json> relative to the root directory 
 of this distribution.
 
 	# comments are allowed, otherwise it is json

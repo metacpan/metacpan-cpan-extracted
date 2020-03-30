@@ -21,7 +21,7 @@ my $scroller = Tickit::Widget::Scroller->new(
       my $self = shift;
       # TODO: This is a fragile API, needs fixing
       return sprintf "-- Start{%d/%d} items{%d} --",
-         $self->{start_item}, $self->{start_partial}, scalar @{ $self->{items} };
+         $self->_start_item, $self->_start_partial, scalar $self->_items;
    },
 );
 

@@ -56,6 +56,7 @@ WriteMakefile(
         'Getopt::Long'              => 0,
         'IPC::System::Simple'       => 0,
         'JSON'                      => 0,
+        'LWP::Protocol::https'      => 0,
         'List::MoreUtils'           => 0,
         'LWP::UserAgent'            => 0,
         'Mojo::DOM'                 => 0,

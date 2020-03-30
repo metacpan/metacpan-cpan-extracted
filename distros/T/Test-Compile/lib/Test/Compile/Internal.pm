@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.3.1");
+use version; our $VERSION = qv("v2.4.0");
 use File::Spec;
 use UNIVERSAL::require;
 use Test::Builder;
@@ -373,6 +373,9 @@ sub _perl_file_compiles {
     my @inc = ('blib/lib', @INC);
     my $taint = $self->_is_in_taint_mode($file);
     my $command = join(" ", ($^X, (map { "-I$_" } @inc), "-c$taint", $file));
+    if ( $self->verbose() ) {
+        $self->{test}->diag("Executing: " . $command);
+    }
     my ($compiles, $output) = $self->_run_command($command);
     if ( $output && (!defined($self->verbose()) || $self->verbose() != 0) ) {
         if ( !$compiles || $self->verbose() ) {
@@ -431,7 +434,7 @@ Evan Giles, C<< <egiles@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2019 by the authors.
+Copyright 2007-2020 by the authors.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

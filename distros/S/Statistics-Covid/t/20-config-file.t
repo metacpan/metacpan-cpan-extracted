@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use warnings;
 
+our $VERSION = '0.21';
+
 use Statistics::Covid::Utils;
 use Test::More;
 use File::Basename;
@@ -13,7 +15,7 @@ my $dirname = dirname(__FILE__);
 
 my $num_tests = 0;
 
-my $config_json_file = File::Spec->catfile($dirname, 'example-config.json');
+my $config_json_file = File::Spec->catfile($dirname, 'config-for-t.json');
 my $confighash = Statistics::Covid::Utils::configfile2perl($config_json_file);
 ok(defined($confighash), "config json file parsed."); $num_tests++;
 

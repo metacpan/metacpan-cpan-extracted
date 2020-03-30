@@ -1,9 +1,11 @@
 package DBIx::Class::Helper::ResultSet::Shortcut::RemoveColumns;
-$DBIx::Class::Helper::ResultSet::Shortcut::RemoveColumns::VERSION = '2.035000';
+$DBIx::Class::Helper::ResultSet::Shortcut::RemoveColumns::VERSION = '2.036000';
 use strict;
 use warnings;
 
 use parent 'DBIx::Class::ResultSet';
+
+__PACKAGE__->load_components('Helper::ResultSet::RemoveColumns');
 
 sub remove_columns { shift->search(undef, { remove_columns => shift }) }
 

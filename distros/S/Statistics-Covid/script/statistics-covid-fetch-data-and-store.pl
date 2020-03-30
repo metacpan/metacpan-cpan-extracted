@@ -6,7 +6,7 @@
 # and write those to another db (which will be created if not exist)
 # useful for creating test db's on the fly.
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 use strict;
 use warnings;

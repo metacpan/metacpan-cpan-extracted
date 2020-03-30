@@ -28,7 +28,7 @@ Module options:
 
 # VERSION
 
-Version 0.02
+Version 0.04
 
 # DESCRIPTION
 
@@ -133,6 +133,8 @@ site.
 [https://github.com/kaz-utashiro/App-week](https://github.com/kaz-utashiro/App-week)
 
 [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap)
+
+[https://qiita.com/kaz-utashiro/items/603f4bca39e397afc91c](https://qiita.com/kaz-utashiro/items/603f4bca39e397afc91c)
 
 # AUTHOR
 

@@ -43,7 +43,7 @@
    "provides" : {
       "Object::Pad" : {
          "file" : "lib/Object/Pad.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

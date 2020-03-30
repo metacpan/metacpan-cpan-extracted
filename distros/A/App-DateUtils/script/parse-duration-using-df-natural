@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/DateUtils/parse_duration_using_df_natural
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2020-01-31'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.122'; # VERSION
+our $VERSION = '0.123'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ parse-duration-using-df-natural - Parse duration string(s) using DateTime::Forma
 
 =head1 VERSION
 
-This document describes version 0.122 of parse-duration-using-df-natural (from Perl distribution App-DateUtils), released on 2019-11-29.
+This document describes version 0.123 of parse-duration-using-df-natural (from Perl distribution App-DateUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -51,15 +51,15 @@ Examples:
  +---------------------------+-------------+--------------+---------+--------------+---------------------+---------------------+
  | module                    | original    | is_parseable | as_secs | as_dtdur_obj | date1               | date2               |
  +---------------------------+-------------+--------------+---------+--------------+---------------------+---------------------+
- | DateTime::Format::Natural | for 2 weeks | 1            | 1209600 | P14D         | 2019-11-29T02:17:56 | 2019-12-13T02:17:56 |
+ | DateTime::Format::Natural | for 2 weeks | 1            | 1209600 | P14D         | 2020-01-31T04:58:41 | 2020-02-14T04:58:41 |
  +---------------------------+-------------+--------------+---------+--------------+---------------------+---------------------+
 
  % parse-duration-using-df-natural 'from 23 Jun to 29 Jun'
- +---------------------------+-----------------------+--------------+----------+--------------+---------------------+---------------------+
- | module                    | original              | is_parseable | as_secs  | as_dtdur_obj | date1               | date2               |
- +---------------------------+-----------------------+--------------+----------+--------------+---------------------+---------------------+
- | DateTime::Format::Natural | from 23 Jun to 29 Jun | 1            | 13157276 | P5MT2H17M56S | 2019-11-29T02:17:56 | 2019-06-29T00:00:00 |
- +---------------------------+-----------------------+--------------+----------+--------------+---------------------+---------------------+
+ +---------------------------+-----------------------+--------------+----------+-----------------+---------------------+---------------------+
+ | module                    | original              | is_parseable | as_secs  | as_dtdur_obj    | date1               | date2               |
+ +---------------------------+-----------------------+--------------+----------+-----------------+---------------------+---------------------+
+ | DateTime::Format::Natural | from 23 Jun to 29 Jun | 1            | 13006879 | P4M28DT19H1M19S | 2020-01-31T04:58:41 | 2020-06-29T00:00:00 |
+ +---------------------------+-----------------------+--------------+----------+-----------------+---------------------+---------------------+
 
  % parse-duration-using-df-natural foo
  +---------------------------+----------+--------------+-------------------------------------------------------+
@@ -122,6 +122,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -195,7 +199,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '1.045';
+our $VERSION = '1.046';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -157,6 +157,7 @@ sub filter_table { 1 }
 sub fixup_default {
     my ( $self, $value ) = @_;
     return undef if !defined $value or $value =~ /^nextval/i or $value eq 'NULL';
+    return "now" if $value =~ /^(?:NOW|(?:CURRENT_|LOCAL|STATEMENT_|TRANSACTION_|CLOCK_)(?:DATE|TIME(?:STAMP)?))(?:\(\))?/i;
     $self->mojodb->db->query( 'SELECT ' . $value )->array->[0];
 }
 
@@ -202,7 +203,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 1.045
+version 1.046
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Test-Compile
 
+v2.4.0    2020-03-29
+    - RT-132153: Be more verbose when in verbose mode
+    - Update copyright
+
 v2.3.1    2019-10-23
     - RT-130694: all_pm_files_ok and all_pl_files_ok should return true/false
 

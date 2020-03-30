@@ -1,0 +1,52 @@
+{
+   "abstract" : "Mojolicious server for AWS Lambda",
+   "author" : [
+      "Prajith P <me@prajith.in>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Server-AWSLambda",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::Types" : "0",
+            "Mojolicious" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Prajithp/P5-Mojo-Server-AWSLambda/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Prajithp/P5-Mojo-Server-AWSLambda.git",
+         "web" : "https://github.com/Prajithp/P5-Mojo-Server-AWSLambda"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "JSON::XS version 3.03",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

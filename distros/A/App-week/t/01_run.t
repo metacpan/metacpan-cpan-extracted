@@ -25,7 +25,7 @@ my %result = (
 END
 );
 
-$ENV{LANG} = 'C';
+$ENV{LANG} = $ENV{LC_ALL} = 'C';
 
 my $week = Script->new([qw(--cm *= -C0 1752/9/2)])->run;
 is($week->result, $result{157209}, "1752/9/2");

@@ -1,5 +1,12 @@
 Revision history for SMS-MessageBird
 
+0.04    Added search method to SMS module.
+
+        Included patch from RT127966 - Fix Unicode in SMS body. [kparkhurst]
+
+        Included PR1 from Github, Re: RT132251 - Thanks to Nico for the report,
+        and Martin McGrath for the PR. - Added prerequisite.
+
 0.03    Fix the module compilation on 5.8 Perls, due to stupidly using the
         defined-or assignment operator. Spotted by the eagle-eyed BIGPRESH.
 

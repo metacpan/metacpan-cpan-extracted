@@ -1,6 +1,6 @@
-2018-01-28  Kingpin  <martin@ubuntu>
+2020-03-29  Kingpin  <martin@ubuntu>
 
-	* Changes: fixed contents of META.yml
+	* lib/Net/Address/Ethernet.pm (get_addresses): use /sbin/ip if Ifconfig fails
 
 2016-02-07  Kingpin  <martin@localhost.localdomain>
 

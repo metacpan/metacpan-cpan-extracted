@@ -3,8 +3,10 @@ package SMS::MessageBird::API;
 use strict;
 use warnings;
 
+use Encode qw( encode_utf8 );
 use LWP::UserAgent;
 use JSON;
+use URI;
 
 =head1 NAME
 
@@ -142,10 +144,21 @@ sub _api_request {
 
     my %request_params;
     if ($data) {
-        my $content_payload = JSON->new->encode($data);
 
-        $request_params{'Content-Type'} = 'application/json',
-        $request_params{Content} = $content_payload;
+        # For a GET request, we need to send the $data as request params.
+        if (lc $method eq 'get') {
+            my $get_url = URI->new($endpoint);
+            $get_url->query_form(%$data);
+            $endpoint = $get_url;
+
+        # For the others POST, PUT, PATCH - send the data as payload.
+        } else {
+
+            my $content_payload = JSON->new->encode($data);
+
+            $request_params{'Content-Type'} = 'application/json;charset=utf-8',
+            $request_params{Content} = Encode::encode_utf8($content_payload);
+        }
     }
 
     my $api_response = $self->{ua}->$method(

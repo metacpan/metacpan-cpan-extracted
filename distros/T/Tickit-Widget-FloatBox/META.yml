@@ -7,7 +7,7 @@ build_requires:
   Test::More: '0.88'
   Tickit::Test: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,9 +16,12 @@ name: Tickit-Widget-FloatBox
 provides:
   Tickit::Widget::FloatBox:
     file: lib/Tickit/Widget/FloatBox.pm
-    version: '0.03'
+    version: '0.04'
 requires:
+  Object::Pad: '0.17'
   Tickit::ContainerWidget: '0'
+  perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

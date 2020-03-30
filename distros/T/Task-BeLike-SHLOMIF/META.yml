@@ -21,7 +21,7 @@ name: Task-BeLike-SHLOMIF
 provides:
   Task::BeLike::SHLOMIF:
     file: lib/Task/BeLike/SHLOMIF.pm
-    version: v0.0.5
+    version: v0.0.6
 requires:
   App::CSV2Chart: '0'
   App::Countdown: '0'
@@ -48,6 +48,7 @@ requires:
   Pod::Xhtml: '0'
   SQ: '0'
   Task::FreecellSolver::Testing: '0'
+  Task::FreecellSolver::Testing::MultiConfig: '0'
   Task::Sites::ShlomiFish: '0'
   Term::ReadLine::Gnu: '0'
   Test::Pod: '0'
@@ -57,7 +58,7 @@ resources:
   bugtracker: https://github.com/shlomif/task-belike-shlomif/issues
   homepage: http://metacpan.org/release/Task-BeLike-SHLOMIF
   repository: https://github.com/shlomif/Task-BeLike-SHLOMIF.git
-version: 0.0.5
+version: 0.0.6
 x_Dist_Zilla:
   perl:
     version: '5.030002'

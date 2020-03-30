@@ -1,5 +1,10 @@
 Revision history for Object-Pad
 
+0.18    2020-03-30
+        [CHANGES]
+         * Implement the BUILDARGS part of constructor protocol
+         * Apply the :method attribute to all method subs
+
 0.17    2020-03-27
         [CHANGES]
          * Add some style suggestions for code authors using the module

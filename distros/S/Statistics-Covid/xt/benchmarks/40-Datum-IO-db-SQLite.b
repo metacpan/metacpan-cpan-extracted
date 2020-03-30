@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use lib 'blib/lib';
+our $VERSION = '0.21';
 
 use Statistics::Covid::Datum;
 use Statistics::Covid::Datum::IO;

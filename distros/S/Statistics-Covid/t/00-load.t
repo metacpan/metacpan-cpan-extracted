@@ -4,7 +4,9 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 17;
+our $VERSION = '0.21';
+
+plan tests => 19;
 
 BEGIN {
     use_ok( 'Statistics::Covid' ) || print "Bail out!\n";
@@ -22,6 +24,8 @@ BEGIN {
     use_ok( 'Statistics::Covid::Schema::Result::Datum' ) || print "Bail out!\n";
     use_ok( 'Statistics::Covid::Schema::Result::Version' ) || print "Bail out!\n";
     use_ok( 'Statistics::Covid::Version' ) || print "Bail out!\n";
+    use_ok( 'Statistics::Covid::Analysis::Plot::Simple' ) || print "Bail out!\n";
+    use_ok( 'Statistics::Covid::Analysis::Model::Simple' ) || print "Bail out!\n";
     use_ok( 'Statistics::Covid::IO::DualBase' ) || print "Bail out!\n";
     use_ok( 'Statistics::Covid::IO::Base' ) || print "Bail out!\n";
 }
@@ -40,6 +44,9 @@ diag( "Testing Statistics::Covid::Datum::Table $Statistics::Covid::Datum::Table:
 diag( "Testing Statistics::Covid::Datum::IO $Statistics::Covid::Datum::IO::VERSION, Perl $], $^X" );
 diag( "Testing Statistics::Covid::Schema::Result::Datum $Statistics::Covid::Schema::Result::Datum::VERSION, Perl $], $^X" );
 diag( "Testing Statistics::Covid::Schema::Result::Version $Statistics::Covid::Schema::Result::Version::VERSION, Perl $], $^X" );
+diag( "Testing Statistics::Covid::Version $Statistics::Covid::Version::VERSION, Perl $], $^X" );
+diag( "Testing Statistics::Covid::Analysis::Plot::Simple $Statistics::Covid::Analysis::Plot::Simple::VERSION, Perl $], $^X" );
+diag( "Testing Statistics::Covid::Analysis::Model::Simple $Statistics::Covid::Analysis::Model::Simple::VERSION, Perl $], $^X" );
 diag( "Testing Statistics::Covid::Version $Statistics::Covid::Version::VERSION, Perl $], $^X" );
 diag( "Testing Statistics::Covid::IO::DualBase $Statistics::Covid::IO::DualBase::VERSION, Perl $], $^X" );
 diag( "Testing Statistics::Covid::IO::Base $Statistics::Covid::IO::Base::VERSION, Perl $], $^X" );

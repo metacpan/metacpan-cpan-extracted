@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::FloatBox;
+use Object::Pad 0.17;
+use 5.026; # signatures
 
-use strict;
-use warnings;
-use base qw( Tickit::ContainerWidget );
-
-our $VERSION = '0.03';
+class Tickit::Widget::FloatBox 0.04
+   extends Tickit::ContainerWidget;
 
 use Carp;
 
@@ -40,7 +38,9 @@ is inside.
 
 =cut
 
-=head2 $floatbox = Tickit::Widget::FloatBox->new( %args )
+=head2 new
+
+   $floatbox = Tickit::Widget::FloatBox->new( %args )
 
 Constructs a new C<Tickit::Widget::FloatBox> object.
 
@@ -57,70 +57,59 @@ The main L<Tickit::Widget> instance to use as the base.
 
 =cut
 
-sub new
+has $_base_child;
+has @_floats;
+
+method BUILD( %args )
 {
-   my $class = shift;
-   my %args = @_;
-
-   my $self = $class->SUPER::new( %args );
-
    $self->set_base_child( $args{base_child} ) if $args{base_child};
-   $self->{floats} = [];
-
-   return $self;
 }
 
 =head1 ACCESSORS
 
 =cut
 
-sub children
+method children
 {
-   my $self = shift;
    my @children;
 
    push @children, $self->base_child if $self->base_child;
-   push @children, $_->child for @{ $self->{floats} };
+   push @children, $_->child for @_floats;
 
    return @children;
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    return $self->base_child ? $self->base_child->requested_lines : 1;
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
    return $self->base_child ? $self->base_child->requested_cols : 1;
 }
 
-=head2 $base_child = $floatbox->base_child
+=head2 base_child
 
-=head2 $floatbox->set_base_child( $base_child )
+=head2 set_base_child
+
+   $base_child = $floatbox->base_child
+
+   $floatbox->set_base_child( $base_child )
 
 Returns or sets the base widget to use.
 
 =cut
 
-sub base_child
-{
-   my $self = shift;
-   return $self->{base_child};
-}
+method base_child { $_base_child }
 
-sub set_base_child
+method set_base_child( $new )
 {
-   my $self = shift;
-   my ( $new ) = @_;
-
-   if( my $old = $self->{base_child} ) {
-      $self->remove( $old );
+   if( $_base_child ) {
+      $self->remove( $_base_child );
    }
 
-   $self->{base_child} = $new;
+   $_base_child = $new;
    $self->add( $new );
 
    if( my $win = $self->window ) {
@@ -128,31 +117,26 @@ sub set_base_child
    }
 }
 
-sub reshape
+method reshape
 {
-   my $self = shift;
-
    return unless my $win = $self->window;
 
-   if( my $child = $self->base_child ) {
-      if( $child->window ) {
-         $child->window->resize( $win->lines, $win->cols );
+   if( $_base_child ) {
+      if( $_base_child->window ) {
+         $_base_child->window->resize( $win->lines, $win->cols );
       }
       else {
-         $child->set_window( $win->make_sub( 0, 0, $win->lines, $win->cols ) );
+         $_base_child->set_window( $win->make_sub( 0, 0, $win->lines, $win->cols ) );
       }
    }
 
-   $self->_reshape_float( $_, $win ) for @{ $self->{floats} };
+   $self->_reshape_float( $_, $win ) for @_floats;
 
    $self->redraw;
 }
 
-sub _reshape_float
+method _reshape_float( $float, $win )
 {
-   my $self = shift;
-   my ( $float, $win ) = @_;
-
    my $child = $float->child;
    my @geom = $float->_get_geom( $win->lines, $win->cols );
 
@@ -165,21 +149,20 @@ sub _reshape_float
       # TODO: Ordering?
       # TODO: I want a ->make_hidden_float
       $child->set_window( $win->make_float( @geom ) );
-      $child->window->hide if $float->{hidden};
+      $child->window->hide if !$float->is_visible;
    }
 }
 
-sub render_to_rb
+method render_to_rb( $rb, $rect )
 {
-   my $self = shift;
-   my ( $rb, $rect ) = @_;
-
    return if $self->base_child;
 
    $rb->eraserect( $rect );
 }
 
-=head2 $float = $floatbox->add_float( %args )
+=head2 add_float
+
+   $float = $floatbox->add_float( %args )
 
 Adds a widget as a floating child and returns a new C<Float> object. Takes the
 following arguments:
@@ -204,15 +187,12 @@ the C<show> method before it becomes visible.
 
 =cut
 
-sub add_float
+method add_float( %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    my $float = Tickit::Widget::FloatBox::Float->new(
       $self, delete $args{child}, %args
    );
-   push @{ $self->{floats} }, $float;
+   push @_floats, $float;
 
    $self->add( $float->child );
 
@@ -223,16 +203,13 @@ sub add_float
    return $float;
 }
 
-sub _remove_float
+method _remove_float( $float )
 {
-   my $self = shift;
-   my ( $float ) = @_;
-
    my $idx;
-   $self->{floats}[$_] == $float and $idx = $_, last for 0 .. $#{ $self->{floats} };
+   $_floats[$_] == $float and $idx = $_, last for 0 .. $#_floats;
    defined $idx or croak "Cannot remove float - not a member of the FloatBox";
 
-   splice @{ $self->{floats} }, $idx, 1, ();
+   splice @_floats, $idx, 1, ();
 
    $self->remove( $float->child );
 }
@@ -244,36 +221,37 @@ C<add_float> method.
 
 =cut
 
-package # hide
+class # hide
    Tickit::Widget::FloatBox::Float;
 
 use Carp;
 
-sub new
-{
-   my $class = shift;
-   my ( $fb, $child, %args ) = @_;
+has $_fb;
+has $_child;
+has $_hidden;
+has %_geom;
 
-   my $self = bless {
-      fb     => $fb,
-      child  => $child,
-      hidden => delete $args{hidden} || 0,
-   }, $class;
+method BUILD
+{
+   ( $_fb, $_child, my %args ) = @_;
+   $_hidden = delete $args{hidden} || 0;
 
    $self->move( %args );
-
-   return $self;
 }
 
-=head2 $child = $float->child
+=head2 child
+
+   $child = $float->child
 
 Returns the child widget in the region.
 
 =cut
 
-sub child { shift->{child} }
+method child { $_child }
 
-=head2 $float->move( %args )
+=head2 move
+
+   $float->move( %args )
 
 Redefines the area geometry of the region. Takes arguments named C<top>,
 C<bottom>, C<left> and C<right>, each of which should either be a numeric
@@ -301,41 +279,33 @@ current value pass a value of C<undef>.
 
 =cut
 
-sub move
+method move( %args )
 {
-   my $self = shift;
-   my %args = @_;
+   exists $args{$_} and $_geom{$_} = $args{$_} for qw( top bottom left right );
 
-   exists $args{$_} and $self->{$_} = $args{$_} for qw( top bottom left right );
-
-   defined $self->{top} or defined $self->{bottom} or
+   defined $_geom{top} or defined $_geom{bottom} or
       croak "A Float needs at least one of 'top' or 'bottom'";
-   defined $self->{left} or defined $self->{right} or
+   defined $_geom{left} or defined $_geom{right} or
       croak "A Float needs at least one of 'left' or 'right'";
 
-   if( my $win = $self->{fb}->window ) {
-      $self->{fb}->_reshape_float( $self, $win );
+   if( my $win = $_fb->window ) {
+      $_fb->_reshape_float( $self, $win );
    }
 }
 
-sub _get_geom
+method _get_geom( $lines, $cols )
 {
-   my $self = shift;
-   my ( $lines, $cols ) = @_;
-
    my $clines = $self->child->requested_lines;
    my $ccols  = $self->child->requested_cols;
 
-   my ( $top, $bottom ) = _alloc_dimension( $self->{top}, $self->{bottom}, $lines, $clines );
-   my ( $left, $right ) = _alloc_dimension( $self->{left}, $self->{right}, $cols,  $ccols  );
+   my ( $top, $bottom ) = _alloc_dimension( $_geom{top}, $_geom{bottom}, $lines, $clines );
+   my ( $left, $right ) = _alloc_dimension( $_geom{left}, $_geom{right}, $cols,  $ccols  );
 
    return ( $top, $left, $bottom-$top, $right-$left );
 }
 
-sub _alloc_dimension
+sub _alloc_dimension( $start, $end, $parentsz, $childsz )
 {
-   my ( $start, $end, $parentsz, $childsz ) = @_;
-
    # Need to off-by-one to allow -1 == right, etc..
    defined and $_ < 0 and $_ += $parentsz+1 for $start, $end;
 
@@ -345,57 +315,62 @@ sub _alloc_dimension
    return ( $start, $end );
 }
 
-=head2 $float->remove
+=head2 remove
+
+   $float->remove
 
 Removes the float from the FloatBox.
 
 =cut
 
-sub remove
+method remove
 {
-   my $self = shift;
-   $self->{fb}->_remove_float( $self );
+   $_fb->_remove_float( $self );
 }
 
-=head2 $float->hide
+=head2 hide
+
+   $float->hide
 
 Hide the float by hiding the window of its child widget.
 
 =cut
 
-sub hide
+method hide
 {
    my $self = shift;
-   $self->{hidden} = 1;
+   $_hidden = 1;
 
-   $self->child->window->hide if $self->child->window;
+   $_child->window->hide if $_child->window;
 }
 
-=head2 $float->show
+=head2 show
+
+   $float->show
 
 Show the float by showing the window of its child widget. Undoes the effect
 of C<hide>.
 
 =cut
 
-sub show
+method show
 {
-   my $self = shift;
-   $self->{hidden} = 0;
+   $_hidden = 0;
 
-   $self->child->window->show if $self->child->window;
+   $_child->window->show if $_child->window;
 }
 
-=head2 $visible = $float->is_visible
+=head2 is_visible
+
+   $visible = $float->is_visible
 
 Return true if the float is currently visible.
 
 =cut
 
-sub is_visible
+method is_visible
 {
-   my $self = shift;
-   return !$self->{hidden};
+   return !$_hidden;
 }
 
 =head1 TODO

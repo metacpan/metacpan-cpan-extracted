@@ -14,6 +14,13 @@ class Counter {
    method inc { $count++ };
 }
 
+# Counter::count has both :lvalue :method attrs
+{
+   is_deeply( [ sort +attributes::get( \&Counter::count ) ],
+      [ 'lvalue', 'method' ],
+      'attributes of &Counter::count' );
+}
+
 {
    my $counter = Counter->new;
    is( $counter->count, 0, 'count is initially 0');

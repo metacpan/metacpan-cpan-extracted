@@ -6,6 +6,9 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Tickit::Widget::Scroller',
    requires => {
+      'perl' => '5.026', # signatures
+      'Object::Pad' => '0.17',
+
       'String::Tagged' => 0,
       'Tickit::RenderBuffer' => '0.43', # flush_to_term
       'Tickit::Widget' => '0.35',

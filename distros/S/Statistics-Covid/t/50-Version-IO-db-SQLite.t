@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use warnings;
 
+our $VERSION = '0.21';
+
 use Statistics::Covid::Version;
 use Statistics::Covid::Version::IO;
 use File::Temp;
@@ -19,17 +21,17 @@ my $num_tests = 0;
 my ($ret, $count, $io, $schema, $versionObj);
 
 my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+ok(-d $tmpdir, "output dir exists"); $num_tests++;
 my $tmpdbfile = "adb.sqlite";
-my $configfile = File::Spec->catfile($dirname, 'example-config.json');
+my $configfile = File::Spec->catfile($dirname, 'config-for-t.json');
 my $confighash = Statistics::Covid::Utils::configfile2perl($configfile);
 ok(defined($confighash), "config json file parsed."); $num_tests++;
 
-$confighash->{'fileparams'}->{'datafiles-dir'} = $tmpdir;
+$confighash->{'fileparams'}->{'datafiles-dir'} = File::Spec->catfile($tmpdir, 'files');
 $confighash->{'dbparams'}->{'dbtype'} = 'SQLite';
-$confighash->{'dbparams'}->{'dbdir'} = $tmpdir;
+$confighash->{'dbparams'}->{'dbdir'} = File::Spec->catfile($tmpdir, 'db');
 $confighash->{'dbparams'}->{'dbname'} = $tmpdbfile;
-
-unlink $tmpdbfile;
+my $dbfullpath = File::Spec->catfile($confighash->{'dbparams'}->{'dbdir'}, $confighash->{'dbparams'}->{'dbname'});
 
 $io = Statistics::Covid::Version::IO->new({
 	# the params

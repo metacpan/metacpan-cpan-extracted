@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Shortcut;
-$DBIx::Class::Helper::ResultSet::Shortcut::VERSION = '2.035000';
+$DBIx::Class::Helper::ResultSet::Shortcut::VERSION = '2.036000';
 # ABSTRACT: Shortcuts to common searches (->order_by, etc)
 
 use strict;
@@ -219,7 +219,7 @@ calling C<< $rs->count >>.
  # equivalent to...
  $foo_rs->search(undef, { prefetch => 'bar' });
 
-=head2 results_exist
+=head2 results_exist($cond?)
 
  my $results_exist = $schema->resultset('Bar')->search({...})->results_exist;
 
@@ -230,7 +230,9 @@ Uses C<EXISTS> SQL function to check if the query would return anything.
 Usually much less resource intensive the more common C<< foo() if $rs->count >>
 idiom.
 
-=head2 results_exist_as_query
+The optional C<$cond> argument can be used like in C<search()>.
+
+=head2 results_exist_as_query($cond?)
 
  ...->search(
     {},

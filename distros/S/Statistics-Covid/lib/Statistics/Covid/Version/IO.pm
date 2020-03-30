@@ -17,7 +17,7 @@ use Statistics::Covid::Version;
 use Statistics::Covid::Version::Table;
 use Statistics::Covid::Schema;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 # new method inherited but here we will create one
 # to be used as a factory

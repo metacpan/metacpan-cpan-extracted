@@ -6,12 +6,12 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.2204';
+our $VERSION = '0.2205';
 
 use Carp;
 use Algorithm::Combinatorics qw( permutations );
 use Array::Transpose;
-use List::MoreUtils qw( all zip );
+use List::SomeUtils qw( all zip );
 use List::Util qw( max min sum0 );
 use List::Util::WeightedChoice qw( choose_weighted );
 
@@ -128,7 +128,7 @@ sub counter_strategy
             payoff    => $self->{payoff} || $self->{"payoff$player"},
         );
 
-        push @$counter_strategy, $g->expected_payoff();
+        push @$counter_strategy, $g->expected_payoff;
     }
 
     return $counter_strategy;
@@ -512,12 +512,13 @@ Game::Theory::TwoPersonMatrix - Analyze a 2 person matrix game
 
 =head1 VERSION
 
-version 0.2204
+version 0.2205
 
 =head1 SYNOPSIS
 
  use Game::Theory::TwoPersonMatrix;
 
+ # zero-sum game
  my $g = Game::Theory::TwoPersonMatrix->new(
     1 => { 1 => 0.2, 2 => 0.3, 3 => 0.5 },
     2 => { 1 => 0.1, 2 => 0.7, 3 => 0.2 },
@@ -525,15 +526,16 @@ version 0.2204
                 [ 3,-2, 2],
                 [ 2,-3, 1] ]
  );
- $g->col_reduce();
- $g->row_reduce();
+ $g->col_reduce;
+ $g->row_reduce;
  my $player = 1;
- my $x = $g->saddlepoint();
- $x = $g->oddments();
- $x = $g->expected_payoff();
+ my $x = $g->saddlepoint;
+ $x = $g->oddments;
+ $x = $g->expected_payoff;
  $x = $g->counter_strategy($player);
- $x = $g->play();
+ $x = $g->play;
 
+ # non-zero-sum game
  $g = Game::Theory::TwoPersonMatrix->new(
     1 => { 1 => 0.1, 2 => 0.2, 3 => 0.7 },
     2 => { 1 => 0.1, 2 => 0.2, 3 => 0.3, 4 => 0.4 },
@@ -547,20 +549,20 @@ version 0.2204
                  [3,4,4,1],
                  [5,6,8,2] ],
  );
- $x = $g->mm_tally();
- $x = $g->pareto_optimal();
- $x = $g->nash();
- $x = $g->expected_payoff();
+ $x = $g->mm_tally;
+ $x = $g->pareto_optimal;
+ $x = $g->nash;
+ $x = $g->expected_payoff;
  $x = $g->counter_strategy($player);
- $x = $g->play();
+ $x = $g->play;
 
 =head1 DESCRIPTION
 
-C<Game::Theory::TwoPersonMatrix> analyzes a two person matrix game of player
-names, strategies and utilities ("payoffs").
+C<Game::Theory::TwoPersonMatrix> analyzes a two person matrix game of
+player names, strategies and utilities ("payoffs").
 
-Players 1 and 2 are the "row" and "column" players, respectively.  This is due
-to the tabular format of a matrix game:
+Players 1 and 2 are the "row" and "column" players, respectively.
+This is due to the tabular format of a matrix game:
 
                   Player 2
                   --------
@@ -568,10 +570,11 @@ to the tabular format of a matrix game:
  Player |   0.5    1   -1  < Payoff
     1   |   0.5   -1    1  <
 
-A non-zero sum game is represented by two payoff profiles, as in the SYNOPSIS.
+A non-zero-sum game is represented by two payoff profiles, as in the
+SYNOPSIS and the prisoner's dilemma.
 
-A prisoner's dilemma, where Blue is the row player, Red is the column player,
-and T > R > P > S is:
+A prisoner's dilemma, where Blue is the row player, Red is the column
+player, and T > R > P > S is:
 
     \  Red |           |
       \    | Cooperate | Defect
@@ -589,20 +592,21 @@ And in this implementation that would be:
 
  $g = Game::Theory::TwoPersonMatrix->new(
     %strategies,
-    payoff1 => [ [ -1, -3 ], [  0, -2 ] ],  # Blue: [ R1, S1 ], [ T1, P1 ]
-    payoff2 => [ [ -1,  0 ], [ -3, -2 ] ],  # Red:  [ R2, T2 ], [ S2, P2 ]
+    payoff1 => [[ -1, -3 ], [  0, -2 ]], # Blue: [[ R1, S1 ], [ T1, P1 ]]
+    payoff2 => [[ -1,  0 ], [ -3, -2 ]], # Red:  [[ R2, T2 ], [ S2, P2 ]]
  );
 
-The two player strategies are to either cooperate (1) or defect (2).  This is
-given by a hash for each of the two players, where the values are Boolean:
+The two player strategies are to either cooperate (1) or defect (2).
+This is given by a hash for each of the two players, where the values
+are Boolean 1 or 0:
 
  %strategies = (
     1 => { 1 => $cooporate1, 2 => $defect1 }, # Blue
     2 => { 1 => $cooporate2, 2 => $defect2 }, # Red
  );
 
-See the F<eg/> programs in this distribution for examples that exercise
-strategic variations of the prisoner's dilemma.
+See the F<eg/tournament> program in this distribution for examples
+that exercise strategic variations of the prisoner's dilemma.
 
 =head1 METHODS
 
@@ -614,6 +618,7 @@ strategic variations of the prisoner's dilemma.
     payoff => [ [1,0],
                 [0,1] ]
  );
+
  $g = Game::Theory::TwoPersonMatrix->new(
     payoff1 => [ [2,3],
                  [2,1] ],
@@ -623,22 +628,23 @@ strategic variations of the prisoner's dilemma.
 
 Create a new C<Game::Theory::TwoPersonMatrix> object.
 
-Player strategies are given by a hash reference of numbered keys - one for each
-strategy.  The values of these are assumed to add to 1.  Otherwise YMMV.
+Player strategies are given by a hash reference of numbered keys - one
+for each strategy.  The values of these are assumed to add to 1.
+Otherwise YMMV.
 
-Payoffs are given by array references of lists of outcomes.  For zero-sum games
-this is a single payoff list.  For non-zero-sum games this is given as two lists
-- one for each player.
+Payoffs are given by array references of lists of outcomes.  For
+zero-sum games this is a single payoff list.  For non-zero-sum games
+this is given as two lists - one for each player.
 
-The number of row and column payoff values must equal the number of the player
-and opponent strategies, respectively.
+The number of row and column payoff values must equal the number of
+the player and opponent strategies, respectively.
 
 =head2 expected_payoff
 
- $x = $g->expected_payoff();
+ $x = $g->expected_payoff;
 
-Return the expected payoff of a game.  This is the sum of the strategic
-probabilities of each payoff.
+Return the expected payoff of a game.  This is the sum of the
+strategic probabilities of each payoff.
 
 =head2 s_expected_payoff
 
@@ -647,13 +653,13 @@ probabilities of each payoff.
     2 => { 1 => 1, 2 => 0 },
     payoff => [ ['a','b'], ['c','d'] ]
  );
- $x = $g->s_expected_payoff();
+ $x = $g->s_expected_payoff;
  # (1 - p) * 1 * a + (1 - p) * 0 * b + p * 1 * c + p * 0 * d
 
 Return the symbolic expected payoff expression for a non-numeric game.
 
-Using real payoff values, we solve the resulting expression for B<p> in the
-F<eg/> examples.
+Using real payoff values, we solve the resulting expression for B<p>
+in the F<eg/> examples.
 
 =head2 counter_strategy
 
@@ -666,63 +672,67 @@ non-zero-sum game, given pure strategies.
 
  $x = $g->saddlepoint;
 
-Return the saddlepoint of a zero-sum game, or C<undef> if there is none.
+Return the saddlepoint of a zero-sum game, or C<undef> if there is
+none.
 
-A saddlepoint is simultaneously minimum for its row and maximum for its column.
+A saddlepoint is simultaneously minimum for its row and maximum for
+its column.
 
 =head2 oddments
 
- $x = $g->oddments();
+ $x = $g->oddments;
 
-Return each player's "oddments" for a 2x2 zero-sum game with no saddlepoint.
+Return each player's "oddments" for a 2x2 zero-sum game with no
+saddlepoint.
 
 =head2 row_reduce
 
- $g->row_reduce();
+ $g->row_reduce;
 
-Reduce a zero-sum game by identifying and eliminating strictly dominated rows
-and their associated player strategies.
+Reduce a zero-sum game by identifying and eliminating strictly
+dominated rows and their associated player strategies.
 
 =head2 col_reduce
 
- $g->col_reduce();
+ $g->col_reduce;
 
-Reduce a zero-sum game by identifying and eliminating strictly dominated columns
-and their associated opponent strategies.
+Reduce a zero-sum game by identifying and eliminating strictly
+dominated columns and their associated opponent strategies.
 
 =head2 mm_tally
 
- $x = $g->mm_tally();
+ $x = $g->mm_tally;
 
-For zero-sum games, return the maximum of row minimums and the minimum of column
-maximums.  For non-zero-sum games, return the maximum of row and column minimums.
+For zero-sum games, return the maximum of row minimums and the minimum
+of column maximums.  For non-zero-sum games, return the maximum of row
+and column minimums.
 
 =head2 pareto_optimal
 
- $x = $g->pareto_optimal();
+ $x = $g->pareto_optimal;
 
 Return the Pareto optimal outcomes for a non-zero-sum game.
 
 =head2 nash
 
- $x = $g->nash();
+ $x = $g->nash;
 
 Identify the Nash equilibria.
 
-Given payoff pair C<(a,b)>, B<a> is maximum for its column and B<b> is maximum
-for its row.
+Given payoff pair C<(a,b)>, B<a> is maximum for its column and B<b> is
+maximum for its row.
 
 =head2 play
 
- $x = $g->play();
+ $x = $g->play;
  $x = $g->play(%strategies);
 
-Return a single outcome for a zero-sum game, or a pair for a non-zero-sum game
-as a hashref keyed by each strategy chosen and with values of the payoff(s)
-earned.
+Return a single outcome for a zero-sum game, or a pair for a
+non-zero-sum game as a hashref keyed by each strategy chosen and with
+values of the payoff(s) earned.
 
-An optional list of player strategies can be provided.  This is a hash of the
-same type of strategies that are given to the constructor.
+An optional list of player strategies can be provided.  This is a hash
+of the same type of strategies that are given to the constructor.
 
 =head1 SEE ALSO
 
@@ -742,7 +752,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

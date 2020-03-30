@@ -1,10 +1,10 @@
 # ------------------------------------------------------------------------ #
-# Quota.pm - Copyright (C) 1995-2013 Tom Zoerner
+# Quota.pm - Copyright (C) 1995-2020 T. Zoerner
 # ------------------------------------------------------------------------ #
 # This program is free software: you can redistribute it and/or modify
 # it either under the terms of the Perl Artistic License or the GNU
 # General Public License as published by the Free Software Foundation.
-# (Either version 2 of the GPL, or any later version.)
+# (Either version 1 of the GPL, or any later version.)
 # For a copy of these licenses see <http://www.opensource.org/licenses/>.
 #
 # This program is distributed in the hope that it will be useful,
@@ -22,7 +22,7 @@ require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
 @EXPORT = ();
 
-$VERSION = '1.7.2';
+$VERSION = '1.7.3';
 
 bootstrap Quota;
 
@@ -377,7 +377,7 @@ see INSTALL.
 
 =head1 AUTHORS
 
-This module was created 1995 by Tom Zoerner
+This module was created 1995 by T. Zoerner
 (email: tomzo AT users.sourceforge.net)
 and since then continually improved and ported to
 many operating- and file-systems. Numerous people
@@ -385,7 +385,7 @@ have contributed to this process; for a complete
 list of names please see the CHANGES document.
 
 The quota module was in the public domain 1995-2001. Since 2001 it is
-licensed under both the Perl Artistic License and version 2 or later of the
+licensed under both the Perl Artistic License and version 1 or later of the
 GNU General Public License as published by the Free Software Foundation.
 For a copy of these licenses see <http://www.opensource.org/licenses/>.
 The respective authors of the source code are it's owner in regard to

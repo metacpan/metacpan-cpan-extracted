@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 ##----------------------------------------------------------------------
 ## Constants
-my $VERSION = '1.111';
+my $VERSION = '1.112';
 
 ##----------------------------------------------------------------------
 ## Hacks
@@ -59,6 +59,8 @@ WriteMakefile
 		    'Log::Log4perl' => 1.07,
 		    'Unicode::String' => 2.09,
 		    'RPC::XML' => 0.59,
+		    ##
+		    'Scalar::Util' => 0, ##-- for weaken()
 		    ##
 		    #'Log::Dispatch' => 2.22, ##-- for cab servers, FileRotate
 		    ##--

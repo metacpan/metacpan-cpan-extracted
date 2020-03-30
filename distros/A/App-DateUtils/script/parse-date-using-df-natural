@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/DateUtils/parse_date_using_df_natural
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2020-01-31'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.122'; # VERSION
+our $VERSION = '0.123'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ parse-date-using-df-natural - Parse date string(s) using DateTime::Format::Natur
 
 =head1 VERSION
 
-This document describes version 0.122 of parse-date-using-df-natural (from Perl distribution App-DateUtils), released on 2019-11-29.
+This document describes version 0.123 of parse-date-using-df-natural (from Perl distribution App-DateUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ Examples:
  +---------------------------+----------+--------------+------------+---------------------+
  | module                    | original | is_parseable | as_epoch   | as_datetime_obj     |
  +---------------------------+----------+--------------+------------+---------------------+
- | DateTime::Format::Natural | 23rd Jun | 1            | 1561248000 | 2019-06-23T00:00:00 |
+ | DateTime::Format::Natural | 23rd Jun | 1            | 1592870400 | 2020-06-23T00:00:00 |
  +---------------------------+----------+--------------+------------+---------------------+
 
  % parse-date-using-df-natural foo
@@ -117,6 +117,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -194,7 +198,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

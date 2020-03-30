@@ -146,6 +146,30 @@ sub get {
 }
 
 
+=head2 search
+
+ In: %filters - Hashref of filter key / data pairs
+ Out: $response - Hashref of reponse data. See "Response Data" above.
+
+Search sent messages by criterion rather than getting a specifc message by id.
+
+Please see the L<MessageBird API Documentation for message filtering|https://developers.messagebird.com/api/sms-messaging#list-messages>
+for a complete list of filters.
+
+B<Fair warning>: MessageBird's API seems to ignore the documented "searchterm"
+paramter - which isn't an option via their portal, so perhaps doesn't work. It
+will, however, allow you to filter by status, recipient and originator. So it's
+of some use. Limit has a minimum of 10.
+
+=cut
+
+sub search {
+    my ($self, %filters) = @_;
+
+    return $self->_api_request( get => '/messages', \%filters );
+}
+
+
 =head2 remove
 
   In: $message_id - The message_id to remove.

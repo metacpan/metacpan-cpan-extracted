@@ -1,10 +1,10 @@
 {
-   "abstract" : "Subclass of L<Plack::Request> which supports encoding.",
+   "abstract" : "Subclass of L<Plack::Request> which supports encoded requests.",
    "author" : [
       "moznion <moznion@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.8.1",
+   "generated_by" : "Minilla/v3.1.9",
    "license" : [
       "perl_5"
    ],
@@ -30,14 +30,16 @@
          "requires" : {
             "CPAN::Meta" : "0",
             "CPAN::Meta::Prereqs" : "0",
-            "Module::Build" : "0.38"
+            "Module::Build" : "0",
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::LocalFunctions" : "0",
-            "Test::MinimumVersion" : "0.10108",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7",
@@ -65,7 +67,7 @@
    "provides" : {
       "Plack::Request::WithEncoding" : {
          "file" : "lib/Plack/Request/WithEncoding.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -79,8 +81,10 @@
          "web" : "https://github.com/moznion/Plack-Request-WithEncoding"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_contributors" : [
       "Songmu <y.songmu@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+1.03 2020-03-30T14:10:39Z
+
+    - Accept 0 in chops width array.
+
 1.02 2019-11-02T01:51:42Z
 
     - Implement margin option and refine ANSI code handling.

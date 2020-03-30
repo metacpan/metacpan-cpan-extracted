@@ -106,7 +106,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.138';
+our $VERSION = '0.139';
 our @EXPORT_OK = qw{
     shell
 
@@ -267,6 +267,7 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	iss		=> { name => 'ISS (from NASA, no rms data)' },
 	cpf		=> { name => 'CPF TLEs',	rms => 1 },
 	starlink	=> { name => 'Starlink TLEs',	rms => 1 },
+	oneweb		=> { name => 'OneWeb TLEs',	rms => 1 },
     },
     iridium_status => {
 	kelso => {name => 'Celestrak (Kelso)'},

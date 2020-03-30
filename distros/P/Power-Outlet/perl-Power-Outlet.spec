@@ -1,7 +1,7 @@
 %define lowername  power-outlet
 
 Name:           perl-Power-Outlet
-Version:        0.22
+Version:        0.23
 Release:        1%{?dist}
 Summary:        Control and query network attached power outlets
 License:        GPL+ or Artistic
@@ -44,9 +44,19 @@ Requires:       perl(CGI)
 Requires:       perl(Config::IniFiles)
 Requires:       perl(JSON)
 
+%package mqtt-listener
+Summary:        Control Power::Outlet devices from MQTT
+Requires:       %{name} = %{version}-%{release}
+Requires:       perl(YAML::XS)
+Requires:       perl(DateTime)
+Requires:       perl(Net::MQTT::Simple)
+
 %description application-cgi
 power-outlet.cgi is a CGI application to control multiple Power::Outlet
 devices. It was written to work on iPhone and look ok in most browsers.
+
+%description mqtt-listener
+power-outlet-mqtt-listener.pl is an MQTT listener for events that can be mapped to power-outlet devices.
 
 %prep
 %setup -q -n Power-Outlet-%{version}
@@ -71,17 +81,21 @@ echo -ne "\n\n\nFiles in Tar Ball\n\n\n"
 find
 echo -ne "\n\n\n"
 
-mkdir -p $RPM_BUILD_ROOT/
+mkdir -p $RPM_BUILD_ROOT/%{_bindir}/
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{lowername}/conf/
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{lowername}/cgi-bin/
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{lowername}/images/
+mkdir -p $RPM_BUILD_ROOT/%{_unitdir}/
 cp ./scripts/httpd/%{lowername}.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/
 cp ./scripts/images/btn-on.png       $RPM_BUILD_ROOT/%{_datadir}/%{lowername}/images/
 cp ./scripts/images/btn-off.png      $RPM_BUILD_ROOT/%{_datadir}/%{lowername}/images/
 cp ./scripts/conf/%{lowername}.ini   $RPM_BUILD_ROOT/%{_datadir}/%{lowername}/conf/
 cp ./scripts/%{lowername}.cgi        $RPM_BUILD_ROOT/%{_datadir}/%{lowername}/cgi-bin/
 cp ./scripts/%{lowername}-json.cgi   $RPM_BUILD_ROOT/%{_datadir}/%{lowername}/cgi-bin/
+cp ./scripts/conf/%{lowername}-mqtt-listener.yml $RPM_BUILD_ROOT/%{_sysconfdir}/
+cp ./scripts/%{lowername}-mqtt-listener.pl       $RPM_BUILD_ROOT/%{_bindir}/
+cp ./scripts/conf/%{lowername}-mqtt-listener.service  $RPM_BUILD_ROOT/%{_unitdir}/
 
 %check
 make test
@@ -102,13 +116,36 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{lowername}/images/btn-on.png
 %{_datadir}/%{lowername}/images/btn-off.png
 
+%files mqtt-listener
+%defattr(-,root,root,-)
+%attr(0755,root,root) %{_bindir}/%{lowername}-mqtt-listener.pl
+%attr(0744,root,root) %config(noreplace) %{_sysconfdir}/%{lowername}-mqtt-listener.yml
+%attr(0644,root,root) %{_unitdir}/%{lowername}-mqtt-listener.service
+%{_mandir}/man1/%{lowername}-mqtt-listener.pl.1
+
 %files
 %defattr(-,root,root,-)
 %doc Changes LICENSE perl-Power-Outlet.spec README Todo
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
-%{_mandir}/man1/*
+%{_mandir}/man1/%{lowername}.1
 %attr(0755,root,root) %{_bindir}/%{lowername}
+
+%post mqtt-listener
+systemctl daemon-reload
+
+%preun mqtt-listener
+if [ $1 == 0 ]; then #uninstall
+  systemctl unmask %{name}-mqtt-listener.service
+  systemctl stop %{name}-mqtt-listener.service
+  systemctl disable %{name}-mqtt-listener.service
+fi
+
+%postun mqtt-listener
+if [ $1 == 0 ]; then #uninstall
+  systemctl daemon-reload
+  systemctl reset-failed
+fi
 
 %changelog
 * Tue Nov 26 2013 Michael R. Davis (mdavis@stopllc.com) 0.01-1

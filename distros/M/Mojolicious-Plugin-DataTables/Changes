@@ -1,5 +1,12 @@
 Revision history for Perl extension Mojolicious::Plugin::DataTables.
 
-1.00  2010-03-25
+1.01  2020-03-29
+    - Added support for DataTables "regex" option using REGEXP (MySQL and SQLite)
+      or "~" SQL operators (PostgreSQL)
+    - Changed minumum required Perl version (>= 5.10)
+    - Added "examples" directory
+    - Fixed documentation typo
+
+1.00  2020-03-25
     - First release of Mojolicious::Plugin::DataTables
 

@@ -20,7 +20,7 @@ INSTALLATION
       ./Build install
 
 COPYRIGHT AND LICENSE
-    Copyright 2007-2019.
+    Copyright 2007-2020.
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

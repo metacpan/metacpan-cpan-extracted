@@ -4,12 +4,14 @@ package WWW::Subsonic;
 
 use strict;
 use warnings;
+use feature 'state';
 
 use Digest::MD5 qw(md5_hex);
 use HTML::Entities qw(decode_entities);
 use JSON::MaybeXS;
 use Mojo::UserAgent;
 use Moo;
+use Net::Netrc;
 use Types::Standard qw(Enum InstanceOf Int Str);
 use URI;
 use URI::QueryParam;
@@ -18,42 +20,49 @@ use version 0.77;
 # Clean Up the Namespace
 use namespace::autoclean;
 
-our $VERSION = '0.008'; # VERSION
+
+sub _netrc {
+    my $self = shift;
+    state $netrc;
+
+    return $netrc if $netrc;
+
+    my $uri = URI->new( $self->url );
+    $netrc = Net::Netrc->lookup( $uri->host );
+    return $netrc;
+}
+
+our $VERSION = '0.009'; # VERSION
 
 
-has 'protocol' => (
-    is      => 'ro',
-    isa     => Enum[qw(http https)],
-    default => sub { 'https' },
-);
-
-
-has 'server' => (
+has 'url' => (
     is      => 'ro',
     isa     => Str,
-    default => sub { 'localhost' },
-);
-
-
-has 'port' => (
-    is      => 'ro',
-    isa     => Int,
-    default => sub { 'localhost' },
+    default => sub { 'http://localhost:4000' },
 );
 
 
 has 'username' => (
-    is       => 'ro',
-    isa      => Str,
-    required => 1,
+    is  => 'lazy',
+    isa => Str,
 );
+
+sub _build_username {
+    my $self = shift;
+    my $n = $self->_netrc;
+    return $self->_netrc->login || 'brad';
+}
 
 
 has 'password' => (
-    is       => 'ro',
-    isa      => Str,
-    required => 1,
+    is  => 'lazy',
+    isa => Str,
 );
+
+sub _build_password {
+    my $self = shift;
+    return $self->_netrc->password;
+}
 
 
 has 'salt' => (
@@ -108,10 +117,8 @@ has 'client_id' => (
 sub api_request {
     my ($self,$path,$params) = @_;
 
-    my $uri = URI->new( sprintf "%s://%s:%d/rest%s/%s",
-        $self->protocol,
-        $self->server,
-        $self->port,
+    my $uri = URI->new( sprintf "%s/rest%s/%s",
+        $self->url,
         version->parse($self->api_version) >= version->parse('2.0.0') ? 2 : '',
         $path
     );
@@ -174,7 +181,7 @@ WWW::Subsonic - Interface with the Subsonic API
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -184,6 +191,7 @@ This module provides a very simple interface to using the Subsonic API.
     use WWW::Subsonic;
 
     my $subsonic = WWW::Subsonic->new(
+        url      => "https://music.local:4040/",
         username => 'user1',
         password => 'Assw0rd1P',
     );
@@ -200,26 +208,19 @@ This module provides a very simple interface to using the Subsonic API.
 
 =head1 ATTRIBUTES
 
-=head2 B<protocol>
+=head2 B<url>
 
-Subsonic protocol, https (the default) or http.
-
-=head2 B<server>
-
-Subsonic server name, defaults to localhost
-
-=head2 B<port>
-
-Subsonic server port, default 4000
+Subsonic server url, default is 'http://localhost:4000'
 
 =head2 B<username>
 
-Subsonic username, B<required>.
+Subsonic username, if not specified, will try a lookup via netrc.
 
 =head2 B<password>
 
-Subsonic user's password, B<required>.  This is never sent over the wire,
-instead it's hashed using a salt for the server to verify.
+Subsonic user's password, if not specified will try a lookup via netrc.  This
+is never sent over the wire, instead it's hashed using a salt for the server to
+verify.
 
 =head2 B<salt>
 
@@ -305,7 +306,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 

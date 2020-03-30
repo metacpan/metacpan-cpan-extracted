@@ -1,5 +1,14 @@
 Revision history for Perl extension App-week
 
+0.04 2020-03-30T15:09:04Z
+
+    - Set LC_ALL to "C" as well as LANG in test code.
+    - Accept somewhat flexible cal(1) output.
+
+0.03 2020-03-30T02:56:58Z
+
+    - Eliminate to use -h option.
+
 0.02 2020-03-27T04:09:57Z
 
     - Set default value of -Y to one.

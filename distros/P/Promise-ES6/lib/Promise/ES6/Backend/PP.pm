@@ -204,7 +204,7 @@ sub _settle {
         # call to then() that assigned a handler for the state that
         # $final_value_sr indicates (i.e., resolved or rejected).
 
-        my ($new_value);
+        my ($new_value, $callback_failed);
 
         local $@;
 
@@ -238,6 +238,7 @@ sub _settle {
             }
         }
         else {
+            $callback_failed = 1;
 
             # The callback errored, which means $self is now rejected.
 
@@ -248,7 +249,7 @@ sub _settle {
             $_UNHANDLED_REJECTIONS{ $self->[_VALUE_SR_IDX] } = $self->[_VALUE_SR_IDX];
         }
 
-        if (!$self_is_finally || $value_sr_contents_is_promise) {
+        if (!$self_is_finally || $value_sr_contents_is_promise || ($self_is_finally && $callback_failed)) {
             ${ $self->[_VALUE_SR_IDX] } = $new_value;
         }
     }

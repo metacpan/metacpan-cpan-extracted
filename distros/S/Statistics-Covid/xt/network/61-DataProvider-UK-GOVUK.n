@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use warnings;
 
+our $VERSION = '0.21';
+
 use Statistics::Covid::DataProvider::UK::GOVUK;
 use Statistics::Covid::Datum;
 use Statistics::Covid::Utils;

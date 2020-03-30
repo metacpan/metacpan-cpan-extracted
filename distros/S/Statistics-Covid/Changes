@@ -1,18 +1,40 @@
 Revision history for Statistics-Covid
 
-0.21	XXX
+0.22	2020-03-30
+	1) Created L<Statistics::Covid::Analysis::Model::Simple> to fit data to models (polynomial, exponential)
+	2) Improved L<Statistics::Covid::Analysis::Plot::Simple> which plots data.
+	3) Removed dependency of GD::Graph and now plot only using Chart::Clicker
+	4) Created sub L<Statistics::Covid::IO::Base::db_get_schema()>
+	which returns the schema for all the tables in the database
+	and optionally saves it to file.
+	5) added L<Statistics::Covid::IO::Base::db_get_all_tablenames()>
+	to retrieve all tablenames from the database.
+	6) Added dependency C<'SQL::Translator' => '0.11019'>
+	7) Fixed some documentation
+0.21	2020-03-27
 	1) Added dependency to DBIx::Class in Makefile.PL
-	after alert from SREZIC (cpan).
+	after alert from SREZIC (at cpan.org).
+	2) Created L<Statistics::Covid::read_data_from_file()> and
+	L<Statistics::Covid::read_data_from_files()> as a high level
+	reading of local data files and converting to L<Statistics::Covid::Datum>
+	objects.
+	3) Created a C<make network> Makefile target for running tests requiring
+	network access.
+	4) Added a L<Statistics::Covid::Utils::find_files()> sub as a high level
+	interface to L<Find::Files::find()>.
+	5) Created or updated scripts in C<script/> directory for fetching data
+	daily, for merging databases, for selecting records from database.
 0.20    2020-03-27
 	1) Fixed a bug whereas the config hash read from a
 	shared file was used for many DataProviders and each one
 	was making a change to a shared hash. I used Storable::dclone()
 	to clone the hash to each DataProvider constructor.
-	2) Moved tests which required network access to xt/network.
-	3) Added Statistics::Covid::Analysis::Plot which plots data
-	to file using Chart::Clicker and also GD::Graph.
-	Experiment with Chart::GGPlot.
-	4) added a sub datums2dataframe which converts data from
+	2) Moved tests which required network access to C<xt/network/*.n>.
+	3) Added file L<Statistics::Covid::Analysis::Plot> which plots data
+	to file using L<Chart::Clicker> and also L<GD::Graph>.
+	Experimented with L<Chart::GGPlot>.
+	4) Added a sub L<Statistics::Covid::Utils::datums2dataframe()>
+	which converts data from
 	many Datum objects (e.g. as fetched from DB after a select)
 	into a "DataFrame" which contains the same data grouped
 	wrt one or more fields.

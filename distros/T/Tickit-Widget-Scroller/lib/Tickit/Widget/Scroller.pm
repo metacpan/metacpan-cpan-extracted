@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Scroller;
+use 5.026; # signatures
+use Object::Pad 0.17;
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget );
+class Tickit::Widget::Scroller 0.24
+   extends Tickit::Widget;
+
 use Tickit::Style;
 Tickit::Widget->VERSION( '0.35' );
 Tickit::Window->VERSION( '0.57' );  # ->bind_event
@@ -15,8 +16,6 @@ Tickit::Window->VERSION( '0.57' );  # ->bind_event
 use Tickit::Window;
 use Tickit::Utils qw( textwidth );
 use Tickit::RenderBuffer;
-
-our $VERSION = '0.23';
 
 use Carp;
 
@@ -27,23 +26,23 @@ items
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::Scroller;
- use Tickit::Widget::Scroller::Item::Text;
- 
- my $tickit = Tickit->new;
- 
- my $scroller = Tickit::Widget::Scroller->new;
+   use Tickit;
+   use Tickit::Widget::Scroller;
+   use Tickit::Widget::Scroller::Item::Text;
 
- $scroller->push(
-    Tickit::Widget::Scroller::Item::Text->new( "Hello world" ),
-    Tickit::Widget::Scroller::Item::Text->new( "Here are some lines" ),
-    map { Tickit::Widget::Scroller::Item::Text->new( "<Line $_>" ) } 1 .. 50,
- );
- 
- $tickit->set_root_widget( $scroller );
- 
- $tickit->run
+   my $tickit = Tickit->new;
+
+   my $scroller = Tickit::Widget::Scroller->new;
+
+   $scroller->push(
+      Tickit::Widget::Scroller::Item::Text->new( "Hello world" ),
+      Tickit::Widget::Scroller::Item::Text->new( "Here are some lines" ),
+      map { Tickit::Widget::Scroller::Item::Text->new( "<Line $_>" ) } 1 .. 50,
+   );
+
+   $tickit->set_root_widget( $scroller );
+
+   $tickit->run
 
 =head1 DESCRIPTION
 
@@ -141,78 +140,77 @@ C<set_gen_top_indicator> and C<set_gen_bottom_indicator>.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my %args = @_;
+has @_items;
+has @_itemheights;
 
+has $_start_item = 0;
+has $_start_partial = 0;
+
+# accessor methods for t/30indicator.t to use
+# TODO: Should think about whether these should be made public
+method _items         { @_items }
+method _start_item    { $_start_item }
+method _start_partial { $_start_partial }
+
+# We're going to cache window height because we need pre-resize height
+# during resize event
+has $_window_lines;
+has $_window_cols;
+
+has $_gravity_bottom;
+
+has $_pending_scroll_to_bottom;
+
+method BUILD ( %args )
+{
    my $gravity = delete $args{gravity} || "top";
 
-   my $self = $class->SUPER::new( %args );
-
-   # We're going to cache window height because we need pre-resize height
-   # during resize event
-   $self->{window_lines} = undef;
-
-   $self->{items} = [];
-
-   $self->{start_item} = 0;
-   $self->{start_partial} = 0;
-
-   $self->{gravity_bottom} = $gravity eq "bottom";
+   $_gravity_bottom = ( $gravity eq "bottom" );
 
    $self->set_on_scrolled( $args{on_scrolled} ) if $args{on_scrolled};
 
    $self->set_gen_top_indicator( $args{gen_top_indicator} );
    $self->set_gen_bottom_indicator( $args{gen_bottom_indicator} );
-
-   return $self;
 }
 
 =head1 METHODS
 
 =cut
 
-sub cols  { 1 }
-sub lines { 1 }
+method cols  () { 1 }
+method lines () { 1 }
 
-sub _item
+method _item ( $idx )
 {
-   my $self = shift;
-   my ( $idx ) = @_;
-   return $self->{items}[$idx];
+   return $_items[$idx];
 }
 
-sub _itemheight
+method _itemheight ( $idx )
 {
-   my $self = shift;
-   my ( $idx ) = @_;
-   return $self->{itemheights}[$idx] if defined $self->{itemheights}[$idx];
-   return $self->{itemheights}[$idx] = $self->_item( $idx )->height_for_width( $self->window->cols );
+   return $_itemheights[$idx] if defined $_itemheights[$idx];
+   return $_itemheights[$idx] = $self->_item( $idx )->height_for_width( $self->window->cols );
 }
 
-sub reshape
+method reshape ()
 {
-   my $self = shift;
-
-   my ( $itemidx, $itemline ) = $self->line2item( $self->{gravity_bottom} ? -1 : 0 );
-   $itemline -= $self->_itemheight( $itemidx ) if $self->{gravity_bottom} and defined $itemidx;
+   my ( $itemidx, $itemline ) = $self->line2item( $_gravity_bottom ? -1 : 0 );
+   $itemline -= $self->_itemheight( $itemidx ) if $_gravity_bottom and defined $itemidx;
 
    $self->SUPER::reshape;
 
-   $self->{window_lines} = $self->window->lines;
+   $_window_lines = $self->window->lines;
 
-   if( !defined $self->{window_cols} or $self->{window_cols} != $self->window->cols ) {
-      $self->{window_cols} = $self->window->cols;
+   if( !defined $_window_cols or $_window_cols != $self->window->cols ) {
+      $_window_cols = $self->window->cols;
 
-      undef $self->{itemheights};
+      undef @_itemheights;
       $self->resized;
    }
 
    if( defined $itemidx ) {
-      $self->scroll_to( $self->{gravity_bottom} ? -1 : 0, $itemidx, $itemline );
+      $self->scroll_to( $_gravity_bottom ? -1 : 0, $itemidx, $itemline );
    }
-   elsif( $self->{gravity_bottom} ) {
+   elsif( $_gravity_bottom ) {
       $self->scroll_to_bottom;
    }
    else {
@@ -222,29 +220,26 @@ sub reshape
    $self->update_indicators;
 }
 
-sub window_lost
+method window_lost
 {
-   my $self = shift;
    $self->SUPER::window_lost( @_ );
 
    my ( $line, $offscreen ) = $self->item2line( -1, -1 );
 
-   $self->{pending_scroll_to_bottom} = 1 if defined $line;
+   $_pending_scroll_to_bottom = 1 if defined $line;
 
-   undef $self->{window_lines};
+   undef $_window_lines;
 }
 
-sub window_gained
+method window_gained ( $win )
 {
-   my $self = shift;
-   my ( $win ) = @_;
-
-   $self->{window_lines} = $win->lines;
+   $_window_lines = $win->lines;
 
    $self->SUPER::window_gained( $win );
 
-   if( delete $self->{pending_scroll_to_bottom} ) {
+   if( $_pending_scroll_to_bottom ) {
       $self->scroll_to_bottom;
+      undef $_pending_scroll_to_bottom;
    }
 }
 
@@ -268,16 +263,13 @@ clipped if this would scroll past the beginning or end of the display.
 
 =cut
 
-sub on_scrolled
-{
-   my $self = shift;
-   return $self->{on_scrolled};
-}
+has $_on_scrolled;
 
-sub set_on_scrolled
+method on_scrolled { $_on_scrolled }
+
+method set_on_scrolled
 {
-   my $self = shift;
-   ( $self->{on_scrolled} ) = @_;
+   ( $_on_scrolled ) = @_;
 }
 
 =head2 push
@@ -294,44 +286,38 @@ following the tail of the items, scrolling itself downwards as more are added.
 
 =cut
 
-sub push
+method push ( @more )
 {
-   my $self = shift;
+   my $oldsize = @_items;
 
-   my $items = $self->{items};
-
-   my $oldsize = @$items;
-
-   push @$items, @_;
+   push @_items, @more;
 
    if( my $win = $self->window and $self->window->is_visible ) {
       my $added = 0;
-      $added += $self->_itemheight( $_ ) for $oldsize .. $#$items;
-
-      my $lines = $self->{window_lines};
+      $added += $self->_itemheight( $_ ) for $oldsize .. $#_items;
 
       my $oldlast = $oldsize ? $self->item2line( $oldsize-1, -1 ) : -1;
 
-      # Previous tail is on screen if $oldlast is defined and less than $lines
+      # Previous tail is on screen if $oldlast is defined and less than $_window_lines
       # If not, don't bother drawing or scrolling
-      return unless defined $oldlast and $oldlast < $lines;
+      return unless defined $oldlast and $oldlast < $_window_lines;
 
       my $new_start = $oldlast + 1;
       my $new_stop  = $new_start + $added;
 
-      if( $self->{gravity_bottom} ) {
+      if( $_gravity_bottom ) {
          # If there were enough spare lines, render them, otherwise scroll
-         if( $new_stop <= $lines ) {
+         if( $new_stop <= $_window_lines ) {
             $self->render_lines( $new_start, $new_stop );
          }
          else {
-            $self->render_lines( $new_start, $lines ) if $new_start < $lines;
-            $self->scroll( $new_stop - $lines );
+            $self->render_lines( $new_start, $_window_lines ) if $new_start < $_window_lines;
+            $self->scroll( $new_stop - $_window_lines );
          }
       }
       else {
          # If any new lines of content are now on display, render them
-         $new_stop = $lines if $new_stop > $lines;
+         $new_stop = $_window_lines if $new_stop > $_window_lines;
          if( $new_stop > $new_start ) {
             $self->render_lines( $new_start, $new_stop );
          }
@@ -355,43 +341,37 @@ the head of the items, scrolling itself upwards as more are added.
 
 =cut
 
-sub unshift :method
+method unshift :method ( @more )
 {
-   my $self = shift;
-
-   my $items = $self->{items};
-
-   my $oldsize = @$items;
+   my $oldsize = @_items;
 
    my $oldfirst = $oldsize ? $self->item2line( 0, 0 ) : 0;
    my $oldlast  = $oldsize ? $self->item2line( -1, -1 ) : -1;
 
-   unshift @$items, @_;
-   unshift @{ $self->{itemheights} }, ( undef ) x @_;
-   $self->{start_item} += @_;
+   unshift @_items, @more;
+   unshift @_itemheights, ( undef ) x @more;
+   $_start_item += @more;
 
    if( my $win = $self->window and $self->window->is_visible ) {
       my $added = 0;
-      $added += $self->_itemheight( $_ ) for 0 .. $#_;
+      $added += $self->_itemheight( $_ ) for 0 .. $#more;
 
       # Previous head is on screen if $oldfirst is defined and non-negative
       # If not, don't bother drawing or scrolling
       return unless defined $oldfirst and $oldfirst >= 0;
 
-      my $lines = $self->{window_lines};
-
-      if( $self->{gravity_bottom} ) {
+      if( $_gravity_bottom ) {
          # If the display wasn't yet full, scroll it down to display any new
          # lines that are visible
          my $first_blank = $oldlast + 1;
-         my $scroll_delta = $lines - $first_blank;
+         my $scroll_delta = $_window_lines - $first_blank;
          $scroll_delta = $added if $scroll_delta > $added;
          if( $oldsize ) {
             $self->scroll( -$scroll_delta );
          }
          else {
-            $self->{start_item} = 0;
-            # TODO: if $added > $lines, need special handling
+            $_start_item = 0;
+            # TODO: if $added > $_window_lines, need special handling
             $self->render_lines( 0, $added );
          }
       }
@@ -402,8 +382,8 @@ sub unshift :method
          }
          else {
             my $new_stop = $added;
-            $new_stop = $lines if $new_stop > $lines;
-            $self->{start_item} = 0;
+            $new_stop = $_window_lines if $new_stop > $_window_lines;
+            $_start_item = 0;
             $self->render_lines( 0, $new_stop );
          }
       }
@@ -427,17 +407,10 @@ either by C<push> or C<unshift>, or may be discarded.
 
 =cut
 
-sub shift :method
+method shift :method ( $count = 1 )
 {
-   my $self = shift;
-   my ( $count ) = @_;
-
-   defined $count or $count = 1;
-
-   my $items = $self->{items};
-
    croak '$count out of bounds' if $count <= 0;
-   croak '$count out of bounds' if $count > @$items;
+   croak '$count out of bounds' if $count > @_items;
 
    my ( $lastline, $offscreen ) = $self->item2line( $count - 1, -1 );
 
@@ -446,9 +419,9 @@ sub shift :method
       # ->scroll implies $win->restore
    }
 
-   my @ret = splice @$items, 0, $count;
-   splice @{ $self->{itemheights} }, 0, $count;
-   $self->{start_item} -= $count;
+   my @ret = splice @_items, 0, $count;
+   splice @_itemheights, 0, $count;
+   $_start_item -= $count;
 
    if( !defined $lastline and defined $offscreen and $offscreen eq "below" ) {
       $self->scroll_to_top;
@@ -475,17 +448,10 @@ either by C<push> or C<unshift>, or may be discarded.
 
 =cut
 
-sub pop :method
+method pop :method ( $count = 1 )
 {
-   my $self = shift;
-   my ( $count ) = @_;
-
-   defined $count or $count = 1;
-
-   my $items = $self->{items};
-
    croak '$count out of bounds' if $count <= 0;
-   croak '$count out of bounds' if $count > @$items;
+   croak '$count out of bounds' if $count > @_items;
 
    my ( $firstline, $offscreen ) = $self->item2line( -$count, 0 );
 
@@ -493,8 +459,8 @@ sub pop :method
       $self->scroll( $firstline - $self->window->lines );
    }
 
-   my @ret = splice @$items, -$count, $count;
-   splice @{ $self->{itemheights} }, -$count, $count;
+   my @ret = splice @_items, -$count, $count;
+   splice @_itemheights, -$count, $count;
 
    if( !defined $firstline and defined $offscreen and $offscreen eq "above" ) {
       $self->scroll_to_bottom;
@@ -515,19 +481,15 @@ occupy multiple lines, then fewer items may be scrolled than lines.
 
 =cut
 
-sub scroll
+method scroll ( $delta, %opts )
 {
-   my $self = shift;
-   my ( $delta, %opts ) = @_;
-
    return unless $delta;
 
    my $window = $self->window;
-   my $items = $self->{items};
-   @$items or return;
+   @_items or return;
 
-   my $itemidx = $self->{start_item};
-   my $partial = $self->{start_partial};
+   my $itemidx = $_start_item;
+   my $partial = $_start_partial;
    my $scroll_amount = 0;
 
 REDO:
@@ -541,7 +503,7 @@ REDO:
       my $itemheight = $self->_itemheight( $itemidx );
 
       if( $delta >= $itemheight ) {
-         $partial = $itemheight - 1, last if $itemidx == $#$items;
+         $partial = $itemheight - 1, last if $itemidx == $#_items;
 
          $delta -= $itemheight;
          $scroll_amount += $itemheight;
@@ -565,41 +527,39 @@ REDO:
       }
    }
 
-   return if $itemidx == $self->{start_item} and
-             $partial == $self->{start_partial};
-
-   my $lines = $self->{window_lines};
+   return if $itemidx == $_start_item and
+             $partial == $_start_partial;
 
    if( $scroll_amount > 0 and !$opts{allow_gap} ) {
       # We scrolled down. See if we've gone too far
       my $line = -$partial;
       my $idx = $itemidx;
 
-      while( $line < $lines && $idx < @$items ) {
+      while( $line < $_window_lines && $idx < @_items ) {
          $line += $self->_itemheight( $idx );
          $idx++;
       }
 
-      if( $line < $lines ) {
-         my $spare = $lines - $line;
+      if( $line < $_window_lines ) {
+         my $spare = $_window_lines - $line;
 
          $delta = -$spare;
          goto REDO;
       }
    }
 
-   $self->{start_item}    = $itemidx;
-   $self->{start_partial} = $partial;
+   $_start_item    = $itemidx;
+   $_start_partial = $partial;
 
-   if( abs( $scroll_amount ) < $lines ) {
+   if( abs( $scroll_amount ) < $_window_lines ) {
       $window->scroll( $scroll_amount, 0 );
    }
    else {
       $self->redraw;
    }
 
-   if( my $on_scrolled = $self->{on_scrolled} ) {
-      $self->$on_scrolled( $scroll_amount );
+   if( $_on_scrolled ) {
+      $self->$_on_scrolled( $scroll_amount );
    }
 
    $self->update_indicators;
@@ -615,33 +575,28 @@ backwards from the display lines, items, or lines within the item.
 
 =cut
 
-sub scroll_to
+method scroll_to ( $line, $itemidx, $itemline )
 {
-   my $self = shift;
-   my ( $line, $itemidx, $itemline ) = @_;
-
    my $window = $self->window or return;
-   my $lines = $self->{window_lines};
 
-   my $items = $self->{items};
-   @$items or return;
+   @_items or return;
 
    if( $line < 0 ) {
-      $line += $lines;
+      $line += $_window_lines;
 
       croak '$line out of bounds' if $line < 0;
    }
    else {
-      croak '$line out of bounds' if $line >= $lines;
+      croak '$line out of bounds' if $line >= $_window_lines;
    }
 
    if( $itemidx < 0 ) {
-      $itemidx += @$items;
+      $itemidx += @_items;
 
       croak '$itemidx out of bounds' if $itemidx < 0;
    }
    else {
-      croak '$itemidx out of bounds' if $itemidx >= @$items;
+      croak '$itemidx out of bounds' if $itemidx >= @_items;
    }
 
    my $itemheight = $self->_itemheight( $itemidx );
@@ -673,9 +628,9 @@ sub scroll_to
 
    # Work out how far away that is
    my $delta = 0;
-   my $i = $self->{start_item};
+   my $i = $_start_item;
 
-   $delta -= $self->{start_partial};
+   $delta -= $_start_partial;
    while( $itemidx > $i ) {
       $delta += $self->_itemheight( $i );
       $i++;
@@ -702,14 +657,8 @@ therefore scrolls to the very top of the display.
 
 =cut
 
-sub scroll_to_top
+method scroll_to_top ( $itemidx = 0, $itemline = 0 )
 {
-   my $self = shift;
-   my ( $itemidx, $itemline ) = @_;
-
-   defined $itemidx  or $itemidx = 0;
-   defined $itemline or $itemline = 0;
-
    $self->scroll_to( 0, $itemidx, $itemline );
 }
 
@@ -724,14 +673,8 @@ arguments, therefore scrolls to the very bottom of the display.
 
 =cut
 
-sub scroll_to_bottom
+method scroll_to_bottom ( $itemidx = -1, $itemline = -1 )
 {
-   my $self = shift;
-   my ( $itemidx, $itemline ) = @_;
-
-   defined $itemidx  or $itemidx = -1;
-   defined $itemline or $itemline = -1;
-
    $self->scroll_to( -1, $itemidx, $itemline );
 }
 
@@ -749,29 +692,23 @@ line on display; the last line taking C<-1>.
 
 =cut
 
-sub line2item
+method line2item ( $line )
 {
-   my $self = shift;
-   my ( $line ) = @_;
-
    my $window = $self->window or return;
-   my $lines = $self->{window_lines};
-
-   my $items = $self->{items};
 
    if( $line < 0 ) {
-      $line += $lines;
+      $line += $_window_lines;
 
       croak '$line out of bounds' if $line < 0;
    }
    else {
-      croak '$line out of bounds' if $line >= $lines;
+      croak '$line out of bounds' if $line >= $_window_lines;
    }
 
-   my $itemidx = $self->{start_item};
-   $line += $self->{start_partial};
+   my $itemidx = $_start_item;
+   $line += $_start_partial;
 
-   while( $itemidx < @$items ) {
+   while( $itemidx < @_items ) {
       my $itemheight = $self->_itemheight( $itemidx );
       if( $line < $itemheight ) {
          return $itemidx, $line if wantarray;
@@ -807,24 +744,19 @@ lines in the scroller's window for items C<"below">.
 
 =cut
 
-sub item2line
+method item2line ( $want_itemidx, $want_itemline = 0, $count_offscreen = 0 )
 {
-   my $self = shift;
-   my ( $want_itemidx, $want_itemline, $count_offscreen ) = @_;
-
    my $window = $self->window or return;
-   my $lines = $self->{window_lines};
 
-   my $items = $self->{items};
-   @$items or return;
+   @_items or return;
 
    if( $want_itemidx < 0 ) {
-      $want_itemidx += @$items;
+      $want_itemidx += @_items;
 
       croak '$itemidx out of bounds' if $want_itemidx < 0;
    }
    else {
-      croak '$itemidx out of bounds' if $want_itemidx >= @$items;
+      croak '$itemidx out of bounds' if $want_itemidx >= @_items;
    }
 
    my $itemheight = $self->_itemheight( $want_itemidx );
@@ -839,12 +771,12 @@ sub item2line
       croak '$itemline out of bounds' if $want_itemline >= $itemheight;
    }
 
-   my $itemidx = $self->{start_item};
+   my $itemidx = $_start_item;
 
-   my $line = -$self->{start_partial};
+   my $line = -$_start_partial;
 
    if( $want_itemidx < $itemidx or
-       $want_itemidx == $itemidx and $want_itemline < $self->{start_partial} ) {
+       $want_itemidx == $itemidx and $want_itemline < $_start_partial ) {
       if( wantarray and $count_offscreen ) {
          while( $itemidx >= 0 ) {
             if( $want_itemidx == $itemidx ) {
@@ -861,11 +793,11 @@ sub item2line
       return;
    }
 
-   while( $itemidx < @$items and ( $line < $lines or $count_offscreen ) ) {
+   while( $itemidx < @_items and ( $line < $_window_lines or $count_offscreen ) ) {
       if( $want_itemidx == $itemidx ) {
          $line += $want_itemline;
 
-         last if $line >= $lines;
+         last if $line >= $_window_lines;
          return $line;
       }
 
@@ -886,9 +818,8 @@ Returns the number of lines of content above the scrolled display.
 
 =cut
 
-sub lines_above
+method lines_above ()
 {
-   my $self = shift;
    my ( $line, $offscreen ) = $self->item2line( 0, 0, 1 );
    return 0 unless $offscreen;
    return -$line;
@@ -902,19 +833,15 @@ Returns the number of lines of content below the scrolled display.
 
 =cut
 
-sub lines_below
+method lines_below ()
 {
-   my $self = shift;
    my ( $line, $offscreen ) = $self->item2line( -1, -1, 1 );
    return 0 unless $offscreen;
    return $line - $self->window->lines + 1;
 }
 
-sub render_lines
+method render_lines ( $startline, $endline )
 {
-   my $self = shift;
-   my ( $startline, $endline ) = @_;
-
    my $win = $self->window or return;
    $win->expose( Tickit::Rect->new(
       top    => $startline,
@@ -924,27 +851,22 @@ sub render_lines
    ) );
 }
 
-sub render_to_rb
+method render_to_rb ( $rb, $rect )
 {
-   my $self = shift;
-   my ( $rb, $rect ) = @_;
-
    my $win = $self->window;
    my $cols = $win->cols;
 
-   my $items = $self->{items};
-
    my $line = 0;
-   my $itemidx = $self->{start_item};
+   my $itemidx = $_start_item;
 
-   if( my $partial = $self->{start_partial} ) {
+   if( my $partial = $_start_partial ) {
       $line -= $partial;
    }
 
    my $startline = $rect->top;
    my $endline   = $rect->bottom;
 
-   while( $line < $endline and $itemidx < @$items ) {
+   while( $line < $endline and $itemidx < @_items ) {
       my $item       = $self->_item( $itemidx );
       my $itemheight = $self->_itemheight( $itemidx );
 
@@ -998,11 +920,8 @@ my %bindings = (
    'C-End'  => sub { $_[0]->scroll_to_bottom },
 );
 
-sub on_key
+method on_key ( $ev )
 {
-   my $self = shift;
-   my ( $ev ) = @_;
-
    if( $ev->type eq "key" and my $code = $bindings{$ev->str} ) {
       $code->( $self );
       return 1;
@@ -1011,11 +930,8 @@ sub on_key
    return 0;
 }
 
-sub on_mouse
+method on_mouse ( $ev )
 {
-   my $self = shift;
-   my ( $ev ) = @_;
-
    return unless $ev->type eq "wheel";
 
    $self->scroll(  5 ) if $ev->button eq "down";
@@ -1045,18 +961,18 @@ logic as methods without having to capture a closure.
 
 =cut
 
-sub set_gen_top_indicator
+has %_gen_indicator;
+
+method set_gen_top_indicator
 {
-   my $self = shift;
-   ( $self->{gen_top_indicator} ) = @_;
+   ( $_gen_indicator{top} ) = @_;
 
    $self->update_indicators;
 }
 
-sub set_gen_bottom_indicator
+method set_gen_bottom_indicator
 {
-   my $self = shift;
-   ( $self->{gen_bottom_indicator} ) = @_;
+   ( $_gen_indicator{bottom} ) = @_;
 
    $self->update_indicators;
 }
@@ -1071,25 +987,24 @@ return different text now.
 
 =cut
 
-sub update_indicators
-{
-   my $self = shift;
+has %_indicator_win;
+has %_indicator_text;
 
+method update_indicators ()
+{
    my $win = $self->window or return;
 
    for my $edge (qw( top bottom )) {
-      my $text_field = "${edge}_indicator_text";
-
-      my $text = $self->{"gen_${edge}_indicator"} ? $self->${ \$self->{"gen_${edge}_indicator"} }
-                                                  : undef;
+      my $text = $_gen_indicator{$edge} ? $self->${ \$_gen_indicator{$edge} }
+                                        : undef;
       $text //= "";
-      next if $text eq ( $self->{$text_field} // "" );
+      next if $text eq ( $_indicator_text{$edge} // "" );
 
-      $self->{$text_field} = $text;
+      $_indicator_text{$edge} = $text;
 
       if( !length $text ) {
-         $self->{"${edge}_indicator_win"}->hide if $self->{"${edge}_indicator_win"};
-         undef $self->{"${edge}_indicator_win"};
+         $_indicator_win{$edge}->hide if $_indicator_win{$edge};
+         undef $_indicator_win{$edge};
          next;
       }
 
@@ -1098,7 +1013,7 @@ sub update_indicators
                                 : $win->lines - 1;
 
       my $floatwin;
-      if( $floatwin = $self->{"${edge}_indicator_win"} ) {
+      if( $floatwin = $_indicator_win{$edge} ) {
          $floatwin->change_geometry( $line, $win->cols - $textwidth, 1, $textwidth );
       }
       elsif( $self->window ) {
@@ -1106,11 +1021,11 @@ sub update_indicators
          $floatwin->bind_event( expose => sub {
             my ( $win, undef, $info ) = @_;
             $info->rb->text_at( 0, 0,
-               $self->{$text_field},
+               $_indicator_text{$edge},
                $self->get_style_pen( "indicator" )
             );
          } );
-         $self->{"${edge}_indicator_win"} = $floatwin;
+         $_indicator_win{$edge} = $floatwin;
       }
 
       $floatwin->expose;

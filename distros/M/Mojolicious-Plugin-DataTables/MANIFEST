@@ -1,4 +1,5 @@
 Changes
+examples/ssp.pl
 lib/Mojolicious/Plugin/DataTables.pm
 lib/Mojolicious/Plugin/DataTables/SSP/Column.pm
 lib/Mojolicious/Plugin/DataTables/SSP/Params.pm

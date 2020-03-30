@@ -10,6 +10,7 @@ use DTA::CAB::Logger;
 use DTA::CAB::Datum ':all';
 use DTA::CAB::Utils ':minmax', ':files', ':time';
 use File::Basename qw(basename dirname);
+use Scalar::Util qw(weaken);
 use Exporter;
 use Carp;
 use strict;
@@ -41,6 +42,9 @@ our @EXPORT_OK = map {@$_} values %EXPORT_TAGS;
 $EXPORT_TAGS{all}   = [@EXPORT_OK];
 $EXPORT_TAGS{child} = [@EXPORT_OK];
 
+## %CLOSURE_CACHE = ("$object" => { "$closureCode" => \&closure, ... }, ... }
+##  + cache for accessClosure() to avoid unnecessary re-compilation
+our (%CLOSURE_CACHE);
 
 ##==============================================================================
 ## Constructors etc.
@@ -67,14 +71,23 @@ sub new {
   return $anl;
 }
 
+## undef = $anl->DESTROY()
+##  + default destructor deletes any cached closures for $anl
+sub DESTROY {
+  #print STDERR __PACKAGE__, "::DESTROY( $_[0] ): ", scalar(keys(%{$CLOSURE_CACHE{$_[0]}//{}})), " closure(s)\n";
+  delete $CLOSURE_CACHE{$_[0]};
+}
+
 ## undef = $anl->initialize();
 ##  + default implementation does nothing
 sub initialize { return; }
 
 ## undef = $anl->dropClosures();
-##  + (OBSOLETE): drops '_analyze*' closures
-##  + currently does nothing
-sub dropClosures { return; }
+##  + deletes any cached closures for $anl
+##  + v1.112 : uses %CLOSURE_CACHE instead of "_analyze*" keys
+sub dropClosures {
+  delete $CLOSURE_CACHE{$_[0]};
+}
 
 ## $label = $anl->defaultLabel()
 ##  + default label for this class
@@ -514,6 +527,7 @@ sub analyzeClosure {
 sub getAnalyzeClosure {
   my ($anl,$which) = @_;
   my $getsub = $anl->can("getAnalyze${which}Closure");
+  weaken($anl);
   return $getsub->($anl) if ($getsub);
   $anl->logconfess("getAnalyzeClosure('$which'): no getAnalyze${which}Closure() method defined!");
 }
@@ -538,6 +552,7 @@ sub getAnalyzeClosure {
 ##     code => $codeRefOrMethodNameOrCodeString, ##-- clobbers first argument
 ##     pre => $code_str,   ##-- for $codeString accessors, prefix for eval (e.g. 'my ($lexVar);')
 ##     vars => \@vars,     ##-- adds lexical vars 'my ('.join(',',@varNames).');'
+##     cache => $bool,     ##-- enable/disable use of %CLOSURE_CACHE (default=enabled)
 sub accessClosure {
   my ($anl,$code,%opts) = @_;
   if (UNIVERSAL::isa($code,'HASH')) {
@@ -557,8 +572,15 @@ sub accessClosure {
   print STDERR
     ((ref($anl)||$anl), "->accessClosure():\n$code\n") if (0 || (ref($anl) && $anl->{debugAccessClosure}));
 
-  my $sub = eval $code;
+  my $do_cache = !exists($opts{cache}) || $opts{cache};
+  my $sub      = ($do_cache ? $CLOSURE_CACHE{$anl}{$code} : undef);
+  my $cached   = $sub ? 1 : 0;
+
+  weaken($anl);
+  $sub       ||= eval $code;
   $anl->logcluck("accessClosure(): could not compile closure {$code}: $@") if (!$sub);
+  $CLOSURE_CACHE{$anl}{$code} = $sub if ($do_cache && !$cached);
+
   return $sub;
 }
 

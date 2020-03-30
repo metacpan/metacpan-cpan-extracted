@@ -31,7 +31,7 @@ Module options:
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =head1 DESCRIPTION
 
@@ -144,6 +144,8 @@ site.
 L<https://github.com/kaz-utashiro/App-week>
 
 L<Getopt::EX::Colormap>
+
+L<https://qiita.com/kaz-utashiro/items/603f4bca39e397afc91c>
 
 =head1 AUTHOR
 
@@ -375,6 +377,7 @@ package App::week::CalYear {
     use open IO => ':utf8';
     use List::Util qw(max);
     use Text::ANSI::Fold;
+    use Text::VisualWidth::PP qw(vwidth);
     sub TIEARRAY {
 	my $pkg = shift;
 	bless {}, $pkg;
@@ -385,7 +388,8 @@ package App::week::CalYear {
     }
     sub CalYear {
 	my $year = shift;
-	my @cal = `cal -h $year`;
+	my $cal = `cal $year` =~ s/_[\b]//gr;
+	my @cal = $cal =~ /.+/g;
 	my @month = ( [ $cal[0] ], map [], 1..12 );
 	my @monthline = do {
 	    map  { $_ - 2 }		    # 2 lines up
@@ -393,15 +397,24 @@ package App::week::CalYear {
 	    0 .. $#cal;
 	};
 	@monthline == 4 or die "cal(1) command format error.\n";
-	sub fields {
-	    state $fold = new Text::ANSI::Fold
-		width => [20, 2, 20, 2, 20], padding => 1;
-	    ($fold->text(shift)->chops)[0, 2, 4];
-	}
+	state $fields = do {
+	    $cal[$monthline[0] + 1] =~ 
+		m{^   (\s*)
+		      ( (?: (?:\S+)\s+){6} \S+ ) (\s+)
+		      ( (?: (?:\S+)\s+){6} \S+ ) (\s+)
+		      ( (?: (?:\S+)\s+){6} \S+ )
+	    }x or die "cal(1): unexpected day-of-week line.";
+	    my $array = [ vwidth($1), vwidth($2), vwidth($3),
+			  vwidth($4), vwidth($5), vwidth($6) ];
+	    my $fold = new Text::ANSI::Fold width => $array, padding => 1;
+	    sub {
+		($fold->text(shift)->chops)[1, 3, 5];
+	    };
+	};
 	for my $i (0..$#monthline) {
 	    my $start = $monthline[$i];
 	    for my $n (0..7) {
-		my @m = fields $cal[$start + $n];
+		my @m = $fields->($cal[$start + $n]);
 		push @{$month[$i * 3 + 1]}, $m[0];
 		push @{$month[$i * 3 + 2]}, $m[1];
 		push @{$month[$i * 3 + 3]}, $m[2];

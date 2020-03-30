@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::VirtualView;
-$DBIx::Class::Helper::VirtualView::VERSION = '2.035000';
+$DBIx::Class::Helper::VirtualView::VERSION = '2.036000';
 use parent 'DBIx::Class::Helper::ResultSet::VirtualView';
 
 use Carp::Clan;

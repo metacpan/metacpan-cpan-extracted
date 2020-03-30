@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Carp;
 
@@ -71,13 +71,21 @@ with. Each class should perform its required setup behaviour in a method
 called C<BUILD>, but does not need to chain to the C<SUPER> class first;
 this is handled automatically.
 
-   $class->BUILD( @_ )
+   $self->BUILD( @_ )
+
+If the class provides a C<BUILDARGS> class method, that is used to mangle the
+list of arguments before the C<BUILD> methods are called. Note this must be a
+class method not an instance method (and so implemented using C<sub>). It
+should perform any C<SUPER> chaining as may be required.
+
+   @args = $class->BUILDARGS( @_ )
+   $self->BUILD( @args )
 
 If the class provides a C<BUILDALL> method, that is used to implement the
 setup behaviour instead. It is passed the entire parameters list from the
 C<new> method. It should perform any C<SUPER> chaining as may be required.
 
-   $class->BUILDALL( @_ )
+   $self->BUILDALL( @_ )
 
 =head1 KEYWORDS
 
@@ -205,6 +213,10 @@ is C<:lvalue>, allowing easy creation of read-write accessors for slots.
    my $c = Counter->new;
    $c->count++;
 
+Every method automatically gets the C<:method> attribute applied, which
+suppresses warnings about ambiguous calls resolved to core functions if the
+name of a method matches a core function.
+
 =head1 IMPLIED PRAGMATA
 
 In order to encourage users to write clean, modern code, the body of the
@@ -301,6 +313,12 @@ sub import_into
 }
 
 # The universal base-class methods
+
+sub Object::Pad::UNIVERSAL::BUILDARGS
+{
+   shift; # $class
+   return @_;
+}
 
 # TODO: Inject this at class generation time by folding the mro list
 sub Object::Pad::UNIVERSAL::BUILDALL

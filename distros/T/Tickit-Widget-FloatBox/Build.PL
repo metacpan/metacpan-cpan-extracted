@@ -6,6 +6,9 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Tickit::Widget::FloatBox',
    requires => {
+      'perl' => '5.026',
+      'Object::Pad' => '0.17',
+
       'Tickit::ContainerWidget' => 0,
    },
    build_requires => {

@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::build;
-$App::gimpgitbuild::Command::build::VERSION = '0.14.0';
+$App::gimpgitbuild::Command::build::VERSION = '0.16.0';
 use strict;
 use warnings;
 use 5.014;
@@ -149,6 +149,9 @@ sub execute
         }
     );
 
+    my $KEY        = 'GIMPGITBUILD__BUILD_GIMP_USING_MESON';
+    my $GIMP_BUILD = ( exists( $ENV{$KEY} ) ? $ENV{$KEY} : 1 );
+
 # autoconf_git_build "$base_src_dir/git/gimp" "$GNOME_GIT"/gimp "$HOME/apps/gimp-devel"
     _git_build(
         {
@@ -156,7 +159,7 @@ sub execute
             git_co    => "$base_src_dir/git/gimp",
             url       => "$GNOME_GIT/gimp",
             prefix    => $obj->gimp_p,
-            use_meson => 1,
+            use_meson => $GIMP_BUILD,
         }
     );
 
@@ -176,7 +179,7 @@ __END__
 
 =head1 VERSION
 
-version 0.14.0
+version 0.16.0
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

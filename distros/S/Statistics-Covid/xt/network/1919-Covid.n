@@ -4,7 +4,12 @@ use 5.006;
 use strict;
 use warnings;
 
+our $VERSION = '0.21';
+
 use Statistics::Covid;
+
+# TODO: more tests for db_select location and move these to t/
+# from prefab db
 
 use File::Temp;
 use File::Spec;
@@ -83,7 +88,7 @@ for my $anobj (@$objsFromDB){
 }
 
 # retrieve a timeline for a given location
-$objsFromDB = $covid->select_datums_from_db_for_location('Hackney');
+$objsFromDB = $covid->select_datums_from_db_for_specific_location_time_ascending('Hackney');
 ok(defined($objsFromDB), "select_datums_from_db() with conditions called."); $num_tests++;
 for my $anobj (@$objsFromDB){
 	ok(($anobj->name() eq 'Hackney') && ($anobj->belongsto() eq 'UK'), "selected objects from DB match name and belongsto fields."); $num_tests++;

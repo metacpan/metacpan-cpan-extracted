@@ -1,9 +1,34 @@
 ==================================================
-Changes from 2017-12-12 00:00:00 +0000 to present.
+Changes from 2018-03-30 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 1.7 at 2019-12-12 22:00:13 +0000
+version 1.8 at 2020-03-29 17:40:24 +0000
+----------------------------------------
+
+  Change: a50996aee321069d7b3eceee2b5f90ff4d59c9ff
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-03-29 10:34:32 +0000
+
+    Disable @ARGV processing during initialization
+
+    The previous release disabled `@ARGV` processing everywhere except when
+    imported from the `main` namespace. This continues that work by disabling
+    the preprocessing of `@ARGV` entirely. This switches the behavior of the
+    module to `delay_argv`. It's still possible to preprocess the `@ARGV`
+    during the runtime by using:
+
+    ``` use CLI::Helpers qw(:preprocess_argv output); ```
+
+    Otherwise, the processing of `@ARGV` will happen at the first call to a
+    function which needs it. This is generally safer as it prevents
+    interference with other processing of `@ARGV` by scripts and modules.
+
+    Also corrected the option processing parameters so options requiring a
+    value declare it correctly. 
+
+----------------------------------------
+version 1.7 at 2019-12-12 20:09:23 +0000
 ----------------------------------------
 
   Change: 0b5fe2c5ebcb16d8115db6e4e714567f4e7adb5a
@@ -164,5 +189,5 @@ version 1.4 at 2019-06-22 04:16:30 +0000
     More fixes for dist.ini 
 
 =================================================
-Plus 13 releases after 2017-12-12 00:00:00 +0000.
+Plus 13 releases after 2018-03-30 00:00:00 +0000.
 =================================================

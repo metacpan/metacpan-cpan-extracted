@@ -1,14 +1,10 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Scroller::Item::Text;
-
-use strict;
-use warnings;
-
-our $VERSION = '0.23';
+use Object::Pad 0.17;
+class Tickit::Widget::Scroller::Item::Text 0.24;
 
 use Tickit::Utils qw( textwidth cols2chars );
 
@@ -18,14 +14,14 @@ C<Tickit::Widget::Scroller::Item::Text> - add static text to a Scroller
 
 =head1 SYNOPSIS
 
- use Tickit::Widget::Scroller;
- use Tickit::Widget::Scroller::Item::Text;
+   use Tickit::Widget::Scroller;
+   use Tickit::Widget::Scroller::Item::Text;
 
- my $scroller = Tickit::Widget::Scroller->new;
+   my $scroller = Tickit::Widget::Scroller->new;
 
- $scroller->push(
-    Tickit::Widget::Scroller::Item::Text->new( "Hello world" )
- );
+   $scroller->push(
+      Tickit::Widget::Scroller::Item::Text->new( "Hello world" )
+   );
 
 =head1 DESCRIPTION
 
@@ -59,20 +55,17 @@ amount. Does not apply to the first line.
 
 =cut
 
-sub new
+has $_indent;
+has @_chunks;
+
+has $_width; # width for which the @_lineruns are valid
+has @_lineruns;
+
+method BUILD ( $text, %opts )
 {
-   my $class = shift;
-   my ( $text, %opts ) = @_;
+   $_indent = $opts{indent} if defined $opts{indent};
 
-   my $self = bless {
-      lineruns => [],
-   }, $class;
-
-   $self->{indent} = $opts{indent} if defined $opts{indent};
-
-   $self->{chunks} = [ $self->_build_chunks_for( $text ) ];
-
-   return $self;
+   @_chunks = $self->_build_chunks_for( $text );
 }
 
 =head1 METHODS
@@ -106,33 +99,23 @@ following line.
 
 =cut
 
-sub _build_chunks_for
+method _build_chunks_for ( $text )
 {
-   my $self = shift;
-   my ( $text ) = @_;
-
    my @lines = split m/\n/, $text, -1;
    my $lastline = pop @lines;
    return ( map { [ $_, textwidth( $_ ), linebreak => 1 ] } @lines ),
             [ $lastline, textwidth( $lastline ) ];
 }
 
-sub chunks
-{
-   my $self = shift;
-   return @{ $self->{chunks} };
-}
+method chunks { @_chunks }
 
-sub height_for_width
+method height_for_width ( $width )
 {
-   my $self = shift;
-   my ( $width ) = @_;
-
-   $self->{width} = $width;
+   $_width = $width;
 
    my @chunks = $self->chunks;
-   $self->{lineruns} = \my @lineruns;
-   push @lineruns, my $thisline = [];
+   undef @_lineruns;
+   push @_lineruns, my $thisline = [];
 
    my $line_remaining = $width;
 
@@ -171,33 +154,28 @@ sub height_for_width
       }
 
       if( ( $line_remaining == 0 or $opts{linebreak} ) and @chunks ) {
-         push @lineruns, $thisline = [];
-         $line_remaining = $width - ( $self->{indent} || 0 );
+         push @_lineruns, $thisline = [];
+         $line_remaining = $width - ( $_indent || 0 );
       }
    }
 
-   return scalar @lineruns;
+   return scalar @_lineruns;
 }
 
-sub render
+method render ( $rb, %args )
 {
-   my $self = shift;
-   my ( $rb, %args ) = @_;
-
    my $cols = $args{width};
 
    # Rechunk if width changed
-   $self->height_for_width( $cols ) if $cols != $self->{width};
-
-   my $lineruns = $self->{lineruns};
+   $self->height_for_width( $cols ) if $cols != $_width;
 
    foreach my $lineidx ( $args{firstline} .. $args{lastline} ) {
-      my $indent = ( $lineidx && $self->{indent} ) ? $self->{indent} : 0;
+      my $indent = ( $lineidx && $_indent ) ? $_indent : 0;
 
       $rb->goto( $lineidx, 0 );
       $rb->erase( $indent ) if $indent;
 
-      foreach my $chunk ( @{ $lineruns->[$lineidx] } ) {
+      foreach my $chunk ( @{ $_lineruns[$lineidx] } ) {
          my ( $text, $width, $chunkpen ) = @$chunk;
          $rb->text( $text, $chunkpen );
       }

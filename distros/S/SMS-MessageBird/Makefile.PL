@@ -18,8 +18,11 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
+        'Encode'         => 0,
         'JSON'           => 0,
         'LWP::UserAgent' => 0,
+        'LWP::Protocol::https' => 0,
+        'URI'                  => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'SMS-MessageBird-*' },

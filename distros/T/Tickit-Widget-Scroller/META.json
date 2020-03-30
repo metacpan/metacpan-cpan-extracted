@@ -4,23 +4,25 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tickit-Widget-Scroller",
    "prereqs" : {
       "runtime" : {
          "requires" : {
+            "Object::Pad" : "0.17",
             "String::Tagged" : "0",
             "Tickit::Pen" : "0.19",
             "Tickit::RenderBuffer" : "0.43",
             "Tickit::Widget" : "0.35",
-            "Tickit::Window" : "0.57"
+            "Tickit::Window" : "0.57",
+            "perl" : "5.026"
          }
       },
       "test" : {
@@ -33,15 +35,15 @@
    "provides" : {
       "Tickit::Widget::Scroller" : {
          "file" : "lib/Tickit/Widget/Scroller.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Tickit::Widget::Scroller::Item::RichText" : {
          "file" : "lib/Tickit/Widget/Scroller/Item/RichText.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Tickit::Widget::Scroller::Item::Text" : {
          "file" : "lib/Tickit/Widget/Scroller/Item/Text.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       }
    },
    "release_status" : "stable",
@@ -51,6 +53,6 @@
       ],
       "x_IRC" : "irc://irc.freenode.net/#tickit"
    },
-   "version" : "0.23",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

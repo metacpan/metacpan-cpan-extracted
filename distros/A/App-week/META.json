@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Getopt::EX" : "v1.14.0",
-            "Text::ANSI::Fold" : "0.05",
+            "Text::ANSI::Fold" : "1.03",
             "Text::VisualWidth::PP" : "0.05",
             "perl" : "5.014"
          }
@@ -57,7 +57,7 @@
    "provides" : {
       "App::week" : {
          "file" : "lib/App/week.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "App::week::colors" : {
          "file" : "lib/App/week/colors.pm"
@@ -80,7 +80,7 @@
          "web" : "https://github.com/kaz-utashiro/App-week"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_authority" : "cpan:UTASHIRO",
    "x_static_install" : 0
 }

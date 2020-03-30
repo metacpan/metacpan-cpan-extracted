@@ -73,11 +73,11 @@ sub _show_info {
 
 sub get_defaults {
     return {
+        filename_format              => 1,
         max_info_width               => 120,
         max_size_history             => 50,
         no_height_ok                 => 1,
         no_warnings                  => 0,
-        list_download_pause          => 1, ##
         list_sort_item               => 'upload_date',
         list_type_vimeo              => 2,
         list_type_youtube            => 2,
@@ -120,6 +120,7 @@ sub _groups {
             [ 'video_dir',         "- Main video directory" ],
             [ 'use_extractor_dir', "- Extractor directory"  ],
             [ 'use_uploader_dir',  "- Uploader directory"   ],
+            [ 'filename_format',   "- Filename: fmt info"   ],
         ],
         group_quality => [
             [ 'quality',             "- Resolution"          ],
@@ -143,11 +144,6 @@ sub _groups {
             [ '_submenu_type_listmenu',  "- List type"       ],
             [ 'list_sort_item',          "- Sort order"      ],
             [ 'show_view_count',         "- Show view count" ],
-           # [ 'list_download_pause',     "- View download log" ], ##
-           #=head3 View download log
-           #Pause after download from uploader list to see the download log.
-           #- no
-           #- yes
         ],
         group_yt_dl_config_file => [
             [ 'yt_dl_config_location',        "- set yt-dl config location"   ],
@@ -281,6 +277,15 @@ sub set_options {
                 ];
                 _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
+            elsif ( $key eq "filename_format" ) {
+                my $prompt = 'Filename: choose the format info:';
+                my $list = [
+                    'fmt-id',
+                    'fmt-id and height',
+                    'fmt-string',
+                ];
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
+            }
             elsif ( $key eq "useragent" ) {
                 my $prompt = 'Set the UserAgent';
                 my $list = [
@@ -376,14 +381,6 @@ sub set_options {
                 my $list = [
                     'if sorted by "view count"',
                     'always',
-                ];
-                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
-            }
-            elsif ( $key eq "list_download_pause" ) {
-                my $prompt = 'Pause after download from uploader list to see the download log:';
-                my $list = [
-                    'no',
-                    'yes'
                 ];
                 _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }

@@ -31,11 +31,10 @@ sub choose_videos_from_saved_uploaders {
     my ( $set, $opt ) = @_;
     my $prompt = 'Chosen:' . "\n";
     my @ids;
+    my ( $sticky,  $sticky_url ) = _get_sticky_name_and_url( $set->{sticky} );
+    my ( $history, $history_url, $removed_next ) = _get_history_name_and_url( $opt, $set->{history} );
 
     CHANNEL: while ( 1 ) {
-        my ( $sticky,  $sticky_url ) = _get_sticky_name_and_url( $set->{sticky} );
-        my ( $history, $history_url, $removed_next ) = _get_history_name_and_url( $opt, $set->{history} );
-
         my $mark = '*';
         my $confirm = '  CONFIRM';
         my $hidden  = 'Your choice:' . $mark;
@@ -52,52 +51,49 @@ sub choose_videos_from_saved_uploaders {
             if ( @ids ) {
                 $prompt = 'Channels:' . "\n";
                 @ids = ();
+                ( $sticky,  $sticky_url ) = _get_sticky_name_and_url( $set->{sticky} );
+                ( $history, $history_url, $removed_next ) = _get_history_name_and_url( $opt, $set->{history} );
                 $mark = '*';
                 next CHANNEL;
             }
             else {
                 return;
-                #next MENU;
             }
         }
-        else {
-            if ( $menu->[$indexes[0]] eq $hidden ) {
-                $prompt = 'Chosen:' . "\n";
-                @ids = ();
-                for my $i ( 0 .. $#$sticky_url ) {
-                    $prompt .= sprintf "= %s (%s)\n", $sticky->[$i], $set->{sticky}{$sticky_url->[$i]}{uploader_id};
-                    push @ids, $sticky_url->[$i];
-                }
-                @$sticky_url = ();
-                @$sticky     = ();
-                $mark = '';
-                next CHANNEL;
+        elsif ( $menu->[$indexes[0]] eq $hidden ) {
+            for my $i ( 0 .. $#$sticky_url ) {
+                $prompt .= sprintf "= %s (%s)\n", $sticky->[$i], $set->{sticky}{$sticky_url->[$i]}{uploader_id};
+                push @ids, $sticky_url->[$i];
             }
-            my $confirmed;
-            if ( $menu->[$indexes[0]] eq $confirm ) {
-                shift @indexes;
-                $confirmed = 1;
-            }
-            my $count = 0;
-            for my $i ( @indexes ) {
-                $i -= @pre + $count;
-                if ( $i <= $#$sticky ) {
-                    $prompt .= sprintf "= %s (%s)\n", $sticky->[$i], $set->{sticky}{$sticky_url->[$i]}{uploader_id};
-                    push @ids, splice @$sticky_url, $i, 1;
-                               splice @$sticky    , $i, 1;
-                }
-                else {
-                    $i -= @$sticky;
-                    $prompt .= sprintf "= %s (%s)\n", $history->[$i], $set->{history}{$history_url->[$i]}{uploader_id};
-                    push @ids, splice @$history_url,  $i, 1;
-                               splice @$history,      $i, 1;
-                               splice @$removed_next, $i, 1;
-                }
-                $count++;
-            }
-            $mark = '*';
-            return @ids if $confirmed;
+            @$sticky_url = ();
+            @$sticky     = ();
+            $mark = '';
+            next CHANNEL;
         }
+        my $confirmed;
+        if ( $menu->[$indexes[0]] eq $confirm ) {
+            shift @indexes;
+            $confirmed = 1;
+        }
+        my $count = 0;
+        for my $i ( @indexes ) {
+            $i -= @pre + $count;
+            if ( $i <= $#$sticky ) {
+                $prompt .= sprintf "= %s (%s)\n", $sticky->[$i], $set->{sticky}{$sticky_url->[$i]}{uploader_id};
+                push @ids, splice @$sticky_url, $i, 1;
+                            splice @$sticky    , $i, 1;
+            }
+            else {
+                $i -= @$sticky;
+                $prompt .= sprintf "= %s (%s)\n", $history->[$i], $set->{history}{$history_url->[$i]}{uploader_id};
+                push @ids, splice @$history_url,  $i, 1;
+                            splice @$history,      $i, 1;
+                            splice @$removed_next, $i, 1;
+            }
+            $count++;
+        }
+        $mark = '*';
+        return @ids if $confirmed;
     }
 }
 

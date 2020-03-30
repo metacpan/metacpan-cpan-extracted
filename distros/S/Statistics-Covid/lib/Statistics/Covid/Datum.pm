@@ -12,7 +12,7 @@ use Statistics::Covid::Datum::Table;
 
 use DateTime;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 # our constructor which calls parent constructor first and then does
 # things specific to us, like dates
@@ -290,58 +290,24 @@ __END__
 
 
 =head1 NAME
-xxx
-Statistics::Covid::Datum - Version is a table in our database of collected Covid statistics and this module initialises this table using DBIx::Class
 
+Statistics::Covid::Datum - Class dual to the 'Datum' table in DB - it contains data for one time and space point.
 
 =head1 VERSION
 
-Version 0.21
-
-
-
-Whenever a new table is to be created, call it ABC, then you
-must copy this file
-
+Version 0.23
 
 =head1 DESCRIPTION
-This module is not to be used directly. It creates the table Version
-with information, such as tablename, table schema,
-primary key columns, etc., stored in L<Statistics::Covid::Datum::Table>.
-The procedure to create a new table, call it ABC, is as follows:
 
-=over 2
+This module tries to expose all the fields of the Datum table in the database.
+It inherits from L<Statistics::Covid::IO::DualBase>. And overwrites some subs
+from it. For example the L<Statistics::Covid::Datum::newer_than>.
+It exposes all its dual table fields as setter/getter subs and also
+via the generic sub L<Statistics::Covid::Datum::column_value> (which
+takes as an argument the field/column name and returns its value).
 
-=item Create Statistics::Covid::ABC::Table to contain the schema of
-the new table, by copying L<Statistics::Covid::Datum::Table>
-and modifying it.
-
-=item Create Statistics::Covid::Schema::Result::ABC modelled on
-this current module. The basic action performed by this module
-is to create a table, its columns using the specific table schema
-which you will see its format in L<Statistics::Covid::Datum::Table>,
-and the column name(s) to form the primary key.
-
-=item Insert this
-
-    use Statistics::Covid::Schema;
-
-in every module you want to access this and every other table you already created.
-Then follow L<DBIx::Class> guidelines on how to deploy the database and
-interact with these tables. Something along these lines:
-
-    my $dsn = 'dbi:SQLite:dbname=MyDB.sqlite';
-    my $shemahandle = Statistics::Covid::Schema->connect($dsn, "", "", $dbparams);
-    # create the table, will die if table exists
-    $shemahandle->deploy();
-    # find rows for the given table and where condition ...
-    my $resultset = $shemahandle->('Version')->search({name=>'Samarkand'});
-    # ... and act on them
-    $resultset->delete();
-    $shemahandle->disconnect();
-
-=back
-
+See also L<Statistics::Covid::Datum::Table> which describes the
+Datum table in a format L<DBIx::Class> understands.
 
 =head1 AUTHOR
 

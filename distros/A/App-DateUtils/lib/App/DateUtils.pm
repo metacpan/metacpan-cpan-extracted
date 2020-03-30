@@ -1,9 +1,9 @@
 package App::DateUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2020-01-31'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.122'; # VERSION
+our $VERSION = '0.123'; # VERSION
 
 use 5.010001;
 use strict;
@@ -461,14 +461,17 @@ $SPEC{dateconv} = {
         date => {
             schema => ['date*', {
                 'x.perl.coerce_to' => 'DateTime',
-                'x.perl.coerce_rules' => ['From_str::alami'],
+                'x.perl.coerce_rules' => ['From_str::iso8601', 'From_str::natural'],
             }],
             req => 1,
             pos => 0,
         },
         to => {
-            schema => ['str*', in=>[qw/epoch ymd/]], # XXX: iso8601, ...
+            schema => ['str*', in=>[qw/epoch ymd iso8601 ALL/]],
             default => 'epoch',
+            cmdline_aliases => {
+                a => {is_flag=>1, summary => 'Shortcut for --to=ALL', code => sub {$_[0]{to} = 'ALL'}},
+            },
         },
     },
     result_naked => 1,
@@ -483,6 +486,21 @@ $SPEC{dateconv} = {
             args => {date => '1463702400', to=>'ymd'},
             result => '2016-05-20',
         },
+        {
+            summary => 'Convert epoch to iso8601',
+            args => {date => '1580446441', to=>'iso8601'},
+            result => '2020-01-31T04:54:01Z',
+        },
+        {
+            summary => 'Convert iso8601 to epoch',
+            args => {date => '2020-01-31T04:54:01Z', to=>'epoch'},
+            result => '1580446441',
+        },
+        {
+            summary => 'Show all possible conversions',
+            args => {date => 'now', to => 'ALL'},
+            test => 0,
+        },
     ],
 };
 sub dateconv {
@@ -494,6 +512,18 @@ sub dateconv {
         return $date->epoch;
     } elsif ($to eq 'ymd') {
         return $date->ymd;
+    } elsif ($to eq 'iso8601') {
+        require DateTime::Format::ISO8601::Format;
+        return DateTime::Format::ISO8601::Format->new->format_datetime($date);
+    } elsif ($to eq 'ALL') {
+        return {
+            epoch => $date->epoch,
+            ymd   => $date->ymd,
+            iso8601 => do {
+                require DateTime::Format::ISO8601::Format;
+                DateTime::Format::ISO8601::Format->new->format_datetime($date);
+            },
+        };
     } else {
         die "Unknown format '$to'";
     }
@@ -645,7 +675,7 @@ App::DateUtils - An assortment of date-/time-related CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.122 of App::DateUtils (from Perl distribution App-DateUtils), released on 2019-11-29.
+This document describes version 0.123 of App::DateUtils (from Perl distribution App-DateUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -699,11 +729,35 @@ Examples:
 
 =item * Convert "today" to epoch:
 
- dateconv(date => "today"); # -> [200, "OK", 1574985600]
+ dateconv(date => "today"); # -> [200, "OK", 1580428800]
 
 =item * Convert epoch to ymd:
 
  dateconv(date => 1463702400, to => "ymd"); # -> "2016-05-20"
+
+=item * Convert epoch to iso8601:
+
+ dateconv(date => 1580446441, to => "iso8601"); # -> "2020-01-31T04:54:01Z"
+
+=item * Convert iso8601 to epoch:
+
+ dateconv(date => "2020-01-31T04:54:01Z", to => "epoch"); # -> 1580446441
+
+=item * Show all possible conversions:
+
+ dateconv(date => "now", to => "ALL");
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     epoch => 1580446720,
+     iso8601 => "2020-01-31T04:58:40Z",
+     ymd => "2020-01-31",
+   },
+ ]
 
 =back
 
@@ -716,6 +770,7 @@ Arguments ('*' denotes required arguments):
 =item * B<date>* => I<date>
 
 =item * B<to> => I<str> (default: "epoch")
+
 
 =back
 
@@ -742,7 +797,7 @@ Examples:
 =item * Example #2:
 
  datediff(
-   date1 => "2019-06-18T20:08:42",
+     date1 => "2019-06-18T20:08:42",
    date2 => "2019-06-19T06:02:03",
    as => "hms"
  );
@@ -754,7 +809,7 @@ Result:
 =item * Example #3:
 
  datediff(
-   date1 => "2019-06-18T20:08:42",
+     date1 => "2019-06-18T20:08:42",
    date2 => "2019-06-22T06:02:03",
    as => "concise_hms"
  );
@@ -766,7 +821,7 @@ Result:
 =item * Example #4:
 
  datediff(
-   date1 => "2019-06-18T20:08:42",
+     date1 => "2019-06-18T20:08:42",
    date2 => "2019-06-19T06:02:03",
    as => "seconds"
  );
@@ -788,6 +843,7 @@ Arguments ('*' denotes required arguments):
 =item * B<date1>* => I<date>
 
 =item * B<date2>* => I<date>
+
 
 =back
 
@@ -822,6 +878,7 @@ Arguments ('*' denotes required arguments):
 =item * B<duration>* => I<duration>
 
 =item * B<to> => I<str> (default: "secs")
+
 
 =back
 
@@ -859,8 +916,8 @@ Result:
      module          => "DateTime::Format::Flexible",
      original        => "tomorrow",
      is_parseable    => 1,
-     as_epoch        => 1575072000,
-     as_datetime_obj => "2019-11-30T00:00:00",
+     as_epoch        => 1580515200,
+     as_datetime_obj => "2020-02-01T00:00:00",
    },
    {
      module       => "DateTime::Format::Flexible",
@@ -887,6 +944,7 @@ Parse using all installed modules and return all the result at once.
 =item * B<module> => I<str> (default: "DateTime::Format::Flexible")
 
 =item * B<time_zone> => I<str>
+
 
 =back
 
@@ -926,8 +984,8 @@ Result:
      module          => "DateTime::Format::Alami::EN",
      original        => "23 May",
      is_parseable    => 1,
-     as_epoch        => 1558569600,
-     as_datetime_obj => "2019-05-23T00:00:00",
+     as_epoch        => 1590192000,
+     as_datetime_obj => "2020-05-23T00:00:00",
      pattern         => "p_dateymd",
    },
  ]
@@ -957,6 +1015,7 @@ Arguments ('*' denotes required arguments):
 =item * B<dates>* => I<array[str]>
 
 =item * B<time_zone> => I<str>
+
 
 =back
 
@@ -996,8 +1055,8 @@ Result:
      module          => "DateTime::Format::Alami::ID",
      original        => "23 Mei",
      is_parseable    => 1,
-     as_epoch        => 1558569600,
-     as_datetime_obj => "2019-05-23T00:00:00",
+     as_epoch        => 1590192000,
+     as_datetime_obj => "2020-05-23T00:00:00",
      pattern         => "p_dateymd",
    },
  ]
@@ -1027,6 +1086,7 @@ Arguments ('*' denotes required arguments):
 =item * B<dates>* => I<array[str]>
 
 =item * B<time_zone> => I<str>
+
 
 =back
 
@@ -1066,8 +1126,8 @@ Result:
      module          => "DateTime::Format::Flexible",
      original        => "23rd Jun",
      is_parseable    => 1,
-     as_epoch        => 1561248000,
-     as_datetime_obj => "2019-06-23T00:00:00",
+     as_epoch        => 1592870400,
+     as_datetime_obj => "2020-06-23T00:00:00",
    },
  ]
 
@@ -1082,8 +1142,8 @@ Result:
      module          => "DateTime::Format::Flexible(de)",
      original        => "23 Dez",
      is_parseable    => 1,
-     as_epoch        => 1577059200,
-     as_datetime_obj => "2019-12-23T00:00:00",
+     as_epoch        => 1608681600,
+     as_datetime_obj => "2020-12-23T00:00:00",
    },
  ]
 
@@ -1115,6 +1175,7 @@ Arguments ('*' denotes required arguments):
 =item * B<lang> => I<str> (default: "en")
 
 =item * B<time_zone> => I<str>
+
 
 =back
 
@@ -1154,8 +1215,8 @@ Result:
      module          => "DateTime::Format::Natural",
      original        => "23rd Jun",
      is_parseable    => 1,
-     as_epoch        => 1561248000,
-     as_datetime_obj => "2019-06-23T00:00:00",
+     as_epoch        => 1592870400,
+     as_datetime_obj => "2020-06-23T00:00:00",
    },
  ]
 
@@ -1185,6 +1246,7 @@ Arguments ('*' denotes required arguments):
 =item * B<dates>* => I<array[str]>
 
 =item * B<time_zone> => I<str>
+
 
 =back
 
@@ -1222,6 +1284,7 @@ Parse using all installed modules and return all the result at once.
 =item * B<durations>* => I<array[str]>
 
 =item * B<module> => I<str> (default: "Time::Duration::Parse")
+
 
 =back
 
@@ -1290,6 +1353,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<durations>* => I<array[str]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1357,6 +1421,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<durations>* => I<array[str]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1397,8 +1462,8 @@ Result:
      is_parseable => 1,
      as_secs => 1209600,
      as_dtdur_obj => "P14D",
-     date1 => "2019-11-29T02:17:55",
-     date2 => "2019-12-13T02:17:55",
+     date2 => "2020-02-14T04:58:40",
+     date1 => "2020-01-31T04:58:40",
    },
  ]
 
@@ -1413,10 +1478,10 @@ Result:
      module => "DateTime::Format::Natural",
      original => "from 23 Jun to 29 Jun",
      is_parseable => 1,
-     as_secs => 13157275,
-     as_dtdur_obj => "P5MT2H17M55S",
-     date1 => "2019-11-29T02:17:55",
-     date2 => "2019-06-29T00:00:00",
+     as_secs => 13006880,
+     as_dtdur_obj => "P4M28DT19H1M20S",
+     date1 => "2020-01-31T04:58:40",
+     date2 => "2020-06-29T00:00:00",
    },
  ]
 
@@ -1444,6 +1509,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<durations>* => I<array[str]>
+
 
 =back
 
@@ -1512,6 +1578,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<durations>* => I<array[str]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1544,7 +1611,7 @@ feature.
 =head1 SEE ALSO
 
 
-L<dateparse>. The official CLI for DateTime::Format::Natural.
+L<dateparse>. Perinci::To::POD=HASH(0x55d490eec860).
 
 L<App::datecalc>
 
@@ -1554,7 +1621,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

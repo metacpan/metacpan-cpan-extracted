@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.6, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Text::ANSI::Fold:
     file: lib/Text/ANSI/Fold.pm
-    version: '1.02'
+    version: '1.03'
   Text::ANSI::Fold::Japanese::W3C:
     file: lib/Text/ANSI/Fold/Japanese/W3C.pm
   Text::ANSI::Fold::Japanese::Wikipedia:
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Text-ANSI-Fold/issues
   homepage: https://github.com/kaz-utashiro/Text-ANSI-Fold
   repository: git://github.com/kaz-utashiro/Text-ANSI-Fold.git
-version: '1.02'
+version: '1.03'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

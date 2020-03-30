@@ -4,7 +4,7 @@ CLI::Helpers - Subroutines for making simple command line scripts
 
 # VERSION
 
-version 1.7
+version 1.8
 
 # SYNOPSIS
 
@@ -264,17 +264,15 @@ It's possible to change the behavior of the import process.
 - **preprocess\_argv**
 
     This causes the `@ARGV` processing to happen during the `INIT` phase, after
-    import but before runtime. This is the default when being imported from the
-    `main` package. This is usually OK for scripts, but for use in libraries, it may
-    be undesirable.
+    import but before runtime. This is usually OK for scripts, but for use in
+    libraries, it may be undesirable.
 
         use CLI::Helpers qw( :output preprocess_argv );
 
 - **delay\_argv**
 
     This causes the `@ARGV` processing to happen when the first call to a function
-    needing it run, usually an `output()` call. This is the default anytime
-    [CLI::Helpers](https://metacpan.org/pod/CLI::Helpers) is imported from namespace that isn't `main`.
+    needing it run, usually an `output()` call. This is the default.
 
         use CLI::Helpers qw( :output delay_argv );
 
@@ -418,7 +416,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Brad Lhotsky.
+This software is Copyright (c) 2020 by Brad Lhotsky.
 
 This is free software, licensed under:
 

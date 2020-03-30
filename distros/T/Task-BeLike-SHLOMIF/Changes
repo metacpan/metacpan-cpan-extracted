@@ -1,5 +1,8 @@
 Revision history for Task-BeLike-SHLOMIF
 
+0.0.6      2020-03-29
+    - Add Task::FreecellSolver::Testing::MultiConfig
+
 0.0.5      2020-03-04
     - Convert weaver.ini to @SHLOMIF .
     - Add Devel::Trace / etc.

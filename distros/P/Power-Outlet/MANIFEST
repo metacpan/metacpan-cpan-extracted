@@ -31,6 +31,9 @@ t/004_iBoot_defaults.t
 t/005_iBootBar_defaults.t
 perl-Power-Outlet.spec
 scripts/power-outlet
+scripts/power-outlet-mqtt-listener.pl
+scripts/conf/power-outlet-mqtt-listener.yml
+scripts/conf/power-outlet-mqtt-listener.service
 scripts/power-outlet.cgi
 scripts/power-outlet-json.cgi
 scripts/conf/power-outlet.ini

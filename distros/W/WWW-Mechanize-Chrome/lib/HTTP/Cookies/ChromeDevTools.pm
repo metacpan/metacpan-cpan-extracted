@@ -2,7 +2,7 @@ package HTTP::Cookies::ChromeDevTools;
 use strict;
 use Carp qw[croak];
 
-our $VERSION = '0.44';
+our $VERSION = '0.46';
 our @CARP_NOT;
 
 use Moo 2;
@@ -51,7 +51,7 @@ has 'driver' => (
     is => 'lazy',
     default => sub {
         my( $self ) = @_;
-       
+
         # Connect to it
         Chrome::DevToolsProtocol->new(
             'port' => $self->{ port },
@@ -77,7 +77,16 @@ has '_loading' => (
     default => 0,
 );
 
-sub load($self,$driver = $self->driver) {
+=head2 C<< ->load( $file, %options ) >>
+
+    $jar->load( undef, driver => $driver );
+
+Loads the cookies from the Chrome instance. Passing in a filename to load
+cookies from is currently unsupported.
+=cut
+
+sub load($self, $file=undef, %options) {
+    my $driver = $options{ driver } || $self->driver;
     my $cookies = $driver->send_message('Network.getAllCookies')->get();
     $cookies = $cookies->{cookies};
     $self->clear();
@@ -97,29 +106,79 @@ sub load($self,$driver = $self->driver) {
             #$c->{session},
         );
     };
+    if( $file ) {
+        my $jar = HTTP::Cookies->new( file => $file );
+        $self->load_jar( $jar );
+    };
+}
+
+=head2 C<< ->load_jar( $jar, %options ) >>
+
+    $jar->load( $jar, replace => 1;
+
+Imports the cookies from another cookie jar into Chrome.
+
+B<replace> will clear out the cookie jar before loading the fresh cookies.
+
+=cut
+
+sub load_jar($self, $jar, %options) {
+    my $driver = $options{ driver } || $self->driver;
+
+    if( $options{ replace }) {
+        $driver->send_message('Network.clearBrowserCookies')->get();
+        $self->clear();
+    };
+
+    local $self->{_loading} = 0;
+    $jar->scan( sub(@c) {
+        my $c = {};
+        @{$c}{qw(version name value path domain port path_spec secure expires discard hash)} = @c;
+        $self->set_cookie(
+            1,
+            $c->{name},
+            $c->{value},
+            $c->{path},
+            $c->{domain},
+            undef, # Chrome doesn't support port numbers?!
+            undef,
+            $c->{httpOnly},
+            $c->{secure},
+            $c->{expires},
+            #$c->{session},
+        );
+    });
 }
 
 sub set_cookie($self, $version, $key, $val, $path, $domain, $port, $path_spec, $secure, $maxage, $discard) {
 
     # We've just read from Chrome, so just update our local variables
     $self->SUPER::set_cookie( $version, $key, $val, $path, $domain, $port, $path_spec, $secure, $maxage, $discard );
-    
+
     if( ! $self->_loading ) {
         # Update Chrome
-        my $driver = $self->driver;
-        
         $maxage += time();
-        
-        $driver->send_message('Network.setCookie', 
-            name     => $key,
-            value    => $val,
-            path     => $path,
-            domain   => $domain,
-            httpOnly => JSON::false,
-            expires  => $maxage,
-            secure   => $secure,
-        )->get;
+        $self
+          ->set_cookie_in_chrome($version, $key, $val, $path, $domain, $port, $path_spec, $secure, $maxage, $discard)
+          ->get();
     };
+};
+
+sub set_cookie_in_chrome($self, $version, $key, $val, $path, $domain, $port, $path_spec, $secure, $maxage, $discard) {
+    # Update Chrome
+    my $driver = $self->driver;
+
+    $maxage += time();
+
+    $driver->send_message('Network.setCookie',
+        name     => $key,
+        value    => $val,
+        path     => $path,
+        domain   => $domain,
+        httpOnly => JSON::false,
+        expires  => $maxage,
+        secure   => ($secure ? JSON::true : JSON::false),
+    );
 };
 
 sub save {
@@ -138,7 +197,7 @@ L<HTTP::Cookies::Chrome> - offline access to Chrome cookies
 
 =head1 REPOSITORY
 
-The public repository of this module is 
+The public repository of this module is
 L<http://github.com/Corion/www-mechanize-chrome>.
 
 =head1 AUTHOR

@@ -1,3 +1,7 @@
+v0.127.2 2020-03-30T12:29:16Z
+ - resources updated
+ - app tmpl fixed
+
 v0.127.1 2020-03-28T08:41:16Z
  - set latest tag on release only if parent release was latest
  - allow to release code on any branch

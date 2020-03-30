@@ -24,8 +24,21 @@ WriteMakefile(
 	'Test::Harness' => '0',
 	},
 	PREREQ_PM => {
+	# Supported databases, make sure any DB supported is also
+	# declared in the dependencies as follows:
+	'DBI' => '1.60',
+	'DBD::SQLite' => '1.60',
+	#'DBD::mysql' => '4.0',
+	#'DBD::Pg' => '3.10.0',
+	'DBIx::Class' => '0.08',
+
+	# in order to fix Can't deploy without a ddl_dir or SQL::Translator >= 0.11018 
+	'SQL::Translator' => '0.11019',
+
+	'Math::Symbolic' => '0.6',
+	'Algorithm::CurveFit' => '1.0',
+
 	'Chart::Clicker' => '0',
-	'DBIx::Class' => '0',
 	'DateTime' => '0',
 	'DateTime::Format::Strptime' => '0',
 	'Getopt::Long' => '0',
@@ -33,13 +46,15 @@ WriteMakefile(
 	'File::Find' => '0',
 	'File::Copy' => '0',
 	'File::Path' => '0',
+	'File::Temp' => '0',
 	'File::Spec' => '0',
-	'HTTP::CookieJar::LWP' => '0',
 	'LWP::UserAgent' => '0',
+	'HTTP::CookieJar::LWP' => '0',
 	'JSON::Parse' => '0',
 	'Storable' => '0',
 	'Data::Dump' => '0',
 	'Try::Tiny' => '0',
+	'Getopt::Long' => '0',
 	},
 
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -47,6 +62,7 @@ WriteMakefile(
 	postamble => {
 		BENCHMARK_FILES => 'xt/benchmarks/*.b',
 		NETWORK_TEST_FILES => 'xt/network/*.n',
+		DATABASE_FILES => 'xt/database/*.d',
 	}
 );
 
@@ -74,5 +90,15 @@ network :: $(NETWORK_TEST_FILES)
 
 network2 :: $(NETWORK_TEST_FILES)
 	$(TEST_D) xt && $(MAKE) test TEST_FILES='$(NETWORK_TEST_FILES)'
+POSTAMBLE
+
+	# here goes another target:
+	. "DATABASE_FILES=$h{DATABASE_FILES}\n" # the files
+	. <<'POSTAMBLE' # and the target follows
+database :: $(DATABASE_FILES)
+	prove --blib $(INST_LIB) --blib $(INST_ARCHLIB) --verbose $^
+
+database2 :: $(DATABASE_FILES)
+	$(TEST_D) xt && $(MAKE) test TEST_FILES='$(DATABASE_FILES)'
 POSTAMBLE
 }

@@ -7,10 +7,12 @@ use warnings;
 use Data::Dump qw/pp/;
 use Storable;
 use File::Copy;
+use File::Temp;
+use Try::Tiny;
 
 use Statistics::Covid::Utils;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 sub	new {
 	my (
@@ -256,17 +258,27 @@ sub	db_is_connected { return defined $_[0]->schemah() }
 sub     db_connect {
 	my $self = $_[0];
 	my $force_disconnect_first = defined $_[1] ? $_[1] : 0;
+
 	my $dbparams = $self->dbparams();
+
+	my $debug = $self->debug();
 
 	if( $force_disconnect_first && $self->db_is_connected() ){ $self->db_disconnect() }
 
 	my $dsn = $self->db_make_dsn($dbparams);
 	if( ! defined $dsn ){ warn "call to ".'db_make_dsn()'." has failed."; return undef }
+	# our default dbi params for connecting, if some are specified via our db-params set
+	# by the config during construction, then merge them into our defaults,
+	# the latter keys will overwrite the former in the params hash
 	my $dbiparams = {RaiseError => 1, PrintError => 0};
 	if( exists $dbparams->{'connect-params'} and defined $dbparams->{'connect-params'} ){ $dbiparams = {%$dbiparams, %{$dbparams->{'connect-params'}}} }
-	my $schemaHandle = Statistics::Covid::Schema->connect($dsn, "", "", $dbparams);
-	if( ! defined $schemaHandle or $schemaHandle->storage==1 ){ warn 'Statistics::Covid::Schema->connect('.$dsn.') has failed.'; return undef }
-	my $debug = $self->debug();
+	my $schemaHandle;
+	Try::Tiny::try {
+		$schemaHandle = Statistics::Covid::Schema->connect($dsn, "", "", $dbparams);
+	};
+	if( $_ or ! defined($schemaHandle) or $schemaHandle->storage==1 ){ warn 'Statistics::Covid::Schema->connect('.$dsn.') has failed, $_'; return undef }
+	$dbparams->{'schemah'} = $schemaHandle;
+
 	$schemaHandle->storage->debug($debug);
 	my $m = $self->logfilename();
 	if( $m ){
@@ -276,13 +288,27 @@ sub     db_connect {
 		if( 0 == _init_log_file($schemaHandle, $m) ){ warn "call to ".'_init_log_file()'." has failed for file '$m'."; return undef }
 		if( $debug > 0 ){ warn "logging to file '$m'." }
 	}
-	$dbparams->{'schemah'} = $schemaHandle;
-	if( ! Statistics::Covid::Utils::table_exists_dbix_class($schemaHandle, $self->dual_package_vars()->{'tablename'}) ){
+	if( 0 == $self->is_deployed() ){
+		# the table does not exist => we deploy the db (and that's that!)
 		if( $debug > 0 ){ warn "creating table '".$self->dual_package_vars()->{'tablename'}."'..." }
-		$dbparams->{'schemah'}->deploy();
+		Try::Tiny::try {
+			$dbparams->{'schemah'}->deploy()
+		};
+		if( $_ ){ warn "error, call to deploy() has failed for this dsn '$dsn'."; return undef }
 	}
 	if( $debug > 0 ){ warn "db_connect() : connected to '$dsn'." }
 	return $schemaHandle
+}
+# returns true if db is deployed (created)
+# must already be connect to db
+sub	is_deployed {
+	my $self = $_[0];
+	if( ! $self->db_is_connected() ){ warn "error, not connected to any database."; return -1 }
+
+	return Statistics::Covid::Utils::table_exists_dbix_class(
+		$self->schemah(),
+		$self->dual_package_vars()->{'tablename'}
+	)
 }
 # erases all rows in the given table of the database
 # it returns the number of rows deleted (can be zero) on success
@@ -618,5 +644,81 @@ sub	db_disconnect {
 		if( $debug > 0 ){ warn "db_disconnect() : disconnected from DB." }
 	}
 	return 1
+}
+# return an arrayref of all table names in the db we are connected to
+sub	db_get_all_tablenames {
+	my $self = $_[0];
+	if( ! $self->db_is_connected() ){ warn "error, not connected to any database."; return undef }
+	return [$self->schemah()->sources]
+}
+# Get our database schema and return it as a hashref where key=dbtype and value=schema as a string
+# must be already connected to db (via L<db_connect()>)
+# optionally specify the following in the input parameters hashref
+# *** 'outdir' an output dir where to dump SQL files as well
+# their filename will be formed with our Schema class (L<Statistics::Covid::Schema>)
+# our current module version (found in $VERSION of present file)
+# and the database type (e.g. 'SQLite', 'Pg', 'MySQL')
+# can be used with 'outfile' too.
+# *** 'dbtypes' is an arrayref of database type strings. A schema file will be
+# created for each of these databases. Default is our current database type
+# as contained in the configuration set during construction
+# *** 'outfile' is an optional local file to dump all schemas into
+# can be used with 'outdir' too.
+# it will return undef on failure
+sub	db_get_schema {
+	my $self = $_[0];
+	my $params = $_[1];
+
+	my $debug = $self->debug();
+
+	if( ! $self->db_is_connected() ){ warn "error, not connected to any database."; return undef }
+
+	my $outdir = exists($params->{'outdir'}) ? $params->{'outdir'} : undef;
+	if( ! defined $outdir ){
+		# we create a tmp dir
+		$outdir = File::Temp::tempdir(CLEANUP=>1);
+	}
+	if( ! -e $outdir ){
+		if( ! Statistics::Covid::Utils::make_path($outdir) ){ warn "error, failed to create output dir '$outdir'."; return undef }
+		if( $debug > 0 ){ warn "created output dir '$outdir'." }
+	}
+	# optional db types, e.g. SQLite, MySQL, Pg
+	# default is to use our own dbtype as found in the loaded config during construction
+	my $dbtypes = exists($params->{'dbtypes'}) ? $params->{'dbtypes'} : [$self->dbparams()->{'dbtype'}];
+
+	# i assume it throws exception
+	for my $adbtype (@$dbtypes){
+		Try::Tiny::try {
+			$self->schemah()->create_ddl_dir([$adbtype], $VERSION, $outdir);
+		};
+		if( $_ ){ warn "error, call to create_ddl_dir() has failed for db type '$adbtype', $_"; return undef }
+		if( $debug > 0 ){ warn "dumped schemata for '$adbtype' to '$outdir'" }
+	}
+
+	# optional file to save ALL schemas (all schemas in one file)
+	# separated by '-'x29
+	my $outfile = exists($params->{'outfile'}) ? $params->{'outfile'} : undef;
+	my $outfh = undef;
+	if( defined $outfile ){
+		if( ! open($outfh, '>:encoding(UTF-8)', $outfile) ){ warn "error, failed to open output file '$outfile', $!"; return undef }
+	}
+	# now for each datatype we have the following file in outdir
+	#    Statistics-Covid-Schema-<VERSION>-<DBTYPE>.sql
+	# read each of these files and return them bundled in a hashtable keyed on dbtype
+	my %ret;
+	for my $adbtype (@$dbtypes){
+		my $infile = File::Spec->catfile($outdir, 'Statistics-Covid-Schema-'.$VERSION.'-'.$adbtype.'.sql');
+		my $fh;
+		if( ! open($fh, '<:encoding(UTF-8)', $infile) ){ warn "error, failed to open just created SQL file '$infile' for reading, $!"; return undef }
+		my $contents = undef;
+		{local $/=undef; $contents = <$fh> } close $fh;
+		$ret{$adbtype} = $contents;
+		if( defined $outfile ){ print $outfh $contents."\n".('-'x29)."\n" }
+		if( $debug > 0 ){ warn "created schema for database type '$adbtype'." }
+	}
+	if( defined $outfile ){ close($outfh); warn "dumped all schemata to one single file '$outfile'." }
+
+	# if used a tmp outdir, it is erased on out-scope
+	return \%ret
 }
 1;

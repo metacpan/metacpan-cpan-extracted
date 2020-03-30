@@ -1,8 +1,12 @@
-#!perl -T
+#!/usr/bin/env perl
 use 5.006;
 
 use strict;
 use warnings;
+
+use lib 'blib/lib';
+
+our $VERSION = '0.21';
 
 use Statistics::Covid::Datum;
 use Statistics::Covid::Datum::IO;
@@ -19,22 +23,22 @@ my $num_tests = 0;
 my ($ret, $count, $io, $schema, $da);
 
 my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+ok(-d $tmpdir, "output dir exists"); $num_tests++;
 my $tmpdbfile = "adb.sqlite";
-my $configfile = File::Spec->catfile($dirname, 'example-config.json');
+my $configfile = File::Spec->catfile($dirname, 'config-for-t.json');
 my $confighash = Statistics::Covid::Utils::configfile2perl($configfile);
-ok(defined($confighash), "config json file parsed."); $num_tests++;
+ok(defined($confighash), "config json file parsed.") or BAIL_OUT("can not continue."); $num_tests++;
 
-$confighash->{'fileparams'}->{'datafiles-dir'} = $tmpdir;
+$confighash->{'fileparams'}->{'datafiles-dir'} = File::Spec->catfile($tmpdir, 'files');
 $confighash->{'dbparams'}->{'dbtype'} = 'SQLite';
-$confighash->{'dbparams'}->{'dbdir'} = $tmpdir;
+$confighash->{'dbparams'}->{'dbdir'} = File::Spec->catfile($tmpdir, 'db');
 $confighash->{'dbparams'}->{'dbname'} = $tmpdbfile;
-
-unlink $tmpdbfile;
+my $dbfullpath = File::Spec->catfile($confighash->{'dbparams'}->{'dbdir'}, $confighash->{'dbparams'}->{'dbname'});
 
 $io = Statistics::Covid::Datum::IO->new({
 	# the params
 	'config-hash' => $confighash,
-	'debug' => 1,
+	'debug' => 0,
 });
 ok(defined($io), "Statistics::Covid::Datum::IO->new() called"); $num_tests++;
 ok(-d $tmpdir, "output dir exists"); $num_tests++;
@@ -55,9 +59,9 @@ if( $count > 0 ){
 }
 
 $ret = $io->db_insert($da);
-ok($ret==1, "Datum object inserted, 1st time"); $num_tests++;
+ok($ret==1, "Datum object inserted, 1st time, ret=".$ret); $num_tests++;
 $ret = $io->db_insert($da);
-ok($ret==3, "Datum object not inserted, 2nd time - identical"); $num_tests++;
+ok($ret==3, "Datum object not inserted, 2nd time - identical, ret=".$ret); $num_tests++;
 $da->terminal($da->terminal()+1);
 $ret = $io->db_insert($da);
 ok($ret==2, "Datum object inserted, 3rd time - better markers now"); $num_tests++;

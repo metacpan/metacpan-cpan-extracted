@@ -36,7 +36,7 @@ use constant DEBUG_MATCH => 0;
 use vars qw( $DEBUG $VERSION @EXPORT_OK %EXPORT_TAGS );
 use base 'Exporter';
 
-$VERSION = 1.126;
+$VERSION = 1.128;
 
 $DEBUG = 0 || $ENV{N_A_E_DEBUG};
 
@@ -61,6 +61,7 @@ debugging information will be printed to STDERR.
 
 sub get_address
   {
+  # warn " TTT get_address()";
   if (0)
     {
     # If you know the name of the adapter, you can use this code to
@@ -85,7 +86,6 @@ sub get_address
       warn " WWW inet_ntoa failed\n";
       goto IFCONFIG_VERSION;
       } # if
-    use Data::Dumper;
     warn Dumper($s); exit 88; # for debugging
     } # if 0
  IFCONFIG_VERSION:
@@ -186,6 +186,7 @@ debugging information will be printed to STDERR.
 
 sub get_addresses
   {
+  # warn " TTT get_addresses()";
   $DEBUG ||= shift;
   # Short-circuit if this function has already been called:
   if (! $DEBUG && @ahInfo)
@@ -194,9 +195,56 @@ sub get_addresses
     } # if
   my $sAddr = undef;
   my $rh = Ifconfig('list', '', '', '');
-  if (! defined $rh || (! scalar keys %$rh))
+  if ((! defined $rh) || (! scalar keys %$rh))
     {
-    warn " EEE Ifconfig failed: $@";
+    # warn " WWW Ifconfig failed: $@";
+    if ($@ =~ m/not found/)
+      {
+      # At this point we might try another method, such as calling /sbin/ip
+      my $sCmdIp = '/sbin/ip';
+      if (! -f $sCmdIp)
+        {
+        warn " DDD $sCmdIp does not exist";
+        }
+      else
+        {
+        $sCmdIp .= q/ addr show/;
+        my @asOutput = qx/$sCmdIp/;
+        # print STDERR " DDD asOutput ==@asOutput";
+        my $sInterface = q//;
+        my %hash;
+        foreach my $sLine (@asOutput)
+          {
+          # print STDERR " DDD sLine ==$sLine";
+          if ($sLine =~ m/\d:\s(.+?):.+,UP/)
+            {
+            # Found an interface that is in UP state
+            push @ahInfo, {%hash} if %hash;
+            $sInterface = $1;
+            # Start a new adapter's info:
+            %hash = ();
+            $hash{sAdapter} = $sInterface;
+            $hash{iActive} = 1;
+            _debug(" DDD   hash is ", Dumper(\%hash));
+            } # if
+          if ($sLine =~ m/ether\s+(([0-9a-f]{2}:){5}[0-9a-f]{2})/)
+            {
+            $hash{sEthernet} = canonical($1);
+            _debug(" DDD   hash is ", Dumper(\%hash));
+            } # if
+          if ($sLine =~ m/inet\s+((\d+\.){3}\d+)/)
+            {
+            $hash{sAdapter} = $sInterface;
+            $hash{sIP} = $1;
+            $hash{rasIP} = [$1];
+            _debug(" DDD   hash is ", Dumper(\%hash));
+            } # if
+          } # foreach
+        push @ahInfo, {%hash} if %hash;
+        } # if
+      } # if
+    # No sense trying to parse non-existent output:
+    goto ALL_DONE;
     } # if
   _debug(" DDD raw output from Ifconfig is ", Dumper($rh));
   # Convert their hashref to our array format:

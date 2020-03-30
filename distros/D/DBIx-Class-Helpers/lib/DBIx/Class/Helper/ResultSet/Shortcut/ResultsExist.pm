@@ -1,15 +1,15 @@
 package DBIx::Class::Helper::ResultSet::Shortcut::ResultsExist;
-$DBIx::Class::Helper::ResultSet::Shortcut::ResultsExist::VERSION = '2.035000';
+$DBIx::Class::Helper::ResultSet::Shortcut::ResultsExist::VERSION = '2.036000';
 use strict;
 use warnings;
 
 use parent 'DBIx::Class::ResultSet';
 
 sub results_exist_as_query {
-   my $self = shift;
+   my ($self, $cond) = @_;
 
 
-   my $reified = $self->search_rs( {}, {
+   my $reified = $self->search_rs( $cond, {
       columns => { _results_existence_check => \ '42' }
    } )->as_query;
 
@@ -22,9 +22,9 @@ sub results_exist_as_query {
 
 
 sub results_exist {
-   my $self = shift;
+   my ($self, $cond) = @_;
 
-   my $query = $self->results_exist_as_query;
+   my $query = $self->results_exist_as_query($cond);
    $$query->[0] .= ' AS _existence_subq';
 
    my( undef, $sth ) = $self->result_source

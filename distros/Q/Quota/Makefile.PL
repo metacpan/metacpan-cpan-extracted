@@ -67,6 +67,27 @@ if ( ($os =~ /^NetBSD 6/) ||
   $extralibs .= " -lquota";
 }
 
+# check whether RPCSVC is included within libc
+# - SUN RPC/XDR support was split off from glibc, see:
+#   https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/F2NRCEXDDUF6WWNPSOMXRJS6BPMTEEVJ/
+# - in RHEL apparently the rpc/rpc.h header was moved too;
+#   Debian has libtirpc, but headers and implementation are still in glibc too
+if (($os =~ /^Linux/) && (-d '/usr/include/tirpc')) {
+  print "Configured to use tirpc library instead of rpcsvc\n";
+  $extrainc = "-I/usr/include/tirpc";
+  $rpclibs .= "-ltirpc";
+}
+else {
+  if (($os =~ /^Linux/) && (!-e '/usr/include/rpc/rpc.h')) {
+    print "WARNING: Header file /usr/include/rpc/rpc.h not present on this system.\n" .
+          "         Likely compilation will fail. Recommend to either install package\n" .
+          "         \"libtirpc-dev\", or disable RPC (network file system) support by\n" .
+          "         adding the following switch to myconfig.h:\n" .
+          "         #define NO_RPC\n";
+  }
+  $rpclibs .= "-lrpcsvc";
+}
+
 #-----------------------------------------------------------------------------#
 
 use ExtUtils::MakeMaker;
@@ -76,7 +97,7 @@ use ExtUtils::MakeMaker;
                                  "$afsquota $picobj $extraobj ". $hint{'OBJ'},
                'INC'          => $extrainc .' '. $hint{'INC'},
                'DEFINE'       => "$hasafs $hasvxfs",
-               'LIBS'         => [ "-lrpcsvc $extralibs" ],
+               'LIBS'         => [ "$rpclibs $extralibs" ],
                'H'            => [ 'myconfig.h' ],
                'VERSION_FROM' => 'Quota.pm',
                'clean'        => { FILES => 'myconfig.h' },

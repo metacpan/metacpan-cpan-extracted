@@ -4,7 +4,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.44';
+our $VERSION = '0.46';
 
 =head1 NAME
 
@@ -39,6 +39,9 @@ All parameters are passed on to the implementation class.
 
 sub new($factoryclass, @args) {
     $implementation ||= $factoryclass->best_implementation();
+
+    # Just in case a user has set this from the outside
+    eval "require $implementation; 1";
 
     # return a new instance
     $implementation->new(@args);

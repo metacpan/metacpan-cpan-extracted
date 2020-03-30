@@ -1,6 +1,6 @@
 package Statistics::Covid::Schema;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 use base qw/DBIx::Class::Schema/;
 
@@ -20,7 +20,7 @@ Statistics::Covid::Schema - DBIx::Class::Schema subclass, entry to the DBIx::Cla
 
 =head1 VERSION
 
-Version 0.21
+Version 0.23
 
 
 

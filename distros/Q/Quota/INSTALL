@@ -31,6 +31,10 @@ Options:
     If your distribution doesn't include the package you can get it from
     <URL:http://sourceforge.net/projects/linuxquota>. See also (6) below.
 
+    Since 2019, SUN-RPC support has been split off from glibc in some
+    Linux distributions. If you run into compilation problems due to
+    missing header rpc/rpc.h, install package "libtirpc-dev"
+
 2)  Link or create the hints file.
 
  a) Should be done by Makefile.PL for all supported systems. If not, and
@@ -54,7 +58,8 @@ Options:
 4)  Compile the module: make
 
 5)  Run "make test" to check if the module routines do work correctly.
-    (Since release 1.0 you can test the module without installing)
+    For testing group quotas run script test-group.pl (GID and path
+    are hard-coded in this script, so you'll likely have to edit it.)
 
 6)  Linux specials:
 
@@ -92,10 +97,8 @@ Options:
 
 8)  Before you start for another OS, type "make clean"
 
-Please mail me any changes in the hints files or Makefile.PL you had to
-apply to get the package to compile. Please remember to include in your
-mail the name of used OS and version numbers of OS (uname -rs) and module.
 
-Tom
----
-email: tomzo AT nefkom DOT net
+Please submit a ticket at CPAN (https://metacpan.org/pod/Quota) for any
+changes in the hints files or Makefile.PL you had to apply to get the
+package to compile. Please remember to include the name of the OS and
+version numbers of OS (uname -rs) and Quota module.

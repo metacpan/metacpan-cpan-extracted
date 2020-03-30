@@ -12,17 +12,15 @@ use WWW::Subsonic;
 
 my ($opt,$usage) = describe_options('%c - %o <target_directory>',
     ["Subsonic API Details"],
-    ['server|S=s',        "Subsonic Server name, default localhost", { default => 'localhost' } ],
-    ['port|P:s',          "Subsonic Server port, default 4000", { default => "4000" }],
-    ['username|user|u:s', "Subsonic Username, required." ],
-    ['password-file|p:s', "File containing the password for the subsonic user, default: ~/.subsonic_password",
+    ['url|U=s',           "Subsonic Server url, default http://localhost:4000", { default => 'http://localhost:4000' } ],
+    ['username|user|u=s', "Subsonic Username, required." ],
+    ['password-file|p=s', "File containing the password for the subsonic user, default: ~/.subsonic_password",
         { default => "$ENV{HOME}/.subsonic_password", callback => { 'must be a valid file' => sub { -f $_[0] } } }
     ],
-    ["insecure|http",     "Use Insecure HTTP for communication"],
-    ['api-version:s',     "Specify the API Version, defaults to using the WWW::Subsonic default."],
+    ['api-version=s',     "Specify the API Version, defaults to using the WWW::Subsonic default."],
     [],
     ["Media Directories"],
-    ["local-media-dir|local|l:s", "Local directory which might contain media files we can sync."],
+    ["local-media-dir|local|l=s", "Local directory which might contain media files we can sync."],
     [],
     ["Starred Media Options"],
     ["all|A",     "Sync all starred media", { implies => [qw(artists albums songs)] }],
@@ -53,11 +51,9 @@ chomp($password);
 
 # Build the API Object
 my $subsonic = WWW::Subsonic->new(
-    server   => $opt->server,
-    port     => $opt->port,
-    username => $opt->username,
-    password => $password,
-	protocol => $opt->insecure ? 'http' : 'https',
+    url      => $opt->url,
+    $opt->username    ? ( username => $opt->username ) : (),
+    $password         ? ( password => $password )      : (),
     $opt->api_version ? ( api_version => $opt->api_version ) : (),
 );
 
@@ -163,7 +159,7 @@ subsonic_sync_starred.pl - Download and/or sync starred media to a target direct
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

@@ -522,11 +522,44 @@ static XS(injected_constructor)
   dXSARGS;
   const ClassMeta *meta = XSANY.any_ptr;
   SV *class = ST(0);
-  SV **args = mark + 1; /* all the args minus the leading $class */
   SV *self;
 
   PL_curcop = meta->tmpcop;
   CopLINE_set(PL_curcop, __LINE__);
+
+  I32 nargs;
+  {
+    /* @args = $class->BUILDARGS(@_) */
+    CopLINE_set(PL_curcop, __LINE__);
+
+    ENTER;
+    SAVETMPS;
+
+    /* Splice in an extra copy of `class` so we get one there for the foreign
+     * constructor */
+    EXTEND(SP, 1);
+
+    SV **args = SP - items + 2;
+    PUSHMARK(args - 1);
+
+    SV **svp;
+    for(svp = SP; svp >= args; svp--)
+      *(svp+1) = *svp;
+    *args = class;
+    SP++;
+    PUTBACK;
+
+    nargs = call_method("BUILDARGS", G_ARRAY);
+
+    SPAGAIN;
+
+    /* Save the returned values from destruction */
+    for(svp = SP - nargs + 1; svp <= SP; svp++)
+      SvREFCNT_inc(*svp);
+
+    FREETMPS;
+    LEAVE;
+  }
 
   switch(meta->repr) {
     case REPR_NATIVE:
@@ -545,8 +578,9 @@ static XS(injected_constructor)
       {
         ENTER;
         PUSHMARK(SP);
-        EXTEND(SP, SP-args + 1);
+        EXTEND(SP, nargs);
 
+        SV **args = SP - nargs;
         SV **argtop = SP;
         SV **svp;
 
@@ -584,7 +618,7 @@ static XS(injected_constructor)
   }
 
   {
-    /* $self->BUILDALL(@_) */
+    /* $self->BUILDALL(@args) */
     CopLINE_set(PL_curcop, __LINE__);
 
     ENTER;
@@ -592,13 +626,15 @@ static XS(injected_constructor)
 
     EXTEND(SP, 1);
 
-    /* Rather than PUSH all the args again, we'll just move them all up one
-     * position and set the self as the bottom one */
-    PUSHMARK(args);
-    SV **svp, **bottom = args + 1;
-    for(svp = SP; svp >= bottom; svp--)
-      *(svp+1) = *svp;
-    *bottom = self;
+    SV **args = SP - nargs;
+    PUSHMARK(args - 1);
+
+    /* Nudge the args up one and splice `self` in the bottom */
+
+    SV **svp;
+    for(svp = SP - 1; svp >= args; svp--)
+      sv_2mortal(*(svp+1) = *svp);
+    *args = self;
     PUTBACK;
 
     call_method("BUILDALL", G_VOID);
@@ -975,11 +1011,18 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
   compclassmeta->methodscope = NULL;
 }
 
+static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
+{
+  if(ctx->cv)
+    CvMETHOD_on(ctx->cv);
+}
+
 static struct XSParseSublikeHooks parse_method_hooks = {
   .permit          = parse_permit,
   .pre_subparse    = parse_pre_subparse,
   .post_blockstart = parse_post_blockstart,
   .pre_blockend    = parse_pre_blockend,
+  .post_newcv      = parse_post_newcv,
 };
 
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);

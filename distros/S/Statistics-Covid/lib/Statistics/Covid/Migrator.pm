@@ -6,7 +6,7 @@ use warnings;
 
 use DateTime;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 sub	new {
 	my ($class, $params) = @_;
@@ -58,7 +58,7 @@ Statistics::Covid::Migrator - Migrate data already collected to a newer version
 
 =head1 VERSION
 
-Version 0.21
+Version 0.23
 
 =head1 DESCRIPTION
 Newer versions of L<Statistics::Covid> may alter the database schema. This module

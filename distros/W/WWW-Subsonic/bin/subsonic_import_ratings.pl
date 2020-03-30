@@ -15,14 +15,12 @@ use WWW::Subsonic;
 
 my ($opt,$usage) = describe_options('%c - %o iTunesLibrary.xml',
     ["Subsonic API Details"],
-    ['server|S=s',        "Subsonic Server name, default localhost", { default => 'localhost' } ],
-    ['port|P:s',          "Subsonic Server port, default 4040", { default => 4040 }],
-    ['username|user|u:s', "Subsonic Username, required." ],
-    ['password-file|p:s', "File containing the password for the subsonic user, default: ~/.subsonic_password",
+    ['url|U=s',        "Subsonic Server name, default localhost", { default => 'http://localhost:4000' } ],
+    ['username|user|u=s', "Subsonic Username, required." ],
+    ['password-file|p=s', "File containing the password for the subsonic user, default: ~/.subsonic_password",
         { default => "$ENV{HOME}/.subsonic_password", callback => { 'must be a valid file' => sub { -f $_[0] } } }
     ],
-    ['api-version:s',     "Specify the API Version, defaults to using the WWW::Subsonic default."],
-    ["insecure|http",     "Use Insecure HTTP for communication"],
+    ['api-version=s',     "Specify the API Version, defaults to using the WWW::Subsonic default."],
     [],
     ["Import Behavior"],
     ["star-rating",  "If 0-5 rating is greater or equal to this, also 'star' this item, default: 4",
@@ -30,7 +28,7 @@ my ($opt,$usage) = describe_options('%c - %o iTunesLibrary.xml',
     ],
     [],
     ["Caching Behavior"],
-    ['cache:s',     "Default Cache Location, default: $ENV{HOME}/.subsonic_cache", { default => "$ENV{HOME}/.subsonic_cache" }],
+    ['cache=s',     "Default Cache Location, default: $ENV{HOME}/.subsonic_cache", { default => "$ENV{HOME}/.subsonic_cache" }],
     ['clear-cache', "Remove the cache file before processing"],
     [],
     ['help', "Display this help", { shortcircuit => 1 }],
@@ -54,11 +52,9 @@ if( -f $opt->password_file ) {
 
 # Instantiate the API Object
 my $subsonic = WWW::Subsonic->new(
-    server   => $opt->server,
-    username => $opt->username,
-    password => $password,
-    protocol => $opt->insecure ? 'http' : 'https',
-    port     => $opt->port,
+    url      => $opt->url,
+    $opt->username    ? ( username => $opt->username )       : (),
+    $password         ? ( password => $password )            : (),
     $opt->api_version ? ( api_version => $opt->api_version ) : (),
 );
 
@@ -161,7 +157,7 @@ while(<<>>) {
                             scalar(@sids),
                             map { $_ || 'n/a' } @song{qw(Artist Album Name)},
                         );
-                        my $rating = sprintf "%0.1f", $song{Rating} / 20;
+                        my $rating = int($song{Rating} / 20);
                         foreach my $song_id ( @sids ) {
                             my $result = $subsonic->api_request('setRating.view' => { id => $song_id, rating => $rating });
                             if( $rating >= $opt->star_rating ) {
@@ -171,7 +167,7 @@ while(<<>>) {
                     }
                     else {
                         output({color=>'red'}, sprintf "No tracks found for %s - %s - %s",
-                            map { $_ || 'n/a' } @song{qw(Artist Album Name)},
+                            map { $_ || 'n/a' } @normal{qw(Artist Album Name)},
                         );
                     }
                 }
@@ -209,7 +205,7 @@ subsonic_import_ratings.pl - Import Ratings from an iTunes Library XML Export to
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

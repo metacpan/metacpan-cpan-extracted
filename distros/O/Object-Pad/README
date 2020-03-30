@@ -45,14 +45,22 @@ DESCRIPTION
     a method called BUILD, but does not need to chain to the SUPER class
     first; this is handled automatically.
 
-       $class->BUILD( @_ )
+       $self->BUILD( @_ )
+
+    If the class provides a BUILDARGS class method, that is used to mangle
+    the list of arguments before the BUILD methods are called. Note this
+    must be a class method not an instance method (and so implemented using
+    sub). It should perform any SUPER chaining as may be required.
+
+       @args = $class->BUILDARGS( @_ )
+       $self->BUILD( @args )
 
     If the class provides a BUILDALL method, that is used to implement the
     setup behaviour instead. It is passed the entire parameters list from
     the new method. It should perform any SUPER chaining as may be
     required.
 
-       $class->BUILDALL( @_ )
+       $self->BUILDALL( @_ )
 
 KEYWORDS
 
@@ -183,6 +191,10 @@ KEYWORDS
     
        my $c = Counter->new;
        $c->count++;
+
+    Every method automatically gets the :method attribute applied, which
+    suppresses warnings about ambiguous calls resolved to core functions if
+    the name of a method matches a core function.
 
 IMPLIED PRAGMATA
 

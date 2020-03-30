@@ -10,7 +10,7 @@ use Mojolicious::Plugin::DataTables::SSP::Column;
 use Mojolicious::Plugin::DataTables::SSP::Params;
 use Mojolicious::Plugin::DataTables::SSP::Results;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub register {
 
@@ -56,6 +56,14 @@ sub _dt_ssp {
     my @columns = delete $args{columns};
     my $debug   = delete $args{debug};
 
+    my $regexp_operator = 'REGEXP';    # MySQL and SQLite use REGEXP operator
+    my $db_type         = ref $db;
+
+    # PostgreSQL use "~" operator
+    if ( $db_type =~ /Mojo::Pg/ ) {
+        $regexp_operator = '~';
+    }
+
     my $ssp = $c->datatable->ssp_params($options);
 
     return {} if ( !$ssp->draw );
@@ -73,8 +81,15 @@ sub _dt_ssp {
 
     foreach ( @{ $ssp->columns } ) {
         if ( $_->database && $_->searchable != 0 && $_->search->{value} ) {
-            push @col_filters, $_->database . " LIKE ?";
-            push @db_bind,     '%' . $_->search->{value} . '%';
+
+            if ( $_->search->{regex} ) {
+                push @col_filters, $_->database . " $regexp_operator ?";
+                push @db_bind,     $_->search->{value};
+            } else {
+                push @col_filters, $_->database . " LIKE ?";
+                push @db_bind,     '%' . $_->search->{value} . '%';
+            }
+
         }
     }
 
@@ -89,8 +104,15 @@ sub _dt_ssp {
 
         foreach ( @{ $ssp->columns } ) {
             if ( $_->database && $_->searchable != 0 ) {
-                push @global_filters, $_->database . " LIKE ?";
-                push @db_bind,        '%' . $ssp->search->{value} . '%';
+
+                if ( $ssp->search->{regex} ) {
+                    push @global_filters, $_->database . " $regexp_operator ?";
+                    push @db_bind,        $ssp->search->{value};
+                } else {
+                    push @global_filters, $_->database . " LIKE ?";
+                    push @db_bind,        '%' . $ssp->search->{value} . '%';
+                }
+
             }
         }
 
@@ -297,7 +319,7 @@ Mojolicious::Plugin::DataTables - DataTables Plugin for Mojolicious
                 dt    => 2,
             },
         ]
-    ));
+    );
 
     return $c->render(json => $dt_ssp);
 
@@ -401,7 +423,7 @@ Controller:
                 dt    => 2,
             },
         ]
-    ));
+    );
 
 =head2 Formatter
 

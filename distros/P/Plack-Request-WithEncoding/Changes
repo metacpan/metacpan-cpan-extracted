@@ -1,5 +1,9 @@
 Revision history for Perl extension Plack-Request-WithEncoding
 
+0.13 2020-03-29T13:39:56Z
+
+    - Update documents (@CPBen++ https://github.com/moznion/Plack-Request-WithEncoding/issues/2)
+
 0.12 2013-11-14T02:45:14Z
 
     - Correct the defect of documents

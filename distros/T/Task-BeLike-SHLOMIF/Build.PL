@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Task-BeLike-SHLOMIF",
-  "dist_version" => "0.0.5",
+  "dist_version" => "0.0.6",
   "license" => "mit",
   "module_name" => "Task::BeLike::SHLOMIF",
   "recursive_test_files" => 1,
@@ -48,6 +48,7 @@ my %module_build_args = (
     "Pod::Xhtml" => 0,
     "SQ" => 0,
     "Task::FreecellSolver::Testing" => 0,
+    "Task::FreecellSolver::Testing::MultiConfig" => 0,
     "Task::Sites::ShlomiFish" => 0,
     "Term::ReadLine::Gnu" => 0,
     "Test::Pod" => 0,

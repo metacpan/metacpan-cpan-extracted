@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------ #
 # Interactive test and demo script for the Perl Quota extension module
 #
-# Author: Tom Zoerner 1995-2005
+# Author: T. Zoerner 1995-2020
 #
 # This program (test.pl) is in the public domain and can be used and
 # redistributed without restrictions.

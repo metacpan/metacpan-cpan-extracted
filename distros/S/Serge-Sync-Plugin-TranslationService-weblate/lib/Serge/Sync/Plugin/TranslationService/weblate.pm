@@ -5,7 +5,6 @@ use parent Serge::Sync::Plugin::Base::TranslationService, Serge::Interface::SysC
 
 use strict;
 
-use File::chdir;
 use File::Find qw(find);
 use File::Spec::Functions qw(catfile abs2rel);
 use JSON -support_by_pp; # -support_by_pp is used to make Perl on Mac happy
@@ -15,7 +14,7 @@ use Scalar::Util qw(reftype);
 use File::Path qw(make_path);
 use File::Basename;
 
-our $VERSION = qv('0.900.2');
+our $VERSION = qv('0.900.6');
 
 sub name {
     return 'Weblate translation software (https://weblate.org/) synchronization plugin';

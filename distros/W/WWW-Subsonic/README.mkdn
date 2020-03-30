@@ -4,7 +4,7 @@ WWW::Subsonic - Interface with the Subsonic API
 
 # VERSION
 
-version 0.008
+version 0.009
 
 # SYNOPSIS
 
@@ -14,6 +14,7 @@ This module provides a very simple interface to using the Subsonic API.
     use WWW::Subsonic;
 
     my $subsonic = WWW::Subsonic->new(
+        url      => "https://music.local:4040/",
         username => 'user1',
         password => 'Assw0rd1P',
     );
@@ -30,26 +31,19 @@ This module provides a very simple interface to using the Subsonic API.
 
 # ATTRIBUTES
 
-## **protocol**
+## **url**
 
-Subsonic protocol, https (the default) or http.
-
-## **server**
-
-Subsonic server name, defaults to localhost
-
-## **port**
-
-Subsonic server port, default 4000
+Subsonic server url, default is 'http://localhost:4000'
 
 ## **username**
 
-Subsonic username, **required**.
+Subsonic username, if not specified, will try a lookup via netrc.
 
 ## **password**
 
-Subsonic user's password, **required**.  This is never sent over the wire,
-instead it's hashed using a salt for the server to verify.
+Subsonic user's password, if not specified will try a lookup via netrc.  This
+is never sent over the wire, instead it's hashed using a salt for the server to
+verify.
 
 ## **salt**
 

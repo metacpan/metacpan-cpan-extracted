@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.020000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Masscan-Scanner",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "Masscan::Scanner",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "20200328.173827",
+  "VERSION" => "20200329.150259",
   "test" => {
     "TESTS" => "t/*.t"
   }
