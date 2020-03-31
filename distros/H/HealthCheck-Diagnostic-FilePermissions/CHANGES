@@ -1,9 +1,28 @@
 ==================================================
-Changes from 2019-03-26 00:00:00 +0000 to present.
+Changes from 2019-03-31 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version v1.4.2 at 2020-03-25 19:17:28 +0000
+version v1.4.6 at 2020-03-30 22:01:33 +0000
+-------------------------------------------
+
+  Change: 599098247722b2efc340c37148b0b2c0c3a4feaa
+  Author: Brandon Messineo <brandon.messineo@grantstreet.com>
+  Date : 2020-03-30 18:01:33 +0000
+
+    Update README 
+
+  Change: 192ccce862875a7484876c939ec8ee09d1734f8a
+  Author: Brandon Messineo <brandon.messineo@grantstreet.com>
+  Date : 2020-03-26 15:10:40 +0000
+
+    Do not chmod sticky bits and fix #1
+
+    Because that can only be set by a super user in some operating
+    systems. 
+
+-------------------------------------------
+version v1.4.2 at 2020-03-25 18:42:05 +0000
 -------------------------------------------
 
   Change: 6f456bc5da147a0095c1470394ea1bbd6d9c57fd
@@ -87,5 +106,5 @@ dist/version v0.0.0.1804_01/master/SM-1804 at 2019-05-22 22:39:21 +0000
     the text. 
 
 =================================================
-Plus 10 releases after 2019-03-26 00:00:00 +0000.
+Plus 10 releases after 2019-03-31 00:00:00 +0000.
 =================================================

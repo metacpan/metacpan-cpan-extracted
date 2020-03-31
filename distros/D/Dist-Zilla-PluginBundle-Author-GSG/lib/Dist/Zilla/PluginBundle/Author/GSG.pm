@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
 use version;
-our $VERSION = 'v0.0.20'; # VERSION
+our $VERSION = 'v0.1.0'; # VERSION
 
 use Moose;
 with qw(
@@ -53,6 +53,9 @@ sub configure {
             static_install_mode    => 'mode',
             static_install_dry_run => 'dry_run',
         } ) ],
+
+        # StaticInstall wants scripts in a script/ ExecDir
+        [ 'ExecDir' => { dir => 'script' } ],
 
         [ 'PodWeaver' => {
             replacer           => 'replace_with_comment',
@@ -154,7 +157,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version v0.0.20
+version v0.1.0
 
 =head1 SYNOPSIS
 
@@ -194,6 +197,9 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     [StaticInstall]
     ; mode    from static_install_mode
     ; dry_run from static_install_dry_run
+
+    [ExecDir]
+    dir = script    # in addition to bin/ for StaticInstall compatibility
 
     [Pod::Weaver]
     replacer = replace_with_comment

@@ -1,5 +1,8 @@
 Change log for Mail::AuthenticationResults
 
+1.20200331.1 2020-03-31 03:31:13+00:00 UTC
+        - Treat an undefined value as emptystring in search
+
 1.20200108 2020-01-08 03:38:09+00:00 UTC
         - Added as_json method to return structured JSON
           version of an instance.

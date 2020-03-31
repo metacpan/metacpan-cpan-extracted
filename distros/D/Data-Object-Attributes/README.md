@@ -31,6 +31,37 @@ If no directives are specified, the attribute is declared as `read-write` and
 
 This package supports the following scenarios:
 
+## has
+
+    package Example::Has;
+
+    use Moo;
+
+    has 'data' => (
+      is => 'ro',
+      isa => sub { die }
+    );
+
+    package Example::HasData;
+
+    use Moo;
+
+    use Data::Object::Attributes;
+
+    extends 'Example::Has';
+
+    has '+data' => (
+      is => 'ro',
+      isa => sub { 1 }
+    );
+
+    package main;
+
+    my $example = Example::HasData->new(data => time);
+
+This package supports the `has` keyword function and all of its
+configurations. See the [Moo](https://metacpan.org/pod/Moo) documentation for more details.
+
 ## has-bld
 
     package Example::HasBld;
@@ -219,7 +250,7 @@ documentation for more details.
 
 ## has-mod
 
-    package Example::Has;
+    package Example::HasNomod;
 
     use Moo;
 
@@ -236,7 +267,7 @@ documentation for more details.
 
     use Data::Object::Attributes;
 
-    extends 'Example::Has';
+    extends 'Example::HasNomod';
 
     has data => (
       is => 'ro',

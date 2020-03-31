@@ -81,4 +81,4 @@ To install this module type the following:
 
 ## Copyright
 
-Copyright (C) 2019-2020 by Giuseppe Di Terlizzi
+Copyright (C) 2020 by Giuseppe Di Terlizzi

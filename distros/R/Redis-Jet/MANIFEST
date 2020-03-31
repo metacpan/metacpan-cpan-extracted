@@ -17,6 +17,7 @@ t/03_utf8_server.t
 t/04_pipeline_err.t
 t/05_params.t
 t/06_large_data.t
+t/07_server_unix.t
 t/99_leaks.t
 typemap
 META.yml

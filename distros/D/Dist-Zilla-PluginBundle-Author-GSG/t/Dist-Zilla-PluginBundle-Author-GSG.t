@@ -315,4 +315,22 @@ subtest "Pass through Git::GatherDir params" => sub {
     );
 };
 
+subtest "Add 'script' ExecDir for StaticInstall" => sub {
+    my $tzil = Builder->from_config(
+        { dist_root => 'corpus/dist/exec_dir' },
+        {   add_files => {
+                'source/dist.ini' => dist_ini(
+                    { name => 'External-Fake' }, ['@Author::GSG'],
+                ),
+            }
+        }
+    );
+
+    my @dirs = sort map { $_->dir }
+        grep { $_->plugin_name =~ /\bExecDir$/ } @{ $tzil->plugins };
+
+    is_deeply \@dirs, [qw< bin script >],
+        "Have both bin/ and script/ ExecDirs";
+};
+
 done_testing;

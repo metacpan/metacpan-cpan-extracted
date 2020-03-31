@@ -3,7 +3,7 @@ package Mojolicious::Plugin::DataTables::SSP::Results;
 use Mojo::Base -base;
 use Mojo::JSON qw(encode_json);
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 has 'draw';
 has 'records_total';

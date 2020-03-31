@@ -15,7 +15,7 @@ meta->around_hook(probe => sub {
 });
 
 share {
-  start_url 'https://github.com/redis/hiredis/archive/v0.14.0.tar.gz';
+  start_url 'https://github.com/redis/hiredis/archive/v0.14.1.tar.gz';
   plugin 'Download';
   plugin Extract => format => 'tar.gz';
   build [

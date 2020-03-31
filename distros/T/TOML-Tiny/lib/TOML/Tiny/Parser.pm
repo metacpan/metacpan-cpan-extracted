@@ -1,6 +1,6 @@
 package TOML::Tiny::Parser;
 # ABSTRACT: parser used by TOML::Tiny
-$TOML::Tiny::Parser::VERSION = '0.05';
+$TOML::Tiny::Parser::VERSION = '0.06';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -26,7 +26,6 @@ sub new {
   bless{
     inflate_integer  => $param{inflate_integer}  || sub{ shift },
     inflate_float    => $param{inflate_float}    || sub{ shift },
-    inflate_number   => $param{inflate_number}   || sub{ shift },
     inflate_datetime => $param{inflate_datetime} || sub{ shift },
     inflate_boolean  => $param{inflate_boolean}  || sub{ shift eq 'true' ? $TRUE : $FALSE },
     strict_arrays    => $param{strict_arrays},
@@ -340,7 +339,7 @@ TOML::Tiny::Parser - parser used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

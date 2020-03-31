@@ -44,6 +44,41 @@ C<optional>.
 
 =cut
 
+=scenario has
+
+This package supports the C<has> keyword function and all of its
+configurations. See the L<Moo> documentation for more details.
+
+=example has
+
+  package Example::Has;
+
+  use Moo;
+
+  has 'data' => (
+    is => 'ro',
+    isa => sub { die }
+  );
+
+  package Example::HasData;
+
+  use Moo;
+
+  use Data::Object::Attributes;
+
+  extends 'Example::Has';
+
+  has '+data' => (
+    is => 'ro',
+    isa => sub { 1 }
+  );
+
+  package main;
+
+  my $example = Example::HasData->new(data => time);
+
+=cut
+
 =scenario has-is
 
 This package supports the C<is> directive, used to denote whether the attribute
@@ -259,7 +294,7 @@ supported by the L<Moo> object superclass.
 
 =example has-mod
 
-  package Example::Has;
+  package Example::HasNomod;
 
   use Moo;
 
@@ -276,7 +311,7 @@ supported by the L<Moo> object superclass.
 
   use Data::Object::Attributes;
 
-  extends 'Example::Has';
+  extends 'Example::HasNomod';
 
   has data => (
     is => 'ro',
@@ -568,6 +603,13 @@ $subs->synopsis(fun($tryable) {
   ok my $result = $tryable->result;
   ok !$result->data;
   ok $result->data(time);
+  ok $result->data;
+
+  $result
+});
+
+$subs->scenario('has', fun($tryable) {
+  ok my $result = $tryable->result;
   ok $result->data;
 
   $result

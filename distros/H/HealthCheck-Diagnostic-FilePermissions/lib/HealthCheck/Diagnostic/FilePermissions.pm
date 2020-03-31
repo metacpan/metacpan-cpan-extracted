@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: Check the paths for expected permissions in a HealthCheck
 use version;
-our $VERSION = 'v1.4.2'; # VERSION
+our $VERSION = 'v1.4.7'; # VERSION
 
 use strict;
 use warnings;
@@ -238,7 +238,7 @@ HealthCheck::Diagnostic::FilePermissions - Check the paths for expected permissi
 
 =head1 VERSION
 
-version v1.4.2
+version v1.4.7
 
 =head1 SYNOPSIS
 

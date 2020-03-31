@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/ChromeUtils/pause_chrome
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-12-09'; # DATE
+our $DATE = '2019-12-10'; # DATE
 our $DIST = 'App-ChromeUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,13 +39,23 @@ pause-chrome - Pause (kill -STOP) Chrome
 
 =head1 VERSION
 
-This document describes version 0.002 of pause-chrome (from Perl distribution App-ChromeUtils), released on 2019-12-09.
+This document describes version 0.003 of pause-chrome (from Perl distribution App-ChromeUtils), released on 2019-12-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % pause-chrome [options]
+
+=head1 DESCRIPTION
+
+A modern browser now runs complex web pages and applications. Despite browser's
+power management feature, these pages/tabs on the browser often still eat
+considerable CPU cycles even though they only run in the background. Stopping
+(kill -STOP) the browser processes is a simple and effective way to stop CPU
+eating on Unix. It can be performed whenever you are not using your browsers for
+a little while, e.g. when you are typing on an editor or watching a movie. When
+you want to use your browser again, simply unpause it.
 
 =head1 OPTIONS
 

@@ -31,6 +31,37 @@ SCENARIOS
 
     This package supports the following scenarios:
 
+ has
+
+      package Example::Has;
+    
+      use Moo;
+    
+      has 'data' => (
+        is => 'ro',
+        isa => sub { die }
+      );
+    
+      package Example::HasData;
+    
+      use Moo;
+    
+      use Data::Object::Attributes;
+    
+      extends 'Example::Has';
+    
+      has '+data' => (
+        is => 'ro',
+        isa => sub { 1 }
+      );
+    
+      package main;
+    
+      my $example = Example::HasData->new(data => time);
+
+    This package supports the has keyword function and all of its
+    configurations. See the Moo documentation for more details.
+
  has-bld
 
       package Example::HasBld;
@@ -222,7 +253,7 @@ SCENARIOS
 
  has-mod
 
-      package Example::Has;
+      package Example::HasNomod;
     
       use Moo;
     
@@ -239,7 +270,7 @@ SCENARIOS
     
       use Data::Object::Attributes;
     
-      extends 'Example::Has';
+      extends 'Example::HasNomod';
     
       has data => (
         is => 'ro',

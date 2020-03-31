@@ -11,7 +11,7 @@ configure_requires:
   Devel::CheckCompiler: '0.04'
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,17 +30,19 @@ no_index:
 provides:
   Redis::Jet:
     file: lib/Redis/Jet.pm
-    version: '0.08'
+    version: '0.09'
 requires:
-  perl: '5.008005'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/kazeburo/Redis-Jet/issues
   homepage: https://github.com/kazeburo/Redis-Jet
   repository: git://github.com/kazeburo/Redis-Jet.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:KAZEBURO
 x_contributors:
   - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'ToshiakiYokoda <adokoy001@gmail.com>'
   - 'itsusony <itsusony@fout.jp>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'itsusony <meng.xiangliang1985@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

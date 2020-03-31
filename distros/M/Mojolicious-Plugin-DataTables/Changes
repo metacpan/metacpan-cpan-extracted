@@ -1,5 +1,12 @@
 Revision history for Perl extension Mojolicious::Plugin::DataTables.
 
+1.03  2020-03-30
+    - Improved "where" param with SQL bind values
+
+1.02  2020-03-29
+    - Added "where" param
+    - Changed boolean condition for columns search (OR -> AND)
+
 1.01  2020-03-29
     - Added support for DataTables "regex" option using REGEXP (MySQL and SQLite)
       or "~" SQL operators (PostgreSQL)

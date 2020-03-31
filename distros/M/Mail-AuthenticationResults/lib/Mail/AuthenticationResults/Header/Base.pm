@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::Base;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20200108'; # VERSION
+our $VERSION = '1.20200331.1'; # VERSION
 use Scalar::Util qw{ weaken refaddr };
 use JSON;
 use Carp;
@@ -325,6 +325,7 @@ sub search {
     }
 
     if ( exists( $search->{ 'value' } ) ) {
+        $search->{ 'value' } = '' if ! defined $search->{ 'value' };
         if ( $self->_HAS_VALUE() ) {
             if ( ref $search->{ 'value' } eq 'Regexp' && $self->value() =~ m/$search->{'value'}/ ) {
                 $match = $match && 1;
@@ -414,7 +415,7 @@ Mail::AuthenticationResults::Header::Base - Base class for modelling parts of th
 
 =head1 VERSION
 
-version 1.20200108
+version 1.20200331.1
 
 =head1 DESCRIPTION
 
@@ -582,7 +583,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Marc Bradshaw.
+This software is copyright (c) 2020 by Marc Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

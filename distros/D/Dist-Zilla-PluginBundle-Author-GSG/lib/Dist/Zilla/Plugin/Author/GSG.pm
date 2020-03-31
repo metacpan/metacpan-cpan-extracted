@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 # ABSTRACT: Grant Street Group defaults CPAN dists
 use version;
-our $VERSION = 'v0.0.20'; # VERSION
+our $VERSION = 'v0.1.0'; # VERSION
 
 before 'BUILDARGS' => sub {
     my ($class, $args) = @_;
@@ -64,7 +64,7 @@ Dist::Zilla::Plugin::Author::GSG - Grant Street Group defaults CPAN dists
 
 =head1 VERSION
 
-version v0.0.20
+version v0.1.0
 
 =head1 SYNOPSIS
 

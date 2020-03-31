@@ -9,7 +9,7 @@ use routines;
 
 use Moo;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # BUILD
 
@@ -167,6 +167,8 @@ $builders->{wrt} = fun($info, $name, %opts) {
 fun options($info, $name, %opts) {
   %opts = (is => 'rw') unless %opts;
 
+  $opts{mod} = 1 if $name =~ s/^\+//;
+
   %opts = (%opts, $builders->{new}->($info, $name, %opts)) if defined $opts{new};
   %opts = (%opts, $builders->{bld}->($info, $name, %opts)) if defined $opts{bld};
   %opts = (%opts, $builders->{clr}->($info, $name, %opts)) if defined $opts{clr};
@@ -233,6 +235,39 @@ C<optional>.
 =head1 SCENARIOS
 
 This package supports the following scenarios:
+
+=cut
+
+=head2 has
+
+  package Example::Has;
+
+  use Moo;
+
+  has 'data' => (
+    is => 'ro',
+    isa => sub { die }
+  );
+
+  package Example::HasData;
+
+  use Moo;
+
+  use Data::Object::Attributes;
+
+  extends 'Example::Has';
+
+  has '+data' => (
+    is => 'ro',
+    isa => sub { 1 }
+  );
+
+  package main;
+
+  my $example = Example::HasData->new(data => time);
+
+This package supports the C<has> keyword function and all of its
+configurations. See the L<Moo> documentation for more details.
 
 =cut
 
@@ -440,7 +475,7 @@ documentation for more details.
 
 =head2 has-mod
 
-  package Example::Has;
+  package Example::HasNomod;
 
   use Moo;
 
@@ -457,7 +492,7 @@ documentation for more details.
 
   use Data::Object::Attributes;
 
-  extends 'Example::Has';
+  extends 'Example::HasNomod';
 
   has data => (
     is => 'ro',

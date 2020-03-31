@@ -31,7 +31,7 @@ Module options:
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 DESCRIPTION
 
@@ -375,7 +375,6 @@ sub calref {
 package App::week::CalYear {
     use Encode;
     use open IO => ':utf8';
-    use List::Util qw(max);
     use Text::ANSI::Fold;
     use Text::VisualWidth::PP qw(vwidth);
     sub TIEARRAY {
@@ -387,9 +386,9 @@ package App::week::CalYear {
 	$obj->{$year} //= [ CalYear($year) ];
     }
     sub CalYear {
-	my $year = shift;
+	my $year = sprintf "%4d", shift;
 	my $cal = `cal $year` =~ s/_[\b]//gr;
-	my @cal = $cal =~ /.+/g;
+	my @cal = split /\n/, $cal;
 	my @month = ( [ $cal[0] ], map [], 1..12 );
 	my @monthline = do {
 	    map  { $_ - 2 }		    # 2 lines up
@@ -398,17 +397,19 @@ package App::week::CalYear {
 	};
 	@monthline == 4 or die "cal(1) command format error.\n";
 	state $fields = do {
-	    $cal[$monthline[0] + 1] =~ 
+	    $cal[ $monthline[0] + 1 ] =~ 
 		m{^   (\s*)
-		      ( (?: (?:\S+)\s+){6} \S+ ) (\s+)
-		      ( (?: (?:\S+)\s+){6} \S+ ) (\s+)
-		      ( (?: (?:\S+)\s+){6} \S+ )
+		      ( (?: (?:\S+) \s+){6} \S+ ) (\s+)
+		      ( (?: (?:\S+) \s+){6} \S+ ) (\s+)
+		      ( (?: (?:\S+) \s+){6} \S+ )
 	    }x or die "cal(1): unexpected day-of-week line.";
-	    my $array = [ vwidth($1), vwidth($2), vwidth($3),
-			  vwidth($4), vwidth($5), vwidth($6) ];
-	    my $fold = new Text::ANSI::Fold width => $array, padding => 1;
+	    my $w = vwidth $2;
+	    my @w = (length $1, $w, length $3, $w, length $5, $w);
+	    my $fold = new Text::ANSI::Fold width => \@w, padding => 1;
 	    sub {
-		($fold->text(shift)->chops)[1, 3, 5];
+		map {
+		    $_ // ' ' x $w;
+		} ($fold->text(shift)->chops)[1, 3, 5];
 	    };
 	};
 	for my $i (0..$#monthline) {

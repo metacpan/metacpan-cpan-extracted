@@ -10,7 +10,7 @@ use Mojolicious::Plugin::DataTables::SSP::Column;
 use Mojolicious::Plugin::DataTables::SSP::Params;
 use Mojolicious::Plugin::DataTables::SSP::Results;
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 sub register {
 
@@ -55,11 +55,17 @@ sub _dt_ssp {
     my $db      = delete $args{db};
     my @columns = delete $args{columns};
     my $debug   = delete $args{debug};
+    my $where   = delete $args{where};
 
-    my $regexp_operator = 'REGEXP';    # MySQL and SQLite use REGEXP operator
+    if ( !$db ) {
+        $c->app->log->error('Missing "db" param') if ($debug);
+        return {};
+    }
+
+    my $regexp_operator = 'REGEXP';    # REGEXP operator for MySQL and SQLite
     my $db_type         = ref $db;
 
-    # PostgreSQL use "~" operator
+    # "~" operator for PostgreSQL
     if ( $db_type =~ /Mojo::Pg/ ) {
         $regexp_operator = '~';
     }
@@ -75,6 +81,16 @@ sub _dt_ssp {
     my @db_columns = $ssp->db_columns;
 
     push @db_columns, @columns;
+
+    if ($where) {
+        if (ref $where eq 'ARRAY') {
+            my ($where_sql, @where_bind) = @{$where};
+            push @db_filters, $where_sql;
+            push @db_bind, @where_bind;
+        } else {
+            push @db_filters, $where;
+        }
+    }
 
     # Column filter
     my @col_filters;
@@ -94,7 +110,7 @@ sub _dt_ssp {
     }
 
     if (@col_filters) {
-        push @db_filters, '(' . join( ' OR ', @col_filters ) . ')';
+        push @db_filters, '(' . join( ' AND ', @col_filters ) . ')';
     }
 
     # Global Search
@@ -229,6 +245,7 @@ sub _decode_params {
     $dt_params->{timestamp} = $req_params->param('_')      || 0;
     $dt_params->{columns}   = [];
     $dt_params->{order}     = [];
+    $dt_params->{where}     = undef;
 
     foreach ( @{ $req_params->names } ) {
 
@@ -298,6 +315,7 @@ Mojolicious::Plugin::DataTables - DataTables Plugin for Mojolicious
         db      => $db,
         columns => qw/role create_date/,
         debug   => 1,
+        where   => 'status = "active"'
         options => [
             {
                 label     => 'UID',
@@ -353,6 +371,8 @@ Params:
 =item C<columns>: Extra columns to fetch
 
 =item C<debug>: Write debug information using L<Mojo::Log> class
+
+=item C<where>: WHERE condition in SQL format
 
 =item C<options>: Array of options (see below)
 
@@ -467,6 +487,27 @@ The C<searchable> flag enable or disable a filter for specified column.
             ...
         }
     ]
+
+=head2 Where condition
+
+Use the C<where> option to filter the table:
+
+    $c->datatable->ssp(
+        table   => 'users',
+        db      => $db,
+        where   => 'status = 1',
+        options => [ ... ]
+    );
+
+It's possible to use array (C<[ where, bind_1, bind_2, ... ]>) to bind values:
+
+    $c->datatable->ssp(
+        table   => 'users',
+        db      => $db,
+        where   => [ 'status = ?', 'active' ],
+        options => [ ... ]
+    );
+
 
 =head1 SEE ALSO
 

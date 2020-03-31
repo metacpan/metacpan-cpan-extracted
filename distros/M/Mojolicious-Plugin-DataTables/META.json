@@ -45,6 +45,6 @@
          "web" : "https://github.com/giterlizzi/perl-Mojolicious-Plugin-DataTables"
       }
    },
-   "version" : "1.01",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

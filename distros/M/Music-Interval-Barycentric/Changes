@@ -1,5 +1,9 @@
 Revision history for Music-Interval-Barycentric
 
+0.0302 2020-03-30 20:18:44
+    - Improve documentation.
+    - Add test cases.
+
 0.0301 2018-12-30 20:48:58
     - Fix the eg/synopsis code.
     - Enhance the description documentation.

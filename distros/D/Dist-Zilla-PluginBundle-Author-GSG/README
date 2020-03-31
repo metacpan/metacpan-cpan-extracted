@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.0.20
+    version v0.1.0
 
 SYNOPSIS
 
@@ -44,6 +44,9 @@ SYNOPSIS
         [StaticInstall]
         ; mode    from static_install_mode
         ; dry_run from static_install_dry_run
+    
+        [ExecDir]
+        dir = script    # in addition to bin/ for StaticInstall compatibility
     
         [Pod::Weaver]
         replacer = replace_with_comment

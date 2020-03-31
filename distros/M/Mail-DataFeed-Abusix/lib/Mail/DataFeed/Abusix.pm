@@ -1,15 +1,15 @@
 package Mail::DataFeed::Abusix;
+use Moo;
 use v5.20;
 use strict;
 use warnings;
 use feature qw(postderef);
 no warnings qw(experimental::postderef);
 # ABSTRACT: Send SMTP transaction data to the Abusix transaction feed
-our $VERSION = '1.20181128'; ## VERSION
+our $VERSION = '1.20200331.1'; ## VERSION
 use Digest::MD5 qw(md5_hex);
 use IO::Socket;
 
-use Moo;
   has feed_name => ( is => 'ro', required => 1 );
   has feed_key => ( is => 'ro', required => 1);
   has feed_dest => ( is => 'ro', required => 1);
@@ -102,7 +102,7 @@ Mail::DataFeed::Abusix - Send SMTP transaction data to the Abusix transaction fe
 
 =head1 VERSION
 
-version 1.20181128
+version 1.20200331.1
 
 =head1 SYNOPSIS
 
@@ -191,7 +191,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Marc Bradshaw.
+This software is copyright (c) 2020 by Marc Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

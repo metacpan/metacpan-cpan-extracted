@@ -41,7 +41,7 @@ simple interfaces to communicate with Redis server
 
     - `server => "server:port"`
 
-        server address and port
+        server address and port. For using unix\_socket pass socket path to server like \`server => '/path/to/redis.sock'. When server includes \`/\`, Redis::Jet treat server as unix\_socket.
 
     - connect\_timeout
 
@@ -83,9 +83,9 @@ https://gist.github.com/kazeburo/608fc2ba0748e6ab3663
 
 \* [Redis](https://metacpan.org/pod/Redis)
 
-\* [Redis::Fast](https://metacpan.org/pod/Redis::Fast)
+\* [Redis::Fast](https://metacpan.org/pod/Redis%3A%3AFast)
 
-\* [Redis::hiredis](https://metacpan.org/pod/Redis::hiredis)
+\* [Redis::hiredis](https://metacpan.org/pod/Redis%3A%3Ahiredis)
 
 \* http://redis.io/
 

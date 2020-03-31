@@ -1,6 +1,6 @@
 package TOML::Tiny::Grammar;
 # ABSTRACT: exports regex definitions used to parse TOML source
-$TOML::Tiny::Grammar::VERSION = '0.05';
+$TOML::Tiny::Grammar::VERSION = '0.06';
 use strict;
 use warnings;
 use v5.18;
@@ -145,7 +145,7 @@ TOML::Tiny::Grammar - exports regex definitions used to parse TOML source
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

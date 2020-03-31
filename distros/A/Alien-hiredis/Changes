@@ -1,3 +1,6 @@
+0.009     2020-03-30 21:57:06 EDT
+  - Upgrade share install to version 0.14.1 of hiredis.
+
 0.008     2019-05-22 10:34:56 EDT
   - Require a newer version of Alien::Build::MM for a clean_install bugfix.
   - Reminder: You may need to reinstall XS modules built against Alien::hiredis if you had version 0.005 or older installed previously.

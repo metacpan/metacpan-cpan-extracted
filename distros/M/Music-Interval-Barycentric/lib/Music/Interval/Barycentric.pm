@@ -6,14 +6,13 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0302';
 
 use List::Util qw( min );
 
-require Exporter;
-use vars qw(@ISA @EXPORT);
-@ISA    = qw(Exporter);
-@EXPORT = qw(
+use Exporter 'import';
+
+our @EXPORT = qw(
     barycenter
     distance
     evenness_index
@@ -98,13 +97,15 @@ Music::Interval::Barycentric - Compute barycentric musical interval space
 
 =head1 VERSION
 
-version 0.0301
+version 0.0302
 
 =head1 SYNOPSIS
 
  use Music::Interval::Barycentric;
+
  my @chords = ([3, 4, 5], [0, 4, 7]);
- print 'Barycenter: ', join(', ', barycenter(3)), "\n";
+
+ print 'Barycenter: [', join(',', barycenter(scalar @chords)), "]\n";
  printf "Distance: %.3f\n", distance($chords[0], $chords[1]);
  print 'Evenness index: ', evenness_index($chords[0]), "\n";
  print 'Orbit distance: ', orbit_distance(@chords), "\n";
@@ -127,42 +128,42 @@ and thus the consonance of the chord."
 
 =head1 FUNCTIONS
 
-=head2 barycenter()
+=head2 barycenter
 
  @barycenter = barycenter($n);
 
-Return the barycenter (the "central coordinate")  given an integer representing
+Return the barycenter (the "central coordinate") given an integer representing
 the number of notes in a chord.
 
-=head2 distance()
+=head2 distance
 
  $d = distance($chord1, $chord2);
 
 Interval space distance metric between chords.
 
-* This is used by the C<orbit_distance()> and C<evenness_index()> functions.
+* This is used by the C<orbit_distance> and C<evenness_index> functions.
 
-=head2 orbit_distance()
+=head2 orbit_distance
 
   $d = orbit_distance($chord1, $chord2);
 
 Return the distance from C<chord1> to the minimum of the cyclic permutations
 for C<chord2>.
 
-=head2 forte_distance()
+=head2 forte_distance
 
   $d = forte_distance($chord1, $chord2);
 
 Return the distance from C<chord1> to the minimum of the cyclic permutations and
 reverse cyclic permutations for C<chord2>.
 
-=head2 cyclic_permutation()
+=head2 cyclic_permutation
 
  @cycles = cyclic_permutation(@intervals);
 
 Return the list of cyclic permutations of the given intervals.
 
-=head2 evenness_index()
+=head2 evenness_index
 
   $d = evenness_index($chord);
 
@@ -179,7 +180,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

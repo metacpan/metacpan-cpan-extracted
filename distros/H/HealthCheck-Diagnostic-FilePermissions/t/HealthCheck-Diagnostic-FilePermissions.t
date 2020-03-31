@@ -109,18 +109,18 @@ eq_or_diff( $run_check_or_error->(
 
 
 # Check for permissions on the file.
-chmod( 01755, $filename );
+chmod( 0755, $filename );
 $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
     files       => [ $filename ],
-    permissions => '1005', # 01755 in decimal
+    permissions => '493', # 0755 in decimal
 );
 eq_or_diff( $run_check_or_error->( $diagnostic ), [
-    'OK', qq{Permissions are 1755 for '$filename'},
+    'OK', qq{Permissions are 0755 for '$filename'},
 ], 'Pass when given the right file permissions.' );
-chmod( 01700, $filename );
+chmod( 0700, $filename );
 eq_or_diff( $run_check_or_error->( $diagnostic ), [
     'CRITICAL',
-    qq{Permissions should be 1755 but are 1700 for '$filename'},
+    qq{Permissions should be 0755 but are 0700 for '$filename'},
 ], 'Do not pass when the permissions are incorrect for a file.' );
 
 # Check for permissions when we have multiple files.
@@ -133,10 +133,10 @@ $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
 eq_or_diff( $run_check_or_error->( $diagnostic ), [
     'OK', qq{Permissions are correct for '$filename' and '$filename2'},
 ], 'Pass when the files have the same permission.' );
-chmod( 01700, $filename2 );
+chmod( 0700, $filename2 );
 eq_or_diff( $run_check_or_error->( $diagnostic ), [
     'CRITICAL',
-    qq{Permissions should be 0644 but are 1700 for '$filename2'},
+    qq{Permissions should be 0644 but are 0700 for '$filename2'},
 ], 'Do not pass when one of the files has different permissions.' );
 
 # Check for the right result when looking for permissions and one of the

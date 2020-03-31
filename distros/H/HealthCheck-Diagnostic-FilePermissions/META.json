@@ -51,7 +51,7 @@
    "provides" : {
       "HealthCheck::Diagnostic::FilePermissions" : {
          "file" : "lib/HealthCheck/Diagnostic/FilePermissions.pm",
-         "version" : "v1.4.2"
+         "version" : "v1.4.7"
       }
    },
    "release_status" : "stable",
@@ -65,9 +65,9 @@
          "web" : "https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-FilePermissions"
       }
    },
-   "version" : "v1.4.2",
-   "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "JSON::XS version 4.02",
+   "version" : "v1.4.7",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "JSON::XS version 3.04",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }
