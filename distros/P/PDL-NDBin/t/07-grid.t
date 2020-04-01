@@ -5,7 +5,8 @@ use warnings;
 
 use Test::More tests => 12;
 use Test::Exception;
-use PDL::Lite qw[ pdl ];
+# use PDL::Core rather than PDL::Lite to work around a bug in older PDL versions
+use PDL::Core qw[ pdl ];
 use PDL::Basic qw[ sequence ];
 use PDL::NDBin;
 use PDL::NDBin::Utils_PP;

@@ -24,7 +24,7 @@ EOD
 
 # note that version numbers with trailing zeroes (e.g, 0.010) created problems
 # in some of the tests
-pp_setversion( '0.019' );
+pp_setversion( '0.020' );
 
 # check for indx/PDL_Indx support
 use PDL::Lite; # load PDL to check definedness of &PDL::indx

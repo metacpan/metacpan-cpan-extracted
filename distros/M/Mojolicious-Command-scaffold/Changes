@@ -11,3 +11,9 @@ Revision history for Mojolicious::Command::scaffold
 
 0.0.4   2020-03-18
         Bugfix for template stub
+
+0.0.5   2020-04-01
+        Remove cpanfile.snapshot
+
+0.0.6   2020-04-01
+        Fix versioning issue

@@ -2,7 +2,7 @@ NAME
     Mojolicious::Plugin::Sticker - Stick apps together
 
 VERSION
-    0.0.1
+    0.0.2
 
 SYNOPSIS
     A simple Mojolicious plugin inspired by Mojolicious::Plugin::Mount to
@@ -67,8 +67,7 @@ DESCRIPTION
         my $embed = Mojo::Server->new->load_app('my-app');
         app->routes->add_child( $embed->routes );
 
-    head1 METHODS
-
+METHODS
     Mojolicious::Plugin::Sticker inherits all methods from
     Mojolicious::Plugin and implements the following new ones.
 

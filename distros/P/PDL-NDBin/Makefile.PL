@@ -43,6 +43,7 @@ my %WriteMakefileArgs = (
     "Module::Pluggable" => "3.1",
     "PDL" => "2.004",
     "PDL::Basic" => 0,
+    "PDL::Core" => 0,
     "PDL::Types" => 0,
     "Test::Deep" => 0,
     "Test::Exception" => 0,
@@ -50,7 +51,7 @@ my %WriteMakefileArgs = (
     "Test::NoWarnings" => 0,
     "Test::PDL" => "0.10"
   },
-  "VERSION" => "0.019",
+  "VERSION" => "0.020",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -73,6 +74,7 @@ my %FallbackPrereqs = (
   "Module::Pluggable" => "3.1",
   "PDL" => "2.004",
   "PDL::Basic" => 0,
+  "PDL::Core" => 0,
   "PDL::Lite" => 0,
   "PDL::Types" => 0,
   "POSIX" => 0,

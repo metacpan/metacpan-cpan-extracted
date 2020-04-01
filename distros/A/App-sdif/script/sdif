@@ -307,7 +307,7 @@ sub column_width {
 ## --colortable
 ##
 if ($opt_colortable) {
-    color_table($screen_width);
+    Getopt::EX::Colormap::colortable $screen_width;
     exit;
 }
 
@@ -863,44 +863,6 @@ sub unesc {
     $_;
 }
 
-sub color_table {
-    my $width = shift || 80;
-    for my $c (0..5) {
-	for my $b (0..5) {
-	    my @format =
-		("%d$b$c", "$c%d$b", "$b$c%d", "$b%d$c", "$c$b%d", "%d$c$b")
-		[0 .. min(5, $width / (4 * 6) - 1)];
-	    for my $format (@format) {
-		for my $a (0..5) {
-		    my $rgb = sprintf $format, $a;
-		    print $painter->("$rgb/$rgb", " $rgb");
-		}
-	    }
-	    print "\n";
-	}
-    }
-    for my $g (0..5) {
-	my $grey = $g x 3;
-	print $painter->("$grey/$grey", sprintf(" %-19s", $grey));
-    }
-    print "\n";
-    for ('L00' .. 'L25') {
-	print $painter->("$_/$_", " $_");
-    }
-    print "\n";
-    for my $alt (0, 1) {
-	for my $C (split //, "RGBCMYKW") {
-	    my $c = $alt ? lc $C : $C;
-	    print $painter->("$c/$c", "  $c ");
-	}
-	print "\n";
-    }
-    for my $rgb (qw(500 050 005 055 505 550 000 555)) {
-	print $painter->("$rgb/$rgb", " $rgb");
-    }
-    print "\n";
-}
-
 __END__
 
 =pod
@@ -1260,9 +1222,9 @@ Defaults are :
     OCOMMAND => "555/010"  or "GS"
     NCOMMAND => "555/010"  or "GS"
     MCOMMAND => "555/010"  or "GS"
-    OFILE    => "555/010D" or "GDS"
-    NFILE    => "555/010D" or "GDS"
-    MFILE    => "555/010D" or "GDS"
+    OFILE    => "551/010D" or "GDS"
+    NFILE    => "551/010D" or "GDS"
+    MFILE    => "551/010D" or "GDS"
     OMARK    => "010/444"  or "G/W"
     NMARK    => "010/444"  or "G/W"
     MMARK    => "010/444"  or "G/W"
@@ -1328,7 +1290,7 @@ Environment variable B<SDIFOPTS> is used to set default options.
 
 =head1 LICENSE
 
-Copyright 1992-2019 Kazumasa Utashiro
+Copyright 1992-2020 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -1343,6 +1305,8 @@ L<Getopt::EX::Colormap>
 L<App::sdif::colors>,
 L<App::sdif::autocolor>,
 L<App::sdif::autocolor::Apple_Terminal>
+
+L<https://taku910.github.io/mecab/>
 
 =cut
 

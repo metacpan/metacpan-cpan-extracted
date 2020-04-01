@@ -1,5 +1,6 @@
 use Test::More;
 use Test::Mojo;
+use Mojo::File;
 
 my $t = Test::Mojo->new( Mojo::File->new('t/lib/apps/main') );
 

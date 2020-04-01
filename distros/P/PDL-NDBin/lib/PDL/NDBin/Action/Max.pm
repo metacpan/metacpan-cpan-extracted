@@ -1,6 +1,6 @@
 package PDL::NDBin::Action::Max;
 # ABSTRACT: Action for PDL::NDBin that computes maximum
-$PDL::NDBin::Action::Max::VERSION = '0.019';
+$PDL::NDBin::Action::Max::VERSION = '0.020';
 
 use strict;
 use warnings;
@@ -56,7 +56,7 @@ PDL::NDBin::Action::Max - Action for PDL::NDBin that computes maximum
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 DESCRIPTION
 

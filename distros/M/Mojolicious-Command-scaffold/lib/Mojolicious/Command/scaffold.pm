@@ -5,7 +5,7 @@ use Getopt::Long;
 use List::Util qw(any);
 use Mojo::File 'path';
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.6';
 
 # Short description
 has 'description' => <<EOF;

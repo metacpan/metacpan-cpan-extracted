@@ -63358,3 +63358,10 @@ T/TO/TOMZO/Video-ZVBI-1.0.0.tar.gz
 W/WA/WATERKIP/WebService-KvKAPI-0.007.tar.gz
 D/DD/DDICK/WebService-SSLLabs-0.33.tar.gz
 P/PE/PERLANCAR/YouTube-Util-0.002.tar.gz
+U/UT/UTASHIRO/App-sdif-4.13.6.tar.gz
+J/JH/JHTHORSEN/App-tt-0.11.tar.gz
+L/LN/LNATION/Caller-First-0.01.tar.gz
+C/CR/CRLCU/db-sql-migrations-advanced-v0.0.4.tar.gz
+C/CR/CRLCU/Mojolicious-Command-scaffold-0.0.6.tar.gz
+B/BL/BLABOS/Mojolicious-Plugin-Sticker-v0.0.2.tar.gz
+E/EB/EBAUDREZ/PDL-NDBin-0.020.tar.gz

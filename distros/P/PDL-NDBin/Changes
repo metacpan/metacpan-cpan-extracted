@@ -1,5 +1,10 @@
 Revision history for PDL::NDBin
 
+0.020     2020-04-01 14:11:44+02:00 Europe/Brussels
+
+ - fixed the test suite breaking on some, but not all, versions of PDL, due to
+   PDL::Lite not exporting pdl() (Edward Baudrez)
+
 0.019     2020-03-26 10:19:45+01:00 Europe/Brussels
 
  - fixed the test suite breaking because recent versions of PDL::Lite no longer

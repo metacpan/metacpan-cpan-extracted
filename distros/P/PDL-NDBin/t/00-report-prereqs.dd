@@ -47,6 +47,7 @@ do { my $x = {
                                    'Module::Pluggable' => '3.1',
                                    'PDL' => '2.004',
                                    'PDL::Basic' => '0',
+                                   'PDL::Core' => '0',
                                    'PDL::Types' => '0',
                                    'Test::Deep' => '0',
                                    'Test::Exception' => '0',

@@ -1,0 +1,8 @@
+Revision history for Mojolicious::Plugin::Sticker
+
+v0.0.2  2020-04-01
+            - Some minor fixes on pod, tests and .gitignore
+            - Adding this file
+
+v0.0.1  2020-03-31
+            -Initial commit

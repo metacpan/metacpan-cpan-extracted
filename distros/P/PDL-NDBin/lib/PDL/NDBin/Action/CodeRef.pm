@@ -1,6 +1,6 @@
 package PDL::NDBin::Action::CodeRef;
 # ABSTRACT: Action for PDL::NDBin that calls user sub
-$PDL::NDBin::Action::CodeRef::VERSION = '0.019';
+$PDL::NDBin::Action::CodeRef::VERSION = '0.020';
 
 use strict;
 use warnings;
@@ -54,7 +54,7 @@ PDL::NDBin::Action::CodeRef - Action for PDL::NDBin that calls user sub
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 DESCRIPTION
 

@@ -30,6 +30,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+use Getopt::EX::Colormap;
 use App::sdif::autocolor qw(rgb_to_brightness);
 use App::cdif::Command::OSAscript;
 
@@ -65,6 +66,7 @@ sub initialize {
 	    default =>
 	    $brightness > 50 ? '--light' : '--dark');
     }
+    $Getopt::EX::Colormap::RGB24 = 1;
 }
 
 1;

@@ -5,7 +5,7 @@ use DBIx::MultiStatementDo;
 use File::Basename;
 use File::Slurp;
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.4';
 
 has 'applied_migrations' => sub {
     my $self = shift;

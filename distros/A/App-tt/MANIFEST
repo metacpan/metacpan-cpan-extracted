@@ -10,8 +10,8 @@ README
 README.md
 script/tt
 t/00-basic.t
-t/actions.t
 t/Helper.pm
+t/methods.t
 t/register.t
 t/start-stop.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

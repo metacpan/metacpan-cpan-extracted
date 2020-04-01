@@ -1,5 +1,10 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.13.6 2020-04-01T12:27:30Z
+
+    - Move colortable() function in sdif to Getopt::EX::Colormap.
+    - Set $Getopt::EX::Colormap::RGB24 on iTerm2.
+
 4.13.5 2020-03-17T03:27:33Z
 
     - Update sdif default color for *FILE.

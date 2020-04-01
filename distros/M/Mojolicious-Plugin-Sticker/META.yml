@@ -26,13 +26,13 @@ no_index:
 provides:
   Mojolicious::Plugin::Sticker:
     file: lib/Mojolicious/Plugin/Sticker.pm
-    version: v0.0.1
+    version: v0.0.2
 requires:
   Mojolicious: '0'
 resources:
   bugtracker: https://github.com/blabos/Mojolicious-Plugin-Sticker/issues
   repository: https://github.com/blabos/Mojolicious-Plugin-Sticker
-version: v0.0.1
+version: v0.0.2
 x_Dist_Zilla:
   perl:
     version: '5.030002'

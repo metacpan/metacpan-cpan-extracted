@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Sticker;
-$Mojolicious::Plugin::Sticker::VERSION = 'v0.0.1';
+$Mojolicious::Plugin::Sticker::VERSION = 'v0.0.2';
 use Mojo::Base 'Mojolicious::Plugin';
 
 sub register {
@@ -24,7 +24,7 @@ Mojolicious::Plugin::Sticker - Stick apps together
 
 =head1 VERSION
 
-0.0.1
+0.0.2
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ This is exclty what this plugin does:
     app->routes->add_child( $embed->routes );
 
 
-head1 METHODS
+=head1 METHODS
 
 L<Mojolicious::Plugin::Sticker> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
