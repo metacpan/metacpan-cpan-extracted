@@ -252,7 +252,7 @@ foreach my $endpoint (@endpoints) {
 		ok($endpoint_details->heartbeat() =~ /^[01]$/smx, "\$endpoint_details->heartbeat() is a 0 or is a 1");
 		ok($endpoint_details->rc4_with_modern() =~ /^[01]$/smx, "\$endpoint_details->rc4_with_modern() is a 0 or is a 1");
 		if (defined $endpoint_details->sts_response_header()) {
-			ok($endpoint_details->sts_response_header() =~ /^max[-]age=\d+$/smx, "\$endpoint_details->sts_response_header() looks good");
+			ok($endpoint_details->sts_response_header() =~ /^(max[-]age=\d+|)$/smx, "\$endpoint_details->sts_response_header() looks good:" . $endpoint_details->sts_response_header());
 		}
 		ok($endpoint_details->sts_subdomains() =~ /^[01]$/smx, "\$endpoint_details->sts_subdomains() is a 0 or is a 1");
 		if (defined $endpoint_details->pkp_response_header()) {

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use Test::More;
 use Data::Dumper;
 use FASTX::Reader;
-my $seq = "$Bin/../data/test.fastq";
+my $seq = "$RealBin/../data/test.fastq";
 
 # Check required input file
 if (! -e $seq) {

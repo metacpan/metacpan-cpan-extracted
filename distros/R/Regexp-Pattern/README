@@ -6,8 +6,8 @@ SPECIFICATION VERSION
     0.2
 
 VERSION
-    This document describes version 0.2.13 of Regexp::Pattern (from Perl
-    distribution Regexp-Pattern), released on 2020-02-08.
+    This document describes version 0.2.14 of Regexp::Pattern (from Perl
+    distribution Regexp-Pattern), released on 2020-04-01.
 
 SYNOPSIS
     Subroutine interface:
@@ -336,7 +336,9 @@ FUNCTIONS
     it as hashref in the second argument of "re()".
 
     Anchoring. You can also put "-anchor => 1" in %args. This will
-    conveniently wraps the regex inside "qr/\A(?:...)\z/".
+    conveniently wraps the regex inside "qr/\A(?:...)\z/". To only add left
+    anchoring, specify "-anchor => 'left'" ("qr/\A(?:...)/". To only add
+    right anchoring, specify "-anchor => 'right'" ("qr/(?:...)\z/".
 
     Die when pattern by name $name cannot be found (either the module cannot
     be loaded or the pattern with that name is not found in the module).

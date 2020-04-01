@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.316';
+our $VERSION = '0.318';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -207,7 +207,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.316
+Version 0.318
 
 =cut
 
@@ -274,6 +274,23 @@ Create/use uploader directories
 - yes
 
 - if chosen from an uploader or a playlist
+
+=head3 Filename format info
+
+Which format info should be added to the filename.
+
+- none (unsafe)
+
+- video-height (unsafe)
+
+- format-id
+
+- format-id and video-height
+
+- format-string
+
+I<none> and I<video-height> are unsafe because the don't result in an unambiguous filename and could therefore overwrite
+previously downloaded files.
 
 =head2 Video format
 

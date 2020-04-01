@@ -9,7 +9,7 @@ use base qw{ PPIx::QuoteLike::Token::Structure };
 
 use PPIx::QuoteLike::Constant qw{ MINIMUM_PERL @CARP_NOT };
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 # Perl 5.29.0 disallows unassigned code points and combining code points
 # as delimiters. Unfortunately for me non-characters and illegal

@@ -1,3 +1,11 @@
+1.827   2020-04-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add attribute: allow_unknown_opts.
+
+	- Adjust to Perinci::CmdLine::Help 0.172 (must now pass
+	  meta_is_normalized=1 or meta will be normalized first).
+
+
 1.826   2020-01-31  Released-By: PERLANCAR; Urgency: medium
 
 	- Add common option: --page-result:s.
@@ -1523,4 +1531,3 @@
 0.01     2014-07-16  Released-By: SHARYANTO
 
          - First release, early release, completion not yet implemented.
-

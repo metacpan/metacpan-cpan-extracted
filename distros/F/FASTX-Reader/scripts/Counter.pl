@@ -2,13 +2,13 @@
 use 5.010;
 use Carp qw(confess);
 use FindBin qw($Bin);
-use lib "$Bin/../lib/";
+use lib "$RealBin/../lib/";
 use FASTX::Reader;
 
 # Read two samples files if the user didnt provide any filename
 unless ($ARGV[0]) {
  say STDERR "[WARNING] No input file specified, using test data";
- push(@ARGV,"$Bin/../data/test.fastq", "$Bin/../data/test.fasta" );
+ push(@ARGV,"$RealBin/../data/test.fastq", "$RealBin/../data/test.fasta" );
  say STDERR<<END;
  Counter.pl - Script using FASTX::Reader to count sequences in FASTA/FASTQ files
  -------------------------------------------------------------------------------

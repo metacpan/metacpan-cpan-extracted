@@ -2,7 +2,7 @@ use 5.008007;
 package DBIx::Custom;
 use Object::Simple -base;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use Carp 'confess';
 use DBI;
@@ -306,8 +306,6 @@ sub execute {
   my $bind_type = $opt{bind_type};
   $bind_type = _array_to_hash($bind_type) if ref $bind_type eq 'ARRAY';
   
-  # Fix param
-  
   # Create query
   my $query = DBIx::Custom::Query->new;
   $query->param($param);
@@ -325,19 +323,22 @@ sub execute {
   
   # Build bind values
   $query->build;
-
-  # Return query
-  if ($opt{query}) {
-    return $query;
-  }
   
-  # Prepare statement handle
+  # Statement handle
   my $sth;
-  my $prepare_attr = $opt{prepare_attr} || {};
-  eval { $sth = $self->dbh->prepare($parsed_sql, $prepare_attr) };
-  if ($@) {
-    $self->_confess($@, qq{. Following SQL is executed.\n}
-                    . qq{$parsed_sql\n} . _subname);
+  my $reuse_sth;
+  $reuse_sth = $opt{reuse}->{$parsed_sql} if $opt{reuse};
+  if ($reuse_sth) {
+    $sth = $reuse_sth;
+  }
+  else {
+    # Prepare statement handle
+    eval { $sth = $self->dbh->prepare($parsed_sql) };
+    if ($@) {
+      $self->_confess($@, qq{. Following SQL is executed.\n}
+                      . qq{$parsed_sql\n} . _subname);
+    }
+    $opt{reuse}->{$parsed_sql} = $sth if $opt{reuse};
   }
   
   # Execute
@@ -867,7 +868,7 @@ sub values_clause {
   
   my @columns;
   my @place_holders;
-  for my $column (keys %$param) {
+  for my $column (sort keys %$param) {
     confess qq{"$column" is not safety column name in values clause} . _subname
       unless $column =~ /^[$safety_character\.]+$/;
 
@@ -891,7 +892,7 @@ sub assign_clause {
   my $safety_character = $self->safety_character;
 
   my @set_values;
-  for my $column (keys %$param) {
+  for my $column (sort keys %$param) {
     confess qq{"$column" is not safety column name in assign clause} . _subname
       unless $column =~ /^[$safety_character\.]+$/;
       
@@ -1419,7 +1420,7 @@ sub _where_clause_and_param {
     
     my $clause = [];
     my $column_join = '';
-    for my $column (keys %$where) {
+    for my $column (sort keys %$where) {
       
       confess qq{"$column" is not safety column name in where clause} . _subname
         unless $column =~ /^[$safety_character\.]+$/;
@@ -2174,13 +2175,12 @@ and before type rule filter is executed.
   
   reuse => $hash_ref
 
-Reuse query object if the hash reference variable is set.
+Reuse statement handle in same SQL.
   
-  my $queries = {};
-  $dbi->execute($sql, $param, reuse => $queries);
+  my $reuse = {};
+  $dbi->execute($sql, $param, reuse => $reuse);
 
-This will improved performance when you want to execute same query repeatedly
-because generally creating query object is slow.
+This will improved performance when you want to execute same sql repeatedly.
 
 =item table
   
@@ -2224,54 +2224,12 @@ Turn C<into1> type rule off.
 
 Turn C<into2> type rule off.
 
-=item prepare_attr EXPERIMENTAL
+=item prepare_attr
 
   prepare_attr => {mysql_use_result => 1}
 
 Statemend handle attributes,
 this is L<DBI>'s C<prepare> method second argument.
-
-=item query EXPERIMENTAL
-
-  query => 1
-
-If you want to get SQL information only except execution,
-You can get L<DBIx::Custom::Query> object by this option.
-
-  my $query = $dbi->execute(
-    "insert into book (id, name) values (:id, :name)",
-    {id => 1, name => 'Perl'},
-    query => 1
-  );
-
-L<DBIx::Custom::Query> have the following information
-
-  my $sql = $query->sql;
-  my $param = $query->param;
-  my $columns $query->columns;
-
-You can get bind values and the types by the following way.
-  
-  # Build bind values and types
-  $query->build;
-  
-  # Get bind values
-  my $bind_values = $query->bind_values;
-  
-  # Get bind types
-  my $bind_value_types = $query->bind_value_types;
-
-You can prepare sql and execute SQL by L<DBI> directry.
-  
-  my $sth = $dbi->dbh->prepare($sql);
-  $sth->execute($sql, @$bind_values);
-
-If you know parameters have no duplicate column name, have no filter,
-you get bind values in the following fastest way.
-
-my $bind_values = [map { $param->{$_} } @columns]
-
-=back
 
 =head2 get_column_info
 
@@ -2910,12 +2868,6 @@ You can use this in insert statement.
 
 Create a new L<DBIx::Custom::Where> object.
 See L<DBIx::Custom::Where> to know how to create where clause.
-
-=head2 create_result EXPERIMENTAL
-
-  my $result = $dbi->create_result($sth);
-
-Create L<DBIx::Custom::Result> object.
 
 =head1 ENVIRONMENTAL VARIABLES
 

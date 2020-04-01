@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => "2.1",
     "FindBin" => "1.3"
   },
-  "VERSION" => "0.70",
+  "VERSION" => "0.80",
   "test" => {
     "TESTS" => "t/*.t"
   }

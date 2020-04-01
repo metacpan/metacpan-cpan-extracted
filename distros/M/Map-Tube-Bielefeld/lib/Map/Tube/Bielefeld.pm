@@ -1,6 +1,6 @@
 package Map::Tube::Bielefeld;
 
-$VERSION = '2019.0816';
+$VERSION = '2020.0330';
 
 =head1 NAME
 

@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.120   2020-04-01
+        - Bugfix in choose_a_number: undefined $digit.
+
 0.119   2020-03-17
         - Code refactoring.
 

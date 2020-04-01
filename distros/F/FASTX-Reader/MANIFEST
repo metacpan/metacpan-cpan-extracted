@@ -15,6 +15,10 @@ data/comments.fasta
 data/comments.fastq
 data/compressed.fasta.gz
 data/compressed.fastq.gz
+data/dataset.fastq.gz
+data/illumina_1.fq.gz
+data/illumina_2.fq.gz
+data/illumina_nocomm.fq
 data/more_comments.fa
 data/old_sanger.fastq
 data/test.fasta
@@ -23,11 +27,14 @@ data/test2.fastq
 dist.ini
 latest.tar.gz
 lib/FASTX/Reader.pm
+scripts/Benchmark.pl
 scripts/Counter.pl
 scripts/FastqReader.pl
 scripts/Loader.pl
 scripts/Reader.pl
 scripts/Stdin.pl
+scripts/_fq.pl
+scripts/_fx.pl
 scripts/biox_reader.pl
 setup.sh
 t/01_basic_test.t
@@ -46,6 +53,8 @@ t/09_error_nofile.t
 t/10_error_fastq.t
 t/11_get_format.t
 t/12_gzipped_fasta.t
+t/13_illumina_read.t
+t/14_illumina_nonillumina.t
 t/release-00-pod.t
 t/release-01-pod-coverage.t
 t/release-03-minimum-standards.t

@@ -1,0 +1,5 @@
+## Since package version is added as 2nd line by the build system
+[-TestingAndDebugging::RequireUseStrict]
+
+## We are using signatures instead of prototypes
+[-Subroutines::ProhibitSubroutinePrototypes]

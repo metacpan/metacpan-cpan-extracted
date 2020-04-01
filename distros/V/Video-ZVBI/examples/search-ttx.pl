@@ -19,7 +19,7 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-# $Id: search-ttx.pl,v 1.2 2007/12/02 18:32:11 tom Exp tom $
+# $Id: search-ttx.pl,v 1.3 2020/04/01 07:34:29 tom Exp tom $
 
 use strict;
 use blib;

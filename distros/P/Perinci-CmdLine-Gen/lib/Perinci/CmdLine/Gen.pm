@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Gen;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-18'; # DATE
+our $DATE = '2020-04-01'; # DATE
 our $DIST = 'Perinci-CmdLine-Gen'; # DIST
-our $VERSION = '0.495'; # VERSION
+our $VERSION = '0.496'; # VERSION
 
 use 5.010001;
 use strict;
@@ -140,6 +140,10 @@ _
             'summary.alt.bool.not' => 'Prefer Perinci::CmdLine::Classic backend',
             schema  => 'bool',
             default => 1,
+        },
+        allow_unknown_opts => {
+            summary => 'Will be passed to Perinci::CmdLine constructor',
+            schema => 'bool',
         },
         pass_cmdline_object => {
             summary => 'Will be passed to Perinci::CmdLine constructor',
@@ -446,12 +450,12 @@ sub gen_pericmd_script {
         # determine minimum required version
         if ($cmdline_mod =~ /\APerinci::CmdLine::(Lite|Any)\z/) {
             if ($cmdline_mod eq 'Perinci::CmdLine::Lite') {
-                $cmdline_mod_ver = "1.820";
+                $cmdline_mod_ver = "1.827";
             } else {
-                $extra_modules->{"Perinci::CmdLine::Lite"} = "1.820";
+                $extra_modules->{"Perinci::CmdLine::Lite"} = "1.827";
             }
         } elsif ($cmdline_mod =~ /\APerinci::CmdLine::Classic\z/) {
-            $extra_modules->{"Perinci::CmdLine::Base"} = "1.820";
+            $extra_modules->{"Perinci::CmdLine::Base"} = "1.827";
             $extra_modules->{"Perinci::CmdLine::Classic"} = "1.770";
         }
 
@@ -492,6 +496,7 @@ sub gen_pericmd_script {
             (defined($args{default_subcommand}) ? "    default_subcommand => " . dump($args{default_subcommand}) . ",\n" : ""),
             (defined($args{log}) ? "    log => " . dump($args{log}) . ",\n" : ""),
             ($args{default_log_level} ? "    log_level => " . dump($args{default_log_level}) . ",\n" : ""),
+            (defined($args{allow_unknown_opts}) ? "    allow_unknown_opts => " . dump($args{allow_unknown_opts}) . ",\n" : ""),
             (defined($args{pass_cmdline_object}) ? "    pass_cmdline_object => " . dump($args{pass_cmdline_object}) . ",\n" : ""),
             (defined($args{extra_urls_for_version}) ? "    extra_urls_for_version => " . dump($args{extra_urls_for_version}) . ",\n" : ""),
             (defined($args{read_config}) ? "    read_config => " . ($args{read_config} ? 1:0) . ",\n" : ""),
@@ -589,7 +594,7 @@ Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.495 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2020-03-18.
+This document describes version 0.496 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2020-04-01.
 
 =head1 FUNCTIONS
 
@@ -617,6 +622,10 @@ some modules (e.g. non-core XS modules) are prohibited because the goal is to
 have a free-standing script. This option allows whitelisting some extra modules.
 
 If you use C<Perinci::CmdLine::Inline>, this option will be passed to it.
+
+=item * B<allow_unknown_opts> => I<bool>
+
+Will be passed to Perinci::CmdLine constructor.
 
 =item * B<cmdline> => I<perl::modname> (default: "Perinci::CmdLine::Any")
 
@@ -833,6 +842,10 @@ some modules (e.g. non-core XS modules) are prohibited because the goal is to
 have a free-standing script. This option allows whitelisting some extra modules.
 
 If you use C<Perinci::CmdLine::Inline>, this option will be passed to it.
+
+=item * B<allow_unknown_opts> => I<bool>
+
+Will be passed to Perinci::CmdLine constructor.
 
 =item * B<cmdline> => I<perl::modname> (default: "Perinci::CmdLine::Any")
 

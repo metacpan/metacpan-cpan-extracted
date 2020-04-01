@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Tom Zoerner.
+ * Copyright (C) 2006-2020 T. Zoerner.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * $Id: ZVBI.xs,v 1.7 2011/01/02 16:41:28 tom Exp tom $
+ * $Id: ZVBI.xs,v 1.8 2020/04/01 07:17:11 tom Exp tom $
  */
 
 #include "EXTERN.h"
@@ -3918,17 +3918,19 @@ vbi_search_new(vbi, pgno, subno, sv_pattern, casefold=0, regexp=0, progress=NULL
         uint16_t * p_ucs;
         uint16_t * p;
         char * p_utf;
+        const char * p_utf_end;
         STRLEN len;
         int rest;
         unsigned cb_idx;
         CODE:
         /* convert pattern string from Perl's utf8 into UCS-2 */
         p_utf = SvPVutf8_force(sv_pattern, len);
+        p_utf_end = p_utf + len;
         Newx(p_ucs, len * 2 + 2, uint16_t);
         p = p_ucs;
         rest = len;
         while (rest > 0) {
-                *(p++) = utf8_to_uvchr((U8*)p_utf, &len);
+                *(p++) = utf8_to_uvchr_buf((U8*)p_utf, p_utf_end, &len);
                 if (len > 0) {
                         p_utf += len;
                         rest -= len;

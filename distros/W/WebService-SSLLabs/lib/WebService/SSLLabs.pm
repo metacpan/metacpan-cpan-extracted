@@ -10,7 +10,7 @@ use WebService::SSLLabs::Host();
 use WebService::SSLLabs::Endpoint();
 use WebService::SSLLabs::StatusCodes();
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 sub _MINIMUM_ETA_TIME { return 10; }
 
@@ -184,7 +184,7 @@ WebService::SSLLabs - Analyze the configuration of any SSL web server on the pub
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =head1 SYNOPSIS
 

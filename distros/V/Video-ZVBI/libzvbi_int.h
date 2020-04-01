@@ -23,7 +23,7 @@
  */
 
 /* Copied from libzvbi release 0.2.26 */
-/* Perl $Id: libzvbi_int.h,v 1.2 2007/11/28 20:45:36 tom Exp tom $ */
+/* Perl $Id: libzvbi_int.h,v 1.3 2020/04/01 07:22:34 tom Exp tom $ */
 
 /* Generated file, do not edit! */
 
@@ -1733,7 +1733,7 @@ _vbi_inline int
 vbi_unpar8			(unsigned int		c)
 {
 #ifdef __GNUC__
-#if #cpu (i686)
+#if defined(__i686__)  /*#if #cpu (i686)*/
 	int r = c & 127;
 
 	/* This saves cache flushes and an explicit branch. */

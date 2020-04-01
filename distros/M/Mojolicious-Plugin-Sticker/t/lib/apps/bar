@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+
+use Mojolicious::Lite;
+
+get '/bar' => sub {
+    my $c = shift;
+
+    $c->render( json => { bar => 456 } );
+};
+
+post '/baz' => sub {
+    my $c    = shift;
+    my $json = $c->req->json;
+    my $baz  = $json->{baz};
+
+    $c->render( json => { baz => $baz + 42 } );
+};
+
+app->start;
+

@@ -1,9 +1,9 @@
 package Regexp::Pattern;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-08'; # DATE
+our $DATE = '2020-04-01'; # DATE
 our $DIST = 'Regexp-Pattern'; # DIST
-our $VERSION = '0.2.13'; # VERSION
+our $VERSION = '0.2.14'; # VERSION
 
 use strict 'subs', 'vars';
 #use warnings;
@@ -34,7 +34,13 @@ sub re {
     }
 
     if ($args{-anchor}) {
+        if ($args{-anchor} eq 'left') {
+            $pat = qr/\A(?:$pat)/;
+        } elsif ($args{-anchor} eq 'right') {
+            $pat = qr/(?:$pat)\z/;
+        } else {
             $pat = qr/\A(?:$pat)\z/;
+        }
     }
 
     return $pat;
@@ -153,7 +159,7 @@ Regexp::Pattern - Convention/framework for modules that contain collection of re
 
 =head1 VERSION
 
-This document describes version 0.2.13 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2020-02-08.
+This document describes version 0.2.14 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2020-04-01.
 
 =head1 SYNOPSIS
 
@@ -487,7 +493,9 @@ dynamic pattern can accept arguments for its generator, and you can pass it as
 hashref in the second argument of C<re()>.
 
 B<Anchoring.> You can also put C<< -anchor => 1 >> in C<%args>. This will
-conveniently wraps the regex inside C<< qr/\A(?:...)\z/ >>.
+conveniently wraps the regex inside C<< qr/\A(?:...)\z/ >>. To only add left
+anchoring, specify C<< -anchor => 'left' >> (C<< qr/\A(?:...)/ >>. To only add
+right anchoring, specify C<< -anchor => 'right' >> (C<< qr/(?:...)\z/ >>.
 
 Die when pattern by name C<$name> cannot be found (either the module cannot be
 loaded or the pattern with that name is not found in the module).

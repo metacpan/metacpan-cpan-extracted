@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.495 of Perinci::CmdLine::Gen (from
-    Perl distribution Perinci-CmdLine-Gen), released on 2020-03-18.
+    This document describes version 0.496 of Perinci::CmdLine::Gen (from
+    Perl distribution Perinci-CmdLine-Gen), released on 2020-04-01.
 
 FUNCTIONS
   gen_pericmd_script
@@ -28,6 +28,10 @@ FUNCTIONS
 
         If you use "Perinci::CmdLine::Inline", this option will be passed to
         it.
+
+    *   allow_unknown_opts => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
 
     *   cmdline => *perl::modname* (default: "Perinci::CmdLine::Any")
 
@@ -242,6 +246,10 @@ FUNCTIONS
 
         If you use "Perinci::CmdLine::Inline", this option will be passed to
         it.
+
+    *   allow_unknown_opts => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
 
     *   cmdline => *perl::modname* (default: "Perinci::CmdLine::Any")
 

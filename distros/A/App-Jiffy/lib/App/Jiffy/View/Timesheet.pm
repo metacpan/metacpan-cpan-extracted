@@ -10,7 +10,7 @@ use DateTime;
 sub render {
   my $entries = shift;
   my $options = shift;
-  my $from = $options->{from};
+  my $from    = $options->{from};
 
   # Header
   if ($from) {
@@ -38,7 +38,7 @@ sub render {
 
     # Get the deltas
     my $duration = $entry->duration;
-    my %deltas = $duration->deltas;
+    my %deltas   = $duration->deltas;
 
     foreach my $unit ( sort keys %deltas ) {
       next unless $deltas{$unit};
@@ -47,11 +47,13 @@ sub render {
 
     # Print entry
     if ( $options->{verbose} ) {
-      my ( $clock_time ) = $entry->start_time->hms =~ /(.*):.*$/;
+      my ($clock_time) = $entry->start_time->hms =~ /(.*):.*$/;
       print "\t " .
-      # Time
+
+        # Time
         $clock_time .
-      # Title
+
+        # Title
         "\t" . $entry->title . "\n";
     } else {
       print "\t " . $entry->title . "\n";

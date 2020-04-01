@@ -61,7 +61,7 @@
          "web" : "https://github.com/vpeil/perl-map-tube-bielefeld"
       }
    },
-   "version" : "2019.0816",
+   "version" : "2020.0330",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
    "x_static_install" : 1

@@ -6,7 +6,7 @@ use Moo;
 # This code has an EUPL license. Please see the LICENSE file in this repo for
 # more information.
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Carp;
 use OpenAPI::Client 0.17;
@@ -30,6 +30,13 @@ has client => (
     isa     => $_type_open_api,
     lazy    => 1,
     builder => '_build_open_api_client',
+);
+
+
+has api_host => (
+    is       => 'ro',
+    isa      => Str,
+    predicate => 'has_api_host',
 );
 
 sub search {
@@ -119,7 +126,11 @@ sub _build_open_api_client {
     my $self = shift;
 
     my $openapi_url = sprintf('data://%s/kvk_gsasearch_webapi__v1.json', __PACKAGE__);
-    return OpenAPI::Client->new($openapi_url);
+    my $api = OpenAPI::Client->new($openapi_url);
+    if ($self->has_api_host) {
+        $api->base_url->host($self->api_host);
+    }
+    return $api;
 }
 
 
@@ -135,7 +146,7 @@ WebService::KvKAPI - Query the Dutch Chamber of Commerence (KvK) API
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 AUTHOR
 
@@ -1111,6 +1122,10 @@ The KvK API key. You can request one at L<https://developers.kvk.nl/>.
 =head2 client
 
 An L<OpenAPI::Client> object. Build for you.
+
+=head2 api_host
+
+Optional API host to allow overriding the default host C<api.kvk.nl>.
 
 =head1 METHODS
 

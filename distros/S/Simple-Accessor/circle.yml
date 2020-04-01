@@ -1,0 +1,31 @@
+machine:
+  environment:
+    # Path
+    PATH: "$PATH:/home/$USER/perl5/bin"
+    # cpanm - Install destination of libraries
+    PERL_CPANM_OPT: "--local-lib=/home/$USER/perl5"
+    # perl - Include path
+    PERL5LIB: "/home/$USER/perl5/lib/perl5:$PERL5LIB"
+
+dependencies:
+  cache_directories:
+    - ~/perl5
+    - local
+  pre:
+    # Install the cpanm (cpanminus) command
+    - curl -L https://cpanmin.us | perl - App::cpanminus
+    # Install the carton command using cpanm
+    - cpanm Carton
+  override:
+    # Install the dependency cpan modules using cpanfile
+    - carton install
+
+test:
+  override:
+    # Run the tests
+    - carton exec -- prove -l -m -Q -r t/ --formatter=TAP::Formatter::JUnit> result.xml
+    # Convert charset of the test results
+    # Thanks for http://qiita.com/uchiko/items/65254be5e9504c9c1742
+    - perl -i -ple 's/\[\\x([a-f0-9]{2})\]/pack("H*", $1)/egx' result.xml
+    # Copy the test results to Circle-CI Artifacts
+    - cp result.xml $CIRCLE_TEST_REPORTS

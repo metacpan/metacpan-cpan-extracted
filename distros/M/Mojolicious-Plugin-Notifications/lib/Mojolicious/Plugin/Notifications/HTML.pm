@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin::Notifications::Engine';
 use Exporter 'import';
 use Mojo::Util qw/xml_escape/;
 use Scalar::Util qw/blessed/;
+use Mojo::ByteStream 'b';
 
 our @EXPORT_OK = ('notify_html');
 
@@ -58,7 +59,7 @@ sub notifications {
     $html .= notify_html($c, @{$_});
   };
 
-  return $c->b($html);
+  return b($html);
 };
 
 
@@ -162,7 +163,7 @@ B<Confirmation is EXPERIMENTAL!>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2014-2020, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

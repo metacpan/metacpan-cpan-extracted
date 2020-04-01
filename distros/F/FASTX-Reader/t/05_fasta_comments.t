@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use Test::More;
 use FASTX::Reader;
-my $seq = "$Bin/../data/comments.fasta";
+my $seq = "$RealBin/../data/comments.fasta";
 
 # TEST: Retrieves sequence COMMENTS from a FASTA file
 

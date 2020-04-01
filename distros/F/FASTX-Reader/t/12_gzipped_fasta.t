@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use Test::More;
 
 use FASTX::Reader;
-my $seq = "$Bin/../data/compressed.fasta.gz";
+my $seq = "$RealBin/../data/compressed.fasta.gz";
 
 # Check required input file
 if (! -e $seq) {

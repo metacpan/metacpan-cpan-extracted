@@ -6,7 +6,10 @@ use warnings;
 
 use Exporter 'import';
 our @EXPORT      = qw();
-our @EXPORT_OK   = qw(colorize colorize24 ansi_code ansi_pair csi_code);
+our @EXPORT_OK   = qw(
+    colorize colorize24 ansi_code ansi_pair csi_code
+    colortable
+    );
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 our @ISA         = qw(Getopt::EX::LabeledParam);
 
@@ -364,6 +367,8 @@ sub color {
     cached_colorize($obj->{CACHE}, $c, $text);
 }
 
+use List::Util qw(min max);
+
 sub colormap {
     my $obj = shift;
     my %opt = @_;
@@ -376,7 +381,6 @@ sub colormap {
 	"option $opt{name} \\",
 	do {
 	    my $maxlen = $opt{noalign} ? "" : do {
-		use List::Util qw(max);
 		max map { length } keys %{$hash};
 	    };
 	    my $format = "\t%s %${maxlen}s=%s \\";
@@ -393,6 +397,44 @@ sub colormap {
 	},
 	"\t\$<move(0,0)>\n",
 	);
+}
+
+sub colortable {
+    my $width = shift || 144;
+    my $column = min 6, $width / (4 * 6);
+    for my $c (0..5) {
+	for my $b (0..5) {
+	    my @format =
+		("%d$b$c", "$c%d$b", "$b$c%d", "$b%d$c", "$c$b%d", "%d$c$b")
+		[0 .. $column - 1];
+	    for my $format (@format) {
+		for my $a (0..5) {
+		    my $rgb = sprintf $format, $a;
+		    print colorize "$rgb/$rgb", " $rgb";
+		}
+	    }
+	    print "\n";
+	}
+    }
+    for my $g (0..5) {
+	my $grey = $g x 3;
+	print colorize "$grey/$grey", sprintf(" %-19s", $grey);
+    }
+    print "\n";
+    for ('L00' .. 'L25') {
+	print colorize "$_/$_", " $_";
+    }
+    print "\n";
+    for my $rgb ("RGBCMYKW", "rgbcmykw") {
+	for my $c (split //, $rgb) {
+	    print colorize "$c/$c", "  $c ";
+	}
+	print "\n";
+    }
+    for my $rgb (qw(500 050 005 055 505 550 000 555)) {
+	print colorize "$rgb/$rgb", " $rgb";
+    }
+    print "\n";
 }
 
 1;
@@ -422,6 +464,8 @@ Getopt::EX::Colormap - ANSI terminal color and option support
   use Getopt::EX::Colormap qw(colorize);
   $text = colorize(SPEC, TEXT);
   $text = colorize(SPEC_1, TEXT_1, SPEC_2, TEXT_2, ...);
+
+  $ perl -MGetopt::EX::Colormap=colortable -e colortable
 
 
 =head1 DESCRIPTION
@@ -500,7 +544,7 @@ terminal :
 
 =over 4
 
-Begining # can be omitted in 24bit RGB notation.
+Beginning # can be omitted in 24bit RGB notation.
 
 When values are all same in 24bit or 12bit RGB, it is converted to 24
 grey level, otherwise 6x6x6 216 color.
@@ -548,8 +592,8 @@ discussion about negation of C<D> (Track Wikipedia link in SEE ALSO),
 and Apple_Terminal (v2.10 433) does not reset at least.
 
 If the spec start with plus (C<+>) or minus (C<->) character,
-following characters are appneded/deleted from previous value. Reset
-mark (C<^>) is inserted before appended string.
+following characters are appended/deleted to/from previous
+value. Reset mark (C<^>) is inserted before appended string.
 
 Effect characters are case insensitive, and can be found anywhere and
 in any order in color spec string.  Because C<X> and C<;> takes no
@@ -602,7 +646,7 @@ C<{SGR1;30;48;5;224}> or more readable C<{SGR(1,30,48,5,224)}>.
 
 =head1 COLOR NAMES
 
-Color names are experimentaly supported in this version.  Currently
+Color names are experimentally supported in this version.  Currently
 names are listed in L<Graphics::ColorNames::X> module.  Following
 colors are available.
 
@@ -839,7 +883,7 @@ C<alphabet> to sort them alphabetically.
 
 Colormap label is aligned so that `=' marks are lined vertically.
 Give true value to B<noalign> parameter, if you don't like this
-behaviour.
+behavior.
 
 =back
 
@@ -880,6 +924,13 @@ Produce CSI (Control Sequence Introducer) sequence by name with
 numeric parameters.  I<name> is one of CUU, CUD, CUF, CUB, CNL, CPL,
 CHA, CUP, ED, EL, SU, SD, HVP, SGR, SCP, RCP.
 
+=item B<colortable>([I<width>])
+
+Print visual 256 color matrix table on the screen.  Default I<width>
+is 144.  Use like this:
+
+    perl -MGetopt::EX::Colormap=colortable -e colortable
+
 =back
 
 
@@ -891,7 +942,7 @@ by scrolling in the middle of colored text at the bottom line of the
 terminal.
 
 However, some terminal, including Apple_Terminal, clear the text on
-the terminal when I<Erase Line> sequence is received at the rightmost
+the cursor when I<Erase Line> sequence is received at the rightmost
 column of the screen.  If you do not want this behavior, set module
 variable C<Getopt::EX::Colormap::NO_RESET_EL> or
 C<GETOPTEX_NO_RESET_EL> environment.
@@ -909,3 +960,6 @@ L<Graphics::ColorNames::X>
 L<https://en.wikipedia.org/wiki/X11_color_names>
 
 =cut
+
+#  LocalWords:  colormap colorize Cyan RGB cyan Wikipedia CSI ansi
+#  LocalWords:  SGR

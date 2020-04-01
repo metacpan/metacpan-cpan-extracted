@@ -22,11 +22,12 @@ lib/PPIx/QuoteLike/Utils.pm
 LICENSES/Artistic
 LICENSES/Copying
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 README
 t/basic.t
 t/dump.t
 t/locations.t
+t/normalize_interpolation_for_ppi.t
 t/parse.t
 t/unit-adhoc.t
 t/variables.t

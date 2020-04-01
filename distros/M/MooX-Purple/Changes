@@ -3,3 +3,6 @@ Revision history for MooX-Purple
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.11    2020-03-31
+	Update class and role regex to match qualified identifiers (::)
+

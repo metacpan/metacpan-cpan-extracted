@@ -3,7 +3,7 @@ Quota extension module for Perl
 
 Author:    T. Zoerner (tomzo AT users.sourceforge.net)
 
-Version:   1.7.3
+Version:   1.7.4
 Date:      March 2020
 DLSIP-Code:Rcdfg
            - stable release
@@ -49,7 +49,7 @@ SYNOPSIS
 
          ($block_curr, $block_soft, $block_hard, $block_timelimit,
           $inode_curr, $inode_soft, $inode_hard, $inode_timelimit) =
-         Quota::rpcquery($host, $path [,$uid]);
+         Quota::rpcquery($host, $path [,$uid [,kind]]);
 
          Quota::rpcpeer([$port [,$use_tcp [,timeout]]]);
 
@@ -113,13 +113,15 @@ DESCRIPTION
 	 systems Quota::query will return undef in that case and
 	 errno will be set to ESRCH.
 
-         When $kind is given and set to 1, $uid is taken as gid
-         and group quotas are queried. This is not supported across
-         RPC and even locally only on a few architectures (e.g. Linux
-         and other BSD based Unix variants, OSF/1 and AIX - check the
-         quotactl(2) man page on your systems).  When $kind is set
-         to 2, project quotas are queried; this is currently only
-         supported for XFS.  When unsupported, this flag is ignored.
+         When $kind is given and set to 1, the value in $uid is taken
+         as gid and group quotas are queried. Group quotas may not be
+         supported across all platforms (e.g. Linux and other BSD
+         based Unix variants, OSF/1 and AIX - check the quotactl(2)
+         man page on your systems).
+
+         When $kind is set to 2, project quotas are queried; this is
+         currently only supported for XFS. When unsupported, this flag
+         is ignored.
 
      Quota::setqlim($dev, $uid, $bs,$bh, $is,$ih, $tlo, $kind)
          Sets quota limits for the given user. Meanings of $dev,
@@ -137,11 +139,11 @@ DESCRIPTION
          are set to 7.0 days.  More alternatives (i.e. setting a
          specific time) aren't available in most implementations.
 
-         When $kind is given and set to 1, $uid is taken as gid
-         and group quota limits are set. This is supported only on a
-         few architectures (see above).  When I<$kind> is set to 2,
-         project quotas are modified; this is currently only supported
-         for XFS.  When unsupported, this flag is ignored.
+         When $kind is given and set to 1, $uid is taken as gid and
+         group quota limits are set. This is not supported on all
+         platforms (see above). When $kind is set to 2, project quotas
+         are modified; this is currently only supported for XFS. When
+         unsupported, this flag is ignored.
 
          Note: if you want to set the quota of a particular user
          to zero, i.e.  no write permission, you must not set all
@@ -167,13 +169,18 @@ DESCRIPTION
          in this module; it's a limitation in certain kernels.
 
      ($bc,$bs,$bh,$bt, $ic,$is,$ih,$it) =
-         Quota::rpcquery($host,$path,$uid)
+         Quota::rpcquery($host,$path,$uid,$kind)
 
-         This is equivalent to Quota::query("$host:$path",$uid),
+         This is equivalent to Quota::query("$host:$path",$uid,$kind),
          i.e.  query quota for a given user on a given remote
          host via RPC.  $path is the path of any file or
          directory inside the wanted file system on the remote
          host.
+
+         Querying group quotas ($kind = 1) is only recently supported
+         on some platforms (e.g. on Linux via "extended" quota RPC,
+         i.e. quota RPC version 2) so it may fail due to lack of
+         support either on client or server side, or both.
 
      Quota::rpcpeer($port,$use_tcp,timeout)
          Configure parameters for subsequent RPC queries; all

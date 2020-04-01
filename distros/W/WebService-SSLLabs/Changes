@@ -1,5 +1,8 @@
 Revision history for WebService-SSLLabs
 
+0.33   Tue Mar 31 20:39:00 2020
+        Updating the test suite to cope with a change in the sts_response_header field
+
 0.32   Sat Jan 19 19:52:00 2020
         Corrected changelog
 

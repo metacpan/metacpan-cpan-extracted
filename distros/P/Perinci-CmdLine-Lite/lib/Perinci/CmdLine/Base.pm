@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2020-01-31'; # DATE
-our $VERSION = '1.826'; # VERSION
+our $DATE = '2020-04-01'; # DATE
+our $VERSION = '1.827'; # VERSION
 
 use 5.010001;
 use strict;
@@ -48,6 +48,7 @@ has description => (is=>'rw');
 has exit => (is=>'rw', default=>1);
 has formats => (is=>'rw');
 has default_format => (is=>'rw');
+has allow_unknown_opts => (is=>'rw', default=>0);
 has pass_cmdline_object => (is=>'rw', default=>0);
 has per_arg_json => (is=>'rw');
 has per_arg_yaml => (is=>'rw');
@@ -1074,7 +1075,7 @@ sub _parse_argv2 {
             per_arg_json        => $self->{per_arg_json},
             per_arg_yaml        => $self->{per_arg_yaml},
             common_opts         => $copts,
-            strict              => $r->{in_completion} ? 0:1,
+            strict              => $r->{in_completion} || $self->{allow_unknown_opts} ? 0:1,
             (ggls_res            => $r->{_ggls_res}) x defined($r->{_ggls_res}),
             on_missing_required_args => sub {
                 my %a = @_;
@@ -1763,7 +1764,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.826 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2020-01-31.
+This document describes version 1.827 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2020-04-01.
 
 =head1 DESCRIPTION
 
@@ -2418,6 +2419,10 @@ Available output formats.
 =head2 default_format => str
 
 Default format.
+
+=head2 allow_unknown_opts => bool (default: 0)
+
+Whether to allow unknown options.
 
 =head2 pass_cmdline_object => bool (default: 0)
 

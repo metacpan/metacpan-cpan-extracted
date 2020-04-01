@@ -11,14 +11,16 @@ use PPIx::QuoteLike::Constant qw{
     LOCATION_COLUMN
     LOCATION_LOGICAL_LINE
     LOCATION_LOGICAL_FILE
-    VARIABLE_RE
     @CARP_NOT
 };
-use PPIx::QuoteLike::Utils qw{ __variables };
+use PPIx::QuoteLike::Utils qw{
+    __normalize_interpolation_for_ppi
+    __variables
+};
 
 use base qw{ PPIx::QuoteLike::Token };
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 sub ppi {
     my ( $self ) = @_;
@@ -36,13 +38,7 @@ sub ppi {
 	    $content .= ' ' x ( $location->[LOCATION_COLUMN] - 1 );
 	}
 
-##	The following code is tempting, but I really, really want to
-##	avoid enabling it, because I may hit uses of ${something} that
-##	it does not cover.
-##	( $content = $self->content() ) =~
-##	    s/ \A ( [\$\@] (?: \# \$? | \$* ) )
-##	    \{ ( @{[ VARIABLE_RE ]} ) \} \z /$1$2/smxo;
-	$content .= $self->content();
+	$content .= __normalize_interpolation_for_ppi( $self->content() );
 
 	$self->{ppi} = PPI::Document->new( \$content );
 
@@ -71,14 +67,6 @@ sub ppi {
 	}
     }
     return $self->{ppi};
-}
-
-# For the moment this is package-private and subject to change or
-# retraction without notice. If there is need, it will be made public
-# by stripping the leading underscores and documenting it.
-sub __purge_ppi {
-    my ( $self ) = @_;
-    return delete $self->{ppi};
 }
 
 sub variables {
@@ -145,6 +133,13 @@ C<'${foo}'>, but the content of the C<PPI::Document> will be C<'$foo'>.
 
 This convenience method returns all interpolated variables. Each is
 returned only once, and they are returned in no particular order.
+
+B<NOTE> that this method is discouraged, and may well be deprecated and
+removed. My problem with it is that it returns variable names rather
+than L<PPI::Element|PPI::Element> objects, leaving you no idea how the
+variables are used. It was originally written for the benefit of
+L<Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter|Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter>,
+but has proven inadequate to that policy's needs.
 
 =head1 SEE ALSO
 

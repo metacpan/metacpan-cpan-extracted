@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2011 Tom Zoerner.
+# Copyright (C) 2006-2020 T. Zoerner.
 #
 # Man page descriptions are in part copied from libzvbi documentation:
 #
@@ -17,7 +17,7 @@
 #
 # For a copy of the GPL refer to <http://www.gnu.org/licenses/>
 #
-# $Id: ZVBI.pm,v 1.7 2011/01/02 14:02:44 tom Exp tom $
+# $Id: ZVBI.pm,v 1.8 2020/04/01 07:16:37 tom Exp tom $
 #
 
 package Video::ZVBI;
@@ -31,7 +31,7 @@ require Exporter;
 require DynaLoader;
 
 our @ISA = ('Exporter', 'DynaLoader');
-our $VERSION = "0.2.6";  # remember to update README and META.yml too
+our $VERSION = "1.0.0";  # remember to update README and META.yml too
 our @EXPORT = qw();
 our @EXPORT_OK = qw();  # filled by XSUB
 
@@ -2741,7 +2741,7 @@ analog VBI device and generates a PES or TS stream on STDOUT.
 
 =head1 AUTHORS
 
-The ZVBI Perl interface module was written by Tom Zoerner <tomzo@sourceforge.net>
+The ZVBI Perl interface module was written by T. Zoerner <tomzo@sourceforge.net>
 starting March 2006 for the Teletext EPG grabber accompanying nxtvepg
 L<http://nxtvepg.sourceforge.net/>
 
@@ -2752,7 +2752,7 @@ See also L<http://zapping.sourceforge.net/>
 
 =head1 COPYING
 
-Copyright (C) 2007 Tom Zoerner.
+Copyright (C) 2006-2020 T. Zoerner.
 
 Parts of the descriptions in this man page are copied from the
 "libzvbi" documentation, licensed under the GNU General Public

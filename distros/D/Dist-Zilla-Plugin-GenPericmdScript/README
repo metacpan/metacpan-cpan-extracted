@@ -2,9 +2,9 @@ NAME
     Dist::Zilla::Plugin::GenPericmdScript - Generate Perinci::CmdLine script
 
 VERSION
-    This document describes version 0.421 of
+    This document describes version 0.422 of
     Dist::Zilla::Plugin::GenPericmdScript (from Perl distribution
-    Dist-Zilla-Plugin-GenPericmdScript), released on 2018-01-17.
+    Dist-Zilla-Plugin-GenPericmdScript), released on 2020-04-01.
 
 SYNOPSIS
     In dist.ini:
@@ -114,6 +114,9 @@ CONFIGURATION (SCRIPT SPECIFICATION)
     This can be used if you want your script to be verbose by default, for
     example.
 
+  allow_unknown_opts => bool
+    Will be passed to Perinci::CmdLine object construction code.
+
   pass_cmdline_object => bool
     Will be passed to Perinci::CmdLine object construction code.
 
@@ -203,7 +206,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

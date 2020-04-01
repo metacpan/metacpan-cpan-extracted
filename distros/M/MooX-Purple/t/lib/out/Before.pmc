@@ -1,6 +1,0 @@
-package Before;
-use Moo::Role;
-use MooX::LazierAttributes;
-
-sub seven { return '7' }
-1;

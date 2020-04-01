@@ -73,6 +73,6 @@
          "web" : "https://github.com/kuerbis/App-YTDL"
       }
    },
-   "version" : "0.316",
+   "version" : "0.318",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

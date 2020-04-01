@@ -1,0 +1,9 @@
+0.002   2020-04-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Handle YouTube embed URL, e.g.
+	  https://www.youtube.com/embed/<video_id>?rel=0.
+
+
+0.001   2020-04-01  Released-By: PERLANCAR
+
+        - First release.

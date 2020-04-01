@@ -182,12 +182,12 @@ sub is_registered_version {
 sub get_version_path {
     my $version = shift;
     my $version_path = catdir($versions_dir, $version);
-    return catdir($version_path, 'install') if -d catdir($version_path, 'install', 'bin');
-    return $version_path                    if -d catdir($version_path, 'bin');
-    return trim(slurp($version_path))       if -f $version_path;
+    return catdir($version_path, 'install')
+        if -d catdir($version_path, 'install', 'bin');
+    return $version_path              if -d catdir($version_path, 'bin');
+    return trim(slurp($version_path)) if -f $version_path;
     die "Invalid version found: $version";
 }
-
 
 sub get_raku {
     my $version = shift;
@@ -195,6 +195,36 @@ sub get_raku {
     return _which('raku', $version) // which('perl6', $version);
 }
 
+sub match_version {
+    my $impl = shift // 'moar';
+    my $ver = shift if @_ && $_[0] !~ /^--/;
+    my @args = @_;
+
+    if (!defined $ver) {
+        my $version_regex = '^\d\d\d\d\.\d\d(?:\.\d+)?$';
+        my $combined_regex = '('
+            . join('|', App::Rakubrew::Variables::available_backends())
+            . ')-(.+)';
+        if ($impl eq 'moar-blead') {
+            $ver = 'master';
+        }
+        elsif ($impl =~ /$combined_regex/) {
+            $impl = $1;
+            $ver = $2;
+        }
+        elsif ($impl =~ /$version_regex/) {
+            $ver = $impl;
+            $impl = 'moar';
+        }
+        else {
+            my @versions = App::Rakubrew::Build::available_rakudos();
+            @versions = grep { /^\d\d\d\d\.\d\d/ } @versions;
+            $ver = $versions[-1];
+        }
+    }
+
+    return ($impl, $ver, @args);
+}
 
 sub which {
     my $prog = shift;
@@ -257,27 +287,30 @@ sub _which {
                 }
             }
             @results = sort {
-                # Prefer .exe > .bat > .p6 > .pl6 > .pl > nothing > anything else
+                # .exe > .bat > .raku > .p6 > .pl6 > .pl > nothing > rest
                 my (undef, undef, $suffix_a) = my_fileparse($a);
                 my (undef, undef, $suffix_b) = my_fileparse($b);
-                return -1        if $suffix_a eq '.exe' && $suffix_b ne '.exe';
-                return  1        if $suffix_a ne '.exe' && $suffix_b eq '.exe';
-                return $a cmp $b if $suffix_a eq '.exe' && $suffix_b eq '.exe';
-                return -1        if $suffix_a eq '.bat' && $suffix_b ne '.bat';
-                return  1        if $suffix_a ne '.bat' && $suffix_b eq '.bat';
-                return $a cmp $b if $suffix_a eq '.bat' && $suffix_b eq '.bat';
-                return -1        if $suffix_a eq '.p6'  && $suffix_b ne '.p6';
-                return  1        if $suffix_a ne '.p6'  && $suffix_b eq '.p6';
-                return $a cmp $b if $suffix_a eq '.p6'  && $suffix_b eq '.p6';
-                return -1        if $suffix_a eq '.pl6' && $suffix_b ne '.pl6';
-                return  1        if $suffix_a ne '.pl6' && $suffix_b eq '.pl6';
-                return $a cmp $b if $suffix_a eq '.pl6' && $suffix_b eq '.pl6';
-                return -1        if $suffix_a eq '.pl'  && $suffix_b ne '.pl';
-                return  1        if $suffix_a ne '.pl'  && $suffix_b eq '.pl';
-                return $a cmp $b if $suffix_a eq '.pl'  && $suffix_b eq '.pl';
-                return -1        if $suffix_a eq ''     && $suffix_b ne '';
-                return  1        if $suffix_a ne ''     && $suffix_b eq '';
-                return $a cmp $b if $suffix_a eq ''     && $suffix_b eq '';
+                return -1        if $suffix_a eq '.exe'  && $suffix_b ne '.exe';
+                return  1        if $suffix_a ne '.exe'  && $suffix_b eq '.exe';
+                return $a cmp $b if $suffix_a eq '.exe'  && $suffix_b eq '.exe';
+                return -1        if $suffix_a eq '.bat'  && $suffix_b ne '.bat';
+                return  1        if $suffix_a ne '.bat'  && $suffix_b eq '.bat';
+                return $a cmp $b if $suffix_a eq '.bat'  && $suffix_b eq '.bat';
+                return -1        if $suffix_a eq '.raku' && $suffix_b ne '.raku';
+                return  1        if $suffix_a ne '.raku' && $suffix_b eq '.raku';
+                return $a cmp $b if $suffix_a eq '.raku' && $suffix_b eq '.raku';
+                return -1        if $suffix_a eq '.p6'   && $suffix_b ne '.p6';
+                return  1        if $suffix_a ne '.p6'   && $suffix_b eq '.p6';
+                return $a cmp $b if $suffix_a eq '.p6'   && $suffix_b eq '.p6';
+                return -1        if $suffix_a eq '.pl6'  && $suffix_b ne '.pl6';
+                return  1        if $suffix_a ne '.pl6'  && $suffix_b eq '.pl6';
+                return $a cmp $b if $suffix_a eq '.pl6'  && $suffix_b eq '.pl6';
+                return -1        if $suffix_a eq '.pl'   && $suffix_b ne '.pl';
+                return  1        if $suffix_a ne '.pl'   && $suffix_b eq '.pl';
+                return $a cmp $b if $suffix_a eq '.pl'   && $suffix_b eq '.pl';
+                return -1        if $suffix_a eq ''      && $suffix_b ne '';
+                return  1        if $suffix_a ne ''      && $suffix_b eq '';
+                return $a cmp $b if $suffix_a eq ''      && $suffix_b eq '';
                 return $a cmp $b;
             } @results;
             $target = $results[0];

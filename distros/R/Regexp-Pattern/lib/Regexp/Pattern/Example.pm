@@ -1,7 +1,7 @@
 package Regexp::Pattern::Example;
 
-our $DATE = '2020-02-08'; # DATE
-our $VERSION = '0.2.13'; # VERSION
+our $DATE = '2020-04-01'; # DATE
+our $VERSION = '0.2.14'; # VERSION
 
 use 5.010001;
 
@@ -140,7 +140,7 @@ Regexp::Pattern::Example - An example Regexp::Pattern::* module
 
 =head1 VERSION
 
-This document describes version 0.2.13 of Regexp::Pattern::Example (from Perl distribution Regexp-Pattern), released on 2020-02-08.
+This document describes version 0.2.14 of Regexp::Pattern::Example (from Perl distribution Regexp-Pattern), released on 2020-04-01.
 
 =head1 SYNOPSIS
 

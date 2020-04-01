@@ -58,15 +58,9 @@ EOD
     note q<PPI document corresponding to '${bar}'>;
     my $ppi2 = $token[3]->ppi();
     @token = $ppi2->tokens();
-    cmp_ok scalar @token, '==', 4, 'Interpolation PPI has 4 tokens';
+    cmp_ok scalar @token, '==', 1, 'Interpolation PPI has 1 token';
     is_deeply $token[0]->location(), [ 2, 5, 5, 42, 'the_answer' ],
-	q<Token 0 ('$') location>;
-    is_deeply $token[1]->location(), [ 2, 6, 6, 42, 'the_answer' ],
-	q<Token 1 ('{') location>;
-    is_deeply $token[2]->location(), [ 2, 7, 7, 42, 'the_answer' ],
-	q<Token 2 ('bar') location>;
-    is_deeply $token[3]->location(), [ 2, 10, 10, 42, 'the_answer' ],
-	q<Token 5 ('}') location>;
+	q<Token 0 ('$bar') location>;
 }
 
 done_testing;

@@ -3,7 +3,7 @@ package MooX::Purple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use Keyword::Declare;
 
 sub import {
@@ -34,7 +34,7 @@ sub import {
 			|
 		)?+
 	}xms;
-	keyword role (Ident $class, GATTRS @roles, Block $block) {
+	keyword role (QualIdent $class, GATTRS @roles, Block $block) {
 		my ($body, %attrs) = _set_class_role_attrs($block, _parse_role_attrs(@roles));
 		return qq|{
 			package $class;
@@ -46,7 +46,7 @@ sub import {
 			1;
 		}|;
 	}
-	keyword class (Ident $class, GATTRS @roles, Block $block) {
+	keyword class (QualIdent $class, GATTRS @roles, Block $block) {
 		my ($body, %attrs) = _set_class_role_attrs($block, _parse_role_attrs(@roles));
 		return qq|{
 			package $class;
@@ -115,7 +115,7 @@ MooX::Purple - MooX::Purple
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-Notifications",
    "no_index" : {
@@ -47,6 +47,6 @@
          "url" : "https://github.com/Akron/Mojolicious-Plugin-Notifications"
       }
    },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

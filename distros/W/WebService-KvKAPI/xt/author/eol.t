@@ -13,6 +13,7 @@ my @files = (
     't/00-compile.t',
     't/01-basic.t',
     't/02-spoof.t',
+    't/03-host-override.t',
     't/9999-live-test.t'
 );
 

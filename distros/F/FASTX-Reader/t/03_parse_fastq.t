@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use Test::More;
 
 use FASTX::Reader;
-my $seq = "$Bin/../data/test.fastq";
+my $seq = "$RealBin/../data/test.fastq";
 
 # TEST: Retrieves sequences from a test FASTQ file
 

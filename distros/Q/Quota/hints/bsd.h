@@ -27,9 +27,13 @@
 /* defining this will force the XS to use the libquota API for all file systems
  * except RPC; defines below such as Q_CTL_V2 have no effect */
 #define NETBSD_LIBQUOTA
+#else  /* !__NetBSD__ */
+#if defined(__APPLE__)
+#include <sys/quota.h>
 #else
 #include <ufs/ufs/quota.h>
 #endif
+#endif  /* !__NetBSD__ */
 
 #if defined(__NetBSD__) && (__NetBSD_Version__ >= 299000900) /* NetBSD 2.99.9 */
 /* NetBSD 3.0 has no statfs anymore */

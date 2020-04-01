@@ -1,29 +1,36 @@
-libzvbi-perl (2.6) unstable; urgency=low
+libzvbi-perl (1.0.0) stable; urgency=low
+
+  * Elevated status to "stable release"
+  * Minor adaption to recent releases of Perl
+
+ -- T. Zoerner <tomzo@users.sourceforge.net>  Tue, 01 Apr 2020 09:09:00 +0100
+
+libzvbi-perl (0.2.6) unstable; urgency=low
 
   * Makefile.PL: Improved zvbi library path detection (again)
   * ZVBI.pm: Spelling and format fixes in documentation
   * ppport_zvbi.h: update to ppport.h version 3.19
 
- -- Tom Zoerner <tomzo@users.sourceforge.net>  Sun, 02 Jan 2011 14:45:13 +0200
+ -- T. Zoerner <tomzo@users.sourceforge.net>  Sun, 02 Jan 2011 14:45:13 +0200
 
-libzvbi-perl (2.5) unstable; urgency=low
+libzvbi-perl (0.2.5) unstable; urgency=low
 
   * Makefile.PL: Improved zvbi library path detection
   * ZVBI.xs: Fixed compiler warnings with Perl 5.10
   * ppport_zvbi.h: update to ppport.h version 3.13
 
- -- Tom Zoerner <tomzo@users.sourceforge.net>  Sun, 03 May 2009 19:07:46 +0200
+ -- T. Zoerner <tomzo@users.sourceforge.net>  Sun, 03 May 2009 19:07:46 +0200
 
-libzvbi-perl (2.4) unstable; urgency=low
+libzvbi-perl (0.2.4) unstable; urgency=low
 
   * ZVBI.xs: Fixed compiler warnings and XSUB usage bugs; improved backwards
     compatibility by use of Devel::PPPort
   * Makefile.PL: added work-around for libthreads dependency for FreeBSD.
     Thanks to Slaven Rezic from the CPAN testers team for the hint.
 
- -- Tom Zoerner <tomzo@users.sourceforge.net>  Sun, 05 Oct 2008 21:35:00 +0200
+ -- T. Zoerner <tomzo@users.sourceforge.net>  Sun, 05 Oct 2008 21:35:00 +0200
 
-libzvbi-perl (2.3) unstable; urgency=low
+libzvbi-perl (0.2.3) unstable; urgency=low
 
   * Makefile.PL: use exit(0) instead of die when libzvbi is missing
     to get an N/A test report instead of FAIL from CPAN testers
@@ -38,9 +45,9 @@ libzvbi-perl (2.3) unstable; urgency=low
   * libzvbi_int.h: updated to libzvbi.h from release 0.2.26
   * test.pl: added output of library version number
 
- -- Tom Zoerner <tomzo@users.sourceforge.net>  Sun, 02 Dec 2007 22:00:00 +0200
+ -- T. Zoerner <tomzo@users.sourceforge.net>  Sun, 02 Dec 2007 22:00:00 +0200
 
-libzvbi-perl (2.2) unstable; urgency=low
+libzvbi-perl (0.2.2) unstable; urgency=low
 
   * Makefile.PL: Abort if zvbi library is not found; added compile
     options USE_DL_SYM and USE_LIBZVBI_INT for ZVBI.xs; require
@@ -53,17 +60,17 @@ libzvbi-perl (2.2) unstable; urgency=low
 
   * Meta.yml: Added (name changed to upper case in 0.2.3)
 
- -- Tom Zoerner <tomzo@users.sourceforge.net>  Fri, 23 Nov 2007 22:00:00 +0200
+ -- T. Zoerner <tomzo@users.sourceforge.net>  Fri, 23 Nov 2007 22:00:00 +0200
 
-libzvbi-perl (2.1) unstable; urgency=low
+libzvbi-perl (0.2.1) unstable; urgency=low
 
   * ZVBI.xs: Compatibility fixes for older Perl versions;
     Syntax fixes; Bugfix in search callback function array
 
- -- Tom Zoerner <tomzo@users.sourceforge.net>  Mon, 19 Nov 2007 22:00:00 +0200
+ -- T. Zoerner <tomzo@users.sourceforge.net>  Mon, 19 Nov 2007 22:00:00 +0200
 
-libzvbi-perl (2.0) unstable; urgency=low
+libzvbi-perl (0.2.0) unstable; urgency=low
 
   * : First official release (CPAN)
 
- -- Tom Zoerner <tomzo@users.sourceforge.net>  Sun, 18 Nov 2007 22:00:00 +0200
+ -- T. Zoerner <tomzo@users.sourceforge.net>  Sun, 18 Nov 2007 22:00:00 +0200

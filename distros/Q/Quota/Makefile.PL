@@ -61,9 +61,9 @@ if ( $os =~ /^SunOS/ ) {
    # }
 }
 
-# check whether wee are using the NetBSD quota library
-if ( ($os =~ /^NetBSD 6/) ||
-     (($os =~ /^NetBSD 5\.99\.(\d\d)/) && ($1 >= 59)) ) {
+# check whether we are using the NetBSD quota library
+if ( ($os =~ /^NetBSD (\d+)\.(\d+)\.(\d+)/) &&
+     (($1 >= 6) || (($1 == 5) && ($2 == 99) && ($3 >= 59)) )) {
   $extralibs .= " -lquota";
 }
 

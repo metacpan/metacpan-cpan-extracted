@@ -20,15 +20,13 @@ use App::Rakubrew;
 use App::Rakubrew::Variables;
 use App::Rakubrew::Config;
 
-#my $release_index_url   = 'https://rakubrew.org/releases';
-#my $download_url_prefix = 'https://rakubrew.org';
-my $release_index_url   = 'http://localhost:20000/releases';
-my $download_url_prefix = 'http://localhost:20000';
+my $release_index_url   = 'https://rakubrew.org/releases';
+my $download_url_prefix = 'https://rakubrew.org';
 
 my %dl_urls = (
-    fatpack => "$download_url_prefix/perl",
-    win     => "$download_url_prefix/win",
-    macos   => "$download_url_prefix/macos",
+    fatpack => "$download_url_prefix/perl/rakubrew",
+    win     => "$download_url_prefix/win/rakubrew.exe",
+    macos   => "$download_url_prefix/macos/rakubrew",
 );
 
 sub update {
@@ -172,6 +170,6 @@ sub _download_release_index {
 ;
         exit 1;
     }
-    return decode_json($res->content);
+    return decode_json($res->{content});
 }
 

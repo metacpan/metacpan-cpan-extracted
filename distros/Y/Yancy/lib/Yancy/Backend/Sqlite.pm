@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '1.046';
+our $VERSION = '1.047';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -119,6 +119,8 @@ with qw( Yancy::Backend::Role::Sync Yancy::Backend::Role::Relational );
 use Text::Balanced qw( extract_bracketed );
 use Mojo::JSON qw( true false encode_json );
 BEGIN {
+    eval { require DBD::SQLite; DBD::SQLite->VERSION( 1.56 ); 1 }
+        or die "Could not load SQLite backend: DBD::SQLite version 1.56 or higher required\n";
     eval { require Mojo::SQLite; Mojo::SQLite->VERSION( 3 ); 1 }
         or die "Could not load SQLite backend: Mojo::SQLite version 3 or higher required\n";
 }
@@ -208,7 +210,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 1.046
+version 1.047
 
 =head1 SYNOPSIS
 

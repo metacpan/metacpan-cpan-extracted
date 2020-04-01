@@ -1,3 +1,4 @@
+use v5.14;
 use strict;
 use warnings;
 use utf8;
@@ -11,7 +12,7 @@ $Script::lib    = File::Spec->rel2abs('lib');
 $Script::script = File::Spec->rel2abs('script/week');
 
 my %result = (
-'157209' => <<END
+'157209' => <<END,
                           
         September         
    Su Mo Tu We Th Fr Sa   
@@ -25,9 +26,20 @@ my %result = (
 END
 );
 
-$ENV{LANG} = $ENV{LC_ALL} = 'C';
+SKIP: {
+    local %ENV = %ENV;
+    $ENV{LANG} = $ENV{LC_ALL} = 'C';
 
-my $week = Script->new([qw(--cm *= -C0 1752/9/2)])->run;
-is($week->result, $result{157209}, "1752/9/2");
+    local $_ = `cal`;
+    if ($? != 0) {
+	skip "cal command execution error.", 1;
+    } else {
+	s/((?=.)[\000-\037])/sprintf("^%c", ord($1)+0100)/ge;
+	print;
+    }
+
+    my $week = Script->new([qw(--cm *= -C0 1752/9/2)])->run;
+    is($week->result, $result{"157209"}, "1752/9/2");
+}
 
 done_testing;

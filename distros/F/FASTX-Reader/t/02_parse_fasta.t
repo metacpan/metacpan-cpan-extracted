@@ -1,12 +1,12 @@
 use strict;
 use warnings;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use Test::More;
 use FASTX::Reader;
 
 # TEST: Retrieves sequences from a test FASTA file
 
-my $seq = "$Bin/../data/test.fasta";
+my $seq = "$RealBin/../data/test.fasta";
 
 # Check required input file
 if (! -e $seq) {

@@ -155,15 +155,11 @@ sub download_youtube {
             my $output = $opt->{video_dir};
             $output .= '/%(extractor)s' if $opt->{use_extractor_dir};
             $output .= '/%(uploader)s'  if $opt->{use_uploader_dir} == 1 || $opt->{use_uploader_dir} == 2 && $data->{$ex}{$video_id}{from_list};
-            if ( $opt->{filename_format} == 0 ) {
-                $output .= '/%(title)s_%(format_id)s.%(ext)s';
-            }
-            elsif ( $opt->{filename_format} == 1 ) {
-                $output .= '/%(title)s_%(format_id)s_%(height)s.%(ext)s';
-            }
-            else {
-                $output .= '/%(title)s_%(format)s.%(ext)s';
-            }
+               if ( $opt->{filename_format} == 0 ) { $output .= '/%(title)s.%(ext)s'; }
+            elsif ( $opt->{filename_format} == 1 ) { $output .= '/%(title)s_%(height)s.%(ext)s'; }
+            elsif ( $opt->{filename_format} == 2 ) { $output .= '/%(title)s_%(format_id)s.%(ext)s'; }
+            elsif ( $opt->{filename_format} == 3 ) { $output .= '/%(title)s_%(format_id)s_%(height)s.%(ext)s'; }
+            else                                   { $output .= '/%(title)s_%(format)s.%(ext)s'; }
             push @cmd, '-o', $output;
             push @cmd, '--', $data->{$ex}{$video_id}{webpage_url};
             print $data->{$ex}{$video_id}{count} . '/' . $total . ' ';

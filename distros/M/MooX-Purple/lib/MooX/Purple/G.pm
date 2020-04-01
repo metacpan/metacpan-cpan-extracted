@@ -2,7 +2,7 @@ package MooX::Purple::G;
 use strict;
 use warnings;
 use 5.006;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use PPR;
 use Cwd qw/abs_path/;
 
@@ -159,14 +159,14 @@ sub import {
 		g(
 			$source,
 			qq/(?<match> role\\s*
-			(?<class> (?&PerlIdentifier)) 
+			(?<class> (?&PerlQualifiedIdentifier)) 
 			(?<attrs> (?: $GATTRS*))
 			(?<block> (?&PerlBlock)))/,
 			\&roles, 
 			$lib
 		),
 		qq/(?<match> class\\s*
-		(?<class> (?&PerlIdentifier))
+		(?<class> (?&PerlQualifiedIdentifier))
 		(?<attrs> (?: $GATTRS*))
 		(?<block> (?&PerlBlock)))/,
 		\&classes,
@@ -351,7 +351,7 @@ MooX::Purple - MooX::Purple::G
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

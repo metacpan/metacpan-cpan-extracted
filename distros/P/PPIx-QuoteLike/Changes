@@ -1,3 +1,20 @@
+0.011		2020-03-31	T. R. Wyant
+    Normalize interpolation before feeding to PPI. This produces a
+    more-easily-analyzed PPI parse.
+
+    The ->variables() method is now discouraged. It was written to support
+    Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter, but turned
+    out to be inadequate for the job.
+
+    Deprecate new() argument postderef. At this stage it is only
+    documented as deprecated. In the first release after October 1 2020
+    it will warn on the first use. Eventually it will be retracted, and
+    postfix dereferences will always be recognized. This is the default
+    behavior now.
+
+    Correct bracket matchers to accept multiple lines. This was, in some
+    cases, causing interpolations to be misclassified as unknown tokens.
+
 0.010		2020-03-09	T. R. Wyant
     Remove redundant and poorly-performing code introduced in version
     0.009.

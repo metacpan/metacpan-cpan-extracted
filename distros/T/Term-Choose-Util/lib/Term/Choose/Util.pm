@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.119';
+our $VERSION = '0.120';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -570,9 +570,13 @@ sub choose_a_number {
         return $ob->choose_a_number( @_ );
     }
     my ( $self, $digits, $opt ) = @_;
+    my $default_digits = 7;
     if ( ref $digits ) {
         $opt = $digits;
-        $digits = 7;
+        $digits = $default_digits;
+    }
+    elsif ( ! $digits ) {
+        $digits = $default_digits;
     }
     $self->__prepare_opt( $opt );
     my $tab   = '  -  ';
@@ -986,7 +990,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.119
+Version 0.120
 
 =cut
 

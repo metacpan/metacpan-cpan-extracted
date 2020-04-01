@@ -390,29 +390,6 @@ my $user_table_info;
   is_deeply($columns, [$key1, $key2, $key3, $key4, $key5]);
 }
 
-# query option
-{
-  my $dbi = DBIx::Custom->connect;
-  
-  eval { $dbi->execute("drop table $table1") };
-  $dbi->execute($create_table1);
-  
-  my $param = {$key1 => 1, $key2 => 2};
-  my $query = $dbi->insert($param, table => $table1, query => 1);
-  
-  my $sth = $dbi->dbh->prepare($query->sql);
-  $sth->execute(@{$query->bind_values});
-  
-  $param = {$key1 => 3, $key2 => 4};
-  $query->param($param);
-  $query->build;
-  $sth->execute(@{$query->bind_values});
-  
-  my $result = $dbi->select(table => $table1);
-  my $rows = $result->all;
-  is_deeply($rows, [{$key1 => 1, $key2 => 2}, {$key1 => 3, $key2 => 4}]);
-}
-
 # insert
 {
   my $dbi = DBIx::Custom->connect;
@@ -4501,4 +4478,54 @@ EOS
     )->all;
     is_deeply($rows, [{"$table1.$key1" => 2, "$table1.$key2" => 4}, {"$table1.$key1" => 1, "$table1.$key2" => 2}]);
   }
+}
+
+
+# execute reuse option
+{
+  my $dbi = DBIx::Custom->connect;
+  eval { $dbi->execute("drop table $table1") };
+  $dbi->execute($create_table1);
+  my $reuse = {};
+  for my $i (1 .. 2) {
+    $dbi->insert({$key1 => 1, $key2 => 2}, table => $table1, reuse => $reuse);
+  }
+  my $rows1 = $dbi->select(table => $table1, reuse => $reuse)->all;
+  is_deeply($rows1, [{$key1 => 1, $key2 => 2}, {$key1 => 1, $key2 => 2}]);
+
+  my $rows2 = $dbi->select(table => $table1, reuse => $reuse)->all;
+  is_deeply($rows2, [{$key1 => 1, $key2 => 2}, {$key1 => 1, $key2 => 2}]);
+
+  my $row1 = $dbi->select(table => $table1, where => {$key1 => 1, $key2 => 2}, reuse => $reuse)->one;
+  is_deeply($row1, {$key1 => 1, $key2 => 2});
+
+  my $row2 = $dbi->select(table => $table1, where => {$key1 => 1, $key2 => 2}, reuse => $reuse)->one;
+  is_deeply($row2, {$key1 => 1, $key2 => 2});
+
+  for my $i (1 .. 2) {
+    $dbi->update({$key1 => 1, $key2 => 3}, where => {$key1 => 1, $key2 => 2}, table => $table1, reuse => $reuse);
+  }
+
+  my $rows3 = $dbi->select(table => $table1, reuse => $reuse)->all;
+  is_deeply($rows3, [{$key1 => 1, $key2 => 3}, {$key1 => 1, $key2 => 3}]);
+
+  ok(keys %$reuse);
+
+  my $found_insert;
+  my $found_select;
+  my $found_update;
+  for my $sql (keys %$reuse) {
+    if ($sql =~ /insert/) {
+      $found_insert++;
+    }
+    if ($sql =~ /select/) {
+      $found_select++;
+    }
+    if ($sql =~ /update/) {
+      $found_update++;
+    }
+  }
+  ok($found_insert == 1);
+  ok($found_select == 2);
+  ok($found_update == 1);
 }

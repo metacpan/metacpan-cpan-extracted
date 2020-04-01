@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use Test::More;
 use Data::Dumper;
 use FASTX::Reader;

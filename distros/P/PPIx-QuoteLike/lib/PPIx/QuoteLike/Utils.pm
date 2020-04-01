@@ -18,6 +18,7 @@ use PPIx::QuoteLike::Constant qw{
     VARIABLE_RE
     @CARP_NOT
 };
+use Readonly;
 use Scalar::Util ();
 
 use constant LEFT_CURLY		=> q<{>;
@@ -32,10 +33,30 @@ our @EXPORT_OK = qw{
     statement
     visual_column_number
     __instance
+    __match_enclosed
+    __matching_delimiter
+    __normalize_interpolation_for_ppi
     __variables
 };
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
+
+# Readonly::Scalar my $BRACED_RE	=> __match_enclosed( LEFT_CURLY );
+Readonly::Scalar my $BRACKETED_RE	=> __match_enclosed( '[' ); # ]
+Readonly::Scalar my $PARENTHESIZED_RE	=> __match_enclosed( '(' ); # )
+
+Readonly::Scalar my $SIGIL_AND_CAST_RE	=> qr/ \$ \# \$* | [\@\$] \$* /smx;
+# The following is an interpretation of perldata Identifier Parsing for
+# Perls before 5.10.
+Readonly::Scalar my $SYMBOL_NAME_RE	=> qr/
+    \^? (?:
+	(?: :: )* '?
+	    \w+ (?: (?: (?: :: )+ '? | (?: :: )* ' ) \w+ )*
+	    (?: :: )* |
+	[[:punct:]]
+    )
+/smx;
+
 
 sub column_number {
     my ( $self ) = @_;
@@ -322,6 +343,109 @@ sub logical_line_number {
     return ( $self->location() || [] )->[LOCATION_LOGICAL_LINE];
 }
 
+{
+    our %REGEXP_CACHE;
+
+    my %matching_bracket;
+
+    BEGIN {
+	%matching_bracket = qw/ ( ) [ ] { } < > /;
+    }
+
+    sub __match_enclosed {
+	my ( $left ) = @_;
+	my $ql = quotemeta $left;
+
+	$REGEXP_CACHE{$ql}
+	    and return $REGEXP_CACHE{$ql};
+
+	if ( my $right = $matching_bracket{$left} ) {
+
+	    # Based on Regexp::Common $RE{balanced} 2.113 (because I
+	    # can't use (?-1)
+
+	    my $ql = quotemeta $left;
+	    my $qr = quotemeta $right;
+	    my $pkg = __PACKAGE__;
+	    my $r  = "(??{ \$${pkg}::REGEXP_CACHE{'$ql'} })";
+
+	    my @parts = (
+		"(?>[^\\\\$ql$qr]+)",
+		"(?>\\\$[$ql$qr])",
+		'(?>\\\\.)',
+		$r,
+	    );
+
+	    {
+		use re qw{ eval };
+		local $" = '|';
+		$REGEXP_CACHE{$ql} = qr/($ql(?:@parts)*$qr)/sm;
+	    }
+
+	    return $REGEXP_CACHE{$ql};
+
+	} else {
+
+	    # Based on Regexp::Common $RE{delimited}{-delim=>'`'}
+	    return ( $REGEXP_CACHE{$ql} ||=
+		qr< (?:
+		    (?: \Q$left\E )
+		    (?: [^\\\Q$left\E]* (?: \\ . [^\\\Q$left\E]* )* )
+		    (?: \Q$left\E )
+		) >smx
+	    );
+	}
+    }
+
+    sub __matching_delimiter {
+	my ( $left ) = @_;
+	my $right = $matching_bracket{$left}
+	    or return $left;
+	return $right;
+    }
+}
+
+sub __normalize_interpolation_for_ppi {
+    ( local $_ ) = @_;
+
+    # "@{[ foo() ]}" => 'foo()'
+    if ( m/ \A \@ [{] \s* ( $BRACKETED_RE ) \s* [}] \z /smx ) {
+	$_ = $1;
+	s/ \A [[] \s* //smx;
+	s/ \s* []] \z //smx;
+	return "$_";
+    }
+
+    # "${\( foo() )}" => 'foo()'
+    if ( m/ \A \$ [{] \s* \\ \s* ( $PARENTHESIZED_RE ) \s* [}] \z /smx ) {
+	$_ = $1;
+	s/ \A [(] \s* //smx;
+	s/ \s* [)] \z //smx;
+	return "$_";
+    }
+
+    # "${foo}" => '$foo'
+    m/ \A ( $SIGIL_AND_CAST_RE ) \s* [{] \s* ( $SYMBOL_NAME_RE ) \s* [}] \z /smx
+	and return "$1$2";
+
+    # "${foo{bar}}" => '$foo{bar}'
+    # NOTE that this is a warning, and so not done.
+#    if ( m/ \A ( $SIGIL_AND_CAST_RE ) (?= [{] ) ( $BRACED_RE ) /smx ) {
+#	( my $sigil, local $_ ) = ( $1, $2 );
+#	s/ \A [{] \s* //smx;
+#	s/ \s* [}] \z //smx;
+#	return "$sigil$_";
+#    }
+
+    # "$ foo->{bar}" => '$foo->{bar}'
+    if ( m/ \A ( $SIGIL_AND_CAST_RE ) \s+ ( $SYMBOL_NAME_RE ) ( .* ) /smx ) {
+	return "$1$2$3";
+    }
+
+    # Everything else
+    return "$_";
+}
+
 sub statement {
     my ( $self ) = @_;
     my $top = $self->top()
@@ -468,6 +592,26 @@ This subroutine/method returns the logical line number (taking C<#line>
 directives into account) of the first character in the element, or
 C<undef> if that can not be determined.
 
+=head2 __normalize_interpolation_for_ppi
+
+Despite the leading underscores, this exportable subroutine is public
+and supported. The underscores are so it will not appear to be public
+code to various tools when imported into other code.
+
+This subroutine takes as its argument a string representing an
+interpolation. It removes such things as braces around variable names to
+make it into more normal Perl -- which is to say Perl that produces a
+more normal L<PPI|PPI> parse. Sample transformations are:
+
+ '${foo}'        => '$foo'
+ '@{[ foo() ]}'  => 'foo()'
+ '${\( foo() )}' => 'foo()'
+
+B<NOTE> that this is not intended for general code cleanup.
+Specifically, it assumes that its argument is an interpolation and
+B<only> an interpolation. Feeding it anything else is unsupported, and
+probably will not return anything useful.
+
 =head2 statement
 
 This subroutine/method returns the L<PPI::Statement|PPI::Statement> that
@@ -496,6 +640,13 @@ can not be determined.
 =head2 __variables
 
  say for __variables( PPI::Document->new( \'$foo' );
+
+B<NOTE> that this subroutine is discouraged, and may well be deprecated
+and removed. My problem with it is that it returns variable names rather
+than L<PPI::Element|PPI::Element> objects, leaving you no idea how the
+variables are used. It was originally written for the benefit of
+L<Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter|Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter>,
+but has proven inadequate to that policy's needs.
 
 Despite the leading underscores, this exportable subroutine is public
 and supported. The underscores are so it will not appear to be public

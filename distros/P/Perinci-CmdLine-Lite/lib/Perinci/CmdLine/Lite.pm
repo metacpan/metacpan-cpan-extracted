@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2020-01-31'; # DATE
-our $VERSION = '1.826'; # VERSION
+our $DATE = '2020-04-01'; # DATE
+our $VERSION = '1.827'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -572,6 +572,7 @@ sub action_help {
         program_summary => ($scd ? $scd->{summary}:undef ) // $meta->{summary},
         program_description => $scd ? $scd->{description} : undef,
         meta => $meta,
+        meta_is_normalized => 1,
         subcommands => $has_sc_no_sc ? $self->list_subcommands : undef,
         common_opts => $common_opts,
         per_arg_json => $self->per_arg_json,
@@ -628,7 +629,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.826 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2020-01-31.
+This document describes version 1.827 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2020-04-01.
 
 =head1 SYNOPSIS
 

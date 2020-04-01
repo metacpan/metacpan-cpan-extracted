@@ -6,7 +6,7 @@ use Import::Into ();
 use Module::Runtime ();
 use Scalar::Util ();
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 our @CARP_NOT = 'Mojolicious::Plugin::Log::Any';
 
@@ -29,14 +29,14 @@ sub attach_logger {
     if ($logger->isa('Log::Any::Proxy')) {
       $do_log = sub {
         my ($self, $level, @msg) = @_;
-        my $msg = join "\n", @msg;
+        my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
         $msg = "[$level] $msg" if $prepend;
         $logger->$level($msg);
       };
     } elsif ($logger->isa('Log::Dispatch')) {
       $do_log = sub {
         my ($self, $level, @msg) = @_;
-        my $msg = join "\n", @msg;
+        my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
         $msg = "[$level] $msg" if $prepend;
         $level = 'critical' if $level eq 'fatal';
         $logger->log(level => $level, message => $msg);
@@ -44,7 +44,7 @@ sub attach_logger {
     } elsif ($logger->isa('Log::Dispatchouli') or $logger->isa('Log::Dispatchouli::Proxy')) {
       $do_log = sub {
         my ($self, $level, @msg) = @_;
-        my $msg = join "\n", @msg;
+        my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
         $msg = "[$level] $msg" if $prepend;
         return $logger->log_debug($msg) if $level eq 'debug';
         # hacky but we don't want to use log_fatal because it throws an
@@ -66,7 +66,7 @@ sub attach_logger {
     $logger = Log::Any->get_logger(category => $category);
     $do_log = sub {
       my ($self, $level, @msg) = @_;
-      my $msg = join "\n", @msg;
+      my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
       $msg = "[$level] $msg" if $prepend;
       $logger->$level($msg);
     };
@@ -75,7 +75,7 @@ sub attach_logger {
     $logger = Log::Log4perl->get_logger($category);
     $do_log = sub {
       my ($self, $level, @msg) = @_;
-      my $msg = join "\n", @msg;
+      my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
       $msg = "[$level] $msg" if $prepend;
       $logger->$level($msg);
     };
@@ -86,7 +86,7 @@ sub attach_logger {
     "$logger"->import::into(ref($self), values %functions);
     $do_log = sub {
       my ($self, $level, @msg) = @_;
-      my $msg = join "\n", @msg;
+      my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
       $msg = "[$level] $msg" if $prepend;
       $self->can($functions{$level})->($msg);
     };

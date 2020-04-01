@@ -1,6 +1,12 @@
 Revision history for App-YTDL
 
 
+0.318   2020-03-31
+        - Update option 'filename format info'.
+
+0.317   2020-03-31
+        - Update documentation.
+
 0.316   2020-03-30
         - Added "LWP::Protocol::https" as prerequisite.
         - Bugfix: add format to filename.

@@ -35,9 +35,7 @@ has title => (
   required => 1,
 );
 
-has _duration => (
-  is       => 'rw',
-);
+has _duration => ( is => 'rw', );
 
 has cfg => ( is => 'ro', );
 
@@ -77,7 +75,7 @@ sub save {
     my $result = $self->db->get_collection($collection)->insert_one($document);
 
     # Update id
-    $self->id($result->inserted_id);
+    $self->id( $result->inserted_id );
   }
 }
 
@@ -89,13 +87,13 @@ C<duration> returns the time between this entry and the next.
 
 sub duration {
   my $self = shift;
-  my $set = shift;
+  my $set  = shift;
 
   if ($set) {
     $self->_duration($set);
   }
 
-  if ($self->_duration) {
+  if ( $self->_duration ) {
     return $self->_duration;
   }
 
@@ -187,11 +185,11 @@ sub search {
   # Return undef if nothing was found
   return unless $entries;
 
-  my $LocalTZ = DateTime::TimeZone->new(name => 'local'); # For caching
+  my $LocalTZ = DateTime::TimeZone->new( name => 'local' );    # For caching
 
 # @TODO create a subclass of the MongoDB cursor that allows chaining of results like MongoDB
   map {
-    $_->{start_time}->set_time_zone($LocalTZ); # Convert to local tz
+    $_->{start_time}->set_time_zone($LocalTZ);    # Convert to local tz
     App::Jiffy::TimeEntry->new(
       id         => $_->{_id},
       title      => $_->{title},
@@ -233,11 +231,9 @@ sub TO_JSON {
 
   {
     start_time => $self->start_time->iso8601,
-    title => $self->title,
-    duration => {
-      $self->duration->deltas
-    },
-  }
+    title      => $self->title,
+    duration   => { $self->duration->deltas },
+  };
 }
 
 1;

@@ -21,7 +21,11 @@ The KvK API key. You can request one at [https://developers.kvk.nl/](https://dev
 
 ## client
 
-An [OpenAPI::Client](https://metacpan.org/pod/OpenAPI::Client) object. Build for you.
+An [OpenAPI::Client](https://metacpan.org/pod/OpenAPI%3A%3AClient) object. Build for you.
+
+## api\_host
+
+Optional API host to allow overriding the default host `api.kvk.nl`.
 
 # METHODS
 
@@ -68,4 +72,4 @@ Search the KVK, retreives a maximum of X results up the the nearest 10, eg 15 as
 
 The KvK also has test endpoints. While they are supported via the direct
 `api_call` method, you can instantiate a model that works only in
-spoofmode: [WebService::KvKAPI::Spoof](https://metacpan.org/pod/WebService::KvKAPI::Spoof)
+spoofmode: [WebService::KvKAPI::Spoof](https://metacpan.org/pod/WebService%3A%3AKvKAPI%3A%3ASpoof)

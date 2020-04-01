@@ -10,7 +10,7 @@ use Pod::Usage;
 use PPI::Document;
 use PPIx::QuoteLike::Utils qw{ __variables };
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 my %opt;
 
@@ -71,6 +71,9 @@ found.
 The heavy lifting is done by
 L<PPIx::QuoteLike::Utils|PPIx::QuoteLike::Utils> subroutine
 L<__variables()|PPIx::QuoteLike::Utils/__variables>.
+
+B<NOTE> that the C<__variables()> subroutine is discouraged, and may be
+deprecated and removed.
 
 =head1 AUTHOR
 

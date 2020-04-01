@@ -9,15 +9,15 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 use PPIx::QuoteLike::Dumper;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 my %opt;
 
 GetOptions( \%opt,
     qw{
 	encoding=s indent=i locations! margin=i
-	perl_version|perl-version! ppi! significant!
-	tokens! variables!
+	perl_version|perl-version! ppi! short!
+	significant!  tokens! variables!
     },
     'whitespace!'	=> sub {
 	$opt{significant} = !$_[1];
@@ -31,7 +31,7 @@ defined $opt{encoding}
 
 my @dumper_arg = map { $_ => $opt{$_} } qw{
     encoding indent locations margin perl_version ppi
-    significant tokens variables
+    short significant tokens variables
 };
 
 foreach my $arg ( @ARGV ) {
@@ -104,6 +104,12 @@ L<PPI|PPI> must be installed for this to work.
 
 The default is C<-noppi>.
 
+=head2 -short
+
+If this option is asserted, leading C<'PPIx::QuoteLike::'> will be
+removed from the class names in the output.
+
+The default is C<-noshort>.
 
 =head2 -significant
 

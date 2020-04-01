@@ -1,3 +1,8 @@
+0.496   2020-04-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: allow_unknown_opts (Perinci::CmdLine::Base 1.827).
+
+
 0.495   2020-03-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump generated prereq version Log::ger 0.033 -> 0.037 (including

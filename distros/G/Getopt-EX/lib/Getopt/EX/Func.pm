@@ -83,7 +83,7 @@ sub parse_func {
     }x) {
 	my($name, $arg) = @+{"name", "arg"};
 	my $pkg = $opt->{PACKAGE} || $caller;
-	$name =~ s/^/${pkg}::/ unless $name =~ /::/;
+	$name =~ s/^/$pkg\::/ unless $name =~ /::/;
 	@func = ($name, arg2kvlist($arg));
     }
     else {

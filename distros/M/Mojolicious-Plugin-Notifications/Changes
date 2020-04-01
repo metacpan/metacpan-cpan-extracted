@@ -1,3 +1,8 @@
+1.05 2020-03-31
+        - Fixed a bug using $c->b() in HTML engine,
+          I wasn't able to test.
+        - Improved test suite.
+
 1.04 2019-05-14
         - Updated Mojolicious dependency
           (Thanks to Slaven Rezić!).

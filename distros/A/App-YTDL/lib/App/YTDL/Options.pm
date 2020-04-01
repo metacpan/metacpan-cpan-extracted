@@ -73,7 +73,7 @@ sub _show_info {
 
 sub get_defaults {
     return {
-        filename_format              => 1,
+        filename_format              => 3,
         max_info_width               => 120,
         max_size_history             => 50,
         no_height_ok                 => 1,
@@ -120,7 +120,7 @@ sub _groups {
             [ 'video_dir',         "- Main video directory" ],
             [ 'use_extractor_dir', "- Extractor directory"  ],
             [ 'use_uploader_dir',  "- Uploader directory"   ],
-            [ 'filename_format',   "- Filename: fmt info"   ],
+            [ 'filename_format',   "- Filename format info" ],
         ],
         group_quality => [
             [ 'quality',             "- Resolution"          ],
@@ -280,8 +280,10 @@ sub set_options {
             elsif ( $key eq "filename_format" ) {
                 my $prompt = 'Filename: choose the format info:';
                 my $list = [
+                    'none (unsafe)',
+                    'video-height (unsafe)',
                     'fmt-id',
-                    'fmt-id and height',
+                    'fmt-id and video-height',
                     'fmt-string',
                 ];
                 _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );

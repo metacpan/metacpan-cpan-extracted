@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+
+use Mojolicious::Lite;
+
+plugin Sticker => { app => 't/lib/apps/foo' };
+plugin Sticker => { app => 't/lib/apps/bar' };
+
+app->start;
+

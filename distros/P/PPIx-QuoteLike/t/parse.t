@@ -598,144 +598,87 @@ if ( ok $obj, q{Able to parse "\N{$foo}"} ) {
     }
 }
 
-$obj = PPIx::QuoteLike->new( <<'__END_OF_HERE_DOCUMENT'
+{
+    my $here_doc = <<'__END_OF_HERE_DOCUMENT';
 << "EOD"
 $foo->{bar}bazzle
+${\
+    $burfle
+}
 EOD
 __END_OF_HERE_DOCUMENT
- );
-if ( ok $obj, q{Able to parse << "EOD"
-$foo->{bar}bazzle
-EOD
-} ) {
-    cmp_ok $obj->failures(), '==', 0, q{Failures parsing << "EOD"
-$foo->{bar}bazzle
-EOD
-};
-    cmp_ok $obj->interpolates(), '==', 1, q{Does << "EOD"
-$foo->{bar}bazzle
-EOD
- interpolate};
-    is $obj->content(), <<'__END_OF_HERE_DOCUMENT'
-<< "EOD"
-$foo->{bar}bazzle
-EOD
-__END_OF_HERE_DOCUMENT
-, q{Can recover << "EOD"
-$foo->{bar}bazzle
-EOD
-};
-    is $obj->__get_value( 'type' ), '<<',
-	q{Type of << "EOD"
-$foo->{bar}bazzle
-EOD
-};
-    is $obj->delimiters(), q{"EOD"EOD}, q{Delimiters of << "EOD"
-$foo->{bar}bazzle
-EOD
-};
-    is $obj->__get_value( 'start' ), q{"EOD"}, q{Start delimiter of << "EOD"
-$foo->{bar}bazzle
-EOD
-};
-    is $obj->__get_value( 'finish' ), q{EOD}, q{Finish delimiter of << "EOD"
-$foo->{bar}bazzle
-EOD
-};
-    is $obj->encoding(), undef, q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- encoding};
-    is_deeply [ sort $obj->variables() ],
-	[ qw{ $foo } ],
-	q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- interpolated variables};
-    cmp_ok $obj->postderef(), '==', 1, q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- postderef};
-    cmp_ok scalar $obj->elements(), '==', 8,
-	q{Number of elements of << "EOD"
-$foo->{bar}bazzle
-EOD
-};
-    cmp_ok scalar $obj->children(), '==', 2,
-	q{Number of children of << "EOD"
-$foo->{bar}bazzle
-EOD
-};
-    if ( my $kid = $obj->child( 0 ) ) {
-	ok $kid->isa( 'PPIx::QuoteLike::Token::Interpolation' ),
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 0 class};
-	is $kid->content(), q/$foo->{bar}/,
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 0 content};
-	is $kid->error(), undef,
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 0 error};
-	cmp_ok $kid->parent(), '==', $obj,
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 0 parent};
-	cmp_ok $kid->previous_sibling() || 0, '==', $obj->__kid( 0 - 1 ),
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 0 previous sibling};
-	cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 0 + 1 ),
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 0 next sibling};
-	is_deeply [ sort $kid->variables() ],
-	    [ qw{ $foo } ],
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 0 interpolated variables};
-    }
-    if ( my $kid = $obj->child( 1 ) ) {
-	ok $kid->isa( 'PPIx::QuoteLike::Token::String' ),
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 1 class};
-	is $kid->content(), q{bazzle
-},
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 1 content};
-	is $kid->error(), undef,
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 1 error};
-	cmp_ok $kid->parent(), '==', $obj,
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 1 parent};
-	cmp_ok $kid->previous_sibling() || 0, '==', $obj->__kid( 1 - 1 ),
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 1 previous sibling};
-	cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 1 + 1 ),
-	    q{<< "EOD"
-$foo->{bar}bazzle
-EOD
- child 1 next sibling};
+
+    $obj = PPIx::QuoteLike->new( $here_doc );
+    if ( ok $obj, q{Able to parse HERE_DOCUMENT} ) {
+	cmp_ok $obj->failures(), '==', 0, q{Failures parsing HERE_DOCUMENT};
+	cmp_ok $obj->interpolates(), '==', 1, q{Does HERE_DOCUMENT interpolate};
+	is $obj->content(), $here_doc, q{Can recover HERE_DOCUMENT};
+	is $obj->__get_value( 'type' ), '<<', q{Type of HERE_DOCUMENT};
+	is $obj->delimiters(), q{"EOD"EOD}, q{Delimiters of HERE_DOCUMENT};
+	is $obj->__get_value( 'start' ), q{"EOD"},
+	    q{Start delimiter of HERE_DOCUMENT};
+	is $obj->__get_value( 'finish' ), q{EOD},
+	    q{Finish delimiter of HERE_DOCUMENT};
+	is $obj->encoding(), undef, q{Encoding of HERE_DOCUMENT};
+	is_deeply [ sort $obj->variables() ],
+	    [ qw{ $burfle $foo } ],
+	    q{HERE_DOCUMENT interpolated variables};
+	cmp_ok $obj->postderef(), '==', 1, q{HERE_DOCUMENT postderef};
+	cmp_ok scalar $obj->elements(), '==', 10,
+	    q{Number of elements of HERE_DOCUMENT};
+	cmp_ok scalar $obj->children(), '==', 4,
+	    q{Number of children of HERE_DOCUMENT};
+
+	if ( my $kid = $obj->child( 0 ) ) {
+	    ok $kid->isa( 'PPIx::QuoteLike::Token::Interpolation' ),
+		q{HERE_DOCUMENT child 0 class};
+	    is $kid->content(), q/$foo->{bar}/,
+		q{HERE_DOCUMENT child 0 content};
+	    is $kid->error(), undef,
+		q{HERE_DOCUMENT child 0 error};
+	    cmp_ok $kid->parent(), '==', $obj,
+		q{HERE_DOCUMENT child 0 parent};
+	    cmp_ok $kid->previous_sibling() || 0, '==', $obj->__kid( 0 - 1 ),
+		q{HERE_DOCUMENT child 0 previous sibling};
+	    cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 0 + 1 ),
+		q{HERE_DOCUMENT child 0 next sibling};
+	    is_deeply [ sort $kid->variables() ],
+		[ qw{ $foo } ],
+		q{HERE_DOCUMENT child 0 interpolated variables};
+	}
+
+	if ( my $kid = $obj->child( 1 ) ) {
+	    ok $kid->isa( 'PPIx::QuoteLike::Token::String' ),
+		q{HERE_DOCUMENT child 1 class};
+	    is $kid->content(), qq{bazzle\n},
+		q{HERE_DOCUMENT child 1 content};
+	    is $kid->error(), undef,
+		q{HERE_DOCUMENT child 1 error};
+	    cmp_ok $kid->parent(), '==', $obj,
+		q{HERE_DOCUMENT child 1 parent};
+	    cmp_ok $kid->previous_sibling() || 0, '==', $obj->__kid( 1 - 1 ),
+		q{HERE_DOCUMENT child 1 previous sibling};
+	    cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 1 + 1 ),
+		q{HERE_DOCUMENT child 1 next sibling};
+	}
+
+	if ( my $kid = $obj->child( 2 ) ) {
+	    ok $kid->isa( 'PPIx::QuoteLike::Token::Interpolation' ),
+	    q{HERE_DOCUMENT child 2 class};
+	    is $kid->content(), "\${\\\n    \$burfle\n}",
+		q{HERE_DOCUMENT child 2 content};
+	    is $kid->error(), undef,
+		q{HERE_DOCUMENT child 2 error};
+	    cmp_ok $kid->parent(), '==', $obj,
+		q{HERE_DOCUMENT child 2 parent};
+	    cmp_ok $kid->previous_sibling() || 2, '==', $obj->__kid( 2 - 1 ),
+		q{HERE_DOCUMENT child 2 previous sibling};
+	    cmp_ok $kid->next_sibling() || 2, '==', $obj->__kid( 2 + 1 ),
+		q{HERE_DOCUMENT child 2 next sibling};
+	    is_deeply [ sort $kid->variables() ],
+		[ qw{ $burfle } ],
+	    q{HERE_DOCUMENT child 2 interpolated variables};
+	}
     }
 }
 

@@ -5,7 +5,7 @@ Getopt::EX - Getopt Extender
 
 # VERSION
 
-Version v1.15.5
+Version v1.15.6
 
 # DESCRIPTION
 
@@ -70,7 +70,7 @@ _foo_ is specified like this:
     % example -Mfoo::bar(buz=100) ...
 
 Then, after the module **foo** is loaded, function _bar_ is called
-with the parameter _baz_ with value 100.
+with the parameter _buz_ with value 100.
 
 If the module includes `__DATA__` section, it is interpreted just
 same as rc file.  So you can define arbitrary option there.  Combined

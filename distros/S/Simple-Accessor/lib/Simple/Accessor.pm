@@ -1,16 +1,38 @@
 package Simple::Accessor;
-$Simple::Accessor::VERSION = '1.11';
+$Simple::Accessor::VERSION = '1.13';
 use strict;
 use warnings;
 
 # ABSTRACT: a light and simple way to provide accessor in perl
 
+# VERSION
+
 =head1 NAME
 Simple::Accessor - very simple, light and powerful accessor
 
-=head1 VERSION
+=head1 SYNOPSIS
 
-version 1.11
+    package Role::Color;
+    use Simple::Accessor qw{color};
+
+    sub _build_color { 'red' } # default color
+
+    package Car;
+
+    # that s all what you need ! no more line required
+    use Simple::Accessor qw{brand hp};
+
+    with 'Role::Color';
+
+    sub _build_hp { 2 }
+    sub _build_brand { 'unknown' }
+
+    package main;
+
+    my $c = Car->new( brand => 'zebra' );
+
+    is $c->brand, 'zebra';
+    is $c->color, 'red';
 
 =head1 DESCRIPTION
 
@@ -32,20 +54,20 @@ accessible.
     use Simple::Accessor qw{foo bar cherry apple};
 
 You can now call 'new' on your class, and create objects using these attributes
-    
-    package main;    
+
+    package main;
     use MyClass;
 
-    my $o = MyClass->new() 
-        or MyClass->new(bar => 42) 
+    my $o = MyClass->new()
+        or MyClass->new(bar => 42)
         or MyClass->new(apple => 'fruit', cherry => 'fruit', banana => 'yummy');
 
 You can get / set any value using the accessor
-    
+
     is $o->bar(), 42;
     $o->bar(51);
     is $o->bar(), 51;
-    
+
 You can provide your own init method that will be call by new with default args.
 This is optional.
 
@@ -53,7 +75,7 @@ This is optional.
 
     sub build { # previously known as initialize
         my ($self, %opts) = @_;
-        
+
         $self->foo(12345);
     }
 
@@ -70,7 +92,7 @@ You can also control the object after or before its creation using
         bless $self, 'Basket';
     }
 
-You can also provide individual builders / initializers 
+You can also provide individual builders / initializers
 
     sub _build_bar { # previously known as _initialize_bar
         # will be used if no value has been provided for bar
@@ -87,7 +109,7 @@ Be careful with the after method, as there is no protection against infinite loo
 
     sub _before_foo {
         my ($self, $v) = @_;
-    
+
         # do whatever you want with $v
         return 1 or 0;
     }
@@ -97,29 +119,65 @@ Be careful with the after method, as there is no protection against infinite loo
         # invalid value ( will not be set )
         return 0 if ( $v == 42);
         # valid value
-        return 1;        
+        return 1;
     }
 
     sub _after_cherry {
         my ($self) = @_;
-        
+
         # use the set value for extra operations
         $self->apple($self->cherry());
     }
-    
+
 =head1 METHODS
 
 None. The only public method provided is the classical import.
 
 =cut
 
+my $INFO;
+
 sub import {
     my ( $class, @attr ) = @_;
 
     my $from = caller();
 
+    $INFO = {} unless defined $INFO;
+    $INFO->{$from} = {} unless defined $INFO->{$from};
+    $INFO->{$from}->{'attributes'} = [ @attr ];
+
+    _add_with($from);
     _add_new($from);
     _add_accessors( to => $from, attributes => \@attr );
+
+    return;
+}
+
+sub _add_with {
+    my $class = shift;
+    return unless $class;
+
+    my $with  = $class . '::with';
+    {
+        no strict 'refs';
+        *$with = sub {
+            my ( @what ) = @_;
+
+            $INFO->{$class}->{'with'} = [] unless $INFO->{$class}->{'with'};
+            push @{$INFO->{$class}->{'with'}}, @what;
+
+            foreach my $module ( @what ) {
+                eval qq[require $module; 1] or die $@;
+                _add_accessors(
+                    to => $class,
+                    attributes => $INFO->{$module}->{attributes},
+                    from_role => $module
+                );
+            }
+
+            return;
+        };
+    }
 }
 
 sub _add_new {
@@ -161,12 +219,16 @@ sub _add_new {
 sub _add_accessors {
     my (%opts) = @_;
 
-    return unless $opts{to};
+    return unless my $class = $opts{to};
     my @attributes = @{ $opts{attributes} };
     return unless @attributes;
 
+    my $from_role = $opts{from_role};
+
     foreach my $att (@attributes) {
-        my $accessor = $opts{to} . "::$att";
+        my $accessor = $class . "::" . $att;
+
+        die "$class: attribute '$att' is already defined." if $class->can($att);
 
         # allow symbolic refs to typeglob
         no strict 'refs';
@@ -181,6 +243,10 @@ sub _add_accessors {
                     my $sub = '_' . $_ . '_' . $att;
                     if ( $self->can( $sub ) ) {
                         return unless $self->$sub($v);
+                    } elsif ( $from_role  ) {
+                        if ( my $code = $from_role->can( $sub ) ) {
+                            return unless $code->( $self, $v );
+                        }
                     }
                 }
             }
@@ -191,6 +257,10 @@ sub _add_accessors {
                     my $sub = '_' . $builder . '_' . $att;
                     if ( $self->can( $sub ) ) {
                         return $self->{$att} = $self->$sub();
+                    } elsif ( $from_role  ) {
+                        if ( my $code = $from_role->can( $sub ) ) {
+                            return $self->{$att} = $code->( $self );
+                        }
                     }
                 }
             }

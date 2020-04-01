@@ -30,10 +30,23 @@ subtest "sub interface" => sub {
     };
 
     subtest "-anchor option" => sub {
-        my $re1 = re("Example::re1", -anchor=>1);
-        ok $re1;
-        ok('123-456' =~ $re1);
-        ok(!(' 123-456' =~ $re1));
+        my $re1_anchor = re("Example::re1", -anchor=>1);
+        ok $re1_anchor;
+        ok(  '123-456'  =~ $re1_anchor);
+        ok(!(' 123-456' =~ $re1_anchor));
+        ok(!('123-456z' =~ $re1_anchor));
+
+        my $re1_left = re("Example::re1", -anchor=>'left');
+        ok $re1_left;
+        ok(  '123-456'  =~ $re1_left);
+        ok(!(' 123-456' =~ $re1_left));
+        ok(  '123-456z' =~ $re1_left);
+
+        my $re1_right = re("Example::re1", -anchor=>'right');
+        ok $re1_right;
+        ok(  '123-456'  =~ $re1_right);
+        ok(  ' 123-456' =~ $re1_right);
+        ok(!('123-456z' =~ $re1_right));
     };
 };
 

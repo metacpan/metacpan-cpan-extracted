@@ -3,8 +3,11 @@ package App::Jiffy;
 use strict;
 use warnings;
 
+use utf8;
+use open ':std', ':encoding(utf8)';
+
 use 5.008_005;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use App::Jiffy::TimeEntry;
 use App::Jiffy::View::Timesheet;
@@ -46,8 +49,7 @@ sub remove_terminators {
   return (
     title => {
       '$not' => $self->terminator_regex,
-    }
-  )
+    } );
 }
 
 sub add_entry {
@@ -63,7 +65,7 @@ sub add_entry {
 
   my $start_time;
 
-  my $LocalTZ = DateTime::TimeZone->new( name => 'local' ); # For caching
+  my $LocalTZ = DateTime::TimeZone->new( name => 'local' );    # For caching
   my $now = DateTime->now( time_zone => $LocalTZ );
 
   if ( $options->{time} ) {
@@ -123,7 +125,7 @@ sub current_time {
 }
 
 sub time_sheet {
-  my $self = shift;
+  my $self    = shift;
   my $options = shift;
   my $from;
   if ( ref $options ne 'HASH' ) {
@@ -150,13 +152,13 @@ sub time_sheet {
     },
   );
 
-  if ($options->{round}) {
-    @entries = map { $_->duration(round($_->duration)); $_ } @entries;
+  if ( $options->{round} ) {
+    @entries = map { $_->duration( round( $_->duration ) ); $_ } @entries;
   }
 
-  if ($options->{json}) {
-    my $json = JSON::MaybeXS->new(pretty => 1, convert_blessed => 1);
-    print $json->encode(\@entries);
+  if ( $options->{json} ) {
+    my $json = JSON::MaybeXS->new( pretty => 1, convert_blessed => 1 );
+    print $json->encode( \@entries );
   } else {
     $options->{from} = $from;
     App::Jiffy::View::Timesheet::render( \@entries, $options );
@@ -164,9 +166,9 @@ sub time_sheet {
 }
 
 sub search {
-  my $self = shift;
+  my $self       = shift;
   my $query_text = shift;
-  my $options = shift;
+  my $options    = shift;
   my $days;
   if ( ref $options ne 'HASH' ) {
     $days = $options;
@@ -193,8 +195,8 @@ sub search {
     },
   );
 
-  if ($options->{round}) {
-    @entries = map { $_->duration(round($_->duration)); $_ } @entries;
+  if ( $options->{round} ) {
+    @entries = map { $_->duration( round( $_->duration ) ); $_ } @entries;
   }
 
   if ( not @entries ) {
@@ -202,9 +204,9 @@ sub search {
     return;
   }
 
-  if ($options->{json}) {
-    my $json = JSON::MaybeXS->new(pretty => 1, convert_blessed => 1);
-    print $json->encode(\@entries);
+  if ( $options->{json} ) {
+    my $json = JSON::MaybeXS->new( pretty => 1, convert_blessed => 1 );
+    print $json->encode( \@entries );
   } else {
     $options->{from} = $days;
     App::Jiffy::View::Timesheet::render( \@entries, $options );
@@ -215,33 +217,51 @@ sub run {
   my $self = shift;
   my @args = @_;
 
-  if ( $args[0] eq 'current' ) {
-    shift @args;
-    return $self->current_time(@args);
-  } elsif ( $args[0] eq 'timesheet' ) {
-    shift @args;
+  if ( $args[0] ) {
+    if ( $args[0] eq 'current' ) {
+      shift @args;
+      return $self->current_time(@args);
+    } elsif ( $args[0] eq 'timesheet' ) {
+      shift @args;
 
-    my $p = Getopt::Long::Parser->new( config => ['pass_through'], );
-    $p->getoptionsfromarray( \@args, 'verbose' => \my $verbose, 'round' => \my $round, 'json' => \my $json);
+      my $p = Getopt::Long::Parser->new( config => ['pass_through'], );
+      $p->getoptionsfromarray(
+        \@args,
+        'verbose' => \my $verbose,
+        'round'   => \my $round,
+        'json'    => \my $json
+      );
 
-    return $self->time_sheet({
-      verbose => $verbose,
-      round => $round,
-      json => $json,
-    }, @args);
-  } elsif ( $args[0] eq 'search' ) {
-    shift @args;
+      return $self->time_sheet( {
+          verbose => $verbose,
+          round   => $round,
+          json    => $json,
+        },
+        @args
+      );
+    } elsif ( $args[0] eq 'search' ) {
+      shift @args;
 
-    my $p = Getopt::Long::Parser->new( config => ['pass_through'], );
-    $p->getoptionsfromarray( \@args, 'verbose' => \my $verbose, 'round' => \my $round, 'json' => \my $json);
+      my $p = Getopt::Long::Parser->new( config => ['pass_through'], );
+      $p->getoptionsfromarray(
+        \@args,
+        'verbose' => \my $verbose,
+        'round'   => \my $round,
+        'json'    => \my $json
+      );
 
-    my $query_text = shift @args;
+      my $query_text = shift @args;
 
-    return $self->search($query_text, {
-      verbose => $verbose,
-      round => $round,
-      json => $json,
-    }, @args);
+      return $self->search(
+        $query_text,
+        {
+          verbose => $verbose,
+          round   => $round,
+          json    => $json,
+        },
+        @args
+      );
+    }
   }
 
   my $p = Getopt::Long::Parser->new( config => ['pass_through'], );

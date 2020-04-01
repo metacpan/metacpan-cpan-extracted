@@ -1,6 +1,6 @@
 package Getopt::EX;
 use 5.014;
-use version; our $VERSION = version->declare("v1.15.5");
+use version; our $VERSION = version->declare("v1.15.6");
 
 
 1;
@@ -12,7 +12,7 @@ Getopt::EX - Getopt Extender
 
 =head1 VERSION
 
-Version v1.15.5
+Version v1.15.6
 
 
 =head1 DESCRIPTION
@@ -78,7 +78,7 @@ I<foo> is specified like this:
     % example -Mfoo::bar(buz=100) ...
 
 Then, after the module B<foo> is loaded, function I<bar> is called
-with the parameter I<baz> with value 100.
+with the parameter I<buz> with value 100.
 
 If the module includes C<__DATA__> section, it is interpreted just
 same as rc file.  So you can define arbitrary option there.  Combined
@@ -219,3 +219,7 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+#  LocalWords:  Getopt colormap perl foo bar buz colorize BASECLASS
+#  LocalWords:  rc examplerc ENV ARGV getoptions builtins func
+#  LocalWords:  GetOptions

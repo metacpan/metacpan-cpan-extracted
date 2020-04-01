@@ -82,7 +82,7 @@ query_kvk.pl - Query the Dutch Chamber of Commerce via the CLI
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -112,6 +112,26 @@ A KvK number
 =item * --branchNumber
 
 A branch number
+
+=item * --tradeName
+
+The tradename at the KvK
+
+=item * --street
+
+The streetname
+
+=item * --houseNumber
+
+The house number
+
+=item * --postalCode
+
+The zipcode
+
+=item * --city
+
+The city
 
 =item * --apiKey
 

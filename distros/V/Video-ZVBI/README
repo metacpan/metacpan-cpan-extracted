@@ -2,27 +2,27 @@ ZVBI library interface module
 -----------------------------
 
 Name:           Video-ZVBI
-Version:        0.2.6
-Date:           January 2011
+Version:        1.0.0
+Date:           April 2020
 
-DLSIP-code:     bcdOg
-                - development stage: beta testing
+DLSIP-code:     RcdOg
+                - stable release
                 - C compiler required for installation
                 - support by developer
                 - object oriented using blessed references
                 - licensed under GPL (GNU General Public License)
 
 Supported OS:   Linux, FreeBSD, NetBSD, OpenBSD
-Author:         TOMZO (Tom Zoerner <tomzo@users.sourceforge.net>)
-URL:            http://www.perl.com/CPAN/authors/Tom_Zoerner/
+Author:         TOMZO (T. Zoerner <tomzo AT users.sourceforge.net>)
+URL:            https://github.com/tomzox/Perl-Video-ZVBI
 
 
 Description
 -----------
 
-This module provides a Perl interface to the ZVBI library.  The ZVBI
-library allows to access broadcast data services such as teletext or
-closed caption via analog video or DVB capture devices.
+This Perl module provides an object-oriented interface to the ZVBI
+library. The ZVBI library allows accessing broadcast data services such
+as teletext or closed caption via analog video or DVB capture devices.
 
 Official ZVBI library description:
 
@@ -42,13 +42,13 @@ to manipulate captured data directly (i.e. not via library functions),
 the structures' data is copied into Perl data types.  This approach
 allows for a pretty snappy performance.
 
-Best starting point to get familiar with the module is to have a look
-at <http://zapping.sourceforge.net/doc/libzvbi/index.html> and the
-examples scripts provided in the example/ subdirectory: these are
-more or less direct C to Perl ports of the respective programs in
-the test/ subdirectory of the libzvbi sources with a few additions,
-such as a teletext level 2.5 browser implemented in ~300 lines of
-Perl::Tk.
+Best starting point to get familiar with the module having a look at
+ZVBI <http://zapping.sourceforge.net/ZVBI/index.html>, the documentation
+generated when building the ZVBI package, and the example scripts
+provided in the example/ sub-directory: these are more or less direct C
+to Perl ports of the respective programs in the test/ sub-directory of
+the libzvbi sources with a few additions, such as a teletext level 2.5
+browser implemented in apx. 300 lines of Perl::Tk.
 
 
 Comparison with the Video-Capture-VBI module
@@ -69,16 +69,6 @@ supports much more platforms, drivers (e.g. V4L2, DVB, BSD) and services,
 so that it seems warranted to make that available to the Perl universe.
 
 
-BETA WARNING
-------------
-
-This module is still a beta release. Hence interfaces may change in
-in incompatible ways or even interfaces may be renamed. If you plan
-to use this module in a large project please let me know. Once the
-module has been validated in a larger project the beta status may
-be terminated.
-
-
 Installation
 ------------
 
@@ -88,11 +78,18 @@ USE_DL_SYM in Makefile.PL) which in turn requires the pthreads and
 PNG libraries. Once you have these, installation is done in the
 usual steps:
 
-perl Makefile.PL
-make
-make install
+    perl Makefile.PL
+    make
+    make install
 
-Note there are no dependencies on other Perl modules.
+However cleaner than installing directly is generating a package and
+installing that, as this will ensure dependencies are available and
+allow for easy removal of installed files. The repository at the
+homepage listed above contains a script called create_deb.sh that
+automatically creates such a package for Debian (or Ubuntu).
+
+Note there are no dependencies on other Perl modules by the module
+itself. Some of provided example scripts however depend on Perl::Tk.
 
 Trouble-shooting note: By default the module compiles against an
 internal copy of libzvbi.h and loads symbols added in recent library
@@ -104,22 +101,22 @@ USE_LIBZVBI_INT in Makefile.PL
 Bug Reports
 -----------
 
-Please send bug reports relating to the interface module to my
-Sourceforge mail address listed above.  Feel free to also mail me
-about feature requests or interface improvements.
+Please submit bug reports relating to the interface module via
+CPAN <https://metacpan.org/pod/Video::ZVBI>.
 
 If your bug report or request relates to libzvbi rather than the
-interface module, please contact the libzvbi authors, preferrably
+interface module, please contact the libzvbi authors, preferably
 via the zapping mailing list (<http://zapping.sourceforge.net/>)
 In case of capture problems, please make sure to specify which
-operating system and hardware you're using, and of course which
-version of libzvbi and which version of the Perl ZVBI module.
+operating system and hardware you are using, and of course which
+version of libzvbi and which version of Perl and the ZVBI module
+respectively.
 
 
 Copyright
 ---------
 
-Copyright (C) 2006-2011 Th. "Tom" Zoerner.
+Copyright (C) 2006-2020 T. Zoerner.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -133,4 +130,3 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-

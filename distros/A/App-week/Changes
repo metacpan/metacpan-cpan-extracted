@@ -1,5 +1,10 @@
 Revision history for Perl extension App-week
 
+0.06 2020-03-31T10:37:38Z
+
+    - Normalize month names off-to-left position.
+    - Skip test when cal command not found.
+
 0.05 2020-03-31T01:40:15Z
 
     - Probably some system remove trailing spaces.

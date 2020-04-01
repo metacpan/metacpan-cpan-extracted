@@ -22,7 +22,7 @@ require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
 @EXPORT = ();
 
-$VERSION = '1.7.3';
+$VERSION = '1.7.4';
 
 bootstrap Quota;
 
@@ -213,13 +213,13 @@ limits are zero, there is no limit for that user. On most
 systems Quota::query will return undef in that case and
 errno will be set to ESRCH.
 
-When I<$kind> is given and set to 1, I<$uid> is taken as gid and
-group quotas are queried. This is B<not> supported across RPC and
-even locally only on a few architectures (e.g. Linux and other BSD
-based Unix variants, OSF/1 and  AIX - check the quotactl(2) man page
-on your systems). When I<$kind> is set to 2, project quotas are
-queried; this is currently only supported for XFS.  When unsupported,
-this flag is ignored.
+When I<$kind> is given and set to 1, the value in I<$uid> is taken as
+gid and group quotas are queried. Group quotas may not be supported
+across all platforms (e.g. Linux and other BSD based Unix variants,
+OSF/1 and  AIX - check the quotactl(2) man page on your systems).
+
+When I<$kind> is set to 2, project quotas are queried; this is
+currently only supported for XFS. When unsupported, this flag is ignored.
 
 =item I<Quota::setqlim($dev, $uid, $bs,$bh, $is,$ih, $tlo, $kind)>
 
@@ -239,10 +239,10 @@ More alternatives (i.e. setting a specific time) aren't available in
 most implementations.
 
 When I<$kind> is given and set to 1, I<$uid> is taken as gid and
-group quota limits are set. This is supported only on a few
-architectures (see above). When I<$kind> is set to 2, project
-quotas are modified; this is currently only supported for XFS.
-When unsupported, this flag is ignored.
+group quota limits are set. This is not supported on all platforms
+(see above). When I<$kind> is set to 2, project quotas are modified;
+this is currently only supported for XFS. When unsupported, this
+flag is ignored.
 
 Note: if you want to set the quota of a particular user to zero, i.e.
 no write permission, you must not set all limits to zero, since that
@@ -272,10 +272,12 @@ I<Quota::rpcquery($host,$path,$uid,$kind)>
 This is equivalent to B<Quota::query("$host:$path",$uid,$kind)>, i.e.
 query quota for a given user on a given remote host via RPC.
 I<$path> is the path of any file or directory inside the
-file system on the remote host.  Querying group quotas ($kind = 1)
-is only recently supported on some platforms (e.g. on linux via
-"extended" quota RPC, i.e. quota RPC version 2) so it may fail due
-to lack of support either on client or server side, or both.
+file system on the remote host.
+
+Querying group quotas ($kind = 1) is only recently supported on some
+platforms (e.g. on Linux via "extended" quota RPC, i.e. quota RPC
+version 2) so it may fail due to lack of support either on client or
+server side, or both.
 
 =item I<Quota::rpcpeer($port,$use_tcp,timeout)>
 

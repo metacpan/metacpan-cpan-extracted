@@ -21,7 +21,7 @@ sub round {
   # Round minutes
   my $minutes = $duration->minutes;
   if ( $minutes % $minute_period >= $minute_period / 2 ) {
-    $duration->add( minutes => $minute_period - ($minutes % $minute_period) );
+    $duration->add( minutes => $minute_period - ( $minutes % $minute_period ) );
   } else {
     $duration->subtract( minutes => $minutes % $minute_period );
   }

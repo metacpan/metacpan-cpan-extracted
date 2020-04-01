@@ -52,3 +52,7 @@ Revision history for Perl module Devel::Git::MultiBisect
 0.13 Fri Dec  6 13:10:28 EST 2019
     - BuildTransitions:  Enable multisection for changes in build-time
       warnings.
+
+0.14 Tue Mar 31 08:47:56 EDT 2020
+    - Add example program: xt/warnings-transitions.pl.  No change in 
+      functionality.

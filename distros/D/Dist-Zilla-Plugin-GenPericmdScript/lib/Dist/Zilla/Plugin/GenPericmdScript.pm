@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::GenPericmdScript;
 
-our $DATE = '2018-01-17'; # DATE
-our $VERSION = '0.421'; # VERSION
+our $DATE = '2020-04-01'; # DATE
+our $VERSION = '0.422'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,6 +34,7 @@ has summary => (is=>'rw');
 has cmdline => (is=>'rw');
 has prefer_lite => (is=>'rw');
 has enable_log => (is=>'rw');
+has allow_unknown_opts => (is=>'rw');
 has pass_cmdline_object => (is=>'rw');
 has default_log_level => (is=>'rw');
 has extra_urls_for_version => (is=>'rw');
@@ -150,6 +151,7 @@ sub munge_files {
             log => $self->enable_log,
             ($self->extra_urls_for_version ? (extra_urls_for_version => [split(/\s*,\s*/, $self->extra_urls_for_version)]) : ()),
             default_log_level => $self->default_log_level,
+            allow_unknown_opts => $self->allow_unknown_opts,
             pass_cmdline_object => $self->pass_cmdline_object,
             (cmdline => $self->cmdline) x !!defined($self->cmdline),
             prefer_lite => $self->prefer_lite,
@@ -270,7 +272,7 @@ Dist::Zilla::Plugin::GenPericmdScript - Generate Perinci::CmdLine script
 
 =head1 VERSION
 
-This document describes version 0.421 of Dist::Zilla::Plugin::GenPericmdScript (from Perl distribution Dist-Zilla-Plugin-GenPericmdScript), released on 2018-01-17.
+This document describes version 0.422 of Dist::Zilla::Plugin::GenPericmdScript (from Perl distribution Dist-Zilla-Plugin-GenPericmdScript), released on 2020-04-01.
 
 =head1 SYNOPSIS
 
@@ -393,6 +395,10 @@ If set, will add this code to the generated script:
 
 This can be used if you want your script to be verbose by default, for example.
 
+=head2 allow_unknown_opts => bool
+
+Will be passed to Perinci::CmdLine object construction code.
+
 =head2 pass_cmdline_object => bool
 
 Will be passed to Perinci::CmdLine object construction code.
@@ -502,7 +508,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

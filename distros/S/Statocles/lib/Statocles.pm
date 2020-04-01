@@ -1,5 +1,5 @@
 package Statocles;
-our $VERSION = '0.096';
+our $VERSION = '0.097';
 # ABSTRACT: A static site generator
 
 use Statocles::Base 'Class';
@@ -45,6 +45,8 @@ sub run {
         'help|h',
         'version',
         'verbose|v+',
+        'include|I:s@',
+        'lib|l',
     );
     return pod2usage(0) if $opt{help};
 
@@ -53,6 +55,14 @@ sub run {
         require POSIX;
         say "Locale: " . POSIX::setlocale( POSIX::LC_CTYPE );
         return 0;
+    }
+
+    if ( $opt{lib} ) {
+        unshift @{ $opt{include} }, 'lib';
+    }
+
+    if ( $opt{include} ) {
+        unshift @INC, @{ $opt{include} };
     }
 
     my $method = shift @argv;
@@ -171,7 +181,7 @@ Statocles - A static site generator
 
 =head1 VERSION
 
-version 0.096
+version 0.097
 
 =head1 SYNOPSIS
 

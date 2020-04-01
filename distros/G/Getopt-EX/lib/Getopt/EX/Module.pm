@@ -62,7 +62,7 @@ sub configure {
 	};
 	while (@base) {
 	    my $base = shift @base;
-	    my $mod = $base ? "${base}::${module}" : $module;
+	    my $mod = $base ? "$base\::$module" : $module;
 	    eval "package $pkg; use $mod;";
 	    if ($@) {
 		my $path = $mod =~ s{::}{/}gr . ".pm";
@@ -71,7 +71,7 @@ sub configure {
 	    }
 	    $obj->module($mod);
 	    $obj->define('__PACKAGE__' => $mod);
-	    local *data = "${mod}::DATA";
+	    local *data = "$mod\::DATA";
 	    if (not eof *data) {
 		$obj->readrc(*data);
 	    }
@@ -356,7 +356,7 @@ sub parseline {
 	if ($arg[2] =~ /^\\?(?<mark>[\$\@\%])(?<name>[\w:]+)/) {
 	    my($mark, $name) = @+{"mark", "name"};
 	    my $mod = $obj->module;
-	    /:/ or s/^/${mod}::/ for $name;
+	    /:/ or s/^/$mod\::/ for $name;
 	    no strict 'refs';
 	    $obj->builtin($arg[1] => {'$' => \${$name},
 				      '@' => \@{$name},
@@ -423,7 +423,7 @@ sub run_inits {
     ##
     ## Call &initialize if defined.
     ##
-    my $init = "${module}::initialize";
+    my $init = "$module\::initialize";
     if (defined &$init) {
 	no strict 'refs';
 	&$init($obj, $argv);

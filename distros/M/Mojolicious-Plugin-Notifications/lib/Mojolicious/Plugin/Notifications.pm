@@ -7,7 +7,7 @@ use Scalar::Util qw/blessed/;
 
 our $TYPE_RE = qr/^[-a-zA-Z_]+$/;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 # TODO:
 #   Maybe revert to tx-handler and use session instead of flash!
@@ -356,7 +356,7 @@ in case the session expires using C<session(expires =E<gt> 1)>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2019, L<Nils Diewald|https://nils-diewald.de/>.
+Copyright (C) 2014-2020, L<Nils Diewald|https://nils-diewald.de/>.
 
 Part of the code was written at the
 L<Mojoconf 2014|http://www.mojoconf.org/mojo2014/> hackathon.

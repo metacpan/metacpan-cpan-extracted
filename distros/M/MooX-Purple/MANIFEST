@@ -18,12 +18,8 @@ t/08-has_attributes.t
 t/09-has_attributes-lib.t
 t/10-role_attributes.t
 t/11-role_attributes-lib.t
-t/lib/out/BasicAttributes.pmc
-t/lib/out/Before.pmc
-t/lib/out/ExtendsBasicAttributes.pmc
-t/lib/out/Hello.pmc
-t/lib/out/Night.pmc
-t/lib/out/World.pmc
+t/12-path.t
+t/13-path-lib.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

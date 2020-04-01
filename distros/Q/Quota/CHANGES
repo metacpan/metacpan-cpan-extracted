@@ -1,3 +1,9 @@
+Changes in 1.7.4 (March 2020)
+- Build fixes for NetBSD release > 6 and Apple/Darwin
+  based on failure reports of automated CPAN testing
+- Added support for group quotas in test.pl;
+  Corrections to documentation of group quota handling
+
 Changes in 1.7.3 (March 2020)
 - Added detection for missing header rpc/rpc.h;
   automatically switch to using "tirpc", if present.

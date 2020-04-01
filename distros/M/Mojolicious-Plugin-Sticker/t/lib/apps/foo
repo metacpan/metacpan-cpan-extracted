@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+
+use Mojolicious::Lite;
+
+get '/foo' => sub {
+    my $c = shift;
+
+    $c->render( json => { foo => 123 } );
+};
+
+app->start;
+

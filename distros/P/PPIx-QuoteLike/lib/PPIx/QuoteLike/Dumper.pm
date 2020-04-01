@@ -12,7 +12,7 @@ use PPIx::QuoteLike::Constant qw{ @CARP_NOT };
 use PPIx::QuoteLike::Utils qw{ __instance };
 use Scalar::Util ();
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use constant SCALAR_REF	=> ref \0;
 
@@ -25,6 +25,7 @@ use constant SCALAR_REF	=> ref \0;
 	margin		=> 0,
 	perl_version	=> 0,
 	ppi		=> 0,
+	short		=> 0,
 	significant	=> 0,
 	tokens		=> 0,
 	variables	=> 0,
@@ -98,7 +99,7 @@ sub list {
 	    map { _format_content( $obj, $_ ) }
 	    qw{ type start finish };
 	push @rslt,
-	    join "\t", ref $obj, $string,
+	    join "\t", $self->_class_name( $obj ), $string,
 	    _format_attr( $obj, qw{ encoding failures interpolates } ),
 	    $self->_perl_version( $obj ),
 	    $self->_variables( $obj ),
@@ -118,7 +119,7 @@ sub list {
 		' ' x 19 :
 	    '';
 	my @line = (
-	    ref $elem,
+	    $self->_class_name( $elem ),
 	    _quote( $elem->content() ),
 	    $self->_perl_version( $elem ),
 	    $self->_variables( $elem ),
@@ -154,6 +155,14 @@ sub string {
     my ( $self ) = @_;
     my $margin = ' ' x $self->{margin};
     return join '', map { "$margin$_\n" } $self->list();
+}
+
+sub _class_name {
+    my ( $self, $obj ) = @_;
+    my $class = ref $obj;
+    $self->{short}
+	and $class =~ s/ \A PPIx::QuoteLike:: //smx;
+    return $class;
 }
 
 {
@@ -259,17 +268,6 @@ $val
 __END_OF_HERE_DOCUMENT
 ";
     }
-
-=begin comment
-
-    $val =~ m/ [{}] /smx
-	or return "q{$val}";
-    $val =~ m{ / }smx
-	or return "q/$val/";
-
-=end comment
-
-=cut
 
     $val =~ s/ (?= [\\'] )/\\/smxg;
     return "'$val'";
@@ -394,6 +392,10 @@ The default is C<0> (i.e. false).
 
 =item postderef Boolean
 
+B<THIS ARGUMENT IS DEPRECATED>.  See L<DEPRECATION
+NOTICE|PPIx::QuoteLike/DEPRECATION NOTICE> in
+L<PPIx::QuoteLike|PPIx::QuoteLike> for the details.
+
 This argument specifies whether or not postfix dereferences are
 recognized in interpolations. It is passed through to
 L<PPIx::QuoteLike|PPIx::QuoteLike> L<new()|PPIx::QuoteLike/new> unless
@@ -406,6 +408,11 @@ This argument specifies whether or not a PPI dump is provided for
 interpolations.
 
 The default is C<0> (i.e. false).
+
+=item short Boolean
+
+If true, leading C<'PPIx::QuoteLike::'> will be removed from the class
+names in the output.
 
 =item tokens boolean
 

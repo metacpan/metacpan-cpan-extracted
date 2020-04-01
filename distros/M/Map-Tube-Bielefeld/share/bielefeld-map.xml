@@ -23,9 +23,9 @@
     <station id="1-11" name="Bethel" line="1:11" link="1-12"/>
     <station id="1-12" name="Adenauerplatz" line="1:12" link="1-13"/>
     <station id="1-13" name="Landgericht" line="1:13" link="1-14,2-07"/>
-    <station id="1-14" name="Rathaus" line="1:14" link="1-15,2-07,3-12,4-01"/>
-    <station id="1-15" name="Jahnplatz" line="1:15" link="1-16,2-08,3-13,4-02"/>
-    <station id="1-16" name="Hauptbahnhof" line="1:16" link="1-17,2-09,3-14,4-03"/>
+    <station id="1-14" name="Rathaus" line="1:14" link="1-15,2-07,3-11,4-02"/>
+    <station id="1-15" name="Jahnplatz" line="1:15" link="1-16,2-08,3-12,4-03"/>
+    <station id="1-16" name="Hauptbahnhof" line="1:16" link="1-17,2-09,3-13,4-04"/>
     <station id="1-17" name="Sudbrackstraße" line="1:17" link="1-18"/>
     <station id="1-18" name="Johannesstift" line="1:18" link="1-19"/>
     <station id="1-19" name="Deciusstraße" line="1:19" link="1-20"/>
@@ -40,9 +40,9 @@
     <station id="2-04" name="Teutoburger Straße" line="2:4" link="2-05"/>
     <station id="2-05" name="August-Bebel-Straße" line="2:5" link="2-06"/>
     <station id="2-06" name="Landgericht" line="2:6" link="2-07,1-14"/>
-    <station id="2-07" name="Rathaus" line="2:7" link="2-08,1-15,3-12,4-01"/>
-    <station id="2-08" name="Jahnplatz" line="2:8" link="2-09,1-15,3-13,4-02"/>
-    <station id="2-09" name="Hauptbahnhof" line="2:9" link="2-10,4-03,3-13,1-16"/>
+    <station id="2-07" name="Rathaus" line="2:7" link="2-08,1-15,3-11,4-02"/>
+    <station id="2-08" name="Jahnplatz" line="2:8" link="2-09,1-15,3-12,4-03"/>
+    <station id="2-09" name="Hauptbahnhof" line="2:9" link="2-10,4-04,3-13,1-16"/>
     <station id="2-10" name="Beckhausstraße" line="2:10" link="2-11"/>
     <station id="2-11" name="Stadtheider Straße" line="2:11" link="2-12"/>
     <station id="2-12" name="Schillerstraße" line="2:12" link="2-13"/>
@@ -62,33 +62,33 @@
     <station id="3-03" name="Elpke" line="3:3" link="3-04"/>
     <station id="3-04" name="Roggenkamp" line="3:4" link="3-05"/>
     <station id="3-05" name="Luther-Kirche" line="3:5" link="3-06"/>
-    <station id="3-06" name="Sieker Mitte" line="3:7" link="3-07"/>
-    <station id="3-07" name="Hartlager Weg" line="3:8" link="3-08"/>
+    <station id="3-06" name="Sieker Mitte" line="3:6" link="3-07"/>
+    <station id="3-07" name="Hartlager Weg" line="3:7" link="3-08"/>
     <station id="3-08" name="Oststraße" line="3:8" link="3-09"/>
     <station id="3-09" name="Krankenhaus Mitte" line="3:9" link="3-10"/>
-    <station id="3-10" name="Ravensberger Straße" line="3:10" link="3-11"/>
-    <station id="3-11" name="August-Schröder-Straße" line="3:11" link="3-12"/>
-    <station id="3-12" name="Rathaus" line="3:12" link="3-13,4-01,2-07,1-14"/>
-    <station id="3-13" name="Jahnplatz" line="3:13" link="3-14,4-02,1-15,2-08"/>
-    <station id="3-14" name="Hauptbahnhof" line="3:14" link="3-15,4-03,2-09,1-16"/>
-    <station id="3-15" name="Wittekindstraße" line="3:15" link="3-16"/>
-    <station id="3-16" name="Nordpark" line="3:16" link="3-17"/>
-    <station id="3-17" name="Auf der Hufe" line="3:17" link="3-18"/>
-    <station id="3-18" name="Lange Straße" line="3:18" link="3-19"/>
-    <station id="3-19" name="Koblenzer Straße" line="3:19" link="3-20"/>
-    <station id="3-20" name="Voltmannstraße" line="3:20" link="3-21"/>
-    <station id="3-21" name="Babenhausen Süd" line="3:21" link="3-20"/>
+    <station id="3-10" name="Marktstraße" line="3:10" link="3-11"/>
+    <station id="3-11" name="Rathaus" line="3:11" link="3-12,4-02,2-07,1-14"/>
+    <station id="3-12" name="Jahnplatz" line="3:12" link="3-13,4-03,1-15,2-08"/>
+    <station id="3-13" name="Hauptbahnhof" line="3:13" link="3-14,4-04,2-09,1-16"/>
+    <station id="3-14" name="Wittekindstraße" line="3:14" link="3-15"/>
+    <station id="3-15" name="Nordpark" line="3:15" link="3-16"/>
+    <station id="3-16" name="Auf der Hufe" line="3:16" link="3-17"/>
+    <station id="3-17" name="Lange Straße" line="3:17" link="3-18"/>
+    <station id="3-18" name="Koblenzer Straße" line="3:18" link="3-19"/>
+    <station id="3-19" name="Voltmannstraße" line="3:19" link="3-20"/>
+    <station id="3-20" name="Babenhausen Süd" line="3:20" link="3-19"/>
 
     <!-- Linie 4 -->
-    <station id="4-01" name="Rathaus" line="4:1" link="4-02,3-12,2-07,1-14"/>
-    <station id="4-02" name="Jahnplatz" line="4:2" link="4-03,3-13,2-08,1-15"/>
-    <station id="4-03" name="Hauptbahnhof" line="4:3" link="4-04,3-14,2-09,1-16"/>
-    <station id="4-04" name="Siegfriedplatz" line="4:4" link="4-05"/>
-    <station id="4-05" name="Rudolf-Oetker-Halle" line="4:5" link="4-06"/>
-    <station id="4-06" name="Graf-von-Stauffenberg-Straße" line="4:6" link="4-07"/>
-    <station id="4-07" name="Bültmannshof" line="4:7" link="4-08"/>
-    <station id="4-08" name="Universität" line="4:8" link="4-09"/>
-    <station id="4-09" name="Wellensiek" line="4:9" link="4-10"/>
-    <station id="4-10" name="Lohmannshof" line="4:10" link="4-09"/>
+    <station id="4-01" name="Dürkopp Tor 6" line="4:1" link="4-02"/>
+    <station id="4-02" name="Rathaus" line="4:2" link="4-03,3-11,2-07,1-14"/>
+    <station id="4-03" name="Jahnplatz" line="4:3" link="4-04,3-12,2-08,1-15"/>
+    <station id="4-04" name="Hauptbahnhof" line="4:4" link="4-05,3-13,2-09,1-16"/>
+    <station id="4-05" name="Siegfriedplatz" line="4:5" link="4-06"/>
+    <station id="4-06" name="Rudolf-Oetker-Halle" line="4:6" link="4-07"/>
+    <station id="4-07" name="Graf-von-Stauffenberg-Straße" line="4:7" link="4-08"/>
+    <station id="4-08" name="Bültmannshof" line="4:8" link="4-09"/>
+    <station id="4-09" name="Universität" line="4:9" link="4-10"/>
+    <station id="4-10" name="Wellensiek" line="4:10" link="4-11"/>
+    <station id="4-11" name="Lohmannshof" line="4:11" link="4-10"/>
   </stations>
 </tube>

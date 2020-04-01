@@ -2,8 +2,8 @@ NAME
     App::FirefoxUtils - Utilities related to Firefox
 
 VERSION
-    This document describes version 0.006 of App::FirefoxUtils (from Perl
-    distribution App-FirefoxUtils), released on 2019-12-09.
+    This document describes version 0.007 of App::FirefoxUtils (from Perl
+    distribution App-FirefoxUtils), released on 2019-12-10.
 
 SYNOPSIS
 DESCRIPTION
@@ -59,6 +59,15 @@ FUNCTIONS
      pause_firefox(%args) -> [status, msg, payload, meta]
 
     Pause (kill -STOP) Firefox.
+
+    A modern browser now runs complex web pages and applications. Despite
+    browser's power management feature, these pages/tabs on the browser
+    often still eat considerable CPU cycles even though they run in the
+    background. Stopping (kill -STOP) the browser processes is a simple and
+    effective way to stop CPU eating on Unix. It can be performed whenever
+    you are not using your browsers for a little while, e.g. when you are
+    typing on an editor or watching a movie. When you want to use your
+    browser again, simply unpause it.
 
     This function is not exported.
 

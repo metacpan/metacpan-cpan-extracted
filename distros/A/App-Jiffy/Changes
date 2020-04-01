@@ -1,5 +1,9 @@
 Revision history for App-Jiffy
 
+0.09  2020-03-31 16:46:10 CDT
+        - Prevent warning when entering blank entry
+        - Set binmode for output to support utf8 strings
+
 0.08  2018-10-31 19:32:13 PDT
         - Set timezone to `local` when displaying today's `timesheet`
 

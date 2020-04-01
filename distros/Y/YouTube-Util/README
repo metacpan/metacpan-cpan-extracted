@@ -1,0 +1,93 @@
+NAME
+    YouTube::Util - YouTube-related utilities
+
+VERSION
+    This document describes version 0.002 of YouTube::Util (from Perl
+    distribution YouTube-Util), released on 2020-04-01.
+
+FUNCTIONS
+  extract_youtube_video_id
+    Usage:
+
+     extract_youtube_video_id($arg) -> any
+
+    Extract YouTube video ID from a string containing video ID, or
+    youtube-dl-generated filename, or YouTube URL.
+
+    Examples:
+
+    *   Example #1:
+
+         extract_youtube_video_id("https://www.youtube.com/watch?v=rp4UwPZfRis"); # -> "rp4UwPZfRis"
+
+    *   Example #2:
+
+         extract_youtube_video_id("https://www.youtube.com/watch?v=cl1p7SOwnEk&list=PLjxOg4YY7Ah2JGb_QvA6KSB6YmikzA2fo&index=2&t=0s");
+
+        Result:
+
+         "cl1p7SOwnEk"
+
+    *   Example #3:
+
+         extract_youtube_video_id("https://www.youtube.com/watch?list=PLjxOg4YY7Ah2JGb_QvA6KSB6YmikzA2fo&v=cl1p7SOwnEk&index=2&t=0s");
+
+        Result:
+
+         "cl1p7SOwnEk"
+
+    *   Example #4:
+
+         extract_youtube_video_id("https://www.youtube.com/embed/U9v2S49sHeQ?rel=0"); # -> "U9v2S49sHeQ"
+
+    *   Example #5:
+
+         extract_youtube_video_id("\$100,000 Name That Tune - Nick vs. Carol-SY-DnVZeFH0.mp4"); # -> "SY-DnVZeFH0"
+
+    *   Example #6:
+
+         extract_youtube_video_id("GNdALsnBjh8"); # -> "GNdALsnBjh8"
+
+    *   Example #7:
+
+         extract_youtube_video_id("foo"); # -> undef
+
+    Return undef if not found.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $arg* => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/YouTube-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-YouTube-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=YouTube-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern::YouTube
+
+    App::YouTubeUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

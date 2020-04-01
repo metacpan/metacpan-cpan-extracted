@@ -16,7 +16,7 @@ use PPIx::QuoteLike::Utils qw{
     visual_column_number
 };
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 # Private to this package.
 sub __new {
@@ -284,6 +284,13 @@ This method returns the top of the hierarchy.
 =head2 variables
 
  say "Interpolates $_" for $elem->variables();
+
+B<NOTE> that this method is discouraged, and may well be deprecated and
+removed. My problem with it is that it returns variable names rather
+than L<PPI::Element|PPI::Element> objects, leaving you no idea how the
+variables are used. It was originally written for the benefit of
+L<Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter|Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter>,
+but has proven inadequate to that policy's needs.
 
 This convenience method returns all interpolated variables. Each is
 returned only once, and they are returned in no particular order.
