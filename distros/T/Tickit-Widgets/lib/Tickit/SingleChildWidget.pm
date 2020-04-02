@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::SingleChildWidget;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Tickit::ContainerWidget );
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Carp;
 
@@ -39,8 +39,12 @@ obtain it.
 
    $widget = Tickit::SingleChildWidget->new( %args )
 
-Constructs a new C<Tickit::SingleChildWidget> object. If passed an argument
-called C<child> this will be added as the contained child widget.
+Constructs a new C<Tickit::SingleChildWidget> object.
+
+As a back-compatibility option if passed an argument called C<child> this will
+be added as the contained child widget. This is now discouraged as it
+complicates the creation of subclasses; see instead the L</set_child> method
+used as a chaining mutator.
 
 =cut
 
@@ -51,7 +55,10 @@ sub new
 
    my $self = $class->SUPER::new( %args );
 
-   $self->set_child( $args{child} ) if exists $args{child};
+   if( exists $args{child} ) {
+      Carp::carp( "The 'child' constructor argument to $class is discouraged; use ->set_child instead" );
+      $self->set_child( $args{child} );
+   }
 
    return $self;
 }
@@ -88,6 +95,15 @@ sub children
 
 Sets the child widget, or C<undef> to remove.
 
+This method returns the container widget instance itself making it suitable to
+use as a chaining mutator; e.g.
+
+   my $container = Tickit::SingleChildWidget->new( ... )
+      ->set_child( Tickit::Widget::Static->new( ... ) );
+
+This should be preferred over using the C<child> constructor argument, which
+is now discouraged.
+
 =cut
 
 sub set_child
@@ -105,6 +121,8 @@ sub set_child
    if( $child ) {
       $self->SUPER::add( $child );
    }
+
+   return $self;
 }
 
 sub add

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.0';
+our $VERSION = 'v7.0.2';
 
 
 has max_value => (
@@ -98,7 +98,7 @@ SemanticWeb::Schema::PropertyValue - A property-value pair, e
 
 =head1 VERSION
 
-version v7.0.0
+version v7.0.2
 
 =head1 DESCRIPTION
 
@@ -161,66 +161,7 @@ href="http://schema.org/PropertyValue">PropertyValue</a> for each <a
 class="localLink"
 href="http://schema.org/variableMeasured">variableMeasured</a> and attach
 the corresponding <a class="localLink"
-href="http://schema.org/measurementTechnique">measurementTechnique</a>.]]><
-/rdfs:comment> <schema:domainIncludes
-rdf:resource="http://schema.org/Dataset"/> <schema:isPartOf
-rdf:resource="http://pending.schema.org"/> <schema:domainIncludes
-rdf:resource="http://schema.org/DataDownload"/>
-<schema:category>issue-1425</schema:category> </rdf:Property>
-<schema:HealthAspectEnumeration
-rdf:about="http://schema.org/LivingWithHealthAspect"> <schema:isPartOf
-rdf:resource="http://pending.schema.org"/>
-<rdfs:label>LivingWithHealthAspect</rdfs:label>
-<schema:category>issue-2374</schema:category> <rdfs:comment>Information
-about coping or life related to the topic.</rdfs:comment> <dct:source
-rdf:resource="https://github.com/schemaorg/schemaorg/issues/2374"/>
-</schema:HealthAspectEnumeration> <rdf:Property
-rdf:about="http://schema.org/termsOfService"> <rdfs:comment>Human-readable
-terms of service documentation.</rdfs:comment> <schema:isPartOf
-rdf:resource="http://pending.schema.org"/>
-<schema:category>issue-1423</schema:category> <dct:source
-rdf:resource="https://github.com/schemaorg/schemaorg/issues/1423"/>
-<schema:domainIncludes rdf:resource="http://schema.org/Service"/>
-<schema:rangeIncludes rdf:resource="http://schema.org/URL"/>
-<schema:rangeIncludes rdf:resource="http://schema.org/Text"/>
-<rdfs:label>termsOfService</rdfs:label> </rdf:Property>
-<schema:ReturnFeesEnumeration
-rdf:about="http://schema.org/OriginalShippingFees">
-<rdfs:comment>OriginalShippingFees ...</rdfs:comment>
-<rdfs:label>OriginalShippingFees</rdfs:label> <schema:isPartOf
-rdf:resource="http://pending.schema.org"/>
-<schema:category>issue-2288</schema:category> <dct:source
-rdf:resource="https://github.com/schemaorg/schemaorg/issues/2288"/>
-</schema:ReturnFeesEnumeration> <rdf:Property
-rdf:about="http://schema.org/timeToComplete"> <dct:source
-rdf:resource="https://github.com/schemaorg/schemaorg/issues/2289"/>
-<schema:rangeIncludes rdf:resource="http://schema.org/Duration"/>
-<rdfs:label>timeToComplete</rdfs:label> <schema:domainIncludes
-rdf:resource="http://schema.org/EducationalOccupationalProgram"/>
-<schema:category>issue-2289</schema:category> <rdfs:comment>The expected
-length of time to complete the program if attending
-full-time.</rdfs:comment> <schema:isPartOf
-rdf:resource="http://pending.schema.org"/> </rdf:Property> <rdfs:Class
-rdf:about="http://schema.org/PodcastSeason"> <rdfs:subClassOf
-rdf:resource="http://schema.org/CreativeWorkSeason"/> <dct:source
-rdf:resource="https://github.com/schemaorg/schemaorg/issues/373"/>
-<schema:category>issue-373</schema:category> <schema:isPartOf
-rdf:resource="http://pending.schema.org"/> <rdfs:comment>A single season of
-a podcast. Many podcasts do not break down into separate seasons. In that
-case, PodcastSeries should be used.</rdfs:comment>
-<rdfs:label>PodcastSeason</rdfs:label> </rdfs:Class> <rdf:Property
-rdf:about="http://schema.org/phoneticText"> <dct:source
-rdf:resource="https://github.com/schemaorg/schemaorg/issues/2108"/>
-<schema:domainIncludes rdf:resource="http://schema.org/PronounceableText"/>
-<rdfs:label>phoneticText</rdfs:label> <schema:rangeIncludes
-rdf:resource="http://schema.org/Text"/>
-<schema:category>issue-2108</schema:category> <schema:isPartOf
-rdf:resource="http://pending.schema.org"/>
-<rdfs:comment><![CDATA[Representation of a text <a class="localLink"
-href="http://schema.org/textValue">textValue</a> using the specified <a
-class="localLink"
-href="http://schema.org/speechToTextMarkup">speechToTextMarkup</a>. For
-example the city name of Houston in IPA: /ËhjuËstÉn/.<p>
+href="http://schema.org/measurementTechnique">measurementTechnique</a>.<p>
 
 A measurement_technique should be one of the following types:
 

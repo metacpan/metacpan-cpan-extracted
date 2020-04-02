@@ -192,11 +192,6 @@ static OP *S_parse_subsignature(pTHX_ int flags)
   }
 endofelems:
 
-  if(!elems) {
-    LEAVE;
-    return NULL;
-  }
-
   if (!FEATURE_SIGNATURES_IS_ENABLED)
     croak("Experimental subroutine signatures not enabled");
 

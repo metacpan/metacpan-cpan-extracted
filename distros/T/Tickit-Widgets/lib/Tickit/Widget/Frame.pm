@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::Frame;
 
@@ -12,7 +12,7 @@ use Tickit::Style;
 
 use Tickit::WidgetRole::Alignable name => "title_align";
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Carp;
 
@@ -26,22 +26,22 @@ C<Tickit::Widget::Frame> - draw a frame around another widget
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::Frame;
- use Tickit::Widget::Static;
+   use Tickit;
+   use Tickit::Widget::Frame;
+   use Tickit::Widget::Static;
 
- my $hello = Tickit::Widget::Static->new(
-    text   => "Hello, world",
-    align  => "centre",
-    valign => "middle",
- );
+   my $frame = Tickit::Widget::Frame->new(
+      style => { linetype => "single" },
+   )
+      ->set_child(
+         Tickit::Widget::Static->new(
+            text   => "Hello, world",
+            align  => "centre",
+            valign => "middle",
+         )
+      );
 
- my $frame = Tickit::Widget::Frame->new(
-    child => $hello,
-    style => { linetype => "single" },
- );
-
- Tickit->new( root => $frame )->run;
+   Tickit->new( root => $frame )->run;
 
 =head1 DESCRIPTION
 
@@ -107,7 +107,9 @@ use constant WIDGET_PEN_FROM_STYLE => 1;
 
 =cut
 
-=head2 $frame = Tickit::Widget::Frame->new( %args )
+=head2 new
+
+   $frame = Tickit::Widget::Frame->new( %args )
 
 Constructs a new C<Tickit::Widget::Static> object.
 
@@ -134,12 +136,6 @@ sub new
 {
    my $class = shift;
    my %args = @_;
-
-   # Previously 'linetype' was called 'style', but it collided with
-   # Tickit::Widget's idea of style
-   if( defined $args{style} and !ref $args{style} ) {
-      $args{style} = { linetype => delete $args{style} };
-   }
 
    my $self = $class->SUPER::new( %args );
 
@@ -218,7 +214,9 @@ my %LINESTYLES = (
    thick  => LINE_THICK,
 );
 
-=head2 $title = $frame->title
+=head2 title
+
+   $title = $frame->title
 
 =cut
 
@@ -228,7 +226,9 @@ sub title
    return $self->{title};
 }
 
-=head2 $frame->set_title( $title )
+=head2 set_title
+
+   $frame->set_title( $title )
 
 Accessor for the C<title> property, a string written in the top of the
 frame.
@@ -242,9 +242,13 @@ sub set_title
    $self->redraw;
 }
 
-=head2 $title_align = $frame->title_align
+=head2 title_align
 
-=head2 $frame->set_title_align( $title_align )
+=head2 set_title_align
+
+   $title_align = $frame->title_align
+
+   $frame->set_title_align( $title_align )
 
 Accessor for the C<title_align> property. Gives a vlaue in the range C<0.0> to
 C<1.0> to align the title in the top of the frame.

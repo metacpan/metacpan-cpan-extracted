@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.0';
+our $VERSION = 'v7.0.2';
 
 
 has recipient => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::ReturnAction - The act of returning to the origin that whic
 
 =head1 VERSION
 
-version v7.0.0
+version v7.0.2
 
 =head1 DESCRIPTION
 

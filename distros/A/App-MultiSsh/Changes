@@ -1,5 +1,13 @@
 Revision history for App-MultiSsh
 
+0.24   2020-04-02
+        Updating for release of version 0.24
+        Got tests to match code changes (Ivan Wills)
+        Making is possible to control synchronize-pages's state (Ivan Wills)
+        Fixed the test (Ivan Wills)
+        Removed warning (Ivan Wills)
+        Adding more info to show which server your are connected to (Ivan Wills)
+
 0.23   2020-01-08
         Updating for release of version 0.23
         Updated date (Ivan Wills)

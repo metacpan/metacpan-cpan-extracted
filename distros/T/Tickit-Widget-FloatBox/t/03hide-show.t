@@ -13,9 +13,8 @@ use Tickit::Widget::Static;
 
 my $win = mk_window;
 
-my $widget = Tickit::Widget::FloatBox->new(
-   base_child => TestWidget->new,
-);
+my $widget = Tickit::Widget::FloatBox->new
+   ->set_base_child( TestWidget->new );
 
 $widget->set_window( $win );
 

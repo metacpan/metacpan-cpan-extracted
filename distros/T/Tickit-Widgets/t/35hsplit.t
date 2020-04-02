@@ -16,10 +16,9 @@ my $win = mk_window;
 
 my @statics = map { Tickit::Widget::Static->new( text => "Widget $_" ) } qw( A B );
 
-my $widget = Tickit::Widget::HSplit->new(
-   top_child    => $statics[0],
-   bottom_child => $statics[1],
-);
+my $widget = Tickit::Widget::HSplit->new
+   ->set_top_child    ( $statics[0] )
+   ->set_bottom_child ( $statics[1] );
 
 ok( defined $widget, 'defined $widget' );
 

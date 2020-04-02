@@ -1176,7 +1176,11 @@ sub manage_table_html {
     my @out;
     my $map = $self->html_table_mapping;
     # here it's full of hardcoded things, but it can't be done differently
-    push @out, "\n<table>";
+    my $attrs = '';
+    if ($table->{specification}) {
+        $attrs =q{ class="markdown-style-table"}
+    }
+    push @out, "\n<table${attrs}>";
 
     # the hash is always defined
     if ($table->{caption} ne "") {
@@ -1261,16 +1265,22 @@ sub manage_table_ltx {
         $textable .= "|";
     }
     $textable .= "}\n";
+    if (!$table->{specification}) {
+        $textable .= "\\hline\n";
+    }
     if (my @head = @{$out->{head}}) {
-        $textable .= "\\hline\n" . join("", @head);
+        $textable .= join("", @head) . "\\hline\n";
     }
     if (my @body = @{$out->{body}}) {
-        $textable .= "\\hline\n" . join("", @body);
+        $textable .= join("", @body);
     }
     if (my @foot = @{$out->{foot}}) {
         $textable .= "\\hline\n" . join("", @foot);
     }
-    $textable .= "\\hline\n\\end{tabularx}\n";
+    if (!$table->{specification}) {
+        $textable .= "\\hline\n";
+    }
+    $textable .= "\\end{tabularx}\n";
     if ($has_caption) {
         $textable .= "\n\\caption[]{" .
           $self->manage_regular($table->{caption})

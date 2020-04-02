@@ -7,6 +7,7 @@ use Test::More;
 BEGIN {
    $] >= 5.026000 or plan skip_all => "No parse_subsignature()";
 }
+use Test::Fatal;
 
 use feature 'signatures';
 no warnings 'experimental';
@@ -50,6 +51,14 @@ use testcase "t::func";
    }
 
    is( has_whitespace( "value" ), "value", 'func with whitespace in signature' );
+
+   # RT132284
+   func noparams() { return "constant" }
+
+   is( noparams, "constant", 'func with no params' );
+   like( exception { noparams( 1, 2, 3 ) },
+      qr/^Too many arguments for subroutine 'main::noparams' at /,
+      'Exception thrown from empty signature validation failure' );
 }
 
 # RT131571

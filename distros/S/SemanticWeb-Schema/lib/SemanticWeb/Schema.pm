@@ -15,7 +15,7 @@ use Types::Standard qw/ Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.0';
+our $VERSION = 'v7.0.2';
 
 # RECOMMEND PREREQ: aliased
 # RECOMMEND PREREQ: Class::XSAccessor 1.18
@@ -48,7 +48,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 =head1 VERSION
 
-version v7.0.0
+version v7.0.2
 
 The version number of this distribution is based on the corresponding
 version of schema classes.
@@ -76,17 +76,17 @@ were generated automatically from the following sources:
 
 =over
 
-=item L<https://schema.org/version/7.0/ext-auto.rdf>
+=item L<https://schema.org/version/7.02/ext-auto.rdf>
 
-=item L<https://schema.org/version/7.0/ext-bib.rdf>
+=item L<https://schema.org/version/7.02/ext-bib.rdf>
 
-=item L<https://schema.org/version/7.0/ext-health-lifesci.rdf>
+=item L<https://schema.org/version/7.02/ext-health-lifesci.rdf>
 
-=item L<https://schema.org/version/7.0/ext-meta.rdf>
+=item L<https://schema.org/version/7.02/ext-meta.rdf>
 
-=item L<https://schema.org/version/7.0/ext-pending.rdf>
+=item L<https://schema.org/version/7.02/ext-pending.rdf>
 
-=item L<https://schema.org/version/7.0/schema.rdf>
+=item L<https://schema.org/version/7.02/schema.rdf>
 
 =back
 

@@ -71,13 +71,33 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
   OP *sigop = NULL;
   if(lex_peek_unichar(0) == '(') {
     lex_read_unichar(0);
-
-    sigop = parse_subsignature(0);
     lex_read_space(0);
 
-    if(PL_parser->error_count) {
-      LEAVE_with_name("parse_block");
-      return 0;
+#if HAVE_PERL_VERSION(5, 31, 3)
+    /* core's parse_subsignature doesn't seem able to handle empty sigs
+     *   RT132284
+     *   https://github.com/Perl/perl5/issues/17689
+     */
+    if(lex_peek_unichar(0) == ')') {
+      /* Inject an empty OP_ARGCHECK much as core would do if it encountered
+       * an empty signature */
+      UNOP_AUX_item *aux = (UNOP_AUX_item *)PerlMemShared_malloc(sizeof(UNOP_AUX_item) * 3);
+      aux[0].iv = 0;
+      aux[1].iv = 0;
+      aux[2].iv = 0;
+
+      sigop = op_prepend_elem(OP_LINESEQ, newSTATEOP(0, NULL, NULL),
+        newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux));
+    }
+    else
+#endif
+    {
+      sigop = parse_subsignature(0);
+
+      if(PL_parser->error_count) {
+        LEAVE_with_name("parse_block");
+        return 0;
+      }
     }
 
     if(lex_peek_unichar(0) != ')')

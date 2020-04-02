@@ -21,13 +21,14 @@ name: Music-Interval-Barycentric
 requires:
   Exporter: '0'
   List::Util: '0'
+  constant: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/ology/Music-Interval-Barycentric
   repository: https://github.com/ology/Music-Interval-Barycentric.git
-version: '0.0302'
+version: '0.0307'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -222,7 +223,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
-          exclude_match: []
+          exclude_match:
+            - \.mid
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''

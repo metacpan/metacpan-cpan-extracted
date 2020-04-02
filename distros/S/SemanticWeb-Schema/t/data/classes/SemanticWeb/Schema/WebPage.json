@@ -50,8 +50,8 @@
          "rdfs:label" : "reviewedBy",
          "schema:domainIncludes" : "schema:WebPage",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:significantLink" : {
@@ -76,8 +76,8 @@
          "rdfs:label" : "speakable",
          "schema:category" : "issue-1389",
          "schema:domainIncludes" : [
-            "schema:Article",
-            "schema:WebPage"
+            "schema:WebPage",
+            "schema:Article"
          ],
          "schema:rangeIncludes" : [
             "schema:URL",

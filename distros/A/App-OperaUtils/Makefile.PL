@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::OperaUtils",
   "PREREQ_PM" => {
-    "App::BrowserUtils" => 0,
+    "App::BrowserUtils" => "0.002",
     "Data::Sah::Coerce::perl::To_int::From_int::check_uid_exists" => 0,
     "Data::Sah::Coerce::perl::To_int::From_str::convert_unix_user_to_uid" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::BrowserUtils" => 0,
+  "App::BrowserUtils" => "0.002",
   "Data::Sah::Coerce::perl::To_int::From_int::check_uid_exists" => 0,
   "Data::Sah::Coerce::perl::To_int::From_str::convert_unix_user_to_uid" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,

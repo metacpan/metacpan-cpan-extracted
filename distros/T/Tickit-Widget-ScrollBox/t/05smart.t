@@ -45,9 +45,9 @@ my ( $downward, $rightward ) = (0) x 2;
 my $child = ScrollableWidget->new;
 
 my $widget = Tickit::Widget::ScrollBox->new(
-   child => $child,
-   horizontal => 1, vertical => 1,
-);
+   horizontal => 1,
+   vertical   => 1,
+)->set_child( $child );
 
 $widget->set_window( $win );
 flush_tickit;

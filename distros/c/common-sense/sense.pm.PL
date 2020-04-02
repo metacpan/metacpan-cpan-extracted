@@ -1,6 +1,6 @@
 #! perl-000
 
-our $VERSION = 3.74;
+our $VERSION = 3.75;
 
 open STDOUT, ">$ARGV[0]~"
    or die "$ARGV[0]~: $!";
@@ -26,7 +26,7 @@ BEGIN {
 }
 
 no warnings;
-use warnings qw(FATAL closed threads internal debugging pack malloc portable prototype
+use warnings qw(FATAL closed threads internal debugging pack malloc prototype
                 inplace io pipe unpack glob digit printf
                 layer reserved taint closure semicolon);
 no warnings qw(exec newline unopened);
@@ -45,7 +45,7 @@ while (<DATA>) {
       print "   # use strict, use utf8; use feature;\n";
       printf "   \$^H |= 0x%x;\n", $H;
 
-      if (my @features = grep /^feature_/, keys %H) {
+      if (my @features = grep /^feature_/, sort keys %H) {
          print "   \@^H{qw(@features)} = (1) x ", (scalar @features), ";\n";
       }
    } elsif (/^VERSION/) {

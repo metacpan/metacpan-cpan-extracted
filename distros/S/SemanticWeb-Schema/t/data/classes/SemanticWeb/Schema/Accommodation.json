@@ -18,29 +18,16 @@
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"
       },
-      "schema:accommodationFloorPlan" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A floorplan of some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>.",
-         "rdfs:label" : "accommodationFloorPlan",
-         "schema:category" : "issue-2373",
-         "schema:domainIncludes" : [
-            "schema:Residence",
-            "schema:Accommodation"
-         ],
-         "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:FloorPlan"
-      },
       "schema:amenityFeature" : {
          "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
             "schema:FloorPlan",
-            "schema:Place",
-            "schema:Accommodation"
+            "schema:LodgingBusiness",
+            "schema:Accommodation",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
       },
@@ -60,8 +47,8 @@
          "rdfs:comment" : "The size of the accommodation, e.g. in square meter or squarefoot.\nTypical unit code(s): MTK for square meter, FTK for square foot, or YDK for square yard",
          "rdfs:label" : "floorSize",
          "schema:domainIncludes" : [
-            "schema:FloorPlan",
-            "schema:Accommodation"
+            "schema:Accommodation",
+            "schema:FloorPlan"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
@@ -72,9 +59,9 @@
          "rdfs:label" : "leaseLength",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
+            "schema:Offer",
             "schema:Accommodation",
-            "schema:RealEstateListing",
-            "schema:Offer"
+            "schema:RealEstateListing"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
@@ -89,8 +76,8 @@
          "rdfs:label" : "numberOfBathroomsTotal",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
-            "schema:FloorPlan"
+            "schema:FloorPlan",
+            "schema:Accommodation"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Integer"
@@ -102,9 +89,9 @@
          "rdfs:label" : "numberOfBedrooms",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
+            "schema:ApartmentComplex",
             "schema:FloorPlan",
-            "schema:Accommodation",
-            "schema:ApartmentComplex"
+            "schema:Accommodation"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
@@ -132,8 +119,8 @@
          "rdfs:label" : "numberOfPartialBathrooms",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
-            "schema:FloorPlan"
+            "schema:FloorPlan",
+            "schema:Accommodation"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Number"
@@ -144,17 +131,17 @@
          "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
-            "schema:FloorPlan",
-            "schema:LodgingBusiness",
-            "schema:House",
             "schema:Apartment",
-            "schema:SingleFamilyResidence",
+            "schema:FloorPlan",
+            "schema:House",
             "schema:Accommodation",
-            "schema:Suite"
+            "schema:Suite",
+            "schema:LodgingBusiness",
+            "schema:SingleFamilyResidence"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:permittedUsage" : {
@@ -172,9 +159,9 @@
          "rdfs:label" : "petsAllowed",
          "schema:domainIncludes" : [
             "schema:LodgingBusiness",
+            "schema:Accommodation",
             "schema:FloorPlan",
-            "schema:ApartmentComplex",
-            "schema:Accommodation"
+            "schema:ApartmentComplex"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -188,9 +175,9 @@
          "rdfs:label" : "tourBookingPage",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
+            "schema:ApartmentComplex",
             "schema:Accommodation",
-            "schema:Place",
-            "schema:ApartmentComplex"
+            "schema:Place"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:URL"

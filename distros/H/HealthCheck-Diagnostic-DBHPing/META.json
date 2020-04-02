@@ -53,7 +53,7 @@
    "provides" : {
       "HealthCheck::Diagnostic::DBHPing" : {
          "file" : "lib/HealthCheck/Diagnostic/DBHPing.pm",
-         "version" : "v1.2.3"
+         "version" : "v1.2.4"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-DBHPing"
       }
    },
-   "version" : "v1.2.3",
+   "version" : "v1.2.4",
    "x_generated_by_perl" : "v5.18.2",
    "x_serialization_backend" : "JSON::XS version 4.02",
    "x_spdx_expression" : "Artistic-2.0",

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::CheckButton;
 
@@ -10,7 +10,7 @@ use warnings;
 use base qw( Tickit::Widget );
 use Tickit::Style;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Carp;
 
@@ -25,16 +25,16 @@ C<Tickit::Widget::CheckButton> - a widget allowing a toggle true/false option
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::CheckButton;
- use Tickit::Widget::VBox;
+   use Tickit;
+   use Tickit::Widget::CheckButton;
+   use Tickit::Widget::VBox;
 
- my $vbox = Tickit::Widget::VBox->new;
- $vbox->add( Tickit::Widget::CheckButton->new(
-       label => "Check button $_",
- ) ) for 1 .. 5;
+   my $vbox = Tickit::Widget::VBox->new;
+   $vbox->add( Tickit::Widget::CheckButton->new(
+         label => "Check button $_",
+   ) ) for 1 .. 5;
 
- Tickit->new( root => $vbox )->run;
+   Tickit->new( root => $vbox )->run;
 
 =head1 DESCRIPTION
 
@@ -117,7 +117,9 @@ use constant KEYPRESSES_FROM_STYLE => 1;
 
 =cut
 
-=head2 $checkbutton = Tickit::Widget::CheckButton->new( %args )
+=head2 new
+
+   $checkbutton = Tickit::Widget::CheckButton->new( %args )
 
 Constructs a new C<Tickit::Widget::CheckButton> object.
 
@@ -168,9 +170,13 @@ sub cols
 
 =cut
 
-=head2 $label = $checkbutton->label
+=head2 label
 
-=head2 $checkbutton->set_label( $label )
+=head2 set_label
+
+   $label = $checkbutton->label
+
+   $checkbutton->set_label( $label )
 
 Returns or sets the label text of the button.
 
@@ -190,7 +196,9 @@ sub set_label
    $self->redraw;
 }
 
-=head2 $on_toggle = $checkbutton->on_toggle
+=head2 on_toggle
+
+   $on_toggle = $checkbutton->on_toggle
 
 =cut
 
@@ -200,12 +208,14 @@ sub on_toggle
    return $self->{on_toggle};
 }
 
-=head2 $checkbutton->set_on_toggle( $on_toggle )
+=head2 set_on_toggle
+
+   $checkbutton->set_on_toggle( $on_toggle )
 
 Return or set the CODE reference to be called when the button state is
 changed.
 
- $on_toggle->( $checkbutton, $active )
+   $on_toggle->( $checkbutton, $active )
 
 =cut
 
@@ -219,7 +229,9 @@ sub set_on_toggle
 
 =cut
 
-=head2 $checkbutton->activate
+=head2 activate
+
+   $checkbutton->activate
 
 Sets this button's active state to true.
 
@@ -233,7 +245,9 @@ sub activate
    $self->{on_toggle}->( $self, 1 ) if $self->{on_toggle};
 }
 
-=head2 $checkbutton->deactivate
+=head2 deactivate
+
+   $checkbutton->deactivate
 
 Sets this button's active state to false.
 
@@ -255,7 +269,9 @@ sub toggle
    return 1;
 }
 
-=head2 $active = $checkbutton->is_active
+=head2 is_active
+
+   $active = $checkbutton->is_active
 
 Returns this button's active state.
 

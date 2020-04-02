@@ -11,46 +11,41 @@ my $border = Tickit::Widget::Border->new(
    h_border => 6,
    v_border => 2,
    style => { bg => "green" },
-   child => Tickit::Widget::ScrollBox->new(
-      child => ScrollableWidget->new,
+)->set_child(
+   Tickit::Widget::ScrollBox->new(
       style => { bg => "black" },
-   ),
+   )->set_child(
+      ScrollableWidget->new
+   )
 );
 
 Tickit->new( root => $border )->run;
 
-package ScrollableWidget;
-use base qw( Tickit::Widget );
-
-sub lines { 1 }
-sub cols  { 1 }
+use Object::Pad 0.17;
+class ScrollableWidget extends Tickit::Widget;
 
 use constant CAN_SCROLL => 1;
 
-sub set_scrolling_extents
+method lines () { 1 }
+method cols  () { 1 }
+
+has $_vextent; method vextent () { $_vextent }
+has $_hextent; method hextent () { $_hextent }
+
+method set_scrolling_extents
 {
-   my $self = shift;
-   ( $self->{vextent}, $self->{hextent} ) = @_;
-   $self->{vextent}->set_total( 100 ) if $self->{vextent};
-   $self->{hextent}->set_total(  50 ) if $self->{hextent};
+   ( $_vextent, $_hextent ) = @_;
+   $_vextent->set_total( 100 ) if $_vextent;
+   $_hextent->set_total(  50 ) if $_hextent;
 }
 
-sub scrolled
+method scrolled ( $downward, $rightward, $id )
 {
-   my $self = shift;
-   my ( $downward, $rightward, $id ) = @_;
-
    $self->redraw;
 }
 
-sub vextent { shift->{vextent} }
-sub hextent { shift->{hextent} }
-
-sub render_to_rb
+method render_to_rb ( $rb, $rect )
 {
-   my $self = shift;
-   my ( $rb, $rect ) = @_;
-
    $rb->clear;
 
    my $vstart = $self->vextent ? $self->vextent->start : 0;

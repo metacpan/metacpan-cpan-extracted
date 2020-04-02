@@ -13,9 +13,9 @@ use Pod::Usage;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use FindBin qw/$Bin/;
-use App::MultiSsh qw/hosts_from_map is_host multi_run shell_quote/;
+use App::MultiSsh qw/hosts_from_map/;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -86,7 +86,7 @@ mscp - Multi host scp (send files to multiple hosts only)
 
 =head1 VERSION
 
-This documentation refers to mscp version 0.23.
+This documentation refers to mscp version 0.24.
 
 =head1 SYNOPSIS
 

@@ -9,8 +9,8 @@
    "properties" : {
       "schema:amount" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "https://github.com/schemaorg/schemaorg/issues/1698"
+            "https://github.com/schemaorg/schemaorg/issues/1698",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of money.",
@@ -20,11 +20,11 @@
             "issue-1253"
          ],
          "schema:domainIncludes" : [
-            "schema:DatedMoneySpecification",
-            "schema:MoneyTransfer",
+            "schema:LoanOrCredit",
             "schema:MonetaryGrant",
+            "schema:DatedMoneySpecification",
             "schema:InvestmentOrDeposit",
-            "schema:LoanOrCredit"
+            "schema:MoneyTransfer"
          ],
          "schema:rangeIncludes" : [
             "schema:MonetaryAmount",
@@ -39,9 +39,9 @@
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : [
             "schema:LoanOrCredit",
+            "schema:ExchangeRateSpecification",
             "schema:MonetaryAmountDistribution",
             "schema:DatedMoneySpecification",
-            "schema:ExchangeRateSpecification",
             "schema:MonetaryAmount"
          ],
          "schema:rangeIncludes" : "schema:Text"
@@ -53,13 +53,13 @@
          "rdfs:label" : "endDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeason",
+            "schema:Event",
+            "schema:CreativeWorkSeries",
             "schema:EducationalOccupationalProgram",
             "schema:DatedMoneySpecification",
-            "schema:Role",
+            "schema:CreativeWorkSeason",
             "schema:Schedule",
-            "schema:Event",
-            "schema:CreativeWorkSeries"
+            "schema:Role"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
@@ -73,13 +73,13 @@
          "rdfs:label" : "startDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeason",
-            "schema:EducationalOccupationalProgram",
-            "schema:CreativeWorkSeries",
-            "schema:Event",
             "schema:DatedMoneySpecification",
+            "schema:Schedule",
             "schema:Role",
-            "schema:Schedule"
+            "schema:CreativeWorkSeason",
+            "schema:Event",
+            "schema:CreativeWorkSeries",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",

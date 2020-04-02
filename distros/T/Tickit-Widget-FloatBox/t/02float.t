@@ -15,9 +15,8 @@ my $win = mk_window;
 
 my ( $child_lines, $child_cols );
 
-my $widget = Tickit::Widget::FloatBox->new(
-   base_child => TestWidget->new,
-);
+my $widget = Tickit::Widget::FloatBox->new
+   ->set_base_child( TestWidget->new );
 
 $widget->set_window( $win );
 flush_tickit;

@@ -1,9 +1,9 @@
 package Mojolicious::Command;
 use Mojo::Base -base;
 
-use Carp 'croak';
-use Mojo::File 'path';
-use Mojo::Loader 'data_section';
+use Carp qw(croak);
+use Mojo::File qw(path);
+use Mojo::Loader qw(data_section);
 use Mojo::Server;
 use Mojo::Template;
 
@@ -139,7 +139,7 @@ this attribute is weakened.
   my $description = $command->description;
   $command        = $command->description('Foo');
 
-Short description of command, used for the command list.
+Short description of command. Used for the command list.
 
 =head2 quiet
 
@@ -161,7 +161,7 @@ with L</"render_data">, defaults to activating C<vars>.
   my $usage = $command->usage;
   $command  = $command->usage('Foo');
 
-Usage information for command, used for the help screen.
+Usage information for command. Used for the help screen.
 
 =head1 METHODS
 

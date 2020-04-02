@@ -21,8 +21,8 @@
          "rdfs:comment" : "The day of the week for which these opening hours are valid.",
          "rdfs:label" : "dayOfWeek",
          "schema:domainIncludes" : [
-            "schema:OpeningHoursSpecification",
-            "schema:EducationalOccupationalProgram"
+            "schema:EducationalOccupationalProgram",
+            "schema:OpeningHoursSpecification"
          ],
          "schema:rangeIncludes" : "schema:DayOfWeek"
       },
@@ -40,17 +40,17 @@
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
+            "schema:Permit",
+            "schema:OpeningHoursSpecification",
+            "schema:Offer",
             "schema:MonetaryAmount",
             "schema:Demand",
-            "schema:OpeningHoursSpecification",
-            "schema:PriceSpecification",
-            "schema:Permit",
             "schema:LocationFeatureSpecification",
-            "schema:Offer"
+            "schema:PriceSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:validThrough" : {
@@ -59,17 +59,17 @@
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:Demand",
             "schema:MonetaryAmount",
-            "schema:JobPosting",
+            "schema:LocationFeatureSpecification",
             "schema:OpeningHoursSpecification",
             "schema:PriceSpecification",
-            "schema:LocationFeatureSpecification"
+            "schema:JobPosting",
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       }
    }

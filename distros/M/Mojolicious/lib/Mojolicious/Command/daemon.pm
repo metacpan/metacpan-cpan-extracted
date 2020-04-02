@@ -2,7 +2,7 @@ package Mojolicious::Command::daemon;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Server::Daemon;
-use Mojo::Util 'getopt';
+use Mojo::Util qw(getopt);
 
 has description => 'Start application with HTTP and WebSocket server';
 has usage       => sub { shift->extract_usage };
@@ -85,14 +85,14 @@ L<Mojolicious::Command> and implements the following new ones.
   my $description = $daemon->description;
   $daemon         = $daemon->description('Foo');
 
-Short description of this command, used for the command list.
+Short description of this command. Used for the command list.
 
 =head2 usage
 
   my $usage = $daemon->usage;
   $daemon   = $daemon->usage('Foo');
 
-Usage information for this command, used for the help screen.
+Usage information for this command. Used for the help screen.
 
 =head1 METHODS
 

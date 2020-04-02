@@ -26,8 +26,8 @@
          "rdfs:label" : "numberOfAvailableAccommodationUnits",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:ApartmentComplex",
-            "schema:FloorPlan"
+            "schema:FloorPlan",
+            "schema:ApartmentComplex"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:QuantitativeValue"
@@ -39,9 +39,9 @@
          "rdfs:label" : "numberOfBedrooms",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
+            "schema:ApartmentComplex",
             "schema:FloorPlan",
-            "schema:Accommodation",
-            "schema:ApartmentComplex"
+            "schema:Accommodation"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
@@ -56,9 +56,9 @@
          "rdfs:label" : "petsAllowed",
          "schema:domainIncludes" : [
             "schema:LodgingBusiness",
+            "schema:Accommodation",
             "schema:FloorPlan",
-            "schema:ApartmentComplex",
-            "schema:Accommodation"
+            "schema:ApartmentComplex"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -72,9 +72,9 @@
          "rdfs:label" : "tourBookingPage",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
+            "schema:ApartmentComplex",
             "schema:Accommodation",
-            "schema:Place",
-            "schema:ApartmentComplex"
+            "schema:Place"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:URL"

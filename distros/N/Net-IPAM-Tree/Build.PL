@@ -1,0 +1,30 @@
+use 5.10.0;
+use strict;
+use warnings;
+use Module::Build;
+Module::Build->VERSION('0.4004');
+
+my $builder = Module::Build->new(
+    module_name        => 'Net::IPAM::Tree',
+    license            => 'perl_5',
+    dist_author        => q{Karl Gaissmaier <karl.gaissmaier(at)uni-ulm.de>},
+    dist_version_from  => 'lib/Net/IPAM/Tree.pm',
+    release_status     => 'stable',
+    configure_requires => {
+        'Module::Build' => '0.4004',
+    },
+    test_requires => {
+        'Test::More' => '0',
+    },
+    requires => {
+        'List::MoreUtils'  => '0',
+        'Scalar::Util'     => '0',
+        'Net::IPAM::IP'    => '0',
+        'Net::IPAM::Block' => '0',
+
+        #'Foo::Bar::Module' => '5.0401',
+    },
+    add_to_cleanup => ['Net-IPAM-Tree-*'],
+);
+
+$builder->create_build_script();

@@ -4,8 +4,8 @@
       "rdfs:comment" : "An auto parts store.",
       "rdfs:label" : "AutoPartsStore",
       "rdfs:subClassOf" : [
-         "schema:Store",
-         "schema:AutomotiveBusiness"
+         "schema:AutomotiveBusiness",
+         "schema:Store"
       ]
    },
    "properties" : {}

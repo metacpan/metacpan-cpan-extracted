@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::RadioButton;
 
@@ -10,7 +10,7 @@ use warnings;
 use base qw( Tickit::Widget );
 use Tickit::Style;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Carp;
 
@@ -26,19 +26,19 @@ options
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::RadioButton;
- use Tickit::Widget::VBox;
+   use Tickit;
+   use Tickit::Widget::RadioButton;
+   use Tickit::Widget::VBox;
 
- my $group = Tickit::Widget::RadioButton::Group->new;
+   my $group = Tickit::Widget::RadioButton::Group->new;
 
- my $vbox = Tickit::Widget::VBox->new;
- $vbox->add( Tickit::Widget::RadioButton->new(
-       caption => "Radio button $_",
-       group   => $group,
- ) ) for 1 .. 5;
+   my $vbox = Tickit::Widget::VBox->new;
+   $vbox->add( Tickit::Widget::RadioButton->new(
+         caption => "Radio button $_",
+         group   => $group,
+   ) ) for 1 .. 5;
 
- Tickit->new( root => $vbox )->run;
+   Tickit->new( root => $vbox )->run;
 
 =head1 DESCRIPTION
 
@@ -122,7 +122,9 @@ use constant KEYPRESSES_FROM_STYLE => 1;
 
 =cut
 
-=head2 $radiobutton = Tickit::Widget::RadioButton->new( %args )
+=head2 new
+
+   $radiobutton = Tickit::Widget::RadioButton->new( %args )
 
 Constructs a new C<Tickit::Widget::RadioButton> object.
 
@@ -183,7 +185,9 @@ sub cols
 
 =cut
 
-=head2 $group = $radiobutton->group
+=head2 group
+
+   $group = $radiobutton->group
 
 Returns the C<Tickit::Widget::RadioButton::Group> this button belongs to.
 
@@ -195,9 +199,13 @@ sub group
    return $self->{group};
 }
 
-=head2 $label = $radiobutton->label
+=head2 label
 
-=head2 $radiobutton->set_label( $label )
+=head2 set_label
+
+   $label = $radiobutton->label
+
+   $radiobutton->set_label( $label )
 
 Returns or sets the label text of the button.
 
@@ -217,7 +225,9 @@ sub set_label
    $self->redraw;
 }
 
-=head2 $on_toggle = $radiobutton->on_toggle
+=head2 on_toggle
+
+   $on_toggle = $radiobutton->on_toggle
 
 =cut
 
@@ -227,7 +237,9 @@ sub on_toggle
    return $self->{on_toggle};
 }
 
-=head2 $radiobutton->set_on_toggle( $on_toggle )
+=head2 set_on_toggle
+
+   $radiobutton->set_on_toggle( $on_toggle )
 
 Return or set the CODE reference to be called when the button state is
 changed.
@@ -245,7 +257,9 @@ sub set_on_toggle
    ( $self->{on_toggle} ) = @_;
 }
 
-=head2 $value = $radiobutton->value
+=head2 value
+
+   $value = $radiobutton->value
 
 =cut
 
@@ -255,7 +269,9 @@ sub value
    return $self->{value};
 }
 
-=head2 $radiobutton->set_value( $value )
+=head2 set_value
+
+   $radiobutton->set_value( $value )
 
 Return or set the scalar value used to identify the radio button to the
 group's C<on_changed> callback. This can be any scalar value; it is simply
@@ -273,7 +289,9 @@ sub set_value
 
 =cut
 
-=head2 $radiobutton->activate
+=head2 activate
+
+   $radiobutton->activate
 
 Sets this button as the active member of the group, deactivating the previous
 one.
@@ -299,7 +317,9 @@ sub activate
    return 1;
 }
 
-=head2 $active = $radiobutton->is_active
+=head2 is_active
+
+   $active = $radiobutton->is_active
 
 Returns true if this button is the active button of the group.
 
@@ -365,7 +385,9 @@ will be implicitly created for a button if none is passed.
 
 =cut
 
-=head2 $group = Tickit::Widget::RadioButton::Group->new
+=head2 new
+
+   $group = Tickit::Widget::RadioButton::Group->new
 
 Returns a new group.
 
@@ -377,7 +399,9 @@ sub new
    return bless [ undef, undef ], $class;
 }
 
-=head2 $radiobutton = $group->active
+=head2 active
+
+   $radiobutton = $group->active
 
 Returns the button which is currently active in the group
 
@@ -396,7 +420,9 @@ sub set_active
    $self->[1]->( $self->active, $self->active->value ) if $self->[1];
 }
 
-=head2 $on_changed = $group->on_changed
+=head2 on_changed
+
+   $on_changed = $group->on_changed
 
 =cut
 
@@ -406,7 +432,9 @@ sub on_changed
    return $self->[1];
 }
 
-=head2 $group->set_on_changed( $on_changed )
+=head2 set_on_changed
+
+   $group->set_on_changed( $on_changed )
 
 Return or set the CODE reference to be called when the active member of the
 group changes. This may be more convenient than setting the C<on_toggle>
@@ -414,7 +442,7 @@ callback of each button in the group.
 
 The callback is passed the currently-active button, and its C<value>.
 
- $on_changed->( $active, $value )
+   $on_changed->( $active, $value )
 
 =cut
 

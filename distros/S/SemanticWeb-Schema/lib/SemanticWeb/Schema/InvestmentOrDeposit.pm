@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.0';
+our $VERSION = 'v7.0.2';
 
 
 has amount => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::InvestmentOrDeposit - A type of financial product that typi
 
 =head1 VERSION
 
-version v7.0.0
+version v7.0.2
 
 =head1 DESCRIPTION
 

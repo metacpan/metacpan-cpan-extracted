@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widgets;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head1 NAME
 
@@ -16,13 +16,13 @@ C<Tickit::Widgets> - load several L<Tickit::Widget> classes at once
 
 =head1 SYNOPSIS
 
- use Tickit::Widgets qw( Static VBox HBox );
+   use Tickit::Widgets qw( Static VBox HBox );
 
 Equivalent to
 
- use Tickit::Widget::Static;
- use Tickit::Widget::VBox;
- use Tickit::Widget::HBox;
+   use Tickit::Widget::Static;
+   use Tickit::Widget::VBox;
+   use Tickit::Widget::HBox;
 
 =head1 DESCRIPTION
 
@@ -33,6 +33,10 @@ It will C<require> each of the modules.
 
 Note that because each Widget module should be a pure object class with no
 exports, this utility does not run the C<import> method of the used classes.
+
+An optional version check may be supplied using a C<=> sign:
+
+   use Tickit::Widgets qw( HBox=0.48 VBox=0.48 );
 
 =cut
 
@@ -46,11 +50,18 @@ sub import
       my $class = $_; # $_ is alias to read-only values;
       local $_; # placate bug in Tickit::RenderContext 0.06
 
+      my $version;
+      $class =~ s/=(\d+\.\d+)$// and $version = $1;
+
       $class = "Tickit::Widget::$class" unless $class =~ m/::/;
 
       ( my $file = "$class.pm" ) =~ s{::}{/}g;
 
       require $file;
+
+      if( defined $version ) {
+         $class->VERSION( $version );
+      }
    }
 }
 

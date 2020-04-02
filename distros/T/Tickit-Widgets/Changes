@@ -1,5 +1,14 @@
 Revision history for Tickit-Widgets
 
+0.30    2020-04-02
+        [CHANGES]
+         * Ignore mouse wheel events on T:W:Button
+         * Avoid smartmatch
+         * Update for Tickit::Event 0.66
+         * Discourage use of `child`-like arguments to constructors in favour
+           of chaining mutator `->set_child`-like methods
+         * Support Widget version tests in Tickit::Widgets->import
+
 0.29    2018-03-13 13:49:27
         [CHANGES]
          * Have Tickit::Widget::Entry also delete back a word on

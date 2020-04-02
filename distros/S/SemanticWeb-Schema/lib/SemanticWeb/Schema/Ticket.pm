@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.0';
+our $VERSION = 'v7.0.2';
 
 
 has date_issued => (
@@ -98,7 +98,7 @@ SemanticWeb::Schema::Ticket - Used to describe a ticket to an event
 
 =head1 VERSION
 
-version v7.0.0
+version v7.0.2
 
 =head1 DESCRIPTION
 

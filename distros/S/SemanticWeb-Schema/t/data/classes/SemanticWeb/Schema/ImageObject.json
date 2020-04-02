@@ -12,9 +12,9 @@
          "rdfs:comment" : "The caption for this object. For downloadable machine formats (closed caption, subtitles etc.) use MediaObject and indicate the <a class=\"localLink\" href=\"http://schema.org/encodingFormat\">encodingFormat</a>.",
          "rdfs:label" : "caption",
          "schema:domainIncludes" : [
-            "schema:VideoObject",
             "schema:AudioObject",
-            "schema:ImageObject"
+            "schema:ImageObject",
+            "schema:VideoObject"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -27,8 +27,8 @@
          "rdfs:label" : "exifData",
          "schema:domainIncludes" : "schema:ImageObject",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:PropertyValue"
+            "schema:PropertyValue",
+            "schema:Text"
          ]
       },
       "schema:representativeOfPage" : {
@@ -43,8 +43,8 @@
          "rdfs:comment" : "Thumbnail image for an image or video.",
          "rdfs:label" : "thumbnail",
          "schema:domainIncludes" : [
-            "schema:VideoObject",
-            "schema:ImageObject"
+            "schema:ImageObject",
+            "schema:VideoObject"
          ],
          "schema:rangeIncludes" : "schema:ImageObject"
       }

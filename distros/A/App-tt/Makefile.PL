@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   'Applify' => '0.21',
   'File::HomeDir' => '1.00',
   'JSON::XS' => '3.00',
+  'List::Util' => '1.45',
   'perl' => '5.010001'
 }
 ,

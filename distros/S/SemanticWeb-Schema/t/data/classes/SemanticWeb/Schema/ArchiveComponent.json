@@ -30,9 +30,9 @@
          "schema:domainIncludes" : "schema:ArchiveComponent",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:Place",
             "schema:PostalAddress",
-            "schema:Place"
+            "schema:Text"
          ]
       }
    }

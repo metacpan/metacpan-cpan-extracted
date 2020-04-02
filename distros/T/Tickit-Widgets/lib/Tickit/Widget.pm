@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -18,7 +18,7 @@ use Tickit::Pen;
 use Tickit::Style;
 use Tickit::Utils qw( textwidth );
 use Tickit::Window 0.57;  # $win->bind_event
-use Tickit::Event 0.63;  # $info->type("newapi") on Focus
+use Tickit::Event 0.66;  # $info->type newapi
 
 use constant PEN_ATTR_MAP => { map { $_ => 1 } @Tickit::Pen::ALL_ATTRS };
 
@@ -107,10 +107,10 @@ of the style classes or the default definitions.
 The hash should contain style keys, optionally suffixed by style tags, giving
 values.
 
- style => {
-   'fg'        => 3,
-   'fg:active' => 5,
- }
+   style => {
+     'fg'        => 3,
+     'fg:active' => 5,
+   }
 
 =back
 
@@ -309,7 +309,7 @@ sub get_style_values
 A shortcut to calling C<get_style_values> to collect up the pen attributes,
 and form a L<Tickit::Pen::Immutable> object from them. If C<$prefix> is
 supplied, it will be prefixed on the pen attribute names with an underscore
-(which would be read from the stylesheet file as a hypen). Note that the
+(which would be read from the stylesheet file as a hyphen). Note that the
 returned pen instance is immutable, and may be cached.
 
 =cut
@@ -549,7 +549,7 @@ sub window_gained
 
    $event_ids->{focus} = $window->bind_event( focus => sub {
       my ( $win, undef, $info ) = @_;
-      $self->_on_win_focus( $win, $info->type( "newapi" ), $info->win );
+      $self->_on_win_focus( $win, $info->type, $info->win );
    } ) if $self->can( "_widget_style_type" );
 
    if( $self->can( "on_key" ) or $self->KEYPRESSES_FROM_STYLE ) {
@@ -577,7 +577,7 @@ sub window_gained
 
    $event_ids->{mouse} = $window->bind_event( mouse => sub {
       my ( $win, undef, $info ) = @_;
-      $self->take_focus if $self->CAN_FOCUS and $info->button == 1 and $info->type eq "press";
+      $self->take_focus if $self->CAN_FOCUS and $info->type eq "press" and $info->button == 1;
       $self->on_mouse( $info ) if $self->can( "on_mouse" );
    } );
 }
@@ -938,26 +938,26 @@ information.
 =head2 A Trivial "Hello, World" Widget
 
 The following is about the smallest possible C<Tickit::Widget> implementation,
-containing the bare minimum of functionallity. It displays the fixed string
+containing the bare minimum of functionality. It displays the fixed string
 "Hello, world" at the top left corner of its window.
 
- package HelloWorldWidget;
- use base 'Tickit::Widget';
+   package HelloWorldWidget;
+   use base 'Tickit::Widget';
 
- sub lines {  1 }
- sub cols  { 12 }
+   sub lines {  1 }
+   sub cols  { 12 }
 
- sub render_to_rb
- {
-    my $self = shift;
-    my ( $rb, $rect ) = @_;
+   sub render_to_rb
+   {
+      my $self = shift;
+      my ( $rb, $rect ) = @_;
 
-    $rb->eraserect( $rect );
+      $rb->eraserect( $rect );
 
-    $rb->text_at( 0, 0, "Hello, world" );
- }
+      $rb->text_at( 0, 0, "Hello, world" );
+   }
 
- 1;
+   1;
 
 The C<lines> and C<cols> methods tell the container of the widget what its
 minimum size requirements are, and the C<render_to_rb> method actually draws
@@ -966,18 +966,18 @@ it to the render buffer.
 A slight improvement on this would be to obtain the size of the window, and
 position the text in the centre rather than the top left corner.
 
- sub render_to_rb
- {
-    my $self = shift;
-    my ( $rb, $rect ) = @_;
-    my $win = $self->window;
+   sub render_to_rb
+   {
+      my $self = shift;
+      my ( $rb, $rect ) = @_;
+      my $win = $self->window;
 
-    $rb->eraserect( $rect );
+      $rb->eraserect( $rect );
 
-    $rb->text_at( $win->lines - 1 ) / 2, ( $win->cols - 12 ) / 2,
-       "Hello, world"
-    );
- }
+      $rb->text_at( $win->lines - 1 ) / 2, ( $win->cols - 12 ) / 2,
+         "Hello, world"
+      );
+   }
 
 =head2 Reacting To User Input
 
@@ -985,43 +985,43 @@ If a widget subclass provides an C<on_key> method, then this will receive
 keypress events if the widget's window has the focus. This example uses it to
 change the pen foreground colour.
 
- package ColourWidget;
- use base 'Tickit::Widget';
+   package ColourWidget;
+   use base 'Tickit::Widget';
 
- my $text = "Press 0 to 7 to change the colour of this text";
+   my $text = "Press 0 to 7 to change the colour of this text";
 
- sub lines { 1 }
- sub cols  { length $text }
+   sub lines { 1 }
+   sub cols  { length $text }
 
- sub render_to_rb
- {
-    my $self = shift;
-    my ( $rb, $rect ) = @_;
-    my $win = $self->window;
+   sub render_to_rb
+   {
+      my $self = shift;
+      my ( $rb, $rect ) = @_;
+      my $win = $self->window;
 
-    $rb->eraserect( $rect );
+      $rb->eraserect( $rect );
 
-    $rb->text_at( $win->lines - 1 ) / 2, ( $win->cols - 12 ) / 2,
-       "Hello, world"
-    );
+      $rb->text_at( $win->lines - 1 ) / 2, ( $win->cols - 12 ) / 2,
+         "Hello, world"
+      );
 
-    $win->focus( 0, 0 );
- }
+      $win->focus( 0, 0 );
+   }
 
- sub on_key
- {
-    my $self = shift;
-    my ( $args ) = @_;
+   sub on_key
+   {
+      my $self = shift;
+      my ( $args ) = @_;
 
-    if( $args->type eq "text" and $args->str =~ m/[0-7]/ ) {
-       $self->set_style( fg => $args->str );
-       return 1;
-    }
+      if( $args->type eq "text" and $args->str =~ m/[0-7]/ ) {
+         $self->set_style( fg => $args->str );
+         return 1;
+      }
 
-    return 0;
- }
+      return 0;
+   }
 
- 1;
+   1;
 
 The C<render_to_rb> method sets the focus at the window's top left corner to
 ensure that the window always has focus, so the widget will receive keypress
@@ -1036,40 +1036,40 @@ Similarly, by providing an C<on_mouse> method, the widget subclass will
 receive mouse events within the window of the widget. This example saves a
 list of the last 10 mouse clicks and renders them with an C<X>.
 
- package ClickerWidget;
- use base 'Tickit::Widget';
+   package ClickerWidget;
+   use base 'Tickit::Widget';
 
- # In a real Widget this would be stored in an attribute of $self
- my @points;
+   # In a real Widget this would be stored in an attribute of $self
+   my @points;
 
- sub lines { 1 }
- sub cols  { 1 }
+   sub lines { 1 }
+   sub cols  { 1 }
 
- sub render_to_rb
- {
-    my $self = shift;
-    my ( $rb, $rect ) = @_;
+   sub render_to_rb
+   {
+      my $self = shift;
+      my ( $rb, $rect ) = @_;
 
-    $rb->eraserect( $rect );
+      $rb->eraserect( $rect );
 
-    foreach my $point ( @points ) {
-       $rb->text_at( $point->[0], $point->[1], "X" );
-    }
- }
+      foreach my $point ( @points ) {
+         $rb->text_at( $point->[0], $point->[1], "X" );
+      }
+   }
 
- sub on_mouse
- {
-    my $self = shift;
-    my ( $args ) = @_;
+   sub on_mouse
+   {
+      my $self = shift;
+      my ( $args ) = @_;
 
-    return unless $args->type eq "press" and $args->button == 1;
+      return unless $args->type eq "press" and $args->button == 1;
 
-    push @points, [ $args->line, $args->col ];
-    shift @points while @points > 10;
-    $self->redraw;
- }
+      push @points, [ $args->line, $args->col ];
+      shift @points while @points > 10;
+      $self->redraw;
+   }
 
- 1;
+   1;
 
 This time there is no need to set the window focus, because mouse events do
 not need to follow the window that's in focus; they always affect the window

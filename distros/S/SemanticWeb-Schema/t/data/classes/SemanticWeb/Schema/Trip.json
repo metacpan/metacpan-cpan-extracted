@@ -36,8 +36,8 @@
          "schema:domainIncludes" : "schema:Trip",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:ItemList",
-            "schema:Place"
+            "schema:Place",
+            "schema:ItemList"
          ]
       },
       "schema:offers" : {
@@ -47,19 +47,19 @@
          "rdfs:label" : "offers",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:MenuItem",
-            "schema:Product",
-            "schema:Event",
-            "schema:Trip",
             "schema:CreativeWork",
+            "schema:AggregateOffer",
             "schema:EducationalOccupationalProgram",
+            "schema:Product",
+            "schema:MenuItem",
             "schema:Service",
-            "schema:AggregateOffer"
+            "schema:Trip",
+            "schema:Event"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ]
       },
       "schema:partOfTrip" : {
@@ -80,13 +80,13 @@
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Trip",
-            "schema:Reservation",
             "schema:ParcelDelivery",
-            "schema:Service",
+            "schema:Reservation",
+            "schema:CreativeWork",
             "schema:EducationalOccupationalProgram",
-            "schema:CreativeWork"
+            "schema:Service",
+            "schema:Invoice",
+            "schema:Trip"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",

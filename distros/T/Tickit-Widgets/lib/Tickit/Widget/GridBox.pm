@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::GridBox;
 
@@ -10,7 +10,7 @@ use warnings;
 use base qw( Tickit::ContainerWidget );
 use Tickit::Style;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Carp;
 
@@ -24,24 +24,26 @@ C<Tickit::Widget::GridBox> - lay out a set of child widgets in a grid
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::GridBox;
- use Tickit::Widget::Static;
+   use Tickit;
+   use Tickit::Widget::GridBox;
+   use Tickit::Widget::Static;
 
- my $gridbox = Tickit::Widget::GridBox->new(
-    style => {
-       col_spacing => 2,
-       row_spacing => 1,
-    },
-    children => [
-      [ Tickit::Widget::Static->new( text => "top left" ),
-        Tickit::Widget::Static->new( text => "top right" ) ],
-      [ Tickit::Widget::Static->new( text => "bottom left" ),
-        Tickit::Widget::Static->new( text => "bottom right" ) ],
-    ],
- );
+   my $gridbox = Tickit::Widget::GridBox->new(
+      style => {
+         col_spacing => 2,
+         row_spacing => 1,
+      }
+   )
+      ->append_row(
+        [ Tickit::Widget::Static->new( text => "top left" ),
+          Tickit::Widget::Static->new( text => "top right" ) ],
+      )
+      ->append_row(
+        [ Tickit::Widget::Static->new( text => "bottom left" ),
+          Tickit::Widget::Static->new( text => "bottom right" ) ],
+      );
 
- Tickit->new( root => $gridbox )->run;
+   Tickit->new( root => $gridbox )->run;
 
 =head1 DESCRIPTION
 
@@ -78,7 +80,9 @@ use constant WIDGET_PEN_FROM_STYLE => 1;
 
 =head1 CONSTRUCTOR
 
-=head2 $gridbox = Tickit::Widget::GridBox->new( %args )
+=head2 new
+
+   $gridbox = Tickit::Widget::GridBox->new( %args )
 
 Constructs a new C<Tickit::Widget::GridBox> object.
 
@@ -91,6 +95,8 @@ Takes the following named arguments:
 Optional. If present, should be a 2D ARRAYref of ARRAYrefs containing the
 C<Tickit::Widget> children to display in the grid. They are all added with no
 additional options.
+
+This is now discouraged in favour of the L</append_row> method.
 
 =back
 
@@ -109,6 +115,8 @@ sub new
    $self->{max_col} = -1;
 
    if( my $children = $args{children} ) {
+      Carp::carp( "The 'children' constructor argument to $class is discouraged; use ->append_row instead" );
+
       foreach my $row ( 0 .. $#$children ) {
          foreach my $col ( 0 .. $#{ $children->[$row] } ) {
             $self->add( $row, $col, $children->[$row][$col] );
@@ -169,9 +177,13 @@ sub children
 
 =cut
 
-=head2 $count = $gridbox->rowcount
+=head2 rowcount
 
-=head2 $count = $gridbox->colcount
+=head2 colcount
+
+   $count = $gridbox->rowcount
+
+   $count = $gridbox->colcount
 
 Returns the number of rows or columns in the grid.
 
@@ -189,7 +201,9 @@ sub colcount
    return $self->{max_col} + 1;
 }
 
-=head2 $gridbox->add( $row, $col, $child, %opts )
+=head2 add
+
+   $gridbox->add( $row, $col, $child, %opts )
 
 Sets the child widget to display in the given grid cell. Cells do not need to
 be explicitly constructed; the grid will automatically expand to the size
@@ -230,7 +244,9 @@ sub add
    );
 }
 
-=head2 $gridbox->remove( $row, $col )
+=head2 remove
+
+   $gridbox->remove( $row, $col )
 
 Removes the child widget on display in the given cell. May shrink the grid if
 this was the last child widget in the given row or column.
@@ -278,7 +294,9 @@ sub remove
    $self->window->expose( $childrect ) if $childrect;
 }
 
-=head2 $child = $gridbox->get( $row, $col )
+=head2 get
+
+   $child = $gridbox->get( $row, $col )
 
 Returns the child widget at the given cell in the grid. If the row or column
 index are beyond the bounds of the grid, or if there is no widget in the given
@@ -295,9 +313,13 @@ sub get
    return $self->{grid}[$row][$col];
 }
 
-=head2 @children = $gridbox->get_row( $row )
+=head2 get_row
 
-=head2 @children = $gridbox->get_col( $col )
+=head2 get_col
+
+   @children = $gridbox->get_row( $row )
+
+   @children = $gridbox->get_col( $col )
 
 Convenient shortcut to call C<get> on an entire row or column of the grid.
 
@@ -317,7 +339,9 @@ sub get_col
    return map { $self->get( $_, $col ) } 0 .. $self->rowcount - 1;
 }
 
-=head2 $gridbox->insert_row( $before_row, [ @children ] )
+=head2 insert_row
+
+   $gridbox->insert_row( $before_row, [ @children ] )
 
 Inserts a new row into the grid by moving the existing rows after it lower
 down. Any child widgets in the referenced array will be set on the cells of
@@ -338,9 +362,13 @@ sub insert_row
 
       $self->add( $row, $col, $child ); # No options
    }
+
+   return $self;
 }
 
-=head2 $gridbox->insert_col( $before_col, [ @children ] )
+=head2 insert_col
+
+   $gridbox->insert_col( $before_col, [ @children ] )
 
 Inserts a new column into the grid by moving the existing columns after it to
 the right. Any child widgets in the referenced array will be set on the cells
@@ -364,9 +392,13 @@ sub insert_col
 
       $self->add( $row, $col, $child ); # No options
    }
+
+   return $self;
 }
 
-=head2 $gridbox->append_row( [ @children ] )
+=head2 append_row
+
+   $gridbox->append_row( [ @children ] )
 
 Shortcut to inserting a new row after the end of the current grid.
 
@@ -375,22 +407,37 @@ Shortcut to inserting a new row after the end of the current grid.
 sub append_row
 {
    my $self = shift;
-   $self->insert_row( $self->rowcount, @_ );
+   return $self->insert_row( $self->rowcount, @_ );
 }
 
-=head2 $gridbox->append_col( [ @children ] )
+=head2 append_col
+
+   $gridbox->append_col( [ @children ] )
 
 Shortcut to inserting a new column after the end of the current grid.
+
+These four methods return the container widget instance itself making them
+suitable to use as a chaining mutator; e.g.
+
+   my $container = Tickit::Widget::GridBox->new( ... )
+      ->append_row( [ Tickit::Widget::Static->new( ... ),
+                      Tickit::Widget::Static->new( ... ) ] )
+      ->append_row( ... );
+
+This should be preferred over using the C<children> constructor argument,
+which is now discouraged.
 
 =cut
 
 sub append_col
 {
    my $self = shift;
-   $self->insert_col( $self->colcount, @_ );
+   return $self->insert_col( $self->colcount, @_ );
 }
 
-=head2 $gridbox->delete_row( $row )
+=head2 delete_row
+
+   $gridbox->delete_row( $row )
 
 Deletes a row of the grid by moving the existing rows after it higher up.
 
@@ -407,7 +454,9 @@ sub delete_row
    $self->children_changed;
 }
 
-=head2 $gridbox->delete_col( $col )
+=head2 delete_col
+
+   $gridbox->delete_col( $col )
 
 Deletes a column of the grid by moving the existing columns after it to the
 left.

@@ -15,9 +15,8 @@ my $win = mk_window;
 my ( $child_lines, $child_cols );
 my $child_render_rect;
 
-my $widget = Tickit::Widget::FloatBox->new(
-   base_child => TestWidget->new,
-);
+my $widget = Tickit::Widget::FloatBox->new
+   ->set_base_child( TestWidget->new );
 
 ok( defined $widget, 'defined $widget' );
 

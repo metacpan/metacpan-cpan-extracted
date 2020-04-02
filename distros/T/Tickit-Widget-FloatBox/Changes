@@ -1,5 +1,10 @@
 Revision history for Tickit-Widget-FloatBox
 
+0.05    2020-04-02
+        [CHANGES]
+         * Discourage `base_child` as a constructor argument
+         * Make `->set_base_child` a chaining mutator
+
 0.04    2020-03-28
         [CHANGES]
          * Use Object::Pad

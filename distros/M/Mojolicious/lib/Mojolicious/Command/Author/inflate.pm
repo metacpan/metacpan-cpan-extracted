@@ -2,7 +2,7 @@ package Mojolicious::Command::Author::inflate;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Loader qw(data_section file_is_binary);
-use Mojo::Util 'encode';
+use Mojo::Util qw(encode);
 
 has description => 'Inflate embedded files to real files';
 has usage       => sub { shift->extract_usage };
@@ -70,14 +70,14 @@ L<Mojolicious::Command> and implements the following new ones.
   my $description = $inflate->description;
   $inflate        = $inflate->description('Foo');
 
-Short description of this command, used for the command list.
+Short description of this command. Used for the command list.
 
 =head2 usage
 
   my $usage = $inflate->usage;
   $inflate  = $inflate->usage('Foo');
 
-Usage information for this command, used for the help screen.
+Usage information for this command. Used for the help screen.
 
 =head1 METHODS
 

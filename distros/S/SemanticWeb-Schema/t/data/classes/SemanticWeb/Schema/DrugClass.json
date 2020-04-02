@@ -13,8 +13,8 @@
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
             "schema:Patient",
-            "schema:TherapeuticProcedure",
             "schema:DrugClass",
+            "schema:TherapeuticProcedure",
             "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",

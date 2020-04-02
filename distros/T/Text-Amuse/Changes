@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+1.51 2020-04-02
+
+ - EXPERIMENTAL: refine the (new) table style keeping the
+   backcompatibility.
+
 1.50 2020-03-28
 
  - EXPERIMENTAL feature: support GH-Markdown tables.

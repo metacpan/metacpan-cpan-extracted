@@ -30,6 +30,10 @@ CONSTRUCTOR
 
       The main Tickit::Widget instance to use as the base.
 
+      This argument is now discouraged as it complicates the construction
+      of subclasses; see instead the "set_base_child" method used as a
+      chaining mutator.
+
 ACCESSORS
 
  base_child
@@ -41,6 +45,12 @@ ACCESSORS
        $floatbox->set_base_child( $base_child )
 
     Returns or sets the base widget to use.
+
+    The mutator method returns the container widget instance itself making
+    it suitable to use as a chaining mutator; e.g.
+
+       my $container = Tickit::Widget::FloatBox->new( ... )
+          ->set_base_child( Tickit::Widget::Box->new ... );
 
  add_float
 

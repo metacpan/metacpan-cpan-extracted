@@ -18,7 +18,7 @@ is $tt->command_register(@args), 0, 'register project-name';
 @args[0 .. 2] = ("$year-10-17T09:00:00", '17:00:00', 'other');
 is $tt->command_register(@args), 0, 'register with hh::mm::ss';
 
-@args[1] = '18:00:00';
+$args[1] = '18:00:00';
 is $tt->command_register(@args), 1, 'register with same time';
 
 $main::out = '';

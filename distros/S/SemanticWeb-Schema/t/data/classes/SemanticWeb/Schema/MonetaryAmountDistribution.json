@@ -16,9 +16,9 @@
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : [
             "schema:LoanOrCredit",
+            "schema:ExchangeRateSpecification",
             "schema:MonetaryAmountDistribution",
             "schema:DatedMoneySpecification",
-            "schema:ExchangeRateSpecification",
             "schema:MonetaryAmount"
          ],
          "schema:rangeIncludes" : "schema:Text"

@@ -16,8 +16,8 @@
          "schema:rangeIncludes" : "schema:AnatomicalStructure",
          "schema:supersededBy" : [
             "schema:veinBranch",
-            "schema:arterialBranch",
-            "schema:nerveBranch"
+            "schema:nerveBranch",
+            "schema:arterialBranch"
          ]
       },
       "schema:nerveMotor" : {

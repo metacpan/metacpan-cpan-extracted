@@ -13,8 +13,8 @@
          "rdfs:label" : "healthCondition",
          "schema:domainIncludes" : [
             "schema:Patient",
-            "schema:PeopleAudience",
-            "schema:MedicalStudy"
+            "schema:MedicalStudy",
+            "schema:PeopleAudience"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalCondition"
@@ -25,11 +25,11 @@
          "rdfs:label" : "sponsor",
          "schema:domainIncludes" : [
             "schema:Event",
-            "schema:CreativeWork",
             "schema:MedicalStudy",
-            "schema:Grant",
+            "schema:CreativeWork",
+            "schema:Organization",
             "schema:Person",
-            "schema:Organization"
+            "schema:Grant"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",
@@ -41,15 +41,15 @@
          "rdfs:comment" : "The status of the study (enumerated).",
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
-            "schema:MedicalStudy",
             "schema:MedicalProcedure",
-            "schema:MedicalCondition"
+            "schema:MedicalCondition",
+            "schema:MedicalStudy"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
+            "schema:Text",
             "schema:EventStatusType",
-            "schema:MedicalStudyStatus",
-            "schema:Text"
+            "schema:MedicalStudyStatus"
          ]
       },
       "schema:studyLocation" : {

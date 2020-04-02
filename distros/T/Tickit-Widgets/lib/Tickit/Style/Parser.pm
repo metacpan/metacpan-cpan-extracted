@@ -13,7 +13,7 @@ our $VERSION = '0.51';
 
 use Struct::Dumb;
 
-# Identifiers can include hypens
+# Identifiers can include hyphens
 use constant pattern_ident => qr/[A-Z0-9_-]+/i;
 
 # Allow #-style line comments

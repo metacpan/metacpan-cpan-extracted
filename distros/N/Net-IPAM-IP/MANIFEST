@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Net/IPAM/IP.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-new.t
+t/02-sort.t
+t/03-incr.t
+t/04-errors.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t

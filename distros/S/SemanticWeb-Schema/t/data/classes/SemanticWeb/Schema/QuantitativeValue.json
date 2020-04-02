@@ -12,10 +12,10 @@
          "rdfs:comment" : "A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.<br/><br/>\n\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. http://schema.org/width, http://schema.org/color, http://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
          "rdfs:label" : "additionalProperty",
          "schema:domainIncludes" : [
-            "schema:QualitativeValue",
             "schema:Place",
+            "schema:QuantitativeValue",
             "schema:Product",
-            "schema:QuantitativeValue"
+            "schema:QualitativeValue"
          ],
          "schema:rangeIncludes" : "schema:PropertyValue"
       },
@@ -26,9 +26,9 @@
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
             "schema:QuantitativeValue",
-            "schema:PropertyValueSpecification",
             "schema:PropertyValue",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:PropertyValueSpecification"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -38,10 +38,10 @@
          "rdfs:comment" : "The lower value of some characteristic or property.",
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
-            "schema:PropertyValue",
             "schema:MonetaryAmount",
+            "schema:PropertyValueSpecification",
             "schema:QuantitativeValue",
-            "schema:PropertyValueSpecification"
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -51,14 +51,14 @@
          "rdfs:comment" : "The unit of measurement given using the UN/CEFACT Common Code (3 characters) or a URL. Other codes than the UN/CEFACT Common Code may be used with a prefix followed by a colon.",
          "rdfs:label" : "unitCode",
          "schema:domainIncludes" : [
-            "schema:PropertyValue",
-            "schema:TypeAndQuantityNode",
+            "schema:UnitPriceSpecification",
             "schema:QuantitativeValue",
-            "schema:UnitPriceSpecification"
+            "schema:PropertyValue",
+            "schema:TypeAndQuantityNode"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:unitText" : {
@@ -66,10 +66,10 @@
          "rdfs:comment" : "A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for\n<a href='unitCode'>unitCode</a>.",
          "rdfs:label" : "unitText",
          "schema:domainIncludes" : [
-            "schema:TypeAndQuantityNode",
+            "schema:QuantitativeValue",
             "schema:PropertyValue",
-            "schema:UnitPriceSpecification",
-            "schema:QuantitativeValue"
+            "schema:TypeAndQuantityNode",
+            "schema:UnitPriceSpecification"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -80,13 +80,13 @@
          "rdfs:label" : "value",
          "schema:domainIncludes" : [
             "schema:MonetaryAmount",
-            "schema:PropertyValue",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Boolean",
             "schema:Text",
+            "schema:Boolean",
+            "schema:Number",
             "schema:StructuredValue"
          ]
       },
@@ -97,14 +97,14 @@
          "rdfs:label" : "valueReference",
          "schema:domainIncludes" : [
             "schema:QuantitativeValue",
-            "schema:QualitativeValue",
-            "schema:PropertyValue"
+            "schema:PropertyValue",
+            "schema:QualitativeValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:StructuredValue",
             "schema:QuantitativeValue",
-            "schema:PropertyValue",
+            "schema:StructuredValue",
             "schema:Enumeration",
+            "schema:PropertyValue",
             "schema:QualitativeValue"
          ]
       }

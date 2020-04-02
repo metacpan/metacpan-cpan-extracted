@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2500",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A School District is an administrative area for the administration of schools.",
+      "rdfs:label" : "SchoolDistrict",
+      "rdfs:subClassOf" : "schema:AdministrativeArea",
+      "schema:category" : "issue-2500",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

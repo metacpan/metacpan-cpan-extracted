@@ -1,20 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::Button;
 
 use strict;
 use warnings;
-use feature qw( switch );
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 use base qw( Tickit::Widget );
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE LINE_DOUBLE LINE_THICK );
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Tickit::Utils qw( textwidth );
 
@@ -26,19 +24,19 @@ C<Tickit::Widget::Button> - a widget displaying a clickable button
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::Button;
+   use Tickit;
+   use Tickit::Widget::Button;
 
- my $button = Tickit::Widget::Button->new(
-    label => "Click Me!",
-    on_click => sub {
-       my ( $self ) = @_;
+   my $button = Tickit::Widget::Button->new(
+      label => "Click Me!",
+      on_click => sub {
+         my ( $self ) = @_;
 
-       # Do something!
-    },
- );
+         # Do something!
+      },
+   );
 
- Tickit->new( root => $button )->run;
+   Tickit->new( root => $button )->run;
 
 =head1 DESCRIPTION
 
@@ -115,7 +113,9 @@ use constant KEYPRESSES_FROM_STYLE => 1;
 
 =cut
 
-=head2 $entry = Tickit::Widget::Button->new( %args )
+=head2 new
+
+   $button = Tickit::Widget::Button->new( %args )
 
 Constructs a new C<Tickit::Widget::Button> object.
 
@@ -169,7 +169,9 @@ sub cols
 
 =cut
 
-=head2 $label = $button->label
+=head2 label
+
+   $label = $button->label
 
 =cut
 
@@ -178,7 +180,9 @@ sub label
    return shift->{label}
 }
 
-=head2 $button->set_label( $label )
+=head2 set_label
+
+   $button->set_label( $label )
 
 Return or set the text to display in the button area.
 
@@ -191,7 +195,9 @@ sub set_label
    $self->redraw;
 }
 
-=head2 $on_click = $button->on_click
+=head2 on_click
+
+   $on_click = $button->on_click
 
 =cut
 
@@ -201,7 +207,9 @@ sub on_click
    return $self->{on_click};
 }
 
-=head2 $button->set_on_click( $on_click )
+=head2 set_on_click
+
+   $button->set_on_click( $on_click )
 
 Return or set the CODE reference to be called when the button area is clicked.
 
@@ -215,11 +223,13 @@ sub set_on_click
    ( $self->{on_click} ) = @_;
 }
 
-=head2 $button->click
+=head2 click
+
+   $button->click
 
 Behave as if the button has been clicked; running its C<on_click> handler.
-This is provided for convenience of activating its handler programatically via
-other parts of code.
+This is provided for convenience of activating its handler programmatically
+via other parts of code.
 
 =cut
 
@@ -250,13 +260,21 @@ sub _activate
    $self->set_style_tag( active => $active );
 }
 
-=head2 $align = $button->align
+=head2 align
 
-=head2 $button->set_align( $align )
+=head2 set_align
 
-=head2 $valign = $button->valign
+=head2 valign
 
-=head2 $button->set_valign( $valign )
+=head2 set_valign
+
+   $align = $button->align
+
+   $button->set_align( $align )
+
+   $valign = $button->valign
+
+   $button->set_valign( $valign )
 
 Accessors for the horizontal and vertical alignment of the label text within
 the button area. See also L<Tickit::WidgetRole::Alignable>.
@@ -335,30 +353,28 @@ sub on_mouse
    my $type = $args->type;
    my $button = $args->button;
 
-   return unless $button == 1;
+   return if $type eq "wheel" or $button != 1;
 
-   for( $type ) {
-      when( "press" ) {
-         $self->_activate( 1 );
-      }
-      when( "drag_start" ) {
-         $self->{dragging_on_self} = 1;
-      }
-      when( "drag_stop" ) {
-         $self->{dragging_on_self} = 0;
-      }
-      when( "drag" ) {
-         # TODO: This could be neater with an $arg->srcwin
-         $self->_activate( 1 ) if $self->{dragging_on_self} and !$self->{active};
-      }
-      when( "drag_outside" ) {
-         $self->_activate( 0 ) if $self->{active};
-      }
-      when( "release" ) {
-         if( $self->{active} ) {
-            $self->_activate( 0 );
-            $self->click;
-         }
+   if( $type eq "press" ) {
+      $self->_activate( 1 );
+   }
+   elsif( $type eq "drag_start" ) {
+      $self->{dragging_on_self} = 1;
+   }
+   elsif( $type eq "drag_stop" ) {
+      $self->{dragging_on_self} = 0;
+   }
+   elsif( $type eq "drag" ) {
+      # TODO: This could be neater with an $arg->srcwin
+      $self->_activate( 1 ) if $self->{dragging_on_self} and !$self->{active};
+   }
+   elsif( $type eq "drag_outside" ) {
+      $self->_activate( 0 ) if $self->{active};
+   }
+   elsif( $type eq "release" ) {
+      if( $self->{active} ) {
+         $self->_activate( 0 );
+         $self->click;
       }
    }
 

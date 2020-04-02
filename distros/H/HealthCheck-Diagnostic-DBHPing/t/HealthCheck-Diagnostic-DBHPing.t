@@ -6,7 +6,7 @@ use HealthCheck::Diagnostic::DBHPing;
 use DBI;
 use DBD::SQLite;
 
-my $nl = $] >= 5.016 ? ".\n" : "\n";
+my $nl = Carp->VERSION lt '1.25' ? "\n" : ".\n";
 
 eval { HealthCheck::Diagnostic::DBHPing->check };
 is $@, sprintf( "Valid 'dbh' is required at %s line %d$nl",

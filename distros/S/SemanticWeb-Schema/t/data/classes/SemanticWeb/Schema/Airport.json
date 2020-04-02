@@ -11,8 +11,8 @@
          "rdfs:comment" : "IATA identifier for an airline or airport.",
          "rdfs:label" : "iataCode",
          "schema:domainIncludes" : [
-            "schema:Airport",
-            "schema:Airline"
+            "schema:Airline",
+            "schema:Airport"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },

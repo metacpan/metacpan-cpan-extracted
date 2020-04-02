@@ -463,15 +463,9 @@ table, th, td {
     border: solid 1px black;
     border-collapse: collapse;
 }
+
 td, th {
     padding: 2px 5px;
-}
-
-hr {
-    margin: 24px 0;
-    color: #000;
-    height: 1px;
-    background-color: #000;
 }
 
 table {
@@ -479,10 +473,36 @@ table {
 }
 
 td, th { vertical-align: top; }
-th {font-weight: bold;}
 
 caption {
     caption-side:bottom;
+}
+
+table.markdown-style-table,
+table.markdown-style-table th,
+table.markdown-style-table td {
+    border: none;
+}
+
+table.markdown-style-table > thead > tr > th,
+table.markdown-style-table > thead > tr > td {
+    border-bottom: solid 1px black;
+}
+
+table.markdown-style-table > tfoot > tr > th,
+table.markdown-style-table > tfoot > tr > td {
+    border-top: solid 1px black;
+}
+
+table.markdown-style-table > thead > tr > td {
+    border-bottom: solid 1px black;
+}
+
+hr {
+    margin: 24px 0;
+    color: #000;
+    height: 1px;
+    background-color: #000;
 }
 
 img.embedimg {

@@ -15,13 +15,29 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.0';
+our $VERSION = 'v7.0.2';
+
+
+has announcement_location => (
+    is        => 'rw',
+    predicate => '_has_announcement_location',
+    json_ld   => 'announcementLocation',
+);
+
 
 
 has category => (
     is        => 'rw',
     predicate => '_has_category',
     json_ld   => 'category',
+);
+
+
+
+has date_posted => (
+    is        => 'rw',
+    predicate => '_has_date_posted',
+    json_ld   => 'datePosted',
 );
 
 
@@ -106,7 +122,7 @@ SemanticWeb::Schema::SpecialAnnouncement - A SpecialAnnouncement combines a simp
 
 =head1 VERSION
 
-version v7.0.0
+version v7.0.2
 
 =head1 DESCRIPTION
 
@@ -114,7 +130,10 @@ version v7.0.0
 update with contextualized Web links and other structured data. It
 represents an information update made by a locally-oriented organization,
 for example schools, pharmacies, healthcare providers, community groups,
-police, local government.<br/><br/> The motivating scenario for
+police, local government.<br/><br/> For work in progress guidelines on
+Coronavirus-related markup see <a
+href="https://docs.google.com/document/d/14ikaGCKxo50rRM7nvKSlbUpjyIk2WMQd3
+IkB1lItlrM/edit#">this doc</a>.<br/><br/> The motivating scenario for
 SpecialAnnouncement is the <a
 href="https://en.wikipedia.org/wiki/2019%E2%80%9320_coronavirus_pandemic">C
 oronavirus pandemic</a>, and the initial vocabulary is oriented to this
@@ -131,10 +150,10 @@ although there may be overlaps. The intent is to cover the kinds of
 everyday practical information being posted to existing websites during an
 emergency situation.<br/><br/> Several kinds of information can be
 provided:<br/><br/> We encourage the provision of "name", "text",
-"datePosted", "expires" (if appropriate) and "url" as a simple baseline. It
-is important to provide a value for "category" where possible, most ideally
-as a well known URL from Wikipedia or Wikidata. In the case of the
-2019-2020 Coronavirus pandemic, this should be
+"datePosted", "expires" (if appropriate), "category" and "url" as a simple
+baseline. It is important to provide a value for "category" where possible,
+most ideally as a well known URL from Wikipedia or Wikidata. In the case of
+the 2019-2020 Coronavirus pandemic, this should be
 "https://en.wikipedia.org/w/index.php?title=2019-20_coronavirus_pandemic"
 or "https://www.wikidata.org/wiki/Q81068910".<br/><br/> For many of the
 possible properties, values can either be simple links or an inline
@@ -145,9 +164,9 @@ href="http://schema.org/WebContent">WebContent</a> type, and provide the
 url as a property of that, alongside at least a simple "<a
 class="localLink" href="http://schema.org/text">text</a>" summary of the
 page. It is unlikely that a single SpecialAnnouncement will need all of the
-possible properties simultaneously. More options may be added later
-if<br/><br/> We expect that in many cases the page referenced might contain
-more specialized structured data, e.g. contact info, <a class="localLink"
+possible properties simultaneously.<br/><br/> We expect that in many cases
+the page referenced might contain more specialized structured data, e.g.
+contact info, <a class="localLink"
 href="http://schema.org/openingHours">openingHours</a>, <a
 class="localLink" href="http://schema.org/Event">Event</a>, <a
 class="localLink" href="http://schema.org/FAQPage">FAQPage</a> etc. By
@@ -158,7 +177,37 @@ Coronavirus) indicated by the <a class="localLink"
 href="http://schema.org/category">category</a> property of the <a
 class="localLink"
 href="http://schema.org/SpecialAnnouncement">SpecialAnnouncement</a>.<br/><
-br/> The basic content of <a class="localLink"
+br/> Many <a class="localLink"
+href="http://schema.org/SpecialAnnouncement">SpecialAnnouncement</a>s will
+relate to particular regions and to identifiable local organizations. Use
+<a class="localLink"
+href="http://schema.org/spatialCoverage">spatialCoverage</a> for the
+region, and <a class="localLink"
+href="http://schema.org/announcementLocation">announcementLocation</a> to
+indicate specific <a class="localLink"
+href="http://schema.org/LocalBusiness">LocalBusiness</a>es and <a
+class="localLink"
+href="http://schema.org/CivicStructures">CivicStructures</a>. If the
+announcement affects both a particular region and a specific location (for
+example, a library closure that serves an entire region), use both <a
+class="localLink"
+href="http://schema.org/spatialCoverage">spatialCoverage</a> and <a
+class="localLink"
+href="http://schema.org/announcementLocation">announcementLocation</a>.<br/
+><br/> The <a class="localLink" href="http://schema.org/about">about</a>
+property can be used to indicate entities that are the focus of the
+announcement. We now recommend using <a class="localLink"
+href="http://schema.org/about">about</a> only for representing non-location
+entities (e.g. a <a class="localLink"
+href="http://schema.org/Course">Course</a> or a <a class="localLink"
+href="http://schema.org/RadioStation">RadioStation</a>). For places, use <a
+class="localLink"
+href="http://schema.org/announcementLocation">announcementLocation</a> and
+<a class="localLink"
+href="http://schema.org/spatialCoverage">spatialCoverage</a>. Consumers of
+this markup should be aware that the initial design encouraged the use of
+/about for locations too.<br/><br/> The basic content of <a
+class="localLink"
 href="http://schema.org/SpecialAnnouncement">SpecialAnnouncement</a> is
 similar to that of an <a href="https://en.wikipedia.org/wiki/RSS">RSS</a>
 or <a href="https://en.wikipedia.org/wiki/Atom_(Web_standard)">Atom</a>
@@ -172,20 +221,35 @@ URL, or an inline <a class="localLink"
 href="http://schema.org/DataFeed">DataFeed</a> object, with <a
 class="localLink"
 href="http://schema.org/encodingFormat">encodingFormat</a> providing media
-type information e.g. "application/rss+xml" or
-"application/atom+xml".<br/><br/> For an announcement that is about a
-place, you can use <a class="localLink"
-href="http://schema.org/about">about</a> (or <a class="localLink"
-href="http://schema.org/mainEntity">mainEntity</a>) to make that
-relationship explicit. For example, the announcement could be "about" a new
-<a class="localLink"
-href="http://schema.org/CovidTestingFacility">CovidTestingFacility</a>, and
-provide contact information, <a class="localLink"
-href="http://schema.org/location">location</a>, <a class="localLink"
-href="http://schema.org/geo">geo</a>, <a class="localLink"
-href="http://schema.org/openingHours">openingHours</a> etc.<p>
+type information e.g. "application/rss+xml" or "application/atom+xml".<p>
 
 =head1 ATTRIBUTES
+
+=head2 C<announcement_location>
+
+C<announcementLocation>
+
+=for html <p>Indicates a specific <a class="localLink"
+href="http://schema.org/CivicStructure">CivicStructure</a> or <a
+class="localLink" href="http://schema.org/LocalBusiness">LocalBusiness</a>
+associated with the SpecialAnnouncement. For example, a specific testing
+facility or business with special opening hours. For a larger geographic
+region like a quarantine of an entire region, use <a class="localLink"
+href="http://schema.org/spatialCoverage">spatialCoverage</a>.<p>
+
+A announcement_location should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CivicStructure']>
+
+=item C<InstanceOf['SemanticWeb::Schema::LocalBusiness']>
+
+=back
+
+=head2 C<_has_announcement_location>
+
+A predicate for the L</announcement_location> attribute.
 
 =head2 C<category>
 
@@ -207,6 +271,24 @@ A category should be one of the following types:
 =head2 C<_has_category>
 
 A predicate for the L</category> attribute.
+
+=head2 C<date_posted>
+
+C<datePosted>
+
+Publication date of an online listing.
+
+A date_posted should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_date_posted>
+
+A predicate for the L</date_posted> attribute.
 
 =head2 C<disease_prevention_info>
 
@@ -288,15 +370,59 @@ C<newsUpdatesAndGuidelines>
 =for html <p>Indicates a page with news updates and guidelines. This could often be
 (but is not required to be) the main page containing <a class="localLink"
 href="http://schema.org/SpecialAnnouncement">SpecialAnnouncement</a> markup
-on a site.<p>
+on a site.]]></rdfs:comment> <dct:source
+rdf:resource="https://github.com/schemaorg/schemaorg/issues/2490"/>
+<schema:rangeIncludes rdf:resource="http://schema.org/URL"/>
+</rdf:Property> <schema:LegalValueLevel
+rdf:about="http://schema.org/OfficialLegalValue">
+<schema:category>issue-1156</schema:category> <schema:isPartOf
+rdf:resource="http://pending.schema.org"/> <dct:source
+rdf:resource="http://publications.europa.eu/mdr/eli/index.html"/>
+<dct:source
+rdf:resource="https://github.com/schemaorg/schemaorg/issues/1156"/>
+<rdfs:label>OfficialLegalValue</rdfs:label> <skos:exactMatch
+rdf:resource="http://data.europa.eu/eli/ontology#LegalValue-official"/>
+<rdfs:comment>All the documents published by an official publisher should
+have at least the legal value level "OfficialLegalValue". This indicates
+that the document was published by an organisation with the public task of
+making it available (e.g. a consolidated version of a EU directive
+published by the EU Office of Publications).</rdfs:comment>
+</schema:LegalValueLevel> <schema:HealthAspectEnumeration
+rdf:about="http://schema.org/PrognosisHealthAspect">
+<schema:category>issue-2374</schema:category>
+<rdfs:label>PrognosisHealthAspect</rdfs:label> <rdfs:comment>Typical
+progression and happenings of life course of the topic.</rdfs:comment>
+<dct:source
+rdf:resource="https://github.com/schemaorg/schemaorg/issues/2374"/>
+<schema:isPartOf rdf:resource="http://pending.schema.org"/>
+</schema:HealthAspectEnumeration> <rdf:Property
+rdf:about="http://schema.org/materialExtent"> <schema:category
+xml:lang="en">issue-1759</schema:category> <schema:isPartOf
+rdf:resource="http://pending.schema.org"/> <schema:rangeIncludes
+rdf:resource="http://schema.org/Text"/> <rdfs:label
+xml:lang="en">materialExtent</rdfs:label> <dct:source
+rdf:resource="https://github.com/schemaorg/schemaorg/issues/1759"/>
+<schema:rangeIncludes rdf:resource="http://schema.org/QuantitativeValue"/>
+<rdfs:comment>The quantity of the materials being described or an
+expression of the physical space they occupy.</rdfs:comment>
+<schema:domainIncludes rdf:resource="http://schema.org/CreativeWork"/>
+</rdf:Property> <rdf:Property
+rdf:about="http://schema.org/accommodationFloorPlan">
+<schema:domainIncludes rdf:resource="http://schema.org/Residence"/>
+<rdfs:label>accommodationFloorPlan</rdfs:label> <schema:rangeIncludes
+rdf:resource="http://schema.org/FloorPlan"/>
+<schema:category>issue-2373</schema:category> <schema:isPartOf
+rdf:resource="http://pending.schema.org"/> <schema:domainIncludes
+rdf:resource="http://schema.org/Accommodation"/> <dct:source
+rdf:resource="https://github.com/schemaorg/schemaorg/issues/2373"/>
+<rdfs:comment><![CDATA[A floorplan of some <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>.<p>
 
 A news_updates_and_guidelines should be one of the following types:
 
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::WebContent']>
-
-=item C<Str>
 
 =back
 

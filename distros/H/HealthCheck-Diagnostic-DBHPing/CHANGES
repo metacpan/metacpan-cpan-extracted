@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2019-03-26 00:00:00 +0000 to present.
+Changes from 2019-04-02 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version v1.2.3 at 2020-03-25 19:16:29 +0000
+version v1.2.4 at 2020-04-01 18:24:52 +0000
+-------------------------------------------
+
+  Change: c7fb962caf22610b11e55c742252bb11a7ce2505
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-04-01 14:24:36 +0000
+
+    Update README 
+
+  Change: 5f55b3dfdd5c49d2c633dd70773ba0e75645312a
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-03-27 11:57:05 +0000
+
+    This should be the correct incantation 
+
+-------------------------------------------
+version v1.2.3 at 2020-03-25 18:41:57 +0000
 -------------------------------------------
 
   Change: 385f608766fd8b8b918e954546c02151ead23ac7
@@ -35,5 +51,5 @@ version v1.2.2 at 2019-11-07 20:30:31 +0000
     Remove gitc metadata 
 
 =================================================
-Plus 16 releases after 2019-03-26 00:00:00 +0000.
+Plus 16 releases after 2019-04-02 00:00:00 +0000.
 =================================================

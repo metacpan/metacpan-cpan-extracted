@@ -3,10 +3,10 @@
 #
 #  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.17;
 use 5.026; # signatures
+use Object::Pad 0.17;
 
-class Tickit::Widget::FloatBox 0.04
+class Tickit::Widget::FloatBox 0.05
    extends Tickit::ContainerWidget;
 
 use Carp;
@@ -53,6 +53,10 @@ L<Tickit::ContainerWidget> constructor.
 
 The main L<Tickit::Widget> instance to use as the base.
 
+This argument is now discouraged as it complicates the construction of
+subclasses; see instead the L</set_base_child> method used as a chaining
+mutator.
+
 =back
 
 =cut
@@ -60,16 +64,19 @@ The main L<Tickit::Widget> instance to use as the base.
 has $_base_child;
 has @_floats;
 
-method BUILD( %args )
+method BUILD ( %args )
 {
-   $self->set_base_child( $args{base_child} ) if $args{base_child};
+   if( $args{base_child} ) {
+      Carp::carp( "The 'base_child' constructor argument to ${\ref $self} is discouraged; use ->set_base_child instead" );
+      $self->set_base_child( $args{base_child} );
+   }
 }
 
 =head1 ACCESSORS
 
 =cut
 
-method children
+method children ()
 {
    my @children;
 
@@ -79,12 +86,12 @@ method children
    return @children;
 }
 
-method lines
+method lines ()
 {
    return $self->base_child ? $self->base_child->requested_lines : 1;
 }
 
-method cols
+method cols ()
 {
    return $self->base_child ? $self->base_child->requested_cols : 1;
 }
@@ -99,11 +106,17 @@ method cols
 
 Returns or sets the base widget to use.
 
+The mutator method returns the container widget instance itself making it
+suitable to use as a chaining mutator; e.g.
+
+   my $container = Tickit::Widget::FloatBox->new( ... )
+      ->set_base_child( Tickit::Widget::Box->new ... );
+
 =cut
 
-method base_child { $_base_child }
+method base_child () { $_base_child }
 
-method set_base_child( $new )
+method set_base_child ( $new )
 {
    if( $_base_child ) {
       $self->remove( $_base_child );
@@ -115,9 +128,11 @@ method set_base_child( $new )
    if( my $win = $self->window ) {
       $new->set_window( $win->make_sub( 0, 0, $win->lines, $win->cols ) );
    }
+
+   return $self;
 }
 
-method reshape
+method reshape ()
 {
    return unless my $win = $self->window;
 
@@ -135,7 +150,7 @@ method reshape
    $self->redraw;
 }
 
-method _reshape_float( $float, $win )
+method _reshape_float ( $float, $win )
 {
    my $child = $float->child;
    my @geom = $float->_get_geom( $win->lines, $win->cols );
@@ -153,7 +168,7 @@ method _reshape_float( $float, $win )
    }
 }
 
-method render_to_rb( $rb, $rect )
+method render_to_rb ( $rb, $rect )
 {
    return if $self->base_child;
 
@@ -187,7 +202,7 @@ the C<show> method before it becomes visible.
 
 =cut
 
-method add_float( %args )
+method add_float ( %args )
 {
    my $float = Tickit::Widget::FloatBox::Float->new(
       $self, delete $args{child}, %args
@@ -203,7 +218,7 @@ method add_float( %args )
    return $float;
 }
 
-method _remove_float( $float )
+method _remove_float ( $float )
 {
    my $idx;
    $_floats[$_] == $float and $idx = $_, last for 0 .. $#_floats;
@@ -231,7 +246,7 @@ has $_child;
 has $_hidden;
 has %_geom;
 
-method BUILD
+method BUILD ()
 {
    ( $_fb, $_child, my %args ) = @_;
    $_hidden = delete $args{hidden} || 0;
@@ -247,7 +262,7 @@ Returns the child widget in the region.
 
 =cut
 
-method child { $_child }
+method child () { $_child }
 
 =head2 move
 
@@ -279,7 +294,7 @@ current value pass a value of C<undef>.
 
 =cut
 
-method move( %args )
+method move ( %args )
 {
    exists $args{$_} and $_geom{$_} = $args{$_} for qw( top bottom left right );
 
@@ -293,7 +308,7 @@ method move( %args )
    }
 }
 
-method _get_geom( $lines, $cols )
+method _get_geom ( $lines, $cols )
 {
    my $clines = $self->child->requested_lines;
    my $ccols  = $self->child->requested_cols;
@@ -304,7 +319,7 @@ method _get_geom( $lines, $cols )
    return ( $top, $left, $bottom-$top, $right-$left );
 }
 
-sub _alloc_dimension( $start, $end, $parentsz, $childsz )
+sub _alloc_dimension ( $start, $end, $parentsz, $childsz )
 {
    # Need to off-by-one to allow -1 == right, etc..
    defined and $_ < 0 and $_ += $parentsz+1 for $start, $end;
@@ -323,7 +338,7 @@ Removes the float from the FloatBox.
 
 =cut
 
-method remove
+method remove ()
 {
    $_fb->_remove_float( $self );
 }
@@ -336,7 +351,7 @@ Hide the float by hiding the window of its child widget.
 
 =cut
 
-method hide
+method hide ()
 {
    my $self = shift;
    $_hidden = 1;
@@ -353,7 +368,7 @@ of C<hide>.
 
 =cut
 
-method show
+method show ()
 {
    $_hidden = 0;
 
@@ -368,7 +383,7 @@ Return true if the float is currently visible.
 
 =cut
 
-method is_visible
+method is_visible ()
 {
    return !$_hidden;
 }

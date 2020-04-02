@@ -12,8 +12,8 @@
          "rdfs:label" : "interactionService",
          "schema:domainIncludes" : "schema:InteractionCounter",
          "schema:rangeIncludes" : [
-            "schema:WebSite",
-            "schema:SoftwareApplication"
+            "schema:SoftwareApplication",
+            "schema:WebSite"
          ]
       },
       "schema:interactionType" : {

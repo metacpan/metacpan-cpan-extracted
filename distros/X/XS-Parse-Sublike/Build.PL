@@ -11,6 +11,7 @@ my $build = Module::Build::with::XSTests->new(
          # Not actually needed but used by hax/lexer-additions.c.inc
    },
    test_requires => {
+      'Test::Fatal' => 0,
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

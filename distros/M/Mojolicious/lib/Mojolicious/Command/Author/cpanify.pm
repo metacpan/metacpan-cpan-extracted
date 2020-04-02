@@ -1,8 +1,8 @@
 package Mojolicious::Command::Author::cpanify;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::File 'path';
-use Mojo::Util 'getopt';
+use Mojo::File qw(path);
+use Mojo::Util qw(getopt);
 
 has description => 'Upload distribution to CPAN';
 has usage       => sub { shift->extract_usage };
@@ -76,14 +76,14 @@ L<Mojolicious::Command> and implements the following new ones.
   my $description = $cpanify->description;
   $cpanify        = $cpanify->description('Foo');
 
-Short description of this command, used for the command list.
+Short description of this command. Used for the command list.
 
 =head2 usage
 
   my $usage = $cpanify->usage;
   $cpanify  = $cpanify->usage('Foo');
 
-Usage information for this command, used for the help screen.
+Usage information for this command. Used for the help screen.
 
 =head1 METHODS
 

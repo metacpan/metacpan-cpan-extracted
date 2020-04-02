@@ -11,8 +11,8 @@
          "rdfs:comment" : "The distance travelled, e.g. exercising or travelling.",
          "rdfs:label" : "distance",
          "schema:domainIncludes" : [
-            "schema:ExerciseAction",
-            "schema:TravelAction"
+            "schema:TravelAction",
+            "schema:ExerciseAction"
          ],
          "schema:rangeIncludes" : "schema:Distance"
       }

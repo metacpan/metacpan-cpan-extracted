@@ -1,0 +1,39 @@
+---
+abstract: 'Create relative symbolic links'
+author:
+  - 'Thomas R. Wyant, III F<wyant at cpan dot org>'
+build_requires:
+  File::Temp: '0'
+  Test2::Plugin::BailOnFail: '0'
+  Test2::Tools::LoadModule: '0'
+  Test2::V0: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Symlink-Relative
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  File::Symlink::Relative:
+    file: lib/File/Symlink/Relative.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Spec: '0'
+  constant: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Symlink-Relative
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-File-Symlink-Relative.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

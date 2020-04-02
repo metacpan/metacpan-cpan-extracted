@@ -12,8 +12,8 @@
          "rdfs:label" : "healthCondition",
          "schema:domainIncludes" : [
             "schema:Patient",
-            "schema:PeopleAudience",
-            "schema:MedicalStudy"
+            "schema:MedicalStudy",
+            "schema:PeopleAudience"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalCondition"

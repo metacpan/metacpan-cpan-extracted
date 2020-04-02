@@ -31,13 +31,13 @@
          "rdfs:comment" : "The base salary of the job or of an employee in an EmployeeRole.",
          "rdfs:label" : "baseSalary",
          "schema:domainIncludes" : [
-            "schema:EmployeeRole",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:EmployeeRole"
          ],
          "schema:rangeIncludes" : [
             "schema:Number",
-            "schema:MonetaryAmount",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount"
          ]
       },
       "schema:benefits" : {
@@ -49,26 +49,32 @@
          "schema:supersededBy" : "schema:jobBenefits"
       },
       "schema:datePosted" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2490",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Publication date of an online listing.",
          "rdfs:label" : "datePosted",
+         "schema:category" : "issue-2490",
          "schema:domainIncludes" : [
             "schema:JobPosting",
+            "schema:SpecialAnnouncement",
             "schema:RealEstateListing"
          ],
-         "schema:rangeIncludes" : "schema:Date"
+         "schema:rangeIncludes" : [
+            "schema:Date",
+            "schema:DateTime"
+         ]
       },
       "schema:educationRequirements" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/1779"
+            "https://github.com/schemaorg/schemaorg/issues/1779",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Educational background needed for the position or Occupation.",
          "rdfs:label" : "educationRequirements",
          "schema:category" : [
-            "issue-1698",
-            "issue-1779"
+            "issue-1779",
+            "issue-1698"
          ],
          "schema:domainIncludes" : [
             "schema:Occupation",
@@ -76,8 +82,8 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:EducationalOccupationalCredential"
+            "schema:EducationalOccupationalCredential",
+            "schema:Text"
          ]
       },
       "schema:employerOverview" : {
@@ -119,8 +125,8 @@
          ],
          "schema:rangeIncludes" : [
             "schema:Number",
-            "schema:MonetaryAmount",
-            "schema:MonetaryAmountDistribution"
+            "schema:MonetaryAmountDistribution",
+            "schema:MonetaryAmount"
          ]
       },
       "schema:experienceRequirements" : {
@@ -163,8 +169,8 @@
          "rdfs:label" : "industry",
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:DefinedTerm"
+            "schema:DefinedTerm",
+            "schema:Text"
          ]
       },
       "schema:jobBenefits" : {
@@ -210,36 +216,36 @@
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:Text"
+            "schema:Text",
+            "schema:Date"
          ]
       },
       "schema:occupationalCategory" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/2460",
-            "https://github.com/schemaorg/schemaorg/issues/1698",
             "https://github.com/schemaorg/schemaorg/issues/2289",
-            "https://github.com/schemaorg/schemaorg/issues/2192"
+            "https://github.com/schemaorg/schemaorg/issues/2460",
+            "https://github.com/schemaorg/schemaorg/issues/2192",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A category describing the job, preferably using a term from a taxonomy such as <a href=\"http://www.onetcenter.org/taxonomy.html\">BLS O*NET-SOC</a>, <a href=\"https://www.ilo.org/public/english/bureau/stat/isco/isco08/\">ISCO-08</a> or similar, with the property repeated for each applicable value. Ideally the taxonomy should be identified, and both the textual label and formal code for the category should be provided.<br/><br/>\n\nNote: for historical reasons, any textual label and formal code provided as a literal may be assumed to be from O*NET-SOC.",
          "rdfs:label" : "occupationalCategory",
          "schema:category" : [
-            "issue-1698",
+            "issue-2289",
             "issue-2192",
             "issue-2460",
-            "issue-2289"
+            "issue-1698"
          ],
          "schema:domainIncludes" : [
+            "schema:WorkBasedProgram",
             "schema:EducationalOccupationalProgram",
             "schema:JobPosting",
-            "schema:WorkBasedProgram",
             "schema:Occupation"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:CategoryCode"
+            "schema:CategoryCode",
+            "schema:Text"
          ]
       },
       "schema:physicalRequirement" : {
@@ -252,8 +258,8 @@
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
             "schema:Text",
-            "schema:DefinedTerm",
-            "schema:URL"
+            "schema:URL",
+            "schema:DefinedTerm"
          ]
       },
       "schema:qualifications" : {
@@ -265,8 +271,8 @@
          "rdfs:comment" : "Specific qualifications required for this role or Occupation.",
          "rdfs:label" : "qualifications",
          "schema:category" : [
-            "issue-1698",
-            "issue-1779"
+            "issue-1779",
+            "issue-1698"
          ],
          "schema:domainIncludes" : [
             "schema:JobPosting",
@@ -318,8 +324,8 @@
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:sensoryRequirement" : {
@@ -345,16 +351,16 @@
          "rdfs:comment" : "A statement of knowledge, skill, ability, task or any other assertion expressing a competency that is desired or required to fulfill this role or to work in this occupation.",
          "rdfs:label" : "skills",
          "schema:category" : [
-            "issue-2322",
-            "issue-1698"
+            "issue-1698",
+            "issue-2322"
          ],
          "schema:domainIncludes" : [
-            "schema:JobPosting",
-            "schema:Occupation"
+            "schema:Occupation",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:DefinedTerm"
+            "schema:DefinedTerm",
+            "schema:Text"
          ]
       },
       "schema:specialCommitments" : {
@@ -387,17 +393,17 @@
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:Demand",
             "schema:MonetaryAmount",
-            "schema:JobPosting",
+            "schema:LocationFeatureSpecification",
             "schema:OpeningHoursSpecification",
             "schema:PriceSpecification",
-            "schema:LocationFeatureSpecification"
+            "schema:JobPosting",
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:workHours" : {

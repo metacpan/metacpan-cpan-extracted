@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.0';
+our $VERSION = 'v7.0.2';
 
 
 has application_deadline => (
@@ -178,6 +178,14 @@ has time_of_day => (
 
 
 
+has time_to_complete => (
+    is        => 'rw',
+    predicate => '_has_time_to_complete',
+    json_ld   => 'timeToComplete',
+);
+
+
+
 has training_salary => (
     is        => 'rw',
     predicate => '_has_training_salary',
@@ -210,7 +218,7 @@ SemanticWeb::Schema::EducationalOccupationalProgram - A program offered by an in
 
 =head1 VERSION
 
-version v7.0.0
+version v7.0.2
 
 =head1 DESCRIPTION
 
@@ -639,6 +647,24 @@ A time_of_day should be one of the following types:
 =head2 C<_has_time_of_day>
 
 A predicate for the L</time_of_day> attribute.
+
+=head2 C<time_to_complete>
+
+C<timeToComplete>
+
+The expected length of time to complete the program if attending full-time.
+
+A time_to_complete should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Duration']>
+
+=back
+
+=head2 C<_has_time_to_complete>
+
+A predicate for the L</time_to_complete> attribute.
 
 =head2 C<training_salary>
 

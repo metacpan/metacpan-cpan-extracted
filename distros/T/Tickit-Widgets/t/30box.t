@@ -15,9 +15,8 @@ my $win = mk_window;
 my( $child_lines, $child_cols );
 my $child_render_rect;
 
-my $widget = Tickit::Widget::Box->new(
-   child => my $child = TestWidget->new,
-);
+my $widget = Tickit::Widget::Box->new
+   ->set_child( my $child = TestWidget->new );
 
 ok( defined $widget, 'defined $widget' );
 
@@ -80,10 +79,9 @@ $widget->set_child( undef );
 
 {
    my $widget = Tickit::Widget::Box->new(
-      child       => $child,
       child_cols  => "50%",
       child_lines => "70%",
-   );
+   )->set_child( $child );
    $widget->set_window( $win );
 
    flush_tickit;

@@ -12,8 +12,8 @@
          "rdfs:label" : "arrivalBusStop",
          "schema:domainIncludes" : "schema:BusTrip",
          "schema:rangeIncludes" : [
-            "schema:BusStop",
-            "schema:BusStation"
+            "schema:BusStation",
+            "schema:BusStop"
          ]
       },
       "schema:busName" : {
@@ -36,8 +36,8 @@
          "rdfs:label" : "departureBusStop",
          "schema:domainIncludes" : "schema:BusTrip",
          "schema:rangeIncludes" : [
-            "schema:BusStation",
-            "schema:BusStop"
+            "schema:BusStop",
+            "schema:BusStation"
          ]
       }
    }

@@ -1,8 +1,8 @@
 {
    "class" : {
       "dc:source" : [
-         "schemadotorgsources:source_rNews",
-         "schemadotorgsources2:TP-draws"
+         "schemadotorgsources2:TP-draws",
+         "schemadotorgsources:source_rNews"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A NewsArticle is an article whose content reports news, or provides background context and supporting materials for understanding the news.<br/><br/>\n\nA more detailed overview of <a href=\"/docs/news.html\">schema.org News markup</a> is also available.",

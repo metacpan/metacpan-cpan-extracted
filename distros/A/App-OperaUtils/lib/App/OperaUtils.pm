@@ -1,9 +1,9 @@
 package App::OperaUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-09'; # DATE
+our $DATE = '2019-12-10'; # DATE
 our $DIST = 'App-OperaUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -33,6 +33,7 @@ sub ps_opera {
 $SPEC{pause_opera} = {
     v => 1.1,
     summary => "Pause (kill -STOP) Opera",
+    description => $App::BrowserUtils::desc_pause,
     args => {
        %App::BrowserUtils::args_common,
     },
@@ -95,7 +96,7 @@ App::OperaUtils - Utilities related to the Opera browser
 
 =head1 VERSION
 
-This document describes version 0.001 of App::OperaUtils (from Perl distribution App-OperaUtils), released on 2019-12-09.
+This document describes version 0.002 of App::OperaUtils (from Perl distribution App-OperaUtils), released on 2019-12-10.
 
 =head1 SYNOPSIS
 
@@ -166,6 +167,14 @@ Usage:
  pause_opera(%args) -> [status, msg, payload, meta]
 
 Pause (kill -STOP) Opera.
+
+A modern browser now runs complex web pages and applications. Despite browser's
+power management feature, these pages/tabs on the browser often still eat
+considerable CPU cycles even though they only run in the background. Stopping
+(kill -STOP) the browser processes is a simple and effective way to stop CPU
+eating on Unix. It can be performed whenever you are not using your browsers for
+a little while, e.g. when you are typing on an editor or watching a movie. When
+you want to use your browser again, simply unpause it.
 
 This function is not exported.
 

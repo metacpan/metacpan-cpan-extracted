@@ -35,6 +35,7 @@
          "requires" : {
             "Exporter" : "0",
             "List::Util" : "0",
+            "constant" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -59,7 +60,7 @@
          "web" : "https://github.com/ology/Music-Interval-Barycentric"
       }
    },
-   "version" : "0.0302",
+   "version" : "0.0307",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -306,7 +307,9 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
-                  "exclude_match" : [],
+                  "exclude_match" : [
+                     "\\.mid"
+                  ],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",

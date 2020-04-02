@@ -1,18 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2019 -- leonerd@leonerd.org.uk
 
 package Tickit::ContainerWidget;
 
 use strict;
 use warnings;
 use 5.010; # //
-use feature qw( switch );
 use base qw( Tickit::Widget );
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Carp;
 
@@ -97,6 +95,9 @@ sub add
 {
    my $self = shift;
    my ( $child, %opts ) = @_;
+
+   $child and $child->isa( "Tickit::Widget" ) or
+      croak "Expected child to be a Tickit::Widget";
 
    $child->set_parent( $self );
 
@@ -278,24 +279,22 @@ sub find_child
       @children = grep { defined $other and $_ == $other or $where->() } @children;
    }
 
-   for( $how ) {
-      when( "first" ) {
-         return $children[0];
-      }
-      when( "last" ) {
-         return $children[-1];
-      }
-      when( "before" ) {
-         $children[$_] == $other and return $children[$_-1] for 1 .. $#children;
-         return undef;
-      }
-      when( "after" ) {
-         $children[$_] == $other and return $children[$_+1] for 0 .. $#children-1;
-         return undef;
-      }
-      default {
-         croak "Unrecognised ->find_child mode '$how'";
-      }
+   if( $how eq "first" ) {
+      return $children[0];
+   }
+   elsif( $how eq "last" ) {
+      return $children[-1];
+   }
+   elsif( $how eq "before" ) {
+      $children[$_] == $other and return $children[$_-1] for 1 .. $#children;
+      return undef;
+   }
+   elsif( $how eq "after" ) {
+      $children[$_] == $other and return $children[$_+1] for 0 .. $#children-1;
+      return undef;
+   }
+   else {
+      croak "Unrecognised ->find_child mode '$how'";
    }
 }
 

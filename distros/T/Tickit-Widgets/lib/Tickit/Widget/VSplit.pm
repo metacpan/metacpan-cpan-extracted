@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::VSplit;
 
@@ -11,7 +11,7 @@ use base qw( Tickit::Widget::LinearSplit );
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE CAP_BOTH );
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Carp;
 
@@ -23,16 +23,15 @@ C<Tickit::Widget::VSplit> - an adjustable vertical split between two widgets
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::VSplit;
- use Tickit::Widget::Static;
+   use Tickit;
+   use Tickit::Widget::VSplit;
+   use Tickit::Widget::Static;
 
- my $vsplit = Tickit::Widget::VSplit->new(
-    left_child  => Tickit::Widget::Static->new( text => "Text above" ),
-    right_child => Tickit::Widget::Static->new( text => "Text below" ),
- );
+   my $vsplit = Tickit::Widget::VSplit->new
+      ->set_left_child ( Tickit::Widget::Static->new( text => "Text above" ) ),
+      ->set_right_child( Tickit::Widget::Static->new( text => "Text below" ) );
 
- Tickit->new( root => $vsplit )->run;
+   Tickit->new( root => $vsplit )->run;
 
 =head1 DESCRIPTION
 
@@ -93,7 +92,9 @@ use constant VALUE_METHOD => "cols";
 
 =head1 CONSTRUCTOR
 
-=head2 $vsplit = Tickit::Widget::VSplit->new( %args )
+=head2 new
+
+   $vsplit = Tickit::Widget::VSplit->new( %args )
 
 Constructs a new C<Tickit::Widget::VSplit> object.
 
@@ -105,7 +106,10 @@ Takes the following named arguments
 
 =item right_child => WIDGET
 
-Child widgets to use
+Child widgets to use.
+
+These options are now discouraged in favour of the L</set_left_child> and
+L</set_right_child> methods.
 
 =back
 
@@ -118,8 +122,11 @@ sub new
 
    my $self = $class->SUPER::new( %args );
 
-   $self->set_left_child ( $args{left_child}  ) if $args{left_child};
-   $self->set_right_child( $args{right_child} ) if $args{right_child};
+   Carp::carp( "The 'left_child' constructor argument to $class is discouraged; use ->set_left_child instead" ) and
+      $self->set_left_child ( $args{left_child}  ) if $args{left_child};
+
+   Carp::carp( "The 'right_child' constructor argument to $class is discouraged; use ->set_right_child instead" ) and
+      $self->set_right_child( $args{right_child} ) if $args{right_child};
 
    return $self;
 }
@@ -148,9 +155,13 @@ sub cols
 
 =cut
 
-=head2 $child = $hsplit->left_child
+=head2 left_child
 
-=head2 $vsplit->set_left_child( $child )
+=head2 set_left_child
+
+   $child = $hsplit->left_child
+
+   $vsplit->set_left_child( $child )
 
 Accessor for the child widget used in the left half of the display.
 
@@ -159,11 +170,25 @@ Accessor for the child widget used in the left half of the display.
 *left_child     = __PACKAGE__->can( "A_child" );
 *set_left_child = __PACKAGE__->can( "set_A_child" );
 
-=head2 $child = $hsplit->right_child
+=head2 right_child
 
-=head2 $vsplit->set_right_child( $child )
+=head2 set_right_child
+
+   $child = $hsplit->right_child
+
+   $vsplit->set_right_child( $child )
 
 Accessor for the child widget used in the right half of the display.
+
+These mutators returning the container widget itself making them suitable to
+use as chaining mutators; e.g.
+
+   my $container = Tickit::Widget::VSplit->new( ... )
+      ->set_left_child ( Tickit::Widget::Box->new ... )
+      ->set_right_child( Tickit::Widget::Box->new ... );
+
+These should be preferred over using the C<left_child> and C<right_child>
+constructor arguments, which are now discouraged.
 
 =cut
 

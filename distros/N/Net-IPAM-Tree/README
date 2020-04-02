@@ -1,0 +1,37 @@
+Net-IPAM-Tree
+
+Net::IPAM::Tree - A CIDR/Block tree library for fast IP lookup with longest-prefix-match.
+
+A module for fast IP-routing-table lookups and IP-ACLs (Access Control Lists).
+
+It is NOT a standard patricia-trie implementation. This isn't possible for general blocks not represented by bitmasks, every tree item is a Net::IPAM::Block.
+
+SEE ALSO
+
+Net::IPAM::IP is the basic respresentation for Net::IPAM::Block and Net::IPAM::Tree.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::IPAM::Tree
+
+You can also look for information at github (TODO)
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2020 by Karl Gaissmaier.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

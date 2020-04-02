@@ -2,7 +2,7 @@ package Mojolicious::Command::eval;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Promise;
-use Mojo::Util 'getopt';
+use Mojo::Util qw(getopt);
 
 has description => 'Run code against application';
 has usage       => sub { shift->extract_usage };
@@ -76,14 +76,14 @@ L<Mojolicious::Command> and implements the following new ones.
   my $description = $eval->description;
   $eval           = $eval->description('Foo');
 
-Short description of this command, used for the command list.
+Short description of this command. Used for the command list.
 
 =head2 usage
 
   my $usage = $eval->usage;
   $eval     = $eval->usage('Foo');
 
-Usage information for this command, used for the help screen.
+Usage information for this command. Used for the help screen.
 
 =head1 METHODS
 

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::WidgetRole::Alignable;
 
@@ -31,10 +31,10 @@ to implement alignment of content within a possibly-larger space.
 The following methods are provided parametrically on the caller package when
 the module is imported by
 
- use Tickit::WidgetRole::Alignable
-    name    => NAME,
-    style   => STYLE,
-    reshape => RESHAPE;
+   use Tickit::WidgetRole::Alignable
+      name    => NAME,
+      style   => STYLE,
+      reshape => RESHAPE;
 
 The parameters are
 

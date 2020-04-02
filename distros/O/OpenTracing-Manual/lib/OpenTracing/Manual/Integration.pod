@@ -1,0 +1,290 @@
+
+=head1 NAME
+
+
+
+OpenTracing::Manual::Integration - For Framework or Integration Developers
+
+
+
+=head1 DESCRIPTION
+
+
+
+This part of the L<OpenTracing::Manual> will describe how distributed traces are
+progressed from one service to the other, using the concept of carriers.
+
+
+
+=head1 TABLE Of CONTENTS
+
+
+
+=over
+
+=item L</"Bootstrap a Implementation">
+
+=item L</"OpenTracing Carriers">
+
+=item L</"Extracting Context from an Incoming Request">
+
+=item L</"Inject Context into an Outgoing Request">
+
+=item L</"Testing your Framework Plugins">
+
+=back
+
+
+
+=head1 INTRODUCTION
+
+
+
+Most of the time, a framework will have some sort of architecture that allows to
+add plugins into the framework itself. These plugins, conveniently, bootstrap a
+specific Implementation, but those backends should be easilly swapped, without
+having too much impact on the code itself. All calls should follow the API.
+
+Any framework plugin has the following responsabillities:
+
+=over
+
+=item Bootstrap a implenetation and GlobalTracer
+
+=item Extracting posible exisitng trace information to create a Context
+
+=back
+
+On the otherhand, on the outgoing side of the server, the responsabillity is to:
+
+=over
+
+=item Inject the current Context into a 'Carrier'
+
+=back
+
+
+
+=head1 THE DETAILS
+
+
+
+=head2 Bootstrap a Implementation
+
+Plugins should either use a generic way to bootstrap a implementation or tailord
+for just one implementation.
+
+    use MyFramework::Plugin::OpenTracing;
+    #
+    # Bootstrap implementation from the `OPENTRACING_IMPLEMENTATION`
+    # environment variable
+
+or specifying it on the C<use> statement
+
+    use MyFramework::Plugin::OpenTracing ( 'SomeImplementation',
+        option => 'foo'
+    );
+
+or having a tailord plugin:
+
+    use MyFrameWork::Plugin::OpenTracing::SomeImplementation;
+
+But the latter approach requires writing multiple modules or subclasses.
+
+Whatever way you choose, the responsabillity of the Framework Plugin is to set
+the L<OpenTracing::GlobalTracer> such that it can be used inside the
+application.
+
+    use OpenTracing::Implementation qw/SomeImplementation/;
+
+Or a more verbose way:
+
+    use OpenTracing::Implementation
+    
+    my $tracer = OpenTracing::Implementation->bootstrap_global_tracer(
+        SomeImplementation,
+        option_one => 'foo',
+        option_two => 'bar',
+    );
+
+See L<OpenTracing::Implementation> for more on how to bootstrap.
+
+
+
+=head2 OpenTracing Carriers
+
+The OpenTracing specification requires a L<Tracer|
+OpenTracing::Interface::Tracer> implementation to understand how a L<SpanContext
+|OpenTracing::Interface::SpanContext> will be I<inject> into or I<extract> from
+a so called I<carrier> or I<request>.
+
+The I<carrier formats> required are I<text>, I<http>, and I<binary>, but there
+is no I<standard> on how thoses formats exactly look like and are implementation
+dependent.
+
+For the time being, with this Perl implementation and definition, only
+L<HTTP::Headers> will be used as a carrier. But once more, there is no
+definition on what HTTP Header information is used and how it is formatted.
+
+The L<HTTP::Headers> object is most common in Perl programming, and other
+variants like L<HTTP::Headers::Fast> or L<HTTP:::Headers::Fast::XS> share the
+same public interface. Most frameworks know how to handle those.
+
+=head2 Extracting Context from an Incoming Request
+
+    my $http_headers = YourFramework->request->headers;
+    #
+    # as long as this is a HTTP::Headers object
+    
+    my $root_context = $TRACER->extract_context(
+        OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS => $http_headers
+    );
+
+All Spans are part of a context. That is also true for the rootspan in a
+Framework. Spans are started as a C<child_of> a specific L<SpanContext|
+OpenTracing::Interface::SpanContext>.
+
+The SpanContext for a root-span is the incomming request that may or may not
+contain tracer information from its requestor. Use the L<< C<extract_context>
+from a I<Tracer> object|OpenTracing::Interface::Tracer/
+"extract_context(-OPENTRACING_CARRIER_FORMAT-=>-$carrier-)" >>
+
+
+Since some implementations may use inmutable objects and may have required
+attributes for a L<SpanContext|OpenTracing::Interface::SpanContext> and since
+the entire API is being accessed through the
+L<Tracer|OpenTracing::Interface::Tracer> object, you may need to use I<builders>
+as part of the attributes. Such builders can bridge the gap between the
+framework and the implementation like so at initialisation time:
+
+    $TRACER->set_default_context_builder sub {
+        my $service_url = YourFramework->request->url;
+        my $service_type = 'WEB',
+        
+        return {
+            tracer_service_endpoint => $service_url,
+            trecer_service_type     => $service_type,
+        }
+    };
+
+And as such the returned hashreference might be merged with extracted tracerinfo
+and used to create a complete L<SpanContext|OpenTracing::Interface::SpanContext>
+object.
+
+But remember, such mechanisms are entirely dependent on the implmentation.
+
+
+
+=head2 Inject Context into an Outgoing Request
+
+    my $span_context = $TRACER->get_active_span->get_context;
+    
+    use HTTP::Headers;
+    my $http_headers = HTTP::Headers->new( ... );
+    
+    my $cntx_headers =
+        $tracer->inject_context(
+            OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS => $http_headers,
+            $opentracing_spancontext
+    );
+    
+    my $request = HTTP::Request->new(
+        GET => 'https://...', $cntx_headers
+    );
+    my response = LWP::UserAgent->request( $request );
+
+
+
+=head2 Testing your Framework Plugins
+
+To test that your Framework Plugin is doing the right thing, all you need to do
+is run it with the L<Test Implementation|OpenTracing::Implementation::Test>. And
+then compare the collected span information using
+L<< C<globaltracer_cmp_deeply>|Test::OpenTracing::Integration >>
+with a expected C<bag> of L<Span|OpenTracing::Interface::Span>s.
+
+    use Test::Most;
+    use Test::OpenTracing::Integration;
+    
+    my $test_application = Test::Application->new;
+    my $http_request = HTTP::Request->new( ... );
+    
+    lives_ok{ $test_application->execute_request( $http_request );
+    } "Can do request";
+    
+    globaltracer_cmp_deeply [ ... ],
+        "... and produced the expected spans";
+    
+    done_testing;
+    
+    package Test::Application;
+    
+    use YourFramework;
+    
+    use YourFramework::Plugin::OpenTracing qw/Test/
+    
+    sub execute_request { ... }
+
+Crucial is that you use the L<Test Implementation|
+OpenTracing::Implementation::Test>.
+This will keep an in-memmory recording of all spans and have a additional
+L<< C<get_recorded_trace>|OpenTracing::Implementation::Test::Tracer >> to get
+the collected spans, which can be used to compare with expected spans.
+
+
+
+=head1 SEE ALSO
+
+
+
+=over
+
+=item L<OpenTracing::Interface>
+
+A role that defines the Tracer interface.
+
+=item L<OpenTracing::Manual>
+
+A quick overview about Perl5 and OpenTracing
+
+=item L<OpenTracing::Manual::Instrumentation>
+
+For Application developers and Devops.
+
+=item L<OpenTracing::Manual::Implementation>
+
+For Tracing Service Implementations
+
+=item L<OpenTracing::Manual::Ecosystem>
+
+An overview of the OpenTracing puzzle pieces.
+
+=item L<OpenTracing Overview|https://opentracing.io/docs/overview/>
+
+The OpenTracing API standard.
+
+=back
+
+
+
+=head1 AUTHOR
+
+
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.

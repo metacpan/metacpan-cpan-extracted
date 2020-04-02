@@ -27,8 +27,8 @@
          "rdfs:label" : "gender",
          "schema:category" : "issue-2341",
          "schema:domainIncludes" : [
-            "schema:SportsTeam",
-            "schema:Person"
+            "schema:Person",
+            "schema:SportsTeam"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [

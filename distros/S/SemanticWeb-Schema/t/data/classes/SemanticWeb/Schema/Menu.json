@@ -21,8 +21,8 @@
          "rdfs:comment" : "A subgrouping of the menu (by dishes, course, serving time period, etc.).",
          "rdfs:label" : "hasMenuSection",
          "schema:domainIncludes" : [
-            "schema:Menu",
-            "schema:MenuSection"
+            "schema:MenuSection",
+            "schema:Menu"
          ],
          "schema:rangeIncludes" : "schema:MenuSection"
       }

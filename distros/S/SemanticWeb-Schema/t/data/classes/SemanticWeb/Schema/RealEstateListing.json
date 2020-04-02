@@ -10,14 +10,20 @@
    },
    "properties" : {
       "schema:datePosted" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2490",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Publication date of an online listing.",
          "rdfs:label" : "datePosted",
+         "schema:category" : "issue-2490",
          "schema:domainIncludes" : [
             "schema:JobPosting",
+            "schema:SpecialAnnouncement",
             "schema:RealEstateListing"
          ],
-         "schema:rangeIncludes" : "schema:Date"
+         "schema:rangeIncludes" : [
+            "schema:Date",
+            "schema:DateTime"
+         ]
       },
       "schema:leaseLength" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
@@ -26,9 +32,9 @@
          "rdfs:label" : "leaseLength",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
+            "schema:Offer",
             "schema:Accommodation",
-            "schema:RealEstateListing",
-            "schema:Offer"
+            "schema:RealEstateListing"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [

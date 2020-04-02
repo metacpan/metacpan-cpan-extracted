@@ -34,10 +34,10 @@
          "rdfs:comment" : "A medical specialty of the provider.",
          "rdfs:label" : "medicalSpecialty",
          "schema:domainIncludes" : [
-            "schema:MedicalOrganization",
+            "schema:MedicalClinic",
             "schema:Physician",
             "schema:Hospital",
-            "schema:MedicalClinic"
+            "schema:MedicalOrganization"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalSpecialty"

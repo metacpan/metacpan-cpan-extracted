@@ -1,5 +1,10 @@
 Revision history for App-gimpgitbuild
 
+0.16.1   2020-04-02
+    - Require xvfb-run
+    - Add --enable-debug to gimp build
+    - https://gitlab.gnome.org/GNOME/gimp/-/issues/2884
+
 0.16.0   2020-03-29
     - Add the GIMPGITBUILD__BUILD_GIMP_USING_MESON env var.
 

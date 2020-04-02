@@ -11,7 +11,7 @@ use 5.010; # //
 use base qw( Tickit::Widget );
 use Tickit::Style;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Tickit::Utils qw( textwidth );
 

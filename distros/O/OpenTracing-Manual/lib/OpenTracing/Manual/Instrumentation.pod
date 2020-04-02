@@ -1,0 +1,203 @@
+
+=head1 NAME
+
+
+
+OpenTracing::Manual::Instrumentation - For Application developers and Devops
+
+
+
+=head1 DESCRIPTION
+
+
+
+This part of the L<OpenTracing::Manual> is about how to setup OpenTracing inside
+an exisiting (web) application and add more detailed instrumentation to specific
+parts of the code.
+
+
+
+=head1 TABLE Of CONTENTS
+
+=over
+
+=item L</"<Adding OpenTracing to your Application">
+
+=item L</"Getting Access to the bootstrapped Tracer">
+
+=item L</"Use of Baggage Items for Request Parameters">
+
+=item L</"Manually adding Spans">
+
+=back
+
+
+
+=head1 THE DETAILS
+
+
+
+=head2 Adding OpenTracing to your Application
+
+From the point of view for application developers that want to add
+instrumentation, most likely it is just a matter of adding the right plugin to
+your framework or useragent.
+
+    use YourFramework::Plugin::OpenTracing;
+    #
+    # use OPENTRACING_IMPLEMENTATION environment variable to select which.
+
+This will bootstrap a Tracer Implementation, use
+L<< C<extract_context>|OpenTracing::Interface::Tracer/
+"extract_context(-OPENTRACING_CARRIER_FORMAT-=>-$carrier-)" >>
+and
+L<< C<start_active_span>|OpenTracing::Interface::Tracer/
+"start_active_span(-$operation_name,-%options-)" >>
+with any already existing Tracer information.
+
+If your microservices are 'small' and 'shallow' this might be just enough what
+you need. However, you will only get tracer information on the level provided by
+the plugin. That is, probably just one single rootspan. Some framework plugins
+might add another layer on top of that rootspan, like a setup-span, a run-span,
+a render-span, and a teardown-span.
+
+Incase you want more detailed information, see the next.
+
+
+
+=head2 Getting Access to the bootstrapped Tracer
+
+To get access to the Tracer, there are two ways to do so:
+
+    use OpenTracing::GlobalTracer qw/$TRACER/;
+    #
+    # which might be `undef` if not yet bootstrapped
+
+Or use a more reliable way:
+
+    use aliased OpenTracing::GlobalTracer;
+    
+    my $tracer = GlobalTracer->get_global_tracer;
+    #
+    # which will always return a tracer (or croak)
+
+In the latter approach, it may return a L<OpenTracing::Implementation::NoOp> as
+defined in the specs. But at least your application won't break because of some
+badly bootstrapped tracer, and 'production' can continue running.
+
+In the examples below, C<$TRACER> will be used, but you should have used the
+class method to get one.
+
+
+
+=head2 Use of Baggage Items for Request Parameters
+
+During some setup-stage, add Baggage Items, using L<< set_baggage_item|
+OpenTracing::Interface::Span/set_baggage_item(-$key-=>-$value-) >>
+
+    my $customer_id = YourFramwork->request->query_param('customer_id);
+        
+    $TRACER
+        ->get_active_span
+        ->set_baggage_item( customer_id => $customer_id );
+
+Those Baggage Items will be progressed into all descendent spans and delivered
+to the Tracing Provider.
+
+
+
+=head2 Manually adding Spans
+
+If you like to get more detail, you can add more
+L<Spans|OpenTracing::Interface::Span>. For simplicity, Spans do
+live inside a L<Scope|OpenTracing::Interface::Scope>, handled by a
+L<ScopeManager|OpenTracing::Interface::ScopeManager>. Starting a Span will
+return a Scope. According to the spec, once finished the scope this Span lives
+in, one needs to call L<< C<close>|OpenTracing::Interface::Scope/"close" >>.
+
+    sub exciting_task {
+        my $_scope = $TRACER->start_active_span( "exiting task" );
+        
+        ...
+        
+        $_scope->close;
+        
+        return
+    }
+
+This can be annoying and even terrible if there are multiple exit points, using
+I<return early> concepts, or when bailing out halfway.
+
+This being Perl, we can do better using L<OpenTracing::AutoScope>:
+
+    use OpenTracing::AutoScope;
+    
+    sub exciting_task {
+        OpenTracing::AutoScope->start_guarded_span;
+        
+        ...
+        
+        return
+    }
+
+See L<< C<start_active_span>|OpenTracing::Interface::Tracer/
+"start_active_span(-$operation_name,-%options-)" >> for all the options you can
+pass in.
+
+
+
+=head1 SEE ALSO
+
+
+
+=over
+
+=item L<OpenTracing::Interface>
+
+A role that defines the Tracer interface.
+
+=item L<OpenTracing::Manual>
+
+A quick overview about Perl5 and OpenTracing
+
+=item L<OpenTracing::Manual::Integration>
+
+For Framework or Integration Developers
+
+=item L<OpenTracing::Manual::Implementation>
+
+For Tracing Service Implementations
+
+=item L<OpenTracing::Manual::Ecosystem>
+
+An overview of the OpenTracing puzzle pieces.
+
+=item L<OpenTracing Overview|https://opentracing.io/docs/overview/>
+
+The OpenTracing API standard.
+
+=back
+
+
+
+=head1 AUTHOR
+
+
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.

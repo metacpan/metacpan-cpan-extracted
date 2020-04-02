@@ -13,8 +13,8 @@
          "rdfs:label" : "cssSelector",
          "schema:category" : "issue-1389",
          "schema:domainIncludes" : [
-            "schema:WebPageElement",
-            "schema:SpeakableSpecification"
+            "schema:SpeakableSpecification",
+            "schema:WebPageElement"
          ],
          "schema:rangeIncludes" : "schema:CssSelectorType"
       },

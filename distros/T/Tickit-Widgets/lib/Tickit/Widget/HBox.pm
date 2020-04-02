@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::HBox;
 
@@ -10,7 +10,7 @@ use warnings;
 use base qw( Tickit::Widget::LinearBox );
 use Tickit::Style;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use List::Util qw( sum max );
 
@@ -20,24 +20,24 @@ C<Tickit::Widget::HBox> - distribute child widgets in a horizontal row
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::HBox;
- use Tickit::Widget::Static;
+   use Tickit;
+   use Tickit::Widget::HBox;
+   use Tickit::Widget::Static;
 
- my $hbox = Tickit::Widget::HBox->new;
+   my $hbox = Tickit::Widget::HBox->new;
 
- foreach my $position (qw( left centre right )) {
-    $hbox->add(
-       Tickit::Widget::Static->new(
-          text   => $position,
-          align  => $position,
-          valign => "middle",
-       ),
-       expand => 1
-    );
- }
+   foreach my $position (qw( left centre right )) {
+      $hbox->add(
+         Tickit::Widget::Static->new(
+            text   => $position,
+            align  => $position,
+            valign => "middle",
+         ),
+         expand => 1
+      );
+   }
 
- Tickit->new( root => $hbox )->run;
+   Tickit->new( root => $hbox )->run;
 
 =head1 DESCRIPTION
 

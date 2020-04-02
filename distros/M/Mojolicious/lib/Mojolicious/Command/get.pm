@@ -1,7 +1,7 @@
 package Mojolicious::Command::get;
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::Collection 'c';
+use Mojo::Collection qw(c);
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::JSON qw(to_json j);
@@ -9,7 +9,7 @@ use Mojo::JSON::Pointer;
 use Mojo::URL;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode getopt);
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 
 has description => 'Perform HTTP request';
 has usage       => sub { shift->extract_usage };
@@ -209,14 +209,14 @@ L<Mojolicious::Command> and implements the following new ones.
   my $description = $get->description;
   $get            = $get->description('Foo');
 
-Short description of this command, used for the command list.
+Short description of this command. Used for the command list.
 
 =head2 usage
 
   my $usage = $get->usage;
   $get      = $get->usage('Foo');
 
-Usage information for this command, used for the help screen.
+Usage information for this command. Used for the help screen.
 
 =head1 METHODS
 

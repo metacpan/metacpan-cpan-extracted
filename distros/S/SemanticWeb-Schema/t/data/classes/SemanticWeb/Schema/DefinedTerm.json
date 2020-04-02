@@ -19,8 +19,8 @@
          "schema:domainIncludes" : "schema:DefinedTerm",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:DefinedTermSet"
+            "schema:DefinedTermSet",
+            "schema:URL"
          ]
       },
       "schema:termCode" : {

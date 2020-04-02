@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic::DBHPing;
 
 # ABSTRACT: Ping a database handle to check its health
 use version;
-our $VERSION = 'v1.2.3'; # VERSION
+our $VERSION = 'v1.2.4'; # VERSION
 
 use 5.010;
 use strict;
@@ -68,7 +68,7 @@ HealthCheck::Diagnostic::DBHPing - Ping a database handle to check its health
 
 =head1 VERSION
 
-version v1.2.3
+version v1.2.4
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::LinearBox;
 
@@ -10,7 +10,7 @@ use warnings;
 use base qw( Tickit::ContainerWidget );
 use Tickit::RenderBuffer;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Carp;
 
@@ -57,7 +57,9 @@ returned by C<get_child_base>.
 
 =cut
 
-=head2 $widget = Tickit::Widget::LinearBox->new( %args )
+=head2 new
+
+   $widget = Tickit::Widget::LinearBox->new( %args )
 
 Returns a new C<Tickit::Widget::LinearBox>.
 
@@ -68,7 +70,8 @@ Takes the following named argmuents:
 =item children => ARRAY[Tickit::Widget]
 
 Optional. If provided, the widgets in this array will be added, with no
-additional options.
+additional options. This is now discouraged in favour of the L</add> or
+L</add_children> methods.
 
 =back
 
@@ -85,7 +88,10 @@ sub new
 
    $self->{children} = [];
 
-   $self->add( $_ ) for @{ $args{children} };
+   if( $args{children} ) {
+      Carp::carp( "The 'children' constructor argument to $class is discouraged; use ->add_children instead" );
+      $self->add( $_ ) for @{ $args{children} };
+   }
 
    return $self;
 }
@@ -94,7 +100,9 @@ sub new
 
 =cut
 
-=head2 @children = $widget->children
+=head2 children
+
+   @children = $widget->children
 
 In scalar context, returns the number of contained children. In list context,
 returns a list of all the child widgets.
@@ -126,7 +134,9 @@ sub _any2index
    }
 }
 
-=head2 %opts = $widget->child_opts( $child_or_index )
+=head2 child_opts
+
+   %opts = $widget->child_opts( $child_or_index )
 
 Returns the options currently set for the given child, specified either by
 reference or by index.
@@ -143,7 +153,9 @@ sub child_opts
    return $self->SUPER::child_opts( $child );
 }
 
-=head2 $widget->set_child( $index, $child )
+=head2 set_child
+
+   $widget->set_child( $index, $child )
 
 Replaces the child widget at the given index with the given new one;
 preserving any options that are set on it.
@@ -170,7 +182,9 @@ sub set_child
    $self->SUPER::add( $child, %opts );
 }
 
-=head2 $widget->set_child_opts( $child_or_index, %newopts )
+=head2 set_child_opts
+
+   $widget->set_child_opts( $child_or_index, %newopts )
 
 Sets new options on the given child, specified either by reference or by
 index. Any options whose value is given as C<undef> are deleted.
@@ -195,9 +209,21 @@ sub render_to_rb
    $rb->eraserect( $rect );
 }
 
-=head2 $widget->add( $child, %opts )
+=head2 add
 
-Adds the widget as a new child of this one, with the given options
+   $widget->add( $child, %opts )
+
+Adds the widget as a new child of this one, with the given options.
+
+This method returns the container widget instance itself making it suitable to
+use as a chaining mutator; e.g.
+
+   my $container = Tickit::Widget::LinearBox->new( ... )
+      ->add( Tickit::Widget::Static->new( ... ) )
+      ->add( Tickit::Widget::Static->new( ... ) );
+
+This should be preferred over using the C<children> constructor argument,
+which is now discouraged.
 
 =cut
 
@@ -212,9 +238,34 @@ sub add
       expand     => $opts{expand} || 0,
       force_size => $opts{force_size},
    );
+
+   return $self;
 }
 
-=head2 $widget->remove( $child_or_index )
+=head2 add_children
+
+   $widget->add_children( @children )
+
+Adds each of the given widgets as a new child of this one, with no additional
+options.
+
+This method returns the container widget instance itself making it suitable to
+use as a chaining mutator.
+
+=cut
+
+sub add_children
+{
+   my $self = shift;
+
+   $self->add( $_ ) for @_;
+
+   return $self;
+}
+
+=head2 remove
+
+   $widget->remove( $child_or_index )
 
 Removes the given child widget if present, by reference or index
 

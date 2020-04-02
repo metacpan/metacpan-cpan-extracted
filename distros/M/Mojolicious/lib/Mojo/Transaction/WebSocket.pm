@@ -1,8 +1,8 @@
 package Mojo::Transaction::WebSocket;
 use Mojo::Base 'Mojo::Transaction';
 
-use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
-use List::Util 'first';
+use Compress::Raw::Zlib qw(Z_SYNC_FLUSH);
+use List::Util qw(first);
 use Mojo::JSON qw(encode_json j);
 use Mojo::Util qw(decode encode trim);
 use Mojo::WebSocket
@@ -376,13 +376,13 @@ Build WebSocket message.
 
   $ws->client_read($data);
 
-Read data client-side, used to implement user agents such as L<Mojo::UserAgent>.
+Read data client-side. Used to implement user agents such as L<Mojo::UserAgent>.
 
 =head2 client_write
 
   my $bytes = $ws->client_write;
 
-Write data client-side, used to implement user agents such as
+Write data client-side. Used to implement user agents such as
 L<Mojo::UserAgent>.
 
 =head2 closed
@@ -485,21 +485,21 @@ Send message or frame non-blocking via WebSocket, the optional drain callback
 will be executed once all data has been written.
 
   # Send "Ping" frame
-  use Mojo::WebSocket 'WS_PING';
+  use Mojo::WebSocket qw(WS_PING);
   $ws->send([1, 0, 0, 0, WS_PING, 'Hello World!']);
 
 =head2 server_read
 
   $ws->server_read($data);
 
-Read data server-side, used to implement web servers such as
+Read data server-side. Used to implement web servers such as
 L<Mojo::Server::Daemon>.
 
 =head2 server_write
 
   my $bytes = $ws->server_write;
 
-Write data server-side, used to implement web servers such as
+Write data server-side. Used to implement web servers such as
 L<Mojo::Server::Daemon>.
 
 =head2 with_compression

@@ -2,7 +2,7 @@ package Mojolicious::Command::prefork;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Server::Prefork;
-use Mojo::Util 'getopt';
+use Mojo::Util qw(getopt);
 
 has description =>
   'Start application with pre-forking HTTP and WebSocket server';
@@ -103,14 +103,14 @@ L<Mojolicious::Command> and implements the following new ones.
   my $description = $prefork->description;
   $prefork        = $prefork->description('Foo');
 
-Short description of this command, used for the command list.
+Short description of this command. Used for the command list.
 
 =head2 usage
 
   my $usage = $prefork->usage;
   $prefork  = $prefork->usage('Foo');
 
-Usage information for this command, used for the help screen.
+Usage information for this command. Used for the help screen.
 
 =head1 METHODS
 

@@ -4,13 +4,13 @@ NAME
 
 SYNOPSIS
 
-     use Tickit::Widgets qw( Static VBox HBox );
+       use Tickit::Widgets qw( Static VBox HBox );
 
     Equivalent to
 
-     use Tickit::Widget::Static;
-     use Tickit::Widget::VBox;
-     use Tickit::Widget::HBox;
+       use Tickit::Widget::Static;
+       use Tickit::Widget::VBox;
+       use Tickit::Widget::HBox;
 
 DESCRIPTION
 
@@ -22,6 +22,10 @@ DESCRIPTION
     Note that because each Widget module should be a pure object class with
     no exports, this utility does not run the import method of the used
     classes.
+
+    An optional version check may be supplied using a = sign:
+
+       use Tickit::Widgets qw( HBox=0.48 VBox=0.48 );
 
 AUTHOR
 

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::LinearSplit;
 
@@ -10,7 +10,7 @@ use warnings;
 use base qw( Tickit::ContainerWidget );
 use Tickit::Window 0.32; # needs drag_start
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Carp;
 
@@ -38,6 +38,7 @@ sub set_A_child
    my ( $child ) = @_;
    $self->remove( $self->{A_child} ) if $self->{A_child};
    $self->add( $self->{A_child} = $child );
+   return $self;
 }
 
 sub B_child
@@ -52,6 +53,7 @@ sub set_B_child
    my ( $child ) = @_;
    $self->remove( $self->{B_child} ) if $self->{B_child};
    $self->add( $self->{B_child} = $child );
+   return $self;
 }
 
 sub children

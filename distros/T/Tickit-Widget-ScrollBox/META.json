@@ -4,13 +4,13 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tickit-Widget-ScrollBox",
    "prereqs" : {
@@ -23,20 +23,22 @@
       },
       "runtime" : {
          "requires" : {
-            "Tickit::SingleChildWidget" : "0.36",
+            "Object::Pad" : "0.17",
+            "Tickit::SingleChildWidget" : "0.53",
             "Tickit::Style" : "0.35",
-            "Tickit::Window" : "0.39"
+            "Tickit::Window" : "0.39",
+            "perl" : "5.025"
          }
       }
    },
    "provides" : {
       "Tickit::Widget::ScrollBox" : {
          "file" : "lib/Tickit/Widget/ScrollBox.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Tickit::Widget::ScrollBox::Extent" : {
          "file" : "lib/Tickit/Widget/ScrollBox/Extent.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -46,5 +48,6 @@
       ],
       "x_IRC" : "irc://irc.freenode.net/#tickit"
    },
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

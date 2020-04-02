@@ -14,13 +14,15 @@ my $build = Module::Build->new(
       'List::Util' => '1.33',
       'Parser::MGC' => 0,
       'Struct::Dumb' => 0,
-      'Tickit::Event' => '0.63',
+      'Tickit::Event' => '0.66', # $info->type newapi
       'Tickit::RenderBuffer' => 0,
       'Tickit::Utils' => '0.29',
       'Tickit::Window' => '0.57', # $win->bind_event
    },
    test_requires => {
+      'Test::Identity' => 0,
       'Test::More' => '0.88', # done_testing
+      'Test::Refcount' => 0,
    },
    license => 'perl',
    create_license => 1,

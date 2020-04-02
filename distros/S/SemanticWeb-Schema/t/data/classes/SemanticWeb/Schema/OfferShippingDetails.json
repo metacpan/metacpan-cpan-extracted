@@ -1,0 +1,23 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "OfferShippingDetails - indicates the kinds of shipping options might be available for an online shopping offer.",
+      "rdfs:label" : "OfferShippingDetails",
+      "rdfs:subClassOf" : "schema:Intangible",
+      "schema:category" : "issue-2506",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {
+      "schema:shippingDestination" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "shippingDestination indicates the target region for an online shipping destination.",
+         "rdfs:label" : "shippingDestination",
+         "schema:category" : "issue-2506",
+         "schema:domainIncludes" : "schema:OfferShippingDetails",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:AdministrativeArea"
+      }
+   }
+}

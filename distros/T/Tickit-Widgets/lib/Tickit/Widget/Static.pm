@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::Static;
 
@@ -27,16 +27,16 @@ C<Tickit::Widget::Static> - a widget displaying static text
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::Static;
+   use Tickit;
+   use Tickit::Widget::Static;
 
- my $hello = Tickit::Widget::Static->new(
-    text   => "Hello, world",
-    align  => "centre",
-    valign => "middle",
- );
+   my $hello = Tickit::Widget::Static->new(
+      text   => "Hello, world",
+      align  => "centre",
+      valign => "middle",
+   );
 
- Tickit->new( root => $hello )->run;
+   Tickit->new( root => $hello )->run;
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,9 @@ changed.
 
 =cut
 
-=head2 $static = Tickit::Widget::Static->new( %args )
+=head2 new
+
+   $static = Tickit::Widget::Static->new( %args )
 
 Constructs a new C<Tickit::Widget::Static> object.
 
@@ -122,7 +124,9 @@ sub cols
    return max map { textwidth $_ } @{ $self->{lines} }
 }
 
-=head2 $text = $static->text
+=head2 text
+
+   $text = $static->text
 
 =cut
 
@@ -132,7 +136,9 @@ sub text
    return join "\n", @{ $self->{lines} };
 }
 
-=head2 $static->set_text( $text )
+=head2 set_text
+
+   $static->set_text( $text )
 
 Accessor for C<text> property; the actual text on display in the widget
 
@@ -156,9 +162,13 @@ sub set_text
    $self->redraw;
 }
 
-=head2 $align = $static->align
+=head2 align
 
-=head2 $static->set_align( $align )
+=head2 set_align
+
+   $align = $static->align
+
+   $static->set_align( $align )
 
 Accessor for horizontal alignment value.
 

@@ -1,5 +1,11 @@
 Revision history for Tickit-Widget-ScrollBox
 
+0.08    2020-04-02
+        [CHANGES]
+         * Use Object::Pad
+         * Discourage `child` as a constructor argument
+         * Make `->set_child` a chaining mutator
+
 0.07    2016/01/06 19:38:39
         [CHANGES]
          * Updates for latest Tickit:

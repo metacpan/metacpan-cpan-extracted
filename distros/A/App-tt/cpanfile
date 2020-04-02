@@ -3,5 +3,6 @@ requires "perl"          => "5.010001";
 requires "Applify"       => "0.21";
 requires "File::HomeDir" => "1.00";
 requires "JSON::XS"      => "3.00";
+requires "List::Util"    => "1.45";
 
 test_requires "Test::More" => "0.88";

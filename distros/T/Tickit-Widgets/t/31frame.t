@@ -15,9 +15,8 @@ my $win = mk_window;
 
 my $static = Tickit::Widget::Static->new( text => "Widget" );
 
-my $widget = Tickit::Widget::Frame->new(
-   child => $static,
-);
+my $widget = Tickit::Widget::Frame->new
+   ->set_child( $static );
 
 ok( defined $widget, 'defined $widget' );
 
@@ -157,8 +156,7 @@ ok( !defined $static->window, '$static has no window after ->set_window undef' )
          linetype_left  => "single",
          linetype_right => "single",
       },
-      child => $static,
-   );
+   )->set_child( $static );
 
    $widget->set_window( $win );
 

@@ -20,8 +20,7 @@ my $static = Tickit::Widget::Static->new(
 my $widget = Tickit::Widget::ScrollBox->new(
    horizontal => "on_demand",
    vertical   => "on_demand",
-   child => $static,
-);
+)->set_child( $static );
 
 $widget->set_window( $win );
 flush_tickit;

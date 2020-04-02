@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::Border;
 
@@ -10,7 +10,7 @@ use warnings;
 use base qw( Tickit::SingleChildWidget );
 use Tickit::Style;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
@@ -20,21 +20,20 @@ C<Tickit::Widget::Border> - draw a fixed-size border around a widget
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::Border;
- use Tickit::Widget::Static;
+   use Tickit;
+   use Tickit::Widget::Border;
+   use Tickit::Widget::Static;
 
- my $hello = Tickit::Widget::Static->new(
-    text   => "Hello, world",
-    align  => "centre",
-    valign => "middle",
- );
+   my $border = Tickit::Widget::Border->new
+      ->set_child(
+         Tickit::Widget::Static->new(
+            text   => "Hello, world",
+            align  => "centre",
+            valign => "middle",
+         )
+      );
 
- my $border = Tickit::Widget::Border->new;
-
- $border->set_child( $hello );
-
- Tickit->new( root => $border )->run;
+   Tickit->new( root => $border )->run;
 
 =head1 DESCRIPTION
 
@@ -51,7 +50,9 @@ The default style pen is used as the widget pen.
 
 =cut
 
-=head2 $border = Tickit::Widget::Border->new( %args )
+=head2 new
+
+   $border = Tickit::Widget::Border->new( %args )
 
 Constructs a new C<Tickit::Widget::Border> object.
 
@@ -99,9 +100,13 @@ sub cols
 
 =cut
 
-=head2 $lines = $border->top_border
+=head2 top_border
 
-=head2 $border->set_top_border( $lines )
+=head2 set_top_border
+
+   $lines = $border->top_border
+
+   $border->set_top_border( $lines )
 
 Return or set the number of lines of border at the top of the widget
 
@@ -120,9 +125,13 @@ sub set_top_border
    $self->resized;
 }
 
-=head2 $lines = $border->bottom_border
+=head2 bottom_border
 
-=head2 $border->set_bottom_border( $lines )
+=head2 set_bottom_border
+
+   $lines = $border->bottom_border
+
+   $border->set_bottom_border( $lines )
 
 Return or set the number of lines of border at the bottom of the widget
 
@@ -141,9 +150,13 @@ sub set_bottom_border
    $self->resized;
 }
 
-=head2 $cols = $border->left_border
+=head2 left_border
 
-=head2 $border->set_left_border( $cols )
+=head2 set_left_border
+
+   $cols = $border->left_border
+
+   $border->set_left_border( $cols )
 
 Return or set the number of cols of border at the left of the widget
 
@@ -162,9 +175,13 @@ sub set_left_border
    $self->resized;
 }
 
-=head2 $cols = $border->right_border
+=head2 right_border
 
-=head2 $border->set_right_border( $cols )
+=head2 set_right_border
+
+   $cols = $border->right_border
+
+   $border->set_right_border( $cols )
 
 Return or set the number of cols of border at the right of the widget
 
@@ -183,7 +200,9 @@ sub set_right_border
    $self->resized;
 }
 
-=head2 $border->set_h_border( $cols )
+=head2 set_h_border
+
+   $border->set_h_border( $cols )
 
 Set the number of cols of both horizontal (left and right) borders simultaneously
 
@@ -196,7 +215,9 @@ sub set_h_border
    $self->resized;
 }
 
-=head2 $border->set_v_border( $cols )
+=head2 set_v_border
+
+   $border->set_v_border( $cols )
 
 Set the number of lines of both vertical (top and bottom) borders simultaneously
 
@@ -209,7 +230,9 @@ sub set_v_border
    $self->resized;
 }
 
-=head2 $border->set_border( $count )
+=head2 set_border
+
+   $border->set_border( $count )
 
 Set the number of cols or lines in all four borders simultaneously
 

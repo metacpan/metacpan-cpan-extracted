@@ -22,8 +22,8 @@
          "schema:domainIncludes" : "schema:Joint",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:MedicalEntity",
-            "schema:Text"
+            "schema:Text",
+            "schema:MedicalEntity"
          ]
       },
       "schema:structuralClass" : {

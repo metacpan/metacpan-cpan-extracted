@@ -1,0 +1,348 @@
+
+=head1 NAME
+
+
+
+OpenTracing::Manual::Implementation - For Tracing Service Implementations
+
+
+
+=head1 DESCRIPTION
+
+
+
+This part of the L<OpenTracing::Manual> will describe how communication with the
+backend is established through some sort of I<Agent>. This manual alsi provides
+information on how to C<extract_context> or C<inject_context> and carriers.
+
+
+
+=head1 TABLE Of CONTENTS
+
+
+
+=over
+
+=item L</"Bootstrapping a Tracer Implementation">
+
+=item L</"Writing your own Implementation and using Roles">
+
+=item L</"Adding Implementation Specific Information to Traces">
+
+=item L</"Sending Span Information to a Service Provider Backend">
+
+=item L</"Propagating Tracer Information between Services">
+
+=item L</"OpenTracing Roles and Types">
+
+=item L</"Testing your Implementation">
+
+=back
+
+
+
+=head1 INTRODUCTION
+
+
+
+OpenTracing merely descibes the API, see the L<OpenTracing::Interface>
+documentation. It only requires that any implementation has a minimal set of
+methods that have a signature, or defined argument list. It is a deliberate
+choice to have the specification as POD and leaving the implementation to the
+Service Provider. The OpenTracing SDK for Perl however, comes with quite some
+useful tools to help building your own.
+
+
+
+=head1 THE DETAILS
+
+
+
+=head2 Bootstrapping a Tracer Implementation
+
+Because of directure structure, Perl best practices and more, an implementation
+consists a several files, grouped under a single namespace. However, the API has
+no higher level definition of what an implemetation is, it only speaks of the
+L<Tracer|OpenTracing::Interface::Tracer> being the I<entry point> of the API. It
+only looks more natural to be able to do things like:
+
+    use "OpenTracing::Implementation qw/YourServiceProvider/;
+
+Which bootstraps the L<OpenTracing::GlobalTracer>.
+
+Or be more specific in your own code:
+
+    use aliased
+        "OpenTracing::Implementatation::MyServiceProvider",
+        "Implementation" ;
+    
+    my $tracer = Implementation->bootstrap_tracer( %options );
+
+Although the 'Implementation' could do all sorts of things whith that call, it
+basically is the same as:
+
+    use aliased
+        "OpenTracing::Implementatation::MyServiceProvider::Tracer" ;
+    
+    my $tracer = Tracer->new( %options );
+
+=head2 Writing your own Implementation and using Roles
+
+Since a lot of the responsabilities described in the <OpenTracing::Interface>
+are common across all implementations, there is a whole set of L<Moo::Role>s
+files to quickly build your own classes.
+
+    package OpenTracing::Implementation::MyServiceProvider::Scope
+    
+    use Moo;
+    
+    ...
+    
+    with 'OpenTracing::Role::Scope'
+    
+    1;
+
+Look at L<OpenTracing::Roles> what each of those roles provide.
+
+
+
+=head2 Adding Implementation Specific Information to Traces.
+
+The L<OpenTracing::Interface::SpanContext> carries data across process
+boundaries. Specifically, it has two major components:
+
+=over
+
+=item An implementation-dependent state to refer to the distinct span within a
+trace
+
+for example the implementing Tracer's definition of spanID and traceID
+
+=item Any Baggage Items
+
+These are key:value pairs that cross process-boundaries.
+These may be useful to have some data available for access throughout the trace.
+
+=back
+
+Depending on the purpose, it is most likely that you want to add additional
+information like a I<ServiceEndpoint> to the L<SpanContext|
+OpenTracing::Interface::SpanContext> as 'private' attributes. As an implementor
+you do want to have a reliable way to persist that information. The
+L<BaggageItems|OpenTracing::Interface::SpanContext/"METHODS"> can be altered at
+application level, as they are part of the 'public' API.
+
+    package OpenTracing::Implementation::MyServiceProvider::SpanContext
+    
+    use Moo;
+    
+    with 'OpenTracing::Role::SpanContext'
+    
+    has service_endpoint => (
+        is      => 'ro',
+        default => { 'index.cgi' },
+        isa     =>  Str,
+    );
+    
+    1;
+
+As implementor, it's your own responsabillity to send that information back to
+the service provider.
+
+
+
+=head2 Sending Span Information to a Service Provider Backend
+
+How information is being send back to a service provider backend is beyond the
+scope of this manual. There are different scenario's to do so. Some may want to
+collect a larger number of spans and send those straight to the backend. Others
+may have a locally installed agent that will gather spans comming from multiple
+threads and send them as a batch to the backend.
+
+Eitherway, as a implementor, you will need to add to the L<Tracer|OpenTracing::
+Interface::Tracer> a I<send> method that will communicate with the outer world.
+
+    package OpenTracing::Implementation::MyServiceProvider::Tracer
+    
+    use Moo;
+    
+    with 'OpenTracing::Role::Tracer'
+    
+    has your_agent => (
+        is      => 'lazy',
+        isa     => 'OpenTracing::Implementation::MyServiceProvider::Agent',
+        handles => qw/send_the_span/,
+    );
+    
+    1;
+
+Then, at the time you call L<< C<finish>|OpenTracing::Interface::Span/
+"finish(-<none>-|-$epoch_timestamp-)" >>,
+calling such method as mentioned (C<send_the_span>) in the above example through
+a call back added as a C<on_finish> attribute, would transmit the span.
+
+
+
+=head2 Propagating Tracer Information between Services
+
+At the boundry or edges of an application, Frameworks use the two methods
+L<< C<inject_context>|OpenTracing::Interface::Tracer/
+"inject_context(-OPENTRACING_CARRIER_FORMAT-=>-$carrier,-$span_context-)" >> and
+L<< C<extract_context>|OpenTracing::Interface::Tracer/
+"extract_context(-OPENTRACING_CARRIER_FORMAT-=>-$carrier-)" >>.
+
+It is required that these methods are provided in the implementation. There are
+at least three OpenTracing required formats that need to be support. Only the
+C<OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS> is being described in the manual.
+
+An C<inject_context> might be implememnted like:
+
+    package OpenTracing::Implementation::MyServiceProvider::Tracer
+    
+    our $injectors = {
+        OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS => sub {
+            my $http_headers = shift;
+            my $context = shift;
+            
+            return $http_headers->clone(
+                X_YOUR_IMPLEMENTATION_TRACE_ID = $context->trace_id,
+                ...
+        },
+        OPENTRACING_CARRIER_FORMAT_BINARY => sub { ... },
+        OPENTRACING_CARRIER_FORMAT_TEXT_MAP => sub { ... },
+    }
+    
+    sub inject_tracer {
+        my $self = shift;
+        my $carrier_format = shift;
+        my $carrier;
+        
+        croak "unsupported carrier format [$carrier_format]"
+            unless exists %$injectors{$carrier_format};
+        
+        my $context = $self->get_active_span->get_context;
+        
+        return $injectors->{$carrier_format}->($carrier, $context)
+    }
+
+Where the C<X_YOUR_IMPLEMENTATION_TRACE_ID> is fully provider dependant. The
+other (micro) service you want to talk may be implemented using a complete
+different technology stack or language. But since (most likely) that service
+will use the same Distributated Tracing Backend, it expects the carrier to hold
+the trace information in a known format.
+
+
+
+=head2 OpenTracing Roles and Types
+
+The entire L<API|OpenTracing::Interface>is described in POD, it also provides a
+set of Roles. These roles can optionally be consumed to do all the type-checking
+for parameters, options, and returned results.
+
+It also provides L<OpenTracing::Types>. These duck-type checking types check
+that a object will at least have the methods described in the API.
+A C<isa> check will dictate a subclassing, which is what is deliberatly avoided.
+
+
+
+=head2 Testing your Implementation
+
+There are a few tests available for Implementation developers. Those will check
+that the implementation is at least compliant with the L<OpenTracing::Interface>
+and can be found at L<Test::OpenTracing::Interface>.
+
+    use Test::Most;
+    use Test::OpenTracing::Interface::Span;
+    
+    use YourImplementation::Span;
+    
+    my $test_span = new_ok( 'YourImplementation::Span' => { %options },
+        "Created a Span object"
+    );
+    
+    interface_can_ok( $test_span,
+        "... and can do all the required methods defined"
+    );
+    
+    interface_lives_ok( $test_span,
+        "... and each method accepts described parameters and options"
+    );
+    
+    interface_dies_ok( $test_span,
+        "... and will not tollerate bad input"
+    );
+
+The latter one should work, but only if your implementation does do some sort of
+checking.
+
+B<WARNING>: If you do not check for the parameters and their types, please do
+check manually that the C<child_of> and C<references> options are mutual
+exclusive in
+L<< C<start_active_span>|OpenTracing::Interface::Tracer/
+"start_active_span(-$operation_name,-%options-)" >>
+and
+L<< C<start_span>|OpenTracing::Interface::Tracer/
+"start_span(-$operation_name,-%options-)" >>
+
+Testing that your implementation is executing the C<inject_context> and
+C<extract_context> correctly, is entirely up to you. Also, it is up to you to
+check that the correct span information is being send to the tracer backend at
+C<finish>.
+
+
+
+=head1 SEE ALSO
+
+
+
+=over
+
+=item L<OpenTracing::Interface>
+
+A role that defines the Tracer interface.
+
+=item L<OpenTracing::Manual>
+
+A quick overview about Perl5 and OpenTracing
+
+=item L<OpenTracing::Manual::Instrumentation>
+
+For Application developers and Devops.
+
+=item L<OpenTracing::Manual::Integration>
+
+For Framework or Integration Developers
+
+=item L<OpenTracing::Manual::Ecosystem>
+
+An overview of the OpenTracing puzzle pieces.
+
+=item L<OpenTracing Overview|https://opentracing.io/docs/overview/>
+
+The OpenTracing API standard.
+
+=back
+
+
+
+=head1 AUTHOR
+
+
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.

@@ -1,17 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::ScrollBox;
+use 5.026; # signatures
+use Object::Pad 0.17;
 
-use strict;
-use warnings;
-use base qw( Tickit::SingleChildWidget );
+class Tickit::Widget::ScrollBox 0.08
+   extends Tickit::SingleChildWidget 0.53;
+
 Tickit::Window->VERSION( '0.39' ); # ->scroll_with_children, default expose_after_scroll
 use Tickit::Style;
-
-our $VERSION = '0.07';
 
 use Carp;
 
@@ -26,17 +25,16 @@ C<Tickit::Widget::ScrollBox> - allow a single child widget to be scrolled
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::ScrollBox;
- use Tickit::Widget::Static;
+   use Tickit;
+   use Tickit::Widget::ScrollBox;
+   use Tickit::Widget::Static;
 
- my $scrollbox = Tickit::Widget::ScrollBox->new(
-    child => Tickit::Widget::Static->new(
-       text => join( "\n", map { "The content for line $_" } 1 .. 100 ),
-    ),
- );
+   my $scrollbox = Tickit::Widget::ScrollBox->new
+      ->set_child( Tickit::Widget::Static->new(
+         text => join( "\n", map { "The content for line $_" } 1 .. 100 ),
+      ) );
 
- Tickit->new( root => $scrollbox )->run;
+   Tickit->new( root => $scrollbox )->run;
 
 =head1 DESCRIPTION
 
@@ -172,43 +170,40 @@ child content necessary to display.
 
 =cut
 
-sub new
+has $_vextent;
+has $_hextent;
+
+has $_v_on_demand;
+has $_h_on_demand;
+
+has $_child_is_scrollable;
+
+has $_viewport;
+
+method BUILD ( %args )
 {
-   my $class = shift;
-   my %args = @_;
+   my $vertical   = $args{vertical} // 1;
+   my $horizontal = $args{horizontal};
 
-   my $vertical   = delete $args{vertical} // 1;
-   my $horizontal = delete $args{horizontal};
+   $_vextent = Tickit::Widget::ScrollBox::Extent->new( $self, "v" ) if $vertical;
+   $_hextent = Tickit::Widget::ScrollBox::Extent->new( $self, "h" ) if $horizontal;
 
-   my $child = delete $args{child};
-
-   my $self = $class->SUPER::new( %args );
-
-   $self->{vextent} = Tickit::Widget::ScrollBox::Extent->new( $self, "v" ) if $vertical;
-   $self->{hextent} = Tickit::Widget::ScrollBox::Extent->new( $self, "h" ) if $horizontal;
-
-   $self->{v_on_demand} = $vertical  ||'' eq "on_demand";
-   $self->{h_on_demand} = $horizontal||'' eq "on_demand";
-
-   $self->add( $child ) if $child;
-
-   return $self;
+   $_v_on_demand = $vertical  ||'' eq "on_demand";
+   $_h_on_demand = $horizontal||'' eq "on_demand";
 }
 
 =head1 ACCESSORS
 
 =cut
 
-sub lines
+method lines ()
 {
-   my $self = shift;
-   return $self->child->lines + ( $self->hextent ? 1 : 0 );
+   return $self->child->lines + ( $_hextent ? 1 : 0 );
 }
 
-sub cols
+method cols ()
 {
-   my $self = shift;
-   return $self->child->cols + ( $self->vextent ? 1 : 0 );
+   return $self->child->cols + ( $_vextent ? 1 : 0 );
 }
 
 =head2 vextent
@@ -220,18 +215,16 @@ vertical scrolling extent.
 
 =cut
 
-sub vextent
+method vextent ()
 {
-   my $self = shift;
-   return $self->{vextent};
+   return $_vextent;
 }
 
-sub _v_visible
+method _v_visible ()
 {
-   my $self = shift;
-   return 0 unless my $vextent = $self->{vextent};
-   return 1 unless $self->{v_on_demand};
-   return $vextent->limit > 0;
+   return 0 unless $_vextent;
+   return 1 unless $_v_on_demand;
+   return $_vextent->limit > 0;
 }
 
 =head2 hextent
@@ -243,99 +236,86 @@ horizontal scrolling extent.
 
 =cut
 
-sub hextent
+method hextent ()
 {
-   my $self = shift;
-   return $self->{hextent};
+   return $_hextent;
 }
 
-sub _h_visible
+method _h_visible ()
 {
-   my $self = shift;
-   return 0 unless my $hextent = $self->{hextent};
-   return 1 unless $self->{h_on_demand};
-   return $hextent->limit > 0;
+   return 0 unless $_hextent;
+   return 1 unless $_h_on_demand;
+   return $_hextent->limit > 0;
 }
 
 =head1 METHODS
 
 =cut
 
-sub children_changed
+method children_changed ()
 {
-   my $self = shift;
    if( my $child = $self->child ) {
-      my $scrollable = $self->{child_is_scrollable} = $child->can( "CAN_SCROLL" ) && $child->CAN_SCROLL;
+      my $scrollable = $_child_is_scrollable = $child->can( "CAN_SCROLL" ) && $child->CAN_SCROLL;
 
       if( $scrollable ) {
          foreach my $method (qw( set_scrolling_extents scrolled )) {
             $child->can( $method ) or croak "ScrollBox child cannot ->$method - do you implement it?";
          }
 
-         my $vextent = $self->vextent;
-         my $hextent = $self->hextent;
-
-         $child->set_scrolling_extents( $vextent, $hextent );
-         defined $vextent->real_total or croak "ScrollBox child did not set vextent->total" if $vextent;
-         defined $hextent->real_total or croak "ScrollBox child did not set hextent->total" if $hextent;
+         $child->set_scrolling_extents( $_vextent, $_hextent );
+         defined $_vextent->real_total or croak "ScrollBox child did not set vextent->total" if $_vextent;
+         defined $_hextent->real_total or croak "ScrollBox child did not set hextent->total" if $_hextent;
       }
    }
    $self->SUPER::children_changed;
 }
 
-sub reshape
+method reshape ()
 {
-   my $self = shift;
-
    my $window = $self->window or return;
    my $child  = $self->child or return;
 
-   my $vextent = $self->vextent;
-   my $hextent = $self->hextent;
-
-   if( !$self->{child_is_scrollable} ) {
-      $vextent->set_total( $child->lines ) if $vextent;
-      $hextent->set_total( $child->cols  ) if $hextent;
+   if( !$_child_is_scrollable ) {
+      $_vextent->set_total( $child->lines ) if $_vextent;
+      $_hextent->set_total( $child->cols  ) if $_hextent;
    }
 
-   my $v_spare = ( $vextent ? $vextent->real_total : $window->lines-1 ) - $window->lines;
-   my $h_spare = ( $hextent ? $hextent->real_total : $window->cols-1  ) - $window->cols;
+   my $v_spare = ( $_vextent ? $_vextent->real_total : $window->lines-1 ) - $window->lines;
+   my $h_spare = ( $_hextent ? $_hextent->real_total : $window->cols-1  ) - $window->cols;
 
    # visibility of each bar might depend on the visibility of the other, if it
    # it was exactly at limit
    $v_spare++ if $v_spare == 0 and $h_spare > 0;
    $h_spare++ if $h_spare == 0 and $v_spare > 0;
 
-   my $v_visible = $vextent && ( !$self->{v_on_demand} || $v_spare > 0 );
-   my $h_visible = $hextent && ( !$self->{h_on_demand} || $h_spare > 0 );
+   my $v_visible = $_vextent && ( !$_v_on_demand || $v_spare > 0 );
+   my $h_visible = $_hextent && ( !$_h_on_demand || $h_spare > 0 );
 
    my @viewportgeom = ( 0, 0,
       $window->lines - ( $h_visible ? 1 : 0 ),
       $window->cols  - ( $v_visible ? 1 : 0 ) );
 
-   my $viewport;
-   if( $viewport = $self->{viewport} ) {
-      $viewport->change_geometry( @viewportgeom );
+   if( $_viewport ) {
+      $_viewport->change_geometry( @viewportgeom );
    }
    else {
-      $viewport = $window->make_sub( @viewportgeom );
-      $self->{viewport} = $viewport;
+      $_viewport = $window->make_sub( @viewportgeom );
    }
 
-   $vextent->set_viewport( $viewport->lines ) if $vextent;
-   $hextent->set_viewport( $viewport->cols  ) if $hextent;
+   $_vextent->set_viewport( $_viewport->lines ) if $_vextent;
+   $_hextent->set_viewport( $_viewport->cols  ) if $_hextent;
 
-   if( $self->{child_is_scrollable} ) {
-      $child->set_window( $viewport ) unless $child->window;
+   if( $_child_is_scrollable ) {
+      $child->set_window( $_viewport ) unless $child->window;
    }
    else {
       my ( $childtop, $childlines ) =
-         $vextent ? ( -$vextent->start, $vextent->total )
-                  : ( 0, max( $child->lines, $viewport->lines ) );
+         $_vextent ? ( -$_vextent->start, $_vextent->total )
+                   : ( 0, max( $child->lines, $_viewport->lines ) );
 
       my ( $childleft, $childcols ) =
-         $hextent ? ( -$hextent->start, $hextent->total )
-                  : ( 0, max( $child->cols, $viewport->cols ) );
+         $_hextent ? ( -$_hextent->start, $_hextent->total )
+                   : ( 0, max( $child->cols, $_viewport->cols ) );
 
       my @childgeom = ( $childtop, $childleft, $childlines, $childcols );
 
@@ -343,20 +323,19 @@ sub reshape
          $childwin->change_geometry( @childgeom );
       }
       else {
-         $childwin = $viewport->make_sub( @childgeom );
+         $childwin = $_viewport->make_sub( @childgeom );
          $child->set_window( $childwin );
       }
    }
 }
 
-sub window_lost
+method window_lost ( $win )
 {
-   my $self = shift;
-   $self->SUPER::window_lost( @_ );
+   $self->SUPER::window_lost( $win );
 
-   $self->{viewport}->close if $self->{viewport};
+   $_viewport->close if $_viewport;
 
-   undef $self->{viewport};
+   undef $_viewport;
 }
 
 =head2 scroll
@@ -368,12 +347,10 @@ number of columns (either of which which may be negative).
 
 =cut
 
-sub scroll
+method scroll ( $downward = 0, $rightward = 0 )
 {
-   my $self = shift;
-   my ( $downward, $rightward ) = @_;
-   $self->vextent->scroll( $downward )  if $self->vextent and defined $downward;
-   $self->hextent->scroll( $rightward ) if $self->hextent and defined $rightward;
+   $_vextent->scroll( $downward )  if $_vextent and $downward;
+   $_hextent->scroll( $rightward ) if $_hextent and $rightward;
 }
 
 =head2 scroll_to
@@ -385,22 +362,14 @@ the child's content is the topmost visible in the container.
 
 =cut
 
-sub scroll_to
+method scroll_to ( $top = undef, $left = undef )
 {
-   my $self = shift;
-   my ( $top, $left ) = @_;
-   $self->vextent->scroll_to( $top )  if $self->vextent and defined $top;
-   $self->hextent->scroll_to( $left ) if $self->hextent and defined $left;
+   $_vextent->scroll_to( $top )  if $_vextent and defined $top;
+   $_hextent->scroll_to( $left ) if $_hextent and defined $left;
 }
 
-sub _extent_scrolled
+method _extent_scrolled ( $id, $delta, $value )
 {
-   my $self = shift;
-   my ( $id, $delta, $value ) = @_;
-
-   my $vextent = $self->vextent;
-   my $hextent = $self->hextent;
-
    if( my $win = $self->window ) {
       if( $id eq "v" ) {
          $win->expose( Tickit::Rect->new(
@@ -429,24 +398,21 @@ sub _extent_scrolled
       $rightward = $delta;
    }
 
-   if( $self->{child_is_scrollable} ) {
+   if( $_child_is_scrollable ) {
       $child->scrolled( $downward, $rightward, $id );
    }
    else {
       my $childwin = $child->window or return;
 
-      $childwin->reposition( $vextent ? -$vextent->start : 0,
-                             $hextent ? -$hextent->start : 0 );
+      $childwin->reposition( $_vextent ? -$_vextent->start : 0,
+                             $_hextent ? -$_hextent->start : 0 );
 
-      my $viewport = $self->{viewport};
-      $viewport->scroll_with_children( $downward, $rightward );
+      $_viewport->scroll_with_children( $downward, $rightward );
    }
 }
 
-sub render_to_rb
+method render_to_rb ( $rb, $rect )
 {
-   my $self = shift;
-   my ( $rb, $rect ) = @_;
    my $win = $self->window or return;
 
    my $lines = $win->lines;
@@ -460,10 +426,9 @@ sub render_to_rb
    my $h_visible = $self->_h_visible;
 
    if( $v_visible and $rect->right == $cols ) {
-      my $vextent = $self->vextent;
       my ( $bar_top, $mark_top, $mark_bottom, $bar_bottom ) =
-         $vextent->scrollbar_geom( 1, $lines - 2 - ( $h_visible ? 1 : 0 ) );
-      my $start = $vextent->start;
+         $_vextent->scrollbar_geom( 1, $lines - 2 - ( $h_visible ? 1 : 0 ) );
+      my $start = $_vextent->start;
 
       $rb->text_at (        0, $cols-1,
          $start > 0 ? $self->get_style_values( "arrow_up" ) : " ", $arrow_pen );
@@ -471,15 +436,13 @@ sub render_to_rb
       $rb->erase_at(       $_, $cols-1, 1, $scrollmark_pen ) for $mark_top .. $mark_bottom-1;
       $rb->vline_at( $mark_bottom, $bar_bottom-1, $cols-1, LINE_DOUBLE, $scrollbar_pen, CAP_BOTH ) if $bar_bottom > $mark_bottom;
       $rb->text_at ( $bar_bottom, $cols-1,
-         $start < $vextent->limit ? $self->get_style_values( "arrow_down" ) : " ", $arrow_pen );
+         $start < $_vextent->limit ? $self->get_style_values( "arrow_down" ) : " ", $arrow_pen );
    }
 
    if( $h_visible and $rect->bottom == $lines ) {
-      my $hextent = $self->hextent;
-
       my ( $bar_left, $mark_left, $mark_right, $bar_right ) =
-         $hextent->scrollbar_geom( 1, $cols - 2 - ( $v_visible ? 1 : 0 ) );
-      my $start = $hextent->start;
+         $_hextent->scrollbar_geom( 1, $cols - 2 - ( $v_visible ? 1 : 0 ) );
+      my $start = $_hextent->start;
 
       $rb->goto( $lines-1, 0 );
 
@@ -489,132 +452,129 @@ sub render_to_rb
       $rb->erase_at( $lines-1, $mark_left, $mark_right - $mark_left, $scrollmark_pen );
       $rb->hline_at( $lines-1, $mark_right, $bar_right-1, LINE_DOUBLE, $scrollbar_pen, CAP_BOTH ) if $bar_right > $mark_right;
       $rb->text_at(  $lines-1, $bar_right,
-         $start < $hextent->limit ? $self->get_style_values( "arrow_right" ) : " ", $arrow_pen );
+         $start < $_hextent->limit ? $self->get_style_values( "arrow_right" ) : " ", $arrow_pen );
 
       $rb->erase_at( $lines-1, $cols-1, 1 ) if $v_visible;
    }
 }
 
-sub key_up_1    { my $vextent = shift->vextent or return; $vextent->scroll( -1 ); 1 }
-sub key_down_1  { my $vextent = shift->vextent or return; $vextent->scroll( +1 ); 1 }
-sub key_left_1  { my $hextent = shift->hextent or return; $hextent->scroll( -1 ); 1 }
-sub key_right_1 { my $hextent = shift->hextent or return; $hextent->scroll( +1 ); 1 }
+method key_up_1    { $_vextent or return; $_vextent->scroll( -1 ); 1 }
+method key_down_1  { $_vextent or return; $_vextent->scroll( +1 ); 1 }
+method key_left_1  { $_hextent or return; $_hextent->scroll( -1 ); 1 }
+method key_right_1 { $_hextent or return; $_hextent->scroll( +1 ); 1 }
 
-sub key_up_half    { my $vextent = shift->vextent or return; $vextent->scroll( -int( $vextent->viewport / 2 ) ); 1 }
-sub key_down_half  { my $vextent = shift->vextent or return; $vextent->scroll( +int( $vextent->viewport / 2 ) ); 1 }
-sub key_left_half  { my $hextent = shift->hextent or return; $hextent->scroll( -int( $hextent->viewport / 2 ) ); 1 }
-sub key_right_half { my $hextent = shift->hextent or return; $hextent->scroll( +int( $hextent->viewport / 2 ) ); 1 }
+method key_up_half    { $_vextent or return; $_vextent->scroll( -int( $_vextent->viewport / 2 ) ); 1 }
+method key_down_half  { $_vextent or return; $_vextent->scroll( +int( $_vextent->viewport / 2 ) ); 1 }
+method key_left_half  { $_hextent or return; $_hextent->scroll( -int( $_hextent->viewport / 2 ) ); 1 }
+method key_right_half { $_hextent or return; $_hextent->scroll( +int( $_hextent->viewport / 2 ) ); 1 }
 
-sub key_to_top       { my $vextent = shift->vextent or return; $vextent->scroll_to( 0 ); 1 }
-sub key_to_bottom    { my $vextent = shift->vextent or return; $vextent->scroll_to( $vextent->limit ); 1 }
-sub key_to_leftmost  { my $hextent = shift->hextent or return; $hextent->scroll_to( 0 ); 1 }
-sub key_to_rightmost { my $hextent = shift->hextent or return; $hextent->scroll_to( $hextent->limit ); 1 }
+method key_to_top       { $_vextent or return; $_vextent->scroll_to( 0 ); 1 }
+method key_to_bottom    { $_vextent or return; $_vextent->scroll_to( $_vextent->limit ); 1 }
+method key_to_leftmost  { $_hextent or return; $_hextent->scroll_to( 0 ); 1 }
+method key_to_rightmost { $_hextent or return; $_hextent->scroll_to( $_hextent->limit ); 1 }
 
-sub on_mouse
+has $_drag_offset;
+has $_drag_bar;
+
+method on_mouse ( $args )
 {
-   my $self = shift;
-   my ( $args ) = @_;
-
    my $type   = $args->type;
    my $button = $args->button;
 
    my $lines = $self->window->lines;
    my $cols  = $self->window->cols;
 
-   my $vextent = $self->vextent;
-   my $hextent = $self->hextent;
-
    my $vlen = $lines - 2 - ( $self->_h_visible ? 1 : 0 );
    my $hlen = $cols  - 2 - ( $self->_v_visible ? 1 : 0 );
 
    if( $type eq "press" and $button == 1 ) {
-      if( $vextent and $args->col == $cols-1 ) {
+      if( $_vextent and $args->col == $cols-1 ) {
          # Click in vertical scrollbar
-         my ( undef, $mark_top, $mark_bottom, $bar_bottom ) = $vextent->scrollbar_geom( 1, $vlen );
+         my ( undef, $mark_top, $mark_bottom, $bar_bottom ) = $_vextent->scrollbar_geom( 1, $vlen );
          my $line = $args->line;
 
          if( $line == 0 ) { # up arrow
-            $vextent->scroll( -1 );
+            $_vextent->scroll( -1 );
          }
          elsif( $line < $mark_top ) { # above area
-            $vextent->scroll( -int( $vextent->viewport / 2 ) );
+            $_vextent->scroll( -int( $_vextent->viewport / 2 ) );
          }
          elsif( $line < $mark_bottom ) {
             # press in mark - ignore for now - TODO: prelight?
          }
          elsif( $line < $bar_bottom ) { # below area
-            $vextent->scroll( +int( $vextent->viewport / 2 ) );
+            $_vextent->scroll( +int( $_vextent->viewport / 2 ) );
          }
          elsif( $line == $bar_bottom ) { # down arrow
-            $vextent->scroll( +1 );
+            $_vextent->scroll( +1 );
          }
          return 1;
       }
-      if( $hextent and $args->line == $lines-1 ) {
+      if( $_hextent and $args->line == $lines-1 ) {
          # Click in horizontal scrollbar
-         my ( undef, $mark_left, $mark_right, $bar_right ) = $hextent->scrollbar_geom( 1, $hlen );
+         my ( undef, $mark_left, $mark_right, $bar_right ) = $_hextent->scrollbar_geom( 1, $hlen );
          my $col = $args->col;
 
          if( $col == 0 ) { # left arrow
-            $hextent->scroll( -1 );
+            $_hextent->scroll( -1 );
          }
          elsif( $col < $mark_left ) { # above area
-            $hextent->scroll( -int( $hextent->viewport / 2 ) );
+            $_hextent->scroll( -int( $_hextent->viewport / 2 ) );
          }
          elsif( $col < $mark_right ) {
             # press in mark - ignore for now - TODO: prelight
          }
          elsif( $col < $bar_right ) { # below area
-            $hextent->scroll( +int( $hextent->viewport / 2 ) );
+            $_hextent->scroll( +int( $_hextent->viewport / 2 ) );
          }
          elsif( $col == $bar_right ) { # right arrow
-            $hextent->scroll( +1 );
+            $_hextent->scroll( +1 );
          }
          return 1;
       }
    }
    elsif( $type eq "drag_start" and $button == 1 ) {
-      if( $vextent and $args->col == $cols-1 ) {
+      if( $_vextent and $args->col == $cols-1 ) {
          # Drag in vertical scrollbar
-         my ( undef, $mark_top, $mark_bottom ) = $vextent->scrollbar_geom( 1, $vlen );
+         my ( undef, $mark_top, $mark_bottom ) = $_vextent->scrollbar_geom( 1, $vlen );
          my $line = $args->line;
 
          if( $line >= $mark_top and $line < $mark_bottom ) {
-            $self->{drag_offset} = $line - $mark_top;
-            $self->{drag_bar}    = "v";
+            $_drag_offset = $line - $mark_top;
+            $_drag_bar    = "v";
             return 1;
          }
       }
-      if( $hextent and $args->line == $lines-1 ) {
+      if( $_hextent and $args->line == $lines-1 ) {
          # Drag in horizontal scrollbar
-         my ( undef, $mark_left, $mark_right ) = $hextent->scrollbar_geom( 1, $hlen );
+         my ( undef, $mark_left, $mark_right ) = $_hextent->scrollbar_geom( 1, $hlen );
          my $col = $args->col;
 
          if( $col >= $mark_left and $col < $mark_right ) {
-            $self->{drag_offset} = $col - $mark_left;
-            $self->{drag_bar}    = "h";
+            $_drag_offset = $col - $mark_left;
+            $_drag_bar    = "h";
             return 1;
          }
       }
    }
-   elsif( $type eq "drag" and $button == 1 and defined( $self->{drag_offset} ) ) {
-      if( $self->{drag_bar} eq "v" ) {
-         my $want_bar_top = $args->line - $self->{drag_offset} - 1;
-         my $want_top = int( $want_bar_top * $vextent->total / $vlen + 0.5 );
-         $vextent->scroll_to( $want_top );
+   elsif( $type eq "drag" and $button == 1 and defined $_drag_offset ) {
+      if( $_drag_bar eq "v" ) {
+         my $want_bar_top = $args->line - $_drag_offset - 1;
+         my $want_top = int( $want_bar_top * $_vextent->total / $vlen + 0.5 );
+         $_vextent->scroll_to( $want_top );
       }
-      if( $self->{drag_bar} eq "h" ) {
-         my $want_bar_left = $args->col - $self->{drag_offset} - 1;
-         my $want_left = int( $want_bar_left * $hextent->total / $hlen + 0.5 );
-         $hextent->scroll_to( $want_left );
+      if( $_drag_bar eq "h" ) {
+         my $want_bar_left = $args->col - $_drag_offset - 1;
+         my $want_left = int( $want_bar_left * $_hextent->total / $hlen + 0.5 );
+         $_hextent->scroll_to( $want_left );
       }
    }
    elsif( $type eq "drag_stop" ) {
-      undef $self->{drag_offset};
+      undef $_drag_offset;
    }
    elsif( $type eq "wheel" ) {
       # Alt-wheel for horizontal
-      my $extent = $args->mod & 2 ? $self->hextent : $self->vextent;
+      my $extent = $args->mod & 2 ? $_hextent : $_vextent;
       $extent->scroll( -5 ) if $extent and $button eq "up";
       $extent->scroll( +5 ) if $extent and $button eq "down";
       return 1;

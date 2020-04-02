@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/OperaUtils/unpause_opera
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-12-09'; # DATE
+our $DATE = '2019-12-10'; # DATE
 our $DIST = 'App-OperaUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ unpause-opera - Unpause (resume, continue, kill -CONT) Opera
 
 =head1 VERSION
 
-This document describes version 0.001 of unpause-opera (from Perl distribution App-OperaUtils), released on 2019-12-09.
+This document describes version 0.002 of unpause-opera (from Perl distribution App-OperaUtils), released on 2019-12-10.
 
 =head1 SYNOPSIS
 

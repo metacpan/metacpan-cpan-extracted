@@ -1,0 +1,49 @@
+{
+   "abstract" : "A CIDR/Block tree library for fast IP lookup with longest-prefix-match.",
+   "author" : [
+      "Karl Gaissmaier <karl.gaissmaier(at)uni-ulm.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4229",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-IPAM-Tree",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "Net::IPAM::Block" : "0",
+            "Net::IPAM::IP" : "0",
+            "Scalar::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::IPAM::Tree" : {
+         "file" : "lib/Net/IPAM/Tree.pm",
+         "version" : "1.00"
+      },
+      "Net::IPAM::Tree::Node" : {
+         "file" : "lib/Net/IPAM/Tree/Node.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

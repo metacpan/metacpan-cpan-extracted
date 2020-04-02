@@ -533,6 +533,7 @@ lib/SemanticWeb/Schema/OfferCatalog.pm
 lib/SemanticWeb/Schema/OfferForLease.pm
 lib/SemanticWeb/Schema/OfferForPurchase.pm
 lib/SemanticWeb/Schema/OfferItemCondition.pm
+lib/SemanticWeb/Schema/OfferShippingDetails.pm
 lib/SemanticWeb/Schema/OfficeEquipmentStore.pm
 lib/SemanticWeb/Schema/OnDemandEvent.pm
 lib/SemanticWeb/Schema/OpeningHoursSpecification.pm
@@ -685,6 +686,7 @@ lib/SemanticWeb/Schema/Schedule.pm
 lib/SemanticWeb/Schema/ScheduleAction.pm
 lib/SemanticWeb/Schema/ScholarlyArticle.pm
 lib/SemanticWeb/Schema/School.pm
+lib/SemanticWeb/Schema/SchoolDistrict.pm
 lib/SemanticWeb/Schema/ScreeningEvent.pm
 lib/SemanticWeb/Schema/Sculpture.pm
 lib/SemanticWeb/Schema/SeaBodyOfWater.pm
@@ -1363,6 +1365,7 @@ t/data/classes/SemanticWeb/Schema/OfferCatalog.json
 t/data/classes/SemanticWeb/Schema/OfferForLease.json
 t/data/classes/SemanticWeb/Schema/OfferForPurchase.json
 t/data/classes/SemanticWeb/Schema/OfferItemCondition.json
+t/data/classes/SemanticWeb/Schema/OfferShippingDetails.json
 t/data/classes/SemanticWeb/Schema/OfficeEquipmentStore.json
 t/data/classes/SemanticWeb/Schema/OnDemandEvent.json
 t/data/classes/SemanticWeb/Schema/OpeningHoursSpecification.json
@@ -1516,6 +1519,7 @@ t/data/classes/SemanticWeb/Schema/Schedule.json
 t/data/classes/SemanticWeb/Schema/ScheduleAction.json
 t/data/classes/SemanticWeb/Schema/ScholarlyArticle.json
 t/data/classes/SemanticWeb/Schema/School.json
+t/data/classes/SemanticWeb/Schema/SchoolDistrict.json
 t/data/classes/SemanticWeb/Schema/ScreeningEvent.json
 t/data/classes/SemanticWeb/Schema/Sculpture.json
 t/data/classes/SemanticWeb/Schema/SeaBodyOfWater.json

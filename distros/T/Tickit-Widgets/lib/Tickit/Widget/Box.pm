@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::Box;
 
@@ -14,7 +14,7 @@ use Tickit::RenderBuffer;
 
 use Tickit::Utils qw( bound );
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
@@ -24,23 +24,25 @@ C<Tickit::Widget::Box> - apply spacing and positioning to a widget
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::Box;
- use Tickit::Widget::Static;
+   use Tickit;
+   use Tickit::Widget::Box;
+   use Tickit::Widget::Static;
 
- my $box = Tickit::Widget::Box->new(
-    bg => "green",
-    child_lines => "80%",
-    child_cols  => "80%",
-    child => Tickit::Widget::Static->new(
-      text   => "Hello, world!",
-      bg     => "black",
-      align  => "centre",
-      valign => "middle",
-    ),
- );
+   my $box = Tickit::Widget::Box->new(
+      bg => "green",
+      child_lines => "80%",
+      child_cols  => "80%",
+   )
+      ->set_child(
+         Tickit::Widget::Static->new(
+           text   => "Hello, world!",
+           bg     => "black",
+           align  => "centre",
+           valign => "middle",
+         )
+      );
 
- Tickit->new( root => $box )->run;
+   Tickit->new( root => $box )->run;
 
 =head1 DESCRIPTION
 
@@ -73,7 +75,9 @@ changed.
 
 =cut
 
-=head2 $box = Tickit::Widget::Box->new( %args )
+=head2 new
+
+   $box = Tickit::Widget::Box->new( %args )
 
 In addition to the constructor arguments allowed by C<Tickit::Widget> and
 C<Tickit::SingleChildWidget>, this constructor also recognises the following
@@ -145,33 +149,53 @@ or percentages, specified in strings of the form C<10%>. If a percentage is
 given it specifies a size that is a fraction of the total amount that is
 available to the Box.
 
-=head2 $min = $box->child_lines_min
+=head2 child_lines_min
 
-=head2 $box->set_child_lines_min( $min )
+=head2 set_child_lines_min
 
-=head2 $min = $box->child_cols_min
+=head2 child_cols_min
 
-=head2 $box->set_child_cols_min( $min )
+=head2 set_child_cols_min
+
+   $min = $box->child_lines_min
+
+   $box->set_child_lines_min( $min )
+
+   $min = $box->child_cols_min
+
+   $box->set_child_cols_min( $min )
 
 Accessors for the child size minimum limits. If the child widget requests a
 size smaller than these limits, the allocated Window will be resized up to at
 least these sizes.
 
-=head2 $max = $box->child_lines_max
+=head2 child_lines_max
 
-=head2 $box->set_child_lines_max( $max )
+=head2 set_child_lines_max
 
-=head2 $max = $box->child_cols_max
+=head2 child_cols_max
 
-=head2 $box->set_child_cols_max( $max )
+=head2 set_child_cols_max
+
+   $max = $box->child_lines_max
+
+   $box->set_child_lines_max( $max )
+
+   $max = $box->child_cols_max
+
+   $box->set_child_cols_max( $max )
 
 Accessors for the child size maximum limits. If the child widget requests a
 size larger than these limits, the allocated Window will be resized down to at
 most these sizes.
 
-=head2 $box->set_child_lines( $size )
+=head2 set_child_lines
 
-=head2 $box->set_child_cols( $size )
+=head2 set_child_cols
+
+   $box->set_child_lines( $size )
+
+   $box->set_child_cols( $size )
 
 Convenient shortcut mutators that set both the minimum and maximum limit to
 the same value. This has the effect of forcing the size of the child widget.

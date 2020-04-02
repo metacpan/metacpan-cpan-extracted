@@ -8,7 +8,8 @@ Makefile.PL
 README
 README.md
 dist.ini
-eg/synopsis
+eg/all-possible
+eg/evolve
 lib/Music/Interval/Barycentric.pm
 t/00-compile.t
 t/01-functions.t

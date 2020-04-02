@@ -15,9 +15,8 @@ common::sense - save a tree AND a kitten, use common::sense!
    # no feature qw(array_base);
    # no warnings;
    # use warnings qw(FATAL closed threads internal debugging pack
-   #                 portable prototype inplace io pipe unpack malloc
-   #                 glob digit printf layer reserved taint closure
-   #                 semicolon);
+   #                 prototype inplace io pipe unpack malloc glob
+   #                 digit printf layer reserved taint closure semicolon);
    # no warnings qw(exec newline unopened);
 
 =head1 DESCRIPTION

@@ -1,11 +1,11 @@
 package Mojo::JSON;
 use Mojo::Base -strict;
 
-use Carp 'croak';
-use Exporter 'import';
+use Carp qw(croak);
+use Exporter qw(import);
 use JSON::PP ();
 use Mojo::Util qw(decode encode monkey_patch);
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed);
 
 # For better performance Cpanel::JSON::XS is required
 use constant JSON_XS => $ENV{MOJO_NO_JSON_XS}
@@ -364,7 +364,7 @@ Encode Perl value to JSON.
 
   my $false = false;
 
-False value, used because Perl has no native equivalent.
+False value. Used because Perl has no native equivalent.
 
 =head2 from_json
 
@@ -393,7 +393,7 @@ Encode Perl value to JSON text without C<UTF-8> encoding it.
 
   my $true = true;
 
-True value, used because Perl has no native equivalent.
+True value. Used because Perl has no native equivalent.
 
 =head1 SEE ALSO
 

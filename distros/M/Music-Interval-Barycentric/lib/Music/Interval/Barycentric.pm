@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0307';
 
 use List::Util qw( min );
 
@@ -21,13 +21,13 @@ our @EXPORT = qw(
     cyclic_permutation
 );
 
-my $SIZE  = 3;  # Triad chord
-my $SCALE = 12; # Scale notes
+use constant SIZE  => 3;  # Default chord size
+use constant SCALE => 12; # Default number of scale notes
 
 
 sub barycenter {
-    my $size  = shift || $SIZE;  # Default to a triad
-    my $scale = shift || $SCALE; # Default to the common scale notes
+    my $size  = shift || SIZE;  # Default to a triad
+    my $scale = shift || SCALE; # Default to the common scale notes
     return ($scale / $size) x $size;
 }
 
@@ -97,25 +97,30 @@ Music::Interval::Barycentric - Compute barycentric musical interval space
 
 =head1 VERSION
 
-version 0.0302
+version 0.0307
 
 =head1 SYNOPSIS
 
  use Music::Interval::Barycentric;
 
- my @chords = ([3, 4, 5], [0, 4, 7]);
+ my @chords = ([3,4,5], [0,4,7]); # Given in "pitch-class notation"
 
- print 'Barycenter: [', join(',', barycenter(scalar @chords)), "]\n";
- printf "Distance: %.3f\n", distance($chords[0], $chords[1]);
- print 'Evenness index: ', evenness_index($chords[0]), "\n";
- print 'Orbit distance: ', orbit_distance(@chords), "\n";
- print 'Forte distance: ', forte_distance(@chords), "\n";
+ my $dist = distance(@chords);
+ $dist = orbit_distance(@chords);
+ $dist = forte_distance(@chords);
+ my $even = evenness_index($chords[0]);
+
+ my $cycles = cyclic_permutation($chords[0]);
+ # [[3,4,5], [5,3,4], [4,5,3]]
+
+ my @center = barycenter(scalar @{ $chords[0] });
+ # [4,4,4]
 
 =head1 DESCRIPTION
 
 Barycentric chord analysis
 
-From the Amazon link below:
+From the book (linked below):
 
 "An intervallic representation of the chord leads naturally to a discrete
 barycentric condition. This condition itself leads to a convenient geometric
@@ -130,18 +135,25 @@ and thus the consonance of the chord."
 
 =head2 barycenter
 
- @barycenter = barycenter($n);
+ @point = barycenter;
+ @point = barycenter($chord_size);
+ @point = barycenter($chord_size, $scale_notes);
 
 Return the barycenter (the "central coordinate") given an integer representing
-the number of notes in a chord.
+the number of notes in a chord, and an optional number of notes in the scale.
+
+Defaults:
+
+  chord_size: 3
+  scale_notes: 12
 
 =head2 distance
 
  $d = distance($chord1, $chord2);
 
-Interval space distance metric between chords.
+Common Euclidean space distance metric between chords (vectors).
 
-* This is used by the C<orbit_distance> and C<evenness_index> functions.
+This function is used by the C<orbit_distance> and C<evenness_index> functions.
 
 =head2 orbit_distance
 
@@ -165,11 +177,13 @@ Return the list of cyclic permutations of the given intervals.
 
 =head2 evenness_index
 
-  $d = evenness_index($chord);
+  $e = evenness_index($chord);
 
 Return a chord distance from the barycenter.
 
 =head1 SEE ALSO
+
+The F<t/01-functions.t> and F<eg/*> programs in this distribution.
 
 L<http://www.amazon.com/Geometry-Musical-Chords-Interval-Representation/dp/145022797X>
 "A New Geometry of Musical Chords in Interval Representation: Dissonance, Enrichment, Degeneracy and Complementation"

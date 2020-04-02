@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.0';
+our $VERSION = 'v7.0.2';
 
 
 has aggregate_rating => (
@@ -202,6 +202,14 @@ has slogan => (
 
 
 
+has terms_of_service => (
+    is        => 'rw',
+    predicate => '_has_terms_of_service',
+    json_ld   => 'termsOfService',
+);
+
+
+
 
 
 1;
@@ -218,7 +226,7 @@ SemanticWeb::Schema::Service - A service provided by an organization, e
 
 =head1 VERSION
 
-version v7.0.0
+version v7.0.2
 
 =head1 DESCRIPTION
 
@@ -666,6 +674,24 @@ A slogan should be one of the following types:
 =head2 C<_has_slogan>
 
 A predicate for the L</slogan> attribute.
+
+=head2 C<terms_of_service>
+
+C<termsOfService>
+
+Human-readable terms of service documentation.
+
+A terms_of_service should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_terms_of_service>
+
+A predicate for the L</terms_of_service> attribute.
 
 =head1 SEE ALSO
 

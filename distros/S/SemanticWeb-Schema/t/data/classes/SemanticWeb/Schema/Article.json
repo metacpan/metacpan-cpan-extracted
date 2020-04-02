@@ -23,8 +23,8 @@
       },
       "schema:backstory" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1688",
-            "schemadotorgsources2:TP"
+            "schemadotorgsources2:TP",
+            "https://github.com/schemaorg/schemaorg/issues/1688"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "For an <a class=\"localLink\" href=\"http://schema.org/Article\">Article</a>, typically a <a class=\"localLink\" href=\"http://schema.org/NewsArticle\">NewsArticle</a>, the backstory property provides a textual summary giving a brief explanation of why and how an article was created. In a journalistic setting this could include information about reporting process, methods, interviews, data sources, etc.",
@@ -44,14 +44,14 @@
          "rdfs:comment" : "The page on which the work ends; for example \"138\" or \"xvi\".",
          "rdfs:label" : "pageEnd",
          "schema:domainIncludes" : [
-            "schema:Chapter",
             "schema:Article",
+            "schema:Chapter",
             "schema:PublicationIssue",
             "schema:PublicationVolume"
          ],
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
+            "schema:Text",
+            "schema:Integer"
          ]
       },
       "schema:pageStart" : {
@@ -62,13 +62,13 @@
          "rdfs:label" : "pageStart",
          "schema:domainIncludes" : [
             "schema:Chapter",
-            "schema:Article",
+            "schema:PublicationVolume",
             "schema:PublicationIssue",
-            "schema:PublicationVolume"
+            "schema:Article"
          ],
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
+            "schema:Text",
+            "schema:Integer"
          ]
       },
       "schema:pagination" : {
@@ -80,8 +80,8 @@
          "schema:domainIncludes" : [
             "schema:PublicationVolume",
             "schema:Article",
-            "schema:Chapter",
-            "schema:PublicationIssue"
+            "schema:PublicationIssue",
+            "schema:Chapter"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -92,8 +92,8 @@
          "rdfs:label" : "speakable",
          "schema:category" : "issue-1389",
          "schema:domainIncludes" : [
-            "schema:Article",
-            "schema:WebPage"
+            "schema:WebPage",
+            "schema:Article"
          ],
          "schema:rangeIncludes" : [
             "schema:URL",

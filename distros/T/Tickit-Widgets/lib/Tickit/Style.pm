@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Style;
 
@@ -37,35 +37,35 @@ C<Tickit::Style> - declare customisable style information on widgets
 
 =head1 SYNOPSIS
 
- package My::Widget::Class
- use base qw( Tickit::Widget );
- use Tickit::Style;
+   package My::Widget::Class
+   use base qw( Tickit::Widget );
+   use Tickit::Style;
 
- style_definition base =>
-    fg => "red";
+   style_definition base =>
+      fg => "red";
 
- style_definition ':active' =>
-    b => 1;
+   style_definition ':active' =>
+      b => 1;
 
- ...
+   ...
 
- sub render_to_rb
- {
-    my $self = shift;
-    my ( $rb, $rect ) = @_;
+   sub render_to_rb
+   {
+      my $self = shift;
+      my ( $rb, $rect ) = @_;
 
-    $rb->text_at( 0, 0, "Here is my text", $self->get_style_pen );
- }
+      $rb->text_at( 0, 0, "Here is my text", $self->get_style_pen );
+   }
 
 Z<>
 
- use My::Widget::Class;
+   use My::Widget::Class;
 
- my $w = My::Widget::Class->new(
-    class => "another-class",
- );
+   my $w = My::Widget::Class->new(
+      class => "another-class",
+   );
 
- ...
+   ...
 
 =head1 DESCRIPTION
 
@@ -92,32 +92,32 @@ a body definition in a brace-delimited (C<{}>) block. Comments can appear
 anywhere that whitespace is allowed, starting with a hash symbol (C<#>) and
 continuing to the end of the line.
 
- WidgetClass {
-   # basic style goes here
- }
+   WidgetClass {
+     # basic style goes here
+   }
 
- WidgetClass.styleclass {
-   # style to apply for this class goes here
- }
+   WidgetClass.styleclass {
+     # style to apply for this class goes here
+   }
 
- WidgetClass:tag {
-   # style to apply when this tag is active goes here
- }
+   WidgetClass:tag {
+     # style to apply when this tag is active goes here
+   }
 
 Each style definition contains a set semicolon-delimited (C<;>) assignments of
 values to keys. Each key is suffixed by a colon (C<:>), and the values may be
 integers, quoted strings (C<"...">), or the special identifiers C<true> or
 C<false>.
 
- WidgetClass.styleclass {
-   key1: "value 1";
-   key2: 123;
-   key3: true;
- }
+   WidgetClass.styleclass {
+     key1: "value 1";
+     key2: 123;
+     key3: true;
+   }
 
-While it is more traditional for keys in stylesheet files to contain hypens
+While it is more traditional for keys in stylesheet files to contain hyphens
 (C<->), it is more convenient in Perl code to use underscores (C<_>) instead.
-The parser will convert hypens in key names into underscores.
+The parser will convert hyphens in key names into underscores.
 
 As well as giving visual styling information, stylesheets can also associate
 behavioural actions with keypresses. These are given by a keypress key name in
@@ -160,9 +160,9 @@ tags.
 For instance, if both C<tag1> and C<tag2> are active, the following
 stylesheet does not precisely determine the foreground colour:
 
- WidgetClass      { fg: "red"; }
- WidgetClass:tag1 { fg: "blue"; }
- WidgetClass:tag2 { fg: "green"; }
+   WidgetClass      { fg: "red"; }
+   WidgetClass:tag1 { fg: "blue"; }
+   WidgetClass:tag2 { fg: "green"; }
 
 While it is not specified which tagged definition takes precedence, and
 therefore whether it shall be blue or green, it is specified that both of the
@@ -184,11 +184,11 @@ affect it.
 
 To copy the style information from the base, apply the C<-copy> keyword:
 
- use Tickit::Style -copy;
+   use Tickit::Style -copy;
 
 Alternatively, to start with a new blank state, use the C<-blank> keyword:
 
- use Tickit::Style -blank;
+   use Tickit::Style -blank;
 
 Currently, C<-blank> is the default behaviour, but this may change in a future
 version, with a deprecation warning if no keyword is specified.
@@ -263,14 +263,14 @@ style information, via the C<style_definition> function. It provides a definitio
 equivalent to a stylesheet definition with no style class, optionally with a
 single set of tags. To supply no tags, use the special string C<"base">.
 
- style_definition base =>
-    key1 => "value",
-    key2 => 123;
+   style_definition base =>
+      key1 => "value",
+      key2 => 123;
 
 To provide definitions with tags, use the colon-prefixed notation.
 
- style_definition ':active' =>
-    key3 => "value";
+   style_definition ':active' =>
+      key3 => "value";
 
 =cut
 

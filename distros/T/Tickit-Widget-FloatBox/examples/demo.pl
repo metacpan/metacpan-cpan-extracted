@@ -7,16 +7,14 @@ use Tickit;
 use Tickit::Widgets qw( Placegrid Box FloatBox );
 
 my $tickit = Tickit->new(
-   root => my $fb = Tickit::Widget::FloatBox->new(
-      base_child => Tickit::Widget::Placegrid->new,
-   )
+   root => my $fb = Tickit::Widget::FloatBox->new
+      ->set_base_child( Tickit::Widget::Placegrid->new )
 );
 
 my $float = $fb->add_float(
    child => Tickit::Widget::Box->new(
-      child => Tickit::Widget::Placegrid->new( grid_fg => "red" ),
       child_lines => 5, child_cols => 20,
-   ),
+   )->set_child( Tickit::Widget::Placegrid->new( grid_fg => "red" ) ),
    top => 1, left => 1,
 );
 

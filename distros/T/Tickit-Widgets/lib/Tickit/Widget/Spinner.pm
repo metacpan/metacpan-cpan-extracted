@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::Spinner;
 
@@ -11,7 +11,7 @@ use base qw( Tickit::Widget );
 
 use Tickit::Style;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use List::Util qw( max );
 use Tickit::Utils qw( textwidth );
@@ -22,14 +22,14 @@ C<Tickit::Widget::Spinner> - a widget displaying a small text animation
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::Spinner;
+   use Tickit;
+   use Tickit::Widget::Spinner;
 
- my $spinner = Tickit::Widget::Spinner->new(
-    chars => [ "<X>  ", " <X> ", "  <X>", ">  <X", "X>  <" ],
- );
+   my $spinner = Tickit::Widget::Spinner->new(
+      chars => [ "<X>  ", " <X> ", "  <X>", ">  <X", "X>  <" ],
+   );
 
- Tickit->new( root => $spinner )->run;
+   Tickit->new( root => $spinner )->run;
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,9 @@ use constant WIDGET_PEN_FROM_STYLE => 1;
 
 =cut
 
-=head2 $spinner = Tickit::Widget::Spinner->new( %args )
+=head2 new
+
+   $spinner = Tickit::Widget::Spinner->new( %args )
 
 Constructs a new C<Tickit::Widget::Spinner> object.
 
@@ -100,7 +102,9 @@ sub cols
    return $self->{cols};
 }
 
-=head2 $spinner->start
+=head2 start
+
+   $spinner->start
 
 Starts the animation effect.
 
@@ -114,7 +118,9 @@ sub start
    $self->tick;
 }
 
-=head2 $spinner->stop
+=head2 stop
+
+   $spinner->stop
 
 Stops the animation effect.
 

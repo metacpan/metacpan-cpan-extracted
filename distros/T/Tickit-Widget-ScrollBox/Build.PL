@@ -6,7 +6,10 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Tickit::Widget::ScrollBox',
    requires => {
-      'Tickit::SingleChildWidget' => '0.36',
+      'perl' => '5.025', # signatures
+      'Object::Pad' => '0.17',
+
+      'Tickit::SingleChildWidget' => '0.53',
       'Tickit::Style' => '0.35',
       'Tickit::Window' => '0.39',
    },

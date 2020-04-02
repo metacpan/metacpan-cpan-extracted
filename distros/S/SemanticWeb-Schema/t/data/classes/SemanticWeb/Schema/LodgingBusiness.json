@@ -12,10 +12,10 @@
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
             "schema:FloorPlan",
-            "schema:Place",
-            "schema:Accommodation"
+            "schema:LodgingBusiness",
+            "schema:Accommodation",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
       },
@@ -24,11 +24,11 @@
          "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
          "rdfs:label" : "audience",
          "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:Service",
             "schema:CreativeWork",
             "schema:LodgingBusiness",
-            "schema:Service",
             "schema:PlayAction",
-            "schema:Event",
             "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Audience"
@@ -38,10 +38,10 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:ContactPoint",
             "schema:ServiceChannel",
+            "schema:LodgingBusiness",
             "schema:TouristAttraction",
-            "schema:LodgingBusiness"
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
@@ -57,8 +57,8 @@
             "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
-            "schema:Time",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Time"
          ]
       },
       "schema:checkoutTime" : {
@@ -80,17 +80,17 @@
          "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
-            "schema:FloorPlan",
-            "schema:LodgingBusiness",
-            "schema:House",
             "schema:Apartment",
-            "schema:SingleFamilyResidence",
+            "schema:FloorPlan",
+            "schema:House",
             "schema:Accommodation",
-            "schema:Suite"
+            "schema:Suite",
+            "schema:LodgingBusiness",
+            "schema:SingleFamilyResidence"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:petsAllowed" : {
@@ -100,9 +100,9 @@
          "rdfs:label" : "petsAllowed",
          "schema:domainIncludes" : [
             "schema:LodgingBusiness",
+            "schema:Accommodation",
             "schema:FloorPlan",
-            "schema:ApartmentComplex",
-            "schema:Accommodation"
+            "schema:ApartmentComplex"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",

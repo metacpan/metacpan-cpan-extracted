@@ -16,10 +16,10 @@ GetOptions(
 my $scrollbox = Tickit::Widget::ScrollBox->new(
    horizontal => "on_demand",
    vertical   => "on_demand",
-
-   child => Tickit::Widget::Static->new(
+)->set_child(
+   Tickit::Widget::Static->new(
       text => join( "\n", map { "The content for line $_ " x 3 } 1 .. $LINES ),
-   ),
+   )
 );
 
 Tickit->new( root => $scrollbox )->run;

@@ -10,13 +10,14 @@ my $vbox = Tickit::Widget::VBox->new( spacing => 1 );
 
 $vbox->add( Tickit::Widget::Static->new( text => "Enter some text here:" ) );
 
-$vbox->add( Tickit::Widget::Border->new(
-   h_border => 2,
-   v_border => 1,
-   bg => 'blue',
-   child =>
-      ( my $entry = Tickit::Widget::Entry->new ),
-) );
+$vbox->add(
+   Tickit::Widget::Border->new(
+      h_border => 2,
+      v_border => 1,
+      bg => 'blue',
+   )
+   ->set_child( my $entry = Tickit::Widget::Entry->new ),
+);
 
 $vbox->add( my $label = Tickit::Widget::Static->new( text => "" ) );
 

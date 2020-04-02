@@ -1,0 +1,35 @@
+Net-IPAM-IP
+
+Net::IPAM::IP - A library for reading, formatting, sorting and converting IP-addresses.
+
+Both versions, IPv4 and IPv6, are handled transparently, they can be parsed, fast compared, printed in defined formats and many more.
+
+SEE ALSO
+
+Net::IPAM::IP is the basic respresentation for Net::IPAM::Block and Net::IPAM::Tree.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::IPAM::IP
+
+You can also look for information at github (TODO)
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2020 by Karl Gaissmaier.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

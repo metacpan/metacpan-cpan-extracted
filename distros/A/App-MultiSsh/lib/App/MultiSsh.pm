@@ -18,7 +18,7 @@ use Path::Tiny;
 use IO::Handle;
 use POSIX qw/:errno_h/;
 
-our $VERSION     = '0.23';
+our $VERSION     = '0.24';
 our @EXPORT_OK   = qw/hosts_from_map is_host multi_run shell_quote tmux/;
 our %EXPORT_TAGS = ();
 
@@ -194,18 +194,19 @@ sub tmux {
     for my $ssh (@commands) {
         if ( !$tmux && $option->{tmux_nested} ) {
             $tmux = ' rename-window mssh';
-            $final = '; bash -c ' . shell_quote($ssh);
+            $final = '; bash -c ' . shell_quote("echo $ssh; echo 'set-window-option synchronize-panes on|off'") . '\\;' . shell_quote($ssh);
         }
         else {
             my $cmd = !$tmux ? 'new-session' : '\\; split-window -d -p ' . $pct;
 
-            $tmux .= " $cmd " . shell_quote($ssh);
+            $tmux .= " $cmd " . shell_quote("echo $ssh") . '\\;' . shell_quote($ssh);
         }
     }
 
-    $tmux .= ' \\; set-window-option synchronize-panes on' if $commands[0] !~ /\s$/xms;
+    my $sync = $option->{tmux_sync} ? 'on' : 'off';
+    $tmux .= " \\; set-window-option synchronize-panes $sync" if $commands[0] !~ /\s$/xms;
 
-    return "tmux$tmux \\; select-layout tiled \\; setw synchronize-panes$final";
+    return "tmux$tmux \\; select-layout tiled \\; setw synchronize-panes $sync$final";
 }
 
 sub layout {
@@ -279,7 +280,7 @@ App::MultiSsh - Multi host ssh executer
 
 =head1 VERSION
 
-This documentation refers to App::MultiSsh version 0.23
+This documentation refers to App::MultiSsh version 0.24
 
 =head1 SYNOPSIS
 

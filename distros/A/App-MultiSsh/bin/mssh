@@ -17,15 +17,16 @@ use Path::Tiny;
 use POSIX ":sys_wait_h";
 use App::MultiSsh qw/hosts_from_map is_host multi_run shell_quote/;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
-    host    => [],
-    verbose => 0,
-    man     => 0,
-    help    => 0,
-    VERSION => 0,
+    host      => [],
+    tmux_sync => 0,
+    verbose   => 0,
+    man       => 0,
+    help      => 0,
+    VERSION   => 0,
 );
 
 if ( !@ARGV ) {
@@ -54,6 +55,7 @@ sub main {
         'tmux_cmd|tmux-cmd|T=s',
         'tmux|m',
         'tmux_nested|tmux-nested|n',
+        'tmux_sync|tmux-sync|sync|S!',
         'only|only-hosts|o!',
         'test|t!',
         'verbose|v+',
@@ -162,7 +164,7 @@ mssh - Multi host ssh executer
 
 =head1 VERSION
 
-This documentation refers to mssh version 0.23.
+This documentation refers to mssh version 0.24.
 
 =head1 SYNOPSIS
 
@@ -221,6 +223,9 @@ This documentation refers to mssh version 0.23.
                 Use this fag when running in an existing tmux session to split up
                 the current tmux window in the same fashion as running a sepperate
                 tmux session.
+     --tmux-sync
+     --sync     Turn on TMUX synchronize pages
+     --no-sync  Turn off TMUX synchronize pages (Default)
   -o --only-hosts
                 No command passed (all arguments are hosts)
 

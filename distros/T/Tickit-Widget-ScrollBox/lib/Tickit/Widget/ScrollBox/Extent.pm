@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::ScrollBox::Extent;
+use 5.026; # signatures
+use Object::Pad 0.17;
 
-use strict;
-use warnings;
-
-our $VERSION = '0.07';
+class Tickit::Widget::ScrollBox::Extent 0.08;
 
 use Scalar::Util qw( weaken );
 
@@ -24,36 +22,31 @@ returned by the C<hextent> and C<vextent> methods of the associated ScrollBox.
 
 =cut
 
-sub new
+has $_start = 0;
+has $_total;
+
+has $_scrollbox;
+has $_id;
+
+method BUILD ( $scrollbox, $id )
 {
-   my $class = shift;
-   my ( $scrollbox, $id ) = @_;
-
-   my $self = bless {
-      start => 0,
-      id    => $id,
-   }, $class;
-
-   weaken( $self->{scrollbox} = $scrollbox );
-   return $self;
+   weaken( $_scrollbox = $scrollbox );
+   $_id = $id;
 }
 
-sub _clamp
+method _clamp ()
 {
-   my $self = shift;
-
    my $limit = $self->total - $self->viewport;
-   $self->{start} = $limit if $self->{start} > $limit;
+   $_start = $limit if $_start > $limit;
 }
 
 # Internal; used by T:W:ScrollBox
-sub set_viewport
-{
-   my $self = shift;
-   my ( $viewport ) = @_;
+has $_viewport;
 
-   $self->{viewport} = $viewport;
-   $self->_clamp if defined $self->{total};
+method set_viewport ( $viewport )
+{
+   $_viewport = $viewport;
+   $self->_clamp if defined $_total;
 }
 
 =head1 ACCESSORS
@@ -69,11 +62,7 @@ Returns the size of the viewable portion of the scrollable area (the
 
 =cut
 
-sub viewport
-{
-   my $self = shift;
-   return $self->{viewport};
-}
+method viewport { $_viewport }
 
 =head2 total
 
@@ -91,32 +80,24 @@ the child widget, when it is performing smart scrolling.
 
 =cut
 
-sub total
+method total ()
 {
-   my $self = shift;
-   my $viewport = $self->{viewport};
-   my $total    = $self->{total};
+   my $viewport = $_viewport;
+   my $total    = $_total;
    $total = $viewport if $viewport > $total;
    return $total;
 }
 
-sub real_total
+method real_total () { $_total }
+
+method set_total ( $total )
 {
-   my $self = shift;
-   return $self->{total};
-}
+   return if defined $_total and $_total == $total;
 
-sub set_total
-{
-   my $self = shift;
-   my ( $total ) = @_;
+   $_total = $total;
+   $self->_clamp if defined $_viewport;
 
-   return if defined $self->{total} and $self->{total} == $total;
-
-   $self->{total} = $total;
-   $self->_clamp if defined $self->{viewport};
-
-   $self->{scrollbox}->_extent_scrolled( $self->{id}, 0, undef );
+   $_scrollbox->_extent_scrolled( $_id, 0, undef );
 }
 
 =head2 limit
@@ -130,10 +111,9 @@ than the total.
 
 =cut
 
-sub limit
+method limit ()
 {
-   my $self = shift;
-   my $limit = $self->{total} - $self->{viewport};
+   my $limit = $_total - $_viewport;
    $limit = 0 if $limit < 0;
    return $limit;
 }
@@ -147,11 +127,7 @@ is always at least zero, and no greater than the limit.
 
 =cut
 
-sub start
-{
-   my $self = shift;
-   return $self->{start};
-}
+method start () { $_start }
 
 =head1 METHODS
 
@@ -166,10 +142,9 @@ moves outside the allowed range.
 
 =cut
 
-sub scroll
+method scroll ( $delta )
 {
-   my $self = shift;
-   $self->scroll_to( $self->start + $_[0] );
+   $self->scroll_to( $self->start + $delta );
 }
 
 =head2 scroll_to
@@ -181,22 +156,19 @@ outside the allowed range.
 
 =cut
 
-sub scroll_to
+method scroll_to ( $start )
 {
-   my $self = shift;
-   my ( $start ) = @_;
-
    my $limit = $self->limit;
    $start = $limit if $start > $limit;
 
    $start = 0 if $start < 0;
 
-   return if $self->{start} == $start;
+   return if $_start == $start;
 
-   my $delta = $start - $self->{start};
+   my $delta = $start - $_start;
 
-   $self->{start} = $start;
-   $self->{scrollbox}->_extent_scrolled( $self->{id}, $delta, $start );
+   $_start = $start;
+   $_scrollbox->_extent_scrolled( $_id, $delta, $start );
 }
 
 =head2 scrollbar_geom
@@ -209,11 +181,8 @@ C<$length>.
 
 =cut
 
-sub scrollbar_geom
+method scrollbar_geom ( $top, $length )
 {
-   my $self = shift;
-   my ( $top, $length ) = @_;
-
    my $total = $self->total;
 
    my $bar_length = int( $self->viewport * $length / $total + 0.5 );

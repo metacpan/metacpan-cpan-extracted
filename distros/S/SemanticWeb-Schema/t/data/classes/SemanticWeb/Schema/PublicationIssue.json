@@ -17,8 +17,8 @@
          "rdfs:subPropertyOf" : "schema:position",
          "schema:domainIncludes" : "schema:PublicationIssue",
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
+            "schema:Text",
+            "schema:Integer"
          ]
       },
       "schema:pageEnd" : {
@@ -28,14 +28,14 @@
          "rdfs:comment" : "The page on which the work ends; for example \"138\" or \"xvi\".",
          "rdfs:label" : "pageEnd",
          "schema:domainIncludes" : [
-            "schema:Chapter",
             "schema:Article",
+            "schema:Chapter",
             "schema:PublicationIssue",
             "schema:PublicationVolume"
          ],
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
+            "schema:Text",
+            "schema:Integer"
          ]
       },
       "schema:pageStart" : {
@@ -46,13 +46,13 @@
          "rdfs:label" : "pageStart",
          "schema:domainIncludes" : [
             "schema:Chapter",
-            "schema:Article",
+            "schema:PublicationVolume",
             "schema:PublicationIssue",
-            "schema:PublicationVolume"
+            "schema:Article"
          ],
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
+            "schema:Text",
+            "schema:Integer"
          ]
       },
       "schema:pagination" : {
@@ -64,8 +64,8 @@
          "schema:domainIncludes" : [
             "schema:PublicationVolume",
             "schema:Article",
-            "schema:Chapter",
-            "schema:PublicationIssue"
+            "schema:PublicationIssue",
+            "schema:Chapter"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

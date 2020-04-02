@@ -1,11 +1,12 @@
 package App::gimpgitbuild::Command::build;
-$App::gimpgitbuild::Command::build::VERSION = '0.16.0';
+$App::gimpgitbuild::Command::build::VERSION = '0.16.1';
 use strict;
 use warnings;
 use 5.014;
 
 use App::gimpgitbuild -command;
 
+use File::Which qw/ which /;
 use Path::Tiny qw/ path tempdir tempfile cwd /;
 
 use App::gimpgitbuild::API::GitBuild ();
@@ -47,8 +48,9 @@ sub _check
 
 sub _git_build
 {
-    my $args = shift;
-    my $id   = $args->{id};
+    my $args                 = shift;
+    my $id                   = $args->{id};
+    my $extra_configure_args = ( $args->{extra_configure_args} // [] );
 
     my $KEY = "GIMPGITBUILD__SKIP_BUILDS_RE";
     if ( exists $ENV{$KEY} )
@@ -79,7 +81,7 @@ sub _git_build
     my $meson1 =
 qq#mkdir -p "$MESON_BUILD_DIR" && cd "$MESON_BUILD_DIR" && meson --prefix="$args->{prefix}" $UBUNTU_MESON_LIBDIR_OVERRIDE .. && ninja $PAR_JOBS && ninja $PAR_JOBS test && ninja $PAR_JOBS install#;
     my $autoconf1 =
-qq#NOCONFIGURE=1 ./autogen.sh && ./configure --prefix="$args->{prefix}" && make $PAR_JOBS && @{[_check()]} && make install#;
+qq#NOCONFIGURE=1 ./autogen.sh && ./configure @{$extra_configure_args} --prefix="$args->{prefix}" && make $PAR_JOBS && @{[_check()]} && make install#;
     _do_system(
         {
             cmd => [
@@ -88,6 +90,17 @@ qq#cd "$git_co" && git checkout "$args->{branch}" && ($args->{tag} || $^X -MGit:
             ]
         }
     );
+    return;
+}
+
+sub _which_xvfb_run
+{
+    my $path = which('xvfb-run');
+    if ( not defined($path) )
+    {
+        die
+"Cannot find xvfb-run ! It is required for tests to succeed: see https://gitlab.gnome.org/GNOME/gimp/-/issues/2884";
+    }
     return;
 }
 
@@ -106,6 +119,7 @@ sub execute
     $ENV{PATH}            = $env->{PATH};
     $ENV{PKG_CONFIG_PATH} = $env->{PKG_CONFIG_PATH};
     $ENV{XDG_DATA_DIRS}   = $env->{XDG_DATA_DIRS};
+    _which_xvfb_run();
     my $base_src_dir = $obj->base_git_clones_dir;
 
     my $GNOME_GIT = 'https://gitlab.gnome.org/GNOME';
@@ -134,7 +148,7 @@ sub execute
             url       => "https://github.com/mypaint/libmypaint.git",
             prefix    => $obj->mypaint_p,
             use_meson => 0,
-            branch    => "v1.3.0",
+            branch    => "v1.5.1",
             tag       => "true",
         }
     );
@@ -155,11 +169,12 @@ sub execute
 # autoconf_git_build "$base_src_dir/git/gimp" "$GNOME_GIT"/gimp "$HOME/apps/gimp-devel"
     _git_build(
         {
-            id        => "gimp",
-            git_co    => "$base_src_dir/git/gimp",
-            url       => "$GNOME_GIT/gimp",
-            prefix    => $obj->gimp_p,
-            use_meson => $GIMP_BUILD,
+            id                   => "gimp",
+            extra_configure_args => [ qw# --enable-debug #, ],
+            git_co               => "$base_src_dir/git/gimp",
+            url                  => "$GNOME_GIT/gimp",
+            prefix               => $obj->gimp_p,
+            use_meson            => $GIMP_BUILD,
         }
     );
 
@@ -179,7 +194,7 @@ __END__
 
 =head1 VERSION
 
-version 0.16.0
+version 0.16.1
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

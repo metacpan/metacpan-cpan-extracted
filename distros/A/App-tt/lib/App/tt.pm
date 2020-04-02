@@ -2,7 +2,7 @@ package App::tt;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 1;
 
@@ -14,7 +14,7 @@ App::tt - Time tracking application
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 DESCRIPTION
 
