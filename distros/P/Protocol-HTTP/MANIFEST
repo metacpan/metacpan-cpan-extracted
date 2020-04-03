@@ -4,8 +4,8 @@ lib/Protocol/HTTP.pm
 lib/Protocol/HTTP.pod
 lib/Protocol/HTTP/Compression.pm
 lib/Protocol/HTTP/Compression.pod
-lib/Protocol/HTTP/errc.pm
-lib/Protocol/HTTP/errc.pod
+lib/Protocol/HTTP/Error.pm
+lib/Protocol/HTTP/Error.pod
 lib/Protocol/HTTP/Message.pm
 lib/Protocol/HTTP/Message.pod
 lib/Protocol/HTTP/Request.pm
@@ -127,7 +127,6 @@ t/regression/1/002.033.txt
 t/regression/1/002.034.txt
 t/regression/1/002.035.txt
 t/regression/1/002.036.txt
-t/synopsis.t
 xsi/Compression.xsi
 xsi/Error.xsi
 xsi/Message.xsi

@@ -96,12 +96,6 @@ test-files/test-bioaln-cat-3.aln
 test-files/test-bioaln-pep2dna.aln
 test-files/test-bioaln-pep2dna.nuc
 test-files/test-bioaln.aln
-test-files/test-bioaln.aln.slice-142.aln
-test-files/test-bioaln.aln.slice-239.aln
-test-files/test-bioaln.aln.slice-258.aln
-test-files/test-bioaln.aln.slice-31.aln
-test-files/test-bioaln.aln.slice-67.aln
-test-files/test-bioaln.aln.slice-91.aln
 test-files/test-bioaln.cds
 test-files/test-biopop.fas
 test-files/test-bioseq-leadgap.fas
@@ -121,6 +115,7 @@ test-files/test-biotree-trait-file.txt
 test-files/test-biotree.dnd
 
 TODO.md
-META.json
 META.yml
+META.json
 Makefile.PL
+SIGNATURE    Added here by Module::Build

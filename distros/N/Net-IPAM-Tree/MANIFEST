@@ -1,9 +1,5 @@
 Build.PL
 Changes
-examples/a.pl
-examples/b.pl
-examples/c.pl
-examples/d.pl
 lib/Net/IPAM/Tree.pm
 lib/Net/IPAM/Tree/Node.pm
 LICENSE

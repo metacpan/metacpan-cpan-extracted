@@ -27,6 +27,9 @@ use Bio::Tools::SeqStats;
 use Bio::SeqUtils;
 use Scalar::Util;
 use Exporter ();
+use Bio::CodonUsage::IO;
+use Bio::Tools::pICalculator;
+# use Bio::Tools::GuessSeqFormat;
 
 if ($ENV{'DEBUG'}) { use Data::Dumper }
 
@@ -44,22 +47,29 @@ remove_stop parse_orders find_by_order
 pick_by_order del_by_order find_by_id
 pick_by_id del_by_id find_by_re
 pick_by_re del_by_re
+pick_by_file del_by_file
 find_by_ambig pick_by_ambig del_by_ambig find_by_length
-del_by_length);
+del_by_length codon_sim codon_info);
 
 # Package global variables
-my ($in, $out, $seq, %opts, $filename, $in_format, $out_format);
+my ($in, $out, $seq, %opts, $filename, $in_format, $out_format, $guesser);
 use Bio::BPWrapper;
 my $VERSION = '1.0';
 
 ## For new options, just add an entry into this table with the same key as in
 ## the GetOpts function in the main program. Make the key be a reference to the handler subroutine (defined below), and test that it works.
 my %opt_dispatch = (
+    'codon-table' => \&codon_table,
+#    'codon-sim' => \&codon_sim,
+    'codon-info' => \&codon_info,
+    'iep' => \&iso_electric_point,
     'composition' => \&print_composition,
+    'mol-wt' => \&print_weight,
     'delete' => \&filter_seqs,
     'fetch' => \&retrieve_seqs,
     'no-gaps' => \&remove_gaps,
     'length' => \&print_lengths,
+    'longest-orf' => \&update_longest_orf,
     'num-seq' => \&print_seq_count,
     'pick' => \&filter_seqs,
     'revcom' => \&make_revcom,
@@ -76,12 +86,13 @@ my %opt_dispatch = (
     'linearize' => \&linearize,
     'reloop' => \&reloop_at,
     'remove-stop' => \&remove_stop,
+    'sort' => \&sort_by,
     'split-cdhit' => \&split_cdhit,
 #   'dotplot' => \&draw_dotplot,
 #    'extract' => \&reading_frame_ops,
 #	'longest-orf' => \&reading_frame_ops,
 #	'prefix' => \&anonymize,
-#	'rename' => \&rename_id,
+	'rename' => \&rename_id,
 #	'slidingwindow' => \&sliding_window,
 #	'split' => \&split_seqs,
   );
@@ -95,13 +106,15 @@ my %filter_dispatch = (
     'delete_by_id'      => \&del_by_id,
     'find_by_re'     => \&find_by_re,
     'pick_by_re'     => \&pick_by_re,
-    'delete_by_re'      => \&del_by_re,
+    'find_by_file'     => \&find_by_file,
+    'pick_by_file'     => \&pick_by_file,
+    'delete_by_file'      => \&del_by_file,
     'find_by_ambig'  => \&find_by_ambig,
     'pick_by_ambig'  => \&pick_by_ambig,
     'delete_by_ambig'   => \&del_by_ambig,
     'find_by_length' => \&find_by_length,
     'pick_by_length' => \&pick_by_length,
-    'del_by_length'  => \&del_by_length,
+    'delete_by_length'  => \&del_by_length,
 );
 
 ##################### initializer & option handlers ###################
@@ -128,8 +141,20 @@ sub initialize {
 
     $filename = shift @ARGV || "STDIN";    # If no more arguments were given on the command line, assume we're getting input from standard input
 
+# guess format won't work for piped input; remove
+#    if ($filename eq "STDIN") {
+#	my $lines; 
+#	my $line_ct = 0; 
+#	while(<>) { $lines .= $_; $line_ct++; last if $line_ct >= 100 } # read the first 100 lines
+#	$guesser = Bio::Tools::GuessSeqFormat->new( -text => $lines );
+#    } else {
+#	$guesser = Bio::Tools::GuessSeqFormat->new( -file => $filename);
+#    }
+#    $in_format  = $guesser->guess() unless $opts{'input'};
+
     $in_format = $opts{"input"} // 'fasta';
 
+#    die "Reads only fasta, fastq, embl, genbank. Not aligment file formats like clustalw\n" unless $in_format =~ /fasta|fastq|embl|genbank/;
     $in = Bio::SeqIO->new(-format => $in_format, ($filename eq "STDIN")? (-fh => \*STDIN) : (-file => $filename));
 
     $out_format = $opts{"output"} // 'fasta';
@@ -161,7 +186,344 @@ sub write_out {
 }
 
 
-################### subroutine ########################
+################### subroutines ########################
+
+=begin
+sub codon_sim {
+    my $seq = $in->next_seq(); # only the first sequence used
+    if (&_internal_stop_or_x($seq->translate()->seq())) {
+	die "internal stop or non-standard base:\t" . $seq->id . "\texit.\n";
+    }
+    use Algorithm::Numerical::Sample  qw /sample/;
+    use Math::Random qw /random_permutation/;
+########################
+# Read CUTG and make a random codon set for each AA
+########################
+    my $cutg_file = $opts{'codon-sim'};
+    my $io = Bio::CodonUsage::IO->new(-file => $cutg_file);
+    my $cdtable = $io->next_data();
+    my @bases = qw(A T C G);
+    my @codons;
+    for (my $i=0; $i<=3; $i++) {
+	my $first = $bases[$i];
+	for (my $j=0; $j<=3; $j++) {
+	    my $second = $bases[$j];
+	    for (my $k=0; $k<=3; $k++) {
+		my $third = $bases[$k];
+		push @codons, $first . $second . $third;
+	    }
+	}
+    }
+    
+    my $myCodonTable  = Bio::Tools::CodonTable->new( -id => 1 );
+
+    my (@cd_cts, %aas, %aa_cds);
+    foreach my $cd (@codons) {
+	my $aa = $myCodonTable->translate($cd);
+	$aas{$aa}++;
+	push @cd_cts, {codon => $cd, aa => $aa, cts => $cdtable->codon_count($cd)};
+    }
+
+    foreach my $aa (keys %aas) { 
+	my @cds = grep {$_->{aa} eq $aa} @cd_cts;
+	my @cd_sets; 
+	foreach (@cds) {
+	    for (my $i=1; $i<=$_->{cts}; $i++) {
+		push @cd_sets, $_->{codon};
+	    }
+	}
+	@cd_sets = random_permutation(@cd_sets);
+	$aa_cds{$aa} = \@cd_sets;
+    }
+
+##############################
+# generate a random CDS with the same AA sequence
+###############################
+    my $pep = $seq->translate()->seq();
+    my @aas = split //, $pep;
+    my $sim_cds = "";
+    for (my $i = 0; $i <= $#aas; $i++) {
+	my @sampled_cds = sample(-set => $aa_cds{$aas[$i]}); # sample 1 by default
+	my $cd_sim = shift @sampled_cds;
+	$sim_cds .= $cd_sim;
+    }
+    my $sim_obj = Bio::Seq->new(-id => $seq->id() . "|sim", -seq => $sim_cds);
+    $out->write_seq($sim_obj);
+}
+=cut
+
+sub rename_id {
+    open NAME, "<", $opts{rename} || die "a file with old-tab-new needed\n";
+    my %names;
+    while(<NAME>) {
+	chomp;
+	my ($oldN, $newN) = split;
+	$names{$oldN} = $newN;
+    }
+    close NAME;
+
+    while( my $seqobj  = $in->next_seq() ) {
+	my $id = $seqobj->display_id();
+	if ($names{$id}) {
+#	    $seqobj->id($id . "|" . $names{$id});
+#	    warn "$id appended by $names{$id}\n";
+	    $seqobj->id($names{$id});
+	    warn "$id replaced by $names{$id}\n";
+	} else {
+	    warn "$id not changed\n";
+	}
+	$out->write_seq($seqobj);
+    }
+}
+
+
+sub update_longest_orf {
+    while( my $seqobj  = $in->next_seq() ) {
+	my $pep_string = $seqobj->translate( undef, undef, 0 )->seq();
+	unless ($pep_string =~ /\*[A-Z]/) { # no internal stop; don't proceed
+	    my $id = $seqobj->id();
+	    $seqobj->id($id . "|+1");
+	    $seqobj = &_trim_end_to_frame($seqobj);
+	    $out->write_seq($seqobj);
+#	    warn $seqobj->id, ": +1 ok\n";
+	    next;
+	}
+
+	unless ($opts{"no-revcom"}) { # do not search in revcom
+	    my $pep_rev = $seqobj->revcom()->translate( undef, undef, 0 )->seq();
+	    unless ($pep_rev =~ /\*[A-Z]/) { # no internal stop for revcom
+		my $id = $seqobj->id();
+		$seqobj->id($id . "|-1");
+		my $rev = $seqobj->revcom();
+		$rev = &_trim_end_to_frame($rev);
+		$out->write_seq($rev);
+#	    warn $seqobj->id(), ": -1 ok\n";
+		next;
+	    }
+	}
+
+	my $longest = {
+	    'aa_start'  => 1,
+	    'aa_end'    => 1,
+	    'aa_length' => 1,
+	    'nt_start'  => 1,
+	    'nt_end'    => 1,
+	    'nt_seq'    => $seqobj->seq(),
+	    'frame'     => 1,
+	};
+
+	foreach my $fm (1, 2, 3, -1, -2, -3 ) {
+#	    warn "checking frame $fm ...\n";
+	    next if $opts{"no-revcom"} && $fm < 0; # do not search in revcom
+	    my $new_seqobj = Bio::Seq->new(
+		-id  => $seqobj->id() . "|$fm",
+		-seq => $fm > 0 ? $seqobj->subseq( $fm, $seqobj->length() ) : $seqobj->revcom()->subseq( abs($fm), $seqobj->length() )
+		);    # chop seq to frame first
+	    
+	    &_get_longest($new_seqobj, $longest, $fm);
+#	    warn "longest ORF:", $longest->{aa_length}, "\n";
+
+	}
+#	warn "start codon not M/V/L:", $seqobj->id() unless substr( $longest->{nt_seq}, 0, 3 ) =~ /[atg|gt[atcg]|ct[atcg]|tt[ag]/i;
+#	print ">", $seqobj->id, "|f", $longest->{frame}, "|longest-orf\n", $longest->{nt_seq}, "\n";
+	my $fid = $longest->{frame} > 0 ? "+" . $longest->{frame} : $longest->{frame};
+	my $longest_seq = Bio::Seq->new(-id => $seqobj->id . "|" . $fid, -seq => $longest->{nt_seq} );
+	$longest_seq = &_trim_end_to_frame($longest_seq);
+	$out->write_seq($longest_seq);
+    }
+}
+
+sub _trim_end_to_frame {
+    my $seqobj = shift;
+    my $seq_len = $seqobj->length();
+    my $remainder = $seq_len % 3;
+    my $seqstr = $seqobj->subseq(1, $seq_len - $remainder);
+    $seqobj->seq($seqstr);
+    return $seqobj;
+}
+
+sub _get_longest { # for each frame
+    my ($seq, $ref, $fm) = @_;
+    my $pep_string = $seq->translate( undef, undef, 0 )->seq();
+    unless ($pep_string =~ /\*[A-Z]/) { # no internal stops, found the longest
+	$ref->{nt_seq} = $seq->seq();
+	$ref->{frame} = $fm;
+	$ref->{aa_length} = $seq->length()/3;
+    } else { # has internal stops
+	die $seq->id(), " contains ambiguous aa (X)\n" if $pep_string =~ /X/;
+	my $three_prime = $seq->length();
+    
+	my $start = 1;
+	my @aas = split '', $pep_string;
+	for ( my $i = 0; $i <= $#aas; $i++ ) {
+	    next unless $aas[$i] eq '*' || $i == $#aas;    # hit a stop codon or end of sequence
+	    if ($i - $start + 2 > $ref->{aa_length}) { # if longer than the last longest
+		$ref->{aa_start}  = $start;
+		$ref->{aa_end}    = $i + 1;
+		$ref->{aa_length} = $i - $start + 2;
+		$ref->{nt_start}  = 3 * ( $start - 1 ) + 1;
+		my $end = 3 * $i + 3;
+		$end
+		    = ( $end > $three_prime )
+		    ? $three_prime
+		    : $end;    # guranteed not to go beyond 3'
+		$ref->{nt_end} = $end;
+		$ref->{frame}  = $fm;
+		$ref->{nt_seq} = $seq->subseq( 3 * ( $start - 1 ) + 1, $end );
+	    }
+	    $start = $i + 2; # re-start
+	}
+    } 
+}
+
+
+sub iso_electric_point {
+    my $calc = Bio::Tools::pICalculator->new(-places => 2, -pKset => 'EMBOSS');
+    while ( my $seq = $in->next_seq ) {
+	$calc->seq($seq);
+	print $seq->id(), "\t", $calc->iep;
+	for(my $i = 0; $i <= 14; $i += 0.5 ){
+	    print "\t", $i, "|", sprintf("%.2f", $calc->charge_at_pH($i));
+	}
+	print "\n";
+    }
+}
+
+sub print_weight {
+    while ($seq = $in->next_seq()) { 
+	my $ref_weight = Bio::Tools::SeqStats->get_mol_wt($seq);
+	print join "\t", $seq->id(), $ref_weight->[0], $ref_weight->[1];
+	print "\n";
+    }
+}
+
+sub codon_info {
+    my $cutg_file = $opts{'codon-info'} || "need a codon usage file in CUTG GCG format";
+    my $io = Bio::CodonUsage::IO->new(-file => $cutg_file);
+    my $cdtable = $io->next_data();
+    my @bases = qw(A T C G);
+    my @codons;
+    for (my $i=0; $i<=3; $i++) {
+	my $first = $bases[$i];
+	for (my $j=0; $j<=3; $j++) {
+	    my $second = $bases[$j];
+	    for (my $k=0; $k<=3; $k++) {
+		my $third = $bases[$k];
+		push @codons, $first . $second . $third;
+	    }
+	}
+    }
+
+    my $myCodonTable  = Bio::Tools::CodonTable->new( -id => 1 );
+#print Dumper($cdtable->all_aa_frequencies);
+
+    my (@cd_cts, %aas);
+    foreach my $cd (@codons) {
+	my $aa = $myCodonTable->translate($cd);
+	$aas{$aa}++;
+	push @cd_cts, {codon => $cd, aa => $aa, cts => $cdtable->codon_count($cd)};
+    }
+
+    my $h_genome = 0;
+    foreach my $aa (keys %aas) {
+	my @cds = grep {$_->{aa} eq $aa} @cd_cts; 
+	$h_genome += &__cd_entropy(\@cds);
+    }
+
+=begin
+    use Bio::Tools::CodonOptTable;
+    while (my $seq = $in->next_seq()) {
+	my $seqobj = Bio::Tools::CodonOptTable->new(
+	    -seq         => $seq->seq(),
+	    -genetic_code => 1,
+	    -alphabet         => 'dna',
+	    -is_circular      => 0,
+	    -id => $seq->id(),
+	    );
+	my $myCodons = $seqobj->rscu_rac_table();
+	my %oneLetterAA;
+	my @cdCTs;
+	my $numCodons = 0;
+	foreach my $rec (@$myCodons) {
+	    $numCodons += $rec->{frequency};
+	    my $codon = $rec->{codon};
+	    my $aa = $myCodonTable->translate($codon);
+	    $oneLetterAA{$aa}++;
+	    push @cdCTs, {codon => $codon, aa => $aa, cts => $rec->{frequency}};
+	}
+=cut
+    while (my $seq = $in->next_seq()) {
+	if (&_internal_stop_or_x($seq->translate()->seq())) {
+	    warn "internal stop or non-standard base:\t" . $seq->id . "\tskip.\n";
+	    next;
+	}
+	my %oneLetterAA;
+	my %codons;
+	my @cdCTs;
+	my $numCodons = 0;
+	for (my $i=0; $i<=$seq->length()-3; $i+=3) {
+	    $codons{substr($seq->seq(), $i, 3)}++;
+	    $numCodons++;
+	}
+
+	foreach my $cd (keys %codons) {
+	    my $aa = $myCodonTable->translate($cd);
+	    $oneLetterAA{$aa}++;
+	    push @cdCTs, {codon => $cd, aa => $aa, cts => $codons{$cd}};
+	}
+
+	my $h_cds = 0;
+	foreach my $aa (keys %oneLetterAA) {
+	    my @cds = grep {$_->{aa} eq $aa} @cdCTs; 
+	    $h_cds += &__cd_entropy(\@cds);
+	}
+	print $seq->id, "\t", $seq->length(), "\t", $numCodons, "\t";
+	printf "%.6f\n", $h_genome - $h_cds;
+    }    
+}
+
+sub __cd_entropy {
+    my $ref = shift;
+    my @cd_obj = @$ref;
+    return 0 if @cd_obj <= 1; # single codons (M & W)
+    my $sum = 0;
+    my $h = 0;
+    foreach (@cd_obj) {
+	$sum += $_->{cts};
+    }
+    return 0 unless $sum > 0;
+    foreach (@cd_obj) {
+	$_->{rel_freq} = $_->{cts}/$sum;
+    }
+
+    foreach (@cd_obj) {
+	next unless $_->{rel_freq} > 0;
+	$h -= $_->{rel_freq} * log($_->{rel_freq})/log(2);
+    }
+    return $h;
+}
+
+sub sort_by {
+    my $match = $opts{'sort'};
+    $match =~ /length|id/ || die "Enter 'length' or 'id' to sort.\n";
+    my @seqs;
+
+    while (my $seq = $in->next_seq()) {
+	push @seqs, {id => $seq->display_id, len => $seq->length, seqob => $seq};
+    }
+
+    if ($match eq 'id'){
+	@seqs =  sort {$a->{id} cmp $b->{id}}  @seqs;
+    }
+
+    if ($match eq 'length'){
+	@seqs =  sort {$a->{len} <=> $b->{len}}  @seqs;
+    }
+
+    foreach (@seqs) {
+	$out->write_seq($_->{seqob});
+    }
+}
 
 sub split_cdhit {
     my $cls_file = $opts{'split-cdhit'};
@@ -244,6 +606,14 @@ sub filter_seqs {
         my %id_list = map { $_ => 1 } @selected;    # create a hash from @selected
         while (my $currseq = $in->next_seq) { $filter_dispatch{$callsub}->($action, $match, $currseq, \%id_list) }
         foreach (keys %id_list) { warn "No matches found for '$_'\n" if $id_list{$_} == 1 }
+    }
+    elsif ($tag eq 'file') {
+	open LIST, "<", $value || die "can't find file $value\n";
+	my %list;
+	while(<LIST>) { chomp; $list{$_}++ }
+	close LIST;
+        while (my $currseq = $in->next_seq) { $filter_dispatch{$callsub}->($action, $match, $currseq, \%list) }
+        foreach (keys %list) { warn "No matches found for '$_'\n" if $list{$_} == 1 }
     } else {
         while (my $currseq = $in->next_seq) { $filter_dispatch{$callsub}->($action, $currseq, $value) }
     }
@@ -273,6 +643,7 @@ sub remove_gaps {
     while ($seq = $in->next_seq()) {
         my $string = $seq->seq();
         $string =~ s/-//g;
+        $string =~ s/\.//g;
         my $new_seq = Bio::Seq->new(-id => $seq->id(), -seq => $string);
         $out->write_seq($new_seq)
     }
@@ -304,7 +675,6 @@ sub print_seq_count {
 }
 
 =head2 make_revcom()
-
 Reverse complement. Wraps
 L<Bio::Seq-E<gt>revcom()|https://metacpan.org/pod/Bio::Seq#revcom>.
 
@@ -340,7 +710,25 @@ sub print_subseq {
 sub _internal_stop_or_x {
     my $str = shift;
     $str =~ s/\*$//; # remove last stop
-    return ($str =~ /[X\*]/) ? 1 : 0; # previously missed double **
+    my @internalStops;
+    my @nonStandardAA;
+    while ($str =~ m/\*/g) { # internal stop  # previously missed double **
+	push @internalStops, pos($str);
+    }
+
+    while ($str =~ m/X/g) { # non-standard AA
+	push @nonStandardAA, pos($str);
+    }
+
+    if (@nonStandardAA) {
+	warn "Presence of X at postions:\t", join(";", @nonStandardAA), "\n";
+    }
+
+    if (@internalStops) {
+	warn "Presence of internal stops at postions:\t", join(";", @internalStops), "\n";
+    }
+
+    return @internalStops ? 1 : 0;	
 }
 
 =head2 reading_frame_ops
@@ -367,10 +755,26 @@ sub reading_frame_ops {
 	}
         elsif ($frame == 3) {
                 my @prots = Bio::SeqUtils->translate_3frames($seq);
-                $out->write_seq($_) foreach @prots
+		foreach (@prots) {
+		    my $id = $_->id();
+		    $id =~ /^(\S+)-(\d)F$/;
+		    my ($oriId, $fm) = ($1, $2);
+		    $_->id($oriId . "|+" . ($fm+1));
+		    $out->write_seq($_);
+		}
         } elsif ($frame == 6) {
                 my @prots = Bio::SeqUtils->translate_6frames($seq);
-                $out->write_seq($_) foreach @prots
+		foreach (@prots) {
+		    my $id = $_->id();
+		    $id =~ /^(\S+)-(\d)([RF])$/;
+		    my ($oriId, $fm, $dir) = ($1, $2, $3);
+		    if ($dir eq 'F') {
+			$_->id($oriId . "|+" . ($fm+1));
+		    } else {
+			$_->id($oriId . "|-" . ($fm+1));
+		    }
+		    $out->write_seq($_);
+		}
         } else { warn "Accepted frame arguments: 1, 3, and 6\n"}
     }
 }
@@ -498,6 +902,23 @@ L<Bio::Tools::SeqStats-E<gt>count_codons()|https://metacpan.org/pod/Bio::Tools::
 
 =cut
 
+sub codon_table {
+    my $string = $opts{'codon-table'};
+#    die "bioseq --codon-table atg|M\n" unless $string;
+    my $myCodonTable = Bio::Tools::CodonTable->new();
+    use Bio::Tools::IUPAC;
+    my $iupac = Bio::Tools::IUPAC->new();
+    my %aas = $iupac->iupac_iup(); #print Dumper(\%aas); # T=>T; Z=>E/Q; etc
+#    my %nts = $iupac->iupac(); #print Dumper(\%nts); # M=>A/C; A=>A; etc
+    if ($string =~ /^[atcg]{3}$/i) {
+	print $string, "\t", $myCodonTable->translate($string), "\n";
+    } elsif (&_in_list($string, [keys %aas])) {
+	print $string, "\t", join "\t", $myCodonTable->revtranslate($string), "\n";
+    } else {
+	print $string, "Currently only takes a 3-letter DNA-base codon or a 1-letter uppercase IUPAC aa code";
+    }
+}
+
 sub count_codons {
     my $new_seq;
     my $myCodonTable = Bio::Tools::CodonTable->new();
@@ -521,18 +942,22 @@ genome. Won't work for a eukaryote genbank file.
 
 sub print_gb_gene_feats { # works only for prokaryote genome
     $seq = $in->next_seq();
+    die "$filename: Not a GenBank file. Quit\n" unless $in_format eq 'genbank';
     my $gene_count = 0;
     foreach my $feat ($seq->get_SeqFeatures()) {
-        if ($feat->primary_tag eq 'gene') {
+        if ($feat->primary_tag eq 'CDS') {
 	    my $location = $feat->location();
 	    next if $location->isa('Bio::Location::Split');
-            my $gene_tag = "gene_" . $gene_count++;
+	    my $gene_tag = "gene_" . $gene_count++;
 	    my $gene_symbol = 'na';
+	    my $product = 'na';
             foreach my $tag ($feat->get_all_tags()) {
 		($gene_tag) = $feat->get_tag_values($tag) if $tag eq 'locus_tag';
 		($gene_symbol) = $feat->get_tag_values($tag) if $tag eq 'gene';
+		($product) = $feat->get_tag_values($tag) if $tag eq 'product';
+		$product =~ s/\s/_/g;
 	    }
-            my $gene = Bio::Seq->new(-id => (join "|", ($gene_tag, $feat->start, $feat->end, $feat->strand, $gene_symbol)),
+            my $gene = Bio::Seq->new(-id => (join "|", ($gene_tag, $feat->start, $feat->end, $feat->strand, $gene_symbol, $product)),
 				     -seq=>$seq->subseq($feat->start, $feat->end));
             if ($feat->strand() > 0) { $out->write_seq($gene) } else { $out->write_seq($gene->revcom())}
 #            print join "\t",
@@ -632,6 +1057,15 @@ sub remove_stop {
 
 ####################### internal subroutine ###########################
 
+sub _in_list {
+    my $scalar = shift;
+    my $ref_to_array = shift;
+    foreach (@{$ref_to_array}) {
+	return 1 if $_ eq $scalar;
+    } 
+    return 0;
+}
+
 sub parse_orders {
     my @selected = @{shift()};
 
@@ -669,6 +1103,30 @@ sub _make_sed_file {
 }
 
 ################### pick/delete filters #####################
+
+sub find_by_file {
+    my ($action, $match, $currseq, $id_list) = @_;
+    my $seq_id = $currseq->id();
+    $filter_dispatch{$action . "_by_id"}->($match, $currseq, $id_list, $seq_id)
+}
+
+sub pick_by_file {
+    my ($match, $currseq, $id_list, $seq_id) = @_;
+    if ($id_list->{$seq_id}) {
+        $id_list->{$seq_id}++;
+        die "Multiple matches (" . $id_list->{$seq_id} - 1 . ") for $match found\n" if $id_list->{$seq_id} > 2;
+        $out->write_seq($currseq)
+    }
+}
+
+sub del_by_file {
+    my ($match, $currseq, $id_list, $seq_id) = @_;
+    if ($id_list->{$seq_id}) {
+        $id_list->{$seq_id}++;
+        warn "Deleted sequence: ", $currseq->id(), "\n"
+    } else { $out->write_seq($currseq) }
+}
+
 
 sub find_by_order {
     my ($action, $ct, $currseq, $order_list) = @_; # say join "\t", @_;
@@ -734,7 +1192,7 @@ sub del_by_re {
 sub find_by_ambig {
     my ($action, $currseq, $cutoff) = @_;
     my $string        = $currseq->seq();
-    my $ct            = ($string =~ s/n/n/gi);
+    my $ct            = ($string =~ s/([^ATCG])/$1/gi); # won't work for AA seqs
     my $percent_ambig = $ct / $currseq->length();
     $filter_dispatch{"$action" . "_by_ambig"}->($currseq, $cutoff, $ct, $percent_ambig)
 }
@@ -748,7 +1206,8 @@ sub pick_by_ambig {
 sub del_by_ambig {
     my ($currseq, $cutoff, $ct, $percent_ambig) = @_;
 
-    if ($percent_ambig > $cutoff) { warn "Deleted sequence: ", $currseq->id(), " number of N: ", $ct, "\n" }
+#    if ($percent_ambig > $cutoff) { warn "Deleted sequence: ", $currseq->id(), " number of N: ", $ct, "\n" }
+    if ($ct >= $cutoff) { warn "Deleted sequence: ", $currseq->id(), " number of bad monomers: ", $ct, "\n" }
     else { $out->write_seq($currseq) }
 }
 

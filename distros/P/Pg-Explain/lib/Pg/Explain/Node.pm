@@ -1,10 +1,25 @@
 package Pg::Explain::Node;
+
+# UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
+use v5.14;
 use strict;
+use warnings;
+use warnings qw( FATAL utf8 );
+use utf8;
+use open qw( :std :utf8 );
+use Unicode::Normalize qw( NFC );
+use Unicode::Collate;
+use Encode qw( decode );
+
+if ( grep /\P{ASCII}/ => @ARGV ) {
+    @ARGV = map { decode( 'UTF-8', $_ ) } @ARGV;
+}
+
+# UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
+
 use Clone qw( clone );
 use HOP::Lexer qw( string_lexer );
 use Carp;
-use warnings;
-use strict;
 
 =head1 NAME
 
@@ -12,11 +27,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 0.96
+Version 0.97
 
 =cut
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 =head1 SYNOPSIS
 
@@ -156,6 +171,10 @@ For more details, check ->add_cte method description.
 
 Returns true if given node was not executed, according to plan.
 
+=head2 parent
+
+Parent node of current node, or undef if it's top node.
+
 =head2 explain
 
 Returns Pg::Explain for this node.
@@ -166,22 +185,23 @@ sub actual_loops           { my $self = shift; $self->{ 'actual_loops' }        
 sub actual_rows            { my $self = shift; $self->{ 'actual_rows' }            = $_[ 0 ] if 0 < scalar @_; return $self->{ 'actual_rows' }; }
 sub actual_time_first      { my $self = shift; $self->{ 'actual_time_first' }      = $_[ 0 ] if 0 < scalar @_; return $self->{ 'actual_time_first' }; }
 sub actual_time_last       { my $self = shift; $self->{ 'actual_time_last' }       = $_[ 0 ] if 0 < scalar @_; return $self->{ 'actual_time_last' }; }
+sub cte_order              { my $self = shift; $self->{ 'cte_order' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'cte_order' }; }
+sub ctes                   { my $self = shift; $self->{ 'ctes' }                   = $_[ 0 ] if 0 < scalar @_; return $self->{ 'ctes' }; }
 sub estimated_rows         { my $self = shift; $self->{ 'estimated_rows' }         = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_rows' }; }
 sub estimated_row_width    { my $self = shift; $self->{ 'estimated_row_width' }    = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_row_width' }; }
 sub estimated_startup_cost { my $self = shift; $self->{ 'estimated_startup_cost' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_startup_cost' }; }
 sub estimated_total_cost   { my $self = shift; $self->{ 'estimated_total_cost' }   = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_total_cost' }; }
+sub explain                { my $self = shift; $self->{ 'explain' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'explain' }; }
 sub extra_info             { my $self = shift; $self->{ 'extra_info' }             = $_[ 0 ] if 0 < scalar @_; return $self->{ 'extra_info' }; }
-sub workers_launched       { my $self = shift; $self->{ 'workers_launched' }       = $_[ 0 ] if 0 < scalar @_; return $self->{ 'workers_launched' }; }
-sub workers                { my $self = shift; $self->{ 'workers' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'workers' } || 1; }
 sub initplans              { my $self = shift; $self->{ 'initplans' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'initplans' }; }
 sub never_executed         { my $self = shift; $self->{ 'never_executed' }         = $_[ 0 ] if 0 < scalar @_; return $self->{ 'never_executed' }; }
-sub explain                { my $self = shift; $self->{ 'explain' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'explain' }; }
+sub parent                 { my $self = shift; $self->{ 'parent' }                 = $_[ 0 ] if 0 < scalar @_; return $self->{ 'parent' }; }
 sub scan_on                { my $self = shift; $self->{ 'scan_on' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'scan_on' }; }
 sub sub_nodes              { my $self = shift; $self->{ 'sub_nodes' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'sub_nodes' }; }
 sub subplans               { my $self = shift; $self->{ 'subplans' }               = $_[ 0 ] if 0 < scalar @_; return $self->{ 'subplans' }; }
 sub type                   { my $self = shift; $self->{ 'type' }                   = $_[ 0 ] if 0 < scalar @_; return $self->{ 'type' }; }
-sub ctes                   { my $self = shift; $self->{ 'ctes' }                   = $_[ 0 ] if 0 < scalar @_; return $self->{ 'ctes' }; }
-sub cte_order              { my $self = shift; $self->{ 'cte_order' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'cte_order' }; }
+sub workers_launched       { my $self = shift; $self->{ 'workers_launched' }       = $_[ 0 ] if 0 < scalar @_; return $self->{ 'workers_launched' }; }
+sub workers                { my $self = shift; $self->{ 'workers' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'workers' } || 1; }
 
 =head2 new
 
@@ -332,12 +352,13 @@ Example of plan with subplan:
 =cut
 
 sub add_subplan {
-    my $self = shift;
+    my $self  = shift;
+    my @nodes = map { $_->parent( $self ); $_ } @_;
     if ( $self->subplans ) {
-        push @{ $self->subplans }, @_;
+        push @{ $self->subplans }, @nodes;
     }
     else {
-        $self->subplans( [ @_ ] );
+        $self->subplans( [ @nodes ] );
     }
     return;
 }
@@ -362,12 +383,13 @@ Example of plan with initplan:
 =cut
 
 sub add_initplan {
-    my $self = shift;
+    my $self  = shift;
+    my @nodes = map { $_->parent( $self ); $_ } @_;
     if ( $self->initplans ) {
-        push @{ $self->initplans }, @_;
+        push @{ $self->initplans }, @nodes;
     }
     else {
-        $self->initplans( [ @_ ] );
+        $self->initplans( [ @nodes ] );
     }
     return;
 }
@@ -385,6 +407,8 @@ Since we need order (ctes are stored unordered, in hash), there is also $node->c
 sub add_cte {
     my $self = shift;
     my ( $name, $cte ) = @_;
+    $cte->parent( $self );
+
     if ( $self->ctes ) {
         $self->ctes->{ $name } = $cte;
         push @{ $self->cte_order }, $name;
@@ -432,12 +456,13 @@ Node 'Limit' has 1 sub_plan, which is "Seq Scan"
 =cut
 
 sub add_sub_node {
-    my $self = shift;
+    my $self  = shift;
+    my @nodes = map { $_->parent( $self ); $_ } @_;
     if ( $self->sub_nodes ) {
-        push @{ $self->sub_nodes }, @_;
+        push @{ $self->sub_nodes }, @nodes;
     }
     else {
-        $self->sub_nodes( [ @_ ] );
+        $self->sub_nodes( [ @nodes ] );
     }
     return;
 }
@@ -550,6 +575,42 @@ sub all_subnodes {
     push @nodes, @{ $self->initplans }   if $self->initplans;
     push @nodes, @{ $self->subplans }    if $self->subplans;
     push @nodes, values %{ $self->ctes } if $self->ctes;
+    return @nodes;
+}
+
+=head2 all_recursive_subnodes
+
+Returns list of all subnodes of current node and its subnodes, and their subnodes, and ...
+
+=cut
+
+sub all_recursive_subnodes {
+    my $self  = shift;
+    my @nodes = ();
+    push @nodes, @{ $self->sub_nodes }   if $self->sub_nodes;
+    push @nodes, @{ $self->initplans }   if $self->initplans;
+    push @nodes, @{ $self->subplans }    if $self->subplans;
+    push @nodes, values %{ $self->ctes } if $self->ctes;
+
+    return map { $_, $_->all_recursive_subnodes } @nodes;
+}
+
+=head2 all_parents
+
+Returns list of all nodes that are "above" given node in explain.
+
+List can be empty if it's top level node.
+
+=cut
+
+sub all_parents {
+    my $self    = shift;
+    my @nodes   = ();
+    my $current = $self;
+    while ( my $next = $current->parent ) {
+        unshift @nodes, $next;
+        $current = $next;
+    }
     return @nodes;
 }
 

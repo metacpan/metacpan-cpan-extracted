@@ -1,8 +1,11 @@
 # -*- Mode: CPerl -*-
+#use lib qw(. ../lib);
+
 use Test::More;
-use lib qw(. ../lib);
 use DDC::Any qw(:none);
 use File::Basename;
+use lib '.'; ##-- for perl 5.26 (--> '.' is no longer in @INC; did you mean do "./t/parseme.pl"?)
+use strict;
 no warnings 'once';
 
 if (!DDC::Any->have_xs()) {

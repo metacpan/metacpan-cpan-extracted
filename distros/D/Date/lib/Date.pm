@@ -4,7 +4,7 @@ use Date::Rel;
 use XS::Framework;
 use XS::Install::Payload;
 
-our $VERSION = '5.0.2';
+our $VERSION = '5.0.3';
 
 XS::Loader::bootstrap();
 
@@ -12,6 +12,7 @@ __init__();
 
 sub __init__ {
     use_embed_zones() unless tzsysdir(); # use embed zones by default where system zones are unavailable
+    *Date::errc:: = *Date::Error::;
 }
 
 Export::XS::Auto->import(

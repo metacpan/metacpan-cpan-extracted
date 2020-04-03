@@ -28,5 +28,7 @@ t/scripts/s10-expected.js
 t/scripts/s10.js
 t/scripts/s11-expected.js
 t/scripts/s11.js
+t/scripts/s12-expected.js
+t/scripts/s12.js
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,13 @@
 #-*- Mode: ChangeLog -*-
 
+v0.24 Fri, 03 Apr 2020 11:21:40 +0200 moocow
+	* added support for DDC v2.2.3
+	  - attribute get/set bool QueryCompiler::KeepLexerComments
+	  - attribute get/set array QueryOptions::LexerComments
+	  - method QueryOptions::ClearComments()
+	  - tests for lexer-comments in t/09_qcomments.t
+	* added t/08_qparse.t to MANIFEST (had been missing)
+
 v0.23 Thu, 09 Jan 2020 14:53:21 +0100 moocow
 	* added quick&dirty thread-safety class-method DDC::XS::Object::CLONE_SKIP a lka https://perldoc.perl.org/perlmod.html#Making-your-module-threadsafe
 

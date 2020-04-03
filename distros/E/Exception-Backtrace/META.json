@@ -28,7 +28,7 @@
             "XS::Framework" : "v1.2.9",
             "XS::Install" : "v1.2.16",
             "XS::libdwarf" : "20200114.6",
-            "XS::libpanda" : "v1.3.13",
+            "XS::libpanda" : "v1.3.14",
             "next::XS" : "v1.0.7"
          }
       },
@@ -37,7 +37,7 @@
             "XS::Framework" : "v1.2.9",
             "XS::Install" : "v1.2.16",
             "XS::libdwarf" : "20200114.6",
-            "XS::libpanda" : "v1.3.13",
+            "XS::libpanda" : "v1.3.14",
             "next::XS" : "v1.0.7",
             "perl" : "5.022000"
          }
@@ -50,12 +50,12 @@
             "Test::Warnings" : "0",
             "XS::Framework" : "v1.2.9",
             "XS::libdwarf" : "20200114.6",
-            "XS::libpanda" : "v1.3.13",
+            "XS::libpanda" : "v1.3.14",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.1",
+   "version" : "v1.0.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -23,7 +23,7 @@ Net::IPAM::Block - A library for reading, formatting, sorting and converting IP-
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.03';
 
 our $MaxCIDRSplit = 1 << 20;
 
@@ -69,7 +69,7 @@ Example for valid input strings:
  2001:db8::1-2001:db8::ff00:35
  192.168.2.3-192.168.7.255
 
-If a begin-end range can be represented as a CIDR, new() calculates the netmask and returns the range as CIDR block with a proper mask_ip.
+If a begin-end range can be represented as a CIDR, new() calculates the netmask and returns the range as CIDR block with a proper mask.
 
 Plain IP addresses as input strings or objects are converted to /32 or /128 CIDRs.
 
@@ -631,10 +631,9 @@ sub _contains_block {
 
 =head2 find_free_cidrs
 
-  @cidrs = $outer->find_free_cidrs(@inner)
+  @free = $outer->find_free_cidrs(@inner)
 
-Returns all free CIDR blocks (of max possible bitlen) within given CIDR, minus the inner CIDR blocks.
-Croaks if inner blocks are no subset of (or not equal to) outer block.
+Returns all free cidrs within given block, minus the inner blocks.
 
   my $outer = Net::IPAM::Block->new("192.168.2.0/24");
   my @inner = (
@@ -653,21 +652,13 @@ sub find_free_cidrs {
   my $outer = shift;
   my @inner = @_;
 
-  croak "outer block isn't a CIDR," unless $outer->is_cidr;
-  croak "missing inner blocks," unless scalar @inner;
+  return $outer unless scalar @inner;
 
-  # all blocks must be a subset of $self (or equal, but then there will be no free block)
-  # croaks naturally on IP version mismatch
-  foreach my $block (@_) {
-    croak sprintf( "%s is no subset nor equal to outer block %s,", $block->to_string, $outer->to_string )
-      unless $outer->contains($block) || $outer->cmp($block) == 0;
-  }
-
-  # collect free CIDRs
+  # collect free blocks
   my @free;
 
   # start with outer block, split them to find free cidrs
-  my @candidates = ($outer);
+  my @candidates = ($outer->to_cidrs);
 
   while (@candidates) {
     my $this = shift @candidates;
@@ -909,6 +900,7 @@ TODO
 =head1 SEE ALSO
 
 L<Net::IPAM::IP>
+L<Net::IPAM::Tree>
 
 =head1 LICENSE AND COPYRIGHT
 

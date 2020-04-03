@@ -17,13 +17,14 @@ my $builder = Module::Build->new(
         'Test::More' => '0',
     },
     requires => {
-        'List::MoreUtils'  => '0',
-        'Scalar::Util'     => '0',
-        'Net::IPAM::IP'    => '0',
-        'Net::IPAM::Block' => '0',
+      'perl'             => '5.10.0',
+      'List::MoreUtils'  => '0.420_001',
+      'Scalar::Util'     => '1.39',
+      'Net::IPAM::IP'    => '0',
+      'Net::IPAM::Block' => '0',
 
-        #'Foo::Bar::Module' => '5.0401',
-    },
+      #'Foo::Bar::Module' => '5.0401',
+      },
     add_to_cleanup => ['Net-IPAM-Tree-*'],
 );
 

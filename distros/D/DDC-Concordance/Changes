@@ -2,6 +2,9 @@
 ##
 ## Change log for perl distribution DDC-Concordance
 
+v0.45 Fri, 03 Apr 2020 13:25:41 +0200 moocow
+	+ added DDC::PP support for ddc v2.2.3 (subcorpus paths, lexer-comment retention)
+
 v0.44 Mon, 09 Mar 2020 12:21:57 +0100 moocow
 	+ added global variable $DDC::Client::JSON_BACKEND - workaround for JSON::XS with perl threads
 	+ added DDC::Client methods parseAddr(), addrStr() for URL-specification of connect parameters
@@ -12,7 +15,7 @@ v0.43 Thu, 19 Sep 2019 14:47:12 +0200 moocow
 	+ added DDC::Client support for UNIX-domain sockets (tested with socat wrappers)
 
 v0.42 Fri, 24 Aug 2018 11:15:38 +0200 moocow
-	+ added DDC:PP support for ddc v2.1.16 (~DDC::XS v0.21) lexer-comments "#[...]", "#:...\n" and parsed comments #CMT '...'
+	+ added DDC::PP support for ddc v2.1.16 (~DDC::XS v0.21) lexer-comments "#[...]", "#:...\n" and parsed comments #CMT '...'
 
 v0.41 Fri, 09 Mar 2018 09:48:31 +0100 moocow
 	+ DDC::Client::Distributed is now just a dummy wrapper for DDC::Client

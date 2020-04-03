@@ -1,5 +1,8 @@
 Revision history for JavaScript-Packer
 
+2.06       2020-04-03
+    - Fix regex when when character ord matches 65 (GH #8, thanks to @r3hp1c)
+
 2.05       2020-02-04
     - Fix regex when "best" compression matches ord check equal to 57 (GH #6, thanks to @r3hp1c)
 

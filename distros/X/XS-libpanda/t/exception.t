@@ -6,8 +6,9 @@ use Config;
 use Test::More;
 use Test::Catch;
 
-plan skip_all => 'backtrace is not supported on 32bit systems' unless $Config{ivsize} == 8;
-plan skip_all => 'available for linux only' unless $^O eq 'linux';
+#    *bsd 32bit: libunwind: EHHeaderParser::decodeTableEntry: bad fde: CIE ID is not zero
+# other: should be ok
+plan skip_all => 'backtrace is not supported on 32bit systems' if ($Config{ptrsize} == 4) && ($^O =~ /(bsd)/);
 
 catch_run('[exception]');
 

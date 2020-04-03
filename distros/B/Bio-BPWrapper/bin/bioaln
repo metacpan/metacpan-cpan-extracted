@@ -32,6 +32,7 @@ GetOptions(
     "consensus|C:50",
     "delete|d=s",
     "dna2pep|D",
+    "gap-char=s",
     "gap-states",
     "gap-states2",
     "input|i=s",
@@ -42,6 +43,7 @@ GetOptions(
     "no-gaps|g",
     "num-seq|n",
     "output|o=s",
+    "pair-diff", # pairwise sequence diff
     "pep2dna|P=s",
     "permute-states|M",
     "phy-nonint", # non-interleaved phylip (for e.g.,clique)
@@ -262,6 +264,10 @@ Delete sequences based on their ids. Option takes a comma-separated list of ids.
 
 Turn an in-frame protein-coding sequence alignment to a corresponding protein alignment.
 
+=item --gap-char '.'
+
+Change '.' (e.g., from BCFtools, which causes problem for --uniq-seq) to default gap character '-'
+
 =item --gap-states
 
 Prints one alignment gap per line, including its start, end, whether in-frame, whether on-edge, how many copies, and alignment length. (Can't remember what context this was developed at first; ignore)
@@ -272,9 +278,11 @@ Prints one alignment gap per column, including its start-end as column heading a
 
 =item --input, -i 'format'
 
-Specify input file format. Common ones include 'clustalw' (default), 'fasta' and 'phylip'. See L<Bio::AlignIO> for supported formats.
+Now it tries to guess the format. BLAST outputs still need to be specified
 
-In addition, it reads NCBI-blast outputs as well. The preferred output format is 'blastxml' (-outfmt 5). e.g., bioaln -i'blastxml' blast.out.
+[Deprecated except for blast output] Specify input file format. Common ones include 'clustalw' (default), 'fasta' and 'phylip'. See L<Bio::AlignIO> for supported formats.
+
+In addition, it reads NCBI-blast outputs as well. e.g., bioaln -i'blast' blast.out.
 
 =item --length, -l
 
@@ -322,6 +330,10 @@ Print number of sequences in alignment.
 =item --output, -o 'format'
 
 Output file format. Common ones include 'clustalw' (default), 'fasta' and 'phylip'. See L<Bio::AlignIO> for supported formats. An additional format 'paml' is supported.
+
+=item --pair-diff
+
+Print pairwise sequence differences, including columns: seqA, seqB, num_variable_sites (no gap), num_pair_diff (no gap), total_pair_length (no gap), percent identity, fraction diff, and pair_diff/num_variable
 
 =item --pep2dna, -P 'unaligned-cds-file' <protein_alignment>
 

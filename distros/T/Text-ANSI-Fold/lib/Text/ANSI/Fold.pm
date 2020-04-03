@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -30,7 +30,12 @@ sub ansi_fold {
 my $alphanum_re = qr{ [_\d\p{Latin}] }x;
 my $reset_re    = qr{ \e \[ [0;]* m (?: \e \[ [0;]* [mK])* }x;
 my $color_re    = qr{ \e \[ [\d;]* [mK] }x;
-my $control_re  = qr{ \e \] [\;\:\/0-9a-z]* \e \\ }x;
+my $control_re  = qr{
+    # see ECMA-48 8.3.89 OSC - OPERATING SYSTEM COMMAND
+    \e \]			# osc
+    [\x08-\x13\x20-\x7d]*+	# command
+    \e \\			# st
+}x;
 
 use constant SGR_RESET => "\e[m";
 
@@ -361,11 +366,11 @@ sub chops {
 	for my $w (@{$width}) {
 	    if ($w == 0) {
 		push @chops, '';
-		next;
 	    }
-	    if ((my $chop = $obj->retrieve(width => $w)) ne '') {
+	    elsif ((my $chop = $obj->retrieve(width => $w)) ne '') {
 		push @chops, $chop;
-	    } else {
+	    }
+	    else {
 		last;
 	    }
 	}
@@ -652,6 +657,10 @@ ANSI escape code definition.
 
 Requirements for Japanese Text Layout,
 W3C Working Group Note 3 April 2012
+
+=item <http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf>
+
+Control Functions for Coded Character Sets
 
 =back
 

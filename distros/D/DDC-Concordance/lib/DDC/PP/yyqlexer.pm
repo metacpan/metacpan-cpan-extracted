@@ -40,6 +40,11 @@ BEGIN {
   $DEF{symbol_cescape} = '(?:\\\\.)';
   $DEF{symbol_text}    = "(?:$DEF{symbol_cescape}|$DEF{symbol_cfirst})(?:$DEF{symbol_cescape}|$DEF{symbol_crest})*";
 
+  ##-- subcorpus symbols (ddc >= v2.2.0; also allow '!' here)
+  $DEF{corpus_cfirst} =	'[^ \t\n\r\f\v\0&|?^%,:;#=~(){}<>\[\]\\\'\"$@]';
+  $DEF{corpus_crest}  =	'[^ \t\n\r\f\v\0&|?^%,:;#=~(){}<>\[\]\\\'\"]';
+  $DEF{corpus_text}   =	"(?:$DEF{symbol_cescape}|$DEF{corpus_cfirst})(?:$DEF{symbol_cescape}|$DEF{corpus_crest})*";
+
   ##-- bareword index names (underscore and digits ok, but no '.', '-', or '+')
   $DEF{index_char} = '[^ \t\n\r\f\x0b\0&|!?^%,:;#*=~(){}<>\[\]\\\\/\'\".$@+-]';
   $DEF{index_name} = "(?:$DEF{index_char}|$DEF{symbol_cescape})+";
@@ -98,6 +103,9 @@ sub new {
 		   yytype=>undef,
 		   yylineno=>undef,
 
+		   ##-- lexer comment retention hacks
+		   comments=>[],
+
 		   ##-- user args
 		   @_
 		  },
@@ -113,6 +121,8 @@ sub clear {
   delete @$lex{qw(src fh bufr bufp buf yytext yytype yylineno)};
   $lex->{state} = 'INITIAL';
   @{$lex->{stack}} = qw();
+  @{$lex->{comments}} = qw();
+  delete $lex->{_cmtbuf};
   return $lex;
 }
 BEGIN { *reset = *close = \&clear; }
@@ -309,8 +319,8 @@ sub yylex {
 	if    ($$bufr =~ m/\G\z/)	{ $type = '__EOF__'; }
 
 	##-- comments
-	elsif ($$bufr =~ m/\G\#:[^\n]*/sp)	{ $type='__SKIP__'; }
-	elsif ($$bufr =~ m/\G\#\[/p)		{ $type='__SKIP__'; $lex->yypushq('Q_COMMENT'); }
+	elsif ($$bufr =~ m/\G\#:[^\n]*/sp)	{ $type='__SKIP__'; push(@{$lex->{comments}},${^MATCH}."\n"); }
+	elsif ($$bufr =~ m/\G\#\[/p)		{ $type='__SKIP__'; $lex->{_cmtbuf}=${^MATCH}; $lex->yypushq('Q_COMMENT'); }
 
 	##-- operators
 	elsif ($$bufr =~ m/\G\&\&/p)	{ $type = 'OP_BOOL_AND'; }
@@ -377,9 +387,12 @@ sub yylex {
 	elsif ($$bufr =~ m/\G\@\{/p)				{ $type = 'AT_LBRACE'; }	##-- literal-set operator
 	elsif ($$bufr =~ m/\G\*\{/p)				{ $type = 'STAR_LBRACE'; }	##-- prefix-set opener
 	elsif ($$bufr =~ m/\G\}\*/p)				{ $type = 'RBRACE_STAR'; }	##-- suffix-set closer
-	elsif ($$bufr =~ m/\G[!.,:;=@%^#~\/]/p)			{ $type = ${^MATCH}; } ##-- single-char punctuation operators
+	elsif ($$bufr =~ m/\G[!.,;=@%^#~\/]/p)			{ $type = ${^MATCH}; } ##-- single-char punctuation operators
 	elsif ($$bufr =~ m/\G[\[\]{}()<>]/p)			{ $type = ${^MATCH}; } ##-- parentheses
 	elsif ($$bufr =~ m/\G\"/p)				{ $type = ${^MATCH}; } ##-- double-quotes
+
+	##-- subcorpus path-lists
+	elsif ($$bufr =~ m/\G\:/p)				{ $type = ${^MATCH}; $lex->{state}='Q_CORPORA'; }
 
 	##-- truncated symbols
 	elsif ($$bufr =~ m/\G\*\'($DEF{sq_text})\'\*/po) { $type='INFIX';  $text=$1; }	##-- dual-truncated quoted string (infix symbol)
@@ -433,9 +446,25 @@ sub yylex {
 	$match = ${^MATCH} if (!defined($match));
       }
       ##------------------------
+      elsif ($lex->{state} eq 'Q_CORPORA') {
+	if    ($$bufr =~ m/\G$DEF{corpus_text}/p)	{ $type='SYMBOL'; }
+	elsif ($$bufr =~ m/\G\'($DEF{sq_text})\'/po)	{ $type='SYMBOL'; $text=$1; }
+	elsif ($$bufr =~ m/\G\,/p)			{ $type=${^MATCH}; }
+	elsif ($$bufr =~ m/\G\s+/p)			{ $type='__SKIP__'; }
+	else						{ $type='__SKIP__'; $lex->yypopq(); }
+
+	$match = ${^MATCH};
+      }
+      ##------------------------
       elsif ($lex->{state} eq 'Q_COMMENT') {
-	if    ($$bufr =~ m/\G\]/p)		    { $type='__SKIP__'; $lex->yypopq(); }
-	elsif ($$bufr =~ m/\G$DEF{comment_text}/sp) { $type='__SKIP__';  }
+	if    ($$bufr =~ m/\G\]/p)		    {
+	  $type='__SKIP__';
+	  $lex->{_cmtbuf} .= ${^MATCH};
+	  push(@{$lex->{comments}}, $lex->{_cmtbuf});
+	  delete $lex->{_cmtbuf};
+	  $lex->yypopq();
+	}
+	elsif ($$bufr =~ m/\G$DEF{comment_text}/sp) { $type='__SKIP__'; $lex->{_cmtbuf} .= ${^MATCH}; }
 	else                                        { $type='__ERROR__'; }
 
 	$match = ${^MATCH};

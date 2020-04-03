@@ -31,7 +31,7 @@ use Bio::Tree::Node;
 use Bio::Tree::TreeFunctionsI;
 use Data::Dumper;
 use POSIX;
-
+use List::Util qw(shuffle);
 if ($ENV{'DEBUG'}) { use Data::Dumper }
 
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -71,6 +71,86 @@ sub initialize {
     foreach (@nodes) { push @otus, $_ if $_->is_Leaf }
 }
 
+sub reorder_by_ref {
+    die "reference node id missing\n" unless $opts{'ref'};
+    my $id = 0;
+    &_flip_if_not_in_top_clade($rootnode, $opts{'ref'}, \$id);
+    $print_tree = 1;
+}
+
+sub _flip_if_not_in_top_clade { # by resetting creation_id & sortby option of each_Descendent
+    my ($nd, $ref, $refid) = @_;
+    $nd->_creation_id($$refid++);
+#    print STDERR $nd->internal_id(), ":\t";
+    if ($nd->is_Leaf()) {
+#	print STDERR "\n";
+	return }
+    my @des = $nd->each_Descendent();
+    my @des_reordered;
+    for (my $i=0; $i<=$#des; $i++) {
+	my $in_des = 0;
+	my $id = $des[$i]->internal_id();
+	my @otus = &_each_leaf($des[$i]);
+	foreach (@otus) { $in_des = 1 if $ref eq $_->id }
+#	print STDERR join("|", map { $_->id } @otus), " => ", $in_des, ";";
+	if ($in_des) {
+	    unshift @des_reordered, $des[$i];
+	} else {
+	    push @des_reordered, $des[$i];
+	}
+    }
+    foreach (@des_reordered) {
+	$_->_creation_id($$refid++);
+#	print STDERR $_->internal_id(), ";";
+    }
+#    print STDERR "\n";
+    my @des_new = $nd->each_Descendent('creation'); # key sort function!!
+    foreach my $de (@des_new) {
+	&_flip_if_not_in_top_clade($de, $opts{'ref'}, $refid);
+    }
+}
+
+sub cut_tree {
+    my @otu_hts;
+    $rootnode->{height} = 0;
+    foreach my $nd (@nodes) {
+	my $ht = &distance_to_root($nd);
+	$nd->{height} = $ht;
+	push @otu_hts, $ht if $nd->is_Leaf;
+    }
+
+    @otu_hts = sort {$a <=> $b} @otu_hts;
+    my $least_otu_height = shift @otu_hts;
+    my $cut = $opts{'cut-tree'} || 0.5 * $least_otu_height; # default to cut the branches traversing the line that is 1/2 of least deep OTU
+    die "Cut tree at $cut, greater than least-deep OTU ($least_otu_height). Lower cut value.\n" if $cut >= $least_otu_height;
+
+    my @cut_nodes;
+    my $group_ct = 0;
+    &identify_nodes_to_cut_by_walk_from_root($rootnode, \$cut, \@cut_nodes, \$group_ct);
+    foreach my $cutnode (@cut_nodes) {
+	print $cutnode->is_Leaf() ? "cut_otu" : $cutnode->id(), ":\t";
+	print join "\t", map {$_->id()} &_each_leaf($cutnode);
+	print "\n";
+    }
+    $print_tree = 1;
+}
+
+
+sub identify_nodes_to_cut_by_walk_from_root {
+    my $node = shift;
+    my $ref_cut = shift;
+    my $ref_group = shift;
+    my $ref_ct = shift;
+    return if $node->{height} > $$ref_cut; # node too high
+    foreach my $des ($node->each_Descendent() ) {
+        if ($des->{height} > $$ref_cut) {  # found a branch to cut: parent height < $cut & child height > $cut
+            $des->id("cut_" . $$ref_ct++) unless $des->is_Leaf;
+            push @$ref_group, $des
+        }
+        &identify_nodes_to_cut_by_walk_from_root($des, $ref_cut, $ref_group, $ref_ct); # node too low
+    }
+}
+
 sub label_selected_nodes {
     my $label_file = $opts{'label-selected-nodes'}; # each line consists of internal_id label
     my %labs;
@@ -92,6 +172,30 @@ sub label_selected_nodes {
     }
     $print_tree = 1
 }
+
+sub rename_tips {
+    my $label_file = $opts{'rename-tips'}; # each line consists of internal_id label
+    my %labs;
+    open LAB, "<", $label_file || die "label file not found\n";
+    while(<LAB>) {
+	chomp;
+	my ($a, $b) = split;
+	$labs{$a} = $b;
+    }
+    close LAB;
+    foreach my $nd (@nodes) {
+	next unless $nd->is_Leaf;
+	my $old = $nd->id();
+	if ($labs{$nd->id}) {
+	    $nd->id($labs{$nd->id});
+	    warn "Success: old tip $old changed to new name\t", $nd->id(), "\n";
+	} else {
+	    warn "Failed: old tip $old not changed\n";
+	}
+    }
+    $print_tree = 1
+}
+
 
 sub write_tab_tree{
 #    print "*" x 200, "\n";
@@ -412,7 +516,30 @@ sub edge_length_abundance {
     }
 }
 
-sub swap_otus {
+=for comment
+# Needs work
+sub rotate_an_in_node {
+    my $nd_id = $opts{'rotate-node'};
+    my $ref_node = $tree->find_node(-id => $nd_id) || $tree->find_node(-internal_id => $nd_id) || die "node not found\n";
+    my $pa_node = $ref_node->ancestor();
+    $pa_node->each_Descendent($nd_id) || 'die: not an internal node\n';
+#    $ref_node->each_Descendent( sub { shuffle(@des) } );
+    $print_tree = 1;
+#}
+## Not working
+#sub sort_child { # sort by height
+#    my $by = $opts{'sort-child'} || 'height';
+#    foreach my $nd (@nodes) {
+#	next if $nd->is_Leaf;
+#	my @des = $nd->each_Descendent();
+#	$nd->each_Descendent($by);
+#    $ref_node->each_Descendent( sub { shuffle(@des) } );
+#   }
+#    $print_tree = 1;
+#}
+=cut
+
+sub swap_otus { # don't know why
     my @otus;
     my $otu_ct = 0;
     foreach (@nodes) {
@@ -490,7 +617,8 @@ sub reroot {
     my $outgroup_id = $opts{'reroot'};
     my $outgroup    = $tree->find_node($outgroup_id);
 #    my $newroot     = $outgroup->create_node_on_branch(-FRACTION => 0.5, -ANNOT => {id => 'newroot'});
-    $tree->reroot($outgroup);
+#    $tree->reroot($outgroup);
+    $tree->reroot_at_midpoint($outgroup);
     $print_tree = 1;
 }
 
@@ -788,6 +916,12 @@ sub delete_low_boot_support {
    $print_tree = 1;
 }
 
+sub delete_short_branch {
+   my $cutoff = $opts{'del-short-br'} || die 'spcify cutoff, e.g., 0.02\n'; # default 0.02
+   &_remove_short_branch($rootnode, $cutoff);
+   $print_tree = 1;
+}
+
 sub mid_point_root {
     my $node1;
     my $maxL=0;
@@ -847,15 +981,19 @@ Call this after calling C<#initialize(\%opts)>.
 
 sub write_out {
     my $opts = shift;
+    rename_tips() if $opts->{'rename-tips'};
     write_tab_tree() if $opts->{'as-text'};
+    cut_tree() if $opts->{'cut-tree'};
     mid_point_root() if $opts->{'mid-point'};
     pars_binary() if $opts->{'ci'};
     getdistance() if $opts->{'dist'};
     delete_low_boot_support() if $opts->{'del-low-boot'};
+    delete_short_branch() if $opts->{'del-short-br'};
     say $tree->total_branch_length() if $opts->{'length'};
     countOTU() if $opts->{'otus-num'};
     $print_tree = 1 if defined($opts->{'output'});
     reroot() if $opts->{'reroot'};
+    reorder_by_ref() if $opts->{'ref'};
     subset() if $opts->{'subset'};
     print_leaves_lengths() if $opts->{'otus-all'};
     getlca() if $opts->{'lca'};
@@ -866,6 +1004,8 @@ sub write_out {
     print_all_lengths() if $opts->{'length-all'};
     random_tree() if defined($opts->{'random'});
     depth_to_root() if $opts->{'depth'};
+    rotate_an_in_node() if $opts->{'rotate-node'};
+#    sort_child() if $opts->{'sort-child'};
     alldesc() if $opts->{'otus-desc'};
     walk() if $opts->{'walk'};
     multi2bi() if $opts->{'multi2bi'};
@@ -901,6 +1041,22 @@ sub _remove_branch {
     }
 }
 
+sub _remove_short_branch {
+    my $nd = shift;
+    my $brcut = shift;
+    return if $nd->is_Leaf();
+    my @desc = $nd->each_Descendent();
+    my $pa = $nd->ancestor();
+    foreach my $ch (@desc) {
+        if ($nd->branch_length() && $nd->branch_length() <= $brcut) {
+            $pa->remove_Descendent($nd); # remove the current node
+            $pa->add_Descendent($ch); # elevate the child node
+            $ch->branch_length($ch->branch_length() + $nd->branch_length()); # increment branch length
+        }
+        &_remove_short_branch($ch, $brcut);
+    }
+}
+
 sub _name2node {
     my $str = shift;
     my @node_names = split /\s*,\s*/, $str;
@@ -908,7 +1064,7 @@ sub _name2node {
     my @node_objects;
     for my $node_name (@node_names) {
         $nd = $tree->find_node(-id => $node_name) || $tree->find_node(-internal_id => $node_name);
-        if ($nd) { push @node_objects, $nd } else { say "Node/leaf '$node_name' not found. Ignoring..." }
+        if ($nd) { push @node_objects, $nd } else { warn "Node/leaf '$node_name' not found. Ignoring...\n" }
     }
     return @node_objects
 }
@@ -916,6 +1072,7 @@ sub _name2node {
 # _each_leaf ($node): returns a list of all OTU's descended from this node, if any
 sub _each_leaf {
 	my @leaves;
+	return $_[0] if $_[0]->is_Leaf;
 	for ($_[0]->get_all_Descendents) { push (@leaves, $_) if $_->is_Leaf }
 	return @leaves
 }

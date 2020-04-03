@@ -1,3 +1,8 @@
+1.0.2    02.04.2020
+    - fix tests on FreeBSD with new XS::libpanda
+    - slightly improve performance on traces symbolization
+    - respect effective stash name (can be set via Sub::Name)
+
 1.0.1    24.03.2020
     - bugfix: the library in perl call is called sub package, not callee
     - disable some tests on NetBSD

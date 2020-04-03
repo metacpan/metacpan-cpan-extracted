@@ -4,7 +4,7 @@
       "Steve Kemp <steve@steve.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -75,8 +75,8 @@
       ],
       "repository" : {
          "url" : "https://github.com/skx/chronicle2.git"
-      },
-      "x_GitMirror" : "http://git.steve.org.uk/cpan/chronicle2"
+      }
    },
-   "version" : "v5.1.7"
+   "version" : "v5.1.8",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

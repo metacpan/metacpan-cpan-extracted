@@ -36,7 +36,7 @@ use List::Util qw(shuffle sum);
 use Bio::Tools::CodonTable;
 use Data::Dumper;
 use Exporter ();
-
+#use Bio::Tools::GuessSeqFormat;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
 
 @ISA         = qw(Exporter);
@@ -51,7 +51,7 @@ snp_coding_log print_num_snps
 );
 
 # Package global variables
-my ($opts,     $flags,       $aln_file, $aln,         $in,
+my ($opts,     $aln_file, $aln,         $in,
     $pop,      $sample_size, $stat_obj, @stats,       $sim,
     $sim_type, @ingroups,     @outgroups, $dist_method, $dna_stats,
     $pop_stats, @var_sites, @exgroups, $ingroup, $outgroup, $pop_cds,
@@ -91,32 +91,45 @@ $myCodonTable  = Bio::Tools::CodonTable->new( -id => 11 );
 ## TODO DNAStatistics subs
 
 sub initialize {
-    ($opts, $flags) = @_;
+#    ($opts, $flags) = @_;
+    $opts = shift;
     Bio::BPWrapper::common_opts($opts);
-
     $aln_file = shift @ARGV || "STDIN";    # If no more arguments were given on the command line, assume we're getting input from standard input
+#    my $guesser;
+#    if ($aln_file eq "STDIN") {
+#	my $lines; 
+#	my $line_ct = 0; 
+#	while(<>) { $lines .= $_; $line_ct++; last if $line_ct >= 100 } # read the first 100 lines
+#	$guesser = Bio::Tools::GuessSeqFormat->new( -text => $lines );
+#   } else {
+#	$guesser = Bio::Tools::GuessSeqFormat->new( -file => $aln_file);
+#    }
 
-    my $in_format = $flags->{"input"} // 'fasta';
+#    my $in_format  = $guesser->guess(); # unless $opts->{'input'};
+#    warn "$in_format\n";
+    my $in_format = $opts->{"input"} // 'fasta';
 
-    if ($aln_file eq "STDIN") { $in = Bio::AlignIO->new(-format => $in_format, -fh => \*STDIN) }  # We're getting input from STDIN
-    else                      { $in = Bio::AlignIO->new(-format => $in_format, -file => "<$aln_file") }  # Filename, or '-', was given
+    $in = Bio::AlignIO->new(-format => $in_format, ($aln_file eq "STDIN")? (-fh => \*STDIN) : (-file => $aln_file));
+#    if ($aln_file eq "STDIN") { $in = Bio::AlignIO->new(-format => $in_format, -fh => \*STDIN) }  # We're getting input from STDIN
+#    else                      { $in = Bio::AlignIO->new(-format => $in_format, -file => "<$aln_file") }  # Filename, or '-', was given
 
+#    print Dumper(\$in);
     $aln = $in->next_aln;
 
-    $sample_size = $flags->{"sample_size"} // undef;
+#    $sample_size = $flags->{"sample_size"} // undef;
 #    @ingroups     = split /\s+,\s+/, join ',', @{ $opts->{"ingroup"} }     // undef if $opts->{"ingroup"};;
 #    @outgroups    = split /\s+,\s+/, join ',', @{ $opts->{"outgroup"} }    // undef if $opts->{"outgroup"};
 #    @exgroups    = split /\s+,\s+/, join ',', @{ $opts->{"exclude"} }    // undef if $opts->{"exclude"};
-    $dist_method = $flags->{"dist-method"} // undef;
-    if ($opts->{"distance"} || $opts->{"kaks"}) {
-        die "Cannot use distance or kaks options together with any of the following: @popgen_list\n" if &_in_list($opts, \@popgen_list);
-        $dna_stats = Bio::Align::DNAStatistics->new();
-    } else {
-        $pop = Bio::PopGen::Utilities->aln_to_population(-alignment => $aln, -include_monomorphic => $opts->{"snp-noncoding"} || $opts->{'bi-sites'} || $opts->{'bi-haps'} || $opts->{'bi-sites-for-r'} || $opts->{'heterozygosity'} ? 0:1, -site_model => 'all');
-        $pop_cds = Bio::PopGen::Utilities->aln_to_population(-alignment => $aln, -include_monomorphic => 0, -site_model => 'codon') if $opts->{"snp-coding"} || $opts->{"snp-coding-long"};
+#    $dist_method = $flags->{"dist-method"} // undef;
+#    if ($opts->{"distance"} && $opts->{"kaks"}) {
+#        die "Cannot use distance or kaks options together with any of the following: @popgen_list\n" if &_in_list($opts, \@popgen_list);
+    $dna_stats = Bio::Align::DNAStatistics->new(); # unless $opts->{'distance'} && $opts->{'kaks'};
+#    } else {
+    $pop = Bio::PopGen::Utilities->aln_to_population(-alignment => $aln, -include_monomorphic => $opts->{"snp-noncoding"} || $opts->{'bi-sites'} || $opts->{'bi-haps'} || $opts->{'bi-sites-for-r'} || $opts->{'heterozygosity'} ? 0:1, -site_model => 'all');
+    $pop_cds = Bio::PopGen::Utilities->aln_to_population(-alignment => $aln, -include_monomorphic => 0, -site_model => 'codon') if $opts->{"snp-coding"} || $opts->{"snp-coding-long"};
 #        $stat_obj = PopGenStatistics->new();
-        $pop_stats = Bio::PopGen::Statistics->new()
-    }
+    $pop_stats = Bio::PopGen::Statistics->new()
+#}
 }
 
 sub can_handle {
@@ -135,7 +148,7 @@ sub handle_opt {
 sub print_distance {
     my $warn_bad_dist_method;
     local $SIG{__WARN__} = sub { $warn_bad_dist_method .= shift };
-    my $dist_matrix = $dna_stats->distance(-align => $aln, -method => $dist_method);
+    my $dist_matrix = $dna_stats->distance(-align => $aln, -method => $opts->{'distance'} || 'jc');
     die "$warn_bad_dist_method\nQuitting on bad distance method...\n" if $warn_bad_dist_method;
     say $dist_matrix->print_matrix
 }
@@ -500,6 +513,7 @@ sub _in_list {
 }
 
 sub _parse_stats {
+#    die "biopop --stats pi|theda|tajima_d <dna alignment file>" unless $opts->{'stats'};
     return split(/,/, join(',', @{ $opts->{"stats"} }))
 }
 

@@ -39,10 +39,13 @@ class Night is qw/Hello/ {
 };
 
 my $hello = Hello->new();
+=pod
 is_deeply($hello->one, {okay => 'one'});
 is($hello->two({}), 'Hello World');
 is($hello->three, 'lost');
+=cut
 is($hello->five, 'fourth');
+=pod
 eval {$hello->four};
 like($@, qr/cannot call private method four from/);
 is($hello->six, 'ruling the world');
@@ -59,5 +62,5 @@ is($night->six, 'ruling the world');
 is($night->eight, '8');
 is($night->nine, 'crazy');
 is($night->ten, 'ten');
-
+=cut
 done_testing();

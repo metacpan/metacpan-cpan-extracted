@@ -54,6 +54,37 @@ The git code generally has the newest code. If git is not your thing, you can al
 
 ```
    $ cpan install Bio::BPWrapper
+   $ cpanm --sudo Bio::BPWrapper
+
+```
+
+# Install and run from docker
+
+Use the bpwrapper docker image. It includes `bioaln`, `biopop`, `bioseq`, and `biotree`.
+
+To download the image so that docker recognizes it:
+
+```console
+docker pull rockyb/bpwrapper
+```
+
+For things other than getting help, you'll often need to pass a data in file to the program. Do that by sharing the
+directory that the file is in on the `docker` invocation.
+
+You'll need to pay attention to the permissions on the data file its
+directory. The docker container runs as as a user that may not have
+access to data. I've found however that if you put the data in `/tmp`
+files will be seen inside the running docker container.
+
+For example:
+
+```console
+$ cp test-data/cds.fas /tmp/cds.fas
+$ docker run -it -v /tmp:/test-files rockyb/bpwrapper bioseq -l /test-files/cds.fas
+DK2	120
+W70332	120
+M1608	108
+F2
 ```
 
 # Developers, Contact, Citation
@@ -61,4 +92,4 @@ The git code generally has the newest code. If git is not your thing, you can al
 * Pedro Pagan
 * Girish Ramrattan
 * Weigang Qiu, City University of New York, Hunter College (Correspondence: [weigang@genectr.hunter.cuny.edu)](mailto://weigang@genectr.hunter.cuny.edu))
-* If you find the tools useful, please cite: Y. Hernández, P. Pagan,  G. Ramrattan, & W.-G. Qiu. (2015). Bp-utils (Release 1.0): BioPerl-based command-line utilities for manipulating sequences, alignments, and phylogenetic trees. URL: https://github.com/bioperl/bp-utils.
+* If you find the tools useful, please cite: Hernadez, Bernstein, et al (2018). BpWrapper::BioPerl-based sequence and tree utilities for rapid prototyping of bioinformatics pipelines. BMC Genomics 19:76. [Paper link](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2074-9).

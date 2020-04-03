@@ -1,6 +1,7 @@
 #include "log.h"
 #include <math.h>
 #include <memory>
+#include <thread>
 #include <iomanip>
 #include <sstream>
 
@@ -11,12 +12,12 @@ namespace panda { namespace log {
 namespace details {
     std::unique_ptr<ILogger> ilogger;
 
-    static thread_local struct {
-        std::ostringstream os;
-    } tls;
-    static thread_local std::ostringstream* os = &tls.os;
+    static thread_local struct { std::ostringstream os; } tls; // struct folding workarounds a bug in FreeBSD with TLS
+    static thread_local std::ostringstream* os = &tls.os;      // stream for child threads, TLS via pointers works 3x faster in GCC
+    static std::ostringstream mt_os;                           // stream for main thread, can't use TLS because it's destroyed much earlier
+    static auto mt_id = std::this_thread::get_id();
 
-    std::ostream& _get_os () { return *os; }
+    std::ostream& _get_os () { return std::this_thread::get_id() == mt_id ? mt_os : *os; }
 
     bool _do_log (std::ostream& _stream, const CodePoint& cp, Level level) {
         std::ostringstream& stream = static_cast<std::ostringstream&>(_stream);

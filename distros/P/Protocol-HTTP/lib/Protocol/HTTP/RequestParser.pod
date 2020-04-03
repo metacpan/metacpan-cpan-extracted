@@ -111,7 +111,7 @@ Otherwise (no errors and not yet done), position will always be equal to the len
 
 The last, 4th value is optional and is only returned if there was an error during parsing process.
 It is an L<XS::STL::ErrorCode> object which represents Perl API for convenient C++ C<std::error_code> subsystem.
-Possible errors are described in L<Protocol::HTTP::errc>
+Possible errors are described in L<Protocol::HTTP::Error>
 
 
 

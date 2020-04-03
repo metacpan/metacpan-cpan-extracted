@@ -258,6 +258,10 @@ characters with prohibited character handling.
     Requirements for Japanese Text Layout,
     W3C Working Group Note 3 April 2012
 
+- <http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf>
+
+    Control Functions for Coded Character Sets
+
 # LICENSE
 
 Copyright (C) 2018- Kazumasa Utashiro.

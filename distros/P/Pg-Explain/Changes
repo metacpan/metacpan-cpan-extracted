@@ -1,5 +1,12 @@
 Revision history for Pg-Explain
 
+0.97    2020/04/03
+        - Allow parsing of plans inside psql generated frames
+        - Provide a way to easily get all subnodes, including subnodes of subnodes
+        - Provide a way to easily get parents of given node
+        - Remove unnecessary Data::Dumper loads in tests
+        - Assume plans should be in UTF-8
+
 0.96    2020/03/23
         - Performance optimizations
         - Fix handling of certains misaligned plans

@@ -2,11 +2,11 @@ package MooX::Purple::G;
 use strict;
 use warnings;
 use 5.006;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 use PPR;
 use Cwd qw/abs_path/;
 
-our (%HAS, $GATTRS, $SATTRS);
+our (%HAS, $GATTRS, $SATTRS, $PREFIX);
 BEGIN {
 	$GATTRS = '(
 		allow (?&PerlNWS)
@@ -14,11 +14,11 @@ BEGIN {
 			(?&PerlList))
 		|
 		with (?&PerlNWS)
-			(?:(?!qw)(?&PerlQualifiedIdentifier)|
+			(?:(?!qw)(?&PerlPrefixUnaryOperator)*(?&PerlQualifiedIdentifier)|
 			(?&PerlList))
 		|
 		is (?&PerlNWS)
-			(?:(?!qw)(?&PerlQualifiedIdentifier)|
+			(?:(?!qw)(?&PerlPrefixUnaryOperator)*(?&PerlQualifiedIdentifier)|
 			(?&PerlList))
 		|
 		use (?&PerlNWS)
@@ -151,22 +151,25 @@ sub kv {
 }
 
 sub import {
-	my $lib = $_[1];
-	open FH, "<$0";
+	my ($class, %args) = @_;
+	$PREFIX = $args{-prefix} unless $PREFIX;
+	my $lib = $args{-lib};
+	my $file = $args{-module} ? [caller(1)]->[1] : $0;
+	open FH, "<$file";
 	my $source = \join '', <FH>;
 	close FH;
 	g(
 		g(
 			$source,
 			qq/(?<match> role\\s*
-			(?<class> (?&PerlQualifiedIdentifier)) 
+			(?<class>(?&PerlPrefixUnaryOperator)*(?&PerlQualifiedIdentifier)) 
 			(?<attrs> (?: $GATTRS*))
 			(?<block> (?&PerlBlock)))/,
 			\&roles, 
 			$lib
 		),
 		qq/(?<match> class\\s*
-		(?<class> (?&PerlQualifiedIdentifier))
+		(?<class>(?&PerlPrefixUnaryOperator)*(?&PerlQualifiedIdentifier))
 		(?<attrs> (?: $GATTRS*))
 		(?<block> (?&PerlBlock)))/,
 		\&classes,
@@ -264,10 +267,14 @@ sub roles {
 	my @hack = grep {$_ && $_ !~ m/^\s*$/} $args{attrs} =~ m/(?:$GATTRS) $PPR::GRAMMAR/gx;
 	my ($body, %attrs) = _set_class_role_attrs($args{block}, _parse_role_attrs(@hack));
 	$body =~ s/\s*$//;
+	
+	$args{class} =~ s/^\+/$PREFIX\:\:/;
+
 	my $r = \qq|{
 	package $args{class};
 	use Moo::Role;
 	use MooX::LazierAttributes;
+	use MooX::ValidateSubs;
 	$attrs{with}$attrs{use}$body
 	1;
 }|;
@@ -280,6 +287,9 @@ sub classes {
 	my @hack = grep {$_ && $_ !~ m/^\s*$/} $args{attrs} =~ m/(?:$GATTRS) $PPR::GRAMMAR/gx;
 	my ($body, %attrs) = _set_class_role_attrs($args{block}, _parse_role_attrs(@hack));
 	$body =~ s/\s*$//;
+
+	$args{class} =~ s/^\+/$PREFIX\:\:/;
+
 	my $r = \qq|{
 	package $args{class};
 	use Moo;
@@ -312,8 +322,9 @@ sub private {
 sub public {
 	my %args = @_;
 	return qq|sub $args{method} $args{block}|;
-}
 
+}
+=pod
 sub _parse_role_attrs {
 	my @roles = @_;
 	my %attrs;
@@ -327,6 +338,32 @@ sub _parse_role_attrs {
 	}
 	return %attrs;
 }
+=cut
+
+sub _parse_role_attrs {
+	my @roles = @_;
+	my %attrs;
+	my $i = 0;
+	for (@roles) {
+		if ($_ =~ m/\s*use\s*((?!qw)(?&PerlQualifiedIdentifier))\s*((?&PerlList)) $PPR::GRAMMAR/xms) {
+			$attrs{use}{sprintf "%s %s", $1, $2}++;
+			next;
+		}
+		$_ =~ m/(with|allow|is|use)(.*)/i;
+		my @list = eval($2); # || $2
+		push @list, do { (my $g = $2) =~ s/^\s*//; $g; } unless @list;
+		for (@list) {
+			$attrs{$1}{$_} = $i++;
+		}
+	}
+	for my $o (qw/with allow is use/) {
+		$attrs{$o} = [sort { $attrs{$o}{$a} <=> $attrs{$o}{$b} } keys %{$attrs{$o}}] if $attrs{$o};
+	}
+	return %attrs;
+}
+
+
+
 
 sub _set_class_role_attrs {
 	my ($body, %attrs) = @_;
@@ -334,8 +371,22 @@ sub _set_class_role_attrs {
 		my $allow = join ' ', @{$attrs{allow}};
 		$body =~ s{private\s*(\p{XIDS}\p{XIDC}*)}{private $1 allow qw/$allow/}g;
 	}
-	$attrs{is} = $attrs{is} ? sprintf "extends qw/%s/;\n", join ' ', @{$attrs{is}} : '';
-	$attrs{with} = $attrs{with} ? sprintf "with qw/%s/;\n", join ' ', @{$attrs{with}} : '';
+	$attrs{is} = $attrs{is} ? sprintf "extends qw/%s/;\n",  join(' ', map { my $l = $_; $l =~ s/^\s*\+/$PREFIX\:\:/; $l; } @{$attrs{is}}) : '';
+	my $last;
+	$attrs{with} = $attrs{with} 
+		? sprintf "with qw/%s/;\n", join(' ', map { 
+			my $l = $_; 
+			$l =~ s/^\s*\+/$PREFIX\:\:/; 
+			unless($l =~ s/^\s*\-/$last\:\:/) {
+				$last = $l;
+			}
+			if ($l =~ s/^\s*\~//) {
+				$last = $PREFIX ? ($PREFIX . '::' . $l) : $l;
+				$l = '';
+			}
+			$l; 
+		} @{$attrs{with}}) 
+		: '';
 	$attrs{use} = $attrs{use} ? join('', map { sprintf("\tuse %s;\n", $_) } @{$attrs{use}}) : '';
 	$body =~ s/(^{)|(}$)//g;
 	return $body, %attrs;
@@ -351,7 +402,7 @@ MooX::Purple - MooX::Purple::G
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

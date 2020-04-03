@@ -1,0 +1,7 @@
+package Before;
+use Moo::Role;
+use MooX::LazierAttributes;
+use MooX::ValidateSubs;
+
+sub seven { return '7' }
+1;

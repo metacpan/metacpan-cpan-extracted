@@ -40,7 +40,7 @@ WriteMakefile
 				runtime => {
 					    recommends => {
 							   'Alien::DDC::Concordance' => 0.002,
-							   'DDC::XS' => 0.21,
+							   'DDC::XS' => 0.24,
 							  },
 					    #suggests => {},
 					   },

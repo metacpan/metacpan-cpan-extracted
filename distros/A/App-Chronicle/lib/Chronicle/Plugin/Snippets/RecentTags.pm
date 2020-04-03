@@ -71,24 +71,52 @@ sub on_initiate
     #
     my $count = $config->{ 'recent-tag-count' } || 10;
 
+    #
+    #  Fetch the most recent tags, obeying the limit.
+    #
     my $recent = $dbh->prepare(
         "SELECT a.name FROM tags AS a JOIN blog AS b WHERE ( b.id = a.blog_id  ) ORDER BY b.date DESC LIMIT $count"
       ) or
       die "Failed to find recent tags: " . $dbh->errstr();
 
+    #
+    #  Count how many times the given tag has been used.
+    #
+    $count = $dbh->prepare("SELECT COUNT(name) FROM tags WHERE name=?") or
+      die "Failed to count tag-usage: " . $dbh->errstr();
+
+
+    #
+    #  Look for the recent tags
+    #
     $recent->execute() or die "Failed to execute:" . $dbh->errstr();
     my $tag;
     $recent->bind_columns( undef, \$tag );
 
 
     my $entries = undef;
+    my %SEEN;
 
     while ( $recent->fetch() )
     {
-        push( @$entries, { tag => $tag } );
-    }
-    $recent->finish();
+        # Count prior-uses
+        $count->execute($tag);
+        my $c = $count->fetchrow_array();
 
+        # store the results, unless this tag is a duplicate
+        push( @$entries,
+              {  tag   => $tag,
+                 count => $c
+              } )
+          unless ( $SEEN{ $tag } );
+
+        # We avoid using this tag again in the future.
+        $SEEN{ $tag } += 1;
+    }
+
+    # Close our statements
+    $recent->finish();
+    $count->finish();
 
     #
     #  Now we have the structure.

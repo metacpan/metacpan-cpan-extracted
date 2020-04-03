@@ -4,7 +4,7 @@
       "philiprbrenan@gmail.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -22,16 +22,17 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Data::Table::Text" : "20181026",
+            "Data::Table::Text" : "20200221",
             "Test2::API" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "v5.26.1"
          }
       }
    },
    "provides" : {
       "Math::Vectors2" : {
          "file" : "lib/Math/Vectors2.pm",
-         "version" : "20181026"
+         "version" : "20200402"
       }
    },
    "release_status" : "stable",
@@ -40,6 +41,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20181026",
+   "version" : "20200402",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

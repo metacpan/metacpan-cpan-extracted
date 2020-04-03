@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -25,40 +25,40 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::catch" : "v1.1.0",
-            "Alien::libpanda" : "v1.3.7",
-            "Export::XS" : "v3.0.2",
-            "Test::Catch" : "v1.0.11",
-            "XS::Framework" : "v1.2.4",
-            "XS::Install" : "v1.2.13",
+            "Export::XS" : "v3.0.4",
+            "Test::Catch" : "v1.0.13",
+            "XS::Framework" : "v1.2.9",
+            "XS::Install" : "v1.2.16",
+            "XS::libcatch" : "v1.1.0",
+            "XS::libpanda" : "v1.3.14",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::libpanda" : "v1.3.7",
-            "Export::XS" : "v3.0.2",
-            "XS::Framework" : "v1.2.4",
-            "XS::Install" : "v1.2.13",
+            "Export::XS" : "v3.0.4",
+            "XS::Framework" : "v1.2.9",
+            "XS::Install" : "v1.2.16",
+            "XS::libpanda" : "v1.3.14",
             "next::XS" : "v1.0.7"
          }
       },
       "test" : {
          "requires" : {
-            "Alien::catch" : "v1.1.0",
-            "Alien::libpanda" : "v1.3.7",
-            "Export::XS" : "v3.0.2",
-            "Test::Catch" : "v1.0.11",
+            "Export::XS" : "v3.0.4",
+            "Test::Catch" : "v1.0.13",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "XS::Framework" : "v1.2.4",
+            "XS::Framework" : "v1.2.9",
+            "XS::libcatch" : "v1.1.0",
+            "XS::libpanda" : "v1.3.14",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v5.0.2",
+   "version" : "v5.0.3",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

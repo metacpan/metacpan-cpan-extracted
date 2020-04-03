@@ -1,10 +1,41 @@
 Revision history for Bio::BPWrappers
 
-1.12 2016-07-01:
+1.13 2020-02-02:
+----------------
+
+* revised for Bio::Perl 1.7.x; uses only Bio::Restriction::Analysis now
+* command options regularized and documentation updated
+* citations and doc links added and updated
+* use Bio::Tools::GuessSeqFormat to guess format in `bioaln`, `bioseq` and `biopop`
+
+* bioaln:
+  * fix bugs in file reading with `--concat`
+  * add ungapped diffs to `--pair-diff`
+* bioseq:
+  * add pick/delete by file
+  * add `codon-table` interface to Tools::Codon:Table and Tools::TUPAC
+  * use `--gap char -` to change "." to "-"a
+  * modify `--delete` to delete by max number of x ambiguous (non-ATCGs) bases
+  * modify `-t1` to allow non-standard AA to pass (but not internal stops)
+  * fix bug in `--delete-by-length`
+  * revive `--longest-orf` to trim end to be in-frame, add reading frame 1 and -1
+  * add `--no-revcom` (Z)
+  * add `-codon-info`: calculate codon bias of a CDS using Shannon information
+* biotree:
+  * Refactor options and update documentation
+  * add `--add-delete-short-br`
+  * add `--cut-tree`: cut tree to identify groups
+  * add `--pair-diff`: pairwise sequence diff
+  * add `--rename-tips`: rename tips accorting to a 2-column table
+* Dockerize
+  * Add `Dockerfile`
+  * Add `GNUMakefile` target to build docker
+  * Put on https://https://hub.docker.com in rockyb/bpwrapper
+
+1.12 2017-07-15:
 ----------------
 
 bioaln:
-
  - Allow BLAST input in bioaln
 
 biotree:

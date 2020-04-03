@@ -21,7 +21,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0"
+            "Carp" : "0",
+            "Socket" : "2.019",
+            "perl" : "v5.10.0"
          }
       },
       "test" : {
@@ -33,10 +35,10 @@
    "provides" : {
       "Net::IPAM::IP" : {
          "file" : "lib/Net/IPAM/IP.pm",
-         "version" : "1.00"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
-   "version" : "1.00",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

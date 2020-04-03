@@ -1,5 +1,16 @@
 Revision history for Net-IPAM-Block
 
+1.03    Fri, 03 Apr 2020 08:55:36 +0200
+        [Changes]
+        * find_free_cidrs, better algo, allow block as outer, never croak
+
+        [Bugfix]
+        * define minimum version in require for List::Util, Scalar::Util
+
+1.02    not released
+
+1.01    not released
+
 1.00    Thu, 02 Apr 2020 12:28:50 +0200
         First version, released on an unsuspecting world.
 

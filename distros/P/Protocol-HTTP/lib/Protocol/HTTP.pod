@@ -91,7 +91,7 @@ L<Protocol::HTTP::ResponseParser>
 
 L<Protocol::HTTP::Compression>
 
-L<Protocol::HTTP::errc>
+L<Protocol::HTTP::Error>
 
 
 
@@ -99,7 +99,7 @@ L<Protocol::HTTP::errc>
 
 =head2 error_category
 
-The error category that all of L<Protocol::HTTP::errc> errors have.
+The error category that all of L<Protocol::HTTP::Error> errors have.
 
 
 

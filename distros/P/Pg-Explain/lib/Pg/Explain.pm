@@ -1,9 +1,25 @@
 package Pg::Explain;
-use v5.6;
+
+# UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
+use v5.14;
 use strict;
-use autodie;
+use warnings;
+use warnings qw( FATAL utf8 );
+use utf8;
+use open qw( :std :utf8 );
+use Unicode::Normalize qw( NFC );
+use Unicode::Collate;
+use Encode qw( decode );
+
+if ( grep /\P{ASCII}/ => @ARGV ) {
+    @ARGV = map { decode( 'UTF-8', $_ ) } @ARGV;
+}
+
+# UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
+
 use Carp;
 use Clone qw( clone );
+use autodie;
 use Data::Dumper;
 use Pg::Explain::StringAnonymizer;
 use Pg::Explain::FromText;
@@ -17,11 +33,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 0.96
+Version 0.97
 
 =cut
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 =head1 SYNOPSIS
 
@@ -141,8 +157,36 @@ sub source_filtered {
     my $self   = shift;
     my $source = $self->source;
 
+    # Remove frames around, handles |, ║, │
+    $source =~ s/^(\||║|│)(.*)\1\r?\n/$2\n/gm;
+
+    # Remove separator lines from various types of borders
+    $source =~ s/^\+-+\+\r?\n//gm;
+    $source =~ s/^(-|─|═)\1+\r?\n//gm;
+    $source =~ s/^(├|╟|╠|╞)(─|═)\2*(┤|╢|╣|╡)\r?\n//gm;
+
+    # Remove more horizontal lines
+    $source =~ s/^\+-+\+\r?\n//gm;
+    $source =~ s/^└(─)+┘\r?\n//gm;
+    $source =~ s/^╚(═)+╝\r?\n//gm;
+    $source =~ s/^┌(─)+┐\r?\n//gm;
+    $source =~ s/^╔(═)+╗\r?\n//gm;
+
+    # Remove quotes around lines, both ' and "
     $source =~ s/^(["'])(.*)\1\r?\n/$2\n/gm;
+
+    # Remove "+" line continuations
     $source =~ s/\s*\+\r?\n/\n/g;
+
+    # Remove "↵" line continuations
+    $source =~ s/↵\r?\n/\n/g;
+
+    # Remove "query plan" header
+    $source =~ s/^\s*QUERY PLAN\s*\r?\n//m;
+
+    # Remove rowcount
+    $source =~ s/^\(\d+ rows?\)(\r?\n|\z)//gm;
+
     return $source;
 }
 
@@ -182,7 +226,12 @@ sub new {
         $self->_read_source_from_file();
     }
     elsif ( $args{ 'source' } ) {
-        $self->{ 'source' } = $args{ 'source' };
+        if ( Encode::is_utf8( $args{ 'source' } ) ) {
+            $self->{ 'source' } = $args{ 'source' };
+        }
+        else {
+            $self->{ 'source' } = decode( 'UTF-8', $args{ 'source' } );
+        }
     }
     else {
         croak( 'One of (source, source_file) parameters has to be provided)' );

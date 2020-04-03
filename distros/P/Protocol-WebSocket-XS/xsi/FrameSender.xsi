@@ -1,0 +1,16 @@
+MODULE = Protocol::WebSocket::XS                PACKAGE = Protocol::WebSocket::XS::FrameSender
+PROTOTYPES: DISABLE
+
+Simple XSFrameSender::send (Sv payload_sv, bool final = false) {
+    if (payload_sv.is_array_ref()) {
+        Array payloads(payload_sv);
+        std::vector<string> list;
+        av_to_vstring(payloads, list);
+        auto range = THIS->send(list.begin(), list.end(), final);
+        RETVAL = strings_to_sv(range);
+    } else {
+        auto payload = Simple(payload_sv).as_string();
+        auto range = THIS->send(payload, final);
+        RETVAL = strings_to_sv(range);
+    }
+}

@@ -5,7 +5,7 @@ package DDC::PP;
 
 ##--------------------------------------------------------------
 ## ddcConfig.h
-sub library_version { return "2.1.16"; }
+sub library_version { return "2.2.3"; }
 
 
 ##--------------------------------------------------------------
@@ -128,7 +128,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2017 by Bryan Jurish
+Copyright (C) 2016-2020 by Bryan Jurish
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

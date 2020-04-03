@@ -2,47 +2,38 @@
 #include <cstring>
 #include <memory>
 #include <functional>
-
-#if defined(__unix__)
-  #include <execinfo.h>
+#ifdef _WIN32
+  #include "exception/win.icc"
+#else
+  #include "exception/unix.icc"
 #endif
 
 namespace panda {
 
+static RawTraceProducer  rawtrace_producer = get_default_raw_producer();
+static BacktraceProducer bt_producer       = get_default_bt_producer();
 
 BacktraceInfo::~BacktraceInfo() {};
 
-static BacktraceProducer* producer = nullptr;
-
 void Backtrace::install_producer(BacktraceProducer& producer_) {
-    producer = &producer_;
+    bt_producer = producer_;
 }
 
 Backtrace::Backtrace (const Backtrace& other) noexcept : buffer(other.buffer) {}
 	
-#if defined(__unix__)
-
 Backtrace::Backtrace () noexcept {
-    buffer.resize(max_depth);
-    auto depth = ::backtrace(buffer.data(), max_depth);
-    if (depth <= 0) {
-        buffer.clear();
-        return;
-    } 
-    buffer.resize(depth);
+    void* temp_buff[max_depth];
+    auto depth = rawtrace_producer(temp_buff, max_depth);
+    if (depth) {
+        buffer.resize(max_depth);
+        std::memcpy(buffer.data(), temp_buff, sizeof(void*) * depth);
+    }
 }
-
-#else
-
-Backtrace::Backtrace () noexcept {}
-
-#endif
 
 Backtrace::~Backtrace() {}
 
 iptr<BacktraceInfo> Backtrace::get_backtrace_info() const noexcept {
-    if (producer) { return (*producer)(buffer); }
-    return iptr<BacktraceInfo>();
+    return bt_producer(buffer);
 }
 
 exception::exception () noexcept {}

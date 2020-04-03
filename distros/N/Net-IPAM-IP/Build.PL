@@ -17,10 +17,10 @@ my $builder = Module::Build->new(
         'Test::More' => '0',
     },
     requires => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
-        'Carp'              => '0',
-    },
+      'perl'   => '5.10.0',
+      'Socket' => '2.019',
+      'Carp'   => '0',
+      },
     add_to_cleanup     => [ 'Net-IPAM-IP-*' ],
 );
 

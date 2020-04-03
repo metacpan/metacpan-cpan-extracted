@@ -1,6 +1,6 @@
 use Test::More;
 use MooX::Purple;
-use MooX::Purple::G 't/lib';
+use MooX::Purple::G -lib => 't/lib';
 #TODO read 'has' 
 role RoleAttributes {
 	has one   => ( is_rw, default => sub { 10 } );

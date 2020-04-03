@@ -95,7 +95,7 @@ L<Protocol::HTTP::Response> object.
 If we were not expecting a response (i.e. we were between "request-response" series: nothing was parsing at the moment, and no context request was set),
 the result would be success, C<$state> == STATE_HEADERS (initial state), C<$err> is absent and C<$res> would contain an empty L<Protocol::HTTP::Response> object.
 
-Otherwise the result is a fail, C<$state> == STATE_ERROR, C<$err> == Protocol::HTTP::errc::unexpected_eof and C<$res> will contain
+Otherwise the result is a fail, C<$state> == STATE_ERROR, C<$err> == Protocol::HTTP::Error::unexpected_eof and C<$res> will contain
 a non-complete L<Protocol::HTTP::Response> object.
 
 

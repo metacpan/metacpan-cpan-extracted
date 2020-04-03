@@ -11,7 +11,7 @@ use Bio::BPWrapper::PopManipulations;
 
 ################# Option parsing #################
 my %opts;
-my %flags;
+#my %flags;
 GetOptions(
     \%opts,
     "help|h",
@@ -22,7 +22,7 @@ GetOptions(
     "bi-sites-for-r",
     "four-gametes|f",
     "heterozygosity|H",
-    "input|i=s" => \$flags{"input"},
+#    "input|i=s" => \$flags{"input"},
     "mis-match|m",
     "pi|p",
     "seg-sites|s",
@@ -30,7 +30,7 @@ GetOptions(
     "snp-coding-long|C",
     "snp-noncoding|n",
     "stats|t=s@",    # Comma-separated, or multiply specified, list
-#    "distance|d",
+    "distance|d=s",
 #    "dist-method|D=s" => \$flags{"dist-method"},
 #    "mut-info",
 #    "numseq|n=i"    => \$flags{"numseq"},
@@ -46,7 +46,8 @@ use constant PROGRAM => File::Basename::basename(__FILE__);
 Bio::BPWrapper::print_version(PROGRAM) if $opts{"version"};
 
 # This sets all internal variables, and loads AlignIO objects
-initialize(\%opts, \%flags);
+# initialize(\%opts, \%flags);
+initialize(\%opts);
 write_out(\%opts)
 
 ################# POD Documentation ##################
@@ -92,6 +93,10 @@ Prints a FASTA alignment consisting of only binary-informative SNPs.
 
 Prints binary-informative SNPs for each individual, in a pseudo-diploid genotype so the output could be imported into R package "genetics" for further analysis.
 
+=item --distance|-d 'jc|k2|uncorrected|f81|t92|f84|tajimanei'
+
+Prints a distance matrix based on a specified method (JC by default)
+
 =item --four-gametes, -f
 
 Performs four-gametes test of recombination by Hudson & Kaplan (Genetics.1985. 111:147-164) and a test of epistasis (Wilson??). It identifies all binary-informative SNPs and print, for each of pair of SNPs per line, site coordinates, counts of four possible gametes, Shannon diversity of haplotypes, and whether compatible or not. Two SNPs are incompatibile if all four possible haplotypes are present, indicating recombination. Presence of only two of the four possible haplotypes indicate, on the other hand, a possible epistatic interaction.
@@ -102,7 +107,7 @@ Print, for each segregating site, the observed heterozygosity [i.e., 1-sum(freq^
 
 =item --input, -i <format>
 
-Input file format. By default, this is 'FASTA'.
+Input file format. By default, this is 'FASTA'. Now it tries to guess the format. No more need to set this flag.
 
 =item --mis-match, -m
 

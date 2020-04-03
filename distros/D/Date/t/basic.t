@@ -122,21 +122,21 @@ subtest 'from string' => sub {
 };
 
 subtest 'error' => sub {
-    is(Date->new(+67767976233446399 + 1)->error, Date::errc::out_of_range);
+    is(Date->new(+67767976233446399 + 1)->error, Date::Error::out_of_range);
    ok(Date->new(undef)->error); 
 };
 
 subtest64 "MEIACORE-728 bugfix" => sub {
-    is(Date->new("-567815678-12-27 02:52:56")->error, Date::errc::parser_error);
-    is(Date->new("567815678-12-27 02:52:56")->error, Date::errc::parser_error);
-    is(Date->new("+999999999-12-31 23:59:59")->error, Date::errc::parser_error);
-    is(Date->new("1234567890-12-27 02:52:56")->error, Date::errc::parser_error);
-    is(Date->new("1234567890-12-27 02:52:56")->error, Date::errc::parser_error);
-    is(Date->new("-1234567890-12-27 02:52:56")->error, Date::errc::parser_error);
-    is(Date->new("-1234567890-12-27 02:52:56")->error, Date::errc::parser_error);
-    is(Date->new(-1977603371737344898)->error, Date::errc::out_of_range);
-    is(Date->new(-67768100567884800 - 1)->error, Date::errc::out_of_range);
-    is(Date->new(+67767976233446399 + 1)->error, Date::errc::out_of_range);
+    is(Date->new("-567815678-12-27 02:52:56")->error, Date::Error::parser_error);
+    is(Date->new("567815678-12-27 02:52:56")->error, Date::Error::parser_error);
+    is(Date->new("+999999999-12-31 23:59:59")->error, Date::Error::parser_error);
+    is(Date->new("1234567890-12-27 02:52:56")->error, Date::Error::parser_error);
+    is(Date->new("1234567890-12-27 02:52:56")->error, Date::Error::parser_error);
+    is(Date->new("-1234567890-12-27 02:52:56")->error, Date::Error::parser_error);
+    is(Date->new("-1234567890-12-27 02:52:56")->error, Date::Error::parser_error);
+    is(Date->new(-1977603371737344898)->error, Date::Error::out_of_range);
+    is(Date->new(-67768100567884800 - 1)->error, Date::Error::out_of_range);
+    is(Date->new(+67767976233446399 + 1)->error, Date::Error::out_of_range);
 };
 
 done_testing();

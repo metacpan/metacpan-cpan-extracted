@@ -2,7 +2,6 @@
 
 use Test::More;
 use Test::Deep;
-use Data::Dumper;
 use File::Basename;
 use autodie;
 use FindBin;

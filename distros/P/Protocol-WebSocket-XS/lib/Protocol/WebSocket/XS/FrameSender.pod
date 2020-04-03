@@ -1,0 +1,40 @@
+=head1 NAME
+
+Protocol::WebSocket::XS::FrameSender - low-level frame generator helper
+
+
+=head1 DESCRIPTION
+
+The class helps in creation of low-level frames of a single message. It
+might be useful if message data is partly available and should be
+serialized and delivered to peer ASAP as a frame.
+
+You cannot instantiate an object of the class direcly, it can be accessed
+only via L<Protocol::WebSocket::XS::Parser>.
+
+
+=head1 METHODS
+
+=head2 send($string|\@strings, [$final = 0])
+
+Returns serialized frame with the supplied payload (in form of string or array of strings).
+
+Set C<$final> to a true value for the last frame to finalize the message. In this case no further C<send()> calls are allowed.
+
+If C<deflate> is enabled then C<send()> may generate an empty frames (except for the last frame) due to I<output latency>.
+C<final> frame flushes all accumulated compressed payload.
+
+
+=head1 SEE ALSO
+
+L<Protocol::WebSocket::XS>
+
+L<Protocol::WebSocket::XS::FrameIterator>
+
+L<Protocol::WebSocket::XS::Message>
+
+L<Protocol::WebSocket::XS::Parser>
+
+L<rfc6455|https://tools.ietf.org/html/rfc6455>
+
+=cut

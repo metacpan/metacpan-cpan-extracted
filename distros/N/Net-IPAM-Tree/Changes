@@ -1,5 +1,18 @@
 Revision history for Net-IPAM-Tree
 
+1.04    Fri, 03 Apr 2020 09:12:50 +0200
+        no new features, CPAN module things only
+
+1.03    Thu, 02 Apr 2020 19:41:25 +0200
+        no new features, CPAN module things only
+        define proper version for perl in requires
+        define proper version for List::MoreUtils in requires
+
+1.02    not released
+        make same methods private in Net::IPAM::Tree::Node
+
+1.01    not released
+
 1.00    Thu, 02 Apr 2020 12:44:34 +0200
         First version, released on an unsuspecting world.
 

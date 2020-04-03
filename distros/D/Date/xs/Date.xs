@@ -59,7 +59,7 @@ BOOT {
         {"INPUT_FORMAT_DOT",     Date::InputFormat::dot},
     });
     
-    Stash ecstash("Date::errc", GV_ADD);
+    Stash ecstash("Date::Error", GV_ADD);
     xs::exp::create_constants(ecstash, {
         {"parser_error",  xs::out(make_error_code(errc::parser_error))},
         {"out_of_range", xs::out(make_error_code(errc::out_of_range))},

@@ -1,9 +1,24 @@
 package Pg::Explain::StringAnonymizer;
+
+# UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
+use v5.14;
 use strict;
+use warnings;
+use warnings qw( FATAL utf8 );
+use utf8;
+use open qw( :std :utf8 );
+use Unicode::Normalize qw( NFC );
+use Unicode::Collate;
+use Encode qw( decode );
+
+if ( grep /\P{ASCII}/ => @ARGV ) {
+    @ARGV = map { decode( 'UTF-8', $_ ) } @ARGV;
+}
+
+# UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
+
 use Carp;
 use Digest::SHA qw( sha1 );
-use warnings;
-use strict;
 
 =head1 NAME
 
@@ -11,11 +26,11 @@ Pg::Explain::StringAnonymizer - Class to anonymize sets of strings
 
 =head1 VERSION
 
-Version 0.96
+Version 0.97
 
 =cut
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 =head1 SYNOPSIS
 

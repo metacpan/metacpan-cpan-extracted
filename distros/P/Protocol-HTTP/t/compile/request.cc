@@ -5,16 +5,19 @@
 TEST("method") {
     auto req = Request::Builder().uri("/").build();
     string mstr;
+    bool clforce = false;
     SECTION("OPTIONS") { mstr = "OPTIONS"; req->method = Method::OPTIONS; }
     SECTION("GET")     { mstr = "GET";     req->method = Method::GET; }
     SECTION("HEAD")    { mstr = "HEAD";    req->method = Method::HEAD; }
-    SECTION("POST")    { mstr = "POST";    req->method = Method::POST; }
-    SECTION("PUT")     { mstr = "PUT";     req->method = Method::PUT; }
+    SECTION("POST")    { mstr = "POST";    req->method = Method::POST; clforce = true; }
+    SECTION("PUT")     { mstr = "PUT";     req->method = Method::PUT; clforce = true; }
     SECTION("DELETE")  { mstr = "DELETE";  req->method = Method::DELETE; }
     SECTION("TRACE")   { mstr = "TRACE";   req->method = Method::TRACE; }
     SECTION("CONNECT") { mstr = "CONNECT"; req->method = Method::CONNECT; }
 
-    CHECK(req->to_string() == mstr + " / HTTP/1.1\r\n\r\n" );
+    string extra;
+    if (clforce) extra = "Content-Length: 0\r\n";
+    CHECK(req->to_string() == mstr + " / HTTP/1.1\r\n" + extra + "\r\n" );
 }
 
 TEST("default method is GET") {

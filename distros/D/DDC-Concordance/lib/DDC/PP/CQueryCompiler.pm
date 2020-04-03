@@ -49,6 +49,7 @@ sub new {
   my $qc = bless({
 		  ##-- DDC::XS emulation
 		  Query => undef,
+		  KeepLexerComments => 0,
 
 		  ##-- guts: status flags
 		  error => undef,
@@ -101,6 +102,7 @@ sub getClosures {
 ## DDC::XS emulation
 
 __PACKAGE__->defprop('Query');
+__PACKAGE__->defprop('KeepLexerComments');
 
 ## undef = $qc->CleanParser()
 ##  + reset all parse-relevant data structures
@@ -136,9 +138,11 @@ sub reset {
 
   ##-- lexer & parser state
   $qc->{lexer}->reset();
+
   delete($qc->{parser}{USER}{hint});
   $qc->{parser}{USER}{qc}      = $qc;
   $qc->{parser}{USER}{lex}     = $qc->{lexer};
+
 }
 
 ## $qc = $qc->from($which,$src, %opts)
@@ -182,11 +186,16 @@ sub parse {
   $qc->reset();
   $qc->from(@_);
   my $result = eval { $qc->yyparse(); };
+  my $err    = $@;
   delete($qc->{parser}{qc});       ##-- chop circular reference we know how to get at...
   delete($qc->{parser}{USER}{qc}); ##-- chop circular reference we know how to get at...
 
+  ##-- adopt lexer comments
+  $result->{Options}{LexerComments} = $qc->{lexer}{comments}
+    if ($qc->{KeepLexerComments} && $result && $result->{Options});
+
   ##-- how'd it go?
-  die($@) if ($@);
+  die($err) if ($err);
   return $result;
 }
 
@@ -260,13 +269,13 @@ sub _yylex_sub {
     return ('',undef) if ($type eq '__EOF__');
 
     ##-- un-escape single-quoted symbols (this happens in the parser)
-#    if ($type =~ /^SQ_(.*)$/) {
-#      $type = $1;
-#      $text = unescapeq($text);
-#    }
-#    elsif ($type eq 'SYMBOL') {
-#      $text = unescape($text);
-#    }
+    #    if ($type =~ /^SQ_(.*)$/) {
+    #      $type = $1;
+    #      $text = unescapeq($text);
+    #    }
+    #    elsif ($type eq 'SYMBOL') {
+    #      $text = unescape($text);
+    #    }
 
     if ($qc->{yydebug} & 0x01) {
       print STDERR ": yylex(): type=($type) ; text=(".(defined($text) ? $text : '-undef-')." ; state=(".($qc->{lexer}{state}).")\n";

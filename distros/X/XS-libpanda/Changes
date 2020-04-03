@@ -1,3 +1,7 @@
+1.3.14   xx.xx.2020
+            - exceptions: add default backtrace producer (info gather info from symbols)
+            - exceptions: enable tests for all *nix systems
+            - fix logging on global destruction
 1.3.13   24.03.2020
            - panda log: refactor a little
            - VarIntStack iterator

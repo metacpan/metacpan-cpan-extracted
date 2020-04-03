@@ -21,7 +21,7 @@ use strict;
 
 ##======================================================================
 ## Globals
-our $VERSION = '0.44'; ##-- for ddc >= v2.0.21; fixes for ddc >= 2.0.38
+our $VERSION = '0.45'; ##-- for ddc >= v2.0.21; fixes for ddc >= 2.0.38
 our @ISA = qw();
 
 

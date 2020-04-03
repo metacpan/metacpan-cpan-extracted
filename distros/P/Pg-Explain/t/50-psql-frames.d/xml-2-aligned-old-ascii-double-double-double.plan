@@ -1,0 +1,64 @@
++------------------------------------------------------------------+
+|                            QUERY PLAN                            |
++------------------------------------------------------------------+
+| <explain xmlns="http://www.postgresql.org/2009/explain">         |
+|   <Query>                                                        |
+|     <Plan>                                                       |
+|       <Node-Type>Nested Loop</Node-Type>                         |
+|       <Parallel-Aware>false</Parallel-Aware>                     |
+|       <Join-Type>Inner</Join-Type>                               |
+|       <Startup-Cost>0.00</Startup-Cost>                          |
+|       <Total-Cost>2017.80</Total-Cost>                           |
+|       <Plan-Rows>15</Plan-Rows>                                  |
+|       <Plan-Width>133</Plan-Width>                               |
+|       <Actual-Startup-Time>0.038</Actual-Startup-Time>           |
+|       <Actual-Total-Time>2.046</Actual-Total-Time>               |
+|       <Actual-Rows>15</Actual-Rows>                              |
+|       <Actual-Loops>1</Actual-Loops>                             |
+|       <Inner-Unique>false</Inner-Unique>                         |
+|       <Plans>                                                    |
+|         <Plan>                                                   |
+|           <Node-Type>Seq Scan</Node-Type>                        |
+|           <Parent-Relationship>Outer</Parent-Relationship>       |
+|           <Parallel-Aware>false</Parallel-Aware>                 |
+|           <Relation-Name>users</Relation-Name>                   |
+|           <Alias>u</Alias>                                       |
+|           <Startup-Cost>0.00</Startup-Cost>                      |
+|           <Total-Cost>41.40</Total-Cost>                         |
+|           <Plan-Rows>1</Plan-Rows>                               |
+|           <Plan-Width>129</Plan-Width>                           |
+|           <Actual-Startup-Time>0.013</Actual-Startup-Time>       |
+|           <Actual-Total-Time>0.077</Actual-Total-Time>           |
+|           <Actual-Rows>1</Actual-Rows>                           |
+|           <Actual-Loops>1</Actual-Loops>                         |
+|           <Filter>(username = 'depesz'::text)</Filter>           |
+|           <Rows-Removed-by-Filter>1231</Rows-Removed-by-Filter>  |
+|         </Plan>                                                  |
+|         <Plan>                                                   |
+|           <Node-Type>Seq Scan</Node-Type>                        |
+|           <Parent-Relationship>Inner</Parent-Relationship>       |
+|           <Parallel-Aware>false</Parallel-Aware>                 |
+|           <Relation-Name>part_0</Relation-Name>                  |
+|           <Alias>p</Alias>                                       |
+|           <Startup-Cost>0.00</Startup-Cost>                      |
+|           <Total-Cost>1976.25</Total-Cost>                       |
+|           <Plan-Rows>15</Plan-Rows>                              |
+|           <Plan-Width>17</Plan-Width>                            |
+|           <Actual-Startup-Time>0.024</Actual-Startup-Time>       |
+|           <Actual-Total-Time>1.967</Actual-Total-Time>           |
+|           <Actual-Rows>15</Actual-Rows>                          |
+|           <Actual-Loops>1</Actual-Loops>                         |
+|           <Filter>(added_by = 'depesz'::text)</Filter>           |
+|           <Rows-Removed-by-Filter>13205</Rows-Removed-by-Filter> |
+|         </Plan>                                                  |
+|       </Plans>                                                   |
+|     </Plan>                                                      |
+|     <Planning-Time>0.041</Planning-Time>                         |
+|     <Triggers>                                                   |
+|     </Triggers>                                                  |
+|     <Execution-Time>2.055</Execution-Time>                       |
+|   </Query>                                                       |
+| </explain>                                                       |
++------------------------------------------------------------------+
+(1 row)
+

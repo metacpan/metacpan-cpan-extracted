@@ -35,10 +35,14 @@ DDC::XS::CQueryOptions - XS interface to DDC C++ CQueryOptions objects
  undef            = $CQueryOptions->setSubcorpora(\@Subcorpora);
  \@Comments       = $CQueryOptions->getComments();
  undef            = $CQueryOptions->setComments(\@Comments);
+ \@LexerComments  = $CQueryOptions->getLexerComments();
+ undef            = $CQueryOptions->setLexerComments(\@LexerComments);
+
  
  # Methods
  undef   = $CQueryOptions->swap($CQueryOptions2);
  undef   = $CQueryOptions->Clear();
+ undef   = $CQueryOptions->ClearComments();
  $bool   = $CQueryOptions->CanFilterByFile();
  $string = $CQueryOptions->toString();
  $string = $CQueryOptions->toJson();
@@ -74,7 +78,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2018 by Bryan Jurish
+Copyright (C) 2015-2020 by Bryan Jurish
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

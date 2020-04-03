@@ -13,6 +13,8 @@ public:
   //%name{CountSample} size_t m_qCountSample %get %set;
   //%name{CountSort} HitSortEnum m_qCountSort %get %set;
 
+  %name{KeepLexerComments} bool m_KeepLexerComments %get %set;
+
 public:
   CQueryCompiler();
 

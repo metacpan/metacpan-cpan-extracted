@@ -1,3 +1,4 @@
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
 use v5.16;
 use Module::Build;
 
@@ -8,7 +9,8 @@ my $b = Module::Build->new
   license       => 'perl',
   requires      =>
    {'Carp'             =>0,
-    'Data::Table::Text'=>q(20181026),
+    'Data::Table::Text'              => 20200221,
+     perl              => '5.26.1',
     'Test2::API'       =>0,
     'Test::More'       =>0,
    },

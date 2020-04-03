@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.45      2020-04-02 11:11:08 -0600
+  - Fixed default macos and windows workflows.
+
 2.44      2020-02-04 15:36:38 -0700
   - Added support for github actions / workflow
 

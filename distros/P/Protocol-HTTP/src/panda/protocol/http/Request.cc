@@ -17,6 +17,10 @@ static inline string _method_str (Request::Method rm) {
     }
 }
 
+static inline bool _method_has_meaning_for_body (Request::Method method) {
+    return method == Request::Method::POST || method == Request::Method::PUT;
+}
+
 string Request::http_header (Compression::Type applied_compression) const {
     //part 1: precalc pieces
     auto out_meth = _method_str(method);
@@ -25,7 +29,7 @@ string Request::http_header (Compression::Type applied_compression) const {
 
     auto tmp_http_ver = !http_version ? 11 : http_version;
     string out_content_length;
-    if (!chunked && body.parts.size() && !headers.has("Content-Length")) {
+    if (!chunked && (body.parts.size() || _method_has_meaning_for_body(method)) && !headers.has("Content-Length")) {
         out_content_length = panda::to_string(body.length());
     }
 

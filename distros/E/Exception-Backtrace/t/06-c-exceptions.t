@@ -21,8 +21,8 @@ subtest "backtraceable exception is thrown" => sub {
 
     my $bt = Exception::Backtrace::get_backtrace_string($@);
     note $bt;
-    if ($bt =~ /panda::Backtrace::Backtrace/) {
-        like $bt, qr/panda::exception/;
+    if ($bt =~ /panda::exception::exception/) {
+        like $bt, qr/MyTest_xsgen.cc/;
     }
     else {
         like $bt, qr/libpanda\./;

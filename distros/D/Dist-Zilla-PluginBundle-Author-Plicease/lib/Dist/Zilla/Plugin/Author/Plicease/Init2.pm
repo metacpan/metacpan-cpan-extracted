@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.44 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.45 {
 
   use 5.014;
   use Moose;
@@ -372,7 +372,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.44
+version 2.45
 
 =head1 DESCRIPTION
 
@@ -725,15 +725,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Prepare for cache
+        run: |
+          perl -V > perlversion.txt
+          ls -l perlversion.txt
+
       - name: Cache CPAN modules
         uses: actions/cache@v1
         env:
           cache-name: cache-cpan-modules
         with:
           path: c:\cx
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}
+            ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
       - name: Set up Perl
         run: |
@@ -747,13 +752,12 @@ jobs:
           dzil authordeps --missing | cpanm -n
           dzil listdeps --missing   | cpanm -n
       - name: Install Dynamic Dependencies
-        run: |
-          dzil run 'cpanm --installdeps .'
+        run: dzil run --no-build 'cpanm --installdeps .'
       - name: Run Tests
         run: dzil test -v
 
 
-__[ dist/.github/workflows/windows.yml ]__
+__[ dist/.github/workflows/macos.yml ]__
 name: macos
 
 on:
@@ -806,6 +810,6 @@ jobs:
           dzil authordeps --missing | cpanm -n
           dzil listdeps --missing   | cpanm -n
       - name: Install Dynamic Dependencies
-        run: dzil run 'cpanm --installdeps .'
+        run: dzil run --no-build 'cpanm --installdeps .'
       - name: Run Tests
         run: dzil test -v

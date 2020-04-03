@@ -26,6 +26,7 @@ use List::Util qw(shuffle);
 use Bio::Align::Utilities qw(:all);
 use Exporter ();
 use Bio::SearchIO;
+#use Bio::Tools::GuessSeqFormat;
 
 if ($ENV{'DEBUG'}) { use Data::Dumper }
 
@@ -61,6 +62,7 @@ my %opt_dispatch = (
     "boot" => \&bootstrap,
     "codon-view" => \&draw_codon_view,
     "delete" => \&del_seqs,
+    "gap-char" => \&gap_char,
     "no-gaps" => \&remove_gaps,
     "length" => \&print_length,
     "match" => \&print_match,
@@ -79,6 +81,7 @@ my %opt_dispatch = (
     "rm-col" => \&remove_gapped_cols_in_one_seq,
     "aln-index" => \&colnum_from_residue_pos,
     "list-ids" => \&list_ids,
+    "pair-diff" => \&pair_diff,
     "permute-states" => \&permute_states,
     "pep2dna" => \&protein_to_dna,
     "resample" => \&sample_seqs,
@@ -121,31 +124,57 @@ sub initialize {
 
     # assume we're getting input from standard input
 
-    $in_format = $opts{"input"} || $default_format;
+#    my $in_format = $opts{"input"} || $default_format;
+#    my $in_format;
+#    use IO::Scalar;
+#    my $s;
+#    my ($guesser);
+#    if ($file eq "STDIN") {
+#	my $line_ct = 0; 
+#	my $lines;
+#	while(<>) { $lines .= $_; $line_ct++; last if $line_ct >= 100 } # read the first 100 lines
+#	$guesser = Bio::Tools::GuessSeqFormat->new( -text => $lines );
+#   } else {
+#	open $ifh, "<", $file or die $!;
+#	$guesser = Bio::Tools::GuessSeqFormat->new( -file => $file );
+#    }
+#    $in_format  = $guesser->guess();
+#    die "unknown file format. Try specify with -i flag.\n" unless $in_format;
+#    seek (STDIN, 0, 0);
+#    warn "$in_format\n";
 
+    my $in_format = $opts{'input'} || 'clustalw';
     if ($opts{"concat"}) {
-	   while ($file = shift @ARGV) {
+#	foreach my $file (glob @ARGV) {
+	while ($file = shift @ARGV) {
+#	    warn "reading $file\n";
+#	       $guesser = Bio::Tools::GuessSeqFormat->new( -file => $file);
+#	       $in_format  = $guesser->guess;
 	       $in = Bio::AlignIO->new(-file => $file, -format => $in_format);
 	       while ($aln=$in->next_aln()) { push @alns, $aln }
-	   }
+	}
     } else {
-	$file = shift @ARGV || "STDIN";    # If no more arguments were given on the command line,
-	if ($opts{"input"} && $opts{"input"} =~ /blast/) { # "blastxml" (-outfmt 5 ) preferred
-	    my $searchio = Bio::SearchIO->new( -format => $opts{'input'}, ($file eq "STDIN")? (-fh => \*STDIN) : (-file => $file));
+	$file = shift @ARGV || "STDIN";    # If no more arguments were given on the command line
+	if ($in_format && $in_format =~ /blast/) { # guess blastoutput as "phylip", so -i 'blast' is needed
+#	if ($opts{"input"} && $opts{"input"} =~ /blast/) { # "blastxml" (-outfmt 5 ) preferred
+	    my $searchio = Bio::SearchIO->new( -format => 'blast', ($file eq "STDIN")? (-fh => \*STDIN) : (-file => $file)); # works for regular blast output
+#	    my $searchio = Bio::SearchIO->new( -format => 'blast', -fh => $ifh);
 	    while ( my $result = $searchio->next_result() ) {
 		while( my $hit = $result->next_hit ) {
  		    my $hsp = $hit->next_hsp; # get first hit; others ignored
 		    $aln = $hsp->get_aln();
 		}
 	    }
-	} else {
-	   $in = Bio::AlignIO->new(-format => $in_format, ($file eq "STDIN")? (-fh => \*STDIN) : (-file => $file));
-	   $aln = $in->next_aln()
+	} else { # would throw error if format guessed wrong
+#	    $in = Bio::AlignIO->new(-format => $in_format, ($file eq "STDIN")? (-fh => \*STDIN) : (-file => $file));
+#	    $in = Bio::AlignIO->new(-format => $in_format, -fh => $ifh);
+	    $in = Bio::AlignIO->new(-format=>$in_format, ($file eq "STDIN")? (-fh => \*STDIN) : (-file => $file) );
+	    $aln = $in->next_aln()
 	}
     }
-
+    
     $binary = $opts{"binary"} ? 1 : 0;
-
+    
     #### Options which *require an output FH* go *after* this ####
     $out_format = $opts{"output"} || $default_format;
     $out = Bio::AlignIO->new(-format => $out_format, -fh => \*STDOUT) unless $out_format eq 'paml'
@@ -236,6 +265,58 @@ sub phylip_non_interleaved {
 
 ###################### subroutine ######################
 
+sub gap_char {
+    my $char = $opts{'gap-char'};
+    die "gap-char takes a single character\n" unless length($char) == 1;
+    foreach my $seq ($aln->each_seq()) { 
+	my $seq_str = $seq->seq();
+	$seq_str =~ s/[\.-]/$char/g;
+	$seq->seq($seq_str); 
+    }
+}
+
+sub pair_diff {
+    my $alnBack = $aln;
+    $alnBack = $alnBack->remove_gaps();
+    my $matchLineFull = $alnBack->match_line();
+    my @match_symbols_full = split //, $matchLineFull;
+    my $num_var = 0; # de-gapped variable sites
+    for (my $i = 0; $i < $alnBack->length; $i++) {
+	next if $match_symbols_full[$i] eq '*'; 
+	$num_var++;
+    }
+
+    my (@seqs);
+    foreach my $seq ($aln->each_seq()) { push @seqs, $seq }
+    @seqs = sort { $a->id() cmp $b->id() } @seqs;
+    for (my $i=0; $i < $#seqs; $i++) {
+	my $idA = $seqs[$i]->id();
+	my $seqA = $seqs[$i];
+	for (my $j=$i+1; $j <= $#seqs; $j++) {
+	    my $idB = $seqs[$j]->id();
+	    my $seqB = $seqs[$j];
+	    my $pair = new Bio::SimpleAlign;
+	    $pair->add_seq($seqA);
+	    $pair->add_seq($seqB);
+	    $pair = $pair->remove_gaps();
+#	    my $mask = $seqA->seq ^ $seqB->seq; #  (exclusive or) operator: returns "\0" if same
+	    my $ct_diff = 0;
+	    my $matchLine = $pair->match_line();
+	    my @match_symbols = split //, $matchLine;
+	    for (my $i = 0; $i < $pair->length; $i++) {
+		next if $match_symbols[$i] eq '*'; 
+		$ct_diff++;
+	    }
+#	    while ($mask =~ /[^\0]/g) { $ct_diff++ }
+	    my $pairdiff = $pair->percentage_identity();
+	    print join "\t", ($idA, $idB, $num_var, $ct_diff, $pair->length());
+	    printf "\t%.4f\t%.4f\t%.4f\n", $pairdiff, 1-$pairdiff/100, $ct_diff/$num_var;
+	}
+    }
+    exit;
+}
+
+
 sub split_cdhit {
     my $cls_file = $opts{'split-cdhit'};
     open IN, "<" . $cls_file || die "cdhit clstr file not found: $cls_file\n";
@@ -281,11 +362,8 @@ sub split_cdhit {
     exit;
 }
 
-sub _remove_common_gaps {
-
-
-
-}
+#sub _remove_common_gaps {
+#}
 
 sub trim_ends {
     my (@seqs, @gaps);

@@ -123,7 +123,10 @@ static PerlTrace* get_trace() noexcept {
             if (CvHASGV(dbcx->blk_sub.cv)) {
                 xs::Sub sub(dbcx->blk_sub.cv);
                 name = sub.name();
-                library = sub.stash().name();
+                // just sub.stash().name() can't be called, as it omits
+                // the effects of Sub::Name
+                library = sub.glob().effective_stash().name();
+
             } else {
                 name = "(unknown)";
             }

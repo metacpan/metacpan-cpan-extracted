@@ -1,13 +1,13 @@
 use Test::More;
 use lib 't/lib';
 
-use Day::Night;
-use Day::Night::Day;
+use Everyday::Night;
+use Everyday::Day::Night::Day;
 
-my $night = Day::Night->new();
+my $night = Everyday::Night->new();
 is($night->nine, 'crazy');
 
-my $night = Day::Night::Day->new();
+my $night = Everyday::Day::Night::Day->new();
 is($night->nine, 'crazy');
 
 done_testing();

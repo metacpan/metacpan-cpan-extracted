@@ -38,7 +38,9 @@ t/04_qcount.t
 t/05_qfilter.t
 t/06_qoptions.t
 t/07_traverse.t
+t/08_qparse.t
+t/08_qparse.dat
+t/09_qcomments.t
 t/parseme.pl
-t/parseme.dat
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

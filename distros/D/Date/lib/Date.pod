@@ -100,7 +100,7 @@ low-level time functions implementation.
     if ($a) { # valid date
       ...
     } else { # invalid date
-      if ($a->error == Date::errc::parser_error) { ... }
+      if ($a->error == Date::Error::parser_error) { ... }
       print $a->error->message;
     }
     
@@ -226,7 +226,7 @@ C<$timezone> parameter is ignored in this case.
 You can limit the number of allowed formats by passing C<$format> argument, which is the bitmask of the following constants:
 INPUT_FORMAT_ALL(the default), INPUT_FORMAT_ISO, INPUT_FORMAT_ISO8601, INPUT_FORMAT_RFC1123, INPUT_FORMAT_RFC850, INPUT_FORMAT_ANSI_C, INPUT_FORMAT_DOT.
 
-If C<$string> is an invalid date or a valid date but in format other than specified, then C<error()> is set to C<Date::errc::parser_error>
+If C<$string> is an invalid date or a valid date but in format other than specified, then C<error()> is set to C<Date::Error::parser_error>
 
 
 =head4 new_ymd(%ymdhms)
@@ -698,9 +698,9 @@ If parts of the date are invalid or the whole date is not valid, e.g. 2001-02-31
 
 when range_check is not set (the default), then these date values are automatically converted to a valid date (normalized): 2001-03-03
 
-when range_check is set, then a date "2001-02-31" became invalid date and error() is set to C<Date::errc::out_of_range>.
+when range_check is set, then a date "2001-02-31" became invalid date and error() is set to C<Date::Error::out_of_range>.
 
-One exception from this rule is when format has a weekday name (rfc1123, etc) and it doesn't match represented date, C<Date::errc::out_of_range> will be always set.
+One exception from this rule is when format has a weekday name (rfc1123, etc) and it doesn't match represented date, C<Date::Error::out_of_range> will be always set.
 
 
 =head4 date(...)
@@ -832,11 +832,11 @@ Like C<timelocal()> but runs calculations in timezone C<$timezone> instead of lo
 
 =head1 CONSTANTS
 
-=head4 Date::errc::parser_error
+=head4 Date::Error::parser_error
 
 Wrong date string format
 
-=head4 Date::errc::out_of_range
+=head4 Date::Error::out_of_range
 
 Invalid date (or date part) supplied when range_check() is in effect
 

@@ -42,6 +42,7 @@ t/05_pp_qfilter.t
 t/06_pp_qoptions.t
 t/07_pp_traverse.t
 t/08_pp_qparse.t
+t/09_pp_qcomments.t
 t/10a_any_import_none.t
 t/10b_any_import_pp.t
 t/10c_any_import_xs.t
@@ -56,8 +57,11 @@ t/17a_any_pp_traverse.t
 t/17b_any_xs_traverse.t
 t/18a_any_pp_qparse.t
 t/18b_any_xs_qparse.t
+t/19a_any_pp_qcomments.t
+t/19b_any_xs_qcomments.t
 t/parseme.pl
 t/parseme.dat
+t/qcomments.pl
 
 ddc-query.perl
 ddc-cgi.perl
@@ -66,5 +70,6 @@ ddc-expand-lts-query.perl
 ddc-lts-wrapper.perl
 ddc-make-bibl.perl
 ddc-dump2tj.perl
+ddc-tee.perl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -17,9 +17,10 @@ my $builder = Module::Build->new(
         'Test::More' => '0',
     },
     requires => {
+      'perl'          => '5.10.0',
+      'List::Util'    => '1.43',
+      'Scalar::Util'  => '1.39',
       'Carp'          => '0',
-      'List::Util'    => '0',
-      'Scalar::Util'  => '0',
       'Net::IPAM::IP' => '0',
       },
     add_to_cleanup     => [ 'Net-IPAM-Block-*' ],

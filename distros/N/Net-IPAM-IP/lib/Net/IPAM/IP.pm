@@ -13,7 +13,7 @@ use Socket qw/AF_INET AF_INET6 inet_pton inet_ntop/;
 use Exporter 'import';
 our @EXPORT_OK = qw(incr_n);
 
-our $VERSION = '1.00';
+our $VERSION = '1.03';
 
 =head1 NAME
 
@@ -400,6 +400,10 @@ TODO
 
 =back
 
+=head1 SEE ALSO
+
+L<Net::IPAM::Block>
+L<Net::IPAM::Tree>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -29,7 +29,7 @@ The complexity for tree operations is in worst case O(h * log n) with h <= 128 (
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -116,7 +116,7 @@ sub insert {
       }
     );
 
-    unless ( defined $self->{root}->insert_node($node) ) {
+    unless ( defined $self->{root}->_insert_node($node) ) {
       $warnings++;
 
       # caller can shut up with: no warnings 'Net::IPAM::Tree'
@@ -159,7 +159,7 @@ sub contains {
   croak("wrong arg,") unless $thing->isa('Net::IPAM::Block');
 
   # just look in childs of root node
-  return $self->{root}->contains($thing);
+  return $self->{root}->_contains($thing);
 }
 
 =head2 lookup($thing)
@@ -190,7 +190,7 @@ sub lookup {
 
   croak("wrong arg,") unless $thing->isa('Net::IPAM::Block');
 
-  return $self->{root}->lookup($thing);
+  return $self->{root}->_lookup($thing);
 }
 
 =head2 remove
@@ -208,7 +208,7 @@ sub remove {
   croak("wrong arg,") unless $_[1]->isa('Net::IPAM::Block');
 
   # remove block, relink childs
-  return $_[0]->{root}->remove( $_[1], 0 );
+  return $_[0]->{root}->_remove( $_[1], 0 );
 }
 
 =head2 remove_branch
@@ -226,7 +226,7 @@ sub remove_branch {
   croak("wrong arg,") unless $_[1]->isa('Net::IPAM::Block');
 
   # remove block and child nodes
-  return $_[0]->{root}->remove( $_[1], 1 );
+  return $_[0]->{root}->_remove( $_[1], 1 );
 }
 
 =head2 to_string
@@ -389,11 +389,6 @@ sub len {
 
 Karl Gaissmaier, C<< <karl.gaissmaier(at)uni-ulm.de> >>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-net-ipam-tree at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-IPAM-Tree>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -409,6 +404,11 @@ You can also look for information at:
 TODO
 
 =back
+
+=head1 SEE ALSO
+
+L<Net::IPAM::IP>
+L<Net::IPAM::Block>
 
 =head1 LICENSE AND COPYRIGHT
 

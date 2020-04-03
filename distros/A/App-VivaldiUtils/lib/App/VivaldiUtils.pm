@@ -1,9 +1,9 @@
 package App::VivaldiUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-09'; # DATE
+our $DATE = '2019-12-10'; # DATE
 our $DIST = 'App-VivaldiUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -33,6 +33,7 @@ sub ps_vivaldi {
 $SPEC{pause_vivaldi} = {
     v => 1.1,
     summary => "Pause (kill -STOP) Vivaldi",
+    description => $App::BrowserUtils::desc_pause,
     args => {
        %App::BrowserUtils::args_common,
     },
@@ -95,7 +96,7 @@ App::VivaldiUtils - Utilities related to the Vivaldi browser
 
 =head1 VERSION
 
-This document describes version 0.002 of App::VivaldiUtils (from Perl distribution App-VivaldiUtils), released on 2019-12-09.
+This document describes version 0.003 of App::VivaldiUtils (from Perl distribution App-VivaldiUtils), released on 2019-12-10.
 
 =head1 SYNOPSIS
 
@@ -129,6 +130,14 @@ Usage:
  pause_vivaldi(%args) -> [status, msg, payload, meta]
 
 Pause (kill -STOP) Vivaldi.
+
+A modern browser now runs complex web pages and applications. Despite browser's
+power management feature, these pages/tabs on the browser often still eat
+considerable CPU cycles even though they only run in the background. Stopping
+(kill -STOP) the browser processes is a simple and effective way to stop CPU
+eating on Unix. It can be performed whenever you are not using your browsers for
+a little while, e.g. when you are typing on an editor or watching a movie. When
+you want to use your browser again, simply unpause it.
 
 This function is not exported.
 

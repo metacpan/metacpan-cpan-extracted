@@ -19,6 +19,8 @@ src/panda/error.h
 src/panda/excepted.h
 src/panda/exception.cc
 src/panda/exception.h
+src/panda/exception/unix.icc
+src/panda/exception/win.icc
 src/panda/expected.h
 src/panda/from_chars.cc
 src/panda/from_chars.h

@@ -14,6 +14,7 @@ Makefile.PL
 MANIFEST			This list of files
 misc/devel-trace.pl
 misc/exception-bactrace.pl
+misc/named-subs.pl
 src/panda/CTrace.cc
 src/panda/CTrace.h
 src/panda/dwarf.cc
@@ -32,6 +33,7 @@ t/04-no-segfault-at-start.t
 t/05-perl-exceptions.t
 t/06-c-exceptions.t
 t/07-api.t
+t/08-subname.t
 t/MyTest.pm
 t/MyTest.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)

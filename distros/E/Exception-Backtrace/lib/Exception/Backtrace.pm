@@ -9,7 +9,7 @@ use overload
     '""'     => sub { shift->{_value} },
     fallback => 1;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 
 require XS::Loader;

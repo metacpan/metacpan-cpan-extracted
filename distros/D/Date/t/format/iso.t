@@ -55,7 +55,7 @@ subtest 'parse' => sub {
         $ok = 1 if $d;
         ok !$ok;
         ok !$d;
-        is $d->error, Date::errc::parser_error;
+        is $d->error, Date::Error::parser_error;
         is int($d), 0;
         
         $d = date("2017-07-HELLO");

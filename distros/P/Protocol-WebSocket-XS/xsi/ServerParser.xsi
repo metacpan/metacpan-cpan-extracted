@@ -1,0 +1,29 @@
+MODULE = Protocol::WebSocket::XS                PACKAGE = Protocol::WebSocket::XS::ServerParser
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Protocol::WebSocket::XS::Parser");
+}
+
+ServerParser* new (SV* CLASS) {
+    RETVAL = new ServerParser();
+    PROTO = CLASS;
+}
+
+bool ServerParser::accept_parsed ()
+
+bool ServerParser::accepted ()
+
+ConnectRequestSP ServerParser::accept (string buf) {
+    RETVAL = THIS->accept(buf);
+}
+
+string ServerParser::accept_error (panda::protocol::http::ResponseSP res = nullptr) {
+    if (!res) RETVAL = THIS->accept_error();
+    else RETVAL = THIS->accept_error(res);
+}
+
+string ServerParser::accept_response (ConnectResponseSP res = nullptr) {
+    if (!res) RETVAL = THIS->accept_response();
+    else RETVAL = THIS->accept_response(res);
+}

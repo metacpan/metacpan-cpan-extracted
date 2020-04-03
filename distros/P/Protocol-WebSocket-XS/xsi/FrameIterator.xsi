@@ -1,0 +1,12 @@
+MODULE = Protocol::WebSocket::XS                PACKAGE = Protocol::WebSocket::XS::FrameIterator
+PROTOTYPES: DISABLE
+
+FrameSP XSFrameIterator::next () {
+    RETVAL = THIS->next();
+}
+
+XSMessageIterator* XSFrameIterator::get_messages () {
+    auto messages = THIS->get_messages();
+    if (messages.begin() == messages.end()) XSRETURN_UNDEF;
+    RETVAL = new XSMessageIterator(messages.begin());
+}

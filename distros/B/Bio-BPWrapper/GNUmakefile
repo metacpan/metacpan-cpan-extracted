@@ -6,6 +6,7 @@ BASH ?= bash
 all: Build
 	$(PERL) Build --makefile_env_macros 1
 
+#: make Build program
 Build:
 	$(PERL) Build.PL || $(PERL) Makefile.PL
 
@@ -15,10 +16,14 @@ build: Build
 
 #: Remove automatically generated files
 clean: Build
-	$(PERL) Build --makefile_env_macros 1 clean
+	$(PERL) Build --makefile_env_macros 1 clean || /bin/true
 	@rm bin/*.check \
         lib/Bio/BPWrapper*.check \
 	lib/Bio/BPWrapper/*.check || /bin/true
+
+#: Create a docker image
+docker:
+	docker build -t rockyb/bpwrapper .
 
 code: Build
 	$(PERL) Build --makefile_env_macros 1 code

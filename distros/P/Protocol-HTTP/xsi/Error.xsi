@@ -4,7 +4,7 @@ PROTOTYPES: DISABLE
 BOOT {
     Stash s(__PACKAGE__);
     
-    Stash ecstash("Protocol::HTTP::errc", GV_ADD);
+    Stash ecstash("Protocol::HTTP::Error", GV_ADD);
     xs::exp::create_constants(ecstash, {
         {"lexical_error",                   xs::out(make_error_code(errc::lexical_error))},
         {"multiple_content_length",         xs::out(make_error_code(errc::multiple_content_length))},

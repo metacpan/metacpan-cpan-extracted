@@ -3,7 +3,6 @@
 use Test::More;
 use Test::Deep;
 use Test::Exception;
-use Data::Dumper;
 use autodie;
 plan 'tests' => 12;
 

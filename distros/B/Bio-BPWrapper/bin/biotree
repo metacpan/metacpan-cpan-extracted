@@ -22,8 +22,10 @@ GetOptions(\%opts,
 	   "ci|c=s", # attach binary trait table
 	   "clean-br|b",
 	   "clean-boot|B",
+	   "cut-tree=f", # cut tree to identify groups
 	   "del-otus|d=s",
 	   "del-low-boot|D=f",
+	   "del-short-br|E=f",
 	   "depth=s",
 	   "dist=s",
 	   "dist-all",
@@ -40,12 +42,16 @@ GetOptions(\%opts,
 	   "otus-all|u",
 	   "otus-desc|U:s",
 	   "otus-num|n",
-	   "output|o=s",
+	   "output|o=s", 
 	   "random=i",
+	   "ref=s", # specify reference OTU (move to top)
+	   "rename-tips=s", 
 	   "reroot|r=s",
+ 	   "rotate-node=s", # rotate around an internal node (give node id)
 	   "sis-pairs", # pairwise OTU togetherness
+#	   "sort-child=s", # sort child by height (default) or others (to make output tree consistent)
 	   "subset|s=s",
-	   "swap-otus=s", # output trees with each possible pairs (with the designated one) swapped
+	   "swap-otus=s", # ??
 	   "tree-shape", # for apTreeshape package
 	   "walk|w=s",
 #	   "rmbl|R",
@@ -122,6 +128,12 @@ Remove branch lengths from all nodes.
 
 Remove all branch support values.
 
+=item --cut-tree "length"
+
+Identify clades based on branches that bisected by a cut line (half way to max by default).
+
+Through error if cut is greater than the least deep OTU.
+
 =item --del-otus, -d 'otu1,out2,etc'
 
 Get a subtree by removing specified OTUs
@@ -129,6 +141,10 @@ Get a subtree by removing specified OTUs
 =item --del-low-boot, -D 'cutoff'
 
 Remove branches supported by less than specified cutoff value, creating a multi-furcating tree.
+
+=item --del-short-br, -E 'cutoff'
+
+Remove branches shorter than specified cutoff value, creating a multi-furcating tree.
 
 =item --depth 'node'
 
@@ -204,9 +220,21 @@ Output file format. Accepts newick, nhx, and tabtree.
 
 Builds a tree of a random subset of the original tree's OTUs.
 
+=item --ref <OTU>
+
+Rotate <OTU> to be the top tip
+
+=item --rename-tips <file>
+
+Rename tips according to a 2-column table
+
 =item --reroot, -r 'newroot'
 
 Reroot tree to specified node by creating new branch.
+
+=item --rotate-node 'inode_internal_id'
+
+Flip two descendant nodes of an internal node (die if multi-furcation). Useful for plotting.
 
 =item --sis-pairs
 

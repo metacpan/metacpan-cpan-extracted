@@ -11,11 +11,9 @@ use List::MoreUtils qw(lower_bound);
 
 Net::IPAM::Tree::Node - A node in the Net::IPAM::Tree
 
-=cut
-
-our $VERSION = '1.00';
-
 =head1 SYNOPSIS
+
+This module is not useful standalone, it's just needed for Net::IPAM::Tree
 
 A node is a recursive datastructure with a payload (block) and a parent and zero or more child nodes.
 
@@ -77,15 +75,16 @@ sub childs {
   return @{ $_[0]->{childs} };
 }
 
-=head2 insert_node
+####
+# _insert_node($block)
+#
+# One method for inserting new nodes and parent-child relinking, recursive descent, heavy duty,
+# key algorithm for this tree.
+#
+# Returns undef on duplicate block.
+#
 
-One method for inserting new nodes and parent-child relinking, recursive descent, heavy duty, key algorithm for this tree.
-
-Returns undef on duplicate block.
-
-=cut
-
-sub insert_node {
+sub _insert_node {
   my ( $node, $input ) = @_;
 
   # number of childs
@@ -109,7 +108,7 @@ sub insert_node {
     if ( $prev->{block}->contains( $input->{block} ) ) {
 
       # it's contained, recursive descent, return success or undef on failure
-      return $prev->insert_node($input);
+      return $prev->_insert_node($input);
     }
   }
 
@@ -148,7 +147,7 @@ sub insert_node {
     if ( $input->{block}->contains( $child->{block} ) ) {
 
       # insert or return undef
-      $input->insert_node($child) // die("logic error,");
+      $input->_insert_node($child) // die("logic error,");
       next;
     }
 
@@ -164,15 +163,16 @@ sub insert_node {
   return 1;
 }
 
-=head2 remove
+####
+# _remove($block, $branch)
+#
+# Remove block in node or childs of node, returns undef if not found.
+# If $branch is true, don't relink the child nodes.
+#
+#   $node->_remove($block, $branch) // warn("block not found,");
+#
 
-Remove block in tree, returns undef if not found. If $branch is true, don't relink the child nodes.
-
-  $node->remove($block, $branch) // warn("block not found,");
-
-=cut
-
-sub remove {
+sub _remove {
   my ( $node, $that, $del_branch ) = @_;
   #
   # number of childs, return undef (false) if 0
@@ -199,7 +199,7 @@ sub remove {
 
       # re-insert grand_childs from deleted child into tree
       foreach my $grand_child ( @{ $match->{childs} } ) {
-        $node->insert_node($grand_child) or die("logic error,");
+        $node->_insert_node($grand_child) or die("logic error,");
       }
 
       # success
@@ -214,7 +214,7 @@ sub remove {
     # child before idx may contain the item, recdescent
     my $prev = $node->{childs}[ $idx - 1 ];
     if ( $prev->{block}->contains($that) ) {
-      return $prev->remove( $that, $del_branch );
+      return $prev->_remove( $that, $del_branch );
     }
   }
 
@@ -223,14 +223,15 @@ sub remove {
   return;
 }
 
-=head2 contains($block)
-
-Reports whether the given block is contained in any child of the (root) node.
-
-=cut
-
+####
+# _contains($block)
+#
+# Reports whether the given block is contained in any child of the node.
+#
 # block is a Net::IPAM::Block or a subclass
-sub contains {
+#
+
+sub _contains {
   my ( $node, $block ) = @_;
   #
   # number of childs, return undef (false) if 0
@@ -258,14 +259,14 @@ sub contains {
   return;
 }
 
-=head2 lookup($block)
-
-Returns item in tree with longest-prefix-match for $block, returns undef if not found.
-
-=cut
-
+####
+# _lookup($block)
+#
+# Returns item in tree with longest-prefix-match for $block, returns undef if not found.
+#
 # block is a Net::IPAM::Block or a subclass
-sub lookup {
+#
+sub _lookup {
   my ( $node, $block ) = @_;
   #
   # number of childs, return undef if we have no childs
@@ -295,7 +296,7 @@ sub lookup {
       return $this->{block} if @{ $this->{childs} } == 0;
 
       # recursive descent
-      return $this->lookup($block);
+      return $this->_lookup($block);
     }
   }
 

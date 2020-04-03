@@ -1,0 +1,34 @@
+MODULE = Protocol::WebSocket::XS                PACKAGE = Protocol::WebSocket::XS
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__);
+
+    Stash ecstash("Protocol::WebSocket::XS::Error", GV_ADD);
+    xs::exp::create_constants(ecstash, {
+        {"garbage_after_connect",      xs::out(make_error_code(errc::garbage_after_connect))},
+        {"unsupported_version",        xs::out(make_error_code(errc::unsupported_version))},
+        {"response_code_101",          xs::out(make_error_code(errc::response_code_101))},
+        {"connection_mustbe_upgrade",  xs::out(make_error_code(errc::connection_mustbe_upgrade))},
+        {"upgrade_mustbe_websocket",   xs::out(make_error_code(errc::upgrade_mustbe_websocket))},
+        {"sec_accept_missing",         xs::out(make_error_code(errc::sec_accept_missing))},
+        {"method_mustbe_get",          xs::out(make_error_code(errc::method_mustbe_get))},
+        {"http_1_1_required",          xs::out(make_error_code(errc::http_1_1_required))},
+        {"body_prohibited",            xs::out(make_error_code(errc::body_prohibited))},
+        {"invalid_opcode",             xs::out(make_error_code(errc::invalid_opcode))},
+        {"control_fragmented",         xs::out(make_error_code(errc::control_fragmented))},
+        {"control_payload_too_big",    xs::out(make_error_code(errc::control_payload_too_big))},
+        {"not_masked",                 xs::out(make_error_code(errc::not_masked))},
+        {"max_frame_size",             xs::out(make_error_code(errc::max_frame_size))},
+        {"close_frame_invalid_data",   xs::out(make_error_code(errc::close_frame_invalid_data))},
+        {"initial_continue",           xs::out(make_error_code(errc::initial_continue))},
+        {"fragment_no_continue",       xs::out(make_error_code(errc::fragment_no_continue))},
+        {"max_message_size",           xs::out(make_error_code(errc::max_message_size))},
+        {"deflate_negotiation_failed", xs::out(make_error_code(errc::deflate_negotiation_failed))},
+        {"control_frame_compression",  xs::out(make_error_code(errc::control_frame_compression))},
+        {"inflate_error",              xs::out(make_error_code(errc::inflate_error))},
+    });
+    xs::exp::autoexport(ecstash);
+
+    s.add_const_sub("error_category", xs::out<const std::error_category*>(&error_categoty));
+}

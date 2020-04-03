@@ -1,6 +1,6 @@
 use Test::More;
 use MooX::Purple;
-use MooX::Purple::G 't/lib';
+use MooX::Purple::G -lib => 't/lib';
 
 role Before {
 	public seven { return '7' }

@@ -46,6 +46,7 @@ iptr<BacktraceInfo> dl_produce(const RawTrace& buffer) {
             auto frame = it.second->resolve(ip_addr);
             if (frame) {
                 frames.emplace_back(std::move(frame));
+                break;
             }
         }
     }

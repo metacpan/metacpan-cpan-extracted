@@ -1,3 +1,5 @@
+1.0.3    02.04.2020
+           - change errc package to Error
 1.0.2    16.02.2020
            - add benchmarks to docs
            - bugfix: cookies/custom headeres do not affect generic headers

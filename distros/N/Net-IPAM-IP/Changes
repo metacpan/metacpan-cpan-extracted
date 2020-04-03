@@ -1,5 +1,14 @@
 Revision history for Net-IPAM-IP
 
+1.03    Fri, 03 Apr 2020 09:35:00 +0200
+        [Bugfix]
+        * define minimum version in require for Socket
+
+1.02    Thu, 02 Apr 2020 20:26:55 +0200
+        define proper version for perl in requires
+
+1.01    not released
+
 1.00    Thu, 02 Apr 2020 10:40:16 +0200
         First released version, released on an unsuspecting world.
 

@@ -1,0 +1,92 @@
+=head1 NAME
+
+Protocol::WebSocket::XS::ClientParser - Client-side websocket parser
+
+
+
+=head1 SYNOPSIS
+
+    use Protocol::WebSocket::XS;
+
+    my $client = Protocol::WebSocket::XS::ClientParser->new;
+
+    # create request to be sent via network to server
+    my $req_str = $client->connect_request({
+        uri           => "ws://example.com/",
+        ws_key        => "dGhlIHNhbXBsZSBub25jZQ==",
+        ws_protocol   => "chat",
+        ws_extensions => [ [ 'permessage-deflate'] ],
+        headers       => {
+            'Origin'     => 'http://www.crazypanda.ru',
+            'User-Agent' => 'My-UA',
+        },
+    });
+
+    # receive server-reply from network
+    my $reply = '';
+    # establish connection and finish negotiation phase
+    my $response = $client->connect($reply);
+    
+    if ($client->established) {
+        # ...
+    }
+
+
+
+
+=head1 DESCRIPTION
+
+Client-side specialization of L<Protocol::WebSocket::XS::Parser>.
+
+Methods of this class are used for establishing a logical websocket connection with server.
+
+See L<Protocol::WebSocket::XS::Parser> for API after establishing a connection.
+
+
+
+=head1 METHODS
+
+=head2 new()
+
+Creates new instance of parser
+
+
+=head2 connect_request($request)
+
+Returns serialized HTTP-request that must be sent to server, with all supported extensions preconfigured
+(see L<Parser|Protocol::WebSocket::XS::Parser>). Extensions-related headers (C<per-message deflate>, etc...) are automatically added.
+
+C<$request> should be a L<Protocol::WebSocket::XS::ConnectRequest> object or a params hashref that its constructor supports.
+
+    my $data = $parser->connect_request($request);
+    # send $data to network
+
+
+=head2 connect($data)
+
+Parses server HTTP-response to the initial HTTP-request. All supported extensions
+will be enabled in the parser for furher usage, if server agrees to use them.
+
+Returns undef if more data is needed, otherwise returns L<Protocol::WebSocket::XS::ConnectResponse> which can be ignored
+if you don't care (just check $parser->established()).
+
+If any error occurs during parsing, $response->error() will be set to appropriate constant.
+
+    # receive $data
+    my $response = $parser->connect($data);
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::WebSocket::XS>
+
+L<Protocol::WebSocket::XS::ConnectRequest>
+
+L<Protocol::WebSocket::XS::ConnectResponse>
+
+L<Protocol::WebSocket::XS::Parser>
+
+L<Protocol::WebSocket::XS::ServerParser>
+
+=cut

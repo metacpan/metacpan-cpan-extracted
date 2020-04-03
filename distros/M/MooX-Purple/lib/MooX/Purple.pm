@@ -3,10 +3,14 @@ package MooX::Purple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 use Keyword::Declare;
+use Caller::Reverse qw/callr/;
+our $PREFIX;
 
 sub import {
+	my ($class, %args) = @_;
+	$PREFIX = $args{-prefix} unless $PREFIX;
 	keytype GATTRS is m{
 		(?:
 			allow (?&PerlNWS)
@@ -14,11 +18,11 @@ sub import {
 				(?&PerlList))
 			|
 			with (?&PerlNWS)
-				(?:(?!qw)(?&PerlQualifiedIdentifier)|
+				(?:(?!qw)(?&PerlPrefixUnaryOperator)*(?&PerlQualifiedIdentifier)|
 				(?&PerlList))
 			|
 			is (?&PerlNWS)
-				(?:(?!qw)(?&PerlQualifiedIdentifier)|
+				(?:(?!qw)(?&PerlPrefixUnaryOperator)*(?&PerlQualifiedIdentifier)|
 				(?&PerlList))
 			|
 			use (?&PerlNWS)
@@ -35,30 +39,18 @@ sub import {
 		)?+
 	}xms;
 	keyword role (QualIdent $class, GATTRS @roles, Block $block) {
-		my ($body, %attrs) = _set_class_role_attrs($block, _parse_role_attrs(@roles));
-		return qq|{
-			package $class;
-			use Moo::Role;
-			use MooX::LazierAttributes;
-			$attrs{with}
-			$attrs{use}
-			$body
-			1;
-		}|;
+		_handle_role($class, $block, @roles)
+	}
+	keyword role (PrefixUnaryOperator $pre, QualIdent $class, GATTRS @roles, Block $block) {
+		$class = $PREFIX . '::' . $class if $pre;
+		_handle_role($class, $block, @roles)
 	}
 	keyword class (QualIdent $class, GATTRS @roles, Block $block) {
-		my ($body, %attrs) = _set_class_role_attrs($block, _parse_role_attrs(@roles));
-		return qq|{
-			package $class;
-			use Moo;
-			use MooX::LazierAttributes;
-			use MooX::ValidateSubs;
-			$attrs{is}
-			$attrs{with}
-			$attrs{use}
-			$body
-			1;
-		}|;
+		_handle_class($class, $block, @roles);
+	}
+	keyword class (PrefixUnaryOperator $pre, QualIdent $class, GATTRS @roles, Block $block) {
+		$class = $PREFIX . '::' . $class if $pre;	
+		_handle_class($class, $block, @roles);
 	}
 	keyword private (Ident $method, SATTRS @roles, Block $block) {
 		my %attrs = _parse_role_attrs(@roles);
@@ -78,6 +70,61 @@ sub import {
 	}
 }
 
+sub _handle_class {
+	my ($class, $block, @roles) = @_;
+	my ($body, %attrs) = _set_class_role_attrs($block, _parse_role_attrs(@roles));
+	my $out = qq|{
+		package $class;
+		use Moo;
+		use MooX::LazierAttributes;
+		use MooX::ValidateSubs;
+		$attrs{is}
+		$attrs{with}
+		$attrs{use}
+		$body
+		1;
+	}|;
+	return $out;
+}
+
+sub _handle_role {
+	my ($class, $block, @roles) = @_; 
+	my ($body, %attrs) = _set_class_role_attrs($block, _parse_role_attrs(@roles));
+	return qq|{
+		package $class;
+		use Moo::Role;
+		use MooX::LazierAttributes;
+		use MooX::ValidateSubs;
+		$attrs{with}
+		$attrs{use}
+		$body
+		1;
+	}|;
+}
+
+sub _parse_role_attrs {
+	my @roles = @_;
+	my %attrs;
+	my $i = 0;
+	for (@roles) {
+		if ($_ =~ m/\s*use\s*((?!qw)(?&PerlQualifiedIdentifier))\s*((?&PerlList)) $PPR::GRAMMAR/xms) {
+			$attrs{use}{sprintf "%s %s", $1, $2}++;
+			next;
+		}
+		$_ =~ m/(with|allow|is|use)(.*)/i;
+		my @list = eval($2); # || $2
+		push @list, $2 unless @list;
+		for (@list) {
+			$attrs{$1}{$_} = $i++;
+		}
+	}
+	for my $o (qw/with allow is use/) {
+		$attrs{$o} = [sort { $attrs{$o}{$a} <=> $attrs{$o}{$b} } keys %{$attrs{$o}}] if $attrs{$o};
+	}
+	return %attrs;
+}
+
+=pod todo uncomment and remove above hack
 sub _parse_role_attrs {
 	my @roles = @_;
 	my %attrs;
@@ -87,19 +134,34 @@ sub _parse_role_attrs {
 			next;
 		}
 		$_ =~ m/(with|allow|is|use)(.*)/i;
-		push @{$attrs{$1}}, eval $2 || $2;
+		push @{$attrs{$1}}, eval($2) || $2;
 	}
 	return %attrs;
 }
+=cut
 
 sub _set_class_role_attrs {
-	my ($body, %attrs) = @_;
+	my ($body, %attrs, %args) = @_;
 	if ($attrs{allow}) {
 		my $allow = join ' ', @{$attrs{allow}};
 		$body =~ s{private\s*(\p{XIDS}\p{XIDC}*)}{private $1 allow qw/$allow/}g;
 	}
-	$attrs{is} = $attrs{is} ? sprintf "extends qw/%s/;\n", join ' ', @{$attrs{is}} : '';
-	$attrs{with} = $attrs{with} ? sprintf "with qw/%s/;\n", join ' ', @{$attrs{with}} : '';
+	$attrs{is} = $attrs{is} ? sprintf "extends qw/%s/;\n",  join(' ', map { my $l = $_; $l =~ s/^\s*\+/$PREFIX\:\:/; $l; } @{$attrs{is}}) : '';
+	my $last;
+	$attrs{with} = $attrs{with} 
+		? sprintf "with qw/%s/;\n", join(' ', map { 
+			my $l = $_; 
+			$l =~ s/^\s*\+/$PREFIX\:\:/; 
+			unless($l =~ s/^\s*\-/$last\:\:/) {
+				$last = $l;
+			}
+			if ($l =~ s/^\s*\~//) {
+				$last = $PREFIX ? ($PREFIX . '::' . $l) : $l;
+				$l = '';
+			}
+			$l; 
+		} @{$attrs{with}}) 
+		: '';
 	$attrs{use} = $attrs{use} ? join('', map { sprintf("use %s;\n", $_) } @{$attrs{use}}) : '';
 	$body =~ s/(^{)|(}$)//g;
 	return $body, %attrs;
@@ -115,7 +177,7 @@ MooX::Purple - MooX::Purple
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -156,6 +218,42 @@ Version 0.11
 	};
 
 	Night->new()->five();
+
+	...
+
+	# ../Foo.pm
+	package Foo;
+	use MooX::Purple -prefix => 'Foo';
+	use Foo::Roles;
+	class +Class with qw/~Role -One -Two -Three -Four/ {
+		public print {
+			return $_[1];
+		}
+	}
+		
+	# ../Foo/Roles.pm
+	package Foo::Roles;
+	use MooX::Purple;
+	role +Role::One {
+		public one {
+			$_[0]->print(1);
+		}
+	}
+	role +Role::Two {
+		public two {
+			$_[0]->print(2);
+		}
+	}
+	role +Role::Three {
+		public three {
+			$_[0]->print(3);
+		}
+	}
+	role +Role::Four {
+		public four {
+			$_[0]->print(4);
+		}
+	}
 
 =head1 AUTHOR
 

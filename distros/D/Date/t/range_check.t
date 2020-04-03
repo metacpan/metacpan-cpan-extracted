@@ -12,6 +12,6 @@ my $date = Date->new("2001-02-31");
 ok(!$date);
 ok(!defined $date->to_string);
 is(int($date), 0);
-is($date->error, Date::errc::out_of_range);
+is($date->error, Date::Error::out_of_range);
 
 done_testing();
