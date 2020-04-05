@@ -107,16 +107,8 @@ KEYWORDS
     @INC mechanisms.
 
     The superclass must either be implemented by Object::Pad, or be some
-    class whose instances are blessed hash references.
-
-    In the latter case, all Object::Pad-based subclasses derived from it
-    will store their instance data in a key called "Object::Pad/slots",
-    which is fairly unlikely to clash with existing storage on the
-    instance. The exact format of the value stored here is not specified
-    and may change between module versions, though it can be relied on to
-    be well-behaved as some kind of perl data structure for purposes of
-    modules like Data::Dumper or serialisation into things like YAML or
-    JSON.
+    class whose instances are blessed hash references. For more detail on
+    this latter case see "SUBCLASSING CLASSIC PERL CLASSES".
 
     An optional version check can also be supplied; it performs the
     equivalent of
@@ -217,6 +209,63 @@ IMPLIED PRAGMATA
     problematic. Either the code will continue to run unaffected, or you
     may have to make some small alterations to bring it into a conforming
     style.
+
+SUBCLASSING CLASSIC PERL CLASSES
+
+    There are a number of details specific to the case of deriving an
+    Object::Pad class from an existing classic Perl class that is not
+    implemented using Object::Pad.
+
+ Storage of Instance Data
+
+    Instances will store their data in a key called "Object::Pad/slots",
+    which is fairly unlikely to clash with existing storage on the
+    instance. The exact format of the value stored here is not specified
+    and may change between module versions, though it can be relied on to
+    be well-behaved as some kind of perl data structure for purposes of
+    modules like Data::Dumper or serialisation into things like YAML or
+    JSON.
+
+ Object State During Methods Invoked By Superclass Constructor
+
+    It is common in classic Perl OO style to invoke methods on $self during
+    the constructor. This is supported here since Object::Pad version 0.19.
+    Note however that any methods invoked by the superclass constructor may
+    not see the object in a fully consistent state. (This fact is not
+    specific to using Object::Pad and would happen in classic Perl OO as
+    well). The slot initialisers will have been invoked but the BUILD
+    methods will not.
+
+    For example; in the following
+
+       package ClassicPerlBaseClass {
+          sub new {
+             my $self = bless {}, shift;
+             say "Value seen by superconstructor is ", $self->get_value;
+             return $self;
+          }
+          sub get_value { return "A" }
+       }
+    
+       class DerivedClass extends ClassicPerlBaseClass {
+          has $_value = "B";
+          method BUILD {
+             $_value = "C";
+          }
+          method get_value { return $_value }
+       }
+    
+       my $obj = DerivedClass->new;
+       say "Value seen by user is ", $obj->get_value;
+
+    Until the ClassicPerlBaseClass::new superconstructor has returned the
+    BUILD method will not have been invoked. The $_value slot will still
+    exist, but its value will be B during the superconstructor. After the
+    superconstructor, the BUILD methods are invoked before the completed
+    object is returned to the user. The result will therefore be:
+
+       Value seen by superconstructor is B
+       Value seen by user is C
 
 STYLE SUGGESTIONS
 

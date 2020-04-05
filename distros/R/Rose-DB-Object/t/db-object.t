@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More tests => 598;
+use Test::More tests => 594;
 
 BEGIN 
 {
@@ -25,7 +25,7 @@ our($PG_HAS_CHKPASS, $HAVE_PG, $HAVE_MYSQL, $HAVE_INFORMIX, $HAVE_SQLITE,
 
 SKIP: foreach my $db_type (qw(pg pg_with_schema))
 {
-  skip("PostgreSQL tests", 242)  unless($HAVE_PG);
+  skip("PostgreSQL tests", 238)  unless($HAVE_PG);
 
   Rose::DB->default_type($db_type);
 
@@ -364,7 +364,8 @@ SKIP: foreach my $db_type (qw(pg pg_with_schema))
 
   is($o->dur->in_units('years'), 7, "interval in_units years 1 - $db_type");
   is($o->dur->in_units('months'), 84, "interval in_units months 1 - $db_type");
-  is($o->dur->nanoseconds, 3000, "interval nanoseconds 1 - $db_type");
+  # Test disabled until https://github.com/lestrrat-p5/DateTime-Format-Pg/issues/19 is addressed
+  #is($o->dur->nanoseconds, 3000, "interval nanoseconds 1 - $db_type");
   is($o->dur->days, 0, "interval days 2 - $db_type");
   is($o->dur->minutes, 0, "interval minutes 2 - $db_type");
   is($o->dur->seconds, 0, "interval seconds 2 - $db_type");
@@ -403,7 +404,8 @@ SKIP: foreach my $db_type (qw(pg pg_with_schema))
 
   is($o->dur->in_units('years'), 7, "interval in_units years 2 - $db_type");
   is($o->dur->in_units('months'), 84, "interval in_units months 2 - $db_type");
-  is($o->dur->nanoseconds, 3000, "interval nanoseconds 2 - $db_type");
+  # Test disabled until https://github.com/lestrrat-p5/DateTime-Format-Pg/issues/19 is addressed
+  #is($o->dur->nanoseconds, 3000, "interval nanoseconds 2 - $db_type");
   is($o->dur->days, 0, "interval days 3 - $db_type");
   is($o->dur->minutes, 0, "interval minutes 3 - $db_type");
   is($o->dur->seconds, 0, "interval seconds 3 - $db_type");

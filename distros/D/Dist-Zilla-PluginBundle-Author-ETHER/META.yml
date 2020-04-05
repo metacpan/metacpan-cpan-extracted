@@ -54,13 +54,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::ETHER:
     file: lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
-    version: '0.152'
+    version: '0.153'
   Dist::Zilla::PluginBundle::Author::ETHER:
     file: lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
-    version: '0.152'
+    version: '0.153'
   Pod::Weaver::PluginBundle::Author::ETHER:
     file: lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
-    version: '0.152'
+    version: '0.153'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -209,10 +209,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER.git
-version: '0.152'
+version: '0.153'
 x_Dist_Zilla:
   perl:
-    version: '5.031009'
+    version: '5.031010'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -357,7 +357,6 @@ x_Dist_Zilla:
             - CONTRIBUTING
             - INSTALL
             - LICENCE
-            - META.json
             - README.pod
           exclude_match: []
           follow_symlinks: 0
@@ -828,7 +827,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20200220'
+          Module::CoreList: '5.20200320'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -991,7 +990,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.152
+          tag: v0.153
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -1181,7 +1180,7 @@ x_contributors:
   - 'Randy Stauner <rwstauner@cpan.org>'
   - 'Roy Ivy III <rivy@cpan.org>'
   - 'Сергей Романов <sromanov@cpan.org>'
-x_generated_by_perl: v5.31.9
+x_generated_by_perl: v5.31.10
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

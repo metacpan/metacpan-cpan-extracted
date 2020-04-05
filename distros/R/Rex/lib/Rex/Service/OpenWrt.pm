@@ -9,7 +9,7 @@ package Rex::Service::OpenWrt;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.2'; # VERSION
+our $VERSION = '1.9.0'; # VERSION
 
 use Rex::Service::Debian;
 use base qw(Rex::Service::Debian);

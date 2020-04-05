@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::rdeps;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '1.045'; # VERSION
+our $DATE = '2020-04-04'; # DATE
+our $VERSION = '1.046'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::lcpan::Cmd::rdeps - List reverse dependencies
 
 =head1 VERSION
 
-This document describes version 1.045 of App::lcpan::Cmd::rdeps (from Perl distribution App-lcpan), released on 2020-03-04.
+This document describes version 1.046 of App::lcpan::Cmd::rdeps (from Perl distribution App-lcpan), released on 2020-04-04.
 
 =head1 FUNCTIONS
 
@@ -67,6 +67,12 @@ herself.
 Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
+
+=item * B<flatten> => I<bool>
+
+Instead of showing tree-like information, flatten it.
+
+See deps' I<flatten> argument for more details.
 
 =item * B<index_name> => I<filename> (default: "index.db")
 

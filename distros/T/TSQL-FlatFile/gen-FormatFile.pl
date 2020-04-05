@@ -22,7 +22,7 @@ use List::MoreUtils qw{firstidx} ;
 use Data::Dumper;
 use Regexp::Exhaustive qw/ exhaustive /;
 
-use version ; our $VERSION = qv('1.0.1');
+use version ; our $VERSION = qv('1.0.3');
 our $opt_asciifile;
 our $opt_csvfile;
 our $opt_linenumber;
@@ -59,6 +59,12 @@ if ($datadebug)
     say "best_unmatchedcount:",$$res->{best_unmatchedcount};
     say "best_unmatchedamount:",$$res->{best_unmatchedamount};
 
+    $obj->printDebugData
+                    ( $asciifile
+                    , $datalinenumber
+                    , $$res->{positions}
+                    );
+    
 }
 else {
     my $res = $obj->processLine
@@ -92,11 +98,11 @@ gen-Ascii.pl - ???????????????????
 
 =head1 VERSION
 
-1.0.1
+1.0.3
 
 =head1 USAGE
 
-gen-Ascii.pl -c <csvfile> 
+gen-FormatFile.pl -c <csvfile> 
 
 
 =head1 REQUIRED ARGUMENTS

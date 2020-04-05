@@ -10,9 +10,9 @@
 package Perinci::CmdLine::Inline;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-18'; # DATE
+our $DATE = '2020-04-05'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.547'; # VERSION
+our $VERSION = '0.548'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -511,6 +511,8 @@ sub _gen_common_opt_handler {
         push @l, '$_pci_r->{config_profile} = $_[1];';
     } elsif ($co eq 'no_env') {
         push @l, '$_pci_r->{read_env} = 0;';
+    } elsif ($co eq 'page_result') {
+        push @l, '$_pci_r->{page_result} = 1;';
     } else {
         die "BUG: Unrecognized common_opt '$co'";
     }
@@ -1206,6 +1208,9 @@ sub gen_inline_pericmd_script {
                     $copts{$_} = $Perinci::CmdLine::Base::copts{$_};
                 }
             }
+            for (qw/page_result/) {
+                $copts{$_} = $Perinci::CmdLine::Base::copts{$_};
+            }
             $cd->{copts} = \%copts;
         }
 
@@ -1382,6 +1387,15 @@ _
         push @l, "### format & display result\n\n";
         push @l, "{\n";
         push @l, 'log_trace("Displaying result ...");', "\n" if $cd->{gen_args}{log};
+
+        push @l, 'my $fh;', "\n";
+        push @l, 'if ($_pci_r->{page_result} // $ENV{PAGE_RESULT} // $_pci_r->{res}[3]{"cmdline.page_result"}) {', "\n";
+        push @l, 'my $pager = $_pci_r->{pager} // $_pci_r->{res}[3]{"cmdline.pager"} // $ENV{PAGER} // "less -FRSX";', "\n";
+        push @l, 'open $fh, "| $pager";', "\n";
+        push @l, '} else {', "\n";
+        push @l, '$fh = \*STDOUT;', "\n";
+        push @l, '}', "\n";
+
         push @l, 'my $fres;', "\n";
         push @l, 'my $save_res; if (exists $_pci_r->{res}[3]{"cmdline.result"}) { $save_res = $_pci_r->{res}[2]; $_pci_r->{res}[2] = $_pci_r->{res}[3]{"cmdline.result"} }', "\n";
         push @l, 'my $is_success = $_pci_r->{res}[0] =~ /\A2/ || $_pci_r->{res}[0] == 304;', "\n";
@@ -1399,9 +1413,9 @@ _
         push @l, 'if ($use_utf8) { binmode STDOUT, ":encoding(utf8)" }', "\n";
 
         push @l, 'if ($is_stream) {', "\n";
-        push @l, '    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $l; print "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { print _pci_json()->encode($rec),"\n" } }', "\n";
+        push @l, '    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $fh $l; print $fh "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { print $fh _pci_json()->encode($rec),"\n" } }', "\n";
         push @l, '} else {', "\n";
-        push @l, '    print $fres;', "\n";
+        push @l, '    print $fh $fres;', "\n";
         push @l, '}', "\n";
         push @l, 'if (defined $save_res) { $_pci_r->{res}[2] = $save_res }', "\n";
         push @l, "}\n\n";
@@ -1619,7 +1633,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.547 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2020-02-18.
+This document describes version 0.548 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2020-04-05.
 
 =head1 SYNOPSIS
 

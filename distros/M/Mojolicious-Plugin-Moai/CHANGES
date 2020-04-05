@@ -1,5 +1,12 @@
 Changelog for Mojolicious-Plugin-Moai
 
+0.012     2020-04-04 15:54:57-05:00 America/Chicago
+
+    [Other]
+
+    - Improved tests for navbar menu. This raises the needed Mojolicious
+      version to 8.31 for the 'attr_*' methods on Test::Mojo
+
 0.011     2020-03-07 15:38:36-06:00 America/Chicago
 
     [Fixed]

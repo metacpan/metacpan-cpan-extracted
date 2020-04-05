@@ -410,24 +410,6 @@ sub test_expandTilde : Test(2) {
 
 # -----------------------------------------------------------------------------
 
-sub test_newExtension : Test(3) {
-    my $self = shift;
-
-    my $path = '/this/is/a/file.sql';
-    $path = Quiq::Path->newExtension($path,'.log');
-    $self->is($path,'/this/is/a/file.log');
-
-    $path = '/this/is/a/file.sql';
-    $path = Quiq::Path->newExtension($path,'log');
-    $self->is($path,'/this/is/a/file.log');
-
-    $path = '/this/is/a/file.ext.sql';
-    $path = Quiq::Path->newExtension($path,'log');
-    $self->is($path,'/this/is/a/file.ext.log');
-}
-
-# -----------------------------------------------------------------------------
-
 sub test_filename : Test(2) {
     my $self = shift;
 
@@ -566,6 +548,24 @@ sub test_newer : Test(2) {
 
     Quiq::Path->delete($file1);
     Quiq::Path->delete($file2);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_newExtension : Test(3) {
+    my $self = shift;
+
+    my $path = '/this/is/a/file.sql';
+    $path = Quiq::Path->newExtension($path,'.log');
+    $self->is($path,'/this/is/a/file.log');
+
+    $path = '/this/is/a/file.sql';
+    $path = Quiq::Path->newExtension($path,'log');
+    $self->is($path,'/this/is/a/file.log');
+
+    $path = '/this/is/a/file.ext.sql';
+    $path = Quiq::Path->newExtension($path,'log');
+    $self->is($path,'/this/is/a/file.ext.log');
 }
 
 # -----------------------------------------------------------------------------

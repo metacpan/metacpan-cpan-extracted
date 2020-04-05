@@ -8,17 +8,19 @@ use Test::More tests => 2;
 use App::WRT::HTML qw(:all);
 
 my $a_tag = a('hi', {href => 'https://example.com/', title => 'example'});
-diag($a_tag);
+# diag($a_tag);
 
-ok(
-  $a_tag eq '<a href="https://example.com/" title="example">hi</a>',
+is(
+  $a_tag,
+  '<a href="https://example.com/" title="example">hi</a>',
   'got a tag with attributes'
 );
 
 my $small_tag = small('text', {title => '<thing with angle brackets>'});
-diag($small_tag);
+# diag($small_tag);
 
-ok(
-  $small_tag eq '<small title="&lt;thing with angle brackets&gt;">text</small>',
+is(
+  $small_tag,
+  '<small title="&lt;thing with angle brackets&gt;">text</small>',
   'got a tag with escaped attributes'
 );

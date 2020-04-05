@@ -1,0 +1,103 @@
+=head1 NAME
+
+Protocol::WebSocket::Fast::ServerParser - Server-side websocket parser
+
+
+
+=head1 SYNOPSIS
+
+    use Protocol::WebSocket::Fast;
+
+    my $server  = Protocol::WebSocket::Fast::ServerParser->new;
+    my $request = $server->accept($data);
+
+    my $response_data = $request->error ? $server->accept_error : $server->accept_response;
+    # send $response_data to client
+
+    $server->accept_parsed;
+    $server->accepted;
+
+
+=head1 DESCRIPTION
+
+Server-side specialization of L<Protocol::WebSocket::Fast::Parser>.
+
+Methods of this class are used for accepting a logical websocket connection from client.
+
+See L<Protocol::WebSocket::Fast::Parser> for API after accepting a connection.
+
+
+=head1 METHODS
+
+=head2 accept_parsed()
+
+Returns true if server finished parsing client's connect request.
+
+
+=head2 accepted()
+
+Returns true if C<accept_parsed()> and no errors have been met.
+
+
+=head2 accept($data)
+
+Parses client's connect request (HTTP-request).
+
+Returns undef if more data is needed, otherwise returns L<Protocol::WebSocket::Fast::ConnectRequest> object.
+In internal state sets flags whether the requests has been parsed and accepted.
+
+Developer might inspect the request object and add application-specific checks.
+
+In case of any errors, $request->error() will be set.
+
+    my $request = $server_parser->accept($data);
+
+
+=head2 accept_response([$response])
+
+Returns serialized B<successful> response from server to client.
+
+Extensions-related headers are automatically added for the build-in extensions,
+which where enabled by configuration (L<Protocol::WebSocket::Fast::Parser::configure>)
+if request contained acceptable extension configurations.
+
+Developer might supply customized C<$response> with predefined headers, custom extensions, etc...
+
+C<$response> may be an L<Protocol::WebSocket::Fast::ConnectResponse> object or a params hashref that its constructor supports.
+
+    my $data = $server->accept_response({
+        body    => 'hello',
+        headers => {hello => 'world'},
+    });
+
+
+
+=head2 accept_error([$response])
+
+Returns serialized B<failure> response from server to client.
+Further communication with server is not possible, as websocket connection was not established.
+
+Developer might supply customized C<$object> with predefined headers, etc...
+
+C<$response> may be a L<Protocol::HTTP::Response> object or a params hashref that its constructor supports.
+
+    my $data = $server->accept_error({
+        code => 401,
+        body => 'we are unable to process your request because ...',
+    });
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::WebSocket::Fast>
+
+L<Protocol::WebSocket::Fast::ClientParser>
+
+L<Protocol::WebSocket::Fast::ConnectRequest>
+
+L<Protocol::WebSocket::Fast::ConnectResponse>
+
+L<Protocol::WebSocket::Fast::Parser>
+
+=cut

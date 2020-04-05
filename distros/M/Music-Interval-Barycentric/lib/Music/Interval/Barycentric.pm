@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0307';
+our $VERSION = '0.0400';
 
 use List::Util qw( min );
 
@@ -19,6 +19,7 @@ our @EXPORT = qw(
     orbit_distance
     forte_distance
     cyclic_permutation
+    inversion
 );
 
 use constant SIZE  => 3;  # Default chord size
@@ -83,6 +84,12 @@ sub evenness_index {
     return $i;
 }
 
+
+sub inversion {
+    my $chord = shift;
+    return [ reverse @$chord ];
+}
+
 1;
 
 __END__
@@ -97,7 +104,7 @@ Music::Interval::Barycentric - Compute barycentric musical interval space
 
 =head1 VERSION
 
-version 0.0307
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -110,8 +117,8 @@ version 0.0307
  $dist = forte_distance(@chords);
  my $even = evenness_index($chords[0]);
 
- my $cycles = cyclic_permutation($chords[0]);
- # [[3,4,5], [5,3,4], [4,5,3]]
+ my @cycles = cyclic_permutation($chords[0]);
+ # [3,4,5], [5,3,4], [4,5,3]
 
  my @center = barycenter(scalar @{ $chords[0] });
  # [4,4,4]
@@ -139,8 +146,9 @@ and thus the consonance of the chord."
  @point = barycenter($chord_size);
  @point = barycenter($chord_size, $scale_notes);
 
-Return the barycenter (the "central coordinate") given an integer representing
-the number of notes in a chord, and an optional number of notes in the scale.
+Return the barycenter (the "central coordinate") given an optional integer
+representing the number of notes in a chord, and an optional number of notes in
+the scale.
 
 Defaults:
 
@@ -153,7 +161,7 @@ Defaults:
 
 Common Euclidean space distance metric between chords (vectors).
 
-This function is used by the C<orbit_distance> and C<evenness_index> functions.
+This function takes two array references representing chords.
 
 =head2 orbit_distance
 
@@ -162,6 +170,8 @@ This function is used by the C<orbit_distance> and C<evenness_index> functions.
 Return the distance from C<chord1> to the minimum of the cyclic permutations
 for C<chord2>.
 
+This function takes two array references representing chords.
+
 =head2 forte_distance
 
   $d = forte_distance($chord1, $chord2);
@@ -169,17 +179,32 @@ for C<chord2>.
 Return the distance from C<chord1> to the minimum of the cyclic permutations and
 reverse cyclic permutations for C<chord2>.
 
+This function takes two array references representing chords.
+
 =head2 cyclic_permutation
 
  @cycles = cyclic_permutation(@intervals);
 
 Return the list of cyclic permutations of the given intervals.
 
+This function takes a list of array references representing chords.
+
 =head2 evenness_index
 
   $e = evenness_index($chord);
 
 Return a chord distance from the barycenter.
+
+This function takes an array reference representing a chord.
+
+=head2 inversion
+
+  my $inverted = inversion($chord);
+
+"The inversion of a chord is formed by displaying the "retrograde"
+representation of the original chord."
+
+This function takes an array reference representing a chord.
 
 =head1 SEE ALSO
 

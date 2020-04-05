@@ -1,3 +1,12 @@
+0.817 (04.05.2020) - John Siracusa <siracusa@gmail.com>
+
+    * Added missing module load in Rose::DB::Object::Metadata::Util
+      (RT 132300)
+
+0.816 (04.03.2020) - John Siracusa <siracusa@gmail.com>
+
+    * Updated to support DBD::Pg 3.8.0 and later.
+
 0.815 (03.17.2015) - John Siracusa <siracusa@gmail.com>
 
     * Updated more project URLs.

@@ -9,7 +9,7 @@ package Rex::Interface::Fs::Local;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.2'; # VERSION
+our $VERSION = '1.9.0'; # VERSION
 
 use Rex::Interface::Fs::Base;
 use base qw(Rex::Interface::Fs::Base);
@@ -95,7 +95,14 @@ sub is_file {
 
 sub unlink {
   my ( $self, @files ) = @_;
-  CORE::unlink(@files);
+  for my $file (@files) {
+    if ( CORE::unlink($file) == 0 ) {
+      die "Error unlinking file: $file" if ( Rex::Config->get_autodie );
+      return 0;
+    }
+  }
+
+  return 1;
 }
 
 sub mkdir {

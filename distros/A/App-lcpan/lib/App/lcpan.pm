@@ -1,9 +1,9 @@
 package App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-04'; # DATE
+our $DATE = '2020-04-04'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.045'; # VERSION
+our $VERSION = '1.046'; # VERSION
 
 use 5.010001;
 use strict;
@@ -3704,7 +3704,7 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
 
 sub _get_revdeps {
     my ($mods, $dbh, $memory_by_dist_name, $memory_by_mod_id,
-        $level, $max_level, $filters, $phase, $rel) = @_;
+        $level, $max_level, $filters, $flatten, $phase, $rel) = @_;
 
     log_trace("Finding reverse dependencies for module(s) %s ...", $mods);
 
@@ -3779,7 +3779,7 @@ ORDER BY dist".($level > 1 ? " DESC" : ""));
         }
         my $subres = _get_revdeps(\@mods, $dbh,
                                   $memory_by_dist_name, $memory_by_mod_id,
-                                  $level+1, $max_level, $filters, $phase, $rel);
+                                  $level+1, $max_level, $filters, $flatten, $phase, $rel);
         return $subres if $subres->[0] != 200;
         # insert to res in appropriate places
       SUBRES_TO_INSERT:
@@ -4004,6 +4004,15 @@ my %rdeps_args = (
     %rdeps_rel_args,
     %rdeps_phase_args,
     %rdeps_level_args,
+    flatten => {
+        summary => 'Instead of showing tree-like information, flatten it',
+        schema => 'bool',
+        description => <<'_',
+
+See deps' *flatten* argument for more details.
+
+_
+    },
     authors => {
         'x.name.is_plural' => 1,
         summary => 'Filter certain author',
@@ -4033,12 +4042,17 @@ _
     },
 );
 
+our $rdeps_args_rels = {
+    dep_any => [flatten => ['level']],
+};
+
 $SPEC{'rdeps'} = {
     v => 1.1,
     summary => 'List reverse dependencies',
     args => {
         %rdeps_args,
     },
+    args_rels => $rdeps_args_rels,
 };
 sub rdeps {
     my %args = @_;
@@ -4056,11 +4070,12 @@ sub rdeps {
         authors_arent => $authors_arent,
     };
 
-    my $res = _get_revdeps($mods, $dbh, {}, {}, 1, $level, $filters, $args{phase}, $args{rel});
+    my $res = _get_revdeps($mods, $dbh, {}, {}, 1, $level, $filters, $args{flatten}, $args{phase}, $args{rel});
 
     return $res unless $res->[0] == 200;
     for (@{$res->[2]}) {
-        $_->{dist} = ("  " x ($_->{level}-1)) . $_->{dist};
+        $_->{dist} = ("  " x ($_->{level}-1)) . $_->{dist}
+            unless $args{flatten};
         delete $_->{level};
         delete $_->{dist_id};
         delete $_->{module_dist_id};
@@ -4204,7 +4219,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.045 of App::lcpan (from Perl distribution App-lcpan), released on 2020-03-04.
+This document describes version 1.046 of App::lcpan (from Perl distribution App-lcpan), released on 2020-04-04.
 
 =head1 SYNOPSIS
 
@@ -4392,7 +4407,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 
@@ -4592,7 +4607,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 
@@ -4762,7 +4777,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 
@@ -4836,6 +4851,12 @@ herself.
 Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
+
+=item * B<flatten> => I<bool>
+
+Instead of showing tree-like information, flatten it.
+
+See deps' I<flatten> argument for more details.
 
 =item * B<index_name> => I<filename> (default: "index.db")
 

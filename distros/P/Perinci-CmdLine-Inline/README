@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.547 of Perinci::CmdLine::Inline (from
-    Perl distribution Perinci-CmdLine-Inline), released on 2020-02-18.
+    This document describes version 0.548 of Perinci::CmdLine::Inline (from
+    Perl distribution Perinci-CmdLine-Inline), released on 2020-04-05.
 
 SYNOPSIS
      % gen-inline-pericmd-script /Perinci/Examples/gen_array -o gen-array

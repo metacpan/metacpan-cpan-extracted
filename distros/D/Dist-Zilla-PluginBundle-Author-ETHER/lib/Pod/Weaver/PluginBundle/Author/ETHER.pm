@@ -5,7 +5,7 @@ package Pod::Weaver::PluginBundle::Author::ETHER;
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.152';
+our $VERSION = '0.153';
 
 use namespace::autoclean -also => ['_exp'];
 use Pod::Weaver::Config::Assembler;
@@ -185,7 +185,7 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.152
+version 0.153
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,17 @@
+0.600   2020-04-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Stop using a custom FileFinder like this:
+
+	      ['FileFinder::ByName' => 'FileFinder::ByName PERLANCAR' => {dir => ['lib', 'script'], skip => ['lib/Bencher/ScenarioR/']}]
+	      ['Test::Perl::Critic::Subset' => {finder => ['@Author::PERLANCAR/FileFinder::ByName PERLANCAR']}],
+
+	  because whenever we use @Filter then the name
+	  '@Author::PERLANCAR/FileFinder::ByName PERLANCAR' breaks (but this can
+	  actually be worked around using [@Filter / @Author::PERLANCAR]). For
+	  an easy workaround at the moment, I'm adding a hard-coded skip list to
+	  Test::Perl::Critic::Subset.
+
+
 0.599   2019-10-29  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Forgot to depend on DZP:Test::Perl::Critic::Subset.
@@ -232,7 +246,7 @@
          - Rename dist.
 
 
-0.26     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.26     2014-08-16  Released-By: SHARYANTO; Message: Happy 19th CPAN Day!
 
          - Add plugin: SetScriptShebang.
 

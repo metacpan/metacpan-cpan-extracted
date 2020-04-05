@@ -1,0 +1,98 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+wrt-repl - simple read-eval-print loop for wrt's inner workings
+
+=head1 USAGE
+
+    wrt repl
+
+=head1 DESCRIPTION
+
+Uses Term::ReadLine to provide a live interface to a loaded wrt environment for
+the current working wrt directory.
+
+This is primarily a debugging tool for the current wrt implementation itself.
+
+Detailed documentation can be found in the L<App::WRT> man page or at
+L<https://code.p1k3.com/gitea/brennen/wrt>.
+
+=head1 LICENSE
+
+    wrt is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+=head1 AUTHOR
+
+Brennen Bearnes <code@p1k3.com>
+
+=cut
+
+use 5.10.0;
+
+use strict;
+use warnings;
+use utf8;
+use open qw(:std :utf8);
+
+use Getopt::Long qw(GetOptionsFromArray);
+use Pod::Usage;
+use App::WRT;
+use Carp;
+use Term::ReadLine;
+use Data::Dumper;
+
+$Carp::Verbose = 1;
+
+if (not caller()) {
+  main(@ARGV);
+  exit(0);
+}
+
+sub main {
+  my (@local_argv) = @_;
+
+  # Handle options, including help generated from the POD above.  See:
+  # - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
+  # - https://metacpan.org/pod/Pod::Usage
+  # - http://michael.thegrebs.com/2014/06/08/Pod-Usage/
+  my $config_file = 'wrt.json';
+  GetOptionsFromArray(
+    \@local_argv,
+    'config=s'    => \$config_file,
+    help          => sub { pod2usage(0) },
+  ) or pod2usage(2);
+
+  my $term = Term::ReadLine->new('wrt repl');
+  my $OUT = $term->OUT || \*STDOUT;
+
+  print $OUT "loading configuration from $config_file\n";
+
+  my $w = App::WRT::new_from_file($config_file);
+
+  print $OUT $w->{entry_dir} . ":\n";
+  print $OUT "\t" . scalar($w->{entries}->all()) . " items\n";
+  print $OUT "\t" . scalar($w->{entries}->all_renderable())
+             . " renderable entries\n\n";
+  print $OUT "Available:\n\t\$w\n";
+  print $OUT "\t\$w->{entries}\n";
+  print $OUT "\tDumper(\$foo)\n";
+  print $OUT "\n";
+
+  my $prompt = "wrt :: $w->{title_prefix} :: ";
+
+  while ( defined ($_ = $term->readline($prompt)) ) {
+    my $result = eval($_);
+    carp $@ if $@;
+    print $OUT $result, "\n" unless $@;
+    $term->addhistory($_) if /\S/;
+    $prompt = "wrt :: $w->{title_prefix} :: ";
+  }
+}
+
+1;

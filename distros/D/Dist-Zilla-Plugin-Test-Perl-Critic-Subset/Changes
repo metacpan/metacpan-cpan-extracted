@@ -1,3 +1,14 @@
+3.001.005  2020-04-03  Released-By: PERLANCAR; Urgency: medium
+
+	   - By default also skip t/ because we often have generated test
+	     scripts that we cannot control.
+
+
+3.001.004  2020-04-03  Released-By: PERLANCAR; Urgency: medium
+
+	   - Add default skip: lib/Bencher/ScenarioR/.
+
+
 3.001.003  2019-10-24  Released-By: PERLANCAR; Urgency: medium
 
 	   - Add configurations 'dir' and 'skip' as well.

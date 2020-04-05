@@ -1,0 +1,58 @@
+==================================================
+Changes from 2019-04-04 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v1.1.4 at 2020-04-03 15:53:23 +0000
+-------------------------------------------
+
+  Change: 03620addcbf013bfaea136a96175c09ab99441d3
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-04-02 12:54:03 +0000
+
+    Convert to Dist::Zilla::PluginBundle::Author::GSG
+
+    To support GitHub/CPAN releases 
+
+---------------------------------------------
+version v1.1.2.1 at 2019-10-18 21:48:59 +0000
+---------------------------------------------
+
+  Change: 1d62fd6023f4b4823935cd87bca869145b418df3
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-18 17:48:59 +0000
+
+    Create distribution files 
+
+  Change: 35d189dc8cf74778a233b1f54326dd2205902485
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-18 17:40:54 +0000
+
+    Convert to Bitbucket workflow 
+
+  Change: 6f1ce5e4225afc251429b03081c375ec5789bcb7
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-18 17:40:54 +0000
+
+    Remove gitc metadata 
+
+---------------------------------------------
+version v1.1.2.0 at 2019-05-07 14:22:25 +0000
+---------------------------------------------
+
+  Change: 048d4975f9a502801ad09e539768377ce77c7a29
+  Author: Fred Kontur <fkontur@grantstreet.com>
+  Date : 2019-05-03 09:58:32 +0000
+
+    The file t/strict.t has been added to this commit. 
+
+  Change: 76db9d4423ab8579826c02f3f3267bd33fb0625b
+  Author: Fred Kontur <fkontur@grantstreet.com>
+  Date : 2019-05-02 09:00:23 +0000
+
+    Created a test file to ensure that all files in the directory use the
+    "strict" pragma. 
+
+=================================================
+Plus 10 releases after 2019-04-04 00:00:00 +0000.
+=================================================

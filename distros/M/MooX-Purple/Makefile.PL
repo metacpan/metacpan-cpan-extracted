@@ -15,7 +15,7 @@ WriteMakefile(
 	    'ExtUtils::MakeMaker' => '0',
 	},
 	BUILD_REQUIRES => {
-	    'Test::More' => '0',
+		'Test::More' => '0',
 		'JSON' => '0',
 		'Scalar::Util' => '0'
 	},
@@ -24,6 +24,7 @@ WriteMakefile(
 		'Moo' => '2.003004',
 		'MooX::LazierAttributes' => '1.07008',
 		'MooX::ValidateSubs' => '1.012004',
+		'Perl::Tidy' => '20200110'
 	},
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES => 'MooX-Purple-*' },

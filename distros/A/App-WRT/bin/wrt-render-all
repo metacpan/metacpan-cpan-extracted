@@ -42,9 +42,12 @@ no  warnings 'uninitialized';
 
 use Getopt::Long;
 use Pod::Usage;
+use Time::HiRes;
 use App::WRT;
 use App::WRT::FileIO;
 use App::WRT::Renderer;
+
+my $start_time = [Time::HiRes::gettimeofday()];
 
 # If invoked directly from the command-line, caller() will return undef.
 # Execute main() with a callback to print output directly, a FileIO object,
@@ -88,6 +91,10 @@ sub main {
   );
 
   $renderer->render();
+
+  $output->(
+    "elapsed: " . Time::HiRes::tv_interval($start_time) . " seconds"
+  );
 }
 
 1;

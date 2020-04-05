@@ -50,7 +50,7 @@ my %tagmap = (
 );
 
 # Install appropriate subs in symbol table:
-{ no strict 'refs'; 
+{ no strict 'refs';
 
   for my $key (keys %tags) {
     my $subname = $tagmap{$key};

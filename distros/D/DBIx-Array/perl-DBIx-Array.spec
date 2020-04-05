@@ -1,5 +1,5 @@
 Name:           perl-DBIx-Array
-Version:        0.63
+Version:        0.64
 Release:        1%{?dist}
 Summary:        DBI Wrapper with Perl style data structure interfaces
 License:        BSD

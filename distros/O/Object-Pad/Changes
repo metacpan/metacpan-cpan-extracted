@@ -1,5 +1,17 @@
 Revision history for Object-Pad
 
+0.19    2020-04-04
+        [CHANGES]
+         * More sanity checking of HASH-based foreign superclass constructor
+         * More unit testing of reliable destruction of constructor and
+           BUILDARGS arguments
+
+        [BUGFIXES]
+         * Allow classic Perl superclass constructors to invoke methods on
+           instances (RT132263)
+         * Fix SP pointer discipline during method calls in generated
+           constructor
+
 0.18    2020-03-30
         [CHANGES]
          * Implement the BUILDARGS part of constructor protocol

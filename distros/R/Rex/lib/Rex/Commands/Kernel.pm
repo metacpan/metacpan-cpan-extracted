@@ -31,7 +31,7 @@ package Rex::Commands::Kernel;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.2'; # VERSION
+our $VERSION = '1.9.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;

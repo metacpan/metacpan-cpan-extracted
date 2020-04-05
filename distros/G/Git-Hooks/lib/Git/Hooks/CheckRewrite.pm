@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckRewrite;
 # ABSTRACT: Git::Hooks plugin for checking against unsafe rewrites
-$Git::Hooks::CheckRewrite::VERSION = '2.10.1';
+$Git::Hooks::CheckRewrite::VERSION = '2.11.1';
 use 5.010;
 use utf8;
 use Path::Tiny;
@@ -182,7 +182,7 @@ Git::Hooks::CheckRewrite - Git::Hooks plugin for checking against unsafe rewrite
 
 =head1 VERSION
 
-version 2.10.1
+version 2.11.1
 
 =head1 SYNOPSIS
 
@@ -252,7 +252,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2020 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

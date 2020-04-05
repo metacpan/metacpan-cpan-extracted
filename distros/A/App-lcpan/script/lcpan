@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '1.045'; # VERSION
+our $DATE = '2020-04-04'; # DATE
+our $VERSION = '1.046'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.045 of lcpan (from Perl distribution App-lcpan), released on 2020-03-04.
+This document describes version 1.046 of lcpan (from Perl distribution App-lcpan), released on 2020-04-04.
 
 =head1 SYNOPSIS
 
@@ -673,6 +673,17 @@ List namespaces.
 
 List reverse dependencies.
 
+=head2 B<rdeps-scripts>
+
+List scripts that depend on specified modules.
+
+This is basically rdeps + dist_scripts.
+
+If you want to find scripts that depend on a module indirectly, you can do:
+
+ % lcpan rdeps -R --flatten Some::Module | td select dist | xargs lcpan dist-scripts
+
+
 =head2 B<rel>
 
 Alias for 'release'.
@@ -1070,7 +1081,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.24.0"
 
 =item B<--phase>=I<s>
 
@@ -1106,11 +1117,11 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
+=item B<--author-arg>=I<s>*
+
 =item B<--author-isnt>=I<s@>
 
 Can be specified multiple times.
-
-=item B<--author>=I<s>*
 
 =item B<--author>=I<s@>
 
@@ -1154,7 +1165,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.24.0"
 
 =item B<--phase>=I<s>
 
@@ -1551,7 +1562,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.24.0"
 
 =item B<--phase>=I<s>
 
@@ -1625,7 +1636,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.24.0"
 
 =item B<--phase>=I<s>
 
@@ -1733,7 +1744,13 @@ See C<--level>.
 
 =item B<--detail>, B<-l>
 
-=item B<--dist>=I<s>*
+=item B<--dist>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--dists-json>=I<s>
+
+See C<--dist>.
 
 =back
 
@@ -2503,7 +2520,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.24.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2673,7 +2690,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.24.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2843,6 +2860,13 @@ Filter certain author (JSON-encoded).
 
 See C<--author>.
 
+=item B<--flatten>
+
+Instead of showing tree-like information, flatten it.
+
+See deps' *flatten* argument for more details.
+
+
 =item B<--level>=I<s>, B<-l>
 
 Recurse for a number of levels (-1 means unlimited).
@@ -2876,6 +2900,38 @@ Default value:
 Recurse (alias for `--level 10`).
 
 See C<--level>.
+
+=back
+
+=head2 Options for subcommand rdeps-scripts
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=item B<--phase>=I<s>
+
+Default value:
+
+ "ALL"
+
+=item B<--rel>=I<s>
+
+Default value:
+
+ "ALL"
 
 =back
 
@@ -3636,7 +3692,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
 
- author (see --author)
+ author (see --author-arg)
  authors (see --author)
  authors_arent (see --author-isnt)
  include_core (see --exclude-core)
@@ -3803,7 +3859,7 @@ List of available configuration parameters:
 =head2 Configuration for subcommand dist-scripts
 
  detail (see --detail)
- dist (see --dist)
+ dists (see --dist)
 
 =head2 Configuration for subcommand dist2author
 
@@ -4008,7 +4064,14 @@ List of available configuration parameters:
 
  authors (see --author)
  authors_arent (see --author-isnt)
+ flatten (see --flatten)
  level (see --level)
+ modules (see --module)
+ phase (see --phase)
+ rel (see --rel)
+
+=head2 Configuration for subcommand rdeps-scripts
+
  modules (see --module)
  phase (see --phase)
  rel (see --rel)

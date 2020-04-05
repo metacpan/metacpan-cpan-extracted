@@ -1,0 +1,42 @@
+NAME
+    Parallel::Map - Multi processing parallel map code
+
+SYNOPSIS
+      use Parallel::Map;
+  
+      pmap_void {
+        sleep 1;
+        warn "${_}\n";
+        Future->done;
+      } foreach => \@choices, forks => 5;
+
+DESCRIPTION
+    All subroutines match Future::Utils "fmap_" subroutines of the same
+    name.
+
+  pmap_void
+      pmap_void { <block returning future> } foreach => \@input;
+      pmap_void { <block returning future> } generate => sub { <iterator> }
+
+  pmap_scalar
+      pmap_scalar { <block returning future> } foreach => \@input;
+      pmap_scalar { <block returning future> } generate => sub { <iterator> }
+
+  pmap_concat
+      pmap_concat { <block returning future> } foreach => \@input;
+      pmap_concat { <block returning future> } generate => sub { <iterator> }
+
+AUTHOR
+     mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    None yet - maybe this software is perfect! (ahahahahahahahahaha)
+
+COPYRIGHT
+    Copyright (c) 2020 the Parallel::Map "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

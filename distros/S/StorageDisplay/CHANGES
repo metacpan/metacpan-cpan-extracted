@@ -1,0 +1,507 @@
+==================================================
+Changes from 2019-04-05 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.0.4 at 2020-04-04 20:03:26 +0000
+------------------------------------------
+
+  Change: 24d34635366d83c6842f3cfce401fa75c9db5fd5
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 22:03:05 +0000
+
+    data/Makefile: protect data files and add a rule to clean reference
+    files 
+
+  Change: 158d86788de9034153624846720633700fab69ee
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 22:02:28 +0000
+
+    Rewrite disp_size routine to try to avoid rounding error
+
+    reference files has been updated accordingly 
+
+  Change: 35e6e38a6f40cd499607731010a1d2fa01f0f1e8
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 22:00:42 +0000
+
+    Add a test to track Data::Dumper behavior 
+
+  Change: b7a2c9eff08ac1f34b07ca3d646f1b27abe26ec3
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 10:52:18 +0000
+
+    New release 
+
+  Change: be5cd08ef9d9a05c5e84d994fae95f8f4d6a4bba
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 10:51:58 +0000
+
+    Add a test for perl rounding
+
+    and commute files in file comparison 
+
+  Change: c57ef7dffda7009321985afe7af175fcaa253f21
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 10:38:03 +0000
+
+    New release 
+
+  Change: 2ee296c7cb1ad06bd64333760830e067305482cf
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 10:38:03 +0000
+
+    Cleanup generated (untracked) files before release 
+
+  Change: d12c42a046de687ef2ae3fd512413afa275d568d
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 10:30:17 +0000
+
+    Generate changelog from git 
+
+  Change: 085e14e556b86dff2c869dc7041c6b999af28237
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 10:28:03 +0000
+
+    Avoid to run localhost analysis when storage2dot is called with
+    --help
+
+    But the help has to be written... 
+
+  Change: ed700c7acba230679febf3f4dad0ccfba88d4289
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 00:16:05 +0000
+
+    fix dist.ini to avoid duplicate steps (when uploading) 
+
+  Change: 005fd50ebf4b0eefc4892e01242fc1675987ae31
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 00:03:00 +0000
+
+    Ignore test files 
+
+  Change: 5fb70987f87e7f4601bccacb1df55d82026fa5b8
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-03 23:51:28 +0000
+
+    Fix VERSION position to avoid to be before strictures 
+
+  Change: 146c26ba4a05f31a46a19b970cdb683970b7007c
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-03 23:48:54 +0000
+
+    dzil meta file 
+
+  Change: 6b8581692e7492d332e62f407991540a063a9f19
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-03 23:48:42 +0000
+
+    update local run-on debug script to run storage2dot in bin/ 
+
+  Change: 374dcf88f7bd9b04c45151e38b45273ef934b8cd
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-03 23:45:55 +0000
+
+    Cleanup main code
+
+    Help to be written 
+
+  Change: 8d27449a6e6d26ebd0d9f1349845fff4e248a383
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-03 23:45:31 +0000
+
+    Add testing using refs 
+
+  Change: 2caefeaf13f82c20cae99213622d6d9e9ef0933e
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-03 23:45:08 +0000
+
+    Update refs 
+
+  Change: 1bdf1a80061be1b43fe6eb56f943111ded88a58d
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-03 23:44:32 +0000
+
+    Add disk size for megacli disks 
+
+  Change: 80fb0f30044032bb69cfaa93efaa1f9c7e146742
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-03-23 00:00:37 +0000
+
+    Update color for file source in VM 
+
+  Change: e13f83ab027016f9b3eacdf260bbe8b80f7f2735
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-03-22 23:44:51 +0000
+
+    Update reference test files 
+
+  Change: 46b650e435bc73d43bb9a757e1830f469b421fbe
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-03-22 23:42:12 +0000
+
+    cleanup 
+
+  Change: ed1fa4fd9bad9d9fb697d071817f542cedd737f0
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-03-22 23:41:53 +0000
+
+    Link mounted FS for VM disk with file source 
+
+  Change: 6feca6b4dfc8275f810bc0e3e2f63e167057732d
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-03-22 22:12:54 +0000
+
+    Record examples for tests 
+
+  Change: 0181140e65820380dbd2d77b30f46ad77025d2ba
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-03-22 22:02:55 +0000
+
+    Ignore devices reported by pvs that are not PV 
+
+  Change: 651b1575b3f6030e6f7fe2938a1058386fca2eb7
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-03-22 21:42:56 +0000
+
+    Do not fail when no MegaRAID is present but megacli is installed 
+
+  Change: a7d92284d0eed71a72f993b886cd316a64d72d69
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-03-22 21:41:54 +0000
+
+    Find disks without partitions table 
+
+  Change: 12d21bffc833da059e90715f53dc09f5adfdec37
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-03-02 10:53:33 +0000
+
+    Add support for JBOD disk in LSI controlers 
+
+  Change: 77f5cce468e5b4d12164c8d5b2b56d7a10ee94ba
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-03-02 10:52:51 +0000
+
+    Add depends on perl module in data Makefile 
+
+  Change: 7534396ee734af3e1713df19538a94f90d687278
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-27 12:39:14 +0000
+
+    setup initial tests 
+
+  Change: a1e9e6f1d2636aaebd8110df2fda077e0d7f5733
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-27 10:27:15 +0000
+
+    Cleanup code 
+
+  Change: 1f8e6d99c93e6557e1aab94d9c4ae359237f5335
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-26 23:03:17 +0000
+
+    Start moving to proper perl distribution 
+
+  Change: 7ead9eaabc94f0b98f2dc9ea658c94f463c14676
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-26 15:24:00 +0000
+
+    Allows one to replay from command outputs
+
+    useful for debugging or regression tests 
+
+  Change: 261e04e74e8be3c3295ab6cee30cdae87e8747b0
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-26 15:20:35 +0000
+
+    Handle hidden lv (for pvmove for example) 
+
+  Change: 8e33d906c8a60689f0b1d148c261d0be3bb47e8f
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-25 18:41:16 +0000
+
+    Add battery status for LSI Megacli 
+
+  Change: 9b695f56fae70dc47fe834a432df006695e7aede
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-25 16:12:34 +0000
+
+    Fix bug when there are some PV without assigned VG 
+
+  Change: bf98efa2e4052cb598399cd64717db1dc8dea718
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-25 16:11:50 +0000
+
+    Fix color display bug when 'used' == 0 
+
+  Change: 8fb004f7cd2fcee6ecfd61dee02e8ed2da8fb1e2
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-25 16:10:06 +0000
+
+    Sort dump when collecting 
+
+  Change: 49eadf29af0b720615b2e0e2d8d7d2537d07234c
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-25 16:09:51 +0000
+
+    Unify 3 RAID detections (MD, LSI SAS2Ircu, MegaCLI) 
+
+  Change: 65febee6faca9327f659cbd7e91d655e83bdc093
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-25 16:06:23 +0000
+
+    Sort collected data 
+
+  Change: 388e6233be36bc2f7ec3559243f91dae4877d1e8
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-25 11:33:19 +0000
+
+    Collect with megacli 
+
+  Change: d82bdced1c985979344ba752d13d39e1ac97fdb5
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-25 11:32:44 +0000
+
+    Cleanup spaces 
+
+  Change: e62d12a3b4773b3dc36ac9609c2c3fa90a526dcd
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-25 11:31:43 +0000
+
+    Dump data in deterministic order 
+
+  Change: 4279d1f2ef2a1c7a6349f7954cfe4e7a6d6a3c3b
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-24 18:16:29 +0000
+
+    Refactor RAID system 
+
+  Change: 17c7e6ce16fe4a5bcc7cade55170e6a02f8b55ff
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-24 13:49:51 +0000
+
+    Reindent (partial) 
+
+  Change: 2fa2add3384c364a1fb5a57eb03aa1a196d2c83a
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-24 13:49:36 +0000
+
+    Force order on filesystems 
+
+  Change: cb2c753dfdf7d1e57df5b0a1c42fdfb0e4393792
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-24 13:49:11 +0000
+
+    Error message when the data file cannot be read 
+
+  Change: 64e654971cb6da3dfd8c657b2d1f410e632cc3aa
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-24 13:48:19 +0000
+
+    Do not fail when no info present for a collector 
+
+  Change: cbcd6190b71e571159ea7dc9a68c96a472355298
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-24 13:47:27 +0000
+
+    Handle depends in collect (prog and files) 
+
+  Change: 97d7c94399d364839dd7319c329b6015e84bbfb1
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-24 13:42:30 +0000
+
+    Add basic documentation 
+
+  Change: e5af6e25d6a54e6b375f51eba14b5012df4e92bb
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-05 16:22:20 +0000
+
+    Start of LSI support 
+
+  Change: 27f34c4bee266a2eaa2b9ad3b3a407372ea52726
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-02-05 16:22:04 +0000
+
+    Cleanup 
+
+  Change: cd36b8b5a19900f09bfbf307b8214d05d5a77ffc
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-13 00:43:25 +0000
+
+    Add libvirt 
+
+  Change: a4506a33535b470e618225b9a66e498d365ebb75
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-12 22:48:51 +0000
+
+    storage2dot can do the collect (even remotely) 
+
+  Change: e7998526a00c2686bf0f469a72b5aa3f538ffcfb
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-12 22:48:10 +0000
+
+    Add MD support 
+
+  Change: b688ab87c732dfdcf295819d9a73b58abcc3c3f4
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-11 23:11:25 +0000
+
+    CMDReader
+
+    not really usefull => too many pasword to type for sudo 
+
+  Change: 7ae766268357404555d94e08b93c84b42c23eae8
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-11 01:26:06 +0000
+
+    Create partitions for collected info 
+
+  Change: 018f0817334d216be8413d6ffbd89611c237664f
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-11 01:18:54 +0000
+
+    clean json + add luks support 
+
+  Change: 9b6fe08f79d4c4d03cfc019d9877ce30e5525f5c
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-10 20:42:09 +0000
+
+    Decode json at creation time 
+
+  Change: 0bea03cce0f73f0d30e66268cba3c0e92a1904b2
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-08 22:06:38 +0000
+
+    Refactoring Collect.pm in (basic, no depends) OO style 
+
+  Change: 51b388c72f5912855f25ace023066812407477ac
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-08 22:05:55 +0000
+
+    Refactor and bug fix
+
+    - avoid a separate file for a module - add log/warn/error methods for
+    basic logging - fix computation of free/busy part for striped
+    rectangles - fix partitions for kpartx mapped partitions 
+
+  Change: 6f6f820087e74567611a2cae046e1d98ce0facac
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-08 00:46:44 +0000
+
+    Add mounted FS and swap
+
+    Fix color for provided block 
+
+  Change: be808dcb042a78a22557ee5a24eb328ced545372
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-08 00:11:36 +0000
+
+    End of refactoring. Partitions and LVM functionnal 
+
+  Change: 6687a51d8d201dcfd7a8423f71b9050896914de0
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-06 20:53:30 +0000
+
+    Add cached hashes 
+
+  Change: c09f288ad7fa876b6c09c3e822fdd084172f0bec
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-06 15:22:22 +0000
+
+    Start rewrite in perl 
+
+  Change: 51e6b332cb596bbea658bfde93bde7ac8a0a7d9b
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2019-10-06 15:22:03 +0000
+
+    Fix minor bugs 
+
+  Change: 833ed9eb59bd5b0c4698aee668eb65aebcaca97b
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2017-07-25 15:29:12 +0000
+
+    Small improvment for color/layout and typo fix 
+
+  Change: a0c1ef37a14bee17d67d6f9c351aefd8144b75c5
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2017-07-25 15:28:29 +0000
+
+    run-on use machine-name prefixed filename 
+
+  Change: 5157abee570cdef4a5bcbef06272d5d1701b6197
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2014-09-08 19:39:03 +0000
+
+    Raid: show faulty state 
+
+  Change: a7b2dadd262e18e1263f20c7d38e8f0af3d3cd68
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2014-09-07 23:35:32 +0000
+
+    Add a script to run the current version on another host
+
+    Mainly useful for debug, to test a locally just developped version 
+
+  Change: f3624c5075bde3726202001c8297b19044ddc850
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2014-09-07 23:33:56 +0000
+
+    Fix output file not initially truncated
+
+    and add the short option (-o) 
+
+  Change: 5b2dff6e7f44a2ae1908750e656678f53b94b0d4
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2014-09-07 23:32:42 +0000
+
+    RAID: fix bug on empty lines
+
+    and add colors for spare (free) and rebuilding (warning) states 
+
+  Change: b8111e74b1eab2d9976edbe1fc8fca54f788d2f9
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2014-09-07 23:31:35 +0000
+
+    Correctly handle disks without any label 
+
+  Change: bc05daa2407cd58e073b8d3b7a7eb8db092b4897
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2014-09-07 23:30:32 +0000
+
+    Fix printed size in Byte
+
+    and add a space before unit 
+
+  Change: e534d20466d716e57e1219da9cc0d1173a40f512
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2014-04-08 21:20:23 +0000
+
+    Enhanced version 
+
+  Change: c88d4dd422e04e015ce25a70946781e78f05a789
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2014-04-01 16:31:44 +0000
+
+    New improved version 
+
+  Change: feb590efb3a79f8afc43713cb7975976742fde68
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2014-04-01 02:09:03 +0000
+
+    better layout 
+
+  Change: 4309a79ce5a9ed3f5db4c26fddcf55de68495d37
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2014-03-31 10:31:26 +0000
+
+    First version 
+
+  Change: a4e5d7754dfe92d543b6694cd824c644b8cd368d
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2014-03-31 10:31:06 +0000
+
+    initial import 
+
+================
+End of releases.
+================

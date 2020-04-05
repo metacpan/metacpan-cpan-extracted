@@ -6,7 +6,7 @@ use warnings;
 
 #our $VERSION = '3.002';
 
-our $VERSION = '3.001.003'; # VERSION
+our $VERSION = '3.001.005'; # VERSION
 
 use Moose;
 use Path::Tiny;
@@ -65,7 +65,7 @@ has dirs => (
         traits => ['Array'],
         handles => { skips => 'elements' },
         lazy => 1,
-        default => sub { [] },
+        default => sub { ['^lib/Bencher/ScenarioR/', '^t/'] },
     );
 }
 
@@ -160,7 +160,7 @@ Dist::Zilla::Plugin::Test::Perl::Critic::Subset - Tests to check your code again
 
 =head1 VERSION
 
-version 3.001.003
+version 3.001.005
 
 =head1 SYNOPSIS
 
@@ -248,7 +248,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

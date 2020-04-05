@@ -1,3 +1,43 @@
+1.178 2020-04-05
+================
+
+[Quiq::AnsiColors]
+* strLn() - hinzugefügt
+
+[Quiq::Cascm]
+* edit() - Optionen -show, -version hinzugefügt
+
+[Quiq::Database::Config]
+* Doku bearbeitet
+
+[Quiq::Database::Connection]
+* schemaExists() - hinzugefügt
+* tableDiff() - Kolumnennamen in "" eingefasst
+
+[Quiq::Database::ResultSet]
+* asTable() - Newline am Ende entfernt
+
+[Quiq::Dbms]
+* Doku bearbeitet
+
+[Quiq::PostgreSql::Catalog]
+* new() - hinzugefügt
+* functions() - hinzugefügt
+* objects() - hinzugefügt
+* views() - hinzugefügt
+* viewSelect() - hinzugefügt
+
+[Quiq::PostgreSql::Psql]
+* run() - Optionen -echo, -log, -script hinzugefügt
+* run() - Exitcode wird zurückgeliefert
+
+[Quiq::Sql]
+* Operatoren ~, !~, NOT IN hinzugefügt
+* union() - hinzugefügt
+
+[Quiq::Terminal]
+* askUser() - Option -timeout hinzugefügt
+
 1.177 2020-03-08
 ================
 

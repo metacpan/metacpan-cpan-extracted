@@ -60,7 +60,7 @@
          "web" : "https://github.com/ology/Music-Interval-Barycentric"
       }
    },
-   "version" : "0.0307",
+   "version" : "0.0400",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

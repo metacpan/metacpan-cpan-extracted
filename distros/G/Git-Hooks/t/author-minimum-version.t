@@ -1,4 +1,3 @@
-#!perl
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
@@ -7,8 +6,9 @@ BEGIN {
   }
 }
 
+use strict;
+use warnings;
 
 use Test::More;
-
 use Test::MinimumVersion;
 all_minimum_version_ok( qq{5.10} );

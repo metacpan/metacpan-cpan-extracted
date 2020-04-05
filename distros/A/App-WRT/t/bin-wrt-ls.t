@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -45,10 +45,9 @@ ok(
 $output_string = '';
 main($output, @local_argv);
 ok(
-  $output_string eq "tag-something\nwrt-noexpand\n",
+  $output_string eq "foo\ntag.animals.platypus\ntag.something\ntag.topics.example\nwrt-noexpand\n",
   "Correctly listed properties."
-);
-diag($output_string);
+) or diag($output_string);
 
 @local_argv = qw(--days --months);
 $output_string = '';

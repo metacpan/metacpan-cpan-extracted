@@ -62,7 +62,7 @@ use strict;
 use warnings;
 use Fcntl;
 
-our $VERSION = '1.8.2'; # VERSION
+our $VERSION = '1.9.0'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;

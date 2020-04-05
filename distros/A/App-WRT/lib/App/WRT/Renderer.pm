@@ -6,7 +6,6 @@ use 5.10.0;
 
 use Carp;
 use File::Basename;
-use Time::HiRes;
 
 =pod
 
@@ -82,9 +81,6 @@ sub render {
   my $entry_dir = $self->{wrt}->{entry_dir};
   my $publish_dir = $self->{wrt}->{publish_dir};
 
-  # Use this to log elapsed render time:
-  my $start_time = [Time::HiRes::gettimeofday()];
-
   # Ensure that publication path exists and is a directory:
   if (-e $publish_dir) {
     unless (-d $publish_dir) {
@@ -100,10 +96,13 @@ sub render {
   # Handle the front page and Atom feed:
   $self->write("${publish_dir}/index.html", $self->{wrt}->display('new'));
 
+  # Handle feed formats:
   my $feed_alias = $self->{wrt}->{feed_alias};
-  my $feed_content = $self->{wrt}->display($feed_alias);
-  $self->write("${publish_dir}/${feed_alias}", $feed_content);
-  $self->write("${publish_dir}/${feed_alias}.xml", $feed_content);
+  my $xml_feed_content = $self->{wrt}->feed_print_recent();
+  my $json_feed_content = $self->{wrt}->feed_print_json_recent();
+  $self->write("${publish_dir}/${feed_alias}", $xml_feed_content);
+  $self->write("${publish_dir}/${feed_alias}.xml", $xml_feed_content);
+  $self->write("${publish_dir}/${feed_alias}.json", $json_feed_content);
 
   # Handle any other paths that aren't derived directly from files:
   my @meta_paths = qw(all);
@@ -117,7 +116,7 @@ sub render {
     next if $target =~ m{/index$};
 
     # Lowercase and alphanumeric + underscores + dashes, no dots - an entry:
-    if ($target =~ $self->{wrt}->{entrypath_expr}) {
+    if ($self->{wrt}->{entries}->is_renderable($target)) {
       $self->dir_make_logged("$publish_dir/$target");
 
       my $rendered = $self->{wrt}->display($target);
@@ -145,11 +144,6 @@ sub render {
 
   $self->log("rendered $rendered_count entries");
   $self->log("copied $copied_count static files");
-  $self->log(
-    "  in "
-    . Time::HiRes::tv_interval($start_time)
-    . " seconds"
-  );
 
   # Presumed success:
   return 1;

@@ -9,13 +9,17 @@ wrt - WRiting Tool, a static site/blog generator and related utilites
 
 =head1 SYNOPSIS
 
-    wrt init        # Initialize a wrt repository
-    wrt display     # Print HTML for entries
-    wrt render-all  # Render all defined entries to filesystem
-    wrt addprop     # Add a property to an entry
-    wrt findprop    # Find entries containing certain properties
-    wrt config      # Dump configuration data for a wrt repository
-    wrt -h          # Print help message
+    wrt init          # Initialize a wrt repository
+    wrt display       # Print HTML for entries
+    wrt feed          # Print feeds for entries
+    wrt render-all    # Render all defined entries to filesystem
+    wrt ls            # List entries in repository
+    wrt config        # Display current configuration
+    wrt repl          # Get a debug REPL for current wrt repo
+    wrt addprop       # Add a property to an entry
+    wrt findprop      # Find entries containing certain properties
+    wrt version, -v   # Print the installed version of wrt
+    wrt help, -h      # Print this help message
 
 =head1 DESCRIPTION
 

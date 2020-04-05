@@ -3,48 +3,64 @@ NAME
 
 SYNOPSIS
      use Image::Random;
+
      my $obj = Image::Random->new(%parameters);
      my $type = $obj->create($output_path);
      my ($width, $height) = $obj->sizes($new_width, $new_height);
      my $type = $obj->type($new_type);
 
 METHODS
-    "new(%parameters)"
-             Constructor.
+  "new"
+     my $obj = Image::Random->new(%parameters);
 
-            *       "color"
+    Constructor.
 
-                     Color of image.
-                     Default value is undef.
-                     Undefined value means random color.
+    *       "color"
 
-            *       "height"
+             Color of image.
+             Default value is undef.
+             Undefined value means random color.
 
-                     Height of image.
-                     Default value is 1920.
+    *       "height"
 
-            *       "type"
+             Height of image.
+             Default value is 1920.
 
-                     Image type.
-                     List of supported types: bmp, gif, jpeg, png, pnm, raw, sgi, tga, tiff
-                     Default value is 'bmp'.
+    *       "type"
 
-            *       "width"
+             Image type.
+             List of supported types: bmp, gif, jpeg, png, pnm, raw, sgi, tga, tiff
+             Default value is 'bmp'.
 
-                     Width of image.
-                     Default value is 1080.
+    *       "width"
 
-    "create($path)"
-             Create image.
-             Returns scalar value of supported file type.
+             Width of image.
+             Default value is 1080.
 
-    "sizes([$width, $height])"
-             Set/Get image sizes.
-             Returns actual width and height.
+  "create"
+     my $type = $obj->create($output_path);
 
-    "type([$type])"
-             Set/Get image type.
-             Returns actual type of image.
+    Create image.
+
+    Returns scalar value of supported file type.
+
+  "sizes"
+     my ($width, $height) = $obj->sizes($new_width, $new_height);
+
+    Set/Get image sizes.
+
+    Both parameters are optional, used only for set sizes.
+
+    Returns actual width and height.
+
+  "type"
+     my $type = $obj->type($new_type);
+
+    Set/Get image type.
+
+    Parameter $new_type is optional, used only for setting.
+
+    Returns actual type of image.
 
 ERRORS
      new():
@@ -103,9 +119,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2013-2020 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2013-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

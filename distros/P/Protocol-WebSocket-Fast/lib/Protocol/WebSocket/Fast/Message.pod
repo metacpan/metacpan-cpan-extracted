@@ -1,0 +1,82 @@
+=head1 NAME
+
+Protocol::WebSocket::Fast::Message - WebSocket Message class
+
+
+
+=head1 DESCRIPTION
+
+The class represents a message received via WebSocket protocol.
+
+You cannot instantiate an object of the class direcly, it can be accessed
+via L<Protocol::WebSocket::Fast::MessageIterator> or L<Protocol::WebSocket::Fast::Parser>.
+
+You cannot modify Message object, all provided methods are read only.
+
+=head1 METHODS
+
+=head2 error()
+
+Returns undef if there were no errors during parsing the message.
+
+Otherwise returns an L<XS::ErrorCode> object which represents Perl API for convenient C++ C<std::error_code> subsystem.
+Possible errors are described in L<Protocol::WebSocket::Fast::Error> and L<Protocol::HTTP::Error>.
+
+    my $message = $message_iterator->next;
+    if ($message->error) {
+        if    ($message->error == Protocol::WebSocket::Fast::Error::invalid_opcode) { ... }
+        elsif ($message->error == Protocol::WebSocket::Fast::Error::max_frame_size) { ... }
+        else  { ... }
+    }
+
+
+=head2 opcode()
+
+The opcode value for the current message
+
+See constants in L<Protocol::WebSocket::Fast>.
+
+
+=head2 is_control()
+
+True if the message is a control message (consists of single control frame)
+
+
+=head2 payload_length()
+
+Returns unpacked payload size, i.e. if payload was compressed, it will return size of uncompressed payload.
+
+
+=head2 payload()
+
+Returns payload as string
+
+
+=head2 close_code()
+
+If this message is a C<close message>, returns its close code, see L<Protocol::WebSocket::Fast> for constants.
+
+
+=head2 close_message()
+
+If this message is a C<close message>, returns message assiciated with the close code.
+
+
+=head2 frame_count()
+
+Returns number of frames in the message
+
+
+=head1 SEE ALSO
+
+L<Protocol::WebSocket::Fast>
+
+L<Protocol::WebSocket::Fast::Frame>
+
+L<Protocol::WebSocket::Fast::MessageIterator>
+
+L<Protocol::WebSocket::Fast::Parser>
+
+L<rfc6455|https://tools.ietf.org/html/rfc6455>
+
+=cut

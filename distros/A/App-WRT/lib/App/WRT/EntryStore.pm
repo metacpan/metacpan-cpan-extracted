@@ -6,6 +6,8 @@ use 5.10.0;
 
 use File::Find;
 use Carp;
+use App::WRT::Sort qw(sort_entries);
+use App::WRT::Util qw(file_get_contents);
 
 =pod
 
@@ -38,6 +40,34 @@ App::WRT::EntryStore - model the contents of a wrt repo's entry_dir
       30 # count
     );
 
+=cut
+
+# "Constants"
+
+my $ENTRYTYPE_FILE = 0;
+my $ENTRYTYPE_DIR  = 1;
+my $ENTRYTYPE_VIRT = 2;
+
+my %SUBENTRY_IGNORE = ('index' => 1);
+my $SUBENTRY_EXPR = qr{
+  ^
+    [[:lower:][:digit:]_-]+
+    (
+      [.]
+      (tgz|zip|tar[.]gz|gz|txt)
+    )?
+  $
+}x;
+
+# What gets considered a renderable entry path:
+my $RENDERABLE_EXPR = qr{
+  ^
+    (
+      [[:lower:][:digit:]_\/-]+
+    )
+  $
+}x;
+
 =head1 METHODS
 
 =over
@@ -51,9 +81,6 @@ which can be used to index into entries by depth, property, and next/previous
 entry.
 
 =cut
-
-my $ENTRYTYPE_FILE = 0;
-my $ENTRYTYPE_DIR = 1;
 
 sub new {
   my $class = shift;
@@ -71,10 +98,10 @@ sub new {
   my %source_files;
   my %entry_properties;
   my %property_entries;
+  my %children;
 
   find(
     sub {
-      # We skip index files, because they'll be rendered from the dir path:
       return unless $File::Find::name =~ m{^ \Q$entry_dir\E / (.*) $}x;
 
       my $target = $1;
@@ -105,6 +132,23 @@ sub new {
     $entry_dir
   );
 
+  # Ensure that the entry list for every property is sorted:
+  for (keys %property_entries) {
+     $property_entries{$_} = [ sort_entries(@{ $property_entries{$_} }) ];
+  }
+
+  # Create virtual entries based on tags, _if there's not already a file
+  # there_:
+  foreach my $prop (keys %property_entries) {
+    if ( $prop =~ m/^ tag[.] (.*)$/x ) {
+      my $tag = $1;
+      $tag =~ s{[.]}{/}g;
+      unless (defined $source_files{$tag}) {
+        push @entries, $tag;
+        $source_files{$tag} = $ENTRYTYPE_VIRT;
+      }
+    }
+  }
 
   # Stash refs for future use:
   $self->{entries}          = \@entries;
@@ -113,6 +157,7 @@ sub new {
   $self->{entry_properties} = \%entry_properties;
 
   $self->generate_date_hashes();
+  $self->store_children();
 
   return $self;
 }
@@ -131,6 +176,20 @@ sub all {
   return @{ $self->{entries} };
 }
 
+=item all_renderable()
+
+Returns a list of all source paths which are considered "renderable".
+
+=cut
+
+sub all_renderable() {
+  my ($self) = shift;
+  return grep {
+    (index($_, 'index', -5) == -1)
+    &&
+    m/$RENDERABLE_EXPR/
+  } @{ $self->{entries} }; }
+
 =item dates_by_depth($depth)
 
 Returns a sorted list of all date-like entries which are at a specified depth.
@@ -145,9 +204,8 @@ sub dates_by_depth {
   my ($self) = shift;
   my ($depth) = @_;
 
-  if (! defined $depth) {
-    croak('No $depth given.');
-  }
+  croak('No $depth given.')
+    unless defined $depth;
 
   # Check if we already have a value cached:
   return @{ $self->{by_depth}->{$depth} }
@@ -161,28 +219,14 @@ sub dates_by_depth {
   }
   my $pattern = join '/', @particles;
 
-  # Sort entries matching the above pattern by converting them to an array with
-  # an easily sortable string format as the second value, like [ "2014/1/1",
-  # "201400010001" ], sorting these arrayrefs by that value, and then
-  # re-mapping them to the original values.
-  #
-  # See here: https://en.wikipedia.org/wiki/Schwartzian_transform
-
-  my @by_depth = map  { $_->[0] }
-                 sort { $a->[1] cmp $b->[1] }
-                 map  { [$_, sortable_date_from_entry($_)] }
-                 grep m{^ $pattern $}x, $self->all();
+  my @by_depth = sort_entries(
+    grep m{^ $pattern $}x, $self->all()
+  );
 
   # Stash arrayref for future use:
   $self->{by_depth}->{$depth} = \@by_depth;
 
   return @by_depth;
-}
-
-sub sortable_date_from_entry {
-  my ($entry) = @_;
-  my @parts = map { sprintf("%4d", $_) } split '/', $entry;
-  return join '', @parts;
 }
 
 =item all_years(), all_months(), all_days()
@@ -286,6 +330,26 @@ sub generate_date_hashes {
   $self->{next_dates} = { reverse %prev };
 }
 
+=item store_children
+
+Store hashes of arrayrefs which maps parents to their immediate children.
+
+=cut
+
+sub store_children {
+  my $self = shift;
+
+  my %child_cache;
+
+  for my $entry ($self->all()) {
+    my $dirname = $self->dirname($entry);
+    $child_cache{$dirname} //= [ ];
+    push @{ $child_cache{$dirname} }, $entry;
+  }
+
+  $self->{child_cache} = { %child_cache };
+}
+
 =item parent($entry)
 
 Return an entry's parent, or undef if it's at the top level.
@@ -309,7 +373,7 @@ sub parent {
 
 =item children($entry)
 
-Return an entry's (immediate) children.
+Return an entry's (immediate) children, if any.
 
 =cut
 
@@ -320,8 +384,42 @@ sub children {
   # Explode unless an entry actually exists in the archives:
   croak("No such entry: $entry") unless $self->is_extant($entry);
 
-  # A cheesy regexp solution to this problem:
-  return grep { m{^ \Q$entry\E / [^/]+ $}x } $self->all();
+  if (defined $self->{child_cache}{$entry}) {
+    return @{ $self->{child_cache}{$entry} };
+  }
+  return ();
+}
+
+=item children_basenames($entry)
+
+Returns an entry's immediate children, but just basenames - not full paths.
+
+=cut
+
+sub children_basenames {
+  my $self = shift;
+  my ($entry) = @_;
+
+  return map { $self->basename($_) } $self->children($entry);
+}
+
+=item get_sub_entries($entry_loc)
+
+Returns "sub entries" based on the C<SUBENTRY_EXPR> regexp.
+
+=cut
+
+sub get_sub_entries {
+  my ($self, $entry) = @_;
+
+  # index gets special treatment as the text body of an entry, rather
+  # than as a sub-entry:
+  my @subs = grep { m/$SUBENTRY_EXPR/ } $self->children_basenames($entry);
+  return grep { ! $SUBENTRY_IGNORE{$_} } @subs;
+
+  # return grep { ! $SUBENTRY_IGNORE{$_} }
+  #        grep { m/$SUBENTRY_EXPR/ }
+  #        $self->children_basenames($entry);
 }
 
 =item previous($entry)
@@ -390,6 +488,22 @@ sub has_prop {
   return (@props == 1);
 }
 
+=item prop_value($entry, $prop)
+
+Return the value of given property, if it exists.  Otherwise return undef.
+
+=cut
+
+sub prop_value {
+  my ($self, $entry, $prop) = @_;
+  if ($self->has_prop($entry, $prop)) {
+    return file_get_contents(
+      $self->{entry_dir} . '/' . $entry . '/' . $prop . '.prop'
+    );
+  }
+  return undef;
+}
+
 =item all_props()
 
 Return an array of all properties.
@@ -436,11 +550,22 @@ sub is_file {
   return ($self->{source_files}{$entry} == $ENTRYTYPE_FILE);
 }
 
+=item is_renderable($entry)
+
+Check if an entry path is, theoretically, renderable.
+
+=cut
+
+sub is_renderable {
+  my ($self, $entry) = @_;
+  return ($entry =~ $RENDERABLE_EXPR);
+}
+
 =item has_index($entry)
 
 Check if an entry contains an index file.
 
-TODO: Should this care about the pathological(?) case where index is a
+TODO: Should this care about the pathological (?) case where index is a
 directory?
 
 =cut
@@ -461,6 +586,19 @@ sub basename {
   my ($self, $entry) = @_;
   my @parts = split '/', $entry;
   return pop @parts; 
+}
+
+=item dirname($entry)
+
+Get a directory name (i.e., directory without filename) for a given entry.
+
+=cut
+
+sub dirname {
+  my ($self, $entry) = @_;
+  my @parts = split '/', $entry;
+  pop @parts; 
+  return join '/', @parts;
 }
 
 =back

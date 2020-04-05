@@ -1,0 +1,45 @@
+{
+   "abstract" : "DBI Wrapper with Perl style data structure interfaces",
+   "author" : [
+      "Michael R. Davis (domain=>stopllc,tld=>com,account=>mdavis)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Array",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::CSV" : "0",
+            "DBI" : "0",
+            "File::Basename" : "0",
+            "Test::Simple" : "0",
+            "Tie::Cache" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.64"
+}

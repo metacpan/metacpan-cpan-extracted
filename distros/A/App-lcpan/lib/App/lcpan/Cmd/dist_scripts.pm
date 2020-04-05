@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::dist_scripts;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '1.045'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-04'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.046'; # VERSION
 
 use 5.010;
 use strict;
@@ -16,7 +18,7 @@ $SPEC{'handle_cmd'} = {
     summary => 'List scripts in a distribution',
     args => {
         %App::lcpan::common_args,
-        %App::lcpan::dist_args,
+        %App::lcpan::dists_args,
         %App::lcpan::detail_args,
     },
 };
@@ -26,24 +28,27 @@ sub handle_cmd {
     my $state = App::lcpan::_init(\%args, 'ro');
     my $dbh = $state->{dbh};
 
-    my $dist = $args{dist};
+    my @wheres;
+    push @wheres, "dist.name IN (".join(",", map {$dbh->quote($_)} @{ $args{dists} }).")";
     my $detail = $args{detail};
 
     my $sth = $dbh->prepare("SELECT
   script.name name,
+  dist.name dist,
   script.abstract abstract
 FROM script
 LEFT JOIN file ON script.file_id=file.id
 LEFT JOIN dist ON file.id=dist.file_id
-WHERE dist.name=?
+WHERE ".join(" AND ", @wheres)."
 ORDER BY name DESC");
-    $sth->execute($dist);
+    $sth->execute();
     my @res;
     while (my $row = $sth->fetchrow_hashref) {
+        delete $row->{dist} unless @{ $args{dists} } > 1;
         push @res, $detail ? $row : $row->{name};
     }
     my $resmeta = {};
-    $resmeta->{'table.fields'} = [qw/name abstract/]
+    $resmeta->{'table.fields'} = [qw/name dist abstract/]
         if $detail;
     [200, "OK", \@res, $resmeta];
 }
@@ -63,7 +68,7 @@ App::lcpan::Cmd::dist_scripts - List scripts in a distribution
 
 =head1 VERSION
 
-This document describes version 1.045 of App::lcpan::Cmd::dist_scripts (from Perl distribution App-lcpan), released on 2020-03-04.
+This document describes version 1.046 of App::lcpan::Cmd::dist_scripts (from Perl distribution App-lcpan), released on 2020-04-04.
 
 =head1 FUNCTIONS
 
@@ -90,7 +95,7 @@ Defaults to C<~/cpan>.
 
 =item * B<detail> => I<bool>
 
-=item * B<dist>* => I<perl::distname>
+=item * B<dists>* => I<array[perl::distname]>
 
 =item * B<index_name> => I<filename> (default: "index.db")
 

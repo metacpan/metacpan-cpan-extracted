@@ -77,19 +77,19 @@ if [ -e "$init_target/wrt.json" ]; then
   exit 73
 fi
 
-printf "Entries:\t%s/archives/\n" "$init_target"
+printf 'Entries:\t%s/archives/\n' "$init_target"
 mkdir -p "$init_target/archives"
 
-printf "Publish to:\t%s/public/\n" "$init_target"
+printf 'Publish to:\t%s/public/\n' "$init_target"
 mkdir -p "$init_target/public"
 
-printf "Configuration:\t%s/wrt.json\n" "$init_target"
+printf 'Configuration:\t%s/wrt.json\n' "$init_target"
 cat > "$init_target/wrt.json" << 'JSON'
 {
    "entry_dir": "./archives",
    "publish_dir": "./public",
    "title_prefix": "your title here",
-   "template": "default.html",
+   "template": "default",
    "description": "a wrt site",
    "url_root": "https://example.com/",
    "image_url_root": "https://example.com/",
@@ -104,10 +104,10 @@ cat > "$init_target/wrt.json" << 'JSON'
 }
 JSON
 
-printf "Template:\t%s/templates/default.html\n" "$init_target"
+printf 'Template:\t%s/templates/default\n' "$init_target"
 mkdir -p "$init_target/templates"
 
-cat > "$init_target/templates/default.html" << 'HTML'
+cat > "$init_target/templates/default" << 'HTML'
 <!DOCTYPE html>
 <html>
 <head>
@@ -117,6 +117,9 @@ cat > "$init_target/templates/default.html" << 'HTML'
   <meta name="author" content="${author}" />
   <link rel="stylesheet" href="${stylesheet_url}" />
   <link rel="icon" type="image/x-png" href="${favicon_url}" />
+  <link rel=alternate type="application/atom+xml" title="${title_prefix} atom feed" href="${url_root}${feed_alias}" />
+  <link rel=feed type="application/atom+xml" title="${title_prefix} atom feed" href="${url_root}${feed_alias}" />
+  <link rel="alternate" title="${title_prefix} JSON feed" type="application/json" href="${url_root}${feed_alias}.json" />
 </head>
 
 <body>
@@ -128,6 +131,8 @@ cat > "$init_target/templates/default.html" << 'HTML'
 <h1>${title}</h1>
 
 ${content}
+
+${page_navigation}
 
 <p><small><em>${license}</em></small></p>
 

@@ -1,9 +1,9 @@
 package Sah::Schemas::PhysicalQuantity;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-11'; # DATE
+our $DATE = '2020-04-04'; # DATE
 our $DIST = 'Sah-Schemas-PhysicalQuantity'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Various Sah schemas to represent physical quantities (length/distance, mass, etc)
@@ -20,7 +20,7 @@ Sah::Schemas::PhysicalQuantity - Various Sah schemas to represent physical quant
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::PhysicalQuantity (from Perl distribution Sah-Schemas-PhysicalQuantity), released on 2020-03-11.
+This document describes version 0.002 of Sah::Schemas::PhysicalQuantity (from Perl distribution Sah-Schemas-PhysicalQuantity), released on 2020-04-04.
 
 =head1 HOMEPAGE
 

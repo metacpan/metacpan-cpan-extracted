@@ -2,6 +2,7 @@ package App::WRT::Util;
 
 use strict;
 use warnings;
+use open qw(:std :utf8);
 
 use Carp;
 use Encode;
@@ -28,11 +29,11 @@ Calls $sort_order, which can be one of:
 sub dir_list {
   my ($dir, $sort_order, $pattern) = @_;
 
-  $pattern    ||= qr/^[0-9]{1,2}$/;
-  $sort_order ||= 'high_to_low';
+  $pattern    //= qr/^[0-9]{1,2}$/;
+  $sort_order //= 'high_to_low';
 
   opendir my $list_dir, $dir
-    or die "Couldn't open $dir: $!";
+    or croak "Couldn't open $dir: $!";
 
   my @files = sort $sort_order
               grep { m/$pattern/ }
@@ -60,7 +61,7 @@ L<https://secure.php.net/manual/en/function.file-put-contents.php>
 sub file_put_contents {
   my ($file, $contents) = @_;
   open(my $fh, '>', $file)
-    or die "Unable to open $file for writing: $!";
+    or croak "Unable to open $file for writing: $!";
   print $fh $contents;
   close $fh;
 }
@@ -76,6 +77,12 @@ L<https://secure.php.net/manual/en/function.file-get-contents.php>
 sub file_get_contents {
   my ($file) = @_;
 
+  # Make warnings here fatal, and return some useful info about which file is
+  # being opened:
+  local $SIG{__WARN__} = sub {
+    croak "$_[0] when opening $file\n";
+  };
+
   open my $fh, '<', $file
     or croak "Couldn't open $file: $!\n";
 
@@ -88,9 +95,6 @@ sub file_get_contents {
 
   close $fh or croak "Couldn't close $file: $!";
 
-  # TODO: _May_ want to assume here that any file is UTF-8 text.
-  # http://perldoc.perl.org/perlunitut.html
-  # return decode('UTF-8', $contents);
   return $contents;
 }
 

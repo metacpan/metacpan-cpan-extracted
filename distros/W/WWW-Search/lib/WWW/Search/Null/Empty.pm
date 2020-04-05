@@ -1,4 +1,3 @@
-# $Id: Empty.pm,v 1.10 2010-12-02 23:45:57 Martin Exp $
 
 =head1 NAME
 
@@ -34,9 +33,11 @@ use strict;
 use warnings;
 
 use base 'WWW::Search';
+
 our
-$VERSION = do { my @r = (q$Revision: 1.10 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
-our $MAINTAINER = q{Martin Thurn <mthurn@cpan.org>};
+$VERSION = 1.11;
+our
+$MAINTAINER = q{Martin Thurn <mthurn@cpan.org>};
 
 sub _native_setup_search
   {
@@ -50,6 +51,8 @@ sub _native_retrieve_some
   my $response = new HTTP::Response(200,
                                     "This is a test of WWW::Search");
   $self->{response} = $response;
+  # Explicitly set the number of results:
+  $self->{'approx_count'} = 0;
   return 0;
   } # native_retrieve_some
 

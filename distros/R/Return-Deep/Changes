@@ -1,0 +1,6 @@
+Revision history for Perl extension Return::Deep.
+
+0.01  Fri Apr  3 16:52:39 2020
+	- original version; created by h2xs 1.23 with options
+		-n Return::Deep
+

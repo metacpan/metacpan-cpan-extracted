@@ -143,7 +143,7 @@ L<Protocol::HTTP::Compression::Brotli>
 
 L<URI::XS>
 
-L<Protocol::WebSocket::XS>
+L<Protocol::WebSocket::Fast>
 
 L<rfc2616 (http 1.1) |https://tools.ietf.org/html/rfc2616>
 

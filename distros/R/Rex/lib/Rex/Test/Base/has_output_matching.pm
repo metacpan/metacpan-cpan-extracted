@@ -9,7 +9,7 @@ package Rex::Test::Base::has_output_matching;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.2'; # VERSION
+our $VERSION = '1.9.0'; # VERSION
 
 use Rex -minimal;
 use Rex::Helper::Run;

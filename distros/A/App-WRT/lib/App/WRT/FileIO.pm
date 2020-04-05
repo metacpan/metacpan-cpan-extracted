@@ -2,6 +2,7 @@ package App::WRT::FileIO;
 
 use strict;
 use warnings;
+use open qw(:std :utf8);
 
 use Carp;
 use Encode;

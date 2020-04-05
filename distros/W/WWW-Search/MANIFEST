@@ -27,6 +27,7 @@ Programs/WebSearch
 README
 README.md
 t/0_versions.t
+t/approx.t
 t/autosearch.t
 t/null-count.t
 t/null-empty.t

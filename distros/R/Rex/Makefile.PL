@@ -88,9 +88,10 @@ my %WriteMakefileArgs = (
     "String::Escape" => 0,
     "Test::Deep" => 0,
     "Test::More" => 0,
-    "Test::UseAllModules" => "0.15"
+    "Test::UseAllModules" => "0.15",
+    "utf8" => 0
   },
-  "VERSION" => "1.8.2",
+  "VERSION" => "1.9.0",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/issue/*.t"
   }
@@ -153,6 +154,7 @@ my %FallbackPrereqs = (
   "lib" => 0,
   "overload" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "vars" => 0,
   "version" => 0,
   "warnings" => 0

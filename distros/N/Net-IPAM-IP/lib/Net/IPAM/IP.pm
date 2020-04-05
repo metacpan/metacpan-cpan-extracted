@@ -13,7 +13,22 @@ use Socket qw/AF_INET AF_INET6 inet_pton inet_ntop/;
 use Exporter 'import';
 our @EXPORT_OK = qw(incr_n);
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
+
+BEGIN {
+  # On some platforms, inet_pton accepts various forms of invalid input or discards valid input.
+  if (
+       defined inet_pton( AF_INET(),  '030.0.0.1' )
+    || defined inet_pton( AF_INET6(), '2001::1:' )
+
+    || !defined inet_pton( AF_INET6(), 'fE80::0:1' )
+    )
+  {
+    # use a pure perl implementationi, see below
+    no warnings 'redefine';
+    *inet_pton = \&_inet_pton_pp;
+  }
+}
 
 =head1 NAME
 
@@ -40,6 +55,8 @@ Net::IPAM::IP - A library for reading, formatting, sorting and converting IP-add
 
 	$ip = Net::IPAM::IP->new_from_bytes(pack('C4', 192, 168, 0, 1));       # 192.168.0.1
 	$ip = Net::IPAM::IP->new_from_bytes(pack('N4', 0x20010db8, 0, 0, 1,)); # 2001:db8::1
+
+=cut
 
 =head1 METHODS
 
@@ -370,6 +387,55 @@ sub incr_n {
 
   # incr this long
   vec( $n, $pos, 32 ) = ++$long;
+  return $n;
+}
+
+sub _inet_pton_pp {
+  return _inet_pton_v4_pp( $_[1] ) if $_[0] == AF_INET;
+  return _inet_pton_v6_pp( $_[1] ) if $_[0] == AF_INET6;
+  return;
+}
+
+sub _inet_pton_v4_pp {
+
+  # 'C' may overflow for values > 255, check below
+  no warnings qw(pack numeric);
+  my $n = pack( 'C4', split( /\./, $_[0] ) );
+
+	# unpack(pack...) must be idempotent
+	# check for overflow errors or leading zeroes
+  return unless $_[0] eq join( '.', unpack( 'C4', $n ) );
+
+  return $n;
+}
+
+sub _inet_pton_v6_pp {
+  my $ip = shift // return;
+  return if $ip =~ m/[^a-fA-F0-9:]/;
+
+  my $dbl_col_count = $ip =~ s/::/::/g;
+  my $col_count     = $ip =~ tr/://;
+
+  return if $dbl_col_count > 1;
+  return if $dbl_col_count == 0 && $col_count != 7;
+
+	# 1:2:3:4:5:6::8 not allowed in RFC-5952 (4.2)
+	# return if $dbl_col_count == 1 && $col_count > 6;
+
+	# but in RFC-4291, we accept it too
+  return if $dbl_col_count == 1 && $col_count > 7;
+
+  # normalize, prepend, append 0
+  $ip =~ s/^:: /0::/x;
+  $ip =~ s/ ::$/::0/x;
+
+  my $expand_dbl_col = ':0' x ( 8 - $col_count ) . ':';
+  $ip =~ s/::/$expand_dbl_col/;
+
+  my @hextets = split( /:/, $ip );
+  return if grep { length > 4 } @hextets;
+
+  my $n = pack( 'n8', map { hex } @hextets );
   return $n;
 }
 

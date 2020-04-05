@@ -106,7 +106,7 @@ if ($from_stdin) {
 
 # TODO: Better error reporting strategy, print this on stderr:
 foreach my $entry (map { $w->expand_alias($_) } @to_display) {
-  unless ($w->{entries}->is_extant($entry)) {
+  unless ($w->{entries}->is_extant($entry) || $entry eq $w->{feed_alias}) {
     say("No such entry: $entry");
     exit(1);
   }

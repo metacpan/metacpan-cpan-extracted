@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.177';
+our $VERSION = '1.178';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -76,6 +76,13 @@ Code die (langsame) Antwortzeit des Benutzers herauszunehmen.
 Achtung: Der Wert der Zeitvariable wird in die Zukunft verschoben
 und sollte daher nur zur Zeitdauermessung verwendet werden.
 
+=item -timeout => $n
+
+Liefere den Defaultwert nach $n Sekunden. Ist kein Defaultwert
+angegeben, wirf eine Exception. Diese Option ist für Programme
+nützlich, die einen automatischen Default-Ablauf haben, in den
+der Benutzer aber eingreifen kann, wenn er das Programm bedient.
+
 =item -ttyIn => $bool (Default: 0)
 
 Lies Eingabe vom Terminal. Der Terminal-Eingabekanal (/dev/tty)
@@ -128,6 +135,7 @@ sub askUser {
     my $in = *STDIN;
     my $out = *STDOUT;
     my $timer = undef;
+    my $timeout = undef;
     my $ttyIn = 0;
     my $ttyOut = 0;
     my $values = undef;
@@ -140,6 +148,7 @@ sub askUser {
             -inHandle => \$in,
             -outHandle => \$out,
             -timer => \$timer,
+            -timeout => \$timeout,
             -ttyIn => \$ttyIn,
             -ttyOut => \$ttyOut,
             -values => \$values,
@@ -152,9 +161,15 @@ sub askUser {
         }
         else {
             $class->throw(
-                'ASK-00001: Im Automatikmodus ist Defaultwert erforderlich',
+                'ASK-00001: Option -automatic without option -default',
             );
         }
+    }
+
+    if ($timeout && !defined $default) {
+        $class->throw(
+            'ASK-00002: Option -timeout without option -default',
+        );
     }
 
     my $reset = '';
@@ -200,7 +215,28 @@ sub askUser {
         if ($ttyIn) {
             $in = Quiq::FileHandle->new('<','/dev/tty');
         }
-        $answ = <$in>;
+
+        if ($timeout) {
+            eval {
+                local $SIG{ALRM} = sub {die "alarm\n"}; # \n erforderlich
+                alarm $timeout;
+                $answ = <$in>;
+                alarm 0;
+            };
+            if ($@) {
+                # Timeout abgelaufen
+
+                if ($@ ne "alarm\n") {
+                    # Unerwarteten Fehler weiterleiten
+                    die;
+                }
+                say $answ = $default;
+            }
+        }
+        else {
+            $answ = <$in>;
+        }
+
         if ($ttyIn) {
             $in->close;
         }
@@ -290,7 +326,7 @@ sub ansiEsc {
 
 =head1 VERSION
 
-1.177
+1.178
 
 =head1 AUTHOR
 

@@ -1,3 +1,13 @@
+0.04 2020-04-05T15:17:10+02:00
+ - Add Curses::UI::AnyEvent.
+ - Add missing LICENSE file.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.03 2015-11-05T11:58:07+01:00
  - Update Curses::UI::Number to 0.06 version.
  - Update Curses::UI::Time to 0.05 version.

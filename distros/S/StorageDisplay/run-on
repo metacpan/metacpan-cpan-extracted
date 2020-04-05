@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -x
+set -e
+
+m="$1"
+f="$(echo "$m" | sed -e 's/[.].*//')"
+export PERL5LIB=lib:$PERL5LIB
+bin/storage2dot --remote "$m" -c --record /tmp/$f-2.rawdata -o /tmp/$f-2.data
+bin/storage2dot --data /tmp/$f-2.data -o /tmp/$f-2.dot
+dot -Tpdf > /tmp/$f-2.pdf /tmp/$f-2.dot
+echo "*** evince /tmp/$f-2.pdf"
+exit 0
+
+
+
+
+scp storage2dot $m:/tmp
+ssh -t $m /tmp/storage2dot -o /tmp/$f.dot "$@"
+scp $m:/tmp/$f.dot /tmp/$f.dot
+dot -Tpdf > /tmp/$f.pdf /tmp/$f.dot
+echo "*** evince /tmp/$f.pdf"

@@ -1,14 +1,11 @@
 package Error::Pure::Always;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 my %OLD_SIG;
 
@@ -49,11 +46,9 @@ Error::Pure::Always - Perl module for rewrite die by err from Error::Pure module
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Always;
 
  # Set env error type.
@@ -67,11 +62,9 @@ Error::Pure::Always - Perl module for rewrite die by err from Error::Pure module
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Always;
 
  # Set env error type.
@@ -85,11 +78,9 @@ Error::Pure::Always - Perl module for rewrite die by err from Error::Pure module
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Always;
 
  # Set error type.
@@ -122,21 +113,22 @@ Thanks for L<Carp::Always> module.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure-Always>
+L<https://github.com/michal-josef-spacek/Error-Pure-Always>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2012-2015 Michal Špaček
- BSD 2-Clause License
+© 2012-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

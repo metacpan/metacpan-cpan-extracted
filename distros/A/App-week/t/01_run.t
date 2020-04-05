@@ -12,7 +12,7 @@ $Script::lib    = File::Spec->rel2abs('lib');
 $Script::script = File::Spec->rel2abs('script/week');
 
 my %result = (
-'157209' => <<END,
+'175209' => <<END,
                           
         September         
    Su Mo Tu We Th Fr Sa   
@@ -39,7 +39,7 @@ SKIP: {
     }
 
     my $week = Script->new([qw(--cm *= -C0 1752/9/2)])->run;
-    is($week->result, $result{"157209"}, "1752/9/2");
+    is($week->result, $result{"175209"}, "1752/9/2");
 }
 
 done_testing;

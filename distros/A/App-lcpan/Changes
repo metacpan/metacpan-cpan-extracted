@@ -1,3 +1,12 @@
+1.046   2020-04-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add subcommand: rdeps-scripts.
+
+        - dist-scripts: Accept multiple dists.
+
+	- rdeps: Add --flatten like in deps.
+
+
 1.045   2020-03-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Add options: skip_sub_indexing_files,

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.153     2020-04-04 04:32:08Z
+          - add mention of git submodules, when relevant, in CONTRIBUTING
+
 0.152     2020-03-24 01:01:11Z
           - skip a test when a necessary feature of Dist::Zilla is not
             available (normal runtime functionality not affected)

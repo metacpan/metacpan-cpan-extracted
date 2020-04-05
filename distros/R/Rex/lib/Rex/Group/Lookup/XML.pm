@@ -28,7 +28,7 @@ use strict;
 use warnings;
 use Rex -base;
 
-our $VERSION = '1.8.2'; # VERSION
+our $VERSION = '1.9.0'; # VERSION
 
 require Exporter;
 use base qw(Exporter);

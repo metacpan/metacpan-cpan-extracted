@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.177';
+our $VERSION = '1.178';
 
 use Quiq::Udl;
 use Quiq::CommandLine;
@@ -37,11 +37,11 @@ Die Klasse stellt einen Wrapper für den PostgreSQL-Client psql dar.
 
 =head2 Klassenmethoden
 
-=head3 run() - Rufe psql für interaktive Nutzung auf
+=head3 run() - Starte psql-Sitzung ohne Passworteingabe
 
 =head4 Synopsis
 
-  $class->run($database);
+  $exitCode = $class->run($database);
 
 =head4 Arguments
 
@@ -62,10 +62,26 @@ Der Name muss in der Datenbank-Konfigurationsdatei definiert sein.
 
 Führe Kommando $cmd aus und terminiere die Verbindung.
 
+=item -echo => $bool (Default: I<wenn -script 1, sonst 0>)
+
+Gib alle Kommandos, die an den Server geschickt werden, auf stdout aus.
+
+=item -log => $file
+
+Logge Sitzung nach Datei $file.
+
+=item -script => $file
+
+Führe SQL-Skript $file aus und terminiere die Verbindung.
+
 =item -showInternal => $bool (Default: 0)
 
 Gib die Queries aus, die psql im Zusammenhang mit Backslash-Kommandos
 intern ausführt.
+
+=item -stopOnError => $bool (Default: I<wenn -script 1, sonst 0>)
+
+Terminiere beim ersten Fehler.
 
 =item -debug => $bool (Default: 0)
 
@@ -73,12 +89,17 @@ Gib das ausgeführte psql-Kommando auf STDOUT aus.
 
 =back
 
+=head4 Returns
+
+Bei interaktiver Sitzung 0. Bei Skript- oder Kommando-Ausführung
+wie bei psql(1).
+
 =head4 Description
 
-Rufe psql für die interaktive Nutzung am Terminal auf. Der Vorteil dieser
-Methode ist, dass die Datenbank per Name kontaktiert werden kann, wenn
-der UDL in die Konfiguration (s. Quiq::Database::Config) eingetragen
-wurde.
+Rufe psql auf und führe eine Anmeldung durch, auch bei
+Passwort-Authentisierung. Die Datenbank kann per Name kontaktiert werden
+kann, wenn der UDL in die Konfiguration (s. Quiq::Database::Config)
+eingetragen wurde.
 
 =head4 Example
 
@@ -101,14 +122,22 @@ sub run {
 
     # Options
 
-    my $debug = 0;
     my $command = undef;
+    my $debug = 0;
+    my $echo = 0;
+    my $log = undef;
+    my $script = undef;
     my $showInternal = 0;
+    my $stopOnError = 0;
 
     $class->parameters(\@_,
         -command => \$command,
         -debug => \$debug,
+        -echo => \$echo,
+        -log => \$log,
+        -script => \$script,
         -showInternal => \$showInternal,
+        -stopOnError => \$stopOnError,
     );
 
     # Führe Operation aus
@@ -134,15 +163,24 @@ sub run {
         $c->addOption(-P=>'pager=off');
         $c->addLongOption('--command'=>$command);
     }
-
+    if ($script) {
+        $c->addLongOption('--file'=>$script);
+        $stopOnError = 1;
+        $echo = 1;
+    }
+    if ($stopOnError) {
+        $c->addLongOption('--set'=>'ON_ERROR_STOP=1');
+    }
+    $c->addBoolOption('--echo-all'=>$echo);
+    $c->addLongOption('--log-file'=>$log);
     if (my $database = $udl->db) {
         $c->addArgument($database);
     }
 
     my $cmd = $c->command;
-    if ($debug) {
+    # if ($debug) {
         say $cmd;
-    }
+    # }
 
     my $exp = Expect->new;
     if ($debug) {
@@ -157,39 +195,41 @@ sub run {
 
     # Anmeldung. Wir unterscheiden drei Fälle.
 
-    my $interact = 0;
+    my $interact = $command || $script? 0: 1;
     $exp->expect(3,[
         # mit Passwort
         -re => 'Password.*?:',sub {
             my $exp = shift;
             $exp->send($udl->password."\n");
-            $interact = 1;
         },
     ],[
         # ohne Passwort
         -re => '^psql ',sub {
-            $interact = 1;
         },
     ],[
         # Verbindung kommt nicht zustande
         -re => '^psql:',sub {
             # Ende der Kommunikation
+            $interact = 0;
         },
     ]);
 
     if ($interact) {
         # Benutzer-Interaktion
+
         $exp->interact;
+        return 0;
     }
 
-    return;
+    $exp->expect(undef);
+    return $exp->exitstatus/256;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.177
+1.178
 
 =head1 AUTHOR
 

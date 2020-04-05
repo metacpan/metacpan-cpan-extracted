@@ -4,10 +4,9 @@ use strict;
 use warnings;
 
 use CPAN;
-use Class::Utils qw(set_params);
 use Getopt::Std;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -16,8 +15,13 @@ sub new {
 	# Create object.
 	my $self = bless {}, $class;
 
-	# Process params.
-	set_params($self, @params);
+	# Object.
+	return $self;
+}
+
+# Run.
+sub run {
+	my $self = shift;
 
 	# Process arguments.
 	$self->{'_opts'} = {
@@ -31,23 +35,15 @@ sub new {
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tmodule_prefix\tModule prefix. e.g. ".
 			"Module::Install\n";
-		exit 1;
+		return 1;
 	}
 	$self->{'_module_prefix'} = shift @ARGV;
-
-	# Object.
-	return $self;
-}
-
-# Run.
-sub run {
-	my $self = shift;
 
 	# Print all modules with prefix.
 	# XXX Rewrite to something nice.
 	CPAN::Shell->m("/^$self->{'_module_prefix'}/");
 
-	return;
+	return 0;
 }
 
 1;
@@ -66,29 +62,25 @@ App::CPAN::Search - Base class for cpan-search script.
 =head1 SYNOPSIS
 
  use App::CPAN::Search;
+
  my $app = App::CPAN::Search->new;
- $app->run;
+ my $exit_code = $app->run;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $app = App::CPAN::Search->new;
 
- Constructor.
+Constructor.
 
-=item C<run()>
+=head2 C<run>
 
- Run method.
- Returns undef.
+ my $exit_code = $app->run;
 
-=back
+Run.
 
-=head1 ERRORS
-
- new():
-         From Class::Utils::set_params():
-                 Unknown parameter '%s'.
+Returns 1 for error, 0 for success.
 
 =head1 EXAMPLE
 
@@ -103,7 +95,7 @@ App::CPAN::Search - Base class for cpan-search script.
  );
 
  # Run.
- App::CPAN::Search->new->run;
+ exit App::CPAN::Search->new->run;
 
  # Output like:
  # Reading '/home/skim/.local/share/.cpan/Metadata'
@@ -119,12 +111,11 @@ App::CPAN::Search - Base class for cpan-search script.
 =head1 DEPENDENCIES
 
 L<CPAN>,
-L<Class::Utils>,
 L<Getopt::Std>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/App-CPAN-Search>
+L<https://github.com/michal-josef-spacek/App-CPAN-Search>
 
 =head1 AUTHOR
 
@@ -134,11 +125,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2015-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

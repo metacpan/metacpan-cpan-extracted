@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Dicom::File::Detect qw(dicom_detect_file);
 use English;
 use Error::Pure::Utils qw(clean);

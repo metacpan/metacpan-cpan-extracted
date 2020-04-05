@@ -20,7 +20,10 @@ Options:
     -Y[n]   Display n years of calender
     -c n    Display calendar in n column (default 3).
 
-    --colormap  FIELD=COLOR
+Color options:
+
+    --colormap  Specify colormap
+    --rgb24     Use 24bit RGB color ANSI sequence
 
 Module options:
 
@@ -31,7 +34,7 @@ Module options:
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 DESCRIPTION
 
@@ -206,7 +209,7 @@ my @opt_colormap;
 my $opt_year;
 my $opt_Y;
 my $opt_usage;
-my @opt_catch_all;
+my $opt_rgb24;
 our %debug;
 
 my %month = do {
@@ -223,8 +226,9 @@ my @optargs = (
     "column|c=n"    => \$opt_column,
     "colormap|cm=s" => \@opt_colormap,
     "colordump"     => \$opt_colordump,
+    "rgb24!"        => \$opt_rgb24,
     "usage:s"       => \$opt_usage,
-    "crashspace!"   => \$debug{crashspace},
+    "debug=s"       => \%debug,
     "<>" => sub {
 	local $_ = $_[0];
 	if (/^-+([0-9]+)$/) {
@@ -266,6 +270,9 @@ use Getopt::EX::Colormap;
 my $cm = Getopt::EX::Colormap
     ->new(HASH => \%colormap)
     ->load_params(@opt_colormap);
+
+$Getopt::EX::Colormap::RGB24 = $opt_rgb24
+    if defined $opt_rgb24;
 
 sub color {
     $cm->color(@_);
@@ -393,6 +400,9 @@ package App::week::CalYear {
 	if ($main::debug{crashspace}) {
 	    $cal =~ s/ +$//mg;
 	}
+	if ($main::debug{netbsd}) {
+	    $cal =~ s/(Su|Mo|We|Fr|Sa)/' ' . substr($1,0,1)/mge;
+	}
 	my @cal = split /\n/, $cal, -1;
 	my @month = ( [ $cal[0] ], map [], 1..12 );
 	my @monthline = do {
@@ -402,11 +412,13 @@ package App::week::CalYear {
 	};
 	@monthline == 4 or die "cal(1) command format error.\n";
 	state $fields = do {
+	    use Unicode::EastAsianWidth;
+	    my $dow_re = qr/\p{InFullwidth}|[ \w]\w/;
 	    $cal[ $monthline[0] + 1 ] =~ 
 		m{^   (\s*)
-		      ( (?: (?:\S+) \s+){6} \S+ ) (\s+)
-		      ( (?: (?:\S+) \s+){6} \S+ ) (\s+)
-		      ( (?: (?:\S+) \s+){6} \S+ )
+		      ( (?: $dow_re [ ]){6} $dow_re ) (\s+)
+		      ( (?: $dow_re [ ]){6} $dow_re ) (\s+)
+		      ( (?: $dow_re [ ]){6} $dow_re )
 	    }x or die "cal(1): unexpected day-of-week line.";
 	    my $w = vwidth $2;
 	    my @w = (length $1, $w, length $3, $w, length $5, $w);

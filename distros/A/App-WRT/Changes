@@ -1,6 +1,25 @@
 Revision history for App::WRT
 
-v6.3.0 2019-06-23
+v7.0.0 2020-04-04
+
+  - Add a full tagging system
+  - Cache HTML for every entry in the archive for a speedup in rendering large sites
+  - Extract headers from rendered HTML with Mojo::DOM and cache
+  - Use extracted headers to title pages, navigation links, and feed entries
+  - Handle feed_alias in wrt-display
+  - Remove entry_map from configuration and hardcode the default's assumptions
+    about blog entry layout
+  - Remove embedded_perl from configuration - now always look for embedded
+    Perl, since this is required for templates.  This feature may be
+    deprecated in a future release.
+  - Warn on HTML parsing errors (usually character encoding issues)
+  - Rename default template from "basic" to "default"
+  - Add JSON Feed support, improve Atom feed performance
+  - Add wrt-repl for debugging
+  - Add feed links to default template produced by wrt-init
+  - Add wrt-feed for printing feeds
+
+v6.3.1 2019-06-23
 
   - Generalize iso_date() test for epoch to include all timezones
 

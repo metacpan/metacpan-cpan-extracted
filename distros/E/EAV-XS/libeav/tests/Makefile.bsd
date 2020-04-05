@@ -41,7 +41,7 @@ LD_LIBRARY_PATH = ${LIB_PATH}
 all: ${TARGETS} ${PARTIAL_TRT}
 
 .SUFFIXES: .bin
-.o.bin: depend
+.o.bin:
 	# === tests -> linkage
 	${CC} ${LDFLAGS} ${CPPFLAGS} ${CFLAGS} -o $@ $< ${DEP_OBJ} ${LIBS}
 
@@ -58,7 +58,7 @@ all: ${TARGETS} ${PARTIAL_TRT}
 
 clean:
 	# === tests -> cleanup
-	${RM} ${TARGETS} ${OBJECTS} ${PARTIAL_OBJ} ${PARTIAL_TRT} Makefile.depend
+	${RM} ${TARGETS} ${OBJECTS} ${PARTIAL_OBJ} ${PARTIAL_TRT}
 
 check: check-domain check-lpart check-email check-lib
 
@@ -67,7 +67,7 @@ check-domain: $(TARGETS) $(PARTIAL_TRT)
 	# domain tests
 	# =====================================================
 	env LD_LIBRARY_PATH="${LIB_PATH}" \
-	./t-all-tlds-test.bin ../data/tld-domains.txt
+	./t-all-tlds-test.bin 11 52 ../data/tld-domains.txt
 	env LD_LIBRARY_PATH="${LIB_PATH}" \
 	./t-domain-length.bin 4 3 ../data/domain-length.txt
 	env LD_LIBRARY_PATH="${LIB_PATH}" \
@@ -441,13 +441,3 @@ check-lib:
 
 
 .PHONY: all debug clean check
-
-#----------------------------------------------------------#
-
-depend: Makefile.depend
-Makefile.depend:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -MM -MG $(SOURCES) $(PARTIAL_SRC) > $@
-
-.sinclude "Makefile.depend"
-
-.DELETE_ON_ERROR:

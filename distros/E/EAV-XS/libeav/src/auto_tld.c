@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2020-03-24 13:10:53 */
+/* this file was auto-generated at 2020-04-02 18:27:10 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -881,7 +881,7 @@ const tld_t tld_list[] = {
     { "mz", 3, TLD_TYPE_COUNTRY_CODE },
     { "na", 3, TLD_TYPE_COUNTRY_CODE },
     { "nab", 4, TLD_TYPE_GENERIC },
-    { "nadex", 6, TLD_TYPE_GENERIC },
+    { "nadex", 6, TLD_TYPE_NOT_ASSIGNED },
     { "nagoya", 7, TLD_TYPE_GENERIC },
     { "name", 5, TLD_TYPE_GENERIC_RESTRICTED },
     { "nationwide", 11, TLD_TYPE_GENERIC },
@@ -1452,7 +1452,7 @@ const tld_t tld_list[] = {
     { "xn--e1a4c", 10, TLD_TYPE_COUNTRY_CODE },
     { "xn--eckvdtc9d", 14, TLD_TYPE_GENERIC },
     { "xn--efvy88h", 12, TLD_TYPE_GENERIC },
-    { "xn--estv75g", 12, TLD_TYPE_GENERIC },
+    { "xn--estv75g", 12, TLD_TYPE_NOT_ASSIGNED },
     { "xn--fct429k", 12, TLD_TYPE_GENERIC },
     { "xn--fhbei", 10, TLD_TYPE_GENERIC },
     { "xn--fiq228c5hs", 15, TLD_TYPE_GENERIC },

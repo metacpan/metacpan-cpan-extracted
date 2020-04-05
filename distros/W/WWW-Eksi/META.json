@@ -46,11 +46,11 @@
    "provides" : {
       "WWW::Eksi" : {
          "file" : "lib/WWW/Eksi.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "WWW::Eksisozluk" : {
          "file" : "lib/WWW/Eksisozluk.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/kyzn/WWW-Eksi"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_contributor_covenant" : {
       "version" : 0.02
    },

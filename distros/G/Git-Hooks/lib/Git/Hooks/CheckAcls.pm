@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckAcls;
 # ABSTRACT: [DEPRECATED] Git::Hooks plugin for branch/tag access control
-$Git::Hooks::CheckAcls::VERSION = '2.10.1';
+$Git::Hooks::CheckAcls::VERSION = '2.11.1';
 use 5.010;
 use utf8;
 use Log::Any '$log';
@@ -140,7 +140,7 @@ Git::Hooks::CheckAcls - [DEPRECATED] Git::Hooks plugin for branch/tag access con
 
 =head1 VERSION
 
-version 2.10.1
+version 2.11.1
 
 =head1 SYNOPSIS
 
@@ -320,7 +320,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2020 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

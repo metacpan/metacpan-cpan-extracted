@@ -28,7 +28,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Interval-Barycentric
   repository: https://github.com/ology/Music-Interval-Barycentric.git
-version: '0.0307'
+version: '0.0400'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

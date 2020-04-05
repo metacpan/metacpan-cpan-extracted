@@ -4,7 +4,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME                => 'TSQL-FlatFile',
+    NAME                => 'TSQL::FlatFile',
     AUTHOR              => q{Ded MedVed <dedmedved@cpan.org>},
     VERSION_FROM        => 'lib/TSQL/FlatFile.pm',
     ABSTRACT_FROM       => 'lib/TSQL/FlatFile.pm',
@@ -14,6 +14,8 @@ WriteMakefile(
       : ()),
     PL_FILES            => {},
     EXE_FILES => [ "gen-FormatFile.pl"
+                 , "gen-SkeletonTable.pl"
+                 , "renumber-FormatFile.pl"                 
                  ],
     PREREQ_PM => {
         'Test::More'                => 0,
@@ -30,6 +32,7 @@ WriteMakefile(
         'List::Util'                => 0,
         'Modern::Perl'              => 0,
         'Readonly'                  => 0,
+        'Regexp::Exhaustive'        => 0,
         'Smart::Comments'           => 0,
         'Spreadsheet::WriteExcel'   => 0,
         'Spreadsheet::ParseExcel'   => 0,

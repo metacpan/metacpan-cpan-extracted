@@ -1,0 +1,91 @@
+=head1 NAME
+
+Protocol::WebSocket::Fast::Frame - WebSocket Frame class
+
+
+
+=head1 DESCRIPTION
+
+The class represents a frame received via WebSocket protocol.
+
+The Frame object cannot be instantiated direcly, it can be accessed
+via L<Protocol::WebSocket::Fast::FrameIterator> or
+L<Protocol::WebSocket::Fast::Parser>.
+
+The Frame object is read-only, i.e. all provided methods are just getters.
+
+
+
+=head1 METHODS
+
+=head2 error()
+
+Returns undef if there were no errors during parsing the frame.
+
+Otherwise returns an L<XS::ErrorCode> object which represents Perl API for convenient C++ C<std::error_code> subsystem.
+Possible errors are described in L<Protocol::WebSocket::Fast::Error> and L<Protocol::HTTP::Error>.
+
+    my $frame = $frame_iterator->next;
+    if ($frame->error) {
+        if    ($frame->error == Protocol::WebSocket::Fast::Error::invalid_opcode) { ... }
+        elsif ($frame->error == Protocol::WebSocket::Fast::Error::max_frame_size) { ... }
+        else  { ... }
+    }
+
+
+=head2 opcode()
+
+The opcode value for the current frame
+
+See constants in L<Protocol::WebSocket::Fast>.
+
+
+=head2 is_control()
+
+True if the frame is a control frame
+
+
+=head2 final()
+
+True if the frame is final
+
+
+=head2 payload_length()
+
+Returns frame payload length, i.e. size of transferred bytes over network.
+Might not match the size of actual payload if it was compressed.
+
+
+=head2 payload()
+
+Returns payload as a string.
+
+Performance note: as the underhood the payload can be transferred over network
+in different fragments, it might be uneffective to concantenate all pieces
+every time on payload access; in other words it is recommended to cache
+the method.
+
+=head2 close_code()
+
+If this frame is a C<close frame>, returns its close code, see L<Protocol::WebSocket::Fast> for constants.
+
+
+=head2 close_message()
+
+If this frame is a C<close frame>, returns its message.
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::WebSocket::Fast>
+
+L<Protocol::WebSocket::Fast::FrameIterator>
+
+L<Protocol::WebSocket::Fast::Message>
+
+L<Protocol::WebSocket::Fast::Parser>
+
+L<rfc6455|https://tools.ietf.org/html/rfc6455>
+
+=cut

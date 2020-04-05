@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use base qw(Exporter);
-our @EXPORT_OK = qw(iso_date get_date get_mtime month_name);
+our @EXPORT_OK = qw(iso_date rfc_3339_date get_date get_mtime month_name);
 
 use POSIX qw(strftime);
 
@@ -15,6 +15,24 @@ App::WRT::Date - a small collection of date utility functions
 =head2 FUNCTIONS
 
 =over
+
+=item rfc_3339_date($time)
+
+Return an RFC 3339 date string for the given epoch time.
+
+L<https://www.ietf.org/rfc/rfc3339.txt>
+
+=cut
+
+sub rfc_3339_date {
+  my ($time) = @_;
+  my $time_str = strftime('%Y-%m-%dT%H:%M:%S%z', localtime($time));
+
+  # HACK: Add a : to the last 4 digits, because apparently this isn't supported
+  # by POSIX strftime().
+  $time_str =~ s/(\d{2})(\d{2})$/$1:$2/x;
+  return $time_str;
+}
 
 =item iso_date($time)
 

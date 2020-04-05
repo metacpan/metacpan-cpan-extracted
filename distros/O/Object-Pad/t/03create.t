@@ -44,4 +44,24 @@ class WithBuildargs {
    is_deeply( \@buildall,  [qw( 4 5 6 )],               '@_ to BUILDALL' );
 }
 
+{
+   my $newarg_destroyed;
+   my $buildargs_result_destroyed;
+   package DestroyWatch {
+      sub new { bless [ $_[1] ], $_[0] }
+      sub DESTROY { ${ $_[0][0] }++ }
+   }
+
+   class RefcountTest {
+      sub BUILDARGS {
+         return DestroyWatch->new( \$buildargs_result_destroyed )
+      }
+   }
+
+   RefcountTest->new( DestroyWatch->new( \$newarg_destroyed ) );
+
+   is( $newarg_destroyed, 1, 'argument to ->new destroyed' );
+   is( $buildargs_result_destroyed, 1, 'result of BUILDARGS destroyed' );
+}
+
 done_testing;

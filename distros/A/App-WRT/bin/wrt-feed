@@ -1,0 +1,126 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+wrt-feed - print an Atom or JSON feed from given wrt entries
+
+=head1 USAGE
+
+    # Print most recent entries:
+    wrt feed
+    wrt feed --json
+
+    # Print entries for a specific month:
+    wrt feed 2019/11
+    wrt feed --json 2019/11
+
+=head1 DESCRIPTION
+
+Detailed documentation can be found in the L<App::WRT> man page or at
+L<https://code.p1k3.com/gitea/brennen/wrt>.
+
+=head1 LICENSE
+
+    wrt is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+=head1 AUTHOR
+
+Brennen Bearnes <code@p1k3.com>
+
+=cut
+
+use 5.14.0;
+
+use strict;
+use warnings;
+no  warnings 'uninitialized';
+use utf8;
+use open qw(:std :utf8);
+
+# use Data::Dumper;
+use App::WRT;
+
+use Carp;
+use Getopt::Long qw(GetOptionsFromArray);
+use Pod::Usage;
+
+# If invoked directly from the command-line, caller() will return undef.
+# Execute main() with a callback to print output directly, and a copy of
+# our real @ARGV:
+if (not caller()) {
+  my $output = sub { say @_; };
+  my $retval = main($output, @ARGV);
+  exit($retval);
+}
+
+sub main {
+  my ($output, @local_argv) = @_;
+  # Handle options, including help generated from the POD above.  See:
+  # - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
+  # - https://metacpan.org/pod/Pod::Usage
+  # - http://michael.thegrebs.com/2014/06/08/Pod-Usage/
+  my $from_stdin  = 0;
+  my $print_json  = 0;
+  my $config_file = 'wrt.json';
+  GetOptionsFromArray(
+    \@local_argv,
+
+    stdin      => \$from_stdin,
+    json       => \$print_json,
+    'config=s' => \$config_file,
+    help       => sub { pod2usage(0) },
+
+  ) or pod2usage(2);
+
+  unless (-e $config_file) {
+    croak "No wrt config file found.  Tried: $config_file";
+  }
+
+  my $w = App::WRT::new_from_file($config_file);
+
+  # With --stdin, take names of entries to display from standard input, one line
+  # per name.  Otherwise, take names from arguments if any are given, or fall
+  # back to most recent entries.
+  my @to_display = ();
+  if ($from_stdin) {
+    while (my $entry = <>) {
+      chomp($entry);
+      push @to_display, $entry;
+    }
+  } elsif (@local_argv) {
+    (@to_display) = @local_argv;
+  }
+
+  my (@expanded_to_display) = map { $w->expand_alias($_) } @to_display;
+
+  foreach my $entry (@expanded_to_display) {
+    unless ($w->{entries}->is_extant($entry)) {
+      # TODO: Better error reporting strategy, print this on stderr:
+      say("No such entry: $entry");
+      return 1;
+    }
+  }
+
+  if (@expanded_to_display) {
+    if ($print_json) {
+      $output->( $w->feed_print_json(@expanded_to_display) );
+    } else {
+      $output->( $w->feed_print(@expanded_to_display) );
+    }
+  } else {
+    if ($print_json) {
+      $output->( $w->feed_print_json_recent() );
+    } else {
+      $output->( $w->feed_print_recent() );
+    }
+  }
+
+  return 0;
+}
+
+1;

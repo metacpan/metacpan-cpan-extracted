@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2019-10-29'; # DATE
-our $VERSION = '0.599'; # VERSION
+our $DATE = '2020-04-03'; # DATE
+our $VERSION = '0.600'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -17,7 +17,6 @@ sub configure {
     });
 
     $self->add_plugins(
-        ['FileFinder::ByName' => 'FileFinder::ByName PERLANCAR' => {dir => ['lib', 'script'], skip => ['lib/Bencher/ScenarioR/']}],
         ['ExecDir' => 'ExecDir script' => {dir=>'script'}],
         'PERLANCAR::BeforeBuild',
         'Rinci::AbstractFromMeta',
@@ -45,7 +44,7 @@ sub configure {
         'Rinci::EmbedValidator',
         'SetScriptShebang',
         'Test::Compile',
-        ['Test::Perl::Critic::Subset' => {finder => ['@Author::PERLANCAR/FileFinder::ByName PERLANCAR']}],
+        'Test::Perl::Critic::Subset',
         'Test::Rinci',
         'StaticInstall', # by default enable static install because 99% of the time my dist is pure-perl
         'EnsureSQLSchemaVersionedTest',
@@ -73,7 +72,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.599 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-10-29.
+This document describes version 0.600 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2020-04-03.
 
 =head1 SYNOPSIS
 
@@ -138,7 +137,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

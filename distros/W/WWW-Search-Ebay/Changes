@@ -1,3 +1,10 @@
+2020-04-04  Kingpin  <martin@ubuntu>
+
+	* lib/WWW/Search/Ebay.pm (_get_result_count_elements): new HTML patterns
+
+	* lib/WWW/Search/Ebay/Motors.pm: removed because cars are no longer searchable via simple CGI parameters
+	* lib/WWW/Search/Ebay/Stores.pm: removed because stores are no longer searchable via simple CGI parameters
+
 2016-02-07  Kingpin  <martin@localhost.localdomain>
 
 	* lib/WWW/Search/Ebay.pm (_parse_shipping): allow shipping to be "unknown"

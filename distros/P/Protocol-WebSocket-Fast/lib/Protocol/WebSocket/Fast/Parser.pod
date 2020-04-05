@@ -1,0 +1,395 @@
+=head1 NAME
+
+Protocol::WebSocket::Fast::Parser - Websocket parser
+
+=cut
+
+=head1 SYNOPSIS
+
+    use Protocol::WebSocket::Fast;
+
+    my $parser = Protocol::WebSocket::Fast::ClientParser->new;
+    
+    $parser->configure({
+        max_frame_size     => 0,
+        max_message_size   => 0,
+        max_handshake_size => 0,
+        deflate => {
+            server_max_window_bits     => 15,
+            client_max_window_bits     => 15,
+            client_no_context_takeover => 0,
+            server_no_context_takeover => 0,
+            mem_level                  => 8,
+            compression_level          => -1,
+            strategy                   => 0,
+            compression_threshold      => 1410,
+        },
+    });
+    
+    ...
+
+    $data = $parser->send_ping;
+    $data = $parser->send_message(opcode => OPCODE_TEXT, payload => 'hello world');
+    my @messages = $parser->get_messages($data);
+
+
+
+=head1 DESCRIPTION
+
+C<Protocol::WebSocket::Fast::Parser> contains common implementation for L<Protocol::WebSocket::Fast::ClientParser> and L<Protocol::WebSocket::Fast::ServerParser>.
+No direct class instantiation is possible.
+
+The instance of L<Protocol::WebSocket::Fast::Parser> keeps track of state (established connection, closed etc.)
+and might contain some not parsed (incomplete) data.
+
+
+
+=head1 METHODS
+
+=head2 configure(\%params)
+
+Performs parser configuration. If connection is already established, some settings might have no effect.
+
+Available parameters (default values are provided in brackets):
+
+=over
+
+=item max_frame_size [0 = unlimited]
+
+Max size of a message frame in bytes.
+
+=item max_message_size [0 = unlimited]
+
+Max size of a message in bytes.
+If compression is in use, this is the max size of a decompressed message.
+
+=item max_handshake_size [0 = unlimited]
+
+Max size of connect request (for server parser) or connect response (for client parser) headers.
+
+=item deflate
+
+Compression configuration. Can't be changed after connection is established (changes are ignored).
+
+Provided as a hashref with the following possible parameters:
+
+=over
+
+=item server_max_window_bits [15]
+
+This parameter has a decimal integer value without leading zeroes between 9 to 15, inclusive, indicating the base-2 logarithm of the LZ77 sliding window size.
+
+By including this parameter in an extension negotiation offer, a client limits the LZ77 sliding window size that the server will use to compress messages.
+If the peer server uses a small LZ77 sliding window to compress messages, the client can reduce the memory needed for the LZ77 sliding window.
+
+This option MAY be set by client-side.
+
+=item client_max_window_bits [15]
+
+This parameter has a decimal integer value without leading zeroes between 9 to 15, inclusive, indicating the base-2 logarithm of the LZ77 sliding window size.
+
+A client informs server, that it is not going to use an LZ77 sliding window size greater than the size specified by the value in the extension
+negotiation offer to compress messages.
+
+By including this extension parameter in an extension negotiation response, a server limits the LZ77 sliding window size that the client uses to compress messages.
+This reduces the amount of memory for the decompression context that the server has to reserve for the connection.
+
+This option MAY be set by client-side.
+
+=item client_no_context_takeover [false]
+
+A a client informs the peer server of a hint that the client is not going to use context takeover.
+
+This reduces the amount of memory that the server has to reserve for the connection by the cost of reducing session compression ratio.
+
+=item server_no_context_takeover
+
+By including this extension parameter in an extension negotiation offer, a client prevents the peer server from using context takeover.
+If the peer server doesn't use context takeover, the client doesn't need to reserve memory to retain the LZ77 sliding window between messages
+by the cost of reducing session compression ratio.
+
+=item mem_level [8]
+
+Specifies how much memory should be allocated for the internal compression state.
+C<mem_level=1> uses minimum memory leading to slow compression speed and reduces compression ratio.
+C<mem_level=9> uses maximum of the memory for optimal speed.
+
+=item compression_level [-1]
+
+=over
+
+=item -1 - default compression
+
+=item 0 - no compression
+
+=item 1 - best speed
+
+=item 9 - best compression
+
+=back
+
+=item strategy [0]
+
+The parameter is used to tune the compression algorithm.
+
+=over
+
+=item 0 - default startegy
+
+=item 1 - filtered
+
+=item 2 - huffman only
+
+=item 3 - RLE
+
+=item 4 - fixed
+
+=back
+
+=item compression_threshold [1410]
+
+The minimum size of text I<message> payload to let the payload be compressed.
+
+Default value is C<1410>, i.e. when the message payload is going to exceed one TCP-segment, it will be compressed in the hope that it still be able to fit in.
+
+This parameter is not used when message is created manually frame by frame, i.e. by frame builder
+
+    $parser->start_message()
+
+as the whole message size is not known at the moment. It's developer
+responsibility to decide, whether compress message or not:
+
+    parser->start_message(deflate => 0 | 1)
+
+=back
+
+See L<rfc7692|https://tools.ietf.org/html/rfc7692> and L<zlib manual|https://www.zlib.net/manual.html> for more details.
+
+=back
+
+
+=head2 no_deflate()
+
+Disables usage of C<permessage-deflate> compression extension at connection
+negotiation phase.
+
+
+=head2 max_frame_size()
+
+Returns max_frame_size setting.
+
+
+=head2 max_message_size()
+
+Returns max_message_size setting.
+
+
+=head2 max_handshake_size()
+
+Returns max_handshake_size setting.
+
+
+=head2 deflate_config()
+
+Returns deflate config as hashref. See L<configure>
+
+
+=head2 effective_deflate_config()
+
+Returns deflate config of the currently established connection as hashref.
+It might be different than the default L<deflate_config>.
+
+
+=head2 established()
+
+Returns C<true> if connection has been established,
+i.e. for client-side if parser successfully parsed server response and for server-side if C<accept_response> has been invoked.
+
+
+=head2 recv_closed()
+
+Returns true if parser received close packet from peer, that is no further frames/messages are expected from peer.
+
+
+=head2 send_closed()
+
+Returns true if parser sent close packet to peer, that is no further frames/messages are expected to be sent to peer.
+
+
+=head2 is_deflate_active()
+
+Returns true if connection has been established and peer has agreed to use per-message deflate extension.
+
+
+=head2 get_frames([$data])
+
+Tries to parse frames from C<$data>.
+
+In list context it returns all fully arrived frames L<frames|Protocol::WebSocket::Fast::Frame> and consumes all of the C<$data>.
+
+In scalar context, if at least one frame is fully arrived, it returns L<Protocol::WebSocket::Fast::FrameIterator> which is a lazy frame iterator (parses on-the-fly).
+Otherwise returns undef.
+
+This operation is destructive, i.e. once parsed, data is removed from internal buffer and accessible only via high-level interface,
+i.e. as L<Protocol::WebSocket::Fast::Frame> or L<FrameIterator|Protocol::WebSocket::Fast::FrameIterator>
+
+This method enables C<frame-by-frame> receiving mode, so that you can't mix it will C<get_messages()> calls. Once you've started receiving a message
+frame-by-frame you have to continue receiving until final frame arrives, but no more than final frame! Thus if you want to mix frame/message mode you
+should use scalar context iterator interface (because list context will return all received frames, possibly even after final frame).
+After that you can safely swith to C<whole-message-mode> by calling C<get_messages>. In other words, switching between C<get_frames()> / C<get_messages()>
+is only possible when you are between two messages.
+
+
+=head2 get_messages([$data])
+
+Tries to parse messages from from C<$data>.
+
+In list context it returns all fully arrived L<messages|Protocol::WebSocket::Fast::Message> and consumes all of the C<$data>.
+
+In scalar context, if at least one message is fully arrived, it returns L<Protocol::WebSocket::Fast::MessageIterator> which is a lazy message iterator (parses on-the-fly).
+Otherwise returns undef.
+
+This operation is destructive, i.e. once parsed data is be removed from internal buffer and accessible only via high-level interface,
+i.e. as L<Message|Protocol::WebSocket::Fast::Message> or L<MessageIterator|Protocol::WebSocket::Fast::MessageIterator>.
+
+This method can't be called until current message is fully received if you earlier called C<get_frames()>. See C<get_frames()> description.
+
+If you plan to switch to C<get_frames()> mode, you should only use scalar context iterator interface, because list context may consume
+consequent frames from the next message.
+
+
+=head2 start_message(opcode => [OPCODE_BINARY], deflate => [0])
+
+Start multiframe message.
+
+Returns new L<FrameSender|Protocol::WebSocket::Fast::FrameSender>, assuming that a developer will manually compose message from frames.
+
+    my $sender = $parser->start_message(opcode => OPCODE_TEXT, deflate => 0);
+    $sender->send("hello ");
+    $sender->send("world")
+    $sender->send("!!!", 1); # final frame
+
+Options can be:
+
+=over
+
+=item deflate
+
+Use compression for the B<whole message> or not.
+
+=item opcode
+
+B<Message> opcode (from L<Protocol::WebSocket::Fast>). Should be either C<OPCODE_TEXT> or C<OPCODE_BINARY>.
+
+=back
+
+
+=head2 send_control($opcode, [$payload = ''])
+
+Returns serialized single frame control message with the specified opcode and optional payload.
+
+Max payload length is 125, everything bigger will be trimmed.
+
+The constructed frame is always final and is never compressed.
+
+See L<Protocol::WebSocket::Fast> for available opcodes.
+
+
+=head2 send_ping([$payload = ''])
+
+Same as C<send_control(OPCODE_PING, $payload)>.
+
+
+=head2 send_pong([$payload = ''])
+
+Same as C<send_control(OPCODE_PONG, $payload)>.
+
+
+=head2 send_close($code, [$payload = ''])
+
+Returns serialized close frame with the specified code and optional payload.
+
+See L<Protocol::WebSocket::Fast> for available close code constants.
+
+Max payload length is 123, everythin bigger will be trimmed.
+
+The constructed frame is always final and is never compressed.
+
+
+=head2 send_message(payload => $msg|\@msg, opcode => [OPCODE_BINARY], deflate => [unspecified])
+
+Returns serialized single frame message with the supplied payload data.
+
+C<payload> can be a string or arrayref of strings
+
+When C<deflate> option is specified, then the payload is either compressed
+or not. Otherwise, if C<deflate> option is not specified, then compression
+is determined by the following policy:
+
+If the C<opcode> is C<OPCODE_BINARY>, then compression is not applied.
+
+If the C<opcode> is C<OPCODE_TEXT> and payload length exceeds
+C<compression_threshold> (see L<configure>) then compression is applied.
+
+Otherwise payload is sent uncompressed.
+
+Example:
+
+    my $data = $parser->send_message(
+        opcode  => OPCODE_TEXT,
+        deflate => 1,
+        payload => 'Lorem ipsum dolor',
+    );
+
+
+=head2 send_message_multiframe(payload => \@strings, opcode => [OPCODE_BINARY], deflate => [unspecified])
+
+This method sends one message as multiple frames. It is useful if it is
+desirable to preserve payload decomposition into multiple pieces, which
+will be serialized as multiple frames.
+
+See L<send_message> for parameters.
+
+NOTE: parameter C<payload> must be an arrayref of strings. Each string in array will be sent as a separate frame.
+
+    my $data = $parser->send_message_multiframe(
+        opcode  => OPCODE_BINARY,
+        payload => [qw/Lorem ipsum dolor/],
+    );
+
+
+=head2 reset()
+
+Clears internal state and reset buffer.
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::WebSocket::Fast>
+
+L<Protocol::WebSocket::Fast::ClientParser>
+
+L<Protocol::WebSocket::Fast::ConnectRequest>
+
+L<Protocol::WebSocket::Fast::ConnectResponse>
+
+L<Protocol::WebSocket::Fast::Frame>
+
+L<Protocol::WebSocket::Fast::FrameSender>
+
+L<Protocol::WebSocket::Fast::FrameIterator>
+
+L<Protocol::WebSocket::Fast::Message>
+
+L<Protocol::WebSocket::Fast::MessageIterator>
+
+L<Protocol::WebSocket::Fast::ServerParser>
+
+L<rfc6455|https://tools.ietf.org/html/rfc6455>
+
+L<rfc7692|https://tools.ietf.org/html/rfc7692>
+
+L<zlib|https://www.zlib.net>
+
+=cut

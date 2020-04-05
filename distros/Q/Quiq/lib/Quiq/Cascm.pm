@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.177';
+our $VERSION = '1.178';
 
 use Quiq::Database::Row::Array;
 use Quiq::AnsiColor;
@@ -435,7 +435,17 @@ Nächster Stand:
 # -----------------------------------------------------------------------------
 
 sub edit {
-    my ($self,$repoFile,$package,$version) = @_;
+    my ($self,$repoFile,$package) = splice @_,0,3;
+
+    # Optionen und Argumente
+
+    my $show = undef;
+    my $version = undef;
+
+    $self->parameters(\@_,
+        -show => \$show,
+        -version => \$version,
+    );
 
     my $output = '';
 
@@ -491,9 +501,18 @@ sub edit {
     $output .= $self->checkout($transportPackage || $package,$repoFile);
 
     my $fileChanged = 0;
-    my $editor = $ENV{'EDITOR'} || 'vi';
+    my $editCmd = "emacs -nw $localFile";
+    if ($show) {
+        # $editCmd .= " -f split-window-horizontally $show -f other-window";
+        $editCmd .= " -f split-window-vertically $show -f other-window";
+    }
+    my $sh = Quiq::Shell->new(
+        log=>1,
+        cmdPrefix => '> ',
+        cmdAnsiColor => 'bold',
+    );
     while (1) {
-        Quiq::Shell->exec("$editor $localFile");
+        $sh->exec($editCmd);
         if ($p->compare($localFile,$backupFile)) {
             # Im Falle von Perl-Code diesen auf Syntaxfehler hin überprüfen
 
@@ -717,11 +736,8 @@ sub putFiles {
     }
 
     if ($transportPackage) {
-        $output .= $self->movePackage($state,$transportPackage,
-            -askUser => 1,
-        );
-        $output .= $self->switchPackage($transportPackage,
-            $package,@items);
+        $output .= $self->movePackage($state,$transportPackage,-askUser=>1);
+        $output .= $self->switchPackage($transportPackage,$package,@items);
         $output .= $self->deletePackages($transportPackage);
     }
 
@@ -1600,6 +1616,90 @@ sub findItem {
 
 # -----------------------------------------------------------------------------
 
+=head3 moveItem() - Verschiebe Repository-Datei in ein anderes Verzeichnis
+
+=head4 Synopsis
+
+  $output = $scm->moveItem($repoFile,$repoDir,$removePackage,$putPackage);
+
+=head4 Arguments
+
+=over 4
+
+=item $repoFile
+
+Repository-Pfad der Datei, die verschoben werden soll.
+
+=item $repoDir
+
+Repository-Pfad des Ziel-Verzeichnisses. Dieses Verzeichnis muss
+bereits existieren.
+
+=item $removePackage
+
+Package, das die per removeItem() entfernte Datei aufnimmt.
+
+=item $removePackage
+
+Package, das die per putFiles() hinzugefügte Datei aufnimmt.
+
+=back
+
+=head4 Returns
+
+Ausgabe der Kommandos (String)
+
+=head4 Description
+
+Entferne Datei $repoFile aus dem Repository und füge sie unter
+dem neuen Repository-Pfad $repoDir wieder zum Repository hinzu.
+Verschiebe sie also innerhalb der Repository-Verzeichnisstruktur. Die
+entfernte Datei wird zu Package $removePackage hinzugefügt und die
+neue Datei zu Package $putPackage.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub moveItem {
+    my ($self,$repoFile,$repoDir,$removePackage,$putPackage) = @_;
+
+    my $p = Quiq::Path->new;
+
+    # Repository-Information
+    my $workspace = $self->workspace;
+
+    # Prüfe, ob Zielverzeichnis exisitert
+
+    my $destDir = "$workspace/$repoDir";
+    if (!$p->exists($destDir)) {
+            $self->throw(
+                'CASCM-00099: Destination directory does not exist',
+                Dir => $destDir,
+            );
+    }
+
+    # Prüfe, ob Put-Package existiert
+    $self->packageState($putPackage);
+
+    my $output;
+
+    # Entferne Datei unter altem Pfad aus Repository
+    $output = $self->removeItems($removePackage,$repoFile);
+
+    # Füge Datei unter neuem Pfad zum repository hinzu
+
+    my $srcFile = "$workspace/$repoFile";
+    $output .= $self->putFiles($putPackage,$repoDir,$srcFile);
+
+    # Ursprüngliche Repository-Datei entfernen
+    $p->delete($srcFile);
+
+    return $output;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 removeItems() - Lösche Items
 
 =head4 Synopsis
@@ -1638,10 +1738,24 @@ Stufe gelöscht.
 sub removeItems {
     my ($self,$package,@repoFiles) = @_;
 
+    my $output;
+
     # FIXME: Dateien mit dem gleichen ViewPath mit
     # einem Aufruf behandeln (Optimierung).
 
-    my $output;
+    my $state = $self->packageState($package);
+
+    # Erzeuge ein Transportpackage, falls sich das Zielpackage
+    # nicht auf der untersten Stufe befindet
+
+    my $transportPackage;
+    if ($state ne $self->states->[0]) {
+        my $name = Quiq::Converter->intToWord(time);
+        $transportPackage = "S6800_0_Seitz_Lift_$name";
+        $output .= $self->createPackage($transportPackage);
+    }
+
+    my @items;
     for my $repoFile (@repoFiles) {
         my ($dir,$file) = Quiq::Path->split($repoFile);
         my $viewPath = $self->viewPath;
@@ -1654,10 +1768,20 @@ sub removeItems {
             -en => $self->projectContext,
             -vp => $dir? "$viewPath/$dir": $viewPath,
             -st => $self->states->[0],
-            -p => $package,
+            -p => $transportPackage || $package,
         );
 
         $output .= $self->runCmd('hri',$c);
+
+        # Liste der Items im Packate (nur relevant
+        # im Falle eines Transportpackage)
+        push @items,$file;
+    }
+
+    if ($transportPackage) {
+        $output .= $self->movePackage($state,$transportPackage,-askUser=>1);
+        $output .= $self->switchPackage($transportPackage,$package,@items);
+        $output .= $self->deletePackages($transportPackage);
     }
 
     return $output;
@@ -2819,7 +2943,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.177
+1.178
 
 =head1 AUTHOR
 

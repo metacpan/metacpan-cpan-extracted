@@ -89,6 +89,8 @@ sub main {
   # - https://metacpan.org/pod/Pod::Usage
   # - http://michael.thegrebs.com/2014/06/08/Pod-Usage/
   my $config_file = 'wrt.json';
+  my $with_titles = 0;
+
   my $list_days = 0;
   my $list_months = 0;
   my $list_years = 0;
@@ -96,12 +98,13 @@ sub main {
   my $list_all = 1;
   GetOptionsFromArray(
     \@local_argv,
-    'config=s' => \$config_file,
-    help       => sub { pod2usage(0) },
-    days       => \$list_days,
-    months     => \$list_months,
-    years      => \$list_years,
-    props      => \$list_props,
+    'config=s'    => \$config_file,
+    help          => sub { pod2usage(0) },
+    days          => \$list_days,
+    months        => \$list_months,
+    years         => \$list_years,
+    props         => \$list_props,
+    'with-titles' => \$with_titles,
   ) or pod2usage(2);
 
   # Allow only one of --days, --months, --years, --props.  Default to listing
@@ -141,7 +144,12 @@ sub main {
     # When invoked from command line, this will normally be a simple
     # routine that does `say $entry`.  Under testing, it may instead
     # accumulate output for checking elsewhere.
-    $output->($entry);
+
+    if ($with_titles) {
+      $output->($entry . "\t" . $w->get_title($entry));
+    } else {
+      $output->($entry);
+    }
   }
 }
 

@@ -22,5 +22,6 @@ Search.pm
 SIGNATURE
 t/App-CPAN-Search/01-use.t
 t/App-CPAN-Search/02-version.t
+t/App-CPAN-Search/03-new.t
 xt/App-CPAN-Search/01-pod_coverage.t
 xt/App-CPAN-Search/02-pod.t

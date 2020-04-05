@@ -8,6 +8,7 @@ libeav/bin/main.h
 libeav/bin/Makefile
 libeav/bin/Makefile.bsd
 libeav/bin/Makefile.openbsd
+libeav/bin/Makefile.windows-gmake
 libeav/bin/utf8_decode.c
 libeav/bin/utf8_decode.h
 libeav/data/domain-length.txt
@@ -36,6 +37,7 @@ libeav/LICENSE.postfix
 libeav/Makefile
 libeav/Makefile.bsd
 libeav/Makefile.openbsd
+libeav/Makefile.windows-gmake
 libeav/partial/idn/eav.c
 libeav/partial/idn/is_6531_email.c
 libeav/partial/idn/is_utf8_domain.c
@@ -61,6 +63,10 @@ libeav/src/is_special_domain.c
 libeav/src/is_tld.c
 libeav/src/utf8_decode.c
 libeav/src/utf8_decode.h
+libeav/src/win32/getline.c
+libeav/src/win32/getline.h
+libeav/src/win32/strndup.c
+libeav/src/win32/strndup.h
 libeav/tests/common.h
 libeav/tests/idnkit/t-6531-email-fqdn.c
 libeav/tests/idnkit/t-6531-email-tld-special.c
@@ -79,6 +85,7 @@ libeav/tests/idnX/t-domain-length.c
 libeav/tests/Makefile
 libeav/tests/Makefile.bsd
 libeav/tests/Makefile.openbsd
+libeav/tests/Makefile.windows-gmake
 libeav/tests/t-5321-email.c
 libeav/tests/t-5321-localpart.c
 libeav/tests/t-5322-email.c

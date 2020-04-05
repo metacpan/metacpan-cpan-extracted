@@ -2,11 +2,12 @@ package MooX::Purple::G;
 use strict;
 use warnings;
 use 5.006;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 use PPR;
+use Perl::Tidy;
 use Cwd qw/abs_path/;
 
-our (%HAS, $GATTRS, $SATTRS, $PREFIX);
+our (%HAS, $GATTRS, $SATTRS, $PREFIX, %MACROS);
 BEGIN {
 	$GATTRS = '(
 		allow (?&PerlNWS)
@@ -86,7 +87,13 @@ sub p {
 	g(
 		g(
 			g(
-				$_[0],
+				g(
+					$_[0],
+					qq|(?<match>macro\\s*
+					(?<macro> (?&PerlIdentifier))\\s*
+					(?<block> (?&PerlBlock));\n*)|,
+					\&macro
+				),
 				qq|(?<match> private\\s*
 				(?<method> (?&PerlIdentifier))
 				(?<attrs> (?: $SATTRS*))
@@ -201,8 +208,15 @@ sub write_file {
 	$f =~ s/\:\:/\//g;
 	make_path(substr($f, 0, rindex($f, '/')));
 	open FH, '>', $f or die "$f cannot open file to write $!";
-	print FH $_[1];
+	print FH perl_tidy($_[1]);
 	close FH;
+}
+
+sub macro {
+	my %args = @_;
+	$args{block} =~ s/^\n*\{\n*\s*|;\n*\t*\}\n*$//g;
+	$MACROS{$args{macro}} = $args{block};
+	return '';
 }
 
 sub attributes {
@@ -302,11 +316,19 @@ sub classes {
 	return ($$r, %args);
 }
 
+sub macro_replacement {
+	my $block = shift;
+	my $mac = join '|', keys %MACROS;
+	$block =~ s/&($mac)/$MACROS{$1}/g;
+	return $block;
+}
+
 sub private {
 	my %args = @_;
 	my @hack = grep {$_ && $_ !~ m/^\s*$/} $args{attrs} =~ m/(?:$SATTRS) $PPR::GRAMMAR/gx;
 	my %attrs = _parse_role_attrs(@hack);
 	my $allowed = $attrs{allow} ? sprintf 'qw(%s)', join ' ', @{$attrs{allow}} : 'qw//';
+	$args{block} = macro_replacement($args{block});
 	$args{block} =~ s/(^{)|(}$)//g;
 	$args{block} =~ s/^\s*//;
 	return "sub $args{method} {
@@ -321,9 +343,10 @@ sub private {
 
 sub public {
 	my %args = @_;
+	$args{block} = macro_replacement($args{block});
 	return qq|sub $args{method} $args{block}|;
-
 }
+
 =pod
 sub _parse_role_attrs {
 	my @roles = @_;
@@ -362,9 +385,6 @@ sub _parse_role_attrs {
 	return %attrs;
 }
 
-
-
-
 sub _set_class_role_attrs {
 	my ($body, %attrs) = @_;
 	if ($attrs{allow}) {
@@ -392,6 +412,37 @@ sub _set_class_role_attrs {
 	return $body, %attrs;
 }
 
+sub perl_tidy {
+	my $source = shift;
+ 
+	my $dest_string;
+	my $stderr_string;
+	my $errorfile_string;
+	my $argv = "-npro";   # Ignore any .perltidyrc at this site
+	$argv .= " -pbp";     # Format according to perl best practices
+	$argv .= " -nst";     # Must turn off -st in case -pbp is specified
+	$argv .= " -se";      # -se appends the errorfile to stderr
+	$argv .= " -nola";    # Disable label indent
+	$argv .= " -t";       # Use tab instead of 4 spaces
+ 
+	my $error = Perl::Tidy::perltidy(
+		argv        => $argv,
+		source      => \$source,
+		destination => \$dest_string,
+		stderr      => \$stderr_string,
+		errorfile   => \$errorfile_string,    # ignored when -se flag is set
+		##phasers   => 'stun',                # uncomment to trigger an error
+	);
+ 
+	if ($error) {
+		# serious error in input parameters, no tidied output
+		print "<<STDERR>>\n$stderr_string\n";
+		die "Exiting because of serious errors\n";
+	}
+
+	return $dest_string;
+}
+
 1;
 
 __END__
@@ -402,7 +453,7 @@ MooX::Purple - MooX::Purple::G
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

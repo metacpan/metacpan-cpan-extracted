@@ -19,14 +19,17 @@ my $iDebug;
 my $iDump = 0;
 
 tm_new_engine('Ebay::Category');
+$WWW::Search::Test::sSaveOnError = q{category-failed.html};
 # goto MULTI_RESULT;
 # goto DEBUG_NOW;
 # goto CONTENTS;
 
 diag("Sending 0-page category query...");
 $iDebug = 0;
-# This test returns no results (but we should not get an HTTP error):
-tm_run_test('normal', $WWW::Search::Test::bogus_query, 0, 0, $iDebug);
+# This test returns no results (but we should not get any errors):
+WWW::Search::Test::_tm_run_test('normal', $WWW::Search::Test::bogus_query, 0, 0, $iDebug, 0);
+
+# goto SKIP_CONTENTS;
 
 # DEBUG_NOW:
 pass;
@@ -50,7 +53,6 @@ CONTENTS:
 diag("Sending 1-page category query to check contents...");
 $iDebug = 0;
 $iDump = 0;
-$WWW::Search::Test::sSaveOnError = q{category-failed.html};
 # 175817 is "Credit Services"
 tm_run_test('normal', 175817, 1, 199, $iDebug, $iDump);
 # Now get the results and inspect them:
@@ -89,7 +91,7 @@ if ($iAnyFailed)
     } # while
   } # if
 SKIP_CONTENTS:
-;
+pass;
 
 __END__
 

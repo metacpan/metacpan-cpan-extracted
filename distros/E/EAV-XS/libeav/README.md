@@ -101,6 +101,14 @@ The `FORCE_IDN` option can have the next values
 * `idn2`
 * `idnkit`
 
+When there is no `libidn2.pc` file on the system (Debian 8,
+for instance), then you may do this:
+
+```
+% make FORCE_IDN=idn2 DEFS="-DHAVE_LIBIDN2" LIBS="-lidn2"
+```
+
+
 ### Build with idnkit
 
 First of all, you have to specify the directory where [idnkit][8]

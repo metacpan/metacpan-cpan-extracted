@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.10.1';
+$Git::Hooks::VERSION = '2.11.1';
 use 5.010;
 use utf8;
 use Carp;
@@ -132,7 +132,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.10.1
+version 2.11.1
 
 =head1 SYNOPSIS
 
@@ -396,6 +396,11 @@ you can use. Some are described succinctly below. Please, see their
 own documentation for more details.
 
 =over
+
+=item * L<Git::Hooks::CheckDiff>
+
+Check if the differences introduced by new commits comply with specified
+policies.
 
 =item * L<Git::Hooks::CheckFile>
 
@@ -1392,7 +1397,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2020 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

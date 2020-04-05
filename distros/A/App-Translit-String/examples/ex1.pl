@@ -1,14 +1,12 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use App::Translit::String;
 
 # Run.
-App::Translit::String->new->run;
+exit App::Translit::String->new->run;
 
 # Print version.
 sub VERSION_MESSAGE {

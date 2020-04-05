@@ -1,9 +1,8 @@
 
-# $rcs = ' $Id: Makefile.PL,v 1.104 2015-06-06 19:55:18 Martin Exp $ ';
-
 use inc::Module::Install;
+include 'Module::AutoInstall';
 
-version(3.054);
+version(3.055);
 all_from('lib/WWW/Search/Ebay.pm');
 
 requires(perl => 5.005);
@@ -16,12 +15,12 @@ test_requires('IO::Capture::Stderr');
 requires('LWP::Simple');
 # Test::More is needed for `make test`:
 test_requires('Test::More');
-# We need the version that has methods named with leading underscore:
-requires('WWW::Search' => 2.557);
+# We need the version where approximate_result_count() can return undef:
+requires('WWW::Search' => 2.566);
 # We need the version that has the bidder and seller methods:
 requires('WWW::SearchResult' => 2.067);
-# We need the bug-fixed version of WWW::Search::Test:
-test_requires('WWW::Search::Test' => 2.290);
+# We need the version of WWW::Search::Test that checks for undefined approximate result count:
+test_requires('WWW::Search::Test' => 2.294);
 
 author_tests('xt');
 

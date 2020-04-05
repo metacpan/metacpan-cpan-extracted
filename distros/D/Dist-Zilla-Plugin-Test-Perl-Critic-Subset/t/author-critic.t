@@ -11,7 +11,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.002
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.004
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 

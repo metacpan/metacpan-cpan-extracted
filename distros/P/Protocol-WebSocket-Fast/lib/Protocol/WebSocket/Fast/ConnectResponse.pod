@@ -1,0 +1,115 @@
+=head1 NAME
+
+Protocol::WebSocket::Fast::ConnectResponse - Websocket server response for connection request
+
+
+
+=head1 SYNOPSIS
+
+    use Protocol::WebSocket::Fast;
+
+    # server creates connect responses
+    my $response = Protocol::WebSocket::Fast::ConnectResponse->new({
+        body          => '...',
+        headers       => { 'Cache-Control' => 'no-cache'},
+        ws_protocol   => "chat",
+        ws_extensions => [["ext1"], ["ext2", {arg1 => 1}]],
+    });
+    
+    # client parses connect responses
+    $response = $client_parser->connect($data);
+
+    $response->body;
+    $response->ws_protocol;
+    $response->ws_extensions;
+    $response->ws_accept_key;
+    $response->ws_version;
+    $response->error;
+
+
+
+=head1 DESCRIPTION
+
+A response that is sent by websocket server to client.
+This class extends L<Protocol::HTTP::Response> with websocket-related details, so all methods of L<Protocol::HTTP::Response> also apply.
+
+A successful response is C<101 Switching Protocols> and contains selected subset of server-supported extensions and their options, initially proposed
+by client in the request if they match server-configuration, e.g. C<Sec-WebSocket-Extensions>
+
+
+
+=head1 METHODS
+
+=head2 new([\%params])
+
+Creates new connect response object from params (or empty, if no params specified).
+
+Parameters are everything that L<Protocol::HTTP::Response>'s C<new()> supports plus the following:
+
+=over
+
+=item ws_protocol
+
+Identifies application specific communication protocol.
+
+See L<rfc6455|https://tools.ietf.org/html/rfc6455> (look for C<Sec-WebSocket-Protocol>).
+
+=item ws_extensions => \@extensions
+
+Additional extensions and their options, which has been offered by client-side
+and server-side aggrees to use. The extensions, which are provided
+by the module and enabled by user (default), will be added automatically by
+L<Protocol::WebSocket::Fast::ServerParser>.
+
+=back
+
+
+=head2 ws_accept_key([$key])
+
+Get/set key hash, i.e. C<Sec-WebSocket-Accept> header.
+
+
+=head2 ws_version()
+
+Returns value of C<Sec-WebSocket-Version> header in response.
+
+
+=head2 ws_extensions([\@extensions])
+
+Get/set available websocket extensions in response.
+Currently only C<permessage-deflate> is supported.
+
+    $response->ws_extensions([['permessage-deflate' => { 'client_max_window_bits' => '15' }]]);
+
+See L<Protocol::WebSocket::Fast::Parser> for all available deflate options.
+
+
+=head2 ws_protocol([$string])
+
+Get/set websocket protocol identity (i.e. C<Sec-WebSocket-Protocol> header).
+
+
+=head2 error()
+
+L<XS::ErrorCode> object which represents Perl API for convenient C++ C<std::error_code> subsystem.
+Possible errors are described in L<Protocol::WebSocket::Fast::Error>, L<Protocol::HTTP::Error>.
+
+    if ($response->error) {
+        # handle it
+    }
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::WebSocket::Fast>
+
+L<Protocol::WebSocket::Fast::ConnectRequest>
+
+L<Protocol::WebSocket::Fast::ClientParser>
+
+L<Protocol::WebSocket::Fast::HTTPRequest>
+
+L<Protocol::WebSocket::Fast::ServerParser>
+
+=cut

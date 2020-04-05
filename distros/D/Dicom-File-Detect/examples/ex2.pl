@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Dicom::File::Detect qw(dicom_detect_file);
 
 # Arguments.

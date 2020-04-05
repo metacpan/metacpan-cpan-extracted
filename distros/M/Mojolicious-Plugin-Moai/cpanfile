@@ -1,4 +1,4 @@
-requires "Mojolicious" => "8";
+requires "Mojolicious" => "8.31";
 requires "Role::Tiny" => "2.000001";
 requires "perl" => "5.014";
 

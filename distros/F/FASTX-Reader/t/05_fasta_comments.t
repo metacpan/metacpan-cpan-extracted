@@ -3,19 +3,19 @@ use warnings;
 use FindBin qw($RealBin);
 use Test::More;
 use FASTX::Reader;
-my $seq = "$RealBin/../data/comments.fasta";
+my $seq_file = "$RealBin/../data/comments.fasta";
 
 # TEST: Retrieves sequence COMMENTS from a FASTA file
 
 # Check required input file
-if (! -e $seq) {
-  print STDERR "ERROR TESTING: $seq not found\n";
+if (! -e $seq_file) {
+  print STDERR "ERROR TESTING: $seq_file not found\n";
   exit 0;
 }
 
-my $data = FASTX::Reader->new({ filename => "$seq" });
+my $data = FASTX::Reader->new({ filename => "$seq_file" });
 
-while ($seq = $data->getRead() ) {
+while (my $seq = $data->getRead() ) {
 	my $comment = $seq->{comment};
 	ok( length( $comment ) > 0, "[FASTA COMMENT] comment found: $comment");
 	my (undef, $len) = split /=/, $comment;

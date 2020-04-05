@@ -1,0 +1,342 @@
+digraph "machine"{
+	rankdir=LR;
+	{ "@Part: sda" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sda<BR/>Label: gpt<BR/>Size: 2.73 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/sda1<BR/>EFI<BR/>Size: 477 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="yellow">
+						/dev/sda2<BR/>pv-chu-A<BR/>Size: 931 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1.35 TiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000000:pink;0.170664:pink;0.333329:green;0.496006";
+	]; }
+	{ "@Part: sdb" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sdb<BR/>Label: gpt<BR/>Size: 2.73 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/sdb1<BR/>oldsys<BR/>Size: 500 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 2.24 TiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000000:pink;0.178954:green;0.821045";
+	]; }
+	{ "@Part: sdc" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sdc<BR/>Label: gpt<BR/>Size: 5.46 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1024 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/sdc1<BR/>pv-chu-B<BR/>Size: 5.46 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1008 kiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000179:pink;0.999821:green;0.000000";
+	]; }
+	subgraph "cluster_os" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=lightgrey,fillcolor=lightgrey,shape=rectangle];
+		subgraph "cluster_os@PV" {
+			color=white;
+			fillcolor=white;
+			{ "LVM@os@PV@sdb1" [
+				label="PV: /dev/sdb1\nSize: 500 GiB\nFree: 202 GiB\nUsed: 298 GiB";
+				style=striped;fillcolor="pink;0.596028.2:green"
+			]; }
+			label="os's PVs";
+		}
+		subgraph "cluster_os@LV" {
+			color=white;
+			fillcolor=white;
+			{ "dm-1" [
+				label="LV: home\nSize: 18.6 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-2" [
+				label="LV: root\nSize: 46.6 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-3" [
+				label="LV: swap\nSize: 121 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-4" [
+				label="LV: tmp\nSize: 93.1 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-5" [
+				label="LV: var\nSize: 18.6 GiB";
+				fillcolor="lightgrey"
+			]; }
+			label="os's LVs";
+		}
+		label="LVM: os\nSize: 500 GiB\nFree: 202 GiB";
+		style=striped;fillcolor="pink;0.596028.2:green"
+	}
+	subgraph "cluster_vgchu" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=lightgrey,fillcolor=lightgrey,shape=rectangle];
+		subgraph "cluster_vgchu@PV" {
+			color=white;
+			fillcolor=white;
+			{ "LVM@vgchu@PV@sda2" [
+				label="PV: /dev/sda2\nSize: 931 GiB\nFree: 871 GiB\nUsed: 60.0 GiB";
+				style=striped;fillcolor="pink;0.064425.2:green"
+			]; }
+			{ "LVM@vgchu@PV@sdc1" [
+				label="PV: /dev/sdc1\nSize: 5.46 TiB\nFree: 1.46 TiB\nUsed: 4.00 TiB";
+				style=striped;fillcolor="pink;0.733131.2:green"
+			]; }
+			label="vgchu's PVs";
+		}
+		subgraph "cluster_vgchu@LV" {
+			color=white;
+			fillcolor=white;
+			{ "dm-6" [
+				label="LV: kvm-hera-disk1\nSize: 50.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-7" [
+				label="LV: kvm-hera-disk2\nSize: 4.00 TiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-0" [
+				label="LV: root\nSize: 10.0 GiB";
+				fillcolor="yellow"
+			]; }
+			label="vgchu's LVs";
+		}
+		label="LVM: vgchu\nSize: 6.37 TiB\nFree: 2.31 TiB";
+		style=striped;fillcolor="pink;0.637588.2:green"
+	}
+	subgraph "cluster_@LSIMegacli@0" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@LSIMegacli@0@@BBUStatus" [
+			label="BBU Status: Good";
+			shape=oval
+			fillcolor=green
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u0p0" [
+			label="SEAGATE ST33000650SS RS0FZ293DKRZ\nc0u0p0: slot [32:0]\nOnline, Spun Up\nSize: 2.73 TiB";
+			fillcolor=yellow
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u0p1" [
+			label="SEAGATE ST33000650SS RS0FZ293B1QG\nc0u0p1: slot [32:1]\nOnline, Spun Up\nSize: 2.73 TiB";
+			fillcolor=yellow
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@[32:2]" [
+			label="SEAGATE ST33000650SS RS0FZ293E2CT\nc0uXpY: slot [32:2]\nUnconfigured(good), Spun Up\nSize: 2.73 TiB";
+			fillcolor=white
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@[32:3]" [
+			label="SEAGATE ST33000650SS RS0FZ293BLDF\nc0uXpY: slot [32:3]\nUnconfigured(good), Spun Up\nSize: 2.73 TiB";
+			fillcolor=white
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u2p2" [
+			label="SEAGATE ST33000650SS RS0FZ2933SXS\nc0u2p2: slot [32:4]\nOnline, Spun Up\nSize: 2.73 TiB";
+			fillcolor=yellow
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u2p0" [
+			label="SEAGATE ST33000650SS RS0FZ2933T6S\nc0u2p0: slot [32:5]\nOnline, Spun Up\nSize: 2.73 TiB";
+			fillcolor=yellow
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u2p1" [
+			label="SEAGATE ST33000650SS RS0FZ293G8FL\nc0u2p1: slot [32:8]\nOnline, Spun Up\nSize: 2.73 TiB";
+			fillcolor=yellow
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u0pY" [
+			label="SEAGATE ST33000650SS RS0FZ293E20Z\nc0u0pY: slot [32:9]\nHotspare, Spun Up\nSize: 2.73 TiB";
+			fillcolor=green
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@c0u1p0" [
+			label="SEAGATE ST33000650SS RS0FZ293EDEA\nc0u1p0: slot [32:10]\nOnline, Spun Up\nSize: 2.73 TiB";
+			fillcolor=yellow
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@[32:11]" [
+			label="SEAGATE ST33000650SS RS0FZ293GBHC\nc0uXpY: slot [32:11]\nHotspare, Spun Up\nSize: 2.73 TiB";
+			fillcolor=green
+		]; }
+		subgraph "cluster_sda@@state" {
+			{ "sda" [
+				label="/dev/sda (c0u0)\nRAID-1\nSize: 2.73 TiB";
+				fillcolor="yellow"
+			]; }
+			label="state: Optimal";
+			shape=oval
+			fillcolor=green
+		}
+		subgraph "cluster_sdb@@state" {
+			{ "sdb" [
+				label="/dev/sdb (c0u1)\nRAID-0\nSize: 2.73 TiB";
+				fillcolor="yellow"
+			]; }
+			label="state: Optimal";
+			shape=oval
+			fillcolor=green
+		}
+		subgraph "cluster_sdc@@state" {
+			{ "sdc" [
+				label="/dev/sdc (c0u2)\nRAID-5\nSize: 5.46 TiB";
+				fillcolor="yellow"
+			]; }
+			label="state: Optimal";
+			shape=oval
+			fillcolor=green
+		}
+		label="PERC H710P Adapter\nController: c0";
+	}
+	subgraph "cluster_@FS" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@FS@/" [
+			label="/\nDevice: /dev/vgchu/root\next4\nSize: 9.72 GiB\nFree: 3.94 GiB\nUsed: 5.27 GiB";
+			style=striped;fillcolor="pink;0.594976.2:green"
+		]; }
+		{ "@FS@/boot/efi" [
+			label="/boot/efi\nDevice: /dev/sda1\nvfat\nSize: 477 GiB\nFree: 477 GiB\nUsed: 5.38 MiB";
+			style=striped;fillcolor="pink;0.000011.2:green"
+		]; }
+		label="Mounted FS and swap";
+	}
+	subgraph "cluster_@libvirt" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		subgraph "cluster_@libvirt@1-hera" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@1-hera@dm-6" [
+				label="/dev/vgchu/kvm-hera-disk1\n(sda)";
+			]; }
+			{ "@libvirt@1-hera@dm-7" [
+				label="/dev/vgchu/kvm-hera-disk2\n(sdc)";
+			]; }
+			label="1-hera";
+			fillcolor=yellow
+		}
+		subgraph "cluster_@libvirt@memtest86+" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@memtest86+@/srv/kvm/memtest86+-5.01.iso" [
+				label="/srv/kvm/memtest86+-5.01.iso\n(hda)";
+			]; }
+			label="memtest86+";
+		}
+		label="Libvirt Virtual Machines";
+	}
+	// Links from LVM VG: os
+	"LVM@os@PV@sdb1" -> "dm-1"
+	"LVM@os@PV@sdb1" -> "dm-2"
+	"LVM@os@PV@sdb1" -> "dm-3"
+	"LVM@os@PV@sdb1" -> "dm-4"
+	"LVM@os@PV@sdb1" -> "dm-5"
+	// Links from LVM VG: vgchu
+	"LVM@vgchu@PV@sda2" -> "dm-0"
+	"LVM@vgchu@PV@sda2" -> "dm-6"
+	"LVM@vgchu@PV@sdc1" -> "dm-7"
+	// Links from MegaCli: Controller c0
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u0p0" -> "sda"
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u0p1" -> "sda"
+	
+	
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u2p2" -> "sdc"
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u2p0" -> "sdc"
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u2p1" -> "sdc"
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u0pY" -> "sda"
+	"@LSIMegacli@0@dev@LSIMegaCli@c0u1p0" -> "sdb"
+	
+	// Links for @Part: sda
+	"sda" -> "@Part: sda"
+	// Links for @Part: sdb
+	"sdb" -> "@Part: sdb"
+	// Links for @Part: sdc
+	"sdc" -> "@Part: sdc"
+	// Links for LVM@os@PV@sdb1
+	"@Part: sdb":"1" -> "LVM@os@PV@sdb1"
+	// Links for LVM@vgchu@PV@sda2
+	"@Part: sda":"2" -> "LVM@vgchu@PV@sda2"
+	// Links for LVM@vgchu@PV@sdc1
+	"@Part: sdc":"1" -> "LVM@vgchu@PV@sdc1"
+	// Links for @FS@/
+	"dm-0" -> "@FS@/"
+	// Links for @FS@/boot/efi
+	"@Part: sda":"1" -> "@FS@/boot/efi"
+	// Links for @libvirt@1-hera@dm-6
+	"dm-6" -> "@libvirt@1-hera@dm-6"
+	// Links for @libvirt@1-hera@dm-7
+	"dm-7" -> "@libvirt@1-hera@dm-7"
+	// Links for @libvirt@memtest86+@/srv/kvm/memtest86+-5.01.iso
+	"@FS@/" -> "@libvirt@memtest86+@/srv/kvm/memtest86+-5.01.iso"
+}

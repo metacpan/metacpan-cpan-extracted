@@ -1,9 +1,9 @@
 package Data::Sah::Filter::perl::PhysicalQuantity::convert_unit;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-11'; # DATE
+our $DATE = '2020-04-04'; # DATE
 our $DIST = 'Sah-Schemas-PhysicalQuantity'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -57,7 +57,7 @@ Data::Sah::Filter::perl::PhysicalQuantity::convert_unit
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::Filter::perl::PhysicalQuantity::convert_unit (from Perl distribution Sah-Schemas-PhysicalQuantity), released on 2020-03-11.
+This document describes version 0.002 of Data::Sah::Filter::perl::PhysicalQuantity::convert_unit (from Perl distribution Sah-Schemas-PhysicalQuantity), released on 2020-04-04.
 
 =for Pod::Coverage ^(meta|filter)$
 

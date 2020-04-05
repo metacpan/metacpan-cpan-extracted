@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 no if "$]" >= 5.031008, feature => 'indirect';
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.151-6-g21b7ca6
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.152-3-ga555cef
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.152';
+our $VERSION = '0.153';
 
 use Moose;
 with
@@ -110,7 +110,7 @@ has licence => (
             // $self->payload->{license}
             # licenSe is US-only; known non-American authors will be treated appropriately.
             // ((any { $authority eq "cpan:$_" }
-                    qw(ETHER ABERGMAN AVAR BINGOS BOBTFISH CHANSEN CHOLET DOHERTY FLORA GAAS GETTY GSAR ILMARI JAWNSY JQUELIN LBROCARD LEONT LLAP MANWAR MSTROUT NEILB NUFFIN OALDERS PERIGRIN PHAYLON SALVA))
+                    qw(ETHER ABERGMAN AVAR BINGOS BOBTFISH CHANSEN CHOLET DOHERTY FLORA GAAS GETTY GSAR ILMARI JAWNSY JQUELIN LBROCARD LEONT LLAP MANWAR MSTROUT NEILB NUFFIN OALDERS PERIGRIN PHAYLON RELEQUEST SALVA))
                 ? 'LICENCE' : 'LICENSE');
     },
 );
@@ -642,7 +642,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.152
+version 0.153
 
 =head1 SYNOPSIS
 

@@ -85,7 +85,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION = '1.8.2'; # VERSION
+our $VERSION = '1.9.0'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;

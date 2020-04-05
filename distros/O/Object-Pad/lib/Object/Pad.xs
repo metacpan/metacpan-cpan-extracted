@@ -211,7 +211,28 @@ static OP *pp_methstart(pTHX)
       if(SvTYPE(rv) != SVt_PVHV)
         croak("Not a HASH reference");
       SV **slotssvp = hv_fetchs((HV *)rv, "Object::Pad/slots", 0);
-      if(!slotssvp || !SvROK(*slotssvp) || SvTYPE(SvRV(*slotssvp)) != SVt_PVAV)
+      /* A method invoked during a superclass constructor of a classic perl
+       * class might encounter $self without slots. If this is the case we'll
+       * invoke INITSLOTS now to create it.
+       *   https://rt.cpan.org/Ticket/Display.html?id=132263
+       */
+      if(!slotssvp) {
+        dSP;
+
+        ENTER;
+        EXTEND(SP, 1);
+        PUSHMARK(SP);
+        mPUSHs(newSVsv(self));
+        PUTBACK;
+
+        call_method("INITSLOTS", G_VOID);
+
+        PUTBACK;
+        LEAVE;
+
+        slotssvp = hv_fetchs((HV *)rv, "Object::Pad/slots", 0);
+      }
+      if(!SvROK(*slotssvp) || SvTYPE(SvRV(*slotssvp)) != SVt_PVAV)
         croak("Expected $self->{\"Object::Pad/slots\"} to be an ARRAY reference");
       slotsav = SvRV(*slotssvp);
       break;
@@ -249,6 +270,9 @@ static OP *pp_slotpad(pTHX)
   SLOTOFFSET slotix = op->iv;
 #endif
   PADOFFSET targ = PL_op->op_targ;
+
+  if(SvTYPE(PAD_SV(PADIX_SLOTS)) != SVt_PVAV)
+    croak("ARGH: expected ARRAY of slots at PADIX_SLOTS");
 
   AV *slotsav = (AV *)PAD_SV(PADIX_SLOTS);
 
@@ -378,11 +402,14 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
   OP *ops = NULL;
   int i;
 
+  ENTER;
+
   I32 floor_ix = start_subparse(FALSE, 0);
   SAVEFREESV(PL_compcv);
 
   I32 save_ix = block_start(TRUE);
 
+  SAVESPTR(PL_curcop);
   PL_curcop = meta->tmpcop;
   CopLINE_set(PL_curcop, __LINE__);
 
@@ -507,6 +534,8 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
 
   newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, newSVpvs("INITSLOTS")),
     NULL, NULL, ops);
+
+  LEAVE;
 }
 
 static void late_generate_initslots(pTHX_ void *p)
@@ -524,6 +553,7 @@ static XS(injected_constructor)
   SV *class = ST(0);
   SV *self;
 
+  COP *prevcop = PL_curcop;
   PL_curcop = meta->tmpcop;
   CopLINE_set(PL_curcop, __LINE__);
 
@@ -577,6 +607,8 @@ static XS(injected_constructor)
 
       {
         ENTER;
+        SAVETMPS;
+
         PUSHMARK(SP);
         EXTEND(SP, nargs);
 
@@ -595,13 +627,29 @@ static XS(injected_constructor)
         call_sv((SV *)supernew, G_SCALAR);
         SPAGAIN;
 
-        self = POPs;
+        self = SvREFCNT_inc(POPs);
+
+        PUTBACK;
+        FREETMPS;
         LEAVE;
+
+        if(!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV ||
+          !SvOBJECT(SvRV(self))) {
+          PL_curcop = prevcop;
+          croak("Expected %" SVf "->SUPER::new to return a blessed HASH reference", class);
+        }
+
+        sv_2mortal(self);
       }
       break;
     }
   }
 
+  /* It's possible the superclass constructor invoked a `method` and thus
+   * INITSLOTS has already been called
+   */
+  if(meta->repr != REPR_FOREIGN_HASH ||
+     !hv_exists(MUTABLE_HV(SvRV(self)), "Object::Pad/slots", 17))
   {
     /* $self->INITSLOTS */
     CopLINE_set(PL_curcop, __LINE__);
@@ -623,18 +671,20 @@ static XS(injected_constructor)
 
     ENTER;
     SAVETMPS;
+    SPAGAIN;
 
     EXTEND(SP, 1);
 
-    SV **args = SP - nargs;
+    SV **args = SP - nargs + 1;
     PUSHMARK(args - 1);
 
     /* Nudge the args up one and splice `self` in the bottom */
 
     SV **svp;
-    for(svp = SP - 1; svp >= args; svp--)
+    for(svp = SP; svp >= args; svp--)
       sv_2mortal(*(svp+1) = *svp);
     *args = self;
+    SP++;
     PUTBACK;
 
     call_method("BUILDALL", G_VOID);
@@ -643,6 +693,7 @@ static XS(injected_constructor)
     LEAVE;
   }
 
+  PL_curcop = prevcop;
   ST(0) = self;
   XSRETURN(1);
 }

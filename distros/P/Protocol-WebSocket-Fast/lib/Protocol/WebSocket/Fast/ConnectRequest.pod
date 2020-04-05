@@ -1,0 +1,123 @@
+=head1 NAME
+
+Protocol::WebSocket::Fast::ConnectRequest - Client-initiated HTTP request for establishing websocket connection
+
+
+
+=head1 SYNOPSIS
+
+    use Protocol::WebSocket::Fast;
+
+    # client creates connect requests
+    my $request = Protocol::WebSocket::Fast::ConnectRequest->new({
+        uri           => "ws://example.com/",
+        headers       => {'Origin' => 'http://www.crazypanda.ru'},
+        ws_version    => 13,
+        ws_protocol   => "chat",
+        ws_extensions => [["ext1"], ["ext2", {arg1 => 1}]],
+        # ... other params that Protocol::HTTP::Request supports
+    });
+    
+    # server parses connect requests
+    $request = $server_parser->accept($data);
+
+    $request->ws_key;
+    $request->ws_version;
+    $request->ws_protocol;
+    $request->ws_extensions;
+    $request->error;
+    
+
+=head1 DESCRIPTION
+
+A request for connecting to websocket server. This class extends L<Protocol::HTTP::Request> with websocket-related details, so all methods of
+L<Protocol::HTTP::Request> also apply.
+
+
+
+=head1 METHODS
+
+=head2 new([\%params])
+
+Creates new connect request object from params (or empty, if no params specified).
+
+Parameters are everything that L<Protocol::HTTP::Request>'s C<new()> supports plus the following:
+
+=over
+
+=item ws_key
+
+See L<rfc6455|https://tools.ietf.org/html/rfc6455> (look for C<Sec-WebSocket-Key>)
+
+=item ws_version
+
+See L<rfc6455|https://tools.ietf.org/html/rfc6455> (look for C<Sec-WebSocket-Version>).
+
+Version must be at least C<13> because previous versions were buggy.
+
+=item ws_protocol
+
+Identifies application specific communication protocol.
+
+See L<rfc6455|https://tools.ietf.org/html/rfc6455> (look for C<Sec-WebSocket-Protocol>).
+
+=item ws_extensions => \@extensions
+
+Additional extensions, which client would like to use. The extensions, which are provided
+by the module and enabled by user (default), will be added automatically by
+L<Protocol::WebSocket::Fast::ClientParser>.
+
+=back
+
+=head2 ws_key([$key])
+
+Get/set websocket key.
+
+
+=head2 ws_version([$version])
+
+Get/set websocket version.
+
+
+=head2 ws_protocol([$protocol])
+
+Get/set application specific communication protocol
+
+
+=head2 ws_extensions([\@extensions])
+
+Get/set websocket additional extensions
+
+
+=head2 ws_version_supported()
+
+Returns true if websocket version is supported by the package
+
+
+=head2 error
+
+L<XS::ErrorCode> object which represents Perl API for convenient
+C++ C<std::error_code> subsystem. Possible errors are described in
+L<Protocol::WebSocket::Fast::Error>, L<Protocol::HTTP::Error>.
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::WebSocket::Fast>
+
+L<Protocol::WebSocket::Fast::ClientParser>
+
+L<Protocol::WebSocket::Fast::ConnectResponse>
+
+L<Protocol::WebSocket::Fast::ServerParser>
+
+L<URI::XS>
+
+L<Protocol::HTTP::Request>
+
+L<XS::ErrorCode>
+
+L<Protocol::HTTP::Error>
+
+=cut

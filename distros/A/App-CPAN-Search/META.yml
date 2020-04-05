@@ -24,12 +24,11 @@ no_index:
     - xt
 requires:
   CPAN: 0
-  Class::Utils: 0.03
   Getopt::Std: 0
   perl: 5.6.0
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPAN-Search
-  homepage: https://github.com/tupinek/App-CPAN-Search
+  homepage: https://github.com/michal-josef-spacek/App-CPAN-Search
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/App-CPAN-Search
-version: '0.03'
+  repository: git://github.com/michal-josef-spacek/App-CPAN-Search
+version: '0.04'

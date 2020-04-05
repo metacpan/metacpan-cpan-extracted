@@ -2,7 +2,7 @@ package DBIx::Array::Session::Action;
 use strict;
 use warnings;
 
-our $VERSION='0.58';
+our $VERSION='0.64';
 
 =head1 NAME
 

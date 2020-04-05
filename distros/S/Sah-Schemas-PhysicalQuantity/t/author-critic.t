@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.003
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Data/Sah/Filter/perl/PhysicalQuantity/check_type.pm','lib/Data/Sah/Filter/perl/PhysicalQuantity/convert_from_str.pm','lib/Data/Sah/Filter/perl/PhysicalQuantity/convert_unit.pm','lib/Sah/Schema/physical/distance.pm','lib/Sah/Schema/physical/mass.pm','lib/Sah/Schema/physical/mass_in_kg.pm','lib/Sah/Schema/physical/quantity.pm','lib/Sah/SchemaR/physical/distance.pm','lib/Sah/SchemaR/physical/mass.pm','lib/Sah/SchemaR/physical/mass_in_kg.pm','lib/Sah/SchemaR/physical/quantity.pm','lib/Sah/Schemas/PhysicalQuantity.pm'];
+my $filenames = ['lib/Data/Sah/Filter/perl/PhysicalQuantity/check_type.pm','lib/Data/Sah/Filter/perl/PhysicalQuantity/convert_from_str.pm','lib/Data/Sah/Filter/perl/PhysicalQuantity/convert_unit.pm','lib/Sah/Schema/physical/distance.pm','lib/Sah/Schema/physical/mass.pm','lib/Sah/Schema/physical/mass_in_kg.pm','lib/Sah/Schema/physical/quantity.pm','lib/Sah/Schema/physical/type.pm','lib/Sah/Schema/physical/unit.pm','lib/Sah/SchemaR/physical/distance.pm','lib/Sah/SchemaR/physical/mass.pm','lib/Sah/SchemaR/physical/mass_in_kg.pm','lib/Sah/SchemaR/physical/quantity.pm','lib/Sah/SchemaR/physical/type.pm','lib/Sah/SchemaR/physical/unit.pm','lib/Sah/Schemas/PhysicalQuantity.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task;
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
-our $VERSION = '0.599'; # VERSION
+our $VERSION = '0.600'; # VERSION
 
 use Dist::Zilla::PluginBundle::Filter;
 
@@ -33,7 +33,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task - Dist::Zilla like P
 
 =head1 VERSION
 
-This document describes version 0.599 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-10-29.
+This document describes version 0.600 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2020-04-03.
 
 =head1 SYNOPSIS
 
@@ -74,7 +74,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

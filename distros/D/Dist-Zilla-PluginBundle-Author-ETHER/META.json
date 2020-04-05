@@ -39,7 +39,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.152",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.153",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -326,15 +326,15 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/ETHER.pm",
-         "version" : "0.152"
+         "version" : "0.153"
       },
       "Dist::Zilla::PluginBundle::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/ETHER.pm",
-         "version" : "0.152"
+         "version" : "0.153"
       },
       "Pod::Weaver::PluginBundle::Author::ETHER" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/ETHER.pm",
-         "version" : "0.152"
+         "version" : "0.153"
       }
    },
    "release_status" : "stable",
@@ -352,10 +352,10 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.152",
+   "version" : "0.153",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.031009"
+         "version" : "5.031010"
       },
       "plugins" : [
          {
@@ -548,7 +548,6 @@
                      "CONTRIBUTING",
                      "INSTALL",
                      "LICENCE",
-                     "META.json",
                      "README.pod"
                   ],
                   "exclude_match" : [],
@@ -1166,7 +1165,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20200220"
+                  "Module::CoreList" : "5.20200320"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1383,7 +1382,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.152",
+                  "tag" : "v0.153",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1640,7 +1639,7 @@
       "Roy Ivy III <rivy@cpan.org>",
       "\u0421\u0435\u0440\u0433\u0435\u0439 \u0420\u043e\u043c\u0430\u043d\u043e\u0432 <sromanov@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.31.9",
+   "x_generated_by_perl" : "v5.31.10",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0,

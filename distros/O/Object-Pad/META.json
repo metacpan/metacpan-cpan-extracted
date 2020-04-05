@@ -35,6 +35,7 @@
       "test" : {
          "requires" : {
             "Data::Dump" : "0",
+            "Test::Fatal" : "0",
             "Test::More" : "0.88",
             "Test::Refcount" : "0"
          }
@@ -43,7 +44,7 @@
    "provides" : {
       "Object::Pad" : {
          "file" : "lib/Object/Pad.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -52,6 +53,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -6,12 +6,11 @@
 #include <eav.h>
 #include <eav/auto_tld.h>
 #include "common.h"
-
-
-/* how many expect TLDs with test type */
-#define TEST_CHECK          (11)
-/* how many expect not assigned TLDs */
-#define NOT_ASSIGNED_CHECK  (50)
+#ifdef HAVE_LIBIDN2
+    #include <idn2.h>
+#else
+    #include <idna.h>
+#endif
 
 
 extern int
@@ -24,16 +23,23 @@ main (int argc, char *argv[])
     int t;
     int r;
     FILE *fh;
+    char *file = NULL;
+    int expect_tld_test = -1;   /* how many expect TLDs with test type */
+    int expect_tld_na = -1;     /* how many expect not assigned TLDs */
 
 
-    if (argc >= 3 || argc < 2) {
-        msg_warn ("usage: %s FILE\n", argv[0]);
+    if (argc >= 5 || argc < 4) {
+        msg_warn ("usage: %s TLD_TEST_COUNT TLD_NA_COUNT FILE\n", argv[0]);
         return 2;
     }
 
     setlocale(LC_ALL, "en_US.UTF-8");
 
-    fh = fopen (argv[--argc], "r");
+    file = argv[3];
+    expect_tld_test = atoi (argv[1]);
+    expect_tld_na = atoi (argv[2]);
+
+    fh = fopen (file, "r");
 
     if (fh == NULL) {
         msg_warn ("open: %s: %s", argv[argc], strerror(errno));
@@ -57,26 +63,32 @@ main (int argc, char *argv[])
         }
         else
         {
-            printf ("FAIL: %s (rv: %d)\n", line, t);
+            printf ("FAIL: %s (%d) %s\n", line, t,
+#ifdef HAVE_LIBIDN2
+                    idn2_strerror(r)
+#else
+                    idna_strerror(r)
+#endif
+            );
         }
 
         if (t >= 0)
             tld_count[t]++;
     }
 
-    if (tld_count[TLD_TYPE_TEST] != TEST_CHECK) {
+    if (tld_count[TLD_TYPE_TEST] != expect_tld_test) {
         msg_warn ("%s: expected %d test TLDs, but got %d [%d]\n",
                 argv[0],
-                TEST_CHECK,
+                expect_tld_test,
                 tld_count[TLD_TYPE_TEST],
                 TLD_TYPE_TEST);
         return 5;
     }
 
-    if (tld_count[TLD_TYPE_NOT_ASSIGNED] != NOT_ASSIGNED_CHECK) {
+    if (tld_count[TLD_TYPE_NOT_ASSIGNED] != expect_tld_na) {
         msg_warn ("%s: expected %d not assigned TLDs, but got %d [%d]\n",
                 argv[0],
-                NOT_ASSIGNED_CHECK,
+                expect_tld_na,
                 tld_count[TLD_TYPE_NOT_ASSIGNED],
                 TLD_TYPE_NOT_ASSIGNED);
         return 6;

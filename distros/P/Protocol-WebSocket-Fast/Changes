@@ -1,0 +1,8 @@
+1.0.3    03.04.2020
+           - renamed from Protocol::WebSocket::XS to Protocol::WebSocket::Fast
+1.0.2    03.04.2020
+           - remove usage of private Panda::Lib module
+1.0.1    02.04.2020
+           - fix synopsis
+1.0.0    02.04.2020
+           - first release

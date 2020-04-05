@@ -2,9 +2,8 @@
 use strict;
 use warnings;
 use Data::Dumper qw{Dumper};
-use Test::More tests => 55 * 2 + 1;
-
-BEGIN { use_ok( 'DBIx::Array' ); }
+use Test::More tests => 98 * 2;
+use DBIx::Array;
 
 {
   package #hide from CPAN indexer
@@ -50,59 +49,119 @@ foreach my $driver ("DBD::CSV", "DBD::XBase") {
 
   SKIP: {
     $reason="SQL::Abstract not found." if $no_abs;
-    skip $reason, 22 if $no_driver || $no_abs;
-    my $array=$dba->absarrayobject("My::Package", $table, [qw{ID TYPE NAME}], {}, [qw{ID}]);
-    isa_ok($array, "ARRAY", 'absarrayhashname scalar context');
-    isa_ok($array->[0], "My::Package", 'absarrayobject row 0');
-    isa_ok($array->[1], "My::Package", 'absarrayobject row 1');
-    isa_ok($array->[2], "My::Package", 'absarrayobject row 2');
-    diag(Dumper $array);
-    is($array->[0]->{'ID'}, 0, 'data');
-    is($array->[0]->{'TYPE'}, "a", 'data');
-    is($array->[0]->{'NAME'}, "foo", 'data');
-    is($array->[1]->{'ID'}, 1, 'data');
-    is($array->[1]->{'TYPE'}, "b", 'data');
-    is($array->[1]->{'NAME'}, "bar", 'data');
-    is($array->[2]->{'ID'}, 2, 'data');
-    is($array->[2]->{'TYPE'}, "c", 'data');
-    is($array->[2]->{'NAME'}, "baz", 'data');
-    is($array->[0]->id, 0, 'data');
-    is($array->[0]->type, "a", 'data');
-    is($array->[0]->name, "foo", 'data');
-    is($array->[1]->id, 1, 'data');
-    is($array->[1]->type, "b", 'data');
-    is($array->[1]->name, "bar", 'data');
-    is($array->[2]->id, 2, 'data');
-    is($array->[2]->type, "c", 'data');
-    is($array->[2]->name, "baz", 'data');
+    skip $reason, 43 if $no_driver || $no_abs;
+    {
+      my $array=$dba->absarrayobject("My::Package", $table, [qw{ID TYPE NAME}], {}, [qw{ID}]);
+      isa_ok($array, "ARRAY", 'absarrayhashname scalar context');
+      isa_ok($array->[0], "My::Package", 'absarrayobject row 0');
+      isa_ok($array->[1], "My::Package", 'absarrayobject row 1');
+      isa_ok($array->[2], "My::Package", 'absarrayobject row 2');
+      diag(Dumper $array);
+      is($array->[0]->{'ID'}, 0, 'data');
+      is($array->[0]->{'TYPE'}, "a", 'data');
+      is($array->[0]->{'NAME'}, "foo", 'data');
+      is($array->[1]->{'ID'}, 1, 'data');
+      is($array->[1]->{'TYPE'}, "b", 'data');
+      is($array->[1]->{'NAME'}, "bar", 'data');
+      is($array->[2]->{'ID'}, 2, 'data');
+      is($array->[2]->{'TYPE'}, "c", 'data');
+      is($array->[2]->{'NAME'}, "baz", 'data');
+      is($array->[0]->id, 0, 'data');
+      is($array->[0]->type, "a", 'data');
+      is($array->[0]->name, "foo", 'data');
+      is($array->[1]->id, 1, 'data');
+      is($array->[1]->type, "b", 'data');
+      is($array->[1]->name, "bar", 'data');
+      is($array->[2]->id, 2, 'data');
+      is($array->[2]->type, "c", 'data');
+      is($array->[2]->name, "baz", 'data');
+    }
+    {
+      my @array=$dba->absarrayobject("My::Package", $table, [qw{ID TYPE NAME}], {}, [qw{ID}]);
+      isa_ok($array[0], "My::Package", 'absarrayobject row 0');
+      isa_ok($array[1], "My::Package", 'absarrayobject row 1');
+      isa_ok($array[2], "My::Package", 'absarrayobject row 2');
+      diag(Dumper \@array);
+      is($array[0]->{'ID'}, 0, 'data');
+      is($array[0]->{'TYPE'}, "a", 'data');
+      is($array[0]->{'NAME'}, "foo", 'data');
+      is($array[1]->{'ID'}, 1, 'data');
+      is($array[1]->{'TYPE'}, "b", 'data');
+      is($array[1]->{'NAME'}, "bar", 'data');
+      is($array[2]->{'ID'}, 2, 'data');
+      is($array[2]->{'TYPE'}, "c", 'data');
+      is($array[2]->{'NAME'}, "baz", 'data');
+      is($array[0]->id, 0, 'data');
+      is($array[0]->type, "a", 'data');
+      is($array[0]->name, "foo", 'data');
+      is($array[1]->id, 1, 'data');
+      is($array[1]->type, "b", 'data');
+      is($array[1]->name, "bar", 'data');
+      is($array[2]->id, 2, 'data');
+      is($array[2]->type, "c", 'data');
+      is($array[2]->name, "baz", 'data');
+    }
   }
 
   SKIP: {
-    skip $reason, 22 if $no_driver;
-    my $array=$dba->sqlarrayobject("My::Package", qq{SELECT ID, TYPE, NAME from $table ORDER BY ID});
-    isa_ok($array, "ARRAY", 'sqlarrayhashname scalar context');
-    isa_ok($array->[0], "My::Package", 'sqlarrayobject row 0');
-    isa_ok($array->[1], "My::Package", 'sqlarrayobject row 1');
-    isa_ok($array->[2], "My::Package", 'sqlarrayobject row 2');
-    diag(Dumper $array);
-    is($array->[0]->{'ID'}, 0, 'data');
-    is($array->[0]->{'TYPE'}, "a", 'data');
-    is($array->[0]->{'NAME'}, "foo", 'data');
-    is($array->[1]->{'ID'}, 1, 'data');
-    is($array->[1]->{'TYPE'}, "b", 'data');
-    is($array->[1]->{'NAME'}, "bar", 'data');
-    is($array->[2]->{'ID'}, 2, 'data');
-    is($array->[2]->{'TYPE'}, "c", 'data');
-    is($array->[2]->{'NAME'}, "baz", 'data');
-    is($array->[0]->id, 0, 'data');
-    is($array->[0]->type, "a", 'data');
-    is($array->[0]->name, "foo", 'data');
-    is($array->[1]->id, 1, 'data');
-    is($array->[1]->type, "b", 'data');
-    is($array->[1]->name, "bar", 'data');
-    is($array->[2]->id, 2, 'data');
-    is($array->[2]->type, "c", 'data');
-    is($array->[2]->name, "baz", 'data');
+    skip $reason, 44 if $no_driver;
+    {
+      local $@;
+      my $array = eval{$dba->sqlarrayobject("", qq{SELECT ID, TYPE, NAME from $table ORDER BY ID})};
+      my $error = $@;
+      like($error, qr/requires a class parameter/, 'no class');
+    }
+    {
+      my $array = $dba->sqlarrayobject("My::Package", qq{SELECT ID, TYPE, NAME from $table ORDER BY ID});
+      isa_ok($array, "ARRAY", 'sqlarrayhashname scalar context');
+      isa_ok($array->[0], "My::Package", 'sqlarrayobject row 0');
+      isa_ok($array->[1], "My::Package", 'sqlarrayobject row 1');
+      isa_ok($array->[2], "My::Package", 'sqlarrayobject row 2');
+      diag(Dumper $array);
+      is($array->[0]->{'ID'}, 0, 'data');
+      is($array->[0]->{'TYPE'}, "a", 'data');
+      is($array->[0]->{'NAME'}, "foo", 'data');
+      is($array->[1]->{'ID'}, 1, 'data');
+      is($array->[1]->{'TYPE'}, "b", 'data');
+      is($array->[1]->{'NAME'}, "bar", 'data');
+      is($array->[2]->{'ID'}, 2, 'data');
+      is($array->[2]->{'TYPE'}, "c", 'data');
+      is($array->[2]->{'NAME'}, "baz", 'data');
+      is($array->[0]->id, 0, 'data');
+      is($array->[0]->type, "a", 'data');
+      is($array->[0]->name, "foo", 'data');
+      is($array->[1]->id, 1, 'data');
+      is($array->[1]->type, "b", 'data');
+      is($array->[1]->name, "bar", 'data');
+      is($array->[2]->id, 2, 'data');
+      is($array->[2]->type, "c", 'data');
+      is($array->[2]->name, "baz", 'data');
+    }
+    {
+      my @array = $dba->sqlarrayobject("My::Package", qq{SELECT ID, TYPE, NAME from $table ORDER BY ID});
+      isa_ok($array[0], "My::Package", 'sqlarrayobject row 0');
+      isa_ok($array[1], "My::Package", 'sqlarrayobject row 1');
+      isa_ok($array[2], "My::Package", 'sqlarrayobject row 2');
+      diag(Dumper \@array);
+      is($array[0]->{'ID'}, 0, 'data');
+      is($array[0]->{'TYPE'}, "a", 'data');
+      is($array[0]->{'NAME'}, "foo", 'data');
+      is($array[1]->{'ID'}, 1, 'data');
+      is($array[1]->{'TYPE'}, "b", 'data');
+      is($array[1]->{'NAME'}, "bar", 'data');
+      is($array[2]->{'ID'}, 2, 'data');
+      is($array[2]->{'TYPE'}, "c", 'data');
+      is($array[2]->{'NAME'}, "baz", 'data');
+      is($array[0]->id, 0, 'data');
+      is($array[0]->type, "a", 'data');
+      is($array[0]->name, "foo", 'data');
+      is($array[1]->id, 1, 'data');
+      is($array[1]->type, "b", 'data');
+      is($array[1]->name, "bar", 'data');
+      is($array[2]->id, 2, 'data');
+      is($array[2]->type, "c", 'data');
+      is($array[2]->name, "baz", 'data');
+    }
   }
 
   SKIP: {

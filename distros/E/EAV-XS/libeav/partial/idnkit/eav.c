@@ -72,17 +72,7 @@ eav_is_email (eav_t *eav, const char *email, size_t length)
     if (eav->idnmsg)
         eav->idnmsg = NULL;
 
-#ifdef EAV_EXTRA
-    if (eav->result.lpart != NULL) {
-        free (eav->result.lpart);
-        eav->result.lpart = NULL;
-    }
-
-    if (eav->result.domain != NULL) {
-        free (eav->result.domain);
-        eav->result.domain = NULL;
-    }
-#endif
+    eav_result_free (eav->result);
 
     if (eav->utf8) {
         eav->result = eav->utf8_cb (
@@ -99,23 +89,23 @@ eav_is_email (eav_t *eav, const char *email, size_t length)
             eav->tld_check );
     }
 
-    if (eav->result.rc == 0) {
+    if (eav->result->rc == 0) {
         eav->errcode = EEAV_NO_ERROR;
         return (YES);
     }
 
-    if (eav->result.rc < 0) {
-        eav->errcode = inverse(eav->result.rc);
+    if (eav->result->rc < 0) {
+        eav->errcode = inverse(eav->result->rc);
 
         if (eav->errcode == EEAV_IDN_ERROR) {
-            eav->idnmsg = idn_result_tostring (eav->result.idn_rc);
+            eav->idnmsg = idn_result_tostring (eav->result->idn_rc);
         }
 
         return (NO);
     }
 
     /* user tld preferences */
-    switch (eav->result.rc) {
+    switch (eav->result->rc) {
     case TLD_TYPE_NOT_ASSIGNED:
         eav->errcode = EEAV_TLD_NOT_ASSIGNED;
         tld_test = (eav->allow_tld & EAV_TLD_NOT_ASSIGNED);
@@ -179,11 +169,7 @@ eav_init (eav_t *eav)
     eav->ascii_cb = NULL;
     eav->initialized = false;
     eav->errcode = EEAV_NO_ERROR;
-
-#ifdef EAV_EXTRA
-    eav->result.lpart = NULL;
-    eav->result.domain = NULL;
-#endif
+    eav->result = NULL;
 }
 
 
@@ -193,15 +179,6 @@ eav_free (eav_t *eav)
     if (eav != NULL && eav->initialized)
         idn_resconf_destroy (eav->idn);
 
-#ifdef EAV_EXTRA
-    if (eav->result.lpart != NULL) {
-        free (eav->result.lpart);
-        eav->result.lpart = NULL;
-    }
-
-    if (eav->result.domain != NULL) {
-        free (eav->result.domain);
-        eav->result.domain = NULL;
-    }
-#endif
+    eav_result_free (eav->result);
+    eav->result = NULL;
 }

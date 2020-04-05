@@ -44,72 +44,6 @@ my %dashes = (
 
 =over
 
-=item line_parse
-
-Performs substitutions on lines called by fragment_slurp, at least.  Calls
-image_markup(), textile_process(), markdown_process().
-
-Returns string.
-
-Parses some special markup, specifically:
-
-    <textile></textile> - Text::Textile to HTML
-    <markdown></markdown> - Text::Markdown::Discount to HTML
-    <freeverse></freeverse>
-    <retcon></retcon>
-    <list></list>
-
-    <image>filename.ext
-    optional alt tag
-    optional title text</image>
-
-    ${variable} interpolation from the WRT object
-    <perl>print "hello world";</perl>
-    <include>path/to/file/from/project/root</include>
-
-=cut
-
-sub line_parse {
-    my $self = shift;
-    my ($everything, $file) = (@_);
-
-    # Take care of <include>, <textile>, <markdown>, and <image> tags:
-    include_process($self, $everything);
-    textile_process($everything);
-    markdown_process($everything);
-    $everything =~ s!<image>(.*?)</image>!$self->image_markup($file, $1)!seg;
-
-    foreach my $key (keys %tags) {
-       # Set some replacements, unless they've been explicitly set already:
-       $end_tags{$key}    ||= $tags{$key};
-       $blank_lines{$key} ||= "\n\n";
-       $newlines{$key}    ||= "\n";
-       $dashes{$key}      ||= " -- ";
-
-        # Transform blocks:
-        while ($everything =~ m/(<$key>.*?<\/$key>)/s) {
-            my $block = $1;
-
-            # Save the bits between instances of the block:
-            my (@interstices) = split /\Q$block\E/s, $everything;
-
-            # Tags that surround the block:
-            $block =~ s{\n?<$key>\n?}{<$tags{$key}>}gs;
-            $block =~ s{\n?</$key>\n?}{</$end_tags{$key}>}gs;
-
-            # Dashes, blank lines, and newlines:
-            $block = dashes($dashes{$key}, $block);
-            $block =~ s/\n\n/$blank_lines{$key}/gs;
-            $block = newlines($newlines{$key}, $block);
-
-            # ...and slap it all back together as $everything
-            $everything = join $block, @interstices;
-        }
-    }
-
-    return $everything;
-}
-
 =item eval_perl
 
 Evaluate embedded Perl in a string, replacing blocks enclosed with <perl> tags
@@ -154,36 +88,101 @@ sub eval_perl {
   return $text;
 }
 
-sub newlines {
-  my ($replacement, $block) = @_;
+=item line_parse
 
-  # Single newlines (i.e., line ends) within the block,
-  # except those preceded by a double-quote, which probably
-  # indicates a still-open tag:
+Performs substitutions on lines called by fragment_slurp, at least.  Calls
+include_process(), image_markup(), textile_process(), markdown_process().
 
-  $block =~ s/(?<=[^"\n])  # not a double-quote or newline
-                           # don't capture
+Returns string.
 
-              \n           # end-of-line
+Parses some special markup.  Specifically:
 
-              (?=[^\n])    # not a newline
-                           # don't capture
-             /$replacement/xgs;
+    <perl>print "hello world";</perl>
+    ${variable} interpolation from the WRT object
 
-  return $block;
+    <include>path/to/file/from/project/root</include>
 
+    <textile></textile> - Text::Textile to HTML
+    <markdown></markdown> - Text::Markdown::Discount to HTML
+
+    <image>filename.ext
+    optional alt tag
+    optional title text</image>
+
+    <freeverse></freeverse>
+    <retcon></retcon>
+    <list></list>
+
+=cut
+
+sub line_parse {
+    my $self = shift;
+    my ($everything, $file) = (@_);
+
+    # Take care of <include>, <textile>, <markdown>, and <image> tags:
+    include_process($self, $everything);
+    textile_process($everything);
+    markdown_process($everything);
+    $everything =~ s!<image>(.*?)</image>!$self->image_markup($file, $1)!seg;
+
+    foreach my $key (keys %tags) {
+       # Set some replacements, unless they've been explicitly set already:
+       $end_tags{$key} ||= $tags{$key};
+
+        # Transform blocks:
+        while ($everything =~ m| (<$key>\n?) (.*?) (\n?</$key>) |sx) {
+            my $open = $1;
+            my $block = $2;
+            my $close = $3;
+
+            # Save the bits between instances of the block:
+            my (@interstices) = split /\Q$open$block$close\E/s, $everything;
+
+            # Transform dashes, blank lines, and newlines:
+            dashes($dashes{$key}, $block)          if defined $dashes{$key};
+            $block =~ s/\n\n/$blank_lines{$key}/gs if defined $blank_lines{$key};
+            newlines($newlines{$key}, $block)      if defined $newlines{$key};
+
+            # Slap it all back together as $everything, with start and end
+            # tags:
+            $block = "<$tags{$key}>$block</$end_tags{$key}>";
+            $everything = join $block, @interstices;
+        }
+    }
+
+    return $everything;
 }
 
-# might need a rewrite.
+=item newlines($replacement, $block)
+
+Inline replace single newlines (i.e., line ends) within the block, except those
+preceded by a double-quote, which probably indicates a still-open tag.
+
+=cut
+
+sub newlines {
+  $_[1] =~ s/(?<=[^"\n])  # not a double-quote or newline
+                          # don't capture
+
+             \n           # end-of-line
+
+             (?=[^\n])    # not a newline
+                          # don't capture
+            /$_[0]/xgs;
+}
+
+=item dashes($replacement, $block)
+
+Inline replace double dashes in a block - " -- " - with a given replacement.
+
+=cut
+
 sub dashes {
-  my ($replacement, $block) = @_;
+  $_[1] =~ s/(\s+)      # whitespace - no capture
+             \-{2}      # two dashes
+             (\n|\s+|$) # newline, whitespace, or eol
+            /$1$_[0]$2/xgs;
 
-  $block =~ s/(\s+)      # whitespace - no capture
-              \-{2}      # two dashes
-              (\n|\s+|$) # newline, whitespace, or eol
-             /$1${replacement}$2/xgs;
-
-  return $block;
 }
 
 =item include_process

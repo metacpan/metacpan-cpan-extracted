@@ -25,41 +25,63 @@ You'll need a Unix / Linux, and a relatively recent Perl installation.  In
 practice I know that Debian Jessie or later (or Ubuntu 16.04 or later) and Perl
 5.26.1 work.
 
-The short version, git edition: 
-
-    $ git clone https://code.p1k3.com/gitea/brennen/wrt.git
-    $ cd wrt
-    $ perl Build.PL
-    $ ./Build installdeps
-    $ ./Build test
-    $ ./Build install
-
 The short version, CPAN edition:
 
-    $ cpan -i App::WRT
+```sh
+cpan -i App::WRT
+```
+
+The short version, git edition:
+
+```sh
+git clone https://code.p1k3.com/gitea/brennen/wrt.git
+cd wrt
+perl Build.PL
+./Build installdeps
+./Build test
+./Build install
+```
 
 Starting a new site once installed:
 
-    # Set up some defaults:
-    $ mkdir project && cd project
-    $ wrt init
+```sh
+# Set up some defaults:
+mkdir project && cd project
+wrt init
 
-    # Edit an entry for January 1, 2019:
-    $ mkdir -p archives/2019/1/
-    $ nano archives/2019/1/1
+# Edit an entry for January 1, 2019:
+mkdir -p archives/2019/1/
+nano archives/2019/1/1
 
-    # Publish HTML to project/public/
-    $ wrt render-all
+# Publish HTML to project/public/
+wrt render-all
+```
 
 Please see the [App::WRT listing on MetaCPAN][mc] or the POD documentation in
 [lib/App/WRT.pm](lib/App/WRT.pm) in this repository for detailed instructions.
 
 [mc]: https://metacpan.org/pod/App::WRT
 
+security
+========
+
+A cautionary note that, since wrt templates and entries can contain embedded
+Perl, running this code against untrusted input is effectively the same as
+executing an arbitrary script.  There may be _other_ issues with running it
+against an untrusted archive (I make no promises) but it's probably not worth
+worrying about them in light of the `<perl>` feature.
+
+This shouldn't worry you if you're generating a static site of your own.  Just
+don't (for example) create a service that uses it to publish sites for users
+you don't already trust to run code on your systems.
+
+wrt-as-a-service might be something I explore in future, but it will need
+some tweaking first.
+
 copying
 =======
 
-wrt is copyright 2001-2019 Brennen Bearnes.
+wrt is copyright 2001-2020 Brennen Bearnes.
 
 wrt is free software; you can redistribute it and/or modify it under the terms
 of the GNU General Public License as published by the Free Software Foundation;

@@ -1,5 +1,10 @@
 Revision history for Music-Interval-Barycentric
 
+0.0400 2020-04-03 08:37:52
+    - Improve documentation.
+    - Fix eg/evolve slightly.
+    - Add the inversion function.
+
 0.0307 2020-04-01 19:26:37
     - Add a test!
     - Imported documentation.

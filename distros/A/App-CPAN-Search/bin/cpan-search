@@ -5,10 +5,10 @@ use warnings;
 
 use App::CPAN::Search;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Run.
-App::CPAN::Search->new->run;
+exit App::CPAN::Search->new->run;
 
 # Print version.
 sub VERSION_MESSAGE {
@@ -55,7 +55,7 @@ cpan-search - Script to search on CPAN archive.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/App-CPAN-Search>
+L<https://github.com/michal-josef-spacek/App-CPAN-Search>
 
 =head1 AUTHOR
 
@@ -65,11 +65,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2015-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

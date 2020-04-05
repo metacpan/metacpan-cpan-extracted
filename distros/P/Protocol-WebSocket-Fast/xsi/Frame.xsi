@@ -1,0 +1,24 @@
+MODULE = Protocol::WebSocket::Fast                PACKAGE = Protocol::WebSocket::Fast::Frame
+PROTOTYPES: DISABLE
+
+ErrorCode Frame::error () {
+    RETVAL = THIS->error;
+}
+
+int Frame::opcode () {
+    RETVAL = (int)THIS->opcode();
+}
+
+bool Frame::is_control ()
+
+bool Frame::final ()
+
+size_t Frame::payload_length ()
+
+Simple Frame::payload () {
+    RETVAL = strings_to_sv(THIS->payload);
+}
+
+uint16_t Frame::close_code ()
+
+string Frame::close_message ()

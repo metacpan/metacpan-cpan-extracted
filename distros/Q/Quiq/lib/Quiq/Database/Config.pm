@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.177';
+our $VERSION = '1.178';
 
 use Quiq::Path;
 use Quiq::Hash;
@@ -26,10 +26,11 @@ L<Quiq::Config>
 
 Die Klasse kapselt den Zugriff auf eine Konfigurationsdatei, in
 der Eingenschaften von einer oder mehrerer Datenbanken hinterlegt sind.
-Es können prinzipiell beliebige Eigenschaften spezifiziert werden.
+Es können beliebige Eigenschaften spezifiziert werden.
 Speziell wird die Abfrage des Universal Database Locators (UDL)
 unterstützt. Die Datei darf wegen etwaig enthaltener Passwörter
-nur für den Owner lesbar/schreibbar sein.
+nur für den Owner lesbar/schreibbar sein. Ist sie es nicht, wird
+eine Exception geworfen.
 
 =head2 Aufbau der Konfigurationsdatei
 
@@ -52,8 +53,9 @@ nur für den Owner lesbar/schreibbar sein.
 =item *
 
 Der Konfigurationshash {...} wird im Konstruktor zu einem
-ungelockten %<Quiq::Hash> gemacht. Entsprechend können die Methoden
-dieser Klasse zum Lesen der Konfigurationseinträge genutzt werden.
+ungelockten Quiq::Hash instantiiert. Entsprechend können die
+Methoden der Klasse Quiq::Hash zum Lesen der
+Konfigurationseinträge genutzt werden.
 
 =back
 
@@ -61,7 +63,7 @@ dieser Klasse zum Lesen der Konfigurationseinträge genutzt werden.
 
   use Quiq::Database::Config;
   
-  $cfg = Quiq::Database::Config->new('~/project/ocean/db.conf');
+  $cfg = Quiq::Database::Config->new('~/project/test/db.conf');
   $udl = $cfg->udl('test_db');
 
 =head1 METHODS
@@ -142,11 +144,11 @@ sub new {
 
 =head2 Objektmethoden
 
-=head3 udl() - Universal Database Locator zu Datenbankname
+=head3 udl() - Universal Database Locator
 
 =head4 Synopsis
 
-  $udl = $class->udl($database);
+  $udl = $cfg->udl($database);
 
 =head4 Arguments
 
@@ -164,7 +166,7 @@ Universal Database Locator (String).
 
 =head4 Description
 
-Ermittele den Universal Database Locator (UDL) für Datenbank $database
+Ermittele den Universal Database Locator (UDL) der Datenbank $database
 und liefere diesen zurück.
 
 =cut
@@ -193,7 +195,7 @@ sub udl {
 
 =head1 VERSION
 
-1.177
+1.178
 
 =head1 AUTHOR
 

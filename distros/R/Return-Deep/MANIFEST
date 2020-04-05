@@ -1,0 +1,12 @@
+Changes
+Deep.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Return-Deep.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Return/Deep.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -9,6 +9,10 @@
 #define msg_warn(...)   fprintf (stderr, __VA_ARGS__)
 #define msg_ok(...)     fprintf (stdout, __VA_ARGS__)
 
+#ifdef __WIN32
+    #include <getline.h>
+#endif
+
 
 const char *
 sanitize (const char *str, size_t length)
@@ -99,7 +103,7 @@ sanitize_utf8 (const char *text, size_t length)
         }
         else {
             /* it possible that we read everything; does not work always. */
-            /* at p1, length: len - p2 */
+            /* at p1, length: len - p1 */
             SKIP(c1, p1, length - p1);
         }
     }

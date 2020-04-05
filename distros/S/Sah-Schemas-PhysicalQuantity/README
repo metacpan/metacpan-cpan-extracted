@@ -3,9 +3,9 @@ NAME
     physical quantities (length/distance, mass, etc)
 
 VERSION
-    This document describes version 0.001 of Sah::Schemas::PhysicalQuantity
+    This document describes version 0.002 of Sah::Schemas::PhysicalQuantity
     (from Perl distribution Sah-Schemas-PhysicalQuantity), released on
-    2020-03-11.
+    2020-04-04.
 
 HOMEPAGE
     Please visit the project's homepage at

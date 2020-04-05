@@ -4,7 +4,7 @@ use warnings;
 
 use lib 'lib';
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 require_ok('App::WRT::Date');
 
@@ -14,10 +14,30 @@ ok(
 );
 
 my $iso_date = App::WRT::Date::iso_date(0);
-diag($iso_date);
-ok(
-  $iso_date =~ m/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/,
+note($iso_date);
+like(
+  $iso_date,
+  qr/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/x,
   'ISO-ish date for epoch'
+);
+
+my $rfc_3339_date = App::WRT::Date::rfc_3339_date(0);
+note($rfc_3339_date);
+like(
+  $rfc_3339_date,
+  qr{
+    ^
+      # year, like: 2019-12-16
+      \d{4}-\d{2}-\d{2}
+
+      # time, like: 22:43:23
+      T\d{2}:\d{2}:\d{2}
+
+      # timezone offset, like: -07:00
+      [+-]\d{2}:\d{2}
+    $
+  }x,
+  'RFC 3339-ish date for epoch'
 );
 
 ok(

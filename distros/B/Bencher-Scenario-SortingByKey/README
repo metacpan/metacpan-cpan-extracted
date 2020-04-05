@@ -1,0 +1,235 @@
+NAME
+    Bencher::Scenario::SortingByKey - Benchmark various techniques to sort
+    array by some computed key
+
+VERSION
+    This document describes version 0.002 of Bencher::Scenario::SortingByKey
+    (from Perl distribution Bencher-Scenario-SortingByKey), released on
+    2019-12-25.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m SortingByKey
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m SortingByKey
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    Sort::Key 1.33
+
+BENCHMARK PARTICIPANTS
+    *   uncached (perl_code)
+
+        Code template:
+
+         state $array=<array>; sort { -$a <=> -$b } @$array
+
+        This technique does not cache the sort key and computes it everytime
+        they are compared. This performance of this technique depends on how
+        expensive the computation of key is. (In this benchmark, the
+        computation is very cheap.)
+
+        In Perl code:
+
+         @sorted = sort { GEN_KEY($a) cmp GEN_KEY($b) } @array;
+
+    *   ST (perl_code)
+
+        Code template:
+
+         state $array=<array>; map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [$_, -$_] } @$array
+
+        Schwartzian transform (also known as map/sort/map technique) caches
+        the sort key in an arrayref. It works by constructing, for each
+        array element, a container record (most often anonymous arrayref)
+        containing the original element and the key to be sorted. Later
+        after the sort, it discards the anonymous arrayrefs. The arrayref
+        construction is a significant part of the total cost, especially for
+        larger arrays.
+
+        In Perl code:
+
+         @sorted = map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [$_, GEN_KEY($_)] } @array;
+
+    *   GRT (perl_code)
+
+        Code template:
+
+         state $array=<array>; map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [$_, -$_] } @$array
+
+        Guttman-Rosler transform, another map/sort/map technique, is similar
+        to ST. The difference is, the computed key is transformed into a
+        fixed-length string that can be compared lexicographically (thus
+        eliminating the need for the Perl custom sort block). The original
+        element is also transformed as a string and concatenated into the
+        string. Thus, GRT avoids the construction of the anonymous
+        arrayrefs. As a downside, the construction of the key string can be
+        tricky.
+
+        In Perl code (assuming the compute key is transformed into a fixed
+        4-byte string:
+
+         @sorted = map { substr($_, 4) } sort map { pack("NN", -$_, $_) } @array;
+
+    *   2array (perl_code)
+
+        Code template:
+
+         state $array=<array>; my @keys = map { -$_ } @$array; my @indexes = 0..$#{$array}; map { $array->[$_] } sort { $keys[$a] <=> $keys[$b] } @indexes
+
+        This technique caches the compute key in a single array. It also
+        constructs an array of indexes, sorts the array according to the
+        array keys, then constructs the final sorted array using the sorted
+        indexes.
+
+        Compared to GRT, it constructs far fewer anonymous arrayrefs. But it
+        still requires Perl custom sort block.
+
+        In Perl code:
+
+         @indexes = 0 .. $#array;
+         @keys    = map { GEN_KEY($_) } @array;
+         @sorted  = map { $array[$_] } sort { $keys[$a] <=> $keys[$b] } @indexes;
+
+    *   Sort::Key::nkeysort (perl_code)
+
+        Code template:
+
+         state $array=<array>; Sort::Key::nkeysort(sub { -$_ }, @$array)
+
+        This module also caches the compute keys. It's faster because it's
+        implemented in XS. The compute key must be string (to be compared
+        lexicographically) or numeric.
+
+BENCHMARK DATASETS
+    *   10
+
+    *   100
+
+    *   1000
+
+    *   10000
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.30.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+    (2 cores)*, OS: *GNU/Linux Ubuntu version 19.04*, OS kernel: *Linux
+    version 5.0.0-37-generic*.
+
+    Benchmark with default options ("bencher -m SortingByKey"):
+
+     #table1#
+     {dataset=>10}
+     +---------------------+-----------+-----------+------------+---------+---------+
+     | participant         | rate (/s) | time (μs) | vs_slowest |  errors | samples |
+     +---------------------+-----------+-----------+------------+---------+---------+
+     | GRT                 |    203230 |    4.9206 |      1     | 5.8e-12 |      20 |
+     | ST                  |    207000 |    4.84   |      1.02  | 1.5e-09 |      26 |
+     | 2array              |    320000 |    3.13   |      1.57  | 1.6e-09 |      23 |
+     | Sort::Key::nkeysort |    506900 |    1.973  |      2.494 | 2.3e-11 |      22 |
+     | uncached            |  25000000 |    0.04   |    123     | 2.3e-11 |      20 |
+     +---------------------+-----------+-----------+------------+---------+---------+
+
+     #table2#
+     {dataset=>100}
+     +---------------------+-----------+-----------+------------+---------+---------+
+     | participant         | rate (/s) | time (μs) | vs_slowest |  errors | samples |
+     +---------------------+-----------+-----------+------------+---------+---------+
+     | GRT                 |     13000 |    75     |       1    | 2.1e-07 |      20 |
+     | ST                  |     13000 |    75     |       1    | 1.3e-07 |      20 |
+     | 2array              |     23400 |    42.8   |       1.75 | 1.2e-08 |      26 |
+     | Sort::Key::nkeysort |     51900 |    19.3   |       3.88 | 5.2e-09 |      33 |
+     | uncached            |   9830000 |     0.102 |     736    | 5.2e-11 |      20 |
+     +---------------------+-----------+-----------+------------+---------+---------+
+
+     #table3#
+     {dataset=>1000}
+     +---------------------+-----------+-----------+------------+---------+---------+
+     | participant         | rate (/s) | time (μs) | vs_slowest |  errors | samples |
+     +---------------------+-----------+-----------+------------+---------+---------+
+     | GRT                 |       930 |  1100     |       1    | 1.7e-06 |      20 |
+     | ST                  |       940 |  1100     |       1    |   2e-06 |      21 |
+     | 2array              |      1580 |   634     |       1.69 | 2.1e-07 |      20 |
+     | Sort::Key::nkeysort |      3820 |   261     |       4.1  | 5.3e-08 |      20 |
+     | uncached            |   1456000 |     0.687 |    1561    | 1.7e-11 |      20 |
+     +---------------------+-----------+-----------+------------+---------+---------+
+
+     #table4#
+     {dataset=>10000}
+     +---------------------+-----------+-------------+------------+---------+---------+
+     | participant         | rate (/s) |  time (ms)  | vs_slowest |  errors | samples |
+     +---------------------+-----------+-------------+------------+---------+---------+
+     | GRT                 |      67.6 | 14.8        |       1    | 1.3e-05 |      20 |
+     | ST                  |      67.9 | 14.7        |       1    |   7e-06 |      20 |
+     | 2array              |     122   |  8.22       |       1.8  | 1.8e-06 |      20 |
+     | Sort::Key::nkeysort |     320   |  3.1        |       4.8  |   6e-06 |      20 |
+     | uncached            |  149191   |  0.00670284 |    2206.16 | 5.7e-12 |      20 |
+     +---------------------+-----------+-------------+------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher -m SortingByKey
+    --module-startup"):
+
+     #table5#
+     +---------------------+-----------+------------------------+------------+---------+---------+
+     | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+     +---------------------+-----------+------------------------+------------+---------+---------+
+     | Sort::Key           |      13.4 |                    7.4 |        1   | 9.4e-06 |      20 |
+     | perl -e1 (baseline) |       6   |                    0   |        2.2 | 9.4e-06 |      20 |
+     +---------------------+-----------+------------------------+------------+---------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-SortingByKey>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-SortingByKey>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Sort
+    ingByKey>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Guttman, U., & Rosler, L. (2003). A fresh look at efficient perl
+    sorting. <http://www.sysarch.com/Perl/sort_paper.html>. This is the
+    original paper that mentions GRT.
+
+    <https://www.perlmonks.org/?node_id=145659>
+
+    <https://www.perlmonks.org/?node_id=287149>
+
+    Sort::Maker, also by Uri Guttman, describes the various sort techniques
+    (ST, GRT, etc).
+
+    Sort::Key by Salvador Fandiño García.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

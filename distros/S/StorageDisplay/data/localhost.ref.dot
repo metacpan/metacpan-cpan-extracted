@@ -1,0 +1,428 @@
+digraph "machine"{
+	rankdir=LR;
+	{ "@Part: dm-6" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">Linux device-mapper (linear)</TD> </TR><TR><TD >/dev/eyak/kvm-miathan<BR/>Label: msdos<BR/>Size: 10.0 GiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD PORT="1" BGCOLOR="mediumorchid1">
+						/dev/eyak/kvm-miathan@1<BR/>Size: 4.88 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD>
+							<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+							<TD PORT="2" BGCOLOR="mediumorchid1">
+							/dev/eyak/kvm-miathan@2<BR/>Size: 4.87 GiB
+							</TD></TR><TR><TD>
+							<TABLE >
+								<TR>
+									<TD PORT="5" BGCOLOR="lightgrey">
+									/dev/eyak/kvm-miathan@5<BR/>Size: 4.87 GiB
+									</TD>
+								</TR>
+							</TABLE>
+							</TD></TR></TABLE>
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 254 MiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="pink;0.487964:pink;0.487198:green;0.024832";
+	]; }
+	{ "@Part: nvme0n1" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">Force MP510</TD> </TR><TR><TD >/dev/nvme0n1<BR/>Label: gpt<BR/>Size: 1.75 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/nvme0n1p1<BR/>EFI system partition<BR/>Size: 600 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="yellow">
+						/dev/nvme0n1p2<BR/>pv1-noenc<BR/>Size: 10.0 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="3" BGCOLOR="yellow">
+						/dev/nvme0n1p3<BR/>pv2-enc<BR/>Size: 500 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="4" BGCOLOR="yellow">
+						/dev/nvme0n1p4<BR/>pv3-enc<BR/>Size: 500 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="5" BGCOLOR="yellow">
+						/dev/nvme0n1p5<BR/>pv4-enc<BR/>Size: 500 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="6" BGCOLOR="yellow">
+						/dev/nvme0n1p6<BR/>test<BR/>Size: 278 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 328 kiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000001:pink;0.000328:pink;0.005591:pink;0.279564:pink;0.279564:pink;0.279564:pink;0.155387:green;0.000000";
+	]; }
+	subgraph "cluster_Unassigned PVs" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		subgraph "cluster_Unassigned PVs@PV" {
+			color=white;
+			fillcolor=white;
+			{ "LVM@Unassigned PVs@PV@nvme0n1p6" [
+				label="PV: /dev/nvme0n1p6\nSize: 278 GiB\nFree: 278 GiB\nUsed: 0 B";
+				style=striped;fillcolor="green"
+			]; }
+			label="";
+		}
+		label="LVM: Unassigned PVs";
+	}
+	subgraph "cluster_eyak" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=lightgrey,fillcolor=lightgrey,shape=rectangle];
+		subgraph "cluster_eyak@PV" {
+			color=white;
+			fillcolor=white;
+			{ "LVM@eyak@PV@dm-0" [
+				label="PV: /dev/mapper/pv2_decrypted\nSize: 500 GiB\nFree: 0 B\nUsed: 500 GiB";
+				style=striped;fillcolor="pink;1.000000.2:green"
+			]; }
+			{ "LVM@eyak@PV@dm-2" [
+				label="PV: /dev/mapper/pv3_decrypted\nSize: 500 GiB\nFree: 40.9 GiB\nUsed: 459 GiB";
+				style=striped;fillcolor="pink;0.918114.2:green"
+			]; }
+			{ "LVM@eyak@PV@dm-11" [
+				label="PV: /dev/mapper/pv4_decrypted\nSize: 500 GiB\nFree: 0 B\nUsed: 500 GiB";
+				style=striped;fillcolor="pink;1.000000.2:green"
+			]; }
+			label="eyak's PVs";
+		}
+		subgraph "cluster_eyak@LV" {
+			color=white;
+			fillcolor=white;
+			{ "dm-13" [
+				label="LV: chorale\nSize: 200 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-5" [
+				label="LV: crypt_vdanjean\nSize: 5.00 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-7" [
+				label="LV: data\nSize: 300 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-1" [
+				label="LV: home\nSize: 200 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-6" [
+				label="LV: kvm-miathan\nSize: 10.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-12" [
+				label="LV: photo-arch\nSize: 300 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-4" [
+				label="LV: photos\nSize: 277 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-3" [
+				label="LV: root\nSize: 70.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-8" [
+				label="LV: scratch\nSize: 97.0 GiB";
+				fillcolor="lightgrey"
+			]; }
+			label="eyak's LVs";
+		}
+		label="LVM: eyak\nSize: 1.46 TiB\nFree: 40.9 GiB";
+		style=striped;fillcolor="pink;0.972705.2:green"
+	}
+	subgraph "cluster_eyak-init" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=lightgrey,fillcolor=lightgrey,shape=rectangle];
+		subgraph "cluster_eyak-init@PV" {
+			color=white;
+			fillcolor=white;
+			{ "LVM@eyak-init@PV@nvme0n1p2" [
+				label="PV: /dev/nvme0n1p2\nSize: 10.00 GiB\nFree: 1020 MiB\nUsed: 9.00 GiB";
+				style=striped;fillcolor="pink;0.900352.2:green"
+			]; }
+			label="eyak-init's PVs";
+		}
+		subgraph "cluster_eyak-init@LV" {
+			color=white;
+			fillcolor=white;
+			{ "dm-10" [
+				label="LV: base-root\nSize: 8.00 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-9" [
+				label="LV: boot\nSize: 1.00 GiB";
+				fillcolor="yellow"
+			]; }
+			label="eyak-init's LVs";
+		}
+		label="LVM: eyak-init\nSize: 10.00 GiB\nFree: 1020 MiB";
+		style=striped;fillcolor="pink;0.900352.2:green"
+	}
+	subgraph "cluster_@LUKS@dm-5" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@LUKS@dm-5@dm-5" [
+			label="/dev/eyak/crypt_vdanjean\nSize: 5.00 GiB";
+			fillcolor="yellow"
+		]; }
+		{ "@LUKS@dm-5@@" [
+			label="Not decrypted";
+		]; }
+		label="/dev/eyak/crypt_vdanjean\nLUKS version 1";
+	}
+	subgraph "cluster_@LUKS@nvme0n1p3" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@LUKS@nvme0n1p3@nvme0n1p3" [
+			label="/dev/nvme0n1p3\nSize: 500 GiB";
+			fillcolor="yellow"
+		]; }
+		{ "dm-0" [
+			label="/dev/mapper/pv2_decrypted\nSize: 500 GiB";
+			fillcolor="yellow"
+		]; }
+		label="/dev/nvme0n1p3\nLUKS version 2";
+	}
+	subgraph "cluster_@LUKS@nvme0n1p4" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@LUKS@nvme0n1p4@nvme0n1p4" [
+			label="/dev/nvme0n1p4\nSize: 500 GiB";
+			fillcolor="yellow"
+		]; }
+		{ "dm-2" [
+			label="/dev/mapper/pv3_decrypted\nSize: 500 GiB";
+			fillcolor="yellow"
+		]; }
+		label="/dev/nvme0n1p4\nLUKS version 2";
+	}
+	subgraph "cluster_@LUKS@nvme0n1p5" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@LUKS@nvme0n1p5@nvme0n1p5" [
+			label="/dev/nvme0n1p5\nSize: 500 GiB";
+			fillcolor="yellow"
+		]; }
+		{ "dm-11" [
+			label="/dev/mapper/pv4_decrypted\nSize: 500 GiB";
+			fillcolor="yellow"
+		]; }
+		label="/dev/nvme0n1p5\nLUKS version 2";
+	}
+	subgraph "cluster_@FS" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@FS@/boot" [
+			label="/boot\nDevice: /dev/eyak-init/boot\next4\nSize: 976 MiB\nFree: 652 MiB\nUsed: 257 MiB";
+			style=striped;fillcolor="pink;0.331810.2:green"
+		]; }
+		{ "@FS@/srv/chorale" [
+			label="/srv/chorale\nDevice: /dev/eyak/chorale\next4\nSize: 196 GiB\nFree: 20.6 GiB\nUsed: 165 GiB";
+			style=striped;fillcolor="pink;0.894964.2:green"
+		]; }
+		{ "@FS@/home" [
+			label="/home\nDevice: /dev/eyak/home\next4\nSize: 196 GiB\nFree: 953 MiB\nUsed: 185 GiB";
+			style=striped;fillcolor="pink;0.995247.2:green"
+		]; }
+		{ "@FS@/srv/photos" [
+			label="/srv/photos\nDevice: /dev/eyak/photos\next4\nSize: 273 GiB\nFree: 17.0 GiB\nUsed: 253 GiB";
+			style=striped;fillcolor="pink;0.937555.2:green"
+		]; }
+		{ "@FS@/" [
+			label="/\nDevice: /dev/eyak/root\next4\nSize: 68.7 GiB\nFree: 2.89 GiB\nUsed: 62.5 GiB";
+			style=striped;fillcolor="pink;0.957862.2:green"
+		]; }
+		{ "@FS@/boot/efi" [
+			label="/boot/efi\nDevice: /dev/nvme0n1p1\nvfat\nSize: 599 MiB\nFree: 513 MiB\nUsed: 85.7 MiB";
+			style=striped;fillcolor="pink;0.143089.2:green"
+		]; }
+		label="Mounted FS and swap";
+	}
+	subgraph "cluster_@libvirt" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		subgraph "cluster_@libvirt@OrdiClaire" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@OrdiClaire@sdb" [
+				label="sdb\n(vda)";
+			]; }
+			label="OrdiClaire";
+		}
+		subgraph "cluster_@libvirt@arm-aramis" {
+			color=white;
+			fillcolor=white;
+			label="arm-aramis";
+		}
+		subgraph "cluster_@libvirt@debiantesting" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@debiantesting@/home/vdanjean/dl/iso/chroot.img" [
+				label="/home/vdanjean/dl/iso/chroot.img\n(sda)";
+			]; }
+			{ "@libvirt@debiantesting@/home/vdanjean/dl/iso/debian-9.5.0-amd64-netinst.iso" [
+				label="/home/vdanjean/dl/iso/debian-9.5.0-amd64-netinst.iso\n(hda)";
+			]; }
+			label="debiantesting";
+		}
+		subgraph "cluster_@libvirt@part2_agent" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@part2_agent@/var/lib/libvirt/images/part2_agent.img" [
+				label="/var/lib/libvirt/images/part2_agent.img\n(vda)";
+				fillcolor=mediumorchid1
+			]; }
+			label="part2_agent";
+		}
+		subgraph "cluster_@libvirt@part2_master" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@part2_master@/var/lib/libvirt/images/part2_master.img" [
+				label="/var/lib/libvirt/images/part2_master.img\n(vda)";
+				fillcolor=mediumorchid1
+			]; }
+			label="part2_master";
+		}
+		subgraph "cluster_@libvirt@test" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@test@/var/lib/libvirt/images/test.img" [
+				label="/var/lib/libvirt/images/test.img\n(vda)";
+				fillcolor=mediumorchid1
+			]; }
+			label="test";
+		}
+		subgraph "cluster_@libvirt@vagrant_default" {
+			color=white;
+			fillcolor=white;
+			{ "@libvirt@vagrant_default@/var/lib/libvirt/images/vagrant_default.img" [
+				label="/var/lib/libvirt/images/vagrant_default.img\n(vda)";
+				fillcolor=mediumorchid1
+			]; }
+			label="vagrant_default";
+		}
+		label="Libvirt Virtual Machines";
+	}
+	// Links from LVM VG: eyak
+	"LVM@eyak@PV@dm-0" -> "dm-3"
+	"LVM@eyak@PV@dm-0" -> "dm-1"
+	"LVM@eyak@PV@dm-0" -> "dm-4"
+	"LVM@eyak@PV@dm-2" -> "dm-4"
+	"LVM@eyak@PV@dm-2" -> "dm-5"
+	"LVM@eyak@PV@dm-2" -> "dm-6"
+	"LVM@eyak@PV@dm-2" -> "dm-7"
+	"LVM@eyak@PV@dm-2" -> "dm-8"
+	"LVM@eyak@PV@dm-2" -> "dm-13"
+	"LVM@eyak@PV@dm-2" -> "dm-3"
+	"LVM@eyak@PV@dm-11" -> "dm-12"
+	"LVM@eyak@PV@dm-11" -> "dm-13"
+	// Links from LVM VG: eyak-init
+	"LVM@eyak-init@PV@nvme0n1p2" -> "dm-9"
+	"LVM@eyak-init@PV@nvme0n1p2" -> "dm-10"
+	// Links from LUKS: /dev/eyak/crypt_vdanjean
+	"@LUKS@dm-5@dm-5" -> "@LUKS@dm-5@@"
+	// Links from LUKS: /dev/nvme0n1p3
+	"@LUKS@nvme0n1p3@nvme0n1p3" -> "dm-0"
+	// Links from LUKS: /dev/nvme0n1p4
+	"@LUKS@nvme0n1p4@nvme0n1p4" -> "dm-2"
+	// Links from LUKS: /dev/nvme0n1p5
+	"@LUKS@nvme0n1p5@nvme0n1p5" -> "dm-11"
+	// Links for @Part: dm-6
+	"dm-6" -> "@Part: dm-6"
+	// Links for LVM@Unassigned PVs@PV@nvme0n1p6
+	"@Part: nvme0n1":"6" -> "LVM@Unassigned PVs@PV@nvme0n1p6"
+	// Links for LVM@eyak@PV@dm-0
+	"dm-0" -> "LVM@eyak@PV@dm-0"
+	// Links for LVM@eyak@PV@dm-2
+	"dm-2" -> "LVM@eyak@PV@dm-2"
+	// Links for LVM@eyak@PV@dm-11
+	"dm-11" -> "LVM@eyak@PV@dm-11"
+	// Links for LVM@eyak-init@PV@nvme0n1p2
+	"@Part: nvme0n1":"2" -> "LVM@eyak-init@PV@nvme0n1p2"
+	// Links for @LUKS@dm-5@dm-5
+	"dm-5" -> "@LUKS@dm-5@dm-5"
+	// Links for @LUKS@nvme0n1p3@nvme0n1p3
+	"@Part: nvme0n1":"3" -> "@LUKS@nvme0n1p3@nvme0n1p3"
+	// Links for @LUKS@nvme0n1p4@nvme0n1p4
+	"@Part: nvme0n1":"4" -> "@LUKS@nvme0n1p4@nvme0n1p4"
+	// Links for @LUKS@nvme0n1p5@nvme0n1p5
+	"@Part: nvme0n1":"5" -> "@LUKS@nvme0n1p5@nvme0n1p5"
+	// Links for @FS@/boot
+	"dm-9" -> "@FS@/boot"
+	// Links for @FS@/srv/chorale
+	"dm-13" -> "@FS@/srv/chorale"
+	// Links for @FS@/home
+	"dm-1" -> "@FS@/home"
+	// Links for @FS@/srv/photos
+	"dm-4" -> "@FS@/srv/photos"
+	// Links for @FS@/
+	"dm-3" -> "@FS@/"
+	// Links for @FS@/boot/efi
+	"@Part: nvme0n1":"1" -> "@FS@/boot/efi"
+	// Links for @libvirt@debiantesting@/home/vdanjean/dl/iso/chroot.img
+	"@FS@/home" -> "@libvirt@debiantesting@/home/vdanjean/dl/iso/chroot.img"
+	// Links for @libvirt@debiantesting@/home/vdanjean/dl/iso/debian-9.5.0-amd64-netinst.iso
+	"@FS@/home" -> "@libvirt@debiantesting@/home/vdanjean/dl/iso/debian-9.5.0-amd64-netinst.iso"
+}

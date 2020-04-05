@@ -13,11 +13,11 @@ TSQL::FlatFile - secret module by Ded MedVed
 
 =head1 VERSION
 
-Version 1.01
+Version 1.03
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 
 use Data::Dumper ;
@@ -45,7 +45,7 @@ sub crlf {
     
 }
 sub processLine {
-#warn Dumper @_;  
+
     my $self                    = shift or croak 'no self';
                 
     my $asciifile               = shift || croak 'no ascii file name';
@@ -133,7 +133,7 @@ sub processLine {
 
 
 sub getLinePositions {
-#warn Dumper @_;  
+ 
     my $self        = shift or croak 'no self';
     
     my $asciifile   = shift || croak 'no ascii file name';
@@ -154,10 +154,7 @@ sub getLinePositions {
     $cfile->header($cfile_fh);
     while ((my $row = $cfile->getline_hr  ($cfile_fh)) && ($li++ < $filepos)) {
         %csv_row = %$row;
-#say $li, $csv_row{capcode};
     }
-#say $li, $csv_row{capcode};
-    #warn Dumper keys %csv_row;
     my @vals = sort { length($csv_row{$b}) <=> length($csv_row{$a}) } keys %csv_row;
     
     $li=0;
@@ -167,9 +164,7 @@ sub getLinePositions {
     while (defined(my $row = <$afile> ) && ($li++ < $filepos)) {
         chomp $row;
         $ascii_row = $row;
-#say $li," ", $ascii_row;
     }
-#say $li," ", $ascii_row;    
     #say $ascii_row;
     my %positions ;
     foreach my $v (@vals){
@@ -198,77 +193,101 @@ sub getLinePositions {
 
     my $unmatchedamount = length($ascii_row) - $ascii_row =~ tr/^//;
 
-my @best_result          = @result;
-my $best_line            = $filepos; 
-my $best_unmatchedcount  = $unmatchedcount; 
-my $best_unmatchedamount = $unmatchedamount;
-
-#$li = $filepos;
-
-#exit;
-
-if  ($incrementalsearch && ( $best_unmatchedcount > 0 || $best_unmatchedamount > 0 ) ) {
-
-##    my $readnext = 1;
+    my @best_result          = @result;
+    my $best_line            = $filepos; 
+    my $best_unmatchedcount  = $unmatchedcount; 
+    my $best_unmatchedamount = $unmatchedamount;
     
-    while ((my $crow = $cfile->getline_hr  ($cfile_fh)) && (defined(my $row = <$afile> )) && ($li++ < $filepos+100 ) && ( $best_unmatchedcount > 0 || $best_unmatchedamount > 0 ) ) {
- 
-        %csv_row = %$crow;
-        
-#warn Dumper %csv_row;
-#warn Dumper keys %csv_row;
-        my @vals = sort { length($csv_row{$b}) <=> length($csv_row{$a}) } keys %csv_row;
-        
-        
-        chomp $row;
-        $ascii_row = $row;
+    if  ($incrementalsearch && ( $best_unmatchedcount > 0 || $best_unmatchedamount > 0 ) ) {
     
-#        say $li," ", $ascii_row;
-#say Dumper %csv_row;
-        my %positions ;
-        foreach my $v (@vals){
-            my $val = quotemeta($csv_row{$v})." *";
-            $ascii_row  =~ m/(?>$val)/;
-            $positions{$v} = [@-,@+];
-#warn Dumper $val  unless defined $` ;        
-#warn  $ascii_row unless defined $` ;
+        while ((my $crow = $cfile->getline_hr  ($cfile_fh)) && (defined(my $row = <$afile> )) && ($li++ < $filepos+100 ) && ( $best_unmatchedcount > 0 || $best_unmatchedamount > 0 ) ) {
     
-            $ascii_row = $`. "^"x length($&) . $';
-        }
+            %csv_row = %$crow;
+            
+    #warn Dumper %csv_row;
+    #warn Dumper keys %csv_row;
+            my @vals = sort { length($csv_row{$b}) <=> length($csv_row{$a}) } keys %csv_row;
+            
+            
+            chomp $row;
+            $ascii_row = $row;
         
-        my @sortedkeys = sort { $positions{$a}[0] <=> $positions{$b}[0]} keys %positions;
-        my @result = ();
-        {
-            my $i=0;
+    #        say $li," ", $ascii_row;
+    #say Dumper %csv_row;
+            my %positions ;
+            foreach my $v (@vals){
+                my $val = quotemeta($csv_row{$v})." *";
+                $ascii_row  =~ m/(?>$val)/;
+                $positions{$v} = [@-,@+];
+    #warn Dumper $val  unless defined $` ;        
+    #warn  $ascii_row unless defined $` ;
+        
+                $ascii_row = $`. "^"x length($&) . $';
+            }
+            
+            my @sortedkeys = sort { $positions{$a}[0] <=> $positions{$b}[0]} keys %positions;
+            my @result = ();
+            {
+                my $i=0;
+                foreach my $k (@sortedkeys) {
+                    $result[$i] = {key=>$k,start=>$positions{$k}[0],end=>$positions{$k}[1]};
+                    $i++;
+                }
+            }
+            
+            
+            my $unmatchedcount = 0;
             foreach my $k (@sortedkeys) {
-                $result[$i] = {key=>$k,start=>$positions{$k}[0],end=>$positions{$k}[1]};
-                $i++;
+                if ($positions{$k}[0] == $positions{$k}[1] ) {
+                    $unmatchedcount++;
+                };
+            };
+        
+            my $unmatchedamount = length($ascii_row) - $ascii_row =~ tr/^//;
+        
+            @best_result          = @result           if $unmatchedcount  < $best_unmatchedcount || $unmatchedamount < $best_unmatchedamount; 
+        
+            $best_line            = $li               if $unmatchedcount  < $best_unmatchedcount || $unmatchedamount < $best_unmatchedamount; 
+            $best_unmatchedcount  = $unmatchedcount   if $unmatchedcount  < $best_unmatchedcount; 
+            $best_unmatchedamount = $unmatchedamount  if $unmatchedamount < $best_unmatchedamount; 
+            
+            @result     = @best_result;
             }
         }
-        
-        
-        my $unmatchedcount = 0;
-        foreach my $k (@sortedkeys) {
-            if ($positions{$k}[0] == $positions{$k}[1] ) {
-                $unmatchedcount++;
-            };
-        };
     
-        my $unmatchedamount = length($ascii_row) - $ascii_row =~ tr/^//;
-    
-        @best_result          = @result           if $unmatchedcount  < $best_unmatchedcount || $unmatchedamount < $best_unmatchedamount; 
-    
-        $best_line            = $li               if $unmatchedcount  < $best_unmatchedcount || $unmatchedamount < $best_unmatchedamount; 
-        $best_unmatchedcount  = $unmatchedcount   if $unmatchedcount  < $best_unmatchedcount; 
-        $best_unmatchedamount = $unmatchedamount  if $unmatchedamount < $best_unmatchedamount; 
-        
-        @result     = @best_result;
-        }
-    }
-    return \{ positions => \@result, best_line => $best_line, best_unmatchedcount => $best_unmatchedcount, best_unmatchedamount => $best_unmatchedamount }  ;
+    return \{ positions => \@best_result, best_line => $best_line, best_unmatchedcount => $best_unmatchedcount, best_unmatchedamount => $best_unmatchedamount }  ;
 }
 
+sub printDebugData {
+#warn Dumper @_ ;    
+    my $self                = shift or croak 'no self';
+    my $asciifile           = shift || croak 'no ascii file name';
+    my $datalinenumber      = shift || croak 'no data line start position give';
+    my $columns             = shift || croak 'no columns given' ;
 
+#warn Dumper $columns ;
+    
+    my $li=0;
+    open(my $afile, "<", $asciifile)  or die "Could not open file $!";
+    my $row = <$afile>;
+    my $ascii_row = "";
+    while (defined(my $row = <$afile> ) && ($li++ < $datalinenumber)) { }    
+    while (defined(my $row = <$afile> ) && ($li++ < $datalinenumber + 20)) {
+        chomp $row;
+        $ascii_row = $row;
+        my $output_row = "";
+        my $first=1;
+        foreach my $col (@$columns) {
+            my $start = $col->{start};
+            my $length = $col->{end} - $start;
+            if (($length > 0 )) {
+                $output_row .= ($first? "":"|") . substr($ascii_row,$start,$length);
+                $first =0;
+            }
+        }
+        say $output_row;
+    }
+}
 sub flatten { return map { @$_} @_ } ;
 
 sub DESTROY {}

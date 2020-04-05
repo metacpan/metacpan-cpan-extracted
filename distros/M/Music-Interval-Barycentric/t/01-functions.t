@@ -68,4 +68,7 @@ is evenness_index($chords[7][2]), 2, 'evenness_index';
 is evenness_index($chords[8][0]), 1, 'evenness_index';
 is sprintf('%.3f', evenness_index($chords[8][1])), 3.536, 'evenness_index';
 
+is_deeply inversion($chords[0][0]), [5,3,4], 'inversion';
+is_deeply inversion($chords[6][0]), [6,1,3,2], 'inversion';
+
 done_testing();

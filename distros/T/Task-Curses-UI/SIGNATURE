@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,38 +12,39 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 62e2a9d0cf2da03ffefe86b79c916ecb8e981fb2 Changes
-SHA1 fda23a0b314432c4a81e8d7beb5290e9f0219c73 LICENSE
-SHA1 d98d8ab2aec2146356fffcd11e9d0e105f211a07 MANIFEST
-SHA1 a78a4573c386c08ef7b666358550a9641d895ecc META.yml
-SHA1 9c29452817316035a82041aea7da78f24738e23c Makefile.PL
-SHA1 ae4142b2ba4b2c58f14bf001e0ab0899554c7f0e README
-SHA1 e44421478da2774c9a5039ac373f80e2a9150076 UI.pm
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 4add860581ffacd3882a8d856fb9cab354becad0 t/Task-Curses-UI/01-use.t
-SHA1 6dbb58a645a05deba18fa5245aab82c5cfa428b9 t/Task-Curses-UI/02-version.t
-SHA1 656fec5e0e40a3334f76c2c9be1e8c69c8649bc1 xt/Task-Curses-UI/01-pod_coverage.t
-SHA1 f6d891ad9b14918a359e2876de26f1b3cdca4385 xt/Task-Curses-UI/02-pod.t
+SHA256 d31aba4818d8654a0ca15963d9c5cf83f474e39a1b7cb1fd9c1d776aee48f33c Changes
+SHA256 4fd520fd3174c7bc1875a90a588fe12fbd2268830d6275df890f9acb6b76ec7b LICENSE.artistic_2
+SHA256 b47dd6a3ac3bf4d241874909d8e985bccf84a062fcbda326ef686955f83f7f88 LICENSE.bsd
+SHA256 7add2be102af11dcb60a5a2edd5c0a23b0d437fc793cb408a9bcdc45f5acd122 MANIFEST
+SHA256 c25105d12df796f9127f60e2a57bc980570d35814d8df7267ad14043b4e19af0 META.yml
+SHA256 e90d1bc5053a34fe21a892fe50cfc98e2a695277eeaa2aa0570792960d95473e Makefile.PL
+SHA256 c133224b5e5ff697e6224ae3f92acc639d60cee5a5d5b53785d961df03fe19da README
+SHA256 03c2449ecde4eb9515f32ec5a07eb55d0b62595c64bf2f3478bce8eb42019bab UI.pm
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 474443bb450d47ecb6b8c78e9b28a717b1b6e41f7f2ef76eda52fd026457bcde t/Task-Curses-UI/01-use.t
+SHA256 9b9bd4e0402d12a3b9ec0bb0e33b9518a20a7aeb938e15dd64d48a9ba8556a9d t/Task-Curses-UI/02-version.t
+SHA256 f0a7013446b48e25d90505bdd43e09458f4ac4b24e566c159adcf9d7cb9c1f4f xt/Task-Curses-UI/01-pod_coverage.t
+SHA256 562d5b65ae19e46af53bab504b32a74f3670ec0fb9e9b18f93603e5a18fd3048 xt/Task-Curses-UI/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWOzZBAAoJEJe+XXKaIuTlAScH/2qgKXFvfDa/I+KfU5owfGUc
-JTC1wF16krF2k3eLwdOedG/LAFGoN77+IN/S1AWUiwfVXh9hJgp1ty9XnekfYjpW
-mEv+RwPMfYBGAJPfmW2eZWkuMzrwwRalWev08aZsveJzGW8YgthhFtntqr2SuM39
-VKoQH3PbShmalIDXIIyQ8CS2cwCRWgC77d6s7MMb9PC1BycHhdpsuTB/T5LyPacO
-DRcNVEtqZ5jFvGRNwo7fcqzc/vhEehvbOL8BD9KYIhIm4B+wZjHgy3d6g81ObuEG
-+6WlWTASvsCENRdbwDDm58L8CvEhBEHzp0z+ILEtYRFHiWF6AywAV8Cf0q/p2o8=
-=nQaQ
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl6J2lgACgkQKyiOZjWe
+rHaevgf+PKfPhQvtINdOzcSH9LPXmSkXel1atgM+43iS77LW92Ifb9dfqsUrvgdP
+gsocFz8yr7ZzAeM7R84gAcWMT+3AciFy3ps04qNYwR7cXSxr4KY3zU4KVBg66EI0
+J6rTWZXdbgX4qSnkOjBqo3iyemmyywJkGkNv+jDq1oULsDAoeuvSK4IvydkU6L2m
+ymyFAnTCvT7bchMna51lNXQ3wd8Q9Czs+An1tqGBYOX5BUKttEoZejFrz+yrCJKX
+lMzMloqIy+p0LvUGWBYGS4pbyNOfn73mZvTVfUAe1XPIuJ5t2dd5eStIlKokQL8V
+cIgexHaGk6I8JG9QBeuIHkbvX/N0cQ==
+=VTTo
 -----END PGP SIGNATURE-----

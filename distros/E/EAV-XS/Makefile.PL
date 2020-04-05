@@ -1,5 +1,6 @@
 use strict;
 use ExtUtils::MakeMaker 5.62;
+use Config;
 
 # The libeav options:
 # * RFC6531_FOLLOW_RFC20 = ON | OFF     - disallow some chars by RFC 20
@@ -22,6 +23,13 @@ sub myconfigure() {
         elsif ($^O eq "solaris") {
             $cfg->{'DEFINE'} = "-DEAV_EXTRA -m64";
             $cfg->{'dynamic_lib'}->{'OTHERLDFLAGS'} = "-m64";
+        }
+        elsif ($^O eq "MSWin32") {
+            $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.windows-gmake";
+
+            if ($Config{'cf_by'} eq "strawberry-perl") {
+                $cfg->{'macro'}->{'LIBEAV_OPTIONS'} .= " CC=$Config{'ccname'}";
+            }
         }
 
         return $cfg;
@@ -68,6 +76,13 @@ EOF
     elsif ($^O eq "solaris") {
         $cfg->{'DEFINE'} = "-DEAV_EXTRA -m64";
         $cfg->{'dynamic_lib'}->{'OTHERLDFLAGS'} = "-m64";
+    }
+    elsif ($^O eq "MSWin32") {
+        $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.windows-gmake";
+
+        if ($Config{'cf_by'} eq "strawberry-perl") {
+            $cfg->{'macro'}->{'LIBEAV_OPTIONS'} .= " CC=$Config{'ccname'}";
+        }
     }
 
     return $cfg;

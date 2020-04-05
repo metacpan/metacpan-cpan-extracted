@@ -20,7 +20,7 @@ my %params = (
 
 if ($ENV{SANITIZE}) {
     ($params{CCFLAGS}||='') .= ' -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer';
-    push $params{LIBS}->@*, qw/-lubsan -lasan/
+    push @{$params{LIBS}}, qw/-lubsan -lasan/
 }
 
 if ($ENV{DEV}) {

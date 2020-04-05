@@ -5,7 +5,7 @@
 [![Travis Build Status](https://travis-ci.org/telatin/FASTQ-Parser.svg?branch=master)](https://travis-ci.org/telatin/FASTQ-Parser)
 [![Kwalitee](https://cpants.cpanauthors.org/release/PROCH/FASTX-Reader-0.05.svg)](https://cpants.cpanauthors.org/release/PROCH/FASTX-Reader-0.60)
 
-### An OOP Perl module to parse FASTA and FASTQ files
+### A Perl module to parse FASTA and FASTQ files
 
 This is a package built using Heng Li's _readfq()_ subroutine ([link](https://github.com/lh3/readfq)). For updated documentation, please visit *[Meta::CPAN](https://metacpan.org/pod/FASTX::Reader)*.
 

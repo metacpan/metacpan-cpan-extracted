@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Mojolicious::Plugin::Moai",
   "PREREQ_PM" => {
-    "Mojolicious" => 8,
+    "Mojolicious" => "8.31",
     "Role::Tiny" => "2.000001"
   },
   "TEST_REQUIRES" => {
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test2::API" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t t/menu/*.t t/test/role/*.t"
   }
@@ -40,7 +40,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Mojolicious" => 8,
+  "Mojolicious" => "8.31",
   "Role::Tiny" => "2.000001",
   "Test2::API" => 0,
   "Test::More" => "1.001005"

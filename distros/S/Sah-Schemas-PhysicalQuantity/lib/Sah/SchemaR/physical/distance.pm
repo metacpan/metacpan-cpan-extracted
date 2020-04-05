@@ -1,7 +1,7 @@
 package Sah::SchemaR::physical::distance;
 
-our $DATE = '2020-03-11'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-04-04'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $rschema = ["obj",[{examples=>[{valid=>0,value=>"10 s"},{valid=>0,value=>10}],isa=>"Physics::Unit",prefilters=>["PhysicalQuantity::convert_from_str",["PhysicalQuantity::check_type",{is=>"Distance"}]],summary=>"A physical distance"}],["obj"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::physical::distance - A physical distance
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::physical::distance (from Perl distribution Sah-Schemas-PhysicalQuantity), released on 2020-03-11.
+This document describes version 0.002 of Sah::SchemaR::physical::distance (from Perl distribution Sah-Schemas-PhysicalQuantity), released on 2020-04-04.
 
 =head1 DESCRIPTION
 

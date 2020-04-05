@@ -22,6 +22,8 @@ t/12-path.t
 t/13-path-lib.t
 t/14-file.t
 t/15-file-compile.t
+t/16-macro.t
+t/17-macro-compile.t
 t/lib/out/BasicAttributes.pmc
 t/lib/out/Before.pmc
 t/lib/out/ExtendsBasicAttributes.pmc

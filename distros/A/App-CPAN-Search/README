@@ -22,7 +22,7 @@ EXAMPLE
      cpan-search Module::Install
 
 REPOSITORY
-    <https://github.com/tupinek/App-CPAN-Search>
+    <https://github.com/michal-josef-spacek/App-CPAN-Search>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -30,9 +30,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015-2018 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2015-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

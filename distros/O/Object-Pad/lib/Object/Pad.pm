@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Carp;
 
@@ -132,15 +132,8 @@ and thus it must either already exist, or be locatable via the usual C<@INC>
 mechanisms.
 
 The superclass must either be implemented by C<Object::Pad>, or be some class
-whose instances are blessed hash references.
-
-In the latter case, all C<Object::Pad>-based subclasses derived from it will
-store their instance data in a key called C<"Object::Pad/slots">, which is
-fairly unlikely to clash with existing storage on the instance. The exact
-format of the value stored here is not specified and may change between module
-versions, though it can be relied on to be well-behaved as some kind of perl
-data structure for purposes of modules like L<Data::Dumper> or serialisation
-into things like C<YAML> or C<JSON>.
+whose instances are blessed hash references. For more detail on this latter
+case see L<SUBCLASSING CLASSIC PERL CLASSES>.
 
 An optional version check can also be supplied; it performs the equivalent of
 
@@ -237,6 +230,61 @@ within the body. As long as you write code that is in a clean, modern style
 find any new restrictions to be majorly problematic. Either the code will
 continue to run unaffected, or you may have to make some small alterations to
 bring it into a conforming style.
+
+=head1 SUBCLASSING CLASSIC PERL CLASSES
+
+There are a number of details specific to the case of deriving an
+C<Object::Pad> class from an existing classic Perl class that is not
+implemented using C<Object::Pad>.
+
+=head2 Storage of Instance Data
+
+Instances will store their data in a key called C<"Object::Pad/slots">, which
+is fairly unlikely to clash with existing storage on the instance. The exact
+format of the value stored here is not specified and may change between module
+versions, though it can be relied on to be well-behaved as some kind of perl
+data structure for purposes of modules like L<Data::Dumper> or serialisation
+into things like C<YAML> or C<JSON>.
+
+=head2 Object State During Methods Invoked By Superclass Constructor
+
+It is common in classic Perl OO style to invoke methods on C<$self> during
+the constructor. This is supported here since C<Object::Pad> version 0.19.
+Note however that any methods invoked by the superclass constructor may not
+see the object in a fully consistent state. (This fact is not specific to
+using C<Object::Pad> and would happen in classic Perl OO as well). The slot
+initialisers will have been invoked but the C<BUILD> methods will not.
+
+For example; in the following
+
+   package ClassicPerlBaseClass {
+      sub new {
+         my $self = bless {}, shift;
+         say "Value seen by superconstructor is ", $self->get_value;
+         return $self;
+      }
+      sub get_value { return "A" }
+   }
+
+   class DerivedClass extends ClassicPerlBaseClass {
+      has $_value = "B";
+      method BUILD {
+         $_value = "C";
+      }
+      method get_value { return $_value }
+   }
+
+   my $obj = DerivedClass->new;
+   say "Value seen by user is ", $obj->get_value;
+
+Until the C<ClassicPerlBaseClass::new> superconstructor has returned the
+C<BUILD> method will not have been invoked. The C<$_value> slot will still
+exist, but its value will be C<B> during the superconstructor. After the
+superconstructor, the C<BUILD> methods are invoked before the completed object
+is returned to the user. The result will therefore be:
+
+   Value seen by superconstructor is B
+   Value seen by user is C
 
 =head1 STYLE SUGGESTIONS
 

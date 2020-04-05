@@ -1,3 +1,9 @@
+0.094   2020-04-06  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with Perinci::CmdLine::Inline 0.548 (support
+          --page-result).
+
+
 0.093   2019-09-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Add actions: shuf (along with its option --repeat [-r]), as-aoaos,

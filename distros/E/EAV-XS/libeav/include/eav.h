@@ -49,20 +49,20 @@ typedef struct eav_result_s {
 
 /* eav.c utf-8 callback */
 #ifdef HAVE_IDNKIT
-typedef eav_result_t
+typedef eav_result_t *
 (*eav_utf8_f)  (idn_resconf_t,
                 idn_action_t,
                 const char *,
                 size_t,
                 bool tld_check);
 #else
-typedef eav_result_t
+typedef eav_result_t *
 (*eav_utf8_f) (const char *, size_t, bool);
 #endif
 
 
 /* eav.c ascii callback */
-typedef eav_result_t (*eav_ascii_f) (const char *,
+typedef eav_result_t * (*eav_ascii_f) (const char *,
                                      size_t,
                                      bool);
 
@@ -82,7 +82,7 @@ typedef struct eav_s {
 #endif
     eav_utf8_f      utf8_cb;
     eav_ascii_f     ascii_cb;
-    eav_result_t    result;
+    eav_result_t    *result;
 } eav_t;
 
 
@@ -250,36 +250,43 @@ is_special_domain (const char *start, const char *end);
 /*
  * is_822_email: check email address as defined in RFC 822.
  */
-extern eav_result_t
+extern eav_result_t *
 is_822_email (const char *email, size_t length, bool tld_check);
 
 /*
  * is_5321_email: check email address as defined in RFC 5321.
  */
-extern eav_result_t
+extern eav_result_t *
 is_5321_email (const char *email, size_t length, bool tld_check);
 
 /*
  * is_5322_email: check email address as defined in RFC 5322.
  */
-extern eav_result_t
+extern eav_result_t *
 is_5322_email (const char *email, size_t length, bool tld_check);
 
 /*
  * is_6531_email: check email address as defined in RFC 6531.
  */
 #ifdef HAVE_IDNKIT
-extern eav_result_t
+extern eav_result_t *
 is_6531_email  (idn_resconf_t ctx,
                 idn_action_t actions,
                 const char *email,
                 size_t length,
                 bool tld_check);
 #else
-extern eav_result_t
+extern eav_result_t *
 is_6531_email  (const char *email,
                 size_t length,
                 bool tld_check);
 #endif /* HAVE_IDNKIT */
+
+/*
+ * eav_result_free: free eav_result_t structure.
+ */
+extern void
+eav_result_free (eav_result_t *result);
+
 
 #endif /* EAV_H */

@@ -18,10 +18,12 @@ t/011_bulk_inserts.t
 t/011_bulk_updates.t
 t/012_bulk_inserts_cursor.t
 t/013_sqlwhere.t
+t/014_AutoCommit.t
 Todo
 scripts/DBIx-Array-tablename.pl
 scripts/DBIx-Array-bind_param.pl
 scripts/DBIx-Array-export-xls.pl
 scripts/DBIx-Array-export-xls.pl.xls
 perl-DBIx-Array.spec
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,44 +3,40 @@ use Moo;
 use MooX::LazierAttributes;
 use MooX::ValidateSubs;
 with qw/World/;
-use Scalar::Util qw/reftype/ ;
+use Scalar::Util qw/reftype/;
 use JSON;
 
 use Types::Standard qw/Str HashRef ArrayRef Object/;
 
 has one => (
-	is => "ro",
-	default => sub { { okay => 'one'} }
+	is      => "ro",
+	default => sub { { okay => 'one' } }
 );
 
 has two => (
-	is => "rw",
-	isa => Str,
-	default => sub { 'the world is flat' }
+	is      => "rw",
+	isa     => Str,
+	default => sub {'the world is flat'}
 );
 
 has three => (
-	is => "rw",
-	isa => Str,
-	default => sub { 'the world is flat' }
+	is      => "rw",
+	isa     => Str,
+	default => sub {'the world is flat'}
 );
 
-validate_subs
-	four => {
-		params => {
-			message => [Str, sub {'four'}]
-		}
-	};
+validate_subs four => { params => { message => [ Str, sub {'four'} ] } };
 
 sub four { return $_[1]->{message} }
+
 sub five {
-	my $caller = caller();
+	my $caller  = caller();
 	my @allowed = qw(main);
-	unless ($caller eq __PACKAGE__ || grep { $_ eq $caller } @allowed) {
+	unless ( $caller eq __PACKAGE__ || grep { $_ eq $caller } @allowed ) {
 		die "cannot call private method five from $caller";
 	}
-	return $_[0]->six 
+	return $_[0]->six;
 }
-sub ten { reftype bless {}, 'Flat::World' }
+sub ten    { reftype bless {}, 'Flat::World' }
 sub eleven { encode_json { flat => "world" } }
 1;

@@ -1,6 +1,7 @@
 package Rose::DB::Object::Metadata::Auto;
 
 use strict;
+no warnings 'uninitialized';
 
 use Carp();
 
@@ -133,6 +134,7 @@ sub auto_generate_columns
 
       my $table_unquoted = $db->unquote_table_name($table);
 
+      my $supports_catalog = $db->supports_catalog;
       $catalog = $self->auto_formatted_catalog($db);
       $schema  = $self->auto_formatted_schema($db);
 
@@ -153,7 +155,7 @@ sub auto_generate_columns
 
           $col_info->{'TABLE_NAME'} = $db->unquote_table_name($col_info->{'TABLE_NAME'});
 
-          next COLUMN unless($col_info->{'TABLE_CAT'}   eq $catalog &&
+          next COLUMN unless((!$supports_catalog || $col_info->{'TABLE_CAT'} eq $catalog) &&
                              $col_info->{'TABLE_SCHEM'} eq $schema &&
                              $col_info->{'TABLE_NAME'}  eq $table_unquoted);
         }

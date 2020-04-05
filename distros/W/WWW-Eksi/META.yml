@@ -18,10 +18,10 @@ name: WWW-Eksi
 provides:
   WWW::Eksi:
     file: lib/WWW/Eksi.pm
-    version: '0.32'
+    version: '0.33'
   WWW::Eksisozluk:
     file: lib/WWW/Eksisozluk.pm
-    version: '0.32'
+    version: '0.33'
 requires:
   Carp: '0'
   DateTime: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/kyzn/WWW-Eksi/issues
   homepage: https://github.com/kyzn/WWW-Eksi
   repository: https://github.com/kyzn/WWW-Eksi.git
-version: '0.32'
+version: '0.33'
 x_contributor_covenant:
   version: 0.02
 x_contributors:

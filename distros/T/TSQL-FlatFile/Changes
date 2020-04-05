@@ -2,3 +2,11 @@ Revision history for TSQL-FlatFile
 
 1.00    Date/time
         First version, released on an unsuspecting world.  Broken.
+1.01    02/04/2020
+        Does some searching for best matches from a start position.
+1.02    02/04/2020
+        Given a set of file positions prints some lines formatted with that info.
+1.03    04/04/2020
+        Realign column numbers in format file.
+        Generate skeleton table.
+        

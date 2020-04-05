@@ -23,8 +23,8 @@ tm_new_engine('Ebay::BuyItNow');
 
 diag("Sending 0-page buy-it-now query...");
 $iDebug = 0;
-# This test returns no results (but we should not get an HTTP error):
-tm_run_test('normal', $WWW::Search::Test::bogus_query, 0, 0, $iDebug);
+# This test returns no results (but we should not get any error):
+WWW::Search::Test::_tm_run_test('normal', $WWW::Search::Test::bogus_query, 0, 0, $iDebug, 0);
 
 # DEBUG_NOW:
 pass;
@@ -84,7 +84,7 @@ my @ao = $WWW::Search::Test::oSearch->results();
 cmp_ok(0, '<', scalar(@ao), 'got some results');
 my @ara;
 push @ara, [
-            url => like => qr{\Ahttp://(cgi|www)\d*\.ebay\.com},
+            url => like => qr{\Ahttps?://(cgi|www)\d*\.ebay\.com},
             'result URL is really from ebay.com'
            ];
 push @ara, [

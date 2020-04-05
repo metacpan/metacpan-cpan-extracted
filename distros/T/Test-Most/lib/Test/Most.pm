@@ -33,7 +33,7 @@ BEGIN {
     $OK_FUNC = \&Test::Builder::ok;
 }
 
-our $VERSION = '0.35';
+our $VERSION = '0.37';
 $VERSION = eval $VERSION;
 
 BEGIN {
@@ -278,15 +278,17 @@ sub set_failure_handler {
 
 {
     no warnings 'redefine';
+    my $orig_destroy = Test::Builder->can('DESTROY');
 
     # we need this because if the failure is on the final test, we won't have
     # a subsequent test triggering the behavior.
-    sub Test::Builder::DESTROY {
+    *Test::Builder::DESTROY = sub {
         my $builder = $_[0];
         if ( $builder->{TEST_MOST_test_failed} ) {
             ( $builder->{TEST_MOST_failure_action} || sub {} )->();
         }
-    }
+        $orig_destroy->(@_) if $orig_destroy;
+    };
 }
 
 sub _deferred_plan_handler {

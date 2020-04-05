@@ -2514,7 +2514,7 @@ The same "multi many" caveats apply, but the C<multi_many_ok> parameter is not r
 
 I hope you've learned something from this tutorial.  Although it is by no means a complete tour of all of the features of L<Rose::DB::Object>, it does hit most of the highlights.  This tutorial will likely expand in the future, and a separate document describing the various ways that  L<Rose::DB::Object> can be extended is also planned.  For now, there is a brief overview that was pulled from the L<Rose::DB::Object> mailing list in the wiki.
 
-http://code.google.com/p/rose/wiki/RDBOExtending
+https://github.com/siracusa/rose/wiki/Extending-Rose%3A%3ADB%3A%3AObject
 
 See the L<support|/SUPPORT> section below for more information on the mailing list.
 

@@ -27,7 +27,7 @@ diag("Sending 0-page seller ID query...");
 $iDebug = 0;
 $iDump = 0;
 # This test returns no results (but we should not get an HTTP error):
-tm_run_test('normal', $WWW::Search::Test::bogus_query, 0, 0, $iDebug, $iDump);
+WWW::Search::Test::_tm_run_test('normal', $WWW::Search::Test::bogus_query, 0, 0, $iDebug, $iDump, 0);
 
 goto SKIP_MULTI;
 pass('no-op');
@@ -60,7 +60,7 @@ tm_run_test('normal', 'oldschool2017', 1, 199, $iDebug, $iDump);
 my @ao = $WWW::Search::Test::oSearch->results();
 cmp_ok(0, '<', scalar(@ao), 'got some results');
 my @ara = (
-           ['url', 'like', qr{\Ahttp://(cgi|www)\d*\.ebay\.com}, 'URL is really from ebay.com'],
+           ['url', 'like', qr{\Ahttps?://(cgi|www)\d*\.ebay\.com}, 'URL is really from ebay.com'],
            ['title', 'ne', 'q{}', 'Title is not empty'],
            ['change_date', 'date', 'change_date is really a date'],
            ['description', 'like', qr{Item #\d+;}, 'description contains item #'],

@@ -146,7 +146,7 @@ get_lpart(self)
     PREINIT:
         const char *lpart;
     CODE:
-        lpart = self->result.lpart;
+        lpart = self->result->lpart;
 
         if (lpart != NULL)
             RETVAL = newSVpv(lpart, 0);
@@ -164,7 +164,7 @@ get_domain(self)
     PREINIT:
         const char *domain;
     CODE:
-        domain = self->result.domain;
+        domain = self->result->domain;
 
         if (domain != NULL)
             RETVAL = newSVpv(domain, 0);
@@ -180,7 +180,7 @@ bool
 get_is_ipv4(self)
         EAV::XS     self
     CODE:
-        RETVAL = self->result.is_ipv4;
+        RETVAL = self->result->is_ipv4;
     OUTPUT:
         RETVAL
 
@@ -191,7 +191,7 @@ bool
 get_is_ipv6(self)
         EAV::XS     self
     CODE:
-        RETVAL = self->result.is_ipv6;
+        RETVAL = self->result->is_ipv6;
     OUTPUT:
         RETVAL
 
@@ -202,6 +202,6 @@ bool
 get_is_domain(self)
         EAV::XS     self
     CODE:
-        RETVAL = self->result.is_domain;
+        RETVAL = self->result->is_domain;
     OUTPUT:
         RETVAL

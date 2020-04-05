@@ -8,7 +8,7 @@ use Benchmark qw{ timethese };
 # Read two samples files if the user didnt provide any filename
 unless ($ARGV[0]) {
  say STDERR "[WARNING] No input file specified, using test data";
- push(@ARGV,"$RealBin/../data/test.fastq", "$RealBin/../data/test.fasta" );
+ push(@ARGV,"$RealBin/../data/interleaved.fq.gz", "$RealBin/../data/illumina_nocomm.fq" );
  say STDERR<<END;
  Counter.pl - Script using FASTX::Reader to count sequences in FASTA/FASTQ files
  -------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ my $fq = $load . q(
 
 say $fx;
 say $fq;
-timethese( 10000, {
+timethese( 1000, {
         FxReader    => $fx,
         FqReader    => $fq,
   });

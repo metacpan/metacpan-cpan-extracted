@@ -1,3 +1,22 @@
+0.06 2020-04-05T16:04:58+02:00
+ - Add example to doc.
+ - Add test for error in reverese transliteration.
+ - Remove trailing code from test (argument setting).
+ - Rewrite doc to using POD =head2 for methods.
+ - Update doc to reality.
+
+0.05 2020-04-03T19:03:46+02:00
+ - Add some tests.
+ - Change behaviour of run() to return exit code. And run exit in script to
+   return value.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.04 2016-04-27T20:23:00+02:00
  - Fix example (implement --version).
 

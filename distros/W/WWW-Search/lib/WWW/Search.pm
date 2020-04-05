@@ -1,7 +1,6 @@
 # Search.pm
 # by John Heidemann
 # Copyright (C) 1996 by USC/ISI
-# $Id: Search.pm,v 2.565 2008-11-29 05:52:08 Martin Exp $
 #
 # A complete copyright notice appears at the end of this file.
 
@@ -99,7 +98,7 @@ use vars qw( @ISA @EXPORT @EXPORT_OK );
 our
 $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 our
-$VERSION = do { my @r = (q$Revision: 2.565 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = 2.566;
 
 =item new
 
@@ -646,8 +645,15 @@ sub logout
 
 =item approximate_result_count
 
-Some backends indicate how many results they have found.
-Typically this is an approximate value.
+Some backends indicate how many results they have found,
+e.g. with a number shown at the top of the search results page.
+Note that there is no corresponding method that returns the actual count of results;
+that's because results are normally retrieved in batches (i.e. pages)
+and at any given time there's no way to know how big the final list of results will be.
+NEW: if request has not been made to the search provider, 
+this method will return undef (used to return zero).
+NEW: if the results page does not explicitly indicate the result count,
+this method will return undef (used to return zero).
 
 =cut
 
@@ -663,7 +669,7 @@ sub approximate_result_count
     {
     # Caller is trying to SET the value:
     DEBUG_ARC && print STDERR " + a_r_cSET(state=$self->{state},iArg=$iArg)\n";
-    $self->{'approx_count'} =  $iArg;
+    $self->{'approx_count'} = $iArg;
     return $iArg;
     } # if
   if (
@@ -679,8 +685,8 @@ sub approximate_result_count
     # Prime the pump, if necessary:
     $self->retrieve_some();
     } # if
-  $iArg = $self->{'approx_count'} || 0;
-  # print STDERR " + a_r_cGET(state=$self->{state},answer=$iArg)\n";
+  $iArg = $self->{'approx_count'};
+  DEBUG_ARC && print STDERR " + a_r_cGET(state=$self->{state},answer=$iArg)\n";
   return $iArg;
   } # approximate_result_count
 
@@ -998,7 +1004,6 @@ sub reset_search
   $self->{'requests_made'} = 0;
   $self->{'state'} = SEARCH_BEFORE;
   $self->{'_next_url'} = '';
-  $self->{'approx_count'} = 0;
   # This method is called by native_query().  native_query() is called
   # either by gui_query() or by the user.  In the case that
   # gui_query() was called, we do NOT want to clear out the _options

@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::deps;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '1.045'; # VERSION
+our $DATE = '2020-04-04'; # DATE
+our $VERSION = '1.046'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::lcpan::Cmd::deps - List dependencies
 
 =head1 VERSION
 
-This document describes version 1.045 of App::lcpan::Cmd::deps (from Perl distribution App-lcpan), released on 2020-03-04.
+This document describes version 1.046 of App::lcpan::Cmd::deps (from Perl distribution App-lcpan), released on 2020-04-04.
 
 =head1 FUNCTIONS
 
@@ -131,7 +131,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 

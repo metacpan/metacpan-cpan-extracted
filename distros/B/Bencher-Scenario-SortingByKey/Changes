@@ -1,0 +1,11 @@
+0.002   2019-12-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated weaver plugin which shows participant's
+          description in POD. Split results per dataset.
+
+
+0.001   2019-12-25  Released-By: PERLANCAR
+
+        - First release.

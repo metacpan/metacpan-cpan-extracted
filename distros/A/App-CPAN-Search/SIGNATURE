@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,39 +14,40 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA512
 
-SHA1 a4677abf46da20f0dc547f387225f4528284d6ee Changes
-SHA1 1531e20e801192e06dc1c07629829c7ac5bff92a LICENSE
-SHA1 b478c512a2bd480cf4d32a6edab304a8694c54f0 MANIFEST
-SHA1 0222f990104a1a5daac7d757bf046e258003e272 META.yml
-SHA1 5976bda0e320beb97919185f36fb0228181252c2 Makefile.PL
-SHA1 e9f789bb1dde38e8c937114fcb9f338e07b318ce README
-SHA1 4f69932c14bd8ff268abd017d849155f8ce2a8ba Search.pm
-SHA1 cbc086008e614392644a403c88886eb4b0dac0d3 bin/cpan-search
-SHA1 fa84ab21f117e1b41125fe8dc2652559a24e66c7 examples/ex1.pl
-SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
-SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
-SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
-SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
-SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
-SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
-SHA1 78f307119470d0c85d7d6496e76fc95cb939b462 inc/Module/Install/Scripts.pm
-SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
-SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
-SHA1 b5819a94b52958d959889fd67915e1147ad8fc86 t/App-CPAN-Search/01-use.t
-SHA1 d24162fa09e5f2e42e41cdb5bfd83120657f8dd3 t/App-CPAN-Search/02-version.t
-SHA1 1928000a2298f62201101ac98189a681f6b49797 xt/App-CPAN-Search/01-pod_coverage.t
-SHA1 818e8fb948bf0e2320d3481894ad0ad39f8de9fd xt/App-CPAN-Search/02-pod.t
+SHA256 9601840e2c6c84558c9bcc74004fa0e8349bfbb1aa5d93525cb2511684addf34 Changes
+SHA256 b47dd6a3ac3bf4d241874909d8e985bccf84a062fcbda326ef686955f83f7f88 LICENSE
+SHA256 bf526f8e7786133914ef4af6306da1c495cc3d0b38214375c0ee0f4a262f2b4b MANIFEST
+SHA256 fee8ddefb73f9ce10034e936c6e3fa50c57c9cbec50a5ac2e3960a1e05a3f0b9 META.yml
+SHA256 865a73a4bdf1fefa6778ab5d09ab7cac9e48ca1b6bf57cfad845b10b7950284d Makefile.PL
+SHA256 36f9f3dbb49d8eb6d183232d472e9369b0da205da8efa2830860f7531a3a7b2b README
+SHA256 e97bdf643d84e85eec0cbda0a5fb2f8168353fbab99aa8ce46bd218c5f619393 Search.pm
+SHA256 6211bf099dad743f34d46c322e4beecf4bee80fcff6e149ecf748a2c373b2c3a bin/cpan-search
+SHA256 3625b89f1eaa5c1176673cdb87425d6cfea600cb8e24413015a5c02a2e966203 examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 b5db794933d2898464b4dee92077b24d5b661c3984f4868f7f3b68e52436f61a t/App-CPAN-Search/01-use.t
+SHA256 e2afb213746dd419c3868c8f4a43e6f24bb582f1023a887217da76ca58027b02 t/App-CPAN-Search/02-version.t
+SHA256 874459cbd94261120ebf03a21eaea097b9f08d43c4adc09ffc47bd21e8b704f9 t/App-CPAN-Search/03-new.t
+SHA256 2353dbaa2db8f05d5c2b7dadbb8c942ad96dac79b3bf6a4d51d536d4cb334f6c xt/App-CPAN-Search/01-pod_coverage.t
+SHA256 3e093e5c3b7b1c72f7a02d5cfc914a2521952d86072c7372f011bf276ca45251 xt/App-CPAN-Search/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAlp6pesACgkQKyiOZjWe
-rHZj+Qf+INg145kcxrl7cxSLNS8tQVl3tLGrHyKLe0dzZwQb58kS54JsRFx04fPF
-69wRm4RSwkuUkMs6ysFT2/caLcHzQ9I0SOziSE4+evUvx86703S60McUqWkBkKmJ
-5AWE5/Uk/AA38Fq3f5Thcf1YwLM3pcrbJhAqvPzIz8mpudXdVxKOy5UB+WF2m2pB
-Fx/jzAcF/doiOCI0luwplcrnnnIxfeKumIOb+CZq4hVnSuP0O5RMyktJ42IiNcsR
-/FNdm44xHM3LqhZLc65ctAsuT4a/yokBsnkWv8kIjQm7cvfrMMNYe3QcM6Rg+JmZ
-xcbMi8uha/kuRURrWG5nCjcKt6xGWQ==
-=s7lQ
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl6J38MACgkQKyiOZjWe
+rHZlVwf8CreGFkmkQVWoUPGvNFfnM6cP2uwiQXbVuVue1cbZmhJ/B5jqCrKW6XBu
+d0vNzvw1hrNyoScsxsZK6EtSzT5LUGW1SEAh5F8aGhFTK4e2slyjfcx7ru6SMOWU
+NFq4fnsNb0Lmzi+8zLpONC0ak0lguDp9IYScVhFsgAjMTfh1xTozH/eBAplWchi1
+Xc1R8tVGftjOdaX0638En2SKQjCjeNnNU083dpAk3qNO+n6elxsnfm0uZ+WRCfUX
+IMGib47N7BjlQknEOP/TGtUQdilzjboS7vX5hXXt9FiYxiXIiTwYLKS23U2DU0wj
+tylGmkKUUlO4pflwfqqTEclHpUNXFw==
+=aBVj
 -----END PGP SIGNATURE-----

@@ -1,0 +1,210 @@
+NAME
+    App::VitaminUtils - Utilities related to vitamins
+
+VERSION
+    This document describes version 0.001 of App::VitaminUtils (from Perl
+    distribution App-VitaminUtils), released on 2020-04-04.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   convert-vitamin-a-unit
+
+    *   convert-vitamin-d-unit
+
+    *   convert-vitamin-e-unit
+
+FUNCTIONS
+  convert_vitamin_a_unit
+    Usage:
+
+     convert_vitamin_a_unit(%args) -> [status, msg, payload, meta]
+
+    Convert a vitamin A quantity from one unit to another.
+
+    Examples:
+
+    *   Show all possible conversions:
+
+         convert_vitamin_a_unit(quantity => "mcg");
+
+        Result:
+
+         [
+           { amount => 0.001, unit => "mg" },
+           { amount => 3.33333333333333, unit => "IU-retinol" },
+           { amount => 1.66666666666667, unit => "IU-beta-carotene" },
+         ]
+
+    *   Convert from mcg to IU (retinol):
+
+         convert_vitamin_a_unit(quantity => "1500 mcg", to_unit => "IU"); # -> 5000
+
+    *   Convert from mcg to IU (retinol):
+
+         convert_vitamin_a_unit(quantity => "1500 mcg", to_unit => "IU-retinol"); # -> 5000
+
+    *   Convert from mcg to IU (beta-carotene):
+
+         convert_vitamin_a_unit(quantity => "1500 mcg", to_unit => "IU-beta-carotene"); # -> 2500
+
+    *   Convert from IU to mg:
+
+         convert_vitamin_a_unit(quantity => "5000 IU", to_unit => "mg"); # -> 1.5
+
+    If target unit is not specified, will show all known conversions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quantity* => *str*
+
+    *   to_unit => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  convert_vitamin_d_unit
+    Usage:
+
+     convert_vitamin_d_unit(%args) -> [status, msg, payload, meta]
+
+    Convert a vitamin D quantity from one unit to another.
+
+    Examples:
+
+    *   Show all possible conversions:
+
+         convert_vitamin_d_unit(quantity => "mcg");
+
+        Result:
+
+         [
+           { amount => 1, unit => "mcg" },
+           { amount => 0.001, unit => "mg" },
+           { amount => 40, unit => "IU" },
+         ]
+
+    *   Convert from mcg to IU:
+
+         convert_vitamin_d_unit(quantity => "2 mcg", to_unit => "IU"); # -> 80
+
+    *   Convert from IU to mg:
+
+         convert_vitamin_d_unit(quantity => "5000 IU", to_unit => "mg"); # -> 0.125
+
+    If target unit is not specified, will show all known conversions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quantity* => *str*
+
+    *   to_unit => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  convert_vitamin_e_unit
+    Usage:
+
+     convert_vitamin_e_unit(%args) -> [status, msg, payload, meta]
+
+    Convert a vitamin E quantity from one unit to another.
+
+    Examples:
+
+    *   Show all possible conversions:
+
+         convert_vitamin_e_unit(quantity => "mg");
+
+        Result:
+
+         [
+           { amount => 1, unit => "mg" },
+           { amount => 1.49253731343284, unit => "IU-natural" },
+           { amount => 1.11111111111111, unit => "IU-synthetic" },
+         ]
+
+    *   Convert from mg to IU (d-alpha-tocopherol/natural vitamin E):
+
+         convert_vitamin_e_unit(quantity => "67 mg", to_unit => "IU"); # -> 100
+
+    *   Convert from mg to IU (d-alpha-tocopherol/natural vitamin E):
+
+         convert_vitamin_e_unit(quantity => "67 mg", to_unit => "IU-natural"); # -> 100
+
+    *   Convert from mg to IU (dl-alpha-tocopherol/synthetic vitamin E):
+
+         convert_vitamin_e_unit(quantity => "90 mg", to_unit => "IU-synthetic"); # -> 100
+
+    *   Convert from IU to mg:
+
+         convert_vitamin_e_unit(quantity => "400 IU", to_unit => "mg"); # -> 268
+
+    If target unit is not specified, will show all known conversions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quantity* => *str*
+
+    *   to_unit => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-VitaminUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-VitaminUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-VitaminUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Physics::Unit
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

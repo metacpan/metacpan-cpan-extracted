@@ -11,7 +11,7 @@ use App::CPAN::Search;
 );
 
 # Run.
-App::CPAN::Search->new->run;
+exit App::CPAN::Search->new->run;
 
 # Output like:
 # Reading '/home/skim/.local/share/.cpan/Metadata'

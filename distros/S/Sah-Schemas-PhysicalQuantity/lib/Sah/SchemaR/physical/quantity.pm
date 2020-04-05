@@ -1,7 +1,7 @@
 package Sah::SchemaR::physical::quantity;
 
-our $DATE = '2020-03-11'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-04-04'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $rschema = ["obj",[{examples=>[],isa=>"Physics::Unit",prefilters=>["PhysicalQuantity::convert_from_str"],summary=>"A physical quantity"}],["obj"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::physical::quantity - A physical quantity
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::physical::quantity (from Perl distribution Sah-Schemas-PhysicalQuantity), released on 2020-03-11.
+This document describes version 0.002 of Sah::SchemaR::physical::quantity (from Perl distribution Sah-Schemas-PhysicalQuantity), released on 2020-04-04.
 
 =head1 DESCRIPTION
 

@@ -24,7 +24,7 @@ MANDIR ?= $(DATAROOTDIR)/man
 
 MAJOR_VERSION = 0
 MINOR_VERSION = 2
-PATCH_VERSION = 0
+PATCH_VERSION = 1
 VERSION = $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 
 DLL_EXT ?= so
@@ -47,29 +47,29 @@ ifeq ($(FORCE_IDN),idnkit)
 $(info > Force using idnkit)
 WITH_IDN = idnkit
 IDNKIT_DIR ?= /usr/local
-DEFS = -DHAVE_IDNKIT -I$(IDNKIT_DIR)/include
-LIBS = -L$(IDNKIT_DIR)/lib -lidnkit
-LIBS_STATIC = -L$(IDNKIT_DIR)/lib -lidnkit
+DEFS ?= -DHAVE_IDNKIT -I$(IDNKIT_DIR)/include
+LIBS ?= -L$(IDNKIT_DIR)/lib -lidnkit
+LIBS_STATIC ?= -L$(IDNKIT_DIR)/lib -lidnkit
 PARTIAL = $(wildcard partial/idnkit/*.c)
 OBJECTS += $(patsubst  partial/idnkit/%.c,  partial/idnkit/%.o, $(PARTIAL))
 else ifeq ($(FORCE_IDN),idn2)
 $(info > Force using libidn2)
 WITH_IDN = idn2
-DEFS = -DHAVE_LIBIDN2 $(shell $(PKG_CONFIG) --cflags libidn2)
-LIBS = $(shell $(PKG_CONFIG) --libs libidn2)
-LIBS_STATIC = $(shell $(PKG_CONFIG) --static --libs libidn2)
+DEFS ?= -DHAVE_LIBIDN2 $(shell $(PKG_CONFIG) --cflags libidn2)
+LIBS ?= $(shell $(PKG_CONFIG) --libs libidn2)
+LIBS_STATIC ?= $(shell $(PKG_CONFIG) --static --libs libidn2)
 PARTIAL = $(wildcard partial/idn2/*.c)
 OBJECTS += $(patsubst  partial/idn2/%.c,  partial/idn2/%.o, $(PARTIAL))
 else ifeq ($(FORCE_IDN),idn)
 $(info > Force using libidn)
 WITH_IDN = idn
-DEFS = -DHAVE_LIBIDN $(shell $(PKG_CONFIG) --cflags libidn)
-LIBS_STATIC = $(shell $(PKG_CONFIG) --static --libs libidn)
-LIBS = $(shell $(PKG_CONFIG) --libs libidn)
+DEFS ?= -DHAVE_LIBIDN $(shell $(PKG_CONFIG) --cflags libidn)
+LIBS ?= $(shell $(PKG_CONFIG) --libs libidn)
+LIBS_STATIC ?= $(shell $(PKG_CONFIG) --static --libs libidn)
 PARTIAL = $(wildcard partial/idn/*.c)
 OBJECTS += $(patsubst  partial/idn/%.c,  partial/idn/%.o, $(PARTIAL))
 else
-$(error ! Unknown IDN library type)
+$(error !!! Unknown IDN library type)
 endif
 else
 $(info > Looking for idn library ...)
@@ -102,12 +102,12 @@ endif
 endif
 
 ifeq ($(RFC6531_FOLLOW_RFC5322),ON)
-DEFS += -DRFC6531_FOLLOW_RFC5322
+CPPFLAGS += -DRFC6531_FOLLOW_RFC5322
 export RFC6531_FOLLOW_RFC5322
 endif
 
 ifeq ($(RFC6531_FOLLOW_RFC20),ON)
-DEFS += -DRFC6531_FOLLOW_RFC20
+CPPFLAGS += -DRFC6531_FOLLOW_RFC20
 export RFC6531_FOLLOW_RFC20
 endif
 
@@ -149,12 +149,12 @@ $(BIN_TARGET): $(DLL_TARGET)
 $(BIN_TARGET_STATIC): $(LIB_TARGET)
 	$(MAKE) -C bin static
 
-$(DLL_TARGET): depend $(OBJECTS)
+$(DLL_TARGET): $(OBJECTS)
 	# library -> shared linkage
 	$(CC) -shared $(LDFLAGS) -Iinclude -Wl,-soname,$(DLL_TARGET) \
 		-o $(DLL_TARGET) $(OBJECTS) $(LIBS)
 
-$(LIB_TARGET): depend $(OBJECTS)
+$(LIB_TARGET): $(OBJECTS)
 	# library -> static linkage
 	$(AR) rcs $@ $(OBJECTS)
 
@@ -202,8 +202,7 @@ libeav.pc: libeav.pc.in
 
 clean: clean-tests clean-bin
 	# cleanup
-	$(RM) $(DLL_TARGET) $(LIB_TARGET) $(OBJECTS) \
-	Makefile.depend libeav.pc
+	$(RM) $(DLL_TARGET) $(LIB_TARGET) $(OBJECTS) libeav.pc
 
 clean-tests:
 	$(MAKE) -C tests clean
@@ -252,11 +251,3 @@ install-man:
 #----------------------------------------------------------#
 
 .PHONY: all debug check clean docs install libs libeav.pc
-
-depend: Makefile.depend
-Makefile.depend:
-	$(CC) $(CFLAGS) -MM -MG $(SOURCES) > $@
-
--include Makefile.depend
-
-.DELETE_ON_ERROR:

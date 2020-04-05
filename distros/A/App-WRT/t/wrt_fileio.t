@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -11,14 +11,13 @@ use App::WRT::FileIO;
 my $io = App::WRT::FileIO->new();
 
 my @dir_list = $io->dir_list('example', 'alpha', '^wrt[.]json$');
-diag(@dir_list);
 ok(
   $dir_list[0] eq 'wrt.json',
   'got wrt.json from dir_list'
-);
+) or diag(@dir_list);
 
 my $get_contents = $io->file_get_contents('example/wrt.json');
 ok(
   $get_contents =~ m/entry_dir/,
-  'got an expected string in wrt.json'
-);
+  'got an expected string - entry_dir - in wrt.json'
+) or diag($get_contents);

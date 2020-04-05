@@ -1,7 +1,9 @@
 package Sah::Schemas::YouTube;
 
-our $DATE = '2016-07-22'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-11'; # DATE
+our $DIST = 'Sah-Schemas-YouTube'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to YouTube
@@ -18,7 +20,7 @@ Sah::Schemas::YouTube - Sah schemas related to YouTube
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::YouTube (from Perl distribution Sah-Schemas-YouTube), released on 2016-07-22.
+This document describes version 0.003 of Sah::Schemas::YouTube (from Perl distribution Sah-Schemas-YouTube), released on 2020-03-11.
 
 =head1 HOMEPAGE
 
@@ -48,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

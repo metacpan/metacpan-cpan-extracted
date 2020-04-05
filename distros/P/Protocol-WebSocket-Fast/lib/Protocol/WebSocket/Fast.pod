@@ -1,0 +1,214 @@
+=head1 NAME
+
+Protocol::WebSocket::Fast - very fast WebSocket protocol implementation
+
+
+
+=head1 SYNOPSIS
+
+    use Protocol::WebSocket::Fast::ClientParser;
+    use Protocol::WebSocket::Fast::ServerParser;
+
+    my $client = Protocol::WebSocket::Fast::ClientParser->new;
+    my $req_str = $client->connect_request({
+        uri           => "ws://example.com/",
+        ws_protocol   => "chat",
+        ws_extensions => [ [ 'permessage-deflate'] ],
+    });
+
+    my $server = Protocol::WebSocket::Fast::ServerParser->new;
+    my $req    = $server->accept($req_str);
+
+    my $accept_reply_str = $req->error ? $server->accept_error : $server->accept_response;
+    my $reply = $client->connect($accept_reply_str);   # => isa 'Protocol::WebSocket::Fast::ConnectResponse'
+    $client->established;
+    $client->is_deflate_active;
+
+    # control frames
+    my $data = $client->send_control(OPCODE_PING, "hello");
+    my ($frame) = $server->get_frames($data);
+
+    $frame->payload;        # 'hello'
+    $frame->payload_length; # 5
+    $frame->is_control;     # true
+    $frame->opcode;         # OPCODE_PING
+    $frame->final;          # true
+
+    # send message split by frame
+    my $sender = $server->start_message(opcode => OPCODE_TEXT, final => 0, deflate => 0);
+    my $data1 = $sender->send("Lorem ");
+    my $data2 = $sender->send("ipsum ");
+    my $data3 = $sender->send("dolor ", 1); # final frame
+
+    my ($message) = $client->get_messages($data);
+
+    $message->opcode;                         # OPCODE_TEXT
+    $message->is_control;                     # 0
+    $message->payload_length;                 # 18
+    $message->payload;                        # 'Lorem ipsum dolor '
+    $message->frame_count;                    # 3
+
+    # convenient way just to send message
+    my $data = $client->send_message(deflate => 1, payload => 'sit amet, ');
+
+    # pieces merged into single frame/message
+    my $data = $client->send_message(deflate => 0, payload => ['consectetur ', 'adipiscing ', 'elit.']);
+    
+    # iterator api
+    my $it = $server->get_frames($data);
+    while (my $frame = $it->next) { ... }
+
+    # pieces are send as frames; a bit faster, when you already have your data and compression is turned off
+    my $data = $client->send_message_multiframe(deflate => 0, payload => \@data);
+    my $it = $server->get_messages($data_7);
+    my $message = $it->next;
+    $message->frame_count; # 3
+
+    # server/client configuration
+    $client->configure({
+        max_frame_size     => 1024 * 10,
+        max_message_size   => 1024 * 100,
+        max_handshake_size => 1024 * 5,
+        deflate            => {             # always on by default
+            compression_threshold => 0,     # compress all TEXT-frames
+        },
+    });
+
+    # completely disable compression; effective before connection establishment
+    $client->no_deflate;
+
+
+
+=head1 DESCRIPTION
+
+C<Protocol::WebSocket::Fast> is a port of C<panda::protocol::websocket>, extremely fast server/client zero-copy
+incremental WebSocket parser and serialization library (L<rfc6455|https://tools.ietf.org/html/rfc6455>) with Perl and C++ interface.
+
+The library supports compression (a.k.a. per-message deflate extension, see
+L<rfc7692|https://tools.ietf.org/html/rfc7692>) via C<zlib> C library, which
+is enabled by default for all text messages exceeding TCP max segment
+size (1410 bytes).
+
+The module has dual Perl/C++ interface (see L<XS::Manifesto>) so further
+XS-bindings can be written on the top of C<Protocol::WebSocket::Fast> (see L<UniEvent::WebSocket>).
+
+The <Protocol::WebSocket::Fast> is B<not> drop-in replacement of <Protocol::WebSocket>,
+as it uses sligthly different API.
+
+
+
+=head1 PERFORMANCE
+
+Compared to C<Protocol::WebSocket>. Tests were performed on Xeon v3-2687W 2.9Ghz, Debian 10.
+
+Parsing websocket packet with 200 bytes payload.
+    
+                                 Rate   Protocol::WebSocket  Protocol::WebSocket::Fast
+    Protocol::WebSocket       68593/s                     --                    -97%
+    Protocol::WebSocket::Fast 2360644/s                  3342%                      --
+
+    
+
+=head1 CONSTANTS
+
+=head2 Opcodes
+
+=over
+
+=item OPCODE_CONTINUE
+
+=item OPCODE_TEXT
+
+=item OPCODE_BINARY
+
+=item OPCODE_CLOSE
+
+=item OPCODE_PING
+
+=item OPCODE_PONG
+
+=back
+
+=head2 Close codes
+
+=over
+
+=item CLOSE_DONE
+
+=item CLOSE_AWAY
+
+=item CLOSE_PROTOCOL_ERROR
+
+=item CLOSE_INVALID_DATA
+
+=item CLOSE_UNKNOWN
+
+=item CLOSE_ABNORMALLY
+
+=item CLOSE_INVALID_TEXT
+
+=item CLOSE_BAD_REQUEST
+
+=item CLOSE_MAX_SIZE
+
+=item CLOSE_EXTENSION_NEEDED
+
+=item CLOSE_INTERNAL_ERROR
+
+=item CLOSE_TLS
+
+=back
+
+
+
+=head1 REFERENCE
+
+L<Protocol::WebSocket::Fast::ClientParser>
+
+L<Protocol::WebSocket::Fast::ServerParser>
+
+L<Protocol::WebSocket::Fast::Parser>
+
+L<Protocol::WebSocket::Fast::ConnectRequest>
+
+L<Protocol::WebSocket::Fast::ConnectResponse>
+
+L<Protocol::WebSocket::Fast::Message>
+
+L<Protocol::WebSocket::Fast::MessageIterator>
+
+L<Protocol::WebSocket::Fast::Frame>
+
+L<Protocol::WebSocket::Fast::FrameIterator>
+
+L<Protocol::WebSocket::Fast::FrameSender>
+
+L<Protocol::WebSocket::Fast::Error>
+
+
+
+=head1 SEE ALSO
+
+L<rfc6455|https://tools.ietf.org/html/rfc6455>
+
+L<rfc7692|https://tools.ietf.org/html/rfc7692>
+
+L<Protocol::HTTP>
+
+L<Protocol::WebSocket>
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+Ivan Baidakou <dmol@cpan.org>, Crazy Panda LTD
+
+
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

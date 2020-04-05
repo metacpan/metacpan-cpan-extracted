@@ -26,10 +26,13 @@ is_utf8_domain (int *r,
     if (start == end)
         return inverse(EEAV_DOMAIN_EMPTY);
 
-    *r = idn2_lookup_ul (start, &domain, IDN2_NONTRANSITIONAL);
+#if IDN2_VERSION_NUMBER >= 0x02000000
+    *r = idn2_to_ascii_8z (start, &domain, IDN2_NONTRANSITIONAL);
+#else
+    *r = idn2_lookup_ul (start, &domain, 0);
+#endif
 
     if (*r != IDN2_OK) {
-//        printf ("error: idn2_lookup_ul = %d: %s\n", *r, idn2_strerror (*r));
         iserr = true; rc = EEAV_IDN_ERROR;
         goto done;
     }

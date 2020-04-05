@@ -8,7 +8,7 @@ use List::Util qw(sum);
 use DBI;
 use DBIx::Array::Session::Action;
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -121,7 +121,7 @@ Bless directly into a class
 
 sub new {
   my $this  = shift;
-  my $class = ref($this) || $this;
+  my $class = ref($this) ? ref($this) : $this;
   my $self  = {};
   bless $self, $class;
   $self->initialize(@_);
@@ -1218,7 +1218,7 @@ sub bulksqlupdatearrayarray {
   my $size              = @$arrayarray;
   my @tuple_status      = (); #pass to set $tupples
   my ($tupples, $count) = $sth->execute_for_fetch( sub {shift @$arrayarray}, \@tuple_status);
-  warn("Warning: Atempted $size transactions but only $tupples where successful.") unless $size == $tupples;
+  warn("Warning: Attempted $size transactions but only $tupples where successful.") unless $size == $tupples;
   #warn Dumper \@tuple_status;
   unless (defined($count) and $count >= 0) {
     $count = sum(0, grep {$_ > 0} grep {not ref($_)} @tuple_status);
@@ -1391,7 +1391,7 @@ sub dbms_name {shift->dbh->get_info(17)};
 
 =head1 Methods (Session Management)
 
-These methods allow the setting of Oracle session features that are available in the v$session table.  If other databases support these features, please let me know.  But, as it stands, these method are non operational unless SQL_DBMS_NAME is Oracle.
+These methods allow the setting of Oracle session features that are available in the v$session table.  If other databases support these features, please let me know.  But, as it stands, these methods are non operational unless SQL_DBMS_NAME is Oracle.
 
 =head2 module
 

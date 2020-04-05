@@ -1,7 +1,7 @@
 package App::td;
 
-our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.093'; # VERSION
+our $DATE = '2020-04-05'; # DATE
+our $VERSION = '0.094'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -533,7 +533,7 @@ App::td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.093 of App::td (from Perl distribution App-td), released on 2019-09-15.
+This document describes version 0.094 of App::td (from Perl distribution App-td), released on 2020-04-05.
 
 =head1 FUNCTIONS
 
@@ -674,6 +674,7 @@ Arguments.
 
 Allow duplicates.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -721,7 +722,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

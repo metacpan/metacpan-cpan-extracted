@@ -1,11 +1,9 @@
 package Dicom::File::Detect;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use Readonly;
 
@@ -13,18 +11,19 @@ use Readonly;
 Readonly::Array our @EXPORT => qw(dicom_detect_file);
 Readonly::Scalar our $DCM_MAGIC => qw{DICM};
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Detect DICOM file.
 sub dicom_detect_file {
 	my $file = shift;
+
 	my $dcm_flag = 0;
 	open my $fh, '<', $file or err "Cannot open file '$file'.";
 	my $seek = seek $fh, 128, 0;
 	my $magic;
 	my $read = read $fh, $magic, 4;
 	close $fh or err "Cannot close file '$file'.";
+
 	if ($magic eq $DCM_MAGIC) {
 		return 1;
 	} else {
@@ -47,6 +46,7 @@ Dicom::File::Detect - Detect DICOM file through magic string.
 =head1 SYNOPSIS
 
  use Dicom::File::Detect qw(dicom_detect_file);
+
  my $dcm_flag = dicom_detect_file($file);
 
 =head1 DESCRIPTION
@@ -58,14 +58,13 @@ See L<DICOM on Wikipedia|https://en.wikipedia.org/wiki/DICOM>.
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<dicom_detect_file>
 
-=item C<dicom_detect_file($file)>
+ my $dcm_flag = dicom_detect_file($file);
 
- Detect DICOM file.
- Returns 1/0.
+Detect DICOM file.
 
-=back
+Returns 1/0.
 
 =head1 ERRORS
 
@@ -75,11 +74,9 @@ See L<DICOM on Wikipedia|https://en.wikipedia.org/wiki/DICOM>.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Dicom::File::Detect qw(dicom_detect_file);
  use File::Temp qw(tempfile);
  use IO::Barf qw(barf);
@@ -113,11 +110,9 @@ See L<DICOM on Wikipedia|https://en.wikipedia.org/wiki/DICOM>.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Dicom::File::Detect qw(dicom_detect_file);
 
  # Arguments.
@@ -162,21 +157,22 @@ Install the Dicom modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Dicom-File-Detect>
+L<https://github.com/michal-josef-spacek/Dicom-File-Detect>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

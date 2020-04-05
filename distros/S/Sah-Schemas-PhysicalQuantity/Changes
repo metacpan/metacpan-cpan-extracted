@@ -1,3 +1,8 @@
+0.002   2020-04-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: physical::type, physical::unit.
+
+
 0.001   2020-03-11  Released-By: PERLANCAR
 
         - First release.

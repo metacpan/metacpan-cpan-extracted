@@ -44,6 +44,7 @@
             "List::Util" : "0",
             "Modern::Perl" : "0",
             "Readonly" : "0",
+            "Regexp::Exhaustive" : "0",
             "Smart::Comments" : "0",
             "Spreadsheet::ParseExcel" : "0",
             "Spreadsheet::WriteExcel" : "0",
@@ -60,6 +61,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

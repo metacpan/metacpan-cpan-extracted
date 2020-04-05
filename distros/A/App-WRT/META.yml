@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: App-WRT
 provides:
   App::WRT:
     file: lib/App/WRT.pm
-    version: v6.3.1
+    version: v7.0.0
   App::WRT::Date:
     file: lib/App/WRT/Date.pm
   App::WRT::EntryStore:
@@ -28,27 +28,33 @@ provides:
     file: lib/App/WRT/Image.pm
   App::WRT::Markup:
     file: lib/App/WRT/Markup.pm
+  App::WRT::Mock::FileIO:
+    file: lib/App/WRT/Mock/FileIO.pm
   App::WRT::Renderer:
     file: lib/App/WRT/Renderer.pm
+  App::WRT::Sort:
+    file: lib/App/WRT/Sort.pm
   App::WRT::Util:
     file: lib/App/WRT/Util.pm
 requires:
-  Data::Dumper: '0'
-  Exporter: '0'
-  File::Basename: '0'
-  File::Copy: '0'
-  File::Spec: '0'
-  Getopt::Long: '0'
-  HTML::Entities: '0'
-  Image::Size: '0'
-  JSON: '0'
-  POSIX: '0'
+  Data::Dumper: '2.170'
+  Exporter: '5.73'
+  File::Basename: '2.85'
+  File::Copy: '2.33'
+  File::Spec: '3.74'
+  Getopt::Long: '2.5'
+  HTML::Entities: '3.69'
+  Image::Size: '3.300'
+  JSON: '4.02'
+  JSON::Feed: '0.001'
+  Mojo::DOM: '0'
+  POSIX: '1.84'
   Text::Markdown::Discount: '0.11'
-  Text::Textile: '0'
-  Time::HiRes: '0'
+  Text::Textile: '2.13'
+  Time::HiRes: '1.9759'
   XML::Atom::SimpleFeed: '0.900'
-  perl: v5.10.0
+  perl: v5.14.0
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: v6.3.1
+version: v7.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

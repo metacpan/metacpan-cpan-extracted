@@ -1,13 +1,14 @@
 #!perl
 
-our $DATE = '2018-02-08'; # DATE
-our $VERSION = '0.321'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-03'; # DATE
+our $DIST = 'App-shcompgen'; # DIST
+our $VERSION = '0.322'; # VERSION
 # FRAGMENT id=shcompgen-nohint
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 
 use App::shcompgen;
 use Perinci::CmdLine::Any;
@@ -42,7 +43,7 @@ shcompgen - Generate shell completion scripts
 
 =head1 VERSION
 
-This document describes version 0.321 of shcompgen (from Perl distribution App-shcompgen), released on 2018-02-08.
+This document describes version 0.322 of shcompgen (from Perl distribution App-shcompgen), released on 2020-04-03.
 
 =head1 SYNOPSIS
 
@@ -267,13 +268,11 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
@@ -328,13 +327,17 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
 =item B<--no-env>
 
 Do not read environment for default options.
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =item B<--quiet>
 
@@ -642,7 +645,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

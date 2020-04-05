@@ -1,8 +1,10 @@
 Changes
 lib/TSQL/FlatFile.pm
 gen-FormatFile.pl
+gen-SkeletonTable.pl
+renumber-FormatFile.pl
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST			                    This list of files
 README
 t/00-load.t
 t/manifest.t

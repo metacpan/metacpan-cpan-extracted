@@ -1,9 +1,9 @@
 package App::cpanmodules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-26'; # DATE
+our $DATE = '2020-03-25'; # DATE
 our $DIST = 'App-cpanmodules'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -244,7 +244,7 @@ App::cpanmodules - The Acme::CPANModules CLI
 
 =head1 VERSION
 
-This document describes version 0.005 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2019-12-26.
+This document describes version 0.006 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2020-03-25.
 
 =head1 SYNOPSIS
 
@@ -275,6 +275,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<module>* => I<perl::modname>
+
 
 =back
 
@@ -310,6 +311,7 @@ Arguments ('*' denotes required arguments):
 =item * B<mentions> => I<perl::modname>
 
 =item * B<module> => I<perl::modname>
+
 
 =back
 
@@ -348,6 +350,7 @@ Arguments ('*' denotes required arguments):
 
 Include additional attributes from each entry.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -378,6 +381,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<module>* => I<perl::modname>
+
 
 =back
 
@@ -417,13 +421,15 @@ L<App::CPANModulesUtils> provides some other CLI's related to Acme::CPANModules.
 L<lcpan> also has some subcommands (supplied by
 L<App::lcpan::CmdBundle::cpanmodules>) to query Acme::CPANModules modules.
 
+L<App::CPANAuthorsUtils> for L<Acme::CPANAuthors>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

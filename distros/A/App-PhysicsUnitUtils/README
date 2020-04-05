@@ -1,0 +1,92 @@
+NAME
+    App::PhysicsUnitUtils - Utilities related to Physics::Unit
+
+VERSION
+    This document describes version 0.002 of App::PhysicsUnitUtils (from
+    Perl distribution App-PhysicsUnitUtils), released on 2020-04-04.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   convert-unit
+
+FUNCTIONS
+  convert_unit
+    Usage:
+
+     convert_unit(%args) -> [status, msg, payload, meta]
+
+    Convert a physical quantity from one unit to another.
+
+    Examples:
+
+    *   Show all possible conversions for speed:
+
+         convert_unit(quantity => "m/s");
+
+        Result:
+
+         [
+           { amount => 3.33564095198152e-09, unit => "c" },
+           { amount => 3.28083989501312, unit => "fps" },
+           { amount => 3600000000000, unit => "knot" },
+           { amount => 3600000000000, unit => "knots" },
+           { amount => 3.6, unit => "kph" },
+           { amount => 0.001, unit => "kps" },
+           { amount => 2.2369362920544, unit => "mph" },
+           { amount => 1, unit => "mps" },
+           { amount => 3.33564095198152e-09, unit => "speed-of-light" },
+         ]
+
+    *   Convert from meters/sec to kilometers/hour:
+
+         convert_unit(quantity => "40 m/s", to_unit => "kph"); # -> 144
+
+    If target unit is not specified, will show all known conversions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quantity* => *str*
+
+    *   to_unit => *physical::unit*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PhysicsUnitUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PhysicsUnitUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PhysicsUnitUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Physics::Unit
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

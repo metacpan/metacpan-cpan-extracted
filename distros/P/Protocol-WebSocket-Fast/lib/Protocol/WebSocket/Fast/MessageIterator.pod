@@ -1,0 +1,45 @@
+=head1 NAME
+
+Protocol::WebSocket::Fast::MessageIterator - WebSocket message iterator class
+
+
+
+=head1 DESCRIPTION
+
+The class allows developer traverse on parsed websocket messages.
+
+You cannot instantiate an object of the class direcly, it can be accessed
+only via L<Protocol::WebSocket::Fast::Parser> or L<Protocol::WebSocket::Fast::FrameIterator>.
+
+
+
+=head1 METHODS
+
+=head2 next()
+
+Returns next unvisited L<Protocol::WebSocket::Fast::Message> parsed from receive buffer;
+otherwise (i.e. when end of buffer is reached) it returns C<undef>.
+
+
+=head2 get_frames()
+
+Returns L<Protocol::WebSocket::Fast::FrameIterator>, if there is any unread frames left.
+Otherwise it returns C<undef>.
+
+See L<Protocol::WebSocket::Fast::Parser> for more details on switching between frame and message modes.
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::WebSocket::Fast>
+
+L<Protocol::WebSocket::Fast::FrameIterator>
+
+L<Protocol::WebSocket::Fast::Message>
+
+L<Protocol::WebSocket::Fast::Parser>
+
+L<rfc6455|https://tools.ietf.org/html/rfc6455>
+
+=cut

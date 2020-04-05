@@ -1,0 +1,151 @@
+digraph "machine"{
+	rankdir=LR;
+	{ "@Part: sda" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">ATA MZ7KM240HMHQ0D3</TD> </TR><TR><TD >/dev/sda<BR/>Label: msdos<BR/>Size: 224 GiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 992 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/sda1<BR/>Size: 3.72 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="yellow">
+						/dev/sda2<BR/>Size: 19.6 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="3" BGCOLOR="lightgrey">
+						/dev/sda3<BR/>Size: 22.4 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD>
+							<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+							<TD PORT="4" BGCOLOR="mediumorchid1">
+							/dev/sda4<BR/>Size: 178 GiB
+							</TD></TR><TR><TD>
+							<TABLE >
+								<TR>
+									<TD PORT="5" BGCOLOR="yellow">
+									/dev/sda5<BR/>Size: 178 GiB
+									</TD>
+								</TR>
+							</TABLE>
+							</TD></TR></TABLE>
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 600 kiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000004:pink;0.016660:pink;0.087478:pink;0.099975:pink;0.795875:green;0.000003";
+	]; }
+	{ "@Part: sdb" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">ATA MZ7KM480HMHQ0D3</TD> </TR><TR><TD >/dev/sdb<BR/>Label: gpt<BR/>Size: 447 GiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="lightgrey">
+						/dev/sdb1<BR/>primary<BR/>Size: 112 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 4.47 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="lightgrey">
+						/dev/sdb2<BR/>primary<BR/>Size: 107 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 4.47 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="3" BGCOLOR="lightgrey">
+						/dev/sdb3<BR/>primary<BR/>Size: 107 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 4.47 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="4" BGCOLOR="lightgrey">
+						/dev/sdb4<BR/>primary<BR/>Size: 103 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 4.47 GiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000002:pink;0.249998:green;0.009999:pink;0.240000:green;0.010001:pink;0.240000:green;0.010001:pink;0.229999:green;0.010000";
+	]; }
+	subgraph "cluster_@FS" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@FS@SWAP" [
+			label="SWAP\nDevice: /dev/sda1\nswap\nSize: 3.72 GiB\nFree: 3.72 GiB\nUsed: 0 B";
+			style=striped;fillcolor="green"
+		]; }
+		{ "@FS@/" [
+			label="/\nDevice: /dev/sda2\next4\nSize: 19.1 GiB\nFree: 8.11 GiB\nUsed: 10.0 GiB";
+			style=striped;fillcolor="pink;0.575949.2:green"
+		]; }
+		{ "@FS@/tmp" [
+			label="/tmp\nDevice: /dev/sda5\next4\nSize: 175 GiB\nFree: 166 GiB\nUsed: 59.4 MiB";
+			style=striped;fillcolor="pink;0.051254.2:green"
+		]; }
+		label="Mounted FS and swap";
+	}
+	subgraph "cluster_@libvirt" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		label="Libvirt Virtual Machines";
+	}
+	// Links for @FS@SWAP
+	"@Part: sda":"1" -> "@FS@SWAP"
+	// Links for @FS@/
+	"@Part: sda":"2" -> "@FS@/"
+	// Links for @FS@/tmp
+	"@Part: sda":"5" -> "@FS@/tmp"
+}

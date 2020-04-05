@@ -21,7 +21,7 @@ our @ISA = qw(Rose::Object);
 
 our $Error;
 
-our $VERSION = '0.781';
+our $VERSION = '0.782';
 
 our $Debug = 0;
 
@@ -1523,6 +1523,8 @@ sub _get_primary_key_column_names
 
   my @columns;
 
+  my $supports_catalog = $self->supports_catalog;
+
   PK: while(my $pk_info = $sth->fetchrow_hashref)
   {
     CHECK_TABLE: # Make sure this column is from the right table
@@ -1532,7 +1534,7 @@ sub _get_primary_key_column_names
       $pk_info->{'TABLE_NAME'} = 
         $self->unquote_table_name($pk_info->{'TABLE_NAME'});
 
-      next PK  unless($pk_info->{'TABLE_CAT'}   eq $catalog &&
+      next PK  unless((!$supports_catalog || $pk_info->{'TABLE_CAT'} eq $catalog) &&
                       $pk_info->{'TABLE_SCHEM'} eq $schema &&
                       $pk_info->{'TABLE_NAME'}  eq $table);
     }

@@ -109,6 +109,7 @@ foreach my $db_type (qw(pg mysql informix sqlite))
     next  unless($class->meta->column($col));
 
     my $o = $class->new;
+
     $o->save;
 
     ok(!has_modified_columns($o), "has_modified_columns $col 1 - $db_type");

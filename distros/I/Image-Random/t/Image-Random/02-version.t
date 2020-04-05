@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Image::Random::VERSION, 0.08, 'Version.');
+is($Image::Random::VERSION, 0.09, 'Version.');

@@ -1,3 +1,9 @@
+0.548   2020-04-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Support common option --page-result like in
+	  Perinci::CmdLine::Lite.
+
+
 0.547   2020-02-18  Released-By: PERLANCAR; Urgency: medium
 
        - Add options:

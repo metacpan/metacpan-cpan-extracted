@@ -1,0 +1,18 @@
+MODULE = Protocol::WebSocket::Fast                PACKAGE = Protocol::WebSocket::Fast::ClientParser
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Protocol::WebSocket::Fast::Parser");
+}
+
+ClientParser* new (SV* CLASS) {
+    RETVAL = new ClientParser();
+    PROTO = CLASS;
+}
+
+string ClientParser::connect_request (ConnectRequestSP req)
+
+ConnectResponseSP ClientParser::connect (string buf) {
+    RETVAL = THIS->connect(buf);
+}
+

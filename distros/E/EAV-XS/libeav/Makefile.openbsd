@@ -25,7 +25,7 @@ MANDIR ?= $(DATAROOTDIR)/man
 
 MAJOR_VERSION = 0
 MINOR_VERSION = 2
-PATCH_VERSION = 0
+PATCH_VERSION = 1
 VERSION = $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 
 DLL_EXT ?= so
@@ -164,12 +164,12 @@ ${BIN_TARGET_STATIC}: ${LIB_TARGET}
 	RFC6531_FOLLOW_RFC20="${RFC6531_FOLLOW_RFC20}" \
 	${MAKE} -f Makefile.openbsd -C bin
 
-${DLL_TARGET}: depend ${OBJECTS}
+${DLL_TARGET}: ${OBJECTS}
 	# library -> shared linkage
 	${CC} -shared ${LDFLAGS} -Iinclude -Wl,-soname,${DLL_TARGET} \
 		-o ${DLL_TARGET} ${OBJECTS} ${LIBS}
 
-${LIB_TARGET}: depend ${OBJECTS}
+${LIB_TARGET}: ${OBJECTS}
 	# library -> static linkage
 	${AR} rcs $@ ${OBJECTS}
 
@@ -239,8 +239,7 @@ libeav.pc: libeav.pc.in
 
 clean: clean-tests clean-bin
 	# cleanup
-	${RM} ${DLL_TARGET} ${LIB_TARGET} ${OBJECTS} \
-	Makefile.depend libeav.pc
+	${RM} ${DLL_TARGET} ${LIB_TARGET} ${OBJECTS} libeav.pc
 
 clean-tests:
 	env _defs="${DEFS}" \
@@ -345,11 +344,3 @@ install-man:
 #----------------------------------------------------------#
 
 .PHONY: all debug check clean docs install libs libeav.pc
-
-depend: Makefile.depend
-Makefile.depend:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -MM -MG $(SOURCES) > $@
-
--include "Makefile.depend"
-
-.DELETE_ON_ERROR:

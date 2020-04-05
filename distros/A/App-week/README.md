@@ -17,7 +17,10 @@ Options:
     -Y[n]   Display n years of calender
     -c n    Display calendar in n column (default 3).
 
-    --colormap  FIELD=COLOR
+Color options:
+
+    --colormap  Specify colormap
+    --rgb24     Use 24bit RGB color ANSI sequence
 
 Module options:
 
@@ -28,7 +31,7 @@ Module options:
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # DESCRIPTION
 

@@ -1,0 +1,382 @@
+NAME
+
+    Data::Object::Cast
+
+ABSTRACT
+
+    Data Type Casting for Perl 5
+
+SYNOPSIS
+
+      package main;
+    
+      use Data::Object::Cast;
+    
+      local $Data::Object::Cast::To = 'Test::Object';
+    
+      # Data::Object::Cast::Deduce([1..4]); # Test::Object::Array
+
+DESCRIPTION
+
+    This package provides functions for casting native data types to
+    objects and the reverse.
+
+LIBRARIES
+
+    This package uses type constraints from:
+
+    Types::Standard
+
+FUNCTIONS
+
+    This package implements the following functions:
+
+ deduce
+
+      Deduce(Any $value) : Object
+
+    The Deduce function returns the argument as a data type object.
+
+    Deduce example #1
+
+        # given: synopsis
+      
+        Data::Object::Cast::Deduce([1..4])
+      
+        # $array
+
+    Deduce example #2
+
+        # given: synopsis
+      
+        Data::Object::Cast::Deduce(sub { shift })
+      
+        # $code
+
+    Deduce example #3
+
+        # given: synopsis
+      
+        Data::Object::Cast::Deduce(1.23)
+      
+        # $float
+
+    Deduce example #4
+
+        # given: synopsis
+      
+        Data::Object::Cast::Deduce({1..4})
+      
+        # $hash
+
+    Deduce example #5
+
+        # given: synopsis
+      
+        Data::Object::Cast::Deduce(123)
+      
+        # $number
+
+    Deduce example #6
+
+        # given: synopsis
+      
+        Data::Object::Cast::Deduce(qr/.*/)
+      
+        # $regexp
+
+    Deduce example #7
+
+        # given: synopsis
+      
+        Data::Object::Cast::Deduce(\'abc')
+      
+        # $scalar
+
+    Deduce example #8
+
+        # given: synopsis
+      
+        Data::Object::Cast::Deduce('abc')
+      
+        # $string
+
+    Deduce example #9
+
+        # given: synopsis
+      
+        Data::Object::Cast::Deduce(undef)
+      
+        # $undef
+
+ deducedeep
+
+      DeduceDeep(Any @args) : (Object)
+
+    The DeduceDeep function returns any arguments as data type objects,
+    including nested data.
+
+    DeduceDeep example #1
+
+        # given: synopsis
+      
+        Data::Object::Cast::DeduceDeep([1..4])
+      
+        # $array <$number>
+
+    DeduceDeep example #2
+
+        # given: synopsis
+      
+        Data::Object::Cast::DeduceDeep({1..4})
+      
+        # $hash <$number>
+
+ detract
+
+      Detract(Any $value) : Any
+
+    The Detract function returns the argument as native Perl data type
+    value.
+
+    Detract example #1
+
+        # given: synopsis
+      
+        Data::Object::Cast::Detract(
+          Data::Object::Cast::Deduce(
+            [1..4]
+          )
+        )
+      
+        # $arrayref
+
+    Detract example #2
+
+        # given: synopsis
+      
+        Data::Object::Cast::Detract(
+          Data::Object::Cast::Deduce(
+            sub { shift }
+          )
+        )
+      
+        # $coderef
+
+    Detract example #3
+
+        # given: synopsis
+      
+        Data::Object::Cast::Detract(
+          Data::Object::Cast::Deduce(
+            1.23
+          )
+        )
+      
+        # $number
+
+    Detract example #4
+
+        # given: synopsis
+      
+        Data::Object::Cast::Detract(
+          Data::Object::Cast::Deduce(
+            {1..4}
+          )
+        )
+      
+        # $hashref
+
+    Detract example #5
+
+        # given: synopsis
+      
+        Data::Object::Cast::Detract(
+          Data::Object::Cast::Deduce(
+            123
+          )
+        )
+      
+        # $number
+
+    Detract example #6
+
+        # given: synopsis
+      
+        Data::Object::Cast::Detract(
+          Data::Object::Cast::Deduce(
+            qr/.*/
+          )
+        )
+      
+        # $regexp
+
+    Detract example #7
+
+        # given: synopsis
+      
+        Data::Object::Cast::Detract(
+          Data::Object::Cast::Deduce(
+            \'abc'
+          )
+        )
+      
+        # $scalarref
+
+    Detract example #8
+
+        # given: synopsis
+      
+        Data::Object::Cast::Detract(
+          Data::Object::Cast::Deduce(
+            'abc'
+          )
+        )
+      
+        # $string
+
+    Detract example #9
+
+        # given: synopsis
+      
+        Data::Object::Cast::Detract(
+          Data::Object::Cast::Deduce(
+            undef
+          )
+        )
+      
+        # $undef
+
+ detractdeep
+
+      DetractDeep(Any @args) : (Any)
+
+    The DetractDeep function returns any arguments as native Perl data type
+    values, including nested data.
+
+    DetractDeep example #1
+
+        # given: synopsis
+      
+        Data::Object::Cast::DetractDeep(
+          Data::Object::Cast::DeduceDeep(
+            [1..4]
+          )
+        )
+
+    DetractDeep example #2
+
+        # given: synopsis
+      
+        Data::Object::Cast::DetractDeep(
+          Data::Object::Cast::DeduceDeep(
+            {1..4}
+          )
+        )
+
+ typename
+
+      TypeName(Any $value) : Maybe[Str]
+
+    The TypeName function returns the name of the value's data type.
+
+    TypeName example #1
+
+        # given: synopsis
+      
+        Data::Object::Cast::TypeName([1..4])
+      
+        # 'ARRAY'
+
+    TypeName example #2
+
+        # given: synopsis
+      
+        Data::Object::Cast::TypeName(sub { shift })
+      
+        # 'CODE'
+
+    TypeName example #3
+
+        # given: synopsis
+      
+        Data::Object::Cast::TypeName(1.23)
+      
+        # 'FLOAT'
+
+    TypeName example #4
+
+        # given: synopsis
+      
+        Data::Object::Cast::TypeName({1..4})
+      
+        # 'HASH'
+
+    TypeName example #5
+
+        # given: synopsis
+      
+        Data::Object::Cast::TypeName(123)
+      
+        # 'NUMBER'
+
+    TypeName example #6
+
+        # given: synopsis
+      
+        Data::Object::Cast::TypeName(qr/.*/)
+      
+        # 'REGEXP'
+
+    TypeName example #7
+
+        # given: synopsis
+      
+        Data::Object::Cast::TypeName(\'abc')
+      
+        # 'STRING'
+
+    TypeName example #8
+
+        # given: synopsis
+      
+        Data::Object::Cast::TypeName('abc')
+      
+        # 'STRING'
+
+    TypeName example #9
+
+        # given: synopsis
+      
+        Data::Object::Cast::TypeName(undef)
+      
+        # 'UNDEF'
+
+AUTHOR
+
+    Al Newkirk, awncorp@cpan.org
+
+LICENSE
+
+    Copyright (C) 2011-2019, Al Newkirk, et al.
+
+    This is free software; you can redistribute it and/or modify it under
+    the terms of the The Apache License, Version 2.0, as elucidated in the
+    "license file"
+    <https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
+
+PROJECT
+
+    Wiki <https://github.com/iamalnewkirk/foobar/wiki>
+
+    Project <https://github.com/iamalnewkirk/foobar>
+
+    Initiatives <https://github.com/iamalnewkirk/foobar/projects>
+
+    Milestones <https://github.com/iamalnewkirk/foobar/milestones>
+
+    Contributing
+    <https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
+
+    Issues <https://github.com/iamalnewkirk/foobar/issues>
+

@@ -1,3 +1,15 @@
+0.04 2020-04-05T15:40:18+02:00
+ - Add test for constructor.
+ - Change behaviour of run() to return exit code. And run exit in script to
+   return value.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move argument parsing from constructor to run section.
+ - Remove unused class.
+ - Rewrite doc to using POD =head2 for methods.
+ - Update author github username.
+ - Update copyright years.
+
 0.03 2018-02-07T08:08:26+01:00
  - Update Module::Install to 1.19 version.
  - Update copyright years.

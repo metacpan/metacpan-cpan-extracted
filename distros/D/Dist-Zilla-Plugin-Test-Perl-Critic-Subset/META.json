@@ -73,7 +73,7 @@
          "web" : "https://github.com/perlancar/operl-Dist-Zilla-Plugin-Test-Perl-Critic"
       }
    },
-   "version" : "3.001.003",
+   "version" : "3.001.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -82,7 +82,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "CopyrightYearFromGit",
-            "version" : "0.004"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -166,11 +166,6 @@
             "version" : "6.009"
          },
          {
-            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
-            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
-            "version" : "6.009"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.009"
@@ -178,7 +173,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.598"
+            "version" : "0.600"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -369,7 +364,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
@@ -413,12 +408,14 @@
             "config" : {
                "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
                   "finder" : [
-                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                     ":ExecFiles",
+                     ":InstallModules",
+                     ":TestFiles"
                   ]
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.002"
+            "version" : "3.001.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

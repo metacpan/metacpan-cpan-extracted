@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::contents;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '1.045'; # VERSION
+our $DATE = '2020-04-04'; # DATE
+our $VERSION = '1.046'; # VERSION
 
 use 5.010;
 use strict;
@@ -138,7 +138,7 @@ App::lcpan::Cmd::contents - List contents inside releases
 
 =head1 VERSION
 
-This document describes version 1.045 of App::lcpan::Cmd::contents (from Perl distribution App-lcpan), released on 2020-03-04.
+This document describes version 1.046 of App::lcpan::Cmd::contents (from Perl distribution App-lcpan), released on 2020-04-04.
 
 =head1 FUNCTIONS
 

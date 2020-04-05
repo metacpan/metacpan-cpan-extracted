@@ -34,7 +34,7 @@ eav.static: ${OBJECTS}
 	# bin -> static linkage
 	${CC} -static -o $@ ${OBJECTS} ${LIBS_STATIC}
 
-.c.o: depend
+.c.o:
 	${CC} ${CPPFLAGS} ${DEFS} ${INCLUDES} ${CFLAGS} -o $@ -c $<
 
 
@@ -50,7 +50,7 @@ strip-static: static
 
 clean:
 	# bin -> cleanup
-	${RM} ${TARGETS} ${OBJECTS} Makefile.depend
+	${RM} ${TARGETS} ${OBJECTS}
 
 #----------------------------------------------------------#
 
@@ -60,12 +60,4 @@ install: shared
 
 #----------------------------------------------------------#
 
-.PHONY: all clean debug
-
-depend: Makefile.depend
-Makefile.depend:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -MM -MG $(SOURCES) > $@
-
-.sinclude "Makefile.depend"
-
-.DELETE_ON_ERROR:
+.PHONY: all clean debug install strip static shared strip-static eav eav.static

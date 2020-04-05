@@ -100,8 +100,15 @@ You can learn more about Dist::Zilla at http://dzil.org/.
 {{
 my $link = $dist->distmeta->{resources}{repository}{web};
 if ($link and $link =~ /github/) {
-"\n" . 'The code for this distribution is hosted at GitHub. The repository is:
-' . $link . '
+"\n" . 'The code for this distribution is hosted at GitHub. The repository is:'
+."\n\n".$link."\n"
+.(-f '.gitmodules' ? '
+This repository uses git submodules. That means you also need to run:
+
+  $ git submodule update --init --recursive
+  $ git submodule update --remote
+' : '')
+.'
 You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a pull request. Please include a
 suitable end-user-oriented entry in the Changes file describing your change.

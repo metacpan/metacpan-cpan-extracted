@@ -4,7 +4,7 @@ package WWW::Search::Ebay;
 use strict;
 use warnings;
 
-our $VERSION = 2.276;
+our $VERSION = 2.281;
 
 =head1 NAME
 
@@ -695,9 +695,21 @@ sub _get_result_count_elements
   my $self = shift;
   my $tree = shift;
   my @ao;
+  push @ao, $tree->look_down( # as of 2020-04
+                             '_tag' => 'h1',
+                             class => 'srp-controls__count-heading'
+                            );
+  push @ao, $tree->look_down( # as of 2020-04
+                             '_tag' => 'div',
+                             class => 'srp-controls__control srp-controls__count'
+                            );
   push @ao, $tree->look_down( # as of 2015-06
                              '_tag' => 'span',
                              class => 'listingscnt'
+                            );
+  push @ao, $tree->look_down( # as of 2020-03
+                             '_tag' => 'span',
+                             class => 'rcnt'
                             );
   push @ao, $tree->look_down(
                              '_tag' => 'div',
@@ -755,6 +767,9 @@ sub _get_itemtitle_tds
   push @ao, $tree->look_down(_tag => 'td',
                              class => 'details ttl',
                             );
+  push @ao, $tree->look_down(_tag => 'div',
+                             class => 's-item__info clearfix',
+                            );
   my $oDiv = $tree->look_down(_tag => 'div',
                               id => 'ResultSetItems',
                              );
@@ -795,7 +810,7 @@ sub _parse_tree
     # print Dumper($hit);
     push(@{$self->{cache}}, $hit);
     $self->{'_num_hits'}++;
-    $self->approximate_result_count(1);
+    # $self->approximate_result_count(1);
     return 1;
     } # if
 
@@ -879,8 +894,11 @@ sub _parse_tree
       }
     } # foreach FONT
 
-  if ($self->approximate_result_count() < 1)
+  my $iApprox = $self->approximate_result_count();
+  if (defined($iApprox) && ($iApprox < 1))
     {
+    # Header says there are no results; return now and don't bother
+    # parsing the page:
     return $iHits;
     } # if
 

@@ -1,5 +1,13 @@
 Revision history for Net-IPAM-IP
 
+1.05    Sat, 04 Apr 2020 18:32:33 +0200
+        [fixup]
+        * reinvent inet_pton in pure perl for non standard implementations in Solaris, Windows, ...
+
+1.04    Fri, 03 Apr 2020 23:26:35 +0200
+        [test]
+        * arrgh, different non standard Socket functions in Solaris, Windows, ...
+
 1.03    Fri, 03 Apr 2020 09:35:00 +0200
         [Bugfix]
         * define minimum version in require for Socket

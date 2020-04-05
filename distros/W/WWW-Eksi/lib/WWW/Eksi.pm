@@ -1,5 +1,5 @@
 package WWW::Eksi;
-$WWW::Eksi::VERSION = '0.32';
+$WWW::Eksi::VERSION = '0.33';
 =head1 NAME
 
 WWW::Eksi - Interface for Eksisozluk.com
@@ -229,7 +229,7 @@ sub debe {
   return unless $data;
 
   my $dom   = Mojo::DOM->new($data);
-  my $links = $dom->at('ul[class~=partial]')->find('a');
+  my $links = $dom->find('ul[class~=partial]')->[1]->find('a');
   my $ids   = $links->map(sub{$_->{href}=~m/\/(\d+)$/})->to_array;
   my @entries = ();
 
@@ -359,7 +359,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Kivanc Yazan.
+This software is copyright (c) 2020 by Kivanc Yazan.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

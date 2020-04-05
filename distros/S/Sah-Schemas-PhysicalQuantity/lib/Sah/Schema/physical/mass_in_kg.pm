@@ -1,9 +1,9 @@
 package Sah::Schema::physical::mass_in_kg;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-11'; # DATE
+our $DATE = '2020-04-04'; # DATE
 our $DIST = 'Sah-Schemas-PhysicalQuantity'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Physics::Unit; # for examples
 
@@ -52,7 +52,7 @@ Sah::Schema::physical::mass_in_kg - A physical mass quantity, in kg
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::physical::mass_in_kg (from Perl distribution Sah-Schemas-PhysicalQuantity), released on 2020-03-11.
+This document describes version 0.002 of Sah::Schema::physical::mass_in_kg (from Perl distribution Sah-Schemas-PhysicalQuantity), released on 2020-04-04.
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;
@@ -88,9 +88,9 @@ Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
 Sample data:
 
- "10 s"  # INVALID
+ undef  # INVALID
 
- 10  # INVALID
+ undef  # INVALID
 
 =head1 HOMEPAGE
 

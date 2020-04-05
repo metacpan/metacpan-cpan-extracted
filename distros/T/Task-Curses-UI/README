@@ -8,6 +8,9 @@ SEE ALSO
     Curses::UI
         A curses based OO user interface framework
 
+    Curses::UI::AnyEvent
+        Sub-class of Curses::UI for AnyEvent
+
     Curses::UI::Buttonbox
         Create and manipulate button widgets
 
@@ -123,18 +126,20 @@ SEE ALSO
         Create and manipulate Window widgets
 
 REPOSITORY
-    <https://github.com/tupinek/Task-Curses-UI>
+    <https://github.com/michal-josef-spacek/Task-Curses-UI>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015 Michal Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2015-2020 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

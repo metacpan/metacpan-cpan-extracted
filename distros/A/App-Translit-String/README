@@ -53,6 +53,12 @@ EXAMPLE3
      # Output:
      # Российскайа Федерацийа
 
+EXAMPLE4
+     translit-string -t 'ISO 843' Ελλάδα
+
+     # Output:
+     # Elláda
+
 DEPENDENCIES
     App::Translit::String.
 
@@ -64,17 +70,18 @@ SEE ALSO
         transliterates text between writing systems
 
 REPOSITORY
-    <https://github.com/tupinek/App-Translit-String>
+    <https://github.com/michal-josef-spacek/App-Translit-String>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015-2016 Michal Špaček
-     BSD 2-Clause License
+    © 2015-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.06
 

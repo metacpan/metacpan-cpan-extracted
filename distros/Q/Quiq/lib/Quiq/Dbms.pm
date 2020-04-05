@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.177';
+our $VERSION = '1.178';
 
 # -----------------------------------------------------------------------------
 
@@ -26,11 +26,13 @@ L<Quiq::Hash>
   # Instantiierung
   my $d = Quiq::Dbms->new($dbms);
   
-  # Namen der bekannten Datensysteme
+  # Namen der unterstützten Datenbanksysteme
   my @names = Quiq::Dbms->dbmsNames;
   
   # Boolsche Variable für Tests
-  ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) = $d->dbmsVector;
+  
+  ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) =
+      $d->dbmsTestVector;
   
   # Test-Methoden
   
@@ -124,6 +126,8 @@ sub new {
 }
 
 # -----------------------------------------------------------------------------
+
+=head2 Klassenmethoden
 
 =head3 dbmsNames() - Liste der Namen der unterstützten Datenbanksysteme
 
@@ -318,7 +322,7 @@ sub isMSSQL {
 
 =head1 VERSION
 
-1.177
+1.178
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.177';
+our $VERSION = '1.178';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -381,7 +381,8 @@ sub maxBlobSize {
 
 =head4 Description
 
-Bei eingeschaltetem Strict-Modus wird eine Exception
+Bei eingeschaltetem Strict-Modus wird im Falle eines Datenbankfehlers
+eine Exception geworfen.
 
 =head4 Example
 
@@ -396,6 +397,8 @@ Bei eingeschaltetem Strict-Modus wird eine Exception
   # bei Datenbank-Fehler wird Exception geworfen
   
   $db->strict(0)
+  
+  # bei Datenbank-Fehler wird keine Exception geworfen
 
 =cut
 
@@ -3100,6 +3103,42 @@ sub delete {
 
 =head2 Schemas
 
+=head3 schemaExists() - Prüfe, ob Schema existiert
+
+=head4 Synopsis
+
+  $bool = $db->schemaExists($schema);
+
+=head4 Description
+
+Liefere wahr, wenn Schema $schema existiert, sonst falsch.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub schemaExists {
+    my ($self,$schema) = @_;
+
+    # Optionen
+
+    my $bool;
+    if ($self->isPostgreSQL) {
+        ($bool) = $self->values(
+            -select => '1',
+            -from => 'pg_namespace',
+            -where, nspname => $schema,
+        );
+    }
+    else {
+        $self->throw;
+    }
+
+    return $bool? 1: 0;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 schemas() - Liste der Schemata
 
 =head4 Synopsis
@@ -3456,9 +3495,9 @@ Kolumnen, nach denen die Gesamt-Differenzliste sortiert wird.
 =head4 Description
 
 Die Methode untersucht zwei strukturell identische Tabellen hinsichtlich
-etwaig vorhandener Daten-Differenzen. Sie tut dies mittels SQL und ist
-dadurch auch auf großen Datenmengen sehr schnell. Der Vergleich
-geschieht durch die Bildung der zwei Differenzmengen
+etwaig vorhandener Daten-Differenzen. Sie tut dies mittels SQL und kann
+dadurch auch große Datenmengen bewältigen. Der Vergleich geschieht durch
+Bildung zweier Differenzmengen:
 
   -- Alle Zeilen in Tabelle 1, die nicht in Tabelle 2 vorkommen
   
@@ -3607,9 +3646,9 @@ sub tableDiff {
         ",
         -placeholders =>
             __TABLE1__ => $table1,
-            __TITLES1__ => join(', ',@columns),
+            __TITLES1__ => join(', ',map {qq|"$_"|} @columns),
             __TABLE2__ => $table2,
-            __TITLES2__ => join(', ',@columns),
+            __TITLES2__ => join(', ',map {qq|"$_"|} @columns),
     );
 
     my $i = 0;
@@ -3640,9 +3679,9 @@ sub tableDiff {
         ",
         -placeholders =>
             __TABLE1__ => $table1,
-            __TITLES1__ => join(', ',@columns),
+            __TITLES1__ => join(', ',map {qq|"$_"|} @columns),
             __TABLE2__ => $table2,
-            __TITLES2__ => join(', ',@columns),
+            __TITLES2__ => join(', ',map {qq|"$_"|} @columns),
     );
 
     $i = 0;
@@ -5201,7 +5240,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.177
+1.178
 
 =head1 AUTHOR
 

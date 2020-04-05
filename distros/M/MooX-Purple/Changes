@@ -9,3 +9,6 @@ Revision history for MooX-Purple
 0.12    2020-04-02
 	- Add class/role prefix, and mechanism to chain (+~-).
 	- Fix compilation when using MooX-Purple as a module.pm.
+
+0.13    2020-04-04
+	- Add macro keyword.

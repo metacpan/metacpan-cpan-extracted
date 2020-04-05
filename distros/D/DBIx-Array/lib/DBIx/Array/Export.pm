@@ -3,7 +3,7 @@ use base qw{DBIx::Array};
 use strict;
 use warnings;
 
-our $VERSION='0.58';
+our $VERSION='0.64';
 our $PACKAGE=__PACKAGE__;
 
 =head1 NAME

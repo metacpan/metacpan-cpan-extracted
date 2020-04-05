@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.177';
+our $VERSION = '1.178';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -2287,35 +2287,6 @@ sub extension {
 
 # -----------------------------------------------------------------------------
 
-=head3 newExtension() - Setze eine neue Extension
-
-=head4 Synopsis
-
-  $newPath = $this->newExtension($path,$ext);
-
-=head4 Description
-
-Entferne die bestehende Extension von Pfad $path und füge $ext als
-neue Extension hinzu. Besitzt $path keine Extension, wird
-$ext hinzugefügt. Etension $ext kann mit oder ohne Punkt am Anfang
-angegeben werden.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub newExtension {
-    my ($this,$path,$ext) = @_;
-
-    $ext =~ s/^\.//;         # Wir entfernen einen optionalen .
-    $path =~ s/\.([^.]+)$//; # Wir entfernen die bestehende Extension
-    $path .= ".$ext";        # Wir fügen die neue Extension hinzu
-
-    return $path;
-}
-
-# -----------------------------------------------------------------------------
-
 =head3 filename() - Letzte Pfadkomponente
 
 =head4 Synopsis
@@ -2604,6 +2575,35 @@ sub newer {
     my $t2 = (stat $path2)[9] || 0;
 
     return $t1 > $t2? 1: 0;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 newExtension() - Setze eine neue Extension
+
+=head4 Synopsis
+
+  $newPath = $this->newExtension($path,$ext);
+
+=head4 Description
+
+Entferne die bestehende Extension von Pfad $path und füge $ext als
+neue Extension hinzu. Besitzt $path keine Extension, wird
+$ext hinzugefügt. Etension $ext kann mit oder ohne Punkt am Anfang
+angegeben werden.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub newExtension {
+    my ($this,$path,$ext) = @_;
+
+    $ext =~ s/^\.//;         # Wir entfernen einen optionalen .
+    $path =~ s/\.([^.]+)$//; # Wir entfernen die bestehende Extension
+    $path .= ".$ext";        # Wir fügen die neue Extension hinzu
+
+    return $path;
 }
 
 # -----------------------------------------------------------------------------
@@ -3273,7 +3273,7 @@ sub uid {
 
 =head1 VERSION
 
-1.177
+1.178
 
 =head1 AUTHOR
 

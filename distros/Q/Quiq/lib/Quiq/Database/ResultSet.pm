@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.177';
+our $VERSION = '1.178';
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -885,9 +885,9 @@ sub asTable {
     if ($msg) {
         $str .= $msg;
     }
-    if ($info || $msg) {
-        $str .= "\n";
-    }
+    #if ($info || $msg) {
+    #    $str .= "\n";
+    #}
 
     return $str;
 }
@@ -967,7 +967,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.177
+1.178
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.177';
+our $VERSION = '1.178';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -4755,7 +4755,7 @@ sub opCAST {
 
 # -----------------------------------------------------------------------------
 
-=head3 opIN() - Generiere IN-Ausdruck
+=head3 opIN() - Generiere IN- oder NOT IN-Ausdruck
 
 =head4 Synopsis
 
@@ -4763,7 +4763,7 @@ sub opCAST {
 
 =head4 Description
 
-Generiere Ausdruck "IN (VAL1, VAL2, ...)" und liefere diesen zurück.
+Generiere Ausdruck "IN / NOT IN (VAL1, VAL2, ...)" und liefere diesen zurück.
 
 =cut
 
@@ -4779,7 +4779,7 @@ sub opIN {
         # Subselect
         $str = Quiq::String->removeIndentationNl($_[0]);
         $str =~ s/^/        /mg;
-        return "IN (\n$str    )";
+        return "$op (\n$str    )";
     }
 
     for (@_) {
@@ -4790,7 +4790,7 @@ sub opIN {
         # $str .= $self->valExpr($_); Problem: STRING wird zu '''STRING'''
     }
 
-    return $str?  "IN ($str)": '';
+    return $str?  "$op ($str)": '';
 }
 
 # -----------------------------------------------------------------------------
@@ -5036,11 +5036,14 @@ my %opMethod = (
     '=' => 'opRel',
     '>' => 'opRel',
     '>=' => 'opRel',
+    '~' => 'opRel',
+    '!~' => 'opRel',
     'LIKE' => 'opRel',
     'AS' => 'opAS',
     'BETWEEN' => 'opBETWEEN',
     'CAST' => 'opCAST',
     'IN' => 'opIN',
+    'NOT IN' => 'opIN',
     'LOWER' => 'opFunc',
     'MAX' => 'opFunc',
     'MIN' => 'opFunc',
@@ -5438,6 +5441,52 @@ sub notExists {
 
 # -----------------------------------------------------------------------------
 
+=head3 union() - Verknüpfe Statements mit UNION
+
+=head4 Synopsis
+
+  $stmt = $sql->union(@stmts);
+
+=head4 Arguments
+
+=over 4
+
+=item @stmts
+
+Statements, die mit UNION verknpft werden.
+
+=back
+
+=head4 Returns
+
+String
+
+=head4 Description
+
+Verknüpfe die (SELECT-)Statements @stmts per UNION und liefere das
+resultierende Statement zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub union {
+    my $self = shift;
+    # @_: @stmts
+
+    my $stmt = '';
+    for (@_) {
+        if ($stmt) {
+            $stmt .= "\nUNION\n";
+        }
+        $stmt .= Quiq::Unindent->trim($_);
+    }
+
+    return $stmt;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Spezielle Konstrukte
 
 =head3 diff() - Liefere SELECT zur Differenzermittlung
@@ -5543,7 +5592,7 @@ sub diff {
 
 =head1 VERSION
 
-1.177
+1.178
 
 =head1 AUTHOR
 

@@ -3,10 +3,10 @@ package MooX::Purple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 use Keyword::Declare;
 use Caller::Reverse qw/callr/;
-our $PREFIX;
+our ($PREFIX, %MACROS);
 
 sub import {
 	my ($class, %args) = @_;
@@ -52,6 +52,15 @@ sub import {
 		$class = $PREFIX . '::' . $class if $pre;	
 		_handle_class($class, $block, @roles);
 	}
+	keyword class (PrefixUnaryOperator $pre, QualIdent $class, Block $block) {
+		$class = $PREFIX . '::' . $class if $pre;	
+		_handle_class($class, $block);
+	}
+	keyword macro (Ident $macro, Block $block) {
+		$block =~ s/^\n*\{\n*\s*|;\n*\t*\}\n*$//g;
+		$MACROS{$macro} = $block;
+		return '';
+	}
 	keyword private (Ident $method, SATTRS @roles, Block $block) {
 		my %attrs = _parse_role_attrs(@roles);
 		my $allowed = $attrs{allow} ? sprintf 'qw(%s)', join ' ', @{$attrs{allow}} : 'qw//';
@@ -66,6 +75,8 @@ sub import {
 		}";
 	}
 	keyword public (Ident $method, Block $block) {
+		my $mac = join '|', keys %MACROS;
+		$block =~ s/&($mac)/$MACROS{$1}/g;
 		return qq|sub $method $block|;
 	}
 }
@@ -177,7 +188,7 @@ MooX::Purple - MooX::Purple
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
@@ -254,6 +265,28 @@ Version 0.12
 			$_[0]->print(4);
 		}
 	}
+
+	...
+
+	use MooX::Purple -prefix => 'Macro';
+
+	class +Simple {
+		macro generic {
+			'crazy';
+		};
+		macro second {
+			my $x = 0;
+			$x++ for (0..100);
+			return $x;
+		};
+		public one { &generic; }
+		public two { 
+			print &generic
+			&second; 
+		}
+	};
+
+	class +Inherit is +Simple {};
 
 =head1 AUTHOR
 

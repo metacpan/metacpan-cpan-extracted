@@ -2,6 +2,8 @@ package Rose::DB::Object::Metadata::Util;
 
 use strict;
 
+use Carp();
+
 require Exporter;
 our @ISA = qw(Exporter);
 
@@ -13,7 +15,7 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 our $DEFAULT_PERL_INDENT = 4;
 our $DEFAULT_PERL_BRACES = 'k&r';
 
-our $VERSION = '0.67';
+our $VERSION = '0.817';
 
 sub perl_hashref
 {

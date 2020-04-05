@@ -1,0 +1,156 @@
+digraph "machine"{
+	rankdir=LR;
+	{ "@Part: nvme0n1" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">Dell Express Flash NVMe PM1725 1.6TB AIC</TD> </TR><TR><TD >/dev/nvme0n1<BR/>Label: gpt<BR/>Size: 1.46 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="lightgrey">
+						/dev/nvme0n1p1<BR/>ceph data<BR/>Size: 100 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="lightgrey">
+						/dev/nvme0n1p2<BR/>ceph block<BR/>Size: 1.46 TiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000001:pink;0.000066:pink;0.999934";
+	]; }
+	{ "@Part: sda" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">ATA SSDSC2KG480G8R</TD> </TR><TR><TD >/dev/sda<BR/>Label: msdos<BR/>Size: 447 GiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 992 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/sda1<BR/>Size: 3.72 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="yellow">
+						/dev/sda2<BR/>Size: 19.6 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="3" BGCOLOR="lightgrey">
+						/dev/sda3<BR/>Size: 22.4 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD>
+							<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR>
+							<TD PORT="4" BGCOLOR="mediumorchid1">
+							/dev/sda4<BR/>Size: 401 GiB
+							</TD></TR><TR><TD>
+							<TABLE >
+								<TR>
+									<TD PORT="5" BGCOLOR="yellow">
+									/dev/sda5<BR/>Size: 401 GiB
+									</TD>
+								</TR>
+							</TABLE>
+							</TD></TR></TABLE>
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 856 kiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000002:pink;0.008330:pink;0.043740:pink;0.049989:pink;0.897935:green;0.000002";
+	]; }
+	subgraph "cluster_@LSIMegacli@0" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@LSIMegacli@0@@BBUStatus" [
+			label="BBU Status: Absent";
+			shape=oval
+			fillcolor=white
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@[32:0]" [
+			label="BTYG918106V4480BGN SSDSC2KG480G8R XCV1DL65\nc0uXpY: slot [32:0]\nJBOD\nSize: 447 GiB";
+			fillcolor=yellow
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@[32:1]" [
+			label="SEAGATE ST2000NX0463 NT32W460T12A\nc0uXpY: slot [32:1]\nUnconfigured(good), Spun Up\nSize: 1.82 TiB";
+			fillcolor=white
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@[32:2]" [
+			label="SEAGATE ST2000NX0463 NT32W4602M7F\nc0uXpY: slot [32:2]\nUnconfigured(good), Spun Up\nSize: 1.82 TiB";
+			fillcolor=white
+		]; }
+		{ "@LSIMegacli@0@dev@LSIMegaCli@[32:3]" [
+			label="SEAGATE ST2000NX0463 NT32W460V6V9\nc0uXpY: slot [32:3]\nUnconfigured(good), Spun Up\nSize: 1.82 TiB";
+			fillcolor=white
+		]; }
+		label="PERC H330 Adapter\nController: c0";
+	}
+	subgraph "cluster_@FS" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@FS@SWAP" [
+			label="SWAP\nDevice: /dev/sda1\nswap\nSize: 3.72 GiB\nFree: 3.72 GiB\nUsed: 0 B";
+			style=striped;fillcolor="green"
+		]; }
+		{ "@FS@/" [
+			label="/\nDevice: /dev/sda2\next4\nSize: 19.1 GiB\nFree: 8.10 GiB\nUsed: 10.0 GiB";
+			style=striped;fillcolor="pink;0.576230.2:green"
+		]; }
+		{ "@FS@/tmp" [
+			label="/tmp\nDevice: /dev/sda5\next4\nSize: 395 GiB\nFree: 375 GiB\nUsed: 70.2 MiB";
+			style=striped;fillcolor="pink;0.051026.2:green"
+		]; }
+		label="Mounted FS and swap";
+	}
+	subgraph "cluster_@libvirt" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		label="Libvirt Virtual Machines";
+	}
+	// Links from MegaCli: Controller c0
+	
+	
+	
+	
+	// Links for @Part: sda
+	"@LSIMegacli@0@dev@LSIMegaCli@[32:0]" -> "@Part: sda"
+	// Links for @FS@SWAP
+	"@Part: sda":"1" -> "@FS@SWAP"
+	// Links for @FS@/
+	"@Part: sda":"2" -> "@FS@/"
+	// Links for @FS@/tmp
+	"@Part: sda":"5" -> "@FS@/tmp"
+}

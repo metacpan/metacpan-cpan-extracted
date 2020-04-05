@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = '1.8.2'; # VERSION
+our $VERSION = '1.9.0'; # VERSION
 
 use Rex::Inventory::DMIDecode::BaseBoard;
 use Rex::Inventory::DMIDecode::Bios;

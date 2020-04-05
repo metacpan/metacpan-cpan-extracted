@@ -8,11 +8,9 @@ SYNOPSIS
      perl -MError::Pure::Always perl_script.pl
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::Always;
 
      # Set env error type.
@@ -25,11 +23,9 @@ EXAMPLE1
      # 1 at example1.pl line 9.
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::Always;
 
      # Set env error type.
@@ -42,11 +38,9 @@ EXAMPLE2
      # #Error [path_to_script:12] 1
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::Always;
 
      # Set error type.
@@ -70,17 +64,18 @@ ACKNOWLEDGMENTS
     Thanks for Carp::Always module.
 
 REPOSITORY
-    <https://github.com/tupinek/Error-Pure-Always>
+    <https://github.com/michal-josef-spacek/Error-Pure-Always>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2012-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2012-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

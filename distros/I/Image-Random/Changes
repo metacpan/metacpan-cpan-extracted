@@ -1,3 +1,8 @@
+0.09 2020-04-05T13:20:53+02:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rewrite doc to use POD =head2 on METHODS.
+
 0.08 2020-02-28T18:09:13+01:00
  - Comment bad test and add TODO about it.
  - Fix test dependency for writing jpeg file.

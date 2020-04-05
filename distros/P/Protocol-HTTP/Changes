@@ -1,3 +1,7 @@
+1.0.5    03.04.2020
+           - fix Makefile.PL for perls < 5.22
+1.0.4    03.04.2020
+           - change link to protocol websocket in docs
 1.0.3    02.04.2020
            - change errc package to Error
 1.0.2    16.02.2020

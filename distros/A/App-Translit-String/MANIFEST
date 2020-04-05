@@ -24,5 +24,6 @@ String.pm
 t/App-Translit-String/01-use.t
 t/App-Translit-String/02-version.t
 t/App-Translit-String/03-new.t
+t/App-Translit-String/04-run.t
 xt/App-Translit-String/01-pod_coverage.t
 xt/App-Translit-String/02-pod.t

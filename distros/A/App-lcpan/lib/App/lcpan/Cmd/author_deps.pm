@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::author_deps;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '1.045'; # VERSION
+our $DATE = '2020-04-04'; # DATE
+our $VERSION = '1.046'; # VERSION
 
 use 5.010;
 use strict;
@@ -71,7 +71,7 @@ App::lcpan::Cmd::author_deps - List dependencies for all of the dists of an auth
 
 =head1 VERSION
 
-This document describes version 1.045 of App::lcpan::Cmd::author_deps (from Perl distribution App-lcpan), released on 2020-03-04.
+This document describes version 1.046 of App::lcpan::Cmd::author_deps (from Perl distribution App-lcpan), released on 2020-04-04.
 
 =head1 FUNCTIONS
 
@@ -169,7 +169,7 @@ Only list depended modules published by specified author(s).
 
 Do not list depended modules published by specified author(s).
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 

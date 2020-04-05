@@ -7,10 +7,6 @@
 #include <eav/auto_tld.h>
 #include "common.h"
 
-typedef int (*utf8_email) ( idn_resconf_t ctx,
-                            idn_action_t a,
-                            const char *s,
-                            const char *e);
 
 static void
 init_idn (idn_resconf_t *ctx)
@@ -42,7 +38,7 @@ main (int argc, char *argv[])
     ssize_t read = 0;
     idn_resconf_t ctx;
     idn_action_t actions = IDN_ENCODE_REGIST;
-    eav_result_t r;
+    eav_result_t *r;
     FILE *fh;
     char *file = NULL;
     int expect_pass = -1;
@@ -79,7 +75,7 @@ main (int argc, char *argv[])
         len = strlen (line);
         r = is_6531_email (ctx, actions, line, len, true);
 
-        if (r.rc >= 0) {
+        if (r->rc >= 0) {
             printf ("PASS: %s\n", sanitize_utf8(line, len));
             passed++;
         }

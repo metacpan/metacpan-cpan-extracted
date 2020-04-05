@@ -1,11 +1,9 @@
 package Task::Curses::UI;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 1;
 
@@ -30,6 +28,10 @@ Task::Curses::UI - Install the Curses::UI modules.
 =item L<Curses::UI>
 
 A curses based OO user interface framework
+
+=item L<Curses::UI::AnyEvent>
+
+Sub-class of Curses::UI for AnyEvent
 
 =item L<Curses::UI::Buttonbox>
 
@@ -187,22 +189,24 @@ Create and manipulate Window widgets
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Task-Curses-UI>
+L<https://github.com/michal-josef-spacek/Task-Curses-UI>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
- Artistic License
- BSD 2-Clause License
+© 2015-2020 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

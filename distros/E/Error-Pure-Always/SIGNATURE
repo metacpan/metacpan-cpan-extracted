@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,42 +12,42 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 04c1bc92b10b498c4d15c02e4ee295cf1fa6c7d4 Always.pm
-SHA1 db52c7dcb6e0f26a8bbbaae84db1901ee5a50a21 Changes
-SHA1 59eb82858eb4fad4d198101c284fbf4254443437 LICENSE
-SHA1 2fc4bbf804498d6dd5612c88e0ffd88c7c9a1388 MANIFEST
-SHA1 90b29982572efbb3582a3861dcc9b88f9c9d12f8 META.yml
-SHA1 002723a4db98a85db0c3760f028c3d933a640b52 Makefile.PL
-SHA1 364d6a1565727d5dc5128cc741a4d21fd952bf61 README
-SHA1 9d7d1174f15317521fab93208b67e8eb97c2acea examples/ex1.pl
-SHA1 da7512f49e9192ccf3440b78b05ab3fc1624ce51 examples/ex2.pl
-SHA1 e905c1393f7babacb093c27854c7d892ef21460c examples/ex3.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 3571deb409bb92ef4a43b52df4a39cf983f89c0b t/Error-Pure-Always/01-use.t
-SHA1 17ecb4c301b0b0ac9b065650a8087e20e5548d7a t/Error-Pure-Always/02-version.t
-SHA1 ee76766033ac61b749f6e8e8e9d4c8ca97f1a378 t/Error-Pure-Always/03-err.t
-SHA1 3e8f69f41b3147a43fc5ba791d05c45a5fab00bd xt/Error-Pure-Always/01-pod_coverage.t
-SHA1 3c84c9cff49e5160c4553bc391386e5926612dd2 xt/Error-Pure-Always/02-pod.t
+SHA256 26553b4899c6dac40734411d63bfb8a6de20f82234d20da72c78eb7ea68c3bbe Always.pm
+SHA256 90f3761af84c93cbfbc080a462f8a568149ccdefb5f7583a04b1e9ffed3be331 Changes
+SHA256 1ae39daee8ea9b57b471d2c15aae3939c74e92af2daced627a4abf8866cdd546 LICENSE
+SHA256 19c063d0e85a571491960e5fa0bb515433665544f8c6df0f6b5369575d07c1f8 MANIFEST
+SHA256 16d9cbf7f2eee23a61e60c8c27c3ad6a9f697a6645e5bee0a3fe199d2dbc57be META.yml
+SHA256 c6ba72e1005532eb13a0671844fd58e8580e296398bc062b8340991ff6b5e998 Makefile.PL
+SHA256 866de1067b00208e7374d7c885e5876921721b697b102d8498c9e80e6379e120 README
+SHA256 bd0a7880a70e459cdbad8e6c8a0a0d7526f7c93dd5c76561a5038a0e3ee97063 examples/ex1.pl
+SHA256 204f8e6875e8e8781d75fac74c6771699caf800a1d6d2b81edcdc3f7c5bcdd69 examples/ex2.pl
+SHA256 c0544751f6eef2b06203685cb924734fabdb88b475e01b6aafe38f831982332c examples/ex3.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 13febec43b210ea999c15c508fb61c12c6b1a14953701bf52637fe5be5aea825 t/Error-Pure-Always/01-use.t
+SHA256 f2344478132dc1ad3b45d8c90ffddb0dc3654ebc9ac56563f483d076c55d0007 t/Error-Pure-Always/02-version.t
+SHA256 23e81849a0e3fbc41a5f86da350257b3e2c8b2f7a5d90a422408b59ba8193209 t/Error-Pure-Always/03-err.t
+SHA256 4ce678a820a2c122db7a3666c1ea5980fa797797793b737e5dd7dd3e73ac8107 xt/Error-Pure-Always/01-pod_coverage.t
+SHA256 b1d8d1b6c6f2344587381ed1f4ea243b579401fa4b9e47fb9f6289b9084468c0 xt/Error-Pure-Always/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJV+We7AAoJEJe+XXKaIuTlasIH/RaO2ktxH39OwpSk/5YUjv4N
-TUnzCHePKGZZ2eNUpaU67gD2sJVaf4vibcW76UmXGSOrDVAoUqokslrnVOdPFEW+
-bFbatNUQniGTNydVjEmlYR+JEwSaceSp7ue9QU+s0nG/1rZ4xJmUthrihP0SiD3U
-L/Y35dl4LA2GOzO8mWs46W0WZUx+3xowzJcAzHX7DTJySvjvml34aGwemI2cl4ba
-0EtynqIin0lzINCPDisW4gmLVWKweshMvS3ESdhtFordZUvR+Y1v07R9ATBDfFZi
-MsBVMAL2W0c9Ul41SiIBWMgQmI7yt5D43nIH9GnMx6gm40NbPvx9NfnzxVk9l00=
-=zevr
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl6J1RoACgkQKyiOZjWe
+rHbriQf/ZduAKiri0JBaTiRHVnyftBQh/EAoGUEl/w8k92jR1Vp92FMQIzRUEVzY
+FTuZBVeiq8VpdyhjBEhUYw8GEIOihiF0HYVIV84+8ZdLByaxhlQEXDGfRDPZOzOB
+dl7qnHTIa3Pbgy43RPI2O56rb7dpHNQIx/s0voYirjb1ms+MKup+aTigDzKBt67f
+KYwFfkTq4GJDW3zmyEd+sRHHD777D/YI5EeKPE9u/ZK+YslPgKvBlcYZbvtLgB8I
+D4H8BPsFLWmTSrc5iopze1xnMdlS0Eu+WlshZYtLJjmBx4N8zB72L7MNDyAxKSnf
+wUdwFLYU5lEfECjmE62On4LazD3MmA==
+=ffje
 -----END PGP SIGNATURE-----

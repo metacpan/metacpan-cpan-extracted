@@ -1184,6 +1184,41 @@ sub test_notExists : Test(2) {
 
 # -----------------------------------------------------------------------------
 
+sub test_union : Test(2) {
+    my $self = shift;
+
+    my $sql = Quiq::Sql->new('PostgreSQL');
+
+    my $stmt = $sql->union;
+    $self->is($stmt,'');
+
+    $stmt = $sql->union("
+            SELECT
+                *
+            FROM
+                test1
+        ","
+            SELECT
+                *
+            FROM
+                test2
+    ");
+
+    $self->is($stmt,Quiq::Unindent->trim("
+        SELECT
+            *
+        FROM
+            test1
+        UNION
+        SELECT
+            *
+        FROM
+            test2
+    "));
+}
+
+# -----------------------------------------------------------------------------
+
 package main;
 Quiq::Sql::Test->runTests;
 

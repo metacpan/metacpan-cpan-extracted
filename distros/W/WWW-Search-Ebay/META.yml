@@ -8,7 +8,7 @@ build_requires:
   ExtUtils::MakeMaker: 6.36
   IO::Capture::Stderr: 0
   Test::More: 0
-  WWW::Search::Test: 2.29
+  WWW::Search::Test: 2.294
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
@@ -29,9 +29,9 @@ requires:
   Date::Manip: 0
   HTML::TreeBuilder: 0
   LWP::Simple: 0
-  WWW::Search: 2.557
+  WWW::Search: 2.566
   WWW::SearchResult: 2.067
   perl: 5.005
 resources:
   license: http://dev.perl.org/licenses/
-version: 3.054
+version: 3.055

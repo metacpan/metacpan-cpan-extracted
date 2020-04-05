@@ -163,6 +163,13 @@ sub auto_generate_column
 {
   my($self, $name, $col_info) = @_;
 
+  if ($col_info->{'TYPE_NAME'} eq 'bigint')
+  {
+    # Newer versions of DBD::Pg and/or PostgreSQL seem to return default bigint
+    # values wrapped in single quotes. Strip them off.
+    $col_info->{'COLUMN_DEF'} =~ s/^'(\d+)'$/$1/;
+  }
+
   $col_info->{'NUMERIC_PRECISION'} = $col_info->{'DECIMAL_DIGITS'};
   $col_info->{'NUMERIC_SCALE'}     = $col_info->{'COLUMN_SIZE'};
 

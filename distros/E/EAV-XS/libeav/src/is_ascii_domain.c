@@ -53,7 +53,7 @@ is_ascii_domain (const char *start, const char *end)
     /*
      * Find bad characters or label lengths. Find adjacent delimiters.
      */
-    for (cp = start; start < end && (ch = *(unsigned char *) cp) != 0; cp++) {
+    for (cp = start; cp < end && (ch = *(unsigned char *) cp) != 0; cp++) {
         if (ISALNUM(ch) || ch == '_') {     /* grr.. */
             if (label_length == 0)
                 label_count++;
@@ -63,13 +63,13 @@ is_ascii_domain (const char *start, const char *end)
             if (!ISDIGIT(ch))
                 non_numeric = 1;
         } else if (ch == '.') {
-            if (label_length == 0 || cp + 1 == end)
+            if (label_length == 0)
                 return inverse(EEAV_DOMAIN_MISPLACED_DELIMITER);
             label_length = 0;
         } else if (ch == '-') {
             non_numeric = 1;
             label_length++;
-            if (label_length == 1 || cp + 1 == end || cp[1] == '.')
+            if (label_length == 1 || cp[1] == 0 || cp[1] == '.')
                 return inverse(EEAV_DOMAIN_MISPLACED_HYPHEN);
         }
 #ifdef SLOPPY_VALID_HOSTNAME

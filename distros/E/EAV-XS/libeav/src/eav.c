@@ -58,3 +58,23 @@ eav_errstr (eav_t *eav)
         return errors[ eav->errcode ];
 }
 
+
+extern void
+eav_result_free (eav_result_t *result)
+{
+    if (result == NULL) return;
+
+#ifdef EAV_EXTRA
+    if (result->lpart != NULL) {
+        free (result->lpart);
+        result->lpart = NULL;
+    }
+
+    if (result->domain != NULL) {
+        free (result->domain);
+        result->domain = NULL;
+    }
+#endif
+
+    free (result);
+}

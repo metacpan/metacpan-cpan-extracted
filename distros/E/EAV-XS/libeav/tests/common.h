@@ -5,6 +5,10 @@
 #include <string.h>
 #include <assert.h>
 #include "../src/utf8_decode.h"
+#ifdef __WIN32
+    #include "../src/win32/getline.h"
+#endif
+
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 

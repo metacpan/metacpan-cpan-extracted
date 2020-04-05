@@ -51,7 +51,7 @@ package Rex;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.2'; # VERSION
+our $VERSION = '1.9.0'; # VERSION
 
 # development version if this variable is not set
 if ( !$Rex::VERSION ) {
@@ -912,6 +912,18 @@ sub import {
       if ( $add eq "task_chaining_cmdline_args" ) {
         Rex::Logger::debug("Enabling task_chaining_cmdline_args feature");
         Rex::Config->set_task_chaining_cmdline_args(1);
+        $found_feature = 1;
+      }
+
+      if ( $add eq "write_utf8_files" ) {
+        Rex::Logger::debug("Enabling write_utf8_files feature");
+        Rex::Config->set_write_utf8_files(1);
+        $found_feature = 1;
+      }
+
+      if ( $add eq "no_write_utf8_files" ) {
+        Rex::Logger::debug("Disabling write_utf8_files feature");
+        Rex::Config->set_write_utf8_files(0);
         $found_feature = 1;
       }
 

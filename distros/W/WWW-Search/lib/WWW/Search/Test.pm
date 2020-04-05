@@ -1,12 +1,3 @@
-# $rcs = ' $Id: Test.pm,v 2.293 2015-06-06 20:55:31 Martin Exp $ ' ;
-
-package WWW::Search::Test;
-
-use strict;
-use warnings;
-
-our
-$VERSION = 2.294;
 
 =head1 NAME
 
@@ -25,6 +16,11 @@ See file test.pl in the WWW-Search-HotBot distribution for a detailed
 =head1 METHODS AND FUNCTIONS
 
 =cut
+
+package WWW::Search::Test;
+
+use strict;
+use warnings;
 
 use Bit::Vector;
 use Carp;
@@ -54,8 +50,9 @@ use vars qw( @EXPORT );
               tm_new_engine tm_run_test tm_run_test_no_approx
             );
 
-use vars qw( $bogus_query $websearch );
+use vars qw( $VERSION $bogus_query $websearch );
 
+$VERSION = 2.294;
 $bogus_query = "Bogus" . $$ . "NoSuchWord" . time;
 
 ($MODE_DUMMY, $MODE_INTERNAL, $MODE_EXTERNAL, $MODE_UPDATE) = qw(dummy internal external update);
@@ -661,6 +658,8 @@ sub _tm_run_test
                                              qq{lower-bound num-hits for query=$sQuery});
     if ($iApprox)
       {
+      $iAnyFailure++ unless Test::More::isnt($oSearch->approximate_result_count, undef,
+                                               qq{approximate_result_count is defined});
       $iAnyFailure++ unless Test::More::cmp_ok($iMin, '<=', $oSearch->approximate_result_count,
                                                qq{lower-bound approximate_result_count});
       } # if
@@ -671,6 +670,8 @@ sub _tm_run_test
                                              qq{upper-bound num-hits for query=$sQuery});
     if ($iApprox)
       {
+      $iAnyFailure++ unless Test::More::isnt($oSearch->approximate_result_count, undef,
+                                               qq{approximate_result_count is defined});
       $iAnyFailure++ unless Test::More::cmp_ok($oSearch->approximate_result_count, '<=', $iMax,
                                                qq{upper-bound approximate_result_count});
       } # if
@@ -895,12 +896,6 @@ ENDCODE
       {
       Test::More::diag(Dumper($oResult));
       } # while
-    $sSaveOnError ||= q'';
-    if ($sSaveOnError ne q'')
-      {
-      write_file($sSaveOnError, { err_mode => 'quiet'}, $oSearch->response->content);
-      Test::More::diag(qq'HTML was saved in $sSaveOnError');
-      } # if
     } # if
   } # test_most_results
 

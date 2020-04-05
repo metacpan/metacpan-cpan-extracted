@@ -1,0 +1,146 @@
+=head1 NAME
+
+Protocol::WebSocket::Fast::Error - Websocket error constants
+
+
+
+=head1 SYNOPSIS
+
+    use Protocol::WebSocket::Fast;
+
+    my @msgs = $server->get_messages($buf);
+    ...
+    if ($msg->error == Protocol::WebSocket::Fast::Error::max_message_size) {
+        ...
+    }
+
+
+
+=head1 DESCRIPTION
+
+Constants provided by this package are returned by parsers to signal about websocket protocol errors.
+
+All errors are L<XS::ErrorCode> objects and are of category C<Protocol::WebSocket::Fast::error_category>.
+
+    Protocol::WebSocket::Fast::Error::max_frame_size->category() == Protocol::WebSocket::Fast::error_category; # true
+
+
+
+=head1 CONSTANTS
+
+=over
+
+=item garbage_after_connect
+
+Client sent something immediately after http connection request
+
+
+=item unsupported_version
+
+Client wants version that server does not support
+
+
+=item response_code_101
+
+The client-side expected 101/Protocol switch from the server response to switch
+from HTTP to websockets protocol, but other code has been received.
+
+
+=item connection_mustbe_upgrade
+
+HTTP header C<Connection> is not set to C<upgrade>
+
+
+=item upgrade_mustbe_websocket
+
+HTTP header C<Upgrade> is not set to C<websocket>
+
+
+=item sec_accept_missing
+
+HTTP header C<Sec-WebSocket-Accept> is missing or contains invalid value
+
+
+=item method_mustbe_get
+
+Client's HTTP connection request method is not C<GET>
+
+
+=item http_1_1_required
+
+HTTP request/response version is not C<1.1>
+
+
+=item body_prohibited
+
+Client's HTTP connection request has HTTP body
+
+
+=item invalid_opcode
+
+Frame with invalid or reserved opcode
+
+
+=item control_fragmented
+
+Fragmented C<control frame> received.
+
+
+=item control_payload_too_big
+
+Maximum payload for control frame exceeded (127 bytes)
+
+
+=item not_masked
+
+Unmasked frame from client
+
+
+=item max_frame_size
+
+C<frame> size exceeds max configured size.
+
+
+=item max_message_size
+
+C<message> size exceeds max configured size.
+
+
+=item close_frame_invalid_data
+
+Bad payload for close frame
+
+
+=item initial_continue
+
+The initial frame cannot have opcode C<CONTINUE>
+
+
+=item fragment_no_continue
+
+Fragmented websocket frame should have opcode C<CONTINUE>
+
+
+=item deflate_negotiation_failed
+
+Client received unsupported per-message deflate extension settings from server
+
+
+=item control_frame_compression
+
+Received control frame was compressed, but C<permessage-deflate> websocket extension cannot be applied for control frames
+
+
+=item inflate_error
+
+Internal error in C<zlib> library, compressed payload is corrupted
+
+=back
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::WebSocket::Fast>
+
+=cut

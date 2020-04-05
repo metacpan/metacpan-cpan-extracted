@@ -2,22 +2,20 @@ CFLAGS ?= -O2 -Wall -Wextra -std=c99 -pedantic
 DESTDIR ?= ${_destdir}
 INSTALL ?= ${_install}
 
-DEFS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_SVID_SOURCE -D__EXTENSIONS__
-DEFS += -I../include
-DEFS += ${_defs}
+CPPFLAGS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_SVID_SOURCE -D__EXTENSIONS__
+CPPFLAGS += -I../include
+CPPFLAGS += ${_defs} $(INCLUDES)
 
 TARGETS = eav eav.static
 SOURCES = $(wildcard *.c)
 OBJECTS = $(patsubst %.c, %.o, $(SOURCES))
 
-LIBS = -L.. -leav ${_libs}
-LIBS_STATIC = -L.. -leav ${_libs_static}
+LIBS = ${_libs}
+LIBS_STATIC = ${_libs_static}
 
 #----------------------------------------------------------#
 
-CPPFLAGS += $(DEFS) $(INCLUDES)
-
-all: depend shared
+all: shared
 
 debug: DEFS += -g -D_DEBUG
 debug: all
@@ -27,15 +25,15 @@ shared: eav
 
 eav: $(OBJECTS)
 	# bin -> shared linkage
-	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) -L.. -leav $(LIBS)
 
 eav.static: LDFLAGS = -static
 eav.static: $(OBJECTS)
 	# bin -> static linkage
-	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS_STATIC)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) -L.. -leav $(LIBS_STATIC)
 
 %.o: %.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $@ -c $<
 
 
 strip: shared
@@ -50,7 +48,7 @@ strip-static: static
 
 clean:
 	# bin -> cleanup
-	$(RM) $(TARGETS) $(OBJECTS) Makefile.depend
+	$(RM) $(TARGETS) $(OBJECTS)
 
 #----------------------------------------------------------#
 
@@ -60,12 +58,4 @@ install: shared
 
 #----------------------------------------------------------#
 
-.PHONY: all clean debug
-
-depend: Makefile.depend
-Makefile.depend:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -MM -MG $(SOURCES) > $@
-
--include Makefile.depend
-
-.DELETE_ON_ERROR:
+.PHONY: all clean debug install strip eav eav.static static shared

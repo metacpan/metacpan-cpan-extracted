@@ -6,16 +6,16 @@ use FASTX::Reader;
 
 # TEST: Retrieves sequences from a test FASTA file
 
-my $seq = "$RealBin/../data/test.fasta";
+my $seq_file = "$RealBin/../data/test.fasta";
 
 # Check required input file
-if (! -e $seq) {
-  print STDERR "Skip test: $seq not found\n";
+if (! -e $seq_file) {
+  print STDERR "Skip test: $seq_file not found\n";
   exit 0;
 }
 
-my $data = FASTX::Reader->new({ filename => "$seq" });
-$seq = $data->getRead();
+my $data = FASTX::Reader->new({ filename => "$seq_file" });
+my $seq = $data->getRead();
 
 ok(defined $seq->{seq}, "[FASTA] sequence is defined");
 

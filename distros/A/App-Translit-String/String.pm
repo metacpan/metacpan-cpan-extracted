@@ -1,17 +1,14 @@
 package App::Translit::String;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English;
 use Error::Pure qw(err);
 use Getopt::Std;
 use Lingua::Translit;
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -44,7 +41,7 @@ sub run {
 		print STDERR "\t-t table\tTransliteration table (default ".
 			"value is 'ISO/R 9').\n";
 		print STDERR "\t--version\tPrint version.\n";
-		exit 1;
+		return 1;
 	}
 	$self->{'_string'} = $ARGV[0];
 
@@ -68,7 +65,7 @@ sub run {
 			'Error', $EVAL_ERROR;
 	}
 	print "$ret\n";
-	return;
+	return 0;
 }
 
 1;
@@ -86,22 +83,25 @@ App::Translit::String - Perl class for translit-string application.
 =head1 SYNOPSIS
 
  use App::Translit::String;
+
  my $obj = App::Translit::String->new;
- $obj->run;
+ my $exit_code = $obj->run;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $obj = App::Translit::String->new;
 
- Constructor.
+Constructor.
 
-=item C<run()>
+=head2 C<run>
 
- Run.
+ my $exit_code = $obj->run;
 
-=back
+Run.
+
+Returns 1 for error, 0 for success.
 
 =head1 ERRORS
 
@@ -112,15 +112,13 @@ App::Translit::String - Perl class for translit-string application.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use App::Translit::String;
 
  # Run.
- App::Translit::String->new->run;
+ exit App::Translit::String->new->run;
 
  # Print version.
  sub VERSION_MESSAGE {
@@ -139,16 +137,14 @@ App::Translit::String - Perl class for translit-string application.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use App::Translit::String;
 
  # Run.
  @ARGV = ('Российская Федерация');
- App::Translit::String->new->run;
+ exit App::Translit::String->new->run;
 
  # Output:
  # Rossijskaja Federacija
@@ -162,21 +158,22 @@ L<Lingua::Translit>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/App-Translit-String>.
+L<https://github.com/michal-josef-spacek/App-Translit-String>.
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015-2016 Michal Špaček
- BSD 2-Clause License
+© 2015-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.06
 
 =cut

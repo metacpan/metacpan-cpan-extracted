@@ -4,13 +4,13 @@
       "John Siracusa <siracusa@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Rose-DB-Object",
    "no_index" : {
@@ -42,7 +42,7 @@
             "File::Spec" : "0",
             "List::MoreUtils" : "0",
             "Math::BigInt" : "1.77",
-            "Rose::DB" : "0.763",
+            "Rose::DB" : "0.782",
             "Rose::DateTime::Util" : "0.532",
             "Rose::Object" : "0.854",
             "Scalar::Util" : "0",
@@ -66,5 +66,6 @@
       },
       "x_MailingList" : "http://groups.google.com/group/rose-db-object"
    },
-   "version" : "0.815"
+   "version" : "0.817",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

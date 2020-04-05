@@ -17,7 +17,7 @@ END   { IPC::Shareable->clean_up_all; }
 
 use base 'Rex::Output::Base';
 
-our $VERSION = '1.8.2'; # VERSION
+our $VERSION = '1.9.0'; # VERSION
 
 sub get {
   my ( $class, $output_module ) = @_;

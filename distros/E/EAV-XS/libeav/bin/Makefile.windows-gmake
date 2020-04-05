@@ -1,0 +1,61 @@
+CFLAGS ?= -O2 -Wall -Wextra -std=c99 -pedantic
+DESTDIR ?= ${_destdir}
+INSTALL ?= ${_install}
+RM = del /Q
+
+CPPFLAGS = -D_GNU_SOURCE -D_XOPEN_SOURCE=700 -D_SVID_SOURCE -D__EXTENSIONS__
+CPPFLAGS += -I../include -I../src/win32
+CPPFLAGS += ${_defs} $(INCLUDES)
+
+TARGETS = eav.exe eav-static.exe
+SOURCES = $(wildcard *.c)
+OBJECTS = $(patsubst %.c, %.o, $(SOURCES))
+
+LIBS = ${_libs}
+LIBS_STATIC = ${_libs_static}
+
+#----------------------------------------------------------#
+
+.PHONY: all clean debug static shared install
+
+all: shared
+
+debug: DEFS += -g -D_DEBUG
+debug: all
+
+static: eav-static.exe
+shared: eav.exe
+
+eav.exe: $(OBJECTS)
+	$(info === bin -> shared linkage)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) -L.. -leav $(LIBS)
+
+eav-static.exe: LDFLAGS = -static
+eav-static.exe: $(OBJECTS)
+	$(info === bin -> static linkage)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) -L.. -leav $(LIBS_STATIC)
+
+%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFS) -o $@ -c $<
+
+
+strip: shared
+	$(info === bin -> strip)
+	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav
+
+strip-static: static
+	$(info === bin -> strip)
+	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav.static
+
+#----------------------------------------------------------#
+
+clean:
+	$(info === bin -> cleanup)
+	$(RM) $(TARGETS) $(OBJECTS)
+
+#----------------------------------------------------------#
+
+install: shared
+	$(INSTALL) -d $(DESTDIR)/bin
+	$(INSTALL) -m 0755 eav $(DESTDIR)/bin
+

@@ -217,7 +217,7 @@ fqc - A FASTA/FASTQ sequence counter
 
 =head1 VERSION
 
-version 0.80
+version 0.87
 
 =head1 SYNOPSIS
 

@@ -14,6 +14,7 @@ subtest 'Bootstrap4' => \&test_navbar, 'Bootstrap4',
     navbar_elem => 'nav.navbar',
     brand_elem => '.navbar-brand',
     menu_elem => '.navbar-nav',
+    menu_item_elem => 'a.nav-item:nth-child(%d)',
     collapse_elem => '.navbar-collapse',
     toggle_elem => '.navbar-toggler',
     fixed_top => 'nav.navbar.fixed-top',
@@ -26,6 +27,7 @@ subtest 'Bulma' => \&test_navbar, 'Bulma',
     navbar_elem => 'nav.navbar',
     brand_elem => '.navbar-brand .navbar-item:first-child',
     menu_elem => '.navbar-start',
+    menu_item_elem => 'a.navbar-item:nth-child(%d)',
     collapse_elem => '.navbar-menu',
     toggle_elem => '.navbar-burger',
     fixed_top => 'nav.navbar.is-fixed-top',
@@ -84,34 +86,41 @@ sub test_navbar {
       # Menu items
       ->element_exists( $attr{ menu_elem }, 'nav menu exists' )
       ->text_like(
-        $attr{ menu_elem } . ' a:nth-child(1)', qr{^\s*Home\s*$},
+        join( ' ', $attr{ menu_elem }, sprintf $attr{ menu_item_elem }, 1 ),
+        qr{^\s*Home\s*$},
         'first menu item text correct',
       )
-      ->element_exists(
-        $attr{ menu_elem } . ' a:nth-child(1)[href=/home]',
+      ->attr_is(
+        join( ' ', $attr{ menu_elem }, sprintf $attr{ menu_item_elem }, 1 ),
+        href => '/home',
         'first menu item href correct',
       )
       ->text_like(
-        $attr{ menu_elem } . ' a:nth-child(2)', qr{^\s*About\s*$},
+        join( ' ', $attr{ menu_elem }, sprintf $attr{ menu_item_elem }, 2 ),
+        qr{^\s*About\s*$},
         'second menu item text correct',
       )
-      ->element_exists(
-        $attr{ menu_elem } . ' a:nth-child(2)[href=/about]',
+      ->attr_is(
+        join( ' ', $attr{ menu_elem }, sprintf $attr{ menu_item_elem }, 2 ),
+        href => '/about',
         'second menu item href correct',
       )
       ->text_like(
-        $attr{ menu_elem } . ' a:nth-child(3)', qr{^\s*Contact\s*$},
+        join( ' ', $attr{ menu_elem }, sprintf $attr{ menu_item_elem }, 3 ),
+        qr{^\s*Contact\s*$},
         'third menu item text correct',
       )
-      ->element_exists(
-        $attr{ menu_elem } . ' a:nth-child(3)[href=/contact]',
+      ->attr_is(
+        join( ' ', $attr{ menu_elem }, sprintf $attr{ menu_item_elem }, 3 ),
+        href => '/contact',
         'third menu item href correct',
       )
       # Brand
       ->element_exists( $attr{brand_elem}, 'brand element exists' )
       ->text_like( $attr{brand_elem}, qr{^\s*My Brand\s*$}, 'brand element text correct' )
-      ->element_exists(
-        $attr{brand_elem} . '[href=/home]',
+      ->attr_is(
+        $attr{brand_elem},
+        href => '/home',
         'brand element href correct',
       )
       # Responsive
