@@ -9,7 +9,7 @@ use List::Util qw(any);
 our @ISA=qw(Exporter);
 our @EXPORT=qw(to_infix to_postfix evaluate_infix evaluate_postfix);
 
-our $VERSION='1.1.10';
+our $VERSION='1.1.11';
 our $LIBRARY=__PACKAGE__;
 
 sub to_infix{
@@ -61,7 +61,7 @@ Math::RPN::Simple - Simpler implementation of L<Math::RPN>.
 
 =head1 VERSION
 
-Version 1.1.10
+Version 1.1.11
 
 =head1 DESCRIPTION
 

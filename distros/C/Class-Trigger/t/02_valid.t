@@ -1,7 +1,7 @@
 use strict;
 use Test::More tests => 4;
 
-use lib 't/lib';
+use lib './t/lib';
 use Foo::Valid;			# should be use()
 
 ok(Foo::Valid->add_trigger(before_foo => sub { }));

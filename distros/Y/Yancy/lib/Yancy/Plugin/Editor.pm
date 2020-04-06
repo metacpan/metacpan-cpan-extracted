@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.047';
+our $VERSION = '1.048';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -179,7 +179,7 @@ sub register {
     my ( $self, $app, $config ) = @_;
 
     $self->backend( $config->{backend} );
-    $self->schema( $config->{schema} );
+    $self->schema( my $schema = $config->{schema} );
 
     for my $key ( grep exists $config->{ $_ }, qw( moniker ) ) {
         $self->$key( $config->{ $key } );
@@ -210,31 +210,7 @@ sub register {
     };
     $route = $route->under( $auth_under );
 
-    # Routes
-    $route->get( '/' )->name( 'yancy.index' )
-        ->to(
-            template => 'yancy/index',
-            controller => $config->{default_controller},
-            action => 'index',
-        );
-    $route->post( '/upload' )->name( 'yancy.editor.upload' )
-        ->to( cb => sub {
-            my ( $c ) = @_;
-            my $upload = $c->param( 'upload' );
-            my $path = $c->yancy->file->write( $upload );
-            $c->res->headers->location( $path );
-            $c->render( status => 201, text => $path );
-        } );
-
-    $app->helper( $self->_helper_name( 'menu' ), currym( $self, '_helper_menu' ) );
-    $app->helper( $self->_helper_name( 'include' ), currym( $self, '_helper_include' ) );
-    $app->helper( $self->_helper_name( 'route' ), sub { $route } );
-    $app->helper( 'yancy.route', sub {
-        derp 'yancy.route helper is deprecated. Use yancy.editor.route instead';
-        return $self->route;
-    } );
-    $self->route( $route );
-
+    # First create the OpenAPI schema and API URL
     my $spec;
     if ( $config->{openapi} && keys %{ $config->{openapi} } ) {
         $spec = $config->{openapi};
@@ -261,6 +237,61 @@ sub register {
     $formats->{ password } = sub { undef };
     $formats->{ markdown } = sub { undef };
     $formats->{ tel } = sub { undef };
+
+    # Do some sanity checks on the config to make sure nothing bad
+    # happens
+    for my $schema_name ( keys %$schema ) {
+        if ( my $view = $schema->{ $schema_name }{ 'x-view' } ) {
+            $schema_name = $view->{schema};
+        }
+        next if $schema->{ $schema_name }{ 'x-view' };
+        if ( my $list_cols = $schema->{ $schema_name }{ 'x-list-columns' } ) {
+            for my $col ( @$list_cols ) {
+                if ( ref $col eq 'HASH' ) {
+                    # Check template for columns
+                    my @cols = $col->{template} =~ m'\{([^{]+)\}'g;
+                    if ( my ( $col ) = grep { !exists $schema->{ $schema_name }{ properties }{ $_ } } @cols ) {
+                        die sprintf q{Column "%s" in x-list-columns template does not exist in schema "%s"},
+                            $col, $schema_name;
+                    }
+                }
+                else {
+                    if ( !exists $schema->{ $schema_name }{ properties }{ $col } ) {
+                        die sprintf q{Column "%s" in x-list-columns does not exist in schema "%s"},
+                            $col, $schema_name;
+                    }
+                }
+            }
+        }
+    }
+
+    # Now create the routes and helpers the editor needs
+    $route->get( '/' )->name( 'yancy.index' )
+        ->to(
+            template => 'yancy/index',
+            controller => $config->{default_controller},
+            action => 'index',
+            api_url => $openapi->route->render,
+        );
+    $route->post( '/upload' )->name( 'yancy.editor.upload' )
+        ->to( cb => sub {
+            my ( $c ) = @_;
+            my $upload = $c->param( 'upload' );
+            my $path = $c->yancy->file->write( $upload );
+            $c->res->headers->location( $path );
+            $c->render( status => 201, text => $path );
+        } );
+
+    $app->helper( $self->_helper_name( 'menu' ), currym( $self, '_helper_menu' ) );
+    $app->helper( $self->_helper_name( 'include' ), currym( $self, '_helper_include' ) );
+    $app->helper( $self->_helper_name( 'route' ), sub { $route } );
+    $app->helper( 'yancy.route', sub {
+        derp 'yancy.route helper is deprecated. Use yancy.editor.route instead';
+        return $self->route;
+    } );
+    $self->route( $route );
+
+
 }
 
 sub _helper_include {
@@ -628,7 +659,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.047
+version 1.048
 
 =head1 SYNOPSIS
 

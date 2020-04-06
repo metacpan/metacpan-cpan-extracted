@@ -1,5 +1,5 @@
 package Yancy::Backend::Role::Relational;
-our $VERSION = '1.047';
+our $VERSION = '1.048';
 # ABSTRACT: A role to give a relational backend relational capabilities
 
 #pod =head1 SYNOPSIS
@@ -254,6 +254,9 @@ sub normalize {
             if ( !$data->{ $key } ) {
                 $replace{ $key } = undef;
             }
+            elsif ( $data->{ $key } eq 'now' ) {
+                $replace{ $key } = \'CURRENT_TIMESTAMP';
+            }
             else {
                 $replace{ $key } = $data->{ $key };
                 $replace{ $key } =~ s/T/ /;
@@ -426,7 +429,7 @@ Yancy::Backend::Role::Relational - A role to give a relational backend relationa
 
 =head1 VERSION
 
-version 1.047
+version 1.048
 
 =head1 SYNOPSIS
 

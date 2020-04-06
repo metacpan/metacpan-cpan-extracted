@@ -54,6 +54,6 @@
          "web" : "https://gitlab.com/DeBos/Proxy-Scraper"
       }
    },
-   "version" : "v2.1.6",
+   "version" : "v2.1.7",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

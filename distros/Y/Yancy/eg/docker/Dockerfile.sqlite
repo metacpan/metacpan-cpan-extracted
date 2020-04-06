@@ -1,0 +1,3 @@
+ARG TAG=latest
+FROM preaction/yancy:${TAG}
+RUN cpanm DBD::SQLite Mojo::SQLite

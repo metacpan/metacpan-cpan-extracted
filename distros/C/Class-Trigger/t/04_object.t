@@ -3,7 +3,7 @@ use Test::More tests => 5;
 
 use IO::Scalar;
 
-use lib 't/lib';
+use lib './t/lib';
 use Foo;
 
 ok(Foo->add_trigger(before_foo => sub { print "before_foo\n" }),

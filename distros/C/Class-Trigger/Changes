@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::Trigger.
 
+0.15  2020-04-05 20:41:50 PDT
+        - Repackaged to avoid build issues with modern perls
+
 0.14 Sun Oct 11 15:55:14 PDT 2009
         - Make this a non-dev release
 

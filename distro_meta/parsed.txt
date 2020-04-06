@@ -63458,3 +63458,11 @@ D/DE/DEDMEDVED/TSQL-FlatFile-1.03.tar.gz
 K/KY/KYZN/WWW-Eksi-0.33.tar.gz
 M/MT/MTHURN/WWW-Search-2.519.tar.gz
 M/MT/MTHURN/WWW-Search-Ebay-3.055.tar.gz
+P/PE/PERLANCAR/App-BrowserUtils-0.002.tar.gz
+M/MI/MIYAGAWA/Class-Trigger-0.15.tar.gz
+L/LE/LEONT/Dist-Zilla-Plugin-MetaMergeFile-0.003.tar.gz
+L/LE/LEONT/Dist-Zilla-Plugin-MetaMergeFile-0.002.tar.gz
+D/DE/DEBOS/Math-CooGeo-1.0.9.tar.gz
+D/DE/DEBOS/Math-RPN-Simple-1.1.11.tar.gz
+P/PR/PREACTION/Yancy-1.048.tar.gz
+D/DE/DEBOS/Proxy-Scraper-2.1.7.tar.gz

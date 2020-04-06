@@ -1,9 +1,9 @@
 package App::BrowserUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-09'; # DATE
+our $DATE = '2019-12-10'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -51,6 +51,18 @@ our %argopt_quiet = (
 our %args_common = (
     %argopt_users,
 );
+
+our $desc_pause = <<'_';
+
+A modern browser now runs complex web pages and applications. Despite browser's
+power management feature, these pages/tabs on the browser often still eat
+considerable CPU cycles even though they run in the background. Stopping (kill
+-STOP) the browser processes is a simple and effective way to stop CPU eating on
+Unix. It can be performed whenever you are not using your browsers for a little
+while, e.g. when you are typing on an editor or watching a movie. When you want
+to use your browser again, simply unpause it.
+
+_
 
 sub _do_browser {
     require Proc::Find;
@@ -131,6 +143,7 @@ sub ps_browsers {
 $SPEC{pause_browsers} = {
     v => 1.1,
     summary => "Pause (kill -STOP) browsers",
+    description => $desc_pause,
     args => {
         %args_common,
     },
@@ -231,7 +244,7 @@ App::BrowserUtils - Utilities related to browsers, particularly modern GUI ones
 
 =head1 VERSION
 
-This document describes version 0.001 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2019-12-09.
+This document describes version 0.002 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2019-12-10.
 
 =head1 SYNOPSIS
 
@@ -302,6 +315,14 @@ Usage:
  pause_browsers(%args) -> [status, msg, payload, meta]
 
 Pause (kill -STOP) browsers.
+
+A modern browser now runs complex web pages and applications. Despite browser's
+power management feature, these pages/tabs on the browser often still eat
+considerable CPU cycles even though they run in the background. Stopping (kill
+-STOP) the browser processes is a simple and effective way to stop CPU eating on
+Unix. It can be performed whenever you are not using your browsers for a little
+while, e.g. when you are typing on an editor or watching a movie. When you want
+to use your browser again, simply unpause it.
 
 This function is not exported.
 

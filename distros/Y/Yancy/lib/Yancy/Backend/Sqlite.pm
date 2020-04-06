@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '1.047';
+our $VERSION = '1.048';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -145,7 +145,7 @@ sub create {
     my ( $self, $schema_name, $params ) = @_;
     $params = $self->normalize( $schema_name, $params );
     die "No refs allowed in '$schema_name': " . encode_json $params
-        if grep ref, values %$params;
+        if grep ref && ref ne 'SCALAR', values %$params;
     my $id_field = $self->id_field( $schema_name );
     my $inserted_id = $self->mojodb->db->insert( $schema_name, $params )->last_insert_id;
     # SQLite does not have a 'returning' syntax. Assume id field is correct
@@ -210,7 +210,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 1.047
+version 1.048
 
 =head1 SYNOPSIS
 

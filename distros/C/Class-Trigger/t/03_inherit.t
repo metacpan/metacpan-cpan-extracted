@@ -3,7 +3,7 @@ use Test::More tests => 6;
 
 use IO::Scalar;
 
-use lib 't/lib';
+use lib './t/lib';
 use Foo;
 use Foo::Bar;
 

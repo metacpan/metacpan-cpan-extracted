@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::MetaMergeFile;
-$Dist::Zilla::Plugin::MetaMergeFile::VERSION = '0.001';
+$Dist::Zilla::Plugin::MetaMergeFile::VERSION = '0.003';
 use Moose;
 use namespace::autoclean;
 
@@ -67,7 +67,7 @@ Dist::Zilla::Plugin::MetaMergeFile - Add arbitrary metadata using a mergefile
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 

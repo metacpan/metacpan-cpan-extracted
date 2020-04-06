@@ -1,0 +1,3 @@
+runtime:
+	requires:
+		Foo::Bar: 1

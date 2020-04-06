@@ -1,7 +1,7 @@
 use strict;
 use Test::More tests => 1;
 
-use lib 't/lib';
+use lib './t/lib';
 use Foo;
 
 my $foo = Foo->new();

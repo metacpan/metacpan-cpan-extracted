@@ -28,6 +28,7 @@ eg/doc-site/public/screenshot.png
 eg/docker/Dockerfile
 eg/docker/Dockerfile.mysql
 eg/docker/Dockerfile.pg
+eg/docker/Dockerfile.sqlite
 eg/test-app/.gitignore
 eg/test-app/myapp.auth.conf
 eg/test-app/myapp.conf

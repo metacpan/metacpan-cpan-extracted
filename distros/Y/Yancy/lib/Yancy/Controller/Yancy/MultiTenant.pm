@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::MultiTenant;
-our $VERSION = '1.047';
+our $VERSION = '1.048';
 # ABSTRACT: A controller to show a user only their content
 
 #pod =head1 SYNOPSIS
@@ -235,7 +235,13 @@ sub set {
 
     if ( $c->req->method ne 'GET' ) {
         my $user_id_field = $c->stash( 'user_id_field' ) // 'user_id';
-        $c->req->param( $user_id_field => $c->stash( 'user_id' ) );
+        my $user_id = $c->stash( 'user_id' );
+        if ( eval { $c->req->json } ) {
+            $c->req->json->{ $user_id_field } = $user_id;
+        }
+        else {
+            $c->req->param( $user_id_field => $c->stash( 'user_id' ) );
+        }
     }
 
     return $c->SUPER::set;
@@ -329,7 +335,7 @@ Yancy::Controller::Yancy::MultiTenant - A controller to show a user only their c
 
 =head1 VERSION
 
-version 1.047
+version 1.048
 
 =head1 SYNOPSIS
 
