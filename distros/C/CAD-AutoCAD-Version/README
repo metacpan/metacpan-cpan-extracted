@@ -120,6 +120,13 @@ EXAMPLE2
 DEPENDENCIES
     Class::Utils, Readonly.
 
+SEE ALSO
+    CAD::AutoCAD::Detect
+        Detect AutoCAD files through magic string.
+
+    File::Find::Rule::DWG
+        Common rules for searching DWG files.
+
 REPOSITORY
     <https://github.com/michal-josef-spacek/CAD-AutoCAD-Version>
 
@@ -134,5 +141,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

@@ -43,8 +43,8 @@
          "rdfs:label" : "identifier",
          "schema:domainIncludes" : "schema:Thing",
          "schema:rangeIncludes" : [
-            "schema:PropertyValue",
             "schema:URL",
+            "schema:PropertyValue",
             "schema:Text"
          ]
       },
@@ -54,8 +54,8 @@
          "rdfs:label" : "image",
          "schema:domainIncludes" : "schema:Thing",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:ImageObject"
+            "schema:ImageObject",
+            "schema:URL"
          ]
       },
       "schema:mainEntityOfPage" : {

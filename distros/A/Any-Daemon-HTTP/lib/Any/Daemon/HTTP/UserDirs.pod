@@ -153,12 +153,12 @@ Extends L<"DETAILS" in Any::Daemon::HTTP::Directory|Any::Daemon::HTTP::Directory
  
 =head1 SEE ALSO
 
-This module is part of Any-Daemon-HTTP distribution version 0.29,
-built on November 04, 2019. Website: F<http://perl.overmeer.net/any-daemon/>
+This module is part of Any-Daemon-HTTP distribution version 0.30,
+built on April 06, 2020. Website: F<http://perl.overmeer.net/any-daemon/>
 
 =head1 LICENSE
 
-Copyrights 2013-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2013-2020 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.2';
+our $VERSION = 'v7.0.3';
 
 
 
@@ -34,7 +34,7 @@ SemanticWeb::Schema::AssignAction - The act of allocating an action/event/task t
 
 =head1 VERSION
 
-version v7.0.2
+version v7.0.3
 
 =head1 DESCRIPTION
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.2';
+our $VERSION = 'v7.0.3';
 
 
 has announcement_location => (
@@ -106,6 +106,14 @@ has travel_bans => (
 
 
 
+has web_feed => (
+    is        => 'rw',
+    predicate => '_has_web_feed',
+    json_ld   => 'webFeed',
+);
+
+
+
 
 
 1;
@@ -122,7 +130,7 @@ SemanticWeb::Schema::SpecialAnnouncement - A SpecialAnnouncement combines a simp
 
 =head1 VERSION
 
-version v7.0.2
+version v7.0.3
 
 =head1 DESCRIPTION
 
@@ -370,59 +378,15 @@ C<newsUpdatesAndGuidelines>
 =for html <p>Indicates a page with news updates and guidelines. This could often be
 (but is not required to be) the main page containing <a class="localLink"
 href="http://schema.org/SpecialAnnouncement">SpecialAnnouncement</a> markup
-on a site.]]></rdfs:comment> <dct:source
-rdf:resource="https://github.com/schemaorg/schemaorg/issues/2490"/>
-<schema:rangeIncludes rdf:resource="http://schema.org/URL"/>
-</rdf:Property> <schema:LegalValueLevel
-rdf:about="http://schema.org/OfficialLegalValue">
-<schema:category>issue-1156</schema:category> <schema:isPartOf
-rdf:resource="http://pending.schema.org"/> <dct:source
-rdf:resource="http://publications.europa.eu/mdr/eli/index.html"/>
-<dct:source
-rdf:resource="https://github.com/schemaorg/schemaorg/issues/1156"/>
-<rdfs:label>OfficialLegalValue</rdfs:label> <skos:exactMatch
-rdf:resource="http://data.europa.eu/eli/ontology#LegalValue-official"/>
-<rdfs:comment>All the documents published by an official publisher should
-have at least the legal value level "OfficialLegalValue". This indicates
-that the document was published by an organisation with the public task of
-making it available (e.g. a consolidated version of a EU directive
-published by the EU Office of Publications).</rdfs:comment>
-</schema:LegalValueLevel> <schema:HealthAspectEnumeration
-rdf:about="http://schema.org/PrognosisHealthAspect">
-<schema:category>issue-2374</schema:category>
-<rdfs:label>PrognosisHealthAspect</rdfs:label> <rdfs:comment>Typical
-progression and happenings of life course of the topic.</rdfs:comment>
-<dct:source
-rdf:resource="https://github.com/schemaorg/schemaorg/issues/2374"/>
-<schema:isPartOf rdf:resource="http://pending.schema.org"/>
-</schema:HealthAspectEnumeration> <rdf:Property
-rdf:about="http://schema.org/materialExtent"> <schema:category
-xml:lang="en">issue-1759</schema:category> <schema:isPartOf
-rdf:resource="http://pending.schema.org"/> <schema:rangeIncludes
-rdf:resource="http://schema.org/Text"/> <rdfs:label
-xml:lang="en">materialExtent</rdfs:label> <dct:source
-rdf:resource="https://github.com/schemaorg/schemaorg/issues/1759"/>
-<schema:rangeIncludes rdf:resource="http://schema.org/QuantitativeValue"/>
-<rdfs:comment>The quantity of the materials being described or an
-expression of the physical space they occupy.</rdfs:comment>
-<schema:domainIncludes rdf:resource="http://schema.org/CreativeWork"/>
-</rdf:Property> <rdf:Property
-rdf:about="http://schema.org/accommodationFloorPlan">
-<schema:domainIncludes rdf:resource="http://schema.org/Residence"/>
-<rdfs:label>accommodationFloorPlan</rdfs:label> <schema:rangeIncludes
-rdf:resource="http://schema.org/FloorPlan"/>
-<schema:category>issue-2373</schema:category> <schema:isPartOf
-rdf:resource="http://pending.schema.org"/> <schema:domainIncludes
-rdf:resource="http://schema.org/Accommodation"/> <dct:source
-rdf:resource="https://github.com/schemaorg/schemaorg/issues/2373"/>
-<rdfs:comment><![CDATA[A floorplan of some <a class="localLink"
-href="http://schema.org/Accommodation">Accommodation</a>.<p>
+on a site.<p>
 
 A news_updates_and_guidelines should be one of the following types:
 
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::WebContent']>
+
+=item C<Str>
 
 =back
 
@@ -509,6 +473,27 @@ A travel_bans should be one of the following types:
 =head2 C<_has_travel_bans>
 
 A predicate for the L</travel_bans> attribute.
+
+=head2 C<web_feed>
+
+C<webFeed>
+
+The URL for a feed, e.g. associated with a podcast series, blog, or series
+of date-stamped updates. This is usually RSS or Atom.
+
+A web_feed should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::DataFeed']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_web_feed>
+
+A predicate for the L</web_feed> attribute.
 
 =head1 SEE ALSO
 

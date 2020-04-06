@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 6db32c8543e17438a2fa1e0c1e9015c19861fa98f22cf41833a1babd8ba9d5bd Changes
+SHA256 dca15af0ff870688d8526875227bb01b87402f5c7ab2dd27a2890a6c369b0243 Detect.pm
+SHA256 9984f7b209d43761721f55f57d3b943c1d5308788d8d1818642db5deac235044 LICENSE
+SHA256 4c16b86fb8800ecfb9ae41e15a749369cc6593307e5fa8880dfebdee3120402d MANIFEST
+SHA256 658b47cf865646d7c108c238b5c69914b3f02e13ab7a33e700dbb7d5049e15b5 META.yml
+SHA256 956f5eaf37089f93f6889726f1b72f9b7058dbb52f64dff114d624e5ff198bd3 Makefile.PL
+SHA256 5f238fcb34549501d694b6f71b813135de76a55707c34c6f508259d9bbe8c5c4 README
+SHA256 a016ba6acc89bb8841b3e7f959bf55765c4dba96fcbab4fbcd0475836324f7b6 examples/ex1.pl
+SHA256 7d02b318fae57d6f9cf7d6dc67d7d04739bc1cd5b7066ab8bb6fcc9ec85d97d4 examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 67f9524041b2b5451ef262062c804f5291f3d13c6d0bbc6be49adff08e81ca85 t/CAD-AutoCAD-Detect/01-use.t
+SHA256 7699112502e222a7963fbc79d7683cde711bc285381d347b22785b44ab95d690 t/CAD-AutoCAD-Detect/02-version.t
+SHA256 da62a65ddf2d23cb69d8f9fc33777671fd71a3bdac5f4891e9c5e57faaefe8b1 t/CAD-AutoCAD-Detect/03-detect_dwg_file.t
+SHA256 4c17b604c4684af9639e1d638e8134ebf794d3585ef48bfcbc48cb90b5f5b6b8 t/data/ex1.dwg
+SHA256 d059ccec3a1d429f8fd117a95642733a676c63393130d6be951cf158f1d6e38b t/data/ex2.dwg
+SHA256 a69298329297ce09c5dbb060130e9fc37fd73fe8e5c6dba9200b1c7e17dbc7c5 t/data/ex3.dwg
+SHA256 4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865 t/data/fake.dwg
+SHA256 69d65704edb421ee170df6230ad47902284863ecab9cc93461f9e9f2848b1a47 xt/CAD-AutoCAD-Detect/01-pod_coverage.t
+SHA256 11a24d66d30805aada00cd209e4241e8ae48a11dfe9234bb8a38ae7a143d0aca xt/CAD-AutoCAD-Detect/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl6K+cUACgkQKyiOZjWe
+rHZxcAf/f5vtMkFwKs8ffNrAyS3imdymG0dapMGMLZlpSufu4e4hca5+nmnsnTKL
+cUcntloVg/Ee5ZDpUWk0knZicP4drTmuhShQ6MLskT5/lZr1Gt/AgSGWvM2I+GPi
+AHeVw5ZXAJFs5TgG+L7ChRjLSk8BekK0h+fq1W0znCZAkDE3fjU3E0vDFMtdiFoU
+8uRQCfTOCM+iU1Z9SjIwVaDpabbdC0lEgdpBJekLYOZfhq25IQI7W/w2t2ZCoBzk
+/9vS505wwYaZ6qAwZls1xBQc4WUf13rjvz49CiFf9f2vXAR6JaI/YMS4EN6+127e
+S969OcG9DwoOW37kSsqX1l79AYsOMw==
+=6EEk
+-----END PGP SIGNATURE-----

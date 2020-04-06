@@ -69,6 +69,6 @@
          "web" : "https://github.com/markov2/perl5-Any-Daemon-HTTP"
       }
    },
-   "version" : "0.29",
+   "version" : "0.30",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

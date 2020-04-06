@@ -1,0 +1,199 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A CDCPMDRecord is a data structure representing a record in a CDC tabular data format\n      used for hospital data reporting. See <a href=\"/docs/cdc-covid.html\">documentation</a> for details, and the linked CDC materials for authoritative\n      definitions used as the source here.",
+      "rdfs:label" : "CDCPMDRecord",
+      "rdfs:subClassOf" : "schema:StructuredValue",
+      "schema:category" : "issue-2521",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {
+      "schema:cvdCollectionDate" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "collectiondate - Date for which patient counts are reported.",
+         "rdfs:label" : "cvdCollectionDate",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:DateTime"
+         ]
+      },
+      "schema:cvdFacilityCounty" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Name of the County of the NHSN facility that this data record applies to. Use <a class=\"localLink\" href=\"http://schema.org/cvdFacilityId\">cvdFacilityId</a> to identify the facility. To provide other details, <a class=\"localLink\" href=\"http://schema.org/healthcareReportingData\">healthcareReportingData</a> can be used on a <a class=\"localLink\" href=\"http://schema.org/Hospital\">Hospital</a> entry.",
+         "rdfs:label" : "cvdFacilityCounty",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:cvdFacilityId" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Identifier of the NHSN facility that this data record applies to. Use <a class=\"localLink\" href=\"http://schema.org/cvdFacilityCounty\">cvdFacilityCounty</a> to indicate the county. To provide other details, <a class=\"localLink\" href=\"http://schema.org/healthcareReportingData\">healthcareReportingData</a> can be used on a <a class=\"localLink\" href=\"http://schema.org/Hospital\">Hospital</a> entry.",
+         "rdfs:label" : "cvdFacilityId",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:cvdNumBeds" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numbeds - HOSPITAL INPATIENT BEDS: Inpatient beds, including all staffed, licensed, and overflow (surge) beds used for inpatients.",
+         "rdfs:label" : "cvdNumBeds",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumBedsOcc" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numbedsocc - HOSPITAL INPATIENT BED OCCUPANCY: Total number of staffed inpatient beds that are occupied.",
+         "rdfs:label" : "cvdNumBedsOcc",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumC19Died" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numc19died - DEATHS: Patients with suspected or confirmed COVID-19 who died in the hospital, ED, or any overflow location.",
+         "rdfs:label" : "cvdNumC19Died",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumC19HOPats" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numc19hopats - HOSPITAL ONSET: Patients hospitalized in an NHSN inpatient care location with onset of suspected or confirmed COVID-19 14 or more days after hospitalization.",
+         "rdfs:label" : "cvdNumC19HOPats",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumC19HospPats" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numc19hosppats - HOSPITALIZED: Patients currently hospitalized in an inpatient care location who have suspected or confirmed COVID-19.",
+         "rdfs:label" : "cvdNumC19HospPats",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumC19MechVentPats" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numc19mechventpats - HOSPITALIZED and VENTILATED: Patients hospitalized in an NHSN inpatient care location who have suspected or confirmed COVID-19 and are on a mechanical ventilator.",
+         "rdfs:label" : "cvdNumC19MechVentPats",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumC19OFMechVentPats" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numc19ofmechventpats - ED/OVERFLOW and VENTILATED: Patients with suspected or confirmed COVID-19 who are in the ED or any overflow location awaiting an inpatient bed and on a mechanical ventilator.",
+         "rdfs:label" : "cvdNumC19OFMechVentPats",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumC19OverflowPats" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numc19overflowpats - ED/OVERFLOW: Patients with suspected or confirmed COVID-19 who are in the ED or any overflow location awaiting an inpatient bed.",
+         "rdfs:label" : "cvdNumC19OverflowPats",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumICUBeds" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numicubeds - ICU BEDS: Total number of staffed inpatient intensive care unit (ICU) beds.",
+         "rdfs:label" : "cvdNumICUBeds",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumICUBedsOcc" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numicubedsocc - ICU BED OCCUPANCY: Total number of staffed inpatient ICU beds that are occupied.",
+         "rdfs:label" : "cvdNumICUBedsOcc",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumTotBeds" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numtotbeds - ALL HOSPITAL BEDS: Total number of all Inpatient and outpatient beds, including all staffed,ICU, licensed, and overflow (surge) beds used for inpatients or outpatients.",
+         "rdfs:label" : "cvdNumTotBeds",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumVent" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numvent - MECHANICAL VENTILATORS: Total number of ventilators available.",
+         "rdfs:label" : "cvdNumVent",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:cvdNumVentUse" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "numventuse - MECHANICAL VENTILATORS IN USE: Total number of ventilators in use.",
+         "rdfs:label" : "cvdNumVentUse",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:CDCPMDRecord",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:datePosted" : {
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2490",
+            "https://github.com/schemaorg/schemaorg/issues/2521"
+         ],
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Publication date of an online listing.",
+         "rdfs:label" : "datePosted",
+         "schema:category" : [
+            "issue-2490",
+            "issue-2521"
+         ],
+         "schema:domainIncludes" : [
+            "schema:SpecialAnnouncement",
+            "schema:RealEstateListing",
+            "schema:CDCPMDRecord",
+            "schema:JobPosting"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:DateTime",
+            "schema:Date"
+         ]
+      }
+   }
+}

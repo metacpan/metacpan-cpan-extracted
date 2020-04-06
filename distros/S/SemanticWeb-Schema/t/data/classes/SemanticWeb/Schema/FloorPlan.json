@@ -15,9 +15,9 @@
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
-            "schema:FloorPlan",
             "schema:LodgingBusiness",
             "schema:Accommodation",
+            "schema:FloorPlan",
             "schema:Place"
          ],
          "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
@@ -28,8 +28,8 @@
          "rdfs:comment" : "The size of the accommodation, e.g. in square meter or squarefoot.\nTypical unit code(s): MTK for square meter, FTK for square foot, or YDK for square yard",
          "rdfs:label" : "floorSize",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
-            "schema:FloorPlan"
+            "schema:FloorPlan",
+            "schema:Accommodation"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
@@ -50,8 +50,8 @@
          "rdfs:label" : "numberOfAccommodationUnits",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:FloorPlan",
-            "schema:ApartmentComplex"
+            "schema:ApartmentComplex",
+            "schema:FloorPlan"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:QuantitativeValue"
@@ -63,8 +63,8 @@
          "rdfs:label" : "numberOfAvailableAccommodationUnits",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:FloorPlan",
-            "schema:ApartmentComplex"
+            "schema:ApartmentComplex",
+            "schema:FloorPlan"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:QuantitativeValue"
@@ -89,9 +89,9 @@
          "rdfs:label" : "numberOfBedrooms",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
+            "schema:Accommodation",
             "schema:ApartmentComplex",
-            "schema:FloorPlan",
-            "schema:Accommodation"
+            "schema:FloorPlan"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
@@ -119,8 +119,8 @@
          "rdfs:label" : "numberOfPartialBathrooms",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:FloorPlan",
-            "schema:Accommodation"
+            "schema:Accommodation",
+            "schema:FloorPlan"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Number"
@@ -131,17 +131,17 @@
          "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
-            "schema:Apartment",
-            "schema:FloorPlan",
-            "schema:House",
-            "schema:Accommodation",
             "schema:Suite",
             "schema:LodgingBusiness",
-            "schema:SingleFamilyResidence"
+            "schema:FloorPlan",
+            "schema:Accommodation",
+            "schema:SingleFamilyResidence",
+            "schema:Apartment",
+            "schema:House"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:petsAllowed" : {
@@ -151,13 +151,13 @@
          "rdfs:label" : "petsAllowed",
          "schema:domainIncludes" : [
             "schema:LodgingBusiness",
-            "schema:Accommodation",
             "schema:FloorPlan",
-            "schema:ApartmentComplex"
+            "schema:ApartmentComplex",
+            "schema:Accommodation"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Boolean"
+            "schema:Boolean",
+            "schema:Text"
          ]
       }
    }

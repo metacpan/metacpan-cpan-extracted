@@ -14,11 +14,11 @@
          "rdfs:label" : "currency",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : [
-            "schema:LoanOrCredit",
-            "schema:ExchangeRateSpecification",
+            "schema:MonetaryAmount",
             "schema:MonetaryAmountDistribution",
             "schema:DatedMoneySpecification",
-            "schema:MonetaryAmount"
+            "schema:LoanOrCredit",
+            "schema:ExchangeRateSpecification"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -28,10 +28,10 @@
          "rdfs:comment" : "The upper value of some characteristic or property.",
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:PropertyValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValueSpecification"
+            "schema:PropertyValueSpecification",
+            "schema:PropertyValue",
+            "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -41,10 +41,10 @@
          "rdfs:comment" : "The lower value of some characteristic or property.",
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:PropertyValueSpecification",
             "schema:QuantitativeValue",
-            "schema:PropertyValue"
+            "schema:PropertyValue",
+            "schema:PropertyValueSpecification",
+            "schema:MonetaryAmount"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -54,13 +54,13 @@
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
-            "schema:Permit",
-            "schema:OpeningHoursSpecification",
             "schema:Offer",
+            "schema:OpeningHoursSpecification",
             "schema:MonetaryAmount",
-            "schema:Demand",
+            "schema:Permit",
             "schema:LocationFeatureSpecification",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
@@ -73,13 +73,13 @@
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
+            "schema:Demand",
             "schema:MonetaryAmount",
-            "schema:LocationFeatureSpecification",
             "schema:OpeningHoursSpecification",
-            "schema:PriceSpecification",
             "schema:JobPosting",
             "schema:Offer",
-            "schema:Demand"
+            "schema:LocationFeatureSpecification",
+            "schema:PriceSpecification"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
@@ -97,10 +97,10 @@
             "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Boolean",
             "schema:Number",
-            "schema:StructuredValue"
+            "schema:Boolean",
+            "schema:StructuredValue",
+            "schema:Text"
          ]
       }
    }

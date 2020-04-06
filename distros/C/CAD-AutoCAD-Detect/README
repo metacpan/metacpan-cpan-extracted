@@ -1,0 +1,104 @@
+NAME
+    CAD::AutoCAD::Detect - Detect AutoCAD files through magic string.
+
+SYNOPSIS
+     use CAD::AutoCAD::Detect qw(detect_dwg_file);
+
+     my $dwg_flag = detect_dwg_file($file);
+
+DESCRIPTION
+    This Perl module detect AutoCAD files through magic string.
+
+    List of supported files: dwg
+
+SUBROUTINES
+  "detect_dwg_file"
+     my $dwg_flag = detect_dwg_file($file);
+
+    Detect DWG file.
+
+    Returns 1/0.
+
+ERRORS
+     detect_dwg_file():
+             Cannot close file '%s'.
+             Cannot open file '%s'.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CAD::AutoCAD::Detect qw(detect_dwg_file);
+     use File::Temp qw(tempfile);
+     use IO::Barf qw(barf);
+     use MIME::Base64;
+
+     # Data in base64.
+     my $data = <<'END';
+     QUMxMDAyAAAAAAAAAAAAAAAK
+     END
+
+     # Temp file.
+     my (undef, $temp_file) = tempfile();
+
+     # Save data to file.
+     barf($temp_file, decode_base64($data));
+
+     # Check file.
+     my $dwg_flag = detect_dwg_file($temp_file);
+
+     # Print out.
+     if ($dwg_flag) {
+             print "File '$temp_file' is DWG file.\n";
+     } else {
+             print "File '$temp_file' isn't DWG file.\n";
+     }
+
+     # Output like:
+     # File '%s' isn't DWG file.
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use CAD::AutoCAD::Detect qw(detect_dwg_file);
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 file\n";
+             exit 1;
+     }
+     my $file = $ARGV[0];
+
+     # Check DWG file.
+     my $dwg_flag = detect_dwg_file($file);
+
+     # Print out.
+     if ($dwg_flag) {
+             print "File '$file' is DWG file.\n";
+     } else {
+             print "File '$file' isn't DWG file.\n";
+     }
+
+     # Output:
+     # Usage: detect-dwg-file file
+
+DEPENDENCIES
+    CAD::AutoCAD::Version, Error::Pure, Exporter, List::MoreUtils, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/CAD-AutoCAD-Detect>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2020 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

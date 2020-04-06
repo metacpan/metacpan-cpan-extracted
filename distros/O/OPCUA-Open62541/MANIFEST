@@ -21,6 +21,7 @@ t/client-config-default.t
 t/client-config.t
 t/client-connect-async.t
 t/client-connect.t
+t/client-disconnect-async.t
 t/client-leak.t
 t/client.t
 t/critic.t

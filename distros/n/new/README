@@ -32,6 +32,10 @@ DESCRIPTION
 
     then install the resulting object in $O in the calling package.
 
+    Caveat: if $class loads successfully but does not have a "new" method,
+    we install the $class instead since you might want to call class
+    methods.
+
     If the first argument to "import" after $class begins with "$", this is
     treated as the name to install the object as, so
 

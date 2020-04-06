@@ -4,9 +4,9 @@
       "rdfs:comment" : "A hospital.",
       "rdfs:label" : "Hospital",
       "rdfs:subClassOf" : [
+         "schema:MedicalOrganization",
          "schema:EmergencyService",
-         "schema:CivicStructure",
-         "schema:MedicalOrganization"
+         "schema:CivicStructure"
       ]
    },
    "properties" : {
@@ -15,15 +15,28 @@
          "rdfs:comment" : "A medical service available from this provider.",
          "rdfs:label" : "availableService",
          "schema:domainIncludes" : [
-            "schema:MedicalClinic",
+            "schema:Physician",
             "schema:Hospital",
-            "schema:Physician"
+            "schema:MedicalClinic"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
             "schema:MedicalProcedure",
-            "schema:MedicalTherapy",
-            "schema:MedicalTest"
+            "schema:MedicalTest",
+            "schema:MedicalTherapy"
+         ]
+      },
+      "schema:healthcareReportingData" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2521",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates data describing a hospital, e.g. a CDC <a class=\"localLink\" href=\"http://schema.org/CDCPMDRecord\">CDCPMDRecord</a> or as some kind of <a class=\"localLink\" href=\"http://schema.org/Dataset\">Dataset</a>.",
+         "rdfs:label" : "healthcareReportingData",
+         "schema:category" : "issue-2521",
+         "schema:domainIncludes" : "schema:Hospital",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:CDCPMDRecord",
+            "schema:Dataset"
          ]
       },
       "schema:medicalSpecialty" : {
@@ -32,9 +45,9 @@
          "rdfs:label" : "medicalSpecialty",
          "schema:domainIncludes" : [
             "schema:MedicalClinic",
+            "schema:MedicalOrganization",
             "schema:Physician",
-            "schema:Hospital",
-            "schema:MedicalOrganization"
+            "schema:Hospital"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalSpecialty"

@@ -31,13 +31,13 @@
          "rdfs:comment" : "Real or fictional location of the game (or part of game).",
          "rdfs:label" : "gameLocation",
          "schema:domainIncludes" : [
-            "schema:VideoGameSeries",
-            "schema:Game"
+            "schema:Game",
+            "schema:VideoGameSeries"
          ],
          "schema:rangeIncludes" : [
-            "schema:PostalAddress",
+            "schema:URL",
             "schema:Place",
-            "schema:URL"
+            "schema:PostalAddress"
          ]
       },
       "schema:numberOfPlayers" : {

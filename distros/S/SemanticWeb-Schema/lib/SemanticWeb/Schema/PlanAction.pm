@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.2';
+our $VERSION = 'v7.0.3';
 
 
 has scheduled_time => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::PlanAction - The act of planning the execution of an event/
 
 =head1 VERSION
 
-version v7.0.2
+version v7.0.3
 
 =head1 DESCRIPTION
 

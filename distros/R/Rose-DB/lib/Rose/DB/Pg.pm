@@ -11,7 +11,7 @@ use Rose::DB;
 
 our $VERSION = '0.786'; # overshot version number, freeze until caught up
 
-use constant DBD_PG_AFTER_380 => ($DBD::Pg::VERSION =~ /^(\d+)\.(\d+)/ && ($1 >=3 && $2 >= 8)) ? 1 : 0;
+our $DBD_PG_AFTER_380; # set in refine_dbi_foreign_key_info()
 
 our $Debug = 0;
 
@@ -672,7 +672,12 @@ sub refine_dbi_foreign_key_info
 {
   my($self, $fk_info) = @_;
 
-  if(DBD_PG_AFTER_380)
+  if(!defined $DBD_PG_AFTER_380 && defined $DBD::Pg::VERSION)
+  {
+    $DBD_PG_AFTER_380 = ($DBD::Pg::VERSION =~ /^(\d+)\.(\d+)/ && ($1 >=3 && $2 >= 8)) ? 1 : 0;
+  }
+
+  if($DBD_PG_AFTER_380)
   {
     $fk_info->{'FK_TABLE_CAT'} = undef;
     $fk_info->{'UK_TABLE_CAT'} = undef;

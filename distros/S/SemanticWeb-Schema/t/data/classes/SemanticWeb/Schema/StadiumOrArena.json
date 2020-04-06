@@ -4,8 +4,8 @@
       "rdfs:comment" : "A stadium.",
       "rdfs:label" : "StadiumOrArena",
       "rdfs:subClassOf" : [
-         "schema:SportsActivityLocation",
-         "schema:CivicStructure"
+         "schema:CivicStructure",
+         "schema:SportsActivityLocation"
       ]
    },
    "properties" : {}

@@ -6,7 +6,7 @@ package SemanticWeb::Schema::3DModel;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::CreativeWork /;
+extends qw/ SemanticWeb::Schema::MediaObject /;
 
 
 use MooX::JSON_LD '3DModel';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.2';
+our $VERSION = 'v7.0.3';
 
 
 
@@ -34,7 +34,7 @@ SemanticWeb::Schema::3DModel - A 3D model represents some kind of 3D content
 
 =head1 VERSION
 
-version v7.0.2
+version v7.0.3
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,7 @@ href="http://schema.org/3DModel">3DModel</a>.<p>
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::CreativeWork>
+L<SemanticWeb::Schema::MediaObject>
 
 =head1 SOURCE
 

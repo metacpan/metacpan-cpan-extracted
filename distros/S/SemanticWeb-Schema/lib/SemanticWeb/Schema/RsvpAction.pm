@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.2';
+our $VERSION = 'v7.0.3';
 
 
 has additional_number_of_guests => (
@@ -58,7 +58,7 @@ SemanticWeb::Schema::RsvpAction - The act of notifying an event organizer as to 
 
 =head1 VERSION
 
-version v7.0.2
+version v7.0.3
 
 =head1 DESCRIPTION
 

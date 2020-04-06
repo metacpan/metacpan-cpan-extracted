@@ -13,8 +13,8 @@
          "rdfs:label" : "arrivalTime",
          "schema:domainIncludes" : "schema:Trip",
          "schema:rangeIncludes" : [
-            "schema:Time",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Time"
          ]
       },
       "schema:departureTime" : {
@@ -36,8 +36,8 @@
          "schema:domainIncludes" : "schema:Trip",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Place",
-            "schema:ItemList"
+            "schema:ItemList",
+            "schema:Place"
          ]
       },
       "schema:offers" : {
@@ -48,13 +48,13 @@
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:CreativeWork",
-            "schema:AggregateOffer",
-            "schema:EducationalOccupationalProgram",
-            "schema:Product",
             "schema:MenuItem",
-            "schema:Service",
+            "schema:AggregateOffer",
+            "schema:Event",
             "schema:Trip",
-            "schema:Event"
+            "schema:EducationalOccupationalProgram",
+            "schema:Service",
+            "schema:Product"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [
@@ -81,16 +81,16 @@
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:ParcelDelivery",
-            "schema:Reservation",
-            "schema:CreativeWork",
-            "schema:EducationalOccupationalProgram",
             "schema:Service",
-            "schema:Invoice",
-            "schema:Trip"
+            "schema:Reservation",
+            "schema:EducationalOccupationalProgram",
+            "schema:Trip",
+            "schema:CreativeWork",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:subTrip" : {

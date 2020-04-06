@@ -17,9 +17,9 @@
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:SuperficialAnatomy",
+            "schema:AnatomicalSystem",
             "schema:AnatomicalStructure",
-            "schema:AnatomicalSystem"
+            "schema:SuperficialAnatomy"
          ]
       },
       "schema:category" : {
@@ -32,20 +32,20 @@
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:PhysicalActivity",
-            "schema:Offer",
             "schema:Product",
+            "schema:PhysicalActivity",
+            "schema:Invoice",
             "schema:Recommendation",
-            "schema:URL",
             "schema:SpecialAnnouncement",
             "schema:ActionAccessSpecification",
             "schema:Service",
-            "schema:Invoice"
+            "schema:Offer",
+            "schema:URL"
          ],
          "schema:rangeIncludes" : [
             "schema:Thing",
-            "schema:PhysicalActivityCategory",
-            "schema:Text"
+            "schema:Text",
+            "schema:PhysicalActivityCategory"
          ]
       },
       "schema:epidemiology" : {
@@ -64,8 +64,8 @@
          "rdfs:comment" : "Changes in the normal mechanical, physical, and biochemical functions that are associated with this activity or condition.",
          "rdfs:label" : "pathophysiology",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
-            "schema:PhysicalActivity"
+            "schema:PhysicalActivity",
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"

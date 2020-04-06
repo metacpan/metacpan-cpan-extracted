@@ -14,8 +14,8 @@
          "rdfs:subPropertyOf" : "schema:suggestedAnswer",
          "schema:domainIncludes" : "schema:Question",
          "schema:rangeIncludes" : [
-            "schema:Answer",
-            "schema:ItemList"
+            "schema:ItemList",
+            "schema:Answer"
          ]
       },
       "schema:answerCount" : {

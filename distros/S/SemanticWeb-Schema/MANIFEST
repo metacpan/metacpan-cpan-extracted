@@ -120,6 +120,7 @@ lib/SemanticWeb/Schema/BusinessEntityType.pm
 lib/SemanticWeb/Schema/BusinessEvent.pm
 lib/SemanticWeb/Schema/BusinessFunction.pm
 lib/SemanticWeb/Schema/BuyAction.pm
+lib/SemanticWeb/Schema/CDCPMDRecord.pm
 lib/SemanticWeb/Schema/CableOrSatelliteService.pm
 lib/SemanticWeb/Schema/CafeOrCoffeeShop.pm
 lib/SemanticWeb/Schema/Campground.pm
@@ -947,6 +948,7 @@ t/data/classes/SemanticWeb/Schema/BusinessEntityType.json
 t/data/classes/SemanticWeb/Schema/BusinessEvent.json
 t/data/classes/SemanticWeb/Schema/BusinessFunction.json
 t/data/classes/SemanticWeb/Schema/BuyAction.json
+t/data/classes/SemanticWeb/Schema/CDCPMDRecord.json
 t/data/classes/SemanticWeb/Schema/CableOrSatelliteService.json
 t/data/classes/SemanticWeb/Schema/CafeOrCoffeeShop.json
 t/data/classes/SemanticWeb/Schema/Campground.json

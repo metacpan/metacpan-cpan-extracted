@@ -3,7 +3,8 @@ use warnings;
 
 package OPCUA::Open62541::Test::Client;
 use OPCUA::Open62541::Test::Logger;
-use OPCUA::Open62541 qw(STATUSCODE_GOOD :CLIENTSTATE);
+use OPCUA::Open62541 qw(STATUSCODE_GOOD STATUSCODE_BADCONNECTIONCLOSED
+    :CLIENTSTATE);
 use Carp 'croak';
 use Time::HiRes qw(sleep);
 
@@ -73,12 +74,20 @@ sub iterate {
     # loop should not take longer than 5 seconds
     for ($i = 50; $i > 0; $i--) {
 	my $sc = $self->{client}->run_iterate(0);
+	if (!defined($end) && $sc == STATUSCODE_BADCONNECTIONCLOSED) {
+	    # iterate until disconnected
+	    pass "client: $ident iterate" if $ident;
+	    last;
+	}
 	if ($sc != STATUSCODE_GOOD) {
 	    fail "client: $ident iterate" or diag "run_iterate failed: $sc"
 		if $ident;
 	    last;
 	}
-	if ($$end) {
+	if (ref($end) eq 'ARRAY' && @$end == 0 or
+	    ref($end) eq 'HASH' && keys %$end == 0 or
+	    ref($end) eq 'CODE' && $end->() or
+	    ref($end) eq 'SCALAR' && $$end) {
 	    pass "client: $ident iterate" if $ident;
 	    last;
 	}
@@ -180,6 +189,13 @@ Otherwise the loop terminates with failure if the status of client
 run_iterate() is not good or after calling it 50 times.
 If $ident is set, it is used to identify a passed or failed test.
 This one test is not included in planning().
+
+If $end is undef, the iteration will continue until the client has
+disconnected.
+If $end is an array or hash reference, the iteration will continue
+until the array or hash is empty.
+If $end is a code reference, the iteration will continue until the
+function call returns true.
 
 =item $client->stop()
 

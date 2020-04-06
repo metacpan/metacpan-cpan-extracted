@@ -1,4 +1,7 @@
 Revision history for new
 
+0.000002 - 2020-04-06
+  - Support class method calls when class has no new() method
+
 0.000001 - 2020-03-28
   - Initial release

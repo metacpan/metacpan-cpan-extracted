@@ -24,13 +24,13 @@
          "rdfs:comment" : "A contraindication for this therapy.",
          "rdfs:label" : "contraindication",
          "schema:domainIncludes" : [
-            "schema:MedicalTherapy",
-            "schema:MedicalDevice"
+            "schema:MedicalDevice",
+            "schema:MedicalTherapy"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:MedicalContraindication"
+            "schema:MedicalContraindication",
+            "schema:Text"
          ]
       },
       "schema:postOp" : {

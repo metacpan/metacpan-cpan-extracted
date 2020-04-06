@@ -309,6 +309,7 @@ my @files = (
     't/session_in_template.t',
     't/session_lifecycle.t',
     't/session_object.t',
+    't/session_yaml_object.t',
     't/shared_engines.t',
     't/static_content.t',
     't/template.t',

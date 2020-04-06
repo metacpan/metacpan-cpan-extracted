@@ -25,6 +25,3 @@ is \&bar2, \&foo;
 is \&bar3, \&foo;
 is \&bar4, \&foo;
 is \&bar5, \&foo;
-
-
-

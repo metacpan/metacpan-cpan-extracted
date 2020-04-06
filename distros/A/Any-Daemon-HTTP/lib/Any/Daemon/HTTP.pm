@@ -1,4 +1,4 @@
-# Copyrights 2013-2019 by [Mark Overmeer].
+# Copyrights 2013-2020 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Any::Daemon::HTTP;
 use vars '$VERSION';
-$VERSION = '0.29';
+$VERSION = '0.30';
 
 
 use Log::Report      'any-daemon-http';
@@ -293,6 +293,8 @@ sub _connection($$)
     {   my $vhostn = $req->header('Host') || 'default';
 		my $vhost  = $self->virtualHost($vhostn);
 
+		$self->_clean_uri($req->uri);
+
         # Fallback to vhost without specific port number
         $vhost ||= $self->virtualHost($1)
             if $vhostn =~ /(.*)\:[0-9]+$/;
@@ -341,6 +343,20 @@ sub _connection($$)
 
     alarm 0;
     $nr_req;
+}
+
+sub _clean_uri($)
+{   my ($self, $uri) = @_;
+    my $path = $uri->path;
+
+    for($path)
+    {  1 while s!/[^/.]+/+\.\.(/|\z)!/$1!
+            || s!^/\.\.(/|\z)!/$1!
+            || s!/{2,}!/!       # //
+            || s!/\.(/|\z)!/!;  # /./
+    }
+
+    $uri->path($path);
 }
 
 sub run(%)

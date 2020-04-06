@@ -1,6 +1,6 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '0.300000';
+$Dancer2::Core::App::VERSION = '0.300001';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
@@ -270,12 +270,12 @@ sub _build_template_engine {
     my $engine_options =
           $self->_get_config_for_engine( template => $value, $config );
 
-    my $engine_attrs = { config => $engine_options };
-    $engine_attrs->{layout} ||= $config->{layout};
-    $engine_attrs->{views}  ||= $config->{views}
-                            || path( $self->location, 'views' );
-    $engine_attrs->{layout_dir} ||= $config->{layout_dir}
-                                || 'layouts';
+    my $engine_attrs = {
+        config => $engine_options,
+        layout => $config->{layout},
+        layout_dir => ( $config->{layout_dir} || 'layouts' ),
+        views => $config->{views},
+    };
 
     Scalar::Util::weaken( my $weak_self = $self );
 
@@ -687,7 +687,7 @@ sub _build_default_config {
         charset        => ( $ENV{DANCER_CHARSET}      || '' ),
         logger         => ( $ENV{DANCER_LOGGER}       || 'console' ),
         views          => ( $ENV{DANCER_VIEWS}
-                            || path( $self->config_location, 'views' ) ),
+                            || path( $self->location, 'views' ) ),
         environment    => $self->environment,
         appdir         => $self->location,
         public_dir     => $public,
@@ -1273,16 +1273,6 @@ sub redirect {
     my $destination = shift;
     my $status      = shift;
 
-    # RFC 2616 requires an absolute URI with a scheme,
-    # turn the URI into that if it needs it
-
-    # Scheme grammar as defined in RFC 2396
-    #  scheme = alpha *( alpha | digit | "+" | "-" | "." )
-    my $scheme_re = qr{ [a-z][a-z0-9\+\-\.]* }ix;
-    if ( $destination !~ m{^ $scheme_re : }x ) {
-        $destination = $self->request->uri_for( $destination, {}, 1 );
-    }
-
     $self->response->redirect( $destination, $status );
 
     # Short circuit any remaining before hook / route code
@@ -1680,7 +1670,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 0.300000
+version 0.300001
 
 =head1 DESCRIPTION
 
@@ -1894,7 +1884,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Alexis Sukrieh.
+This software is copyright (c) 2020 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

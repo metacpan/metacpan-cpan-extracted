@@ -15,7 +15,10 @@
          "rdfs:comment" : "The URL for a feed, e.g. associated with a podcast series, blog, or series of date-stamped updates. This is usually RSS or Atom.",
          "rdfs:label" : "webFeed",
          "schema:category" : "issue-373",
-         "schema:domainIncludes" : "schema:PodcastSeries",
+         "schema:domainIncludes" : [
+            "schema:PodcastSeries",
+            "schema:SpecialAnnouncement"
+         ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
             "schema:URL",

@@ -17,9 +17,9 @@
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:SuperficialAnatomy",
+            "schema:AnatomicalSystem",
             "schema:AnatomicalStructure",
-            "schema:AnatomicalSystem"
+            "schema:SuperficialAnatomy"
          ]
       },
       "schema:differentialDiagnosis" : {
@@ -35,10 +35,10 @@
          "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
-            "schema:Patient",
-            "schema:DrugClass",
             "schema:TherapeuticProcedure",
-            "schema:MedicalCondition"
+            "schema:DrugClass",
+            "schema:MedicalCondition",
+            "schema:Patient"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"
@@ -75,8 +75,8 @@
          "rdfs:comment" : "Changes in the normal mechanical, physical, and biochemical functions that are associated with this activity or condition.",
          "rdfs:label" : "pathophysiology",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
-            "schema:PhysicalActivity"
+            "schema:PhysicalActivity",
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -94,8 +94,8 @@
          "rdfs:comment" : "A possible treatment to address this condition, sign or symptom.",
          "rdfs:label" : "possibleTreatment",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
-            "schema:MedicalSignOrSymptom"
+            "schema:MedicalSignOrSymptom",
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalTherapy"
@@ -145,14 +145,14 @@
          "rdfs:comment" : "The status of the study (enumerated).",
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
+            "schema:MedicalStudy",
             "schema:MedicalProcedure",
-            "schema:MedicalCondition",
-            "schema:MedicalStudy"
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:EventStatusType",
+            "schema:Text",
             "schema:MedicalStudyStatus"
          ]
       },

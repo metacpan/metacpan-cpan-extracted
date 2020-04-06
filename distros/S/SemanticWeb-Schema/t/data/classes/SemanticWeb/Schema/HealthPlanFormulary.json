@@ -16,8 +16,8 @@
          "rdfs:label" : "healthPlanCostSharing",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : [
-            "schema:HealthPlanNetwork",
-            "schema:HealthPlanFormulary"
+            "schema:HealthPlanFormulary",
+            "schema:HealthPlanNetwork"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Boolean"
@@ -29,8 +29,8 @@
          "rdfs:label" : "healthPlanDrugTier",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : [
-            "schema:HealthInsurancePlan",
-            "schema:HealthPlanFormulary"
+            "schema:HealthPlanFormulary",
+            "schema:HealthInsurancePlan"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"

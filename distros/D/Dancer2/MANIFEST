@@ -331,6 +331,7 @@ t/session_hooks_no_change_id.t
 t/session_in_template.t
 t/session_lifecycle.t
 t/session_object.t
+t/session_yaml_object.t
 t/shared_engines.t
 t/static_content.t
 t/template.t

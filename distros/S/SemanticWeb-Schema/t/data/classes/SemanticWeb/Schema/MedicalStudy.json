@@ -24,16 +24,16 @@
          "rdfs:comment" : "A person or organization that supports a thing through a pledge, promise, or financial contribution. e.g. a sponsor of a Medical Study or a corporate sponsor of an event.",
          "rdfs:label" : "sponsor",
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:MedicalStudy",
-            "schema:CreativeWork",
             "schema:Organization",
             "schema:Person",
-            "schema:Grant"
+            "schema:Event",
+            "schema:Grant",
+            "schema:MedicalStudy",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:status" : {
@@ -41,14 +41,14 @@
          "rdfs:comment" : "The status of the study (enumerated).",
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
+            "schema:MedicalStudy",
             "schema:MedicalProcedure",
-            "schema:MedicalCondition",
-            "schema:MedicalStudy"
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:EventStatusType",
+            "schema:Text",
             "schema:MedicalStudyStatus"
          ]
       },

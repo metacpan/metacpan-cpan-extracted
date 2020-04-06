@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.2';
+our $VERSION = 'v7.0.3';
 
 
 has acriss_code => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::BusOrCoach - A bus (also omnibus or autobus) is a road vehi
 
 =head1 VERSION
 
-version v7.0.2
+version v7.0.3
 
 =head1 DESCRIPTION
 

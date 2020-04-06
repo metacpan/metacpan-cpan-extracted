@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::Cronjob;
 # ABSTRACT: wrap up programs to be run as cron jobs
-$App::Cronjob::VERSION = '1.200008';
+$App::Cronjob::VERSION = '1.200009';
 use Digest::MD5 qw(md5_hex);
 use Errno;
 use Fcntl qw( :DEFAULT :flock );
@@ -263,7 +263,7 @@ END_TEMPLATE
 
 {
   package App::Cronjob::Exception;
-$App::Cronjob::Exception::VERSION = '1.200008';
+$App::Cronjob::Exception::VERSION = '1.200009';
 sub new {
     my ($class, $type, $text, $extra) = @_;
     bless { type => $type, text => $text, extra => $extra } => $class;
@@ -284,7 +284,7 @@ App::Cronjob - wrap up programs to be run as cron jobs
 
 =head1 VERSION
 
-version 1.200008
+version 1.200009
 
 =head1 SEE INSTEAD
 

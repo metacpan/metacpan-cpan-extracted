@@ -33,36 +33,43 @@
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:PhysicalActivity",
-            "schema:Offer",
             "schema:Product",
+            "schema:PhysicalActivity",
+            "schema:Invoice",
             "schema:Recommendation",
-            "schema:URL",
             "schema:SpecialAnnouncement",
             "schema:ActionAccessSpecification",
             "schema:Service",
-            "schema:Invoice"
+            "schema:Offer",
+            "schema:URL"
          ],
          "schema:rangeIncludes" : [
             "schema:Thing",
-            "schema:PhysicalActivityCategory",
-            "schema:Text"
+            "schema:Text",
+            "schema:PhysicalActivityCategory"
          ]
       },
       "schema:datePosted" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2490",
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2490",
+            "https://github.com/schemaorg/schemaorg/issues/2521"
+         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Publication date of an online listing.",
          "rdfs:label" : "datePosted",
-         "schema:category" : "issue-2490",
+         "schema:category" : [
+            "issue-2490",
+            "issue-2521"
+         ],
          "schema:domainIncludes" : [
-            "schema:JobPosting",
             "schema:SpecialAnnouncement",
-            "schema:RealEstateListing"
+            "schema:RealEstateListing",
+            "schema:CDCPMDRecord",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:diseasePreventionInfo" : {
@@ -87,10 +94,10 @@
          "schema:domainIncludes" : "schema:SpecialAnnouncement",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
+            "schema:URL",
             "schema:WebContent",
-            "schema:Observation",
             "schema:Dataset",
-            "schema:URL"
+            "schema:Observation"
          ]
       },
       "schema:gettingTestedInfo" : {
@@ -107,13 +114,17 @@
          ]
       },
       "schema:newsUpdatesAndGuidelines" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2490",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Indicates a page with news updates and guidelines. This could often be (but is not required to be) the main page containing <a class=\"localLink\" href=\"http://schema.org/SpecialAnnouncement\">SpecialAnnouncement</a> markup on a site.]]></rdfs:comment>\n    <dct:source rdf:resource=\"https://github.com/schemaorg/schemaorg/issues/2490\"/>\n    <schema:rangeIncludes rdf:resource=\"http://schema.org/URL\"/>\n  </rdf:Property>\n  <schema:LegalValueLevel rdf:about=\"http://schema.org/OfficialLegalValue\">\n    <schema:category>issue-1156</schema:category>\n    <schema:isPartOf rdf:resource=\"http://pending.schema.org\"/>\n    <dct:source rdf:resource=\"http://publications.europa.eu/mdr/eli/index.html\"/>\n    <dct:source rdf:resource=\"https://github.com/schemaorg/schemaorg/issues/1156\"/>\n    <rdfs:label>OfficialLegalValue</rdfs:label>\n    <skos:exactMatch rdf:resource=\"http://data.europa.eu/eli/ontology#LegalValue-official\"/>\n    <rdfs:comment>All the documents published by an official publisher should have at least the legal value level \"OfficialLegalValue\". This indicates that the document was published by an organisation with the public task of making it available (e.g. a consolidated version of a EU directive published by the EU Office of Publications).</rdfs:comment>\n  </schema:LegalValueLevel>\n  <schema:HealthAspectEnumeration rdf:about=\"http://schema.org/PrognosisHealthAspect\">\n    <schema:category>issue-2374</schema:category>\n    <rdfs:label>PrognosisHealthAspect</rdfs:label>\n    <rdfs:comment>Typical progression and happenings of life course of the topic.</rdfs:comment>\n    <dct:source rdf:resource=\"https://github.com/schemaorg/schemaorg/issues/2374\"/>\n    <schema:isPartOf rdf:resource=\"http://pending.schema.org\"/>\n  </schema:HealthAspectEnumeration>\n  <rdf:Property rdf:about=\"http://schema.org/materialExtent\">\n    <schema:category xml:lang=\"en\">issue-1759</schema:category>\n    <schema:isPartOf rdf:resource=\"http://pending.schema.org\"/>\n    <schema:rangeIncludes rdf:resource=\"http://schema.org/Text\"/>\n    <rdfs:label xml:lang=\"en\">materialExtent</rdfs:label>\n    <dct:source rdf:resource=\"https://github.com/schemaorg/schemaorg/issues/1759\"/>\n    <schema:rangeIncludes rdf:resource=\"http://schema.org/QuantitativeValue\"/>\n    <rdfs:comment>The quantity of the materials being described or an expression of the physical space they occupy.</rdfs:comment>\n    <schema:domainIncludes rdf:resource=\"http://schema.org/CreativeWork\"/>\n  </rdf:Property>\n  <rdf:Property rdf:about=\"http://schema.org/accommodationFloorPlan\">\n    <schema:domainIncludes rdf:resource=\"http://schema.org/Residence\"/>\n    <rdfs:label>accommodationFloorPlan</rdfs:label>\n    <schema:rangeIncludes rdf:resource=\"http://schema.org/FloorPlan\"/>\n    <schema:category>issue-2373</schema:category>\n    <schema:isPartOf rdf:resource=\"http://pending.schema.org\"/>\n    <schema:domainIncludes rdf:resource=\"http://schema.org/Accommodation\"/>\n    <dct:source rdf:resource=\"https://github.com/schemaorg/schemaorg/issues/2373\"/>\n    <rdfs:comment><![CDATA[A floorplan of some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>.",
+         "rdfs:comment" : "Indicates a page with news updates and guidelines. This could often be (but is not required to be) the main page containing <a class=\"localLink\" href=\"http://schema.org/SpecialAnnouncement\">SpecialAnnouncement</a> markup on a site.",
          "rdfs:label" : "newsUpdatesAndGuidelines",
          "schema:category" : "issue-2490",
          "schema:domainIncludes" : "schema:SpecialAnnouncement",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:WebContent"
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:WebContent"
+         ]
       },
       "schema:publicTransportClosuresInfo" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2490",
@@ -124,8 +135,8 @@
          "schema:domainIncludes" : "schema:SpecialAnnouncement",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:WebContent",
-            "schema:URL"
+            "schema:URL",
+            "schema:WebContent"
          ]
       },
       "schema:quarantineGuidelines" : {
@@ -137,8 +148,8 @@
          "schema:domainIncludes" : "schema:SpecialAnnouncement",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:WebContent",
-            "schema:URL"
+            "schema:URL",
+            "schema:WebContent"
          ]
       },
       "schema:schoolClosuresInfo" : {
@@ -165,6 +176,22 @@
          "schema:rangeIncludes" : [
             "schema:WebContent",
             "schema:URL"
+         ]
+      },
+      "schema:webFeed" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The URL for a feed, e.g. associated with a podcast series, blog, or series of date-stamped updates. This is usually RSS or Atom.",
+         "rdfs:label" : "webFeed",
+         "schema:category" : "issue-373",
+         "schema:domainIncludes" : [
+            "schema:PodcastSeries",
+            "schema:SpecialAnnouncement"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:DataFeed"
          ]
       }
    }

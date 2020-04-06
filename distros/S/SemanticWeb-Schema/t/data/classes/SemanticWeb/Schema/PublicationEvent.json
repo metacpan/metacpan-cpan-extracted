@@ -20,8 +20,8 @@
          "rdfs:label" : "isAccessibleForFree",
          "schema:domainIncludes" : [
             "schema:CreativeWork",
-            "schema:Place",
             "schema:PublicationEvent",
+            "schema:Place",
             "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:Boolean"

@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.13.7 2020-04-06T15:06:22Z
+
+    - Unify --visible-* to --visible and implement general.
+
 4.13.6 2020-04-01T12:27:30Z
 
     - Move colortable() function in sdif to Getopt::EX::Colormap.

@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::Logger;
 # ABSTRACT: Role for logger engines
-$Dancer2::Core::Role::Logger::VERSION = '0.300000';
+$Dancer2::Core::Role::Logger::VERSION = '0.300001';
 use Dancer2::Core::Types;
 
 use Moo::Role;
@@ -82,10 +82,7 @@ sub format_message {
     my $block_handler = sub {
         my ( $block, $type ) = @_;
         if ( $type eq 't' ) {
-            return Encode::decode(
-                $config->{'charset'} || 'UTF-8',
-                POSIX::strftime( $block, localtime(time) )
-            );
+            return POSIX::strftime( $block, localtime(time) );
         }
         elsif ( $type eq 'h' ) {
             return ( $request && $request->header($block) ) || '-';
@@ -98,19 +95,9 @@ sub format_message {
 
     my $chars_mapping = {
         a => sub { $self->app_name },
-        t => sub {
-            Encode::decode(
-                $config->{'charset'} || 'UTF-8',
-                POSIX::strftime( "%d/%b/%Y %H:%M:%S", localtime(time) )
-            );
-        },
+        t => sub { POSIX::strftime( "%d/%b/%Y %H:%M:%S", localtime(time) ) },
         T => sub { POSIX::strftime( "%Y-%m-%d %H:%M:%S", localtime(time) ) },
-        u => sub {
-            Encode::decode(
-                $config->{'charset'} || 'UTF-8',
-                POSIX::strftime( "%d/%b/%Y %H:%M:%S", gmtime(time) )
-            );
-        },
+        u => sub { POSIX::strftime( "%d/%b/%Y %H:%M:%S", gmtime(time) ) },
         U => sub { POSIX::strftime( "%Y-%m-%d %H:%M:%S", gmtime(time) ) },
         P => sub {$$},
         L => sub {$level},
@@ -204,7 +191,7 @@ Dancer2::Core::Role::Logger - Role for logger engines
 
 =head1 VERSION
 
-version 0.300000
+version 0.300001
 
 =head1 DESCRIPTION
 
@@ -337,7 +324,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Alexis Sukrieh.
+This software is copyright (c) 2020 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,49 +1,49 @@
 package Sub::Alias;
-use warnings;
+use 5.012;
 use strict;
-use 5.008;
+use warnings;
 
-use Sub::Exporter -setup => {
-    exports => [ 'alias' ],
-    groups => { default => [ 'alias' ] }
-};
+our $VERSION = '1.0.0';
 
-use Devel::BeginLift qw(alias);
+use Keyword::Declare;
 
-use Devel::Declare qw();
+sub import {
+    keyword alias (Ident $new_ident, Comma, Str $old_name) {
+        my $old_ident = substr($old_name, 1, -1);
+        return qq! {; no strict "refs"; *{"${new_ident}"} = *{"${old_ident}"}; }; !;
+    };
 
-our $VERSION = '0.03';
+    keyword alias (Str $new_name, Comma, Str $old_name) {
+        my $new_ident = substr($new_name, 1, -1);
+        my $old_ident = substr($old_name, 1, -1);
+        return qq! {; no strict "refs"; *{"${new_ident}"} = *{"${old_ident}"}; }; !;
+    };
 
-sub alias {
-    my ($new_name, $old_name) = @_;
-    my $caller = caller;
+    keyword alias (Ident $new_ident, Comma, /\\&(?&PerlIdentifier)/ $sub_ref) {
+        my $old_ident = substr($sub_ref, 2);
+        return qq! {; no strict "refs"; *{"${new_ident}"} = *{"${old_ident}"}; }; !;
+    };
 
-    if (defined($new_name) && defined($old_name)) {
-        _alias($new_name, $old_name, $caller);
-    }
-    else {
-        my $line = Devel::Declare::get_linestr;
-        my $offset = Devel::Declare::get_linestr_offset;
+    keyword alias (Str $new_name, Comma, /\\&(?&PerlIdentifier)/ $sub_ref) {
+        my $new_ident = substr($new_name, 1, -1);
+        my $old_ident = substr($sub_ref, 2);
+        my $caller = caller(2);
+        return qq! {; no strict "refs"; *{"${new_ident}"} = *{"${old_ident}"}; }; !;
+    };
 
-        my $line2 = $line;
-        if ($line2 =~ s/alias/Sub::Alias::_alias/) {
-            substr($line, $offset, 0) = $line2;
-            Devel::Declare::set_linestr($line);
-        }
-    }
-    return 1;
+    keyword alias (VariableScalar $new_name, Comma, Str $old_name) {
+        my $old_ident = substr($old_name, 1, -1);
+        return qq! {; no strict "refs"; *{"${new_name}"} = *{"${old_ident}"}; }; !;
+    };
+
+    keyword alias (VariableScalar $new_name, Comma, /\\&(?&PerlIdentifier)/ $sub_ref) {
+        my $old_ident = substr($sub_ref, 2);
+        return qq! {; no strict "refs"; *{"${new_name}"} = *{"${old_ident}"}; }; !;
+    };
 }
 
-
-sub _alias {
-    my ($new_name, $old_name, $caller) = @_;
-    $caller ||= caller;
-
-    no strict;
-    no warnings;
-    *{"$caller\::${new_name}"} = ref($old_name) ? $old_name : *{"$caller\::${old_name}"};
-
-    return 1;
+sub unimport {
+    unkeyword alias;
 }
 
 1;
@@ -70,66 +70,41 @@ This document describes Sub::Alias version 0.01
 =head1 DESCRIPTION
 
 This module does a compile-time code injection to let you define
-subroute aliases with their names, but not code refs.
-
-The not-so-scarily-described way to alias a sub looks like this:
-
-    sub name { "..." }
-    *get_name = \&name;
-
-As you can see, it's a bit of trouble to type the whole line without
-without making your finger jammed unless you're using some smart text
-editors.
+subroute aliases by names or code refs.
 
 =head1 INTERFACE
 
-=over
+By <use Sub::Alias>, an new keyword 'alias' is introduced in the
+scope. Let's say there is an existing subroutine named "wine"
+and we want to create an alias to it named "vino".
 
-=item alias $new_name => $old_name
+The following 2 ways should be trivial to understand:
 
-This function is exported by default.
+    # By name
+    alias vino => "wine";
 
-The alias subroutine can be referenced by its name:
+    # By code reference
+    alias vino => \&wine;
 
-    alias get_name => 'name';
+The first argument can be a scalar variable containing the new name:
 
-Or by its reference:
+    my $n = "vino";
+    alias $n => \&wine;
 
-    alias get_name => \&name;
-
-Also notice that doing this will actually call the C<name> function:
-
-    alias get_name => name;
-
-However, C<get_name> will still be an alias to C<name> funciton after this
-statement.
-
-It is recommended that you just pass function names as strings.
-
-B<NOTICE:> If your new name depends on runtime data:
-
-    alias $new_foo => \&foo;
-
-You need to put them in a single line alone.
-
-=back
+Complex exressions that computes a new name is not supported.
 
 =head1 DEPENDENCIES
 
-L<Devel::BeginLift>, L<Devel::Declare>, L<Sub::Exporter>
+L<Keyword::Declare>
 
 =head1 INCOMPATIBILITIES
 
-None reported.
+Perl versions older than 5.12 are not supported.
 
 =head1 BUGS AND LIMITATIONS
 
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-C<bug-sub-alias@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
-
+Please report any bugs or feature requests to Github Issue at
+L<https://github.com/gugod/Sub-Alias/issues>
 
 =head1 AUTHOR
 
@@ -138,7 +113,7 @@ Kang-min Liu  C<< <gugod@gugod.org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2008, 2009, Kang-min Liu C<< <gugod@gugod.org> >>.
+Copyright (c) 2020, Kang-min Liu C<< <gugod@gugod.org> >>.
 
 This is free software, licensed under:
 

@@ -16,14 +16,14 @@
          "rdfs:comment" : "The amount of money.",
          "rdfs:label" : "amount",
          "schema:category" : [
-            "issue-1698",
-            "issue-1253"
+            "issue-1253",
+            "issue-1698"
          ],
          "schema:domainIncludes" : [
-            "schema:LoanOrCredit",
-            "schema:MonetaryGrant",
-            "schema:DatedMoneySpecification",
             "schema:InvestmentOrDeposit",
+            "schema:DatedMoneySpecification",
+            "schema:MonetaryGrant",
+            "schema:LoanOrCredit",
             "schema:MoneyTransfer"
          ],
          "schema:rangeIncludes" : [
@@ -38,11 +38,11 @@
          "rdfs:label" : "currency",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : [
-            "schema:LoanOrCredit",
-            "schema:ExchangeRateSpecification",
+            "schema:MonetaryAmount",
             "schema:MonetaryAmountDistribution",
             "schema:DatedMoneySpecification",
-            "schema:MonetaryAmount"
+            "schema:LoanOrCredit",
+            "schema:ExchangeRateSpecification"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -53,13 +53,13 @@
          "rdfs:label" : "endDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:CreativeWorkSeries",
-            "schema:EducationalOccupationalProgram",
-            "schema:DatedMoneySpecification",
             "schema:CreativeWorkSeason",
+            "schema:CreativeWorkSeries",
             "schema:Schedule",
-            "schema:Role"
+            "schema:DatedMoneySpecification",
+            "schema:Role",
+            "schema:EducationalOccupationalProgram",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
@@ -73,13 +73,13 @@
          "rdfs:label" : "startDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:DatedMoneySpecification",
-            "schema:Schedule",
             "schema:Role",
-            "schema:CreativeWorkSeason",
-            "schema:Event",
             "schema:CreativeWorkSeries",
-            "schema:EducationalOccupationalProgram"
+            "schema:CreativeWorkSeason",
+            "schema:DatedMoneySpecification",
+            "schema:EducationalOccupationalProgram",
+            "schema:Schedule",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",

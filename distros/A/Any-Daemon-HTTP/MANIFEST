@@ -25,6 +25,7 @@ lib/Any/Daemon/HTTP/UserDirs.pod
 lib/Any/Daemon/HTTP/VirtualHost.pm
 lib/Any/Daemon/HTTP/VirtualHost.pod
 t/01use.t
+t/10clean_uri.t
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

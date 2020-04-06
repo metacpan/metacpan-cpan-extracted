@@ -39,13 +39,13 @@
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
             "schema:Offer",
-            "schema:Demand",
-            "schema:ActionAccessSpecification"
+            "schema:ActionAccessSpecification",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
             "schema:Time",
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:category" : {
@@ -58,26 +58,26 @@
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:PhysicalActivity",
-            "schema:Offer",
             "schema:Product",
+            "schema:PhysicalActivity",
+            "schema:Invoice",
             "schema:Recommendation",
-            "schema:URL",
             "schema:SpecialAnnouncement",
             "schema:ActionAccessSpecification",
             "schema:Service",
-            "schema:Invoice"
+            "schema:Offer",
+            "schema:URL"
          ],
          "schema:rangeIncludes" : [
             "schema:Thing",
-            "schema:PhysicalActivityCategory",
-            "schema:Text"
+            "schema:Text",
+            "schema:PhysicalActivityCategory"
          ]
       },
       "schema:eligibleRegion" : {
          "dc:source" : [
-            "schemadotorgsources:source_GoodRelationsTerms",
-            "https://github.com/schemaorg/schemaorg/issues/1741"
+            "https://github.com/schemaorg/schemaorg/issues/1741",
+            "schemadotorgsources:source_GoodRelationsTerms"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is valid.<br/><br/>\n\nSee also <a class=\"localLink\" href=\"http://schema.org/ineligibleRegion\">ineligibleRegion</a>.",
@@ -85,15 +85,15 @@
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:DeliveryChargeSpecification",
+            "schema:Offer",
             "schema:Demand",
             "schema:ActionAccessSpecification",
-            "schema:Offer"
+            "schema:DeliveryChargeSpecification"
          ],
          "schema:rangeIncludes" : [
+            "schema:Place",
             "schema:GeoShape",
-            "schema:Text",
-            "schema:Place"
+            "schema:Text"
          ]
       },
       "schema:expectsAcceptanceOf" : {
@@ -103,8 +103,8 @@
          "rdfs:label" : "expectsAcceptanceOf",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
             "schema:MediaSubscription",
+            "schema:ActionAccessSpecification",
             "schema:ConsumeAction"
          ],
          "schema:rangeIncludes" : "schema:Offer"
@@ -116,16 +116,16 @@
          "rdfs:label" : "ineligibleRegion",
          "schema:category" : "issue-2242",
          "schema:domainIncludes" : [
-            "schema:DeliveryChargeSpecification",
-            "schema:ActionAccessSpecification",
+            "schema:Offer",
             "schema:Demand",
-            "schema:Offer"
+            "schema:DeliveryChargeSpecification",
+            "schema:ActionAccessSpecification"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Place",
+            "schema:Text",
             "schema:GeoShape",
-            "schema:Text"
+            "schema:Place"
          ]
       },
       "schema:requiresSubscription" : {
@@ -139,8 +139,8 @@
             "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:Boolean",
-            "schema:MediaSubscription"
+            "schema:MediaSubscription",
+            "schema:Boolean"
          ]
       }
    }

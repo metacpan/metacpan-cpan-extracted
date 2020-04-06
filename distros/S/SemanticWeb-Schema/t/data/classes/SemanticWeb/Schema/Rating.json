@@ -15,8 +15,8 @@
             "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:bestRating" : {
@@ -45,8 +45,8 @@
          "rdfs:label" : "ratingValue",
          "schema:domainIncludes" : "schema:Rating",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       },
       "schema:reviewAspect" : {

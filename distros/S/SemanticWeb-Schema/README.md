@@ -4,7 +4,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 # VERSION
 
-version v7.0.2
+version v7.0.3
 
 The version number of this distribution is based on the corresponding
 version of schema classes.
@@ -32,12 +32,12 @@ to embed in websites.
 This is a base class for the `SemanticWeb::Schema` classes, which
 were generated automatically from the following sources:
 
-- [https://schema.org/version/7.02/ext-auto.rdf](https://schema.org/version/7.02/ext-auto.rdf)
-- [https://schema.org/version/7.02/ext-bib.rdf](https://schema.org/version/7.02/ext-bib.rdf)
-- [https://schema.org/version/7.02/ext-health-lifesci.rdf](https://schema.org/version/7.02/ext-health-lifesci.rdf)
-- [https://schema.org/version/7.02/ext-meta.rdf](https://schema.org/version/7.02/ext-meta.rdf)
-- [https://schema.org/version/7.02/ext-pending.rdf](https://schema.org/version/7.02/ext-pending.rdf)
-- [https://schema.org/version/7.02/schema.rdf](https://schema.org/version/7.02/schema.rdf)
+- [https://schema.org/version/7.03/ext-auto.rdf](https://schema.org/version/7.03/ext-auto.rdf)
+- [https://schema.org/version/7.03/ext-bib.rdf](https://schema.org/version/7.03/ext-bib.rdf)
+- [https://schema.org/version/7.03/ext-health-lifesci.rdf](https://schema.org/version/7.03/ext-health-lifesci.rdf)
+- [https://schema.org/version/7.03/ext-meta.rdf](https://schema.org/version/7.03/ext-meta.rdf)
+- [https://schema.org/version/7.03/ext-pending.rdf](https://schema.org/version/7.03/ext-pending.rdf)
+- [https://schema.org/version/7.03/schema.rdf](https://schema.org/version/7.03/schema.rdf)
 
 # ATTRIBUTES
 

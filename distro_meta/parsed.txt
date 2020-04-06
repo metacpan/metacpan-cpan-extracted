@@ -63466,3 +63466,17 @@ D/DE/DEBOS/Math-CooGeo-1.0.9.tar.gz
 D/DE/DEBOS/Math-RPN-Simple-1.1.11.tar.gz
 P/PR/PREACTION/Yancy-1.048.tar.gz
 D/DE/DEBOS/Proxy-Scraper-2.1.7.tar.gz
+M/MA/MARKOV/Any-Daemon-HTTP-0.30.tar.gz
+U/UT/UTASHIRO/App-sdif-4.13.7.tar.gz
+R/RJ/RJBS/App-Cronjob-1.200009.tar.gz
+U/UT/UTASHIRO/App-week-0.08.tar.gz
+S/SK/SKIM/CAD-AutoCAD-Detect-0.01.tar.gz
+S/SK/SKIM/CAD-AutoCAD-Version-0.03.tar.gz
+C/CR/CROMEDOME/Dancer2-0.300001.tar.gz
+S/SK/SKIM/File-Find-Rule-DWG-0.01.tar.gz
+S/SH/SHLOMIF/Module-Format-0.4.0.tar.gz
+M/MS/MSTROUT/new-0.000002.tar.gz
+B/BL/BLUHM/OPCUA-Open62541-0.007.tar.gz
+J/JS/JSIRACUSA/Rose-DB-0.783.tar.gz
+R/RR/RRWO/SemanticWeb-Schema-v7.0.3.tar.gz
+G/GU/GUGOD/Sub-Alias-1.0.0.tar.gz

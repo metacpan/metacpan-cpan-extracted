@@ -13,17 +13,17 @@
          "rdfs:label" : "inLanguage",
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
-            "schema:BroadcastService",
+            "schema:PronounceableText",
+            "schema:Event",
+            "schema:WriteAction",
             "schema:CommunicateAction",
             "schema:CreativeWork",
-            "schema:WriteAction",
-            "schema:LinkRole",
-            "schema:Event",
-            "schema:PronounceableText"
+            "schema:BroadcastService",
+            "schema:LinkRole"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Language"
+            "schema:Language",
+            "schema:Text"
          ]
       },
       "schema:language" : {

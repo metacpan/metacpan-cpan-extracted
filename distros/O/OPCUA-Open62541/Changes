@@ -1,5 +1,15 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.007 2020-04-06
+    - Fix memory leak in callback_async() and extend leak tests.
+      The API does not invoke the connect callback in case of error.
+      This requires special code to track the call data and to free
+      it during destroy.
+    - Implement UA_Client_readValueAttribute_async().
+    - Implement client disconnect_async().
+    - Add missing functions to pod documentation.
+    - Test request id of async browse request.
+
 0.006 2020-03-27
     - Remove server config clean() function from Perl API.
     - To run a test server manually, the timeout can be disabled.

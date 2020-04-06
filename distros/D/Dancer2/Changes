@@ -1,3 +1,22 @@
+0.300001  2020-04-06 12:14:47-04:00 America/New_York
+
+    [ BUG FIXES ]
+    * GH #1461: Relax redirect to match RFC_7231 (James Raspass)
+    * GH #1499: Don't double decode date strings (simbabque)
+    * GH #1536: Fix storing objects in YAML sessions (Tom Hukins)
+
+    [ ENHANCEMENTS ]
+    * GH #1540: Improve configuration handling (Tom Hukins)
+
+    [ DOCUMENTATION ]
+    * GH #1425: Revamped Tutorial (Steve Dondley)
+    * GH #1521: Documentation on configuring the adress to listen on: 
+      "server" does not seem to work, but "host" does (Ma_Sys.ma)
+    * GH #1530: Fix missing space in docs (ferki)
+    * GH #1535: Fix example code in SessionFactory::File (Sergiy Borodych)
+    * GH #1538: Defined or should not be an assignment (Timothy Alexis 
+      Vass)
+
 0.300000  2019-12-23 23:55:09-06:00 America/Chicago
 
     [ BUG FIXES ]

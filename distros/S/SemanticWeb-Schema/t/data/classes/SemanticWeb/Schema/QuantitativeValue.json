@@ -12,9 +12,9 @@
          "rdfs:comment" : "A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.<br/><br/>\n\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. http://schema.org/width, http://schema.org/color, http://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
          "rdfs:label" : "additionalProperty",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:QuantitativeValue",
             "schema:Product",
+            "schema:QuantitativeValue",
+            "schema:Place",
             "schema:QualitativeValue"
          ],
          "schema:rangeIncludes" : "schema:PropertyValue"
@@ -25,10 +25,10 @@
          "rdfs:comment" : "The upper value of some characteristic or property.",
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:PropertyValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValueSpecification"
+            "schema:PropertyValueSpecification",
+            "schema:PropertyValue",
+            "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -38,10 +38,10 @@
          "rdfs:comment" : "The lower value of some characteristic or property.",
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:PropertyValueSpecification",
             "schema:QuantitativeValue",
-            "schema:PropertyValue"
+            "schema:PropertyValue",
+            "schema:PropertyValueSpecification",
+            "schema:MonetaryAmount"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -52,13 +52,13 @@
          "rdfs:label" : "unitCode",
          "schema:domainIncludes" : [
             "schema:UnitPriceSpecification",
-            "schema:QuantitativeValue",
+            "schema:TypeAndQuantityNode",
             "schema:PropertyValue",
-            "schema:TypeAndQuantityNode"
+            "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:unitText" : {
@@ -66,10 +66,10 @@
          "rdfs:comment" : "A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for\n<a href='unitCode'>unitCode</a>.",
          "rdfs:label" : "unitText",
          "schema:domainIncludes" : [
-            "schema:QuantitativeValue",
             "schema:PropertyValue",
-            "schema:TypeAndQuantityNode",
-            "schema:UnitPriceSpecification"
+            "schema:QuantitativeValue",
+            "schema:UnitPriceSpecification",
+            "schema:TypeAndQuantityNode"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -84,10 +84,10 @@
             "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Boolean",
             "schema:Number",
-            "schema:StructuredValue"
+            "schema:Boolean",
+            "schema:StructuredValue",
+            "schema:Text"
          ]
       },
       "schema:valueReference" : {
@@ -96,16 +96,16 @@
          "rdfs:comment" : "A pointer to a secondary value that provides additional information on the original value, e.g. a reference temperature.",
          "rdfs:label" : "valueReference",
          "schema:domainIncludes" : [
+            "schema:QualitativeValue",
             "schema:QuantitativeValue",
-            "schema:PropertyValue",
-            "schema:QualitativeValue"
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
-            "schema:StructuredValue",
             "schema:Enumeration",
-            "schema:PropertyValue",
-            "schema:QualitativeValue"
+            "schema:QualitativeValue",
+            "schema:StructuredValue",
+            "schema:PropertyValue"
          ]
       }
    }

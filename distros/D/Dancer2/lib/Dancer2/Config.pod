@@ -13,7 +13,7 @@ Dancer2::Config - Configure Dancer2 to suit your needs
 
 =head1 VERSION
 
-version 0.300000
+version 0.300001
 
 =head1 DESCRIPTION
 
@@ -156,7 +156,7 @@ your Dancer2 applications.
 
 =head2 Run mode and listening interface/port
 
-=head3 server (string)
+=head3 host (string)
 
 The IP address that the Dancer2 app should bind to.  Default is 0.0.0.0,
 i.e.  bind to all available interfaces.
@@ -676,7 +676,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Alexis Sukrieh.
+This software is copyright (c) 2020 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

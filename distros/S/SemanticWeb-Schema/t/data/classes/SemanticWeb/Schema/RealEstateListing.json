@@ -10,19 +10,26 @@
    },
    "properties" : {
       "schema:datePosted" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2490",
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2490",
+            "https://github.com/schemaorg/schemaorg/issues/2521"
+         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Publication date of an online listing.",
          "rdfs:label" : "datePosted",
-         "schema:category" : "issue-2490",
+         "schema:category" : [
+            "issue-2490",
+            "issue-2521"
+         ],
          "schema:domainIncludes" : [
-            "schema:JobPosting",
             "schema:SpecialAnnouncement",
-            "schema:RealEstateListing"
+            "schema:RealEstateListing",
+            "schema:CDCPMDRecord",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:leaseLength" : {
@@ -32,9 +39,9 @@
          "rdfs:label" : "leaseLength",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:Accommodation",
-            "schema:RealEstateListing"
+            "schema:RealEstateListing",
+            "schema:Offer"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [

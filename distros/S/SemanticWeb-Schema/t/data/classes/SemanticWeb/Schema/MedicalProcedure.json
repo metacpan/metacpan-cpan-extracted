@@ -59,14 +59,14 @@
          "rdfs:comment" : "The status of the study (enumerated).",
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
+            "schema:MedicalStudy",
             "schema:MedicalProcedure",
-            "schema:MedicalCondition",
-            "schema:MedicalStudy"
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:EventStatusType",
+            "schema:Text",
             "schema:MedicalStudyStatus"
          ]
       }

@@ -33,7 +33,7 @@ Readonly::Hash my %ACADVER => (
 	'AC1032' => 'AutoCAD 2018/2019/2020',
 );
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -207,6 +207,20 @@ Returns array of identifiers.
 L<Class::Utils>,
 L<Readonly>.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<CAD::AutoCAD::Detect>
+
+Detect AutoCAD files through magic string.
+
+=item L<File::Find::Rule::DWG>
+
+Common rules for searching DWG files.
+
+=back
+
 =head1 REPOSITORY
 
 L<https://github.com/michal-josef-spacek/CAD-AutoCAD-Version>
@@ -225,6 +239,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

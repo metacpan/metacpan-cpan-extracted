@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -64,16 +64,9 @@ and methods.
 
 =item $variant->setScalar($p, $data_type)
 
-=back
+=item $data_type = $variant->getType()
 
-=head3 VariableAttributes
-
-This type is converted automatically from a hash.
-The key that are recognized are:
-
-=over 4
-
-=item VariableAttributes_value
+=item $p = $variant->getScalar()
 
 =back
 
@@ -99,6 +92,8 @@ magically.
 
 =item $status_code = $server->run_shutdown($server)
 
+=item $status_code = $server->addVariableNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, $nodeContext, \$outNewNodeId)
+
 =back
 
 =head3 ServerConfig
@@ -110,6 +105,8 @@ magically.
 =item $status_code = $server_config->setMinimal($port, $certificate)
 
 =item $server_config->setCustomHostname($custom_hostname)
+
+=item $logger = $server_config->getLogger()
 
 =back
 
@@ -125,11 +122,43 @@ magically.
 
 =item $status_code = $client->connect_async($endpointUrl, $callback, $userdata)
 
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $status_code) = @_ }
+
+=back
+
 =item $status_code = $client->run_iterate($timeout)
+
+=item $status_code = $client->disconnect()
+
+=item $status_code = $client->disconnect_async(\$requestId)
 
 =item $client_state = $client->getState()
 
-=item $status_code = $client->disconnect()
+=item $status_code = $client->sendAsyncBrowseRequest(\%request, \&callback, $data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, \%response) = @_ }
+
+=back
+
+=item $status_code = $client->readDisplayNameAttribute(\%nodeId, \$outDisplayName)
+
+=item $status_code = $client->readDescriptionAttribute(\%nodeId, \$outDescription)
+
+=item $status_code = $client->readValueAttribute(\%nodeId, \$outValue)
+
+=item $status_code = $client->readDataTypeAttribute(\%nodeId, \$outDataType)
+
+=item $status_code = $client->readValueAttribute_async(\%nodeId, \&callback, $data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, \%var) = @_ }
+
+=back
 
 =back
 
@@ -138,6 +167,8 @@ magically.
 =over 4
 
 =item $status_code = $client_config->setDefault()
+
+=item $logger = $client_config->getLogger()
 
 =back
 

@@ -3,22 +3,26 @@ abstract: 'Simple subroutine alias.'
 author:
   - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
 build_requires:
-  Test::More: 0.42
-distribution_type: module
-generated_by: 'Module::Install version 0.77'
+  Test::More: '0.42'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.027, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: Sub::Alias
+  version: '1.4'
 name: Sub-Alias
-no_index:
-  directory:
-    - inc
-    - t
+provides:
+  Sub::Alias:
+    file: lib/Sub/Alias.pm
+    version: v1.0.0
 requires:
-  Devel::BeginLift: 0
-  Devel::Declare: 0
-  Sub::Exporter: 0
-  perl: 5.8.0
-version: 0.03
+  Keyword::Declare: '0'
+resources:
+  bugtracker: https://github.com/gugod/Sub-Alias/issues
+  repository: https://github.com/gugod/Sub-Alias.git
+version: 1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: MIT
+x_static_install: '1'

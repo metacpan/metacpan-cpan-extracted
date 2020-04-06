@@ -1,5 +1,10 @@
 Revision history for Perl extension App-week
 
+0.08 2020-04-06T13:36:08Z
+
+    - Handle 'once' warnings on 5.28.0 on some Linux system.
+    - Update test for NetBSD style calendar.
+
 0.07 2020-04-04T15:37:33Z
 
     - Add --rgb24 option.

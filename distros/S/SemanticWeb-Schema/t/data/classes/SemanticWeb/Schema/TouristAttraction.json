@@ -1,8 +1,8 @@
 {
    "class" : {
       "dc:source" : [
-         "schemadotorgsources:IIT-CNR.it",
-         "schemadotorgsources:Tourism"
+         "schemadotorgsources:Tourism",
+         "schemadotorgsources:IIT-CNR.it"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A tourist attraction.  In principle any Thing can be a <a class=\"localLink\" href=\"http://schema.org/TouristAttraction\">TouristAttraction</a>, from a <a class=\"localLink\" href=\"http://schema.org/Mountain\">Mountain</a> and <a class=\"localLink\" href=\"http://schema.org/LandmarksOrHistoricalBuildings\">LandmarksOrHistoricalBuildings</a> to a <a class=\"localLink\" href=\"http://schema.org/LocalBusiness\">LocalBusiness</a>.  This Type can be used on its own to describe a general <a class=\"localLink\" href=\"http://schema.org/TouristAttraction\">TouristAttraction</a>, or be used as an <a class=\"localLink\" href=\"http://schema.org/additionalType\">additionalType</a> to add tourist attraction properties to any other type.  (See examples below)",
@@ -15,10 +15,10 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:ServiceChannel",
             "schema:LodgingBusiness",
-            "schema:TouristAttraction",
-            "schema:ContactPoint"
+            "schema:ContactPoint",
+            "schema:ServiceChannel",
+            "schema:TouristAttraction"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
@@ -27,8 +27,8 @@
       },
       "schema:touristType" : {
          "dc:source" : [
-            "schemadotorgsources:IIT-CNR.it",
-            "schemadotorgsources:Tourism"
+            "schemadotorgsources:Tourism",
+            "schemadotorgsources:IIT-CNR.it"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Attraction suitable for type(s) of tourist. eg. Children, visitors from a particular country, etc.",
@@ -36,8 +36,8 @@
          "schema:category" : "issue-1810",
          "schema:domainIncludes" : [
             "schema:TouristAttraction",
-            "schema:TouristDestination",
-            "schema:TouristTrip"
+            "schema:TouristTrip",
+            "schema:TouristDestination"
          ],
          "schema:rangeIncludes" : [
             "schema:Audience",

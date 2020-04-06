@@ -25,8 +25,8 @@
          "rdfs:label" : "contactPoint",
          "schema:domainIncludes" : [
             "schema:Organization",
-            "schema:Person",
-            "schema:HealthInsurancePlan"
+            "schema:HealthInsurancePlan",
+            "schema:Person"
          ],
          "schema:rangeIncludes" : "schema:ContactPoint"
       },
@@ -47,8 +47,8 @@
          "rdfs:label" : "healthPlanDrugTier",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : [
-            "schema:HealthInsurancePlan",
-            "schema:HealthPlanFormulary"
+            "schema:HealthPlanFormulary",
+            "schema:HealthInsurancePlan"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"

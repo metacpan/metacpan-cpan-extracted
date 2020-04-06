@@ -12,9 +12,9 @@
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
-            "schema:FloorPlan",
             "schema:LodgingBusiness",
             "schema:Accommodation",
+            "schema:FloorPlan",
             "schema:Place"
          ],
          "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
@@ -24,12 +24,12 @@
          "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
          "rdfs:label" : "audience",
          "schema:domainIncludes" : [
-            "schema:Event",
             "schema:Service",
             "schema:CreativeWork",
+            "schema:Event",
+            "schema:Product",
             "schema:LodgingBusiness",
-            "schema:PlayAction",
-            "schema:Product"
+            "schema:PlayAction"
          ],
          "schema:rangeIncludes" : "schema:Audience"
       },
@@ -38,10 +38,10 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:ServiceChannel",
             "schema:LodgingBusiness",
-            "schema:TouristAttraction",
-            "schema:ContactPoint"
+            "schema:ContactPoint",
+            "schema:ServiceChannel",
+            "schema:TouristAttraction"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
@@ -53,12 +53,12 @@
          "rdfs:comment" : "The earliest someone may check into a lodging establishment.",
          "rdfs:label" : "checkinTime",
          "schema:domainIncludes" : [
-            "schema:LodgingReservation",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:LodgingReservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Time"
+            "schema:Time",
+            "schema:DateTime"
          ]
       },
       "schema:checkoutTime" : {
@@ -66,12 +66,12 @@
          "rdfs:comment" : "The latest someone may check out of a lodging establishment.",
          "rdfs:label" : "checkoutTime",
          "schema:domainIncludes" : [
-            "schema:LodgingReservation",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:LodgingReservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Time"
+            "schema:Time",
+            "schema:DateTime"
          ]
       },
       "schema:numberOfRooms" : {
@@ -80,17 +80,17 @@
          "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
-            "schema:Apartment",
-            "schema:FloorPlan",
-            "schema:House",
-            "schema:Accommodation",
             "schema:Suite",
             "schema:LodgingBusiness",
-            "schema:SingleFamilyResidence"
+            "schema:FloorPlan",
+            "schema:Accommodation",
+            "schema:SingleFamilyResidence",
+            "schema:Apartment",
+            "schema:House"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:petsAllowed" : {
@@ -100,13 +100,13 @@
          "rdfs:label" : "petsAllowed",
          "schema:domainIncludes" : [
             "schema:LodgingBusiness",
-            "schema:Accommodation",
             "schema:FloorPlan",
-            "schema:ApartmentComplex"
+            "schema:ApartmentComplex",
+            "schema:Accommodation"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Boolean"
+            "schema:Boolean",
+            "schema:Text"
          ]
       },
       "schema:starRating" : {

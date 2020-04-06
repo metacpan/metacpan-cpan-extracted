@@ -21,8 +21,8 @@
          "rdfs:label" : "commentTime",
          "schema:domainIncludes" : "schema:UserComments",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:creator" : {
@@ -34,8 +34,8 @@
             "schema:UserComments"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:discusses" : {

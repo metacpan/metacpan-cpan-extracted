@@ -48,13 +48,13 @@
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
-            "schema:Permit",
-            "schema:OpeningHoursSpecification",
             "schema:Offer",
+            "schema:OpeningHoursSpecification",
             "schema:MonetaryAmount",
-            "schema:Demand",
+            "schema:Permit",
             "schema:LocationFeatureSpecification",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
@@ -68,8 +68,8 @@
          "rdfs:label" : "validIn",
          "schema:category" : "issue-1779",
          "schema:domainIncludes" : [
-            "schema:Permit",
-            "schema:EducationalOccupationalCredential"
+            "schema:EducationalOccupationalCredential",
+            "schema:Permit"
          ],
          "schema:rangeIncludes" : "schema:AdministrativeArea"
       },

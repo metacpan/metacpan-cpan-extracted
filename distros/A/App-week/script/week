@@ -34,7 +34,7 @@ Module options:
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 DESCRIPTION
 
@@ -271,8 +271,10 @@ my $cm = Getopt::EX::Colormap
     ->new(HASH => \%colormap)
     ->load_params(@opt_colormap);
 
-$Getopt::EX::Colormap::RGB24 = $opt_rgb24
-    if defined $opt_rgb24;
+if (defined $opt_rgb24) {
+    no warnings 'once';
+    $Getopt::EX::Colormap::RGB24 = $opt_rgb24;
+}
 
 sub color {
     $cm->color(@_);

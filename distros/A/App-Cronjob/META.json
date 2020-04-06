@@ -71,7 +71,7 @@
          "web" : "https://github.com/rjbs/App-Cronjob"
       }
    },
-   "version" : "1.200008",
+   "version" : "1.200009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -443,7 +443,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.200008",
+                  "tag" : "1.200009",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

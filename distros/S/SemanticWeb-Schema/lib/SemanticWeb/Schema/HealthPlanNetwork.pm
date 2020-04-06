@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.2';
+our $VERSION = 'v7.0.3';
 
 
 has health_plan_cost_sharing => (
@@ -58,7 +58,7 @@ SemanticWeb::Schema::HealthPlanNetwork - A US-style health insurance plan networ
 
 =head1 VERSION
 
-version v7.0.2
+version v7.0.3
 
 =head1 DESCRIPTION
 

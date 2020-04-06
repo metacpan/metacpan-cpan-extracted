@@ -1,5 +1,10 @@
 == history for distribution Any-Daemon-HTTP
 
+version 0.30: Mon  6 Apr 12:46:54 CEST 2020
+
+	Fixes:
+	- cleanup request path
+
 version 0.29: Mon  4 Nov 09:07:23 CET 2019
 
 	Fixes:

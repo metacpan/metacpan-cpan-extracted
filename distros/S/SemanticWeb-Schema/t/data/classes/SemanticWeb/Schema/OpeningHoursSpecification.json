@@ -40,13 +40,13 @@
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
-            "schema:Permit",
-            "schema:OpeningHoursSpecification",
             "schema:Offer",
+            "schema:OpeningHoursSpecification",
             "schema:MonetaryAmount",
-            "schema:Demand",
+            "schema:Permit",
             "schema:LocationFeatureSpecification",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
@@ -59,13 +59,13 @@
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
+            "schema:Demand",
             "schema:MonetaryAmount",
-            "schema:LocationFeatureSpecification",
             "schema:OpeningHoursSpecification",
-            "schema:PriceSpecification",
             "schema:JobPosting",
             "schema:Offer",
-            "schema:Demand"
+            "schema:LocationFeatureSpecification",
+            "schema:PriceSpecification"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",

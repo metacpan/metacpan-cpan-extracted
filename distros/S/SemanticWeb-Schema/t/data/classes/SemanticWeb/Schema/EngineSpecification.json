@@ -33,9 +33,9 @@
          "schema:domainIncludes" : "schema:EngineSpecification",
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
             "schema:Text",
-            "schema:QualitativeValue"
+            "schema:QualitativeValue",
+            "schema:URL"
          ]
       },
       "schema:fuelType" : {
@@ -48,9 +48,9 @@
             "schema:EngineSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
+            "schema:Text",
             "schema:QualitativeValue",
-            "schema:Text"
+            "schema:URL"
          ]
       },
       "schema:torque" : {

@@ -5,15 +5,15 @@
       "rdfs:comment" : "A payment method using a credit, debit, store or other card to associate the payment with an account.",
       "rdfs:label" : "PaymentCard",
       "rdfs:subClassOf" : [
-         "schema:FinancialProduct",
-         "schema:PaymentMethod"
+         "schema:PaymentMethod",
+         "schema:FinancialProduct"
       ]
    },
    "properties" : {
       "schema:cashBack" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "schemadotorgsources:FIBO"
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A cardholder benefit that pays the cardholder a small percentage of their net expenditures.",
@@ -41,8 +41,8 @@
       },
       "schema:floorLimit" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "schemadotorgsources:FIBO"
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A floor limit is the amount of money above which credit card transactions must be authorized.",

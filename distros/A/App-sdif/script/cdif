@@ -67,8 +67,25 @@ my $opt_command = 1;
 my $opt_mark = 1;
 my $opt_prefix = 1;
 my $opt_prefix_pattern = q/(?:\\| )*(?:  )*/;
-my $opt_visible_cr = 1;
-my $opt_visible_esc = 1;
+
+my %visible = (
+    nul => [ 1,  "\000"  => "\N{SYMBOL FOR NULL}" ],
+    bel => [ 1,  "\007"  => "\N{SYMBOL FOR BELL}" ],
+    bs  => [ 1,  "\010"  => "\N{SYMBOL FOR BACKSPACE}" ],
+    ht  => [ 0,  "\011"  => "\N{SYMBOL FOR HORIZONTAL TABULATION}" ],
+    nl  => [ 0,  "\012"  => "\N{SYMBOL FOR NEWLINE}" . "\n" ],
+    vt  => [ 1,  "\013"  => "\N{SYMBOL FOR VERTICAL TABULATION}" ],
+    np  => [ 1,  "\014"  => "\N{SYMBOL FOR FORM FEED}" ],
+    cr  => [ 1,  "\015"  => "\N{SYMBOL FOR CARRIAGE RETURN}" ],
+    esc => [ 1,  "\033"  => "\N{SYMBOL FOR ESCAPE}" ],
+    sp  => [ 0,  "\040"  => "\N{SYMBOL FOR SPACE}" ],
+    del => [ 1,  "\177"  => "\N{SYMBOL FOR DELETE}" ],
+    );
+my %opt_visible = do {
+    map { $_ => splice @{$visible{$_}}, 0, 1 }
+    keys %visible;
+};
+my @opt_visible;
 
 my $opt_c;
 my $opt_u;
@@ -122,8 +139,9 @@ my @optargs = (
     "mark!" => \$opt_mark,
     "prefix!" => \$opt_prefix,
     "prefix-pattern=s" => \$opt_prefix_pattern,
-    "visible-cr|vcr!" => \$opt_visible_cr,
-    "visible-esc|vesc!" => \$opt_visible_esc,
+    "visible=s" => \@opt_visible,
+    "visible-cr|vcr!" => sub { $opt_visible{cr} = $_[1] },
+    "visible-esc|vesc!" => sub { $opt_visible{esc} = $_[1] },
 
     "i|ignore-case" => \$opt_i,
     "b|ignore-space-change" => \$opt_b,
@@ -263,6 +281,35 @@ my $w_pattern = do {
 	    \p{Latin}+ |
 	    [\ \t\r\f]*\n | \s+ | (.)\g{-1}*
 	}x;
+    }
+};
+
+##
+## Converter function for visible characters
+##
+use Getopt::EX::LabeledParam;
+Getopt::EX::LabeledParam
+    ->new(HASH => \%opt_visible)
+    ->load_params (@opt_visible);
+my $converter = do {
+    my $chars = join "", do {
+	map  {
+	    my $v = $visible{$_} // die "Unknown charname: \"$_\"\n";
+	    $v->[0];
+	}
+	grep {
+	    $opt_visible{$_};
+	}
+	keys %opt_visible;
+    };
+    if ($chars eq '') {
+	undef;
+    } else {
+	my $re = qr/[\Q$chars\E]/;
+	my %hash = map { @$_ } values %visible;
+	sub {
+	    s/($re)/$hash{$1}/g;
+	}
     }
 };
 
@@ -581,11 +628,8 @@ sub compare {
 	$$new =~ s/^($nmark_re)/push(@nmark, $1), ""/mge;
     }
 
-    if ($opt_visible_cr) {
-	s/\r/\N{SYMBOL FOR CARRIAGE RETURN}/g for $$old, $$new;
-    }
-    if ($opt_visible_esc) {
-	s/\e/\N{SYMBOL FOR ESCAPE}/g for $$old, $$new;
+    if ($converter) {
+	$converter->() for $$old, $$new;
     }
 
     ($$old, $$new) = context($$old, $$new);
@@ -868,8 +912,7 @@ Options:
 	--[no]mark	    print mark or not       (default true)
 	--[no]prefix	    read git --graph output (default true)
 	--prefix-pattern    prefix pattern
-	--[no]visible-cr    visible carriage return (default true)
-	--[no]visible-esc   visible escape          (default true)
+	--visible char=?    set visible attributes
 	--[no]mecab	    use mecab tokenizer     (default false)
 
 
@@ -1108,15 +1151,25 @@ Specify prefix pattern in regex.  Default pattern is:
 This pattern matches B<git> graph style and whitespace indented diff
 output.
 
-=item B<-->[B<no>]B<visible-cr>
+=item B<--visible> I<chaname>=[0,1]
 
-Convert CARRIAGE-RETURN to visible code.
-True by default.
+Set visible attribute for specified characters.  Default visible: nul,
+bel, bs, vt, np, cr, esc, del.  Default invisible: ht, nl, sp.  See
+L<ascii(7)> for name representation.
+
+Multiple characters can be specified at once, by assembling them by
+commna (C<,>) like C<--visible ht=1,sp=1>; or connecting them by equal
+sign (C<=>) like C<--visible ht=sp=1>.  Character name accept
+wildcard; C<--visible '*=1'>.
+
+Currently this option is effective only for modified lines.
+
+=item B<-->[B<no>]B<visible-cr>
 
 =item B<-->[B<no>]B<visible-esc>
 
-Convert ESCAPE to visible code.
-True by default.
+Set CARRIAGE-RETURN and ESCAPE visible attributes.  These options will
+be deprecated soon.  Use B<--visible> option instead.
 
 =item B<-->[B<no>]B<mecab>
 
@@ -1149,7 +1202,7 @@ Environment variable B<CDIFOPTS> is used to set default options.
 
 =head1 LICENSE
 
-Copyright 1992-2019 Kazumasa Utashiro
+Copyright 1992-2020 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

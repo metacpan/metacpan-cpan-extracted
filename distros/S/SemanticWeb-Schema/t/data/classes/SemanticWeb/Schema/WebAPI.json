@@ -18,8 +18,8 @@
          "schema:domainIncludes" : "schema:WebAPI",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:CreativeWork",
-            "schema:URL"
+            "schema:URL",
+            "schema:CreativeWork"
          ]
       }
    }

@@ -15,13 +15,21 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.2';
+our $VERSION = 'v7.0.3';
 
 
 has accommodation_category => (
     is        => 'rw',
     predicate => '_has_accommodation_category',
     json_ld   => 'accommodationCategory',
+);
+
+
+
+has accommodation_floor_plan => (
+    is        => 'rw',
+    predicate => '_has_accommodation_floor_plan',
+    json_ld   => 'accommodationFloorPlan',
 );
 
 
@@ -146,7 +154,7 @@ SemanticWeb::Schema::Accommodation - An accommodation is a place that can accomm
 
 =head1 VERSION
 
-version v7.0.2
+version v7.0.3
 
 =head1 DESCRIPTION
 
@@ -183,6 +191,25 @@ A accommodation_category should be one of the following types:
 =head2 C<_has_accommodation_category>
 
 A predicate for the L</accommodation_category> attribute.
+
+=head2 C<accommodation_floor_plan>
+
+C<accommodationFloorPlan>
+
+=for html <p>A floorplan of some <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>.<p>
+
+A accommodation_floor_plan should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::FloorPlan']>
+
+=back
+
+=head2 C<_has_accommodation_floor_plan>
+
+A predicate for the L</accommodation_floor_plan> attribute.
 
 =head2 C<amenity_feature>
 

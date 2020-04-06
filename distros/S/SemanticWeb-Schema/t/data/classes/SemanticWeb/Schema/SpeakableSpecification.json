@@ -15,8 +15,8 @@
          "rdfs:label" : "cssSelector",
          "schema:category" : "issue-1389",
          "schema:domainIncludes" : [
-            "schema:SpeakableSpecification",
-            "schema:WebPageElement"
+            "schema:WebPageElement",
+            "schema:SpeakableSpecification"
          ],
          "schema:rangeIncludes" : "schema:CssSelectorType"
       },
@@ -27,8 +27,8 @@
          "rdfs:label" : "xpath",
          "schema:category" : "issue-1389",
          "schema:domainIncludes" : [
-            "schema:SpeakableSpecification",
-            "schema:WebPageElement"
+            "schema:WebPageElement",
+            "schema:SpeakableSpecification"
          ],
          "schema:rangeIncludes" : "schema:XPathType"
       }

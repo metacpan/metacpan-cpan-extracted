@@ -12,8 +12,8 @@
          "rdfs:comment" : "Description of fees, commissions, and other terms applied either to a class of financial product, or by a financial service organization.",
          "rdfs:label" : "feesAndCommissionsSpecification",
          "schema:domainIncludes" : [
-            "schema:FinancialProduct",
-            "schema:FinancialService"
+            "schema:FinancialService",
+            "schema:FinancialProduct"
          ],
          "schema:rangeIncludes" : [
             "schema:URL",

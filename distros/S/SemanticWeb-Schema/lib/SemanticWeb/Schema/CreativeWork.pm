@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v7.0.2';
+our $VERSION = 'v7.0.3';
 
 
 has about => (
@@ -538,6 +538,14 @@ has material => (
 
 
 
+has material_extent => (
+    is        => 'rw',
+    predicate => '_has_material_extent',
+    json_ld   => 'materialExtent',
+);
+
+
+
 has mentions => (
     is        => 'rw',
     predicate => '_has_mentions',
@@ -826,7 +834,7 @@ SemanticWeb::Schema::CreativeWork - The most generic kind of creative work
 
 =head1 VERSION
 
-version v7.0.2
+version v7.0.3
 
 =head1 DESCRIPTION
 
@@ -2118,6 +2126,27 @@ A material should be one of the following types:
 =head2 C<_has_material>
 
 A predicate for the L</material> attribute.
+
+=head2 C<material_extent>
+
+C<materialExtent>
+
+The quantity of the materials being described or an expression of the
+physical space they occupy.
+
+A material_extent should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_material_extent>
+
+A predicate for the L</material_extent> attribute.
 
 =head2 C<mentions>
 

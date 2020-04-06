@@ -14,8 +14,8 @@
    "properties" : {
       "schema:downPayment" : {
          "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "a type of payment made in cash during the onset of the purchase of an expensive good/service. The payment typically represents only a percentage of the full purchase price.",
@@ -30,8 +30,8 @@
       },
       "schema:earlyPrepaymentPenalty" : {
          "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount to be paid as a penalty in the event of early payment of the loan.",
@@ -43,8 +43,8 @@
       },
       "schema:loanPaymentAmount" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "schemadotorgsources:FIBO"
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of money to pay in a single payment.",
@@ -69,8 +69,8 @@
       },
       "schema:numberOfLoanPayments" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "schemadotorgsources:FIBO"
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of payments contractually required at origination to repay the loan. For monthly paying loans this is the number of months from the contractual first payment date to the maturity date.",

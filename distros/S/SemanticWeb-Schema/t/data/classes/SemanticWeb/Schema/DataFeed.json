@@ -13,8 +13,8 @@
          "schema:domainIncludes" : "schema:DataFeed",
          "schema:rangeIncludes" : [
             "schema:Text",
-            "schema:DataFeedItem",
-            "schema:Thing"
+            "schema:Thing",
+            "schema:DataFeedItem"
          ]
       }
    }

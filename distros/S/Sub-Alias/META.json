@@ -1,0 +1,59 @@
+{
+   "abstract" : "Simple subroutine alias.",
+   "author" : [
+      "Kang-min Liu  C<< <gugod@gugod.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.027",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Sub-Alias",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.027"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Keyword::Declare" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Sub::Alias" : {
+         "file" : "lib/Sub/Alias.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Sub-Alias/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gugod/Sub-Alias.git",
+         "web" : "https://github.com/gugod/Sub-Alias"
+      }
+   },
+   "version" : "1.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_spdx_expression" : "MIT",
+   "x_static_install" : "1"
+}

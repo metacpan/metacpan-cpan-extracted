@@ -138,7 +138,17 @@ typedef struct {
 } *				OPCUA_Open62541_ServerConfig;
 
 /* client.h */
-typedef UA_Client *		OPCUA_Open62541_Client;
+typedef struct ClientCallbackData {
+	SV *			ccd_callback;
+	SV *			ccd_client;
+	SV *			ccd_data;
+	struct ClientCallbackData **	ccd_callbackdataref;
+}				ClientCallbackData;
+
+typedef struct {
+	UA_Client *		cl_client;
+	ClientCallbackData *	cl_callbackdata;
+} *				OPCUA_Open62541_Client;
 typedef struct {
 	UA_ClientConfig *	clc_clientconfig;
 	SV *			clc_client;
@@ -1187,12 +1197,6 @@ static MGVTBL server_run_mgvtbl = { 0, server_run_mgset, 0, 0, 0, 0, 0, 0 };
 
 /* Open62541 C callback handling */
 
-typedef struct {
-	SV *			ccd_callback;
-	SV *			ccd_client;
-	SV *			ccd_data;
-}				ClientCallbackData;
-
 static ClientCallbackData *
 newClientCallbackData(SV *callback, SV *client, SV *data)
 {
@@ -1203,7 +1207,7 @@ newClientCallbackData(SV *callback, SV *client, SV *data)
 		CROAK("Callback '%s' is not a CODE reference",
 		    SvPV_nolen(callback));
 
-	ccd = malloc(sizeof(*ccd));
+	ccd = calloc(1, sizeof(*ccd));
 	if (ccd == NULL)
 		CROAKE("malloc");
 	DPRINTF("ccd %p", ccd);
@@ -1216,8 +1220,13 @@ newClientCallbackData(SV *callback, SV *client, SV *data)
 	ccd->ccd_client = client;
 	ccd->ccd_data = data;
 
+	/*
+	 * Client remembers a ref to callback data and destroys it when freed.
+	 * So we must not increase the Perl refcount of the client.  Perl must
+	 * free the client and then the callback data is destroyed.
+	 * This API sucks.  Callbacks that may be called are hard to handle.
+	 */
 	SvREFCNT_inc(callback);
-	SvREFCNT_inc(client);
 	SvREFCNT_inc(data);
 
 	return ccd;
@@ -1227,11 +1236,15 @@ static void
 deleteClientCallbackData(ClientCallbackData *ccd)
 {
 	dTHX;
-	DPRINTF("ccd %p", ccd);
+	DPRINTF("ccd %p, ccd_callbackdataref %p",
+	    ccd, ccd->ccd_callbackdataref);
 
 	SvREFCNT_dec(ccd->ccd_callback);
-	SvREFCNT_dec(ccd->ccd_client);
 	SvREFCNT_dec(ccd->ccd_data);
+
+	/* The callback data is freed now, do not remember to free it later. */
+	if (ccd->ccd_callbackdataref != NULL)
+		*ccd->ccd_callbackdataref = NULL;
 
 	free(ccd);
 }
@@ -1288,6 +1301,20 @@ clientAsyncBrowseCallback(UA_Client *client, void *userdata,
 	sv = newSV(0);
 	if (response != NULL)
 		XS_pack_UA_BrowseResponse(sv, *response);
+
+	clientCallbackPerl(client, userdata, requestId, sv);
+}
+
+static void
+clientAsyncReadValueAttributeCallback(UA_Client *client, void *userdata,
+    UA_UInt32 requestId, UA_Variant *var)
+{
+	dTHX;
+	SV *sv;
+
+	sv = newSV(0);
+	if (var != NULL)
+		XS_pack_UA_Variant(sv, *var);
 
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
@@ -1903,10 +1930,16 @@ UA_Client_new(class)
 	if (strcmp(class, "OPCUA::Open62541::Client") != 0)
 		CROAK("Class '%s' is not OPCUA::Open62541::Client", class);
     CODE:
-	RETVAL = UA_Client_new();
+	RETVAL = calloc(1, sizeof(*RETVAL));
 	if (RETVAL == NULL)
+		CROAKE("calloc");
+	RETVAL->cl_client = UA_Client_new();
+	if (RETVAL->cl_client == NULL) {
+		free(RETVAL);
 		CROAKE("UA_Client_new");
-	DPRINTF("class %s, client %p", class, RETVAL);
+	}
+	DPRINTF("class %s, client %p, cl_client %p",
+	    class, RETVAL, RETVAL->cl_client);
     OUTPUT:
 	RETVAL
 
@@ -1914,8 +1947,13 @@ void
 UA_Client_DESTROY(client)
 	OPCUA_Open62541_Client		client
     CODE:
-	DPRINTF("client %p", client);
-	UA_Client_delete(client);
+	DPRINTF("client %p, cl_client %p, cl_callbackdata %p",
+	    client, client->cl_client, client->cl_callbackdata);
+	UA_Client_delete(client->cl_client);
+	/* The client may still have an uncalled connect callback. */
+	if (client->cl_callbackdata != NULL)
+		deleteClientCallbackData(client->cl_callbackdata);
+	free(client);
 
 OPCUA_Open62541_ClientConfig
 UA_Client_getConfig(client)
@@ -1924,9 +1962,9 @@ UA_Client_getConfig(client)
 	RETVAL = malloc(sizeof(*RETVAL));
 	if (RETVAL == NULL)
 		CROAKE("malloc");
-	RETVAL->clc_clientconfig = UA_Client_getConfig(client);
-	DPRINTF("client %p, config %p, clc_clientconfig %p",
-	    client, RETVAL, RETVAL->clc_clientconfig);
+	RETVAL->clc_clientconfig = UA_Client_getConfig(client->cl_client);
+	DPRINTF("client %p, cl_client %p, config %p, clc_clientconfig %p",
+	    client, client->cl_client, RETVAL, RETVAL->clc_clientconfig);
 	if (RETVAL->clc_clientconfig == NULL) {
 		free(RETVAL);
 		XSRETURN_UNDEF;
@@ -1940,6 +1978,10 @@ UA_StatusCode
 UA_Client_connect(client, endpointUrl)
 	OPCUA_Open62541_Client		client
 	char *				endpointUrl
+    CODE:
+	RETVAL = UA_Client_connect(client->cl_client, endpointUrl);
+    OUTPUT:
+	RETVAL
 
 UA_StatusCode
 UA_Client_connect_async(client, endpointUrl, callback, data)
@@ -1955,19 +1997,27 @@ UA_Client_connect_async(client, endpointUrl, callback, data)
 	 * The socket API is smarter in this case, connect(2) fails with
 	 * EINPROGRESS which can be detected by the caller.
 	 */
-	if (UA_Client_getState(client) >= UA_CLIENTSTATE_WAITING_FOR_ACK ||
-	    !SvOK(callback)) {
+	if (UA_Client_getState(client->cl_client) >=
+	    UA_CLIENTSTATE_WAITING_FOR_ACK || !SvOK(callback)) {
 		/* ignore callback and data if no callback is defined */
-		RETVAL = UA_Client_connect_async(client, endpointUrl, NULL,
-		    NULL);
+		RETVAL = UA_Client_connect_async(client->cl_client,
+		    endpointUrl, NULL, NULL);
 	} else {
 		ClientCallbackData *ccd;
 
 		ccd = newClientCallbackData(callback, ST(0), data);
-		RETVAL = UA_Client_connect_async(client, endpointUrl,
-		    clientAsyncServiceCallback, ccd);
-		if (RETVAL != UA_STATUSCODE_GOOD)
+		RETVAL = UA_Client_connect_async(client->cl_client,
+		    endpointUrl, clientAsyncServiceCallback, ccd);
+		if (RETVAL == UA_STATUSCODE_GOOD) {
+			if (client->cl_callbackdata != NULL)
+				deleteClientCallbackData(
+				    client->cl_callbackdata);
+			/* Pointer to free ccd if callback is not called. */
+			client->cl_callbackdata = ccd;
+			ccd->ccd_callbackdataref = &client->cl_callbackdata;
+		} else {
 			deleteClientCallbackData(ccd);
+		}
 	}
     OUTPUT:
 	RETVAL
@@ -1976,14 +2026,40 @@ UA_StatusCode
 UA_Client_run_iterate(client, timeout)
 	OPCUA_Open62541_Client		client
 	UA_UInt16			timeout
+    CODE:
+	RETVAL = UA_Client_run_iterate(client->cl_client, timeout);
+    OUTPUT:
+	RETVAL
 
 UA_StatusCode
 UA_Client_disconnect(client)
 	OPCUA_Open62541_Client		client
+    CODE:
+	RETVAL = UA_Client_disconnect(client->cl_client);
+    OUTPUT:
+	RETVAL
+
+UA_StatusCode
+UA_Client_disconnect_async(client, requestId)
+	OPCUA_Open62541_Client		client
+	OPCUA_Open62541_UInt32		requestId
+    INIT:
+	if (SvOK(ST(1)) && !(SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) < SVt_PVAV))
+		CROAK("requestId is not a scalar reference");
+    CODE:
+	RETVAL = UA_Client_disconnect_async(client->cl_client, requestId);
+	if (requestId != NULL)
+		XS_pack_UA_UInt32(SvRV(ST(1)), *requestId);
+    OUTPUT:
+	RETVAL
 
 UA_ClientState
 UA_Client_getState(client)
 	OPCUA_Open62541_Client		client
+    CODE:
+	RETVAL = UA_Client_getState(client->cl_client);
+    OUTPUT:
+	RETVAL
 
 UA_StatusCode
 UA_Client_sendAsyncBrowseRequest(client, request, callback, data, reqId)
@@ -1999,8 +2075,31 @@ UA_Client_sendAsyncBrowseRequest(client, request, callback, data, reqId)
 		CROAK("reqId is not a scalar reference");
     CODE:
 	ccd = newClientCallbackData(callback, ST(0), data);
-	RETVAL = UA_Client_sendAsyncBrowseRequest(client, &request,
+	RETVAL = UA_Client_sendAsyncBrowseRequest(client->cl_client, &request,
 	    clientAsyncBrowseCallback, ccd, reqId);
+	if (RETVAL != UA_STATUSCODE_GOOD)
+		deleteClientCallbackData(ccd);
+	if (reqId != NULL)
+		XS_pack_UA_UInt32(SvRV(ST(4)), *reqId);
+    OUTPUT:
+	RETVAL
+
+UA_StatusCode
+UA_Client_readValueAttribute_async(client, nodeId, callback, data, reqId)
+	OPCUA_Open62541_Client		client
+	UA_NodeId			nodeId
+	SV *				callback
+	SV *				data
+	OPCUA_Open62541_UInt32		reqId
+    INIT:
+	ClientCallbackData *		ccd;
+
+	if (SvOK(ST(4)) && !(SvROK(ST(4)) && SvTYPE(SvRV(ST(4))) < SVt_PVAV))
+		CROAK("reqId is not a scalar reference");
+    CODE:
+	ccd = newClientCallbackData(callback, ST(0), data);
+	RETVAL = UA_Client_readValueAttribute_async(client->cl_client, nodeId,
+	    clientAsyncReadValueAttributeCallback, ccd, reqId);
 	if (RETVAL != UA_STATUSCODE_GOOD)
 		deleteClientCallbackData(ccd);
 	if (reqId != NULL)
@@ -2017,7 +2116,7 @@ UA_Client_readDisplayNameAttribute(client, nodeId, outDisplayName)
 	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
 		CROAK("outDisplayName is not a scalar reference");
     CODE:
-	RETVAL = UA_Client_readDisplayNameAttribute(client, nodeId,
+	RETVAL = UA_Client_readDisplayNameAttribute(client->cl_client, nodeId,
 	    outDisplayName);
 	if (outDisplayName != NULL)
 		XS_pack_UA_LocalizedText(SvRV(ST(2)), *outDisplayName);
@@ -2033,7 +2132,7 @@ UA_Client_readDescriptionAttribute(client, nodeId, outDescription)
 	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
 		CROAK("outDescription is not a scalar reference");
     CODE:
-	RETVAL = UA_Client_readDescriptionAttribute(client, nodeId,
+	RETVAL = UA_Client_readDescriptionAttribute(client->cl_client, nodeId,
 	    outDescription);
 	if (outDescription != NULL)
 		XS_pack_UA_LocalizedText(SvRV(ST(2)), *outDescription);
@@ -2049,7 +2148,8 @@ UA_Client_readValueAttribute(client, nodeId, outValue)
 	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
 		CROAK("outValue is not a scalar reference");
     CODE:
-	RETVAL = UA_Client_readValueAttribute(client, nodeId, outValue);
+	RETVAL = UA_Client_readValueAttribute(client->cl_client, nodeId,
+	    outValue);
 	if (outValue != NULL)
 		XS_pack_UA_Variant(SvRV(ST(2)), *outValue);
     OUTPUT:
@@ -2067,7 +2167,8 @@ UA_Client_readDataTypeAttribute(client, nodeId, outDataType)
 	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
 		CROAK("outDataType is not a scalar reference");
     CODE:
-	RETVAL = UA_Client_readDataTypeAttribute(client, nodeId, &outNodeId);
+	RETVAL = UA_Client_readDataTypeAttribute(client->cl_client, nodeId,
+	    &outNodeId);
 	/*
 	 * Convert NodeId to DataType, see XS_unpack_UA_NodeId() for
 	 * the opposite direction.

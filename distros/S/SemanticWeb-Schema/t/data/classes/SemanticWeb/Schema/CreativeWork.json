@@ -15,8 +15,8 @@
          "schema:category" : "issue-1670",
          "schema:domainIncludes" : [
             "schema:Event",
-            "schema:CommunicateAction",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:CommunicateAction"
          ],
          "schema:inverseOf" : "schema:subjectOf",
          "schema:rangeIncludes" : "schema:Thing"
@@ -103,8 +103,8 @@
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:URL"
          ]
       },
       "schema:aggregateRating" : {
@@ -112,14 +112,14 @@
          "rdfs:comment" : "The overall rating, based on a collection of reviews or ratings, of the item.",
          "rdfs:label" : "aggregateRating",
          "schema:domainIncludes" : [
-            "schema:Place",
             "schema:CreativeWork",
             "schema:Service",
-            "schema:Event",
+            "schema:Product",
             "schema:Brand",
             "schema:Organization",
-            "schema:Offer",
-            "schema:Product"
+            "schema:Event",
+            "schema:Place",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:AggregateRating"
       },
@@ -142,12 +142,12 @@
          "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
          "rdfs:label" : "audience",
          "schema:domainIncludes" : [
-            "schema:Event",
             "schema:Service",
             "schema:CreativeWork",
+            "schema:Event",
+            "schema:Product",
             "schema:LodgingBusiness",
-            "schema:PlayAction",
-            "schema:Product"
+            "schema:PlayAction"
          ],
          "schema:rangeIncludes" : "schema:Audience"
       },
@@ -173,8 +173,8 @@
             "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:award" : {
@@ -182,10 +182,10 @@
          "rdfs:comment" : "An award won by or for this item.",
          "rdfs:label" : "award",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:Person",
             "schema:CreativeWork",
+            "schema:Person",
             "schema:Product",
+            "schema:Service",
             "schema:Organization"
          ],
          "schema:rangeIncludes" : "schema:Text"
@@ -195,10 +195,10 @@
          "rdfs:comment" : "Awards won by or for this item.",
          "rdfs:label" : "awards",
          "schema:domainIncludes" : [
-            "schema:Organization",
             "schema:CreativeWork",
+            "schema:Person",
             "schema:Product",
-            "schema:Person"
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : "schema:Text",
          "schema:supersededBy" : "schema:award"
@@ -216,8 +216,8 @@
          "rdfs:label" : "citation",
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Text"
          ]
       },
       "schema:comment" : {
@@ -225,8 +225,8 @@
          "rdfs:comment" : "Comments, typically from users.",
          "rdfs:label" : "comment",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:RsvpAction"
+            "schema:RsvpAction",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : "schema:Comment"
       },
@@ -260,8 +260,8 @@
          "rdfs:label" : "contentRating",
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:rangeIncludes" : [
-            "schema:Rating",
-            "schema:Text"
+            "schema:Text",
+            "schema:Rating"
          ]
       },
       "schema:contentReferenceTime" : {
@@ -279,12 +279,12 @@
          "rdfs:comment" : "A secondary contributor to the CreativeWork or Event.",
          "rdfs:label" : "contributor",
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:copyrightHolder" : {
@@ -319,9 +319,9 @@
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
+            "schema:CorrectionComment",
             "schema:URL",
-            "schema:Text",
-            "schema:CorrectionComment"
+            "schema:Text"
          ]
       },
       "schema:creativeWorkStatus" : {
@@ -346,8 +346,8 @@
             "schema:UserComments"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:dateCreated" : {
@@ -359,8 +359,8 @@
             "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:dateModified" : {
@@ -372,8 +372,8 @@
             "schema:DataFeedItem"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:datePublished" : {
@@ -465,8 +465,8 @@
          "rdfs:label" : "fileFormat",
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ],
          "schema:supersededBy" : "schema:encodingFormat"
       },
@@ -476,15 +476,15 @@
          "rdfs:label" : "funder",
          "rdfs:subPropertyOf" : "schema:sponsor",
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:MonetaryGrant",
-            "schema:Organization",
             "schema:CreativeWork",
+            "schema:Event",
+            "schema:Organization",
+            "schema:MonetaryGrant",
             "schema:Person"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:genre" : {
@@ -492,13 +492,13 @@
          "rdfs:comment" : "Genre of the creative work, broadcast channel or group.",
          "rdfs:label" : "genre",
          "schema:domainIncludes" : [
+            "schema:BroadcastChannel",
             "schema:MusicGroup",
-            "schema:CreativeWork",
-            "schema:BroadcastChannel"
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:hasPart" : {
@@ -524,17 +524,17 @@
          "rdfs:label" : "inLanguage",
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
-            "schema:BroadcastService",
+            "schema:PronounceableText",
+            "schema:Event",
+            "schema:WriteAction",
             "schema:CommunicateAction",
             "schema:CreativeWork",
-            "schema:WriteAction",
-            "schema:LinkRole",
-            "schema:Event",
-            "schema:PronounceableText"
+            "schema:BroadcastService",
+            "schema:LinkRole"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Language"
+            "schema:Language",
+            "schema:Text"
          ]
       },
       "schema:interactionStatistic" : {
@@ -544,9 +544,9 @@
          "rdfs:label" : "interactionStatistic",
          "schema:category" : "issue-2421",
          "schema:domainIncludes" : [
+            "schema:Organization",
             "schema:CreativeWork",
-            "schema:Person",
-            "schema:Organization"
+            "schema:Person"
          ],
          "schema:rangeIncludes" : "schema:InteractionCounter"
       },
@@ -563,8 +563,8 @@
          "rdfs:label" : "isAccessibleForFree",
          "schema:domainIncludes" : [
             "schema:CreativeWork",
-            "schema:Place",
             "schema:PublicationEvent",
+            "schema:Place",
             "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:Boolean"
@@ -575,9 +575,9 @@
          "rdfs:label" : "isBasedOn",
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:rangeIncludes" : [
+            "schema:Product",
             "schema:CreativeWork",
-            "schema:URL",
-            "schema:Product"
+            "schema:URL"
          ]
       },
       "schema:isBasedOnUrl" : {
@@ -587,8 +587,8 @@
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:rangeIncludes" : [
             "schema:CreativeWork",
-            "schema:Product",
-            "schema:URL"
+            "schema:URL",
+            "schema:Product"
          ],
          "schema:supersededBy" : "schema:isBasedOn"
       },
@@ -606,8 +606,8 @@
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:inverseOf" : "schema:hasPart",
          "schema:rangeIncludes" : [
-            "schema:CreativeWork",
-            "schema:URL"
+            "schema:URL",
+            "schema:CreativeWork"
          ]
       },
       "schema:keywords" : {
@@ -672,9 +672,22 @@
             "schema:Product"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:URL",
+            "schema:Text",
             "schema:Product"
+         ]
+      },
+      "schema:materialExtent" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1759",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The quantity of the materials being described or an expression of the physical space they occupy.",
+         "rdfs:label" : "materialExtent",
+         "schema:category" : "issue-1759",
+         "schema:domainIncludes" : "schema:CreativeWork",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:mentions" : {
@@ -692,13 +705,13 @@
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:CreativeWork",
-            "schema:AggregateOffer",
-            "schema:EducationalOccupationalProgram",
-            "schema:Product",
             "schema:MenuItem",
-            "schema:Service",
+            "schema:AggregateOffer",
+            "schema:Event",
             "schema:Trip",
-            "schema:Event"
+            "schema:EducationalOccupationalProgram",
+            "schema:Service",
+            "schema:Product"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [
@@ -711,8 +724,8 @@
          "rdfs:comment" : "The position of an item in a series or sequence of items.",
          "rdfs:label" : "position",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:ListItem"
+            "schema:ListItem",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -737,16 +750,16 @@
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
             "schema:ParcelDelivery",
-            "schema:Reservation",
-            "schema:CreativeWork",
-            "schema:EducationalOccupationalProgram",
             "schema:Service",
-            "schema:Invoice",
-            "schema:Trip"
+            "schema:Reservation",
+            "schema:EducationalOccupationalProgram",
+            "schema:Trip",
+            "schema:CreativeWork",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:publication" : {
@@ -780,9 +793,9 @@
          "rdfs:comment" : "The publishingPrinciples property indicates (typically via <a class=\"localLink\" href=\"http://schema.org/URL\">URL</a>) a document describing the editorial principles of an <a class=\"localLink\" href=\"http://schema.org/Organization\">Organization</a> (or individual e.g. a <a class=\"localLink\" href=\"http://schema.org/Person\">Person</a> writing a blog) that relate to their activities as a publisher, e.g. ethics or diversity policies. When applied to a <a class=\"localLink\" href=\"http://schema.org/CreativeWork\">CreativeWork</a> (e.g. <a class=\"localLink\" href=\"http://schema.org/NewsArticle\">NewsArticle</a>) the principles are those of the party primarily responsible for the creation of the <a class=\"localLink\" href=\"http://schema.org/CreativeWork\">CreativeWork</a>.<br/><br/>\n\nWhile such policies are most typically expressed in natural language, sometimes related information (e.g. indicating a <a class=\"localLink\" href=\"http://schema.org/funder\">funder</a>) can be expressed using schema.org terminology.",
          "rdfs:label" : "publishingPrinciples",
          "schema:domainIncludes" : [
+            "schema:Organization",
             "schema:Person",
-            "schema:CreativeWork",
-            "schema:Organization"
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:CreativeWork",
@@ -809,14 +822,14 @@
          "rdfs:comment" : "A review of the item.",
          "rdfs:label" : "review",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:Organization",
+            "schema:Product",
             "schema:Brand",
-            "schema:Event",
-            "schema:CreativeWork",
-            "schema:Place",
             "schema:Service",
-            "schema:Product"
+            "schema:Offer",
+            "schema:CreativeWork",
+            "schema:Event",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : "schema:Review"
       },
@@ -825,11 +838,11 @@
          "rdfs:comment" : "Review of the item.",
          "rdfs:label" : "reviews",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:Organization",
-            "schema:Product",
             "schema:Place",
-            "schema:CreativeWork"
+            "schema:Offer",
+            "schema:CreativeWork",
+            "schema:Product",
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : "schema:Review",
          "schema:supersededBy" : "schema:review"
@@ -840,8 +853,8 @@
          "rdfs:label" : "schemaVersion",
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:sdDatePublished" : {
@@ -863,8 +876,8 @@
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:URL"
          ]
       },
       "schema:sdPublisher" : {
@@ -909,16 +922,16 @@
          "rdfs:comment" : "A person or organization that supports a thing through a pledge, promise, or financial contribution. e.g. a sponsor of a Medical Study or a corporate sponsor of an event.",
          "rdfs:label" : "sponsor",
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:MedicalStudy",
-            "schema:CreativeWork",
             "schema:Organization",
             "schema:Person",
-            "schema:Grant"
+            "schema:Event",
+            "schema:Grant",
+            "schema:MedicalStudy",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:temporal" : {
@@ -927,8 +940,8 @@
          "rdfs:label" : "temporal",
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Text"
+            "schema:Text",
+            "schema:DateTime"
          ]
       },
       "schema:temporalCoverage" : {
@@ -939,8 +952,8 @@
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:rangeIncludes" : [
             "schema:Text",
-            "schema:URL",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:URL"
          ]
       },
       "schema:text" : {
@@ -982,8 +995,8 @@
             "schema:Event"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:typicalAgeRange" : {
@@ -1025,8 +1038,8 @@
          "rdfs:label" : "video",
          "schema:domainIncludes" : "schema:CreativeWork",
          "schema:rangeIncludes" : [
-            "schema:Clip",
-            "schema:VideoObject"
+            "schema:VideoObject",
+            "schema:Clip"
          ]
       },
       "schema:workExample" : {

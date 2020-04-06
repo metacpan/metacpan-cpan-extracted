@@ -20,12 +20,11 @@ my $bar = "BAR";
 alias $bar => 'foo';
 is \&BAR, \&foo;
 
-{
-    local $TODO = "multi-line alias statements at runtime.";
+subtest "Multi-line" => sub {
     my $baz = "BAZ";
 
     alias $baz,
         'foo';
 
     is \&BAZ, \&foo;
-}
+};

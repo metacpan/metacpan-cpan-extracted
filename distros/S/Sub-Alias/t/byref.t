@@ -1,6 +1,6 @@
 #!/usr/bin/env perl -w
 use strict;
-use Test::More tests => 1;
+use Test::More tests => 4;
 
 use Sub::Alias;
 
@@ -9,8 +9,12 @@ sub foo {
     "foooooo"
 }
 
-alias 'fuu' => \&foo;
+alias fuu1 => \&foo;
+alias 'fuu2' => \&foo;
+alias 'fuu3', \&foo;
+alias 'fuu4', \&foo;
 
-# is *fuu, *foo;
-is \&fuu, \&foo;
-
+is \&fuu1, \&foo;
+is \&fuu2, \&foo;
+is \&fuu3, \&foo;
+is \&fuu4, \&foo;

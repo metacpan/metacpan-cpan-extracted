@@ -25,8 +25,8 @@
          "schema:domainIncludes" : "schema:Diet",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:expertConsiderations" : {

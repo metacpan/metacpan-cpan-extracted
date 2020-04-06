@@ -14,8 +14,8 @@
          "schema:category" : "issue-1670",
          "schema:domainIncludes" : [
             "schema:Event",
-            "schema:CommunicateAction",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:CommunicateAction"
          ],
          "schema:inverseOf" : "schema:subjectOf",
          "schema:rangeIncludes" : "schema:Thing"
@@ -27,17 +27,17 @@
          "rdfs:label" : "inLanguage",
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
-            "schema:BroadcastService",
+            "schema:PronounceableText",
+            "schema:Event",
+            "schema:WriteAction",
             "schema:CommunicateAction",
             "schema:CreativeWork",
-            "schema:WriteAction",
-            "schema:LinkRole",
-            "schema:Event",
-            "schema:PronounceableText"
+            "schema:BroadcastService",
+            "schema:LinkRole"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Language"
+            "schema:Language",
+            "schema:Text"
          ]
       },
       "schema:language" : {
@@ -58,20 +58,20 @@
          "rdfs:label" : "recipient",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:Message",
-            "schema:SendAction",
-            "schema:ReturnAction",
-            "schema:PayAction",
             "schema:GiveAction",
-            "schema:AuthorizeAction",
-            "schema:TipAction",
+            "schema:PayAction",
             "schema:CommunicateAction",
-            "schema:DonateAction"
+            "schema:Message",
+            "schema:DonateAction",
+            "schema:SendAction",
+            "schema:TipAction",
+            "schema:ReturnAction",
+            "schema:AuthorizeAction"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization",
             "schema:Audience",
+            "schema:Organization",
+            "schema:Person",
             "schema:ContactPoint"
          ]
       }

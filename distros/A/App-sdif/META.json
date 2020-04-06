@@ -80,7 +80,7 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v4.13.6"
+         "version" : "v4.13.7"
       },
       "App::sdif::Divert" : {
          "file" : "lib/App/sdif/Divert.pm"
@@ -121,7 +121,7 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "4.13.6",
+   "version" : "4.13.7",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

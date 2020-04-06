@@ -43,8 +43,8 @@
          "rdfs:comment" : "Thumbnail image for an image or video.",
          "rdfs:label" : "thumbnail",
          "schema:domainIncludes" : [
-            "schema:ImageObject",
-            "schema:VideoObject"
+            "schema:VideoObject",
+            "schema:ImageObject"
          ],
          "schema:rangeIncludes" : "schema:ImageObject"
       }

@@ -6,7 +6,8 @@ use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
 use Test::More tests =>
     OPCUA::Open62541::Test::Server::planning() +
-    OPCUA::Open62541::Test::Client::planning() + 6;
+    OPCUA::Open62541::Test::Client::planning() + 16;
+use Test::LeakTrace;
 use Test::NoWarnings;
 
 my $server = OPCUA::Open62541::Test::Server->new();
@@ -74,6 +75,47 @@ is_deeply($out, $attr{VariableAttributes_dataType}, "data type");
 
 $client->{client}->readValueAttribute(\%requestedNewNodeId, \$out);
 is_deeply($out, $attr{VariableAttributes_value}, "value");
+
+# async
+
+my $data = "foo",
+my $reqid;
+my $read = 0;
+$out = undef;
+is($client->{client}->readValueAttribute_async(
+    \%requestedNewNodeId,
+    sub {
+	my ($c, $d, $i, $v) = @_;
+
+	is($c, $client->{client}, "client");
+	is($$d, "foo", "data in");
+	$$d = "bar";
+	is($i, $reqid, "reqid");
+	is_deeply($v, $attr{VariableAttributes_value}, "value");
+
+	$read = 1;
+    },
+    \$data,
+    \$reqid,
+), STATUSCODE_GOOD, "readValueAttribute_async");
+is($data, "foo", "data unchanged");
+like($reqid, qr/^\d+$/, "reqid number");
+$client->iterate(\$read, "read deep");
+is($data, 'bar', "data out");
+
+no_leaks_ok {
+    $read = 0;
+    $client->{client}->readValueAttribute_async(
+	\%requestedNewNodeId,
+	sub {
+	    my ($c, $d, $i, $v) = @_;
+	    $read = 1;
+	},
+	$data,
+	\$reqid,
+    );
+    $client->iterate(\$read);
+} "readValueAttribute_async leak";
 
 $client->stop();
 $server->stop();
