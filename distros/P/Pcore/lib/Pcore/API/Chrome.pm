@@ -20,6 +20,8 @@ has _proxy_server => ();
 # https://chromedevtools.github.io/devtools-protocol/tot/
 # https://peter.sh/experiments/chromium-command-line-switches/
 
+# TODO test --ignore-certificate-errors
+
 const our $CHECK_PORT_TIMEOUT => 0.1;
 const our $CONNECT_TIMEOUT    => 10;
 
@@ -153,9 +155,9 @@ sub set_proxy ( $self, $proxy ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 92                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
+## |    2 | 94                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 104                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 106                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

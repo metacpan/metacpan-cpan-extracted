@@ -1,32 +1,33 @@
 package Pcore::App::API::Backend::Local;
 
-use Pcore -role, -sql, -res;
-use Pcore::App::API qw[:ALL];
+use Pcore -role, -res, -sql;
+use Pcore::App::API::Const qw[:ROOT_USER :INVALIDATE_TYPE :PRIVATE_TOKEN :TOKEN_TYPE];
+use Pcore::Util::UUID qw[uuid_v4];
 use Pcore::Util::Text qw[encode_utf8];
 use Pcore::Util::Digest qw[sha3_512_bin];
-use Pcore::Util::UUID qw[uuid_v4];
 use Pcore::Util::Data qw[to_b64u];
 
 with qw[
-  Pcore::App::API
-  Pcore::App::API::Backend::Local::Methods
+  Pcore::App::API::Backend
   Pcore::App::API::Backend::Local::User
-  Pcore::App::API::Backend::Local::UserToken
-  Pcore::App::API::Backend::Local::UserSession
   Pcore::App::API::Backend::Local::UserActionToken
-  Pcore::App::API::Backend::Local::Settings
+  Pcore::App::API::Backend::Local::UserSession
+  Pcore::App::API::Backend::Local::UserToken
 ];
 
-has dbh => ( init_arg => undef );
+has dbh => ( required => 1 );
+
+has auth_workers       => ( required => 1 );
+has argon2_time        => ( required => 1 );
+has argon2_memory      => ( required => 1 );
+has argon2_parallelism => ( required => 1 );
 
 has _hash_cache      => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Hash::LRU']
 has _hash_cache_size => 10_000;                   # PositiveInt;
 
-sub init ( $self ) {
+# INIT
+sub init ($self) {
     $self->{_hash_cache} = P->hash->limited( $self->{_hash_cache_size} );
-
-    # init dbh
-    $self->{dbh} = P->handle( $self->{app}->{cfg}->{api}->{backend}, max_dbh => 10 );
 
     # update schema
     $self->_db_add_schema_patch( $self->{dbh} );
@@ -45,8 +46,12 @@ sub init ( $self ) {
 
     say $self->{app}->{node}->run_node(
         {   type      => 'Pcore::App::API::Node',
-            workers   => $self->{app}->{cfg}->{api}->{node}->{workers},
-            buildargs => $self->{app}->{cfg}->{api}->{node}->{argon},
+            workers   => $self->{auth_workers},
+            buildargs => {
+                argon2_time        => $self->{argon2_time},
+                argon2_memory      => $self->{argon2_memory},
+                argon2_parallelism => $self->{argon2_parallelism},
+            },
         },
     );
 
@@ -117,7 +122,7 @@ sub do_authenticate_private ( $self, $private_token ) {
     }
 }
 
-# HASH FUNCTIONS
+# HASH
 sub _verify_private_token ( $self, $private_token, $hash ) {
     if ( $private_token->[$PRIVATE_TOKEN_TYPE] == $TOKEN_TYPE_PASSWORD ) {
         my $cache_id = "$hash/$private_token->[$PRIVATE_TOKEN_HASH]";
@@ -203,12 +208,12 @@ sub _return_auth ( $self, $private_token, $user_id, $user_name ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 121                  | * Private subroutine/method '_verify_private_token' declared but not used                                      |
-## |      | 139                  | * Private subroutine/method '_generate_password_hash' declared but not used                                    |
-## |      | 153                  | * Private subroutine/method '_generate_token' declared but not used                                            |
-## |      | 170                  | * Private subroutine/method '_return_auth' declared but not used                                               |
+## |      | 126                  | * Private subroutine/method '_verify_private_token' declared but not used                                      |
+## |      | 144                  | * Private subroutine/method '_generate_password_hash' declared but not used                                    |
+## |      | 158                  | * Private subroutine/method '_generate_token' declared but not used                                            |
+## |      | 175                  | * Private subroutine/method '_return_auth' declared but not used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 139, 170             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 144, 175             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

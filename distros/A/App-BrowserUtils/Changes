@@ -1,3 +1,10 @@
+0.003   2019-12-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention supported browsers in Description.
+
+
 0.002   2019-12-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Add description for pause; provide the description in package

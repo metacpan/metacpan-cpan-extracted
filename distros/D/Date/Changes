@@ -1,3 +1,5 @@
+5.0.4    07.04.2020
+           - RT#132310 - fix format constants in docs
 5.0.3    02.04.2020
            - change errc package to Error
 5.0.2    28.01.2020

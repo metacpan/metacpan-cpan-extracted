@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Password;
-our $VERSION = '1.048';
+our $VERSION = '1.049';
 # ABSTRACT: A simple password-based auth
 
 #pod =encoding utf8
@@ -205,6 +205,16 @@ our $VERSION = '1.048';
 #pod configuration will result in a user's password being upgraded the next
 #pod time they log in.
 #pod
+#pod =head2 allow_register
+#pod
+#pod If true, allow the visitor to register their own user account.
+#pod
+#pod =head2 register_fields
+#pod
+#pod An array of fields to show to the user when registering an account. By
+#pod default, all required fields from the schema will be presented in the
+#pod form to register.
+#pod
 #pod =head2 Sessions
 #pod
 #pod This module uses L<Mojolicious
@@ -263,6 +273,18 @@ our $VERSION = '1.048';
 #pod
 #pod Handle login by checking the user's username and password.
 #pod
+#pod =head2 yancy.auth.password.logout
+#pod
+#pod Clear the current login and allow the user to log in again.
+#pod
+#pod =head2 yancy.auth.password.register_form
+#pod
+#pod Display the form to register a new user, if registration is enabled.
+#pod
+#pod =head2 yancy.auth.password.register
+#pod
+#pod Register a new user, if registration is enabled.
+#pod
 #pod =head1 TEMPLATES
 #pod
 #pod To override these templates in your application, provide your own
@@ -292,6 +314,11 @@ our $VERSION = '1.048';
 #pod
 #pod The layout that Yancy uses when displaying the login form, the
 #pod unauthorized error message, and other auth-related pages.
+#pod
+#pod =head2 yancy/auth/password/register.html.ep
+#pod
+#pod The page containing the form to register a new user. Will display all of the
+#pod L</register_fields>.
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -326,6 +353,9 @@ sub register {
     $self->init( $app, $config );
     $app->helper(
         'yancy.auth.current_user' => currym( $self, 'current_user' ),
+    );
+    $app->helper(
+        'yancy.auth.logout' => currym( $self, 'logout' ),
     );
 }
 
@@ -375,7 +405,7 @@ sub init {
         }
     }
 
-    my $route = $config->{route} || $app->routes->any( '/yancy/auth/' . $self->moniker );
+    my $route = $app->yancy->routify( $config->{route}, '/yancy/auth/' . $self->moniker );
     $route->get( 'register' )->to( cb => currym( $self, '_get_register' ) )->name( 'yancy.auth.password.register_form' );
     $route->post( 'register' )->to( cb => currym( $self, '_post_register' ) )->name( 'yancy.auth.password.register' );
     $route->get( 'logout' )->to( cb => currym( $self, '_get_logout' ) )->name( 'yancy.auth.password.logout' );
@@ -622,9 +652,14 @@ sub _check_pass {
     return $success;
 }
 
-sub _get_logout {
+sub logout {
     my ( $self, $c ) = @_;
     delete $c->session->{yancy}{auth}{password};
+}
+
+sub _get_logout {
+    my ( $self, $c ) = @_;
+    $self->logout( $c );
     $c->flash( info => 'logout' );
     return $c->redirect_to( 'yancy.auth.password.login_form' );
 }
@@ -641,7 +676,7 @@ Yancy::Plugin::Auth::Password - A simple password-based auth
 
 =head1 VERSION
 
-version 1.048
+version 1.049
 
 =head1 SYNOPSIS
 
@@ -846,6 +881,16 @@ can be updated transparently when necessary. Changing the digest
 configuration will result in a user's password being upgraded the next
 time they log in.
 
+=head2 allow_register
+
+If true, allow the visitor to register their own user account.
+
+=head2 register_fields
+
+An array of fields to show to the user when registering an account. By
+default, all required fields from the schema will be presented in the
+form to register.
+
 =head2 Sessions
 
 This module uses L<Mojolicious
@@ -904,6 +949,18 @@ Display the login form. See L</TEMPLATES> below.
 
 Handle login by checking the user's username and password.
 
+=head2 yancy.auth.password.logout
+
+Clear the current login and allow the user to log in again.
+
+=head2 yancy.auth.password.register_form
+
+Display the form to register a new user, if registration is enabled.
+
+=head2 yancy.auth.password.register
+
+Register a new user, if registration is enabled.
+
 =head1 TEMPLATES
 
 To override these templates in your application, provide your own
@@ -933,6 +990,11 @@ the error.
 
 The layout that Yancy uses when displaying the login form, the
 unauthorized error message, and other auth-related pages.
+
+=head2 yancy/auth/password/register.html.ep
+
+The page containing the form to register a new user. Will display all of the
+L</register_fields>.
 
 =head1 SEE ALSO
 

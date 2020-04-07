@@ -2,7 +2,7 @@ package Catmandu::WoS::SearchRecords;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 use Moo::Role;
 use Catmandu::Util qw(xml_escape);

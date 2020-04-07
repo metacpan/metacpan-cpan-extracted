@@ -2,7 +2,7 @@ package Catmandu::Importer::WoSRetrieveById;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 use Moo;
 use Catmandu::Util qw(is_value xml_escape);

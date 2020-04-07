@@ -20,8 +20,6 @@ from the command line.
 
 =cut
 
-our $VERSION = '0.0102';
-
 =head1 SYNOPSIS
 
     use Template::Preprocessor::TTML;
@@ -86,7 +84,7 @@ sub _get_mode_callbacks
 sub _mode_version
 {
     print <<"EOF";
-This is TTML version $VERSION
+This is TTML version $Template::Preprocessor::TTML::VERSION
 TTML is a Command Line Preprocessor based on the Template Toolkit
 (http://www.template-toolkit.org/)
 

@@ -1,4 +1,4 @@
-libnf-1.25.tar.gz
+libnf-1.27.tar.gz
 Changes
 Makefile.PL
 MANIFEST
@@ -40,4 +40,3 @@ examples/example2.pl
 examples/example3.pl
 examples/example4.pl
 bin/nfasnupd
-META.yml                                 Module meta-data (added by MakeMaker)

@@ -31,12 +31,12 @@ sub get_permissions ($self) {
 
 # RUN
 sub run ( $self ) {
-    $self->{util} = <: $module_name ~ "::Util " :>->new( app => $self );
 
-    # update schema
-    print 'Updating DB schema ... ';
-    say( my $res = $self->{util}->update_schema( $self->{cfg}->{db} ) );
-    return $res if !$res;
+    # load settings
+    my $res = $self->{api}->settings_load;
+
+    # create util
+    $self->{util} = <: $module_name ~ "::Util " :>->new( settings => $self->{api}->{settings} );
 
     # load settings
     $res = $self->{api}->settings_load;
@@ -48,16 +48,16 @@ sub run ( $self ) {
         # {   type      => '<: $module_name :>::Node::Worker',
         #     workers   => 1,
         #     buildargs => {
-        #         cfg  => $self->{cfg},
-        #         util => $self->{util},
+        #         env      => $self->{env},
+        #         settings => $self->{api}->{settings},
         #     },
         # },
         # {   type      => '<: $module_name :>::Node::SystemLog',
         #     workers   => 1,
         #     buildargs => {
+        #         env            => $self->{env},
+        #         settings       => $self->{api}->{settings},
         #         store_interval => 0,
-        #         cfg            => $self->{cfg},
-        #         util           => { settings => $self->{api}->{settings} },
         #     },
         # },
     );

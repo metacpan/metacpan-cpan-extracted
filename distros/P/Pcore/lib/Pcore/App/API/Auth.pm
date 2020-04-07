@@ -1,7 +1,7 @@
 package Pcore::App::API::Auth;
 
 use Pcore -class, -res;
-use Pcore::App::API qw[:TOKEN_TYPE :PRIVATE_TOKEN :PERMS];
+use Pcore::App::API::Const qw[:PERMS];
 use Pcore::Util::Scalar qw[is_res is_plain_arrayref];
 
 use overload    #
@@ -28,7 +28,7 @@ sub TO_DUMP ( $self, $dumper, %args ) {
 
     my %attrs = $self->%*;
 
-    delete $attrs{app};
+    delete $attrs{api};
 
     $res .= $dumper->_dump( \%attrs, path => $args{path} );
 
@@ -77,7 +77,7 @@ sub api_call ( $self, $method_id, @args ) {
 
 sub _api_can_call ( $self, $method_id ) {
     if ( $self->{is_authenticated} ) {
-        my $auth = $self->{api}->authenticate_private( $self->{private_token} );
+        my $auth = $self->{api}->authenticate( $self->{private_token} );
 
         return $auth->_check_permissions($method_id);
     }

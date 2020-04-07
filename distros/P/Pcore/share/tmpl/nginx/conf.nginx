@@ -35,6 +35,7 @@ http {
     output_buffers            1 128k;
 
     keepalive_timeout         70;
+: if $use_geoip2 {
 : if $geoip2_country_path {
 
     # NOTE https://github.com/leev/ngx_http_geoip2_module
@@ -52,6 +53,7 @@ http {
         auto_reload 0m;
         # $geoip2_data_city_name default=London city names en;
     }
+: }
 : }
 
     gzip                      on;

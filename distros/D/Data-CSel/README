@@ -2,8 +2,8 @@ NAME
     Data::CSel - Select tree node objects using CSS Selector-like syntax
 
 VERSION
-    This document describes version 0.121 of Data::CSel (from Perl
-    distribution Data-CSel), released on 2019-07-26.
+    This document describes version 0.122 of Data::CSel (from Perl
+    distribution Data-CSel), released on 2020-04-07.
 
 SYNOPSIS
      use Data::CSel qw(csel);
@@ -565,6 +565,20 @@ EXPRESSION SYNTAX
     There is no need for something like this CSel, as we deal with only Perl
     objects.
 
+VARIABLES
+@Data::CSel::CLASS_PREFIXES
+    Array of namespace prefixes to check when matching type in type selector
+    as well as class selector. This is like PATH environment variable in
+    Unix shell. For example, if @CLASS_PREFIXES is "["Foo::Bar", "Baz"]",
+    then this expression:
+
+     T
+
+    will match class "Foo::Bar::T", or "Baz::T", or "T".
+
+    Note that @Data::CSel::CLASS_PREFIXES is consulted after the
+    "class_prefixes" opton in "csel()".
+
 FUNCTIONS
   csel
     Usage:
@@ -590,14 +604,17 @@ FUNCTIONS
 
     *   class_prefixes => array of str
 
-        Array of namespace to check when matching type in type selector as
-        well as class selector. This is like PATH environment variable in
-        Unix shell. For example, if "class_prefixes" is "["Foo::Bar",
-        "Baz"]", then this expression:
+        Array of namespace prefixes to check when matching type in type
+        selector as well as class selector. This is like PATH environment
+        variable in Unix shell. For example, if "class_prefixes" is
+        "["Foo::Bar", "Baz"]", then this expression:
 
          T
 
         will match class "Foo::Bar::T", or "Baz::T", or "T".
+
+        Note that @Data::CSel::CLASS_PREFIXES is also consulted after this
+        "class_prefixes" option.
 
     *   wrap => bool
 
@@ -728,7 +745,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

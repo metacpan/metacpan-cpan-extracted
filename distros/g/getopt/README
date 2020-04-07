@@ -1,0 +1,45 @@
+NAME
+    getopt - Shortcut for using Getopt::Std's getopt() from the command line
+
+VERSION
+    This document describes version 0.001 of getopt (from Perl distribution
+    getopt), released on 2020-04-08.
+
+SYNOPSIS
+     % perl -Mgetopt=oDI -e '...'
+
+    is shortcut for:
+
+     % perl -MGetopt::Std -e 'getopt("oDI"); ...'
+
+DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/getopt>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-getopt>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=getopt>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Getopt::Std
+
+    getopts
+
+    perl's "-s" switch
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

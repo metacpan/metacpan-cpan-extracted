@@ -8,11 +8,18 @@ BEGIN { use_ok('Net::IPAM::IP') || print "Bail out!\n"; }
 
 can_ok( 'Net::IPAM::IP', 'new' );
 
-my $ip;
-foreach my $txt (qw/fE80::0:1 1.2.3.4 ::ffff:127.0.0.1 ::ff:0/) {
-  ok( $ip = Net::IPAM::IP->new($txt),                               "new($txt)" );
-  ok( $ip->cmp( Net::IPAM::IP->new_from_bytes( $ip->bytes ) ) == 0, "new_from_bytes" );
-  ok( $ip->cmp( $ip->clone ) == 0,                                  "clone" );
+# valid
+foreach my $txt (qw/:: fE80::0:1 1.2.3.4 ::ffff:127.0.0.1 ::ff:0 caFe::/) {
+  ok( Net::IPAM::IP->new($txt), "is valid ($txt)" );
+}
+
+# invalid
+foreach my $txt (
+  qw/010.0.0.1 10.000.0.1 : ::cafe::affe cafe::: cafe::1:: cafe::1: :cafe:: ::cafe::
+  cafe::1:2:3:4:5:6:7:8 1:2:3:4:5:6:7:8:9 ::1.2.3.4 cafe:affe:1.2.3.4 ::ff:1.2.3.4 ::dddd:1.2.3.4/
+  )
+{
+  ok( !Net::IPAM::IP->new($txt), "is invalid ($txt)" );
 }
 
 ok( Net::IPAM::IP->new_from_bytes("\xff\xff\xff\xff") eq '255.255.255.255', "new_from_bytes" );
@@ -25,16 +32,18 @@ ok( Net::IPAM::IP->new('fe80::1')->to_string eq 'fe80::1',            'to_string
 ok( Net::IPAM::IP->new('1.2.3.4')->to_string eq '1.2.3.4',            'to_string 1.2.3.4' );
 ok( Net::IPAM::IP->new('0.0.0.0')->to_string eq '0.0.0.0',            'to_string 0.0.0.0' );
 ok( Net::IPAM::IP->new('1.1.1.1')->to_string eq '1.1.1.1',            'to_string 1.1.1.1' );
+
 ok( Net::IPAM::IP->new('::ffff:127.0.0.1')->to_string eq '127.0.0.1', 'to_string ::ffff:127.0.0.1' );
 ok( Net::IPAM::IP->new('::cafe:affe')->to_string eq '::cafe:affe',    'to_string ::cafe:affe' );
 
-ok( !Net::IPAM::IP->new('::12345'),          'undefined ::12345' );
-ok( !Net::IPAM::IP->new('::1.2.3.4'),        'undefined ::1.2.3.4' );
-ok( !Net::IPAM::IP->new('ffgd::1'),          'undefined ffgd::1' );
+ok( !Net::IPAM::IP->new('::12345'),   'undefined ::12345' );
+ok( !Net::IPAM::IP->new('::1.2.3.4'), 'undefined ::1.2.3.4' );
+ok( !Net::IPAM::IP->new('ffgd::1'),   'undefined ffgd::1' );
+ok( !Net::IPAM::IP->new('fe80:::'),   'undefined fe80:::' );
 
-ok( !Net::IPAM::IP->new('127.0.0.X'),        'undefined 127.0.0.X' );
-ok( !Net::IPAM::IP->new('300.0.0.1'),        'undefined 300.0.0.1' );
-ok( !Net::IPAM::IP->new('030.0.0.1'),        'undefined 030.0.0.1' );
+ok( !Net::IPAM::IP->new('127.0.0.X'), 'undefined 127.0.0.X' );
+ok( !Net::IPAM::IP->new('300.0.0.1'), 'undefined 300.0.0.1' );
+ok( !Net::IPAM::IP->new('030.0.0.1'), 'undefined 030.0.0.1' );
 
 ok( Net::IPAM::IP->new('fe80::1')->version == 6,                 'version fe80::1' );
 ok( Net::IPAM::IP->new('1.2.3.4')->version == 4,                 'version 1.2.3.4' );

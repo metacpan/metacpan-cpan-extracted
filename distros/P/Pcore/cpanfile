@@ -117,6 +117,16 @@ requires 'Digest::SHA3',  v1.4.0;
 # Pcore::Util::File
 requires 'File::Copy::Recursive';
 
+# Pcore::Util::GeoIP
+feature linux => sub {
+    requires 'MaxMind::DB::Reader::XS', v1.0.5;
+};
+
+feature windows => sub {
+    requires 'MaxMind::DB::Reader', v1.0.13;
+
+};
+
 # Pcore::Util::List
 requires 'List::Util::XS';
 requires 'List::AllUtils';

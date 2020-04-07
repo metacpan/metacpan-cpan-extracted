@@ -1,7 +1,7 @@
 package Pcore::App::API::Role::Profile;
 
 use Pcore -role;
-use Pcore::App::API qw[:TOKEN_TYPE :PRIVATE_TOKEN];
+use Pcore::App::API::Const qw[:TOKEN_TYPE :PRIVATE_TOKEN];
 
 sub API_read ( $self, $auth, @ ) {
     state $q1 = $self->{dbh}->prepare('SELECT "name", "email", "email_confirmed", "telegram_name" FROM "user" WHERE "id" = ?');
@@ -12,7 +12,7 @@ sub API_read ( $self, $auth, @ ) {
 }
 
 sub API_change_password ( $self, $auth, $password ) {
-    my $res = $self->{api}->user_set_password( $auth->{user_id}, $password );
+    my $res = $self->{api}->{backend}->user_set_password( $auth->{user_id}, $password );
 
     return $res;
 }

@@ -1,7 +1,7 @@
 package Pcore::App::API::Role::Session;
 
 use Pcore -role, -sql, -res;
-use Pcore::App::API qw[:TOKEN_TYPE :PRIVATE_TOKEN];
+use Pcore::App::API::Const qw[:TOKEN_TYPE :PRIVATE_TOKEN];
 use Pcore::Util::Scalar qw[is_plain_hashref];
 use Pcore::Util::Digest qw[sha256_bin hmac_sha256_hex];
 
@@ -15,7 +15,7 @@ sub API_signout ( $self, $auth ) {
     if ( $auth->{private_token}->[$PRIVATE_TOKEN_TYPE] && $auth->{private_token}->[$PRIVATE_TOKEN_TYPE] == $TOKEN_TYPE_SESSION ) {
 
         # remove user session
-        return $self->{api}->user_session_remove( $auth->{private_token}->[$PRIVATE_TOKEN_ID] );
+        return $self->{api}->{backend}->user_session_remove( $auth->{private_token}->[$PRIVATE_TOKEN_ID] );
     }
 
     # not a session token
@@ -47,7 +47,7 @@ sub API_signin ( $self, $auth, $args ) {
         $user_id = $user_id->{user_id};
 
         # create user session
-        my $session = $self->{api}->user_session_create($user_id);
+        my $session = $self->{api}->{backend}->user_session_create($user_id);
 
         # user session creation error
         return 500 if !$session;
@@ -217,7 +217,7 @@ sub API_confirm_email ( $self, $auth, $token ) {
 }
 
 sub API_recover_password ( $self, $auth, $user_id ) {
-    my $token = $self->{api}->user_action_token_create( $user_id, $TOKEN_TYPE_PASSWORD_RECOVERY );
+    my $token = $self->{api}->{backend}->user_action_token_create( $user_id, $TOKEN_TYPE_PASSWORD_RECOVERY );
 
     return $token if !$token;
 
@@ -229,7 +229,7 @@ sub API_recover_password ( $self, $auth, $user_id ) {
 sub API_set_password ( $self, $auth, $token, $password ) {
     return 400 if !$token;
 
-    $token = $self->{api}->user_action_token_verify( $token, $TOKEN_TYPE_PASSWORD_RECOVERY );
+    $token = $self->{api}->{backend}->user_action_token_verify( $token, $TOKEN_TYPE_PASSWORD_RECOVERY );
 
     # token verification error
     return $token if !$token;
@@ -258,12 +258,12 @@ sub API_set_password ( $self, $auth, $token, $password ) {
         return $res;
     };
 
-    $res = $self->{api}->user_set_password( $token->{data}->{user_id}, $password, $dbh );
+    $res = $self->{api}->{backend}->user_set_password( $token->{data}->{user_id}, $password, $dbh );
 
     # set password error
     return $on_finish->( $dbh, $res ) if !$res;
 
-    $res = $self->{api}->user_action_token_remove( $TOKEN_TYPE_PASSWORD_RECOVERY, $token->{data}->{email} );
+    $res = $self->{api}->{backend}->user_action_token_remove( $TOKEN_TYPE_PASSWORD_RECOVERY, $token->{data}->{email} );
 
     # error
     return $on_finish->( $dbh, $res ) if !$res;
@@ -284,7 +284,7 @@ sub API_signup ( $self, $auth, $args ) {
     #     # lowecase user name
     #     $args->{username} = lc $args->{username};
 
-    #     my $res = $self->{api}->user_create( $args->{username}, $args->{password}, 1, $permissions );
+    #     my $res = $self->{api}->{backend}->user_create( $args->{username}, $args->{password}, 1, $permissions );
 
     #     if ( !$res ) {
     #         return $res;

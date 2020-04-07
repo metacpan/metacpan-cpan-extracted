@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth;
-our $VERSION = '1.048';
+our $VERSION = '1.049';
 # ABSTRACT: Add one or more authentication plugins to your site
 
 #pod =head1 SYNOPSIS
@@ -149,6 +149,20 @@ our $VERSION = '1.048';
 #pod Validate there is a logged-in user and optionally that the user data has
 #pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 #pod
+#pod =head2 yancy.auth.logout
+#pod
+#pod Log out any current account from any auth plugin.
+#pod
+#pod =head1 ROUTES
+#pod
+#pod =head2 yancy.auth.login
+#pod
+#pod Display all of the login forms for the configured auth plugins.
+#pod
+#pod =head2 yancy.auth.logout
+#pod
+#pod Log out of all configured auth plugins.
+#pod
 #pod =head1 TEMPLATES
 #pod
 #pod =head2 yancy/auth/login.html.ep
@@ -204,9 +218,17 @@ sub register {
             ( $name, $plugin_conf ) = @$plugin_conf;
         }
 
-        if ( $config->{route} ) {
-            $plugin_conf->{route} //= $config->{route}->any( $plugin_conf->{moniker} || lc $name );
+        # If we got a route config, we need to customize the plugin
+        # routes as well.  If this plugin got its own "route" config,
+        # use it.  Otherwise, build a route from the auth route and the
+        # plugin's moniker.
+        if ( my $route = $app->yancy->routify( $config->{route} ) ) {
+            $plugin_conf->{route} = $app->yancy->routify(
+                $plugin_conf->{route},
+                $route->any( $plugin_conf->{moniker} || lc $name ),
+            );
         }
+
         my %merged_conf = ( %$config, %$plugin_conf );
         if ( $plugin_conf->{username_field} ) {
             # If this plugin has a unique username field, we don't need
@@ -231,8 +253,17 @@ sub register {
     $app->helper(
         'yancy.auth.plugins' => currym( $self, 'plugins' ),
     );
-    $self->route( $app->routes->get( '/yancy/auth' ) );
-    $self->route->to( cb => currym( $self, 'login_form' ) );
+    $app->helper(
+        'yancy.auth.logout' => currym( $self, 'logout' ),
+    );
+    # Make this route after all the plugin routes so that it matches
+    # last.
+    $self->route( $app->yancy->routify(
+        $config->{route},
+        $app->routes->get( '/yancy/auth' ),
+    ) );
+    $self->route->get( '/logout' )->to( cb => currym( $self, '_handle_logout' ) )->name( 'yancy.auth.logout' );
+    $self->route->get( '' )->to( cb => currym( $self, 'login_form' ) )->name( 'yancy.auth.login' );
 }
 
 #pod =method current_user
@@ -276,6 +307,24 @@ sub login_form {
     );
 }
 
+#pod =method logout
+#pod
+#pod Log out the current user. Will call the C<logout> method on all configured auth plugins.
+#pod
+#pod =cut
+
+sub logout {
+    my ( $self, $c ) = @_;
+    $_->logout( $c ) for $self->plugins;
+}
+
+sub _handle_logout {
+    my ( $self, $c ) = @_;
+    $self->logout( $c );
+    $c->res->code( 303 );
+    return $c->redirect_to( 'yancy.auth.login' );
+}
+
 1;
 
 __END__
@@ -288,7 +337,7 @@ Yancy::Plugin::Auth - Add one or more authentication plugins to your site
 
 =head1 VERSION
 
-version 1.048
+version 1.049
 
 =head1 SYNOPSIS
 
@@ -356,6 +405,10 @@ Returns the list of configured auth plugins.
 =head2 login_form
 
 Render the login form template for inclusion in L<Yancy::Plugin::Auth>.
+
+=head2 logout
+
+Log out the current user. Will call the C<logout> method on all configured auth plugins.
 
 =head1 CONFIGURATION
 
@@ -450,6 +503,20 @@ C<undef> if no user was found in the session.
 
 Validate there is a logged-in user and optionally that the user data has
 certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
+
+=head2 yancy.auth.logout
+
+Log out any current account from any auth plugin.
+
+=head1 ROUTES
+
+=head2 yancy.auth.login
+
+Display all of the login forms for the configured auth plugins.
+
+=head2 yancy.auth.logout
+
+Log out of all configured auth plugins.
 
 =head1 TEMPLATES
 

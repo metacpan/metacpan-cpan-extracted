@@ -45,7 +45,7 @@
             "IPC::Open3" : "0",
             "Role::Tiny::With" : "0",
             "Role::TinyCommons::Tree::FromStruct" : "0",
-            "Role::TinyCommons::Tree::NodeMethods" : "0.11",
+            "Role::TinyCommons::Tree::NodeMethods" : "0.121",
             "Test::More" : "0.98",
             "lib" : "0",
             "parent" : "0"
@@ -64,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-Data-CSel"
       }
    },
-   "version" : "0.121",
+   "version" : "0.122",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -159,7 +159,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.597"
+            "version" : "0.600"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -210,7 +210,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.003"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -384,7 +384,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.06"
+                        "version" : "0.082"
                      }
                   ]
                }
@@ -405,12 +405,12 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
             "name" : "@Author::PERLANCAR/Rinci::AddToDb",
-            "version" : "0.01"
+            "version" : "0.020"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
@@ -445,9 +445,18 @@
             "version" : "2.054"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
-            "name" : "@Author::PERLANCAR/Test::Perl::Critic",
-            "version" : "3.001"
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic::Subset",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
+                  "finder" : [
+                     ":ExecFiles",
+                     ":InstallModules",
+                     ":TestFiles"
+                  ]
+               }
+            },
+            "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
+            "version" : "3.001.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

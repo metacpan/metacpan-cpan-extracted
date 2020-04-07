@@ -510,6 +510,16 @@ subtest "option: class_prefixes" => sub {
         nodes  => [$n{root}],
         result => [@n{qw/a2/}],
     );
+    {
+        local @Data::CSel::CLASS_PREFIXES = ("Local");
+        test_csel(
+            name   => 'with @Data::CSel::CLASS_PREFIXES',
+            expr   => "TN2",
+            opts   => {class_prefixes=>['Foo']},
+            nodes  => [$n{root}],
+            result => [@n{qw/a2/}],
+        );
+    }
 };
 
 DONE_TESTING:

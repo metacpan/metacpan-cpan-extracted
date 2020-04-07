@@ -1,13 +1,24 @@
-SYNOPSIS
+NAME
+    Data::Dmp - Dump Perl data structures as Perl code
 
+VERSION
+    This document describes version 0.240 of Data::Dmp (from Perl
+    distribution Data-Dmp), released on 2020-04-07.
+
+SYNOPSIS
      use Data::Dmp; # exports dd() and dmp()
      dd [1, 2, 3]; # prints "[1,2,3]"
      $a = dmp({a => 1}); # -> "{a=>1}"
 
-DESCRIPTION
+    Print truncated dump (capped at
+    "$Data::Dmp::OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS" characters):
 
+     use Data::Dmp qw(dd_ellipsis dmp_ellipsis);
+     dd_ellipsis [1..100];
+
+DESCRIPTION
     Data::Dmp is a Perl dumper like Data::Dumper. It's compact (only about
-    175 lines of code long), starts fast and does not use any non-core
+    200 lines of code long), starts fast and does not use any non-core
     modules except Regexp::Stringify when dumping regexes. It produces
     compact single-line output (similar to Data::Dumper::Concise). It
     roughly has the same speed as Data::Dumper (usually a bit faster for
@@ -15,46 +26,32 @@ DESCRIPTION
     various formatting options. It supports dumping objects, regexes,
     circular structures, coderefs. Its code is first based on Data::Dump: I
     removed all the parts that I don't need, particularly the pretty
-    formatting stuffs) and added some features that I need like proper
-    regex dumping and coderef deparsing.
+    formatting stuffs) and added some features that I need like proper regex
+    dumping and coderef deparsing.
 
-FUNCTIONS
-
- dd($data, ...) => $data ...
-
-    Exported by default. Like Data::Dump's dd (a.k.a. dump), print one or
-    more data to STDOUT. Unlike Data::Dump's dd, it always prints and
-    return the original data (like XXX), making it convenient to insert
-    into expressions. This also removes ambiguity and saves one wantarray()
-    call.
-
- dmp($data, ...) => $str
-
-    Exported by default. Return dump result as string. Unlike Data::Dump's
-    dd (a.k.a. dump), it never prints and only return the data.
-
-SETTINGS
-
- $Data::Dmp::OPT_PERL_VERSION => str (default: 5.010)
+VARIABLES
+  $Data::Dmp::OPT_PERL_VERSION
+    String, default: 5.010.
 
     Set target Perl version. If you set this to, say 5.010, then the dumped
     code will keep compatibility with Perl 5.10.0. This is used in the
     following ways:
 
-      * passed to Regexp::Stringify
+    *   passed to Regexp::Stringify
 
-      * when dumping code references
+    *   when dumping code references
 
-      For example, in perls earlier than 5.016, feature.pm does not
-      understand:
+        For example, in perls earlier than 5.016, feature.pm does not
+        understand:
 
-       no feature ':all';
+         no feature ':all';
 
-      so we replace it with:
+        so we replace it with:
 
-       no feature;
+         no feature;
 
- $Data::Dmp::OPT_REMOVE_PRAGMAS => bool (default: 0)
+  $Data::Dmp::OPT_REMOVE_PRAGMAS
+    Bool, default: 0.
 
     If set to 1, then pragmas at the start of coderef dump will be removed.
     Coderef dump is produced by B::Deparse and is of the form like:
@@ -68,30 +65,88 @@ SETTINGS
 
     Note that without the pragmas, the dump might be incorrect.
 
- $Data::Dmp::OPT_DEPARSE => bool (default: 1)
+  $Data::Dmp::OPT_DEPARSE
+    Bool, default: 1.
 
     Can be set to 0 to skip deparsing code. Coderefs will be dumped as
-    sub{"DUMMY"} instead, like in Data::Dump.
+    "sub{"DUMMY"}" instead, like in Data::Dump.
 
- $Data::Dmp::OPT_STRINGIFY_NUMBERS => bool (default: 0)
+  $Data::Dmp::OPT_STRINGIFY_NUMBERS
+    Bool, default: 0.
 
     If set to true, will dump numbers as quoted string, e.g. 123 as "123"
-    instead of 123. This might be helpful if you want to compute the hash
-    of or get a canonical representation of data structure.
+    instead of 123. This might be helpful if you want to compute the hash of
+    or get a canonical representation of data structure.
+
+  $Data::Dmp::OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS
+    Int, default: 70.
+
+    Used by "dd_ellipsis" and "dmp_ellipsis".
 
 BENCHMARKS
+     [1..10]:
+                          Rate    Data::Dump Data::Dumper Data::Dmp
+     Data::Dump    32032+-55/s            --       -64.6%    -73.9%
+     Data::Dumper 90580+-110/s 182.77+-0.59%           --    -26.1%
+     Data::Dmp    122575+-43/s 282.66+-0.67% 35.32+-0.17%        --
+ 
+     [1..100]:
+                           Rate    Data::Dump   Data::Dmp Data::Dumper
+     Data::Dump   3890.6+-5.9/s            --      -73.7%       -73.7%
+     Data::Dmp     14768.3+-5/s 279.59+-0.59%          --        -0.1%
+     Data::Dumper   14790+-87/s   280.2+-2.3% 0.15+-0.59%           --
+ 
+     Some mixed structure:
+                         Rate    Data::Dump   Data::Dmp Data::Dumper
+     Data::Dump    9035+-17/s            --      -68.3%       -80.9%
+     Data::Dmp    28504+-10/s 215.47+-0.59%          --       -39.6%
+     Data::Dumper 47188+-55/s   422.3+-1.1% 65.55+-0.2%           --
 
-    # COMMAND: devscripts/bench
+FUNCTIONS
+  dd
+    Usage:
+
+     dd($data, ...); # returns $data
+
+    Exported by default. Like "Data::Dump"'s "dd" (a.k.a. "dump"), print one
+    or more data to STDOUT. Unlike "Data::Dump"'s "dd", it *always* prints
+    and return *the original data* (like XXX), making it convenient to
+    insert into expressions. This also removes ambiguity and saves one
+    "wantarray()" call.
+
+  dmp
+    Usage:
+
+     my $dump = dmp($data, ...);
+
+    Exported by default. Return dump result as string. Unlike "Data::Dump"'s
+    "dd" (a.k.a. "dump"), it *never* prints and only return the dump result.
+
+  dd_ellipsis
+    Usage:
+
+     dd_ellipsis($data, ...); # returns data
+
+    Just like "dd", except will truncate its output to
+    "$Data::Dmp::OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS" characters if dump is too
+    long. Note that truncated dump will probably not be valid Perl code.
+
+  dmp_ellipsis
+    Usage:
+
+     my $dump = dd_ellipsis($data, ...); # returns data
+
+    Just like "dmp", except will truncate dump result to
+    "$Data::Dmp::OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS" characters if dump is too
+    long. Note that truncated dump will probably not be valid Perl code.
 
 FAQ
-
- When to use Data::Dmp? How does it compare to other dumper modules?
-
+  When to use Data::Dmp? How does it compare to other dumper modules?
     Data::Dmp might be suitable for you if you want a relatively fast
     pure-Perl data structure dumper to eval-able Perl code. It produces
     compact, single-line Perl code but offers little/no formatting options.
-    Data::Dmp and Data::Dump module family usually produce Perl code that
-    is "more eval-able", e.g. it can recreate circular structure.
+    Data::Dmp and Data::Dump module family usually produce Perl code that is
+    "more eval-able", e.g. it can recreate circular structure.
 
     Data::Dump produces visually nicer output (some alignment, use of range
     operator to shorten lists, use of base64 for binary data, etc) but no
@@ -100,12 +155,12 @@ FAQ
     variant, Data::Dump::Color, for console debugging.
 
     Data::Dumper is a core module, offers a lot of formatting options (like
-    disabling hash key sorting, setting verboseness/indent level, and so
-    on) but you usually have to configure it quite a bit before it does
-    exactly like you want (that's why there are modules on CPAN that are
-    just wrapping Data::Dumper with some configuration, like
-    Data::Dumper::Concise et al). It does not support dumping Perl code
-    that can recreate circular structures.
+    disabling hash key sorting, setting verboseness/indent level, and so on)
+    but you usually have to configure it quite a bit before it does exactly
+    like you want (that's why there are modules on CPAN that are just
+    wrapping Data::Dumper with some configuration, like
+    Data::Dumper::Concise et al). It does not support dumping Perl code that
+    can recreate circular structures.
 
     Of course, dumping to eval-able Perl code is slow (not to mention the
     cost of re-loading the code back to in-memory data, via eval-ing)
@@ -116,13 +171,25 @@ FAQ
     serialized data without eval-ing them, thus achieving the speed
     comparable to JSON::XS).
 
- Is the output guaranteed to be single line dump?
-
+  Is the output guaranteed to be single line dump?
     No. Some things can still produce multiline dump, e.g. newline in
     regular expression.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Dmp>.
 
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Data-Dmp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dmp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Data::Dump and other variations/derivate works in Data::Dump::*.
 
     Data::Dumper and its variants.
@@ -130,4 +197,14 @@ SEE ALSO
     Data::Printer.
 
     YAML, JSON, Storable, Sereal, and other serialization formats.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

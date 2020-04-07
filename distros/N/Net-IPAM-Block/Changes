@@ -1,5 +1,8 @@
 Revision history for Net-IPAM-Block
 
+1.04    Mon, 06 Apr 2020 22:21:52 +0200
+        * bump versions in prereqs
+
 1.03    Fri, 03 Apr 2020 08:55:36 +0200
         [Changes]
         * find_free_cidrs, better algo, allow block as outer, never croak

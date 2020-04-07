@@ -75,7 +75,7 @@ low-level time functions implementation.
     $date->wday_sname;  # Thu
     $date->to_string    # 2000-02-29 12:21:11
     "$date"             # same as prev.
-    $date->to_string(Date::Format::iso8601); # 2000-02-29T12:21:11+03:00
+    $date->to_string(Date::FORMAT_ISO8601); # 2000-02-29T12:21:11+03:00
     $date->gmtoff       # current offset from UTC (in seconds)
     $date->tzname       # returns the timezone name (EST, EET, etc)
     $date->tzlocal      # true if $date is in local time zone
@@ -411,7 +411,7 @@ Short name of the day
 Same as C<to_string()>.
 
 
-=head4 to_string($format = Date::Format::iso)
+=head4 to_string($format = Date::FORMAT_ISO)
 
 Stringifies date using C<$format>.
 
@@ -419,7 +419,7 @@ Available formats:
 
 =over
 
-=item Date::Format::iso
+=item Date::FORMAT_ISO
 
 Default format
 
@@ -427,53 +427,53 @@ Default format
 
 Microseconds part will be absent if mksec == 0.
 
-=item Date::Format::iso_tz
+=item Date::FORMAT_ISO_TZ
 
 C<iso> with timezone offset
 
     2019-12-31 23:59:59.123+03:00
 
-=item Date::Format::iso_date
+=item Date::FORMAT_ISO_DATE
 
 Only date
 
     2019-12-31
 
-=item Date::Format::iso8601
+=item Date::FORMAT_ISO8601
 
     2019-12-31T23:59:59.123+03:00
 
-=item Date::Format::iso8601_notz
+=item Date::FORMAT_ISO8601_NOTZ
 
 Same as C<iso8601> but omits printing timezone offset
 
     2019-12-31T23:59:59.123
 
-=item Date::Format::rfc1123
+=item Date::FORMAT_RFC1123
 
     Tue, 10 Dec 2019 00:00:00 GMT
     
-=item Date::Format::cookie
+=item Date::FORMAT_COOKIE
 
 same as rfc1123
 
-=item Date::Format::rfc850
+=item Date::FORMAT_RFC850
 
     Tuesday, 01-Jan-19 03:04:00 GMT
 
-=item Date::Format::ansi_c
+=item Date::FORMAT_ANSI_C
 
     Sun Sep  1 03:04:00 2019
 
-=item Date::Format::ymd
+=item Date::FORMAT_YMD
 
     2019/12/31
 
-=item Date::Format::dot
+=item Date::FORMAT_DOT
 
     31.12.2019
 
-=item Date::Format::hms
+=item Date::FORMAT_HMS
 
     23:59:59
 

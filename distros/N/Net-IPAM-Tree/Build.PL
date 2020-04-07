@@ -20,8 +20,8 @@ my $builder = Module::Build->new(
       'perl'             => '5.10.0',
       'List::MoreUtils'  => '0.420_001',
       'Scalar::Util'     => '1.39',
-      'Net::IPAM::IP'    => '0',
-      'Net::IPAM::Block' => '0',
+      'Net::IPAM::IP'    => '1.06',
+      'Net::IPAM::Block' => '1.03',
 
       #'Foo::Bar::Module' => '5.0401',
       },

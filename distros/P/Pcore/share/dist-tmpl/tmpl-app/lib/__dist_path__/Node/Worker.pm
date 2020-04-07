@@ -20,6 +20,8 @@ sub NODE_ON_EVENT ( $self, $ev ) {
 sub BUILD ( $self, $args ) {
     $self->{node}->wait_online if $self->{node};
 
+    $self->on_settings_update( $self->{settings} );
+
     return;
 }
 
@@ -38,7 +40,7 @@ sub API_test ( $self, @args ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 11                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 32                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 36 does not match the package declaration       |
+## |    1 | 34                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 38 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -109,10 +109,10 @@ subtest 'parse' => sub {
 
 subtest 'stringify' => sub {
     my $d = date_ymd(2017, 8, 28, 13, 49, 35, 123456);
-    subtest 'Format::iso8601' => sub {
+    subtest 'FORMAT_ISO8601' => sub {
         is $d->to_string(Date::FORMAT_ISO8601), "2017-08-28T13:49:35.123456+03";
     };
-    subtest 'Format::iso8601_notz' => sub {
+    subtest 'FORMAT_ISO8601_NOTZ' => sub {
         is $d->to_string(Date::FORMAT_ISO8601_NOTZ), "2017-08-28T13:49:35.123456";
     };
 };

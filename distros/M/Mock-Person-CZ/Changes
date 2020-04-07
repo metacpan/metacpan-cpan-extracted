@@ -1,3 +1,14 @@
+0.05 2020-04-07T11:42:33+02:00
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Fix author requires.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rewrite doc to using POD =head2 for methods.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.04 2015-09-22T13:14:45+02:00
  - Fix comment (thanks Mohammad S Anwar).
  - Move author tests to xt/ directory.

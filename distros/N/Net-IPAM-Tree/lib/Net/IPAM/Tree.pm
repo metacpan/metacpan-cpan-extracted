@@ -4,6 +4,8 @@ use 5.10.0;
 use strict;
 use warnings;
 
+our $VERSION = '1.05';
+
 # caller can shut up with: no warnings 'Net::IPAM::Tree'
 use warnings::register;
 
@@ -28,8 +30,6 @@ It is B<NOT> a standard patricia-trie implementation. This isn't possible for ge
 The complexity for tree operations is in worst case O(h * log n) with h <= 128 (IPv6) or h <=32 (IPv4).
 
 =cut
-
-our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -311,12 +311,14 @@ Walks the tree starting at root node in depth first order.
 
   my $err_string = $t->walk($callback);
 
-For every node the callback funtion is called with the node and the current depth (counting from 0) as arguments.
+For every node C<< Net::IPAM::Tree::Node >> the callback funtion is called with the node and the current depth (counting from 0) as arguments.
 
 	my $err_string = $callback->($node, $depth);
 
 The callback must return undef if there is no error!
 On error, the walk is stopped and the error is returned to the caller.
+
+Example, get some tree statistics:
 
   my ( $n, $max_d, $max_c ) = ( 0, 0, 0 );
 
@@ -407,6 +409,7 @@ TODO
 
 =head1 SEE ALSO
 
+L<Net::IPAM::Tree::Node>
 L<Net::IPAM::IP>
 L<Net::IPAM::Block>
 

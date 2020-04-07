@@ -1,5 +1,9 @@
 Revision history for FSM-Basic
 
+0.17    Tue Apr 7 18:39:30 2020 +0200
+            add parameter substitution from the command line to the exec and do parameters
+
+
 0.16    Thu Apr 26 16:00:24 CEST 2018
             Fix POD errors
 

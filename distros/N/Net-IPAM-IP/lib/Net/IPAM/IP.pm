@@ -2,33 +2,39 @@ package Net::IPAM::IP;
 
 use strict;
 use warnings;
+our $VERSION = '1.07';
+
+use Socket qw/AF_INET AF_INET6/;
+
+# On some platforms, inet_pton accepts various forms of invalid input or discards valid input.
+# In this case use a (slower) pure perl implementation for Socket::inet_pton.
+# and also for Socket::inet_ntop, I don't trust that too.
+BEGIN {
+  if (    # wrong valid
+       defined Socket::inet_pton( AF_INET,  '010.0.0.1' )
+    || defined Socket::inet_pton( AF_INET,  '10.000.0.1' )
+    || defined Socket::inet_pton( AF_INET6, 'cafe:::' )
+    || defined Socket::inet_pton( AF_INET6, 'cafe::1::' )
+    || defined Socket::inet_pton( AF_INET6, 'cafe::1:' )
+    || defined Socket::inet_pton( AF_INET6, ':cafe::' )
+
+    # wrong invalid
+    || !defined Socket::inet_pton( AF_INET6, 'caFe::' )
+    )
+  {
+    no warnings 'redefine';
+    *Socket::inet_pton = \&_inet_pton_pp;
+    *Socket::inet_ntop = \&_inet_ntop_pp;
+  }
+}
+
+use Carp qw/croak/;
+use Exporter 'import';
+our @EXPORT_OK = qw(incr_n);
 
 use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
-
-use Carp qw/croak/;
-use Socket qw/AF_INET AF_INET6 inet_pton inet_ntop/;
-
-use Exporter 'import';
-our @EXPORT_OK = qw(incr_n);
-
-our $VERSION = '1.05';
-
-BEGIN {
-  # On some platforms, inet_pton accepts various forms of invalid input or discards valid input.
-  if (
-       defined inet_pton( AF_INET(),  '030.0.0.1' )
-    || defined inet_pton( AF_INET6(), '2001::1:' )
-
-    || !defined inet_pton( AF_INET6(), 'fE80::0:1' )
-    )
-  {
-    # use a pure perl implementationi, see below
-    no warnings 'redefine';
-    *inet_pton = \&_inet_pton_pp;
-  }
-}
 
 =head1 NAME
 
@@ -80,7 +86,7 @@ sub new {
 
   # IPv4
   if ( index( $_[1], ':' ) < 0 ) {
-    my $n = inet_pton( AF_INET, $_[1] ) // return;
+    my $n = Socket::inet_pton( AF_INET, $_[1] ) // return;
     $self->{version} = 4;
     $self->{binary}  = pack( 'C a*', AF_INET, $n );
     return $self;
@@ -88,9 +94,12 @@ sub new {
 
   # IPv4-mapped-IPv6
   if ( index( $_[1], '.' ) >= 0 ) {
+    my $ip4m6 = $_[1];
 
-    # remove leading ::ffff: with substr()
-    my $n = inet_pton( AF_INET, substr( $_[1], 7 ) ) // return;
+    # remove leading ::ffff: or return undef
+    return unless $ip4m6 =~ s/^::ffff://i;
+
+    my $n = Socket::inet_pton( AF_INET, $ip4m6 ) // return;
 
     $self->{version} = 4;
     $self->{binary}  = pack( 'C a*', AF_INET, $n );
@@ -98,7 +107,7 @@ sub new {
   }
 
   # IPv6 address
-  my $n = inet_pton( AF_INET6, $_[1] ) // return;
+  my $n = Socket::inet_pton( AF_INET6, $_[1] ) // return;
   $self->{version} = 6;
   $self->{binary}  = pack( 'C a*', AF_INET6, $n );
   return $self;
@@ -235,21 +244,21 @@ Stringification is overloaded with C<to_string>
 #sub to_string {
 #  return $_[0]->{string} if defined $_[0]->{string};
 #  my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
-#  return $_[0]->{string} = inet_ntop( $v, $n );
+#  return $_[0]->{string} = Socket::inet_ntop( $v, $n );
 #}
 
-# circumvent IPv4-compatible-IPv4 bug in inet_ntop
+# circumvent IPv4-compatible-IPv4 bug in Socket::inet_ntop
 sub to_string {
 
-  # unpack to version and network byte order (from inet_pton)
+  # unpack to version and network byte order (from Socket::inet_pton)
   my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
 
-  my $str = inet_ntop( $v, $n );
+  my $str = Socket::inet_ntop( $v, $n );
 
-  # no bug in inet_ntop for IPv4, just return
+  # no bug in Socket::inet_ntop for IPv4, just return
   return $str if $v == AF_INET;
 
-  # handle bug in inet_ntop for deprecated IPv4-compatible-IPv6 addresses
+  # handle bug in Socket::inet_ntop for deprecated IPv4-compatible-IPv6 addresses
   # ::aaaa:bbbb are returned as ::hex(aa).hex(aa).hex(bb).hex(bb) = ::170.170.187.187
   # e.g: ::cafe:affe => ::202.254.175.254
 
@@ -258,24 +267,8 @@ sub to_string {
     return $str;
   }
 
-  # here we handle the bug, strip off leading '::'
-  $str = substr( $str, 2 );
-
-  # split to 4 octets
-  my @octets = split( /\./, $str );
-
-  # convert to hextets, insert leading '::'
-  $str = sprintf( '::%02x%02x:%02x%02x', @octets );
-
-  # strip leading zeros in hextets ::0aff:000e -> ::aff:e
-  # OMG, write once read never, look-ahead-behind tricks and /g flag
-  $str =~ s/
-						 (?<![0-9a-f])  # negative lookbehind, (no leading hex_digit)
-						 0+          # at least one 0 or more (substitute with nothing)
-						 (?=[0-9a-f])   # positive lookahead, (followed by a hex_digit)
-						//gx;
-
-  return $str;
+  # handle the bug, use our pure perl inet_ntop
+  return _inet_ntop_pp( $v, $n );
 }
 
 =head2 incr
@@ -288,8 +281,8 @@ Returns the next IP address, returns undef on overflow.
 =cut
 
 sub incr {
-	my $n = incr_n($_[0]->bytes) // return;
-	return Net::IPAM::IP->new_from_bytes($n);
+  my $n = incr_n( $_[0]->bytes ) // return;
+  return Net::IPAM::IP->new_from_bytes($n);
 }
 
 =head2 expand
@@ -304,7 +297,7 @@ Expand IP address into canonical form, useful for grep, aligned output and lexic
 sub expand {
   return $_[0]->{expand} if defined $_[0]->{expand};
 
-  # unpack to version and network byte order (from inet_pton)
+  # unpack to version and network byte order (from Socket::inet_pton)
   my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
 
   if ( $v == AF_INET6 ) {
@@ -334,7 +327,7 @@ Reverse IP address, needed for PTR entries in DNS zone files.
 sub reverse {
   return $_[0]->{reverse} if defined $_[0]->{reverse};
 
-  # unpack to version and network byte order (from inet_pton)
+  # unpack to version and network byte order (from Socket::inet_pton)
   my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
 
   if ( $v == AF_INET6 ) {
@@ -390,45 +383,123 @@ sub incr_n {
   return $n;
 }
 
-sub _inet_pton_pp {
-  return _inet_pton_v4_pp( $_[1] ) if $_[0] == AF_INET;
-  return _inet_pton_v6_pp( $_[1] ) if $_[0] == AF_INET6;
+# make fast 'tail' calls, goto &NAME
+# modify @_ = (AF_INETx, $ip) => @_ = ($ip)
+sub _inet_ntop_pp {
+  my $v = shift;
+  goto &_inet_ntop_v4_pp if $v == AF_INET;
+  goto &_inet_ntop_v6_pp if $v == AF_INET6;
   return;
 }
 
+sub _inet_ntop_v4_pp {
+  my $n = shift // return;
+  return if length($n) != 4;
+  return join( '.', unpack( 'C4', $n ) );
+}
+
+# (1) Hexadecimal digits are expressed as lower-case letters.
+#     For example, 2001:db8::1 is preferred over 2001:DB8::1.
+#
+# (2) Leading zeros in each 16-bit field are suppressed.
+#     For example, 2001:0db8::0001 is rendered as 2001:db8::1,
+#     though any all-zero field that is explicitly presented is rendered as 0.
+#
+# (3) Representations are shortened as much as possible.
+#     The longest sequence of consecutive all-zero fields is replaced with double-colon.
+#     If there are multiple longest runs of all-zero fields, then it is the leftmost that is compressed.
+#     E.g., 2001:db8:0:0:1:0:0:1 is rendered as 2001:db8::1:0:0:1 rather than as 2001:db8:0:0:1::1.
+#
+# (4) "::" is not used to shorten just a single 0 field.
+#     For example, 2001:db8:0:0:0:0:2:1 is shortened to 2001:db8::2:1,
+#     but 2001:db8:0000:1:1:1:1:1 is rendered as 2001:db8:0:1:1:1:1:1.
+#
+sub _inet_ntop_v6_pp {
+  my $n = shift // return;
+  return if length($n) != 16;
+
+  # expand binary to hex, lower case, rule (1)
+  # 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+  my $ip = join( ':', unpack( 'H4' x 8, $n ) );
+
+  # squash leading zeroes, rule (2)
+  # 2001:db8:85a3:0:0:8a2e:370:7334
+  $ip =~ s/\b 0{1,3}//gx;
+
+  # find all consecutive groups containing zeros
+  my $rx     = qr/(?:^|:) [0:]+ /x;
+  my @groups = $ip =~ m/$rx/g;
+
+  # find longest group (count zeros with tr///), rule (3)
+  # count zeros with tr///
+  my $max_str   = '';
+  my $max_zeros = 0;
+
+  foreach my $match (@groups) {
+    my $zeroes = $match =~ tr/0/0/;
+    if ( $zeroes > $max_zeros ) {
+      $max_zeros = $zeroes;
+      $max_str   = $match;
+    }
+  }
+
+  # the substitution may only be applied once in the address, rule (3,4)
+  # "::" is not used to shorten just a single 0 field
+  if ( $max_zeros >= 2 ) {
+    $ip =~ s/$max_str/::/;
+  }
+
+  return $ip;
+}
+
+# make fast 'tail' calls, goto &NAME
+# modify @_ = (AF_INETx, $ip) => @_ = ($ip)
+sub _inet_pton_pp {
+  my $v = shift;
+  goto &_inet_pton_v4_pp if $v == AF_INET;
+  goto &_inet_pton_v6_pp if $v == AF_INET6;
+  return;
+}
+
+# @_ = ($ip)
 sub _inet_pton_v4_pp {
 
   # 'C' may overflow for values > 255, check below
   no warnings qw(pack numeric);
   my $n = pack( 'C4', split( /\./, $_[0] ) );
 
-	# unpack(pack...) must be idempotent
-	# check for overflow errors or leading zeroes
+  # unpack(pack...) must be idempotent
+  # check for overflow errors or leading zeroes
   return unless $_[0] eq join( '.', unpack( 'C4', $n ) );
 
   return $n;
 }
 
+# @_ = ($ip)
 sub _inet_pton_v6_pp {
   my $ip = shift // return;
+
   return if $ip =~ m/[^a-fA-F0-9:]/;
+  return if $ip =~ m/:::/;
 
-  my $dbl_col_count = $ip =~ s/::/::/g;
+  # starts with just one colon: :cafe...
+  return if $ip =~ m/^:[^:]/;
+
+  # ends with just one colon: ..:cafe:affe:
+  return if $ip =~ m/[^:]:$/;
+
   my $col_count     = $ip =~ tr/://;
+  my $dbl_col_count = $ip =~ s/::/::/g;
 
+  return if $col_count > 7;
   return if $dbl_col_count > 1;
   return if $dbl_col_count == 0 && $col_count != 7;
 
-	# 1:2:3:4:5:6::8 not allowed in RFC-5952 (4.2)
-	# return if $dbl_col_count == 1 && $col_count > 6;
-
-	# but in RFC-4291, we accept it too
-  return if $dbl_col_count == 1 && $col_count > 7;
-
-  # normalize, prepend, append 0
+  # normalize for splitting, prepend or append 0
   $ip =~ s/^:: /0::/x;
   $ip =~ s/ ::$/::0/x;
 
+  # expand ::
   my $expand_dbl_col = ':0' x ( 8 - $col_count ) . ':';
   $ip =~ s/::/$expand_dbl_col/;
 
@@ -438,6 +509,10 @@ sub _inet_pton_v6_pp {
   my $n = pack( 'n8', map { hex } @hextets );
   return $n;
 }
+
+=head1 WARNINGS
+
+Some Socket::inet_pton implementations are hopelessly buggy and are redefined during loading.
 
 =head1 AUTHOR
 

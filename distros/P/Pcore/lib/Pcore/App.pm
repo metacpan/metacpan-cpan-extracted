@@ -4,13 +4,12 @@ use Pcore -role, -const;
 use Pcore::API::Nginx;
 use Pcore::HTTP::Server;
 use Pcore::App::Router;
-use Pcore::App::API;
 use Pcore::CDN;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 
 has devel => 0;    # Bool
 
-has cfg    => ( init_arg => undef );    # HashRef
+has env    => ( init_arg => undef );    # HashRef
 has name   => ( init_arg => undef );
 has server => ( init_arg => undef );    # InstanceOf ['Pcore::HTTP::Server']
 has router => ( init_arg => undef );    # HashRef [ InstanceOf ['Pcore::App::Router'] ]
@@ -30,57 +29,61 @@ const our $LOCALES => {
 
 };
 
-around new => sub ( $orig, $self, $devel = undef, $runtime_cfg = undef ) {
+around new => sub ( $orig, $self, $devel = undef, $env = undef ) {
+    $devel //= $ENV{PCORE_DEVEL};
+
+    $ENV{PCORE_DEVEL} = $devel;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+
     $self = $self->$orig( devel => $devel );
 
-    my $cfg = $self->default_cfg;
+    $env = $self->_load_env($env);
 
-    if ($runtime_cfg) {
-        for my $key ( keys $runtime_cfg->%* ) {
-
-            # server
-            if ( $key eq 'server' ) {
-                for my $server ( keys $cfg->{server}->%* ) {
-
-                    # listen
-                    if ( my $listen = $runtime_cfg->{server}->{$server}->{listen} ) {
-                        $cfg->{server}->{$server}->{listen} = $listen;
-                    }
-
-                    # server_name
-                    if ( my $server_name = $runtime_cfg->{server}->{$server}->{server_name} ) {
-                        push $cfg->{server}->{$server}->{server_name}->@*, is_plain_arrayref $server_name ? $server_name->@* : $server_name;
-                    }
-                }
-            }
-
-            # api
-            elsif ( $key eq 'api' ) {
-                P->hash->merge( $cfg->{api}, $runtime_cfg->{api} );
-            }
-
-            # copy unknown key
-            else {
-                $cfg->{$key} = $runtime_cfg->{$key};
-            }
-        }
-    }
-
-    $self->{cfg} = $cfg;
+    $self->{env} = $env;
 
     $self->{name} = lc( ref $self ) =~ s/::/-/smgr;
 
     # create CDN object
-    $self->{cdn} = Pcore::CDN->new( $self->{cfg}->{cdn} ) if $self->{cfg}->{cdn};
-
-    # create API object
-    $self->{api} = Pcore::App::API->new($self);
+    $self->{cdn} = Pcore::CDN->new( $self->{env}->{cdn} ) if $self->{env}->{cdn};
 
     return $self;
 };
 
-sub default_cfg ($self) {
-    my $cfg = {
+# ENVIRONMENT CONFIG
+sub _load_env ( $self, $env = undef ) {
+    my $effective_env = $self->default_env;
+
+    my $merge = sub (@filename) {
+        for my $filename (@filename) {
+            return if !-f "$ENV->{DATA_DIR}/$filename";
+
+            $self->_merge_env( $effective_env, P->cfg->read( "$ENV->{DATA_DIR}/$filename", params => { DATA_DIR => $ENV->{DATA_DIR} } ) );
+        }
+
+        return;
+    };
+
+    $merge->( '.env.yaml', '.env.local.yaml' );
+
+    if ( $self->{devel} ) {
+        $merge->( '.env.devel.yaml', '.env.devel.local.yaml' );
+    }
+    else {
+        $merge->( '.env.prod.yaml', '.env.prod.local.yaml' );
+    }
+
+    $self->_merge_env( $effective_env, $env ) if $env;
+
+    return $effective_env;
+}
+
+sub _merge_env ( $self, $env1, $env2 ) {
+    P->hash->merge( $env1, $env2 );
+
+    return;
+}
+
+sub default_env ($self) {
+    my $env = {
 
         # server
         server => {
@@ -93,19 +96,15 @@ sub default_cfg ($self) {
 
         # api
         api => {
-            backend => undef,
-            node    => {
-                workers => undef,
-                argon   => {
-                    argon2_time        => 3,
-                    argon2_memory      => '64M',
-                    argon2_parallelism => 1,
-                },
-            },
+            backend            => undef,
+            auth_workers       => undef,
+            argon2_time        => 3,
+            argon2_memory      => '64M',
+            argon2_parallelism => 1,
         },
     };
 
-    return $cfg;
+    return $env;
 }
 
 # PERMISSIONS
@@ -125,6 +124,13 @@ sub get_default_locale ( $self, $req ) {
 # RUN
 around run => sub ( $orig, $self ) {
 
+    # create API object
+    $self->{api} = P->class->load( 'API', ns => ref $self )->new( {
+        $self->{env}->{api}->%*,
+        app => $self,
+        db  => $self->{env}->{db},
+    } );
+
     # create node
     # TODO when to use node???
     if (1) {
@@ -134,13 +140,14 @@ around run => sub ( $orig, $self ) {
 
         my $requires = defined $node_req ? { $node_req->%* } : {};
 
-        $requires->{'Pcore::App::API::Node'} = undef if $self->{cfg}->{api}->{backend};
+        # TODO fix condition for all backend types, should be true for local backends
+        $requires->{'Pcore::App::API::Node'} = undef if $self->{api}->{db} && !defined $self->{api}->{backend};
 
         $self->{node} = Pcore::Node->new( {
             type     => ref $self,
             requires => $requires,
-            server   => $self->{cfg}->{node}->{server},
-            listen   => $self->{cfg}->{node}->{listen},
+            server   => $self->{env}->{node}->{server},
+            listen   => $self->{env}->{node}->{listen},
             on_event => do {
                 if ( $self->can('NODE_ON_EVENT') ) {
                     sub ( $node, $ev ) {
@@ -168,12 +175,12 @@ around run => sub ( $orig, $self ) {
     exit 3 if !$res;
 
     # create HTTP routers
-    for my $name ( sort keys $self->{cfg}->{server}->%* ) {
+    for my $name ( sort keys $self->{env}->{server}->%* ) {
         print qq[Scanning HTTP controllers "$name" ... ];
 
         $self->{router}->{$name} = Pcore::App::Router->new( {
             app       => $self,
-            namespace => $self->{cfg}->{server}->{$name}->{namespace},
+            namespace => $self->{env}->{server}->{$name}->{namespace},
         } );
 
         $self->{router}->{$name}->init;
@@ -185,11 +192,11 @@ around run => sub ( $orig, $self ) {
     exit 3 if !$res;
 
     # start HTTP servers
-    for my $name ( sort keys $self->{cfg}->{server}->%* ) {
-        $self->{cfg}->{server}->{$name}->{listen} ||= "/var/run/$self->{name}-$name.sock";
+    for my $name ( sort keys $self->{env}->{server}->%* ) {
+        $self->{env}->{server}->{$name}->{listen} ||= "/var/run/$self->{name}-$name.sock";
 
         my $http_server = Pcore::HTTP::Server->new( {
-            listen     => $self->{cfg}->{server}->{$name}->{listen},
+            listen     => $self->{env}->{server}->{$name}->{listen},
             on_request => $self->{router}->{$name},
         } );
 
@@ -211,12 +218,12 @@ sub run_nginx ($self) {
 
     my $has_server_name;
 
-    for my $vhost_name ( sort keys $self->{cfg}->{server}->%* ) {
+    for my $vhost_name ( sort keys $self->{env}->{server}->%* ) {
         my $vhost_params = $self->get_nginx_vhost_params($vhost_name);
 
         $nginx->add_vhost( $vhost_name, $vhost_params );    # if !$nginx->is_vhost_exists($vhost_name);
 
-        if ( $self->{cfg}->{server}->{$vhost_name}->{server_name} && $self->{cfg}->{server}->{$vhost_name}->{server_name}->@* ) {
+        if ( $self->{env}->{server}->{$vhost_name}->{server_name} && $self->{env}->{server}->{$vhost_name}->{server_name}->@* ) {
             $has_server_name = 1;
 
             $nginx->add_load_balancer_vhost( "$self->{name}-$vhost_name", $vhost_params );
@@ -245,7 +252,7 @@ sub get_nginx_vhost_params ( $self, $vhost_name ) {
     my $params = {
         app_name    => $self->{name},
         vhost_name  => $vhost_name,
-        server_name => $self->{cfg}->{server}->{$vhost_name}->{server_name},
+        server_name => $self->{env}->{server}->{$vhost_name}->{server_name},
         data_dir    => $ENV->{DATA_DIR},
         upstream    => $self->{server}->{$vhost_name}->{listen}->to_nginx_upstream_server,
     };
@@ -262,16 +269,6 @@ sub get_nginx_vhost_params ( $self, $vhost_name ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (21)                               |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

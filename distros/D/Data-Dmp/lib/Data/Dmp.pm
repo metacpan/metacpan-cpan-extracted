@@ -1,7 +1,11 @@
+## no critic: Modules::ProhibitAutomaticExportation
+
 package Data::Dmp;
 
-our $DATE = '2017-01-30'; # DATE
-our $VERSION = '0.23'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-07'; # DATE
+our $DIST = 'Data-Dmp'; # DIST
+our $VERSION = '0.240'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,12 +16,14 @@ use Scalar::Util qw(looks_like_number blessed reftype refaddr);
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(dd dmp);
+our @EXPORT_OK = qw(dd_ellipsis dmp_ellipsis);
 
 # for when dealing with circular refs
 our %_seen_refaddrs;
 our %_subscripts;
 our @_fixups;
 
+our $OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS = 70;
 our $OPT_PERL_VERSION = "5.010";
 our $OPT_REMOVE_PRAGMAS = 0;
 our $OPT_DEPARSE = 1;
@@ -166,6 +172,7 @@ sub _dump {
 }
 
 our $_is_dd;
+our $_is_ellipsis;
 sub _dd_or_dmp {
     local %_seen_refaddrs;
     local %_subscripts;
@@ -181,6 +188,11 @@ sub _dd_or_dmp {
         $res = "do{my\$a=$res;" . join("", @_fixups) . "\$a}";
     }
 
+    if ($_is_ellipsis) {
+        $res = substr($res, 0, $OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS) . '...'
+            if length($res) > $OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS;
+    }
+
     if ($_is_dd) {
         say $res;
         return wantarray() || @_ > 1 ? @_ : $_[0];
@@ -189,8 +201,11 @@ sub _dd_or_dmp {
     }
 }
 
-sub dd { local $_is_dd=1; _dd_or_dmp(@_) } # goto &sub doesn't work here
+sub dd { local $_is_dd=1; _dd_or_dmp(@_) } # goto &sub doesn't work with local
 sub dmp { goto &_dd_or_dmp }
+
+sub dd_ellipsis { local $_is_dd=1; local $_is_ellipsis=1; _dd_or_dmp(@_) }
+sub dmp_ellipsis { local $_is_ellipsis=1; _dd_or_dmp(@_) }
 
 1;
 # ABSTRACT: Dump Perl data structures as Perl code
@@ -207,7 +222,7 @@ Data::Dmp - Dump Perl data structures as Perl code
 
 =head1 VERSION
 
-This document describes version 0.23 of Data::Dmp (from Perl distribution Data-Dmp), released on 2017-01-30.
+This document describes version 0.240 of Data::Dmp (from Perl distribution Data-Dmp), released on 2020-04-07.
 
 =head1 SYNOPSIS
 
@@ -215,9 +230,15 @@ This document describes version 0.23 of Data::Dmp (from Perl distribution Data-D
  dd [1, 2, 3]; # prints "[1,2,3]"
  $a = dmp({a => 1}); # -> "{a=>1}"
 
+Print truncated dump (capped at L</$Data::Dmp::OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS>
+characters):
+
+ use Data::Dmp qw(dd_ellipsis dmp_ellipsis);
+ dd_ellipsis [1..100];
+
 =head1 DESCRIPTION
 
-Data::Dmp is a Perl dumper like L<Data::Dumper>. It's compact (only about 175
+Data::Dmp is a Perl dumper like L<Data::Dumper>. It's compact (only about 200
 lines of code long), starts fast and does not use any non-core modules except
 L<Regexp::Stringify> when dumping regexes. It produces compact single-line
 output (similar to L<Data::Dumper::Concise>). It roughly has the same speed as
@@ -228,9 +249,11 @@ on L<Data::Dump>: I removed all the parts that I don't need, particularly the
 pretty formatting stuffs) and added some features that I need like proper regex
 dumping and coderef deparsing.
 
-=head1 SETTINGS
+=head1 VARIABLES
 
-=head2 $Data::Dmp::OPT_PERL_VERSION => str (default: 5.010)
+=head2 $Data::Dmp::OPT_PERL_VERSION
+
+String, default: 5.010.
 
 Set target Perl version. If you set this to, say C<5.010>, then the dumped code
 will keep compatibility with Perl 5.10.0. This is used in the following ways:
@@ -251,7 +274,9 @@ so we replace it with:
 
 =back
 
-=head2 $Data::Dmp::OPT_REMOVE_PRAGMAS => bool (default: 0)
+=head2 $Data::Dmp::OPT_REMOVE_PRAGMAS
+
+Bool, default: 0.
 
 If set to 1, then pragmas at the start of coderef dump will be removed. Coderef
 dump is produced by L<B::Deparse> and is of the form like:
@@ -265,50 +290,88 @@ turn turn on this option which will make the above dump become:
 
 Note that without the pragmas, the dump might be incorrect.
 
-=head2 $Data::Dmp::OPT_DEPARSE => bool (default: 1)
+=head2 $Data::Dmp::OPT_DEPARSE
+
+Bool, default: 1.
 
 Can be set to 0 to skip deparsing code. Coderefs will be dumped as
 C<sub{"DUMMY"}> instead, like in Data::Dump.
 
-=head2 $Data::Dmp::OPT_STRINGIFY_NUMBERS => bool (default: 0)
+=head2 $Data::Dmp::OPT_STRINGIFY_NUMBERS
+
+Bool, default: 0.
 
 If set to true, will dump numbers as quoted string, e.g. 123 as "123" instead of
 123. This might be helpful if you want to compute the hash of or get a canonical
 representation of data structure.
 
+=head2 $Data::Dmp::OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS
+
+Int, default: 70.
+
+Used by L</dd_ellipsis> and L</dmp_ellipsis>.
+
 =head1 BENCHMARKS
 
  [1..10]:
-                       Rate    Data::Dump Data::Dumper Data::Dmp
- Data::Dump     30417+-55/s            --       -66.2%    -74.0%
- Data::Dumper   89888+-79/s  195.52+-0.6%           --    -23.1%
- Data::Dmp    116890+-160/s 284.29+-0.87% 30.04+-0.21%        --
+                      Rate    Data::Dump Data::Dumper Data::Dmp
+ Data::Dump    32032+-55/s            --       -64.6%    -73.9%
+ Data::Dumper 90580+-110/s 182.77+-0.59%           --    -26.1%
+ Data::Dmp    122575+-43/s 282.66+-0.67% 35.32+-0.17%        --
  
  [1..100]:
-                        Rate    Data::Dump  Data::Dmp Data::Dumper
- Data::Dump    3712.3+-7.9/s            --     -73.9%       -74.9%
- Data::Dmp    14211.3+-4.9/s 282.82+-0.82%         --        -3.8%
- Data::Dumper    14771+-28/s   297.9+-1.1% 3.94+-0.2%           --
+                       Rate    Data::Dump   Data::Dmp Data::Dumper
+ Data::Dump   3890.6+-5.9/s            --      -73.7%       -73.7%
+ Data::Dmp     14768.3+-5/s 279.59+-0.59%          --        -0.1%
+ Data::Dumper   14790+-87/s   280.2+-2.3% 0.15+-0.59%           --
  
  Some mixed structure:
-                     Rate    Data::Dump    Data::Dmp Data::Dumper
- Data::Dump    8764+-16/s            --       -67.6%       -80.1%
- Data::Dmp    27016+-36/s  208.28+-0.7%           --       -38.6%
- Data::Dumper 43995+-13/s 402.02+-0.95% 62.85+-0.22%           --
+                     Rate    Data::Dump   Data::Dmp Data::Dumper
+ Data::Dump    9035+-17/s            --      -68.3%       -80.9%
+ Data::Dmp    28504+-10/s 215.47+-0.59%          --       -39.6%
+ Data::Dumper 47188+-55/s   422.3+-1.1% 65.55+-0.2%           --
 
 =head1 FUNCTIONS
 
-=head2 dd($data, ...) => $data ...
+=head2 dd
+
+Usage:
+
+ dd($data, ...); # returns $data
 
 Exported by default. Like C<Data::Dump>'s C<dd> (a.k.a. C<dump>), print one or
 more data to STDOUT. Unlike C<Data::Dump>'s C<dd>, it I<always> prints and
 return I<the original data> (like L<XXX>), making it convenient to insert into
 expressions. This also removes ambiguity and saves one C<wantarray()> call.
 
-=head2 dmp($data, ...) => $str
+=head2 dmp
+
+Usage:
+
+ my $dump = dmp($data, ...);
 
 Exported by default. Return dump result as string. Unlike C<Data::Dump>'s C<dd>
-(a.k.a. C<dump>), it I<never> prints and only return the data.
+(a.k.a. C<dump>), it I<never> prints and only return the dump result.
+
+=head2 dd_ellipsis
+
+Usage:
+
+ dd_ellipsis($data, ...); # returns data
+
+Just like L</dd>, except will truncate its output to
+L</$Data::Dmp::OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS> characters if dump is too long.
+Note that truncated dump will probably not be valid Perl code.
+
+=head2 dmp_ellipsis
+
+Usage:
+
+ my $dump = dd_ellipsis($data, ...); # returns data
+
+Just like L</dmp>, except will truncate dump result to
+L</$Data::Dmp::OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS> characters if dump is too long.
+Note that truncated dump will probably not be valid Perl code.
 
 =head1 FAQ
 
@@ -378,7 +441,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

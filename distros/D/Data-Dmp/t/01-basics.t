@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-use Data::Dmp qw(dmp);
+use Data::Dmp qw(dd dmp dd_ellipsis dmp_ellipsis);
 use Test::More 0.98;
 
 # undef
@@ -71,6 +71,13 @@ is(dmp(bless({}, "Foo")), q(bless({},"Foo")));
 
 # regexp
 is(dmp(qr/abc/i), q{qr(abc)i});
+
+subtest "OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS" => sub {
+    local $Data::Dmp::OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS = 10;
+    is(dmp_ellipsis("a23"), q["a23"]);
+    is(dmp_ellipsis("a234567890123"), q["a23456789...]);
+    is(dmp         ("a234567890123"), q["a234567890123"]);
+};
 
 DONE_TESTING:
 done_testing;

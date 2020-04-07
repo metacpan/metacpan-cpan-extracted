@@ -19,7 +19,13 @@ sub NODE_ON_EVENT ( $self, $ev ) {
 }
 
 sub BUILD ( $self, $args ) {
-    $self->{util}->{dbh}->add_schema_patch(
+    $self->{node}->wait_online if $self->{node};
+
+    $self->on_settings_update( $self->{settings} );
+
+    $self->{dbh} = P->handle( $self->{env}->{db} );
+
+    $self->{dbh}->add_schema_patch(
         1, 'log',
         {   pgsql => <<'SQL',
                 CREATE TABLE "system_log" (
@@ -44,7 +50,7 @@ SQL
         }
     );
 
-    $self->{util}->{dbh}->upgrade_schema;
+    $self->{dbh}->upgrade_schema;
 
     # init store timer
     if ( $self->{store_interval} ) {
@@ -94,7 +100,7 @@ sub _process_ev ( $self, $ev ) {
 }
 
 sub _store ( $self, $buf ) {
-    $self->{util}->{dbh}->do( [ 'INSERT INTO "system_log" ("created", "channel", "level", "title", "data")', VALUES $buf ] );
+    $self->{dbh}->do( [ 'INSERT INTO "system_log" ("created", "channel", "level", "title", "data")', VALUES $buf ] );
 
     return;
 }
@@ -108,7 +114,7 @@ sub _store ( $self, $buf ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 104                  | Documentation::RequirePackageMatchesPodName - Pod NAME on line 108 does not match the package declaration      |
+## |    1 | 110                  | Documentation::RequirePackageMatchesPodName - Pod NAME on line 114 does not match the package declaration      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

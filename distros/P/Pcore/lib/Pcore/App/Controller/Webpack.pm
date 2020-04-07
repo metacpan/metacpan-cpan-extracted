@@ -10,42 +10,51 @@ sub get_nginx_cfg ($self) {
     my $tmpl = <<'NGINX';
     # webpack "<: $location :>" -> "<: $root :>"
 : if $location == '/' {
+    # index
+    location =/ {
+        alias <: $root :>/;
+
+        add_header Cache-Control "public, private, must-revalidate, proxy-revalidate";
+        try_files index.html =404;
+    }
+
+    # redirect to index
     location =/index.html {
         return 301 /;
     }
 
+    # serve static
     location / {
         alias <: $root :>/;
 
         add_header Cache-Control "public, max-age=30672000";
         try_files $uri =404;
-
-        # index
-        location =/ {
-            add_header Cache-Control "public, private, must-revalidate, proxy-revalidate";
-            try_files index.html =404;
-        }
     }
 : } else {
+    # index
+    location =<: $location :>/ {
+        alias <: $root :>/;
+
+        add_header Cache-Control "public, private, must-revalidate, proxy-revalidate";
+        try_files index.html =404;
+    }
+
+    # redirect to index
     location =<: $location :> {
         return 301 <: $location :>/;
     }
 
-    location =<: $location :>/index.html {
+    # redirect to index
+    location =<: $location :>index.html {
         return 301 <: $location :>/;
     }
 
+    # serve static
     location <: $location :>/ {
         alias <: $root :>/;
 
         add_header Cache-Control "public, max-age=30672000";
         try_files $uri =404;
-
-        # index
-        location =<: $location :>/ {
-            add_header Cache-Control "public, private, must-revalidate, proxy-revalidate";
-            try_files index.html =404;
-        }
     }
 : }
 NGINX

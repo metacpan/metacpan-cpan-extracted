@@ -4,6 +4,7 @@ NAME
 SYNOPSIS
      use Mock::Person::CZ qw(first_male first_female last_male last_female
              middle_male middle_female name);
+
      my $first_male = first_male();
      my $first_female = first_female();
      my $last_male = last_male();
@@ -33,35 +34,49 @@ DESCRIPTION
         ch_%C5%BEensk%C3%BDch_jmen_v_%C4%8Cesk%C3%A9_republice>.
 
 SUBROUTINES
-    "first_male()"
-            Returns random first name of male person.
+  "first_male"
+     my $first_male = first_male();
 
-    "first_female()"
-            Returns random first name of female person.
+    Returns random first name of male person.
 
-    "last_male()"
-            Returns random last name of male person.
+  "first_female"
+     my $first_female = first_female();
 
-    "last_female()"
-            Returns random last name of female person.
+    Returns random first name of female person.
 
-    "middle_male()"
-            Returns random middle name of male person.
+  "last_male"
+     my $last_male = last_male();
 
-    "middle_female()"
-            Returns random middle name of female person.
+    Returns random last name of male person.
 
-    "name([$sex])"
-            Recieves scalar with sex of the person ('male' or 'female') and
-            returns scalar with generated name. Default value of $sex
-            variable is 'male'.
+  "last_female"
+     my $last_female = last_female();
+
+    Returns random last name of female person.
+
+  "middle_male"
+     my $middle_male = middle_male();
+
+    Returns random middle name of male person.
+
+  "middle_female"
+     my $middle_female = middle_female();
+
+    Returns random middle name of female person.
+
+  "name"
+     my $name = name($sex);
+
+    Recieves scalar with sex of the person ('male' or 'female').
+
+    Default value of $sex variable is 'male'.
+
+    Returns scalar with generated name.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Mock::Person::CZ qw(name);
 
@@ -72,11 +87,9 @@ EXAMPLE1
      # Štefan Lukáš Šimek
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Mock::Person::CZ;
 
@@ -166,17 +179,18 @@ SEE ALSO
         Install the Mock::Person modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Mock-Person-CZ>
+    <https://github.com/michal-josef-spacek/Mock-Person-CZ>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2013-2015
-     BSD 2-Clause License
+    © Michal Josef Špaček 2013-2020
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

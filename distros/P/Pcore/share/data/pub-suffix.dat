@@ -10,6 +10,7 @@
 *.advisor.ws;*.advisor.ws
 *.alces.network;*.alces.network
 *.awdev.ca;*.awdev.ca
+*.azurecontainer.io;*.azurecontainer.io
 *.bd;*.bd
 *.bzz.dapps.earth;*.bzz.dapps.earth
 *.ck;*.ck
@@ -1661,6 +1662,7 @@ conf.au;conf.au
 conf.lv;conf.lv
 conf.se;conf.se
 conference.aero;conference.aero
+conn.uk;conn.uk
 construction;construction
 consulado.st;consulado.st
 consultant.aero;consultant.aero
@@ -1687,6 +1689,7 @@ coop.rw;coop.rw
 coop.tt;coop.tt
 cooperativa.bo;cooperativa.bo
 copenhagen.museum;copenhagen.museum
+copro.uk;copro.uk
 corporation.museum;corporation.museum
 correios-e-telecomunicações.museum;xn--correios-e-telecomunicaes-ghc29a.museum
 corsica;corsica
@@ -1695,6 +1698,7 @@ cosenza.it;cosenza.it
 cosidns.de;cosidns.de
 costume.museum;costume.museum
 couchpotatofries.org;couchpotatofries.org
+couk.me;couk.me
 council.aero;council.aero
 country;country
 countryestate.museum;countryestate.museum
@@ -2359,6 +2363,8 @@ fastly.net;fastly.net
 fastlylb.net;fastlylb.net
 fastpanel.direct;fastpanel.direct
 fastvps-server.com;fastvps-server.com
+fastvps.host;fastvps.host
+fastvps.site;fastvps.site
 fauske.no;fauske.no
 fbsbx.com;fbsbx.com
 fbx-os.fr;fbx-os.fr
@@ -2468,7 +2474,6 @@ flowers;flowers
 flt.cloud.muni.cz;flt.cloud.muni.cz
 fly;fly
 flynnhosting.net;flynnhosting.net
-flynnhub.com;flynnhub.com
 flå.no;xn--fl-zia.no
 fm;fm
 fm.br;fm.br
@@ -3034,6 +3039,7 @@ grandrapids.museum;grandrapids.museum
 grane.no;grane.no
 granvin.no;granvin.no
 graphics;graphics
+graphox.us;graphox.us
 gratangen.no;gratangen.no
 gratis;gratis
 graz.museum;graz.museum
@@ -3939,7 +3945,6 @@ k12.ok.us;k12.ok.us
 k12.or.us;k12.or.us
 k12.pa.us;k12.pa.us
 k12.pr.us;k12.pr.us
-k12.ri.us;k12.ri.us
 k12.sc.us;k12.sc.us
 k12.tn.us;k12.tn.us
 k12.tr;k12.tr
@@ -5224,6 +5229,8 @@ mydobiss.com;mydobiss.com
 mydrobo.com;mydrobo.com
 myds.me;myds.me
 myeffect.net;myeffect.net
+myfast.host;myfast.host
+myfast.space;myfast.space
 myfirewall.org;myfirewall.org
 myforum.community;myforum.community
 myfritz.net;myfritz.net
@@ -6400,8 +6407,12 @@ plantation.museum;plantation.museum
 plants.museum;plants.museum
 platform.sh;platform.sh
 platformsh.site;platformsh.site
+platter-app.com;platter-app.com
+platter-app.dev;platter-app.dev
+platterp.us;platterp.us
 play;play
 playstation;playstation
+playstation-cloud.com;playstation-cloud.com
 plaza.museum;plaza.museum
 plc.co.im;plc.co.im
 plc.ly;plc.ly
@@ -7858,6 +7869,7 @@ tone.ibaraki.jp;tone.ibaraki.jp
 tono.iwate.jp;tono.iwate.jp
 tonosho.kagawa.jp;tonosho.kagawa.jp
 tonsberg.no;tonsberg.no
+toolforge.org;toolforge.org
 tools;tools
 toon.ehime.jp;toon.ehime.jp
 top;top
@@ -8113,6 +8125,7 @@ uk.com;uk.com
 uk.eu.org;uk.eu.org
 uk.net;uk.net
 uk0.bigv.io;uk0.bigv.io
+ukco.me;ukco.me
 uki.kumamoto.jp;uki.kumamoto.jp
 ukiha.fukuoka.jp;ukiha.fukuoka.jp
 uklugs.org;uklugs.org
@@ -8500,6 +8513,7 @@ withyoutube.com;withyoutube.com
 wiw.gov.pl;wiw.gov.pl
 wlocl.pl;wlocl.pl
 wloclawek.pl;wloclawek.pl
+wmcloud.org;wmcloud.org
 wme;wme
 wmflabs.org;wmflabs.org
 wnext.app;wnext.app
@@ -8901,7 +8915,6 @@ zw;zw
 岡山.jp;xn--rht3d.jp
 岩手.jp;xn--djty4k.jp
 島根.jp;xn--klty5x.jp
-工行;xn--estv75g
 广东;xn--xhq521b
 広島.jp;xn--kltx9a.jp
 微博;xn--9krt00a

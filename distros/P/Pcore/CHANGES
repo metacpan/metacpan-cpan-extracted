@@ -1,3 +1,26 @@
+v0.129.2 2020-04-07T10:25:43Z
+ - app env updated
+
+v0.129.1 2020-04-07T10:16:24Z
+ - app env updated
+
+v0.129.0 2020-04-07T10:07:59Z
+ - app env updated
+
+v0.128.0 2020-04-07T01:01:55Z
+ - api refactored
+ - child node kill on destroy
+ - child process inherit @INC under par
+ - pod moved to wiki
+ - merged with geoip
+ - nginx geoip disabled
+ - chrome cert
+ - package.json
+ - app router
+ - api path updated
+ - resources updated
+ - app rputer updated
+
 v0.127.2 2020-03-30T12:29:16Z
  - resources updated
  - app tmpl fixed

@@ -1,7 +1,7 @@
 package Pcore::App::API::Backend::Local::UserActionToken;
 
 use Pcore -role, -sql, -res;
-use Pcore::App::API qw[:PRIVATE_TOKEN];
+use Pcore::App::API::Const qw[:PRIVATE_TOKEN];
 
 sub user_action_token_create ( $self, $user_id, $token_type ) {
     my ( $res, $dbh ) = $self->{dbh}->get_dbh;

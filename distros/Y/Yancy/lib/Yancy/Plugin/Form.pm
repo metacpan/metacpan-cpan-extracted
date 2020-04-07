@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form;
-our $VERSION = '1.048';
+our $VERSION = '1.049';
 # ABSTRACT: Generate form HTML using various UI libraries
 
 #pod =head1 SYNOPSIS
@@ -62,7 +62,7 @@ our $VERSION = '1.048';
 #pod =item type
 #pod
 #pod The type of the input field to create. One of the JSON schema types.
-#pod See L<Yancy::Help::Config/Generated Forms> for details on the supported
+#pod See L<Yancy::Help::Config/Data Collections> for details on the supported
 #pod types.
 #pod
 #pod =item format
@@ -145,12 +145,27 @@ our $VERSION = '1.048';
 #pod
 #pod =head2 yancy->form->field_for
 #pod
-#pod     my $html = $c->yancy->form->field_for( $schema, $name );
-#pod     %= $c->yancy->form->field_for( $schema, $name );
+#pod     my $html = $c->yancy->form->field_for( $schema, $name, %args );
+#pod     %= $c->yancy->form->field_for( $schema, $name, %args );
 #pod
 #pod Generate a field for the given C<$schema> and property C<$name>. The
 #pod field will include a C<< <label> >>, the appropriate input (C<< <input>
-#pod >>, C<< <select> >>, or otherwise ), and any descriptive text.
+#pod >>, C<< <select> >>, or otherwise ), and any descriptive text. C<%args>
+#pod is a hash with the following keys:
+#pod
+#pod =over
+#pod
+#pod =item title
+#pod
+#pod The field's title. Defaults to the C<title> defined for this property
+#pod in the schema (see L<Yancy::Help::Config>), or the field's name.
+#pod
+#pod =item description
+#pod
+#pod The field's description. Optional. Defaults to the C<description> defined
+#pod for this property in the schema (see L<Yancy::Help::Config>).
+#pod
+#pod =back
 #pod
 #pod =head2 yancy->form->form_for
 #pod
@@ -207,7 +222,7 @@ Yancy::Plugin::Form - Generate form HTML using various UI libraries
 
 =head1 VERSION
 
-version 1.048
+version 1.049
 
 =head1 SYNOPSIS
 
@@ -269,7 +284,7 @@ C<%args> is a list of name/value pairs with the following keys:
 =item type
 
 The type of the input field to create. One of the JSON schema types.
-See L<Yancy::Help::Config/Generated Forms> for details on the supported
+See L<Yancy::Help::Config/Data Collections> for details on the supported
 types.
 
 =item format
@@ -352,12 +367,27 @@ creates just the input field, nothing else.
 
 =head2 yancy->form->field_for
 
-    my $html = $c->yancy->form->field_for( $schema, $name );
-    %= $c->yancy->form->field_for( $schema, $name );
+    my $html = $c->yancy->form->field_for( $schema, $name, %args );
+    %= $c->yancy->form->field_for( $schema, $name, %args );
 
 Generate a field for the given C<$schema> and property C<$name>. The
 field will include a C<< <label> >>, the appropriate input (C<< <input>
->>, C<< <select> >>, or otherwise ), and any descriptive text.
+>>, C<< <select> >>, or otherwise ), and any descriptive text. C<%args>
+is a hash with the following keys:
+
+=over
+
+=item title
+
+The field's title. Defaults to the C<title> defined for this property
+in the schema (see L<Yancy::Help::Config>), or the field's name.
+
+=item description
+
+The field's description. Optional. Defaults to the C<description> defined
+for this property in the schema (see L<Yancy::Help::Config>).
+
+=back
 
 =head2 yancy->form->form_for
 

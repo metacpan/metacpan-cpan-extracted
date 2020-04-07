@@ -5,7 +5,7 @@
 
 our $DATE = '2019-12-10'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ browsers-are-paused - Check whether browsers are paused
 
 =head1 VERSION
 
-This document describes version 0.002 of browsers-are-paused (from Perl distribution App-BrowserUtils), released on 2019-12-10.
+This document describes version 0.003 of browsers-are-paused (from Perl distribution App-BrowserUtils), released on 2019-12-10.
 
 =head1 SYNOPSIS
 

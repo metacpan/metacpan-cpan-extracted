@@ -1,5 +1,12 @@
 Revision history for Template-Preprocessor-TTML
 
+0.0104  2020-04-06
+    - Fix the tests with recent Template.pm.
+    - Move to github.
+
+0.0103  2015-12-28
+    - Update E-mail.
+
 0.0102  2015-05-31
     - Convert to Dist-Zilla.
         - Some improvements in the process.

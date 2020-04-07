@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::OAuth2;
-our $VERSION = '1.048';
+our $VERSION = '1.049';
 # ABSTRACT: Authenticate using an OAuth2 provider
 
 #pod =head1 SYNOPSIS
@@ -116,6 +116,9 @@ sub register {
     $app->helper(
         'yancy.auth.current_user' => currym( $self, 'current_user' ),
     );
+    $app->helper(
+        'yancy.auth.logout' => currym( $self, 'logout' ),
+    );
 }
 
 sub init {
@@ -129,8 +132,10 @@ sub init {
         $self->$url_attr( Mojo::URL->new( $config->{ $url_attr } ) );
     }
     $self->route(
-        $config->{route}
-        || $app->routes->any( '/yancy/auth/' . $self->moniker )
+        $app->yancy->routify(
+            $config->{route},
+            '/yancy/auth/' . $self->moniker,
+        )
     );
     $self->route->to( cb => currym( $self, '_handle_auth' ) );
 }
@@ -144,6 +149,18 @@ sub init {
 sub current_user {
     my ( $self, $c ) = @_;
     return $c->session->{yancy}{ $self->moniker }{access_token} || undef;
+}
+
+#pod =method logout
+#pod
+#pod Clear any currently-logged-in user.
+#pod
+#pod =cut
+
+sub logout {
+    my ( $self, $c ) = @_;
+    delete $c->session->{yancy}{ $self->moniker };
+    return;
 }
 
 sub _handle_auth {
@@ -231,7 +248,7 @@ Yancy::Plugin::Auth::OAuth2 - Authenticate using an OAuth2 provider
 
 =head1 VERSION
 
-version 1.048
+version 1.049
 
 =head1 SYNOPSIS
 
@@ -267,6 +284,10 @@ authorization method.
 =head2 current_user
 
 Returns the access token of the currently-logged-in user.
+
+=head2 logout
+
+Clear any currently-logged-in user.
 
 =head2 get_authorize_url
 

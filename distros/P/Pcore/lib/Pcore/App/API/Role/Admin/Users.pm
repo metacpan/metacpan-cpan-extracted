@@ -105,7 +105,7 @@ sub API_create ( $self, $auth, $args ) {
     }
 
     # create user
-    my $res = $self->{api}->user_create( $args->{username}, $args->{password}, $args->{enabled}, $permissions );
+    my $res = $self->{api}->{backend}->user_create( $args->{username}, $args->{password}, $args->{enabled}, $permissions );
 
     # error creating user
     return $res if !$res;
@@ -124,7 +124,7 @@ sub API_create ( $self, $auth, $args ) {
 }
 
 sub API_delete ( $self, $auth, $user_id ) {
-    my $res = $self->{api}->user_delete($user_id);
+    my $res = $self->{api}->{backend}->user_delete($user_id);
 
     return $res;
 }
@@ -134,7 +134,7 @@ sub API_set_enabled ( $self, $auth, $user_id, $enabled ) {
     # user can't disable itselt
     return [ 400, q[You can't disable yourself] ] if $auth->{user_id} eq $user_id;
 
-    my $res = $self->{api}->user_set_enabled( $user_id, $enabled );
+    my $res = $self->{api}->{backend}->user_set_enabled( $user_id, $enabled );
 
     return $res;
 }
@@ -157,7 +157,7 @@ sub API_read_permissions ( $self, $auth, $args ) {
     else {
         my $is_me = $user_id eq $auth->{user_id};
 
-        my $user_permissions = $self->{api}->user_get_permissions($user_id);
+        my $user_permissions = $self->{api}->{backend}->user_get_permissions($user_id);
 
         # request error
         return $user_permissions if !$user_permissions;
@@ -201,7 +201,7 @@ sub API_write_permissions ( $self, $auth, $user_id, $permissions ) {
         return [ 400, q[You can't modify some permissions] ];
     }
     else {
-        my $res = $self->{api}->user_set_permissions( $user_id, $permissions );
+        my $res = $self->{api}->{backend}->user_set_permissions( $user_id, $permissions );
 
         return $res;
     }

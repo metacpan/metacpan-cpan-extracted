@@ -30,12 +30,12 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Role::Tiny::With" => 0,
     "Role::TinyCommons::Tree::FromStruct" => 0,
-    "Role::TinyCommons::Tree::NodeMethods" => "0.11",
+    "Role::TinyCommons::Tree::NodeMethods" => "0.121",
     "Test::More" => "0.98",
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.121",
+  "VERSION" => "0.122",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +51,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Role::Tiny::With" => 0,
   "Role::TinyCommons::Tree::FromStruct" => 0,
-  "Role::TinyCommons::Tree::NodeMethods" => "0.11",
+  "Role::TinyCommons::Tree::NodeMethods" => "0.121",
   "Scalar::Util" => 0,
   "Test::More" => "0.98",
   "lib" => 0,

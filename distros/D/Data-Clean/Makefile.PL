@@ -18,7 +18,8 @@ my %WriteMakefileArgs = (
   "NAME" => "Data::Clean",
   "PREREQ_PM" => {
     "Clone::PP" => 0,
-    "Log::ger" => "0.027",
+    "Data::Dmp" => "0.240",
+    "Log::ger" => "0.037",
     "Scalar::Util" => 0,
     "String::LineNumber" => 0,
     "String::PerlQuote" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.506",
+  "VERSION" => "0.507",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,11 +43,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Clone::PP" => 0,
+  "Data::Dmp" => "0.240",
   "DateTime" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.027",
+  "Log::ger" => "0.037",
   "Scalar::Util" => 0,
   "String::LineNumber" => 0,
   "String::PerlQuote" => 0,

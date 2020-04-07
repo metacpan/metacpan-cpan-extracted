@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Steenlant <nicolas.steenlant\@ugent.be>"
   ],
   "dist_name" => "Catmandu-WoS",
-  "dist_version" => "0.0302",
+  "dist_version" => "0.0303",
   "license" => "perl",
   "module_name" => "Catmandu::WoS",
   "recursive_test_files" => 1,

@@ -1,5 +1,30 @@
 Revision history for C and Perl extension of nfdump.
 
+1.27 2020-04-07
+	- after a few years stalled development the library is going to be 
+	  maintained and sponsored by NetX Networks a.s. 
+	- source code moved from original https://github.com/VUTBR/libnf 
+	  to https://github.com/NETX-AS/libnf
+	- updated README 
+	- un-submoduled ffilter code to avoid nigtmare with git submodules 
+	- backported patch https://github.com/VUTBR/libnf/pull/24
+	- updated to nfdump 1.6.20
+	- removed support for legacy nadump V0 format 
+	- some test files in perl/t/ dir converted from V0 format 
+
+
+1.26 2018-06-xx - never released
+	- updated to nfdump 1.6.17
+	- c: better processing of list of exporters 
+	- c: ringbuf support to handle data beween libnf instancec in real time 
+	- c: new functions lnf_ring_init, lnf_ring_info, lnf_ring_read,
+	  lnf_ring_write, lnf_ring_free
+	- c: new examples examples/lnf_ex13_ring_write.c, examples/lnf_ex14_ring_read.c
+	- nfdumpp: new shm (ringbuf) output format (-o shm) 
+	- nfdumpp: new --loop-read option for continuos reading of input file(s)
+	- nfdumpp: new --shm-read option for read data from shm (ringbuf)
+	- perl: perl module is not separate code but part of libnf repository 
+
 1.25 2016-12-04
 	- libnf and modules moved to separate repositories (libnf, libnf-ffilter, libnf-perl)
 	  command git submodule update --remote --merge must be used to update to latest 
@@ -8,7 +33,7 @@ Revision history for C and Perl extension of nfdump.
 	-c: versioning of libnf.so added (issue #5, thanks to Tomas Cejka)
 	-c: added new API function lnf_mem_clean(lnf_mem_t *lnf_mem)
 	-c: added exmaple lnf_ex11_memclean.c
-	-c: new finction lnf_rec_get_raw/lnf_rec_set_raw
+	-c: new function lnf_rec_get_raw/lnf_rec_set_raw
 	-c: new example examples/lnf_ex12_rec_raw.c 
 	-c: new function lnf_filter_ffilter_ptr
 	-c: fix of RPM build (issue #5, thanks to Tomas Cejka)

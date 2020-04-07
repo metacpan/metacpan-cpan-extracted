@@ -3,19 +3,37 @@ package <: $module_name ~ "::Node" :>;
 use Pcore -role;
 use <: $module_name ~ "::Util" :>;
 
-has cfg => ( required => 1 );
+has env      => ( required => 1 );
+has settings => ( required => 1 );
 
 has util => ( init_arg => undef );    # InstanceOf ['<: $module_name :>::Util']
 
 around BUILD => sub ( $orig, $self, $args ) {
-    $self->{util} = <: $module_name ~ "::Util" :>->new;
+    P->bind_events(
+        'app.api.settings.updated',
+        sub ($ev) {
+            $self->_on_settings_update( $ev->{data} );
 
-    $self->{util}->@{ keys $args->{util}->%* } = values $args->{util}->%*;
+            return;
+        }
+    );
 
-    $self->{util}->build_dbh( $self->{cfg}->{db} );
+    $self->{util} = <: $module_name ~ "::Util" :>->new( settings => $self->{settings} );
 
     return $self->$orig($args);
 };
+
+sub _on_settings_update ( $self, $data ) {
+    $self->{settings} = $data;
+
+    $self->on_settings_update($data);
+
+    return;
+}
+
+sub on_settings_update ( $self, $data ) {
+    return;
+}
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -26,7 +44,7 @@ around BUILD => sub ( $orig, $self, $args ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 4                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 22                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 26 does not match the package declaration       |
+## |    1 | 40                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 44 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

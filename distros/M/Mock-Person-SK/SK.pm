@@ -1,12 +1,10 @@
 package Mock::Person::SK;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use utf8;
 use warnings;
 
-# Modules.
 use Readonly;
 
 # Constants.
@@ -14,8 +12,7 @@ Readonly::Scalar our $SPACE => q{ };
 Readonly::Array our @EXPORT_OK => qw(first_male first_female middle_female
 	last_male last_female middle_male middle_female name);
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # First and middle male names.
 our @first_male = our @middle_male = qw(
@@ -1253,6 +1250,7 @@ Mock::Person::SK - Generate random sets of Slovak names.
 
  use Mock::Person::SK qw(first_male first_female last_male last_female
          middle_male middle_female name);
+
  my $first_male = first_male();
  my $first_female = first_female();
  my $last_male = last_male();
@@ -1283,47 +1281,57 @@ From Slovakia calendar.
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<first_male>
 
-=item B<first_male()>
+ my $first_male = first_male();
 
 Returns random first name of male person.
 
-=item B<first_female()>
+=head2 C<first_female>
+
+ my $first_female = first_female();
 
 Returns random first name of female person.
 
-=item B<last_male()>
+=head2 C<last_male>
+
+ my $last_male = last_male();
 
 Returns random last name of male person.
 
-=item B<last_female()>
+=head2 C<last_female>
+
+ my $last_female = last_female();
 
 Returns random last name of female person.
 
-=item B<middle_male()>
+=head2 C<middle_male>
+
+ my $middle_male = middle_male();
 
 Returns random middle name of male person.
 
-=item B<middle_female()>
+=head2 C<middle_female>
+
+ my $middle_female = middle_female();
 
 Returns random middle name of female person.
 
-=item B<name([$sex])>
+=head2 C<name>
 
-Recieves scalar with sex of the person ('male' or 'female') and returns
-scalar with generated name.
+ my $name = name($sex);
+
+Recieves scalar with sex of the person ('male' or 'female').
+
 Default value of $sex variable is 'male'.
 
-=back
+Returns scalar with generated name.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Mock::Person::SK qw(name);
 
@@ -1335,11 +1343,9 @@ Default value of $sex variable is 'male'.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Mock::Person::SK;
 
@@ -2140,21 +2146,22 @@ Install the Mock::Person modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Mock-Person-SK>
+L<https://github.com/michal-josef-spacek/Mock-Person-SK>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2013-2015
- BSD 2-Clause License
+© Michal Josef Špaček 2013-2020
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

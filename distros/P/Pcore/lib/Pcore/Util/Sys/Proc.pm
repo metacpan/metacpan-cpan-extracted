@@ -257,9 +257,9 @@ sub _redirect_stderr ( $self, $args ) {
 # TODO under windows run directly and handle process creation error
 sub _create_process ( $self, $cmd, $args, $restore ) {
 
-    # prepare environment
-    # local $ENV{PERL5LIB} = join $Config{path_sep}, grep { !ref } @INC;
-    local $ENV{PATH} = "$ENV{PATH}$Config{path_sep}$ENV{PAR_TEMP}" if $ENV->{is_par};
+    # prepare PAR environment
+    local $ENV{PERL5LIB} = join $Config{path_sep}, grep { !ref } @INC  if $ENV->{is_par};
+    local $ENV{PATH}     = "$ENV{PATH}$Config{path_sep}$ENV{PAR_TEMP}" if $ENV->{is_par};
 
     my $chdir_guard = $args->{chdir} ? P->file->chdir( $args->{chdir} ) : undef;
 

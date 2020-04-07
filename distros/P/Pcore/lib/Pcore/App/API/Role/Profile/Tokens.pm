@@ -23,7 +23,7 @@ sub API_read ( $self, $auth, $args ) {
 }
 
 sub API_create ( $self, $auth, $args ) {
-    my $token = $self->{api}->user_token_create( $auth->{user_id}, $args->{name}, $args->{enabled}, $args->{permissions} );
+    my $token = $self->{api}->{backend}->user_token_create( $auth->{user_id}, $args->{name}, $args->{enabled}, $args->{permissions} );
 
     return $token;
 }
@@ -33,7 +33,7 @@ sub API_delete ( $self, $auth, $token_id ) {
 
     return $res if !$res;
 
-    $res = $self->{api}->user_token_remove($token_id);
+    $res = $self->{api}->{backend}->user_token_remove($token_id);
 
     return $res;
 }
@@ -43,7 +43,7 @@ sub API_set_enabled ( $self, $auth, $token_id, $enabled ) {
 
     return $res if !$res;
 
-    $res = $self->{api}->user_token_set_enabled( $token_id, $enabled );
+    $res = $self->{api}->{backend}->user_token_set_enabled( $token_id, $enabled );
 
     return $res;
 }
@@ -55,7 +55,7 @@ sub API_read_permissions ( $self, $auth, $args ) {
 
     return $res if !$res;
 
-    my $token_permissions = $self->{api}->user_token_get_permissions_for_edit($token_id);
+    my $token_permissions = $self->{api}->{backend}->user_token_get_permissions_for_edit($token_id);
 
     return $token_permissions;
 }
@@ -65,7 +65,7 @@ sub API_write_permissions ( $self, $auth, $token_id, $permissions ) {
 
     return $res if !$res;
 
-    $res = $self->{api}->user_token_set_permissions( $token_id, $permissions );
+    $res = $self->{api}->{backend}->user_token_set_permissions( $token_id, $permissions );
 
     return $res;
 }

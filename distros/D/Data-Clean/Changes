@@ -1,3 +1,10 @@
+0.507   2020-04-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: !debug.
+
+	- Document 'die' command.
+
+
 0.506   2019-11-18  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

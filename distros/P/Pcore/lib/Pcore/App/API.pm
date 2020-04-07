@@ -1,117 +1,110 @@
 package Pcore::App::API;
 
-use Pcore -role, -const, -export;
+use Pcore -const, -class, -export, -res, -sql;
+use Pcore::App::API::Const qw[:ROOT_USER];
 use Pcore::Util::Scalar qw[looks_like_number looks_like_uuid];
-use Pcore::Util::Scalar qw[is_plain_arrayref];
-use Pcore::Util::Data qw[from_b64u];
-use Pcore::Util::Digest qw[sha3_512_bin];
-use Pcore::Util::Text qw[encode_utf8];
-use Pcore::Util::UUID qw[uuid_from_bin];
+use Pcore::App::API::Auth;
 
-our $EXPORT = {
-    ROOT_USER       => [qw[$ROOT_USER_NAME $ROOT_USER_ID]],
-    PERMS           => [qw[$PERMS_ANY $PERMS_AUTHENTICATED]],
-    TOKEN_TYPE      => [qw[$TOKEN_TYPE_PASSWORD $TOKEN_TYPE_TOKEN $TOKEN_TYPE_SESSION $TOKEN_TYPE_EMAIL_CONFIRM $TOKEN_TYPE_PASSWORD_RECOVERY]],
-    INVALIDATE_TYPE => [qw[$INVALIDATE_USER $INVALIDATE_TOKEN $INVALIDATE_ALL]],
-    PRIVATE_TOKEN   => [qw[$PRIVATE_TOKEN_ID $PRIVATE_TOKEN_HASH $PRIVATE_TOKEN_TYPE]],
-};
+with qw[Pcore::App::API::Methods];
 
-has app => ( required => 1 );
+has app                => ( required => 1 );
+has db                 => ();
+has backend            => ();                  # undef - default, 0 - don't use, str - uri
+has auth_workers       => undef;
+has argon2_time        => 3;
+has argon2_memory      => '64M';
+has argon2_parallelism => 1;
 
+has dbh      => ( init_arg => undef );
 has settings => ( init_arg => undef );
 
-has _auth_cb_queue            => ( sub { {} }, init_arg => undef );    # HashRef
-has _auth_cache_user          => ( init_arg             => undef );    # HashRef, user_id => { user_token_id }
-has _auth_cache_token         => ( init_arg             => undef );    # HashRef, user_token_id => auth_descriptor
-has _auth_cache_cleanup_timer => ( init_arg             => undef );    # InstanceOf['AE::timer']
+# INIT
+sub init ($self) {
 
-const our $ROOT_USER_NAME => 'root';
-const our $ROOT_USER_ID   => 1;
+    # create dbh
+    $self->{dbh} = P->handle( $self->{db}, max_dbh => 10 ) if $self->{db};
 
-const our $PERMS_ANY           => undef;
-const our $PERMS_AUTHENTICATED => '*';
+    # init api methods
+    my $res = $self->init_methods;
 
-const our $TOKEN_TYPE_PASSWORD          => 1;
-const our $TOKEN_TYPE_TOKEN             => 2;
-const our $TOKEN_TYPE_SESSION           => 3;
-const our $TOKEN_TYPE_EMAIL_CONFIRM     => 4;
-const our $TOKEN_TYPE_PASSWORD_RECOVERY => 5;
+    return $res if !$res;
 
-const our $INVALIDATE_USER  => 1;
-const our $INVALIDATE_TOKEN => 2;
-const our $INVALIDATE_ALL   => 3;
+    my $backend_class;
 
-const our $PRIVATE_TOKEN_ID   => 0;
-const our $PRIVATE_TOKEN_HASH => 1;
-const our $PRIVATE_TOKEN_TYPE => 2;
-
-const our $AUTH_CACHE_CLEANUP_TIMEOUT => 60 * 60 * 12;    # remove sessions tokens, that are older than 12 hours
-
-require Pcore::App::API::Auth;
-
-sub new ( $self, $app ) {
-    state $scheme_class = {
-        sqlite => 'Pcore::App::API::Backend::Local::sqlite',
-        pgsql  => 'Pcore::App::API::Backend::Local::pgsql',
-        ws     => 'Pcore::App::API::Backend::Remote',
-        wss    => 'Pcore::App::API::Backend::Remote',
-    };
-
-    if ( defined $app->{cfg}->{api}->{backend} ) {
-        my $uri = P->uri( $app->{cfg}->{api}->{backend} );
-
-        if ( my $class = $scheme_class->{ $uri->{scheme} } ) {
-            return P->class->load($class)->new( { app => $app } );
+    # create / init backend
+    if ( !defined $self->{backend} ) {
+        if ( $self->{dbh}->{is_sqlite} ) {
+            $backend_class = 'sqlite';
         }
-        else {
-            die 'Unknown API backend scheme';
+        elsif ( $self->{dbh}->{is_pgsql} ) {
+            $backend_class = 'pgsql';
         }
     }
-    else {
-        return P->class->load('Pcore::App::API::Backend::NoAuth')->new( { app => $app } );
+    elsif ( $self->{backend} ) {
+        my $uri = P->uri( $self->{backend} );
+
+        state $scheme = {
+            sqlite => 'sqlite',
+            pgsql  => 'pgsql',
+            http   => 'remote',
+            https  => 'remote',
+            ws     => 'remote',
+            wss    => 'remote',
+        };
+
+        $backend_class = $scheme->{ $uri->{scheme} };
     }
+
+    if ($backend_class) {
+        $backend_class = eval { P->class->load( $backend_class, ns => 'Pcore::App::API::Backend' ) };
+
+        die $@ if $@;
+
+        $self->{backend} = $backend_class->new(
+            app                => $self->{app},
+            api                => $self,
+            dbh                => $self->{dbh},
+            auth_workers       => $self->{auth_workers},
+            argon2_time        => $self->{argon2_time},
+            argon2_memory      => $self->{argon2_memory},
+            argon2_parallelism => $self->{argon2_parallelism},
+        );
+
+        $self->{backend}->init;
+    }
+
+    # upgrade shema
+    if ( $self->{dbh} ) {
+        print 'Upgrading DB schema ... ';
+
+        $res = $self->upgrade_schema;
+
+        say $res;
+
+        return $res if !$res;
+
+    }
+
+    return res 200;
 }
 
-# setup events listeners
-around init => sub ( $orig, $self ) {
+# template method
+sub upgrade_schema ($self) {
+    return res 200;
+}
 
-    # setup events listeners
-    P->bind_events(
-        'app.api.auth.invalidate',
-        sub ($ev) {
-            if ( $ev->{data}->{type} == $INVALIDATE_USER ) {
-                $self->_invalidate_user( $ev->{data}->{id} );
-            }
-            elsif ( $ev->{data}->{type} == $INVALIDATE_TOKEN ) {
-                $self->_invalidate_token( $ev->{data}->{id} );
-            }
-            elsif ( $ev->{data}->{type} == $INVALIDATE_ALL ) {
-                $self->_invalidate_all;
-            }
-
-            return;
-        }
-    );
-
-    # expired sessions invalidation timer
-    $self->{_auth_cache_cleanup_timer} = AE::timer $AUTH_CACHE_CLEANUP_TIMEOUT, $AUTH_CACHE_CLEANUP_TIMEOUT, sub {
-        $self->_auth_cache_cleanup;
-
-        return;
-    };
-
-    # on settings update
-    P->bind_events(
-        'app.api.settings.updated',
-        sub ($ev) {
-            $self->{settings} = $ev->{data};
-
-            return;
-        }
-    );
-
-    return $self->$orig;
-};
+sub authenticate ( $self, $token = undef ) {
+    if ( my $backend = $self->{backend} ) {
+        return $backend->authenticate($token);
+    }
+    else {
+        return bless {
+            api              => $self,
+            is_authenticated => 0,
+          },
+          'Pcore::App::API::Auth';
+    }
+}
 
 # UTIL
 sub user_is_root ( $self, $user_id ) {
@@ -149,192 +142,37 @@ sub validate_email ( $self, $email ) {
     return $email =~ /^[[:alnum:]][[:alnum:]._-]+[[:alnum:]]\@[[:alnum:].-]+$/smi;
 }
 
-# AUTHENTICATE
-sub authenticate ( $self, $token = undef ) {
+# SETTINGS
+sub settings_load ( $self ) {
+    state $q1 = $self->{dbh}->prepare(q[SELECT * FROM "settings" WHERE "id" = 1]);
 
-    # no auth token provided
-    return $self->_get_unauthenticated_descriptor if !defined $token;
+    my $settings = $self->{dbh}->selectrow($q1);
 
-    my $private_token;
+    if ($settings) {
+        delete $settings->{data}->{id};
 
-    # authenticate user password
-    if ( is_plain_arrayref $token) {
-        my ( $token_type, $token_id, $private_token_hash );
+        $self->{settings} = $settings->{data};
 
-        # lowercase user name
-        $token->[0] = lc $token->[0];
-
-        # generate private token hash
-        $private_token_hash = eval { sha3_512_bin encode_utf8( $token->[1] ) . encode_utf8 $token->[0] };
-
-        $private_token = [ $token->[0], $private_token_hash, $TOKEN_TYPE_PASSWORD ] if !$@;
+        P->fire_event( 'app.api.settings.updated', $settings->{data} );
     }
 
-    # authenticate token
-    else {
-        $private_token = $self->_unpack_token($token);
-    }
-
-    # error decoding token
-    return $self->_get_unauthenticated_descriptor if !$private_token;
-
-    return $self->authenticate_private($private_token);
+    return $settings;
 }
 
-sub _unpack_token ( $self, $token ) {
-    my ( $token_id, $token_type, $private_token_hash );
+# TODO check, if settings was updated
+sub settings_update ( $self, $settings ) {
+    $settings->{smtp_tls}                = SQL_BOOL $settings->{smtp_tls}                if exists $settings->{smtp_tls};
+    $settings->{telegram_bot_enabled}    = SQL_BOOL $settings->{telegram_bot_enabled}    if exists $settings->{telegram_bot_enabled};
+    $settings->{telegram_signin_enabled} = SQL_BOOL $settings->{telegram_signin_enabled} if exists $settings->{telegram_signin_enabled};
 
-    # decode token
-    eval {
-        my $token_bin = from_b64u $token;
+    my $res = $self->{dbh}->do( [ q[UPDATE "settings"], SET [$settings], 'WHERE "id" = 1' ] );
 
-        # unpack token id
-        $token_id = uuid_from_bin( substr $token_bin, 0, 16 )->str;
+    $self->settings_load if $res;
 
-        die if length $token_bin < 16;
-
-        $token_type = unpack 'C', substr $token_bin, 16, 1;
-
-        $private_token_hash = sha3_512_bin substr $token_bin, 17;
-    };
-
-    # error decoding token
-    return if $@;
-
-    return [ $token_id, $private_token_hash, $token_type ];
-}
-
-sub authenticate_private ( $self, $private_token ) {
-    my $auth;
-
-    # private token is cached
-    if ( $auth = $self->{_auth_cache_token}->{ $private_token->[$PRIVATE_TOKEN_ID] } ) {
-
-        # private token is valid
-        if ( $private_token->[$PRIVATE_TOKEN_HASH] eq $auth->{private_token}->[$PRIVATE_TOKEN_HASH] ) {
-
-            # update last accessed time
-            $auth->{last_accessed} = time;
-
-            return $auth;
-        }
-
-        # private token is in cache, but hash is not valid
-        else {
-            return $self->_get_unauthenticated_descriptor($private_token);
-        }
-    }
-
-    my $cv = P->cv;
-
-    my $cache = $self->{_auth_cb_queue};
-
-    push $cache->{ $private_token->[$PRIVATE_TOKEN_HASH] }->@*, $cv;
-
-    return $cv->recv if $cache->{ $private_token->[$PRIVATE_TOKEN_HASH] }->@* > 1;
-
-    # authenticate on backend
-    my $res = $self->do_authenticate_private($private_token);
-
-    # authentication error
-    if ( !$res ) {
-
-        # invalidate token
-        $self->_invalidate_token( $private_token->[$PRIVATE_TOKEN_ID] );
-
-        # return new unauthenticated auth object
-        $auth = $self->_get_unauthenticated_descriptor($private_token);
-    }
-
-    # authenticated
-    else {
-
-        # create auth
-        $auth = bless $res->{data}, 'Pcore::App::API::Auth';
-
-        $auth->{api}              = $self;
-        $auth->{is_authenticated} = 1;
-        $auth->{private_token}    = $private_token;
-        $auth->{last_accessed}    = time;
-
-        # store in cache
-        $self->{_auth_cache_user}->{ $auth->{user_id} }->{ $private_token->[$PRIVATE_TOKEN_ID] } = 1;
-        $self->{_auth_cache_token}->{ $private_token->[$PRIVATE_TOKEN_ID] } = $auth;
-    }
-
-    # call callbacks
-    $cache = delete $cache->{ $private_token->[$PRIVATE_TOKEN_HASH] };
-
-    while ( my $cb = shift $cache->@* ) {
-        $cb->($auth);
-    }
-
-    return $cv->recv;
-}
-
-sub _get_unauthenticated_descriptor ( $self, $private_token = undef ) {
-    return bless {
-        api              => $self,
-        is_authenticated => 0,
-        private_token    => $private_token,
-      },
-      'Pcore::App::API::Auth';
-}
-
-# AUTH CACHE INVALIDATE
-sub _invalidate_user ( $self, $user_id ) {
-    if ( my $user_tokens = delete $self->{_auth_cache_user}->{$user_id} ) {
-        delete $self->{_auth_cache_token}->@{ keys $user_tokens->%* };
-    }
-
-    return;
-}
-
-sub _invalidate_token ( $self, $token_id ) {
-    my $auth = delete $self->{_auth_cache_token}->{$token_id};
-
-    if ( defined $auth ) {
-        my $user_id = $auth->{user_id};
-
-        delete $self->{_auth_cache_user}->{$user_id}->{$token_id};
-
-        delete $self->{_auth_cache_user}->{$user_id} if !$self->{_auth_cache_user}->{$user_id}->%*;
-    }
-
-    return;
-}
-
-sub _invalidate_all ( $self ) {
-    undef $self->{_auth_cache_user};
-
-    undef $self->{_auth_cache_token};
-
-    return;
-}
-
-sub _auth_cache_cleanup ($self) {
-    my $time = time - $AUTH_CACHE_CLEANUP_TIMEOUT;
-
-    for my $auth ( values $self->{_auth_cache_token}->%* ) {
-        if ( $auth->{private_token}->[$PRIVATE_TOKEN_TYPE] == $TOKEN_TYPE_SESSION && $auth->{last_accessed} < $time ) {
-            $self->_invalidate_token( $auth->{private_token}->[$PRIVATE_TOKEN_ID] );
-        }
-    }
-
-    return;
+    return $res;
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 188                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

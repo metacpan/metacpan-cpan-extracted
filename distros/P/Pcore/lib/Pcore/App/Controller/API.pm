@@ -161,6 +161,7 @@ sub get_nginx_cfg ($self) {
         return 418;
     }
 
+    # serve static
     location / {
         rewrite ^/favicon.ico$ /cdn/favicon.ico last;
         rewrite ^/robots.txt$ /cdn/robots.txt last;
@@ -169,12 +170,12 @@ sub get_nginx_cfg ($self) {
     }
 : } else {
     location =<: $location :> {
-        return 301 <: $location :>/;
+        error_page 418 = @backend;
+        return 418;
     }
 
     location =<: $location :>/ {
-        error_page 418 = @backend;
-        return 418;
+        return 301 <: $location :>;
     }
 
     location <: $location :>/ {

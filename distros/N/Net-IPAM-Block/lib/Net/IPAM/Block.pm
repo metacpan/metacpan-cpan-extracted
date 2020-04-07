@@ -4,6 +4,8 @@ use 5.10.0;
 use strict;
 use warnings;
 
+our $VERSION = '1.04';
+
 use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
@@ -22,8 +24,6 @@ our @EXPORT_OK = qw(aggregate);
 Net::IPAM::Block - A library for reading, formatting, sorting and converting IP-blocks.
 
 =cut
-
-our $VERSION = '1.03';
 
 our $MaxCIDRSplit = 1 << 20;
 

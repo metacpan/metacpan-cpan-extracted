@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.048';
+our $VERSION = '1.049';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -73,6 +73,8 @@ our $VERSION = '1.048';
 #pod and add authentication or authorization. Defaults to allowing access to
 #pod the Yancy web application under C</yancy>, and the REST API under
 #pod C</yancy/api>.
+#pod
+#pod This can be a string or a L<Mojolicious::Routes::Route> object.
 #pod
 #pod =head2 return_to
 #pod
@@ -190,7 +192,7 @@ sub register {
     }
 
     # XXX: Throw an error if there is already a route here
-    my $route = $config->{route} // $app->routes->any( '/yancy' );
+    my $route = $app->yancy->routify( $config->{route}, '/yancy' );
     $route->to( return_to => $config->{return_to} // '/' );
 
     # Create authentication for editor. We need to delay fetching this
@@ -659,7 +661,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.048
+version 1.049
 
 =head1 SYNOPSIS
 
@@ -732,6 +734,8 @@ A base route to add the editor to. This allows you to customize the URL
 and add authentication or authorization. Defaults to allowing access to
 the Yancy web application under C</yancy>, and the REST API under
 C</yancy/api>.
+
+This can be a string or a L<Mojolicious::Routes::Route> object.
 
 =head2 return_to
 

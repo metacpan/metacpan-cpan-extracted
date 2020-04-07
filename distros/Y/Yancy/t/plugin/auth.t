@@ -123,6 +123,13 @@ subtest 'login' => sub {
     };
 };
 
+subtest 'logout' => sub {
+    $t->get_ok( '/yancy/auth/logout' )
+      ->status_is( 303 )
+      ->header_is( location => '/yancy/auth' )
+      ;
+};
+
 subtest 'protect routes' => sub {
     my $t = Test::Mojo->new( 'Mojolicious' );
     $t->app->plugin( 'Yancy', {
@@ -194,7 +201,8 @@ subtest 'protect routes' => sub {
             $t->get_ok( '/', { Accept => 'application/json' } )
               ->status_is( 401 )
               ->json_like( '/errors/0/message', qr{You are not authorized} )
-              ->or( sub { diag shift->tx->res->body } );
+              ->or( sub { diag shift->tx->res->dom->at( '#errors,#routes' ) } )
+              ;
         };
     };
 
@@ -296,7 +304,7 @@ subtest 'one user, multiple auth' => sub {
             password => '123qwe',
           } )
           ->status_is( 303 )
-          ->or( sub { diag shift->tx->res->body } )
+          ->or( sub { diag shift->tx->res->dom->at( '#errors,#routes' ) } )
           ->header_is( location => '/' );
     };
     subtest 'email login works' => sub {
@@ -305,7 +313,7 @@ subtest 'one user, multiple auth' => sub {
             password => '123qwe',
           } )
           ->status_is( 303 )
-          ->or( sub { diag shift->tx->res->body } )
+          ->or( sub { diag shift->tx->res->dom->at( '#errors,#routes' ) } )
           ->header_is( location => '/' );
     };
 };

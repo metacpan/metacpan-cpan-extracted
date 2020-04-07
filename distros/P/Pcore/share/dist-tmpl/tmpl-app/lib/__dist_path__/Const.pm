@@ -1,7 +1,7 @@
 package <: $module_name ~ "::Const" :>;
 
 use Pcore -const, -export;
-use Pcore::App::API qw[:PERMS];
+use Pcore::App::API::Const qw[:PERMS];
 
 our $EXPORT = {
     PERMS  => [qw[$PERMS_ANY $PERMS_AUTHENTICATED $PERMS_ADMIN $PERMS_USER]],

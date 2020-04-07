@@ -1,7 +1,6 @@
 package Net::DAVTalk;
 
 use strict;
-use warnings FATAL => 'all';
 
 use Carp;
 use DateTime::Format::ISO8601;
@@ -22,12 +21,11 @@ Net::DAVTalk - Interface to talk to DAV servers
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
-our $VERSION = '0.17';
-
+our $VERSION = '0.18';
 
 =head1 SYNOPSIS
 

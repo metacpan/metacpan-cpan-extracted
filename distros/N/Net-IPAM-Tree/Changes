@@ -1,5 +1,9 @@
 Revision history for Net-IPAM-Tree
 
+1.05    Fri, 03 Apr 2020 09:12:50 +0200 Mon, 06 Apr 2020 22:17:45 +0200
+        - newer versions in prereq
+        - minor POD things
+
 1.04    Fri, 03 Apr 2020 09:12:50 +0200
         no new features, CPAN module things only
 

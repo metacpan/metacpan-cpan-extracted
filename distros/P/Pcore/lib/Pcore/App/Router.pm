@@ -79,7 +79,7 @@ sub init ( $self ) {
 
         die qq[Controller path "$route" is not unique] if exists $self->{path_ctrl}->{$route};
 
-        $map->{ $route eq '/' ? '/' : "$route/" } = $class;
+        $map->{$route} = $class;
 
         $self->{class_ctrl}->{$class} = $self->{path_ctrl}->{$route} = $obj;
 
@@ -91,11 +91,15 @@ sub init ( $self ) {
 
     $self->{map} = $map;
 
-    my $re = '\A(' . ( join '|', map {quotemeta} reverse sort { length $a <=> length $b } keys $map->%* ) . ')(.*)\z';
-
-    $self->{path_re} = qr/$re/sm;
+    $self->{path_re} = $self->_build_re( [ keys $map->%* ] );
 
     return;
+}
+
+sub _build_re ( $self, $routes ) {
+    my $re = '\A(' . ( join '|', map {quotemeta} reverse sort { length $a <=> length $b } $routes->@* ) . ')(?:$|\/|(?<=[/]))(.*)';
+
+    return qr/$re/sm;
 }
 
 sub run ( $self, $req ) {
@@ -108,8 +112,6 @@ sub run ( $self, $req ) {
     my $map = $self->{map};
 
     my $path = P->path("/$env->{PATH_INFO}");
-
-    $path .= '/' if $path ne '/' && !defined $path->{filename};
 
     if ( $path =~ $self->{path_re} ) {
 
@@ -127,6 +129,16 @@ sub run ( $self, $req ) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    1 | 100                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

@@ -36,7 +36,7 @@ function.
 
 =head1 VERSION
 
-version 0.0103
+version 0.0104
 
 =head1 AUTHOR
 
@@ -50,37 +50,9 @@ Copyright 2006 Shlomi Fish, all rights reserved.
 
 This program is released under the following license: MIT X11
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2005 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Preprocessor-TTML or by
-email to bug-template-preprocessor-ttml@rt.cpan.org.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Template::Preprocessor::TTML
 
 =head2 Websites
 
@@ -95,15 +67,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Template-Preprocessor-TTML>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Template-Preprocessor-TTML>
+L<https://metacpan.org/release/Template-Preprocessor-TTML>
 
 =item *
 
@@ -112,30 +76,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Template-Preprocessor-TTML>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Template-Preprocessor-TTML>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Template-Preprocessor-TTML>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Template-Preprocessor-TTML>
 
 =item *
 
@@ -149,7 +89,7 @@ L<http://cpants.cpanauthors.org/dist/Template-Preprocessor-TTML>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/T/Template-Preprocessor-TTML>
 
@@ -183,8 +123,31 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<http://bitbucket.org/shlomif/latemp>
+L<https://github.com/thewml/latemp>
 
-  hg clone ssh://hg@bitbucket.org/shlomif/latemp
+  git clone http://bitbucket.org/shlomif/latemp
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Preprocessor-TTML> or
+by email to
+L<bug-template-preprocessor-ttml@rt.cpan.org|mailto:bug-template-preprocessor-ttml@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2005 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

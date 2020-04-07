@@ -3,12 +3,12 @@ NAME
     suitable for use with Data::CSel
 
 VERSION
-    This document describes version 0.004 of Data::CSel::WrapStruct (from
-    Perl distribution Data-CSel-WrapStruct), released on 2019-07-29.
+    This document describes version 0.006 of Data::CSel::WrapStruct (from
+    Perl distribution Data-CSel-WrapStruct), released on 2020-04-07.
 
 SYNOPSIS
      use Data::CSel qw(csel);
-     use Data::CSel::WrapStruct qw(wrap_struct);
+     use Data::CSel::WrapStruct qw(wrap_struct unwrap_tree);
 
      my $data = [
          0,
@@ -22,26 +22,46 @@ SYNOPSIS
      my @nodes = csel(":root > * > *:nth-child(4) > *", $tree);
      my @tags = map { $_->value } @nodes; # -> ("even", "prime", "even")
 
-    Arrays are wrapped in a Data::CSel::WrapStruct::Array, hashes in a
-    Data::CSel::WrapStruct::Hash, and so on. So if you are using type
-    selectors, you might want to add "Data::CSel::WrapStruct" into
-    "class_prefixes" for convenience:
+    Scalars are wrapped using "Data::CSel::WrapStruct::Scalar" class,
+    scalarrefs are wrapped using "Data::CSel::WrapStruct::ScalarRef" class,
+    arrays are wrapped using "Data::CSel::WrapStruct::Array" class, and
+    hashes are wrapped using "Data::CSel::WrapStruct::Hash" class. For
+    convenience, when you load "Data::CSel::WrapStruct", it adds
+    "Data::CSel::WrapStruct" to @Data::CSel::CLASS_PREFIXES so you don't
+    have to specify "{class_prefixes=>["Data::CSel::WrapStruct"]}" "csel()"
+    option everytime.
 
-     my @hashes = map {$_->value} csel({class_prefixes=>["Data::CSel::WrapStruct"]}, "Hash", $tree);
+     my @hashes = map {$_->value} csel("Hash", $tree);
      # -> ({url=>"http://example.com/two.jpg"}, {})
 
     The wrapper objects provide some methods, e.g.:
 
-     my @empty_hashes = map {$_->value} csel({class_prefixes=>["Data::CSel::WrapStruct"]}, "Hash[length=0]", $tree);
+     my @empty_hashes = map {$_->value} csel("Hash[length=0]", $tree);
      # -> ({})
 
-    Refer to their respective documentation for the list of methods
-    available.
+     my @hashes_that_have_url_key = map {$_->value} csel("Hash[has_key('url')]", $tree);
+     # -> ({url=>"http://example.com/two.jpg"})
 
-    Some more examples:
-
-     [map {$_->value} csel({class_prefixes=>["Data::CSel::WrapStruct"]}, "Scalar[value >= 3]")]
+     my @larger_scalars = [map {$_->value} csel("Scalar[value >= 3]", $tree)]
      # -> (3, 4)
+
+    See "NODE METHODS", "SCALAR NODE METHODS", "SCALARREF NODE METHODS",
+    "ARRAY NODE METHODS", "HASH NODE METHODS" for more details on the
+    provided methods.
+
+    You can replace the value of nodes using "value":
+
+     my @posint_scalar_nodes = csel("Scalar[value > 0]", $tree);
+     for (@posint_scalar_nodes) { $_->value( $_->value * 10 ) }
+     use Data::Dump;
+     dd unwrap_tree($data);
+     # => [
+     #     0,
+     #     10,
+     #     [20, ["two","dua"], {url=>"http://example.com/two.jpg"}, ["even","prime"]],
+     #     30,
+     #     [40, ["four","empat"], {}, ["even"]],
+     # ];
 
 DESCRIPTION
     This module provides "wrap_struct()" which creates a tree of objects
@@ -51,13 +71,115 @@ DESCRIPTION
     You can retrieve the original value of data items by calling "value()"
     method on the tree nodes.
 
+NODE METHODS
+  parent
+  children
+  value
+    Usage:
+
+     my $val = $node->value; # get node value
+     $node->value(1);        # set node value
+
+    Get or set node value.
+
+    Note that when setting node value, the new node value is not
+    automatically wrapped for you. If you want to set new node value and
+    expect to select it or part of it again with "csel()", you will have to
+    wrap the new value first with "wrap_struct".
+
+  remove
+    Usage:
+
+     $node->remove;
+
+    Remove node from parent.
+
+SCALAR NODE METHODS
+    In addition to methods listed in "NODE METHODS", Scalar nodes also have
+    the following methods.
+
+SCALARREF NODE METHODS
+    In addition to methods listed in "NODE METHODS", ScalarRef nodes also
+    have the following methods.
+
+ARRAY NODE METHODS
+    In addition to methods listed in "NODE METHODS", Array nodes also have
+    the following methods.
+
+  length
+    Get array length. Can be used to select an array based on its length,
+    e.g.:
+
+     @nodes = csel('Array[length > 0]');
+
+HASH NODE METHODS
+    In addition to methods listed in "NODE METHODS", Hash nodes also have
+    the following methods.
+
+  length
+    Get the number of keys. Can be used to select a hash based on its number
+    of keys, e.g.:
+
+     @nodes = csel('Hash[length > 0]');
+
+  has_key
+    Usage:
+
+     my $bool = $node->has_key("foo");
+
+    Check whether hash has a certain key. Can be used to select a hash,
+    e.g.:
+
+     @nodes = csel('Hash[has_key("foo")]');
+
+  key
+    Usage:
+
+     my $key_val = $node->key("foo");
+
+    Get a hash key's value. Can be used to select a hash based on the value
+    of one of its keys, e.g.:
+
+     @nodes = csel('Hash[key("name") = "lisa"]');
+
 FUNCTIONS
     None exported by default, but exportable.
 
-  wrap_struct($data) => tree
-    Wrap a data structure using a tree of objects.
+  wrap_struct
+    Usage:
+
+     my $tree = wrap_struct($data);
+
+    Wrap a data structure into a tree of objects.
 
     Currently cannot handle recursive structure.
+
+  unwrap_tree
+    Usage:
+
+     my $data = unwrap_tree($wrapped_data);
+
+    Unwrap a tree produced by "wrap_tree" back into unwrapped data
+    structure.
+
+FAQ
+  Changing the node value doesn't work!
+     my $data = [0, 1, 2];
+     my @nodes = csel("Scalar[value > 0]", wrap_struct($data));
+     for (@nodes) { $_->[0] = "x" }
+     use Data::Dump;
+     dd $data;
+
+    still prints "[0,1,2]" instead of "[0,'x','x']". Why?
+
+    To set node value, you have to use the "value()" node method with an
+    argument:
+
+     ...
+     for (@nodes) { $->value("x") }
+     ...
+
+    will then print the expected "[0,'x','x']".
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -81,7 +203,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

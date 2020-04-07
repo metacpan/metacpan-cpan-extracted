@@ -2,7 +2,7 @@ package Catmandu::Importer::WoSCitedReferences;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 use Moo;
 use Catmandu::Util qw(is_string xml_escape);

@@ -38,9 +38,10 @@ package App {
 
 my $app = bless {
     cfg => {
+        db  => 'sqlite:',
         api => {
-            backend => 'sqlite:',
-            node    => { workers => 1 }
+            backend      => undef,
+            auth_workers => 1,
         }
     },
     node => Pcore::Node->new(
@@ -50,15 +51,19 @@ my $app = bless {
   },
   'App';
 
-my $api = Pcore::App::API->new($app);
+my $api = Pcore::App::API->new(
+    $app->{cfg}->{api}->%*,
+    app => $app,
+    db  => $app->{cfg}->{db},
+);
 
 my $res = $api->init;
 ok( $res, 'api_init' );
 
-# $res = $api->get_user('root');
+# $res = $api->{backend}->get_user('root');
 # ok( $res, 'get_user' );
 
-my $sess = $api->user_session_create(1);
+my $sess = $api->{backend}->user_session_create(1);
 ok( $sess, 'user_session_create' );
 
 my $auth;

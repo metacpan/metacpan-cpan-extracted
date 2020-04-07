@@ -69,17 +69,17 @@ subtest 'stringify' => sub {
     my $dateh = date_ymd(2019, 12, 9, 20, 47, 30, 55);
     my $date  = date_ymd(2019, 12, 9, 20, 47, 30);
     
-    subtest 'Format::iso' => sub {
+    subtest 'FORMAT_ISO' => sub {
         is $date->to_string(Date::FORMAT_ISO), "2019-12-09 20:47:30";
         is $dateh->to_string(Date::FORMAT_ISO), "2019-12-09 20:47:30.000055";
         is $date->to_string, $date->to_string(Date::FORMAT_ISO), 'this is the default format';
     };
     
-    subtest 'Format::iso_date' => sub {
+    subtest 'FORMAT_ISO_DATE' => sub {
         is $date->to_string(Date::FORMAT_ISO_DATE), "2019-12-09";
     };
     
-    subtest 'Format::iso_tz' => sub {
+    subtest 'FORMAT_ISO_TZ' => sub {
         is $date->to_string(Date::FORMAT_ISO_TZ), "2019-12-09 20:47:30+03";
         is $dateh->to_string(Date::FORMAT_ISO_TZ), "2019-12-09 20:47:30.000055+03";
         
@@ -87,11 +87,11 @@ subtest 'stringify' => sub {
         is $date->to_string(Date::FORMAT_ISO_TZ), "2019-12-09 20:47:30-05:30";
     };
     
-    subtest 'Format::ymd' => sub {
+    subtest 'FORMAT_YMD' => sub {
         is $date->to_string(Date::FORMAT_YMD), '2019/12/09';
     };
     
-    subtest 'Format::hms' => sub {
+    subtest 'FORMAT_HMS' => sub {
         is $dateh->to_string(Date::FORMAT_HMS), '20:47:30';
     };
 };

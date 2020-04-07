@@ -2,7 +2,7 @@ package Catmandu::WoS::SearchBase;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 use Moo::Role;
 use URI::Escape qw(uri_escape);

@@ -1,7 +1,7 @@
 package Pcore::App::API::Backend::Local::User;
 
 use Pcore -role, -sql, -res;
-use Pcore::App::API qw[:ROOT_USER :PRIVATE_TOKEN :INVALIDATE_TYPE];
+use Pcore::App::API::Const qw[:ROOT_USER :PRIVATE_TOKEN :INVALIDATE_TYPE];
 
 sub _user_password_authenticate ( $self, $private_token ) {
 
@@ -29,7 +29,7 @@ sub _user_password_authenticate ( $self, $private_token ) {
 sub user_create ( $self, $user_name, $password, $enabled, $permissions ) {
 
     # validate user name
-    return res [ 400, 'User name is not valid' ] if !$self->validate_user_name($user_name);
+    return res [ 400, 'User name is not valid' ] if !$self->{api}->validate_user_name($user_name);
 
     # lowercase user name
     $user_name = lc $user_name;
@@ -142,7 +142,7 @@ sub user_set_password ( $self, $user_id, $password, $dbh = undef ) {
 sub user_set_enabled ( $self, $user_id, $enabled ) {
 
     # root can't be disabled
-    return res [ 400, q[Can't modify root user] ] if $self->user_is_root($user_id);
+    return res [ 400, q[Can't modify root user] ] if $self->{api}->user_is_root($user_id);
 
     my $dbh = $self->{dbh};
 
@@ -211,7 +211,7 @@ SQL
 sub user_set_permissions ( $self, $user_id, $permissions, $dbh = undef ) {
     return res 204 if !$permissions || !$permissions->%*;    # not modified
 
-    return res [ 400, q[Can't modify root user] ] if $self->user_is_root($user_id);
+    return res [ 400, q[Can't modify root user] ] if $self->{api}->user_is_root($user_id);
 
     my $on_finish;
 
@@ -322,7 +322,7 @@ SQL
 sub user_delete ( $self, $user_id ) {
 
     # root can't be deleted
-    return res [ 400, q[Can not delete root user] ] if $self->user_is_root($user_id);
+    return res [ 400, q[Can not delete root user] ] if $self->{api}->user_is_root($user_id);
 
     my $dbh = $self->{dbh};
 

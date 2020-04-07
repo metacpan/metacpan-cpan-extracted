@@ -1,6 +1,6 @@
 package XS::Manifesto;
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 =head1 NAME
 
@@ -46,7 +46,7 @@ considered to be cheap nowadays, it can still be an issue.
 
 Second, as both XS-libraries C<My::libA> and C<My::libB> use C<Alien::libX>
 independently, they can upgrade C<Alien::libX> independently. While it's a
-benefit in some circumstances, in can lead to them loosing binary compatibility
+benefit in some circumstances, in can lead to them losing binary compatibility
 between themselves, i.e. data structures created via C<My::libA::libX> might
 be not allowed to be transferred to C<My::libB::libX>. In other words, it's
 only possible to have final XS-modules without binary inter-dependencies.

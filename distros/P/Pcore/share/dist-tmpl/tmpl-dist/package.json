@@ -1,0 +1,17 @@
+{
+    "author": "<: $author :> <<: $author_email :>>",
+    "bugs": {
+        "email": "",
+        "url": ""
+    },
+    "description": "",
+    "homepage": "",
+    "license": "<: $license :>",
+    "name": "<: $dist_name :>",
+    "private": <: $cpan_distribution :>,
+    "repository": {
+        "type": "git",
+        "url": ""
+    },
+    "type": "perl"
+}

@@ -14,6 +14,7 @@ t/01-cat.t
 t/01-catRAND.t
 t/01-catSEQ.t
 t/01-catWRAND.t
+t/01-exec.t
 t/test_cat1.txt
 t/test_cat.txt
 t/manifest.t

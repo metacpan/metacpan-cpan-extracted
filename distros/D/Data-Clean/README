@@ -2,8 +2,8 @@ NAME
     Data::Clean - Clean data structure
 
 VERSION
-    This document describes version 0.506 of Data::Clean (from Perl
-    distribution Data-Clean), released on 2019-11-18.
+    This document describes version 0.507 of Data::Clean (from Perl
+    distribution Data-Clean), released on 2020-04-07.
 
 SYNOPSIS
      use Data::Clean;
@@ -22,6 +22,12 @@ SYNOPSIS
 
          # specify how to deal with all other kinds of objects
          -obj           => ['unbless'],
+
+         # recurse into object
+         #'!recurse_obj'=> 1,
+
+         # generate cleaner with debugging messages
+         #'!debug'      => 1,
      );
 
      # to get cleansed data
@@ -78,6 +84,11 @@ METHODS
         The clone module (all but the last part of the "!clone_func" value)
         will automatically be loaded using "require()".
 
+    *   !debug (bool)
+
+        If set to true, will generate code to print debugging messages. For
+        debugging only.
+
     Available commands:
 
     *   ['stringify']
@@ -121,6 +132,10 @@ METHODS
         This will perform unblessing using
         Function::Fallback::CoreOrPP::unbless(). Should be done only for
         objects ("-obj").
+
+    *   ['die']
+
+        Die. Only for testing.
 
     *   ['code', STR]
 
@@ -201,7 +216,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

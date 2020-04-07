@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Token;
-our $VERSION = '1.048';
+our $VERSION = '1.049';
 # ABSTRACT: A simple token-based auth
 
 #pod =head1 SYNOPSIS
@@ -183,7 +183,10 @@ sub init {
         $self->token_digest( $digest );
     }
 
-    my $route = $config->{route} || $app->routes->any( '/yancy/auth/' . $self->moniker );
+    my $route = $app->yancy->routify(
+        $config->{route},
+        '/yancy/auth/' . $self->moniker,
+    );
     $route->to( cb => currym( $self, 'check_token' ) );
 }
 
@@ -222,6 +225,11 @@ sub check_token {
 sub login_form {
     # There is no login form for a token
     return undef;
+}
+
+sub logout {
+    # There is no way to log out a token
+    return;
 }
 
 sub add_token {
@@ -293,7 +301,7 @@ Yancy::Plugin::Auth::Token - A simple token-based auth
 
 =head1 VERSION
 
-version 1.048
+version 1.049
 
 =head1 SYNOPSIS
 

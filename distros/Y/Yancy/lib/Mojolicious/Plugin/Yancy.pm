@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.048';
+our $VERSION = '1.049';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -56,10 +56,17 @@ our $VERSION = '1.048';
 #pod
 #pod =item route
 #pod
-#pod A base route to add Yancy to. This allows you to customize the URL
-#pod and add authentication or authorization. Defaults to allowing access
-#pod to the Yancy web application under C</yancy>, and the REST API under
-#pod C</yancy/api>.
+#pod A base route to add the Yancy editor to. This allows you to customize
+#pod the URL and add authentication or authorization. Defaults to allowing
+#pod access to the Yancy web application under C</yancy>, and the REST API
+#pod under C</yancy/api>.
+#pod
+#pod This can be a string or a L<Mojolicious::Routes::Route> object.
+#pod
+#pod     # These are equivalent
+#pod     use Mojolicious::Lite;
+#pod     plugin Yancy => { route => app->routes->any( '/admin' ) };
+#pod     plugin Yancy => { route => '/admin' };
 #pod
 #pod =item return_to
 #pod
@@ -578,6 +585,7 @@ use Mojo::Loader qw( load_class );
 use Yancy::Util qw( load_backend curry copy_inline_refs derp is_type );
 use JSON::Validator::OpenAPI::Mojolicious;
 use Storable qw( dclone );
+use Scalar::Util qw( blessed );
 
 has _filters => sub { {} };
 
@@ -665,6 +673,7 @@ sub register {
     $app->helper( 'yancy.set' => \&_helper_set );
     $app->helper( 'yancy.create' => \&_helper_create );
     $app->helper( 'yancy.validate' => \&_helper_validate );
+    $app->helper( 'yancy.routify' => \&_helper_routify );
 
     # Default form is Bootstrap4. Any form plugin added after this will
     # override this one
@@ -986,6 +995,17 @@ sub _merge_schema {
     return $keep;
 }
 
+sub _helper_routify {
+    my ( $self, @args ) = @_;
+    for my $maybe_route ( @args ) {
+        next unless defined $maybe_route;
+        return blessed $maybe_route && $maybe_route->isa( 'Mojolicious::Routes::Route' )
+            ? $maybe_route
+            : $self->app->routes->any( $maybe_route )
+            ;
+    }
+}
+
 1;
 
 __END__
@@ -998,7 +1018,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.048
+version 1.049
 
 =head1 SYNOPSIS
 
@@ -1054,10 +1074,17 @@ connections.
 
 =item route
 
-A base route to add Yancy to. This allows you to customize the URL
-and add authentication or authorization. Defaults to allowing access
-to the Yancy web application under C</yancy>, and the REST API under
-C</yancy/api>.
+A base route to add the Yancy editor to. This allows you to customize
+the URL and add authentication or authorization. Defaults to allowing
+access to the Yancy web application under C</yancy>, and the REST API
+under C</yancy/api>.
+
+This can be a string or a L<Mojolicious::Routes::Route> object.
+
+    # These are equivalent
+    use Mojolicious::Lite;
+    plugin Yancy => { route => app->routes->any( '/admin' ) };
+    plugin Yancy => { route => '/admin' };
 
 =item return_to
 

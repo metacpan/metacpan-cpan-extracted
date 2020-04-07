@@ -9,7 +9,7 @@ build_requires:
   IPC::Open3: '0'
   Role::Tiny::With: '0'
   Role::TinyCommons::Tree::FromStruct: '0'
-  Role::TinyCommons::Tree::NodeMethods: '0.11'
+  Role::TinyCommons::Tree::NodeMethods: '0.121'
   Test::More: '0.98'
   lib: '0'
   parent: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-CSel
   homepage: https://metacpan.org/release/Data-CSel
   repository: git://github.com/perlancar/perl-Data-CSel.git
-version: '0.121'
+version: '0.122'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -109,7 +109,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.597'
+      version: '0.600'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -148,7 +148,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -288,7 +288,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.082'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -302,11 +302,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
-      version: '0.01'
+      version: '0.020'
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
@@ -333,9 +333,15 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/Test::Compile'
       version: '2.054'
     -
-      class: Dist::Zilla::Plugin::Test::Perl::Critic
-      name: '@Author::PERLANCAR/Test::Perl::Critic'
-      version: '3.001'
+      class: Dist::Zilla::Plugin::Test::Perl::Critic::Subset
+      config:
+        Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
+          finder:
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
+      name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
+      version: 3.001.005
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'

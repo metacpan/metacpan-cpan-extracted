@@ -15,7 +15,7 @@ use threads;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '1.25';
+our $VERSION = '1.27';
 
 # XXX
 # Items to export into callers namespace by default. Note: do not export
@@ -76,6 +76,7 @@ XSLoader::load('Net::NfDump', $VERSION);
 # how to convert particular type to 
 my %CVTTYPE = ( 
 	'ip' => 'ip', 'srcip' => 'ip', 'dstip' => 'ip', 'nexthop' => 'ip', 'bgpnexthop' => 'ip', 'router' => 'ip',
+	'net' => 'ip', 'srcnet' => 'ip', 'dstnet' => 'ip', 'routerip' => 'ip', 'nextip' => 'ip',
 	'insrcmac' => 'mac', 'outsrcmac' => 'mac', 'indstmac' => 'mac', 'outdstmac' => 'mac',
 	'mpls' => 'mpls',
 	'xsrcip' => 'ip', 'xdstip' => 'ip', 'nsrcip' => 'ip', 'ndstip' => 'ip',

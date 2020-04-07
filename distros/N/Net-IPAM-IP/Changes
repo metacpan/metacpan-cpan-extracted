@@ -1,5 +1,12 @@
 Revision history for Net-IPAM-IP
 
+1.07    Tue, 07 Apr 2020 14:11:16 +0200
+        * Socket implementations in Windows before Win10 drives me crazy
+
+1.06    Mon, 06 Apr 2020 21:21:43 +0200
+        * still fighting with broken tests on bad inet_pton implementations
+        * reinvent also inet_ntop in pure perl for to_string in some corner cases
+
 1.05    Sat, 04 Apr 2020 18:32:33 +0200
         [fixup]
         * reinvent inet_pton in pure perl for non standard implementations in Solaris, Windows, ...

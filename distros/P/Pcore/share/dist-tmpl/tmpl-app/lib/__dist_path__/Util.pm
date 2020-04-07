@@ -4,50 +4,33 @@ use Pcore -class, -res;
 use Pcore::API::SMTP;
 use <: $module_name ~ "::Const qw[]" :>;
 
-has app      => ();
-has tmpl     => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Tmpl']
-has dbh      => ( init_arg => undef );    # ConsumerOf ['Pcore::Handle::DBI']
-has settings => ( init_arg => undef );    # HashRef
+has settings => ( required => 1 );    # HashRef
 
 has _smtp => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::API::SMTP'] ]
 
 sub BUILD ( $self, $args ) {
 
-    # init tmpl
-    $self->{tmpl} = P->tmpl;
-
     # set settings listener
     P->bind_events(
         'app.api.settings.updated',
         sub ($ev) {
-            $self->{settings} = $ev->{data};
-
-            delete $self->{_smtp};
+            $self->on_settings_update( $ev->{data} );
 
             return;
         }
     );
 
+    $self->on_settings_update( $self->{settings} );
+
     return;
 }
 
-*TO_JSON = *TO_CBOR = sub ($self) {
-    return { settings => $self->{settings} };
-};
+sub on_settings_update ( $self, $data ) {
+    $self->{settings} = $data;
 
-# DBH
-sub build_dbh ( $self, $db ) {
-    $self->{dbh} = P->handle($db) if !defined $self->{dbh};
+    delete $self->{_smtp};
 
-    return $self->{dbh};
-}
-
-sub update_schema ( $self, $db ) {
-    my $dbh = $self->build_dbh($db);
-
-    $dbh->load_schema( $ENV->{share}->get_location('/<: $dist_name :>/db'), 'main' );
-
-    return $dbh->upgrade_schema;
+    return;
 }
 
 # SMTP
@@ -98,9 +81,9 @@ sub sendmail ( $self, $to, $subject, $body, %args ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 5                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 48, 87               | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 70                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 94                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 98 does not match the package declaration       |
+## |    1 | 77                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 81 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

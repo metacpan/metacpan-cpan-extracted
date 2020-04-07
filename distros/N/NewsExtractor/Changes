@@ -1,3 +1,6 @@
+v0.14.0 2020-04-08T00:00:54+0800
+  - Improve the extraction of journalist names on ETToday and CNA
+
 v0.13.0 2020-03-22T16:20:13+0800
   - Improve the extraction of journalist names on www.setn.com
 

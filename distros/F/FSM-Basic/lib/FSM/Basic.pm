@@ -6,15 +6,15 @@ use warnings;
 
 =head1 NAME
 
-FSM::Basic -  Finite state machine using HASH as state definitions
+FSM::Basic - Finite state machine using HASH as state definitions
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 
@@ -103,6 +103,27 @@ The keys are the states name.
 
 
 "exec" for system code,
+
+
+for "do" and "exec" it is possible to use a parameter from the command inside the "do" or "exec"
+All parameters are splitted over space and put in an array
+Each element are a substitution for __NBR__ where NBR is the array index
+
+e.g. for a ping
+
+"ping (.*)"      => {"exec" => "ping -c 3 __1__"},
+
+The __1__ is substitued by the first parameter in the expected command
+
+If you run the command "ping 127.0.0.1" the exec run the command "ping -c 3 127.0.0.1" 
+
+Other example:
+
+      "test (.*)": {
+        "exec": "ping -c 3 __2__"
+      }
+      
+If you call with "test other 127.0.0.1" the exec run the command "ping -c 3 127.0.0.1"     
 
 =back
 
@@ -238,6 +259,7 @@ sub run {
             {
                 $in = $1;
             }
+            my @all = split /\s+/, $in;
             if (exists $self->{states_list}{ $self->{state} }{expect}{$in}) {
                 $state = $self->{states_list}{ $self->{state} }{expect}{$in};
             } else {
@@ -266,6 +288,10 @@ sub run {
                 }
                 if (exists $state->{exec}) {
                     my $old_exec = $state->{exec};
+                    for (my $nbr = 0 ; $nbr <= $#all ; $nbr++) {
+                        my $str = '__' . $nbr . '__';
+                        $state->{exec} =~ s/$str/$all[$nbr]/g;
+                    }
                     $state->{exec} =~ s/__IN__/$in/g;
                     my $string = `$state->{exec}`;
                     $output = sprintf("%s", $string) . $output;
@@ -273,6 +299,10 @@ sub run {
                 }
                 if (exists $state->{do}) {
                     my $old_do = $state->{do};
+                    for (my $nbr = 0 ; $nbr <= $#all ; $nbr++) {
+                        my $str = '__' . $nbr . '__';
+                        $state->{do} =~ s/$str/$all[$nbr]/g;
+                    }
                     $state->{do} =~ s/__IN__/$in/g;
                     $output = (eval $state->{do}) . $output;
                     $state->{do} = $old_do;

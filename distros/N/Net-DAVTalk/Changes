@@ -1,6 +1,9 @@
 Revision history for Net-DAVTalk
 
-0.17    Fri  8 Nov 17:28 2019
+0.18    Tue Apr  7 15:54 2020
+  - remove FATAL warnings from DAVTalk module
+
+0.17    Fri Nov  8 17:28 2019
   - don't double-decode XML (thanks tadzik) PR#1
   - provide the 'ua()' method to get/set the user agent after creation
   - use the UA's own timeout support rather than duplicating it

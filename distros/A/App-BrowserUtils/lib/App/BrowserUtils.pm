@@ -3,7 +3,7 @@ package App::BrowserUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2019-12-10'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -56,11 +56,11 @@ our $desc_pause = <<'_';
 
 A modern browser now runs complex web pages and applications. Despite browser's
 power management feature, these pages/tabs on the browser often still eat
-considerable CPU cycles even though they run in the background. Stopping (kill
--STOP) the browser processes is a simple and effective way to stop CPU eating on
-Unix. It can be performed whenever you are not using your browsers for a little
-while, e.g. when you are typing on an editor or watching a movie. When you want
-to use your browser again, simply unpause it.
+considerable CPU cycles even though they only run in the background. Stopping
+(kill -STOP) the browser processes is a simple and effective way to stop CPU
+eating on Unix. It can be performed whenever you are not using your browsers for
+a little while, e.g. when you are typing on an editor or watching a movie. When
+you want to use your browser again, simply unpause it.
 
 _
 
@@ -244,7 +244,7 @@ App::BrowserUtils - Utilities related to browsers, particularly modern GUI ones
 
 =head1 VERSION
 
-This document describes version 0.002 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2019-12-10.
+This document describes version 0.003 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2019-12-10.
 
 =head1 SYNOPSIS
 
@@ -267,6 +267,9 @@ This distribution includes several utilities related to browsers:
 =item * L<unpause-browsers>
 
 =back
+
+Supported browsers: Firefox on Linux, Opera on Linux, Chrome on Linux, and
+Vivaldi on Linux.
 
 =head1 FUNCTIONS
 
@@ -318,11 +321,11 @@ Pause (kill -STOP) browsers.
 
 A modern browser now runs complex web pages and applications. Despite browser's
 power management feature, these pages/tabs on the browser often still eat
-considerable CPU cycles even though they run in the background. Stopping (kill
--STOP) the browser processes is a simple and effective way to stop CPU eating on
-Unix. It can be performed whenever you are not using your browsers for a little
-while, e.g. when you are typing on an editor or watching a movie. When you want
-to use your browser again, simply unpause it.
+considerable CPU cycles even though they only run in the background. Stopping
+(kill -STOP) the browser processes is a simple and effective way to stop CPU
+eating on Unix. It can be performed whenever you are not using your browsers for
+a little while, e.g. when you are typing on an editor or watching a movie. When
+you want to use your browser again, simply unpause it.
 
 This function is not exported.
 

@@ -1,7 +1,9 @@
 package Data::CSel;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.121'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-07'; # DATE
+our $DIST = 'Data-CSel'; # DIST
+our $VERSION = '0.122'; # VERSION
 
 use 5.020000;
 use strict;
@@ -16,6 +18,8 @@ our @EXPORT_OK = qw(
                        csel
                        parse_csel
                );
+
+our @CLASS_PREFIXES;
 
 our $_i1;
 
@@ -423,7 +427,7 @@ sub _simpsel {
         my @fres;
 
         my @types_to_match;
-        for (@{ $opts->{class_prefixes} // [] }) {
+        for (@{ $opts->{class_prefixes} // [] }, @CLASS_PREFIXES) {
             push @types_to_match, $_ . (/::$/ ? "" : "::") . $simpsel->{type};
         }
         push @types_to_match, $simpsel->{type};
@@ -561,7 +565,7 @@ sub _simpsel {
             my $class = $f->{class};
 
             my @classes_to_match;
-            for (@{ $opts->{class_prefixes} // [] }) {
+            for (@{ $opts->{class_prefixes} // [] }, @CLASS_PREFIXES) {
                 push @classes_to_match, $_ . (/::$/ ? "" : "::") . $class;
             }
             push @classes_to_match, $class;
@@ -720,7 +724,7 @@ Data::CSel - Select tree node objects using CSS Selector-like syntax
 
 =head1 VERSION
 
-This document describes version 0.121 of Data::CSel (from Perl distribution Data-CSel), released on 2019-07-26.
+This document describes version 0.122 of Data::CSel (from Perl distribution Data-CSel), released on 2020-04-07.
 
 =head1 SYNOPSIS
 
@@ -1292,6 +1296,22 @@ CSS namespaces are used when there are foreign elements (e.g. SVG in addition to
 HTML) and one wants to use the same stylesheet for both. There is no need for
 something like this CSel, as we deal with only Perl objects.
 
+=head1 VARIABLES
+
+=head1 @Data::CSel::CLASS_PREFIXES
+
+Array of namespace prefixes to check when matching type in type selector as well
+as class selector. This is like PATH environment variable in Unix shell. For
+example, if C<@CLASS_PREFIXES> is C<< ["Foo::Bar", "Baz"] >>, then this
+expression:
+
+ T
+
+will match class C<Foo::Bar::T>, or C<Baz::T>, or C<T>.
+
+Note that C<@Data::CSel::CLASS_PREFIXES> is consulted after the
+C<class_prefixes> opton in C<csel()>.
+
 =head1 FUNCTIONS
 
 =head2 csel
@@ -1320,13 +1340,17 @@ Known options:
 
 =item * class_prefixes => array of str
 
-Array of namespace to check when matching type in type selector as well as class
-selector. This is like PATH environment variable in Unix shell. For example, if
-C<class_prefixes> is C<< ["Foo::Bar", "Baz"] >>, then this expression:
+Array of namespace prefixes to check when matching type in type selector as well
+as class selector. This is like PATH environment variable in Unix shell. For
+example, if C<class_prefixes> is C<< ["Foo::Bar", "Baz"] >>, then this
+expression:
 
  T
 
 will match class C<Foo::Bar::T>, or C<Baz::T>, or C<T>.
+
+Note that C<@Data::CSel::CLASS_PREFIXES> is also consulted after this
+C<class_prefixes> option.
 
 =item * wrap => bool
 
@@ -1473,7 +1497,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

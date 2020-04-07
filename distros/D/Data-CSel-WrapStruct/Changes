@@ -1,3 +1,25 @@
+0.006   2020-04-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] No longer require users to add
+          {class_prefixes=>['Data::CSel::WrapStruct']} csel() option; we add the
+          prefix to @Data::CSel::CLASS_PREFIXES for them.
+
+	- [bugfix] Hash method key() was inadvertently renamed to key_value();
+	  now it's reverted to key().
+
+
+0.005   2020-04-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow wrapper node method value() to set new value using value($val).
+
+        - Add wrapper node method: remove().
+
+	- Add function unwrap_tree().
+
+        - UPDATE: this release contains a bug where Hash method key() was
+          inadvertently renamed to key_value(). Fixed in 0.006.
+
+
 0.004   2019-07-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Handle JSON::PP::Boolean object by turning it into 1/0.
@@ -6,7 +28,7 @@
 	  remembered key().
 
 
-0.003   2016-09-10 (PERLANCAR)  Released-By: unreleased
+0.003   2016-09-10  Released-By: PERLANCAR; Released: no
 
         - [Incompatible change] Rename Hash method pair_value() to the shorter
           and more easily remembered key().

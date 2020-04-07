@@ -9,6 +9,12 @@ MODULES
 
       * Catmandu::Importer::WoSCitedReferences
 
+      * Catmandu::Importer::WoSCitingArticles
+
+      * Catmandu::Importer::WoSRelatedRecords
+
+      * Catmandu::Importer::WoSRetrieveById
+
 AUTHOR
 
     Nicolas Steenlant <nicolas.steenlant@ugent.be>

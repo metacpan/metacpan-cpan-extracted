@@ -1,7 +1,7 @@
 package Data::Clean;
 
-our $DATE = '2019-11-18'; # DATE
-our $VERSION = '0.506'; # VERSION
+our $DATE = '2020-04-07'; # DATE
+our $VERSION = '0.507'; # VERSION
 
 use 5.010001;
 use strict;
@@ -152,6 +152,7 @@ sub _generate_cleanser_code {
     };
 
     $cd->{modules}{'Scalar::Util'} //= 0;
+    $cd->{modules}{'Data::Dmp'} //= 0 if $opts->{'!debug'};
 
     if (!$cd->{clone_func}) {
         $cd->{clone_func} = 'Clone::PP::clone';
@@ -173,7 +174,7 @@ sub _generate_cleanser_code {
                  [\@stmts_main, '$_', 'main']) {
                 my $act  = $act0 ; $act  =~ s/\Q{{var}}\E/$_->[1]/g;
                 my $cond = $cond0; $cond =~ s/\Q{{var}}\E/$_->[1]/g;
-                #unless (@{ $_->[0] }) { push @{ $_->[0] }, '    say "D:'.$_->[2].' val=", '.$_->[1].', ", ref=$ref"; # DEBUG'."\n" }
+                if ($opts->{'!debug'}) { unless (@{ $_->[0] }) { push @{ $_->[0] }, '    print "DEBUG:'.$_->[2].' cleaner: val=", Data::Dmp::dmp_ellipsis('.$_->[1].'), ", ref=$ref\n"; '."\n" } }
                 push @{ $_->[0] }, "    ".($n && $which ne 'new_if' ? "els":"")."if ($cond) { $act }\n";
             }
             $n++;
@@ -209,7 +210,7 @@ sub _generate_cleanser_code {
         die "Can't handle command $circ->[0] for option '-circular'" unless $self->can($meth);
         my @args = @$circ; shift @args;
         my $act = $self->$meth($cd, \@args);
-        #$add_stmt->('stmt', 'say "ref=$ref, " . {{var}}'); # DEBUG
+        if ($opts->{'!debug'}) { $add_stmt->('stmt', 'print "DEBUG: main cleaner: ref=$ref, " . {{var}} . "\n"'); }
         $add_new_if->('$ref && $refs{ {{var}} }++', $act);
     }
 
@@ -281,6 +282,7 @@ sub _generate_cleanser_code {
         'my $ref=ref($_);'."\n",
         join("", @stmts_main).'}'."\n"
     );
+    push @code, 'print "DEBUG: main cleaner: result: ", Data::Dmp::dmp_ellipsis($data), "\n";'."\n" if $opts->{'!debug'};
     push @code, '$data'."\n";
     push @code, '}'."\n";
 
@@ -327,7 +329,7 @@ Data::Clean - Clean data structure
 
 =head1 VERSION
 
-This document describes version 0.506 of Data::Clean (from Perl distribution Data-Clean), released on 2019-11-18.
+This document describes version 0.507 of Data::Clean (from Perl distribution Data-Clean), released on 2020-04-07.
 
 =head1 SYNOPSIS
 
@@ -347,6 +349,12 @@ This document describes version 0.506 of Data::Clean (from Perl distribution Dat
 
      # specify how to deal with all other kinds of objects
      -obj           => ['unbless'],
+
+     # recurse into object
+     #'!recurse_obj'=> 1,
+
+     # generate cleaner with debugging messages
+     #'!debug'      => 1,
  );
 
  # to get cleansed data
@@ -408,6 +416,11 @@ C<Clone::PP::clone>.
 The clone module (all but the last part of the C<!clone_func> value) will
 automatically be loaded using C<require()>.
 
+=item * !debug (bool)
+
+If set to true, will generate code to print debugging messages. For debugging
+only.
+
 =back
 
 Available commands:
@@ -453,6 +466,10 @@ This will replace a scalar reference like \1 with 1.
 
 This will perform unblessing using L<Function::Fallback::CoreOrPP::unbless()>.
 Should be done only for objects (C<-obj>).
+
+=item * ['die']
+
+Die. Only for testing.
 
 =item * ['code', STR]
 
@@ -547,7 +564,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
