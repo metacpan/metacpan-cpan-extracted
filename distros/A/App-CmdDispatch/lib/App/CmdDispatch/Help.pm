@@ -3,7 +3,7 @@ package App::CmdDispatch::Help;
 use warnings;
 use strict;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 sub new
 {
@@ -279,7 +279,7 @@ App::CmdDispatch::Help - Provide help functionality for the CmdDispatch module
 
 =head1 VERSION
 
-This document describes App::CmdDispatch::Help version 0.43
+This document describes App::CmdDispatch::Help version 0.44
 
 =head1 SYNOPSIS
 

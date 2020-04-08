@@ -172,3 +172,21 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+- ua: 'istellabot/t.1.13'
+  name: 'istellabot'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: 't.1.13'
+- ua: 'Mozilla/5.0 (compatible; Cincraw/1.0; +http://cincrawdata.net/bot/)'
+  name: 'Cincraw'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'

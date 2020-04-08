@@ -8,7 +8,7 @@ configure_requires:
   Module::Build: '0.4005'
   perl: 5.008_001
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojo::IOLoop::ReadWriteProcess:
     file: lib/Mojo/IOLoop/ReadWriteProcess.pm
-    version: '0.24'
+    version: '0.25'
   Mojo::IOLoop::ReadWriteProcess::CGroup:
     file: lib/Mojo/IOLoop/ReadWriteProcess/CGroup.pm
   Mojo::IOLoop::ReadWriteProcess::CGroup::v1:
@@ -87,12 +87,14 @@ resources:
   bugtracker: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess/issues
   homepage: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess
   repository: git://github.com/mudler/Mojo-IOLoop-ReadWriteProcess.git
-version: '0.24'
+version: '0.25'
 x_contributors:
   - 'Clemens Famulla-Conrad <cfamullaconrad@suse.de>'
   - 'Ettore Di Giacinto <mudler@gentoo.org>'
   - 'Ettore Di Giacinto <mudler@users.noreply.github.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Oliver Kurz <okurz@suse.de>'
+  - 'Santiago Zarate <santiago+github@zarate.co>'
   - 'Sebastian Riedel <sri@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

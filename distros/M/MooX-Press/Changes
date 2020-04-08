@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.058	2020-04-08
+
+ - Stop using MooX::TypeTiny for now; it introduces some weird coercion
+   bugs.
+
 0.057	2020-02-24
 
  - Eliminate some warnings when `make_attribute` is called to add an

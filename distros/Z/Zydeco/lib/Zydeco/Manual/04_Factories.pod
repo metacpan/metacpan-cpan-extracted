@@ -156,10 +156,10 @@ A key feature of custom factory methods is that although they are I<logically>
 part of the factory package, they are I<lexically> defined within the class,
 so have access to its lexical variables.
 
-=head2 Custom Factory Methods via a Proxy
+=head2 Factory Methods via a Proxy
 
-It is to instead define additional methods in the class itself and then
-install factory methods that call those.
+It is possible to instead define additional methods in the class itself and
+then install factory methods that call those.
 
   package MyApp {
     use Zydeco;
@@ -189,9 +189,6 @@ can use:
 
 One advantage of using a proxy is that subclasses can inherit the method and
 potentially override it.
-
-Another advantage is that the proxied method can be a multimethod.
-(Multimethods are discussed in the next chapter.)
 
 =head2 Singletons
 

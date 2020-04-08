@@ -6,7 +6,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.09
+Version 2.10
 
 =head1 SYNOPSIS
 
@@ -237,7 +237,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::subst;
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 use v5.14;
 use strict;
@@ -300,6 +300,8 @@ our $opt_warn_overlap = 1;
 our $opt_warn_include = 0;
 our $opt_stat_style = "default";
 our $opt_show_comment = 0;
+our $opt_show_numbers = 1;
+my %stat;
 
 my $current_file;
 my $contents;
@@ -327,12 +329,12 @@ sub subst_initialize {
 	@subst_diffcmd = ("diff", "-U$opt_U");
     }
 
-    for my $dict (@opt_dictfile) {
-	read_dict($dict);
-    }
-
-    if (my $select = $opt_subst_select) {
-	$dict->select($select);
+    for my $dictfile (@opt_dictfile) {
+	if (-d $dict) {
+	    warn "$dict is directory\n";
+	    next;
+	}
+	read_dict($dictfile);
     }
 }
 
@@ -377,19 +379,16 @@ my @match_list;
 
 sub subst_show_stat {
     my %arg = @_;
-
     my @fromto = $dict->dictionary;
-    my $from_max = max map { vwidth $_->string  } grep { defined } @fromto;
-    my $to_max   = max map { vwidth $_->correct } grep { defined } @fromto;
-
+    my($from_max, $to_max) = (0, 0);
+    my @show;
     for my $i (0 .. $#fromto) {
 	my $p = $fromto[$i] // next;
 	if ($p->is_comment) {
-	    say $p->comment if $opt_show_comment;
+	    push @show, [ $i, $p, {} ];
 	    next;
 	}
 	my($from_re, $to) = ($p->string, $p->correct // '');
-
 	my $hash = $match_list[$i] // {};
 	my @keys = keys %{$hash};
 	my @ng = grep { $_ ne $to } @keys;
@@ -403,11 +402,28 @@ sub subst_show_stat {
 	} elsif (is $ss_check 'ok') {
 	    next unless @ok;
 	}
+	$from_max = max $from_max, vwidth $from_re;
+	$to_max   = max $to_max  , vwidth $to;
+	push @show, [ $i, $p, $hash ];
+    }
+    if ($opt_show_numbers) {
+	printf "HIT_PATTERN=%d/%d NG=%d, OK=%d, TOTAL=%d\n",
+	    $stat{hit}, $stat{total},
+	    $stat{ng}, $stat{ok}, $stat{ng} + $stat{ok};
+    }
+    for my $show (@show) {
+	my($i, $p, $hash) = @$show;
+	if ($p->is_comment) {
+	    say $p->comment if $opt_show_comment;
+	    next;
+	}
+	my($from_re, $to) = ($p->string, $p->correct // '');
+	my @keys = keys %{$hash};
 	if ($opt_stat_style eq 'dict') {
 	    vprintf("%-${from_max}s // %s", $from_re // '', $to // '');
 	} else {
-	    vprintf("%3d: %${from_max}s => %-${to_max}s",
-		    $i + 1, $from_re // '', $to // '');
+	    vprintf("%${from_max}s => %-${to_max}s %4d:",
+		    $from_re // '', $to // '', $i + 1);
 	    for my $key ((sort { $hash->{$b} <=> $hash->{$a} }
 			  grep { $_ ne $to } @keys),
 			 (grep { $_ eq $to } @keys)) {
@@ -419,7 +435,6 @@ sub subst_show_stat {
 	}
 	print "\n";
     }
-
     $_ = "";
 }
 
@@ -489,12 +504,18 @@ sub subst_search {
 
     my @matched;
     my $index = -1;
+    my @effective;
+    my $ng = is $ss_check qw(ng any all none);
+    my $ok = is $ss_check qw(ok any all none);
+    my $outstand = is $ss_check qw(outstand);
     for my $p ($dict->dictionary) {
 	$index++;
 	$p // next;
 	next if $p->is_comment;
 	my($from_re, $to) = ($p->string, $p->correct // '');
 	my @match = match_regions pattern => $p->regex;
+	$stat{total}++;
+	$stat{hit}++ if @match;
 	next if @match == 0 and $opt_check ne 'all';
 	my $hash = $match_list[$index] //= {};
 	my $callback = sub {
@@ -518,17 +539,15 @@ sub subst_search {
 	    }
 	    $_->[3] = $callback;
 	}
-	my $mix =
-	    (is $ss_check qw(ng))           ? \@ng :
-	    (is $ss_check qw(ok))           ? \@ok :
-	    (is $ss_check qw(outstand))     ? ( @ng ? \@match : [] ) :
-	    (is $ss_check qw(any all none)) ? \@match :
-	    die "Invalid parameter: $opt_check\n";
+	$stat{ng} += @ng;
+	$stat{ok} += @ok;
+	$effective[ $index * 2     ] = 1 if $ng || ( @ng && $outstand );
+	$effective[ $index * 2 + 1 ] = 1 if $ok || ( @ng && $outstand );
 	mix_regions {
 	    overlap => ( my $overlap = [] ),
 	    include => ( my $include = [] ),
 	    nosort  => 1,
-	}, \@matched, $mix;
+	}, \@matched, \@match;
 	##
 	## Warning
 	##
@@ -551,7 +570,23 @@ sub subst_search {
 	    }
 	}
     }
-    @matched;
+    ##
+    ## --select
+    ##
+    if (my $select = $opt_subst_select) {
+	my $max = $dict->dictionary;
+	use Getopt::EX::Numbers;
+	my $numbers = Getopt::EX::Numbers->new(max => $max);
+	my %select = do {
+	    map  { ($_ * 2 => 1) , ($_ * 2 + 1 => 1) }
+	    map  { $_ - 1 }
+	    grep { $_ <= $max }
+	    map  { $numbers->parse($_)->sequence }
+	    split /,/, $select;
+	};
+	@matched = grep $select{$_->[2]}, @matched;
+    }
+    grep $effective[$_->[2]], @matched;
 }
 
 sub subst_diff {
@@ -650,33 +685,84 @@ option --divert-stdout --prologue __PACKAGE__::divert_stdout \
 option --with-stat     --epilogue subst_show_stat
 option --stat          --divert-stdout --with-stat
 
-option  --subst-color \
-        --cm 555D/100,K/433 \
-        --cm 555D/010,K/343 \
-        --cm 555D/001,K/334 \
-        --cm 555D/011,K/344 \
-        --cm 555D/101,K/434 \
-        --cm 555D/110,K/443 \
-        --cm 555D/111,K/444 \
-        --cm 555D/021,K/354 \
-        --cm 555D/201,K/534 \
-        --cm 555D/210,K/543 \
-        --cm 555D/012,K/345 \
-        --cm 555D/102,K/435 \
-        --cm 555D/120,K/453 \
-        --cm 555D/200,K/533 \
-        --cm 555D/020,K/353 \
-        --cm 555D/002,K/335 \
-        --cm 555D/022,K/355 \
-        --cm 555D/202,K/535 \
-        --cm 555D/220,K/553 \
-        --cm 555D/211,K/544 \
-        --cm 555D/121,K/454 \
-        --cm 555D/112,K/445 \
-        --cm 555D/122,K/455 \
-        --cm 555D/212,K/545 \
-        --cm 555D/221,K/554 \
-        --cm 555D/222,K/L23
+option  --subst-color --subst-color-light
+
+option  --subst-color-light \
+        --cm 555D/100,000/433 \
+        --cm 555D/010,000/343 \
+        --cm 555D/001,000/334 \
+        --cm 555D/011,000/344 \
+        --cm 555D/101,000/434 \
+        --cm 555D/110,000/443 \
+        --cm 555D/111,000/444 \
+        --cm 555D/021,000/354 \
+        --cm 555D/201,000/534 \
+        --cm 555D/210,000/543 \
+        --cm 555D/012,000/345 \
+        --cm 555D/102,000/435 \
+        --cm 555D/120,000/453 \
+        --cm 555D/200,000/533 \
+        --cm 555D/020,000/353 \
+        --cm 555D/002,000/335 \
+        --cm 555D/022,000/355 \
+        --cm 555D/202,000/535 \
+        --cm 555D/220,000/553 \
+        --cm 555D/211,000/544 \
+        --cm 555D/121,000/454 \
+        --cm 555D/112,000/445 \
+        --cm 555D/122,000/455 \
+        --cm 555D/212,000/545 \
+        --cm 555D/221,000/554 \
+        --cm 555D/222,000/L23
+
+option  --subst-color-dark \
+        --cm 000D/555,555/L01 \
+        --cm 000D/544,555/100 \
+        --cm 000D/454,555/010 \
+        --cm 000D/445,555/001 \
+        --cm 000D/455,555/011 \
+        --cm 000D/545,555/101 \
+        --cm 000D/554,555/110 \
+        --cm 000D/354,555/021 \
+        --cm 000D/534,555/201 \
+        --cm 000D/543,555/210 \
+        --cm 000D/345,555/012 \
+        --cm 000D/435,555/102 \
+        --cm 000D/453,555/120 \
+        --cm 000D/533,555/200 \
+        --cm 000D/353,555/020 \
+        --cm 000D/335,555/002 \
+        --cm 000D/355,555/022 \
+        --cm 000D/535,555/202 \
+        --cm 000D/553,555/220
+
+option  --subst-color-dark-2 \
+        --cm 000D/433,555/100 \
+        --cm 000D/343,555/010 \
+        --cm 000D/334,555/001 \
+        --cm 000D/344,555/011 \
+        --cm 000D/434,555/101 \
+        --cm 000D/443,555/110 \
+        --cm 000D/444,555/111 \
+        --cm 000D/354,555/021 \
+        --cm 000D/534,555/201 \
+        --cm 000D/543,555/210 \
+        --cm 000D/345,555/012 \
+        --cm 000D/435,555/102 \
+        --cm 000D/453,555/120 \
+        --cm 000D/533,555/200 \
+        --cm 000D/353,555/020 \
+        --cm 000D/335,555/002 \
+        --cm 000D/355,555/022 \
+        --cm 000D/535,555/202 \
+        --cm 000D/553,555/220 \
+        --cm 000D/544,555/211 \
+        --cm 000D/454,555/121 \
+        --cm 000D/445,555/112 \
+        --cm 000D/455,555/122 \
+        --cm 000D/545,555/212 \
+        --cm 000D/554,555/221 \
+        --cm 000D/L23,555/222
 
 ##
 ## Handle included sample dictionaries.

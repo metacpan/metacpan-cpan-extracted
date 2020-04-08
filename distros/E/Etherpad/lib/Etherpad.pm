@@ -4,6 +4,7 @@ package Etherpad;
 
 use Mojo::Base -base;
 use Mojo::UserAgent;
+use Mojo::JSON qw(decode_json);
 use Mojo::IOLoop;
 use Data::Dumper;
 use Carp qw(carp);
@@ -15,7 +16,7 @@ has 'password';
 has 'proxy';
 has 'ua' => sub { Mojo::UserAgent->new; };
 
-our $VERSION = '1.2.13.1';
+our $VERSION = '1.2.13.2';
 
 
 sub _execute {
@@ -40,10 +41,10 @@ sub _execute {
 
     $args->{args}->{apikey} = $c->apikey;
 
-    my $tx  = $c->ua->get($url => form => $args->{args});
-    my $res = $tx->result;
+    my $res = $c->ua->get($url => form => $args->{args})->result;
     if ($res->is_success) {
-        my $json = $res->json;
+        # Can’t use $res->json when json is too large
+        my $json = decode_json($res->body);
         if ($json->{code} == 0) {
             return 1 if $args->{boolean};
             my $data;
@@ -812,7 +813,7 @@ sub get_chat_head {
     }
 
     my $args = {
-        padId => $pad_id
+        padID => $pad_id
     };
 
     return $c->_execute({
@@ -1540,7 +1541,7 @@ Etherpad - interact with Etherpad API
 
 =head1 VERSION
 
-version 1.2.13.1
+version 1.2.13.2
 
 =head1 SYNOPSIS
 

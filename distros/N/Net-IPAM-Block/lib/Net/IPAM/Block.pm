@@ -4,7 +4,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 use overload
   '""'     => sub { shift->to_string },
@@ -480,6 +480,78 @@ The hostmask is only defined for real CIDR blocks.
 sub hostmask {
   my $mask = $_[0]->{mask} // return;
   return Net::IPAM::IP->new_from_bytes( ~( $mask->bytes ) );
+}
+
+=head2 bitlen
+
+C<< bitlen >> returns the minimum number of bits to represent a range from base to last
+
+  $n = $b->bitlen
+
+obvious for CIDR blocks:
+
+  $b = Net::IPAM::Block->new('10.0.0.0/24')
+  say $b->bitlen;     # 32 - 24 = 8 bit
+
+  $b = Net::IPAM::Block->new('::/0');
+  say $b->bitlen;     # 128 - 0 = 128 bit
+
+  
+not so obvious for ranges:
+
+  $b = Net::IPAM::Block->new('2001:db8::affe-2001:db8::cafe');
+  say $b->bitlen;     # 15 bit (at least)
+
+=cut
+
+sub bitlen {
+	my $self = shift;
+  my $bits = 32;
+  $bits = 128 if $self->version == 6;
+
+  return _bitlen($self->{base}->bytes, $self->{last}->bytes, $bits);
+}
+
+=head2 iter
+
+C<< iter >> returns the next IP in block, starting with base and stopping at last. Returns undef after last.
+
+  $b = Net::IPAM::Block->new('2001:db8::affe-2001:db8::cafe');
+  while ( my $ip = $b->iter ) {
+    say $ip;
+  }
+
+  OUTPUT:
+
+  2001:db8::affe
+  2001:db8::afff
+  2001:db8::b000
+  2001:db8::b001
+  ...
+  2001:db8::cafb
+  2001:db8::cafc
+  2001:db8::cafd
+  2001:db8::cafe
+
+=cut
+
+sub iter {
+  my $self = shift;
+
+  # init
+  unless ( defined $self->{iter} ) {
+
+    # initialize state
+    return $self->{iter} = $self->{base};
+  }
+
+  #next
+  if ( $self->{iter}->cmp( $self->{last} ) < 0 ) {
+    return $self->{iter} = $self->{iter}->incr;
+  }
+
+  # over
+  return;
 }
 
 =head2 cmp

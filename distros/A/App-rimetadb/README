@@ -2,8 +2,8 @@ NAME
     App::rimetadb - Manage a Rinci metadata database
 
 VERSION
-    This document describes version 0.224 of App::rimetadb (from Perl
-    distribution App-rimetadb), released on 2019-11-26.
+    This document describes version 0.225 of App::rimetadb (from Perl
+    distribution App-rimetadb), released on 2020-04-08.
 
 SYNOPSIS
     See the included CLI script rimetadb.
@@ -548,7 +548,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

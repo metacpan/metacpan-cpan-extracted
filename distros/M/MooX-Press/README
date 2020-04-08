@@ -1233,10 +1233,6 @@ DESCRIPTION
     provide code this way, it might be slightly faster.
 
   Optimization Features
-    MooX::Press will automatically load MooX::TypeTiny if it's installed,
-    which optimizes how Type::Tiny constraints and coercions are inlined into
-    Moo constructors. This is only used for Moo classes.
-
     MooX::Press will automatically load and apply MooX::XSConstructor if it's
     installed, which will optmimize constructors for some very basic classes.
     Again, this is only for Moo classes.

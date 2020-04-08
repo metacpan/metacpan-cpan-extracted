@@ -4,12 +4,12 @@ use warnings;
 use strict;
 use Term::ReadLine;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 my $term;
 sub new
 {
-    my $class = shift;
+    my ($class) = @_;
     $term ||= Term::ReadLine->new('CmdDispatch Shell');
     $term->ornaments( 0 );
     return bless { term => $term }, $class;
@@ -38,7 +38,7 @@ sub prompt
 
     sub new
     {
-        my $class = @_;
+        my ($class) = @_;
         return bless {}, $class;
     }
 
@@ -71,7 +71,7 @@ App::CmdDispatch::IO - Abstract out the input and output for C<App::CmdDispatch>
 
 =head1 VERSION
 
-This document describes C<App::CmdDispatch::IO> version 0.43
+This document describes C<App::CmdDispatch::IO> version 0.44
 
 =head1 SYNOPSIS
 

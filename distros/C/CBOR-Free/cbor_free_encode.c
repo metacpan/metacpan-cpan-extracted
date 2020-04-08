@@ -182,6 +182,23 @@ bool _check_reference( pTHX_ SV *varref, encode_ctx *encode_state ) {
     return true;
 }
 
+static inline I32 _magic_safe_hv_iterinit( pTHX_ HV* hash ) {
+    I32 count;
+
+    if (SvMAGICAL(hash)) {
+        count = 0;
+
+        while (hv_iternext(hash)) count++;
+
+        hv_iterinit(hash);
+    }
+    else {
+        count = hv_iterinit(hash);
+    }
+
+    return count;
+}
+
 void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
     ++encode_state->recurse_count;
 
@@ -193,6 +210,8 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
 
         _croak_encode( encode_state, NULL );
     }
+
+    SvGETMAGIC(value);
 
     if (!SvROK(value)) {
 
@@ -323,14 +342,12 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
         HV *hash = (HV *)SvRV(value);
 
         if (!encode_state->reftracker || _check_reference( aTHX_ (SV *)hash, encode_state)) {
-            SV *cur_sv;
             char *key;
             STRLEN key_length;
 
             HE* h_entry;
-            SV* svkey;
 
-            I32 keyscount = hv_iterinit(hash);
+            I32 keyscount = _magic_safe_hv_iterinit(aTHX_ hash);
 
             _init_length_buffer( aTHX_ keyscount, CBOR_TYPE_MAP, encode_state );
 
@@ -354,7 +371,7 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
                         sortables[curkey].buffer = SvPV(key_sv, sortables[curkey].length);
                     }
 
-                    sortables[curkey].value = HeVAL(h_entry);
+                    sortables[curkey].value = hv_iterval(hash, h_entry);
 
                     curkey++;
                 }
@@ -396,7 +413,7 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
                         _encode( aTHX_ key_sv, encode_state );
                     }
 
-                    _encode( aTHX_ HeVAL(h_entry), encode_state );
+                    _encode( aTHX_ hv_iterval(hash, h_entry), encode_state );
                 }
             }
         }

@@ -222,7 +222,7 @@ void _croak_cannot_decode_64bit( pTHX_ decode_ctx* decstate, const uint8_t *u64b
 
     SV* args[3] = {
         newSVpvs("CannotDecode64Bit"),
-        newSVpvn(u64bytes, 8),
+        newSVpvn( (const char *)u64bytes, 8),
         newSVuv(offset),
     };
 
@@ -340,7 +340,7 @@ static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
         case 0x1e:
         case 0x1f:  // indefinite must be handled outside this function.
             _croak_invalid_control( aTHX_ decstate );
-            break;
+            return 0; // Silence compiler warning.
 
         default:
             ret = (uint8_t) control->pieces.length_type;
@@ -527,6 +527,7 @@ void _decode_hash_entry( pTHX_ decode_ctx* decstate, HV *hash ) {
 
         default:
             _croak_invalid_map_key( aTHX_ decstate, decstate->curbyte[0], decstate->curbyte - decstate->start );
+            return; // Silence compiler warning.
     }
 
     SV *curval = _decode( aTHX_ decstate );

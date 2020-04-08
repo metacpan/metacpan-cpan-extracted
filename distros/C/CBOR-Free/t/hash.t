@@ -35,6 +35,16 @@ sub T3_basic {
     }
 }
 
+sub T1_many_keys {
+    my %hash = map { $_ => 1 } 1 .. 1256;
+
+    my $as_cbor = CBOR::Free::encode(\%hash);
+
+    my $rt = CBOR::Free::decode($as_cbor);
+
+    is_deeply( $rt, \%hash, '%Config-sized hash round trips' );
+}
+
 #----------------------------------------------------------------------
 
 sub T6_canonical {

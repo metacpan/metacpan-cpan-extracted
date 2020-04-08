@@ -110,6 +110,7 @@ ok $t1 < $t2, 'last getLastEdited should be when setText was performed';
 
 ok $ec->move_pad($p, $p2), 'movePad';
 
+sleep 1;
 $t = $ec->list_all_pads();
 is_deeply $t, [$p2], 'listAllPads';
 

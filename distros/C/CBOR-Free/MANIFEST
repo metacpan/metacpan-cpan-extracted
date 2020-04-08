@@ -1,6 +1,3 @@
-.appveyor.yml
-.gitignore
-.travis.yml
 Changes
 Free.xs
 LICENSE
@@ -35,6 +32,7 @@ t/against_cbor_xs.t
 t/array.t
 t/boolean.t
 t/cbor_numbers_sort_lex.t
+t/config.t
 t/dec_strings.t
 t/decode.t
 t/decode_map_keys.t

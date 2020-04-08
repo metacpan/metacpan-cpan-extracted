@@ -1,0 +1,9 @@
+- ua: 'Reeder/3.2.40 CFNetwork/1125.2 Darwin/19.4.0'
+  name: 'Reeder'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '3.2.40'

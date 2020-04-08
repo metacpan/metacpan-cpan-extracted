@@ -1,5 +1,11 @@
 Revision history for Net-IPAM-Block
 
+1.06    Wed, 08 Apr 2020 12:41:41 +0200
+        * documentation glitch
+
+1.05    Wed, 08 Apr 2020 12:02:37 +0200
+        * added methods bitlen() and iter()
+
 1.04    Mon, 06 Apr 2020 22:21:52 +0200
         * bump versions in prereqs
 

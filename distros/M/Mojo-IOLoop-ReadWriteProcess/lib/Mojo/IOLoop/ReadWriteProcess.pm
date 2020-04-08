@@ -1,6 +1,6 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
@@ -516,7 +516,6 @@ sub stop {
         . ") to kill process: "
         . $self->pid)
       if DEBUG;
-    sleep $self->sleeptime_during_kill if $self->sleeptime_during_kill;
     $self->session->_protect(
       sub {
         local $?;
@@ -525,6 +524,7 @@ sub stop {
         $self->_status($?) if $ret == $self->process_id;
       });
     $attempt++;
+    sleep $self->sleeptime_during_kill if $self->sleeptime_during_kill;
   }
 
   sleep $self->kill_sleeptime if $self->kill_sleeptime;

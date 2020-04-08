@@ -84,13 +84,7 @@ SKIP: {
         $cbor = CBOR::XS::encode_cbor($item);
         $decoded = CBOR::Free::decode($cbor);
 
-        my $item_q = ref($item) ? "$item" : do {
-            local $Data::Dumper::Useqq = 1;
-            local $Data::Dumper::Terse = 1;
-            local $Data::Dumper::Indent = 0;
-
-            Data::Dumper::Dumper($item);
-        };
+        my $item_q = ref($item) ? "$item" : _dump_string($item);
 
         is_deeply(
             $decoded,
@@ -107,6 +101,30 @@ SKIP: {
             sprintf( "CBOR::XS decodes what we encoded (%d bytes)", length $cbor),
         ) or diag sprintf('CBOR: %v.02x', $cbor);
     }
+
+    #----------------------------------------------------------------------
+
+    use Config;
+
+    for my $key (keys %Config::Config) {
+        my $cbxs = CBOR::XS::encode_cbor($Config::Config{$key});
+        my $cbf = CBOR::Free::encode($Config::Config{$key});
+
+        is(
+            _dump_string($cbf), _dump_string($cbxs),
+            "\$Config{$key}",
+        );
+    }
+}
+
+sub _dump_string {
+    my $item = shift;
+
+    local $Data::Dumper::Useqq = 1;
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Indent = 0;
+
+    return Data::Dumper::Dumper($item);
 }
 
 done_testing;

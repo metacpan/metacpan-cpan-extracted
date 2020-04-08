@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.516';
+our $VERSION   = '0.517';
 
 use Keyword::Simple ();
 use PPR;
@@ -570,7 +570,7 @@ our $GRAMMAR = qr{
 		(?<MxpMultiSyntax>
 		
 			(?&PerlOWS)
-			method
+			(?: method | factory )                        # CAPTURE:kind
 			(?&PerlOWS)
 			(?: (?&MxpSimpleIdentifier) )                 # CAPTURE:name
 			(?&PerlOWS)
@@ -1125,9 +1125,9 @@ sub _handle_method_keyword {
 	return $return;
 }
 
-sub _handle_multimethod_keyword {
+sub _handle_multi_keyword {
 	my $me = shift;
-	my ($name, $code, $has_sig, $sig, $attrs) = @_;
+	my ($kind, $name, $code, $has_sig, $sig, $attrs) = @_;
 	
 	my $optim;
 	my $extra_code = '';
@@ -1147,8 +1147,9 @@ sub _handle_multimethod_keyword {
 		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 		return sprintf(
-			'q[%s]->_multimethod(%s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, %s });',
+			'q[%s]->_multi(%s => %s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, %s });',
 			$me,
+			$kind,
 			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
 			$me->_stringify_attributes($attrs),
 			$munged_code,
@@ -1160,8 +1161,9 @@ sub _handle_multimethod_keyword {
 	else {
 		my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
 		return sprintf(
-			'q[%s]->_multimethod(%s, { attributes => %s, caller => __PACKAGE__, code => %s, named => 0, signature => sub { @_ }, %s });',
+			'q[%s]->_multi(%s => %s, { attributes => %s, caller => __PACKAGE__, code => %s, named => 0, signature => sub { @_ }, %s });',
 			$me,
+			$kind,
 			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
 			$me->_stringify_attributes($attrs),
 			$munged_code,
@@ -1805,14 +1807,18 @@ sub import {
 			'multi method <name> (<signature>) { <block> }',
 			'multi method <name> <attributes> { <block> }',
 			'multi method <name> { <block> }',
+			'multi factory <name> <attributes> (<signature>) { <block> }',
+			'multi factory <name> (<signature>) { <block> }',
+			'multi factory <name> <attributes> { <block> }',
+			'multi factory <name> { <block> }',
 			$ref,
 		);
 		
-		my ($pos, $name, $attributes, $sig, $code) = ($+[0], $+{name}, $+{attributes}, $+{sig}, $+{code});
+		my ($pos, $kind, $name, $attributes, $sig, $code) = ($+[0], $+{kind}, $+{name}, $+{attributes}, $+{sig}, $+{code});
 		my $has_sig = !!exists $+{sig};
 		my @attrs   = $attributes ? grep(defined, ( ($attributes) =~ /($re_attr)/xg )) : ();
 		
-		$me->_inject($ref, $pos, $me->_handle_multimethod_keyword($name, $code, $has_sig, $sig, \@attrs));
+		$me->_inject($ref, $pos, $me->_handle_multi_keyword($kind, $name, $code, $has_sig, $sig, \@attrs));
 	} if $want{multi};
 
 	# `before`, `after`, and `around` keywords
@@ -2205,17 +2211,32 @@ sub _can {
 	'MooX::Press'->install_methods($target, { $name => $code })
 }
 
-sub _multimethod {
+sub _multi {
 	my $me = shift;
-	my ($name, $spec) = @_;
+	my ($kind, $name, $spec) = @_;
 	
-	if (is_HashRef $TARGET) {
-		push @{ $TARGET->{multimethod} ||= [] }, $name => $spec;
-		return;
+	if ($kind eq 'factory') {
+		my $proxy_name = "__multi_factory_$name";
+		
+		if (is_HashRef $TARGET) {
+			$TARGET->{factory} ||= [];
+			push @{$TARGET->{factory}}, $name => \$proxy_name unless grep { $_ eq $name } @{$TARGET->{factory}};
+			push @{ $TARGET->{multimethod} ||= [] }, $proxy_name => $spec;
+			return;
+		}
+		
+		$me->_syntax_error('multi factory method declaration', 'Not supported outside class');
 	}
 	
-	my $target = $TARGET || caller;
-	'MooX::Press'->install_multimethod($target, 'class', $name, $spec);
+	else {
+		if (is_HashRef $TARGET) {
+			push @{ $TARGET->{multimethod} ||= [] }, $name => $spec;
+			return;
+		}
+		
+		my $target = $TARGET || caller;
+		'MooX::Press'->install_multimethod($target, 'class', $name, $spec);
+	}
 }
 
 sub _modifier {
@@ -2261,7 +2282,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.516';
+#	our $VERSION   = '0.517';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2272,7 +2293,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.516';
+#	our $VERSION   = '0.517';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2285,12 +2306,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.516';
+#	our $VERSION   = '0.517';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.516';
+#	our $VERSION   = '0.517';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2304,7 +2325,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.516';
+#	our $VERSION   = '0.517';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;

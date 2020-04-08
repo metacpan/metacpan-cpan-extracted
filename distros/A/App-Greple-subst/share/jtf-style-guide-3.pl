@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use utf8;
-use open IO => 'utf8', ':std';
+use open IO => ':utf8', ':std';
 
 use Data::Dumper;
 {
@@ -30,17 +30,16 @@ GetOptions(
     ) || usage({status => 1});
 
 use Data::Section -setup;
-
-my $header = do {
-    my $ref = __PACKAGE__->section_data("HEAD");
-    defined $ref ? $$ref :"";
+sub section {
+    my $ref;
+    ($ref = __PACKAGE__->section_data(+shift)) and $$ref;
 };
 
+my $header = section "HEAD";
+
 my $data = do {
-    my $ref = __PACKAGE__->section_data("DICT") // die "undefined";
-    local $_ = $$ref;
-    s/^\s*\n//gm;
-    s/^\s*#.*\n//gm;
+    local $_ = section "DICT" or die "No dictionary";
+    s/^\s*(?:#.*)?\n//mg;
     tr[〜～][]d;
     $_;
 };

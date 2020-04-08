@@ -163,6 +163,16 @@ sub init_app {
         read_schema => 1,
         schema => $schema,
     } );
+
+    # Add custom menu items
+    $app->yancy->editor->include( 'plugin/editor/custom_element' );
+    $app->yancy->editor->menu(
+        Plugins => 'Custom Element',
+        {
+            component => 'custom-element',
+        },
+    );
+
     my $upload_dir = tempdir;
     push @{ $app->static->paths }, $upload_dir;
     $upload_dir->child( 'uploads' )->make_path;
@@ -189,8 +199,11 @@ my $t = Test::Mojo->with_roles("+Selenium")->new( $app )
 $t->navigate_ok("/yancy")
     ->status_is(200)
     ->wait_for( '#sidebar-schema-list li:nth-child(2) a' )
+    # Make sure we didn't add anything to the history stack
+    ->main::script_result_is( 'return window.history.length', 2, 'only the new window page and current page in history' )
     ->click_ok( '#sidebar-schema-list li:nth-child(2) a' )
     ->wait_for( 'table[data-schema=people]' )
+    ->main::script_result_is( 'return window.history.length', 3, 'another page in history' )
     ->main::capture( 'people-list' )
     ->click_ok( '#add-item-btn' )
     ->main::capture( 'people-new-item-form' )
@@ -266,6 +279,25 @@ subtest 'upload file' => sub {
         ;
 };
 
+subtest 'yes/no fields' => sub {
+    $t->click_ok( '#sidebar-schema-list li:nth-child(1) a', 'click blog schema' )
+      ->wait_for( 'table[data-schema=blog]' )
+      ->click_ok( 'table[data-schema=blog] tbody tr:nth-child(1) a.edit-button' )
+      ->wait_for( '.edit-form .yes-no' )
+      ->live_element_exists( '.edit-form .yes-no :nth-child(2).active', 'Published is "No"' )
+      ->click_ok( '.edit-form .yes-no :nth-child(1)', 'click Published: "Yes"' )
+      ->main::scroll_to( '.edit-form .save-button' )
+      ->click_ok( '.edit-form .save-button' )
+      ->wait_for( '.toast, .alert', 'save toast banner or error' )
+      ->click_ok( '.toast-header button.close', 'dismiss toast banner' )
+      ->click_ok( 'table tbody tr:nth-child(1) a.edit-button' )
+      ->wait_for( '.edit-form .yes-no' )
+      ->live_element_exists( '.edit-form .yes-no :nth-child(1).active', 'Published is "Yes"' )
+      ->main::scroll_to( '.edit-form .cancel-button' )
+      ->click_ok( '.edit-form .cancel-button' )
+      ;
+};
+
 subtest 'x-foreign-key' => sub {
     $t->click_ok( '#sidebar-schema-list li:nth-child(1) a', 'click blog schema' )
       ->wait_for( 'table[data-schema=blog]' )
@@ -301,37 +333,7 @@ subtest 'x-foreign-key' => sub {
 };
 
 subtest 'custom menu' => sub {
-    my $app = init_app;
-
-    # Add custom menu items
-    $app->yancy->editor->include( 'plugin/editor/custom_element' );
-    $app->yancy->editor->menu(
-        Plugins => 'Custom Element',
-        {
-            component => 'custom-element',
-        },
-    );
-
-    my $t = Test::Mojo->with_roles("+Selenium")->new( $app )
-        ->driver_args({
-            desired_capabilities => {
-                # This causes no window to appear. It took me forever to
-                # figure this out ... but it no longer works in Chrome 77
-                # chromeOptions => {
-                #     args => [ 'headless', 'window-size=1024,768' ],
-                # },
-            },
-        })
-        ->screenshot_directory( $Bin )
-        ->setup_or_skip_all;
-    $t->navigate_ok("/yancy")
-        # Test normal size and create screenshots for the docs site
-        # XXX This no longer works with Chrome 77
-        #->set_window_size( [ 800, 600 ] )
-        ->screenshot_directory( $Bin )
-        ->status_is(200)
-        # Custom plugin menu
-        ->click_ok( '#sidebar-collapse h6:nth-of-type(1) + ul li:nth-child(1) a' )
+    $t->click_ok( '#sidebar-collapse h6:nth-of-type(1) + ul li:nth-child(1) a' )
         ->wait_for( '#custom-element', 'custom element is shown' )
         ->main::capture( 'custom-element-clicked' )
         ;
@@ -356,3 +358,33 @@ sub capture {
     $i++;
     return $t;
 }
+
+#=head2 scroll_to
+#
+#   $t->main::scroll_to( $selector )
+#
+# Scroll so the given element is in the middle of the viewport
+sub scroll_to {
+    my ( $t, $selector ) = @_;
+    $t->tap( sub {
+        $_->driver->execute_script(
+            'document.querySelector(arguments[0]).scrollIntoView({ block: "center" })',
+            $selector,
+        )
+    } );
+}
+
+sub script_result_is {
+    my ( $t, $script, $value, $description ) = @_;
+    $t->tap( sub {
+        is $_->driver->execute_script( $script ), $value, $description;
+    } );
+}
+
+sub script_diag {
+    my ( $t, $script ) = @_;
+    $t->tap( sub {
+        diag explain $t->driver->execute_script( $script );
+    } );
+}
+

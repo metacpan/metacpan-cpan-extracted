@@ -1,0 +1,9 @@
+- ua: 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/538.1 (KHTML, like Gecko) QuiteRSS/0.18.2 Safari/538.1 1'
+  name: 'QuiteRSS'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: true
+  is_chromeos: false
+  version: '0.18.2'

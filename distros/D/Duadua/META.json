@@ -1,5 +1,5 @@
 {
-   "abstract" : "Detect User-Agent",
+   "abstract" : "Detect User-Agent, do up again!",
    "author" : [
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
@@ -66,6 +66,6 @@
          "url" : "http://github.com/bayashi/Duadua"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

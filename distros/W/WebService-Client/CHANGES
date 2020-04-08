@@ -3,8 +3,30 @@ Changes from 2010-04-11 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version 1.0000 at 2020-04-08 01:48:31 +0000
+version 1.0001 at 2020-04-08 04:16:41 +0000
 -------------------------------------------
+
+  Change: d13324674f010a713a13af4e9a743d9720995b5b
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2020-04-08 00:13:35 +0000
+
+    Get the decoded_content of the http response in v2 mode 
+
+  Change: 8ce8aa6ace3638d2c63e60d36ad487db37d0e5bd
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2020-04-07 22:22:36 +0000
+
+    Add an example of how to use the v2 mode 
+
+-------------------------------------------
+version 1.0000 at 2020-04-08 01:49:43 +0000
+-------------------------------------------
+
+  Change: a57076bc37dd1916dbc4ba9209ff5b082201e8db
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2020-04-07 21:49:43 +0000
+
+    v1.0000 
 
   Change: 69b2cf1de001eddb6c13a9326b55be8341711d37
   Author: Naveed Massjouni <nmassjouni@harmonia.com>

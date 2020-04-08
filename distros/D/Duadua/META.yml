@@ -1,5 +1,5 @@
 ---
-abstract: 'Detect User-Agent'
+abstract: 'Detect User-Agent, do up again!'
 author:
   - 'Dai Okabayashi <bayashi@cpan.org>'
 build_requires:
@@ -37,5 +37,5 @@ resources:
   bugtracker: http://github.com/bayashi/Duadua/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/bayashi/Duadua
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

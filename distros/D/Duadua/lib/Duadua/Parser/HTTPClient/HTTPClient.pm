@@ -278,6 +278,18 @@ sub _java {
             $h->{version} = $version if $version;
         }
     }
+    elsif ( index($d->ua, 'Dalvik/') > -1 ) {
+        $h = {
+            name       => 'HttpURLConnection Dalvik',
+            is_android => 1,
+            is_linux   => 1,
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!^Dalvik/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+    }
 
     return $h;
 }

@@ -5,6 +5,7 @@ lib/Duadua.pm
 lib/Duadua/CLI.pm
 lib/Duadua/Parser.pm
 lib/Duadua/Parser/Bot/AdIdxBot.pm
+lib/Duadua/Parser/Bot/AdstxtCom.pm
 lib/Duadua/Parser/Bot/Applebot.pm
 lib/Duadua/Parser/Bot/Baiduspider.pm
 lib/Duadua/Parser/Bot/Barkrowler.pm
@@ -32,6 +33,8 @@ lib/Duadua/Parser/Bot/Msnbot.pm
 lib/Duadua/Parser/Bot/Netcraft.pm
 lib/Duadua/Parser/Bot/OldReader.pm
 lib/Duadua/Parser/Bot/OracleGrapeshotCrawler.pm
+lib/Duadua/Parser/Bot/QuiteRSS.pm
+lib/Duadua/Parser/Bot/Reeder.pm
 lib/Duadua/Parser/Bot/Sakura.pm
 lib/Duadua/Parser/Bot/Slackbot.pm
 lib/Duadua/Parser/Bot/SMTBot.pm
@@ -42,6 +45,7 @@ lib/Duadua/Parser/Bot/YandexBot.pm
 lib/Duadua/Parser/Browser/AppleSafari.pm
 lib/Duadua/Parser/Browser/BrowserMisc.pm
 lib/Duadua/Parser/Browser/DuckDuckGo.pm
+lib/Duadua/Parser/Browser/GoogleApp.pm
 lib/Duadua/Parser/Browser/GoogleChrome.pm
 lib/Duadua/Parser/Browser/MicrosoftEdge.pm
 lib/Duadua/Parser/Browser/MicrosoftInternetExplorer.pm
@@ -68,6 +72,7 @@ t/15_reparse.t
 t/20_util.t
 t/50_cli.t
 t/testset/bot/adidxbot.yaml
+t/testset/bot/adstxt_com.yaml
 t/testset/bot/applebot.yaml
 t/testset/bot/baiduspider.yaml
 t/testset/bot/barkrowler.yaml
@@ -96,6 +101,8 @@ t/testset/bot/msnbot.yaml
 t/testset/bot/netcraft.yaml
 t/testset/bot/oldreader.yaml
 t/testset/bot/oracle_grapeshotcrawler.yaml
+t/testset/bot/quiterss.yaml
+t/testset/bot/reeder.yaml
 t/testset/bot/sakura.yaml
 t/testset/bot/slackbot.yaml
 t/testset/bot/smtbot.yaml
@@ -106,6 +113,7 @@ t/testset/bot/yandexbot.yaml
 t/testset/browser/apple_safari.yaml
 t/testset/browser/browser_misc.yaml
 t/testset/browser/duckduckgo.yaml
+t/testset/browser/google_app.yaml
 t/testset/browser/google_chrome.yaml
 t/testset/browser/microsoft_edge.yaml
 t/testset/browser/microsoft_internet_explorer.yaml

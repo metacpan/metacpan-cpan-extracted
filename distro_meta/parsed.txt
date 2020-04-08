@@ -63520,3 +63520,17 @@ N/NE/NERDVANA/Language-FormulaEngine-0.05.tar.gz
 D/DA/DAGOLDEN/MongoDBx-Queue-2.002.tar.gz
 I/IR/IRONCAMEL/WebService-Client-1.0000.tar.gz
 P/PE/PERLANCAR/Zodiac-Chinese-Table-0.021.tar.gz
+G/GW/GWADEJ/App-CmdDispatch-0.44.tar.gz
+U/UT/UTASHIRO/App-Greple-subst-2.10.tar.gz
+P/PE/PERLANCAR/App-rimetadb-0.225.tar.gz
+F/FE/FELIPE/CBOR-Free-0.23.tar.gz
+B/BA/BAYASHI/Duadua-0.18.tar.gz
+L/LD/LDIDRY/Etherpad-1.2.13.2.tar.gz
+M/MU/MUDLER/Mojo-IOLoop-ReadWriteProcess-0.25.tar.gz
+T/TE/TESMITH/Mojo-WebService-LastFM-0.02.tar.gz
+P/PR/PREACTION/Yancy-1.050.tar.gz
+T/TO/TOBYINK/MooX-Press-0.058.tar.gz
+T/TO/TOBYINK/Zydeco-0.517.tar.gz
+G/GA/GAISSMAI/Net-IPAM-Block-1.06.tar.gz
+W/WY/WYANT/Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter-0.106.tar.gz
+I/IR/IRONCAMEL/WebService-Client-1.0001.tar.gz

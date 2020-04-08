@@ -1,3 +1,8 @@
+0.225   2020-04-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [build] Rebuild, to update Sah coerce rule module names.
+
+
 0.224   2019-11-26  Released-By: PERLANCAR; Urgency: high
 
         - Merge two releases (0.223.1, 0.223).
@@ -156,7 +161,7 @@
 	- Switch to SQL::Schema::Versioned (module renamed).
 
 
-0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.06     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - [build] CLI scripts are now generated automatically using
            Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the

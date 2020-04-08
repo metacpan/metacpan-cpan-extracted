@@ -16,7 +16,7 @@ use Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter;
 use Readonly;
 use Pod::Usage;
 
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 
 Readonly::Scalar my $DEFAULT_SINGLE_FILE_FORMAT => 4;
 Readonly::Scalar my $DEFAULT_MULTI_FILE_FORMAT  => 5;
@@ -33,6 +33,7 @@ GetOptions( \%opt, qw{
         allow_state_in_expression|state-in-expression!
         prohibit_reference_only_variables|reference-only-variables!
         prohibit_returned_lexicals|returned-lexicals!
+        dump! trace=s
     },
     'format=s'  => \( my $format ),
     'verbose!'  => \( my $verbose ),
@@ -58,18 +59,22 @@ my $critic = Perl::Critic->new(
 
 $critic->add_policy(
     -policy => 'Variables::ProhibitUnusedVarsStricter',
-    -config => \%opt,
+    -config => \%opt
 );
 
-Perl::Critic::Violation::set_format(
-    defined $format ? $format :
-    ( @ARGV > 1 || -d $ARGV[0] ) ?
-        $DEFAULT_MULTI_FILE_FORMAT :
-        $DEFAULT_SINGLE_FILE_FORMAT
-);
+{
+    no warnings qw{ newline };  ## no critic (ProhibitNoWarnings)
+    Perl::Critic::Violation::set_format(
+        defined $format ? $format :
+        ( @ARGV > 1 || -d $ARGV[0] ) ?
+            $DEFAULT_MULTI_FILE_FORMAT :
+            $DEFAULT_SINGLE_FILE_FORMAT
+    );
+}
 
 foreach my $fn ( @ARGV ) {
 
+    no warnings qw{ newline };  ## no critic (ProhibitNoWarnings)
     foreach my $pf ( -e $fn ? all_perl_files( $fn ) : \$fn ) {
         my @violations = Perl::Critic::Violation::sort_by_location(
             $critic->critique( $pf ) );
@@ -112,6 +117,15 @@ unique abbreviations.
 
 Variables computed by subroutines or methods specified to this option
 are ignored. It can be specified more than once.
+
+=head2 --dump
+
+ --dump
+
+This B<unsupported> Boolean option causes a dump of variables and their
+declarations to C<STDERR>.
+
+This option and its effects can be changed or retracted without notice.
 
 =head2 --format
 
@@ -156,6 +170,17 @@ If this Boolean option is asserted, unused variables unpacked from
 subroutine arguments are ignored.
 
 The default is C<--no-subroutine-arguments>.
+
+=head2 --trace
+
+ --trace '$foo %bar'
+
+This B<unsupported> option causes all definitions and uses of the given
+variables to be displayed to C<STDERR>. Multiple variables are
+space-separated. True sigils are used -- that is, C<$foo> refers only to
+the scalar.
+
+This option and its effects may be changed or retracted without notice.
 
 =head2 --verbose
 

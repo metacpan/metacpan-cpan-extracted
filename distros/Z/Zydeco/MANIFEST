@@ -48,6 +48,7 @@ t/27rolehooks.t
 t/31lexhas.t
 t/40loading.t
 t/41ps.t
+t/42mf.t
 t/50complextypes.t
 t/51mixedsigs.t
 t/52lists.t

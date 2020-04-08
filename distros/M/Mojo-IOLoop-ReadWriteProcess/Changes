@@ -1,5 +1,9 @@
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+0.25 2020-04-08T14:48:01Z
+   - In "stop" sleep only after sending the first signal to speedup termination by okurz
+   - Various fixups in test suite
+
 0.24 2019-10-15T11:11:50Z
 
    - Fix compatibility with Mojolicious 8.23 by kraih

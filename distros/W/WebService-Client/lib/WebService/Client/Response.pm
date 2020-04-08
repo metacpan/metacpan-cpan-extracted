@@ -1,7 +1,7 @@
 package WebService::Client::Response;
 use Moo;
 
-our $VERSION = '1.0000'; # VERSION
+our $VERSION = '1.0001'; # VERSION
 
 use JSON::MaybeXS ();
 
@@ -30,7 +30,7 @@ has json => (
 
 sub data {
     my ($self) = @_;
-    return $self->json->decode($self->content);
+    return $self->json->decode($self->decoded_content);
 }
 
 sub ok {
@@ -52,7 +52,7 @@ WebService::Client::Response
 
 =head1 VERSION
 
-version 1.0000
+version 1.0001
 
 =head1 AUTHOR
 

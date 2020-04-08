@@ -24,12 +24,13 @@ no_index:
 provides:
   Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter:
     file: lib/Perl/Critic/Policy/Variables/ProhibitUnusedVarsStricter.pm
-    version: '0.105'
+    version: '0.106'
 recommends:
   File::Which: '0'
 requires:
   PPI::Token::Symbol: '0'
-  PPIx::QuoteLike: '0.005'
+  PPIx::QuoteLike: '0.011'
+  PPIx::Regexp: '0.071'
   Perl::Critic::Document: '1.119'
   Perl::Critic::Policy: '1.119'
   Perl::Critic::Utils: '1.119'
@@ -43,5 +44,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter.git
-version: '0.105'
+version: '0.106'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

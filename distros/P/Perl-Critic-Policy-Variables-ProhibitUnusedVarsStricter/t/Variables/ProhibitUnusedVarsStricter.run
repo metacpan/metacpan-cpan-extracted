@@ -225,6 +225,8 @@ my %fruit = (
 my $teddy = 'Theodore';
 my $one = 'I'
 my $five = 'V';
+my $v6 = 6;
+my $bear = \$teddy;
 
 "$foo";
 qq{$bar};
@@ -232,6 +234,9 @@ qq{$bar};
 qq{$fruit{apple}};
 "\\${teddy}bear";
 "$one$five";
+"${v6}_...";    # Yes, this occurred.
+s{(foo)}{ my $t = $teddy; my $r = $1; $t =~ s/\\1/$r/; }smxe;   # Yes, this is real
+"$${bear}"; # Parsed as Magic '$$', Subscript '{bear}'
 
 #-----------------------------------------------------------------------------
 
@@ -397,16 +402,18 @@ print { $fh } "Hello, sailor!\n";
 
 \( my $foo = 'bar' );
 \do { my $bar = 'baz' };
+\( my $x, my $y );
 
 #-----------------------------------------------------------------------------
 
 ## name Taking a reference is not OK if the user says not
 ## parms { prohibit_reference_only_variables => '1' }
-## failures 2
+## failures 4
 ## cut
 
 \( my $foo = 'bar' );
 \do { my $bar = 'baz' };
+\( my $x, my $y );
 
 #-----------------------------------------------------------------------------
 
@@ -586,6 +593,49 @@ my $x = [ qw{ Conan Solomon Bran Kull } ];
 if ( my ( undef, $x ) = @{ $x } ) {
     say $x;
 }
+
+#-----------------------------------------------------------------------------
+
+## name Unused variables declared in passing
+## failures 1
+## cut
+
+Readonly::Scalar my $foo = 'bar';
+
+#-----------------------------------------------------------------------------
+
+## name Variables declared in passing
+## failures 0
+## cut
+
+Readonly::Scalar my $foo = 'bar';
+say "$foo";
+
+#-----------------------------------------------------------------------------
+
+## name Unused variables declared in stringy things
+## failures 2
+## cut
+
+my $bar = 'bar';
+s/foo/ my $bar = 'baz' /smxe;
+say $bar;
+my $answer = 42;
+say "@{[ my $answer = 43; ]}";
+say $answer;
+
+#-----------------------------------------------------------------------------
+
+## name Variables declared and used in stringy things
+## failures 0
+## cut
+
+my $bar = 'bar';
+s/foo/ my $bar = 'baz'; $bar /smxe;
+say $bar;
+my $answer = 42;
+say "@{[ my $answer = 43; $answer ]}";
+say $answer;
 
 #-----------------------------------------------------------------------------
 

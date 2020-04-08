@@ -18,6 +18,13 @@ use constant COMMON_DEFINITION => (
 			handles      => { 'inc_foo' => [ 'inc', 1 ] },
 		},
 	],
+	can => {
+		'foo_lvalue' => {
+			code       => 'sub { $_[0]{foo} }',
+			attributes => [ 'lvalue' ],
+			optimize   => 1,
+		},
+	}
 );
 
 use MooX::Press (
@@ -43,6 +50,9 @@ for my $toolkit (qw/ Moo Moose Mouse /) {
 	$obj->inc_foo;
 	
 	is ($obj->{foo}, 43, 'attribute can be modified by handler' );
+	
+	$obj->foo_lvalue = 99;
+	is ($obj->{foo}, 99, ':lvalue' );
 }
 
 done_testing;

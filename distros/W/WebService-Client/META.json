@@ -68,11 +68,11 @@
    "provides" : {
       "WebService::Client" : {
          "file" : "lib/WebService/Client.pm",
-         "version" : "1.0000"
+         "version" : "1.0001"
       },
       "WebService::Client::Response" : {
          "file" : "lib/WebService/Client/Response.pm",
-         "version" : "1.0000"
+         "version" : "1.0001"
       }
    },
    "release_status" : "stable",
@@ -86,7 +86,7 @@
          "web" : "https://github.com/ironcamel/WebService-Client"
       }
    },
-   "version" : "1.0000",
+   "version" : "1.0001",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.15"
 }

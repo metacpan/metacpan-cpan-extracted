@@ -1,0 +1,9 @@
+- ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/99.0.302108490 Mobile/15E148 Safari/605.1'
+  name: 'Google App'
+  is_bot: false
+  is_ios: true
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '99.0.302108490'

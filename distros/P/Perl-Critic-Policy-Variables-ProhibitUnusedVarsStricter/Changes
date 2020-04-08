@@ -1,3 +1,18 @@
+0.106		2020-04-08	T. R. Wyant
+    Dig out variables declared inside strings e.g. "foo@{[ my $bar ]}"
+
+    Find variables declared in passing.  That is, things like
+    Readonly::Scalar my $answer => 42; which do not get parsed by PPI as
+    a PPI::Statement::Variable.
+
+    Pick up $y in '( my $x, my $y )'. The previous code picked up only
+    the variables declared before the first comma in the
+    PPI::Statement::Variable.
+
+    Refactor handling of derived PPI documents.
+
+    Refactor the recording of symbol declarations and uses.
+
 0.105		2020-02-18	T. R. Wyant
     examples/unused-vars is now driven by options on the command line,
     not by a configuration file.

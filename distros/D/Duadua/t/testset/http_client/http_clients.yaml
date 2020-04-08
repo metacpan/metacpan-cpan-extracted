@@ -292,3 +292,12 @@
   is_linux: flase
   is_windows: false
   is_chromeos: false
+- ua: 'Dalvik/2.1.0 (Linux; U; Android 7.0; SM-G930V Build/NRD90M)'
+  name: 'HttpURLConnection Dalvik'
+  is_bot: false
+  is_ios: false
+  is_android: true
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+  version: '2.1.0'

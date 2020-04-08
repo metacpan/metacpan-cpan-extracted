@@ -189,10 +189,9 @@ Candidates declared earlier beat candidates declared later.
 
 For all the gory details, see L<Sub::MultiMethod>.
 
-=head2 Multi... Factories?
+=head2 Multi Factories
 
-There is no C<< multi factory >>, but you can use proxying to achieve
-the same effect.
+Yes, C<multi> and C<factory> can be used together.
 
   package MyApp {
     use Zydeco;
@@ -200,25 +199,29 @@ the same effect.
     class Person {
       has name, age;
       
-      multi method _new_person ( Str $name ) {
+      multi factory new_person ( Str $name ) {
         $class->new( name => $name );
       }
       
-      multi method _new_person ( Str $name, Num $age ) {
+      multi factory new_person ( Str $name, Num $age ) {
         $class->new( name => $name, age => $age );
       }
       
-      multi method _new_person ( HashRef $args ) {
+      multi factory new_person ( HashRef $args ) {
         $class->new( %$args );
       }
-      
-      factory new_person via _new_person;
     }
   }
   
   my $alice  = MyApp->new_person("Alice");
   my $bob    = MyApp->new_person("Bob", 49);
   my $carol  = MyApp->new_person({ name => "Carol" });
+
+Internally this works by creating a multi method called
+"__multi_factory_new_person" and creating a factory method which
+calls that.
+
+The C<via> syntax isn't supported with multi factories.
 
 =head2 Abbreviated Syntax
 
@@ -238,8 +241,9 @@ In this chapter, we looked at the following keyword:
 
 =head1 NEXT STEPS
 
-We have looked at three ways to define methods: C<method>, C<factory>, and
-C<< multi method >>. Now let's look at how to modify existing methods.
+We have looked at four ways to define methods: C<method>, C<factory>,
+C<< multi method >>, and C<< multi factory >>. Now let's look at how to
+modify existing methods.
 
 =over
 

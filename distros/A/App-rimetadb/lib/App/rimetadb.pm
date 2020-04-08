@@ -1,7 +1,7 @@
 package App::rimetadb;
 
-our $DATE = '2019-11-26'; # DATE
-our $VERSION = '0.224'; # VERSION
+our $DATE = '2020-04-08'; # DATE
+our $VERSION = '0.225'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1033,7 +1033,7 @@ App::rimetadb - Manage a Rinci metadata database
 
 =head1 VERSION
 
-This document describes version 0.224 of App::rimetadb (from Perl distribution App-rimetadb), released on 2019-11-26.
+This document describes version 0.225 of App::rimetadb (from Perl distribution App-rimetadb), released on 2020-04-08.
 
 =head1 SYNOPSIS
 
@@ -1072,6 +1072,7 @@ DBI connection password.
 =item * B<user> => I<str>
 
 DBI connection user.
+
 
 =back
 
@@ -1135,6 +1136,7 @@ Select arguments with specific type only.
 
 DBI connection user.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1185,6 +1187,7 @@ DBI connection password.
 
 DBI connection user.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1230,6 +1233,7 @@ DBI connection password.
 =item * B<user> => I<str>
 
 DBI connection user.
+
 
 =back
 
@@ -1285,6 +1289,7 @@ DBI connection password.
 
 DBI connection user.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1306,7 +1311,7 @@ Usage:
 
  meta(%args) -> [status, msg, payload, meta]
 
-Get package/function metadata from the database.
+Get packageE<sol>function metadata from the database.
 
 This function is not exported.
 
@@ -1334,6 +1339,7 @@ DBI connection password.
 =item * B<user> => I<str>
 
 DBI connection user.
+
 
 =back
 
@@ -1385,6 +1391,7 @@ DBI connection password.
 
 DBI connection user.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1431,6 +1438,7 @@ DBI connection password.
 
 DBI connection user.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1452,7 +1460,7 @@ Usage:
 
  update(%args) -> [status, msg, payload, meta]
 
-Add/update a package or function metadata in the database.
+AddE<sol>update a package or function metadata in the database.
 
 This routine lets you add/update a package or function metadata in the database
 with the specified metadata.
@@ -1489,6 +1497,7 @@ DBI connection password.
 =item * B<user> => I<str>
 
 DBI connection user.
+
 
 =back
 
@@ -1571,7 +1580,7 @@ C<perl> and use its C<-I> option.
 
 =item * B<module_or_package>* => I<array[perl::modname_or_prefix]>
 
-Perl module or prefixes or package to add/update.
+Perl module or prefixes or package to addE<sol>update.
 
 For each entry, you can specify:
 
@@ -1609,6 +1618,7 @@ Use a Perl module, a la Perl's -M.
 
 DBI connection user.
 
+
 =back
 
 Special arguments:
@@ -1617,7 +1627,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1658,7 +1668,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

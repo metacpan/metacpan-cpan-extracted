@@ -5,12 +5,12 @@ use warnings;
 sub set_os {
     my ($class, $d, $h) = @_;
 
-    if ( index($d->ua, 'Android') > -1 ) {
+    if ( index($d->ua, 'Win') > -1 && (index($d->ua, 'Win32') > -1 || index($d->ua, 'Windows') > -1) ) {
+        $h->{is_windows} = 1;
+    }
+    elsif ( index($d->ua, 'Android') > -1 ) {
         $h->{is_android} = 1;
         $h->{is_linux}   = 1; # Android is Linux also.
-    }
-    elsif ( index($d->ua, 'Win32') > -1 || index($d->ua, 'Windows') > -1 ) {
-        $h->{is_windows} = 1;
     }
     elsif ( index($d->ua, 'iPhone') > -1 ) {
         $h->{is_ios} = 1;

@@ -27,7 +27,7 @@ WriteMakefile1(
     ABSTRACT_FROM => 'lib/CBOR/Free.pm',
     LICENSE      => 'perl',
 
-    INC => '-I.',
+    INC => '-Wall -I.',
 
     OBJECT => [
         '$(BASEEXT)$(OBJ_EXT)',

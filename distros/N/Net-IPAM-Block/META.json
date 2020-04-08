@@ -37,10 +37,10 @@
    "provides" : {
       "Net::IPAM::Block" : {
          "file" : "lib/Net/IPAM/Block.pm",
-         "version" : "1.04"
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
-   "version" : "1.04",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

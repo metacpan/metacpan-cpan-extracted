@@ -5,12 +5,13 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.057';
+our $VERSION   = '0.058';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
 use Exporter::Tiny qw(mkopt);
 use Import::Into;
+use match::simple qw(match);
 use Module::Runtime qw(use_module);
 use namespace::autoclean;
 
@@ -615,7 +616,7 @@ sub _make_package {
 	}
 	else {
 		use_module($toolkit)->import::into($qname);
-		use_module("MooX::TypeTiny")->import::into($qname) if $toolkit eq 'Moo' && eval { require MooX::TypeTiny };
+#		use_module("MooX::TypeTiny")->import::into($qname) if $toolkit eq 'Moo' && eval { require MooX::TypeTiny };
 		use_module("MooseX::XSAccessor")->import::into($qname) if $toolkit eq 'Moose' && eval { require MooseX::XSAccessor };
 		use_module("namespace::autoclean")->import::into($qname);
 		
@@ -1410,7 +1411,7 @@ sub install_methods {
 	
 	for my $name (sort keys %$methods) {
 		no strict 'refs';
-		my ($code, $signature, $signature_style, $invocant_count, $is_coderef, $caller, @curry);
+		my ($code, $signature, $signature_style, $invocant_count, $is_coderef, $caller, $attrs, @curry);
 		$caller = $class;
 		
 		if (is_CodeRef($methods->{$name})) {
@@ -1418,6 +1419,7 @@ sub install_methods {
 			$signature_style = 'none';
 		}
 		elsif (is_HashRef($methods->{$name})) {
+			$attrs      = $methods->{$name}{attributes};
 			$code       = $methods->{$name}{code};
 			$signature  = $methods->{$name}{signature};
 			@curry      = @{ $methods->{$name}{curry} || [] };
@@ -1453,6 +1455,9 @@ sub install_methods {
 			$callcode = "package $caller; $callcode" if defined $caller;
 		}
 		
+		my $attrs_string = $is_coderef ? "" : ":method";
+		$attrs_string .= " :lvalue" if match("lvalue", $attrs);
+		
 		my $subcode = sprintf(
 			q{
 				package %-49s  # package name
@@ -1470,7 +1475,7 @@ sub install_methods {
 			(($signature && !$optimized)
 				? 'my $check;'
 				: ''),
-			($is_coderef ? '' : "$name :method"),
+			($is_coderef ? $attrs_string : "$name $attrs_string"),
 			($signature
 				? sprintf('my @invocants = splice(@_, 0, %d);', $invocant_count)
 				: ''),
@@ -3038,10 +3043,6 @@ a real coderef. This doesn't let you close over any variables, but if
 you can provide code this way, it might be slightly faster.
 
 =head2 Optimization Features
-
-MooX::Press will automatically load L<MooX::TypeTiny> if it's installed,
-which optimizes how Type::Tiny constraints and coercions are inlined into
-Moo constructors. This is only used for Moo classes.
 
 MooX::Press will automatically load and apply L<MooX::XSConstructor> if it's
 installed, which will optmimize constructors for some very basic classes.

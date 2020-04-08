@@ -49,3 +49,20 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+- ua: 'Mozilla/5.0 (compatible; Google-Site-Verification/1.0)'
+  name: 'Google-Site-Verification'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'
+- ua: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko; Google Page Speed Insights) Chrome/41.0.2272.118 Safari/537.36'
+  name: 'Google Page Speed Insights'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: true
+  is_windows: false
+  is_chromeos: false

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use utf8;
-use open IO => 'utf8', ':std';
+use open IO => ':utf8', ':std';
 
 use Data::Dumper;
 {

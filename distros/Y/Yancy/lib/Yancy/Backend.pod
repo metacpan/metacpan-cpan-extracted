@@ -11,7 +11,7 @@ Yancy::Backend - Handles talking to the database.
 
 =head1 VERSION
 
-version 1.049
+version 1.050
 
 =head1 SYNOPSIS
 
