@@ -1,0 +1,50 @@
+#!/usr/bin/env testml
+
+# These JSONY streams need JSON equivalence, or need to be declared as
+# decoding (parsing) errors:
+
+*jsony.jsony-load.Bool == True
+
+=== Empty Stream
+--- jsony: ''
+
+=== Whitespace Stream
+--- jsony: '              '
+
+=== Collections as mapping keys
+--- jsony
+{
+      [foo bar] baz
+        {foo bar} baz
+}
+
+=== Duplicate mapping keys
+--- jsony: { foo foo foo foo }
+
+=== Odd number of nodes in mapping
+--- jsony: { foo bar baz }
+
+=== Semis and commas in jsony
+--- jsony
+{
+       foo: bar, baz
+          do :re ,mi
+                 oh : my , lord
+}
+
+=== Comment syntax
+--- jsony
+/* comment */
+# comment
+What happens?
+
+=== Unterminated Quotes
+--- jsony
+{
+      name 'Ingy dot Net
+        size 42
+}
+
+=== Unquoted punctuation
+--- jsony
+! @ # $ % ^ { & * ( | }'}

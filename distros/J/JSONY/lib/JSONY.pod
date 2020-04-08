@@ -15,7 +15,7 @@ JSONY - Relaxed JSON with a little bit of YAML
 
 =head1 VERSION
 
-This document describes L<JSONY> version B<0.1.19>.
+This document describes L<JSONY> version B<0.1.20>.
 
 =head1 SYNOPSIS
 

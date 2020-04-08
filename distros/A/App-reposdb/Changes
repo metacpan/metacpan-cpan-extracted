@@ -1,4 +1,9 @@
-0.005   2017-07-10 (PERLANCAR)
+0.006   2020-04-08  Released-By: PERLANCAR
+
+        - [build] Rebuild, to update Sah coerce rule module names.
+
+
+0.005   2017-07-10  Released-By: PERLANCAR
 
 	- [experimental] Add reposdb-inline script which is
 	  Perinci::CmdLine::Inline-generated script.
@@ -6,13 +11,13 @@
 	- Replace Log::Any with Log::ger.
 
 
-0.004   2016-06-15 (PERLANCAR)
+0.004   2016-06-15  Released-By: PERLANCAR
 
         - Add tagging (add --has-tag & --lacks-tag in ls, add subcommands
           tag/remove-tag/remove-all-tags, add tab completion for repo & tag).
 
 
-0.003   2016-06-12 (PERLANCAR)
+0.003   2016-06-12  Released-By: PERLANCAR
 
         - ls: Support multiple --sort.
 
@@ -21,7 +26,7 @@
         - [doc] Add package description.
 
 
-0.002   2016-06-12 (PERLANCAR)
+0.002   2016-06-12  Released-By: PERLANCAR
 
 	- ls: Add --sort.
 
@@ -30,6 +35,6 @@
 	- Tweak Rinci metadata: add 'common' argument tag.
 
 
-0.001   2016-06-12 (PERLANCAR)
+0.001   2016-06-12  Released-By: PERLANCAR
 
         - First, minimal release.

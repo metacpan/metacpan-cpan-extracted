@@ -3,8 +3,8 @@ NAME
     date
 
 VERSION
-    This document describes version 0.020 of Zodiac::Chinese::Table (from
-    Perl distribution Zodiac-Chinese-Table), released on 2020-01-02.
+    This document describes version 0.021 of Zodiac::Chinese::Table (from
+    Perl distribution Zodiac-Chinese-Table), released on 2020-01-03.
 
 SYNOPSIS
      use Chinese::Zodiac::Table qw(chinese_zodiac);
@@ -59,6 +59,8 @@ BUGS
 
 SEE ALSO
     Zodiac::Chinese
+
+    App::ZodiacUtils distribution contains some CLIs.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

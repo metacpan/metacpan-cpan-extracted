@@ -2,8 +2,10 @@
 
 package Getopt::Long::More;
 
-our $DATE = '2019-12-19'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-08'; # DATE
+our $DIST = 'Getopt-Long-More'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 use strict;
 
@@ -77,10 +79,10 @@ sub GetOptionsFromArray {
     my @opts_spec = @_;
 
     # provide explicit --help|?, for completion. also, we need to override the
-    # option handler to use our HelpMessage.
+    # option destination to use our HelpMessage.
     if ($Getopt::Long::auto_help) {
         unshift @opts_spec, 'help|?' => optspec(
-            handler => sub { HelpMessage() },
+            destination => sub { HelpMessage() },
             summary => 'Print help message and exit',
         );
     }
@@ -89,7 +91,7 @@ sub GetOptionsFromArray {
     # provide explicit --version, for completion
     if ($Getopt::Long::auto_version) {
         unshift @opts_spec, 'version' => optspec(
-            handler => sub { VersionMessage() },
+            destination => sub { VersionMessage() },
             summary => 'Print program version and exit',
         );
     }
@@ -102,23 +104,23 @@ sub GetOptionsFromArray {
     my $prev;
     my $has_arg_handler;
     my $arg_handler_accessed;
-  MAPPING:  # Resulting in the complete EVAPORATION of OptSpec objects, replaced by their handler, if one exists.
+  MAPPING:  # Resulting in the complete EVAPORATION of OptSpec objects, replaced by their destination, if one exists.
       for my $e (@opts_spec) {
         unless ( ref($e) eq 'Getopt::Long::More::OptSpec' ) {
           push @go_opts_spec, $e;
           next;
         }
 
-        next unless exists $e->{handler};
+        next unless exists $e->{destination};
 
         if ( $prev  eq '<>' ) {
           $has_arg_handler++;
           push @go_opts_spec, sub {
             $arg_handler_accessed++;
-            $e->{handler}->(@_);
+            $e->{destination}->(@_);
           };
         } else {
-          push @go_opts_spec, $e->{handler};
+          push @go_opts_spec, $e->{destination};
         }
     } continue {
       $prev = $e;
@@ -235,44 +237,44 @@ sub GetOptionsFromArray {
                             die "Missing required command-line argument\n";
                         }
                     }
-                } elsif ( exists $_->{handler} ) {
-                    if (ref($_->{handler}) eq 'SCALAR'
-                            && !defined(${$_->{handler}})) {
+                } elsif ( exists $_->{destination} ) {
+                    if (ref($_->{destination}) eq 'SCALAR'
+                            && !defined(${$_->{destination}})) {
                         die "Missing required option $osname\n";
                         # XXX doesn't work yet?
-                    } elsif (ref($_->{handler}) eq 'ARRAY' &&
-                                 !@{$_->{handler}}) {
+                    } elsif (ref($_->{destination}) eq 'ARRAY' &&
+                                 !@{$_->{destination}}) {
                         die "Missing required option $osname\n";
                         # XXX doesn't work yet?
-                    } elsif (ref($_->{handler}) eq 'HASH'
-                                 && !keys(%{$_->{handler}})) {
+                    } elsif (ref($_->{destination}) eq 'HASH'
+                                 && !keys(%{$_->{destination}})) {
                         die "Missing required option $osname\n";
                     }
                 } else {
-                    die "Can't enforce 'required' status without also knowing the 'handler' for option '$osname'. "
-                        . "You need to provide a 'handler' to optspec() in order to benefit from that feature\n";
+                    die "Can't enforce 'required' status without also knowing the 'destination' for option '$osname'. "
+                        . "You need to provide a 'destination' to optspec() in order to benefit from that feature\n";
                 }
             }
             # supply default value
             if (defined $_->{default}) {
                 if ($osname eq '<>') {
                     # currently ignored
-                } elsif ( exists $_->{handler} ) {
-                    if (ref($_->{handler}) eq 'SCALAR'
-                            && !defined(${$_->{handler}})) {
-                        ${$_->{handler}} = $_->{default};
+                } elsif ( exists $_->{destination} ) {
+                    if (ref($_->{destination}) eq 'SCALAR'
+                            && !defined(${$_->{destination}})) {
+                        ${$_->{destination}} = $_->{default};
                         # XXX doesn't work yet?
-                    } elsif (ref($_->{handler}) eq 'ARRAY' &&
-                                 !@{$_->{handler}}) {
-                        $_->{handler} = [@{ $_->{default} }]; # shallow copy
+                    } elsif (ref($_->{destination}) eq 'ARRAY' &&
+                                 !@{$_->{destination}}) {
+                        $_->{destination} = [@{ $_->{default} }]; # shallow copy
                         # XXX doesn't work yet?
-                    } elsif (ref($_->{handler}) eq 'HASH' &&
-                                 !keys(%{$_->{handler}})) {
-                        $_->{handler} = { %{ $_->{default} } }; # shallow copy
+                    } elsif (ref($_->{destination}) eq 'HASH' &&
+                                 !keys(%{$_->{destination}})) {
+                        $_->{destination} = { %{ $_->{default} } }; # shallow copy
                     }
                 } else {
-                    die "Can't assign 'default' without also knowing the 'handler' for option '$osname'. "
-                        . "You need to provide a 'handler' to optspec() in order to benefit from that feature\n";
+                    die "Can't assign 'default' without also knowing the 'destination' for option '$osname'. "
+                        . "You need to provide a 'destination' to optspec() in order to benefit from that feature\n";
                 }
             }
         }
@@ -367,18 +369,68 @@ sub OptionsPod {
 }
 
 package # hide from PAUSE indexer
+    Getopt::Long::More::Internal::Util;
+
+# TAU: Named this <GLM>::Internal::Util because <GLM>::Util was already taken on CPAN.
+our @CARP_NOT = qw( Getopt::Long::More Getopt::Long::More::Internal::Util  Getopt::Long::More::OptSpec);
+
+# The subroutines here (::Util) are intended to be pretty generic
+# and so could also be used elsewhere later on.
+
+sub map_args {
+  my %o = %{; shift || {} };  # shallow copy
+  my %p = (@_);
+  my ($deprecated, $aliases,
+      $deprecated_aliases) =  map {; $_ || {} } @p{qw/deprecated aliases deprecated_aliases/};
+
+  my %deprecations =  ( %$deprecated, %$deprecated_aliases );
+  my %synonyms     =  ( %$aliases,    %$deprecated_aliases );
+
+  # Deprecated => warn
+  while ( my ($k, $canon) = each %deprecations )  {
+    next unless exists $o{$k};
+    require Carp;
+    Carp::carp( "'$k' is deprecated!",
+                ( defined($canon) ? " You should use '$canon' instead." : () ),
+                "\n"
+              );
+  }
+
+  # Synonym => map to canonical key.
+  while ( my ($k, $canon) = each %synonyms ) {
+    next unless exists $o{$k};
+
+    my $v = delete $o{$k};
+    next unless defined $canon; #  if $canon key is undefined => disregard
+
+    if  ( exists $o{$canon} ) {
+      require Carp;
+      Carp::croak( "'$k' may only be used as a synonym for '$canon'; not alongside it.", "\n" );
+    }
+
+    $o{$canon} = $v;
+  }
+  wantarray ? (%o) : \%o;
+}
+
+
+package # hide from PAUSE indexer
     Getopt::Long::More::OptSpec;
+
+# Poor man's import....
+*map_args = \&Getopt::Long::More::Internal::Util::map_args;
 
 sub new {
     my $class = shift;
-    my $obj = bless {@_}, $class;
+    my $obj   = map_args( { @_ }, deprecated_aliases => { handler => 'destination' } );
+
     for (keys %$obj) {
         next if /\A(x|x\..+|_.*)\z/;
-        unless (/\A(handler|required|default|summary|description|completion)\z/) {
+        unless (/\A(required|default|summary|description|destination|completion)\z/) {
             die "Unknown optspec property '$_'";
         }
     }
-    $obj;
+    bless $obj, $class;
 }
 
 1;
@@ -396,7 +448,7 @@ Getopt::Long::More - Like Getopt::Long, but with more stuffs
 
 =head1 VERSION
 
-This document describes version 0.006 of Getopt::Long::More (from Perl distribution Getopt-Long-More), released on 2019-12-19.
+This document describes version 0.007 of Getopt::Long::More (from Perl distribution Getopt-Long-More), released on 2020-04-08.
 
 =head1 SYNOPSIS
 
@@ -413,7 +465,7 @@ This document describes version 0.006 of Getopt::Long::More (from Perl distribut
      # but if you want to specify extra stuffs...
      'baz'   => optspec(
          # will be passed to Getopt::Long
-         handler => \$opts{baz},
+         destination => \$opts{baz},
 
          # specify that this option is required
          required => 1,
@@ -458,28 +510,39 @@ provides the same interface as Getopt::Long and, unlike other wrappers like
 L<Getopt::Long::Complete> or L<Getopt::Long::Modern> it does not change default
 configuration and all Getopt::Long configuration are supported. In fact,
 Getopt::Long::More behaves much like Getopt::Long until you start to use optspec
-object as one or more option handlers.
+object as one or more option destinations.
 
 =for Pod::Coverage ^(OptSpec)$
 
 =head1 OPTSPEC OBJECT
 
 In addition to using scalarref, arrayref, hashref, or coderef as the option
-handler ("linkage") as Getopt::Long allows, Getopt::Long::More also allows using
-optspec object as the linkage. This allows you to specify more stuffs. Optspec
-object is created using the C<optspec> function which accepts a list of property
+destination as Getopt::Long allows, Getopt::Long::More also allows using
+optspec object as the destination. This enables you to specify more stuffs.
+
+Optspec object is created using the C<optspec> function which accepts a list of property
 name-property value pairs:
 
  '--fruit=s' => optspec(
-     handler => \$opts{fruit},
+     destination => \$opts{fruit},
      default => 'apple',
      summary => 'Supply name of fruit to order',
      completion => [qw/apple apricot banana/],
      ...
  )
 
-All properties are optional. Tthe C<handler> property will be passed to
-Getopt::Long when parsing options. In addition to that, these other properties
+All properties are optional.
+
+=head2 destination =>  ScalarRef / ArrayRef / HashRef /  CodeRef
+
+The C<destination> property, if present, will be passed to Getopt::Long when parsing options.
+
+Note that, in previous versions of this module, C<destination> was referred to as C<handler>,
+which is now B<deprecated>. At this time C<handler> is still being accepted as an
+I<alias> for C<destination>, but do NOT count on that forever.
+The name C<handler> will be discontinued at one point. You have been B<warned>.
+
+In addition to C<destination>, these other properties
 are also recognized:
 
 =head2 required => bool
@@ -602,7 +665,7 @@ Use the option spec C<< <> >>:
  GetOptions(
      ...
      '<>' => optspec(
-         handler => \&process,
+         destination => \&process,
          completion => sub {
              ...
          },
@@ -641,7 +704,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,7 +6,7 @@ package MongoDBx::Queue::_V1;
 
 # V1 implementation
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 use Moose 2;
 
@@ -111,7 +111,7 @@ sub peek {
 
 sub size {
     my ($self) = @_;
-    return $self->_mongo_collection( $self->collection_name )->count_documents( {} );
+    return $self->_mongo_collection( $self->collection_name )->estimated_document_count();
 }
 
 sub waiting {

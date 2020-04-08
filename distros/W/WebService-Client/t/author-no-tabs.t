@@ -16,9 +16,11 @@ use Test::NoTabs;
 
 my @files = (
     'lib/WebService/Client.pm',
+    'lib/WebService/Client/Response.pm',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/00-test-get.t',
     't/author-eof.t',
     't/author-eol.t',
     't/author-no-breakpoints.t',

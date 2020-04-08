@@ -1,7 +1,7 @@
 package App::tracepm;
 
-our $DATE = '2017-07-29'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $DATE = '2020-04-08'; # DATE
+our $VERSION = '0.230'; # VERSION
 
 use 5.010001;
 use strict;
@@ -464,7 +464,7 @@ App::tracepm - Trace dependencies of your Perl script
 
 =head1 VERSION
 
-This document describes version 0.22 of App::tracepm (from Perl distribution App-tracepm), released on 2017-07-29.
+This document describes version 0.230 of App::tracepm (from Perl distribution App-tracepm), released on 2020-04-08.
 
 =head1 SYNOPSIS
 
@@ -479,7 +479,7 @@ This distribution provides command-line utility called L<tracepm>.
 
 Usage:
 
- tracepm(%args) -> [status, msg, result, meta]
+ tracepm(%args) -> [status, msg, payload, meta]
 
 Trace dependencies of your Perl script.
 
@@ -608,6 +608,7 @@ This is like running:
 
 Filter only modules that are XS modules.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -615,7 +616,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -627,7 +628,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-tracep
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-tracepm>.
+Source repository is at L<https://github.com/perlancar/perl-App-tracepm>.
 
 =head1 BUGS
 
@@ -643,7 +644,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

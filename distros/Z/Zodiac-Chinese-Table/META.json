@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Zodiac-Chinese-Table"
       }
    },
-   "version" : "0.020",
+   "version" : "0.021",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

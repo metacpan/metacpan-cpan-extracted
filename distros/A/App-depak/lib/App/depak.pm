@@ -1,7 +1,7 @@
 package App::depak;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.581'; # VERSION
+our $DATE = '2020-04-08'; # DATE
+our $VERSION = '0.582'; # VERSION
 
 use 5.010001;
 use strict;
@@ -907,7 +907,7 @@ App::depak - Pack your dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.581 of App::depak (from Perl distribution App-depak), released on 2019-06-20.
+This document describes version 0.582 of App::depak (from Perl distribution App-depak), released on 2020-04-08.
 
 =head1 SYNOPSIS
 
@@ -1084,7 +1084,7 @@ the fallback when some modules are not installed.
 
 =item * B<shebang> => I<str> (default: "/usr/bin/perl")
 
-Set shebang line/path.
+Set shebang lineE<sol>path.
 
 =item * B<skip_not_found> => I<bool>
 
@@ -1168,6 +1168,7 @@ Additional modules to "use".
 Will be passed to the tracer. Will currently only affect the C<fatpacker> and
 C<require> methods (because those methods actually run your script).
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1203,7 +1204,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

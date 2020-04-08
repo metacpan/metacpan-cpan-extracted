@@ -178,15 +178,39 @@ baz: 42
 
 
 === Terminal comment
---- jsony(#)
-abcd: goldfish
-# Terminal Comment w/ newline
+--- jsony(<)
+    abcd: goldfish
+    # Terminal Comment w/ newline
 --- json: {"abcd": "goldfish"}
 
 
 === Terminal comment w/ no final newline (Issue 3)
---- jsony(#)
-abcd: goldfish
-# Terminal Comment w/o newline|
+--- jsony(<)
+    abcd: goldfish
+    # Terminal Comment w/o newline|
 --- json: {"abcd": "goldfish"}
 
+
+=== Empty input
+--- jsony
+--- json: []
+
+
+=== Just a comment
+--- jsony(<)
+    # Just a comment
+--- json: []
+
+
+=== Comment in an empty object
+--- jsony(<)
+    {
+    # Just a comment
+    }
+--- json: {}
+
+
+=== List of nodes
+--- jsony
+[] {} 42
+--- json: [[], {}, 42]

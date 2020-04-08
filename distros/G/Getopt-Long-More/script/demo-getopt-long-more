@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2019-12-19'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-08'; # DATE
+our $DIST = 'Getopt-Long-More'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 use strict;
 use warnings;
@@ -23,14 +25,14 @@ my $res = GetOptions(
     'flag2|f'    => \$opts{flag2},
     'bool|b!'    => \$opts{bool},
     'int=i'      => optspec(
-        handler => \$opts{int},
-        summary => 'An integer number',
-        default => 42,
+        destination => \$opts{int},
+        summary     => 'An integer number',
+        default     => 42,
     ),
     'module|M=s@' => optspec(
-        required => 1,
-        handler => $opts{module},
-        summary => 'Module name(s)',
+        required    => 1,
+        destination => $opts{module},
+        summary     => 'Module name(s)',
         description => <<'_',
 One or more module names.
 
@@ -57,16 +59,16 @@ _
     'str|text|S=s' => \$opts{str},
     'array=s@' => $opts{array},
     'int-comp-array=i' => optspec(
-        handler => \$opts{int_comp_array},
-        completion => sub {
+        destination => \$opts{int_comp_array},
+        completion  => sub {
             require Complete::Util;
             my %args = @_;
             Complete::Util::complete_array_elem(array=>[1..10], word=>$args{word});
         },
     ),
     'str-comp-sub=s' => optspec(
-        handler => \$opts{str_comp_sub},
-        completion => sub {
+        destination => \$opts{str_comp_sub},
+        completion  => sub {
             require Complete::Util;
             my %args = @_;
             return complete_array_elem(array=>[map {"$args{word}$_"} "a".."z"],
@@ -78,9 +80,9 @@ _
         exit 0;
     },
     '<>' => optspec(
-        handler => sub { push @argv, $_[0] },
-        required => 1,
-        completion => sub {
+        destination => sub { push @argv, $_[0] },
+        required    => 1,
+        completion  => sub {
             require Complete::Util;
             my %args = @_;
             my $argpos = $args{argpos};
@@ -112,7 +114,7 @@ demo-getopt-long-more - Script to demonstrate Getopt::Long::More
 
 =head1 VERSION
 
-This document describes version 0.006 of demo-getopt-long-more (from Perl distribution Getopt-Long-More), released on 2019-12-19.
+This document describes version 0.007 of demo-getopt-long-more (from Perl distribution Getopt-Long-More), released on 2020-04-08.
 
 =head1 SYNOPSIS
 
@@ -183,7 +185,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

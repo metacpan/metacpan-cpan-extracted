@@ -18,4 +18,4 @@ BEGIN {
 }
 use Test::PAUSE::Permissions;
 
-all_permissions_ok('ironcamel');
+all_permissions_ok();

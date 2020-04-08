@@ -2,8 +2,8 @@ NAME
     Getopt::Long::More - Like Getopt::Long, but with more stuffs
 
 VERSION
-    This document describes version 0.006 of Getopt::Long::More (from Perl
-    distribution Getopt-Long-More), released on 2019-12-19.
+    This document describes version 0.007 of Getopt::Long::More (from Perl
+    distribution Getopt-Long-More), released on 2020-04-08.
 
 SYNOPSIS
      use Getopt::Long::More; # imports GetOptions as well as optspec; you can also
@@ -19,7 +19,7 @@ SYNOPSIS
          # but if you want to specify extra stuffs...
          'baz'   => optspec(
              # will be passed to Getopt::Long
-             handler => \$opts{baz},
+             destination => \$opts{baz},
 
              # specify that this option is required
              required => 1,
@@ -63,26 +63,39 @@ DESCRIPTION
     like Getopt::Long::Complete or Getopt::Long::Modern it does not change
     default configuration and all Getopt::Long configuration are supported.
     In fact, Getopt::Long::More behaves much like Getopt::Long until you
-    start to use optspec object as one or more option handlers.
+    start to use optspec object as one or more option destinations.
 
 OPTSPEC OBJECT
     In addition to using scalarref, arrayref, hashref, or coderef as the
-    option handler ("linkage") as Getopt::Long allows, Getopt::Long::More
-    also allows using optspec object as the linkage. This allows you to
-    specify more stuffs. Optspec object is created using the "optspec"
-    function which accepts a list of property name-property value pairs:
+    option destination as Getopt::Long allows, Getopt::Long::More also
+    allows using optspec object as the destination. This enables you to
+    specify more stuffs.
+
+    Optspec object is created using the "optspec" function which accepts a
+    list of property name-property value pairs:
 
      '--fruit=s' => optspec(
-         handler => \$opts{fruit},
+         destination => \$opts{fruit},
          default => 'apple',
          summary => 'Supply name of fruit to order',
          completion => [qw/apple apricot banana/],
          ...
      )
 
-    All properties are optional. Tthe "handler" property will be passed to
-    Getopt::Long when parsing options. In addition to that, these other
-    properties are also recognized:
+    All properties are optional.
+
+  destination =>  ScalarRef / ArrayRef / HashRef /  CodeRef
+    The "destination" property, if present, will be passed to Getopt::Long
+    when parsing options.
+
+    Note that, in previous versions of this module, "destination" was
+    referred to as "handler", which is now deprecated. At this time
+    "handler" is still being accepted as an *alias* for "destination", but
+    do NOT count on that forever. The name "handler" will be discontinued at
+    one point. You have been warned.
+
+    In addition to "destination", these other properties are also
+    recognized:
 
   required => bool
     Set this to 1 to specify that the option is required.
@@ -188,7 +201,7 @@ FAQ
      GetOptions(
          ...
          '<>' => optspec(
-             handler => \&process,
+             destination => \&process,
              completion => sub {
                  ...
              },
@@ -223,7 +236,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,12 +1,11 @@
 %grammar jsony
 %version 0.0.1
 
-jsony:
-  | seq
-  | map
+jsony: .leading-whitespace (
   | top_seq
   | top_map
   | list
+)
 
 node:
   | map
@@ -100,5 +99,7 @@ comment: /(:
   HASH |
   SPACE*
 ) (: EOL | EOS )/
+
+leading-whitespace: ws?
 
 # vim: sw=2:

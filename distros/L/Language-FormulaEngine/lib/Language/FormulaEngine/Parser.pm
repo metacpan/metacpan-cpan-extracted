@@ -8,7 +8,7 @@ use Language::FormulaEngine::Parser::ContextUtil
 use namespace::clean;
 
 # ABSTRACT: Create parse tree from an input string
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 has parse_tree   => ( is => 'rw' );
@@ -251,63 +251,75 @@ sub parse_list {
 }
 
 
-our (@CMP_OPS, @MATH_OPS, @LOGIC_OPS, @LIST_OPS);
-BEGIN {
-	@CMP_OPS= (qw(  =  ==  !=  <>  >  >=  <  <=  ), "\x{2260}", "\x{2264}", "\x{2265}");
-	@MATH_OPS= qw(  +  -  *  /  );
-	@LOGIC_OPS= qw(  and  or  not  !  );
-	@LIST_OPS= ( ',', '(', ')' );
-	my %keywords= (
-		(map { $_ => $_ } @CMP_OPS, @MATH_OPS, @LOGIC_OPS, @LIST_OPS),
-		'=' => '==', '<>' => '!=', "\x{2260}" => '!=',
-		"\x{2264}" => '<=', "\x{2265}" => '>=',
-	);
-	my $kw_regex= join '|', map { "\Q$_\E" }
+sub cmp_operators { qw(  =  ==  !=  <>  >  >=  <  <=  ), "\x{2260}", "\x{2264}", "\x{2265}" }
+sub math_operators { qw(  +  -  *  /  ) }
+sub logic_operators { qw(  and  or  not  !  ) }
+sub list_operators { ',', '(', ')' }
+my $keyword_map;
+sub keyword_map {
+	$keyword_map ||= do {
+		use Const::Fast;
+		const my %keyword_map,
+			(map { $_ => $_ } cmp_operators, math_operators, logic_operators, list_operators),
+			'=' => '==', '<>' => '!=', "\x{2260}" => '!=',
+			"\x{2264}" => '<=', "\x{2265}" => '>=';
+		\%keyword_map;
+	};
+}
+sub scanner_rules {
+	my $self= shift;
+	my $keywords= $self->keyword_map;
+	my $kw_regex= join '|', map "\Q$_\E",
 		sort { length($b) <=> length($a) } # longest keywords get priority
-		keys %keywords;
+		keys %$keywords;
 	
-	# Evaling this just to make sure the regex gets compiled one single time
-	my $scan_token= eval q%
-		sub {
-			my $self= shift;
-			
-			# Ignore whitespace
-			if ($self->{input} =~ /\G(\s+)/gc) {
-				return '' => ''; # empty string causes next_token to loop
-			}
-			
-			# Check for numbers
-			if ($self->{input} =~ /\G([0-9]*\.?[0-9]+(?:[eE][+-]?[0-9]+)?)\b/gc) {
-				return Number => $1+0;
-			}
-			# or hex numbers
-			if ($self->{input} =~ /\G0x([0-9A-Fa-f]+)/gc) {
-				return Number => hex($1);
-			}
-			
-			# Check for any keyword, and convert the type to the canonical (lowercase) name.
-			if ($self->{input} =~ /\G(%.$kw_regex.q%)/gc) {
-				return $keywords{lc $1} => $1;
-			}
-			
-			# Check for identifiers
-			if ($self->{input} =~ /\G([A-Za-z_][A-Za-z0-9_.]*)\b/gc) {
-				return Identifier => $1;
-			}
-			
-			# Single or double quoted string, using Pascal-style repeated quotes for escaping
-			if ($self->{input} =~ /\G(?:"((?:[^"]|"")*)"|'((?:[^']|'')*)')/gc) {
+	# Perl 5.20.1 and 5.20.2 have a bug where regex comparisons on unicode strings can crash.
+	# It seems to damage the scalar $1, but copying it first fixes the problem.
+	my $kw_canonical= $] >= 5.020000 && $] < 5.020003? '$keywords->{lc(my $clone1= $1)}' : '$keywords->{lc $1}';
+	return (
+		# Pattern Name, Pattern, Token Type and Token Value
+		[ 'Whitespace',  qr/(\s+)/, '"" => ""' ], # empty string causes next_token to loop
+		[ 'Decimal',     qr/([0-9]*\.?[0-9]+(?:[eE][+-]?[0-9]+)?)\b/, 'Number => $1+0' ],
+		[ 'Hexadecimal', qr/0x([0-9A-Fa-f]+)/, 'Number => hex($1)' ],
+		[ 'Keywords',    qr/($kw_regex)/, $kw_canonical.' => $1' ],
+		[ 'Identifiers', qr/([A-Za-z_][A-Za-z0-9_.]*)\b/, 'Identifier => $1' ],
+		# Single or double quoted string, using Pascal-style repeated quotes for escaping
+		[ 'StringLiteral', qr/(?:"((?:[^"]|"")*)"|'((?:[^']|'')*)')/, q%
+			do{
 				my $str= defined $1? $1 : $2;
 				$str =~ s/""/"/g if defined $1;
 				$str =~ s/''/'/g if defined $2;
-				return String => $str;
+				(String => $str)
 			}
-			return;
-		}
-	% or die $@;
-	no strict 'refs';
-	*scan_token= $scan_token;
+		%],
+	);
 }
+
+sub _build_scan_token_method_body {
+	my $self= shift;
+	return join('', map
+			'  return ' . $_->[2] . ' if $self->{input} =~ /\G' . $_->[1] . "/gc;\n",
+			$self->scanner_rules
+		).'  return;' # return empty list of no rule matched
+}
+
+sub _build_scan_token_method {
+	my ($pkg, $method_name)= @_;
+	$pkg= ref $pkg if ref $pkg;
+	$method_name= 'scan_token' unless defined $method_name;
+	my $keywords= $pkg->keyword_map; # this is made available to the eval
+	my $code= "sub ${pkg}::$method_name {\n"
+		."  my \$self= shift;\n"
+		.$pkg->_build_scan_token_method_body
+		."}\n";
+	# closure needed for 5.8 and 5.10 which complain about using a lexical
+	# in a sub declared at package scope.
+	no warnings 'redefine','closure';
+	eval "$code; 1" or die $@ . "for generated scanner code:\n".$code;
+	return $pkg->can('scan_token');
+}
+
+sub scan_token { my $m= $_[0]->_build_scan_token_method; goto $m; };
 
 
 sub Language::FormulaEngine::Parser::Node::Call::function_name { $_[0][0] }
@@ -395,7 +407,7 @@ Language::FormulaEngine::Parser - Create parse tree from an input string
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -407,7 +419,7 @@ This class scans tokens from an input string and builds a parse tree.  In compil
 it is both a Scanner and Parser.  It performs a top-down recursive descent parse, because this
 is easy and gives good error messages.  It only parses strings, but leaves room for subclasses
 to implement streaming.  By default, the parser simply applies a Grammar to the input, without
-checking whether the functions variables exist, but can be subclassed to do more detailed
+checking whether the functions or variables exist, but can be subclassed to do more detailed
 analysis during the parse.
 
 The generated parse tree is made up of Function nodes (each infix operator is converted to a

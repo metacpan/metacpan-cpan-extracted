@@ -2,7 +2,7 @@ package Test2::Harness::IPC;
 use strict;
 use warnings;
 
-our $VERSION = '1.000015';
+our $VERSION = '1.000017';
 
 use POSIX;
 
@@ -63,7 +63,10 @@ sub start {
     $self->check_for_fork();
 
     for my $sig (qw/INT HUP TERM CHLD/) {
-        croak "Signal '$sig' was already set by something else" if defined $SIG{$sig};
+        croak "Signal '$sig' was already set by something else"
+            if defined $SIG{$sig}
+            && $SIG{$sig} ne 'IGNORE'
+            && $SIG{$sig} ne 'DEFAULT';
         $SIG{$sig} = sub { $self->handle_sig($sig) };
     }
 }

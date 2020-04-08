@@ -2,11 +2,12 @@ package Language::FormulaEngine::Namespace;
 use Moo;
 use Carp;
 use Try::Tiny;
+require MRO::Compat if $] lt '5.009005';
 use Language::FormulaEngine::Error ':all';
 use namespace::clean;
 
 # ABSTRACT: Object holding function and variable names
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 has variables            => ( is => 'rw', default => sub { +{} } );
@@ -49,17 +50,24 @@ sub get_value {
 sub get_function {
 	my ($self, $name)= @_;
 	$name= lc $name;
+	# The value 0E0 is a placeholder for "no such function"
 	my $info= $self->{_function_cache}{$name} ||= do {
-		my $fn= $self->can("fn_$name");
-		my $ev= $self->can("nodeval_$name");
-		my $pl= $self->can("perlgen_$name");
-		$fn || $ev || $pl? {
-			($fn? ( native => $fn ) : ()),
-			($ev? ( evaluator => $ev ) : ()),
-			($pl? ( perl_generator => $pl ) : ())
-		} : 1;
+		my %tmp= $self->_collect_function_info($name);
+		keys %tmp? \%tmp : '0E0';
 	};
 	return ref $info? $info : undef;
+}
+
+sub _collect_function_info {
+	my ($self, $name)= @_;
+	my $fn= $self->can("fn_$name");
+	my $ev= $self->can("nodeval_$name");
+	my $pl= $self->can("perlgen_$name");
+	return
+		($fn? ( native => $fn ) : ()),
+		($ev? ( evaluator => $ev ) : ()),
+		($pl? ( perl_generator => $pl ) : ()),
+		$self->maybe::next::method($name);
 }
 
 
@@ -86,6 +94,19 @@ sub evaluate_call {
 }
 
 
+sub find_methods {
+	my ($self, $pattern)= @_;
+	my $todo= mro::get_linear_isa(ref $self || $self);
+	my (%seen, @ret);
+	for my $pkg (@$todo) {
+		my $stash= do { no strict 'refs'; \%{$pkg.'::'} };
+		push @ret, grep +($_ =~ $pattern and defined $stash->{$_}{CODE} and !$seen{$_}++), keys %$stash;
+	}
+	\@ret;
+}
+
+
+
 1;
 
 __END__
@@ -100,7 +121,7 @@ Language::FormulaEngine::Namespace - Object holding function and variable names
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -216,6 +237,12 @@ C<< $self->can("perlgen_$name") >>.
 
 Evaluate a function call, passing it either to a specialized evaluator or performing a more
 generic evaluation of the arguments followed by calling a native perl function.
+
+=head2 find_methods
+
+Find methods on this object that match a regex.
+
+  my $method_name_arrayref= $ns->find_methods(qr/^fn_/);
 
 =head1 FUNCTION LIBRARY
 

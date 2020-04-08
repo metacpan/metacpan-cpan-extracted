@@ -1,3 +1,13 @@
+0.007   2020-04-08  Released-By: PERLANCAR; Urgency: medium
+
+        [INCOMPATIBLE CHANGES]
+
+        - Rename optspec property 'handler' to 'destination' to be more
+          consistent with GoL lingo [GH#21, GH#22, GH#25]. The old name is still
+          supported but now warns (thus this change being categorized as
+          Incompatible Change). The old name will be removed in the future.
+
+
 0.006   2019-12-18  Released-By: PERLANCAR; Urgency: medium
 
         [BUG FIXES]
@@ -14,8 +24,8 @@
 
         [TESTS]
 
-	- Add tests for the case of optspec has required=1 or has default
-	  but no handler is supplied (ref: PR#7).
+	- Add tests for the case of optspec has required=1 or has default but no
+	  handler is supplied (ref: GH#7).
 
 	- Add more test cases, mostly related to "missing handler".
 

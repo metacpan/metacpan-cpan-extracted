@@ -1,11 +1,12 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/tracepm/tracepm
-# and generated automatically using Perinci::CmdLine::Gen version 0.47
+# Note: This script is a CLI for Riap function /App/tracepm/tracepm
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2017-07-29'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-08'; # DATE
 our $DIST = 'App-tracepm'; # DIST
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.230'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,10 +14,12 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/tracepm/tracepm",
     program_name => "tracepm",
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Trace dependencies of your Perl script
 # PODNAME: tracepm
@@ -33,7 +36,7 @@ tracepm - Trace dependencies of your Perl script
 
 =head1 VERSION
 
-This document describes version 0.22 of tracepm (from Perl distribution App-tracepm), released on 2017-07-29.
+This document describes version 0.230 of tracepm (from Perl distribution App-tracepm), released on 2020-04-08.
 
 =head1 SYNOPSIS
 
@@ -196,17 +199,15 @@ Can be specified multiple times.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -300,6 +301,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -409,7 +414,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-tracep
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-tracepm>.
+Source repository is at L<https://github.com/perlancar/perl-App-tracepm>.
 
 =head1 BUGS
 
@@ -425,7 +430,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

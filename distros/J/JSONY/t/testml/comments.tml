@@ -1,0 +1,10 @@
+#!/usr/bin/env testml
+
+# Make sure the JSONY parses to what we expect:
+*jsony.jsony-load.yaml == *json.json-decode.yaml
+
+=== Trailing comment
+--- jsony
+- foo # foo
+- bar
+--- json: [ "foo", "bar", "baz" ]

@@ -1,6 +1,103 @@
 ==================================================
-Changes from 2007-06-11 00:00:00 +0000 to present.
+Changes from 2010-04-11 00:00:00 +0000 to present.
 ==================================================
+
+-------------------------------------------
+version 1.0000 at 2020-04-08 01:48:31 +0000
+-------------------------------------------
+
+  Change: 69b2cf1de001eddb6c13a9326b55be8341711d37
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2019-11-04 19:28:04 +0000
+
+    Update README and Makefile 
+
+  Change: 335e2f1886cdb2c5b6229f8d8a3f4760ff034dbe
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2019-11-04 16:25:16 +0000
+
+    Add ok() method to Response class 
+
+  Change: f0c573987142d3418965440f03a2ffac96eac508
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2019-11-04 16:24:45 +0000
+
+    Set the default mode to be an empty string 
+
+  Change: 7483f92e5cdc8cb006ad4cbea4cd91b3752eb32d
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2019-10-30 16:53:58 +0000
+
+    Add a new operating mode that always returns a response object (#19)
+
+    This is to address issue #11. djzort suggested adding a mode where
+    the http response is always returned. 
+
+  Change: 2cc9f986ed2d1889f0ea2718c1bfffef4e0c64b2
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2019-10-26 14:43:09 +0000
+
+    Merge pull request #16 from ZipRecruiter/nawglan/authordeps
+
+    add authordep entries in dist.ini for missing development requires. 
+
+  Change: 46cff5dab359d38e0ba20c77e757c7c9a39cc153
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2019-10-26 14:40:40 +0000
+
+    Merge pull request #17 from ZipRecruiter/add-test-for-get
+
+    Adds a test for successful path GET functionality, including
+    deserialâ¦ 
+
+  Change: 0f89f68a186b10dd9692e16af433fdfae49d1d1a
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2019-04-03 15:01:54 +0000
+
+    Merge pull request #15 from ZipRecruiter/kwalitee-minimumperl
+
+    Add [MinimumPerl] to dist.ini 
+
+  Change: 923f98d84dbfaa46d5d54033dba2a8f3b3574de7
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2019-04-03 10:08:44 +0000
+
+    Merge pull request #14 from ZipRecruiter/kwalitee-provides
+
+    Add [MetaProvides::Package] to dist.ini 
+
+  Change: 4203d86199fe04f14c628980de62b4690892ca07
+  Author: nalabelle <nalabelle@gmail.com>
+  Date : 2018-07-18 20:11:44 +0000
+
+    Adds a test for successful path GET functionality, including
+    deserialization into list 
+
+  Change: 1a0de516b88a550757f95dd49df5cc6949e9c537
+  Author: Desmond Daignault <nawglan@cpan.org>
+  Date : 2018-07-18 21:46:59 +0000
+
+    add authordep entries in dist.ini for missing development requires. 
+
+  Change: 06bde4856347f02a147183cc0a282d7dccaead02
+  Author: Kivanc Yazan <kyzn@cpan.org>
+  Date : 2018-07-18 18:38:39 +0000
+
+    Add [MetaProvides::Package] to dist.ini
+
+    Without it, META.yml file is missing {provides}, which was reported
+    as an "experimental issue" at
+    https://cpants.cpanauthors.org/dist/WebService-Client 
+
+  Change: 9cce32c5ca91f756e3d7a0eb0f06798cdd24f68d
+  Author: Kivanc Yazan <kyzn@cpan.org>
+  Date : 2018-07-18 18:29:55 +0000
+
+    Add [MinimumPerl] to dist.ini
+
+    Without it, META.yml file is missing {requires}{perl}, which was
+    reported as an "extra issue" at
+    https://cpants.cpanauthors.org/dist/WebService-Client 
 
 -------------------------------------------
 version 0.0601 at 2017-06-08 19:41:46 +0000

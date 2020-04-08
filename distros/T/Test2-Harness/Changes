@@ -1,3 +1,13 @@
+1.000017  2020-04-07 15:47:42-07:00 America/Los_Angeles
+
+    - Fix log_dir test on macos
+
+1.000016  2020-04-07 15:14:00-07:00 America/Los_Angeles
+
+    - Fix #! in yath script
+    - Fix 'DEFAULT' and 'IGNORE' signal inheritence
+    - Fix log-dir specificiation (#174)
+
 1.000015  2020-03-23 11:49:38-07:00 America/Los_Angeles
 
     - YathUI plugin improvements (show url, show errors)

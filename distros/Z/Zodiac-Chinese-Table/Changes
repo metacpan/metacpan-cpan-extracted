@@ -1,3 +1,10 @@
+0.021   2020-01-03  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention App::ZodiacUtils.
+
+
 0.020   2020-01-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Update data (add years 1900-1924, 2044-2092).

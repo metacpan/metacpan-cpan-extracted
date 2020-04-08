@@ -1,3 +1,8 @@
+0.05 - 2020-04-07
+  - Parser's scanner_rules can now be overridden in subclasses
+  - Added method Namespace->find_methods
+  - Work around bug in 5.20 regex parsing on unicode strings
+
 0.04 - 2020-03-22
   - Fix bug where IFERROR would clobber $@
   - Deparse of parse nodes is now handled with method calls,

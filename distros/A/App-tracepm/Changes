@@ -1,25 +1,30 @@
-0.22    2017-07-29 (PERLANCAR)
+0.230   2020-04-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [build] Rebuild, to update Sah coerce rule module names.
+
+
+0.22    2017-07-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [ux] Tweak Rinci metadata.
 
 
-0.21    2017-07-29 (PERLANCAR)
+0.21    2017-07-29  Released-By: PERLANCAR
 
 	- Add option --module.
 
 	- [ux] Add -l as shortcut option for --detail.
 
 
-0.20    2017-07-10 (PERLANCAR)
+0.20    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.19    2016-01-18 (PERLANCAR)
+0.19    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -28,7 +33,7 @@
         - Bump prereq version Log::Any::IfLOG to 0.07.
 
 
-0.18    2015-09-03 (PERLANCAR)
+0.18    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -37,7 +42,7 @@
 	  requirement.
 
 
-0.17    2015-04-15 (PERLANCAR)
+0.17    2015-04-15  Released-By: PERLANCAR
 
         - [Bugfix] To append output file in multiple run, we can't use package
           variable but must use env var.
@@ -46,7 +51,7 @@
           setting env per run).
 
 
-0.16    2015-04-15 (PERLANCAR)
+0.16    2015-04-15  Released-By: PERLANCAR
 
 	- Add option --multiple-args.
 
@@ -54,24 +59,24 @@
 	  is_still_core()).
 
 
-0.15    2015-04-14 (PERLANCAR)
+0.15    2015-04-14  Released-By: PERLANCAR
 
 	- Add option: --trap-script-output.
 
 
-0.14    2015-01-03 (PERLANCAR)
+0.14    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.13    2014-12-28 (PERLANCAR)
+0.13    2014-12-28  Released-By: PERLANCAR
 
 	- Add option --eval (-e).
 
 
-0.12    2014-12-26 (PERLANCAR)
+0.12    2014-12-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -79,47 +84,47 @@
 	  want to avoid abs_path().
 
 
-0.11    2014-12-26 (PERLANCAR)
+0.11    2014-12-26  Released-By: PERLANCAR
 
 	- [Bugfix] Set minimum version for Module::CoreList which has
 	  is_core() [GH#4].
 
 
-0.10    2014-12-05 (PERLANCAR)
+0.10    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Update renamed module Module::MoreUtil -> Module::XSOrPP.
 
 
-0.09    2014-12-04 (PERLANCAR)
+0.09    2014-12-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from SHARYANTO::Module::Util to Module::MoreUtil.
 
 
-0.08    2014-11-13 (PERLANCAR)
+0.08    2014-11-13  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [ux] Return error if unknown method specified.
 
 
-0.07    2014-11-09 (PERLANCAR)
+0.07    2014-11-09  Released-By: PERLANCAR
 
 	- Switch CLI script to using Perinci::CmdLine::Lite, now that
 	  Perinci::CmdLine::Lite has support for logging.
 
 
-0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.06     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - [build] CLI scripts are now generated automatically using
            Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
            generated script is not as polished as it should be. Stay tuned.
 
 
-0.05    2014-07-02 (SHARYANTO)
+0.05    2014-07-02  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -128,12 +133,12 @@
           installing [RT#96884]
 
 
-0.04    2014-04-11 (SHARYANTO)
+0.04    2014-04-11  Released-By: SHARYANTO
 
         - Add methods: prereqscanner{,_lite}{,_recurse}.
 
 
-0.03    2014-04-10 (SHARYANTO)
+0.03    2014-04-10  Released-By: SHARYANTO
 
         - Add field 'by' for method 'require', to see which package loads which
           module.
@@ -142,11 +147,11 @@
           %INC keys which are unordered.
 
 
-0.02    2014-04-10 (SHARYANTO)
+0.02    2014-04-10  Released-By: SHARYANTO
 
         - Add trace method: require.
 
 
-0.01    2014-04-08 (SHARYANTO)
+0.01    2014-04-08  Released-By: SHARYANTO
 
         - First release.

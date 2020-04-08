@@ -1,7 +1,8 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.006'
                                       }
                       },
        'develop' => {
@@ -28,7 +29,8 @@ do { my $x = {
                                       'JSON::MaybeXS' => '0',
                                       'LWP::UserAgent' => '0',
                                       'Moo' => '1.005000',
-                                      'Moo::Role' => '0'
+                                      'Moo::Role' => '0',
+                                      'perl' => '5.006'
                                     }
                     },
        'test' => {
@@ -40,8 +42,8 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Test::LWP::UserAgent' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.006',
                                    'strict' => '0',
                                    'warnings' => '0'

@@ -1,9 +1,9 @@
 package Zodiac::Chinese::Table;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-02'; # DATE
+our $DATE = '2020-01-03'; # DATE
 our $DIST = 'Zodiac-Chinese-Table'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1999,7 +1999,7 @@ Zodiac::Chinese::Table - Look up Chinese zodiac for a given Gregorian date
 
 =head1 VERSION
 
-This document describes version 0.020 of Zodiac::Chinese::Table (from Perl distribution Zodiac-Chinese-Table), released on 2020-01-02.
+This document describes version 0.021 of Zodiac::Chinese::Table (from Perl distribution Zodiac-Chinese-Table), released on 2020-01-03.
 
 =head1 SYNOPSIS
 
@@ -2060,6 +2060,8 @@ feature.
 =head1 SEE ALSO
 
 L<Zodiac::Chinese>
+
+L<App::ZodiacUtils> distribution contains some CLIs.
 
 =head1 AUTHOR
 

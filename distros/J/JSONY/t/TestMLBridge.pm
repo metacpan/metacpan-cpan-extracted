@@ -9,7 +9,7 @@ use YAML::PP;
 sub jsony_load {
     my ($self, $jsony) = @_;
     $jsony =~ s/\|\n\z//;
-    return 'JSONY'->new->load($jsony);
+    return 'JSONY'->load($jsony);
 }
 
 sub json_decode {

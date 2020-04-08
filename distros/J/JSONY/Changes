@@ -1,5 +1,8 @@
 # This Changes log is JSONY!
 
+- 0.1.20 'Tue Apr  7 13:24:19 PDT 2020',
+    'Allow lists starting with array or hash',
+    'Allow for leading comments'
 - 0.1.19 'Wed Jan 22 20:08:39 PST 2020',
     'Use latest Pegex and TestML',
     'Fix tests to use JSON::PP and YAML::PP'

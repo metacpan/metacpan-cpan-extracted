@@ -1,17 +1,22 @@
-0.120   2018-09-11 (PERLANCAR)
+0.121   2020-04-08  Released-By: PERLANCAR
+
+	- [build] Rebuild, to update Sah coerce rule module names.
+
+
+0.120   2018-09-11  Released-By: PERLANCAR
 
 	- [incompatible change] Do not strip source code by default, to
 	  speed up generation.
 
 
-0.11    2017-07-08 (PERLANCAR)
+0.11    2017-07-08  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.10    2017-01-12 (PERLANCAR)
+0.10    2017-01-12  Released-By: PERLANCAR
 
         [INCOMPATIBLE CHANGES]
 
@@ -21,7 +26,7 @@
         - Change 'subcommand' argument (array) to 'subcommands' (hash).
 
 
-0.09    2016-12-02 (PERLANCAR)
+0.09    2016-12-02  Released-By: PERLANCAR
 
 	- Set Getopt::Long configuration gnu_compat to allow setting empty
 	  value '--name=' and no_getopt_compat to disallow '+name'.
@@ -32,49 +37,49 @@
 	  be able to complete e.g. Unicode filenames properly.
 
 
-0.08    2016-02-06 (PERLANCAR)
+0.08    2016-02-06  Released-By: PERLANCAR
 
 	- Update to Complete::Bash 0.27.
 
 
-0.07    2016-01-18 (PERLANCAR)
+0.07    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.06    2016-01-14 (PERLANCAR)
+0.06    2016-01-14  Released-By: PERLANCAR
 
 	- [Bugfix] Typo causing load_module option to not take effect.
 
 	- Bump prereq version Log::Any::IfLOG to 0.07.
 
 
-0.05    2015-09-27 (PERLANCAR)
+0.05    2015-09-27  Released-By: PERLANCAR
 
 	- Replace Data::Dumper with Data::Dmp 0.13 for more compatible
 	  dumping of coderefs.
 
 
-0.04    2015-08-19 (PERLANCAR)
+0.04    2015-08-19  Released-By: PERLANCAR
 
 	- Remove temporary code, set defaults for stripping to make it work
 	  because defaults aren't yet called if we call via function.
 
 
-0.03    2015-08-19 (PERLANCAR)
+0.03    2015-08-19  Released-By: PERLANCAR
 
 	- Add arguments: read_config, read_env.
 
 	- Set default output_file when called as function.
 
 
-0.02    2015-08-19 (PERLANCAR)
+0.02    2015-08-19  Released-By: PERLANCAR
 
 	- Pack the completer script so it only depends on core modules.
 
 
-0.01    2015-08-19 (PERLANCAR)
+0.01    2015-08-19  Released-By: PERLANCAR
 
         - First release.

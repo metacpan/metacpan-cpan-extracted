@@ -2,8 +2,8 @@ NAME
     App::tracepm - Trace dependencies of your Perl script
 
 VERSION
-    This document describes version 0.22 of App::tracepm (from Perl
-    distribution App-tracepm), released on 2017-07-29.
+    This document describes version 0.230 of App::tracepm (from Perl
+    distribution App-tracepm), released on 2020-04-08.
 
 SYNOPSIS
     This distribution provides command-line utility called tracepm.
@@ -12,7 +12,7 @@ FUNCTIONS
   tracepm
     Usage:
 
-     tracepm(%args) -> [status, msg, result, meta]
+     tracepm(%args) -> [status, msg, payload, meta]
 
     Trace dependencies of your Perl script.
 
@@ -143,7 +143,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -154,7 +154,7 @@ HOMEPAGE
     <https://metacpan.org/release/App-tracepm>.
 
 SOURCE
-    Source repository is at <https://github.com/sharyanto/perl-App-tracepm>.
+    Source repository is at <https://github.com/perlancar/perl-App-tracepm>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -167,7 +167,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

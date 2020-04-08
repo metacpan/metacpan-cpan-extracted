@@ -1,7 +1,7 @@
 package App::GenPericmdCompleterScript;
 
-our $DATE = '2018-09-11'; # DATE
-our $VERSION = '0.120'; # VERSION
+our $DATE = '2020-04-08'; # DATE
+our $VERSION = '0.121'; # VERSION
 
 use 5.010001;
 use strict;
@@ -465,7 +465,7 @@ App::GenPericmdCompleterScript - Generate Perinci::CmdLine completer script
 
 =head1 VERSION
 
-This document describes version 0.120 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2018-09-11.
+This document describes version 0.121 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2020-04-08.
 
 =head1 FUNCTIONS
 
@@ -474,7 +474,7 @@ This document describes version 0.120 of App::GenPericmdCompleterScript (from Pe
 
 Usage:
 
- gen_pericmd_completer_script(%args) -> [status, msg, result, meta]
+ gen_pericmd_completer_script(%args) -> [status, msg, payload, meta]
 
 Generate Perinci::CmdLine completer script.
 
@@ -567,6 +567,7 @@ then the subcommands become:
 
 URL to function (or package, if you have subcommands).
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -574,7 +575,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -602,7 +603,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

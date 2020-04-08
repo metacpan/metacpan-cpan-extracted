@@ -29,6 +29,8 @@ t/safe.t
 t/testml-fail.t
 t/testml-json.t
 t/testml-load.t
+t/testml/comments.tml
+t/testml/edge.tml
 t/testml/fail.tml
 t/testml/json.tml
 t/testml/load.tml

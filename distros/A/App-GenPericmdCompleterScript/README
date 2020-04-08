@@ -3,15 +3,15 @@ NAME
     script
 
 VERSION
-    This document describes version 0.120 of App::GenPericmdCompleterScript
+    This document describes version 0.121 of App::GenPericmdCompleterScript
     (from Perl distribution App-GenPericmdCompleterScript), released on
-    2018-09-11.
+    2020-04-08.
 
 FUNCTIONS
   gen_pericmd_completer_script
     Usage:
 
-     gen_pericmd_completer_script(%args) -> [status, msg, result, meta]
+     gen_pericmd_completer_script(%args) -> [status, msg, payload, meta]
 
     Generate Perinci::CmdLine completer script.
 
@@ -108,7 +108,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -134,7 +134,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

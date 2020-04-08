@@ -605,7 +605,11 @@ sub get_label {
 
   $label ||= $self->getv('Label') || '';
 
-  my $block_label = $self->{block} ? $self->{block}{label} : '';
+  my $block_label = (
+    defined($self->{block}) and
+    defined($self->{block}{label})
+  ) ? $self->{block}{label}
+    : '';
 
   if ($label) {
     $label =~ s/^\+/$block_label/;

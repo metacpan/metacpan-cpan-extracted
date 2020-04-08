@@ -1,7 +1,7 @@
 package App::reposdb;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2020-04-08'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -419,7 +419,7 @@ App::reposdb - Manipulate repos.db
 
 =head1 VERSION
 
-This document describes version 0.005 of App::reposdb (from Perl distribution App-reposdb), released on 2017-07-10.
+This document describes version 0.006 of App::reposdb (from Perl distribution App-reposdb), released on 2020-04-08.
 
 =head1 SYNOPSIS
 
@@ -443,7 +443,7 @@ C<repos.db> is faster than having to C<git status> or even stat() each repositor
 
 Usage:
 
- add_repo_tag(%args) -> [status, msg, result, meta]
+ add_repo_tag(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -457,6 +457,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<tags>* => I<array[str]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -464,18 +465,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_repos
 
 Usage:
 
- list_repos(%args) -> [status, msg, result, meta]
+ list_repos(%args) -> [status, msg, payload, meta]
 
 List repositories registered in repos.db.
 
@@ -495,6 +497,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<sorts> => I<array[str]> (default: ["name"])
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -502,18 +505,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 remove_all_repo_tags
 
 Usage:
 
- remove_all_repo_tags(%args) -> [status, msg, result, meta]
+ remove_all_repo_tags(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -525,6 +529,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<reposdb_path>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -532,18 +537,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 remove_repo_tag
 
 Usage:
 
- remove_repo_tag(%args) -> [status, msg, result, meta]
+ remove_repo_tag(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -557,6 +563,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<tags>* => I<array[str]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -564,18 +571,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 touch_repo
 
 Usage:
 
- touch_repo(%args) -> [status, msg, result, meta]
+ touch_repo(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -595,6 +603,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<to> => I<date>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -602,7 +611,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -630,7 +639,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

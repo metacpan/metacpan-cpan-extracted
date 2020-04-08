@@ -1,0 +1,13 @@
+use Test::More;
+
+use Ln;
+
+my $array = Ln::Array->new(qw/one two three four/);
+my %first = $array->entries;
+
+diag explain \%first;
+
+is($first{0}, 'one');
+
+
+done_testing;

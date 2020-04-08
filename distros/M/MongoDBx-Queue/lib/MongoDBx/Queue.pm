@@ -6,7 +6,7 @@ package MongoDBx::Queue;
 
 # ABSTRACT: A message queue implemented with MongoDB
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 use Moose 2;
 use MooseX::Types::Moose qw/:all/;
@@ -245,7 +245,7 @@ MongoDBx::Queue - A message queue implemented with MongoDB
 
 =head1 VERSION
 
-version 2.001
+version 2.002
 
 =head1 SYNOPSIS
 
@@ -514,7 +514,7 @@ with the v1 client, add the task via the v2 client, then remove it via the v1
 client.  Workers could be operating on one or both versions of the queue while
 migration is going on, depending on your needs.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 

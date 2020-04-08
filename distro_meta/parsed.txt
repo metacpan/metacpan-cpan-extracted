@@ -63507,3 +63507,16 @@ S/SH/SHLOMIF/Template-Preprocessor-TTML-0.0104.tar.gz
 E/ES/ESAYM/Time-Piece-1.3401.tar.gz
 P/PE/PETERCJ/Win32-Mechanize-NotepadPlusPlus-0.003.tar.gz
 D/DM/DMOL/XS-Manifesto-1.0.3.tar.gz
+P/PE/PERLANCAR/App-depak-0.582.tar.gz
+P/PE/PERLANCAR/App-GenPericmdCompleterScript-0.121.tar.gz
+P/PE/PERLANCAR/App-reposdb-0.006.tar.gz
+P/PE/PERLANCAR/App-tracepm-0.230.tar.gz
+E/EX/EXODIST/Test2-Harness-1.000017.tar.gz
+M/MA/MANWAR/BankAccount-Validator-UK-0.53.tar.gz
+L/LN/LNATION/Data-LnArray-0.02.tar.gz
+P/PE/PERLANCAR/Getopt-Long-More-0.007.tar.gz
+I/IN/INGY/JSONY-0.1.20.tar.gz
+N/NE/NERDVANA/Language-FormulaEngine-0.05.tar.gz
+D/DA/DAGOLDEN/MongoDBx-Queue-2.002.tar.gz
+I/IR/IRONCAMEL/WebService-Client-1.0000.tar.gz
+P/PE/PERLANCAR/Zodiac-Chinese-Table-0.021.tar.gz

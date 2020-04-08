@@ -4,7 +4,7 @@ use warnings;
 
 package MongoDBx::Queue::Role::_CommonOptions;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 use Moose::Role 2;
 use MooseX::Types::Moose qw/:all/;

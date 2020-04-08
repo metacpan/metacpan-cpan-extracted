@@ -22,5 +22,5 @@ t/35-error.t
 t/40-default-ns-core.t
 t/41-default-ns-functions.t
 t/50-compiler-customize.t
-t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/release-pod-coverage.t

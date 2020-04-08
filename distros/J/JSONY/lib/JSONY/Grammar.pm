@@ -3,7 +3,7 @@ use base 'Pegex::Grammar';
 
 use constant file => './share/jsony.pgx';
 
-sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.73)
+sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.74)
   {
     '+grammar' => 'jsony',
     '+toprule' => 'jsony',
@@ -24,23 +24,29 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.73)
       '.rgx' => qr/\G"((?:\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})|[^"\x00-\x1f])*)"/
     },
     'jsony' => {
-      '.any' => [
+      '.all' => [
         {
-          '.ref' => 'seq'
+          '-skip' => 1,
+          '.ref' => 'leading_whitespace'
         },
         {
-          '.ref' => 'map'
-        },
-        {
-          '.ref' => 'top_seq'
-        },
-        {
-          '.ref' => 'top_map'
-        },
-        {
-          '.ref' => 'list'
+          '.any' => [
+            {
+              '.ref' => 'top_seq'
+            },
+            {
+              '.ref' => 'top_map'
+            },
+            {
+              '.ref' => 'list'
+            }
+          ]
         }
       ]
+    },
+    'leading_whitespace' => {
+      '+max' => 1,
+      '.ref' => 'ws'
     },
     'list' => {
       '+max' => 1,
@@ -227,6 +233,9 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.73)
           ]
         }
       ]
+    },
+    'ws' => {
+      '.rgx' => qr/\G(?:\s|(?:\#\ .*|\#|\ *)(?:\r?\n|\z))/
     }
   }
 }

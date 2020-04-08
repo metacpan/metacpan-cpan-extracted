@@ -80,4 +80,20 @@
     { "label": "Terminal comment w/ no final newline (Issue 3)",
       "point": {
         "jsony": "abcd: goldfish\n# Terminal Comment w/o newline|\n",
-        "json": "{\"abcd\": \"goldfish\"}"}}]}
+        "json": "{\"abcd\": \"goldfish\"}"}},
+    { "label": "Empty input",
+      "point": {
+        "jsony": "",
+        "json": "[]"}},
+    { "label": "Just a comment",
+      "point": {
+        "jsony": "# Just a comment\n",
+        "json": "[]"}},
+    { "label": "Comment in an empty object",
+      "point": {
+        "jsony": "{\n# Just a comment\n}\n",
+        "json": "{}"}},
+    { "label": "List of nodes",
+      "point": {
+        "jsony": "[] {} 42\n",
+        "json": "[[], {}, 42]"}}]}

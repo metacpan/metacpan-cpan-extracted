@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.0601
+    version 1.0000
 
 SYNOPSIS
 
@@ -14,12 +14,11 @@ SYNOPSIS
             use Moo;
             with 'WebService::Client';
     
-            use Function::Parameters;
-    
-            has '+base_url' => ( default => 'https://foo.com/v1' );
             has auth_token  => ( is => 'ro', required => 1 );
     
             method BUILD() {
+                $self->base_url('https://foo.com/v1');
+    
                 $self->ua->default_header('X-Auth-Token' => $self->auth_token);
                 # or if the web service uses http basic/digest authentication:
                 # $self->ua->credentials( ... );
@@ -27,15 +26,18 @@ SYNOPSIS
                 # $self->ua->default_headers->authorization_basic( ... );
             }
     
-            method get_widgets() {
+            sub get_widgets() {
+                my ($self) = @_;
                 return $self->get("/widgets");
             }
     
-            method get_widget($id) {
+            sub get_widget($id) {
+                my ($self, $id) = @_;
                 return $self->get("/widgets/$id");
             }
     
-            method create_widget($widget_data) {
+            sub create_widget($widget_data) {
+                my ($self, $widget_data) = @_;
                 return $self->post("/widgets", $widget_data);
             }
         }
@@ -49,6 +51,15 @@ SYNOPSIS
         );
         my $widget = $client->create_widget({ color => 'blue' });
         print $client->get_widget($widget->{id})->{color};
+
+    Minimal example which retrieves the current Bitcoin price:
+
+        package CoinDeskClient;
+        use Moo;
+        with 'WebService::Client';
+    
+        my $client = CoinDeskClient->new(base_url => 'https://api.coindesk.com/v1');
+        print $client->get('/bpi/currentprice.json')->{bpi}{USD}{rate_float};
 
 DESCRIPTION
 

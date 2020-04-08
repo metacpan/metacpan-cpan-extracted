@@ -5,7 +5,7 @@ use Try::Tiny;
 use Module::Runtime 'require_module';
 
 # ABSTRACT: Parser/Interpreter/Compiler for simple spreadsheet formula language
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 has parser => (
@@ -81,7 +81,7 @@ Language::FormulaEngine - Parser/Interpreter/Compiler for simple spreadsheet for
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
