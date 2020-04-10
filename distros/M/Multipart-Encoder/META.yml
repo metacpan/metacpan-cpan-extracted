@@ -1,0 +1,44 @@
+---
+abstract: 'encoder for mime-type C<multipart/form-data>.'
+author:
+  - 'Yaroslav O. Kosmina L<mailto:dart@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Multipart-Encoder
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Multipart::Encoder:
+    file: lib/Multipart/Encoder.pm
+    version: v0.0.7
+requires:
+  File::LibMagic: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/darviarush/perl-multipart-encoder/issues
+  homepage: https://github.com/darviarush/perl-multipart-encoder
+  repository: git://github.com/darviarush/perl-multipart-encoder.git
+version: v0.0.7
+x_authority: cpan:DART
+x_contributors:
+  - 'Iaroslav O. Kosmina <darviarush@ya.ru>'
+  - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
+  - 'Yaroslav O. Kosmina <kosmina.yaroslav@220-volt.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

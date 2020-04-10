@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -20,24 +20,33 @@
 # Usage: perl grep-not-in-oeis.pl [-v] filename...
 #
 # Do some Math::OEIS::Grep searches for numbers in the given files.
-# The numbers should appear as for instance
+# In each file, target numbers should appear as
 #
 #     # not in OEIS: 17238, 12783, 4839, 589
 #
 # The idea is that a document or program can note values you didn't find in
-# the OEIS (and haven't decided to add yet, or ever maybe) but which with a
-# machine-readable form so grep in the future to see if they or something
-# close has been added.
+# the OEIS (and haven't added yet, or maybe ever) but which with a
+# machine-readable form so can grep in the future to see if they or
+# something close has been added.
+#
+# Numbers should be separated by commas.  Spaces are optional.
 #
 # Sequences which match but you know are false (become different later, only
-# a middle match, etc) can be excluded by further "not" lines like
+# a middle match, close but not quite what you want, etc) can be excluded by
+# further "not" lines like
 #
 #     # not in OEIS: 17238, 12783, 4839, 589
-#     # not A123456 as its formula is different after 512 terms
+#     # not A123456 as its formula is different after 200 terms
 #     # not A000006 which begins differently
 #
-# The results are rough, and the document style demanded may change wildly,
-# but this is an example of using Math::OEIS::Grep in a mechanical way.
+# This program is an example of using Math::OEIS::Grep in a mechanical way.
+# The "not A123456" lines become its "exclude_list".  Perhaps some
+# additional hints or exclusions will be possible in the future, eg. values
+# range.
+#
+# The results printed are a bit rough and are intended for human readers so
+# may change a little or a lot.  But the "not in OEIS" lines grepped from
+# the files should be settled.
 #
 
 use 5.010;
@@ -54,7 +63,7 @@ use PerlIO::encoding;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 13;
+our $VERSION = 14;
 $|=1;
 
 # output coding for the benefit of Math::OEIS::Grep printing sequence names
@@ -110,6 +119,7 @@ foreach my $filename (@filenames) {
       next;
     }
 
+    my $name = $values;
     my @values;
     if ($values =~ /\./) {
       ### decimal: $values
@@ -159,7 +169,7 @@ foreach my $filename (@filenames) {
 
     ### @exclude_list
     Math::OEIS::Grep->search (array => \@values,
-                              name => "$filename:$linenum: $values",
+                              name => "$filename:$linenum: $name",
                               verbose => $verbose,
                               exclude_list => \@exclude_list);
   }

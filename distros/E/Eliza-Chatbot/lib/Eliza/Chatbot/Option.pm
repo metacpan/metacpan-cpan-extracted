@@ -43,7 +43,7 @@ Eliza::Chatbot::Options
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 Options
 
@@ -93,7 +93,7 @@ Returns a greeting message.
 
 =head1 AUTHOR
 
-LNATION thisusedtobeanemail@gmail.com
+LNATION email@lnation.org
 
 =head1 LICENSE AND COPYRIGHT
 

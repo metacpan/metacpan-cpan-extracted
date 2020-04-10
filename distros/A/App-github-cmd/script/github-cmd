@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-07-27'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2020-04-08'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -43,7 +43,7 @@ github-cmd - Yet another github CLI
 
 =head1 VERSION
 
-This document describes version 0.007 of github-cmd (from Perl distribution App-github-cmd), released on 2019-07-27.
+This document describes version 0.008 of github-cmd (from Perl distribution App-github-cmd), released on 2020-04-08.
 
 =head1 SYNOPSIS
 
@@ -196,6 +196,10 @@ Do not use any configuration file.
 
 Do not read environment for default options.
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =item B<--pass>=I<s>
 
 =item B<--quiet>
@@ -225,6 +229,10 @@ Display program's version and exit.
 =over
 
 =item B<--description>=I<s>
+
+=item B<--homepage-json>=I<s>
+
+See C<--homepage>.
 
 =item B<--homepage>=I<s>
 
@@ -397,7 +405,7 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 A1F9JCEH02_OPT => str
+=head2 HP_SGGQBDS_OPT => str
 
 Specify additional command-line options.
 
@@ -436,7 +444,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

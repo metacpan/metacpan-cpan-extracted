@@ -5,7 +5,7 @@
 
 our $DATE = '2020-01-31'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.123'; # VERSION
+our $VERSION = '0.124'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ parse-duration-using-df-alami-en - Parse duration string(s) using DateTime::Form
 
 =head1 VERSION
 
-This document describes version 0.123 of parse-duration-using-df-alami-en (from Perl distribution App-DateUtils), released on 2020-01-31.
+This document describes version 0.124 of parse-duration-using-df-alami-en (from Perl distribution App-DateUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 

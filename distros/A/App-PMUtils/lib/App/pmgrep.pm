@@ -2,8 +2,8 @@
 
 package App::pmgrep;
 
-our $DATE = '2019-12-15'; # DATE
-our $VERSION = '0.729'; # VERSION
+our $DATE = '2020-01-31'; # DATE
+our $VERSION = '0.730'; # VERSION
 
 use 5.010001;
 use strict;
@@ -136,7 +136,7 @@ App::pmgrep - Print lines from installed Perl module sources matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.729 of App::pmgrep (from Perl distribution App-PMUtils), released on 2019-12-15.
+This document describes version 0.730 of App::pmgrep (from Perl distribution App-PMUtils), released on 2020-01-31.
 
 =head1 FUNCTIONS
 
@@ -201,6 +201,7 @@ Whether to include .pod files.
 
 =item * B<regexps> => I<array[re]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -236,7 +237,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

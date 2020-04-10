@@ -641,11 +641,12 @@ sub unsatisfied_requires {
 	    #- check on the selected package if a provide is satisfying the resolution (need to do the ops).
 	    foreach (grep { exists $state->{selected}{$_} } keys %{$urpm->{provides}{$n} || {}}) {
 		my $p = $urpm->{depslist}[$_];
+		next if $p->arch eq 'src'; # ignore provides from SRPM (new in rpm-4.16)
 		!$urpm->{provides}{$n}{$_} || $p->provides_overlap($prop) and next REQUIRES;
 	    }
 
 	    #- check if the package itself provides what is necessary.
-	    $pkg->provides_overlap($prop) and next REQUIRES;
+	    $pkg->arch ne 'src' and $pkg->provides_overlap($prop) and next REQUIRES;
 
 	    #- check on installed system if a package which is not obsoleted is satisfying the require.
 	    my $satisfied = 0;
@@ -1210,7 +1211,7 @@ sub resolve_requested__no_recommends_ {
 	    } else {
 		_set_flag_installed_and_upgrade_if_no_newer($db, $pkg);
 
-		if ($pkg->flag_installed && !$pkg->flag_upgrade && !$urpm->{options}{downgrade}) {
+		if ($pkg->flag_installed && !$pkg->flag_upgrade && !$urpm->{options}{downgrade} && !$urpm->{options}{reinstall}) {
 		    _no_more_recent_installed_and_providing($urpm, $db, $state, $pkg, $dep->{required}) or next;
 		}
 	    }
@@ -1417,7 +1418,7 @@ sub _unselect_package_deprecated_by_property {
 		#- remove this package from the list of packages to install,
 		#- unless urpmi was invoked with --allow-force 
 		#- (in which case rpm could be invoked with --oldpackage)
-		if (!$urpm->{options}{'allow-force'} && !$urpm->{options}{downgrade}) {
+		if (!$urpm->{options}{'allow-force'} && !$urpm->{options}{downgrade} && !$urpm->{options}{reinstall}) {
 		    #- since the originally requested packages (or other
 		    #- non-installed ones) could be unselected by the following
 		    #- operation, remember them, to warn the user
@@ -1429,6 +1430,10 @@ sub _unselect_package_deprecated_by_property {
 		}
 	    } elsif ($satisfied) {
 		$obsoleted = 1;
+	    } elsif ($urpm->{options}{reinstall}) {
+		# So that we do not ask for "The following package has to be removed for others to be upgraded:
+		# foo-V-R (in order to install foo-V-R) (y/N)"
+		return;
 	    }
 	} elsif ($satisfied) {
 	    $obsoleted = 1;

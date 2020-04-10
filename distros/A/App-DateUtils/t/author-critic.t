@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/DateUtils.pm','script/dateconv','script/datediff','script/durconv','script/parse-date','script/parse-date-using-df-alami-en','script/parse-date-using-df-alami-id','script/parse-date-using-df-flexible','script/parse-date-using-df-natural','script/parse-duration','script/parse-duration-using-df-alami-en','script/parse-duration-using-df-alami-id','script/parse-duration-using-df-natural','script/parse-duration-using-td-parse'];
+my $filenames = ['lib/App/DateUtils.pm','script/dateconv','script/datediff','script/durconv','script/parse-date','script/parse-date-using-df-alami-en','script/parse-date-using-df-alami-id','script/parse-date-using-df-flexible','script/parse-date-using-df-natural','script/parse-duration','script/parse-duration-using-df-alami-en','script/parse-duration-using-df-alami-id','script/parse-duration-using-df-natural','script/parse-duration-using-td-parse','script/strftime'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

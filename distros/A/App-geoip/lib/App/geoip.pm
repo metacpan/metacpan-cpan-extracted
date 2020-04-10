@@ -3,25 +3,26 @@
 use 5.14.0;
 use warnings;
 
-our $VERSION = "0.11";
+our $VERSION = "0.13";
 our $CMD = $0 =~ s{.*/}{}r;
 
 sub usage {
     my $err = shift and select STDERR;
     say "usage: $CMD [--fetch] [--no-update] [--dist] [--whois] ip|host ...";
-    say "   -f  --fetch        Fetch new ZIP sources";
-    say "       --no-update    Do not update the database on new data";
-    say "   -s  --short        Skip location and flags";
-    say "   -d  --dist         Show distance in KM between here and there";
-    say "                      will only work if LWP::UserAgent and";
-    say "                      HTML::TreeBuilder are installed";
-    say "   -w  --whois        Show whois information";
-    say "                      will only work if Net::Whois::IP is installed";
-    say "   -j  --json         Output information in JSON";
-    say "   -J  --json-pretty  Output information in JSON";
-    say "   -lL --local=L      Specify local location LAT/LON";
-    say "   -D  --DB=dsn       Specify geoip database DSN default: dbi:Pg:geoip";
-    say "                      may be specified in \$GEOIP_DBI_DSN";
+    say "   -f   --fetch        Fetch new ZIP sources";
+    say "        --no-update    Do not update the database on new data";
+    say "   -s   --short        Skip location and flags";
+    say "   -d   --dist         Show distance in KM between here and there";
+    say "                       will only work if LWP::UserAgent and";
+    say "                       HTML::TreeBuilder are installed";
+    say "   -w   --whois        Show whois information";
+    say "                       will only work if Net::Whois::IP is installed";
+    say "   -j   --json         Output information in JSON";
+    say "   -J   --json-pretty  Output information in JSON";
+    say "   -lL  --local=L      Specify local location LAT/LON";
+    say "   -D   --DB=dsn       Specify geoip database DSN default: dbi:Pg:geoip";
+    say "                       may be specified in \$GEOIP_DBI_DSN";
+    say "        --country=c    Find CIRDR's for country c";
     say "$CMD --man will show the full manual";
     exit $err;
     } # usage
@@ -79,6 +80,9 @@ GetOptions (
     "l|local=s"		=> \$conf{local_location},
 
     "D|DB=s"		=> \$conf{dsn},
+
+    # Queries
+      "country=s"	=> \ my $query_c,
 
     "v|verbose:1"	=> \(my $opt_v = 0),
       "man"		=> sub { pod2usage (-verbose => 2, -exitstatus => 0); },
@@ -470,6 +474,57 @@ if ($conf{update} && -s $zcfn and ($stmp{$zcfn} // -1) < (stat $zcfn)[9]) {
 
 binmode STDERR, ":encoding(utf-8)";
 binmode STDOUT, ":encoding(utf-8)";
+
+if ($query_c) {
+    @ARGV = ();
+    my %ctry;
+    my $sth = $dbh->prepare ("select id, name, continent from country");
+    $sth->execute;
+    $sth->bind_columns (\my ($id, $name, $cont));
+    while ($sth->fetch) {
+	$name =~ m/^ $query_c $/ix and $ctry{full}{$id} = [ $name, $cont, 0, 0 ];
+	$name =~ m/  $query_c  /ix and $ctry{part}{$id} = [ $name, $cont, 0, 0 ];
+	}
+    $sth->finish;
+    if    (keys %{$ctry{full}}) {
+	%ctry = %{$ctry{full}};
+	}
+    elsif (keys %{$ctry{part}}) {
+	%ctry = %{$ctry{part}};
+	}
+    else {
+	$dbh->rollback;
+	die "No matching country found for $query_c\n";
+	}
+
+    $sth = $dbh->prepare (join " " =>
+	"select   cidr, reg_country_id, ip_from_n, ip_to_n",
+	"from     ipv4",
+	"order by reg_country_id, cidr");
+    $sth->execute;
+    $sth->bind_columns (\my $cidr, \$id, \my $from, \my $to);
+    while ($sth->fetch) {
+	defined $id or next;
+	my $c = $ctry{$id} or next;
+	say $cidr;
+	$c->[2]++;
+	$c->[3] += $to - $from + 1;
+	}
+    $sth->finish;
+    $dbh->rollback;
+
+    if ($opt_v) {
+	my @w = (6, 10, 40, 15);
+	printf STDERR "%s\n%$w[0]s %$w[1]s %-$w[2]s %s\n%s %s %s %s\n",
+	    "Selected CIDR's", "# CIDR", "# IP", "Country", "Continent",
+	    map { "-" x $_ } @w;
+	printf STDERR "%$w[0]d %$w[1]d %-$w[2].$w[2]s %s\n",
+	    @{$_}[2, 3, 0], $cont{$_->[1]} for
+		sort { $a->[0] cmp $b->[0] } values %ctry;
+	}
+
+    exit 0;
+    }
 
 my %seen;
 my %found;
@@ -974,6 +1029,29 @@ can copy or move to your liking. This file will be somewhere around 500 Mb.
 =head2 Full report
 
  $ geoip --dist --whois 1.2.3.4
+
+=head2 Selecting CIDR's for countries
+
+=head3 List all CIDR's for Vatican City
+
+ $ geoip --country=Vatican > vatican-city.cidr
+
+=head3 Statistics
+
+If you enable verbosity, the selected statistics will be presented at the
+end of the CIDR-list: number of CIDR's, number of enclosed IP's, name of
+the country and the continent. As the country name is just a perl regex,
+you can select all countries with C<.>, or all countries that start with
+a C<V>:
+
+ $ geoip --country=^V -v >/dev/null
+ Selected CIDR's
+ # CIDR       # IP Country               Continent
+ ------ ---------- --------------------- ---------------
+     21      18176 Vanuatu               Oceania
+    321      13056 Vatican City          Europe
+    272    6798500 Venezuela             South America
+    612   16014080 Vietnam               Asia
 
 =head1 TODO
 

@@ -21,8 +21,7 @@ my $basic_payload;
 {
     my $meta = find_meta('Dist::Zilla::PluginBundle::Basic');
     $meta->make_mutable;
-    $meta->add_before_method_modifier(configure => sub
-    {
+    $meta->add_before_method_modifier(configure => sub {
         # capture the full payload, for testing
         $basic_payload = shift->payload;
     });
@@ -32,8 +31,7 @@ use Dist::Zilla::PluginBundle::Author::ETHER;
 {
     my $meta = find_meta('Dist::Zilla::PluginBundle::Author::ETHER');
     $meta->make_mutable;
-    $meta->add_before_method_modifier(configure => sub
-    {
+    $meta->add_before_method_modifier(configure => sub {
         shift->add_bundle(
             '@Filter' => {
                 ':version' => '4.000',              # required minimum for @Filter

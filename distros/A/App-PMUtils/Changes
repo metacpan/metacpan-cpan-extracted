@@ -1,3 +1,12 @@
+0.730   2020-01-31  Released-By: PERLANCAR; Urgency: low
+
+	[pmuninst]
+
+        - [ux] Warn when the module has distributions depending on it.
+
+	- [doc] Mention pm-uninstall.
+
+
 0.729   2019-12-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utility: pmunlink.
@@ -307,7 +316,7 @@
 	- Adjust to Complete::Module 0.06.
 
 
-0.36    2014-12-25 (PERLANCAR) - ♪ feliz navidad
+0.36    2014-12-25  Released-By: PERLANCAR; Message: ♪ feliz navidad
 
         - No functional changes.
 
@@ -409,7 +418,7 @@
          - Add pmcore.
 
 
-0.20     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.20     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - Use Perinci::CmdLine::Any.
 

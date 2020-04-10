@@ -3,7 +3,7 @@
 use 5.20.0;
 use warnings;
 
-our $VERSION = "1.29 - 2018-04-21";
+our $VERSION = "1.32 - 2019-07-25";
 
 sub usage {
     my $err = shift and select STDERR;
@@ -31,6 +31,7 @@ use JSON::XS;
 use YAML::Tiny;
 use Data::Peek;
 use LWP::UserAgent;
+use HTML::Entities;
 use HTML::TreeBuilder;
 use List::Util  qw( sum0 );
 use Encode      qw( encode decode );
@@ -97,9 +98,9 @@ close $html;
 sub href {
     my ($txt, $ref, $ttl, $dtl) = (@_, "", "", "");
     if (ref $txt eq "HASH") {
-	$ttl = $txt->{title};
-	$dtl = $txt->{dtitle};
-	$txt = $txt->{text};
+	$ttl = encode_entities ($txt->{title});
+	$dtl = encode_entities ($txt->{dtitle});
+	$txt = encode_entities ($txt->{text});
 	}
     $ttl //= "";
     $dtl //= "";
@@ -221,19 +222,30 @@ EOH
 	my $kwtc = "none";
 	unless (defined $data->{kwalitee}) {
 	    $opt_v > 1 and warn " Fetch kwalitee\n";
-	    ($r = $ua->get ("http://cpants.cpanauthors.org/dist/$dist")) &&
-	     $r->is_success && $r->content =~ m{
-		<dt> [\s\r\n]*  Kwalitee          [\s\r\n]* </dt> [\s\r\n]*
-		<dd> [\s\r\n]* ([0-9.]+)          [\s\r\n]* </dd> [\s\r\n]*
-		<dt> [\s\r\n]*  Core \s* Kwalitee [\s\r\n]* </dt> [\s\r\n]*
-		<dd> [\s\r\n]* ([0-9.]+)          [\s\r\n]* </dd>
-		}xi and ($data->{kwk}, $data->{kwc}) = ($1, $2);
-	     $data->{kwalitee} = join " / " =>
-		 $data->{kwc} // "-", $data->{kwk} // "&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;";
-	     $data->{kwc} and $kwtc = $data->{kwc} >= 100 ? "pass"
-				    : $data->{kwc} >=  80 ? "na"
-				    : $data->{kwc} >=  60 ? "warn" : "fail";
-	     }
+	    $r = $ua->get ("https://cpants.cpanauthors.org/dist/$dist");
+	    my $tree = HTML::TreeBuilder->new;
+	    $tree->parse_content ($r && $r->is_success ? decode ("utf-8", $r->content) : "");
+	    if (my ($dl) = $tree->look_down (_tag => "dl", class => "small")) {
+		my ($dt, %dl) = ("");
+		foreach my $d ($dl->look_down (_tag => qr{^d[td]$})) {
+		    my $txt = $d->as_text;
+		    if ($d->tag eq "dt") {
+			$dt = lc $txt;
+			next;
+			}
+		    $dl{$dt} //= $txt;
+		    }
+		$data->{kwk} = $dl{"kwalitee"};
+		$data->{kwc} = $dl{"core kwalitee"};
+		$data->{kwr} = $dl{"release date"};
+
+		$data->{kwalitee} = join " / " =>
+		    $data->{kwc} || "-", $data->{kwk} || "&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;";
+		$data->{kwc} and $kwtc = $data->{kwc} >= 100 ? "pass"
+				       : $data->{kwc} >=  80 ? "na"
+				       : $data->{kwc} >=  60 ? "warn" : "fail";
+		}
+	    }
 	$time{kwalitee} += t_used;
 
 	# GIT repo and last commit
@@ -360,7 +372,7 @@ EOH
 	    }
 	$time{github} += t_used;
 	$rt_tag =~ m/^[-0-9]?$/ or
-	    $rt_tag = ($mcpd ? $mcpd->bugs->{rt}{active} // "" : "") // "*";
+	    $rt_tag = ($mcpd ? $mcpd->bugs->{rt}{active} // "" : "") || "*";
 	$time{rt_tag} += t_used;
 
 	# Downriver deps
@@ -427,7 +439,7 @@ EOH
 	    }
 	$time{travis} += t_used;
 	if ($tci_tag =~ m{^(?:unknown|\*|)$} && $git =~ m{\b github\.com \b}x) {
-	    $tci       = "$git/settings/hooks/new?service=travis";
+	    $tci       = "https://travis-ci.org/profile";
 	    $tci_tag   = "add";
 	    $tci_class = [ "tci", "gray" ];
 	    }
@@ -493,7 +505,7 @@ EOH
 
     print $html <<"EOH";
 
-          <tr><td colspan="19"><hr></td></tr>
+          <tr><td colspan="19"><hr /></td></tr>
           <tr>
             <td><a href="http://backpan.perl.org/authors/id/$auid3/$author/">BackPAN</a></td>
             <td colspan="11"><a href="http://analysis.cpantesters.org/?author=$author&amp;age=91.3&amp;SUBMIT_xxx=Submit">CPANTESTERS analysis</a></td>
@@ -511,16 +523,17 @@ EOH
 
 sub header {
     print $html <<"EOH";
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta name="Generator"          content="makewww.pl">
-  <meta name="Author"             content="H.Merijn Brand">
-  <meta name="Description"        content="Perl">
-  <title>$author Perl QA page</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="Generator"          content="makewww.pl" />
+  <meta name="Author"             content="H.Merijn Brand" />
+  <meta name="Description"        content="Perl" />
+  <title>$author - Perl QA page</title>
 
-  <link rel="stylesheet" type="text/css"  href="tux.css">
+  <link rel="stylesheet" type="text/css"  href="tux.css" />
   </head>
 <body>
 
@@ -530,7 +543,7 @@ EOH
 
 sub footer {
     my @d = localtime;
-    my $stamp = sprintf "%02d-%02d-%04d", $d[3], $d[4] + 1, $d[5] + 1900;
+    my $stamp = sprintf "%04d-%02d-%02d", $d[5] + 1900, $d[4] + 1, $d[3];
     print $html <<"EOH";
 
   <tr class="boxed">

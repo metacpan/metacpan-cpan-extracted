@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/DateUtils.pm'
@@ -25,7 +25,8 @@ my @scripts = (
     'script/parse-duration-using-df-alami-en',
     'script/parse-duration-using-df-alami-id',
     'script/parse-duration-using-df-natural',
-    'script/parse-duration-using-td-parse'
+    'script/parse-duration-using-td-parse',
+    'script/strftime'
 );
 
 # no fake home requested

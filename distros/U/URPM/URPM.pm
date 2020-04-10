@@ -4,6 +4,9 @@ use strict;
 use warnings;
 use DynaLoader;
 
+# Make sure debugging with Data::Dumper is more easily comparable:
+$Data::Dumper::Sortkeys = 1;
+
 # different files, but same package
 # require them here to avoid dependencies
 use URPM::Build;
@@ -11,7 +14,7 @@ use URPM::Resolve;
 use URPM::Signature;
 
 our @ISA = qw(DynaLoader);
-our $VERSION = 'v5.24.1';
+our $VERSION = 'v5.25';
 
 URPM->bootstrap($VERSION);
 
@@ -836,6 +839,11 @@ Options are:
 
     update => 0 / 1 : indicates whether this is an upgrade
     excludepath => [ ... ]
+
+=item $trans->addReinstall($pkg)
+
+Adds a package to be re-installed to the transaction represented by $trans.
+$pkg is an C<URPM::Package> object.
 
 =item $trans->remove($name)
 

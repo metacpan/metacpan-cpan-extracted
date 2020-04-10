@@ -20,7 +20,7 @@ name: App-PMUtils
 recommends:
   Perl::MinimumVersion::Fast: '0'
 requires:
-  AppBase::Grep: '0.003'
+  AppBase::Grep: '0.006'
   Browser::Open: '0'
   Complete::Module: '0.09'
   Config: '0'
@@ -71,7 +71,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMUtils
   homepage: https://metacpan.org/release/App-PMUtils
   repository: git://github.com/perlancar/perl-App-PMUtils.git
-version: '0.729'
+version: '0.730'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -210,7 +210,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -350,7 +350,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -364,7 +364,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

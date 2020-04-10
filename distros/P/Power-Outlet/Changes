@@ -4,6 +4,12 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.24 2020-04-09
+  - Updated lib/Power/Outlet/Common/IP/HTTP/JSON.pm - Updated error pass through from HTTP::Tiny
+  - Updated scripts/power-outlet.cgi - Added support for groups in configuration INI file
+  - Updated scripts/conf/power-outlet.ini - Added my current configuration with new Tasmota devices
+  - Updated perl-Power-Outlet.spec - Updated requires
+
 0.23 2020-03-29
   - Added scripts/power-outlet-mqtt-listener.pl
   - Added scripts/conf/power-outlet-mqtt-listener.yml

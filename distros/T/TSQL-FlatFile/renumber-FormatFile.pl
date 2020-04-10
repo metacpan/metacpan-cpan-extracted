@@ -10,7 +10,6 @@ use Carp;
 
 use Readonly ;
 use File::Basename;
-use Smart::Comments;
 use Try::Tiny;
 use Getopt::Euclid qw( :vars<opt_> );
 use Data::Dumper;
@@ -33,11 +32,11 @@ for my $li (0 .. scalar(@rows) -3){
     my @matches = ($rows[$li+2] =~ m/$matchExp/);
  #   warn Dumper @matches;
     my $firstadj  = length($matches[0]) - length($li+1);
-    my $secondadj = length($matches[4]) - length($li+1);    
+    my $secondadj = length($matches[4]) - length($li+1);
 #warn $secondadj;
     say $li+1
-   
-#, " " ,$matches[0]     
+
+#, " " ,$matches[0]
         , ($firstadj>0?" "x$firstadj:"")
         , ($firstadj<0?substr($matches[1],-$firstadj):$matches[1])
     #    , $matches[2]
@@ -49,7 +48,7 @@ for my $li (0 .. scalar(@rows) -3){
         , ($secondadj>0?" "x$secondadj:"")
         , ($secondadj<0?substr($matches[5],-$secondadj):$matches[5])
         , $matches[6];
-    #my $col1 = 
+    #my $col1 =
 }
 #warn Dumper @rows;
 
@@ -76,7 +75,7 @@ renumber-FormatFile.pl - ???????????????????
 
 =head1 USAGE
 
-renumber-FormatFile.pl -i <formatfile> 
+renumber-FormatFile.pl -i <formatfile>
 
 
 =head1 REQUIRED ARGUMENTS

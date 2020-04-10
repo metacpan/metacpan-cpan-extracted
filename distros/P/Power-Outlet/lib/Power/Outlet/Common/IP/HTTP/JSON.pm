@@ -5,7 +5,7 @@ use base qw{Power::Outlet::Common::IP::HTTP};
 #use Data::Dumper qw{Dumper};
 use JSON qw{encode_json decode_json};
 
-our $VERSION='0.21';
+our $VERSION='0.24';
 
 =head1 NAME
 
@@ -49,7 +49,11 @@ sub json_request {
   #print "$method $url\n";
   #print Dumper(\%options);
   my $response = $self->http_client->request($method, $url, \%options);  
-  die(sprintf(qq{HTTP Error: "%s", URL: "$url"}, $response->{"reason"})) unless $response->{"status"} eq "200";
+  if ($response->{"status"} eq "599") {
+    die(sprintf(qq{HTTP Error: "%s %s", URL: "$url", Content: %s}, $response->{"status"}, $response->{"reason"}, $response->{"content"}));
+  } elsif ($response->{"status"} ne "200") {
+    die(sprintf(qq{HTTP Error: "%s %s", URL: "$url"}, $response->{"status"}, $response->{"reason"}));
+  } 
   my $json     = $response->{"content"};
   #print "Response: $json\n";
   return decode_json($json);

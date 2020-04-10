@@ -60,6 +60,7 @@ my %module = (
         'List::Util'               => '1.29', # for pairmap
         'PerlX::Maybe'             => 0,
         'MIME::Base64'             => 0,
+        'JSON'                     => 0,
     },
     TEST_REQUIRES => {
         'Test::More'              => '0.88', # for done_testing support

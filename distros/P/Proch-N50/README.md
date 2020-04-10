@@ -1,4 +1,4 @@
-# Proch::N50 0.90
+# Proch::N50 
 
 [![CPAN](https://img.shields.io/badge/CPAN-Proch::N50-1abc9c.svg)](https://metacpan.org/pod/Proch::N50)
 [![Kwalitee](https://cpants.cpanauthors.org/release/PROCH/Proch-N50-0.70.svg)](https://cpants.cpanauthors.org/release/PROCH/Proch-N50-0.70)

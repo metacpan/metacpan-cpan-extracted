@@ -5,7 +5,7 @@
 
 our $DATE = '2020-01-31'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.123'; # VERSION
+our $VERSION = '0.124'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ durconv - Convert duration to another format
 
 =head1 VERSION
 
-This document describes version 0.123 of durconv (from Perl distribution App-DateUtils), released on 2020-01-31.
+This document describes version 0.124 of durconv (from Perl distribution App-DateUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -51,6 +51,28 @@ Convert "3h2m" to number of seconds:
 
  % durconv 3h2m
  10920
+
+Convert "3h2m" to iso8601:
+
+ % durconv 3h2m --to iso8601
+ PT3H2M
+
+Show all possible conversions:
+
+ % durconv 3h2m --to ALL
+ [
+    200,
+    "OK",
+    {
+       "hash" : {
+          "hours" : 3,
+          "minutes" : 2
+       },
+       "iso8601" : "PT3H2M",
+       "secs" : 10920
+    },
+    {}
+ ]
 
 =head1 OPTIONS
 
@@ -70,7 +92,13 @@ Default value:
 
 Valid values:
 
- ["secs","hash"]
+ ["secs","hash","iso8601","ALL"]
+
+=item B<-a>
+
+Shortcut for --to=ALL.
+
+See C<--to>.
 
 =back
 

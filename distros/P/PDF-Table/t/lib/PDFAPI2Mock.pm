@@ -1,3 +1,6 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
 package PDFAPI2Mock;
 
 BEGIN {
@@ -5,13 +8,13 @@ BEGIN {
     # Mock PDF::API2
 
     # this is a mini MockObject with factory methods
-    package Mock;
+    package Mock; ## no critic
     sub new { return bless [] => shift; }
 
     sub get {
         my $self   = shift;
         my $method = shift;    # optional method name
-        return $method ? grep( $_->[0] eq $method, @$self ) : @$self;
+        return $method ? grep( { $_->[0] eq $method } @$self ) : @$self;
     }
 
     sub getall {
@@ -39,10 +42,12 @@ BEGIN {
         my $class = shift;
 
         for my $method (@_) {
-            no strict 'refs';
+            no strict 'refs';  ## no critic
             *{ $class . '::' . $method } =
               sub { push @{ +shift }, [ $method, @_ ]; return 1 };
         }
+
+	return;
     }
 
     sub factory {
@@ -50,32 +55,33 @@ BEGIN {
         my $target = shift;
         my $method = shift;
 
-        no strict 'refs';
+        no strict 'refs'; ## no critic
         *{ $class . '::' . $method } = sub {
             my $thing = $target->new;
             push @{ +shift }, [ $method, $thing ];
             return $thing;
         };
+
+	return;
     }
 
-    package PDF::API2;
+    package PDF::API2; ## no critic
     our @ISA = 'Mock';
     __PACKAGE__->set_true(qw(corefont));
     __PACKAGE__->factory( 'PDF::API2::Page', 'page' );
 
-    package PDF::API2::Page;
+    package PDF::API2::Page; ## no critic
     our @ISA = 'Mock';
     __PACKAGE__->factory( 'PDF::API2::Content',       'gfx' );
     __PACKAGE__->factory( 'PDF::API2::Content::Text', 'text' );
 
-    package PDF::API2::Content;
+    package PDF::API2::Content; ## no critic
     our @ISA = 'Mock';
     __PACKAGE__->set_true(
         qw(strokecolor linewidth move hline vline fillcolor stroke rect fill));
-    package PDF::API2::Content::Text;
+    package PDF::API2::Content::Text; ## no critic
     our @ISA = 'Mock';
     __PACKAGE__->set_true(qw(font fillcolor translate text));
     sub advancewidth { shift; return 5 * length shift }
 }
 return 1;
-

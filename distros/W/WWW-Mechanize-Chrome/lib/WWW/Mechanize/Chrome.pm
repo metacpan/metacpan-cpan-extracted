@@ -25,7 +25,7 @@ use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -1186,6 +1186,9 @@ B<deprecated> - use C<< ->target >> instead
 
 Access the L<Chrome::DevToolsProtocol> instance connecting to Chrome.
 
+Deprecated, don't use this anymore. Most likely you want to use C<< ->target >>
+to talk to the Chrome tab or C<< ->transport >> to talk to the Chrome instance.
+
 =cut
 
 sub driver {
@@ -1203,6 +1206,19 @@ Chrome tab we use.
 
 sub target {
     $_[0]->{target}
+};
+
+=head2 C<< $mech->transport >>
+
+    my $transport = $mech->transport
+
+Access the L<Chrome::DevToolsProtocol::Transport> instance connecting to the
+Chrome instance.
+
+=cut
+
+sub transport {
+    $_[0]->driver->transport
 };
 
 =head2 C<< $mech->tab >>
@@ -4425,12 +4441,14 @@ sub _field_by_name {
 sub get_set_value($self,%options) {
     my $set_value = exists $options{ value };
     my $value = delete $options{ value };
-    my $pre   = delete $options{pre}  || $self->{pre_value};
+    my $pre   = delete $options{pre};
     $pre = [$pre]
-        if (! ref $pre);
-    my $post  = delete $options{post} || $self->{post_value};
+        if (defined $pre and ! ref $pre);
+    my $post  = delete $options{post};
     $post = [$post]
-        if (! ref $post);
+        if (defined $pre and ! ref $post);
+    $pre  ||= []; # just to eliminate some checks downwards
+    $post ||= []; # just to eliminate some checks downwards
     my $name  = delete $options{ name };
 
     my @fields = $self->_field_by_name(
@@ -4449,9 +4467,27 @@ sub get_set_value($self,%options) {
             );
             my $method = $method{ lc $tag };
 
-            # Send pre-change events:
-
             my $id = $obj->{objectId};
+
+            # Send pre-change events:
+            for my $ev (@$pre) {
+                $self->target->send_message(
+                        'Runtime.callFunctionOn',
+                        objectId => $id,
+                        functionDeclaration => <<'JS',
+function(ev) {
+    var event = new Event(ev, {
+        view : window,
+        bubbles: true,
+        cancelable: true
+    });
+    this.dispatchEvent(event);
+}
+JS
+                        arguments => [{ value => $ev }],
+                    );
+            };
+
             if( 'value' eq $method ) {
                 $self->target->send_message('DOM.setAttributeValue', nodeId => 0+$obj->nodeId, name => 'value', value => "$value" )->get;
 
@@ -4493,6 +4529,24 @@ JS
             };
 
             # Send post-change events
+            # Send pre-change events:
+            for my $ev (@$post) {
+                $self->target->send_message(
+                        'Runtime.callFunctionOn',
+                        objectId => $id,
+                        functionDeclaration => <<'JS',
+function(ev) {
+    var event = new Event(ev, {
+        view : window,
+        bubbles: true,
+        cancelable: true
+    });
+    this.dispatchEvent(event);
+}
+JS
+                        arguments => [{ value => $ev }],
+                    );
+            };
         };
 
         # Don't bother to fetch the field's value if it's not wanted
@@ -4527,7 +4581,6 @@ JS
                 return $values[0];
             }
         } else {
-            # Need to handle SELECT fields here
             return $obj->get_attribute('value');
         };
     } else {

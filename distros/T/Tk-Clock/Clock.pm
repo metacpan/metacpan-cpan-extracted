@@ -5,7 +5,7 @@ package Tk::Clock;
 use strict;
 use warnings;
 
-our $VERSION = "0.40";
+our $VERSION = "0.41";
 
 use Carp;
 
@@ -107,8 +107,7 @@ my %locale = (
       },
     );
 
-sub _booleans
-{
+sub _booleans {
     my $data = shift;
     $data->{$_} = !!$data->{$_} for qw(
 	ana24hour
@@ -122,23 +121,21 @@ sub _booleans
 	);
     } # _booleans
 
-sub _decode
-{
+sub _decode {
     my $s = shift;
     $s && $s =~ m{[\x80-\xff]} or return $s;
     my $u = eval { Encode::decode ("UTF-8", $s, Encode::FB_CROAK) };
     return ($@ ? $s : $u);
     } # _decode
 
-sub _newLocale
-{
+sub _newLocale {
     my $locale = shift or return $locale{C};
 
     require POSIX;
     require Encode;
 
-    my $curloc = POSIX::setlocale (&POSIX::LC_TIME, "")      || "C";
-    my $newloc = POSIX::setlocale (&POSIX::LC_TIME, $locale) || "C";
+    my $curloc = POSIX::setlocale (POSIX::LC_TIME (), "")      || "C";
+    my $newloc = POSIX::setlocale (POSIX::LC_TIME (), $locale) || "C";
     $locale{$newloc} and return $locale{$newloc};
 
     my $l = $locale{$locale} = {};
@@ -154,36 +151,31 @@ sub _newLocale
 	    POSIX::strftime ("%A", 0, 0, 0, $d - 1, 0, 113);
 	}
 
-    POSIX::setlocale (&POSIX::LC_TIME, $curloc);
+    POSIX::setlocale (POSIX::LC_TIME (), $curloc);
 
     return $l;
     } # _newLocale
 
-sub _month	# (month, size)
-{
+sub _month {	# (month, size)
     my ($locale, $m, $l) = @_;
     ($locale{$locale} || $locale{C})->{month}[$m][$l];
     } # _month
 
-sub _wday	# (wday, size)
-{
+sub _wday {	# (wday, size)
     my ($locale, $m, $l) = @_;
     ($locale{$locale} || $locale{C})->{day}[$m][$l];
     } # _wday
 
-sub _min
-{
+sub _min {
     $_[0] <= $_[1] ? $_[0] : $_[1];
     } # _min
 
-sub _max
-{
+sub _max {
     $_[0] >= $_[1] ? $_[0] : $_[1];
     } # _max
 
 # Transparent packInfo for pack/grid/place/form
-sub _packinfo
-{
+sub _packinfo {
     my $clock = shift;
 
     my %pi = map { ("-$_" => 0) } qw( padx pady ipadx ipady );
@@ -210,8 +202,7 @@ sub _packinfo
     %pi;
     } # _packinfo
 
-sub _resize
-{
+sub _resize {
     my $clock = shift;
 
     use integer;
@@ -236,8 +227,7 @@ sub _resize
     } # _resize
 
 # Callback when auto-resize is called
-sub _resize_auto
-{
+sub _resize_auto {
     my $clock = shift;
     my $data  = $clock->privateData;
 
@@ -247,8 +237,6 @@ sub _resize_auto
     my $geo   = $clock->geometry;
     my ($gw, $gh) = split m/\D/, $geo; # Cannot use ->cget here
     $gw < 5 and return; # not packed yet?
-    my %pi = $clock->_packinfo;
-    my ($px, $py) = ($pi{"-padx"}, $pi{"-pady"});
     $data->{useDigital} and $gh -= $data->{_digSize};
     my $nwdth = _min ($gw, $gh - 1);
     abs ($nwdth - $owdth) > 5 && $nwdth >= 10 or return;
@@ -265,8 +253,7 @@ sub _resize_auto
     $clock->_resize;
     } # _resize_auto
 
-sub _createDigital
-{
+sub _createDigital {
     my $clock = shift;
 
     my $data = $clock->privateData;
@@ -276,14 +263,14 @@ sub _createDigital
     my ($wd, $hd) = do {
 	my $s_date = $data->{fmtd}->(@t, 0, 0, 0);
 	$s_date =~ s/\b([0-9])\b/0$1/g; # prepare "d" running from 9 to 10
-	my $f = $clock->Label (-font => $data->{dateFont})->cget (-font);
+	my $f  = $clock->Label (-font => $data->{dateFont})->cget (-font);
 	my %fm = $clock->fontMetrics ($f);
 	($clock->fontMeasure ($f, $s_date), $fm{"-linespace"} || 9);
 	};
     my ($wt, $ht) = do {
 	my $s_time = $data->{fmtt}->(@t, 0, 0, 0);
 	$s_time =~ s/\b([0-9])\b/0$1/g; # prepare "h" running from 9 to 10
-	my $f = $clock->Label (-font => $data->{timeFont})->cget (-font);
+	my $f  = $clock->Label (-font => $data->{timeFont})->cget (-font);
 	my %fm = $clock->fontMetrics ($f);
 	($clock->fontMeasure ($f, $s_time), $fm{"-linespace"} || 9);
 	};
@@ -321,16 +308,14 @@ sub _createDigital
     $clock->_resize;
     } # _createDigital
 
-sub _destroyDigital
-{
+sub _destroyDigital {
     my $clock = shift;
 
     $clock->delete ("date");
     $clock->delete ("time");
     } # _destroyDigital
 
-sub _where
-{
+sub _where {
     my ($clock, $tick, $len, $anaSize) = @_;      # ticks 0 .. 59
     my ($x, $y, $angle);
 
@@ -342,8 +327,7 @@ sub _where
     ($h - $x / 4, $h + $y / 4, $h + $x, $h - $y);
     } # _where
 
-sub _createAnalog
-{
+sub _createAnalog {
     my $clock = shift;
 
     my $data = $clock->privateData;
@@ -402,7 +386,7 @@ sub _createAnalog
 	$clock->createOval (($cntr - $diam) x 2, ($cntr + $diam) x 2,
 	    -tags  => "hour",
 	    -fill  => $data->{handColor},
-	    -width => 0.
+	    -width => 0,
 	    );
 	}
     $clock->createLine (
@@ -425,7 +409,7 @@ sub _createAnalog
 	    $clock->createOval (($cntr - $diam) x 2, ($cntr + $diam) x 2,
 		-tags  => "sec",
 		-fill  => $data->{secsColor},
-		-width => 0.
+		-width => 0,
 		);
 	    }
 	}
@@ -433,15 +417,13 @@ sub _createAnalog
     $clock->_resize;
     } # _createAnalog
 
-sub _destroyAnalog
-{
+sub _destroyAnalog {
     my $clock = shift;
 
     $clock->delete ($_) for qw( back info tick hour min sec );
     } # _destroyAnalog
 
-sub Populate
-{
+sub Populate {
     my ($clock, $args) = @_;
 
     my $data = $clock->privateData;
@@ -488,8 +470,7 @@ my %attr_weight = (
     useLocale	=>     1,
     );
 
-sub config
-{
+sub config {
     my $clock = shift;
 
     ref $clock or croak "Bad method call";
@@ -508,7 +489,8 @@ sub config
 	}
 
     my $data = $clock->privateData;
-    $attr_weight{$_} ||= unpack "s>", $_ for keys %def_config;
+    my $pfmt = $] < 5.010 ? "s" : "s>";
+    $attr_weight{$_} ||= unpack $pfmt, $_ for keys %def_config;
 
     my $autoScale;
     # sort, so the recreational attribute will be done last
@@ -732,8 +714,7 @@ sub config
     $clock;
     } # config
 
-sub _run
-{
+sub _run {
     my $clock = shift;
 
     my $data = $clock->privateData;
@@ -1144,6 +1125,17 @@ show (part of) the image as a backdrop of the clock
 The C<new ()> constructor will also accept options valid for Canvas widgets,
 like C<-background> and C<-relief>.
 
+=head1 TAGS
+
+As all of the clock is part of a Canvas, the items cannot be addressed as
+Subwidgets. You can however alter presentation afterwards using the tags:
+
+ my $clock = $mw->Clock->pack;
+ $clock->itemconfigure ("date", -fill => "Red");
+
+Currently defined tags are C<date>, C<hour>, C<info>, C<min>, C<sec>,
+C<tick>, and C<time>.
+
 =head1 BUGS
 
 If the system load's too high, the clock might skip some seconds.
@@ -1174,7 +1166,7 @@ Thanks to all who have given me feedback and weird ideas.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 1999-2016 H.Merijn Brand
+Copyright (C) 1999-2020 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

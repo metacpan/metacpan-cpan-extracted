@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/rjbs/App-Cronjob/issues
   homepage: https://github.com/rjbs/App-Cronjob
   repository: https://github.com/rjbs/App-Cronjob.git
-version: '1.200009'
+version: '1.200010'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -325,7 +325,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.200009'
+          tag: '1.200010'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

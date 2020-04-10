@@ -4,8 +4,8 @@ package Proch::N50;
 use 5.012;
 use warnings;
 
-$Proch::N50::VERSION = '1.0.0';
-
+$Proch::N50::VERSION = '1.2.0';
+use File::Spec;
 use JSON::PP;
 use FASTX::Reader;
 use File::Basename;
@@ -19,7 +19,7 @@ sub getStats {
     # * filename (Str)
     # * Also return JSON string (Bool)
 
-    my ( $file, $wantJSON ) = @_;
+    my ( $file, $wantJSON, $customN ) = @_;
     my $answer;
     $answer->{status} = 1;
     $answer->{N50}    = undef;
@@ -57,20 +57,24 @@ sub getStats {
     }
 
     # Invokes core _n50fromHash() routine
-    my ($n50, $min, $max) = _n50fromHash( \%sizes, $slen );
+    my ($n50, $min, $max, $auN, $n75, $n90) = _n50fromHash( \%sizes, $slen, $customN );
 
     my $basename = basename($file);
 
     $answer->{N50}      = $n50 + 0;
+    $answer->{N75}      = $n75 + 0;
+    $answer->{N90}      = $n90 + 0;
+    $answer->{auN}      = sprintf("%.5f", $auN + 0);
     $answer->{min}      = $min + 0;
     $answer->{max}      = $max + 0;
     $answer->{seqs}     = $n;
     $answer->{size}     = $slen;
     $answer->{filename} = $basename;
     $answer->{dirname}  = dirname($file);
+    $answer->{path   }  = File::Spec->rel2abs(dirname($file));
 
     # If JSON is required return JSON
-    if ( defined $wantJSON ) {
+    if ( defined $wantJSON and $wantJSON ) {
 
         my $json = JSON::PP->new->ascii->pretty->allow_nonref;
         my $pretty_printed = $json->encode( $answer );
@@ -86,22 +90,44 @@ sub _n50fromHash {
     # Parameters:
     # * A hash of  key={contig_length} and value={no_contigs}
     # * Sum of all contigs sizes
-    my ( $hash_ref, $total ) = @_;
-    my $tlen = 0;
+    my ( $hash_ref, $total_size, $x ) = @_;
+    my $progressive_sum = 0;
+    my $auN = 0;
+    my $n50 = undef;
+    my $n75 = undef;
+    my $n90 = undef;
+    my $nx  = undef;
     my @sorted_keys = sort { $a <=> $b } keys %{$hash_ref};
 
     # Added in v. 0.039
     my $max =  $sorted_keys[-1];
     my $min =  $sorted_keys[0] ;
+    # N50 definition: https://en.wikipedia.org/wiki/N50_statistic
+    # Was '>=' in my original implementation of N50. Now complies with 'seqkit'
+    # N50 Calculation
 
     foreach my $s ( @sorted_keys ) {
-        $tlen += $s * ${$hash_ref}{$s};
+        my $ctgs_length = $s * ${$hash_ref}{$s};
+        $progressive_sum +=  $ctgs_length;
 
-     # N50 definition: https://en.wikipedia.org/wiki/N50_statistic
-     # Was '>=' in my original implementation of N50. Now complies with 'seqkit'
-     # N50 Calculation
-        return ($s, $min, $max) if ( $tlen > ( $total / 2 ) );
+
+        $auN += ( $ctgs_length ) * ( $ctgs_length / $total_size);
+
+       if ( !$n50 and $progressive_sum > ( $total_size * ((100 - 50) / 100) ) ) {
+         $n50 = $s;
+       }
+
+       if ( !$n75 and $progressive_sum > ( $total_size * ((100 - 75) / 100) ) ) {
+         $n75 = $s;
+       }
+       if ( !$n90 and $progressive_sum > ( $total_size * ((100 - 90) / 100) ) ) {
+         $n90 = $s;
+       }
+       if ( !$nx and defined $x) {
+         $nx = $s if ( $progressive_sum > ( $total_size * ((100 - 90) / 100) ));
+       }
     }
+    return ($n50, $min, $max, $auN, $n75, $n90, $nx);
 
 }
 
@@ -149,7 +175,7 @@ Proch::N50 - a small module to calculate N50 (total size, and total number of se
 
 =head1 VERSION
 
-version 1.0.0
+version 1.2.0
 
 =head1 SYNOPSIS
 
@@ -165,12 +191,15 @@ version 1.0.0
   # Will print:
   # %FASTA_stats = (
   #               'N50' => 65,
+  #               'N75' => 50,
+  #               'N90' => 4,
   #               'min' => 4,
   #               'max' => 65,
   #               'dirname' => 'data',
+  #               'auN' => 45.02112,
   #               'size' => 130,
   #               'seqs' => 6,
-  #               'filename' => 'small_test.fa',
+  #               'filename' => 'test.fa',
   #               'status' => 1
   #             );
 
@@ -207,53 +236,38 @@ This function return a hash reporting:
 
 total number of bp in the files
 
-=back
+=item I<N50>, I<N75>, I<N90> (int)
 
-=over 4
+the actual N50, N75, and N90 metrices
 
-=item I<N50> (int)
+=item I<auN> (float)
 
-the actual N50
-
-=back
-
-=over 4
+the area under the Nx curve, as described in L<https://lh3.github.io/2020/04/08/a-new-metric-on-assembly-contiguity>.
+Returs with 5 decimal digits.
 
 =item I<min> (int)
 
 Minimum length observed in FASTA/Q file
 
-=back
-
-=over 4
-
 =item I<max> (int)
 
 Maximum length observed in FASTA/Q file
-
-=back
-
-=over 4
 
 =item I<seqs> (int)
 
 total number of sequences in the files
 
-=back
-
-=over 4
-
 =item I<filename> (string)
 
 file basename of the input file
 
-=back
-
-=over 4
-
 =item I<dirname> (string)
 
-name of the directory containing the input file
+name of the directory containing the input file (as received)
+
+=item I<path> (string)
+
+name of the directory containing the input file (resolved to its absolute path)
 
 =back
 

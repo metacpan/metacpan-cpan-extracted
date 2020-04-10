@@ -2,9 +2,9 @@ NAME
     Parse::CommandLine::Regexp - Parsing string like command line
 
 VERSION
-    This document describes version 0.001 of Parse::CommandLine::Regexp
+    This document describes version 0.002 of Parse::CommandLine::Regexp
     (from Perl distribution Parse-CommandLine-Regexp), released on
-    2019-02-10.
+    2020-04-09.
 
 DESCRIPTION
     This module is an alternative to Parse::CommandLine, using regexp
@@ -44,19 +44,20 @@ BUGS
 SEE ALSO
     Parse::CommandLine
 
-    Text::ParseWords, which allows you to specify what characters to use as
-    delimiters.
+    Text::ParseWords's "shellwords()". This module also allows you to
+    specify which quoting characters to use.
 
-    "parse_cmdline" in Complete::Bash, which also takes into account
-    non-whitespace word-breaking character such as "|".
+    "parse_cmdline" in Complete::Bash, which uses similar technique as this
+    module, but also takes into account non-whitespace word-breaking
+    character such as "|".
 
-    Text::CSV and friends
+    Text::CSV and friends.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,13 +1,18 @@
-0.003   2018-01-29 (PERLANCAR)
+0.004   2020-04-10  Released-By: PERLANCAR
+
+        - [build] Rebuild to update Sah coerce rule module names.
+
+
+0.003   2018-01-29  Released-By: PERLANCAR
 
 	- Adjust to AppBase::Grep 0.003 (multiple patterns).
 
 
-0.002   2018-01-29 (PERLANCAR)
+0.002   2018-01-29  Released-By: PERLANCAR
 
 	- Only show label if user specifies more than 1 file.
 
 
-0.001   2018-01-28 (PERLANCAR)
+0.001   2018-01-28  Released-By: PERLANCAR
 
         - First release.

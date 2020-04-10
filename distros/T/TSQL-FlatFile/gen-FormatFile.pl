@@ -14,13 +14,11 @@ use Readonly ;
 use List::MoreUtils qw(any) ;
 
 use File::Basename;
-use Smart::Comments;
 use Try::Tiny;
 
 use Getopt::Euclid qw( :vars<opt_> );
 use List::MoreUtils qw{firstidx} ;
 use Data::Dumper;
-use Regexp::Exhaustive qw/ exhaustive /;
 
 use version ; our $VERSION = qv('1.0.3');
 our $opt_asciifile;
@@ -75,7 +73,7 @@ else {
                             , $incrementalsearch
                             , $debug
                             ) ;
-    say $res;
+    print $res;
 }
 
 close $fh;

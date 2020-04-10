@@ -14,20 +14,19 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Proch-N50",
   "EXE_FILES" => [
-    "bin/n50",
-    "bin/n50.bak"
+    "bin/n50"
   ],
   "LICENSE" => "mit",
   "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Proch::N50",
   "PREREQ_PM" => {
     "FASTX::Reader" => "0.32",
-    "Getopt::Long" => "2.45",
+    "Getopt::Long" => "2.39",
     "JSON::PP" => "2.27",
-    "Pod::Usage" => "1.64",
+    "Pod::Usage" => "1.61",
     "Text::ASCIITable" => 0
   },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,9 +35,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "FASTX::Reader" => "0.32",
-  "Getopt::Long" => "2.45",
+  "Getopt::Long" => "2.39",
   "JSON::PP" => "2.27",
-  "Pod::Usage" => "1.64",
+  "Pod::Usage" => "1.61",
   "Text::ASCIITable" => 0
 );
 

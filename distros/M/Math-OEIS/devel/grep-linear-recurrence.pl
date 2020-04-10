@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2015, 2016, 2017, 2019 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -29,6 +29,7 @@ use Smart::Comments;
 
 {
   # ~/OEIS/Index to OEIS Section Rec - OeisWiki.html
+
   my $filename = Math::OEIS->local_filename
     ('Index to OEIS Section Rec - OeisWiki.html');
   my $str = File::Slurp::read_file($filename);
@@ -51,8 +52,11 @@ HERE
   print $fh "[]]};\n";
   print "$count signatures\n";
   print $fh <<'HERE';
-print(#signatures);
+print(#signatures" vector length");
 want = x^3 - x^2 - 2;
+want = x^5 - x^4 - x^2 - 1;
+want = x^2 - 11*x + 9;
+want = x^2 - 5*x + 2;     \\ A082486, rpp, rpq growth
 printcompact(v) =
 {
   print1("[");

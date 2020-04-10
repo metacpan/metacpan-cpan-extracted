@@ -730,6 +730,18 @@ INCOMPATIBILITIES WITH MOOSE
     An extension MooX::late exists to ease translating Moose packages to Moo
     by providing a more Moose-like interface.
 
+COMPATIBILITY WITH OLDER PERL VERSIONS
+    Moo is compatible with perl versions back to 5.6. When running on older
+    versions, additional prerequisites will be required. If you are
+    packaging a script with its dependencies, such as with App::FatPacker,
+    you will need to be certain that the extra prerequisites are included.
+
+    MRO::Compat
+        Required on perl versions prior to 5.10.0.
+
+    Devel::GlobalDestruction
+        Required on perl versions prior to 5.14.0.
+
 SUPPORT
     IRC: #moose on irc.perl.org
 

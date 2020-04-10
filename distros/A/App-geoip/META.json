@@ -1,17 +1,67 @@
 {
-   "name" : "App-geoip",
-   "version" : "0.11",
-   "provides" : {
-      "App::geoip" : {
-         "version" : "0.11",
-         "file" : "lib/App/geoip.pm"
-         }
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
       },
+   "generated_by" : "Author",
+   "license" : [
+      "perl_5"
+      ],
    "author" : [
       "H.Merijn Brand <h.m.brand@xs4all.nl>"
       ],
+   "provides" : {
+      "App::geoip" : {
+         "file" : "lib/App/geoip.pm",
+         "version" : "0.13"
+         }
+      },
+   "release_status" : "stable",
+   "dynamic_config" : 1,
+   "name" : "App-geoip",
+   "resources" : {
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "repository" : {
+         "web" : "https://github.com/Tux/GeoIP2",
+         "url" : "https://github.com/Tux/GeoIP2",
+         "type" : "git"
+         },
+      "homepage" : "https://metacpan.org/pod/App::geoip",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ]
+      },
    "abstract" : "Show geological data based on hostname or IP address(es)",
    "prereqs" : {
+      "runtime" : {
+         "recommends" : {
+            "DBI" : "1.643",
+            "Data::Dumper" : "2.173",
+            "Getopt::Long" : "2.51",
+            "Socket" : "2.029",
+            "LWP::Simple" : "6.43",
+            "Net::CIDR" : "0.20",
+            "Pod::Usage" : "1.70",
+            "Archive::Zip" : "1.68",
+            "JSON::PP" : "4.04",
+            "Text::CSV_XS" : "1.41",
+            "Math::Trig" : "1.23"
+            },
+         "requires" : {
+            "LWP::Simple" : "0",
+            "Getopt::Long" : "0",
+            "Data::Dumper" : "0",
+            "Math::Trig" : "0",
+            "JSON::PP" : "0",
+            "perl" : "5.014",
+            "Socket" : "0",
+            "DBI" : "0",
+            "Text::CSV_XS" : "1.39",
+            "Pod::Usage" : "0",
+            "Archive::Zip" : "0",
+            "Net::CIDR" : "0"
+            }
+         },
       "build" : {
          "requires" : {
             "Config" : "0"
@@ -22,61 +72,11 @@
             "ExtUtils::MakeMaker" : "0"
             }
          },
-      "runtime" : {
-         "requires" : {
-            "Math::Trig" : "0",
-            "perl" : "5.014",
-            "Archive::Zip" : "0",
-            "LWP::Simple" : "0",
-            "Net::CIDR" : "0",
-            "Data::Dumper" : "0",
-            "Pod::Usage" : "0",
-            "Getopt::Long" : "0",
-            "JSON::PP" : "0",
-            "Text::CSV_XS" : "1.39",
-            "Socket" : "0",
-            "DBI" : "0"
-            },
-         "recommends" : {
-            "DBI" : "1.642",
-            "Socket" : "2.029",
-            "LWP::Simple" : "6.43",
-            "Net::CIDR" : "0.20",
-            "JSON::PP" : "4.04",
-            "Archive::Zip" : "1.67",
-            "Text::CSV_XS" : "1.40",
-            "Data::Dumper" : "2.173",
-            "Getopt::Long" : "2.51",
-            "Pod::Usage" : "1.69",
-            "Math::Trig" : "1.23"
-            }
-         },
       "test" : {
          "requires" : {
             "Test::More" : "0"
             }
          }
       },
-   "license" : [
-      "perl_5"
-      ],
-   "generated_by" : "Author",
-   "dynamic_config" : 1,
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
-      },
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ],
-      "homepage" : "https://metacpan.org/pod/App::geoip",
-      "x_IRC" : "irc://irc.perl.org/#csv",
-      "repository" : {
-         "url" : "https://github.com/Tux/GeoIP2",
-         "type" : "git",
-         "web" : "https://github.com/Tux/GeoIP2"
-         }
-      },
-   "release_status" : "stable"
+   "version" : "0.13"
    }

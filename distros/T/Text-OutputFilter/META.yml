@@ -14,9 +14,9 @@ name: Text-OutputFilter
 provides: 
   Text::OutputFilter: 
     file: OutputFilter.pm
-    version: '0.21'
+    version: '0.22'
 recommends: 
-  Test::More: '1.302162'
+  Test::More: '1.302174'
 requires: 
   Carp: 0
   Test::More: 0
@@ -25,4 +25,4 @@ requires:
 resources: 
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Text-OutputFilter
-version: '0.21'
+version: '0.22'

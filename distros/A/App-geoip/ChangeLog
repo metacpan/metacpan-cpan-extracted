@@ -1,3 +1,9 @@
+0.13	- 2020-04-09, H.Merijn Brand
+    * Make 5.14.0 explicit in Makefile.PL
+
+0.12	- 2020-04-09, H.Merijn Brand
+    * Add option to select CIDR's for country
+
 0.11	- 2020-01-21, H.Merijn Brand
     * Release!
 

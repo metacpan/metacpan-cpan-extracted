@@ -37,13 +37,13 @@
             "Keyword::Declare" : "0.001017",
             "Moo" : "2.003004",
             "MooX::LazierAttributes" : "1.07008",
-            "MooX::ValidateSubs" : "1.012004",
+            "MooX::ValidateSubs" : "1.012005",
             "Perl::Tidy" : "20200110",
             "perl" : "5.018"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

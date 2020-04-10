@@ -1,3 +1,8 @@
+0.008   2020-04-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [build] Rebuild, to update Sah coerce rule module names.
+
+
 0.007   2019-07-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Implement delete-repo.

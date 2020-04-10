@@ -5,7 +5,7 @@
 
 our $DATE = '2020-01-31'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.123'; # VERSION
+our $VERSION = '0.124'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ dateconv - Convert date to another format
 
 =head1 VERSION
 
-This document describes version 0.123 of dateconv (from Perl distribution App-DateUtils), released on 2020-01-31.
+This document describes version 0.124 of dateconv (from Perl distribution App-DateUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -73,8 +73,8 @@ Show all possible conversions:
  +---------+----------------------+
  | key     | value                |
  +---------+----------------------+
- | epoch   | 1580446720           |
- | iso8601 | 2020-01-31T04:58:40Z |
+ | epoch   | 1580449881           |
+ | iso8601 | 2020-01-31T05:51:21Z |
  | ymd     | 2020-01-31           |
  +---------+----------------------+
 

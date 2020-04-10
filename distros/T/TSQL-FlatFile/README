@@ -18,7 +18,7 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc TSQL-FlatFile
+    perldoc TSQL::FlatFile
 
 Each utility script contains its own documentation.  You can run perldoc
 on the script, or use 'scriptname.pl --man' to view the help.

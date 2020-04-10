@@ -1,3 +1,6 @@
+0.016     Thu Apr 9 2020 05:35:59 PM CEST
+- Fix broken IPC::Run::run call for push_command
+
 0.015     Sat Jun 3 2017 01:29:16 PM CEST
 - Add Path::Tiny as a dependency
 - Use ReadmeAnyFromPod so the README.md file is built from POD

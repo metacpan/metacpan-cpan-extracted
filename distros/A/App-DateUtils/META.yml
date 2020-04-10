@@ -41,6 +41,7 @@ requires:
   DateTime::Format::ISO8601::Format: '0'
   DateTime::Format::Natural: '0'
   Module::Installed::Tiny: '0.004'
+  POSIX: '0'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
   Time::Duration::Parse: '0'
@@ -51,7 +52,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DateUtils
   homepage: https://metacpan.org/release/App-DateUtils
   repository: git://github.com/perlancar/perl-App-DateUtils.git
-version: '0.123'
+version: '0.124'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -107,6 +108,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript parse_duration_using_df_natural'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript strftime'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::InsertExecsList

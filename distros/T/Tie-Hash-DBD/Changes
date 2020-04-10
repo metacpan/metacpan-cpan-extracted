@@ -1,3 +1,6 @@
+0.21	- 09 Apr 2020, H.Merijn Brand
+    * It's 2020
+
 0.20	- 02 Sep 2019, H.Merijn Brand
     * Require the correct module for YAML::Syck::Dump
 

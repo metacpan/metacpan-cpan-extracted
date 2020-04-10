@@ -1,3 +1,9 @@
+0.007   2020-04-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] remove() on array element should update children's
+	  key_in_parent whose value is larger than our index.
+
+
 0.006   2020-04-07  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] No longer require users to add

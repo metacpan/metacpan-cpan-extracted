@@ -79,8 +79,7 @@ all_plugins_in_prereqs($tzil,
 );
 
 SKIP:
-foreach my $plugin ('Dist::Zilla::Plugin::MakeMaker::Fallback', 'Dist::Zilla::Plugin::ModuleBuildTiny::Fallback')
-{
+foreach my $plugin ('Dist::Zilla::Plugin::MakeMaker::Fallback', 'Dist::Zilla::Plugin::ModuleBuildTiny::Fallback') {
     skip "need recent $plugin to test default_jobs option", 1 if not $plugin->can('default_jobs');
     my $obj = first { find_meta($_)->name eq $plugin } @{$tzil->plugins};
     is(

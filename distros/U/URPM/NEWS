@@ -1,3 +1,8 @@
+Version 5.25 - 8 April 2020
+
+- add support for reinstall (needs rpm >= 4.12.x)
+- workaround rpm-4.16 adding provides to SRPMs, thus fixing urpmi testuite
+
 Version 5.24.1 - 17 January 2020
 
 - make test pass on most distros

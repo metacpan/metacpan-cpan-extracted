@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-# Copyright (c) 2015-2018 H.Merijn Brand
+# Copyright (c) 2015-2020 H.Merijn Brand
 
 require 5.006;
 use strict;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 use ExtUtils::MakeMaker;
 
@@ -27,6 +27,12 @@ my $rv = WriteMakefile (%wm);
 package MY;
 
 sub postamble {
+    my $min_vsn = ($] >= 5.010 && -d "xt" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
+	? join "\n" =>
+	    'test::	doc',
+	    '	-@env TEST_FILES="xt/*.t" make -e test_dynamic',
+	    ''
+	: "";
     <<"EOPA";
 VERSION = $VERSION
 
@@ -42,20 +48,26 @@ Checklist.html:	Checklist.md
 Checklist.pod:	Checklist.md
 	perl md2pod.pl
 
-Checklist.pm:	doc
+Checklist.pm:	Checklist.pod
 	perl pod2pm.pl
+
+spellcheck:
+	pod-spell-check --aspell --ispell
+
+checkmeta:	spellcheck
+	perl sandbox/genMETA.pl -c
+
+fixmeta:	distmeta
+	perl sandbox/genMETA.pl
+
+tgzdist:	checkmeta fixmeta \$(DISTVNAME).tar.gz distcheck
+	-\@mv -f \$(DISTVNAME).tar.gz \$(DISTVNAME).tgz
+	-\@cpants_lint.pl \$(DISTVNAME).tgz
+	-\@rm -f Debian_CPANTS.txt
+
+$min_vsn
 
 test::		doc
 	perl scripts/pod-spell-check --aspell --ispell
-
-tgzdist:
-	perl check-versions.pl
-	perl -pi -e'm/"version"/ and s{"[0-9]\.[.0-9]+"}{"$VERSION"}' META.json
-	jsn2yml < META.json > META.yml
-	ln -s . Release-Checklist-$VERSION
-	sed "s,^,Release-Checklist-$VERSION/," MANIFEST >Mx
-	tar --format=ustar -czv -T Mx -f Release-Checklist-$VERSION.tgz
-	rm -f Mx Release-Checklist-$VERSION
-	cpants_lint.pl Release-Checklist-$VERSION.tgz
 EOPA
     } # postamble

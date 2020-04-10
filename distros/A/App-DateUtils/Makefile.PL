@@ -26,7 +26,8 @@ my %WriteMakefileArgs = (
     "script/parse-duration-using-df-alami-en",
     "script/parse-duration-using-df-alami-id",
     "script/parse-duration-using-df-natural",
-    "script/parse-duration-using-td-parse"
+    "script/parse-duration-using-td-parse",
+    "script/strftime"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -56,6 +57,7 @@ my %WriteMakefileArgs = (
     "DateTime::Format::ISO8601::Format" => 0,
     "DateTime::Format::Natural" => 0,
     "Module::Installed::Tiny" => "0.004",
+    "POSIX" => 0,
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.820",
     "Time::Duration::Parse" => 0,
@@ -68,7 +70,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.123",
+  "VERSION" => "0.124",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -103,6 +105,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Installed::Tiny" => "0.004",
+  "POSIX" => 0,
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.820",
   "Test::More" => 0,

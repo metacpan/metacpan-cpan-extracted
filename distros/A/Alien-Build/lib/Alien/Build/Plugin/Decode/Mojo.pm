@@ -6,7 +6,7 @@ use 5.008001;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin to extract links from HTML using Mojo::DOM or Mojo::DOM58
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 
 sub _load ($;$)
@@ -105,7 +105,7 @@ Alien::Build::Plugin::Decode::Mojo - Plugin to extract links from HTML using Moj
 
 =head1 VERSION
 
-version 2.17
+version 2.19
 
 =head1 SYNOPSIS
 

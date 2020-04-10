@@ -27,7 +27,7 @@ our @ISA = ('Math::OEIS::SortedFile');
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 13;
+our $VERSION = 14;
 
 use constant base_filename => 'names';
 

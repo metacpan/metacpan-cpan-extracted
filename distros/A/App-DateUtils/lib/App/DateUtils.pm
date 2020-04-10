@@ -3,7 +3,7 @@ package App::DateUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-01-31'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.123'; # VERSION
+our $VERSION = '0.124'; # VERSION
 
 use 5.010001;
 use strict;
@@ -529,6 +529,48 @@ sub dateconv {
     }
 }
 
+$SPEC{strftime} = {
+    v => 1.1,
+    summary => 'Format date using strftime()',
+    args => {
+        format => {
+            schema => 'str*',
+            req => 1,
+            pos => 0,
+        },
+        date => {
+            schema => ['date*', {
+                'x.perl.coerce_to' => 'DateTime',
+                'x.perl.coerce_rules' => ['From_str::iso8601', 'From_str::natural'],
+            }],
+            pos => 1,
+        },
+    },
+    result_naked => 1,
+    examples => [
+        {
+            summary => 'Format current time as yyyy-mm-dd',
+            args => {format => '%Y-%m-%d'},
+            test => 0,
+        },
+        {
+            summary => 'Format a specific time as yyyy-mm-dd',
+            args => {format => '%Y-%m-%d', date => 'tomorrow'},
+            test => 0,
+        },
+    ],
+};
+sub strftime {
+    require DateTime;
+    require POSIX;
+
+    my %args = @_;
+    my $format = $args{format};
+    my $date   = $args{date} // DateTime->now;
+
+    POSIX::strftime($format, gmtime($date->epoch));
+}
+
 $SPEC{durconv} = {
     v => 1.1,
     summary => 'Convert duration to another format',
@@ -541,8 +583,11 @@ $SPEC{durconv} = {
             pos => 0,
         },
         to => {
-            schema => ['str*', in=>[qw/secs hash/]], # XXX: iso8601, ...
+            schema => ['str*', in=>[qw/secs hash iso8601 ALL/]],
             default => 'secs',
+            cmdline_aliases => {
+                a => {is_flag=>1, summary => 'Shortcut for --to=ALL', code => sub {$_[0]{to} = 'ALL'}},
+            },
         },
     },
     result_naked => 1,
@@ -552,6 +597,16 @@ $SPEC{durconv} = {
             args => {duration => '3h2m'},
             result => 10920,
         },
+        {
+            summary => 'Convert "3h2m" to iso8601',
+            args => {duration => '3h2m', to=>'iso8601'},
+            result => 'PT3H2M',
+        },
+        {
+            summary => 'Show all possible conversions',
+            args => {duration => '3h2m', to => 'ALL'},
+            test => 0,
+        },
     ],
 };
 sub durconv {
@@ -559,7 +614,7 @@ sub durconv {
     my $dur = $args{duration};
     my $to  = $args{to};
 
-    if ($to eq 'secs') {
+    my $code_secs = sub {
         # approximation
         return (
             $dur->years       * 365*86400 +
@@ -571,7 +626,9 @@ sub durconv {
             $dur->seconds     *         1 +
             $dur->nanoseconds *      1e-9
         );
-    } elsif ($to eq 'hash') {
+    };
+
+    my $code_hash = sub {
         my $h = {
             years => $dur->years,
             months => $dur->months,
@@ -586,6 +643,27 @@ sub durconv {
             delete $h->{$_} if $h->{$_} == 0;
         }
         return $h;
+    };
+
+    my $code_iso8601 = sub {
+        require DateTime::Format::Duration::ISO8601;
+        DateTime::Format::Duration::ISO8601->new->format_duration($dur);
+    };
+
+    if ($to eq 'secs') {
+        return $code_secs->();
+    } elsif ($to eq 'hash') {
+        return $code_hash->();
+    } elsif ($to eq 'hash') {
+        return $code_hash->();
+    } elsif ($to eq 'iso8601') {
+        return $code_iso8601->();
+    } elsif ($to eq 'ALL') {
+        return {
+            secs => $code_secs->(),
+            hash => $code_hash->(),
+            iso8601 => $code_iso8601->(),
+        };
     } else {
         die "Unknown format '$to'";
     }
@@ -675,7 +753,7 @@ App::DateUtils - An assortment of date-/time-related CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.123 of App::DateUtils (from Perl distribution App-DateUtils), released on 2020-01-31.
+This document describes version 0.124 of App::DateUtils (from Perl distribution App-DateUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -709,6 +787,8 @@ date/time:
 =item * L<parse-duration-using-df-natural>
 
 =item * L<parse-duration-using-td-parse>
+
+=item * L<strftime>
 
 =back
 
@@ -753,8 +833,8 @@ Result:
    200,
    "OK",
    {
-     epoch => 1580446720,
-     iso8601 => "2020-01-31T04:58:40Z",
+     epoch => 1580449881,
+     iso8601 => "2020-01-31T05:51:21Z",
      ymd => "2020-01-31",
    },
  ]
@@ -866,6 +946,26 @@ Examples:
 =item * Convert "3h2m" to number of seconds:
 
  durconv(duration => "3h2m"); # -> 10920
+
+=item * Convert "3h2m" to iso8601:
+
+ durconv(duration => "3h2m", to => "iso8601"); # -> "PT3H2M"
+
+=item * Show all possible conversions:
+
+ durconv(duration => "3h2m", to => "ALL");
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     hash    => { hours => 3, minutes => 2 },
+     iso8601 => "PT3H2M",
+     secs    => 10920,
+   },
+ ]
 
 =back
 
@@ -1462,8 +1562,8 @@ Result:
      is_parseable => 1,
      as_secs => 1209600,
      as_dtdur_obj => "P14D",
-     date2 => "2020-02-14T04:58:40",
-     date1 => "2020-01-31T04:58:40",
+     date2 => "2020-02-14T05:51:21",
+     date1 => "2020-01-31T05:51:21",
    },
  ]
 
@@ -1478,10 +1578,10 @@ Result:
      module => "DateTime::Format::Natural",
      original => "from 23 Jun to 29 Jun",
      is_parseable => 1,
-     as_secs => 13006880,
-     as_dtdur_obj => "P4M28DT19H1M20S",
-     date1 => "2020-01-31T04:58:40",
+     as_secs => 13003719,
+     as_dtdur_obj => "P4M28DT18H8M39S",
      date2 => "2020-06-29T00:00:00",
+     date1 => "2020-01-31T05:51:21",
    },
  ]
 
@@ -1592,6 +1692,45 @@ that contains extra information.
 
 Return value:  (any)
 
+
+
+=head2 strftime
+
+Usage:
+
+ strftime(%args) -> any
+
+Format date using strftime().
+
+Examples:
+
+=over
+
+=item * Format current time as yyyy-mm-dd:
+
+ strftime(format => "%Y-%m-%d"); # -> [200, "OK", "2020-01-31"]
+
+=item * Format a specific time as yyyy-mm-dd:
+
+ strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> [200, "OK", "2020-02-01"]
+
+=back
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<date> => I<date>
+
+=item * B<format>* => I<str>
+
+
+=back
+
+Return value:  (any)
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-DateUtils>.
@@ -1611,7 +1750,7 @@ feature.
 =head1 SEE ALSO
 
 
-L<dateparse>. Perinci::To::POD=HASH(0x55d490eec860).
+L<dateparse>. Perinci::To::POD=HASH(0x560f4ff3c148).
 
 L<App::datecalc>
 

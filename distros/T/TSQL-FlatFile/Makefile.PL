@@ -15,7 +15,9 @@ WriteMakefile(
     PL_FILES            => {},
     EXE_FILES => [ "gen-FormatFile.pl"
                  , "gen-SkeletonTable.pl"
-                 , "renumber-FormatFile.pl"                 
+                 , "renumber-FormatFile.pl"
+                 , "test-FormatFile.pl"
+                 , "gen-CsvHeader.pl"
                  ],
     PREREQ_PM => {
         'Test::More'                => 0,
@@ -32,13 +34,7 @@ WriteMakefile(
         'List::Util'                => 0,
         'Modern::Perl'              => 0,
         'Readonly'                  => 0,
-        'Regexp::Exhaustive'        => 0,
-        'Smart::Comments'           => 0,
-        'Spreadsheet::WriteExcel'   => 0,
-        'Spreadsheet::ParseExcel'   => 0,
-        'Storable'                  => 0,
         'Text::Diff'                => 0,
-        'Try::Tiny'                 => 0,
         'autodie'                   => 0,
         'indirect'                  => 0,
         'version'                   => 0,

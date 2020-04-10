@@ -5,12 +5,16 @@
 #Backups
 .*\.old$
 .*\.bak$
+.*~
+
+#Editor stuff
+.*\.swp$
 
 #Blib folder
 ^blib/*
 
 #Git folder
-^\.git/*
+\.git
 
 #Hidden files
 ^\..*

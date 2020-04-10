@@ -71,6 +71,15 @@ subtest "status_code == -1" => sub {
 
   eval { $status->assert_ok("test") };
   like($@, qr{^test \Q$expect_err\E}, '->assert_ok throws string error');
-};
 
+  {
+    local $? = -1;
+    eval { Process::Status->assert_ok('class test') };
+    like(
+      $@,
+      qr{^class test did not run; \$\? was -1},
+      '->assert_ok as class method does not die, and throws string error'
+    );
+  }
+};
 done_testing;

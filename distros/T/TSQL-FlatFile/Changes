@@ -9,4 +9,5 @@ Revision history for TSQL-FlatFile
 1.03    04/04/2020
         Realign column numbers in format file.
         Generate skeleton table.
-        
+1.04    04/04/2020
+        Use format file to debug ie preview file format.

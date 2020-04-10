@@ -108,10 +108,8 @@ cmp_deeply(
 # this is split up into separate tests with a loop because in each case
 # the (grand?)parent key may not even exist, and this is hard to express with
 # Test::Deep.
-foreach my $phase (uniq 'develop', $PREREQ_PHASE_DEFAULT)
-{
-    foreach my $relationship (qw(requires recommends suggests))
-    {
+foreach my $phase (uniq 'develop', $PREREQ_PHASE_DEFAULT) {
+    foreach my $relationship (qw(requires recommends suggests)) {
         cmp_deeply(
             (($tzil->distmeta->{prereqs}{$phase} // {})->{$relationship}) // {},
             notexists(keys %network_plugins, Dist::Zilla::Util->expand_config_package_name('BlockRelease')),

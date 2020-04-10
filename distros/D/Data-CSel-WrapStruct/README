@@ -3,8 +3,8 @@ NAME
     suitable for use with Data::CSel
 
 VERSION
-    This document describes version 0.006 of Data::CSel::WrapStruct (from
-    Perl distribution Data-CSel-WrapStruct), released on 2020-04-07.
+    This document describes version 0.007 of Data::CSel::WrapStruct (from
+    Perl distribution Data-CSel-WrapStruct), released on 2020-04-09.
 
 SYNOPSIS
      use Data::CSel qw(csel);

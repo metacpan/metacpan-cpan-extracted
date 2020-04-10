@@ -68,37 +68,38 @@ subtest "server = $_" => sub {
 
     my $tzil;
     my @warnings = warnings {
-        $tzil = Builder->from_config(
-            { dist_root => 'does-not-exist' },
-            {
-                # tempdir_root => default
-                add_files => {
-                    path(qw(source dist.ini)) => simple_ini(
-                        'GatherDir',
-                        [ '@Author::ETHER' => {
-                            server => $server,
-                            installer => 'MakeMaker',
-                            '-remove' =>  \@REMOVED_PLUGINS,
-                            'RewriteVersion::Transitional.skip_version_provider' => 1,
-                          },
-                        ],
-                    ),
-                    path(qw(source lib MyModule.pm)) => "package MyModule;\n\n1",
-                    path(qw(source Changes)) => '',
+        my $exception = exception {
+            $tzil = Builder->from_config(
+                { dist_root => 'does-not-exist' },
+                {
+                    # tempdir_root => default
+                    add_files => {
+                        path(qw(source dist.ini)) => simple_ini(
+                            'GatherDir',
+                            [ '@Author::ETHER' => {
+                                server => $server,
+                                installer => 'MakeMaker',
+                                '-remove' =>  \@REMOVED_PLUGINS,
+                                'RewriteVersion::Transitional.skip_version_provider' => 1,
+                              },
+                            ],
+                        ),
+                        path(qw(source lib MyModule.pm)) => "package MyModule;\n\n1",
+                        path(qw(source Changes)) => '',
+                    },
                 },
-            },
-        );
+            );
+        };
+        is $exception, undef, "no exception for server = $server";
     };
 
     skip('can only test server=github when in the local git repository', 4)
         if $server eq 'github' and not git_in_path($tzil->tempdir);
 
-    if ($server eq 'github' or $server eq 'none')
-    {
+    if ($server eq 'github' or $server eq 'none') {
         warn @warnings if @warnings;
     }
-    else
-    {
+    else {
         my $expected = "server = $server: recommend instead using server = github and GithubMeta.remote = $server with a read-only mirror";
         my $ok = cmp_deeply(
             [ map colorstrip($_), @warnings ],

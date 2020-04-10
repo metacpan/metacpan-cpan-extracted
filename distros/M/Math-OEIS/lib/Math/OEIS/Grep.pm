@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -23,7 +23,7 @@ use Carp 'croak';
 use Math::OEIS::Names;
 use Math::OEIS::Stripped;
 
-our $VERSION = 13;
+our $VERSION = 14;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -173,7 +173,9 @@ sub search {
   my $count = 0;
 
   my $orig_array = $array;
-  my $mung_desc = '';
+  my @orig_mung_desc;
+  my @mung_desc;
+  my $show_mung;   # when mung_desc changed so show it if any match
  MUNG: foreach my $mung ('none',
                          ($h{'_EXPERIMENTAL_exact'}
                           ? ()
@@ -201,7 +203,8 @@ sub search {
         $count++;
       }
       ### trimmed to: join(',',@$array)
-      $mung_desc = "[TRIMMED START $count VALUES]\n";
+      @orig_mung_desc = ("[TRIMMED START $count VALUES]");
+      $show_mung = 1;
       if (_aref_any_nonzero($array) &&
           (@$array >= 3 || length(join(',',@$array)) >= 5)) {
         $orig_array = $array;
@@ -211,7 +214,8 @@ sub search {
       }
 
     } elsif ($mung eq 'negate') {
-      $mung_desc = "[NEGATED]\n";
+      @mung_desc = ('[NEGATED]');
+      $show_mung = 1;
       $array = [ map { my $value = $_;
                        unless ($value eq '0' || $value =~ s/^-//) {
                          $value = "-$value";
@@ -220,7 +224,8 @@ sub search {
                      } @$orig_array ];
 
     } elsif ($mung eq 'half') {
-      $mung_desc = "[HALF]\n";
+      @mung_desc = ('[HALF]');
+      $show_mung = 1;
       $array = [ map {
         my $value = _to_bigint($_);
         if ($value % 2) {
@@ -233,7 +238,8 @@ sub search {
       } @$orig_array ];
 
     } elsif ($mung eq 'quarter') {
-      $mung_desc = "[QUARTER]\n";
+      @mung_desc = ('[QUARTER]');
+      $show_mung = 1;
       $array = [ map {
         my $value = _to_bigint($_);
         if ($value % 4) {
@@ -246,11 +252,13 @@ sub search {
       } @$orig_array ];
 
     } elsif ($mung eq 'double') {
-      $mung_desc = "[DOUBLE]\n";
+      @mung_desc = ('[DOUBLE]');
+      $show_mung = 1;
       $array = [ map {2*_to_bigint($_)} @$orig_array ];
 
     } elsif ($mung eq 'abs') {
-      $mung_desc = "[ABSOLUTE VALUES]\n";
+      @mung_desc = ('[ABSOLUTE VALUES]');
+      $show_mung = 1;
       my $any_negative = 0;
       $array = [ map { my $abs = $_;
                        $any_negative |= ($abs =~ s/^-//);
@@ -269,6 +277,9 @@ sub search {
         next;
       }
     }
+
+    ### @mung_desc
+    ### @orig_mung_desc
 
     my $re = $class->array_to_regexp($array);
     if ($h{'_EXPERIMENTAL_exact'}) {
@@ -378,8 +389,10 @@ sub search {
       print $name;
       $name = '';
 
-      print $mung_desc;
-      $mung_desc = '';
+      if ($show_mung && (@orig_mung_desc || @mung_desc)) {
+        print join(' ',@mung_desc,@orig_mung_desc),"\n";
+        $show_mung = 0;
+      }
 
       my $anum_name = Math::OEIS::Names->anum_to_name($anum);
       if (! defined $anum_name) { $anum_name = '[unknown name]'; }
@@ -563,33 +576,34 @@ The exact form of the results printout and transformations is not settled.
 The intention is to do something sensible to find given numbers.
 
 The OEIS F<names> file, if available, is used to show the name of a matched
-sequence (see L<Math::OEIS::Names>).
+sequence, per L<Math::OEIS::Names>.  This may include some non-ASCII
+characters (in people's names usually).
 
 =head2 Details
 
-When a match is found it's usually necessary to examine the sequence
-definition manually to check the relevance.  It might be any of exactly what
-you're seeking, an interesting unexpected connection, a middle match only,
-or mere coincidence of a few values.
+When a match is found, it's usually necessary to examine the sequence
+definition manually to check the relevance.  It might be exactly what you
+want, an interesting unexpected connection, a match somewhere in the middle
+of a sequence, or mere coincidence of a few values.
 
 If the given array of values is longer than the OEIS samples then it will
 still match.  Matching stops at the end of the given values or the end of
 the OEIS samples, whichever comes first.  A minimum match length is
 demanded, and it's possible this is at the end of the sample values.  (Small
 values like 0,1 tend to hit various false matches under this rule.  The
-intention is to tighten in some way.)
+intention is to tighten that somehow.)
 
 Values can be either numbers or strings and are stringized for the grep.
 For numbers, be careful of round-off if exceeding a Perl integer.
-C<Math::BigInt> or anything similar can be used in the usual way if desired.
+C<Math::BigInt> or anything similar can be used in usual ways if desired.
 
 An array of constant values or small constant difference is noticed and not
-searched since there's usually too many matches and the first is often not
-the relevant OEIS sequence.
+searched since there's usually too many matches, the first is often not the
+relevant OEIS sequence, and tends to be uninteresting anyway.
 
 C<File::Map> is used to read the F<stripped> file if that module is
-available.  This is recommended since C<mmap()> is roughly a 2x speedup over
-plain reading (by blocks).
+available.  This is recommended since string matching in an C<mmap()> is
+roughly a 2x speedup over plain reading (by blocks).
 
 The OEIS search hints L<http://oeis.org/hints.html> note that it can be
 worth skipping some initial values in case you have a different idea of a
@@ -599,13 +613,13 @@ here by stripping leading zeros and one initial value if no full match.
 It may be worth dividing out a small common factor.  There's attempts here
 to automate that here by searching for /2 and /4 if no exact match (and
 doubling *2 too).  Maybe more divisions could be attempted, even a full GCD.
-In practice OEIS sequences with common factors are often present when they
+In practice, OEIS sequences with common factors are often present when they
 arise naturally from a sequence definition.
 
-Non-integer constants appear in the OEIS as sequences of decimal digits (and
-sometimes other bases).  Digits should be given here as values 0 to 9 etc.
-For angles, the OEIS is usually radians but sometimes degrees so it can be
-worth trying both.  There's no attempt here to automate that.
+Constants appear in the OEIS as sequences of decimal digits (and sometimes
+other bases).  Digits should be given here as values 0 to 9 etc.  For
+angles, the OEIS is usually radians but sometimes degrees so it can be worth
+trying both.  There's no attempt here to automate that.
 
 =head1 FUNCTIONS
 
@@ -633,13 +647,13 @@ not obvious from the values.  Eg.
     name => "case d=123",
 
 C<max_matches> limits the number of sequences returned.  This is intended as
-a protection against a large number of matches from a small array or
-frequently occurring values.
+a protection against a large number of matches which can occur from a small
+array or frequently occurring values.
 
 C<values_min>, C<values_max> specify the range of values permitted in the
 matched sequence.  Default C<undef> means no limits.  These limits can be
-used when the range of the target values is known and so sequences with
-bigger or smaller should be skipped.
+used when the range of the target values is known and so sequence with
+bigger or smaller is not a match.
 
     values_min => 0,
     values_max => 2,
@@ -654,19 +668,19 @@ which you have reviewed and know to be different.
 
 =head1 COMMAND LINE
 
-The module C<import> accepts a C<-search> option which is designed for use
+The module C<import()> has a C<-search> option which is designed for use
 from the command line
 
     perl -MMath::OEIS::Grep=-search,123,456,789
     # search and then exit perl
 
-This C<-search> prints non-ASCII characters in sequence names with
-C<Encode::Locale> if that module (and C<PerlIO::encoding>) is available.
-(The module calls don't touch output encoding, that's left to application
-mainline setups.)
+This option prints non-ASCII characters in the charset given by
+C<Encode::Locale> if that module and C<PerlIO::encoding> are available.
+(The C<search()> method call doesn't touch output encoding, that's left to
+application mainline setups.)
 
 From within Emacs, see the author's C<oeis.el> to run a search on numbers
-entered or at point in the buffer
+entered or at point in a buffer
 
 =over
 
@@ -674,16 +688,15 @@ L<http://user42.tuxfamily.org/oeis-el/index.html>
 
 =back
 
-F<examples/grep-not-in-oeis.pl> in the sources is a way to keep searches in
-a document.
+See F<examples/grep-not-in-oeis.pl> in the sources for a way to keep
+searches in a document.
 
 =head1 SEE ALSO
 
 L<Math::OEIS>,
 L<Math::OEIS::Stripped>,
 L<Math::OEIS::Names>,
-L<File::Map>
-
+L<File::Map>,
 L<Encode::Locale>
 
 =head1 HOME PAGE
@@ -692,7 +705,7 @@ L<http://user42.tuxfamily.org/math-oeis/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 Math-OEIS is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

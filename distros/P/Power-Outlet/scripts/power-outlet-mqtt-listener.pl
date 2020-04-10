@@ -105,7 +105,7 @@ __END__
 
 =head1 NAME
 
-power-outlet-mqtt-listener.pl
+power-outlet-mqtt-listener.pl - MQTT listener for Power::Outlet devices
 
 =head1 SYNOPSIS
 
@@ -113,7 +113,7 @@ power-outlet-mqtt-listener.pl
 
 =head1 DESCRIPTION
 
-This script provides an MQTT interface for Power::Outlet devices
+This script provides an MQTT listener for Power::Outlet devices
 
 =head1 COPYRIGHT
 

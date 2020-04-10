@@ -1,9 +1,11 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
-
 use Test::More tests => 6;
+
 use lib 't/lib'; # Needed for 'make test' from project dirs
-use PDFAPI2Mock;
+use PDFAPI2Mock;    # provide dummy PDF::API2. obviously a real PDF::API2 or
+                    # PDF::Builder installation will be needed in order to run
 
 BEGIN {
     use_ok('PDF::Table');
@@ -26,7 +28,7 @@ my $required = [ x => 10,
 ok($object->table($pdf, $page, [$data], @$required));
 
 eval { $object->table('pdf', $page, [$data], @$required) };
-like($@, qr/Error: Invalid pdf object received/);
+like($@, qr/Error: Invalid PDF object received/);
 
 eval { $object->table($pdf, 'page', [$data], @$required) };
 like($@, qr/Error: Invalid page object received/);
@@ -39,3 +41,4 @@ like($@, qr/Odd number of elements in hash assignment/);
 
 done_testing();
 
+1;

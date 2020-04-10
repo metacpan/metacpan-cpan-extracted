@@ -1,7 +1,9 @@
 package Parse::CommandLine::Regexp;
 
-our $DATE = '2019-02-10'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-09'; # DATE
+our $DIST = 'Parse-CommandLine-Regexp'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -71,7 +73,7 @@ Parse::CommandLine::Regexp - Parsing string like command line
 
 =head1 VERSION
 
-This document describes version 0.001 of Parse::CommandLine::Regexp (from Perl distribution Parse-CommandLine-Regexp), released on 2019-02-10.
+This document describes version 0.002 of Parse::CommandLine::Regexp (from Perl distribution Parse-CommandLine-Regexp), released on 2020-04-09.
 
 =head1 DESCRIPTION
 
@@ -114,13 +116,14 @@ feature.
 
 L<Parse::CommandLine>
 
-L<Text::ParseWords>, which allows you to specify what characters to use as
-delimiters.
+L<Text::ParseWords>'s C<shellwords()>. This module also allows you to specify
+which quoting characters to use.
 
-C<parse_cmdline> in L<Complete::Bash>, which also takes into account
-non-whitespace word-breaking character such as C<|>.
+C<parse_cmdline> in L<Complete::Bash>, which uses similar technique as this
+module, but also takes into account non-whitespace word-breaking character such
+as C<|>.
 
-L<Text::CSV> and friends
+L<Text::CSV> and friends.
 
 =head1 AUTHOR
 
@@ -128,7 +131,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

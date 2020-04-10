@@ -1,0 +1,30 @@
+Revision history for Perl extension Multipart-Encoder
+
+v0.0.7 2020-04-09T16:35:54Z
+
+    - remove non-used condition
+
+v0.0.6 2020-04-09T16:23:53Z
+
+    - remove version from manual
+
+v0.0.5 2020-04-09T16:21:43Z
+
+    - fix pod
+
+v0.0.4 2020-04-09T14:33:30Z
+
+    - release to cpan
+
+v0.0.3 2020-04-09T12:52:52Z
+
+    - add manual
+
+v0.0.2 2020-03-26T11:22:22Z
+
+    - readme
+
+v0.0.1 2020-03-26T11:19:47Z
+
+    - original version
+

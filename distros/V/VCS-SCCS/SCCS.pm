@@ -1,6 +1,6 @@
 #!/pro/bin/perl
 
-# Copyright (c) 2007-2016 H.Merijn Brand.  All rights reserved.
+# Copyright (c) 2007-2020 H.Merijn Brand.  All rights reserved.
 
 package VCS::SCCS;
 
@@ -11,7 +11,7 @@ use POSIX  qw(mktime);
 use Carp;
 
 use vars qw( $VERSION );
-$VERSION = "0.24";
+$VERSION = "0.25";
 
 ### ###########################################################################
 
@@ -983,7 +983,7 @@ H.Merijn Brand <h.m.brand@xs4all.nl>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2007-2016 H.Merijn Brand
+Copyright (C) 2007-2020 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

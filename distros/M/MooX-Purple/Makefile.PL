@@ -23,7 +23,7 @@ WriteMakefile(
 		'Keyword::Declare' => '0.001017',
 		'Moo' => '2.003004',
 		'MooX::LazierAttributes' => '1.07008',
-		'MooX::ValidateSubs' => '1.012004',
+		'MooX::ValidateSubs' => '1.012005',
 		'Perl::Tidy' => '20200110'
 	},
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

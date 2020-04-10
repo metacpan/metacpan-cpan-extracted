@@ -86,8 +86,7 @@ FOO
 
     $tzil->chrome->logger->set_debug(1);
 
-    if ($testcase->{error})
-    {
+    if ($testcase->{error}) {
         like(
             exception { $tzil->build },
             $testcase->{error},

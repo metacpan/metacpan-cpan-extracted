@@ -46,8 +46,7 @@ $c->config (
 
 my ($l, $rest, $end, $secs, $left) = ("");
 
-sub rest
-{
+sub rest {
     use integer;
     my $now = time;
 
@@ -89,8 +88,7 @@ sub rest
     $end  = undef;
     } # rest
 
-sub start
-{
+sub start {
     my $val = 60 * shift;
     $end = time + $val;
     rest ();

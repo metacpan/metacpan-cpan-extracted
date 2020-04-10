@@ -1,5 +1,9 @@
 Revision history for Process-Status
 
+0.009     2020-04-08 17:58:46-04:00 America/New_York
+        - fix behavior of assert_ok on negative statuses when called as a class
+          method (thanks, Michael McClimon)
+
 0.008     2019-02-15 11:16:23-05:00 America/New_York
         - fix behavior of assert_ok on negative statuses (thanks, Michael
           McClimon)

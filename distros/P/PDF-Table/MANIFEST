@@ -1,10 +1,13 @@
+.perlcriticrc
+.perl-version
 Changes
+examples/010_fonts.pl
 examples/colspan.pl
 examples/header.pl
 examples/header_repeat_with_cell_props.pl
+examples/PDFpref
 examples/row_height.pl
 examples/sample1.pl
-examples/table_of_lorem.pdf
 lib/PDF/Table.pm
 Makefile.PL
 MANIFEST
@@ -19,6 +22,10 @@ t/PDF-Table.t
 t/pod.t
 t/manifest.t
 t/table.t
+util/1_pc.pl
+util/2_t-tests.pl
+util/3_examples.pl
 util/pod2cpanhtml.pl
+version
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

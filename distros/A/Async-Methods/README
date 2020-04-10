@@ -1,0 +1,22 @@
+NAME
+    Async::Methods - Helpers for async method work
+
+SYNOPSIS
+    Sorry, this is not documented yet and is just a demonstration of the
+    relevant ideas. Please don't try and use it yet.
+
+DESCRIPTION
+AUTHOR
+     mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    None yet - maybe this software is perfect! (ahahahahahahahahaha)
+
+COPYRIGHT
+    Copyright (c) 2020 the Async::Methods "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2015, 2016, 2017, 2019 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -21,10 +21,16 @@ use 5.004;
 use strict;
 use FindBin;
 use Math::OEIS::Grep;
+$|=1;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
 
+{
+  # abs and trim combinations
+  Math::OEIS::Grep->search(array=>[3,-1,-3,-1,3,1,3,-1,3,-1,-3,1,-3,-1,-3,-1,3,-1,-3,-1]);
+  exit 0;
+}
 
 {
   my @seq = Math::OEIS::Stripped->anum_to_values('A038770xxx');

@@ -34,6 +34,7 @@ my @files = (
     't/21-remove-plugin.t',
     't/22-plugin_prereqs.t',
     't/23-cpanfile.t',
+    't/24-bugtracker.t',
     't/lib/Helper.pm',
     't/lib/NoNetworkHits.pm',
     't/lib/NoPrereqChecks.pm',

@@ -51,8 +51,7 @@ my @tests = (
     },
 );
 
-subtest "expecting $_->{expected_file} from config: " . join(' => ', %{ $_->{config} }) => sub
-{
+subtest "expecting $_->{expected_file} from config: " . join(' => ', %{ $_->{config} }) => sub {
     my $expected_file = $_->{expected_file};
     my $config = $_->{config};
 

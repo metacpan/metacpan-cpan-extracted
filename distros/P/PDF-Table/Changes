@@ -1,4 +1,19 @@
 Change history for Perl extension PDF::Table.
+
+Version 0.12.0 (2020-04-09) 
+
+ Permit either PDF::API2 or PDF::Builder (#51)
+ Don't use UTF-8 with corefonts
+ General cleanup of typos and misspellings in Table.pm
+ Minimum Perl 5.10 in Makefile.PL (#53) 
+ More cleanup of text in Table.pm
+ Add tools (util) for running PerlCritic, t-tests, examples
+ Clean up code to pass PerlCritic
+ Clean up examples to run with either API2 or Builder. PDFpref file to declare
+   which to use if both available
+ Comments in t tests about use of Mock PDFAPI2
+ Document needed and optional prerequisite modules
+
 Version 0.11.0 Colspan feature by domm
 
 Version 0.10.0 Introduces underlined text in cells

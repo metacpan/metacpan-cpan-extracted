@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 NAME
 
@@ -374,9 +374,9 @@ sub _build_tiny_headers( $self, $prefix = "    ", %options ) {
 }
 
 
-=head2 C<< $r->as_snippet >>
+=head2 C<< $r->as_snippet( %options ) >>
 
-    print $r->as_snippet;
+    print $r->as_snippet( type => 'LWP' );
 
 Returns a code snippet that returns code to create an equivalent
 L<HTTP::Request> object and to perform the request using L<WWW::Mechanize>.
@@ -467,7 +467,7 @@ sub as_lwp_snippet( $self, %options ) {
     my \$r = HTTP::Request->new(
         '@{[$self->method]}' => '@{[$self->uri]}',
         [
-@{[$self->_build_lwp_headers('            ', %options)]},
+@{[$self->_build_lwp_headers('            ', %options)]}
         ],
         @{[$self->_build_quoted_body()]}
     );
@@ -534,7 +534,7 @@ sub as_http_tiny_snippet( $self, %options ) {
         '@{[$self->method]}' => '@{[$self->uri]}',
         {
           headers => {
-@{[$self->_build_tiny_headers('            ', %options)]},
+@{[$self->_build_tiny_headers('            ', %options)]}
           },
           @content
         },
@@ -576,7 +576,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

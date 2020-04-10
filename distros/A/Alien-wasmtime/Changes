@@ -1,0 +1,19 @@
+Revision history for Alien-wasmtime},
+
+0.05      2020-04-09 04:04:03 -0600
+  - use ALIEN_WASMTIME_VERSION to override the version of
+    wasmtime downloaded (gh#7)
+
+0.04      2020-04-08 16:26:41 -0600
+  - First cpan release
+
+0.03      2020-04-06 16:45:23 -0600
+  - Bump to version 0.15.0 (gh#5)
+
+0.02      2020-04-03 14:37:19 -0600
+  - Add support for cflags and libs methods.
+
+0.01      2020-04-03 07:51:29 -0600
+  - initial version
+
+

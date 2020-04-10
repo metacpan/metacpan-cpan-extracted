@@ -2,7 +2,7 @@ NAME
     App::DateUtils - An assortment of date-/time-related CLI utilities
 
 VERSION
-    This document describes version 0.123 of App::DateUtils (from Perl
+    This document describes version 0.124 of App::DateUtils (from Perl
     distribution App-DateUtils), released on 2020-01-31.
 
 SYNOPSIS
@@ -34,6 +34,8 @@ SYNOPSIS
     *   parse-duration-using-df-natural
 
     *   parse-duration-using-td-parse
+
+    *   strftime
 
 FUNCTIONS
   dateconv
@@ -71,8 +73,8 @@ FUNCTIONS
            200,
            "OK",
            {
-             epoch => 1580446720,
-             iso8601 => "2020-01-31T04:58:40Z",
+             epoch => 1580449881,
+             iso8601 => "2020-01-31T05:51:21Z",
              ymd => "2020-01-31",
            },
          ]
@@ -160,6 +162,26 @@ FUNCTIONS
     *   Convert "3h2m" to number of seconds:
 
          durconv(duration => "3h2m"); # -> 10920
+
+    *   Convert "3h2m" to iso8601:
+
+         durconv(duration => "3h2m", to => "iso8601"); # -> "PT3H2M"
+
+    *   Show all possible conversions:
+
+         durconv(duration => "3h2m", to => "ALL");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           {
+             hash    => { hours => 3, minutes => 2 },
+             iso8601 => "PT3H2M",
+             secs    => 10920,
+           },
+         ]
 
     This function is not exported.
 
@@ -652,8 +674,8 @@ FUNCTIONS
              is_parseable => 1,
              as_secs => 1209600,
              as_dtdur_obj => "P14D",
-             date2 => "2020-02-14T04:58:40",
-             date1 => "2020-01-31T04:58:40",
+             date2 => "2020-02-14T05:51:21",
+             date1 => "2020-01-31T05:51:21",
            },
          ]
 
@@ -668,10 +690,10 @@ FUNCTIONS
              module => "DateTime::Format::Natural",
              original => "from 23 Jun to 29 Jun",
              is_parseable => 1,
-             as_secs => 13006880,
-             as_dtdur_obj => "P4M28DT19H1M20S",
-             date1 => "2020-01-31T04:58:40",
+             as_secs => 13003719,
+             as_dtdur_obj => "P4M28DT18H8M39S",
              date2 => "2020-06-29T00:00:00",
+             date1 => "2020-01-31T05:51:21",
            },
          ]
 
@@ -763,6 +785,33 @@ FUNCTIONS
 
     Return value: (any)
 
+  strftime
+    Usage:
+
+     strftime(%args) -> any
+
+    Format date using strftime().
+
+    Examples:
+
+    *   Format current time as yyyy-mm-dd:
+
+         strftime(format => "%Y-%m-%d"); # -> [200, "OK", "2020-01-31"]
+
+    *   Format a specific time as yyyy-mm-dd:
+
+         strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> [200, "OK", "2020-02-01"]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   date => *date*
+
+    *   format* => *str*
+
+    Return value: (any)
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-DateUtils>.
@@ -779,7 +828,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    dateparse. Perinci::To::POD=HASH(0x55d490eec860).
+    dateparse. Perinci::To::POD=HASH(0x560f4ff3c148).
 
     App::datecalc
 

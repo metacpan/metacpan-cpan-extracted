@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Process::Status;
 # ABSTRACT: a handle on process termination, like $?
-$Process::Status::VERSION = '0.008';
+$Process::Status::VERSION = '0.009';
 use Config ();
 
 #pod =head1 OVERVIEW
@@ -160,7 +160,7 @@ sub as_string {
 
 sub assert_ok {
   my $self = $_[0]->_self;
-  return if $$self == 0;
+  return if $self->is_success;
   my $name = @_ > 1 ? $_[1] : "program";
 
   require Carp;
@@ -169,7 +169,7 @@ sub assert_ok {
 
 {
   package Process::Status::Negative;
-$Process::Status::Negative::VERSION = '0.008';
+$Process::Status::Negative::VERSION = '0.009';
 BEGIN { our @ISA = 'Process::Status' }
   sub status_code { $_[0][0] }
   sub pid_t       { $_[0][0] } # historical nonsense
@@ -211,7 +211,7 @@ Process::Status - a handle on process termination, like $?
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 OVERVIEW
 
@@ -291,11 +291,21 @@ If a program name is not provided, "program" is used.
 
 Ricardo Signes <rjbs@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Michael McClimon
+=for stopwords Michael McClimon Ricardo Signes
+
+=over 4
+
+=item *
 
 Michael McClimon <michael@mcclimon.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

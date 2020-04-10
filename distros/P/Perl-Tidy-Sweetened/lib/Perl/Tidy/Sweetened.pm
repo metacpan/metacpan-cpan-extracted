@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Perl::Tidy qw();
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 use Perl::Tidy::Sweetened::Pluggable;
 use Perl::Tidy::Sweetened::Keyword::Block;
@@ -58,6 +58,19 @@ $plugins->add_filter(
         clauses =>
           [ 'PAREN?', '(returns \s* PAREN)?', '(\b(?:is|but|does) \s+ \w+)?' ],
     ) );
+
+# Create a subroutine filter for:
+#    around foo (Int $i) returns (Bool) {}
+#    before foo (Int $i) returns (Bool) {}
+#    after foo (Int $i) returns (Bool) {}
+# where both the parameter list and the returns type are optional
+$plugins->add_filter(
+    Perl::Tidy::Sweetened::Keyword::Block->new(
+        keyword     => $_,
+        marker      => uc($_),
+        replacement => 'sub',
+        clauses     => ['PAREN?'],
+    ) ) for qw(around before after);
 
 # Create a subroutine filter for:
 #    classmethod foo (Int $i) {}
@@ -122,7 +135,7 @@ Perl::Tidy::Sweetened - Tweaks to Perl::Tidy to support some syntactic sugar
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 STATUS
 

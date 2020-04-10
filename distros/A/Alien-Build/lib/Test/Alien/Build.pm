@@ -29,7 +29,7 @@ our @EXPORT = qw(
 );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 
 my $build;
@@ -623,7 +623,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 2.17
+version 2.19
 
 =head1 SYNOPSIS
 
@@ -817,7 +817,7 @@ nature of how the C<~/.alienbuild/rc.pl> file works, you can only use this once!
 
 =head2 alien_subtest
 
- alienfile_subtest $test_name => sub {
+ alien_subtest $test_name => sub {
    ...
  };
 

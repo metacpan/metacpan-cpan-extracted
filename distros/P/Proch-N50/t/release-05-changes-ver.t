@@ -27,8 +27,8 @@ if (-e "$changes_file") {
 		my $clean_line = $line;
 		$clean_line =~s/[^'"~;\@A-Za-z0-9\*,\.\!\?\-_ \t()\[\]{}\\\/:]+//g;
 		say {$out} $clean_line;
-		print STDERR "[ORIGI $line]\n[CLEAN $clean_line]\n" if (length($line)!=length($clean_line));
-		ok(length($line) == length($clean_line), 
+		print STDERR "Stripping unexpected characters in Changes:\nORIGINAL: [$line]\nCLEAN: [$clean_line]\n" if (length($line)!=length($clean_line));
+		ok(length($line) == length($clean_line),
 			"Line #$c has not weird chars: " . length($line) . ' == ' . length($clean_line)
 		);
 	}

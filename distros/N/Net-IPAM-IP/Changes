@@ -1,5 +1,8 @@
 Revision history for Net-IPAM-IP
 
+1.08    Thu, 09 Apr 2020 23:04:47 +0200
+        * micro benchmark, substr() is 20% faster than unpack()
+
 1.07    Tue, 07 Apr 2020 14:11:16 +0200
         * Socket implementations in Windows before Win10 drives me crazy
 

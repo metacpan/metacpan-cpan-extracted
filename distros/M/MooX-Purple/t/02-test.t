@@ -29,9 +29,9 @@ class Hello with World allow qw/main/ {
 			}
 		};
 
-	public two { return $_[1]->{message} }
+	public two { return $_[0]->{message} }
 	public three { return 'lost'; }
-	private five { return $_[0]->four }
+	private five { return $self->four }
 };
 
 class Night is qw/Hello/ {

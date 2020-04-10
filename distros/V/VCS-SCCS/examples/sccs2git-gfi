@@ -13,8 +13,7 @@ system "git init";
 # could be explored to write checkout hooks that translate SCCS
 # keywords to actual content. Would be hard to translate back
 
-sub pr_date
-{
+sub pr_date {
     my @dt = localtime shift;
     sprintf "%s %02d-%02d-%4d %02d:%02d:%02d",
 	(qw( Sun Mon Tue Wed Thu Fri Sat ))[$dt[6]],
@@ -78,6 +77,11 @@ foreach my $c (sort keys %sccs) {
 
     printf STDERR "%-20s %3d %6s  %s %s %s\n", $fn, $rev, $vsn,
 	$stamp, $delta{date}, $delta{"time"};
+
+    # Advance earlier epoch timestamp to git epoch timestamp.
+    # git considers anything with timestamp earlier
+    # than 100000000 since epoch as invalid timestamp.
+    $delta{stamp} < 100_000_000 and $delta{stamp}++;
 
     print { $gfi } "commit ", $branchname, "\n";
     print { $gfi } "committer ", $delta{committer}, " <",

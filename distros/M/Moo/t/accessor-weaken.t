@@ -1,6 +1,7 @@
 use Moo::_strictures;
 use Test::More;
 use Moo::_Utils ();
+use Scalar::Util ();
 
 note "pretending to be pre-5.8.3"
   if $ENV{MOO_TEST_PRE_583};
@@ -26,6 +27,7 @@ my $ref = {};
 my $foo = Foo->new(one => $ref);
 is($foo->one, $ref, 'value present');
 ok(Scalar::Util::isweak($foo->{one}), 'value weakened');
+is($foo->one($ref), $ref, 'value returned from setter');
 undef $ref;
 ok(!defined $foo->{one}, 'weak value gone');
 

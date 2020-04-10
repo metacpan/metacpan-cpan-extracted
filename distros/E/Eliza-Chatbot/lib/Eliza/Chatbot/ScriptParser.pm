@@ -107,7 +107,7 @@ Eliza::Chatbot::ScriptParser
 
 =head1 Version
 
-Version 0.07
+Version 0.08
 
 =head1 Options
 
@@ -199,7 +199,7 @@ Reassembly rules should be marked with I<reasm_for_memory> rather than I<reasmb>
 
 =head1 AUTHOR
 
-LNATION thisusedtobeanemail@gmail.com
+LNATION email@lnation.org
 
 =head1 LICENSE AND COPYRIGHT
 

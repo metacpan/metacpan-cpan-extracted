@@ -105,8 +105,7 @@ sub all_plugins_in_prereqs
 
     subtest "all plugins in use are specified as *required* runtime prerequisites by the plugin bundle, or injected as $prereq_plugin_phase-$prereq_plugin_relationship prerequisites by the distribution (unless option disabled)" => sub {
         foreach my $plugin (uniq map find_meta($_)->name,
-            grep $_->plugin_name =~ /^$bundle_name\/[^@]/, @{$tzil->plugins})
-        {
+                grep $_->plugin_name =~ /^$bundle_name\/[^@]/, @{$tzil->plugins}) {
             note($plugin . ' is explicitly exempted; skipping'), next
                 if exists $exempt{$plugin};
 
@@ -128,8 +127,7 @@ sub all_plugins_in_prereqs
                 "$plugin is a $prereq_plugin_phase prereq of the distribution",
             ) if $prereq_plugin_phase and $prereq_plugin_relationship;
 
-            if (exists $additional{$plugin})
-            {
+            if (exists $additional{$plugin}) {
                 # plugin was added in via an extra option, therefore the
                 # plugin should exist as a recommendation of the bundle (as some tests require it)
                 cmp_deeply(
@@ -138,8 +136,7 @@ sub all_plugins_in_prereqs
                     $plugin . ' is a runtime recommendation of this plugin bundle',
                 ) if $pluginbundle_meta;
             }
-            else
-            {
+            else {
                 # plugin is a core requirement of the bundle
                 cmp_deeply(
                     $pluginbundle_meta->{prereqs}{runtime}{requires},
@@ -151,8 +148,7 @@ sub all_plugins_in_prereqs
 
         pass 'this is a token test to keep things humming' if not $pluginbundle_meta;
 
-        if (not Test::Builder->new->is_passing)
-        {
+        if (not Test::Builder->new->is_passing) {
             diag 'got distribution metadata: ', explain $dist_meta;
             diag 'got plugin bundle metadata: ', explain $pluginbundle_meta;
         }
@@ -161,8 +157,7 @@ sub all_plugins_in_prereqs
 
 # provides a temp directory that is guaranteed to not be inside a git repository
 # directory is cleaned up when $tempdir goes out of scope
-sub no_git_tempdir
-{
+sub no_git_tempdir {
     my $tempdir = Path::Tiny->tempdir(CLEANUP => 1);
     mkdir $tempdir if not -d $tempdir;    # FIXME: File::Temp::newdir doesn't make the directory?!
 
@@ -173,8 +168,7 @@ sub no_git_tempdir
 }
 
 # checks if a .git directory is in the current or any parent directory
-sub git_in_path
-{
+sub git_in_path {
     my $in_git;
     my $dir = path($_[0]);
     my $count = 0;
@@ -198,8 +192,7 @@ sub git_in_path
 }
 
 # TODO: replace with Test::Deep::notexists($key)
-sub notexists
-{
+sub notexists {
     my @keys = @_;
     Test::Deep::code(sub {
         # TODO return 0 unless $self->test_reftype($_[0], 'HASH');
@@ -212,8 +205,7 @@ sub notexists
 }
 
 # simple Path::Tiny helper: like `find $dir -type f`
-sub recursive_child_files
-{
+sub recursive_child_files {
     my $dir = shift;
     my @found_files;
     $dir->visit(

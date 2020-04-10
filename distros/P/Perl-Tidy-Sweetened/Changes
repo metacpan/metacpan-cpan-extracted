@@ -1,5 +1,10 @@
 Changes for Perl::Tidy::Sweetend
 
+1.16 - Wed Apr  8 11:57:37 EDT 2020
+    Adds support for 'around/before/after' keywords (GH#17)
+    Thanks to witoldwegner for the PR.
+    [Upgrade recommended if you use these method modifiers.]
+
 1.15 - Tue Aug 28 09:15:20 EDT 2018
     Adds basic support for kavorka traits (is/does/but) (GH#16)
     Update the perl versions to test with travis (+5.28, +5.26, -5.21)

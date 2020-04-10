@@ -8,28 +8,52 @@ use Test::More 0.98;
 use File::chdir;
 use File::Temp qw(tempdir);
 
-subtest basics => sub {
+subtest "backward compatibility: hash getopt_spec still accepted" => sub {
     my %gospec = (
-        'flag1|1'     => sub{},
-        'flag2|f'     => sub{},
-        'flag3|2'     => sub{},
-        'flag4|3'     => sub{},
-        'bool!'       => sub{},
-        'int=i'       => sub{},
-        'float|F=f'   => sub{},
-        'str|S=s'     => sub{},
+        'flag1|1' => sub {},
+        'flag2|f' => sub {},
     );
 
     test_complete(
         name        => 'option name',
         args        => {getopt_spec=>\%gospec, completion=>sub{[]}},
         comp_line0  => 'CMD ^',
+        result      => [qw/--flag1 --flag2
+                           -1 -f/],
+    );
+};
+
+subtest "Getopt::Long compliance: hash storage supported" => sub {
+    test_complete(
+        name        => 'option name',
+        args        => {getopt_spec=>[{}, 'foo', 'bar'], completion=>sub{[]}},
+        comp_line0  => 'CMD ^',
+        result      => [qw/--bar --foo/],
+    );
+};
+
+subtest basics => sub {
+    my @gospec = (
+        'flag1|1',
+        'flag2|f',
+        'flag3|2',
+        'flag4|3',
+        'bool!',
+        'int=i',
+        'float|F=f',
+        'str|S=s',
+    );
+
+    test_complete(
+        name        => 'option name',
+        args        => {getopt_spec=>\@gospec, completion=>sub{[]}},
+        comp_line0  => 'CMD ^',
         result      => [qw/--bool --flag1 --flag2 --flag3 --flag4 --float --int
                            --no-bool --nobool --str -1 -2 -3 -F -f -S/],
     );
     test_complete(
         name        => 'option name (2)',
-        args        => {getopt_spec=>\%gospec, },
+        args        => {getopt_spec=>\@gospec, },
         comp_line0  => 'CMD --f^',
         result      => {words=>
                             [qw/--flag1 --flag2 --flag3 --flag4 --float/],
@@ -37,7 +61,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name (3)',
-        args        => {getopt_spec=>\%gospec, },
+        args        => {getopt_spec=>\@gospec, },
         comp_line0  => 'CMD --str^',
         result      => {words=>
                             [qw/--str/],
@@ -46,13 +70,13 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name (single letter n! does not get --nox and --no-x)',
-        args        => {getopt_spec=>{'n!'=>sub{}}, completion=>sub{[]}, },
+        args        => {getopt_spec=>['n!'], completion=>sub{[]}, },
         comp_line0  => 'CMD ^',
         result      => [qw/-n/],
     );
     test_complete(
         name        => 'option name (bundling)',
-        args        => {getopt_spec=>\%gospec, },
+        args        => {getopt_spec=>\@gospec, },
         comp_line0  => 'CMD -f^',
         result      => {words=>
                             [qw/-f1 -f2 -f3 -fF -fS/],
@@ -60,7 +84,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name (bundling 2)',
-        args        => {getopt_spec=>\%gospec, },
+        args        => {getopt_spec=>\@gospec, },
         comp_line0  => 'CMD -f1^',
         result      => {words=>
                             [qw/-f12 -f13 -f1F -f1S/],
@@ -68,7 +92,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name (bundling 3)',
-        args        => {getopt_spec=>\%gospec, },
+        args        => {getopt_spec=>\@gospec, },
         comp_line0  => 'CMD -f12^',
         result      => {words=>
                             [qw/-f123 -f12F -f12S/],
@@ -76,7 +100,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name (bundling 4)',
-        args        => {getopt_spec=>\%gospec, },
+        args        => {getopt_spec=>\@gospec, },
         comp_line0  => 'CMD -f132^',
         result      => {words=>
                             [qw/-f132F -f132S/],
@@ -84,7 +108,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name (bundling), bundling=0',
-        args        => {getopt_spec=>\%gospec, bundling=>0},
+        args        => {getopt_spec=>\@gospec, bundling=>0},
         comp_line0  => 'CMD -f^',
         result      => {words=>
                             [qw/-F -f/],
@@ -92,13 +116,13 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name (bundling, stops after value expected)',
-        args        => {getopt_spec=>\%gospec, },
+        args        => {getopt_spec=>\@gospec, },
         comp_line0  => 'CMD -fS^',
         result      => [qw/-fS/],
     );
     test_complete(
         name        => 'option value (bundling)',
-        args        => {getopt_spec=>\%gospec,
+        args        => {getopt_spec=>\@gospec,
                         completion=>sub {
                           my %args = @_;
                           Complete::Util::complete_array_elem(
@@ -111,7 +135,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name (bundling 1)',
-        args        => {getopt_spec=>\%gospec,
+        args        => {getopt_spec=>\@gospec,
                         completion=>sub {
                           my %args = @_;
                           Complete::Util::complete_array_elem(
@@ -124,7 +148,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name (bundling 1b)',
-        args        => {getopt_spec=>\%gospec,
+        args        => {getopt_spec=>\@gospec,
                         completion=>sub {
                           my %args = @_;
                           Complete::Util::complete_array_elem(
@@ -137,7 +161,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name (bundling 5)',
-        args        => {getopt_spec=>\%gospec, },
+        args        => {getopt_spec=>\@gospec, },
         comp_line0  => 'CMD -f -1^',
         result      => {words=>
                             [qw/-12 -13 -1F -1S/],
@@ -145,7 +169,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name with mentioned non-repeatable option (alias)',
-        args        => {getopt_spec=>\%gospec},
+        args        => {getopt_spec=>\@gospec},
         comp_line0  => 'CMD --flag1 -^', # means -1 is also mentioned
         result      => {words=>
                             [qw/--bool --flag2 --flag3 --flag4 --float --int --no-bool
@@ -154,7 +178,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name with mentioned non-repeatable option (alias 2)',
-        args        => {getopt_spec=>\%gospec, },
+        args        => {getopt_spec=>\@gospec, },
         comp_line0  => 'CMD -^  --flag1', # ditto
         result      => {words=>
                             [qw/--bool --flag2 --flag3 --flag4 --float --int --no-bool
@@ -163,7 +187,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name with mentioned non-repeatable option (bundling)',
-        args        => {getopt_spec=>\%gospec, },
+        args        => {getopt_spec=>\@gospec, },
         comp_line0  => 'CMD -f1 -^',
         result      => {words=>
                             [qw/--bool --flag3 --flag4 --float --int --no-bool
@@ -173,7 +197,7 @@ subtest basics => sub {
     my @foo;
     test_complete(
         name        => 'repeatable option name 1 (assigned to arrayref)',
-        args        => {getopt_spec=>{'foo=s'=>\@foo, 'bar=s'=>sub{}}, },
+        args        => {getopt_spec=>['foo=s'=>\@foo, 'bar=s'], },
         comp_line0  => 'CMD --foo 1 --bar 2 --^',
         result      => {words=>
                             [qw/--foo/],
@@ -181,7 +205,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'repeatable option name 2 (desttype @)',
-        args        => {getopt_spec=>{'foo=s@'=>sub{}, 'bar=s'=>sub{}}, },
+        args        => {getopt_spec=>['foo=s@', 'bar=s'], },
         comp_line0  => 'CMD --foo 1 --bar 2 --^',
         result      => {words=>
                             [qw/--foo/],
@@ -189,7 +213,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'repeatable option name 3 (desttype %)',
-        args        => {getopt_spec=>{'foo=s%'=>sub{}, 'bar=s'=>sub{}}, },
+        args        => {getopt_spec=>['foo=s%'=>, 'bar=s'], },
         comp_line0  => 'CMD --foo 1 --bar 2 --^',
         result      => {words=>
                             [qw/--foo/],
@@ -197,7 +221,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'repeatable option name 4 (incremental)',
-        args        => {getopt_spec=>{'foo+'=>sub{}, 'bar=s'=>sub{}}, },
+        args        => {getopt_spec=>['foo+', 'bar=s'], },
         comp_line0  => 'CMD --foo --bar 2 --^',
         result      => {words=>
                             [qw/--foo/],
@@ -205,7 +229,7 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name + arg completion',
-        args        => {getopt_spec=>\%gospec,
+        args        => {getopt_spec=>\@gospec,
                         completion=>sub { [qw/-x/] }},
         comp_line0  => 'CMD ^',
         result      => [qw/--bool --flag1 --flag2 --flag3 --flag4 --float --int --no-bool
@@ -214,7 +238,7 @@ subtest basics => sub {
     # if the user types '-', she indicates that she wants option names only
     test_complete(
         name        => 'option name only (user types -)',
-        args        => {getopt_spec=>\%gospec,
+        args        => {getopt_spec=>\@gospec,
                         completion=>sub { [qw/-x/] }},
         comp_line0  => 'CMD -^',
         result      => {words=>
@@ -225,13 +249,13 @@ subtest basics => sub {
 
     test_complete(
         name        => 'option value without completion routine',
-        args        => {getopt_spec=>\%gospec, completion=>sub{[]}},
+        args        => {getopt_spec=>\@gospec, completion=>sub{[]}},
         comp_line0  => 'CMD --str ^',
         result      => [qw//],
     );
     test_complete(
         name         => 'option value without completion routine (2)',
-        args         => {getopt_spec=>\%gospec, completion=>sub{[]}},
+        args         => {getopt_spec=>\@gospec, completion=>sub{[]}},
         comp_line0   => 'CMD --str=^',
         default_word => '', # Don't use '--str=' (words expanded into --str, =, '')
         result       => [qw//],
@@ -240,7 +264,7 @@ subtest basics => sub {
     # XXX Unless pass_through, Getopt::Long would error on this
     test_complete(
         name         => 'option value for unknown option',
-        args         => {getopt_spec=>\%gospec, completion=>sub{[]}},
+        args         => {getopt_spec=>\@gospec, completion=>sub{[]}},
         comp_line0   => 'CMD --foo=^',
         default_word => '', # Don't use '--str=' (words expanded into --str, =, '')
         result       => [qw//],
@@ -249,14 +273,14 @@ subtest basics => sub {
     # XXX Unless pass_through, Getopt::Long would error on this
     test_complete(
         name        => 'option value for option that does not expect value',
-        args        => {getopt_spec=>\%gospec, completion=>sub{[]}},
+        args        => {getopt_spec=>\@gospec, completion=>sub{[]}},
         comp_line0  => 'CMD --flag1=^',
         default_word => '', # Don't use '--flag1=' (words expanded into --str, =, '')
         result      => [qw//],
     );
     test_complete(
         name        => 'option value with completion routine returning array',
-        args        => {getopt_spec=>\%gospec,
+        args        => {getopt_spec=>\@gospec,
                         completion=>sub { [qw/aa a b c/] }},
         comp_line0  => 'CMD --str ^',
         result      => [qw/aa a b c/],
@@ -264,7 +288,7 @@ subtest basics => sub {
 
     test_complete(
         name        => 'extras argument',
-        args        => {getopt_spec=>\%gospec,
+        args        => {getopt_spec=>\@gospec,
                         extras=>{foo=>10, bar=>20},
                         completion=>sub {
                             my %args = @_;
@@ -283,14 +307,14 @@ subtest basics => sub {
 };
 
 subtest 'config bundling=0' => sub {
-    my %gospec = (
-        'flag1'     => sub{},
-        'flag2'     => sub{},
-        '-flag3'    => sub{},
+    my @gospec = (
+        'flag1',
+        'flag2',
+        '-flag3',
     );
     test_complete(
         name        => 'basics',
-        args        => {getopt_spec=>\%gospec, bundling=>0},
+        args        => {getopt_spec=>\@gospec, bundling=>0},
         comp_line0  => 'CMD -^',
         result      => {
             words   => [qw/--flag1 --flag2 -flag3/],
@@ -308,7 +332,7 @@ subtest "default fallback completion" => sub {
 
     test_complete(
         name        => 'file fallback completion',
-        args        => {getopt_spec=>{'foo'=>sub{}}},
+        args        => {getopt_spec=>['foo']},
         comp_line0  => 'CMD ^',
         result      => {words=>[qw/--foo f1 f2/], path_sep=>'/'},
     );

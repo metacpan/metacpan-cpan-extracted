@@ -5,7 +5,7 @@
 
 our $DATE = '2020-01-31'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.123'; # VERSION
+our $VERSION = '0.124'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ parse-duration-using-df-natural - Parse duration string(s) using DateTime::Forma
 
 =head1 VERSION
 
-This document describes version 0.123 of parse-duration-using-df-natural (from Perl distribution App-DateUtils), released on 2020-01-31.
+This document describes version 0.124 of parse-duration-using-df-natural (from Perl distribution App-DateUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -51,14 +51,14 @@ Examples:
  +---------------------------+-------------+--------------+---------+--------------+---------------------+---------------------+
  | module                    | original    | is_parseable | as_secs | as_dtdur_obj | date1               | date2               |
  +---------------------------+-------------+--------------+---------+--------------+---------------------+---------------------+
- | DateTime::Format::Natural | for 2 weeks | 1            | 1209600 | P14D         | 2020-01-31T04:58:41 | 2020-02-14T04:58:41 |
+ | DateTime::Format::Natural | for 2 weeks | 1            | 1209600 | P14D         | 2020-01-31T05:51:22 | 2020-02-14T05:51:22 |
  +---------------------------+-------------+--------------+---------+--------------+---------------------+---------------------+
 
  % parse-duration-using-df-natural 'from 23 Jun to 29 Jun'
  +---------------------------+-----------------------+--------------+----------+-----------------+---------------------+---------------------+
  | module                    | original              | is_parseable | as_secs  | as_dtdur_obj    | date1               | date2               |
  +---------------------------+-----------------------+--------------+----------+-----------------+---------------------+---------------------+
- | DateTime::Format::Natural | from 23 Jun to 29 Jun | 1            | 13006879 | P4M28DT19H1M19S | 2020-01-31T04:58:41 | 2020-06-29T00:00:00 |
+ | DateTime::Format::Natural | from 23 Jun to 29 Jun | 1            | 13003718 | P4M28DT18H8M38S | 2020-01-31T05:51:22 | 2020-06-29T00:00:00 |
  +---------------------------+-----------------------+--------------+----------+-----------------+---------------------+---------------------+
 
  % parse-duration-using-df-natural foo

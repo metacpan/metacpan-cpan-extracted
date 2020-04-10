@@ -3,8 +3,8 @@ NAME
     Getopt::Long specification
 
 VERSION
-    This document describes version 0.475 of Complete::Getopt::Long (from
-    Perl distribution Complete-Getopt-Long), released on 2020-02-05.
+    This document describes version 0.477 of Complete::Getopt::Long (from
+    Perl distribution Complete-Getopt-Long), released on 2020-04-10.
 
 SYNOPSIS
     See Getopt::Long::Complete for an easy way to use this module.
@@ -99,11 +99,11 @@ FUNCTIONS
          use Complete::Unix qw(complete_user);
          use Complete::Util qw(complete_array_elem);
          complete_cli_arg(
-             getopt_spec => {
+             getopt_spec => [
                  'help|h'   => sub{...},
                  'format=s' => \$format,
                  'user=s'   => \$user,
-             },
+             ],
              completion  => sub {
                  my %args  = @_;
                  my $word  = $args{word};
@@ -132,7 +132,7 @@ FUNCTIONS
         "word", and so on as described in the function description will not
         be overwritten by this.
 
-    *   getopt_spec* => *hash*
+    *   getopt_spec* => *array*
 
         Getopt::Long specification.
 

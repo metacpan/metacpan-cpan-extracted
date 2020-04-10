@@ -2584,6 +2584,20 @@ Trans_add(trans, pkg, ...)
   OUTPUT:
   RETVAL
 
+#ifdef RPM4_12_0
+int
+Trans_addReinstall(trans, pkg)
+  URPM::Transaction trans
+  URPM::Package pkg
+  CODE:
+  if ((pkg->flag & FLAG_ID_MASK) <= FLAG_ID_MAX && pkg->h != NULL)
+    RETVAL = rpmtsAddReinstallElement(trans->ts, pkg->h, (fnpyKey)(1+(long)(pkg->flag & FLAG_ID_MASK))) == 0;
+  else RETVAL = 0;
+  OUTPUT:
+  RETVAL
+
+#endif
+
 int
 Trans_remove(trans, name)
   URPM::Transaction trans

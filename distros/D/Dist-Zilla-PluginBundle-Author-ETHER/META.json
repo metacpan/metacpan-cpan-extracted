@@ -39,7 +39,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.153",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.154",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -326,15 +326,15 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/ETHER.pm",
-         "version" : "0.153"
+         "version" : "0.154"
       },
       "Dist::Zilla::PluginBundle::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/ETHER.pm",
-         "version" : "0.153"
+         "version" : "0.154"
       },
       "Pod::Weaver::PluginBundle::Author::ETHER" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/ETHER.pm",
-         "version" : "0.153"
+         "version" : "0.154"
       }
    },
    "release_status" : "stable",
@@ -352,7 +352,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.153",
+   "version" : "0.154",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.031010"
@@ -1382,7 +1382,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.153",
+                  "tag" : "v0.154",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

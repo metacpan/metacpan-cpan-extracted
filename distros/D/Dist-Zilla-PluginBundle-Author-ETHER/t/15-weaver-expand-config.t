@@ -16,8 +16,7 @@ my @bad_data = (
     [ [ Name => { ':version' => '999' } ], qr/Pod::Weaver::Section::Name version 999 required/ ],
 );
 
-foreach my $bad_data (@bad_data)
-{
+foreach my $bad_data (@bad_data) {
     like(
         exception { Pod::Weaver::PluginBundle::Author::ETHER->_expand_config($bad_data->[0]) },
         $bad_data->[1],
@@ -56,8 +55,7 @@ my @test_data = (
         [ 'Collect' => 'FOO', { command => 'foo' } ] => [ 'FOO', _exp('Collect'), { command => 'foo' } ] ],
 );
 
-foreach my $test_data (@test_data)
-{
+foreach my $test_data (@test_data) {
     cmp_deeply(
         Pod::Weaver::PluginBundle::Author::ETHER->_expand_config($test_data->[1]),
         $test_data->[2],

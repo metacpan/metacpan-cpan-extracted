@@ -1,6 +1,6 @@
 use Test::More;
-use MooX::Purple;
-use MooX::Purple::G -lib => 't/lib';
+use MooX::Purple -author => 'lnation <thisusedtobeanemail@gmail.com>', -version => '0.13';
+use MooX::Purple::G -lib => 't/lib', -author => 'lnation <thisusedtobeanemail@gmail.com>', -version => '0.13';
 
 role Before {
 	public seven { return '7' }
@@ -24,8 +24,8 @@ class Hello with qw/World/ allow qw/main/ use Scalar::Util qw/reftype/ use qw/JS
 			}
 		};
 
-	public four { return $_[1]->{message} }
-	private five { return $_[0]->six }
+	public four { return $_[0]->{message} }
+	private five { return $self->six }
 	public ten { reftype bless {}, 'Flat::World' }
 	public eleven { encode_json { flat => "world" } }
 };

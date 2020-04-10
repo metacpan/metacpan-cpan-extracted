@@ -1,0 +1,47 @@
+---
+abstract: 'Handling Argon2 passwords in Dancer2'
+author:
+  - 'Sergiy Borodych C<< <bor at cpan.org> >>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Argon2
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Dancer2::Plugin::Argon2:
+    file: lib/Dancer2/Plugin/Argon2.pm
+    version: '0.01'
+  Dancer2::Plugin::Argon2::Passphrase:
+    file: lib/Dancer2/Plugin/Argon2/Passphrase.pm
+    version: '0.01'
+requires:
+  Crypt::Argon2: '0.007'
+  Crypt::URandom: '0.36'
+  Dancer2: '0.300000'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/bor/Dancer2-Plugin-Argon2/issues
+  homepage: https://github.com/bor/Dancer2-Plugin-Argon2
+  repository: git://github.com/bor/Dancer2-Plugin-Argon2.git
+version: '0.01'
+x_authority: cpan:BOR
+x_contributors:
+  - 'Sergiy Borodych <bor@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

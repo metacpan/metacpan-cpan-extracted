@@ -3,9 +3,8 @@ package MooX::Purple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use Keyword::Declare;
-use Caller::Reverse qw/callr/;
 our ($PREFIX, %MACROS);
 
 sub import {
@@ -38,6 +37,12 @@ sub import {
 			|
 		)?+
 	}xms;
+	keytype PATTRS is m{
+		(?:
+			describe (?&PerlNWS)
+				(?:(?&PerlString))
+		)?+
+	}xms;
 	keyword role (QualIdent $class, GATTRS @roles, Block $block) {
 		_handle_role($class, $block, @roles)
 	}
@@ -57,28 +62,91 @@ sub import {
 		_handle_class($class, $block);
 	}
 	keyword macro (Ident $macro, Block $block) {
-		$block =~ s/^\n*\{\n*\s*|;\n*\t*\}\n*$//g;
-		$MACROS{$macro} = $block;
-		return '';
+		return _handle_macro($macro, $block);
 	}
 	keyword private (Ident $method, SATTRS @roles, Block $block) {
-		my %attrs = _parse_role_attrs(@roles);
-		my $allowed = $attrs{allow} ? sprintf 'qw(%s)', join ' ', @{$attrs{allow}} : 'qw//';
-		$block =~ s/(^{)|(}$)//g;
-		return "sub $method {
-			my \$caller = caller();
-			my \@allowed = $allowed;
-			unless (\$caller eq __PACKAGE__ || grep { \$_ eq \$caller } \@allowed) {
-				die \"cannot call private method $method from \$caller\";
-			}
-			$block
+		return _handle_private($method, $block, @roles);	
+	}
+	keyword public (Ident $method, Block $block, PATTRS @pod) {
+		return _handle_public($method, $block, @pod);
+	}
+	keyword start (Ident $method, Block $block) {
+		return _handle_when('-', $method, $block);	
+	}
+	keyword during (Ident $method, Block $block) {
+		return _handle_when('~', $method, $block);	
+	}
+	keyword trigger (Ident $method, Block $block) {
+		return _handle_when('=', $method, $block);
+	}
+	keyword end (Ident $method, Block $block) {
+		return _handle_when('+', $method, $block);	
+	}
+}
+
+sub _handle_macro {
+	my ($macro, $block) = @_;
+	$block =~ s/^\n*\{\n*\s*|;\n*\t*\}\n*$//g;
+	$MACROS{$macro} = $block;
+	return '';
+}
+
+sub _handle_public {
+	my ($method, $block) = @_;
+	my $mac = join '|', keys %MACROS;
+	$block =~ s/&($mac)/$MACROS{$1}/g;
+	$block =~ s/(^{)|(}$)//g;
+	return "sub $method { 
+		my (\$self) = shift;
+		$block
+	}";
+}
+
+sub _handle_private {
+	my ($method, $block, @roles) = @_;
+	my %attrs = _parse_role_attrs(@roles);
+	my $allowed = $attrs{allow} ? sprintf 'qw(%s)', join ' ', @{$attrs{allow}} : 'qw//';
+	my $mac = join '|', keys %MACROS;
+	$block =~ s/&($mac)/$MACROS{$1}/g;
+	$block =~ s/(^{)|(}$)//g;
+	return "sub $method {
+		my (\$self) = shift;
+		my \$caller = caller();
+		my \@allowed = $allowed;
+		unless (\$caller eq __PACKAGE__ || grep { \$_ eq \$caller } \@allowed) {
+			die \"cannot call private method $method from \$caller\";
+		}
+		$block
+	}";
+}
+
+sub _handle_when {
+	my ($pre, $method, $block) = @_;
+	my %map = (
+		'-' => 'before',
+		'+' => 'after',
+		'~' => 'around',
+		'=' => 'around'
+	);
+	$block =~ s/(^{)|(}$)//g;
+	if ($pre eq '~') {
+		$block = "{
+			my (\$orig, \$self) = (shift, shift);
+			$block;
 		}";
+	} elsif ($pre eq '=') {
+		$block = "{
+			my (\$orig, \$self) = (shift, shift);
+			my \$out = \$self->\$orig(\@_);
+			$block;
+		}";
+	} else {
+		$block = "{
+			my (\$self) = (shift);
+			$block;
+		}"
 	}
-	keyword public (Ident $method, Block $block) {
-		my $mac = join '|', keys %MACROS;
-		$block =~ s/&($mac)/$MACROS{$1}/g;
-		return qq|sub $method $block|;
-	}
+	return "$map{$pre} $method => sub $block;";
 }
 
 sub _handle_class {
@@ -89,6 +157,7 @@ sub _handle_class {
 		use Moo;
 		use MooX::LazierAttributes;
 		use MooX::ValidateSubs;
+		use Data::LnArray qw/arr/;
 		$attrs{is}
 		$attrs{with}
 		$attrs{use}
@@ -106,6 +175,7 @@ sub _handle_role {
 		use Moo::Role;
 		use MooX::LazierAttributes;
 		use MooX::ValidateSubs;
+		use Data::LnArray qw/arr/;
 		$attrs{with}
 		$attrs{use}
 		$body
@@ -188,7 +258,7 @@ MooX::Purple - MooX::Purple
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -280,13 +350,34 @@ Version 0.13
 			return $x;
 		};
 		public one { &generic; }
+		
+		start one {
+			print "before\n";
+		}
+		
+		during one {
+			print "around\n";
+			$self->$orig();
+		};
+
+		trigger one {
+			print "trigger\n";
+			return 'insane';
+		}
+
+		end one {
+			print "after\n";
+		}
+
 		public two { 
 			print &generic
 			&second; 
-		}
+		} describe "Add Documentation for method 'two'"
 	};
 
 	class +Inherit is +Simple {};
+
+
 
 =head1 AUTHOR
 

@@ -14,9 +14,9 @@ plan tests => scalar @files * 4
 
 for my $file (@files) {
   ok(-f $file, "$file exists");
-  open F, "<$file"
+  open my $fh, '<', $file
     or die "Couldn't open $file : $!";
-  my @lines = <F>;
+  my @lines = <$fh>;
   is_deeply([grep(/^$/, @lines)],[], "No empty lines in $file");
   is_deeply([grep(/^\s+$/, @lines)],[], "No whitespace-only lines in $file");
   is_deeply([grep(/^\s*\S\s+$/, @lines)],[],"No trailing whitespace on lines in $file");
@@ -30,6 +30,6 @@ for my $file (@files) {
     is_deeply([grep(/^MYMETA\.(yml|json)$/, @lines)],[],"We don't try to ship MYMETA.* $file");
   };
 
-  close F;
+  close $fh;
 };
 

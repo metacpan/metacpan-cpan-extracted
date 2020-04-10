@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::PMUtils",
   "PREREQ_PM" => {
-    "AppBase::Grep" => "0.003",
+    "AppBase::Grep" => "0.006",
     "Browser::Open" => 0,
     "Complete::Module" => "0.09",
     "Config" => 0,
@@ -107,7 +107,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.729",
+  "VERSION" => "0.730",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -115,7 +115,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "AppBase::Grep" => "0.003",
+  "AppBase::Grep" => "0.006",
   "Browser::Open" => 0,
   "Complete::Module" => "0.09",
   "Config" => 0,

@@ -1,11 +1,11 @@
-package Class::C3::XS; # git description: 0.13-10-g9f1c5a6
+package Class::C3::XS; # git description: v0.14-7-gf53d46e
 # ABSTRACT: XS speedups for Class::C3
 
 use 5.006_000;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 #pod =pod
 #pod
@@ -68,7 +68,7 @@ Class::C3::XS - XS speedups for Class::C3
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 

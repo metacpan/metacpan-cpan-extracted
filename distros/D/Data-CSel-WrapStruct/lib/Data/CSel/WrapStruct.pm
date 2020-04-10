@@ -1,9 +1,9 @@
 package Data::CSel::WrapStruct;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-07'; # DATE
+our $DATE = '2020-04-09'; # DATE
 our $DIST = 'Data-CSel-WrapStruct'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -104,6 +104,10 @@ sub remove {
         my $ref_parent = ref $parent->[0];
         if ($ref_parent eq 'ARRAY') {
             splice @{ $parent->[0] }, $key_in_parent, 1;
+            # shift larger indexes by 1
+            for my $chld (@{ $parent->children }) {
+                $chld->[2]-- if $chld->[2] >= $key_in_parent;
+            }
         } elsif ($ref_parent eq 'HASH') {
             delete $parent->[0]{$key_in_parent};
         } else {
@@ -197,7 +201,7 @@ Data::CSel::WrapStruct - Wrap data structure into a tree of objects suitable for
 
 =head1 VERSION
 
-This document describes version 0.006 of Data::CSel::WrapStruct (from Perl distribution Data-CSel-WrapStruct), released on 2020-04-07.
+This document describes version 0.007 of Data::CSel::WrapStruct (from Perl distribution Data-CSel-WrapStruct), released on 2020-04-09.
 
 =head1 SYNOPSIS
 

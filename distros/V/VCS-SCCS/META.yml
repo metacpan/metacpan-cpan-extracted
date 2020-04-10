@@ -5,7 +5,7 @@ author:
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150005
+generated_by: Author, CPAN::Meta::Converter version 2.150010
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,9 +14,9 @@ name: VCS-SCCS
 provides: 
   VCS::SCCS: 
     file: SCCS.pm
-    version: '0.24'
+    version: '0.25'
 recommends: 
-  Test::More: '1.302015'
+  Test::More: '1.302174'
 requires: 
   Carp: 0
   File::Spec: 0
@@ -27,4 +27,4 @@ requires:
 resources: 
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/VCS-SCCS
-version: '0.24'
+version: '0.25'

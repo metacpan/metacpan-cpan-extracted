@@ -1,7 +1,7 @@
 package App::github::cmd;
 
-our $DATE = '2019-07-27'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2020-04-08'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +30,7 @@ our %args_common = (
     },
 );
 our %argsrels_common = (
-    req_all => [qw/login pass/],
+    choose_all => [qw/login pass/],
     req_one => [qw/login access_token/],
 );
 our %arg0_user = (
@@ -90,6 +90,9 @@ $SPEC{get_user} = {
         %args_common,
         %argopt0_user,
     },
+    args_rels => {
+        %argsrels_common,
+    },
 };
 sub get_user {
     my %args = @_;
@@ -108,6 +111,9 @@ $SPEC{get_repo} = {
         %argopt_user,
         %arg0_repo,
     },
+    args_rels => {
+        %argsrels_common,
+    },
 };
 sub get_repo {
     my %args = @_;
@@ -125,6 +131,9 @@ $SPEC{repo_exists} = {
         %args_common,
         %argopt_user,
         %arg0_repo,
+    },
+    args_rels => {
+        %argsrels_common,
     },
 };
 sub repo_exists {
@@ -152,6 +161,9 @@ $SPEC{list_repos} = {
             default => 0,
         },
     },
+    args_rels => {
+        %argsrels_common,
+    },
 };
 sub list_repos {
     my %args = @_;
@@ -178,6 +190,9 @@ $SPEC{create_repo} = {
             schema => 'url*',
         },
     },
+    args_rels => {
+        %argsrels_common,
+    },
 };
 sub create_repo {
     my %args = @_;
@@ -198,6 +213,9 @@ $SPEC{delete_repo} = {
         %args_common,
         %argopt_user,
         %arg0_repo,
+    },
+    args_rels => {
+        %argsrels_common,
     },
 };
 sub delete_repo {
@@ -221,6 +239,9 @@ $SPEC{rename_repo} = {
             req => 1,
             pos => 1,
         },
+    },
+    args_rels => {
+        %argsrels_common,
     },
 };
 sub rename_repo {
@@ -250,7 +271,7 @@ App::github::cmd - Yet another github CLI
 
 =head1 VERSION
 
-This document describes version 0.007 of App::github::cmd (from Perl distribution App-github-cmd), released on 2019-07-27.
+This document describes version 0.008 of App::github::cmd (from Perl distribution App-github-cmd), released on 2020-04-08.
 
 =head1 SYNOPSIS
 
@@ -284,6 +305,7 @@ Arguments ('*' denotes required arguments):
 =item * B<pass> => I<str>
 
 =item * B<repo>* => I<str>
+
 
 =back
 
@@ -321,6 +343,7 @@ Arguments ('*' denotes required arguments):
 =item * B<repo>* => I<str>
 
 =item * B<user> => I<str>
+
 
 =back
 
@@ -361,6 +384,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<user> => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -397,6 +421,7 @@ Arguments ('*' denotes required arguments):
 =item * B<pass> => I<str>
 
 =item * B<user> => I<str>
+
 
 =back
 
@@ -436,6 +461,7 @@ Arguments ('*' denotes required arguments):
 =item * B<pass> => I<str>
 
 =item * B<start> => I<nonnegint> (default: 0)
+
 
 =back
 
@@ -478,6 +504,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<user> => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -517,6 +544,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<user> => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -554,7 +582,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

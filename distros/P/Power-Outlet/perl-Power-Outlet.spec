@@ -1,7 +1,7 @@
 %define lowername  power-outlet
 
 Name:           perl-Power-Outlet
-Version:        0.23
+Version:        0.24
 Release:        1%{?dist}
 Summary:        Control and query network attached power outlets
 License:        GPL+ or Artistic
@@ -41,8 +41,10 @@ drivers like amps and volts.
 Summary:        Control multiple Power::Outlet devices from web browser
 Requires:       %{name} = %{version}-%{release}
 Requires:       perl(CGI)
+Requires:       perl(CGI::Carp)
 Requires:       perl(Config::IniFiles)
 Requires:       perl(JSON)
+Requires:       perl(List::MoreUtils)
 
 %package mqtt-listener
 Summary:        Control Power::Outlet devices from MQTT

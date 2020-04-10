@@ -2,13 +2,18 @@ NAME
     Data::CSel - Select tree node objects using CSS Selector-like syntax
 
 VERSION
-    This document describes version 0.122 of Data::CSel (from Perl
-    distribution Data-CSel), released on 2020-04-07.
+    This document describes version 0.123 of Data::CSel (from Perl
+    distribution Data-CSel), released on 2020-04-09.
 
 SYNOPSIS
-     use Data::CSel qw(csel);
+     use Data::CSel qw(csel csel_each);
 
      my @cells = csel("Table[name=~/data/i] TCell[value != '']:first", $tree);
+     for (@cells) { say $_->value }
+
+    Using "csel_each":
+
+    Using selection object:
 
      # ditto, but wrap result using a Data::CSel::Selection
      my $res = csel({wrap=>1}, "Table ...", $tree);
@@ -658,6 +663,21 @@ FUNCTIONS
 
         This option can be used if your node object uses method other than
         the default "children" to set children nodes.
+
+  csel_each
+    Usage:
+
+     csel_each { say $_[0]->value } "expr", $tree;
+     csel_each { say $_->value    } {csel_opt1=>..., ...}, "expr", $tree1, $tree2;
+
+    Execute callback for every node that matches expression. Basically
+    shortcut for:
+
+     my @nodes = csel(...);
+     for (@nodes) { $callback->($_) )}
+
+    The callback will retrieve the node either in the first element of @_ or
+    in the localized $_ for convenience.
 
   parse_csel
     Usage:

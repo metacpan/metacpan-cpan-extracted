@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2007-2016 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2007-2020 H.Merijn Brand
 
 require 5.006;
 

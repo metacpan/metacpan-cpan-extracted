@@ -144,15 +144,13 @@ SKIP: {
        +($_->[1] => $_->[2]{':version'}),   # package => payload :version
         Pod::Weaver::PluginBundle::Default->mvp_bundle_config;
 
-    foreach my $bundle_plugin_config (Pod::Weaver::PluginBundle::Author::ETHER->mvp_bundle_config)
-    {
+    foreach my $bundle_plugin_config (Pod::Weaver::PluginBundle::Author::ETHER->mvp_bundle_config) {
         my $package = $bundle_plugin_config->[1];
         my $payload_version = $bundle_plugin_config->[2]{':version'};
 
         # package is part of @Default
         if (exists $default_bundle_requirements{$package}
-            and not exists $pluginbundle_meta->{prereqs}{runtime}{requires}{$package})
-        {
+                and not exists $pluginbundle_meta->{prereqs}{runtime}{requires}{$package}) {
             cmp_deeply(
                 $pluginbundle_meta->{prereqs}{runtime}{requires},
                 superhashof({ 'Pod::Weaver::PluginBundle::Default' =>
@@ -163,8 +161,7 @@ SKIP: {
                 $package . ' is part of [@Default], and Pod::Weaver::PluginBundle::Default is a runtime prereq of the plugin bundle' . ($payload_version ? ' at at least ' . $payload_version : ''),
             );
         }
-        else
-        {
+        else {
             cmp_deeply(
                 $pluginbundle_meta->{prereqs}{runtime}{requires},
                 superhashof({ $package => (defined $payload_version ? _atleast($payload_version) : ignore()) }),

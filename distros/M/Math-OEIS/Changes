@@ -1,4 +1,4 @@
-Copyright 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-OEIS.
 
@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License along
 with Math-OEIS.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 14, April 2020
+    - Grep fix for misleading mung headings
 
 Version 13, September 2019
     - Name,Stripped avoid some warnings on big A-number not found

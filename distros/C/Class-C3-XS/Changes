@@ -1,5 +1,8 @@
 Revision history for Class-C3-XS
 
+0.15      2020-04-09 02:10:13Z
+        - minor distribution tooling updates
+
 0.14      2016-08-07 00:14:09Z
         - fix naming of test packages, now that . is no longer in @INC while
           base.pm is running. (RT#116566, perl RT#128769)

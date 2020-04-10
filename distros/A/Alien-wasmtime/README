@@ -1,0 +1,72 @@
+NAME
+
+    Alien::wasmtime - Find or download wasmtime for use by other Perl
+    modules
+
+VERSION
+
+    version 0.05
+
+SYNOPSIS
+
+     use Alien::wasmtime;
+     use FFI::Platypus 1.00;
+     
+     my $ffi = FFI::Platypus->new(
+       api => 1,
+       lib => [Alien::wasmtime->dynamic_libs],
+     );
+
+DESCRIPTION
+
+    This Alien provides wasmtime a runtime for Wasm (Web Assembly). It's
+    intended to be used by FFI (not XS) to build Wasm bindings for Perl.
+
+METHODS
+
+ dynamic_libs
+
+     my @libs = Alien::wasmtime->dynamic_libs;
+
+    Returns the list of libraries needed to use wasmtime via FFI.
+
+ENVIRONMENT
+
+    ALIEN_WASMTIME_VERSION
+
+      Override the version of wasmtime downloaded. To get the latest
+      development release you can install with:
+
+       $ env ALIEN_WASMTIME_VERSION=dev cpanm Alien::wasmtime
+
+CAVEATS
+
+    Wasm and wasmtime is a moving target at the moment, so expect breakage
+    until it becomes stable.
+
+    Normally Aliens should try to use the system library before downloading
+    from the internet. Since wasmtime isn't provided by many package
+    managers yet, we skip this step for now. In the future we will support
+    probing of the system wasmtime.
+
+    This Alien is geared for use with FFI only.
+
+SEE ALSO
+
+    Wasm::Wasmtime
+
+    Alien
+
+    FFI::Platypus
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2020 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

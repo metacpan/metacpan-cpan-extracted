@@ -8,7 +8,7 @@ use MooX::LazierAttributes;
 use Eliza::Chatbot::Option;
 use Eliza::Chatbot::Brain;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our @user_options = qw(name script_file debug prompts_on memory_on);
 
@@ -104,7 +104,7 @@ Eliza::Chatbot - Eliza chatbot
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 
@@ -179,7 +179,7 @@ Return a single instance of the Eliza Object
 
 =head1 AUTHOR
 
-LNATION thisusedtobeanemail@gmail.com
+LNATION email@lnation.org
 
 =head1 ACKNOWLEDGEMENTS
 

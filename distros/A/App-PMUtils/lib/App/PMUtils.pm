@@ -1,7 +1,7 @@
 package App::PMUtils;
 
-our $DATE = '2019-12-15'; # DATE
-our $VERSION = '0.729'; # VERSION
+our $DATE = '2020-01-31'; # DATE
+our $VERSION = '0.730'; # VERSION
 
 use 5.010001;
 use strict;
@@ -247,7 +247,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.729 of App::PMUtils (from Perl distribution App-PMUtils), released on 2019-12-15.
+This document describes version 0.730 of App::PMUtils (from Perl distribution App-PMUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -325,7 +325,7 @@ Usage:
 
  pmdir(%args) -> [status, msg, payload, meta]
 
-Get directory of locally installed Perl module/prefix.
+Get directory of locally installed Perl moduleE<sol>prefix.
 
 This is basically a shortcut for:
 
@@ -351,6 +351,7 @@ Absolutify each path.
 =item * B<pmc> => I<int> (default: 0)
 
 =item * B<pod> => I<int> (default: 0)
+
 
 =back
 
@@ -410,6 +411,7 @@ and it won't change directory if the module doesn't exist.
 
 =item * B<prefix> => I<int> (default: 0)
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -454,6 +456,7 @@ Get all found files for each module instead of the first one.
 
 =item * B<pod> => I<int> (default: 0)
 
+
 =back
 
 Special arguments:
@@ -462,7 +465,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -494,6 +497,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<releases>* => I<array[str]>
+
 
 =back
 
@@ -563,7 +567,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -221,7 +221,7 @@ Eliza::Chatbot::Brain
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SUBROUTINES/METHODS
 
@@ -302,7 +302,7 @@ _debug_memory is a special function hwihc returns the contents of Eliza's memory
 
 =head1 AUTHOR
 
-LNATION thisusedtobeanemail@gmail.com
+LNATION email@lnation.org
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -328,7 +328,7 @@ Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONT
 
 =head1 AUTHOR
 
-LNATION thisusedtobeanemail@gmail.com
+LNATION email@lnation.org
 
 =head1 LICENSE AND COPYRIGHT
 

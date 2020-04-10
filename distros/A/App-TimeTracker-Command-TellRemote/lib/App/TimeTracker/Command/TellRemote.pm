@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = "3.000";
+our $VERSION = "3.001";
 # ABSTRACT: App::TimeTracker plugin for telling generic remotes
 
 use Moose::Role;
@@ -23,14 +23,14 @@ has 'tell_remote' => (
 
 after [ 'cmd_start', 'cmd_continue' ] => sub {
     my $self = shift;
-    return if $self->irc_quiet;
+    return unless $self->tell_remote;
     my $task = $self->_current_task;
     $self->_tell_remote( start => $task );
 };
 
 after 'cmd_stop' => sub {
     my $self = shift;
-    return if $self->irc_quiet;
+    return unless $self->tell_remote;
     return unless $self->_current_command eq 'cmd_stop';
     my $task = App::TimeTracker::Data::Task->previous( $self->home );
     $self->_tell_remote( stop => $task );
@@ -49,14 +49,11 @@ sub _tell_remote {
         . $task->say_project_tags;
     # Use bytes for creating the digest, otherwise we'll get into trouble
     # https://rt.cpan.org/Public/Bug/Display.html?id=93139
-    my $token = sha1_hex( encode_utf8($message), $cfg->{secret} );
+    my $token = sha1_hex( encode_utf8($message), $cfg->{secret} ) if $cfg->{secret} ;
 
-    my $url
-        = $cfg->{host}
-        . '?message='
-        . uri_escape_utf8($message)
-        . '&token='
-        . $token;
+    my $url = $cfg->{url} . '?message=' . uri_escape_utf8($message);
+    $url .= '&token='. $token if $cfg->{secret};
+
     my $res = $ua->get($url);
     unless ( $res->is_success ) {
         error_message( 'Could not post to remote status via %s: %s',
@@ -79,16 +76,15 @@ App::TimeTracker::Command::TellRemote - App::TimeTracker plugin for telling gene
 
 =head1 VERSION
 
-version 3.000
+version 3.001
 
 =head1 DESCRIPTION
 
-We use an internal IRC channel for internal communication. And we all want (need) to know what other team members are currently doing. This plugin helps us making sharing this information easy.
+We use an internal IRC channel for internal communication. And we all want (need) to know what other team members are currently doing. This plugin helps us making sharing this information easy. B<Update:> We moved to a L<matrix|https://matrix.org> chat, and this plugin still works..
 
-After running some commands, this plugin prepares a short message and
-sends it (together with an authentification token) to a small
-webserver-cum-irc-bot (C<Bot::FromHTTP>, not yet on CPAN, but basically
-just a slightly customized/enhanced pastebin).
+After running some commands, this plugin prepares a short message and sends it (together with an authentification token) to a small webserver-cum-irc-bot (C<Bot::FromHTTP>, not yet on CPAN, but basically just a slightly customized/enhanced pastebin).
+
+In fact, you can post the message to any Webhook, eg C<Net::Matrix::Webhook>
 
 The messages is transfered as a GET-Request like this:
 
@@ -104,15 +100,17 @@ add C<TellRemote> to your list of plugins
 
 add a hash named C<tell_remote>, containing the following keys:
 
-=head3 host
+=head3 url
 
-The hostname of the server C<Bot::FromHTTP> is running on. Might also contain a special port number (C<http://ircbox.vpn.yourcompany.com:9090>)
+The URL where the webhook is running. Might also contain a special port number (C<http://ircbox.vpn.yourcompany.com:9090>)
 
 =head3 secret
 
-A shared secret used to calculate the authentification token. The token is calculated like this:
+An optional shared secret used to calculate the authentification token. The token is calculated like this:
 
   my $token = Digest::SHA::sha1_hex($message, $secret);
+
+If no secret is used, no token added to the request to the webhook
 
 =head1 NEW COMMANDS
 

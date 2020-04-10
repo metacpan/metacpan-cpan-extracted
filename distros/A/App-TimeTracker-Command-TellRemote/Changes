@@ -1,5 +1,10 @@
 Revision history for App-TimeTracker-TellRemote
 
+3.001   2020-04-05T00:40:05
+    make token / secret optional
+    fix --tell_remote flag
+
+
 3.000   2019-06-16T13:23:35
     - moved from App-TimeTracker into distinct repo
     - renamed from Post2IRC to TellRemote

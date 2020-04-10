@@ -6,7 +6,7 @@ use XML::LibXML::LazyBuilder qw{DOM E};
 use Net::UPnP::HTTP;
 use Net::UPnP::ActionResponse;
 
-our $VERSION='0.21';
+our $VERSION='0.24';
 
 =head1 NAME
 

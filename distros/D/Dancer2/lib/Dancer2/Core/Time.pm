@@ -1,6 +1,6 @@
 package Dancer2::Core::Time;
 # ABSTRACT: class to handle common helpers for time manipulations
-$Dancer2::Core::Time::VERSION = '0.300002';
+$Dancer2::Core::Time::VERSION = '0.300003';
 use Moo;
 
 has seconds => (
@@ -134,7 +134,7 @@ Dancer2::Core::Time - class to handle common helpers for time manipulations
 
 =head1 VERSION
 
-version 0.300002
+version 0.300003
 
 =head1 SYNOPSIS
 

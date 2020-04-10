@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 no if "$]" >= 5.031008, feature => 'indirect';
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.152-3-ga555cef
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.153-3-g721a01f
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.153';
+our $VERSION = '0.154';
 
 use Moose;
 with
@@ -56,6 +56,18 @@ has server => (
     default => sub { $_[0]->payload->{server} // 'github' },
 );
 
+has bugtracker => (
+    is => 'ro', isa => enum([qw(rt github)]),
+    init_arg => undef,
+    lazy => 1,
+    default => sub {
+        my $bugtracker = $_[0]->payload->{bugtracker} // 'rt';
+        die 'bugtracker cannot be github unless server = github'
+            if $bugtracker eq 'github' and $_[0]->server ne 'github';
+        $bugtracker;
+    },
+);
+
 has surgical_podweaver => (
     is => 'ro', isa => 'Bool',
     init_arg => undef,
@@ -87,8 +99,7 @@ around copy_files_from_release => sub {
         ));
 };
 
-sub commit_files_after_release
-{
+sub commit_files_after_release {
     grep -e, sort(uniq('README.md', 'README.pod', 'Changes', shift->copy_files_from_release));
 }
 
@@ -194,8 +205,7 @@ my %extra_args = (
 );
 
 # plugins that use the network when they run
-sub _network_plugins
-{
+sub _network_plugins {
     qw(
         PromptIfStale
         Test::Pod::LinkCheck
@@ -251,12 +261,10 @@ my @never_gather = grep -e, qw(
     inc/ExtUtils/MakeMaker/Dist/Zilla/Develop.pm
 );
 
-sub BUILD
-{
+sub BUILD {
     my $self = shift;
 
-    if ($self->airplane)
-    {
+    if ($self->airplane) {
         warn '[@Author::ETHER] ' . colored('building in airplane mode - plugins requiring the network are skipped, and releases are not permitted', 'yellow') . "\n";
 
         # doing this before running configure means we can be sure we update the removal list before
@@ -265,8 +273,7 @@ sub BUILD
     }
 }
 
-sub configure
-{
+sub configure {
     my $self = shift;
 
     warn '[DZ] Building with ', blessed($self), ' ', $VERSION, "...\n"
@@ -386,8 +393,13 @@ sub configure
         ],
 
         # Metadata
-        $self->server eq 'github' ? [ 'GithubMeta' => { ':version' => '0.54', homepage => 0, issues => 0 } ] : (),
-        [ 'AutoMetaResources'   => { 'bugtracker.rt' => 1,
+        $self->server eq 'github' ? [ 'GithubMeta' => {
+                ':version' => '0.54',
+                homepage => 0,
+                issues => ($self->bugtracker eq 'github' ? 1 : 0),
+            } ] : (),
+        [ 'AutoMetaResources'   => {
+            $self->bugtracker eq 'rt' ? ( 'bugtracker.rt' => 1 ) : (),
               $self->server eq 'gitmo' ? ( 'repository.gitmo' => 1 )
             : $self->server eq 'p5sagit' ? ( 'repository.p5sagit' => 1 )
             : $self->server eq 'catagits' ? ( 'repository.catagits' => 1 )
@@ -528,8 +540,7 @@ sub configure
     # if ModuleBuildTiny(::*) is being used, disable its static option if
     # [StaticInstall] is being run with mode=off or dry_run=1
     if (($static_install_mode eq 'off' or $static_install_dry_run)
-        and any { /^ModuleBuildTiny/ } $self->installer)
-    {
+            and any { /^ModuleBuildTiny/ } $self->installer) {
         my $mbt = Dist::Zilla::Util->expand_config_package_name('ModuleBuildTiny');
         my $mbt_spec = first { $_->[1] =~ /^$mbt/ } @{ $self->plugins };
 
@@ -551,8 +562,7 @@ sub configure
 }
 
 # determine plugin prereqs, and apply default configs (respecting superclasses, roles)
-around add_plugins => sub
-{
+around add_plugins => sub {
     my ($orig, $self, @plugins) = @_;
 
     @plugins = grep {
@@ -564,8 +574,7 @@ around add_plugins => sub
         } $self->_removed_plugins
     } map +(ref $_ ? $_ : [ $_ ]), @plugins;
 
-    foreach my $plugin_spec (@plugins)
-    {
+    foreach my $plugin_spec (@plugins) {
         # these should never be added as plugin prereqs
         next if $plugin_spec->[0] eq 'BlockRelease'     # temporary use during development
             or $plugin_spec->[0] eq 'VerifyPhases';     # only used by ether, not others
@@ -576,8 +585,7 @@ around add_plugins => sub
         push @$plugin_spec, {} if not ref $plugin_spec->[-1];
         my $payload = $plugin_spec->[-1];
 
-        foreach my $module (grep +($plugin->isa($_) or $plugin->does($_)), keys %extra_args)
-        {
+        foreach my $module (grep +($plugin->isa($_) or $plugin->does($_)), keys %extra_args) {
             my %configs = %{ $extra_args{$module} };    # copy, not reference!
 
             # don't keep :version unless it matches the package exactly, but still respect the prereq
@@ -596,8 +604,7 @@ around add_plugins => sub
     return $self->$orig(@plugins);
 };
 
-around add_bundle => sub
-{
+around add_bundle => sub {
     my ($orig, $self, $bundle, $payload) = @_;
 
     return if $self->_plugin_removed($bundle);
@@ -642,7 +649,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.153
+version 0.154
 
 =head1 SYNOPSIS
 
@@ -803,7 +810,7 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     issues = 0
 
     [AutoMetaResources]
-    bugtracker.rt = 1
+    bugtracker.rt = 1       ; (if issues = 'rt' or omitted)
     ; (plus repository.* = 1 if server = 'gitmo' or 'p5sagit')
 
     [Authority]
@@ -1034,7 +1041,7 @@ following F<dist.ini> (following the preamble), minus some optimizations:
 =for stopwords metacpan
 
 The distribution's code is assumed to be hosted at L<github|http://github.com>;
-L<RT|http://rt.cpan.org> is used as the issue tracker.
+L<RT|http://rt.cpan.org> is used as the issue tracker (see option L</rt> below).
 The home page in the metadata points to L<github|http://github.com>,
 while the home page on L<github|http://github.com> is updated on release to
 point to L<metacpan|http://metacpan.org>.
@@ -1241,6 +1248,13 @@ Available since version 0.147.
 A boolean option that, when set, adds a F<cpanfile> to the built distribution and also commits it to the local
 repository after release. Beware that if the distribution has C<< dynamic_config => 1 >> in metadata, this will
 I<not> be a complete list of prerequisites.
+
+=head2 bugtracker
+
+Available since version 0.154.
+
+When set to C<rt> or omitted, L<RT|http://rt.cpan.org> is used as the bug/issue tracker. Can also be set to
+C<github>, in which case GitHub issues are used as the bugtracker in distribution metadata.
 
 =for stopwords customizations
 

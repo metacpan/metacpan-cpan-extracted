@@ -1,5 +1,9 @@
 Revision history for Etherpad
 
+1.2.14.0  2020-04-09 10:07:36 UTC
+    - Update to Etherpad API v1.2.14 (unreleased yet)
+    - Use httpS URLs for Etherpad doc
+
 1.2.13.2  2020-04-08 10:13:42 UTC
     - Avoid empty json bug when response is very large
 

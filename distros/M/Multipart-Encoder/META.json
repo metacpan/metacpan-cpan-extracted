@@ -1,0 +1,81 @@
+{
+   "abstract" : "encoder for mime-type C<multipart/form-data>.",
+   "author" : [
+      "Yaroslav O. Kosmina L<mailto:dart@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.9",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Multipart-Encoder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::LibMagic" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Multipart::Encoder" : {
+         "file" : "lib/Multipart/Encoder.pm",
+         "version" : "v0.0.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/darviarush/perl-multipart-encoder/issues"
+      },
+      "homepage" : "https://github.com/darviarush/perl-multipart-encoder",
+      "repository" : {
+         "url" : "git://github.com/darviarush/perl-multipart-encoder.git",
+         "web" : "https://github.com/darviarush/perl-multipart-encoder"
+      }
+   },
+   "version" : "v0.0.7",
+   "x_authority" : "cpan:DART",
+   "x_contributors" : [
+      "Iaroslav O. Kosmina <darviarush@ya.ru>",
+      "Yaroslav O. Kosmina <darviarush@mail.ru>",
+      "Yaroslav O. Kosmina <kosmina.yaroslav@220-volt.ru>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

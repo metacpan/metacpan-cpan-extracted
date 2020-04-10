@@ -5,7 +5,7 @@ use Module::Metadata;
 
 WriteMakefile(
     NAME             => 'Eliza::Chatbot',
-    AUTHOR           => q{Robert Acock <thisusedtobeanemail@gmail.com>},
+    AUTHOR           => q{Robert Acock <email@lnation.org>},
     VERSION_FROM     => 'lib/Eliza/Chatbot.pm',
     ABSTRACT_FROM    => 'lib/Eliza/Chatbot.pm',
     LICENSE          => 'artistic_2',

@@ -4,16 +4,15 @@ App::TimeTracker::Command::TellRemote - App::TimeTracker plugin for telling gene
 
 # VERSION
 
-version 3.000
+version 3.001
 
 # DESCRIPTION
 
-We use an internal IRC channel for internal communication. And we all want (need) to know what other team members are currently doing. This plugin helps us making sharing this information easy.
+We use an internal IRC channel for internal communication. And we all want (need) to know what other team members are currently doing. This plugin helps us making sharing this information easy. **Update:** We moved to a [matrix](https://matrix.org) chat, and this plugin still works..
 
-After running some commands, this plugin prepares a short message and
-sends it (together with an authentification token) to a small
-webserver-cum-irc-bot (`Bot::FromHTTP`, not yet on CPAN, but basically
-just a slightly customized/enhanced pastebin).
+After running some commands, this plugin prepares a short message and sends it (together with an authentification token) to a small webserver-cum-irc-bot (`Bot::FromHTTP`, not yet on CPAN, but basically just a slightly customized/enhanced pastebin).
+
+In fact, you can post the message to any Webhook, eg `Net::Matrix::Webhook`
 
 The messages is transfered as a GET-Request like this:
 
@@ -29,15 +28,17 @@ add `TellRemote` to your list of plugins
 
 add a hash named `tell_remote`, containing the following keys:
 
-### host
+### url
 
-The hostname of the server `Bot::FromHTTP` is running on. Might also contain a special port number (`http://ircbox.vpn.yourcompany.com:9090`)
+The URL where the webhook is running. Might also contain a special port number (`http://ircbox.vpn.yourcompany.com:9090`)
 
 ### secret
 
-A shared secret used to calculate the authentification token. The token is calculated like this:
+An optional shared secret used to calculate the authentification token. The token is calculated like this:
 
     my $token = Digest::SHA::sha1_hex($message, $secret);
+
+If no secret is used, no token added to the request to the webhook
 
 # NEW COMMANDS
 

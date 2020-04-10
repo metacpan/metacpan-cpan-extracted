@@ -2,13 +2,17 @@ package MooX::Purple::G;
 use strict;
 use warnings;
 use 5.006;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use PPR;
 use Perl::Tidy;
 use Cwd qw/abs_path/;
+our %POD;
 
-our (%HAS, $GATTRS, $SATTRS, $PREFIX, %MACROS);
+our (%HAS, $GATTRS, $SATTRS, $PATTRS, $PREFIX, %MACROS, $DIST_VERSION, $AUTHOR, $AUTHOR_EMAIL);
 BEGIN {
+	$DIST_VERSION = '-version';
+	$AUTHOR = '-author';
+	$AUTHOR_EMAIL = '-author';
 	$GATTRS = '(
 		allow (?&PerlNWS)
 			(?:(?!qw)(?&PerlQualifiedIdentifier)|
@@ -32,6 +36,12 @@ BEGIN {
 		allow (?&PerlNWS)
 			(?:(?!qw)(?&PerlQualifiedIdentifier)|
 			(?&PerlList))
+		|
+		(?:(?&PerlNWS)*)
+	)';
+	$PATTRS = '(
+		describe (?&PerlNWS)
+			(?:(?&PerlString))
 		|
 		(?:(?&PerlNWS)*)
 	)';
@@ -62,19 +72,21 @@ BEGIN {
 };
 
 sub g {
-	my ($source, $keyword, $callback, $lib) = @_;
+	my ($source, $keyword, $callback, $lib, $pod) = @_;
 	while ($$source =~ m/
 		$keyword 
 		$PPR::GRAMMAR
 	/xms) {
 		my %hack = %+;
+		$hack{generate_pod} = $pod; 
 		my ($make, %makes) = $callback->(%hack);
 		$hack{match} = quotemeta($hack{match});
 		if ($lib) {
 			$make =~ s/(^\{\s*)|(\}\s*$)//g;
 			$make =~ s/^\t//gm;
+			$make .= render_pod($makes{class});
 			write_file(sprintf("%s/%s.pmc", $lib, $makes{class}), $make)
-				if $makes{class};		
+				if $makes{class};
 			$$source =~ s/$hack{match}//;
 		} else {
 			$$source =~ s/$hack{match}/$make/e;
@@ -88,7 +100,31 @@ sub p {
 		g(
 			g(
 				g(
-					$_[0],
+					g(
+						g(
+							g(
+								g(
+									$_[0],
+									qq|(?<match>start\\s*
+									(?<method>(?&PerlIdentifier))\\s*
+									(?<block>(?&PerlBlock)))|,
+									\&start
+								),
+								qq|(?<match>end\\s*
+								(?<method>(?&PerlIdentifier))\\s*
+								(?<block>(?&PerlBlock)))|,
+								\&end
+							),
+							qq|(?<match>during\\s*
+							(?<method>(?&PerlIdentifier))\\s*
+							(?<block>(?&PerlBlock)))|,
+							\&during
+						),
+						qq|(?<match>trigger\\s*
+						(?<method>(?&PerlIdentifier))\\s*
+						(?<block>(?&PerlBlock)))|,
+						\&trigger
+					),
 					qq|(?<match>macro\\s*
 					(?<macro> (?&PerlIdentifier))\\s*
 					(?<block> (?&PerlBlock));\n*)|,
@@ -103,8 +139,11 @@ sub p {
 			qq|(?<match> public\\s*
 			(?<method> (?&PerlIdentifier))
 			(?:(?&PerlNWS))*
-			(?<block> (?&PerlBlock)))|,
+			(?<block> (?&PerlBlock))
+			(?<pod> (?: $PATTRS*)))|,
 			\&public,
+			undef,
+			$_[1]
 		),
 		qq|(?<match> attributes\\s* (?<list> (?&PerlList))\\s*\;)|,
 		\&attributes
@@ -160,6 +199,13 @@ sub kv {
 sub import {
 	my ($class, %args) = @_;
 	$PREFIX = $args{-prefix} unless $PREFIX;
+	if ($args{-author}) {
+		$args{-author} =~ m/(.*)\s*\<(.*)\>/;
+		$AUTHOR_EMAIL = $2;
+		($AUTHOR = $1) =~ s/\s$//;
+		$AUTHOR_EMAIL =~ s/\@/ at /;
+	}
+	$DIST_VERSION = $args{-version} if $args{-version};
 	my $lib = $args{-lib};
 	my $file = $args{-module} ? [caller(1)]->[1] : $0;
 	open FH, "<$file";
@@ -167,7 +213,11 @@ sub import {
 	close FH;
 	g(
 		g(
-			$source,
+			g(
+				$source,
+				qq/(?<match>(?&PerlPod))/,
+				\&parse_pod
+			),
 			qq/(?<match> role\\s*
 			(?<class>(?&PerlPrefixUnaryOperator)*(?&PerlQualifiedIdentifier)) 
 			(?<attrs> (?: $GATTRS*))
@@ -217,6 +267,56 @@ sub macro {
 	$args{block} =~ s/^\n*\{\n*\s*|;\n*\t*\}\n*$//g;
 	$MACROS{$args{macro}} = $args{block};
 	return '';
+}
+
+sub start {
+ 	push @_, pre => '-';
+	when(@_);  
+}
+
+sub end {
+	push @_, pre => '+';
+	when(@_);
+}
+
+sub during {
+	push @_, pre => '~';
+	when(@_);
+}
+
+sub trigger {
+	push @_, pre => '=';
+	when(@_);
+}
+
+sub when {
+	my %args = @_;
+	my %map = (
+		'-' => 'before',
+		'+' => 'after',
+		'~' => 'around',
+		'=' => 'around'
+	);
+
+	$args{block} =~ s/(^{)|(}$)//g;
+	if ($args{pre} eq '~') {
+		$args{block} = "{
+			my (\$orig, \$self) = (shift, shift);
+			$args{block};
+		}";
+	} elsif ($args{pre} eq '=') {
+		$args{block} = "{
+			my (\$orig, \$self) = (shift, shift);
+			my \$out = \$self->\$orig(\@_);
+			$args{block};
+		}";
+	} else {
+		$args{block} = "{
+			my (\$self) = (shift);
+			$args{block};
+		}";
+	}
+	return "$map{$args{pre}} $args{method} => sub $args{block};";
 }
 
 sub attributes {
@@ -284,16 +384,155 @@ sub roles {
 	
 	$args{class} =~ s/^\+/$PREFIX\:\:/;
 
+	my $pod = prepare_pod($args{class});
+
 	my $r = \qq|{
 	package $args{class};
 	use Moo::Role;
 	use MooX::LazierAttributes;
 	use MooX::ValidateSubs;
+	use Data::LnArray qw/arr/;
 	$attrs{with}$attrs{use}$body
 	1;
 }|;
-	p($r);
+	p($r, !$pod);
 	return ($$r, %args);
+}
+
+sub parse_pod {
+	my %h = @_;
+	if ($h{match} =~ m/=head1 NAME\n*([^\s]+)/) {
+		$POD{$1} = $POD{CURRENT} = { PARSED => 1, DATA => [] };	
+	}
+	push @{$POD{CURRENT}{DATA}}, $h{match};
+}
+
+sub prepare_pod {
+	my $class = shift;
+	if (!$POD{$class}) {
+		$POD{$class} = $POD{CURRENT} = { PARSED => 0, DATA => [] };
+		push @{$POD{$class}{DATA}}, "=head1 NAME
+
+$class - The great new $class!
+
+=cut";
+		push @{$POD{$class}{DATA}}, "=head1 Version
+
+Version $DIST_VERSION
+
+=cut";
+		push @{$POD{$class}{DATA}}, "=head1 SYNOPSIS
+
+	use $class;
+
+	$class\-\>new(\\%args)
+
+=cut";
+		push @{$POD{$class}{DATA}}, "=head1 SUBROUTINES/METHODS
+
+=cut";
+		return 0;
+	}
+	return 1;
+}
+
+sub render_pod {
+	my $class = shift;
+	if ($POD{$class}) {
+		if (!$POD{$class}{PARSED}) {
+			(my $url_class = $class) =~ s/\:\:/-/g;
+			push $POD{$class}{DATA}, "=head1 AUTHOR
+
+$AUTHOR, C<< <$AUTHOR_EMAIL> >>
+
+=cut";
+			push $POD{$class}{DATA}, "=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-moox-purple at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=$url_class>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=cut";
+			push $POD{$class}{DATA}, "=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc $class
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=$url_class>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/$url_class>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/$url_class>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/$url_class/>
+
+=back
+
+=cut";
+			push $POD{$class}{DATA}, "=head1 ACKNOWLEDGEMENTS
+
+=cut";
+
+			push $POD{$class}{DATA}, "=head1 LICENSE AND COPYRIGHT
+
+Copyright 2019 $AUTHOR.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS 'AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut";
+
+		}
+		return join "\n", @{$POD{$class}{DATA}};
+	}
+	return '';
 }
 
 sub classes {
@@ -301,18 +540,19 @@ sub classes {
 	my @hack = grep {$_ && $_ !~ m/^\s*$/} $args{attrs} =~ m/(?:$GATTRS) $PPR::GRAMMAR/gx;
 	my ($body, %attrs) = _set_class_role_attrs($args{block}, _parse_role_attrs(@hack));
 	$body =~ s/\s*$//;
-
 	$args{class} =~ s/^\+/$PREFIX\:\:/;
 
+	my $pod = prepare_pod($args{class});
 	my $r = \qq|{
 	package $args{class};
 	use Moo;
 	use MooX::LazierAttributes;
 	use MooX::ValidateSubs;
+	use Data::LnArray qw/arr/;
 	$attrs{is}$attrs{with}$attrs{use}$body
 	1;
 }|;
-	p($r);
+	p($r, !$pod);
 	return ($$r, %args);
 }
 
@@ -332,6 +572,7 @@ sub private {
 	$args{block} =~ s/(^{)|(}$)//g;
 	$args{block} =~ s/^\s*//;
 	return "sub $args{method} {
+		my (\$self) = shift;
 		my \$caller = caller();
 		my \@allowed = $allowed;
 		unless (\$caller eq __PACKAGE__ || grep { \$_ eq \$caller } \@allowed) {
@@ -343,8 +584,24 @@ sub private {
 
 sub public {
 	my %args = @_;
+	if ($args{pod}) {
+		$args{pod} =~ m/describe\s*(.*)/i;
+		$args{pod} = eval $1;
+	} 
+	$args{pod} //= '';
+	push @{ $POD{CURRENT}{DATA} }, "=head2 $args{method}
+
+$args{pod}
+
+	\$class->$args{method}
+
+=cut" if $args{generate_pod};
 	$args{block} = macro_replacement($args{block});
-	return qq|sub $args{method} $args{block}|;
+	$args{block} =~ s/(^{)|(}$)//g;
+	return "sub $args{method} { 
+		my (\$self) = shift;
+		$args{block}
+	}";
 }
 
 =pod
@@ -453,7 +710,7 @@ MooX::Purple - MooX::Purple::G
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -652,6 +909,5 @@ CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-=cut
 
 1; # End of MooX::Purple

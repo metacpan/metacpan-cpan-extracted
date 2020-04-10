@@ -7,7 +7,7 @@ use Carp;
 
 use Dist::Zilla::App -command;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 sub abstract { 'generate RPM spec file from your build template' }
 
@@ -46,7 +46,7 @@ Dist::Zilla::App::Command::mkrpmspec - generate RPM spec file from your template
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ Vincent Lequertier <vi.le@autistici.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by vincent Lequertier, Stephen Clouse.
+This software is copyright (c) 2020 by Vincent Lequertier, Stephen Clouse.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

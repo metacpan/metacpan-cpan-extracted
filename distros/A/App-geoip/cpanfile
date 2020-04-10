@@ -10,17 +10,17 @@ requires   "Pod::Usage";
 requires   "Socket";
 requires   "Text::CSV_XS"             => "1.39";
 
-recommends "Archive::Zip"             => "1.67";
-recommends "DBI"                      => "1.642";
+recommends "Archive::Zip"             => "1.68";
+recommends "DBI"                      => "1.643";
 recommends "Data::Dumper"             => "2.173";
 recommends "Getopt::Long"             => "2.51";
 recommends "JSON::PP"                 => "4.04";
 recommends "LWP::Simple"              => "6.43";
 recommends "Math::Trig"               => "1.23";
 recommends "Net::CIDR"                => "0.20";
-recommends "Pod::Usage"               => "1.69";
+recommends "Pod::Usage"               => "1.70";
 recommends "Socket"                   => "2.029";
-recommends "Text::CSV_XS"             => "1.40";
+recommends "Text::CSV_XS"             => "1.41";
 
 on "configure" => sub {
     requires   "ExtUtils::MakeMaker";

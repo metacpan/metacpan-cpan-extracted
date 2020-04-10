@@ -3,9 +3,9 @@
 package Getopt::Long::Complete;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-04-10'; # DATE
 our $DIST = 'Getopt-Long-Complete'; # DIST
-our $VERSION = '0.312'; # VERSION
+our $VERSION = '0.313'; # VERSION
 
 use strict;
 use warnings;
@@ -57,7 +57,7 @@ sub GetOptionsWithCompletion {
             }
         }
     } else {
-        $ospec = {@_};
+        $ospec = \@_;
     }
 
     my $shell;
@@ -147,7 +147,7 @@ Getopt::Long::Complete - A drop-in replacement for Getopt::Long, with shell tab 
 
 =head1 VERSION
 
-This document describes version 0.312 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2020-02-28.
+This document describes version 0.313 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2020-04-10.
 
 =head1 SYNOPSIS
 

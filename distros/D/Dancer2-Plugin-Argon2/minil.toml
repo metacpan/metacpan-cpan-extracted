@@ -1,0 +1,5 @@
+name = "Dancer2-Plugin-Argon2"
+authority = "cpan:BOR"
+#badges = ["travis-ci.com"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"

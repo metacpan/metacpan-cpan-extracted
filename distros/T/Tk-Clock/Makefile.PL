@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 1999-2016 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 1999-2020 H.Merijn Brand
 
 require 5.006;
 
@@ -25,7 +25,7 @@ my %wm = (
 		       "Tk::Derived"		=> 0,
 		       "Tk::Widget"		=> 0,
 		       "Carp"			=> 0,
-		       "Test::More"		=> 0.88,
+		       "Test::More"		=> 0.90,
 		       "Test::NoWarnings"	=> 0,
 		       "Encode"			=> 0,
 		       "POSIX"			=> 0,
@@ -45,8 +45,7 @@ my $rv = WriteMakefile (%wm);
 
 package MY;
 
-sub postamble
-{
+sub postamble {
     my $valgrind = join " ", qw(
 	PERL_DESTRUCT_LEVEL=2 PERL_DL_NONLAZY=1
 	    valgrind
@@ -79,7 +78,7 @@ sub postamble
 	'leaktest:',
 	q{	sandbox/leaktest $(FULLPERLRUN) "test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)},
 	'',
-	'spellcheck:',
+	'spellcheck:	doc',
 	'	pod-spell-check --aspell',
 	'',
 	'checkmeta:	spellcheck',
@@ -93,6 +92,17 @@ sub postamble
 	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
+	'',
+	'doc docs:		doc/Clock.md doc/Clock.html doc/Clock.man',
+	'	-@rm -f pod2html.tmp',
+	'doc/Clock.md:		Clock.pm',
+	'	pod2markdown  < $? > $@',
+	'doc/Clock.html:	Clock.pm',
+	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
+	'doc/Clock.3:		Clock.pm',
+	'	pod2man       < $? > $@',
+	'doc/Clock.man:	doc/Clock.3',
+	'	nroff -mandoc < $? > $@',
 	'',
 	$min_vsn;
     } # postamble

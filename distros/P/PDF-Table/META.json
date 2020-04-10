@@ -1,16 +1,16 @@
 {
-   "abstract" : "A utility class for building table layouts in a PDF::API2 object.",
+   "abstract" : "A utility class for building table layouts in a PDF::API2  (or PDF::Builder) object.",
    "author" : [
-      "Desislav Kamenov <omega@cpan.org>"
+      "Phil Perry <omega@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDF-Table",
    "no_index" : {
@@ -31,17 +31,20 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "perl" : "5.010"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/kamenov/PDF-Table/issues"
+         "web" : "https://github.com/PhilterPaper/PDF-Table/issues"
       },
       "repository" : {
-         "url" : "https://github.com/kamenov/PDF-Table"
+         "url" : "https://github.com/PhilterPaper/PDF-Table"
       }
    },
-   "version" : "v0.11.0"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

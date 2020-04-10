@@ -14,7 +14,7 @@ Alien::Build::Plugin::Fetch - Fetch Alien::Build plugins
 
 =head1 VERSION
 
-version 2.17
+version 2.19
 
 =head1 SYNOPSIS
 

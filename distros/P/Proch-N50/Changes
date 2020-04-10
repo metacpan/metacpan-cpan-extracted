@@ -1,3 +1,10 @@
+1.2.0	2020-04-09
+  * getStats() now also returns "N75" and "N90" statistics
+	* getStats() now also returns "auN" metric https://lh3.github.io/2020/04/08/a-new-metric-on-assembly-contiguity
+	* getStats() now also returns "path", the absolute path to "dirname"
+	* getStats() can return a N{X} metrics, if invoked as getStats(file, json, X);
+	* 'n50' 4.0.0 xprogram partially supports the new metrics
+
 1.0.0	2020-03-16
 	* First stable release (stable APIs)
 	* Switched to semantic versioning
@@ -20,7 +27,7 @@
 
 0.80	2019-08-18
 	* Only "bin/n50" has been updated
-	* NEW: Added -q for thousand separator (will cause adding quotes in --format csv) 
+	* NEW: Added -q for thousand separator (will cause adding quotes in --format csv)
 	* Now also n50 migrated to JSON::PP, as Proch::N50 does since 0.04
 	* Prints a short usage if invoked without filenames
 	* Warning printed if using --format custom without --template

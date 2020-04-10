@@ -5,7 +5,7 @@ package App::SpeedTest;
 use strict;
 use warnings;
 
-our $VERSION = "0.22";
+our $VERSION = "0.23";
 
 1;
 __END__
@@ -148,7 +148,7 @@ kilometers to the server.
    9:  4141 - Vodafone               Reykjavík   2039.16 km
   10:  3644 - Snerpa                 Isafjordur  2192.27 km
 
-=item -p | --ping
+=item -p | --ping | --ping=40
 X<-p>
 X<--ping>
 
@@ -156,18 +156,29 @@ Show a list of servers in the selection with their latency in ms.
 Be very patient if running this with L</--all>.
 
  $ speedtest --ping --cc=BE
-   1: 10986 - Proximus             Schaarbeek         169.72 km      58 ms
-   2:  4812 - Universite Catholiqâ€¦ Louvain-La-Neuve   186.05 km      66 ms
-   3: 12627 - Proximus             Brussels           172.22 km      67 ms
-   4: 12306 - VOO                  Liège              185.52 km      79 ms
-   5: 21086 - ASP                  Brussels           172.22 km      91 ms
-   6:  4319 - Orange Belgium       Brussels           172.22 km     127 ms
-   7:  4320 - EDPnet               Sint-Niklaas       147.26 km     489 ms
-   8:  2955 - Nucleus BVBA         Antwerp            132.91 km 4000000 ms
-   9:  2848 - Cu.be Solutions      Diegem             165.51 km 4000000 ms
-  10:  5151 - Combell              Brussels           172.22 km 4000000 ms
+   1:  4320 - EDPnet               Sint-Niklaas     148.06 km      52 ms
+   2: 12627 - Proximus             Brussels         173.04 km      55 ms
+   3: 10986 - Proximus             Schaarbeek       170.54 km      55 ms
+   4: 15212 - Telenet BVBA/SPRL    Mechelen         133.89 km      57 ms
+   5: 29238 - Arcadiz              DIEGEM           166.33 km      58 ms
+   6:  5151 - Combell              Brussels         173.04 km      59 ms
+   7: 26887 - Arxus NV             Brussels         173.04 km      64 ms
+   8:  4812 - Universite Catholiqâ€¦ Louvain-La-Neuv  186.87 km      70 ms
+   9:  2848 - Cu.be Solutions      Diegem           166.33 km      75 ms
+  10: 12306 - VOO                  Liège            186.26 km      80 ms
+  11: 24261 - Une Nouvelle Villeâ€¦  Charleroi        217.48 km     147 ms
+  12: 30594 - Orange Belgium       Evere            169.29 km     150 ms
 
 If a server does not respond, a very high latency is used as default.
+
+This option only shows the 40 nearest servers. The number can be changed
+as optional argument.
+
+ $ speedtest --cc=BE --ping=4
+   1:  4320 - EDPnet               Sint-Niklaas     148.06 km      53 ms
+   2: 29238 - Arcadiz              DIEGEM           166.33 km      57 ms
+   3: 15212 - Telenet BVBA/SPRL    Mechelen         133.89 km      62 ms
+   4:  2848 - Cu.be Solutions      Diegem           166.33 km      76 ms
 
 =item -1 | --one-line
 X<-1>
@@ -442,7 +453,7 @@ L<github issues|https://github.com/Tux/speedtest/issues>.
 
 I will never accept pull request that do not strictly conform to my
 style, however you might hate it. You can read the reasoning behind
-my preferences L<here|http://tux.nl/style.html>.
+my preferences L<here|https://tux.nl/style.html>.
 
 I really don't care about mixed spaces and tabs in (leading) whitespace
 
@@ -457,11 +468,9 @@ connection. The values shown cannot be used in a legal debate.
 H.Merijn Brand F<E<lt>h.m.brand@xs4all.nlE<gt>> wrote this for his own
 personal use, but was asked to make it publicly available as application.
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2019 H.Merijn Brand
-
-=head1 LICENSE
+Copyright (C) 2014-2020 H.Merijn Brand
 
 This software is free; you can redistribute it and/or modify
 it under the same terms as Perl itself.

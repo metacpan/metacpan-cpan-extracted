@@ -13,11 +13,11 @@ TSQL::FlatFile - secret module by Ded MedVed
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 
 use Data::Dumper ;
@@ -72,29 +72,39 @@ sub processLine {
     #    warn Dumper $row;
         %csv_row = %$row;
     }
-    #warn Dumper %csv_row;
+warn Dumper %csv_row;
     #warn Dumper keys %csv_row;
-    my @vals = sort { length($csv_row{$b}) <=> length($csv_row{$a}) } keys %csv_row;
-    
+    my @vals = @{sort_values(\%csv_row) };                     
+warn Dumper @vals;   
     $li=0;
     open(my $afile, "<", $asciifile)  or die "Could not open file $!";
-    #skip header
-    my $row = <$afile>;
+
     while (defined(my $row = <$afile> ) && ($li++ < $filepos)) {
         chomp $row;
         $ascii_row = $row;
     }
-    
-    #say $ascii_row;
+#warn Dumper $ascii_row;
+#exit;
     my %positions ;
     foreach my $v (@vals){
-        my $val = quotemeta($csv_row{$v})." *";
-        $ascii_row  =~ m/(?>$val)/;
-        $positions{$v} = [@-,@+];
-        $ascii_row = $`. "^"x length($&) . $';
+        # only try a match if something exists to match
+        if ((length($v) > 0 ) ) {
+            my $val = quotemeta($csv_row{$v})." *";
+            $ascii_row  =~ m/(?>$val)/;
+            $positions{$v} = [@-,@+];
+            if ((defined $&) ) {
+warn "matched ",$& , "                       at ",  @-, " - ", @+ ,"                            ";
+                $ascii_row = $`. "^"x length($&) . $';
+            }
+            else {
+                warn "${v}: hasn't matched data ";  
+            }
+        }
     }
-    
-    my @sortedkeys = sort { $positions{$a}[0] <=> $positions{$b}[0]} keys %positions;
+#warn  map { substr($_,1) } (keys %positions,1);    
+    my @sortedkeys = sort {  $positions{$a}[0] <=> $positions{$b}[0]        ## sort on data length
+                          || substr($a,1)      <=> substr($b,1)             ## then prefern matching L->R to match presumed csv ordering.
+                          } keys %positions;
     #warn of any mismatches
     my $blanklines = "";
     foreach my $k (@sortedkeys) {
@@ -123,8 +133,10 @@ sub processLine {
         $result .= "12.0" . $self->crlf;
         $result .= (scalar(@sortedkeys)) .$self->crlf;
         my $i=1;
+        my $first_offset = $positions{$sortedkeys[0]}[0];
+#warn Dumper $first_offset;        
         foreach my $k (@sortedkeys) {
-            $result .= ($i . "\t" . "SQLCHAR" . "\t" . "0" . "\t" . ($positions{$k}[1]-$positions{$k}[0]) . "\t" . (($i == scalar(@sortedkeys)) ? '"\r\n"':'""') . "\t" .  $i . "\t" .  $k . "\t"x((55-length($k))/8) . "SQL_Latin1_general_CP1_CI_AS") . $self->crlf;
+            $result .= ($i . "\t" . "SQLCHAR" . "\t" . "0" . "\t" .  ( ( $i==1?$first_offset:0 ) + $positions{$k}[1] - $positions{$k}[0]) . "\t" . (($i == scalar(@sortedkeys)) ? '"\r\n"':'""') . "\t" .  substr($k,1) . "\t" .  $k . "\t"x((55-length($k))/8) . "SQL_Latin1_General_CP1_CI_AS") . $self->crlf;
             $i++;
         }
     }
@@ -144,7 +156,8 @@ sub getLinePositions {
     my $incrementalsearch       = shift ;
     if (!defined $incrementalsearch) {
         croak 'no incrementalsearch flag given' ;
-    }    my $debug                   = shift ;
+    }
+    my $debug                   = shift ;
 
     my $li=0;
     
@@ -155,12 +168,12 @@ sub getLinePositions {
     while ((my $row = $cfile->getline_hr  ($cfile_fh)) && ($li++ < $filepos)) {
         %csv_row = %$row;
     }
-    my @vals = sort { length($csv_row{$b}) <=> length($csv_row{$a}) } keys %csv_row;
+    my @vals = @{sort_values(\%csv_row) };
     
     $li=0;
     open(my $afile, "<", $asciifile)  or die "Could not open file $!";
     #skip header
-    my $row = <$afile>;
+    #my $row = <$afile>;
     while (defined(my $row = <$afile> ) && ($li++ < $filepos)) {
         chomp $row;
         $ascii_row = $row;
@@ -171,10 +184,23 @@ sub getLinePositions {
         my $val = quotemeta($csv_row{$v})." *";
         $ascii_row  =~ m/(?>$val)/;
         $positions{$v} = [@-,@+];
-        $ascii_row = $`. "^"x length($&) . $';
+ 
+
+        if ((defined $&) ) {
+            $ascii_row = $`. "^"x length($&) . $';
+        }
+        else {
+            warn "${v}: hasn't matched data ";  
+        }
+    
+    
+    
     }
     
-    my @sortedkeys = sort { $positions{$a}[0] <=> $positions{$b}[0]} keys %positions;
+    my @sortedkeys = sort {  $positions{$a}[0] <=> $positions{$b}[0]        ## sort on data length
+                          || substr($a,1)      <=> substr($b,1)             ## then prefern matching L->R to match presumed csv ordering.
+                          } keys %positions;
+    
     my @result = ();
     {
       my $i=0;
@@ -225,7 +251,10 @@ sub getLinePositions {
                 $ascii_row = $`. "^"x length($&) . $';
             }
             
-            my @sortedkeys = sort { $positions{$a}[0] <=> $positions{$b}[0]} keys %positions;
+            my @sortedkeys = sort {  $positions{$a}[0] <=> $positions{$b}[0]        ## sort on data length
+                          || substr($a,1)      <=> substr($b,1)             ## then prefern matching L->R to match presumed csv ordering.
+                          } keys %positions;
+
             my @result = ();
             {
                 my $i=0;
@@ -287,6 +316,16 @@ sub printDebugData {
         }
         say $output_row;
     }
+}
+
+sub sort_values {
+    
+    my $values = shift || die "no values passed.";
+    
+    my @sorted = sort {  length($$values{$b})    <=> length($$values{$a})      ## sort descending on data length
+                          || substr($a,1)       <=> substr($b,1)             ## then prefer matching L->R to match presumed csv ordering.
+                          } keys %$values;
+    return \@sorted;
 }
 sub flatten { return map { @$_} @_ } ;
 

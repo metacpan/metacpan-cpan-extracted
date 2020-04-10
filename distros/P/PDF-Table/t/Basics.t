@@ -1,10 +1,12 @@
-use Test::More tests => 7;
+#!/usr/bin/perl
 use strict;
 use warnings;
+use Test::More tests => 7;
 
 use lib 't/lib';    # Needed for 'make test' from project dir
 use TestData;
-use PDFAPI2Mock;
+use PDFAPI2Mock;    # provide dummy PDF::API2. obviously a real PDF::API2 or
+                    # PDF::Builder installation will be needed in order to run
 
 BEGIN {
     use_ok('PDF::Table');
@@ -113,4 +115,4 @@ ok(
     'The cell_render_hook() subroutine output is valid'
 ) or diag explain \$pdf;
 
-
+1;

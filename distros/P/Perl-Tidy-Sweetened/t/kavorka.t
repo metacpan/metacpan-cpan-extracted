@@ -176,4 +176,34 @@ RAW
 method foo () but begin { 'bar' }
 TIDIED
 
+run_test( <<'RAW', <<'TIDIED', 'around modifiers', '',  );
+around  foo(Str :$bar, Str :$baz?)   {
+say "hi";
+}
+RAW
+around foo (Str :$bar, Str :$baz?) {
+    say "hi";
+}
+TIDIED
+
+run_test( <<'RAW', <<'TIDIED', 'before modifiers', '',  );
+before  foo(Str :$bar, Str :$baz?)   {
+say "hi";
+}
+RAW
+before foo (Str :$bar, Str :$baz?) {
+    say "hi";
+}
+TIDIED
+
+run_test( <<'RAW', <<'TIDIED', 'after modifiers', '',  );
+after foo(Str :$bar, Str :$baz?)   {
+say "hi";
+}
+RAW
+after foo (Str :$bar, Str :$baz?) {
+    say "hi";
+}
+TIDIED
+
 done_testing;

@@ -3,6 +3,7 @@ MANIFEST
 Makefile.PL
 README
 CONTRIBUTING.md
+cpanfile
 Clock.pm
 examples/24hour.pl
 examples/cdclock.pl

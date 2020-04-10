@@ -5,11 +5,11 @@ use warnings;
 
 use MooX::ReturnModifiers;
 use B;
-our $VERSION = '1.012004';
+our $VERSION = '1.012005';
 
 sub import {
 	my $target	= caller;
-	my %modifiers = return_modifiers($target);
+	my %modifiers = return_modifiers($target, [qw/has with around/]);
 	
 	my $raise_context_error = sub {
 		my ($error, $c) = @_;
@@ -35,7 +35,11 @@ sub import {
 						sub {
 							my ( $orig, $self, @params ) = @_;
 							my @caller = caller;
-    				
+    			
+							if (! ref $self) {
+								$self = $self->new;
+							}
+	
 							my $current_spec = $self->$store_spec;
 
 							if ( my $param_spec = $current_spec->{params} ) {
@@ -91,7 +95,7 @@ MooX::ValidateSubs - Validating sub routines via Type::Tiny.
 
 =head1 VERSION
 
-Version 1.012004
+Version 1.012005
 
 =cut
 

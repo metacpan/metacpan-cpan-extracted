@@ -1,10 +1,12 @@
-use Test::More tests => 11;
+#!/usr/bin/perl
 use strict;
 use warnings;
+use Test::More tests => 11;
 
 use lib 't/lib'; # Needed for 'make test' from project dirs
 use TestData qw();
-use PDFAPI2Mock;
+use PDFAPI2Mock;    # provide dummy PDF::API2. obviously a real PDF::API2 or
+                    # PDF::Builder installation will be needed in order to run
 
 BEGIN {
    use_ok('PDF::Table')
@@ -147,3 +149,5 @@ ok(1,'fake test because the one below is not working and must be fixed');
 ok($pdf->match(
       [['text', 'abcdefghijklm nopqrstuvwxyz']],
 ), 'break long words on max_word_length');
+
+1;

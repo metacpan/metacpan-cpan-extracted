@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 $|++;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -96,7 +96,7 @@ Perl::Tidy::Sweetened::Variable::Twigils - Perl::Tidy::Sweetened filter plugin t
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 

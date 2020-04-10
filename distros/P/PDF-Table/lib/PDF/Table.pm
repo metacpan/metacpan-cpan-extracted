@@ -1,14 +1,15 @@
 #!/usr/bin/env perl
 # vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 
 package PDF::Table;
 
 use Carp;
-our $VERSION = '0.11.0';
+our $VERSION = '0.12'; # fixed, read by Makefile.PL
+my $LAST_UPDATE = '0.12'; # manually update whenever code is changed
 
 print __PACKAGE__.' is version: '.$VERSION.$/ if($ENV{'PDF_TABLE_DEBUG'});
 
@@ -55,37 +56,43 @@ sub set_defaults{
     my $self = shift;
 
     $self->{'font_size'} = 12;
+    return;
 }
 
 sub set_pdf{
     my ($self, $pdf) = @_;
     $self->{'pdf'} = $pdf;
+    return;
 }
 
 sub set_page{
     my ($self, $page) = @_;
-    if ( defined($page) && ref($page) ne 'PDF::API2::Page' ){
+    if ( defined($page) && ref($page) ne 'PDF::API2'
+                        && ref($page) ne 'PDF::Builder::Page' ){
 
-        if( ref($self->{'pdf'}) eq 'PDF::API2' ){
+        if( ref($self->{'pdf'}) eq 'PDF::API2' ||
+            ref($self->{'pdf'}) eq 'PDF::Builder' ){
             $self->{'page'} = $self->{'pdf'}->page();
         } else {
-            carp 'Warning: Page must be a PDF::API2::Page object but it seems to be: '.ref($page).$/;
-            carp 'Error: Cannot set page from passed PDF object either as it is invalid!'.$/;
+            carp 'Warning: Page must be a PDF::API2::Page or PDF::Builder::Page object but it seems to be: '.ref($page).$/;
+            carp 'Error: Cannot set page from passed PDF object either, as it is invalid!'.$/;
         }
         return;
     }
     $self->{'page'} = $page;
-
+    return;
 }
 
 sub set_data{
     my ($self, $data) = @_;
     #TODO: implement
+    return;
 }
 
 sub set_options{
     my ($self, $options) = @_;
     #TODO: implement
+    return;
 }
 
 ############################################################
@@ -279,13 +286,15 @@ sub table
     #=====================================
     unless($pdf and $page and $data)
     {
-        carp "Error: Mandatory parameter is missing pdf/page/data object!\n";
+        carp "Error: Mandatory parameter is missing PDF/page/data object!\n";
         return;
     }
 
     # Validate mandatory argument data type
-    croak "Error: Invalid pdf object received."  unless (ref($pdf) eq 'PDF::API2');
-    croak "Error: Invalid page object received." unless (ref($page) eq 'PDF::API2::Page');
+    croak "Error: Invalid PDF object received."  unless (ref($pdf) eq 'PDF::API2'
+                                                      || ref($pdf) eq 'PDF::Builder');
+    croak "Error: Invalid page object received." unless (ref($page) eq 'PDF::API2::Page'
+                                                      || ref($page) eq 'PDF::Builder::Page');
     croak "Error: Invalid data received."        unless ((ref($data) eq 'ARRAY') && scalar(@$data));
     croak "Error: Missing required settings."    unless (scalar(keys %arg));
 
@@ -361,7 +370,7 @@ sub table
     my $txt     = $page->text;
 
     # Set Default Properties
-    my $fnt_name       = $arg{'font'            } || $pdf->corefont('Times',-encode => 'utf8');
+    my $fnt_name       = $arg{'font'            } || $pdf->corefont('Times',-encode => 'latin1');
     my $fnt_size       = $arg{'font_size'       } || 12;
     my $fnt_underline  = $arg{'font_underline'  } || undef; # merely stating undef is the intended default
     my $max_word_len   = $arg{'max_word_length' } || 20;
@@ -421,7 +430,7 @@ sub table
 
     my $pg_cnt      = 1;
     my $cur_y       = $ybase;
-    my $cell_props  = $arg{cell_props} || [];   # per cell properties
+    my $cell_props  = $arg{'cell_props'} || [];   # per cell properties
 
     #If there is no valid data array reference warn and return!
     if(ref $data ne 'ARRAY')
@@ -463,7 +472,7 @@ sub table
             # look for font information for this column
             my ($cell_font, $cell_font_size, $cell_font_underline);
 
-            if( !$row_idx and ref $header_props )
+            if( !$row_idx && ref $header_props )
             {
                 $cell_font           = $header_props->{'font'};
                 $cell_font_size      = $header_props->{'font_size'};
@@ -506,7 +515,8 @@ sub table
             $max_col_w                    = 0;
             $min_col_w                    = 0;
 
-            my @words = split( /\s+/, $data->[$row_idx][$column_idx] ) if $data->[$row_idx][$column_idx];
+            my @words;
+            @words = split( /\s+/, $data->[$row_idx][$column_idx] ) if $data->[$row_idx][$column_idx];
 
             foreach( @words )
             {
@@ -542,7 +552,7 @@ sub table
         $row_col_widths->[$row_idx] = $column_widths;
 
         # Copy the calculated row properties of header row.
-        @$header_row_props = @$column_widths if(!$row_idx and ref $header_props);
+        @$header_row_props = @$column_widths if(!$row_idx && ref $header_props);
     }
 
     # Calc real column widths and expand table width if needed.
@@ -592,7 +602,7 @@ sub table
             # Check for safety reasons
             if( $bot_marg < 0 )
             {   # This warning should remain i think
-                carp "!!! Warning: !!! Incorrect Table Geometry! next_y or start_y (${next_y}) is above next_h or start_h (${next_h}). Setting bottom margin to end of sheet!\n";
+                carp "!!! Warning: !!! Incorrect Table Geometry! next_y or start_y ($next_y) is above next_h or start_h ($next_h). Setting bottom margin to end of sheet!\n";
                 $bot_marg = 0;
             }
 
@@ -671,7 +681,7 @@ sub table
 
             # $row_h is the calculated global user requested row height.
             # It will be honored, only if it has bigger value than the calculated one.
-            # TODO: It's questionable if padding should be inclided in this calculation or not
+            # TODO: It's questionable if padding should be included in this calculation or not
             if($current_row_height < $row_h){
                 $current_row_height = $row_h;
             }
@@ -738,8 +748,8 @@ sub table
                 my $cell_props = $cell_props->[$row_index][$column_idx];
                 my $this_cell_width = $calc_column_widths->[$column_idx];
                 # Handle colspan (issue#46)
-                if ($cell_props && $cell_props->{colspan} && $cell_props->{colspan} > 1) {
-                    my $colspan = $cell_props->{colspan};
+                if ($cell_props && $cell_props->{'colspan'} && $cell_props->{'colspan'} > 1) {
+                    my $colspan = $cell_props->{'colspan'};
                     for my $offset (1 .. $colspan - 1) {
                         $this_cell_width += $calc_column_widths->[$column_idx + $offset] if $calc_column_widths->[$column_idx + $offset];
                         $colspanned{$row_index.'_'.($column_idx + $offset)} = 1;
@@ -794,8 +804,8 @@ sub table
                 }
 
                 # Hook to pass coordinates back - http://www.perlmonks.org/?node_id=754777
-                if (ref $arg{cell_render_hook} eq 'CODE') {
-                   $arg{cell_render_hook}->(
+                if (ref $arg{'cell_render_hook'} eq 'CODE') {
+                   $arg{'cell_render_hook'}->(
                                             $page,
                                             $first_row,
                                             $row_index,
@@ -893,21 +903,21 @@ sub CalcColumnWidths
 
     for(my $j = 0; $j < scalar( @$col_props); $j++)
     {
-        $min_width += $col_props->[$j]->{min_w} || 0;
+        $min_width += $col_props->[$j]->{'min_w'} || 0;
     }
 
     # I think this is the optimal variant when good view can be guaranateed
     if($avail_width < $min_width)
     {
-        carp "!!! Warning !!!\n Calculated Mininal width($min_width) > Table width($avail_width).\n",
+        carp "!!! Warning !!!\n Calculated Minimal width ($min_width) > Table width ($avail_width).\n",
             ' Expanding table width to:',int($min_width)+1,' but this could lead to unexpected results.',"\n",
             ' Possible solutions:',"\n",
-            '  0)Increase table width.',"\n",
-            '  1)Decrease font size.',"\n",
-            '  2)Choose a more narrow font.',"\n",
-            '  3)Decrease "max_word_length" parameter.',"\n",
-            '  4)Rotate page to landscape(if it is portrait).',"\n",
-            '  5)Use larger paper size.',"\n",
+            '  0) Increase table width.',"\n",
+            '  1) Decrease font size.',"\n",
+            '  2) Choose a narrower font.',"\n",
+            '  3) Decrease "max_word_length" parameter.',"\n",
+            '  4) Rotate page to landscape (if it is portrait).',"\n",
+            '  5) Use larger paper size.',"\n",
             '!!! --------- !!!',"\n";
         $avail_width = int( $min_width) + 1;
 
@@ -916,7 +926,7 @@ sub CalcColumnWidths
     # Calculate how much can be added to every column to fit the available width.
     for(my $j = 0; $j < scalar(@$col_props); $j++ )
     {
-        $calc_widths->[$j] = $col_props->[$j]->{min_w} || 0;;
+        $calc_widths->[$j] = $col_props->[$j]->{'min_w'} || 0;;
     }
 
     # Allow columns to expand to max_w before applying extra space equally.
@@ -932,9 +942,9 @@ sub CalcColumnWidths
         {
             my $new_w = $calc_widths->[$j] + $span;
 
-            if (!$is_last_iter && $new_w > $col_props->[$j]->{max_w})
+            if (!$is_last_iter && $new_w > $col_props->[$j]->{'max_w'})
             {
-                $new_w = $col_props->[$j]->{max_w}
+                $new_w = $col_props->[$j]->{'max_w'};
             }
             if ($calc_widths->[$j] != $new_w )
             {
@@ -957,9 +967,14 @@ __END__
 
 =head1 NAME
 
-PDF::Table - A utility class for building table layouts in a PDF::API2 object.
+PDF::Table - A utility class for building table layouts in a PDF::API2 
+(or PDF::Builder) object.
 
 =head1 SYNOPSIS
+
+Rather than cluttering up the following documentation with B<(or PDF::Builder)>
+additions, wherever it refers to C<PDF::API2>, understand that you can 
+substitute C<PDF::Builder> to use that product instead.
 
  use PDF::API2;
  use PDF::Table;
@@ -968,7 +983,7 @@ PDF::Table - A utility class for building table layouts in a PDF::API2 object.
  my $pdf = new PDF::API2(-file => "table_of_lorem.pdf");
  my $page = $pdf->page;
 
- # some data to layout
+ # some data to lay out
  my $some_data =[
     ["1 Lorem ipsum dolor",
     "Donec odio neque, faucibus vel",
@@ -996,7 +1011,8 @@ PDF::Table - A utility class for building table layouts in a PDF::API2 object.
      padding => 5,
      padding_right => 10,
      background_color_odd  => "gray",
-     background_color_even => "lightblue", #cell background color for even rows
+     background_color_even => "lightblue", # cell background color for even rows
+     max_word_length => 50, # 50 between forced splits
   );
 
  # do other stuff with $pdf
@@ -1005,16 +1021,16 @@ PDF::Table - A utility class for building table layouts in a PDF::API2 object.
 
 =head1 EXAMPLE
 
-For a complete working example or initial script look into distribution`s 'examples' folder.
+For a complete working example or initial script look into distribution's 'examples' folder.
 
 
 =head1 DESCRIPTION
 
-This class is a utility for use with the PDF::API2 module from CPAN.
+This class is a utility for use with the PDF::API2 (or PDF::Builder) module from CPAN.
 It can be used to display text data in a table layout within a PDF.
 The text data must be in a 2D array (such as returned by a DBI statement handle fetchall_arrayref() call).
 The PDF::Table will automatically add as many new pages as necessary to display all of the data.
-Various layout properties, such as font, font size, and cell padding and background color can be specified for each column and/or for even/odd rows.
+Various layout properties, such as font, font size, cell padding, and background color can be specified for each column and/or for even/odd rows.
 Also a (non)repeated header row with different layout properties can be specified.
 
 See the L</METHODS> section for complete documentation of every parameter.
@@ -1056,19 +1072,19 @@ Generates a multi-row, multi-column table into an existing PDF document based on
     $pdf      - a PDF::API2 instance representing the document being created
     $page     - a PDF::API2::Page instance representing the current page of the document
     $data     - an ARRAY reference to a 2D data structure that will be used to build the table
-    %settings - HASH with geometry and formatting parameters.
+    %settings - HASH with geometry and formatting parameters
 
-For full %settings description see section L</Table settings> below.
+For full C<%settings> description see section L</Table settings> below.
 
-This method will add more pages to the pdf instance as required based on the formatting options and the amount of data.
+This method will add more pages to the PDF instance as required based on the formatting options and the amount of data.
 
 =item Returns
 
-The return value is a 3 items list where
+The return value is a 3 item list where
 
     $final_page - The first item is a PDF::API2::Page instance that the table ends on
-    $number_of_pages - The second item is the count of pages that the table spans on
-    $final_y - The third item is the Y coordinate of the table bottom so that additional content can be added in the same document.
+    $number_of_pages - The second item is the count of pages that the table spans
+    $final_y - The third item is the Y coordinate of the table bottom so that additional content can be added in the same document
 
 =item Example
 
@@ -1093,34 +1109,38 @@ The return value is a 3 items list where
 
 =head4 Mandatory
 
-There are some mandatory parameteres for setting table geometry and position across page(s)
+There are some mandatory parameters for setting table geometry and position across page(s)
 
 =over
 
 =item B<x> - X coordinate of upper left corner of the table. Left edge of the sheet is 0.
 
-B<Value:> can be any whole number satisfying 0 =< X < PageWidth
+B<Value:> can be any whole number satisfying C<0 =< X < PageWidth>
+
 B<Default:> No default value
 
     x => 10
 
 =item B<start_y> - Y coordinate of upper left corner of the table at the initial page.
 
-B<Value:> can be any whole number satisfying 0 < start_y < PageHeight (depending on space availability when embedding a table)
+B<Value:> can be any whole number satisfying C<0 < start_y < PageHeight> (depending on space availability when embedding a table)
+
 B<Default:> No default value
 
     start_y => 327
 
 =item B<w> - width of the table starting from X.
 
-B<Value:> can be any whole number satisfying 0 < w < PageWidth - x
+B<Value:> can be any whole number satisfying C<0 < w < PageWidth - x>
+
 B<Default:> No default value
 
     w  => 570
 
 =item B<start_h> - Height of the table on the initial page
 
-B<Value:> can be any whole number satisfying 0 < start_h < PageHeight - Current Y position
+B<Value:> can be any whole number satisfying C<0 < start_h < PageHeight - Current Y position>
+
 B<Default:> No default value
 
     start_h => 250
@@ -1133,22 +1153,25 @@ B<Default:> No default value
 
 =item B<next_h> - Height of the table on any additional page
 
-B<Value:> can be any whole number satisfying 0 < next_h < PageHeight
+B<Value:> can be any whole number satisfying C<0 < next_h < PageHeight>
+
 B<Default:> Value of param B<'start_h'>
 
     next_h  => 700
 
 =item B<next_y> - Y coordinate of upper left corner of the table at any additional page.
 
-B<Value:> can be any whole number satisfying 0 < next_y < PageHeight
+B<Value:> can be any whole number satisfying C<0 < next_y < PageHeight>
+
 B<Default:> Value of param B<'start_y'>
 
     next_y  => 750
 
-=item B<max_word_length> - Breaks long words (like serial numbers hashes etc.) by adding a space after every Nth symbol
+=item B<max_word_length> - Breaks long words (like serial numbers, hashes, etc.) by adding a space after every Nth symbol
 
 B<Value:> can be any whole positive number
-B<Default:> 20
+
+B<Default:> C<20>
 
     max_word_length => 20    # Will add a space after every 20 symbols
 
@@ -1164,15 +1187,15 @@ B<Default:> 20
 
 B<Value:> can be any whole positive number
 
-B<Default padding:> 0
+B<Default padding:> C<0>
 
-B<Default padding_*> $padding
+B<Default padding_*> C<$padding>
 
     padding        => 5      # all sides cell padding
     padding_top    => 8,     # top cell padding, overrides 'padding'
     padding_right  => 6,     # right cell padding, overrides 'padding'
     padding_left   => 2,     # left cell padding, overrides 'padding'
-    padding_bottom => undef  # bottom padding will be 5 as it will fallback to 'padding'
+    padding_bottom => undef  # bottom padding will be 5 as it will fall back to 'padding'
 
 =item B<border> - Width of table border lines.
 
@@ -1181,30 +1204,34 @@ B<Default padding_*> $padding
 =item B<vertical_borders> -  Width of vertical border lines. Overrides 'border' value.
 
 B<Value:> can be any whole positive number. When set to 0 will disable border lines.
-B<Default:> 1
+
+B<Default:> C<1>
 
     border             => 3     # border width is 3
     horizontal_borders => 1     # horizontal borders will be 1 overriding 3
-    vertical_borders   => undef # vertical borders will be 3 as it will fallback to 'border'
+    vertical_borders   => undef # vertical borders will be 3 as it will fall back to 'border'
 
 =item B<border_color> -  Border color for all borders.
 
-B<Value:> Color specifier as 'name' or 'HEX'
-B<Default:> 'black'
+B<Value:> Color specifier as 'name' or '#rrggbb'
+
+B<Default:> C<'black'>
 
     border_color => 'red'
 
-=item B<font> - instance of PDF::API2::Resource::Font defining the fontf to be used in the table
+=item B<font> - instance of PDF::API2::Resource::Font defining the font to be used in the table
 
 B<Value:> can be any PDF::API2::Resource::* type of font
-B<Default:> 'Times' with UTF8 encoding
 
-    font => $pdf->corefont("Helvetica", -encoding => "utf8")
+B<Default:> C<'Times'> with latin1 encoding
+
+    font => $pdf->corefont("Helvetica", -encoding => "latin1")
 
 =item B<font_size> - Default size of the font that will be used across the table
 
 B<Value:> can be any positive number
-B<Default:> 12
+
+B<Default:> C<12>
 
     font_size => 16
 
@@ -1216,15 +1243,17 @@ B<Default:> 12
 
 =item B<font_underline> - Font underline of the header row
 
-B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide mlultiple underlines. Negative distance gives strike-through.
+B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide multiple underlines. Negative distance gives strike-through.
+
 B<Default:> none
 
 =item B<background_color_odd> - Background color for odd rows
 
 =item B<background_color_even> - Background color for even rows
 
-B<Value:> Color specifier as 'name' or 'HEX'
-B<Default:> 'black' font on 'white' background
+B<Value:> Color specifier as 'name' or '#rrggbb'
+
+B<Default:> C<'black'> font on C<'white'> background
 
     font_color            => '#333333'
     font_color_odd        => 'purple'
@@ -1232,18 +1261,20 @@ B<Default:> 'black' font on 'white' background
     background_color_odd  => 'gray'
     background_color_even => 'lightblue'
 
-=item B<row_height> - Desired row height but it will be honored only if row_height > font_size + padding_top + padding_bottom
+=item B<row_height> - Desired row height but it will be honored only if C<row_height > font_size + padding_top + padding_bottom>
 
 B<Value:> can be any whole positive number
-B<Default:> font_size + padding_top + padding_bottom
+
+B<Default:> C<font_size + padding_top + padding_bottom>
 
     row_height => 24
 
 =item B<new_page_func> - CODE reference to a function that returns a PDF::API2::Page instance.
 
-If used the parameter 'new_page_func' must be a function reference which when executed will create a new page and will return the object back to the module.
-For example you can use it to put Page Title, Page Frame, Page Numbers and other staff that you need.
-Also if you need some different type of paper size and orientation than the default A4-Portrait for example B2-Landscape you can use this function ref to set it up for you. For more info about creating pages refer to PDF::API2 PAGE METHODS Section.
+If used, the parameter 'C<new_page_func>' must be a function reference which when executed will create a new page and will return the object back to the module.
+For example you can use it to put Page Title, Page Frame, Page Numbers and other stuff that you need.
+Also if you need a different paper size and orientation than the default 
+US-Letter, e.g., B2-Landscape, you can use this function ref to set it up for you. For more info about creating pages refer to PDF::API2 PAGE METHODS Section.
 Don't forget that your function must return a page object created with PDF::API2 page() method.
 
     new_page_func  => $code_ref
@@ -1260,7 +1291,7 @@ Don't forget that your function must return a page object created with PDF::API2
 
     cell_props => $cel_props
 
-=item B<cell_render_hook> - CODE reference to a function called with the current cell coordinates.  If used the parameter 'cell_render_hook' must be a function reference. It is most useful for creating a url link inside of a cell. The following example adds a link in the first column of each non-header row:
+=item B<cell_render_hook> - CODE reference to a function called with the current cell coordinates.  If used, the parameter 'cell_render_hook' must be a function reference. It is most useful for creating a URL link inside of a cell. The following example adds a link in the first column of each non-header row:
 
     cell_render_hook  => sub {
         my ($page, $first_row, $row, $col, $x, $y, $w, $h) = @_;
@@ -1286,44 +1317,51 @@ There is no 'data' variable for the content, because the module asumes that firs
 
 =over
 
-=item B<font> - instance of PDF::API2::Resource::Font defining the fontf to be used in the header row
+=item B<font> - instance of PDF::API2::Resource::Font defining the font to be used in the header row
 
 B<Value:> can be any PDF::API2::Resource::* type of font
-B<Default:> 'font' of the table. See table parameter 'font' for more details.
+
+B<Default:> C<'font'> of the table. See table parameter 'font' for more details.
 
 =item B<font_size> - Font size of the header row
 
 B<Value:> can be any positive number
-B<Default:> 'font_size' of the table + 2
+
+B<Default:> C<'font_size'> of the table + 2
 
 =item B<font_color> - Font color of the header row
 
-B<Value:> Color specifier as 'name' or 'HEX'
-B<Default:> '#000066'
+B<Value:> Color specifier as 'name' or '#rrggbb'
+
+B<Default:> C<#000066>
 
 =item B<font_underline> - Font underline of the header row
 
-B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide mlultiple underlines. Negative distance gives strike-through.
+B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide multiple underlines. Negative distance gives strike-through.
+
 B<Default:> none
 
 =item B<bg_color> - Background color of the header row
 
-B<Value:> Color specifier as 'name' or 'HEX'
-B<Default:> #FFFFAA
+B<Value:> Color specifier as 'name' or '#rrggbb'
+
+B<Default:> C<#FFFFAA>
 
 =item B<repeat> - Flag showing if header row should be repeated on every new page
 
 B<Value:> 0,1   1-Yes/True, 0-No/False
-B<Default:> 0
+
+B<Default:> C<0>
 
 =item B<justify> - Alignment of text in the header row.
 
 B<Value:> One of 'left', 'right', 'center'
-B<Default:> Same as column alignment (or 'left' if undefined)
+
+B<Default:> Same as column alignment (or C<'left'> if undefined)
 
     my $hdr_props =
     {
-        font       => $pdf->corefont("Helvetica", -encoding => "utf8"),
+        font       => $pdf->corefont("Helvetica", -encoding => "latin1"),
         font_size  => 18,
         font_color => '#004444',
         bg_color   => 'yellow',
@@ -1343,45 +1381,53 @@ Each hashref can contain any of the keys shown below:
 
 =over
 
-=item B<min_w> - Minimum width of this column. Auto calculation will try its best to honour this param but aplying it is NOT guaranteed.
+=item B<min_w> - Minimum width of this column. Auto calculation will try its best to honour this param but applying it is NOT guaranteed.
 
-B<Value:> can be any whole number satisfying 0 < min_w < w
+B<Value:> can be any whole number satisfying C<0 < min_w < w>
+
 B<Default:> Auto calculated
 
-=item B<max_w> - Maximum width of this column. Auto calculation will try its best to honour this param but aplying it is NOT guaranteed.
+=item B<max_w> - Maximum width of this column. Auto calculation will try its best to honour this param but applying it is NOT guaranteed.
 
-B<Value:> can be any whole number satisfying 0 < max_w < w
+B<Value:> can be any whole number satisfying C<0 < max_w < w>
+
 B<Default:> Auto calculated
 
-=item B<font> - instance of PDF::API2::Resource::Font defining the fontf to be used in this column
+=item B<font> - instance of PDF::API2::Resource::Font defining the font to be used in this column
 
 B<Value:> can be any PDF::API2::Resource::* type of font
-B<Default:> 'font' of the table. See table parameter 'font' for more details.
+
+B<Default:> C<font> of the table. See table parameter 'font' for more details.
 
 =item B<font_size> - Font size of this column
 
 B<Value:> can be any positive number
-B<Default:> 'font_size' of the table.
+
+B<Default:> C<font_size> of the table.
 
 =item B<font_color> - Font color of this column
 
-B<Value:> Color specifier as 'name' or 'HEX'
-B<Default:> 'font_color' of the table.
+B<Value:> Color specifier as 'name' or '#rrggbb'
+
+B<Default:> C<font_color> of the table.
 
 =item B<font_underline> - Font underline of this cell
 
-B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide mlultiple underlines. Negative distance gives strike-through.
+B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide multiple underlines. Negative distance gives strike-through.
+
 B<Default:> none
 
 =item B<background_color> - Background color of this column
 
-B<Value:> Color specifier as 'name' or 'HEX'
+B<Value:> Color specifier as 'name' or '#rrggbb'
+
 B<Default:> undef
 
 =item B<justify> - Alignment of text in this column
 
 B<Value:> One of 'left', 'right', 'center'
-B<Default:> 'left'
+
+B<Default:> C<'left'>
 
 Example:
 
@@ -1401,8 +1447,8 @@ Example:
 
 =back
 
-NOTE: If 'min_w' and/or 'max_w' parameter is used in 'col_props', have in mind that it may be overridden by the calculated minimum/maximum cell witdh so that table can be created.
-When this happens a warning will be issued with some advises what can be done.
+NOTE: If 'min_w' and/or 'max_w' parameter is used in 'col_props', have in mind that it may be overridden by the calculated minimum/maximum cell width so that the table can be created.
+When this happens, a warning will be issued with some suggestions on what can be done.
 In cases of a conflict between column formatting and odd/even row formatting, 'col_props' will override odd/even.
 
 =head4 Cell Properties
@@ -1414,39 +1460,46 @@ Each hashref can contain any of the keys shown below:
 
 =over
 
-=item B<font> - instance of PDF::API2::Resource::Font defining the fontf to be used in this cell
+=item B<font> - instance of PDF::API2::Resource::Font defining the font to be used in this cell
 
 B<Value:> can be any PDF::API2::Resource::* type of font
-B<Default:> 'font' of the table. See table parameter 'font' for more details.
+
+B<Default:> C<'font'> of the table. See table parameter 'font' for more details.
 
 =item B<font_size> - Font size of this cell
 
 B<Value:> can be any positive number
-B<Default:> 'font_size' of the table.
+
+B<Default:> C<font_size> of the table.
 
 =item B<font_color> - Font color of this cell
 
-B<Value:> Color specifier as 'name' or 'HEX'
-B<Default:> 'font_color' of the table.
+B<Value:> Color specifier as 'name' or '#rrggbb'
+
+B<Default:> C<font_color> of the table.
 
 =item B<font_underline> - Font underline of this cell
 
-B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide mlultiple underlines. Negative distance gives strike-through.
+B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide multiple underlines. Negative distance gives strike-through.
+
 B<Default:> none
 
 =item B<background_color> - Background color of this cell
 
-B<Value:> Color specifier as 'name' or 'HEX'
+B<Value:> Color specifier as 'name' or '#rrggbb'
+
 B<Default:> undef
 
 =item B<justify> - Alignment of text in this cell
 
 B<Value:> One of 'left', 'right', 'center'
-B<Default:> 'left'
+
+B<Default:> C<'left'>
 
 =item B<colspan> - Span this cell over multiple columns to the right
 
 B<Value:> can be any positive number less than the number of columns to the right of the current column
+
 B<Default:> undef
 
 NOTE: If you want to have regular columns B<after> a colspan, you have to provide C<undef> for the columns that should be spanned
@@ -1471,7 +1524,7 @@ See L<examples/colspan.pl> for detailed usage.
 Example:
 
     my $cell_props = [
-        [ #This array is for the first row. If header_props is defined it will overwrite these settings.
+        [ #This array is for the first row. If header_props is defined it will override these settings.
             {    #Row 1 cell 1
                 background_color => '#AAAA00',
                 font_color       => 'yellow',
@@ -1509,7 +1562,7 @@ Example:
         font_color       => 'blue',
     };
 
-NOTE: In case of a conflict between column, odd/even and cell formatting, cell formatting will overwrite the other two.
+NOTE: In case of a conflict between column, odd/even, and cell formatting; cell formatting will override the other two.
 In case of a conflict between header row and cell formatting, header formatting will override cell.
 
 =head2 text_block()
@@ -1521,9 +1574,9 @@ In case of a conflict between header row and cell formatting, header formatting 
 =item Description
 
 Utility method to create a block of text. The block may contain multiple paragraphs.
-It is mainly used internaly but you can use it from outside for placing formatted text anywhere on the sheet.
+It is mainly used internally but you can use it from outside for placing formatted text anywhere on the sheet.
 
-NOTE: This method will NOT add more pages to the pdf instance if the space is not enough to place the string inside the block.
+NOTE: This method will NOT add more pages to the PDF instance if the space is not enough to place the string inside the block.
 Leftover text will be returned and has to be handled by the caller - i.e. add a new page and a new block with the leftover.
 
 =item Parameters
@@ -1534,7 +1587,7 @@ Leftover text will be returned and has to be handled by the caller - i.e. add a 
 
 =item Returns
 
-The return value is a 3 items list where
+The return value is a 3 item list where
 
     $width_of_last_line - Width of last line in the block
     $final_y - The Y coordinate of the block bottom so that additional content can be added after it
@@ -1555,9 +1608,10 @@ The return value is a 3 items list where
         #OPTIONAL PARAMS
         lead     => $font_size | $distance_between_lines,
         align    => "left|right|center|justify|fulljustify",
+        max_word_length => $optional_max_word_chars_between_splits
         hang     => $optional_hanging_indent,
-        Only one of the subsequent 3params can be given.
-        They override each other.-parspace is the weightest
+        Only one of the subsequent params can be given.
+        They override each other. parspace is the highest weight
         parspace => $optional_vertical_space_before_first_paragraph,
         flindent => $optional_indent_of_first_line,
         fpindent => $optional_indent_of_first_paragraph,
@@ -1570,7 +1624,7 @@ The return value is a 3 items list where
 
 =head1 VERSION
 
-0.10.1
+0.12
 
 =head1 AUTHOR
 
@@ -1578,16 +1632,21 @@ Daemmon Hughes
 
 =head1 DEVELOPMENT
 
-Further development since Ver: 0.02 - Desislav Kamenov
+Further development Versions 0.02 -- 0.11 - Desislav Kamenov
+
+Further development since Ver: 0.12 - Phil Perry
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2006 by Daemmon Hughes, portions Copyright 2004 Stone
 Environmental Inc. (www.stone-env.com) All Rights Reserved.
 
+Copyright (C) 2020 by Phil M Perry.
+
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.4 or,
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
 at your option, any later version of Perl 5 you may have available.
+Note that Perl 5.10 is the minimum supported level.
 
 =head1 PLUGS
 
@@ -1614,13 +1673,13 @@ Thanks to all GitHub contributors!
 
 =head1 CONTRIBUTION
 
-Hey PDF::Table is on GitHub. You are more than welcome to contribute!
+Hey, PDF::Table is on GitHub. You are more than welcome to contribute!
 
-https://github.com/kamenov/PDF-Table
+https://github.com/PhilterPaper/PDF-Table
 
 =head1 SEE ALSO
 
-L<PDF::API2>
+L<PDF::API2>, L<PDF::Builder>
 
 =cut
 

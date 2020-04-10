@@ -28,7 +28,7 @@ eval q{use Scalar::Util 'weaken'; 1}
   || eval q{sub weaken { $_[0] = undef }; 1 }
     || die "Oops, error making a weaken() fallback: $@";
 
-our $VERSION = 13;
+our $VERSION = 14;
 
 # singleton here results in a separate instance object in each derived subclass
 use Class::Singleton;

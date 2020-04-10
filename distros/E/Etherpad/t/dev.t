@@ -178,4 +178,7 @@ ok $ec->is_password_protected($t->[0]), 'isPasswordProtected 2';
 $ec->delete_pad($t->[0]);
 $ec->delete_group($gid);
 
+my $stats = $ec->get_stats();
+is_deeply $stats, { 'totalActivePads' => 0, 'totalPads' => 2, 'totalSessions' => 0 }, 'getStats';
+
 done_testing;

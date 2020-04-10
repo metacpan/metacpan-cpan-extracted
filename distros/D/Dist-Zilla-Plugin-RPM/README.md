@@ -4,7 +4,7 @@ Dist::Zilla::Plugin::RPM - Build an RPM from your Dist::Zilla release
 
 # VERSION
 
-version 0.015
+version 0.016
 
 # SYNOPSIS
 
@@ -35,7 +35,7 @@ distribution.
 
     The spec file to use to build the RPM.
 
-    The spec file is run through [Text::Template](https://metacpan.org/pod/Text::Template) before calling
+    The spec file is run through [Text::Template](https://metacpan.org/pod/Text%3A%3ATemplate) before calling
     rpmbuild, so you can substitute values from Dist::Zilla into the final output.
     The template uses <% %> tags (like [Mason](https://metacpan.org/pod/Mason)) as delimiters to avoid
     conflict with standard spec file markup.
@@ -115,7 +115,7 @@ distribution.
 
 # SEE ALSO
 
-[Dist::Zilla](https://metacpan.org/pod/Dist::Zilla)
+[Dist::Zilla](https://metacpan.org/pod/Dist%3A%3AZilla)
 
 # AUTHOR
 
@@ -123,7 +123,7 @@ Vincent Lequertier <vi.le@autistici.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by vincent Lequertier, Stephen Clouse.
+This software is copyright (c) 2020 by Vincent Lequertier, Stephen Clouse.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

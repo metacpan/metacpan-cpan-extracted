@@ -10,7 +10,6 @@ README
 README.md
 README.template
 bin/n50
-bin/n50.bak
 data/big.fa
 data/sim1.fa
 data/sim2.fa
@@ -19,10 +18,12 @@ data/test.fa
 dist.ini
 lib/Proch/N50.pm
 scripts/n50_algorithm.txt
+scripts/n50_dump.pl
 scripts/test.fa
 scripts/test.pl
 t/10_basic_test.t
 t/11_calculateN50.t
+t/12_new_stats.t
 t/12_stats.t
 t/13_json.t
 t/14_bad_file.t

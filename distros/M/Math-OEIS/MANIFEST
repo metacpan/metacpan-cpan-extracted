@@ -10,6 +10,7 @@ devel/compositional-inverse.pl
 devel/grep-linear-recurrence.pl
 devel/grep-power-prefix-digits.pl
 devel/grep.pl
+devel/misc.pl
 devel/oeis-cleanup.pl
 devel/speed.pl
 devel/uninteresting.pl

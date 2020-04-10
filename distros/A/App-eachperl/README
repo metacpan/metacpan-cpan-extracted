@@ -1,0 +1,26 @@
+NAME
+
+    App::eachperl - a wrapper script for iterating multiple perl binaries
+
+SYNOPSIS
+
+       $ eachperl exec -E 'say "Hello"'
+    
+         --- perl5.30.0 --- 
+       Hello
+    
+         --- bleadperl --- 
+       Hello
+    
+       ----------
+       perl5.30.0          : 0
+       bleadperl           : 0
+
+DESCRIPTION
+
+    For more detail see the manpage for the eachperl(1) script.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

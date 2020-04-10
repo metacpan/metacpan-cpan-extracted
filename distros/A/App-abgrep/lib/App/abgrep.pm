@@ -2,8 +2,8 @@
 
 package App::abgrep;
 
-our $DATE = '2018-01-29'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-04-10'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -94,7 +94,7 @@ App::abgrep - Print lines matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.003 of App::abgrep (from Perl distribution App-abgrep), released on 2018-01-29.
+This document describes version 0.004 of App::abgrep (from Perl distribution App-abgrep), released on 2020-04-10.
 
 =head1 FUNCTIONS
 
@@ -103,7 +103,7 @@ This document describes version 0.003 of App::abgrep (from Perl distribution App
 
 Usage:
 
- abgrep(%args) -> [status, msg, result, meta]
+ abgrep(%args) -> [status, msg, payload, meta]
 
 Print lines matching a pattern.
 
@@ -142,6 +142,7 @@ Invert the sense of matching.
 
 =item * B<regexps> => I<array[re]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -149,7 +150,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -177,7 +178,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

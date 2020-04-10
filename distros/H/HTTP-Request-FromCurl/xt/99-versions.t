@@ -7,13 +7,6 @@ use warnings;
 use strict;
 use File::Find;
 use Test::More;
-BEGIN {
-    eval 'use File::Slurp; 1';
-    if ($@) {
-        plan skip_all => "File::Slurp needed for testing";
-        exit 0;
-    };
-};
 
 require './Makefile.PL';
 # Loaded from Makefile.PL
@@ -26,6 +19,14 @@ find(\&wanted, grep { -d } ($blib));
 if( my $exe = $module{EXE_FILES}) {
     push @files, @$exe;
 };
+
+sub read_file {
+    open my $fh, '<', $_[0]
+        or die "Couldn't read '$_[0]': $!";
+    binmode $fh;
+    local $/;
+    <$fh>
+}
 
 sub wanted {
   push @files, $File::Find::name if /\.p(l|m|od)$/;

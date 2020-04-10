@@ -1,0 +1,425 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-10'; # DATE
+our $DIST = 'App-ManagePoolStyleRepo'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+use Log::ger; BEGIN { $ENV{LOG_LEVEL} //= 'info' }
+
+use Perinci::CmdLine::Classic;
+
+my $prefix = '/App/ManagePoolStyleRepo/';
+my $cli = Perinci::CmdLine::Classic->new(
+    url => $prefix,
+    log => 1,
+    subcommands => {
+        'update-index'  => {url=>"${prefix}update_index"},
+        'list-items'    => {url=>"${prefix}list_items"},
+    },
+);
+$cli->run;
+
+# ABSTRACT: Manage my pending perl releases
+# PODNAME: manage-pool-style-repo
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+manage-pool-style-repo - Manage my pending perl releases
+
+=head1 VERSION
+
+This document describes version 0.001 of manage-pool-style-repo (from Perl distribution App-ManagePoolStyleRepo), released on 2020-04-10.
+
+=head1 SYNOPSIS
+
+Pool-style repo can be used to store collections, e.g. movies, songs, books,
+programs. To create a pool-style repo, first create a directory, e.g. C<movies>
+along with C<movies/pool>:
+
+ % mkdir movies
+ % mkdir movies/pool
+
+Put some items (movies) inside the pool (each item as a directory or a file; but
+mostly you want to use directory to be able to put tags inside), e.g.:
+
+ movies/pool/a wednesday (2008)/
+ movies/pool/a wednesday (2008)/movie.mp4
+ movies/pool/a wednesday (2008)/.tag-country-in
+ movies/pool/a wednesday (2008)/.tag-genre-crime
+ movies/pool/a wednesday (2008)/.tag-genre-drama
+
+ movies/pool/andhadhun (2018)/
+ movies/pool/andhadhun (2018)/movie.mp4
+ movies/pool/andhadhun (2018)/movie.srt
+ movies/pool/andhadhun (2018)/.tag-country-in
+ movies/pool/andhadhun (2018)/.tag-genre-crime
+ movies/pool/andhadhun (2018)/.tag-genre-thriller
+
+ movies/pool/the raid - redemption (2011)/
+ movies/pool/the raid - redemption (2011)/the-raid.mkv
+ movies/pool/the raid - redemption (2011)/.tag-country-id
+ movies/pool/the raid - redemption (2011)/.tag-genre-action
+ movies/pool/the raid - redemption (2011)/.tag-genre-thriller
+
+ movies/pool/the swimmer (1968)/
+ movies/pool/the swimmer (1968)/swimmer.avi
+ movies/pool/the swimmer (1968)/.tag-country-us
+ movies/pool/the swimmer (1968)/.tag-genre-drama
+
+ movies/pool/to_live_1994.mp4
+
+ movies/pool/TS/toy-story.mp4
+ movies/pool/TS/.tag-country-us
+ movies/pool/TS/.tag-genre-animated
+ movies/pool/TS/.tag-genre-fantasy
+ movies/pool/TS/.title                 # containing "toy story (1995)"
+
+ movies/pool/TS2/toy-story2.mp4
+ movies/pool/TS2/.tag-country-us
+ movies/pool/TS2/.tag-genre-animated
+ movies/pool/TS2/.tag-genre-fantasy
+ movies/pool/TS2/.title                 # containing "toy story 2 (1999)"
+
+If you want to put items using an intermediate level of subdirectories, you can
+use C<pool1/> instead:
+
+ movies/pool1/a/a wednesday (2008)/...
+ movies/pool1/a/andhadhun (2018)/...
+ movies/pool1/t/the raid - redemption (2011)/
+ movies/pool1/t/the swimmer (1968)/
+ movies/pool1/t/to_live_1994.mp4
+ movies/pool1/t/TS/
+ movies/pool1/t/TS2/
+
+(the intermediate directories can be anything.)
+
+If you want two levels of intermediate directories, use C<pool2>:
+
+ movies/pool2/a/aw/a wednesday (2008)/...
+ movies/pool2/a/an/andhadhun (2018)/...
+ movies/pool2/t/th/the raid - redemption (2011)/
+ movies/pool2/t/th/the swimmer (1968)/
+ movies/pool2/t/to/to_live_1994.mp4
+ movies/pool2/t/ts/TS/
+ movies/pool2/t/ts/TS2/
+
+To create index:
+
+ % manage-pool-style-repo update-index movies
+
+This will create this directory structure of symlinks:
+
+ movies/index/
+ movies/index/by-tag/
+
+ movies/index/by-tag/country/
+ movies/index/by-tag/country/id/the raid - redemption (2011) -> ../../../../pool/the raid - redemption (2011)
+ movies/index/by-tag/country/in/a wednesday (2008) -> ../../../../pool/a wednesday (2008)
+ movies/index/by-tag/country/in/andhadhun (2018) -> ../../../../pool/andhadhun (2018)
+ movies/index/by-tag/country/us/the swimmer (1968) -> ../../../../pool/the swimmer (1968)
+ movies/index/by-tag/country/us/toy story (1995) -> ../../../../pool/TS
+ movies/index/by-tag/country/us/toy story 2 (1999) -> ../../../../pool/TS2
+
+ movies/index/by-tag/genre/
+ movies/index/by-tag/genre/action/the raid - redemption (2011) -> ../../../../pool/the raid - redemption (2011)
+ movies/index/by-tag/genre/animated/toy story (1995) -> ../../../../pool/TS
+ movies/index/by-tag/genre/animated/toy story 2 (1999) -> ../../../../pool/TS2
+ movies/index/by-tag/genre/crime/a wednesday (2008) -> ../../../../pool/a wednesday (2008)
+ movies/index/by-tag/genre/crime/andhadhun (2018) -> ../../../../pool/andhadhun (2018)
+ movies/index/by-tag/genre/drama/a wednesday (2008) -> ../../../../pool/a wednesday (2008)
+ movies/index/by-tag/genre/drama/the swimmer (1968) -> ../../../../pool/the swimmer (1968)
+ movies/index/by-tag/genre/fantasy/toy story (1995) -> ../../../../pool/TS
+ movies/index/by-tag/genre/fantasy/toy story 2 (1999) -> ../../../../pool/TS2
+ movies/index/by-tag/genre/thriller/the raid - redemption (2011) -> ../../../../pool/the raid - redemption (2011)
+ movies/index/by-tag/genre/thriller/andhadhun (2018) -> ../../../../pool/andhadhun (2018)
+
+ movies/index/by-title/
+ movies/index/by-title/the raid - redemption (2011) -> ../../pool/the raid - redemption (2011)
+ movies/index/by-title/a wednesday (2008) -> ../../pool/a wednesday (2008)
+ movies/index/by-title/andhadhun (2018) -> ../../pool/andhadhun (2018)
+ movies/index/by-title/the swimmer (1968) -> ../../pool/the swimmer (1968)
+ movies/index/by-title/toy story (1995) -> ../../pool/TS
+ movies/index/by-title/toy story 2 (1999) -> ../../pool/TS2
+ movies/index/by-title/to_live_1994.mp4 -> ../../pool/to_live_1994.mp4
+
+=head1 DESCRIPTION
+
+=head2 Pool-style repo
+
+A "pool-style repo" is a term I coined to refer to a directory structure that
+contains a collection of items (media files like movies, songs, or books;
+software, and so on). The items are put in C<pool/> top-level subdirectory. Each
+item can be a file or a directory, although to have the benefit of giving tags,
+you'll need to use a directory.
+
+If you use C<pool1/> instead of C<pool>, then the items are expected to be put
+under a layer of intermediate directory like shown in the example in
+L</SYNOPSIS>. And if you use C<pool2/>, the items are expected to be put under
+two layers of intermediate directories, also shown in the example. You can use
+one or all of C<pool>, C<pool1>, C<pool2> to put your items.
+
+This script can then be used to create C<index> directory structure which
+contains symbolic links to the items. There are C<index/by-tag>,
+C<index/by-title>. These directory structure can be navigated by any filesystem
+tool of your choice.
+
+This files organization is inspired from how Debian repository works.
+
+=head1 SUBCOMMANDS
+
+=head2 B<list-items>
+
+=head2 B<update-index>
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<s>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format-options>=I<s>
+
+Pass options to formatter.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Equivalent to --format=json-pretty.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand list-items
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--has-tag>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--has-tags-json>=I<s>
+
+See C<--has-tag>.
+
+=item B<--lacks-tag>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--lacks-tags-json>=I<s>
+
+See C<--lacks-tag>.
+
+=item B<--repo-path>=I<s>*
+
+Repo directory.
+
+=item B<-q>=I<s>
+
+Search query.
+
+=back
+
+=head2 Options for subcommand update-index
+
+=over
+
+=item B<--repo-path>=I<s>*
+
+Repo directory.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C manage-pool-style-repo manage-pool-style-repo
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete manage-pool-style-repo 'p/*/`manage-pool-style-repo`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/PI0PwIx53Z.conf>, F</home/s1/PI0PwIx53Z.conf>, or F</etc/PI0PwIx53Z.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ format_options (see --format-options)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand list-items
+
+ detail (see --detail)
+ has_tags (see --has-tag)
+ lacks_tags (see --lacks-tag)
+ q (see -q)
+ repo_path (see --repo-path)
+
+=head2 Configuration for subcommand update-index
+
+ repo_path (see --repo-path)
+
+=head1 ENVIRONMENT
+
+=head2 PI0PWIX53Z_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F</home/s1/.config/PI0PwIx53Z.conf>
+
+F</home/s1/PI0PwIx53Z.conf>
+
+F</etc/PI0PwIx53Z.conf>
+
+=head1 BUGS
+
+Please report all bug reports or feature requests to L<mailto:stevenharyanto@gmail.com>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

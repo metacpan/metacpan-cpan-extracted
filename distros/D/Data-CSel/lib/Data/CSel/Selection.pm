@@ -1,9 +1,9 @@
 package Data::CSel::Selection;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-07'; # DATE
+our $DATE = '2020-04-09'; # DATE
 our $DIST = 'Data-CSel'; # DIST
-our $VERSION = '0.122'; # VERSION
+our $VERSION = '0.123'; # VERSION
 
 sub new {
     my $class = shift;
@@ -35,7 +35,7 @@ Data::CSel::Selection - Selection object
 
 =head1 VERSION
 
-This document describes version 0.122 of Data::CSel::Selection (from Perl distribution Data-CSel), released on 2020-04-07.
+This document describes version 0.123 of Data::CSel::Selection (from Perl distribution Data-CSel), released on 2020-04-09.
 
 =head1 DESCRIPTION
 

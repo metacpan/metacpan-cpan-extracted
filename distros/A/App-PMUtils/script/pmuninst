@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-12-15'; # DATE
-our $VERSION = '0.729'; # VERSION
+our $DATE = '2020-01-31'; # DATE
+our $VERSION = '0.730'; # VERSION
 
 use 5.010;
 use strict;
@@ -41,30 +41,42 @@ sub pmuninst {
     my %args = @_;
     my $mods = $args{module};
 
-    if ($args{uninstall_rdeps}) {
-        return [412, "lcpan is required to find reverse deps"]
-            unless which("lcpan");
+    my $lcpan_is_available;
+    my @rmods;
+    {
+        last unless which "lcpan";
+        $lcpan_is_available++;
         require JSON::MaybeXS;
-        my $res = readpipe(
+        my $lrres = readpipe(
             {log=>1, die=>1},
             "lcpan", "rdeps", "--phase", "ALL", "--rel", "requires", "--json",
             "-l", 2, # limit to this level for now, for speed
             "--no-naked-res",
             @$mods
         );
-        $res = JSON::MaybeXS->new->decode($res);
-        my @rmods;
-        for (@{ $res->[2] }) {
+        $lrres = JSON::MaybeXS->new->decode($lrres);
+        for (@{ $lrres->[2] }) {
             my $mod = $_->{dist}; $mod =~ s/^\s+//; $mod =~ s/-/::/g;
             next unless module_path(module=>$mod);
             push @rmods, $mod unless $mod ~~ @$mods;
         }
+        @rmods = sort @rmods;
+    }
+
+    if ($args{uninstall_rdeps}) {
+        return [412, "lcpan is required to find reverse deps"]
+            unless $lcpan_is_available;
         if (@rmods && !$args{confirm_yes}) {
             return [200, "Cancelled"] unless
                 confirm("These modules will also be uninstalled: ".
                         join(", ", @rmods) . ", are you sure?");
         }
         push @$mods, @rmods;
+    } else {
+        print "Warning: The following module(s) depend on ".
+            (@$mods > 1 ? "(".join(", ", @$mods).")" : $mods->[0]).
+            " and may not work aftewards: ".join(", ", @rmods)."\n\n"
+            if @rmods;
     }
 
     for my $mod (@$mods) {
@@ -99,7 +111,7 @@ pmuninst - Uninstall an installed Perl module (using cpanm --uninstall)
 
 =head1 VERSION
 
-This document describes version 0.729 of pmuninst (from Perl distribution App-PMUtils), released on 2019-12-15.
+This document describes version 0.730 of pmuninst (from Perl distribution App-PMUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -232,13 +244,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<pm-uninstall> from L<App::pmuninstall>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,7 +7,7 @@ use Moose::Util::TypeConstraints;
 use Path::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 with 'Dist::Zilla::Role::Releaser',
      'Dist::Zilla::Role::FilePruner';
@@ -220,7 +220,7 @@ sub _execute_push_command {
   $in = join("\n", @{$self->_packages_to_push});
 
   $self->log('pushing packages: '.join(', ', @{$self->_packages_to_push}));
-  IPC::Run::run( $self->_push_command, \$in, \$out, $err )
+  IPC::Run::run( $self->_push_command, \$in, \$out, \$err )
     or $self->log_fatal('push command failed: '.$err);
 
   return;
@@ -258,7 +258,7 @@ Dist::Zilla::Plugin::RPM - Build an RPM from your Dist::Zilla release
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -389,7 +389,7 @@ Vincent Lequertier <vi.le@autistici.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by vincent Lequertier, Stephen Clouse.
+This software is copyright (c) 2020 by Vincent Lequertier, Stephen Clouse.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

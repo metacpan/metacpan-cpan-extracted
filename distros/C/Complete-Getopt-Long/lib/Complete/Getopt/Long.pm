@@ -1,9 +1,9 @@
 package Complete::Getopt::Long;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-05'; # DATE
+our $DATE = '2020-04-10'; # DATE
 our $DIST = 'Complete-Getopt-Long'; # DIST
-our $VERSION = '0.475'; # VERSION
+our $VERSION = '0.477'; # VERSION
 
 use 5.010001;
 use strict;
@@ -162,7 +162,7 @@ _
     args => {
         getopt_spec => {
             summary => 'Getopt::Long specification',
-            schema  => 'hash*',
+            schema  => 'array*',
             req     => 1,
         },
         completion => {
@@ -205,11 +205,11 @@ Example:
     use Complete::Unix qw(complete_user);
     use Complete::Util qw(complete_array_elem);
     complete_cli_arg(
-        getopt_spec => {
+        getopt_spec => [
             'help|h'   => sub{...},
             'format=s' => \$format,
             'user=s'   => \$user,
-        },
+        ],
         completion  => sub {
             my %args  = @_;
             my $word  = $args{word};
@@ -306,12 +306,30 @@ sub complete_cli_arg {
     my $bundling = $args{bundling} // 1;
     my %parsed_opts;
 
+    # backward compatibility: gospec was expected to be a hash, now an array
+    if (ref $gospec eq 'HASH') {
+        my $ary_gospec = [];
+        for (keys %$gospec) {
+            push @$ary_gospec, $_;
+            push @$ary_gospec, $gospec->{$_} if ref $gospec->{$_};
+        }
+        $gospec = $ary_gospec;
+    }
+
     log_trace('[comp][compgl] entering %s(), words=%s, cword=%d, word=<%s>',
               $fname, \@words, $cword, $words[$cword]) if $COMPLETE_GETOPT_LONG_TRACE;
 
+    # strip hash storage from getopt_spec
+    shift @$gospec if ref $gospec->[0] eq 'HASH';
+
     # parse all options first & supply default completion routine
     my %opts;
-    for my $ospec (keys %$gospec) {
+    my $i = -1;
+    while (++$i <= $#{$gospec}) {
+        my $ospec = $gospec->[$i];
+        my $dest  = $i+1 <= $#{$gospec} && ref $gospec->[$i+1] ?
+            splice(@$gospec, $i+1, 1) : undef;
+
         my $res = Getopt::Long::Util::parse_getopt_long_opt_spec($ospec)
             or die "Can't parse option spec '$ospec'";
         next if $res->{is_arg};
@@ -328,7 +346,8 @@ sub complete_cli_arg {
                         "-$o" : "--$o";
                 $opts{$k} = {
                     name => $k,
-                    ospec => $ospec, # key to getopt specification
+                    ospec => $ospec,
+                    dest  => $dest,
                     parsed => $res,
                     is_neg => $is_neg,
                 };
@@ -422,7 +441,7 @@ sub complete_cli_arg {
 
     my @expects;
 
-    my $i = -1;
+    $i = -1;
     my $argpos = 0;
 
   WORD:
@@ -631,9 +650,9 @@ sub complete_cli_arg {
             next if $exp->{short_only} && $optname =~ /\A--/;
             if ($seen_opts{$optname}) {
                 my $opthash = $opts{$optname};
-                my $ospecval = $gospec->{$opthash->{ospec}};
                 my $parsed = $opthash->{parsed};
-                if (ref($ospecval) eq 'ARRAY') {
+                my $dest = $opthash->{dest};
+                if (ref $dest eq 'ARRAY') {
                     $repeatable = 1;
                 } elsif ($parsed->{desttype} || $parsed->{is_inc}) {
                     $repeatable = 1;
@@ -751,7 +770,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.475 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2020-02-05.
+This document describes version 0.477 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2020-04-10.
 
 =head1 SYNOPSIS
 
@@ -850,11 +869,11 @@ Example:
  use Complete::Unix qw(complete_user);
  use Complete::Util qw(complete_array_elem);
  complete_cli_arg(
-     getopt_spec => {
+     getopt_spec => [
          'help|h'   => sub{...},
          'format=s' => \$format,
          'user=s'   => \$user,
-     },
+     ],
      completion  => sub {
          my %args  = @_;
          my $word  = $args{word};
@@ -882,7 +901,7 @@ The keys from this C<extras> hash will be merged into the final C<%args> passed 
 completion routines. Note that standard keys like C<type>, C<word>, and so on as
 described in the function description will not be overwritten by this.
 
-=item * B<getopt_spec>* => I<hash>
+=item * B<getopt_spec>* => I<array>
 
 Getopt::Long specification.
 

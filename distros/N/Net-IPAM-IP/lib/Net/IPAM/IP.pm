@@ -2,7 +2,7 @@ package Net::IPAM::IP;
 
 use strict;
 use warnings;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Socket qw/AF_INET AF_INET6/;
 
@@ -88,7 +88,7 @@ sub new {
   if ( index( $_[1], ':' ) < 0 ) {
     my $n = Socket::inet_pton( AF_INET, $_[1] ) // return;
     $self->{version} = 4;
-    $self->{binary}  = pack( 'C a*', AF_INET, $n );
+    $self->{binary}  = chr(AF_INET) . $n;
     return $self;
   }
 
@@ -102,14 +102,14 @@ sub new {
     my $n = Socket::inet_pton( AF_INET, $ip4m6 ) // return;
 
     $self->{version} = 4;
-    $self->{binary}  = pack( 'C a*', AF_INET, $n );
+    $self->{binary}  = chr(AF_INET) . $n;
     return $self;
   }
 
   # IPv6 address
   my $n = Socket::inet_pton( AF_INET6, $_[1] ) // return;
   $self->{version} = 6;
-  $self->{binary}  = pack( 'C a*', AF_INET6, $n );
+  $self->{binary}  = chr(AF_INET6) . $n;
   return $self;
 }
 
@@ -140,21 +140,21 @@ sub new_from_bytes {
 
   if ( length($n) == 4 ) {
     $self->{version} = 4;
-    $self->{binary}  = pack( 'C a*', AF_INET, $n );
+    $self->{binary}  = chr(AF_INET) . $n;
     return $self;
   }
   elsif ( length($n) == 16 ) {
 
     # check for IPv4-mapped IPv6 address ::ffff:1.2.3.4
     if ( index( $n, "\x00" x 10 . "\xff\xff" ) == 0 ) {
-      my $ipv4 = unpack( 'x12 a4', $n );
+      my $ipv4 = substr( $n, 12 );
       $self->{version} = 4;
-      $self->{binary}  = pack( 'C a*', AF_INET, $ipv4 );
+      $self->{binary}  = chr(AF_INET) . $ipv4;
       return $self;
     }
 
     $self->{version} = 6;
-    $self->{binary}  = pack( 'C a*', AF_INET6, $n );
+    $self->{binary}  = chr(AF_INET6) . $n;
     return $self;
   }
 
@@ -176,7 +176,7 @@ Returns the packed IP address as byte-string. It's the opposite to new_from_byte
 sub bytes {
 
   # drop first byte (version) and return the packed IP address,
-  return unpack( 'x a*', $_[0]->{binary} );
+  return substr( $_[0]->{binary}, 1 );
 }
 
 =head2 cmp
@@ -215,7 +215,10 @@ sub version {
   return $_[0]->{version} if defined $_[0]->{version};
 
   # unpack first byte, AF_INETx
-  my $v = unpack( 'C', $_[0]->{binary} );
+  # my $v = unpack( 'C', $_[0]->{binary} );
+  #
+  # 20% faster with substr()
+  my $v = ord( substr( $_[0]->{binary}, 0, 1 ) );
 
   # get, cache and return
   return $_[0]->{version} = 4 if $v == AF_INET;
@@ -251,7 +254,10 @@ Stringification is overloaded with C<to_string>
 sub to_string {
 
   # unpack to version and network byte order (from Socket::inet_pton)
-  my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
+  # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
+  #
+  # 20% faster with substr()
+  my ( $v, $n ) = ( ord( substr( $_[0]->{binary}, 0, 1 ) ), substr( $_[0]->{binary}, 1, ) );
 
   my $str = Socket::inet_ntop( $v, $n );
 
@@ -298,7 +304,9 @@ sub expand {
   return $_[0]->{expand} if defined $_[0]->{expand};
 
   # unpack to version and network byte order (from Socket::inet_pton)
-  my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
+  # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
+  # substr() ist faster
+  my ( $v, $n ) = ( ord( substr( $_[0]->{binary}, 0, 1 ) ), substr( $_[0]->{binary}, 1, ) );
 
   if ( $v == AF_INET6 ) {
     my @hextets = unpack( 'H4' x 8, $n );
@@ -328,7 +336,9 @@ sub reverse {
   return $_[0]->{reverse} if defined $_[0]->{reverse};
 
   # unpack to version and network byte order (from Socket::inet_pton)
-  my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
+  # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
+  # substr() ist faster
+  my ( $v, $n ) = ( ord( substr( $_[0]->{binary}, 0, 1 ) ), substr( $_[0]->{binary}, 1, ) );
 
   if ( $v == AF_INET6 ) {
     my $hex_str = unpack( 'H*',     $n );

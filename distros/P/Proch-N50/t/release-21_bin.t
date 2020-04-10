@@ -11,7 +11,7 @@ use warnings;
 use Proch::N50;
 use Test::More;
 use FindBin qw($RealBin);
-
+use Data::Dumper;
 my $file = "$RealBin/../data/sim2.fa";
 my $script = "$RealBin/../bin/n50";
 
@@ -29,9 +29,9 @@ if (-e "$file" and -e "$script") {
 	chomp($output);
 
 	my @data = split /\t/, $output;
-	ok($#data == 10,  "Tabular output produced");
+	ok($#data >= 10,  "Tabular output produced");
 	ok($data[0] =~/^#/, "Header produced");
-	ok($data[7] == 7_530, "Total size is 7,530: $data[7]");
+	ok($data[10] == 7_530, "Total size is 7,530: $data[10]") || print Dumper \@data;
 
 
 	# THOUSAND SEPARATOR
@@ -42,9 +42,9 @@ if (-e "$file" and -e "$script") {
 	chomp($output);
 
 	@data = split /\t/, $output;
-	ok($#data == 10,  "Tabular output produced");
+	ok($#data >= 10,  "Tabular output produced");
 	ok($data[0] =~/^#/, "Header produced");
-	ok($data[7] eq "7,530", "Total size is 7,530 with thousand separator: $data[7]");
+	ok($data[10] eq "7,530", "Total size is 7,530 with thousand separator: $data[10]");
 }
 
 done_testing();

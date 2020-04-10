@@ -21,10 +21,10 @@ our %program = (
     'NAME'    => 'FASTX N50',
     'AUTHOR'  => 'Andrea Telatin',
     'MAIL'    => 'andrea@telatin.com',
-    'VERSION' => '3.1.0',
+    'VERSION' => '4.0.0',
 );
 my $hasJSON = undef;
-our $t;
+my $t;
 
 local $Term::ANSIColor::AUTORESET = 1;
 
@@ -202,7 +202,7 @@ if ( defined $opt_format ) {
             require Text::ASCIITable;
             Text::ASCIITable->import();
             $t = Text::ASCIITable->new();
-            $t->setCols( 'File', 'Seqs', 'Total bp', 'N50', 'min', 'max' );
+            $t->setCols( 'File', 'Seqs', 'Total bp', 'N50', 'min', 'max', 'N75', 'N90','auN' );
             1;
         };
         if ( !$has_table ) {
@@ -269,7 +269,9 @@ foreach my $file (@ARGV) {
     my $slen = $FileStats->{size} + 0;
     my $min  = $FileStats->{min} + 0;
     my $max  = $FileStats->{max} + 0;
-
+    my $n75  = $FileStats->{N75} + 0;
+    my $n90  = $FileStats->{N90} + 0;
+    my $auN  = $FileStats->{auN} + 0;
     say STDERR "[$file]\tTotalSize:$slen;N50:$n50;Sequences:$n" if ($opt_debug);
 
     $file = basename($file)            if ($opt_basename);
@@ -281,6 +283,9 @@ foreach my $file (@ARGV) {
         'size' => $slen,
         'min'  => $min,
         'max'  => $max,
+        'N75'  => $n75,
+        'N90'  => $n90,
+        'auN'  => $auN,
     );
 
     if ( defined $output_object{$file} ) {
@@ -290,7 +295,7 @@ foreach my $file (@ARGV) {
     $output_object{$file} = \%metrics;
     $output_print{$file}  = {};
 
-    
+
     for my $key ( keys %{ $output_object{$file} } ) {
 
             if ( $opt_thousand_separator or $opt_format eq 'screen' ) {
@@ -298,9 +303,9 @@ foreach my $file (@ARGV) {
             }   else {
                 $output_print{$file}{$key} = $output_object{$file}{$key}  ;
             }
-        
+
     }
-    
+
 
 }
 
@@ -358,7 +363,7 @@ elsif ( $opt_format eq 'tsv' or $opt_format eq 'csv' ) {
     $opt_separator = ',' if ( $opt_format eq 'csv' );
 
     # TSV format
-    my @fields = ( 'path', 'seqs', 'size', 'N50', 'min', 'max' );
+    my @fields = ( 'path', 'seqs', 'size', 'N50', 'min', 'max', 'N75', 'N90','auN' );
     say '#', join( $opt_separator, @fields ) if ( !defined $opt_noheader );
 
     foreach my $r ( sort $sort_function keys %output_object ) {
@@ -386,7 +391,7 @@ elsif ( $opt_format eq 'tsv' or $opt_format eq 'csv' ) {
     }
 }
 elsif ( $opt_format eq 'custom' ) {
-    my @fields = ( 'seqs', 'size', 'N50', 'min', 'max' );
+    my @fields = ( 'seqs', 'size', 'N50', 'min', 'max','N75', 'N90','auN' );
 
     # Format: custom (use tags {new}{tab} {path} ...)
     foreach my $r ( sort $sort_function keys %output_object ) {
@@ -406,7 +411,7 @@ elsif ( $opt_format eq 'custom' ) {
 }
 elsif ( $opt_format eq 'screen' ) {
 
-    my @fields = ( 'path', 'seqs', 'size', 'N50', 'min', 'max' );
+    my @fields = ( 'path', 'seqs', 'size', 'N50', 'min', 'max', 'N75', 'N90','auN' );
 
     #my $field = 'N50';
 
@@ -417,6 +422,7 @@ elsif ( $opt_format eq 'screen' ) {
             push( @array, $output_print{$r}{ $fields[$i] } )
               if ( defined $output_print{$r}{ $fields[$i] } );
         }
+
         $t->addRow(@array);
     }
 
@@ -436,8 +442,8 @@ sub debug {
 # Print message with colors unless --nocolor
 sub printMessage {
     my ( $message, $title, $title_color, $message_color ) = @_;
-    
- 
+
+
     $title_color = 'reset'
       if ( ( !defined $title_color )
         or ( !colorvalid($title_color) )
@@ -555,7 +561,7 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 1.0.0
+version 1.2.0
 
 =head1 SYNOPSIS
 
@@ -564,9 +570,11 @@ version 1.0.0
 =head1 DESCRIPTION
 
 This program parses a list of FASTA/FASTQ files calculating for each one the
-number of sequences, the sum of sequences lengths and the N50.
+number of sequences, the sum of sequences lengths and the N50, N75, N90 and auN*.
 It will print the result in different formats, by default only the N50 is printed
 for a single file and all metrics in TSV format for multiple files.
+
+I<*>: See L<https://lh3.github.io/2020/04/08/a-new-metric-on-assembly-contiguity>
 
 =head1 PARAMETERS
 
@@ -683,34 +691,41 @@ Same as C<--format tsv> and C<--separator ,>:
 
 Use C<-x> as shortcut for C<--format screen>. Enables --thousands-sep (-q) by default.
 
-  .----------------------------------------------------------------.
-  | File               | Seqs   | Total bp   | N50   | min | max   |
-  +--------------------+--------+------------+-------+-----+-------+
-  | test_fasta_grep.fa |      1 |         80 |    80 |  80 |    80 |
-  | small_test.fa      |      6 |        130 |    65 |   4 |    65 |
-  | rdp_16s_v16.fa     | 13,212 | 19,098,167 | 1,467 | 320 | 2,210 |
-  '--------------------+--------+------------+-------+-----+--------'
+.-----------------------------------------------------------------------------------------.
+| File          | Seqs | Total bp | N50    | min   | max    | N75   | N90   | auN         |
++---------------+------+----------+--------+-------+--------+-------+-------+-------------+
+| big.fa        |    4 |   18,359 | 11,840 | 2,167 | 11,840 | 2,176 | 2,167 | 8923.21,984 |
+| sim1.fa       |   39 |   18,864 |    679 |    20 |    971 |   408 |   313 |  733.51,389 |
+| sim2.fa       |   21 |    7,530 |    493 |    68 |    989 |   330 |   174 |  575.47,012 |
+| test.fa       |    8 |      825 |    189 |     4 |    256 |   168 |   168 |  260.99,515 |
+'---------------+------+----------+--------+-------+--------+-------+-------+-------------'
 
 =item I<json> (JSON)
 
 Use C<-j> as shortcut for C<--format json>.
 
-  {
-    "small_test.fa" : {
-       "max"  : 65,
-       "N50"  : 65,
-       "seqs" : 6,
-       "size" : 130,
-       "min"  : 4
-    },
-    "rdp_16s_v16.fa" : {
-       "seqs" : 13212,
-       "N50"  : 1467,
-       "max"  : 2210,
-       "min"  : 320,
-       "size" : 19098167
+    {
+       "data/sim1.fa" : {
+          "seqs" : 39,
+          "N50" : 679,
+          "max" : 971,
+          "N90" : 313,
+          "min" : 20,
+          "size" : 18864,
+          "auN" : 733.51389,
+          "N75" : 408
+       },
+       "data/sim2.fa" : {
+          "max" : 989,
+          "seqs" : 21,
+          "N50" : 493,
+          "N90" : 174,
+          "min" : 68,
+          "auN" : 575.47012,
+          "N75" : 330,
+          "size" : 7530
+       }
     }
-  }
 
 =item I<custom>
 

@@ -29,9 +29,9 @@ class Hello with qw/World/ allow qw/main/ use Scalar::Util qw/reftype/ use qw/JS
 			}
 		};
 
-	public two { return $_[1]->{message} }
+	public two { return $_[0]->{message} }
 	public three { return 'lost'; }
-	private five { return $_[0]->four }
+	private five { return $self->four }
 	public eleven { return reftype {} }
 	public twelve { return encode_json({ okay => 1 }) }
 };

@@ -8,7 +8,7 @@ BEGIN { use_ok( 'Power::Outlet::Tasmota' ); }
 
 my $host        = $ENV{"NET_TASMOTA_HOST"}     || undef;
 my $relays      = $ENV{"NET_TASMOTA_RELAYS"}   || "POWER,POWER1,Power2,power3,PoWeR4";
-my $names       = $ENV{"NET_TASMOTA_NAMES"}    || "Smart Outlet Top Outlet,Smart Outlet Top Outlet,Smart Outlet Bottom Outlet,Smart Outlet Top Amber LED,Smart Outlet Bottom Amber LED"; #my devices defaults...
+my $names       = $ENV{"NET_TASMOTA_NAMES"}    || "Smart Outlet Top Outlet,Smart Outlet Top Outlet,Smart Outlet Bottom Outlet,Smart Outlet USB Port,Smart Outlet Top Amber LED"; #my devices defaults...
 
 my $loop_tests  = 17;
 my @relays      = split(/,/, $relays);

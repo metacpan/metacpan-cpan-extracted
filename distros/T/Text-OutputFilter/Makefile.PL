@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2006-2019 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2006-2020 H.Merijn Brand
 
 require 5.008;
 use strict;
@@ -28,8 +28,7 @@ my $rv = WriteMakefile (%wm);
 
 package MY;
 
-sub postamble
-{
+sub postamble {
     my $valgrind = join " ", qw(
 	PERL_DESTRUCT_LEVEL=2 PERL_DL_NONLAZY=1
 	    valgrind
@@ -55,7 +54,7 @@ sub postamble
 	'leaktest:',
 	q{	sandbox/leaktest $(FULLPERLRUN) "test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)},
 	'',
-	'spellcheck:',
+	'spellcheck:	doc',
 	'	pod-spell-check --aspell',
 	'',
 	'checkmeta:	spellcheck',
@@ -68,5 +67,16 @@ sub postamble
 	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
+	'',
+	'doc docs:		doc/OutputFilter.md doc/OutputFilter.html doc/OutputFilter.man',
+	'	-@rm -f pod2html.tmp',
+	'doc/OutputFilter.md:	OutputFilter.pm',
+	'	pod2markdown  < $? > $@',
+	'doc/OutputFilter.html:	OutputFilter.pm',
+	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
+	'doc/OutputFilter.3:	OutputFilter.pm',
+	'	pod2man       < $? > $@',
+	'doc/OutputFilter.man:	doc/OutputFilter.3',
+	'	nroff -mandoc < $? > $@',
 	'';
     } # postamble

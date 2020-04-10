@@ -94,6 +94,22 @@ test_csel(
         [4, ["four","empat"], {}, []],
     ],
 );
+{
+    my $tree = wrap_struct([1,2,3,4,5]);
+    test_csel(
+        name => "remove properly shift array indexes",
+        expr   => 'Scalar[value > 2]',
+        opts   => {},
+        tree   => $tree,
+        after_csel => sub {
+            my ($res_nodes) = @_;
+            for (@{$res_nodes}) {
+                $_->remove;
+            }
+        },
+        result_struct => [1,2],
+    );
+}
 
 # XXX remove scalar from hash
 # XXX remove array from array, hash
