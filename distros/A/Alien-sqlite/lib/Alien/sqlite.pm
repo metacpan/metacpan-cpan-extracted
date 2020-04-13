@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 
 1;
@@ -46,13 +46,14 @@ L<https://github.com/shawnlaffan/perl-alien-sqlite/issues>.
 
 =head1 SEE ALSO
 
-L<Geo:Proj4>
-
 L<Geo::GDAL::FFI>
 
 L<Alien::gdal>
+
 L<Alien::geos::af>
+
 L<Alien::proj>
+
 L<Alien::spatialite>
 
 

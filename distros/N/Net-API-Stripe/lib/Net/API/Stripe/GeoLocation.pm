@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/GeoLocation.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -40,6 +40,14 @@ Net::API::Stripe::GeoLocation - A Stripe Geo Location Object
 
 =head1 SYNOPSIS
 
+    my $geo_loc = $stripe->fraud_review->ip_address_location({
+		city => 'Tokyo',
+		country => 'jp',
+		latitude => '35.6935496',
+		longitude => '139.7461204',
+		region => undef,
+    });
+
 =head1 VERSION
 
     0.1
@@ -48,7 +56,7 @@ Net::API::Stripe::GeoLocation - A Stripe Geo Location Object
 
 Information related to the location of the payment. Note that this information is an approximation and attempts to locate the nearest population center - it should not be used to determine a specific address.
 
-This is used in C<Net::API::Stripe::Fraud::Review>
+This is used in L<Net::API::Stripe::Fraud::Review>
 
 =head1 CONSTRUCTOR
 
@@ -56,18 +64,8 @@ This is used in C<Net::API::Stripe::Fraud::Review>
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::GeoLocation> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -100,10 +98,10 @@ The state/county/province/region where the payment originated.
 =head1 API SAMPLE
 
 	{
-	  "id": "prv_1FVF3MCeyNCl6fY27Q3RLQ4n",
+	  "id": "prv_fake123456789",
 	  "object": "review",
 	  "billing_zip": null,
-	  "charge": "ch_1AaRjGCeyNCl6fY2v83S8nXJ",
+	  "charge": "ch_fake123456789",
 	  "closed_reason": null,
 	  "created": 1571480456,
 	  "ip_address": null,
@@ -133,7 +131,7 @@ L<https://stripe.com/docs/api/radar/reviews/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

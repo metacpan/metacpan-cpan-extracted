@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +21,7 @@ resources:
   bugtracker: https://github.com/nmelnick/domain-publicsuffix/issues
   homepage: https://github.com/nmelnick/domain-publicsuffix
   repository: https://github.com/nmelnick/domain-publicsuffix.git
-version: '0.16'
+version: '0.17'
 x_generated_by_perl: v5.24.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -14,7 +14,7 @@ use warnings;
 my $win32   = ($^O eq 'MSWin32');
 my $darwin  = ($^O eq 'darwin');
 my $solaris = ($^O eq 'solaris');
-my $linux   = !($win32 || $darwin || $solaris ); # yea, more than linux are going to end here!
+my $linux   = ($^O eq 'linux');
 
 my $cc_gcc   = $Config{cc} =~ /gcc/;
 my $cc_wincl = $win32 && $Config{cc} =~ /cl/;
@@ -45,9 +45,6 @@ Makefile.PL, e.g.:
 
     perl Makefile.PL gcrypt
 
-If you want to build on Windows, see the file BUILDING.WIN32 in the
-distribution.
-
 EOF
 
 my $crypto_backend;
@@ -63,6 +60,9 @@ perl_version '5.006000';
 auto_provides;
 makemaker_append_once CCFLAGS   => $Config{ccflags};
 makemaker_append_once LDDLFLAGS => $Config{lddlflags};
+
+# On MSYS2 there are issues finding system DLL import libs.
+makemaker_append_once LIBS => ':nosearch' if $win32;
 
 my %arg2mmappend = ( inc => 'INC',
                      lib => 'LIBS',
@@ -119,17 +119,18 @@ push @search_paths,
 push @search_paths, $ENV{HOME}, "$ENV{HOME}/libssh2" if defined $ENV{HOME};
 
 # mac homebrew support
-if ($^O eq 'darwin' && -x '/usr/local/bin/brew') {
-    system("/usr/local/bin/brew info libssh2 | grep '^Not installed' >/dev/null");
-    if ($? >> 8 == 0) {
-        system("/usr/local/bin/brew -v install libssh2");
-    }
-    system("/usr/local/bin/brew info openssl | grep '^Not installed' >/dev/null");
-    if ($? >> 8 == 0) {
-        system("/usr/local/bin/brew -v install openssl");
+if ($^O eq 'darwin' && (qx`command -v brew`)[0]) {
+    if(system("brew info libssh2 | grep '^Not installed' 2>&1 >/dev/null") >> 8 == 0) {
+        system("brew -v install libssh2");
     }
 
-    push @search_paths, '/usr/local/Cellar/openssl/*';
+    if(system("brew info openssl | grep '^Not installed' 2>&1 >/dev/null") >> 8 == 0) {
+        system("brew -v install openssl");
+    }
+
+    for(qw/openssl libssh2/) {
+        push @search_paths, map { chomp; $_ } (qx`brew --prefix $_`)[0];
+    }
 }
 
 @search_paths = map { /\*/
@@ -237,29 +238,27 @@ EOF
     }
     $crypto_backend ||= 'openssl';
 
-    unless ($win32) {
-        findlib(lib => 'z',
-                header => 'zlib.h',
+    findlib(lib => 'z',
+            header => 'zlib.h',
+            search_paths => \@search_paths,
+            run_checks_as_author => 1);
+
+    if ($crypto_backend eq 'gcrypt') {
+        findlib(lib => 'gcrypt',
+                header => 'gcrypt.h',
+                search_paths => \@search_paths,
+                run_checks_as_author => 1);
+    }
+    else {
+        findlib(lib => 'ssl',
+                header => 'openssl/ssl.h',
                 search_paths => \@search_paths,
                 run_checks_as_author => 1);
 
-        if ($crypto_backend eq 'gcrypt') {
-            findlib(lib => 'gcrypt',
-                    header => 'gcrypt.h',
-                    search_paths => \@search_paths,
-                    run_checks_as_author => 1);
-        }
-        else {
-            findlib(lib => 'ssl',
-                    header => 'openssl/ssl.h',
-                    search_paths => \@search_paths,
-                    run_checks_as_author => 1);
-
-            findlib(lib => 'crypto',
-                    header => 'openssl/crypto.h',
-                    search_paths => \@search_paths,
-                    run_checks_as_author => 1);
-        }
+        findlib(lib => 'crypto',
+                header => 'openssl/crypto.h',
+                search_paths => \@search_paths,
+                run_checks_as_author => 1);
     }
 }
 
@@ -269,18 +268,11 @@ if ($crypto_backend eq 'gcrypt') {
     makemaker_append_once(LDDLFLAGS => '-lgcrypt');
 }
 else {
-    if ($cc_wincl) {
-        makemaker_append_once(LIBS => "-l$_") for qw(ssleay32 libeay32); # Win32 + MSVC compiler
-    }
-    if ($cc_gcc && $win32) {
-        makemaker_append_once(LIBS => "-l$_") for qw(ssl32 eay32); # Win32 + GCC compiler (mingw)
-    }
-    else {
-        makemaker_append_once(LIBS => "-l$_") for qw(ssl crypto);
-    }
+    makemaker_append_once(LIBS => "-l$_") for qw(ssl crypto);
 }
 
 makemaker_append_once(DEFINE => '-DLIBSSH2_WIN32') if $win32;
+
 makemaker_append_once(DEFINE => '-DUSE_GCRYPT')    if $crypto_backend eq 'gcrypt';
 
 makemaker_append_once(CCFLAGS => '-Wno-deprecated-declarations') if $^O eq 'darwin';
@@ -298,6 +290,18 @@ if (-f $gen) {
 
 WriteAll;
 
+# Generate README.pod
+if ($Module::Install::AUTHOR and -d '.git') {
+    require Pod::Simple::JustPod;
+    my $parser = Pod::Simple::JustPod->new;
+    $parser->output_string(\my $out_str);
+    $parser->parse_file('lib/Net/SSH2.pm');
+
+    open my $out_fh, '>README.pod' or die "Can't open README.pod for writing: $!";
+    print $out_fh $out_str;
+    close $out_fh;
+}
+
 my %appended;
 sub makemaker_append_once {
     my $key = shift;
@@ -308,11 +312,19 @@ sub makemaker_append_once {
 }
 
 sub capture {
+    # Ignore not found errors.
+    open(my $olderr, '>&STDERR') or die "can't dup STDERR: $!";
+    close STDERR;
+
+    my $out = '';
+
     if (open my $fh, '-|', @_) {
-        my $out  = do { local $/, <$fh> };
+        $out = do { local $/, <$fh> };
         close $fh;
-        return $out;
     }
-    ''
+
+    open(STDERR, '>&', $olderr) or die "can't dup STDERR: $!";
+
+    return $out;
 }
 

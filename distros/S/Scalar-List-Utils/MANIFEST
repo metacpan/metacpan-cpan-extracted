@@ -42,6 +42,7 @@ t/sum.t
 t/sum0.t
 t/tainted.t
 t/uniq.t
+t/uniqnum.t
 t/weak.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,11 @@
 Revision history for Net-IPAM-Tree
 
+1.07    Sun, 12 Apr 2020 18:01:12 +0200
+        - fix utf8 for tree printing chars
+
+1.06    Fri, 10 Apr 2020 15:35:10 +0200
+        - minor POD improvements
+
 1.05    Fri, 03 Apr 2020 09:12:50 +0200 Mon, 06 Apr 2020 22:17:45 +0200
         - newer versions in prereq
         - minor POD things

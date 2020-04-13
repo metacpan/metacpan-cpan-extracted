@@ -2,7 +2,7 @@
 
 # t/001_load.t - check module loading and create testing directory
 
-use Test::More tests => 161;
+use Test::More tests => 158;
 
 BEGIN
 {
@@ -96,13 +96,13 @@ BEGIN
 	use_ok( 'Net::API::Stripe::File::Link' );
 	use_ok( 'Net::API::Stripe::File::Links' );
 	use_ok( 'Net::API::Stripe::File' );
+	use_ok( 'Net::API::Stripe::Fraud::Review::Session' );
 	use_ok( 'Net::API::Stripe::Fraud::Review' );
 	use_ok( 'Net::API::Stripe::Fraud::ValueList::Item' );
 	use_ok( 'Net::API::Stripe::Fraud::ValueList' );
 	use_ok( 'Net::API::Stripe::Fraud' );
 	use_ok( 'Net::API::Stripe::Generic' );
 	use_ok( 'Net::API::Stripe::GeoLocation' );
-	use_ok( 'Net::API::Stripe::Hash' );
 	use_ok( 'Net::API::Stripe::Issuing::Authorization::RequestHistory' );
 	use_ok( 'Net::API::Stripe::Issuing::Authorization::Transaction' );
 	use_ok( 'Net::API::Stripe::Issuing::Authorization::VerificationData' );
@@ -154,7 +154,6 @@ BEGIN
 	use_ok( 'Net::API::Stripe::Product' );
 	use_ok( 'Net::API::Stripe::Refund' );
 	use_ok( 'Net::API::Stripe::Reporting::ReportRun' );
-	use_ok( 'Net::API::Stripe::Session' );
 	use_ok( 'Net::API::Stripe::Shipping' );
 	use_ok( 'Net::API::Stripe::Sigma::ScheduledQueryRun' );
 	use_ok( 'Net::API::Stripe::Tax::Rate' );
@@ -164,11 +163,9 @@ BEGIN
 	use_ok( 'Net::API::Stripe::TimeZone' );
 	use_ok( 'Net::API::Stripe::Token' );
 # Requires Apache2; cannot test
-# 	use_ok( 'Net::API::Stripe::WebHook::Apache' );
+#	use_ok( 'Net::API::Stripe::WebHook::Apache' );
 	use_ok( 'Net::API::Stripe::WebHook::Object' );
 	use_ok( 'Net::API::Stripe::WebHook' );
-	use_ok( 'Net::API::Stripe' );
-	use_ok( 'Net::API::Stripe::Error' );
 }
 
 ## my $object = Net::API::Stripe->new ();

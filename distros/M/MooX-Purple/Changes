@@ -12,3 +12,9 @@ Revision history for MooX-Purple
 
 0.13    2020-04-04
 	- Add macro keyword.
+
+0.15    2020-04-10
+	- Undeclared dependency Data::LnArray <SREZIC@cpan.org>.
+
+0.16    2020-04-10
+	- Experimental push on scalar is now forbidden

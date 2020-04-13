@@ -11,7 +11,7 @@ Yancy::Help::Auth - How to do user authentication and authorization in Yancy
 
 =head1 VERSION
 
-version 1.050
+version 1.051
 
 =head1 DESCRIPTION
 

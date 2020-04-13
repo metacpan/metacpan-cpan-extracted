@@ -25,7 +25,7 @@ Simon (G7RZU) <simon@gb7fr.org.uk>
 
 use vars qw($VERSION);
 #Define version
-$VERSION = '0.2';
+$VERSION = '0.3';
 
 =head1 METHODS
 
@@ -136,7 +136,6 @@ sub _action {
     } else {
         return(1);
     };
-    print("\n\n$reqaction\n\n");
     $self->{LASTACTIONRES} = $self->_do_action($reqaction,$formdataref);
     return(0);
 
@@ -162,7 +161,7 @@ sub add_static_tg {
     return($self->_action('addstatic',$ts,$tg));
 };
 
-=head2 add_static_tg
+=head2 del_static_tg
     
     Delete static TG from repeater config. 
 

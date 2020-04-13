@@ -1,0 +1,186 @@
+NAME
+    App::ProveAuthor - Prove distributions of a CPAN author
+
+VERSION
+    This document describes version 0.001 of App::ProveAuthor (from Perl
+    distribution App-ProveAuthor), released on 2020-03-25.
+
+SYNOPSIS
+    See the included script prove-author.
+
+FUNCTIONS
+  prove_author
+    Usage:
+
+     prove_author(%args) -> [status, msg, payload, meta]
+
+    Prove distributions of a CPAN author.
+
+    To use this utility, first create "~/.config/prove-author.conf":
+
+     dists_dirs = ~/repos
+     dists_dirs = ~/repos-other
+
+    The above tells *prove-author* where to look for Perl distributions.
+    Then:
+
+     % prove-author PERLANCAR
+
+    This will search local CPAN mirror for all distributions that belong to
+    that author, then search the distributions in the distribution
+    directories (or download them from local CPAN mirror), "cd" to each and
+    run "prove" in it.
+
+    You can run with "--dry-run" ("-n") option first to not actually run
+    "prove" but just see what distributions will get tested. An example
+    output:
+
+     % prove-author GRAVATTJ -n
+     prove-author: Found dist: Backup-Duplicity-YADW
+     prove-author: Found dist: Backup-EZ
+     prove-author: Found dist: CLI-Driver
+     prove-author: Found dist: File-RandomGenerator
+     prove-author: Found dist: MySQL-ORM
+     prove-author: Found dist: MySQL-QueryMulti
+     prove-author: Found dist: MySQL-Util
+     prove-author: Found dist: MySQL-Util-Lite-ForeignKeyColumn
+     prove-author: Found dist: Util-Medley
+     prove-author: Found dist: Backup-Duplicity-YADW
+     prove-author: Found dist: Backup-EZ
+     prove-author: Found dist: CLI-Driver
+     prove-author: Found dist: File-RandomGenerator
+     prove-author: Found dist: MySQL-ORM
+     prove-author: Found dist: MySQL-QueryMulti
+     prove-author: Found dist: MySQL-Util
+     prove-author: Found dist: MySQL-Util-Lite-ForeignKeyColumn
+     prove-author: Found dist: Util-Medley
+     prove-author: [DRY] [1/9] Running prove for distribution Backup-Duplicity-YADW (directory /home/u1/repos-other/perl-Backup-Duplicity-YADW) ...
+     prove-author: [DRY] [2/9] Running prove for distribution Backup-EZ (directory /tmp/aM6akPpQUe/Backup-EZ-0.43) ...
+     prove-author: [DRY] [3/9] Running prove for distribution CLI-Driver (directory /tmp/JkZpohbCMa/CLI-Driver-0.3) ...
+     prove-author: [DRY] [4/9] Running prove for distribution File-RandomGenerator (directory /tmp/TU7lm9yjQs/File-RandomGenerator-0.06) ...
+     prove-author: [DRY] [5/9] Running prove for distribution MySQL-ORM (directory /tmp/5OstYMM3Ii/MySQL-ORM-0.12) ...
+     prove-author: [DRY] [6/9] Running prove for distribution MySQL-QueryMulti (directory /tmp/WKRilHdWOr/MySQL-QueryMulti-0.08) ...
+     prove-author: [DRY] [7/9] Running prove for distribution MySQL-Util (directory /tmp/IZS7BH1wtI/MySQL-Util-0.41) ...
+     prove-author: [DRY] [8/9] Running prove for distribution MySQL-Util-Lite-ForeignKeyColumn (directory /tmp/Cx9Jy7o3_i/MySQL-Util-0.34) ...
+     prove-author: [DRY] [9/9] Running prove for distribution Util-Medley (directory /tmp/_DK2_0kdgC/Util-Medley-0.025) ...
+
+    The above example shows that I only have the distribution directories
+    locally on my "~/repos" for two of GRAVATTJ's distributions.
+
+    If we reinvoke the above command without the "-n", *prove-author* will
+    actually run "prove" on each directory and provide a summary at the end.
+    Example output:
+
+     % prove-author GRAVATTJ
+     +-------------------------------------------------+-----------------------------------------------+-----------------------------------+--------+
+     | dir                                             | label                                         | reason                            | status |
+     +-------------------------------------------------+-----------------------------------------------+-----------------------------------+--------+
+     | /home/u1/repos-other/perl-Backup-Duplicity-YADW | distribution Backup-Duplicity-YADW            | Non-zero exit code (255)          | 500    |
+     | /tmp/7Jmw0xDarg/Backup-EZ-0.43                  | distribution Backup-EZ                        | Non-zero exit code (25)           | 500    |
+     | /tmp/hiiemSXIot/CLI-Driver-0.3                  | distribution CLI-Driver                       | Non-zero exit code (1)            | 500    |
+     | /tmp/CsAIDKALXQ/File-RandomGenerator-0.06       | distribution File-RandomGenerator             | Test failed (Failed 1/2 subtests) | 500    |
+     | /tmp/DfHp_1ZrZV/MySQL-ORM-0.12                  | distribution MySQL-ORM                        | Non-zero exit code (1)            | 500    |
+     | /tmp/XC0t4vZnGo/MySQL-QueryMulti-0.08           | distribution MySQL-QueryMulti                 | Test failed                       | 500    |
+     | /tmp/OJ9b7aFljf/MySQL-Util-0.41                 | distribution MySQL-Util                       | Non-zero exit code (1)            | 500    |
+     | /tmp/Eb1QtTu2Cu/MySQL-Util-0.34                 | distribution MySQL-Util-Lite-ForeignKeyColumn | Non-zero exit code (1)            | 500    |
+     | /tmp/Wui5PMkP98/Util-Medley-0.025               | distribution Util-Medley                      | Test failed (No subtests run)     | 500    |
+     +-------------------------------------------------+-----------------------------------------------+-----------------------------------+--------+
+
+    The above example shows that all distributions still failed testing (due
+    to lack of testing requirements). You can scroll up for the detailed
+    "prove" output to see the details of failure failed, fix things, and
+    re-run.
+
+    How distribution directory is searched: see App::ProveDists
+    documentation.
+
+    When a dependent distribution cannot be found or downloaded/extracted,
+    this counts as a 412 error (Precondition Failed).
+
+    When a distribution's test fails, this counts as a 500 error (Error).
+    Otherwise, the status is 200 (OK).
+
+    *prove-author* will return status 200 (OK) with the status of each dist.
+    It will exit 0 if all distros are successful, otherwise it will exit 1.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   author* => *cpan::pause_id*
+
+        CPAN author IDd prove.
+
+    *   dists_dirs* => *array[dirname]*
+
+        Where to find the distributions directories.
+
+    *   download => *bool* (default: 1)
+
+        Whether to try download/extract distribution from local CPAN mirror
+        (when not found in dists_dirs).
+
+    *   prove_opts => *array[str]* (default: ["-l"])
+
+        Options to pass to the prove command.
+
+    *   summarize_all => *bool*
+
+        If true, also summarize successes in addition to failures.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ProveAuthor>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ProveAuthor>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProveAuthor>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    prove
+
+    App::lcpan
+
+    prove-dirs from App::ProveDirs
+
+    prove-dists from App::ProveDists
+
+    prove-mods from App::ProveMods
+
+    prove-rdeps from App::ProveRdeps
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

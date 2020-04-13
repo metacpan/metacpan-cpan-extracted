@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Order/StatusTransitions.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -38,6 +38,13 @@ Net::API::Stripe::Order::StatusTransitions - A Stripe Order Status Transitions O
 
 =head1 SYNOPSIS
 
+    my $st = $order->status_transitions({
+        canceled => undef,
+        fulfiled => '2020-04-12',
+        paid => '2020-04-30',
+        returned => undef,
+    });
+
 =head1 VERSION
 
     0.1
@@ -46,24 +53,16 @@ Net::API::Stripe::Order::StatusTransitions - A Stripe Order Status Transitions O
 
 The timestamps at which the order status was updated.
 
+This is instantiated by method B<status_transitions> in module L<Net::API::Stripe::Order>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Order::StatusTransitions> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -92,7 +91,7 @@ When set, this returns a C<DateTime> object.
 =head1 API SAMPLE
 
 	{
-	  "id": "or_1FVF3JCeyNCl6fY2kbhcVYn8",
+	  "id": "or_fake123456789",
 	  "object": "order",
 	  "amount": 1500,
 	  "amount_returned": null,
@@ -109,7 +108,7 @@ When set, this returns a C<DateTime> object.
 		  "amount": 1500,
 		  "currency": "jpy",
 		  "description": "T-shirt",
-		  "parent": "sk_19eIKPCeyNCl6fY2Bxpfr8bb",
+		  "parent": "sk_fake123456789",
 		  "quantity": null,
 		  "type": "sku"
 		}
@@ -120,7 +119,7 @@ When set, this returns a C<DateTime> object.
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/order_returns?order=or_1FVF3JCeyNCl6fY2kbhcVYn8"
+		"url": "/v1/order_returns?order=or_fake123456789"
 	  },
 	  "selected_shipping_method": null,
 	  "shipping": {
@@ -166,7 +165,7 @@ L<https://stripe.com/docs/api/orders/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -48,9 +48,6 @@ ok( !Net::IPAM::IP->new('030.0.0.1'), 'undefined 030.0.0.1' );
 ok( Net::IPAM::IP->new('fe80::1')->version == 6,                 'version fe80::1' );
 ok( Net::IPAM::IP->new('1.2.3.4')->version == 4,                 'version 1.2.3.4' );
 ok( Net::IPAM::IP->new('::ffff:127.0.0.1')->version == 4,        'version ::ffff:127.0.0.1' );
-ok( Net::IPAM::IP->new('fe80::1')->clone->version == 6,          'cloned version fe80::1' );
-ok( Net::IPAM::IP->new('1.2.3.4')->clone->version == 4,          'cloned version 1.2.3.4' );
-ok( Net::IPAM::IP->new('::ffff:127.0.0.1')->clone->version == 4, 'cloned version ::ffff:127.0.0.1' );
 ok( Net::IPAM::IP->new('::1:2')->version == 6,                   'version ::1:2' );
 ok( Net::IPAM::IP->new('::ff00')->version == 6,                  'version ::ff00' );
 
@@ -71,7 +68,7 @@ ok( Net::IPAM::IP->new_from_bytes($bytes_v4)->to_string eq '10.0.0.1',    'new_f
 ok( Net::IPAM::IP->new_from_bytes($bytes_v4m6)->to_string eq '127.0.0.1', 'new_from_bytes() v4mappedv6' );
 ok( Net::IPAM::IP->new_from_bytes($bytes_v6)->to_string eq 'fe80::1',     'new_from_bytes() v6' );
 
-# overload
+# overload '""'
 ok( Net::IPAM::IP->new_from_bytes($bytes_v4) eq '10.0.0.1',    'new_from_bytes() v4' );
 ok( Net::IPAM::IP->new_from_bytes($bytes_v4m6) eq '127.0.0.1', 'new_from_bytes() v4mappedv6' );
 ok( Net::IPAM::IP->new_from_bytes($bytes_v6) eq 'fe80::1',     'new_from_bytes() v6' );
@@ -80,6 +77,10 @@ ok( Net::IPAM::IP->new_from_bytes($bytes_v6) eq 'fe80::1',     'new_from_bytes()
 $bytes_v6 = Net::IPAM::IP->new('fe80::ffff')->bytes;
 ok( Net::IPAM::IP->new_from_bytes($bytes_v6)->to_string eq 'fe80::ffff', 'new_from_bytes() v6' );
 
-#diag(Net::IPAM::IP->new_from_bytes($bytes_v6)->to_string);
+my $obj;
+$obj = Net::IPAM::IP->new('1.2.3.4');
+is_deeply( $obj, $obj->new_from_bytes($obj->bytes), 'clone IPv4');
+$obj = Net::IPAM::IP->new('2001:db8::1');
+is_deeply( $obj, $obj->new_from_bytes($obj->bytes), 'clone IPv6');
 
 done_testing();

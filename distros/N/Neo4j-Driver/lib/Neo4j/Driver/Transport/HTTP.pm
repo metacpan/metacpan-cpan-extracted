@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transport::HTTP;
 # ABSTRACT: Adapter for the Neo4j Transactional HTTP API
-$Neo4j::Driver::Transport::HTTP::VERSION = '0.15';
+$Neo4j::Driver::Transport::HTTP::VERSION = '0.16';
 
 use Carp qw(carp croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction);
@@ -13,7 +13,7 @@ use Try::Tiny;
 
 use URI 1.25;
 use REST::Client 134;
-use JSON::MaybeXS qw();
+use JSON::MaybeXS 1.002004 qw(JSON);
 
 use Neo4j::Driver::ResultSummary;
 use Neo4j::Driver::StatementResult;
@@ -24,9 +24,15 @@ BEGIN { $JSON_CODER = sub {
 	return JSON::MaybeXS->new(utf8 => 1, allow_nonref => 0);
 }}
 
-# https://neo4j.com/docs/http-api/current/
-our $TRANSACTION_ENDPOINT = '/db/data/transaction';
-our $COMMIT_ENDPOINT = '/db/data/transaction/commit';
+our %ENDPOINTS_NEO4J_3 = (  # https://neo4j.com/docs/http-api/3.5/
+	new_transaction => '/db/data/transaction',
+	new_commit => '/db/data/transaction/commit',
+);
+our %ENDPOINTS_NEO4J_4 = (  # https://neo4j.com/docs/http-api/4.0/
+	new_transaction => '/db/{databaseName}/tx',
+	new_commit => '/db/{databaseName}/tx/commit',
+);
+
 our $CONTENT_TYPE = 'application/json';
 
 # https://neo4j.com/docs/rest-docs/current/#rest-api-service-root
@@ -46,6 +52,7 @@ sub new {
 		die_on_error => $driver->{die_on_error},
 		cypher_types => $driver->{cypher_types},
 		cypher_filter => $driver->{cypher_filter},
+		endpoints => \%ENDPOINTS_NEO4J_3,
 	}, $class;
 	
 	my $uri = $driver->{uri};
@@ -80,6 +87,16 @@ sub new {
 }
 
 
+# Switch to using the specified database (Neo4j >= 4 only).
+sub _database {
+	my ($self, $db) = @_;
+	
+	$self->{endpoints} = { %ENDPOINTS_NEO4J_4 };
+	$self->{endpoints}->{new_transaction} =~ s/{databaseName}/$db/;
+	$self->{endpoints}->{new_commit} =~ s/{databaseName}/$db/;
+}
+
+
 # Prepare query statement, including parameters. When multiple statements
 # are to be combined in a single server communication, this method allows
 # preparing each statement individually.
@@ -97,7 +114,7 @@ sub prepare {
 	my $json = { statement => '' . $query };
 	$json->{resultDataContents} = $RESULT_DATA_CONTENTS;
 	$json->{resultDataContents} = $RESULT_DATA_CONTENTS_GRAPH if $self->{return_graph};
-	$json->{includeStats} = JSON::MaybeXS::true if $self->{return_stats};
+	$json->{includeStats} = JSON()->true if $self->{return_stats};
 	$json->{parameters} = $parameters if defined $parameters;
 	
 	return $json;
@@ -139,7 +156,8 @@ sub _request {
 	
 	my $client = $self->{client};
 	
-	my $tx_endpoint = $tx->{transaction_endpoint} // URI->new( $TRANSACTION_ENDPOINT );
+	my $tx_endpoint = $tx->{transaction_endpoint};
+	$tx_endpoint //= URI->new( $self->{endpoints}->{new_transaction} );
 	$client->request( $method, "$tx_endpoint", $content );
 	
 	my $content_type = $client->responseHeader('Content-Type');
@@ -151,7 +169,7 @@ sub _request {
 			push @errors, $client->responseContent();
 		}
 		elsif ($self->{die_on_error}) {
-			croak $errors[0];
+			croak "$errors[0] on $method to $tx_endpoint";
 		}
 	}
 	if ($content_type && $content_type =~ m|^application/json\b|) {
@@ -198,7 +216,8 @@ sub begin {
 sub autocommit {
 	my ($self, $tx) = @_;
 	
-	$tx->{transaction_endpoint} = $tx->{commit_endpoint} // URI->new( $COMMIT_ENDPOINT );
+	$tx->{transaction_endpoint} = $tx->{commit_endpoint};
+	$tx->{transaction_endpoint} //= URI->new( $self->{endpoints}->{new_commit} );
 }
 
 
@@ -358,7 +377,7 @@ Neo4j::Driver::Transport::HTTP - Adapter for the Neo4j Transactional HTTP API
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Order/SKU/Inventory.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -36,6 +36,12 @@ Net::API::Stripe::Order::SKU::Inventory - A Stripe SKU Inventory Object
 
 =head1 SYNOPSIS
 
+    my $inv = $stripe->sku->inventory({
+    	quantity => 2,
+    	type => 'infinite',
+    	value => undef,
+    });
+
 =head1 VERSION
 
     0.1
@@ -44,24 +50,16 @@ Net::API::Stripe::Order::SKU::Inventory - A Stripe SKU Inventory Object
 
 Description of the SKU’s inventory.
 
+This is instantiated by method B<inventory> in module L<Net::API::Stripe::Order::SKU>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Order::SKU::Inventory> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -86,7 +84,7 @@ An indicator of the inventory available. Possible values are in_stock, limited, 
 =head1 API SAMPLE
 
 	{
-	  "id": "sku_G1HcdqsCPOkGA7",
+	  "id": "sku_fake123456789",
 	  "object": "sku",
 	  "active": true,
 	  "attributes": {
@@ -105,7 +103,7 @@ An indicator of the inventory available. Possible values are in_stock, limited, 
 	  "metadata": {},
 	  "package_dimensions": null,
 	  "price": 1500,
-	  "product": "prod_Dwk1FH8ifmrGgw",
+	  "product": "prod_fake123456789",
 	  "updated": 1571480453
 	}
 
@@ -127,7 +125,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

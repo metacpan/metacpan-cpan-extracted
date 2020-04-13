@@ -51,8 +51,8 @@ This script launches the B<CPANPLUS> utility to perform various operations
 from the command line. If it's invoked without arguments, an interactive
 shell is executed by default.
 
-Optionally, it can take a single-letter switch and one or more argument,
-to perform the associated action on each arguments.  A summary of the
+Optionally, it can take a single-letter switch and one or more arguments,
+to perform the associated action on each argument.  A summary of the
 available commands is listed below; C<cpanp -h> provides a detailed list.
 
     h                   # help information

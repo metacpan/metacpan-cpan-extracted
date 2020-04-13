@@ -3,13 +3,14 @@ package Proch::N50;
 
 use 5.012;
 use warnings;
-
-$Proch::N50::VERSION = '1.2.0';
+my  $opt_digits = 2;
+$Proch::N50::VERSION = '1.3.0';
 use File::Spec;
 use JSON::PP;
 use FASTX::Reader;
 use File::Basename;
 use Exporter qw(import);
+
 our @EXPORT = qw(getStats getN50 jsonStats);
 
 
@@ -20,6 +21,9 @@ sub getStats {
     # * Also return JSON string (Bool)
 
     my ( $file, $wantJSON, $customN ) = @_;
+    if (defined $customN and ($customN > 100 or $customN < 0) ) {
+      die "[Proch::N50] Custom value must be 0 < x < 100\n";
+    }
     my $answer;
     $answer->{status} = 1;
     $answer->{N50}    = undef;
@@ -56,15 +60,26 @@ sub getStats {
         $sizes{$size}++;
     }
 
-    # Invokes core _n50fromHash() routine
-    my ($n50, $min, $max, $auN, $n75, $n90) = _n50fromHash( \%sizes, $slen, $customN );
-
+    my ($n50, $min, $max, $auN, $n75, $n90, $nx);
+    unless ($n) {
+      ($n50, $min, $max, $auN, $n75, $n90, $nx) =
+      (   0,    0,    0,    0,    0,    0,   0);
+       say STDERR "[n50] WARNING: Not a sequence file: $file";
+    } else {
+      # Invokes core _n50fromHash() routine
+      ($n50, $min, $max, $auN, $n75, $n90, $nx) = _n50fromHash( \%sizes, $slen, $customN );
+    }
     my $basename = basename($file);
 
     $answer->{N50}      = $n50 + 0;
     $answer->{N75}      = $n75 + 0;
     $answer->{N90}      = $n90 + 0;
-    $answer->{auN}      = sprintf("%.5f", $auN + 0);
+    if (defined $customN) {
+      $answer->{Ne}       = $nx  + 0;
+      $answer->{"N$customN"} = $nx  + 0;
+    }
+
+    $answer->{auN}      = sprintf("%.${opt_digits}f", $auN + 0);
     $answer->{min}      = $min + 0;
     $answer->{max}      = $max + 0;
     $answer->{seqs}     = $n;
@@ -90,7 +105,7 @@ sub _n50fromHash {
     # Parameters:
     # * A hash of  key={contig_length} and value={no_contigs}
     # * Sum of all contigs sizes
-    my ( $hash_ref, $total_size, $x ) = @_;
+    my ( $hash_ref, $total_size, $custom_n ) = @_;
     my $progressive_sum = 0;
     my $auN = 0;
     my $n50 = undef;
@@ -123,8 +138,8 @@ sub _n50fromHash {
        if ( !$n90 and $progressive_sum > ( $total_size * ((100 - 90) / 100) ) ) {
          $n90 = $s;
        }
-       if ( !$nx and defined $x) {
-         $nx = $s if ( $progressive_sum > ( $total_size * ((100 - 90) / 100) ));
+       if ( !$nx and defined $custom_n) {
+         $nx = $s if ( $progressive_sum > ( $total_size * ((100 - $custom_n) / 100) ));
        }
     }
     return ($n50, $min, $max, $auN, $n75, $n90, $nx);
@@ -175,7 +190,7 @@ Proch::N50 - a small module to calculate N50 (total size, and total number of se
 
 =head1 VERSION
 
-version 1.2.0
+version 1.3.0
 
 =head1 SYNOPSIS
 

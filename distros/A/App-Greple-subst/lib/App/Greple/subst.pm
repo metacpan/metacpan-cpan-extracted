@@ -6,7 +6,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.10
+Version 2.11
 
 =head1 SYNOPSIS
 
@@ -63,6 +63,17 @@ longer pattern in front.
 
 If the matched string overlaps with previously matched string, it is
 warned (B<--warn-overlap> by default) and ignored.
+
+=head2 Terminal color
+
+This version uses L<Getopt::EX::autocolor> module.  It sets option
+B<--light-screen> or B<--dark-screen> depending on the terminal on
+which the command run, or B<BRIGHTNESS> environment variable.
+
+Some terminals (eg: "Apple_Terminal" or "iTerm") are detected
+automatically and no action is required.  Otherwise set B<BRIGHTNESS>
+environment to 0 (black) to 100 (white) digit depending on terminal
+background color.
 
 =head1 OPTIONS
 
@@ -178,8 +189,6 @@ Created from following guideline document.
     Japan Technical Communicators Association
     https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf
 
-=item B<--exdict> sccc2.dict
-
 =item B<--exdict> jtf-style-guide-3.dict
 
 =item B<--jtf-style-guide>
@@ -192,6 +201,8 @@ Created from following guideline document.
     一般社団法人 日本翻訳連盟（JTF）
     翻訳品質委員会
     https://www.jtf.jp/jp/style_guide/pdf/jtf_style_guide.pdf
+
+=item B<--exdict> sccc2.dict
 
 =item B<--sccc2>
 
@@ -237,7 +248,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::subst;
 
-our $VERSION = '2.10';
+our $VERSION = '2.11';
 
 use v5.14;
 use strict;
@@ -670,10 +681,10 @@ builtin ignore-space!  $opt_ignore_space
 builtin show-comment!  $opt_show_comment
 
 option default \
+	-Mautocolor \
 	--prologue subst_initialize \
 	--begin subst_begin \
-	--le &subst_search --no-regioncolor \
-	--subst-color
+	--le &subst_search --no-regioncolor
 
 expand ++dump    --all --need 0 -h --nocolor
 option --diff    --subst ++dump --of &subst_diff
@@ -685,84 +696,58 @@ option --divert-stdout --prologue __PACKAGE__::divert_stdout \
 option --with-stat     --epilogue subst_show_stat
 option --stat          --divert-stdout --with-stat
 
-option  --subst-color --subst-color-light
+option  --light-terminal --subst-color-light
+option  --dark-terminal  --subst-color-dark
 
-option  --subst-color-light \
-        --cm 555D/100,000/433 \
-        --cm 555D/010,000/343 \
-        --cm 555D/001,000/334 \
-        --cm 555D/011,000/344 \
-        --cm 555D/101,000/434 \
-        --cm 555D/110,000/443 \
-        --cm 555D/111,000/444 \
-        --cm 555D/021,000/354 \
-        --cm 555D/201,000/534 \
-        --cm 555D/210,000/543 \
-        --cm 555D/012,000/345 \
-        --cm 555D/102,000/435 \
-        --cm 555D/120,000/453 \
-        --cm 555D/200,000/533 \
-        --cm 555D/020,000/353 \
-        --cm 555D/002,000/335 \
-        --cm 555D/022,000/355 \
-        --cm 555D/202,000/535 \
-        --cm 555D/220,000/553 \
-        --cm 555D/211,000/544 \
-        --cm 555D/121,000/454 \
-        --cm 555D/112,000/445 \
-        --cm 555D/122,000/455 \
-        --cm 555D/212,000/545 \
-        --cm 555D/221,000/554 \
-        --cm 555D/222,000/L23
+option	--subst-color-light \
+	--cm 555D/100,000/433 \
+	--cm 555D/010,000/343 \
+	--cm 555D/001,000/334 \
+	--cm 555D/011,000/344 \
+	--cm 555D/101,000/434 \
+	--cm 555D/110,000/443 \
+	--cm 555D/111,000/444 \
+	--cm 555D/021,000/354 \
+	--cm 555D/201,000/534 \
+	--cm 555D/210,000/543 \
+	--cm 555D/012,000/345 \
+	--cm 555D/102,000/435 \
+	--cm 555D/120,000/453 \
+	--cm 555D/200,000/533 \
+	--cm 555D/020,000/353 \
+	--cm 555D/002,000/335 \
+	--cm 555D/022,000/355 \
+	--cm 555D/202,000/535 \
+	--cm 555D/220,000/553 \
+	--cm 555D/211,000/544 \
+	--cm 555D/121,000/454 \
+	--cm 555D/112,000/445 \
+	--cm 555D/122,000/455 \
+	--cm 555D/212,000/545 \
+	--cm 555D/221,000/554 \
+	--cm 555D/222,000/L23 \
+	$<move(0,0)>
 
-option  --subst-color-dark \
-        --cm 000D/555,555/L01 \
-        --cm 000D/544,555/100 \
-        --cm 000D/454,555/010 \
-        --cm 000D/445,555/001 \
-        --cm 000D/455,555/011 \
-        --cm 000D/545,555/101 \
-        --cm 000D/554,555/110 \
-        --cm 000D/354,555/021 \
-        --cm 000D/534,555/201 \
-        --cm 000D/543,555/210 \
-        --cm 000D/345,555/012 \
-        --cm 000D/435,555/102 \
-        --cm 000D/453,555/120 \
-        --cm 000D/533,555/200 \
-        --cm 000D/353,555/020 \
-        --cm 000D/335,555/002 \
-        --cm 000D/355,555/022 \
-        --cm 000D/535,555/202 \
-        --cm 000D/553,555/220
-
-option  --subst-color-dark-2 \
-        --cm 000D/433,555/100 \
-        --cm 000D/343,555/010 \
-        --cm 000D/334,555/001 \
-        --cm 000D/344,555/011 \
-        --cm 000D/434,555/101 \
-        --cm 000D/443,555/110 \
-        --cm 000D/444,555/111 \
-        --cm 000D/354,555/021 \
-        --cm 000D/534,555/201 \
-        --cm 000D/543,555/210 \
-        --cm 000D/345,555/012 \
-        --cm 000D/435,555/102 \
-        --cm 000D/453,555/120 \
-        --cm 000D/533,555/200 \
-        --cm 000D/353,555/020 \
-        --cm 000D/335,555/002 \
-        --cm 000D/355,555/022 \
-        --cm 000D/535,555/202 \
-        --cm 000D/553,555/220 \
-        --cm 000D/544,555/211 \
-        --cm 000D/454,555/121 \
-        --cm 000D/445,555/112 \
-        --cm 000D/455,555/122 \
-        --cm 000D/545,555/212 \
-        --cm 000D/554,555/221 \
-        --cm 000D/L23,555/222
+option	--subst-color-dark \
+	--cm DS;433,544/L01 \
+	--cm DS;343,454/L01 \
+	--cm DS;334,445/L01 \
+	--cm DS;344,455/L01 \
+	--cm DS;434,545/L01 \
+	--cm DS;443,554/L01 \
+	--cm DS;243,354/L01 \
+	--cm DS;423,534/L01 \
+	--cm DS;432,543/L01 \
+	--cm DS;234,345/L01 \
+	--cm DS;324,435/L01 \
+	--cm DS;342,453/L01 \
+	--cm DS;422,533/L01 \
+	--cm DS;242,353/L01 \
+	--cm DS;224,335/L01 \
+	--cm DS;244,355/L01 \
+	--cm DS;424,535/L01 \
+	--cm DS;442,553/L01 \
+	$<move(0,0)>
 
 ##
 ## Handle included sample dictionaries.
@@ -775,6 +760,8 @@ option --exdictdir --prologue 'sub{ say "$ENV{GREPLE_SUBST_DICT}"; exit }'
 option --jtca-katakana-guide --exdict jtca-katakana-guide-3.dict
 option --jtf-style-guide     --exdict jtf-style-guide-3.dict
 option --sccc2               --exdict sccc2.dict
+
+option --all-katakana	     --exdict all-katakana.dict
 
 option --dumpdict --printdict --prologue 'sub{exit}'
 

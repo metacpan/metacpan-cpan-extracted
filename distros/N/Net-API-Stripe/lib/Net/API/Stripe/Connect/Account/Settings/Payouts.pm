@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Settings/Payouts.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -20,7 +20,16 @@ BEGIN
 
 sub debit_negative_balances { return( shift->_set_get_boolean( 'debit_negative_balances', @_ ) ); }
 
-sub schedule { return( shift->_set_get_hash( 'schedule', @_ ) ); }
+sub schedule
+{
+    return( shift->_set_get_class( 'schedule',
+    {
+    delay_days => { type => 'integer' },
+    interval => { type => 'scalar' },
+    monthly_anchor => { type => 'integer' },
+    weekly_anchor => { type => 'scalar' }
+    }, @_ ) );
+}
 
 sub statement_descriptor { return( shift->_set_get_scalar( 'statement_descriptor', @_ ) ); }
 
@@ -37,6 +46,17 @@ Net::API::Stripe::Connect::Account::Settings::Payouts - A Stripe Account Setting
 
 =head1 SYNOPSIS
 
+    my $payouts = $stripe->account->settings->payouts({
+        debit_negative_balances => $stripe->false,
+        schedule => 
+            {
+            delay_days => 7,
+            interval => 'weekly',
+            weekly_anchor => 'monday',
+            },
+        statement_descriptor => 'Weekly payout',
+    });
+
 =head1 VERSION
 
     0.1
@@ -45,24 +65,16 @@ Net::API::Stripe::Connect::Account::Settings::Payouts - A Stripe Account Setting
 
 Settings used to configure the account within the Stripe dashboard.
 
+This is instantiated by method B<payouts> from module L<Net::API::Stripe::Connect::Account::Settings>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Settings::Payouts> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -72,11 +84,13 @@ Toggles debug mode on/off
 
 =item B<debit_negative_balances> boolean
 
-A Boolean indicating if Stripe should try to reclaim negative balances from an attached bank account. See our Understanding Connect Account Balances documentation for details. Default value is true for Express accounts and false for Custom accounts.
+A Boolean indicating if Stripe should try to reclaim negative balances from an attached bank account. See L<Stripe Understanding Connect Account Balances documentation|https://stripe.com/docs/connect/account-balances> for details. Default value is true for Express accounts and false for Custom accounts.
 
 =item B<schedule> hash
 
-Details on when funds from charges are available, and when they are paid out to an external account. See our Setting Bank and Debit Card Payouts documentation for details.
+Details on when funds from charges are available, and when they are paid out to an external account. See L<Stripe Setting Bank and Debit Card Payouts documentation|https://stripe.com/docs/connect/bank-transfers#payout-information> for details.
+
+This is a dynamic class with name L<Net::API::Stripe::Connect::Account::Settings::Payouts::Schedule>. It is created using method B<_set_get_class> from module L<Module::Generic>
 
 =over 8
 
@@ -107,7 +121,7 @@ The text that appears on the bank account statement for payouts. If not set, thi
 =head1 API SAMPLE
 
 	{
-	  "id": "acct_19eGgRCeyNCl6xYZ",
+	  "id": "acct_fake123456789",
 	  "object": "account",
 	  "business_profile": {
 		"mcc": null,
@@ -139,7 +153,7 @@ The text that appears on the bank account statement for payouts. If not set, thi
 	  "payouts_enabled": true,
 	  "settings": {
 		"branding": {
-		  "icon": "file_1DLf5rCeyNCl6fY2kS4e5hMT",
+		  "icon": "file_fake123456789",
 		  "logo": null,
 		  "primary_color": "#0e77ca"
 		},
@@ -190,7 +204,7 @@ L<https://stripe.com/docs/api/accounts/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

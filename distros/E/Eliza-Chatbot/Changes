@@ -5,3 +5,6 @@ Revision history for Perl module Eliza::Chatbot
         - Remove all mention of signatures.
         - Don't call keys on an arrayref.
 
+0.09    2020-04-10
+        - runaway string in 5.8.9.
+

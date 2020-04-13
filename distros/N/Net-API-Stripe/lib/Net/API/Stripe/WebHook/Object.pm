@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/WebHook/Object.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -52,11 +52,24 @@ Net::API::Stripe::WebHook::Object - An Stripe WebHook Object
 
 =head1 SYNOPSIS
 
+    my $hook = $stripe->webhook({
+        api_version => '2020-03-02',
+        application => undef,
+        enabled_events => ['*'],
+        livemode => $stripe->false,
+        status => 'enabled',
+        url => 'https://api.example.con/stripe/CAC29A87-991E-44AF-8636-888E03082DDF',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
+
+This is a Stripe webhook endpoint object.
 
 =head1 CONSTRUCTOR
 
@@ -64,18 +77,8 @@ Net::API::Stripe::WebHook::Object - An Stripe WebHook Object
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::WebHook::Object> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -128,7 +131,7 @@ The URL of the webhook endpoint.
 =head1 API SAMPLE
 
 	{
-	  "id": "we_1DVZbtCeyNCl6fY25k54GtOS",
+	  "id": "we_fake123456789",
 	  "object": "webhook_endpoint",
 	  "api_version": "2017-02-14",
 	  "application": null,
@@ -161,7 +164,7 @@ L<https://stripe.com/docs/api/webhook_endpoints>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 
 my @tests = (
     {
@@ -771,6 +772,10 @@ my @tests = (
                 type => 'string',
                 max_length => 2,
             },
+            str_re => {
+                type => 'string',
+                re   => qr/Valid/,
+            },
         },
         params => [
             # String
@@ -793,6 +798,10 @@ my @tests = (
             [ { str_max => 500 },    0 ],
             [ { str_max => undef },  0 ],
             [ { str_max => {} },     0 ],
+            # String re
+            [ { str_re => 'text' },             0 ],
+            [ { str_re => 'Validate::Simple' }, 1 ],
+            [ { str_re => 'Invalid' },          0 ],
         ],
     },
     {
@@ -1027,63 +1036,112 @@ for my $test ( @tests ) {
 }
 
 plan tests =>
-    1              # Use the class
-    + 1            # Create an object
-    + 4            # Validate with empty params
-    + 3 * $test_count;  # Various validations
+    1                      # Use the class
+    + 2                    # Create an object
+    + 2                    # Empty params
+    + 2                    # Empty specs
+    + 7                    # Invalid specs
+    + 3 * 3 * $test_count; # Various validations
 
 use_ok( 'Validate::Simple' );
-my $validate = new_ok( 'Validate::Simple' );
+my $vs = new_ok( 'Validate::Simple' );
 
-ok( !$validate->validate(),          "Empty params" );
-ok( !$validate->validate(undef),     "Empty params" );
-ok( !$validate->validate({}),        "Empty specs" );
-ok( !$validate->validate({}, undef), "Empty specs" );
+my $vs1 = new_ok( 'Validate::Simple', [ { var => {} } ] );
+
+# Empty params
+ok( !$vs1->validate(),                    "Empty params" );
+ok( !$vs->validate(undef, { var => {} }), "Empty params" );
+
+# Empty specs
+throws_ok { $vs->validate({}) }
+    qr/No specs passed/,
+    "Empty specs";
+throws_ok
+    { !$vs->validate({}, undef) }
+    qr/No specs passed/,
+    "Empty specs";
+
+# Invalid specs
+throws_ok
+    { $vs->validate({}, 'string' ) }
+    qr/Specs is not valid/,
+    "Invalid specs: string";
+
+throws_ok
+    { $vs->validate({}, [ 1, 2 ] ) }
+    qr/Specs is not valid/,
+    "Invalid specs: array";
+
+throws_ok
+    { $vs->validate({}, { 1 => [] } ) }
+    qr/Specs is not valid/,
+    "Invalid specs: structure";
+
+throws_ok
+    { $vs->validate( {}, { var => { type => 'unknown' } } ) }
+    qr/Specs is not valid/,
+    "Invalid specs: unknown type";
+
+throws_ok
+    { $vs->validate( {}, { var => { type => 'array', of => 'string' } } ) }
+    qr/Specs is not valid/,
+    "Invalid specs: bad 'of'";
+
+throws_ok
+    { $vs->validate( {}, { var => { typo => 'string' } } ) }
+    qr/Specs is not valid/,
+    "Invalid specs: typo";
+
+throws_ok
+    { my $vs2 = Validate::Simple->new( [] ) }
+    qr/Specification must be a hashref/,
+    "Invalid specs: bad specs in constructor";
 
 
+for my $all_errors ( undef, 0, 1 ) {
+    my $ae = defined( $all_errors ) ? $all_errors : '[undef]';
+    for my $test ( @tests ) {
+        my $specs = $test->{specs};
+        my $name  = $test->{name};
+        for my $par ( @{ $test->{params} } ) {
+            my ( $params, $expected_true ) = @$par;
+            # Test pass specs to validate() method
+            if ( $expected_true ) {
+                ok( $vs->validate( $params, $specs, $all_errors ),
+                    "Validation '$name': Passed as expected"
+                        . " - \$all_errors = $ae - "
+                        . join(';', $vs->delete_errors())
+                    );
+            } else {
+                ok( !$vs->validate( $params, $specs, $all_errors ),
+                    "Validation '$name': Did not pass as expected"
+                        . " - \$all_errors = $ae - "
+                        . join(';', $vs->delete_errors())
+                    );
+            }
 
-for my $test ( @tests ) {
-    my $specs = $test->{specs};
-    my $name  = $test->{name};
-    for my $par ( @{ $test->{params} } ) {
-        my ( $params, $expected_true ) = @$par;
-        # Test pass specs to validate() method
-        if ( $expected_true ) {
-            ok( $validate->validate( $params, $specs ),
-                "Validation '$name': Passed as expected"
-                    . " - "
-                    . join(';', $validate->delete_errors())
-                );
-        }
-        else {
-            ok( !$validate->validate( $params, $specs ),
-                "Validation '$name': Did not pass as expected"
-                    . " - "
-                    . join(';', $validate->delete_errors())
-                );
-        }
+            # Create object with specs
+            my $val = new_ok( 'Validate::Simple' => [ $specs, $all_errors] );
 
-        # Create object with specs
-        my $val = new_ok(
-            'Validate::Simple' => [ $specs ],
-            "Create object with specs '$name'" );
+            my $is_valid = $val->validate( $params );
 
-        # Validate against object specs
-        if ( $expected_true ) {
-            ok( $val->validate( $params ),
-                "Validation again '$name': Passed as expected"
-                    . " - "
-                    . join(';', $val->errors() )
-                );
-        }
-        else {
-            ok( !$val->validate( $params ),
-                "Validation again '$name': Did not passed as expected"
-                    . " - "
-                    . join(';', $val->errors() )
-                );
+            # Validate against object specs
+            if ( $expected_true ) {
+                ok( $is_valid,
+                    "Validation again '$name': Passed as expected"
+                        . " - \$all_errors = $ae - "
+                        . join(';', $val->errors() )
+                    );
+            } else {
+                ok( !$is_valid,
+                    "Validation again '$name': Did not passed as expected"
+                        . " - \$all_errors = $ae - "
+                        . join(';', $val->errors() )
+                    );
+            }
         }
     }
 }
+
 
 1;

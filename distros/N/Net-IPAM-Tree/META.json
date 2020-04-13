@@ -37,13 +37,13 @@
    "provides" : {
       "Net::IPAM::Tree" : {
          "file" : "lib/Net/IPAM/Tree.pm",
-         "version" : "1.05"
+         "version" : "1.07"
       },
       "Net::IPAM::Tree::Node" : {
          "file" : "lib/Net/IPAM/Tree/Node.pm"
       }
    },
    "release_status" : "stable",
-   "version" : "1.05",
+   "version" : "1.07",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

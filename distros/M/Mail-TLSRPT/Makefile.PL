@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "JSON" => 0,
     "Moo" => 0,
     "Net::IP" => 0,
+    "Prometheus::Tiny::Shared" => 0,
     "Text::CSV" => 0,
     "Type::Utils" => 0,
     "Types::Standard" => 0,
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.20200306.1",
+  "VERSION" => "1.20200413.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,6 +66,7 @@ my %FallbackPrereqs = (
   "MIME::Base64" => 0,
   "Moo" => 0,
   "Net::IP" => 0,
+  "Prometheus::Tiny::Shared" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Text::CSV" => 0,

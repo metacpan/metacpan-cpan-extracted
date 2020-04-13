@@ -16,6 +16,8 @@ sub load ( $module, @ ) {
 
     $package = resolve_class_name( $package, $args{ns} );
 
+    die q[Invalid package name] if $package =~ /[^[:alnum:]_:]/sm;
+
     $module = package_to_module($package);
 
     require $module;

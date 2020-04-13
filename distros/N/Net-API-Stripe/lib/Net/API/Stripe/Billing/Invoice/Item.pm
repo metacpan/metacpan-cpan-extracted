@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Invoice/Item.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -73,6 +73,20 @@ Net::API::Stripe::Billing::Invoice::Item - A Stripe Invoice Item Object
 
 =head1 SYNOPSIS
 
+    my $invoice_item = $stripe->invoice_item({
+        amount => 2000,
+        currency => 'jpy',
+        customer => $customer_object,
+        date => '2020-03-17',
+		description => 'Support services',
+        invoice => $invoice_object,
+        metadata => { transaction_id => 1212, customer_id => 987 },
+        plan => $plan_object,
+        proration => 1,
+        quantity => 7,
+        subscription => $subscription_object,
+    });
+
 =head1 VERSION
 
     0.1
@@ -87,18 +101,7 @@ Sometimes you want to add a charge or credit to a customer, but actually charge 
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Billing::Invoice::Item> object.
 
 =back
 
@@ -201,15 +204,15 @@ Same as unit_amount, but contains a decimal value with at most 12 decimal places
 =head1 API SAMPLE
 
 	{
-	  "id": "ii_1E9NPMCeyNCl6fY2kwMZb4TN",
+	  "id": "ii_fake123456789",
 	  "object": "invoiceitem",
 	  "amount": 8000,
 	  "currency": "jpy",
-	  "customer": "cus_G0vQn57xCoD5rG",
+	  "customer": "cus_fake123456789",
 	  "date": 1551493020,
-	  "description": "Unused time on Angels, Inc entrepreneur monthly membership after 02 Mar 2019",
+	  "description": "Unused time on Provider, Inc entrepreneur monthly membership after 02 Mar 2019",
 	  "discountable": false,
-	  "invoice": "in_1EKcARCeyNCl6fY2BaXPdnwG",
+	  "invoice": "in_fake123456789",
 	  "livemode": false,
 	  "metadata": {},
 	  "period": {
@@ -231,7 +234,7 @@ Same as unit_amount, but contains a decimal value with at most 12 decimal places
 		"livemode": false,
 		"metadata": {},
 		"nickname": null,
-		"product": "prod_DwjzQmlOcoMCqN",
+		"product": "prod_fake123456789",
 		"tiers": null,
 		"tiers_mode": null,
 		"transform_usage": null,
@@ -240,8 +243,8 @@ Same as unit_amount, but contains a decimal value with at most 12 decimal places
 	  },
 	  "proration": true,
 	  "quantity": 1,
-	  "subscription": "sub_EccdFNq60pUMDL",
-	  "subscription_item": "si_Eccd4op26fXydB",
+	  "subscription": "sub_fake123456789",
+	  "subscription_item": "si_fake123456789",
 	  "tax_rates": [],
 	  "unit_amount": 8000,
 	  "unit_amount_decimal": "8000"
@@ -265,7 +268,7 @@ L<https://stripe.com/docs/api/invoiceitems>, L<https://stripe.com/docs/billing/i
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

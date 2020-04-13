@@ -3,6 +3,10 @@
 
 =head1 TODO
 
+=head2 Address open issues on GitHub
+
+See L<https://github.com/johannessen/neo4j-driver-perl/issues>.
+
 =head2 Functionality and API
 
 =over
@@ -18,6 +22,8 @@ C<0> and C<get('0')> would mean I<key> C<0>. The JS driver uses this concept.
 
 =item * Add timers to L<Neo4j::Driver::ResultSummary> (see C<Neo4j::Bolt>).
 
+=item * Make sure accessing a database that has authentication disabled works.
+
 =back
 
 =head2 Experimental features
@@ -28,6 +34,11 @@ C<0> and C<get('0')> would mean I<key> C<0>. The JS driver uses this concept.
 for clarity. Create an instance on creation of the driver's first session,
 so that it's relatively cheap and can safely be handed down to the
 L<ResultSummary|Neo4j::Driver::ResultSummary>. Get server version with Bolt.
+
+=item * L<Neo4j::Driver/"Database selection">: Make stable. While running
+multiple databases is mostly an enterprise feature, even the community edition
+comes with the C<system> database in addition to the main/default database,
+thus switching databases must be possible somehow.
 
 =item * L<Neo4j::Driver/"Parameter syntax conversion">: make stable and move
 filter implementation to C<Transaction> in preparation of Bolt v3 support

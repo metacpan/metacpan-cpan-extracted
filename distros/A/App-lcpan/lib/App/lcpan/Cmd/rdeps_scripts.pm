@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::rdeps_scripts;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-04'; # DATE
+our $DATE = '2020-04-11'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.046'; # VERSION
+our $VERSION = '1.049'; # VERSION
 
 use 5.010;
 use strict;
@@ -18,11 +18,9 @@ $SPEC{'handle_cmd'} = {
     summary => 'List scripts that depend on specified modules',
     description => <<'_',
 
-This is basically rdeps + dist_scripts.
+This is basically rdeps + dist_scripts. Equivalent to something like:
 
-If you want to find scripts that depend on a module indirectly, you can do:
-
-    % lcpan rdeps -R --flatten Some::Module | td select dist | xargs lcpan dist-scripts
+    % lcpan rdeps Some::Module | td select dist | xargs lcpan dist-scripts Some::Module
 
 _
     args => {
@@ -30,6 +28,7 @@ _
         %App::lcpan::mods_args,
         %App::lcpan::rdeps_rel_args,
         %App::lcpan::rdeps_phase_args,
+        %App::lcpan::rdeps_level_args,
     },
 };
 sub handle_cmd {
@@ -53,7 +52,7 @@ sub handle_cmd {
     }
     return [404, "No dists found for the module(s) specified"] unless @dists;
 
-    $res = App::lcpan::rdeps(%args);
+    $res = App::lcpan::rdeps(%args, flatten=>1);
     return [500, "Can't mod2dist: $res->[0] - $res->[1]"]
         unless $res->[0] == 200;
     push @dists, $_->{dist} for @{ $res->[2] };
@@ -98,7 +97,7 @@ App::lcpan::Cmd::rdeps_scripts - List scripts that depend on specified modules
 
 =head1 VERSION
 
-This document describes version 1.046 of App::lcpan::Cmd::rdeps_scripts (from Perl distribution App-lcpan), released on 2020-04-04.
+This document describes version 1.049 of App::lcpan::Cmd::rdeps_scripts (from Perl distribution App-lcpan), released on 2020-04-11.
 
 =head1 FUNCTIONS
 
@@ -111,11 +110,9 @@ Usage:
 
 List scripts that depend on specified modules.
 
-This is basically rdeps + dist_scripts.
+This is basically rdeps + dist_scripts. Equivalent to something like:
 
-If you want to find scripts that depend on a module indirectly, you can do:
-
- % lcpan rdeps -R --flatten Some::Module | td select dist | xargs lcpan dist-scripts
+ % lcpan rdeps Some::Module | td select dist | xargs lcpan dist-scripts Some::Module
 
 This function is not exported.
 
@@ -137,6 +134,10 @@ If C<index_name> is a filename without any path, e.g. C<index.db> then index wil
 be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
+
+=item * B<level> => I<int> (default: 1)
+
+Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 

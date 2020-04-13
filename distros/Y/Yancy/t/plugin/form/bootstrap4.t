@@ -32,7 +32,8 @@ my $t = Test::Mojo->new( 'Yancy', {
 } );
 $t->app->yancy->plugin( 'Form::Bootstrap4' );
 
-my $plugin = $t->app->yancy->form;
+my $c = $t->app->build_controller;
+my $plugin = $c->yancy->form;
 
 subtest 'input' => sub {
 
@@ -401,23 +402,19 @@ subtest 'form_for' => sub {
 
     subtest 'form fields' => sub {
         my $fields = $dom->find( '.form-group' );
-        is $fields->size, 9, 'found 10 fields';
+        is $fields->size, 8, 'found 8 fields';
         #; diag $fields->each;
         my $labels = $fields->map( at => 'label' )->grep( sub { defined } );
-        is $labels->size, 9, 'found 10 labels';
+        is $labels->size, 8, 'found 8 labels';
         #; diag $labels->each;
         is_deeply [ $labels->map( 'text' )->each ],
-            [ 'id', 'username *', 'E-mail Address *', 'password *', 'access', 'age', 'plugin', 'avatar', 'created' ],
+            [ 'username *', 'E-mail Address *', 'password *', 'access', 'age', 'plugin', 'avatar', 'created' ],
             'label texts in correct order';
         my $inputs = $fields->map( at => 'input,select,textarea' )->grep( sub { defined } );
-        is $inputs->size, 8, 'found 9 inputs (1 is read-only)';
+        is $inputs->size, 8, 'found 8 inputs';
         is_deeply [ $inputs->map( attr => 'name' )->each ],
             [ 'username', 'email', 'password', 'access', 'age', 'plugin', 'avatar', 'created' ],
             'input names in correct order';
-
-        my $id_input = $dom->at( 'p[data-name=id]' );
-        is $id_input->text, $item{ id },
-            'id field value is correct';
 
         my $email_input = $dom->at( 'input[name=email]' );
         is $email_input->attr( 'type' ), 'email',
@@ -437,6 +434,11 @@ subtest 'form_for' => sub {
         ok my $selected_option = $access_input->at( 'option[selected]' ),
             'access select field has selected option';
         is $selected_option->text, 'user', 'selected option value is correct';
+    };
+
+    subtest 'hidden csrf field' => sub {
+        ok my $csrf_field = $dom->at( '[name=csrf_token]' ), 'crsf token field exists';
+        is $csrf_field->attr( 'value' ), $c->csrf_token, 'crsf token value correct';
     };
 
     subtest 'buttons' => sub {
@@ -460,23 +462,78 @@ subtest 'form_for' => sub {
         my $c = $t->app->build_controller;
         $c->stash( item => \%item );
 
-        my $html = Yancy::Plugin::Form::Bootstrap4->form_for( $c, 'user' );
+        my $html = $c->yancy->form->form_for( 'user' );
         #; diag $html;
         my $dom = Mojo::DOM->new( $html );
         my $form = $dom->children->[0];
 
         my $fields = $dom->find( '.form-group' );
-        is $fields->size, 9, 'found 9 fields';
+        is $fields->size, 8, 'found 8 fields';
         my $labels = $fields->map( at => 'label' )->grep( sub { defined } );
-        is $labels->size, 9, 'found 9 labels';
+        is $labels->size, 8, 'found 8 labels';
         my $inputs = $fields->map( at => 'input,select,textarea' )->grep( sub { defined } );
-        is $inputs->size, 8, 'found 8 inputs (1 is read-only)';
+        is $inputs->size, 8, 'found 8 inputs';
 
         my $email_input = $dom->at( 'input[name=email]' );
         is $email_input->attr( 'type' ), 'email',
             'email field type is correct';
         is $email_input->attr( 'value' ), $item{ email },
             'email field value is correct';
+    };
+
+    subtest 'form_for properties option' => sub {
+        my $html = $plugin->form_for( 'user', item => \%item, properties => [qw/email password username age/] );
+        my $dom  = Mojo::DOM->new($html);
+        my $form = $dom->children->[0];
+        is $dom->at('input[name=id]'),     undef;
+        is $dom->at('input[name=access]'), undef;
+        is $dom->at('input[name=plugin]'), undef;
+        ok $dom->at('input[name=email]');
+        ok $dom->at('input[name=password]');
+        ok $dom->at('input[name=username]');
+        ok $dom->at('input[name=age]');
+
+        subtest 'default from stash' => sub {
+            my $c = $t->app->build_controller;
+            $c->stash(
+                item => \%item,
+                properties => [qw/email password username age/],
+            );
+            my $html = $c->yancy->form->form_for( 'user' );
+            my $dom  = Mojo::DOM->new($html);
+            my $form = $dom->children->[0];
+            is $dom->at('input[name=id]'),     undef;
+            is $dom->at('input[name=access]'), undef;
+            is $dom->at('input[name=plugin]'), undef;
+            ok $dom->at('input[name=email]');
+            ok $dom->at('input[name=password]');
+            ok $dom->at('input[name=username]');
+            ok $dom->at('input[name=age]');
+        };
+    };
+
+    subtest 'set values from current request params' => sub {
+        my $c = $t->app->build_controller;
+        $c->stash( item => \%item );
+        $c->req->param( email => 'override@example.com' );
+
+        my $html = $c->yancy->form->form_for( 'user' );
+        #; diag $html;
+        my $dom = Mojo::DOM->new( $html );
+        my $form = $dom->children->[0];
+
+        my $fields = $dom->find( '.form-group' );
+        is $fields->size, 8, 'found 8 fields';
+        my $labels = $fields->map( at => 'label' )->grep( sub { defined } );
+        is $labels->size, 8, 'found 8 labels';
+        my $inputs = $fields->map( at => 'input,select,textarea' )->grep( sub { defined } );
+        is $inputs->size, 8, 'found 8 inputs';
+
+        my $email_input = $dom->at( 'input[name=email]' );
+        is $email_input->attr( 'type' ), 'email',
+            'email field type is correct';
+        is $email_input->attr( 'value' ), 'override@example.com',
+            'email field value is set from query param';
     };
 };
 

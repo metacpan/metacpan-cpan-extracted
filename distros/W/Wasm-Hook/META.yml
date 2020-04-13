@@ -1,0 +1,32 @@
+---
+abstract: 'Automatically load WebAssembly modules without a Perl wrapper'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000060'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Wasm-Hook
+requires:
+  Path::Tiny: '0'
+  Ref::Util: '0'
+  Wasm: '0.02'
+  autodie: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/perlwasm/Wasm-Hook/issues
+  homepage: https://metacpan.org/pod/Wasm::Hook
+  repository: git://github.com/perlwasm/Wasm-Hook.git
+version: '0.02'
+x_generated_by_perl: v5.31.10
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

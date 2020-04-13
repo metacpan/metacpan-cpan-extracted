@@ -25,17 +25,37 @@ SKIP: {
    # TODO: Work out why and fix it
    skip "'no indirect' doesn't appear to work on this perl", 2 if $] < 5.020;
 
+   my $warnings = "";
+   local $SIG{__WARN__} = sub {
+      $warnings .= join "", @_;
+   };
+
    ok( !eval <<'EOPERL',
       class TestIndirect {
-         sub x { new Test(1,2,3) }
+         sub x { foo Test->new(1,2,3) }
       }
 
       1;
 EOPERL
       'class scope implies no indirect' );
+   my $e = $@;
 
-   like( $@, qr/^Indirect call of method "new" on object "Test" /,
-      'message form failure of no indirect' );
+   if( $] >= 5.031009 ) {
+      # On perl 5.31.9 onwards we use core's  no feature 'indirect' which has
+      #   different error semantics. It gives a generic "syntax error" plus
+      #   warnings
+      like( $warnings,
+         qr/^Bareword found where operator expected at \(eval /,
+         'warnings from failure of no feature "indirect"' );
+      like( $e,
+         qr/^syntax error at \(eval /,
+         'error result from failure of no feature "indirect"' );
+   }
+   else {
+      like( $e,
+         qr/^Indirect call of method "foo" on object "Test" /,
+         'message from failure of no indirect' );
+   }
 }
 
 done_testing;

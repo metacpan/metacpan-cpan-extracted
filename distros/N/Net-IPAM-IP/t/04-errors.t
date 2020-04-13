@@ -8,7 +8,6 @@ BEGIN { use_ok('Net::IPAM::IP') || print "Bail out!\n"; }
 
 can_ok( 'Net::IPAM::IP', 'new' );
 can_ok( 'Net::IPAM::IP', 'new_from_bytes' );
-can_ok( 'Net::IPAM::IP', 'clone' );
 
 eval { Net::IPAM::IP->new };
 like( $@, qr/wrong/i, 'new: missing arg' );

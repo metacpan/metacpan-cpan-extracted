@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Card.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -69,6 +69,25 @@ Net::API::Stripe::Issuing::Card - A Stripe Issued Card Object
 
 =head1 SYNOPSIS
 
+    my $card = $stripe->card({
+        authorization_controls => $authorization_controls_objet,
+        brand => 'visa',
+        cardholder => $cardholder_object,
+        currency => 'jpy',
+        exp_month => 12,
+        exp_year => 2030,
+        last4 => 123,
+        metadata => { transaction_id => 123 },
+        name => 'John Doe',
+        replacement_for => $card_object,
+        replacement_reason => 'loss',
+        shipping => $address_object,
+        status => 'active',
+        type => 'physical',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -77,7 +96,7 @@ Net::API::Stripe::Issuing::Card - A Stripe Issued Card Object
 
 You can create physical or virtual cards that are issued to cardholders.
 
-This Module bears some resemblance with C<Net::API::Stripe::Connect::ExternalAccount::Card>, but is quite different, so it stands on its own.
+This Module bears some resemblance with L<Net::API::Stripe::Connect::ExternalAccount::Card>, but is quite different, so it stands on its own.
 
 =head1 CONSTRUCTOR
 
@@ -85,18 +104,8 @@ This Module bears some resemblance with C<Net::API::Stripe::Connect::ExternalAcc
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Issuing::Card> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -114,9 +123,9 @@ String representing the object’s type. Objects of the same type share the same
 
 =item B<authorization_controls> hash
 
-Spending rules that give you some control over how your cards can be used. Refer to our authorizations documentation for more details.
+Spending rules that give you some control over how your cards can be used. Refer to L<Stripe's authorizations documentation|https://stripe.com/docs/issuing/purchases/authorizations> for more details.
 
-This is a C<Net::API::Stripe::Issuing::Card::AuthorizationsControl> object.
+This is a L<Net::API::Stripe::Issuing::Card::AuthorizationsControl> object.
 
 =item B<brand> string
 
@@ -126,7 +135,7 @@ The brand of the card.
 
 The Cardholder object to which the card belongs.
 
-This is a C<Net::API::Stripe::Issuing::Card::Holder> object.
+This is a L<Net::API::Stripe::Issuing::Card::Holder> object.
 
 =item B<created> timestamp
 
@@ -164,7 +173,7 @@ The name of the cardholder, printed on the card.
 
 Metadata about the PIN on the card.
 
-This is a virtual C<Net::API::Stripe::Issuing::Card::PinInfo> object.
+This is a virtual L<Net::API::Stripe::Issuing::Card::PinInfo> object.
 
 It contains the following property:
 
@@ -178,7 +187,7 @@ The status of the pin. One of blocked or active.
 
 =item B<replacement_for> string (expandable)
 
-The card this card replaces, if any. When expanded, this is a C<Net::API::Stripe::Issuing::Card> object.
+The card this card replaces, if any. When expanded, this is a L<Net::API::Stripe::Issuing::Card> object.
 
 =item B<replacement_reason> string
 
@@ -188,7 +197,7 @@ Why the card that this card replaces (if any) needed to be replaced. One of dama
 
 Where and how the card will be shipped.
 
-This is a C<Net::API::Stripe::Shipping> object.
+This is a L<Net::API::Stripe::Shipping> object.
 
 =item B<status> string
 
@@ -203,7 +212,7 @@ One of virtual or physical.
 =head1 API SAMPLE
 
 	{
-	  "id": "ic_1FVF3MCeyNCl6fY2xb9oQVgl",
+	  "id": "ic_fake123456789",
 	  "object": "issuing.card",
 	  "authorization_controls": {
 		"allowed_categories": null,
@@ -216,7 +225,7 @@ One of virtual or physical.
 	  },
 	  "brand": "Visa",
 	  "cardholder": {
-		"id": "ich_1DNcRHCeyNCl6fY2Epuwa9n9",
+		"id": "ich_fake123456789",
 		"object": "issuing.cardholder",
 		"authorization_controls": {
 		  "allowed_categories": [],
@@ -285,7 +294,7 @@ L<https://stripe.com/docs/api/issuing/cards>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

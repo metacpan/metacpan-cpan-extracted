@@ -53,6 +53,7 @@ my (
     $opt_template,
     $opt_fullpath,
     $opt_thousand_separator,
+    $opt_ne,
     $opt_format_screen,    # x: same as -f screen
     $opt_format_json,      # j: same as -f json
     $opt_sort_by,          # o
@@ -62,6 +63,10 @@ my (
 $opt_sort_by      = 'N50';
 $opt_reverse_sort = undef;
 my %valid_sort_keys = (
+    'auN'  => 1,
+    'Ne'   => 1,
+    'N90'  => 1,
+    'N75'  => 1,
     'N50'  => 1,
     'min'  => 1,
     'max'  => 1,
@@ -69,6 +74,7 @@ my %valid_sort_keys = (
     'size' => 1,
     'path' => 1,
 );
+$valid_sort_keys{"N$opt_ne"} = 1 if (defined $opt_ne);
 my $tab  = "\t";
 my $new  = "\n";
 my $_opt = GetOptions(
@@ -76,6 +82,7 @@ my $_opt = GetOptions(
     'b|basename'      => \$opt_basename,
     'c|color'         => \$opt_color,
     'd|debug'         => \$opt_debug,
+    'e|Ne=i'          => \$opt_ne,
     'f|format=s'      => \$opt_format,
     'h|help'          => \$opt_help,
     'j|json'          => \$opt_format_json,
@@ -125,6 +132,7 @@ if ( $opt_format eq 'list' ) {
     exit;
 }
 
+# No files provided, no version
 unless ( defined $ARGV[0] or $opt_version ) {
     say STDERR "\n Usage: n50 file.fa ... \n Type n50 --help for full manual";
 
@@ -202,7 +210,9 @@ if ( defined $opt_format ) {
             require Text::ASCIITable;
             Text::ASCIITable->import();
             $t = Text::ASCIITable->new();
-            $t->setCols( 'File', 'Seqs', 'Total bp', 'N50', 'min', 'max', 'N75', 'N90','auN' );
+            my @cols = ('File', 'Seqs', 'Total bp', 'N50', 'min', 'max', 'N75', 'N90','auN');
+            push @cols, "N$opt_ne" if (defined $opt_ne);
+            $t->setCols( @cols );
             1;
         };
         if ( !$has_table ) {
@@ -244,7 +254,8 @@ foreach my $file (@ARGV) {
     }
 
     my $JSON      = 1 if ( $opt_format =~ /JSON/ );
-    my $FileStats = Proch::N50::getStats( $file, $JSON );
+    my $FileStats = Proch::N50::getStats( $file, $JSON, $opt_ne ) || 0;
+
 
     # Validate answer: check {status}==1
     if ( !$FileStats->{status} ) {
@@ -256,9 +267,9 @@ foreach my $file (@ARGV) {
     }
 
     say Dumper $FileStats if ($opt_debug);
-    if ( !defined $FileStats->{min} ) {
+    if ( !defined $FileStats->{auN} ) {
         say STDERR
-          "Fatal error: statistics not calculated parsing \"$file\". Aborting.";
+          "Fatal error: statistics not calculated parsing \"$file\". Proch::N50 > 1.2.0 requiredscre.";
         say STDERR Dumper $FileStats;
         say STDERR $Proch::N50::VERSION;
         die;
@@ -272,6 +283,7 @@ foreach my $file (@ARGV) {
     my $n75  = $FileStats->{N75} + 0;
     my $n90  = $FileStats->{N90} + 0;
     my $auN  = $FileStats->{auN} + 0;
+    my $Ne   = $FileStats->{Ne}  + 0 if (defined $opt_ne);
     say STDERR "[$file]\tTotalSize:$slen;N50:$n50;Sequences:$n" if ($opt_debug);
 
     $file = basename($file)            if ($opt_basename);
@@ -283,14 +295,15 @@ foreach my $file (@ARGV) {
         'size' => $slen,
         'min'  => $min,
         'max'  => $max,
+        'auN'  => $auN,
         'N75'  => $n75,
         'N90'  => $n90,
-        'auN'  => $auN,
     );
+    $metrics{"N$opt_ne"} = $Ne if (defined $opt_ne);
 
     if ( defined $output_object{$file} ) {
-        print STDERR
-" WARNING: Overwriting '$file': multiple items with the same filename. Try not using -b/--basename.\n";
+        print STDERR  " WARNING: ",
+        "Overwriting '$file': multiple items with the same filename. Try not using -b/--basename.\n";
     }
     $output_object{$file} = \%metrics;
     $output_print{$file}  = {};
@@ -363,7 +376,8 @@ elsif ( $opt_format eq 'tsv' or $opt_format eq 'csv' ) {
     $opt_separator = ',' if ( $opt_format eq 'csv' );
 
     # TSV format
-    my @fields = ( 'path', 'seqs', 'size', 'N50', 'min', 'max', 'N75', 'N90','auN' );
+    my @fields = ( 'path', 'seqs', 'size', 'N50', 'min', 'max', 'N75', 'N90','auN');
+    push(@fields, "N$opt_ne") if (defined $opt_ne);
     say '#', join( $opt_separator, @fields ) if ( !defined $opt_noheader );
 
     foreach my $r ( sort $sort_function keys %output_object ) {
@@ -392,7 +406,7 @@ elsif ( $opt_format eq 'tsv' or $opt_format eq 'csv' ) {
 }
 elsif ( $opt_format eq 'custom' ) {
     my @fields = ( 'seqs', 'size', 'N50', 'min', 'max','N75', 'N90','auN' );
-
+    push(@fields, "N$opt_ne") if (defined $opt_ne);
     # Format: custom (use tags {new}{tab} {path} ...)
     foreach my $r ( sort $sort_function keys %output_object ) {
         my $output_string = '';
@@ -412,15 +426,19 @@ elsif ( $opt_format eq 'custom' ) {
 elsif ( $opt_format eq 'screen' ) {
 
     my @fields = ( 'path', 'seqs', 'size', 'N50', 'min', 'max', 'N75', 'N90','auN' );
-
+    push(@fields, "N$opt_ne") if (defined $opt_ne);
     #my $field = 'N50';
 
     foreach my $r ( sort $sort_function keys %output_object ) {
         my @array;
         push( @array, $r );
         for ( my $i = 1 ; $i <= $#fields ; $i++ ) {
+          if ( defined $output_print{$r}{ $fields[$i] } ) {
             push( @array, $output_print{$r}{ $fields[$i] } )
-              if ( defined $output_print{$r}{ $fields[$i] } );
+          } else {
+            say Dumper $output_print{$r};
+            die "$fields[$i] not defined";
+          }
         }
 
         $t->addRow(@array);
@@ -435,7 +453,7 @@ sub debug {
     my ( $message, $title ) = @_;
     $title = 'INFO' unless defined $title;
     $title = uc($title);
-    printMessage( $message, $title, 'green', 'reset' );
+    printMessage( $message, $title, 'green', 'yellow' );
     return 1;
 }
 
@@ -443,39 +461,38 @@ sub debug {
 sub printMessage {
     my ( $message, $title, $title_color, $message_color ) = @_;
 
+    if (! defined $title_color) {
+      $title_color = 'reset';
+    } elsif (! colorvalid($title_color)) {
+      say STDERR "$title_color not valid title color";
+      $title_color = 'reset';
+    }
 
-    $title_color = 'reset'
-      if ( ( !defined $title_color )
-        or ( !colorvalid($title_color) )
-        or ( !$opt_color ) );
-    $message_color = 'reset'
-      if ( ( !defined $message_color )
-        or ( !colorvalid($message_color) )
-        or ( !$opt_color ) );
+    if (! defined $message_color) {
+      $message_color = 'reset';
+    } elsif (! colorvalid($message_color)) {
+      say STDERR "$message_color not valid title color";
+      $message_color = 'reset';
+    }
 
-    say STDERR colored( "$title", $title_color ), "\t",
-      colored( "$message", $message_color );
+
+    print STDERR colored( "$title", $title_color ), "\t" if ($title);
+    say  colored( "$message", $message_color );
     return 1;
 }
 
 sub version {
 
     printMessage( "$program{NAME}, ver. $program{VERSION}",
-        '', 'reset', 'green' );
+        '', undef, 'bold blue' );
 
-    print STDERR '  ', '-' x 65, "\n";
 
-    printMessage(
-        qq(
-  $program{AUTHOR}
 
-  Program to calculate N50 from multiple FASTA/FASTQ files,
-  using Proch::N50 $Proch::N50::VERSION
-  https://metacpan.org/pod/distribution/Proch-N50/bin/n50
-), '', 'blue', 'green'
+    printMessage("Program to calculate N50 from multiple FASTA/FASTQ files,\n" .
+
+  "https://metacpan.org/pod/distribution/Proch-N50/bin/n50", '', 'blue', 'blue'
     );
-
-    print STDERR '  ', '-' x 65, "\n";
+    printMessage("Using Proch::N50 $Proch::N50::VERSION", '', undef, 'red');
 
     return $program{VERSION};
 }
@@ -496,8 +513,10 @@ sub n50fromHash {
 
 sub thousands {
     my ($number) = @_;
-    $number =~ s/(\d{1,3}?)(?=(\d{3})+$)/$1,/g;
-    return $number;
+    my ($int, $dec) = split /\./, $number;
+    $int =~ s/(\d{1,3}?)(?=(\d{3})+$)/$1,/g;
+    $dec = $dec ? ".$dec" : '';
+    return "$int$dec";
 }
 
 # Heng Li's subroutine (edited)
@@ -561,7 +580,7 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 1.2.0
+version 1.3.0
 
 =head1 SYNOPSIS
 
@@ -594,6 +613,10 @@ Reverse sort (see: C<-o>);
 
 Output format: default, tsv, json, custom, screen.
 See below for format specific switches. Specify "list" to list available formats.
+
+=item I<-e>
+
+Also calculate a custom N{e} metric. Expecting an integer 0 < e < 100.
 
 =item I<-s, --separator>
 
@@ -691,14 +714,14 @@ Same as C<--format tsv> and C<--separator ,>:
 
 Use C<-x> as shortcut for C<--format screen>. Enables --thousands-sep (-q) by default.
 
-.-----------------------------------------------------------------------------------------.
-| File          | Seqs | Total bp | N50    | min   | max    | N75   | N90   | auN         |
-+---------------+------+----------+--------+-------+--------+-------+-------+-------------+
-| big.fa        |    4 |   18,359 | 11,840 | 2,167 | 11,840 | 2,176 | 2,167 | 8923.21,984 |
-| sim1.fa       |   39 |   18,864 |    679 |    20 |    971 |   408 |   313 |  733.51,389 |
-| sim2.fa       |   21 |    7,530 |    493 |    68 |    989 |   330 |   174 |  575.47,012 |
-| test.fa       |    8 |      825 |    189 |     4 |    256 |   168 |   168 |  260.99,515 |
-'---------------+------+----------+--------+-------+--------+-------+-------+-------------'
+  .-----------------------------------------------------------------------------------------.
+  | File          | Seqs | Total bp | N50    | min   | max    | N75   | N90   | auN         |
+  +---------------+------+----------+--------+-------+--------+-------+-------+-------------+
+  | big.fa        |    4 |   18,359 | 11,840 | 2,167 | 11,840 | 2,176 | 2,167 | 8923.21,984 |
+  | sim1.fa       |   39 |   18,864 |    679 |    20 |    971 |   408 |   313 |  733.51,389 |
+  | sim2.fa       |   21 |    7,530 |    493 |    68 |    989 |   330 |   174 |  575.47,012 |
+  | test.fa       |    8 |      825 |    189 |     4 |    256 |   168 |   168 |  260.99,515 |
+  '---------------+------+----------+--------+-------+--------+-------+-------+-------------'
 
 =item I<json> (JSON)
 

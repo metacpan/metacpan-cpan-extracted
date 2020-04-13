@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Plan.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -90,6 +90,20 @@ Net::API::Stripe::Billing::Plan - A Stripe Plan Object
 
 =head1 SYNOPSIS
 
+    my $plan = $stripe->plan({
+        # Or you can just use 1. $stripe->true returns a Module::Generic::Boolean object
+        active => $stripe->true,
+        amount => 2000,
+        billing_scheme => 'per_unit',
+        count => 12,
+        currency => 'jpy',
+        interval => 'month',
+        interval_count => 1,
+        metadata => { transaction_id => 1212, customer_id => 123 },
+        name => 'Professional services subscription gold plan',
+        statement_description => 'Provider, Inc Pro Services',
+    });
+
 =head1 VERSION
 
     0.1
@@ -104,18 +118,7 @@ Plans define the base price, currency, and billing cycle for subscriptions. For 
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Billing::Plan> object.
 
 =back
 
@@ -256,7 +259,7 @@ Configures how the quantity per period should be determined, can be either I<met
 	  "livemode": false,
 	  "metadata": {},
 	  "nickname": null,
-	  "product": "prod_BWtaL30HYleHZU",
+	  "product": "prod_fake123456789",
 	  "tiers": null,
 	  "tiers_mode": null,
 	  "transform_usage": null,
@@ -284,7 +287,7 @@ As you can see, there are extra properties: I<name>, I<statement_description> an
 		"metadata": {},
 		"name": "MyShop, Inc monthly membership",
 		"nickname": null,
-		"product": "prod_BWtaL30HYleHZU",
+		"product": "prod_fake123456789",
 		"statement_description": null,
 		"statement_descriptor": null,
 		"tiers": null,
@@ -318,7 +321,7 @@ L<https://stripe.com/docs/api/plans>, L<https://stripe.com/docs/billing/subscrip
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

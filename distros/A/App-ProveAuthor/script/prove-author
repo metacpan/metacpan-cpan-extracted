@@ -1,0 +1,402 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/ProveAuthor/prove_author
+# and generated automatically using Perinci::CmdLine::Gen version 0.495
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-25'; # DATE
+our $DIST = 'App-ProveAuthor'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/ProveAuthor/prove_author",
+    program_name => "prove-author",
+    log => 1,
+    log_level => "info",
+);
+
+$cmdline->run;
+
+# ABSTRACT: Prove distributions of a CPAN author
+# PODNAME: prove-author
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+prove-author - Prove distributions of a CPAN author
+
+=head1 VERSION
+
+This document describes version 0.001 of prove-author (from Perl distribution App-ProveAuthor), released on 2020-03-25.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % prove-author [options] <author>
+
+=head1 DESCRIPTION
+
+To use this utility, first create C<~/.config/prove-author.conf>:
+
+ dists_dirs = ~/repos
+ dists_dirs = ~/repos-other
+
+The above tells I<prove-author> where to look for Perl distributions. Then:
+
+ % prove-author PERLANCAR
+
+This will search local CPAN mirror for all distributions that belong to that
+author, then search the distributions in the distribution directories (or
+download them from local CPAN mirror), C<cd> to each and run C<prove> in it.
+
+You can run with C<--dry-run> (C<-n>) option first to not actually run C<prove> but
+just see what distributions will get tested. An example output:
+
+ % prove-author GRAVATTJ -n
+ prove-author: Found dist: Backup-Duplicity-YADW
+ prove-author: Found dist: Backup-EZ
+ prove-author: Found dist: CLI-Driver
+ prove-author: Found dist: File-RandomGenerator
+ prove-author: Found dist: MySQL-ORM
+ prove-author: Found dist: MySQL-QueryMulti
+ prove-author: Found dist: MySQL-Util
+ prove-author: Found dist: MySQL-Util-Lite-ForeignKeyColumn
+ prove-author: Found dist: Util-Medley
+ prove-author: Found dist: Backup-Duplicity-YADW
+ prove-author: Found dist: Backup-EZ
+ prove-author: Found dist: CLI-Driver
+ prove-author: Found dist: File-RandomGenerator
+ prove-author: Found dist: MySQL-ORM
+ prove-author: Found dist: MySQL-QueryMulti
+ prove-author: Found dist: MySQL-Util
+ prove-author: Found dist: MySQL-Util-Lite-ForeignKeyColumn
+ prove-author: Found dist: Util-Medley
+ prove-author: [DRY] [1/9] Running prove for distribution Backup-Duplicity-YADW (directory /home/u1/repos-other/perl-Backup-Duplicity-YADW) ...
+ prove-author: [DRY] [2/9] Running prove for distribution Backup-EZ (directory /tmp/aM6akPpQUe/Backup-EZ-0.43) ...
+ prove-author: [DRY] [3/9] Running prove for distribution CLI-Driver (directory /tmp/JkZpohbCMa/CLI-Driver-0.3) ...
+ prove-author: [DRY] [4/9] Running prove for distribution File-RandomGenerator (directory /tmp/TU7lm9yjQs/File-RandomGenerator-0.06) ...
+ prove-author: [DRY] [5/9] Running prove for distribution MySQL-ORM (directory /tmp/5OstYMM3Ii/MySQL-ORM-0.12) ...
+ prove-author: [DRY] [6/9] Running prove for distribution MySQL-QueryMulti (directory /tmp/WKRilHdWOr/MySQL-QueryMulti-0.08) ...
+ prove-author: [DRY] [7/9] Running prove for distribution MySQL-Util (directory /tmp/IZS7BH1wtI/MySQL-Util-0.41) ...
+ prove-author: [DRY] [8/9] Running prove for distribution MySQL-Util-Lite-ForeignKeyColumn (directory /tmp/Cx9Jy7o3_i/MySQL-Util-0.34) ...
+ prove-author: [DRY] [9/9] Running prove for distribution Util-Medley (directory /tmp/_DK2_0kdgC/Util-Medley-0.025) ...
+
+The above example shows that I only have the distribution directories locally on
+my C<~/repos> for two of GRAVATTJ's distributions.
+
+If we reinvoke the above command without the C<-n>, I<prove-author> will actually
+run C<prove> on each directory and provide a summary at the end. Example output:
+
+ % prove-author GRAVATTJ
+ +-------------------------------------------------+-----------------------------------------------+-----------------------------------+--------+
+ | dir                                             | label                                         | reason                            | status |
+ +-------------------------------------------------+-----------------------------------------------+-----------------------------------+--------+
+ | /home/u1/repos-other/perl-Backup-Duplicity-YADW | distribution Backup-Duplicity-YADW            | Non-zero exit code (255)          | 500    |
+ | /tmp/7Jmw0xDarg/Backup-EZ-0.43                  | distribution Backup-EZ                        | Non-zero exit code (25)           | 500    |
+ | /tmp/hiiemSXIot/CLI-Driver-0.3                  | distribution CLI-Driver                       | Non-zero exit code (1)            | 500    |
+ | /tmp/CsAIDKALXQ/File-RandomGenerator-0.06       | distribution File-RandomGenerator             | Test failed (Failed 1/2 subtests) | 500    |
+ | /tmp/DfHp_1ZrZV/MySQL-ORM-0.12                  | distribution MySQL-ORM                        | Non-zero exit code (1)            | 500    |
+ | /tmp/XC0t4vZnGo/MySQL-QueryMulti-0.08           | distribution MySQL-QueryMulti                 | Test failed                       | 500    |
+ | /tmp/OJ9b7aFljf/MySQL-Util-0.41                 | distribution MySQL-Util                       | Non-zero exit code (1)            | 500    |
+ | /tmp/Eb1QtTu2Cu/MySQL-Util-0.34                 | distribution MySQL-Util-Lite-ForeignKeyColumn | Non-zero exit code (1)            | 500    |
+ | /tmp/Wui5PMkP98/Util-Medley-0.025               | distribution Util-Medley                      | Test failed (No subtests run)     | 500    |
+ +-------------------------------------------------+-----------------------------------------------+-----------------------------------+--------+
+
+The above example shows that all distributions still failed testing (due to lack
+of testing requirements). You can scroll up for the detailed C<prove> output to
+see the details of failure failed, fix things, and re-run.
+
+How distribution directory is searched: see L<App::ProveDists> documentation.
+
+When a dependent distribution cannot be found or downloaded/extracted, this
+counts as a 412 error (Precondition Failed).
+
+When a distribution's test fails, this counts as a 500 error (Error). Otherwise,
+the status is 200 (OK).
+
+I<prove-author> will return status 200 (OK) with the status of each dist. It will
+exit 0 if all distros are successful, otherwise it will exit 1.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--author>=I<s>*
+
+CPAN author IDd prove.
+
+=item B<--dists-dir>=I<s@>*
+
+Where to find the distributions directories.
+
+Can be specified multiple times.
+
+=item B<--dists-dirs-json>=I<s>
+
+Where to find the distributions directories (JSON-encoded).
+
+See C<--dists-dir>.
+
+=item B<--no-download>
+
+=item B<--prove-opt>=I<s@>
+
+Options to pass to the prove command.
+
+Default value:
+
+ ["-l"]
+
+Can be specified multiple times.
+
+=item B<--prove-opts-json>=I<s>
+
+Options to pass to the prove command (JSON-encoded).
+
+See C<--prove-opt>.
+
+=item B<--summarize-all>
+
+If true, also summarize successes in addition to failures.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--dry-run>
+
+Run in simulation mode (also via DRY_RUN=1).
+
+Default value:
+
+ ""
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C prove-author prove-author
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete prove-author 'p/*/`prove-author`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/prove-author.conf>, F<~/prove-author.conf>, or F</etc/prove-author.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ author (see --author)
+ dists_dirs (see --dists-dir)
+ download (see --no-download)
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ prove_opts (see --prove-opt)
+ summarize_all (see --summarize-all)
+
+=head1 ENVIRONMENT
+
+=head2 PROVE_AUTHOR_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/prove-author.conf>
+
+F<~/prove-author.conf>
+
+F</etc/prove-author.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ProveAuthor>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ProveAuthor>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProveAuthor>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

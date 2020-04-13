@@ -1,0 +1,67 @@
+{
+   "abstract" : "A SQL Database object abstraction class",
+   "author" : [
+      "Jacques Deguest (jack@deguest.jp)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DB-Object",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Struct" : "0.65",
+            "DBI" : "1.643",
+            "DateTime" : "1.51",
+            "DateTime::Format::Strptime" : "1.76",
+            "DateTime::TimeZone" : "2.36",
+            "Devel::Confess" : "0.009004",
+            "Fcntl" : "0",
+            "File::Basename" : "2.85",
+            "File::Spec" : "3.78",
+            "IO::Dir" : "0",
+            "IO::File" : "0",
+            "JSON" : "4.02",
+            "Module::Generic" : "v0.11.6",
+            "Net::IP" : "1.26",
+            "Number::Format" : "1.75",
+            "POSIX" : "1.88",
+            "Scalar::Util" : "1.54",
+            "Test::More" : "0",
+            "TryCatch" : "1.003002",
+            "URI" : "1.76",
+            "Want" : "0.29",
+            "common::sense" : "3.74",
+            "parent" : "0",
+            "perl" : "5.006000",
+            "strict" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.9.1",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

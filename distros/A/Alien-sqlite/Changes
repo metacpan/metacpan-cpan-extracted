@@ -1,4 +1,9 @@
 Revision history for Alien::sqlite
 
+1.03 2020-04-13
+    - Rename .la files on Windows as they can interfere with
+      compilation of dependent Aliens like gdal
+    - Remove unnecessary files from tarball (thanks Todd Rinaldo)
+
 1.02 2018-12-29
     - First release to cpan

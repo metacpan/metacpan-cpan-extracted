@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 9;
 
 use List::Util qw(sample);
 
@@ -65,9 +65,9 @@ use List::Util qw(sample);
 {
   local $List::Util::RAND = sub { 4/10 };
 
-  is( join( "", sample 5, 'A'..'Z' ), 'JKALC',
+  is(
+    join( "", sample 5, 'A'..'Z' ),
+    join( "", sample 5, 'A'..'Z' ),
     'rigged rand() yields predictable output'
   );
 }
-
-done_testing;

@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::extract_dist;
 
-our $DATE = '2020-04-04'; # DATE
-our $VERSION = '1.046'; # VERSION
+our $DATE = '2020-04-11'; # DATE
+our $VERSION = '1.049'; # VERSION
 
 use 5.010;
 use strict;
@@ -67,7 +67,7 @@ App::lcpan::Cmd::extract_dist - Extract a distribution's latest release file to 
 
 =head1 VERSION
 
-This document describes version 1.046 of App::lcpan::Cmd::extract_dist (from Perl distribution App-lcpan), released on 2020-04-04.
+This document describes version 1.049 of App::lcpan::Cmd::extract_dist (from Perl distribution App-lcpan), released on 2020-04-11.
 
 =head1 FUNCTIONS
 

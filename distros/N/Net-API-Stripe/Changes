@@ -2,5 +2,19 @@ Revision history for Perl module Net::API::Stripe
 
 0.1 Tue Oct 15 09:54:59 2019
     - original version; created by ExtUtils::ModuleMaker 0.63
-
-
+0.2 to 0.7 Alpha versions
+0.8 2020-03-30 Working submission to CPAN
+0.9 2020-04-03 Corrected mistakes in parameters definition for dispute_list in Net::API::Stripe
+	Added session_list method to list all checkout sessions in Net::API::Stripe
+	Added missing documentation in Net::API::Stripe
+	Improved documentation of Net::API::Stripe::Number
+	Created missing synopsis in all documentation
+	Created a convenient alias zip_code for postal_Code subroutine in Net::API::Stripe::Address
+	Change the helper method for default_for_currency in Net::API::Stripe::Connect::ExternalAccount::Bank to use boolean instead of scalar.
+	Added Stripe api calls for bank accounts
+	Change helper method for B<approved> from B<_set_get_scalar> to B<_set_get_boolean> in Net::API::Stripe::Issuing::Authorization::RequestHistory
+	Removed Net::API::Stripe::Customer::Subscription being replaced directly Net::API::Stripe::List
+	Removed Net::API::Stripe::Balance::Transaction::List used to handle the list of balance_transactions and replaced it directly by Net::API::Stripe::List from which it inherited
+	Removed Net::API::Stripe::Hash since it was not used anymore and used instead Module::Generic _set_get_hash, _set_get_class, etc
+	Removed Net::API::Stripe::Session because its namespace was to high and generic for its particular purpose.
+	

@@ -4,13 +4,13 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Pod-Simpler-Aoh",
    "no_index" : {
@@ -44,7 +44,7 @@
    "provides" : {
       "Pod::Simpler::Aoh" : {
          "file" : "lib/Pod/Simpler/Aoh.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -55,5 +55,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Pod-Simpler-Aoh"
       }
    },
-   "version" : "0.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

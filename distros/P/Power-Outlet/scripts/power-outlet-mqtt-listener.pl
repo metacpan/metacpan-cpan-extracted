@@ -105,7 +105,7 @@ __END__
 
 =head1 NAME
 
-power-outlet-mqtt-listener.pl - MQTT listener for Power::Outlet devices
+power-outlet-mqtt-listener.pl - MQTT listener to control Power::Outlet devices
 
 =head1 SYNOPSIS
 
@@ -113,7 +113,61 @@ power-outlet-mqtt-listener.pl - MQTT listener for Power::Outlet devices
 
 =head1 DESCRIPTION
 
-This script provides an MQTT listener for Power::Outlet devices
+This script provides an MQTT listener to control Power::Outlet devices
+
+=head1 CONFIGURATION
+
+The YAML formatted file /etc/power-outlet-mqtt-listener.yml is a key-value hash.  
+
+The "host" key value is a string representing the host name of the MQTT server.
+
+The "directives" key value is a list of individual directives with "name", "topic", "value" (topic payload to match) and "actions".
+
+The "actions" key value is a list of individual actions to run when "topic" and "value" match. Individual actions have keys "name", "driver", "command", and "options". "options" is a hash of options that is passed to the driver.
+
+Example:
+
+  ---
+  host: mqtt
+
+  directives:
+
+  - name: Smart Outlet Top Button Press
+    topic: cmnd/smartoutlet_button_topic/POWER1
+    value: TOGGLE
+    actions:
+    - name: Outside Lights
+      driver: iBootBarGroup
+      command: 'ON'
+      options:
+        outlets: '1,2,6,7'
+        host: bar
+
+  - name: Smart Outlet Bottom Button Press
+    topic: cmnd/smartoutlet_button_topic/POWER2
+    value: TOGGLE
+    actions:
+    - name: Outside Lights
+      driver: iBootBarGroup
+      command: 'OFF'
+      options:
+        outlets: '1,2,6,7'
+        host: bar
+
+=head1 SYSTEMD
+
+The included rpm spec file installs a systemd service file so you can run this process from systemd.
+
+  systemctl power-outlet-mqtt-listener.service enable
+  systemctl power-outlet-mqtt-listener.service start
+
+=head1 BUILD
+
+  rpmbuild -ta Power-Outlet-*.tar.gz
+
+=head1 INSTALL
+
+  sudo yum install perl-Power-Outlet-mqtt-listener 
 
 =head1 COPYRIGHT
 

@@ -46,10 +46,11 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.52"
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Build"        => "1.19",
-    "Alien::Build::MM"    => "0.32",
-    "ExtUtils::MakeMaker" => "6.52",
-    "Path::Tiny"          => 0
+    "Alien::Build"                      => "1.19",
+    "Alien::Build::MM"                  => "0.32",
+    "Alien::Build::Plugin::Build::Copy" => 0,
+    "ExtUtils::MakeMaker"               => "6.52",
+    "Path::Tiny"                        => 0
   },
   "DISTNAME"         => "Alien-wasmtime",
   "LICENSE"          => "perl",
@@ -67,7 +68,7 @@ my %WriteMakefileArgs = (
     "Test::Alien"       => "1.90",
     "Test::Alien::Diag" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test"    => {
     "TESTS" => "t/*.t"
   }

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Plan/TransformUsage.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -34,6 +34,11 @@ Net::API::Stripe::Billing::Plan::TransformUsage - A Stripe Plan Transform Usage 
 
 =head1 SYNOPSIS
 
+    my $usage = $plan->transform_usage({
+        divide_by => 2,
+        round => 0,
+    });
+
 =head1 VERSION
 
     0.1
@@ -42,24 +47,16 @@ Net::API::Stripe::Billing::Plan::TransformUsage - A Stripe Plan Transform Usage 
 
 Apply a transformation to the reported usage or set quantity before computing the billed price. Cannot be combined with tiers.
 
+Called from method B<transform_usage> in L<Net::API::Stripe::Billing::Plan>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Billing::Plan::TransformUsage> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -94,7 +91,7 @@ After division, either round the result up or down.
 	  "livemode": false,
 	  "metadata": {},
 	  "nickname": null,
-	  "product": "prod_BWtaL30HYleHZU",
+	  "product": "prod_fake123456789",
 	  "tiers": null,
 	  "tiers_mode": null,
 	  "transform_usage": null,
@@ -120,7 +117,7 @@ L<https://stripe.com/docs/api/plans/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

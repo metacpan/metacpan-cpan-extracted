@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Thresholds.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -18,7 +18,7 @@ BEGIN
 	our( $VERSION ) = '0.1';
 };
 
-sub amount_gte { return( shift->_set_get_scalar( 'amount_gte', @_ ) ); }
+sub amount_gte { return( shift->_set_get_number( 'amount_gte', @_ ) ); }
 
 sub item_reasons { return( shift->_set_get_hash_as_object( 'item_reasons', 'Net::API::Stripe::Billing::Thresholds::ItemReasons', @_ ) ); }
 
@@ -38,6 +38,11 @@ Net::API::Stripe::Billing::Thresholds - A Stripe Billing Thresholds Object
 
 =head1 SYNOPSIS
 
+    my $obj = $subscription->billing_thresholds({
+        amount_gte => 1000,
+        reset_billing_cycle_anchor => $stripe->true,
+    });
+
 =head1 VERSION
 
     0.1
@@ -52,18 +57,7 @@ Define thresholds at which an invoice will be sent, and the subscription advance
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Billing::Thresholds> object.
 
 =back
 
@@ -94,7 +88,7 @@ The quantity threshold boundary that applied to the given line item.
 =head1 API SAMPLE
 
 	{
-	  "id": "sub_EccdFNq60pUMDL",
+	  "id": "sub_fake123456789",
 	  "object": "subscription",
 	  "application_fee_percent": null,
 	  "billing_cycle_anchor": 1551492959,
@@ -105,7 +99,7 @@ The quantity threshold boundary that applied to the given line item.
 	  "created": 1551492959,
 	  "current_period_end": 1556763359,
 	  "current_period_start": 1554171359,
-	  "customer": "cus_EccdcylryhFDnC",
+	  "customer": "cus_fake123456789",
 	  "days_until_due": null,
 	  "default_payment_method": null,
 	  "default_source": null,
@@ -116,7 +110,7 @@ The quantity threshold boundary that applied to the given line item.
 		"object": "list",
 		"data": [
 		  {
-			"id": "si_Eccd4op26fXydB",
+			"id": "si_fake123456789",
 			"object": "subscription_item",
 			"billing_thresholds": null,
 			"created": 1551492959,
@@ -136,7 +130,7 @@ The quantity threshold boundary that applied to the given line item.
 			  "livemode": false,
 			  "metadata": {},
 			  "nickname": null,
-			  "product": "prod_Dwk1QNPjrMJlY8",
+			  "product": "prod_fake123456789",
 			  "tiers": null,
 			  "tiers_mode": null,
 			  "transform_usage": null,
@@ -144,14 +138,14 @@ The quantity threshold boundary that applied to the given line item.
 			  "usage_type": "licensed"
 			},
 			"quantity": 1,
-			"subscription": "sub_EccdFNq60pUMDL",
+			"subscription": "sub_fake123456789",
 			"tax_rates": []
 		  }
 		],
 		"has_more": false,
-		"url": "/v1/subscription_items?subscription=sub_EccdFNq60pUMDL"
+		"url": "/v1/subscription_items?subscription=sub_fake123456789"
 	  },
-	  "latest_invoice": "in_1EKcARCeyNCl6fY2BaXPdnwG",
+	  "latest_invoice": "in_fake123456789",
 	  "livemode": false,
 	  "metadata": {},
 	  "next_pending_invoice_item_invoice": null,
@@ -172,7 +166,7 @@ The quantity threshold boundary that applied to the given line item.
 		"livemode": false,
 		"metadata": {},
 		"nickname": null,
-		"product": "prod_Dwk1QNPjrMJlY8",
+		"product": "prod_fake123456789",
 		"tiers": null,
 		"tiers_mode": null,
 		"transform_usage": null,
@@ -205,7 +199,7 @@ L<https://stripe.com/docs/api/subscriptions/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

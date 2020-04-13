@@ -17,7 +17,7 @@ use Params::Check               qw[allow check];
 use Locale::Maketext::Simple    Class => 'CPANPLUS', Style => 'gettext';
 
 use vars qw[$VERSION];
-$VERSION = "0.9906";
+$VERSION = "0.9908";
 
 use constant TXN_COMMIT => 1000;
 

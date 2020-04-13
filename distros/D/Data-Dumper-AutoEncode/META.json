@@ -4,57 +4,67 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-Dumper-AutoEncode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "share"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Module::Build::Pluggable::CPANfile" : "0.05"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.42",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
          }
       },
       "runtime" : {
-         "recommends" : {
-            "IO::Interactive::Tiny" : "0"
-         },
          "requires" : {
             "B" : "0",
             "Carp" : "0",
             "Data::Dumper" : "0",
             "Encode" : "0",
-            "Exporter" : "0",
+            "IO::Interactive::Tiny" : "0",
             "Scalar::Util" : "0",
             "parent" : "0",
-            "perl" : "v5.8.1"
+            "perl" : "5.008005",
+            "strict" : "0",
+            "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Data::Dumper::AutoEncode" : {
-         "file" : "lib/Data/Dumper/AutoEncode.pm",
-         "version" : "0.108"
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/Data-Dumper-AutoEncode/issues"
+      },
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
          "url" : "http://github.com/bayashi/Data-Dumper-AutoEncode"
       }
    },
-   "version" : "0.108",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

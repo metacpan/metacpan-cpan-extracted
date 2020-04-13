@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Transaction.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -63,6 +63,19 @@ Net::API::Stripe::Issuing::Transaction - A Stripe Issuing Transaction Object
 
 =head1 SYNOPSIS
 
+    my $trans = $stripe->issuing_transaction({
+        amount => 2000,
+        authorization => $authorization_object,
+        balance_transaction => $balance_transaction,
+        card => $card_object,
+        currency => 'jpy',
+        merchant_amount => 2000,
+        merchant_currency => 'jpy',
+        metadata => { transaction_id => 123, customer_id > 456 },
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -77,18 +90,8 @@ Any use of an issued card (L<https://stripe.com/docs/issuing>) that results in f
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Issuing::Transaction> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -110,23 +113,23 @@ String representing the object’s type. Objects of the same type share the same
 
 The Authorization object that led to this transaction.
 
-When expanded, this is a C<Net::API::Stripe::Issuing::Authorization> object.
+When expanded, this is a L<Net::API::Stripe::Issuing::Authorization> object.
 
 =item B<balance_transaction> string (expandable)
 
-When expanded, this is a C<Net::API::Stripe::Balance::Transaction> object.
+When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<card> string (expandable)
 
 The card used to make this transaction.
 
-When expanded, this is a C<Net::API::Stripe::Payment::Card> object.
+When expanded, this is a L<Net::API::Stripe::Payment::Card> object.
 
 =item B<cardholder> string (expandable)
 
 The cardholder to whom this transaction belongs.
 
-When expanded, this is a C<Net::API::Stripe::Issuing::Card::Holder> object.
+When expanded, this is a L<Net::API::Stripe::Issuing::Card::Holder> object.
 
 =item B<created> timestamp
 
@@ -138,7 +141,7 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 =item B<dispute> string (expandable)
 
-When expanded, this is a C<Net::API::Stripe::Issuing::Dispute> object.
+When expanded, this is a L<Net::API::Stripe::Issuing::Dispute> object.
 
 =item B<livemode> boolean
 
@@ -152,7 +155,7 @@ Has the value true if the object exists in live mode or the value false if the o
 
 More information about the user involved in the transaction.
 
-This is a C<Net::API::Stripe::Issuing::MerchantData> object.
+This is a L<Net::API::Stripe::Issuing::MerchantData> object.
 
 =item B<metadata> hash
 
@@ -167,12 +170,12 @@ One of capture, refund, cash_withdrawal, refund_reversal, dispute, or dispute_lo
 =head1 API SAMPLE
 
 	{
-	  "id": "ipi_1FVF3MCeyNCl6fY2IcWlQov3",
+	  "id": "ipi_fake123456789",
 	  "object": "issuing.transaction",
 	  "amount": -100,
-	  "authorization": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+	  "authorization": "iauth_fake123456789",
 	  "balance_transaction": null,
-	  "card": "ic_1FVF3MCeyNCl6fY2UUvnxdw6",
+	  "card": "ic_fake123456789",
 	  "cardholder": null,
 	  "created": 1571480456,
 	  "currency": "usd",
@@ -212,7 +215,7 @@ L<https://stripe.com/docs/api/issuing/transactions>, L<https://stripe.com/docs/i
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

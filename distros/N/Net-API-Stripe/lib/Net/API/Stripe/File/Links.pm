@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/File/Links.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -40,99 +40,52 @@ __END__
 
 Net::API::Stripe::File::Links - File Links for Stripe API
 
-=head1 SYNOPSIS
-
-=head1 VERSION
-
-    0.1
-
 =head1 DESCRIPTION
 
-This is an object of file links
-
-=head1 CONSTRUCTOR
-
-=over 4
-
-=item B<new>( %ARG )
-
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
-
-=back
-
-=head1 METHODS
-
-=over 4
-
-=item B<object> string, value is "list"
-
-String representing the object’s type. Objects of the same type share the same value. Always has the value list.
-
-=item B<data> array of C<Net::API::Stripe::File::Link> objects
-
-=item B<has_more> boolean
-
-True if this list has another page of items after this one that can be fetched.
-
-=item B<url> string
-
-The URL where this list can be accessed.
-
-=back
+This module inherits completely from L<Net::API::Stripe::List> and may be removed in the future.
 
 =head1 API SAMPLE
 
 	{
-	  "id": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+	  "id": "file_fake123456789",
 	  "object": "file",
 	  "created": 1540111053,
-	  "filename": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+	  "filename": "file_fake123456789",
 	  "links": {
 		"object": "list",
 		"data": [
 		  {
-			"id": "link_1FUBkBCeyNCl6fY2qHYSz07c",
+			"id": "link_fake123456789",
 			"object": "file_link",
 			"created": 1571229407,
 			"expired": false,
 			"expires_at": null,
-			"file": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+			"file": "file_fake123456789",
 			"livemode": false,
 			"metadata": {},
-			"url": "https://files.stripe.com/links/fl_test_hz1kCVcA56eXrmtn7NefMLnz"
+			"url": "https://files.stripe.com/links/fl_test_fake123456789"
 		  },
 		  {
-			"id": "link_1FUAcFCeyNCl6fY271oD9exG",
+			"id": "link_fake123456789",
 			"object": "file_link",
 			"created": 1571225071,
 			"expired": false,
 			"expires_at": null,
-			"file": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+			"file": "file_fake123456789",
 			"livemode": false,
 			"metadata": {},
-			"url": "https://files.stripe.com/links/fl_test_8NLJYB8cW3mTdt8HGI4qWyPY"
+			"url": "https://files.stripe.com/links/fl_test_fake123456789"
 		  },
 		  {
-			"id": "link_1FUACkCeyNCl6fY2O4OY3lGf",
+			"id": "link_fake123456789",
 			"object": "file_link",
 			"created": 1571223490,
 			"expired": false,
 			"expires_at": null,
-			"file": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+			"file": "file_fake123456789",
 			"livemode": false,
 			"metadata": {},
-			"url": "https://files.stripe.com/links/fl_test_fw15hmJNq7mdGjVXDnCSGa1k"
+			"url": "https://files.stripe.com/links/fl_test_fake123456789"
 		  },
 		  {
 			"id": "link_1FUA14CeyNCl6fY2s3gFUjmP",
@@ -140,93 +93,87 @@ The URL where this list can be accessed.
 			"created": 1571222766,
 			"expired": false,
 			"expires_at": null,
-			"file": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+			"file": "file_fake123456789",
 			"livemode": false,
 			"metadata": {},
-			"url": "https://files.stripe.com/links/fl_test_CFGUdKzOySQmE7nnu90OJvFA"
+			"url": "https://files.stripe.com/links/fl_test_fake123456789"
 		  },
 		  {
-			"id": "link_1FU3MDCeyNCl6fY2AO4G1dEB",
+			"id": "link_fake123456789",
 			"object": "file_link",
 			"created": 1571197169,
 			"expired": false,
 			"expires_at": null,
-			"file": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+			"file": "file_fake123456789",
 			"livemode": false,
 			"metadata": {},
-			"url": "https://files.stripe.com/links/fl_test_ihRJaSmdENz7UrUYj4n15sxD"
+			"url": "https://files.stripe.com/links/fl_test_fake123456789"
 		  },
 		  {
-			"id": "link_1FTxyCCeyNCl6fY2r4TebpGF",
+			"id": "link_fake123456789",
 			"object": "file_link",
 			"created": 1571176460,
 			"expired": false,
 			"expires_at": null,
-			"file": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+			"file": "file_fake123456789",
 			"livemode": false,
 			"metadata": {},
-			"url": "https://files.stripe.com/links/fl_test_HoVMKjGfUBiMD2OS7aDZivWJ"
+			"url": "https://files.stripe.com/links/fl_test_fake123456789"
 		  },
 		  {
-			"id": "link_1FTe4wCeyNCl6fY2aoPS0DOo",
+			"id": "link_fake123456789",
 			"object": "file_link",
 			"created": 1571099998,
 			"expired": false,
 			"expires_at": null,
-			"file": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+			"file": "file_fake123456789",
 			"livemode": false,
 			"metadata": {},
-			"url": "https://files.stripe.com/links/fl_test_mGNgt9DXqHEgDtB436aPMo0s"
+			"url": "https://files.stripe.com/links/fl_test_fake123456789"
 		  },
 		  {
-			"id": "link_1E9RjaCeyNCl6fY2WTBMmC1P",
+			"id": "link_fake123456789",
 			"object": "file_link",
 			"created": 1551509650,
 			"expired": false,
 			"expires_at": null,
-			"file": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+			"file": "file_fake123456789",
 			"livemode": false,
 			"metadata": {},
-			"url": "https://files.stripe.com/links/fl_test_KjRaNp9SHHgHV1crZbmXNFPS"
+			"url": "https://files.stripe.com/links/fl_test_fake123456789"
 		  },
 		  {
-			"id": "link_1E9RcVCeyNCl6fY2ENfBjqlt",
+			"id": "link_fake123456789",
 			"object": "file_link",
 			"created": 1551509211,
 			"expired": false,
 			"expires_at": null,
-			"file": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+			"file": "file_fake123456789",
 			"livemode": false,
 			"metadata": {},
-			"url": "https://files.stripe.com/links/fl_test_hYLTeLBZuBzWgpN9jCkltoMq"
+			"url": "https://files.stripe.com/links/fl_test_fake123456789"
 		  },
 		  {
-			"id": "link_1Dss88CeyNCl6fY21fJ0EdbR",
+			"id": "link_fake123456789",
 			"object": "file_link",
 			"created": 1547559540,
 			"expired": false,
 			"expires_at": null,
-			"file": "file_1DNcRFCeyNCl6fY2DkDq3nUd",
+			"file": "file_fake123456789",
 			"livemode": false,
 			"metadata": {},
-			"url": "https://files.stripe.com/links/fl_test_EgTRoBg3u2NXbACJp3ZmJhQP"
+			"url": "https://files.stripe.com/links/fl_test_fake123456789"
 		  }
 		],
 		"has_more": true,
-		"url": "/v1/file_links?file=file_1DNcRFCeyNCl6fY2DkDq3nUd"
+		"url": "/v1/file_links?file=file_fake123456789"
 	  },
 	  "purpose": "dispute_evidence",
 	  "size": 9863,
 	  "title": null,
 	  "type": "png",
-	  "url": "https://files.stripe.com/v1/files/file_1DNcRFCeyNCl6fY2DkDq3nUd/contents"
+	  "url": "https://files.stripe.com/v1/files/file_fake123456789/contents"
 	}
-
-=head1 HISTORY
-
-=head2 v0.1
-
-Initial version
 
 =head1 AUTHOR
 
@@ -240,7 +187,7 @@ L<https://stripe.com/docs/api/files/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

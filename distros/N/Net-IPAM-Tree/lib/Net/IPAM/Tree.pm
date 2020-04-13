@@ -3,8 +3,9 @@ package Net::IPAM::Tree;
 use 5.10.0;
 use strict;
 use warnings;
+use utf8;
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
 # caller can shut up with: no warnings 'Net::IPAM::Tree'
 use warnings::register;
@@ -25,7 +26,8 @@ Net::IPAM::Tree - A CIDR/Block tree library for fast IP lookup with longest-pref
 
 A module for fast IP-routing-table lookups and IP-ACLs (Access Control Lists).
 
-It is B<NOT> a standard patricia-trie implementation. This isn't possible for general blocks not represented by bitmasks, every tree item is a Net::IPAM::Block.
+It is B<NOT> a standard patricia-trie implementation.
+This isn't possible for general blocks not represented by bitmasks, every tree item is a Net::IPAM::Block.
 
 The complexity for tree operations is in worst case O(h * log n) with h <= 128 (IPv6) or h <=32 (IPv4).
 
@@ -133,8 +135,8 @@ sub insert {
 
 =head2 contains($thing)
 
-Returns true if the given $thing (Net::IPAM::IP or Net::IPAM::Block) is contained in any block of the tree.
-Just returns true or false and not the matching prefix, this is much faster than a full C<lookup> for the longest-prefix-match.
+Returns true if the given $thing (L<Net::IPAM::IP> or L<Net::IPAM::Block>) is contained in any block of the tree.
+Just returns true or false and not the matching prefix, this is much faster than a full L</"lookup"> for the longest-prefix-match.
 
 This can be used for fast ACL lookups.
 
@@ -164,7 +166,8 @@ sub contains {
 
 =head2 lookup($thing)
 
-Returns Net::IPAM::Block with longest prefix match for $thing (Net::IPAM::IP or Net::IPAM::Block) in the tree, undef if not found.
+Returns L<Net::IPAM::Block> with longest prefix match for $thing (L<Net::IPAM::IP> or L<Net::IPAM::Block>)
+in the tree, undef if not found.
 
 This can be used for fast routing table lookups.
 
@@ -307,11 +310,12 @@ sub to_string {
 
 =head2 walk
 
-Walks the tree starting at root node in depth first order.
+Walks the tree, starting at root node in depth first order.
 
   my $err_string = $t->walk($callback);
 
-For every node C<< Net::IPAM::Tree::Node >> the callback funtion is called with the node and the current depth (counting from 0) as arguments.
+For every node L<Net::IPAM::Tree::Node> the callback function is called with the node
+and the current depth (counting from 0) as arguments.
 
 	my $err_string = $callback->($node, $depth);
 
@@ -371,20 +375,21 @@ sub walk {
 
 =head2 len
 
-Returns the number of blocks in the tree.
+Just for convenience, L</"len"> returns the number of blocks in the tree,
+implemented as a simple L</"walk"> callback.
 
 =cut
 
 sub len {
-	my $self = shift;
+  my $self = shift;
 
-	my $n;
-	my $counter_cb = sub {$n++; return};
+  my $n;
+  my $counter_cb = sub { $n++; return };
 
-	my $err = $self->walk($counter_cb);
-	croak($err) if defined $err;
+  my $err = $self->walk($counter_cb);
+  croak($err) if defined $err;
 
-	return $n;
+  return $n;
 }
 
 =head1 AUTHOR

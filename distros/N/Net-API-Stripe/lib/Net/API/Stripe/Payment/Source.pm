@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Source.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -34,6 +34,8 @@ sub account_holder_name { return( shift->_set_get_scalar( 'account_holder_name',
 sub account_holder_type { return( shift->_set_get_scalar( 'account_holder_type', @_ ) ); }
 
 sub active { return( shift->_set_get_scalar( 'active', @_ ) ); }
+
+sub address { return( shift->_address_populate( @_ ) ); }
 
 sub address_city { return( shift->_set_get_scalar( 'address_city', @_ ) ); }
 
@@ -191,6 +193,37 @@ Net::API::Stripe::Payment::Source - A Stripe Payment Source Object
 
 =head1 SYNOPSIS
 
+    my $source = $stripe->source({
+        account => $account_object,
+        account_holder_name => 'John Doe',
+        account_holder_type => 'individual',
+        active => $stripe->true,
+        # Or maybe more simply you pass a Net::API::Stripe::Address object
+        # address => $address_object
+        address_line1 => '1-2-3 Kudan-Minami, Chiyoda-ku',
+        address_line2 => 'Big Bldg 12F',
+        address_city => 'Tokyo',
+        address_state => undef,
+        address_zip => '123-4567',
+        address_country => 'jp',
+        amount => 2000,
+        brand => 'Visa',
+        card => $card_object,
+        country => 'jp',
+        currency => 'jpy',
+        description => 'Primary source for customer',
+        email => 'john.doe@example.com',
+        exp_month => 4,
+        exp_year => 2030,
+        funding => 'debit',
+        metadata => { transaction_id => 123, customer_id => 456 },
+        name => 'John Doe',
+        statement_descriptor => 'Big Corp Services',
+        type => 'card',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -207,18 +240,7 @@ Stripe states this approach for card is deprecated in favour or PaymentIntent: L
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Payment::Source> object.
 
 =back
 
@@ -263,6 +285,14 @@ It is not very clear in the Stripe API, but in the B<type> property, they mentio
 =item B<active> boolean
 
 True when this bitcoin receiver has received a non-zero amount of bitcoin.
+
+=item B<address> L<Net::API::Stripe::Address> object or hash
+
+This is a helper method. Provided with either a L<Net::API::Stripe::Address> object or a hash with same properties, this will assign all the address_* properties by calling its method.
+
+=item B<address> L<Net::API::Stripe::Address> object or hash
+
+This is a helper method. Provided with either a L<Net::API::Stripe::Address> object or a hash with same properties, this will assign all the address_* properties by calling its method.
 
 =item B<address_city> string
 
@@ -409,6 +439,7 @@ Uniquely identifies this particular card number. You can use this attribute to c
 =item B<flow> string
 
 The authentication flow of the source. flow is one of redirect, receiver, code_verification, none.
+
 =item B<livemode> boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
@@ -586,17 +617,17 @@ If B<type> is set to C<wechat>, this is a C<Net::API::Stripe::Payment::Method::D
 =head1 API SAMPLE
 
 	{
-	  "id": "src_1FUXrFCeyNCl6fY2Fk07erzD",
+	  "id": "src_fake123456789",
 	  "object": "source",
 	  "ach_credit_transfer": {
 		"account_number": "test_52796e3294dc",
 		"routing_number": "110000000",
-		"fingerprint": "ecpwEzmBOSMOqQTL",
+		"fingerprint": "anvbmbvmnbvmab",
 		"bank_name": "TEST BANK",
 		"swift_code": "TSTEZ122"
 	  },
 	  "amount": null,
-	  "client_secret": "src_client_secret_G0YzRXUMP1IJhwBBA4dW38It",
+	  "client_secret": "src_client_secret_fake123456789",
 	  "created": 1571314413,
 	  "currency": "jpy",
 	  "flow": "receiver",
@@ -650,7 +681,7 @@ L<https://stripe.com/docs/api/sources>, L<https://stripe.com/docs/sources>, L<ht
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

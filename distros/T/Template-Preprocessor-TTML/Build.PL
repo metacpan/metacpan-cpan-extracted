@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Template-Preprocessor-TTML",
-  "dist_version" => "0.0104",
+  "dist_version" => "0.0105",
   "license" => "mit",
   "module_name" => "Template::Preprocessor::TTML",
   "recursive_test_files" => 1,
@@ -36,7 +36,7 @@ my %module_build_args = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0,
+    "Test::More" => "0.88",
     "perl" => "5.006"
   }
 );
@@ -47,7 +47,7 @@ my %fallback_build_requires = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
-  "Test::More" => 0,
+  "Test::More" => "0.88",
   "perl" => "5.006"
 );
 

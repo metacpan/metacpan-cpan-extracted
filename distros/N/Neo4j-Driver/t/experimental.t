@@ -20,7 +20,7 @@ my $s = $driver->session;
 # those features or moved elsewhere once the features are documented
 # and thus officially supported.
 
-use Test::More 0.96 tests => 12;
+use Test::More 0.96 tests => 13;
 use Test::Exception;
 use Test::Warnings qw(warnings :no_end_test);
 
@@ -115,6 +115,18 @@ subtest 'multiple statements as array' => sub {
 		lives_and { is $r->[1]->single->get, 23 } 'retrieve value';
 		# TODO: also check statement order in summary
 	};
+};
+
+
+subtest 'database selection' => sub {
+	plan tests => 5;
+	my ($dx, $sx);
+	lives_ok { $dx = 0; $dx = Neo4j::Driver->new(); } 'new driver';
+	lives_ok { $sx = 0; $sx = $dx->session(); } 'new session, default db';
+	is $sx->{transport}->{endpoints}->{new_transaction}, "/db/data/transaction", 'default tx endpoint';
+	my $db = 'fortytwo';
+	lives_ok { $sx = 0; $sx = $dx->session(database => $db); } 'new session, custom db';
+	is $sx->{transport}->{endpoints}->{new_transaction}, "/db/$db/tx", 'custom tx endpoint';
 };
 
 

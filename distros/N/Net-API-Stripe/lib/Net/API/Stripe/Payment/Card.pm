@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Card.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -29,8 +29,6 @@ __END__
 
 Net::API::Stripe::Payment::Card - A Stripe Payment Card Object
 
-=head1 SYNOPSIS
-
 =head1 VERSION
 
     0.1
@@ -39,7 +37,7 @@ Net::API::Stripe::Payment::Card - A Stripe Payment Card Object
 
 You can store multiple cards on a customer in order to charge the customer later. You can also store multiple debit cards on a recipient in order to transfer to those cards later.
 
-That being said, all the methods are exactly the same as C<Net::API::Stripe::Connect::ExternalAccount::Card> so this module inherits 100% from it.
+That being said, all the methods are exactly the same as L<Net::API::Stripe::Connect::ExternalAccount::Card> so this module inherits 100% from it.
 
 The only reason why I am keeping it here, ie because Stripe makes a distinction as mentioned above.
 
@@ -55,7 +53,7 @@ L<https://stripe.com/docs/api/cards>, L<https://stripe.com/docs/sources/cards>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

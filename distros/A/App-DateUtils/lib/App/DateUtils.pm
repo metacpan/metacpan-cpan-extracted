@@ -3,7 +3,7 @@ package App::DateUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-01-31'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.124'; # VERSION
+our $VERSION = '0.125'; # VERSION
 
 use 5.010001;
 use strict;
@@ -571,6 +571,51 @@ sub strftime {
     POSIX::strftime($format, gmtime($date->epoch));
 }
 
+$SPEC{strftimeq} = {
+    v => 1.1,
+    summary => 'Format date using strftimeq()',
+    description => <<'_',
+
+strftimeq() is like POSIX's strftime(), but allows an extra conversion `%(...)q`
+to insert Perl code, for flexibility in customizing format. For more details,
+read <pm:Date::strftimeq>.
+
+_
+    args => {
+        format => {
+            schema => 'str*',
+            req => 1,
+            pos => 0,
+        },
+        date => {
+            schema => ['date*', {
+                'x.perl.coerce_to' => 'DateTime',
+                'x.perl.coerce_rules' => ['From_str::iso8601', 'From_str::natural'],
+            }],
+            pos => 1,
+        },
+    },
+    result_naked => 1,
+    examples => [
+        {
+            summary => 'Format current time as yyyy-mm-dd but add "Sun" when the date is Sunday',
+            args => {format => '%Y-%m-%d%( require Date::DayOfWeek; Date::DayOfWeek::dayofweek($_[3], $_[4]+1, $_[5]+1900) == 0 ? "sun":"" )q'},
+            test => 0,
+        },
+    ],
+};
+sub strftimeq {
+    require DateTime;
+    require Date::strftimeq;
+    require POSIX;
+
+    my %args = @_;
+    my $format = $args{format};
+    my $date   = $args{date} // DateTime->now;
+
+    Date::strftimeq::strftimeq($format, gmtime($date->epoch));
+}
+
 $SPEC{durconv} = {
     v => 1.1,
     summary => 'Convert duration to another format',
@@ -753,7 +798,7 @@ App::DateUtils - An assortment of date-/time-related CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.124 of App::DateUtils (from Perl distribution App-DateUtils), released on 2020-01-31.
+This document describes version 0.125 of App::DateUtils (from Perl distribution App-DateUtils), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -789,6 +834,8 @@ date/time:
 =item * L<parse-duration-using-td-parse>
 
 =item * L<strftime>
+
+=item * L<strftimeq>
 
 =back
 
@@ -833,8 +880,8 @@ Result:
    200,
    "OK",
    {
-     epoch => 1580449881,
-     iso8601 => "2020-01-31T05:51:21Z",
+     epoch => 1580450649,
+     iso8601 => "2020-01-31T06:04:09Z",
      ymd => "2020-01-31",
    },
  ]
@@ -1562,8 +1609,8 @@ Result:
      is_parseable => 1,
      as_secs => 1209600,
      as_dtdur_obj => "P14D",
-     date2 => "2020-02-14T05:51:21",
-     date1 => "2020-01-31T05:51:21",
+     date1 => "2020-01-31T06:04:09",
+     date2 => "2020-02-14T06:04:09",
    },
  ]
 
@@ -1578,10 +1625,10 @@ Result:
      module => "DateTime::Format::Natural",
      original => "from 23 Jun to 29 Jun",
      is_parseable => 1,
-     as_secs => 13003719,
-     as_dtdur_obj => "P4M28DT18H8M39S",
+     as_secs => 13002951,
+     as_dtdur_obj => "P4M28DT17H55M51S",
+     date1 => "2020-01-31T06:04:09",
      date2 => "2020-06-29T00:00:00",
-     date1 => "2020-01-31T05:51:21",
    },
  ]
 
@@ -1731,6 +1778,49 @@ Arguments ('*' denotes required arguments):
 
 Return value:  (any)
 
+
+
+=head2 strftimeq
+
+Usage:
+
+ strftimeq(%args) -> any
+
+Format date using strftimeq().
+
+Examples:
+
+=over
+
+=item * Format current time as yyyy-mm-dd but add "Sun" when the date is Sunday:
+
+ strftimeq(format => "%Y-%m-%d%( require Date::DayOfWeek; Date::DayOfWeek::dayofweek(\$_[3], \$_[4]+1, \$_[5]+1900) == 0 ? \"sun\":\"\" )q");
+
+Result:
+
+ [200, "OK", "2020-01-31"]
+
+=back
+
+strftimeq() is like POSIX's strftime(), but allows an extra conversion C<%(...)q>
+to insert Perl code, for flexibility in customizing format. For more details,
+read L<Date::strftimeq>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<date> => I<date>
+
+=item * B<format>* => I<str>
+
+
+=back
+
+Return value:  (any)
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-DateUtils>.
@@ -1750,7 +1840,7 @@ feature.
 =head1 SEE ALSO
 
 
-L<dateparse>. Perinci::To::POD=HASH(0x560f4ff3c148).
+L<dateparse>. Perinci::To::POD=HASH(0x564a231e0ff8).
 
 L<App::datecalc>
 

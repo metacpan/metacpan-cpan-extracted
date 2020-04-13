@@ -92,8 +92,9 @@ size (1410 bytes).
 The module has dual Perl/C++ interface (see L<XS::Manifesto>) so further
 XS-bindings can be written on the top of C<Protocol::WebSocket::Fast> (see L<UniEvent::WebSocket>).
 
-The <Protocol::WebSocket::Fast> is B<not> drop-in replacement of <Protocol::WebSocket>,
-as it uses sligthly different API.
+C<Protocol::WebSocket::Fast> is B<not> drop-in replacement of <Protocol::WebSocket>, as it uses different API.
+
+C<Protocol::WebSocket::Fast> fully conforms to RFC and passes all L<autobahn|https://github.com/crossbario/autobahn-testsuite> tests.
 
 
 

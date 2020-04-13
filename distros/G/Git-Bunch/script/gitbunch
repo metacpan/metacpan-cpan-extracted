@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.625'; # VERSION
+our $DATE = '2020-01-31'; # DATE
+our $VERSION = '0.626'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,7 @@ gitbunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.625 of gitbunch (from Perl distribution Git-Bunch), released on 2019-11-29.
+This document describes version 0.626 of gitbunch (from Perl distribution Git-Bunch), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -192,6 +192,10 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =item B<--quiet>
 
@@ -765,7 +769,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

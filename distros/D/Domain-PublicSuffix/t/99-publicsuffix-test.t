@@ -5,6 +5,11 @@ use warnings;
 use Test::More;
 use Domain::PublicSuffix;
 
+my $builder = Test::More->builder;
+binmode $builder->output,         ":encoding(utf8)";
+binmode $builder->failure_output, ":encoding(utf8)";
+binmode $builder->todo_output,    ":encoding(utf8)";
+
 ok( my $dps = Domain::PublicSuffix->new({
 	'use_default'             => 1,
 	'domain_allow_underscore' => 1,
@@ -14,6 +19,7 @@ ok( my $dps = Domain::PublicSuffix->new({
 sub checkPublicSuffix {
     my ($root, $domain) = @_;
 
+    $root ||= '';
     is( $dps->get_root_domain($root), $domain, $root . ' -> ' . ($domain or 'undef') );
 }
 

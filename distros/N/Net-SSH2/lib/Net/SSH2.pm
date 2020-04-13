@@ -1,6 +1,6 @@
 package Net::SSH2;
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 use 5.006;
 use strict;
@@ -669,18 +669,34 @@ Net::SSH2 - Support for the SSH 2 protocol via libssh2.
 
   my $ssh2 = Net::SSH2->new();
 
-  $ssh2->connect('example.com') or $ssh2->die_with_error;
+  $ssh2->connect('example.com')
+    or $ssh2->die_with_error;
 
-  $ssh->check_hostkey('ask') or $ssh2->die_with_error;
+  $ssh->check_hostkey('ask')
+    or $ssh2->die_with_error;
 
-  if ($ssh2->auth_keyboard('fizban')) {
-      my $chan = $ssh2->channel();
-      $chan->exec('program');
+  $ssh->auth_publickey($ENV{USER}, "$ENV{HOME}/.ssh/id_rsa.pub", "$ENV{HOME}/.ssh/id_rsa")
+    or $ssh->die_with_error;
 
-      my $sftp = $ssh2->sftp();
-      my $fh = $sftp->open('/etc/passwd') or $sftp->die_with_error;
-      print $_ while <$fh>;
-  }
+  my $chan = $ssh2->channel()
+    or $ssh2->die_with_error;
+
+  $chan->exec('ls')
+    or $ssh2->die_with_error;
+
+  print while <$chan>;
+
+  print "EXIT CODE: ", $chan->exit_status, "\n";
+
+  $chan->close;
+
+  my $sftp = $ssh2->sftp()
+    or $ssh2->die_with_error;;
+
+  my $fh = $sftp->open('/etc/passwd')
+    or $sftp->die_with_error;
+
+  print while <$fh>;
 
 =head1 DESCRIPTION
 
@@ -1470,13 +1486,13 @@ The SFTP client implements version 3 of the SFTP protocol.
 Private and public keys can be generated and stored using different
 formats and cyphers. Which ones are accepted by C<Net::SSH2> depends
 on the libssh2 version being used and of the underlying crypto backend
-(OpenSSL C<libssl> or C<libgcrypt>) it was
-configured to use at build time.
+it was configured to use at build time (OpenSSL C<libssl> or
+C<libgcrypt>).
 
 An increassingly common problem is that OpenSSH since version 7.8
 (released 2018-8-24) generates keys by default using the format
-RFC4716 which is not supported by C<libssl>, the default crypto
-backend.
+RFC4716 which is not supported by the default crypto backend
+(C<libssl>).
 
 Keys can be converted inplace to the old PEM format using
 L<ssh-keygen(1)> as follows:
@@ -1488,7 +1504,7 @@ used to convert keys.
 
 Another common issue is that in the last years OpenSSH has
 incorporated several new cyphers that are not supported by any version
-of C<libssh2> yet (though the incomming 1.8.1 may aliviate the
+of C<libssh2> yet (though the incoming 1.8.1 may aliviate the
 situation). Currently the best option from an interoperability
 standpoint is probably to stick to RSA key usage.
 
@@ -1500,10 +1516,9 @@ other hand security issues are found and reported far more
 frequently. That means that C<Net::SSH2>/C<libssh2> could be an easy
 attack vector.
 
-So, Net::SSH2 must be used with care only in trusted environments.
-
-More specifically, using it to connect to untrusted third party
-computers over the Internet may be a very bad idea!
+So, Net::SSH2 should be used only in trusted environments. More
+specifically, using it to connect to untrusted third party computers
+over the Internet is probably a very bad idea!
 
 =head1 SEE ALSO
 
@@ -1525,7 +1540,7 @@ L<Net::OpenSSH::Compat>.
 
 Copyright (C) 2005 - 2010 by David B. Robins (dbrobins@cpan.org).
 
-Copyright (C) 2010 - 2016 by Rafael Kitover (rkitover@cpan.org).
+Copyright (C) 2010 - 2020 by Rafael Kitover (rkitover@cpan.org).
 
 Copyright (C) 2011 - 2019 by Salvador FandiE<ntilde>o (salva@cpan.org).
 

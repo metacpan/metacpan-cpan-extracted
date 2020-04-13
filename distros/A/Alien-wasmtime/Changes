@@ -1,5 +1,8 @@
 Revision history for Alien-wasmtime},
 
+0.06      2020-04-12 14:07:38 -0600
+  - Use Build::Copy plugin (gh#8)
+
 0.05      2020-04-09 04:04:03 -0600
   - use ALIEN_WASMTIME_VERSION to override the version of
     wasmtime downloaded (gh#7)

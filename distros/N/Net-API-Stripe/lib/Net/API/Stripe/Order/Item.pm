@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Order/Item.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -45,6 +45,18 @@ Net::API::Stripe::Order::Item - A Stripe Order Item Object
 
 =head1 SYNOPSIS
 
+    my $item = $stripe->order_item({
+        amount => 2000,
+        currency => 'jpy',
+        description => 'Onsite support service',
+        parent => $order_object,
+        # hours
+        quantity => 200,
+        type => 'sku',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -59,18 +71,8 @@ A representation of the constituent items of any given order. Can be used to rep
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Order::Item> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -98,7 +100,7 @@ Description of the line item, meant to be displayable to the user (e.g., "Expres
 
 The ID of the associated object for this line item. Expandable if not null (e.g., expandable to a SKU).
 
-When expanded, this is a C<Net::API::Stripe::Order> object.
+When expanded, this is a L<Net::API::Stripe::Order> object.
 
 =item B<quantity> positive integer
 
@@ -117,7 +119,7 @@ The type of line item. One of sku, tax, shipping, or discount.
 	  "amount": 1500,
 	  "currency": "jpy",
 	  "description": "T-shirt",
-	  "parent": "sk_19eIKPCeyNCl6fY2Bxpfr8bb",
+	  "parent": "sk_fake123456789",
 	  "quantity": null,
 	  "type": "sku"
 	}
@@ -140,7 +142,7 @@ L<https://stripe.com/docs/api/order_items>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -1,3 +1,9 @@
+0.626   2020-01-31  Released-By: PERLANCAR; Urgency: low
+
+	- Avoid the use of From_str::alami date coercion for now as
+	  DateTime::Format::Alami is flaky.
+
+
 0.625   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update coerce rule names in Sah schemas.

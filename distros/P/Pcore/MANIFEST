@@ -7,17 +7,13 @@ README.md
 cpanfile
 lib/Build.PL
 lib/Pcore.pm
-lib/Pcore/API/AntiCaptcha.pm
-lib/Pcore/API/AntiCaptcha/Captcha.pm
 lib/Pcore/API/Bitbucket.pm
 lib/Pcore/API/Chrome.pm
 lib/Pcore/API/Chrome/Tab.pm
 lib/Pcore/API/Client.pm
-lib/Pcore/API/Cloudflare.pm
 lib/Pcore/API/Docker/Engine.pm
 lib/Pcore/API/Docker/Hub.pm
 lib/Pcore/API/Docker/Registry.pm
-lib/Pcore/API/Dynadot.pm
 lib/Pcore/API/Facebook.pm
 lib/Pcore/API/Facebook/Marketing.pm
 lib/Pcore/API/Facebook/User.pm
@@ -26,8 +22,6 @@ lib/Pcore/API/Git/Upstream.pm
 lib/Pcore/API/GitHub.pm
 lib/Pcore/API/Google/FCM.pm
 lib/Pcore/API/Google/OAuth.pm
-lib/Pcore/API/Majestic.pm
-lib/Pcore/API/Moz.pm
 lib/Pcore/API/Nginx.pm
 lib/Pcore/API/PAUSE.pm
 lib/Pcore/API/PDF.pm
@@ -42,6 +36,12 @@ lib/Pcore/API/S3.pm
 lib/Pcore/API/SMTP.pm
 lib/Pcore/API/Sitemap.pm
 lib/Pcore/API/Telegram/Bot.pm
+lib/Pcore/API/anticaptcha.pm
+lib/Pcore/API/anticaptcha/Captcha.pm
+lib/Pcore/API/cloudflare.pm
+lib/Pcore/API/dynadot.pm
+lib/Pcore/API/majestic.pm
+lib/Pcore/API/moz.pm
 lib/Pcore/App.pm
 lib/Pcore/App/API.pm
 lib/Pcore/App/API/Auth.pm
@@ -56,7 +56,6 @@ lib/Pcore/App/API/Backend/remote.pm
 lib/Pcore/App/API/Backend/sqlite.pm
 lib/Pcore/App/API/Base.pm
 lib/Pcore/App/API/Const.pm
-lib/Pcore/App/API/Methods.pm
 lib/Pcore/App/API/Node.pm
 lib/Pcore/App/API/Role/Admin/Settings.pm
 lib/Pcore/App/API/Role/Admin/SystemLog.pm
@@ -66,6 +65,7 @@ lib/Pcore/App/API/Role/Profile/Tokens.pm
 lib/Pcore/App/API/Role/Read.pm
 lib/Pcore/App/API/Role/Session.pm
 lib/Pcore/App/API/Role/Upload.pm
+lib/Pcore/App/API/Router.pm
 lib/Pcore/App/Controller.pm
 lib/Pcore/App/Controller/API.pm
 lib/Pcore/App/Controller/Webpack.pm

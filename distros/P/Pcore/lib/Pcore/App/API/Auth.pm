@@ -51,9 +51,9 @@ sub api_call ( $self, $method_id, @args ) {
     my $api = $self->{api};
 
     # get method
-    my $method_cfg = $api->{_method}->{$method_id};
+    my $method_cfg = $api->{router}->{method}->{$method_id};
 
-    my $obj = $api->{_obj}->{ $method_cfg->{class_name} };
+    my $obj = $api->{router}->{obj}->{ $method_cfg->{class_name} };
 
     my $method_name = $method_cfg->{local_method_name};
 
@@ -89,7 +89,7 @@ sub _api_can_call ( $self, $method_id ) {
 sub _check_permissions ( $self, $method_id ) {
 
     # find method
-    my $method_cfg = $self->{api}->{_method}->{$method_id};
+    my $method_cfg = $self->{api}->{router}->{method}->{$method_id};
 
     # method wasn't found
     return res [ 404, 'Method was not found' ] if !$method_cfg;

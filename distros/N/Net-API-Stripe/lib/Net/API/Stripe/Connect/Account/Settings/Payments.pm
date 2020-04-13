@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Settings/Payments.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -37,6 +37,12 @@ Net::API::Stripe::Connect::Account::Settings::Payments - A Stripe Account Settin
 
 =head1 SYNOPSIS
 
+    my $payments = $stripe->account->settings->payments({
+        statement_descriptor => 'Contract drafting',
+        statement_descriptor_kana => 'けいやくあんぶんさくせい'
+        statement_descriptor_kanji => '契約案文作成',
+    });
+
 =head1 VERSION
 
     0.1
@@ -45,24 +51,16 @@ Net::API::Stripe::Connect::Account::Settings::Payments - A Stripe Account Settin
 
 Settings used to configure the account within the Stripe dashboard.
 
+This is instantiated by method B<payments> from module L<Net::API::Stripe::Connect::Account::Settings>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Settings::Payments> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -87,7 +85,7 @@ The Kanji variation of the default text that appears on credit card statements w
 =head1 API SAMPLE
 
 	{
-	  "id": "acct_19eGgRCeyNCl6xYZ",
+	  "id": "acct_fake123456789",
 	  "object": "account",
 	  "business_profile": {
 		"mcc": null,
@@ -119,7 +117,7 @@ The Kanji variation of the default text that appears on credit card statements w
 	  "payouts_enabled": true,
 	  "settings": {
 		"branding": {
-		  "icon": "file_1DLf5rCeyNCl6fY2kS4e5hMT",
+		  "icon": "file_fake123456789",
 		  "logo": null,
 		  "primary_color": "#0e77ca"
 		},
@@ -170,7 +168,7 @@ L<https://stripe.com/docs/api/accounts/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

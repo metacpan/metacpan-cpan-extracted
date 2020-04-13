@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Coupon.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -63,13 +63,24 @@ Net::API::Stripe::Billing::Coupon - A Stripe Coupon Object
 
 =head1 SYNOPSIS
 
+    my $coupon = $stripe->coupons( create => 
+    {
+    id => 'SUMMER10POFF',
+    currency => 'usd',
+    duration_in_months => 2,
+    max_redemptions => 12,
+    name => 'Summer 10% reduction',
+    percent_off => 10,
+    valid => 1
+    }) || die( $stripe->error );
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-A coupon contains information about a percent-off or amount-off discount you might want to apply to a customer. Coupons may be applied to invoices (C<Net::API::Stripe::Billing::Invoice> / L<https://stripe.com/docs/api/coupons#invoices>) or orders (C<Net::API::Stripe::Order> / L<https://stripe.com/docs/api/coupons#create_order-coupon>). Coupons do not work with conventional one-off charges (C<Net::API::Stripe::Charge> / L<https://stripe.com/docs/api/coupons#create_charge>), but you can implement a custom coupon system (L<https://stripe.com/docs/recipes/coupons-for-charges>) in your application.
+A coupon contains information about a percent-off or amount-off discount you might want to apply to a customer. Coupons may be applied to invoices (L<Net::API::Stripe::Billing::Invoice> / L<https://stripe.com/docs/api/coupons#invoices>) or orders (L<Net::API::Stripe::Order> / L<https://stripe.com/docs/api/coupons#create_order-coupon>). Coupons do not work with conventional one-off charges (L<Net::API::Stripe::Charge> / L<https://stripe.com/docs/api/coupons#create_charge>), but you can implement a custom coupon system (L<https://stripe.com/docs/recipes/coupons-for-charges>) in your application.
 
 =head1 CONSTRUCTOR
 
@@ -77,18 +88,8 @@ A coupon contains information about a percent-off or amount-off discount you mig
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Billing::Coupon> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -206,7 +207,7 @@ L<https://stripe.com/docs/api/coupons/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

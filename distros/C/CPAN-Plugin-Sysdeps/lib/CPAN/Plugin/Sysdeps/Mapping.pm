@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 # shortcuts
 #  os and distros
@@ -332,7 +332,13 @@ sub mapping {
       #[os_freebsd,
       # [package => 'libofa']],
       [like_debian,
-       [package => 'libofa0-dev']]],
+       [package => 'libofa0-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^[68]\.},
+	package => []], # N/A for centos6+8
+       [package => 'libofa-devel']],
+     ],
 
      [cpanmod => 'Audio::Opusfile',
       [os_freebsd,
@@ -592,6 +598,11 @@ sub mapping {
        [package => 'augeas-devel']],
       [os_darwin,
        [package => 'augeas']],
+     ],
+
+     [cpanmod => 'Config::UCL',
+      [os_freebsd,
+       [package => 'libucl']],
      ],
 
      [cpanmod => 'Convert::Recode',
@@ -1056,7 +1067,11 @@ sub mapping {
       [like_debian,
        [package => 'pkg-config | pkgconf']],
       [like_fedora,
-       [package => 'pkgconfig']],
+       [linuxdistro => 'centos', linuxdistroversion => {'<', 8},
+	[package => 'pkgconfig']],
+       [linuxdistro => 'fedora', linuxdistroversion => {'<', 31},
+	[package => 'pkgconfig']],
+       [package => 'pkgconf-pkg-config']],
       [os_darwin,
        [package => 'pkg-config']],
      ],
@@ -1987,6 +2002,8 @@ sub mapping {
       [like_debian,
        [package => 'librdkafka-dev']],
       [like_fedora,
+       [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
+	package => []], # N/A for centos6
        [package => 'librdkafka-devel']],
       [os_darwin,
        [package => 'librdkafka']],
@@ -2319,6 +2336,14 @@ sub mapping {
 	[package => []], # not available before jessie
        ],
        [package => 'libnanomsg-dev']]],
+
+     [cpanmod => 'Neo4j::Bolt',
+      [like_debian,
+       [before_debian_stretch,
+	[package => []],
+       ],
+       [package => 'libneo4j-client-dev']],
+     ],
 
      [cpanmod => 'Net::Bluetooth',
       [like_debian,
@@ -2769,6 +2794,26 @@ sub mapping {
        [package => [qw(libXcursor-devel)]]], # XXX probably incomplete
      ],
 
+     [cpanmod => 'Primesieve',
+      [os_freebsd,
+       [osvers => {'>=', 11},
+	[package => 'primesieve']]],
+      [like_debian,
+       [before_ubuntu_xenial,
+	[package => []]],
+       [linuxdistrocodename => [qw(xenial)],
+	[package => 'libprimesieve6-dev']],
+       [linuxdistrocodename => [qw(stretch)],
+	[package => 'libprimesieve7-dev']],
+       [package => 'libprimesieve-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	package => []], # N/A for centos6,7,8
+       [package => 'primesieve-devel']],
+      [os_darwin,
+       [package => 'primesieve']],
+     ],
+
      [cpanmod => 'PulseAudio',
       [package => 'pulseaudio']],
 
@@ -2838,7 +2883,7 @@ sub mapping {
        [package => 'rpm-devel']],
      ],
 
-     [cpanmod => ['RPM4', 'URPM'],
+     [cpanmod => 'RPM4',
       [os_freebsd,
        [package => 'rpm4']],
       [like_debian,
@@ -2983,21 +3028,24 @@ sub mapping {
       [os_freebsd,
        [package => 'tcl86 | tcl85 | tcl84']],
       [like_debian,
-       [package => 'tcl8.5-dev']],
+       [package => 'tcl8.6-dev | tcl8.5-dev']],
       [like_fedora,
        [package => 'tcl-devel']],
      ],
 
      [cpanmod => 'Tcl::pTk',
       [os_freebsd,
-       [package => 'tk86 | tk85 | tk84']]], # XXX what about debian?
+       [package => 'tk86 | tk85 | tk84']],
+      [like_debian,
+       [package => ['tk8.6-dev | tk8.5-dev', 'tcl']]],
+     ],
 
      [cpanmod => 'Tcl::Tk', # XXX maybe also Tkx?
       [os_freebsd,
        [package => 'tk86 | tk85 | tk84']],
       [like_debian,
        # tcllib is needed for the snit package
-       [package => ['tk8.5-dev', 'tcllib']]],
+       [package => ['tk8.6-dev | tk8.5-dev', 'tcllib']]],
       [like_fedora,
        [package => ['tk', 'tcllib']]],
      ],
@@ -3088,6 +3136,17 @@ sub mapping {
        [package => 'libcsv-dev']],
       [like_fedora,
        [package => 'libcsv-devel']],
+     ],
+
+     [cpanmod => 'Text::Hspell',
+      [like_debian,
+       [before_ubuntu_trusty, # not available for wheezy
+	[package => []]],
+       [package => 'hspell']],
+      [like_fedora,
+       [linuxdistro => 'centos', linuxdistroversion => {'==', 8}, # not available (maybe not yet?) for CentOS8
+	[package => []]],
+       [package => 'hspell-devel']],
      ],
 
      [cpanmod => 'Text::Hunspell',
@@ -3204,12 +3263,15 @@ sub mapping {
       [os_darwin,
        [package => 'libstatgrab']]],
 
-     [cpanmod => 'URPM',
+     [cpanmod => ['URPM::Resolve', 'urpmi'],
+      [os_freebsd,
+       [package => 'rpm4']],
       [like_debian,
-       [package => 'librpm-dev']], # but does not work anyway with the librpm version as found on squeeze
+       [package => ['rpm', 'librpm-dev']]], # but does not work anyway with the librpm version as found on squeeze
       [like_fedora,
-       [package => 'rpm-devel']],
-      # XXX what about freebsd?
+       [package => ['rpm', 'rpm-build', 'rpm-devel']]],
+      [os_darwin,
+       [package => 'rpm']],
      ],
 
      [cpanmod => 'USB::LibUSB',

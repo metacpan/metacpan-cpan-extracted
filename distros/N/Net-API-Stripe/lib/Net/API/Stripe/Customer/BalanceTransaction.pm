@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Customer/BalanceTransaction.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -57,6 +57,31 @@ Net::API::Stripe::Customer::BalanceTransaction - A Stripe Customer Balance Trana
 
 =head1 SYNOPSIS
 
+    my $bt = $stripe->balance_transaction({
+        amount => 2000,
+        currency => 'jpy',
+        customer => $customer_object,
+        description => 'Payment for professional service',
+        invoice => $invoice_object,
+        metadata => { transaction_id => 123 },
+        type => 'initial',
+    });
+
+Crediting the customer:
+
+    my $bt = $stripe->balance_transaction({
+        amount => -2000,
+        credit_note => $credit_note_object,
+        currency => 'jpy',
+        customer => $customer_object,
+        description => 'Credit note for cancelled invoice',
+        invoice => $invoice_object,
+        metadata => { transaction_id => 123 },
+        type => 'credit_note',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -71,18 +96,8 @@ Each customer has a I<balance> value, which denotes a debit or credit that's aut
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Customer::BalanceTransaction> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -108,7 +123,7 @@ Time at which the object was created. Measured in seconds since the Unix epoch.
 
 =item B<credit_note> string (expandable)
 
-The ID of the credit note (if any) related to the transaction. When expanded this is a C<Net::API::Stripe::Billing::CreditNote> object.
+The ID of the credit note (if any) related to the transaction. When expanded this is a L<Net::API::Stripe::Billing::CreditNote> object.
 
 =item B<currency> currency
 
@@ -116,7 +131,7 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 =item B<customer> string (expandable)
 
-The ID of the customer the transaction belongs to. When expanded, this is a C<Net::API::Stripe::Customer> object.
+The ID of the customer the transaction belongs to. When expanded, this is a L<Net::API::Stripe::Customer> object.
 
 =item B<description> string
 
@@ -128,7 +143,7 @@ The customer’s balance after the transaction was applied. A negative value dec
 
 =item B<invoice> string (expandable)
 
-The ID of the invoice (if any) related to the transaction. When expanded, this is a C<Net::API::Stripe::Billing::Invoice> object.
+The ID of the invoice (if any) related to the transaction. When expanded, this is a L<Net::API::Stripe::Billing::Invoice> object.
 
 =item B<livemode> boolean
 
@@ -193,7 +208,7 @@ L<https://stripe.com/docs/api/customer_balance_transactions>, L<https://stripe.c
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

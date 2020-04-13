@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Refund.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -63,6 +63,17 @@ Net::API::Stripe::Refund - A Stripe Refund Object
 
 =head1 SYNOPSIS
 
+    my $refund = $stripe->refund({
+        amount => 2000,
+        charge => $charge_object,
+        currency => 'jpy',
+        description => 'Cancelled service order',
+        metadata => { transaction_id => 123, customer_id => 456 },
+        reason => 'requested_by_customer',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -77,18 +88,8 @@ Refund objects allow you to refund a charge that has previously been created but
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Refund> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -112,11 +113,11 @@ Amount, in JPY.
 
 Balance transaction that describes the impact on your account balance.
 
-When expanded, this is a C<Net::API::Stripe::Balance::Transaction> object.
+When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<charge> string (expandable)
 
-ID of the charge that was refunded. When expanded, this is a C<Net::API::Stripe::Charge> object.
+ID of the charge that was refunded. When expanded, this is a L<Net::API::Stripe::Charge> object.
 
 =item B<created> timestamp
 
@@ -132,7 +133,7 @@ An arbitrary string attached to the object. Often useful for displaying to users
 
 =item B<failure_balance_transaction> string (expandable)
 
-If the refund failed, this balance transaction describes the adjustment made on your account balance that reverses the initial balance transaction. This is a C<Net::API::Stripe::Balance::Transaction>
+If the refund failed, this balance transaction describes the adjustment made on your account balance that reverses the initial balance transaction. This is a L<Net::API::Stripe::Balance::Transaction>
 
 =item B<failure_reason> string
 
@@ -152,26 +153,26 @@ This is the transaction number that appears on email receipts sent for this refu
 
 =item B<source_transfer_reversal> string (expandable)
 
-The transfer reversal that is associated with the refund. Only present if the charge came from another Stripe account. See the Connect documentation for details. This is a C<Net::API::Stripe::Connect::Transfer::Reversal>
+The transfer reversal that is associated with the refund. Only present if the charge came from another Stripe account. See the Connect documentation for details. This is a L<Net::API::Stripe::Connect::Transfer::Reversal>
 
 =item B<status> string
 
-Status of the refund. For credit card refunds, this can be pending, succeeded, or failed. For other types of refunds, it can be pending, succeeded, failed, or canceled. Refer to our refunds documentation for more details.
+Status of the refund. For credit card refunds, this can be pending, succeeded, or failed. For other types of refunds, it can be pending, succeeded, failed, or canceled. Refer to L<Stripe refunds documentation|https://stripe.com/docs/refunds#failed-refunds> for more details.
 
 =item B<transfer_reversal> string (expandable)
 
-If the accompanying transfer was reversed, the transfer reversal object. Only applicable if the charge was created using the destination parameter. This is a C<Net::API::Stripe::Connect::Transfer::Reversal> object.
+If the accompanying transfer was reversed, the transfer reversal object. Only applicable if the charge was created using the destination parameter. This is a L<Net::API::Stripe::Connect::Transfer::Reversal> object.
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "re_1DQFAzCeyNCl6fY2Ntw9eath",
+	  "id": "re_fake123456789",
 	  "object": "refund",
 	  "amount": 30200,
-	  "balance_transaction": "txn_1DQFAzCeyNCl6fY2VBP8MxtZ",
-	  "charge": "ch_1DQFAHCeyNCl6fY2ugNKel6w",
+	  "balance_transaction": "txn_fake123456789",
+	  "charge": "ch_fake123456789",
 	  "created": 1540736617,
 	  "currency": "jpy",
 	  "metadata": {},
@@ -200,7 +201,7 @@ L<https://stripe.com/docs/api/refunds>, L<https://stripe.com/docs/refunds>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

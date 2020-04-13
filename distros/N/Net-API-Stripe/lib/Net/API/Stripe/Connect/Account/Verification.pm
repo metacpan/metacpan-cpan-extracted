@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Verification.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -51,15 +51,28 @@ Net::API::Stripe::Connect::Account::Verification - A Stripe Account Verification
 
 =head1 SYNOPSIS
 
+    my $check = $stripe->account->verification({
+        additional_document => $document_object,
+        details => 'Provided identity information could not be verified',
+        details_code => 'document_name_mismatch',
+        document => $document_object,
+        # For tax ids verification
+        # verified_address => '1-2-3 Kudan-minami, Chiyoda-ku, Tokyo 123-4567',
+        # verified_name => 'John Doe',
+        status => 'unverified',
+    });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-The Stripe API has changed considerably as of 2019-02-19. The original methods here were used previously in Stripe API as part of the account verification, but has been replaced by a C<Net::API::Stripe::Connect::Account::Requirements> module.
+The Stripe API has changed considerably as of 2019-02-19. The original methods here were used previously in Stripe API as part of the account verification, but has been replaced by a L<Net::API::Stripe::Connect::Account::Requirements> module.
 
 Instead, the new methods are used for person, or company verification, not account.
+
+This is instantiated by method B<tos_acceptance> from modules L<Net::API::Stripe::Connect::Account>, L<Net::API::Stripe::Connect::Account::Company>, L<Net::API::Stripe::Connect::Person>
 
 =head1 CONSTRUCTOR
 
@@ -67,18 +80,8 @@ Instead, the new methods are used for person, or company verification, not accou
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Verification> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -90,7 +93,7 @@ Toggles debug mode on/off
 
 A document showing address, either a passport, local ID card, or utility bill from a well-known utility company.
 
-This is a C<Net::API::Stripe::Connect::Account::Document> object.
+This is a L<Net::API::Stripe::Connect::Account::Document> object.
 
 =item B<details> string
 
@@ -104,7 +107,7 @@ One of document_address_mismatch, document_dob_mismatch, document_duplicate_type
 
 An identifying document for the person, either a passport or local ID card.
 
-This is a C<Net::API::Stripe::Connect::Account::Document> object.
+This is a L<Net::API::Stripe::Connect::Account::Document> object.
 
 =item B<status> string
 
@@ -128,11 +131,11 @@ Verified name.
 
 =item B<disabled_reason>
 
-This has been replaced with the method B<past_due> in C<Net::API::Stripe::Connect::Account::Requirements>
+This has been replaced with the method B<past_due> in L<Net::API::Stripe::Connect::Account::Requirements>
 
 =item B<due_by>
 
-This has been replaced with the method B<current_deadline> in C<Net::API::Stripe::Connect::Account::Requirements>
+This has been replaced with the method B<current_deadline> in L<Net::API::Stripe::Connect::Account::Requirements>
 
 =item B<fields_needed>
 
@@ -156,7 +159,7 @@ L<https://stripe.com/docs/api/accounts/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

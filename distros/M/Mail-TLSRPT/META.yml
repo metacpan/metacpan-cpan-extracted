@@ -28,6 +28,7 @@ requires:
   JSON: '0'
   Moo: '0'
   Net::IP: '0'
+  Prometheus::Tiny::Shared: '0'
   Text::CSV: '0'
   Type::Utils: '0'
   Types::Standard: '0'
@@ -39,6 +40,6 @@ requires:
 resources:
   bugtracker: https://github.com/marcbradshaw/mail-tls-rpt/issues
   repository: git://github.com/marcbradshaw/mail-tls-rpt.git
-version: 1.20200306.1
+version: 1.20200413.1
 x_generated_by_perl: v5.30.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,3 +1,11 @@
+0.474   2020-04-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow adding a reminded date to silence an anniversary.
+
+	- [bugfix] When listing anniversaries, forgot to load Org::Parser before
+          instantiating the parser.
+
+
 0.473   2020-02-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLIs: sort-org-headlines, reverse-org-headlines.

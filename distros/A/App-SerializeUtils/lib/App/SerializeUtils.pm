@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.161'; # VERSION
+our $VERSION = '0.162'; # VERSION
 
 1;
 # ABSTRACT: Utilities for serialization tasks
@@ -21,7 +21,7 @@ App::SerializeUtils - Utilities for serialization tasks
 
 =head1 VERSION
 
-This document describes version 0.161 of App::SerializeUtils (from Perl distribution App-SerializeUtils), released on 2018-11-19.
+This document describes version 0.162 of App::SerializeUtils (from Perl distribution App-SerializeUtils), released on 2020-04-10.
 
 =head1 SYNOPSIS
 
@@ -50,6 +50,8 @@ serialization:
 
 =item * L<dd2sereal>
 
+=item * L<dd2sexp>
+
 =item * L<dd2storable>
 
 =item * L<dd2yaml>
@@ -64,6 +66,8 @@ serialization:
 
 =item * L<json2sereal>
 
+=item * L<json2sexp>
+
 =item * L<json2storable>
 
 =item * L<json2yaml>
@@ -75,6 +79,8 @@ serialization:
 =item * L<phpser2json>
 
 =item * L<phpser2sereal>
+
+=item * L<phpser2sexp>
 
 =item * L<phpser2storable>
 
@@ -94,11 +100,27 @@ serialization:
 
 =item * L<sereal2phpser>
 
+=item * L<sereal2sexp>
+
 =item * L<sereal2storable>
 
 =item * L<sereal2yaml>
 
 =item * L<serializeutils-convert>
+
+=item * L<sexp2dd>
+
+=item * L<sexp2ddc>
+
+=item * L<sexp2json>
+
+=item * L<sexp2phpser>
+
+=item * L<sexp2sereal>
+
+=item * L<sexp2storable>
+
+=item * L<sexp2yaml>
 
 =item * L<storable2dd>
 
@@ -109,6 +131,8 @@ serialization:
 =item * L<storable2phpser>
 
 =item * L<storable2sereal>
+
+=item * L<storable2sexp>
 
 =item * L<storable2yaml>
 
@@ -121,6 +145,8 @@ serialization:
 =item * L<yaml2phpser>
 
 =item * L<yaml2sereal>
+
+=item * L<yaml2sexp>
 
 =item * L<yaml2storabls>
 
@@ -164,7 +190,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

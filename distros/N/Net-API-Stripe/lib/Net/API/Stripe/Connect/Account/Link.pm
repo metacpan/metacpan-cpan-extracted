@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Link.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -38,6 +38,11 @@ Net::API::Stripe::Connect::Account::Link - A Stripe Account Link Object
 
 =head1 SYNOPSIS
 
+    my $lnk = $stripe->account_link({
+        expires_at => '2020-06-01',
+        url => 'https://example.com/some/file.pdf',
+    });
+
 =head1 VERSION
 
     0.1
@@ -52,18 +57,8 @@ Account Links are the means by which a Connect platform grants a connected accou
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Link> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -95,7 +90,7 @@ The URL for the account link.
 	  "object": "account_link",
 	  "created": 1571480455,
 	  "expires_at": 1571480755,
-	  "url": "https://connect.stripe.com/setup/c/5wz6ikCMkOzs"
+	  "url": "https://connect.stripe.com/setup/c/mbmnjccbnmcbnmcb"
 	}
 
 =head1 HISTORY
@@ -116,7 +111,7 @@ L<https://stripe.com/docs/api/account_links>, L<https://stripe.com/docs/connect/
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

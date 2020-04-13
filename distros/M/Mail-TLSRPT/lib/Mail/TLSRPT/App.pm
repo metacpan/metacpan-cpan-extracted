@@ -1,6 +1,6 @@
 package Mail::TLSRPT::App;
 # ABSTRACT: App::Cmd base class
-our $VERSION = '1.20200306.1'; # VERSION
+our $VERSION = '1.20200413.1'; # VERSION
 use 5.20.0;
 use Mail::TLSRPT::Pragmas;
 use App::Cmd::Setup -app;
@@ -18,7 +18,7 @@ Mail::TLSRPT::App - App::Cmd base class
 
 =head1 VERSION
 
-version 1.20200306.1
+version 1.20200413.1
 
 =head1 AUTHOR
 

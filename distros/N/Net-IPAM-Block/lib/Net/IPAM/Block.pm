@@ -4,10 +4,11 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.09';
 
 use overload
   '""'     => sub { shift->to_string },
+  bool     => sub { 1 },
   fallback => 1;
 
 use Carp qw(croak);
@@ -98,7 +99,7 @@ sub new {
   my $self  = bless( {}, $_[0] );
   my $input = $_[1];
 
-  return $self->_fromIP($input) if blessed($input) && $input->isa('Net::IPAM::IP');
+  return $self->_fromIP($input) if ref $input;
 
   # handle CIDR: 2001:db8::/32
   my $idx = index( $input, '/' );
@@ -177,7 +178,7 @@ sub _fromAddr {
   my $mask_n = _make_mask_n( $bits, $bits );
 
   $self->{base} = $base;
-  $self->{last} = $base->clone;
+  $self->{last} = Net::IPAM::IP->new_from_bytes( $base->bytes );
   $self->{mask} = Net::IPAM::IP->new_from_bytes($mask_n);
 
   return $self;
@@ -188,13 +189,15 @@ sub _fromAddr {
 sub _fromIP {
   my ( $self, $base ) = @_;
 
+  return unless blessed($base) && $base->isa('Net::IPAM::IP');
+
   my $bits = 32;
   $bits = 128 if $base->version == 6;
 
   my $mask_n = _make_mask_n( $bits, $bits );
 
   $self->{base} = $base;
-  $self->{last} = $base->clone;
+  $self->{last} = Net::IPAM::IP->new_from_bytes( $base->bytes );
   $self->{mask} = Net::IPAM::IP->new_from_bytes($mask_n);
 
   return $self;
@@ -221,7 +224,7 @@ Returns the block in canonical form.
   say Net::IPAM::Block->new('1.2.3.4-1.2.3.36')->to_string;   # 1.2.3.4-1.2.3.36
   say Net::IPAM::Block->new('127.0.0.1')->to_string;          # 127.0.0.1/32
 
-Stringification is overloaded with C<to_string>
+Stringification is overloaded with L</"to_string">
 
   my $b = Net::IPAM::Block->new('fe80::/10');
   say $b;                                      # fe80::/10
@@ -505,11 +508,11 @@ not so obvious for ranges:
 =cut
 
 sub bitlen {
-	my $self = shift;
+  my $self = shift;
   my $bits = 32;
   $bits = 128 if $self->version == 6;
 
-  return _bitlen($self->{base}->bytes, $self->{last}->bytes, $bits);
+  return _bitlen( $self->{base}->bytes, $self->{last}->bytes, $bits );
 }
 
 =head2 iter
@@ -730,7 +733,7 @@ sub find_free_cidrs {
   my @free;
 
   # start with outer block, split them to find free cidrs
-  my @candidates = ($outer->to_cidrs);
+  my @candidates = ( $outer->to_cidrs );
 
   while (@candidates) {
     my $this = shift @candidates;
@@ -941,6 +944,22 @@ sub aggregate {
 
   return wantarray ? @cidrs : [@cidrs];
 }
+
+=head1 OPERATORS
+
+L<Net::IPAM::Block> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$block;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$block";
+
+Alias for L</"to_string">.
 
 =head1 AUTHOR
 

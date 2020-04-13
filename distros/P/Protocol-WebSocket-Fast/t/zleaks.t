@@ -16,7 +16,7 @@ my %exclude = map {$_ => 1} qw/zleaks.t bug-SRV-1608.t/;
 my @files;
 
 if ($ENV{LEAK_FILE}) { push @files, $ENV{LEAK_FILE}; }
-else { @files = grep { !$exclude{$_} } map { substr($_, 2) } <t/*.t>; }
+else { @files = grep { !$exclude{$_} } map { substr($_, 2) } <t/*.t>, <t/*/*.t>; }
 
 test_leak(1, [@files], 200);
 

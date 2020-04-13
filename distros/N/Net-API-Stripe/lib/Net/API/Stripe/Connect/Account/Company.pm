@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Company.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -60,6 +60,35 @@ Net::API::Stripe::Connect::Account::Company - A Stripe Company Object
 
 =head1 SYNOPSIS
 
+    my $cie = $stripe->account->company({
+        address => $stripe->address({
+            line1 => '1-2-3 Kudan-Minami, Chiyoda-ku',
+            line2 => 'Big Bldg 12F',
+            city => 'Tokyo',
+            postal_code => '123-4567',
+            country => 'jp',
+        }),
+	   address_kana => $stripe->address({
+		   line1 => 'ちよだくくだんみなみ1-2-3',
+		   line2 => 'だいびる12かい',
+		   city => 'とうきょうと',
+		   postal_code => '123-4567',
+		   country => 'jp',
+	   }),
+	   address_kanji => $stripe->address({
+		   line1 => '千代田区九段南1-2-3',
+		   line2 => '大ビル12階',
+		   city => '東京都',
+		   postal_code => '123-4567',
+		   country => 'jp',
+	   }),
+	   name => 'Yamato Nadehiko, Inc',
+	   name_kana => 'やまとなでひこかぶしきがいしゃ',
+	   name_kanji => '大和撫子株式会社',
+	   phone => '+81-(0)3-1234-5678',
+	   structure => 'private_corporation',
+    });
+
 =head1 VERSION
 
     0.1
@@ -68,24 +97,16 @@ Net::API::Stripe::Connect::Account::Company - A Stripe Company Object
 
 Settings used to apply the account’s branding to email receipts, invoices, Checkout, and other products.
 
+This is called from method B<company> in modules L<Net::API::Stripe::Connect::Account> and L<Net::API::Stripe::Issuing::Card::Holder>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Company> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -97,19 +118,19 @@ Toggles debug mode on/off
 
 The company’s primary address.
 
-This is a C<Net::API::Stripe::Address> object.
+This is a L<Net::API::Stripe::Address> object.
 
 =item B<address_kana> hash
 
 The Kana variation of the company’s primary address (Japan only).
 
-This is a C<Net::API::Stripe::Address> object.
+This is a L<Net::API::Stripe::Address> object.
  
 =item B<address_kanji> hash
 
 The Kanji variation of the company’s primary address (Japan only).
 
-This is a C<Net::API::Stripe::Address> object.
+This is a L<Net::API::Stripe::Address> object.
 
 =item B<directors_provided> boolean
 
@@ -185,14 +206,14 @@ Whether the company’s business VAT number was provided.
 
 =item B<verification> hash
 
-Information on the verification state of the company. This is a C<Net::API::Stripe::Connect::Account::Verification> object.
+Information on the verification state of the company. This is a L<Net::API::Stripe::Connect::Account::Verification> object.
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "acct_19eGgRCeyNCl6xYZ",
+	  "id": "acct_fake123456789",
 	  "object": "account",
 	  "business_profile": {
 		"mcc": null,
@@ -224,7 +245,7 @@ Information on the verification state of the company. This is a C<Net::API::Stri
 	  "payouts_enabled": true,
 	  "settings": {
 		"branding": {
-		  "icon": "file_1DLf5rCeyNCl6fY2kS4e5hMT",
+		  "icon": "file_fake123456789",
 		  "logo": null,
 		  "primary_color": "#0e77ca"
 		},
@@ -281,7 +302,7 @@ L<https://stripe.com/docs/api/accounts/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

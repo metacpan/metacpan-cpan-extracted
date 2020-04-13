@@ -1,9 +1,9 @@
 package App::FirefoxUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-10'; # DATE
+our $DATE = '2020-04-11'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -96,7 +96,7 @@ App::FirefoxUtils - Utilities related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.007 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2019-12-10.
+This document describes version 0.008 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2020-04-11.
 
 =head1 SYNOPSIS
 
@@ -145,6 +145,7 @@ Arguments ('*' denotes required arguments):
 
 Kill browser processes that belong to certain user(s) only.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -170,11 +171,11 @@ Pause (kill -STOP) Firefox.
 
 A modern browser now runs complex web pages and applications. Despite browser's
 power management feature, these pages/tabs on the browser often still eat
-considerable CPU cycles even though they run in the background. Stopping (kill
--STOP) the browser processes is a simple and effective way to stop CPU eating on
-Unix. It can be performed whenever you are not using your browsers for a little
-while, e.g. when you are typing on an editor or watching a movie. When you want
-to use your browser again, simply unpause it.
+considerable CPU cycles even though they only run in the background. Stopping
+(kill -STOP) the browser processes is a simple and effective way to stop CPU
+eating on Unix. It can be performed whenever you are not using your browsers for
+a little while, e.g. when you are typing on an editor or watching a movie. When
+you want to use your browser again, simply unpause it.
 
 This function is not exported.
 
@@ -185,6 +186,7 @@ Arguments ('*' denotes required arguments):
 =item * B<users> => I<array[unix::local_uid]>
 
 Kill browser processes that belong to certain user(s) only.
+
 
 =back
 
@@ -219,6 +221,7 @@ Arguments ('*' denotes required arguments):
 
 Kill browser processes that belong to certain user(s) only.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -251,6 +254,7 @@ Arguments ('*' denotes required arguments):
 =item * B<users> => I<array[unix::local_uid]>
 
 Kill browser processes that belong to certain user(s) only.
+
 
 =back
 
@@ -285,6 +289,7 @@ Arguments ('*' denotes required arguments):
 
 Kill browser processes that belong to certain user(s) only.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -304,7 +309,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Firefo
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-FirefoxUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-ManUtils>.
 
 =head1 BUGS
 
@@ -333,7 +338,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

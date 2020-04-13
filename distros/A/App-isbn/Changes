@@ -1,10 +1,15 @@
-0.002   2018-08-23 (PERLANCAR)
+0.003   2020-04-10  Released-By: PERLANCAR
+
+        - [build] Rebuild to update Sah coerce rule module names.
+
+
+0.002   2018-08-23  Released-By: PERLANCAR
 
 	- Avoid perl undef warning.
 
 	- Use isbn schema.
 
 
-0.001   2018-08-02 (PERLANCAR)
+0.001   2018-08-02  Released-By: PERLANCAR
 
         - First release.

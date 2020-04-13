@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Business/Profile.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -46,6 +46,16 @@ Net::API::Stripe::Connect::Business::Profile - A Stripe Account Business Profile
 
 =head1 SYNOPSIS
 
+    my $profile = $stripe->account->business_profile({
+        name => 'Big Corp, Inc',
+        product_description => 'Professional services',
+        support_address => $address_object,
+        support_email => 'john.doe@example.com',
+        support_phone => '+81-(0)90-1234-5678',
+        support_url => 'https://example.com/support',
+        url => 'https://example.com',
+    });
+
 =head1 VERSION
 
     0.1
@@ -54,24 +64,16 @@ Net::API::Stripe::Connect::Business::Profile - A Stripe Account Business Profile
 
 Optional information related to the business.
 
+This is instantiated by method B<business_profile> from module L<Net::API::Stripe::Connect::Account>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Business::Profile> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -95,7 +97,7 @@ Internal-only description of the product sold or service provided by the busines
 
 A publicly available mailing address for sending support issues to.
 
-This is a C<Net::API::Stripe::Address> object.
+This is a L<Net::API::Stripe::Address> object.
 
 =item B<support_email> string
 
@@ -122,7 +124,7 @@ This is a C<URI> object.
 =head1 API SAMPLE
 
 	{
-	  "id": "acct_19eGgRCeyNCl6xYZ",
+	  "id": "acct_fake123456789",
 	  "object": "account",
 	  "business_profile": {
 		"mcc": null,
@@ -190,9 +192,9 @@ This is a C<URI> object.
 		"object": "list",
 		"data": [
 		  {
-			"id": "ba_19eGy1CeyNCl6fY2R3ACmqG4",
+			"id": "ba_fake123456789",
 			"object": "bank_account",
-			"account": "acct_19eGgRCeyNCl6xYZ",
+			"account": "acct_fake123456789",
 			"account_holder_name": "カ）マイショップインク",
 			"account_holder_type": null,
 			"bank_name": "三井住友銀行",
@@ -207,7 +209,7 @@ This is a C<URI> object.
 		  }
 		],
 		"has_more": false,
-		"url": "/v1/accounts/acct_19eGgRCeyNCl6xYZ/external_accounts"
+		"url": "/v1/accounts/acct_fake123456789/external_accounts"
 	  },
 	  "metadata": {},
 	  "payouts_enabled": true,
@@ -221,7 +223,7 @@ This is a C<URI> object.
 	  },
 	  "settings": {
 		"branding": {
-		  "icon": "file_1DLf5rCeyabl6fY2kS4e5xyz",
+		  "icon": "file_fake123456789",
 		  "logo": null,
 		  "primary_color": "#0e77ca"
 		},
@@ -277,7 +279,7 @@ L<https://stripe.com/docs/api/accounts/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

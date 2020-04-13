@@ -8,7 +8,7 @@ package Net::SMTPS;
 
 use vars qw ( $VERSION @ISA );
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 use strict;
 use base qw ( Net::SMTP );
@@ -172,7 +172,7 @@ sub auth {
 	    $self->debug_print(1, "AUTH-server offerred: ". $sv . "\n") if $self->debug;
 
 	    foreach my $i (@cl_mech) {
-		if (index($sv, $i) >= 0 && grep(/$i/i, @matched) == () ) {
+		if (index($sv, $i) >= 0 && !grep(/$i/i, @matched)) {
 		    push @matched, uc($i);
 		}
 	    }
@@ -277,7 +277,7 @@ Tomo.M <tomo at cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2017 Tomo.M All rights reserved.
+Copyright (c) 2020 Tomo.M All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

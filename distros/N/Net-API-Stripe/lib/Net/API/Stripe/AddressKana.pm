@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/AddressKana.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -30,13 +30,21 @@ Net::API::Stripe::AddressKana - A Stripe Japanese Address Object
 
 =head1 SYNOPSIS
 
+   my $addr = $stripe->address({
+       line1 => 'ちよだくくだんみなみ1-2-3',
+       line2 => 'だいびる12かい',
+       city => 'とうきょうと',
+       postal_code => '123-4567',
+       country => 'jp',
+   });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-This module inherits everything from C<Net::API::Stripe::Address>
+This module inherits everything from L<Net::API::Stripe::Address>
 
 This is used to store the address in its kana version.
 
@@ -52,7 +60,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

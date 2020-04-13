@@ -39,4 +39,20 @@ class Point {
       'anon method' );
 }
 
+# nested anon method (RT132321)
+{
+   class RT132321 {
+      has $_genvalue;
+
+      method BUILD {
+         $_genvalue = method { 123 };
+      }
+
+      method value { $self->$_genvalue() }
+   }
+
+   my $obj = RT132321->new;
+   is( $obj->value, 123, '$obj->value from BUILD-generated anon method' );
+}
+
 done_testing;

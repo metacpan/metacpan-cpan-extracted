@@ -70,20 +70,21 @@ Net::API::Stripe::Billing::CreditNote::LineItem - Stripe API Credit note Line It
 
 =head1 DESCRIPTION
 
+	my $credit_line = $stripe->credit_note_line_item({
+		amount => 2000,
+		description => 'Credit note line text',
+		discount_amount => 500,
+		quantity => 2,
+		type => 'invoice_line_item',
+	});
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %arg )
 
-Creates a new C<Net::API::Stripe::Billing::CreditNote::LineItem> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Billing::CreditNote::LineItem> object
 
 =back
 
@@ -168,12 +169,12 @@ Same as unit_amount, but contains a decimal value with at most 12 decimal places
 =head1 API SAMPLE
 
 	{
-	  "id": "cnli_1G47bpCeyNCl6fY2uOLkJD9x",
+	  "id": "cnli_fake124567890",
 	  "object": "credit_note_line_item",
 	  "amount": 1000,
 	  "description": "My First Invoice Item (created for API docs)",
 	  "discount_amount": 0,
-	  "invoice_line_item": "il_1G47bpCeyNCl6fY2HsPtoc57",
+	  "invoice_line_item": "il_fake124567890",
 	  "livemode": false,
 	  "quantity": 1,
 	  "tax_amounts": [],
@@ -213,11 +214,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<https://stripe.com/docs/api/credit_notes/line_item>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2020 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2020 DEGUEST Pte. Ltd.
 
 All rights reserved
 

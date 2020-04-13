@@ -1,9 +1,9 @@
 package App::VivaldiUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-10'; # DATE
+our $DATE = '2020-04-11'; # DATE
 our $DIST = 'App-VivaldiUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -96,7 +96,7 @@ App::VivaldiUtils - Utilities related to the Vivaldi browser
 
 =head1 VERSION
 
-This document describes version 0.003 of App::VivaldiUtils (from Perl distribution App-VivaldiUtils), released on 2019-12-10.
+This document describes version 0.004 of App::VivaldiUtils (from Perl distribution App-VivaldiUtils), released on 2020-04-11.
 
 =head1 SYNOPSIS
 
@@ -149,6 +149,7 @@ Arguments ('*' denotes required arguments):
 
 Kill browser processes that belong to certain user(s) only.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -181,6 +182,7 @@ Arguments ('*' denotes required arguments):
 =item * B<users> => I<array[unix::local_uid]>
 
 Kill browser processes that belong to certain user(s) only.
+
 
 =back
 
@@ -215,6 +217,7 @@ Arguments ('*' denotes required arguments):
 
 Kill browser processes that belong to certain user(s) only.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -247,6 +250,7 @@ Arguments ('*' denotes required arguments):
 =item * B<users> => I<array[unix::local_uid]>
 
 Kill browser processes that belong to certain user(s) only.
+
 
 =back
 
@@ -284,6 +288,7 @@ Arguments ('*' denotes required arguments):
 =item * B<users> => I<array[unix::local_uid]>
 
 Kill browser processes that belong to certain user(s) only.
+
 
 =back
 
@@ -333,7 +338,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

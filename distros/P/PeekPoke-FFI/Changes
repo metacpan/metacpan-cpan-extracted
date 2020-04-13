@@ -1,5 +1,9 @@
 Revision history for PeekPoke-FFI},
 
+0.02      2020-04-13 06:47:21 -0600
+  - Fix bug in poke where it was only getting one byte for types
+    with more than one byte (gh#2)
+
 0.01      2020-04-09 10:58:53 -0600
   - initial version
 

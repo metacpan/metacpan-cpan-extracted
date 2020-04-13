@@ -10,7 +10,7 @@ use File::Temp qw( tempdir );
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '2.19'; # VERSION
+our $VERSION = '2.21'; # VERSION
 
 
 has '+format' => 'tar';
@@ -337,7 +337,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 2.19
+version 2.21
 
 =head1 SYNOPSIS
 

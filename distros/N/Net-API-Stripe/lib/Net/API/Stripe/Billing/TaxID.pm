@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/TaxID.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/12/19
 ## Modified 2019/12/19
@@ -49,6 +49,13 @@ Net::API::Stripe::Billing::TaxID - A Stripe Customer Tax ID Object
 
 =head1 SYNOPSIS
 
+    my $tax = $stripe->tax_id({
+        country => 'jp',
+        customer => $customer_object,
+        # or maybe 'unknown'
+        type => 'eu_vat',
+    });
+
 =head1 VERSION
 
     0.1
@@ -65,18 +72,8 @@ See Customer Tax Identification Numbers L<https://stripe.com/docs/billing/taxes/
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Billing::TaxID> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -102,7 +99,7 @@ Time at which the object was created. Measured in seconds since the Unix epoch.
 
 =item B<customer> string (expandable)
 
-ID of the customer. When expanded, this is a C<Net::API::Stripe::Customer> object.
+ID of the customer. When expanded, this is a L<Net::API::Stripe::Customer> object.
 
 =item B<livemode> boolean
 
@@ -145,7 +142,7 @@ Verified name.
 	  "object": "tax_id",
 	  "country": "DE",
 	  "created": 123456789,
-	  "customer": "cus_G7ucGt79A501bC",
+	  "customer": "cus_fake123456789",
 	  "livemode": false,
 	  "type": "eu_vat",
 	  "value": "DE123456789",
@@ -181,7 +178,7 @@ L<https://stripe.com/docs/billing/taxes/tax-ids>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -31,8 +31,8 @@ requires:
   Data::Sah::Coerce::perl::To_date::From_float::epoch_always: '0'
   Data::Sah::Coerce::perl::To_date::From_obj::datetime: '0'
   Data::Sah::Coerce::perl::To_date::From_obj::time_moment: '0'
-  Data::Sah::Coerce::perl::To_date::From_str::alami_en: '0'
   Data::Sah::Coerce::perl::To_date::From_str::iso8601: '0'
+  Data::Sah::Coerce::perl::To_date::From_str::natural: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::date: '0'
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Git-Bunch
   homepage: https://metacpan.org/release/Git-Bunch
   repository: git://github.com/perlancar/perl-Git-Bunch.git
-version: '0.625'
+version: '0.626'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -175,7 +175,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -315,7 +315,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -329,7 +329,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

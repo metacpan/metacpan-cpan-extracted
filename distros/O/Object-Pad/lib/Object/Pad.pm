@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp;
 
@@ -19,7 +19,7 @@ XSLoader::load( __PACKAGE__, $VERSION );
 require feature;
 if( $] >= 5.020 ) {
    require experimental;
-   require indirect;
+   require indirect if $] < 5.031009;
 }
 
 require mro;
@@ -40,7 +40,7 @@ C<Object::Pad> - a simple syntax for lexical slot-based objects
         ($x, $y) = @_;
       }
 
-      method move($dX, $dY) {
+      method move ($dX, $dY) {
          $x += $dX;
          $y += $dY;
       }
@@ -187,7 +187,7 @@ The C<signatures> feature is automatically enabled for method declarations. In
 this case the signature does not have to account for the invocant instance; 
 that is handled directly.
 
-   method m($one, $two) {
+   method m ($one, $two) {
       say "$self invokes method on one=$one two=$two";
    }
 
@@ -217,7 +217,7 @@ C<class> block acts as if the following pragmata are in effect:
 
    use strict;
    use warnings;
-   no indirect ':fatal';
+   no indirect ':fatal';  # or  no feature 'indirect' on perl 5.32 onwards
    use feature 'signatures';
 
 This list may be extended in subsequent versions to add further restrictions
@@ -411,7 +411,7 @@ async subs which await expressions:
 
    class Example
    {
-      async method perform($block)
+      async method perform ($block)
       {
          say "$self is performing code";
          await $block->();

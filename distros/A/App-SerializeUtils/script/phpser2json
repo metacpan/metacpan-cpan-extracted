@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-11-19'; # DATE
-our $VERSION = '0.161'; # VERSION
+our $DATE = '2020-04-10'; # DATE
+our $VERSION = '0.162'; # VERSION
 
 use 5.010001;
 use strict;
@@ -56,26 +56,29 @@ PARSE_INPUT: {
     if ($from =~ /\A(dd?)\z/) {
         if ($Opts{safe}) {
             require Data::Undump;
-            $code_from = 'Data::Undump::undump(~~<>)';
+            $code_from = 'Data::Undump::undump(scalar <>)';
         } else {
-            $code_from = 'eval ~~<>';
+            $code_from = 'eval scalar <>';
         }
     } elsif ($from eq 'json') {
         require JSON::MaybeXS;
-        $code_from = 'JSON::MaybeXS->new->allow_nonref->decode(~~<>)';
+        $code_from = 'JSON::MaybeXS->new->allow_nonref->decode(scalar <>)';
     } elsif ($from eq 'phpser') {
         require PHP::Serialization;
-        $code_from = 'PHP::Serialization::unserialize(~~<>)';
+        $code_from = 'PHP::Serialization::unserialize(scalar <>)';
     } elsif ($from eq 'sereal') {
         require Sereal::Decoder;
-        $code_from = 'Sereal::Decoder::decode_sereal(~~<>)';
+        $code_from = 'Sereal::Decoder::decode_sereal(scalar <>)';
+    } elsif ($from eq 'sexp') {
+        require SExpression::Decode::Marpa;
+        $code_from = 'SExpression::Decode::Marpa::from_sexp(scalar <>)';
     } elsif ($from eq 'storable') {
         require Storable;
-        $code_from = 'Storable::thaw(~~<>)';
+        $code_from = 'Storable::thaw(scalar <>)';
     } elsif ($from eq 'yaml') {
         no warnings 'once';
         require YAML::Syck; $YAML::Syck::ImplicitTyping = 1;
-        $code_from = 'YAML::Syck::Load(~~<>)';
+        $code_from = 'YAML::Syck::Load(scalar <>)';
     } else {
         die "serializeutils-convert: Can't convert from '$from'\n";
     }
@@ -114,6 +117,9 @@ OUTPUT: {
     } elsif ($to eq 'sereal') {
         require Sereal::Encoder;
         $code_to = "Sereal::Encoder::encode_sereal($code_from)";
+    } elsif ($to eq 'sexp') {
+        require Data::Dump::SExpression;
+        $code_to = "Data::Dump::SExpression::dump_sexp($code_from)";
     } elsif ($to eq 'storable') {
         require Storable;
         $code_to = "Storable::freeze($code_from)";
@@ -149,7 +155,7 @@ phpser2json - Convert between serialization formats
 
 =head1 VERSION
 
-This document describes version 0.161 of phpser2json (from Perl distribution App-SerializeUtils), released on 2018-11-19.
+This document describes version 0.162 of phpser2json (from Perl distribution App-SerializeUtils), released on 2020-04-10.
 
 =head1 SYNOPSIS
 
@@ -333,7 +339,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

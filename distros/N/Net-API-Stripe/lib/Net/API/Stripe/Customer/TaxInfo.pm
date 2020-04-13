@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Customer/TaxInfo.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -35,6 +35,11 @@ Net::API::Stripe::Customer::TaxInfo - A Stripe Customer Tax Info (deprecated)
 
 =head1 SYNOPSIS
 
+    my $tx_info = $stripe->customer->tax_info({
+        tax_id => 'EU123456789',
+        type => 'vat',
+    });
+
 =head1 VERSION
 
     0.1
@@ -43,24 +48,16 @@ Net::API::Stripe::Customer::TaxInfo - A Stripe Customer Tax Info (deprecated)
 
 The customer’s tax information. Appears on invoices emailed to this customer. This parameter has been deprecated and will be removed in a future API version, for further information view the migration guide (L<https://stripe.com/docs/billing/migration/taxes#moving-from-taxinfo-to-customer-tax-ids>).
 
+This is instantiated by method B<tax_info> in module L<Net::API::Stripe::Customer>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Customer::TaxInfo> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -81,7 +78,7 @@ The type of ID number. The only possible value is vat
 =head1 API SAMPLE
 
 	{
-	  "id": "cus_G4gOz1jqVe40Bg",
+	  "id": "cus_fake123456789",
 	  "object": "customer",
 	  "address": null,
 	  "balance": 0,
@@ -108,20 +105,20 @@ The type of ID number. The only possible value is vat
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/customers/cus_G4gOz1jqVe40Bg/sources"
+		"url": "/v1/customers/cus_fake123456789/sources"
 	  },
 	  "subscriptions": {
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/customers/cus_G4gOz1jqVe40Bg/subscriptions"
+		"url": "/v1/customers/cus_fake123456789/subscriptions"
 	  },
 	  "tax_exempt": "none",
 	  "tax_ids": {
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/customers/cus_G4gOz1jqVe40Bg/tax_ids"
+		"url": "/v1/customers/cus_fake123456789/tax_ids"
 	  },
 	  "tax_info": null,
 	  "tax_info_verification": null
@@ -141,11 +138,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Stripe API documentation:
 
-L<https://stripe.com/docs/api/customers/create>, L<>https://stripe.com/docs/billing/migration/taxes#moving-from-taxinfo-to-customer-tax-ids
+L<https://stripe.com/docs/api/customers/create>, L<https://stripe.com/docs/billing/migration/taxes#moving-from-taxinfo-to-customer-tax-ids>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

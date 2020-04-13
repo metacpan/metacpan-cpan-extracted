@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Number.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -107,11 +107,17 @@ sub init
 {
 	my $self = shift( @_ );
 	my $num  = shift( @_ );
+	use utf8;
+	$self->{thousand}	= ',';
+	$self->{decimal}	= '.';
+	$self->{symbol}		= '¥';
+	$self->{precision}	= 0;
 	$self->SUPER::init( @_ );
 	$self->{_fmt} = Number::Format->new(
-		-thousands_sep => ',',
-		-decimal_point => '.',
-		-int_curr_symbol => '¥',
+		-thousands_sep => $self->{thousand},
+		-decimal_point => $self->{decimal},
+		-int_curr_symbol => $self->{currency},
+		-decimal_digits => $self->{precision},
 	);
 	$self->{_number} = $num;
 	return( $self );
@@ -163,32 +169,38 @@ Net::API::Stripe::Number - A Number Object
 
 =head1 SYNOPSIS
 
+	my $num = Net::API::Stripe::Number( 2000 );
+	print( $num->format_money( 0, '¥' ), "\n" );
+	## Resulting in ¥2,000
+
+Or
+
+	## For France standard
+	my $num = Net::API::Stripe::Number( 2000, 
+	{
+	thousand => '.',
+	decimal => ',',
+	precision => 2,
+	symbol => '€',
+	});
+	print( $num->format_money(), "\n" );
+	## Will produce: €2.000,00
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-This is a convenient wrapper around C<Number::Format> object. It does not inherit, but still you can use all of the C<Number::Format> method directly from here thanks to AUTOLOAD.
+This is a convenient wrapper around L<Number::Format> object. It does not inherit, but still you can use all of the L<Number::Format> method directly from here thanks to AUTOLOAD.
 
 =head1 CONSTRUCTOR
 
 =over 4
 
-=item B<new>( %ARG )
+=item B<new>( Number, %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Given a number this creates a new L<Net::API::Stripe> objects.
 
 =back
 
@@ -204,13 +216,13 @@ This returns the original number
 
 This calls C<Number::Format::format_number> method passing it the original number and any extra arguments.
 
-For details of what arguments to provide, check the C<Number::Format> documentation.
+For details of what arguments to provide, check the L<Number::Format> documentation.
 
 =item B<format_money>
 
 This calls C<Number::Format::format_price> method passing it the original number and any extra arguments.
 
-For details of what arguments to provide, check the C<Number::Format> documentation.
+For details of what arguments to provide, check the L<Number::Format> documentation.
 
 =back
 
@@ -226,11 +238,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-C<Number::Format>
+L<Number::Format>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

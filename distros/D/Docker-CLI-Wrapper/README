@@ -1,5 +1,5 @@
 This archive contains the distribution Docker-CLI-Wrapper,
-version 0.0.4:
+version 0.0.5:
 
   a wrapper for the CLI of docker and compatible tools.
 

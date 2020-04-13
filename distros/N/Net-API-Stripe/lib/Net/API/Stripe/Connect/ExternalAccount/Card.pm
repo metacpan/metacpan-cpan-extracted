@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/ExternalAccount/Card.pm
-## Version 0.1
+## Version 0.2
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2019/11/02
+## Modified 2020/04/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = '0.2';
 };
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
@@ -24,6 +24,8 @@ sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
 sub account { return( shift->_set_get_scalar_or_object( 'account', 'Net::API::Stripe::Connect::Account', @_ ) ); }
+
+sub address { return( shift->_address_populate( @_ ) ); }
 
 sub address_city { return( shift->_set_get_scalar( 'address_city', @_ ) ); }
 
@@ -106,9 +108,49 @@ Net::API::Stripe::Connect::ExternalAccount::Card - A Stripe Card Account Object
 
 =head1 SYNOPSIS
 
+    my $card = $stripe->card({
+        account => 'acct_fake123456789',
+        # Or you can also simply pass a Net::API::Stripe::Address object
+        # address => $address_object
+        address_line1 => '1-2-3 Kudan-Minami, Chiyoda-ku',
+        address_line2 => 'Big bldg. 12F',
+        address_city => 'Tokyo',
+        address_zip => '123-4567',
+        address_country => 'jp',
+        brand => 'visa',
+        country => 'jp',
+        currency => 'jpy',
+        customer => $customer_object,
+        cvc => 123,
+        # Boolean
+        default_for_currency => 1,
+        exp_month => 12,
+        exp_year => 2030,
+        funding => 'debit',
+        metadata => { transaction_id => 123, customer_id => 456 },
+        name => 'John Doe',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects. For example:
+
+    my $stripe = Net::API::Stripe->new( conf_file => 'settings.json' ) | die( Net::API::Stripe->error );
+    my $stripe_card = $stripe->cards( create =>
+    {
+    account => 'acct_fake123456789',
+    external_account =>
+        {
+        object => 'card',
+        exp_month => 12,
+        exp_year => 2030,
+        number => '012345678',
+        },
+    default_for_currency => $stripe->true,
+    metadata => { transaction_id => 123, customer_id => 456 },
+    }) || die( $stripe->error );
+
 =head1 VERSION
 
-    0.1
+    0.2
 
 =head1 DESCRIPTION
 
@@ -122,18 +164,8 @@ Bank accounts (L<https://stripe.com/docs/api#customer_bank_account_object>) and 
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::ExternalAccount::Card> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -153,7 +185,11 @@ String representing the object’s type. Objects of the same type share the same
 
 The account this card belongs to. This attribute will not be in the card object if the card belongs to a customer or recipient instead.
 
-When expanded, this is a C<Net::API::Stripe::Connect::Account> object.
+When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
+
+=item B<address> L<Net::API::Stripe::Address> object or hash
+
+This is a helper method. Provided with either a L<Net::API::Stripe::Address> object or a hash with same properties, this will assign all the address_* properties by calling its method.
 
 =item B<address_city> string
 
@@ -225,7 +261,7 @@ Three-letter ISO code for currency. Only applicable on accounts (not customers o
 
 The customer that this card belongs to. This attribute will not be in the card object if the card belongs to an account or recipient instead.
 
-When expanded, this is a C<Net::API::Stripe::Customer> object.
+When expanded, this is a L<Net::API::Stripe::Customer> object.
 
 =item B<cvc> string
 
@@ -267,7 +303,7 @@ Details of the original PaymentMethod that created this object.
 
 =item B<installments> hash
 
-If present, this is a C<Net::API::Stripe::Payment::Installment> object. As of 2019-02-19, this is only used in Mexico though. See here for more information: L<https://stripe.com/docs/payments/installments>
+If present, this is a L<Net::API::Stripe::Payment::Installment> object. As of 2019-02-19, this is only used in Mexico though. See here for more information: L<https://stripe.com/docs/payments/installments>
 
 =item B<last4> string
 
@@ -291,13 +327,13 @@ The recipient that this card belongs to. This attribute will not be in the card 
 
 Since 2017, Stripe recipients have been replaced by Stripe accounts: L<https://stripe.com/docs/connect/recipient-account-migrations>
 
-So this is a Stripe account id, or if expanded, a C<Net::API::Stripe::Connect::Account> object.
+So this is a Stripe account id, or if expanded, a L<Net::API::Stripe::Connect::Account> object.
 
 =item B<three_d_secure> hash
 
 Populated if this transaction used 3D Secure authentication.
 
-This is an objectified hash reference, ie its key / value pairs can be accessed as virtual methods. It uses the virtal package C<Net::API::Stripe::Payment::3DSecure>
+This is an objectified hash reference, ie its key / value pairs can be accessed as virtual methods. It uses the virtal package L<Net::API::Stripe::Payment::3DSecure>
 
 =over 8
 
@@ -319,7 +355,7 @@ The version of 3D Secure that was used for this payment.
 
 Contains details on how this Card maybe be used for 3D Secure authentication.
 
-This is a virtual C<Net::API::Strip::Payment::3DUsage> object ie whereby each key can be accessed as methods.
+This is a virtual L<Net::API::Strip::Payment::3DUsage> object ie whereby each key can be accessed as methods.
 
 =over 8
 
@@ -337,7 +373,7 @@ If the card number is tokenized, this is the method that was used. Can be apple_
 
 If this Card is part of a card wallet, this contains the details of the card wallet.
 
-If present, this is a virtual package C<Net::API::Stripe::Payment::Wallet> object. The following data structure that can be accessed as chain objects is:
+If present, this is a virtual package L<Net::API::Stripe::Payment::Wallet> object. The following data structure that can be accessed as chain objects is:
 
 =over 4
 
@@ -459,7 +495,7 @@ If this is a visa_checkout card wallet, this hash contains details about the wal
 
 =over 4
 
-=item B<billing_address hash
+=item B<billing_address> hash
 
 Owner’s verified billing address. Values are verified or provided by the wallet directly (if supported) at the time of authorization or settlement. They cannot be set or mutated.
 
@@ -540,7 +576,7 @@ State/County/Province/Region.
 =head1 API SAMPLE
 
 	{
-	  "id": "card_1FVF3JCeyNCl6fY2zKx7HpoK",
+	  "id": "card_fake123456789",
 	  "object": "card",
 	  "address_city": null,
 	  "address_country": null,
@@ -557,7 +593,7 @@ State/County/Province/Region.
 	  "dynamic_last4": null,
 	  "exp_month": 8,
 	  "exp_year": 2020,
-	  "fingerprint": "x18XyLUPM6hub5xz",
+	  "fingerprint": "lkavkajndvkdvnj",
 	  "funding": "credit",
 	  "last4": "4242",
 	  "metadata": {},
@@ -570,6 +606,10 @@ State/County/Province/Region.
 =head2 v0.1
 
 Initial version
+
+=head2 v0.2
+
+Added the method B<address> to make it easy to pass a L<Net::API::Stripe::Address> object or an hash reference to populate automatically the properties I<address_line1>, I<address_line2>, I<address_city>, I<address_zip> and I<address_country>
 
 =head1 STRIPE HISTORY
 
@@ -589,7 +629,7 @@ L<https://stripe.com/docs/api/external_account_cards/object>, L<https://stripe.c
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '2.19'; # VERSION
+our $VERSION = '2.21'; # VERSION
 
 
 our @aliens;
@@ -193,7 +193,7 @@ sub xs_ok
   my @diag;
   my $dir = Alien::Build::Temp->newdir(
     TEMPLATE => 'test-alien-XXXXXX',
-    CLEANUP  => $^O eq 'MSWin32' ? 0 : 1,
+    CLEANUP  => $^O =~ /^(MSWin32|cygwin)$/ ? 0 : 1,
   );
   my $xs_filename = path($dir)->child('test.xs')->stringify;
   my $c_filename  = path($dir)->child("test.@{[ $xs->{c_ext} ]}")->stringify;
@@ -654,7 +654,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 2.19
+version 2.21
 
 =head1 SYNOPSIS
 

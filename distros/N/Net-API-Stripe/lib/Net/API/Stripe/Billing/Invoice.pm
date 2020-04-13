@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Invoice.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -167,6 +167,31 @@ Net::API::Stripe::Billing::Invoice - A Stripe Invoice
 
 =head1 SYNOPSIS
 
+    my $stripe = Net::API::Stripe->new( conf_file => './settings.json', expand => 'all' ) || die( Net::API::Stripe->error );
+    my $inv = $stripe->invoices( create => 
+    {
+    account_country => 'jp',
+    account_name => 'John Doe',
+    amount_due => 2000,
+    amount_paid => 500,
+    amount_remaining => 1500
+    billing => 'charge_automatically',
+    charge => 'ch_fake123456789',
+    currency => 'jpy',
+    customer => $customer_object,
+    customer_address => $stripe->address({
+        line1 => '1-2-3 Sugamo, Bukyo-ku',
+        line2 => 'Taro Bldg'.
+        city => 'Tokyo',
+        postal_code => '123-4567',
+        country => 'jp',
+		}),
+	customer_email => 'john.doe@example.com',
+	customer_name => 'John Doe',
+	description => 'Invoice for professional services',
+	due_date => '2020-04-01',
+    }) || die( $stripe->error );
+
 =head1 VERSION
 
     0.1
@@ -175,15 +200,15 @@ Net::API::Stripe::Billing::Invoice - A Stripe Invoice
 
 Invoices are statements of amounts owed by a customer, and are either generated one-off, or generated periodically from a subscription.
 
-They contain invoice items (C<Net::API::Stripe::Billing::Invoice::Item> / L<https://stripe.com/docs/api/invoices#invoiceitems>), and proration adjustments that may be caused by subscription upgrades/downgrades (if necessary).
+They contain invoice items (L<Net::API::Stripe::Billing::Invoice::Item> / L<https://stripe.com/docs/api/invoices#invoiceitems>), and proration adjustments that may be caused by subscription upgrades/downgrades (if necessary).
 
 If your invoice is configured to be billed through automatic charges, Stripe automatically finalizes your invoice and attempts payment. Note that finalizing the invoice, when automatic (L<https://stripe.com/docs/billing/invoices/workflow/#auto_advance>), does not happen immediately as the invoice is created. Stripe waits until one hour after the last webhook was successfully sent (or the last webhook timed out after failing). If you (and the platforms you may have connected to) have no webhooks configured, Stripe waits one hour after creation to finalize the invoice.
 
 If your invoice is configured to be billed by sending an email, then based on your email settings, Stripe will email the invoice to your customer and await payment. These emails can contain a link to a hosted page to pay the invoice.
 
-Stripe applies any customer credit on the account before determining the amount due for the invoice (i.e., the amount that will be actually charged). If the amount due for the invoice is less than Stripe's minimum allowed charge per currency (L<https://stripe.com/docs/currencies#minimum-and-maximum-charge-amounts>), the invoice is automatically marked paid, and we add the amount due to the customer's running account balance which is applied to the next invoice.
+Stripe applies any customer credit on the account before determining the amount due for the invoice (i.e., the amount that will be actually charged). If the amount due for the invoice is less than L<Stripe's minimum allowed charge per currency|https://stripe.com/docs/currencies#minimum-and-maximum-charge-amounts>, the invoice is automatically marked paid, and Stripe adds the amount due to the customer's running account balance which is applied to the next invoice.
 
-More details on the customer's account balance are here (L<https://stripe.com/docs/api/customers/object#customer_object-account_balance>).
+More details on the customer's account balance are L<here|https://stripe.com/docs/api/customers/object#customer_object-account_balance>.
 
 =head1 CONSTRUCTOR
 
@@ -191,18 +216,7 @@ More details on the customer's account balance are here (L<https://stripe.com/do
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Billing::Invoice> object.
 
 =back
 
@@ -455,7 +469,6 @@ The amount of tax on this invoice. This is the sum of all the tax amounts on thi
 =item B<threshold_reason> hash
 
 If billing_reason is set to subscription_threshold this returns more information on which threshold rules triggered the invoice.
-Show child attributes
 
 =item B<total> integer
 
@@ -475,121 +488,121 @@ The time at which webhooks for this invoice were successfully delivered (if the 
 
 =head1 API SAMPLE
 
-	{
-	  "id": "in_1B9q03CeyNCl6fY2YNPu6oqa",
-	  "object": "invoice",
-	  "account_country": "JP",
-	  "account_name": "Angels, Inc",
-	  "amount_due": 8000,
-	  "amount_paid": 8000,
-	  "amount_remaining": 0,
-	  "application_fee_amount": null,
-	  "attempt_count": 1,
-	  "attempted": true,
-	  "auto_advance": false,
-	  "billing": "charge_automatically",
-	  "billing_reason": "subscription",
-	  "charge": "ch_1B9q03CeyNCl6fY2wu5siR6R",
-	  "collection_method": "charge_automatically",
-	  "created": 1507273919,
-	  "currency": "jpy",
-	  "custom_fields": null,
-	  "customer": "cus_G0vQn57xCoD5rG",
-	  "customer_address": null,
-	  "customer_email": "florian@111studio.jp",
-	  "customer_name": null,
-	  "customer_phone": null,
-	  "customer_shipping": null,
-	  "customer_tax_exempt": "none",
-	  "customer_tax_ids": [],
-	  "default_payment_method": null,
-	  "default_source": null,
-	  "default_tax_rates": [],
-	  "description": null,
-	  "discount": null,
-	  "due_date": null,
-	  "ending_balance": 0,
-	  "footer": null,
-	  "hosted_invoice_url": "https://pay.stripe.com/invoice/invst_XvyJuu53kQe203lIDyXEYxa7Lh",
-	  "invoice_pdf": "https://pay.stripe.com/invoice/invst_XvyJuu53kQe203lIDyXEYxa7Lh/pdf",
-	  "lines": {
-		"data": [
-		  {
-			"id": "sli_be2a0c3589f761",
-			"object": "line_item",
-			"amount": 8000,
-			"currency": "jpy",
-			"description": "1 × Angels, Inc professional monthly membership (at ¥8,000 / month)",
-			"discountable": true,
-			"livemode": false,
-			"metadata": {},
-			"period": {
-			  "end": 1559441759,
-			  "start": 1556763359
-			},
-			"plan": {
-			  "id": "professional-monthly-jpy",
-			  "object": "plan",
-			  "active": true,
-			  "aggregate_usage": null,
-			  "amount": 8000,
-			  "amount_decimal": "8000",
-			  "billing_scheme": "per_unit",
-			  "created": 1541833564,
-			  "currency": "jpy",
-			  "interval": "month",
-			  "interval_count": 1,
-			  "livemode": false,
-			  "metadata": {},
-			  "nickname": null,
-			  "product": "prod_Dwk1QNPjrMJlY8",
-			  "tiers": null,
-			  "tiers_mode": null,
-			  "transform_usage": null,
-			  "trial_period_days": null,
-			  "usage_type": "licensed"
-			},
-			"proration": false,
-			"quantity": 1,
-			"subscription": "sub_EccdFNq60pUMDL",
-			"subscription_item": "si_Eccd4op26fXydB",
-			"tax_amounts": [],
-			"tax_rates": [],
-			"type": "subscription"
-		  }
-		],
-		"has_more": false,
-		"object": "list",
-		"url": "/v1/invoices/in_1B9q03CeyNCl6fY2YNPu6oqa/lines"
-	  },
-	  "livemode": false,
-	  "metadata": {},
-	  "next_payment_attempt": null,
-	  "number": "53DB91F-0001",
-	  "paid": true,
-	  "payment_intent": null,
-	  "period_end": 1507273919,
-	  "period_start": 1507273919,
-	  "post_payment_credit_notes_amount": 0,
-	  "pre_payment_credit_notes_amount": 0,
-	  "receipt_number": "2066-1929",
-	  "starting_balance": 0,
-	  "statement_descriptor": null,
-	  "status": "paid",
-	  "status_transitions": {
-		"finalized_at": 1507273919,
-		"marked_uncollectible_at": null,
-		"paid_at": 1507273919,
-		"voided_at": null
-	  },
-	  "subscription": "sub_BWtnk6Km6GOapC",
-	  "subtotal": 8000,
-	  "tax": null,
-	  "tax_percent": null,
-	  "total": 8000,
-	  "total_tax_amounts": [],
-	  "webhooks_delivered_at": 1507273920
-	}
+    {
+      "id": "in_fake123456789",
+      "object": "invoice",
+      "account_country": "JP",
+      "account_name": "Provider, Inc",
+      "amount_due": 8000,
+      "amount_paid": 8000,
+      "amount_remaining": 0,
+      "application_fee_amount": null,
+      "attempt_count": 1,
+      "attempted": true,
+      "auto_advance": false,
+      "billing": "charge_automatically",
+      "billing_reason": "subscription",
+      "charge": "ch_fake1234567890",
+      "collection_method": "charge_automatically",
+      "created": 1507273919,
+      "currency": "jpy",
+      "custom_fields": null,
+      "customer": "cus_fake1234567890",
+      "customer_address": null,
+      "customer_email": "john.doe@example.com",
+      "customer_name": null,
+      "customer_phone": null,
+      "customer_shipping": null,
+      "customer_tax_exempt": "none",
+      "customer_tax_ids": [],
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [],
+      "description": null,
+      "discount": null,
+      "due_date": null,
+      "ending_balance": 0,
+      "footer": null,
+      "hosted_invoice_url": "https://pay.stripe.com/invoice/invst_lksjkljslmckhsjcbncmbcn",
+      "invoice_pdf": "https://pay.stripe.com/invoice/invst_lksjkljslmckhsjcbncmbcn/pdf",
+      "lines": {
+        "data": [
+          {
+            "id": "sli_fake123456789",
+            "object": "line_item",
+            "amount": 8000,
+            "currency": "jpy",
+            "description": "1 × Provider, Inc professional monthly membership (at ¥8,000 / month)",
+            "discountable": true,
+            "livemode": false,
+            "metadata": {},
+            "period": {
+              "end": 1559441759,
+              "start": 1556763359
+            },
+            "plan": {
+              "id": "professional-monthly-jpy",
+              "object": "plan",
+              "active": true,
+              "aggregate_usage": null,
+              "amount": 8000,
+              "amount_decimal": "8000",
+              "billing_scheme": "per_unit",
+              "created": 1541833564,
+              "currency": "jpy",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "metadata": {},
+              "nickname": null,
+              "product": "prod_fake123456789",
+              "tiers": null,
+              "tiers_mode": null,
+              "transform_usage": null,
+              "trial_period_days": null,
+              "usage_type": "licensed"
+            },
+            "proration": false,
+            "quantity": 1,
+            "subscription": "sub_fake123456789",
+            "subscription_item": "si_fake123456789",
+            "tax_amounts": [],
+            "tax_rates": [],
+            "type": "subscription"
+          }
+        ],
+        "has_more": false,
+        "object": "list",
+        "url": "/v1/invoices/in_fake123456789/lines"
+      },
+      "livemode": false,
+      "metadata": {},
+      "next_payment_attempt": null,
+      "number": "53DB91F-0001",
+      "paid": true,
+      "payment_intent": null,
+      "period_end": 1507273919,
+      "period_start": 1507273919,
+      "post_payment_credit_notes_amount": 0,
+      "pre_payment_credit_notes_amount": 0,
+      "receipt_number": "2066-1929",
+      "starting_balance": 0,
+      "statement_descriptor": null,
+      "status": "paid",
+      "status_transitions": {
+        "finalized_at": 1507273919,
+        "marked_uncollectible_at": null,
+        "paid_at": 1507273919,
+        "voided_at": null
+      },
+      "subscription": "sub_fake123456789",
+      "subtotal": 8000,
+      "tax": null,
+      "tax_percent": null,
+      "total": 8000,
+      "total_tax_amounts": [],
+      "webhooks_delivered_at": 1507273920
+    }
 
 =head1 HISTORY
 
@@ -656,7 +669,7 @@ L<https://stripe.com/docs/api/invoices>, L<https://stripe.com/docs/billing/invoi
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

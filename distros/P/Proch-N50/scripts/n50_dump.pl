@@ -33,7 +33,8 @@ foreach my $file (@ARGV) {
         || die " FATAL ERROR:\n Unable to open file for reading ($file).\n";
   }
 
-  my $FileStats = Proch::N50::getStats( $file );
+  my $FileStats = Proch::N50::getStats( $file, undef, 40 );
+  say Dumper $FileStats;
+  say $FileStats->{'Ne'};
 
-  say Data::Dumper->Dump( [$FileStats], ['n50{"'.basename($file).'"}']);
 }

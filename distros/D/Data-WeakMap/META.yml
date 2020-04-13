@@ -1,0 +1,43 @@
+---
+abstract: "WeakMap that doesn't leak memory, and which you can operate on like a hash"
+author:
+  - 'Alexander Karelas <karjala@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-WeakMap
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::WeakMap:
+    file: lib/Data/WeakMap.pm
+    version: v0.0.2
+  Data::WeakMap::Item::Tie:
+    file: lib/Data/WeakMap/Item/Tie.pm
+  Data::WeakMap::Tie:
+    file: lib/Data/WeakMap/Tie.pm
+requires:
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/akarelas/Data-WeakMap-perl/issues
+  homepage: https://github.com/akarelas/Data-WeakMap-perl
+  repository: git://github.com/akarelas/Data-WeakMap-perl.git
+version: v0.0.2
+x_authority: cpan:KARJALA
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

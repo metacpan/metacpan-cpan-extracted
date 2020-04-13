@@ -60,6 +60,16 @@ Net::API::Stripe::Reporting::ReportRun - Stripe API Reporting Run Object
 
 =head1 SYNOPSIS
 
+    my $report = $stripe->report_run({
+        livemode => $stripe->false,
+        report_type => 'balance.summary.1',
+        result => $file_object,
+        status => 'pending',
+        succeeded_at => undef,
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -76,14 +86,8 @@ Note that reports can only be run based on your live-mode data (not test-mode da
 
 =item B<new>( %arg )
 
-Creates a new C<Net::API::Stripe::Reporting::ReportRun> objects.
+Creates a new L<Net::API::Stripe::Reporting::ReportRun> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -91,27 +95,27 @@ Toggles debug mode on/off
 
 =over 4
 
-=item B<id>() string
+=item B<id> string
 
 Unique identifier for the object.
 
-=item B<object>() string, value is "reporting.report_run"
+=item B<object> string, value is "reporting.report_run"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<created>() timestamp
+=item B<created> timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<error>() string
+=item B<error>string
 
 If something should go wrong during the run, a message about the failure (populated when status=failed).
 
-=item B<livemode>() boolean
+=item B<livemode> boolean
 
 Always true: reports can only be run on live-mode data.
 
-=item B<parameters>() hash
+=item B<parameters> hash
 
 Parameters of this report run.
 
@@ -147,19 +151,19 @@ Category of balance transactions to be included in the report run.
 
 =back
 
-=item B<report_type>() string
+=item B<report_type> string
 
 The ID of the report type to run, such as "balance.summary.1".
 
-=item B<result>() hash
+=item B<result> hash
 
-The file object (C<Net::APi::Stripe::File>) representing the result of the report run (populated when status=succeeded).
+The file object (L<Net::APi::Stripe::File>) representing the result of the report run (populated when status=succeeded).
 
-=item B<status>() string
+=item B<status> string
 
-Status of this report run. This will be pending when the run is initially created. When the run finishes, this will be set to succeeded and the result field will be populated. Rarely, we may encounter an error, at which point this will be set to failed and the error field will be populated.
+Status of this report run. This will be pending when the run is initially created. When the run finishes, this will be set to succeeded and the result field will be populated. Rarely, Stripe may encounter an error, at which point this will be set to failed and the error field will be populated.
 
-=item B<succeeded_at>() timestamp
+=item B<succeeded_at> timestamp
 
 Timestamp at which this run successfully finished (populated when status=succeeded). Measured in seconds since the Unix epoch.
 
@@ -168,7 +172,7 @@ Timestamp at which this run successfully finished (populated when status=succeed
 =head1 API SAMPLE
 
 	{
-	  "id": "frr_1G2dqECeyNCl6fY2KeuZWZ14",
+	  "id": "frr_fake123456789",
 	  "object": "reporting.report_run",
 	  "created": 1579440566,
 	  "error": null,
@@ -179,21 +183,21 @@ Timestamp at which this run successfully finished (populated when status=succeed
 	  },
 	  "report_type": "balance.summary.1",
 	  "result": {
-		"id": "file_1D4e5EF5IfL0eXz9mGVilzEx",
+		"id": "file_fake123456789",
 		"object": "file",
 		"created": 1535589144,
-		"filename": "file_1D4e5EF5IfL0eXz9mGVilzEx",
+		"filename": "file_fake123456789",
 		"links": {
 		  "object": "list",
 		  "data": [],
 		  "has_more": false,
-		  "url": "/v1/file_links?file=file_1D4e5EF5IfL0eXz9mGVilzEx"
+		  "url": "/v1/file_links?file=file_fake123456789"
 		},
 		"purpose": "finance_report_run",
 		"size": 9863,
 		"title": null,
 		"type": "csv",
-		"url": "https://files.stripe.com/v1/files/file_1D4e5EF5IfL0eXz9mGVilzEx/contents"
+		"url": "https://files.stripe.com/v1/files/file_fake123456789/contents"
 	  },
 	  "status": "succeeded",
 	  "succeeded_at": 1525192811
@@ -215,7 +219,7 @@ L<perl>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2020 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2020 DEGUEST Pte. Ltd.
 
 All rights reserved
 

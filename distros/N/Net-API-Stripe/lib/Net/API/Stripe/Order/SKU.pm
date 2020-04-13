@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Order/SKU.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -31,7 +31,7 @@ sub created { shift->_set_get_datetime( 'created', @_ ); }
 
 sub currency { shift->_set_get_scalar( 'currency', @_ ); }
 
-sub image { shift->_set_get_scalar( 'image', @_ ); }
+sub image { shift->_set_get_uri( 'image', @_ ); }
 
 sub inventory { shift->_set_get_object( 'inventory', 'Net::API::Stripe::Order::SKU::Inventory', @_ ); }
 
@@ -59,6 +59,32 @@ Net::API::Stripe::Order::SKU - A Stripe SKU Object
 
 =head1 SYNOPSIS
 
+    my $sku = $stripe->sku({
+        active => $stripe->true,
+        attributes => 
+        {
+            size => 'Medium',
+            gender => 'Unisex',
+        },
+        currency => 'jpy',
+        image => 'https://example.com/path/product.jpg',
+        inventory => $inventory_object,
+        metadata => { transaction_id => 123 },
+        package_dimensions =>
+        {
+            # In inches
+			height => 6,
+			length => 20,
+			# Ounce
+			weight => 21
+			width => 12
+        },
+        price => 2000,
+        product => $product_object,
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -75,18 +101,8 @@ Can also be used to manage inventory.
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Order::SKU> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -122,11 +138,13 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 The URL of an image for this SKU, meant to be displayable to the customer.
 
+This is a L<URI> object.
+
 =item B<inventory> hash
 
 Description of the SKU’s inventory.
 
-This is a C<Net::API::Stripe::Order::SKU::Inventory> object.
+This is a L<Net::API::Stripe::Order::SKU::Inventory> object.
 
 =item B<livemode> boolean
 
@@ -140,7 +158,7 @@ Set of key-value pairs that you can attach to an object. This can be useful for 
 
 The dimensions of this SKU for shipping purposes.
 
-This is a C<Net::API::Stripe::Order::SKU::PackageDimensions> object.
+This is a L<Net::API::Stripe::Order::SKU::PackageDimensions> object.
 
 =item B<price> positive integer or zero
 
@@ -150,7 +168,7 @@ The cost of the item as a positive integer in the smallest currency unit (that i
 
 The ID of the product this SKU is associated with. The product must be currently active.
 
-When expanded, this is a C<Net::API::Stripe::Product> object.
+When expanded, this is a L<Net::API::Stripe::Product> object.
 
 =item B<updated> timestamp
 
@@ -159,7 +177,7 @@ When expanded, this is a C<Net::API::Stripe::Product> object.
 =head1 API SAMPLE
 
 	{
-	  "id": "sku_G1HcdqsCPOkGA7",
+	  "id": "sku_fake123456789",
 	  "object": "sku",
 	  "active": true,
 	  "attributes": {
@@ -178,7 +196,7 @@ When expanded, this is a C<Net::API::Stripe::Product> object.
 	  "metadata": {},
 	  "package_dimensions": null,
 	  "price": 1500,
-	  "product": "prod_Dwk1FH8ifmrGgw",
+	  "product": "prod_fake123456789",
 	  "updated": 1571480453
 	}
 
@@ -200,7 +218,7 @@ L<https://stripe.com/docs/api/skus>, L<https://stripe.com/docs/orders>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

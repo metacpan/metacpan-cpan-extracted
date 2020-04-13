@@ -1,0 +1,9 @@
+Revision history for Wasm-Hook},
+
+0.02      2020-04-11 11:08:56 -0600
+  - Wasm subroutines are exportable using Exporter (gh#2)
+
+0.01      2020-04-10 21:09:49 -0600
+  - initial version
+
+

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Event/Request.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -34,13 +34,20 @@ Net::API::Stripe::Event::Request - A Stripe Event Request object
 
 =head1 SYNOPSIS
 
+    my $req = $stripe->event->request({
+        id => 'req_HwlkQJshckjIsj',
+        idempotency_key => '677A3112-FBAD-4804-BA61-CEF1CC13D155',
+    });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-This is a Stripe Event Request object
+This is a Stripe Event Request object.
+
+This is instantiated by the method B<request> in module L<Net::API::Stripe::Event>
 
 =head1 CONSTRUCTOR
 
@@ -48,18 +55,8 @@ This is a Stripe Event Request object
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Event::Request> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -80,7 +77,7 @@ The idempotency key transmitted during the request, if any. Note: This property 
 =head1 API SAMPLE
 
 	{
-	  "id": "evt_1Ccdk1CeyNCl6fY2mTXIaobI",
+	  "id": "evt_fake123456789",
 	  "object": "event",
 	  "api_version": "2017-02-14",
 	  "created": 1528914645,
@@ -141,7 +138,7 @@ L<https://stripe.com/docs/api/events/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

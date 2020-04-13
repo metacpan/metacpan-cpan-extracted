@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Authorization/RequestHistory.pm
-## Version 0.1
+## Version 0.1.1
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2019/11/02
+## Modified 2020/04/11
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -15,10 +15,10 @@ BEGIN
 {
     use strict;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = '0.1.1';
 };
 
-sub approved { shift->_set_get_scalar( 'approved', @_ ); }
+sub approved { shift->_set_get_boolean( 'approved', @_ ); }
 
 sub authorized_amount { shift->_set_get_number( 'authorized_amount', @_ ); }
 
@@ -44,11 +44,23 @@ Net::API::Stripe::Issuing::Authorization::RequestHistory - A Stripe Authorizatio
 
 =head1 SYNOPSIS
 
+    my $req_history = $stripe->authorization->req_history({
+        approved => $stripe->true,
+        authorized_amount => 2000,
+        authorized_currency => 'jpy',
+        created => '2020-04-12',
+        held_amount => 1000,
+        held_currency => 'jpy',
+        reason => 'webhook_declined',
+    });
+
 =head1 VERSION
 
-    0.1
+    0.1.1
 
 =head1 DESCRIPTION
+
+This is instantiated by method B<request_history> in module L<Net::API::Stripe::Issuing::Authorization>
 
 =head1 CONSTRUCTOR
 
@@ -56,18 +68,8 @@ Net::API::Stripe::Issuing::Authorization::RequestHistory - A Stripe Authorizatio
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Issuing::Authorization::RequestHistory> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -108,7 +110,7 @@ One of authentication_failed, authorization_controls, card_active, card_inactive
 =head1 API SAMPLE
 
 	{
-	  "id": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+	  "id": "iauth_fake123456789",
 	  "object": "issuing.authorization",
 	  "approved": true,
 	  "authorization_method": "online",
@@ -139,12 +141,12 @@ One of authentication_failed, authorization_controls, card_active, card_inactive
 	  "status": "reversed",
 	  "transactions": [
 		{
-		  "id": "ipi_1DPqmFCeyNCl6fY2ve8MAJJu",
+		  "id": "ipi_fake123456789",
 		  "object": "issuing.transaction",
 		  "amount": -100,
-		  "authorization": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+		  "authorization": "iauth_fake123456789",
 		  "balance_transaction": null,
-		  "card": "ic_1DPqmFCeyNCl6fY2bHuXx2E3",
+		  "card": "ic_fake123456789",
 		  "cardholder": null,
 		  "created": 1540642827,
 		  "currency": "usd",
@@ -166,12 +168,12 @@ One of authentication_failed, authorization_controls, card_active, card_inactive
 		  "type": "capture"
 		},
 		{
-		  "id": "ipi_1DPqmFCeyNCl6fY2wlCERJ4S",
+		  "id": "ipi_fake123456789",
 		  "object": "issuing.transaction",
 		  "amount": -100,
-		  "authorization": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+		  "authorization": "iauth_fake123456789",
 		  "balance_transaction": null,
-		  "card": "ic_1DPqmFCeyNCl6fY290pxaFhn",
+		  "card": "ic_fake123456789",
 		  "cardholder": null,
 		  "created": 1540642827,
 		  "currency": "usd",
@@ -208,6 +210,10 @@ One of authentication_failed, authorization_controls, card_active, card_inactive
 
 Initial version
 
+=head2 v0.1.1
+
+Change helper method for B<approved> from B<_set_get_scalar> to B<_set_get_boolean>
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
@@ -220,7 +226,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

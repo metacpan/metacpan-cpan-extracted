@@ -11,7 +11,8 @@ bin/tlsrpt
 dist.ini
 lib/Mail/TLSRPT.pm
 lib/Mail/TLSRPT/App.pm
-lib/Mail/TLSRPT/App/Command/process.pm
+lib/Mail/TLSRPT/App/Command/csv.pm
+lib/Mail/TLSRPT/App/Command/prometheus.pm
 lib/Mail/TLSRPT/Failure.pm
 lib/Mail/TLSRPT/Policy.pm
 lib/Mail/TLSRPT/Pragmas.pm
@@ -22,6 +23,7 @@ t/01-policy-no-sub.t
 t/01-report-no-sub.t
 t/02-csv.t
 t/02-data-full.t
+t/02-prometheus.t
 t/02-text-full.t
 t/03-file-json.t
 t/author-pod-syntax.t
@@ -29,3 +31,4 @@ t/data/email.eml
 t/data/expected.json
 t/data/report.json
 t/data/report.json.gz.b64
+weaver.ini

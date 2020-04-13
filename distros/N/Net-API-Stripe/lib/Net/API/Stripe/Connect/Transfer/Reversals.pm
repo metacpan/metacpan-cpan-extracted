@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Transfer/Reversals.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -45,6 +45,22 @@ Net::API::Stripe::Connect::Transfer::Reversals - A list of Transfer Reversal as 
 
 =head1 SYNOPSIS
 
+    my $list = $stripe->reversals( 'list' ) || die( $stripe->error );
+    while( my $rev = $list->next )
+    {
+    	printf( <<EOT, $rev->amount->format_money( 0, '¥' ), $rev->currency, $rev->created->iso8601 );
+    Amount: %s
+    Currency: %s
+    Created: %s
+    EOT
+    }
+
+Would produce:
+
+    Amount: ¥2,000
+    Currency: jpy
+    Created: 2020-04-06T06:00:00
+
 =head1 VERSION
 
     0.1
@@ -53,7 +69,7 @@ Net::API::Stripe::Connect::Transfer::Reversals - A list of Transfer Reversal as 
 
 A list of reversals that have been applied to the transfer.
 
-This module inherits from C<Net::API::Stripe::List> and overrides only the B<data> method.
+This module inherits from L<Net::API::Stripe::List> and overrides only the B<data> method.
 
 =head1 CONSTRUCTOR
 
@@ -61,32 +77,7 @@ This module inherits from C<Net::API::Stripe::List> and overrides only the B<dat
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
-
-=back
-
-=head1 METHODS
-
-=over 4
-
-=item B<object> string, value is "list"
-
-String representing the object’s type. Objects of the same type share the same value. Always has the value list.
-
-=item B<data> array of hashes
-
-Array of C<Net::API::Stripe::Connect::Transfer::Reversal> objects.
+Creates a new L<Net::API::Stripe::Connect::Transfer::Reversals> object.
 
 =item B<has_more> boolean
 
@@ -102,20 +93,20 @@ The URL where this list can be accessed.
 
 	{
 	  "object": "list",
-	  "url": "/v1/transfers/tr_1FVF3MCeyNCl6fY2ibhPTw7J/reversals",
+	  "url": "/v1/transfers/tr_fake123456789/reversals",
 	  "has_more": false,
 	  "data": [
 		{
-		  "id": "trr_1FVF3MCeyNCl6fY2UM85yr0M",
+		  "id": "trr_fake123456789",
 		  "object": "transfer_reversal",
 		  "amount": 1100,
-		  "balance_transaction": "txn_1A3RPuCeyNCl6fY29RsjBA0b",
+		  "balance_transaction": "txn_fake123456789",
 		  "created": 1571480456,
 		  "currency": "jpy",
 		  "destination_payment_refund": null,
 		  "metadata": {},
 		  "source_refund": null,
-		  "transfer": "tr_1FVF3MCeyNCl6fY2ibhPTw7J"
+		  "transfer": "tr_fake123456789"
 		},
 		{...},
 		{...}
@@ -140,7 +131,7 @@ L<https://stripe.com/docs/api/transfer_reversals/list>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

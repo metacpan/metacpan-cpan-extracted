@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Intent/NextAction.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -18,7 +18,15 @@ BEGIN
     our( $VERSION ) = '0.1';
 };
 
-sub redirect_to_url { shift->_set_get_hash( 'redirect_to_url', @_ ); }
+# sub redirect_to_url { shift->_set_get_hash( 'redirect_to_url', @_ ); }
+sub redirect_to_url
+{
+    return( shift->_set_get_class(
+    {
+    return_url => { type => 'uri' },
+    url => { type => 'uri' },
+    }, @_ ) );
+}
 
 sub type { shift->_set_get_scalar( 'type', @_ ); }
 
@@ -36,6 +44,15 @@ Net::API::Stripe::Payment::Intent::NextAction - A Stripe Payment Next Action Obj
 
 =head1 SYNOPSIS
 
+    my $next = $stripe->payment_intent->next_action({
+        redirect_to_url => 
+        {
+        return_url => 'https://example.com/pay/return',
+        url => 'https://example.com/pay/auth',
+        },
+        type => 'redirect_to_url',
+    });
+
 =head1 VERSION
 
     0.1
@@ -46,24 +63,16 @@ If present, this property tells you what actions you need to take in order for y
 
 It used to be NextSourceAction, but the naming changed in Stripe API as of 2019-02-11
 
+This is instantiated by method B<next_action> in module L<Net::API::Stripe::Payment::Intent>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Payment::Intent::NextAction> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -74,6 +83,8 @@ Toggles debug mode on/off
 =item B<redirect_to_url> hash
 
 Contains instructions for authenticating a payment by redirecting your customer to another page or application.
+
+This is actually a dynamic class L<Net::API::Stripe::Payment::Intent::NextAction::RedirectToUrl> so the following property can be accessed as methods:
 
 =over 8
 
@@ -100,7 +111,7 @@ When confirming a PaymentIntent with Stripe.js, Stripe.js depends on the content
 =head1 API SAMPLE
 
 	{
-	  "id": "pi_1EUnBEF5IfL0eXz99dkRR60n",
+	  "id": "pi_fake123456789",
 	  "object": "payment_intent",
 	  "amount": 1099,
 	  "amount_capturable": 0,
@@ -114,9 +125,9 @@ When confirming a PaymentIntent with Stripe.js, Stripe.js depends on the content
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/charges?payment_intent=pi_1EUnBEF5IfL0eXz99dkRR60n"
+		"url": "/v1/charges?payment_intent=pi_fake123456789"
 	  },
-	  "client_secret": "pi_1EUnBEF5IfL0eXz99dkRR60n_secret_sqsp5vQECBqN0qTVoQwpBT0Iy",
+	  "client_secret": "pi_fake123456789_secret_ksjfjfbsjbfsmbfmf",
 	  "confirmation_method": "automatic",
 	  "created": 1556596976,
 	  "currency": "jpy",
@@ -162,7 +173,7 @@ L<https://stripe.com/docs/api/payment_intents/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

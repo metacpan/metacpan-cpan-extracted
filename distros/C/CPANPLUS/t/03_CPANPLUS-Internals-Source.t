@@ -125,6 +125,8 @@ SKIP: {
     skip( "Index file size too long (>260 chars). Can't write to disk", 28 )
         if length $expected_file > 260 and ON_WIN32;
 
+    skip( "MINIX file system has a 60 char limit on filenames", 28 )
+        if length $expected_file > 60 and ON_MINIX;
 
     ### local file
     ### 2 tests

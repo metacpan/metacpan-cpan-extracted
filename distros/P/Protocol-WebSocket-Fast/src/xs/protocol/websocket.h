@@ -7,14 +7,6 @@ namespace xs { namespace protocol { namespace websocket {
 
 using namespace panda::protocol::websocket;
 
-void  av_to_header_values (const Array& av, HeaderValues* vals);
-Array header_values_to_av (const HeaderValues& vals);
-
-void av_to_vstring (const Array& av, std::vector<string>& v);
-
-ConnectRequestSP  make_request  (const Hash& params, const ConnectRequestSP& = {});
-ConnectResponseSP make_response (const Hash& params, const ConnectResponseSP& = {});
-
 struct XSFrameIterator : FrameIterator {
     XSFrameIterator (Parser* parser, const FrameSP& start_frame) : FrameIterator(parser, start_frame), nexted(false) { parser->retain(); }
     XSFrameIterator (const XSFrameIterator& oth)                 : FrameIterator(oth), nexted(oth.nexted)            { parser->retain(); }
@@ -54,6 +46,18 @@ struct XSFrameSender : FrameSender {
     }
     ~XSFrameSender () { _parser.release(); }
 };
+
+void  av_to_header_values (const Array& av, HeaderValues* vals);
+Array header_values_to_av (const HeaderValues& vals);
+
+void av_to_vstring (const Array& av, std::vector<string>& v);
+
+ConnectRequestSP  make_request  (const Hash& params, const ConnectRequestSP& = {});
+ConnectResponseSP make_response (const Hash& params, const ConnectResponseSP& = {});
+
+void parser_config_in   (Parser::Config&, const Hash&);
+void deflate_config_in  (DeflateExt::Config&, const Hash&);
+Sv   deflate_config_out (const DeflateExt::Config&);
 
 }}}
 
@@ -127,55 +131,19 @@ namespace xs {
 
     template <class TYPE> struct Typemap<panda::protocol::websocket::DeflateExt::Config, TYPE> : TypemapBase<panda::protocol::websocket::DeflateExt::Config, TYPE> {
         static TYPE in (SV* arg) {
-            const Hash h = arg;
             TYPE cfg;
-            Scalar val;
-
-            if ((val = h.fetch("server_max_window_bits")))     cfg.server_max_window_bits     = static_cast<std::uint8_t>(Simple(val));
-            if ((val = h.fetch("client_max_window_bits")))     cfg.client_max_window_bits     = static_cast<std::uint8_t>(Simple(val));
-            if ((val = h.fetch("client_no_context_takeover"))) cfg.client_no_context_takeover = SvTRUE(val);
-            if ((val = h.fetch("server_no_context_takeover"))) cfg.server_no_context_takeover = SvTRUE(val);
-            if ((val = h.fetch("mem_level")))                  cfg.mem_level                  = Simple(val);
-            if ((val = h.fetch("compression_level")))          cfg.compression_level          = Simple(val);
-            if ((val = h.fetch("strategy")))                   cfg.strategy                   = Simple(val);
-            if ((val = h.fetch("compression_threshold")))      cfg.compression_threshold      = Simple(val);
+            xs::protocol::websocket::deflate_config_in(cfg, arg);
             return cfg;
         }
 
-        static Sv out (TYPE var, const Sv& = Sv()) {
-            Hash settings = Hash::create();
-            settings.store("server_max_window_bits",     Simple(var.server_max_window_bits));
-            settings.store("client_max_window_bits",     Simple(var.client_max_window_bits));
-            settings.store("client_no_context_takeover", Simple(var.client_no_context_takeover));
-            settings.store("server_no_context_takeover", Simple(var.server_no_context_takeover));
-            settings.store("mem_level",                  Simple(var.mem_level));
-            settings.store("compression_level",          Simple(var.compression_level));
-            settings.store("strategy",                   Simple(var.strategy));
-            settings.store("compression_threshold",      Simple(var.compression_threshold));
-
-            return Ref::create(settings);
-        }
+        static Sv out (TYPE var, const Sv& = Sv()) { return xs::protocol::websocket::deflate_config_out(var); }
     };
 
     template <class TYPE> struct Typemap<panda::protocol::websocket::Parser::Config, TYPE> : TypemapBase<panda::protocol::websocket::Parser::Config, TYPE> {
         static TYPE in (SV* arg) {
             TYPE cfg;
-            const Hash h = arg;
-
-            Scalar val;
-            if ((val = h.fetch("max_frame_size")))     cfg.max_frame_size     = Simple(val);
-            if ((val = h.fetch("max_message_size")))   cfg.max_message_size   = Simple(val);
-            if ((val = h.fetch("max_handshake_size"))) cfg.max_handshake_size = Simple(val);
-
-            if(h.exists("deflate")) cfg.deflate.reset();
-            Hash deflate_settings = h.fetch("deflate");
-            if (deflate_settings) {
-                auto dcfg = xs::in<panda::protocol::websocket::DeflateExt::Config>(deflate_settings);
-                cfg.deflate = dcfg;
-            }
+            xs::protocol::websocket::parser_config_in(cfg, arg);
             return cfg;
         }
     };
-
-
 }

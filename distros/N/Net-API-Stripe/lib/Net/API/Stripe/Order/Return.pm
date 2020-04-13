@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Order/Return.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -50,6 +50,16 @@ Net::API::Stripe::Order::Return - A Stripe Order Return Object
 
 =head1 SYNOPSIS
 
+    my $return = $stripe->return({
+        amount => 2000,
+        currency => 'jpy',
+        items => [ $item_object1, $item_object2 ],
+        order => $order_object,
+        refund => undef,
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -64,18 +74,7 @@ A return represents the full or partial return of a number of order items (L<htt
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Order::Return> object.
 
 =back
 
@@ -130,7 +129,7 @@ When expanded, this is a C<Net::API::Stripe::Refund> object.
 =head1 API SAMPLE
 
 	{
-	  "id": "orret_1FVF3MCeyNCl6fY2aSQGwLie",
+	  "id": "orret_fake123456789",
 	  "object": "order_return",
 	  "amount": 1500,
 	  "created": 1571480456,
@@ -140,15 +139,15 @@ When expanded, this is a C<Net::API::Stripe::Refund> object.
 		  "object": "order_item",
 		  "amount": 1500,
 		  "currency": "jpy",
-		  "description": "Angels, Inc investor yearly membership",
-		  "parent": "sk_1FVF3JCeyNCl6fY2OAx9OZcE",
+		  "description": "Provider, Inc investor yearly membership",
+		  "parent": "sk_fake123456789",
 		  "quantity": null,
 		  "type": "sku"
 		}
 	  ],
 	  "livemode": false,
-	  "order": "or_1FVF3MCeyNCl6fY234CwgGhd",
-	  "refund": "re_1FVF3MCeyNCl6fY2uLjiA3z2"
+	  "order": "or_fake123456789",
+	  "refund": "re_fake123456789"
 	}
 
 =head1 HISTORY
@@ -169,7 +168,7 @@ L<https://stripe.com/docs/api/order_returns>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

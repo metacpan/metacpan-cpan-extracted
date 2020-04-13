@@ -90,7 +90,7 @@ sub user_create ( $self, $user_name, $password, $enabled, $permissions ) {
     # update user
     state $q2 = $dbh->prepare(q[UPDATE "user" SET "enabled" = ? WHERE "id" = ?]);
 
-    $res = $dbh->do( $q2, [ SQL_BOOL $enabled, $user_id ] );
+    $res = $dbh->do( $q2, [ TO_BOOL $enabled, $user_id ] );
 
     # dbh error
     return $on_finish->( $dbh, $res ) if !$res;
@@ -153,9 +153,9 @@ sub user_set_enabled ( $self, $user_id, $enabled ) {
     my $res = $dbh->do(
         $q1,
         [    #
-            SQL_BOOL $enabled,
+            TO_BOOL $enabled,
             $user_id,
-            SQL_BOOL !$enabled,
+            TO_BOOL !$enabled,
         ]
     );
 
@@ -269,7 +269,7 @@ sub user_set_permissions ( $self, $user_id, $permissions, $dbh = undef ) {
 SQL
         );
 
-        $res = $dbh->do( $q1, [ $user_id, $name, SQL_BOOL $enabled] );
+        $res = $dbh->do( $q1, [ $user_id, $name, TO_BOOL $enabled] );
 
         # dbh error
         return $on_finish->( $dbh, $res ) if !$res;
@@ -294,7 +294,7 @@ SQL
 SQL
             );
 
-            $res = $dbh->do( $q2, [ SQL_BOOL $enabled, $user_id, SQL_BOOL !$enabled, $name ] );
+            $res = $dbh->do( $q2, [ TO_BOOL $enabled, $user_id, TO_BOOL !$enabled, $name ] );
 
             # dbh error
             return $on_finish->( $dbh, $res ) if !$res;

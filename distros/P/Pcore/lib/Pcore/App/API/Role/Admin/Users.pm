@@ -35,7 +35,7 @@ sub API_read ( $self, $auth, $args ) {
 
         # filter status
         if ( exists $args->{where}->{enabled} ) {
-            $where &= [ '"user"."enabled"', IN [ map { SQL_BOOL $_} $args->{where}->{enabled}->[1]->@* ] ];
+            $where &= [ '"user"."enabled"', IN [ map { TO_BOOL $_} $args->{where}->{enabled}->[1]->@* ] ];
         }
     }
 

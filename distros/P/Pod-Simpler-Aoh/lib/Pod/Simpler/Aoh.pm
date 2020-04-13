@@ -6,7 +6,7 @@ use Types::Standard qw/Str ArrayRef HashRef/;
 
 extends 'Pod::Simple';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 attributes(
     pod => [ rw, ArrayRef, { lzy_array, clr } ],
@@ -98,18 +98,20 @@ sub _insert_pod {
 }
 
 sub _parse_text {
-    if ( my $content = $_[2]->{ $_[1] } ) {
-        if ( $_[2]->{element_name} =~ m{item-text|over-text} ) {
-            return sprintf "%s\n\n%s\n\n", $content, $_[2]->{text};
-        }
-        # expecting a code example
-        elsif ( $content =~ /[\.\;\:\*]$/ ) {
-            return sprintf "%s\n\n%s", $content, $_[2]->{text};
-        }
-        return sprintf "%s%s", $content, $_[2]->{text};
+    my $content = $_[2]->{$_[1]} || '';   
+    if ( $_[2]->{element_name} =~ m{item-text|over-text} ) {
+        return sprintf "%s\n\n%s\n\n", $content, $_[2]->{text};
     }
-    return $_[2]->{text};
+    # expecting a code example 
+    elsif ( $_[2]->{element_name} =~ m/Verbatim/ ) {
+        return $content ? sprintf "%s\n\n%s\n\n", $content, $_[2]->{text} : sprintf("%s\n\n", $_[2]->{text});
+    }
+    elsif ( $content =~ /[\;\.\:\*]$/ ) {
+        return sprintf "%s\n\n%s", $content, $_[2]->{text};
+    }
+    return $content ? sprintf "%s%s", $content, $_[2]->{text} : $_[2]->{text};
 }
+
 
 1;
 
@@ -121,7 +123,7 @@ Pod::Simpler::Aoh - Parse pod into an array of hashes.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 

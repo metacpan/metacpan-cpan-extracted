@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Github;
-our $VERSION = '1.050';
+our $VERSION = '1.051';
 # ABSTRACT: Authenticate using Github's OAuth2 provider
 
 #pod =head1 SYNOPSIS
@@ -41,6 +41,11 @@ our $VERSION = '1.050';
 #pod
 #pod The client secret, provided by Github.
 #pod
+#pod =head2 login_label
+#pod
+#pod The label for the button to log in using Github. Defaults
+#pod to C<Login with Github>.
+#pod
 #pod =head2 Sessions
 #pod
 #pod This module uses L<Mojolicious
@@ -72,7 +77,15 @@ our $VERSION = '1.050';
 #pod Validate there is a logged-in user and optionally that the user data has
 #pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 #pod
+#pod =head2 yancy.auth.login_form
+#pod
+#pod Returns the rendered login button.
+#pod
 #pod =head1 TEMPLATES
+#pod
+#pod =head2 yancy/auth/github/login_form.html.ep
+#pod
+#pod Display the button to log in using Github.
 #pod
 #pod =head2 layouts/yancy/auth.html.ep
 #pod
@@ -98,6 +111,7 @@ has schema =>;
 has username_field => 'username';
 has plugin_field =>;
 has allow_register => 0;
+has login_label => 'Login with Github';
 
 sub init {
     my ( $self, $app, $config ) = @_;
@@ -126,6 +140,21 @@ sub current_user {
     my ( $self, $c ) = @_;
     my $username = $c->session->{yancy}{ $self->moniker }{ github_login } || return undef;
     return $self->_get_user( $c, $username );
+}
+
+#pod =method login_form
+#pod
+#pod Get a link to log in using Github.
+#pod
+#pod =cut
+
+sub login_form {
+    my ( $self, $c ) = @_;
+    return $c->render_to_string(
+        'yancy/auth/github/login_form',
+        label => $self->login_label,
+        url => $self->route->render,
+    );
 }
 
 sub _get_user {
@@ -214,7 +243,7 @@ Yancy::Plugin::Auth::Github - Authenticate using Github's OAuth2 provider
 
 =head1 VERSION
 
-version 1.050
+version 1.051
 
 =head1 SYNOPSIS
 
@@ -249,6 +278,10 @@ authorization method.
 
 Returns the user row of the currently-logged-in user.
 
+=head2 login_form
+
+Get a link to log in using Github.
+
 =head1 CONFIGURATION
 
 This plugin has the following configuration options.
@@ -260,6 +293,11 @@ The client ID, provided by Github.
 =head2 client_secret
 
 The client secret, provided by Github.
+
+=head2 login_label
+
+The label for the button to log in using Github. Defaults
+to C<Login with Github>.
 
 =head2 Sessions
 
@@ -292,7 +330,15 @@ user was found in the session.
 Validate there is a logged-in user and optionally that the user data has
 certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 
+=head2 yancy.auth.login_form
+
+Returns the rendered login button.
+
 =head1 TEMPLATES
+
+=head2 yancy/auth/github/login_form.html.ep
+
+Display the button to log in using Github.
 
 =head2 layouts/yancy/auth.html.ep
 

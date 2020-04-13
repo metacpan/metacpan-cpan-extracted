@@ -20,13 +20,13 @@ name: Docker-CLI-Wrapper
 provides:
   Docker::CLI::Wrapper:
     file: lib/Docker/CLI/Wrapper.pm
-    version: v0.0.4
+    version: v0.0.5
   Docker::CLI::Wrapper::Base:
     file: lib/Docker/CLI/Wrapper/Base.pm
-    version: v0.0.4
+    version: v0.0.5
   Docker::CLI::Wrapper::Container:
     file: lib/Docker/CLI/Wrapper/Container.pm
-    version: v0.0.4
+    version: v0.0.5
 requires:
   Moo: '0'
   Path::Tiny: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/shlomif/Docker-CLI-Wrapper/issues
   homepage: http://metacpan.org/release/Docker-CLI-Wrapper
   repository: https://github.com/shlomif/Docker-CLI-Wrapper.git
-version: 0.0.4
+version: 0.0.5
 x_Dist_Zilla:
   perl:
     version: '5.030002'

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Sigma/ScheduledQueryRun.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -53,13 +53,38 @@ Net::API::Stripe::Sigma::ScheduledQueryRun - A Stripe Schedule Query Run Object
 
 =head1 SYNOPSIS
 
+    my $query = $stripe->schedule_query({
+        created => '2020-06-12T08:00:00',
+        data_load_time => '2020-06-12T08:00:02',
+        file => $file_object,
+        livemode => $stripe->false,
+        result_available_until => '2020-05-31',
+        sql => <<EOT,
+	select
+	  id,
+	  amount,
+	  fee,
+	  currency
+	from balance_transactions
+	where
+	  created < data_load_time and
+	  created >= data_load_time - interval '1' month
+	order by created desc
+	limit 10
+    EOT
+        status => 'completed',
+        title => 'Monthly balance transactions',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-If you have scheduled a Sigma query (L<https://stripe.com/docs/sigma/scheduled-queries>), you'll receive a sigma.scheduled_query_run.created webhook each time the query runs. The webhook contains a ScheduledQueryRun object, which you can use to retrieve the query results.
+If you have scheduled a L<Sigma query|https://stripe.com/docs/sigma/scheduled-queries>, you'll receive a sigma.scheduled_query_run.created webhook each time the query runs. The webhook contains a ScheduledQueryRun object, which you can use to retrieve the query results.
 
 =head1 CONSTRUCTOR
 
@@ -67,18 +92,8 @@ If you have scheduled a Sigma query (L<https://stripe.com/docs/sigma/scheduled-q
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Sigma::ScheduledQueryRun> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -106,13 +121,13 @@ When the query was run, Sigma contained a snapshot of your Stripe data at this t
 
 If the query run was not successful, this field contains information about the failure.
 
-Show child attributes
+This is a L<Net::API::Stripe::Error> object.
 
 =item B<file> hash
 
 The file object representing the results of the query.
 
-This is a C<Net::API::Stripe::File> object.
+This is a L<Net::API::Stripe::File> object.
 
 =item B<livemode> boolean
 
@@ -139,12 +154,12 @@ Title of the query.
 =head1 API SAMPLE
 
 	{
-	  "id": "sqr_1FVF3NF5IfL0eXz9q8pnEHhr",
+	  "id": "sqr_fake123456789",
 	  "object": "scheduled_query_run",
 	  "created": 1571480457,
 	  "data_load_time": 1571270400,
 	  "file": {
-		"id": "file_1DCefYF5IfL0eXz9JoCbwZik",
+		"id": "file_fake123456789",
 		"object": "file",
 		"created": 1537498020,
 		"filename": "path",
@@ -152,13 +167,13 @@ Title of the query.
 		  "object": "list",
 		  "data": [],
 		  "has_more": false,
-		  "url": "/v1/file_links?file=file_1DCefYF5IfL0eXz9JoCbwZik"
+		  "url": "/v1/file_links?file=file_fake123456789"
 		},
 		"purpose": "sigma_scheduled_query",
 		"size": 500,
 		"title": null,
 		"type": "csv",
-		"url": "https://files.stripe.com/v1/files/file_1DCefYF5IfL0eXz9JoCbwZik/contents"
+		"url": "https://files.stripe.com/v1/files/file_fake123456789/contents"
 	  },
 	  "livemode": false,
 	  "result_available_until": 1603065600,
@@ -181,11 +196,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Stripe API documentation:
 
-L<https://stripe.com/docs/api/sigma/scheduled_queries>
+L<https://stripe.com/docs/api/sigma/scheduled_queries>, L<https://stripe.com/docs/sigma/scheduled-queries>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

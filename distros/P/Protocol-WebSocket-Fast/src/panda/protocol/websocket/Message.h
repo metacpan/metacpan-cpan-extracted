@@ -24,6 +24,9 @@ struct Message : virtual panda::Refcnt {
 
     bool add_frame (const Frame& frame);
 
+    size_t max_size () const         { return _max_size; }
+    void   max_size (size_t newsize) { _max_size = newsize; }
+
 private:
     enum class State { PENDING, DONE };
 

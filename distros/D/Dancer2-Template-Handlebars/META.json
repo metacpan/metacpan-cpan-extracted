@@ -1,0 +1,86 @@
+{
+   "abstract" : "Dancer2 wrapper for Handlebars templating engine",
+   "author" : [
+      "Ruth Holloway <ruth@hiruthie.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Template-Handlebars",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Perl::Critic" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2::Core::Role::Template" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Sub::Attribute" : "0",
+            "Text::Handlebars" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Dancer2" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::WWW::Mechanize::PSGI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Template::Handlebars" : {
+         "file" : "lib/Dancer2/Template/Handlebars.pm",
+         "version" : "0.3"
+      },
+      "Dancer2::Template::Handlebars::Helpers" : {
+         "file" : "lib/Dancer2/Template/Handlebars/Helpers.pm",
+         "version" : "0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/GeekRuthie/dancer2-template-handlebars/-/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/GeekRuthie/dancer2-template-handlebars.git",
+         "web" : "https://gitlab.com/GeekRuthie/dancer2-template-handlebars"
+      }
+   },
+   "version" : "0.3",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
+   "x_generated_by_perl" : "v5.24.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

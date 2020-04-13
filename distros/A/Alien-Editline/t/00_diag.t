@@ -13,6 +13,7 @@ $modules{$_} = $_ for qw(
   Alien::Base
   Alien::Build
   Alien::Build::MM
+  ExtUtils::CBuilder
   ExtUtils::MakeMaker
   Test2::Bundle::Extended
   Test::Alien

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Intent.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -120,13 +120,28 @@ Net::API::Stripe::Payment::Intent - A Stripe Payment Intent Object
 
 =head1 SYNOPSIS
 
+    my $intent = $stripe->payment_intent({
+        amount => 2000,
+        amount_capturable => 2000,
+        application => $connect_account_object,
+        application_fee_amount => 20,
+        capture_method => 'automatic',
+        customer => $customer_object,
+        description => 'Preparation for payment',
+        invoice => $invoice_object,
+        metadata => { transaction_id => 123, customer_id => 456 },
+        receipt_email => 'john.doe@example.com',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-A PaymentIntent guides you through the process of collecting a payment from your customer. We recommend that you create exactly one PaymentIntent for each order or customer session in your system. You can reference the PaymentIntent later to see the history of payment attempts for a particular session.
+A PaymentIntent guides you through the process of collecting a payment from your customer. Stripe recommends that you create exactly one PaymentIntent for each order or customer session in your system. You can reference the PaymentIntent later to see the history of payment attempts for a particular session.
 
 A PaymentIntent transitions through multiple statuses throughout its lifetime as it interfaces with Stripe.js to perform authentication flows and ultimately creates at most one successful charge.
 
@@ -154,18 +169,8 @@ More info here: L<https://stripe.com/docs/payments/payment-intents/web>
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Payment::Intent> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -197,7 +202,7 @@ Amount that was collected by this PaymentIntent.
 
 ID of the Connect application that created the PaymentIntent.
 
-This is a C<Net::API::Stripe::Connect::Account> object.
+This is a L<Net::API::Stripe::Connect::Account> object.
 
 =item B<application_fee_amount> integer
 
@@ -223,7 +228,7 @@ Change capture_method to manual if you wish to separate authorization and captur
 
 Charges that were created by this PaymentIntent, if any.
 
-This is a C<Net::API::Stripe::Payment::Intent::Charges> object.
+This is a L<Net::API::Stripe::Payment::Intent::Charges> object.
 
 =item B<client_secret> retrievable with publishable key string
 
@@ -231,7 +236,7 @@ The client secret of this PaymentIntent. Used for client-side retrieval using a 
 
 The client secret can be used to complete a payment from your frontend. It should not be stored, logged, embedded in URLs, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret.
 
-Please refer to our quickstart guide to learn about how client_secret should be handled.
+Please refer to L<Stripe quickstart guide|https://stripe.com/docs/payments/accept-a-payment> to learn about how client_secret should be handled.
 confirmation_method retrievable with publishable key string
 
 One of automatic (default) or manual.
@@ -256,7 +261,7 @@ ID of the Customer this PaymentIntent belongs to, if one exists.
 
 If present, payment methods used with this PaymentIntent can only be attached to this Customer, and payment methods attached to other Customers cannot be used with this PaymentIntent.
 
-This is a customer id or a C<Net::API::Stripe::Customer> object.
+This is a customer id or a L<Net::API::Stripe::Customer> object.
 
 =item B<description> retrievable with publishable key string
 
@@ -272,7 +277,7 @@ When expanded, this is a C<::API::Stripe::Billing::Invoice> object.
 
 The payment error encountered in the previous PaymentIntent confirmation.
 
-This is a C<Net::API::Stripe::Error> object.
+This is a L<Net::API::Stripe::Error> object.
 
 =item B<livemode> retrievable with publishable key boolean
 
@@ -286,14 +291,15 @@ Set of key-value pairs that you can attach to an object. This can be useful for 
 
 If present, this property tells you what actions you need to take in order for your customer to fulfill a payment using the provided source.
 
-This is a C<Net::API::Stripe::Payment::Intent::NextAction> object with the following properties:
+This is a L<Net::API::Stripe::Payment::Intent::NextAction> object with the following properties:
 
 =over 8
 
 =item B<redirect_to_url> hash
 
 Contains instructions for authenticating a payment by redirecting your customer to another page or application.
-Show child attributes
+
+See module L<Net::API::Stripe::Payment::Intent::NextAction> for more information.
 
 =over 12
 
@@ -321,7 +327,7 @@ When confirming a PaymentIntent with Stripe.js, Stripe.js depends on the content
 
 The account (if any) for which the funds of the PaymentIntent are intended. See the PaymentIntents use case for connected accounts for details.
 
-When expanded, this is a C<Net::API::Stripe::Connect::Account> object.
+When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
 =item B<payment_method> retrievable with publishable key string (expandable)
 
@@ -331,7 +337,7 @@ ID of the payment method used in this PaymentIntent.
 
 Payment-method-specific configuration for this PaymentIntent.
 
-This is a virtual C<Net::API::Stripe::Payment::Method::Options> object, ie a package created on the fly to allow the hash keys to be accessed as methods.
+This is a virtual L<Net::API::Stripe::Payment::Method::Options> object, ie a package created on the fly to allow the hash keys to be accessed as methods.
 
 =over 8
 
@@ -353,7 +359,7 @@ Email address that the receipt for the resulting payment will be sent to.
 
 ID of the review associated with this PaymentIntent, if any.
 
-This is a C<Net::API::Stripe::Fraud::Review> object.
+This is a L<Net::API::Stripe::Fraud::Review> object.
 
 =item B<setup_future_usage> retrievable with publishable key string
 
@@ -369,11 +375,11 @@ Stripe uses setup_future_usage to dynamically optimize your payment flow and com
 
 Shipping information for this PaymentIntent.
 
-This is a C<Net::API::Stripe::Shipping> object.
+This is a L<Net::API::Stripe::Shipping> object.
 
 =item B<source>
 
-This is a C<Net::API::Stripe::Payment::Source>, but it seems it is not documented on the Stripe API although it is found in its response.
+This is a L<Net::API::Stripe::Payment::Source>, but it seems it is not documented on the Stripe API although it is found in its response.
 
 =item B<statement_descriptor> string
 
@@ -391,7 +397,7 @@ Status of this PaymentIntent, one of requires_payment_method, requires_confirmat
 
 The data with which to automatically create a Transfer when the payment is finalized. See the PaymentIntents use case for connected accounts for details.
 
-This is a C<Net::API::Stripe::Payment::Intent::TransferData> object.
+This is a L<Net::API::Stripe::Payment::Intent::TransferData> object.
 
 =item B<transfer_group> string
 
@@ -402,7 +408,7 @@ A string that identifies the resulting payment as part of a group. See the Payme
 =head1 API SAMPLE
 
 	{
-	  "id": "pi_1EUnBEF5IfL0eXz99dkRR60n",
+	  "id": "pi_fake123456789",
 	  "object": "payment_intent",
 	  "amount": 1099,
 	  "amount_capturable": 0,
@@ -416,9 +422,9 @@ A string that identifies the resulting payment as part of a group. See the Payme
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/charges?payment_intent=pi_1EUnBEF5IfL0eXz99dkRR60n"
+		"url": "/v1/charges?payment_intent=pi_fake123456789"
 	  },
-	  "client_secret": "pi_1EUnBEF5IfL0eXz99dkRR60n_secret_sqsp5vQECBqN0qTVoQwpBT0Iy",
+	  "client_secret": "pi_fake123456789_secret_nvsnvmsbfmsbfmbfm",
 	  "confirmation_method": "automatic",
 	  "created": 1556596976,
 	  "currency": "jpy",
@@ -474,7 +480,7 @@ L<https://stripe.com/docs/api/payment_intents>, L<https://stripe.com/docs/paymen
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

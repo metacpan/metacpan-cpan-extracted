@@ -102,8 +102,14 @@ WeMo device
 
 Default Location: /usr/share/power-outlet/conf/power-outlet.ini
 
+=head2 BUILD
+
+  rpmbuild -ta Power-Outlet-*.tar.gz
+
 =head1 INSTALLATION
 
-I recomend installation with the provided RPM package perl-Power-Outlet-application-cgi which installs to /usr/share/power-outlet.
+I recommend installation with the provided RPM package perl-Power-Outlet-application-cgi which installs to /usr/share/power-outlet.
+
+  sudo yum install perl-Power-Outlet-application-cgi
 
 =cut

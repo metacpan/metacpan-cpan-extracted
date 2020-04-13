@@ -1,7 +1,7 @@
 package App::ListOrgAnniversaries;
 
-our $DATE = '2020-02-28'; # DATE
-our $VERSION = '0.473'; # VERSION
+our $DATE = '2020-04-12'; # DATE
+our $VERSION = '0.474'; # VERSION
 
 use 5.010;
 use strict;
@@ -45,7 +45,7 @@ sub _process_hl {
         }
     }
 
-    my @annivs;
+    my @annivs; # elem = [$field, $date, $date_reminded]
     $hl->walk(
         sub {
             my ($el) = @_;
@@ -54,7 +54,11 @@ sub _process_hl {
                 my $field = $el->field_name;
                 return unless defined($field) &&
                     $field =~ $args->{field_pattern};
-                push @annivs, [$field, $el->datetime];
+                if ($field =~ $args->{reminded_field_pattern} && @annivs) {
+                    $annivs[-1][2] = $el->datetime;
+                } else {
+                    push @annivs, [$field, $el->datetime];
+                }
                 return;
             }
             if ($el->isa('Org::Element::Drawer') && $el->name eq 'PROPERTIES') {
@@ -67,9 +71,15 @@ sub _process_hl {
                                        "must be YYYY-MM-DD");
                         next;
                     }
-                    push @annivs,
-                        [$k, DateTime->new(year=>$1, month=>$2, day=>$3,
-                                       time_zone=>$tz)];
+                    if ($k =~ $args->{reminded_field_pattern} && @annivs) {
+                        $annivs[-1][2] = $el->datetime;
+                    } else {
+                        push @annivs, [
+                            lc $k,
+                            DateTime->new(year=>$1, month=>$2, day=>$3,
+                                          time_zone=>$tz),
+                        ];
+                    }
                     return;
                 }
             }
@@ -77,14 +87,15 @@ sub _process_hl {
     );
 
     if (!@annivs) {
-        log_debug("Node doesn't contain anniversary fields, skipped");
+        log_debug("Headline doesn't contain anniversary fields, skipped");
         return;
     }
-    log_trace("annivs = ", \@annivs);
+
+  ANNIV:
     for my $anniv (@annivs) {
-        my ($field, $date) = @$anniv;
-        log_debug("Anniversary found: field=%s, date=%s",
-                     $field, $date->ymd);
+        my ($field, $date, $date_reminded) = @$anniv;
+        log_debug("Anniversary found: field=%s, date=%s, date reminded=%s",
+                     $field, $date->ymd, $date_reminded ? $date_reminded->ymd : undef);
         my $y = $today->year - $date->year;
         my $date_ly = $date->clone; $date_ly->add(years => $y-1);
         my $date_ty = $date->clone; $date_ty->add(years => $y  );
@@ -98,7 +109,25 @@ sub _process_hl {
                 -$days > $args->{max_overdue};
             next if !defined($args->{due_in}) &&
                 !defined($args->{max_overdue}) &&
-                    DateTime->compare($d, $today) < 0;
+                DateTime->compare($d, $today) < 0;
+
+          REMINDED: {
+                if ($date_reminded) {
+                    my $days_reminded;
+                    $days_reminded = ($date_reminded < $today ? -1:1) *
+                        $date_reminded->delta_days($today)->in_units('days');
+                    last REMINDED if defined($args->{due_in}) &&
+                        $days_reminded > $args->{due_in};
+                    last REMINDED if defined($args->{max_overdue}) &&
+                        -$days_reminded > $args->{max_overdue};
+                    last REMINDED if !defined($args->{due_in}) &&
+                        !defined($args->{max_overdue}) &&
+                        DateTime->compare($date_reminded, $today) < 0;
+                    #log_debug("Anniversary already reminded, skipped");
+                    next DATE;
+                }
+            }
+
             my $pl = abs($days) > 1 ? "s" : "";
             my $hide_age = $date->year == 1900;
             my $msg = sprintf(
@@ -147,17 +176,46 @@ By convention, if year is '1900' it is assumed to mean year is not specified.
 
 By default, all contacts' anniversaries will be listed. You can filter contacts
 using tags ('has_tags' and 'lacks_tags' options), or by 'due_in' and
-'max_overdue' options (due_in=14 and max_overdue=2 is what I commonly use in my
+'max_overdue' options (due_in=14 and max_overdue=7 is what I commonly use in my
 startup script).
+
+If you have acted on someone's birthday or anniversary, you can add another
+field with name: the anniversary field + " reminded" (this is customizable using
+the options `reminded_field_pattern`). For example:
+
+    * First last                              :office:friend:
+      :PROPERTIES:
+      :BIRTHDAY:     1900-06-07
+      :BIRTHDAY_REMINDED:  2020-06-08
+      :EMAIL:        foo@example.com
+      :OTHERFIELD:   ...
+      :END:
+
+or:
+
+    * Some name                               :office:
+      - birthday   :: [1900-06-07 ]
+      - birthday reminded :: [2020-06-09]
+      - email      :: foo@example.com
+      - otherfield :: ...
+
+and the reminder will not be shown again.
 
 _
     args    => {
         %App::OrgUtils::common_args1,
         field_pattern => {
-            summary => 'Field regex that specifies anniversaries',
-            schema  => [str => {
-                default => '(?:birthday|anniversary)',
-            }],
+            summary => 'Regex for fields that specify anniversaries',
+            schema  => 're*',
+            default => qr/(?:birthday|anniversary)/i,
+        },
+        reminded_field_pattern => {
+            schema => 're*',
+            default => qr/reminded/i,
+        },
+        reminded_suffix => {
+            schema => 'str*',
+            default => ' reminded',
         },
         has_tags => {
             summary => 'Filter headlines that have the specified tags',
@@ -211,14 +269,15 @@ _
     },
 };
 sub list_org_anniversaries {
+    require Org::Parser;
+
     my %args = @_;
 
     my $sort  = $args{sort};
     my $tz    = $args{time_zone} // $ENV{TZ} // "UTC";
     my $files = $args{files};
-    my $f     = $args{field_pattern} // '';
-    return [400, "Invalid field_pattern: $@"] unless eval { $f = qr/$f/i };
-    $args{field_pattern} = $f;
+    $args{field_pattern} //= qr/(?:birthday|anniversary)/i;
+    $args{reminded_field_pattern} //= qr/reminded/i;
 
     $today = $args{today} // DateTime->today(time_zone => $tz);
 
@@ -271,7 +330,7 @@ App::ListOrgAnniversaries - List all anniversaries in Org files
 
 =head1 VERSION
 
-This document describes version 0.473 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2020-02-28.
+This document describes version 0.474 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2020-04-12.
 
 =head1 SYNOPSIS
 
@@ -313,8 +372,30 @@ By convention, if year is '1900' it is assumed to mean year is not specified.
 
 By default, all contacts' anniversaries will be listed. You can filter contacts
 using tags ('has_tags' and 'lacks_tags' options), or by 'due_in' and
-'max_overdue' options (due_in=14 and max_overdue=2 is what I commonly use in my
+'max_overdue' options (due_in=14 and max_overdue=7 is what I commonly use in my
 startup script).
+
+If you have acted on someone's birthday or anniversary, you can add another
+field with name: the anniversary field + " reminded" (this is customizable using
+the options C<reminded_field_pattern>). For example:
+
+ * First last                              :office:friend:
+   :PROPERTIES:
+   :BIRTHDAY:     1900-06-07
+   :BIRTHDAY_REMINDED:  2020-06-08
+   :EMAIL:        foo@example.com
+   :OTHERFIELD:   ...
+   :END:
+
+or:
+
+ * Some name                               :office:
+   - birthday   :: [1900-06-07 ]
+   - birthday reminded :: [2020-06-09]
+   - email      :: foo@example.com
+   - otherfield :: ...
+
+and the reminder will not be shown again.
 
 This function is not exported by default, but exportable.
 
@@ -326,9 +407,9 @@ Arguments ('*' denotes required arguments):
 
 Only show anniversaries that are due in this number of days.
 
-=item * B<field_pattern> => I<str> (default: "(?:birthday|anniversary)")
+=item * B<field_pattern> => I<re> (default: qr((?:birthday|anniversary))i)
 
-Field regex that specifies anniversaries.
+Regex for fields that specify anniversaries.
 
 =item * B<files>* => I<array[filename]>
 
@@ -343,6 +424,10 @@ Filter headlines that don't have the specified tags.
 =item * B<max_overdue> => I<int>
 
 Don't show dates that are overdue more than this number of days.
+
+=item * B<reminded_field_pattern> => I<re> (default: qr(reminded)i)
+
+=item * B<reminded_suffix> => I<str> (default: " reminded")
 
 =item * B<sort> => I<str|code> (default: "due_date")
 

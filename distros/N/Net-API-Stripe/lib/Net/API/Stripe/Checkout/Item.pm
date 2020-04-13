@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Checkout/Item.pm
-## Version 0.2
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Version 0.1
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/12/19
@@ -50,6 +50,17 @@ Net::API::Stripe::Checkout::Item - A Stripe Checkout Item
 
 =head1 SYNOPSIS
 
+    my $item = $stripe->session->display_items([
+    {
+        amount => 2000,
+        currency => 'jpy',
+        description => 'Some item',
+        name => 'Session item',
+        plan => $plan_object,
+        quantity => 1,
+        type => 'plan',
+    }]);
+
 =head1 VERSION
 
     0.2
@@ -58,7 +69,7 @@ Net::API::Stripe::Checkout::Item - A Stripe Checkout Item
 
 The line items, plans, or SKUs purchased by the customer.
 
-This is part of the C<Net::API::Stripe::Checkout::Session> object
+This is part of the L<Net::API::Stripe::Checkout::Session> object an called from the method B<display_items>
 
 =head1 CONSTRUCTOR
 
@@ -66,18 +77,8 @@ This is part of the C<Net::API::Stripe::Checkout::Session> object
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Checkout::Item> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -125,7 +126,7 @@ The name for the line item.  This is used in session checkout I<line_items>.
 
 =item B<plan> hash, plan object
 
-This is a C<Net::API::Stripe::Billing::Plan> object.
+This is a L<Net::API::Stripe::Billing::Plan> object.
 
 =item B<quantity> integer
 
@@ -133,7 +134,7 @@ Quantity of the display item being purchased.
 
 =item B<sku> hash, sku object
 
-This is a C<Net::API::Stripe::Order::SKU> object.
+This is a L<Net::API::Stripe::Order::SKU> object.
 
 =item B<type> string
 
@@ -144,7 +145,7 @@ The type of display item. One of custom, plan or sku
 =head1 API SAMPLE
 
 	{
-	  "id": "ppage_1FqwVPCeyNCl6fY2KczD76D6",
+	  "id": "ppage_fake123456789",
 	  "object": "checkout.session",
 	  "billing_address_collection": null,
 	  "cancel_url": "https://example.com/cancel",
@@ -167,7 +168,7 @@ The type of display item. One of custom, plan or sku
 	  "livemode": false,
 	  "locale": null,
 	  "mode": null,
-	  "payment_intent": "pi_1FhAQWCeyNCl6fY21LWf1aY3",
+	  "payment_intent": "pi_fake123456789",
 	  "payment_method_types": [
 		"card"
 	  ],
@@ -204,7 +205,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

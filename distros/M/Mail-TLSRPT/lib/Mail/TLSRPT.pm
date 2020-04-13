@@ -1,12 +1,10 @@
 package Mail::TLSRPT;
 # ABSTRACT: TLSRPT object
-our $VERSION = '1.20200306.1'; # VERSION
+our $VERSION = '1.20200413.1'; # VERSION
 use 5.20.0;
 use Moo;
-use Carp;
-use Types::Standard qw{Str HashRef ArrayRef};
-use Type::Utils qw{class_type};
 use Mail::TLSRPT::Pragmas;
+
 
 1;
 
@@ -22,7 +20,11 @@ Mail::TLSRPT - TLSRPT object
 
 =head1 VERSION
 
-version 1.20200306.1
+version 1.20200413.1
+
+=head1 DESCRIPTION
+
+Classes to process tlsrpt reports
 
 =head1 AUTHOR
 

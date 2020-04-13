@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Product.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -74,15 +74,43 @@ Net::API::Stripe::Product - A Stripe Product Object
 
 =head1 SYNOPSIS
 
+    my $prod = $stripe->product({
+        active => $stripe->true,
+        attributes => [qw( colour size gender )],
+        caption => 'Fashionable T-shirt',
+        description => 'Product for limited edition t-shirt',
+        images => [qw(
+            https://img.example.com/p12/file1.jpg
+            https://img.example.com/p12/file2.jpg
+            https://img.example.com/p12/file3.jpg
+        )],
+        livemode => $stripe->false,
+        metadata => { product_id => 123, customer_id => 456 },
+        name => 'Limited Edition Shirt',
+        package_dimensions =>
+        {
+        	use_metric => 1,
+            width => 30,
+            length => 50,
+            height => 15,
+            weight => 500,
+        },
+        shippable => $stripe->true,
+        type => 'good',
+        url => 'https://store.example.com/p12/',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-Store representations of products you sell in Product objects, used in conjunction with SKUs (L<https://stripe.com/docs/api/products#skus>). Products may be physical goods, to be shipped, or digital.
+Store representations of products you sell in Product objects, used in conjunction with L<SKUs|https://stripe.com/docs/api/products#skus>. Products may be physical goods, to be shipped, or digital.
 
-Documentation on Products for use with Subscriptions can be found at Subscription Products (L<https://stripe.com/docs/api/products#service_products>).
+Documentation on Products for use with Subscriptions can be found at L<Subscription Products|https://stripe.com/docs/api/products#service_products>.
 
 =head1 CONSTRUCTOR
 
@@ -90,18 +118,7 @@ Documentation on Products for use with Subscriptions can be found at Subscriptio
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Product> object.
 
 =back
 
@@ -195,12 +212,14 @@ A label that represents units of this product, such as seat(s), in Stripe and on
 
 A URL of a publicly-accessible webpage for this product. Only applicable to products of type=good
 
+This returns a L<URI> object.
+
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "prod_Dwk1FH8ifmrGgw",
+	  "id": "prod_fake123456789",
 	  "object": "product",
 	  "active": true,
 	  "attributes": [],
@@ -211,7 +230,7 @@ A URL of a publicly-accessible webpage for this product. Only applicable to prod
 	  "images": [],
 	  "livemode": false,
 	  "metadata": {},
-	  "name": "Angels, Inc investor yearly membership",
+	  "name": "Provider, Inc investor yearly membership",
 	  "package_dimensions": null,
 	  "shippable": null,
 	  "statement_descriptor": null,
@@ -245,7 +264,7 @@ L<https://stripe.com/docs/api/products>, L<https://stripe.com/docs/orders#define
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

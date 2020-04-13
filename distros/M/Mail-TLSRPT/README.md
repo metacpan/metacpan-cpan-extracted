@@ -4,7 +4,11 @@ Mail::TLSRPT - TLSRPT object
 
 # VERSION
 
-version 1.20200306.1
+version 1.20200413.1
+
+# DESCRIPTION
+
+Classes to process tlsrpt reports
 
 # AUTHOR
 

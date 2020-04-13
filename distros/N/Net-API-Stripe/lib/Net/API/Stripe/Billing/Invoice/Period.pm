@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Invoice/Period.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -34,13 +34,20 @@ Net::API::Stripe::Billing::Invoice::Period - A Stripe Invoice Period Object
 
 =head1 SYNOPSIS
 
+    my $period = $invoice_line_item->period({
+        end => '2020-12-31',
+        start => '2020-01-01',
+    });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-The timespan covered by this invoice item.
+The timespan covered by an invoice item.
+
+This is instantiated from method B<period> in L<Net::API::Stripe::Billing::Invoice::Item> or method B<period> from L<Net::API::Stripe::Billing::Invoice::LineItem>.
 
 =head1 CONSTRUCTOR
 
@@ -48,18 +55,8 @@ The timespan covered by this invoice item.
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Billing::Invoice::Period> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -80,10 +77,10 @@ Start of the line item’s billing period
 =head1 API SAMPLE
 
 	{
-	  "id": "in_1B9q03CeyNCl6fY2YNPu6oqa",
+	  "id": "in_fake123456789",
 	  "object": "invoice",
 	  "account_country": "JP",
-	  "account_name": "Angels, Inc",
+	  "account_name": "Provider, Inc",
 	  "amount_due": 8000,
 	  "amount_paid": 8000,
 	  "amount_remaining": 0,
@@ -93,14 +90,14 @@ Start of the line item’s billing period
 	  "auto_advance": false,
 	  "billing": "charge_automatically",
 	  "billing_reason": "subscription",
-	  "charge": "ch_1B9q03CeyNCl6fY2wu5siR6R",
+	  "charge": "ch_fake123456789",
 	  "collection_method": "charge_automatically",
 	  "created": 1507273919,
 	  "currency": "jpy",
 	  "custom_fields": null,
-	  "customer": "cus_G0vQn57xCoD5rG",
+	  "customer": "cus_fake123456789",
 	  "customer_address": null,
-	  "customer_email": "florian@111studio.jp",
+	  "customer_email": "john.doe@example.com",
 	  "customer_name": null,
 	  "customer_phone": null,
 	  "customer_shipping": null,
@@ -114,16 +111,16 @@ Start of the line item’s billing period
 	  "due_date": null,
 	  "ending_balance": 0,
 	  "footer": null,
-	  "hosted_invoice_url": "https://pay.stripe.com/invoice/invst_XvyJuu53kQe203lIDyXEYxa7Lh",
-	  "invoice_pdf": "https://pay.stripe.com/invoice/invst_XvyJuu53kQe203lIDyXEYxa7Lh/pdf",
+	  "hosted_invoice_url": "https://pay.stripe.com/invoice/invst_fake123456789",
+	  "invoice_pdf": "https://pay.stripe.com/invoice/invst_fake123456789/pdf",
 	  "lines": {
 		"data": [
 		  {
-			"id": "sli_be2a0c3589f761",
+			"id": "sli_fake123456789",
 			"object": "line_item",
 			"amount": 8000,
 			"currency": "jpy",
-			"description": "1 × Angels, Inc professional monthly membership (at ¥8,000 / month)",
+			"description": "1 × Provider, Inc professional monthly membership (at ¥8,000 / month)",
 			"discountable": true,
 			"livemode": false,
 			"metadata": {},
@@ -146,7 +143,7 @@ Start of the line item’s billing period
 			  "livemode": false,
 			  "metadata": {},
 			  "nickname": null,
-			  "product": "prod_Dwk1QNPjrMJlY8",
+			  "product": "prod_fake123456789",
 			  "tiers": null,
 			  "tiers_mode": null,
 			  "transform_usage": null,
@@ -155,8 +152,8 @@ Start of the line item’s billing period
 			},
 			"proration": false,
 			"quantity": 1,
-			"subscription": "sub_EccdFNq60pUMDL",
-			"subscription_item": "si_Eccd4op26fXydB",
+			"subscription": "sub_fake123456789",
+			"subscription_item": "si_fake123456789",
 			"tax_amounts": [],
 			"tax_rates": [],
 			"type": "subscription"
@@ -164,7 +161,7 @@ Start of the line item’s billing period
 		],
 		"has_more": false,
 		"object": "list",
-		"url": "/v1/invoices/in_1B9q03CeyNCl6fY2YNPu6oqa/lines"
+		"url": "/v1/invoices/in_fake123456789/lines"
 	  },
 	  "livemode": false,
 	  "metadata": {},
@@ -186,7 +183,7 @@ Start of the line item’s billing period
 		"paid_at": 1507273919,
 		"voided_at": null
 	  },
-	  "subscription": "sub_BWtnk6Km6GOapC",
+	  "subscription": "sub_fake123456789",
 	  "subtotal": 8000,
 	  "tax": null,
 	  "tax_percent": null,
@@ -213,7 +210,7 @@ L<https://stripe.com/docs/api/invoices/line_item>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

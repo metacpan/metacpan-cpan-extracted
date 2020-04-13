@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Method.pm
-## Version 0.1.1
+## Version 0.1
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
@@ -27,7 +27,7 @@ sub au_becs_debit { return( shift->_set_get_hash( 'three_d_secure', @_ ) ); }
 
 sub billing_details { return( shift->_set_get_object( 'billing_details', 'Net::API::Stripe::Billing::Details', @_ ) ); }
 
-sub card { return( shift->_set_get_hash( 'card', @_ ) ); }
+sub card { return( shift->_set_get_object( 'card', 'Net::API::Stripe::Connect::ExternalAccount::Card', @_ ) ); }
 
 sub card_present { return( shift->_set_get_hash( 'card_present', @_ ) ); }
 
@@ -71,6 +71,13 @@ Net::API::Stripe::Payment::Method - A Stripe Payment Method Object
 
 =head1 SYNOPSIS
 
+    my $pm = $stripe->payment_method({
+        billing_details => $billing_details_object,
+        card => $
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1.1
@@ -85,18 +92,8 @@ PaymentMethod objects represent your customer's payment instruments. They can be
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Payment::Method> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -136,17 +133,17 @@ Last four digits of the bank account number.
 
 Billing information associated with the PaymentMethod that may be used or required by particular types of payment methods.
 
-This is a C<Net::API::Stripe::Billing::Details> object.
+This is a L<Net::API::Stripe::Billing::Details> object.
 
 =item B<card> hash
 
 If this is a card PaymentMethod, this hash contains details about the card.
-Show child attributes
+
+This is a L<Net::API::Stripe::Connect::ExternalAccount::Card> object.
 
 =item B<card_present> hash
 
 If this is an card_present PaymentMethod, this hash contains details about the Card Present payment method.
-Show child attributes
 
 =item B<created> timestamp
 
@@ -256,7 +253,7 @@ Possible enum values: card, fpx, ideal, sepa_debit
 		"country": "US",
 		"exp_month": 8,
 		"exp_year": 2020,
-		"fingerprint": "x18XyLUPM6hub5xz",
+		"fingerprint": "kabvjbjcnbmbcmn",
 		"funding": "credit",
 		"generated_from": null,
 		"last4": "4242",
@@ -298,7 +295,7 @@ L<https://stripe.com/docs/api/payment_methods>, L<https://stripe.com/docs/paymen
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

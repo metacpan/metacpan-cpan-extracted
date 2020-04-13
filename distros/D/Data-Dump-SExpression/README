@@ -1,0 +1,62 @@
+NAME
+    Data::Dump::SExpression - Dump Perl data structures as S-expression
+
+VERSION
+    This document describes version 0.001 of Data::Dump::SExpression (from
+    Perl distribution Data-Dump-SExpression), released on 2020-04-10.
+
+SYNOPSIS
+     use Data::Dump::SExpression qw(dd_sexp dump_sexp);
+     dd [1, 2, 3]; # prints "(1 2 3)"
+     my $dmp = dump_sexp({a=>1, b=>1}); # -> '(("a" . 1) ("b" . 1))'
+
+DESCRIPTION
+    EARLY RELEASE.
+
+VARIABLES
+FUNCTIONS
+  dd_sexp
+    Usage:
+
+     dd_sexp($data, ...);
+
+    Print dump to STDOUT. Return the original $data.
+
+  dump_sexp
+    Usage:
+
+     my $dump = dump_sexp($data, ...);
+
+    Return dump result as string. it *never* prints and only return the dump
+    result.
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Dump-SExpression>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Dump-SExpression>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-SExpression
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    To parse S-expression: SExpression::Decode::Marpa,
+    SExpression::Decode::Regexp, Data::SExpression.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

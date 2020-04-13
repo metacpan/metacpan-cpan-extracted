@@ -1,3 +1,8 @@
+0.9908      Sun Apr 12 12:37:28 BST 2020
+
+* Skip some tests on MINIX due to MINIX FS limitations
+* Correct the pluralization of some doc text [grammar].
+
 0.9906      Thu Jan 23 18:39:57 GMT 2020
 
 * Correctly resolved testing issues on MSWin32

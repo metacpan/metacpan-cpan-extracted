@@ -2,8 +2,8 @@ NAME
     App::FirefoxUtils - Utilities related to Firefox
 
 VERSION
-    This document describes version 0.007 of App::FirefoxUtils (from Perl
-    distribution App-FirefoxUtils), released on 2019-12-10.
+    This document describes version 0.008 of App::FirefoxUtils (from Perl
+    distribution App-FirefoxUtils), released on 2020-04-11.
 
 SYNOPSIS
 DESCRIPTION
@@ -62,7 +62,7 @@ FUNCTIONS
 
     A modern browser now runs complex web pages and applications. Despite
     browser's power management feature, these pages/tabs on the browser
-    often still eat considerable CPU cycles even though they run in the
+    often still eat considerable CPU cycles even though they only run in the
     background. Stopping (kill -STOP) the browser processes is a simple and
     effective way to stop CPU eating on Unix. It can be performed whenever
     you are not using your browsers for a little while, e.g. when you are
@@ -172,7 +172,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-App-FirefoxUtils>.
+    <https://github.com/perlancar/perl-App-ManUtils>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -197,7 +197,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

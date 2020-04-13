@@ -57,7 +57,7 @@ my %WriteMakefileArgs = (
     "FFI::Platypus::Record" => 0,
     "Test2::V0"             => "0.000060"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test"    => {
     "TESTS" => "t/*.t"
   }

@@ -18,14 +18,13 @@ my @wanted_files = sort qw(
   t/is_file_tidy.t
   t/list_files.t
   t/perltidy.t
-  t/pod-coverage.t
-  t/pod.t
-  t/strict.t
 );
 
-@wanted_files = map { s/\//\\/g; $_ } @wanted_files if $^O eq 'MSWin32';
+@wanted_files = map { my $ret = $_; $ret =~ s/\//\\/g; $ret } @wanted_files
+  if $^O eq 'MSWin32';
 
 my @found_files =
   Test::PerlTidy::list_files( path => '.', exclude => [ qr/blib|xt/, ], );
 
+# TEST
 is_deeply( \@wanted_files, \@found_files );

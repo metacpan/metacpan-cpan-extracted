@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Charge/Outcome.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -58,18 +58,8 @@ Details about whether the payment was accepted, and why. See understanding decli
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Charge::Outcome> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -110,14 +100,14 @@ Possible values are authorized, manual_review, issuer_declined, blocked, and inv
 =head1 API SAMPLE
 
 		{
-		  "id": "ch_1FTxyCCeyNCl6fY2aYoHTBBF",
+		  "id": "ch_fake123456789",
 		  "object": "charge",
 		  "amount": 100,
 		  "amount_refunded": 0,
 		  "application": null,
 		  "application_fee": null,
 		  "application_fee_amount": null,
-		  "balance_transaction": "txn_1FTlZvCeyNCl6fY2qIteNrPe",
+		  "balance_transaction": "txn_fake123456789",
 		  "billing_details": {
 			"address": {
 			  "city": null,
@@ -148,7 +138,7 @@ Possible values are authorized, manual_review, issuer_declined, blocked, and inv
 		  "outcome": null,
 		  "paid": true,
 		  "payment_intent": null,
-		  "payment_method": "card_1DSiVdCeyNCl6fY2xvLI809J",
+		  "payment_method": "card_fake123456789",
 		  "payment_method_details": {
 			"card": {
 			  "brand": "visa",
@@ -160,7 +150,7 @@ Possible values are authorized, manual_review, issuer_declined, blocked, and inv
 			  "country": "US",
 			  "exp_month": 4,
 			  "exp_year": 2024,
-			  "fingerprint": "x18XyLUPM6hub5xz",
+			  "fingerprint": "fake123456789",
 			  "funding": "credit",
 			  "installments": null,
 			  "last4": "4242",
@@ -172,13 +162,13 @@ Possible values are authorized, manual_review, issuer_declined, blocked, and inv
 		  },
 		  "receipt_email": null,
 		  "receipt_number": null,
-		  "receipt_url": "https://pay.stripe.com/receipts/acct_19eGgRCeyNCl6fY2/ch_1FTxyCCeyNCl6fY2aYoHTBBF/rcpt_FzxuG1UR6Pj9Er68sVPgHRNMLeKZomf",
+		  "receipt_url": "https://pay.stripe.com/receipts/acct_fake123456789/ch_fake123456789/rcpt_fake123456789",
 		  "refunded": false,
 		  "refunds": {
 			"object": "list",
 			"data": [],
 			"has_more": false,
-			"url": "/v1/charges/ch_1FTxyCCeyNCl6fY2aYoHTBBF/refunds"
+			"url": "/v1/charges/ch_fake123456789/refunds"
 		  },
 		  "review": null,
 		  "shipping": null,
@@ -208,7 +198,7 @@ L<https://stripe.com/docs/api/charges/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

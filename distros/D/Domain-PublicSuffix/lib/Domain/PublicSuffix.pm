@@ -1,5 +1,5 @@
 package Domain::PublicSuffix;
-$Domain::PublicSuffix::VERSION = '0.16';
+$Domain::PublicSuffix::VERSION = '0.17';
 use strict;
 use warnings;
 use base 'Class::Accessor::Fast';
@@ -37,8 +37,11 @@ Domain::PublicSuffix - Parse a domain down to root
  $root = $suffix->get_root_domain('www.google.co.uk');
  # $root now contains google.co.uk
 
+ my $suf = $suffix->suffix();
+ # $suf now contains co.uk
+
  my $tld = $suffix->tld();
- # $tld now contains co.uk
+ # $tld now contains uk
 
 =head1 DESCRIPTION
 
@@ -449,7 +452,7 @@ jwieland: Jason Wieland
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-16 Nicholas Melnick, C<nick at abstractwankery.com>.
+Copyright 2008-2020 Nicholas Melnick, C<nick at abstractwankery.com>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

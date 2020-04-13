@@ -2,8 +2,8 @@ NAME
     App::SerializeUtils - Utilities for serialization tasks
 
 VERSION
-    This document describes version 0.161 of App::SerializeUtils (from Perl
-    distribution App-SerializeUtils), released on 2018-11-19.
+    This document describes version 0.162 of App::SerializeUtils (from Perl
+    distribution App-SerializeUtils), released on 2020-04-10.
 
 SYNOPSIS
      $ script-that-produces-json | json2yaml
@@ -28,6 +28,8 @@ DESCRIPTION
 
     *   dd2sereal
 
+    *   dd2sexp
+
     *   dd2storable
 
     *   dd2yaml
@@ -42,6 +44,8 @@ DESCRIPTION
 
     *   json2sereal
 
+    *   json2sexp
+
     *   json2storable
 
     *   json2yaml
@@ -53,6 +57,8 @@ DESCRIPTION
     *   phpser2json
 
     *   phpser2sereal
+
+    *   phpser2sexp
 
     *   phpser2storable
 
@@ -72,11 +78,27 @@ DESCRIPTION
 
     *   sereal2phpser
 
+    *   sereal2sexp
+
     *   sereal2storable
 
     *   sereal2yaml
 
     *   serializeutils-convert
+
+    *   sexp2dd
+
+    *   sexp2ddc
+
+    *   sexp2json
+
+    *   sexp2phpser
+
+    *   sexp2sereal
+
+    *   sexp2storable
+
+    *   sexp2yaml
 
     *   storable2dd
 
@@ -87,6 +109,8 @@ DESCRIPTION
     *   storable2phpser
 
     *   storable2sereal
+
+    *   storable2sexp
 
     *   storable2yaml
 
@@ -99,6 +123,8 @@ DESCRIPTION
     *   yaml2phpser
 
     *   yaml2sereal
+
+    *   yaml2sexp
 
     *   yaml2storabls
 
@@ -136,8 +162,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2011 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2017, 2015, 2014, 2013, 2011
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

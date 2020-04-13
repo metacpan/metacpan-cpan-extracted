@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Discount.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -43,6 +43,23 @@ Net::API::Stripe::Billing::Discount - A Stripe Discount
 
 =head1 SYNOPSIS
 
+	my $discount = $stripe->discount({
+	    coupon => $stripe->coupon({
+			id => 'SUMMER10POFF',
+			currency => 'usd',
+			duration_in_months => 2,
+			max_redemptions => 12,
+			name => 'Summer 10% reduction',
+			percent_off => 10,
+			valid => 1
+	    }),
+	    customer => $customer_object,
+	    # undef() for once or forever
+	    end => '2020-12-31',
+	    start => '2020-06-01',
+	    subscription => 'sub_fake1234567',
+	});
+
 =head1 VERSION
 
     0.1
@@ -57,18 +74,8 @@ A discount represents the actual application of a coupon to a particular custome
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Billing::Discount> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -82,11 +89,11 @@ String representing the object’s type. Objects of the same type share the same
 
 =item B<coupon> hash, coupon object
 
-Hash describing the coupon applied to create this discount. This is a C<Net::API::Stripe::Billing::Coupon> object.
+Hash describing the coupon applied to create this discount. This is a L<Net::API::Stripe::Billing::Coupon> object.
 
 =item B<customer> string (expandable)
 
-This is the Stripe customer id, or when expanded, this is the C<Net::API::Stripe::Customer> object.
+This is the Stripe customer id, or when expanded, this is the L<Net::API::Stripe::Customer> object.
 
 =item B<end> timestamp
 
@@ -123,7 +130,7 @@ The subscription that this coupon is applied to, if it is applied to a particula
 		"times_redeemed": 0,
 		"valid": true
 	  },
-	  "customer": "cus_G0vQn57xCoD5rG",
+	  "customer": "cus_fake124567890",
 	  "end": 1579346711,
 	  "start": 1571397911,
 	  "subscription": null
@@ -147,7 +154,7 @@ L<https://stripe.com/docs/api>, L<https://stripe.com/docs/billing/subscriptions/
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

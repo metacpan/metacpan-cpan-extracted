@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Requirements.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -24,7 +24,17 @@ sub currently_due { return( shift->_set_get_array( 'currently_due', @_ ) ); }
 
 sub disabled_reason { return( shift->_set_get_scalar( 'disabled_reason', @_ ) ); }
 
-sub errors { return( shift->_set_get_array( 'errors', @_ ) ); }
+# sub errors { return( shift->_set_get_array( 'errors', @_ ) ); }
+sub errors
+{
+	return( shift->_set_get_class_array( 'errors',
+	    {
+	    code => { type => 'scalar' },
+	    reason => { type => 'scalar' },
+	    requirement => { type => 'scalar' },
+	    })
+	);
+}
 
 sub eventually_due { return( shift->_set_get_array( 'eventually_due', @_ ) ); }
 
@@ -44,6 +54,17 @@ Net::API::Stripe::Connect::Account::Requirements - A Stripe Account Requirements
 
 =head1 SYNOPSIS
 
+    my $req = $stripe->person->requirements({
+        current_deadline => '2020-05-01',
+        errors => [
+            {
+            code => 'invalid_address_city_state_postal_code',
+            reason => 'Some reason why this failed',
+            requirement => 'some_field',
+            }
+        ],
+    });
+
 =head1 VERSION
 
     0.1
@@ -52,24 +73,16 @@ Net::API::Stripe::Connect::Account::Requirements - A Stripe Account Requirements
 
 Information about the requirements for this person, including what information needs to be collected, and by when.
 
+This is instantiated from method B<requirements> in modules L<Net::API::Stripe::Connect::Account>, L<Net::API::Stripe::Connect::Person> and L<Net::API::Stripe::Issuing::Card::Holder>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Requirements> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -94,6 +107,8 @@ If the capability is disabled, this string describes why. Possible values are re
 =item B<errors> array of hash
 
 The fields that need to be collected again because validation or verification failed for some reason.
+
+This is an array reference of virtual objects class L<Net::API::Stripe::Connect::Account::Requirements::Errors>
 
 =over 4
 
@@ -278,9 +293,9 @@ Fields that may become required depending on the results of verification or revi
 =head1 API SAMPLE
 
 	{
-	  "id": "person_G1oOYsyChrE4Qa",
+	  "id": "person_fake123456789",
 	  "object": "person",
-	  "account": "acct_19eGgRCeyNCl6fY2",
+	  "account": "acct_fake123456789",
 	  "created": 1571602397,
 	  "dob": {
 		"day": null,
@@ -344,7 +359,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

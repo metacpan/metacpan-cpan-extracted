@@ -5,10 +5,10 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.15';
+$Neo4j::Driver::Record::VERSION = '0.16';
 
 use Carp qw(croak);
-use JSON::MaybeXS qw(is_bool);
+use JSON::MaybeXS 1.002004 qw(is_bool);
 
 use Neo4j::Driver::ResultSummary;
 
@@ -95,7 +95,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 

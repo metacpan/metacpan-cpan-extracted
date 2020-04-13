@@ -94,7 +94,7 @@ sub user_token_create ( $self, $user_id, $name, $enabled, $permissions ) {
 
     $enabled = 0+ !!$enabled;
 
-    $res = $dbh->do( $q2, [ SQL_UUID $token->{data}->{id}, $user->{data}->{id}, $name, SQL_BOOL $enabled ] );
+    $res = $dbh->do( $q2, [ SQL_UUID $token->{data}->{id}, $user->{data}->{id}, $name, TO_BOOL $enabled ] );
 
     return $on_finish->( $dbh, $res ) if !$res;
 
@@ -146,7 +146,7 @@ sub user_token_set_enabled ( $self, $token_id, $enabled ) {
 
     $enabled = 0+ !!$enabled;
 
-    my $res = $dbh->do( $q1, [ SQL_BOOL $enabled, SQL_UUID $token_id, SQL_BOOL !$enabled ] );
+    my $res = $dbh->do( $q1, [ TO_BOOL $enabled, SQL_UUID $token_id, TO_BOOL !$enabled ] );
 
     # dbh error
     return $res if !$res;
@@ -318,7 +318,7 @@ sub user_token_set_permissions ( $self, $token_id, $permissions, $dbh = undef ) 
                 push $insert_user_permission->@*,
                   { user_id       => SQL [ '(SELECT "user_id" FROM "user_token" WHERE "id" =',  SQL_UUID $token_id, ')' ],
                     permission_id => SQL [ '(SELECT "id" FROM "app_permission" WHERE "name" =', \$name,             ')' ],
-                    enabled       => SQL_BOOL 1,
+                    enabled       => TO_BOOL 1,
                   };
             }
 
@@ -327,11 +327,11 @@ sub user_token_set_permissions ( $self, $token_id, $permissions, $dbh = undef ) 
                   { user_id       => SQL [ '(SELECT "user_id" FROM "user_token" WHERE "id" =', SQL_UUID $token_id, ')' ],
                     token_id      => SQL_UUID $token_id,
                     permission_id => SQL [ '(SELECT "id" FROM "app_permission" WHERE "name" =', \$name, ')' ],
-                    enabled       => SQL_BOOL $enabled,
+                    enabled       => TO_BOOL $enabled,
                   };
             }
             else {
-                push $update_token_permission->@*, [ SQL_BOOL $enabled, SQL_UUID $token_id, $name, ];
+                push $update_token_permission->@*, [ TO_BOOL $enabled, SQL_UUID $token_id, $name, ];
             }
         }
     }

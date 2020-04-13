@@ -8,7 +8,7 @@ has _buf => ( required => 1 );    # ArrayRef
 sub GET_SQL_QUERY ( $self, $dbh, $i ) {
     my @bind;
 
-    if ( defined $self->{_buf} ) {
+    if ( $self->{_buf} ) {
 
         # Scalar value is processed as parameter
         if ( !is_ref $self->{_buf} ) {
@@ -16,8 +16,8 @@ sub GET_SQL_QUERY ( $self, $dbh, $i ) {
         }
 
         # ScalarRef value is processed as parameter
-        elsif ( !is_plain_scalarref $self->{_buf} ) {
-            push @bind, $self->{_buf}->$* if defined $self->{_buf}->$*;
+        elsif ( is_plain_scalarref $self->{_buf} ) {
+            push @bind, $self->{_buf}->$* if $self->{_buf}->$*;
         }
 
         else {

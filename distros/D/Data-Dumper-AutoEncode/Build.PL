@@ -1,38 +1,28 @@
 use strict;
 use warnings;
-use Module::Build;
+use Module::Build::Pluggable qw/CPANfile/;
 
-my $builder = Module::Build->new(
+my $builder = Module::Build::Pluggable->new(
+    name                => 'Data-Dumper-AutoEncode',
     module_name         => 'Data::Dumper::AutoEncode',
-    license             => 'perl',
+    license             => 'artistic_2',
     dist_author         => 'Dai Okabayashi <bayashi@cpan.org>',
     dist_version_from   => 'lib/Data/Dumper/AutoEncode.pm',
-    configure_requires  => {
-        'Module::Build' => 0.38,
-    },
-    build_requires      => {
-        'Test::More' => 0.88,
-    },
-    requires => {
-        'perl' => '5.8.1',
-        'parent' => 0,
-        'B' => 0,
-        'Carp' => 0,
-        'Encode' => 0,
-        'Scalar::Util' => 0,
-        'Data::Dumper' => 0,
-        'Exporter' => 0,
-    },
-    recommends => {
-        'IO::Interactive::Tiny' => 0,
-    },
+    add_to_cleanup      => [ 'Data-Dumper-AutoEncode-*' ],
     script_files        => [ 'script/edumper' ],
     add_to_cleanup      => [ 'Data-Dumper-AutoEncode-*' ],
+    no_index => {
+        directory => [ 't', 'xt', 'share' ],
+    },
     meta_merge     => {
       resources => {
-        repository  => 'http://github.com/bayashi/Data-Dumper-AutoEncode'
+        repository  => 'http://github.com/bayashi/Data-Dumper-AutoEncode',
+        bugtracker  => 'http://github.com/bayashi/Data-Dumper-AutoEncode/issues',
       }
     },
+    recursive_test_files => 1,
+    test_files => (-d '.git' || $ENV{RELEASE_TESTING}) ? ['t/', 'xt/'] : ['t/'],
+    create_license => 1, # https://metacpan.org/pod/Software::License
 );
 
 $builder->create_build_script();

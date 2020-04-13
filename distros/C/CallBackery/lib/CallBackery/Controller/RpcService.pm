@@ -480,7 +480,7 @@ sub handleUpload {
         }
         return $self->render(text=>encode_json({exception=>{message=>$@,code=>9999}}));
     }
-    if (evan { blessed $return and $return->isa('Mojo::Promise')}){
+    if (eval { blessed $return and $return->isa('Mojo::Promise')}){
         $return->then(sub {
             $self->render(text=>encode_json(shift));
         },

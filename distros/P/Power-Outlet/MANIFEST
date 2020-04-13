@@ -35,7 +35,9 @@ scripts/power-outlet-mqtt-listener.pl
 scripts/conf/power-outlet-mqtt-listener.yml
 scripts/conf/power-outlet-mqtt-listener.service
 scripts/power-outlet.cgi
+scripts/power-outlet.cgi.pod
 scripts/power-outlet-json.cgi
+scripts/power-outlet-json.cgi.pod
 scripts/conf/power-outlet.ini
 scripts/images/btn-on.png
 scripts/images/btn-off.png

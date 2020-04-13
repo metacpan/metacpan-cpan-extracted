@@ -6,6 +6,8 @@ pod_spelling_system:
   stopwords:
     - Editline
     - libedit
+    - Hukins
+    - TOMHUKINS
 
 pod_coverage:
   skip: 0

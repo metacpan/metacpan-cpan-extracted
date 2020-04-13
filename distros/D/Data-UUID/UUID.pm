@@ -15,7 +15,7 @@ our @EXPORT = qw(
    NameSpace_URL
    NameSpace_X500
 );
-our $VERSION = '1.224';
+our $VERSION = '1.226';
 
 bootstrap Data::UUID $VERSION;
 
@@ -106,7 +106,7 @@ This modules provides several methods to create a UUID.  In all methods, C<<
    # convert to Base64-encoded string
    $ug->to_b64string(<uuid>);
 
-   Conversly, string UUIDs can be converted back to binary form:
+   Conversely, string UUIDs can be converted back to binary form:
 
    # recreate binary UUID from string
    $ug->from_string(<uuid>);

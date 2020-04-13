@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/ExternalAccount/Bank.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -37,7 +37,7 @@ sub currency { shift->_set_get_scalar( 'currency', @_ ); }
 
 sub customer { shift->_set_get_scalar_or_object( 'customer', 'Net::API::Stripe::Customer', @_ ); }
 
-sub default_for_currency { shift->_set_get_scalar( 'default_for_currency', @_ ); }
+sub default_for_currency { shift->_set_get_boolean( 'default_for_currency', @_ ); }
 
 sub fingerprint { shift->_set_get_scalar( 'fingerprint', @_ ); }
 
@@ -61,6 +61,38 @@ Net::API::Stripe::Connect::ExternalAccount::Bank - A Stripe Bank Account Object
 
 =head1 SYNOPSIS
 
+    my $bank = $stripe->bank_account({
+        account_holder_name => 'Big Corp, Inc',
+        account_holder_type => 'company',
+        bank_name => 'Big Bank, Corp'
+        country => 'us',
+        currency => 'usd',
+        customer => $customer_object,
+        default_for_currency => $stripe->true,
+        fingerprint => 'kshfkjhfkjsjdla',
+        last4 => 1234,
+        metadata => { transaction_id => 2222 },
+        routing_number => 123,
+        status => 'new',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects. For example:
+
+    my $stripe = Net::API::Stripe->new( conf_file => 'settings.json' ) | die( Net::API::Stripe->error );
+    my $stripe_bank = $stripe->bank_accounts( create =>
+    {
+    account => 'acct_fake123456789',
+    external_account =>
+        {
+        object => 'bank_account',
+        country => 'jp',
+        currency => 'jpy',
+        account_number => '012345678',
+        },
+    default_for_currency => $stripe->true,
+    metadata => { transaction_id => 123, customer_id => 456 },
+    }) || die( $stripe->error );
+
 =head1 VERSION
 
     0.1
@@ -77,18 +109,8 @@ Bank accounts (L<https://stripe.com/docs/api#customer_bank_account_object>) and 
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::ExternalAccount::Bank> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -106,7 +128,7 @@ String representing the object’s type. Objects of the same type share the same
 
 =item B<account> string (expandable)
 
-When expanded, this is a C<Net::API::Stripe::Connect::Account> object.
+When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
 =item B<account_holder_name> string
 
@@ -130,7 +152,7 @@ Three-letter ISO code for the currency paid out to the bank account.
 
 =item B<customer> string (expandable)
 
-When expanded, this is a C<Net::API::Stripe::Customer> object.
+When expanded, this is a L<Net::API::Stripe::Customer> object.
 
 =item B<default_for_currency> boolean
 
@@ -161,15 +183,15 @@ For external accounts, possible values are new and errored. Validations aren’t
 =head1 API SAMPLE
 
 	{
-	  "id": "ba_1FVF3LCeyNCl6fY2lwmYi6dN",
+	  "id": "ba_fake123456789",
 	  "object": "bank_account",
-	  "account": "acct_19eGgRCeyNCl6fY2",
+	  "account": "acct_fake123456789",
 	  "account_holder_name": "Jane Austen",
 	  "account_holder_type": "individual",
 	  "bank_name": "STRIPE TEST BANK",
 	  "country": "US",
 	  "currency": "jpy",
-	  "fingerprint": "1JWtPxqbdX5Gamtz",
+	  "fingerprint": "ksfkhfkjcchjkn",
 	  "last4": "6789",
 	  "metadata": {},
 	  "routing_number": "110000000",
@@ -200,7 +222,7 @@ L<https://stripe.com/docs/api/external_account_bank_accounts/object>, L<https://
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

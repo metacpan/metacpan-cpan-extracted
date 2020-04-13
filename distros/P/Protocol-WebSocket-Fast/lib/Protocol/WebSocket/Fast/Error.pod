@@ -108,7 +108,7 @@ C<message> size exceeds max configured size.
 
 =item close_frame_invalid_data
 
-Bad payload for close frame
+Bad payload for close frame (bad close code, unparsable close code, etc...)
 
 
 =item initial_continue
@@ -134,6 +134,17 @@ Received control frame was compressed, but C<permessage-deflate> websocket exten
 =item inflate_error
 
 Internal error in C<zlib> library, compressed payload is corrupted
+
+
+=item unexpected_rsv
+
+Received a frame with one of RSV flags set but no extension defining RSV meaning has been negotiated
+
+
+=item invalid_utf8
+
+Invalid utf8 sequence in text payload
+
 
 =back
 

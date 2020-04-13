@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Customer/TaxInfoVerification.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -45,11 +45,21 @@ Net::API::Stripe::Customer::TaxInfoVerification - A Customer Tax Verification Ob
 
 =head1 SYNOPSIS
 
+    my $tx_info = $stripe->customer->tax_info_verification({
+        additional_document => $account_document_object,
+        details => 'Provided identity information could not be verified',
+        details_code => 'document_name_mismatch',
+        document => $account_document_object,
+        status => 'pending',
+    });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
+
+This is instantiated by method B<tax_info_verification> in module B<Net::API::Stripe::Customer>
 
 =head1 CONSTRUCTOR
 
@@ -57,18 +67,8 @@ Net::API::Stripe::Customer::TaxInfoVerification - A Customer Tax Verification Ob
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Customer::TaxInfoVerification> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -80,7 +80,7 @@ Toggles debug mode on/off
 
 A document showing address, either a passport, local ID card, or utility bill from a well-known utility company.
 
-This is a C<Net::API::Stripe::Connect::Account::Document> object.
+This is a L<Net::API::Stripe::Connect::Account::Document> object.
 
 =item B<details> string
 
@@ -94,7 +94,7 @@ One of document_address_mismatch, document_dob_mismatch, document_duplicate_type
 
 An identifying document for the person, either a passport or local ID card.
 
-This is a C<Net::API::Stripe::Connect::Account::Document> object.
+This is a L<Net::API::Stripe::Connect::Account::Document> object.
 
 =item B<status> string
 
@@ -117,7 +117,7 @@ Verified name.
 	  "object": "tax_id",
 	  "country": "DE",
 	  "created": 123456789,
-	  "customer": "cus_Eky0BeTYmSj9pa",
+	  "customer": "cus_fake123456789",
 	  "livemode": false,
 	  "type": "eu_vat",
 	  "value": "DE123456789",
@@ -146,7 +146,7 @@ L<https://stripe.com/docs/api/customers/>, L<https://stripe.com/docs/api/persons
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

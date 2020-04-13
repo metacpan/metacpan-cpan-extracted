@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Dispute.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -19,38 +19,38 @@ BEGIN
     our( $VERSION ) = '0.1';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub amount { shift->_set_get_number( 'amount', @_ ); }
+sub amount { return( shift->_set_get_number( 'amount', @_ ) ); }
 
-sub balance_transaction { shift->_set_get_scalar_or_object( 'balance_transaction', 'Net::API::Stripe::Balance::Transaction', @_ ); }
+sub balance_transaction { return( shift->_set_get_scalar_or_object( 'balance_transaction', 'Net::API::Stripe::Balance::Transaction', @_ ) ); }
 
 ## Array that contains Net::API::Stripe::Balance::Transaction
-sub balance_transactions { shift->_set_get_object_array( 'balance_transactions', 'Net::API::Stripe::Balance::Transaction', @_ ); }
+sub balance_transactions { return( shift->_set_get_object_array( 'balance_transactions', 'Net::API::Stripe::Balance::Transaction', @_ ) ); }
 
-sub charge { shift->_set_get_scalar_or_object( 'charge', 'Net::API::Stripe::Charge', @_ ); }
+sub charge { return( shift->_set_get_scalar_or_object( 'charge', 'Net::API::Stripe::Charge', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
-sub currency { shift->_set_get_scalar( 'currency', @_ ); }
+sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
 
-sub disputed_transaction { shift->_set_get_scalar_or_object( 'disputed_transaction', 'Net::API::Stripe::Balance::Transaction', @_ ); }
+sub disputed_transaction { return( shift->_set_get_scalar_or_object( 'disputed_transaction', 'Net::API::Stripe::Balance::Transaction', @_ ) ); }
 
-sub evidence { shift->_set_get_hash( 'evidence', @_ ); }
+sub evidence { return( shift->_set_get_object( 'evidence', 'Net::API::Stripe::Dispute::Evidence', @_ ) ); }
 
-sub evidence_details { shift->_set_get_object( 'evidence_details', 'Net::API::Stripe::Dispute::EvidenceDetails', @_ ); }
+sub evidence_details { return( shift->_set_get_object( 'evidence_details', 'Net::API::Stripe::Dispute::EvidenceDetails', @_ ) ); }
 
-sub is_charge_refundable { shift->_set_get_boolean( 'is_charge_refundable', @_ ); }
+sub is_charge_refundable { return( shift->_set_get_boolean( 'is_charge_refundable', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
-sub metadata { shift->_set_get_hash( 'metadata', @_ ); }
+sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
-sub reason { shift->_set_get_scalar( 'reason', @_ ); }
+sub reason { return( shift->_set_get_scalar( 'reason', @_ ) ); }
 
-sub status { shift->_set_get_scalar( 'status', @_ ); }
+sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
 1;
 
@@ -64,6 +64,22 @@ Net::API::Stripe::Dispute - A Stripe Dispute Object
 
 =head1 SYNOPSIS
 
+    my $dispute = $stripe->dispute({
+        amount => 2000,
+        # could also use a Net::API::Stripe::Charge object
+        charge => 'ch_fake124567890',
+        currency => 'jpy',
+        # Or a Stripe transaction id such as trn_fake1234567890
+        disputed_transaction => $transaction_object,
+        evidence => $dispute_evidence_object,
+        is_charge_refundable => $stripe->true,
+        metadata => { transaction_id => 123, customer_id => 456 },
+        reason => 'insufficient_funds',
+        status => 'warning_needs_response',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -72,7 +88,7 @@ Net::API::Stripe::Dispute - A Stripe Dispute Object
 
 From the documentation:
 
-A dispute occurs when a customer questions your charge with their card issuer. When this happens, you're given the opportunity to respond to the dispute with evidence that shows that the charge is legitimate. You can find more information about the dispute process in our Disputes and Fraud (L<https://stripe.com/docs/disputes>) documentation.
+A dispute occurs when a customer questions your charge with their card issuer. When this happens, you're given the opportunity to respond to the dispute with evidence that shows that the charge is legitimate. You can find more information about the dispute process in L<Stripe Disputes and Fraud documentation|https://stripe.com/docs/disputes>.
 
 =head1 CONSTRUCTOR
 
@@ -80,18 +96,7 @@ A dispute occurs when a customer questions your charge with their card issuer. W
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Dispute> object.
 
 =back
 
@@ -230,11 +235,11 @@ Current status of dispute. Possible values are warning_needs_response, warning_u
 =head1 API SAMPLE
 
 	{
-	  "id": "dp_1FU3MDCeyNCl6fY2o2SGHniK",
+	  "id": "dp_fake123456789",
 	  "object": "dispute",
 	  "amount": 1000,
 	  "balance_transactions": [],
-	  "charge": "ch_1FU3MDCeyNCl6fY2LDHAlVnP",
+	  "charge": "ch_fake123456789",
 	  "created": 1571197169,
 	  "currency": "jpy",
 	  "evidence": {
@@ -297,7 +302,7 @@ L<https://stripe.com/docs/api/disputes>, L<https://stripe.com/docs/disputes>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

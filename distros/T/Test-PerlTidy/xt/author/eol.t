@@ -18,9 +18,6 @@ my @files = (
     't/list_files.t',
     't/messy_file.txt',
     't/perltidy.t',
-    't/pod-coverage.t',
-    't/pod.t',
-    't/strict.t',
     't/tidy_file.txt'
 );
 

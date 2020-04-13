@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/ApplicationFee.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -59,6 +59,13 @@ Net::API::Stripe::Connect::ApplicationFee - A Stripe Application Fee Object
 
 =head1 SYNOPSIS
 
+    my $app_fee = $stripe->application_fee({
+        account => $account_object,
+        amount => 2000,
+        balance_transaction => $balance_transaction_object,
+        currency => 'jpy',
+    });
+
 =head1 VERSION
 
     0.1
@@ -73,18 +80,8 @@ When you collect a transaction fee on top of a charge made for your user (using 
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::ApplicationFee> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -102,7 +99,7 @@ String representing the object’s type. Objects of the same type share the same
 
 =item B<account> string (expandable)
 
-ID of the Stripe account this fee was taken from. When expanded, this is a C<Net::API::Stripe::Connect::Account> object.
+ID of the Stripe account this fee was taken from. When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
 =item B<amount> integer
 
@@ -114,17 +111,17 @@ Amount in JPY refunded (can be less than the amount attribute on the fee if a pa
 
 =item B<application> string (expandable) "application"
 
-ID of the Connect application that earned the fee. When expanded, this is a C<Net::API::Stripe::Connect::Account> object.
+ID of the Connect application that earned the fee. When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
 =item B<balance_transaction> string (expandable)
 
 Balance transaction that describes the impact of this collected application fee on your account balance (not including refunds).
 
-When expanded, this is a C<Net::API::Stripe::Balance::Transaction> object.
+When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<charge> string (expandable)
 
-ID of the charge that the application fee was taken from. When expanded, this is a C<Net::API::Stripe::Charge> object.
+ID of the charge that the application fee was taken from. When expanded, this is a L<Net::API::Stripe::Charge> object.
 
 =item B<created> timestamp
 
@@ -144,7 +141,7 @@ Has the value true if the object exists in live mode or the value false if the o
 
 ID of the corresponding charge on the platform account, if this fee was the result of a charge using the destination parameter.
 
-When expanded, this is a C<Net::API::Stripe::Charge> object.
+When expanded, this is a L<Net::API::Stripe::Charge> object.
 
 =item B<refunded> boolean
 
@@ -154,21 +151,21 @@ Whether the fee has been fully refunded. If the fee is only partially refunded, 
 
 A list of refunds that have been applied to the fee.
 
-This is a C<Net::API::Stripe::Connect::ApplicationFee::Refunds> object.
+This is a L<Net::API::Stripe::Connect::ApplicationFee::Refunds> object.
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "fee_1FVF3LCeyNCl6fY2e4pW6luQ",
+	  "id": "fee_fake123456789",
 	  "object": "application_fee",
-	  "account": "acct_19eGgRCeyNCl6fY2",
+	  "account": "acct_fake123456789",
 	  "amount": 100,
 	  "amount_refunded": 0,
-	  "application": "ca_G1HcxZB0v0XIKPgCGLDz7pl9RPhHUmfH",
-	  "balance_transaction": "txn_1A3RPuCeyNCl6fY29RsjBA0b",
-	  "charge": "ch_1FVF3JCeyNCl6fY28AmYm7pv",
+	  "application": "ca_fake123456789",
+	  "balance_transaction": "txn_fake123456789",
+	  "charge": "ch_fake123456789",
 	  "created": 1571480455,
 	  "currency": "jpy",
 	  "livemode": false,
@@ -178,7 +175,7 @@ This is a C<Net::API::Stripe::Connect::ApplicationFee::Refunds> object.
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/application_fees/fee_1FVF3LCeyNCl6fY2e4pW6luQ/refunds"
+		"url": "/v1/application_fees/fee_fake123456789/refunds"
 	  }
 	}
 
@@ -200,7 +197,7 @@ L<https://stripe.com/docs/api/application_fees>, L<https://stripe.com/docs/conne
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

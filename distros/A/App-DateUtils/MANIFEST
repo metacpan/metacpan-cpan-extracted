@@ -22,6 +22,7 @@ script/parse-duration-using-df-alami-id
 script/parse-duration-using-df-natural
 script/parse-duration-using-td-parse
 script/strftime
+script/strftimeq
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

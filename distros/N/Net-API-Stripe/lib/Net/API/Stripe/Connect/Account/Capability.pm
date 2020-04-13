@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Capability.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -45,6 +45,13 @@ Net::API::Stripe::Connect::Account::Capability - A Stripe Account Capability Obj
 
 =head1 SYNOPSIS
 
+    my $capa = $stripe->=capability({
+        account => $account_object,
+        requested => $stripe->true,
+        requested_at => '2020-04-01',
+        status => 'active',
+    });
+
 =head1 VERSION
 
     0.1
@@ -59,18 +66,8 @@ A hash containing the set of capabilities that was requested for this account an
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Capability> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -90,7 +87,7 @@ String representing the object’s type. Objects of the same type share the same
 
 The account for which the capability enables functionality.
 
-When expanded, this is a C<Net::API::Stripe::Connect::Account> object.
+When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
 =item B<requested> boolean
 
@@ -104,7 +101,7 @@ Time at which the capability was requested. Measured in seconds since the Unix e
 
 Information about the requirements for the capability, including what information needs to be collected, and by when.
 
-This is a C<Net::API::Stripe::Connect::Account::Requirements> object.
+This is a L<Net::API::Stripe::Connect::Account::Requirements> object.
 
 =item B<status> string
 
@@ -117,7 +114,7 @@ The status of the capability. Can be active, inactive, pending, or unrequested.
 	{
 	  "id": "card_payments",
 	  "object": "capability",
-	  "account": "acct_19eGgRCeyNCl6fY2",
+	  "account": "acct_fake123456789",
 	  "requested": true,
 	  "requested_at": 1571480455,
 	  "requirements": {
@@ -148,7 +145,7 @@ L<https://stripe.com/docs/api/accounts/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

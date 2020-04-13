@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.14';
+our $VERSION = '0.17';
 
 =head1 NAME
 
@@ -541,6 +541,96 @@ sub as_http_tiny_snippet( $self, %options ) {
     );
 SNIPPET
 };
+
+=head2 C<< $r->as_curl >>
+
+    print $r->as_curl;
+
+Returns a curl command line representing the request
+
+This is convenient if you started out from something else or want a canonical
+representation of a curl command line.
+
+=over 4
+
+=item B<curl>
+
+The curl command to be used. Default is C<curl>.
+
+=back
+
+=cut
+
+# These are what curl uses as defaults, not what Perl should use as default!
+our %curl_header_defaults = (
+    'Accept'          => '*/*',
+    #'Accept-Encoding' => 'deflate, gzip',
+    # For Perl, use HTTP::Message::decodable() instead of the above list
+);
+
+sub as_curl($self,%options) {
+    $options{ curl } = 'curl'
+        if ! exists $options{ long_options };
+    $options{ long_options } = 1
+        if ! exists $options{ long_options };
+
+    my @request_commands;
+
+    if( $self->method eq 'HEAD' ) {
+        push @request_commands,
+            $options{ long_options } ? '--head' : '-I';
+
+    } elsif( $self->method ne 'GET' ) {
+        push @request_commands,
+            $options{ long_options } ? '--request' : '-X',
+            $self->method;
+    };
+
+    if( scalar keys %{ $self->headers }) {
+        for my $h (sort keys %{$self->headers}) {
+            my $v = $self->headers->{$h};
+
+            my $default;
+            if( exists $curl_header_defaults{ $h }) {
+                $default = $curl_header_defaults{ $h };
+            };
+
+            if( ! ref $v ) {
+                $v = [$v];
+            };
+            for my $val (@$v) {
+                if( !defined $default or $val ne $default ) {
+
+                    # also skip the Host: header if it derives from $uri
+                    if( $h eq 'Host' and ($val eq $self->uri->host_port
+                                          or $val eq $self->uri->host   )) {
+                        # trivial host header
+                    } elsif( $h eq 'User-Agent' ) {
+                        push @request_commands,
+                            $options{ long_options } ? '--user-agent' : '-A',
+                            $val;
+                    } else {
+                        push @request_commands,
+                            $options{ long_options } ? '--header' : '-h',
+                            "$h: $val";
+                    };
+                };
+            };
+        };
+    };
+
+    if( my $body = $self->body ) {
+        push @request_commands,
+            $options{ long_options } ? '--data' : '-d',
+            $body;
+    };
+
+    push @request_commands, $self->uri;
+
+    return
+        #(defined $options{ curl } ? $options{curl} : () ),
+        @request_commands;
+}
 
 =head2 C<< $r->clone >>
 

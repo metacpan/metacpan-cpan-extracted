@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Dispute/Evidence/Other.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -34,6 +34,11 @@ Net::API::Stripe::Issuing::Dispute::Evidence::Other - A Stripe Issued Card Evide
 
 =head1 SYNOPSIS
 
+    my $other = $stripe->issuing_evidence->other({
+        dispute_explanation => 'Service was not provided',
+        uncategorized_file => $file_object,
+    });
+
 =head1 VERSION
 
     0.1
@@ -42,24 +47,16 @@ Net::API::Stripe::Issuing::Dispute::Evidence::Other - A Stripe Issued Card Evide
 
 Evidence to support an uncategorized dispute. This will only be present if your dispute’s reason is other.
 
+This is instantiated by method B<other> in module L<Net::API::Stripe::Issuing::Dispute::Evidence>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Issuing::Dispute::Evidence::Other> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -75,19 +72,19 @@ Brief freeform text explaining why you are disputing this transaction.
 
 (ID of a file upload) Additional file evidence supporting your dispute.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "idp_1FVF3MCeyNCl6fY2U60c43Sz",
+	  "id": "idp_fake123456789",
 	  "object": "issuing.dispute",
 	  "amount": 100,
 	  "created": 1571480456,
 	  "currency": "usd",
-	  "disputed_transaction": "ipi_1FVF3MCeyNCl6fY2uC8uNvgo",
+	  "disputed_transaction": "ipi_fake123456789",
 	  "evidence": {
 		"fraudulent": {
 		  "dispute_explanation": "Fraud; card reported lost on 10/19/2019",
@@ -119,7 +116,7 @@ L<https://stripe.com/docs/api/issuing/disputes>, L<https://stripe.com/docs/issui
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

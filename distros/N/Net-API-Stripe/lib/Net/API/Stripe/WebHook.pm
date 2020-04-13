@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/WebHook.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -30,8 +30,6 @@ __END__
 
 Net::API::Stripe::WebHook - An interface to manage and handle Stripe WebHooks
 
-=head1 SYNOPSIS
-
 =head1 VERSION
 
     0.1
@@ -41,44 +39,17 @@ Net::API::Stripe::WebHook - An interface to manage and handle Stripe WebHooks
 Create a webhook:
 
 	curl https://api.stripe.com/v1/webhook_endpoints \
-	  -u sk_test_de3cHLEOsYm4zjiWQZBlYXyU: \
+	  -u sk_test_khaffUjkDalUfkLhWD: \
 	  -d url="https://example.com/my/webhook/endpoint" \
 	  -d "enabled_events[]=charge.failed" \
 	  -d "enabled_events[]=charge.succeeded"
 
-=head1 CONSTRUCTOR
-
-=over 4
-
-=item B<new>( %ARG )
-
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
-
-=back
-
-=head1 METHODS
-
-=over 4
-
-=item
-
-=back
+See L<Net::API::Stripe::WebHook::Apache> for detail of implementation using Apache with mod_perl and L<Net::API::Stripe::WebHook::Object> for the Stripe WebHook object.
 
 =head1 API SAMPLE
 
 	{
-	  "id": "we_1DVZbtCeyNCl6fY25k54GtOS",
+	  "id": "we_fake123456789",
 	  "object": "webhook_endpoint",
 	  "api_version": "2017-02-14",
 	  "application": null,
@@ -116,7 +87,7 @@ L<https://stripe.com/docs/webhooks/best-practices#event-handling>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -1,0 +1,56 @@
+=head1 NAME
+
+power-outlet-json.cgi - Control Power::Outlet device with web service
+
+=head1 DESCRIPTION
+
+power-outlet-json.cgi is a CGI application to control a Power::Outlet device with a web service.
+
+=head1 API
+
+The script is called over HTTP with name and action parameters.  The name is the Section Name from the INI file and the action is one of on, off, query, or switch.
+
+  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp&action=off
+  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp&action=on
+  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp&action=query
+  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp&action=switch
+
+Return is a JSON hash with keys status and state.  status is OK if there are no errors, state is the state of the switch after command either ON or OFF.
+
+  {"status":"OK","state":"ON"}
+
+=head1 CONFIGURATION
+
+To add an outlet for the web service, add a new INI section to the power-outlet.ini file.
+
+  [Unique_Section_Name]
+  type=iBoot
+  host=Lamp
+
+If you need to override the defaults
+
+  [Unique_Section_Name]
+  type=iBoot
+  host=Lamp
+  port=80
+  pass=PASS
+  name=My iBoot Description
+
+WeMo device
+
+  [WeMo]
+  type=WeMo
+  host=mywemo
+
+Default Location: /usr/share/power-outlet/conf/power-outlet.ini
+
+=head2 BUILD
+
+  rpmbuild -ta Power-Outlet-*.tar.gz
+
+=head1 INSTALLATION
+
+I recommend installation with the provided RPM package perl-Power-Outlet-application-cgi which installs to /usr/share/power-outlet.
+
+  sudo yum install perl-Power-Outlet-application-cgi
+

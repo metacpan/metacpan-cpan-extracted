@@ -1,0 +1,49 @@
+=head1 NAME
+
+power-outlet.cgi - Control multiple Power::Outlet devices from web browser
+
+=head1 DESCRIPTION
+
+power-outlet.cgi is a CGI application to control multiple Power::Outlet devices.  It was written to work on iPhone and look ok in most browsers.
+
+=head1 CONFIGURATION
+
+To add an outlet for the CGI application, add a new INI section to the power-outlet.ini file.
+
+  [Unique_Section_Name]
+  type=iBoot
+  host=Lamp
+  groups=Inside
+  groups=Kitchen
+
+If you need to override the defaults
+
+  [Unique_Section_Name]
+  type=iBoot
+  host=Lamp
+  port=80
+  pass=PASS
+  name=My iBoot Description
+  groups=Outside
+  groups=Deck
+
+WeMo device
+
+  [WeMo]
+  type=WeMo
+  host=mywemo
+  groups=Inside
+  groups=Study
+
+Default Location: /usr/share/power-outlet/conf/power-outlet.ini
+
+=head1 BUILD
+
+  rpmbuild -ta Power-Outlet-*.tar.gz
+
+=head1 INSTALLATION
+
+I recommend installation with the provided RPM package perl-Power-Outlet-application-cgi which installs to /usr/share/power-outlet and configures Apache with /etc/httpd/conf.d/power-outlet.conf.
+
+  sudo yum install perl-Power-Outlet-application-cgi
+

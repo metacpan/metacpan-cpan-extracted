@@ -60,7 +60,9 @@ And elsewhere:
 
   $full->feed_lion;
 
-  say $full->pounds;},
+  say $full->pounds;
+
+},
     });
 };
 

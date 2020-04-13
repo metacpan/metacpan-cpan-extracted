@@ -43,7 +43,7 @@ void av_to_vstring (const Array& av, std::vector<string>& v) {
     }
 }
 
-ConnectRequestSP make_request(const Hash& params, const ConnectRequestSP& dest) {
+ConnectRequestSP make_request (const Hash& params, const ConnectRequestSP& dest) {
     auto ret = dest ? dest : ConnectRequestSP(new ConnectRequest());
     http::fill(ret, params);
 
@@ -62,7 +62,7 @@ ConnectRequestSP make_request(const Hash& params, const ConnectRequestSP& dest) 
     return ret;
 }
 
-ConnectResponseSP make_response(const Hash& params, const ConnectResponseSP& dest) {
+ConnectResponseSP make_response (const Hash& params, const ConnectResponseSP& dest) {
     auto ret = dest ? dest : ConnectResponseSP(new ConnectResponse());
     http::fill(ret, params);
 
@@ -77,6 +77,46 @@ ConnectResponseSP make_response(const Hash& params, const ConnectResponseSP& des
     if ((val = params.fetch("ws_protocol"))) ret->ws_protocol = xs::in<string>(val);
 
     return ret;
+}
+
+void parser_config_in (Parser::Config& cfg, const Hash& h) {
+    Scalar val;
+    if ((val = h.fetch("max_frame_size")))     cfg.max_frame_size     = Simple(val);
+    if ((val = h.fetch("max_message_size")))   cfg.max_message_size   = Simple(val);
+    if ((val = h.fetch("max_handshake_size"))) cfg.max_handshake_size = Simple(val);
+    if ((val = h.fetch("check_utf8")))         cfg.check_utf8         = val.is_true();
+
+    if(h.exists("deflate")) cfg.deflate.reset();
+    Hash deflate_settings = h.fetch("deflate");
+    if (deflate_settings) {
+        auto dcfg = xs::in<panda::protocol::websocket::DeflateExt::Config>(deflate_settings);
+        cfg.deflate = dcfg;
+    }
+}
+
+void deflate_config_in (DeflateExt::Config& cfg, const Hash& h) {
+    Scalar val;
+    if ((val = h.fetch("server_max_window_bits")))     cfg.server_max_window_bits     = static_cast<std::uint8_t>(Simple(val));
+    if ((val = h.fetch("client_max_window_bits")))     cfg.client_max_window_bits     = static_cast<std::uint8_t>(Simple(val));
+    if ((val = h.fetch("client_no_context_takeover"))) cfg.client_no_context_takeover = SvTRUE(val);
+    if ((val = h.fetch("server_no_context_takeover"))) cfg.server_no_context_takeover = SvTRUE(val);
+    if ((val = h.fetch("mem_level")))                  cfg.mem_level                  = Simple(val);
+    if ((val = h.fetch("compression_level")))          cfg.compression_level          = Simple(val);
+    if ((val = h.fetch("strategy")))                   cfg.strategy                   = Simple(val);
+    if ((val = h.fetch("compression_threshold")))      cfg.compression_threshold      = Simple(val);
+}
+
+Sv deflate_config_out (const DeflateExt::Config& cfg) {
+    Hash settings = Hash::create();
+    settings.store("server_max_window_bits",     Simple(cfg.server_max_window_bits));
+    settings.store("client_max_window_bits",     Simple(cfg.client_max_window_bits));
+    settings.store("client_no_context_takeover", Simple(cfg.client_no_context_takeover));
+    settings.store("server_no_context_takeover", Simple(cfg.server_no_context_takeover));
+    settings.store("mem_level",                  Simple(cfg.mem_level));
+    settings.store("compression_level",          Simple(cfg.compression_level));
+    settings.store("strategy",                   Simple(cfg.strategy));
+    settings.store("compression_threshold",      Simple(cfg.compression_threshold));
+    return Ref::create(settings);
 }
 
 }}}

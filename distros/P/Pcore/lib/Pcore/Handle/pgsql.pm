@@ -2,7 +2,7 @@ package Pcore::Handle::pgsql;
 
 use Pcore -class, -const, -res, -export;
 use Pcore::Handle::DBI::Const qw[:CONST];
-use Pcore::Util::Scalar qw[looks_like_number is_plain_arrayref is_blessed_arrayref];
+use Pcore::Util::Scalar qw[is_bool looks_like_number is_plain_arrayref is_blessed_arrayref];
 use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Data qw[to_json];
 use Pcore::Util::Hash::HashArray;
@@ -157,6 +157,8 @@ sub quote ( $self, $var ) {
             die 'Unsupported SQL type';
         }
     }
+
+    # perl Array -> encode to postgres array
     elsif ( is_plain_arrayref $var) {
 
         # encode and quote
@@ -165,6 +167,11 @@ sub quote ( $self, $var ) {
         $var->$* =~ s/'/''/smg;
 
         return q['] . $var->$* . q['];
+    }
+
+    # known boolean objects
+    elsif ( is_bool $var ) {
+        return $var ? 'TRUE' : 'FALSE';
     }
 
     # NUMBER

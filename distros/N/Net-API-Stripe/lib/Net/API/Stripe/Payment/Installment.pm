@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Installment.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -32,6 +32,10 @@ Net::API::Stripe::Payment::Installment - A Stripe Instalment Payment Object
 
 =head1 SYNOPSIS
 
+    my $inst = $stripe->card->installments({
+        plan => $plan_object,
+    });
+
 =head1 VERSION
 
     0.1
@@ -42,14 +46,18 @@ Installment details for this payment (Mexico only).
 
 For more information, see the installments integration guide (L<https://stripe.com/docs/payments/installments>).
 
+This is instantiated by method B<installments> in module L<Net::API::Stripe::Connect::ExternalAccount::Card>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Payment::Installment> object.
 It may also take an hash like arguments, that also are method of the same name.
+
+=back
 
 =head1 METHODS
 
@@ -95,7 +103,7 @@ L<https://stripe.com/docs/payments/installments>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

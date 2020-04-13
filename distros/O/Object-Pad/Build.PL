@@ -7,7 +7,10 @@ use XS::Parse::Sublike::Builder;
 my $build = Module::Build->new(
    module_name => 'Object::Pad',
    requires => {
-      'indirect' => 0,
+      # On perl 5.31.9 onwards we use core's no feature 'indirect',
+      ( $] >= 5.031009 ?
+         () :
+         ( 'indirect' => 0 ) ),
 
       'perl' => '5.016', # pad_add_name_pvn, pad_add_name_pvs, gv_init_pvn
    },

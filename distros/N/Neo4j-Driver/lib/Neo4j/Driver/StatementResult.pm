@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::StatementResult;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::StatementResult::VERSION = '0.15';
+$Neo4j::Driver::StatementResult::VERSION = '0.16';
 
 use Carp qw(croak);
 
@@ -238,7 +238,7 @@ Neo4j::Driver::StatementResult - Result of running a Cypher statement (a stream 
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 

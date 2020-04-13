@@ -1,9 +1,8 @@
 package Mail::TLSRPT::Policy;
 # ABSTRACT: TLSRPT policy object
-our $VERSION = '1.20200306.1'; # VERSION
+our $VERSION = '1.20200413.1'; # VERSION
 use 5.20.0;
 use Moo;
-use Carp;
 use Mail::TLSRPT::Pragmas;
 use Mail::TLSRPT::Failure;
     has policy_type => (is => 'rw', isa => Enum[qw( tlsa sts no-policy-found )], required => 1);
@@ -13,6 +12,7 @@ use Mail::TLSRPT::Failure;
     has total_successful_session_count => (is => 'rw', isa => Int, required => 1);
     has total_failure_session_count => (is => 'rw', isa => Int, required => 1);
     has failures => (is => 'rw', isa => ArrayRef, required => 0, lazy => 1, builder => sub{return []} );
+
 
 sub new_from_data($class,$data) {
     my @failures;
@@ -31,6 +31,7 @@ sub new_from_data($class,$data) {
     return $self;
 }
 
+
 sub as_struct($self) {
     my @failures = map {$_->as_struct} $self->failures->@*;
     return {
@@ -48,6 +49,7 @@ sub as_struct($self) {
     };
 }
 
+
 sub as_string($self) {
     return join( "\n",
         'Policy:',
@@ -59,6 +61,33 @@ sub as_string($self) {
         ' Failure-Session-Count: '.$self->total_failure_session_count,
         map { $_->as_string } $self->failures->@*,
     );
+}
+
+sub _register_prometheus($self,$prometheus) {
+    $prometheus->declare('tlsrpt_sessions_total', help=>'TLSRPT tls sessions', type=>'counter' );
+}
+
+
+sub process_prometheus($self,$report,$prometheus) {
+    $self->_register_prometheus($prometheus);
+    $prometheus->add('tlsrpt_sessions_total',$self->total_successful_session_count,{
+        result=>'successful',
+        organization_name=>$report->organization_name,
+        policy_type=>$self->policy_type,
+        policy_domain=>$self->policy_domain,
+        policy_mx_host=>$self->policy_mx_host,
+    });
+    $prometheus->add('tlsrpt_sessions_total',$self->total_failure_session_count,{
+        result=>'failure',
+        organization_name=>$report->organization_name,
+        policy_type=>$self->policy_type,
+        policy_domain=>$self->policy_domain,
+        policy_mx_host=>$self->policy_mx_host,
+    });
+    Mail::TLSRPT::Failure->_register_prometheus($prometheus) if ! scalar $self->failures->@*;
+    foreach my $failure ( $self->failures->@* ) {
+        $failure->process_prometheus($self,$report,$prometheus);
+    }
 }
 
 sub _csv_headers($self) {
@@ -97,7 +126,47 @@ Mail::TLSRPT::Policy - TLSRPT policy object
 
 =head1 VERSION
 
-version 1.20200306.1
+version 1.20200413.1
+
+=head1 SYNOPSIS
+
+my $policy = Mail::TLSRPT::Policy->new(
+    policy_type => 'no-policy-found',
+    policy_string => [],
+    policy_domain => 'example.com',
+    polixy_mx_host => 'mx.example.com',
+    total_succerssful_session_count => 10,
+    total_failure_session_count => 2,
+    failures => $failures,
+);
+
+=head1 DESCRIPTION
+
+Classes to process tlsrpt policy in a report
+
+=head1 CONSTRUCTOR
+
+=head2 I<new($class)>
+
+Create a new object
+
+=head2 I<new_from_data($data)>
+
+Create a new object using a data structure, this will create sub-objects as required.
+
+=head1 METHODS
+
+=head2 I<as_struct>
+
+Return the current object and sub-objects as a data structure
+
+=head2 I<as_string>
+
+Return a textual human readable representation of the current object and its sub-objects
+
+=head2 I<process_prometheus($prometheus,$report)>
+
+Generate metrics using the given Prometheus::Tiny object
 
 =head1 AUTHOR
 

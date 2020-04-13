@@ -1,0 +1,3097 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::API::Stripe - An interface to Stripe API
+
+=head1 SYNOPSIS
+
+    my $stripe = Net::API::Stripe->new({
+		debug => 3,
+		conf_file => './stripe-settings.json',
+		livemode => 0,
+		ignore_unknown_parameters => 1,
+		expand => 'all',
+    }) || die( Net::API::Stripe->error );
+
+A Stripe json settings file looks like this:
+
+	{
+		"livemode": false,
+		"test_secret_key": "sk_test_1234567890abcdefg",
+		"test_public_key": "pk_test_1234567890abcdefg",
+		"live_secret_key": "sk_live_0987654321zyxwvut",
+		"live_public_key": "pk_live_0987654321zyxwvut",
+		"version": "2020-03-02",
+	}
+
+Create a customer:
+
+	# Create an address object
+	my $addr;
+	if( $v->{street} || $v->{city} || $v->{postal_code} || $v->{country} )
+	{
+		$addr = $stripe->address({
+			line1 => $v->{street},
+			line2 => $v->{building},
+			city => $v->{city},
+			postal_code => $v->{postal_code},
+			state => $v->{state},
+			country => $v->{country},
+		}) || bailout( "Unable to create a postal address object: ", $stripe->error );
+	}
+	my $cust_object = $stripe->customer({
+	    balance => 20000,
+	    address => $addr,
+	    # Must be set up previously before using it
+	    coupon => '2020DISCOUNT50',
+	    # Japanese Yen
+	    currency => 'jpy',
+	    description => 'VIP customer',
+	    email => 'john@example.com',
+	    invoice_prefix => 'VIP',
+	    # Default payment must be set up beforehand for it to be declared here
+	    invoice_settings => { default_payment_method => 'pm_fake1234567' },
+	    metadata => { db_id => 123, process_id => 456 },
+	    name => 'John Doe',
+	    phone => '+81-90-1234-5678',
+	    preferred_locales => [qw( en ja )],
+	    shipping => $addr,
+	});
+
+	# Submit this customer to Stripe for creation
+	my $cust = $stripe->customers( create => $cust_object ) || die( sprintf( "Failed with error message %s and code %d\n", $stripe->error->message, $stripe->error->code );
+
+Retrieve customer:
+
+    my $cust = $stripe->customers( retrieve => 'cust_fake12345' );
+    # or we can also pass a customer object
+    my $cust = $stripe->customers( retrieve => $cust_object ) || do
+    {
+    	if( $stripe->http_response->code == 404 )
+    	{
+    		die( "Customer ", $cust_object->id, " does not exist!\n" );
+    	}
+    	else
+    	{
+    		die( "Some unexpected error occurred: ", $stripe->error, "\n" );
+    	}
+    };
+
+Other methods are describe below and the parameters they take are documented in their respective module.    
+
+=head1 VERSION
+
+    v0.9
+
+=head1 DESCRIPTION
+
+This is a comprehensive Stripe API. It provides an object oriented friendly interface for which I put a lot of hard word so you could spend your time on other aspects of your development.
+
+It inherits from L<Module::Generic> and L<Net::API::Stripe> sub modules inherits from L<Net::API::Stripe::Generic>
+
+=head1 CONSTRUCTOR
+
+=head2 new( %ARG )
+
+Creates a new L<Net::API::Stripe> objects.
+It may also take an hash like arguments, that also are method of the same name.
+
+=over 4
+
+=item I<api_uri> The base uri of the Stripe API. This should not be changed.
+
+=item I<browser> The user agent id to use when making http api calls
+
+=item I<conf_file> The file path to the configuration file. Each property in this configuration file is same as the parameters to instantiate a new L<Net::API::Stripe> object.
+
+=item I<debug> Toggles debug mode on/off
+
+=item I<expand> Integer. Sets the depth level of expansion of Stripe objects. If objects are not expanded, Stripe API will return the object id, but when they are expanded, Stripe returns the entire object and its properties. Youc an then chain your code and do something like:
+
+    print $cust->invoice_settings->default_payment_method->type
+
+=item I<ignore_unknown_parameters> Boolean. When this is on, this will ignore any properties sent back from Stripe API that are unknown to us. This happens frequently as Stripe updates its API. When this value is set to false, then unknown properties will cause this to stop processing and return an error.
+
+=item I<livemode> Boolean value to toggle test or live mode
+
+=item I<verbose> Toggles verbose mode on/off
+
+=item I<version> The version of the Stripe API to use. Example C<2020-03-02>
+
+=back
+
+=head1 METHODS
+
+=head2 account
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::Account> object.
+
+=head2 account_link
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::Account::Link> object.
+
+=head2 address
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Address> object.
+
+=head2 amount
+
+Provided with a number, this returns a L<Net::API::Stripe::Number> object, which extends L<Number::Format>
+
+=head2 api_uri
+
+Returns the L<URI> object of the Stripe api.
+
+=head2 application_fee
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::ApplicationFee> object.
+
+=head2 application_fee_refund
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::ApplicationFee::Refund> object.
+
+=head2 authorization
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Issuing::Authorization> object.
+
+=head2 balance
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Balance> object.
+
+=head2 balance_transaction
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Balance::Transaction> object.
+
+=head2 bank_account
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::ExternalAccount::Bank> object.
+
+=head2 browser
+
+Set or get the user agent string used when making calls to Stripe API.
+
+=head2 capability
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::Account::Capability> object.
+
+=head2 card_holder
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Issuing::Card::Holder> object.
+
+=head2 card
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::ExternalAccount::Card> object.
+
+=head2 charge
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Charge> object.
+
+=head2 code2error
+
+Given a code returned by Stripe upon error, this returns the corresponding string.
+
+    my $cust = $stripe->customers( retrieve => $id ) || 
+      die( $stripe->code2error( $stripe->error->code ), "\n" );
+
+=head2 conf_file( [ file path ] )
+
+Given a json configuration file, it will read the data, set the property I<conf_data> to the decoded hash and return it. When called without argument, it returns the current value of I<conf_data>.
+
+=head2 connection_token
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Terminal::ConnectionToken> object.
+
+=head2 country_spec
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::CountrySpec> object.
+
+=head2 coupon
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::Coupon> object.
+
+=head2 credit_note
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::CreditNote> object.
+
+=head2 currency
+
+Set or get the 3-letter iso 4217 currency, such as C<jpy> for Japanese yen or C<eur> for Euro.
+
+=head2 customer
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Customer> object.
+
+=head2 customer_balance_transaction
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Customer::BalanceTransaction> object.
+
+=head2 customer_tax_id
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Customer::TaxId> object.
+
+=head2 delete( END POINT, HASH PAYLOAD )
+
+Given a Stripe end point as a URI absolute path, and a payload as a hash reference, this will issue a C<DELETE> http query and return a hash reference corresponding to the json data returned by Stripe, or, in case of error, it will return undef and set the error which can be accessed with C<$stripe->error> (a L<Module::Generic::Exception> object).
+
+=head2 discount
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::Discount> object.
+
+=head2 dispute
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Dispute> object.
+
+=head2 encode_with_json
+
+Takes a bollean value. This is used to set whether the payload should be encoded with json. This should not be changed.
+
+=head2 event
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Event> object.
+
+=head2 expand
+
+Integer. Sets or get the depth of Stripe object expansion. See Stripe api documentation for more information: L<https://stripe.com/docs/api/expanding_objects>
+
+=head2 fields
+
+Given an object type, this returns an array reference of all the methods (aka fields) for that module.
+
+=head2 file
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::File> object.
+
+=head2 file_link
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::File::Link> object.
+
+=head2 fraud
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Fraud> object.
+
+=head2 generate_uuid
+
+Returns a uuid version 4. This uses L<Data::UUID> to achieve that.
+
+=head2 get( END POINT, HASH PAYLOAD )
+
+Given a Stripe absolute uri and a hash reference, this will issue a http C<GET> request and return a hash reference representing the json data returned by Stripe or undef if an error occurred. The error can then be retrieved like C<$stripe->error> which is a L<Module::Generic::Exception> object.
+
+=head2 http_client
+
+This returns the L<LWP::UserAgent> object and create it if it is not yet instantiated.
+
+=head2 http_request
+
+Get or set the L<HTTP::Request> based on the data provided.
+
+=head2 http_response
+
+Get or set the L<HTTP::Response> based on the data provided.
+
+=head2 ignore_unknown_parameters
+
+Boolean. When true, this module will ignore unknown properties returned from calls made to Stripe api. if set to false, and an unknown property is received, this will generate an error and return undef, stopping the flow of the request instead of ignoring it.
+
+=head2 invoice
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::Invoice> object.
+
+=head2 invoice_item
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::Invoice::Item> object.
+
+=head2 invoice_line_item
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::Invoice::LineItem> object.
+
+=head2 invoice_settings
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::Invoice::Settings> object.
+
+=head2 issuing_card
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Issuing::Card> object.
+
+=head2 issuing_dispute
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Issuing::Dispute> object.
+
+=head2 issuing_transaction
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Issuing::Transaction> object.
+
+=head2 json
+
+This returns a C<JSON> object with option I<allow_nonref> enabled.
+
+=head2 key( STRIPE API SECRET KEY )
+
+Provided with your Stripe api secret key, this will set this property accordingly, but will also set the B<auth> property as well. B<auth> is used to authenticate you when making calls to Stripe api. B<auth> would be something like this:
+
+    Basic c2tfMTIzNDU2Nzg5MGFiY2RlZmdoaWo6Cg
+
+=head2 livemode
+
+Boolean. Set or get the livemode status. If it is true, then all api query will be mad in live mode.
+
+=head2 location
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Terminal::Location> object.
+
+=head2 login_link
+
+Provided with optional hash parameters this returns a L<Net::API::Stripe::Connect::Account::LoginLink> object.
+
+=head2 order
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Order> object.
+
+=head2 order_item
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Order::Item> object.
+
+=head2 payment_intent
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Payment::Intent> object.
+
+=head2 payment_method
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Payment::Method> object.
+
+=head2 payout
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Payout> object.
+
+=head2 person
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::Person> object.
+
+=head2 plan
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::Plan> object.
+
+=head2 post( END POINT, HASH PAYLOAD )
+
+Given a Stripe end point absolute uri and a hash reference, this will issue a C<POST> http request to the Stripe api and return a hash reference representing the object provided by Stripe or undef with an error set, which can be retrieved using the B<error> method.
+
+If no I<idempotency> parameter was provided, B<post> will automatically create one.
+
+=head2 post_multipart( END POINT, HASH PAYLOAD )
+
+Given a Stripe end point absolute uri and a hash reference, this will issue a C<POST> multipart http request to the Stripe api and return a hash reference representing the object returned by Stripe. If an error had occurred, it will return undef and set an error that can be retrieved using the B<error> method.
+
+This method is used primarily when upload file. See the section below on C</"FILES">
+
+=head2 product
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Product> object.
+
+=head2 reader
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Terminal::Reader> object.
+
+=head2 refund
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Refund> object.
+
+=head2 return
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Order::Return> object.
+
+=head2 review
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Fraud::Review> object.
+
+=head2 schedule
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::Subscription::Schedule> object.
+
+=head2 session
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Session> object.
+
+=head2 schedule_query
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Sigma::ScheduledQueryRun> object.
+
+=head2 session
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Checkout::Session> object.
+
+=head2 setup_intent
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Payment::Intent::Setup> object.
+
+=head2 shipping
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Shipping> object.
+
+=head2 sku
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Order::SKU> object.
+
+=head2 source
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Payment::Source> object.
+
+=head2 subscription
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::Subscription> object.
+
+=head2 subscription_item
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::Subscription::Item> object.
+
+=head2 tax_ids
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::TaxID> object.
+
+=head2 tax_rate
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Tax::Rate> object.
+
+=head2 token
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Token> object.
+
+=head2 topup
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::TopUp> object.
+
+=head2 transfer
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::Transfer> object.
+
+=head2 transfer_reversal
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::Transfer::Reversal> object.
+
+=head2 usage_record
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Billing::UsageRecord> object.
+
+=head2 value_list
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Fraud::ValueList> object.
+
+=head2 value_list_item
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Fraud::ValueList::Item> object.
+
+=head2 version
+
+Set or get the api version. This must be set on the L<Stripe dashboard|https://dashboard.stripe.com/>
+
+=head2 webhook
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::WebHook::Object> object.
+
+=head2 transfer
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::Transfer> object.
+
+=head2 transfer
+
+Provided with optional hash parameters, this returns a L<Net::API::Stripe::Connect::Transfer> object.
+
+=head2 BALANCE
+
+You can B<retrieve> the account balance.
+
+=head3 retrieve
+
+Provided a C<balance> object or an id, this returns a L<Net::API::Stripe::Balance> object or undef upon error.
+
+=head2 ERROR HANDLING
+
+L<Net::API::Stripe> never dies, or at least not voluntarily. Instead, when an error occurs and is reported, it returns undef and the error can be retrieved with the B<error> method, such as:
+
+    my $prod = $stripe->products( retrieve => $prod_id ) || die( $stripe->error, "\n" );
+
+The B<error> method returns the L<Module::Generic::Exception> set. Please refer to the manual page of L<Module::Generic> for more information, but essentially, the following methods are available with the error objects:
+
+=head3 as_string
+
+This is triggered when the error object is stringified
+
+=head3 code
+
+The error code returned by Stripe
+
+=head3 file
+
+The file containing the error
+
+=head3 line
+
+The line number of the error
+
+=head3 message
+
+The actual error message
+
+=head3 package
+
+The package name where the error occurred.
+
+=head3 rethrow
+
+Used to re-trigger the error
+
+=head3 subroutine
+
+The subroutine name where the error originates
+
+=head3 trace
+
+The full stack trace object. This is a L<Devel::StackTrace>
+
+=head3 type
+
+The error type, if any
+
+=head2 DATES AND DATETIME
+
+Everywhere Stripe returns a date or datetime, L<Net::API::Stripe> will return a L<DateTime> object so one can call the method like this:
+
+    printf( "Object was created on %s\n", $product->created->iso8601 );
+
+=head2 NUMBERS
+
+When a number is returned by Stripe, L<Net::API::Stripe> will return a L<Net::API::Stripe::Number>, so one could call the method representing a number like this:
+
+    printf( "Charge was %s\n", $charge->amount->format_money( 2, '€' ) );
+	# Assuming the charge amount is 100, this would produce: €100.00
+
+=head2 API ACCESS METHODS
+
+All api access methods below from L</"BALANCE TRANSACTIONS"> and below also take the I<expand> parameter, which can have value 'all' to expand all possible objects, or it can have an integer to set the depth of expanstion or it can be an array reference of object properties to expand. Sub levels of expansion are noted by a dot between properties.
+
+    my $cust = $stripe->customers( retrieve => { id => $customer_id, expand => [qw( invoice_settings.default_payment_method invoice_settings.default_payment_method.customer )] })
+
+When providing an object as a parameter to an api method, I<expand> will always set automatically to C<all>.
+
+=head2 BALANCES
+
+You an B<retrieve> balances.
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Balance> object, or a hash reference, this will retrieve a Stripe balance and return its L<Net::API::Stripe::Balance> object.
+
+There is no argument.
+
+=head2 BALANCE TRANSACTION
+
+You can B<retrieve> or B<list> the balance transactions.
+
+=head3 list
+
+This can take various parameter to influence the list of data returned by Stripe. It returns a L<Net::API::Stripe::List> object of L<Net::API::Stripe::Balance::Transaction> objects. Valid parameters are as follows. See Stripe API for more information: L<https://stripe.com/docs/api/balance_transactions/list>
+
+    my $list = $stripe->balance_transactions( 'list' ) || die( $stripe->error );
+	while( my $bt = $list->next )
+	{
+		printf( <<EOT, $bt->id, $bt->amount, $bt->created->iso8601, $bt->currency, $bt->customer->name, $bt->description );
+Id: %s
+Amount: %s
+Created on: $s
+Currency: %s
+Cusomer name: %s
+Description: %s
+EOT
+	}
+
+Possible parameters are:
+
+=over 4
+
+=item I<available_on>
+
+=item I<created>
+
+=item I<currency> 3-letter iso 4217 currency
+
+=item I<ending_before> Stripe balance transaction id
+
+=item I<limit> Integer
+
+=item I<payout>
+
+=item I<source>
+
+=item I<starting_after>
+
+=item I<type> Only returns transactions of the given type
+
+=back
+
+=head3 retrieve
+
+Provided a C<balance_transaction> object or an id, this returns a L<Net::API::Stripe::Balance::Transaction> object or undef upon error.
+
+=head2 BANK ACCOUNT
+
+You can B<create>, B<retrieve>, B<update>, B<delete> or B<list> bank acounts.
+
+=head3 create
+
+Provided wuth a bank account object L<Net::API::Stripe::Connect::ExternalAccount::Bank> that has its I<account> property set, or simply a hash reference this will create a Stripe bank account and return its object as a L<Net::API::Stripe::Connect::ExternalAccount::Bank>
+
+Possible parameters are:
+
+=over 4
+
+=item I<account> A Stripe account id. This is required.
+
+=item I<external_account> This is required. Either a token, like the ones returned by Stripe.js, or a hash reference containing a user’s bank account details with the following properties:
+
+=over 8
+
+=item I<object> (required)
+
+=item I<country> (required)
+
+=item I<currency> (required)
+
+=item I<account_holder_name>
+
+=item I<account_holder_type>
+
+=item I<routing_number>
+
+=item I<account_number> (required)
+
+=back
+
+=item I<default_for_currency> Boolean
+
+=item I<metadata> An arbitrary hash reference
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/external_account_bank_accounts/create>
+
+=head3 retrieve
+
+Provided wuth a bank account object L<Net::API::Stripe::Connect::ExternalAccount::Bank> that has its I<account> property set, or simply a hash reference this will retrieve a Stripe bank account and return its object as a L<Net::API::Stripe::Connect::ExternalAccount::Bank>
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe bank account id. This is required.
+
+=item I<account> A Stripe account id. This is required.
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/external_account_bank_accounts/retrieve>
+
+=head3 update
+
+Provided wuth a bank account object L<Net::API::Stripe::Connect::ExternalAccount::Bank> that has its I<account> property set, or simply a hash reference this will update a Stripe bank account and return its object as a L<Net::API::Stripe::Connect::ExternalAccount::Bank>
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe bank account id. This is required.
+
+=item I<account> A Stripe account id. This is required.
+
+=item I<account_holder_name> String
+
+=item I<account_holder_type> String
+
+=item I<default_for_currency> Boolean
+
+=item I<metadata> An arbitrary hash reference
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/external_account_bank_accounts/update>
+
+=head3 delete
+
+Provided wuth a bank account object L<Net::API::Stripe::Connect::ExternalAccount::Bank> that has its I<account> property set, or simply a hash reference this will remove a Stripe bank account and return its object as a L<Net::API::Stripe::Connect::ExternalAccount::Bank>
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe bank account id. This is required.
+
+=item I<account> A Stripe account id. This is required.
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/external_account_bank_accounts/delete>
+
+=head3 list
+
+Provided wuth a bank account object L<Net::API::Stripe::Connect::ExternalAccount::Bank> that has its I<account> property set, or simply a hash reference this will list all Stripe bank accounts and return a list object as a L<Net::API::Stripe::List>
+
+Possible parameters are:
+
+=over 4
+
+=item I<account> A Stripe account id. This is required.
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/external_account_bank_accounts/list>
+
+=head2 CARD
+
+You can B<create>, B<retrieve>, B<update>, B<delete> or B<list> cards.
+
+=head3 create
+
+Provided a customer object L<Net::API::Stripe::Customer> or a card object L<Net::API::Stripe::Payment::Card> that has its I<customer> property set, or simply a hash reference this will create a Stripe card and return its object as a L<Net::API::Stripe::Payment::Card>
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A customer id
+
+=item I<source> A hash reference with the following properties: object number exp_month exp_year cvc currency name metadata default_for_currency address_line1 address_line2 address_city address_state address_zip address_country
+
+=item I<metadata> An arbitrary hash reference
+
+=back
+
+=head3 retrieve
+
+Provided a customer object L<Net::API::Stripe::Customer> or a card object L<Net::API::Stripe::Payment::Card> that has its I<customer> property set, or simply a hash reference this will retrieve the customer card information as a L<Net::API::Stripe::Payment::Card> object
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> Stripe card id
+
+=item I<customer> Stripe customer id
+
+=back
+
+=head3 update
+
+Provided a customer object L<Net::API::Stripe::Customer> or a card object L<Net::API::Stripe::Payment::Card> that has its I<customer> property set, or simply a hash reference this will update the customer card information, but what can be updated is limited by Stripe and it is typically the expiration date or postal address
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> Stripe card id
+
+=item I<customer> Stripe customer id
+
+=item I<address_city> City
+
+=item I<address_country> Country as 2-letters ISO 3166 country code
+
+=item I<address_line1> Address first line
+
+=item I<address_line2> Address second line
+
+=item I<address_state> State / region
+
+=item I<address_zip> Postal code
+
+=item I<exp_month> Expiration month
+
+=item I<exp_year> Expiration year
+
+=item I<metadata> Arbitrary hash reference
+
+=item I<name> Name for this credit card
+
+=back
+
+=head3 delete
+
+Provided with a L<customer|Net::API::Stripe::Customer> or a L<card|Net::API::Stripe::Payment::Card> object, or a hash reference, this will issue an api call to Stripe to remove the customer's card. It returns the card object that as deleted with its property I<deleted> set to true.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> Stripe customer id
+
+=item I<card_id> Stripe card id
+
+=back
+
+=head3 list
+
+Provided with a L<customer|Net::API::Stripe::Customer> object, this issue an api call to get the list of all cards for a given customer.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> Stripe customer id
+
+=item I<ending_before> A card id
+
+=item I<limit> Integer
+
+=item I<starting_after> A card id
+
+=back
+
+For more information, see Stripe api documentation here: L<https://stripe.com/docs/api/cards/list>
+
+=head2 CHARGE
+
+You can B<create>, B<retrieve>, B<update>, B<capture> or B<list> charges.
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Charge> object or a hash reference, this will create a Stripe charge and return a charge object L<Net::API::Stripe::Charge>
+
+Possible parameters are:
+
+=over 4
+
+=item I<amount> Amount as integer. This is required
+
+=item I<currency> A 3-letter iso 4217 code such sa C<jpy> for Japanese Yen
+
+=item I<application_fee_amount> Integer
+
+=item I<capture> Boolean
+
+=item I<customer> A customer id
+
+=item I<description> An arbitrary text
+
+=item I<destination> A hash with properties account and amount.
+
+=item I<metadata> Arbitrary hash reference
+
+=item I<on_behalf_of> Stripe account id
+
+=item I<receipt_email> E-mail address
+
+=item I<shipping> Shipping address as a hash reference with the following properties: address name carrier phone tracking_number. See also L<Net::API::Stripe::Shipping>
+
+=item I<source> A source id
+
+=item I<statement_descriptor> Text
+
+=item I<statement_descriptor_suffix> Text
+
+=item I<transfer_data> A date
+
+=item I<transfer_group> Text
+
+=item I<idempotency> identifier
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/charges/create>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Charge> object or a hash reference, this will retrieve a Stripe charge and return its corresponding charge object L<Net::API::Stripe::Charge>
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> Stripe charge id. This is required
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/charges/retrieve>
+
+=head3 update
+
+Provided with a L<Net::API::Stripe::Charge> object or a hash reference, this will update a Stripe charge and return its corresponding charge object L<Net::API::Stripe::Charge>
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe charge id. This is required
+
+=item I<customer> A customer id
+
+=item I<description> An arbitrary text
+
+=item I<fraud_details> A hash with one property: I<user_report>
+
+=item I<metadata> Arbitrary hash reference
+
+=item I<receipt_email> E-mail address
+
+=item I<shipping> Shipping address as a hash reference with the following properties: address name carrier phone tracking_number. See also L<Net::API::Stripe::Shipping>
+
+=item I<transfer_group> Text
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/charges/update>
+
+=head3 capture
+
+Provided with a L<Net::API::Stripe::Charge> object or a hash reference, this will capture a Stripe charge and return its corresponding charge object L<Net::API::Stripe::Charge>
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe charge id. This is required
+
+=item I<amount> Integer
+
+=item I<application_fee_amount> Integer
+
+=item I<destination> A hash reference with one property: I<amount>
+
+=item I<receipt_email> E-mail address
+
+=item I<statement_descriptor> Text
+
+=item I<statement_descriptor_suffix> String
+
+=item I<transfer_data> A hash reference with one property: I<amount>
+
+=item I<transfer_group> Text
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/charges/capture>
+
+=head3 list
+
+This will list all the charges for a given customer and return a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<created> A date that can also be expressed as a unix timestamp
+
+=item I<customer> A Stripe customer id
+
+=item I<ending_before> A Stripe charge id
+
+=item I<limit> Integer
+
+=item I<payment_intent> A payment intent Stripe id
+
+=item I<source> A source Stripe id
+
+=item I<starting_after> A Stripe charge id
+
+=item I<transfer_group> Text
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/charges/list>
+
+=head2 COUPONS
+
+You can B<create>, B<retrieve>, B<update>, B<delete> or B<list> coupons.
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Billing::Coupon> object or a hash reference, this will create a Stripe coupon and return a coupon object L<Net::API::Stripe::Billing::Coupon>
+
+Possible parameters are:
+
+=over 4
+
+=item I<duration> String that can be forever, once or repeating
+
+=item I<amount_off> Integer
+
+=item I<currency> Three-letters iso 4217 currency code such as C<jpy> for Japanese Yen
+
+=item I<duration_in_months> Integer
+
+=item I<id> A Coupon id, which is also the coupon code, so you are encouraged to create it
+
+=item I<max_redemptions> Integer
+
+=item I<metadata> Arbitrary hash reference
+
+=item I<name> String
+
+=item I<percent_off> Percentage such as > 0 and <= 100
+
+=item I<redeem_by> Date
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/coupons/create>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Billing::Coupon> object or a hash reference, this will retrieve a Stripe coupon and return a coupon object L<Net::API::Stripe::Billing::Coupon>.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe coupon id
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/coupons/retrieve>
+
+=head3 update
+
+Provided with a L<Net::API::Stripe::Billing::Coupon> object or a hash reference, this will update a Stripe coupon and return a coupon object L<Net::API::Stripe::Billing::Coupon>.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe coupon id
+
+=item I<metadata> Arbitrary hash reference
+
+=item I<name> String
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/coupons/update>
+
+=head3 delete
+
+Provided with a L<Net::API::Stripe::Billing::Coupon> object or a hash reference, this will remove the Stripe coupon and return a coupon object L<Net::API::Stripe::Billing::Coupon> with the property I<deleted> set to true.
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/coupons/delete>
+
+=head3 list
+
+This will list all the coupons and return a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<created> A date that can also be expressed as a unix timestamp
+
+=item I<customer> A Stripe customer id
+
+=item I<ending_before> A Stripe charge id
+
+=item I<limit> Integer
+
+=item I<starting_after> A Stripe charge id
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/coupons/list>
+
+=head2 CREDIT NOTES
+
+You can B<preview>, B<create>, B<lines>, B<lines_preview>, B<retrieve>, B<update>, B<void> or B<list> credit notes.
+
+=head3 preview
+
+Provided with a L<Net::API::Stripe::Billing::CreditNote> or a hash reference, this will create a Stripe credit note preview and return a L<Net::API::Stripe::Billing::CreditNote> object.
+
+=over 4
+
+=item I<invoice> A Stripe invoice id. This is required.
+
+=item I<amount> Integer
+
+=item I<credit_amount> Integer
+
+=item I<lines> An array of hash with properties: amount description invoice_line_item quantity tax_rates type unit_amount unit_amount_decimal
+
+=item I<memo> Text
+
+=item I<metadata> Arbitrary hash reference
+
+=item I<out_of_band_amount> Integer
+
+=item I<reason> Text
+
+=item I<refund> A Stripe refund id
+
+=item I<refund_amount> Integer
+
+=back
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Billing::CreditNote> object or a hash reference, this will create a Stripe credit note and return a credit note L<Net::API::Stripe::Billing::CreditNote> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<invoice> A Stripe invoice id. This is required.
+
+=item I<amount> Integer
+
+=item I<credit_amount> Integer
+
+=item I<lines> An array of hash with properties: amount description invoice_line_item quantity tax_rates type unit_amount unit_amount_decimal
+
+=item I<memo> Text
+
+=item I<metadata> Arbitrary hash reference
+
+=item I<out_of_band_amount> Integer
+
+=item I<reason> Text
+
+=item I<refund> A Stripe refund id
+
+=item I<refund_amount> Integer
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/credit_notes/create>
+
+=head3 lines
+
+Provided with a L<Net::API::Stripe::Billing::CreditNote> object or a hash reference, this gets the list of all the credit note line items and return a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe credit note id. This is required.
+
+=item I<ending_before> A Stripe credit note id.
+
+=item I<limit> Integer
+
+=item I<starting_after> A Stripe credit note id.
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/credit_notes/lines>
+
+=head3 lines_preview
+
+Provided with a L<Net::API::Stripe::Billing::CreditNote> object or a hash reference, this gets the list of all the credit note preview line items and return a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<amount> Integer
+
+=item I<credit_amount> Integer
+
+=item I<ending_before> A Stripe credit note id.
+
+=item I<invoice> A Stripe invoice id. This is required.
+
+=item I<limit> Integer
+
+=item I<lines> An array of hash with properties: amount description invoice_line_item quantity tax_rates type unit_amount unit_amount_decimal
+
+=item I<memo> Text
+
+=item I<metadata> Arbitrary hash reference
+
+=item I<out_of_band_amount> Integer
+
+=item I<reason> Text
+
+=item I<refund> A Stripe refund id
+
+=item I<refund_amount> Integer
+
+=item I<starting_after> A Stripe credit note id.
+
+=back
+
+For more information see Stripe documentation here: L<https://stripe.com/docs/api/credit_notes/lines>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Billing::CreditNote> object or a hash reference, this will retrieve the Stripe credit note and return a L<Net::API::Stripe::Billing::CreditNote> object
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe credit note id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/credit_notes/retrieve>
+
+=head3 update
+
+Provided with a L<Net::API::Stripe::Billing::CreditNote> object or a hash reference, this will update a Stripe credit note and return a L<Net::API::Stripe::Billing::CreditNote> object
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe credit note id. This is required
+
+=item I<memo> Text
+
+=item I<metadata> Arbitrary hash reference
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/credit_notes/update>
+
+=head3 void
+
+Provided with a L<Net::API::Stripe::Billing::CreditNote> object or a hash reference, this will void a Stripe credit note and return a L<Net::API::Stripe::Billing::CreditNote> object
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe credit note id. This is required
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/credit_notes/void>
+
+=head3 list
+
+Given a set of optional parameters, this get the list of credit notes and return a L<Net::API::Stripe::List> object.
+
+=over 4
+
+=item I<created> Date or unix timestamp
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<limit> Integer
+
+=item I<starting_after> A Stripe credit note id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/credit_notes/list>
+
+=head2 CUSTOMERS
+
+You can B<create>, B<retrieve>, B<update>, B<delete>, B<delete_discount> or B<list> customers.
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Customer> object or a hash reference, this will create a Stripe customer and return its L<Net::API::Stripe::Customer> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<account_balance> Integer
+
+=item I<address> A L<Net::API::Stripe::Address> object or a hash reference with the following properties: line1 city country line2 postal_code state
+
+=item I<balance> Integer
+
+=item I<coupon> A string that matches an existing Stripe coupon.
+
+=item I<default_source> 
+
+=item I<description> Test
+
+=item I<email> String
+
+=item I<id> A customer id, or Stripe will create one
+
+=item I<invoice_prefix> String
+
+=item I<invoice_settings> A hash reference with the following properties: custom_fields default_payment_method footer
+
+=item I<metadata> An arbitrary hash reference
+
+=item I<name> String. Customer name
+
+=item I<payment_method> A Stripe payment method id
+
+=item I<phone> String.
+
+=item I<preferred_locales> An array of strings representing 2-letters ISO 639 language codes such as C<[qw( en fr ja )]>
+
+=item I<shipping> A L<Net::API::Stripe::Address> object or a hash reference with the following properties: line1 city country line2 postal_code state
+
+=item I<source> 
+
+=item I<tax_exempt> String that can be either I<none>, I<exempt> or I<reverse>
+
+=item I<tax_id_data> An array reference of string representing tax id or L<Net::API::Stripe::Customer::TaxId> objects
+
+=item I<tax_info> A L<Net::API::Stripe::Customer::TaxInfo> object or a hash reference with the following properties: tax_id type
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/customers/create>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Customer> object or a hash reference, this will retrieve a Stripe customer and return its L<Net::API::Stripe::Customer> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe customer id. This is required.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/customers/retrieve>
+
+=head3 update
+
+Provided with a L<Net::API::Stripe::Customer> object or a hash reference, this will update a Stripe customer and return its L<Net::API::Stripe::Customer> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<account_balance> Integer
+
+=item I<address> A L<Net::API::Stripe::Address> object or a hash reference with the following properties: line1 city country line2 postal_code state
+
+=item I<balance> Integer
+
+=item I<coupon> A string that matches an existing Stripe coupon.
+
+=item I<default_source> 
+
+=item I<description> Test
+
+=item I<email> String
+
+=item I<id> A customer id, or Stripe will create one
+
+=item I<invoice_prefix> String
+
+=item I<invoice_settings> A hash reference with the following properties: custom_fields default_payment_method footer
+
+=item I<metadata> An arbitrary hash reference
+
+=item I<name> String. Customer name
+
+=item I<next_invoice_sequence> String
+
+=item I<payment_method> A Stripe payment method id
+
+=item I<phone> String.
+
+=item I<preferred_locales> An array of strings representing 2-letters ISO 639 language codes such as C<[qw( en fr ja )]>
+
+=item I<shipping> A L<Net::API::Stripe::Address> object or a hash reference with the following properties: line1 city country line2 postal_code state
+
+=item I<source> 
+
+=item I<tax_exempt> String that can be either I<none>, I<exempt> or I<reverse>
+
+=item I<tax_id_data> An array reference of string representing tax id or L<Net::API::Stripe::Customer::TaxId> objects
+
+=item I<tax_info> A L<Net::API::Stripe::Customer::TaxInfo> object or a hash reference with the following properties: tax_id type
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/customers/create>
+
+=head3 delete
+
+Provided with a L<Net::API::Stripe::Customer> object or a hash reference, this will remove a Stripe customer and return its L<Net::API::Stripe::Customer> object with the property I<deleted> set to true.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe customer id. This is required.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/customers/delete>
+
+=head3 delete_discount
+
+Provided with a L<Net::API::Stripe::Customer> object or a hash reference, this will remove a Stripe customer discount and return the discount removed as a L<Net::API::Stripe::Billing::Discount> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe customer id. This is required.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/discounts/delete>
+
+=head3 list
+
+Provided with some optional parameters, this will get a list of Stripe customers and return a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<created> Date or unix timestamp
+
+=item I<email> String. E-mail address
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<limit> Integer
+
+=item I<starting_after> A Stripe credit note id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/customers/list>
+
+=head2 DISCOUNTS
+
+You can execute the following options: B<delete_customer> or B<delete_subscription>, such as:
+
+    $stripe->discounts( delete_customer => { customer => $customer_id, id => $discount_id });
+
+They will call respectively C<$self->customers( delete_discount => @_ )> and C<$self->subscriptions( delete_discount => @_ )>
+
+=head2 DISPUTES
+
+You can B<close>, B<retrieve>, B<update> or B<list> disputes
+
+=head3 close
+
+Provided with a L<Net::API::Stripe::Dispute> object or an hash reference and this will close a Stripe dispute and return L<Net::API::Stripe::Dispute> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe dispute id.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/disputes/close>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Dispute> or a hash reference of parameters, this will retrieve the Stripe dispute and return a L<Net::API::Stripe::Dispute> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe dispute id. This is required.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/disputes/retrieve>
+
+=head3 update
+
+Provided with a L<Net::API::Stripe::Dispute> or a hash reference of parameters, this will update a Stripe dispute and return a L<Net::API::Stripe::Dispute> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe dispute id. This is required.
+
+=item I<evidence> This is a hash reference with following possible properties:
+
+=over 8
+
+=item I<access_activity_log>
+
+=item I<billing_address>
+
+=item I<cancellation_policy>
+
+=item I<cancellation_policy_disclosure>
+
+=item I<cancellation_rebuttal>
+
+=item I<customer_communication>
+
+=item I<customer_email_address>
+
+=item I<customer_name>
+
+=item I<customer_purchase_ip>
+
+=item I<customer_signature>
+
+=item I<duplicate_charge_documentation>
+
+=item I<duplicate_charge_explanation>
+
+=item I<duplicate_charge_id>
+
+=item I<product_description>
+
+=item I<receipt>
+
+=item I<refund_policy>
+
+=item I<refund_policy_disclosure>
+
+=item I<refund_refusal_explanation>
+
+=item I<service_date>
+
+=item I<service_documentation>
+
+=item I<shipping_address>
+
+=item I<shipping_carrier>
+
+=item I<shipping_date>
+
+=item I<shipping_documentation>
+
+=item I<shipping_tracking_number>
+
+=item I<uncategorized_file>
+
+=item I<uncategorized_text>
+
+=back
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/disputes/update>
+
+=head3 list
+
+Provided with some optional parameters and this will issue a Stripe api call to get the list of disputes and return a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<created> Date or unix timestamp
+
+=item I<charge> A Stripe charge id
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<limit> Integer
+
+=item I<payment_intent> A Stripe payment intent id
+
+=item I<starting_after> A Stripe credit note id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/disputes/list>
+
+=head2 FILES
+
+You can B<create>, B<retrieve> or B<list> files
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::File> or a hash reference of parameters, this will create a Stripe file and return a L<Net::API::Stripe::File> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<file> File path.
+
+It will check if the file exists, is not zero length, is readable and make the file path absolute if it is relative (using C<Cwd::abs_path>)
+
+=item I<file_link_data> A hash reference with the following properties: create expires_at metadata
+
+=item I<purpose> String that can be either I<business_icon> I<business_logo> I<customer_signature> I<dispute_evidence> I<identity_document> I<pci_document> or I<tax_document_user_upload>
+
+=back
+
+For more information, see Stripe documentation here: L<httpshttps://stripe.com/docs/api/files/create>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::File> or a hash reference of parameters, this will retrieve the Stripe file and return a L<Net::API::Stripe::File> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe file id. This is required.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/files/retrieve>
+
+=head3 list
+
+Provided with some optional parameters and this will issue a Stripe api call to get the list of files and return a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<created> Date or unix timestamp
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<limit> Integer
+
+=item I<purpose> String.
+
+=item I<starting_after> A Stripe credit note id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/files/list>
+
+=head2 INVOICES
+
+You can B<create> B<delete> B<finalise> B<lines> B<lines_upcoming> B<invoice_write_off> B<upcoming> B<pay> B<retrieve> B<send> B<update> B<void> B<list> invoices
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference, this will create a Stripe invoice and return a L<Net::API::Stripe::Billing::Invoice> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<customer> A Stripe customer id. This is required.
+
+=item I<application_fee_amount> Integer
+
+=item I<auto_advance> Boolean
+
+=item I<collection_method> String. Either C<charge_automatically>, or C<send_invoice>
+
+=item I<custom_fields> An array of hash reference with key and value properties.
+
+=item I<days_until_due> Integer
+
+=item I<default_payment_method> A Stripe payment method id
+
+=item I<default_source> String
+
+=item I<default_tax_rates> Array reference of decimal amount
+
+=item I<description> Text
+
+=item I<due_date> Date or unix timestamp
+
+=item I<footer> Text
+
+=item I<metadata> An arbitrary hash reference
+
+=item I<statement_descriptor> Text
+
+=item I<subscription> A Stripe subscription id
+
+=item I<tax_percent> Decimal value
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/create>
+
+=head3 delete
+
+This is to remove draft invoice. When provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference of parameters, this will remove the draft invoice and return a L<Net::API::Stripe::Billing::Invoice> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe draft invoice id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/delete>
+
+=head3 finalise
+
+When provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference of parameters, this will set the draft invoice as finalised and return a L<Net::API::Stripe::Billing::Invoice> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe draft invoice id
+
+=item I<auto_advance> Boolean
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/finalize>
+
+=head3 lines
+
+Provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference of parameters, this will retrieve the list of invoice lines and return a L<Net:API::Stripe::List>
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe invoice id. This is required.
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<limit> Integer
+
+=item I<starting_after> A Stripe credit note id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/invoice_lines>
+
+=head3 lines_upcoming
+
+Provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference of parameters, this will retrieve the list of upcoming invoice lines and return a L<Net:API::Stripe::List>
+
+Possible parameters are:
+
+=over 4
+
+=item I<customer> A Stripe customer id. This is required
+
+=item I<coupon> String
+
+=item I<ending_before> A Stripe invoice id
+
+=item I<invoice_items> An array of hash with the following properties:
+
+=over 8
+
+=item I<amount>
+
+=item I<currency>
+
+=item I<description>
+
+=item I<discountable>
+
+=item I<invoiceitem>
+
+=item I<metadata>
+
+=item I<period.end>
+
+=item I<period.start>
+
+=item I<quantity>
+
+=item I<tax_rates>
+
+=item I<unit_amount>
+
+=item I<unit_amount_decimal>
+
+=back
+
+=item I<limit> Integer
+
+=item I<schedule> A Stripe schedule id
+
+=item I<starting_after> A Stripe invoice id
+
+=item I<subscription> A Stripe subscription id
+
+=item I<subscription_billing_cycle_anchor> A timestamp
+
+=item I<subscription_cancel_at> A timestamp
+
+=item I<subscription_cancel_at_period_end> Boolean
+
+=item I<subscription_cancel_now> Boolean
+
+=item I<subscription_default_tax_rates> Array of tax rates
+
+=item I<subscription_items> List of subscription items, each with an attached plan.
+
+=item I<subscription_prorate> String. If previewing an update to a subscription, this decides whether the preview will show the result of applying prorations or not. If set, one of subscription_items or subscription, and one of subscription_items or subscription_trial_end are required.
+
+=item I<subscription_proration_behavior> String. Determines how to handle prorations when the billing cycle changes.
+
+=item I<subscription_proration_date> Date/timestamp. If previewing an update to a subscription, and doing proration, subscription_proration_date forces the proration to be calculated as though the update was done at the specified time.
+
+=item I<subscription_start_date> Date/timestamp.
+
+=item I<subscription_tax_percent> Decimal
+
+=item I<subscription_trial_end> Boolean. If set, one of subscription_items or subscription is required.
+
+=item I<subscription_trial_from_plan> Boolean. Indicates if a plan’s trial_period_days should be applied to the subscription. Setting this flag to true together with subscription_trial_end is not allowed.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/upcoming_invoice_lines>
+
+=head3 invoice_write_off
+
+Provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference of parameters, this will write off an invoice and return its L<Net::API::Stripe::Billing::Invoice> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe invoice id. This is required.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/mark_uncollectible>
+
+=head3 upcoming
+
+Provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference of parameters, this will retrieve an upcoming invoice and return its L<Net::API::Stripe::Billing::Invoice> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<customer> A Stripe customer id. This is required
+
+=item I<coupon> String
+
+=item I<invoice_items> An array of hash with the following properties:
+
+=over 8
+
+=item I<amount>
+
+=item I<currency>
+
+=item I<description>
+
+=item I<discountable>
+
+=item I<invoiceitem>
+
+=item I<metadata>
+
+=item I<period.end>
+
+=item I<period.start>
+
+=item I<quantity>
+
+=item I<tax_rates>
+
+=item I<unit_amount>
+
+=item I<unit_amount_decimal>
+
+=back
+
+=item I<schedule> A Stripe schedule id
+
+=item I<subscription> A Stripe subscription id
+
+=item I<subscription_billing_cycle_anchor> A timestamp
+
+=item I<subscription_cancel_at> A timestamp
+
+=item I<subscription_cancel_at_period_end> Boolean
+
+=item I<subscription_cancel_now> Boolean
+
+=item I<subscription_default_tax_rates> Array of tax rates
+
+=item I<subscription_items> List of subscription items, each with an attached plan.
+
+=item I<subscription_prorate> String. If previewing an update to a subscription, this decides whether the preview will show the result of applying prorations or not. If set, one of subscription_items or subscription, and one of subscription_items or subscription_trial_end are required.
+
+=item I<subscription_proration_behavior> String. Determines how to handle prorations when the billing cycle changes.
+
+=item I<subscription_proration_date> Date/timestamp. If previewing an update to a subscription, and doing proration, subscription_proration_date forces the proration to be calculated as though the update was done at the specified time.
+
+=item I<subscription_start_date> Date/timestamp.
+
+=item I<subscription_tax_percent> Decimal
+
+=item I<subscription_trial_end> Boolean. If set, one of subscription_items or subscription is required.
+
+=item I<subscription_trial_from_plan> Boolean. Indicates if a plan’s trial_period_days should be applied to the subscription. Setting this flag to true together with subscription_trial_end is not allowed.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/upcoming>
+
+=head3 pay
+
+Provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference of parameters, this will mark an invoice as paid and return its L<Net::API::Stripe::Billing::Invoice> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe invoice id. This is required.
+
+=item I<forgive> Boolean
+
+=item I<off_session> Boolean
+
+=item I<paid_out_of_band> Boolean to signify this was paid outside of Stripe
+
+=item I<payment_method> A Stripe payment method id
+
+=item I<source> A Stripe source id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/pay>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference of parameters, this will retrieve an invoice and return its L<Net::API::Stripe::Billing::Invoice> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe invoice id. This is required.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/retrieve>
+
+=head3 send
+
+Provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference of parameters, this will send an invoice to a recipient to get payment and return its L<Net::API::Stripe::Billing::Invoice> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe invoice id. This is required.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/send>
+
+=head3 update
+
+Provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference of parameters, this will update an invoice and return its L<Net::API::Stripe::Billing::Invoice> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> 
+
+=item I<application_fee_amount> Integer
+
+=item I<auto_advance> Boolean
+
+=item I<collection_method> String. Either C<charge_automatically>, or C<send_invoice>
+
+=item I<custom_fields> An array of hash reference with key and value properties.
+
+=item I<days_until_due> Integer
+
+=item I<default_payment_method> A Stripe payment method id
+
+=item I<default_source> String
+
+=item I<default_tax_rates> Array reference of decimal amount
+
+=item I<description> Text
+
+=item I<due_date> Date or unix timestamp
+
+=item I<footer> Text
+
+=item I<metadata> An arbitrary hash reference
+
+=item I<statement_descriptor> Text
+
+=item I<tax_percent> Decimal value
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/update>
+
+=head3 void
+
+Provided with a L<Net::API::Stripe::Billing::Invoice> object or an hash reference of parameters, this will void (i.e. cancel) an invoice and return its L<Net::API::Stripe::Billing::Invoice> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe invoice id. This is required.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/void>
+
+=head3 list
+
+Provided with an hash reference of parameters, this returns a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<collection_method> String that can be charge_automatically or send_invoice.
+
+=item I<created> Date or unix timestamp
+
+=item I<customer> A Stripe customer id.
+
+=item I<due_date> Date / timestamp
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<limit> Integer
+
+=item I<starting_after> A Stripe credit note id
+
+=item I<status> String. Status of the invoice, which can be one of draft, open, paid, uncollectible and void
+
+=item I<subscription> A Stripe subscription id.
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/invoices/list>
+
+=head2 PAYMENT METHODS
+
+You can B<create>, B<retrieve>, B<update>, B<list>, B<attach>, B<detach>, payment methods.
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Payment::Method> object or an hash reference and this will create a Stripe payment method and return its L<Net::API::Stripe::Payment::Method> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<type> String. Any of card, fpx, ideal or sepa_debit
+
+=item I<billing_details> An hash reference with the following properties: address.city address.country address.line1 address.line2 address.postal_code address.state email name phone
+
+=item I<metadata> An arbitrary hash reference
+
+=item I<card> An hash reference with the following properties: exp_month exp_year number cvc
+
+=item I<fpx> An hash reference with the property I<bank>
+
+=item I<ideal> An hash reference with the property I<bank>
+
+=item I<sepa_debit> An hash reference with the property I<iban>
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/payment_methods/create>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Payment::Method> object or an hash reference and this will retrieve a Stripe payment method and return its L<Net::API::Stripe::Payment::Method> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe payment method id. This is required
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/payment_methods/retrieve>
+
+=head3 update
+
+Provided with a L<Net::API::Stripe::Payment::Method> object or an hash reference and this will update the Stripe payment method and return its L<Net::API::Stripe::Payment::Method> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe payment method id. This is required.
+
+=item I<billing_details> An hash reference with the following properties: address.city address.country address.line1 address.line2 address.postal_code address.state email name phone
+
+=item I<metadata> An arbitrary hash reference.
+
+=item I<card> An hash reference with the following properties: exp_month exp_year
+
+=item I<sepa_debit> An hash reference with the following property: iban
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/payment_methods/update>
+
+=head3 list
+
+Provided with an hash reference of parameters, and this will get a list of payment methods and return a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<customer> A Stripe customer id
+
+=item I<type> String. One of card fpx ideal or sepa_debit
+
+=item I<ending_before> A Stripe payment method id
+
+=item I<limit> Integer
+
+=item I<starting_after> A Stripe payment method id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/payment_methods/list>
+
+=head3 attach
+
+Provided with a L<Net::API::Stripe::Customer> or a L<Net::API::Stripe::Payment::Method> object or an hash reference and this will attach the Stripe payment method to the given customer and return its L<Net::API::Stripe::Payment::Method> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe payment method id
+
+=item I<customer> A Stripe customer id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/payment_methods/attach>
+
+=head3 detach
+
+Provided with a L<Net::API::Stripe::Customer> or a L<Net::API::Stripe::Payment::Method> object or an hash reference and this will dettach the Stripe payment method from the given customer and return its L<Net::API::Stripe::Payment::Method> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe payment method id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/payment_methods/detach>
+
+=head2 PLANS
+
+You can B<create>, B<retrieve>, B<update>, B<list>, B<delete> B<plans>.
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Billing::Plan> object or an hash reference of parameters and this will create a Stripe plan and return its L<Net::API::Stripe::Billing::Plan> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe plan id (optional)
+
+=item I<active> Boolean
+
+=item I<aggregate_usage> String
+
+=item I<amount> Integer
+
+=item I<amount_decimal> Decimal
+
+=item I<billing_scheme> String. One of per_unit or tiered
+
+=item I<currency> A 3-letter ISO 4217 code such as C<jpy> for Japanese Yen or C<eur> for Euro
+
+=item I<interval> String. One of day, week, month or year
+
+=item I<interval_count> Integer
+
+=item I<metadata> An arbitrary hash reference
+
+=item I<nickname> String
+
+=item I<product> A Stripe product id
+
+=item I<tiers> An hash reference with the following properties: up_to flat_amount flat_amount_decimal unit_amount unit_amount_decimal
+
+=item I<tiers_mode> String. One of graduated or volume
+
+=item I<transform_usage> An hash reference with the following properties: divide_by round
+
+=item I<trial_period_days> Integer
+
+=item I<usage_type> String. One of metered|licensed
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/plans/create>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Billing::Plan> object or an hash reference of parameters and this will retrieve a Stripe plan and return its L<Net::API::Stripe::Billing::Plan> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe plan id
+
+=back
+
+For more information, see Stripe documentation here: L<hhttps://stripe.com/docs/api/plans/retrieve>
+
+=head3 update
+
+Provided with a L<Net::API::Stripe::Billing::Plan> object or an hash reference of parameters and this will update a Stripe plan and return its L<Net::API::Stripe::Billing::Plan> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe plan id (optional)
+
+=item I<active> Boolean
+
+=item I<metadata> An arbitrary hash reference
+
+=item I<nickname> String
+
+=item I<product> A Stripe product id
+
+=item I<trial_period_days> Integer
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/plans/update>
+
+=head3 list
+
+Provided with an hash reference of parameters, this will get the list of Stripe plans and return a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<created> Date or unix timestamp
+
+=item I<email> String. E-mail address
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<limit> Integer
+
+=item I<product> A Stripe product id
+
+=item I<starting_after> A Stripe credit note id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/plans/list>
+
+=head3 delete
+
+Provided with a L<Net::API::Stripe::Billing::Plan> object or an hash reference of parameters and this will remove a Stripe plan and return its L<Net::API::Stripe::Billing::Plan> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe plan id. This is required
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/plans/delete>
+
+=head2 PRODUCTS
+
+You can B<create>, B<retrieve>, B<update>, B<list>, B<delete> products
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Product> object or an hash reference of parameters and this will create a Stripe product and return its L<Net::API::Stripe::Product> object
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> An id to be used as a Stripe product id
+
+=item I<active> Boolean
+
+=item I<attributes> An array of up to 5 elements
+
+=item I<caption> String
+
+=item I<deactivate_on> Date or timestamp
+
+=item I<description> Text
+
+=item I<images> An array of up to 8 images
+
+=item I<metadata> An arbitrary of hash reference
+
+=item I<name> Stripe. Max length of 250 characters
+
+=item I<package_dimensions> An hash reference with the following properties: height, length, weight and width
+
+=item I<shippable> Boolean
+
+=item I<statement_descriptor> Text
+
+=item I<type> String. One of good or service
+
+=item I<unit_label> String
+
+=item I<url> An url. For goods
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/service_products/create>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Product> object or an hash reference of parameters and this will retrieve a Stripe product and return its L<Net::API::Stripe::Product> object
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe product id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/service_products/retrieve>
+
+=head3 update
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe product id
+
+=item I<active> Boolean
+
+=item I<attributes> An array of up to 5 elements
+
+=item I<caption> String
+
+=item I<deactivate_on> Date or timestamp
+
+=item I<description> Text
+
+=item I<images> An array of up to 8 images
+
+=item I<metadata> An arbitrary of hash reference
+
+=item I<name> Stripe. Max length of 250 characters
+
+=item I<package_dimensions> An hash reference with the following properties: height, length, weight and width
+
+=item I<shippable> Boolean
+
+=item I<statement_descriptor> Text
+
+=item I<type> String. One of good or service
+
+=item I<unit_label> String
+
+=item I<url> An url. For goods
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/service_products/update>
+
+=head3 list
+
+Provided with an hash reference of parameters, this will retrieve a list of Stripe products and return a L<Net::API::Stripe::List> object
+
+Possible parameters are:
+
+=over 4
+
+=item I<active> Boolean
+
+=item I<created> Date or unix timestamp
+
+=item I<email> String. E-mail address
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<ids> An array
+
+=item I<limit> Integer
+
+=item I<shippable> Boolean
+
+=item I<starting_after> A Stripe credit note id
+
+=item I<type> String. One of service or good
+
+=item I<url> The product url
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/service_products/list>
+
+=head3 delete
+
+Provided with a L<Net::API::Stripe::Product> object or an hash reference of parameters and this will remove a Stripe product and return its L<Net::API::Stripe::Product> object with its property I<deleted> set to true.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe product id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/service_products/delete>
+
+=head2 SUBSCRIPTION SCHEDULES
+
+You can B<create>, B<retrieve>, B<update>, B<list>, B<cancel> or B<release> schedules
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Billing::Subscription::Schedule> object or an hash reference of parameters and this will create a Stripe subscription schedule and return a L<Net::API::Stripe::Billing::Subscription::Schedule> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<customer> A Stripe customer id
+
+=item I<default_settings> An hash reference with the following properties: billing_thresholds.amount_gte billing_thresholds.reset_billing_cycle_anchor collection_method default_payment_method invoice_settings.days_until_due
+
+=item I<end_behavior> String. One of release or cancel
+
+=item I<from_subscription> Stripe subscription id
+
+=item I<metadata> An aribitrary hash reference
+
+=item I<phases> An array of hash reference with following properties: plan application_fee_percent billing_thresholds collection_method coupon default_payment_method default_tax_rates end_date invoice_settings iterations tax_percent trial trial_end
+
+=item I<start_date> Date or timestamp or the word 'now'
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscription_schedules/create>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Billing::Subscription::Schedule> object or an hash reference of parameters and this will retrieve a Stripe subscription schedule and return a L<Net::API::Stripe::Billing::Subscription::Schedule> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe subscription schedule id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscription_schedules/retrieve>
+
+=head3 update
+
+Provided with a L<Net::API::Stripe::Billing::Subscription::Schedule> object or an hash reference of parameters and this will update a Stripe subscription schedule and return a L<Net::API::Stripe::Billing::Subscription::Schedule> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe subscription id
+
+=item I<default_settings> An hash reference with the following properties: billing_thresholds.amount_gte billing_thresholds.reset_billing_cycle_anchor collection_method default_payment_method invoice_settings.days_until_due
+
+=item I<end_behavior> String. One of release or cancel
+
+=item I<from_subscription> Stripe subscription id
+
+=item I<metadata> An aribitrary hash reference
+
+=item I<phases> An array of hash reference with following properties: plan application_fee_percent billing_thresholds collection_method coupon default_payment_method default_tax_rates end_date invoice_settings iterations tax_percent trial trial_end
+
+=item I<prorate> Boolean
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscription_schedules/update>
+
+=head3 list
+
+Provided with an hash reference of parameters this will get the list of subscription schedules and return a L<Net::API::Stripe::List> object
+
+Possible parameters are:
+
+=over 4
+
+=item I<canceled_at> Unix timestamp
+
+=item I<completed_at> Unix timestamp
+
+=item I<created> Unix timestamp
+
+=item I<customer> A Stripe customer id
+
+=item I<email> String. E-mail address
+
+=item I<ending_before> A Stripe subscription schedule id
+
+=item I<limit> Integer
+
+=item I<released_at> Unix timestamp
+
+=item I<scheduled> Boolean
+
+=item I<starting_after> A Stripe subscription schedule id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscription_schedules/list>
+
+=head3 cancel
+
+Provided with a L<Net::API::Stripe::Billing::Subscription::Schedule> object or an hash reference of parameters and this will cancel a Stripe subscription schedule and return a L<Net::API::Stripe::Billing::Subscription::Schedule> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe subscription schedule. This is required.
+
+=item I<invoice_now> Boolean
+
+=item I<prorate> Boolean
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscription_schedules/cancel>
+
+=head3 release
+
+Provided with a L<Net::API::Stripe::Billing::Subscription::Schedule> object or an hash reference of parameters and this will release a Stripe subscription schedule and return a L<Net::API::Stripe::Billing::Subscription::Schedule> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe subscription schedule. This is required.
+
+=item I<preserve_cancel_date> Boolean
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscription_schedules/release>
+
+=head2 CHECKOUT SESSIONS
+
+You can B<create> or B<retrieve> checkout sessions
+
+=head3 B<create>
+
+Provided with a L<Net::API::Stripe::Checkout::Session> object or an hash reference of parameters and this will create a Stripe checkout session and return a L<Net::API::Stripe::Checkout::Session> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<cancel_url> URL
+
+=item I<payment_method_types> String. One of card or ideal
+
+=item I<success_url> URL
+
+=item I<billing_address_collection> String. One of auto or required
+
+=item I<client_reference_id> String
+
+=item I<customer> A Stripe customer id
+
+=item I<customer_email> String
+
+=item I<line_items> An array of hash reference with the following properties: amount currency name quantity description images
+
+=item I<locale> a 2-letter iso 639, such as C<fr> or C<ja> or C<local>
+
+=item I<mode> String. One of setup or subscription
+
+=item I<payment_intent_data> An hash reference with the following properties: application_fee_amount capture_method description metadata on_behalf_of receipt_email setup_future_usage
+
+=item I<setup_intent_data> An hash reference with the following properties: description metadata on_behalf_of
+
+=item I<submit_type> String. One of auto, book, donate or pay
+
+=item I<subscription_data> An hash reference with the following properties: items application_fee_percent metadata trial_end trial_from_plan trial_period_days
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/checkout/sessions/create>
+
+=head3 B<retrieve>
+
+Provided with a L<Net::API::Stripe::Checkout::Session> object or an hash reference of parameters and this will retrieve a Stripe checkout session and return a L<Net::API::Stripe::Checkout::Session> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe checkout session
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/checkout/sessions/retrieve>
+
+=head3 B<list>
+
+Provided with an hash reference of parameters, this will get the list of checkout sessions and return a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<limit> Integer
+
+=item I<payment_intent> A Stripe payment intent id
+
+=item I<subscription> A Stripe subscription id
+
+=item I<starting_after> A Stripe credit note id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/checkout/sessions/list>
+
+=head2 SOURCES
+
+You can B<create>, B<retrieve>, B<update>, B<detach> or B<attach> sources
+
+=head3 create
+
+Provided with L<Net::API::Stripe::Payment::Source> object or an hash reference of parameters, this will create a Stripe source and return a L<Net::API::Stripe::Payment::Source> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<type> String. This is required.
+
+=item I<amount> Integer
+
+=item I<currency> A 3-letter iso 4217 code such as C<jpy> or C<eur>
+
+=item I<flow> String. One of redirect, receiver, code_verification, none
+
+=item I<mandate> An hash reference with the following properties: acceptance amount currency interval notification_method
+
+=item I<metadata> An arbitrary hash reference
+
+=item I<owner> An hash reference with the following properties: address email name phone
+
+=item I<receiver> An hash reference with the following property: refund_attributes_method
+
+=item I<redirect> An hash reference with the following property: return_url
+
+=item I<source_order> An hash reference with the following properties: items shipping
+
+=item I<statement_descriptor> Text
+
+=item I<token> String
+
+=item I<usage> String. One of reusable or single_use
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/sources/create>
+
+=head3 retrieve
+
+Provided with L<Net::API::Stripe::Payment::Source> object or an hash reference of parameters, this will retrieve a Stripe source and return a L<Net::API::Stripe::Payment::Source> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe source id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/sources/retrieve>
+
+=head3 update
+
+Provided with L<Net::API::Stripe::Payment::Source> object or an hash reference of parameters, this will update a Stripe source and return a L<Net::API::Stripe::Payment::Source> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe source id
+
+=item I<amount> Integer
+
+=item I<mandate> An hash reference with the following properties: acceptance amount currency interval notification_method
+
+=item I<metadata> An arbitrary hash reference
+
+=item I<owner> An hash reference with the following properties: address email name phone
+
+=item I<source_order> An hash reference with the following properties: items shipping
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/sources/update>
+
+=head3 detach
+
+Provided with a L<Net::API::Stripe::Customer> object or a L<Net::API::Stripe::Payment::Source> object or an hash reference of parameters, this will detach a Stripe source from the customer and return a L<Net::API::Stripe::Payment::Source> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe customer id
+
+=item I<source> A Stripe source id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/sources/detach>
+
+=head3 attach
+
+Provided with a L<Net::API::Stripe::Customer> object or a L<Net::API::Stripe::Payment::Source> object or an hash reference of parameters, this will attach a Stripe source to a customer and return a L<Net::API::Stripe::Payment::Source> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe customer id
+
+=item I<source> A Stripe source id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/sources/attach>
+
+=head2 SUBSCRIPTIONS
+
+You can B<create>, B<delete_discount>, B<retrieve>, B<update>, B<list> or B<cancel> subscriptions
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Billing::Subscription> object or an hash reference of parameters, this will create a Stripe subscription and return a L<Net::API::Stripe::Billing::Subscription> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<customer> A Strip customer id. This is required.
+
+=item I<application_fee_percent> Decimal
+
+=item I<backdate_start_date> Date or timestamp
+
+=item I<billing_cycle_anchor> Date or timestamp
+
+=item I<billing_thresholds> An hash reference with the following properties: amount_gte reset_billing_cycle_anchor
+
+=item I<cancel_at> Date or timestamp
+
+=item I<cancel_at_period_end> Boolean
+
+=item I<collection_method> String. One of charge_automatically, or send_invoice
+
+=item I<coupon> String
+
+=item I<days_until_due> Integer
+
+=item I<default_payment_method> A Stripe payment method id
+
+=item I<default_source> A Stripe source id
+
+=item I<default_tax_rates> Array of string
+
+=item I<items> An array of hash reference with the following properties: plan billing_thresholds metadata quantity tax_rates
+
+=item I<metadata> An arbitrary hash reference
+
+=item I<off_session> Boolean
+
+=item I<payment_behavior> String. One of allow_incomplete error_if_incomplete or pending_if_incomplete
+
+=item I<pending_invoice_item_interval> An hash reference with the following properties: interval interval_count
+
+=item I<prorate> Boolean
+
+=item I<proration_behavior> String. One of billing_cycle_anchor, create_prorations or none
+
+=item I<tax_percent> Decimal
+
+=item I<trial_end> Unix timestamp or 'now'
+
+=item I<trial_from_plan> Boolean
+
+=item I<trial_period_days> Integer
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscriptions/create>
+
+=head3 delete_discount
+
+Provided with a L<Net::API::Stripe::Billing::Subscription> object or an hash reference of parameters, this will remove its discount and return a L<Net::API::Stripe::Billing::Subscription> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe subscription id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscriptions/create>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Billing::Subscription> object or an hash reference of parameters, this will retrieve a Stripe subscription and return a L<Net::API::Stripe::Billing::Subscription> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe subscription id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscriptions/create>
+
+=head3 update
+
+Provided with a L<Net::API::Stripe::Billing::Subscription> object or an hash reference of parameters, this will update a Stripe subscription and return a L<Net::API::Stripe::Billing::Subscription> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe subscription id
+
+=item I<application_fee_percent> Decimal
+
+=item I<billing_cycle_anchor> Date or timestamp
+
+=item I<billing_thresholds> An hash reference with the following properties: amount_gte reset_billing_cycle_anchor
+
+=item I<cancel_at> Date or timestamp
+
+=item I<cancel_at_period_end> Boolean
+
+=item I<collection_method> String. One of charge_automatically, or send_invoice
+
+=item I<coupon> String
+
+=item I<days_until_due> Integer
+
+=item I<default_payment_method> A Stripe payment method id
+
+=item I<default_source> A Stripe source id
+
+=item I<default_tax_rates> Array of string
+
+=item I<items> An array of hash reference with the following properties: plan billing_thresholds metadata quantity tax_rates
+
+=item I<metadata> An arbitrary hash reference
+
+=item I<off_session> Boolean
+
+=item I<pause_collection> An hash reference with the following properties: behavior resumes_at
+
+=item I<payment_behavior> String. One of allow_incomplete error_if_incomplete or pending_if_incomplete
+
+=item I<pending_invoice_item_interval> An hash reference with the following properties: interval interval_count
+
+=item I<prorate> Boolean
+
+=item I<prorate_date> A Date or timestamp
+
+=item I<tax_percent> Decimal
+
+=item I<trial_end> Unix timestamp or 'now'
+
+=item I<trial_from_plan> Boolean
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscriptions/create>
+
+=head3 list
+
+Provided with a L<Net::API::Stripe::Billing::Subscription> object or an hash reference of parameters, this will create a Stripe subscription and return a L<Net::API::Stripe::Billing::Subscription> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<active> Boolean
+
+=item I<created> Date or unix timestamp
+
+=item I<ids> Array reference
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<limit> Integer
+
+=item I<shippable> Boolean
+
+=item I<starting_after> A Stripe credit note id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscriptions/create>
+
+=head3 cancel
+
+Provided with a L<Net::API::Stripe::Billing::Subscription> object or an hash reference of parameters, this will cancel a Stripe subscription and return a L<Net::API::Stripe::Billing::Subscription> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe subscription id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/subscriptions/create>
+
+=head2 TAX IDS
+
+You can B<create>, B<retrieve>, B<delete> or B<list> tax ids
+
+=head3 create
+
+Provided with a L<Net::API::Stripe::Billing::TaxID> object or an hash reference of parameters, this will cancel a Stripe tax id and return a L<Net::API::Stripe::Billing::TaxID> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<customer> A Stripe customer id
+
+=item I<type> String, such as au_abn, ch_vat, eu_vat, in_gst, mx_rfc, no_vat, nz_gst, or za_vat
+
+=item I<value> String
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/customer_tax_ids/create>
+
+=head3 retrieve
+
+Provided with a L<Net::API::Stripe::Billing::TaxID> object or an hash reference of parameters, this will cancel a Stripe tax id and return a L<Net::API::Stripe::Billing::TaxID> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe tax id. This is required
+
+=item I<customer> A Stripe customer id. This is required
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/customer_tax_ids/retrieve>
+
+=head3 delete
+
+Provided with a L<Net::API::Stripe::Billing::TaxID> object or an hash reference of parameters, this will cancel a Stripe tax id and return a L<Net::API::Stripe::Billing::TaxID> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe tax id. This is required
+
+=item I<customer> A Stripe customer id. This is required
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/customer_tax_ids/delete>
+
+=head3 list
+
+Provided with an hash reference of parameters, this will get the list of Stripe tax id and return a L<Net::API::Stripe::List> object.
+
+Possible parameters are:
+
+=over 4
+
+=item I<id> A Stripe customer id. This is required
+
+=item I<ending_before> A Stripe credit note id
+
+=item I<limit> Integer
+
+=item I<starting_after> A Stripe credit note id
+
+=back
+
+For more information, see Stripe documentation here: L<https://stripe.com/docs/api/customer_tax_ids/list>
+
+=head1 API SAMPLE
+
+	{
+	  "object": "balance",
+	  "available": [
+		{
+		  "amount": 0,
+		  "currency": "jpy",
+		  "source_types": {
+			"card": 0
+		  }
+		}
+	  ],
+	  "connect_reserved": [
+		{
+		  "amount": 0,
+		  "currency": "jpy"
+		}
+	  ],
+	  "livemode": false,
+	  "pending": [
+		{
+		  "amount": 7712,
+		  "currency": "jpy",
+		  "source_types": {
+			"card": 7712
+		  }
+		}
+	  ]
+	}
+
+=head1 HISTORY
+
+L<https://stripe.com/docs/upgrades> for Stripe API version history.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+Stripe API documentation:
+
+L<https://stripe.com/docs/api>
+
+L<Net::Stripe>, another Stripe API, but which uses Moose
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

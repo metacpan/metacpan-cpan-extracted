@@ -4,7 +4,7 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.10
+Version 2.11
 
 # SYNOPSIS
 
@@ -61,6 +61,17 @@ longer pattern in front.
 
 If the matched string overlaps with previously matched string, it is
 warned (**--warn-overlap** by default) and ignored.
+
+## Terminal color
+
+This version uses [Getopt::EX::autocolor](https://metacpan.org/pod/Getopt::EX::autocolor) module.  It sets option
+**--light-screen** or **--dark-screen** depending on the terminal on
+which the command run, or **BRIGHTNESS** environment variable.
+
+Some terminals (eg: "Apple\_Terminal" or "iTerm") are detected
+automatically and no action is required.  Otherwise set **BRIGHTNESS**
+environment to 0 (black) to 100 (white) digit depending on terminal
+background color.
 
 # OPTIONS
 
@@ -167,7 +178,6 @@ directory and accessed by **--exdict** option.
         Japan Technical Communicators Association
         https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf
 
-- **--exdict** sccc2.dict
 - **--exdict** jtf-style-guide-3.dict
 - **--jtf-style-guide**
 
@@ -180,6 +190,7 @@ directory and accessed by **--exdict** option.
         翻訳品質委員会
         https://www.jtf.jp/jp/style_guide/pdf/jtf_style_guide.pdf
 
+- **--exdict** sccc2.dict
 - **--sccc2**
 
     Dictionary used for "C/C++ セキュアコーディング 第2版" published in

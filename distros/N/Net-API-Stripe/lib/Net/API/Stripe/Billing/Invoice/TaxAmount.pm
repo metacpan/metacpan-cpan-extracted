@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Invoice/TaxAmount.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -20,7 +20,7 @@ BEGIN
 
 sub amount { return( shift->_set_get_number( 'amount', @_ ) ); }
 
-sub inclusive { return( shift->_set_get_scalar( 'inclusive', @_ ) ); }
+sub inclusive { return( shift->_set_get_boolean( 'inclusive', @_ ) ); }
 
 sub tax_rate { return( shift->_set_get_scalar_or_object( 'tax_rate', 'Net::API::Stripe::Tax::Rate', @_ ) ); }
 
@@ -36,13 +36,18 @@ Net::API::Stripe::Billing::Invoice::TaxAmount - A Stripe Invoice Tax Amount
 
 =head1 SYNOPSIS
 
+	my $tax_amount_obj = $inv_line->tax_amounts({
+	    amount => 2000,
+	    inclusive => 1,
+	});
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-This is use in C<Net::API::Stripe::Billing::Invoice> to calculate all the tax amounts.
+This is use in L<Net::API::Stripe::Billing::Invoice> to calculate all the tax amounts. More particularly this is called from B<tax_amounts> in L<Net::API::Stripe::Billing::Invoice::LineItems>
 
 =head1 CONSTRUCTOR
 
@@ -50,18 +55,8 @@ This is use in C<Net::API::Stripe::Billing::Invoice> to calculate all the tax am
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Billing::Invoice::TaxAmount> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -81,17 +76,17 @@ Whether this tax amount is inclusive or exclusive.
 
 The tax rate that was applied to get this tax amount.
 
-When expanded, this is a C<Net::API::Stripe::Tax::Rate> object.
+When expanded, this is a L<Net::API::Stripe::Tax::Rate> object.
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "in_1B9q03CeyNCl6fY2YNPu6oqa",
+	  "id": "in_fake123456789",
 	  "object": "invoice",
 	  "account_country": "JP",
-	  "account_name": "Angels, Inc",
+	  "account_name": "Provider, Inc",
 	  "amount_due": 8000,
 	  "amount_paid": 8000,
 	  "amount_remaining": 0,
@@ -101,14 +96,14 @@ When expanded, this is a C<Net::API::Stripe::Tax::Rate> object.
 	  "auto_advance": false,
 	  "billing": "charge_automatically",
 	  "billing_reason": "subscription",
-	  "charge": "ch_1B9q03CeyNCl6fY2wu5siR6R",
+	  "charge": "ch_fake123456789",
 	  "collection_method": "charge_automatically",
 	  "created": 1507273919,
 	  "currency": "jpy",
 	  "custom_fields": null,
-	  "customer": "cus_G0vQn57xCoD5rG",
+	  "customer": "cus_fake123456789",
 	  "customer_address": null,
-	  "customer_email": "florian@111studio.jp",
+	  "customer_email": "john.doe@example.com",
 	  "customer_name": null,
 	  "customer_phone": null,
 	  "customer_shipping": null,
@@ -122,16 +117,16 @@ When expanded, this is a C<Net::API::Stripe::Tax::Rate> object.
 	  "due_date": null,
 	  "ending_balance": 0,
 	  "footer": null,
-	  "hosted_invoice_url": "https://pay.stripe.com/invoice/invst_XvyJuu53kQe203lIDyXEYxa7Lh",
-	  "invoice_pdf": "https://pay.stripe.com/invoice/invst_XvyJuu53kQe203lIDyXEYxa7Lh/pdf",
+	  "hosted_invoice_url": "https://pay.stripe.com/invoice/invst_fake123456789",
+	  "invoice_pdf": "https://pay.stripe.com/invoice/invst_fake123456789/pdf",
 	  "lines": {
 		"data": [
 		  {
-			"id": "sli_be2a0c3589f761",
+			"id": "sli_fake123456789",
 			"object": "line_item",
 			"amount": 8000,
 			"currency": "jpy",
-			"description": "1 × Angels, Inc professional monthly membership (at ¥8,000 / month)",
+			"description": "1 × Provider, Inc professional monthly membership (at ¥8,000 / month)",
 			"discountable": true,
 			"livemode": false,
 			"metadata": {},
@@ -154,7 +149,7 @@ When expanded, this is a C<Net::API::Stripe::Tax::Rate> object.
 			  "livemode": false,
 			  "metadata": {},
 			  "nickname": null,
-			  "product": "prod_Dwk1QNPjrMJlY8",
+			  "product": "prod_fake123456789",
 			  "tiers": null,
 			  "tiers_mode": null,
 			  "transform_usage": null,
@@ -163,8 +158,8 @@ When expanded, this is a C<Net::API::Stripe::Tax::Rate> object.
 			},
 			"proration": false,
 			"quantity": 1,
-			"subscription": "sub_EccdFNq60pUMDL",
-			"subscription_item": "si_Eccd4op26fXydB",
+			"subscription": "sub_fake123456789",
+			"subscription_item": "si_fake123456789",
 			"tax_amounts": [],
 			"tax_rates": [],
 			"type": "subscription"
@@ -172,7 +167,7 @@ When expanded, this is a C<Net::API::Stripe::Tax::Rate> object.
 		],
 		"has_more": false,
 		"object": "list",
-		"url": "/v1/invoices/in_1B9q03CeyNCl6fY2YNPu6oqa/lines"
+		"url": "/v1/invoices/in_fake123456789/lines"
 	  },
 	  "livemode": false,
 	  "metadata": {},
@@ -194,7 +189,7 @@ When expanded, this is a C<Net::API::Stripe::Tax::Rate> object.
 		"paid_at": 1507273919,
 		"voided_at": null
 	  },
-	  "subscription": "sub_BWtnk6Km6GOapC",
+	  "subscription": "sub_fake123456789",
 	  "subtotal": 8000,
 	  "tax": null,
 	  "tax_percent": null,
@@ -221,7 +216,7 @@ L<https://stripe.com/docs/api/invoices>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

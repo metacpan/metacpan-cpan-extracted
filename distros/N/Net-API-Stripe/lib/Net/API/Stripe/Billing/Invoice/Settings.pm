@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Invoice/Settings.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -36,15 +36,21 @@ Net::API::Stripe::Billing::Invoice::Settings - A Stripe Invoice Setting Object
 
 =head1 SYNOPSIS
 
+    my $settings = $customer->invoice_settings({
+        customer_fields => $custom_field_object,
+        default_payment_method => 'pm_fake123456789',
+        footer => 'Big Corp, Inc',
+    });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-This defines the invoice settings.
+This defines the invoice settings. It is instantiated from method B<invoice_settings> in L<Net::API::Stripe::Custome>
 
-It is used by C<Net::API::Stripe::Billing::Invoice>, C<Net::API::Stripe::Customer::TaxIds>, and C<Net::API::Stripe::Customer>
+It is used by L<Net::API::Stripe::Billing::Invoice>, L<Net::API::Stripe::Customer::TaxIds>, and L<Net::API::Stripe::Customer>
 
 =head1 CONSTRUCTOR
 
@@ -52,18 +58,8 @@ It is used by C<Net::API::Stripe::Billing::Invoice>, C<Net::API::Stripe::Custome
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Billing::Invoice::Settings> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -73,13 +69,13 @@ Toggles debug mode on/off
 
 =item B<custom_fields> array of hashes
 
-Default custom fields to be displayed on invoices for this customer. This is a C<Net::API::Stripe::CustomField> object
+Default custom fields to be displayed on invoices for this customer. This is a L<Net::API::Stripe::CustomField> object
 
 =item B<default_payment_method> string (expandable)
 
 ID of the default payment method used for subscriptions and invoices for the customer.
 
-When expanded, this is a C<Net::API::Stripe::Payment::Method> object.
+When expanded, this is a L<Net::API::Stripe::Payment::Method> object.
 
 =item B<footer> string
 
@@ -109,7 +105,7 @@ L<https://stripe.com/docs/api/invoices/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -5,10 +5,7 @@ BOOT {
     Stash(__PACKAGE__).inherit("Protocol::WebSocket::Fast::Parser");
 }
 
-ClientParser* new (SV* CLASS) {
-    RETVAL = new ClientParser();
-    PROTO = CLASS;
-}
+ClientParser* ClientParser::new (Parser::Config cfg = {})
 
 string ClientParser::connect_request (ConnectRequestSP req)
 

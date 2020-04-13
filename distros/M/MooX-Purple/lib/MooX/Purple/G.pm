@@ -2,7 +2,7 @@ package MooX::Purple::G;
 use strict;
 use warnings;
 use 5.006;
-our $VERSION = '0.14';
+our $VERSION = '0.16';
 use PPR;
 use Perl::Tidy;
 use Cwd qw/abs_path/;
@@ -441,19 +441,19 @@ sub render_pod {
 	if ($POD{$class}) {
 		if (!$POD{$class}{PARSED}) {
 			(my $url_class = $class) =~ s/\:\:/-/g;
-			push $POD{$class}{DATA}, "=head1 AUTHOR
+			push @{$POD{$class}{DATA}}, "=head1 AUTHOR
 
 $AUTHOR, C<< <$AUTHOR_EMAIL> >>
 
 =cut";
-			push $POD{$class}{DATA}, "=head1 BUGS
+			push @{$POD{$class}{DATA}}, "=head1 BUGS
 
 Please report any bugs or feature requests to C<bug-moox-purple at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=$url_class>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =cut";
-			push $POD{$class}{DATA}, "=head1 SUPPORT
+			push @{$POD{$class}{DATA}}, "=head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
@@ -483,11 +483,11 @@ L<http://search.cpan.org/dist/$url_class/>
 =back
 
 =cut";
-			push $POD{$class}{DATA}, "=head1 ACKNOWLEDGEMENTS
+			push @{$POD{$class}{DATA}}, "=head1 ACKNOWLEDGEMENTS
 
 =cut";
 
-			push $POD{$class}{DATA}, "=head1 LICENSE AND COPYRIGHT
+			push @{$POD{$class}{DATA}}, "=head1 LICENSE AND COPYRIGHT
 
 Copyright 2019 $AUTHOR.
 
@@ -710,7 +710,7 @@ MooX::Purple - MooX::Purple::G
 
 =head1 VERSION
 
-Version 0.14
+Version 0.16
 
 =cut
 

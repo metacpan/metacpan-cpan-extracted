@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Transfer/Reversal.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -51,6 +51,16 @@ Net::API::Stripe::Connect::Transfer::Reversal - A Stripe Transfer Reversal Objec
 
 =head1 SYNOPSIS
 
+    my $rev = $stripe->transfer_reversal({
+        amount => 2000,
+        currency => 'jpy',
+        destination_payment_refund => $refund_object,
+        metadata => { transaction_id => 123 },
+        transfer => $transfer_object,
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -67,18 +77,8 @@ Reversing a transfer that was made for a destination charge (L<https://stripe.co
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Transfer::Reversal> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -99,7 +99,7 @@ Amount, in JPY.
 
 =item B<balance_transaction> string (expandable)
 
-Balance transaction that describes the impact on your account balance. This is a C<Net::API::Stripe::Balance::Transaction> object.
+Balance transaction that describes the impact on your account balance. This is a L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<created> timestamp
 
@@ -113,7 +113,7 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 Linked payment refund for the transfer reversal.
 
-When expanded, this is a C<Net::API::Stripe::Refund> object.
+When expanded, this is a L<Net::API::Stripe::Refund> object.
 
 =item B<metadata> hash
 
@@ -123,20 +123,20 @@ Set of key-value pairs that you can attach to an object. This can be useful for 
 
 ID of the refund responsible for the transfer reversal.
 
-When expanded, this is a C<Net::API::Stripe::Refund> object.
+When expanded, this is a L<Net::API::Stripe::Refund> object.
 
 =item B<transfer> string (expandable)
 
 ID of the transfer that was reversed.
 
-When expanded, this is a C<Net::API::Stripe::Connect::Transfer>
+When expanded, this is a L<Net::API::Stripe::Connect::Transfer>
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "trr_1FUXYWCeyNCl6fY29p8oRwnR",
+	  "id": "trr_fake123456789",
 	  "object": "transfer_reversal",
 	  "amount": 1100,
 	  "balance_transaction": null,
@@ -145,7 +145,7 @@ When expanded, this is a C<Net::API::Stripe::Connect::Transfer>
 	  "destination_payment_refund": null,
 	  "metadata": {},
 	  "source_refund": null,
-	  "transfer": "tr_1FUXYWCeyNCl6fY2Y7XHvRh4"
+	  "transfer": "tr_fake123456789"
 	}
 
 =head1 HISTORY
@@ -166,7 +166,7 @@ L<https://stripe.com/docs/api/transfer_reversals>, L<https://stripe.com/docs/con
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

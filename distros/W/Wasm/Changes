@@ -1,0 +1,26 @@
+Revision history for Wasm},
+
+0.03      2020-04-11 16:19:37 -0600
+  - Remove code reference overload for Wasm::Wasmtime::Extern (gh#18)
+  - Added kind and kind_num methods to Wasm::Wasmtime::Extern (gh#18)
+  - Added as_extern methods to Wasm::Wasmtime::Func and
+    Wasm::Wasmtime::Memory (gh#18)
+  - Added Wasm::Wasmtime::ImportType class (gh#19)
+  - Added imports method to Wasm::Wasmtime::Module (gh#19)
+  - Support callback into Perl with params, results and traps (gh#20)
+  - Added -imports option for Wasm (gh#20)
+
+0.02      2020-04-11 08:36:52 -0600
+  - Added -exporter option to Wasm module (gh#14)
+  - Wasm::Wasmtime::Func attach method will carp when
+    replacing an existing subroutine instead of relying
+    on the built-in warning which unhelpfully indicates
+    Func.pm as the location of the warning (gh#15)
+  - Added kind_num method to Wasm::Wasmtime::ExternType (gh#16)
+  - Added as_externtype method to Wasm::Wasmtime::FuncType (gh#16)
+  - Added as_externtype method to Wasm::Wasmtime::MemoryType (gh#16)
+
+0.01      2020-04-10 17:41:13 -0600
+  - initial version
+
+

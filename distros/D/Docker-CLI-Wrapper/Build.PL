@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Docker-CLI-Wrapper",
-  "dist_version" => "0.0.4",
+  "dist_version" => "0.0.5",
   "license" => "mit",
   "module_name" => "Docker::CLI::Wrapper",
   "recursive_test_files" => 1,

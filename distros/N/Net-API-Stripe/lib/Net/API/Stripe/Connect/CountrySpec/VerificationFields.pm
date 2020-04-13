@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/CountrySpec/VerificationFields.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -34,6 +34,11 @@ Net::API::Stripe::Connect::CountrySpec::VerificationFields - A Stripe Country Sp
 
 =head1 SYNOPSIS
 
+    my $check = $stripe->country_spec->verification_fields({
+        individual => $details_object,
+        company => $details_object,
+    });
+
 =head1 VERSION
 
     0.1
@@ -42,24 +47,16 @@ Net::API::Stripe::Connect::CountrySpec::VerificationFields - A Stripe Country Sp
 
 Lists the types of verification data needed to keep an account open.
 
+This is instantiated by method B<verification_fields> from module L<Net::API::Stripe::Connect::CountrySpec>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::CountrySpec::VerificationFields> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -71,13 +68,13 @@ Toggles debug mode on/off
 
 Verification types for company account.
 
-This is a C<Net::API::Stripe::Connect::CountrySpec::VerificationFields::Details> object.
+This is a L<Net::API::Stripe::Connect::CountrySpec::VerificationFields::Details> object.
 
 =item B<individual> hash
 
 Verification types for individual account.
 
-This is a C<Net::API::Stripe::Connect::CountrySpec::VerificationFields::Details> object.
+This is a L<Net::API::Stripe::Connect::CountrySpec::VerificationFields::Details> object.
 
 =back
 
@@ -175,7 +172,7 @@ L<https://stripe.com/docs/api/country_specs/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -13,10 +13,12 @@ WriteMakefile
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.010000',
     PREREQ_PM        => {
-        'Carp'         => 0,
-        'Scalar::Util' => 0,
-        'Data::Types'  => 0,
-        'Data::Dumper' => 0,
+        'Carp'            => 0,
+        'Scalar::Util'    => 0,
+        'Data::Types'     => 0,
+        'Data::Dumper'    => 0,
+        'Test::Deep'      => 0,
+        'Test::Exception' => 0,
     },
     TEST_REQUIRES    => {
         'Test::More' => 0,

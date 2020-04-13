@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Card/AuthorizationsControl/SpendingLimit.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -36,6 +36,19 @@ Net::API::Stripe::Issuing::Card::AuthorizationsControl::SpendingLimit - A Stripe
 
 =head1 SYNOPSIS
 
+    my $limit = $stripe->card_holder->authorization_controls->spending_limits([
+        {
+        amount => 2000000,
+        categories => '',
+        interval => 'monthly',
+        },
+        {
+        amount => 200000,
+        categories => '',
+        interval => 'weekly',
+        },
+    ]);
+
 =head1 VERSION
 
     0.1
@@ -44,7 +57,7 @@ Net::API::Stripe::Issuing::Card::AuthorizationsControl::SpendingLimit - A Stripe
 
 Limit the spending with rules based on time intervals and categories.
 
-This is used in C<Net::API::Stripe::Issuing::Card::Holder>
+This is instantiated by method B<spending_limits> in module L<Net::API::Stripe::Issuing::Card::Holder>
 
 =head1 CONSTRUCTOR
 
@@ -52,18 +65,8 @@ This is used in C<Net::API::Stripe::Issuing::Card::Holder>
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Issuing::Card::AuthorizationsControl::SpendingLimit> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -88,7 +91,7 @@ The time interval with which to apply this spending limit towards. Allowed value
 =head1 API SAMPLE
 
 	{
-	  "id": "ich_1DNcRHCeyNCl6fY2Epuwa9n9",
+	  "id": "ich_fake123456789",
 	  "object": "issuing.cardholder",
 	  "authorization_controls": {
 		"allowed_categories": [],
@@ -142,7 +145,7 @@ L<https://stripe.com/docs/api/issuing/cardholders/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

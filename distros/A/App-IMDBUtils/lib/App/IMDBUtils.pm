@@ -1,14 +1,14 @@
 package App::IMDBUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-22'; # DATE
+our $DATE = '2020-04-10'; # DATE
 our $DIST = 'App-IMDBUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-#use Log::Any '$log';
+use Log::ger;
 
 our %SPEC;
 
@@ -32,7 +32,7 @@ App::IMDBUtils - Utilities related to IMDB (Internet Movie Database)
 
 =head1 VERSION
 
-This document describes version 0.001 of App::IMDBUtils (from Perl distribution App-IMDBUtils), released on 2019-12-22.
+This document describes version 0.002 of App::IMDBUtils (from Perl distribution App-IMDBUtils), released on 2020-04-10.
 
 =head1 DESCRIPTION
 
@@ -41,6 +41,8 @@ This distribution includes the following CLI utilities:
 =over
 
 =item * L<parse-imdb-title-page>
+
+=item * L<search-imdb-title-id-by-title>
 
 =back
 
@@ -66,7 +68,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,7 @@ use DBI qw[];
 use Pcore::Handle::DBI::Const qw[:CONST];
 use DBD::SQLite qw[];
 use DBD::SQLite::Constants qw[:file_open];
-use Pcore::Util::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_blessed_arrayref];
+use Pcore::Util::Scalar qw[weaken is_bool is_blessed_ref looks_like_number is_plain_arrayref is_blessed_arrayref];
 use Pcore::Util::UUID qw[uuid_v1mc_str uuid_v4_str];
 use Pcore::Util::Digest qw[md5_hex];
 use Pcore::Util::Data qw[to_json];
@@ -165,13 +165,14 @@ sub quote ( $self, $var ) {
 
     my $type;
 
+    # expand type
     if ( is_blessed_arrayref $var) {
         return 'NULL' if !defined $var->[1];
 
         $type = _get_sqlite_type( $var->[0] );
 
         if ( $var->[0] == $SQL_BOOL ) {
-            $var = $var->[1] ? 1 : 0;
+            return $var->[1] ? 'TRUE' : 'FALSE';
         }
         elsif ( $var->[0] == $SQL_JSON ) {
             $var = to_json $var->[1];
@@ -188,6 +189,13 @@ sub quote ( $self, $var ) {
 
             $var = to_json $var;
         }
+
+        # known boolean values
+        elsif ( is_bool $var ) {
+            return $var ? 'TRUE' : 'FALSE';
+        }
+
+        # default type is TEXT
         else {
             $type = $SQLITE_TEXT;
         }
@@ -354,6 +362,11 @@ sub _execute ( $self, $sth, $bind, $bind_pos ) {
             $sth->bind_param( $i + 1, undef, $SQLITE_BLOB );
 
             $bind[$i] = to_json $bind[$i];
+        }
+
+        # known boolean values
+        elsif ( is_bool $bind[$i] ) {
+            $bind[$i] = $bind[$i] ? 1 : 0;
         }
     }
 
@@ -757,13 +770,15 @@ sub attach ( $self, $name, $path = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 368                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (24)                        |
+## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
+## |      | 163                  | * Subroutine "quote" with high complexity score (22)                                                           |
+## |      | 381                  | * Subroutine "do" with high complexity score (24)                                                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 453                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 466                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 330                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 338                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 664                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 677                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

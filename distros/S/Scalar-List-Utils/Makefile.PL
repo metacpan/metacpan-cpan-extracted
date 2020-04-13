@@ -8,36 +8,7 @@ use ExtUtils::MakeMaker;
 my $PERL_CORE = grep { $_ eq 'PERL_CORE=1' } @ARGV;
 my $defines = $ENV{PERL_CORE} ? q[-DPERL_EXT] : q[-DPERL_EXT -DUSE_PPPORT_H];
 
-my $nv_digits;
-
-my $ivsize = $Config{ivsize} * 8;
-my $uv_digits = 1 + int(log(2) / log(10) * $ivsize);
-
-my $nvsize = $Config{nvsize} * 8;
-# we want NV and UV numbers in the same range to format the same, so make sure
-# NVs are given at least as many digits as UVs.  If IV/UVs have equal or
-# greater bits, there's no reason to check NV size since it won't be able to
-# have as much mantissa.
-if ($ivsize >= $nvsize) {
-  $nv_digits = $uv_digits;
-}
-else {
-  # maximum possible digits that could fit in something NV size
-  my $max_digits = 1 + int(log(2) / log(10) * $nvsize);
-
-  my $float = sprintf '%0.'.$max_digits.'g', 1/9;
-  my ($accurate_digits) = $float =~ /(1+)/;
-  # additional digit provides 'partial' accuracy
-  $nv_digits = 1 + length $accurate_digits;
-
-  if ($nv_digits < $uv_digits) {
-    $nv_digits = $uv_digits;
-  }
-}
-
-$defines .= " -DNV_MAX_PRECISION=$nv_digits";
-
-WriteMakefile(
+my %params = (
   NAME         => q[List::Util],
   ABSTRACT     => q[Common Scalar and List utility subroutines],
   AUTHOR       => q[Graham Barr <gbarr@cpan.org>],
@@ -59,7 +30,9 @@ WriteMakefile(
     ? ()
     : (
       INSTALLDIRS      => ($] < 5.011 ? q[perl] : q[site]),
-      PREREQ_PM        => {'Test::More' => 0,},
+      TEST_REQUIRES => {
+        'Test::More' => 0,
+      },
       (eval { ExtUtils::MakeMaker->VERSION(6.31) } ? (LICENSE => 'perl') : ()),
       (eval { ExtUtils::MakeMaker->VERSION(6.48) } ? (MIN_PERL_VERSION => '5.006') : ()),
       ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (
@@ -84,3 +57,18 @@ WriteMakefile(
     )
   ),
 );
+
+if ($params{TEST_REQUIRES} and !eval { ExtUtils::MakeMaker->VERSION(6.64) }) {
+    $params{BUILD_REQUIRES} = {
+        %{$params{BUILD_REQUIRES} || {}},
+        %{delete $params{TEST_REQUIRES}},
+    };
+}
+if ($params{BUILD_REQUIRES} and !eval { ExtUtils::MakeMaker->VERSION(6.5503) }) {
+    $params{PREREQ_PM} = {
+        %{$params{PREREQ_PM} || {}},
+        %{delete $params{BUILD_REQUIRES}},
+    };
+}
+
+WriteMakefile(%params);

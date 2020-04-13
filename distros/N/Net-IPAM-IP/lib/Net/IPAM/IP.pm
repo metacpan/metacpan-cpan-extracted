@@ -2,12 +2,12 @@ package Net::IPAM::IP;
 
 use strict;
 use warnings;
-our $VERSION = '1.08';
+our $VERSION = '1.11';
 
 use Socket qw/AF_INET AF_INET6/;
 
 # On some platforms, inet_pton accepts various forms of invalid input or discards valid input.
-# In this case use a (slower) pure perl implementation for Socket::inet_pton.
+# In this case use a (slower) pure-perl implementation for Socket::inet_pton.
 # and also for Socket::inet_ntop, I don't trust that too.
 BEGIN {
   if (    # wrong valid
@@ -34,6 +34,7 @@ our @EXPORT_OK = qw(incr_n);
 
 use overload
   '""'     => sub { shift->to_string },
+  bool     => sub { 1 },
   fallback => 1;
 
 =head1 NAME
@@ -66,7 +67,7 @@ Net::IPAM::IP - A library for reading, formatting, sorting and converting IP-add
 
 =head1 METHODS
 
-Net::IPAM::IP implements the following methods:
+L<Net::IPAM::IP> implements the following methods:
 
 =head2 new
 
@@ -82,7 +83,7 @@ Returns undef on illegal input.
 
 sub new {
   croak 'wrong method call' unless defined $_[1];
-  my $self = bless( {}, $_[0] );
+  my $self = bless( {}, ref $_[0] || $_[0]);
 
   # IPv4
   if ( index( $_[1], ':' ) < 0 ) {
@@ -113,16 +114,6 @@ sub new {
   return $self;
 }
 
-=head2 clone
-
-Just a shallow copy
-
-=cut
-
-sub clone {
-  return bless( { binary => $_[0]->{binary} }, ref $_[0] );
-}
-
 =head2 new_from_bytes
 
   $ip = Net::IPAM::IP->new_from_bytes("\x0a\x00\x00\x01")
@@ -131,11 +122,15 @@ Parse the input as packed IPv4/IPv6/IPv4-mapped-IPv6 address and returns the IP 
 
 Croaks on illegal input.
 
+Can be used for cloning the object:
+
+  $clone = $obj->new_from_bytes($obj->bytes);
+
 =cut
 
 sub new_from_bytes {
   croak 'wrong method call' unless defined $_[1];
-  my $self = bless( {}, $_[0] );
+  my $self = bless( {}, ref $_[0] || $_[0] );
   my $n    = $_[1];
 
   if ( length($n) == 4 ) {
@@ -169,7 +164,7 @@ sub new_from_bytes {
   $ip    = Net::IPAM::IP->new('10.0.0.1');
   $bytes = $ip->bytes;    # "\x0a\x00\x00\x01"
 
-Returns the packed IP address as byte-string. It's the opposite to new_from_bytes()
+Returns the packed IP address as byte-string. It's the opposite to L</"new_from_bytes">
 
 =cut
 
@@ -214,10 +209,9 @@ Returns 4 or 6.
 sub version {
   return $_[0]->{version} if defined $_[0]->{version};
 
-  # unpack first byte, AF_INETx
+  # unpack first byte, AF_INETx, 20% faster with substr()
   # my $v = unpack( 'C', $_[0]->{binary} );
-  #
-  # 20% faster with substr()
+
   my $v = ord( substr( $_[0]->{binary}, 0, 1 ) );
 
   # get, cache and return
@@ -236,7 +230,7 @@ Returns the input string in canonical form.
 
   say Net::IPAM::IP->new('Fe80::0001')->to_string;  # fe80::1
 
-Stringification is overloaded with C<to_string>
+Stringification is overloaded with L</"to_string">
 
   my $ip = Net::IPAM::IP->new('Fe80::0001') // die 'wrong format,';;
   say $ip; # fe80::1
@@ -250,13 +244,12 @@ Stringification is overloaded with C<to_string>
 #  return $_[0]->{string} = Socket::inet_ntop( $v, $n );
 #}
 
-# circumvent IPv4-compatible-IPv4 bug in Socket::inet_ntop
+# circumvent IPv4-compatible-IPv6 bug in Socket::inet_ntop
 sub to_string {
 
-  # unpack to version and network byte order (from Socket::inet_pton)
+  # unpack to version and network byte order (from Socket::inet_pton), 20% faster with substr()
   # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
-  #
-  # 20% faster with substr()
+
   my ( $v, $n ) = ( ord( substr( $_[0]->{binary}, 0, 1 ) ), substr( $_[0]->{binary}, 1, ) );
 
   my $str = Socket::inet_ntop( $v, $n );
@@ -288,12 +281,12 @@ Returns the next IP address, returns undef on overflow.
 
 sub incr {
   my $n = incr_n( $_[0]->bytes ) // return;
-  return Net::IPAM::IP->new_from_bytes($n);
+  return (ref $_[0])->new_from_bytes($n);
 }
 
 =head2 expand
 
-Expand IP address into canonical form, useful for grep, aligned output and lexical sort.
+Expand IP address into canonical form, useful for C<< grep >>, aligned output and lexical C<< sort >>
 
 	Net::IPAM::IP->new('1.2.3.4')->expand;   # '001.002.003.004'
 	Net::IPAM::IP->new('fe80::1')->expand;   # 'fe80:0000:0000:0000:0000:0000:0000:0001'
@@ -303,9 +296,9 @@ Expand IP address into canonical form, useful for grep, aligned output and lexic
 sub expand {
   return $_[0]->{expand} if defined $_[0]->{expand};
 
-  # unpack to version and network byte order (from Socket::inet_pton)
+  # unpack to version and network byte order (from Socket::inet_pton), substr() ist faster than unpack
   # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
-  # substr() ist faster
+
   my ( $v, $n ) = ( ord( substr( $_[0]->{binary}, 0, 1 ) ), substr( $_[0]->{binary}, 1, ) );
 
   if ( $v == AF_INET6 ) {
@@ -358,11 +351,11 @@ sub reverse {
 
 =head1 FUNCTIONS
 
-Net::IPAM::IP implements the following functions;
+L<Net::IPAM::IP> implements the following functions;
 
 =head2 incr_n($n)
 
-Increment packed IPv4 or IPv6 address, no need for Math::BigInt. Needed by methods in Net::IPAM::Block.
+Increment a packed IPv4 or IPv6 address, no need for L<Math::BigInt>. Needed by methods in L<Net::IPAM::Block>.
 
 =cut
 
@@ -520,9 +513,28 @@ sub _inet_pton_v6_pp {
   return $n;
 }
 
-=head1 WARNINGS
+=head1 OPERATORS
 
-Some Socket::inet_pton implementations are hopelessly buggy and are redefined during loading.
+L<Net::IPAM::IP> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$ip;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$ip";
+
+Alias for L</"to_string">.
+
+=head1 WARNING
+
+Some Socket::inet_XtoY implementations are hopelessly buggy.
+
+Tests are made during loading and in case of errors, these functions are redefined
+with a (slower) pure-perl implementation.
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@ package Pcore::Handle::pgsql::DBH;
 use Pcore -class, -res, -const;
 use Pcore::Handle::DBI::Const qw[:CONST];
 use Pcore::Handle::pgsql qw[:ALL];
-use Pcore::Util::Scalar qw[weaken looks_like_number is_plain_arrayref is_blessed_arrayref];
+use Pcore::Util::Scalar qw[is_bool weaken looks_like_number is_plain_arrayref is_blessed_arrayref];
 use Pcore::Util::Digest qw[md5_hex];
 use Pcore::Util::Data qw[from_json];
 
@@ -456,7 +456,7 @@ sub _ON_DATA_ROW ( $self, $dataref ) {
                 }
 
                 elsif ( $type == $SQL_BOOL ) {
-                    $col = $col eq 'f' ? 0 : 1;
+                    $col = $col eq 'f' ? $FALSE : $TRUE;
                 }
 
                 # TODO decode ARRAY
@@ -657,6 +657,13 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
                     $param_format_codes .= "\x00\x00";    # text
 
                     $param = $self->encode_array($param)->$*;
+                }
+
+                # known boolean objects
+                elsif ( is_bool $param ) {
+                    $param_format_codes .= "\x00\x00";    # text
+
+                    $param = $param ? '1' : '0';
                 }
 
                 # text by default
@@ -1001,13 +1008,13 @@ sub encode_json ( $self, $var ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 542                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (31)                  |
+## |    3 | 542                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (33)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 643, 921             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 643, 928             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 774, 921             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 781, 928             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 813                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 820                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

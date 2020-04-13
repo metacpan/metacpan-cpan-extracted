@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 47 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 60 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/SerializeUtils.pm'
@@ -21,6 +21,7 @@ my @scripts = (
     'script/dd2json',
     'script/dd2phpser',
     'script/dd2sereal',
+    'script/dd2sexp',
     'script/dd2storable',
     'script/dd2yaml',
     'script/json2dd',
@@ -28,12 +29,14 @@ my @scripts = (
     'script/json2json',
     'script/json2phpser',
     'script/json2sereal',
+    'script/json2sexp',
     'script/json2storable',
     'script/json2yaml',
     'script/phpser2dd',
     'script/phpser2ddc',
     'script/phpser2json',
     'script/phpser2sereal',
+    'script/phpser2sexp',
     'script/phpser2storable',
     'script/phpser2yaml',
     'script/pp-dd',
@@ -43,20 +46,30 @@ my @scripts = (
     'script/sereal2ddc',
     'script/sereal2json',
     'script/sereal2phpser',
+    'script/sereal2sexp',
     'script/sereal2storable',
     'script/sereal2yaml',
     'script/serializeutils-convert',
+    'script/sexp2dd',
+    'script/sexp2ddc',
+    'script/sexp2json',
+    'script/sexp2phpser',
+    'script/sexp2sereal',
+    'script/sexp2storable',
+    'script/sexp2yaml',
     'script/storable2dd',
     'script/storable2ddc',
     'script/storable2json',
     'script/storable2phpser',
     'script/storable2sereal',
+    'script/storable2sexp',
     'script/storable2yaml',
     'script/yaml2dd',
     'script/yaml2ddc',
     'script/yaml2json',
     'script/yaml2phpser',
     'script/yaml2sereal',
+    'script/yaml2sexp',
     'script/yaml2storabls',
     'script/yaml2yaml'
 );

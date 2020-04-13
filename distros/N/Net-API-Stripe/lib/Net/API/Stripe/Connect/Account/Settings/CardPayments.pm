@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Settings/CardPayments.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -34,6 +34,15 @@ Net::API::Stripe::Connect::Account::Settings::CardPayments - A Stripe Account Se
 
 =head1 SYNOPSIS
 
+    my $obj = $stripe->account->settings->card_payments({
+        decline_on => 
+            {
+            avs_failure => 0,
+            cvc_failure => 1,
+            },
+        statement_descriptor_prefix => 'Big Corp',
+    });
+
 =head1 VERSION
 
     0.1
@@ -42,24 +51,16 @@ Net::API::Stripe::Connect::Account::Settings::CardPayments - A Stripe Account Se
 
 Settings used to apply the account’s branding to email receipts, invoices, Checkout, and other products.
 
+This can be instantiated from method B<card_payments> in module L<Net::API::Stripe::Connect::Account::Settings>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Settings::CardPayments> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -92,7 +93,7 @@ The default text that appears on credit card statements when a charge is made. T
 =head1 API SAMPLE
 
 	{
-	  "id": "acct_19eGgRCeyNCl6xYZ",
+	  "id": "acct_fake123456789",
 	  "object": "account",
 	  "business_profile": {
 		"mcc": null,
@@ -124,7 +125,7 @@ The default text that appears on credit card statements when a charge is made. T
 	  "payouts_enabled": true,
 	  "settings": {
 		"branding": {
-		  "icon": "file_1DLf5rCeyNCl6fY2kS4e5hMT",
+		  "icon": "file_fake123456789",
 		  "logo": null,
 		  "primary_color": "#0e77ca"
 		},
@@ -175,7 +176,7 @@ L<https://stripe.com/docs/api/accounts/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

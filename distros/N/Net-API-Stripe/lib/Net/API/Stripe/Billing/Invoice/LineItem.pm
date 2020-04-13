@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Invoice/LineItem.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -58,6 +58,8 @@ sub type { shift->_set_get_scalar( 'type', @_ ); }
 
 sub unified_proration { return( shift->_set_get_scalar( 'unified_proration', @_ ) ); }
 
+sub unique_id { return( shift->_set_get_scalar( 'unique_id', @_ ) ); }
+
 1;
 
 __END__
@@ -70,11 +72,26 @@ Net::API::Stripe::Billing::Invoice::LineItem - A Stripe Invoice Line Item Object
 
 =head1 SYNOPSIS
 
+    my $line_item = $stripe->invoice_line_item({
+        amount => 2000,
+        currency => 'jpy',
+        description 'Professional service work',
+        discountable => 0,
+        metadata => { transaction_id => 1212, customer_id => 987 },
+        plan => $plan_object,
+        proration => 0,
+        quantity => 7,
+        subscription => 'sub_fake123456789',
+        type => 'subscription',
+    });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
+
+This is a Stripe L<Net::API::Stripe::Billing::Invoice::LineItem> object as documented here: L<https://stripe.com/docs/api/invoices/line_item>
 
 =head1 CONSTRUCTOR
 
@@ -82,18 +99,7 @@ Net::API::Stripe::Billing::Invoice::LineItem - A Stripe Invoice Line Item Object
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Billing::Invoice::LineItem> object.
 
 =back
 
@@ -188,13 +194,13 @@ For prorations this indicates whether Stripe automatically grouped multiple rela
 =head1 API SAMPLE
 
 	{
-	  "id": "ii_1E9NPMCeyNCl6fY2kwMZb4TN",
+	  "id": "ii_fake123456789",
 	  "object": "line_item",
 	  "amount": -2000,
 	  "currency": "jpy",
-	  "description": "Unused time on Angels, Inc entrepreneur monthly membership after 02 Mar 2019",
+	  "description": "Unused time on Provider, Inc entrepreneur monthly membership after 02 Mar 2019",
 	  "discountable": false,
-	  "invoice_item": "ii_1E9NPMCeyNCl6fY2kwMZb4TN",
+	  "invoice_item": "ii_fake123456789",
 	  "livemode": false,
 	  "metadata": {},
 	  "period": {
@@ -216,7 +222,7 @@ For prorations this indicates whether Stripe automatically grouped multiple rela
 		"livemode": false,
 		"metadata": {},
 		"nickname": null,
-		"product": "prod_DwjzQmlOcoMCqN",
+		"product": "prod_fake123456789",
 		"tiers": null,
 		"tiers_mode": null,
 		"transform_usage": null,
@@ -225,8 +231,8 @@ For prorations this indicates whether Stripe automatically grouped multiple rela
 	  },
 	  "proration": true,
 	  "quantity": 1,
-	  "subscription": "sub_EccdFNq60pUMDL",
-	  "subscription_item": "si_Eccd4op26fXydB",
+	  "subscription": "sub_fake123456789",
+	  "subscription_item": "si_fake123456789",
 	  "tax_amounts": [],
 	  "tax_rates": [],
 	  "type": "invoiceitem"
@@ -237,6 +243,24 @@ For prorations this indicates whether Stripe automatically grouped multiple rela
 =head2 v0.1
 
 Initial version
+
+=head1 STRIPE HISTORY
+
+=head2 2019-12-03
+
+The id field of all invoice line items have changed and are now prefixed with il_. The new id has consistent prefixes across all line items, is globally unique, and can be used for pagination.
+
+=over 4
+
+=item You can no longer use the prefix of the id to determine the source of the line item. Instead use the type field for this purpose.
+
+=item For lines with type=invoiceitem, use the invoice_item field to reference or update the originating Invoice Item object.
+
+=item The Invoice Line Item object on earlier API versions also have a unique_id field to be used for migrating internal references before upgrading to this version.
+
+=item When setting a tax rate to individual line items, use the new id. Users on earlier API versions can pass in either a line item id or unique_id.
+
+=back
 
 =head1 AUTHOR
 
@@ -250,7 +274,7 @@ L<https://stripe.com/docs/api/invoices/line_item>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

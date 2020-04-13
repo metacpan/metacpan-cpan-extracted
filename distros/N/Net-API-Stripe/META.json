@@ -55,10 +55,12 @@
             "MIME::Base64" : "3.15",
             "MIME::QuotedPrint" : "3.13",
             "Module::Generic" : "v0.11.6",
+            "Net::API::REST" : "v0.5.3",
             "Net::IP" : "1.26",
             "Net::OAuth" : "0.28",
             "Number::Format" : "1.75",
             "Scalar::Util" : "1.54",
+            "Test::Pod" : "0",
             "Test::Simple" : "0",
             "TryCatch" : "1.003002",
             "URI::Escape" : "3.31",
@@ -73,6 +75,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.8",
+   "version" : "0.9",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

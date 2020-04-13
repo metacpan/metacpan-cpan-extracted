@@ -25,10 +25,10 @@
       },
       "configure" : {
          "requires" : {
-            "Date" : "v5.0.3",
+            "Date" : "v5.0.4",
             "Encode::Base2N" : "v1.0.2",
             "Export::XS" : "v3.0.4",
-            "Protocol::HTTP" : "v1.0.4",
+            "Protocol::HTTP" : "v1.0.5",
             "Test::Catch" : "v1.0.13",
             "URI::XS" : "v2.0.1",
             "XS::Framework" : "v1.2.9",
@@ -42,10 +42,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Date" : "v5.0.3",
+            "Date" : "v5.0.4",
             "Encode::Base2N" : "v1.0.2",
             "Export::XS" : "v3.0.4",
-            "Protocol::HTTP" : "v1.0.4",
+            "Protocol::HTTP" : "v1.0.5",
             "URI::XS" : "v2.0.1",
             "XS::Framework" : "v1.2.9",
             "XS::Install" : "v1.2.16",
@@ -57,10 +57,10 @@
       },
       "test" : {
          "requires" : {
-            "Date" : "v5.0.3",
+            "Date" : "v5.0.4",
             "Encode::Base2N" : "v1.0.2",
             "Export::XS" : "v3.0.4",
-            "Protocol::HTTP" : "v1.0.4",
+            "Protocol::HTTP" : "v1.0.5",
             "Test::Catch" : "v1.0.13",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
@@ -79,6 +79,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.3",
+   "version" : "v1.1.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

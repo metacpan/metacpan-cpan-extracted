@@ -6,14 +6,37 @@ use Encode ();
 use Scalar::Util qw(blessed refaddr);
 use B;
 use Data::Dumper; # Dumper
-use parent qw/Exporter/;
-our @EXPORT = qw/eDumper Dumper/;
 
-our $VERSION = '0.108';
+our $VERSION = '1.00';
 
 our $ENCODING = '';
-our $CHECK_ALREADY_ENCODED = 1;
+our $CHECK_ALREADY_ENCODED = 0;
 our $DO_NOT_PROCESS_NUMERIC_VALUE = 1;
+our $FLAG_STR = '';
+
+our $BEFORE_HOOK;
+our $AFTER_HOOK;
+
+sub import {
+    my $class = shift;
+    my %args = map { $_ => 1 } @_;
+
+    if (delete $args{'-dumper'}) {
+        no strict 'refs'; ## no critic
+        *{__PACKAGE__."::Dumper"} = *{__PACKAGE__."::eDumper"};
+    }
+
+    my $export_all = !!(scalar(keys %args) == 0);
+
+    my $pkg = caller;
+
+    for my $f (qw/ Dumper eDumper /) {
+        if ( $export_all || (exists $args{$f} && $args{$f}) ) {
+            no strict 'refs'; ## no critic
+            *{"${pkg}::${f}"} = \&{$f};
+        }
+    }
+}
 
 sub _dump {
     my $d = Data::Dumper->new(\@_);
@@ -69,11 +92,32 @@ sub _apply {
             push @retval, $proto;
         }
         else{
-            push @retval, _can_exec($arg) ? $code->($arg) : $arg;
+            if (_can_exec($arg)) {
+                push @retval, $FLAG_STR ? $FLAG_STR . _exec($code, $arg) : _exec($code, $arg);
+            }
+            else {
+                push @retval, $arg;
+            }
         }
     }
 
     return wantarray ? @retval : $retval[0];
+}
+
+sub _exec {
+    my ($code, $arg) = @_;
+
+    if (ref $BEFORE_HOOK eq 'CODE') {
+        $arg = $BEFORE_HOOK->($arg);
+    }
+
+    my $result = $code->($arg);
+
+    if (ref $AFTER_HOOK eq 'CODE') {
+        return $AFTER_HOOK->($result);
+    }
+
+    return $result;
 }
 
 # copied from Data::Recursive::Encode
@@ -90,8 +134,10 @@ sub _can_exec {
     my ($arg) = @_;
 
     return unless defined($arg);
-    return 1 if ( !$DO_NOT_PROCESS_NUMERIC_VALUE || !_is_number($arg) )
-                    && ( $CHECK_ALREADY_ENCODED && Encode::is_utf8($arg) );
+    return if $DO_NOT_PROCESS_NUMERIC_VALUE && _is_number($arg);
+    return 1 if Encode::is_utf8($arg);
+    return 1 if !$CHECK_ALREADY_ENCODED && !Encode::is_utf8($arg);
+
     return;
 }
 
@@ -147,6 +193,8 @@ Also `Dumper` function is exported from Data::Dumper::AutoEncode. It is same as 
 
 =head1 METHOD
 
+By default, both functions B<eDumper> and B<Dumper> will be exported.
+
 =over
 
 =item eDumper(LIST)
@@ -159,14 +207,75 @@ If you want to encode other encoding, set encoding to $Data::Dumper::AutoEncode:
 
 =item Dumper(LIST)
 
-same as Data::Dumper::Dumper
+Same as the C<Dumper> function of L<Data::Dumper>. However, if you specify an import option C<-dumper>, then the C<Dumper> function will work as same as C<eDumper> function. Please see C<IMPORT OPTIONS> section for more details.
+
+=item encode($encoding, $stuff)
+
+Just encode stuff.
 
 =back
+
+=head1 IMPORT OPTIONS
+
+You can specify an import option to override C<Dumper> function.
+
+    use Data::Dumper::AutoEncode '-dumper';
+
+It means C<Dumper> function is overrided as same as eDumper.
+
+
+=head1 GLOBAL VARIABLE OPTIONS
+
+=head2 ENCODING : utf8
+
+Set this option if you need another encoding;
+
+=head2 BEFORE_HOOK / AFTER_HOOK
+
+Set code ref for hooks which excuted around encoding
+
+    $Data::Dumper::AutoEncode::BEFORE_HOOK = sub {
+        my $value = $_[0]; # decoded
+        $value =~ s/\x{2019}/'/g;
+        return $value;
+    };
+
+    $Data::Dumper::AutoEncode::AFTER_HOOK = sub {
+        my $value = $_[0]; # encoded
+        // do something
+        return $value;
+    };
+
+=head2 CHECK_ALREADY_ENCODED : false
+
+If you set this option true value, check a target before encoding. And do encode in case of decoded value.
+
+=head2 DO_NOT_PROCESS_NUMERIC_VALUE : true
+
+By default, numeric values are ignored (do nothing).
+
+=head2 FLAG_STR
+
+Additional string (prefix) for encoded values.
+
+
+=head1 HOW TO SET CONFIGURATION VARIABLES TO DUMP
+
+This C<Data::Dumper::AutoEncode> is using L<Data::Dumper> internally. So, you can set configuration variables to dump as the variables of Data::Dumper, like below.
+
+    use Data::Dumper::AutoEncode;
+
+    local $Data::Dumper::Indent   = 2;
+    local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Deparse  = 1;
+
+    say eDumper($hash);
+
 
 =head1 REPOSITORY
 
 Data::Dumper::AutoEncode is hosted on github
-<http://github.com/bayashi/Data-Dumper-AutoEncode>
+L<http://github.com/bayashi/Data-Dumper-AutoEncode>
 
 
 =head1 AUTHOR

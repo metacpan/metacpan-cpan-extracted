@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Shipping.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2019/11/02
+## Modified 2020/03/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -15,14 +15,14 @@ BEGIN
 {
     use strict;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = '0.1.1';
 };
 
 sub address { return( shift->_set_get_object( 'address', 'Net::API::Stripe::Address', @_ ) ); }
 
 sub carrier { return( shift->_set_get_scalar( 'carrier', @_ ) ); }
 
-sub eta { return( shift->_set_get_scalar( 'eta', @_ ) ); }
+sub eta { return( shift->_set_get_datetime( 'eta', @_ ) ); }
 
 sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
 
@@ -50,15 +50,28 @@ Net::API::Stripe::Shipping - A Stripe Shipping Object
 
 =head1 SYNOPSIS
 
+    my $shipping = $stripe->shipping({
+        address => $address_object,
+        carrier => 'DHL',
+        eta => '2020-04-12T08:00:00',
+        name => 'John Doe',
+        phone => '+81-(0)90-1234-5678',
+        service => 'express',
+        status => 'pending',
+        tracking_number => 1234567890,
+        tracking_url => 'https://track.example.com/1234567890',
+        type => 'individual',
+    });
+
 =head1 VERSION
 
-    0.1
+    0.1.1
 
 =head1 DESCRIPTION
 
 Where and how things will be shipped.
 
-This is inherited by: C<Net::API::Stripe::Charge::Shipping>, C<Net::API::Stripe::Customer::Shipping>, C<Net::API::Stripe::Issuing::Card::Shipping>, C<Net::API::Stripe::Order::Shipping>, C<Net::API::Stripe::>, C<Net::API::Stripe::>
+This is inherited by: L<Net::API::Stripe::Charge::Shipping>, L<Net::API::Stripe::Customer::Shipping>, L<Net::API::Stripe::Issuing::Card::Shipping>, L<Net::API::Stripe::Order::Shipping>, C<Net::API::Stripe::>, C<Net::API::Stripe::>
 
 =head1 CONSTRUCTOR
 
@@ -66,18 +79,8 @@ This is inherited by: C<Net::API::Stripe::Charge::Shipping>, C<Net::API::Stripe:
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Shipping> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -89,7 +92,7 @@ Toggles debug mode on/off
 
 Shipping address.
 
-This is a C<Net::API::Stripe::Address> object, if any.
+This is a L<Net::API::Stripe::Address> object, if any.
 
 =item B<carrier> string
 
@@ -139,6 +142,8 @@ A tracking number for a card shipment. This is a C<URI> object.
 
 A link to the shipping carrier’s site where you can view detailed information about a card shipment.
 
+This returns a L<URI> object.
+
 =item B<type> string
 
 One of bulk or individual. Bulk shipments will be grouped and mailed together, while individual ones will not.
@@ -148,7 +153,7 @@ One of bulk or individual. Bulk shipments will be grouped and mailed together, w
 =head1 API SAMPLE
 
 	{
-	  "id": "ic_1FVxofCeyNCl6fY2XvoWK90A",
+	  "id": "ic_fake123456789",
 	  "object": "issuing.card",
 	  "authorization_controls": {
 		"allowed_categories": null,
@@ -161,7 +166,7 @@ One of bulk or individual. Bulk shipments will be grouped and mailed together, w
 	  },
 	  "brand": "Visa",
 	  "cardholder": {
-		"id": "ich_1DNcRHCeyNCl6fY2Epuwa9n9",
+		"id": "ich_fake123456789",
 		"object": "issuing.cardholder",
 		"authorization_controls": {
 		  "allowed_categories": [],
@@ -230,7 +235,7 @@ L<https://stripe.com/docs/api/issuing/cards/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

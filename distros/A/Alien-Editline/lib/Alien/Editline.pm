@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build and make available Editline (libedit)
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 
@@ -28,48 +28,45 @@ Alien::Editline - Build and make available Editline (libedit)
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
+
+In your Makefile.PL:
+
+ use ExtUtils::MakeMaker;
+ use Alien::Base::Wrapper ();
+
+ WriteMakefile(
+   Alien::Base::Wrapper->new('Alien::Editline')->mm_args2(
+     # MakeMaker args
+     NAME => 'Kafka::Librd',
+     ...
+   ),
+ );
 
 In your Build.PL:
 
  use Module::Build;
- use Alien::Editline;
+ use Alien::Base::Wrapper qw( Alien::Editline !export );
+
  my $builder = Module::Build->new(
    ...
    configure_requires => {
      'Alien::Editline' => '0',
      ...
    },
-   extra_compiler_flags => Alien::Editline->cflags,
-   extra_linker_flags   => Alien::Editline->libs,
+   Alien::Base::Wrapper->mb_args,
    ...
  );
- 
+
  $build->create_build_script;
-
-In your Makefile.PL:
-
- use ExtUtils::MakeMaker;
- use Config;
- use Alien::Editline;
- 
- WriteMakefile(
-   ...
-   CONFIGURE_REQUIRES => {
-     'Alien::Editline' => '0',
-   },
-   CCFLAGS => Alien::Editline->cflags . " $Config{ccflags}",
-   LIBS    => [ Alien::Editline->libs ],
-   ...
- );
 
 In your L<FFI::Platypus> script or module:
 
  use FFI::Platypus;
  use Alien::Editline;
- 
+
  my $ffi = FFI::Platypus->new(
    lib => [ Alien::Editline->dynamic_libs ],
  );
@@ -87,7 +84,11 @@ L<Alien>, L<Alien::Base>, L<Alien::Build::Manual::AlienUser>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Tom Hukins (TOMHUKINS)
 
 =head1 COPYRIGHT AND LICENSE
 

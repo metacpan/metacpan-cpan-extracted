@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Fraud/ValueList/Item.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -44,6 +44,14 @@ Net::API::Stripe::Fraud::ValueList::Item - A Stripe Value List Item Object
 
 =head1 SYNOPSIS
 
+    my $item = $stripe->value_list_item({
+        created_by => 'john.doe@example.com',
+        value => '1.2.3.4',
+        value_list => 'rsl_1FVF3MCeyNCl6fY2Wg2IWniP',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -58,18 +66,8 @@ Value list items allow you to add specific values to a given Radar value list, w
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Fraud::ValueList::Item> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -112,7 +110,7 @@ The identifier of the value list this item belongs to.
 =head1 API SAMPLE
 
 	{
-	  "id": "rsli_1FVF3MCeyNCl6fY2tNq82Oj3",
+	  "id": "rsli_fake123456789",
 	  "object": "radar.value_list_item",
 	  "created": 1571480456,
 	  "created_by": "jenny@example.com",
@@ -139,7 +137,7 @@ L<https://stripe.com/docs/api/radar/value_list_items>, L<https://stripe.com/docs
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

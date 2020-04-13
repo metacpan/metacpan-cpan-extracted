@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Fraud/ValueList.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -50,6 +50,17 @@ Net::API::Stripe::Fraud::ValueList - A Stripe Value List Object
 
 =head1 SYNOPSIS
 
+    my $list = $stripe->value_list({
+        alias => 'custom_ip_blocklist',
+        created_by => 'john.doe@example.com',
+        item_type => 'ip_address',
+        list_items => $list_object,
+        metadata => { transaction_id => 123 },
+        name => 'Custom IP Blocklist',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -64,18 +75,7 @@ Value lists allow you to group values together which can then be referenced in r
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Fraud::ValueList> object.
 
 =back
 
@@ -130,7 +130,7 @@ The name of the value list.
 =head1 API SAMPLE
 
 	{
-	  "id": "rsl_1FVF3MCeyNCl6fY2Y9Pa1Mp9",
+	  "id": "rsl_fake123456789",
 	  "object": "radar.value_list",
 	  "alias": "custom_ip_blocklist",
 	  "created": 1571480456,
@@ -140,7 +140,7 @@ The name of the value list.
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/radar/value_list_items?value_list=rsl_1FVF3MCeyNCl6fY2Y9Pa1Mp9"
+		"url": "/v1/radar/value_list_items?value_list=rsl_fake123456789"
 	  },
 	  "livemode": false,
 	  "metadata": {},
@@ -165,7 +165,7 @@ L<https://stripe.com/docs/api/radar/value_lists>, L<https://stripe.com/docs/rada
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

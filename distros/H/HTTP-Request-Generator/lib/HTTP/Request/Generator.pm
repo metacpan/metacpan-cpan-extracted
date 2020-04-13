@@ -59,7 +59,7 @@ HTTP::Request::Generator - generate HTTP requests
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request
     expand_curl_pattern
 );
@@ -106,9 +106,9 @@ our %defaults = (
 sub fill_url( $url, $values, $raw=undef ) {
     if( $values ) {
         if( $raw ) {
-            $url =~ s!:(\w+)!exists $values->{$1} ? $values->{$1} : $1!ge;
+            $url =~ s!:(\w+)!exists $values->{$1} ? $values->{$1} : ":$1"!ge;
         } else {
-            $url =~ s!:(\w+)!exists $values->{$1} ? uri_escape($values->{$1}) : $1!ge;
+            $url =~ s!:(\w+)!exists $values->{$1} ? uri_escape($values->{$1}) : ":$1"!ge;
         };
     };
     $url
@@ -191,7 +191,26 @@ sub expand_curl_pattern( $pattern ) {
 
     # Split up the URL pattern into a scheme, host(pattern), port number and
     # path (pattern)
-    my( $scheme, $host, $port, $path, $query ) = $pattern =~ m!^(?:([^:]+):)?/?/?(?:([^/:]+))(?::(\d+))?([^?]*)(?:\?(.*))?$!;
+    #use Regexp::Debugger;
+    #use re 'debug';
+    my( $scheme, $host, $port, $path, $query )
+        = $pattern =~ m!^(?:([^:]+):)? # scheme
+                         /?/?          # optional? slashes
+                         (             # hostname
+                              \[(?:[:\da-fA-F]+)\]             # ipv6
+                             |[^/:\[]+
+                                  (?:\[[^/\]]+\][^/:\[]*)*
+                                  (?=[:/]|$)                     # plain, or expansion
+                             |\[[^:\]]+\][^/:]*                # expansion
+                         )
+                         (?::(\d+))?   # optional port
+                         ([^?]*)       # path
+                         (?:\?(.*))?   # optional query part
+                         $!x;
+    #my( $scheme, $host, $port, $path, $query )
+    #    = $pattern =~ m!^(?:([^:]+):)?/?/?(\[(?:[:\da-fA-F]+)\]|[^/:\[]+(?:\[[^/\]]+\][^/:\[]*)*(?=[:/]|$)|\[[^:\]]+\][^/:]*)(?::(\d+))?([^?]*)(?:\?(.*))?$!;
+
+    #no Regexp::Debugger;
 
     # Explicitly enumerate all ranges
     my $idx = 0;
@@ -226,7 +245,6 @@ sub expand_curl_pattern( $pattern ) {
         query_params => _extract_enum_query( $query ),
         raw_params   => 1,
     );
-
     %res
 }
 

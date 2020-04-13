@@ -32,6 +32,7 @@ requires:
   Data::Sah::Compiler::perl::TH::duration: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Date::Parse: '0'
+  Date::strftimeq: '0'
   DateTime: '0'
   DateTime::Format::Alami::EN: '0.13'
   DateTime::Format::Alami::ID: '0.13'
@@ -52,7 +53,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DateUtils
   homepage: https://metacpan.org/release/App-DateUtils
   repository: git://github.com/perlancar/perl-App-DateUtils.git
-version: '0.124'
+version: '0.125'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -112,6 +113,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript strftime'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript strftimeq'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::InsertExecsList

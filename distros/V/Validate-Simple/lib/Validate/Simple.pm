@@ -3,7 +3,7 @@ package Validate::Simple;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.3.0';
 
 use Carp;
 
@@ -17,25 +17,28 @@ my $VALUES_OF_ENUM = '__ VALUES __ OF __ ENUM __';
 # Constructor
 #
 sub new {
-    my ( $class, $specs ) = @_;
+    my ( $class, $specs, $all_errors ) = @_;
 
-    if ( defined $specs && ref $specs ne 'HASH' ) {
+    if ( defined( $specs ) && ref( $specs ) ne 'HASH' ) {
         croak "Specification must be a hashref";
     }
 
     my $self = bless {
-        specs => $specs,
-        _errors => [],
+        specs      => $specs,
+        all_errors => $all_errors,
+        required   => 0,
+        _errors    => [],
     }, $class;
 
-    if ( defined $specs && keys %$specs ) {
-        $self->validate_specs( $specs );
+    if ( defined( $specs ) && keys( %$specs ) ) {
+        $self->validate_specs( $specs, \$self->{required} )
+            || croak "Specs is not valid: " . join( '; ', $self->errors() ); ;
     }
 
     return $self;
 }
 
-# Registe validation error
+# Register validation errors
 #
 # Pushes an error to the list of errors
 #
@@ -60,7 +63,7 @@ sub errors {
 #
 sub delete_errors {
     my ( $self ) = @_;
-    my @errors = $self->_error();
+    my @errors = $self->errors();
     $self->{_errors} = [];
     return @errors;
 }
@@ -147,6 +150,10 @@ my %string = (
     max_length => {
         type => 'positive_int',
     },
+    re         => {
+        type     => 'any',
+        callback => sub { ref( $_[0] ) eq 'Regexp' }
+    },
 );
 
 # Common for lists
@@ -184,26 +191,32 @@ my %enum = (
 
 # Specification of specification format
 my %specs_of_specs = (
-    any        => { %any },
-    ( map { $_ => { %any, %number } } @number_types ),
-    ( map { $_ => { %any, %string } } @string_types ),
-    ( map { $_ => { %any, %list   } } @list_types ),
-    ( map { $_ => { %any, %enum   } } @enum_types ),
+    any        => { specs => { %any } },
+    ( map { $_ => { specs => { %any, %number } } } @number_types ),
+    ( map { $_ => { specs => { %any, %string } } } @string_types ),
+    ( map { $_ => { specs => { %any, %list   } } } @list_types ),
+    ( map { $_ => { specs => { %any, %enum   } } } @enum_types ),
 );
 
 for my $key ( keys %specs_of_specs ) {
-    $specs_of_specs{ $key }{type} = {
+    $specs_of_specs{ $key }{specs}{type} = {
         type     => 'enum',
         values   => [ $key ],
         required => 1,
     };
+    my $required = 0;
+    for my $k ( keys %{ $specs_of_specs{ $key }{specs} } ) {
+        $required++
+            if exists $specs_of_specs{ $key }{specs}{ $k }{required};
+    }
+    $specs_of_specs{ $key }{required} = $required;
 }
 
 # Validate functions per type
-my %validate = ( any => sub { 1; } );
+$specs_of_specs{any}{validate} = sub { 1; };
 for my $type ( @all_types ) {
     next if $type eq 'any';
-    $validate{ $type } = sub { __PACKAGE__->$type( @_ ) };
+    $specs_of_specs{ $type }{validate} = sub { __PACKAGE__->$type( @_ ) };
 }
 
 # Returns specification of specification
@@ -215,32 +228,38 @@ sub spec_of_specs {
 # Validates parameters according to specs
 #
 sub validate {
-    my ( $self, $params, $specs ) = @_;
-
-    # If $specs is not passed, use the one created in constructor,
-    # and skip specs validation
-    my $skip_specs_validation = 1;
-    if ( !defined $specs ) {
-        $specs //= $self->{specs};
-        $skip_specs_validation = 0;
-    }
-
-    # If specs are not known
-    # do not pass
-    return if !defined $specs;
+    my ( $self, $params, $specs, $all_errors ) = @_;
 
     # Clear list of errors
     $self->delete_errors();
 
+    my $req = 0;
+    # If $specs is not passed, use the one created in constructor,
+    # and skip specs validation
+    if ( !defined( $specs ) ) {
+        $specs //= $self->{specs};
+        # If $specs is still not known
+        # do not pass
+        if ( !defined( $specs ) ) {
+            croak 'No specs passed';
+        }
+        $req = $self->{required};
+    }
+    # Otherwise, validate specs first
+    elsif ( !$self->validate_specs( $specs, \$req ) ) {
+        croak 'Specs is not valid: ' . join( '; ', $self->errors() );
+    }
+
     # If params are not HASHREF or undef
     # do not pass
     unless ( $self->hash( $params ) ) {
-        $self->_error("Expected a hashref for params");
+        $self->_error( "Expected a hashref for params" );
         return;
     }
 
+    $all_errors //= $self->{all_errors};
     # Check parameters
-    my $ret = $self->_validate( $params, $specs, $skip_specs_validation );
+    my $ret = $self->_validate( $params, $specs, \$req, $all_errors );
 
     return $ret;
 }
@@ -252,7 +271,7 @@ sub validate {
 # them against rules, which are stored in %specs_of_specs
 #
 sub validate_specs {
-    my ( $self, $specs, $path_to_var ) = @_;
+    my ( $self, $specs, $req, $path_to_var ) = @_;
 
     # This variable contains path to the variable name
     $path_to_var //= '';
@@ -262,33 +281,49 @@ sub validate_specs {
         return;
     }
 
-    while ( my ( $variable, $spec ) = each %$specs ) {
+    if ( !$req ) {
+        $self->_error( "No variable to remember amount of required params" );
+        return;
+    }
+
+    if ( ref( $req ) ne 'SCALAR' ) {
+        $self->_error( "Scalar reference is expected" );
+    }
+
+    for my $variable ( keys %$specs ) {
+        my $spec = $specs->{ $variable };
         my $p2v = "$path_to_var/$variable";
         unless ( $self->hash( $spec ) ) {
             $self->_error( "Each spec MUST be a hashref: $p2v" );
             return;
         }
-        my $type = exists $spec->{type}
+        my $type = exists( $spec->{type} )
             ? $spec->{type}
             : ( $spec->{type} = 'any' );
 
         # Known type?
-        if ( !exists $specs_of_specs{ $type } ) {
+        if ( !exists $specs_of_specs{ $type }{specs} ) {
             $self->_error( "Unknown type '$type' in specs of $p2v" );
             return;
         }
 
         # Validate spec
-        my $spec_of_spec = $specs_of_specs{ $type };
-        if ( !$self->_validate( $spec, $spec_of_spec, 'skip_specs_validation' ) ) {
+        my $spec_of_spec = $specs_of_specs{ $type }{specs};
+        if ( !$self->_validate( $spec, $spec_of_spec, \$specs_of_specs{ $type }{required} ) ) {
             $self->_error( "Bad spec for variable $p2v, should be " . Dumper( $spec_of_spec ) );
             return;
         }
 
         # Check spec of 'of'
-        if ( exists $spec->{of} && !$self->validate_specs( { of => $spec->{of} }, $p2v ) ) {
+        my $r = 0;
+        if ( exists( $spec->{of} ) && !$self->validate_specs( { of => $spec->{of} }, \$r, $p2v ) ) {
+            $self->_error( "Bad 'of' spec for variable $p2v" );
             return;
         }
+
+        # Calculate amount of rerquired params
+        $$req++
+            if exists( $spec->{required} ) && $spec->{required};
     }
 
     return 1;
@@ -297,32 +332,36 @@ sub validate_specs {
 # Actual validation of parameters
 #
 sub _validate {
-    my ( $self, $params, $specs, $skip_specs_validation ) = @_;
+    my ( $self, $params, $specs, $required, $all_errors ) = @_;
 
-    # Check mandatory params
-    return
-        unless $self->required_params( $params, $specs );
-
-    # Check unknown params
-    return
-        unless $self->unknown_params( $params, $specs );
-
-    if ( !$skip_specs_validation && !$self->validate_specs( $specs ) ) {
-        return;
-    }
-
-    while( my ( $name, $value ) = each %$params ) {
+    my $req = $$required;
+    for my $name ( keys %$params ) {
         if ( !exists $specs->{ $name } ) {
-            $self->_error( "Can't find specs for $name" );
-            return;
+            $self->_error( "Unknown param '$name'" );
+            if ( $all_errors ) {
+                next;
+            }
+            else {
+                last;
+            }
         }
-        my $spec = $specs->{ $name };
 
-        my $valid = $self->validate_value( $value, $spec );
-        return unless $valid;
+        my $value = $params->{ $name };
+        my $spec  = $specs->{ $name };
+        $req--
+            if exists( $spec->{required} ) && $spec->{required};
+
+        my $valid = $self->validate_value( "/$name", $value, $spec, $all_errors );
+        last if !$valid && !$all_errors;
     }
 
-    return 1;
+    # Not all required params found
+    # Check, what is missing
+    if ( $req ) {
+        $self->required_params( $params, $specs );
+    }
+
+    return @{ $self->{_errors} } ? 0 : 1;
 }
 
 # Checks whether all required params exist
@@ -330,48 +369,29 @@ sub _validate {
 sub required_params {
     my ( $self, $params, $specs ) = @_;
 
-    my $ret = 1;
     for my $par ( keys %$specs ) {
         my $spec = $specs->{ $par };
-        if ( exists $spec->{required} && $spec->{required} ) {
+        if ( exists( $spec->{required} ) && $spec->{required} ) {
             if ( !exists $params->{ $par } ) {
                 $self->_error( "Required param '$par' does not exist" );
-                $ret = 0;
             }
         }
     }
 
-    return $ret;
+    return;
 }
-
-# Check whether unknown params exist
-#
-sub unknown_params {
-    my ( $self, $params, $specs ) = @_;
-
-    my $ret = 1;
-    for my $par ( keys %$params ) {
-        if ( !exists $specs->{ $par } ) {
-            $self->_error("Unknown param '$par'");
-            $ret = 0;
-        }
-    }
-
-    return $ret;
-}
-
 
 # Valdates value against spec
 #
 sub validate_value {
-    my ( $self, $value, $spec ) = @_;
+    my ( $self, $name, $value, $spec, $all_errors ) = @_;
 
     my $type = $spec->{type} || 'any';
-    my $undef = exists $spec->{undef} && $spec->{undef};
+    my $undef = exists( $spec->{undef} ) && $spec->{undef};
 
     # If undef value is allowed and the value is undefined
     # do not perform any furrther validation
-    if ( $undef && !defined $value ) {
+    if ( $undef && !defined( $value ) ) {
         return 1;
     }
 
@@ -387,15 +407,18 @@ sub validate_value {
     }
 
     # Check type
-    unless ( $validate{ $type }->( $value, @other ) ) {
-        $self->_error( ( $value // '[undef]') . " is not of type '$type'" );
+    unless ( $specs_of_specs{ $type }{validate}->( $value, @other ) ) {
+        my $expl = $type eq 'enum'
+            ? ( ": " . Dumper( $spec->{values} ) )
+            : '';
+        $self->_error( "$name: " . ( $value // '[undef]') . " is not of type '$type'$expl" );
         return;
     }
 
     # Check greater than
     if ( exists $spec->{gt} ) {
         if ( $spec->{gt} >= $value ) {
-            $self->_error( ( $value // '[undef]') . " > $spec->{gt} return false" );
+            $self->_error( "$name: " . ( $value // '[undef]') . " > $spec->{gt} return false" );
             return;
         }
     }
@@ -403,7 +426,7 @@ sub validate_value {
     # Check greater or equal
     if ( exists $spec->{ge} ) {
         if ( $spec->{ge} > $value ) {
-            $self->_error( ( $value // '[undef]') . " >= $spec->{ge} returns false" );
+            $self->_error( "$name: " . ( $value // '[undef]') . " >= $spec->{ge} returns false" );
             return;
         }
     }
@@ -411,7 +434,7 @@ sub validate_value {
     # Check less than
     if ( exists $spec->{lt} ) {
         if ( $spec->{lt} <= $value ) {
-            $self->_error( ( $value // '[undef]') . " < $spec->{lt} returns false" );
+            $self->_error( "$name: " . ( $value // '[undef]') . " < $spec->{lt} returns false" );
             return;
         }
     }
@@ -419,7 +442,7 @@ sub validate_value {
     # Check less or equal
     if ( exists $spec->{le} ) {
         if ( $spec->{le} < $value ) {
-            $self->_error( ( $value // '[undef]') . " <= $spec->{le} returns false" );
+            $self->_error( "$name: " . ( $value // '[undef]') . " <= $spec->{le} returns false" );
             return;
         }
     }
@@ -427,7 +450,7 @@ sub validate_value {
     # Check min length
     if ( exists $spec->{min_length} ) {
         if ( $spec->{min_length} > length( $value // '' ) ) {
-            $self->_error( "length('" . ( $value // '[undef]') . "') > $spec->{min_length} returns false" );
+            $self->_error( "$name: length('" . ( $value // '[undef]') . "') > $spec->{min_length} returns false" );
             return;
         }
     }
@@ -435,35 +458,48 @@ sub validate_value {
     # Check max length
     if ( exists $spec->{max_length} ) {
         if ( $spec->{max_length} < length( $value // '' ) ) {
-            $self->_error( "length('" . ( $value // '[undef]') . "') < $spec->{max_length} returns false" );
+            $self->_error( "$name: length('" . ( $value // '[undef]') . "') < $spec->{max_length} returns false" );
+            return;
+        }
+    }
+
+    # Check re
+    if ( exists $spec->{re} ) {
+        if ( $value !~ $spec->{re} ) {
+            $self->_error( "$name: '$value' does not match the Regexp $spec->{re}" );
             return;
         }
     }
 
     # Check of
     if ( exists $spec->{of} ) {
-        my @values;
+        my ( @keys, @values );
         if ( $type eq 'array' ) {
             @values = @$value;
+            @keys   = @values ? ( 0..$#values ) : ();
         }
         elsif ( $type eq 'hash' ) {
             @values = values %$value;
+            @keys   = keys %$value;
         }
         else {
-            $self->_error( "Cannot set elements types for $type" );
+            $self->_error( "$name: " . "Cannot set elements types for $type" );
             return;
         }
 
         if ( !@values ) {
-            if ( !exists $spec->{empty} || !$spec->{empty} ) {
-                $self->_error( ucfirst( $type ) . " cannot be empty" );
+            if ( !exists( $spec->{empty} ) || !$spec->{empty} ) {
+                $self->_error( "$name: " . ucfirst( $type ) . " cannot be empty" );
                 return;
             }
         }
 
-        for my $v ( @values ) {
-            return
-                unless $self->validate_value( $v, $spec->{of} );
+        for ( my $i = 0; $i < @values; $i++ ) {
+            my ( $k, $v ) = ( $keys[ $i ], $values[ $i ] );
+            my $is_valid = $self->validate_value( "$name/$k", $v, $spec->{of}, $all_errors );
+            if ( !$is_valid && !$all_errors ) {
+                return;
+            }
         }
     }
 
@@ -526,11 +562,11 @@ sub string {
 }
 
 sub array {
-    return ref $_[1] eq 'ARRAY';
+    return ref( $_[1] ) eq 'ARRAY';
 }
 
 sub hash {
-    return ref $_[1] eq 'HASH';
+    return ref( $_[1] ) eq 'HASH';
 }
 
 sub enum {
@@ -538,7 +574,7 @@ sub enum {
 }
 
 sub code {
-    return ref $_[1] eq 'CODE';
+    return ref( $_[1] ) eq 'CODE';
 }
 
 1;
@@ -574,7 +610,7 @@ Validate::Simple - (Relatively) Simple way to validate input parameters
             type   => 'enum',
             values => [
                 'male',
-                'femaile',
+                'female',
                 'id_rather_not_to_say',
             ],
         },
@@ -697,8 +733,9 @@ C<required>, C<undef> and C<callback>.
 
 =head3 C<type>
 
-The value of C<type> defines an expected type of a parameter. You can
-learn more about supported types in the L</"Types"> section.
+The value of C<type> defines an expected type of a parameter. If omitted,
+type C<'any'> is used. You can learn more about supported types in the
+L</"Types"> section.
 
 =head3 C<required>
 
@@ -837,8 +874,32 @@ B<NOTE:> Any number is a valid string, so both
 C<$params1 = { string_param =E<gt> 5 };> and
 C<$params1 = { string_param =E<gt> "5" };> will pass.
 
-You can add constraints to the string length, by adding keys
-C<max_length> and C<min_length>. Either key must be a positive integer.
+You can add the following constraints to a string:
+
+=over
+
+=item max_length
+
+Positive integer number that defines the maximum string length allowed.
+
+=item min_length
+
+Positive integer number that defines the minimum string length allowed.
+
+=item re
+
+Regilar expression. The value will be checked aginst this regexp.
+
+For example:
+
+    my $specs = {
+        str_re => {
+            type => 'string',
+            re   => qr/Valid/,
+        }
+    };
+
+=back
 
 =head3 List types
 
@@ -916,17 +977,23 @@ B<does not> run the code and B<does not> check its result.
 
 =head1 METHODS
 
-=head2 new( \%spec )
+=head2 new( \%spec[, $all_errors] )
 
 Creates an object. The parameter is optional, though it's recomended to
 pass it, because in this case it checks specs syntax only once, not on
 each call of C<validate> method.
 
-=head2 validate( \%params, \%specs )
+By default the module stops validation after finding the first invalid
+value. If the second parameter C<$all_errors> is passed, the module will
+keep checking parameters and will report all found issues.
+
+=head2 validate( \%params, \%specs[, $all_errors] )
 
 Does validation of the C<\%params> against C<\%specs>. If C<\%specs> is
 not provided, it performs validation against the spec, given in the
 C<new> method.
+
+The parameter C<$all_errors> works the same way as in the C<new()> method.
 
 =head2 errors
 

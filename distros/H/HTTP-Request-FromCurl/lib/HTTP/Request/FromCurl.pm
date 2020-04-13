@@ -15,7 +15,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.14';
+our $VERSION = '0.17';
 
 =head1 NAME
 
@@ -50,12 +50,12 @@ HTTP::Request::FromCurl - create a HTTP::Request from a curl command line
 
     my $req = HTTP::Request::FromCurl->new(
         # Note - curl itself may not appear
-        argv => ['--agent', 'myscript/1.0', 'https://example.com'],
+        argv => ['--user-agent', 'myscript/1.0', 'https://example.com'],
     );
 
     my $req = HTTP::Request::FromCurl->new(
         # Note - curl itself may not appear
-        command => '--agent myscript/1.0 https://example.com',
+        command => '--user-agent myscript/1.0 https://example.com',
     );
 
 The constructor returns one or more L<HTTP::Request::CurlParameters> objects
@@ -120,7 +120,7 @@ our %default_headers = (
 Contains the L<Getopt::Long> specification of the recognized command line
 parameters.
 
-The following C<curl> options are recognized but ignored:
+The following C<curl> options are recognized but largely ignored:
 
 =over 4
 
@@ -141,7 +141,7 @@ The following C<curl> options are recognized but ignored:
 =cut
 
 our @option_spec = (
-    'agent|A=s',
+    'user-agent|A=s',
     'verbose|v',
     'silent|s',
     'buffer!',
@@ -349,8 +349,8 @@ sub _build_request( $self, $uri, $options, %build_options ) {
                 $self->_add_header( \%headers, @$kv );
         };
 
-        if( defined $options->{ agent }) {
-            $self->_add_header( \%headers, "User-Agent", $options->{ 'agent' } );
+        if( defined $options->{ 'user-agent' }) {
+            $self->_add_header( \%headers, "User-Agent", $options->{ 'user-agent' } );
         };
 
         if( defined $options->{ referrer }) {
@@ -500,7 +500,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

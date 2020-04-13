@@ -27,6 +27,8 @@ BOOT {
         {"deflate_negotiation_failed", xs::out(make_error_code(errc::deflate_negotiation_failed))},
         {"control_frame_compression",  xs::out(make_error_code(errc::control_frame_compression))},
         {"inflate_error",              xs::out(make_error_code(errc::inflate_error))},
+        {"unexpected_rsv",             xs::out(make_error_code(errc::unexpected_rsv))},
+        {"invalid_utf8",               xs::out(make_error_code(errc::invalid_utf8))},
     });
     xs::exp::autoexport(ecstash);
 

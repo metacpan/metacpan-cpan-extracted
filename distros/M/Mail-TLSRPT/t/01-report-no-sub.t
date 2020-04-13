@@ -19,7 +19,7 @@ my $start_time = $end_time - 86399;
 my $args = {
   organization_name => 'my test org',
   start_datetime => DateTime->from_epoch( epoch=>$start_time ),
-  end_datetime => DateTime->from_epoch( epoch=>$end_time ),
+  end_datetime => $end_time,
   contact_info => 'test@example.com',
   report_id => 'test report 1',
 };

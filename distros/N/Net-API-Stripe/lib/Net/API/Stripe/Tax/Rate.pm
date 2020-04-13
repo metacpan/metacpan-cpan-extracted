@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Tax/Rate.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -52,13 +52,27 @@ Net::API::Stripe::Tax::Rate - A Stripe Tax Rate Object
 
 =head1 SYNOPSIS
 
+    my $rate = $stripe->tax_rate({
+        active => $stripe->true,
+        created => '2020-04-12T17:12:10',
+        description => 'Japan VAT applicable to customers',
+        display_name => 'Japan VAT',
+        inclusive => $stripe->false,
+        jurisdiction => 'jp',
+        livemode => $stripe->false,
+        metadata => { tax_id => 123, customer_id => 456 },
+        percentage => 10,
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-This is used in C<Net::API::Stripe::Billing::Invoice> to describe a list of tax rates, and also in C<Net::API::Stripe::Billing::Subscription::Schedule> in B<phases>->I<default_tax_rates>.
+This is used in L<Net::API::Stripe::Billing::Invoice> to describe a list of tax rates, and also in L<Net::API::Stripe::Billing::Subscription::Schedule> in B<phases>->I<default_tax_rates>.
 
 =head1 CONSTRUCTOR
 
@@ -66,18 +80,8 @@ This is used in C<Net::API::Stripe::Billing::Invoice> to describe a list of tax 
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Tax::Rate> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -134,32 +138,17 @@ This represents the tax rate percent out of 100.
 =head1 API SAMPLE
 
 	{
-	  "object": "balance",
-	  "available": [
-		{
-		  "amount": 0,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 0
-		  }
-		}
-	  ],
-	  "connect_reserved": [
-		{
-		  "amount": 0,
-		  "currency": "jpy"
-		}
-	  ],
+	  "id": "txr_1GWkAHCeyNCl6fY2QtB0BbzC",
+	  "object": "tax_rate",
+	  "active": true,
+	  "created": 1586614713,
+	  "description": "VAT Germany",
+	  "display_name": "VAT",
+	  "inclusive": false,
+	  "jurisdiction": "DE",
 	  "livemode": false,
-	  "pending": [
-		{
-		  "amount": 7712,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 7712
-		  }
-		}
-	  ]
+	  "metadata": {},
+	  "percentage": 19.0
 	}
 
 =head1 HISTORY
@@ -176,11 +165,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Stripe API documentation:
 
-L<https://stripe.com/docs/api>
+L<https://stripe.com/docs/api/tax_rates>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

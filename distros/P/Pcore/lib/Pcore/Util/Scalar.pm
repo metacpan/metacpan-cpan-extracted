@@ -9,7 +9,7 @@ our $EXPORT = {
     ALL    => [qw[looks_like_uuid]],
     SCALAR => [qw[blessed refaddr reftype weaken isweak looks_like_number tainted refcount is_glob]],
     REF    => [qw[is_ref is_scalarref is_arrayref is_hashref is_coderef is_regexpref is_globref is_formatref is_ioref is_refref is_plain_ref is_plain_scalarref is_plain_arrayref is_plain_hashref is_plain_coderef is_plain_globref is_plain_formatref is_plain_refref is_blessed_ref is_blessed_scalarref is_blessed_arrayref is_blessed_hashref is_blessed_coderef is_blessed_globref is_blessed_formatref is_blessed_refref ]],
-    TYPE   => [qw[is_path is_uri is_res]],
+    TYPE   => [qw[is_bool is_path is_uri is_res]],
 };
 
 sub looks_like_uuid : prototype($) ($str) {
@@ -36,6 +36,10 @@ sub on_destroy ( $scalar, $cb ) {
     return;
 }
 
+sub is_bool : prototype($) {
+    return ( is_ref $_[0] && UNIVERSAL::isa( $_[0], JSON::PP::Boolean:: ) ) || ( exists $INC{'Types/Serialiser.pm'} && Types::Serialiser::is_bool( $_[0] ) );
+}
+
 sub is_path : prototype($) { return is_blessed_hashref $_[0] && $_[0]->isa('Pcore::Util::Path') }
 
 sub is_uri : prototype($) { return is_blessed_hashref $_[0] && $_[0]->can('IS_PCORE_URI') }
@@ -50,6 +54,8 @@ sub is_res : prototype($) { return is_blessed_hashref $_[0] && $_[0]->can('IS_PC
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 16                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 40                   | BuiltinFunctions::ProhibitUniversalIsa - UNIVERSAL::isa should not be used as a function                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

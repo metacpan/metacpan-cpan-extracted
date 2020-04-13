@@ -4,7 +4,7 @@ use warnings;
 
 package Mxpress::PDF {
 	BEGIN {
-		our $VERSION = '0.18';
+		our $VERSION = '0.21';
 		our $AUTHORITY = 'cpan:LNATION';
 	};
 	use Zydeco;
@@ -12,7 +12,7 @@ package Mxpress::PDF {
 	use constant mm => 25.4 / 72;
 	use constant pt => 1;
 	class File (HashRef $args) {
-		my @plugins = (qw/font line box circle pie ellipse text title subtitle subsubtitle toc image form input textarea select annotation cover/, ($args->{plugins} ? @{$args->{plugins}} : ()));
+		my @plugins = (qw/font line box circle pie ellipse text title subtitle subsubtitle h1 h2 h3 h4 h5 h6 toc image form input textarea select annotation cover/, ($args->{plugins} ? @{$args->{plugins}} : ()));
 		for my $p (@plugins) {
 			my $meth = sprintf('_store_%s', $p);
 			has {$meth} (type => Object);
@@ -607,6 +607,23 @@ package Mxpress::PDF {
 							push @line, shift(@paragraph);
 						}
 
+						if (!@line && @paragraph) {
+							my $temp = shift(@paragraph);
+							my @letters = split //, $temp;
+							my ($wid, $lin) = 0;
+							while ($wid < $lw) {
+								my $letter = shift @letters;
+								$wid += $text->advancewidth($letter);
+								$lin .= $letter;
+							}
+							$width{$lin} = $wid;
+							my $rest = join '', @letters;
+							$width{$rest} = $text->advancewidth($rest);
+							$line_width += $wid;
+							push @line, $lin;
+							unshift(@paragraph, $rest);
+						}
+
 						my ($wordspace, $align);
 						if ($self->align eq 'fulljustify' or $self->align eq 'justify' and @paragraph) {
 							if (scalar(@line) == 1) {
@@ -623,6 +640,7 @@ package Mxpress::PDF {
 							foreach my $word (@line) {
 								$text->translate($xpos, $ypos);
 								$text->text($word);
+								$width{$word} ||= 1;
 								$xpos += ($width{$word} + $wordspace) if (@line);
 							}
 						} else {
@@ -716,6 +734,48 @@ package Mxpress::PDF {
 					$class->generic_new($file, %args);
 				}
 			}
+			class +H1 {
+				factory h1 (Object $file, Map %args) {
+					$args{font}->{size} ||= 50/pt;
+					$args{font}->{line_height} ||= 40/pt;
+					$class->generic_new($file, %args);
+				}
+			}
+			class +H2 {
+				factory h2 (Object $file, Map %args) {
+					$args{font}->{size} ||= 40/pt;
+					$args{font}->{line_height} ||= 30/pt;
+					$class->generic_new($file, %args);
+				}
+			}
+			class +H3 {
+				factory h3 (Object $file, Map %args) {
+					$args{font}->{size} ||= 30/pt;
+					$args{font}->{line_height} ||= 20/pt;
+					$class->generic_new($file, %args);
+				}
+			}
+			class +H4 {
+				factory h4 (Object $file, Map %args) {
+					$args{font}->{size} ||= 25/pt;
+					$args{font}->{line_height} ||= 15/pt;
+					$class->generic_new($file, %args);
+				}
+			}
+			class +H5 {
+				factory h5 (Object $file, Map %args) {
+					$args{font}->{size} ||= 20/pt;
+					$args{font}->{line_height} ||= 15/pt;
+					$class->generic_new($file, %args);
+				}
+			}
+			class +H6 {
+				factory h6 (Object $file, Map %args) {
+					$args{font}->{size} ||= 15/pt;
+					$args{font}->{line_height} ||= 10/pt;
+					$class->generic_new($file, %args);
+				}
+			}
 		}
 		class +TOC::Outline extends Plugin::Text {
 			has outline (type => Object);
@@ -789,7 +849,7 @@ package Mxpress::PDF {
 					count => 0,
 					toc_line_offset => $args{toc_line_offset} || 0,
 					padding => $args{padding} || 0,
-					levels => [qw/title subtitle subsubtitle/],
+					levels => $args{levels} || [qw/title subtitle subsubtitle/],
 					indent => $args{indent} || 5,
 					($args{font} ? (font => $args{font}) : ())
 				);
@@ -1156,7 +1216,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.18
+Version 0.21
 
 =cut
 
@@ -1351,6 +1411,42 @@ Returns a new Mxpress::PDF::Plugin::Text::Subsubtitle Object. This object aids w
 
 	my $subsubtitle = Mxpress::PDF->subsubtitle($file, %subsubtitle_args);
 
+=head2 h1
+
+Returns a new Mxpress::PDF::Plugin::Text::H1 Object. This object aids with writing 'heading' text to a pdf page.
+
+	my $h1 = Mxpress::PDF->h1($file, %h1_args);
+
+=head2 h2
+
+Returns a new Mxpress::PDF::Plugin::Text::H2 Object. This object aids with writing 'heading' text to a pdf page.
+
+	my $h1 = Mxpress::PDF->h2($file, %h2_args);
+
+=head2 h3
+
+Returns a new Mxpress::PDF::Plugin::Text::H3 Object. This object aids with writing 'heading' text to a pdf page.
+
+	my $h1 = Mxpress::PDF->h3($file, %h3_args);
+
+=head2 h4
+
+Returns a new Mxpress::PDF::Plugin::Text::H4 Object. This object aids with writing 'heading' text to a pdf page.
+
+	my $h1 = Mxpress::PDF->h2($file, %h4_args);
+
+=head2 h5
+
+Returns a new Mxpress::PDF::Plugin::Text::H5 Object. This object aids with writing 'heading' text to a pdf page.
+
+	my $h1 = Mxpress::PDF->h2($file, %h5_args);
+
+=head2 h6
+
+Returns a new Mxpress::PDF::Plugin::Text::H6 Object. This object aids with writing 'heading' text to a pdf page.
+
+	my $h1 = Mxpress::PDF->h2($file, %h6_args);
+
 =head2 toc
 
 Returns a new Mxpress::PDF::Plugin::TOC Object. This object is for managing a table of contents.
@@ -1518,6 +1614,42 @@ A Mxpress::PDF::Plugin::Subtitle Object.
 A Mxpress::PDF::Plugin::Subsubtitle Object
 
 	$file->subsubtitle->add;
+
+=head3 h1
+
+A Mxpress::PDF::Plugin::H1 Object.
+
+	$file->h1->add;
+
+=head3 h2
+
+A Mxpress::PDF::Plugin::H2 Object.
+
+	$file->h2->add;
+
+=head3 h3
+
+A Mxpress::PDF::Plugin::H3 Object.
+
+	$file->h3->add;
+
+=head3 h4
+
+A Mxpress::PDF::Plugin::H4 Object.
+
+	$file->h4->add;
+
+=head3 h5
+
+A Mxpress::PDF::Plugin::H5 Object.
+
+	$file->h5->add;
+
+=head3 h6
+
+A Mxpress::PDF::Plugin::H6 Object.
+
+	$file->h6->add;
 
 =head3 text
 
@@ -2437,6 +2569,102 @@ or when calling the objects add method.
 
 	$file->subsubtitle->add(
 		%subsubtitle_attrs
+	);
+
+=head1 H1
+
+Mxpress::PDF::Plugin::H1 extends Mxpress::PDF::Plugin::Text and is for aiding with adding headings to a Mxpress::PDF::Page.
+
+You can pass default attributes when instantiating the file object.
+
+	Mxpress::PDF->add_file($filename,
+		h1 => { %heading_attrs },
+	);
+
+or when calling the objects add method.
+
+	$file->h1->add(
+		%heading_attrs
+	);
+
+=head1 H2
+
+Mxpress::PDF::Plugin::H2 extends Mxpress::PDF::Plugin::Text and is for aiding with adding headings to a Mxpress::PDF::Page.
+
+You can pass default attributes when instantiating the file object.
+
+	Mxpress::PDF->add_file($filename,
+		h2 => { %heading_attrs },
+	);
+
+or when calling the objects add method.
+
+	$file->h2->add(
+		%heading_attrs
+	);
+
+=head1 H3
+
+Mxpress::PDF::Plugin::H3 extends Mxpress::PDF::Plugin::Text and is for aiding with adding headings to a Mxpress::PDF::Page.
+
+You can pass default attributes when instantiating the file object.
+
+	Mxpress::PDF->add_file($filename,
+		h3 => { %heading_attrs },
+	);
+
+or when calling the objects add method.
+
+	$file->h3->add(
+		%heading_attrs
+	);
+
+=head1 H4
+
+Mxpress::PDF::Plugin::H4 extends Mxpress::PDF::Plugin::Text and is for aiding with adding headings to a Mxpress::PDF::Page.
+
+You can pass default attributes when instantiating the file object.
+
+	Mxpress::PDF->add_file($filename,
+		h4 => { %heading_attrs },
+	);
+
+or when calling the objects add method.
+
+	$file->h4->add(
+		%heading_attrs
+	);
+
+=head1 H5
+
+Mxpress::PDF::Plugin::H5 extends Mxpress::PDF::Plugin::Text and is for aiding with adding headings to a Mxpress::PDF::Page.
+
+You can pass default attributes when instantiating the file object.
+
+	Mxpress::PDF->add_file($filename,
+		h5 => { %heading_attrs },
+	);
+
+or when calling the objects add method.
+
+	$file->h5->add(
+		%heading_attrs
+	);
+
+=head1 H6
+
+Mxpress::PDF::Plugin::H6 extends Mxpress::PDF::Plugin::Text and is for aiding with adding headings to a Mxpress::PDF::Page.
+
+You can pass default attributes when instantiating the file object.
+
+	Mxpress::PDF->add_file($filename,
+		h6 => { %heading_attrs },
+	);
+
+or when calling the objects add method.
+
+	$file->h6->add(
+		%heading_attrs
 	);
 
 =head1 TOC

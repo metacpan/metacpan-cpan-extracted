@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Checkout/Session.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -74,15 +74,30 @@ Net::API::Stripe::Checkout::Session - A Stripe Checkout Session Object
 
 =head1 SYNOPSIS
 
+    my $session = $stripe->session({
+        # This easy to implement with Net::API::REST
+        cancel_url => 'https://api.example.com/v1/stripe/cancel',
+        success_url => 'https://api.example.com/v1/stripe/success',
+        client_reference_id => '1F7F749C-D9C9-46EB-B692-986628BD7302',
+        customer => $customer_object,
+        customer_email => 'john.doe@example.com',
+        # Japanese please
+        locale => 'ja',
+        mode => 'subscription',
+        payment_intent => $payment_intent_object,
+        submit_type => 'pay',
+        subscription => $subscription_object,
+    });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-A Checkout Session represents your customer's session as they pay for one-time purchases or subscriptions through Checkout (L<https://stripe.com/docs/payments/checkout>). We recommend creating a new Session each time your customer attempts to pay.
+A Checkout Session represents your customer's session as they pay for one-time purchases or subscriptions through Checkout (L<https://stripe.com/docs/payments/checkout>). Stripe recommends creating a new Session each time your customer attempts to pay.
 
-Once payment is successful, the Checkout Session will contain a reference to the Customer (C<Net::API::Stripe::Customer> / L<https://stripe.com/docs/api/customers>), and either the successful PaymentIntent (C<Net::API::Stripe::Payment::Intent> / L<https://stripe.com/docs/api/payment_intents>) or an active Subscription (C<Net::API::Stripe::Billing::Subscription> / L<https://stripe.com/docs/api/subscriptions>).
+Once payment is successful, the Checkout Session will contain a reference to the Customer (L<Net::API::Stripe::Customer> / L<https://stripe.com/docs/api/customers>), and either the successful PaymentIntent (L<Net::API::Stripe::Payment::Intent> / L<https://stripe.com/docs/api/payment_intents>) or an active Subscription (L<Net::API::Stripe::Billing::Subscription> / L<https://stripe.com/docs/api/subscriptions>).
 
 You can create a Checkout Session on your server and pass its ID to the client to begin Checkout.
 
@@ -92,18 +107,7 @@ You can create a Checkout Session on your server and pass its ID to the client t
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Checkout::Session> object.
 
 =back
 
@@ -210,7 +214,7 @@ The URL the customer will be directed to after the payment or subscription creat
 =head1 API SAMPLE
 
 	{
-	  "id": "cs_test_Q7mFqgEUBzNvwLV22Nk8QebgmElPDxm5gBKGdWZtKaX89keFHkUTNViB",
+	  "id": "cs_test_ksjfkjfkljslfkjlfkflsfklskflskflskfs",
 	  "object": "checkout.session",
 	  "billing_address_collection": null,
 	  "cancel_url": "https://example.com/cancel",
@@ -233,7 +237,7 @@ The URL the customer will be directed to after the payment or subscription creat
 	  "livemode": false,
 	  "locale": null,
 	  "mode": null,
-	  "payment_intent": "pi_1EUnBEF5IfL0eXz99dkRR60n",
+	  "payment_intent": "pi_fake123456789",
 	  "payment_method_types": [
 		"card"
 	  ],
@@ -261,7 +265,7 @@ L<https://stripe.com/docs/api/checkout/sessions>, L<https://stripe.com/docs/paym
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

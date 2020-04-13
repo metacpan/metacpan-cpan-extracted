@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Intent/TransferData.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -34,6 +34,11 @@ Net::API::Stripe::Payment::Intent::TransferData - A Stripe TransferData Object
 
 =head1 SYNOPSIS
 
+    my $tf_data = $stripe->payment_intent->transfer_data({
+        amount => 2000,
+        destination => $connect_account_object,
+    });
+
 =head1 VERSION
 
     0.1
@@ -42,24 +47,16 @@ Net::API::Stripe::Payment::Intent::TransferData - A Stripe TransferData Object
 
 The data with which to automatically create a Transfer when the payment is finalized. See the PaymentIntents use case for connected accounts for details.
 
+This is instantiated by method B<transfer_data> in module L<Net::API::Stripe::Payment::Intent>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Payment::Intent::TransferData> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -75,14 +72,14 @@ A positive integer representing how much to charge in the smallest currency unit
 
 The account (if any) the payment will be attributed to for tax reporting, and where funds from the payment will be transferred to upon payment success.
 
-When expanded, this is a C<Net::API::Stripe::Connect::Account> object.
+When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "pi_1EUnBEF5IfL0eXz99dkRR60n",
+	  "id": "pi_fake123456789",
 	  "object": "payment_intent",
 	  "amount": 1099,
 	  "amount_capturable": 0,
@@ -96,9 +93,9 @@ When expanded, this is a C<Net::API::Stripe::Connect::Account> object.
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/charges?payment_intent=pi_1EUnBEF5IfL0eXz99dkRR60n"
+		"url": "/v1/charges?payment_intent=pi_fake123456789"
 	  },
-	  "client_secret": "pi_1EUnBEF5IfL0eXz99dkRR60n_secret_sqsp5vQECBqN0qTVoQwpBT0Iy",
+	  "client_secret": "pi_fake123456789_secret_kfhksfhlajfl",
 	  "confirmation_method": "automatic",
 	  "created": 1556596976,
 	  "currency": "jpy",
@@ -144,7 +141,7 @@ L<https://stripe.com/docs/api/payment_intents/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

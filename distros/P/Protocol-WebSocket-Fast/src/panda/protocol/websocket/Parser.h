@@ -4,6 +4,7 @@
 #include "Message.h"
 #include "iterator.h"
 #include "DeflateExt.h"
+#include "Utf8Checker.h"
 #include <deque>
 #include <bitset>
 #include <iterator>
@@ -33,8 +34,15 @@ struct Parser : virtual panda::Refcnt {
         size_t max_frame_size       = 0;
         size_t max_message_size     = 0;
         size_t max_handshake_size   = http::SIZE_UNLIMITED;
+        bool   check_utf8           = false;
         DeflateConfigOption deflate = DeflateExt::Config();
     };
+
+    void configure (const Config& cfg);
+
+    size_t max_frame_size     () const { return _max_frame_size; }
+    size_t max_message_size   () const { return _max_message_size; }
+    size_t max_handshake_size () const { return _max_handshake_size; }
 
     bool established () const { return _flags[ESTABLISHED]; }
     bool recv_closed () const { return _flags[RECV_CLOSED]; }
@@ -129,20 +137,7 @@ struct Parser : virtual panda::Refcnt {
         return send_control(Opcode::CLOSE, frpld);
     }
 
-    void configure (const Config& cfg) {
-        _max_frame_size     = cfg.max_frame_size;
-        _max_message_size   = cfg.max_message_size;
-        _max_handshake_size = cfg.max_handshake_size;
-
-        if (!_flags[ESTABLISHED]) {
-            _deflate_cfg = cfg.deflate;
-            if (_deflate_cfg) _deflate_cfg->max_message_size = _max_message_size;
-        }
-    }
-
-    size_t max_frame_size()     const { return  _max_frame_size; }
-    size_t max_message_size()   const { return  _max_message_size; }
-    size_t max_handshake_size() const { return  _max_handshake_size; }
+    uint16_t suggested_close_code () const { return _suggested_close_code; }
 
     virtual void reset ();
 
@@ -168,37 +163,42 @@ protected:
     static const int RECV_FRAME   = 2; // frame mode receive
     static const int RECV_MESSAGE = 3; // message mode receive
     static const int RECV_INFLATE = 4; // receiving compressed message
-    static const int RECV_CLOSED  = 5; // no more messages from peer (close packet received)
-    static const int SEND_FRAME   = 6; // outgoing message started
-    static const int SEND_DEFLATE = 7; // sending compressed message
-    static const int SEND_CLOSED  = 8; // no more messages from user (close packet sent)
+    static const int RECV_TEXT    = 5; // receiving text message
+    static const int RECV_CLOSED  = 6; // no more messages from peer (close packet received)
+    static const int SEND_FRAME   = 7; // outgoing message started
+    static const int SEND_DEFLATE = 8; // sending compressed message
+    static const int SEND_CLOSED  = 9; // no more messages from user (close packet sent)
     static const int LAST_FLAG    = SEND_CLOSED;
 
     size_t              _max_frame_size;
     size_t              _max_message_size;
     size_t              _max_handshake_size;
     DeflateConfigOption _deflate_cfg;
+    bool                _check_utf8;
     std::bitset<32>     _flags = 0;
     string              _buffer;
     DeflateExtPtr       _deflate_ext;
 
-    Parser (bool recv_mask_required, Config cfg = Config()) :
-        _max_frame_size(cfg.max_frame_size), _max_message_size(cfg.max_message_size), _max_handshake_size(cfg.max_handshake_size),
-        _deflate_cfg(cfg.deflate), _recv_mask_required(recv_mask_required), _message_frame(_recv_mask_required, _max_frame_size) {}
+    Parser (bool recv_mask_required, Config cfg = Config()) : _recv_mask_required(recv_mask_required), _message_frame(recv_mask_required, cfg.max_frame_size) {
+        configure(cfg);
+    }
 
 private:
-    bool      _recv_mask_required;
-    FrameSP   _frame;                // current frame being received (frame mode)
-    int       _frame_count = 0;      // frame count for current message being received (frame mode)
-    MessageSP _message;              // current message being received (message mode)
-    Frame     _message_frame;        // current frame being received (message mode)
-    int       _sent_frame_count = 0; // frame count for current message being sent (frame mode)
-    Opcode    _send_opcode;          // opcode for first frame to be sent (frame mode)
+    bool        _recv_mask_required;
+    FrameSP     _frame;                    // current frame being received (frame mode)
+    int         _frame_count = 0;          // frame count for current message being received
+    MessageSP   _message;                  // current message being received (message mode)
+    Frame       _message_frame;            // current frame being received (message mode)
+    int         _sent_frame_count = 0;     // frame count for current message being sent (frame mode)
+    Opcode      _send_opcode;              // opcode for first frame to be sent (frame mode)
+    uint16_t    _suggested_close_code = 0; // suggested close code to send to peer after error or receiving close frame from peer
+    Utf8Checker _utf8_checker;
 
     std::deque<string> _simple_payload_tmp;
 
-    FrameSP   _get_frame ();
-    MessageSP _get_message();
+    FrameSP   _get_frame   ();
+    MessageSP _get_message ();
+    bool      _parse_frame (Frame&);
 
     void _check_send () const {
         if (!_flags[ESTABLISHED]) throw Error("not established");

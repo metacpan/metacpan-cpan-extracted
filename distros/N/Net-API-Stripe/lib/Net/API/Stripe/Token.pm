@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Token.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -50,6 +50,16 @@ Net::API::Stripe::Token - A Stripe Token Object
 
 =head1 SYNOPSIS
 
+    my $token = $stripe->token({
+        card => $card_object,
+        client_ip => '1.2.3.4',
+        livemode => $stripe->false,
+        type => 'card',
+        used => $stripe->false,
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -60,7 +70,7 @@ Tokenisation is the process Stripe uses to collect sensitive card or bank accoun
 
 If you cannot use client-side tokenization, you can also create tokens using the API with either your publishable or secret API key. Keep in mind that if your integration uses this method, you are responsible for any PCI compliance that may be required, and you must keep your secret API key safe. Unlike with client-side tokenization, your customer's information is not sent directly to Stripe, so Stripe cannot determine how it is handled or stored.
 
-Tokens cannot be stored or used more than once. To store card or bank account information for later use, you can create Customer objects (C<Net::API::Stripe::Customer> / L<https://stripe.com/docs/api#customers>) or Custom accounts (C<Net::API::Stripe::Connect::ExternalAccount::Bank> and C<Net::API::Stripe::Connect::ExternalAccount::Card> / L<https://stripe.com/docs/api#external_accounts>). Note that Radar (L<https://stripe.com/docs/radar>), Stripe's integrated solution for automatic fraud protection, supports only integrations that use client-side tokenization.
+Tokens cannot be stored or used more than once. To store card or bank account information for later use, you can create Customer objects (L<Net::API::Stripe::Customer> / L<https://stripe.com/docs/api#customers>) or Custom accounts (L<Net::API::Stripe::Connect::ExternalAccount::Bank> and L<Net::API::Stripe::Connect::ExternalAccount::Card> / L<https://stripe.com/docs/api#external_accounts>). Note that Radar (L<https://stripe.com/docs/radar>), Stripe's integrated solution for automatic fraud protection, supports only integrations that use client-side tokenization.
 
 =head1 CONSTRUCTOR
 
@@ -68,18 +78,8 @@ Tokens cannot be stored or used more than once. To store card or bank account in
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Token> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -99,13 +99,13 @@ String representing the object’s type. Objects of the same type share the same
 
 Hash describing the bank account.
 
-This is a C<Net::API::Stripe::Payment::BankAccount> object.
+This is a L<Net::API::Stripe::Payment::BankAccount> object.
 
 =item B<card> hash
 
 Hash describing the card used to make the charge.
 
-This is a C<Net::API::Stripe::Payment::Card> object.
+This is a L<Net::API::Stripe::Payment::Card> object.
 
 =item B<client_ip> string
 
@@ -132,10 +132,10 @@ Whether this token has already been used (tokens can be used only once).
 =head1 API SAMPLE
 
 	{
-	  "id": "tok_1FUXrFCeyNCl6fY21WAHXQEd",
+	  "id": "tok_fake123456789",
 	  "object": "token",
 	  "card": {
-		"id": "card_1FUXrFCeyNCl6fY29r2cl9gk",
+		"id": "card_fake123456789",
 		"object": "card",
 		"address_city": null,
 		"address_country": null,
@@ -183,7 +183,7 @@ L<https://stripe.com/docs/api/tokens>, L<https://stripe.com/docs/payments/cards/
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -1,5 +1,16 @@
 Revision history for Object-Pad
 
+0.20    2020-04-10
+        [CHANGES]
+         * Update suggested style for methods with signatures to put
+           whitespace before open paren
+         * Use core's `feature "indirect"` in preference to indirect.pm where
+           available (perl 5.31.9 onwards)
+
+        [BUGFIXES]
+         * Fix for segfault when compiling inner anon methods inside other
+           methods (RT132321)
+
 0.19    2020-04-04
         [CHANGES]
          * More sanity checking of HASH-based foreign superclass constructor

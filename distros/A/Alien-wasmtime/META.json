@@ -25,6 +25,7 @@
          "requires" : {
             "Alien::Build" : "1.19",
             "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Build::Copy" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "Path::Tiny" : "0",
             "perl" : "5.008001"
@@ -79,7 +80,7 @@
          "web" : "https://github.com/perlwasm/Alien-wasmtime"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.30",
       "requires" : {

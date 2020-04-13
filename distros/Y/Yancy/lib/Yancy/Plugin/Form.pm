@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form;
-our $VERSION = '1.050';
+our $VERSION = '1.051';
 # ABSTRACT: Generate form HTML using various UI libraries
 
 #pod =head1 SYNOPSIS
@@ -64,6 +64,15 @@ our $VERSION = '1.050';
 #pod The type of the input field to create. One of the JSON schema types.
 #pod See L<Yancy::Help::Config/Data Collections> for details on the supported
 #pod types.
+#pod
+#pod =item name
+#pod
+#pod The name of the input. Required.
+#pod
+#pod =item value
+#pod
+#pod The value to show in the input. If not defined, will take the value from
+#pod the current request parameters.
 #pod
 #pod =item format
 #pod
@@ -132,6 +141,26 @@ our $VERSION = '1.050';
 #pod Create a form input for the given schema's property. This creates just
 #pod the input field, nothing else. To add a label, see C<field_for>.
 #pod
+#pod C<%args> is a list of name/value pairs with the following keys:
+#pod
+#pod =over
+#pod
+#pod =item type
+#pod
+#pod =item value
+#pod
+#pod =item required
+#pod
+#pod =item format
+#pod
+#pod =item enum
+#pod
+#pod =item enum_labels
+#pod
+#pod =item class
+#pod
+#pod =back
+#pod
 #pod =head2 yancy->form->filter_for
 #pod
 #pod     my $html = $c->yancy->form->filter_for( $schema, $property, %args );
@@ -142,6 +171,19 @@ our $VERSION = '1.050';
 #pod some kind of "blank" value. The filter automatically captures a value
 #pod from the query parameter of the same name as the C<$property>. This
 #pod creates just the input field, nothing else.
+#pod
+#pod Takes the same C<%args> as L</input_for>, with the following changes:
+#pod
+#pod =over
+#pod
+#pod =item * required is always false
+#pod
+#pod =item * format is always removed, to allow for partial searches
+#pod
+#pod =item * 'boolean' type fields become enum fields with 'yes', 'no', and
+#pod empty (either) options
+#pod
+#pod =back
 #pod
 #pod =head2 yancy->form->field_for
 #pod
@@ -165,16 +207,22 @@ our $VERSION = '1.050';
 #pod The field's description. Optional. Defaults to the C<description> defined
 #pod for this property in the schema (see L<Yancy::Help::Config>).
 #pod
+#pod =item class
+#pod
+#pod A class to apply to the input element. See L</input>.
+#pod
 #pod =back
 #pod
 #pod =head2 yancy->form->form_for
 #pod
-#pod     my $html = $c->yancy->form->form_for( $schema, %opt );
-#pod     %= $c->yancy->form->plugin( $schema, %opt );
+#pod     my $html = $c->yancy->form->form_for( $schema, %args );
+#pod     %= $c->yancy->form->plugin( $schema, %args );
 #pod
 #pod Generate a form to edit an item from the given C<$schema>. The form
 #pod will include all the fields, a CSRF token, and a single button to submit
 #pod the form.
+#pod
+#pod C<%args> is a list of name/value pairs with the following keys:
 #pod
 #pod =over
 #pod
@@ -190,6 +238,12 @@ our $VERSION = '1.050';
 #pod
 #pod A hashref of values to fill in the form. Defaults to the value of the
 #pod C<item> in the stash (which is set by L<Yancy::Controller::Yancy/set>.)
+#pod
+#pod =item properties
+#pod
+#pod Arrayref of fields to show in this form. Defaults to the C<properties>
+#pod stash value (like the L<set action in Yancy::Controller::Yancy|Yancy::Controller::Yancy/set> uses).
+#pod Otherwise, defaults to showing all fields except read-only fields.
 #pod
 #pod =back
 #pod
@@ -222,7 +276,7 @@ Yancy::Plugin::Form - Generate form HTML using various UI libraries
 
 =head1 VERSION
 
-version 1.050
+version 1.051
 
 =head1 SYNOPSIS
 
@@ -286,6 +340,15 @@ C<%args> is a list of name/value pairs with the following keys:
 The type of the input field to create. One of the JSON schema types.
 See L<Yancy::Help::Config/Data Collections> for details on the supported
 types.
+
+=item name
+
+The name of the input. Required.
+
+=item value
+
+The value to show in the input. If not defined, will take the value from
+the current request parameters.
 
 =item format
 
@@ -354,6 +417,26 @@ how Yancy translates JSON schema into forms.
 Create a form input for the given schema's property. This creates just
 the input field, nothing else. To add a label, see C<field_for>.
 
+C<%args> is a list of name/value pairs with the following keys:
+
+=over
+
+=item type
+
+=item value
+
+=item required
+
+=item format
+
+=item enum
+
+=item enum_labels
+
+=item class
+
+=back
+
 =head2 yancy->form->filter_for
 
     my $html = $c->yancy->form->filter_for( $schema, $property, %args );
@@ -364,6 +447,19 @@ property. A filter input is never a required field, and always allows
 some kind of "blank" value. The filter automatically captures a value
 from the query parameter of the same name as the C<$property>. This
 creates just the input field, nothing else.
+
+Takes the same C<%args> as L</input_for>, with the following changes:
+
+=over
+
+=item * required is always false
+
+=item * format is always removed, to allow for partial searches
+
+=item * 'boolean' type fields become enum fields with 'yes', 'no', and
+empty (either) options
+
+=back
 
 =head2 yancy->form->field_for
 
@@ -387,16 +483,22 @@ in the schema (see L<Yancy::Help::Config>), or the field's name.
 The field's description. Optional. Defaults to the C<description> defined
 for this property in the schema (see L<Yancy::Help::Config>).
 
+=item class
+
+A class to apply to the input element. See L</input>.
+
 =back
 
 =head2 yancy->form->form_for
 
-    my $html = $c->yancy->form->form_for( $schema, %opt );
-    %= $c->yancy->form->plugin( $schema, %opt );
+    my $html = $c->yancy->form->form_for( $schema, %args );
+    %= $c->yancy->form->plugin( $schema, %args );
 
 Generate a form to edit an item from the given C<$schema>. The form
 will include all the fields, a CSRF token, and a single button to submit
 the form.
+
+C<%args> is a list of name/value pairs with the following keys:
 
 =over
 
@@ -412,6 +514,12 @@ The C<action> URL for the C<< <form> >> tag.
 
 A hashref of values to fill in the form. Defaults to the value of the
 C<item> in the stash (which is set by L<Yancy::Controller::Yancy/set>.)
+
+=item properties
+
+Arrayref of fields to show in this form. Defaults to the C<properties>
+stash value (like the L<set action in Yancy::Controller::Yancy|Yancy::Controller::Yancy/set> uses).
+Otherwise, defaults to showing all fields except read-only fields.
 
 =back
 

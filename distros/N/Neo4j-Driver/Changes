@@ -1,10 +1,15 @@
 Revision history for Neo4j::Driver
 
-0.15  2020-02-20
+0.16  2020-04-12
 
 REMINDER: Neo4j::Driver 0.13 deprecated the old syntax to access nodes,
 relationships and paths. You need to use the new accessor methods introduced
 in 0.13, or else your code will fail with a future version of this software.
+
+ - add experimental option to select a database specified by name (Neo4j 4)
+ - fix handling of outdated JSON module versions
+
+0.15  2020-02-20
 
  - support for secure communication using TLS encryption
  - add stable support for the Bolt protocol

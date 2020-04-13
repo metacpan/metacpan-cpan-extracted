@@ -92,11 +92,10 @@ share {
     \&pause,
     $make_cmd,
     $make_inst_cmd,
-    #@make_clean
+    #@make_clean,
   ];
 
 };
-
 
 sub pause {
     return;  #  re-enable in case of debug

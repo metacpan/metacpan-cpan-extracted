@@ -13,6 +13,7 @@ my %WriteMakefileArgs = (
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
         'Test::Simple' => 0,
+        'Test::Pod'	=> 0,
         'common::sense'			=> 0,
         'parent'				=> 0,
         'constant'				=> 0,
@@ -48,6 +49,7 @@ my %WriteMakefileArgs = (
         'Net::IP'				=> '1.26',
         'Devel::Confess'		=> '0.009004',
         'Number::Format'		=> '1.75',
+        'Net::API::REST'		=> '0.5.3',
     },
     LICENSE				=> 'perl_5',
     MIN_PERL_VERSION	=> 5.6.0,

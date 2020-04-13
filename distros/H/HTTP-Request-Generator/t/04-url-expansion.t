@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More tests => 12;
+use Test::More tests => 14;
 use Data::Dumper;
 
 use HTTP::Request::Generator 'generate_requests';
@@ -80,6 +80,14 @@ expands_properly('https://example.com:8443/[a..b].html', [
                  'https://example.com:8443/a.html',
                  'https://example.com:8443/b.html',
                  ], 'ports can be added but non-defaults survive');
+expands_properly('https://[::1]:8443/[a..b].html', [
+                 'https://[::1]:8443/a.html',
+                 'https://[::1]:8443/b.html',
+                 ], 'IPv6 addresses survive expansion');
+expands_properly('https://127.0.0.8:8443/[a..b].html', [
+                 'https://127.0.0.8:8443/a.html',
+                 'https://127.0.0.8:8443/b.html',
+                 ], 'IPv4 addresses survive expansion');
 
 my @urls = generate_requests(
     pattern => '//f/[0..11][0..11]',

@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Password;
-our $VERSION = '1.050';
+our $VERSION = '1.051';
 # ABSTRACT: A simple password-based auth
 
 #pod =encoding utf8
@@ -294,7 +294,7 @@ our $VERSION = '1.050';
 #pod
 #pod The form to log in.
 #pod
-#pod =head2 yancy/auth/password/login.html.ep
+#pod =head2 yancy/auth/password/login_page.html.ep
 #pod
 #pod The page containing the form to log in. Uses the C<login_form.html.ep>
 #pod template for the form itself.
@@ -356,6 +356,9 @@ sub register {
     );
     $app->helper(
         'yancy.auth.logout' => currym( $self, 'logout' ),
+    );
+    $app->helper(
+        'yancy.auth.login_form' => currym( $self, 'login_form' ),
     );
 }
 
@@ -485,7 +488,7 @@ sub login_form {
 
 sub _get_login {
     my ( $self, $c ) = @_;
-    return $c->render( 'yancy/auth/password/login',
+    return $c->render( 'yancy/auth/password/login_page',
         plugin => $self,
     );
 }
@@ -501,7 +504,7 @@ sub _post_login {
         return $c->rendered( 303 );
     }
     $c->flash( error => 'Username or password incorrect' );
-    return $c->render( 'yancy/auth/password/login',
+    return $c->render( 'yancy/auth/password/login_page',
         status => 400,
         plugin => $self,
         user => $user,
@@ -676,7 +679,7 @@ Yancy::Plugin::Auth::Password - A simple password-based auth
 
 =head1 VERSION
 
-version 1.050
+version 1.051
 
 =head1 SYNOPSIS
 
@@ -970,7 +973,7 @@ template with the same name.
 
 The form to log in.
 
-=head2 yancy/auth/password/login.html.ep
+=head2 yancy/auth/password/login_page.html.ep
 
 The page containing the form to log in. Uses the C<login_form.html.ep>
 template for the form itself.

@@ -1,3 +1,10 @@
+0.004   2020-04-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild to update Sah coerce rule modules
+          (Sah::Schema::unix::local_uid now uses filters instead of coercion
+          rules to convert between username/uid).
+
+
 0.003   2019-12-10  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -4,8 +4,7 @@ use Pcore -const, -class, -export, -res, -sql;
 use Pcore::App::API::Const qw[:ROOT_USER];
 use Pcore::Util::Scalar qw[looks_like_number looks_like_uuid];
 use Pcore::App::API::Auth;
-
-with qw[Pcore::App::API::Methods];
+use Pcore::App::API::Router;
 
 has app                => ( required => 1 );
 has db                 => ();
@@ -15,6 +14,7 @@ has argon2_time        => 3;
 has argon2_memory      => '64M';
 has argon2_parallelism => 1;
 
+has router   => ( init_arg => undef );
 has dbh      => ( init_arg => undef );
 has settings => ( init_arg => undef );
 
@@ -24,8 +24,14 @@ sub init ($self) {
     # create dbh
     $self->{dbh} = P->handle( $self->{db}, max_dbh => 10 ) if $self->{db};
 
-    # init api methods
-    my $res = $self->init_methods;
+    # create router
+    $self->{router} = Pcore::App::API::Router->new(
+        ns  => ref $self,
+        api => $self,
+    );
+
+    # init router
+    my $res = $self->{router}->init( { map { $_ => 1 } $self->{app}->get_permissions->@* } );
 
     return $res if !$res;
 
@@ -161,9 +167,9 @@ sub settings_load ( $self ) {
 
 # TODO check, if settings was updated
 sub settings_update ( $self, $settings ) {
-    $settings->{smtp_tls}                = SQL_BOOL $settings->{smtp_tls}                if exists $settings->{smtp_tls};
-    $settings->{telegram_bot_enabled}    = SQL_BOOL $settings->{telegram_bot_enabled}    if exists $settings->{telegram_bot_enabled};
-    $settings->{telegram_signin_enabled} = SQL_BOOL $settings->{telegram_signin_enabled} if exists $settings->{telegram_signin_enabled};
+    $settings->{smtp_tls}                = TO_BOOL $settings->{smtp_tls}                if exists $settings->{smtp_tls};
+    $settings->{telegram_bot_enabled}    = TO_BOOL $settings->{telegram_bot_enabled}    if exists $settings->{telegram_bot_enabled};
+    $settings->{telegram_signin_enabled} = TO_BOOL $settings->{telegram_signin_enabled} if exists $settings->{telegram_signin_enabled};
 
     my $res = $self->{dbh}->do( [ q[UPDATE "settings"], SET [$settings], 'WHERE "id" = 1' ] );
 

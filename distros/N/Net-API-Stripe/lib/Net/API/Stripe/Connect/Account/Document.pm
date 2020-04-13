@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Document.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -38,6 +38,14 @@ Net::API::Stripe::Connect::Account::Document - An interface to Stripe API
 
 =head1 SYNOPSIS
 
+    my $doc = $stripe->account->verification->document({
+        back => '/some/file/path/scan_back.jpg',
+        details => 'Low resolution jpeg',
+        # Set by Stripe
+        # details_code => 'document_not_readable',
+        front => '/some/file/path/scan_front.jpg',
+    });
+
 =head1 VERSION
 
     0.1
@@ -46,24 +54,16 @@ Net::API::Stripe::Connect::Account::Document - An interface to Stripe API
 
 A document showing address, either a passport, local ID card, or utility bill from a well-known utility company.
 
+Tis is called from method B<document> in module L<Net::API::Stripe::Connect::Account::Verification>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Document> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -75,7 +75,7 @@ Toggles debug mode on/off
 
 The back of an ID returned by a file upload with a purpose value of identity_document.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =item B<details> string
 
@@ -89,16 +89,16 @@ One of document_corrupt, document_country_not_supported, document_expired, docum
 
 The front of an ID returned by a file upload with a purpose value of identity_document.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "person_GcY9g3T1syDdBN",
+	  "id": "person_fake123456789",
 	  "object": "person",
-	  "account": "acct_19eGgRCeyNCl6fY2",
+	  "account": "acct_fake123456789",
 	  "created": 1580075612,
 	  "dob": {
 		"day": null,
@@ -162,7 +162,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

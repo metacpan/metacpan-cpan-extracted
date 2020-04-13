@@ -1,7 +1,7 @@
 package Pcore::Handle::DBI::Query::VALUES;
 
 use Pcore -class, -const, -export;
-use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_arrayref is_plain_arrayref is_plain_hashref is_blessed_hashref];
+use Pcore::Util::Scalar qw[is_ref is_bool is_plain_scalarref is_arrayref is_plain_arrayref is_plain_hashref is_blessed_hashref];
 
 has _buf => ( required => 1 );    # ArrayRef
 
@@ -86,6 +86,13 @@ sub GET_SQL_QUERY ( $self, $dbh, $i ) {
                     push @bind, $token->{$field};
                 }
 
+                # known boolean objects
+                elsif ( is_bool $token->{$field} ) {
+                    push @row, '$' . $i->$*++;
+
+                    push @bind, $token->{$field};
+                }
+
                 # object
                 elsif ( is_blessed_hashref $token->{$field} ) {
                     my ( $sql, $bind ) = $token->{$field}->GET_SQL_QUERY( $dbh, $i );
@@ -113,6 +120,13 @@ sub GET_SQL_QUERY ( $self, $dbh, $i ) {
 
                 # Scalar or ArrayRef value is processed as parameter
                 if ( !is_ref $field || is_arrayref $field ) {
+                    push @row, '$' . $i->$*++;
+
+                    push @bind, $field;
+                }
+
+                # known boolean objects
+                elsif ( is_bool $field ) {
                     push @row, '$' . $i->$*++;
 
                     push @bind, $field;
@@ -156,7 +170,7 @@ sub GET_SQL_QUERY ( $self, $dbh, $i ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "GET_SQL_QUERY" with high complexity score (42)             |
+## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "GET_SQL_QUERY" with high complexity score (44)             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

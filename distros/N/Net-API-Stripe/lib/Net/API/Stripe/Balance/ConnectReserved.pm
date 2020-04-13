@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Balance/ConnectReserved.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -42,24 +42,16 @@ Net::API::Stripe::Balance::ConnectReserved - A Stripe Reserved Fund Object
 
 =head1 DESCRIPTION
 
+This is called from L<Net::API::Stripe::Balance> by B<connect_reserved> method.
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Balance::ConnectReserved> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -77,7 +69,7 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 =item B<source_types> hash
 
-Breakdown of balance by source types. This is a virtual C<Net::API::Stripe::Payment::Source::Types> module that contains the following properties:
+Breakdown of balance by source types. This is a virtual L<Net::API::Stripe::Payment::Source::Types> module that contains the following properties:
 
 =over 8
 
@@ -142,7 +134,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

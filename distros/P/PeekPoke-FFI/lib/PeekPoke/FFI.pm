@@ -9,7 +9,7 @@ use base qw( Exporter );
 our @EXPORT_OK = qw( peek poke );
 
 # ABSTRACT: Perl extension for reading and writing to arbitrary memory locations
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 my $ffi = FFI::Platypus->new( api => 1, lib => [undef], lang => 'C' );
@@ -53,7 +53,7 @@ sub peek
 {
   my $self = _self(\@_);
   my($offset) = @_;
-  $ffi->cast('opaque' => $self->{type} . '[1]', $self->{base} + $offset * $self->{size})->[0];
+  $ffi->cast('opaque' => $self->{type} . '[1]', $self->{base} + ($offset * $self->{size}))->[0];
 }
 
 
@@ -61,7 +61,7 @@ sub poke
 {
   my $self = _self(\@_);
   my($offset, $value) = @_;
-  $self->{memcpy}->call($self->{base} + $offset * $self->{size}, [$value], 1);
+  $self->{memcpy}->call($self->{base} + ($offset * $self->{size}), [$value], $self->{size});
 }
 
 1;
@@ -78,7 +78,7 @@ PeekPoke::FFI - Perl extension for reading and writing to arbitrary memory locat
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ version 0.01
 
  # OO-interface
  use PeekPoke::FFI;
- my $pp = PeekPoke::FFI->new( type => 'sint32', offset => 0xdeadbeaf );
+ my $pp = PeekPoke::FFI->new( type => 'sint32', base => 0xdeadbeaf );
  my $value = $pp->peek( 0xdeadbeaf );
  $pp->poke( 0xdeadbeaf, 0 - $value );
 

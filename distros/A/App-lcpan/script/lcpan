@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-04-04'; # DATE
-our $VERSION = '1.046'; # VERSION
+our $DATE = '2020-04-11'; # DATE
+our $VERSION = '1.049'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.046 of lcpan (from Perl distribution App-lcpan), released on 2020-04-04.
+This document describes version 1.049 of lcpan (from Perl distribution App-lcpan), released on 2020-04-11.
 
 =head1 SYNOPSIS
 
@@ -250,6 +250,8 @@ B<Some other utilities>:
 More subcommands are available. lcpan is plugin-based, see/install
 C<App::lcpan::CmdBundle::*> modules for more subcommands.
 
+See L<App::lcpan::Manual> for more tips, cookcooks, tutorials.
+
 =head2 Injecting additional modules to your local CPAN mirror
 
 Sometimes, you only want to add one or a few modules to the local CPAN mirror.
@@ -317,6 +319,27 @@ Show a single author.
 =head2 B<author-deps>
 
 List dependencies for all of the dists of an author.
+
+For a CPAN author, this subcommand is a shortcut for doing:
+
+ % lcpan deps Your-Dist
+
+for all of your distributions. It shows just how many modules are you currently
+using in one of your distros on CPAN.
+
+To show how many modules from other authors you are depending:
+
+ % lcpan author-deps YOURCPANID --module-author-isnt YOURCPANID
+
+To show how many of your own modules you are depending in your own distros:
+
+ % lcpan author-deps YOURCPANID --module-author-is YOURCPANID
+
+To find whether there are any prerequisites that you mention in your
+distributions that are currently broken (not indexed on CPAN):
+
+ % lcpan author-deps YOURCPANID --broken --dont-uniquify
+
 
 =head2 B<author-deps-by-dependent-count>
 
@@ -677,11 +700,9 @@ List reverse dependencies.
 
 List scripts that depend on specified modules.
 
-This is basically rdeps + dist_scripts.
+This is basically rdeps + dist_scripts. Equivalent to something like:
 
-If you want to find scripts that depend on a module indirectly, you can do:
-
- % lcpan rdeps -R --flatten Some::Module | td select dist | xargs lcpan dist-scripts
+ % lcpan rdeps Some::Module | td select dist | xargs lcpan dist-scripts Some::Module
 
 
 =head2 B<rel>
@@ -988,25 +1009,29 @@ See C<--phase>.
 
 =item B<--broken>
 
-Alias for --exclude-registered --include-unregistered.
+Alias for --exclude-indexed --include-unindexed.
 
-See C<--exclude-unregistered>.
+See C<--exclude-unindexed>.
+
+=item B<--dont-uniquify>
+
+Allow showing multiple modules for different dists.
 
 =item B<--exclude-core>
 
 Exclude core modules.
 
+=item B<--exclude-indexed>
+
+Exclude modules that are indexed (listed in 02packages.details.txt.gz).
+
 =item B<--exclude-noncore>
 
 Exclude non-core modules.
 
-=item B<--exclude-registered>
+=item B<--exclude-unindexed>
 
-Exclude modules that are registered (listed in 02packages.details.txt.gz).
-
-=item B<--exclude-unregistered>
-
-Exclude modules that are not registered (not listed in 02packages.details.txt.gz).
+Exclude modules that are not indexed (not listed in 02packages.details.txt.gz).
 
 =item B<--flatten>
 
@@ -1081,7 +1106,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.2"
 
 =item B<--phase>=I<s>
 
@@ -1117,11 +1142,11 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
-=item B<--author-arg>=I<s>*
-
 =item B<--author-isnt>=I<s@>
 
 Can be specified multiple times.
+
+=item B<--author>=I<s>*
 
 =item B<--author>=I<s@>
 
@@ -1165,7 +1190,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.2"
 
 =item B<--phase>=I<s>
 
@@ -1485,25 +1510,29 @@ See C<--phase>.
 
 =item B<--broken>
 
-Alias for --exclude-registered --include-unregistered.
+Alias for --exclude-indexed --include-unindexed.
 
-See C<--exclude-unregistered>.
+See C<--exclude-unindexed>.
+
+=item B<--dont-uniquify>
+
+Allow showing multiple modules for different dists.
 
 =item B<--exclude-core>
 
 Exclude core modules.
 
+=item B<--exclude-indexed>
+
+Exclude modules that are indexed (listed in 02packages.details.txt.gz).
+
 =item B<--exclude-noncore>
 
 Exclude non-core modules.
 
-=item B<--exclude-registered>
+=item B<--exclude-unindexed>
 
-Exclude modules that are registered (listed in 02packages.details.txt.gz).
-
-=item B<--exclude-unregistered>
-
-Exclude modules that are not registered (not listed in 02packages.details.txt.gz).
+Exclude modules that are not indexed (not listed in 02packages.details.txt.gz).
 
 =item B<--flatten>
 
@@ -1562,7 +1591,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.2"
 
 =item B<--phase>=I<s>
 
@@ -1636,7 +1665,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.2"
 
 =item B<--phase>=I<s>
 
@@ -2520,7 +2549,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.2"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2690,7 +2719,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.2"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2860,6 +2889,10 @@ Filter certain author (JSON-encoded).
 
 See C<--author>.
 
+=item B<--dont-uniquify>
+
+Allow showing multiple modules for different dists.
+
 =item B<--flatten>
 
 Instead of showing tree-like information, flatten it.
@@ -2913,6 +2946,14 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
+=item B<--level>=I<s>, B<-l>
+
+Recurse for a number of levels (-1 means unlimited).
+
+Default value:
+
+ 1
+
 =item B<--module>=I<s@>*
 
 Can be specified multiple times.
@@ -2932,6 +2973,12 @@ Default value:
 Default value:
 
  "ALL"
+
+=item B<-R>
+
+Recurse (alias for `--level 10`).
+
+See C<--level>.
 
 =back
 
@@ -3677,11 +3724,12 @@ List of available configuration parameters:
 =head2 Configuration for subcommand author-deps
 
  author (see --author)
+ dont_uniquify (see --dont-uniquify)
  flatten (see --flatten)
  include_core (see --exclude-core)
+ include_indexed (see --exclude-indexed)
  include_noncore (see --exclude-noncore)
- include_registered (see --exclude-registered)
- include_unregistered (see --exclude-unregistered)
+ include_unindexed (see --exclude-unindexed)
  level (see --level)
  module_authors (see --module-author)
  module_authors_arent (see --module-author-isnt)
@@ -3692,7 +3740,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
 
- author (see --author-arg)
+ author (see --author)
  authors (see --author)
  authors_arent (see --author-isnt)
  include_core (see --exclude-core)
@@ -3805,11 +3853,12 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand deps
 
+ dont_uniquify (see --dont-uniquify)
  flatten (see --flatten)
  include_core (see --exclude-core)
+ include_indexed (see --exclude-indexed)
  include_noncore (see --exclude-noncore)
- include_registered (see --exclude-registered)
- include_unregistered (see --exclude-unregistered)
+ include_unindexed (see --exclude-unindexed)
  level (see --level)
  modules (see --module)
  perl_version (see --perl-version)
@@ -4064,6 +4113,7 @@ List of available configuration parameters:
 
  authors (see --author)
  authors_arent (see --author-isnt)
+ dont_uniquify (see --dont-uniquify)
  flatten (see --flatten)
  level (see --level)
  modules (see --module)
@@ -4072,6 +4122,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand rdeps-scripts
 
+ level (see --level)
  modules (see --module)
  phase (see --phase)
  rel (see --rel)
@@ -4250,6 +4301,8 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<App::lcpan::Manual>
 
 L<CPAN::Mini>
 

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payout.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -71,6 +71,23 @@ Net::API::Stripe::Payout - A Stripe Payout Object
 
 =head1 SYNOPSIS
 
+    my $payout = $stripe->payout({
+        amount => 2000,
+        arrival_date => '2020-04-12',
+        automatic => $stripe->true,
+        currency => 'jpy',
+        description => 'Customer payout',
+        destination => $connect_account_object,
+        livemode => $stripe->false,
+        metadata => { transaction_id => 123, customer_id => 456 },
+        method => 'standard',
+        statement_descriptor => 'Fund raised payout',
+        status => 'pending',
+        type => 'bank_account',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -85,18 +102,8 @@ A Payout object is created when you receive funds from Stripe, or when you initi
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Payout> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -126,7 +133,7 @@ Returns true if the payout was created by an automated payout schedule (L<https:
 
 =item B<balance_transaction> string (expandable)
 
-ID of the balance transaction that describes the impact of this payout on your account balance. This is a string or a C<Net::API::Stripe::Balance::Transaction> object.
+ID of the balance transaction that describes the impact of this payout on your account balance. This is a string or a L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<created> timestamp
 
@@ -142,11 +149,11 @@ An arbitrary string attached to the object. Often useful for displaying to users
 
 =item B<destination> string expandable card or bank account
 
-ID of the bank account or card the payout was sent to. This is a string or a C<Net::API::Stripe::Connect::Account> object.
+ID of the bank account or card the payout was sent to. This is a string or a L<Net::API::Stripe::Connect::Account> object.
 
 =item B<failure_balance_transaction> string (expandable)
 
-If the payout failed or was canceled, this will be the ID of the balance transaction that reversed the initial balance transaction, and puts the funds from the failed payout back in your balance. Alternatively it can also be the C<Net::API::Stripe::Balance::Transaction> object if it was expanded.
+If the payout failed or was canceled, this will be the ID of the balance transaction that reversed the initial balance transaction, and puts the funds from the failed payout back in your balance. Alternatively it can also be the L<Net::API::Stripe::Balance::Transaction> object if it was expanded.
 
 =item B<failure_code> string
 
@@ -189,16 +196,16 @@ Can be bank_account or card.
 =head1 API SAMPLE
 
 	{
-	  "id": "po_1FJVCuCeyNCl6fY2XGI6h0xg",
+	  "id": "po_fake123456789",
 	  "object": "payout",
 	  "amount": 7712,
 	  "arrival_date": 1568851200,
 	  "automatic": true,
-	  "balance_transaction": "txn_1FTlZvCeyNCl6fY2qIteNrPe",
+	  "balance_transaction": "txn_fake123456789",
 	  "created": 1568682616,
 	  "currency": "jpy",
 	  "description": "STRIPE PAYOUT",
-	  "destination": "ba_19eGy1CeyNCl6fY2R3ACmqG4",
+	  "destination": "ba_fake123456789",
 	  "failure_balance_transaction": null,
 	  "failure_code": null,
 	  "failure_message": null,
@@ -236,7 +243,7 @@ L<https://stripe.com/docs/payouts>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

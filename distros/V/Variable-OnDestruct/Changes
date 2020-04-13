@@ -1,5 +1,9 @@
 Revision history for Variable-OnDestruct
 
+0.04      2020-04-10 23:23:46+02:00 Europe/Amsterdam
+        - Don't run destructor in late global destruction
+        - Run callback on alternative stack
+
 0.03    2010-10-30
         Added support for subs and globs
         Removed usage of Dynaloader, removed inheritance from Exporter

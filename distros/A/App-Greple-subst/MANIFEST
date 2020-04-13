@@ -8,6 +8,7 @@ lib/App/Greple/subst.pm
 lib/App/Greple/subst/Dict.pm
 minil.toml
 share/Makefile
+share/all-katakana.dict
 share/jtca-katakana-guide-3.dict
 share/jtca-katakana-guide-3.pl
 share/jtf-style-guide-3.dict

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/TosAcceptance.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -34,9 +34,15 @@ __END__
 
 =head1 NAME
 
-Net::API::Stripe::Example - An interface to Stripe API
+Net::API::Stripe::Connect::Account::TosAcceptance - An interface to Stripe API
 
 =head1 SYNOPSIS
+
+    my $tos_ok = $stripe->account->tos_acceptance({
+        date => '2020-04-12',
+        ip => '1.2.3.4',
+        user_agent => 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.66 Safari/537.36',
+    });
 
 =head1 VERSION
 
@@ -46,24 +52,16 @@ Net::API::Stripe::Example - An interface to Stripe API
 
 Details on the acceptance of the Stripe Services Agreement
 
+This is instantiated by method B<tos_acceptance> from module L<Net::API::Stripe::Connect::Account>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::TosAcceptance> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -88,7 +86,7 @@ The user agent of the browser from which the Stripe Services Agreement was accep
 =head1 API SAMPLE
 
 	{
-	  "id": "acct_19eGgRCeyNCl6xYZ",
+	  "id": "acct_fake123456789",
 	  "object": "account",
 	  "business_profile": {
 		"mcc": null,
@@ -156,9 +154,9 @@ The user agent of the browser from which the Stripe Services Agreement was accep
 		"object": "list",
 		"data": [
 		  {
-			"id": "ba_19eGy1CeyNCl6fY2R3ACmqG4",
+			"id": "ba_fake123456789",
 			"object": "bank_account",
-			"account": "acct_19eGgRCeyNCl6xYZ",
+			"account": "acct_fake123456789",
 			"account_holder_name": "カ）マイショップインク",
 			"account_holder_type": null,
 			"bank_name": "三井住友銀行",
@@ -173,7 +171,7 @@ The user agent of the browser from which the Stripe Services Agreement was accep
 		  }
 		],
 		"has_more": false,
-		"url": "/v1/accounts/acct_19eGgRCeyNCl6xYZ/external_accounts"
+		"url": "/v1/accounts/acct_fake123456789/external_accounts"
 	  },
 	  "metadata": {},
 	  "payouts_enabled": true,
@@ -187,7 +185,7 @@ The user agent of the browser from which the Stripe Services Agreement was accep
 	  },
 	  "settings": {
 		"branding": {
-		  "icon": "file_1DLf5rCeyabl6fY2kS4e5xyz",
+		  "icon": "file_fake123456789",
 		  "logo": null,
 		  "primary_color": "#0e77ca"
 		},
@@ -239,11 +237,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Stripe API documentation:
 
-L<https://stripe.com/docs/api>
+L<https://stripe.com/docs/api/accounts/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

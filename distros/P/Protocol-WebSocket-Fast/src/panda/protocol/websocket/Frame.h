@@ -27,20 +27,16 @@ struct Frame : virtual panda::Refcnt, AllocatedObject<Frame> {
     Opcode   opcode         () const { return _header.opcode; }
     bool     final          () const { return _header.fin; }
     bool     rsv1           () const { return _header.rsv1; }
+    bool     rsv2           () const { return _header.rsv2; }
+    bool     rsv3           () const { return _header.rsv3; }
     size_t   payload_length () const { return _header.length; }
     uint16_t close_code     () const { return _close_code; }
     string   close_message  () const { return _close_message; }
 
-    bool parse (string& buf);
+    size_t max_size () const         { return _max_size; }
+    void   max_size (size_t newsize) { _max_size = newsize; }
 
-    void check (bool fragment_in_message) {
-        assert(_state == State::DONE);
-        if (is_control() || error) return;
-        if (!fragment_in_message) {
-            if (opcode() == Opcode::CONTINUE) error = errc::initial_continue;
-        }
-        else if (opcode() != Opcode::CONTINUE) error = errc::fragment_no_continue;
-    }
+    bool parse (string& buf);
 
     void reset () {
         _state = State::HEADER;

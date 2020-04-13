@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Transfer.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -68,6 +68,16 @@ Net::API::Stripe::Connect::Transfer - A Stripe Account-to-Account Transfer Objec
 
 =head1 SYNOPSIS
 
+    my $trans = $stripe->transfer({
+        amount => 2000,
+        currency => 'jpy',
+        description => 'Campaign contribution payment',
+        destination => $account_object,
+        metadata => { transaction_id => 123 },
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -76,7 +86,7 @@ Net::API::Stripe::Connect::Transfer - A Stripe Account-to-Account Transfer Objec
 
 A Transfer object is created when you move funds between Stripe accounts as part of Connect.
 
-Before April 6, 2017, transfers also represented movement of funds from a Stripe account to a card or bank account. This behavior has since been split out into a Payout object (C<Net::API::Stripe::Payout> / L<https://stripe.com/docs/api/transfers#payout_object>), with corresponding payout endpoints. For more information, read about the transfer/payout split (L<https://stripe.com/docs/transfer-payout-split>).
+Before April 6, 2017, transfers also represented movement of funds from a Stripe account to a card or bank account. This behavior has since been split out into a Payout object (L<Net::API::Stripe::Payout> / L<https://stripe.com/docs/api/transfers#payout_object>), with corresponding payout endpoints. For more information, read about the transfer/payout split (L<https://stripe.com/docs/transfer-payout-split>).
 
 =head1 CONSTRUCTOR
 
@@ -84,18 +94,8 @@ Before April 6, 2017, transfers also represented movement of funds from a Stripe
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Transfer> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -123,7 +123,7 @@ Amount in JPY reversed (can be less than the amount attribute on the transfer if
 
 Balance transaction that describes the impact of this transfer on your account balance.
 
-When expanded, this is a C<Net::API::Stripe::Balance::Transaction> object.
+When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<created> timestamp
 
@@ -141,13 +141,13 @@ An arbitrary string attached to the object. Often useful for displaying to users
 
 ID of the Stripe account the transfer was sent to.
 
-When expanded, this is a C<Net::API::Stripe::Connect::Account> object.
+When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
 =item B<destination_payment> string (expandable)
 
 If the destination is a Stripe account, this will be the ID of the payment that the destination account received for the transfer.
 
-When expanded, this is a C<Net::API::Stripe::Connect::Transfer> object.
+When expanded, this is a L<Net::API::Stripe::Connect::Transfer> object.
 
 =item B<livemode> boolean
 
@@ -161,7 +161,7 @@ A set of key-value pairs that you can attach to a transfer object. It can be use
 
 A list of reversals that have been applied to the transfer.
 
-This is a C<Net::API::Stripe::Connect::Transfer::Reversals> object.
+This is a L<Net::API::Stripe::Connect::Transfer::Reversals> object.
 
 =item B<reversed> boolean
 
@@ -171,7 +171,7 @@ Whether the transfer has been fully reversed. If the transfer is only partially 
 
 ID of the charge or payment that was used to fund the transfer. If null, the transfer was funded from the available balance.
 
-When expanded, this is a C<Net::API::Stripe::Charge> object.
+When expanded, this is a L<Net::API::Stripe::Charge> object.
 
 =item B<source_type> string
 
@@ -190,23 +190,23 @@ A string that identifies this transaction as part of a group. See the Connect do
 =head1 API SAMPLE
 
 	{
-	"id": "tr_1FU3MGCeyNCl6fY2RRs8LIvw",
+	"id": "tr_fake123456789",
 	"object": "transfer",
 	"amount": 1100,
 	"amount_reversed": 0,
-	"balance_transaction": "txn_1FTlZvCeyNCl6fY2qIteNrPe",
+	"balance_transaction": "txn_fake123456789",
 	"created": 1571197172,
 	"currency": "jpy",
 	"description": null,
-	"destination": "acct_19eGgRCeyNCl6fY2",
-	"destination_payment": "py_G03TG3DUT9GKVY",
+	"destination": "acct_fake123456789",
+	"destination_payment": "py_fake123456789",
 	"livemode": false,
 	"metadata": {},
 	"reversals": {
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/transfers/tr_1FU3MGCeyNCl6fY2RRs8LIvw/reversals"
+		"url": "/v1/transfers/tr_fake123456789/reversals"
 	},
 	"reversed": false,
 	"source_transaction": null,
@@ -238,7 +238,7 @@ L<https://stripe.com/docs/api/transfers>, L<https://stripe.com/docs/connect/char
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

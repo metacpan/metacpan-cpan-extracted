@@ -1,6 +1,7 @@
 Changes
 header-settings.json
 lib/Net/API/Stripe.pm
+lib/Net/API/Stripe.pod
 lib/Net/API/Stripe/Address.pm
 lib/Net/API/Stripe/AddressKana.pm
 lib/Net/API/Stripe/AddressKanji.pm
@@ -9,7 +10,6 @@ lib/Net/API/Stripe/Balance/ConnectReserved.pm
 lib/Net/API/Stripe/Balance/Pending.pm
 lib/Net/API/Stripe/Balance/Transaction.pm
 lib/Net/API/Stripe/Balance/Transaction/FeeDetails.pm
-lib/Net/API/Stripe/Balance/Transaction/List.pm
 lib/Net/API/Stripe/Billing/Coupon.pm
 lib/Net/API/Stripe/Billing/CreditNote.pm
 lib/Net/API/Stripe/Billing/CreditNote/LineItem.pm
@@ -76,7 +76,6 @@ lib/Net/API/Stripe/Customer.pm
 lib/Net/API/Stripe/Customer/BalanceTransaction.pm
 lib/Net/API/Stripe/Customer/List.pm
 lib/Net/API/Stripe/Customer/Sources.pm
-lib/Net/API/Stripe/Customer/Subscription.pm
 lib/Net/API/Stripe/Customer/TaxId.pm
 lib/Net/API/Stripe/Customer/TaxIds.pm
 lib/Net/API/Stripe/Customer/TaxInfo.pm
@@ -94,11 +93,11 @@ lib/Net/API/Stripe/File/Link.pm
 lib/Net/API/Stripe/File/Links.pm
 lib/Net/API/Stripe/Fraud.pm
 lib/Net/API/Stripe/Fraud/Review.pm
+lib/Net/API/Stripe/Fraud/Review/Session.pm
 lib/Net/API/Stripe/Fraud/ValueList.pm
 lib/Net/API/Stripe/Fraud/ValueList/Item.pm
 lib/Net/API/Stripe/Generic.pm
 lib/Net/API/Stripe/GeoLocation.pm
-lib/Net/API/Stripe/Hash.pm
 lib/Net/API/Stripe/Issuing/Authorization.pm
 lib/Net/API/Stripe/Issuing/Authorization/RequestHistory.pm
 lib/Net/API/Stripe/Issuing/Authorization/Transaction.pm
@@ -150,7 +149,6 @@ lib/Net/API/Stripe/Product.pm
 lib/Net/API/Stripe/Product/PackageDimension.pm
 lib/Net/API/Stripe/Refund.pm
 lib/Net/API/Stripe/Reporting/ReportRun.pm
-lib/Net/API/Stripe/Session.pm
 lib/Net/API/Stripe/Shipping.pm
 lib/Net/API/Stripe/Sigma/ScheduledQueryRun.pm
 lib/Net/API/Stripe/Tax/Rate.pm
@@ -167,5 +165,6 @@ Makefile.PL
 MANIFEST
 README
 t/001_load.t
+t/002_pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

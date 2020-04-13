@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Fraud/Review.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -40,12 +40,11 @@ sub open { return( shift->_set_get_boolean( 'open', @_ ) ); }
 
 sub opened_reason { return( shift->_set_get_scalar( 'opened_reason', @_ ) ); }
 
-# sub payment_intent { return( shift->_set_get_scalar_or_object( 'payment_intent', 'Net::API::Stripe::Terminal::PaymentIntent', @_ ) ); }
 sub payment_intent { return( shift->_set_get_scalar_or_object( 'payment_intent', 'Net::API::Stripe::Payment::Intent', @_ ) ); }
 
 sub reason { return( shift->_set_get_scalar( 'reason', @_ ) ); }
 
-sub session { return( shift->_set_get_object( 'session', 'Net::API::Stripe::Session', @_ ) ); }
+sub session { return( shift->_set_get_object( 'session', 'Net::API::Stripe::Fraud::Review::Session', @_ ) ); }
 
 1;
 
@@ -58,6 +57,27 @@ __END__
 Net::API::Stripe::Fraud::Review - A Stripe Fraud Review Object
 
 =head1 SYNOPSIS
+
+    my $review = $stripe->review({
+        billing_zip => '123-4567',
+        # Could also be a Net::API::Stripe::Charge object when expanded
+        charge => 'ch_fake1234567890',
+        ip_address => '1.2.3.4',
+        ip_address_location => 
+            {
+            city => 'Tokyo',
+            country => 'jp',
+            latitude => '35.6935496',
+            longitude => '139.7461204',
+            region => undef,
+            },
+        open => $stripe->true,
+        payment_intent => $payment_intent_object,
+        reason => 'Some issue',
+        session => $session_object,
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
 
 =head1 VERSION
 
@@ -73,18 +93,8 @@ Reviews can be used to supplement automated fraud detection with human expertise
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Fraud::Review> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -108,7 +118,7 @@ The ZIP or postal code of the card used, if applicable.
 
 The charge associated with this review.
 
-When expanded, this is a C<Net::API::Stripe::Charge> object.
+When expanded, this is a L<Net::API::Stripe::Charge> object.
 
 =item B<closed_reason> string
 
@@ -126,7 +136,7 @@ The IP address where the payment originated.
 
 Information related to the location of the payment. Note that this information is an approximation and attempts to locate the nearest population center - it should not be used to determine a specific address.
 
-This is a C<Net::API::Stripe::GeoLocation> object.
+This is a L<Net::API::Stripe::GeoLocation> object.
 
 =item B<livemode> boolean
 
@@ -144,7 +154,7 @@ The reason the review was opened. One of rule or manual.
 
 The PaymentIntent ID associated with this review, if one exists.
 
-When expanded, this is a C<Net::API::Stripe::Payment::Intent> object.
+When expanded, this is a L<Net::API::Stripe::Payment::Intent> object.
 
 =item B<reason> string
 
@@ -154,17 +164,17 @@ The reason the review is currently open or closed. One of rule, manual, approved
 
 Information related to the browsing session of the user who initiated the payment.
 
-This is a C<Net::API::Stripe::Session> object.
+This is a L<Net::API::Stripe::Session> object.
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "prv_1FVF3MCeyNCl6fY27Q3RLQ4n",
+	  "id": "prv_fake123456789",
 	  "object": "review",
 	  "billing_zip": null,
-	  "charge": "ch_1AaRjGCeyNCl6fY2v83S8nXJ",
+	  "charge": "ch_fake123456789",
 	  "closed_reason": null,
 	  "created": 1571480456,
 	  "ip_address": null,
@@ -194,7 +204,7 @@ L<https://stripe.com/docs/api/radar/reviews>, L<https://stripe.com/radar>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -147,6 +147,27 @@ Net::API::Stripe::Connect::Account - A Stripe Account Object
 
 =head1 SYNOPSIS
 
+    my $acct = $stripe->account({
+        business_profile => 
+        {
+        logo => '/some/file/path/logo.jpg',
+        name => 'Big Corp, Inc',
+        },
+        settings =>
+        {
+        primary_color => 'blue',
+        dashboard => { display_name => 'Big Corp, Inc' },
+        },
+        business_type => 'company',
+        business_url => 'https://example.com',
+        charges_enabled => $stripe->true,
+        company => $company_object,
+        country => 'jp',
+        default_currency => 'jpy',
+        email => 'hello@example.com',
+        metadata => { transaction_id => 1212, customer_id => 123 },
+    });
+
 =head1 VERSION
 
     0.1
@@ -163,18 +184,8 @@ Some properties, marked below, are available only to platforms that want to crea
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -210,7 +221,7 @@ This is outdated. It now points to B<settings>->B<primary_color>
 
 Optional information related to the business.
 
-This is a C<Net::API::Stripe::Business::Profile> object.
+This is a L<Net::API::Stripe::Business::Profile> object.
 
 =item B<business_type> string
 
@@ -224,7 +235,7 @@ This is outdated. It now points to B<business_profile>->B<url>
 
 A hash containing the set of capabilities that was requested for this account and their associated states. Keys are names of capabilities. You can see the full list here (L<https://stripe.com/docs/api/capabilities/list>). Values may be active, inactive, or pending.
 
-This is a C<Net::API::Stripe::Connect::Account::Capabilities> object, although there is no real C<Net::API::Stripe::Connect::Account::Capability> module. This is created on the fly by the B<_set_get_hash_as_object> method of C<Module::Generic>
+This is a L<Net::API::Stripe::Connect::Account::Capabilities> object, although there is no real L<Net::API::Stripe::Connect::Account::Capability> module. This is created on the fly by the B<_set_get_hash_as_object> method of L<Module::Generic>
 
 =over 8
 
@@ -254,7 +265,7 @@ Whether the account can create live charges.
 
 Information about the company or business. This field is null unless business_type is set to company.
 
-This is a C<Net::API::Stripe::Connect::Account::Company> object.
+This is a L<Net::API::Stripe::Connect::Account::Company> object.
 
 =item B<country> string
 
@@ -292,17 +303,17 @@ The primary user’s email address.
 
 External accounts (bank accounts and debit cards) currently attached to this account
 
-This is a C<Net::API::Stripe::Connect::Account::ExternalAccounts> object.
+This is a L<Net::API::Stripe::Connect::Account::ExternalAccounts> object.
 
 =item B<individual> custom only hash
 
 Information about the person represented by the account. This field is null unless business_type is set to individual.
 
-This is a C<Net::API::Stripe::Connect::Person> object.
+This is a L<Net::API::Stripe::Connect::Person> object.
 
 =item B<legal_entity>
 
-This is outdated. Stripe now uses a C<Net::API::Stripe::Connect::Account::Company> object and a C<Net::API::Stripe::Connect::Person> object.
+This is outdated. Stripe now uses a L<Net::API::Stripe::Connect::Account::Company> object and a L<Net::API::Stripe::Connect::Person> object.
 
 =item B<metadata> hash
 
@@ -328,13 +339,13 @@ This is outdated. It now points to B<business_profile>->B<product_description>
 
 Information about the requirements for the account, including what information needs to be collected, and by when.
 
-This is a C<Net::API::Stripe::Connect::Account::Requirements> object.
+This is a L<Net::API::Stripe::Connect::Account::Requirements> object.
 
 =item B<settings> hash
 
 Options for customizing how the account functions within Stripe.
 
-This is a C<Net::API::Stripe::Connect::Account::Settings> object.
+This is a L<Net::API::Stripe::Connect::Account::Settings> object.
 
 =item B<statement_descriptor>
 
@@ -364,7 +375,7 @@ This is outdated. It is a C<DateTime> object.
 
 Details on the acceptance of the Stripe Services Agreement
 
-This is a C<Net::API::Stripe::Connect::Account::TosAcceptance> object.
+This is a L<Net::API::Stripe::Connect::Account::TosAcceptance> object.
 
 =item B<type> string
 
@@ -372,7 +383,7 @@ The Stripe account type. Can be standard, express, or custom.
 
 =item B<verification>
 
-This is outdated. It is a C<Net::API::Stripe::Connect::Account::Verification> object.
+This is outdated. It is a L<Net::API::Stripe::Connect::Account::Verification> object.
 
 =back
 
@@ -381,7 +392,7 @@ This is outdated. It is a C<Net::API::Stripe::Connect::Account::Verification> ob
 =head2 Response Standard
 
 	{
-	  "id": "acct_19eGgRCeyNCl6xYZ",
+	  "id": "acct_fake123456789",
 	  "object": "account",
 	  "business_profile": {
 		"mcc": null,
@@ -413,7 +424,7 @@ This is outdated. It is a C<Net::API::Stripe::Connect::Account::Verification> ob
 	  "payouts_enabled": true,
 	  "settings": {
 		"branding": {
-		  "icon": "file_1DLf5rCeyNCl6fY2kS4e5hMT",
+		  "icon": "file_fake123456789",
 		  "logo": null,
 		  "primary_color": "#0e77ca"
 		},
@@ -696,7 +707,7 @@ Initial version
 
 =head2 2019-02-19
 
-Statement descriptor behaviors for card payments created via /v1/charges have changed. See our statement descriptor guide for details.
+Statement descriptor behaviors for card payments created via /v1/charges have changed. See L<Stripe statement descriptor guide|https://stripe.com/docs/statement-descriptors> for details.
 
 =over 4
 
@@ -707,6 +718,8 @@ Statement descriptor behaviors for card payments created via /v1/charges have ch
 =item * If an account has no statement_descriptor set, the account's business or legal name will be used as statement descriptor.
 
 =item * Statement descriptors may no longer contain *, ', and ".
+
+=back
 
 =head2 2019-02-19
 
@@ -778,7 +791,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

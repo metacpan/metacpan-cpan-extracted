@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/ExternalAccounts.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -79,15 +79,15 @@ __END__
 
 Net::API::Stripe::Connect::Account::ExternalAccounts - A Stripe External Accounts List Object
 
-=head1 SYNOPSIS
-
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-This module inherits everything from C<Net::API::Stripe::List> module and overrides only the B<data> method
+This module inherits everything from L<Net::API::Stripe::List> module and overrides only the B<data> method
+
+This is instantiated from method B<external_accounts> in module L<Net::API::Stripe::Connect::Account>
 
 =head1 AUTHOR
 
@@ -101,7 +101,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

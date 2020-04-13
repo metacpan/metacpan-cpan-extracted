@@ -1,5 +1,11 @@
 Revision history for Domain-PublicSuffix
 
+0.17    2020-04-13 14:08 GMT
+  - Refresh PublicSuffix list
+  - Fix documentation regarding what tld() will return
+  - Add Default updater
+  - Fix warnings in tests
+
 0.16    2019-10-18 20:00 GMT
   - Refresh PublicSuffix list
   - Add publicsuffix.org unit tests

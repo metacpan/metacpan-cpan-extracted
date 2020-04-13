@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Source/CodeVerification.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -34,6 +34,11 @@ Net::API::Stripe::Payment::Source::CodeVerification - A Stripe Code Verification
 
 =head1 SYNOPSIS
 
+    my $code = $stripe->source->code_verification({
+        attempts_remaining => 2,
+        status => 'pending',
+    });
+
 =head1 VERSION
 
     0.1
@@ -42,7 +47,7 @@ Net::API::Stripe::Payment::Source::CodeVerification - A Stripe Code Verification
 
 Information related to the code verification flow. Present if the source is authenticated by a verification code (flow is code_verification).
 
-This is part of the C<Net::API::Stripe::Payment::Source> object
+This is part of the L<Net::API::Stripe::Payment::Source> object
 
 =head1 CONSTRUCTOR
 
@@ -50,18 +55,8 @@ This is part of the C<Net::API::Stripe::Payment::Source> object
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Payment::Source::CodeVerification> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -82,17 +77,17 @@ The status of the code verification, either pending (awaiting verification, atte
 =head1 API SAMPLE
 
 	{
-	  "id": "src_1FUXrFCeyNCl6fY2Fk07erzD",
+	  "id": "src_fake123456789",
 	  "object": "source",
 	  "ach_credit_transfer": {
 		"account_number": "test_52796e3294dc",
 		"routing_number": "110000000",
-		"fingerprint": "ecpwEzmBOSMOqQTL",
+		"fingerprint": "kabvkbmvbmbv",
 		"bank_name": "TEST BANK",
 		"swift_code": "TSTEZ122"
 	  },
 	  "amount": null,
-	  "client_secret": "src_client_secret_G0YzRXUMP1IJhwBBA4dW38It",
+	  "client_secret": "src_client_secret_fake123456789",
 	  "created": 1571314413,
 	  "currency": "jpy",
 	  "flow": "receiver",
@@ -140,7 +135,7 @@ L<https://stripe.com/docs/api/sources/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

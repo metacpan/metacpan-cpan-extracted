@@ -6,57 +6,37 @@ subtest 'basics - black' => sub {
         convert_colour(
                 start => '#000000',
                 light => '10%',
-				expected => [25, 25, 25],
+		expected => [25, 25, 25],
         );
-		convert_colour(
-                start => '#000000',
-                light => '20%',
-				expected => [51, 51, 51],
-        );
-		convert_colour(
+	convert_colour(
                 start => '#000000',
                 light => '30%',
-				expected => [76, 76, 76],
+		expected => [76, 76, 76],
         );
-		convert_colour(
-                start => '#000000',
-                light => '40%',
-				expected => [102, 102, 102],
-        );
-		convert_colour(
+	convert_colour(
                 start => '#000000',
                 light => '50%',
-				expected => [127, 127, 127],
+		expected => [127, 127, 127],
         );
-		convert_colour(
-                start => '#000000',
-                light => '60%',
-				expected => [153, 153, 153],
-        );
-   		convert_colour(
+   	convert_colour(
                 start => '#000000',
                 light => '70%',
-				expected => [178, 178, 178],
+		expected => [178, 178, 178],
         );
-     	convert_colour(
-                start => '#000000',
-                light => '80%',
-				expected => [204, 204, 204],
-        );
- 		convert_colour(
+ 	convert_colour(
                 start => '#000000',
                 light => '90%',
-				expected => [229, 229, 229],
+		expected => [229, 229, 229],
         );
      	convert_colour(
                 start => '#000000',
                 light => '100%',
-				expected => [255, 255, 255],
+		expected => [255, 255, 255],
         );
      	convert_colour(
                 start => '#000000',
                 light => '200%',
-				expected => [255, 255, 255],
+		expected => [255, 255, 255],
         );
 };   
 

@@ -35,12 +35,12 @@ HTTP::Request::FromCurl - create a HTTP::Request from a curl command line
 
     my $req = HTTP::Request::FromCurl->new(
         # Note - curl itself may not appear
-        argv => ['--agent', 'myscript/1.0', 'https://example.com'],
+        argv => ['--user-agent', 'myscript/1.0', 'https://example.com'],
     );
 
     my $req = HTTP::Request::FromCurl->new(
         # Note - curl itself may not appear
-        command => '--agent myscript/1.0 https://example.com',
+        command => '--user-agent myscript/1.0 https://example.com',
     );
 
 The constructor returns one or more [HTTP::Request::CurlParameters](https://metacpan.org/pod/HTTP::Request::CurlParameters) objects
@@ -94,7 +94,7 @@ Contains the default headers added to every request
 Contains the [Getopt::Long](https://metacpan.org/pod/Getopt::Long) specification of the recognized command line
 parameters.
 
-The following `curl` options are recognized but ignored:
+The following `curl` options are recognized but largely ignored:
 
 - ` --dump-header `
 - ` --include `
@@ -186,7 +186,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2018 by Max Maischein `corion@cpan.org`.
+Copyright 2018-2020 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

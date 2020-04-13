@@ -14,6 +14,16 @@ Mojolicious::Plugin::Prometheus - Mojolicious Plugin
     # Mojolicious::Lite, with custom response buckets (seconds)
     plugin 'Prometheus' => { response_buckets => [qw/4 5 6/] };
 
+    # You can add your own route to do access control
+    my $under = app->routes->under('/secret' =>sub {
+      my $c = shift;
+      return 1 if $c->req->url->to_abs->userinfo eq 'Bender:rocks';
+      $c->res->headers->www_authenticate('Basic');
+      $c->render(text => 'Authentication required!', status => 401);
+      return undef;
+    });
+    plugin Prometheus => {route => $under};
+
 # DESCRIPTION
 
 [Mojolicious::Plugin::Prometheus](https://metacpan.org/pod/Mojolicious::Plugin::Prometheus) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin that exports Prometheus metrics from Mojolicious.
@@ -39,6 +49,12 @@ See [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus) for usage.
 Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) application.
 
 `%config` can have:
+
+- route
+
+    [Mojolicious::Routes::Route](https://metacpan.org/pod/Mojolicious::Routes::Route) object to attach the metrics to, defaults to generating a new one for '/'.
+
+    Default: /
 
 - path
 

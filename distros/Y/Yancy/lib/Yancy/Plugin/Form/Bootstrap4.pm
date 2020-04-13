@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form::Bootstrap4;
-our $VERSION = '1.050';
+our $VERSION = '1.051';
 # ABSTRACT: Generate forms using Bootstrap 4
 
 #pod =head1 SYNOPSIS
@@ -93,6 +93,7 @@ sub input {
     my ( $self, $c, %opt ) = @_;
 
     die "input name is required" unless $opt{name};
+    $opt{value} //= $c->req->param( $opt{name} );
 
     my %attr;
     my $template = 'input';
@@ -231,6 +232,15 @@ sub form_for {
 
     my $item = $opt{ item } || $c->stash( 'item' ) || {};
     my $props = $c->yancy->schema( $coll )->{properties};
+
+    my $prop_names = $opt{properties} // $c->stash( 'properties' )
+        # By default, do not show read-only fields
+        // [ grep !$props->{$_}{readOnly}, keys %$props ];
+    $props = {
+        map { $_ => $props->{ $_ } }
+        @$prop_names
+    };
+
     my @sorted_props
         = sort {
             ( $props->{$a}{'x-order'}//2**31 ) <=> ( $props->{$b}{'x-order'}//2**31 )
@@ -239,7 +249,7 @@ sub form_for {
     my @fields;
     for my $field ( @sorted_props ) {
         my %field_opt = (
-            value => $item->{ $field },
+            value => $c->req->param( $field ) // $item->{ $field },
         );
         push @fields, $c->yancy->form->field_for( $coll, $field, %field_opt );
     }
@@ -267,7 +277,7 @@ Yancy::Plugin::Form::Bootstrap4 - Generate forms using Bootstrap 4
 
 =head1 VERSION
 
-version 1.050
+version 1.051
 
 =head1 SYNOPSIS
 

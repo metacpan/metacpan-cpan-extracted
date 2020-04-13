@@ -1,47 +1,12 @@
-Revision history for Perl extension Data::Dumper::AutoEncode
+## Data-Dumper-AutoEncode commit log
 
-0.108   Fri Sep 15 08:16:32 JST 2017
-        do not double encode
-        refactor script: edumper
+https://github.com/bayashi/Data-Dumper-AutoEncode/commits/master
 
-0.107   Mon Dec 28 18:54:12 JST 2015
-        add POD for edumper script
+## Tags
 
-0.106   Tue Nov 17 17:14:41 JST 2015
-        fix to treate a numeric value correctly
-        fix packaging
+https://github.com/bayashi/Data-Dumper-AutoEncode/tags
 
-0.105   Fri Oct 16 10:38:55 JST 2015
-        fix `edumper` for a huge dump
+## Last Release
 
-0.104   Thu Oct  8 09:35:49 JST 2015
-        [no code change]
-        add the `edumper` script for unescaping string which was escaped by Data::Dumper
-
-0.103   Sun Oct 14 15:50:00 JST 2012
-        [no code change]
-        fixed for kwalitee
-
-0.102   Tue Dec 20 19:03:00 JST 2011
-        [no code change]
-        added dependent module: parent
-
-0.101   Sun Dec 18 22:04:00 JST 2011
-        ooooooops, missed merge. removed duplicate variable.
-
-0.100   Sun Dec 18 22:03:00 JST 2011
-        [Note: this is an IMCOMPATIBLE CHANGE]
-        changed interface of `eDumper` method. be same as `Dumper`
-            fixed document
-            added(changed) tests
-
-0.012   Sun Dec 18 21:04:00 JST 2011
-        [no code change]
-        fixed code encoding
-
-0.011   Sun Dec 18 21:01:00 JST 2011
-        [no code change]
-        added POD: description
-
-0.01    Sun Dec 18 12:16:13 JST 2011
-        - original version
+1.00   Mon Apr 13 04:47:24 JST 2020
+    - https://github.com/bayashi/Data-Dumper-AutoEncode/compare/0.99...1.00

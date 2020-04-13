@@ -141,5 +141,7 @@ Simple Parser::send_message (...) : ALIAS(send_message_multiframe=1) {
 
 void Parser::reset ()
 
+uint16_t Parser::suggested_close_code ()
+
 void Parser::no_deflate ()
 

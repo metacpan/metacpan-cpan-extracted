@@ -15,7 +15,7 @@ use threads;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 # XXX
 # Items to export into callers namespace by default. Note: do not export
@@ -1430,11 +1430,13 @@ libnf C interface http://libnf.net/
 
 =head1 AUTHOR
 
-Tomas Podermanski, E<lt>tpoder@cis.vutbr.czE<gt>, Brno University of Technology
+Tomas Podermanski, E<lt>tpoder@vut.czE<gt>, Brno University of Technology
+NetX Networks a.s., E<lt>info@netx.as<gt>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2012 by Brno University of Technology
+Copyright (C) 2012 - 2019 by Brno University of Technology
+Copyright (C) 2020 by NetX Networks a.s.
 
 This library is free software; you can redistribute it and modify
 it under the same terms as Perl itself.

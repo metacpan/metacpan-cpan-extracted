@@ -14,7 +14,7 @@ my @tests = (
     { cmd => [ '--verbose', '-g', '-s', '--oauth2-bearer','someWeirdStuff', '$url' ],
       version => '007061000',
     },
-    { cmd => [ '--verbose', '-g', '-s', '-A', 'www::mechanize/1.0', '$url' ],
+    { cmd => [ '--verbose', '-g', '-s', '--user-agent', 'www::mechanize/1.0', '$url' ],
     },
     { cmd => [ '--verbose', '-s', '-g', '$url', '--header', 'X-Test: test' ] },
 );

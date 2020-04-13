@@ -59,15 +59,15 @@
    "provides" : {
       "Docker::CLI::Wrapper" : {
          "file" : "lib/Docker/CLI/Wrapper.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.5"
       },
       "Docker::CLI::Wrapper::Base" : {
          "file" : "lib/Docker/CLI/Wrapper/Base.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.5"
       },
       "Docker::CLI::Wrapper::Container" : {
          "file" : "lib/Docker/CLI/Wrapper/Container.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.5"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://github.com/shlomif/Docker-CLI-Wrapper"
       }
    },
-   "version" : "0.0.4",
+   "version" : "0.0.5",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

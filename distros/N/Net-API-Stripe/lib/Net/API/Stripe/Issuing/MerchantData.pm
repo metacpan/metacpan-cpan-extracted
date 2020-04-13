@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/MerchantData.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -46,13 +46,27 @@ Net::API::Stripe::Issuing::MerchantData - A Stripe Merchant Data Object
 
 =head1 SYNOPSIS
 
+    my $data = $stripe->authorization->merchant_data({
+        # https://stripe.com/docs/issuing/categories
+        category => '8111',
+        city => 'Tokyo',
+        country => 'jp',
+        name => 'Big Corp, Inc',
+        network_id => $some_id,
+        postal_code => '123-4567',
+        state => undef,
+        url => 'https://store.example.com/12/service/advisory',
+    });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-This is used in C<Net::API::Stripe::Issuing::Authorization> object.
+This is used in L<Net::API::Stripe::Issuing::Authorization> object.
+
+This is instantiated by method B<merchant_data> in module L<Net::API::Stripe::Issuing::Authorization>, L<Net::API::Stripe::Issuing::Authorization::Transaction> and L<Net::API::Stripe::Issuing::Transaction>
 
 =head1 CONSTRUCTOR
 
@@ -60,18 +74,8 @@ This is used in C<Net::API::Stripe::Issuing::Authorization> object.
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Issuing::MerchantData> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -81,7 +85,7 @@ Toggles debug mode on/off
 
 =item B<category> string
 
-A categorization of the seller’s type of business. See our merchant categories guide for a list of possible values.
+A categorization of the seller’s type of business. See Stripe merchant categories guide (L<https://stripe.com/docs/issuing/categories>) for a list of possible values.
 
 =item B<city> string
 
@@ -116,7 +120,7 @@ The url an online purchase was made from
 =head1 API SAMPLE
 
 	{
-	  "id": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+	  "id": "iauth_fake123456789",
 	  "object": "issuing.authorization",
 	  "approved": true,
 	  "authorization_method": "online",
@@ -147,12 +151,12 @@ The url an online purchase was made from
 	  "status": "reversed",
 	  "transactions": [
 		{
-		  "id": "ipi_1DPqmFCeyNCl6fY2ve8MAJJu",
+		  "id": "ipi_fake123456789",
 		  "object": "issuing.transaction",
 		  "amount": -100,
-		  "authorization": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+		  "authorization": "iauth_fake123456789",
 		  "balance_transaction": null,
-		  "card": "ic_1DPqmFCeyNCl6fY2bHuXx2E3",
+		  "card": "ic_fake123456789",
 		  "cardholder": null,
 		  "created": 1540642827,
 		  "currency": "usd",
@@ -174,12 +178,12 @@ The url an online purchase was made from
 		  "type": "capture"
 		},
 		{
-		  "id": "ipi_1DPqmFCeyNCl6fY2wlCERJ4S",
+		  "id": "ipi_fake123456789",
 		  "object": "issuing.transaction",
 		  "amount": -100,
-		  "authorization": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+		  "authorization": "iauth_fake123456789",
 		  "balance_transaction": null,
-		  "card": "ic_1DPqmFCeyNCl6fY290pxaFhn",
+		  "card": "ic_fake123456789",
 		  "cardholder": null,
 		  "created": 1540642827,
 		  "currency": "usd",
@@ -228,7 +232,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

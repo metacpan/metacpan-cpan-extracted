@@ -10,9 +10,6 @@ with qw[Pcore::App::API::Role::Admin::Settings];
 const our $API_NAMESPACE_PERMS => $PERMS_ADMIN;
 
 around API_update => sub ( $orig, $self, $auth, $args ) {
-
-    # $args->{use_proxy} = SQL_BOOL $args->{use_proxy} if defined $args->{use_proxy};
-
     return $self->$orig( $auth, $args );
 };
 
@@ -25,7 +22,7 @@ around API_update => sub ( $orig, $self, $auth, $args ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 4                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 21                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 25 does not match the package declaration       |
+## |    1 | 18                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 22 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

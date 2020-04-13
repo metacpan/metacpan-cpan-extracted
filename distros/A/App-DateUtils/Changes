@@ -1,3 +1,8 @@
+0.125   2020-01-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: strftimeq.
+
+
 0.124   2020-01-31  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utility: strftime.

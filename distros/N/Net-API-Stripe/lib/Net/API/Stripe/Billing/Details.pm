@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Details.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -35,9 +35,22 @@ __END__
 
 =head1 NAME
 
-Net::API::Stripe::Balance - An interface to Stripe API
+Net::API::Stripe::Billing::Details - An interface to Stripe API
 
 =head1 SYNOPSIS
+
+    my $billing_details = $stripe->charge->billing_details({
+    	address => $stripe->address({
+    		line1 => '1-2-3 Kudan-Manami, Chiyoda-ku',
+    		line2 => 'Big Bldg, 12F',
+    		city => 'Tokyo',
+    		postal_code => '123-4567',
+    		country => 'jp',
+    	}),
+    	email => 'john.doe@example.com',
+    	name => 'John Doe',
+    	phone => '+81-90-1234-5678',
+    });
 
 =head1 VERSION
 
@@ -45,24 +58,16 @@ Net::API::Stripe::Balance - An interface to Stripe API
 
 =head1 DESCRIPTION
 
+This is created by method B<billing_details> L<Net::API::Stripe::Charge> or by method B<billing_details> in L<Net::API::Stripe::Payment::Method> and capture the billing details
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Billing::Details> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -74,7 +79,7 @@ Toggles debug mode on/off
 
 Billing address.
 
-This is a C<Net::API::Stripe::Address> object.
+This is a L<Net::API::Stripe::Address> object.
 
 =item B<email> string
 
@@ -118,7 +123,7 @@ Billing phone number (including extension).
 		"country": "US",
 		"exp_month": 8,
 		"exp_year": 2020,
-		"fingerprint": "x18XyLUPM6hub5xz",
+		"fingerprint": "xksmmnsnmhfjskhjh",
 		"funding": "credit",
 		"generated_from": null,
 		"last4": "4242",
@@ -154,7 +159,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

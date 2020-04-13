@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Person.pm
-## Version 0.2
+## Version 0.1
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
@@ -42,27 +42,28 @@ sub dob
 	{
 		## There may be a hash provided with undefined values for each of the properties, so we need to check that
 		my $ref = shift( @_ );
-		my $ok = 0;
-		for( qw( year month day ) )
-		{
-			$ok++, last if( $ref->{ $_ } );
-		}
-		## No need to go further
-		return if( !$ok );
-		
-		foreach my $k ( qw( year month day ) )
-		{
-			return( $self->error( "Hash provided for person date of birth is missing the $k property" ) ) if( !$ref->{ $k } );
-		}
-		@$ref{ qw( hour minute second ) } = ( 0, 0, 0 );
 		my $dt;
-		try
+		if( $self->_is_object( $ref ) && $ref->isa( 'DateTime' ) )
 		{
-			$dt = DateTime->new( %$ref );
+			$dt = $ref;
 		}
-		catch( $e )
+		elsif( $self->_is_hash( $ref ) )
 		{
-			return( $self->error( "An error occurred while trying to create a datetime object from this person's date of birth (year = '$ref->{year}', month = '$ref->{month}', day = '$ref->{day}'." ) );
+			return if( !length( $ref->{year} ) && !length( $ref->{month} ) && !length( $ref->{day} ) );
+		
+			foreach my $k ( qw( year month day ) )
+			{
+				return( $self->error( "Hash provided for person date of birth is missing the $k property" ) ) if( !$ref->{ $k } );
+			}
+			@$ref{ qw( hour minute second ) } = ( 0, 0, 0 );
+			try
+			{
+				$dt = DateTime->new( %$ref );
+			}
+			catch( $e )
+			{
+				return( $self->error( "An error occurred while trying to create a datetime object from this person's date of birth (year = '$ref->{year}', month = '$ref->{month}', day = '$ref->{day}'." ) );
+			}
 		}
 		my $fmt = DateTime::Format::Strptime->new(
 			pattern => '%Y-%m-%d',
@@ -119,6 +120,33 @@ Net::API::Stripe::Connect::Person - A Stripe Person Object
 
 =head1 SYNOPSIS
 
+    my $pers = $stripe->person({
+        account => $account_object,
+        address => $address_object,
+        address_kana => $address_kana_object,
+        address_kanji => $address_kanji_object,
+        # or:
+        # dob => DateTime->new( year => 1985, month => 8, day => 15 )
+        dob => 
+        {
+        	day => 15
+        	month => 8,
+        	year => 1985,
+        },
+        email => 'nadeshiko.yamato@example.com',
+        first_name => 'Nadeshiko',
+        last_name => 'Yamato',
+        first_name_kana => 'なでしこ',
+        last_name_kana => 'やまと',
+        first_name_kanji => '撫子',
+        last_name_kanji => '大和',
+        gender => 'female',
+        metadata => { transaction_id => 123, customer_id => 456 },
+        phone => '+81-(0)90-1234-5678',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.2
@@ -133,18 +161,8 @@ This is an object representing a person associated with a Stripe account.
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Person> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -162,35 +180,35 @@ String representing the object’s type. Objects of the same type share the same
 
 =item B<account> string
 
-The account the person is associated with. If expanded (currently not implemented in Stripe API), this will be a C<Net::API::Stripe::Connect::Account> object.
+The account the person is associated with. If expanded (currently not implemented in Stripe API), this will be a L<Net::API::Stripe::Connect::Account> object.
 
 =item B<address> hash
 
 The person’s address.
 
-This is C<Net::API::Stripe::Address> object.
+This is L<Net::API::Stripe::Address> object.
 
 =item B<address_kana> hash
 
 The Kana variation of the person’s address (Japan only).
 
-This is C<Net::API::Stripe::Address> object.
+This is L<Net::API::Stripe::Address> object.
 
 =item B<address_kanji> hash
 
 The Kanji variation of the person’s address (Japan only).
 
-This is C<Net::API::Stripe::Address> object.
+This is L<Net::API::Stripe::Address> object.
 
 =item B<created> timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<dob> hash
+=item B<dob> L<DateTime> object or hash
 
 The person’s date of birth.
 
-This is a C<DateTime> object.
+This returns a C<DateTime> object. It can take either a L<DateTime> object or an hash with the following properties:
 
 =over 8
 
@@ -260,13 +278,13 @@ The person’s phone number.
 
 Describes the person’s relationship to the account.
 
-This is a C<Net::API::Stripe::Connect::Account::Relationship> object.
+This is a L<Net::API::Stripe::Connect::Account::Relationship> object.
 
 =item B<requirements> hash
 
 Information about the requirements for this person, including what information needs to be collected, and by when.
 
-This is a C<Net::API::Stripe::Connect::Account::Requirements> object.
+This is a L<Net::API::Stripe::Connect::Account::Requirements> object.
 
 =item B<ssn_last_4_provided> boolean
 
@@ -276,16 +294,16 @@ Whether the last 4 digits of this person’s SSN have been provided.
 
 The persons’s verification status.
 
-This is a C<Net::API::Stripe::Connect::Account::Verification> object.
+This is a L<Net::API::Stripe::Connect::Account::Verification> object.
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "person_G1oOYsyChrE4Qa",
+	  "id": "person_fake123456789",
 	  "object": "person",
-	  "account": "acct_19eGgRCeyNCl6fY2",
+	  "account": "acct_fake123456789",
 	  "created": 1571602397,
 	  "dob": {
 		"day": null,
@@ -337,6 +355,10 @@ This is a C<Net::API::Stripe::Connect::Account::Verification> object.
 
 Initial version
 
+=head2 v0.2
+
+Update the method B<dob> to accept L<DateTime> objects
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
@@ -349,7 +371,7 @@ L<https://stripe.com/docs/api/persons/object>, L<https://stripe.com/docs/connect
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

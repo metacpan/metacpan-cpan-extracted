@@ -1,5 +1,5 @@
 package Test::PerlTidy;
-$Test::PerlTidy::VERSION = '20190402';
+$Test::PerlTidy::VERSION = '20200412';
 use 5.014;
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use vars qw( @EXPORT );    ## no critic (Modules::ProhibitAutomaticExportation)
 @EXPORT = qw( run_tests );
 
 use Carp qw( croak );
-use Path::Tiny qw( path );
+use Path::Tiny 0.100 qw( path );
 use File::Spec ();
 use IO::File   ();
 use Perl::Tidy 20181120;
@@ -24,6 +24,10 @@ our $MUTE = 0;
 
 sub run_tests {
     my %args = @_;
+    my @opts;
+    if ( my $perltidy_options = delete( $args{perltidy_options} ) ) {
+        push @opts, +{ perltidy_options => $perltidy_options, };
+    }
 
     # Skip all tests if instructed to.
     $test->skip_all('All tests skipped.') if $args{skip_all};
@@ -36,15 +40,17 @@ sub run_tests {
 
     # Check each file in turn.
     foreach my $file (@files) {
-        $test->ok( is_file_tidy( $file, $args{perltidyrc} ), "'$file'" );
+        $test->ok( is_file_tidy( $file, $args{perltidyrc}, @opts, ),
+            "'$file'" );
     }
 
     return;
 }
 
 sub is_file_tidy {
-    my ( $file_to_tidy, $perltidyrc ) = @_;
+    my ( $file_to_tidy, $perltidyrc, $named_args ) = @_;
 
+    $named_args //= { perltidy_options => {}, };
     my $code_to_tidy = load_file($file_to_tidy);
 
     my $tidied_code = q{};
@@ -61,6 +67,7 @@ sub is_file_tidy {
         logfile     => \$logfile,
         errorfile   => \$errorfile,
         perltidyrc  => $perltidyrc,
+        %{ $named_args->{perltidy_options} },
     );
 
     # If there were perltidy errors report them and return.
@@ -188,7 +195,7 @@ Test::PerlTidy
 
 =head1 VERSION
 
-version 20190402
+version 20200412
 
 =head1 SYNOPSIS
 
@@ -223,10 +230,6 @@ a test fail unless it is exactly as perltidy would like it to be.
 =head1 NAME
 
 Test::PerlTidy - check that all your files are tidy.
-
-=head1 VERSION
-
-version 20190402
 
 =head1 REASONS TO DO THIS
 
@@ -325,6 +328,11 @@ true value to turn off that diagnostic output.
 
 Set C<skip_all> to a true value to skip all tests.  Default is false.
 
+=item perltidy_options
+
+Pass these to Perl::Tidy::perltidy().
+(Added in version 20200411 .)
+
 =back
 
 =head2 list_files ( [ I<start_path> | I<%args> ] )
@@ -336,9 +344,13 @@ Generate the list of files to be tested.  Generally not called directly.
 Load the file to be tested from disk and return the contents.
 Generally not called directly.
 
-=head2 is_file_tidy ( I<path_to_file> [ , I<path_to_perltidyrc> ] )
+=head2 is_file_tidy ( I<path_to_file> [ , I<path_to_perltidyrc> ] [, I<$named_args>] )
 
 Test if a file is tidy or not.  Generally not called directly.
+
+$named_args can be a hash ref which may have a key called 'perltidy_options'
+that refers to a hash ref of options that will be passed to Perl::Tidy::perltidy().
+($named_args was added in version 20200411).
 
 =head1 SEE ALSO
 
@@ -377,7 +389,7 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Edmund von der Burg.
+This software is copyright (c) 2020 by Edmund von der Burg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

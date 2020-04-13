@@ -17,6 +17,7 @@ t/07-aggegate.t
 t/08-findfree.t
 t/09-relations.t
 t/10-errors.t
+t/11-subclassing.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

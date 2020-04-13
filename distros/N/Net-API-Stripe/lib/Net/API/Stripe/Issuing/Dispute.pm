@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Dispute.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -53,6 +53,19 @@ Net::API::Stripe::Issuing::Dispute - A Stripe Issued Card Transaction Dispute Ob
 
 =head1 SYNOPSIS
 
+    my $dispute = $stripe->issuing_dispute({
+        amount => 2000,
+        currency => 'jpy',
+        disputed_transaction => $issuing_transaction_object,
+        evidence => $dispute_evidence_object,
+        livemode => $stripe->false,
+        metadata => { transaction_id => 123 },
+        reason => 'Something went wrong',
+        status => 'lost',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -61,7 +74,7 @@ Net::API::Stripe::Issuing::Dispute - A Stripe Issued Card Transaction Dispute Ob
 
 As a card issuer (L<https://stripe.com/docs/issuing>), you can dispute transactions (L<https://stripe.com/docs/issuing/disputes>) that you do not recognize, suspect to be fraudulent, or have some other issue.
 
-This module looks similar to the C<Net::API::Stripe::Dispute> and has overlapping fields, but the B<event> method points to different modules, so it is by design that there are 2 <*::Dispute::Evidence> modules.
+This module looks similar to the L<Net::API::Stripe::Dispute> and has overlapping fields, but the B<event> method points to different modules, so it is by design that there are 2 <*::Dispute::Evidence> modules.
 
 =head1 CONSTRUCTOR
 
@@ -69,18 +82,8 @@ This module looks similar to the C<Net::API::Stripe::Dispute> and has overlappin
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Issuing::Dispute> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -112,13 +115,13 @@ The currency the disputed_transaction was made in.
 
 The transaction being disputed.
 
-When expanded, this is a C<Net::API::Stripe::Issuing::Transaction> object.
+When expanded, this is a L<Net::API::Stripe::Issuing::Transaction> object.
 
 =item B<evidence> hash
 
 Evidence related to the dispute. This hash will contain exactly one non-null value, containing an evidence object that matches its reason
 
-This is a C<Net::API::Stripe::Issuing::Dispute::Evidence> object.
+This is a L<Net::API::Stripe::Issuing::Dispute::Evidence> object.
 
 =item B<livemode> boolean
 
@@ -141,12 +144,12 @@ Current status of dispute. One of lost, under_review, unsubmitted, or won.
 =head1 API SAMPLE
 
 	{
-	  "id": "idp_1FVF3MCeyNCl6fY2U60c43Sz",
+	  "id": "idp_fake123456789",
 	  "object": "issuing.dispute",
 	  "amount": 100,
 	  "created": 1571480456,
 	  "currency": "usd",
-	  "disputed_transaction": "ipi_1FVF3MCeyNCl6fY2uC8uNvgo",
+	  "disputed_transaction": "ipi_fake123456789",
 	  "evidence": {
 		"fraudulent": {
 		  "dispute_explanation": "Fraud; card reported lost on 10/19/2019",
@@ -178,7 +181,7 @@ L<https://stripe.com/docs/api/issuing/disputes>, L<https://stripe.com/docs/issui
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

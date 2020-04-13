@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth;
-our $VERSION = '1.050';
+our $VERSION = '1.051';
 # ABSTRACT: Add one or more authentication plugins to your site
 
 #pod =head1 SYNOPSIS
@@ -149,6 +149,11 @@ our $VERSION = '1.050';
 #pod Validate there is a logged-in user and optionally that the user data has
 #pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 #pod
+#pod =head2 yancy.auth.login_form
+#pod
+#pod Return an HTML string containing the rendered login forms for all
+#pod configured auth plugins, in order.
+#pod
 #pod =head2 yancy.auth.logout
 #pod
 #pod Log out any current account from any auth plugin.
@@ -165,14 +170,18 @@ our $VERSION = '1.050';
 #pod
 #pod =head1 TEMPLATES
 #pod
-#pod =head2 yancy/auth/login.html.ep
+#pod =head2 yancy/auth/login_form.html.ep
 #pod
 #pod This displays all of the login forms for all of the configured plugins
 #pod (if the plugin has a login form).
 #pod
+#pod =head2 yancy/auth/login_page.html.ep
+#pod
+#pod This displays the login form on a page directing the user to log in.
+#pod
 #pod =head2 layouts/yancy/auth.html.ep
 #pod
-#pod The layout that Yancy uses when displaying the login form, the
+#pod The layout that Yancy uses when displaying the login page, the
 #pod unauthorized error message, and other auth-related pages.
 #pod
 #pod =head1 SEE ALSO
@@ -256,6 +265,9 @@ sub register {
     $app->helper(
         'yancy.auth.logout' => currym( $self, 'logout' ),
     );
+    $app->helper(
+        'yancy.auth.login_form' => currym( $self, 'login_form' ),
+    );
     # Make this route after all the plugin routes so that it matches
     # last.
     $self->route( $app->yancy->routify(
@@ -263,7 +275,7 @@ sub register {
         $app->routes->get( '/yancy/auth' ),
     ) );
     $self->route->get( '/logout' )->to( cb => currym( $self, '_handle_logout' ) )->name( 'yancy.auth.logout' );
-    $self->route->get( '' )->to( cb => currym( $self, 'login_form' ) )->name( 'yancy.auth.login' );
+    $self->route->get( '' )->to( cb => currym( $self, '_login_page' ) )->name( 'yancy.auth.login' );
 }
 
 #pod =method current_user
@@ -295,14 +307,24 @@ sub plugins {
 
 #pod =method login_form
 #pod
-#pod Render the login form template for inclusion in L<Yancy::Plugin::Auth>.
+#pod     %= $c->yancy->auth->login_form
+#pod
+#pod Return the rendered login form template.
 #pod
 #pod =cut
 
 sub login_form {
     my ( $self, $c ) = @_;
+    return $c->render_to_string(
+        template => 'yancy/auth/login_form',
+        plugins => $self->_plugins,
+    );
+}
+
+sub _login_page {
+    my ( $self, $c ) = @_;
     $c->render(
-        template => 'yancy/auth/login',
+        template => 'yancy/auth/login_page',
         plugins => $self->_plugins,
     );
 }
@@ -337,7 +359,7 @@ Yancy::Plugin::Auth - Add one or more authentication plugins to your site
 
 =head1 VERSION
 
-version 1.050
+version 1.051
 
 =head1 SYNOPSIS
 
@@ -404,7 +426,9 @@ Returns the list of configured auth plugins.
 
 =head2 login_form
 
-Render the login form template for inclusion in L<Yancy::Plugin::Auth>.
+    %= $c->yancy->auth->login_form
+
+Return the rendered login form template.
 
 =head2 logout
 
@@ -504,6 +528,11 @@ C<undef> if no user was found in the session.
 Validate there is a logged-in user and optionally that the user data has
 certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 
+=head2 yancy.auth.login_form
+
+Return an HTML string containing the rendered login forms for all
+configured auth plugins, in order.
+
 =head2 yancy.auth.logout
 
 Log out any current account from any auth plugin.
@@ -520,14 +549,18 @@ Log out of all configured auth plugins.
 
 =head1 TEMPLATES
 
-=head2 yancy/auth/login.html.ep
+=head2 yancy/auth/login_form.html.ep
 
 This displays all of the login forms for all of the configured plugins
 (if the plugin has a login form).
 
+=head2 yancy/auth/login_page.html.ep
+
+This displays the login form on a page directing the user to log in.
+
 =head2 layouts/yancy/auth.html.ep
 
-The layout that Yancy uses when displaying the login form, the
+The layout that Yancy uses when displaying the login page, the
 unauthorized error message, and other auth-related pages.
 
 =head1 SEE ALSO

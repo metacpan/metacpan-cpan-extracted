@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Terminal/Reader.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -19,23 +19,25 @@ BEGIN
     our( $VERSION ) = '0.1';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub device_sw_version { shift->_set_get_scalar( 'device_sw_version', @_ ); }
+sub device_sw_version { return( shift->_set_get_scalar( 'device_sw_version', @_ ) ); }
 
-sub device_type { shift->_set_get_scalar( 'device_type', @_ ); }
+sub device_type { return( shift->_set_get_scalar( 'device_type', @_ ) ); }
 
-sub ip_address { shift->_set_get_scalar( 'ip_address', @_ ); }
+sub ip_address { return( shift->_set_get_scalar( 'ip_address', @_ ) ); }
 
-sub label { shift->_set_get_scalar( 'label', @_ ); }
+sub label { return( shift->_set_get_scalar( 'label', @_ ) ); }
 
-sub location { shift->_set_get_scalar( 'location', @_ ); }
+sub location { return( shift->_set_get_scalar( 'location', @_ ) ); }
 
-sub serial_number { shift->_set_get_scalar( 'serial_number', @_ ); }
+sub registration_code { return( shift->_set_get_scalar( 'registration_code', @_ ) ); }
 
-sub status { shift->_set_get_scalar( 'status', @_ ); }
+sub serial_number { return( shift->_set_get_scalar( 'serial_number', @_ ) ); }
+
+sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
 1;
 
@@ -48,6 +50,19 @@ __END__
 Net::API::Stripe::Terminal::Reader - A Stripe Terminal Reader Object
 
 =head1 SYNOPSIS
+
+    my $reader = $stripe->reader({
+        device_sw_version => '1.0.2',
+        device_type => 'verifone_P400',
+        ip_address => '1.2.3.4',
+        label => 'Blue Rabbit',
+        # Anywhere
+        location => undef,
+        registration_code => 'puppies-plug-could',
+        serial_number => '123-456-789',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
 
 =head1 VERSION
 
@@ -63,18 +78,8 @@ A Reader represents a physical device for accepting payment details.
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Terminal::Reader> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -104,11 +109,11 @@ The local IP address of the reader.
 
 =item B<label> string
 
-Custom label given to the reader for easier identification.
+Custom label given to the reader for easier identification. If no label is specified, the registration code will be used.
 
 =item B<location> string
 
-The location identifier of the reader.
+The location to assign the reader to. If no location is specified, the reader will be assigned to the account’s default location.
 
 =item B<serial_number> string
 
@@ -129,9 +134,12 @@ The networking status of the reader.
 	  "device_type": "verifone_P400",
 	  "ip_address": "192.168.2.2",
 	  "label": "Blue Rabbit",
-	  "location": null,
+	  "livemode": false,
+	  "location": "tml_1234",
+	  "metadata": {},
 	  "serial_number": "123-456-789",
-	  "status": "online"
+	  "status": "online",
+	  "registration_code": "puppies-plug-could"
 	}
 
 =head1 HISTORY
@@ -152,7 +160,7 @@ L<https://stripe.com/docs/api/terminal/readers>, L<https://stripe.com/docs/termi
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

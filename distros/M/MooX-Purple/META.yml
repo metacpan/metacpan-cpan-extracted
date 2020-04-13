@@ -20,11 +20,12 @@ no_index:
     - t
     - inc
 requires:
+  Data::LnArray: '0.02'
   Keyword::Declare: '0.001017'
   Moo: '2.003004'
   MooX::LazierAttributes: '1.07008'
   MooX::ValidateSubs: '1.012005'
   Perl::Tidy: '20200110'
   perl: '5.018'
-version: '0.14'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

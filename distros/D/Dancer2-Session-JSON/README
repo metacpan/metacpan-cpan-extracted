@@ -2,7 +2,7 @@ NAME
     Dancer2::Session::JSON - Dancer 2 session storage in files with JSON
 
 VERSION
-    version 0.002
+    version 0.003
 
 DESCRIPTION
     This module implements Dancer 2 session engine based on JSON files.
@@ -46,8 +46,10 @@ SUPPORT
 AUTHOR
     David Golden <dagolden@cpan.org>
 
-CONTRIBUTOR
-    Jason A. Crome <jason@crome-plated.com>
+CONTRIBUTORS
+    *   Jason A. Crome <jason@crome-plated.com>
+
+    *   Sawyer X <xsawyerx@cpan.org>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2013 by David Golden.

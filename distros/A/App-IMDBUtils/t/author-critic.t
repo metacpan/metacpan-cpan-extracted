@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.003
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/IMDBUtils.pm','script/parse-imdb-title-page'];
+my $filenames = ['lib/App/IMDBUtils.pm','script/parse-imdb-title-page','script/search-imdb-title-id-by-title'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

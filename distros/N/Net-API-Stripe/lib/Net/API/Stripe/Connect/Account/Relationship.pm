@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Relationship.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -42,6 +42,15 @@ Net::API::Stripe::Connect::Account::Relationship - A Stripe Account Relationship
 
 =head1 SYNOPSIS
 
+    my $rel = $stripe->person->relationship({
+        director => $stripe->true,
+        executive => $stripe->true,
+        owner => $stripe->true,
+        percent_ownership => 33,
+        representative => $stripe->true,
+        title => 'Representative Director',
+    });
+
 =head1 VERSION
 
     0.1
@@ -56,18 +65,10 @@ Describes the person’s relationship to the account.
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Relationship> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+This is instantiated from the method B<relationship> in module L<Net::API::Stripe::Connect::Person>
 
 =back
 
@@ -104,9 +105,9 @@ The person’s title (e.g., CEO, Support Engineer).
 =head1 API SAMPLE
 
 	{
-	  "id": "person_G1oOYsyChrE4Qa",
+	  "id": "person_fake123456789",
 	  "object": "person",
-	  "account": "acct_19eGgRCeyNCl6fY2",
+	  "account": "acct_fake123456789",
 	  "created": 1571602397,
 	  "dob": {
 		"day": null,
@@ -170,7 +171,7 @@ L<https://stripe.com/docs/api/persons/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

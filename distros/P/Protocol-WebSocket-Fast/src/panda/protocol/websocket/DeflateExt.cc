@@ -245,15 +245,8 @@ string& DeflateExt::compress(string& str, bool final) {
 
 bool DeflateExt::uncompress(Frame& frame) {
     bool r;
-    if (frame.error) r = false;
-    else if (frame.is_control()) {
-        frame.error = errc::control_frame_compression;
-        r = false;
-    }
-    else if (frame.payload_length() == 0) r = true;
-    else {
-        r = uncompress_impl(frame);
-    }
+    if (frame.payload_length() == 0) r = true;
+    else                             r = uncompress_impl(frame);
     // reset stream in case of a) error and b) when it was last frame of message
     // and there was setting to do not use
     if(!r || (frame.final() && reset_after_rx)) reset_rx();

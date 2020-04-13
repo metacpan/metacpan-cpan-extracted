@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Customer/TaxId.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -51,13 +51,22 @@ Net::API::Stripe::Customer::TaxId - A Customer Tax ID object
 
 =head1 SYNOPSIS
 
+    my $tax_id = $stripe->tax_id({
+        country => 'jp',
+        customer => $customer_object,
+        type => 'eu_vat',
+        value => 'EU123456789',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-You can add one or multiple tax IDs to a customer (C<Net::API::Stripe::Customer> / L<https://stripe.com/docs/api/customers>). A customer's tax IDs are displayed on invoices and credit notes issued for the customer.
+You can add one or multiple tax IDs to a customer (L<Net::API::Stripe::Customer> / L<https://stripe.com/docs/api/customers>). A customer's tax IDs are displayed on invoices and credit notes issued for the customer.
 
 =head1 CONSTRUCTOR
 
@@ -65,18 +74,8 @@ You can add one or multiple tax IDs to a customer (C<Net::API::Stripe::Customer>
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Customer::TaxId> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -102,7 +101,7 @@ Time at which the object was created. Measured in seconds since the Unix epoch.
 
 =item B<customer> string (expandable)
 
-ID of the customer. When expanded, this is a C<Net::API::Stripe::Customer> object.
+ID of the customer. When expanded, this is a L<Net::API::Stripe::Customer> object.
 
 =item B<livemode> boolean
 
@@ -118,18 +117,18 @@ Value of the tax ID.
 
 =item B<verification> object
 
-Tax ID verification information. This is a C<Net::API::Stripe::Customer::TaxInfoVerification> object.
+Tax ID verification information. This is a L<Net::API::Stripe::Customer::TaxInfoVerification> object.
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "txi_123456789",
+	  "id": "txi_fake123456789",
 	  "object": "tax_id",
 	  "country": "DE",
 	  "created": 123456789,
-	  "customer": "cus_Eky0BeTYmSj9pa",
+	  "customer": "cus_fake123456789",
 	  "livemode": false,
 	  "type": "eu_vat",
 	  "value": "DE123456789",
@@ -154,11 +153,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Stripe API documentation:
 
-L<https://stripe.com/docs/api/customer_tax_ids>, L<https://stripe.com/docs/billing/taxes/tax-ids>
+L<https://stripe.com/docs/api/customer_tax_ids>, L<https://stripe.com/docs/billing/taxes/tax-ids>, L<https://en.wikipedia.org/wiki/VAT_identification_number>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

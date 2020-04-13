@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe.pm
-## Version 0.8
+## Version 0.9
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/07/19
-## Modified 2020/03/29
+## Modified 2020/04/13
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,14 +39,7 @@ BEGIN
 	use File::Spec;
 	use Cwd ();
 	use DateTime;
-# 	use Net::API::Stripe::Billing;
-# 	use Net::API::Stripe::Connect;
-# 	use Net::API::Stripe::Fraud;
-# 	use Net::API::Stripe::Issuing;
-# 	use Net::API::Stripe::Orders;
-# 	use Net::API::Stripe::Payment;
-# 	use Net::API::Stripe::Sigma;
-# 	use Net::API::Stripe::Terminal;
+	use DateTime::Format::Strptime;
 	use TryCatch;
 	use Want;
 	use Digest::SHA ();
@@ -54,7 +47,7 @@ BEGIN
 	use Devel::Confess;
 	use constant API_BASE => 'https://api.stripe.com/v1';
 	use constant STRIPE_WEBHOOK_SOURCE_IP => [qw( 54.187.174.169 54.187.205.235 54.187.216.72 54.241.31.99 54.241.31.102 54.241.34.107 )];
-	our $VERSION = '0.8';
+	our $VERSION = '0.9';
 };
 
 {
@@ -266,8 +259,8 @@ BEGIN
 	returns 				=> 'Net::API::Stripe::Order::Returns',
 	reversals 				=> 'Net::API::Stripe::Connect::Transfer::Reversals',
 	review 					=> 'Net::API::Stripe::Fraud::Review',
+	review_session 			=> 'Net::API::Stripe::Fraud::Review::Session',
 	scheduled_query_run 	=> 'Net::API::Stripe::Sigma::ScheduledQueryRun',
-	session 				=> 'Net::API::Stripe::Session',
 	settings 				=> 'Net::API::Stripe::Connect::Account::Settings',
 	setup_intent 			=> 'Net::API::Stripe::Payment::Intent::Setup',
 	shipping				=> 'Net::API::Stripe::Shipping',
@@ -389,7 +382,8 @@ BEGIN
 	dispute					=>
 		{
 		charge => 'charge',
-		disputed_transaction => 'balance_transaction',
+		# "This property cannot be expanded (latest_invoice.charge.dispute.disputed_transaction)"
+		# disputed_transaction => 'balance_transaction',
 		},
 	event					=> {},
 	fee_refund				=>
@@ -790,6 +784,134 @@ sub balance_transaction_retrieve
 }
 
 sub bank_account { return( shift->_response_to_object( 'Net::API::Stripe::Connect::ExternalAccount::Bank', @_ ) ); }
+
+sub bank_accounts
+{
+	my $self = shift( @_ );
+	my $action = shift( @_ );
+	my $allowed = [qw( create retrieve update delete list )];
+	my $meth = $self->_get_method( 'bank_account', $action, $allowed ) || return;
+	return( $self->$meth( @_ ) );
+}
+
+sub bank_account_create
+{
+	my $self = shift( @_ );
+	return( $self->error( "No parameters were provided to create a bank account" ) ) if( !scalar( @_ ) );
+	my $args = $self->_get_args_from_object( 'Net::API::Stripe::Connect::ExternalAccount::Bank', @_ );
+	my $okParams = 
+	{
+	expandable			=> { allowed => $EXPANDABLES->{bank_account} },
+	external_account	=> {},
+	account				=> { re => qr/^\w+$/, required => 1 },
+	metadata 			=> { type => 'hash' },
+	default_for_currency => {},
+	};
+	if( $self->_is_hash( $args->{external_account} ) )
+	{
+		$okParams->{external_account} =
+		{
+		type => 'hash',
+		fields => [qw( object! country! currency! account_holder_name account_holder_type routing_number account_number! )],
+		};
+	}
+	else
+	{
+		$okParams->{external_account} = { type => 'scalar', re => qr/^\w+$/ };
+	}
+	my $id = $args->{account};
+	my $err = $self->_check_parameters( $okParams, $args );
+	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	my $hash = $self->post( "accounts/${id}/external_accounts", $args ) || return;
+	return( $self->_response_to_object( 'Net::API::Stripe::Connect::ExternalAccount::Bank', $hash ) );
+}
+
+sub bank_account_delete
+{
+	my $self = shift( @_ );
+	return( $self->error( "No parameters were provided to delete a bank account information." ) ) if( !scalar( @_ ) );
+	my $args = $self->_get_args_from_object( 'Net::API::Stripe::Connect::ExternalAccount::Bank', @_ );
+	my $okParams = 
+	{
+	expandable => { allowed => $EXPANDABLES->{coupon} },
+	id 			=> { re => qr/^\w+$/, required => 1 },
+	account		=> { re => qr/^\w+$/, required => 1 },
+	};
+	my $err = $self->_check_parameters( $okParams, $args );
+	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	my $id = CORE::delete( $args->{id} ) || return( $self->error( "No bank account id was provided to delete its information." ) );
+	my $acct = CORE::delete( $args->{account} );
+	my $hash = $self->delete( "accounts/${acct}/external_accounts/${id}", $args ) || return;
+	return( $self->_response_to_object( 'Net::API::Stripe::Connect::ExternalAccount::Bank', $hash ) );
+}
+
+sub bank_account_list
+{
+	my $self = shift( @_ );
+	my $args = shift( @_ );
+	my $okParams = 
+	{
+	expandable		=> { allowed => $EXPANDABLES->{coupon} },
+	account			=> { re => qr/^\w+$/, required => 1 },
+	## "A cursor for use in pagination. ending_before is an object ID that defines your place in the list."
+	'ending_before' => qr/^\w+$/,
+	'limit' 		=> qr/^\d+$/,
+	'starting_after' => qr/^\w+$/,
+	};
+	my $err = $self->_check_parameters( $okParams, $args );
+	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	if( $args->{expand} )
+	{
+		$self->_adjust_list_expandables( $args ) || return;
+	}
+	my $hash = $self->get( 'coupons', $args ) || return;
+	return( $self->_response_to_object( 'Net::API::Stripe::List', $hash ) );
+}
+
+sub bank_account_retrieve
+{
+	my $self = shift( @_ );
+	return( $self->error( "No parameters were provided to retrieve a bank account information." ) ) if( !scalar( @_ ) );
+	my $args = $self->_get_args_from_object( 'Net::API::Stripe::Connect::ExternalAccount::Bank', @_ );
+	my $okParams = 
+	{
+	expandable	=> { allowed => $EXPANDABLES->{coupon} },
+	id 			=> { re => qr/^\w+$/, required => 1 },
+	account		=> { re => qr/^\w+$/, required => 1 },
+	};
+	my $err = $self->_check_parameters( $okParams, $args );
+	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	my $id = CORE::delete( $args->{id} ) || return( $self->error( "No bank account id was provided to retrieve its information." ) );
+	my $acct = CORE::delete( $args->{account} );
+	my $hash = $self->get( "accounts/${acct}/external_accounts/${id}", $args ) || return;
+	return( $self->_response_to_object( 'Net::API::Stripe::Connect::ExternalAccount::Bank', $hash ) );
+}
+
+sub bank_account_update
+{
+	my $self = shift( @_ );
+	return( $self->error( "No parameters were provided to update a bank account" ) ) if( !scalar( @_ ) );
+	my $args = $self->_get_args_from_object( 'Net::API::Stripe::Connect::ExternalAccount::Bank', @_ );
+	my $okParams = 
+	{
+	expandable 	=> { allowed => $EXPANDABLES->{coupon} },
+	id 			=> { re => qr/^\w+$/, required => 1 },
+	account		=> { re => qr/^\w+$/, required => 1 },
+	account_holder_name => {},
+	account_holder_type => { re => qr/^(company|individual)$/ },
+	default_for_currency => {},
+	## Return true only if there is an error
+	metadata 	=> { type => 'hash' },
+	};
+	## We found some errors
+	my $err = $self->_check_parameters( $okParams, $args );
+	# $self->message( 3, "Data to be posted: ", $self->dumper( $args ) ); exit;
+	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	my $id = CORE::delete( $args->{id} ) || return( $self->error( "No bank account id was provided to update coupon's details" ) );
+	my $acct = CORE::delete( $args->{account} );
+	my $hash = $self->post( "accounts/${acct}/external_accounts/${id}", $args ) || return;
+	return( $self->_response_to_object( 'Net::API::Stripe::Connect::ExternalAccount::Bank', $hash ) );
+}
 
 sub browser { return( shift->_set_get_scalar( 'browser', @_ ) ); }
 
@@ -1427,7 +1549,7 @@ sub credit_note_lines_preview
 {
 	my $self = shift( @_ );
 	my $args = $self->_get_args_from_object( 'Net::API::Stripe::Billing::CreditNote', @_ );
-	return( $self->error( "No credit note id was provided to retrieve its information." ) ) if( !CORE::length( $args->{id} ) );
+	# return( $self->error( "No credit note id was provided to retrieve its information." ) ) if( !CORE::length( $args->{id} ) );
 	return( $self->error( "No invoice id or object was provided." ) ) if( !CORE::length( $args->{invoice} ) );
 	if( $args->{_object} && 
 		$self->_is_object( $args->{_object}->{invoice} ) && 
@@ -1440,7 +1562,7 @@ sub credit_note_lines_preview
 	my $okParams = 
 	{
 	expandable			=> { allowed => $EXPANDABLES->{credit_note_lines} },
-	id 					=> { re => qr/^\w+$/, required => 1 },
+	# id 					=> { re => qr/^\w+$/, required => 1 },
 	invoice				=> { re => qr/^\w+$/, required => 1 },
 	amount				=> { re => qr/^\d+$/ },
 	credit_amount		=> { re => qr/^\d+$/ },
@@ -1742,6 +1864,8 @@ sub customer_update
 	expandable			=> { allowed => $EXPANDABLES->{customer} },
 	id 					=> { re => qr/^\w+$/, required => 1 },
 	account_balance 	=> { re => qr/^\d+$/ },
+	address				=> { fields => [qw( line1 line2 city postal_code state country )] },
+	balance				=> {},
 	## Anything goes
 	coupon 				=> {},
 	default_source 		=> { re => qr/^\w+$/ },
@@ -1749,10 +1873,16 @@ sub customer_update
 	email 				=> {},
 	## "The prefix for the customer used to generate unique invoice numbers. Must be 3–12 uppercase letters or numbers."
 	invoice_prefix 		=> { re => qr/^[A-Z0-9]{3,12}$/ },
+	invoice_settings	=> { fields => [qw( custom_fields default_payment_method footer )] },
 	## Return true only if there is an error
 	metadata 			=> { type => 'hash' },
+	name				=> {},
+	next_invoice_sequence => {},
+	phone				=> {},
+	preferred_locales	=> { type => 'array' },
 	shipping 			=> { fields => [qw( address name carrier phone tracking_number )] },
 	source 				=> { re => qr/^\w+$/ },
+	tax_exempt			=> { re => qr/^(none|exempt|reverse)$/ },
 	## "The customer’s tax ID number. This will be unset if you POST an empty value."
 	## "The type of ID number. The only possible value is vat"
 	tax_info 			=> { fields => [qw( tax_id type )] },
@@ -1855,17 +1985,18 @@ sub dispute_list
 	my $args = shift( @_ );
 	my $okParams = 
 	{
-	expandable		=> { allowed => $EXPANDABLES->{dispute}, data_prefix_is_ok => 1 },
-	'created'		=> qr/^\d+$/,
-	'created.gt' 	=> qr/^\d+$/,
-	'created.gte' 	=> qr/^\d+$/,
-	'created.lt' 	=> qr/^\d+$/,
-	'created.lte' 	=> qr/^\d+$/,
-	'email' 		=> qr/.*?/,
+	expandable			=> { allowed => $EXPANDABLES->{dispute}, data_prefix_is_ok => 1 },
+	'created'			=> { re => qr/^\d+$/ },
+	'created.gt' 		=> { re => qr/^\d+$/ },
+	'created.gte' 		=> { re => qr/^\d+$/ },
+	'created.lt' 		=> { re => qr/^\d+$/ },
+	'created.lte' 		=> { re => qr/^\d+$/ },
+	'charge' 			=> { re => qr/.*?/ },
 	## "A cursor for use in pagination. ending_before is an object ID that defines your place in the list."
-	'ending_before' => qr/^\w+$/,
-	'limit' 		=> qr/^\d+$/,
-	'starting_after' => qr/^\w+$/,
+	'ending_before' 	=> { re => qr/^\w+$/ },
+	'limit' 			=> { re => qr/^\d+$/ },
+	'payment_intent'	=> { re => qr/^\w+$/ },
+	'starting_after' 	=> { re => qr/^\w+$/ },
 	};
 	my $err = $self->_check_parameters( $okParams, $args );
 	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
@@ -1903,7 +2034,7 @@ sub dispute_update
 	{
 	expandable	=> { allowed => $EXPANDABLES->{dispute} },
 	id 			=> { re => qr/^\w+$/, required => 1 },
-	evidence	=> {},
+	evidence	=> { fields => [qw( access_activity_log billing_address cancellation_policy cancellation_policy_disclosure cancellation_rebuttal customer_communication customer_email_address customer_name customer_purchase_ip customer_signature duplicate_charge_documentation duplicate_charge_explanation duplicate_charge_id product_description receipt refund_policy refund_policy_disclosure refund_refusal_explanation service_date service_documentation shipping_address shipping_carrier shipping_date shipping_documentation shipping_tracking_number uncategorized_file uncategorized_text )] },
 	metadata 	=> { type => 'hash' },
 	submit		=> {},
 	};
@@ -2103,7 +2234,7 @@ sub invoices
 	## Stripe use this api end point uncollectible, but this is prone to mispelling and not easy to remember
 	## So we use write off and convert one into another transparently
 	$action = 'invoice_write_off' if( $action eq 'invoice_uncollectible' );
-	my $allowed = [qw( preview create delete finalise lines lines_upcoming invoice_write_off upcoming pay retrieve send update void list )];
+	my $allowed = [qw( create delete finalise lines lines_upcoming invoice_write_off upcoming pay retrieve send update void list )];
 	my $meth = $self->_get_method( 'coupons', $action, $allowed ) || return;
 	return( $self->$meth( @_ ) );
 }
@@ -2144,7 +2275,7 @@ sub invoice_create
 	description				=> {},
 	due_date				=> {},
 	footer					=> {},
-	metadata 				=> sub{ return( ref( $_[0] ) eq 'HASH' ? undef() : sprintf( "A hash ref was expected, but instead received '%s'", $_[0] ) ) },
+	metadata 				=> { type => 'hash' },
 	statement_descriptor	=> {},
 	subscription			=> { re => qr/^\w+$/ },
 	tax_percent				=> { re => qr/^\d+(?:\.\d+)?$/ },
@@ -2371,6 +2502,23 @@ sub invoice_pay
 	return( $self->_response_to_object( 'Net::API::Stripe::Billing::Invoice', $hash ) );
 }
 
+sub invoice_retrieve
+{
+	my $self = shift( @_ );
+	return( $self->error( "No parameters were provided to retrieve invoice information." ) ) if( !scalar( @_ ) );
+	my $args = $self->_get_args_from_object( 'Net::API::Stripe::Billing::Invoice', @_ );
+	my $okParams = 
+	{
+	expandable	=> { allowed => $EXPANDABLES->{invoice} },
+	id 			=> { re => qr/^\w+$/, required => 1 }
+	};
+	my $err = $self->_check_parameters( $okParams, $args );
+	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	my $id = CORE::delete( $args->{id} ) || return( $self->error( "No invoice id was provided to retrieve its information." ) );
+	my $hash = $self->get( "invoices/${id}", $args ) || return;
+	return( $self->_response_to_object( 'Net::API::Stripe::Billing::Invoice', $hash ) );
+}
+
 sub invoice_send
 {
 	my $self = shift( @_ );
@@ -2447,23 +2595,6 @@ sub invoice_upcoming
 	my $err = $self->_check_parameters( $okParams, $args );
 	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
 	my $hash = $self->post( 'invoices/upcoming', $args ) || return;
-	return( $self->_response_to_object( 'Net::API::Stripe::Billing::Invoice', $hash ) );
-}
-
-sub invoice_retrieve
-{
-	my $self = shift( @_ );
-	return( $self->error( "No parameters were provided to retrieve invoice information." ) ) if( !scalar( @_ ) );
-	my $args = $self->_get_args_from_object( 'Net::API::Stripe::Billing::Invoice', @_ );
-	my $okParams = 
-	{
-	expandable	=> { allowed => $EXPANDABLES->{invoice} },
-	id 			=> { re => qr/^\w+$/, required => 1 }
-	};
-	my $err = $self->_check_parameters( $okParams, $args );
-	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
-	my $id = CORE::delete( $args->{id} ) || return( $self->error( "No invoice id was provided to retrieve its information." ) );
-	my $hash = $self->get( "invoices/${id}", $args ) || return;
 	return( $self->_response_to_object( 'Net::API::Stripe::Billing::Invoice', $hash ) );
 }
 
@@ -2567,6 +2698,8 @@ sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
 sub location { return( shift->_response_to_object( 'Net::API::Stripe::Terminal::Location', @_ ) ); }
 
+sub login_link { return( shift->_response_to_object( 'Net::API::Stripe::Connect::Account::LoginLink', @_ ) ); }
+
 sub order { return( shift->_response_to_object( 'Net::API::Stripe::Order' ) ) }
 
 sub order_item { return( shift->_response_to_object( 'Net::API::Stripe::Order::Item' ) ) }
@@ -2656,7 +2789,15 @@ sub payment_method_detach
 			$args = $self->_get_args_from_object( 'Net::API::Stripe::Customer', @_ );
 			my $obj = $args->{_object};
 			$args->{customer} = $obj->id;
-			$args->{id} = $obj->payment_method->id if( $obj->payment_method );
+			if( $obj->payment_method )
+			{
+				$args->{id} = $obj->payment_method->id;
+			}
+			elsif( $obj->invoice_settings->default_payment_method )
+			{
+				$args->{id} = $obj->invoice_settings->default_payment_method->id;
+			}
+			return( $self->error( "No payent method id could be found in this customer object." ) ) if( !$args->{id} );
 		}
 		elsif( $_[0]->isa( 'Net::API::Stripe::Payment::Method' ) )
 		{
@@ -2841,7 +2982,7 @@ sub plan_create
 	nickname			=> {},
 	product				=> { required => 1 },
 	tiers				=> { fields => [qw( up_to flat_amount flat_amount_decimal unit_amount unit_amount_decimal )] },
-	tiers_mode			=> {},
+	tiers_mode			=> { re => qr/^(graduated|volume)$/ },
 	transform_usage		=> { fields => [qw( divide_by round )] },
 	trial_period_days	=> {},
 	usage_type			=> { re => qr/^(?:metered|licensed)$/ },
@@ -3104,6 +3245,7 @@ sub product_create
 	name				=> { required => 1 },
 	type				=> { re => qr/^(good|service)$/, required => 1 },
 	active				=> {},
+	## Used to exist, but then disappeaared from the api
 	attributes			=> sub{ return( ref( $_[0] ) eq 'ARRAY' && scalar( @{$_[0]} ) <= 5 ? undef() : "An array reference of up to 5 items was expected." ) },
 	caption				=> {},
 	deactivate_on		=> { type => 'array' },
@@ -3282,7 +3424,7 @@ sub schedule_create
 	from_subscription	=> {},
 	metadata			=> {},
 	phases				=> { type => 'array', fields => [qw( plans.plan plans.billing_thresholds.usage_gte plans.quantity plans.tax_rates application_fee_percent billing_thresholds.amount_gte billing_thresholds.reset_billing_cycle_anchor collection_method coupon default_payment_method default_tax_rates end_date invoice_settings.days_until_due iterations tax_percent trial trial_end )]},
-	start_date			=> {},
+	start_date			=> { type => 'datetime' },
 	};
 	
 	my $obj = $args->{_object};
@@ -3386,6 +3528,7 @@ sub schedule_update
 	my $okParams = 
 	{
 	expandable			=> { allowed => $EXPANDABLES->{schedule} },
+	id 					=> { re => qr/^\w+$/, required => 1 },
 	default_settings	=> { fields => [qw( billing_thresholds.amount_gte billing_thresholds.reset_billing_cycle_anchor collection_method default_payment_method invoice_settings.days_until_due )] },
 	end_behavior		=> { re => qr/^(release|cancel)$/ },
 	from_subscription	=> {},
@@ -3402,7 +3545,7 @@ sub schedule_update
 	return( $self->_response_to_object( 'Net::API::Stripe::Billing::Subscription::Schedule', $hash ) );
 }
 
-sub session { return( shift->_response_to_object( 'Net::API::Stripe::Session', @_ ) ); }
+# sub session { return( shift->_response_to_object( 'Net::API::Stripe::Session', @_ ) ); }
 
 sub schedule_query { return( shift->_response_to_object( 'Net::API::Stripe::Sigma::ScheduledQueryRun' ) ) }
 
@@ -3412,7 +3555,7 @@ sub sessions
 {
 	my $self = shift( @_ );
 	my $action = shift( @_ );
-	my $allowed = [qw( create retrieve )];
+	my $allowed = [qw( create retrieve list )];
 	my $meth = $self->_get_method( 'subscription', $action, $allowed ) || return;
 	return( $self->$meth( @_ ) );
 }
@@ -3440,7 +3583,6 @@ sub session_create
 	line_items				=> { type => 'array', fields => [qw( amount currency name quantity description images )] },
 	locale					=> { re => qr/^(local|[a-z]{2})$/ },
 	mode					=> { re => qr/^(setup|subscription)$/ },
-	payment_intent_data		=> { fields => [qw( application_fee_amount capture_method description metadata on_behalf_of receipt_email setup_future_usage  )] },
 	payment_intent_data		=> { fields => [qw( application_fee_amount capture_method description metadata on_behalf_of receipt_email setup_future_usage shipping.address.line1 shipping.address.line2 shipping.address.city shipping.address.country shipping.address.postal_code shipping.address.state shipping.name shipping.carrier shipping.phone shipping.tracking_number statement_descriptor transfer_data.destination )] },
 	setup_intent_data		=> { fields => [qw( description metadata on_behalf_of )] },
 	submit_type				=> { re => qr/^(auto|book|donate|pay)$/ },
@@ -3450,6 +3592,30 @@ sub session_create
 	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
 	my $hash = $self->post( 'checkout/sessions', $args ) || return;
 	return( $self->_response_to_object( 'Net::API::Stripe::Checkout::Session', $hash ) );
+}
+
+sub session_list
+{
+	my $self = shift( @_ );
+	my $args = shift( @_ );
+	my $okParams = 
+	{
+	expandable			=> { allowed => $EXPANDABLES->{schedule}, data_prefix_is_ok => 1 },
+	## "A cursor for use in pagination. ending_before is an object ID that defines your place in the list."
+	'ending_before'		=> {},
+	'limit'				=> { re => qr/^\d+$/ },
+	'payment_intent'	=> { type => 'scalar' },
+	'subscription'		=> { re => qr/^\w+$/ },
+	'starting_after'	=> {},
+	};
+	my $err = $self->_check_parameters( $okParams, $args );
+	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	if( $args->{expand} )
+	{
+		$self->_adjust_list_expandables( $args ) || return;
+	}
+	my $hash = $self->get( 'checkout/sessions', $args ) || return;
+	return( $self->_response_to_object( 'Net::API::Stripe::List', $hash ) );
 }
 
 sub session_retrieve
@@ -3673,23 +3839,25 @@ sub subscription_create
 	expandable 			=> { allowed => $EXPANDABLES->{subscription} },
 	customer			=> { required => 1 },
 	application_fee_percent => { re => qr/^[0-100]$/ },
-	backdate_start_date	=> {},
-	billing_cycle_anchor => { re => qr/^\d+$/ },
+	backdate_start_date	=> { type => 'datetime' },
+	# billing_cycle_anchor => { re => qr/^\d+$/ },
+	billing_cycle_anchor => { type => 'datetime' },
 	billing_thresholds	=> { fields => [qw( amount_gte reset_billing_cycle_anchor )] },
-	cancel_at			=> {},
+	cancel_at			=> { type => 'datetime' },
 	cancel_at_period_end	=> {},
 	collection_method	=> { re => qr/^(?:charge_automatically|send_invoice)$/ },
 	coupon				=> {},
 	days_until_due		=> {},
 	default_payment_method => {},
 	default_source		=> {},
-	default_tax_rates	=> {},
-	items				=> { fields => [qw( plan billing_thresholds.usage_gte metadata quantity tax_rates )], required => 1 },
+	default_tax_rates	=> { type => 'array' },
+	items				=> { type => 'array', fields => [qw( plan billing_thresholds.usage_gte metadata quantity tax_rates )], required => 1 },
 	metadata			=> { type => 'hash' },
 	off_session			=> {},
 	payment_behavior	=> { re => qr/^(?:allow_incomplete|error_if_incomplete)$/ },
 	pending_invoice_item_interval => { fields => [qw( interval interval_count )] },
 	prorate				=> {},
+	proration_behavior	=> { type => 'string', re => qr/^(billing_cycle_anchor|create_prorations|none)$/ },
 	tax_percent			=> { re => qr/^[0-100]$/ },
 	trial_end			=> { re => qr/^(?:\d+|now)$/ },
 	trial_from_plan		=> {},
@@ -3697,6 +3865,7 @@ sub subscription_create
 	};
 	my $err = $self->_check_parameters( $okParams, $args );
 	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
+	$self->message( 3, "Posting the following data: ", sub{ $self->dumper( $args ) } );
 	my $hash = $self->post( 'subscriptions', $args ) || return;
 	return( $self->_response_to_object( 'Net::API::Stripe::Billing::Subscription', $hash ) );
 }
@@ -3739,8 +3908,8 @@ sub subscription_list
 	# boolean
 	'shippable'			=> { type => 'boolean' },
 	'starting_after'	=> {},
-	'type'				=> {},
-	'url'				=> {},
+	# 'type'				=> {},
+	# 'url'				=> {},
 	};
 	my $err = $self->_check_parameters( $okParams, $args );
 	return( $self->error( join( ' ', @$err ) ) ) if( scalar( @$err ) );
@@ -3779,20 +3948,28 @@ sub subscription_update
 	{
 	expandable			=> { allowed => $EXPANDABLES->{subscription} },
 	id					=> { req => qr/^\w+$/, required => 1 },
-	active				=> {},
-	attributes			=> sub{ return( ref( $_[0] ) eq 'ARRAY' && scalar( @{$_[0]} ) <= 5 ? undef() : "An array reference of up to 5 items was expected." ) },
-	caption				=> {},
-	deactivate_on		=> { type => 'array' },
-	description			=> {},
-	images				=> sub{ return( ref( $_[0] ) eq 'ARRAY' && scalar( @{$_[0]} ) <= 8 ? undef() : "An array reference of up to 8 images was expected." ) },
+	application_fee_percent => { re => qr/^[0-100]$/ },
+	billing_cycle_anchor => { re => qr/^\d+$/ },
+	billing_thresholds	=> { fields => [qw( amount_gte reset_billing_cycle_anchor )] },
+	cancel_at			=> {},
+	cancel_at_period_end => {},
+	collection_method	=> { re => qr/^(?:charge_automatically|send_invoice)$/ },
+	coupon				=> {},
+	days_until_due		=> {},
+	default_payment_method => { type => 'string', re => qr/^[\w\_]+$/ },
+	default_source		=> {},
+	default_tax_rates	=> {},
+	items				=> { type => 'array', fields => [qw( id plan billing_thresholds.usage_gte clear_usage deleted metadata quantity tax_rates )] },
 	metadata 			=> { type => 'hash' },
-	name				=> { required => 1 }.
-	package_dimensions	=> {},
-	shippable			=> {},
-	statement_descriptor => {},
-	type				=> { re => qr/^(good|service)$/, required => 1 },
-	unit_label			=> {},
-	url					=> {},
+	off_session			=> {},
+	pause_collection	=> { type => 'string', fields => [qw(behavior resumes_at)] },
+	payment_behavior	=> { re => qr/^(?:allow_incomplete|error_if_incomplete)$/ },
+	pending_invoice_item_interval => { fields => [qw( interval interval_count )] },
+	prorate				=> {},
+	proration_date		=> { type => 'datetime' },
+	tax_percent			=> { re => qr/^[0-100]$/ },
+	trial_end			=> { re => qr/^(?:\d+|now)$/ },
+	trial_from_plan		=> {},
 	};
 	## We found some errors
 	my $err = $self->_check_parameters( $okParams, $args );
@@ -3802,6 +3979,8 @@ sub subscription_update
 	my $hash = $self->post( "subscriptions/${id}", $args ) || return;
 	return( $self->_response_to_object( 'Net::API::Stripe::Billing::Subscription', $hash ) );
 }
+
+sub tax_id { return( shift->_response_to_object( 'Net::API::Stripe::Billing::TaxID', @_ ) ); }
 
 sub tax_ids
 {
@@ -4096,48 +4275,6 @@ sub _as_hash
 	return( $ref );
 }
 
-sub _check_parameters_v1
-{
-	my $self = shift( @_ );
-	my $okParams = shift( @_ );
-	my $args   = shift( @_ );
-	my $err = [];
-	foreach my $k ( keys( %$args ) )
-	{
-		## Special case for expand
-		next if( $k eq 'expand' );
-		push( @$err, "$k is not a recognised valid parameter." ) if( !exists( $okParams->{ $k } ) );
-		my $this = $okParams->{ $k };
-		if( ref( $this ) eq 'ARRAY' )
-		{
-			if( ref( $args->{ $k } ) ne 'HASH' )
-			{
-				push( @$err, sprintf( "Parameter $k must be a dictionary definition with following possible hash keys: %s", join( ', ', @$this ) ) );
-				next;
-			}
-			## return( $self->error( "" ) ) if( !( scalar( map( grep( $_, @$this ), @{$args->{ $k }} ) ) == scalar( @{$args->{ $k } ) ) );
-			foreach my $v ( keys( %{$args->{ $k }} ) )
-			{
-				push( @$err, "Unknown property $v for key $k." ) if( !scalar( grep( /^$v$/, @$this ) ) );
-			}
-		}
-		elsif( ref( $this ) eq 'CODE' )
-		{
-			my $res = $this->( $args->{ $k } );
-			push( @$err, "Invalid parameter $k with value $args->{$k}: $res" ) if( $res );
-		}
-		elsif( ref( $this ) eq 'Regexp' && $args->{ $k } !~ /$this/ )
-		{
-			push( @$err, "Parameter $k with value $args->{$l} does not have a legitimate value" );
-		}
-	}
-	if( exists( $args->{ 'expand' } ) )
-	{
-		push( @$err, sprintf( "expand property should be an array, but instead '%s' was provided", $args->{ 'expand' } ) ) if( ref( $args->{ 'expand' } ) ne 'ARRAY' );
-	}
-	return( $err );
-}
-
 sub _check_parameters
 {
 	my $self = shift( @_ );
@@ -4148,7 +4285,7 @@ sub _check_parameters
 	my $seen = {};
 	local $check_fields_recursive = sub
 	{
-		my( $hash, $mirror, $field ) = @_;
+		my( $hash, $mirror, $field, $required ) = @_;
 		my $errors = [];
 		#	push( @$err, "Unknown property $v for key $k." ) if( !scalar( grep( /^$v$/, @$this ) ) );
 		foreach my $k ( sort( keys( %$hash ) ) )
@@ -4166,23 +4303,22 @@ sub _check_parameters
 				# ++$hash->{ $k }->{__check_fields_recursive_looping} == 1 )
 				++$seen->{ $addr } == 1 )
 			{
-				my $deep_errors = $check_fields_recursive->( $hash->{ $k }, $mirror->{ $k }, $k );
+				my $deep_errors = $check_fields_recursive->( $hash->{ $k }, $mirror->{ $k }, $k, CORE::exists( $required->{ $k } ) ? $required->{ $k } : {} );
 				CORE::push( @$errors, @$deep_errors );
+			}
+		}
+		
+		## Check required fields
+		foreach my $k ( sort( keys( %$required ) ) )
+		{
+			if( !CORE::exists( $hash->{ $k } ) ||
+				!CORE::length( $hash->{ $k } ) )
+			{
+				CORE::push( @$errors, "Field \"$k\" is required but missing in hash provided." );
 			}
 		}
 		return( $errors );
 	};
-	## We polluted the data hash, so we clean it up now
-# 	local $clean_up_check_fields_recursive = sub
-# 	{
-# 		my $ref = shift( @_ );
-# 		return if( ref( $ref ) ne 'HASH' );
-# 		CORE::delete( $ref->{__check_fields_recursive_looping} );
-# 		foreach my $k ( keys( %$ref ) )
-# 		{
-# 			$clean_up_check_fields_recursive->( $ref->{ $k } ) if( ref( $ref->{ $k } ) eq 'HASH' );
-# 		}
-# 	};
 	
 	foreach my $k ( keys( %$args ) )
 	{
@@ -4216,19 +4352,27 @@ sub _check_parameters
 				}
 				elsif( ref( $args->{ $k } ) ne 'HASH' )
 				{
-					push( @$err, sprintf( "Parameter \"$k\" must be a dictionary definition with following possible hash keys: \"%s\"", join( ', ', @$this ) ) );
+					push( @$err, sprintf( "Parameter \"$k\" must be a dictionary definition with following possible hash keys: \"%s\". Did you forget type => 'array' ?", join( ', ', @$this ) ) );
 					next;
 				}
 				
 				## We build a test mirror hash structure against which we will check if actual data fields exist or not
 				my $mirror = {};
+				my $required = {};
 				foreach my $f ( @$this )
 				{
 					my @path = CORE::split( /\./, $f );
 					my $parent_hash = $mirror;
+					my $parent_req = $required;
 					for( my $i = 0; $i < scalar( @path ); $i++ )
 					{
 						my $p = $path[$i];
+						if( substr( $p, -1, 1 ) eq '!' )
+						{
+							$p = substr( $p, 0, CORE::length( $p ) - 1 );
+							$parent_req->{ $p } = 1;
+						}
+						
 						if( $i == $#path )
 						{
 							$parent_hash->{ $p } = 1;
@@ -4236,6 +4380,11 @@ sub _check_parameters
 						else
 						{
 							$parent_hash->{ $p } = {} unless( CORE::exists( $parent_hash->{ $p } ) && ref( $parent_hash->{ $p } ) eq 'HASH' );
+							if( CORE::exists( $parent_req->{ $p } ) )
+							{
+								$parent_req->{ $p } = {} unless( ref( $parent_req->{ $p } ) eq 'HASH' );
+								$parent_req = $parent_req->{ $p };
+							}
 							$parent_hash = $parent_hash->{ $p };
 						}
 					}
@@ -4288,6 +4437,81 @@ sub _check_parameters
 			elsif( $dict->{type} eq 'boolean' && CORE::length( $args->{ $k } ) )
 			{
 				$args->{ $k } = ( $args->{ $k } eq 'true' || ( $args->{ $k } ne 'false' && $args-->{ $k } ) ) ? 'true' : 'false';
+			}
+			elsif( $dict->{type} eq 'date' || $dict->{type} eq 'datetime' )
+			{
+				unless( $self->_is_object( $args->{ $k } ) && $args->{ $k }->isa( 'DateTime' ) )
+				{
+					my $tz = $dict->{time_zone} ? $dict->{time_zone} : 'GMT';
+					my $dt;
+					if( $dict->{type} eq 'date' &&
+						$args->{ $k } =~ /^(?<year>\d{4})[\.|\-](?<month>\d{1,2})[\.|\-](?<day>\d{1,2})$/ )
+					{
+						try
+						{
+							$dt = DateTime(
+								year => int( $+{year} ),
+								month => int( $+{month} ),
+								day => int( $+{day} ),
+								hour => 0,
+								minute => 0,
+								second => 0,
+								time_zone => $tz
+							);
+							$args->{ $k } = $dt;
+						}
+						catch( $e )
+						{
+							push( @$err, "Invalid date (" . $args->{ $k } . ") provided for parameter \"$k\": $e" );
+						}
+					}
+					elsif( $dict->{type} eq 'datetime' &&
+						$args->{ $k } =~ /^(?<year>\d{4})[\.|\-](?<month>\d{1,2})[\.|\-](?<day>\d{1,2})[T|[:blank:]]+(?<hour>\d{1,2}):(?<minute>\d{1,2}):(?<second>\d{1,2})$/ )
+					{
+						try
+						{
+							$dt = DateTime(
+								year => int( $+{year} ),
+								month => int( $+{month} ),
+								day => int( $+{day} ),
+								hour => int( $+{hour} ),
+								minute => int( $+{minute} ),
+								second => int( $+{second} ),
+								time_zone => $tz
+							);
+							$args->{ $k } = $dt;
+						}
+						catch( $e )
+						{
+							push( @$err, "Invalid datetime (" . $args->{ $k } . ") provided for parameter \"$k\": $e" );
+						}
+					}
+					elsif( $args->{ $k } =~ /^\d+$/ )
+					{
+						try
+						{
+							$dt = DateTime->from_epoch(
+								epoch => $args->{ $k },
+								time_zone => $tz,
+							);
+						}
+						catch( $e )
+						{
+							push( @$err, "Invalid timestamp (" . $args->{ $k } . ") provided for parameter \"$k\": $e" );
+						}
+					}
+					if( $dt )
+					{
+						my $pattern = $dict->{pattern} ? $dict->{pattern} : '%s';
+						my $strp = DateTime::Format::Strptime->new(
+							pattern => $pattern,
+							locale => 'en_GB',
+							time_zone => $tz,
+						);
+						$dt->set_formatter( $strp );
+						$args->{ $k } = $dt;
+					}
+				}
 			}
 		}
 		elsif( ref( $this ) eq 'CODE' )
@@ -4422,60 +4646,6 @@ sub _convert_boolean_for_json
 		}
 	};
 	$crawl->( $hash );
-}
-
-sub _encode_params_v1
-{
-	my $self = shift( @_ );
-    my $args = shift( @_ );
-    if( $self->{ '_encode_with_json' } )
-    {
-    	return( $self->json->utf8->allow_blessed->encode( $args ) );
-    }
-    my @components;
-    foreach my $key ( keys( %$args ) )
-    {
-        my $ek    = URI::Escape::uri_escape( $key );
-        my $value = $args->{ $key };
-        my $pkg   = Scalar::Util::blessed( $value );
-        if( $pkg && $pkg =~ /^Net::API::Stripe/ && exists( $value->{id} ) )
-        {
-            push( @components, $ek . '=' . $value->{id} );
-            next;
-        }
-
-        my $ref = ref( $value );
-        if( $ref eq 'HASH' ) 
-        {
-        	foreach my $sk ( keys( %$value ) )
-        	{
-                my $sv = $value->{ $sk };
-                ## don't think this PHP convention goes deeper
-                next if( ref( $sv ) || !length( $sv ) );
-                push( @components, sprintf( '%s[%s]=%s', $ek, URI::Escape::uri_escape( $sk ), URI::Escape::uri_escape_utf8( $sv ) ) );
-            }
-        } 
-        elsif( $ref eq 'ARRAY' ) 
-        {
-            foreach my $sv ( @$value )
-            {
-            	## again, I think we can't go deeper
-                next if( ref( $sv ) );
-                push( @components, sprintf( '%s[]=%s', $ek, URI::Escape::uri_escape_utf8( $sv ) ) );
-            }
-        } 
-        else 
-        {
-        	## JSON boolean stringification magic has been erased
-            $value = ( ref( $value ) eq 'JSON::PP::Boolean' || ref( $value ) eq 'Module::Generic::Boolean' )
-              ? $value
-                  ? 'true'
-                  : 'false'
-              : URI::Escape::uri_escape_utf8( $value );
-            push( @components, "${ek}=${value}" );
-        }
-    }
-    return( join( '&', @components ) );
 }
 
 sub _encode_params
@@ -4911,101 +5081,3 @@ BEGIN
 
 __END__
 
-=encoding utf8
-
-=head1 NAME
-
-Net::API::Stripe - An interface to Stripe API
-
-=head1 SYNOPSIS
-
-=head1 VERSION
-
-    v0.8
-
-=head1 DESCRIPTION
-
-=head1 CONSTRUCTOR
-
-=over 4
-
-=item B<new>( %ARG )
-
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
-
-=back
-
-=head1 METHODS
-
-=over 4
-
-=item
-
-=back
-
-=head1 API SAMPLE
-
-	{
-	  "object": "balance",
-	  "available": [
-		{
-		  "amount": 0,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 0
-		  }
-		}
-	  ],
-	  "connect_reserved": [
-		{
-		  "amount": 0,
-		  "currency": "jpy"
-		}
-	  ],
-	  "livemode": false,
-	  "pending": [
-		{
-		  "amount": 7712,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 7712
-		  }
-		}
-	  ]
-	}
-
-=head1 HISTORY
-
-L<https://stripe.com/docs/upgrades> for Stripe API version history.
-
-=head1 AUTHOR
-
-Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
-
-=head1 SEE ALSO
-
-Stripe API documentation:
-
-L<https://stripe.com/docs/api>
-
-L<Net::Stripe>, another Stripe API, but which uses Moose
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
-
-You can use, copy, modify and redistribute this package and associated
-files under the same terms as Perl itself.
-
-=cut

@@ -1,5 +1,15 @@
 Revision history for Net-IPAM-Block
 
+1.09    Mon, 13 Apr 2020 12:00:59 +0200
+        * tests for subclassing
+
+1.08    Sun, 12 Apr 2020 17:01:13 +0200
+        * speedup new() a little bit
+        * don't use clone() from Net::IPAM::IP
+
+1.07    Fri, 10 Apr 2020 15:24:55 +0200
+        * bool overloaded
+
 1.06    Wed, 08 Apr 2020 12:41:41 +0200
         * documentation glitch
 

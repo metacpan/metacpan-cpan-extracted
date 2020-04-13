@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Neo4j::Driver",
   "PREREQ_PM" => {
-    "JSON::MaybeXS" => 0,
+    "JSON::MaybeXS" => "1.002004",
     "LWP::UserAgent" => 0,
     "REST::Client" => 134,
     "Try::Tiny" => 0,
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Slurp" => 0,
-  "JSON::MaybeXS" => 0,
+  "JSON::MaybeXS" => "1.002004",
   "JSON::PP" => 0,
   "LWP::UserAgent" => 0,
   "REST::Client" => 134,

@@ -4,7 +4,7 @@ use Time::HiRes qw/gettimeofday tv_interval/;
 use Net::Prometheus;
 use IPC::ShareLite;
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.3.1';
 
 has prometheus => sub { Net::Prometheus->new(disable_process_collector => 1) };
 has route => sub {undef};
@@ -119,7 +119,8 @@ sub register {
   );
 
 
-  $self->route($app->routes->get($config->{path} // '/metrics'));
+  my $prefix = $config->{route} // $app->routes->under('/');
+  $self->route($prefix->get($config->{path} // '/metrics'));
   $self->route->to(
     cb => sub {
       my ($c) = @_;
@@ -220,6 +221,16 @@ Mojolicious::Plugin::Prometheus - Mojolicious Plugin
   # Mojolicious::Lite, with custom response buckets (seconds)
   plugin 'Prometheus' => { response_buckets => [qw/4 5 6/] };
 
+  # You can add your own route to do access control
+  my $under = app->routes->under('/secret' =>sub {
+    my $c = shift;
+    return 1 if $c->req->url->to_abs->userinfo eq 'Bender:rocks';
+    $c->res->headers->www_authenticate('Basic');
+    $c->render(text => 'Authentication required!', status => 401);
+    return undef;
+  });
+  plugin Prometheus => {route => $under};
+
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Prometheus> is a L<Mojolicious> plugin that exports Prometheus metrics from Mojolicious.
@@ -247,6 +258,12 @@ Register plugin in L<Mojolicious> application.
 C<%config> can have:
 
 =over 2
+
+=item * route
+
+L<Mojolicious::Routes::Route> object to attach the metrics to, defaults to generating a new one for '/'.
+
+Default: /
 
 =item * path
 

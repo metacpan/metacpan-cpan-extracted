@@ -1,9 +1,14 @@
+1.3.0	2020-04-11
+	* checking that the input files contains sequences
+	* BUG FIX: Wrong auN returned if thousands separator was also enabled
+	* 'n50' program now supports custom "Nx" (-e INT)
+
 1.2.0	2020-04-09
   * getStats() now also returns "N75" and "N90" statistics
 	* getStats() now also returns "auN" metric https://lh3.github.io/2020/04/08/a-new-metric-on-assembly-contiguity
 	* getStats() now also returns "path", the absolute path to "dirname"
 	* getStats() can return a N{X} metrics, if invoked as getStats(file, json, X);
-	* 'n50' 4.0.0 xprogram partially supports the new metrics
+	* 'n50' program partially supports the new metrics
 
 1.0.0	2020-03-16
 	* First stable release (stable APIs)

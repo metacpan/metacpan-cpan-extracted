@@ -1,9 +1,9 @@
 package App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-04'; # DATE
+our $DATE = '2020-04-11'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.046'; # VERSION
+our $VERSION = '1.049'; # VERSION
 
 use 5.010001;
 use strict;
@@ -218,24 +218,24 @@ our %finclude_noncore_args = (
     },
 );
 
-our %finclude_registered_args = (
-    include_registered => {
-        summary => 'Include modules that are registered (listed in 02packages.details.txt.gz)',
-        'summary.alt.bool.not' => 'Exclude modules that are registered (listed in 02packages.details.txt.gz)',
+our %finclude_indexed_args = (
+    include_indexed => {
+        summary => 'Include modules that are indexed (listed in 02packages.details.txt.gz)',
+        'summary.alt.bool.not' => 'Exclude modules that are indexed (listed in 02packages.details.txt.gz)',
         schema  => 'bool',
         default => 1,
         tags => ['category:filtering'],
     },
 );
 
-our %finclude_unregistered_args = (
-    include_unregistered => {
-        summary => 'Include modules that are not registered (not listed in 02packages.details.txt.gz)',
-        'summary.alt.bool.not' => 'Exclude modules that are not registered (not listed in 02packages.details.txt.gz)',
+our %finclude_unindexed_args = (
+    include_unindexed => {
+        summary => 'Include modules that are not indexed (not listed in 02packages.details.txt.gz)',
+        'summary.alt.bool.not' => 'Exclude modules that are not indexed (not listed in 02packages.details.txt.gz)',
         schema  => 'bool',
         default => 1,
         cmdline_aliases => {
-            broken => {is_flag=>1, summary => 'Alias for --exclude-registered --include-unregistered', code => sub { $_[0]{include_unregistered}=1; $_[0]{include_registered}=0 }},
+            broken => {is_flag=>1, summary => 'Alias for --exclude-indexed --include-unindexed', code => sub { $_[0]{include_unindexed}=1; $_[0]{include_indexed}=0 }},
         },
         tags => ['category:filtering'],
     },
@@ -550,7 +550,7 @@ sub _set_namespace {
 }
 
 our $db_schema_spec = {
-    latest_v => 10,
+    latest_v => 11,
 
     install => [
         'CREATE TABLE author (
@@ -684,7 +684,12 @@ our $db_schema_spec = {
              FOREIGN KEY (module_id) REFERENCES module(id)
          )',
         'CREATE INDEX ix_dep__module_name ON dep(module_name)',
-        # 'CREATE UNIQUE INDEX ix_dep__file_id__module_id ON dep(file_id,module_id)', # not all module have module_id anyway, and ones with module_id should already be correct because dep is a hash with module name as key
+        # not all module have module_id anyway, and ones with module_id should
+        # already be correct because dep is a hash with module name as key
+        # 'CREATE UNIQUE INDEX ix_dep__file_id__module_id ON dep(file_id,module_id)',
+        'CREATE INDEX ix_dep__file_id ON dep(file_id)',
+        'CREATE INDEX ix_dep__dist_id ON dep(dist_id)',
+        'CREATE INDEX ix_dep__module_id ON dep(module_id)',
 
         'CREATE TABLE sub (
              id INTEGER NOT NULL PRIMARY KEY,
@@ -882,6 +887,14 @@ our $db_schema_spec = {
          )',
         'CREATE UNIQUE INDEX ix_sub__name__content_id ON sub(name, content_id)',
 
+    ],
+
+    upgrade_to_v11 => [
+        # forgot to add indices because FOREIGN KEY does not automatically
+        # create indexes
+        'CREATE INDEX ix_dep__file_id ON dep(file_id)',
+        'CREATE INDEX ix_dep__dist_id ON dep(dist_id)',
+        'CREATE INDEX ix_dep__module_id ON dep(module_id)',
     ],
 
     # for testing
@@ -3563,7 +3576,7 @@ sub _get_prereqs {
     require Version::Util;
 
     my ($mods, $dbh, $memory_by_mod_name, $memory_by_dist_id,
-        $level, $max_level, $filters, $plver, $flatten, $phase, $rel) = @_;
+        $level, $max_level, $filters, $plver, $flatten, $dont_uniquify, $phase, $rel) = @_;
 
     log_trace("Finding dependencies for module(s) %s (level=%i) ...", $mods, $level);
 
@@ -3586,7 +3599,7 @@ sub _get_prereqs {
             ($dist_id) = $dbh->selectrow_array("SELECT id FROM dist WHERE is_latest AND file_id=(SELECT file_id FROM module WHERE name=?)", {}, $mod)
                 or return [404, "No such module: $mod"];
         }
-        unless ($memory_by_dist_id->{$dist_id}) {
+        unless ($memory_by_dist_id->{$dist_id} && $dont_uniquify) {
             push @dist_ids, $dist_id;
             $memory_by_dist_id->{$dist_id} = $mod;
         }
@@ -3639,7 +3652,7 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
             next;
         }
 
-        if (exists $memory_by_mod_name->{$row->{module}}) {
+        if ((exists $memory_by_mod_name->{$row->{module}}) && !$dont_uniquify) {
             if ($flatten) {
                 $memory_by_mod_name->{$row->{module}} = $row->{version}
                     if version->parse($row->{version}) > version->parse($memory_by_mod_name->{$row->{module}});
@@ -3648,8 +3661,8 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
             }
         }
 
-        next if !$filters->{include_registered}   &&  defined $row->{author};
-        next if !$filters->{include_unregistered} && !defined $row->{author};
+        next if !$filters->{include_indexed}   && ( defined $row->{author} || $row->{module} eq 'perl');
+        next if !$filters->{include_unindexed} && (!defined $row->{author} && $row->{module} ne 'perl');
 
         $row->{is_core} = $row->{module} eq 'perl' ||
             Module::CoreList::More->is_still_core($row->{module}, undef, version->parse($plver)->numify);
@@ -3660,7 +3673,7 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
             if (Version::Util::version_gt($row->{version}, $memory_by_mod_name->{$row->{module}})) {
                 $memory_by_mod_name->{$row->{version}} = $row->{version};
             }
-            next;
+            next unless $dont_uniquify;
         }
         delete $row->{phase} unless $phase eq 'ALL';
         delete $row->{rel}   unless $rel   eq 'ALL';
@@ -3673,7 +3686,7 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
         my $subres = _get_prereqs([map { {mod=>$_->{module}, dist_id=>$_->{module_dist_id}} } @res], $dbh,
                                   $memory_by_mod_name,
                                   $memory_by_dist_id,
-                                  $level+1, $max_level, $filters, $plver, $flatten, $phase, $rel);
+                                  $level+1, $max_level, $filters, $plver, $flatten, $dont_uniquify, $phase, $rel);
         return $subres if $subres->[0] != 200;
         if ($flatten) {
             my %deps; # key = module name
@@ -3704,7 +3717,7 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
 
 sub _get_revdeps {
     my ($mods, $dbh, $memory_by_dist_name, $memory_by_mod_id,
-        $level, $max_level, $filters, $flatten, $phase, $rel) = @_;
+        $level, $max_level, $filters, $flatten, $dont_uniquify, $phase, $rel) = @_;
 
     log_trace("Finding reverse dependencies for module(s) %s ...", $mods);
 
@@ -3720,7 +3733,7 @@ sub _get_revdeps {
             ($mod_id) = $dbh->selectrow_array("SELECT id FROM module WHERE name=?", {}, $mod)
                 or return [404, "No such module: $mod"];
         }
-        unless ($memory_by_mod_id->{$mod_id}) {
+        unless ($memory_by_mod_id->{$mod_id} && $dont_uniquify) {
             push @mod_ids, $mod_id;
             $memory_by_mod_id->{$mod_id} = $mod;
         }
@@ -3762,7 +3775,7 @@ ORDER BY dist".($level > 1 ? " DESC" : ""));
     while (my $row = $sth->fetchrow_hashref) {
         next unless $phase eq 'ALL' || $row->{phase} eq $phase;
         next unless $rel   eq 'ALL' || $row->{rel}   eq $rel;
-        next if exists $memory_by_dist_name->{$row->{dist}};
+        next if exists($memory_by_dist_name->{$row->{dist}}) && !$dont_uniquify;
         $memory_by_dist_name->{$row->{dist}} = $row->{dist_version};
         delete $row->{phase} unless $phase eq 'ALL';
         delete $row->{rel} unless $rel eq 'ALL';
@@ -3779,7 +3792,7 @@ ORDER BY dist".($level > 1 ? " DESC" : ""));
         }
         my $subres = _get_revdeps(\@mods, $dbh,
                                   $memory_by_dist_name, $memory_by_mod_id,
-                                  $level+1, $max_level, $filters, $flatten, $phase, $rel);
+                                  $level+1, $max_level, $filters, $flatten, $dont_uniquify, $phase, $rel);
         return $subres if $subres->[0] != 200;
         # insert to res in appropriate places
       SUBRES_TO_INSERT:
@@ -3902,6 +3915,10 @@ Note that `Bar`'s required version is already 0.45 in the above example.
 
 _
     },
+    dont_uniquify => {
+        summary => 'Allow showing multiple modules for different dists',
+        schema => 'bool*',
+    },
     %finclude_core_args,
     %finclude_noncore_args,
     %perl_version_args,
@@ -3910,8 +3927,8 @@ _
         schema  => ['bool*', is=>1],
         tags => ['category:filtering'],
     },
-    %finclude_registered_args,
-    %finclude_unregistered_args,
+    %finclude_indexed_args,
+    %finclude_unindexed_args,
 );
 
 our $deps_args_rels = {
@@ -3958,20 +3975,20 @@ sub deps {
     my $include_core    = $args{include_core} // 1;
     my $include_noncore = $args{include_noncore} // 1;
     my $with_xs_or_pp = $args{with_xs_or_pp};
-    my $include_registered = $args{include_registered} // 1;
-    my $include_unregistered = $args{include_unregistered} // 1;
+    my $include_indexed = $args{include_indexed} // 1;
+    my $include_unindexed = $args{include_unindexed} // 1;
 
     my $filters = {
         include_core => $include_core,
         include_noncore => $include_noncore,
-        include_registered => $include_registered,
-        include_unregistered => $include_unregistered,
+        include_indexed => $include_indexed,
+        include_unindexed => $include_unindexed,
         authors => $args{authors},
         authors_arent => $args{authors_arent},
     };
 
     my $res = _get_prereqs($mods, $dbh, {}, {},
-                           1, $level, $filters, $plver, $args{flatten}, $phase, $rel);
+                           1, $level, $filters, $plver, $args{flatten}, $args{dont_uniquify}, $phase, $rel);
 
     return $res unless $res->[0] == 200;
     my @cols;
@@ -4012,6 +4029,10 @@ my %rdeps_args = (
 See deps' *flatten* argument for more details.
 
 _
+    },
+    dont_uniquify => {
+        summary => 'Allow showing multiple modules for different dists',
+        schema => 'true*',
     },
     authors => {
         'x.name.is_plural' => 1,
@@ -4070,7 +4091,7 @@ sub rdeps {
         authors_arent => $authors_arent,
     };
 
-    my $res = _get_revdeps($mods, $dbh, {}, {}, 1, $level, $filters, $args{flatten}, $args{phase}, $args{rel});
+    my $res = _get_revdeps($mods, $dbh, {}, {}, 1, $level, $filters, $args{flatten}, $args{dont_uniquify}, $args{phase}, $args{rel});
 
     return $res unless $res->[0] == 200;
     for (@{$res->[2]}) {
@@ -4219,7 +4240,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.046 of App::lcpan (from Perl distribution App-lcpan), released on 2020-04-04.
+This document describes version 1.049 of App::lcpan (from Perl distribution App-lcpan), released on 2020-04-11.
 
 =head1 SYNOPSIS
 
@@ -4342,6 +4363,10 @@ Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
+=item * B<dont_uniquify> => I<bool>
+
+Allow showing multiple modules for different dists.
+
 =item * B<flatten> => I<bool>
 
 Instead of showing tree-like information, flatten it.
@@ -4380,17 +4405,17 @@ Note that C<Bar>'s required version is already 0.45 in the above example.
 
 Include core modules.
 
+=item * B<include_indexed> => I<bool> (default: 1)
+
+Include modules that are indexed (listed in 02packages.details.txt.gz).
+
 =item * B<include_noncore> => I<bool> (default: 1)
 
 Include non-core modules.
 
-=item * B<include_registered> => I<bool> (default: 1)
+=item * B<include_unindexed> => I<bool> (default: 1)
 
-Include modules that are registered (listed in 02packages.details.txt.gz).
-
-=item * B<include_unregistered> => I<bool> (default: 1)
-
-Include modules that are not registered (not listed in 02packages.details.txt.gz).
+Include modules that are not indexed (not listed in 02packages.details.txt.gz).
 
 =item * B<index_name> => I<filename> (default: "index.db")
 
@@ -4407,7 +4432,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.30.2")
 
 Set base Perl version for determining core modules.
 
@@ -4607,7 +4632,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.30.2")
 
 Set base Perl version for determining core modules.
 
@@ -4777,7 +4802,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.30.2")
 
 Set base Perl version for determining core modules.
 
@@ -4851,6 +4876,10 @@ herself.
 Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
+
+=item * B<dont_uniquify> => I<true>
+
+Allow showing multiple modules for different dists.
 
 =item * B<flatten> => I<bool>
 
@@ -5235,6 +5264,8 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<App::lcpan::Manual>
 
 L<CPAN::SQLite>
 

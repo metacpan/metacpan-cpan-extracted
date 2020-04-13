@@ -1,0 +1,8 @@
+0.002   2020-04-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Support hex and octal char escape sequence in string literal.
+
+
+0.001   2020-04-10  Released-By: PERLANCAR
+
+        - First release.

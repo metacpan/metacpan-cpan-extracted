@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Authorization/VerificationData.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -44,13 +44,23 @@ Net::API::Stripe::Issuing::Authorization::VerificationData - A Stripe Authorizat
 
 =head1 SYNOPSIS
 
+    my $data = $stripe->authorization->verification_data({
+        address_line1_check => 'match',
+        address_postal_code_check => 'match',
+        address_zip_check => 'match',
+        authentication => 'success',
+        cvc_check => 'match',
+        expiry_check => 'match',
+        three_d_secure => { result => 'authenticated' },
+    });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-Verification data used in C<Net::API::Stripe::Issuing::Authorization>
+Verification data used by method B<verification_data> in module L<Net::API::Stripe::Issuing::Authorization>
 
 =head1 CONSTRUCTOR
 
@@ -58,18 +68,8 @@ Verification data used in C<Net::API::Stripe::Issuing::Authorization>
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Issuing::Authorization::VerificationData> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -137,15 +137,17 @@ Verification was not performed because no value was provided.
 
 =back
 
-=item B<three_d_secure>
+=item B<three_d_secure> hash
 
 3D Secure details on this authorization.
+
+It has the one following property
 
 =over 8
 
 =item I<result>
 
-Possible enum values
+With following possible enum values
 
 =over 12
 
@@ -170,7 +172,7 @@ The merchant attempted to authenticate the authorization, but the cardholder is 
 =head1 API SAMPLE
 
 	{
-	  "id": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+	  "id": "iauth_fake123456789",
 	  "object": "issuing.authorization",
 	  "approved": true,
 	  "authorization_method": "online",
@@ -201,12 +203,12 @@ The merchant attempted to authenticate the authorization, but the cardholder is 
 	  "status": "reversed",
 	  "transactions": [
 		{
-		  "id": "ipi_1DPqmFCeyNCl6fY2ve8MAJJu",
+		  "id": "ipi_fake123456789",
 		  "object": "issuing.transaction",
 		  "amount": -100,
-		  "authorization": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+		  "authorization": "iauth_fake123456789",
 		  "balance_transaction": null,
-		  "card": "ic_1DPqmFCeyNCl6fY2bHuXx2E3",
+		  "card": "ic_fake123456789",
 		  "cardholder": null,
 		  "created": 1540642827,
 		  "currency": "usd",
@@ -228,12 +230,12 @@ The merchant attempted to authenticate the authorization, but the cardholder is 
 		  "type": "capture"
 		},
 		{
-		  "id": "ipi_1DPqmFCeyNCl6fY2wlCERJ4S",
+		  "id": "ipi_fake123456789",
 		  "object": "issuing.transaction",
 		  "amount": -100,
-		  "authorization": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+		  "authorization": "iauth_fake123456789",
 		  "balance_transaction": null,
-		  "card": "ic_1DPqmFCeyNCl6fY290pxaFhn",
+		  "card": "ic_fake123456789",
 		  "cardholder": null,
 		  "created": 1540642827,
 		  "currency": "usd",
@@ -282,7 +284,7 @@ L<https://stripe.com/docs/api/issuing/authorizations/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

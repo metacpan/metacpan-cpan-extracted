@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Source/Redirect.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -18,13 +18,13 @@ BEGIN
     our( $VERSION ) = '0.1';
 };
 
-sub failure_reason { shift->_set_get_scalar( 'failure_reason', @_ ); }
+sub failure_reason { return( shift->_set_get_scalar( 'failure_reason', @_ ) ); }
 
-sub return_url { shift->_set_get_uri( 'return_url', @_ ); }
+sub return_url { return( shift->_set_get_uri( 'return_url', @_ ) ); }
 
-sub status { shift->_set_get_scalar( 'status', @_ ); }
+sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
-sub url { shift->_set_get_uri( 'url', @_ ); }
+sub url { return( shift->_set_get_uri( 'url', @_ ) ); }
 
 1;
 
@@ -38,6 +38,13 @@ Net::API::Stripe::Payment::Source::Redirect - A Stripe Payment Redirect
 
 =head1 SYNOPSIS
 
+    my $redirect = $stripe->source->redirect({
+        failure_reason => 'user_abort',
+        return_url => 'https://example.com/return',
+        status => 'failed',
+        url => 'https://example.com/auth',
+    });
+
 =head1 VERSION
 
     0.1
@@ -46,24 +53,16 @@ Net::API::Stripe::Payment::Source::Redirect - A Stripe Payment Redirect
 
 Information related to the redirect flow. Present if the source is authenticated by a redirect (flow is redirect).
 
+This is part of the L<Net::API::Stripe::Payment::Source> object
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Payment::Source::Redirect> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -79,6 +78,8 @@ The failure reason for the redirect, either user_abort (the customer aborted or 
 
 The URL you provide to redirect the customer to after they authenticated their payment.
 
+This is a L<URI> object.
+
 =item B<status> string
 
 The status of the redirect, either pending (ready to be used by your customer to authenticate the transaction), succeeded (succesful authentication, cannot be reused) or not_required (redirect should not be used) or failed (failed authentication, cannot be reused).
@@ -87,12 +88,14 @@ The status of the redirect, either pending (ready to be used by your customer to
 
 The URL provided to you to redirect a customer to as part of a redirect authentication flow.
 
+This is a L<URI> object.
+
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "src_1FUXrFCeyNCl6fY2Fk07erzD",
+	  "id": "src_fake123456789",
 	  "object": "source",
 	  "ach_credit_transfer": {
 		"account_number": "test_52796e3294dc",
@@ -102,7 +105,7 @@ The URL provided to you to redirect a customer to as part of a redirect authenti
 		"swift_code": "TSTEZ122"
 	  },
 	  "amount": null,
-	  "client_secret": "src_client_secret_G0YzRXUMP1IJhwBBA4dW38It",
+	  "client_secret": "src_client_secret_fake123456789",
 	  "created": 1571314413,
 	  "currency": "jpy",
 	  "flow": "receiver",
@@ -150,7 +153,7 @@ L<https://stripe.com/docs/api/sources/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

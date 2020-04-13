@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::author_deps;
 
-our $DATE = '2020-04-04'; # DATE
-our $VERSION = '1.046'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-11'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.049'; # VERSION
 
 use 5.010;
 use strict;
@@ -14,6 +16,29 @@ our %SPEC;
 $SPEC{'handle_cmd'} = {
     v => 1.1,
     summary => "List dependencies for all of the dists of an author",
+    description => <<'_',
+
+For a CPAN author, this subcommand is a shortcut for doing:
+
+    % lcpan deps Your-Dist
+
+for all of your distributions. It shows just how many modules are you currently
+using in one of your distros on CPAN.
+
+To show how many modules from other authors you are depending:
+
+    % lcpan author-deps YOURCPANID --module-author-isnt YOURCPANID
+
+To show how many of your own modules you are depending in your own distros:
+
+    % lcpan author-deps YOURCPANID --module-author-is YOURCPANID
+
+To find whether there are any prerequisites that you mention in your
+distributions that are currently broken (not indexed on CPAN):
+
+    % lcpan author-deps YOURCPANID --broken --dont-uniquify
+
+_
     args => {
         %App::lcpan::common_args,
         %App::lcpan::author_args,
@@ -71,7 +96,7 @@ App::lcpan::Cmd::author_deps - List dependencies for all of the dists of an auth
 
 =head1 VERSION
 
-This document describes version 1.046 of App::lcpan::Cmd::author_deps (from Perl distribution App-lcpan), released on 2020-04-04.
+This document describes version 1.049 of App::lcpan::Cmd::author_deps (from Perl distribution App-lcpan), released on 2020-04-11.
 
 =head1 FUNCTIONS
 
@@ -83,6 +108,26 @@ Usage:
  handle_cmd(%args) -> [status, msg, payload, meta]
 
 List dependencies for all of the dists of an author.
+
+For a CPAN author, this subcommand is a shortcut for doing:
+
+ % lcpan deps Your-Dist
+
+for all of your distributions. It shows just how many modules are you currently
+using in one of your distros on CPAN.
+
+To show how many modules from other authors you are depending:
+
+ % lcpan author-deps YOURCPANID --module-author-isnt YOURCPANID
+
+To show how many of your own modules you are depending in your own distros:
+
+ % lcpan author-deps YOURCPANID --module-author-is YOURCPANID
+
+To find whether there are any prerequisites that you mention in your
+distributions that are currently broken (not indexed on CPAN):
+
+ % lcpan author-deps YOURCPANID --broken --dont-uniquify
 
 This function is not exported.
 
@@ -97,6 +142,10 @@ Arguments ('*' denotes required arguments):
 Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
+
+=item * B<dont_uniquify> => I<bool>
+
+Allow showing multiple modules for different dists.
 
 =item * B<flatten> => I<bool>
 
@@ -136,17 +185,17 @@ Note that C<Bar>'s required version is already 0.45 in the above example.
 
 Include core modules.
 
+=item * B<include_indexed> => I<bool> (default: 1)
+
+Include modules that are indexed (listed in 02packages.details.txt.gz).
+
 =item * B<include_noncore> => I<bool> (default: 1)
 
 Include non-core modules.
 
-=item * B<include_registered> => I<bool> (default: 1)
+=item * B<include_unindexed> => I<bool> (default: 1)
 
-Include modules that are registered (listed in 02packages.details.txt.gz).
-
-=item * B<include_unregistered> => I<bool> (default: 1)
-
-Include modules that are not registered (not listed in 02packages.details.txt.gz).
+Include modules that are not indexed (not listed in 02packages.details.txt.gz).
 
 =item * B<index_name> => I<filename> (default: "index.db")
 
@@ -169,7 +218,7 @@ Only list depended modules published by specified author(s).
 
 Do not list depended modules published by specified author(s).
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.30.2")
 
 Set base Perl version for determining core modules.
 

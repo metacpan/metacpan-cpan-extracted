@@ -7,42 +7,29 @@ namespace panda { namespace protocol { namespace websocket {
 using std::cout;
 using std::endl;
 
+// returns true if frame is done
 bool Frame::parse (string& buf) {
     assert(_state != State::DONE);
+
+    auto _err = [&](const std::error_code& ec) -> bool {
+        error = ec;
+        _state = State::DONE;
+        return true;
+    };
 
     if (_state == State::HEADER) {
         if (!_header.parse(buf)) return false;
 
-        if (opcode() > Opcode::PONG || (opcode() > Opcode::BINARY && opcode() < Opcode::CLOSE)) {
-            error = errc::invalid_opcode;
-            _state = State::DONE;
-            return true;
-        }
+        if (opcode() > Opcode::PONG || (opcode() > Opcode::BINARY && opcode() < Opcode::CLOSE)) return _err(errc::invalid_opcode);
 
         if (is_control()) {
-            if (!final()) {
-                error = errc::control_fragmented;
-                _state = State::DONE;
-                return true;
-            }
-            if (_header.length > MAX_CONTROL_PAYLOAD) {
-                error = errc::control_payload_too_big;
-                _state = State::DONE;
-                return true;
-            }
+            if (!final())                             return _err(errc::control_fragmented);
+            if (_header.length > MAX_CONTROL_PAYLOAD) return _err(errc::control_payload_too_big);
+            if (_header.rsv1)                         return _err(errc::control_frame_compression);
         }
 
-        if (!_header.has_mask && _mask_required && _header.length) {
-            error = errc::not_masked;
-            _state = State::DONE;
-            return true;
-        }
-
-        if (_max_size && _header.length > _max_size) {
-            error = errc::max_frame_size;
-            _state = State::DONE;
-            return true;
-        }
+        if (!_header.has_mask && _mask_required && _header.length) return _err(errc::not_masked);
+        if (_max_size && _header.length > _max_size)               return _err(errc::max_frame_size);
 
         _state = _header.length ? State::PAYLOAD : State::DONE;
         _payload_bytes_left = _header.length;
@@ -83,12 +70,11 @@ bool Frame::parse (string& buf) {
                 for (const auto& s : payload) str += s;
             }
 
-            if (FrameHeader::parse_close_payload(str, _close_code, _close_message)) {
-                payload.clear();
-                payload.push_back(_close_message);
-                _header.length = _close_message.length();
-            }
-            else error = errc::close_frame_invalid_data;
+            if (!FrameHeader::parse_close_payload(str, _close_code, _close_message)) return _err(errc::close_frame_invalid_data);
+
+            payload.clear();
+            payload.push_back(_close_message);
+            _header.length = _close_message.length();
         }
         //cout << "Frame[parse]: CLOSE CODE=" << _close_code << " MSG=" << _close_message << endl;
     }

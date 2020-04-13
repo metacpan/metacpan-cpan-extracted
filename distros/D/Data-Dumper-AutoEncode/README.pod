@@ -5,7 +5,7 @@ This is Perl module B<Data::Dumper::AutoEncode>.
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/Data-Dumper-AutoEncode"><img src="https://secure.travis-ci.org/bayashi/Data-Dumper-AutoEncode.png?_t=1447748212"/></a> <a href="https://coveralls.io/r/bayashi/Data-Dumper-AutoEncode"><img src="https://coveralls.io/repos/bayashi/Data-Dumper-AutoEncode/badge.png?_t=1447748212&branch=master"/></a>
+<a href="https://github.com/bayashi/Data-Dumper-AutoEncode/blob/master/lib/Data/Dumper/AutoEncode.pm"><img src="https://img.shields.io/badge/Version-1.00-green?style=flat"></a> <a href="https://github.com/bayashi/Data-Dumper-AutoEncode/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Data-Dumper-AutoEncode/actions"><img src="https://github.com/bayashi/Data-Dumper-AutoEncode/workflows/master/badge.svg?_t=1586720844"/></a> <a href="https://coveralls.io/r/bayashi/Data-Dumper-AutoEncode"><img src="https://coveralls.io/repos/bayashi/Data-Dumper-AutoEncode/badge.png?_t=1586720844&branch=master"/></a>
 
 =end html
 

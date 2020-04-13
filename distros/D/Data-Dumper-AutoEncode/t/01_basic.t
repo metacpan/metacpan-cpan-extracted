@@ -47,9 +47,17 @@ use Encode qw//;
 }
 
 {
+    local $Data::Dumper::AutoEncode::CHECK_ALREADY_ENCODED = 1;
     my $ret = eDumper({ Encode::decode_utf8('富士は日本一の山') => 'エベレストは世界一の山' });
     like $ret, qr/富士は日本一の山/, 'ex decoded';
     like $ret, qr/エベレストは世界一の山/, 'ex encoded';
+}
+
+{
+    local $Data::Dumper::AutoEncode::CHECK_ALREADY_ENCODED = 1;
+    local $Data::Dumper::AutoEncode::FLAG_STR = 'auto_encoded:';
+    is eDumper(Encode::decode_utf8('富士は日本一の山')), q|$VAR1 = 'auto_encoded:富士は日本一の山';|."\n", 'FLAG_STR';
+    is eDumper('富士は日本一の山'), q|$VAR1 = '富士は日本一の山';|."\n", 'No FLAG_STR';
 }
 
 done_testing;

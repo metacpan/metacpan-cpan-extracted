@@ -5,11 +5,11 @@ use warnings;
 package Dancer2::Session::JSON;
 # ABSTRACT: Dancer 2 session storage in files with JSON
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Dancer2::Core::Types;
-use JSON -convert_blessed_universally;
+use JSON;
 
 #--------------------------------------------------------------------------#
 # Attributes
@@ -44,7 +44,7 @@ with 'Dancer2::Core::Role::SessionFactory::File';
 sub _freeze_to_handle {
     my ( $self, $fh, $data ) = @_;
     binmode $fh;
-    print {$fh} $self->_freeze($data);
+    print {$fh} $self->_freeze( +{ %{$data} } );
     return;
 }
 
@@ -68,7 +68,7 @@ Dancer2::Session::JSON - Dancer 2 session storage in files with JSON
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 
@@ -97,7 +97,7 @@ files in /tmp/dancer-sessions
         JSON:
           session_dir: "/tmp/dancer-sessions"
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -120,11 +120,21 @@ L<https://github.com/PerlDancer/dancer2-session-json>
 
 David Golden <dagolden@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Jason A. Crome
+=for stopwords Jason A. Crome Sawyer X
+
+=over 4
+
+=item *
 
 Jason A. Crome <jason@crome-plated.com>
+
+=item *
+
+Sawyer X <xsawyerx@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/CountrySpec.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -49,6 +49,16 @@ Net::API::Stripe::Connect::CountrySpec - A Stripe Country Spec Object
 
 =head1 SYNOPSIS
 
+    my $spec = $stripe->country_spec({
+        default_currency => 'jpy',
+        supported_bank_account_currencies => 
+        {
+        eur => [qw( be fr de it lu nl dk ie gr pt es at fi sw cy cz ee hu lv lt mt pl sk si bg ro hr va )],
+        jpy => [qw( jp )],
+        twd => [qw( tw )],
+        },
+    });
+
 =head1 VERSION
 
     0.1
@@ -63,18 +73,8 @@ Stripe needs to collect certain pieces of information about each account created
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::CountrySpec> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -114,7 +114,7 @@ Countries that can accept transfers from the specified country.
 
 Lists the types of verification data needed to keep an account open.
 
-This is a C<Net::API::Stripe::Connect::CountrySpec::VerificationFields> object.
+This is a L<Net::API::Stripe::Connect::CountrySpec::VerificationFields> object.
 
 =back
 
@@ -212,7 +212,7 @@ L<https://stripe.com/docs/api/country_specs>, L<https://stripe.com/docs/connect/
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

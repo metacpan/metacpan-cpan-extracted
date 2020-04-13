@@ -27,7 +27,8 @@ my %WriteMakefileArgs = (
     "script/parse-duration-using-df-alami-id",
     "script/parse-duration-using-df-natural",
     "script/parse-duration-using-td-parse",
-    "script/strftime"
+    "script/strftime",
+    "script/strftimeq"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -48,6 +49,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::duration" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Date::Parse" => 0,
+    "Date::strftimeq" => 0,
     "DateTime" => 0,
     "DateTime::Format::Alami::EN" => "0.13",
     "DateTime::Format::Alami::ID" => "0.13",
@@ -70,7 +72,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.124",
+  "VERSION" => "0.125",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -93,6 +95,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::duration" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "Date::Parse" => 0,
+  "Date::strftimeq" => 0,
   "DateTime" => 0,
   "DateTime::Format::Alami::EN" => "0.13",
   "DateTime::Format::Alami::ID" => "0.13",

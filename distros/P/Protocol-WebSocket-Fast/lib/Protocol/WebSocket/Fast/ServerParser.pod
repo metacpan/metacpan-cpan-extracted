@@ -29,6 +29,11 @@ See L<Protocol::WebSocket::Fast::Parser> for API after accepting a connection.
 
 =head1 METHODS
 
+=head2 new([\%params])
+
+Creates new instance of parser. See L<Parser|Protocol::WebSocket::Fast::Parser>'s C<configure()> method for parameters description.
+
+
 =head2 accept_parsed()
 
 Returns true if server finished parsing client's connect request.

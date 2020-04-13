@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/CreditNote.pm
-## Version 0.2
+## Version 0.1
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
@@ -85,6 +85,17 @@ Net::API::Stripe::Billing::CreditNote - A Stripe Credit Note Object
 
 =head1 SYNOPSIS
 
+    my $note = $stripe->credite_note({
+        amount => 2000,
+        memo => 'Credit note for your purchase on 2020-03-17',
+        currency => 'eur',
+        # Required
+        invoice => $invoice_object,
+        number => 'CR2020031701',
+        metadata => { transac_id => 1212, client_id => 789, ts => 1584403200 }
+        total => 2000
+    });
+
 =head1 VERSION
 
     0.2
@@ -117,18 +128,8 @@ You may issue multiple credit notes for an invoice. Each credit note will increm
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Billing::CreditNote> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -158,21 +159,21 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 =item B<customer> string (expandable)
 
-ID of the customer. When expanded, this is a C<Net::API::Stripe::Customer> object.
+ID of the customer. When expanded, this is a L<Net::API::Stripe::Customer> object.
 
 =item B<customer_balance_transaction> string (expandable)
 
-Customer balance transaction related to this credit note. When expanded, this is a C<Net::API::Stripe::Balance::Transaction> object.
+Customer balance transaction related to this credit note. When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<invoice> string (expandable)
 
-ID of the invoice. When expanded, this is a C<Net::API::Stripe::Billing::Invoice> object.
+ID of the invoice. When expanded, this is a L<Net::API::Stripe::Billing::Invoice> object.
 
 =item B<lines>() list
 
 Line items that make up the credit note.
 
-This is a C<Net::API::Stripe::List> object with a list of C<Net::API::Stripe::Billing::CreditNote::LineItem>
+This is a L<Net::API::Stripe::List> object with a list of L<Net::API::Stripe::Billing::CreditNote::LineItem>
 
 =item B<livemode> boolean
 
@@ -204,7 +205,7 @@ Reason for issuing this credit note, one of duplicate, fraudulent, order_change,
 
 =item B<refund> string (expandable)
 
-Refund related to this credit note. When expanded, this is a C<Net::API::Stripe::Refund> object.
+Refund related to this credit note. When expanded, this is a L<Net::API::Stripe::Refund> object.
 
 =item B<status> string
 
@@ -238,7 +239,7 @@ Whether this tax amount is inclusive or exclusive.
 
 The tax rate that was applied to get this tax amount.
 
-When expanded, this is a C<Net::API::Stripe::Tax::Rate> object.
+When expanded, this is a L<Net::API::Stripe::Tax::Rate> object.
 
 =back
 
@@ -255,14 +256,14 @@ The time that the credit note was voided. This is a C<DateTime> object.
 =head1 API SAMPLE
 
 	{
-	  "id": "cn_1FUtZzCeyNCl6fY2k3BiiPex",
+	  "id": "cn_fake124567890",
 	  "object": "credit_note",
 	  "amount": 1690,
 	  "created": 1571397911,
 	  "currency": "jpy",
-	  "customer": "cus_Eky0BeTYmSj9pa",
+	  "customer": "cus_fake124567890",
 	  "customer_balance_transaction": null,
-	  "invoice": "in_1FUtZzCeyNCl6fY2BihLOfn1",
+	  "invoice": "in_fake124567890",
 	  "livemode": false,
 	  "memo": null,
 	  "metadata": {},
@@ -293,7 +294,7 @@ L<https://stripe.com/docs/api/credit_notes>, L<https://stripe.com/docs/billing/i
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-02-28'; # DATE
-our $VERSION = '0.473'; # VERSION
+our $DATE = '2020-04-12'; # DATE
+our $VERSION = '0.474'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ list-org-anniversaries - List all anniversaries in Org files
 
 =head1 VERSION
 
-This document describes version 0.473 of list-org-anniversaries (from Perl distribution App-OrgUtils), released on 2020-02-28.
+This document describes version 0.474 of list-org-anniversaries (from Perl distribution App-OrgUtils), released on 2020-04-12.
 
 =head1 SYNOPSIS
 
@@ -83,11 +83,11 @@ Only show anniversaries that are due in this number of days.
 
 =item B<--field-pattern>=I<s>
 
-Field regex that specifies anniversaries.
+Regex for fields that specify anniversaries.
 
 Default value:
 
- "(?:birthday|anniversary)"
+ qr((?:birthday|anniversary))i
 
 =item B<--file>=I<filename>*
 
@@ -124,6 +124,18 @@ Can be specified multiple times.
 =item B<--max-overdue>=I<s>
 
 Don't show dates that are overdue more than this number of days.
+
+=item B<--reminded-field-pattern>=I<s>
+
+Default value:
+
+ qr(reminded)i
+
+=item B<--reminded-suffix>=I<s>
+
+Default value:
+
+ " reminded"
 
 =item B<--sort-json>=I<s>
 
@@ -314,6 +326,8 @@ List of available configuration parameters:
  lacks_tags (see --lacks-tags)
  max_overdue (see --max-overdue)
  naked_res (see --naked-res)
+ reminded_field_pattern (see --reminded-field-pattern)
+ reminded_suffix (see --reminded-suffix)
  sort (see --sort)
  time_zone (see --time-zone)
  today (see --today)

@@ -105,7 +105,8 @@ sub transform {
                     # Change '*' to '\b(.*)\b' in this decomposition rule,
                     # so we can use it for regular expressions.  Later, 
                     # we will want to isolate individual matches to each wildcard. 
-                    ($this_decomp = $decomp) =~ s/\s*\*\s*/\\b\(\.\*\)\\b/g;
+                    $this_decomp = $decomp;
+		    $this_decomp =~ s/\s*\*\s*/\\b\(\.\*\)\\b/g;
                     # If this docomposition rule contains a word which begins with '@', 
                     # then the script also contained some synonyms for that word.  
                     # Find them all using %synon and generate a regular expression 

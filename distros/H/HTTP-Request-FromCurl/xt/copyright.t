@@ -79,7 +79,7 @@ for my $file (@results) {
 
 note "Distribution was last modified in $last_modified_year";
 
-my @out_of_date = grep { $_->{copyright} and $_->{copyright} != $last_modified_year } @results;
+my @out_of_date = grep { $_->{copyright} and $_->{copyright} < $last_modified_year } @results;
 
 if(! is 0+@out_of_date, 0, "All files have a current copyright year ($last_modified_year)") {
     for my $file (@out_of_date) {

@@ -68,20 +68,7 @@ share {
     plugin Extract => 'tar.xz';
   }
 
-  if($^O ne 'MSWin32')
-  {
-    build [
-      'cp -r * %{.install.stage}',
-    ];
-  }
-  else
-  {
-    build sub {
-      my($build) = @_;
-      my $stage = path($build->install_prop->{stage})->canonpath;
-      $build->system("xcopy . $stage /E");
-    };
-  }
+  plugin 'Build::Copy';
 
   gather sub {
     my($build) = @_;

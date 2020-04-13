@@ -8,6 +8,7 @@ use Capture::Tiny 'capture';
 use Test::HTTP::LocalServer;
 use URL::Encode 'url_decode';
 use File::Temp 'tempfile';
+use Storable 'dclone';
 use LWP::UserAgent;
 
 use Filter::signatures;
@@ -17,7 +18,7 @@ no warnings 'experimental::signatures';
 use Exporter 'import';
 
 our @EXPORT_OK = (qw(&run_curl_tests $server));
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 
 $Data::Dumper::Useqq = 1;
 
@@ -55,17 +56,18 @@ sub curl( @args ) {
     my ($stdout, $stderr, $exit) = capture {
         system( $curl, @args )
     };
+
+    return ($stdout,$stderr,$exit)
 }
 
 sub curl_version( $curl ) {
     my( $stdout, undef, $exit ) = curl( '--version' );
     return undef if $exit;
-    ($stdout =~ /^curl\s+([\d.]+)/)[0]
+    return ($stdout =~ /^curl\s+([\d.]+)/)[0]
 };
 
 sub curl_request( @args ) {
     my ($stdout, $stderr, $exit) = curl(@args);
-
     my @res;
 
     if( ! $exit ) {
@@ -187,6 +189,69 @@ $HTTP::Request::FromCurl::default_headers{ 'User-Agent' } = "curl/$version";
 
 my $cmp_version = sprintf "%03d%03d%03d", split /\./, $version;
 
+# Generates 2 OK stanzas
+sub request_logs_identical_ok {
+    my( $test, $name, $r, $res ) = @_;
+    my $status;
+    if( ! $r ) {
+        fail $name;
+        SKIP: {
+            skip "We can't check the request body", 2;
+        };
+
+    } elsif( $r->method ne $res->{method} ) {
+        is $r->method, $res->{method}, $name;
+        diag join " ", @{ $test->{cmd} };
+        SKIP: {
+            skip "We can't check the request body", 2;
+        };
+    } elsif( url_decode($r->uri->path_query) ne $res->{path} ) {
+        is url_decode($r->uri->path_query), $res->{path}, $name ;
+        diag join " ", @{ $test->{cmd} };
+        SKIP: {
+            skip "We can't check the request body", 2;
+        };
+    } else {
+        # There is no convenient way to get at the form data from curl
+        #if( $r->content ne $res->{body} ) {
+        #    is $r->content, $res->{body}, $name;
+        #    diag join " ", @{ $test->{cmd} };
+        #    return;
+        #};
+
+        # If the request has a cookie jar we need to load+extract the cookie:
+        if( my $j = $r->cookie_jar and $r->cookie_jar_options->{read}) {
+            require HTTP::CookieJar;
+            require Path::Tiny;
+            Path::Tiny->import('path');
+            my $jar = HTTP::CookieJar->new->load_cookies(path($j)->lines);
+            if( my $c = $jar->cookie_header($server->url)) {
+                $r->{headers}->{Cookie} = $c
+            };
+        };
+
+        my %got = %{ $r->headers };
+        if( $test->{ignore} ) {
+            delete @got{ @{ $test->{ignore}}};
+            delete @{$res->{headers}}{ @{ $test->{ignore}}};
+        };
+
+        # Fix weirdo CentOS6 build of Curl which has a weirdo User-Agent header:
+        if( exists $res->{headers}->{ 'User-Agent' }) {
+            $res->{headers}->{ 'User-Agent' } =~ s!^(curl/7\.19\.7)\b.+!$1!;
+        };
+
+        is_deeply \%got, $res->{headers}, $name
+            or diag Dumper [\%got, $res->{headers}];
+
+        # Now, also check that our HTTP::Request looks similar
+        my $http_request = $r->as_request;
+        my $payload = $http_request->content;
+
+        is $payload, $r->body || '', "We don't munge the request body";
+    };
+}
+
 sub request_identical_ok {
     my( $test ) = @_;
     local $TODO = $test->{todo};
@@ -199,8 +264,6 @@ sub request_identical_ok {
 
     # Replace the dynamic parameters
     my $port = $server->url->port;
-    # For testing of globbing on an IPv6 system
-    #s!\$(url)\b!http://localhost:$port!g for @$cmd;
     s!\$(url)\b!$server->$1!ge for @$cmd;
     s!\$(port)\b!$server->$1!ge for @$cmd;
     s!\$(tempfile)\b!$tempfile!g for @$cmd;
@@ -231,16 +294,90 @@ sub request_identical_ok {
     my $log = $server->get_log;
     # Clean up some stuff that we will supply from our own values:
     my $compressed = join ", ", HTTP::Message::decodable();
-    $log =~ s!^Accept-Encoding: .*?$!Accept-Encoding: $compressed!msg;
+    $log =~ s!^Accept-Encoding: (.*?)$!Accept-Encoding: $compressed!msg;
+    my $org_accept_encoding = $1;
 
     my @curl_log = split /^(?=Request:)/m, $log;
     note sprintf "Received %d curl requests", 0+@curl_log;
-
 
     my @r = HTTP::Request::FromCurl->new(
         argv => $cmd,
         read_files => 1,
     );
+
+    my @reconstructed_commandline = ('--verbose', map {"$_"} $r[0]->as_curl(curl => undef));
+
+    my @reparse;
+    my $lived = eval {
+        @reparse = HTTP::Request::FromCurl->new(
+            argv => [@reconstructed_commandline],
+            read_files => 1,
+        );
+
+        1;
+    };
+    if( ! $lived or @reparse == 0 ) {
+        fail "Our reconstructed command line parses again";
+        diag $@;
+    } else {
+        pass "Our reconstructed command line parses again"
+    };
+
+    # Well, no!
+    # is_deeply \@reconstructed, $cmd, "Reconstructed command";
+    # Check that the reconstructed command behaves identically
+    my @reconstructed = curl_request( @reconstructed_commandline );
+
+    # Can we maybe even loop over all requests?!
+    for my $i ( 0..0 ) {
+        if( $reconstructed[$i]->{error}) {
+            SKIP: {
+                diag Dumper $test->{cmd};
+                diag Dumper \@reconstructed_commandline;
+                skip "$name (reconstructed): $reconstructed[$i]->{error_output}", 1;
+            };
+        } else {
+
+            # We will modify/fudge things a bit
+            my $copy = dclone( $res[$i] );
+            delete $copy->{response_body};
+            delete $reconstructed[$i]->{response_body};
+            if( exists $reconstructed[$i]->{headers}->{'Accept-Encoding'} ) {
+                $reconstructed[$i]->{headers}->{'Accept-Encoding'} = $org_accept_encoding;
+            };
+
+            # re-decode %7d and %7b to {}
+            if( exists $reconstructed[$i]->{query} ) {
+                $reconstructed[$i]->{query} =~ s!%7b!\{!gi;
+                $reconstructed[$i]->{query} =~ s!%7d!\}!gi;
+            };
+            if( exists $reconstructed[$i]->{path} ) {
+                $reconstructed[$i]->{path} =~ s!%7b!\{!gi;
+                $reconstructed[$i]->{path} =~ s!%7d!\}!gi;
+            };
+
+            if(     exists $copy->{headers}->{'Content-Type'}
+                and $copy->{headers}->{'Content-Type'} =~ m!^multipart/form-data\b! ) {
+                    # Our Content-Length and Content-Type will be somewhat different
+                if( $reconstructed[$i]->{headers}->{'Content-Type'} =~ m!^multipart/form-data\b! ) {
+                    $copy->{headers}->{'Content-Length'} = 0;
+                    $reconstructed[$i]->{headers}->{'Content-Length'} = 0;
+                    $reconstructed[$i]->{headers}->{'Content-Type'} = $copy->{headers}->{'Content-Type'};
+                };
+            };
+
+            if( !is_deeply $reconstructed[$i], $copy, "$name (reconstructed)" ) {
+                diag Dumper $test->{cmd};
+                diag Dumper $copy;
+                diag Dumper \@reconstructed_commandline;
+                diag Dumper $reconstructed[$i];
+            };
+            #request_logs_identical_ok( $test, "$name (reconstructed)", $reconstructed[$i], $res[$i] );
+        };
+    };
+
+    # clean out the second round
+    $server->get_log;
 
     my $requests = @r;
     if( $requests != @res ) {
@@ -257,64 +394,16 @@ sub request_identical_ok {
         my $curl_log = $curl_log[$i];
         (my $boundary) = ($curl_log =~ m!Content-Type: multipart/form-data; boundary=(.*?)$!ms);
 
-        my $status;
-        if( ! $r ) {
-            fail $name;
-            SKIP: {
-                skip "We can't check the request body", 2;
-            };
-
-        } elsif( $r->method ne $res->{method} ) {
-            is $r->method, $res->{method}, $name;
-            diag join " ", @{ $test->{cmd} };
-            SKIP: {
-                skip "We can't check the request body", 2;
-            };
-        } elsif( url_decode($r->uri->path_query) ne $res->{path} ) {
-            is url_decode($r->uri->path_query), $res->{path}, $name ;
-            diag join " ", @{ $test->{cmd} };
-            SKIP: {
-                skip "We can't check the request body", 2;
-            };
-        } else {
-            # There is no convenient way to get at the form data from curl
-            #if( $r->content ne $res->{body} ) {
-            #    is $r->content, $res->{body}, $name;
-            #    diag join " ", @{ $test->{cmd} };
-            #    return;
-            #};
-
-            # If the request has a cookie jar we need to load+extract the cookie:
-            if( my $j = $r->cookie_jar and $r->cookie_jar_options->{read}) {
-                require HTTP::CookieJar;
-                require Path::Tiny;
-                Path::Tiny->import('path');
-                my $jar = HTTP::CookieJar->new->load_cookies(path($j)->lines);
-                if( my $c = $jar->cookie_header($server->url)) {
-                    $r->{headers}->{Cookie} = $c
-                };
-            };
-
-            my %got = %{ $r->headers };
-            if( $test->{ignore} ) {
-                delete @got{ @{ $test->{ignore}}};
-                delete @{$res->{headers}}{ @{ $test->{ignore}}};
-            };
-
-            is_deeply \%got, $res->{headers}, $name
-                or diag Dumper [\%got, $res->{headers}];
-
-            # Now, also check that our HTTP::Request looks similar
-            my $http_request = $r->as_request;
-            my $payload = $http_request->content;
-
-            is $payload, $r->body || '', "We don't munge the request body";
-        };
+        request_logs_identical_ok( $test, $name, $r, $res );
 
         # Now create a program from the request, run it and check that it still
         # sends the same request as curl does
 
         if( $r ) {
+            # Fix weirdo CentOS6 build of Curl which has a weirdo User-Agent header:
+            $curl_log =~ s!^(User-Agent:\s+curl/[\d\.]+)( .*)?$!$1!m;
+                #or die "Didn't find UA header in [$curl_log]?!";
+
             my $code = $r->as_snippet(type => 'LWP',
                 preamble => ['use strict;','use LWP::UserAgent;']
             );
@@ -345,14 +434,14 @@ sub request_identical_ok {
 
         } else {
             SKIP: {
-                skip "Did not generate a request", 4;
+                skip "Did not generate a request", 5;
             };
         };
     };
 };
 
 sub run_curl_tests( @tests ) {
-    my $testcount = @tests * 6;
+    my $testcount = @tests * 8;
     if( ! ref $tests[-1] ) {
         $testcount = pop @tests;
     };

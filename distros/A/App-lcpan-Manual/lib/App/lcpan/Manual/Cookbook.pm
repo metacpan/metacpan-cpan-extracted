@@ -1,0 +1,51 @@
+package App::lcpan::Manual::Cookbook;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-11'; # DATE
+our $DIST = 'App-lcpan-Manual'; # DIST
+our $VERSION = '1.047.000'; # VERSION
+
+1;
+# ABSTRACT: App::lcpan cookbook
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+App::lcpan::Manual::Cookbook - App::lcpan cookbook
+
+=head1 VERSION
+
+version 1.047.000
+
+=head1 FOR MODULE USERS
+
+=head1 FOR MODULE AUTHORS
+
+=head2 Checking if your distribution depends on a non-core Perl module
+
+    % lcpan deps Your-Dist --exclude-core
+
+=head2 Finding out if there is any broken prerequisites
+
+To find out which prerequisites that your distributions specify but are
+currently not indexed (i.e. cannot be installed by users):
+
+    % lcpan author-deps YOURCPANID --broken
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

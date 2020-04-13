@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Node;
 # ABSTRACT: Describes a node from a Neo4j graph
-$Neo4j::Driver::Type::Node::VERSION = '0.15';
+$Neo4j::Driver::Type::Node::VERSION = '0.16';
 
 use Carp qw(croak);
 
@@ -62,7 +62,7 @@ Neo4j::Driver::Type::Node - Describes a node from a Neo4j graph
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 

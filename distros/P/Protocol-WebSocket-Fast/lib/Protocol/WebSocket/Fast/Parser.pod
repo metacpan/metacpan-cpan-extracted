@@ -67,6 +67,11 @@ If compression is in use, this is the max size of a decompressed message.
 
 Max size of connect request (for server parser) or connect response (for client parser) headers.
 
+=item check_utf8 [false]
+
+If set to C<true>, parser will treat payload of every incoming frame with opcode C<OPCODE_TEXT> and also a message in a close frame as utf-8 payload.
+If it contains an invalid utf-8 character sequence, will set frame's or message's error to C<Protocol::WebSocket::Fast::Error::invalid_utf8>.
+
 =item deflate
 
 Compression configuration. Can't be changed after connection is established (changes are ignored).
@@ -361,6 +366,14 @@ NOTE: parameter C<payload> must be an arrayref of strings. Each string in array 
 =head2 reset()
 
 Clears internal state and reset buffer.
+
+
+=head2 suggested_close_code()
+
+Returns C<close code> that you may pass to C<send_close()> after receiving close frame from peer or after an error occured.
+
+This is just a hint, you are free to send any close code you want (that conforms to RFC).
+However if you don't have special need, sending C<suggested_close_code()> is recommended.
 
 
 

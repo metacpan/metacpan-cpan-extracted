@@ -14,7 +14,7 @@ SYNOPSIS
             ($x, $y) = @_;
           }
     
-          method move($dX, $dY) {
+          method move ($dX, $dY) {
              $x += $dX;
              $y += $dY;
           }
@@ -164,7 +164,7 @@ KEYWORDS
     declarations. In this case the signature does not have to account for
     the invocant instance; that is handled directly.
 
-       method m($one, $two) {
+       method m ($one, $two) {
           say "$self invokes method on one=$one two=$two";
        }
     
@@ -195,7 +195,7 @@ IMPLIED PRAGMATA
 
        use strict;
        use warnings;
-       no indirect ':fatal';
+       no indirect ':fatal';  # or  no feature 'indirect' on perl 5.32 onwards
        use feature 'signatures';
 
     This list may be extended in subsequent versions to add further
@@ -350,7 +350,7 @@ WITH OTHER MODULES
     
        class Example
        {
-          async method perform($block)
+          async method perform ($block)
           {
              say "$self is performing code";
              await $block->();

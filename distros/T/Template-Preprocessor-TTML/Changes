@@ -1,5 +1,10 @@
 Revision history for Template-Preprocessor-TTML
 
+0.0105  2020-04-13
+    - Fix mising $VERSION in lib/Template/Preprocessor/TTML.pm
+        - https://rt.cpan.org/Public/Bug/Display.html?id=132334
+        - Thanks to SREZIC for the report
+
 0.0104  2020-04-06
     - Fix the tests with recent Template.pm.
     - Move to github.

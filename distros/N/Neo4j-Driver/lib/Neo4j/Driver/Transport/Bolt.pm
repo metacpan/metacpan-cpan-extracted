@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transport::Bolt;
 # ABSTRACT: Adapter for Neo4j::Bolt
-$Neo4j::Driver::Transport::Bolt::VERSION = '0.15';
+$Neo4j::Driver::Transport::Bolt::VERSION = '0.16';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction);
@@ -298,7 +298,7 @@ Neo4j::Driver::Transport::Bolt - Adapter for Neo4j::Bolt
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 DESCRIPTION
 

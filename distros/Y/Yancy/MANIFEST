@@ -62,9 +62,12 @@ lib/Mojolicious/Plugin/Yancy/resources/public/yancy/popper.min.js.map
 lib/Mojolicious/Plugin/Yancy/resources/public/yancy/vue.js
 lib/Mojolicious/Plugin/Yancy/resources/templates/layouts/yancy.html.ep
 lib/Mojolicious/Plugin/Yancy/resources/templates/layouts/yancy/auth.html.ep
-lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/login.html.ep
-lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/password/login.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/github/login_form.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/login_form.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/login_page.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/oauth2/login_form.html.ep
 lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/password/login_form.html.ep
+lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/password/login_page.html.ep
 lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/password/register.html.ep
 lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/unauthorized.html.ep
 lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/auth/unauthorized.json.ep

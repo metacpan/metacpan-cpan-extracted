@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Authorization.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -77,6 +77,45 @@ Net::API::Stripe::Issuing::Authorization - A Stripe Issued Authorization Object
 
 =head1 SYNOPSIS
 
+    my $auth = $stripe->authorization({
+        approved => $stripe->true,
+        authorization_method => 'online',
+        authorized_amount => 2000,
+        authorized_currency => 'jpy',
+        balance_transactions => 
+        [
+            {
+			amount => 2000,
+			authorization => $authorization_object,
+			card => $card_object,
+			cardholder => $cardholder_object,
+			currency => 'jpy',
+			merchant_amount => 2000,
+			merchant_currency => 'jpy',
+			merchant_data => $merchant_data_object,
+			metadata => { transaction_id => 123 },
+			type => 'capture',
+			},
+        ],
+        card => $card_object,
+        cardholder => $cardholder_object,
+        created => '2020-04-12T04:07:30',
+        held_amount => 2000,
+        held_currency => 'jpy',
+        is_held_amount_controllable => $stripe->true,
+        merchant_data => $merchant_data_object,
+        metadata => { transaction_id => 123 },
+        pending_authorized_amount => 2000,
+        pending_held_amount => 2000,
+        request_history => [ $request_history_obj1, $request_history_obj2 ],
+        status => 'pending',
+        transactions => [ $transactions_obj1, $transactions_obj2, $transactions_obj3 ],
+        verification_data => $verification_data_object,
+        wallet_provider => undef,
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -91,18 +130,7 @@ When an issued card is used to make a purchase, an Issuing Authorization object 
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Issuing::Authorization> object.
 
 =back
 
@@ -207,7 +235,7 @@ What, if any, digital wallet was used for this authorization. One of apple_pay, 
 =head1 API SAMPLE
 
 	{
-	  "id": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+	  "id": "iauth_fake123456789",
 	  "object": "issuing.authorization",
 	  "approved": true,
 	  "authorization_method": "online",
@@ -238,12 +266,12 @@ What, if any, digital wallet was used for this authorization. One of apple_pay, 
 	  "status": "reversed",
 	  "transactions": [
 		{
-		  "id": "ipi_1DPqmFCeyNCl6fY2ve8MAJJu",
+		  "id": "ipi_fake123456789",
 		  "object": "issuing.transaction",
 		  "amount": -100,
-		  "authorization": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+		  "authorization": "iauth_fake123456789",
 		  "balance_transaction": null,
-		  "card": "ic_1DPqmFCeyNCl6fY2bHuXx2E3",
+		  "card": "ic_fake123456789",
 		  "cardholder": null,
 		  "created": 1540642827,
 		  "currency": "usd",
@@ -265,12 +293,12 @@ What, if any, digital wallet was used for this authorization. One of apple_pay, 
 		  "type": "capture"
 		},
 		{
-		  "id": "ipi_1DPqmFCeyNCl6fY2wlCERJ4S",
+		  "id": "ipi_fake123456789",
 		  "object": "issuing.transaction",
 		  "amount": -100,
-		  "authorization": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+		  "authorization": "iauth_fake123456789",
 		  "balance_transaction": null,
-		  "card": "ic_1DPqmFCeyNCl6fY290pxaFhn",
+		  "card": "ic_fake123456789",
 		  "cardholder": null,
 		  "created": 1540642827,
 		  "currency": "usd",
@@ -319,7 +347,7 @@ L<https://stripe.com/docs/api/issuing/authorizations>, L<https://stripe.com/docs
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

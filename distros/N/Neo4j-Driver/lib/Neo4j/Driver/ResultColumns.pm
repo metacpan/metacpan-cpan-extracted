@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultColumns;
 # ABSTRACT: Structure definition of Cypher result values
-$Neo4j::Driver::ResultColumns::VERSION = '0.15';
+$Neo4j::Driver::ResultColumns::VERSION = '0.16';
 
 use Carp qw(croak);
 
@@ -78,7 +78,7 @@ Neo4j::Driver::ResultColumns - Structure definition of Cypher result values
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 DESCRIPTION
 

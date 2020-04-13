@@ -762,7 +762,11 @@ static int keyword_class(pTHX_ OP **op_ptr)
     croak("Expected a block or ';'");
 
   import_pragma("strict", NULL);
+#if HAVE_PERL_VERSION(5, 31, 9)
+  import_pragma("-feature", "indirect");
+#else
   import_pragma("-indirect", ":fatal");
+#endif
 #ifdef HAVE_PARSE_SUBSIGNATURE
   import_pragma("experimental", "signatures");
 #endif
@@ -781,6 +785,8 @@ static int keyword_class(pTHX_ OP **op_ptr)
 
   meta->tmpcop = (COP *)newSTATEOP(0, NULL, NULL);
   CopFILE_set(meta->tmpcop, __FILE__);
+
+  meta->methodscope = NULL;
 
   /* CARGOCULT from perl/op.c:Perl_package() */
   {
@@ -954,6 +960,11 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
   U32 i;
   AV *slots = compclassmeta->slots;
   U32 nslots = av_count(slots);
+
+  /* Save the methodscope for this subparse, in case of nested methods
+   *   (RT132321)
+   */
+  SAVESPTR(compclassmeta->methodscope);
 
   /* While creating the new scope CV we need to ENTER a block so as not to
    * break any interpvars

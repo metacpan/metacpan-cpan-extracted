@@ -1,3 +1,11 @@
+1.1.0    10.04.2020
+           - improve frame/message parsing
+           - add Error::unexpected_rsv if a frame received with rsvX set without associated extension
+           - refactor tests
+           - add suggested_close_code()
+           - raise parsing errors for invalid close codes
+           - support for utf8 validation for TEXT frames (disabled by default)
+           - pass all autobahn tests
 1.0.3    03.04.2020
            - renamed from Protocol::WebSocket::XS to Protocol::WebSocket::Fast
 1.0.2    03.04.2020

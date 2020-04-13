@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Event.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -49,17 +49,35 @@ Net::API::Stripe::Event - A Stripe Event Object
 
 =head1 SYNOPSIS
 
+    my $evt = $stripe->event({
+        api_version => '2020-03-02',
+        data => 
+        {
+			object => $invoice_object,
+        },
+        livemode => $stripe->false,
+        pending_webhooks => 2,
+        request =>
+        {
+			id => 'req_HwlkQJshckjIsj',
+			idempotency_key => '677A3112-FBAD-4804-BA61-CEF1CC13D155',
+        },
+        type => 'invoice.created',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-Events are our way of letting you know when something interesting happens in your account. When an interesting event occurs, we create a new Event object. For example, when a charge succeeds, we create a charge.succeeded event; and when an invoice payment attempt fails, we create an invoice.payment_failed event. Note that many API requests may cause multiple events to be created. For example, if you create a new subscription for a customer, you will receive both a customer.subscription.created event and a charge.succeeded event.
+Events are Stripe's way of letting you know when something interesting happens in your account. When an interesting event occurs, Stripe creates a new Event object. For example, when a charge succeeds, Stripe creates a charge.succeeded event; and when an invoice payment attempt fails, Stripe creates an invoice.payment_failed event. Note that many API requests may cause multiple events to be created. For example, if you create a new subscription for a customer, you will receive both a customer.subscription.created event and a charge.succeeded event.
 
 Events occur when the state of another API resource changes. The state of that resource at the time of the change is embedded in the event's data field. For example, a charge.succeeded event will contain a charge, and an invoice.payment_failed event will contain an invoice.
 
-As with other API resources, you can use endpoints to retrieve an individual event (L<https://stripe.com/docs/api/events#retrieve_event>) or a list of events (L<https://stripe.com/docs/api/events#list_events>) from the API. We also have a separate webhooks (L<http://en.wikipedia.org/wiki/Webhook>) system for sending the Event objects directly to an endpoint on your server. Webhooks are managed in your account settings (L<https://dashboard.stripe.com/account/webhooks>), and our Using Webhooks (L<https://stripe.com/docs/webhooks>) guide will help you get set up.
+As with other API resources, you can use endpoints to L<retrieve an individual event|https://stripe.com/docs/api/events#retrieve_event> or a L<list of events|https://stripe.com/docs/api/events#list_events> from the API. Stripe also have a L<separate webhooks  system|http://en.wikipedia.org/wiki/Webhook> for sending the Event objects directly to an endpoint on your server. Webhooks are managed in your L<account settings|https://dashboard.stripe.com/account/webhooks>, and L<Stripe's Using Webhooks|https://stripe.com/docs/webhooks> guide will help you get set up.
 
 When using Connect, you can also receive notifications of events that occur in connected accounts. For these events, there will be an additional account attribute in the received Event object.
 
@@ -69,18 +87,8 @@ When using Connect, you can also receive notifications of events that occur in c
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Event> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -110,7 +118,7 @@ Time at which the object was created. Measured in seconds since the Unix epoch.
 
 =item B<data> hash
 
-Object containing data associated with the event. This is an C<Net::API::Stripe::Event::Data> object
+Object containing data associated with the event. This is an L<Net::API::Stripe::Event::Data> object
 
 =item B<livemode> boolean
 
@@ -122,7 +130,7 @@ Number of webhooks that have yet to be successfully delivered (i.e., to return a
 
 =item B<request> hash
 
-Information on the API request that instigated the event. This is a C<Net::API::Stripe::Event::Request> object.
+Information on the API request that instigated the event. This is a L<Net::API::Stripe::Event::Request> object.
 
 =item B<type> string
 
@@ -133,7 +141,7 @@ Description of the event (e.g., invoice.created or charge.refunded).
 =head1 API SAMPLE
 
 	{
-	  "id": "evt_1Ccdk1CeyNCl6fY2mTXIaobI",
+	  "id": "evt_fake123456789",
 	  "object": "event",
 	  "api_version": "2017-02-14",
 	  "created": 1528914645,
@@ -194,7 +202,7 @@ L<https://stripe.com/docs/api/events#events>, L<https://stripe.com/docs/api/even
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

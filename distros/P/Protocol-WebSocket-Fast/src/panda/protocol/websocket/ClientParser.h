@@ -11,7 +11,7 @@ using panda::string;
 
 struct ClientParser : Parser {
 
-    ClientParser () : Parser(false), _connect_response_parser() {}
+    ClientParser (const Parser::Config& cfg = {}) : Parser(false, cfg), _connect_response_parser() {}
 
     string connect_request (const ConnectRequestSP& req);
 

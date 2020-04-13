@@ -8,7 +8,7 @@ package Net::POP3S;
 
 use vars qw ( $VERSION @ISA );
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use strict;
 use base qw ( Net::POP3 );
@@ -168,7 +168,7 @@ sub auth {
       my $sv = $self->capa->{SASL} || 'CRAM-MD5';
 
       foreach my $i (@cl_mech) {
-	  if (index($sv, $i) >= 0 && grep(/$i/i, @matched) == () ) {
+	  if (index($sv, $i) >= 0 && !grep(/$i/i, @matched)) {
 	      push @matched, uc($i);
 	  }
       }
@@ -268,7 +268,7 @@ Tomo.M E<lt>tomo at cpan orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Tomo.M
+Copyright (C) 2020 by Tomo.M
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

@@ -1,5 +1,15 @@
 Revision history for Net-IPAM-IP
 
+1.11    Sun, 12 Apr 2020 16:55:02 +0200
+        * better API, get rid of clone(), hint for cloning with existing new_from_bytes()
+
+1.10    Sun Apr 12 13:37:21 2020 +0200
+        * respect inheritence in clone()
+
+1.09    Fri, 10 Apr 2020 14:47:53 +0200
+        * overload bool
+        * improved POD
+
 1.08    Thu, 09 Apr 2020 23:04:47 +0200
         * micro benchmark, substr() is 20% faster than unpack()
 

@@ -1,0 +1,46 @@
+---
+abstract: 'Getopt::EX autocolor module'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Getopt-EX-autocolor
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Getopt::EX::autocolor:
+    file: lib/Getopt/EX/autocolor.pm
+    version: '0.01'
+  Getopt::EX::autocolor::Apple_Terminal:
+    file: lib/Getopt/EX/autocolor/Apple_Terminal.pm
+  Getopt::EX::autocolor::iTerm:
+    file: lib/Getopt/EX/autocolor/iTerm.pm
+requires:
+  App::sdif: v4.13.7
+  Getopt::EX: v1.15.6
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/kaz-utashiro/Getopt-EX-autocolor/issues
+  homepage: https://github.com/kaz-utashiro/Getopt-EX-autocolor
+  repository: git://github.com/kaz-utashiro/Getopt-EX-autocolor.git
+version: '0.01'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_static_install: 1

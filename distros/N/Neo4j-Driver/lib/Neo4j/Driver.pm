@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Perl implementation of the Neo4j Driver API
-$Neo4j::Driver::VERSION = '0.15';
+$Neo4j::Driver::VERSION = '0.16';
 
 use Carp qw(croak);
 
@@ -123,7 +123,7 @@ sub config {
 
 
 sub session {
-	my ($self) = @_;
+	my ($self, %options) = @_;
 	
 	warnings::warnif deprecated => __PACKAGE__ . "->{die_on_error} is deprecated" unless $self->{die_on_error};
 	
@@ -134,6 +134,7 @@ sub session {
 	}
 	else {
 		$transport = Neo4j::Driver::Transport::HTTP->new($self);
+		$transport->_database($options{database}) if defined $options{database};
 	}
 	$self->{session} = 1;
 	
@@ -160,12 +161,12 @@ Neo4j::Driver - Perl implementation of the Neo4j Driver API
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
  use Neo4j::Driver;
- $uri = 'bolt://localhost';  # requires Neo4::Bolt
+ $uri = 'bolt://localhost';  # requires Neo4j::Bolt
  $uri = 'http://localhost';
  $driver = Neo4j::Driver->new($uri)->basic_auth('neo4j', 'password');
  
@@ -286,6 +287,22 @@ L<Neo4j::Driver> implements the following experimental features.
 These are subject to unannounced modification or removal in future
 versions. Expect your code to break if you depend upon these
 features.
+
+=head2 Database selection
+
+ $session = $driver->session( database => 'system' );
+
+Starting with version 4.0, Neo4j supports multiple databases within
+a single installation. A specific database may be selected using the
+optional session config option C<database>.
+
+If this option is not given, the driver will attempt to select
+whichever database is configured as the default in F<neo4j.conf>.
+As of S<L<Neo4j::Driver> 0.16>, this sometimes doesn't work reliably
+with Neo4j 4.x (see L</BUGS>).
+
+The result of using this option on Neo4j versions earlier than 4.0
+is undefined.
 
 =head2 Parameter syntax conversion
 
@@ -411,6 +428,16 @@ These warnings may be disabled if desired.
  no warnings 'ambiguous';
 
 =head1 BUGS
+
+There is a known issue
+(L<#6|https://github.com/johannessen/neo4j-driver-perl/issues/6>)
+that may prevent automatic selection of the default database on
+some Neo4j 4.0 installations. In these cases, L<Neo4j::Driver> will
+report C<Network error: 404 Not Found> when you try to run any
+statement. As a workaround, you can select the default database
+(usually named C<neo4j> or C<graph.db>) manually like this:
+
+ $session = $driver->session(database => 'neo4j');
 
 See the F<TODO> document and Github for known issues and planned
 improvements. Please report new issues and other feedback on Github.

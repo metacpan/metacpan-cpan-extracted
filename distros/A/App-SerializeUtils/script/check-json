@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-11-19'; # DATE
-our $VERSION = '0.161'; # VERSION
+our $DATE = '2020-04-10'; # DATE
+our $VERSION = '0.162'; # VERSION
 
 use 5.010;
 use strict;
@@ -51,7 +51,7 @@ check-json - Check JSON syntax
 
 =head1 VERSION
 
-This document describes version 0.161 of check-json (from Perl distribution App-SerializeUtils), released on 2018-11-19.
+This document describes version 0.162 of check-json (from Perl distribution App-SerializeUtils), released on 2020-04-10.
 
 =head1 DESCRIPTION
 
@@ -95,7 +95,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

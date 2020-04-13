@@ -2,6 +2,11 @@ use alienfile;
 
 plugin 'PkgConfig' => 'libedit';
 
+plugin 'Probe::CBuilder' => (
+  cflags => '-I/usr/include/edit/readline',
+  libs => '-ledit',
+);
+
 share {
 
   plugin Download => (

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Customer/TaxIds.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -51,53 +51,14 @@ Net::API::Stripe::Customer::TaxIds - A Customer Tax IDs List Object
 
 =head1 DESCRIPTION
 
+This module inherits completely from L<Net::API::Stripe::List> and may be removed in the future.
+
 You can add one or multiple tax IDs to a customer. A customer's tax IDs are displayed on invoices and credit notes issued for the customer.
-
-=head1 CONSTRUCTOR
-
-=over 4
-
-=item B<new>( %ARG )
-
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
-
-=back
-
-=head1 METHODS
-
-=over 4
-
-=item B<object> string, value is "list"
-
-String representing the object’s type. Objects of the same type share the same value. Always has the value list.
-
-=item B<data> array of hashes
-
-=item B<has_more> boolean
-
-True if this list has another page of items after this one that can be fetched.
-
-=item B<url> string
-
-The URL where this list can be accessed.
-
-=back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "cus_Fzxuz7ZDVaAWy9",
+	  "id": "cus_fake123456789",
 	  "object": "customer",
 	  "account_balance": 0,
 	  "address": null,
@@ -125,20 +86,20 @@ The URL where this list can be accessed.
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/customers/cus_Fzxuz7ZDVaAWy9/sources"
+		"url": "/v1/customers/cus_fake123456789/sources"
 	  },
 	  "subscriptions": {
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/customers/cus_Fzxuz7ZDVaAWy9/subscriptions"
+		"url": "/v1/customers/cus_fake123456789/subscriptions"
 	  },
 	  "tax_exempt": "none",
 	  "tax_ids": {
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/customers/cus_Fzxuz7ZDVaAWy9/tax_ids"
+		"url": "/v1/customers/cus_fake123456789/tax_ids"
 	  },
 	  "tax_info": null,
 	  "tax_info_verification": null
@@ -162,7 +123,7 @@ L<https://stripe.com/docs/api/customers>, L<https://stripe.com/docs/billing/taxe
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

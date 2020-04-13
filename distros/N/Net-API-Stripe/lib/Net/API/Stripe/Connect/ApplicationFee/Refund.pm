@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/ApplicationFee/Refund.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -61,18 +61,8 @@ Application Fee Refund objects allow you to refund an application fee that has p
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::ApplicationFee::Refund> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -119,13 +109,13 @@ Set of key-value pairs that you can attach to an object. This can be useful for 
 =head1 API SAMPLE
 
 	{
-	  "id": "fr_1FVF3LCeyNCl6fY2UhYYPAVn",
+	  "id": "fr_fake123456789",
 	  "object": "fee_refund",
 	  "amount": 100,
 	  "balance_transaction": null,
 	  "created": 1571480455,
 	  "currency": "jpy",
-	  "fee": "fee_1FVF3LCeyNCl6fY2e4pW6luQ",
+	  "fee": "fee_fake123456789",
 	  "metadata": {}
 	}
 
@@ -147,7 +137,7 @@ L<https://stripe.com/docs/api/fee_refunds>, L<https://stripe.com/docs/connect/de
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

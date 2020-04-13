@@ -33,6 +33,8 @@ std::string ErrorCategory::message (int ev) const {
         case errc::deflate_negotiation_failed : return "deflate parameters negotiation error";
         case errc::control_frame_compression  : return "compression of control frames is not allowed";
         case errc::inflate_error              : return "zlib::inflate error";
+        case errc::unexpected_rsv             : return "RSV is set but no extension defining RSV meaning has been negotiated";
+        case errc::invalid_utf8               : return "invalid utf8 sequence";
     }
     return "unknown error";
 }

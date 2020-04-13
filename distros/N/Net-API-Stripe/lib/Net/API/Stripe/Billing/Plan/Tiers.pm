@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Plan/Tiers.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -40,6 +40,11 @@ Net::API::Stripe::Billing::Plan::Tiers - A Stripe Plan Tiers Object
 
 =head1 SYNOPSIS
 
+    my $tiers = $plan->tiers({
+        flat_amount => 2000,
+        flat_amount_decimal => 2000,
+    });
+
 =head1 VERSION
 
     0.1
@@ -54,18 +59,8 @@ Each element represents a pricing tier. This parameter requires billing_scheme t
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Billing::Plan::Tiers> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -75,25 +70,25 @@ Toggles debug mode on/off
 
 =item B<flat_amount> integer
 
-Price for the entire tier. This is a C<AI::API::Stripe::Number> object.
+Price for the entire tier. This is a L<AI::API::Stripe::Number> object.
 
 =item B<flat_amount_decimal> decimal string
 
 Same as flat_amount, but contains a decimal value with at most 12 decimal places.
 
-This is a C<AI::API::Stripe::Number> object.
+This is a L<AI::API::Stripe::Number> object.
  
 =item B<unit_amount> integer
 
-Per unit price for units relevant to the tier. This is a C<AI::API::Stripe::Number> object.
+Per unit price for units relevant to the tier. This is a L<AI::API::Stripe::Number> object.
 
 =item B<unit_amount_decimal> decimal string
 
-Same as unit_amount, but contains a decimal value with at most 12 decimal places. This is a C<AI::API::Stripe::Number> object.
+Same as unit_amount, but contains a decimal value with at most 12 decimal places. This is a L<AI::API::Stripe::Number> object.
 
 =item B<up_to> integer
 
-Up to and including to this quantity will be contained in the tier. This is a C<AI::API::Stripe::Number> object.
+Up to and including to this quantity will be contained in the tier. This is a L<AI::API::Stripe::Number> object.
 
 =back
 
@@ -114,7 +109,7 @@ Up to and including to this quantity will be contained in the tier. This is a C<
 	  "livemode": false,
 	  "metadata": {},
 	  "nickname": null,
-	  "product": "prod_BWtaL30HYleHZU",
+	  "product": "prod_fake123456789",
 	  "tiers": null,
 	  "tiers_mode": null,
 	  "transform_usage": null,
@@ -140,7 +135,7 @@ L<https://stripe.com/docs/api/plans/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

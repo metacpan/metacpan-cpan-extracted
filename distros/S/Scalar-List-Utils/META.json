@@ -4,7 +4,7 @@
       "Graham Barr <gbarr@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,8 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0",
             "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
@@ -49,6 +53,6 @@
          "web" : "https://github.com/Scalar-List-Utils/Scalar-List-Utils"
       }
    },
-   "version" : "1.54",
+   "version" : "1.55",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

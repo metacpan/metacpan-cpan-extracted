@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Dispute/Evidence.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -81,9 +81,39 @@ __END__
 
 =head1 NAME
 
-Net::API::Stripe::Balance - An interface to Stripe API
+Net::API::Stripe::Dispute::Evidence - A Stripe Dispute Evidence Object
 
 =head1 SYNOPSIS
+
+    my $evidence = $stripe->dispute->evidence({
+        access_activity_log => null,
+		billing_address => '1-2-3 Kudan-Minami, Chiyoda-ku',
+		cancellation_policy => undef,
+		cancellation_policy_disclosure => undef,
+		cancellation_rebuttal => undef,
+		customer_communication => undef,
+		customer_email_address => 'john.doe@example.com',
+		customer_name => 'John Doe',
+		customer_purchase_ip => '1.2.3.4',
+		customer_signature => undef,
+		duplicate_charge_documentation => undef,
+		duplicate_charge_explanation => undef,
+		duplicate_charge_id => undef,
+		product_description => 'Professional service',
+		receipt => undef,
+		refund_policy => undef,
+		refund_policy_disclosure => undef,
+		refund_refusal_explanation => 'Customer has already used Big Corp, Inc service billed',
+		service_date => '2020-04-07',
+		service_documentation => undef,
+		shipping_address => undef,
+		shipping_carrier => undef,
+		shipping_date => undef,
+		shipping_documentation => undef,
+		shipping_tracking_number => undef,
+		uncategorized_file => undef,
+		uncategorized_text => undef,
+    });
 
 =head1 VERSION
 
@@ -91,7 +121,9 @@ Net::API::Stripe::Balance - An interface to Stripe API
 
 =head1 DESCRIPTION
 
-A dispute occurs when a customer questions your charge with their card issuer. When this happens, you're given the opportunity to respond to the dispute with evidence that shows that the charge is legitimate. You can find more information about the dispute process in our Disputes and Fraud (L<https://stripe.com/docs/disputes>) documentation.
+A dispute occurs when a customer questions your charge with their card issuer. When this happens, you're given the opportunity to respond to the dispute with evidence that shows that the charge is legitimate. You can find more information about the dispute process in L<Stripe Disputes and Fraud documentation|https://stripe.com/docs/disputes>.
+
+This is instantiated by method B<evidence> in module L<Net::API::Stripe::Dispute>
 
 =head1 CONSTRUCTOR
 
@@ -99,18 +131,8 @@ A dispute occurs when a customer questions your charge with their card issuer. W
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Dispute::Evidence> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -130,7 +152,7 @@ The billing address provided by the customer.
 
 (ID of a file upload) Your subscription cancellation policy, as shown to the customer.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =item B<cancellation_policy_disclosure> string
 
@@ -144,7 +166,7 @@ A justification for why the customer’s subscription was not canceled.
 
 (ID of a file upload) Any communication with the customer that you feel is relevant to your case. Examples include emails proving that the customer received the product or service, or demonstrating their use of or satisfaction with the product or service.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =item B<customer_email_address> string
 
@@ -162,13 +184,13 @@ The IP address that the customer used when making the purchase.
 
 (ID of a file upload) A relevant document or contract showing the customer’s signature.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =item B<duplicate_charge_documentation> string (expandable)
 
 (ID of a file upload) Documentation for the prior charge that can uniquely identify the charge, such as a receipt, shipping label, work order, etc. This document should be paired with a similar document from the disputed payment that proves the two payments are separate.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =item B<duplicate_charge_explanation> string
 
@@ -186,13 +208,13 @@ A description of the product or service that was sold.
 
 (ID of a file upload) Any receipt or message sent to the customer notifying them of the charge.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =item B<refund_policy> string (expandable)
 
 (ID of a file upload) Your refund policy, as shown to the customer.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =item B<refund_policy_disclosure> string
 
@@ -210,7 +232,7 @@ The date on which the customer received or began receiving the purchased service
 
 (ID of a file upload) Documentation showing proof that a service was provided to the customer. This could include a copy of a signed contract, work order, or other form of written agreement.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =item B<shipping_address> string
 
@@ -292,7 +314,7 @@ L<https://stripe.com/docs/api/disputes/evidence_object#dispute_evidence_object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

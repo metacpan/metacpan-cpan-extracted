@@ -3,6 +3,7 @@ package Pcore::Core::Const;
 use common::header;
 use Const::Fast qw[const];
 use Pcore::Core::Exporter;
+use Cpanel::JSON::XS qw[];
 
 # <<<
 const our $ANSI => {
@@ -40,14 +41,22 @@ for my $name ( keys $ANSI->%* ) {
 }
 
 our $EXPORT = {
-    CORE    => [qw[$MSWIN $EMPTY $SPACE]],
+    CORE    => [qw[:BOOL $MSWIN $EMPTY $SPACE]],
     DEFAULT => [':CORE'],
     ANSI    => [ map { '$' . $_ } keys $ANSI->%* ],
+    BOOL    => [qw[TO_BOOL $TRUE $FALSE]],
 };
 
 const our $MSWIN => $^O =~ /MSWin/sm ? 1 : 0;
 const our $EMPTY => q[];
 const our $SPACE => q[ ];
+
+const our $TRUE  => $Cpanel::JSON::XS::true;
+const our $FALSE => $Cpanel::JSON::XS::false;
+
+sub TO_BOOL : prototype($) {
+    return $_[0] ? $TRUE : $FALSE;
+}
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -56,7 +65,7 @@ const our $SPACE => q[ ];
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 39                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 40                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 1                    | Modules::RequireVersionVar - No package-scoped "$VERSION" variable found                                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

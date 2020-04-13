@@ -56,7 +56,7 @@ sub BUILDARGS ( $self, $uri, %args ) {
 }
 
 sub set_token ( $self, $token = undef ) {
-    if ( $token // $EMPTY ne $self->{token} // $EMPTY ) {
+    if ( ( $token // $EMPTY ) ne ( $self->{token} // $EMPTY ) ) {
         $self->{token} = $token;
 
         my $h = $self->{_ws};

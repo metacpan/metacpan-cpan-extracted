@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Authorization/Transaction.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -62,13 +62,30 @@ Net::API::Stripe::Issuing::Authorization::Transaction - A Stripe Authorization T
 
 =head1 SYNOPSIS
 
+    my $tr = $stripe->issuing_transaction({
+        amount => 2000,
+        authorization => $authorization_object,
+        card => $card_object,
+        cardholder => $cardholder_object,
+        currency => 'jpy',
+        merchant_amount => 2000,
+        merchant_currency => 'jpy',
+        merchant_data => $merchant_data_object,
+        metadata => { transaction_id => 123 },
+        type => 'capture',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-No documentation on Stripe.com
+No documentation on Stripe.com.
+
+This is instantiated by method B<transactions> in module L<Net::API::Stripe::Issuing::Authorization>
 
 =head1 CONSTRUCTOR
 
@@ -76,18 +93,8 @@ No documentation on Stripe.com
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Issuing::Authorization::Transaction> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -109,23 +116,23 @@ String representing the object’s type. Objects of the same type share the same
 
 The Authorization object that led to this transaction.
 
-When expanded, this is a C<Net::API::Stripe::Issuing::Authorization> object.
+When expanded, this is a L<Net::API::Stripe::Issuing::Authorization> object.
 
 =item B<balance_transaction> string (expandable)
 
-When expanded, this is a C<Net::API::Stripe::Balance::Transaction> object.
+When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<card> string (expandable)
 
 The card used to make this transaction.
 
-When expanded, this is a C<Net::API::Stripe::Issuing::Card> object.
+When expanded, this is a L<Net::API::Stripe::Issuing::Card> object.
 
 =item B<cardholder> string (expandable)
 
 The cardholder to whom this transaction belongs.
 
-When expanded, this is a C<Net::API::Stripe::Issuing::Card::Holder> object.
+When expanded, this is a L<Net::API::Stripe::Issuing::Card::Holder> object.
 
 =item B<created> timestamp
 
@@ -137,7 +144,7 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 =item B<dispute> string (expandable)
 
-When expanded, this is a C<Net::API::Stripe::Issuing::Dispute> object.
+When expanded, this is a L<Net::API::Stripe::Issuing::Dispute> object.
 
 =item B<livemode> boolean
 
@@ -151,7 +158,7 @@ Has the value true if the object exists in live mode or the value false if the o
 
 More information about the user involved in the transaction.
 
-This is a C<Net::API::Stripe::Issuing::MerchantData> object.
+This is a L<Net::API::Stripe::Issuing::MerchantData> object.
 
 =item B<metadata> hash
 
@@ -166,7 +173,7 @@ One of capture, refund, cash_withdrawal, refund_reversal, dispute, or dispute_lo
 =head1 API SAMPLE
 
 	{
-	  "id": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+	  "id": "iauth_fake123456789",
 	  "object": "issuing.authorization",
 	  "approved": true,
 	  "authorization_method": "online",
@@ -197,12 +204,12 @@ One of capture, refund, cash_withdrawal, refund_reversal, dispute, or dispute_lo
 	  "status": "reversed",
 	  "transactions": [
 		{
-		  "id": "ipi_1DPqmFCeyNCl6fY2ve8MAJJu",
+		  "id": "ipi_fake123456789",
 		  "object": "issuing.transaction",
 		  "amount": -100,
-		  "authorization": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+		  "authorization": "iauth_fake123456789",
 		  "balance_transaction": null,
-		  "card": "ic_1DPqmFCeyNCl6fY2bHuXx2E3",
+		  "card": "ic_fake123456789",
 		  "cardholder": null,
 		  "created": 1540642827,
 		  "currency": "usd",
@@ -224,12 +231,12 @@ One of capture, refund, cash_withdrawal, refund_reversal, dispute, or dispute_lo
 		  "type": "capture"
 		},
 		{
-		  "id": "ipi_1DPqmFCeyNCl6fY2wlCERJ4S",
+		  "id": "ipi_fake123456789",
 		  "object": "issuing.transaction",
 		  "amount": -100,
-		  "authorization": "iauth_1DPqmFCeyNCl6fY2fOG90330",
+		  "authorization": "iauth_fake123456789",
 		  "balance_transaction": null,
-		  "card": "ic_1DPqmFCeyNCl6fY290pxaFhn",
+		  "card": "ic_fake123456789",
 		  "cardholder": null,
 		  "created": 1540642827,
 		  "currency": "usd",
@@ -274,11 +281,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Stripe API documentation:
 
-L<https://stripe.com/docs/api/issuing/authorizations/object>
+L<https://stripe.com/docs/api/issuing/transactions>, L<https://stripe.com/docs/api/issuing/authorizations/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

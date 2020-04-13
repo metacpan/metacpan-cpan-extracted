@@ -37,7 +37,7 @@ package App {
 }
 
 my $app = bless {
-    cfg => {
+    env => {
         db  => 'sqlite:',
         api => {
             backend      => undef,
@@ -51,10 +51,16 @@ my $app = bless {
   },
   'App';
 
-my $api = Pcore::App::API->new(
-    $app->{cfg}->{api}->%*,
+package API {
+    use Pcore -class;
+
+    extends qw[Pcore::App::API];
+}
+
+my $api = API->new(
+    $app->{env}->{api}->%*,
     app => $app,
-    db  => $app->{cfg}->{db},
+    db  => $app->{env}->{db},
 );
 
 my $res = $api->init;

@@ -1,0 +1,28 @@
+NAME
+    App::lcpan::Manual - Manual for App::lcpan
+
+VERSION
+    version 1.047.000
+
+DESCRIPTION
+    This distribution contains the following documentation pages:
+
+    *   App::lcpan::Manual::Cookbook
+
+    *   App::lcpan::Manual::FAQ
+
+    *   App::lcpan::Manual::Tutorial
+
+    *   App::lcpan::Manual::Tutorial::100_WhatIsLcpan
+
+    *   App::lcpan::Manual::Tutorial::800_WritingASubcommand
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

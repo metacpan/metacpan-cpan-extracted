@@ -24,6 +24,7 @@ WriteMakefile(
 		'Moo' => '2.003004',
 		'MooX::LazierAttributes' => '1.07008',
 		'MooX::ValidateSubs' => '1.012005',
+		'Data::LnArray' => '0.02',
 		'Perl::Tidy' => '20200110'
 	},
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

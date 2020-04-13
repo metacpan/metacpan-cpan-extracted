@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Fraud.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -44,6 +44,16 @@ Net::API::Stripe::Fraud - A Stripe Early Fraud Warning Object
 
 =head1 SYNOPSIS
 
+    my $fraud = $stripe->fraud({
+        actionable => $stripe->true,
+        # Could also be a Net::API::Stripe::Charge object if expanded
+        charge => 'ch_fake124567890',
+        fraud_type => 'unauthorized_use_of_card',
+        livemode => $stripe->false,
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -58,18 +68,8 @@ An early fraud warning indicates that the card issuer has notified us that a cha
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Fraud> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -93,7 +93,7 @@ An EFW is actionable if it has not received a dispute and has not been fully ref
 
 ID of the charge this early fraud warning is for, optionally expanded.
 
-When expanded, this is a C<Net::API::Stripe::Charge> object.
+When expanded, this is a L<Net::API::Stripe::Charge> object.
 
 =item B<created> timestamp
 
@@ -139,7 +139,7 @@ L<https://stripe.com/docs/api/radar/early_fraud_warnings/object>, L<https://stri
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

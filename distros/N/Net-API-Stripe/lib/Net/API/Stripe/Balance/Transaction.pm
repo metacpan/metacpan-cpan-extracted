@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Balance/Transaction.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -62,6 +62,23 @@ Net::API::Stripe::Balance::Transaction - The Balance Transaction object
 
 =head1 SYNOPSIS
 
+    my $bt = $stripe->balance_transactions({
+        amount => 2000,
+        # or we could also use a unix timestamp
+        available_on => '2019-08-15',
+        currency => 'jpy',
+        description => 'Customer account credit',
+        fee_details => Net::API::Stripe::Balance::Transaction::FeeDetails->new({
+			amount => 40,
+			currency => 'eur',
+			description => 'Some transaction',
+			type => 'application_fee',
+		}),
+		net => 1960,
+		status => 'available',
+		type => 'application_fee',
+    }) || die( $stripe->error );
+
 =head1 VERSION
 
     0.1
@@ -76,18 +93,7 @@ Balance transactions represent funds moving through your Stripe account. They're
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Balance::Transaction> object
 
 =back
 
@@ -163,7 +169,7 @@ Net amount of the transaction, in JPY.
 
 The Stripe object to which this transaction is related.
 
-For example, a charge object. This is managed with C<Net::API::Stripe::Generic::_set_get_scalar_or_object_variant) method. It will check if this is a hash, array or string, and will find out the proper associated class by peeking into the data.
+For example, a charge object. This is managed with L<Net::API::Stripe::Generic/"_set_get_scalar_or_object_variant"> method. It will check if this is a hash, array or string, and will find out the proper associated class by peeking into the data.
 
 =item B<sourced_transfers> array
 
@@ -203,7 +209,7 @@ Transaction type:
 
 =item I<issuing_transaction>
 
-=item I<payment>=item I<
+=item I<payment>
 
 =item I<payment_failure_refund>
 
@@ -290,7 +296,7 @@ L<https://stripe.com/docs/api/balance_transactions>, L<https://stripe.com/docs/r
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

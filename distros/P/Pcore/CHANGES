@@ -1,3 +1,19 @@
+v0.130.0 2020-04-13T06:17:49Z
+ - api test fixed
+ - is_bool method added
+ - is_bool mothod added
+ - SQL_BOOL -> TO_BOOL
+ - SQL_BOOL -> BOOL
+ - TRUE/FALSE core const restored
+ - resources updated
+ - dbi ignore offset if null
+ - api router
+ - dbi transparent encode boolean objects
+ - lowercase scheme befor load uri class
+ - valida package name before load
+ - api renamed
+ - undef warn fixed
+
 v0.129.2 2020-04-07T10:25:43Z
  - app env updated
 

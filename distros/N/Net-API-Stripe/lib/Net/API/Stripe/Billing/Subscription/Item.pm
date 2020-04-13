@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Subscription/Item.pm
-## Version 0.1.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Version 0.1
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/01/26
@@ -54,6 +54,13 @@ Net::API::Stripe::Billing::Subscription::Item - A Stripe Subscription Item Objec
 
 =head1 SYNOPSIS
 
+    my $item = $stripe->subscription_item({
+        clear_usage => 1,
+        metadata => { transaction_id => 1212, customer_id => 123 },
+        quantity => 1,
+        subscription => 'sub_fake123456789',
+    });
+
 =head1 VERSION
 
     0.1.1
@@ -68,18 +75,7 @@ Subscription items allow you to create customer subscriptions with more than one
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
+Creates a new L<Net::API::Stripe::Billing::Subscription::Item> object.
 
 =back
 
@@ -119,7 +115,7 @@ This is used in making upcoming invoice items api calls as described here: L<htt
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<deleted>() optional
+=item B<deleted> optional
 
 A flag that, if set to true, will delete the specified item.
 
@@ -154,7 +150,7 @@ This is an array of C<Net::API::Stripe::Tax::Rate> objects.
 =head1 API SAMPLE
 
 	{
-	  "id": "si_G0vQhG34sw79hY",
+	  "id": "si_fake123456789",
 	  "object": "subscription_item",
 	  "billing_thresholds": null,
 	  "created": 1571397912,
@@ -174,7 +170,7 @@ This is an array of C<Net::API::Stripe::Tax::Rate> objects.
 		"livemode": false,
 		"metadata": {},
 		"nickname": null,
-		"product": "prod_BWtaL30HYleHZU",
+		"product": "prod_fake123456789",
 		"tiers": null,
 		"tiers_mode": null,
 		"transform_usage": null,
@@ -182,7 +178,7 @@ This is an array of C<Net::API::Stripe::Tax::Rate> objects.
 		"usage_type": "licensed"
 	  },
 	  "quantity": 1,
-	  "subscription": "sub_G0vQQFJ5SSVbR4",
+	  "subscription": "sub_fake123456789",
 	  "tax_rates": []
 	}
 
@@ -208,7 +204,7 @@ L<https://stripe.com/docs/api/subscription_items>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

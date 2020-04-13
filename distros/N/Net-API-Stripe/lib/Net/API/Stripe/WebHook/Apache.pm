@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/WebHook/Apache.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -187,6 +187,26 @@ Net::API::Stripe::WebHook::Apache - An Apache handler for Stripe Web Hook
 
 =head1 SYNOPSIS
 
+    package My::Module::WebHook;
+    BEGIN
+    {
+        use strict;
+        use curry;
+        use parent qw( Net::API::Stripe::WebHook::Apache );
+    };
+    
+    sub init
+    {
+        my $self = shift( @_ );
+        $self->{event_handlers} =
+        {
+        account => { updated => $self->curry::account_updated,
+        # etc..
+        # See here for a list of Stripe events:
+        # https://stripe.com/docs/api/events/types
+        };
+    }
+
 =head1 VERSION
 
     0.1
@@ -195,9 +215,15 @@ Net::API::Stripe::WebHook::Apache - An Apache handler for Stripe Web Hook
 
 This is the module to handle Stripe Web Hooks using Apache/mod_perl configuration
 
+The way this works is you create your own module which inherits from this one. You override the init method in which you create the object property I<event_handler> with an hash value with keys corresponding to the types of Stripe events. A dot in the Stripe event type corresponds to a sub hash in our I<event_handler> definition.
+
+When an http query is made by Stripe on your webhook, Apache will trigger the method B<handler>, which will check and create the object environment, and call the method B<event_handler> provided by this package to find out the sub in charge of this Stripe event type, as defined in your map I<event_handlers>. You own method is then called and you can do whatever you want with Stripe data.
+
+It is also worth mentioning that Stripe requires ssl to be enabled to perform webhook queries.
+
 =head1 CONFIGURATION
 
-Your Apache VirtualHost configuration would look something like this:
+Your Apache VirtualHost configuration would look something like this, assuming your module package is C<My::Module::WebHook>
 
     <VirtualHost *:443>
     	ServerName example.com:443
@@ -234,7 +260,8 @@ Your Apache VirtualHost configuration would look something like this:
 				PerlSendHeader		On
 				PerlSetupEnv		On
 				PerlOptions			+GlobalRequest
-				PerlResponseHandler	Net::API::Stripe::WebHook::Apache
+				# PerlResponseHandler	Net::API::Stripe::WebHook::Apache
+				PerlResponseHandler My::Module::WebHook
 				Options 			+ExecCGI
 				Order allow,deny
 				Allow from all
@@ -253,7 +280,7 @@ So, if we get an incoming event from Stripe at https://example.com/hook/d18bbab7
 
 Apache will call our special method B<handler>(), which will invoque B<validate_webhook>() that should be overriden by your module, and which must return either true or false. Upon successful return from B<validate_webhook>(), B<handler> will create a new constructor such as $class->new()
 
-What you want to do is inherit C<Net::API::Stripe::WebHook::Apache> and set your own module in Apache configuration, like so: 
+What you want to do is inherit L<Net::API::Stripe::WebHook::Apache> and set your own module in Apache configuration, like so: 
 
     PerlResponseHandler My::WebHookHandler
 
@@ -265,7 +292,7 @@ The inherited handler will be called by Apache with the class My::WebHookHandler
 
 =item B<new>( %args )
 
-Creates a new C<Net::API::Stripe::WebHook::Apache> objects. This should be overriden by your own package.
+Creates a new L<Net::API::Stripe::WebHook::Apache> object. This should be overriden by your own package.
 
 =over 4
 
@@ -281,56 +308,31 @@ Creates a new C<Net::API::Stripe::WebHook::Apache> objects. This should be overr
 
 This is called by Apache/mod_perl upon incoming http request
 
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
-
 =back
 
 =head1 METHODS
 
 =over 4
 
-=item
+=item handler( $r )
+
+This is called by Apache with an L<Apache2::Request> object and returns an Apache2::Constant code such as 200
+
+=item B<event_handler>( Stripe event type )
+
+Provided with a Stripe event type, this checks for a suitable handler (set up in your B<init> method), then return the handler code reference.
+
+~item B<event_handlers>
+
+Set/get an hash reference of Stripe event type to handling methods.
+
+Returns an hash reference.
+
+=item B<stripe>
+
+Set/get a L<Net::API::Stripe> object. It returns the current value.
 
 =back
-
-=head1 API SAMPLE
-
-	{
-	  "object": "balance",
-	  "available": [
-		{
-		  "amount": 0,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 0
-		  }
-		}
-	  ],
-	  "connect_reserved": [
-		{
-		  "amount": 0,
-		  "currency": "jpy"
-		}
-	  ],
-	  "livemode": false,
-	  "pending": [
-		{
-		  "amount": 7712,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 7712
-		  }
-		}
-	  ]
-	}
 
 =head1 HISTORY
 
@@ -346,11 +348,11 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Stripe API documentation:
 
-L<https://stripe.com/docs/api>
+L<https://stripe.com/docs/api/events/types>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

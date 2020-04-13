@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/UsageRecord.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -43,6 +43,13 @@ Net::API::Stripe::Billing::UsageRecord - A Stripe Usage Record Object
 
 =head1 SYNOPSIS
 
+    my $usage_record = $stripe->usage_record({
+        quantity => 1,
+        subscription_item => $subscription_item_object,
+        # Can be a unix timestamp or an iso 8601 date
+        timestamp => '2020-04-01',
+    });
+
 =head1 VERSION
 
     0.1
@@ -57,18 +64,8 @@ Usage records allow you to report customer usage and metrics to Stripe for meter
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Billing::UsageRecord> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -105,11 +102,11 @@ The timestamp when this usage occurred.
 =head1 API SAMPLE
 
 	{
-	  "id": "mbur_1FUtZzCeyNCl6fY2RtcTFLiU",
+	  "id": "mbur_fake123456789",
 	  "object": "usage_record",
 	  "livemode": false,
 	  "quantity": 100,
-	  "subscription_item": "si_G0vQtt5chBNkN7",
+	  "subscription_item": "si_fake123456789",
 	  "timestamp": 1571397911
 	}
 
@@ -131,7 +128,7 @@ L<https://stripe.com/docs/api/usage_records>, L<https://stripe.com/docs/billing/
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

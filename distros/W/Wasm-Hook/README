@@ -1,0 +1,49 @@
+NAME
+
+    Wasm::Hook - Automatically load WebAssembly modules without a Perl
+    wrapper
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+     use Wasm::Hook;
+     use Foo::Bar;  # will load Foo/Bar.wasm or Foo/Bar.wat if no Foo/Bar.pm is found
+     no Wasm::Hook; # turns off automatic wasm / wat loading
+
+DESCRIPTION
+
+    This module installs an @INC hook that automatically loads WebAssembly
+    (Wasm) files so that they can be used like a Perl module, without:
+
+    The functions inside the WebAssembly module are exportable via the
+    Exporter module. @EXPORT_OK is used, so you will need to explicitly
+    export functions.
+
+      * Having to write a boilerplate .pm file that loads the WebAssembly
+
+      * The caller needing to even know or care that the module is
+      implemented in something other than Perl.
+
+    This module will only load a WebAssembly module if there is now Perl
+    Module (.pm file) with the appropriate name.
+
+SEE ALSO
+
+    Wasm
+
+    Wasm::Wasmtime
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2020 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

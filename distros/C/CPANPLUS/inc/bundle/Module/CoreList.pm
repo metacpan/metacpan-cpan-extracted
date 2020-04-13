@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20200120';
+our $VERSION = '5.20200320';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -359,6 +359,9 @@ sub changes_between {
     5.031006 => '2019-11-20',
     5.031007 => '2019-12-20',
     5.031008 => '2020-01-20',
+    5.031009 => '2020-02-20',
+    5.030002 => '2020-03-14',
+    5.031010 => '2020-03-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -17294,6 +17297,74 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.031009 => {
+        delta_from => 5.031008,
+        changed => {
+            'Archive::Tar'          => '2.36',
+            'Archive::Tar::Constant'=> '2.36',
+            'Archive::Tar::File'    => '2.36',
+            'B'                     => '1.80',
+            'B::Op_private'         => '5.031009',
+            'Config'                => '5.031009',
+            'Devel::PPPort'         => '3.57',
+            'Encode'                => '3.03',
+            'ExtUtils::CBuilder'    => '0.280234',
+            'ExtUtils::CBuilder::Base'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::Unix'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::VMS'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::Windows'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::Windows::BCC'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::Windows::GCC'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::Windows::MSVC'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::aix'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::android'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::cygwin'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::darwin'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::dec_osf'=> '0.280234',
+            'ExtUtils::CBuilder::Platform::os2'=> '0.280234',
+            'IO'                    => '1.43',
+            'IO::Select'            => '1.42',
+            'IO::Socket'            => '1.43',
+            'Module::CoreList'      => '5.20200220',
+            'Module::CoreList::Utils'=> '5.20200220',
+            'POSIX'                 => '1.92',
+            'Pod::Html'             => '1.25',
+            'Storable'              => '3.19',
+            'Tie::File'             => '1.06',
+            'Unicode'               => '13.0.0',
+            'XS::APItest'           => '1.07',
+            '_charnames'            => '1.46',
+            'charnames'             => '1.46',
+            'diagnostics'           => '1.37',
+            'feature'               => '1.58',
+            'parent'                => '0.238',
+            'perlfaq'               => '5.20200125',
+            'threads'               => '2.24',
+        },
+        removed => {
+        }
+    },
+    5.030002 => {
+        delta_from => 5.030001,
+        changed => {
+            'B::Op_private'         => '5.030002',
+            'Compress::Raw::Bzip2'  => '2.089',
+            'Config'                => '5.030002',
+            'Module::CoreList'      => '5.20200314',
+            'Module::CoreList::Utils'=> '5.20200314',
+        },
+        removed => {
+        }
+    },
+    5.031010 => {
+        delta_from => 5.031009,
+        changed => {
+            'B::Op_private'         => '5.031010',
+            'Config'                => '5.03101',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -18361,6 +18432,27 @@ sub is_core
     },
     5.031008 => {
         delta_from => 5.031007,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.031009 => {
+        delta_from => 5.031008,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.030002 => {
+        delta_from => 5.030001,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.031010 => {
+        delta_from => 5.031009,
         changed => {
         },
         removed => {

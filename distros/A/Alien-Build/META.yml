@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/Perl5-Alien/Alien-Build.git
-version: '2.19'
+version: '2.21'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'

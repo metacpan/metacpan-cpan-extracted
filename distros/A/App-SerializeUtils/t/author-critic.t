@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/App/SerializeUtils.pm','script/check-json','script/check-phpser','script/check-yaml','script/dd2dd','script/dd2ddc','script/dd2json','script/dd2phpser','script/dd2sereal','script/dd2sexp','script/dd2storable','script/dd2yaml','script/json2dd','script/json2ddc','script/json2json','script/json2phpser','script/json2sereal','script/json2sexp','script/json2storable','script/json2yaml','script/phpser2dd','script/phpser2ddc','script/phpser2json','script/phpser2sereal','script/phpser2sexp','script/phpser2storable','script/phpser2yaml','script/pp-dd','script/pp-json','script/pp-yaml','script/sereal2dd','script/sereal2ddc','script/sereal2json','script/sereal2phpser','script/sereal2sexp','script/sereal2storable','script/sereal2yaml','script/serializeutils-convert','script/sexp2dd','script/sexp2ddc','script/sexp2json','script/sexp2phpser','script/sexp2sereal','script/sexp2storable','script/sexp2yaml','script/storable2dd','script/storable2ddc','script/storable2json','script/storable2phpser','script/storable2sereal','script/storable2sexp','script/storable2yaml','script/yaml2dd','script/yaml2ddc','script/yaml2json','script/yaml2phpser','script/yaml2sereal','script/yaml2sexp','script/yaml2storabls','script/yaml2yaml'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

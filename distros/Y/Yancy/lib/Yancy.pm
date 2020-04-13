@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.050';
+our $VERSION = '1.051';
 # ABSTRACT: A simple framework and editor for content-driven Mojolicious websites
 
 #pod =head1 SYNOPSIS
@@ -218,7 +218,7 @@ Yancy - A simple framework and editor for content-driven Mojolicious websites
 
 =head1 VERSION
 
-version 1.050
+version 1.051
 
 =head1 SYNOPSIS
 
@@ -395,7 +395,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ed J Mohammad S Anwar Rajesh Mallah William Lindley Wojtek Bażant
+=for stopwords Ed J Mohammad S Anwar Pavel Serikov Rajesh Mallah William Lindley Wojtek Bażant
 
 =over 4
 
@@ -406,6 +406,10 @@ Ed J <mohawk2@users.noreply.github.com>
 =item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Pavel Serikov <pavelsr@cpan.org>
 
 =item *
 

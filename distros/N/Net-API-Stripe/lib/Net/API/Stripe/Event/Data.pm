@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Event/Data.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -20,7 +20,6 @@ BEGIN
     our( $VERSION ) = '0.1';
 };
 
-# shift->_set_get_hash( 'object', @_ );
 sub object 
 {
 	my $self = shift( @_ );
@@ -28,23 +27,15 @@ sub object
 	{
 		my $ref = shift( @_ );
 		## This is not a type, there is an object property that contains a hash
-		## my $ref  = $hash->{ 'object' };
-		my $type = $ref->{ 'object' } || return( $self->error( "No object type could be found for field $self->{_field} in hash: ", sub{ $self->dumper( $ref ) } ) );
+		my $type = $ref->{object} || return( $self->error( "No object type could be found for field $self->{_field} in hash: ", sub{ $self->dumper( $ref ) } ) );
 		my $class = $self->_object_type_to_class( $type ) ||
 		return( $self->error( "No class found for object type $type" ) );
 		return( $self->_set_get_object( 'object', $class, $ref ) );
-# 		my $h =
-# 		{
-# 		'_parent' => $self->{ '_parent' },
-# 		'_field' => 'object',
-# 		'_debug' => $self->{ '_debug' },
-# 		};
-# 		$self->{ 'object' } = $class->new( $h, %$ref );
 	}
-	return( $self->{ 'object' } );
+	return( $self->{object} );
 }
 
-sub previous_attributes { shift->_set_get_hash( 'previous_attributes', @_ ); }
+sub previous_attributes { return( shift->_set_get_hash( 'previous_attributes', @_ ) ); }
 
 1;
 
@@ -58,13 +49,20 @@ Net::API::Stripe::Event::Data - A Stripe Event Data Object
 
 =head1 SYNOPSIS
 
+    my $event_data = $stripe->event->data({
+        # The type of object is variable. In this example we use an invoice object
+        object => $invoice_object,
+    });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
 
-This is a Stripe Event Data Object
+This is a Stripe Event Data Object.
+
+This is instantiated by the method B<data> in module L<Net::API::Stripe::Event>
 
 =head1 CONSTRUCTOR
 
@@ -72,18 +70,8 @@ This is a Stripe Event Data Object
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Event::Data> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -104,7 +92,7 @@ Object containing the names of the attributes that have changed, and their previ
 =head1 API SAMPLE
 
 	{
-	  "id": "evt_1Ccdk1CeyNCl6fY2mTXIaobI",
+	  "id": "evt_fake123456789",
 	  "object": "event",
 	  "api_version": "2017-02-14",
 	  "created": 1528914645,
@@ -165,7 +153,7 @@ L<https://stripe.com/docs/api/events/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

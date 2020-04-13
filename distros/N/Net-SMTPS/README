@@ -1,4 +1,4 @@
-Net-SMTPS version 0.09
+Net-SMTPS version 0.10
 ======================
 
    This module implements a wrapper for Net::SMTP, enabling
@@ -34,7 +34,7 @@ COPYRIGHT AND LICENCE
 
 Put the correct copyright and licence information here.
 
-Copyright (C) 2017 by Tomo.M
+Copyright (C) 2020 by Tomo.M
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.12.3 or,

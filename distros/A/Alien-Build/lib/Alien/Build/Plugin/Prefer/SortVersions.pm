@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin to sort candidates by most recent first
-our $VERSION = '2.19'; # VERSION
+our $VERSION = '2.21'; # VERSION
 
 
 has 'filter'   => undef;
@@ -23,7 +23,7 @@ sub init
     my(undef, $res) = @_;
 
     my $cmp = sub {
-      my($A,$B) = map { $_ =~ $self->version } @_;
+      my($A,$B) = map { ($_ =~ $self->version)[0] } @_;
       Sort::Versions::versioncmp($B,$A);
     };
 
@@ -56,7 +56,7 @@ Alien::Build::Plugin::Prefer::SortVersions - Plugin to sort candidates by most r
 
 =head1 VERSION
 
-version 2.19
+version 2.21
 
 =head1 SYNOPSIS
 

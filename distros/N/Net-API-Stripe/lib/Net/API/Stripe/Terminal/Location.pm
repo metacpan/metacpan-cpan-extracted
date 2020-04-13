@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Terminal/Location.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -39,6 +39,13 @@ Net::API::Stripe::Terminal::Location - A Strip Terminal Reader Location Object
 
 =head1 SYNOPSIS
 
+    my $loc = $stripe->location({
+        address => $address_object,
+        display_name => 'Tokyo central',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -53,18 +60,8 @@ A Location represents a grouping of readers.
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Terminal::Location> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -84,7 +81,7 @@ String representing the object’s type. Objects of the same type share the same
 
 The full address of the location.
 
-This is a C<Net::API::Stripe::Address> object.
+This is a L<Net::API::Stripe::Address> object.
 
 =item B<display_name> string
 
@@ -95,7 +92,7 @@ The display name of the location.
 =head1 API SAMPLE
 
 	{
-	  "id": "tml_SnqYTNZ8yjiY7v9RsAlak5U8",
+	  "id": "tml_fake123456789",
 	  "object": "terminal.location",
 	  "address": {
 		"city": "Anytown",
@@ -126,7 +123,7 @@ L<https://stripe.com/docs/api/terminal/locations>, L<https://stripe.com/docs/ter
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

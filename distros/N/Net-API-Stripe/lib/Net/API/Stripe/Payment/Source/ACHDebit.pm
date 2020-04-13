@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Source/ACHDebit.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -44,6 +44,15 @@ Net::API::Stripe::Payment::Source::ACHDebit - A Stripe ACH Debit Object
 
 =head1 SYNOPSIS
 
+    my $ach_debit = $stripe->source->ach_debit({
+        account_holder_type => 'company',
+        bank_name => 'Big Buck, Corp',
+        country => 'us',
+        fingerprint => 'hskfhskjhajl',
+        last4 => 1234,
+        routing_number => undef,
+    });
+
 =head1 VERSION
 
     0.1
@@ -52,24 +61,16 @@ Net::API::Stripe::Payment::Source::ACHDebit - A Stripe ACH Debit Object
 
 This module contains a snapshot of the transaction specific details of the ach_debit payment method.
 
+This is instantiated by method B<ach_debit> in module L<Net::API::Stripe::Payment::Method::Details> and L<Net::API::Stripe::Payment::Source>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Payment::Source::ACHDebit> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -121,7 +122,7 @@ L<https://stripe.com/docs/api/payment_methods/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

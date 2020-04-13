@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.046 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2020-04-04.
+    This document describes version 1.049 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2020-04-11.
 
 SYNOPSIS
     See lcpan script.
@@ -107,6 +107,10 @@ FUNCTIONS
 
         Defaults to "~/cpan".
 
+    *   dont_uniquify => *bool*
+
+        Allow showing multiple modules for different dists.
+
     *   flatten => *bool*
 
         Instead of showing tree-like information, flatten it.
@@ -147,18 +151,18 @@ FUNCTIONS
 
         Include core modules.
 
+    *   include_indexed => *bool* (default: 1)
+
+        Include modules that are indexed (listed in
+        02packages.details.txt.gz).
+
     *   include_noncore => *bool* (default: 1)
 
         Include non-core modules.
 
-    *   include_registered => *bool* (default: 1)
+    *   include_unindexed => *bool* (default: 1)
 
-        Include modules that are registered (listed in
-        02packages.details.txt.gz).
-
-    *   include_unregistered => *bool* (default: 1)
-
-        Include modules that are not registered (not listed in
+        Include modules that are not indexed (not listed in
         02packages.details.txt.gz).
 
     *   index_name => *filename* (default: "index.db")
@@ -176,7 +180,7 @@ FUNCTIONS
 
     *   modules* => *array[perl::modname]*
 
-    *   perl_version => *str* (default: "v5.24.0")
+    *   perl_version => *str* (default: "v5.30.2")
 
         Set base Perl version for determining core modules.
 
@@ -355,7 +359,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.24.0")
+    *   perl_version => *str* (default: "v5.30.2")
 
         Set base Perl version for determining core modules.
 
@@ -508,7 +512,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.24.0")
+    *   perl_version => *str* (default: "v5.30.2")
 
         Set base Perl version for determining core modules.
 
@@ -573,6 +577,10 @@ FUNCTIONS
         Location of your local CPAN mirror, e.g. /path/to/cpan.
 
         Defaults to "~/cpan".
+
+    *   dont_uniquify => *true*
+
+        Allow showing multiple modules for different dists.
 
     *   flatten => *bool*
 
@@ -921,6 +929,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    App::lcpan::Manual
+
     CPAN::SQLite
 
     CPAN::Mini

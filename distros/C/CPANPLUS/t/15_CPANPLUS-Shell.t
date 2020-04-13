@@ -120,6 +120,8 @@ isa_ok( $Shell, $Default,       "   Object" );
         __PACKAGE__->_reset_out;
         CPANPLUS::Error->flush;
 
+        next if $input =~ m!^/cs ! && ON_MINIX;
+
         ok( 1,                  "Testing '$input'" );
         $Shell->$meth( input => $input );
 

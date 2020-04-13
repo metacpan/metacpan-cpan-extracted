@@ -4,13 +4,13 @@
       "Ricardo Signes <rjbs[at]cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-UUID",
    "no_index" : {
@@ -45,6 +45,6 @@
          "url" : "https://github.com/rjbs/Data-UUID"
       }
    },
-   "version" : "1.224",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.226",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

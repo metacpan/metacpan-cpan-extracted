@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Customer.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -103,6 +103,29 @@ Net::API::Stripe::Customer - A Customer object in Stripe API
 
 =head1 SYNOPSIS
 
+    my $cust = $stripe->customer({
+        address => $address_object,
+        balance => 20000,
+        coupon => 'VIP2020_20POFF',
+        currency => 'jpy',
+        description => 'Webstore customer',
+        email => 'john.doe@example.com',
+        invoice_prefix => 'JD123',
+        invoice_settings =>
+            {
+            # or it could just contain an id such as pm_fake124567890
+            default_payment_method => $payment_method_object,
+            footer => 'Big Corp, Inc web store',
+            },
+        metadata => { customer_id => 123 },
+        name => 'John Doe',
+        phone => '+81-(0)90-1234-5678',
+        preferred_locales => [qw( ja en fr )],
+        shipping => $address_object,
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -119,18 +142,8 @@ Stripe Customer objects allow you to perform recurring charges, and to track mul
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Customer> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -152,7 +165,7 @@ It seems not in use anymore as of 2019-10-16, at least by the look of the API do
 
 =item B<address> hash
 
-The customer’s address. This is a C<Net::API::Stripe::Address> object.
+The customer’s address. This is a L<Net::API::Stripe::Address> object.
 
 =item B<balance> integer
 
@@ -160,7 +173,7 @@ Current balance, if any, being stored on the customer. If negative, the customer
 
 =item B<cards>
 
-This represents a C<Net::API::Stripe::Customer::Sources> object.
+This represents a L<Net::API::Stripe::Customer::Sources> object.
 
 It seems that as of 2019-10-16, it is not in Stripe API, but it was seen in Stripe response.
 
@@ -184,7 +197,7 @@ The API does not mention this, but it was part of some response. Deprecated or o
 
 =item B<default_source> string (expandable)
 
-ID of the default payment source for the customer. This is a C<Net::API::Stripe::Payment::Source> object.
+ID of the default payment source for the customer. This is a L<Net::API::Stripe::Payment::Source> object.
 
 =item B<deleted>
 
@@ -200,7 +213,7 @@ An arbitrary string attached to the object. Often useful for displaying to users
 
 =item B<discount> hash, discount object
 
-Describes the current discount active on the customer, if there is one. This is a C<Net::API::Stripe::Billing::Discount> object.
+Describes the current discount active on the customer, if there is one. This is a L<Net::API::Stripe::Billing::Discount> object.
 
 =item B<email> string
 
@@ -212,13 +225,13 @@ The prefix for the customer used to generate unique invoice numbers.
 
 =item B<invoice_settings> hash
 
-The customer’s default invoice settings. This is a C<Net::API::Stripe::Billing::Invoice::Settings> object.
+The customer’s default invoice settings. This is a L<Net::API::Stripe::Billing::Invoice::Settings> object.
 
 =over 8
 
 =item B<custom_fields> array of hashes
 
-Default custom fields to be displayed on invoices for this customer. This is an array of C<Net::API::Stripe::CustomField> object.
+Default custom fields to be displayed on invoices for this customer. This is an array of L<Net::API::Stripe::CustomField> object.
 
 =over 12
 
@@ -234,7 +247,7 @@ The value of the custom field.
 
 =item B<default_payment_method> string (expandable)
 
-ID of the default payment method used for subscriptions and invoices for the customer. When expanded, this is a C<Net::API::Stripe::Payment::Method> object.
+ID of the default payment method used for subscriptions and invoices for the customer. When expanded, this is a L<Net::API::Stripe::Payment::Method> object.
 
 =item B<footer> string
 
@@ -274,7 +287,7 @@ The customer’s preferred locales (languages), ordered by preference.
 
 =item B<shipping> hash
 
-Mailing and shipping address for the customer. Appears on invoices emailed to this customer. This is a C<Net::API::Stripe::Shipping> object.
+Mailing and shipping address for the customer. Appears on invoices emailed to this customer. This is a L<Net::API::Stripe::Shipping> object.
 
 =item B<source> optional
 
@@ -284,11 +297,11 @@ This is used when creating a customer object.
 
 =item B<sources> list
 
-The customer’s payment sources, if any. This is a C<Net::API::Stripe::Customer::Sources> object.
+The customer’s payment sources, if any. This is a L<Net::API::Stripe::Customer::Sources> object.
 
 =item B<subscriptions> list
 
-The customer’s current subscriptions, if any. This is a C<Net::API::Stripe::List> object of C<Net::API::Stripe::Billing::Subscription> objects.
+The customer’s current subscriptions, if any. This is a L<Net::API::Stripe::List> object of L<Net::API::Stripe::Billing::Subscription> objects.
 
 =item B<tax_exempt> string
 
@@ -314,7 +327,7 @@ Value of the tax ID.
 
 =item B<tax_ids> list
 
-The customer’s tax IDs. This is represented by a C<Net::API::Stripe::Customer::TaxIds> object.
+The customer’s tax IDs. This is represented by a L<Net::API::Stripe::Customer::TaxIds> object.
 
 =over 8
 
@@ -322,7 +335,7 @@ The customer’s tax IDs. This is represented by a C<Net::API::Stripe::Customer:
 
 String representing the object's type. Objects of the same type share the same value. Always has the value list.
 
-=item B<data> array of C<Net::API::Stripe::Customer::TaxId> object
+=item B<data> array of L<Net::API::Stripe::Customer::TaxId> object
 
 =item B<has_more> boolean
 
@@ -338,20 +351,20 @@ The URL where this list can be accessed.
 
 The customer’s tax information. Appears on invoices emailed to this customer. This field has been deprecated and will be removed in a future API version, for further information view the migration guide.
 
-This is a C<Net::API::Stripe::Customer::TaxInfo> object.
+This is a L<Net::API::Stripe::Customer::TaxInfo> object.
 
 =item B<tax_info_verification> deprecated hash
 
 Describes the status of looking up the tax ID provided in tax_info. This field has been deprecated and will be removed in a future API version, for further information view the migration guide.
 
-This is a C<Net::API::Stripe::Customer::TaxInfoVerification> object
+This is a L<Net::API::Stripe::Customer::TaxInfoVerification> object
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "cus_Fzxuz7ZDVaAWy9",
+	  "id": "cus_fake123456789",
 	  "object": "customer",
 	  "account_balance": 0,
 	  "address": null,
@@ -379,20 +392,20 @@ This is a C<Net::API::Stripe::Customer::TaxInfoVerification> object
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/customers/cus_Fzxuz7ZDVaAWy9/sources"
+		"url": "/v1/customers/cus_fake123456789/sources"
 	  },
 	  "subscriptions": {
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/customers/cus_Fzxuz7ZDVaAWy9/subscriptions"
+		"url": "/v1/customers/cus_fake123456789/subscriptions"
 	  },
 	  "tax_exempt": "none",
 	  "tax_ids": {
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/customers/cus_Fzxuz7ZDVaAWy9/tax_ids"
+		"url": "/v1/customers/cus_fake123456789/tax_ids"
 	  },
 	  "tax_info": null,
 	  "tax_info_verification": null
@@ -432,7 +445,7 @@ L<https://stripe.com/docs/api/customers>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

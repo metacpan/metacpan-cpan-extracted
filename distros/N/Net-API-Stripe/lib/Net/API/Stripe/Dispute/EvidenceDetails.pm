@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Dispute/EvidenceDetails.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -18,13 +18,13 @@ BEGIN
     our( $VERSION ) = '0.1';
 };
 
-sub due_by { shift->_set_get_datetime( 'due_by', @_ ); }
+sub due_by { return( shift->_set_get_datetime( 'due_by', @_ ) ); }
 
-sub has_evidence { shift->_set_get_boolean( 'has_evidence', @_ ); }
+sub has_evidence { return( shift->_set_get_boolean( 'has_evidence', @_ ) ); }
 
-sub past_due { shift->_set_get_boolean( 'past_due', @_ ); }
+sub past_due { return( shift->_set_get_boolean( 'past_due', @_ ) ); }
 
-sub submission_count { shift->_set_get_scalar( 'submission_count', @_ ); }
+sub submission_count { return( shift->_set_get_scalar( 'submission_count', @_ ) ); }
 
 1;
 
@@ -38,11 +38,20 @@ Net::API::Stripe::Dispute::EvidenceDetails - Dispute Evidence Details Object
 
 =head1 SYNOPSIS
 
+    my $detail = $dispute->evidence_details({
+        due_by => '2020-04-12',
+        has_evidence => $stripe->true,
+        past_due => '2020-05-01',
+        submission_count => 2,
+    });
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
+
+This is instantiated by method B<evidence_details> from module L<Net::API::Stripe::Dispute>
 
 =head1 CONSTRUCTOR
 
@@ -50,18 +59,8 @@ Net::API::Stripe::Dispute::EvidenceDetails - Dispute Evidence Details Object
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Dispute::EvidenceDetails> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -136,7 +135,7 @@ L<https://stripe.com/docs/api/disputes/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

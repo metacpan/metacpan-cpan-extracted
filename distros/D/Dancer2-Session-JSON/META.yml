@@ -3,7 +3,7 @@ abstract: 'Dancer 2 session storage in files with JSON'
 author:
   - 'David Golden <dagolden@cpan.org>'
 build_requires:
-  Dancer2: '0'
+  Dancer2: '0.200000'
   ExtUtils::MakeMaker: '0'
   File::Basename: '0'
   File::Spec: '0'
@@ -17,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,9 +34,9 @@ no_index:
 provides:
   Dancer2::Session::JSON:
     file: lib/Dancer2/Session/JSON.pm
-    version: '0.002'
+    version: '0.003'
 requires:
-  Dancer2: '0'
+  Dancer2: '0.200000'
   Dancer2::Core::Role::SessionFactory::File: '0'
   Dancer2::Core::Types: '0'
   JSON: '0'
@@ -48,7 +48,10 @@ resources:
   bugtracker: https://github.com/PerlDancer/dancer2-session-json/issues
   homepage: https://github.com/PerlDancer/dancer2-session-json
   repository: https://github.com/PerlDancer/dancer2-session-json.git
-version: '0.002'
+version: '0.003'
 x_authority: cpan:YANICK
 x_contributors:
   - 'Jason A. Crome <jason@crome-plated.com>'
+  - 'Sawyer X <xsawyerx@cpan.org>'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

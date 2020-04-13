@@ -6,7 +6,7 @@
 use 5.026; # signatures
 use Object::Pad 0.17;
 
-class Tickit::Widget::FloatBox 0.05
+class Tickit::Widget::FloatBox 0.06
    extends Tickit::ContainerWidget;
 
 use Carp;
@@ -246,9 +246,11 @@ has $_child;
 has $_hidden;
 has %_geom;
 
-method BUILD ()
+method BUILD ( $fb, $child, %args )
 {
-   ( $_fb, $_child, my %args ) = @_;
+   $_fb = $fb;
+   $_child = $child;
+
    $_hidden = delete $args{hidden} || 0;
 
    $self->move( %args );

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Settings/Dashboard.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -34,6 +34,11 @@ Net::API::Stripe::Connect::Account::Settings::Dashboard - A Stripe Account Setti
 
 =head1 SYNOPSIS
 
+    my $dashboard = $stripe->account->settings->dashboard({
+    	display_name => 'Some settings name',
+    	timezone => 'Asia/Tokyo',
+    });
+
 =head1 VERSION
 
     0.1
@@ -42,24 +47,16 @@ Net::API::Stripe::Connect::Account::Settings::Dashboard - A Stripe Account Setti
 
 Settings used to configure the account within the Stripe dashboard.
 
+This is instantiated by method B<dashboard> from module L<Net::API::Stripe::Connect::Account::Settings>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Settings::Dashboard> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -75,14 +72,14 @@ The display name for this account. This is used on the Stripe Dashboard to diffe
 
 The timezone used in the Stripe Dashboard for this account. A list of possible time zone values is maintained at the IANA Time Zone Database.
 
-This is a C<Net::API::Stripe::TimeZone> which inherits all methods for C<DateTime::TimeZone> and add stringification so that its object, when stringified ie used as a string, will return DateTime::TimeZone->name in order to make this work transparently while giving access to all the methods of C<DateTime::TimeZone> module.
+This is a L<Net::API::Stripe::TimeZone> which inherits all methods for L<DateTime::TimeZone> and add stringification so that its object, when stringified ie used as a string, will return DateTime::TimeZone->name in order to make this work transparently while giving access to all the methods of L<DateTime::TimeZone> module.
 
 =back
 
 =head1 API SAMPLE
 
 	{
-	  "id": "acct_19eGgRCeyNCl6xYZ",
+	  "id": "acct_fake123456789",
 	  "object": "account",
 	  "business_profile": {
 		"mcc": null,
@@ -165,7 +162,7 @@ L<https://stripe.com/docs/api/accounts/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

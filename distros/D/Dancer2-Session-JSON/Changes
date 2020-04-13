@@ -1,11 +1,15 @@
 Revision history for Dancer2-Session-JSON
 
-0.002     2015-10-22 21:43:53-05:00 America/Chicago
+0.003     2020-04-10 16:27:00-04:00 America/New_York
 
-    - Fixed broken version check for Dancer2 (David Golden)
-    - Moved tests from Test::TCP to Plack::Test (Jason A. Crome & Dancer Team)
+    * Remove universal TO_JSON (Sawyer X)
+
+0.002     2015-10-22 America/New_York
+
+    * Fixed broken version check for Dancer2 (David Golden)
+    * Moved tests from Test::TCP to Plack::Test (Jason A. Crome & Dancer Team)
 
 0.001     2013-02-23 22:55:15 America/New_York
 
-    - First release
+    * First release
 

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Charge.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -127,6 +127,24 @@ Net::API::Stripe::Charge - The Charge object of Stripe API
 
 =head1 SYNOPSIS
 
+    my $charge = $stripe->charge({
+        amount => 2000,
+        application_fee => $stripe->application_fee({
+            amount => 2000,
+            currency => 'jpy',
+        }),
+        card => $card_object,
+        currency => 'jpy',
+        customer => $customer_object,
+        description => 'Description of the charge',
+        invoice => $invoice_object,
+        metadata => { transaction_id => 144, customer_id => 123 },
+        order => $order_object,
+        payment_intent => $payment_intent_object,
+        receipt_email => 'john.doe@example.com',
+        receipt_number => 'RCP2020040103-123',
+    });
+
 =head1 VERSION
 
     0.1
@@ -141,18 +159,8 @@ To charge a credit or a debit card, you create a Charge object. You can retrieve
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Charge> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -178,11 +186,11 @@ Amount in JPY refunded (can be less than the amount attribute on the charge if a
 
 =item B<application> string expandable "application"
 
-ID of the Connect application that created the charge. This represents a C<Net::API::Stripe::Connect::Account> object
+ID of the Connect application that created the charge. This represents a L<Net::API::Stripe::Connect::Account> object
 
 =item B<application_fee> string (expandable)
 
-The application fee (if any) for the charge. See the Connect documentation for details. This is a C<Net::API::Stripe::Connect::ApplicationFee> object.
+The application fee (if any) for the charge. See the Connect documentation for details. This is a L<Net::API::Stripe::Connect::ApplicationFee> object.
 
 =item B<application_fee_amount> integer
 
@@ -192,13 +200,25 @@ The amount of the application fee (if any) for the charge. See the Connect docum
 
 ID of the balance transaction that describes the impact of this charge on your account balance (not including refunds or disputes).
 
-This is an C<Net::API::Stripe::Balance::Transaction> object.
+This is an L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<billing_details> hash
 
-Billing information associated with the payment method at the time of the transaction. This is a C<Net::API::Stripe::Billing::Details> object.
+Billing information associated with the payment method at the time of the transaction. This is a L<Net::API::Stripe::Billing::Details> object.
 
-Show child attributes
+Hash properties are:
+
+=over 8
+
+=item I<address> This is a L<Net::API::Stripe::Address>
+
+=item I<email> String
+
+=item I<name> String
+
+=item I<phone> String
+
+=back
 
 =item B<captured> boolean
 
@@ -206,7 +226,7 @@ If the charge was created without capturing, this Boolean represents whether it 
 
 =item B<card>
 
-This is a C<Net::API::Stripe::Payment::Card> object. It seems it is no documented, but from experience, Stripe has replied with data containing this property.
+This is a L<Net::API::Stripe::Payment::Card> object. It seems it is no documented, but from experience, Stripe has replied with data containing this property.
 
 =item B<created> timestamp
 
@@ -220,7 +240,7 @@ Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
 ID of the customer this charge is for if one exists.
 
-This is a C<Net::API::Stripe::Customer> object.
+This is a L<Net::API::Stripe::Customer> object.
 
 =item B<description> string
 
@@ -228,13 +248,13 @@ An arbitrary string attached to the object. Often useful for displaying to users
 
 =item B<destination>
 
-This is a C<Net::API::Stripe::Connect::Account> object. But, as of 2019-10-16, it seems absent from Stripe API documentation, so maybe it was removed?
+This is a L<Net::API::Stripe::Connect::Account> object. But, as of 2019-10-16, it seems absent from Stripe API documentation, so maybe it was removed?
 
 =item B<dispute> string (expandable)
 
 Details about the dispute if the charge has been disputed.
 
-When expanded, this is a C<Net::API::Stripe::Dispute> object.
+When expanded, this is a L<Net::API::Stripe::Dispute> object.
 
 =item B<failure_code> string
 
@@ -264,7 +284,7 @@ Assessments reported by you. If set, possible values of are safe and fraudulent.
 
 ID of the invoice this charge is for if one exists.
 
-When expanded, this is a C<Net::API::Stripe::Billing::Invoice> object.
+When expanded, this is a L<Net::API::Stripe::Billing::Invoice> object.
 
 =item B<livemode> boolean
 
@@ -278,19 +298,19 @@ Set of key-value pairs that you can attach to an object. This can be useful for 
 
 The account (if any) the charge was made on behalf of without triggering an automatic transfer. See the Connect documentation for details.
 
-When expanded, this is a C<Net::API::Stripe::Connect::Account> object
+When expanded, this is a L<Net::API::Stripe::Connect::Account> object
 
 =item B<order> string (expandable)
 
 ID of the order this charge is for if one exists.
 
-When expanded, this is a C<Net::API::Stripe::Order> object.
+When expanded, this is a L<Net::API::Stripe::Order> object.
 
 =item B<outcome> hash
 
 Details about whether the payment was accepted, and why. See understanding declines for details.
 
-This is a C<Net::API::Stripe::Charge::Outcome> object.
+This is a L<Net::API::Stripe::Charge::Outcome> object.
 
 =item B<paid> boolean
 
@@ -309,7 +329,8 @@ ID of the payment method used in this charge.
 =item B<payment_method_details> hash
 
 Details about the payment method at the time of the transaction.
-Show child attributes
+
+This is a L<Net::API::Stripe::Payment::Method::Details> object.
 
 =item B<receipt_email> string
 
@@ -331,21 +352,21 @@ Whether the charge has been fully refunded. If the charge is only partially refu
 
 A list of refunds that have been applied to the charge.
 
-This is a C<Net::API::Stripe::Charge::Refunds> object.
+This is a L<Net::API::Stripe::Charge::Refunds> object.
 
 =item B<review> string (expandable)
 
 ID of the review associated with this charge if one exists.
 
-When expanded, this is a C<Net::API::Stripe::Fraud::Review> object.
+When expanded, this is a L<Net::API::Stripe::Fraud::Review> object.
 
 =item B<shipping> hash
 
-Shipping information for the charge. This is a C<Net::API::Stripe::Shipping> object.
+Shipping information for the charge. This is a L<Net::API::Stripe::Shipping> object.
 
 =item B<source>
 
-This represents a C<Net::API::Stripe::Payment::Card> object.
+This represents a L<Net::API::Stripe::Payment::Card> object.
 
 It was present before, or at least used in Stripe response, but it is not anymore on the API documentation as of 2019-10-16.
 
@@ -353,7 +374,7 @@ It was present before, or at least used in Stripe response, but it is not anymor
 
 The transfer ID which created this charge. Only present if the charge came from another Stripe account. See the Connect documentation for details here: L<https://stripe.com/docs/connect/destination-charges>
 
-When expanded, this is a C<Net::API::Stripe::Connect::Transfer> object.
+When expanded, this is a L<Net::API::Stripe::Connect::Transfer> object.
 
 =item B<statement_descriptor> string
 
@@ -375,13 +396,13 @@ The status of the payment is either succeeded, pending, or failed.
 
 ID of the transfer to the destination account (only applicable if the charge was created using the destination parameter).
 
-When expanded, this is a C<Net::API::Stripe::Connect::Transfer> object.
+When expanded, this is a L<Net::API::Stripe::Connect::Transfer> object.
 
 =item B<transfer_data> hash
 
 An optional dictionary including the account to automatically transfer to as part of a destination charge. See the Connect documentation for details.
 
-This is a C<Net::API::Stripe::Connect::Transfer> object, although in the documentation only the following 2 properties are used:
+This is a L<Net::API::Stripe::Connect::Transfer> object, although in the documentation only the following 2 properties are used:
 
 =over 8
 
@@ -393,7 +414,7 @@ The amount transferred to the destination account, if specified. By default, the
 
 ID of an existing, connected Stripe account to transfer funds to if transfer_data was specified in the charge request.
 
-If expanded, this is a C<Net::API::Stripe::Connect::Account> object.
+If expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
 =back
 
@@ -406,14 +427,14 @@ A string that identifies this transaction as part of a group. See the Connect do
 =head1 API SAMPLE
 
 	{
-	  "id": "ch_1FTxyCCeyNCl6fY2aYoHTBBF",
+	  "id": "ch_fake123456789",
 	  "object": "charge",
 	  "amount": 100,
 	  "amount_refunded": 0,
 	  "application": null,
 	  "application_fee": null,
 	  "application_fee_amount": null,
-	  "balance_transaction": "txn_1FTlZvCeyNCl6fY2qIteNrPe",
+	  "balance_transaction": "txn_fake123456789",
 	  "billing_details": {
 		"address": {
 		  "city": null,
@@ -444,7 +465,7 @@ A string that identifies this transaction as part of a group. See the Connect do
 	  "outcome": null,
 	  "paid": true,
 	  "payment_intent": null,
-	  "payment_method": "card_1DSiVdCeyNCl6fY2xvLI809J",
+	  "payment_method": "card_fake123456789",
 	  "payment_method_details": {
 		"card": {
 		  "brand": "visa",
@@ -456,7 +477,7 @@ A string that identifies this transaction as part of a group. See the Connect do
 		  "country": "US",
 		  "exp_month": 4,
 		  "exp_year": 2024,
-		  "fingerprint": "x18XyLUPM6hub5xz",
+		  "fingerprint": "fake123456789",
 		  "funding": "credit",
 		  "installments": null,
 		  "last4": "4242",
@@ -468,13 +489,13 @@ A string that identifies this transaction as part of a group. See the Connect do
 	  },
 	  "receipt_email": null,
 	  "receipt_number": null,
-	  "receipt_url": "https://pay.stripe.com/receipts/acct_19eGgRCeyNCl6fY2/ch_1FTxyCCeyNCl6fY2aYoHTBBF/rcpt_FzxuG1UR6Pj9Er68sVPgHRNMLeKZomf",
+	  "receipt_url": "https://pay.stripe.com/receipts/acct_fake123456789/ch_fake123456789/rcpt_fake123456789",
 	  "refunded": false,
 	  "refunds": {
 		"object": "list",
 		"data": [],
 		"has_more": false,
-		"url": "/v1/charges/ch_1FTxyCCeyNCl6fY2aYoHTBBF/refunds"
+		"url": "/v1/charges/ch_fake123456789/refunds"
 	  },
 	  "review": null,
 	  "shipping": null,
@@ -504,7 +525,7 @@ L<https://stripe.com/docs/api/charges>, L<https://stripe.com/docs/charges>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

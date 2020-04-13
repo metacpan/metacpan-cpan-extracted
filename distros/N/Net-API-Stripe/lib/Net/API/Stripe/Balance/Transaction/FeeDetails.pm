@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Balance/Transaction/FeeDetails.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -40,11 +40,20 @@ Net::API::Stripe::Balance::Transaction::FeeDetails - A Stripe Fee Details Object
 
 =head1 SYNOPSIS
 
+	my $fee_details = Net::API::Stripe::Balance::Transaction::FeeDetails->new({
+	    amount => 2000,
+	    currency => 'eur',
+	    description => 'Some transaction',
+	    type => 'application_fee',
+	});
+
 =head1 VERSION
 
     0.1
 
 =head1 DESCRIPTION
+
+This is called from within L<Net::API::Stripe::Transaction> from method B<fee_details>
 
 =head1 CONSTRUCTOR
 
@@ -52,18 +61,8 @@ Net::API::Stripe::Balance::Transaction::FeeDetails - A Stripe Fee Details Object
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Balance::Transaction::FeeDetails> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -94,13 +93,13 @@ Type of the fee, one of: application_fee, stripe_fee or tax.
 =head1 API SAMPLE
 
 	{
-	  "id": "txn_1FTlZvCeyNCl6fY2qIteNrPe",
+	  "id": "txn_fake124567890",
 	  "object": "balance_transaction",
 	  "amount": 8000,
 	  "available_on": 1571443200,
 	  "created": 1571128827,
 	  "currency": "jpy",
-	  "description": "Invoice 409CD54-0039",
+	  "description": "Invoice 123456-0039",
 	  "exchange_rate": null,
 	  "fee": 288,
 	  "fee_details": [
@@ -113,7 +112,7 @@ Type of the fee, one of: application_fee, stripe_fee or tax.
 		}
 	  ],
 	  "net": 7712,
-	  "source": "ch_1FTlZvCeyNCl6fY2YAZ8thLx",
+	  "source": "ch_fake124567890",
 	  "status": "pending",
 	  "type": "charge"
 	}
@@ -136,7 +135,7 @@ L<https://stripe.com/docs/api>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

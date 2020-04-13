@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Card/Holder.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -63,6 +63,42 @@ Net::API::Stripe::Issuing::Card::Holder - A Stripe Card Holder Object
 
 =head1 SYNOPSIS
 
+    my $holder = $stripe->card_holder({
+        authorization_controls => 
+        {
+            allowed_categories => [],
+            blocked_categories => [],
+            spending_limits => 
+            [
+                {
+                amount => 2000000,
+                categories => '',
+                interval => 'monthly',
+                },
+                {
+                amount => 200000,
+                categories => '',
+                interval => 'weekly',
+                },
+            ],
+            spending_limits_currency => 'jpy',
+        },
+        billing => $billing_details_object,
+        company => $account_company_object,
+        created => '2020-04-12T07:30:10',
+        email => 'john.doe@example.com',
+        individual => $account_individual_object,
+        is_default => $stripe->true,
+        livemode => $stripe->false,
+        name => 'John Doe',
+        phone_number => '+81-(0)90-1234-5678',
+        requirements => $account_requirements_object,
+        status => 'active',
+        type => 'individual',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -77,18 +113,8 @@ An Issuing Cardholder object represents an individual or business entity who is 
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Issuing::Card::Holder> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -106,19 +132,19 @@ String representing the object’s type. Objects of the same type share the same
 
 =item B<authorization_controls> hash
 
-This is a C<Net::API::Stripe::Issuing::Card::AuthorizationsControl> object.
+This is a L<Net::API::Stripe::Issuing::Card::AuthorizationsControl> object.
 
 =item B<billing> hash
 
 The cardholder’s billing address.
 
-This is a C<Net::API::Stripe::Billing::Details> object.
+This is a L<Net::API::Stripe::Billing::Details> object.
 
 =item B<company> hash preview feature
 
 Additional information about a business_entity cardholder.
 
-This is a C<Net::API::Stripe::Connect::Account::Company> object.
+This is a L<Net::API::Stripe::Connect::Account::Company> object.
 
 =item B<created> timestamp
 
@@ -134,7 +160,7 @@ The cardholder’s email address.
 
 Additional information about an individual cardholder.
 
-This is a C<Net::API::Stripe::Connect::Person> object.
+This is a L<Net::API::Stripe::Connect::Person> object.
 
 =item B<is_default> boolean
 
@@ -160,7 +186,7 @@ The cardholder’s phone number.
 
 Information about verification requirements for the cardholder, including what information needs to be collected.
 
-This is a C<Net::API::Stripe::Connect::Account::Requirements> object.
+This is a L<Net::API::Stripe::Connect::Account::Requirements> object.
 
 =item B<status> string
 
@@ -174,42 +200,42 @@ One of individual or business_entity.
 
 =head1 API SAMPLE
 
-	{
-	  "id": "ich_1DNcRHCeyNCl6fY2Epuwa9n9",
-	  "object": "issuing.cardholder",
-	  "authorization_controls": {
-		"allowed_categories": [],
-		"blocked_categories": [],
-		"spending_limits": [],
-		"spending_limits_currency": null
-	  },
-	  "billing": {
-		"address": {
-		  "city": "Beverly Hills",
-		  "country": "US",
-		  "line1": "123 Fake St",
-		  "line2": "Apt 3",
-		  "postal_code": "90210",
-		  "state": "CA"
-		},
-		"name": "Jenny Rosen"
-	  },
-	  "company": null,
-	  "created": 1540111055,
-	  "email": "jenny@example.com",
-	  "individual": null,
-	  "is_default": false,
-	  "livemode": false,
-	  "metadata": {},
-	  "name": "Jenny Rosen",
-	  "phone_number": "+18008675309",
-	  "requirements": {
-		"disabled_reason": null,
-		"past_due": []
-	  },
-	  "status": "active",
-	  "type": "individual"
-	}
+    {
+      "id": "ich_fake123456789",
+      "object": "issuing.cardholder",
+      "authorization_controls": {
+        "allowed_categories": [],
+        "blocked_categories": [],
+        "spending_limits": [],
+        "spending_limits_currency": null
+      },
+      "billing": {
+        "address": {
+          "city": "Beverly Hills",
+          "country": "US",
+          "line1": "123 Fake St",
+          "line2": "Apt 3",
+          "postal_code": "90210",
+          "state": "CA"
+        },
+        "name": "Jenny Rosen"
+      },
+      "company": null,
+      "created": 1540111055,
+      "email": "jenny@example.com",
+      "individual": null,
+      "is_default": false,
+      "livemode": false,
+      "metadata": {},
+      "name": "Jenny Rosen",
+      "phone_number": "+18008675309",
+      "requirements": {
+        "disabled_reason": null,
+        "past_due": []
+      },
+      "status": "active",
+      "type": "individual"
+    }
 
 =head1 HISTORY
 
@@ -229,7 +255,7 @@ L<https://stripe.com/docs/api/issuing/cardholders>, L<https://stripe.com/docs/is
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

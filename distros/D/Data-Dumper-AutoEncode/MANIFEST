@@ -1,5 +1,6 @@
 Build.PL
 Changes
+cpanfile
 lib/Data/Dumper/AutoEncode.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -8,7 +9,11 @@ README.pod
 script/edumper
 t/00_compile.t
 t/01_basic.t
+t/02_rt-125316.t
+t/03_export.t
+t/04_override_dumper.t
 xt/01_perlcritic.t
 xt/02_pod-coverage.t
 xt/03_pod.t
+LICENSE
 META.yml

@@ -1,10 +1,59 @@
+1.049   2020-04-11  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] A logic bug in --dont-uniquify option broke deps & rdeps
+	  subcommands.
+
+
+1.048   2020-04-11  Released-By: PERLANCAR; Urgency: medium; Broken: yes
+
+        - UPDATE: this release was broken, fixed in 1.048.
+
+	- Bump database schema version to v11 to add some indices on dep
+	  table.
+
+	- [subcommands deps, rdeps] Add option --dont-uniquify.
+
+
+1.047   2020-04-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [doc] Mention App::lcpan::Manual.
+
+	[subcommand deps]
+
+	- 'perl' is considered registered even though it does not have 'author'.
+
+        - Rename options --{include,exclude}-{,un}registered to *{,un}indexed*
+          to be more consistent with PAUSE/CPAN terminology.
+
+	[subcommand rdeps-scripts]
+
+        - Add --level (-R).
+
+	[subcommand author-deps]
+
+        - Add description & examples.
+
+
+1.047   2020-04-11  Released-By: PERLANCAR; Urgency: medium
+
+        [subcommand deps]
+
+        - [Incompatible change] deps: Rename --{include,exclude}-{,un}registered
+          options to --{include,exclude}-{,un}indexed to be more consistent with
+          PAUSE/CPAN terminology.
+
+
 1.046   2020-04-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Add subcommand: rdeps-scripts.
 
-        - dist-scripts: Accept multiple dists.
+        [subcommand dist-scripts]
 
-	- rdeps: Add --flatten like in deps.
+        - Accept multiple dists.
+
+	[subcommand rdeps]
+
+        - Add --flatten like in deps.
 
 
 1.045   2020-03-04  Released-By: PERLANCAR; Urgency: medium
@@ -22,17 +71,25 @@
 
 	- [internal] Replace PERLANCAR::Module::List with Module::List::Tiny.
 
-	- [mods subcommand] Tweak schema of 'namespaces' argument for better tab
-	  completion.
+	[subcommand mods]
+
+        - Tweak schema of 'namespaces' argument for better tab completion.
 
 
 1.043   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
-	- deps: Add --{include,exclude}-{,un}registered options.
-
 	- Add subcommand: dist-rdeps.
 
-	- [bugfix] related-mods: connect as ro, not rw.
+	[subcommand deps]
+
+        - Add --{include,exclude}-{,un}registered options. UPDATE 2020-04-11: In
+          1.047, these options are now renamed to
+          --{include,exclude}-{,un}indexed to be consistent with PAUSE/CPAN
+          terminology.
+
+        [subcommand related-mods]
+
+	- [bugfix] Connect as ro, not rw.
 
 
 1.042   2019-11-19  Released-By: PERLANCAR; Urgency: medium
@@ -71,8 +128,9 @@
 
 1.036   2019-07-11  Released-By: PERLANCAR; Urgency: medium
 
-	- mods, dists, authors, rels, namespaces: Add --query-type
-	  regexp-name (-r).
+	[subcommands mods, dists, authors, rels, namespaces]
+
+        - Add --query-type regexp-name (-r).
 
 	- [ux][completion] Show full names as summaries when completing
 	  CPAN IDs.
@@ -122,8 +180,10 @@
 	- Utilize bootstrap database (provided by App-lcpan-Bootstrap
 	  distribution) if available.
 
-	- scripts: Add shortcut option -n (for --query-type name) and -x
-	  (for --query-type exact-name), just like in mods.
+	[subcommand scripts]
+
+        - [ux] Add shortcut option -n (for --query-type name) and -x (for
+          --query-type exact-name), just like in mods.
 
 
 1.028   2018-11-29  Released-By: PERLANCAR
@@ -227,31 +287,37 @@
 
 1.012   2016-11-01  Released-By: PERLANCAR
 
-        - [ux] related-mods: Instead of specifying min_score, let users just
-          specify number of result they want; hide score-related fields by
-          default in result unless user specifies --with-scores.
+        [subcommand related-mods]
+
+        - [ux] Instead of specifying min_score, let users just specify number of
+          result they want; hide score-related fields by default in result
+          unless user specifies --with-scores.
 
 
 1.011   2016-10-14  Released-By: PERLANCAR
 
-	- authors-by-rdep-count: fix SQL again, derp (didn't really count
-	  the number of dists).
+	[subcommand authors-by-rdep-count]
+
+        - [bugfix] Fix SQL again, derp (didn't really count the number of dists).
 
 
 1.010   2016-10-14  Released-By: PERLANCAR
 
-
-        - authors-by-rdep-count: fix SQL which caused duplicated author rows,
-          include author name in the result, only count latest distributions,
-          add options --exclude-same-author.
-
         - [doc] Add Synopsis and Description for lcpanm.
+
+        [subcommand authors-by-rdep-count]
+
+        - [bugfix] Fix SQL which caused duplicated author rows, include author
+          name in the result, only count latest distributions, add options
+          --exclude-same-author.
 
 
 1.009   2016-10-09  Released-By: PERLANCAR
 
-	- stats-last-index-time: Return CPAN mirror information (path and
-	  index name) to be more useful for CLI users.
+	[subcommand stats-last-index-time]
+
+        - Return CPAN mirror information (path and index name) to be more useful
+	  for CLI users.
 
 
 1.008   2016-10-08  Released-By: PERLANCAR
@@ -360,7 +426,9 @@
 
 	- Add subcommand: src.
 
-	- doc: Also page --raw result.
+	[subcommand doc]
+
+        - Also page --raw result.
 
 
 0.85    2016-03-17  Released-By: PERLANCAR
@@ -384,13 +452,15 @@
 
         - Add subcommand: mentions-for-all-mods.
 
-        - [ux] mods: Add shortcut options -x (for --query-type=exact-name), -n
-          (for --query-type=name), -N (for --namespace).
+        - [ux] [subcommand mods] Add shortcut options -x (for
+          --query-type=exact-name), -n (for --query-type=name), -N (for
+          --namespace).
 
-        - [ux] authors, dists, rels: Also add shortcut options -x & -n.
+        - [ux] [subcommands authors, dists, rels] Also add shortcut options -x &
+          -n.
 
-        - [ux] [completion] mods, dists, authors, rels: Do completion on query
-          when query type is exact name.
+        - [ux] [completion] [subcommands mods, dists, authors, rels] Do
+          completion on query when query type is exact name.
 
         - [ux] [completion] Don't do completion when word is empty, to avoid
           slow response.
@@ -398,9 +468,9 @@
 
 0.81    2016-03-02  Released-By: PERLANCAR
 
-	- doc: Encoding fixes (use pod2man -u option).
+	- [subcommand doc] Encoding fixes (use pod2man -u option).
 
-	- related-mods: Add option --skip-same-dist.
+	- [subcommand related-mods] Add option --skip-same-dist.
 
 	- Use Rinci 1.1.79's cmdline_src=stdin_or_args to allow subcommands
 	  like 'mods' to get arguments from stdin, e.g. 'cpan-outdated -p |
@@ -415,10 +485,10 @@
           mentions-for-mod, mentions-for-script, author-deps,
           author-deps-by-dependent-count, deps-by-dependent-count.
 
-	- mods: Add options --include-core, --include-noncore.
+	- [subcommand mods] Add options --include-core, --include-noncore.
 
-	- deps: Add options --module-author, --module-author-isnt,
-	  --include-noncore; various small fixes.
+	- [subcommand deps] Add options --module-author, --module-author-isnt,
+	--include-noncore; various small fixes.
 
         - [ux] Set default log level to 'info' (verbose) so 'lcpan update' by
           default can see indexing process.
@@ -434,7 +504,8 @@
 
 	[Others]
 
-        - deps: Assume 'perl' is a core dependency instead of non-core.
+        - [subcommand deps] Assume 'perl' is a core dependency instead of
+          non-core.
 
 
 0.79    2016-02-19  Released-By: PERLANCAR
@@ -444,8 +515,9 @@
 	- [Optimization] mentions: No need to include both clause when
 	  type=known-module or type=unknown-module.
 
-	- mentions: Allow multiple --mentioned-{module,script,author}, add
-	  options --mentioner-{module,script}.
+	- [subcommand mentions] Allow multiple
+	  --mentioned-{module,script,author}, add options
+	  --mentioner-{module,script}.
 
 
 0.78    2016-02-17  Released-By: PERLANCAR
@@ -457,9 +529,9 @@
           indexed. It is now fixed and we force a reindex of
           content/script/mention.
 
-        - dists: Forgot to update field name.
+        - [subcommand dists] Forgot to update field name.
 
-        - dists: fix Rinci argument specification for 'sort'.
+        - [subcommand dists] fix Rinci argument specification for 'sort'.
 
         [Experimental]
 
@@ -486,18 +558,19 @@
 
 	- No functional changes.
 
-	- [Bugfix] mods: fix Rinci argument specification for 'sort'.
+	- [Bugfix] [subcommand mods] fix Rinci argument specification for
+          'sort'.
 
 
 0.76    2016-02-16  Released-By: PERLANCAR
 
-	- [Bugfix] dists: release name was shown instead of size in
+	- [Bugfix] [subcommand dists] release name was shown instead of size in
 	  rel_size result field.
 
 
 0.75    2016-02-16  Released-By: PERLANCAR
 
-	- dists: Add options --sort, --rel-mtime-newer-than.
+	- [subcommand dists] Add options --sort, --rel-mtime-newer-than.
 
 
 0.74    2016-02-16  Released-By: PERLANCAR
@@ -506,25 +579,26 @@
           'stats' for App::lcpan::Call by only returning the result that is
           needed.
 
-        - stats: Add total_filesize.
+        - [subcommand stats] Add total_filesize.
 
-        - doc: Add option --html to open browser and show the HTML
+        - [subcommand doc] Add option --html to open browser and show the HTML
           documentation.
 
 
 0.73    2016-02-14  Released-By: PERLANCAR
 
-	- doc: Search .pod using content path to be able to show POD when
-	  there is no package declaration in the .pod.
+	- [subcommand doc] Search .pod using content path to be able to show POD
+	  when there is no package declaration in the .pod.
 
 
 0.72    2016-02-14  Released-By: PERLANCAR
 
-        - [Bugfix] doc: Fix SQL error when name contains /\.(pod|pm)$/.
+        - [Bugfix] [subcommand doc] Fix SQL error when name contains
+          /\.(pod|pm)$/.
 
-        - mods: Add result field rel_mtime.
+        - [subcommand mods] Add result field rel_mtime.
 
-        - rels: Add option --no-path.
+        - [subcommand rels] Add option --no-path.
 
 
 0.71    2016-02-12  Released-By: PERLANCAR
@@ -550,15 +624,15 @@
         - New subcommands: doc, script2mod, copy-script, extract-script,
           authors-by-filesize.
 
-        - script2dist: Add option --all.
+        - [subcommand script2dist] Add option --all.
 
-        - script2rel: Accept multiple arguments.
+        - [subcommand script2rel] Accept multiple arguments.
 
-        - dists: Add options --sort, --has-multiple-rels.
+        - [subcommand dists] Add options --sort, --has-multiple-rels.
 
-        - authors-by-*: Add percentage result field.
+        - [subcommands authors-by-*] Add percentage result field.
 
-        - contents: Add option --package.
+        - [subcommand contents] Add option --package.
 
 
 0.68    2016-02-11  Released-By: PERLANCAR
@@ -597,21 +671,23 @@
 
         - Bump database schema version to v7 due to the above fix.
 
-        - [Incompatible change] deps: Change default --include-core to 1.
+        - [Incompatible change] [subcommand deps] Change default --include-core
+          to 1.
 
-        - copy_*, extract_*: Check that release file exists.
+        - [subcommands copy_*, extract_*]: Check that release file exists.
 
 
 0.65    2016-01-23  Released-By: PERLANCAR
 
-	- [Bugfix] deps: Dependency to unindexed modules was not shown.
+	- [Bugfix] [subcommand deps] Dependency to unindexed modules was not
+          shown.
 
 	- Use authors/00whois.xml (produced by e.g. OrePAN) when
 	  authors/01mailrc.txt.gz does not exist.
 
 	- [doc] Update mini CPAN current size.
 
-	- mods: Complete namespace.
+	- [subcommand mods] [ux] Complete namespace.
 
 
 0.64    2016-01-16  Released-By: PERLANCAR
@@ -635,7 +711,7 @@
 
 0.62    2016-01-04  Released-By: PERLANCAR
 
-	- mods: Allow specifying multiple namespaces.
+	- [subcommand mods] Allow specifying multiple namespaces.
 
 
 0.61    2015-12-31  Released-By: PERLANCAR
@@ -653,7 +729,7 @@
 	  able to search certain fields only or exact match on certain
 	  fields only.
 
-	- deps: Add option --flatten when doing recursive.
+	- [subcommand deps] Add option --flatten when doing recursive.
 
 	- [internal] Replace 'format_options' result metadata with the simpler
 	  'table.fields'.
@@ -672,7 +748,7 @@
 
 0.58    2015-12-07  Released-By: PERLANCAR
 
-	- mods-by-rdep-count: [ux] Allow lowercase names in author
+	- [subcommand mods-by-rdep-count] [ux] Allow lowercase names in author
 	  argument.
 
 	- [Incompatible change] Rename subcommands author{rdeps,mods,rels,dists}
@@ -691,7 +767,7 @@
 
 0.56    2015-11-21  Released-By: PERLANCAR
 
-	- stats: Add num_authors_with_releases.
+	- [subcommand stats] Add num_authors_with_releases.
 
 	- [dist] Bump version of IPC::System::Options to fixed 0.22
 	  version.
@@ -699,7 +775,7 @@
 
 0.55    2015-10-20  Released-By: PERLANCAR
 
-	- deps: Add --with-xs-or-pp to show dependency is XS/PP.
+	- [subcommand deps] Add --with-xs-or-pp to show dependency is XS/PP.
 
 	- Warn about modules that don't have dist ID.
 
@@ -777,7 +853,8 @@
 
         - Add subcommand: reset.
 
-        - update: Add options --skip-index-file (-F), --force-update-index.
+        - [subcommand update] Add options --skip-index-file (-F),
+          --force-update-index.
 
         - Don't assume an empty indexer_version in meta table to mean reindex
           from scratch. It might be that the current version fails/crashes in
@@ -792,8 +869,8 @@
 
 0.43    2015-07-01  Released-By: PERLANCAR
 
-        - modst, dists, authors, rels, namespaces: Change multiple query to have
-          AND logic instead of OR, and provide --or switch.
+        - [subcommands modst, dists, authors, rels, namespaces] Change multiple
+          query to have AND logic instead of OR, and provide --or switch.
 
 
 0.42    2015-06-28  Released-By: PERLANCAR
@@ -802,9 +879,9 @@
           term 'rels' and not 'release'/'releases' is used in all other
           subcommand names).
 
-        - mods, dists, authors, rels, namespaces: Accept multiple queries, add
-          option --exact-match. This way, you can use the subcommand to list
-          several things of certain names.
+        - [subcommands mods, dists, authors, rels, namespaces] Accept multiple
+          queries, add option --exact-match. This way, you can use the
+          subcommand to list several things of certain names.
 
         - [Bugfix] Fix namespace matching (previously --namespace Win32 would
           also match Win32API).
@@ -826,9 +903,9 @@
           term 'mods' and not 'module'/'modules' is used in all other subcommand
           names).
 
-        - mods: Add option --sort which allows sorting by name, author, as well
-          as rdeps (number of reverse dependencies). This means we can show
-          "popular" modules first.
+        - [subcommand mods] Add option --sort which allows sorting by name,
+          author, as well as rdeps (number of reverse dependencies). This means
+          we can show "popular" modules first.
 
 
 0.39    2015-06-13  Released-By: PERLANCAR
@@ -861,15 +938,15 @@
 
 0.35    2015-05-19  Released-By: PERLANCAR
 
-	- dists: Add filtering options
+	- [subcommand dists] Add filtering options
 	  --has-{makefilepl,buildpl,metayml,metajson}.
 
 
 0.34    2015-05-15  Released-By: PERLANCAR
 
-        - mod2dist: Accept multiple modules.
+        - [subcommand mod2dist] Accept multiple modules.
 
-        - authorrdeps: Add completion for --user-author{,--isnt}.
+        - [subcommand authorrdeps] Add completion for --user-author{,--isnt}.
 
 
 0.33    2015-04-29  Released-By: PERLANCAR
@@ -890,7 +967,7 @@
 
         - Add subcommand: namespaces.
 
-        - modules: Add filter option --namespace.
+        - [subcommand modules] Add filter option --namespace.
 
 
 0.31    2015-04-28  Released-By: PERLANCAR
@@ -928,15 +1005,15 @@
 
 0.27    2015-04-23  Released-By: PERLANCAR
 
-        - rdeps: Implement recursive (-l/-R).
+        - [subcommand rdeps] Implement recursive (-l/-R).
 
-        - deps: Ordering when in -l/-R mode.
+        - [subcommand deps] Ordering when in -l/-R mode.
 
-        - deps: Optimize query (avoid retrieving module ID's twice when in
-          recursive mode).
+        - [subcommand deps] Optimize query (avoid retrieving module ID's twice
+          when in recursive mode).
 
-        - [Bugfix] deps: Forget to clone data causing deps --phase & --level
-          defaults being reset to 'ALL'.
+        - [Bugfix] [subcommand deps] Forget to clone data causing deps --phase &
+          --level defaults being reset to 'ALL'.
 
 
 0.26    2015-04-22  Released-By: PERLANCAR
@@ -953,7 +1030,7 @@
 
 0.24    2015-04-21  Released-By: PERLANCAR
 
-	- deps: Accept multiple modules, speed up query.
+	- [subcommand deps] Accept multiple modules, speed up query.
 
 
 0.23    2015-04-16  Released-By: PERLANCAR
@@ -966,12 +1043,12 @@
 	  modules, module abstract will be retrieved from handle_cmd's
 	  metadata anyway.
 
-	- mods-by-rdep-count: Add filter options --phase & --rel.
+	- [subcommand mods-by-rdep-count] Add filter options --phase & --rel.
 
 
 0.22    2015-04-15  Released-By: PERLANCAR
 
-        - rdeps: Accept multiple modules.
+        - [subcommand rdeps] Accept multiple modules.
 
         - New subcommand: authorrdeps. If you are a CPAN author, this subcommand
           makes it easy to list all distributions that use one of your modules.
@@ -987,7 +1064,7 @@
           subcommands, to simplify configuration. Merge options to 'update'
           subcommand.
 
-        - update: Add filter options --include-author, --exclude-author.
+        - Add filter options --include-author, --exclude-author.
 
 
 0.20    2015-04-15  Released-By: PERLANCAR
@@ -1009,15 +1086,15 @@
 
 0.18    2015-04-15  Released-By: PERLANCAR
 
-	- mods-from-same-dist: Accept multiple modules.
+	- [subcommand mods-from-same-dist] Accept multiple modules.
 
 
 0.17    2015-04-14  Released-By: PERLANCAR
 
         - Add command: mods-from-same-dist.
 
-        - stats: Add raw_mirror_mtime & raw_last_index_time to ease scripts
-          calculating freshness.
+        - [subcommand stats] Add raw_mirror_mtime & raw_last_index_time to ease
+          scripts calculating freshness.
 
 
 0.16    2015-04-12  Released-By: PERLANCAR
@@ -1041,7 +1118,7 @@
 
         - Enable authors-by-{mod,rel}-count because the queries are now fast.
 
-        - Add command: authors-by-dist-count.
+        - Add subcommand: authors-by-dist-count.
 
 
 0.14    2015-04-07  Released-By: PERLANCAR
@@ -1174,9 +1251,9 @@
 
         - Rename 'rev-deps' subcommand to 'rdeps'.
 
-        - rdeps: Add options --author and --author-isnt to be able to filter by
-          author. This allows you to, for example, see if a module is used by
-          other authors instead of just herself.
+        - [subcommand rdeps] Add options --author and --author-isnt to be able
+          to filter by author. This allows you to, for example, see if a module
+          is used by other authors instead of just herself.
 
 
 0.02    2015-01-13  Released-By: PERLANCAR

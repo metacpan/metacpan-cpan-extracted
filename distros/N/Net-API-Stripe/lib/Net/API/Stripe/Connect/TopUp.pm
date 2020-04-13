@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/TopUp.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -64,6 +64,17 @@ Net::API::Stripe::Connect::TopUp - An Stripe Top-up Object
 
 =head1 SYNOPSIS
 
+    my $topup = $stripe->topup({
+        amount => 2000,
+        currency => 'usd',
+        description => 'Adding fund for Q2 2020',
+        metadata => { transaction_id => 123 },
+        source => $source_object,
+        statement_descriptor => 'Fund transfer to Stripe for Q2 2020',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -78,18 +89,8 @@ To top up your Stripe balance, you create a top-up object. You can retrieve indi
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::TopUp> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -113,7 +114,7 @@ Amount transferred.
 
 ID of the balance transaction that describes the impact of this top-up on your account balance. May not be specified depending on status of top-up.
 
-When expanded, this is a C<Net::API::Stripe::Balance::Transaction> object.
+When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
 =item B<created> timestamp
 
@@ -151,7 +152,7 @@ Set of key-value pairs that you can attach to an object. This can be useful for 
 
 For most Stripe users, the source of every top-up is a bank account. This hash is then the source object describing that bank account.
 
-This is a C<Net::API::Stripe::Payment::Source> object.
+This is a L<Net::API::Stripe::Payment::Source> object.
 
 =item B<statement_descriptor> string
 
@@ -173,7 +174,7 @@ Undocumented in Stripe API, but found in its response json data. See example API
 =head1 API SAMPLE
 
 	{
-	  "id": "tu_123456789",
+	  "id": "tu_fake123456789",
 	  "object": "topup",
 	  "amount": 1000,
 	  "balance_transaction": null,
@@ -188,7 +189,7 @@ Undocumented in Stripe API, but found in its response json data. See example API
 		"order_id": "12345678"
 	  },
 	  "source": {
-		"id": "src_1FVF3MF5IfL0eXz9l7WLfMwG",
+		"id": "src_fake123456789",
 		"object": "source",
 		"ach_debit": {
 		  "country": "US",
@@ -199,7 +200,7 @@ Undocumented in Stripe API, but found in its response json data. See example API
 		  "last4": "6789"
 		},
 		"amount": null,
-		"client_secret": "src_client_secret_G1HcAPbFnoCcNic9PYnhFqDj",
+		"client_secret": "src_client_secret_fake123456789",
 		"created": 1571480456,
 		"currency": "jpy",
 		"flow": "code_verification",
@@ -243,7 +244,7 @@ L<https://stripe.com/docs/api/topups>, L<https://stripe.com/docs/connect/top-ups
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -1,0 +1,57 @@
+NAME
+    SExpression::Decode::Marpa - S-expression parser using Marpa
+
+VERSION
+    This document describes version 0.002 of SExpression::Decode::Marpa
+    (from Perl distribution SExpression-Decode-Marpa), released on
+    2020-04-10.
+
+SYNOPSIS
+     use SExpression::Decode::Marpa qw(from_sexp);
+     my $data = from_sexp(q|((foo . 1) (bar . 2))|); # => [[foo=>1], [bar=>2]]
+
+DESCRIPTION
+    EARLY RELEASE.
+
+    Todo: wrap special values (e.g. nil, t, keyword symbol :foo, other
+    symbols, vectors, lists). Convert to alist when appropriate.
+
+FUNCTIONS
+  from_sexp
+    Usage:
+
+     my $data = from_sexp($str);
+
+    Decode S-expresion in $str. Dies on error.
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/SExpression-Decode-Marpa>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-SExpression-Decode-Marpa>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=SExpression-Decode-Ma
+    rpa>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::SExpression, another S-expression parser based on Parse::Yapp.
+
+    SExpression::Decode::Regexp
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

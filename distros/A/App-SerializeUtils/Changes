@@ -1,4 +1,11 @@
-0.161   2018-11-19 (PERLANCAR)
+0.162   2020-04-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utilities: dd2sexp, json2sexp, phpser2sexp, sereal2sexp,
+	  storable2sexp, yaml2sexp, sexp2dd, sexp2ddc, sexp2json, sexp2phpser,
+	  sexp2sereal, sexp2storable, sexp2yaml.
+
+
+0.161   2018-11-19  Released-By: PERLANCAR
 
 	- Add scripts dd2dd, json2json, yaml2yml for convenience.
 
@@ -14,24 +21,24 @@
           of the default Data::Dump or Data::Dump::Color.
 
 
-0.160   2018-01-29 (PERLANCAR)
+0.160   2018-01-29  Released-By: PERLANCAR
 
 	- pp-json, pp-yaml: Observe COLOR environment variable to set
 	  default for color.
 
 
-0.15    2017-06-26 (PERLANCAR)
+0.15    2017-06-26  Released-By: PERLANCAR
 
 	- [Bugfix] check-json: Fix typo in constructing JSON::MaybeXS
 	  object.
 
 
-0.14    2017-06-01 (PERLANCAR)
+0.14    2017-06-01  Released-By: PERLANCAR
 
 	- [ux] pp-json, pp-yaml: Make sure we print terminating newline.
 
 
-0.13    2017-05-23 (PERLANCAR)
+0.13    2017-05-23  Released-By: PERLANCAR
 
 	- pp-yaml: by default colorize YAML in interactive mode using
 	  YAML::Tiny::Color, add options --(no-)color, --pp, --xs.
@@ -45,68 +52,68 @@
         - pp-dd: When Data::Undump fails, report its error message.
 
 
-0.12    2017-03-01 (PERLANCAR)
+0.12    2017-03-01  Released-By: PERLANCAR
 
 	- pp-dd: Add option --undump (and --eval).
 
 
-0.11    2017-02-28 (PERLANCAR)
+0.11    2017-02-28  Released-By: PERLANCAR
 
 	- Add utilities: pp-yaml, pp-dd.
 
 
-0.10    2016-03-09 (PERLANCAR)
+0.10    2016-03-09  Released-By: PERLANCAR
 
 	- Replace JSON -> JSON::MaybeXS, JSON::XS -> Cpanel::JSON::XS.
 
 
-0.09    2015-12-29 (PERLANCAR)
+0.09    2015-12-29  Released-By: PERLANCAR
 
 	- pp-json: Use canonical().
 
 
-0.08    2015-04-14 (PERLANCAR)
+0.08    2015-04-14  Released-By: PERLANCAR
 
 	- Add *ddc scripts (Data::Dump::Color), these output are nicer for
 	  debugging due to visual hints produced by Data::Dump::Color.
 
 
-0.07     2014-05-22 (SHARYANTO)
+0.07     2014-05-22  Released-By: SHARYANTO
 
          - [converter] Support Sereal and Storable formats (add sereal2*,
            *2sereal, storable2*, *2storable scripts).
 
 
-0.06     2013-10-26 (SHARYANTO)
+0.06     2013-10-26  Released-By: SHARYANTO
 
          - Add --xs, --syck options to check-yaml to pick YAML implementation.
 
          - Add --xs, --pp options to check-json to pick JSON implementation.
 
 
-0.05     2013-10-25 (SHARYANTO)
+0.05     2013-10-25  Released-By: SHARYANTO
 
          - Rename *php* scripts to *phpser* scripts, to reduce ambiguity.
 
          - Add scripts for checking syntax: check-{json,phpser,yaml}.
 
 
-0.04     2013-10-15 (SHARYANTO)
+0.04     2013-10-15  Released-By: SHARYANTO
 
          - Use JSON option allow_nonref.
 
 
-0.03     2013-09-09 (SHARYANTO)
+0.03     2013-09-09  Released-By: SHARYANTO
 
          - No functional changes. Rebuild with MakeMaker instead of
            Module::Build because the latter is deprecated from core in 5.19.
 
 
-0.02    2011-11-26 (SHARYANTO)
+0.02    2011-11-26  Released-By: SHARYANTO
 
         - Rename distribution from App-SerializeConvert to App-SerializeUtils.
 
 
-0.01    2011-11-26 (SHARYANTO)
+0.01    2011-11-26  Released-By: SHARYANTO
 
         - First release.

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Branding.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -36,6 +36,13 @@ Net::API::Stripe::Connect::Account::Branding - A Stripe Account Branding Object
 
 =head1 SYNOPSIS
 
+    my $obj = $stripe->account->setting->branding({
+        icon => '/some/file/path/corp.png',
+        logo => '/some/other/path/large.jpg',
+        # Or an hexadecimal value preceded by a #
+        primary_color => 'blue',
+    });
+
 =head1 VERSION
 
     0.1
@@ -44,24 +51,16 @@ Net::API::Stripe::Connect::Account::Branding - A Stripe Account Branding Object
 
 Settings used to apply the account’s branding to email receipts, invoices, Checkout, and other products.
 
+This is called by method B<branding> from L<Net::API::Stripe::Connect::Account::Settings>
+
 =head1 CONSTRUCTOR
 
 =over 4
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Connect::Account::Branding> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -73,13 +72,13 @@ Toggles debug mode on/off
 
 (ID of a file upload) An icon for the account. Must be square and at least 128px x 128px.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =item B<logo> string (expandable)
 
 (ID of a file upload) A logo for the account that will be used in Checkout instead of the icon and without the account’s name next to it if provided. Must be at least 128px x 128px.
 
-When expanded, this is a C<Net::API::Stripe::File> object.
+When expanded, this is a L<Net::API::Stripe::File> object.
 
 =item B<primary_color> string
 
@@ -90,7 +89,7 @@ A CSS hex color value representing the primary branding color for this account
 =head1 API SAMPLE
 
 	{
-	  "id": "acct_19eGgRCeyNCl6xYZ",
+	  "id": "acct_fake123456789",
 	  "object": "account",
 	  "business_profile": {
 		"mcc": null,
@@ -122,7 +121,7 @@ A CSS hex color value representing the primary branding color for this account
 	  "payouts_enabled": true,
 	  "settings": {
 		"branding": {
-		  "icon": "file_1DLf5rCeyNCl6fY2kS4e5hMT",
+		  "icon": "file_1DLfake123456789",
 		  "logo": null,
 		  "primary_color": "#0e77ca"
 		},
@@ -173,7 +172,7 @@ L<https://stripe.com/docs/api/accounts/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

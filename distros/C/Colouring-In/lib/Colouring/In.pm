@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use smallnum;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 our %TOOL;
 
@@ -301,9 +301,9 @@ sub fadein {
 
 sub colour {
 	my @rgb = @{ $_[0]->{colour} };
-	my $r = $rgb[0] // 255;
-	my $g = $rgb[1] // 255;
-	my $b = $rgb[2] // 255;
+	my $r = defined $rgb[0] ? $rgb[0] : 255;
+	my $g = defined $rgb[1] ? $rgb[1] : 255;
+	my $b = defined $rgb[2] ? $rgb[2] : 255;
 	return ( $r, $g, $b );
 }
 
@@ -317,7 +317,7 @@ Colouring::In - color or colour.
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 

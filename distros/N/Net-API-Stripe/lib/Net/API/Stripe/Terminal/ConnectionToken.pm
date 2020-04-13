@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Terminal/ConnectionToken.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -37,6 +37,14 @@ Net::API::Stripe::Terminal::ConnectionToken - A Stripe Connection Token Object
 
 =head1 SYNOPSIS
 
+    my $token = $stripe->connection_token({
+        # Usable anywhere because undef
+        location => undef,
+        secret => 'pst_SGHJYDGHjfdldjflTHshfj',
+    });
+
+See documentation in L<Net::API::Stripe> for example to make api calls to Stripe to create those objects.
+
 =head1 VERSION
 
     0.1
@@ -51,18 +59,8 @@ A Connection Token is used by the Stripe Terminal SDK to connect to a reader.
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Terminal::ConnectionToken> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -76,7 +74,7 @@ String representing the object’s type. Objects of the same type share the same
 
 =item B<location> string
 
-The id of the location that this connection token is scoped to.
+The id of the location that this connection token is scoped to. If specified the connection token will only be usable with readers assigned to that location, otherwise the connection token will be usable with all readers.
 
 =item B<secret> string
 
@@ -88,7 +86,7 @@ Your application should pass this token to the Stripe Terminal SDK.
 
 	{
 	  "object": "terminal.connection_token",
-	  "secret": "pst_test_RG4m9nG5DN9AsKcu0z2bn1J"
+	  "secret": "pst_test_fake123456789"
 	}
 
 =head1 HISTORY
@@ -109,7 +107,7 @@ L<https://stripe.com/docs/api/terminal/connection_tokens>, L<https://stripe.com/
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

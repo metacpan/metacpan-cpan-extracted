@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Source/Owner.pm
 ## Version 0.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Copyright(c) 2019-2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2019/11/02
@@ -58,6 +58,13 @@ Net::API::Stripe::Payment::Source::Owner - A Stripe Payment Source Owner Object
 
 =head1 SYNOPSIS
 
+    my $owner = $stripe->source->owner({
+        address => $address_object,
+        email => 'john.doe@example.com',
+        name => 'john.doe@example.com',
+        phone => '+81-(0)90-1234-5678',
+    });
+
 =head1 VERSION
 
     0.1
@@ -66,7 +73,7 @@ Net::API::Stripe::Payment::Source::Owner - A Stripe Payment Source Owner Object
 
 Information about the owner of the payment instrument that may be used or required by particular source types.
 
-This is part of the C<Net::API::Stripe::Payment::Source> object
+This is part of the L<Net::API::Stripe::Payment::Source> object
 
 =head1 CONSTRUCTOR
 
@@ -74,18 +81,8 @@ This is part of the C<Net::API::Stripe::Payment::Source> object
 
 =item B<new>( %ARG )
 
-Creates a new C<Net::API::Stripe> objects.
+Creates a new L<Net::API::Stripe::Payment::Source::Owner> object.
 It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
-
-=item I<verbose>
-
-Toggles verbose mode on/off
-
-=item I<debug>
-
-Toggles debug mode on/off
 
 =back
 
@@ -97,7 +94,7 @@ Toggles debug mode on/off
 
 Owner’s address.
 
-This is a C<Net::API::Stripe::Address> object.
+This is a L<Net::API::Stripe::Address> object.
 
 =item B<email> string
 
@@ -113,17 +110,17 @@ Owner’s phone number (including extension).
 
 =item B<receiver> obsolete?
 
-This is a C<Net::API::Stripe::Payment::Source::Receiver> object, but it seems it was removed from the documentation.
+This is a L<Net::API::Stripe::Payment::Source::Receiver> object, but it seems it was removed from the documentation.
 
 =item B<redirect> obsolete?
 
-This is a C<Net::API::Stripe::Payment::Source::Redirect> object, but it seems it was removed from the documentation.
+This is a L<Net::API::Stripe::Payment::Source::Redirect> object, but it seems it was removed from the documentation.
 
 =item B<verified_address> hash
 
 Verified owner’s address. Verified values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement. They cannot be set or mutated.
 
-This is a C<Net::API::Stripe::Address> object.
+This is a L<Net::API::Stripe::Address> object.
 
 =item B<verified_email> string
 
@@ -142,7 +139,7 @@ Verified owner’s phone number (including extension). Verified values are verif
 =head1 API SAMPLE
 
 	{
-	  "id": "src_1FUXrFCeyNCl6fY2Fk07erzD",
+	  "id": "src_fake123456789",
 	  "object": "source",
 	  "ach_credit_transfer": {
 		"account_number": "test_52796e3294dc",
@@ -152,7 +149,7 @@ Verified owner’s phone number (including extension). Verified values are verif
 		"swift_code": "TSTEZ122"
 	  },
 	  "amount": null,
-	  "client_secret": "src_client_secret_G0YzRXUMP1IJhwBBA4dW38It",
+	  "client_secret": "src_client_secret_fake123456789",
 	  "created": 1571314413,
 	  "currency": "jpy",
 	  "flow": "receiver",
@@ -200,7 +197,7 @@ L<https://stripe.com/docs/api/sources/object>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
