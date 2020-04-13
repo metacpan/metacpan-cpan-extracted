@@ -5,7 +5,7 @@ use warnings;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: WASI Configuration
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasi_config_';
@@ -16,20 +16,29 @@ $ffi->custom_type('wasi_config_t' => {
 });
 
 
+sub _wrapper
+{
+  my $xsub = shift;
+  my $self = shift;
+  $xsub->($self, @_);
+  $self;
+}
+
 $ffi->attach( new             => []                                  => 'wasi_config_t' );
-$ffi->attach( set_stdin_file  => ['wasi_config_t','string']          => 'void' );
-$ffi->attach( set_stdout_file => ['wasi_config_t','string']          => 'void' );
-$ffi->attach( set_stderr_file => ['wasi_config_t','string']          => 'void' );
-$ffi->attach( preopen_dir     => ['wasi_config_t','string','string'] => 'void' );
+$ffi->attach( set_stdin_file  => ['wasi_config_t','string']          => 'void', \&_wrapper );
+$ffi->attach( set_stdout_file => ['wasi_config_t','string']          => 'void', \&_wrapper );
+$ffi->attach( set_stderr_file => ['wasi_config_t','string']          => 'void', \&_wrapper );
+$ffi->attach( preopen_dir     => ['wasi_config_t','string','string'] => 'void', \&_wrapper );
 
 foreach my $name (qw( argv env stdin stdout stderr ))
 {
-  $ffi->attach( "inherit_$name" => ['wasi_config_t'] );
+  $ffi->attach( "inherit_$name" => ['wasi_config_t'], \&_wrapper );
 }
 
 $ffi->attach( set_argv => ['wasi_config_t', 'int', 'string[]'] => sub {
   my($xsub, $self, @argv) = @_;
   $xsub->($self, scalar(@argv), \@argv);
+  $self;
 });
 
 $ffi->attach( set_env => ['wasi_config_t','int','string[]','string[]'] => sub {
@@ -42,6 +51,7 @@ $ffi->attach( set_env => ['wasi_config_t','int','string[]','string[]'] => sub {
     push @values, $env{$name};
   }
   $xsub->($self, scalar(@names), \@names, \@values);
+  $self;
 });
 
 $ffi->attach( [ 'delete' => 'DESTROY' ] => ['wasi_config_t'] => sub {
@@ -63,7 +73,7 @@ Wasm::Wasmtime::WasiConfig - WASI Configuration
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -74,14 +84,18 @@ version 0.03
  
  # inherit everything, and provide access to the
  # host filesystem under /host (yikes!)
- $config->inherit_argv;
- $config->inherit_env;
- $config->inherit_stdin;
- $config->inherit_stdout;
- $config->inherit_stderr;
- $config->preopen_dir("/", "/host");
+ $config->inherit_argv
+        ->inherit_env
+        ->inherit_stdin
+        ->inherit_stdout
+        ->inherit_stderr
+        ->preopen_dir("/", "/host");
  
- my $wasi = Wasm::Wasmtime::WasiInstance->new($store, "wasi_snapshot_preview1", $config);
+ my $wasi = Wasm::Wasmtime::WasiInstance->new(
+   $store,
+   "wasi_snapshot_preview1",
+   $config,
+ );
 
 =head1 DESCRIPTION
 
@@ -168,6 +182,16 @@ Configures WASI to use the host program's standard error.
  $config->preopen_dir($host_path, $guest_path);
 
 Pre-open the given directory from the host's C<$host_path> to the guest's C<$guest_path>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

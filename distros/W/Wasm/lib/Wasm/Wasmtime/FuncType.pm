@@ -7,7 +7,7 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ValType;
 
 # ABSTRACT: Wasmtime function type class
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasm_functype_';
@@ -78,7 +78,7 @@ Wasm::Wasmtime::FuncType - Wasmtime function type class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -124,9 +124,19 @@ Returns a list of the result types for the function type, as L<Wasm::Wasmtime::V
 
 =head2 as_externtype
 
- my $externtype = $func->as_externtype
+ my $externtype = $functype->as_externtype
 
 Returns the L<Wasm::Wasmtime::ExternType> for this function type.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

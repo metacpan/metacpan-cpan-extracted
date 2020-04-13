@@ -6,7 +6,7 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Store;
 
 # ABSTRACT: Wasmtime trap class
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasm_trap_';
@@ -63,7 +63,7 @@ Wasm::Wasmtime::Trap - Wasmtime trap class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -102,6 +102,16 @@ Create a trap instance.  C<$message> MUST be null terminated.
  my $message = $trap->message;
 
 Returns the trap message as a string.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

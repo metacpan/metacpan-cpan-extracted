@@ -1,21 +1,13 @@
 package Data::WeakMap;
-use 5.014; # need the ${^GLOBAL_PHASE} var
+use 5.016;
 use strict;
-use warnings;
+use warnings FATAL => 'all';
 
-use Data::WeakMap::Tie;
+use parent 'Data::ManBearPig';
 
-our $VERSION = "v0.0.2";
+our $VERSION = "v0.0.3";
 
-sub new {
-    my $self = {};
-
-    tie %$self, 'Data::WeakMap::Tie';
-
-    bless $self;
-}
-
-
+sub new { shift->SUPER::new }
 
 1;
 __END__
@@ -24,7 +16,7 @@ __END__
 
 =head1 NAME
 
-Data::WeakMap - WeakMap that doesn't leak memory, and which you can operate on like a hash
+Data::WeakMap - WeakMap that behaves like a hash, and doesn't leak memory
 
 =head1 SYNOPSIS
 
@@ -68,13 +60,13 @@ Data::WeakMap - WeakMap that doesn't leak memory, and which you can operate on l
 
 =head1 DESCRIPTION
 
-Data::WeakMap is a Perl implementation for WeakMaps that does not leak memory
+Data::WeakMap is a Perl implementation of WeakMaps that doesn't leak memory
 
 (For more see here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap)
 
 =head1 CAVEATS
 
-Don't do this: each(%map). At least not for now (work in progress). Everything else seems to work fine.
+Don't do this, ever: C<each(%map)>.
 
 =head1 LICENSE
 
@@ -88,4 +80,3 @@ it under the same terms as Perl itself.
 Alexander Karelas E<lt>karjala@cpan.orgE<gt>
 
 =cut
-

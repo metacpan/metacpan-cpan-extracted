@@ -1,0 +1,24 @@
+={title(A Title)}
+
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+{placeholder}
+
+=={subtle(A subtitle)}
+
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text
+some text some text some text some text some text some text some text some text.

@@ -3,8 +3,7 @@ package Acme::Hospital::Bed;
 use 5.006;
 use strict;
 use warnings;
-use feature qw/say/;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
 	my ($package, %args) = @_;
@@ -81,15 +80,15 @@ sub next_patient {
 	$_[0]->check_patients_out;
 	my $available = $_[0]->available_rooms;
 	if ($available == 0) {
-		say 'You won this time.';
+		say('You won this time.');
 		exit;
 	}
 	my %patient = $_[0]->_generate_patient();
 	my @phrases = @{ $_[0]->{phrases}->[$patient{level}] };
 	my $phrase = $phrases[int(rand(@phrases))];
-	say sprintf 'You have %s available rooms', $_[0]->available_rooms;
-	say sprintf('The next patients name is: %s. The patient will stay for: %s.', $patient{name}, $patient{length});
-	say $phrase;
+	say(sprintf 'You have %s available rooms', $_[0]->available_rooms);
+	say( sprintf('The next patients name is: %s. The patient will stay for: %s days.', $patient{name}, $patient{length}));
+	say($phrase);
 	my $ans = _wait_answer();
 	if ($ans eq 'y') {
 		$patient{level} < 6 ? do {
@@ -109,7 +108,7 @@ sub check_patients_out {
 		$_->{length}--;
 		if ($_->{length} == 0) {
 			splice @{$_[0]->{rooms}}, $i, 1; 
-			say 'Patient checked out: ' . $_->{name};
+			say('Patient checked out: ' . $_->{name});
 		}
 		$i++;
 	}
@@ -117,14 +116,14 @@ sub check_patients_out {
 
 sub _lose_a_life {
 	if ($_[0]->{lifes}-- == 0) {
-		say 'GAME OVER!';
+		say('GAME OVER!');
 		exit;
 	}
-	say sprintf 'You lose a life, %s lifes remaining.', $_[0]->{lifes};
+	say(sprintf 'You lose a life, %s lifes remaining.', $_[0]->{lifes});
 }
 
 sub _wait_answer {
-	say 'Should they go to hospital? (y/n) ';
+	say('Should they go to hospital? (y/n) ');
 	my $answer = <STDIN>;
 	chomp $answer;
 	if ($answer !~ m/y|n/) {
@@ -142,6 +141,10 @@ sub _generate_patient {
 	);
 }
 
+sub say {
+	print $_[0] . "\n";
+}
+
 1;
 
 __END__
@@ -152,7 +155,7 @@ Acme::Hospital::Bed - The great new Acme::Hospital::Bed!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -282,7 +285,7 @@ This method will itterate the current rooms arrayref, deducting the length of st
 
 =head1 AUTHOR
 
-LNATION, C<< <thisusedtobeanemail at gmail.com> >>
+LNATION, C<< <email at lnation.org> >>
 
 =head1 BUGS
 

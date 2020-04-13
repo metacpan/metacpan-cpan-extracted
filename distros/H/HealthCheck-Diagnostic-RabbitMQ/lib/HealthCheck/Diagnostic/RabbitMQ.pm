@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic::RabbitMQ;
 
 # ABSTRACT: Check connectivity and queues on a RabbitMQ server
 use version;
-our $VERSION = 'v1.1.4'; # VERSION
+our $VERSION = 'v1.1.5'; # VERSION
 
 use 5.010;
 use strict;
@@ -201,7 +201,7 @@ HealthCheck::Diagnostic::RabbitMQ - Check connectivity and queues on a RabbitMQ 
 
 =head1 VERSION
 
-version v1.1.4
+version v1.1.5
 
 =head1 SYNOPSIS
 

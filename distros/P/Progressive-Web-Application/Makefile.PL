@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
     NAME             => 'Progressive::Web::Application',
-    AUTHOR           => q{lnation <thisusedtobeanemail@gmail.com>},
+    AUTHOR           => q{lnation <email@lnation.org>},
     VERSION_FROM     => 'lib/Progressive/Web/Application.pm',
     ABSTRACT_FROM    => 'lib/Progressive/Web/Application.pm',
     LICENSE          => 'artistic_2',

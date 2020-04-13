@@ -6,7 +6,7 @@ use Wasm::Wasmtime::FFI;
 use base qw( Exporter );
 
 # ABSTRACT: Convert WebAssembly Text to Wasm
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 our @EXPORT = qw( wat2wasm );
@@ -69,7 +69,7 @@ Wasm::Wasmtime::Wat2Wasm - Convert WebAssembly Text to Wasm
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -92,6 +92,16 @@ It is exported by default.
  my $wasm = wat2wasm($wat);
 
 Takes WebAssembly Text C<$wat> and converts it into the WebAssembly binary C<$wasm>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

@@ -10,7 +10,7 @@ use Devel::GlobalDestruction ();
 use base qw( Exporter );
 
 # ABSTRACT: Private class for Wasm::Wasmtime
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 our @EXPORT = qw( $ffi $ffi_prefix _generate_vec_class _generate_destroy );
@@ -190,7 +190,7 @@ Wasm::Wasmtime::FFI - Private class for Wasm::Wasmtime
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

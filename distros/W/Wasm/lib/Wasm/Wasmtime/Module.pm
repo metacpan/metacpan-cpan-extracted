@@ -9,7 +9,7 @@ use Wasm::Wasmtime::ExportType;
 use Carp ();
 
 # ABSTRACT: Wasmtime module class
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasm_module_';
@@ -167,7 +167,7 @@ Wasm::Wasmtime::Module - Wasmtime module class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -266,6 +266,16 @@ Returns the L<Wasm::Wasmtime::Store> object used by this module.
 
 Returns the L<Wasm::Wasmtime::ExportType> with the given C<$name> as exported by the WebAssembly module.
 If no such export exists, then C<undef> is returned.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

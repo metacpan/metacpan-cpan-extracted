@@ -1,0 +1,155 @@
+<div class="header">
+    <h1>App::Mxpress::PDF</h1>
+    <h2>A utility application for generating PDFs.</h2>
+</div>
+
+<div id="login" class="content active">
+	<div class="login-wrapper">
+		<form class="pure-form pure-form-stacked" id="loginForm">
+			<h2>Login</h2>
+			<div class="pure-g">
+				<div class="pure-u-1 pure-u-md-1-2">
+					<label>Username:</label>
+					<input class="pure-u-23-24" data-validate="plain-text" name="username" type="text" />
+				</div>
+				<div class="pure-u-1 pure-u-md-1-2">
+					<label>Password:</label>
+					<input class="pure-u-23-24" data-validate="plain-text" name="password" type="password" />
+				</div>
+				<div class="pure-u-1">
+					<label></label>
+					<input type="submit" class="pure-button pure-button-primary mt1" value="Login" />
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div id="templates" class="content">
+	<h3>Templates</h3>
+	<p>This page lists your available templates and provides a simple CRUD that allows you to manage them.</p>
+	<div class="table-options">
+		<button id="createNewTemplate">Create a new template</button>
+	</div>
+	<div id="example-table"></div>
+</div>
+
+<div id="manage" class="content">
+	<h3>Manage Template</h3>
+	<p>This page allows for you to create new templates or update existing templates.</p>
+	<form class="pure-form pure-form-stacked" id="createTemplate">
+		<div class="pure-g">
+			<div class="pure-u-1 pure-u-md-1-3">
+				<label>Template Name:</label>
+				<input class="pure-u-23-24" data-validate="plain-text" name="name" type="text" />
+			</div>
+			<div class="pure-u-1 pure-u-md-1-3">
+				<label>Page Size:</label>
+				<select class="pure-u-23-24" name="size">
+					<option value="A1">A1</option>
+					<option value="A2">A2</option>
+					<option value="A3">A3</option>
+					<option value="A4" selected>A4</option>
+					<option value="A5">A5</option>
+					<option value="A6">A6</option>
+				</select>
+			</div>
+		</div>
+
+		<label>Styles:</label>
+		<span class="pure-button pure-button-secondary" id="setDefaultStyles">Set Default Styles</span>
+		<div id="createTemplateStylesAce" style="height:300px"></div>
+		<textarea id="createTemplateStylesAce-textarea" style="display:none;" name="styles"></textarea>
+
+		<label>Template:</label>
+		<p>Configurable params can be defined by using the custom templating language, for example {first} will implement a param called first that can be set when generating the PDF. A default can also be set by suffixing parentheses {second(Default value)}.</p> 		
+		<p>You can currently prefix lines with the following markup:</p>
+		<ul class="inline-block">
+			<li>= - title</li>
+			<li>== - subtitle</li>
+			<li>=== - subsubtitle</li>
+			<li>=l= - line</li>
+		</ul>
+		<ul class="inline-block">
+			<li>=t= - text input</li>
+			<li>=a= - textarea</li>
+			<li>=i= - image</li>
+			<li>=s= - select</li>
+		</ul>
+		<div id="createTemplateAce" style="height:300px" name="template"></div>
+		<textarea id="createTemplateAce-textarea" style="display:none;" name="template"></textarea>
+		<input type="submit" class="pure-button pure-button-primary mt1" value="Save" />
+	</form>
+</div>
+
+<div id="generate" class="content">
+	<h3>Generate</h3>
+	<p>This page allows you to create a PDF from a template. A template is defined under the manage page, you can also override any default params by updating the JSON once you have selected the template. 
+	<form class="pure-form pure-form-stacked" id="generatePDF">
+		<div class="pure-g">
+			<div class="pure-u-1 pure-u-md-1-3">
+				<label>Template:</label>
+				<select class="pure-u-23-24" name="template">
+				</select>
+			</div>
+		</div>
+		<label>Params</label>
+		<div id="generateParams" style="height:300px" name="params"></div>
+		<textarea id="generateParams-textarea" style="display:none;" name="params"></textarea>
+		<input type="submit" class="pure-button pure-button-primary mt1" value="Generate" />
+	</form>
+</div>
+
+<div id="pod" class="content">
+	<h3>POD</h3>
+	<p>This page allows you to create a PDF from POD. You can generate for either a module, a distribution or from raw input that is valid markup.</p>
+	<form class="pure-form pure-form-stacked" id="generatePODPDF">
+		<div class="pure-g">
+			<div class="pure-u-1">
+				<label>Styles:</label>
+				<span class="pure-button pure-button-secondary" id="setDefaultPodStyles">Set Default Styles</span>
+				<div id="createPodStylesAce" style="height:300px"></div>
+				<textarea id="createPodStylesAce-textarea" style="display:none;" name="styles"></textarea>
+			</div>
+		</div>
+		<input type="radio" name="pod-type" id="pod-module" value="module" checked />
+		<input type="radio" name="pod-type" id="pod-distribution" value="distribution" />
+		<input type="radio" name="pod-type" id="pod-raw" value="raw" />
+		<div class="pure-g">
+			<div class="pure-u-1 pure-u-md-4-24">
+				<label class="pure-button" for="pod-module">Module</label>
+			</div>
+			<div class="pure-u-1 pure-u-md-4-24">
+				<label class="pure-button" for="pod-distribution">Distribution</label>
+			</div>
+			<div class="pure-u-1 pure-u-md-4-24">
+				<label class="pure-button" for="pod-raw">Raw</label>
+			</div>
+		</div>
+		<div class="pure-g pod-module">
+			<div class="pure-u-1">
+				<label>Module:</label>
+				<input type="text" data-validate="plain-text" name="module" />
+			</div>
+		</div>
+		<div class="pure-g pod-distribution">
+			<div class="pure-u-1">
+				<label>Distribution:</label>
+				<input type="text" data-validate="plain-text" name="distribution" />
+			</div>
+		</div>
+		<div class="pure-g pod-raw">
+			<div class="pure-u-1">
+				<label>Name:</label>
+				<input type="text" data-validate="plain-text" name="name" />
+			</div>
+			<div class="pure-u-1">
+				<label>Raw Pod:</label>
+				<div id="createRawPodAce" style="height:300px"></div>
+				<textarea id="createRawPodAce-textarea" style="display:none;" name="raw"></textarea>
+			</div>
+		</div>
+		<input type="submit" class="pure-button pure-button-primary mt1" value="Generate" />
+	</form>
+</div>
+

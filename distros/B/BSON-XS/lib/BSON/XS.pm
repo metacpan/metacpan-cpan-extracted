@@ -21,7 +21,7 @@ package BSON::XS;
 # ABSTRACT: XS implementation of MongoDB's BSON serialization
 
 use version;
-our $VERSION = 'v0.8.2';
+our $VERSION = 'v0.8.3';
 
 # cached for efficiency during decoding
 # XXX eventually move this into XS
@@ -51,7 +51,7 @@ BSON::XS - XS implementation of MongoDB's BSON serialization
 
 =head1 VERSION
 
-version v0.8.2
+version v0.8.3
 
 =head1 END OF LIFE NOTICE
 
@@ -66,7 +66,7 @@ This module contains an XS implementation for BSON encoding and
 decoding.  There is no public API.  Use the L<BSON> module and it will
 choose the best implementation for you.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -97,7 +97,7 @@ Paul "LeoNerd" Evans <leonerd@leonerd.org.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MongoDB, Inc.
+This software is Copyright (c) 2020 by MongoDB, Inc.
 
 This is free software, licensed under:
 

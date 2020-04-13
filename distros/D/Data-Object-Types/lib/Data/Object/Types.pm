@@ -4,51 +4,49 @@ use 5.014;
 
 use strict;
 use warnings;
-use routines;
-
-use base 'Type::Library';
 
 use Scalar::Util ();
-use Type::Coercion ();
-use Type::Tiny ();
 use Type::Utils ();
-use Types::TypeTiny ();
 
-our $VERSION = '0.01'; # VERSION
+use Data::Object::Types::Keywords;
 
-Type::Utils::extends('Types::Standard');
-Type::Utils::extends('Types::TypeTiny');
-Type::Utils::extends('Types::Common::Numeric');
-Type::Utils::extends('Types::Common::String');
+use base 'Data::Object::Types::Library';
+
+our $VERSION = '0.02'; # VERSION
+
+extends 'Types::Standard';
+extends 'Types::TypeTiny';
+extends 'Types::Common::Numeric';
+extends 'Types::Common::String';
 
 # TYPES
 
-RegisterAll(DoArgsConfig());
-RegisterAll(DoDataConfig());
-RegisterAll(DoDumpableConfig());
-RegisterAll(DoArrayConfig());
-RegisterAll(DoBooleanConfig());
-RegisterAll(DoCliConfig());
-RegisterAll(DoCodeConfig());
-RegisterAll(DoExceptionConfig());
-RegisterAll(DoFloatConfig());
-RegisterAll(DoFuncConfig());
-RegisterAll(DoHashConfig());
-RegisterAll(DoImmutableConfig());
-RegisterAll(DoNumberConfig());
-RegisterAll(DoOptsConfig());
-RegisterAll(DoRegexpConfig());
-RegisterAll(DoReplaceConfig());
-RegisterAll(DoScalarConfig());
-RegisterAll(DoSearchConfig());
-RegisterAll(DoSpaceConfig());
-RegisterAll(DoStashableConfig());
-RegisterAll(DoStateConfig());
-RegisterAll(DoStringConfig());
-RegisterAll(DoStructConfig());
-RegisterAll(DoThrowableConfig());
-RegisterAll(DoUndefConfig());
-RegisterAll(DoVarsConfig());
+register(DoArgsConfig());
+register(DoDataConfig());
+register(DoDumpableConfig());
+register(DoArrayConfig());
+register(DoBooleanConfig());
+register(DoCliConfig());
+register(DoCodeConfig());
+register(DoExceptionConfig());
+register(DoFloatConfig());
+register(DoFuncConfig());
+register(DoHashConfig());
+register(DoImmutableConfig());
+register(DoNumberConfig());
+register(DoOptsConfig());
+register(DoRegexpConfig());
+register(DoReplaceConfig());
+register(DoScalarConfig());
+register(DoSearchConfig());
+register(DoSpaceConfig());
+register(DoStashableConfig());
+register(DoStateConfig());
+register(DoStringConfig());
+register(DoStructConfig());
+register(DoThrowableConfig());
+register(DoUndefConfig());
+register(DoVarsConfig());
 
 # FUNCTIONS
 
@@ -628,140 +626,6 @@ sub DoVarsConfig {
     },
     parent => 'Object'
   }
-}
-
-sub Library {
-  __PACKAGE__->meta;
-}
-
-sub Register {
-  my ($type) = @_;
-
-  my $library = Library();
-
-  my $name = $type->{name};
-  my $aliases = $type->{aliases};
-  my $parent = $type->{parent};
-  my $coercions = $type->{coercions};
-  my $validation = $type->{validation};
-
-  return if $library->get_type($name);
-
-  my $tinytype = Type::Tiny->new(Options($type));
-
-  if ($type->{coercions}) {
-    my $coercions = $type->{coercions};
-
-    for (my $i = 0; $i < @$coercions; $i+=2) {
-      if (!ref($coercions->[$i])) {
-        $coercions->[$i] = $library->get_type($coercions->[$i]);
-      }
-    }
-
-    $tinytype->coercion->add_type_coercions(@$coercions);
-  }
-
-  $library->add_type($tinytype);
-
-  return $tinytype;
-}
-
-sub Options {
-  my ($type) = @_;
-
-  my $library = Library();
-  my %options;
-
-  $options{name} = $type->{name};
-  $options{parent} = $type->{parent};
-  $options{constraint} = sub { $type->{validation}->(@_) };
-
-  if ($type->{explaination}) {
-    $options{deep_explanation} = sub {
-      GenerateExplanation($type, @_)
-    };
-  }
-
-  if ($type->{parameterize_coercions}) {
-    $options{coercion_generator} = sub {
-      GenerateCoercion($type, @_)
-    };
-  }
-
-  if ($type->{parameterize_constraint}) {
-    $options{constraint_generator} = sub {
-      GenerateConstraint($type, @_)
-    };
-  }
-
-  if (!ref($options{parent})) {
-    $options{parent} = $library->get_type($options{parent});
-  }
-
-  return %options;
-}
-
-sub RegisterAll {
-  my ($type) = @_;
-
-  my $registered = Register($type);
-
-  Register({%{$type}, name => $_, aliases => []}) for @{$type->{aliases}};
-
-  return $registered;
-}
-
-sub GenerateCoercion {
-  my ($type, @args) = @_;
-
-  my ($type1, $xtype, $type2) = @args;
-
-  my $library = Library();
-
-  if (!$type2->has_coercion) {
-    return $type1->coercion;
-  }
-
-  my $anon = $type2->coercion->_source_type_union;
-  my $coercion = Type::Coercion->new(type_constraint => $xtype);
-  my $generated = $type->{parameterize_coercions}->($type2, $type1, $anon);
-
-  for (my $i = 0; $i < @$generated; $i+=2) {
-    my $item = $generated->[$i];
-
-    $generated->[$i] = $library->get_type($item) if !ref($item);
-  }
-
-  $coercion->add_type_coercions(@$generated);
-
-  return $coercion;
-}
-
-sub GenerateConstraint {
-  my ($type, @args) = @_;
-
-  return $type->{validator} if !@args;
-
-  my $sign = "@{[$type->{name}]}\[`a\]";
-  my $text = "Parameter to $sign expected to be a type constraint";
-  my @list = map Types::TypeTiny::to_TypeTiny($_), @args;
-
-  for my $item (@list) {
-    if ($item->isa('Type::Tiny')) {
-      next;
-    }
-    if (!Types::TypeTiny::TypeTiny->check($item)) {
-      Types::Standard::_croak("$text; got $item");
-    }
-  }
-
-  return sub { my ($data) = @_; $type->{parameterize_constraint}->($data, @list) };
-}
-
-sub GenerateExplanation {
-  my ($type, @args) = @_;
-
-  return $type->{explaination}->($_[2], $_[1], $_[3]);
 }
 
 # ONE-OFFS
@@ -4669,20 +4533,20 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the The Apache License, Version 2.0, as elucidated in the L<"license
-file"|https://github.com/iamalnewkirk/data-object-name/blob/master/LICENSE>.
+file"|https://github.com/iamalnewkirk/data-object-types/blob/master/LICENSE>.
 
 =head1 PROJECT
 
-L<Wiki|https://github.com/iamalnewkirk/data-object-name/wiki>
+L<Wiki|https://github.com/iamalnewkirk/data-object-types/wiki>
 
-L<Project|https://github.com/iamalnewkirk/data-object-name>
+L<Project|https://github.com/iamalnewkirk/data-object-types>
 
-L<Initiatives|https://github.com/iamalnewkirk/data-object-name/projects>
+L<Initiatives|https://github.com/iamalnewkirk/data-object-types/projects>
 
-L<Milestones|https://github.com/iamalnewkirk/data-object-name/milestones>
+L<Milestones|https://github.com/iamalnewkirk/data-object-types/milestones>
 
-L<Contributing|https://github.com/iamalnewkirk/data-object-name/blob/master/CONTRIBUTE.md>
+L<Contributing|https://github.com/iamalnewkirk/data-object-types/blob/master/CONTRIBUTE.md>
 
-L<Issues|https://github.com/iamalnewkirk/data-object-name/issues>
+L<Issues|https://github.com/iamalnewkirk/data-object-types/issues>
 
 =cut

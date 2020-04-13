@@ -1,10 +1,10 @@
 {
    "abstract" : "Utility for making an application 'progressive'",
    "author" : [
-      "lnation <thisusedtobeanemail@gmail.com>"
+      "lnation <email@lnation.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -49,5 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

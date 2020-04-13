@@ -1,0 +1,161 @@
+.table-options {
+    text-align: right;
+    padding: 1em 0;
+}
+
+#footer {
+    margin: 0 auto;
+    padding: 0 2em;
+    max-width: 800px;
+    margin-bottom: 50px;
+    line-height: 1.6em;
+}
+
+.content {
+    height: 0;
+    opacity: 0;
+    margin: 0;
+}
+
+.content.active {
+    margin: 0 auto;
+    padding: 0 2em;
+    max-width: 800px;
+    margin-bottom: 50px;
+    line-height: 1.6em;
+    opacity: 1;
+    height: auto;
+    transition: all ease-in 0.5s;
+    z-index: 10000;
+}
+
+.header {
+	margin: 0;
+	color: #333;
+	text-align: center;
+	padding: 2.5em 2em 0;
+	border-bottom: 1px solid #eee;
+}
+
+.header h1 {
+	margin: 0.2em 0;
+	font-size: 3em;
+	font-weight: 300;
+}
+.header h2 {
+        font-weight: 300;
+        color: #ccc;
+        padding: 0;
+        margin-top: 0;
+}
+
+.content-subhead {
+	margin: 50px 0 20px 0;
+	font-weight: 300;
+	color: #888;
+}
+
+.inline-block {
+	display: inline-block;
+	margin-top: 0;
+}
+
+.mt1 {
+	margin-top: 1em;
+}
+
+.content .tabulator {
+    display: none;
+}
+
+.content.active .tabulator {
+    display: block;
+}
+
+.content form {
+    height: 0;
+    visibility: hidden;
+}
+
+.content.active form {
+    height: auto;
+    visibility: visible;
+}
+
+input#pod-distribution:checked ~ .pure-g div label[for="pod-distribution"],
+input#pod-raw:checked ~ .pure-g div label[for="pod-raw"],
+input#pod-module:checked ~ .pure-g div label[for="pod-module"] {
+    background: #dadada;
+}
+
+.pod-module, .pod-distribution, .pod-raw {
+    height: 0;
+    visibility: hidden;
+}
+
+input#pod-raw:checked ~ .pure-g.pod-raw,
+input#pod-distribution:checked ~ .pure-g.pod-distribution,
+input#pod-module:checked ~ .pure-g.pod-module {
+    height:auto;
+    visibility:visible;
+}
+
+
+input#pod-module, input#pod-raw, input#pod-distribution {
+    display: none;
+}
+
+div#notify {
+    position: fixed;
+    top: 5%;
+    height: 0;
+    opacity: 0;
+    right: 5%;
+    border: none;
+    box-shadow: none;
+    color: white;
+    width: 200px;
+    text-align: center;
+    z-index: 10000;
+    border-radius: 1em;
+    transition: opacity ease-in 0.5s;
+}
+
+div#notify .title {
+    margin: 0.5em;
+    font-size: 20px;
+}
+
+div#notify.success {
+    background: #5eb95e;
+    border: 1px solid #dadada;
+    box-shadow: 1px 1px 1px 1px #dadada;
+    height: auto;
+    opacity: 1;
+}
+
+div#notify.error {
+    background: #dd514c;
+}
+
+.login-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+form#loginForm {
+    width: 500px;
+    margin: auto;
+}
+
+div#login.active {
+    display: table;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: white;
+    max-width: 100%;
+    width: 100%;
+    height: 100%;
+}
+

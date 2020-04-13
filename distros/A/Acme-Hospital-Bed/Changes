@@ -3,3 +3,7 @@ Revision history for Acme-Hospital-Bed
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.03    2020-04-13
+	- Can't locate feature.pm in @INC - 5.8.9
+	- Tweak slightly the output text.
+

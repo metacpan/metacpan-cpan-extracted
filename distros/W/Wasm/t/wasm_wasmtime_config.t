@@ -1,5 +1,6 @@
 use Test2::V0 -no_srand => 1;
 use Wasm::Wasmtime::Config;
+use File::Glob qw( bsd_glob );
 
 my $config = Wasm::Wasmtime::Config->new;
 isa_ok $config, 'Wasm::Wasmtime::Config';
@@ -89,5 +90,7 @@ is
   match qr/unknown profiler: foo/,
   'profiler: unknown profiler'
 ;
+
+unlink $_ for bsd_glob('jit-*.dump');
 
 done_testing;

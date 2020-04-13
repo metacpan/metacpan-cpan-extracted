@@ -1,5 +1,10 @@
 Revision history for Wasm},
 
+0.04      2020-04-13 13:49:46 -0600
+  - Added Wasm::Wasm::Linker class (gh#23)
+  - Added Wasm::Wasm::GlobalType class (gh#24)
+  - Added Wasm::Wasm::TableType class (gh#25)
+
 0.03      2020-04-11 16:19:37 -0600
   - Remove code reference overload for Wasm::Wasmtime::Extern (gh#18)
   - Added kind and kind_num methods to Wasm::Wasmtime::Extern (gh#18)

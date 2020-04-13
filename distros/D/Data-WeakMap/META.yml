@@ -1,8 +1,9 @@
 ---
-abstract: "WeakMap that doesn't leak memory, and which you can operate on like a hash"
+abstract: "WeakMap that behaves like a hash, and doesn't leak memory"
 author:
   - 'Alexander Karelas <karjala@cpan.org>'
 build_requires:
+  Test::Deep: '0'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -24,20 +25,27 @@ no_index:
     - author
     - builder
 provides:
+  Data::ManBearPig:
+    file: lib/Data/ManBearPig.pm
+    version: v0.0.3
   Data::WeakMap:
     file: lib/Data/WeakMap.pm
-    version: v0.0.2
-  Data::WeakMap::Item::Tie:
-    file: lib/Data/WeakMap/Item/Tie.pm
+    version: v0.0.3
+  Data::WeakMap::Key::Tie:
+    file: lib/Data/WeakMap/Key/Tie.pm
+    version: v0.0.3
   Data::WeakMap::Tie:
     file: lib/Data/WeakMap/Tie.pm
+    version: v0.0.3
 requires:
-  perl: '5.014'
+  Carp: '0'
+  Scalar::Util: '0'
+  perl: '5.016'
 resources:
   bugtracker: https://github.com/akarelas/Data-WeakMap-perl/issues
   homepage: https://github.com/akarelas/Data-WeakMap-perl
   repository: git://github.com/akarelas/Data-WeakMap-perl.git
-version: v0.0.2
+version: v0.0.3
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

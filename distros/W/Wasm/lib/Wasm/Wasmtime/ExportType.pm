@@ -6,7 +6,7 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ExternType;
 
 # ABSTRACT: Wasmtime export type class
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasm_exporttype_';
@@ -76,7 +76,7 @@ Wasm::Wasmtime::ExportType - Wasmtime export type class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -129,6 +129,16 @@ Returns the name of the export.
  my $externtype = $exporttype->type;
 
 Returns the L<Wasm::Wasmtime::ExternType> for the export.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

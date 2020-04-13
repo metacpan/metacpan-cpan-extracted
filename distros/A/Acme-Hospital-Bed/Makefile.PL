@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
     NAME             => 'Acme::Hospital::Bed',
-    AUTHOR           => q{LNATION <thisusedtobeanemail@gmail.com>},
+    AUTHOR           => q{LNATION <email@lnation.org>},
     VERSION_FROM     => 'lib/Acme/Hospital/Bed.pm',
     ABSTRACT_FROM    => 'lib/Acme/Hospital/Bed.pm',
     LICENSE          => 'artistic_2',

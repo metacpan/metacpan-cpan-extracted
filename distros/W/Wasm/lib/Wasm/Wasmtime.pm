@@ -9,17 +9,20 @@ use Wasm::Wasmtime::Extern;
 use Wasm::Wasmtime::ExternType;
 use Wasm::Wasmtime::Func;
 use Wasm::Wasmtime::FuncType;
+use Wasm::Wasmtime::GlobalType;
 use Wasm::Wasmtime::ImportType;
 use Wasm::Wasmtime::Instance;
+use Wasm::Wasmtime::Linker;
 use Wasm::Wasmtime::Module;
 use Wasm::Wasmtime::Store;
+use Wasm::Wasmtime::TableType;
 use Wasm::Wasmtime::Trap;
 use Wasm::Wasmtime::ValType;
 use Wasm::Wasmtime::WasiConfig;
 use Wasm::Wasmtime::WasiInstance;
 
 # ABSTRACT: Perl interface to Wasmtime
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 1;
@@ -36,7 +39,7 @@ Wasm::Wasmtime - Perl interface to Wasmtime
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -142,6 +145,10 @@ Interface to a WebAssembly module instance.
 
 Interface to WebAssembly function.
 
+=item L<Wasm::Wasmtime::Linker>
+
+Link together multiple WebAssembly modules into one program.
+
 =item L<Wasm::Wasmtime::Wat2Wasm>
 
 Tool to convert WebAssembly Text (WAT) to WebAssembly binary (Wasm).
@@ -149,10 +156,6 @@ Tool to convert WebAssembly Text (WAT) to WebAssembly binary (Wasm).
 =item L<Wasm::Wasmtime::WasiInstance>
 
 WebAssembly System Interface (WASI).
-
-=item L<Wasm::Wasmtime::WasiConfig>
-
-Configuration and access control for WebAssembly System Interface (WASI).
 
 =item L<https://github.com/bytecodealliance/wasmtime>
 

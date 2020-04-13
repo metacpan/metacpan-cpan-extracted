@@ -6,7 +6,7 @@ use 5.008001;
 use Carp ();
 
 # ABSTRACT: Write Perl extensions using Wasm
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub import
@@ -154,7 +154,7 @@ Wasm - Write Perl extensions using Wasm
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -255,6 +255,10 @@ String containing WebAssembly Text (WAT).  Helpful for inline WebAssembly inside
 =item L<Wasm::Wasmtime>
 
 Low level interface to C<wasmtime>.
+
+=item L<Wasm::Hook>
+
+Load WebAssembly modules as though they were Perl modules.
 
 =back
 

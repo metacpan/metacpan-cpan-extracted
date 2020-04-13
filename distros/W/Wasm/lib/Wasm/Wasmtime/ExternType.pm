@@ -4,10 +4,12 @@ use strict;
 use warnings;
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::FuncType;
+use Wasm::Wasmtime::GlobalType;
+use Wasm::Wasmtime::TableType;
 use Wasm::Wasmtime::MemoryType;
 
 # ABSTRACT: Wasmtime extern type class
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasm_externtype_';
@@ -49,6 +51,20 @@ $ffi->attach( as_functype => ['wasm_externtype_t'] => 'wasm_functype_t' => sub {
 });
 
 
+$ffi->attach( as_globaltype => ['wasm_externtype_t'] => 'wasm_globaltype_t' => sub {
+  my($xsub, $self) = @_;
+  my $ptr = $xsub->($self->{ptr});
+  $ptr ? Wasm::Wasmtime::GlobalType->new($ptr, $self->{owner} || $self) : undef;
+});
+
+
+$ffi->attach( as_tabletype => ['wasm_externtype_t'] => 'wasm_tabletype_t' => sub {
+  my($xsub, $self) = @_;
+  my $ptr = $xsub->($self->{ptr});
+  $ptr ? Wasm::Wasmtime::TableType->new($ptr, $self->{owner} || $self) : undef;
+});
+
+
 $ffi->attach( as_memorytype => ['wasm_externtype_t'] => 'wasm_memorytype_t' => sub {
   my($xsub, $self) = @_;
   my $ptr = $xsub->($self->{ptr});
@@ -77,7 +93,7 @@ Wasm::Wasmtime::ExternType - Wasmtime extern type class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -137,12 +153,36 @@ Returns the kind of extern type as the internal integer code.
 If the extern type is a function, returns the L<Was::Wasmtime::FuncType> for it.
 Otherwise returns C<undef>.
 
+=head2 as_globaltype
+
+ my $globaltype = $externtype->as_globaltype;
+
+If the extern type is a global object, returns the L<Was::Wasmtime::GlobalType> for it.
+Otherwise returns C<undef>.
+
+=head2 as_tabletype
+
+ my $tabletype = $externtype->as_tabletype;
+
+If the extern type is a table object, returns the L<Was::Wasmtime::TableType> for it.
+Otherwise returns C<undef>.
+
 =head2 as_memorytype
 
  my $memorytype = $externtype->as_memorytype;
 
 If the extern type is a memory object, returns the L<Was::Wasmtime::MemoryType> for it.
 Otherwise returns C<undef>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

@@ -46,11 +46,11 @@ self.addEventListener('activate', function (e) {
 
 self.addEventListener('fetch', function (e) {
 	e.waitUntil(
-		return fetch(e.request).catch(function () {
+		fetch(e.request).catch(function () {
 			caches.match(offlineFile).then(function (response) {
 				return response;
 			});
-		});
+		})
 	);
 });
 

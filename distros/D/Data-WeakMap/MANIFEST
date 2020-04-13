@@ -4,10 +4,12 @@ LICENSE
 META.json
 README.md
 cpanfile
+cpanfile.snapshot
+lib/Data/ManBearPig.pm
 lib/Data/WeakMap.pm
-lib/Data/WeakMap/Item/Tie.pm
+lib/Data/WeakMap/Key/Tie.pm
 lib/Data/WeakMap/Tie.pm
 minil.toml
-t/00_compile.t
+t/00_weakmaps.t
 META.yml
 MANIFEST

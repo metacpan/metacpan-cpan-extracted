@@ -6,7 +6,7 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ExternType;
 
 # ABSTRACT: Wasmtime import type class
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasm_importtype_';
@@ -83,7 +83,7 @@ Wasm::Wasmtime::ImportType - Wasmtime import type class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -138,6 +138,16 @@ Returns the L<Wasm::Wasmtime::ExternType> for the import.
  my $name = $importtype->module;
 
 Returns the name of the module for the import.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

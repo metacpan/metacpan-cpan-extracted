@@ -7,7 +7,7 @@ use JSON;
 use Colouring::In;
 use Image::Scale;
 use Cwd qw/abs_path/;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our (%TOOL, %MANIFEST_SCHEMA);
 BEGIN {
 	%TOOL = (
@@ -434,7 +434,7 @@ Progressive::Web::Application - Utility for making an application 'progressive'
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -1200,7 +1200,7 @@ Returns an Hash reference of known orientations.
 
 =head1 AUTHOR
 
-LNATION, C<< <thisusedtobeanemail at gmail.com> >>
+LNATION, C<< <email at lnation.org> >>
 
 =head1 BUGS
 

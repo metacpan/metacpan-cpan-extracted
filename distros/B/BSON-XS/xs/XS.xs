@@ -536,6 +536,7 @@ hv_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, int depth, bool su
     }
     if (!utf8) {
       key = (const char *) bytes_to_utf8((U8 *)key, &len);
+      SAVEFREEPV(key);
     }
 
     if ( ! is_utf8_string((const U8*)key,len)) {
@@ -543,15 +544,8 @@ hv_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, int depth, bool su
     }
 
     sv_to_bson_elem (bson, key, *hval, opts, stack, depth);
-    if (!utf8) {
-      Safefree(key);
-    }
   }
 
-  /* free the hv elem */
-  if ( ! subdoc ) {
-    Safefree(stack);
-  }
   depth--;
 }
 
@@ -610,10 +604,6 @@ ixhash_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, int depth, boo
     sv_to_bson_elem(bson, str, *v, opts, stack, depth);
   }
 
-  /* free the ixhash elem */
-  if ( ! subdoc ) {
-    Safefree(stack);
-  }
   depth--;
 }
 
@@ -662,10 +652,6 @@ iter_src_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, int depth, b
     sv_to_bson_elem(bson, str, kv[1], opts, stack, depth);
   }
 
-  /* free the stack elem for sv */
-  if ( ! subdoc ) {
-    Safefree(stack);
-  }
   depth--;
 }
 
@@ -692,8 +678,6 @@ av_to_bson (bson_t * bson, AV *av, HV *opts, stackette *stack, int depth) {
       sv_to_bson_elem (bson, SvPV_nolen(key), *sv, opts, stack, depth);
   }
 
-  /* free the av elem */
-  Safefree(stack);
   depth--;
 }
 
@@ -1393,6 +1377,7 @@ check_circular_ref(void *ptr, stackette *stack) {
 
   /* push this onto the circular ref stack */
   Newx(ette, 1, stackette);
+  SAVEFREEPV(ette);
   ette->ptr = ptr;
   /* if stack has not been initialized, stack will be 0 so this will work out */
   ette->prev = start;

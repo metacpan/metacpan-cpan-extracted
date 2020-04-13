@@ -63661,3 +63661,14 @@ A/AN/ANDREIP/Validate-Simple-v0.3.0.tar.gz
 L/LE/LEONT/Variable-OnDestruct-0.04.tar.gz
 P/PL/PLICEASE/Wasm-0.03.tar.gz
 P/PL/PLICEASE/Wasm-Hook-0.02.tar.gz
+L/LN/LNATION/Acme-Hospital-Bed-0.03.tar.gz
+L/LN/LNATION/App-Mxpress-PDF-0.20.tar.gz
+J/JE/JEFFOBER/App-Tailor-0.01.tar.gz
+M/MO/MONGODB/BSON-XS-v0.8.3.tar.gz
+K/KA/KARJALA/Data-WeakMap-v0.0.3.tar.gz
+A/AW/AWNCORP/Data-Object-Types-0.02.tar.gz
+B/BL/BLIAKO/Data-Roundtrip-0.01.tar.gz
+G/GS/GSG/HealthCheck-Diagnostic-RabbitMQ-v1.1.5.tar.gz
+E/EX/EXODIST/Test-Simple-1.302175.tar.gz
+L/LN/LNATION/Progressive-Web-Application-0.06.tar.gz
+P/PL/PLICEASE/Wasm-0.04.tar.gz

@@ -2518,18 +2518,18 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the The Apache License, Version 2.0, as elucidated in the ["license
-file"](https://github.com/iamalnewkirk/data-object-name/blob/master/LICENSE).
+file"](https://github.com/iamalnewkirk/data-object-types/blob/master/LICENSE).
 
 # PROJECT
 
-[Wiki](https://github.com/iamalnewkirk/data-object-name/wiki)
+[Wiki](https://github.com/iamalnewkirk/data-object-types/wiki)
 
-[Project](https://github.com/iamalnewkirk/data-object-name)
+[Project](https://github.com/iamalnewkirk/data-object-types)
 
-[Initiatives](https://github.com/iamalnewkirk/data-object-name/projects)
+[Initiatives](https://github.com/iamalnewkirk/data-object-types/projects)
 
-[Milestones](https://github.com/iamalnewkirk/data-object-name/milestones)
+[Milestones](https://github.com/iamalnewkirk/data-object-types/milestones)
 
-[Contributing](https://github.com/iamalnewkirk/data-object-name/blob/master/CONTRIBUTE.md)
+[Contributing](https://github.com/iamalnewkirk/data-object-types/blob/master/CONTRIBUTE.md)
 
-[Issues](https://github.com/iamalnewkirk/data-object-name/issues)
+[Issues](https://github.com/iamalnewkirk/data-object-types/issues)

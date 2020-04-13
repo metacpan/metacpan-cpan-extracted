@@ -8,7 +8,7 @@ use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::MemoryType;
 
 # ABSTRACT: Wasmtime memory class
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasm_memory_';
@@ -97,7 +97,7 @@ Wasm::Wasmtime::Memory - Wasmtime memory class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -179,6 +179,16 @@ Tries to increase the page size by the given C<$delta>.  Returns true on success
  my $extern = $memory->as_extern;
 
 Returns the L<Wasm::Wasmtime::Extern> for this memory object.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

@@ -2,11 +2,11 @@ package Wasm::Wasmtime::MemoryType;
 
 use strict;
 use warnings;
-use Ref::Util qw( is_ref );
+use Ref::Util qw( is_ref is_plain_arrayref );
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Wasmtime memory type class
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasm_memorytype_';
@@ -20,7 +20,11 @@ $ffi->attach( new => ['uint32[2]'] => 'wasm_memorytype_t' => sub {
   my $owner;
   if(is_ref $_[0])
   {
-    $ptr = $xsub->(shift);
+    my $limit = shift;
+    Carp::croak("bad limits") unless is_plain_arrayref($limit);
+    Carp::croak("no minumum in limit") unless defined $limit->[0];
+    $limit->[1] = 0xffffffff unless defined $limit->[1];
+    $ptr = $xsub->($limit);
   }
   else
   {
@@ -70,7 +74,7 @@ Wasm::Wasmtime::MemoryType - Wasmtime memory type class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -106,9 +110,19 @@ Returns the minimum and maximum number of pages as an array reference.
 
 =head2 as_externtype
 
- my $externtype = $memory->as_externtype
+ my $externtype = $memorytype->as_externtype
 
 Returns the L<Wasm::Wasmtime::ExternType> for this memory type.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

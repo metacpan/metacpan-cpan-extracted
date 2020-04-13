@@ -1,5 +1,5 @@
 {
-   "abstract" : "WeakMap that doesn't leak memory, and which you can operate on like a hash",
+   "abstract" : "WeakMap that behaves like a hash, and doesn't leak memory",
    "author" : [
       "Alexander Karelas <karjala@cpan.org>"
    ],
@@ -42,25 +42,34 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.014"
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.016"
          }
       },
       "test" : {
          "requires" : {
+            "Test::Deep" : "0",
             "Test::More" : "0.98"
          }
       }
    },
    "provides" : {
+      "Data::ManBearPig" : {
+         "file" : "lib/Data/ManBearPig.pm",
+         "version" : "v0.0.3"
+      },
       "Data::WeakMap" : {
          "file" : "lib/Data/WeakMap.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       },
-      "Data::WeakMap::Item::Tie" : {
-         "file" : "lib/Data/WeakMap/Item/Tie.pm"
+      "Data::WeakMap::Key::Tie" : {
+         "file" : "lib/Data/WeakMap/Key/Tie.pm",
+         "version" : "v0.0.3"
       },
       "Data::WeakMap::Tie" : {
-         "file" : "lib/Data/WeakMap/Tie.pm"
+         "file" : "lib/Data/WeakMap/Tie.pm",
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
@@ -74,7 +83,7 @@
          "web" : "https://github.com/akarelas/Data-WeakMap-perl"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.0.3",
    "x_authority" : "cpan:KARJALA",
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1

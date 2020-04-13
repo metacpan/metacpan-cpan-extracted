@@ -1,0 +1,21 @@
+Changes
+lib/Data/Roundtrip.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+script/json2json.pl
+script/json2perl.pl
+script/json2yaml.pl
+script/perl2json.pl
+script/yaml2json.pl
+script/yaml2perl.pl
+t/00-load.t
+t/01-basic.t
+t/02-random-data-structure.t
+t/03-synopsis.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@ use Test::More;
 
 use HealthCheck::Diagnostic::RabbitMQ;
 
-my $nl = $] >= 5.016 ? ".\n" : "\n";
+my $nl = Carp->VERSION lt '1.25' ? "\n" : ".\n";
 
 my $must_have = "'rabbit_mq' must have 'get_server_properties' method"
     . " at %s line %d$nl";

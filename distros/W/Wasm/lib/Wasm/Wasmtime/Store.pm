@@ -6,7 +6,7 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Engine;
 
 # ABSTRACT: Wasmtime store class
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasm_store_';
@@ -44,7 +44,7 @@ Wasm::Wasmtime::Store - Wasmtime store class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -76,6 +76,16 @@ isn't provided, then a new one will be created.
  my $engine = $store->engine;
 
 Returns the L<Wasm::Wasmtime::Engine> object for this storage object.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

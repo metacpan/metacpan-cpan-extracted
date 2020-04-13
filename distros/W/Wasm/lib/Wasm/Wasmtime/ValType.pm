@@ -5,7 +5,7 @@ use warnings;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Wasmtime value type class
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasm_valtype_';
@@ -91,7 +91,7 @@ Wasm::Wasmtime::ValType - Wasmtime value type class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -155,6 +155,16 @@ Returns the value type as a string (ie C<i32>).
  my $kind = $valtype->kind_num;
 
 Returns the number used internally to represent the type.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

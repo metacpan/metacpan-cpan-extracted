@@ -1,0 +1,25 @@
+{
+	"page": {
+		"padding": 15
+	},
+	"cover": {
+		"columns": 1
+	},
+	"toc": {
+		"font": {
+			"colour": "#00f"
+		}
+	},
+	"title": {
+		"margin_bottom": 3
+	},
+	"subtitle": {
+		"margin_bottom": 3
+	},
+	"subsubtitle": {
+		"margin_bottom": 3
+	},
+	"text": {
+		"margin_bottom": 3
+	}
+}

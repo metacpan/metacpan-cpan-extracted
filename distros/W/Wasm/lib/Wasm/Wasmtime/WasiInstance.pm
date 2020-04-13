@@ -8,7 +8,8 @@ use Wasm::Wasmtime::Trap;
 use Wasm::Wasmtime::WasiConfig;
 
 # ABSTRACT: WASI instance class
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
+
 
 $ffi_prefix = 'wasi_instance_';
 $ffi->custom_type('wasi_instance_t' => {
@@ -16,6 +17,7 @@ $ffi->custom_type('wasi_instance_t' => {
   perl_to_native => sub { shift->{ptr} },
   native_to_perl => sub { bless { ptr => shift }, __PACKAGE__ },
 });
+
 
 $ffi->attach( new => ['wasm_store_t', 'string', 'wasi_config_t', 'wasm_trap_t*'] => 'wasi_instance_t' => sub {
   my $xsub = shift;
@@ -38,6 +40,8 @@ $ffi->attach( new => ['wasm_store_t', 'string', 'wasi_config_t', 'wasm_trap_t*']
   $instance;
 });
 
+# TODO: bind_import
+
 $ffi->attach( [ 'delete' => 'DESTROY' ] => ['wasi_instance_t'] => sub {
   my($xsub, $self) = @_;
   $xsub->($self) if $self->{ptr};
@@ -57,7 +61,57 @@ Wasm::Wasmtime::WasiInstance - WASI instance class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
+
+=head1 SYNOPSIS
+
+ use Wasm::Wasmtime;
+ 
+ my $store = Wasm::Wasmtime::Store->new;
+ my $wasi  = Wasm::Wasmtime::WasiInstance->new(
+   $store,
+   "wasi_snapshot_preview1",
+ );
+
+=head1 DESCRIPTION
+
+B<WARNING>: WebAssembly and Wasmtime are a moving target and the interface for these modules
+is under active development.  Use with caution.
+
+This class represents the WebAssembly System Interface (WASI).  For WebAssembly WASI is the
+equivalent to the part of libc that interfaces with the system.
+
+To configure if and how the WASI accesses program argument, environment, standard streams
+and file system directories, see L<Wasm::Wasmtime::WasiConfig>.
+
+For a complete example of using WASI from WebAssembly, see the synopsis for
+L<Wasm::WebAssembly::Linker>.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+ my $wasi = Wasm::Wasmtime::WasiInstance->new(
+   $store,   # Wasm::Wasmtime::Store,
+   $name,    # string
+   $config,  # Wasm::Wasmtime::WasiConfig,
+ );
+ my $wasi = Wasm::Wasmtime::WasiInstance->new(
+   $store,   # Wasm::Wasmtime::Store,
+   $name,    # string
+ );
+
+Create a new WASI instance.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
+
+=back
 
 =head1 AUTHOR
 

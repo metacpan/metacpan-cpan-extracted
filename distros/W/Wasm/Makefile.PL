@@ -59,12 +59,15 @@ my %WriteMakefileArgs = (
     "lib/Wasm/Wasmtime/FFI.pm"          => "\$(INST_LIB)/Wasm/Wasmtime/FFI.pm",
     "lib/Wasm/Wasmtime/Func.pm"         => "\$(INST_LIB)/Wasm/Wasmtime/Func.pm",
     "lib/Wasm/Wasmtime/FuncType.pm"     => "\$(INST_LIB)/Wasm/Wasmtime/FuncType.pm",
+    "lib/Wasm/Wasmtime/GlobalType.pm"   => "\$(INST_LIB)/Wasm/Wasmtime/GlobalType.pm",
     "lib/Wasm/Wasmtime/ImportType.pm"   => "\$(INST_LIB)/Wasm/Wasmtime/ImportType.pm",
     "lib/Wasm/Wasmtime/Instance.pm"     => "\$(INST_LIB)/Wasm/Wasmtime/Instance.pm",
+    "lib/Wasm/Wasmtime/Linker.pm"       => "\$(INST_LIB)/Wasm/Wasmtime/Linker.pm",
     "lib/Wasm/Wasmtime/Memory.pm"       => "\$(INST_LIB)/Wasm/Wasmtime/Memory.pm",
     "lib/Wasm/Wasmtime/MemoryType.pm"   => "\$(INST_LIB)/Wasm/Wasmtime/MemoryType.pm",
     "lib/Wasm/Wasmtime/Module.pm"       => "\$(INST_LIB)/Wasm/Wasmtime/Module.pm",
     "lib/Wasm/Wasmtime/Store.pm"        => "\$(INST_LIB)/Wasm/Wasmtime/Store.pm",
+    "lib/Wasm/Wasmtime/TableType.pm"    => "\$(INST_LIB)/Wasm/Wasmtime/TableType.pm",
     "lib/Wasm/Wasmtime/Trap.pm"         => "\$(INST_LIB)/Wasm/Wasmtime/Trap.pm",
     "lib/Wasm/Wasmtime/ValType.pm"      => "\$(INST_LIB)/Wasm/Wasmtime/ValType.pm",
     "lib/Wasm/Wasmtime/WasiConfig.pm"   => "\$(INST_LIB)/Wasm/Wasmtime/WasiConfig.pm",
@@ -90,7 +93,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"     => "0.000060",
     "Test::Script"  => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test"    => {
     "TESTS" => "t/*.t"
   }

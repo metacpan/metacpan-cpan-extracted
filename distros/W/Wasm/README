@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -109,6 +109,10 @@ SEE ALSO
     Wasm::Wasmtime
 
       Low level interface to wasmtime.
+
+    Wasm::Hook
+
+      Load WebAssembly modules as though they were Perl modules.
 
 AUTHOR
 

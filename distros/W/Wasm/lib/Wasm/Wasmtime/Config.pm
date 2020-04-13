@@ -5,7 +5,7 @@ use warnings;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Global configuration for Wasm::Wasmtime::Engine
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $ffi_prefix = 'wasm_config_';
@@ -158,7 +158,7 @@ Wasm::Wasmtime::Config - Global configuration for Wasm::Wasmtime::Engine
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -284,6 +284,16 @@ Acceptable values for C<$profiler> are:
 =item C<none>
 
 =item C<jitdump>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Wasm>
+
+=item L<Wasm::Wasmtime>
 
 =back
 

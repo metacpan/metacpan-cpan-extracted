@@ -1,6 +1,6 @@
 # NAME
 
-Data::WeakMap - WeakMap that doesn't leak memory, and which you can operate on like a hash
+Data::WeakMap - WeakMap that behaves like a hash, and doesn't leak memory
 
 # SYNOPSIS
 
@@ -43,13 +43,13 @@ Data::WeakMap - WeakMap that doesn't leak memory, and which you can operate on l
 
 # DESCRIPTION
 
-Data::WeakMap is a Perl implementation for WeakMaps that does not leak memory
+Data::WeakMap is a Perl implementation of WeakMaps that doesn't leak memory
 
 (For more see here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/WeakMap)
 
 # CAVEATS
 
-Don't do this: each(%map). At least not for now (work in progress). Everything else seems to work fine.
+Don't do this, ever: `each(%map)`.
 
 # LICENSE
 
