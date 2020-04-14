@@ -4,6 +4,9 @@ use strict;
 use warnings;
 
 use utf8;
+
+our $VERSION = '0.02';
+
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDIN, ':encoding(UTF-8)';
@@ -60,13 +63,15 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
-Convert JSON data to a Perl variable (dump) which can be parsed or eval'ed by any Perl script.
+json2perl.pl : convert JSON data to a Perl variable (dump) which can be parsed or eval'ed by any Perl script.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

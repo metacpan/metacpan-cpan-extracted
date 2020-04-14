@@ -25,13 +25,14 @@ our @EXPORT = (
   'has_all_of',
   'has_one_of',
   'is_instance_of',
-  'is_consumer_of',
   'is_capable_of',
+  'is_comprised_of',
+  'is_consumer_of',
   'register',
   @Type::Utils::EXPORT_OK
 );
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 # FUNCTIONS
 
@@ -76,6 +77,13 @@ fun is_consumer_of(Str $name) {
 fun is_capable_of(Str @routines) {
   fun($value) {
     return 0 if grep {!$value->can($_)} @routines;
+    return 1;
+  }
+}
+
+fun is_comprised_of(Str @names) {
+  fun($value) {
+    return 0 if grep {!exists $value->{$_}} @names;
     return 1;
   }
 }
@@ -242,12 +250,7 @@ Data-Object Type Library Keywords
   register {
     name => 'Person',
     aliases => ['Student', 'Teacher'],
-    validation => sub {
-      my ($value) = @_;
-
-      return 0 if !$value->isa('Test::Person');
-      return 1;
-    },
+    validation => is_instance_of('Test::Person'),
     parent => 'Object'
   };
 
@@ -282,31 +285,50 @@ This package supports the following scenarios:
 
 =head2 exports
 
-  package Test::Library;
+  package Test::Library::Exports;
 
-  # use Data::Object::Types::Keywords;
+  use base 'Data::Object::Types::Library';
 
-  # extends '...'
+  use Data::Object::Types::Keywords;
 
-  # ...
+  # The following is a snapshot of the exported keyword functions:
 
-  # register {
-  #   ...
-  # }
+  # as
+  # class_type
+  # classifier
+  # coerce
+  # compile_match_on_type
+  # declare
+  # declare_coercion
+  # duck_type
+  # dwim_type
+  # english_list
+  # enum
+  # extends
+  # from
+  # has_all_of
+  # has_any_of
+  # has_one_of
+  # inline_as
+  # intersection
+  # is_capable_of
+  # is_consumer_of
+  # is_instance_of
+  # match_on_type
+  # message
+  # register
+  # role_type
+  # subtype
+  # to_type
+  # type
+  # union
+  # via
+  # where
 
-  # declare '...', as ...,  where {
-  #   ...
-  # }
-
-  "Test::Library"
+  "Test::Library::Exports"
 
 This package supports exporting functions which help configure L<Type::Library>
-derived libraries. The following is a snapshot of the exported keyword
-functions: C<as>, C<class_type>, C<classifier>, C<coerce>,
-C<compile_match_on_type>, C<declare>, C<declare_coercion>, C<duck_type>,
-C<dwim_type>, C<english_list>, C<enum>, C<extends>, C<from>, C<inline_as>,
-C<intersection>, C<match_on_type>, C<message>, C<register>, C<role_type>,
-C<subtype>, C<to_type>, C<type>, C<union>, C<via>, and C<where>.
+derived libraries.
 
 =cut
 
@@ -480,6 +502,40 @@ specified.
     name => 'Person',
     validation => $validation,
     parent => 'Object'
+  };
+
+  $validation
+
+=back
+
+=cut
+
+=head2 is_comprised_of
+
+  is_comprised_of(Str @names) : CodeRef
+
+The is_comprised_of function accepts one or more names and returns truthy if
+the value passed is a hashref or hashref based object which has keys that
+correspond to the names provided.
+
+=over 4
+
+=item is_comprised_of example #1
+
+  package Test::Library::IsComprisedOf;
+
+  use Data::Object::Types::Keywords;
+
+  use base 'Data::Object::Types::Library';
+
+  extends 'Types::Standard';
+
+  my $validation = is_comprised_of(qw(mon tues wed thurs fri sat sun));
+
+  register {
+    name => 'WorkHours',
+    validation => $validation,
+    parent => 'HashRef'
   };
 
   $validation

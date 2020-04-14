@@ -20,14 +20,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
 	'PDF::API2' => '2.037',
 	'Colouring::In' => '0.14',
-	'Sub::MultiMethod' => '0.0008',
-   	'PPR' => '0.000024',
-	'Import::Into' => '0',
-	'Syntax::Keyword::Try' => '0',
-	'B::Hooks::EndOfScope' => '0',
-	'Devel::StrictMode' => '0',
-	'Exporter::Tiny' => '0',
-	'namespace::autoclean' => '0',
+	'Zydeco' => '0.517',
 	'Type::Tiny' => '0'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

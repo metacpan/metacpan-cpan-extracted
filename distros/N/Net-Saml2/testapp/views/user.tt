@@ -1,0 +1,45 @@
+<h1>User: <% assertion.nameid %></h1>
+
+<p><a href="/logout-redirect?nameid=<% assertion.nameid | html %>&session=<% assertion.session | html %>">Logout (redirect binding)</a></p>
+
+<p><a href="/logout-soap?nameid=<% assertion.nameid | html %>&session=<% assertion.session | html %>">Logout (soap binding)</a></p>
+
+<p><a href="/logout-local?nameid=<% assertion.nameid | html %>&session=<% assertion.session | html %>">Logout (local)</a></p>
+
+<h2>Attributes</h2>
+
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Value</th>
+  </tr>
+  <tr>
+    <td>DN</td>
+    <td><% assertion.attributes.DN %></td>
+  </tr>
+  <tr>
+    <td>CN</td>
+    <td><% assertion.attributes.CN %></td>
+  </tr>
+  <tr>
+    <td>EmailAddress</td>
+    <td><% assertion.attributes.EmailAddress %></td>
+  </tr>
+  <tr>
+    <td>FirstName</td>
+    <td><% assertion.attributes.FirstName %></td>
+  </tr>
+  <tr>
+    <td>Address</td>
+    <td><% assertion.attributes.Address %></td>
+  </tr>
+  <tr>
+    <td>Phone</td>
+    <td><% assertion.attributes.Phone %></td>
+  </tr>
+  <tr>
+    <td>EmployeeNumber</td>
+    <td><% assertion.attributes.EmployeeNumber %></td>
+  </tr>
+  <% end %>
+</table>

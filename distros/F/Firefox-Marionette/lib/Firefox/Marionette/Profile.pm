@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.96';
+our $VERSION = '0.98';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -422,7 +422,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.96
+Version 0.98
 
 =head1 SYNOPSIS
 

@@ -3,3 +3,6 @@ Revision history for Data-Roundtrip
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.02
+	Changed NAME in documentation of the scripts and some
+	POD errors in lib/Data/Roundtrip.pm

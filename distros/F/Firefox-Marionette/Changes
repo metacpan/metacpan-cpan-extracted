@@ -1,5 +1,11 @@
 Revision history for Firefox-Marionette
 
+0.98  Tue Apr 14 07:27:00 2020
+       Additions to chatty option.
+
+0.97  Tue Apr 14 07:01:00 2020
+       Adding reconnect parameter to new, private parameter to new_window
+
 0.96  Mon Mar  9 18:14:00 2020
        Improved cleanups and added chatty/seer options to new method.
 

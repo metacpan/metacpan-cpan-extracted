@@ -6,7 +6,7 @@ use Carp qw/confess/;
 use IO::Socket::INET;
 use Scalar::Util qw/reftype/;
 
-$Net::Graphite::VERSION = '0.18';
+$Net::Graphite::VERSION = '0.19';
 
 our $TEST = 0;   # if true, don't send anything to graphite
 
@@ -21,6 +21,8 @@ sub new {
         return_connect_error => 0,
         proto                => 'tcp',
         timeout              => 1,
+        tcp_buffer_size      => 64 * 1024,
+        max_retries          => 1,
         # flush_limit
         # path
         # transformer
@@ -41,8 +43,7 @@ sub send {
     if ($args{data}) {
         my $xform = $args{transformer} || $self->transformer;
         if ($xform) {
-            # FIXME
-            $self->{_flush_buffer} = [ $xform->($args{data}) ];
+            push @{$self->{_flush_buffer}}, $xform->($args{data});
         }
         else {
             if (ref $args{data}) {
@@ -73,10 +74,12 @@ sub send {
                     confess "Arg 'data' passed to send method is a ref but has no transformer";
                 }
             }
-            else {
+            elsif ( length $args{data} ) {
                 # passed plaintext without a transformer
-                # FIXME
-                $self->{_flush_buffer} = [ $args{data} ];
+                push @{$self->{_flush_buffer}}, $args{data};
+            }
+            else {
+                # Empty request?
             }
         }
     }
@@ -85,42 +88,98 @@ sub send {
         my $path = $args{path} || $self->path;
         my $time = $args{time} || time;
 
-        $self->{_flush_buffer} = [ "$path $value $time\n" ];
+        push @{$self->{_flush_buffer}}, "$path $value $time\n";
     }
 
     $self->flush();
 
-    return join('', @{ $self->{_flush_buffer} });    # FIXME
+    # This join can get somewhat heavy, so don't do it unless explicitly
+    # requested.
+    return join('', @{ $self->{_flush_buffer} })
+        if defined wantarray;
+
+    return;
 }
 
 sub flush {
     my ($self) = @_;
-    return unless
-      my $flush_buffer = $self->{_flush_buffer};
+    my $flush_buffer = $self->{_flush_buffer}
+        or return;
     return unless @$flush_buffer;
 
     $self->trace($flush_buffer) if $self->{trace};
 
-    unless ($Net::Graphite::TEST) {
-        # FIXME: need to deal with incompletely-sent metrics
-        if ($self->connect()) {
-            foreach my $buf (@$flush_buffer) {
-                while (length($buf)) {
-                    my $res = $self->{_socket}->send($buf);
-                    if (not defined $res) {
-                        next if $! == EINTR;
-                        last; # not sure what to do here
-                    }
+    # Do not do anything if we are just testing
+    return if $Net::Graphite::TEST;
 
-                    substr($buf, 0, $res, '');
-                }
-                if (length($buf) && not $self->{fire_and_forget}) {
-                    confess "Error sending data";
-                }
-            }
+    # If connection failed we already notified about it elsewhere, so just
+    # return.
+    return unless $self->connect();
+
+    my $size_limit = $self->{tcp_buffer_size} || 64 * 1024;
+    my $retries = 0;
+
+  FLUSH_BUFFER:
+    while ( @$flush_buffer ) {
+        my @batch_send = shift @$flush_buffer;
+        my $batch_size = bytes::length( $batch_send[0] );
+        while ( @$flush_buffer ) {
+            my $msg_size = bytes::length( $flush_buffer->[0] );
+
+            last if $batch_size + $msg_size > $size_limit;
+
+            push @batch_send, shift @$flush_buffer;
         }
-        # I didn't close the socket!
+
+        my $buf = join '', @batch_send;
+        while (length($buf)) {
+            # We are using send() here rather than calling a method on the
+            # _socket object to avoid an unnecessary syscall. It would call
+            # getpeername() every single time. It does that do check whether
+            # the fourth argument is needed and we know that for open TCP
+            # sockets it is not.
+            my $res = CORE::send( $self->{_socket}, $buf, 0 );
+
+            if (not defined $res) {
+                redo if $! == EINTR;
+
+                # close/forget the socket, because it is most likely broken in
+                # some way. This will force a re-open on next operation.
+                delete $self->{_socket};
+
+                # Bail out early if it was "fire and forget" request; do not
+                # put the unsent data back in the buffer in that case.
+                return if $self->{fire_and_forget};
+
+                # Put back the unsent data, so we can retry it.
+                # We do not know how much data was actually unprocessed, so
+                # play it safe and put back everything. Normally it is ok to
+                # overwrite a data point in graphite with the same data, so
+                # sending it twice won't be a problem.
+                unshift @$flush_buffer, @batch_send;
+
+                # Reconnect and retry
+                confess "Error sending data"
+                    if ++$retries > $self->{max_retries};
+
+                $self->connect();
+
+                redo FLUSH_BUFFER;
+            }
+
+            substr($buf, 0, $res, '');
+        }
+        if (length($buf) && not $self->{fire_and_forget}) {
+            confess "Error sending data";
+        }
     }
+
+    # On success clear the buffer. The array itself should be empty already,
+    # but shift() won't clear the offset in the underlying data structure,
+    # so the array would potentially keep growing forever.
+    @$flush_buffer = ();
+
+    return;
 }
 
 sub _fill_lines_for_epoch {
@@ -142,7 +201,7 @@ sub _fill_lines_for_epoch {
 sub connect {
     my $self = shift;
     return $self->{_socket}
-      if $self->{_socket} && $self->{_socket}->connected;
+      if $self->{_socket};
 
     $self->{_socket} = IO::Socket::INET->new(
         PeerHost => $self->{host},

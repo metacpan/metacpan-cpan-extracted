@@ -25,8 +25,9 @@ function: has_any_of
 function: has_all_of
 function: has_one_of
 function: is_instance_of
-function: is_consumer_of
 function: is_capable_of
+function: is_comprised_of
+function: is_consumer_of
 function: register
 
 =cut
@@ -44,12 +45,7 @@ function: register
   register {
     name => 'Person',
     aliases => ['Student', 'Teacher'],
-    validation => sub {
-      my ($value) = @_;
-
-      return 0 if !$value->isa('Test::Person');
-      return 1;
-    },
+    validation => is_instance_of('Test::Person'),
     parent => 'Object'
   };
 
@@ -77,32 +73,51 @@ L<Data::Object::Types::Library> and L<Type::Library> libraries.
 =scenario exports
 
 This package supports exporting functions which help configure L<Type::Library>
-derived libraries. The following is a snapshot of the exported keyword
-functions: C<as>, C<class_type>, C<classifier>, C<coerce>,
-C<compile_match_on_type>, C<declare>, C<declare_coercion>, C<duck_type>,
-C<dwim_type>, C<english_list>, C<enum>, C<extends>, C<from>, C<inline_as>,
-C<intersection>, C<match_on_type>, C<message>, C<register>, C<role_type>,
-C<subtype>, C<to_type>, C<type>, C<union>, C<via>, and C<where>.
+derived libraries.
 
 =example exports
 
-  package Test::Library;
+  package Test::Library::Exports;
 
-  # use Data::Object::Types::Keywords;
+  use base 'Data::Object::Types::Library';
 
-  # extends '...'
+  use Data::Object::Types::Keywords;
 
-  # ...
+  # The following is a snapshot of the exported keyword functions:
 
-  # register {
-  #   ...
-  # }
+  # as
+  # class_type
+  # classifier
+  # coerce
+  # compile_match_on_type
+  # declare
+  # declare_coercion
+  # duck_type
+  # dwim_type
+  # english_list
+  # enum
+  # extends
+  # from
+  # has_all_of
+  # has_any_of
+  # has_one_of
+  # inline_as
+  # intersection
+  # is_capable_of
+  # is_consumer_of
+  # is_instance_of
+  # match_on_type
+  # message
+  # register
+  # role_type
+  # subtype
+  # to_type
+  # type
+  # union
+  # via
+  # where
 
-  # declare '...', as ...,  where {
-  #   ...
-  # }
-
-  "Test::Library"
+  "Test::Library::Exports"
 
 =cut
 
@@ -263,6 +278,38 @@ is_instance_of(Str $name) : CodeRef
     name => 'Person',
     validation => $validation,
     parent => 'Object'
+  };
+
+  $validation
+
+=cut
+
+=function is_comprised_of
+
+The is_comprised_of function accepts one or more names and returns truthy if
+the value passed is a hashref or hashref based object which has keys that
+correspond to the names provided.
+
+=signature is_comprised_of
+
+is_comprised_of(Str @names) : CodeRef
+
+=example-1 is_comprised_of
+
+  package Test::Library::IsComprisedOf;
+
+  use Data::Object::Types::Keywords;
+
+  use base 'Data::Object::Types::Library';
+
+  extends 'Types::Standard';
+
+  my $validation = is_comprised_of(qw(mon tues wed thurs fri sat sun));
+
+  register {
+    name => 'WorkHours',
+    validation => $validation,
+    parent => 'HashRef'
   };
 
   $validation
@@ -461,7 +508,9 @@ $subs->synopsis(fun($tryable) {
 });
 
 $subs->scenario('exports', fun($tryable) {
-  can_ok 'Test::Library', (
+  my $result = $tryable->result;
+
+  can_ok $result, (
     'as',
     'class_type',
     'classifier',
@@ -487,6 +536,8 @@ $subs->scenario('exports', fun($tryable) {
     'via',
     'where',
   );
+
+  $result
 });
 
 {
@@ -559,6 +610,16 @@ $subs->example(-1, 'is_instance_of', 'function', fun($tryable) {
   ok $result->(Test::Person->new);
   ok $result->(Test::Teacher->new);
   ok !$result->(Test::Entity->new);
+
+  $result
+});
+
+$subs->example(-1, 'is_comprised_of', 'function', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok !$result->({});
+  ok !$result->({map +($_, 1), qw(mon wed fri)});
+  ok !$result->({map +($_, 1), qw(mon tues wed thurs fri)});
+  ok $result->({map +($_, 1), qw(mon tues wed thurs fri sat sun)});
 
   $result
 });

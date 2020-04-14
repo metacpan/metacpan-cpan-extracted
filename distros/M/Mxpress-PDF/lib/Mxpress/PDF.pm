@@ -4,7 +4,7 @@ use warnings;
 
 package Mxpress::PDF {
 	BEGIN {
-		our $VERSION = '0.21';
+		our $VERSION = '0.22';
 		our $AUTHORITY = 'cpan:LNATION';
 	};
 	use Zydeco;
@@ -15,7 +15,7 @@ package Mxpress::PDF {
 		my @plugins = (qw/font line box circle pie ellipse text title subtitle subsubtitle h1 h2 h3 h4 h5 h6 toc image form input textarea select annotation cover/, ($args->{plugins} ? @{$args->{plugins}} : ()));
 		for my $p (@plugins) {
 			my $meth = sprintf('_store_%s', $p);
-			has {$meth} (type => Object);
+			has {$meth} (is => 'rw', type => Object);
 			method {$p} () {
 				my $klass = $self->$meth;
 				if (!$klass) {
@@ -25,13 +25,13 @@ package Mxpress::PDF {
 				return $klass;
 			}
 		}
-		has file_name (type => Str, required => 1);
-		has pdf (required => 1, type => Object);
-		has pages (required => 1, type => ArrayRef);
-		has page (type => Object);
-		has page_args (type => HashRef);
-		has onsave_cbs (type => ArrayRef);
-		has page_offset (type => Num);
+		has file_name (is => 'rw', type => Str, required => 1);
+		has pdf (required => 1, is => 'rw', type => Object);
+		has pages (required => 1, is => 'rw', type => ArrayRef);
+		has page (is => 'rw', type => Object);
+		has page_args (is => 'rw', type => HashRef);
+		has onsave_cbs (is => 'rw', type => ArrayRef);
+		has page_offset (is => 'rw', type => Num);
 		method add_page (Map %args) {
 			$args{is_rotated} = 0;
 			if ($self->page) {
@@ -103,26 +103,26 @@ package Mxpress::PDF {
 	}
 	class Page {
 		with Utils;
-		has page_size (type => Str, required => 1);
-		has background (type => Str);
-		has num (type => Num, required => 1);
-		has current (type => Object);
-		has columns (type => Num);
-		has column (type => Num);
-		has rows (type => Num);
-		has row (type => Num);
-		has row_y (type => Num);
-		has is_rotated (type => Num);
-		has header (type => HashRef|Object);
-		has footer (type => HashRef|Object);
-		has x (type => Num);
-		has y (type => Num);
-		has w (type => Num);
-		has h (type => Num);
-		has oh (type => Num);
-		has ow (type => Num);
-		has saving (type => Bool);
-		has onsave_cbs (type => ArrayRef);
+		has page_size (is => 'rw', type => Str, required => 1);
+		has background (is => 'rw', type => Str);
+		has num (is => 'rw', type => Num, required => 1);
+		has current (is => 'rw', type => Object);
+		has columns (is => 'rw', type => Num);
+		has column (is => 'rw', type => Num);
+		has rows (is => 'rw', type => Num);
+		has row (is => 'rw', type => Num);
+		has row_y (is => 'rw', type => Num);
+		has is_rotated (is => 'rw', type => Num);
+		has header (is => 'rw', type => HashRef|Object);
+		has footer (is => 'rw', type => HashRef|Object);
+		has x (is => 'rw', type => Num);
+		has y (is => 'rw', type => Num);
+		has w (is => 'rw', type => Num);
+		has h (is => 'rw', type => Num);
+		has oh (is => 'rw', type => Num);
+		has ow (is => 'rw', type => Num);
+		has saving (is => 'rw', type => Bool);
+		has onsave_cbs (is => 'rw', type => ArrayRef);
 		factory page (Object $pdf, Map %args) {
 			my $page = $args{open} ? $pdf->openpage($args{num}) : $pdf->page($args{num} || 0);
 			$page->mediabox($args{page_size});
@@ -211,10 +211,10 @@ package Mxpress::PDF {
 			return ($self->header->active ? $self->header->h : 0 ) + ($self->footer->active ? $self->footer->h : 0);
 		}
 		class +Component {
-			has parent (type => Object);
-			has show_page_num (type => Str);
-			has page_num_text (type => Str);
-			has active (type => Bool);
+			has parent (is => 'rw', type => Object);
+			has show_page_num (is => 'rw', type => Str);
+			has page_num_text (is => 'rw', type => Str);
+			has active (is => 'rw', type => Bool);
 			method add (Map %args) {
 				if ($args{cb}) {
 					$self->onsave(@{ delete $args{cb} });
@@ -260,7 +260,7 @@ package Mxpress::PDF {
 				}
 			}
 			class +Cover {
-				has file (type => Object);
+				has file (is => 'rw', type => Object);
 				factory cover (Object $file, Map %args) {
 					$args{$_} //= $file->page->$_ for qw/x y w h padding oh ow column columns row rows num page_size/;
 					return $class->new(
@@ -311,11 +311,11 @@ package Mxpress::PDF {
 		}
 	}
 	role Utils {
-		has full (type => Bool);
-		has padding (type => Num);
-		has margin_top (type => Num);
-		has margin_bottom (type => Num);
-		has h_offset (type => Num);
+		has full (is => 'rw', type => Bool);
+		has padding (is => 'rw', type => Num);
+		has margin_top (is => 'rw', type => Num);
+		has margin_bottom (is => 'rw', type => Num);
+		has h_offset (is => 'rw', type => Num);
 		method add_padding (Num $padding) {
 			$self->padding($self->padding + $padding);
 		}
@@ -388,14 +388,14 @@ package Mxpress::PDF {
 	}
 	class Plugin {
 		with Utils;
-		has file (type => Object);
-		has position (type => ArrayRef);
+		has file (is => 'rw', type => Object);
+		has position (is => 'rw', type => ArrayRef);
 		class +Font {
-			has colour (type => Str);
-			has size (type => Num);
-			has family (type => Str);
-			has loaded (type => HashRef);
-			has line_height ( type => Num);
+			has colour (is => 'rw', type => Str);
+			has size (is => 'rw', type => Num);
+			has family (is => 'rw', type => Str);
+			has loaded (is => 'rw', type => HashRef);
+			has line_height ( is => 'rw', type => Num);
 			factory font (Object $file, Map %args) {
 				return $class->new(
 					file => $file,
@@ -417,10 +417,10 @@ package Mxpress::PDF {
 			}
 		}
 		class +Shape {
-			has fill_colour ( type => Str );
-			has radius ( type => Num );
-			has start (type => Num);
-			has end (type => Num);
+			has fill_colour ( is => 'rw', type => Str );
+			has radius ( is => 'rw', type => Num );
+			has start (is => 'rw', type => Num);
+			has end (is => 'rw', type => Num);
 			method generic_new (Object $file, Map %args) {
 				return $class->new(
 					padding => $args{padding} || 0,
@@ -519,20 +519,20 @@ package Mxpress::PDF {
 			}
 		}
 		class +Text {
-			has text (type => Object);
-			has font (type => Object);
-			has paragraph_space (type => Num);
-			has paragraphs_to_columns (type => Bool);
-			has first_line_indent (type => Num);
-			has first_paragraph_indent (type => Num);
-			has align (type => Str); #enum
-			has margin_bottom (type => Num);
-			has indent (type => Num);
-			has pad (type => Str);
-			has pad_end (type => Str);
-			has no_space (type => Bool);
-			has min_width (type => Num);
-			has end_w (type => Str);
+			has text (is => 'rw', type => Object);
+			has font (is => 'rw', type => Object);
+			has paragraph_space (is => 'rw', type => Num);
+			has paragraphs_to_columns (is => 'rw', type => Bool);
+			has first_line_indent (is => 'rw', type => Num);
+			has first_paragraph_indent (is => 'rw', type => Num);
+			has align (is => 'rw', type => Str); #enum
+			has margin_bottom (is => 'rw', type => Num);
+			has indent (is => 'rw', type => Num);
+			has pad (is => 'rw', type => Str);
+			has pad_end (is => 'rw', type => Str);
+			has no_space (is => 'rw', type => Bool);
+			has min_width (is => 'rw', type => Num);
+			has end_w (is => 'rw', type => Str);
 			has next_page;
 			factory text (Object $file, Map %args) {
 				$class->generic_new($file, %args);
@@ -778,13 +778,13 @@ package Mxpress::PDF {
 			}
 		}
 		class +TOC::Outline extends Plugin::Text {
-			has outline (type => Object);
-			has x (type => Num);
-			has y (type => Num);
-			has title (type => Str);
-			has page (type => Object);
-			has level (type => Num);
-			has children (type => ArrayRef);
+			has outline (is => 'rw', type => Object);
+			has x (is => 'rw', type => Num);
+			has y (is => 'rw', type => Num);
+			has title (is => 'rw', type => Str);
+			has page (is => 'rw', type => Object);
+			has level (is => 'rw', type => Num);
+			has children (is => 'rw', type => ArrayRef);
 			factory add_outline (Object $file, Object $outline, Map %args) {
 				my ($x, $y) = $file->page->parse_position($args{position} || []);
 				$y += $args{jump_lh};
@@ -833,14 +833,14 @@ package Mxpress::PDF {
 			}
 		}
 		class +TOC {
-			has count (type => Num);
-			has toc_placeholder (type => HashRef);
-			has outline (type => Object);
-			has outlines (type => ArrayRef);
-			has indent (type => Num);
-			has levels (type => ArrayRef);
-			has toc_line_offset (type => Num);
-			has font (type => HashRef);
+			has count (is => 'rw', type => Num);
+			has toc_placeholder (is => 'rw', type => HashRef);
+			has outline (is => 'rw', type => Object);
+			has outlines (is => 'rw', type => ArrayRef);
+			has indent (is => 'rw', type => Num);
+			has levels (is => 'rw', type => ArrayRef);
+			has toc_line_offset (is => 'rw', type => Num);
+			has font (is => 'rw', type => HashRef);
 			factory toc (Object $file, Map %args) {
 				return $class->new(
 					file => $file,
@@ -917,10 +917,10 @@ package Mxpress::PDF {
 			}
 		}
 		class +Image {
-			has width (type => Num);
-			has height (type => Num);
-			has align (type => Str);
-			has valid_mime (type => HashRef, builder => 1);
+			has width (is => 'rw', type => Num);
+			has height (is => 'rw', type => Num);
+			has align (is => 'rw', type => Str);
+			has valid_mime (is => 'rw', type => HashRef, builder => 1);
 			method _build_valid_mime {
 				return {
 					jpeg => 'image_jpeg',
@@ -991,17 +991,17 @@ package Mxpress::PDF {
 			}
 		}
 		class +Annotation {
-			has type (type => Str);
-			has w (type => Num);
-			has h (type => Num);
-			has open (type => Bool);
-			has rect (type => ArrayRef);
-			has border (type => ArrayRef);
+			has type (is => 'rw', type => Str);
+			has w (is => 'rw', type => Num);
+			has h (is => 'rw', type => Num);
+			has open (is => 'rw', type => Bool);
+			has rect (is => 'rw', type => ArrayRef);
+			has border (is => 'rw', type => ArrayRef);
 			factory annotation (Object $file, Map %args) {
 				return $class->new(
 					file => $file,
 					padding => 0,
-					type => 'text',
+					is => 'rw', type => 'text',
 					open => 0,
 					w => 0,
 					h => 0,
@@ -1026,8 +1026,8 @@ package Mxpress::PDF {
 		}
 		class +Form {
 			use PDF::API2::Basic::PDF::Utils;
-			has acro (type => Object);
-			has fields (type => ArrayRef);
+			has acro (is => 'rw', type => Object);
+			has fields (is => 'rw', type => ArrayRef);
 			factory form (Object $file, Map %args) {
 				return $class->new(
 					file => $file,
@@ -1054,9 +1054,9 @@ package Mxpress::PDF {
 			class +Field extends Plugin::Text {
 				use PDF::API2::Basic::PDF::Literal;
 				use PDF::API2::Basic::PDF::Utils;
-				has xo (type => Object);
-				has annotate (type => Object);
-				has name (type => Str);
+				has xo (is => 'rw', type => Object);
+				has annotate (is => 'rw', type => Object);
+				has name (is => 'rw', type => Str);
 				around add (Str $text, Map %args) {
 					return $self->$next($text, %args) if $args{noconfigure};
 					my @pos = ($self->parse_position([]));
@@ -1100,7 +1100,7 @@ package Mxpress::PDF {
 						$self->annotate->{FT} = PDFName('Tx');
 					}	
 					class +Textarea {
-						has lines (type => Num);
+						has lines (is => 'rw', type => Num);
 						factory textarea (Object $file, Map %args) {
 							$args{pad} ||= '_';
 							$args{margin_bottom} ||= 1.7;
@@ -1216,7 +1216,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
@@ -1521,31 +1521,31 @@ The following attributes can be configured for a Mxpress::PDF::File, they are al
 
 	$file->$attr
 
-=head3 file_name (type => Str);
+=head3 file_name (is => 'rw', type => Str);
 
 The file name of the pdf
 
 	$file->file_name;
 
-=head3 pdf (type => Object);
+=head3 pdf (is => 'rw', type => Object);
 
 A PDF::API2 Object.
 
 	$file->pdf;
 
-=head3 pages (type => ArrayRef);
+=head3 pages (is => 'rw', type => ArrayRef);
 
 A list of Mxpress::PDF::Page objects.
 
 	$file->pages;
 
-=head3 page (type => Object);
+=head3 page (is => 'rw', type => Object);
 
 An open Mxpress::PDF::Page object.
 
 	$file->page;
 
-=head3 onsave_cbs (type => ArrayRef);
+=head3 onsave_cbs (is => 'rw', type => ArrayRef);
 
 An array of arrays that define cbs, triggered when $file->save() is called.
 
@@ -1553,19 +1553,19 @@ An array of arrays that define cbs, triggered when $file->save() is called.
 		[$plugin, $method_name, @%args]
 	]
 
-=head3 font (type => Object)
+=head3 font (is => 'rw', type => Object)
 
 A Mxpress:PDF::Plugin::Font Object.
 
 	$file->font->load;
 
-=head3 line (type => Object)
+=head3 line (is => 'rw', type => Object)
 
 A Mxpress::PDF::Plugin::Shape::Line Object.
 
 	$file->line->add;
 
-=head3 box (type => Object)
+=head3 box (is => 'rw', type => Object)
 
 A Mxpress::PDF::Plugin::Shape::Box Object.
 
@@ -1703,109 +1703,109 @@ The following attributes can be configured for a Mxpress::PDF::File, they are al
 
 	$page->$attr
 
-=head3 page_size (type => Str);
+=head3 page_size (is => 'rw', type => Str);
 
 The page size of the pdf, default is A4.
 
 	$page->page_size('A4');
 
-=head3 background (type => Str);
+=head3 background (is => 'rw', type => Str);
 
 The background colour of the page.
 
 	$page->background('#000');
 
-=head3 num (type => Num, required => 1);
+=head3 num (is => 'rw', type => Num, required => 1);
 
 The page number.
 
 	$page->num;
 
-=head3 current (type => Object);
+=head3 current (is => 'rw', type => Object);
 
 The current PDF::API2::Page Object.
 
 	$page->current;
 
-=head3 columns (type => Num);
+=head3 columns (is => 'rw', type => Num);
 
 The number of columns configured for the page, default is 1.
 
 	$page->columns(5);
 
-=head3 column (type => Num);
+=head3 column (is => 'rw', type => Num);
 
 The current column that is being generated, default is 1.
 
 	$page->column(2);
 
-=head3 rows (type => Num);
+=head3 rows (is => 'rw', type => Num);
 
 The number of rows configured for the page, default is 1.
 
 	$page->rows(5);
 
-=head3 row (type => Num);
+=head3 row (is => 'rw', type => Num);
 
 The number of rows configured for the page, default is 1.
 
 	$page->row(2);
 
-=head3 is_rotated (type => Num);
+=head3 is_rotated (is => 'rw', type => Num);
 
 Is the page rotated (portrait/landscape).
 
 	$page->is_rotated;
 
-=head3 x (type => Num);
+=head3 x (is => 'rw', type => Num);
 
 The current x coordinate.
 
 	$page->x($x);
 
-=head3 y (type => Num);
+=head3 y (is => 'rw', type => Num);
 
 The current y coordinate.
 
 	$page->y($y);
 
-=head3 w (type => Num);
+=head3 w (is => 'rw', type => Num);
 
 The available page width.
 
 	$page->w($w);
 
-=head3 h (type => Num);
+=head3 h (is => 'rw', type => Num);
 
 The available page height.
 
 	$page->h($h);
 
-=head3 full (type => Bool);
+=head3 full (is => 'rw', type => Bool);
 
 Disable any column/row configuration and render full width/height.
 
 	$page->full(\1);
 
-=head3 padding (type => Num);
+=head3 padding (is => 'rw', type => Num);
 
 Add padding to the page (mm).
 
 	$page->padding($mm);
 
-=head3 margin_top (type => Num);
+=head3 margin_top (is => 'rw', type => Num);
 
 Add margin to the top of the page (mm).
 
 	$page->margin_top($mm);
 
-=head3 margin_bottom (type => Num);
+=head3 margin_bottom (is => 'rw', type => Num);
 
 Add margin to the bottom of the page (mm).
 
 	$page->margin_bottom($mm);
 
-=head3 onsave_cbs (type => ArrayRef);
+=head3 onsave_cbs (is => 'rw', type => ArrayRef);
 
 Callbacks that will be triggered when $file->save is called.
 
@@ -1813,13 +1813,13 @@ Callbacks that will be triggered when $file->save is called.
 		[$plugin, $method_name, @%args]
 	]);
 
-=head3 header (type => HashRef|Object);
+=head3 header (is => 'rw', type => HashRef|Object);
 
 A Mxpress::PDF::Page::Component::Header Object.
 
 	$page->header;
 
-=head3 footer (type => HashRef|Object);
+=head3 footer (is => 'rw', type => HashRef|Object);
 
 A Mxpress::PDF::Page::Component::Footer Object.
 
@@ -1884,19 +1884,19 @@ The following additional attributes can be configured for a Mxpress::PDF::Page::
 
 	$page->cover->$attr
 
-=head3 show_page_num (type => Str);
+=head3 show_page_num (is => 'rw', type => Str);
 
 Alignment for the page number
 
 	show_page_num => 'right'
 
-=head3 page_num_text (type => Str);
+=head3 page_num_text (is => 'rw', type => Str);
 
 Text to display around the page number.
 
 	page_num_text => 'Page {num}'
 
-=head3 active (type => Bool);
+=head3 active (is => 'rw', type => Bool);
 
 Control whether to display the cover, default is false however it is set to true if ->cover->add() is called.
 
@@ -1962,19 +1962,19 @@ The following additional attributes can be configured for a Mxpress::PDF::Page::
 
 	$page->header->$attr
 
-=head3 show_page_num (type => Str);
+=head3 show_page_num (is => 'rw', type => Str);
 
 Alignment for the page number
 
 	show_page_num => 'right'
 
-=head3 page_num_text (type => Str);
+=head3 page_num_text (is => 'rw', type => Str);
 
 Text to display around the page number.
 
 	page_num_text => 'Page {num}'
 
-=head3 active (type => Bool);
+=head3 active (is => 'rw', type => Bool);
 
 Control whether to display the header, default is false however it is set to true if ->header->add() is called.
 
@@ -2034,19 +2034,19 @@ The following additional attributes can be configured for a Mxpress::PDF::Page::
 
 	$page->footer->$attr
 
-=head3 show_page_num (type => Str);
+=head3 show_page_num (is => 'rw', type => Str);
 
 Alignment for the page number
 
 	show_page_num => 'right'
 
-=head3 page_num_text (type => Str);
+=head3 page_num_text (is => 'rw', type => Str);
 
 Text to display around the page number.
 
 	page_num_text => 'Page {num}'
 
-=head3 active (type => Bool);
+=head3 active (is => 'rw', type => Bool);
 
 Control whether to display the header, default is false however it is set to true if ->footer->add() is called.
 
@@ -2113,23 +2113,23 @@ The following attributes can be configured for a Mxpress::PDF::Plugin::Font obje
 
 	$font->$attr();
 
-=head3 colour (type => Str);
+=head3 colour (is => 'rw', type => Str);
 
 The font colour.
 
-=head3 size (type => Num);
+=head3 size (is => 'rw', type => Num);
 
 The font size.
 
-=head3 family (type => Str);
+=head3 family (is => 'rw', type => Str);
 
 The font family.
 
-=head3 loaded (type => HashRef);
+=head3 loaded (is => 'rw', type => HashRef);
 
 Loaded hashref of PDF::API2 fonts.
 
-=head3 line_height ( type => Num);
+=head3 line_height ( is => 'rw', type => Num);
 
 Line height of the font.
 
@@ -2175,19 +2175,19 @@ The following attributes can be configured for a Mxpress::PDF::Plugin::Line obje
 
 	$line->$attr();
 
-=head3 fill_colour (type => Str);
+=head3 fill_colour (is => 'rw', type => Str);
 
 The colour of the line.
 
 	$line->fill_colour('#000');
 
-=head3 position (type => ArrayRef);
+=head3 position (is => 'rw', type => ArrayRef);
 
 The position of the line
 
 	$line->position([$x, $y]);
 
-=head3 end_position (type => ArrayRef);
+=head3 end_position (is => 'rw', type => ArrayRef);
 
 	$line->end_position([$x, $y]);
 
@@ -2225,13 +2225,13 @@ The following attributes can be configured for a Mxpress::PDF::Plugin::Box objec
 
 	$box->$attr();
 
-=head3 fill_colour (type => Str);
+=head3 fill_colour (is => 'rw', type => Str);
 
 The background colour of the box.
 
 	$box->fill('#000');
 
-=head3 position (type => ArrayRef);
+=head3 position (is => 'rw', type => ArrayRef);
 
 The position of the box.
 
@@ -2271,19 +2271,19 @@ The following attributes can be configured for a Mxpress::PDF::Plugin::Shape::Ci
 
 	$circle->$attr();
 
-=head3 fill_colour (type => Str);
+=head3 fill_colour (is => 'rw', type => Str);
 
 The background colour of the circle.
 
 	$circle->fill_colour('#000');
 
-=head3 radius (type => Num);
+=head3 radius (is => 'rw', type => Num);
 
 The radius of the circle. (mm)
 
 	$circle->radius($num);
 
-=head3 position (type => ArrayRef);
+=head3 position (is => 'rw', type => ArrayRef);
 
 The position of the circle. (pt)
 
@@ -2323,31 +2323,31 @@ The following attributes can be configured for a Mxpress::PDF::Plugin::Shape::Pi
 
 	$pie->$attr();
 
-=head3 fill_colour (type => Str);
+=head3 fill_colour (is => 'rw', type => Str);
 
 The background colour of the pie.
 
 	$pie->fill_colour('#000');
 
-=head3 radius (type => Num);
+=head3 radius (is => 'rw', type => Num);
 
 The radius of the pie.
 
 	$pie->radius($num);
 
-=head3 start (type => Num);
+=head3 start (is => 'rw', type => Num);
 
 Start percent of the pie.
 
 	$pie->start(180)
 
-=head3 end (type => Num);
+=head3 end (is => 'rw', type => Num);
 
 End percent of the pie.
 
 	$pie->end(90);
 
-=head3 position (type => ArrayRef);
+=head3 position (is => 'rw', type => ArrayRef);
 
 The position of the pie (pt)
 
@@ -2389,31 +2389,31 @@ The following attributes can be configured for a Mxpress::PDF::Plugin::Shape::El
 
 =head2 Attributes
 
-=head3 fill_colour (type => Str);
+=head3 fill_colour (is => 'rw', type => Str);
 
 The background colour of the ellipse.
 
 	$ellipse->fill_colour('#000');
 
-=head3 radius (type => Num);
+=head3 radius (is => 'rw', type => Num);
 
 The radius of the ellispe.
 
 	$ellispse->radius($r);
 
-=head3 start (type => Num);
+=head3 start (is => 'rw', type => Num);
 
 Start percent of the ellipse
 
 	$ellipse->start($p)
 
-=head3 end (type => Num);
+=head3 end (is => 'rw', type => Num);
 
 End percent of the ellipse.
 
 	$ellipse->end($p);
 
-=head3 position (type => ArrayRef);
+=head3 position (is => 'rw', type => ArrayRef);
 
 The position of the ellipse (pt)
 
@@ -2453,61 +2453,61 @@ The following attributes can be configured for a Mxpress::PDF::Plugin::Text obje
 
 	$text->$attrs();
 
-=head3 font (type => Object);
+=head3 font (is => 'rw', type => Object);
 
 An Mxpress::PDF::Plugin::Font object.
 
 	$text->font(Mxpress::PDF->font($file, %font_args));
 
-=head3 paragraph_space (type => Num);
+=head3 paragraph_space (is => 'rw', type => Num);
 
 Configure the spacing between paragraphs.
 
 	$text->paragraph_space($mm);
 
-=head3 paragraphs_to_columns (type => Bool);
+=head3 paragraphs_to_columns (is => 'rw', type => Bool);
 
 If true then paragraphs within the passed text string will be split into individual columns.
 
 	$text->paragraphs_to_columns(\1);
 
-=head3 first_line_indent (type => Num);
+=head3 first_line_indent (is => 'rw', type => Num);
 
 Indent the first line when rendering given text.
 
 	$text->first_line_indent($mm);
 
-=head3 first_paragraph_indent (type => Num);
+=head3 first_paragraph_indent (is => 'rw', type => Num);
 
 Indent the first line when rendering given text.
 
 	$text->first_paragraph_indent($mm);
 
-=head3 align (type => Str); #enum
+=head3 align (is => 'rw', type => Str); #enum
 
 Align the text on each line. (left|justify|center|right)
 
 	$text->align('justify');
 
-=head3 margin_bottom (type => Num);
+=head3 margin_bottom (is => 'rw', type => Num);
 
 Set a bottom margin to be added after text has been rendered.
 
 	$text->margin($mm);
 
-=head3 indent (type => Num);
+=head3 indent (is => 'rw', type => Num);
 
 Set an indent for the block of text.
 
 	$text->indent($mm);
 
-=head3 pad (type => Str);
+=head3 pad (is => 'rw', type => Str);
 
 Pad the passed text to fit the available space, default is undefined.
 
 	$text->pad('.');
 
-=head3 pad_end (type => Str);
+=head3 pad_end (is => 'rw', type => Str);
 
 Append a string to the padded text.
 
@@ -2691,31 +2691,31 @@ The following attributes can be configured for a Mxpress::PDF::Plugin::TOC objec
 
 	$toc->$attr();
 
-=head3 count (type => Num);
+=head3 count (is => 'rw', type => Num);
 
 The current count of toc links
 
 	$file->toc->count;
 
-=head3 indent (type => Num);
+=head3 indent (is => 'rw', type => Num);
 
 The indent used for each level, default is 5.
 
 	$file->toc->indent(0);
 
-=head3 levels (type => ArrayRef);
+=head3 levels (is => 'rw', type => ArrayRef);
 
 The levels that can be used for TOC. For now we just have title|subtitle|subsubtitle but this is where you could extend.
 
 	$file->toc->levels;
 
-=head3 toc_line_offset (type => Num);
+=head3 toc_line_offset (is => 'rw', type => Num);
 
 The line height offset when rendering the table of contents.
 
 	$file->toc_line_offset($mm);
 
-=head3 font (type => HashRef);
+=head3 font (is => 'rw', type => HashRef);
 
 Attributes to be used for building the font class for TOC outlines
 
@@ -2756,43 +2756,43 @@ The following attributes can be configured for a Mxpress::PDF::Plugin::TOC::Obje
 
 	$outline->$attrs();
 
-=head3 outline (type => Object);
+=head3 outline (is => 'rw', type => Object);
 
 The PDF::API2 Outline object.
 
 	$outline->outline;
 
-=head3 x (type => Num);
+=head3 x (is => 'rw', type => Num);
 
 The x coordinates of the outline.
 
 	$outline->x($x);
 
-=head3 y (type => Num);
+=head3 y (is => 'rw', type => Num);
 
 The y coordinates of the outline.
 
 	$outline->y($y);
 
-=head3 title (type => Str);
+=head3 title (is => 'rw', type => Str);
 
 The title text used to render in the table of contents.
 
 	$outline->title($text);
 
-=head3 page (type => Object);
+=head3 page (is => 'rw', type => Object);
 
 The linked Mxpress::PDF::Page object.
 
 	$ouline->page();
 
-=head3 level (type => Num);
+=head3 level (is => 'rw', type => Num);
 
 The level of the outline.
 
 	$ouline->level(1);
 
-=head3 children (type => ArrayRef);
+=head3 children (is => 'rw', type => ArrayRef);
 
 An arrarref of linked Mxpress::PDF::Plugin::TOC::Outline objects.
 
@@ -2822,19 +2822,19 @@ The following attributes can be configured for a Mxpress::PDF::Plugin::Image obj
 
 	$img->$attrs();
 
-=head3 width (type => Num);
+=head3 width (is => 'rw', type => Num);
 
 The width of the image.
 
 	$img->width($pt);
 
-=head3 height (type => Num);
+=head3 height (is => 'rw', type => Num);
 
 The height of the image.
 
 	$img->height($pt);
 
-=head3 align (type => Str);
+=head3 align (is => 'rw', type => Str);
 
 Align the image - left|center|right
 
@@ -2879,25 +2879,25 @@ The following attributes can be configured for a Mxpress::PDF::Plugin::Annotatio
 
 	$annotation->$attrs();
 
-=head3 type (type => Num)
+=head3 type (is => 'rw', type => Num)
 
 The type of annotation text|file|.
 
 	$annotation->type;
 
-=head3 w (type => Num)
+=head3 w (is => 'rw', type => Num)
 
 The width of the annotation.
 
 	$annotation->w;
 
-=head3 h (type => Num)
+=head3 h (is => 'rw', type => Num)
 
 The hieght of the annotation.
 
 	$annotation->h;
 
-=head2 open (type => Bool)
+=head2 open (is => 'rw', type => Bool)
 
 Toggle whether annotation is open.
 

@@ -151,7 +151,9 @@ use constant _ACCESSORS => (
 sub to_string {
     my ($self) = @_;
 
-    return $self->identifier() . ': ' . $self->SUPER::to_string();
+    my $identifier_str = join('/', @{ $self->identifier() }{'type', 'value'});
+
+    return "$identifier_str: " . $self->SUPER::to_string();
 }
 
 1;

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.96
+    Version 0.98
 
 SYNOPSIS
 
@@ -563,7 +563,7 @@ SUBROUTINES/METHODS
         $firefox->go("http://metacpan.org/");
     
         $firefox->find('//input[@id="search-input"]')->type('Test::More');
-        $firefox->find_name('lucky')->click($element);
+        $firefox->find_name('lucky')->click();
     
         my $har = Archive::Har->new();
         $har->hashref($firefox->har());
@@ -726,6 +726,16 @@ SUBROUTINES/METHODS
       set whether the browser should accept insecure certs or whether the
       browser should use a proxy.
 
+      * chatty - Firefox is extremely chatty on the network, including
+      checking for the lastest malware/phishing sites, updates to
+      firefox/etc. This option is therefore off ("0") by default, however,
+      it can be switched on ("1") if required. Even with chatty switched
+      off, connections to firefox.settings.services.mozilla.com may still
+      be made. The only way to prevent this seems to be to set
+      firefox.settings.services.mozilla.com to 127.0.0.1 via /etc/hosts
+      <https://en.wikipedia.org/wiki//etc/hosts>. NOTE: that this option
+      only works when profile_name/profile is not specified.
+
       * firefox - use the specified path to the Firefox
       <https://firefox.org/> binary, rather than the default path.
 
@@ -772,15 +782,24 @@ SUBROUTINES/METHODS
       is running.
 
       * profile_name - pick a specific existing profile to automate, rather
-      than creating a new profile. Note that firefox <https://firefox.com>
-      refuses to allow more than one instance of a profile to run at the
-      same time. Profile names can be obtained by using the
+      than creating a new profile. Firefox <https://firefox.com> refuses to
+      allow more than one instance of a profile to run at the same time.
+      Profile names can be obtained by using the
       Firefox::Marionette::Profile::names() method. NOTE: firefox ignores
       any changes made to the profile on the disk while it is running.
+
+      * reconnect - a highly experimental parameter to allow a reconnection
+      to firefox that a connection has been discontinued. See the survive
+      parameter.
 
       * script - a shortcut to allow directly providing the script timeout,
       instead of needing to use timeouts from the capabilities parameter.
       Overrides all longer ways.
+
+      * seer - this option is switched off "0" by default. When it is
+      switched on "1", it will activate the various speculative and
+      pre-fetch options for firefox. NOTE: that this option only works when
+      profile_name/profile is not specified.
 
       * sleep_time_in_ms - the amount of time (in milliseconds) that this
       module should sleep when unsuccessfully calling the subroutine
@@ -788,7 +807,9 @@ SUBROUTINES/METHODS
       millisecond.
 
       * survive - if this is set to a true value, firefox will not
-      automatically exit when the object goes out of scope.
+      automatically exit when the object goes out of scope. See the
+      reconnect parameter for a highly experimental technique for
+      reconnecting.
 
       * trust - give a path to a root certificate
       <https://en.wikipedia.org/wiki/Root_certificate> that will be trusted
@@ -825,11 +846,16 @@ SUBROUTINES/METHODS
 
         use Firefox::Marionette();
     
-        my $remote_darwin_firefox = Firefox::Marionette->new( debug => 1, host => '10.1.2.3', firefox => '/Applications/Firefox.app/Contents/MacOS/firefox' );
+        my $remote_darwin_firefox = Firefox::Marionette->new(
+                         debug => 1,
+                         host => '10.1.2.3',
+                         trust => '/path/to/root_ca.pem',
+                         firefox => '/Applications/Firefox.app/Contents/MacOS/firefox'
+                                                            ); # start a temporary profile for a remote firefox and load a new CA into the temp profile
         ...
     
         foreach my $profile_name (Firefox::Marionette::Profile->names()) {
-            my $firefox_with_existing_profile = Firefox::Marionette->new( profile_name => $profile_name, trust => "/path/to/root_ca.pem", visible => 1 );
+            my $firefox_with_existing_profile = Firefox::Marionette->new( profile_name => $profile_name, visible => 1 );
             ...
         }
 
@@ -840,6 +866,9 @@ SUBROUTINES/METHODS
       * focus - a boolean field representing if the new window be opened in
       the foreground (focused) or background (not focused). Defaults to
       false.
+
+      * private - a boolean field representing if the new window should be
+      a private window. Defaults to false.
 
       * type - the type of the new window. Can be one of 'tab' or 'window'.
       Defaults to 'tab'.
@@ -980,7 +1009,7 @@ SUBROUTINES/METHODS
 
       * sandbox - Name of the sandbox to evaluate the script in. The
       sandbox is cached for later re-use on the same window
-      <https://developer.mozilla.org/en-US/docs/Web/API/Window>object if
+      <https://developer.mozilla.org/en-US/docs/Web/API/Window> object if
       new is false. If he parameter is undefined, the script is evaluated
       in a mutable sandbox. If the parameter is "system", it will be
       evaluted in a sandbox with elevated system privileges, equivalent to

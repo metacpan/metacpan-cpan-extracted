@@ -37,6 +37,12 @@ Types::Standard
 
 =cut
 
+=inherits
+
+Type::Library
+
+=cut
+
 =description
 
 This package provides an abstract base class which turns the consumer into a

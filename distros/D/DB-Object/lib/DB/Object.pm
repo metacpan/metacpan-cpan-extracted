@@ -1,7 +1,7 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version 0.9.1
+## Version 0.9.2
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
@@ -32,7 +32,7 @@ BEGIN
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH, $CACHE_DIR );
     our( $CONSTANT_QUERIES_CACHE );
-    $VERSION     = '0.9.1';
+    $VERSION     = '0.9.2';
     use Devel::Confess;
 };
 
@@ -2417,68 +2417,75 @@ DB::Object - SQL API
 
     use DB::Object;
 
-    my $db = DB::Object->new();
-    my $dbh = DB::Object->connect();
-    
+	my $dbh = DB::Object->connect({
+	driver => 'Pg',
+	conf_file => 'db-settings.json',
+	database => 'webstore',
+	host => 'localhost',
+	login => 'store-admin',
+	schema => 'auth',
+	debug => 3,
+	}) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
+	
+	# Legacy regular query
     my $sth = $dbh->prepare( "SELECT login,name FROM login WHERE login='jack'" ) ||
     die( $dbh->errstr() );
     $sth->execute() || die( $sth->errstr() );
     my $ref = $sth->fetchrow_hashref();
     $sth->finish();
-    
-    ## Get the table 'login' object
-    my $login = $dbh->login();
-    $login->where( "login='jack'" );
-    ## Or using OR instead of AND in where:
-    $login->where( $dbh->OR( login => 'jack', login => 'joe' ) );
-    ## Or even:
-    $login->where( $dbh->AND( login => $dbh->NOT( 'jack' ), login => $dbh->NOT( 'joe' ) ) );
-    ## Now, much better less hassle ;-)
-    my $ref = $login->select->fetchrow_hashref();
-    ## This will produce:
-    SELECT field1, field2, .... FROM login WHERE login != 'jack' AND login != 'joe'
-    
-    ## Now let's join
-    my $login = $dbh->login();
-    $login->where( "login='jack'" );
-    ## We get all info regarding user jack and his list
-    my $ref = $login->select->join( 'list' )->fetchrow_hashref();
-    
-    ## Same but we give it a higher priority. Having fun obviously...
-    my $ref = $login->select->join( 'list' )->priority( 1 )->fetchrow_hashref();
-    
-    ## Copy user jack info to user bob
-    $login->where( "login='jack'" );
-    $login->copy( 'login' => 'bob' );
-    
-    ## Insert some data. Anything we do not provide will fall back to default values
-    $login->insert( 'login' => 'bob' );
-    ## Same but with a low *non waiting* flag
-    $login->insert( 'login' => 'bob' )->wait();
-    ## Same but ignore if already exists or error occur
-    $login->insert( 'login' => 'jack' )->ignore();
-    
+	
+	# Get a list of databases;
+	my @databases = $dbh->databases;
+	# Doesn't exist? Create it:
+	my $dbh2 = $dbh->create_db( 'webstore' );
+	# Load some sql into it
+	my $rv = $dbh2->do( $sql ) || die( $dbh->error );
+	
+	# Check a table exists
+	$dbh->table_exists( 'customers' ) || die( "Cannot find the customers table!\n" );
+	
+	# Get list of tables, as array reference:
+	my $tables = $dbh->tables;
+	
+	my $cust = $dbh->customers || die( "Cannot get customers object." );
+	$cust->where( email => 'john@example.org' );
+	my $str = $cust->delete->as_string;
+	# Becomes: DELETE FROM customers WHERE email='john\@example.org'
+	
+	# Do some insert with transaction
+	$dbh->begin_work;
+	# Making some other inserts and updates here...
+	my $cust_sth_ins = $cust->insert(
+		first_name => 'Paul',
+		last_name => 'Goldman',
+		email => 'paul@example.org',
+		active => 0,
+	) || do
+	{
+		# Rollback everything since the begin_work
+		$dbh->rollback;
+		die( "Error while create query to add data to table customers: " . $cust->error );
+	};
+	$result = $cust_sth_ins->as_string;
+	# INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
+	$dbh->commit;
     ## Get the last used insert id
     my $id = $dbh->last_insert_id();
     
-    ## Delete that user
-    ## you'd better specify a where clause or you'll find yourself
-    ## suppressing everything in the table...
-    $login->where( "login='bob'" );
-    $login->delete();
-    ## But you could also write
-    my $rows = $login->delete( "login='bob'" )->rows();
-    
-    ## Make a query but get the qery string instead of performing it in real
-    $login->where( "login like 'jac%'" );
-    $login->limit( 10 );
-    $login->group( 'last_name' );
-    $login->order( 'last_name' );
-    ## Reverse sorting
-    $login->reverse();
-    print( STDOUT "Here is my SQL statement:\n",
-    $login->select->join( 'list' )->priority( 1 )->as_string() );
-    
+	$cust->where( email => 'john@example.org' );
+	$cust->order( 'last_name' );
+	$cust->having( email => qr/\@example/ );
+	$cust->limit( 10 );
+	my $cust_sth_sel = $cust->select || die( "An error occurred while creating a query to select data frm table customers: " . $cust->error );
+	# Becomes:
+	# SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\@example' ORDER BY last_name LIMIT 10
+	
+	$cust->reset;
+	$cust->where( email => 'john@example.org' );
+	my $cust_sth_upd = $cust->update( active => 0 )
+	# Would become:
+	# UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
+	
     ## Lets' dump the result of our query
     ## First to STDERR
     $login->where( "login='jack'" );
@@ -2486,19 +2493,9 @@ DB::Object - SQL API
     ## Now dump the result to a file
     $login->select->dump( "my_file.txt" );
     
-    ## Get that table 'login' structure
-    my $data = $login->structure();
-    
-    ## Some info on the status of the SQL server
-    my $status_ref = $dbh->stat();
-    ## or (it does not matter)
-    my $status_ref = $login->stat();
-    ## optimize the table, i.e. claim for free space and cleanups
-    $login->optimize();
-
 =head1 VERSION
 
-    v0.9.1
+    v0.9.2
 
 =head1 DESCRIPTION
 
@@ -2861,7 +2858,7 @@ B<delete> will refuse to execute a query without a where condition. To achieve t
   $tbl->limit( 1 );
   my $rows_affected = $tbl->delete();
   ## or passing the where condition directly to delete
-  my( $sth ) = $tbl->delete( "login" => "jack" );
+  my $sth = $tbl->delete( "login" => "jack" );
 
 =item B<disconnect>()
 
@@ -2879,10 +2876,10 @@ It returns the statement handler or the number of rows affected.
 
 Example:
 
-  $rc  = $dbh->do( $statement ) || die( $dbh->errstr );
-  $rc  = $dbh->do( $statement, \%attr ) || die( $dbh->errstr );
-  $rv  = $dbh->do( $statement, \%attr, @bind_values ) || die( $dbh->errstr );
-  my( $rows_deleted ) = $dbh->do(
+  $rc = $dbh->do( $statement ) || die( $dbh->errstr );
+  $rc = $dbh->do( $statement, \%attr ) || die( $dbh->errstr );
+  $rv = $dbh->do( $statement, \%attr, @bind_values ) || die( $dbh->errstr );
+  my $rows_deleted = $dbh->do(
   q{
        DELETE FROM table WHERE status = ?
   }, undef(), 'DONE' ) || die( $dbh->errstr );
@@ -3209,11 +3206,11 @@ If the database is different than the current one, it sets the I<multi_db> param
 
 It returns the database handler.
 
-=item B<use_cache>( [ on | off ] )
+=item B<use_cache>( [ 0 | 1 ] )
 
 Sets or get the I<use_cache> parameter.
 
-=item B<use_bind>( [ on | off ] )
+=item B<use_bind>( [ 0 | 1 ] )
 
 Sets or get the I<use_cache> parameter.
 
@@ -3303,7 +3300,7 @@ This is used by B<where>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000-2014 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
 
 =head1 CREDITS
 
@@ -3311,6 +3308,6 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<DBI>, L<Apache::DBI>, L<JDev::Text::DB>
+L<DBI>, L<Apache::DBI>
 
 =cut

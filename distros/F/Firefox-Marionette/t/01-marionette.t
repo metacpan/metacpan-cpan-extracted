@@ -525,7 +525,7 @@ SKIP: {
 		}
 		TODO: {
 			local $TODO = $major_version >= 60 && $^O eq 'darwin' ? "darwin has dodgy support for \$firefox->window_rect()->width()" : $firefox->nightly() ? "Nightly returns incorrect values for \$firefox->window_rect()->width()" : q[];
-			ok($new2->width() == $new->width(), "Window has a width of " . $new->width() . ":" . $new2->width());
+			ok($new2->width() >= $new->width(), "Window has a width of " . $new->width() . ":" . $new2->width());
 		}
 		ok($new2->height() == $new->height(), "Window has a height of " . $new->height());
 		TODO: {
@@ -882,8 +882,9 @@ SKIP: {
 		diag("WebDriver:Print command is supported for " . $capabilities->browser_version());
 		1;
 	} or do {
-		diag("WebDriver:Print command is not supported for " . $capabilities->browser_version());
-		skip("WebDriver:Print command is not supported for " . $capabilities->browser_version(), 2);
+		chomp $@;
+		diag("WebDriver:Print command is not supported for " . $capabilities->browser_version() . ":$@");
+		skip("WebDriver:Print command is not supported for " . $capabilities->browser_version() . ":$@", 2);
 	};
 	ok($raw_pdf =~ /^%PDF\-\d+[.]\d+/smx, "PDF is produced in file handle for pdf method");
 	eval { require PDF::API2; } or do {
@@ -1006,17 +1007,13 @@ SKIP: {
 		skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 3);
 	}
 	ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
-        if ($tls_tests_ok) {
-		ok($firefox->go(URI->new("https://fastapi.metacpan.org/author/DDICK")), "https://fastapi.metacpan.org/author/DDICK has been loaded");
-		if ($major_version < 61) {
-			skip("HAR support not available in Firefox before version 61", 1);
-		}
-		if ($ENV{RELEASE_TESTING}) { # har sometimes hangs
-			my $har = $firefox->har();
-			ok($har->{log}->{creator}->{name} eq 'Firefox', "\$firefox->har() gives a data structure with the correct creator name");
-		}
-	} else {
-		skip("TLS test infrastructure seems compromised", 2);
+	ok($firefox->go(URI->new("https://fastapi.metacpan.org/author/DDICK")), "https://fastapi.metacpan.org/author/DDICK has been loaded");
+	if ($major_version < 61) {
+		skip("HAR support not available in Firefox before version 61", 1);
+	}
+	if ($ENV{RELEASE_TESTING}) { # har sometimes hangs
+		my $har = $firefox->har();
+		ok($har->{log}->{creator}->{name} eq 'Firefox', "\$firefox->har() gives a data structure with the correct creator name");
 	}
 }
 
@@ -1029,12 +1026,16 @@ SKIP: {
 		skip($skip_message, 248);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
-	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
+	my $frame_url = 'https://www.w3schools.com/html/tryit.asp?filename=tryhtml_iframe_height_width';
+	my $frame_element = '//iframe[@name="iframeResult"]';
+	ok($firefox->go(URI->new($frame_url)), "$frame_url has been loaded");
 	ok($firefox->interactive() && $firefox->loaded(), "\$firefox->interactive() and \$firefox->loaded() are ok");
 	ok($firefox->window_handle() =~ /^\d+$/, "\$firefox->window_handle() is an integer:" . $firefox->window_handle());
 	my $chrome_window_handle_supported;
 	eval {
 		$chrome_window_handle_supported = $firefox->chrome_window_handle();
+	} or do {
+		diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version:$@");
 	};
 	SKIP: {
 		if (!$chrome_window_handle_supported) {
@@ -1117,22 +1118,22 @@ SKIP: {
 	TODO: {
 		my $element;
 		eval {
-			$element = $firefox->find('//frame[@name="target1"]')->switch_to_shadow_root();
+			$element = $firefox->find($frame_element)->switch_to_shadow_root();
 		};
 		if ($@) {
 			diag("Switch to shadow root is broken:$@");
 		}
 		local $TODO = "Switch to shadow root can be broken";
-		ok($element, "Switched to target1 shadow root");
+		ok($element, "Switched to $frame_element shadow root");
 	}
 	SKIP: {
 		my $switch_to_frame;
-		eval { $switch_to_frame = $firefox->list('//frame[@name="target1"]')->switch_to_frame() };
+		eval { $switch_to_frame = $firefox->list($frame_element)->switch_to_frame() };
 		if ((!$switch_to_frame) && ($major_version < 50)) {
 			diag("switch_to_frame is not supported for $major_version.$minor_version.$patch_version");
 			skip("switch_to_frame is not supported for $major_version.$minor_version.$patch_version", 1);
 		}
-		ok($switch_to_frame, "Switched to target1 frame");
+		ok($switch_to_frame, "Switched to $frame_element frame");
 	}
 	SKIP: {
 		my $active_frame;
@@ -2095,8 +2096,8 @@ SKIP: {
 		ok($firefox->close_current_window_handle(), "Closed new tab");
 		ok(!check_for_window($firefox, $new_window), "\$firefox->new_window() has closed ");
 		ok($firefox->switch_to_window($old_window), "\$firefox->switch_to_window(\$old_window) has switched focus to original window");
-		$new_window = $firefox->new_window(focus => 1, type => 'window');
-		ok(check_for_window($firefox, $new_window), "\$firefox->new_window() has created a new in focus window");
+		$new_window = $firefox->new_window(focus => 1, type => 'window', private => 1);
+		ok(check_for_window($firefox, $new_window), "\$firefox->new_window() has created a new in focus, private window");
 		$firefox->switch_to_window($new_window);
 		ok($firefox->close_current_window_handle(), "Closed new window");
 		ok(!check_for_window($firefox, $new_window), "\$firefox->new_window() has been closed");

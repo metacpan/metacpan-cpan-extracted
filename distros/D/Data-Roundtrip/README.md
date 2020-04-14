@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
@@ -17,43 +17,51 @@ format (not spaces, indendation or line breaks).
 
     use Data::Roundtrip;
 
-    $jsonstr = '{"Songname: Απόκληρος της κοινωνίας" : "Artist: Καζαντζίδης Στέλιος/Βίρβος Κώστας"}';
+    $jsonstr = '{"Songname": "Απόκληρος της κοινωνίας", "Artist": "Καζαντζίδης Στέλιος/Βίρβος Κώστας"}';
     $yamlstr = json2yaml($jsonstr);
     print $yamlstr;
-    # ---
-    # 'Songname: Απόκληρος της κοινωνίας': 'Artist: Καζαντζίδης Στέλιος/Βίρβος Κώστας'
+    #---
+    #Artist: Καζαντζίδης Στέλιος/Βίρβος Κώστας
+    #Songname: Απόκληρος της κοινωνίας
 
     $yamlstr = json2yaml($jsonstr, {'escape-unicode'=>1});
     print $yamlstr;
-    # ---
-    # 'Songname: \u0391\u03c0\u03cc\u03ba\u03bb\u03b7\u03c1\u03bf\u03c2 \u03c4\u03b7\u03c2 \u03ba\u03bf\u03b9\u03bd\u03c9\u03bd\u03af\u03b1\u03c2': 'Artist: \u039a\u03b1\u03b6\u03b1\u03bd\u03c4\u03b6\u03af\u03b4\u03b7\u03c2 \u03a3\u03c4\u03ad\u03bb\u03b9\u03bf\u03c2/\u0392\u03af\u03c1\u03b2\u03bf\u03c2 \u039a\u03ce\u03c3\u03c4\u03b1\u03c2'
+    #---
+    #Artist: \u039a\u03b1\u03b6\u03b1\u03bd\u03c4\u03b6\u03af\u03b4\u03b7\u03c2 \u03a3\u03c4\u03ad\u03bb\u03b9\u03bf\u03c2/\u0392\u03af\u03c1\u03b2\u03bf\u03c2 \u039a\u03ce\u03c3\u03c4\u03b1\u03c2
+    #Songname: \u0391\u03c0\u03cc\u03ba\u03bb\u03b7\u03c1\u03bf\u03c2 \u03c4\u03b7\u03c2 \u03ba\u03bf\u03b9\u03bd\u03c9\u03bd\u03af\u03b1\u03c2
 
     $backtojson = yaml2json($yamlstr);
     # $backtojson is a string representation of this JSON structure:
-    # {"Songname: Απόκληρος της κοινωνίας":"Artist: Καζαντζίδης Στέλιος/Βίρβος Κώστας"}
+    # {"Artist":"Καζαντζίδης Στέλιος/Βίρβος Κώστας","Songname":"Απόκληρος της κοινωνίας"}
 
     # This is useful when sending JSON via a POST request and it needs unicode escaped:
     $backtojson = yaml2json($yamlstr, {'escape-unicode'=>1});
     # $backtojson is a string representation of this JSON structure:
-    # {"Songname: \u0391\u03c0\u03cc\u03ba\u03bb\u03b7\u03c1\u03bf\u03c2 \u03c4\u03b7\u03c2 \u03ba\u03bf\u03b9\u03bd\u03c9\u03bd\u03af\u03b1\u03c2":"Artist: \u039a\u03b1\u03b6\u03b1\u03bd\u03c4\u03b6\u03af\u03b4\u03b7\u03c2 \u03a3\u03c4\u03ad\u03bb\u03b9\u03bf\u03c2/\u0392\u03af\u03c1\u03b2\u03bf\u03c2 \u039a\u03ce\u03c3\u03c4\u03b1\u03c2"}
+    # but this time with unicode escaped
+    # {"Artist":"\u039a\u03b1\u03b6\u03b1\u03bd\u03c4\u03b6\u03af\u03b4\u03b7\u03c2 \u03a3\u03c4\u03ad\u03bb\u03b9\u03bf\u03c2/\u0392\u03af\u03c1\u03b2\u03bf\u03c2 \u039a\u03ce\u03c3\u03c4\u03b1\u03c2","Songname":"\u0391\u03c0\u03cc\u03ba\u03bb\u03b7\u03c1\u03bf\u03c2 \u03c4\u03b7\u03c2 \u03ba\u03bf\u03b9\u03bd\u03c9\u03bd\u03af\u03b1\u03c2"}
 
     # this is the usual Data::Dumper dump:
     print json2dump($jsonstr);
-    #  $VAR1 = {
-    #    "Songname: \x{391}\x{3c0}\x{3cc}\x{3ba}\x{3bb}\x{3b7}\x{3c1}\x{3bf}\x{3c2} \x{3c4}\x{3b7}\x{3c2} \x{3ba}\x{3bf}\x{3b9}\x{3bd}\x{3c9}\x{3bd}\x{3af}\x{3b1}\x{3c2}" => "Artist: \x{39a}\x{3b1}\x{3b6}\x{3b1}\x{3bd}\x{3c4}\x{3b6}\x{3af}\x{3b4}\x{3b7}\x{3c2} \x{3a3}\x{3c4}\x{3ad}\x{3bb}\x{3b9}\x{3bf}\x{3c2}/\x{392}\x{3af}\x{3c1}\x{3b2}\x{3bf}\x{3c2} \x{39a}\x{3ce}\x{3c3}\x{3c4}\x{3b1}\x{3c2}"
-    #  };
+    #$VAR1 = {
+    #  'Songname' => "\x{391}\x{3c0}\x{3cc}\x{3ba}\x{3bb}\x{3b7}\x{3c1}\x{3bf}\x{3c2} \x{3c4}\x{3b7}\x{3c2} \x{3ba}\x{3bf}\x{3b9}\x{3bd}\x{3c9}\x{3bd}\x{3af}\x{3b1}\x{3c2}",
+    #  'Artist' => "\x{39a}\x{3b1}\x{3b6}\x{3b1}\x{3bd}\x{3c4}\x{3b6}\x{3af}\x{3b4}\x{3b7}\x{3c2} \x{3a3}\x{3c4}\x{3ad}\x{3bb}\x{3b9}\x{3bf}\x{3c2}/\x{392}\x{3af}\x{3c1}\x{3b2}\x{3bf}\x{3c2} \x{39a}\x{3ce}\x{3c3}\x{3c4}\x{3b1}\x{3c2}"
+    #};
 
     # and this is a more human-readable version:
     print json2dump($jsonstr, {'dont-bloody-escape-unicode'=>1});
-    #  $VAR1 = {
-    #    "Songname: Απόκληρος της κοινωνίας" => "Artist: Καζαντζίδης Στέλιος/Βίρβος Κώστας"
-    #  };
+    # $VAR1 = {
+    #   "Artist" => "Καζαντζίδης Στέλιος/Βίρβος Κώστας",
+    #   "Songname" => "Απόκληρος της κοινωνίας"
+    # };
 
     # pass some parameters to Data::Dumper like to be terse (no $VAR1) and no indentation:
     print json2dump($jsonstr,
-      {'dont-bloody-escape-unicode'=>0, 'terse'=>1, 'indent'=>0}
+      {'dont-bloody-escape-unicode'=>0, 'terse'=>1}
     );
-    # {"Songname: \x{391}\x{3c0}\x{3cc}\x{3ba}\x{3bb}\x{3b7}\x{3c1}\x{3bf}\x{3c2} \x{3c4}\x{3b7}\x{3c2} \x{3ba}\x{3bf}\x{3b9}\x{3bd}\x{3c9}\x{3bd}\x{3af}\x{3b1}\x{3c2}" => "Artist: \x{39a}\x{3b1}\x{3b6}\x{3b1}\x{3bd}\x{3c4}\x{3b6}\x{3af}\x{3b4}\x{3b7}\x{3c2} \x{3a3}\x{3c4}\x{3ad}\x{3bb}\x{3b9}\x{3bf}\x{3c2}/\x{392}\x{3af}\x{3c1}\x{3b2}\x{3bf}\x{3c2} \x{39a}\x{3ce}\x{3c3}\x{3c4}\x{3b1}\x{3c2}"}
+    # {
+    #  "Artist" => "Καζαντζίδης Στέλιος/Βίρβος Κώστας",
+    #  "Songname" => "Απόκληρος της κοινωνίας"
+    # }
 
     # this is how to reformat a JSON string to have its unicode content escaped:
     my $json_with_unicode_escaped = json2json($jsonstr, {'escape-unicode'=>1});
@@ -65,8 +73,6 @@ format (not spaces, indendation or line breaks).
 # EXPORT
 
 By default no symbols are exported. However, the following export tags are available (:all will export all of them):
-
-over 4
 
 - `:json` :
 `perl2json()`,
@@ -306,8 +312,8 @@ Replace [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper) with [Data::Du
 
 # SEE ALSO
 
-- [Convert JSON to Perl and back with unicode ](https://metacpan.org/pod/%20https%3A#perlmonks.org-node_id-11115241)
-- [RFC: Perl<->JSON<->YAML<->Dumper : roundtripping and possibly with unicode ](https://metacpan.org/pod/%20https%3A#perlmonks.org-node_id-11115280)
+- [Convert JSON to Perl and back with unicode](https://perlmonks.org/?node_id=11115241)
+- [RFC: Perl<->JSON<->YAML<->Dumper : roundtripping and possibly with unicode](https://perlmonks.org/?node_id=11115280)
 
 # SUPPORT
 
@@ -359,15 +365,3 @@ This software, EXCEPT the portion created by \[Corion\] @ Perlmonks,
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 405:
-
-    '=item' outside of any '=over'
-
-- Around line 431:
-
-    You forgot a '=back' before '=head1'

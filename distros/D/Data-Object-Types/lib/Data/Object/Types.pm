@@ -12,7 +12,7 @@ use Data::Object::Types::Keywords;
 
 use base 'Data::Object::Types::Library';
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 extends 'Types::Standard';
 extends 'Types::TypeTiny';

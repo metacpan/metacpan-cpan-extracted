@@ -4,6 +4,9 @@ use strict;
 use warnings;
 
 use utf8;
+
+our $VERSION = '0.02';
+
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDIN, ':encoding(UTF-8)';
@@ -56,13 +59,15 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
-Convert a Perl data structure to JSON
+perl2json.pl : convert a Perl data structure to JSON
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

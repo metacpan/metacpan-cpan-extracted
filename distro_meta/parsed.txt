@@ -63672,3 +63672,13 @@ G/GS/GSG/HealthCheck-Diagnostic-RabbitMQ-v1.1.5.tar.gz
 E/EX/EXODIST/Test-Simple-1.302175.tar.gz
 L/LN/LNATION/Progressive-Web-Application-0.06.tar.gz
 P/PL/PLICEASE/Wasm-0.04.tar.gz
+J/JO/JOENIO/Alien-Doxyparse-0.16.tar.gz
+E/EX/EXODIST/Test2-Harness-1.000018.tar.gz
+A/AW/AWNCORP/Data-Object-Types-0.03.tar.gz
+B/BL/BLIAKO/Data-Roundtrip-0.02.tar.gz
+J/JD/JDEGUEST/DB-Object-0.9.2.tar.gz
+D/DD/DDICK/Firefox-Marionette-0.98.tar.gz
+L/LN/LNATION/Mxpress-PDF-0.22.tar.gz
+F/FE/FELIPE/Net-ACME2-0.35.tar.gz
+S/SL/SLANNING/Net-Graphite-0.19.tar.gz
+T/TI/TIMLEGGE/Net-Saml2-0.20.tar.gz

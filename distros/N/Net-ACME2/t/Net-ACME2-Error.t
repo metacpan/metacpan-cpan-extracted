@@ -35,11 +35,48 @@ use Net::ACME2::Error ();
 
 {
     my $err = Net::ACME2::Error->new(
-        status => 490,
-        type => 'some:general:error',
+        status => 400,
+        type => 'urn:ietf:params:acme:error:rejectedIdentifier',
+        detail => 'Error creating new order :: Cannot issue for "*.lottasubs.tld": Domain name does not end with a valid public suffix (TLD) (and 1 more problems. Refer to sub-problems for more information.)',
         subproblems => [
-            { status => 499, type => 'some:weird:error_yo', identifier => 'id1' },
-            { status => 499, type => 'some:weird:error2', identifier => 'id2' },
+                {
+                    'type'       => 'urn:ietf:params:acme:error:rejectedIdentifier',
+                    'status'     => 400,
+                    'identifier' => {
+                        'type'  => 'dns',
+                        'value' => '*.lottasubs.tld'
+                    },
+                    'detail' => 'Error creating new order :: Domain name does not end with a valid public suffix (TLD)'
+                },
+                {
+                    'detail'     => 'Error creating new order :: Domain name does not end with a valid public suffix (TLD)',
+                    'identifier' => {
+                        'value' => 'www.sub103.lottasubs.tld',
+                        'type'  => 'dns'
+                    },
+                    'status' => 400,
+                    'type'   => 'urn:ietf:params:acme:error:rejectedIdentifier'
+                },
+        ],
+    );
+
+    unlike(
+        $err->to_string(),
+        qr<HASH>,
+        'no HASH in a real-world error’s to_string()',
+    );
+}
+
+{
+    my $err = Net::ACME2::Error->new(
+        status      => 490,
+        type        => 'some:general:error',
+        subproblems => [
+            { status => 499, type => 'some:weird:error_yo',
+                identifier => { type => 'dns', value => 'domain1' }, },
+            { status => 499, type => 'some:weird:error2',
+                identifier => { type => 'dns', value => 'domain2' }
+             },
         ],
     );
 
@@ -49,15 +86,15 @@ use Net::ACME2::Error ();
             all(
                 Isa('Net::ACME2::Error::Subproblem'),
                 methods(
-                    identifier => 'id1',
-                    to_string => re( qr<id1: .*499.*some:weird:error_yo> ),
+                    identifier => { type => 'dns', value => 'domain1' },
+                    to_string  => re(qr<dns/domain1: .*499.*some:weird:error_yo>),
                 ),
             ),
             all(
                 Isa('Net::ACME2::Error::Subproblem'),
                 methods(
-                    identifier => 'id2',
-                    to_string => re( qr<id2: .*499.*some:weird:error2> ),
+                    identifier => { type => 'dns', value => 'domain2' },
+                    to_string  => re(qr<dns/domain2: .*499.*some:weird:error2>),
                 ),
             ),
         ],
@@ -69,9 +106,9 @@ use Net::ACME2::Error ();
         qr<
             490 [ ] some:general:error
             .+
-            id1: [ ] 499 [ ] some:weird:error_yo
+            dns/domain1: [ ] 499 [ ] some:weird:error_yo
             .+
-            id2: [ ] 499 [ ] some:weird:error2
+            dns/domain2: [ ] 499 [ ] some:weird:error2
         >x,
         'to_string()',
     );

@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Type::Library';
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 1;
 
@@ -41,6 +41,14 @@ Data-Object Type Library Superclass
 
 This package provides an abstract base class which turns the consumer into a
 L<Type::Library> type library.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Type::Library>
 
 =cut
 

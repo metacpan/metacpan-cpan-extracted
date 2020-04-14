@@ -11,7 +11,7 @@ To install this module, do the usual:
    make test
    make install
 
-Copyright 2012 - 2019 Scott Lanning. All rights reserved.
+Copyright 2012 - 2020 Scott Lanning. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

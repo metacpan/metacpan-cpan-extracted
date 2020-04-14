@@ -21,15 +21,19 @@ use Data::Roundtrip;
 
 use Data::Roundtrip;
 
-my $jsonstr = '{"Songname: Απόκληρος της κοινωνίας" : "Artist: Καζαντζίδης Στέλιος/Βίρβος Κώστας"}';
+my $jsonstr = '{"Songname": "Απόκληρος της κοινωνίας", "Artist": "Καζαντζίδης Στέλιος/Βίρβος Κώστας"}';
 my $yamlstr = Data::Roundtrip::json2yaml($jsonstr);
 print $yamlstr."\n";
-#--- 
-#abc-αβγ: χψζ-xyz 
+#---
+#Artist: Καζαντζίδης Στέλιος/Βίρβος Κώστας
+#Songname: Απόκληρος της κοινωνίας
+
 $yamlstr = Data::Roundtrip::json2yaml($jsonstr, {'escape-unicode'=>1});
 print $yamlstr."\n";
 #---
-#abc-\u03b1\u03b2\u03b3: \u03c7\u03c8\u03b6-xyz
+#Artist: \u039a\u03b1\u03b6\u03b1\u03bd\u03c4\u03b6\u03af\u03b4\u03b7\u03c2 \u03a3\u03c4\u03ad\u03bb\u03b9\u03bf\u03c2/\u0392\u03af\u03c1\u03b2\u03bf\u03c2 \u039a\u03ce\u03c3\u03c4\u03b1\u03c2
+#Songname: \u0391\u03c0\u03cc\u03ba\u03bb\u03b7\u03c1\u03bf\u03c2 \u03c4\u03b7\u03c2 \u03ba\u03bf\u03b9\u03bd\u03c9\u03bd\u03af\u03b1\u03c2
+
 
 # back to json but unescaped unicode chars
 my $backtojson = Data::Roundtrip::yaml2json($yamlstr, {'escape-unicode'=>0});
@@ -68,8 +72,11 @@ print "unescaped dump:\n".$dump."\n";
 $dump = Data::Roundtrip::json2dump($jsonstr,
 	{'dont-bloody-escape-unicode'=>0}
 );
-print "unescaped dump:\n".$dump."\n";
-
+print "escaped dump:\n".$dump."\n";
+$dump = Data::Roundtrip::json2dump($jsonstr,
+	{'dont-bloody-escape-unicode'=>1, 'terse'=>1, 'indent'=>1}
+);
+print "unescaped, terse dump:\n".$dump."\n";
 
 $dump = Data::Roundtrip::json2dump($jsonstr,
 	{'dont-bloody-escape-unicode'=>0, 'terse'=>1, 'indent'=>0}

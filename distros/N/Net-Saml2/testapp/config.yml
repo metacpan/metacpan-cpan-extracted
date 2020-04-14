@@ -1,0 +1,5 @@
+layout: "main"
+#logger: "console"
+appname: "Saml2Test"
+
+idp: "http://sso.dev.venda.com/opensso/saml2/jsp/exportmetadata.jsp"
