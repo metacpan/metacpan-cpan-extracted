@@ -1,0 +1,59 @@
+{
+   "abstract" : "Client for the CIPRES analysis portal",
+   "author" : [
+      "Rutger Vos <rutgeraldo@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Bio-Phylo-CIPRES",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bio::Phylo" : "0",
+            "XML::Twig" : "0",
+            "YAML" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/naturalis/bio-cipres/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/naturalis/bio-cipres.git",
+         "web" : "https://github.com/naturalis/bio-cipres"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

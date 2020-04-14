@@ -1,0 +1,211 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use XML::Twig;
+use Getopt::Long;
+use Data::Dumper;
+use YAML qw(LoadFile);
+use Bio::Phylo::Util::Logger ':levels';
+
+# process command line arguments
+my $verbosity = INFO;
+my $yml       = $ENV{'DATADIR'} . '/cipres_appinfo.yml';
+my $wd        = $ENV{'DATADIR'};
+my $tool; # MAFFT_XSEDE, IQTREE_XSEDE_1_01_01
+
+# extra parameter switches
+my %param     = ( 'vparam.runtime_' => 7.5 );
+# for MAFFT, add:
+# vparam.anysymbol_=1
+
+# for IQTREE, add:
+# vparam.specify_runtype_=2 (i.e. tree inference)
+# vparam.specify_dnamodel_=HKY (i.e. HKY85 model)
+# vparam.bootstrap_type_=bb (ultrafast bootstrap)
+# vparam.use_bnni_=1 (with bnni)
+# vparam.num_bootreps_=1000 (replicates)
+# vparam.specify_numparts_=1 (partitions)
+
+# outfile name(s)
+my @outfile;
+# for MAFFT: output.fasta
+
+# some fasta file in either case
+my $infile;
+GetOptions(
+	'infile=s'  => \$infile,
+	'yaml=s'    => \$yml,
+	'verbose+'  => \$verbosity,
+	'outfile=s' => \@outfile,
+	'tool=s'    => \$tool,
+	'param=s'   => \%param,
+	'wd=s'      => \$wd,
+);
+
+Bio::Phylo::Util::Logger->new( 
+	'-level'  => $verbosity, 
+	'-class'  => 'main' 
+);
+
+run( 
+	'infile'  => $infile, 
+	'yml'     => $yml,
+	'tool'    => $tool,
+	'param'   => \%param,
+	'outfile' => \@outfile,	
+	'wd'      => $wd,
+);
+
+# given $infile and $yml location, returns aligned FASTA
+sub run {
+	my %args = @_;
+	DEBUG 'args: ' . Dumper(\%args);
+	my $info = LoadFile($args{'yml'});
+	DEBUG 'info: ' . Dumper($info);
+	
+	# launch the job
+	INFO "Going to launch " . $args{'tool'};
+	my $status_url = launch_job( 'info' => $info, %args );
+	
+	# poll results
+	POLL: while ( 1 ) {
+		my $status = check_status( $info, $status_url );
+		DEBUG Dumper( $status );
+		if ( $status->{'completed'} eq 'true' ) {
+			my $outfiles = $status->{'outfiles'};
+			my %results = get_results( 
+				'outfiles' => $outfiles, 
+				'info'     => $info,
+				%args, 
+			);
+			
+			#write results
+			for my $name ( keys %results ) {
+				my $path = $args{'wd'} . '/' . $name;
+				open my $fh, '>', $path or die "Couldn't open $path: $!";
+				print $fh $results{$name};
+				close $fh;
+			}
+			last POLL;
+		}
+		sleep 60;
+	}
+}
+
+# given $info, $infile, $outfiles, returns FASTA string
+sub get_results {
+	my %args = @_;
+	DEBUG 'args: ' . Dumper(\%args);	
+	my $command = status_command( $args{'info'}, $args{'outfiles'} );
+	my $result = `$command`;
+	my %outfile;
+	for my $name ( @{ $args{'outfile'} } ) {
+		$outfile{ $name } = undef;
+	}
+	my $location;
+	DEBUG $result;
+	XML::Twig->new(
+		'twig_handlers' => {
+			'results/jobfiles/jobfile' => sub {
+				my $node = $_;
+				my $name = $node->findvalue('filename');
+				if ( exists $outfile{ $name } ) {
+					$outfile{ $name } = $node->findvalue('downloadUri/url');
+				}
+				DEBUG $node->toString;
+			}
+		}
+	)->parse($result);
+	for my $name ( keys %outfile ) {
+		my $location = $outfile{$name};
+		my $resultcommand = status_command( $args{'info'}, $location );
+		$outfile{$name} = `$resultcommand`;
+	}
+	return %outfile;
+}
+
+# given $info and $infile, returns $status_url
+sub launch_job {
+	my %args = @_;
+	DEBUG 'args: ' . Dumper(\%args);		
+	my $command = launch_command( %args );
+
+	# run submission, parse result
+	my $status_url;	
+	my $result = `$command`;
+	DEBUG $result;
+	XML::Twig->new(
+		'twig_handlers' => {
+			'jobstatus/selfUri/url' => sub { $status_url = $_->text }
+		}
+	)->parse($result);
+	return $status_url;
+}
+
+# given $info and $infile, composes cURL command to launch MUSCLE job
+sub launch_command {
+	my %args = @_;
+	DEBUG 'args: ' . Dumper(\%args);		
+	my $CRA_USER = $args{'info'}->{'CRA_USER'};
+	my $PASSWORD = $args{'info'}->{'PASSWORD'};
+	my $KEY      = $args{'info'}->{'KEY'};
+	my $URL      = $args{'info'}->{'URL'};
+	my $tool     = $args{'tool'};
+	my $infile   = $args{'infile'};
+	my @params;
+	for my $key ( keys %{ $args{'param'} } ) {
+		push @params, '-F', join( '=', $key, $args{'param'}->{$key} );
+	}
+	my $command = <<"CURL_COMMAND";
+curl \\
+	--silent \\
+	-u $CRA_USER:$PASSWORD \\
+	-H cipres-appkey:$KEY \\
+	$URL/job/$CRA_USER \\
+	-F tool=$tool  \\
+	-F input.infile_=\@$infile \\
+	-F metadata.statusEmail=true \\
+	@params
+CURL_COMMAND
+	DEBUG $command;
+	return $command;
+}
+
+# given $info, $infile and $status_url, checks and returns terminalStage
+sub check_status {
+	my ( $info, $infile, $status_url ) = @_;
+	my $command = status_command( $info, $infile, $status_url );
+	
+	# post request, fetch result
+	my ( $status, $outfiles );
+	my $result = `$command`;
+	DEBUG $result;
+	XML::Twig->new(
+		'twig_handlers' => {
+			'jobstatus/resultsUri/url' => sub { $outfiles = $_->text },
+			'jobstatus/terminalStage'  => sub { $status   = $_->text }			
+		}
+	)->parse($result);
+	my $time = localtime();
+	INFO "[$time] completed: $status";
+	return { 'completed' => $status, 'outfiles' => $outfiles };
+}
+
+# given $info, $infile and $status_url, composes cURL command to check status
+sub status_command {
+	my ( $info, $status_url ) = @_;
+	DEBUG Dumper(\@_);
+	my $CRA_USER = $info->{'CRA_USER'};
+	my $PASSWORD = $info->{'PASSWORD'};
+	my $KEY      = $info->{'KEY'};
+	my $command = <<"CURL_COMMAND";
+curl \\
+	--silent \\
+	-u $CRA_USER:$PASSWORD \\
+	-H cipres-appkey:$KEY \\
+	$status_url
+CURL_COMMAND
+	DEBUG $command;
+	return $command;
+}
+

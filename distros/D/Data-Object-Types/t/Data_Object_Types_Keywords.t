@@ -21,9 +21,9 @@ Data-Object Type Library Keywords
 
 =includes
 
-function: has_any_of
-function: has_all_of
-function: has_one_of
+function: is_any_of
+function: is_all_of
+function: is_one_of
 function: is_instance_of
 function: is_capable_of
 function: is_comprised_of
@@ -42,9 +42,15 @@ function: register
 
   extends 'Types::Standard';
 
-  register {
+  register
+  {
     name => 'Person',
     aliases => ['Student', 'Teacher'],
+    validation => is_instance_of('Test::Person'),
+    parent => 'Object'
+  },
+  {
+    name => 'Principal',
     validation => is_instance_of('Test::Person'),
     parent => 'Object'
   };
@@ -98,9 +104,9 @@ derived libraries.
   # enum
   # extends
   # from
-  # has_all_of
-  # has_any_of
-  # has_one_of
+  # is_all_of
+  # is_any_of
+  # is_one_of
   # inline_as
   # intersection
   # is_capable_of
@@ -121,16 +127,16 @@ derived libraries.
 
 =cut
 
-=function has_any_of
+=function is_any_of
 
-The has_any_of function accepts one or more callbacks and returns truthy if any
+The is_any_of function accepts one or more callbacks and returns truthy if any
 of the callbacks return truthy.
 
-=signature has_any_of
+=signature is_any_of
 
-has_any_of(CodeRef @checks) : CodeRef
+is_any_of(CodeRef @checks) : CodeRef
 
-=example-1 has_any_of
+=example-1 is_any_of
 
   package Test::Library::HasAnyOf;
 
@@ -140,7 +146,7 @@ has_any_of(CodeRef @checks) : CodeRef
 
   extends 'Types::Standard';
 
-  my $validation = has_any_of(
+  my $validation = is_any_of(
     sub {
       my ($value) = @_;
 
@@ -165,16 +171,16 @@ has_any_of(CodeRef @checks) : CodeRef
 
 =cut
 
-=function has_all_of
+=function is_all_of
 
-The has_all_of function accepts one or more callbacks and returns truthy if all
+The is_all_of function accepts one or more callbacks and returns truthy if all
 of the callbacks return truthy.
 
-=signature has_all_of
+=signature is_all_of
 
-has_all_of(CodeRef @checks) : CodeRef
+is_all_of(CodeRef @checks) : CodeRef
 
-=example-1 has_all_of
+=example-1 is_all_of
 
   package Test::Library::HasAllOf;
 
@@ -184,7 +190,7 @@ has_all_of(CodeRef @checks) : CodeRef
 
   extends 'Types::Standard';
 
-  my $validation = has_all_of(
+  my $validation = is_all_of(
     sub {
       my ($value) = @_;
 
@@ -209,16 +215,16 @@ has_all_of(CodeRef @checks) : CodeRef
 
 =cut
 
-=function has_one_of
+=function is_one_of
 
-The has_one_of function accepts one or more callbacks and returns truthy if
+The is_one_of function accepts one or more callbacks and returns truthy if
 only one of the callbacks return truthy.
 
-=signature has_one_of
+=signature is_one_of
 
-has_one_of(CodeRef @checks) : CodeRef
+is_one_of(CodeRef @checks) : CodeRef
 
-=example-1 has_one_of
+=example-1 is_one_of
 
   package Test::Library::HasOneOf;
 
@@ -228,7 +234,7 @@ has_one_of(CodeRef @checks) : CodeRef
 
   extends 'Types::Standard';
 
-  my $validation = has_one_of(
+  my $validation = is_one_of(
     sub {
       my ($value) = @_;
 
@@ -255,8 +261,9 @@ has_one_of(CodeRef @checks) : CodeRef
 
 =function is_instance_of
 
-The is_instance_of function accepts a class or package name and returns truthy
-if the value passed to the callback inherits from it.
+The is_instance_of function accepts a class or package name and returns a
+callback which returns truthy if the value passed to the callback inherits from
+the class or package specified.
 
 =signature is_instance_of
 
@@ -286,9 +293,9 @@ is_instance_of(Str $name) : CodeRef
 
 =function is_comprised_of
 
-The is_comprised_of function accepts one or more names and returns truthy if
-the value passed is a hashref or hashref based object which has keys that
-correspond to the names provided.
+The is_comprised_of function accepts one or more names and returns a callback
+which returns truthy if the value passed to the callback is a hashref or
+hashref based object which has keys that correspond to the names provided.
 
 =signature is_comprised_of
 
@@ -318,8 +325,8 @@ is_comprised_of(Str @names) : CodeRef
 
 =function is_consumer_of
 
-The is_consumer_of function accepts a role name and returns truthy if the value
-passed to the callback consumes it.
+The is_consumer_of function accepts a role name and returns a callback which
+returns truthy if the value passed to the callback consumes the role specified.
 
 =signature is_consumer_of
 
@@ -349,9 +356,9 @@ is_consumer_of(Str $name) : CodeRef
 
 =function is_capable_of
 
-The is_capable_of function accepts one or more subroutine names and returns
-truthy if the value passed to the callback has implemented all of the routines
-specified.
+The is_capable_of function accepts one or more subroutine names and returns a
+callback which returns truthy if the value passed to the callback has
+implemented all of the routines specified.
 
 =signature is_capable_of
 
@@ -503,6 +510,10 @@ $subs->synopsis(fun($tryable) {
   ok my $result = $tryable->result;
   ok $result->isa('Data::Object::Types::Library');
   ok $result->isa('Type::Library');
+  ok $result->get_type('Person');
+  ok $result->get_type('Student');
+  ok $result->get_type('Teacher');
+  ok $result->get_type('Principal');
 
   $result
 });
@@ -582,7 +593,7 @@ $subs->scenario('exports', fun($tryable) {
   }
 }
 
-$subs->example(-1, 'has_any_of', 'function', fun($tryable) {
+$subs->example(-1, 'is_any_of', 'function', fun($tryable) {
   ok my $result = $tryable->result;
   ok $result->(Test::Person->new);
   ok !$result->(Test::Entity->new);
@@ -590,14 +601,14 @@ $subs->example(-1, 'has_any_of', 'function', fun($tryable) {
   $result
 });
 
-$subs->example(-1, 'has_all_of', 'function', fun($tryable) {
+$subs->example(-1, 'is_all_of', 'function', fun($tryable) {
   ok my $result = $tryable->result;
   ok $result->(Test::Person->new);
 
   $result
 });
 
-$subs->example(-1, 'has_one_of', 'function', fun($tryable) {
+$subs->example(-1, 'is_one_of', 'function', fun($tryable) {
   ok my $result = $tryable->result;
   ok $result->(Test::Student->new);
   ok $result->(Test::Teacher->new);

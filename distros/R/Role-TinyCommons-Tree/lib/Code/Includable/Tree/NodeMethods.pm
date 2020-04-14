@@ -1,11 +1,13 @@
 package Code::Includable::Tree::NodeMethods;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-24'; # DATE
+our $DATE = '2020-04-14'; # DATE
 our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.122'; # VERSION
+our $VERSION = '0.124'; # VERSION
 
 use strict;
+our $IGNORE_NO_CHILDREN_METHOD = 1;
+
 our $GET_PARENT_METHOD = 'parent';
 our $GET_CHILDREN_METHOD = 'children';
 our $SET_PARENT_METHOD = 'parent';
@@ -18,7 +20,16 @@ use Scalar::Util ();
 # like children, but always return list
 sub _children_as_list {
     my $self = shift;
-    my @children = $self->$GET_CHILDREN_METHOD;
+    my @children;
+    if ($IGNORE_NO_CHILDREN_METHOD) {
+        eval {
+            @children = $self->$GET_CHILDREN_METHOD;
+        };
+        return () if $@;
+    } else {
+        @children = $self->$GET_CHILDREN_METHOD;
+    }
+
     if (@children == 1) {
         return () unless defined($children[0]);
         return @{$children[0]} if ref($children[0]) eq 'ARRAY';
@@ -26,6 +37,7 @@ sub _children_as_list {
     @children;
 }
 
+# direct children first
 sub _descendants {
     my ($self, $res) = @_;
     my @children = _children_as_list($self);
@@ -37,6 +49,22 @@ sub descendants {
     my $self = shift;
     my $res = [];
     _descendants($self, $res);
+    @$res;
+}
+
+sub _descendants_depth_first {
+    my ($self, $res) = @_;
+    my @children = _children_as_list($self);
+    for (@children) {
+        push @$res, $_;
+        _descendants_depth_first($_, $res);
+    }
+}
+
+sub descendants_depth_first {
+    my $self = shift;
+    my $res = [];
+    _descendants_depth_first($self, $res);
     @$res;
 }
 
@@ -261,7 +289,7 @@ Code::Includable::Tree::NodeMethods - Tree node routines
 
 =head1 VERSION
 
-This document describes version 0.122 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-24.
+This document describes version 0.124 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-04-14.
 
 =head1 DESCRIPTION
 
@@ -277,6 +305,11 @@ object as the first argument, e.g.:
 =for Pod::Coverage .+
 
 =head1 VARIABLES
+
+=head2 $IGNORE_NO_CHILDREN_METHOD => bool (default: 1)
+
+If set to true (the default), when a node object does not support a "get
+children" method, we do not die and assume it does not have children.
 
 =head2 $GET_PARENT_METHOD => str (default: parent)
 
@@ -330,6 +363,30 @@ root node).
 
 Return a list of descendents, from the direct children, to their children's
 children, and so on until all the leaf nodes.
+
+For example, for this tree:
+
+ A
+ |-- B
+ |   |-- D
+ |   |-- E
+ |   `-- F
+ `-- C
+     |-- G
+     |   `-- I
+     `-- H
+
+the nodes returned for C<< descendants(A) >> would be:
+
+ B C D E F G H I
+
+=head2 descendants_depth_first
+
+Like L</descendants>, except will return in depth-first order. For example,
+using the same object in the L</descendants> example, C<<
+descendants_depth_first(A) >> will return:
+
+ B D E F C G I H
 
 =head2 first_node
 

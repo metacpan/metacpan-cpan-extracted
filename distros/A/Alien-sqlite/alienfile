@@ -32,10 +32,10 @@ share {
   my $with_local = '';
   my $with_cpp11 = '';
 
-  #  need to work out how to get latest
-  start_url 'https://www.sqlite.org/2018/sqlite-autoconf-3260000.tar.gz';
+  #  need to work out how to get latest without updating next lines
+  start_url 'https://www.sqlite.org/2020/sqlite-autoconf-3310100.tar.gz';
   plugin Download => (
-    version => '3.26.0',
+    version => '3.31.1',
   );
   
   my $lib_version = get_lib_version() // 'not yet defined';

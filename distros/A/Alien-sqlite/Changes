@@ -1,5 +1,9 @@
 Revision history for Alien::sqlite
 
+1.04 2020-04-14
+    - Release from system using Mojo::DOM58 so Mojolicious is not
+      listed in the dependencies on CPAN (thanks Todd Rinaldo for flagging)
+
 1.03 2020-04-13
     - Rename .la files on Windows as they can interfere with
       compilation of dependent Aliens like gdal

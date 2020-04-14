@@ -17,7 +17,7 @@ open(my $fh, '<', "Makefile")
 my $version;
 local $_;
 while(<$fh>) {
-    $version = /^VERSION\s*=\s*(.*)/ and last;
+    ($version) = /^VERSION\s*=\s*(.*)/ and last;
 }
 close($fh);
 
@@ -39,6 +39,8 @@ my @consts = (
   [qw(	enum	NODEIDTYPE		types		)],
   [qw(	define	TYPES			types_generated	)],
   [qw(	define	NS0ID			nodeids		)],
+  # needed for production
+  [qw(	enum	NODECLASS		types_generated	)],
 );
 
 parse_consts($version, @consts);

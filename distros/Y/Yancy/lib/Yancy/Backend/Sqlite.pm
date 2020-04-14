@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '1.051';
+our $VERSION = '1.052';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -179,7 +179,7 @@ sub column_info_extra {
     for my $c ( @$columns ) {
         my $col_name = $c->{COLUMN_NAME};
         my %conf;
-        $conf{auto_increment} = 1 if $sql =~ /${col_name}\s*[^,\)]+AUTOINCREMENT/i;
+        $conf{auto_increment} = 1 if $sql =~ /${col_name}\s+[^,\)]+AUTOINCREMENT/i;
         if ( $sql =~ /${col_name}[^,\)]+CHECK\s*(.+)\)\s*$/si ) {
             # Column has a check constraint, see if it's an enum-like
             my $check = $1;
@@ -210,7 +210,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 1.051
+version 1.052
 
 =head1 SYNOPSIS
 

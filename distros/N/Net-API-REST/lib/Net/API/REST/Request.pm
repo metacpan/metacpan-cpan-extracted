@@ -1097,9 +1097,9 @@ This is designed to work under modperl.
 
 Normally, one would need to know which method to access across various Apache2 mod perl modules, which makes development more time consuming and even difficult, because of the scattered documentation and even sometime outdated.
 
-This module alleviate this problem by providing all the necessary methods in one place. Also, at the contrary of C<Apache2> modules suit, all the methods here are die safe. When an error occurs, it will always return undef() and the error will be able to be accessed using B<error> object, which is a C<Module::Generic::Exception> object.
+This module alleviate this problem by providing all the necessary methods in one place. Also, at the contrary of C<Apache2> modules suit, all the methods here are die safe. When an error occurs, it will always return undef() and the error will be able to be accessed using B<error> object, which is a L<Module::Generic::Exception> object.
 
-Fo its alter ego to manipulate outgoing http response, use the C<Net::API::REST::Response> module.
+Fo its alter ego to manipulate outgoing http response, use the L<Net::API::REST::Response> module.
 
 =head1 METHODS
 
@@ -1111,7 +1111,7 @@ This initiates the package and take the following parameters:
 
 =item I<request>
 
-This is a required parameter to be sent with a value set to a C<Apache2::RequestRec> object
+This is a required parameter to be sent with a value set to a L<Apache2::RequestRec> object
 
 =item I<checkonly>
 
@@ -1167,7 +1167,7 @@ If this is disabled, you need to make sure to manually update the counter, such 
 
 	$req->connection->keepalives( $req->connection->keepalives + 1 );
 
-See C<Apache2::RequestRec> for more information on this.
+See L<Apache2::RequestRec> for more information on this.
 
 =head2 body( name )
 
@@ -1179,7 +1179,7 @@ An optional name parameter can be passed to return the POST data parameter assoc
 
 	my $foo_body = $req->body("foo");
 
-This is similar to the C<param> method with slight difference. Check C<Apache2::Request> for more information.
+This is similar to the C<param> method with slight difference. Check L<Apache2::Request> for more information.
 
 =head2 charset()
 
@@ -1197,7 +1197,7 @@ This is useful and intended when testing this module offline.
 
 Terminate the current worker process as soon as the current request is over.
 
-See C<Apache::RequestUtil> for more information.
+See L<Apache::RequestUtil> for more information.
 
 =head2 client_api_version()
 
@@ -1211,7 +1211,7 @@ An example header to require api version 1.0 would be:
 
 This close the client connection.
 
-This is not implemented in by C<APR::Socket>, so this is an efficient work around.
+This is not implemented in by L<APR::Socket>, so this is an efficient work around.
 
 However, a word of caution, you most likely do not need or want to close manually the client connection and instea have your method return Apache2::Const::OK or any other constant matching the http code you want to return.
 
@@ -1219,7 +1219,7 @@ However, a word of caution, you most likely do not need or want to close manuall
 
 Returns the response status code.
 
-From the C<Apache2::RequestRec> documentation:
+From the L<Apache2::RequestRec> documentation:
 
 Usually you will set this value indirectly by returning the status code as the handler's function result.  However, there are rare instances when you want to trick Apache into thinking that the module returned an "Apache2::Const::OK" status code, but actually send the browser a non-OK status. This may come handy when implementing an HTTP proxy handler.  The proxy handler needs to send to the client, whatever status code the proxied server has returned, while returning "Apache2::Const::OK" to Apache. e.g.:
 
@@ -1228,15 +1228,15 @@ Usually you will set this value indirectly by returning the status code as the h
 
 =head2 connection()
 
-Returns a C<Apache2::Connection> object.
+Returns a L<Apache2::Connection> object.
 
 =head2 connection_id()
 
-Returns the connection id; unique at any point in time. See C<Apache2::Connection> for more information.
+Returns the connection id; unique at any point in time. See L<Apache2::Connection> for more information.
 
 =head2 content()
 
-Returns the content of the file specified with C<$req->filename>. It calls B<slurp_filename> from C<Apache2::Request>, but instead of returning a scalar reference, it returns the data itself.
+Returns the content of the file specified with C<$req->filename>. It calls B<slurp_filename> from L<Apache2::Request>, but instead of returning a scalar reference, it returns the data itself.
 
 =head2 content_encoding()
 
@@ -1252,17 +1252,17 @@ Returns the length in byte of the request body.
 
 =head2 content_type()
 
-Retrieves the value of the Content-type header value. See C<Apache2::RequestRec> for more information.
+Retrieves the value of the Content-type header value. See L<Apache2::RequestRec> for more information.
 
 =head2 cookie( name )
 
 Returns the current value for the given cookie name.
 
-This works by calling the B<cookies> method, which returns a cookie jar object which is a C<Net::API::REST::Cookies> object.
+This works by calling the B<cookies> method, which returns a cookie jar object which is a L<Net::API::REST::Cookies> object.
 
 =head2 cookies()
 
-Returns a C<Net::API::REST::Cookies> object acting as a jar with various methods to access, manipulate and create cookies.
+Returns a L<Net::API::REST::Cookies> object acting as a jar with various methods to access, manipulate and create cookies.
 
 =head2 data()
 
@@ -1278,7 +1278,7 @@ Retrieve the document root for this server.
 
 If a value is provided, it sets the document root to a new value only for the duration of the current request.
 
-See C<Apache2::RequestUtil> for more information.
+See L<Apache2::RequestUtil> for more information.
 
 =head2 env
 
@@ -1286,7 +1286,7 @@ See C<Apache2::RequestUtil> for more information.
 
 Get/set MIME response headers, printed even on errors and persist across internal redirects.
 
-According to the C<Apache2::RequestRec> documentation:
+According to the L<Apache2::RequestRec> documentation:
 
 The difference between "headers_out" and "err_headers_out", is that the latter are printed even on error, and persist across internal redirects (so the headers printed for "ErrorDocument" handlers will have them).
 
@@ -1302,19 +1302,19 @@ If the handler does:
 
 the C<Set-Cookie> header won't be sent.
 
-See C<Apache2::RequestRec> for more information.
+See L<Apache2::RequestRec> for more information.
 
 =head2 filename( string )
 
 Get/set the filename on disk corresponding to this response
 
-See C<Apache2::RequestRec> for more information.
+See L<Apache2::RequestRec> for more information.
 
 =head2 finfo()
 
 Get and set the finfo request record member
 
-See C<Apache2::RequestRec> for more information.
+See L<Apache2::RequestRec> for more information.
 
 =head2 get_handlers( hook_name )
 
@@ -1340,9 +1340,9 @@ will print:
 
 =head2 global_request()
 
-Returns the C<Apache2::RequestRec> object made global with the proper directive in the Apache VirtualHost configuration.
+Returns the L<Apache2::RequestRec> object made global with the proper directive in the Apache VirtualHost configuration.
 
-This calls the module C<Apache::RequestUtil> to retrieve this value.
+This calls the module L<Apache::RequestUtil> to retrieve this value.
 
 =head2 headers( string )
 
@@ -1370,7 +1370,7 @@ Returns or sets the key => value pairs of outgoing http headers, only on 2xx res
 
 See also "err_headers_out", which allows to set headers for non-2xx responses and persist across internal redirects.
 
-More information at C<Apache2::RequestRec>
+More information at L<Apache2::RequestRec>
 
 =head2 hostname( [ hostname ] )
 
@@ -1378,7 +1378,7 @@ Retrieve or set the http server host name, such as www.example.com.
 
 This is not the machine hostname.
 
-More information at C<Apache2::RequestRec>
+More information at L<Apache2::RequestRec>
 
 =head2 http_host()
 
@@ -1386,7 +1386,7 @@ Returns an C<URI> object of the http host being accessed. This is created during
 
 =head2 id()
 
-Returns the connection id; unique at any point in time. See C<Apache2::Connection> for more information.
+Returns the connection id; unique at any point in time. See L<Apache2::Connection> for more information.
 
 This is the same as B<connection_id>()
 
@@ -1402,12 +1402,12 @@ Returns the value of the http header C<If-None-Match>
 
 =head2 input_filters( [ filter ] )
 
-Get/set the first filter in a linked list of request level input filters. It returns a C<Apache2::Filter> object.
+Get/set the first filter in a linked list of request level input filters. It returns a L<Apache2::Filter> object.
 
 	$input_filters      = $r->input_filters();
 	$prev_input_filters = $r->input_filters( $new_input_filters );
 
-According to the C<Apache2::RequestRec> documentation:
+According to the L<Apache2::RequestRec> documentation:
 
 For example instead of using C<$r->read()> to read the POST data, one could use an explicit walk through incoming bucket brigades to get that data. The following function C<read_post()> does just that (in fact that's what C<$r->read()> does behind the scenes):
 
@@ -1469,7 +1469,7 @@ For example to check whether the "SetupEnv" option is enabled for the current re
 
 See also: PerlOptions and the equivalent function for server level PerlOptions flags.
 
-See the C<Apache2::RequestUtil> module documentation for more information.
+See the L<Apache2::RequestUtil> module documentation for more information.
 
 =head2 json()
 
@@ -1497,7 +1497,7 @@ This method answers the question: Should the the connection be kept alive for an
 
 Notice that new states could be added later by Apache, so your code should make no assumptions and do things only if the desired state matches.
 
-See C<Apache2::Connection> for more information.
+See L<Apache2::Connection> for more information.
 
 =head2 keepalives()
 
@@ -1507,7 +1507,7 @@ This method is only relevant for keepalive connections. The core connection outp
 
 If you send your own set of HTTP headers with "$r->assbackwards", which includes the "Keep-Alive" HTTP response header, you must make sure to increment the "keepalives" counter.
 
-See C<Apache2::Connection> for more information.
+See L<Apache2::Connection> for more information.
 
 =head2 languages()
 
@@ -1539,7 +1539,7 @@ Returns a string.
 
 =head2 main()
 
-Get the main request record and returns a C<Apache2::RequestRec> object.
+Get the main request record and returns a L<Apache2::RequestRec> object.
 
 If the current request is a sub-request, this method returns a blessed reference to the main request structure. If the current request is the main request, then this method returns C<undef>.
 
@@ -1561,7 +1561,7 @@ Returns a timestamp in second since epoch.
 
 Pointer to the redirected request if this is an external redirect.
 
-Returns a C<Apache2::RequestRec> blessed reference to the next (internal) request structure or C<undef> if there is no next request.
+Returns a L<Apache2::RequestRec> blessed reference to the next (internal) request structure or C<undef> if there is no next request.
 
 =head2 no_cache()
 
@@ -1576,7 +1576,7 @@ A false value unsets the "no_cache" request record member and the mentioned head
 
 This method should be invoked before any response data has been sent out.
 
-See C<Apache2::RequestUtil> for more information.
+See L<Apache2::RequestUtil> for more information.
 
 =head2 notes( string )
 
@@ -1584,15 +1584,15 @@ Get/set text notes for the duration of this request. These notes can be passed f
 
 If a new value was passed, returns the previous value.
 
-The returned value is a C<APR::Table> object.
+The returned value is a L<APR::Table> object.
 
 =head2 output_filters( [ filter ] )
 
-Get the first filter in a linked list of request level output filters. It returns a C<Apache2::Filter> object.
+Get the first filter in a linked list of request level output filters. It returns a L<Apache2::Filter> object.
 
 If a new output filters was passed, returns the previous value.
 
-According to the C<Apache::RequestRec> documentation:
+According to the L<Apache::RequestRec> documentation:
 
 For example instead of using C<$r->print()> to send the response body, one could send the data directly to the first output filter. The following function C<send_response_body()> does just that:
 
@@ -1617,13 +1617,13 @@ In fact that's what C<$r->read()> does behind the scenes. But it also knows to p
        
 =head2 params( key => value )
 
-Get the request parameters (using case-insensitive keys) by mimicing the OO interface of C<CGI::param>.
+Get the request parameters (using case-insensitive keys) by mimicing the OO interface of L<CGI::param>.
 
 It can take as argument, only a key and it will then retrive the corresponding value, or it can take a key and value pair.
 
 If the value is an array, this will set multiple entry of the key for each value provided.
 
-This uses Apache C<APR::Table> and works for both POST and GET methods.
+This uses Apache L<APR::Table> and works for both POST and GET methods.
 
 If the methods received was a GET method, this method returns the value of the B<query> method instead.
 
@@ -1639,7 +1639,7 @@ Returns the json data decoded into a perl structure. This is set at object initi
 
 =head2 per_dir_config()
 
-Get the dir config vector. Returns a C<Apache2::ConfVector> object.
+Get the dir config vector. Returns a L<Apache2::ConfVector> object.
 
 For an in-depth discussion, refer to the Apache Server Configuration Customization in Perl chapter.
 
@@ -1661,7 +1661,7 @@ Note: sharing variables really means it. The variable is not copied.  Only its r
 	 
 =head2 pool()
 
-Returns the pool associated with the request as a C<APR::Pool> object.
+Returns the pool associated with the request as a L<APR::Pool> object.
 
 =head2 preferred_language( array ref )
 
@@ -1673,7 +1673,7 @@ It returns a string representing a language code.
 
 Pointer to the previous request if this is an internal redirect.
 
-Returns a C<Apache2::RequestRec> blessed reference to the previous (internal) request structure or "undef" if there is no previous request.
+Returns a L<Apache2::RequestRec> blessed reference to the previous (internal) request structure or "undef" if there is no previous request.
 
 =head2 protocol()
 
@@ -1685,7 +1685,7 @@ Get/set the proxyrec request record member and optionally adjust other related f
 
 Valid values are: PROXYREQ_NONE, PROXYREQ_PROXY, PROXYREQ_REVERSE, PROXYREQ_RESPONSE
 
-According to the C<Apache2::RequestRec> documentation:
+According to the L<Apache2::RequestRec> documentation:
 
 For example to turn a normal request into a proxy request to be handled on the same server in the "PerlTransHandler" phase run:
 
@@ -1730,15 +1730,15 @@ Anonymous functions:
 
 	 $r->push_handlers(PerlLogHandler => sub { return Apache2::Const::OK });
 
-See C<Apache::RequestUtil> for more information.
+See L<Apache::RequestUtil> for more information.
 
 =head2 query()
 
-Check the query string sent in the http request, which obviously should be a GET, but not necessarily, and parse it with C<URI::Query> and return a hash reference.
+Check the query string sent in the http request, which obviously should be a GET, but not necessarily, and parse it with L<URI::Query> and return a hash reference.
 
 =head2 query_string( query string )
 
-Actually calls B<args> from C<Apache2::RequestRec> behind the scene.
+Actually calls B<args> from L<Apache2::RequestRec> behind the scene.
 
 This get/set the request QUERY string.
 
@@ -1749,9 +1749,9 @@ Read data from the client and returns the number of characters actually read.
 	 $cnt = $r->read($buffer, $len);
 	 $cnt = $r->read($buffer, $len, $offset);
 
-This method shares a lot of similarities with the Perl core C<read()> function. The main difference in the error handling, which is done via C<APR::Error> exceptions
+This method shares a lot of similarities with the Perl core C<read()> function. The main difference in the error handling, which is done via L<APR::Error> exceptions
 
-See C<Apache2::RequestIO> for more information.
+See L<Apache2::RequestIO> for more information.
 
 =head2 referer()
 
@@ -1781,11 +1781,11 @@ It takes a http constant integer value representing the http status code and a h
 
 It will convert the perl hash into a json string and return it to the client after setting the http response code.
 
-This method is actually discouraged in favour of the equivalent one B<reply> in C<Net::API::REST>, which is more powerful and versatile.
+This method is actually discouraged in favour of the equivalent one B<reply> in L<Net::API::REST>, which is more powerful and versatile.
 
 =head2 request()
 
-Returns the embedded C<Apache2::RequestRec> object provided initially at object initiation.
+Returns the embedded L<Apache2::RequestRec> object provided initially at object initiation.
 
 =head2 request_time()
 
@@ -1793,27 +1793,27 @@ Time when the request started in second since epoch.
 
 =head2 server()
 
-Get the C<Apache2::ServerRec> object for the server the request $r is running under.
+Get the L<Apache2::ServerRec> object for the server the request $r is running under.
 
 =head2 server_admin()
 
-Returns the server admin as provided by C<Apache2::ServerRec>
+Returns the server admin as provided by L<Apache2::ServerRec>
 
 =head2 server_hostname()
 
-Returns the server host name as provided by C<Apache2::ServerRec>
+Returns the server host name as provided by L<Apache2::ServerRec>
 
 =head2 server_name()
 
 Get the current request's server name
 
-See C<Apache2::RequestUtil> for more information.
+See L<Apache2::RequestUtil> for more information.
 
 =head2 server_port()
 
 Get the current server port
 
-See C<Apache2::RequestUtil> for more information.
+See L<Apache2::RequestUtil> for more information.
 
 =head2 server_version
 
@@ -1823,13 +1823,13 @@ Populate the incoming request headers table ("headers_in") with authentication h
 
 	$r->set_basic_credentials( $username, $password );
 
-See C<Apache2::RequestUtil> for more information.
+See L<Apache2::RequestUtil> for more information.
 
 =head2 set_handlers()
 
 Set a list of handlers to be called for a given phase. Any previously set handlers are forgotten.
 
-See C<Apache2::RequestUtil> for more information.
+See L<Apache2::RequestUtil> for more information.
 
 	 $ok = $r->set_handlers($hook_name => \&handler);
 	 $ok = $r->set_handlers($hook_name => ['Foo::Bar::handler', \&handler2]);
@@ -1846,19 +1846,19 @@ Note that if you assign to "$req->filename" you need to update its stat record.
 
 =head2 socket()
 
-Get/set the client socket and returns a C<APR::Socket> object.
+Get/set the client socket and returns a L<APR::Socket> object.
 
-This calls the B<client_socket> method of the C<Apache2::Connection> package.
+This calls the B<client_socket> method of the L<Apache2::Connection> package.
 
 =head2 status( [ integer ] )
 
 Get/set the reply status for the client request.
 
-Normally you would use some C<Apache2::Const> constant, e.g. C<Apache2::Const::REDIRECT>.
+Normally you would use some L<Apache2::Const> constant, e.g. L<Apache2::Const::REDIRECT>.
 
-From the C<Apache2::RequestRec> documentation:
+From the L<Apache2::RequestRec> documentation:
 
-Usually you will set this value indirectly by returning the status code as the handler's function result. However, there are rare instances when you want to trick Apache into thinking that the module returned an C<Apache2::Const:OK> status code, but actually send the browser a non-OK status. This may come handy when implementing an HTTP proxy handler. The proxy handler needs to send to the client, whatever status code the proxied server has returned, while returning C<Apache2::Const::OK> to Apache. e.g.:
+Usually you will set this value indirectly by returning the status code as the handler's function result. However, there are rare instances when you want to trick Apache into thinking that the module returned an C<Apache2::Const:OK> status code, but actually send the browser a non-OK status. This may come handy when implementing an HTTP proxy handler. The proxy handler needs to send to the client, whatever status code the proxied server has returned, while returning L<Apache2::Const::OK> to Apache. e.g.:
 
          $r->status( $some_code );
          return( Apache2::Const::OK );
@@ -1869,7 +1869,7 @@ See also C<$r->status_line>, which. if set, overrides C<$r->status>.
 
 Get/set the response status line. The status line is a string like C<200 Document follows> and it will take precedence over the value specified using the C<$r->status()> described above.
 
-According to the C<Apache2::RequestRec> documentation:
+According to the L<Apache2::RequestRec> documentation:
 
 When discussing C<$r->status> we have mentioned that sometimes a handler runs to a successful completion, but may need to return a different code, which is the case with the proxy server. Assuming that the proxy handler forwards to the client whatever response the proxied server has sent, it'll usually use C<status_line()>, like so:
 
@@ -1889,7 +1889,7 @@ Here 499 is the new response code, and We have been FooBared is the custom respo
 
 Get/set the Apache C<subprocess_env> table, or optionally set the value of a named entry.
 
-From the C<Apache2::RequestRec> documentation:
+From the L<Apache2::RequestRec> documentation:
 
 When called in VOID context with no arguments, it populate %ENV with special variables (e.g. $ENV{QUERY_STRING}) like mod_cgi does.
 
@@ -1949,7 +1949,7 @@ whereas "$r->unparsed_uri" returns:
 
 Returns a C<URI> object representing the full uri of the request.
 
-This is different from the original C<Apache2::RequestRec> which only returns the path portion of the URI.
+This is different from the original L<Apache2::RequestRec> which only returns the path portion of the URI.
 
 So, to get the path portion using our B<uri> method, one would simply do C<$req->uri->path()>
 
@@ -1973,9 +1973,9 @@ When parsing the endpoint sought by the client request, there may be some variab
 
 	/org/jp/llc/12/directors/23/profile
 
-In this case, llc has an id value of 12 and the director an id value of 23. They will be recorded as variables as instructed by the route map set by the package using C<Net::API::REST>
+In this case, llc has an id value of 12 and the director an id value of 23. They will be recorded as variables as instructed by the route map set by the package using L<Net::API::REST>
 
-Note that this is actually not used anymore and superseded by the C<Net::API::REST::Endpoint> package.
+Note that this is actually not used anymore and superseded by the L<Net::API::REST::Endpoint> package.
 
 =head2 _find_bin( string )
 
@@ -1991,7 +1991,7 @@ This splitting can be tricky because the separator value itself may be enclosed 
 
 Given an object type, a method name and optional parameters, this attempts to call it.
 
-Apache2 methods are designed to die upon error, whereas our model is based on returning C<undef> and setting an exception with C<Module::Generic::Exception>, because we believe that only the main program should be in control of the flow and decide whether to interrupt abruptly the execution, not some sub routines.
+Apache2 methods are designed to die upon error, whereas our model is based on returning C<undef> and setting an exception with L<Module::Generic::Exception>, because we believe that only the main program should be in control of the flow and decide whether to interrupt abruptly the execution, not some sub routines.
 
 =head1 AUTHOR
 
@@ -2003,7 +2003,7 @@ https://git.deguest.jp/jack/Net-API-REST
 
 =head1 SEE ALSO
 
-C<Apache2::Request>, C<Apache2::RequestRec>, C<Apache2::RequestUtil>
+L<Apache2::Request>, L<Apache2::RequestRec>, L<Apache2::RequestUtil>
 
 =head1 COPYRIGHT & LICENSE
 

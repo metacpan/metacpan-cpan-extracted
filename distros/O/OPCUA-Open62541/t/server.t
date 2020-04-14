@@ -16,7 +16,7 @@ throws_ok { OPCUA::Open62541::Server::new() }
     (qr/OPCUA::Open62541::Server::new\(class\) /, "class missing");
 no_leaks_ok { eval { OPCUA::Open62541::Server::new() } } "class missing leak";
 
-warnings_like {
+warning_like {
     throws_ok { OPCUA::Open62541::Server::new(undef) }
 	(qr/Class '' is not OPCUA::Open62541::Server /, "class undef");
 } (qr/uninitialized value in subroutine entry /, "class undef warning");

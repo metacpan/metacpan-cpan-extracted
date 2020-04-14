@@ -1,3 +1,9 @@
+0.623   2020-04-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add routines: get_dir_{,dot_}entries,
+	  get_dir_{,dot_,non_dot_}{files,subdirs}.
+
+
 0.622   2019-08-17  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

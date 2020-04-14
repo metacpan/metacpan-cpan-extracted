@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Github;
-our $VERSION = '1.051';
+our $VERSION = '1.052';
 # ABSTRACT: Authenticate using Github's OAuth2 provider
 
 #pod =head1 SYNOPSIS
@@ -243,7 +243,7 @@ Yancy::Plugin::Auth::Github - Authenticate using Github's OAuth2 provider
 
 =head1 VERSION
 
-version 1.051
+version 1.052
 
 =head1 SYNOPSIS
 

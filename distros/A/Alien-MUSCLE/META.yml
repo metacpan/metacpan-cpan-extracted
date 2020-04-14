@@ -1,0 +1,61 @@
+---
+abstract: 'Discover or easy install of MUSCLE'
+author:
+  - unknown
+build_requires:
+  Alien::Build::MM: '0.25'
+  Archive::Tar: '0'
+  Config: '0'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
+  Mojo::DOM58: '1.00'
+  Net::SSLeay: '1.49'
+  Sort::Versions: '0'
+  Test2::Suite: '0.000129'
+  Test::Alien: '0'
+  URI: '0'
+  URI::Escape: '0'
+configure_requires:
+  Alien::Build: '1.40'
+  Alien::Build::MM: '0.25'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-MUSCLE
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Base: '0'
+  Alien::Build: '2.20'
+  ExtUtils::CBuilder: '0.280226'
+  Mojo::DOM58: '0'
+  Sort::Versions: '0'
+  URI: '0'
+resources:
+  bugtracker: https://github.com/kiwiroy/p5-alien-muscle/issues
+  homepage: https://github.com/kiwiroy/p5-alien-muscle
+  repository: https://github.com/kiwiroy/p5-alien-muscle.git
+version: '0.01'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.21'
+  requires:
+    share:
+      Archive::Tar: '0'
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mojo::DOM58: '1.00'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

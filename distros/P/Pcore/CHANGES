@@ -1,3 +1,7 @@
+v0.131.0 2020-04-14T05:45:54Z
+ - node use individual mutex for each child
+ - use mutex under windows to control parent process presence
+
 v0.130.0 2020-04-13T06:17:49Z
  - api test fixed
  - is_bool method added

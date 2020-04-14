@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.02
+    Version 0.03
 
 SYNOPSIS
 
@@ -16,7 +16,7 @@ SYNOPSIS
     can be presented in a pretty format or in a condensed, machine-readable
     format (not spaces, indendation or line breaks).
 
-        use Data::Roundtrip;
+        use Data::Roundtrip qw/:all/;
     
         $jsonstr = '{"Songname": "Απόκληρος της κοινωνίας", "Artist": "Καζαντζίδης Στέλιος/Βίρβος Κώστας"}';
         $yamlstr = json2yaml($jsonstr);
@@ -87,7 +87,7 @@ EXPORT
 
     :all : everything above
 
-SUBROUTINES/METHODS
+SUBROUTINES
 
  perl2json
 
@@ -279,12 +279,13 @@ SCRIPTS
     this module to the command line. They are part of this distribution and
     can be found in the script directory.
 
-    There files are: json2json.pl, json2yaml.pl, yaml2json.pl json2perl.pl,
+    These files are: json2json.pl, json2yaml.pl, yaml2json.pl json2perl.pl,
     perl2json.pl, yaml2perl.pl
 
 AUTHOR
 
-    Andreas Hadjiprocopis, <bliako at cpan.org>
+    Andreas Hadjiprocopis, <bliako at cpan.org> / <andreashad2 at
+    gmail.com>
 
 BUGS
 
@@ -334,16 +335,21 @@ ACKNOWLEDGEMENTS
 
     Several Monks at PerlMonks.org  (in no particular order):
 
-    haukex 
+    haukex <https://perlmonks.org/?node_id=830549>
 
-    Corion  (the  _qquote_redefinition_by_Corion()  which harnesses
-    Data::Dumper's incessant unicode escaping)
+    Corion <https://perlmonks.org/?node_id=5348> (the 
+    _qquote_redefinition_by_Corion()  which harnesses Data::Dumper's
+    incessant unicode escaping)
 
-    kcott  (The EXPORT section among other suggestions)
+    kcott <https://perlmonks.org/?node_id=861371> (The EXPORT section among
+    other suggestions)
 
-    jwkrahn 
+    jwkrahn <https://perlmonks.org/?node_id=540414>
 
-    leszekdubiel 
+    leszekdubiel <https://perlmonks.org/?node_id=1164259>
+
+    marto
+    <https://perlmonks.org/?node_id=https://perlmonks.org/?node_id=324763>
 
     and an anonymous monk
 
@@ -353,8 +359,8 @@ DEDICATIONS
 
 LICENSE AND COPYRIGHT
 
-    This software, EXCEPT the portion created by [Corion] @ Perlmonks, is
-    Copyright (c) 2020 by Andreas Hadjiprocopis.
+    This software, EXCEPT the portions created by [Corion] @ Perlmonks and
+    [kcott] @ Perlmonks, is Copyright (c) 2020 by Andreas Hadjiprocopis.
 
     This is free software, licensed under:
 

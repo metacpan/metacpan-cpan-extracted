@@ -5,6 +5,8 @@ use Mojolicious::Lite;
 use Test::Mojo;
 use Mojo::Util qw(url_escape);
 
+my $MOJO = Mojolicious->VERSION;
+
 plugin 'AdditionalValidationChecks';
 
 get '/' => sub {
@@ -12,6 +14,18 @@ get '/' => sub {
 
   my $validation = $c->validation;
   $validation->input( $c->req->params->to_hash );
+
+  $validation->optional('phone')->phone();
+
+  my $result = $validation->has_error() ? 0 : 1;
+  $c->render(text => $result );
+};
+
+get '/undef' => sub {
+  my $c = shift;
+
+  my $validation = $c->validation;
+  $validation->input( { phone => undef } );
 
   $validation->optional('phone')->phone();
 
@@ -36,7 +50,7 @@ my %phones = (
     '+230 123 222'       => 1,
     '00230123333'        => 1,
     '+49 5361 90'        => 1,
-    ''                   => 1,
+    ''                   => ( $MOJO > 8.33 ? 0 : 1 ),
 );
 
 my $t = Test::Mojo->new;
@@ -44,5 +58,7 @@ for my $phone ( keys %phones ) {
     my $esc = url_escape $phone;
     $t->get_ok('/?phone=' . $esc)->status_is(200)->content_is( $phones{$phone}, "Phone number: $phone" );
 }
+
+$t->get_ok('/undef')->status_is(200)->content_is( 1, "Phone number: <undef>" );
 
 done_testing();

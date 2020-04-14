@@ -41,7 +41,7 @@ throws_ok { OPCUA::Open62541::Server->newWithConfig() }
 no_leaks_ok { eval { OPCUA::Open62541::Server->newWithConfig() } }
     "config missing leak";
 
-warnings_like {
+warning_like {
     throws_ok { OPCUA::Open62541::Server::newWithConfig(undef, $config) }
 	(qr/Class '' is not OPCUA::Open62541::Server /, "class undef");
 } (qr/uninitialized value in subroutine entry /, "class undef warning");

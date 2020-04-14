@@ -2,8 +2,8 @@ NAME
     App::ManagePoolStyleRepo - Manage pool-style repo directory
 
 VERSION
-    This document describes version 0.001 of App::ManagePoolStyleRepo (from
-    Perl distribution App-ManagePoolStyleRepo), released on 2020-04-10.
+    This document describes version 0.002 of App::ManagePoolStyleRepo (from
+    Perl distribution App-ManagePoolStyleRepo), released on 2020-04-13.
 
 FUNCTIONS
   get_item_metadata
@@ -34,6 +34,25 @@ FUNCTIONS
 
     *   lacks_tags => *array[str]*
 
+    *   pool1_pattern => *re* (default: qr(\Apool1(?:\..+)?\z))
+
+        By default, "pool1" and "pool1.*" subdirectories under the repo are
+        searched for items under a layer of intermediate subdirectories. You
+        can customize using this option. But note that "pool2_pattern"
+        option has precedence over this.
+
+    *   pool2_pattern => *re* (default: qr(\Apool2(?:\..+)?\z))
+
+        By default, "pool2" and "pool2.*" subdirectories under the repo are
+        searched for items. You can customize using this option.
+
+    *   pool_pattern => *re* (default: qr(\Apool(?:\..+)?\z))
+
+        By default, "pool" and "pool.*" subdirectory under the repo are
+        searched for items. You can customize using this option. But note
+        that "pool1_pattern" and "pool2_pattern" options have precedence
+        over this.
+
     *   q => *str*
 
         Search query.
@@ -61,6 +80,25 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   pool1_pattern => *re* (default: qr(\Apool1(?:\..+)?\z))
+
+        By default, "pool1" and "pool1.*" subdirectories under the repo are
+        searched for items under a layer of intermediate subdirectories. You
+        can customize using this option. But note that "pool2_pattern"
+        option has precedence over this.
+
+    *   pool2_pattern => *re* (default: qr(\Apool2(?:\..+)?\z))
+
+        By default, "pool2" and "pool2.*" subdirectories under the repo are
+        searched for items. You can customize using this option.
+
+    *   pool_pattern => *re* (default: qr(\Apool(?:\..+)?\z))
+
+        By default, "pool" and "pool.*" subdirectory under the repo are
+        searched for items. You can customize using this option. But note
+        that "pool1_pattern" and "pool2_pattern" options have precedence
+        over this.
 
     *   repo_path* => *dirname*
 

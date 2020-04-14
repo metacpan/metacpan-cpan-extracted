@@ -1,0 +1,2 @@
+[Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef]
+severity = 1

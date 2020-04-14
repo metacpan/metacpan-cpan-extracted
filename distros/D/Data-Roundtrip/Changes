@@ -1,8 +1,12 @@
 Revision history for Data-Roundtrip
 
-0.01    Date/time
+0.01    2020-04-13
         First version, released on an unsuspecting world.
 
-0.02
-	Changed NAME in documentation of the scripts and some
-	POD errors in lib/Data/Roundtrip.pm
+0.02	2020-04-14
+	Changed NAME in documentation of the scripts, some
+	POD errors in lib/Data/Roundtrip.pm and some errors
+	in the documentation.
+
+0.03	2020-04-15
+	Makefile.PL changes thanks to marto @ Perlmonks.org

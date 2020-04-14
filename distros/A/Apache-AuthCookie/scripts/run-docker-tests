@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+IMAGES="\
+  mschout/modperl:apache-1.3-perl-5.10-mp-1.32\
+  mschout/modperl:apache-2.0.53-perl-5.14.4-mp-2.0.9\
+  mschout/modperl:apache-2.2.31-perl-5.20.3-mp-2.0.9\
+  mschout/modperl:apache-2.4.38-perl-5.20.3-mp-2.0.11\
+"
+
+set -eo pipefail
+
+builddir=$1
+
+if [ -z "$builddir" ]; then
+    echo "Usage: $0 ./path/to/Apache-AuthCookie-X.YY"
+    exit 1
+fi
+
+test_in_docker_image() {
+  local docker_image=$1
+
+  echo ">>> Testing in image $docker_image"
+  docker run --rm -v $builddir:/app -it $docker_image /app/scripts/docker-smoke
+}
+
+for image in $IMAGES; do
+  test_in_docker_image $image
+done

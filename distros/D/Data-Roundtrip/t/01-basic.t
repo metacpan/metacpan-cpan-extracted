@@ -4,6 +4,9 @@ use strict;
 use warnings;
 
 use utf8;
+
+our $VERSION='0.03';
+
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDIN,  ':encoding(UTF-8)';

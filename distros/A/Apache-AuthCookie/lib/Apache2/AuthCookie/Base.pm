@@ -1,18 +1,19 @@
 package Apache2::AuthCookie::Base;
-$Apache2::AuthCookie::Base::VERSION = '3.29';
+$Apache2::AuthCookie::Base::VERSION = '3.30';
 # ABSTRACT: Common Methods Shared by Apache2 and Apache2_4 AuthCookie Subclasses.
 
 use strict;
 use mod_perl2 '1.99022';
 use Carp;
 
-use Apache::AuthCookie::Util qw(is_blank);
+use Apache::AuthCookie::Util qw(is_blank is_local_destination);
 use Apache2::AuthCookie::Params;
 use Apache2::RequestRec;
 use Apache2::RequestUtil;
 use Apache2::Log;
 use Apache2::Access;
 use Apache2::Response;
+use Apache2::URI;
 use Apache2::Util;
 use APR::Table;
 use Apache2::Const qw(OK DECLINED SERVER_ERROR M_GET HTTP_FORBIDDEN HTTP_MOVED_TEMPORARILY HTTP_OK);
@@ -284,12 +285,18 @@ sub login {
     }
 
     if ($r->dir_config("${auth_name}EnforceLocalDestination")) {
-        if ($destination !~ m|^\s*/|) {
-            $r->server->log_error("invalid destination $destination detected for uri ",$r->uri);
+        my $current_url = $r->construct_url;
+        unless (is_local_destination($destination, $current_url)) {
+            $r->server->log_error("non-local destination $destination detected for uri ",$r->uri);
 
-            unless (is_blank($default_destination)) {
+            if (is_local_destination($default_destination, $current_url)) {
                 $destination = $default_destination;
                 $r->server->log_error("destination changed to $destination");
+            }
+            else {
+                $r->server->log_error("Returning login form: non local destination: $destination");
+                $r->subprocess_env('AuthCookieReason', 'no_cookie');
+                return $auth_type->login_form($r);
             }
         }
     }
@@ -561,7 +568,7 @@ Apache2::AuthCookie::Base - Common Methods Shared by Apache2 and Apache2_4 AuthC
 
 =head1 VERSION
 
-version 3.29
+version 3.30
 
 =head1 DESCRIPTION
 

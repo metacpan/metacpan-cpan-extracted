@@ -2,8 +2,8 @@ NAME
     App::PODUtils - Command-line utilities related to POD
 
 VERSION
-    This document describes version 0.047 of App::PODUtils (from Perl
-    distribution App-PODUtils), released on 2020-03-08.
+    This document describes version 0.048 of App::PODUtils (from Perl
+    distribution App-PODUtils), released on 2020-04-14.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -13,9 +13,13 @@ SYNOPSIS
 
     *   elide-pod
 
+    *   extract-links-in-pod
+
     *   poddump
 
     *   podless
+
+    *   podxlinks
 
     *   reverse-pod-headings
 
@@ -52,6 +56,28 @@ FUNCTIONS
     element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
+
+    Return value: (any)
+
+  extract_links_in_pod
+    Usage:
+
+     extract_links_in_pod(%args) -> any
+
+    Extract links in POD.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   pod => *perl::pod_filename* (default: "-")
+
+        Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be
+        searched in @INC.
+
+        "-" means standard input.
 
     Return value: (any)
 
@@ -163,7 +189,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    pomdump. Perinci::To::POD=HASH(0x55aa003ac738).
+    pomdump. Perinci::To::POD=HASH(0x55e8f5737ec0).
 
     podsel.
 

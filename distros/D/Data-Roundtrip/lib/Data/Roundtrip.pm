@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Encode qw/encode_utf8 decode_utf8/;
 use JSON qw/decode_json encode_json/;
@@ -106,7 +106,7 @@ sub	perl2yaml {
 	my $pretty_printing = exists($params->{'pretty'}) && defined($params->{'pretty'})
 		? $params->{'pretty'} : 0
 	;
-	warn "perl2yaml() : pretty-printing is not supported" and $pretty_printing=0
+	warn "perl2yaml() : pretty-printing is not supported for YAML output" and $pretty_printing=0
 		if $pretty_printing;
 
 	my $escape_unicode = exists($params->{'escape-unicode'}) && defined($params->{'escape-unicode'})
@@ -337,7 +337,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -349,7 +349,7 @@ be presented in a pretty format or in a condensed, machine-readable
 format (not spaces, indendation or line breaks).
 
 
-    use Data::Roundtrip;
+    use Data::Roundtrip qw/:all/;
 
     $jsonstr = '{"Songname": "Απόκληρος της κοινωνίας", "Artist": "Καζαντζίδης Στέλιος/Βίρβος Κώστας"}';
     $yamlstr = json2yaml($jsonstr);
@@ -438,7 +438,7 @@ C<read_from_filehandle()>, C<write_to_filehandle()>,
 
 =back
 
-=head1 SUBROUTINES/METHODS
+=head1 SUBROUTINES
 
 =head2 C<perl2json>
 
@@ -704,12 +704,12 @@ A few scripts have been put together and offer the functionality of this
 module to the command line. They are part of this distribution and can
 be found in the C<script> directory.
 
-There files are: C<json2json.pl>,  C<json2yaml.pl>,  C<yaml2json.pl>
+These files are: C<json2json.pl>,  C<json2yaml.pl>,  C<yaml2json.pl>
 C<json2perl.pl>, C<perl2json.pl>, C<yaml2perl.pl>
 
 =head1 AUTHOR
 
-Andreas Hadjiprocopis, C<< <bliako at cpan.org> >>
+Andreas Hadjiprocopis, C<< <bliako at cpan.org> / <andreashad2 at gmail.com> >>
 
 =head1 BUGS
 
@@ -767,18 +767,20 @@ Several Monks at L<PerlMonks.org | https://PerlMonks.org> (in no particular orde
 
 =over 4
 
-=item L<haukex | https://perlmonks.org/?node_id=830549>
+=item L<haukex|https://perlmonks.org/?node_id=830549>
 
-=item L<Corion | https://perlmonks.org/?node_id=5348> (the
+=item L<Corion|https://perlmonks.org/?node_id=5348> (the
 C< _qquote_redefinition_by_Corion() > which harnesses
 L<Data::Dumper>'s incessant unicode escaping)
 
-=item L<kcott | https://perlmonks.org/?node_id=861371>
+=item L<kcott|https://perlmonks.org/?node_id=861371>
 (The EXPORT section among other suggestions)
 
-=item L<jwkrahn | https://perlmonks.org/?node_id=540414>
+=item L<jwkrahn|https://perlmonks.org/?node_id=540414>
 
-=item L<leszekdubiel | https://perlmonks.org/?node_id=1164259>
+=item L<leszekdubiel|https://perlmonks.org/?node_id=1164259>
+
+=item L<marto|https://perlmonks.org/?node_id=https://perlmonks.org/?node_id=324763>
 
 =item and an anonymous monk
 
@@ -790,8 +792,9 @@ Almaz!
 
 =head1 LICENSE AND COPYRIGHT
 
-This software, EXCEPT the portion created by [Corion] @ Perlmonks,
- is Copyright (c) 2020 by Andreas Hadjiprocopis.
+This software, EXCEPT the portions created by [Corion] @ Perlmonks
+and [kcott] @ Perlmonks,
+is Copyright (c) 2020 by Andreas Hadjiprocopis.
 
 This is free software, licensed under:
 

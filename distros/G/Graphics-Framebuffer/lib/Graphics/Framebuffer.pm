@@ -361,7 +361,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.46';
+    our $VERSION   = '6.48';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -9000,7 +9000,7 @@ Richard Kelsch <rich@rk-internet.com>
 
 =head1 COPYRIGHT
 
-Copyright 2003-2019 Richard Kelsch, All Rights Reserved.
+Copyright 2003-2020 Richard Kelsch, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under the GNU software license.
 
@@ -9012,7 +9012,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.46 (Dec 10, 2019)
+Version 6.48 (Apr 14, 2020)
 
 =head1 THANKS
 

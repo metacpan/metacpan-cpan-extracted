@@ -34,7 +34,7 @@ no_leaks_ok {
     eval { OPCUA::Open62541::ServerConfig::setMinimal(1, 8404, "") }
 } "config type leak";
 
-warnings_like {
+warning_like {
     OPCUA::Open62541::ServerConfig::setMinimal($config, undef, "")
 } (qr/Use of uninitialized value in subroutine entry /,
     "port undef warning");
@@ -43,7 +43,7 @@ no_leaks_ok {
     OPCUA::Open62541::ServerConfig::setMinimal($config, undef, "");
 } "port undef leak";
 
-warnings_like {
+warning_like {
     OPCUA::Open62541::ServerConfig::setMinimal($config, 8404, undef)
 } (qr/Use of uninitialized value in subroutine entry /,
     "certificate undef warning");

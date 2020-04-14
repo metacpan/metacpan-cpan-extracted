@@ -1,7 +1,5 @@
-build.cmd
 Credsman.png
 credsman.xs
-exmaple.pl
 lib/credsman.pm
 LICENSE
 Makefile.PL
@@ -9,5 +7,6 @@ MANIFEST
 README
 t/1.credsgui.t
 t/2.credsman.t
+t/3.inherit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

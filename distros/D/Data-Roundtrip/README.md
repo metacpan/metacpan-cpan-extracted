@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -15,7 +15,7 @@ the conversions and optionally escaped or un-escaped. Also JSON can
 be presented in a pretty format or in a condensed, machine-readable
 format (not spaces, indendation or line breaks).
 
-    use Data::Roundtrip;
+    use Data::Roundtrip qw/:all/;
 
     $jsonstr = '{"Songname": "Απόκληρος της κοινωνίας", "Artist": "Καζαντζίδης Στέλιος/Βίρβος Κώστας"}';
     $yamlstr = json2yaml($jsonstr);
@@ -96,7 +96,7 @@ By default no symbols are exported. However, the following export tags are avail
 `read_from_filehandle()`, `write_to_filehandle()`,
 - `:all` : everything above
 
-# SUBROUTINES/METHODS
+# SUBROUTINES
 
 ## `perl2json`
 
@@ -293,12 +293,12 @@ A few scripts have been put together and offer the functionality of this
 module to the command line. They are part of this distribution and can
 be found in the `script` directory.
 
-There files are: `json2json.pl`,  `json2yaml.pl`,  `yaml2json.pl`
+These files are: `json2json.pl`,  `json2yaml.pl`,  `yaml2json.pl`
 `json2perl.pl`, `perl2json.pl`, `yaml2perl.pl`
 
 # AUTHOR
 
-Andreas Hadjiprocopis, `<bliako at cpan.org>`
+Andreas Hadjiprocopis, `<bliako at cpan.org> / <andreashad2 at gmail.com>`
 
 # BUGS
 
@@ -343,14 +343,15 @@ You can also look for information at:
 
 Several Monks at [PerlMonks.org ](https://metacpan.org/pod/%20https%3A#PerlMonks.org) (in no particular order):
 
-- [haukex ](https://metacpan.org/pod/%20https%3A#perlmonks.org-node_id-830549)
-- [Corion ](https://metacpan.org/pod/%20https%3A#perlmonks.org-node_id-5348) (the
+- [haukex](https://perlmonks.org/?node_id=830549)
+- [Corion](https://perlmonks.org/?node_id=5348) (the
 ` _qquote_redefinition_by_Corion() ` which harnesses
 [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper)'s incessant unicode escaping)
-- [kcott ](https://metacpan.org/pod/%20https%3A#perlmonks.org-node_id-861371)
+- [kcott](https://perlmonks.org/?node_id=861371)
 (The EXPORT section among other suggestions)
-- [jwkrahn ](https://metacpan.org/pod/%20https%3A#perlmonks.org-node_id-540414)
-- [leszekdubiel ](https://metacpan.org/pod/%20https%3A#perlmonks.org-node_id-1164259)
+- [jwkrahn](https://perlmonks.org/?node_id=540414)
+- [leszekdubiel](https://perlmonks.org/?node_id=1164259)
+- [marto](https://perlmonks.org/?node_id=https://perlmonks.org/?node_id=324763)
 - and an anonymous monk
 
 # DEDICATIONS
@@ -359,8 +360,9 @@ Almaz!
 
 # LICENSE AND COPYRIGHT
 
-This software, EXCEPT the portion created by \[Corion\] @ Perlmonks,
- is Copyright (c) 2020 by Andreas Hadjiprocopis.
+This software, EXCEPT the portions created by \[Corion\] @ Perlmonks
+and \[kcott\] @ Perlmonks,
+is Copyright (c) 2020 by Andreas Hadjiprocopis.
 
 This is free software, licensed under:
 

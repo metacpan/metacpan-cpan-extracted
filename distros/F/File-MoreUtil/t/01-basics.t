@@ -9,7 +9,26 @@ use Cwd qw(abs_path);
 use File::chdir;
 use File::Slurper qw(write_text);
 use File::Spec;
-use File::MoreUtil qw(file_exists l_abs_path dir_empty dir_has_files dir_has_dot_files dir_has_non_dot_files dir_has_subdirs dir_has_dot_subdirs dir_has_non_dot_subdirs);
+use File::MoreUtil qw(
+                         file_exists
+                         l_abs_path
+                         dir_empty
+                         dir_has_files
+                         dir_has_dot_files
+                         dir_has_non_dot_files
+                         dir_has_subdirs
+                         dir_has_dot_subdirs
+                         dir_has_non_dot_subdirs
+
+                         get_dir_entries
+                         get_dir_dot_entries
+                         get_dir_subdirs
+                         get_dir_dot_subdirs
+                         get_dir_non_dot_subdirs
+                         get_dir_files
+                         get_dir_dot_files
+                         get_dir_non_dot_files
+                 );
 use File::Temp qw(tempfile tempdir);
 
 subtest file_exists => sub {
@@ -136,6 +155,34 @@ subtest "dir_empty, dir_has_*files, dir_has_*subdirs" => sub {
     ok(!dir_has_non_dot_subdirs("hasdotfiles"));
     ok( dir_has_non_dot_subdirs("hassubdirs"));
     ok(!dir_has_non_dot_subdirs("hasdotsubdirs"));
+};
+
+subtest "get_dir_*{entries,files,subdirs}" => sub {
+    my $dir = tempdir(CLEANUP=>1);
+    local $CWD = $dir;
+
+    mkdir "dir", 0755;
+    mkdir ".dotdir", 0755;
+    write_text "file", "";
+    write_text ".dotfile", "";
+
+    is_deeply([sort( get_dir_entries() )],
+              [".dotdir", ".dotfile", "dir", "file"]);
+    is_deeply([sort( get_dir_dot_entries() )],
+              [".dotdir", ".dotfile"]);
+    is_deeply([sort( get_dir_files() )],
+              [".dotfile", "file"]);
+    is_deeply([sort( get_dir_dot_files() )],
+              [".dotfile"]);
+    is_deeply([sort( get_dir_non_dot_files() )],
+              ["file"]);
+    is_deeply([sort( get_dir_subdirs() )],
+              [".dotdir", "dir"]);
+    is_deeply([sort( get_dir_dot_subdirs() )],
+              [".dotdir"]);
+    is_deeply([sort( get_dir_non_dot_subdirs() )],
+              ["dir"]);
+
 };
 
 DONE_TESTING:

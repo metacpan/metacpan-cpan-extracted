@@ -24,6 +24,6 @@ resources:
   bugtracker: https://github.com/sysread/App-Tailor/issues
   homepage: https://github.com/sysread/App-Tailor
   repository: https://github.com/sysread/App-Tailor.git
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

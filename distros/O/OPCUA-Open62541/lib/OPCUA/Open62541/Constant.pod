@@ -22549,6 +22549,30 @@ You want to import only the ones you need.
 
 =back
 
+=item :NODECLASS
+
+=over 8
+
+=item NODECLASS_UNSPECIFIED
+
+=item NODECLASS_OBJECT
+
+=item NODECLASS_VARIABLE
+
+=item NODECLASS_METHOD
+
+=item NODECLASS_OBJECTTYPE
+
+=item NODECLASS_VARIABLETYPE
+
+=item NODECLASS_REFERENCETYPE
+
+=item NODECLASS_DATATYPE
+
+=item NODECLASS_VIEW
+
+=back
+
 =back
 
 =head1 SEE ALSO

@@ -74,7 +74,7 @@ WriteMakefile(
         'Test::More' => '1.00',
         'List::Util' => '1.20',
     },
-    PREREQ_FATAL   => 1,
+#    PREREQ_FATAL   => 1,
     PREREQ_PRINT   => 1,
     PREREQ_PM      => {
         'Math::Bezier'   => '0.01',

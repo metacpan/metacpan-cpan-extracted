@@ -1,12 +1,15 @@
 package Apache::AuthCookie::Util;
-$Apache::AuthCookie::Util::VERSION = '3.29';
+$Apache::AuthCookie::Util::VERSION = '3.30';
 # ABSTRACT: Internal Utility Functions for AuthCookie
 
 use strict;
 use base 'Exporter';
+use URI;
 
-our @EXPORT_OK = qw(is_blank);
-
+our @EXPORT_OK = qw(
+  is_blank
+  is_local_destination
+);
 
 sub expires {
     my($time,$format) = @_;
@@ -92,6 +95,33 @@ sub is_blank {
     return defined $_[0] && ($_[0] =~ /\S/) ? 0 : 1;
 }
 
+# returns true if the given value looks like a local destination
+sub is_local_destination {
+    my ($destination, $current_uri) = @_;
+
+    # blank location is not considered "local"
+    return 0 if is_blank($destination);
+
+    # If the location does not start with a scheme or is not protocol relative,
+    # then the location is local.
+    # Scheme is defined in RFC 3986 as:
+    #   ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+    return 1 if $destination !~ m|^ (?: [a-z] [a-z0-9+-.]* :)? //|ix;
+
+    # Otherwise it is an absolute URL, but it might still be local to the
+    # current request, so we need to account for that.
+    $current_uri        = URI->new($current_uri) or return 0;
+    my $destination_uri = URI->new($destination) or return 0;
+
+    # If the current URI and the destination have same scheme, host, and port,
+    # then the URL is local
+    return 1 if lc($current_uri->scheme) eq lc($destination_uri->scheme)
+            and lc($current_uri->host)   eq lc($destination_uri->host)
+            and $current_uri->port       == $destination_uri->port;
+
+    return 0;
+}
+
 1;
 
 __END__
@@ -106,7 +136,7 @@ Apache::AuthCookie::Util - Internal Utility Functions for AuthCookie
 
 =head1 VERSION
 
-version 3.29
+version 3.30
 
 =head1 DESCRIPTION
 

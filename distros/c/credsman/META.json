@@ -4,7 +4,7 @@
       "Rodrigo Agurto <rodagurto@aim.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "freebsd"
    ],
@@ -43,12 +43,13 @@
       "test" : {
          "requires" : {
             "ExtUtils::testlib" : "0",
+            "Net::FTP" : "3",
             "Params::ValidationCompiler" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,5 +1,12 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.008 2020-04-14
+    - Fix double free in set variant.
+    - Test cleanup.
+    - Variant can get and set array type.
+    - Generate correct version number in OPCUA::Open62541::Constant.
+    - Add NODECLASS constant.
+
 0.007 2020-04-06
     - Fix memory leak in callback_async() and extend leak tests.
       The API does not invoke the connect callback in case of error.

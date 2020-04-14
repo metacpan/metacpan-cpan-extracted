@@ -1,7 +1,9 @@
 package Role::TinyCommons::Tree::FromStruct;
 
-our $DATE = '2020-02-24'; # DATE
-our $VERSION = '0.122'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-14'; # DATE
+our $DIST = 'Role-TinyCommons-Tree'; # DIST
+our $VERSION = '0.124'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -31,7 +33,7 @@ Role::TinyCommons::Tree::FromStruct - Role that provides methods to build tree o
 
 =head1 VERSION
 
-This document describes version 0.122 of Role::TinyCommons::Tree::FromStruct (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-24.
+This document describes version 0.124 of Role::TinyCommons::Tree::FromStruct (from Perl distribution Role-TinyCommons-Tree), released on 2020-04-14.
 
 =head1 REQUIRED METHODS
 

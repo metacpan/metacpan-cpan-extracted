@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-10'; # DATE
+our $DATE = '2020-04-13'; # DATE
 our $DIST = 'App-ManagePoolStyleRepo'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010;
 use strict;
@@ -38,7 +38,7 @@ manage-pool-style-repo - Manage my pending perl releases
 
 =head1 VERSION
 
-This document describes version 0.001 of manage-pool-style-repo (from Perl distribution App-ManagePoolStyleRepo), released on 2020-04-10.
+This document describes version 0.002 of manage-pool-style-repo (from Perl distribution App-ManagePoolStyleRepo), released on 2020-04-13.
 
 =head1 SYNOPSIS
 
@@ -300,6 +300,38 @@ Can be specified multiple times.
 
 See C<--lacks-tag>.
 
+=item B<--pool-pattern>=I<s>
+
+Default value:
+
+ qr(\Apool(?:\..+)?\z)
+
+By default, `pool` and `pool.*` subdirectory under the repo are searched for
+items. You can customize using this option. But note that `pool1_pattern` and
+`pool2_pattern` options have precedence over this.
+
+
+=item B<--pool1-pattern>=I<s>
+
+Default value:
+
+ qr(\Apool1(?:\..+)?\z)
+
+By default, `pool1` and `pool1.*` subdirectories under the repo are searched for
+items under a layer of intermediate subdirectories. You can customize using this
+option. But note that `pool2_pattern` option has precedence over this.
+
+
+=item B<--pool2-pattern>=I<s>
+
+Default value:
+
+ qr(\Apool2(?:\..+)?\z)
+
+By default, `pool2` and `pool2.*` subdirectories under the repo are searched for
+items. You can customize using this option.
+
+
 =item B<--repo-path>=I<s>*
 
 Repo directory.
@@ -313,6 +345,38 @@ Search query.
 =head2 Options for subcommand update-index
 
 =over
+
+=item B<--pool-pattern>=I<s>
+
+Default value:
+
+ qr(\Apool(?:\..+)?\z)
+
+By default, `pool` and `pool.*` subdirectory under the repo are searched for
+items. You can customize using this option. But note that `pool1_pattern` and
+`pool2_pattern` options have precedence over this.
+
+
+=item B<--pool1-pattern>=I<s>
+
+Default value:
+
+ qr(\Apool1(?:\..+)?\z)
+
+By default, `pool1` and `pool1.*` subdirectories under the repo are searched for
+items under a layer of intermediate subdirectories. You can customize using this
+option. But note that `pool2_pattern` option has precedence over this.
+
+
+=item B<--pool2-pattern>=I<s>
+
+Default value:
+
+ qr(\Apool2(?:\..+)?\z)
+
+By default, `pool2` and `pool2.*` subdirectories under the repo are searched for
+items. You can customize using this option.
+
 
 =item B<--repo-path>=I<s>*
 
@@ -358,7 +422,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/PI0PwIx53Z.conf>, F</home/s1/PI0PwIx53Z.conf>, or F</etc/PI0PwIx53Z.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/SW16FKyTg4.conf>, F</home/s1/SW16FKyTg4.conf>, or F</etc/SW16FKyTg4.conf>.
 
 All found files will be read and merged.
 
@@ -386,26 +450,32 @@ List of available configuration parameters:
  detail (see --detail)
  has_tags (see --has-tag)
  lacks_tags (see --lacks-tag)
+ pool1_pattern (see --pool1-pattern)
+ pool2_pattern (see --pool2-pattern)
+ pool_pattern (see --pool-pattern)
  q (see -q)
  repo_path (see --repo-path)
 
 =head2 Configuration for subcommand update-index
 
+ pool1_pattern (see --pool1-pattern)
+ pool2_pattern (see --pool2-pattern)
+ pool_pattern (see --pool-pattern)
  repo_path (see --repo-path)
 
 =head1 ENVIRONMENT
 
-=head2 PI0PWIX53Z_OPT => str
+=head2 SW16FKYTG4_OPT => str
 
 Specify additional command-line options.
 
 =head1 FILES
 
-F</home/s1/.config/PI0PwIx53Z.conf>
+F</home/s1/.config/SW16FKyTg4.conf>
 
-F</home/s1/PI0PwIx53Z.conf>
+F</home/s1/SW16FKyTg4.conf>
 
-F</etc/PI0PwIx53Z.conf>
+F</etc/SW16FKyTg4.conf>
 
 =head1 BUGS
 

@@ -428,9 +428,9 @@ Net::API::REST::Cookies - Cookie Jar and cookie management
 
 This is a module to handle cookies sent from the web browser, and also to create new cookie to be returned by the server to the web browser.
 
-The reason for this module is because Apache2::Cookie does not work well in decoding cookies, and C<Cookie::Baker> C<Set-Cookie> timestamp format is wrong. They use Mon-09-Jan 2020 12:17:30 GMT where it should be, as per rfc 6265 Mon, 09 Jan 2020 12:17:30 GMT
+The reason for this module is because Apache2::Cookie does not work well in decoding cookies, and L<Cookie::Baker> C<Set-Cookie> timestamp format is wrong. They use Mon-09-Jan 2020 12:17:30 GMT where it should be, as per rfc 6265 Mon, 09 Jan 2020 12:17:30 GMT
 
-Also C<APR::Request::Cookie> and C<Apache2::Cookie> which is a wrapper around C<APR::Request::Cookie> return a cookie object that returns the value of the cookie upon stringification instead of the full C<Set-Cookie> parameters. Clearly they designed it with a bias leaned toward collecting cookies from the browser.
+Also L<APR::Request::Cookie> and L<Apache2::Cookie> which is a wrapper around L<APR::Request::Cookie> return a cookie object that returns the value of the cookie upon stringification instead of the full C<Set-Cookie> parameters. Clearly they designed it with a bias leaned toward collecting cookies from the browser.
 
 =head1 METHODS
 
@@ -442,7 +442,7 @@ This initiates the package and take the following parameters:
 
 =item I<request>
 
-This is a required parameter to be sent with a value set to a C<Net::API::REST::Request> object
+This is a required parameter to be sent with a value set to a L<Net::API::REST::Request> object
 
 =item I<debug>
 
@@ -488,7 +488,7 @@ https://git.deguest.jp/jack/Net-API-REST
 
 =head1 SEE ALSO
 
-C<Apache2::Cookies>, C<APR::Request::Cookie>, C<Cookie::Baker>
+L<Apache2::Cookies>, L<APR::Request::Cookie>, L<Cookie::Baker>
 
 =head1 COPYRIGHT & LICENSE
 

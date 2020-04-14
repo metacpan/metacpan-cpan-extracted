@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -68,7 +68,7 @@ json2json.pl : re-format JSON data
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

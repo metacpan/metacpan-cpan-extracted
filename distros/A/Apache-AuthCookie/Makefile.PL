@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "URI::Escape" => "1.31"
   },
-  "VERSION" => "3.29",
+  "VERSION" => "3.30",
   "clean" => {
     "FILES" => [
       "t/TEST"

@@ -20,8 +20,11 @@ lib/Apache2/AuthCookie.pm
 lib/Apache2/AuthCookie/Base.pm
 lib/Apache2/AuthCookie/Params.pm
 lib/Apache2_4/AuthCookie.pm
+scripts/docker-shell
 scripts/docker-smoke
+scripts/dzil-build
 scripts/perlbrew-smoke
+scripts/run-docker-tests
 t/Skeleton/AuthCookieHandler.pm
 t/TEST.PL
 t/author-pod-syntax.t
@@ -37,6 +40,8 @@ t/htdocs/docs/login.pl
 t/htdocs/docs/logout.pl
 t/htdocs/docs/myuser/get_me.html
 t/htdocs/docs/protected/echo_user.pl
+t/htdocs/docs/protected/enforce-local/no-default/index.html
+t/htdocs/docs/protected/enforce-local/with-default/index.html
 t/htdocs/docs/protected/get_me.html
 t/htdocs/docs/protected/index.html
 t/htdocs/docs/stimeout/get_me.html

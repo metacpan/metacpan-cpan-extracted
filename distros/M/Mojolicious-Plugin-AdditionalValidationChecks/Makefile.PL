@@ -18,12 +18,20 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::AdditionalValidationChecks",
   "PREREQ_PM" => {
     "Email::Valid" => "1.192",
+    "Mojo::URL" => 0,
     "Mojolicious" => "5.42",
     "Net::Domain::TLD" => 0,
     "Scalar::Util" => 0,
     "Time::Piece" => 0
   },
-  "VERSION" => "0.15",
+  "TEST_REQUIRES" => {
+    "Mojo::Util" => 0,
+    "Mojolicious::Lite" => 0,
+    "Pod::Coverage::TrustPod" => 0,
+    "Test::Mojo" => 0,
+    "Test::More" => 0
+  },
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,9 +40,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Email::Valid" => "1.192",
+  "Mojo::URL" => 0,
+  "Mojo::Util" => 0,
   "Mojolicious" => "5.42",
+  "Mojolicious::Lite" => 0,
   "Net::Domain::TLD" => 0,
+  "Pod::Coverage::TrustPod" => 0,
   "Scalar::Util" => 0,
+  "Test::Mojo" => 0,
+  "Test::More" => 0,
   "Time::Piece" => 0
 );
 

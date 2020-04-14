@@ -2,6 +2,9 @@
 use 5.006;
 use strict;
 use warnings;
+
+our $VERSION='0.03';
+
 use Test::More;
 
 plan tests => 1;

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version 0.5.3
-## Copyright(c) 2019- DEGUEST Pte. Ltd.
+## Version 0.5.4
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2019/12/15
+## Modified 2020/04/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -50,12 +50,12 @@ BEGIN
 	use Net::API::REST::Response;
 	use Net::API::REST::Status;
 	our( $VERSION, $DEBUG, $VERBOSE, $API_VERSION );
-	$VERSION = '0.5.3';
+	$VERSION = '0.5.4';
 };
 
 {
-	$VERBOSE = 1;
-	$DEBUG   = 3;
+	$VERBOSE = 0;
+	$DEBUG   = 0;
 	$API_VERSION = 1;
 	our @AVAILABLE_API_VERSIONS = qw( 1 );
 }
@@ -1679,11 +1679,113 @@ Net::API::REST - Framework for RESTful APIs
 =head1 SYNOPSIS
 
 	package MyPackage;
-	use parent qw( Net::API::REST );
+	BEGIN
+	{
+	    use strict;
+	    use curry;
+		use parent qw( Net::API::REST );
+		use Net::API::Stripe;
+	};
+	
+	sub init
+	{
+	    my $self = shift( @_ );
+		$self->{routes} =
+		{
+		## API version 1
+		1 =>
+			{
+			'favicon.ico' => $self->curry::noop,
+			auth =>
+				{
+				google =>
+					{
+					_handler => $self->curry::oauth_google,
+					callback => $self->curry::oauth_google(callback => 1),
+					},
+				linkedin =>
+					{
+					_handler => $self->curry::oauth_linkedin,
+					callback => $self->curry::oauth_linkedin(callback => 1),
+					},
+				},
+			},
+			stripe => $self->curry::stripe,
+		};
+		$self->{api_version} = 1;
+		$self->{supported_api_versions} = [qw( 1 )];
+		## By default, we support the GET and POST to access our endpoints
+		## It may be adjusted endpoint by endpoint and if nothing is specified this default is used.
+		$self->{default_methods} = [qw( GET POST )];
+		## This is ALL possible supported methods
+		$self->{supported_methods} = [qw( DELETE GET HEAD OPTIONS POST PUT )];
+		$self->{supported_languages} = [qw( en-GB en fr-FR fr ja-JP )];
+		$self->{key} = 'kAncmaDajnacSnbGmbXamn';
+		## We want JWE (Json Web Token encrypted). This will affect jwt_encode's behaviour
+		$self->{jwt_encrypt} = 1;
+		## Because we are encrypting
+		$self->{jwt_algo} = 'PBES2-HS256+A128KW';
+		$self->{jwt_encoding} = 'A128GCM' unless( length( $self->{jwt_encoding} ) );
+		$self->{jwt_accepted_algo} = [qw( PBES2-HS256+A128KW HS256 )];
+		$self->{jwt_accepted_encoding} = [qw( A128GCM )];
+		$self->SUPER::init( @_ );
+		return( $self );
+	}
+	
+	sub stripe
+	{
+		my $self = shift( @_ );
+		my $ep = $self->endpoint;
+		my $pinfo = $ep->path_info;
+		my $remote_ip = $self->request->remote_ip;
+		my $sig = $self->request->headers( 'Stripe-Signature' );
+		return( $self->reply({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "No signature found" }) ) if( !CORE::length( $sig ) );
+		my $payload = $self->request->data || return( $self->reply({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "No payload data received from the client." }) );
+		## Net::API::Stripe object
+		my $stripe = Net::API::Stripe->new(
+			# Enable debug to get debug data in http server log
+			debug => 0,
+			conf_file => "/home/john_doe/stripe-settings.json",
+		) || do
+		{
+			$self->message( 3, "Unable to initiate a Net::API::Stripe object using the configuration file /home/john_doe/stripe-settings.json" );
+			return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR, message => $self->oops }) );
+		};
+	
+		## Do an IP source check to be sure this is Stripe talking to us
+		if( !defined( my $ip_check = $stripe->webhook_validate_caller_ip({ ip => $remote_ip, ignore_ip => $ignore_ip }) ) )
+		{
+			return( $self->reply({ code => $stripe->error->code, message => $stripe->error->message }) );
+		}
+	
+		## Now, we make sure this is Stripe sending this by checking the signature of the payload
+		my $check = $stripe->webhook_validate_signature({
+			secret => $signing_secret,
+			signature => $sig,
+			payload => $payload,
+			time_tolerance => $max_time_spread,
+		});
+		if( !defined( $check ) )
+		{
+			return( $self->reply({code => $stripe->error->code, message => $stripe->error->message }) );
+		}
+	
+		## Ok, if we are here, we passed al checks
+		## Don't wait, reply ok back to Stripe so our request does not time out
+		$self->response->code( Apache2::Const::HTTP_OK );
+		my $json = $self->json->utf8->encode({ code => 200, success => $self->true });
+		$self->response->print( $json );
+		$self->response->rflush;
+		# Do something with the payload received
+		my $evt = $stripe->event( $payload ) || 
+		return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR, message => $self->oops }) );
+		printf( STDERR "Received an event from api version %s on %s for Stripe object type %s\n", $evt->api_version, $evt->created->iso8601, $evt->type );
+		return( Apache2::Const::HTTP_OK );
+	}
 
 =head1 VERSION
 
-    v0.5.3
+    v0.5.4
 
 =head1 DESCRIPTION
 
@@ -1699,7 +1801,7 @@ This initiates the package and take the following parameters:
 
 =item I<request>
 
-This is a required parameter to be sent with a value set to a C<Apache2::RequestRec> object
+This is a required parameter to be sent with a value set to a L<Apache2::RequestRec> object
 
 =item I<debug>
 
@@ -1709,7 +1811,7 @@ Optional. If set with a positive integer, this will activate verbose debugging m
 
 =head2 apache_request()
 
-Returns the C<Apache2::RequestRec> object.
+Returns the L<Apache2::RequestRec> object.
 
 =head2 api_uri()
 
@@ -1741,7 +1843,7 @@ The number of bytes threshold beyond which, the B<reply> method will gzip compre
 
 =head2 decode_base64( data )
 
-Given some data, this will decode it using base64 algorithm. It uses C<APR::Base64::decode> in the background, because C<MIME::Decoder> may have some issue under mod_perl.
+Given some data, this will decode it using base64 algorithm. It uses L<APR::Base64::decode> in the background, because L<MIME::Decoder> may have some issue under mod_perl.
 
 =head2 decode_json( data )
 
@@ -1761,7 +1863,7 @@ This sets or gets the default methods supported by an endpoint.
 
 =head2 encode_base64( data )
 
-Given some data, this will encode it using base64 algorithm. It uses C<APR::Base64::encode> in the background, because C<MIME::Decoder> may have some issue under mod_perl.
+Given some data, this will encode it using base64 algorithm. It uses L<APR::Base64::encode> in the background, because L<MIME::Decoder> may have some issue under mod_perl.
 
 =head2 encode_json( hash reference )
 
@@ -1777,7 +1879,7 @@ If an error occurs, it will return undef and set an exception that can be access
 
 =head2 endpoint( [ Net::API::REST::Endpoint object ] )
 
-This gets or sets an C<Net::API::REST::Endpoint> object.
+This gets or sets an L<Net::API::REST::Endpoint> object.
 
 =head2 generate_uuid()
 
@@ -1805,33 +1907,33 @@ A list of handlers configured to run at the child_exit phase:
 
 Get the localised version of the string passed as an argument.
 
-This is supposed to be superseded by the package inheriting from C<Net::API::REST>
+This is supposed to be superseded by the package inheriting from L<Net::API::REST>
 
 =head2 handler()
 
-This is the main method called by Apache to handle the response. To make this work, in the Apache configuration, you must set the handler to your package and have your package inherit from C<Net::API::REST>. For example:
+This is the main method called by Apache to handle the response. To make this work, in the Apache configuration, you must set the handler to your package and have your package inherit from L<Net::API::REST>. For example:
 
 	PerlResponseHandler MyPackage
 
-When called by Apache, B<handler> will initiate a C<Net::API::REST::Request> object and a C<Net::API::REST::Response>
+When called by Apache, B<handler> will initiate a L<Net::API::REST::Request> object and a L<Net::API::REST::Response>
 
 If the incoming request is an OPTIONS request such as a typical one issued during a javascript Ajax call, it will call the method B<http_options>() which will also set the cors policy by calling B<http_cors>()
 
-Finally, it will try to find a route for the endpoint sought in the incoming query, and construct a C<Net::API::REST::Endpoint> object with the context information of the endpoint, including information such as variables that could exist in the path. For example:
+Finally, it will try to find a route for the endpoint sought in the incoming query, and construct a L<Net::API::REST::Endpoint> object with the context information of the endpoint, including information such as variables that could exist in the path. For example:
 
 	/org/jp/llc/123/directors/42/profile
 
-Here the llc property has an id 123 and the directors property has an id 42. Those two variables are stored in the C<net::API::REST::Endpoint> object. This object can then be accessed with the method B<endpoint>
+Here the llc property has an id 123 and the directors property has an id 42. Those two variables are stored in the L<net::API::REST::Endpoint> object. This object can then be accessed with the method B<endpoint>
 
 Having found a route, B<handler> calls the anonymous subroutine in charge of handling the endpoint.
 
 If no route was found, B<handler> returns a C<400 Bad Request>.
 
-If the endpoint handler returns undef(), B<handler> will return a C<500 Server Error>, otherwise it will pass the return value back to Apache. The return value should be an C<Apache2::Const> return code.
+If the endpoint handler returns undef(), B<handler> will return a C<500 Server Error>, otherwise it will pass the return value back to Apache. The return value should be an L<Apache2::Const> return code.
 
 =head2 header_datetime( DateTime object )
 
-Given a C<DateTime> object, this sets it to GMT time zone and set the proper formatter (C<Net::API::REST::DateTime>) so that the stringification is compliant with http headers standard.
+Given a C<DateTime> object, this sets it to GMT time zone and set the proper formatter (L<Net::API::REST::DateTime>) so that the stringification is compliant with http headers standard.
 
 =head2 http_cors()
 
@@ -1843,7 +1945,7 @@ If the request is an OPTIONS request, this method is called. It will do a C<pre-
 
 =head2 init_headers( code reference )
 
-If this is set, then C<Net::API::REST::handler> will call it.
+If this is set, then L<Net::API::REST::handler> will call it.
 
 =head2 is_perl_option_enabled()
 
@@ -1899,7 +2001,7 @@ Given a language, this returns a language code formatted the web way, ie en_GB w
 
 Given a string, this will log the data into the error log.
 
-When log_error is accessed with the C<Apache2::RequestRec> the error gets logged into the Virtual Host log, but when log_error gets accessed via the C<Apache2::ServerUtil> object, the error get logged into the Apache main error log.
+When log_error is accessed with the L<Apache2::RequestRec> the error gets logged into the Virtual Host log, but when log_error gets accessed via the L<Apache2::ServerUtil> object, the error get logged into the Apache main error log.
 
 =head2 print( list )
 
@@ -1917,17 +2019,17 @@ It will json encode the returned data and print it out back to the client after 
 
 =head2 request()
 
-Returns the C<Net::API::REST::Request> object. This object is set early during the instantiation in the B<handler> method.
+Returns the L<Net::API::REST::Request> object. This object is set early during the instantiation in the B<handler> method.
 
 =head2 response
 
-Returns the C<Net::API::REST::Response> object. This object is set early during the instantiation in the B<handler> method.
+Returns the L<Net::API::REST::Response> object. This object is set early during the instantiation in the B<handler> method.
 
 =head2 route( URI object )
 
 Given an uri, this will find the route for the endpoint sought. If nothing found, it will return an empty string.
 
-Otherwise, a C<Net::API::REST::Endpoint> is returned.
+Otherwise, a L<Net::API::REST::Endpoint> is returned.
 
 =head2 routes( hash reference )
 
@@ -1935,7 +2037,7 @@ This sets the routes for all the endpoints proposed by the RESTful server
 
 =head2 server()
 
-Returns a C<Apache2::Server> object
+Returns a L<Apache2::Server> object
 
 =head2 server_version()
 
@@ -1969,7 +2071,7 @@ This does not mean it won't get processed, but just that we pass and let Apache 
 
 Given an object type, a method name and optional parameters, this attempts to call it.
 
-Apache2 methods are designed to die upon error, whereas our model is based on returning C<undef> and setting an exception with C<Module::Generic::Exception>, because we believe that only the main program should be in control of the flow and decide whether to interrupt abruptly the execution, not some sub routines.
+Apache2 methods are designed to die upon error, whereas our model is based on returning C<undef> and setting an exception with L<Module::Generic::Exception>, because we believe that only the main program should be in control of the flow and decide whether to interrupt abruptly the execution, not some sub routines.
 
 =head1 Net::API::REST::Endpoint methods
 
@@ -1999,7 +2101,7 @@ Returns a hash reference of name => value pairs for the variables found in the e
 
 	/org/jp/llc/12/directors/23/profile
 
-In this case, llc has an id value of 12 and the director an id value of 23. They will be recorded as variables as instructed by the route map set by the package using C<Net::API::REST>
+In this case, llc has an id value of 12 and the director an id value of 23. They will be recorded as variables as instructed by the route map set by the package using L<Net::API::REST>
 
 =head1 AUTHOR
 
@@ -2011,7 +2113,7 @@ https://git.deguest.jp/jack/Net-API-REST
 
 =head1 SEE ALSO
 
-C<Apache2::Request>, C<Apache2::RequestRec>, C<Apache2::RequestUtil>
+L<Apache2::Request>, L<Apache2::RequestRec>, L<Apache2::RequestUtil>
 
 =head1 COPYRIGHT & LICENSE
 

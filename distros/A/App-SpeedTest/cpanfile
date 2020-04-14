@@ -3,6 +3,7 @@ requires   "Data::Peek";
 requires   "Getopt::Long";
 requires   "HTML::TreeBuilder";
 requires   "LWP::UserAgent";
+requires   "List::Util";
 requires   "Math::Trig";
 requires   "Socket";
 requires   "Time::HiRes";
@@ -24,5 +25,5 @@ on "configure" => sub {
 on "test" => sub {
     requires   "Test::More";
 
-    recommends "Test::More"               => "1.302174";
+    recommends "Test::More"               => "1.302175";
     };

@@ -6,12 +6,21 @@ author:
 build_requires:
   File::Spec: '0'
   Module::Metadata: '0'
+  Scalar::Util: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
   Test::More: '0'
-  Test::Most: '0'
+  Test::Warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - CPU
+  - load
+  - average
+  - loadavg
+  - system
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +29,12 @@ name: Sys-CpuLoad
 provides:
   Sys::CpuLoad:
     file: lib/Sys/CpuLoad.pm
-    version: '0.21'
+    version: '0.30'
 requires:
   Exporter: '0'
+  File::Which: '0'
   IO::File: '0'
+  IPC::Run3: '0'
   XSLoader: '0'
   parent: '0'
   perl: v5.6.0
@@ -31,9 +42,12 @@ resources:
   bugtracker: https://github.com/robrwo/Sys-CpuLoad/issues
   homepage: https://metacpan.org/release/Sys-CpuLoad
   repository: git://github.com/robrwo/Sys-CpuLoad.git
-version: '0.21'
+version: '0.30'
 x_authority: cpan:RRWO
 x_contributors:
+  - 'Slaven Rezić <slaven@rezic.de>'
+  - 'Victor Wagner'
+  - 'Dmitry Dorofeev <dima@yasp.com>'
   - 'Vincent Lefèvre <vincent@vinc17.net>'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

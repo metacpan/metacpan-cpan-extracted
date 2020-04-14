@@ -51,6 +51,7 @@ requires:
   IO::File: '0'
   JSON: '0'
   MIME::Base64: '3.15'
+  Module::Generic: v0.11.6
   Regexp::Common: '0'
   Scalar::Util: '0'
   Test::Mock::Apache2: '0.05'
@@ -66,5 +67,5 @@ requires:
   perl: '5.006000'
   strict: '0'
   version: '0'
-version: v0.5.3
+version: v0.5.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

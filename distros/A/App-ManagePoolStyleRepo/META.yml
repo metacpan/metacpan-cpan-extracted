@@ -20,9 +20,11 @@ requires:
   Cwd: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
+  Data::Sah::Compiler::perl::TH::re: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
   Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
+  File::MoreUtil: '0.620'
   File::Path: '0'
   File::Slurper: '0'
   File::Temp: '0'
@@ -40,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ManagePoolStyleRepo
   homepage: https://metacpan.org/release/App-ManagePoolStyleRepo
   repository: git://github.com/perlancar/perl-App-ManagePoolStyleRepo.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

@@ -14,8 +14,7 @@ build_requires:
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
   IO::Zlib: '0'
-  Mojo::DOM: '0'
-  Mojolicious: '7.00'
+  Mojo::DOM58: '1.00'
   Net::SSLeay: '1.49'
   PkgConfig: '0.19026'
   Sort::Versions: '0'
@@ -49,7 +48,7 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-sqlite/issues/
   repository: https://github.com/shawnlaffan/perl-alien-sqlite
-version: '1.03'
+version: '1.04'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.08'
   requires:
@@ -59,8 +58,7 @@ x_alienfile:
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
-      Mojo::DOM: '0'
-      Mojolicious: '7.00'
+      Mojo::DOM58: '1.00'
       Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'

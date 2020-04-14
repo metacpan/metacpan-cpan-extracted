@@ -1,3 +1,10 @@
+# create a variable node with value
+# add node to server tree
+# start server
+# start client
+# read the node from the client
+# check that the value is the same
+
 use strict;
 use warnings;
 use OPCUA::Open62541 ':all';

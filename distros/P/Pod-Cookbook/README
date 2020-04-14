@@ -1,0 +1,153 @@
+NAME
+    Pod::Cookbook - Recipes for working with POD
+
+VERSION
+    This document describes version 0.001 of Pod::Cookbook (from Perl
+    distribution Pod-Cookbook), released on 2020-04-14.
+
+CONVERTING POD TO HTML
+CONVERTING POD TO MARKDOWN
+CONVERTING MARKDOWN TO POD
+GETTING THE PATH OF A LOCALLY INSTALLED POD PAGE
+LISTING LOCALLY INSTALLED POD PAGES
+    You can use podlist. Examples:
+
+    List top-level POD namespaces:
+
+     % podlist
+
+    List all POD pages:
+
+     % podlist -R
+
+MODIFYING POD ELEMENTS
+    To reverse the order of POD sections, you can use reverse-pod-headings.
+
+    To sort POD sections by some criteria, you can use sort-pod-headings.
+
+SELECTING POD ELEMENTS
+    Pod::Elemental is a system for treating a Pod (plain old documentation)
+    documents as trees of elements. podsel uses Pod::Elemental to select the
+    tree nodes using a CSS-like expression (see Data::CSel). Examples below.
+
+    Note that pmpath is a CLI utility to return the path of a locally
+    installed Perl module (or POD).
+
+    To list all head1 commands of the strict.pm documentation:
+
+     % podsel `pmpath strict` 'Command[command=head1]'
+     =head1 NAME
+
+     =head1 SYNOPSIS
+
+     =head1 DESCRIPTION
+
+     =head1 HISTORY
+
+    To list all head1 commands that contain "SYN" in them:
+
+     % podsel `pmpath strict` 'Command[command=head1][content =~ /synopsis/i]'
+     =head1 SYNOPSIS
+
+    To show the contents of strict.pm's Synopsis:
+
+     % podsel -5 `pmpath strict` 'Nested[command=head1][content =~ /synopsis/i]'
+     =head1 SYNOPSIS
+
+         use strict;
+
+         use strict "vars";
+         use strict "refs";
+         use strict "subs";
+
+         use strict;
+         no strict "vars";
+
+    To show the contents of strict.pm's Synopsis without the head1 command
+    itself:
+
+     % podsel -5 `pmpath strict` 'Nested[command=head1][content =~ /synopsis/i] > *'
+         use strict;
+
+         use strict "vars";
+         use strict "refs";
+         use strict "subs";
+
+         use strict;
+         no strict "vars";
+
+    To list of head commands in POD of List::Util:
+
+        % podsel `pmpath List::Util` 'Command[command =~ /head/]'
+        =head1 NAME
+
+        =head1 SYNOPSIS
+
+        =head1 DESCRIPTION
+
+        =head1 LIST-REDUCTION FUNCTIONS
+
+        =head2 reduce
+
+        =head2 reductions
+
+        ...
+
+        =head1 KEY/VALUE PAIR LIST FUNCTIONS
+
+        =head2 pairs
+
+        =head2 unpairs
+
+        =head2 pairkeys
+
+        =head2 pairvalues
+
+        ...
+
+    To list only key/value pair list functions and not list-reduction ones
+    in List::Util:
+
+        % podsel -5 `pmpath List::Util` 'Nested[command=head1][content =~ /pair/i] Nested[command=head2]' --print-method content
+        pairs
+        unpairs
+        pairkeys
+        pairvalues
+        pairgrep
+        pairfirst
+        pairmap
+
+VIEWING POD IN THE TERMINAL
+VIEWING POD IN THE WEB BROWSER
+    Converting the POD to HTML would be the first step. See "CONVERTING POD
+    TO HTML".
+
+    podtohtml has a "--browser" ("-b") option to open web browser and
+    display the generated HTML:
+
+     % podtohtml some.pod -b
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Cookbook>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Cookbook>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Cookbook>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

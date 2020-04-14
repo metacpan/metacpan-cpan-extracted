@@ -1,13 +1,14 @@
 package App::PODUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-08'; # DATE
+our $DATE = '2020-04-14'; # DATE
 our $DIST = 'App-PODUtils'; # DIST
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use File::Slurper::Dash 'read_text';
 use Sort::Sub;
@@ -291,6 +292,46 @@ sub reverse_pod_headings {
     sort_pod_headings(%args, sort_sub=>'record_by_reverse_order');
 }
 
+$SPEC{extract_links_in_pod} = {
+    v => 1.1,
+    summary => 'Extract links in POD',
+    args => {
+        %arg0_pod,
+        detail => {
+            schema => 'bool*',
+            cmdline_aliases => {l=>{}},
+        },
+    },
+    result_naked => 1,
+};
+sub extract_links_in_pod {
+    my %args = @_;
+
+    my $pod_parser = App::PODUtils::PodParser::XLinks->new;
+    $pod_parser->{_links} = [];
+    eval {
+        $pod_parser->parse_string_document(read_text $args{pod});
+    };
+    return [500, "Can't parse POD: $@"] if $@;
+
+    unless ($args{detail}) {
+        $pod_parser->{_links} = [map { $_->{raw} } @{ $pod_parser->{_links} }];
+    }
+
+    [200, "OK", $pod_parser->{_links}];
+}
+
+package # hide from PAUSE
+    App::PODUtils::PodParser::XLinks;
+use Log::ger;
+
+use parent qw(Pod::Simple::Methody);
+
+sub start_L {
+    my $self = shift;
+    push @{ $self->{_links} }, $_[0];
+}
+
 1;
 # ABSTRACT: Command-line utilities related to POD
 
@@ -306,7 +347,7 @@ App::PODUtils - Command-line utilities related to POD
 
 =head1 VERSION
 
-This document describes version 0.047 of App::PODUtils (from Perl distribution App-PODUtils), released on 2020-03-08.
+This document describes version 0.048 of App::PODUtils (from Perl distribution App-PODUtils), released on 2020-04-14.
 
 =head1 SYNOPSIS
 
@@ -319,9 +360,13 @@ POD:
 
 =item * L<elide-pod>
 
+=item * L<extract-links-in-pod>
+
 =item * L<poddump>
 
 =item * L<podless>
+
+=item * L<podxlinks>
 
 =item * L<reverse-pod-headings>
 
@@ -367,6 +412,35 @@ First element (status) is an integer containing HTTP status code
 200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 extract_links_in_pod
+
+Usage:
+
+ extract_links_in_pod(%args) -> any
+
+Extract links in POD.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<detail> => I<bool>
+
+=item * B<pod> => I<perl::pod_filename> (default: "-")
+
+Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be searched in @INC.
+
+"-" means standard input.
+
+
+=back
 
 Return value:  (any)
 
@@ -495,7 +569,7 @@ feature.
 =head1 SEE ALSO
 
 
-L<pomdump>. Perinci::To::POD=HASH(0x55aa003ac738).
+L<pomdump>. Perinci::To::POD=HASH(0x55e8f5737ec0).
 
 L<podsel>.
 

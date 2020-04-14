@@ -1,0 +1,14 @@
+Revision history for Compiled-Params-OO
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    2020-04-14
+        - Optimize code
+        - Ensure SYNOPSIS is valid
+
+0.03    2020-04-14
+	- Add an example demonstrating how to validate option parameters
+
+0.03    2020-04-14
+	- Optimize more (final)

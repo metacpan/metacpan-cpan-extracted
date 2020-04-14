@@ -1,5 +1,5 @@
 package Apache::AuthCookie::Params::CGI;
-$Apache::AuthCookie::Params::CGI::VERSION = '3.29';
+$Apache::AuthCookie::Params::CGI::VERSION = '3.30';
 # ABSTRACT: Internal CGI Params Subclass
 
 use strict;
@@ -182,7 +182,7 @@ Apache::AuthCookie::Params::CGI - Internal CGI Params Subclass
 
 =head1 VERSION
 
-version 3.29
+version 3.30
 
 =head1 SYNOPSIS
 

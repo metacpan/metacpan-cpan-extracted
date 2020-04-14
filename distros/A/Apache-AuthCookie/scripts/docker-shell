@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+DOCKER_IMAGE=$1
+
+if [ -z "$DOCKER_IMAGE" ]; then
+    echo "Usage: $0 docker-image-tag"
+    exit 1
+fi
+
+cd $(dirname $0)/..
+
+docker run --rm -v $PWD:/app -it $DOCKER_IMAGE bash

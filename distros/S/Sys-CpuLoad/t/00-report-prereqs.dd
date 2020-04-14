@@ -27,7 +27,9 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Exporter' => '0',
+                                      'File::Which' => '0',
                                       'IO::File' => '0',
+                                      'IPC::Run3' => '0',
                                       'XSLoader' => '0',
                                       'parent' => '0',
                                       'perl' => 'v5.6.0'
@@ -40,8 +42,11 @@ do { my $x = {
                    'requires' => {
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
+                                   'Scalar::Util' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::Exception' => '0',
                                    'Test::More' => '0',
-                                   'Test::Most' => '0'
+                                   'Test::Warnings' => '0'
                                  }
                  }
      };

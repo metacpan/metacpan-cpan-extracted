@@ -29,18 +29,28 @@
       "runtime" : {
          "requires" : {
             "Email::Valid" : "1.192",
+            "Mojo::URL" : "0",
             "Mojolicious" : "5.42",
             "Net::Domain::TLD" : "0",
             "Scalar::Util" : "0",
             "Time::Piece" : "0",
             "perl" : "5.010"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Mojo::Util" : "0",
+            "Mojolicious::Lite" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "Mojolicious::Plugin::AdditionalValidationChecks" : {
          "file" : "lib/Mojolicious/Plugin/AdditionalValidationChecks.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -55,7 +65,7 @@
          "web" : "http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_contributors" : [
       "Florian Heyer <info@heyer-it.de>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

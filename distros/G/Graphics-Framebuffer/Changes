@@ -1575,3 +1575,13 @@ Revision history for Graphics-Framebuffer
 6.46  Dec 10, 2019
 
       Fixed the prerequisite installation scripts.
+
+6.47  Apr 13, 2020
+
+      Slight change to the example scripts.  Added a new "screensaver.pl"
+      example script.
+
+6.48  Apr 14, 2020
+
+      Pause was whining about the Makefile.PL script.  So it has been fixed
+      to accommodate the whining.

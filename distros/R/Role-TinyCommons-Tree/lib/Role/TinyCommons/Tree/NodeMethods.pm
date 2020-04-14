@@ -1,7 +1,9 @@
 package Role::TinyCommons::Tree::NodeMethods;
 
-our $DATE = '2020-02-24'; # DATE
-our $VERSION = '0.122'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-14'; # DATE
+our $DIST = 'Role-TinyCommons-Tree'; # DIST
+our $VERSION = '0.124'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -31,7 +33,7 @@ Role::TinyCommons::Tree::NodeMethods - Role that provides tree node methods
 
 =head1 VERSION
 
-This document describes version 0.122 of Role::TinyCommons::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-24.
+This document describes version 0.124 of Role::TinyCommons::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-04-14.
 
 =head1 DESCRIPTION
 
@@ -69,6 +71,30 @@ root node).
 
 Return a list of descendents, from the direct children, to their children's
 children, and so on until all the leaf nodes.
+
+For example, for this tree:
+
+ A
+ |-- B
+ |   |-- D
+ |   |-- E
+ |   `-- F
+ `-- C
+     |-- G
+     |   `-- I
+     `-- H
+
+the nodes returned for C<< descendants(A) >> would be:
+
+ B C D E F G H I
+
+=head2 descendants_depth_first
+
+Like L</descendants>, except will return in depth-first order. For example,
+using the same object in the L</descendants> example, C<<
+descendants_depth_first(A) >> will return:
+
+ B D E F C G I H
 
 =head2 first_node
 

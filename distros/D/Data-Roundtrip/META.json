@@ -49,6 +49,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hadjiprocopis/data-roundtrip/issues"
+      },
+      "homepage" : "https://metacpan.org/module/Data::Roundtrip",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hadjiprocopis/data-roundtrip",
+         "web" : "https://github.com/hadjiprocopis/data-roundtrip"
+      }
+   },
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-08-08'; # DATE
-our $VERSION = '0.084'; # VERSION
+our $DATE = '2020-04-14'; # DATE
+our $VERSION = '0.085'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +30,7 @@ ddsel - Select Perl data structure elements using CSel (CSS-selector-like) synta
 
 =head1 VERSION
 
-This document describes version 0.084 of ddsel (from Perl distribution App-CSelUtils), released on 2019-08-08.
+This document describes version 0.085 of ddsel (from Perl distribution App-CSelUtils), released on 2020-04-14.
 
 =head1 SYNOPSIS
 
@@ -135,6 +135,29 @@ Specify action(s) to perform on matching nodes (JSON-encoded).
 
 See C<--node-action>.
 
+=item B<--node-actions-on-descendants>=I<s>
+
+Specify how descendants should be actioned upon.
+
+Default value:
+
+ ""
+
+Valid values:
+
+ ["","descendants_depth_first"]
+
+This option sets how node action is performed (See `node_actions` option).
+
+When set to '' (the default), then only matching nodes are actioned upon.
+
+When set to 'descendants_depth_first', then after each matching node is actioned
+upon by an action, the descendants of the matching node are also actioned, in
+depth-first order. This option is sometimes necessary e.g. when your node's
+`as_string()` method shows a node's string representation that does not include
+its descendants.
+
+
 =item B<--print>
 
 Shortcut for --node-action print_as_string.
@@ -174,6 +197,12 @@ CSel expression, refer to <pm:Data::CSel>.
 `root` will return a single node which is the root node.
 
 
+=item B<-R>
+
+Shortcut for --node-action-on-descendants=descendants_depth_first.
+
+See C<--node-actions-on-descendants>.
+
 =back
 
 =head2 Output options
@@ -212,6 +241,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -298,7 +331,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

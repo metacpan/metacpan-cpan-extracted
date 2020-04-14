@@ -1,5 +1,95 @@
 Revision history for Perl extension Sys-CpuLoad:
 
+0.30      2020-04-06 08:14:52+01:00 Europe/London
+
+0.29      2020-04-04 11:13:49+01:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Added support for changing the default load() function.
+
+  [Documentation]
+  - Added contributors names in Changes for earlier versions.
+
+  [Tests]
+  - Test for warnings.
+
+  - Use Test::More and Test::Deep instead of Test::Most,
+    due to global destruction warnings in latest Test::Most.
+
+  [Other]
+  - Rearrange POD to be interleaved with source code.
+
+0.28      2020-04-02 17:35:22+01:00 Europe/London (TRIAL RELEASE)
+  [Bug Fixes]
+  - Fix how parsed values from uptime are numified for different locales.
+
+0.27      2020-04-02 12:37:28+01:00 Europe/London (TRIAL RELEASE)
+  [Bug Fixes]
+  - Numify parsed values from uptime.
+
+  [Tests]
+  - Use locale-independent test that value is numeric.
+
+0.26      2020-04-01 21:22:26+01:00 Europe/London (TRIAL RELEASE)
+  [Bug Fixes]
+  - Parse uptime output formatted with using different locales, thanks srezic.
+
+  [Tests]
+  - Fix skip_all to handle when no executable is found.
+
+  - Fix comment on skip_all.
+
+  [Other]
+  - Add keywords to distribution metadata.
+
+0.25      2020-03-30 23:30:00+01:00 Europe/London (TRIAL RELEASE)
+  [Tests]
+  - Check if uptime is executable.
+
+  - Fix comment on t/13-w.t.
+
+0.24      2020-03-30 12:25:45+01:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Use IPC::Run3 for uptime.
+
+  - Add the ability to override the path of uptime.
+
+  [Bug Fixes]
+  - Check for uptime errors.
+
+  [Other]
+  - Move Perl::Critic exceptions into t/etc/perlcriticrc.
+
+0.23      2020-03-29 13:09:50+01:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Support getloadavg for DragonFly BSD.
+
+  - Change uptime to use backticks instead of piped open.
+
+  [Bug Fixes]
+  - uptime immediately returns undef if path to `uptime` cannot be found.
+
+  [Tests]
+  - Fixed test when skipping getloadavg test.
+
+  - Skip uptime test if uptime cannot be found.
+
+0.22      2020-03-27 12:51:39+00:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Split getloadavg, proc_loadavg and uptime into separate functions.
+
+  - Use File::Which to locate uptime.
+
+  [Incompatabilities]
+  - Renamed _getbsdload to getloadavg.
+
+  [Bug Fixes]
+  - Accept uptime output without commas, RT#14034.
+
+  [Tests]
+  - Fix bug testing high loads.
+
+  - Add tests for each function.
+
 0.21      2020-03-25 13:03:11+00:00 Europe/London
   [Bug Fixes]
   - Actually use system getloadavg for NetBSD and Solaris.

@@ -1,0 +1,166 @@
+# -*- mode: perl; -*-
+use alienfile;
+use POSIX ();
+use constant _darwin    => !!($^O eq 'darwin');
+use constant _linux     => !!($^O eq 'linux');
+use constant _win       => !!($^O eq 'MSWin32');
+use constant _sixtyfour => !!((POSIX::uname)[4] =~ m{_64});
+use ExtUtils::CBuilder 0.280226;
+use File::Basename ();
+use Path::Tiny     ();
+
+plugin 'Probe::CommandLine' => (command => 'muscle', args => ['-version']);
+
+share {
+  start_url 'https://www.drive5.com/muscle/downloads.htm';
+
+  meta_prop->{muscle_dist_type} = _pick_dist_type();
+
+  before download => sub {
+      log("Dist type = " . meta_prop->{muscle_dist_type});
+  };
+
+  if (meta_prop->{muscle_dist_type} eq 'source') {
+
+    meta_prop->{muscle_compiler} = {ExtUtils::CBuilder->new->get_config}->{cxx};
+
+    plugin Download => (
+      filter  => qr/^muscle[0-9\.]+_src\.tar\.gz$/,
+      version => qr/^muscle([0-9\.]+)_src\.tar\.gz$/,
+    );
+
+    plugin Extract => 'tar.gz';
+
+    meta_prop->{destdir} = 1;
+    #plugin 'Build::Autoconf';
+
+    build [\&_write_makefile, 'cd src', '%{make}', '%{make} install'];
+  }
+  else {
+    if (_win) {
+      plugin Download => (
+        filter  => qr/^muscle[0-9\.]+_i86(?:win)32\.exe$/,
+        version => qr/^muscle([0-9\.]+)_i86(?:cgwin|win)32\.exe$/,
+      );
+
+      # single file - just copy
+      extract [
+        sub {
+          my $build   = shift;
+          my $extract = Path::Tiny->new('.')->absolute;
+          Path::Tiny->new($build->install_prop->{download})->copy($extract);
+        }
+      ];
+    }
+    elsif (_linux || _darwin) {
+      my $arch = (_sixtyfour ? 64 : 32);
+      plugin Download => (
+        filter  => qr/^muscle[0-9\.]+_i86\Q$^O\E\Q$arch\E\.tar\.gz$/,
+        version => qr/^muscle([0-9\.]+)_i86\Q$^O\E\Q$arch\E\.tar\.gz$/,
+      );
+
+      plugin Extract => 'tar.gz';
+    }
+    else {
+      warn "There are no MUSCLE binaries available for your architecture\n";
+      exit 1;
+    }
+
+    before build => sub {
+      my $build = shift;
+      my ($binary) = Path::Tiny->new('.')->absolute->children(qr/^muscle/i);
+      my $ext
+        = (File::Basename::fileparse($binary->basename, qr/(\.exe)$/))[2] || '';
+      my $bin_dir = Path::Tiny->new('.')->absolute->child('bin');
+      $bin_dir->mkpath;
+      $binary->move($bin_dir->child("muscle$ext"));
+    };
+
+    plugin 'Build::Copy';
+  }
+
+  after gather => sub {
+    my $build = shift;
+    my @copy  = qw(muscle_dist_type);
+    @{$build->runtime_prop}{@copy} = @{$build->meta_prop}{@copy};
+  };
+};
+
+sub _pick_dist_type {
+  return 'binary' if $ENV{ALIEN_MUSCLE_FORCE_BINARY};
+  return 'binary' unless ExtUtils::CBuilder->new->have_cplusplus;
+  return 'binary' if _win;
+  return 'source';
+}
+
+sub _write_makefile {
+  my $build  = shift;
+  my $class  = __PACKAGE__;
+  my $handle = do { no strict 'refs'; \*{"${class}::DATA"} };
+  return {} unless fileno $handle;
+  seek $handle, 0, 0;
+  my $data = join '', <$handle>;
+  $data =~ s/^.*\n__DATA__\r?\n/\n/s;
+  my $prefix = $build->install_prop->{prefix};
+  my $cxx = $build->meta_prop->{muscle_compiler};
+  log("PREFIX = $prefix");
+  log("CXX = $cxx");
+  log("Writing src/Makefile");
+  Path::Tiny->new('src/Makefile')
+      ->spew_utf8("PREFIX = $prefix\nCXX = $cxx\n$data");
+}
+
+__DATA__
+# PREFIX and CXX should be added above
+CXXFLAGS=
+LDFLAGS=
+
+# do not want gatest.cpp
+# objects = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
+objects = aligngivenpath.o aligngivenpathsw.o aligntwomsas.o aligntwoprofs.o \
+  aln.o alpha.o anchors.o bittraceback.o blosum62.o blosumla.o clust.o cluster.o \
+  clwwt.o color.o cons.o diaglist.o diffobjscore.o diffpaths.o difftrees.o \
+  difftreese.o distcalc.o distfunc.o distpwkimura.o domuscle.o dosp.o dpreglist.o \
+  drawtree.o edgelist.o enumopts.o enumtostr.o estring.o fasta.o fasta2.o \
+  fastclust.o fastdist.o fastdistjones.o fastdistkbit.o fastdistkmer.o \
+  fastdistmafft.o fastdistnuc.o fastscorepath2.o finddiags.o finddiagsn.o \
+  glbalign.o glbalign352.o glbaligndiag.o glbalignle.o glbalignsimple.o \
+  glbalignsp.o glbalignspn.o glbalignss.o glbalndimer.o globals.o globalslinux.o \
+  globalsosx.o globalsother.o globalswin32.o gonnet.o henikoffweight.o \
+  henikoffweightpb.o html.o hydro.o intmath.o local.o main.o makerootmsa.o \
+  makerootmsab.o maketree.o mhack.o mpam200.o msa.o msa2.o msadistkimura.o msf.o \
+  muscle.o muscleout.o nucmx.o nwdasimple.o nwdasimple2.o nwdasmall.o nwrec.o \
+  nwsmall.o objscore.o objscore2.o objscoreda.o onexception.o options.o \
+  outweights.o pam200mafft.o params.o phy.o phy2.o phy3.o phy4.o phyfromclust.o \
+  phyfromfile.o physeq.o phytofile.o posgap.o ppscore.o profdb.o profile.o \
+  profilefrommsa.o progalign.o progress.o progressivealign.o pwpath.o readmx.o \
+  realigndiffs.o realigndiffse.o refine.o refinehoriz.o refinesubfams.o \
+  refinetree.o refinetreee.o refinevert.o refinew.o savebest.o scoredist.o \
+  scoregaps.o scorehistory.o scorepp.o seq.o seqvect.o setblosumweights.o \
+  setgscweights.o setnewhandler.o spfast.o sptest.o stabilize.o subfam.o \
+  subfams.o sw.o termgaps.o textfile.o threewaywt.o tomhydro.o traceback.o \
+  tracebackopt.o tracebacksw.o treefrommsa.o typetostr.o upgma2.o usage.o \
+  validateids.o vtml2.o writescorefile.o
+
+.SUFFIXES: .cpp .o
+
+.cpp.o:
+	@echo Compiling $<
+	@$(CXX) $(CXXFLAGS) -c -O3 -msse2 -mfpmath=sse -D_FILE_OFFSET_BITS=64 -DNDEBUG=1 -o $@ $<
+
+muscle: $(objects)
+	@echo Linking $@
+	@$(CXX) $(LDFLAGS) -g -o $@ $(objects)
+
+all: muscle
+
+.PHONY: clean install
+
+install: muscle
+	@echo Installing $(DESTDIR)
+	@install -d $(DESTDIR)$(PREFIX)/bin
+	@install -s muscle $(DESTDIR)$(PREFIX)/bin
+
+clean:
+	rm -f *.o *~
+

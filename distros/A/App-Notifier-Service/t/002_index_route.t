@@ -5,7 +5,7 @@ use warnings;
 # the order is important
 use Plack::Test;
 use HTTP::Request::Common;    # install separate
-use App::Notifier::Service;
+use App::Notifier::Service 0.0800;
 
 my $app  = App::Notifier::Service->to_app;
 my $test = Plack::Test->create($app);

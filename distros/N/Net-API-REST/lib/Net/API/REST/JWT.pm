@@ -1018,11 +1018,11 @@ Net::API::REST::JWT - JSON Web Token (JWT, JWS, JWE) as defined by RFC7519, RFC7
 
 =head1 DESCRIPTION
 
-This is purely a copy of Crypt::JWT module with the key exception that it uses the C<JSON::PP> module instead of the C<JSON::XS> one. The reason why is due to some incompatibility with some version of ModPerl. Under this edge case, even if one passes an hash to encode_jwt, it fails to recognise the hash reference and produces the error:
+This is purely a copy of Crypt::JWT module with the key exception that it uses the L<JSON::PP> module instead of the L<JSON::XS> one. The reason why is due to some incompatibility with some version of ModPerl. Under this edge case, even if one passes an hash to encode_jwt, it fails to recognise the hash reference and produces the error:
 
     hash- or arrayref expected (not a simple scalar, use allow_nonref to allow this)
 
-Using C<JSON::PP> alleviates this problem. There is no other change in the code, and the current version of C<Crypt::JWT> used is 0.024
+Using L<JSON::PP> alleviates this problem. There is no other change in the code, and the current version of L<Crypt::JWT> used is 0.024
 
 Implements B<JSON Web Token (JWT)> - L<https://tools.ietf.org/html/rfc7519>.
 The implementation covers not only B<JSON Web Signature (JWS)> - L<https://tools.ietf.org/html/rfc7515>,

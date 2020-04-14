@@ -18,17 +18,22 @@ my %WriteMakefileArgs = (
   "NAME" => "Sys::CpuLoad",
   "PREREQ_PM" => {
     "Exporter" => 0,
+    "File::Which" => 0,
     "IO::File" => 0,
+    "IPC::Run3" => 0,
     "XSLoader" => 0,
     "parent" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "Module::Metadata" => 0,
+    "Scalar::Util" => 0,
+    "Test::Deep" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0,
-    "Test::Most" => 0
+    "Test::Warnings" => 0
   },
-  "VERSION" => "0.21",
+  "VERSION" => "0.30",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,10 +43,15 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Exporter" => 0,
   "File::Spec" => 0,
+  "File::Which" => 0,
   "IO::File" => 0,
+  "IPC::Run3" => 0,
   "Module::Metadata" => 0,
+  "Scalar::Util" => 0,
+  "Test::Deep" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0,
-  "Test::Most" => 0,
+  "Test::Warnings" => 0,
   "XSLoader" => 0,
   "parent" => 0
 );

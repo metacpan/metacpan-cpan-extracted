@@ -21,9 +21,9 @@ BEGIN {
 use Type::Utils (@Type::Utils::EXPORT_OK);
 
 our @EXPORT = (
-  'has_any_of',
-  'has_all_of',
-  'has_one_of',
+  'is_any_of',
+  'is_all_of',
+  'is_one_of',
   'is_instance_of',
   'is_capable_of',
   'is_comprised_of',
@@ -32,11 +32,11 @@ our @EXPORT = (
   @Type::Utils::EXPORT_OK
 );
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 # FUNCTIONS
 
-fun has_any_of(CodeRef @checks) {
+fun is_any_of(CodeRef @checks) {
   fun($value) {
     for my $check (@checks) {
       return 1 if $check->($value);
@@ -45,7 +45,7 @@ fun has_any_of(CodeRef @checks) {
   }
 }
 
-fun has_all_of(CodeRef @checks) {
+fun is_all_of(CodeRef @checks) {
   fun($value) {
     for my $check (@checks) {
       return 0 if !$check->($value);
@@ -54,7 +54,7 @@ fun has_all_of(CodeRef @checks) {
   }
 }
 
-fun has_one_of(CodeRef @checks) {
+fun is_one_of(CodeRef @checks) {
   fun($value) {
     return (grep {$_->($value)} @checks) > 1 ? 0 : 1;
   }
@@ -83,15 +83,17 @@ fun is_capable_of(Str @routines) {
 
 fun is_comprised_of(Str @names) {
   fun($value) {
+    return 0 if !UNIVERSAL::isa($value, 'HASH');
     return 0 if grep {!exists $value->{$_}} @names;
     return 1;
   }
 }
 
-fun register(HashRef $type) {
+fun register(HashRef @types) {
   my $caller = caller;
+  my @created = map _register_all($caller->meta, $_), @types;
 
-  return _register_all($caller->meta, $type);
+  return wantarray ? (@created) : $created[0];
 }
 
 sub _options {
@@ -247,9 +249,15 @@ Data-Object Type Library Keywords
 
   extends 'Types::Standard';
 
-  register {
+  register
+  {
     name => 'Person',
     aliases => ['Student', 'Teacher'],
+    validation => is_instance_of('Test::Person'),
+    parent => 'Object'
+  },
+  {
+    name => 'Principal',
     validation => is_instance_of('Test::Person'),
     parent => 'Object'
   };
@@ -306,9 +314,9 @@ This package supports the following scenarios:
   # enum
   # extends
   # from
-  # has_all_of
-  # has_any_of
-  # has_one_of
+  # is_all_of
+  # is_any_of
+  # is_one_of
   # inline_as
   # intersection
   # is_capable_of
@@ -338,16 +346,16 @@ This package implements the following functions:
 
 =cut
 
-=head2 has_all_of
+=head2 is_all_of
 
-  has_all_of(CodeRef @checks) : CodeRef
+  is_all_of(CodeRef @checks) : CodeRef
 
-The has_all_of function accepts one or more callbacks and returns truthy if all
+The is_all_of function accepts one or more callbacks and returns truthy if all
 of the callbacks return truthy.
 
 =over 4
 
-=item has_all_of example #1
+=item is_all_of example #1
 
   package Test::Library::HasAllOf;
 
@@ -357,7 +365,7 @@ of the callbacks return truthy.
 
   extends 'Types::Standard';
 
-  my $validation = has_all_of(
+  my $validation = is_all_of(
     sub {
       my ($value) = @_;
 
@@ -384,16 +392,16 @@ of the callbacks return truthy.
 
 =cut
 
-=head2 has_any_of
+=head2 is_any_of
 
-  has_any_of(CodeRef @checks) : CodeRef
+  is_any_of(CodeRef @checks) : CodeRef
 
-The has_any_of function accepts one or more callbacks and returns truthy if any
+The is_any_of function accepts one or more callbacks and returns truthy if any
 of the callbacks return truthy.
 
 =over 4
 
-=item has_any_of example #1
+=item is_any_of example #1
 
   package Test::Library::HasAnyOf;
 
@@ -403,7 +411,7 @@ of the callbacks return truthy.
 
   extends 'Types::Standard';
 
-  my $validation = has_any_of(
+  my $validation = is_any_of(
     sub {
       my ($value) = @_;
 
@@ -430,59 +438,13 @@ of the callbacks return truthy.
 
 =cut
 
-=head2 has_one_of
-
-  has_one_of(CodeRef @checks) : CodeRef
-
-The has_one_of function accepts one or more callbacks and returns truthy if
-only one of the callbacks return truthy.
-
-=over 4
-
-=item has_one_of example #1
-
-  package Test::Library::HasOneOf;
-
-  use Data::Object::Types::Keywords;
-
-  use base 'Data::Object::Types::Library';
-
-  extends 'Types::Standard';
-
-  my $validation = has_one_of(
-    sub {
-      my ($value) = @_;
-
-      return 0 if !$value->isa('Test::Student');
-      return 1;
-    },
-    sub {
-      my ($value) = @_;
-
-      return 0 if !$value->isa('Test::Teacher');
-      return 1;
-    },
-  );
-
-  register {
-    name => 'Person',
-    validation => $validation,
-    parent => 'Object'
-  };
-
-  $validation
-
-=back
-
-=cut
-
 =head2 is_capable_of
 
   is_capable_of(Str @routines) : CodeRef
 
-The is_capable_of function accepts one or more subroutine names and returns
-truthy if the value passed to the callback has implemented all of the routines
-specified.
+The is_capable_of function accepts one or more subroutine names and returns a
+callback which returns truthy if the value passed to the callback has
+implemented all of the routines specified.
 
 =over 4
 
@@ -514,9 +476,9 @@ specified.
 
   is_comprised_of(Str @names) : CodeRef
 
-The is_comprised_of function accepts one or more names and returns truthy if
-the value passed is a hashref or hashref based object which has keys that
-correspond to the names provided.
+The is_comprised_of function accepts one or more names and returns a callback
+which returns truthy if the value passed to the callback is a hashref or
+hashref based object which has keys that correspond to the names provided.
 
 =over 4
 
@@ -548,8 +510,8 @@ correspond to the names provided.
 
   is_consumer_of(Str $name) : CodeRef
 
-The is_consumer_of function accepts a role name and returns truthy if the value
-passed to the callback consumes it.
+The is_consumer_of function accepts a role name and returns a callback which
+returns truthy if the value passed to the callback consumes the role specified.
 
 =over 4
 
@@ -581,8 +543,9 @@ passed to the callback consumes it.
 
   is_instance_of(Str $name) : CodeRef
 
-The is_instance_of function accepts a class or package name and returns truthy
-if the value passed to the callback inherits from it.
+The is_instance_of function accepts a class or package name and returns a
+callback which returns truthy if the value passed to the callback inherits from
+the class or package specified.
 
 =over 4
 
@@ -597,6 +560,52 @@ if the value passed to the callback inherits from it.
   extends 'Types::Standard';
 
   my $validation = is_instance_of('Test::Person');
+
+  register {
+    name => 'Person',
+    validation => $validation,
+    parent => 'Object'
+  };
+
+  $validation
+
+=back
+
+=cut
+
+=head2 is_one_of
+
+  is_one_of(CodeRef @checks) : CodeRef
+
+The is_one_of function accepts one or more callbacks and returns truthy if
+only one of the callbacks return truthy.
+
+=over 4
+
+=item is_one_of example #1
+
+  package Test::Library::HasOneOf;
+
+  use Data::Object::Types::Keywords;
+
+  use base 'Data::Object::Types::Library';
+
+  extends 'Types::Standard';
+
+  my $validation = is_one_of(
+    sub {
+      my ($value) = @_;
+
+      return 0 if !$value->isa('Test::Student');
+      return 1;
+    },
+    sub {
+      my ($value) = @_;
+
+      return 0 if !$value->isa('Test::Teacher');
+      return 1;
+    },
+  );
 
   register {
     name => 'Person',

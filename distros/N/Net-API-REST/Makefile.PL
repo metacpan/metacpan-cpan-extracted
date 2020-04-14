@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
         'common::sense'	=> 0,
         'curry'			=> '1.001000',
         'Encode'		=> '3.01',
+        'Module::Generic'		=> '0.11.6',
 		'Apache2::Const'		=> 0,
 		'Apache2::RequestRec'	=> 0,
 		'Apache2::RequestIO'	=> 0,

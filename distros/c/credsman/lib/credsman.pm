@@ -8,7 +8,7 @@ use Data::Dumper;
 use Exporter qw(import);
 our @EXPORT_OK = qw[login GuiCred];
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 require XSLoader;
 XSLoader::load('credsman', $VERSION);
@@ -29,6 +29,7 @@ my $validator = validation_for(
         limit     => { type => Int, optional => 1, default => 3 },
         debug     => { type => Int, optional => 1, default => 0 },
         holder    => { optional => 1, default => undef },
+        undefine  => { optional => 1, default => 0 },
     }
 );
 #-------------------------------------------------------------------------------------------#
@@ -42,12 +43,14 @@ sub login{
         password => undef,
         user     => undef,
         target   => $arg{target},
-        holder   => $arg{holder}
+        holder   => $arg{holder},
+        inherit  => undef,
     );
     # Concat Target Name - This is the name to be stored 
     my $TargetName = work_name($arg{program},$arg{target});
     say "TargetName : ".$TargetName if $arg{debug};
     # Load Passwords ad runs the function passed with the argument
+    
     while ($wrkCred{status} != 0 and $wrkCred{attempt} < $wrkCred{limit}){
         say "in loop" if $arg{debug};
         # load Credentials from Windows Credential Manager
@@ -88,9 +91,28 @@ sub login{
     # Clear Credentials for Security
     $wrkCred{user}     =~ s/.*/ /g;
     $wrkCred{password} =~ s/.*/ /g;
-    say "END" if $arg{debug};
+    say "credsman: END" if $arg{debug};
+    say "credsman: Ending with: \n".Dumper \%wrkCred if $arg{debug};
     # Return Status
-    return $wrkCred{status};
+    if(!$arg{undefine}){
+        say "credsman: Normal Return" if $arg{debug};
+        return $wrkCred{status};
+    }
+    else{
+        if( $wrkCred{status} != 0 ){
+            say "credsman: Status is not 0 - Return Undefined" if $arg{debug};
+            return undef;
+        }
+        elsif(defined $wrkCred{inherit}){
+            say "credsman: Return inherit" if $arg{debug};
+            return ${$wrkCred{inherit}};
+        }
+        else{
+            say "credsman: Status is 0 - But Undefined inherit" if $arg{debug};
+            die "credsman: 'undefine' option was enabled but nothing was passed to ->{inherit} variable";
+        }
+    }
+
 }
 #-------------------------------------------------------------------------------------------#
 my $GuiVal = validation_for(
@@ -121,10 +143,11 @@ credsman - is a simple Pel extension to work with 'Windows Credential Manager'.
 
     use strict;
     use warnings;
+    use Net::FTP;
     use credsman qw(login);
 
     # This type of function is necessary to run login, 
-    # You need to handle the access or conenction and Error messages
+    # You need to handle the access or connection and Error messages
 
     sub Connect_Example {
         my $credentials = shift;
@@ -143,15 +166,51 @@ credsman - is a simple Pel extension to work with 'Windows Credential Manager'.
             return 1;
         }
     }
-   
+
     # In this Example the program will die at the attempt number 10.
 
     die "No Zero Return" if login( 
         program  => 'credsman',          # The Prefix to Store the credentials in wcm 
         target   => "Test",              # The Target to validate user and password, usually a server
         subref   => \&Connect_Example,   # Reference to a Function (how to validate password)
-        limit    => 10,                  # Number of Attemps before the program Finish
+        limit    => 10,                  # Number of Attempts before the program Finish
     );
+
+    # This Example will connect to FTP and Return the object to the function.
+    # Option undefine:   you need to combine with the inherit hash reference
+
+    sub Connect_FTP {
+        my $credentials = shift;
+        # Here your code to login or connect using user and password
+        # The given Parameter has the {inherit} key, if you pass it the function
+          will return the inherit to evaluate.
+        
+        my $ftp = Net::FTP->new("$credentials->{target}", Debug => 0)
+            or die "Cannot connect to some.host.name: $@";
+        
+        my $status = $ftp->login("$credentials->{user}",$credentials->{password});
+
+        if( ! $status ){
+            print "Attempt : $credentials->{attempt} of $credentials->{limit}\n"; 
+            print "$credentials->{user} cannot login ".$ftp->message ."\n";
+            return 1;
+        }
+
+        ${$credentials->{inherit}} = $ftp;
+
+        return 0; # Success
+    }
+   
+    
+    my $ftp = Connect_FTP( 
+        program  => 'credsman',          # The Prefix to Store the credentials in wcm 
+        target   => "Test",              # The Target to validate user and password, usually a server
+        subref   => \&Connect_FTP,       # Reference to a Function (how to validate password)
+        limit    => 3,                   # Number of Attempts before the program Finish
+        undefine => 1,                   # To use with inherit, when you need to pass the object.
+    );
+    
+    die "Fail to Connect" unless defined $ftp; 
 
 
 =head1 DESCRIPTION
@@ -167,7 +226,7 @@ The Credentials will be stored with the Following format
 
     - Windows Credential Manager - Generic Credentials
     - format:
-    - *['program name']~['Server name or Addres']*
+    - *['program name']~['Server name or Address']*
 
 =head2 EXPORT
 

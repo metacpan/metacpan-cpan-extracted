@@ -28,9 +28,10 @@ use Test::More ();
 use Yancy::Util qw( load_backend );
 use Yancy::Backend::Test;
 use JSON::Validator;
-use Mojo::JSON qw( true false );
+use Mojo::JSON qw( decode_json true false );
+use Mojo::File qw( curfile );
 
-our @EXPORT_OK = qw( test_backend init_backend backend_common );
+our @EXPORT_OK = qw( test_backend init_backend backend_common load_fixtures );
 
 =sub init_backend
 
@@ -950,6 +951,64 @@ sub backend_common {
 
     eval { $backend->set( 'blog', $blog_two{id}, { is_published => 0 } ) };
     Test::More::is $@, '', 'set fine with JSON boolean';
+}
+
+=sub load_fixtures
+
+    my %schema = load_fixtures( 'foreign-key-field', 'auth' );
+
+Load the given test fixtures for the database we're currently testing
+(loaded from L</init_backend> using the C<TEST_YANCY_BACKEND>
+environment variable). Test fixtures are directories with the given
+files:
+
+    schema.json     - The JSON schema
+    *.sql           - The SQL schema, named for the backend ("sqlite", "pg", "mysql")
+
+Returns the combined schema ready to be passed-in to a backend or the
+Yancy plugin.
+
+=cut
+
+my %driver = (
+    sqlite => 'SQLite',
+    pg => 'Pg',
+    mysql => 'mysql',
+);
+sub load_fixtures {
+    my ( @fixtures ) = @_;
+    my %schema;
+
+    for my $fixture ( @fixtures ) {
+        my $fixture_dir = curfile->dirname->dirname->sibling( 'fixtures', $fixture );
+
+        # If we're using a database, execute the SQL files
+        if ( $ENV{TEST_YANCY_BACKEND} && $ENV{TEST_YANCY_BACKEND} !~ /^test:/ ) {
+            my ( $backend, $host, $database )
+                = $ENV{TEST_YANCY_BACKEND} =~ m{^([^:]+):(?://([^/]*)/)?(.+)};
+            if ( -e $fixture_dir->child( "$backend.sql" ) ) {
+                my $sql = $fixture_dir->child( "$backend.sql" )->slurp;
+                my $dsn = join ':', 'dbi', $driver{ $backend },
+                    join ';', ( $host ? "host=$host" : '' ), "dbname=$database";
+                require DBI;
+                my $dbh = DBI->connect( $dsn, undef, undef, { RaiseError => 1 } )
+                    or die $DBI::errstr;
+                my @statements = split /;\s*(?=CREATE|DROP)/sm, $sql;
+                $dbh->do( $_ ) or die $dbh->errstr for @statements;
+            }
+            elsif ( -e $fixture_dir->child( "$backend.pl" ) ) {
+                require $fixture_dir->child( "$backend.pl" );
+            }
+        }
+
+        # Read the schema file
+        %schema = (
+            %schema,
+            %{ decode_json( $fixture_dir->child( 'schema.json' )->slurp ) },
+        );
+    }
+
+    return %schema;
 }
 
 1;

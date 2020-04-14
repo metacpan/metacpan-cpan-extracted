@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -xeo pipefail
+
+cd $(dirname $0)/..
+
+dzil authordeps --missing | cpanm -q --notest
+
+dzil build $*

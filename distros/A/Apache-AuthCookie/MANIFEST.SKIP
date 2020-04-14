@@ -24,4 +24,5 @@ error_log
 ^t/logs/
 ^t/TEST$
 ^t/SMOKE$
-
+^travis-build$
+^.travis.yml$

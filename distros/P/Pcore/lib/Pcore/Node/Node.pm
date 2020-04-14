@@ -79,9 +79,25 @@ sub run ( $type, $args ) {
 
         $fh->write( unpack( 'H*', $data ) . "\n" );
 
-        # blocks until $fh is closed
-        # TODO not working under windows if parent process killed in task manager
-        $fh->can_read(undef);
+        if ($MSWIN) {
+            require Win32::Mutex;
+
+            my $mutex = Win32::Mutex->open( $args->{win32_mutex} );
+
+            while () {
+
+                # parent process killed if we can get control on mutex
+                $mutex->wait(0) and exit;
+
+                Coro::sleep 5;
+            }
+        }
+        else {
+
+            # blocks until $fh is closed
+            # TODO not works under FUCKING windows if parent process killed in task manager
+            $fh->can_read(undef);
+        }
 
         exit;
     };

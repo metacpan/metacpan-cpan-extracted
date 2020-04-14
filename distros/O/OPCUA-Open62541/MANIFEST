@@ -23,6 +23,7 @@ t/client-connect-async.t
 t/client-connect.t
 t/client-disconnect-async.t
 t/client-leak.t
+t/client-variant.t
 t/client.t
 t/critic.t
 t/croak.t
@@ -50,6 +51,8 @@ t/statuscodes.t
 t/test-client.t
 t/test-server.t
 t/types.t
+t/variant-array.t
+t/variant-scalar.t
 t/variant.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -121,6 +121,12 @@ t/examples/doc-site.t
 t/examples/test-app.t
 t/examples/todo-app.t
 t/filter.t
+t/fixtures/foreign-key-field/README.md
+t/fixtures/foreign-key-field/dbic.pl
+t/fixtures/foreign-key-field/mysql.sql
+t/fixtures/foreign-key-field/pg.sql
+t/fixtures/foreign-key-field/schema.json
+t/fixtures/foreign-key-field/sqlite.sql
 t/helpers.t
 t/lib/Digest/Broken.pm
 t/lib/Local/Controller/Extend/Yancy.pm

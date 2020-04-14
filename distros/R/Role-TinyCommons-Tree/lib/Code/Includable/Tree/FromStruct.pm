@@ -1,7 +1,9 @@
 package Code::Includable::Tree::FromStruct;
 
-our $DATE = '2020-02-24'; # DATE
-our $VERSION = '0.122'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-14'; # DATE
+our $DIST = 'Role-TinyCommons-Tree'; # DIST
+our $VERSION = '0.124'; # VERSION
 
 use strict;
 our $GET_PARENT_METHOD = 'parent';
@@ -85,7 +87,7 @@ Code::Includable::Tree::FromStruct - Routine to build tree object from data stru
 
 =head1 VERSION
 
-This document describes version 0.122 of Code::Includable::Tree::FromStruct (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-24.
+This document describes version 0.124 of Code::Includable::Tree::FromStruct (from Perl distribution Role-TinyCommons-Tree), released on 2020-04-14.
 
 =for Pod::Coverage .+
 

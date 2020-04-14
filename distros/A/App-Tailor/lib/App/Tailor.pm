@@ -1,6 +1,6 @@
 package App::Tailor;
 # ABSTRACT: easily tailor terminal output to meet your needs
-$App::Tailor::VERSION = '0.01';
+$App::Tailor::VERSION = '0.02';
 
 
 use strict;
@@ -101,14 +101,16 @@ sub apply_rule {
   elsif ($type == MODIFY) {
     my ($regex, $replace) = @rule;
 
-    if (ref $replace eq 'CODE') {
-      $line =~ s/$regex/
-        local $_ = $line;
-        $replace->($line);
-      /xe;
-    }
-    else {
-      $line =~ s/$regex/$replace/;
+    if ($line =~ /$regex/) {
+      if (ref $replace eq 'CODE') {
+        $line =~ s/$regex/
+          local $_ = $line;
+          $replace->($line);
+        /xe;
+      }
+      else {
+        eval "\$line =~ s/$regex/$replace/";
+      }
     }
   }
   elsif ($type == COLORIZE) {
@@ -149,7 +151,7 @@ App::Tailor - easily tailor terminal output to meet your needs
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

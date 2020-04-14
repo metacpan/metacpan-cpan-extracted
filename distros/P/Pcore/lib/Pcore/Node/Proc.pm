@@ -11,6 +11,8 @@ use Pcore::Util::Sys::Proc qw[:PROC_REDIRECT];
 has fh        => ();    # fh
 has on_finish => ();    # CodeRef->($self)
 
+our $WIN32_MUTEX;
+
 sub DESTROY ($self) {
 
     # inform node process, that parent is terminated
@@ -37,12 +39,22 @@ around new => sub ( $orig, $self, $type, % ) {
         script_path => $ENV->{SCRIPT_PATH},
         version     => $main::VERSION->normal,
         scandeps    => $ENV->{SCANDEPS},
+        parent_pid  => $$,
         server      => $args{server},
         listen      => $args{listen},
         buildargs   => $args{buildargs},
     };
 
     if ($MSWIN) {
+        require Win32::Mutex;
+
+        my $mutex_name = P->uuid->v1mc_str;
+
+        # TODO need to cleanup mutexes on child process exit
+        push $WIN32_MUTEX->@*, Win32::Mutex->new( 1, $mutex_name );
+
+        $boot_args->{win32_mutex} = $mutex_name;
+
         $boot_args->{fh} = Win32API::File::FdGetOsFHandle( fileno $fh_w );
     }
     else {

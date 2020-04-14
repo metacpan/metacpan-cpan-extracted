@@ -4,7 +4,7 @@ Sys::CpuLoad - retrieve system load averages
 
 # VERSION
 
-version 0.21
+version 0.30
 
 # SYNOPSIS
 
@@ -26,13 +26,70 @@ of a machine.
 This method returns the load average for 1 minute, 5 minutes and 15
 minutes as an array.
 
-On Linux, FreeBSD and OpenBSD systems, it will make a call to `getloadavg`.
+On Linux, Solaris, FreeBSD, NetBSD and OpenBSD systems, it will make a
+call to ["getloadavg"](#getloadavg).
 
-If `/proc/loadavg` is available, it will attempt to parse the file.
+If `/proc/loadavg` is available on non-Cygwin systems, it
+will call ["proc\_loadavg"](#proc_loadavg).
 
 Otherwise, it will attempt to parse the output of `uptime`.
 
 On error, it will return an array of `undef` values.
+
+As of v0.29, you can override the default function by changing
+`$Sys::CpuLoad::LOAD`:
+
+```perl
+use Sys::CpuLoad 'load';
+
+no warnings 'once';
+
+$Sys::CpuLoad::LOAD = 'uptimr';
+
+@load = load();
+```
+
+If you are writing code to work on multiple systems, you should use
+the `load` function.  But if your code is intended for specific systems,
+then you should use the appropriate function.
+
+## getloadavg
+
+This is a wrapper around the system call to `getloadavg`.
+
+If this call is unavailable, or it is fails, it will return `undef`.
+
+Added in v0.22.
+
+## proc\_loadavg
+
+If `/proc/loadavg` is available, it will be used.
+
+If the data cannot be parsed, it will return `undef`.
+
+Added in v0.22.
+
+## uptime
+
+Parse the output of uptime.
+
+If the [uptime](https://metacpan.org/pod/uptime) executable cannot be found, or the output cannot be
+parsed, it will return `undef`.
+
+Added in v0.22.
+
+As of v0.24, you can override the executable path by setting
+`$Sys::CpuLoad::UPTIME`, e.g.
+
+```perl
+use Sys::CpuLoad 'uptime';
+
+no warnings 'once';
+
+$Sys::CpuLoad::UPTIME = '/usr/bin/w';
+
+@load = uptime();
+```
 
 # SEE ALSO
 
@@ -57,9 +114,12 @@ feature.
 - Robert Rothenberg <rrwo@cpan.org>
 - Clinton Wong <clintdw@cpan.org>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-Vincent Lefèvre <vincent@vinc17.net>
+- Slaven Rezić <slaven@rezic.de>
+- Victor Wagner
+- Dmitry Dorofeev <dima@yasp.com>
+- Vincent Lefèvre <vincent@vinc17.net>
 
 # COPYRIGHT AND LICENSE
 

@@ -1,9 +1,9 @@
 package App::ManagePoolStyleRepo;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-10'; # DATE
+our $DATE = '2020-04-13'; # DATE
 our $DIST = 'App-ManagePoolStyleRepo'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -27,6 +27,38 @@ our %args_common = (
         req => 1,
         pos => 0,
         summary => 'Repo directory',
+    },
+    pool_pattern => {
+        schema => 're*',
+        default => qr/\Apool(?:\..+)?\z/,
+        description => <<'_',
+
+By default, `pool` and `pool.*` subdirectory under the repo are searched for
+items. You can customize using this option. But note that `pool1_pattern` and
+`pool2_pattern` options have precedence over this.
+
+_
+    },
+    pool1_pattern => {
+        schema => 're*',
+        default => qr/\Apool1(?:\..+)?\z/,
+        description => <<'_',
+
+By default, `pool1` and `pool1.*` subdirectories under the repo are searched for
+items under a layer of intermediate subdirectories. You can customize using this
+option. But note that `pool2_pattern` option has precedence over this.
+
+_
+    },
+    pool2_pattern => {
+        schema => 're*',
+        default => qr/\Apool2(?:\..+)?\z/,
+        description => <<'_',
+
+By default, `pool2` and `pool2.*` subdirectories under the repo are searched for
+items. You can customize using this option.
+
+_
     },
 );
 
@@ -114,7 +146,12 @@ $SPEC{list_items} = {
     },
 };
 sub list_items {
+    require File::MoreUtil;
+
     my %args = @_;
+    my $pool_pattern  = $args{pool_pattern}  // qr/\Apool(?:\..+)?\z/;
+    my $pool1_pattern = $args{pool1_pattern} // qr/\Apool1(?:\..+)?\z/;
+    my $pool2_pattern = $args{pool2_pattern} // qr/\Apool2(?:\..+)?\z/;
 
     my $q_lc; $q_lc = lc $args{q} if defined $args{q};
     my $searchable_fields = $args{_searchable_fields} // ['filename', 'title'];
@@ -123,47 +160,52 @@ sub list_items {
 
     my @rows;
 
-  POOL:
+    my @dir_entries = File::MoreUtil::get_dir_entries();
+
+  POOL2:
     {
-        last unless -d "pool";
-        local $CWD = "pool";
-        for my $item_path (glob "*") {
-            my $row;
-            $row = get_item_metadata(item_path=>$item_path, _skip_cd=>1);
-            $row->{dir} = "";
-            push @rows, $row;
+        for my $pool_dir (grep { $_ =~ $pool2_pattern } @dir_entries) {
+            local $CWD = $pool_dir;
+            for my $dir1 (grep {-d} glob "*") {
+                local $CWD = $dir1;
+                for my $dir2 (grep {-d} glob "*") {
+                    local $CWD = $dir2;
+                    for my $item_path (glob "*") {
+                        my $row;
+                        $row = get_item_metadata(item_path=>$item_path, _skip_cd=>1);
+                        $row->{dir} = "$pool_dir/$dir1/$dir2";
+                        push @rows, $row;
+                    }
+                }
+            }
         }
     }
 
   POOL1:
     {
-        last unless -d "pool1";
-        local $CWD = "pool1";
-        for my $dir1 (grep {-d} glob "*") {
-            local $CWD = $dir1;
-            for my $item_path (glob "*") {
-                my $row;
-                $row = get_item_metadata(item_path=>$item_path, _skip_cd=>1);
-                $row->{dir} = $dir1;
-                push @rows, $row;
+        for my $pool_dir (grep { $_ =~ $pool1_pattern } @dir_entries) {
+            local $CWD = $pool_dir;
+            for my $dir1 (grep {-d} glob "*") {
+                local $CWD = $dir1;
+                for my $item_path (glob "*") {
+                    my $row;
+                    $row = get_item_metadata(item_path=>$item_path, _skip_cd=>1);
+                    $row->{dir} = "$pool_dir/$dir1";
+                    push @rows, $row;
+                }
             }
         }
     }
 
-  POOL2:
+  POOL:
     {
-        last unless -d "pool2";
-        local $CWD = "pool2";
-        for my $dir1 (grep {-d} glob "*") {
-            local $CWD = $dir1;
-            for my $dir2 (grep {-d} glob "*") {
-                local $CWD = $dir2;
-                for my $item_path (glob "*") {
-                    my $row;
-                    $row = get_item_metadata(item_path=>$item_path, _skip_cd=>1);
-                    $row->{dir} = "$dir1/$dir2";
-                    push @rows, $row;
-                }
+        for my $pool_dir (grep { $_ =~ $pool_pattern } @dir_entries) {
+            local $CWD = $pool_dir;
+            for my $item_path (glob "*") {
+                my $row;
+                $row = get_item_metadata(item_path=>$item_path, _skip_cd=>1);
+                $row->{dir} = $pool_dir;
+                push @rows, $row;
             }
         }
     }
@@ -238,7 +280,7 @@ sub update_index {
         mkdir "by-title";
         local $CWD = "by-title";
         for my $item (@{ $res->[2] }) {
-            my $target = "../../pool" . (length $item->{dir} ? "/$item->{dir}" : "") . "/$item->{filename}";
+            my $target = "../../$item->{dir}/$item->{filename}";
             my $link   = $item->{title};
             symlink $target, $link or warn "Can't symlink $link -> $target: $!";
         }
@@ -257,7 +299,7 @@ sub update_index {
                 (my $tagdir = $tag) =~ s!-+!/!g;
                 File::Path::mkpath($tagdir) unless $tags{$tag}++;
                 my $num_level = 1; $num_level++ while $tagdir =~ m!/!g;
-                my $target = "../../".("../" x $num_level) . "pool" . (length $item->{dir} ? "/$item->{dir}" : "") . "/$item->{filename}";
+                my $target = "../../".("../" x $num_level).$item->{dir}."/$item->{filename}";
                 my $link = "$tagdir/$item->{title}";
                 symlink $target, $link or warn "Can't symlink $link -> $target: $!";
             }
@@ -288,7 +330,7 @@ App::ManagePoolStyleRepo - Manage pool-style repo directory
 
 =head1 VERSION
 
-This document describes version 0.001 of App::ManagePoolStyleRepo (from Perl distribution App-ManagePoolStyleRepo), released on 2020-04-10.
+This document describes version 0.002 of App::ManagePoolStyleRepo (from Perl distribution App-ManagePoolStyleRepo), released on 2020-04-13.
 
 =head1 FUNCTIONS
 
@@ -332,6 +374,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<lacks_tags> => I<array[str]>
 
+=item * B<pool1_pattern> => I<re> (default: qr(\Apool1(?:\..+)?\z))
+
+By default, C<pool1> and C<pool1.*> subdirectories under the repo are searched for
+items under a layer of intermediate subdirectories. You can customize using this
+option. But note that C<pool2_pattern> option has precedence over this.
+
+=item * B<pool2_pattern> => I<re> (default: qr(\Apool2(?:\..+)?\z))
+
+By default, C<pool2> and C<pool2.*> subdirectories under the repo are searched for
+items. You can customize using this option.
+
+=item * B<pool_pattern> => I<re> (default: qr(\Apool(?:\..+)?\z))
+
+By default, C<pool> and C<pool.*> subdirectory under the repo are searched for
+items. You can customize using this option. But note that C<pool1_pattern> and
+C<pool2_pattern> options have precedence over this.
+
 =item * B<q> => I<str>
 
 Search query.
@@ -367,6 +426,23 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<pool1_pattern> => I<re> (default: qr(\Apool1(?:\..+)?\z))
+
+By default, C<pool1> and C<pool1.*> subdirectories under the repo are searched for
+items under a layer of intermediate subdirectories. You can customize using this
+option. But note that C<pool2_pattern> option has precedence over this.
+
+=item * B<pool2_pattern> => I<re> (default: qr(\Apool2(?:\..+)?\z))
+
+By default, C<pool2> and C<pool2.*> subdirectories under the repo are searched for
+items. You can customize using this option.
+
+=item * B<pool_pattern> => I<re> (default: qr(\Apool(?:\..+)?\z))
+
+By default, C<pool> and C<pool.*> subdirectory under the repo are searched for
+items. You can customize using this option. But note that C<pool1_pattern> and
+C<pool2_pattern> options have precedence over this.
 
 =item * B<repo_path>* => I<dirname>
 

@@ -1,3 +1,16 @@
+0.124   2020-04-14  Released-By: PERLANCAR; Urgency: medium
+
+	- NodeMethods: add descendants_depth_first().
+
+
+0.123   2020-04-14  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Code::Includable::Tree::NodeMethods::_children_as_list: add
+	  option $IGNORE_NO_CHILDREN_METHOD (and enable it by default) to
+	  ignore instead of die when a node does not support method to get
+	  children.
+
+
 0.122   2020-02-24  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Downgrade requirements Class::InsideOut, Moo, Moose,

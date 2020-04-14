@@ -1,2 +1,5 @@
+0.02 2020-04-14
+-Handle back-references and named captures in string-replacements to modify()
+
 0.01 2020-04-13
 -Initial release

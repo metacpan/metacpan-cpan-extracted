@@ -1,3 +1,10 @@
+0.007   2020-04-14  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add -5 as shortcut for '-t Pod5 -t Nester'.
+
+	- [doc] Add some examples.
+
+
 0.006   2019-12-15  Released-By: PERLANCAR; Urgency: medium
 
 	[UX tweaks]

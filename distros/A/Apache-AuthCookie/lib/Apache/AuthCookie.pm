@@ -1,5 +1,5 @@
 package Apache::AuthCookie;
-$Apache::AuthCookie::VERSION = '3.29';
+$Apache::AuthCookie::VERSION = '3.30';
 # ABSTRACT: Perl Authentication and Authorization via cookies
 
 use strict;
@@ -8,8 +8,9 @@ use Carp;
 use mod_perl qw(1.07 StackedHandlers MethodHandlers Authen Authz);
 use Apache::Constants qw(:common M_GET FORBIDDEN OK REDIRECT);
 use Apache::AuthCookie::Params;
-use Apache::AuthCookie::Util qw(is_blank);
+use Apache::AuthCookie::Util qw(is_blank is_local_destination);
 use Apache::Util qw(escape_uri);
+use Apache::URI;
 use Encode ();
 
 
@@ -217,12 +218,18 @@ sub login ($$) {
     }
 
     if ($r->dir_config("${auth_name}EnforceLocalDestination")) {
-        if ($destination !~ m|^\s*/|) {
+        my $current_url = Apache::URI->parse($r)->unparse;
+        unless (is_local_destination($destination, $current_url)) {
             $r->log_error("non-local destination $destination detected for uri ",$r->uri);
 
-            unless (is_blank($default_destination)) {
+            if (is_local_destination($default_destination, $current_url)) {
                 $destination = $default_destination;
                 $r->log_error("destination changed to $destination");
+            }
+            else {
+                $r->log_error("Returning login form: non local destination: $destination");
+                $r->subprocess_env('AuthCookieReason', 'no_cookie');
+                return $auth_type->login_form($r);
             }
         }
     }
@@ -662,7 +669,7 @@ Apache::AuthCookie - Perl Authentication and Authorization via cookies
 
 =head1 VERSION
 
-version 3.29
+version 3.30
 
 =head1 SYNOPSIS
 

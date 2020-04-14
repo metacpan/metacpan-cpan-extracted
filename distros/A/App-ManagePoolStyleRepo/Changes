@@ -1,3 +1,9 @@
+0.002   2020-04-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Read pool.*, pool1.*, and pool2.* too; make them configurable via
+	  pool{,1,2}_pattern options.
+
+
 0.001   2020-04-10  Released-By: PERLANCAR
 
         - First release.

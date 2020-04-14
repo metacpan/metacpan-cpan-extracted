@@ -1,0 +1,16 @@
+lib/Bio/Phylo/CIPRES.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README.md
+script/cipresrun
+script/genequery
+script/refseqpp
+script/seqfilter
+script/seqgisaidpp
+script/sequniqid
+script/sequniqseq
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -14,12 +14,12 @@ extern "C" {
 MODULE = Sys::CpuLoad		PACKAGE = Sys::CpuLoad
 
 void
-_getbsdload()
+getloadavg()
     PREINIT:
         double loadavg[3];
         int    nelem;
     PPCODE:
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__APPLE__) || defined(__linux__) || defined(__sun)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__APPLE__) || defined(__linux__) || defined(__sun) || defined(__DragonFly__)
         nelem = getloadavg(loadavg, 3);
 #else
         nelem = -1;

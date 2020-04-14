@@ -4,7 +4,7 @@ package Mojolicious::Plugin::AdditionalValidationChecks;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Email::Valid;
 use Scalar::Util qw(looks_like_number);
@@ -299,7 +299,7 @@ Mojolicious::Plugin::AdditionalValidationChecks - Add addtional validation check
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -315,6 +315,15 @@ version 0.15
 
 L<Mojolicious::Plugin::AdditionalValidationChecks> adds a few validation checks to
 the L<Mojolicious validator|Mojolicious::Validator>.
+
+=head1 NOTE
+
+The behaviour of empty strings changed in L<Mojolicious 8.34|https://github.com/mojolicious/mojo/blob/v8.34/Changes>.
+So e.g. this was valid before 8.34 and is now invalid:
+
+  my $validation = $self->validation;
+  $validation->input({ nr => '' });
+  $validation->required( 'nr' )->phone();
 
 =head1 CHECKS
 
@@ -532,6 +541,13 @@ This is the default variant
   $validation->required( 'ip' )->ip(); # valid
   $validation->input({ ip => '255.255.255.255' });
   $validation->required( 'ip' )->ip(); # valid
+
+IPv6
+
+  my $validation = $self->validation;
+  $validation->input({ ip => 'fe80:0:0:0:200:f8ff:fe21:67cf' });
+  $validation->required( 'ip' )->ip(6); # valid
+  $validation->required( 'ip' )->ip(); # invalid as IPv4 is the default
 
 =head1 ACKNOWLEDGEMENT
 

@@ -11,9 +11,8 @@ use Graphics::Framebuffer;
 use List::Util qw(min max shuffle);
 use Time::HiRes qw(sleep time alarm);
 use Getopt::Long;
-use Data::Dumper;
 
-# use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
+# use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 our $F;
 
@@ -98,12 +97,12 @@ foreach my $file (@files) {
     my $image = $F->load_image(
         {
             'x'            => 0,
-              'y'            => 0,
-              'width'        => $XX,
-              'height'       => $F->{'H_CLIP'},
-              'file'         => "$images_path/$file",
-              'convertalpha' => ($file =~ /wolf|Crescent/i) ? 1 : 0,
-              'center'       => CENTER_XY,
+            'y'            => 0,
+            'width'        => $XX,
+            'height'       => $F->{'H_CLIP'},
+            'file'         => "$images_path/$file",
+            'convertalpha' => ($file =~ /wolf|Crescent/i) ? 1 : 0,
+            'center'       => CENTER_XY,
         }
     );
     if (defined($image)) {

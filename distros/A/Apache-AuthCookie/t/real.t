@@ -13,12 +13,17 @@ use Apache::Test '-withtestmore';
 use Apache::TestUtil;
 use Apache::TestRequest qw(GET POST GET_BODY);
 use Encode qw(encode);
+use URI;
 
 Apache::TestRequest::user_agent( reset => 1, requests_redirectable => 0 );
 
-plan tests => 36, need_lwp;
+plan tests => 39, need_lwp;
 
 ok 1, 'Test initialized';
+
+# extract the configured hostname + port from Apache::Test
+my $apache_test_config = Apache::Test::config();
+my $host_port = Apache::TestRequest::hostport($apache_test_config);
 
 # TODO: the test descriptions should be things other than 'test #' here.
 
@@ -541,7 +546,7 @@ subtest 'recognize user' => sub {
 subtest 'DefaultDestination' => sub {
     plan tests => 1;
 
-    my $r = POST('/LOGIN', [
+    my $r = POST('/LOGIN-WITHDEFAULT', [
         credential_0 => 'programmer',
         credential_1 => 'Hero'
     ]);
@@ -550,18 +555,153 @@ subtest 'DefaultDestination' => sub {
        'redirected to default destination');
 };
 
-# Test EnforceLocalDestination
-subtest 'EnforceLocalDestination' => sub {
-    plan tests => 1;
+subtest 'DefaultDestination' => sub {
+    plan tests => 3;
 
-    my $r = POST('/LOGIN', [
-        destination  => "http://metacpan.org/",
+    my $r = POST('/LOGIN-WITHDEFAULT', [
         credential_0 => 'programmer',
         credential_1 => 'Hero'
     ]);
 
     is($r->header('Location'), '/docs/protected/index.html',
-       'enforced local destination, redirected to default destination');
+       'redirected to default destination - no destination in params');
+
+    $r = POST('/LOGIN-WITHDEFAULT', [
+        destination  => 'http://metacpan.org/',
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    is($r->header('Location'), 'http://metacpan.org/',
+       'redirected to remote default destination');
+
+    $r = POST('/LOGIN-WITHDEFAULT', [
+        destination  => '/docs/protected/get_me.html',
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    is($r->header('Location'), '/docs/protected/get_me.html',
+       'redirected to requested local default destination');
+};
+
+subtest 'EnforceLocalDestination with default destination' => sub {
+    plan tests => 5;
+
+    my $r = POST('/LOGIN-ENFORCELOCAL-WITHDEFAULT', [
+        destination  => 'http://metacpan.org/',
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    is($r->header('Location'), '/docs/protected/index.html',
+       'redirected to default destination - remote destination in params');
+
+    $r = POST('/LOGIN-ENFORCELOCAL-WITHDEFAULT', [
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    is($r->header('Location'), '/docs/protected/index.html',
+       'redirected to default destination - no destiantion in params');
+
+    $r = POST('/LOGIN-ENFORCELOCAL-WITHDEFAULT', [
+        destination  => '/docs/protected/get_me.html',
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    is($r->header('Location'), '/docs/protected/get_me.html',
+       'redirected to requested local destination');
+
+    $r = POST('/LOGIN-ENFORCELOCAL-WITHDEFAULT', [
+        destination  => '//metacpan.org/index.html',
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    is($r->header('Location'), '/docs/protected/index.html',
+       'redirected to default destination - protocol-relative destination in params');
+
+    my $abs_destination = URI->new("http://${host_port}/docs/protected/get_me.html")->as_string;
+    note "abs destination: $abs_destination";
+    $r = POST('/LOGIN-ENFORCELOCAL-WITHDEFAULT', [
+        destination  => $abs_destination,
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    is($r->header('Location'), $abs_destination,
+       'redirected to requested destination - absolute URI is local to current request');
+};
+
+subtest 'EnforceLocalDestination with no default destination' => sub {
+    plan tests => 4;
+
+    my $r = POST('/LOGIN-ENFORCELOCAL-NODEFAULT', [
+        destination  => 'http://metacpan.org/',
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    like($r->content, qr/Failure reason: 'no_cookie'/,
+        'login form was returned for remote destination');
+
+    $r = POST('/LOGIN-ENFORCELOCAL-NODEFAULT', [
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    like($r->content, qr/Failure reason: 'no_cookie'/,
+        'login form was returned for no destination in params');
+
+    $r = POST('/LOGIN-ENFORCELOCAL-NODEFAULT', [
+        destination  => '/docs/protected/get_me.html',
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    is($r->header('Location'), '/docs/protected/get_me.html',
+       'Got redirected to protected document for local destination');
+
+    $r = POST('/LOGIN-ENFORCELOCAL-NODEFAULT', [
+        destination  => '//metacpan.org/index.html',
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    like($r->content, qr/Failure reason: 'no_cookie'/,
+        'login form was returned - protocol relative destination in params');
+};
+
+subtest 'EnforceLocalDestination with non local default destination' => sub {
+    plan tests => 3;
+
+    my $r = POST('/LOGIN-ENFORCELOCAL-REMOTEDEFAULT', [
+        destination  => "http://metacpan.org/",
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    like($r->content, qr/Failure reason: 'no_cookie'/,
+        'login form was returned for non local destination');
+
+    $r = POST('/LOGIN-ENFORCELOCAL-REMOTEDEFAULT', [
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    like($r->content, qr/Failure reason: 'no_cookie'/,
+        'login form was returned for no destination in params');
+
+    $r = POST('/LOGIN-ENFORCELOCAL-REMOTEDEFAULT', [
+        destination  => '/docs/protected/get_me.html',
+        credential_0 => 'programmer',
+        credential_1 => 'Hero'
+    ]);
+
+    is($r->header('Location'), '/docs/protected/get_me.html',
+       'Got redirected to protected document for local destination');
 };
 
 # remove CR's from a string.  Win32 apache apparently does line ending

@@ -1,7 +1,9 @@
 package Role::TinyCommons::Tree;
 
-our $DATE = '2020-02-24'; # DATE
-our $VERSION = '0.122'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-14'; # DATE
+our $DIST = 'Role-TinyCommons-Tree'; # DIST
+our $VERSION = '0.124'; # VERSION
 
 1;
 # ABSTRACT: Roles related to object tree
@@ -18,7 +20,7 @@ Role::TinyCommons::Tree - Roles related to object tree
 
 =head1 VERSION
 
-This document describes version 0.122 of Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-24.
+This document describes version 0.124 of Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2020-04-14.
 
 =head1 DESCRIPTION
 

@@ -13,7 +13,6 @@ use Test::NoWarnings;
 use Test::LeakTrace;
 
 my $server = OPCUA::Open62541::Test::Server->new();
-$server->port(4840);
 $server->start();
 my $client = OPCUA::Open62541::Test::Client->new(port => $server->port());
 $client->start();

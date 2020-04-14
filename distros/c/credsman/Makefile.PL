@@ -23,6 +23,7 @@ WriteMakefile(
     DEFINE             => '', # e.g., '-DHAVE_SOMETHING'
     OPTIMIZE           => '-O3',
     TEST_REQUIRES      => {
+                           'Net::FTP'   => 3,
                            'Test::More' => 0,
                            'ExtUtils::testlib' => 0,
                            'Params::ValidationCompiler' => 0,

@@ -14,33 +14,36 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-SHA1 31ba629ca96ebda7b1709508f0fc8bf9677d8e3c Changes
+SHA1 375a1955e84a3fa4818c3d7461bb3c5edf1cd60e Changes
 SHA1 cb36dd242de6d18cd64c4b55444347ebf09e43e7 LICENSE
-SHA1 34c525c30df8894d182381be05efa0199f71974b MANIFEST
-SHA1 0ff75e1a6186d7274e76387884eca541fdd5ca4a MANIFEST.SKIP
-SHA1 27e6db2262b210a23ef9d9caa1e048663c962c2d META.json
-SHA1 819cd9960e3a776170ab825bd1705d7567372342 META.yml
-SHA1 0b7f5458f3dcf34807bbc02dccc1873f9e438907 Makefile.PL
+SHA1 542696e08fe645aebe960ab6f83ce5637a120921 MANIFEST
+SHA1 dcf4f2dbf2980048059f61a840b89bc7579b7bed MANIFEST.SKIP
+SHA1 151de4b6221541d0d0100a6d36f1a87bace9e119 META.json
+SHA1 a48643fb7bf77ea3afc1ffb3b7db4c7829c4b7a3 META.yml
+SHA1 6418160ab4308442b78bae60945c1d2b6591313f Makefile.PL
 SHA1 b9945378262a25db34dcdba06da956a52876188b README
 SHA1 f9d2e5d4bcafb4b3d73b0a1f390aa25579cafbd2 README.apache-2.4.pod
 SHA1 ccbc46a0385aabadd1e6f4a22f8d4ebb11b44901 README.modperl2
-SHA1 27e39d8407824657f07f031634152a1383099fd5 lib/Apache/AuthCookie.pm
-SHA1 80a91eddb5f9f4ad387ed574379ab35cc4c1dd2d lib/Apache/AuthCookie/FAQ.pod
-SHA1 8b95c211543c7e6268b50873adfb8deaad2ed537 lib/Apache/AuthCookie/Params.pm
-SHA1 3df3ec40ae5d9e92e5f2a2567e8372785a6b6061 lib/Apache/AuthCookie/Params/Base.pm
-SHA1 8d5b7a5762c874a127420df1741ea60b04dbdfa0 lib/Apache/AuthCookie/Params/CGI.pm
-SHA1 10c92d998b8d6963045a0290eebeae461f342340 lib/Apache/AuthCookie/Util.pm
-SHA1 18b3e60144534176328e04cd0ebf6883ed7b8af0 lib/Apache2/AuthCookie.pm
-SHA1 e4b9406d8668147e6be8254aa326a4873b17c73d lib/Apache2/AuthCookie/Base.pm
-SHA1 cb19296a1431e866f35e0cffe5cb3bcd9fe9cafd lib/Apache2/AuthCookie/Params.pm
-SHA1 43d7023fd161d9e4bf3d4aaee39c894af0d9374f lib/Apache2_4/AuthCookie.pm
+SHA1 fc0708f4b4e74f2b3dcb8ca82409ff85360a3185 lib/Apache/AuthCookie.pm
+SHA1 230cc7f97f735ad51defd14cbbb99a65afb2a671 lib/Apache/AuthCookie/FAQ.pod
+SHA1 1487322b93fe2494c348b6cf47caa790f1250a71 lib/Apache/AuthCookie/Params.pm
+SHA1 22b0ccea20bc7aebb74a14808eb3dd8243c06ece lib/Apache/AuthCookie/Params/Base.pm
+SHA1 c545d90e446fea48500e5f6ae0190e7837d402a3 lib/Apache/AuthCookie/Params/CGI.pm
+SHA1 8c8aef69590175ec89d2971002fb6068604b71aa lib/Apache/AuthCookie/Util.pm
+SHA1 e346c43e215195b235a201bc5a7b7ed4f37bde93 lib/Apache2/AuthCookie.pm
+SHA1 e2b0026242aec662b74bd9c25cdf70aae988b76e lib/Apache2/AuthCookie/Base.pm
+SHA1 9e334ee16e5ce6d6b6a13d187fe3dad0d748dfbb lib/Apache2/AuthCookie/Params.pm
+SHA1 14ecc1018b1164c9de41a32fc42fbc262371631b lib/Apache2_4/AuthCookie.pm
+SHA1 e9a1441d3978e0c7f20373cdffde4e44059f1f59 scripts/docker-shell
 SHA1 202ecf6a31c02ad029aa6e372ece61a935dd74bf scripts/docker-smoke
+SHA1 fd937f1a4ab774883c703fb869c9108eabbce5f1 scripts/dzil-build
 SHA1 fee15f1cd6c3fe17e8370838aafe6d54bfd72611 scripts/perlbrew-smoke
+SHA1 c3fe2ecbcdea18bfb66ee1b48cdc3120af6dff2d scripts/run-docker-tests
 SHA1 3ac8de46e7bba83f6969caec3c9c14cbd99881cb t/Skeleton/AuthCookieHandler.pm
 SHA1 b1f854e6edecbdd44fc7b8db719e0fe21d9340d1 t/TEST.PL
 SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
 SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
-SHA1 1f622a23011f98ead60d3bd0f5a64bf61a0540c0 t/conf/extra.conf.in
+SHA1 a6db6d6b6791f6b296c2b4da81ba6ba563c40375 t/conf/extra.conf.in
 SHA1 2156ea84b69ca7fef7b73d72a06c07cb145da7a9 t/htdocs/docs/authall/get_me.html
 SHA1 2156ea84b69ca7fef7b73d72a06c07cb145da7a9 t/htdocs/docs/authany/get_me.html
 SHA1 2156ea84b69ca7fef7b73d72a06c07cb145da7a9 t/htdocs/docs/cookiename/get_me.html
@@ -51,30 +54,32 @@ SHA1 0dba04a9de174ab9881cfe575d1d23bb5fc588a8 t/htdocs/docs/login.pl
 SHA1 b9eca1b328da7d703abaec2d6a6d5751866843ac t/htdocs/docs/logout.pl
 SHA1 2156ea84b69ca7fef7b73d72a06c07cb145da7a9 t/htdocs/docs/myuser/get_me.html
 SHA1 b37a85d16cbb2342b407f2ba70b8a61aa1ca67bb t/htdocs/docs/protected/echo_user.pl
+SHA1 24be947e7f5f765c02bab477dd47d0915e061bcf t/htdocs/docs/protected/enforce-local/no-default/index.html
+SHA1 d767e693a331d021863a40f43f348ce688bae595 t/htdocs/docs/protected/enforce-local/with-default/index.html
 SHA1 2156ea84b69ca7fef7b73d72a06c07cb145da7a9 t/htdocs/docs/protected/get_me.html
 SHA1 077d964c9f67b5dfe4f5f6a73c71ccbd60bd03af t/htdocs/docs/protected/index.html
 SHA1 2156ea84b69ca7fef7b73d72a06c07cb145da7a9 t/htdocs/docs/stimeout/get_me.html
 SHA1 b17cdb6e4dfb752901c2a9df5ce822a2d54b92b5 t/lib/Sample/Apache/AuthCookieHandler.pm
 SHA1 9ba342e14a302d89f38ab063c56e5ae000a7595c t/lib/Sample/Apache2/AuthCookieHandler.pm
 SHA1 b19593e0dc51baa6a4d84bc27da2e53632ab8592 t/lib/Sample/Apache2_4/AuthCookieHandler.pm
-SHA1 a61e0019aa3d40fcef8954b1b58703a686c23102 t/real.t
+SHA1 b872739fede90854e5685bfb60ff9408cba73fc1 t/real.t
 SHA1 f0c37746e0277de1ddb62c9227628a5ebe5a777a t/signature.t
 SHA1 e91bf0ef7d63322eaf15ca7d9907c6db47ce90ca t/startup.pl
 SHA1 da33f704880ddd2596521c39be5b7b6a22913882 t/util.t
 -----BEGIN PGP SIGNATURE-----
 
-iQJFBAEBCAAvFiEE2EtuRfhGgngE8PsARAzvLrlUzY4FAl53vnARHG1zY2hvdXRA
-Y3Bhbi5vcmcACgkQRAzvLrlUzY6rpRAApqUTgPXtRrzNcRZ86M70q/NgFmBNkiUB
-rEWoaITcUFbwbIYYq8RcoWTh04FAUAkHhsd8oiHLj+mj2OduQGWzM6Mo6rXQq0sR
-do12cF4f8aKeQBf/U1xtUe8fIL38hrEmehCghivfc9k/V8IFAUyEXjQbQMV0+7ex
-5OPBHr5gAVe1NzLuzqgsiDQGk+kW1BUW9P+r4qzB+yx0bOclFR/RuTn4wOuy64do
-P1tgCMKXr3hqFhk9VO+h+gOppNjUkaTM7zKVK+XeA42XXpBUPkH6843UpUehJzPG
-PyqvqVvDG9Dlr0Hj5uY3dKNJKtvpr13Taj188buhDo5ki1HM4m3q6W6lE0fMX06E
-rwwP0eWn3C5p/+jou6LKCqKPuiAQ2JWCVmCG5sG5Gk7jsNBa5uciKIVQbYNGoqAA
-PSXF9gd9Jbm0fLizRQgdFpvoIwoYCwLDTJegR5+xBYGH15W3q5r7+mM55oS4Zv1q
-VcwWEB96mHwdITlIqz3nhPVTUIcYdgaKmAALV5nwDpD1nnEePKhxTSGVZgKk9UsU
-qRSzB4lYDpADU2gI7pqzIwht6hZL3CqdEN5LeLlYwIQtXOD8iwQ3VSlRPRTDQIOx
-pcDyj8NWy35st1bnFX8wjnHTUzzB3ecZbJ6hIg+r/ZK64iSkCcGgzGnv65QKogJT
-XPqyiHnELjo=
-=qkgY
+iQJFBAEBCAAvFiEE2EtuRfhGgngE8PsARAzvLrlUzY4FAl6V2JkRHG1zY2hvdXRA
+Y3Bhbi5vcmcACgkQRAzvLrlUzY7/9Q/9Hk6EjLkTbl2gT/2i4bYPsmIu3IhNxaY8
+eWEEYR2+F3gsHmt4fEeKQiXtqQsJw7Vkd2AyvDmwvsBU0TWvW+TA4yWFFr0lEItE
+TEsFcmm6P/7uvUqPj6AaCO95lLBwyAtOtEQ/wUdWw/EsgQcgcuYpY4x4loerZ5w/
+wL2an6FXUw7UgMKmnkG6nzWTvBQ7gsgTjVIBDal+QVSSE0Iar/CDdB0Y2m94BAPy
+tOOUhkR0Vjdknq/QZcgZLLByknEWWtn1X5QqLiPR0sPHQlXTe9CTVICeWwdydtS8
++tk1fXxxaTl801a7PMnpEtDvfJALQODh0SLgl/SZFE/UUnCnGuk/DWP33gjnjYEP
++10FqN6UaHSYp2FqQHGomWFXZhP0oNTJmyN9qaYrxeRgwF2wEZm/HD2rgkJBrDwR
+2he6FR9382FBhOtjg1RNh7HPQWzKbrfExcqIlOgsnp85bn8zwr1Aztsw5tEAk6dc
+HINFAOLqWnPdRGpioUDN7WRRNm5BRUZXzotvKB5I6RPT85NDeksuELtXdHPx0YSA
+k9n0k8tQDBEZQ/VOkMc3nb6F/lg+298X9WErJLfCP3NLal4jan2iJwnsgE7u1DRw
+kua420FkTafZQgbzmJHrTs11eGUPs/IwJwKNx3++oUqwWcsR0IktNBY9hjcG051N
+Yg+R6gUlKPk=
+=1BzL
 -----END PGP SIGNATURE-----
