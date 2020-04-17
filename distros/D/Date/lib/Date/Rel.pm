@@ -1,6 +1,6 @@
 package Date::Rel;
 use 5.012;
-use Date;
+use Date();
 
 use overload
     '""'     => \&_op_str,

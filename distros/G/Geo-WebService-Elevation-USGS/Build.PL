@@ -21,9 +21,8 @@ my %args = (
     requires => $meta->requires(
 	perl	=> $meta->requires_perl(),
     ),
-    add_to_cleanup => [ qw{ xt/optionals } ],
+    add_to_cleanup => [ qw{ cover_db xt/author/optionals } ],
     license => 'perl',
-    add_to_cleanup	=> [ qw{ cover_db } ],
 );
 
 $mbv >= 0.28

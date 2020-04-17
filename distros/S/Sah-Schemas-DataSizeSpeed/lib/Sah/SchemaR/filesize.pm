@@ -1,9 +1,9 @@
 package Sah::SchemaR::filesize;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2020-03-03'; # DATE
+our $VERSION = '0.006'; # VERSION
 
-our $rschema = ["float",[{description=>"\nFloat, in bytes.\n\nCan be coerced from string that contains units, e.g.:\n\n    2KB   -> 2048      (kilobyte, 1024-based)\n    2mb   -> 2097152   (megabyte, 1024-based)\n    1.5K  -> 1536      (kilobyte, 1024-based)\n    1.6ki -> 1600      (kibibyte, 1000-based)\n\n",min=>0,summary=>"File size","x.perl.coerce_rules"=>["From_str::suffix_filesize"]}],["float"]];
+our $rschema = ["float",[{description=>"\nFloat, in bytes.\n\nCan be coerced from string that contains units, e.g.:\n\n    2KB   -> 2048      (kilobyte, 1024-based)\n    2mb   -> 2097152   (megabyte, 1024-based)\n    1.5K  -> 1536      (kilobyte, 1024-based)\n    1.6ki -> 1600      (kibibyte, 1000-based)\n\n",examples=>[{data=>"2KB",res=>2048,valid=>1},{data=>"2 kb",res=>2048,valid=>1},{data=>"2mb",res=>2097152,valid=>1},{data=>"1.5K",res=>1536,valid=>1},{data=>"1.6ki",res=>1600,valid=>1},{data=>"1zzz",valid=>0}],min=>0,summary=>"Data size","x.perl.coerce_rules"=>["From_str::suffix_datasize"]},{summary=>"File size"}],["datasize","float"]];
 
 1;
 # ABSTRACT: File size
@@ -20,7 +20,7 @@ Sah::SchemaR::filesize - File size
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-11-29.
+This document describes version 0.006 of Sah::SchemaR::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-03.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

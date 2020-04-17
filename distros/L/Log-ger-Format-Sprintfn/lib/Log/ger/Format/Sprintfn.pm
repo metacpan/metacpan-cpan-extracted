@@ -1,9 +1,9 @@
 package Log::ger::Format::Sprintfn;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-09'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Format-Sprintfn'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use warnings;
 use Text::sprintfn;
 
 sub meta { +{
-    v => 1,
+    v => 2,
 } }
 
 sub get_hooks {
@@ -77,7 +77,7 @@ Log::ger::Format::Sprintfn - Use Text::sprintfn for formatting instead of sprint
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

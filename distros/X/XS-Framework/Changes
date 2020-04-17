@@ -1,3 +1,8 @@
+1.3.1  17.04.2020
+           - fix compilation on threaded perls
+1.3.0  15.04.2020
+           - add COP hints API
+           - add sv.detach_mortal()
 1.2.9  24.03.2020
            - add method ErrorCode::contains and operator& as alias
 1.2.8  14.02.2020

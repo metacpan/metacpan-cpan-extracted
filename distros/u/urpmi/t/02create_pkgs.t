@@ -16,6 +16,9 @@ foreach (qw(media tmp tmp/BUILD tmp/RPMS tmp/RPMS/noarch tmp/SRPMS)) {
 }
 my $genhdlist2 = 'genhdlist2 --xml-info';
 
+my $whereis_genhdlist2 = qx(whereis genhdlist2);
+ok("whereis genhdlist2", "genhdlist2 emplacement= $whereis_genhdlist2");
+
 # locally build test rpms
 
 foreach my $dir (grep { -d $_ } glob("data/SPECS/*")) {

@@ -127,13 +127,3 @@ Tests were performed on MacOSX, Core i7 3.2Ghz 2012.
 Calculations are done correctly even when input values are not normalized, these functions just don't put normalized values back to struct.
 
 ** there are 2 more functions with 'll' (superlite) at the end, which only allows normalized input struct. They run even faster.
-
-=head1 AUTHOR
-
-Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
-
-=head1 LICENSE
-
-You may distribute this code under the same terms as Perl itself.
-
-=cut

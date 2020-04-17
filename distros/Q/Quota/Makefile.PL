@@ -25,12 +25,12 @@ if (defined($config)) {
   print "Using hints/$config for myconfig.h\n";
   if (-e "myconfig.h" && (!(-l "myconfig.h") || (readlink("myconfig.h") ne "hints/$config"))) {
      die "\nFATAL: myconfig.h already exists.\n\n" .
-         "You need to do a `make clean' before you configure for a new platform.\n".
+         "You need to do a \"make clean\" before configuring for a new platform.\n".
 	 "If that doesn't help, remove myconfig.h manually.\n";
   }
 }
 else {
-  warn "WARNING: No appropriate hints found for this OS: '$os - see INSTALL'\n";
+  warn "WARNING: No appropriate hints found for this OS/revision: \"$os\" - see INSTALL\n";
 }
 
 my $extralibs = "";
@@ -62,17 +62,19 @@ if ( $os =~ /^SunOS/ ) {
 }
 
 # check whether we are using the NetBSD quota library
-if ( ($os =~ /^NetBSD (\d+)\.(\d+)\.(\d+)/) &&
-     (($1 >= 6) || (($1 == 5) && ($2 == 99) && ($3 >= 59)) )) {
+if (   (($os =~ /^NetBSD 5\.99\.(\d+)/i) && ($1 >= 59))
+    || (($os =~ /^NetBSD (\d+)/i) && ($1 >= 6)) ) {
   $extralibs .= " -lquota";
 }
 
 # check whether RPCSVC is included within libc
 # - SUN RPC/XDR support was split off from glibc, see:
 #   https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/F2NRCEXDDUF6WWNPSOMXRJS6BPMTEEVJ/
-# - in RHEL apparently the rpc/rpc.h header was moved too;
-#   Debian has libtirpc, but headers and implementation are still in glibc too
-if (($os =~ /^Linux/) && (-d '/usr/include/tirpc')) {
+# - in RHEL apparently the rpc/rpc.h header was moved too
+# - Debian has libtirpc, but headers and implementation are still in glibc too
+#   so there's a risk symbols are resolved from libc while compiling against tirpc headers;
+#   therefore we do not use tirpc when rpc headers are present outside tirpc
+if (($os =~ /^Linux/) && (-d '/usr/include/tirpc') && (!-e '/usr/include/rpc/rpc.h')) {
   print "Configured to use tirpc library instead of rpcsvc\n";
   $extrainc = "-I/usr/include/tirpc";
   $rpclibs .= "-ltirpc";

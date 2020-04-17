@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.200510';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.201060';
 use Moose;
 use namespace::autoclean;
 
@@ -84,6 +84,18 @@ has '_gi_mapper' => (           # the nearly homonymous 'gi_mapper' method
 );
 
 
+has '_is_deleted' => (
+    traits   => ['Hash'],
+    is       => 'ro',
+    isa      => 'HashRef[Bool]',
+    lazy     => 1,
+    builder  => '_build_is_deleted',
+    handles  => {
+        'is_deleted' => 'defined',
+    },
+);
+
+
 has '_' . $_ . '_for' => (
     traits   => ['Hash'],
     is       => 'ro',
@@ -97,18 +109,19 @@ has '_' . $_ . '_for' => (
 ) for qw(merged misleading);
 
 
-has '_is_' . $_ => (
+has '_dupes_for' => (
     traits   => ['Hash'],
     is       => 'ro',
-    isa      => 'HashRef[Bool]',
+    isa      => 'HashRef[HashRef[Num]]',
     lazy     => 1,
-    builder  => '_build_is_' . $_,
+    builder  => '_build_dupes_for',
     handles  => {
-        'is_' . $_ => 'defined',
+        'is_dupe'      => 'defined',
+           'dupes_for' => 'get',
     },
-) for qw(dupe deleted);
+);
 
-
+# TODO: change this name? to avoid confusion with othe uses of rank_for
 has '_rank_for' => (
     traits   => ['Hash'],
     is       => 'ro',
@@ -128,7 +141,7 @@ has '_strain_taxid_for' => (
     lazy     => 1,
     builder  => '_build_strain_taxid_for',
     handles  => {
-        'get_strain_taxid_for' => 'get',
+        'get_strain_taxid_for' => 'get',    # TODO: rename?
     },
 );
 
@@ -166,6 +179,7 @@ sub _build_ncbi_tax {
 
     # Note: names.dmp files are reordered on-the-fly so as scientific names
     # get precedence over other names (e.g., synonyms) in case of duplicates
+    # Note: this should not be useful anymore (due to _dupes_for attribute)
     my $ol = q{'if (index($_, "scientific name") == -1) { print } else { push @sns, $_ } END{ print for @sns }'};
     open my $names_fh, '-|', qq{perl -nle $ol @names_files 2> /dev/null};
     open my $nodes_fh, '-|', qq{cat @nodes_files 2> /dev/null};
@@ -176,23 +190,22 @@ sub _build_ncbi_tax {
 
         # allow most NCBI Taxonomy synonyms classes
         # cut -f4 -d'|' names.dmp | sort | uniq -c
-        # last updated on Feb-19-2019
-        #    1155    acronym
-        #     282    anamorph
-        #  439200    authority
-        #     238    blast name
-        #   14406    common name
-        #   26326    equivalent name
-        #     479    genbank acronym
-        #       1    genbank anamorph
-        #   28750    genbank common name
-        #    1106    genbank synonym
-        #     533    in-part
-        #   44817    includes
-        # 2054028    scientific name
-        #  178204    synonym
-        #     175    teleomorph
-        #  129968    type material
+        # last updated on Apr-15-2020
+        #    1163   acronym
+        #     287   anamorph
+        #  484181   authority
+        #     228   blast name
+        #   14484   common name
+        #   48839   equivalent name
+        #     482   genbank acronym
+        #   29528   genbank common name
+        #    1107   genbank synonym
+        #     535   in-part
+        #   51944   includes
+        # 2240432   scientific name
+        #  166703   synonym
+        #     169   teleomorph
+        #  147495   type material
 
         synonyms => [
             'synonym', 'genbank synonym',
@@ -216,40 +229,6 @@ sub _build_gi_mapper {
             dict => file($self->tax_dir, 'gi_taxid_nucl_prot.bin'),
         save_mem => 1,      # 0 does not work on my MacBook Air
     );
-}
-
-sub _build_is_dupe {
-    my $self = shift;
-
-    #### in _build_is_dupe
-
-    my %count_for;
-
-    my $infile = file($self->tax_dir, 'names.dmp');
-    open my $in, '<', $infile;
-
-    LINE:
-    while (my $line = <$in>) {
-
-        # focus on scientific names
-        next LINE unless $line =~ m/scientific \s name/xms;
-
-        # do not consider as duplicates genus and subgenus that are the same
-        # similarly ignore duplicates involving phylum vs other levels
-        # phyla come after classes and synonyms (and thus should win)
-        next LINE     if $line =~ m/genus>/xms || $line =~ m/<phylum>/xms;
-        next LINE     if $line =~ m/<actinobacteria>/xms;   # workaround...
-
-        # extract and count taxon
-        chomp $line;
-        my $taxon = (split /\s*\|\s*/xms, $line)[1];
-        $count_for{$taxon}++
-    }
-
-    # build list of duplicate taxa (most often genera)
-    my %is_dupe = map { $_ => 1 } grep { $count_for{$_} > 1 } keys %count_for;
-
-    return \%is_dupe;
 }
 
 sub _build_is_deleted {
@@ -310,6 +289,65 @@ sub _build_misleading_for {
     return \%misleading_for;
 }
 
+sub _build_dupes_for {
+    my $self = shift;
+
+    #### in _build_dupes_for
+
+    my %taxids_for;
+
+    my $infile = file($self->tax_dir, 'names.dmp');
+    open my $in, '<', $infile;
+
+    # build hash of NCBI names => taxon_id(s) for all taxa
+
+    LINE:
+    while (my $line = <$in>) {
+
+        # focus on scientific names
+        next LINE unless $line =~ m/scientific \s name/xms;
+
+        # Note: old code was tolerant to "minor" duplications:
+        # do not consider as duplicates genus and subgenus that are the same
+        # similarly ignore duplicates involving phylum vs other levels
+        # phyla come after classes and synonyms (and thus should win)
+        # next LINE     if $line =~ m/genus>/xms || $line =~ m/<phylum>/xms;
+        # next LINE     if $line =~ m/<actinobacteria>/xms;   # workaround...
+
+        # extract taxon and track taxon_id
+        chomp $line;
+        my ($taxon_id, $taxon) = (split /\s*\|\s*/xms, $line)[0..1];
+        push @{ $taxids_for{$taxon} }, $taxon_id;
+    }
+
+    my %dupes_for;
+
+    # create helper Taxonomy object
+    my $tax = $self->new( tax_dir => $self->tax_dir );
+
+    TAXON:
+    while (my ($taxon, $taxids) = each %taxids_for) {
+
+        # only proceed for duplicate taxa
+        next TAXON if @{$taxids} < 2;
+
+        # build hash of partial lineage => taxon_id only for duplicate taxa
+        no warnings 'uninitialized';    # avoid undef due to 2-level lineages
+        my %taxid_for = map {
+            ( join q{; }, ( $tax->get_taxonomy($_) )[-3..-1] ) => $_
+        } @{$taxids};
+        use warnings;
+
+        # warn of taxa that end by the same three last taxa
+        # Note: this looks like a NCBI bug a couple of scientific names
+        carp "[BMC] Note: $taxon cannot be disambiguated."
+            . ' This should not be an issue.' if keys %taxid_for < @{$taxids};
+
+        $dupes_for{$taxon} = \%taxid_for;
+    }
+
+    return \%dupes_for;
+}
 
 # Note: taken from nodes.dmp as follows (then manually re-ordered)
 # cut -f3 -d'|' nodes.dmp | sort | uniq
@@ -618,7 +656,6 @@ sub get_taxid_from_legacy_seq_id {
 }
 
 
-
 sub get_taxonomy_from_seq_id {
     my $self   = shift;
     my $seq_id = shift;
@@ -652,6 +689,42 @@ sub fetch_lineage {                         ## no critic (RequireArgUnpacking)
 }
 
 
+sub get_taxid_from_taxonomy {               ## no critic (RequireArgUnpacking)
+    my $self = shift;
+
+    # fetch taxonomy from args using match_on_type strategy (see above)
+    # Note: this could also work from a seq_id but (this would be inefficient)
+    my @taxonomy = $self->get_taxonomy_from_seq_id(@_);
+
+    while (@taxonomy) {
+
+        # first try to get taxon_id from last taxon
+        my $taxon = $taxonomy[-1];
+        my $taxon_id = $self->get_taxid_from_name($taxon);
+        return $taxon_id if $taxon_id;
+
+        # then try to disambiguate duplicate taxa
+        my $dupes_for = $self->dupes_for($taxon);
+        no warnings 'uninitialized';        # avoid undef due to 2-level lineages
+        $taxon_id = $dupes_for->{ join q{; }, @taxonomy[-3..-1] };
+        use warnings;
+        if ($taxon_id) {
+            carp "[BMC] Note: managed to disambiguate $taxon based on lineage!";
+            return $taxon_id;
+        }
+
+        # finally retry with previous (= higher) taxon
+        # Note: this should never be used for NCBI lineages
+        # but for, e.g., SILVA lineages where (triplet) taxa may be different
+        pop @taxonomy;
+        carp "[BMC] Note: trying to identify $taxon by following lineage..."
+            if @taxonomy;
+    }
+
+    return;
+}
+
+
 sub get_taxonomy_with_levels_from_seq_id {  ## no critic (RequireArgUnpacking)
     return shift->_taxonomy_from_seq_id_(1, @_);
 }
@@ -676,6 +749,16 @@ sub _taxonomy_from_seq_id_ {
 
     # examine context for returning plain array or ArrayRef
     return wantarray ? @taxonomy : \@taxonomy;
+}
+
+
+sub get_taxa_from_taxid {                   ## no critic (RequireArgUnpacking)
+    my $self     = shift;
+    my $taxon_id = shift;
+
+    # TODO: consider numbered levels as in fetch-tax.pl?
+    my @taxa = map { $self->get_term_at_level($taxon_id, $_) } @_;
+    return wantarray ? @taxa : \@taxa;      # specify level through currying
 }
 
 
@@ -751,7 +834,7 @@ sub _common_taxonomy {                      ## no critic (RequireArgUnpacking)
     #     push @common_lineage, shift @taxa;
     # }
 
-    # current version: threshold-based majority-rule consensu
+    # current version: threshold-based majority-rule consensus
     # algorithm: at each taxonomic rank count all seen taxa
     # if the most popular taxon is seen > threshold (w.r.t. all lineages)
     # then continue with the lineages featuring it
@@ -1051,7 +1134,8 @@ sub tab_mapper {
     my $infile  = shift;
     my $args    = shift // {};
 
-    my $col = $args->{column} // 1;
+    my $col = $args->{column}    // 1;
+    my $sep = $args->{separator} // qr{\t}xms;
     my $idm = $args->{gi2taxid};
 
     open my $in, '<', $infile;
@@ -1066,7 +1150,7 @@ sub tab_mapper {
         next LINE if $line =~ $EMPTY_LINE
                   || $line =~ $COMMENT_LINE;
 
-        my @fields = split /\t/xms, $line;
+        my @fields = split $sep, $line;
         $family_for{ $fields[0] } = $fields[$col];
     }
 
@@ -1660,7 +1744,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.200510
+version 0.201060
 
 =head1 SYNOPSIS
 
@@ -1678,9 +1762,13 @@ version 0.200510
 
 =head2 get_taxonomy_from_seq_id
 
+=head2 get_taxid_from_taxonomy
+
 =head2 get_taxonomy_with_levels_from_seq_id
 
-=head2 get_label_from_seq_id
+=head2 get_taxa_from_taxid
+
+=head2 get_nexus_label_from_seq_id
 
 =head2 get_common_taxonomy_from_seq_ids
 

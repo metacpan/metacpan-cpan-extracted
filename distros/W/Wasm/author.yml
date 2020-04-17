@@ -29,3 +29,4 @@ pod_coverage:
   private:
     - Wasm::Wasmtime::ExternType#new
     - Wasm::Wasmtime::Extern#new
+    - Wasm::Wasmtime::Table#new

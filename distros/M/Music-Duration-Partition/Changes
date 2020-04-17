@@ -1,5 +1,20 @@
 Revision history for Music-Duration-Partition
 
+0.0309 2020-04-14 21:25:15
+    - Fix empty pool error message.
+    - Improve the syntax of the eg/* programs.
+    - Correct the 'durations' attribute name.
+
+0.0308 2020-04-14 20:24:12
+    - Make the ->durations method private to the module.
+
+0.0307 2020-04-14 20:11:44
+    - Remove the unused ->sizes method.
+
+0.0306 2020-04-14 19:55:55
+    - Improve documentation.
+    - Remove the unused ->name method.
+
 0.0305 2020-01-11 18:09:17
     - Improve documentation.
     - Improve the eg/figured-bass code.

@@ -4,11 +4,13 @@ use strict;
 use warnings;
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Func;
+use Wasm::Wasmtime::Global;
+use Wasm::Wasmtime::Table;
 use Wasm::Wasmtime::Memory;
 use Wasm::Wasmtime::ExternType;
 
 # ABSTRACT: Wasmtime extern class
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 $ffi_prefix = 'wasm_extern_';
@@ -57,6 +59,22 @@ $ffi->attach( as_func => ['wasm_extern_t'] => 'wasm_func_t' => sub {
 });
 
 
+$ffi->attach( as_global => ['wasm_extern_t'] => 'wasm_global_t' => sub {
+  my($xsub, $self) = @_;
+  my $ptr = $xsub->($self->{ptr});
+  return undef unless $ptr;
+  Wasm::Wasmtime::Global->new($ptr, $self->{owner} || $self);
+});
+
+
+$ffi->attach( as_table => ['wasm_extern_t'] => 'wasm_table_t' => sub {
+  my($xsub, $self) = @_;
+  my $ptr = $xsub->($self->{ptr});
+  return undef unless $ptr;
+  Wasm::Wasmtime::Table->new($ptr, $self->{owner} || $self);
+});
+
+
 $ffi->attach( as_memory => ['wasm_extern_t'] => 'wasm_memory_t' => sub {
   my($xsub, $self) = @_;
   my $ptr = $xsub->($self->{ptr});
@@ -88,7 +106,7 @@ Wasm::Wasmtime::Extern - Wasmtime extern class
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -153,6 +171,20 @@ Returns the kind of extern as the internal integer used by Wasmtime.
  my $func = $extern->as_func;
 
 If the extern is a C<func>, returns its L<Wasm::Wasmtime::Func>.
+Otherwise returns C<undef>.
+
+=head2 as_global
+
+ my $global = $extern->as_global;
+
+If the extern is a C<global>, returns its L<Wasm::Wasmtime::Global>.
+Otherwise returns C<undef>.
+
+=head2 as_table
+
+ my $table = $extern->as_table;
+
+If the extern is a C<table>, returns its L<Wasm::Wasmtime::Table>.
 Otherwise returns C<undef>.
 
 =head2 as_memory

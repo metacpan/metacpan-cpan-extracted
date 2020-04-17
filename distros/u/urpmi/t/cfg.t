@@ -38,11 +38,11 @@ close $f;
 my $config = urpm::cfg::load_config($file);
 ok( ref $config, 'config loaded' );
 
-is($config->{global}{downloader}, 'wget');
-ok(my ($update_2) = grep { $_->{name} eq 'update_2' } @{$config->{media}});
-is($update_2->{url}, 'ftp://foo/bar/');
-ok(my ($update_1) = grep { $_->{name} eq 'update 1' } @{$config->{media}});
-is($update_1->{url}, 'http://foo/bar/' . urpm::cfg::get_release());
+is($config->{global}{downloader}, 'wget', 'config is wget');
+ok(my ($update_2) = (grep { $_->{name} eq 'update_2' } @{$config->{media}}), 'update_2 medium exists');
+is($update_2->{url}, 'ftp://foo/bar/', 'url is ftp');
+ok(my ($update_1) = (grep { $_->{name} eq 'update 1' } @{$config->{media}}), 'update_1 medium exists');
+is($update_1->{url}, 'http://foo/bar/' . urpm::cfg::get_release(), 'url is http');
 
 my $config_verbatim = urpm::cfg::load_config_raw($file, 1);
 ok( ref $config_verbatim, 'config loaded' );

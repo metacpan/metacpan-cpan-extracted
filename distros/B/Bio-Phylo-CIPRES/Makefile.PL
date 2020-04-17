@@ -12,9 +12,11 @@ WriteMakefile
     ABSTRACT_FROM => 'lib/Bio/Phylo/CIPRES.pm',
     LICENSE       => 'perl',
     PREREQ_PM     => {
-        'XML::Twig'  => '0',
-	'YAML'       => '0',
-        'Bio::Phylo' => '0',	
+        'XML::Twig'      => '0',
+		'YAML'           => '0',
+        'Bio::Phylo'     => '0',
+        'URI'            => '0',
+        'LWP::UserAgent' => '0',	
     },
     TEST_REQUIRES => {
           'Test::More' => '0'

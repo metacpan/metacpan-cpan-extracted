@@ -26,12 +26,12 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Log::ger" => "0.034",
+    "Log::ger" => "0.037",
     "Log::ger::Output" => "0.007",
-    "Log::ger::Util" => "0.034",
+    "Log::ger::Util" => "0.037",
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,9 +45,9 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.034",
+  "Log::ger" => "0.037",
   "Log::ger::Output" => "0.007",
-  "Log::ger::Util" => "0.034",
+  "Log::ger::Util" => "0.037",
   "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0

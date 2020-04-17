@@ -25,7 +25,6 @@
 use strict;
 use lib '.', 't';
 use helper;
-use urpm::select;
 use urpm::util;
 use urpm::orphans;
 use Test::More 'no_plan';
@@ -41,7 +40,7 @@ set_urpmi_cfg_global_options({ 'nb-of-new-unrequested-pkgs-between-auto-select-o
 
 
 test_urpme_v1(['h'], 'h', '');
-if (urpm::select::_rpm_version() gt 4.13.0) {
+if (are_weak_deps_supported()) {
     test_urpme_v1(['hh', 'h'], 'h', 'hh');
 } else {
     test_urpme_v1(['h'], 'h');
@@ -57,7 +56,7 @@ test_auto_select_both('d', 'dd',  'd-2', 'dd-1');
 test_auto_select_both('e', 'ee1', 'e-2 ee2-2', 'ee1-1');
 test_auto_select_both('f', 'ff1', 'f-2 ff2-2');
 test_auto_select_both('g', 'gg',  'g-2 gg-2');
-if (urpm::select::_rpm_version() gt 4.13.0) {
+if (are_weak_deps_supported()) {
     test_auto_select_both('h', 'hh',  'h-2', 'hh-1');
 } else {
     test_auto_select_both('h', '',  'h-2', '');

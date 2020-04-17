@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.200510';
+$Bio::MUST::Core::Ali::VERSION = '0.201060';
 use Moose;
 use namespace::autoclean;
 
@@ -800,6 +800,19 @@ sub instant_store {
     return;
 }
 
+
+sub instant_count {
+    my $class  = shift;
+    my $infile = shift;
+
+    my $seq_n = 0;
+
+    open my $in, '<', $infile;
+    while (<$in>) { $seq_n++ if m/^>/xms }
+
+    return $seq_n;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -813,7 +826,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.200510
+version 0.201060
 
 =head1 SYNOPSIS
 
@@ -1577,6 +1590,16 @@ This method requires two arguments. The sercond is a hash reference that must
 contain the following keys:
     - infile:  input sequence file
     - coderef: subroutine implementing the transforming logic
+
+=head2 instant_count
+
+Class method returning the number of seqs in any sequence file read from disk
+without loading it in memory. This method will transparently process plain
+FASTA files in addition to the MUST pseudo-FASTA format (ALI files).
+
+    use aliased 'Bio::MUST::Core::Ali';
+    my $seq_n = Ali->instant_count('input.ali');
+    say $seq_n;
 
 =head1 ALIASES
 

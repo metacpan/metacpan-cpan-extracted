@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -49,7 +49,7 @@ my $result = Data::Roundtrip::yaml2json($INPUT_STRING, \%params);
 if( ! defined $result ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::yaml2jsonl()'." has failed.\n"; exit(1) }
 
 if( defined $OUTPUT_FILE ){
-	if( ! Data::Roundtrip::_write_to_file($OUTPUT_FILE, $result) ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::_write_to_file()'." has failed for '$OUTPUT_FILE'.\n"; exit(1) }
+	if( ! Data::Roundtrip::write_to_file($OUTPUT_FILE, $result) ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::write_to_file()'." has failed for '$OUTPUT_FILE'.\n"; exit(1) }
 } else {
 	print STDOUT $result
 }
@@ -68,7 +68,7 @@ yaml2json.pl : convert YAML to JSON with formatting options
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =head1 SYNOPSIS
 

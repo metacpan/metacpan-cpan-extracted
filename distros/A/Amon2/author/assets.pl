@@ -23,7 +23,7 @@ my $ua = LWP::UserAgent->new();
 
 __PACKAGE__->register_js(
     'run_es5shim',
-    'https://raw.github.com/es-shims/es5-shim/v4.0.3/es5-shim.min.js',
+    'https://raw.github.com/es-shims/es5-shim/v4.5.1/es5-shim.min.js',
     'ES5Shim',
 );
 __PACKAGE__->register_js(
@@ -177,7 +177,7 @@ sub files {
 }
 
 sub run_jquery {
-    my $url = 'http://code.jquery.com/jquery-2.1.1.min.js';
+    my $url = 'http://code.jquery.com/jquery-3.5.0.min.js';
     my $res = $ua->get($url);
     $res->is_success or die "Cannot fetch $url: " . $res->status_line;
 
@@ -222,7 +222,7 @@ sub fetch {
 sub run_bootstrap {
     my $files = {};
     print "Fetching bootstrap\n";
-    my $zip_url = 'https://github.com/twbs/bootstrap/archive/v3.3.5.zip';
+    my $zip_url = 'https://github.com/twbs/bootstrap/archive/v4.4.1.zip';
     my $tmpdir = File::Temp::tempdir(CLEANUP => 1);
     my $tmp = "$tmpdir/bootstrap.zip";
     print "Saving files to $tmp\n";

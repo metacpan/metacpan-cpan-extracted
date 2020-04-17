@@ -6,12 +6,22 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/To_float/From_str/suffix_filesize.pm',
-    'Data/Size/Suffix/Filesize.pm',
+    'Data/Sah/Coerce/perl/To_float/From_str/suffix_datasize.pm',
+    'Data/Sah/Coerce/perl/To_float/From_str/suffix_dataspeed.pm',
+    'Data/Size/Suffix/Datasize.pm',
+    'Data/Size/Suffix/Dataspeed.pm',
+    'Sah/Schema/bandwidth.pm',
+    'Sah/Schema/dataquota.pm',
+    'Sah/Schema/datasize.pm',
+    'Sah/Schema/dataspeed.pm',
     'Sah/Schema/filesize.pm',
+    'Sah/SchemaR/bandwidth.pm',
+    'Sah/SchemaR/dataquota.pm',
+    'Sah/SchemaR/datasize.pm',
+    'Sah/SchemaR/dataspeed.pm',
     'Sah/SchemaR/filesize.pm',
     'Sah/Schemas/DataSizeSpeed.pm'
 );

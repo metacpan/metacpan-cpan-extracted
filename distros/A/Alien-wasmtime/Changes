@@ -1,5 +1,9 @@
 Revision history for Alien-wasmtime},
 
+0.07      2020-04-14 10:41:36 -0600
+  - Extra diagnostics and tests to detect virtual memory limits
+    that can cause Wasmtime to OOM (gh#9, perlwasm/Wasm#22)
+
 0.06      2020-04-12 14:07:38 -0600
   - Use Build::Copy plugin (gh#8)
 

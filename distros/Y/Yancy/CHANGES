@@ -1,5 +1,18 @@
 Changelog for Yancy
 
+1.053     2020-04-14 22:56:26-05:00 America/Chicago
+
+    [Added]
+
+    - Added `yancy.mask` filter to mask field values (hide parts of
+      e-mail addresses, mask SSNs, etc...)
+
+    [Fixed]
+
+    - Actually fixed output filters (`x-filter-output`) for both the
+      `get` and `list` helpers. Now with tests so that it stays fixed!
+      Thanks @rmallah for reporting and testing this issue!
+
 1.052     2020-04-13 23:51:56-05:00 America/Chicago
 
     [Fixed]

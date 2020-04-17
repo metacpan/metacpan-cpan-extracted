@@ -1,0 +1,28 @@
+---
+abstract: 'Override any method in your Kelp application'
+author:
+  - 'Bartosz Jarzyna <brtastic.dev@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: KelpX-Hooks
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Kelp: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/brtastic/perl-kelpx-hooks/issues
+  homepage: https://metacpan.org/release/KelpX-Hooks
+  license: https://dev.perl.org/licenses
+  repository: https://github.com/brtastic/perl-kelpx-hooks
+version: '1.00'

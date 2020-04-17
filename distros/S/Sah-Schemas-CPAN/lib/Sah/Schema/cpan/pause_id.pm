@@ -3,7 +3,7 @@ package Sah::Schema::cpan::pause_id;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-CPAN'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use strict;
 use Regexp::Pattern::CPAN;
@@ -36,7 +36,17 @@ Sah::Schema::cpan::pause_id - PAUSE author ID
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2020-03-02.
+This document describes version 0.007 of Sah::Schema::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2020-03-02.
+
+=head1 SYNOPSIS
+
+Sample data:
+
+ ""  # INVALID
+
+ "perlancar"  # valid, becomes "PERLANCAR"
+
+ "perlancar2"  # INVALID (Too long)
 
 =head1 HOMEPAGE
 

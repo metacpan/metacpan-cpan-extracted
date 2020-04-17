@@ -115,7 +115,7 @@ struct SuspendedFrame {
       GV *gv;          /* for SAVEt_SV + cur.sv, saved.sv */
       int *iptr;       /* for SAVEt_INT... */
       STRLEN *lenptr;  /* for SAVEt_STRLEN + cur.len, saved.len */
-      PADOFFSET padix; /* for SAVEt_PADSV_AND_MORTALIZE */
+      PADOFFSET padix; /* for SAVEt_PADSV_AND_MORTALIZE, SAVEt_SPTR */
       SV *sv;          /* for SAVEt_ITEM */
       struct {
         SV *sv;
@@ -367,6 +367,11 @@ static int dumpmagic(pTHX_ const SV *sv, MAGIC *mg)
           ret += DMD_ANNOTATE_SV(sv, saved->saved.sv,   "a suspended SAVEt_SV saved value");
           break;
 
+        case SAVEt_SPTR:
+          ret += DMD_ANNOTATE_SV(sv, saved->cur.sv,   "a suspended SAVEt_SPTR current value");
+          ret += DMD_ANNOTATE_SV(sv, saved->saved.sv, "a suspended SAVEt_SPTR saved value");
+          break;
+
         case SAVEt_PADSV_AND_MORTALIZE:
           ret += DMD_ANNOTATE_SV(sv, saved->cur.sv,   "a suspended SAVEt_PADSV_AND_MORTALIZE current value");
           ret += DMD_ANNOTATE_SV(sv, saved->saved.sv, "a suspended SAVEt_PADSV_AND_MORTALIZE saved value");
@@ -477,6 +482,7 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
               break;
 
             case SAVEt_PADSV_AND_MORTALIZE:
+            case SAVEt_SPTR:
               SvREFCNT_dec(saved->saved.sv);
               SvREFCNT_dec(saved->cur.sv);
               break;
@@ -736,6 +742,31 @@ static void MY_suspend_frame(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
 
         /* restore it for now */
         sv_setsv(var, val);
+
+        break;
+      }
+
+      case SAVEt_SPTR: {
+        PL_savestack_ix -= 3;
+        SV  *val = PL_savestack[PL_savestack_ix].any_ptr;
+        SV **var = PL_savestack[PL_savestack_ix+1].any_ptr;
+
+        /* In general we don't support this; but specifically we will accept
+         * it if we can convert var into a PAD index. This is to support
+         * SAVESPTR(PAD_SVl(padix)), as may be used by Object::Pad or others
+         */
+        if(var < PL_curpad || var > PL_curpad + AvFILL(PL_comppad))
+          panic("TODO: Unsure how to handle a savestack entry of SAVEt_SPTR with var not the current pad\n");
+
+        PADOFFSET padix = var - PL_curpad;
+
+        saved->type = SAVEt_SPTR;
+        saved->u.padix = padix;
+        saved->cur.sv = PL_curpad[padix]; /* steal ownership */
+        saved->saved.sv = val;            /* steal ownership */
+
+        /* restore it for now */
+        PL_curpad[padix] = SvREFCNT_inc(val);
 
         break;
       }
@@ -1385,6 +1416,14 @@ static void MY_resume_frame(pTHX_ SuspendedFrame *frame)
 
         sv_setsv(saved->u.sv, saved->cur.sv);
         SvREFCNT_dec(saved->cur.sv);
+        break;
+
+      case SAVEt_SPTR:
+        PL_curpad[saved->u.padix] = saved->saved.sv;
+        SAVESPTR(PL_curpad[saved->u.padix]);
+
+        SvREFCNT_dec(PL_curpad[saved->u.padix]);
+        PL_curpad[saved->u.padix] = saved->cur.sv;
         break;
 
 #ifdef SAVEt_STRLEN

@@ -58,6 +58,8 @@ static struct
     char          hostname[MAX_MACHINE_NAME + 1];
 } quota_rpc_auth = {-1, -1, {0} };
 
+static const char * quota_rpc_strerror = NULL;
+
 struct quota_xs_nfs_rslt {
   double bhard;
   double bsoft;
@@ -74,11 +76,8 @@ struct quota_xs_nfs_rslt {
  */
 
 int
-callaurpc(host, prognum, versnum, procnum, inproc, in, outproc, out)
-  char *host;
-  int prognum, versnum, procnum;
-  xdrproc_t inproc, outproc;
-  char *in, *out;
+callaurpc(char *host, int prognum, int versnum, int procnum,
+          xdrproc_t inproc, char *in, xdrproc_t outproc, char *out)
 {
   struct sockaddr_in remaddr;
   struct hostent *hp;
@@ -92,8 +91,10 @@ callaurpc(host, prognum, versnum, procnum, inproc, in, outproc, out)
    *  portmap daemon; different ports and protocols can be configured
    */
   hp = gethostbyname(host);
-  if (hp == NULL)
-    return ((int) RPC_UNKNOWNHOST);
+  if (hp == NULL) {
+    quota_rpc_strerror = clnt_sperrno(RPC_UNKNOWNHOST);
+    return -1;
+  }
 
   rep_time.tv_sec = quota_rpc_cfg.timeout / 1000;
   rep_time.tv_usec = (quota_rpc_cfg.timeout % 1000) * 1000;
@@ -106,18 +107,23 @@ callaurpc(host, prognum, versnum, procnum, inproc, in, outproc, out)
    */
   client = NULL;
   if (!quota_rpc_cfg.use_tcp) {
-    client = (CLIENT *)clntudp_create(&remaddr, prognum, 
+    client = (CLIENT *)clntudp_create(&remaddr, prognum,
                                       versnum, rep_time, &socket);
   }
   else {
-    client = (CLIENT *)clnttcp_create(&remaddr, prognum, 
+    client = (CLIENT *)clnttcp_create(&remaddr, prognum,
                                       versnum, &socket, 0, 0);
   }
 
-  if (client == NULL)
-    return ((int) rpc_createerr.cf_stat);
-  
-  /* 
+  if (client == NULL) {
+    if (rpc_createerr.cf_stat != RPC_SUCCESS)
+      quota_rpc_strerror = clnt_sperrno(rpc_createerr.cf_stat);
+    else  /* should never happen (may be due to inconsistent symbol resolution */
+      quota_rpc_strerror = "RPC creation failed for unknown reasons";
+    return -1;
+  }
+
+  /*
    *  Create an authentication handle
    */
   if ((quota_rpc_auth.uid != -1) && (quota_rpc_auth.gid != -1)) {
@@ -143,7 +149,12 @@ callaurpc(host, prognum, versnum, procnum, inproc, in, outproc, out)
   }
   clnt_destroy(client);
 
-  return ((int) clnt_stat);
+  if (clnt_stat != RPC_SUCCESS) {
+    quota_rpc_strerror = clnt_sperrno(clnt_stat);
+    return -1;
+  }
+  else
+    return 0;
 }
 
 int
@@ -175,9 +186,9 @@ getnfsquota( char *hostp, char *fsnamep, int uid, int kind,
      gq_args.gqa_uid = uid;
 
      if (callaurpc(hostp, RQUOTAPROG, RQUOTAVERS, RQUOTAPROC_GETQUOTA,
-                   xdr_getquota_args, &gq_args,
-                   xdr_getquota_rslt, &gq_rslt) != 0) {
-       return (-1);
+                   (xdrproc_t)xdr_getquota_args, (char*)&gq_args,
+                   (xdrproc_t)xdr_getquota_rslt, (char*)&gq_rslt) != 0) {
+       return -1;
      }
   }
 
@@ -214,7 +225,10 @@ getnfsquota( char *hostp, char *fsnamep, int uid, int kind,
         rslt->bcur *= qb_fac;
       }
       else {
-        qb_fac = DEV_QBSIZE / gq_rslt.GQR_RQUOTA.rq_bsize;
+        if (gq_rslt.GQR_RQUOTA.rq_bsize != 0)
+          qb_fac = DEV_QBSIZE / gq_rslt.GQR_RQUOTA.rq_bsize;
+        else
+          qb_fac = 1;
         rslt->bhard = gq_rslt.GQR_RQUOTA.rq_bhardlimit / qb_fac;
         rslt->bsoft = gq_rslt.GQR_RQUOTA.rq_bsoftlimit / qb_fac;
         rslt->bcur = gq_rslt.GQR_RQUOTA.rq_curblocks / qb_fac;
@@ -240,6 +254,7 @@ getnfsquota( char *hostp, char *fsnamep, int uid, int kind,
       else
         rslt->ftime = gq_rslt.GQR_RQUOTA.rq_ftimeleft;
 
+#if 0
       if((gq_rslt.GQR_RQUOTA.rq_bhardlimit == 0) &&
          (gq_rslt.GQR_RQUOTA.rq_bsoftlimit == 0) &&
          (gq_rslt.GQR_RQUOTA.rq_fhardlimit == 0) &&
@@ -247,7 +262,8 @@ getnfsquota( char *hostp, char *fsnamep, int uid, int kind,
         errno = ESRCH;
 	return(-1);
       }
-      return (0);
+#endif
+      return 0;
     }
 
   case Q_NOQUOTA:
@@ -262,7 +278,7 @@ getnfsquota( char *hostp, char *fsnamep, int uid, int kind,
     errno = EINVAL;
     break;
   }
-  return (-1);
+  return -1;
 }
 
 #ifdef MY_XDR
@@ -341,6 +357,9 @@ query(dev,uid=getuid(),kind=0)
 	{
 	  char *p = NULL;
 	  int err;
+#ifndef NO_RPC
+          quota_rpc_strerror = NULL;
+#endif
 #ifdef SGI_XFS
 	  if(!strncmp(dev, "(XFS)", 5)) {
 	    fs_disk_quota_t xfs_dqblk;
@@ -424,7 +443,7 @@ query(dev,uid=getuid(),kind=0)
               }
               *p = ':';
 #else /* NO_RPC */
-	      errno = ENOSYS;
+	      errno = ENOTSUP;
               err = -1;
 #endif /* NO_RPC */
             }
@@ -550,7 +569,11 @@ setqlim(dev,uid,bs,bh,fs,fh,timelimflag=0,kind=0)
 	  qp.uid = uid;
 	  qp.addr = (char *)&dqblk;
 #endif
-	  if(timelimflag != 0) timelimflag = 1;
+	  if(timelimflag != 0)
+	    timelimflag = 1;
+#ifndef NO_RPC
+	  quota_rpc_strerror = NULL;
+#endif
 #ifdef SGI_XFS
 	  if(!strncmp(dev, "(XFS)", 5)) {
 	    fs_disk_quota_t xfs_dqblk;
@@ -707,6 +730,9 @@ int
 sync(dev=NULL)
 	char *	dev
 	CODE:
+#ifndef NO_RPC
+        quota_rpc_strerror = NULL;
+#endif
 #ifdef SOLARIS_VXFS
         if ((dev != NULL) && !strncmp(dev, "(VXFS)", 6)) {
           RETVAL = vx_quotactl(VX_QSYNCALL, dev+6, 0, NULL);
@@ -753,23 +779,10 @@ sync(dev=NULL)
 #ifdef Q_CTL_V3  /* Linux */
 #ifdef SGI_XFS
           if ((dev != NULL) && (!strncmp(dev, "(XFS)", 5))) {
-            struct fs_quota_stat fsq_stat;
-
-            if (!quotactl(QCMD(Q_XGETQSTAT, USRQUOTA), dev+5, 0, CADR &fsq_stat)) {
-              if (fsq_stat.qs_flags & (XFS_QUOTA_UDQ_ACCT | XFS_QUOTA_GDQ_ACCT))
-                RETVAL = 0;
-              else if ( (strcmp(dev+5, "/") == 0) &&
-                        (((fsq_stat.qs_flags & 0xff00) >> 8) & (XFS_QUOTA_UDQ_ACCT | XFS_QUOTA_GDQ_ACCT)) )
-                RETVAL = 0;
-              else {
-                errno = ENOENT;
-                RETVAL = -1;
-              }
-            }
-            else {
-              errno = ENOENT;
+            if (quotactl(QCMD(Q_XQUOTASYNC, XQM_USRQUOTA), dev+5, 0, NULL) != 0)
+              RETVAL = 0;
+            else
               RETVAL = -1;
-            }
           }
           else
 #endif
@@ -816,7 +829,7 @@ sync(dev=NULL)
 	RETVAL
 
 
-void 
+void
 rpcquery(host,path,uid=getuid(),kind=0)
 	char *	host
 	char *	path
@@ -826,6 +839,7 @@ rpcquery(host,path,uid=getuid(),kind=0)
 	{
 #ifndef NO_RPC
           struct quota_xs_nfs_rslt rslt;
+          quota_rpc_strerror = NULL;
           if (getnfsquota(host, path, uid, kind, &rslt) == 0) {
 	    EXTEND(SP, 8);
             PUSHs(sv_2mortal(newSVnv(Q_DIV(rslt.bcur))));
@@ -838,18 +852,19 @@ rpcquery(host,path,uid=getuid(),kind=0)
             PUSHs(sv_2mortal(newSViv(rslt.ftime)));
 	  }
 #else
-	  errno = ENOSYS;
+	  errno = ENOTSUP;
 #endif
 	}
 
 void
 rpcpeer(port=0,use_tcp=FALSE,timeout=RPC_DEFAULT_TIMEOUT)
 	unsigned port
-	unsigned use_tcp 
-	unsigned timeout 
+	unsigned use_tcp
+	unsigned timeout
 	PPCODE:
 	{
 #ifndef NO_RPC
+          quota_rpc_strerror = NULL;
 	  quota_rpc_cfg.port = port;
 	  quota_rpc_cfg.use_tcp = use_tcp;
 	  quota_rpc_cfg.timeout = timeout;
@@ -864,6 +879,7 @@ rpcauth(uid=-1,gid=-1,hostname=NULL)
 	CODE:
 	{
 #ifndef NO_RPC
+          quota_rpc_strerror = NULL;
           if ((uid == -1) && (gid == -1) && (hostname==NULL)) {
             /* reset to default values */
             quota_rpc_auth.uid = uid;
@@ -901,6 +917,9 @@ int
 setmntent()
 	CODE:
 	{
+#ifndef NO_RPC
+          quota_rpc_strerror = NULL;
+#endif
 #ifndef AIX
 #ifndef NO_MNTENT
 #ifndef NO_OPEN_MNTTAB
@@ -958,6 +977,9 @@ void
 getmntent()
 	PPCODE:
 	{
+#ifndef NO_RPC
+          quota_rpc_strerror = NULL;
+#endif
 #ifndef AIX
 #ifndef NO_MNTENT
 #ifndef NO_OPEN_MNTTAB
@@ -1087,6 +1109,9 @@ void
 endmntent()
 	PPCODE:
 	{
+#ifndef NO_RPC
+          quota_rpc_strerror = NULL;
+#endif
 	  if(mtab != NULL) {
 #ifndef AIX
 #ifndef NO_MNTENT
@@ -1140,3 +1165,32 @@ getqcargtype()
 	OUTPUT:
 	RETVAL
 
+const char *
+strerr()
+	CODE:
+#ifndef NO_RPC
+        if (quota_rpc_strerror != NULL)
+          RETVAL = quota_rpc_strerror;
+        else
+#endif
+        // ENOENT for (XFS): "No quota for this user"
+        if((errno == EINVAL) || (errno == ENOTTY) || (errno == ENOENT) || (errno == ENOSYS))
+          RETVAL = "No quotas on this system";
+        else if(errno == ENODEV)
+          RETVAL = "Not a standard file system";
+        else if(errno == EPERM)
+          RETVAL = "Not privileged";
+        else if(errno == EACCES)
+          RETVAL = "Access denied";
+        else if(errno == ESRCH)
+#ifdef Q_CTL_V3  /* Linux */
+          RETVAL = "Quotas not enabled, no quota for this user";
+#else
+          RETVAL = "No quota for this user";
+#endif
+        else if(errno == EUSERS)
+          RETVAL = "Quota table overflow";
+        else
+          RETVAL = strerror(errno);
+	OUTPUT:
+	RETVAL

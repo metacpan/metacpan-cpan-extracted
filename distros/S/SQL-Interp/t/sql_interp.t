@@ -89,6 +89,14 @@ interp_test([sql(sql(),sql())],
             [''],
             'sql(sql(),sql())');
 
+#== SELECT
+interp_test(['SELECT', \$x],
+            ['SELECT ?', $x],
+            'SELECT scalarref');
+interp_test(['SELECT 1 IS DISTINCT FROM', \$x],
+            ['SELECT 1 IS DISTINCT FROM ?', $x],
+            'SELECT DISTINCT FROM');
+
 #== INSERT
 interp_test(['INSERT INTO mytable', \$x],
             ['INSERT INTO mytable VALUES(?)', $x],
@@ -99,6 +107,12 @@ interp_test(['REPLACE INTO mytable', \$x],
 interp_test(['INSERT INTO mytable', sql($x)],
             ["INSERT INTO mytable $x"], # invalid
             'INSERT sql(...)');
+interp_test(['INSERT INTO `My Table`', \$x],
+            ['INSERT INTO `My Table` VALUES(?)', $x],
+            'INSERT backtick-quotes');
+interp_test(['INSERT INTO "My Table"', \$x],
+            ['INSERT INTO "My Table" VALUES(?)', $x],
+            'INSERT double-quotes');
 # OK in mysql
 interp_test(['INSERT INTO mytable', $v0],
             ['INSERT INTO mytable VALUES()'],
@@ -150,6 +164,15 @@ interp_test(['WHERE field IN', sql($x)],
 interp_test(['WHERE field IN', $v0],
             ['WHERE 1=0'],
             'IN arrayref of size = 0');
+interp_test(['WHERE table.field IN', $v0],
+            ['WHERE 1=0'],
+            'IN qualified field name');
+interp_test(['WHERE `My Field` IN', $v0],
+            ['WHERE 1=0'],
+            'IN backtick-quotes');
+interp_test(['WHERE "My Field" IN', $v0],
+            ['WHERE 1=0'],
+            'IN double-quotes');
 
 interp_test(['WHERE field NOT IN', $v0],
             ['WHERE 1=1'],

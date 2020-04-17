@@ -1,5 +1,15 @@
 Revision history for Object-Pad
 
+0.21    2020-04-15
+        [CHANGES]
+         * Added Object::Pad->begin_class() (undocumented)
+           (mostly fixes RT132337 and RT132338)
+         * Improved performance of OP_SLOTPAD
+         * Handle UTF-8 package names more correctly
+
+        [BUGFIXES]
+         * Fix memory leaks related to OP_METHSTART (RT132332)
+
 0.20    2020-04-10
         [CHANGES]
          * Update suggested style for methods with signatures to put

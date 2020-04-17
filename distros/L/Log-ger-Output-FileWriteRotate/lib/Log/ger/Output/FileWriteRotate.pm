@@ -1,12 +1,18 @@
 package Log::ger::Output::FileWriteRotate;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-09'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Output-FileWriteRotate'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
+
+sub meta {
+    return +{
+        v => 2,
+    };
+}
 
 sub get_hooks {
     my %plugin_conf = @_;
@@ -45,7 +51,7 @@ Log::ger::Output::FileWriteRotate - Log to File::Write::Rotate
 
 =head1 VERSION
 
-This document describes version 0.004 of Log::ger::Output::FileWriteRotate (from Perl distribution Log-ger-Output-FileWriteRotate), released on 2020-03-09.
+This document describes version 0.005 of Log::ger::Output::FileWriteRotate (from Perl distribution Log-ger-Output-FileWriteRotate), released on 2020-03-11.
 
 =head1 SYNOPSIS
 

@@ -1,15 +1,15 @@
 package Log::ger::Layout::ConvertCase;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-09'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Layout-ConvertCase'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
 
 sub meta { +{
-    v => 1,
+    v => 2,
 } }
 
 sub get_hooks {
@@ -49,7 +49,7 @@ Log::ger::Layout::ConvertCase - Example layout plugin to convert the case of mes
 
 =head1 VERSION
 
-This document describes version 0.003 of Log::ger::Layout::ConvertCase (from Perl distribution Log-ger-Layout-ConvertCase), released on 2020-03-09.
+This document describes version 0.004 of Log::ger::Layout::ConvertCase (from Perl distribution Log-ger-Layout-ConvertCase), released on 2020-03-11.
 
 =head1 SYNOPSIS
 

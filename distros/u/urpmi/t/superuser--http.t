@@ -12,6 +12,8 @@ need_root_and_prepare();
 need_downloader();
 
 my $url = start_httpd();
+sleep(1); # give time to server to start
+is(`cat tmp/error.log`, '', 'server error logs are empty');
 
 my $name = 'various';
 
@@ -42,12 +44,12 @@ sub test_exotic_medium_name {
 
     # test urpmf/urpmq using info.xml.lzma as user
     mkdir 'root/tmp'; chmod 0777, 'root/tmp';
-    is(run_urpm_cmd_as_user('urpmf --sourcerpm .'), "various:various-1-1.src.rpm\n");
-    is(run_urpm_cmd_as_user('urpmq --sourcerpm various'), "various: various-1-1.src.rpm\n");
+    is(run_urpm_cmd_as_user('urpmf --sourcerpm .'), "various:various-1-1.src.rpm\n", 'urpmf --sourcerpm works as user');
+    is(run_urpm_cmd_as_user('urpmq --sourcerpm various'), "various: various-1-1.src.rpm\n", 'urpmq --sourcerpm works as user');
 
     # test urpmf/urpmq using info.xml.lzma as root
-    is(run_urpm_cmd('urpmf --sourcerpm .'), "various:various-1-1.src.rpm\n");
-    is(run_urpm_cmd('urpmq --sourcerpm various'), "various: various-1-1.src.rpm\n");
+    is(run_urpm_cmd('urpmf --sourcerpm .'), "various:various-1-1.src.rpm\n", 'urpmf --sourcerpm works as root');
+    is(run_urpm_cmd('urpmq --sourcerpm various'), "various: various-1-1.src.rpm\n", 'urpmq --sourcerpm works as root');
 
     urpmi($name);
     check_installed_fullnames("$name-1-1");

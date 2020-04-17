@@ -1,9 +1,9 @@
 package PERLANCAR::Foo::Bar;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2020-02-05'; # DATE
 our $DIST = 'PERLANCAR-Foo-Bar'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Foo, Bar, Foo::Bar, etc modules for testing
@@ -20,12 +20,12 @@ PERLANCAR::Foo::Bar - Foo, Bar, Foo::Bar, etc modules for testing
 
 =head1 VERSION
 
-This document describes version 0.002 of PERLANCAR::Foo::Bar (from Perl distribution PERLANCAR-Foo-Bar), released on 2020-01-03.
+This document describes version 0.003 of PERLANCAR::Foo::Bar (from Perl distribution PERLANCAR-Foo-Bar), released on 2020-02-05.
 
 =head1 DESCRIPTION
 
 Some distributions, in their tests, use C<Foo>, C<Bar>, C<Foo::Bar>, etc as
-random modules name that are assumed to not exist. Well not so fast.
+random module names that are assumed to not exist. Well not so fast.
 
 =head1 HOMEPAGE
 

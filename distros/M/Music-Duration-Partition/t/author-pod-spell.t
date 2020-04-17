@@ -25,4 +25,7 @@ Music
 Partition
 durations
 gene
+hn
 lib
+qn
+wn

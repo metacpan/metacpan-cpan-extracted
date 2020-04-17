@@ -5,7 +5,7 @@ use warnings;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Wasmtime value type class
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 $ffi_prefix = 'wasm_valtype_';
@@ -91,7 +91,7 @@ Wasm::Wasmtime::ValType - Wasmtime value type class
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

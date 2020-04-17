@@ -1,5 +1,9 @@
 Revision history for Perl extension Perl-MinimumVersion-Fast
 
+0.19 2020-04-15T05:27:20Z
+
+    - Depends on Compiler::Lexer 0.23
+
 0.18 2015-07-22T00:33:00Z
 
     - Support Perl 5.6

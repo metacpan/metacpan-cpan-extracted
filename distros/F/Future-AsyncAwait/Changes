@@ -1,5 +1,11 @@
 Revision history for Future-AsyncAwait
 
+0.40    2020-04-15
+        [CHANGES]
+         * Support a limited form of SAVEt_SPTR when the var is within the
+           current pad; this supports SAVESPTR(PAD_SVl(padix)) as may be used
+           by Object::Pad et.al.
+
 0.39    2020-03-27
         [CHANGES]
          * Updated for XS::Parse::Sublike 0.06 API

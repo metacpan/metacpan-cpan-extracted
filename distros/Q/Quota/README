@@ -3,8 +3,8 @@ Quota extension module for Perl
 
 Author:    T. Zoerner (tomzo AT users.sourceforge.net)
 
-Version:   1.7.4
-Date:      March 2020
+Version:   1.8.0
+Date:      April 2020
 DLSIP-Code:Rcdfg
            - stable release
            - C compiler required for installation
@@ -14,17 +14,22 @@ DLSIP-Code:Rcdfg
              (at your option) version 2 or later of the
              GNU General Public License
 Location:  https://metacpan.org/pod/Quota
+Repository:https://github.com/tomzox/Perl-Quota
 
 Supported: SunOS 4.1.3,
            Solaris 2.4 - 2.10,
            HP-UX 9.0x & 10.10 & 10.20 & 11.00,
            IRIX 5.2 & 5.3 & 6.2 - 6.5,
            OSF/1 & Digital Unix 4,
-           BSDi 2, FreeBSD 3.x - 4.9, OpenBSD & NetBSD (no RPC),
-           Linux - kernel 2.0.30 and later, incl. Quota API up to v3,
-             file systems XFS, AIX 4.1, 4.2 and 5.3.
+           BSDi 2, FreeBSD 3.x - 4.9, OpenBSD & NetBSD,
+           Linux - kernel 2.0.30 and later,
+           AIX 4.1, 4.2 and 5.3.
+
+           Standard file systems of the platforms listed above,
+           NFS (Network file system) on all of the above,
+           XFS on Linux and IRIX 6,
            AFS (Andrew File System) on many of the above (see INSTALL),
-	   VxFS (Veritas File System) on Solaris 2.
+           VxFS (Veritas File System) on Solaris 2.
 
 Documentation is in pod format at the end of Quota.pm,
 installation hints are in a file named INSTALL inside this package.
@@ -106,12 +111,12 @@ DESCRIPTION
          this user will fail for blocks or inodes after $bt or
          $it is reached. These times are expressed as usual, i.e.
          in elapsed seconds since 00:00 1/Jan/1970 GMT.
-	 
-	 Note: When the quota limits are not exceeded, the timestamps
-	 are meaningless and should be ignored. When hard and soft
-	 limits are zero, there is no limit for that user. On most
-	 systems Quota::query will return undef in that case and
-	 errno will be set to ESRCH.
+
+         Note: When the quota limits are not exceeded, the timestamps
+         are meaningless and should be ignored. When hard and soft
+         limits are zero, there is no limit for that user. On most
+         systems Quota::query will return undef in that case and
+         errno will be set to ESRCH.
 
          When $kind is given and set to 1, the value in $uid is taken
          as gid and group quotas are queried. Group quotas may not be
@@ -189,11 +194,11 @@ DESCRIPTION
          protocol is UDP)  The default timeout is 4 seconds.
 
      Quota::rpcauth($uid,$gid,$hostname)
-        Configure authorization parameters for subsequent 
-        RPC queries; all parameters are optional. By default 
-        uid and gid are taken from owner of the process and 
+        Configure authorization parameters for subsequent
+        RPC queries; all parameters are optional. By default
+        uid and gid are taken from owner of the process and
         hostname is the host name of current machine.
-    
+
      $arg = Quota::getqcarg($path)
          Get the required $dev argument for Quota::query and
          Quota::setqlim for the file system you want to operate
@@ -268,7 +273,7 @@ RETURN VALUES
 
 EXAMPLES
      An example for each function can be found in the test script
-     test.pl. See also the contrib directory, which contains 
+     test.pl. See also the contrib directory, which contains
      some longer scripts, kindly donated by users of the module.
 
 BUGS

@@ -39,10 +39,10 @@ resources:
   bugtracker: https://github.com/oalders/http-browserdetect/issues
   homepage: https://github.com/oalders/http-browserdetect
   repository: https://github.com/oalders/http-browserdetect.git
-version: '3.26'
+version: '3.27'
 x_Dist_Zilla:
   perl:
-    version: '5.030000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::PromptIfStale
@@ -129,7 +129,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000037'
-          version: '0.006'
+          version: '0.004'
       name: '@Author::OALDERS/InstallGuide'
       version: '1.200013'
     -
@@ -157,6 +157,7 @@ x_Dist_Zilla:
             - "Alders'"
             - AnnoCPAN
             - Atsushi
+            - CGI
             - Cebrin
             - Firebird
             - Florian
@@ -203,6 +204,7 @@ x_Dist_Zilla:
             - galeon
             - getright
             - golib
+            - google
             - googleadsbot
             - googleadsense
             - googlebot
@@ -230,6 +232,7 @@ x_Dist_Zilla:
             - lycos
             - macosx
             - macppc
+            - malware
             - merlynkline
             - mj
             - mozilla
@@ -464,7 +467,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.26.1
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.046'
@@ -472,7 +475,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.25.1
+          git_version: 2.26.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -567,7 +570,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.26.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -580,11 +583,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.26
+          tag: v3.27
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.26.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -621,7 +624,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.26.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -635,7 +638,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.26.1
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.046'
@@ -646,6 +649,14 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: requires
+      name: DevelopRequires
       version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
@@ -730,7 +741,8 @@ x_contributors:
   - 'Uwe <uwe@uwevoelker.de>'
   - 'vti <viacheslav.t@gmail.com>'
   - 'yeahoffline <frank.gasser@gmail.com>'
-x_generated_by_perl: v5.30.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+  - 'Zak B. Elep <zakame@zakame.net>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

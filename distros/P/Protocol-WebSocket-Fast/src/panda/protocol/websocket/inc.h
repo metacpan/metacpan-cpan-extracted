@@ -32,6 +32,10 @@ enum CloseCode : uint16_t {
 
 };
 
+inline bool is_sending_forbidden(uint16_t code) {
+    return (code < DONE || code == 1004 || code == UNKNOWN || code == ABNORMALLY || (code > INTERNAL_ERROR && code < 3000));
+}
+
 }
 
 }}}

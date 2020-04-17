@@ -1,5 +1,5 @@
 ---
-abstract: 'Client for the CIPRES analysis portal'
+abstract: 'Reusable components for CIPRES REST API access'
 author:
   - 'Rutger Vos <rutgeraldo@gmail.com>'
 build_requires:
@@ -20,10 +20,12 @@ no_index:
     - inc
 requires:
   Bio::Phylo: '0'
+  LWP::UserAgent: '0'
+  URI: '0'
   XML::Twig: '0'
   YAML: '0'
 resources:
   bugtracker: https://github.com/naturalis/bio-cipres/issues
   repository: https://github.com/naturalis/bio-cipres.git
-version: v0.0.1
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

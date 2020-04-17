@@ -1,7 +1,9 @@
 package Pod::Weaver::Plugin::Sah::Schemas;
 
-our $DATE = '2019-12-17'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-03'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-Sah-Schemas'; # DIST
+our $VERSION = '0.061'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -90,13 +92,84 @@ sub weave_section {
 
             $self->log(["Generated POD for '%s'", $filename]);
 
-        } elsif ($package =~ /^Sah::Schema::/) {
+        } elsif ($package =~ /^Sah::Schema::(.+)/) {
+            my $sch_name = $1;
 
             {
                 local @INC = ("lib", @INC);
                 require $package_pm;
             }
             my $sch = ${"$package\::schema"};
+
+            # add POD section: Synopsis
+            {
+                my @pod;
+
+                # example on how to use
+                {
+                    push @pod, "Using with L<Data::Sah>:\n\n";
+                    push @pod, <<"_";
+ use Data::Sah qw(gen_validator);
+ my \$vdr = gen_validator("$sch_name*");
+ say \$vdr->(\$data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+_
+
+                    push @pod, "Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):\n\n";
+                    push @pod, <<"_";
+ package MyApp;
+ our \%SPEC;
+ \$SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['$sch_name*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my \%args = \@_;
+     ...
+ }
+
+_
+                }
+
+                # sample data
+                {
+                    require Data::Dmp;
+                    my $egs = $sch->[1]{examples};
+                    last unless $egs && @$egs;
+                    push @pod, "Sample data:\n\n";
+                    for my $eg (@$egs) {
+                        # XXX if dump is too long, use Data::Dump instead
+                        push @pod, " ", Data::Dmp::dmp($eg->{data});
+                        if ($eg->{valid}) {
+                            push @pod, "  # valid";
+                            push @pod, ", becomes ",
+                                Data::Dmp::dmp($eg->{res})
+                                  if exists $eg->{res};
+                        } else {
+                            push @pod, "  # INVALID";
+                            push @pod, " ($eg->{summary})"
+                                if defined $eg->{summary};
+                        }
+                        push @pod, "\n\n";
+                    } # for eg
+                } # examples
+
+                $self->add_text_to_section(
+                    $document, join("", @pod), 'SYNOPSIS',
+                    {ignore => 1},
+                );
+            }
 
             # add POD section: DESCRIPTION
             {
@@ -132,7 +205,7 @@ Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building Sah::Schemas::* 
 
 =head1 VERSION
 
-This document describes version 0.05 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2019-12-17.
+This document describes version 0.061 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2020-03-03.
 
 =head1 SYNOPSIS
 
@@ -193,7 +266,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

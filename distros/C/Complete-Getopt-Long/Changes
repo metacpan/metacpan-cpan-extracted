@@ -1,16 +1,23 @@
+0.478   2020-04-16  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] For an optional with optional value (optname:s), when
+	  user specify --optname=^ (and not --optname ^) then we should
+	  force only completing value.
+
+
 0.477   2020-04-10  Released-By: PERLANCAR; Urgency: medium
 
-	- Recognize (and ignore) hash storage in first argument of
-	  Getopt::Long specification.
+	- Better compliance with Getopt::Long: Recognize (and ignore) hash
+	  storage in first argument of Getopt::Long specification.
 
 
 0.476   2020-04-10  Released-By: PERLANCAR; Urgency: medium
 
-	- Better compliance with Getopt::Long: options specification is now
-	  an array instead of a hash. Not every option spec needs to be
-	  followed by a destination, e.g. ('foo=s' => $ary, 'bar') is okay
-	  instead of ('foo=s' => $ary, 'bar'=>sub {}). The hash form is
-	  still accepted but converted into array internally.
+	- Better compliance with Getopt::Long: options specification is now an
+	  array instead of a hash. Not every option spec needs to be followed by
+	  a destination, e.g. ['foo=s' => $ary, 'bar'] is okay instead of
+	  {'foo=s' => $ary, 'bar'=>sub {}}. The hash form is still accepted but
+	  converted into array internally.
 
 
 0.475   2020-02-05  Released-By: PERLANCAR; Urgency: medium

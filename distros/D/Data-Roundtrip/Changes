@@ -10,3 +10,11 @@ Revision history for Data-Roundtrip
 
 0.03	2020-04-15
 	Makefile.PL changes thanks to marto @ Perlmonks.org
+
+0.04	2020-04-15
+	Added perl2dump_filtered(), perl2dump_homebrew()
+	and dump_perl_var_recursively().
+	Fixed scripts to work with new sub names.
+
+0.05	2020-04-16
+	Makefile.PL minor modification.

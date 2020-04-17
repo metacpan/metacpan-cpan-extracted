@@ -13,7 +13,9 @@ x
 %install
 rm -rf %buildroot
 # Fix a testsuite warning ("warning: %post(rpm-query-in-scriptlet-1-1.x86_64) scriptlet failed" b/c of: "error: Failed to initialize NSS library")
+%ifos linux
 echo %{_libdir}/libnss3.so > list
+%endif
 
 # Find out needed deps:
 for i in sh rpm; do
@@ -21,8 +23,14 @@ for i in sh rpm; do
    echo $bin >> list
    ldd $bin | sed -e 's/^[ \t]*//' -e 's/.* => //' -e 's/ .*//' >> list
 done
+
+%ifos linux
+%global cpio_opts --dereference
+%else
+%global cpio_opts %nil
+%endif
 # Install the wanted tools and their deps:
-grep '/' list | (cd / ; cpio -pumd --dereference %buildroot)
+grep '/' list | (cd / ; cpio -pumd %cpio_opts %buildroot)
 
 # prelinked libraries/binaries cause rpm to abort installation on
 # md5sum errors while package signature does be OK :-( :

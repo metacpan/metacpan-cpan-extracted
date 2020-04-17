@@ -5,7 +5,9 @@ namespace xs { namespace date {
 using panda::string;
 using panda::string_view;
 
-Date sv2date (const Sv& arg, const Timezone* zone, int fmt) {
+panda::string_view strict_hint_name = "Date::strict";
+
+static inline Date _sv2date (const Sv& arg, const Timezone* zone, int fmt) {
     if (!arg) return Date(0, zone);
     if (!arg.defined()) return Date("!"); // date with parsing error
 
@@ -26,6 +28,12 @@ Date sv2date (const Sv& arg, const Timezone* zone, int fmt) {
     return Date(xs::in<string_view>(arg), zone, fmt);
 }
 
+Date sv2date (const Sv& arg, const Timezone* zone, int fmt) {
+    auto ret = _sv2date(arg, zone, fmt);
+    if (ret.error() && is_strict_mode()) throw xs::out(ret.error());
+    return ret;
+}
+
 DateRel sv2daterel (const Sv& arg) {
     if (!arg.defined()) return DateRel();
 
@@ -33,7 +41,9 @@ DateRel sv2daterel (const Sv& arg) {
 
     if (SvNIOK(arg) || arg.is_like_number()) return DateRel(0, 0, 0, 0, 0, xs::in<ptime_t>(arg));
 
-    return DateRel(xs::in<string_view>(arg));
+    auto ret = DateRel(xs::in<string_view>(arg));
+    if (ret.error() && is_strict_mode()) throw xs::out(ret.error());
+    return ret;
 }
 
 }}

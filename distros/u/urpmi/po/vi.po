@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: urpmi-vi\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-26 09:37+0300\n"
+"POT-Creation-Date: 2020-01-18 09:59+0200\n"
 "PO-Revision-Date: 2005-06-08 15:13+0700\n"
 "Last-Translator: Trinh Minh Thanh <tmthanh@yahoo.com>\n"
 "Language-Team: Vietnamese <gnomevi-list@lists.sourceforge.net>\n"
@@ -62,8 +62,8 @@ msgid "Cancel"
 msgstr "Bỏ qua"
 
 #: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
-#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1670
-#: ../urpm/media.pm:1821
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
+#: ../urpm/media.pm:1833
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "...không thu thập được: %s"
@@ -1034,25 +1034,27 @@ msgstr ""
 "--synthesis không thể dùng với  --media, --excludemedia, --sortmedia, --"
 "update hoặc --parallel"
 
-#: ../urpm/media.pm:792
+#: ../urpm/media.pm:793
 #, fuzzy, c-format
 msgid "ignoring non-free medium `%s'"
 msgstr "bỏ qua phương tiện %s"
 
-#: ../urpm/media.pm:802
+#: ../urpm/media.pm:803
 #, fuzzy, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
 msgstr "bỏ qua phương tiện %s"
 
-#: ../urpm/media.pm:806
+#: ../urpm/media.pm:807
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
 
 #: ../urpm/media.pm:816
-#, c-format
-msgid "un-ignoring 32bit medium `%s' b/c system is 32-bit EFI"
-msgstr ""
+#, fuzzy, c-format
+msgid ""
+"un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
+"32-bit EFI"
+msgstr "bỏ qua phương tiện %s"
 
 #: ../urpm/media.pm:844
 #, c-format
@@ -1115,162 +1117,162 @@ msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr ""
 "không thể truy cập phương tiện cài đặt thứ nhất (không thấy tập tin hdlists)"
 
-#: ../urpm/media.pm:1172
+#: ../urpm/media.pm:1184
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr ""
 
-#: ../urpm/media.pm:1230
+#: ../urpm/media.pm:1242
 #, fuzzy, c-format
 msgid "retrieving media.cfg file..."
 msgstr "đang lấy về tập tin hdlists..."
 
-#: ../urpm/media.pm:1273
+#: ../urpm/media.pm:1285
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "đang thử chọn phương tiện không tồn tại \"%s\""
 
-#: ../urpm/media.pm:1276
+#: ../urpm/media.pm:1288
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "đang chọn đa phương tiện: %s"
 
-#: ../urpm/media.pm:1335
+#: ../urpm/media.pm:1347
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "gỡ bỏ phương tiện \"%s\""
 
-#: ../urpm/media.pm:1426
+#: ../urpm/media.pm:1438
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "đang cấu hình lại urpmi cho phương tiện \"%s\""
 
-#: ../urpm/media.pm:1460
+#: ../urpm/media.pm:1472
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...không cấu hình lại được"
 
-#: ../urpm/media.pm:1466
+#: ../urpm/media.pm:1478
 #, c-format
 msgid "reconfiguration done"
 msgstr "hoàn thành việc cấu hình lại"
 
-#: ../urpm/media.pm:1482
+#: ../urpm/media.pm:1494
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr ""
 
-#: ../urpm/media.pm:1503
+#: ../urpm/media.pm:1515
 #, fuzzy, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr "phương tiện \"%s\" không được chọn"
 
-#: ../urpm/media.pm:1514
+#: ../urpm/media.pm:1526
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "đang kiểm tra tập tin tổng hợp [%s]"
 
-#: ../urpm/media.pm:1534
+#: ../urpm/media.pm:1546
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "trục trặc khi đọc tập tin tổng hợp của phương tiện \"%s\""
 
-#: ../urpm/media.pm:1547 ../urpm/media.pm:1642
+#: ../urpm/media.pm:1559 ../urpm/media.pm:1654
 #, fuzzy, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr "đang ghi tập tin danh sách cho phương tiện \"%s\""
 
-#: ../urpm/media.pm:1549 ../urpm/media.pm:1619 ../urpm/media.pm:1872
+#: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
 msgid "...copying failed"
 msgstr "...sao chép không được"
 
-#: ../urpm/media.pm:1615
+#: ../urpm/media.pm:1627
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "đang sao chép tập tin mô tả của \"%s\"..."
 
-#: ../urpm/media.pm:1617 ../urpm/media.pm:1646
+#: ../urpm/media.pm:1629 ../urpm/media.pm:1658
 #, c-format
 msgid "...copying done"
 msgstr "...sao chép hoàn thành"
 
-#: ../urpm/media.pm:1648
+#: ../urpm/media.pm:1660
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "lỗi sao chép [%s] (có lẽ tập tin nhỏ)"
 
-#: ../urpm/media.pm:1696
+#: ../urpm/media.pm:1708
 #, fuzzy, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr "tính toán md5sum của hdlist (hoặc synthesis) nguồn thu thập được"
 
-#: ../urpm/media.pm:1698 ../urpm/media.pm:2181
+#: ../urpm/media.pm:1710 ../urpm/media.pm:2193
 #, fuzzy, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
 msgstr "Lỗi bản sao của [%s] (md5sum không so khớp)"
 
-#: ../urpm/media.pm:1713
+#: ../urpm/media.pm:1725
 #, fuzzy, c-format
 msgid "genhdlist2 failed on %s"
 msgstr "đang kiểm tra tập tin hdlist [%s]"
 
-#: ../urpm/media.pm:1723
+#: ../urpm/media.pm:1735
 #, fuzzy, c-format
 msgid "comparing %s and %s"
 msgstr "cài đặt %s từ %s"
 
-#: ../urpm/media.pm:1753
+#: ../urpm/media.pm:1765
 #, fuzzy, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr "không tìm thấy tập tin hdlist cho phương tiện \"%s\""
 
-#: ../urpm/media.pm:1779
+#: ../urpm/media.pm:1791
 #, fuzzy, c-format
 msgid "copying MD5SUM file of \"%s\"..."
 msgstr "đang sao chép tập tin mô tả của \"%s\"..."
 
-#: ../urpm/media.pm:1819
+#: ../urpm/media.pm:1831
 #, fuzzy, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
 msgstr "tên tập tin rpm [%s] không hợp lệ"
 
-#: ../urpm/media.pm:1822
+#: ../urpm/media.pm:1834
 #, fuzzy, c-format
 msgid "no metadata found for medium \"%s\""
 msgstr "không tìm thấy tập tin hdlist cho phương tiện \"%s\""
 
-#: ../urpm/media.pm:1854
+#: ../urpm/media.pm:1866
 #, fuzzy, c-format
 msgid "retrieving source synthesis of \"%s\"..."
 msgstr "đang thu thập hdlist (hoặc synthesis) nguồn của \"%s\"..."
 
-#: ../urpm/media.pm:1920
+#: ../urpm/media.pm:1932
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "đang kiểm tra tập tin pubkey của \"%s\"..."
 
-#: ../urpm/media.pm:1932
+#: ../urpm/media.pm:1944
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...đã nhập key %s từ tập tin pubkey của \"%s\""
 
-#: ../urpm/media.pm:1936
+#: ../urpm/media.pm:1948
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "không thể nhập tập tin pubkey của \"%s\""
 
-#: ../urpm/media.pm:1977
+#: ../urpm/media.pm:1989
 #, fuzzy, c-format
 msgid "no synthesis file found for medium \"%s\""
 msgstr "không tìm thấy tập tin hdlist cho phương tiện \"%s\""
 
-#: ../urpm/media.pm:2010
+#: ../urpm/media.pm:2022
 #, fuzzy, c-format
 msgid "updated medium \"%s\""
 msgstr "đã thêm phương tiện %s"
 
-#: ../urpm/media.pm:2175
+#: ../urpm/media.pm:2187
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr ""

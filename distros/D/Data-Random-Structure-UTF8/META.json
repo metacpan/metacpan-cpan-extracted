@@ -1,0 +1,62 @@
+{
+   "abstract" : "Produce nested data structures with unicode keys, values, elements.",
+   "author" : [
+      "Andreas Hadjiprocopis <bliako ta cpan.org / andreashad2 ta gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Random-Structure-UTF8",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Random::Structure" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.008000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "Data::Dumper" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hadjiprocopis/Data-Random-Structure-UTF8/issues"
+      },
+      "homepage" : "https://metacpan.org/module/Data::Random::Structure::UTF8",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hadjiprocopis/Data-Random-Structure-UTF8",
+         "web" : "https://github.com/hadjiprocopis/Data-Random-Structure-UTF8"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

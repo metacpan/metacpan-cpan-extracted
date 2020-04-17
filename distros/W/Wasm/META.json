@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Wasm",
    "prereqs" : {
@@ -23,8 +23,12 @@
       },
       "develop" : {
          "requires" : {
+            "Carp::Assert" : "0",
+            "FFI::CheckLib" : "0.26",
+            "File::Glob" : "0",
             "File::Spec" : "0",
             "FindBin" : "0",
+            "PeekPoke::FFI" : "0",
             "Perl::Critic" : "0",
             "Test2::Require::Module" : "0.000060",
             "Test2::Tools::PerlCritic" : "0",
@@ -36,6 +40,7 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
+            "Test::Script" : "0",
             "Test::Spelling" : "0",
             "Test::Strict" : "0",
             "YAML" : "0"
@@ -57,12 +62,8 @@
       },
       "test" : {
          "requires" : {
-            "Carp::Assert" : "0",
-            "FFI::CheckLib" : "0.26",
-            "PeekPoke::FFI" : "0",
             "Test2::API" : "1.302015",
             "Test2::V0" : "0.000060",
-            "Test::Script" : "0",
             "perl" : "5.008001"
          }
       }
@@ -79,9 +80,9 @@
          "web" : "https://github.com/perlwasm/Wasm"
       }
    },
-   "version" : "0.04",
-   "x_generated_by_perl" : "v5.31.10",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "JSON::XS version 4.02",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

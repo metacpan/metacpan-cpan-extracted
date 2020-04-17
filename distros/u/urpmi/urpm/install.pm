@@ -232,7 +232,8 @@ sub _schedule_packages {
 		($true_rpm, $true_pkg) = _apply_delta_rpm($urpm, $mode->{$_}, $mode, $pkg);
 		push @produced_deltas, ($mode->{$_} = $true_rpm); #- fix path
 	    }
-	    if ($trans->add($true_pkg || $pkg, update => $update,
+	    if ($urpm->{options}{reinstall} ? $trans->addReinstall($true_pkg || $pkg) :
+	        $trans->add($true_pkg || $pkg, update => $update,
 		    $options{excludepath} ? (excludepath => [ split /,/, $options{excludepath} ]) : ())) {
 		$urpm->{debug} and $urpm->{debug}(
 		    sprintf('trans: scheduling %s of %s (id=%d, file=%s)', 

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.052';
+our $VERSION = '1.053';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -519,6 +519,22 @@ our $VERSION = '1.052';
 #pod inverted, since this operates outside-inward, while C<yancy.wrap>
 #pod operates inside-outward.
 #pod
+#pod =head4 yancy.mask
+#pod
+#pod Mask part of a field's value by replacing a regular expression match
+#pod with the given character. The first parameter is a regular expression to
+#pod match. The second parameter is the character to replace each matched
+#pod character with.
+#pod
+#pod     # Replace all text before the @ with *
+#pod     'x-filter' => [
+#pod         [ 'yancy.mask' => '^[^@]+', '*' ]
+#pod     ],
+#pod     # Replace all but the last two characters before the @
+#pod     'x-filter' => [
+#pod         [ 'yancy.mask' => '^[^@]+(?=[^@]{2}@)', '*' ]
+#pod     ],
+#pod
 #pod =head2 yancy.filter.apply
 #pod
 #pod     my $filtered_data = $c->yancy->filter->apply( $schema, $item_data );
@@ -708,6 +724,11 @@ sub register {
         $field_value = $field_value->{$_} for @params;
         $field_value;
     } );
+    $self->_helper_filter_add( undef, 'yancy.mask' => sub {
+        my ( $field_name, $field_value, $field_conf, $regex, $replace ) = @_;
+        $field_value =~ s/($regex)/$replace x length $1/e;
+        $field_value;
+    } );
     for my $name ( keys %{ $config->{filters} } ) {
         $self->_helper_filter_add( undef, $name, $config->{filters}{$name} );
     }
@@ -795,7 +816,7 @@ sub _helper_list {
             delete $_->{ $prop_name } for @items;
         }
     }
-    return @items;
+    return map { $c->yancy->filter->apply( $schema_name, $_, 'x-filter-output' ) } @items;
 }
 
 sub _helper_get {
@@ -808,7 +829,7 @@ sub _helper_get {
             delete $item->{ $prop_name };
         }
     }
-    $item = $c->yancy->filter->apply( $schema, $item, 'x-filter-output' );
+    $item = $c->yancy->filter->apply( $schema_name, $item, 'x-filter-output' );
     return $item;
 }
 
@@ -1020,7 +1041,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.052
+version 1.053
 
 =head1 SYNOPSIS
 
@@ -1538,6 +1559,22 @@ This will achieve the reverse of the transformation given in
 L</yancy.wrap> above. Note that obviously the order of arguments is
 inverted, since this operates outside-inward, while C<yancy.wrap>
 operates inside-outward.
+
+=head4 yancy.mask
+
+Mask part of a field's value by replacing a regular expression match
+with the given character. The first parameter is a regular expression to
+match. The second parameter is the character to replace each matched
+character with.
+
+    # Replace all text before the @ with *
+    'x-filter' => [
+        [ 'yancy.mask' => '^[^@]+', '*' ]
+    ],
+    # Replace all but the last two characters before the @
+    'x-filter' => [
+        [ 'yancy.mask' => '^[^@]+(?=[^@]{2}@)', '*' ]
+    ],
 
 =head2 yancy.filter.apply
 

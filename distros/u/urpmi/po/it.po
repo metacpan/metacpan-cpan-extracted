@@ -8,7 +8,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2019-06-26 09:37+0300\n"
+"POT-Creation-Date: 2020-01-18 09:59+0200\n"
 "PO-Revision-Date: 2015-03-21 07:12+0000\n"
 "Last-Translator: Guybrush88 <erpizzo@alice.it>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/mageia/language/"
@@ -65,8 +65,8 @@ msgid "Cancel"
 msgstr "Annulla"
 
 #: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
-#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1670
-#: ../urpm/media.pm:1821
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
+#: ../urpm/media.pm:1833
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "...recupero fallito: %s"
@@ -1063,25 +1063,27 @@ msgstr ""
 "--synthesis non può essere utilizzato con --media, --excludemedia, --"
 "sortmedia, --update, --use-distrib o --parallel"
 
-#: ../urpm/media.pm:792
+#: ../urpm/media.pm:793
 #, c-format
 msgid "ignoring non-free medium `%s'"
 msgstr "ignoro il supporto non-free `%s'"
 
-#: ../urpm/media.pm:802
+#: ../urpm/media.pm:803
 #, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
 msgstr ""
 "Attivando la fonte non-free vengono installati i pacchetti non-free `%s'"
 
-#: ../urpm/media.pm:806
+#: ../urpm/media.pm:807
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr "Attivando la fonte tainted i pacchetti tainted `%s' vengono installati"
 
 #: ../urpm/media.pm:816
 #, fuzzy, c-format
-msgid "un-ignoring 32bit medium `%s' b/c system is 32-bit EFI"
+msgid ""
+"un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
+"32-bit EFI"
 msgstr "Attivando la fonte tainted i pacchetti tainted `%s' vengono installati"
 
 #: ../urpm/media.pm:844
@@ -1145,162 +1147,162 @@ msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr ""
 "impossibile accedere al supporto di installazione (manca il file media.cfg)"
 
-#: ../urpm/media.pm:1172
+#: ../urpm/media.pm:1184
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr "ignoro il supporto non compatibile \"%s\" (per %s)"
 
-#: ../urpm/media.pm:1230
+#: ../urpm/media.pm:1242
 #, c-format
 msgid "retrieving media.cfg file..."
 msgstr "recupero il file media.cfg..."
 
-#: ../urpm/media.pm:1273
+#: ../urpm/media.pm:1285
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "tentativo di selezionare un supporto inesistente \"%s\""
 
-#: ../urpm/media.pm:1276
+#: ../urpm/media.pm:1288
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "sto selezionando più supporti: %s"
 
-#: ../urpm/media.pm:1335
+#: ../urpm/media.pm:1347
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "rimuovo il supporto \"%s\""
 
-#: ../urpm/media.pm:1426
+#: ../urpm/media.pm:1438
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "riconfiguro urpmi per il supporto \"%s\""
 
-#: ../urpm/media.pm:1460
+#: ../urpm/media.pm:1472
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...riconfigurazione fallita"
 
-#: ../urpm/media.pm:1466
+#: ../urpm/media.pm:1478
 #, c-format
 msgid "reconfiguration done"
 msgstr "riconfigurazione eseguita"
 
-#: ../urpm/media.pm:1482
+#: ../urpm/media.pm:1494
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr "Errore generando i nomi dei file: non esiste la dipendenza %d"
 
-#: ../urpm/media.pm:1503
+#: ../urpm/media.pm:1515
 #, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr "il supporto \"%s\" risulta già aggiornato"
 
-#: ../urpm/media.pm:1514
+#: ../urpm/media.pm:1526
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "esamino il file synthesis [%s]"
 
-#: ../urpm/media.pm:1534
+#: ../urpm/media.pm:1546
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "problema nel leggere il file synthesis del supporto \"%s\""
 
-#: ../urpm/media.pm:1547 ../urpm/media.pm:1642
+#: ../urpm/media.pm:1559 ../urpm/media.pm:1654
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr "copia di [%s] per il supporto \"%s\"..."
 
-#: ../urpm/media.pm:1549 ../urpm/media.pm:1619 ../urpm/media.pm:1872
+#: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
 msgid "...copying failed"
 msgstr "...copia fallita"
 
-#: ../urpm/media.pm:1615
+#: ../urpm/media.pm:1627
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "copio il file di descrizione di \"%s\"..."
 
-#: ../urpm/media.pm:1617 ../urpm/media.pm:1646
+#: ../urpm/media.pm:1629 ../urpm/media.pm:1658
 #, c-format
 msgid "...copying done"
 msgstr "...copia terminata"
 
-#: ../urpm/media.pm:1648
+#: ../urpm/media.pm:1660
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "copia di [%s] fallita (il file è stranamente piccolo)"
 
-#: ../urpm/media.pm:1696
+#: ../urpm/media.pm:1708
 #, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr "calcolo md5sum del file synthesis della fonte scaricata"
 
-#: ../urpm/media.pm:1698 ../urpm/media.pm:2181
+#: ../urpm/media.pm:1710 ../urpm/media.pm:2193
 #, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
 msgstr "acquisizione di [%s] fallita (md5sum non corretta)"
 
-#: ../urpm/media.pm:1713
+#: ../urpm/media.pm:1725
 #, c-format
 msgid "genhdlist2 failed on %s"
 msgstr "genhdlist2 non riuscito per %s"
 
-#: ../urpm/media.pm:1723
+#: ../urpm/media.pm:1735
 #, c-format
 msgid "comparing %s and %s"
 msgstr "confronto di %s con %s"
 
-#: ../urpm/media.pm:1753
+#: ../urpm/media.pm:1765
 #, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr "il file hdlist %s per il supporto \"%s\" non è corretto"
 
-#: ../urpm/media.pm:1779
+#: ../urpm/media.pm:1791
 #, c-format
 msgid "copying MD5SUM file of \"%s\"..."
 msgstr "copia del file MD5SUM di \"%s\"..."
 
-#: ../urpm/media.pm:1819
+#: ../urpm/media.pm:1831
 #, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
 msgstr "file MD5SUM non valido (recuperato da %s)"
 
-#: ../urpm/media.pm:1822
+#: ../urpm/media.pm:1834
 #, c-format
 msgid "no metadata found for medium \"%s\""
 msgstr "non trovo i metadati per il supporto \"%s\""
 
-#: ../urpm/media.pm:1854
+#: ../urpm/media.pm:1866
 #, c-format
 msgid "retrieving source synthesis of \"%s\"..."
 msgstr "recupero del file synthesis di \"%s\"..."
 
-#: ../urpm/media.pm:1920
+#: ../urpm/media.pm:1932
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "controllo il file pubkey di \"%s\"..."
 
-#: ../urpm/media.pm:1932
+#: ../urpm/media.pm:1944
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...importata la chiave %s dal file pubkey di \"%s\""
 
-#: ../urpm/media.pm:1936
+#: ../urpm/media.pm:1948
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "impossibile importare il file pubkey di \"%s\""
 
-#: ../urpm/media.pm:1977
+#: ../urpm/media.pm:1989
 #, c-format
 msgid "no synthesis file found for medium \"%s\""
 msgstr "non trovo il file synthesis per il supporto \"%s\""
 
-#: ../urpm/media.pm:2010
+#: ../urpm/media.pm:2022
 #, c-format
 msgid "updated medium \"%s\""
 msgstr "supporto \"%s\" aggiornato"
 
-#: ../urpm/media.pm:2175
+#: ../urpm/media.pm:2187
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr "recupero di [%s] non riuscito"

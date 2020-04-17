@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.10
+    version 1.11
 
 SYNOPSIS
 
@@ -224,6 +224,14 @@ ATTRIBUTES
     Platypus to find symbols using the demangled names (for example, if you
     specify CPP for C++ you can use method names like Foo::get_bar() with
     "attach" or "function".
+
+ api
+
+    [version 1.11]
+
+     my $level = $ffi->api;
+
+    Returns the API level of the Platypus instance.
 
 METHODS
 
@@ -1653,9 +1661,9 @@ SEE ALSO
 
     FFI
 
-      Foreign function interface based on (nomenclature is everything)
-      FSF's ffcall. It hasn't worked for quite some time, and ffcall is no
-      longer supported or distributed.
+      Older, simpler, less featureful FFI. It used to be implemented using
+      FSF's ffcall. Because ffcall has been unsupported for some time, I
+      reimplemented this module using FFI::Platypus.
 
     C::DynaLib
 

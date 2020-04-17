@@ -6,7 +6,7 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Store;
 
 # ABSTRACT: Wasmtime trap class
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 $ffi_prefix = 'wasm_trap_';
@@ -63,7 +63,7 @@ Wasm::Wasmtime::Trap - Wasmtime trap class
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,11 @@
 Revision history for Perl module Amon2
 
+6.14 2020-04-15T15:58:41Z
+
+    - Upgrade bootstrap from 3.3.5 to 4.4.1
+    - Upgrade es5shim from 4.0.3 to 4.5.1
+    - Upgrade jQuery from 3.2.1 to 3.5.0
+
 6.13 2016-04-08T09:57:09Z
 
 	commit df41f39c3c6b2093e558dcd01add680a4b4eb4e6

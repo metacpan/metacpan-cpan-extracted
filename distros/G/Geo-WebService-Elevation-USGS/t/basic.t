@@ -24,9 +24,6 @@ is($ele->get('units'), 'FEET', 'Units can be set back to feet');
 ok($ele->get('croak'), 'Croak defaults to true');
 $ele->set(croak => undef);
 ok(!$ele->get('croak'), 'Croak can be set false');
-is($ele->get('proxy'),
-    'http://gisdata.usgs.gov/XMLWebServices2/Elevation_Service.asmx',
-    'Proxy is as expected');
 ok(!defined($ele->get('places')), 'Places defaults to undefined');
 $ele->set(places => 2);	# USGS returns insane precision
 is($ele->get('places'), 2, 'Places can be set to 2');

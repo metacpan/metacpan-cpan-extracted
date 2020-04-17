@@ -8,9 +8,9 @@ build_requires:
   File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Log::ger: '0.034'
+  Log::ger: '0.037'
   Log::ger::Output: '0.006'
-  Log::ger::Util: '0.034'
+  Log::ger::Util: '0.037'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Output-FileWriteRotate
   homepage: https://metacpan.org/release/Log-ger-Output-FileWriteRotate
   repository: git://github.com/perlancar/perl-Log-ger-Output-FileWriteRotate.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

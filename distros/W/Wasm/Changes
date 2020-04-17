@@ -1,9 +1,15 @@
 Revision history for Wasm},
 
+0.05      2020-04-14 14:23:12 -0400
+  - Added Wasm::Wasmtime::Global class (gh#27)
+  - Added Wasm::Wasmtime::Table class (gh#29)
+  - Require Alien::wasmtime 0.07 to test for OOM tests
+    (gh#22, gh#30, perlwasm/Alien-wasmtime#9)
+
 0.04      2020-04-13 13:49:46 -0600
-  - Added Wasm::Wasm::Linker class (gh#23)
-  - Added Wasm::Wasm::GlobalType class (gh#24)
-  - Added Wasm::Wasm::TableType class (gh#25)
+  - Added Wasm::Wasmtime::Linker class (gh#23)
+  - Added Wasm::Wasmtime::GlobalType class (gh#24)
+  - Added Wasm::Wasmtime::TableType class (gh#25)
 
 0.03      2020-04-11 16:19:37 -0600
   - Remove code reference overload for Wasm::Wasmtime::Extern (gh#18)

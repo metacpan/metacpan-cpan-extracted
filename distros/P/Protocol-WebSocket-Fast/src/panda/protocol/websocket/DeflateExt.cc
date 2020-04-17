@@ -149,7 +149,7 @@ DeflateExt::DeflateExt(const DeflateExt::Config& cfg, Role role): effective_cfg{
     if (r != Z_OK) {
         panda::string err = "zlib::inflateInit2 error";
         if (rx_stream.msg) err.append(panda::string(" : ") + rx_stream.msg);
-        throw std::runtime_error(err);
+        throw Error(err);
     }
 
     tx_stream.next_in = Z_NULL;
@@ -163,7 +163,7 @@ DeflateExt::DeflateExt(const DeflateExt::Config& cfg, Role role): effective_cfg{
     if (r != Z_OK) {
         panda::string err = "zlib::deflateInit2 error";
         if (rx_stream.msg) err.append(panda::string(" : ") + rx_stream.msg);
-        throw std::runtime_error(err);
+        throw Error(err);
     }
 
     reset_after_tx =
@@ -183,7 +183,7 @@ void DeflateExt::reset_tx() {
         if (tx_stream.msg) {
             err += tx_stream.msg;
         }
-        throw std::runtime_error(err);
+        throw Error(err);
     }
 }
 

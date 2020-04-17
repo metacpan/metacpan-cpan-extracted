@@ -2,8 +2,8 @@ NAME
     Ubuntu::Releases - List Ubuntu releases
 
 VERSION
-    This document describes version 0.111 of Ubuntu::Releases (from Perl
-    distribution Ubuntu-Releases), released on 2019-06-28.
+    This document describes version 20200221.0 of Ubuntu::Releases (from
+    Perl distribution Ubuntu-Releases), released on 2020-02-21.
 
 SYNOPSIS
      use Ubuntu::Releases;
@@ -29,6 +29,59 @@ FUNCTIONS
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   animal => *str*
+
+        Only return records where the 'animal' field equals specified value.
+
+    *   animal.contains => *str*
+
+        Only return records where the 'animal' field contains specified
+        text.
+
+    *   animal.in => *array[str]*
+
+        Only return records where the 'animal' field is in the specified
+        values.
+
+    *   animal.is => *str*
+
+        Only return records where the 'animal' field equals specified value.
+
+    *   animal.isnt => *str*
+
+        Only return records where the 'animal' field does not equal
+        specified value.
+
+    *   animal.max => *str*
+
+        Only return records where the 'animal' field is less than or equal
+        to specified value.
+
+    *   animal.min => *str*
+
+        Only return records where the 'animal' field is greater than or
+        equal to specified value.
+
+    *   animal.not_contains => *str*
+
+        Only return records where the 'animal' field does not contain
+        specified text.
+
+    *   animal.not_in => *array[str]*
+
+        Only return records where the 'animal' field is not in the specified
+        values.
+
+    *   animal.xmax => *str*
+
+        Only return records where the 'animal' field is less than specified
+        value.
+
+    *   animal.xmin => *str*
+
+        Only return records where the 'animal' field is greater than
+        specified value.
 
     *   apache_httpd_version => *str*
 
@@ -245,6 +298,10 @@ FUNCTIONS
 
         Only return records where the 'eoldate' field is greater than
         specified value.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
 
     *   fields => *array[str]*
 
@@ -910,7 +967,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

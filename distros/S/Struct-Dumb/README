@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
 
      use Struct::Dumb;
-     
+    
      struct Point => [qw( x y )];
     
      my $point = Point(10, 20);
@@ -32,7 +32,7 @@ SYNOPSIS
 
      use Struct::Dumb qw( -named_constructors )
     
-     struct Point3D => [qw( x y z ];
+     struct Point3D => [qw( x y z )];
     
      my $point3d = Point3D( x => 100, z => 12, y => 50 );
 
@@ -88,6 +88,17 @@ DESCRIPTION
     basis to default true by supplying the -named_constructors option on
     the use statement.
 
+    When using named constructors, individual fields may be declared as
+    being optional. By preceeding the field name with a ? character, the
+    constructor is instructed not to complain if a named parameter is not
+    given for that field; instead it will be set to undef.
+
+       struct Person => [qw( name age ?address )],
+          named_constructor => 1;
+    
+       my $bob = Person( name => "Bob", age => 20 );
+       # This is valid because 'address' is marked as optional
+
 FUNCTIONS
 
  struct
@@ -125,6 +136,23 @@ FUNCTIONS
     :lvalue attribute.
 
     Takes the same options as "struct".
+
+DATA::DUMP FILTER
+
+    Since version 0.10.
+
+    If Data::Dump is loaded, an extra filter is applied so that struct
+    instances are printed in a format matching that which would construct
+    them.
+
+       struct Colour => [qw( red green blue )];
+    
+       use Data::Dump;
+    
+       my %hash = ( col => Colour( 0.8, 0.5, 0.2 ) );
+       Data::Dump::dd \%hash;
+    
+       # prints {col => main::Colour(0.8, 0.5, 0.2)}
 
 NOTES
 

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.03
+    Version 0.05
 
 SYNOPSIS
 
@@ -185,15 +185,141 @@ SUBROUTINES
     Given an input $perlvar (which can be a simple scalar or a nested data
     structure, but not an object), it will return the equivalent string
     (via Data::Dumper). In $optional_paramshashref one can specify whether
-    to NOT escape unicode with 'dont-bloody-escape-unicode' => 1, and/or
-    use terse output with 'terse' => 1 and remove all the incessant
-    indentation 'indent' => 1 which unfortunately goes to the other extreme
-    of producing a space-less output, not fit for human consumption. The
-    output can fed to Data::Roundtrip::dump2perl for getting the Perl
-    variable back.
+    to escape unicode with 'dont-bloody-escape-unicode' => 0, (or
+    'escape-unicode' => 1). The DEFAULT behaviour is to NOT ESCAPE unicode.
 
-    Returns the string representation of the input perl variable on success
-    or undef on failure.
+    Additionally, use terse output with 'terse' => 1 and remove all the
+    incessant indentation with 'indent' => 1 which unfortunately goes to
+    the other extreme of producing a space-less output, not fit for human
+    consumption. The output can fed to Data::Roundtrip::dump2perl for
+    getting the Perl variable back.
+
+    It returns the string representation of the input perl variable on
+    success or undef on failure.
+
+    The output can be fed back to dump2perl.
+
+    CAVEAT: when not escaping unicode (which is the default behaviour),
+    each call to this sub will override Data::Dumper's qquote() sub (with a
+    call to Sub::Override::new), call Data::Dumper's Dumper() and save its
+    output to a temporary variable, restore qquote() sub (with a call to
+    Sub::Override::restore and return the contents. This exercise is done
+    every time this perl2dump() is called. It can be expensive. The
+    alternative is to redefine qquote() once, when the module is loaded.
+
+    Note that there are two other alternatives to this sub,
+    perl2dump_filtered which uses Data::Dump filters to control unicode
+    escaping but lacks in aesthetics and functionality and handling all the
+    cases Dump and Dumper do quite well.
+
+    There is also perl2dump_homebrew which uses the same dump-recursively
+    engine as perl2dump_filtered but does not involve Data::Dump at all.
+
+ perl2dump_filtered
+
+      my $ret = perl2dump_filtered($perlvar, $optional_paramshashref)
+
+    Arguments:
+
+      * $perlvar
+
+      * $optional_paramshashref
+
+    Return value:
+
+      * $ret
+
+    It does the same job as perl2dump which is to stringify a perl
+    variable. And takes the same options.
+
+    It returns the string representation of the input perl variable on
+    success or undef on failure.
+
+    It uses Data::Dump::Filtered to add a filter to Data::Dump.
+
+ perl2dump_homebrew
+
+      my $ret = perl2dump_homebrew($perlvar, $optional_paramshashref)
+
+    Arguments:
+
+      * $perlvar
+
+      * $optional_paramshashref
+
+    Return value:
+
+      * $ret
+
+    It does the same job as perl2dump which is to stringify a perl
+    variable. And takes the same options.
+
+    It returns the string representation of the input perl variable on
+    success or undef on failure.
+
+    The output can be fed back to dump2perl.
+
+    It uses its own basic dumper. Which is recursive. So, beware of
+    extremely deep nested data structures. Deep not long! But it probably
+    is as efficient as it can be but definetely lacks in aesthetics and
+    functionality compared to Dump and Dumper.
+
+ dump_perl_var_recursively
+
+        my $ret = dump_perl_var_recursively($perl_var)
+
+    Arguments:
+
+      * $perl_var, a Perl variable like a scalar or an arbitrarily nested
+      data structure. For the latter, it requires references, e.g. hash-ref
+      or arrayref.
+
+    Return value:
+
+      * $ret, the stringified version of the input Perl variable.
+
+    This sub will take a Perl var (as a scalar or an arbitrarily nested
+    data structure) and emulate a very very basic Dump/Dumper but with
+    enforced rendering unicode (for keys or values or array items), and not
+    escaping unicode - this is not an option, it returns a string
+    representation of the input perl var
+
+    There are 2 obvious limitations:
+
+    1) indentation is very basic,
+
+    2) it supports only scalars, hashes and arrays, (which will dive into
+    them no problem) This sub can be used in conjuction with
+    DataDumpFilterino() to create a Data::Dump filter like,
+
+           Data::Dump::Filtered::add_dump_filter( \& DataDumpFilterino );
+      or
+           dumpf($perl_var, \& DataDumpFilterino);
+
+      the input is a Perl variable as a reference, so no %inp but $inp={}
+      and $inp=[].
+
+      This function is recursive. Beware of extremely deep nested data
+      structures. Deep not long! But it probably is as efficient as it can
+      be but definetely lacks in aesthetics and functionality compared to
+      Dump and Dumper.
+
+      The output is a, possibly multiline, string. Which it can then be fed
+      back to dump2perl.
+
+ dump2perl
+
+        my $ret = dump2perl($dumpstring)
+
+    Arguments:
+
+      * $dumpstring, this comes from the output of Data::Dump, Data::Dumper
+      or our own perl2dump, perl2dump_filtered, perl2dump_homebrew.
+      Escaped, or unescaped.
+
+    Return value:
+
+      * $ret, the Perl data structure on success or undef on failure.
 
  json2perl
 
@@ -273,6 +399,79 @@ SUBROUTINES
 
     similar functionality as their counterparts described above.
 
+ read_from_file
+
+      my $contents = read_from_file($filename)
+
+    Arguments:
+
+      * $filename : the input filename.
+
+    Return value:
+
+      * $contents
+
+    Given a filename, it opens it using <:encoding(UTF-8)>, slurps its
+    contents and closes it. It's a convenience sub which could have also
+    been private. If you want to retain the filehandle, use
+    "read_from_filehandle ".
+
+    Returns the file contents on success or undef on failure.
+
+ read_from_filehandle
+
+      my $contents = read_from_filehandle($filehandle)
+
+    Arguments:
+
+      * $filehandle : the handle to an already opened file.
+
+    Return value:
+
+      * $contents : the file contents slurped.
+
+    It slurps all content from the specified input file handle. Upon return
+    the file handle is still open. Returns the file contents on success or
+    undef on failure.
+
+ write_to_file
+
+      write_to_file($filename, $contents) or die
+
+    Arguments:
+
+      * $filename : the output filename.
+
+      * $contents : any string to write it to file.
+
+    Return value:
+
+      * 1 on success, 0 on failure
+
+    Given a filename, it opens it using <:encoding(UTF-8)>, writes all
+    specified content and closes the file. It's a convenience sub which
+    could have also been private. If you want to retain the filehandle, use
+    "write_to_filehandle ".
+
+    Returns 1 on success or 0 on failure.
+
+ write_to_filehandle
+
+      write_to_filehandle($filehandle, $contents) or die
+
+    Arguments:
+
+      * $filehandle : the handle to an already opened file (for writing).
+
+    Return value:
+
+      * 1 on success or 0 on failure.
+
+    It writes content to the specified file handle. Upon return the file
+    handle is still open.
+
+    Returns 1 on success or 0 on failure.
+
 SCRIPTS
 
     A few scripts have been put together and offer the functionality of
@@ -294,10 +493,6 @@ BUGS
     https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Roundtrip. I will
     be notified, and then you'll automatically be notified of progress on
     your bug as I make changes.
-
-FUTURE WORK
-
-    Replace Data::Dumper with Data::Dumper::AutoEncode
 
 SEE ALSO
 
@@ -365,4 +560,17 @@ LICENSE AND COPYRIGHT
     This is free software, licensed under:
 
       The Artistic License 2.0 (GPL Compatible)
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 565:
+
+      L<> starts or ends with whitespace
+
+    Around line 617:
+
+      L<> starts or ends with whitespace
 

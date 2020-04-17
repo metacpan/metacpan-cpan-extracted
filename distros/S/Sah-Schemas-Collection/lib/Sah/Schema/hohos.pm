@@ -3,7 +3,7 @@ package Sah::Schema::hohos;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-Collection'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $schema = [hash => {
     summary => 'Hash of (defined-)hash-of-(defined-)strings',
@@ -41,7 +41,33 @@ Sah::Schema::hohos - Hash of (defined-)hash-of-(defined-)strings
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::hohos (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+This document describes version 0.004 of Sah::Schema::hohos (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+
+=head1 SYNOPSIS
+
+Sample data:
+
+ "a"  # INVALID
+
+ []  # INVALID
+
+ {}  # valid
+
+ {k=>undef}  # INVALID
+
+ {k=>"a"}  # INVALID
+
+ {k=>[]}  # INVALID
+
+ {k=>{}}  # valid
+
+ {k=>{},k2=>{k=>"a"}}  # valid
+
+ {k=>{},k2=>{k=>[]}}  # INVALID
+
+ {k=>{},k2=>{k=>{}}}  # INVALID
+
+ {k=>{},k2=>{k=>undef}}  # INVALID
 
 =head1 DESCRIPTION
 

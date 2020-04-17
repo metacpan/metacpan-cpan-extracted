@@ -69,6 +69,8 @@ void DateRel::set_ymd (...) {
     *THIS = xs_daterel_ymd(&ST(1), items - 1);
 }
 
+std::error_code DateRel::error ()
+
 ptime_t DateRel::sec (SV* newval = NULL) {
     if (newval) {
         THIS->sec(xs::in<ptime_t>(newval));

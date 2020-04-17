@@ -1,9 +1,9 @@
 package Regexp::Pattern::Palindrome;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-10'; # DATE
+our $DATE = '2020-02-11'; # DATE
 our $DIST = 'Regexp-Pattern-Palindrome'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %RE = (
     palindrome_alphanum => {
@@ -104,7 +104,7 @@ Regexp::Pattern::Palindrome - Regexp patterns related to palindrome
 
 =head1 VERSION
 
-This document describes version 0.001 of Regexp::Pattern::Palindrome (from Perl distribution Regexp-Pattern-Palindrome), released on 2020-02-10.
+This document describes version 0.002 of Regexp::Pattern::Palindrome (from Perl distribution Regexp-Pattern-Palindrome), released on 2020-02-11.
 
 =head1 SYNOPSIS
 
@@ -245,7 +245,9 @@ feature.
 
 =head1 SEE ALSO
 
-L<Regexp::Pattern::Perl>
+L<Regexp::Pattern>
+
+Some utilities related to Regexp::Pattern: L<App::RegexpPatternUtils>, L<rpgrep> from L<App::rpgrep>.
 
 =head1 AUTHOR
 

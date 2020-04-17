@@ -25,7 +25,7 @@ struct Utf8Checker {
         return true;
     }
 
-//private:
+private:
     std::uint8_t  cp_[4];      // a temp buffer for the code point
     size_t        need_ = 0;   // chars we need to finish the code point
     std::uint8_t* p_    = cp_; // current position in temp buffer

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
 package Struct::Dumb;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 use Carp;
 
@@ -25,7 +25,7 @@ C<Struct::Dumb> - make simple lightweight record-like structures
 =head1 SYNOPSIS
 
  use Struct::Dumb;
- 
+
  struct Point => [qw( x y )];
 
  my $point = Point(10, 20);
@@ -55,7 +55,7 @@ Z<>
 
  use Struct::Dumb qw( -named_constructors )
 
- struct Point3D => [qw( x y z ];
+ struct Point3D => [qw( x y z )];
 
  my $point3d = Point3D( x => 100, z => 12, y => 50 );
 
@@ -109,6 +109,17 @@ functions. It defaults to false, but it can be set on a per-package basis to
 default true by supplying the C<-named_constructors> option on the C<use>
 statement.
 
+When using named constructors, individual fields may be declared as being
+optional. By preceeding the field name with a C<?> character, the constructor
+is instructed not to complain if a named parameter is not given for that
+field; instead it will be set to C<undef>.
+
+   struct Person => [qw( name age ?address )],
+      named_constructor => 1;
+
+   my $bob = Person( name => "Bob", age => 20 );
+   # This is valid because 'address' is marked as optional
+
 =cut
 
 sub import
@@ -157,19 +168,51 @@ sub import
 
 =cut
 
+my %_STRUCT_PACKAGES;
+
 sub _struct
 {
-   my ( $name, $fields, $caller, %opts ) = @_;
+   my ( $name, $_fields, $caller, %opts ) = @_;
 
    my $lvalue = !!$opts{lvalue};
    my $named  = !!$opts{named_constructor};
 
    my $pkg = "${caller}::$name";
 
+   my @fields = @$_fields;
+
+   my %optional;
+   s/^\?// and $optional{$_}++ for @fields;
+
+   my $constructor;
+   if( $named ) {
+      $constructor = sub {
+         my %values = @_;
+         my @values;
+         foreach ( @fields ) {
+            exists $values{$_} or $optional{$_} or
+               croak "usage: $pkg requires '$_'";
+            push @values, delete $values{$_};
+         }
+         if( my ( $extrakey ) = keys %values ) {
+            croak "usage: $pkg does not recognise '$extrakey'";
+         }
+         bless \@values, $pkg;
+      };
+   }
+   else {
+      my $fieldcount = @fields;
+      my $argnames = join ", ", map "\$$_", @fields;
+      $constructor = sub {
+         @_ == $fieldcount or croak "usage: $pkg($argnames)";
+         bless [ @_ ], $pkg;
+      };
+   }
+
    my %subs;
-   foreach ( 0 .. $#$fields ) {
+   foreach ( 0 .. $#fields ) {
       my $idx = $_;
-      my $field = $fields->[$idx];
+      my $field = $fields[$idx];
 
       BEGIN {
          overloading->unimport if HAVE_OVERLOADING;
@@ -187,30 +230,6 @@ sub _struct
       croak "$pkg does not have a '$field' field";
       my $dummy; ## croak can't be last because it isn't lvalue, so this line is required
    };
-
-   my $constructor;
-   if( $named ) {
-      $constructor = sub {
-         my %values = @_;
-         my @values;
-         foreach ( @$fields ) {
-            exists $values{$_} or croak "usage: $pkg requires '$_'";
-            push @values, delete $values{$_};
-         }
-         if( my ( $extrakey ) = keys %values ) {
-            croak "usage: $pkg does not recognise '$extrakey'";
-         }
-         bless \@values, $pkg;
-      };
-   }
-   else {
-      my $fieldcount = @$fields;
-      my $argnames = join ", ", map "\$$_", @$fields;
-      $constructor = sub {
-         @_ == $fieldcount or croak "usage: $pkg($argnames)";
-         bless [ @_ ], $pkg;
-      };
-   }
 
    no strict 'refs';
    *{"${pkg}::$_"} = $subs{$_} for keys %subs;
@@ -233,6 +252,11 @@ sub _struct
       'bool' => sub { 1 },
       fallback => 1,
    );
+
+   $_STRUCT_PACKAGES{$pkg} = {
+      named  => $named,
+      fields => \@fields,
+   }
 }
 
 =head2 struct
@@ -278,6 +302,22 @@ Takes the same options as L</struct>.
 
 =cut
 
+=head1 DATA::DUMP FILTER
+
+I<Since version 0.10.>
+
+If L<Data::Dump> is loaded, an extra filter is applied so that struct
+instances are printed in a format matching that which would construct them.
+
+   struct Colour => [qw( red green blue )];
+
+   use Data::Dump;
+
+   my %hash = ( col => Colour( 0.8, 0.5, 0.2 ) );
+   Data::Dump::dd \%hash;
+
+   # prints {col => main::Colour(0.8, 0.5, 0.2)}
+
 =head1 NOTES
 
 =head2 Allowing ARRAY dereference
@@ -318,5 +358,42 @@ convert structs to key/value pairs, or a HASH ref.
 Paul Evans <leonerd@leonerd.org.uk>
 
 =cut
+
+sub apply_datadump_filter
+{
+   require Data::Dump::Filtered;
+
+   Data::Dump::Filtered::add_dump_filter( sub {
+      my ( $ctx, $obj ) = @_;
+      return undef unless my $meta = $_STRUCT_PACKAGES{ $ctx->class };
+
+      BEGIN {
+         overloading->unimport if HAVE_OVERLOADING;
+      }
+
+      my $fields = $meta->{fields};
+      return {
+         dump => sprintf "%s(%s)", $ctx->class,
+            join ", ", map {
+               ( $meta->{named} ? "$fields->[$_] => " : "" ) .
+               Data::Dump::dump($obj->[$_])
+            } 0 .. $#$fields
+      };
+   });
+}
+
+if( defined &Data::Dump::dump ) {
+   apply_datadump_filter;
+}
+else {
+   $Data::Dump::VERSION = bless \( my $x = \&apply_datadump_filter ), "Struct::Dumb::_DestroyWatch";
+}
+
+{
+   package Struct::Dumb::_DestroyWatch;
+   my $GD = 0;
+   END { $GD = 1 }
+   sub DESTROY { ${$_[0]}->() unless $GD; }
+}
 
 0x55AA;

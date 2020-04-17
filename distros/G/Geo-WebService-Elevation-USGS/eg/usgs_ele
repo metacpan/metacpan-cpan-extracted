@@ -12,7 +12,7 @@ use Geo::WebService::Elevation::USGS;
 use Pod::Usage;
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.116';
+our $VERSION = '0.117';
 
 BEGIN {
     eval {
@@ -231,22 +231,6 @@ This command terminates this script. End-of-file also works.
 
 This command displays the value of the attribute named in the command.
 
-=head2 getAllElevations
-
- usgs_ele> getAllElevations lat lon
-
-This command displays all available elevation values for the given
-latitude and longitude. The latitude and longitude are in degrees, with
-south latitude and west longitude being negative.
-
-=head2 getElevation
-
- usgs_ele> getElevation lat lon
-
-This command displays the 'best' elevation value for the given latitude
-and longitude. The latitude and longitude are in degrees, with south
-latitude and west longitude being negative.
-
 =head2 help
 
 This command displays this text.
@@ -303,7 +287,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2019 by Thomas R. Wyant, III
+Copyright (C) 2008-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

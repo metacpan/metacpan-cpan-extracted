@@ -3,6 +3,8 @@ lib/Date.pm
 lib/Date.pod
 lib/Date/Rel.pm
 lib/Date/Rel.pod
+lib/Date/strict.pm
+lib/Date/strict.pod
 lib/Date/TimeImpl.pod
 lib/Date/Timezone.pm
 lib/Date/Timezone.pod
@@ -43,6 +45,7 @@ t/advanced.t
 t/basic.t
 t/clone.t
 t/format/ansi_c.t
+t/format/clf.t
 t/format/dot.t
 t/format/iso.t
 t/format/iso8601.t
@@ -61,6 +64,7 @@ t/relative/basic.t
 t/relative/format-iso8601.t
 t/relative/format-simple.t
 t/relative/operations.t
+t/strict.t
 t/time/api.cc
 t/time/api.t
 t/time/available_zones.t

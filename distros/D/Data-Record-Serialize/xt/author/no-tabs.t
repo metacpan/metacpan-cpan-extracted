@@ -25,6 +25,7 @@ my @files = (
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/bugs/duplicate-fields.t',
     't/bugs/rename-field-to-self.t',
     't/constructor.t',
     't/encoders/dbi.t',

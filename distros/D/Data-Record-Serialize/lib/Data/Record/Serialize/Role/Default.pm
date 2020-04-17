@@ -4,9 +4,12 @@ package Data::Record::Serialize::Role::Default;
 
 use Moo::Role;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 use Hash::Util qw[ hv_store ];
+use Ref::Util qw[ is_coderef ];
+
+use Data::Record::Serialize::Error { errors => [ 'fields' ] }, -all;
 
 use namespace::clean;
 
@@ -50,6 +53,10 @@ around 'setup' => sub {
     $self->_set_fields( [ keys %$data ] )
       unless $self->has_fields;
 
+    # make sure there are no duplicate output fields
+    my %dups;
+    $dups{$_}++ && error( fields => "duplicate output field: $_" ) for@{$self->fields};
+
     if ( $self->_need_types ) {
 
         if ( $self->default_type ) {
@@ -83,18 +90,20 @@ before 'send' => sub {
 
     # nullify fields (set to undef) those that are zero length
 
-    if ( defined ( my $nullify = $self->_nullify ) ) {
+    if ( defined( my $nullify = $self->_nullify ) ) {
 
         $data->{$_} = undef
-          for grep { defined $data->{$_} && ! length $data->{$_} }
-          @$nullify;
+          for grep { defined $data->{$_} && !length $data->{$_} } @$nullify;
     }
 
     if ( $self->_format ) {
 
         my $format = $self->_format;
 
-        $data->{$_} = sprintf( $format->{$_}, $data->{$_} )
+        $data->{$_}
+          = is_coderef( $format->{$_} )
+          ? $format->{$_}( $data->{$_} )
+          : sprintf( $format->{$_}, $data->{$_} )
           foreach grep { defined $data->{$_} && length $data->{$_} }
           keys %{$format};
     }
@@ -151,7 +160,7 @@ Data::Record::Serialize::Role::Default - Default methods for Data::Record::Seria
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 DESCRIPTION
 
@@ -175,10 +184,21 @@ contents, pass in a copy.
  setup
  DEMOLISH
 
-=head1 BUGS AND LIMITATIONS
+=head1 SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/data-record-serialize
+
+and may be cloned from
+
+  https://gitlab.com/djerius/data-record-serialize.git
 
 =head1 SEE ALSO
 

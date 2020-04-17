@@ -9,6 +9,7 @@ use Wasm::Wasmtime::Extern;
 use Wasm::Wasmtime::ExternType;
 use Wasm::Wasmtime::Func;
 use Wasm::Wasmtime::FuncType;
+use Wasm::Wasmtime::Global;
 use Wasm::Wasmtime::GlobalType;
 use Wasm::Wasmtime::ImportType;
 use Wasm::Wasmtime::Instance;
@@ -22,7 +23,7 @@ use Wasm::Wasmtime::WasiConfig;
 use Wasm::Wasmtime::WasiInstance;
 
 # ABSTRACT: Perl interface to Wasmtime
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 1;
@@ -39,7 +40,7 @@ Wasm::Wasmtime - Perl interface to Wasmtime
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

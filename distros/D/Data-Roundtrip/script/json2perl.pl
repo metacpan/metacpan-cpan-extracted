@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -48,11 +48,11 @@ if( defined $INPUT_FILE ){
 	$INPUT_STRING = do { local $/; <STDIN> }
 }
 
-my $result = Data::Roundtrip::json2perl($INPUT_STRING, \%params);
-if( ! defined $result ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::json2perll()'." has failed.\n"; exit(1) }
+my $result = Data::Roundtrip::json2dump($INPUT_STRING, \%params);
+if( ! defined $result ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::json2dump()'." has failed.\n"; exit(1) }
 
 if( defined $OUTPUT_FILE ){
-	if( ! Data::Roundtrip::_write_to_file($OUTPUT_FILE, $result) ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::_write_to_file()'." has failed for '$OUTPUT_FILE'.\n"; exit(1) }
+	if( ! Data::Roundtrip::write_to_file($OUTPUT_FILE, $result) ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::write_to_file()'." has failed for '$OUTPUT_FILE'.\n"; exit(1) }
 } else {
 	print STDOUT $result
 }
@@ -71,7 +71,7 @@ json2perl.pl : convert JSON data to a Perl variable (dump) which can be parsed o
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =head1 SYNOPSIS
 

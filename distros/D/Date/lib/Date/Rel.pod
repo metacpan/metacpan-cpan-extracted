@@ -43,6 +43,9 @@ Creates relative date from string in the following formats:
 
 Any part can be absent or negative.
 
+If a given string is in invalid format, empty object returned with C<error()> set to C<Date::Error::parser_error>.
+
+If you want it to throw an exception on invalid inputs, see L<Date::strict>.
 
 =head4 new($from, $till)
 
@@ -192,6 +195,11 @@ Any of YMDhms can be absent or negative. If all the parts YMDhms are 0, then "" 
 =head4 ""
 
 Same as C<to_string()>
+
+
+=head4 error()
+
+Returns error occured during parsing relative date from string (if any) as L<XS::STL::ErrorCode> object.
 
 
 =head4 'bool', to_bool()
@@ -361,15 +369,3 @@ L<Date::Rel> supports:
 =item L<Data::Recursive>'s C<clone>
 
 =back
-
-
-
-=head1 AUTHOR
-
-Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
-
-=head1 LICENSE
-
-You may distribute this code under the same terms as Perl itself.
-
-=cut

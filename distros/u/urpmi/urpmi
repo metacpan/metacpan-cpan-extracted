@@ -583,7 +583,7 @@ if (@to_install && $options{auto_orphans}) {
 #-     - this also takes care of removing packages from 
 #-       installed-through-deps if the package was first installed as a 
 #-       dep of another package, then removed and then explicitly installed
-if (!$urpm->{options}{downgrade}) {
+if (!$urpm->{options}{downgrade} && !$urpm->{options}{reinstall}) {
     urpm::orphans::mark_as_requested($urpm, $state, $test);
 }
 

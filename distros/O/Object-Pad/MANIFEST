@@ -24,7 +24,9 @@ t/31pad-outside.t
 t/50croak-method.t
 t/51pragmata.t
 t/52croak-scope.t
+t/70mop-create-class.t
 t/80async-method.t
 t/80dynamically+Object-Pad.t
 t/81async-method+dynamically.t
+t/90leak.t
 t/99pod.t

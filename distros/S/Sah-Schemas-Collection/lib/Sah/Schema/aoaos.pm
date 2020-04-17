@@ -3,7 +3,7 @@ package Sah::Schema::aoaos;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-Collection'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $schema = [array => {
     summary => 'Array of (defined-)array-of-(defined-)strings',
@@ -41,7 +41,33 @@ Sah::Schema::aoaos - Array of (defined-)array-of-(defined-)strings
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::aoaos (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+This document describes version 0.004 of Sah::Schema::aoaos (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+
+=head1 SYNOPSIS
+
+Sample data:
+
+ "a"  # INVALID
+
+ []  # valid
+
+ {}  # INVALID
+
+ [undef]  # INVALID
+
+ ["a"]  # INVALID
+
+ [[]]  # valid
+
+ [[],[]]  # valid
+
+ [["a"],[]]  # valid
+
+ [["a","b"],[]]  # valid
+
+ [["a",[]],[]]  # INVALID
+
+ [[undef],[]]  # INVALID
 
 =head1 DESCRIPTION
 

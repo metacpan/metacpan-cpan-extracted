@@ -1,7 +1,9 @@
 package Getopt::EX::Loader;
 
+use v5.14;
 use strict;
 use warnings;
+use utf8;
 use Carp;
 
 use Exporter 'import';
@@ -12,6 +14,7 @@ our @EXPORT_OK   = qw();
 use Data::Dumper;
 use Getopt::EX::Module;
 use Getopt::EX::Func qw(parse_func);
+use Getopt::EX::Colormap qw(colorize);
 
 our $debug = 0;
 
@@ -139,6 +142,7 @@ sub modopt {
     my @modules;
     while (@$argv) {
 	if (my($modpart) = ($argv->[0] =~ /^$start_re(.+)/)) {
+	    debug_argv($argv) if $debug;
 	    if (my $mod = $obj->parseopt($modpart, $argv)) {
 		push @modules, $mod;
 	    } else {
@@ -277,21 +281,12 @@ sub expand {
 	    }->(), @s;
 
 	    @s = $bucket->expand_args(@s);
-	    if ($debug) {
-		printf STDERR "Looking: %s\n", array_to_str(@s);
-	    }
 
-	    my @module = $obj->modopt(\@s);
-
-	    my @default = grep { @$_ } map { [ $_->default ] } @module;
-
-	    if ($debug) {
-		printf STDERR
-		    "\@ARGV = %s\n",
-		    array_to_str(@$argv,
-				 @default ? ( '(', @default, ')' ) : (),
-				 @s       ? ( '<', @s,       '>' ) : (),
-				 @follow);
+	    debug_argv($argv, undef, \@s, \@follow) if $debug;
+	    my(@module, @default);
+	    if (@module = $obj->modopt(\@s)) {
+		@default = grep { @$_ } map { [ $_->default ] } @module;
+		debug_argv($argv, \@default, \@s, \@follow) if $debug;
 	    }
 	    push @$argv, @default, @s, @follow;
 
@@ -300,6 +295,16 @@ sub expand {
     }
 }
 
+sub debug_argv {
+    my($before, $default, $working, $follow) = @_;
+    printf STDERR
+	"\@ARGV = %s\n",
+	array_to_str(@{$before//[]},
+		     $default ? colorize('RDI', array_to_str(@$default)) : (),
+		     $working ? colorize('RD',  array_to_str(@$working)) : (),
+		     @{$follow//[]});
+
+}
 sub array_to_str {
     join ' ', map {
 	if (ref eq 'ARRAY') {

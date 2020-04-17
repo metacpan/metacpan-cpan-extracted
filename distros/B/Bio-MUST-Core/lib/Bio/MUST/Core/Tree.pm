@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
-$Bio::MUST::Core::Tree::VERSION = '0.200510';
+$Bio::MUST::Core::Tree::VERSION = '0.201060';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -472,7 +472,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.200510
+version 0.201060
 
 =head1 SYNOPSIS
 

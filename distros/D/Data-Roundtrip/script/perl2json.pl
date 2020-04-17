@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -37,8 +37,8 @@ if( ! Getopt::Long::GetOptions(
 ) ){ die usage() }
 
 if( defined $INPUT_FILE ){
-	$INPUT_STRING = Data::Roundtrip::_read_from_file($INPUT_FILE);
-	if( ! defined $INPUT_STRING ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::_read_from_file()'." has failed.\n"; exit(1) }
+	$INPUT_STRING = Data::Roundtrip::read_from_file($INPUT_FILE);
+	if( ! defined $INPUT_STRING ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::read_from_file()'." has failed.\n"; exit(1) }
 } elsif( ! defined $INPUT_STRING ){
 	# read from STDIN
 	$INPUT_STRING = do { local $/; <STDIN> }
@@ -48,7 +48,7 @@ my $result = Data::Roundtrip::dump2json($INPUT_STRING, \%params);
 if( ! defined $result ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::dump2jsonl()'." has failed.\n"; exit(1) }
 
 if( defined $OUTPUT_FILE ){
-	if( ! Data::Roundtrip::_write_to_file($OUTPUT_FILE, $result) ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::_write_to_file()'." has failed for '$OUTPUT_FILE'.\n"; exit(1) }
+	if( ! Data::Roundtrip::write_to_file($OUTPUT_FILE, $result) ){ print STDERR "$0 : error, call to ".'Data::Roundtrip::write_to_file()'." has failed for '$OUTPUT_FILE'.\n"; exit(1) }
 } else {
 	print STDOUT $result
 }
@@ -67,7 +67,7 @@ perl2json.pl : convert a Perl data structure to JSON
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =head1 SYNOPSIS
 

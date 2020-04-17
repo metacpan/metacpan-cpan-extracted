@@ -1,5 +1,14 @@
 Revision history for Net-IPAM-IP
 
+1.14    Thu, 16 Apr 2020 12:17:02 +0200
+        * rearrange src and pod, better pod, no new features
+
+1.13    Wed, 15 Apr 2020 22:48:38 +0200
+        * implement the methods getaddrs() and getname()
+
+1.12    Tue, 14 Apr 2020 21:44:55 +0200
+        * better algo in _inet_ntop_v6_pp
+
 1.11    Sun, 12 Apr 2020 16:55:02 +0200
         * better API, get rid of clone(), hint for cloning with existing new_from_bytes()
 

@@ -132,7 +132,7 @@ sub try_distrib_removable_ {
 sub check_conf {
     my (@want) = @_;
     my $config = urpm::cfg::load_config("root/etc/urpmi/urpmi.cfg");
-    is(int(@{$config->{media}}), int(@want));
+    is(int(@{$config->{media}}), int(@want), 'have wanted number');
     foreach my $i (0 .. $#want) {
 	my ($medium, $want) = ($config->{media}[$i], $want[$i]);
 	foreach my $field (@fields) {

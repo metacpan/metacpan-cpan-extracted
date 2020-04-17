@@ -59,6 +59,7 @@ my %WriteMakefileArgs = (
     "lib/Wasm/Wasmtime/FFI.pm"          => "\$(INST_LIB)/Wasm/Wasmtime/FFI.pm",
     "lib/Wasm/Wasmtime/Func.pm"         => "\$(INST_LIB)/Wasm/Wasmtime/Func.pm",
     "lib/Wasm/Wasmtime/FuncType.pm"     => "\$(INST_LIB)/Wasm/Wasmtime/FuncType.pm",
+    "lib/Wasm/Wasmtime/Global.pm"       => "\$(INST_LIB)/Wasm/Wasmtime/Global.pm",
     "lib/Wasm/Wasmtime/GlobalType.pm"   => "\$(INST_LIB)/Wasm/Wasmtime/GlobalType.pm",
     "lib/Wasm/Wasmtime/ImportType.pm"   => "\$(INST_LIB)/Wasm/Wasmtime/ImportType.pm",
     "lib/Wasm/Wasmtime/Instance.pm"     => "\$(INST_LIB)/Wasm/Wasmtime/Instance.pm",
@@ -67,6 +68,7 @@ my %WriteMakefileArgs = (
     "lib/Wasm/Wasmtime/MemoryType.pm"   => "\$(INST_LIB)/Wasm/Wasmtime/MemoryType.pm",
     "lib/Wasm/Wasmtime/Module.pm"       => "\$(INST_LIB)/Wasm/Wasmtime/Module.pm",
     "lib/Wasm/Wasmtime/Store.pm"        => "\$(INST_LIB)/Wasm/Wasmtime/Store.pm",
+    "lib/Wasm/Wasmtime/Table.pm"        => "\$(INST_LIB)/Wasm/Wasmtime/Table.pm",
     "lib/Wasm/Wasmtime/TableType.pm"    => "\$(INST_LIB)/Wasm/Wasmtime/TableType.pm",
     "lib/Wasm/Wasmtime/Trap.pm"         => "\$(INST_LIB)/Wasm/Wasmtime/Trap.pm",
     "lib/Wasm/Wasmtime/ValType.pm"      => "\$(INST_LIB)/Wasm/Wasmtime/ValType.pm",
@@ -86,21 +88,16 @@ my %WriteMakefileArgs = (
     "Sub::Install"             => 0
   },
   "TEST_REQUIRES" => {
-    "Carp::Assert"  => 0,
-    "FFI::CheckLib" => "0.26",
-    "PeekPoke::FFI" => 0,
-    "Test2::API"    => "1.302015",
-    "Test2::V0"     => "0.000060",
-    "Test::Script"  => 0
+    "Test2::API" => "1.302015",
+    "Test2::V0"  => "0.000060"
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Carp::Assert"             => 0,
   "Convert::Binary::C"       => 0,
   "Devel::GlobalDestruction" => 0,
   "FFI::CheckLib"            => "0.26",
@@ -108,17 +105,15 @@ my %FallbackPrereqs = (
   "FFI::Platypus::Buffer"    => 0,
   "FFI::Platypus::Record"    => 0,
   "Path::Tiny"               => 0,
-  "PeekPoke::FFI"            => 0,
   "Ref::Util"                => 0,
   "Sub::Install"             => 0,
   "Test2::API"               => "1.302015",
-  "Test2::V0"                => "0.000060",
-  "Test::Script"             => 0
+  "Test2::V0"                => "0.000060"
 );
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
 if ( do { use FFI::CheckLib 0.26; !find_lib lib => 'wasmtime' } ) {
-  requires( 'Alien::wasmtime', '0.05' );
+  requires( 'Alien::wasmtime', '0.07' );
 }
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

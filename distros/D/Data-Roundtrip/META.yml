@@ -3,7 +3,9 @@ abstract: 'convert between Perl data structures, YAML and JSON with unicode supp
 author:
   - 'Andreas Hadjiprocopis <bliako@cpan.org>'
 build_requires:
+  Data::Dumper: '0'
   Data::Random::Structure: '0'
+  Data::Random::Structure::UTF8: '0.04'
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
@@ -20,16 +22,18 @@ no_index:
     - t
     - inc
 requires:
+  Data::Dump: '0'
+  Data::Dump::Filtered: '0'
   Data::Dumper: '0'
-  Encode: '0'
-  JSON: '0'
-  Sub::Override: '0'
-  Unicode::Escape: '0'
-  YAML: '0'
-  perl: '5.006'
+  Encode: '3.0'
+  JSON: '4.0'
+  Sub::Override: '0.09'
+  Unicode::Escape: '0.02'
+  YAML: '1.28'
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/hadjiprocopis/data-roundtrip/issues
   homepage: https://metacpan.org/module/Data::Roundtrip
   repository: https://github.com/hadjiprocopis/data-roundtrip
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

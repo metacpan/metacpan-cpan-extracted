@@ -273,17 +273,36 @@ returns it. The refcounter is not touched.
 
 This is NULL-safe method.
 
-This method is useful when manually returning SV* on perl stack in xs-adapter,
-e.g.
+This method is useful when manually returning SV* on perl stack in xs-adapter, e.g.
 
     void MyClass::method() {
         ...
-        auto item = new MyClass();
-        auto wrapper = xs::out<>(item);
-        mXPUSHs(wrapped_pt.detach());
+        Sv mysv = somefunc();
+        mXPUSHs(mysv.detach()); // mXPUSHs will make it mortal
         ...
     }
+    
+note that you *MUST* use perl API macros with mortalizing or you will get a memory leak
 
+=head2 detach_mortal()
+
+    SV* detach_mortal ()
+
+Same as C<detach()> + C<sv_2mortal()>
+
+This is NULL-safe method.
+
+This method is useful when manually returning SV* on perl stack in xs-adapter without using perl mortalizing macros, e.g.
+
+    void MyClass::method() {
+        ...
+        Sv mysv = somefunc();
+        EXTEND(SP, 1);
+        ST(0) = mysv.detach_mortal();
+        XSRETURN(1);
+    }
+
+note that you *MUST NOT* use perl API macros with mortalizing or you will get a C<double free> error.
 
 =head2 operators ==() and !=()
 

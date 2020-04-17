@@ -1,20 +1,18 @@
-#!perl
+#!/usr/bin/env perl
+use strict;
+use warnings;
 
 use Test::More;
-use Test::Exception;
 
 use_ok 'Text::TFIDF::Ngram';
 
-my $obj;
+my $obj = new_ok 'Text::TFIDF::Ngram';
 
-lives_ok { $obj = Text::TFIDF::Ngram->new } 'created with no arguments';
-isa_ok $obj, 'Text::TFIDF::Ngram';
+my $got = $obj->files;
+is $got, undef, 'no files';
 
-my $x = $obj->files;
-is $x, undef, 'no files';
-
-$x = $obj->stopwords;
-is $x, 1, 'stopwords';
+$got = $obj->stopwords;
+is $got, 1, 'stopwords';
 
 # https://en.wikipedia.org/wiki/Tf%E2%80%93idf#Example_of_tf%E2%80%93idf
 
@@ -24,8 +22,8 @@ $obj = Text::TFIDF::Ngram->new( files => $files, size => 1, stopwords => 0 );
 isa_ok $obj, 'Text::TFIDF::Ngram';
 
 my $expected = $files;
-$x = $obj->files;
-is_deeply $x, $expected, 'files';
+$got = $obj->files;
+is_deeply $got, $expected, 'files';
 
 my $filename = 't/1.txt';
 my $term     = 'this';
@@ -36,20 +34,20 @@ $expected = {
     a      => 2,
     sample => 1,
 };
-$x = $obj->counts->{$filename};
-is_deeply $x, $expected, 'counts';
+$got = $obj->counts->{$filename};
+is_deeply $got, $expected, 'counts';
 
 $expected = 0.2;
-$x = $obj->tf( $filename, $term );
-is $x, $expected, 'TF';
+$got = $obj->tf( $filename, $term );
+is $got, $expected, 'TF';
 
 $expected = 0;
-$x = $obj->idf($term);
-is $x, $expected, 'IDF';
+$got = $obj->idf($term);
+is $got, $expected, 'IDF';
 
 $expected = undef;
-$x = $obj->tfidf( $filename, $term );
-is $x, $expected, 'TFIDF';
+$got = $obj->tfidf( $filename, $term );
+is $got, $expected, 'TFIDF';
 
 $filename = 't/2.txt';
 $term     = 'example';
@@ -60,37 +58,37 @@ $expected = {
     another => 2,
     example => 3,
 };
-$x = $obj->counts->{$filename};
-is_deeply $x, $expected, 'counts';
+$got = $obj->counts->{$filename};
+is_deeply $got, $expected, 'counts';
 
 $expected = 0.143;
-$x = sprintf '%.3f', $obj->tf( $filename, 'this' );
-is $x, $expected, 'TF';
+$got = sprintf '%.3f', $obj->tf( $filename, 'this' );
+is $got, $expected, 'TF';
 
 $expected = 0.429;
-$x = sprintf '%.3f', $obj->tf( $filename, $term );
-is $x, $expected, 'TF';
+$got = sprintf '%.3f', $obj->tf( $filename, $term );
+is $got, $expected, 'TF';
 
 $expected = 0.301;
-$x = sprintf '%.3f', $obj->idf($term);
-is $x, $expected, 'IDF';
+$got = sprintf '%.3f', $obj->idf($term);
+is $got, $expected, 'IDF';
 
 $expected = 0.129;
-$x = sprintf '%.3f', $obj->tfidf( $filename, $term );
-is $x, $expected, 'TFIDF';
+$got = sprintf '%.3f', $obj->tfidf( $filename, $term );
+is $got, $expected, 'TFIDF';
 
 $term = 'foo';
 
 $expected = 0;
-$x = $obj->tf( $filename, $term );
-is $x, $expected, 'TF';
+$got = $obj->tf( $filename, $term );
+is $got, $expected, 'TF';
 
 $expected = undef;
-$x = $obj->idf($term);
-is $x, $expected, 'IDF';
+$got = $obj->idf($term);
+is $got, $expected, 'IDF';
 
-$x = $obj->tfidf( $filename, $term );
-is $x, $expected, 'TFIDF';
+$got = $obj->tfidf( $filename, $term );
+is $got, $expected, 'TFIDF';
 
 $expected = {
     't/2.txt' => {
@@ -102,14 +100,13 @@ $expected = {
         sample => '0.060',
     }
 };
-$x = $obj->tfidf_by_file;
-# Normalize the value digits of precision:
-for my $file ( keys %$x ) {
-    for my $word ( keys %{ $x->{$file} } ) {
-        $x->{$file}{$word} = sprintf '%.3f', $x->{$file}{$word};
+$got = $obj->tfidf_by_file;
+for my $file ( keys %$got ) {
+    for my $word ( keys %{ $got->{$file} } ) {
+        $got->{$file}{$word} = sprintf '%.3f', $got->{$file}{$word};
     }
 }
-is_deeply $x, $expected, 'tfidf_by_file';
+is_deeply $got, $expected, 'tfidf_by_file';
 
 $files = [qw( t/3.txt t/4.txt )];
 
@@ -130,20 +127,20 @@ $expected = {
     'white as'    => 1,
     'as snow'     => 1,
 };
-$x = $obj->counts->{$filename};
-is_deeply $x, $expected, 'counts';
+$got = $obj->counts->{$filename};
+is_deeply $got, $expected, 'counts';
 
 $expected = 0.111;
-$x = sprintf '%.3f', $obj->tf( $filename, $term );
-is $x, $expected, 'TF';
+$got = sprintf '%.3f', $obj->tf( $filename, $term );
+is $got, $expected, 'TF';
 
 $expected = 0.301;
-$x = sprintf '%.3f', $obj->idf($term);
-is $x, $expected, 'IDF';
+$got = sprintf '%.3f', $obj->idf($term);
+is $got, $expected, 'IDF';
 
 $expected = 0.033;
-$x = sprintf '%.3f', $obj->tfidf( $filename, $term );
-is $x, $expected, 'TFIDF';
+$got = sprintf '%.3f', $obj->tfidf( $filename, $term );
+is $got, $expected, 'TFIDF';
 
 $files = [qw( t/1.txt t/2.txt )];
 
@@ -154,20 +151,20 @@ $filename = 't/1.txt';
 $term     = 'sample';
 
 $expected = 1;
-$x = $obj->tf( $filename, $term );
-is $x, $expected, 'TF';
+$got = $obj->tf( $filename, $term );
+is $got, $expected, 'TF';
 
 $expected = 0.301;
-$x = sprintf '%.3f', $obj->idf($term);
-is $x, $expected, 'IDF';
+$got = sprintf '%.3f', $obj->idf($term);
+is $got, $expected, 'IDF';
 
 $expected = 0.301;
-$x = sprintf '%.3f', $obj->tfidf( $filename, $term );
-is $x, $expected, 'TFIDF';
+$got = sprintf '%.3f', $obj->tfidf( $filename, $term );
+is $got, $expected, 'TFIDF';
 
 $expected = { sample => 1, };
-$x = $obj->counts->{$filename};
-is_deeply $x, $expected, 'counts';
+$got = $obj->counts->{$filename};
+is_deeply $got, $expected, 'counts';
 
 $obj = Text::TFIDF::Ngram->new( files => $files, size => 2, stopwords => 0 );
 isa_ok $obj, 'Text::TFIDF::Ngram';
@@ -175,16 +172,16 @@ isa_ok $obj, 'Text::TFIDF::Ngram';
 $term = 'a sample';
 
 $expected = 0.25;
-$x = $obj->tf( $filename, $term );
-is $x, $expected, 'TF';
+$got = $obj->tf( $filename, $term );
+is $got, $expected, 'TF';
 
 $expected = 0.301;
-$x = sprintf '%.3f', $obj->idf($term);
-is $x, $expected, 'IDF';
+$got = sprintf '%.3f', $obj->idf($term);
+is $got, $expected, 'IDF';
 
 $expected = 0.075;
-$x = sprintf '%.3f', $obj->tfidf( $filename, $term );
-is $x, $expected, 'TFIDF';
+$got = sprintf '%.3f', $obj->tfidf( $filename, $term );
+is $got, $expected, 'TFIDF';
 
 $expected = {
     'this is'  => 1,
@@ -192,8 +189,8 @@ $expected = {
     'a a'      => 1,
     'a sample' => 1,
 };
-$x = $obj->counts->{$filename};
-is_deeply $x, $expected, 'counts';
+$got = $obj->counts->{$filename};
+is_deeply $got, $expected, 'counts';
 
 $filename = 't/4.txt';
 
@@ -213,8 +210,8 @@ $expected = {
     'white as'    => 1,
     'fleece was'  => 1
 };
-$x = $obj->counts->{$filename};
-is_deeply $x, $expected, 'counts';
+$got = $obj->counts->{$filename};
+is_deeply $got, $expected, 'counts';
 
 $obj = Text::TFIDF::Ngram->new( files => [$filename], size => 2, stopwords => 0, lowercase => 1 );
 isa_ok $obj, 'Text::TFIDF::Ngram';
@@ -229,7 +226,7 @@ $expected = {
     'white as'    => 1,
     'fleece was'  => 1
 };
-$x = $obj->counts->{$filename};
-is_deeply $x, $expected, 'counts';
+$got = $obj->counts->{$filename};
+is_deeply $got, $expected, 'counts';
 
 done_testing();

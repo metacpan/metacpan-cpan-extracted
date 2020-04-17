@@ -12,11 +12,11 @@ use Log::Dispatch;
 use POSIX qw( strftime );
 use Term::Encoding qw( term_encoding );
 
-use version 0.77; our $VERSION = version->declare("v0.0.8");
+use version 0.77; our $VERSION = version->declare("v0.0.9");
 
 our $KeepBindingIfNoKey = 0;
 
-my $_default_log_filename = $ENV{'HOME'} || $ENV{'USERPROFILE'};
+my $_default_log_filename = $ENV{'HOME'} || $ENV{'USERPROFILE'} || $ENV{'TMP'} || '/tmp';
 $_default_log_filename =~ s#\\#/#g;
 $_default_log_filename .= '/DBIx-NamedParams.log';
 
@@ -114,7 +114,12 @@ sub prepare_ex {
 
 sub _parse_ex1 {
     my ( $refHash, $name, $type ) = @_;
-    my $numOfArray = scalar( @{ $refHash->{$name} } );
+    my $numOfArray = 0;
+    if ( ref( $refHash->{$name} ) eq 'ARRAY' ) {
+        $numOfArray = scalar( @{ $refHash->{$name} } );
+    } else {
+        croak("Must be array: ${name}");
+    }
     return ":${name}{${numOfArray}}-${type}";
 }
 

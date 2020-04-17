@@ -1,5 +1,8 @@
 Revision history for Perl extension Encoding-FixLatin-XS
 
+1.02      2020-04-16 08:27:29+12:00 Pacific/Auckland
+    - move Encoding::FixLatin prereq to a test prereq (patch from Graham Knop)
+
 1.01      2014-06-05 17:30:06 Pacific/Auckland
     - replace strnlen with strlen for improved portability (with thanks to
       Chris Williams for assistance in identifying the problem)

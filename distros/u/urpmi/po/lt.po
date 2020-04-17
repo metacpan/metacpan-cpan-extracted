@@ -3,22 +3,23 @@
 #
 # Translators:
 # Kęstutis Kružikas <DrKestas@takas.lt>, 2000
-# Moo, 2015-2016
-# Tomsonas, 2016
+# Moo, 2015-2016,2020
+# 059e26f069ff4d5732418348831c70d9, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2019-06-26 09:37+0300\n"
-"PO-Revision-Date: 2016-09-14 13:18+0000\n"
-"Last-Translator: Tomsonas\n"
+"POT-Creation-Date: 2020-01-18 09:59+0200\n"
+"PO-Revision-Date: 2020-01-18 15:17+0000\n"
+"Last-Translator: Moo\n"
 "Language-Team: Lithuanian (http://www.transifex.com/MageiaLinux/mageia/"
 "language/lt/)\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
 
 #: ../gurpm/RPMProgressDialog.pm:47
 #, c-format
@@ -66,8 +67,8 @@ msgid "Cancel"
 msgstr "Atšaukti"
 
 #: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
-#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1670
-#: ../urpm/media.pm:1821
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
+#: ../urpm/media.pm:1833
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "...atkūrimas nepavyko: %s"
@@ -327,6 +328,7 @@ msgid_plural "Proceed with the installation of the %d packages?"
 msgstr[0] "Tęsti vieno paketo diegimą?"
 msgstr[1] "Tęsti %d paketų diegimą?"
 msgstr[2] "Tęsti %d paketų diegimą"
+msgstr[3] "Tęsti %d paketų diegimą"
 
 #: ../gurpmi2:259 ../urpmi:608
 #, c-format
@@ -688,12 +690,12 @@ msgstr ""
 #: ../urpm/download.pm:337
 #, c-format
 msgid "wget is missing\n"
-msgstr ""
+msgstr "trūksta wget\n"
 
 #: ../urpm/download.pm:404
 #, c-format
 msgid "curl is missing\n"
-msgstr ""
+msgstr "trūksta curl\n"
 
 #: ../urpm/download.pm:539
 #, c-format
@@ -703,17 +705,17 @@ msgstr ""
 #: ../urpm/download.pm:574
 #, c-format
 msgid "rsync is missing\n"
-msgstr ""
+msgstr "trūksta rsync\n"
 
 #: ../urpm/download.pm:642
 #, c-format
 msgid "ssh is missing\n"
-msgstr ""
+msgstr "trūksta ssh\n"
 
 #: ../urpm/download.pm:661
 #, c-format
 msgid "prozilla is missing\n"
-msgstr ""
+msgstr "trūksta prozilla\n"
 
 #: ../urpm/download.pm:677
 #, c-format
@@ -1021,24 +1023,26 @@ msgid ""
 "update, --use-distrib or --parallel"
 msgstr ""
 
-#: ../urpm/media.pm:792
+#: ../urpm/media.pm:793
 #, c-format
 msgid "ignoring non-free medium `%s'"
 msgstr ""
 
-#: ../urpm/media.pm:802
+#: ../urpm/media.pm:803
 #, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
 msgstr ""
 
-#: ../urpm/media.pm:806
+#: ../urpm/media.pm:807
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
 
 #: ../urpm/media.pm:816
 #, c-format
-msgid "un-ignoring 32bit medium `%s' b/c system is 32-bit EFI"
+msgid ""
+"un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
+"32-bit EFI"
 msgstr ""
 
 #: ../urpm/media.pm:844
@@ -1101,162 +1105,162 @@ msgstr ""
 msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr ""
 
-#: ../urpm/media.pm:1172
+#: ../urpm/media.pm:1184
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr ""
 
-#: ../urpm/media.pm:1230
+#: ../urpm/media.pm:1242
 #, c-format
 msgid "retrieving media.cfg file..."
 msgstr ""
 
-#: ../urpm/media.pm:1273
+#: ../urpm/media.pm:1285
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "bandoma išrinkti nesančią laikmeną \"%s\""
 
-#: ../urpm/media.pm:1276
+#: ../urpm/media.pm:1288
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "išrenkama daugialypė laikmena: %s"
 
-#: ../urpm/media.pm:1335
+#: ../urpm/media.pm:1347
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "pašalinama laikmena \"%s\""
 
-#: ../urpm/media.pm:1426
+#: ../urpm/media.pm:1438
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "laikmenai \"%s\" iš naujo konfigūruojama urpmi"
 
-#: ../urpm/media.pm:1460
+#: ../urpm/media.pm:1472
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...naujas konfigūravimas nepavyko"
 
-#: ../urpm/media.pm:1466
+#: ../urpm/media.pm:1478
 #, c-format
 msgid "reconfiguration done"
 msgstr "naujas konfigūravimas atliktas"
 
-#: ../urpm/media.pm:1482
+#: ../urpm/media.pm:1494
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr ""
 
-#: ../urpm/media.pm:1503
+#: ../urpm/media.pm:1515
 #, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr ""
 
-#: ../urpm/media.pm:1514
+#: ../urpm/media.pm:1526
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "tikrinamas sintezės failas [%s]"
 
-#: ../urpm/media.pm:1534
+#: ../urpm/media.pm:1546
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "laikmenos \"%s\" sintezės failo skaitymo problema"
 
-#: ../urpm/media.pm:1547 ../urpm/media.pm:1642
+#: ../urpm/media.pm:1559 ../urpm/media.pm:1654
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr ""
 
-#: ../urpm/media.pm:1549 ../urpm/media.pm:1619 ../urpm/media.pm:1872
+#: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
 msgid "...copying failed"
 msgstr "...kopijavimas nepavyko"
 
-#: ../urpm/media.pm:1615
+#: ../urpm/media.pm:1627
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "kopijuojama \"%s\" aprašo byla..."
 
-#: ../urpm/media.pm:1617 ../urpm/media.pm:1646
+#: ../urpm/media.pm:1629 ../urpm/media.pm:1658
 #, c-format
 msgid "...copying done"
 msgstr "...kopijavimas baigtas"
 
-#: ../urpm/media.pm:1648
+#: ../urpm/media.pm:1660
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "[%s] kopijavimas nepavyko (failas yra įtartinai mažas)"
 
-#: ../urpm/media.pm:1696
+#: ../urpm/media.pm:1708
 #, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr ""
 
-#: ../urpm/media.pm:1698 ../urpm/media.pm:2181
+#: ../urpm/media.pm:1710 ../urpm/media.pm:2193
 #, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
 msgstr ""
 
-#: ../urpm/media.pm:1713
+#: ../urpm/media.pm:1725
 #, c-format
 msgid "genhdlist2 failed on %s"
 msgstr ""
 
-#: ../urpm/media.pm:1723
+#: ../urpm/media.pm:1735
 #, c-format
 msgid "comparing %s and %s"
 msgstr ""
 
-#: ../urpm/media.pm:1753
+#: ../urpm/media.pm:1765
 #, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr ""
 
-#: ../urpm/media.pm:1779
+#: ../urpm/media.pm:1791
 #, c-format
 msgid "copying MD5SUM file of \"%s\"..."
 msgstr ""
 
-#: ../urpm/media.pm:1819
+#: ../urpm/media.pm:1831
 #, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
 msgstr ""
 
-#: ../urpm/media.pm:1822
+#: ../urpm/media.pm:1834
 #, c-format
 msgid "no metadata found for medium \"%s\""
 msgstr ""
 
-#: ../urpm/media.pm:1854
+#: ../urpm/media.pm:1866
 #, c-format
 msgid "retrieving source synthesis of \"%s\"..."
 msgstr ""
 
-#: ../urpm/media.pm:1920
+#: ../urpm/media.pm:1932
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "tikrinamas \"%s\" pubkey failas..."
 
-#: ../urpm/media.pm:1932
+#: ../urpm/media.pm:1944
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...iš \"%2$s\" pubkey bylos importuotas raktas %1$s"
 
-#: ../urpm/media.pm:1936
+#: ../urpm/media.pm:1948
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "negaliu importuoti \"%s\" pubkey failo"
 
-#: ../urpm/media.pm:1977
+#: ../urpm/media.pm:1989
 #, c-format
 msgid "no synthesis file found for medium \"%s\""
 msgstr ""
 
-#: ../urpm/media.pm:2010
+#: ../urpm/media.pm:2022
 #, c-format
 msgid "updated medium \"%s\""
 msgstr ""
 
-#: ../urpm/media.pm:2175
+#: ../urpm/media.pm:2187
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr ""
@@ -1380,6 +1384,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpm/orphans.pm:616
 #, c-format
@@ -1388,6 +1393,7 @@ msgid_plural "You may wish to remove them."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpm/orphans.pm:633
 #, c-format
@@ -1404,6 +1410,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpm/parallel.pm:31
 #, c-format
@@ -1716,6 +1723,7 @@ msgid_plural "Removing the following packages will break your system:"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpme:123
 #, c-format
@@ -1735,6 +1743,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpme:151
 #, c-format
@@ -1743,6 +1752,7 @@ msgid_plural "(orphan packages)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpme:158
 #, c-format
@@ -1751,6 +1761,7 @@ msgid_plural "Remove %d packages?"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpme:163
 #, c-format
@@ -2522,6 +2533,7 @@ msgid_plural "The following orphan packages will be removed."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpmi:599
 #, c-format

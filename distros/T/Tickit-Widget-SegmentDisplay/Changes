@@ -1,5 +1,9 @@
 Revision history for Tickit-Widget-SegmentDisplay
 
+0.06    2020-04-15
+        [CHANGES]
+         * Use Object::Pad
+
 0.05    2018-12-23 21:32:55
         [CHANGES]
          * Support rendering using Unicode line-drawing characters

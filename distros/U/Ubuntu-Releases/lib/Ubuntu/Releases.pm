@@ -1,7 +1,9 @@
 package Ubuntu::Releases;
 
-our $DATE = '2019-06-28'; # DATE
-our $VERSION = '0.111'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-21'; # DATE
+our $DIST = 'Ubuntu-Releases'; # DIST
+our $VERSION = '20200221.0'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,22 +24,23 @@ our $meta = {
     fields => {
         version         => { pos => 0, schema => "str*", sortable => 1, summary => "Version", unique => 1 },
         code_name       => { pos => 1, schema => "str*", sortable => 1, summary => "Code name", unique => 1 },
-        reldate         => { pos => 2, schema => "date*", sortable => 1, summary => "Release date" },
-        eoldate         => { pos => 3, schema => "date*", sortable => 1, summary => "Supported until" },
+        animal          => { pos => 2, schema => "str*", sortable => 1, summary => "Code name", unique => 1 },
+        reldate         => { pos => 3, schema => "date*", sortable => 1, summary => "Release date" },
+        eoldate         => { pos => 4, schema => "date*", sortable => 1, summary => "Supported until" },
 
-        linux_version   => {pos=> 4, schema=>'str*'},
+        linux_version   => {pos=> 5, schema=>'str*'},
 
-        mysql_version        => {pos=> 5, schema=>'str*'},
-        mariadb_version      => {pos=> 6, schema=>'str*'},
-        postgresql_version   => {pos=> 7, schema=>'str*'},
-        apache_httpd_version => {pos=> 8, schema=>'str*'},
-        nginx_version        => {pos=> 9, schema=>'str*'},
+        mysql_version        => {pos=> 6, schema=>'str*'},
+        mariadb_version      => {pos=> 7, schema=>'str*'},
+        postgresql_version   => {pos=> 8, schema=>'str*'},
+        apache_httpd_version => {pos=> 9, schema=>'str*'},
+        nginx_version        => {pos=>10, schema=>'str*'},
 
-        perl_version         => {pos=>10, schema=>'str*'},
-        python_version       => {pos=>11, schema=>'str*'},
-        php_version          => {pos=>12, schema=>'str*'},
-        ruby_version         => {pos=>13, schema=>'str*'},
-        bash_version         => {pos=>14, schema=>'str*'},
+        perl_version         => {pos=>11, schema=>'str*'},
+        python_version       => {pos=>12, schema=>'str*'},
+        php_version          => {pos=>13, schema=>'str*'},
+        ruby_version         => {pos=>14, schema=>'str*'},
+        bash_version         => {pos=>15, schema=>'str*'},
     },
     pk => "version",
 };
@@ -47,6 +50,7 @@ our $data = do {
     [];
  [
    {
+     animal               => "warthog",
      apache_httpd_version => "--",
      bash_version         => "2.05b",
      code_name            => "warty",
@@ -64,6 +68,7 @@ our $data = do {
      version              => "4.10",
    },
    {
+     animal               => "hedgehog",
      apache_httpd_version => "--",
      bash_version         => "3.0",
      code_name            => "hoary",
@@ -81,6 +86,7 @@ our $data = do {
      version              => 5.04,
    },
    {
+     animal               => "badger",
      apache_httpd_version => "--",
      bash_version         => "3.0",
      code_name            => "breezy",
@@ -98,6 +104,7 @@ our $data = do {
      version              => "5.10",
    },
    {
+     animal               => "drake",
      apache_httpd_version => "--",
      bash_version         => 3.1,
      code_name            => "dapper",
@@ -115,6 +122,7 @@ our $data = do {
      version              => "6.06 LTS",
    },
    {
+     animal               => "eft",
      apache_httpd_version => "--",
      bash_version         => 3.1,
      code_name            => "edgy",
@@ -132,6 +140,7 @@ our $data = do {
      version              => "6.10",
    },
    {
+     animal               => "fawn",
      apache_httpd_version => "--",
      bash_version         => 3.2,
      code_name            => "feisty",
@@ -149,6 +158,7 @@ our $data = do {
      version              => 7.04,
    },
    {
+     animal               => "gibbon",
      apache_httpd_version => "--",
      bash_version         => 3.2,
      code_name            => "gutsy",
@@ -166,6 +176,7 @@ our $data = do {
      version              => "7.10",
    },
    {
+     animal               => "heron",
      apache_httpd_version => "--",
      bash_version         => 3.2,
      code_name            => "hardy",
@@ -183,6 +194,7 @@ our $data = do {
      version              => "8.04 LTS",
    },
    {
+     animal               => "ibex",
      apache_httpd_version => "--",
      bash_version         => 3.2,
      code_name            => "intrepid",
@@ -200,6 +212,7 @@ our $data = do {
      version              => "8.10",
    },
    {
+     animal               => "jackalope",
      apache_httpd_version => "--",
      bash_version         => 3.2,
      code_name            => "jaunty",
@@ -217,6 +230,7 @@ our $data = do {
      version              => 9.04,
    },
    {
+     animal               => "koala",
      apache_httpd_version => "2.2.12",
      bash_version         => "4.0",
      code_name            => "karmic",
@@ -234,6 +248,7 @@ our $data = do {
      version              => "9.10",
    },
    {
+     animal               => "lynx",
      apache_httpd_version => "2.2.14",
      bash_version         => 4.1,
      code_name            => "lucid",
@@ -251,6 +266,7 @@ our $data = do {
      version              => "10.04 LTS",
    },
    {
+     animal               => "meerkat",
      apache_httpd_version => "2.2.16",
      bash_version         => 4.1,
      code_name            => "maverick",
@@ -268,6 +284,7 @@ our $data = do {
      version              => "10.10",
    },
    {
+     animal               => "narwhal",
      apache_httpd_version => "2.2.17",
      bash_version         => 4.2,
      code_name            => "natty",
@@ -285,6 +302,7 @@ our $data = do {
      version              => 11.04,
    },
    {
+     animal               => "ocelot",
      apache_httpd_version => "2.2.20",
      bash_version         => 4.2,
      code_name            => "oneiric",
@@ -302,6 +320,7 @@ our $data = do {
      version              => "11.10",
    },
    {
+     animal               => "pangolin",
      apache_httpd_version => "2.2.22",
      bash_version         => 4.2,
      code_name            => "precise",
@@ -319,6 +338,7 @@ our $data = do {
      version              => "12.04 LTS",
    },
    {
+     animal               => "quetzal",
      apache_httpd_version => "2.2.22",
      bash_version         => 4.2,
      code_name            => "quantal",
@@ -336,6 +356,7 @@ our $data = do {
      version              => "12.10",
    },
    {
+     animal               => "ringtail",
      apache_httpd_version => "2.2.22",
      bash_version         => 4.2,
      code_name            => "raring",
@@ -353,6 +374,7 @@ our $data = do {
      version              => 13.04,
    },
    {
+     animal               => "salamander",
      apache_httpd_version => "2.4.6",
      bash_version         => 4.2,
      code_name            => "saucy",
@@ -370,6 +392,7 @@ our $data = do {
      version              => "13.10",
    },
    {
+     animal               => "tahr",
      apache_httpd_version => "2.4.7",
      bash_version         => 4.3,
      code_name            => "trusty",
@@ -387,6 +410,7 @@ our $data = do {
      version              => "14.04 LTS",
    },
    {
+     animal               => "unicorn",
      apache_httpd_version => "2.4.10",
      bash_version         => 4.3,
      code_name            => "utopic",
@@ -404,6 +428,7 @@ our $data = do {
      version              => "14.10",
    },
    {
+     animal               => "vervet",
      apache_httpd_version => "2.4.10",
      bash_version         => 4.3,
      code_name            => "vivid",
@@ -421,6 +446,7 @@ our $data = do {
      version              => 15.04,
    },
    {
+     animal               => "werewolf",
      apache_httpd_version => "2.4.12",
      bash_version         => 4.3,
      code_name            => "wily",
@@ -438,6 +464,7 @@ our $data = do {
      version              => "15.10",
    },
    {
+     animal               => "xerus",
      apache_httpd_version => "2.4.18",
      bash_version         => 4.3,
      code_name            => "xenial",
@@ -455,6 +482,7 @@ our $data = do {
      version              => "16.04 LTS",
    },
    {
+     animal               => "yak",
      apache_httpd_version => "2.4.18",
      bash_version         => 4.3,
      code_name            => "yakkety",
@@ -472,6 +500,7 @@ our $data = do {
      version              => "16.10",
    },
    {
+     animal               => "zapus",
      apache_httpd_version => "2.4.25",
      bash_version         => 4.4,
      code_name            => "zesty",
@@ -489,6 +518,7 @@ our $data = do {
      version              => 17.04,
    },
    {
+     animal               => "aardvark",
      apache_httpd_version => "2.4.27",
      bash_version         => 4.4,
      code_name            => "artful",
@@ -506,6 +536,7 @@ our $data = do {
      version              => "17.10",
    },
    {
+     animal               => "beaver",
      apache_httpd_version => "2.4.29",
      bash_version         => "4.4.18",
      code_name            => "bionic",
@@ -523,6 +554,7 @@ our $data = do {
      version              => "18.04 LTS",
    },
    {
+     animal               => "cuttlefish",
      apache_httpd_version => "2.4.34",
      bash_version         => "4.4.18",
      code_name            => "cosmic",
@@ -540,24 +572,42 @@ our $data = do {
      version              => "18.10",
    },
    {
-     apache_httpd_version => "--",
+     animal               => "dingo",
+     apache_httpd_version => "2.4.38",
      bash_version         => "5.0",
      code_name            => "disco",
      eoldate              => "2020-01",
-     linux_version        => "5.0.0",
+     linux_version        => "5.0",
      mariadb_version      => "--",
-     mysql_version        => "--",
+     mysql_version        => "5.7.25",
      nginx_version        => undef,
      perl_version         => "5.28.1",
-     php_version          => "--",
-     postgresql_version   => "--",
+     php_version          => "7.2.15",
+     postgresql_version   => 11.2,
      python_version       => "3.7.3",
      reldate              => "2019-04-18",
      ruby_version         => undef,
      version              => 19.04,
    },
+   {
+     animal               => "ermine",
+     apache_httpd_version => "2.4.41",
+     bash_version         => "5.0",
+     code_name            => "eoan",
+     eoldate              => "2020-01",
+     linux_version        => 5.3,
+     mariadb_version      => "--",
+     mysql_version        => "8.0.17",
+     nginx_version        => undef,
+     perl_version         => "5.28.1",
+     php_version          => "7.3.8",
+     postgresql_version   => 11.5,
+     python_version       => "3.7.5",
+     reldate              => "2019-10-17",
+     ruby_version         => undef,
+     version              => "19.10",
+   },
  ]
-
 };
 
 my $res = gen_read_table_func(
@@ -583,7 +633,7 @@ Ubuntu::Releases - List Ubuntu releases
 
 =head1 VERSION
 
-This document describes version 0.111 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2019-06-28.
+This document describes version 20200221.0 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2020-02-21.
 
 =head1 SYNOPSIS
 
@@ -616,6 +666,50 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<animal> => I<str>
+
+Only return records where the 'animal' field equals specified value.
+
+=item * B<animal.contains> => I<str>
+
+Only return records where the 'animal' field contains specified text.
+
+=item * B<animal.in> => I<array[str]>
+
+Only return records where the 'animal' field is in the specified values.
+
+=item * B<animal.is> => I<str>
+
+Only return records where the 'animal' field equals specified value.
+
+=item * B<animal.isnt> => I<str>
+
+Only return records where the 'animal' field does not equal specified value.
+
+=item * B<animal.max> => I<str>
+
+Only return records where the 'animal' field is less than or equal to specified value.
+
+=item * B<animal.min> => I<str>
+
+Only return records where the 'animal' field is greater than or equal to specified value.
+
+=item * B<animal.not_contains> => I<str>
+
+Only return records where the 'animal' field does not contain specified text.
+
+=item * B<animal.not_in> => I<array[str]>
+
+Only return records where the 'animal' field is not in the specified values.
+
+=item * B<animal.xmax> => I<str>
+
+Only return records where the 'animal' field is less than specified value.
+
+=item * B<animal.xmin> => I<str>
+
+Only return records where the 'animal' field is greater than specified value.
 
 =item * B<apache_httpd_version> => I<str>
 
@@ -790,6 +884,10 @@ Only return records where the 'eoldate' field is less than specified value.
 =item * B<eoldate.xmin> => I<date>
 
 Only return records where the 'eoldate' field is greater than specified value.
+
+=item * B<exclude_fields> => I<array[str]>
+
+Select fields to return.
 
 =item * B<fields> => I<array[str]>
 
@@ -1296,11 +1394,12 @@ Only return records where the 'version' field is greater than specified value.
 
 =item * B<with_field_names> => I<bool>
 
-Return field names in each record (as hash/associative array).
+Return field names in each record (as hashE<sol>associative array).
 
 When enabled, function will return each record as hash/associative array
 (field name => value pairs). Otherwise, function will return each record
 as list/array (field value, field value, ...).
+
 
 =back
 
@@ -1341,7 +1440,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

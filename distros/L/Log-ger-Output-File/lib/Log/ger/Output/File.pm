@@ -3,9 +3,9 @@
 package Log::ger::Output::File;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-09'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Output-File'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ use FileHandle;
 our %lock_handles;
 
 sub meta { +{
-    v => 1,
+    v => 2,
 } }
 
 sub get_hooks {
@@ -99,7 +99,7 @@ Log::ger::Output::File - Send logs to file
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

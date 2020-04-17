@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -21,8 +21,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Object::Pad" : "0.19",
             "Tickit::Test" : "0.12",
-            "Tickit::Widget" : "0.36"
+            "Tickit::Widget" : "0.36",
+            "perl" : "5.026"
          }
       },
       "test" : {
@@ -34,7 +36,7 @@
    "provides" : {
       "Tickit::Widget::SegmentDisplay" : {
          "file" : "lib/Tickit/Widget/SegmentDisplay.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -43,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

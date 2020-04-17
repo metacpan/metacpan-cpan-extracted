@@ -1,3 +1,7 @@
+0.117		2020-04-15	T. R. Wyant
+    Remove all code related to GIS web service which was decomissioned a
+    number of years ago.
+
 0.116		2019-10-14	T. R. Wyant
     All the functionality based on the old GIS web site that this module was
     originally based on now results in a fatal error. This includes not only

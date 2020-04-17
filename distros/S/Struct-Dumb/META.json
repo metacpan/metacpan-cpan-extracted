@@ -4,13 +4,13 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Struct-Dumb",
    "prereqs" : {
@@ -21,6 +21,7 @@
       },
       "test" : {
          "requires" : {
+            "Data::Dump" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0.88"
          }
@@ -29,7 +30,7 @@
    "provides" : {
       "Struct::Dumb" : {
          "file" : "lib/Struct/Dumb.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -38,6 +39,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

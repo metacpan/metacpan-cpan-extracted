@@ -100,22 +100,7 @@ analyze - TF-IDF Analyze a corpus
 
 =head1 SYNOPSIS
 
-analyze --dir=/some/corpus [options]
-
-Options:
-
-  --help      help message
-  --man       full documentation
-  --dir       corpus of text documents
-  --size      ngram size
-  --top       top TF-IDF ngrams
-  --stop      use stopwords
-  --phrase    search phrase
-  --type      file extension
-  --punc      pattern of characters to exclude
-  --lc        lower-case the strings
-
-Examples:
+  perl analyze --dir=/some/corpus [options]
 
   perl analyze --dir=/Users/you/Documents/lit/inaugural --top=5
   perl analyze --dir=/Users/you/Documents/lit/inaugural --phrase='public good'
@@ -123,41 +108,55 @@ Examples:
   perl analyze --dir=/Users/you/Documents/lit/Shakespeare --size=3 --top=5
   perl analyze --dir=/Users/you/perl5/lib/site_perl/Music --size=1 --type=pm --punc=''
 
+=head1 DESCRIPTION
+
+This program analyzes the given corpus with the TF-IDF measure for ngrams.
+
 =head1 OPTIONS
 
 =over 4
 
 =item --help
 
-Brief help message
+Brief help message.
 
 =item --man
 
-Full manual page
+Full documentation.
 
 =item --dir
 
-Required corpus list of text documents
+Corpus list of text documents.
 
 =item --size
 
-Ngram phrase size - Default = 2
+Ngram phrase size.
+
+Default: C<2>
 
 =item --top
 
-Show the top B<N> ngrams seen.  Default = 0
+Show the top B<N> ngrams seen.
+
+Default: C<0>
 
 =item --stop
 
-Constrain the ngrams by excluding stopwords.  Default = 1
+Constrain the ngrams by excluding stopwords.
+
+Default: C<1>
 
 =item --phrase
 
-Search the corpus for the B<phrase> and its IF-IDF values.  Default = ''
+Search the corpus for the B<phrase> and its IF-IDF values.
+
+Default: C<''>
 
 =item --type
 
-Read corpus files of this file extension. Default = 'txt'
+Read corpus files of this file extension.
+
+Default: C<txt>
 
 =item --punc
 
@@ -170,12 +169,10 @@ Note that the single quote is not excluded by default.
 
 =item --lc
 
-Lower-case the results. Default = 0
+Lower-case the results.
+
+Default: C<0>
 
 =back
-
-=head1 DESCRIPTION
-
-This program analyzes the given corpus with the TF-IDF measure for ngrams.
 
 =cut

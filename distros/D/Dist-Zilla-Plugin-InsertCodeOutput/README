@@ -3,9 +3,9 @@ NAME
     into your POD
 
 VERSION
-    This document describes version 0.041 of
+    This document describes version 0.042 of
     Dist::Zilla::Plugin::InsertCodeOutput (from Perl distribution
-    Dist-Zilla-Plugin-InsertCodeOutput), released on 2019-02-04.
+    Dist-Zilla-Plugin-InsertCodeOutput), released on 2020-02-21.
 
 SYNOPSIS
     In dist.ini:
@@ -17,14 +17,24 @@ SYNOPSIS
 
      # CODE: require MyLib; MyLib::gen_stuff("some", "param");
 
+    or for multiline code:
+
+     # BEGIN_CODE
+     require MyLib;
+     MyLib::gen_stuff("some", "param");
+     ...
+     # END_CODE
+
 DESCRIPTION
-    This module finds "# CODE: ..." directives in your POD, evals the
-    specified Perl code while capturing the output using Capture::Tiny's
-    "capture_merged" (which means STDOUT and STDERR output are both
-    captured), and insert the output to your POD as verbatim paragraph
-    (indented with a whitespace), unless when "make_verbatim" is set to 0
-    then it is inserted as-is. If eval fails ($@ is true), build will be
-    aborted.
+    This module finds "# CODE: ..." or "# BEGIN_CODE" and "# END CODE"
+    directives in your POD, evals the specified Perl code while capturing
+    the output using Capture::Tiny's "capture_merged" (which means STDOUT
+    and STDERR output are both captured), and insert the output to your POD
+    as verbatim paragraph (indented with a whitespace), unless when
+    "make_verbatim" is set to 0 then it is inserted as-is. If eval fails ($@
+    is true), build will be aborted.
+
+    The directives must be at the first column of the line.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -56,7 +66,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2015, 2014 by
+    This software is copyright (c) 2020, 2019, 2018, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

@@ -9,9 +9,9 @@ use Test::Refcount;
 BEGIN {
    plan skip_all => "Future is not available"
       unless eval { require Future };
-   plan skip_all => "Future::AsyncAwait >= 0.38 is not available"
+   plan skip_all => "Future::AsyncAwait >= 0.40 is not available"
       unless eval { require Future::AsyncAwait;
-                    Future::AsyncAwait->VERSION( '0.38' ) };
+                    Future::AsyncAwait->VERSION( '0.40' ) };
    plan skip_all => "Object::Pad >= 0.15 is not available"
       unless eval { require Object::Pad;
                     Object::Pad->VERSION( '0.15' ) };

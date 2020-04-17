@@ -16,9 +16,9 @@ my @scripts = (
     'script/disable-touchpad',
     'script/enable-touchpad',
     'script/has-touchpad',
-    'script/touchoff',
-    'script/touchon',
-    'script/touchpad-is-enabled'
+    'script/touchpad-is-enabled',
+    'script/tpoff',
+    'script/tpon'
 );
 
 # no fake home requested

@@ -1,16 +1,23 @@
 --- #YAML:1.0
 name: Quota
 abstract: Quota - Perl interface to file system quotas
-version: 1.7.4
+version: 1.8.0
 author:
   - Tom Zoerner <tomzo@users.sourceforge.net>
 license: perl
 distribution_type: module
 keywords:
+  - system-administration
+  - file-system
+  - quota
   - quotactl
+  - mtab
+  - getmntent
 excludes_os: MSWin32
 no_index:
   directory:
     - contrib
 resources:
+  homepage: https://metacpan.org/pod/Quota
+  repository: https://github.com/tomzox/Perl-Quota
   license: http://dev.perl.org/licenses/

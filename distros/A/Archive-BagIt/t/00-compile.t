@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Archive/BagIt.pm',
@@ -14,7 +14,9 @@ my @module_files = (
     'Archive/BagIt/DotBagIt.pm',
     'Archive/BagIt/Fast.pm',
     'Archive/BagIt/Plugin/Algorithm/MD5.pm',
+    'Archive/BagIt/Plugin/Algorithm/SHA512.pm',
     'Archive/BagIt/Plugin/Manifest/MD5.pm',
+    'Archive/BagIt/Plugin/Manifest/SHA512.pm',
     'Archive/BagIt/Role/Algorithm.pm',
     'Archive/BagIt/Role/Manifest.pm',
     'Archive/BagIt/Role/Plugin.pm'

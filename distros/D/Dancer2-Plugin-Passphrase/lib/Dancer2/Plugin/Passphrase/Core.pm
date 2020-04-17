@@ -72,8 +72,8 @@ sub _merge_options {
     if ( $algorithm eq 'Bcrypt' ) {
         $settings->{'scheme'} = 'CRYPT';
         $settings->{'type'}   = '2a';
-        $settings->{'cost'} =
-          defined $settings->{'cost'} ? $settings->{'cost'} : 4;
+
+        $settings->{'cost'} //= $self->{'Bcrypt'}{'cost'} || 4;
         $settings->{'cost'}   = 31 if $settings->{'cost'} > 31;
         $settings->{'cost'}   = sprintf '%02d', $settings->{'cost'};
     }

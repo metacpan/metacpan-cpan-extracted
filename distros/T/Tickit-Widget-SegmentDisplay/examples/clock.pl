@@ -4,7 +4,11 @@ use strict;
 use warnings;
 
 use Tickit::Async;
-use Tickit::Widgets qw( SegmentDisplay HBox Border );
+use Tickit::Widgets 0.30 qw(
+   SegmentDisplay
+   Border=0.30
+   HBox
+);
 use IO::Async::Loop;
 use IO::Async::Timer::Absolute;
 
@@ -41,12 +45,15 @@ $loop->add( IO::Async::Timer::Absolute->new(
 
 # Put 5 lines border top and bottom, to try to correct aspect ratio on a
 # standard 80x25 terminal
-my $tickit = Tickit::Async->new( root => Tickit::Widget::Border->new(
-   v_border => 5,
-   child => my $hbox = Tickit::Widget::HBox->new(
-      spacing => 1,
-   ),
-) );
+my $tickit = Tickit::Async->new(
+   root => Tickit::Widget::Border->new(
+      v_border => 5,
+   )->set_child(
+      my $hbox = Tickit::Widget::HBox->new(
+         spacing => 1,
+      )
+   )
+);
 $loop->add( $tickit );
 
 $hbox->add( $_, expand => 1 ) for @digits[0,1];

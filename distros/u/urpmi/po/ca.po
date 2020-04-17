@@ -3,14 +3,14 @@
 #
 # Translators:
 # Francesc Pinyol Margalef, 2012-2014
-# Davidmp <medipas@gmail.com>, 2015-2019
+# Davidmp <medipas@gmail.com>, 2015-2020
 # Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2017-2018
 # Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2019-06-26 09:37+0300\n"
-"PO-Revision-Date: 2019-06-26 15:15+0000\n"
+"POT-Creation-Date: 2020-01-18 09:59+0200\n"
+"PO-Revision-Date: 2020-01-27 15:21+0000\n"
 "Last-Translator: Davidmp <medipas@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/MageiaLinux/mageia/language/"
 "ca/)\n"
@@ -66,8 +66,8 @@ msgid "Cancel"
 msgstr "Cancel·la"
 
 #: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
-#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1670
-#: ../urpm/media.pm:1821
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
+#: ../urpm/media.pm:1833
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "...ha fallat la recuperació: %s"
@@ -1062,19 +1062,19 @@ msgstr ""
 "--synthesis no es pot utilitzar amb --media, --excludemedia, --sortmedia, --"
 "update, --use-distrib ni --parallel"
 
-#: ../urpm/media.pm:792
+#: ../urpm/media.pm:793
 #, c-format
 msgid "ignoring non-free medium `%s'"
 msgstr "s'ignora el mitjà no lliure «%s» "
 
-#: ../urpm/media.pm:802
+#: ../urpm/media.pm:803
 #, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
 msgstr ""
 "no-ignorant el mitjà no lliure \"%s\" perquè hi ha paquets no lliures "
 "instal·lats"
 
-#: ../urpm/media.pm:806
+#: ../urpm/media.pm:807
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
@@ -1082,9 +1082,12 @@ msgstr ""
 
 #: ../urpm/media.pm:816
 #, c-format
-msgid "un-ignoring 32bit medium `%s' b/c system is 32-bit EFI"
+msgid ""
+"un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
+"32-bit EFI"
 msgstr ""
-"no s'ignora el mitjà de 32 bits \"%s\" perquè és un sistema EFI de 32 bits"
+"no s'ignora el mitjà de 32 bits \"%s\" perquè hi ha paquets de 32 bits "
+"instal·lats o és un sistema EFI de 32 bits"
 
 #: ../urpm/media.pm:844
 #, c-format
@@ -1148,162 +1151,162 @@ msgstr ""
 "no s'ha pogut accedir al mitjà de distribució (no s'ha trobat el fitxer "
 "media.cfg)"
 
-#: ../urpm/media.pm:1172
+#: ../urpm/media.pm:1184
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr "ometent mitjans no compatibles `%s' (per a %s)"
 
-#: ../urpm/media.pm:1230
+#: ../urpm/media.pm:1242
 #, c-format
 msgid "retrieving media.cfg file..."
 msgstr "s'està recuperant el fitxer media.cfg..."
 
-#: ../urpm/media.pm:1273
+#: ../urpm/media.pm:1285
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "s'ha intentat seleccionar un mitjà inexistent «%s»"
 
-#: ../urpm/media.pm:1276
+#: ../urpm/media.pm:1288
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "s'estan seleccionant diversos mitjans: %s"
 
-#: ../urpm/media.pm:1335
+#: ../urpm/media.pm:1347
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "s'està suprimint el mitjà «%s»"
 
-#: ../urpm/media.pm:1426
+#: ../urpm/media.pm:1438
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "s'està reconfigurant l'urpmi per al mitjà «%s»"
 
-#: ../urpm/media.pm:1460
+#: ../urpm/media.pm:1472
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "..la reconfiguració ha fallat"
 
-#: ../urpm/media.pm:1466
+#: ../urpm/media.pm:1478
 #, c-format
 msgid "reconfiguration done"
 msgstr "reconfiguració acabada"
 
-#: ../urpm/media.pm:1482
+#: ../urpm/media.pm:1494
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr "Error en generar el fitxer de noms: dependència %d no trobada"
 
-#: ../urpm/media.pm:1503
+#: ../urpm/media.pm:1515
 #, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr "El mitjà «%s» està actualitzat."
 
-#: ../urpm/media.pm:1514
+#: ../urpm/media.pm:1526
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "s'està examinant el fitxer de síntesi [%s]"
 
-#: ../urpm/media.pm:1534
+#: ../urpm/media.pm:1546
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "s'ha trobat un problema llegint el fitxer de síntesi del mitjà «%s»"
 
-#: ../urpm/media.pm:1547 ../urpm/media.pm:1642
+#: ../urpm/media.pm:1559 ../urpm/media.pm:1654
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr "s'està copiant [%s] per al mitjà «%s»..."
 
-#: ../urpm/media.pm:1549 ../urpm/media.pm:1619 ../urpm/media.pm:1872
+#: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
 msgid "...copying failed"
 msgstr "..la còpia ha fallat"
 
-#: ../urpm/media.pm:1615
+#: ../urpm/media.pm:1627
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "s'està copiant el fitxer de descripció de «%s»..."
 
-#: ../urpm/media.pm:1617 ../urpm/media.pm:1646
+#: ../urpm/media.pm:1629 ../urpm/media.pm:1658
 #, c-format
 msgid "...copying done"
 msgstr "...còpia feta"
 
-#: ../urpm/media.pm:1648
+#: ../urpm/media.pm:1660
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "la còpia de [%s] ha fallat (el fitxer és sospitosament petit)"
 
-#: ../urpm/media.pm:1696
+#: ../urpm/media.pm:1708
 #, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr "calculant md5sum de la síntesi de l'origen obtingut"
 
-#: ../urpm/media.pm:1698 ../urpm/media.pm:2181
+#: ../urpm/media.pm:1710 ../urpm/media.pm:2193
 #, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
 msgstr "la recuperació de [%s] ha fallat (el md5sum no concorda)"
 
-#: ../urpm/media.pm:1713
+#: ../urpm/media.pm:1725
 #, c-format
 msgid "genhdlist2 failed on %s"
 msgstr "genhdlist2 ha fallat a %s"
 
-#: ../urpm/media.pm:1723
+#: ../urpm/media.pm:1735
 #, c-format
 msgid "comparing %s and %s"
 msgstr "s'està comparant %s i %s"
 
-#: ../urpm/media.pm:1753
+#: ../urpm/media.pm:1765
 #, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr "fitxer hdlist no vàlid %s per al mitjà «%s»"
 
-#: ../urpm/media.pm:1779
+#: ../urpm/media.pm:1791
 #, c-format
 msgid "copying MD5SUM file of \"%s\"..."
 msgstr "s'està copiant el fitxer MD5SUM de «%s»..."
 
-#: ../urpm/media.pm:1819
+#: ../urpm/media.pm:1831
 #, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
 msgstr "fitxer MD5SUM invàlid (baixat de %s)"
 
-#: ../urpm/media.pm:1822
+#: ../urpm/media.pm:1834
 #, c-format
 msgid "no metadata found for medium \"%s\""
 msgstr "no s'han trobat metadades per al mitjà «%s»"
 
-#: ../urpm/media.pm:1854
+#: ../urpm/media.pm:1866
 #, c-format
 msgid "retrieving source synthesis of \"%s\"..."
 msgstr "s'està recuperant la síntesi de l'origen de «%s»..."
 
-#: ../urpm/media.pm:1920
+#: ../urpm/media.pm:1932
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "s'està examinant el fitxer de clau pública de «%s»..."
 
-#: ../urpm/media.pm:1932
+#: ../urpm/media.pm:1944
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...s'ha importat la clau %s del fitxer de clau pública de «%s»"
 
-#: ../urpm/media.pm:1936
+#: ../urpm/media.pm:1948
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "no s'ha pogut importar el fitxer de clau pública de «%s»"
 
-#: ../urpm/media.pm:1977
+#: ../urpm/media.pm:1989
 #, c-format
 msgid "no synthesis file found for medium \"%s\""
 msgstr "no s'ha trobat fitxer de síntesi per al mitjà «%s»"
 
-#: ../urpm/media.pm:2010
+#: ../urpm/media.pm:2022
 #, c-format
 msgid "updated medium \"%s\""
 msgstr "S'ha actualitzat el mitjà «%s»."
 
-#: ../urpm/media.pm:2175
+#: ../urpm/media.pm:2187
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr "la recuperació de [%s] ha fallat"

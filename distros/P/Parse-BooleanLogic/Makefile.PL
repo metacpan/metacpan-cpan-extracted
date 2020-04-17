@@ -1,3 +1,4 @@
+BEGIN { push @INC, '.' }
 use strict;
 use inc::Module::Install;
 

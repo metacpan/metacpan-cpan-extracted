@@ -9,7 +9,7 @@ use Wasm::Wasmtime::TableType;
 use Wasm::Wasmtime::MemoryType;
 
 # ABSTRACT: Wasmtime extern type class
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 $ffi_prefix = 'wasm_externtype_';
@@ -93,7 +93,7 @@ Wasm::Wasmtime::ExternType - Wasmtime extern type class
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -150,28 +150,28 @@ Returns the kind of extern type as the internal integer code.
 
  my $functype = $externtype->as_functype;
 
-If the extern type is a function, returns the L<Was::Wasmtime::FuncType> for it.
+If the extern type is a function, returns the L<Wasm::Wasmtime::FuncType> for it.
 Otherwise returns C<undef>.
 
 =head2 as_globaltype
 
  my $globaltype = $externtype->as_globaltype;
 
-If the extern type is a global object, returns the L<Was::Wasmtime::GlobalType> for it.
+If the extern type is a global object, returns the L<Wasm::Wasmtime::GlobalType> for it.
 Otherwise returns C<undef>.
 
 =head2 as_tabletype
 
  my $tabletype = $externtype->as_tabletype;
 
-If the extern type is a table object, returns the L<Was::Wasmtime::TableType> for it.
+If the extern type is a table object, returns the L<Wasm::Wasmtime::TableType> for it.
 Otherwise returns C<undef>.
 
 =head2 as_memorytype
 
  my $memorytype = $externtype->as_memorytype;
 
-If the extern type is a memory object, returns the L<Was::Wasmtime::MemoryType> for it.
+If the extern type is a memory object, returns the L<Wasm::Wasmtime::MemoryType> for it.
 Otherwise returns C<undef>.
 
 =head1 SEE ALSO

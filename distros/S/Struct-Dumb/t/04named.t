@@ -41,4 +41,15 @@ like( exception { Colour( red => 0, green => 0, blue => 0, yellow => 1 ) },
       qr/^usage: main::Colour does not recognise 'yellow' at \S+ line \d+\.?\n/,
       'Colour() with yellow throws usage exception' );
 
+{
+   package named::optional;
+   use Struct::Dumb;
+
+   struct PointXY => [qw( x y ?z )],
+      named_constructor => 1;
+
+   my $point = PointXY( x => 1, y => 2 );
+   ::is( $point->z, undef, '$point->z from named constructor optional argument' );
+}
+
 done_testing;

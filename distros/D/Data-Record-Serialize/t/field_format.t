@@ -18,13 +18,14 @@ subtest "format fields" => sub {
                 format_fields => {
                     a => 'aAa: %s',
                     b => 'bBb: %s',
+                    c => sub { qq(cCc: $_[0]) }
                 },
             );
         },
         "constructor"
     ) or diag $@;
 
-    $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
+    $s->send( { a => 1, b => 2, c => 'nyuck nyuck', d => 'niagara falls' } );
 
     my $VAR1;
 
@@ -35,7 +36,8 @@ subtest "format fields" => sub {
         {
             a => 'aAa: 1',
             b => 'bBb: 2',
-            c => 'nyuck nyuck',
+            c => 'cCc: nyuck nyuck',
+            d => 'niagara falls'
         },
         'properly formatted'
     );
@@ -59,7 +61,7 @@ subtest "format types" => sub {
                 format_types => {
                     N => 'number: %s',
                     I => 'integer: %s',
-                    S => 'string: %s',
+                    S => sub { qq(string: $_[0]) },
                 },
             );
         },
@@ -96,7 +98,7 @@ subtest "format types w/o specifying them" => sub {
                 format_types => {
                     N => 'number: %s',
                     I => 'integer: %s',
-                    S => 'string: %s',
+                    S => sub { qq(string: $_[0]) },
                 },
             );
         },
@@ -134,22 +136,24 @@ subtest "format fields overrides types" => sub {
                     a => 'N',
                     b => 'I',
                     c => 'S',
+                    d => 'S',
                 },
                 format_types => {
                     N => 'number: %s',
                     I => 'integer: %s',
-                    S => 'string: %s',
+                    S => sub { qq(string: $_[0]) },
                 },
                 format_fields => {
                     a => 'aAa: %s',
                     b => 'bBb: %s',
+                    c => sub { qq(cCc: $_[0]) }
                 },
             );
         },
         "constructor"
     ) or diag $@;
 
-    $s->send( { a => 1, b => 2, c => 3 } );
+    $s->send( { a => 1, b => 2, c => 3, d => 4 } );
 
     my $VAR1;
 
@@ -160,7 +164,8 @@ subtest "format fields overrides types" => sub {
         {
             a => 'aAa: 1',
             b => 'bBb: 2',
-            c => 'string: 3',
+            c => 'cCc: 3',
+            d => 'string: 4',
         },
         'properly formatted'
     );

@@ -140,6 +140,7 @@ typedef struct {
 
 /* Metadata about a class */
 typedef struct {
+  SV *name;
   HV *stash;
   SLOTOFFSET offset;   /* first slot index of this partial within its instance */
   AV *slots;           /* each AV item is a raw pointer directly to a SlotMeta */
@@ -151,20 +152,6 @@ typedef struct {
   COP *tmpcop;         /* a COP to use during generated constructor */
   CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
 } ClassMeta;
-
-/* The metadata on the currently-compiling class */
-#ifdef MULTIPLICITY
-#  define compclassmeta  \
-    (*((ClassMeta **)hv_fetchs(PL_modglobal, "Object::Pad/compclassmeta", GV_ADD)))
-#  define have_compclassmeta  \
-    (!!hv_fetchs(PL_modglobal, "Object::Pad/compclassmeta", 0))
-#else
-/* without MULTIPLICITY there's only one, so we might as well just store it
- * in a static
- */
-static ClassMeta *compclassmeta;
-#define have_compclassmeta (!!compclassmeta)
-#endif
 
 /* Special pad indexes within `method` CVs */
 enum {
@@ -239,8 +226,9 @@ static OP *pp_methstart(pTHX)
     }
   }
 
-  save_clearsv(&PAD_SVl(PADIX_SLOTS));
+  SAVESPTR(PAD_SVl(PADIX_SLOTS));
   PAD_SVl(PADIX_SLOTS) = SvREFCNT_inc(slotsav);
+  save_freesv(slotsav);
 
   return PL_op->op_next;
 }
@@ -283,9 +271,6 @@ static OP *pp_slotpad(pTHX)
 
   SV *slot = slots[slotix];
 
-  if(PAD_SV(targ))
-    SvREFCNT_dec(PAD_SV(targ));
-
   SV *val;
   switch(PL_op->op_private) {
     case OPpSLOTPAD_SV:
@@ -303,8 +288,9 @@ static OP *pp_slotpad(pTHX)
       croak("ARGH: unsure what to do with this slot type");
   }
 
-  save_clearsv(&PAD_SVl(targ));
+  SAVESPTR(PAD_SVl(targ));
   PAD_SVl(targ) = SvREFCNT_inc(val);
+  save_freesv(val);
 
   return PL_op->op_next;
 }
@@ -396,8 +382,8 @@ static AV *MY_get_class_isa(pTHX_ HV *stash)
   return GvAV(*gvp);
 }
 
-#define generate_initslots_method(meta, stash)  MY_generate_initslots_method(aTHX_ meta, stash)
-static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
+#define generate_initslots_method(meta)  MY_generate_initslots_method(aTHX_ meta)
+static void MY_generate_initslots_method(pTHX_ ClassMeta *meta)
 {
   OP *ops = NULL;
   int i;
@@ -436,7 +422,7 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
    * we must be a subclass
    */
   if(meta->offset) {
-    AV *isa = get_class_isa(stash);
+    AV *isa = get_class_isa(meta->stash);
     SV *superclass = AvARRAY(isa)[0];
 
     CopLINE_set(PL_curcop, __LINE__);
@@ -532,17 +518,59 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
   SvREFCNT_inc(PL_compcv);
   ops = block_end(save_ix, ops);
 
-  newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, newSVpvs("INITSLOTS")),
+  newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, newSVpvf("%" SVf "::INITSLOTS", meta->name)),
     NULL, NULL, ops);
 
   LEAVE;
 }
 
-static void late_generate_initslots(pTHX_ void *p)
+/* The metadata on the currently-compiling class */
+#define compclassmeta       S_compclassmeta(aTHX)
+static ClassMeta *S_compclassmeta(pTHX)
 {
-  ClassMeta *meta = p;
+  SV **svp = hv_fetchs(GvHV(PL_hintgv), "Object::Pad/compclassmeta", 0);
+  if(!svp || !*svp || !SvOK(*svp))
+    return NULL;
+  return (ClassMeta *)SvIV(*svp);
+}
 
-  generate_initslots_method(meta, PL_curstash);
+#define have_compclassmeta  S_have_compclassmeta(aTHX)
+static bool S_have_compclassmeta(pTHX)
+{
+  SV **svp = hv_fetchs(GvHV(PL_hintgv), "Object::Pad/compclassmeta", 0);
+  if(!svp || !*svp)
+    return false;
+
+  if(SvOK(*svp) && SvIV(*svp))
+    return true;
+
+  return false;
+}
+
+static int on_free_compclassmeta(pTHX_ SV *sv, MAGIC *mg)
+{
+  ClassMeta *meta = (ClassMeta *)mg->mg_ptr;
+
+  generate_initslots_method(meta);
+}
+
+static MGVTBL vtbl_compclassmeta = {
+  NULL, /* get */
+  NULL, /* set */
+  NULL, /* len */
+  NULL, /* clear */
+  on_free_compclassmeta,
+};
+
+#define COMPCLASSMETA_GEN_ON_FREE (1<<0)
+#define compclassmeta_set(meta, flags)  S_compclassmeta_set(aTHX_ meta, flags)
+static void S_compclassmeta_set(pTHX_ ClassMeta *meta, U8 flags)
+{
+  SV *sv = *hv_fetchs(GvHV(PL_hintgv), "Object::Pad/compclassmeta", GV_ADD);
+  sv_setiv(sv, (IV)meta);
+
+  if(flags & COMPCLASSMETA_GEN_ON_FREE)
+    sv_magicext(sv, NULL, PERL_MAGIC_ext, &vtbl_compclassmeta, (char *)meta, 0);
 }
 
 static XS(injected_constructor);
@@ -698,6 +726,80 @@ static XS(injected_constructor)
   XSRETURN(1);
 }
 
+#define mop_create_class(name, super)  MY_mop_create_class(aTHX_ name, super)
+static ClassMeta *MY_mop_create_class(pTHX_ SV *name, SV *superclassname)
+{
+  ClassMeta *meta;
+  Newx(meta, 1, ClassMeta);
+
+  meta->name = SvREFCNT_inc(name);
+
+  meta->offset = 0;
+  meta->slots  = newAV();
+  meta->repr   = REPR_NATIVE;
+
+  meta->tmpcop = (COP *)newSTATEOP(0, NULL, NULL);
+  CopFILE_set(meta->tmpcop, __FILE__);
+
+  meta->methodscope = NULL;
+
+  HV *stash = meta->stash = gv_stashsv(name, GV_ADD);
+
+  AV *isa;
+  {
+    SV *isaname = newSVpvf("%" SVf "::ISA", name);
+    SAVEFREESV(isaname);
+
+    isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvUTF8(name) ? SVf_UTF8 : 0));
+  }
+
+  if(superclassname && SvOK(superclassname)) {
+    av_push(isa, SvREFCNT_inc(superclassname));
+
+    ClassMeta *supermeta = NULL;
+
+    HV *superstash = gv_stashsv(superclassname, 0);
+    GV **metagvp = (GV **)hv_fetchs(superstash, "META", 0);
+    if(metagvp)
+      supermeta = NUM2PTR(ClassMeta *, SvUV(GvSV(*metagvp)));
+
+    if(supermeta) {
+      /* A subclass of an Object::Pad class */
+      meta->offset = supermeta->offset + av_count(supermeta->slots);
+      meta->repr = supermeta->repr;
+    }
+    else {
+      /* A subclass of a foreign class - presume HASH for now */
+      meta->repr = REPR_FOREIGN_HASH;
+      av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
+    }
+  }
+  else {
+    /* A base class */
+    av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
+  }
+
+  {
+    /* Inject the constructor */
+    SV *newname = newSVpvf("%" SVf "::new", name);
+    SAVEFREESV(newname);
+
+    CV *newcv = newXS(SvPV_nolen(newname), injected_constructor, __FILE__);
+    CvXSUBANY(newcv).any_ptr = meta;
+  }
+
+  {
+    GV **gvp = (GV **)hv_fetchs(stash, "META", GV_ADD);
+    GV *gv = *gvp;
+    gv_init_pvn(gv, stash, "META", 4, 0);
+    GvMULTI_on(gv);
+
+    sv_setuv(GvSVn(gv), PTR2UV(meta));
+  }
+
+  return meta;
+}
+
 
 static int keyword_class(pTHX_ OP **op_ptr)
 {
@@ -711,7 +813,6 @@ static int keyword_class(pTHX_ OP **op_ptr)
   SV *packagever = lex_scan_version(PARSE_OPTIONAL);
 
   SV *superclassname = NULL;
-  ClassMeta *supermeta = NULL;
 
   /* TODO: This grammar is quite flexible; maybe too much? */
   while(1) {
@@ -740,10 +841,6 @@ static int keyword_class(pTHX_ OP **op_ptr)
 
       if(superclassver)
         ensure_module_version(superclassname, superclassver);
-
-      GV **metagvp = (GV **)hv_fetchs(superstash, "META", 0);
-      if(metagvp)
-        supermeta = NUM2PTR(ClassMeta *, SvUV(GvSV(*metagvp)));
     }
     else
       break;
@@ -771,35 +868,21 @@ static int keyword_class(pTHX_ OP **op_ptr)
   import_pragma("experimental", "signatures");
 #endif
 
-  if(have_compclassmeta) {
-    SAVEVPTR(compclassmeta);
-  }
+  ClassMeta *meta = mop_create_class(packagename, superclassname);
 
-  ClassMeta *meta;
-  Newx(meta, 1, ClassMeta);
-  compclassmeta = meta;
-
-  meta->offset = 0;
-  meta->slots  = newAV();
-  meta->repr   = REPR_NATIVE;
-
-  meta->tmpcop = (COP *)newSTATEOP(0, NULL, NULL);
-  CopFILE_set(meta->tmpcop, __FILE__);
-
-  meta->methodscope = NULL;
+  if(superclassname)
+    SvREFCNT_dec(superclassname);
 
   /* CARGOCULT from perl/op.c:Perl_package() */
   {
     SAVEGENERICSV(PL_curstash);
     save_item(PL_curstname);
 
-    PL_curstash = (HV *)SvREFCNT_inc(gv_stashsv(packagename, GV_ADD));
+    PL_curstash = (HV *)SvREFCNT_inc(meta->stash);
     sv_setsv(PL_curstname, packagename);
 
     PL_hints |= HINT_BLOCK_SCOPE;
     PL_parser->copline = NOLINE;
-
-    meta->stash = PL_curstash;
   }
 
   if(packagever) {
@@ -812,54 +895,12 @@ static int keyword_class(pTHX_ OP **op_ptr)
     PL_hints = savehints;
   }
 
-  AV *isa;
-  {
-    SV *isaname = newSVpvf("%" SVf "::ISA", PL_curstname);
-    SAVEFREESV(isaname);
-
-    isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvUTF8(PL_curstash) ? SVf_UTF8 : 0));
-  }
-
-  if(superclassname) {
-    av_push(isa, superclassname);
-
-    if(supermeta) {
-      /* A subclass of an Object::Pad class */
-      meta->offset = supermeta->offset + av_count(supermeta->slots);
-      meta->repr = supermeta->repr;
-    }
-    else {
-      /* A subclass of a foreign class - presume HASH for now */
-      meta->repr = REPR_FOREIGN_HASH;
-      av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
-    }
-  }
-  else {
-    /* A base class */
-    av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
-  }
-
-  {
-    /* Inject the constructor */
-    CV *newcv = newXS("new", injected_constructor, __FILE__);
-    CvXSUBANY(newcv).any_ptr = meta;
-  }
-
-  {
-    GV **gvp = (GV **)hv_fetchs(PL_curstash, "META", GV_ADD);
-    GV *gv = *gvp;
-    gv_init_pvn(gv, PL_curstash, "META", 4, 0);
-    GvMULTI_on(gv);
-
-    sv_setuv(GvSVn(gv), PTR2UV(meta));
-  }
-
   if(is_block) {
     I32 save_ix = block_start(TRUE);
+    compclassmeta_set(meta, COMPCLASSMETA_GEN_ON_FREE);
+
     OP *body = parse_stmtseq(0);
     body = block_end(save_ix, body);
-
-    generate_initslots_method(meta, PL_curstash);
 
     if(!lex_consume("}"))
       croak("Expected }");
@@ -872,7 +913,8 @@ static int keyword_class(pTHX_ OP **op_ptr)
     return KEYWORD_PLUGIN_STMT;
   }
   else {
-    SAVEDESTRUCTOR_X(&late_generate_initslots, meta);
+    SAVEHINTS();
+    compclassmeta_set(meta, COMPCLASSMETA_GEN_ON_FREE);
 
     *op_ptr = newOP(OP_NULL, 0);
     return KEYWORD_PLUGIN_STMT;
@@ -1109,6 +1151,17 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 }
 
 MODULE = Object::Pad    PACKAGE = Object::Pad
+
+void
+_begin_class(name, superclassname)
+    SV *name
+    SV *superclassname
+  CODE:
+  {
+    ClassMeta *meta = mop_create_class(name, superclassname);
+
+    compclassmeta_set(meta, COMPCLASSMETA_GEN_ON_FREE);
+  }
 
 BOOT:
   XopENTRY_set(&xop_methstart, xop_name, "methstart");

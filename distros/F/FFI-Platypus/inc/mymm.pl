@@ -40,6 +40,13 @@ use Capture::Tiny qw( capture_merged );
   }
 }
 
+sub vcpkg
+{
+  return unless $Config{ccname} eq 'cl';
+  require Alien::FFI::Vcpkg;
+  !!eval { Alien::FFI::Vcpkg->vcpkg }
+}
+
 sub myWriteMakefile
 {
   my %args = @_;
@@ -57,6 +64,14 @@ sub myWriteMakefile
     $build_config->set(alien => { class => 'Alien::FFI', mode => 'already-installed' });
     require Alien::Base::Wrapper;
     Alien::Base::Wrapper->import( 'Alien::FFI', 'Alien::psapi', '!export' );
+    %alien = Alien::Base::Wrapper->mm_args;
+  }
+  elsif(vcpkg())
+  {
+    print "using vcpkg libffi package\n";
+    $build_config->set(alien => { class => 'Alien::FFI::Vcpkg', mode => 'system' });
+    require Alien::Base::Wrapper;
+    Alien::Base::Wrapper->import( 'Alien::FFI::Vcpkg', '!export');
     %alien = Alien::Base::Wrapper->mm_args;
   }
   else

@@ -60,9 +60,9 @@ sub test3 {
     check_one_content('<removed>', 'config.rpmorig', 'foo');
     check_one_content('<removed>', 'config-noreplace.rpmsave', 'foo');
     check_one_content('<removed>', 'config-noreplace.rpmnew', 'changed');
-    ok(unlink "$::pwd/root/etc/config.rpmorig");
-    ok(unlink "$::pwd/root/etc/config-noreplace.rpmsave");
-    ok(unlink "$::pwd/root/etc/config-noreplace.rpmnew");
+    ok(unlink("$::pwd/root/etc/config.rpmorig"), 'unlink .rpmorig');
+    ok(unlink("$::pwd/root/etc/config-noreplace.rpmsave"), 'unlink .rpmsave');
+    ok(unlink("$::pwd/root/etc/config-noreplace.rpmnew"), 'unlink .rpmnew');
 
     check_no_etc_files();
 }

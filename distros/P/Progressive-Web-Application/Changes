@@ -2,3 +2,6 @@ Revision history for Progressive-Web-Application
 
 0.01    2019-07-27
         First version.
+
+0.01    2020-04-15
+	- fix failing test t/01-tools.t, for environments that use a non-english locale

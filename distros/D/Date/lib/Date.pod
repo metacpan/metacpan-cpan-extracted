@@ -2,15 +2,7 @@
 
 Date - extremely fast Date framework with timezones, microseconds, relative dates and intervals support.
 
-=head1 DESCRIPTION
 
-Date is a port of C++ C<panda::date> framework which is complete feature-rich date framework, supporting timezones (not just offsets), microseconds,
-relative dates and intervals. Timezones with leap seconds (right/*) are also supported.
-
-L<Date> supports dates between -2147483648/01/01 00:00:00 and 2147483647/12/31 23:59:59 (on 64bit perls).
-
-With L<Date> you can perform some operations even faster than in plain C program using stdlibc functions because it has its own efficient 
-low-level time functions implementation.
 
 =head1 SYNOPSIS
 
@@ -152,6 +144,26 @@ low-level time functions implementation.
     print date("2001-01-29") + '1M' - '1M'; # gives "2001-02-01"
     print date("2000-02-29") + '1Y' - '1Y'; # gives "2000-03-01"
 
+    #strict mode
+    {
+        use Date::strict;
+        my $d = Date->new("invalid date"); # throws
+        my $rel = Date::Rel->new("1X"); # throws
+        $d += "1X"; # throws
+    }
+
+
+
+=head1 DESCRIPTION
+
+Date is a port of C++ C<panda::date> framework which is complete feature-rich date framework, supporting timezones (not just offsets), microseconds,
+relative dates and intervals. Timezones with leap seconds (right/*) are also supported.
+
+L<Date> supports dates between -2147483648/01/01 00:00:00 and 2147483647/12/31 23:59:59 (on 64bit perls).
+
+With L<Date> you can perform some operations even faster than in plain C program using stdlibc functions because it has its own efficient 
+low-level time functions implementation.
+
 
 
 =head1 CLASS METHODS
@@ -218,15 +230,24 @@ Only C locale supported.
 
     DD.MM.YYYY
 
+=item Comman Log Format
+
+    dd/MMM/yyyy:hh:mm:ss +-hhmm
+    [dd/MMM/yyyy:hh:mm:ss +-hhmm]
+
+Only C locale supported.
+
 =back
 
 If timezone offset designator is present inside string, the date is created in unnamed timezone with constant offset from GMT (no transition rules).
 C<$timezone> parameter is ignored in this case.
 
 You can limit the number of allowed formats by passing C<$format> argument, which is the bitmask of the following constants:
-INPUT_FORMAT_ALL(the default), INPUT_FORMAT_ISO, INPUT_FORMAT_ISO8601, INPUT_FORMAT_RFC1123, INPUT_FORMAT_RFC850, INPUT_FORMAT_ANSI_C, INPUT_FORMAT_DOT.
+INPUT_FORMAT_ALL(the default), INPUT_FORMAT_ISO, INPUT_FORMAT_ISO8601, INPUT_FORMAT_RFC1123, INPUT_FORMAT_RFC850, INPUT_FORMAT_ANSI_C, INPUT_FORMAT_DOT, INPUT_FORMAT_CLF.
 
-If C<$string> is an invalid date or a valid date but in format other than specified, then C<error()> is set to C<Date::Error::parser_error>
+If C<$string> is an invalid date or a valid date but in format other than specified, then C<error()> is set to C<Date::Error::parser_error>.
+
+If you want it to throw an exception on invalid inputs, see L<Date::strict>.
 
 
 =head4 new_ymd(%ymdhms)
@@ -477,6 +498,14 @@ same as rfc1123
 
     23:59:59
 
+=item Date::FORMAT_CLF
+
+    10/Oct/1999:21:15:05 +0500
+
+=item Date::FORMAT_CLF_BRACKETS
+
+    [10/Oct/1999:21:15:05 +0500]
+
 =back
 
 
@@ -602,7 +631,7 @@ Returns the number of days in month
 
 =head4 error()
 
-Returns error occured during creating or cloning object (if any) as XS::STL::ErrorCode object.
+Returns error occured during creating or cloning object (if any) as L<XS::STL::ErrorCode> object.
 
 
 =head4 truncated()
@@ -834,7 +863,7 @@ Like C<timelocal()> but runs calculations in timezone C<$timezone> instead of lo
 
 =head4 Date::Error::parser_error
 
-Wrong date string format
+Wrong date or relative date string format
 
 =head4 Date::Error::out_of_range
 
@@ -902,6 +931,16 @@ For example:
 Serializes to C<epoch()>
 
 =back
+
+
+
+=head1 PACKAGES
+
+C<Date> (this package)
+
+L<Date::Rel> - relative date object
+
+L<Date::strict> - enable/disable strict mode
 
 
 

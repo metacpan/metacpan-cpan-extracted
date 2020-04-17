@@ -9,7 +9,7 @@ use Test::More;
 plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/str/str_normalize_cryptoexchange_account.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/normalize_cryptoexchange_account.pm',
     'Data/Sah/CoerceBundle/App/cryp.pm'
 );
 

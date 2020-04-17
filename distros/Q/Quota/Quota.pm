@@ -22,12 +22,11 @@ require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
 @EXPORT = ();
 
-$VERSION = '1.7.4';
+$VERSION = '1.8.0';
 
 bootstrap Quota;
 
 use Carp;
-use POSIX qw(:errno_h);
 use strict;
 
 ##
@@ -107,31 +106,6 @@ sub getqcarg {
   $ret;
 }
 
-##
-##  Translate error codes of quotactl syscall and ioctl
-##
-
-sub strerr {
-  ($#_ != -1) && croak("Usage: Quota::strerr()");
-  my($str);
-
-  eval {
-    if(($! == &EINVAL) || ($! == &ENOTTY) || ($! == &ENOENT) || ($! == ENOSYS))
-                         { $str = "No quotas on this system" }
-    elsif($! == &ENODEV) { $str = "Not a standard file system" }
-    elsif($! == &EPERM)  { $str = "Not privileged" }
-    elsif($! == &EACCES) { $str = "Access denied" }
-    elsif($! == &ESRCH)  { $str = "No quota for this user" }
-    elsif($! == &EUSERS) { $str = "Quota table overflow" }
-    else { die "unknown quota error\n" }
-  };
-  if($@) {
-    my($err) = $! + 0;
-    $str = "error #$err";
-  };
-  $str;
-}
-
 package Quota; # return to package Quota so AutoSplit is happy
 1;
 __END__
@@ -188,13 +162,13 @@ real uid.
 
 The type of I<$dev> varies from system to system. It's the argument
 which is used by the B<quotactl> implementation to address a specific
-file system. It may be the path of a device file (e.g. B</dev/sd0a>)
+file system. It may be the path of a device file (e.g. F</dev/sd0a>)
 or the path of the mount point or the quotas file at the top of
-the file system (e.g. B</home.stand/quotas>). However you do not
+the file system (e.g. F</home.stand/quotas>). However you do not
 have to worry about that; use B<Quota::getqcarg> to automatically
 translate any path inside a file system to the required I<$dev> argument.
 
-I<$dev> may also be in the form of B<hostname:path>, which has the
+I<$dev> may also be in the form of C<"hostname:path">, which has the
 module transparently query the given host via a remote procedure call
 (RPC). In case you have B<NFS> (or similar network mounts), this type
 of argument may also be produced by B<Quota::getqcarg>. Note: RPC
@@ -208,10 +182,10 @@ inodes after I<$bt> or I<$it> is reached. These times are expressed
 as usual, i.e. in elapsed seconds since 00:00 1/Jan/1970 GMT.
 
 Note: When the quota limits are not exceeded, the timestamps
-are meaningless and should be ignored. When hard and soft
-limits are zero, there is no limit for that user. On most
-systems Quota::query will return undef in that case and
-errno will be set to ESRCH.
+are meaningless and should be ignored.  When hard and soft limits are
+both zero, this means there is no limit for that user. (On some
+platforms the query may fail with error code I<ESRCH> in that case;
+most however still report valid usage values.)
 
 When I<$kind> is given and set to 1, the value in I<$uid> is taken as
 gid and group quotas are queried. Group quotas may not be supported
@@ -231,10 +205,10 @@ values larger or equal to 2^32 on 32-bit Perl versions, pass them
 either as strings or floating point.
 
 I<$tlo> decides how the time limits are initialized:
-I<0>: The time limits are set to B<NOT STARTED>, i.e. the time limits
+I<0>: The time limits are set to I<NOT STARTED>, i.e. the time limits
 are not initialized until the first write attempt by this user.
 This is the default.
-I<1>: The time limits are set to B<7.0 days>.
+I<1>: The time limits are set to I<7.0 days>.
 More alternatives (i.e. setting a specific time) aren't available in
 most implementations.
 
@@ -255,7 +229,7 @@ Note that you cannot set quotas via RPC.
 
 Have the kernel update the quota file on disk or all quota files
 if no argument given (the latter doesn't work on all systems,
-in particular on B<HP-UX 10.10>).
+in particular on I<HP-UX 10.10>).
 
 The main purpose of this function is to check if quota is enabled
 in the kernel and for a particular file system. Read the B<quotaon(1m)>
@@ -269,7 +243,7 @@ This is not a bug in this module; it's a limitation in certain kernels.
 
 I<Quota::rpcquery($host,$path,$uid,$kind)>
 
-This is equivalent to B<Quota::query("$host:$path",$uid,$kind)>, i.e.
+This is equivalent to C<Quota::query("$host:$path",$uid,$kind)>, i.e.
 query quota for a given user on a given remote host via RPC.
 I<$path> is the path of any file or directory inside the
 file system on the remote host.
@@ -331,9 +305,9 @@ module-internal variables.
 
 Returns the next entry in the system mount table. This table contains
 information about all currently mounted (local or remote) file systems.
-The format and location of this table (e.g. B</etc/mtab>) vary from
+The format and location of this table (e.g. F</etc/mtab>) vary from
 system to system. This function is provided as a compatible way to
-parse it. (On some systems, like B<OSF/1>, this table isn't
+parse it. (On some systems, like I<OSF/1>, this table isn't
 accessible as a file at all, i.e. only via B<Quota::getmntent>).
 
 =item I<Quota::endmntent()>
@@ -344,7 +318,7 @@ Always returns undef.
 
 =item I<Quota::strerr()>
 
-Translates B<$!> to a quota-specific error text. You should always
+Translates C<$!> to a quota-specific error text. You should always
 use this function to output error messages, since the normal messages
 don't always make sense for quota errors
 (e.g. I<ESRCH>: B<No such process>, here: B<No quota for this user>)
@@ -357,7 +331,7 @@ Quota command directly before which returned an error indication.
 =head1 RETURN VALUES
 
 Functions that are supposed return lists or scalars, return I<undef> upon
-errors. As usual B<$!> contains the error code (see B<Quota::strerr>).
+errors. As usual C<$!> contains the error code (see B<Quota::strerr>).
 
 B<Quota::endmntent> always returns I<undef>.
 All other functions return 0 upon success, non-zero integer otherwise.
@@ -392,6 +366,10 @@ GNU General Public License as published by the Free Software Foundation.
 For a copy of these licenses see <http://www.opensource.org/licenses/>.
 The respective authors of the source code are it's owner in regard to
 copyright.
+
+A repository for sources of this module is at
+<https://github.com/tomzox/Perl-Quota>. In April 2020 the module has
+been ported to Python: <https://github.com/tomzox/Python-Quota>
 
 =head1 SEE ALSO
 

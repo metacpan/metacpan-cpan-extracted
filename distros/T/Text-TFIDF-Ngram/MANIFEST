@@ -9,6 +9,7 @@ README
 README.md
 dist.ini
 eg/analyze
+eg/linkage
 lib/Text/TFIDF/Ngram.pm
 t/00-compile.t
 t/01-methods.t

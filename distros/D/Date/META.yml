@@ -9,14 +9,14 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0'
   Test::Simple: '0.96'
-  XS::Framework: v1.2.9
+  XS::Framework: v1.3.0
   XS::libcatch: v1.1.0
   XS::libpanda: v1.3.14
   next::XS: v1.0.7
 configure_requires:
   Export::XS: v3.0.4
   Test::Catch: v1.0.13
-  XS::Framework: v1.2.9
+  XS::Framework: v1.3.0
   XS::Install: v1.2.16
   XS::libcatch: v1.1.0
   XS::libpanda: v1.3.14
@@ -34,9 +34,9 @@ no_index:
     - inc
 requires:
   Export::XS: v3.0.4
-  XS::Framework: v1.2.9
+  XS::Framework: v1.3.0
   XS::Install: v1.2.16
   XS::libpanda: v1.3.14
   next::XS: v1.0.7
-version: v5.0.4
+version: v5.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

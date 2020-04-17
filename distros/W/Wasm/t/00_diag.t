@@ -11,7 +11,6 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Alien::wasmtime
-  Carp::Assert
   Convert::Binary::C
   Devel::GlobalDestruction
   ExtUtils::MakeMaker
@@ -20,12 +19,10 @@ $modules{$_} = $_ for qw(
   FFI::Platypus::Buffer
   FFI::Platypus::Record
   Path::Tiny
-  PeekPoke::FFI
   Ref::Util
   Sub::Install
   Test2::API
   Test2::V0
-  Test::Script
 );
 
 $post_diag = sub {

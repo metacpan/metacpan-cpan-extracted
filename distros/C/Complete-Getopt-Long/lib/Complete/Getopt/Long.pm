@@ -1,9 +1,9 @@
 package Complete::Getopt::Long;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-10'; # DATE
+our $DATE = '2020-04-16'; # DATE
 our $DIST = 'Complete-Getopt-Long'; # DIST
-our $VERSION = '0.477'; # VERSION
+our $VERSION = '0.478'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,11 +31,11 @@ sub _default_completion {
     my $word = $args{word} // '';
 
     my $fres;
-    log_trace('[comp][compgl] entering default completion routine') if $COMPLETE_GETOPT_LONG_TRACE;
+    log_trace('[compgl] entering default completion routine') if $COMPLETE_GETOPT_LONG_TRACE;
 
     # try completing '$...' with shell variables
     if ($word =~ /\A\$/ && $COMPLETE_GETOPT_LONG_DEFAULT_ENV) {
-        log_trace('[comp][compgl] completing shell variable') if $COMPLETE_GETOPT_LONG_TRACE;
+        log_trace('[compgl] completing shell variable') if $COMPLETE_GETOPT_LONG_TRACE;
         {
             my $compres = Complete::Env::complete_env(
                 word=>$word);
@@ -48,7 +48,7 @@ sub _default_completion {
 
     # try completing '~foo' with user dir (appending / if user's home exists)
     if ($word =~ m!\A~([^/]*)\z! && $COMPLETE_GETOPT_LONG_DEFAULT_FILE) {
-        log_trace("[comp][compgl] completing userdir, user=%s", $1) if $COMPLETE_GETOPT_LONG_TRACE;
+        log_trace("[compgl] completing userdir, user=%s", $1) if $COMPLETE_GETOPT_LONG_TRACE;
         {
             eval { require Unix::Passwd::File };
             last if $@;
@@ -70,7 +70,7 @@ sub _default_completion {
     # expand ~foo (this is supported by complete_file(), so we just give it off
     # to the routine)
     if ($word =~ m!\A(~[^/]*)/! && $COMPLETE_GETOPT_LONG_DEFAULT_FILE) {
-        log_trace("[comp][compgl] completing file, path=<%s>", $word) if $COMPLETE_GETOPT_LONG_TRACE;
+        log_trace("[compgl] completing file, path=<%s>", $word) if $COMPLETE_GETOPT_LONG_TRACE;
         $fres = Complete::Util::hashify_answer(
             Complete::File::complete_file(word=>$word),
             {path_sep=>'/'}
@@ -83,7 +83,7 @@ sub _default_completion {
     # treated like [AB]*.
     require String::Wildcard::Bash;
     if (String::Wildcard::Bash::contains_wildcard($word) && $COMPLETE_GETOPT_LONG_DEFAULT_FILE) {
-        log_trace("[comp][compgl] completing with wildcard glob, glob=<%s>", "$word*") if $COMPLETE_GETOPT_LONG_TRACE;
+        log_trace("[compgl] completing with wildcard glob, glob=<%s>", "$word*") if $COMPLETE_GETOPT_LONG_TRACE;
         {
             my $compres = [glob("$word*")];
             last unless @$compres;
@@ -97,7 +97,7 @@ sub _default_completion {
     }
 
     if ($COMPLETE_GETOPT_LONG_DEFAULT_FILE) {
-        log_trace("[comp][compgl] completing with file, file=<%s>", $word) if $COMPLETE_GETOPT_LONG_TRACE;
+        log_trace("[compgl] completing with file, file=<%s>", $word) if $COMPLETE_GETOPT_LONG_TRACE;
         $fres = Complete::Util::hashify_answer(
             Complete::File::complete_file(word=>$word),
             {path_sep=>'/'}
@@ -105,7 +105,7 @@ sub _default_completion {
     }
 
   RETURN_RES:
-    log_trace("[comp][compgl] leaving default completion routine, result=%s", $fres) if $COMPLETE_GETOPT_LONG_TRACE;
+    log_trace("[compgl] leaving default completion routine, result=%s", $fres) if $COMPLETE_GETOPT_LONG_TRACE;
     $fres;
 }
 
@@ -316,7 +316,7 @@ sub complete_cli_arg {
         $gospec = $ary_gospec;
     }
 
-    log_trace('[comp][compgl] entering %s(), words=%s, cword=%d, word=<%s>',
+    log_trace('[compgl] entering %s(), words=%s, cword=%d, word=<%s>',
               $fname, \@words, $cword, $words[$cword]) if $COMPLETE_GETOPT_LONG_TRACE;
 
     # strip hash storage from getopt_spec
@@ -576,8 +576,9 @@ sub complete_cli_arg {
                 if ($i+1 < @words && $words[$i+1] eq '=') {
                     $i++;
                     $expects[$i] = {separator=>1, optval=>$opt, word=>'', nth=>$nth};
-                    # force a value due to =
-                    if (!$max_vals) { $min_vals = $max_vals = 1 }
+                    # force expecting a value due to =
+                    $min_vals = 1;
+                    $max_vals = $min_vals if $max_vals < $min_vals;
                 }
 
                 for (1 .. $min_vals) {
@@ -620,6 +621,7 @@ sub complete_cli_arg {
     my $exp = $expects[$cword];
     my $word = $exp->{word} // $words[$cword];
 
+    #use DD; say "D:opts: "; dd \%opts;
     #use DD; print "D:words: "; dd \@words;
     #say "D:cword: $cword";
     #use DD; print "D:expects: "; dd \@expects;
@@ -686,7 +688,7 @@ sub complete_cli_arg {
             array => \@o, word => $word,
             (summaries => \@osumms) x !!$o_has_summaries,
         );
-        log_trace('[comp][compgl] adding result from option names, '.
+        log_trace('[compgl] adding result from option names, '.
                       'matching options=%s', $compres) if $COMPLETE_GETOPT_LONG_TRACE;
         push @answers, $compres;
         if (!exists($exp->{optval}) && !exists($exp->{arg})) {
@@ -710,17 +712,17 @@ sub complete_cli_arg {
         );
         my $compres;
         if ($comp) {
-            log_trace("[comp][compgl] invoking routine supplied from 'completion' argument to complete option value, option=<%s>", $opt) if $COMPLETE_GETOPT_LONG_TRACE;
+            log_trace("[compgl] invoking routine supplied from 'completion' argument to complete option value, option=<%s>", $opt) if $COMPLETE_GETOPT_LONG_TRACE;
             $compres = $comp->(%compargs);
             Complete::Util::modify_answer(answer=>$compres, prefix=>$exp->{prefix})
                 if defined $exp->{prefix};
-            log_trace('[comp][compgl] adding result from routine: %s', $compres) if $COMPLETE_GETOPT_LONG_TRACE;
+            log_trace('[compgl] adding result from routine: %s', $compres) if $COMPLETE_GETOPT_LONG_TRACE;
         }
         if (!$compres || !$comp) {
             $compres = _default_completion(%compargs);
             Complete::Util::modify_answer(answer=>$compres, prefix=>$exp->{prefix})
                 if defined $exp->{prefix};
-            log_trace('[comp][compgl] adding result from default '.
+            log_trace('[compgl] adding result from default '.
                           'completion routine') if $COMPLETE_GETOPT_LONG_TRACE;
         }
         push @answers, $compres;
@@ -736,22 +738,22 @@ sub complete_cli_arg {
             argpos=>$exp->{argpos}, seen_opts=>\%seen_opts,
             parsed_opts=>\%parsed_opts,
         );
-        log_trace('[comp][compgl] invoking \'completion\' routine '.
+        log_trace('[compgl] invoking \'completion\' routine '.
                       'to complete argument') if $COMPLETE_GETOPT_LONG_TRACE;
         my $compres; $compres = $comp->(%compargs) if $comp;
         if (!defined $compres) {
             $compres = _default_completion(%compargs);
-            log_trace('[comp][compgl] adding result from default '.
+            log_trace('[compgl] adding result from default '.
                           'completion routine: %s', $compres) if $COMPLETE_GETOPT_LONG_TRACE;
         }
         push @answers, $compres;
     }
 
-    log_trace("[comp][compgl] combining result from %d source(s)", scalar @answers) if $COMPLETE_GETOPT_LONG_TRACE;
+    log_trace("[compgl] combining result from %d source(s)", scalar @answers) if $COMPLETE_GETOPT_LONG_TRACE;
     $fres = Complete::Util::combine_answers(@answers) // [];
 
   RETURN_RES:
-    log_trace("[comp][compgl] leaving %s(), result=%s", $fname, $fres) if $COMPLETE_GETOPT_LONG_TRACE;
+    log_trace("[compgl] leaving %s(), result=%s", $fname, $fres) if $COMPLETE_GETOPT_LONG_TRACE;
     $fres;
 }
 
@@ -770,7 +772,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.477 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2020-04-10.
+This document describes version 0.478 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2020-04-16.
 
 =head1 SYNOPSIS
 

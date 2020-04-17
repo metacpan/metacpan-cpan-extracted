@@ -10,7 +10,7 @@ use Devel::GlobalDestruction ();
 use base qw( Exporter );
 
 # ABSTRACT: Private class for Wasm::Wasmtime
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 our @EXPORT = qw( $ffi $ffi_prefix _generate_vec_class _generate_destroy );
@@ -176,6 +176,98 @@ if($ffi->find_symbol('wasmtime_error_message'))
   });
 }
 
+{ package Wasm::Wasmtime::CBC;
+
+  use Convert::Binary::C;
+  use base qw( Exporter );
+
+  our @EXPORT_OK = qw( perl_to_wasm wasm_to_perl wasm_allocate wasm_type wasm_memcpy );
+
+  $INC{'Wasm/Wasmtime/CBC.pm'} = __FILE__;
+
+  # CBC is probably not how we want to do this long term, but atm
+  # Platypus does not support Unions or arrays of records so.
+  our $cbc = Convert::Binary::C->new(
+    Alignment => 8,
+    LongSize => 8, # CBC does not apparently use the native alignment by default *sigh*
+  );
+  $cbc->parse(q{
+    typedef struct wasm_val_t {
+      unsigned char kind;
+      union {
+        signed int i32;
+        signed long i64;
+        float f32;
+        double f64;
+        void *anyref;
+        void *funcref;
+      } of;
+    } wasm_val_t;
+    typedef wasm_val_t wasm_val_vec_t[];
+  });
+
+  sub perl_to_wasm
+  {
+    my $vals = shift;
+    my $types = shift;
+    $cbc->pack('wasm_val_vec_t', [map {
+      {
+        kind => $_->kind_num,
+        of => {
+          $_->kind => shift @$vals,
+        }
+      }
+    } @$types]);
+  }
+
+  my %kind = (
+    0   => 'i32',
+    1   => 'i64',
+    2   => 'f32',
+    3   => 'f64',
+    128 => 'anyref',
+    129 => 'funcref',
+  );
+
+  sub wasm_to_perl
+  {
+    my $vals = shift;
+    map {
+      $_->{of}->{$kind{$_->{kind}}};
+    } @{ $cbc->unpack('wasm_val_vec_t', $vals) };
+  }
+
+  my $size = $cbc->sizeof('wasm_val_t');
+
+  sub wasm_allocate
+  {
+    my $count = shift;
+    $count ? "\0" x ($count * $size) : undef;
+  }
+
+  sub wasm_type
+  {
+    my $count = shift || 0;
+    my $name = "x_wasm_" . $count;
+    eval { $ffi->type($name) };
+    if($@)
+    {
+      $ffi->type(
+        $count > 0 ? 'string(' . ($count * $size) . ')*' : 'opaque',
+        $name,
+      );
+    }
+    $name;
+  }
+
+  my $ffi2 = FFI::Platypus->new( api => 1, lib => [undef] );
+  $ffi2->attach( [ memcpy => 'wasm_memcpy' ] => ['opaque','string','size_t'] => 'opaque' => sub {
+    my $xsub = shift;
+    $xsub->($_[0], $_[1], length $_[1]);
+  });
+
+}
+
 1;
 
 __END__
@@ -190,7 +282,7 @@ Wasm::Wasmtime::FFI - Private class for Wasm::Wasmtime
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

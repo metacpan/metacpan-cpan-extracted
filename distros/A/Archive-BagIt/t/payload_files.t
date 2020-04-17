@@ -21,6 +21,7 @@ my @ROOT = grep {length} 'src';
 
 
 my $SRC_BAG = File::Spec->catdir( @ROOT, 'src_bag');
+my $SRC_BAG_DEEP = File::Spec->catdir( @ROOT, 'src_bag_deep');
 my $SRC_FILES = File::Spec->catdir( @ROOT, 'src_files');
 my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
 
@@ -36,6 +37,17 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
 
   ok($result,     "Bag verifies");
 }
+
+{
+  my $bag = $Class->new($SRC_BAG_DEEP);
+  ok($bag,        "Object created");
+  isa_ok ($bag,   $Class);
+
+  my $result = $bag->verify_bag();
+
+  ok($result,     "deep Bag verifies");
+}
+
 
 {
   mkdir($DST_BAG);

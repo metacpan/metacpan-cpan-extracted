@@ -58,8 +58,7 @@ Options:
 4)  Compile the module: make
 
 5)  Run "make test" to check if the module routines do work correctly.
-    For testing group quotas run script test-group.pl (GID and path
-    are hard-coded in this script, so you'll likely have to edit it.)
+    Run the script once for user-quota and once group-quota, if needed.
 
 6)  Linux specials:
 

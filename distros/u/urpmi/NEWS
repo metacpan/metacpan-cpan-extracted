@@ -1,10 +1,26 @@
+Version 8.121 - 8 April 2020
+
+- urpmi:
+  o add support for --reinstall
+- urpmq:
+  o display epoch when using -i (mga#25735)
+- library:
+  o add dummy urpmi.pm package for CPAN & proper indexation (RT#127881)
 - cpan_testers:
   o actually needs perl >= 5.10 for //= operator
+  o fix a test with rpm < 4.13.0
+  o fix building rpms on FreeBSD
   o fix failing scriptlets test with rpm < 4.13.0
+  o fix looking for non existing libnss.so on FreeBSD
   o fix testsuite errors on CentOs (NVR vs NVRA)
+  o include /usr/local/bin in PATH
+  o require a newer enough Test::More & rpmtools
   o skip mirrorlist tests on !Mageia
   o skip tests if we have no supported downloader
+  o skip weak deps test on CentOS 7 (unsupported)
   o testsuite needs rpmtools
+  o workaround disabled nobody account (eg on CentOS7)
+  o workaround 'nogroup' not existing on CentOS
 
 Version 8.120 - 21 October 2019
 

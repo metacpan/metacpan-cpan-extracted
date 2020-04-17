@@ -1,0 +1,10 @@
+Revision history for Module-Generate
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    2020-04-15
+	- Move documentation to a .pod file.
+
+0.04    2020-04-16
+	- Persistant order for subroutine definitions

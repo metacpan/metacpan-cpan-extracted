@@ -1,0 +1,145 @@
+
+=head1 NAME
+
+Test::OpenTracing::Interface - Test OpenTracing::Interface compliance
+
+
+
+=head1 SYNOPSIS
+
+    use Test::OpenTracing::Interface::Tracer qw/:all/;
+    
+    can_all_ok 'MyImplementation::Tracer',
+        "MyImplementation Class has all methods defined";
+
+
+
+=head1 DESCRIPTION
+
+This package contains mutiple tests that can be used for proving compliance with
+the L<OpenTracing::Interface> API definition. That definition is written as POD
+documentation. It allows any developer - conform TIMTOWDI - to write their own
+implementation, with their own prefered tools and technology. However, to ensure
+that such implementations will work with L<OpenTracing::Implementation> and the
+L<OpenTracing::GlobalTracer>, any implementation should run the tests provided
+here.
+
+
+
+=head1 INDEX
+
+To C<use> these tests, they are contained in seperate packages. Usually, testing
+one part of the implementation just matches the named packages. The following
+are included:
+
+=over
+
+=item L<Test::OpenTracing::Interface::ContextReference>
+
+=item L<Test::OpenTracing::Interface::Scope>
+
+=item L<Test::OpenTracing::Interface::ScopeManager>
+
+=item L<Test::OpenTracing::Interface::Span>
+
+=item L<Test::OpenTracing::Interface::SpanContext>
+
+=item L<Test::OpenTracing::Interface::Tracer>
+
+=back
+
+
+
+=head1 EXPORTED FUNCTIONS
+
+Each of the packages mentioned above exports the following functions:
+
+=head2 C<can_all_ok( $thing, $message )>
+
+    use Test::OpenTracing::Interface::SomeThing;
+    
+    can_all_ok 'MyImplementation::SomeThing',
+        "SomeThing class has all methods defined";
+    
+    my $test_thing = MyImplementation::SomeThing->new( ... );
+    
+    can_all_ok $test_thing, "TestThing object has all required methods";
+
+Much like L<Test::Most>, this does thest that a class or object 'can' do 'all'
+the required methods as defined in the L<OpenTracing::Interface> API. But
+without having to know what actually needs to be there.
+
+A failing test will report what methods are missing like:
+C<< "$test_thing->can('$method_name') failed" >>.
+
+=head3 Required Positional Parameter
+
+=over
+
+=item C<$thing>
+
+The ClassName or Object that needs be tested. Must be a C<ClassName> or
+C<Object> from L<Types::Standard>.
+
+=back
+
+=head3 Optional Positional Parameter
+
+=over
+
+=item C<$messsge>
+
+The message to display for passing or failing tests. Must be of type C<Str>.
+
+=back
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Test::More>
+
+For all your testing information.
+
+=item L<OpenTracing::Interface>
+
+The definit guide for the OpenTracing API for the Perl programming language.
+
+=item L<Test::OpenTracing::Interface::ContextReference>
+
+=item L<Test::OpenTracing::Interface::Scope>
+
+=item L<Test::OpenTracing::Interface::ScopeManager>
+
+=item L<Test::OpenTracing::Interface::Span>
+
+=item L<Test::OpenTracing::Interface::SpanContext>
+
+=item L<Test::OpenTracing::Interface::Tracer>
+
+=back
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'Test OpenTracing' is Copyright (C) 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+

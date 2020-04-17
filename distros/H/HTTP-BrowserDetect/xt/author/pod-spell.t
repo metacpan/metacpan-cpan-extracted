@@ -24,6 +24,7 @@ Barr
 Bilodeau
 Blake
 BrowserDetect
+CGI
 Cebrin
 Christopher
 Ciornii
@@ -32,6 +33,7 @@ David
 Deltac
 Douglas
 Doye
+Elep
 Findlay
 Firebird
 Florian
@@ -96,6 +98,7 @@ Wilson
 WinNT
 Wu
 Yoshiki
+Zak
 Zarei
 adm
 ahrefs
@@ -129,6 +132,7 @@ galeon
 gbarr
 getright
 golib
+google
 googleadsbot
 googleadsense
 googlebot
@@ -171,6 +175,7 @@ lycos
 macosx
 macppc
 maintainer
+malware
 maros
 merlynkline
 mj
@@ -227,3 +232,4 @@ yandexbot
 yandeximages
 yeahoffline
 ymgsmz
+zakame

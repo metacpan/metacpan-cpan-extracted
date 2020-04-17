@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Core
-$Bio::MUST::Core::Types::VERSION = '0.200510';
+$Bio::MUST::Core::Types::VERSION = '0.201060';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -103,7 +103,8 @@ coerce 'Bio::MUST::Core::Types::Seq'
 # subtype for a stringified NCBI Taxonomy lineage
 subtype 'Bio::MUST::Core::Types::Lineage'
     => as 'Str'
-    => where { tr/;// || m/\A cellular \s organisms/xms || m/\A Viruses/xms }
+    => where { tr/;// || m/\A cellular \s organisms/xms || m/\A Viruses/xms
+        || m/\A other \s sequences/xms || m/\A unclassified \s sequences/xms }
 ;
 
 class_type('Path::Class::Dir');
@@ -221,7 +222,7 @@ Bio::MUST::Core::Types - Distribution-wide Moose types for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.200510
+version 0.201060
 
 =head1 SYNOPSIS
 

@@ -18,11 +18,12 @@ the way of the dodo. This release uses the NED service, which is similar
 but simpler. When the change was made, code was installed to ease the
 transition by emulating the old service to the extent possible. This
 code was deprecated pretty much when it was released as 0.100_01 in July
-of 2014. With release 0.115_01 use of any of the compatibility code,
-including the C<'compatible'> attribute itself, results in a fatal
-error. In another six months, all the compatibility machinery will be
-stripped, and we will left with a reasonably-pure interface to the NED
-service.
+of 2014.
+
+With the release of 0.116_01 all this compatibility code has been
+removed. Specifically, methods C<getElevation()> and
+C<getAllElevations()> are gone, as are attributes C<compatible>,
+C<default_ns>, C<proxy>, C<source>, and C<use_all_limit>.
 
 =head1 DESCRIPTION
 
@@ -35,14 +36,14 @@ an error by an undef response, with the error retrievable from the
 'error' attribute.
 
 For documentation on the underlying web service, see
-L<http://nationalmap.gov>.
+L<https://nationalmap.gov>.
 
 For all methods, the input latitude and longitude are documented at the
 above web site as being WGS84, which for practical purposes I understand
 to be equivalent to NAD83. The vertical reference is not documented
 under the above link, but correspondence with the USGS says that it is
 derived from the National Elevation Dataset (NED; see
-L<http://nationalmap.gov>). This is referred to NAD83 (horizontal) and
+L<https://nationalmap.gov>). This is referred to NAD83 (horizontal) and
 NAVD88 (vertical). NAVD88 is based on geodetic leveling surveys, B<not
 the WGS84/NAD83 ellipsoid,> and takes as its zero datum sea level at
 Father Point/Rimouski, in Quebec, Canada. Alaska is an exception, and is
@@ -51,7 +52,7 @@ based on NAD27 (horizontal) and NAVD29 (vertical).
 Anyone interested in the gory details may find the paper I<Converting
 GPS Height into NAVD88 Elevation with the GEOID96 Geoid Height Model> by
 Dennis G. Milbert, Ph.D. and Dru A. Smith, Ph.D helpful. This is
-available at L<http://www.ngs.noaa.gov/PUBS_LIB/gislis96.html>. This
+available at L<https://www.ngs.noaa.gov/PUBS_LIB/gislis96.html>. This
 paper states that the difference between ellipsoid and geoid heights
 ranges between -75 and +100 meters globally, and between -53 and -8
 meters in "the conterminous United States."
@@ -75,9 +76,8 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.116';
+our $VERSION = '0.117';
 
-use constant BEST_DATA_SET => -1;
 # use constant USGS_URL => 'https://ned.usgs.gov/epqs/pqs.php';
 use constant USGS_URL => 'https://nationalmap.gov/epqs/pqs.php';
 
@@ -133,21 +133,15 @@ sub new {
     shift;
     my $self = {
 	carp	=> 0,
-	compatible	=> 0,
 	croak	=> 1,
-	default_ns	=> 'http://gisdata.usgs.gov/XMLWebServices2/',
 	error	=> undef,
 	places	=> undef,
-	proxy	=>
-	    'http://gisdata.usgs.gov/XMLWebServices2/Elevation_Service.asmx',
 	retry	=> 0,
 	retry_hook => sub {},
-	source	=> BEST_DATA_SET,
 	timeout	=> 30,
 	trace	=> undef,
 	units	=> 'FEET',
 	usgs_url	=> $ENV{GEO_WEBSERVICE_ELEVATION_USGS_URL} || USGS_URL,
-	use_all_limit => 5,
     };
     bless $self, $class;
     @args and $self->set(@args);
@@ -157,20 +151,15 @@ sub new {
 my %mutator = (
     croak	=> \&_set_literal,
     carp	=> \&_set_literal,
-    compatible	=> \&_set_literal,
-    default_ns	=> \&_set_literal,
     error	=> \&_set_literal,
     places	=> \&_set_integer_or_undef,
-    proxy	=> \&_set_literal,
     retry	=> \&_set_unsigned_integer,
     retry_hook	=> \&_set_hook,
-    source	=> \&_set_source,
     throttle	=> \&_set_throttle,
     timeout	=> \&_set_integer_or_undef,
     trace	=> \&_set_literal,
     units	=> \&_set_literal,
     usgs_url	=> \&_set_literal,
-    use_all_limit => \&_set_integer,
 );
 
 my %access_type = (
@@ -214,28 +203,12 @@ hash will contain the following keys:
 
 {y} => The C<$lat> argument.
 
-For compatibility with versions of this module before C<0.100>, this
-method behaves slightly differently if the L<compatible|/compatible>
-attribute is true:
-
-* The C<{Data_ID}> key of the return will be set to the value of the
-{Data_Source} key;
-
-* The C<{Units}> key will be converted to upper case;
-
-* If called in scalar context the return will be a reference to an array
-whose single element is the results hash.
-
-B<Note> that as of version 0.106_01, the default for this
-attribute is B<false>.
-
 You can also pass a C<Geo::Point>, C<GPS::Point>, or C<Net::GPSD::Point>
 object in lieu of the C<$lat> and C<$lon> arguments. If you do this,
 C<$valid> becomes the second argument, rather than the third.
 
 If the optional C<$valid> argument is specified and the returned data
-are invalid, nothing is returned. This means an empty array if
-L<compatible|/compatible> is true. The NAD source does not seem to
+are invalid, nothing is returned. The NAD source does not seem to
 produce data recognizable as invalid, so you will probably not see this.
 
 The NAD server appears to return an elevation of C<0> if the elevation
@@ -245,14 +218,50 @@ is unavailable.
 
 sub elevation {
     my ( $self, $lat, $lon, $valid ) = _latlon( @_ );
+    my $retry_limit = $self->get( 'retry' );
+    my $retry = 0;
 
-    my $rslt = $self->_elevation( $lat, $lon, $valid )
-	or return;
+    while ( $retry++ <= $retry_limit ) {
 
-    # TODO compatibility
-    $self->get( 'compatible' )
-	or return $rslt;
-    return wantarray ? $rslt : [ $rslt ];
+	$self->{error} = undef;
+
+	$self->_pause();
+
+	my $rslt;
+	eval {
+	    $rslt = $self->_request(
+		x	=> $lon,
+		y	=> $lat,
+		units	=> $self->{units},
+	    );
+	    1;
+	} or do {
+	    $self->_error( $@ );
+	    next;
+	};
+
+	$rslt
+	    or next;
+
+	not $valid
+	    or is_valid( $rslt )
+	    or next;
+
+	return $rslt;
+
+    } continue {
+
+	if ( $retry <= $retry_limit ) {
+	    ( my $sub = ( caller( 0 ) )[3] ) =~ s/ .* :: //smx;
+	    $self->get( 'retry_hook' )->( $self, $retry, $sub, $lat,
+		$lon );
+	}
+
+    }
+
+    $self->{croak} and croak $self->{error};
+    return;
+
 }
 
 =head3 $value = $eq->get($attribute);
@@ -272,41 +281,19 @@ sub get {
 
 =head3 $rslt = $eq->getAllElevations($lat, $lon, $valid);
 
-Starting with version 0.100, this method is essentially a wrapper for
-the C<elevation()> method. Starting with version 0.115_01, calling this
-method results in a fatal error.
+This method was removed in version 0.116_01. Please use the
+C<elevation()> method instead. See the L<NOTICE|/NOTICE> above for
+details.
 
-=cut
-
-sub getAllElevations {
-    my ( $self, $lat, $lon, $valid ) = _latlon( @_ );
-
-    _deprecate( 'subroutine' );
-
-    my $rslt = $self->_elevation( $lat, $lon, $valid )
-	or return;
-
-    return wantarray ? $rslt : [ $rslt ];
-}
 
 =head3 $rslt = $eq->getElevation($lat, $lon, $source, $elevation_only);
 
-Starting with version 0.100, this method is essentially a wrapper for
-the C<elevation()> method. Starting with version 0.115_01, calling this
-method results in a fatal error.
+This method was removed in version 0.116_01. Please use the
+C<elevation()> method instead. See the L<NOTICE|/NOTICE> above for
+details.
+
 
 =cut
-
-sub getElevation {
-    my ($self, $lat, $lon, undef, $only) = _latlon( @_ );
-
-    _deprecate( 'subroutine' );
-
-    my $rslt = $self->_elevation( $lat, $lon )
-	or return;
-
-    return $only ? $rslt->{Elevation} : $rslt;
-}
 
 =head3 $boolean = $eq->is_valid($elevation);
 
@@ -343,9 +330,8 @@ result in an exception being thrown.
 
     # Changes in these values require re-instantiating the transport
     # object. Or at least, they may do, under the following assumptions:
-    # SOAP: default_ns, proxy, timeout;
     # HTTP_Post: timeout.
-    my %clean_transport_object = map { $_ => 1 } qw{ default_ns proxy timeout };
+    my %clean_transport_object = map { $_ => 1 } qw{ timeout };
 
     sub set {	## no critic (ProhibitAmbiguousNames)
 	my ($self, @args) = @_;
@@ -374,13 +360,6 @@ sub _set_hook {
     return( $self->{$name} = $val );
 }
 
-sub _set_integer {
-    my ($self, $name, $val) = @_;
-    (!defined $val || $val !~ m/ \A [-+]? \d+ \z /smx)
-	and croak "Attribute $name must be an integer";
-    return ($self->{$name} = $val + 0);
-}
-
 sub _set_integer_or_undef {
     my ($self, $name, $val) = @_;
     (defined $val && $val !~ m/ \A \d+ \z /smx)
@@ -390,19 +369,6 @@ sub _set_integer_or_undef {
 
 sub _set_literal {
     return $_[0]{$_[1]} = $_[2];
-}
-
-{
-    my %supported = map { $_ => 1 } ARRAY_REF, CODE_REF, HASH_REF,
-	REGEXP_REF;
-
-    sub _set_source {
-	my ($self, $name, $val) = @_;
-	my $ref = ref $val;
-	($ref && !$supported{$ref})
-	    and croak "Attribute $name may not be a $ref ref";
-	return ($self->{$name} = $val);
-    }
 }
 
 sub _set_throttle {
@@ -481,59 +447,6 @@ sub _set_unsigned_integer {
 	    and $info->{item}{$item} = 0;
 	return;
     }
-}
-
-#	$rslt = $ele->_elevation( $lat, $lon, $only );
-#
-#	This is the prospective elevation(), once compatibility goes
-#	away.
-
-sub _elevation {
-    my ( $self, $lat, $lon, $valid ) = _latlon( @_ );
-    my $retry_limit = $self->get( 'retry' );
-    my $retry = 0;
-
-    while ( $retry++ <= $retry_limit ) {
-
-	$self->{error} = undef;
-
-	$self->_pause();
-
-	my $rslt;
-	eval {
-	    $rslt = $self->_request(
-		x	=> $lon,
-		y	=> $lat,
-		units	=> $self->{units},
-	    );
-	    1;
-	} or do {
-	    $self->_error( $@ );
-	    next;
-	};
-
-	$rslt
-	    or next;
-
-	not $valid
-	    or is_valid( $rslt )
-	    or next;
-
-	return $rslt;
-
-    } continue {
-
-	if ( $retry <= $retry_limit ) {
-	    ( my $sub = ( caller( 0 ) )[3] ) =~ s/ .* :: //smx;
-	    $self->get( 'retry_hook' )->( $self, $retry, $sub, $lat,
-		$lon );
-	}
-
-    }
-
-    $self->{croak} and croak $self->{error};
-    return;
-
 }
 
 #	$ele->_error($text);
@@ -697,11 +610,6 @@ sub _request {
 	and defined( $places = $self->get( 'places' ) )
 	and $rslt->{Elevation} = sprintf '%.*f', $places, $rslt->{Elevation};
 
-    if ( $self->get( 'compatible' ) ) {
-	$rslt->{Units} = uc $rslt->{Units};
-	$rslt->{Data_ID} = $rslt->{Data_Source};
-    }
-
     return $rslt;
 }
 
@@ -730,12 +638,8 @@ The default is 0 (i.e. false).
 
 =head3 compatible
 
-Boolean
-
-This Boolean attribute determines whether this object attempts to make
-returned data consistent with the old GIS server.
-
-As of version 0.115_01, any access of this attribute is fatal.  See the
+This attribute was removed in version 0.116_01. It existed to support
+interaction with the now-long-defunct GIS web service.  See the
 L<NOTICE|/NOTICE> above for details.
 
 =head3 croak
@@ -752,10 +656,9 @@ The default is 1 (i.e. true).
 
 =head3 default_ns
 
-String
-
-This attribute is deprecated. As of version 0.115.01, any access of this
-attribute is fatal. See the L<NOTICE|/NOTICE> above for details.
+This attribute was removed in version 0.116_01. It existed to support
+interaction with the now-long-defunct GIS web service.  See the
+L<NOTICE|/NOTICE> above for details.
 
 =head3 error
 
@@ -779,10 +682,9 @@ The default is undef.
 
 =head3 proxy
 
-String
-
-This attribute is deprecated. As of version 0.115_01 any access of this
-attribute is fatal. See the L<NOTICE|/NOTICE> above for details.
+This attribute was removed in version 0.116_01. It existed to support
+interaction with the now-long-defunct GIS web service.  See the
+L<NOTICE|/NOTICE> above for details.
 
 =head3 retry
 
@@ -826,8 +728,9 @@ The default is the null subroutine, i.e. C<sub {}>.
 
 =head3 source
 
-This attribute is deprecated. As of version 0.115_01 any access of this
-attribute is fatal. See the L<NOTICE|/NOTICE> above for details.
+This attribute was removed in version 0.116_01. It existed to support
+interaction with the now-long-defunct GIS web service.  See the
+L<NOTICE|/NOTICE> above for details.
 
 =head3 throttle
 
@@ -849,7 +752,7 @@ C<$TARGET>, though I don't think so.
 
 Integer, or undef
 
-This attribute specifies the timeout for the SOAP query in seconds.
+This attribute specifies the timeout for the query in seconds.
 
 The default is 30.
 
@@ -878,10 +781,9 @@ compatibility code goes away.
 
 =head3 use_all_limit
 
-Integer
-
-This attribute is deprecated. As of version 0.115_01 any access of this
-attribute is fatal. See the L<NOTICE|/NOTICE> above for details.
+This attribute was removed in version 0.116_01. It existed to support
+interaction with the now-long-defunct GIS web service.  See the
+L<NOTICE|/NOTICE> above for details.
 
 =head3 usgs_url
 
@@ -909,7 +811,7 @@ problem in my first module to rely heavily on Test::More.
 =head1 BUGS
 
 Bugs can be reported to the author by mail, or through
-L<http://rt.cpan.org/>.
+L<https://rt.cpan.org/>.
 
 =head1 SEE ALSO
 
@@ -919,7 +821,7 @@ Thomas R. Wyant, III; F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2019 Thomas R. Wyant, III
+Copyright (C) 2008-2020 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

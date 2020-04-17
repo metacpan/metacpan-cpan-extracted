@@ -1,0 +1,65 @@
+NAME
+    Java::Release - Parse Java release archive.
+
+SYNOPSIS
+     use Java::Release qw(parse_java_jdk_release);
+
+     my $release_hr = parse_java_jdk_release($file);
+
+SUBROUTINES
+  "parse_java_jdk_release"
+     my $release_hr = parse_java_jdk_release($file);
+
+    Parse Java JDK release name.
+
+    Returns reference to hash with information about release.
+
+ERRORS
+     parse_java_jdk_release():
+             Unsupported release.
+                     release_name: %s
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Printer;
+     use Java::Release qw(parse_java_jdk_release);
+
+     if (@ARGV < 1) {
+            print STDERR "Usage: $0 java_jdk_release\n";
+            exit 1;
+     }
+     my $java_jdk_release = $ARGV[0];
+
+     # Parse Java JDK release name.
+     my $release_hr = parse_java_jdk_release($java_jdk_release);
+
+     p $release_hr;
+
+     # Output like:
+     # Usage: qr{\w+} java_jdk_release
+
+DEPENDENCIES
+    Error::Pure, Exporter, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Java-Release>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2020 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+DEDICATION
+    Thanks for java-package
+    <https://salsa.debian.org/java-team/java-package.git> project.
+
+VERSION
+    0.03
+

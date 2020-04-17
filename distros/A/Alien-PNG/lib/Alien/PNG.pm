@@ -6,7 +6,7 @@ use File::ShareDir qw(dist_dir);
 use File::Spec;
 use File::Find;
 use File::Spec::Functions qw(catdir catfile rel2abs);
-use File::Temp;
+use File::Temp ();
 use ExtUtils::CBuilder;
 
 =head1 NAME
@@ -15,11 +15,11 @@ Alien::PNG - building, finding and using PNG binaries
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -207,7 +207,7 @@ sub check_header {
   my ($package, @header) = @_;
   print STDERR "[$package] Testing header(s): " . join(', ', @header) . "\n";
   my $cb = ExtUtils::CBuilder->new(quiet => 1);
-  my ($fs, $src) = File::Temp->tempfile('XXXXaa', SUFFIX => '.c', UNLINK => 1);
+  my ($fs, $src) = File::Temp::tempfile('aaXXXX', SUFFIX => '.c', UNLINK => 1);
   my $inc = '';
   $inc .= "#include <$_>\n" for @header;  
   syswrite($fs, <<MARKER); # write test source code

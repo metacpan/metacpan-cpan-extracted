@@ -21,7 +21,7 @@ constexpr const uint32_t MICROSECONDS_IN_SECOND = 1000000;
 constexpr const ptime_t  MAX_MICROSECONDS       = 9223372036854000000;
 
 struct Date {
-    enum class Format {iso, iso_tz, iso_date, iso8601, iso8601_notz, rfc1123, rfc850, ansi_c, ymd, dot, hms, cookie = rfc1123};
+    enum class Format {iso, iso_tz, iso_date, iso8601, iso8601_notz, rfc1123, rfc850, ansi_c, ymd, dot, hms, clf, clfb, cookie = rfc1123};
 
     struct InputFormat {
         static const int iso     = 1;
@@ -30,6 +30,7 @@ struct Date {
         static const int rfc850  = 8;
         static const int ansi_c  = 16;
         static const int dot     = 32;
+        static const int clf     = 64;
         static const int all     = ~0;
     };
 

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration
 
-our $VERSION = '0.0305';
+our $VERSION = '0.0309';
 
 use Moo;
 use strictures 2;
@@ -14,15 +14,9 @@ use List::Util qw/ min /;
 use namespace::clean;
 
 
-has names => (
+has durations => (
     is      => 'ro',
     default => sub { return \%MIDI::Simple::Length },
-);
-
-
-has sizes => (
-    is      => 'ro',
-    default => sub { return { reverse %MIDI::Simple::Length } },
 );
 
 
@@ -34,7 +28,7 @@ has size => (
 
 has pool => (
     is      => 'ro',
-    isa     => sub { die 'Not a non-empty ArrayRef' unless ref( $_[0] ) eq 'ARRAY' && @{ $_[0] } > 0 },
+    isa     => sub { die 'Empty pool not allowed' unless ref( $_[0] ) eq 'ARRAY' && @{ $_[0] } > 0 },
     default => sub { return [ keys %MIDI::Simple::Length ] },
 );
 
@@ -61,7 +55,7 @@ has min_size => (
 sub _build_min_size {
     my ($self) = @_;
 
-    my @sizes = map { $self->duration($_) } @{ $self->pool };
+    my @sizes = map { $self->_duration($_) } @{ $self->pool };
 
     return min(@sizes);
 }
@@ -71,18 +65,6 @@ has verbose => (
     is      => 'ro',
     default => sub { return 0 },
 );
-
-
-sub name {
-    my ( $self, $size ) = @_;
-    return $self->sizes->{$size};
-}
-
-
-sub duration {
-    my ( $self, $name ) = @_;
-    return $self->names->{$name};
-}
 
 
 sub motif {
@@ -96,7 +78,7 @@ sub motif {
 
     while ( $sum < $self->size ) {
         my $name = $self->pool_code->();
-        my $size = $self->duration($name);
+        my $size = $self->_duration($name);
         my $diff = $self->size - $sum;
 
         last
@@ -117,6 +99,11 @@ sub motif {
     return $motif;
 }
 
+sub _duration {
+    my ( $self, $name ) = @_;
+    return $self->durations->{$name};
+}
+
 1;
 
 __END__
@@ -131,11 +118,13 @@ Music::Duration::Partition - Partition a musical duration
 
 =head1 VERSION
 
-version 0.0305
+version 0.0309
 
 =head1 SYNOPSIS
 
+  use MIDI::Simple;
   use Music::Duration::Partition;
+  use Music::Scales;
 
   my $mdp = Music::Duration::Partition->new(
     size => 8,
@@ -146,38 +135,31 @@ version 0.0305
 
   my $motif = $mdp->motif;
 
-  my $notes = get_notes($motif); # Your imaginary note generator
+  my @scale = get_scale_MIDI( 'C', 4, 'major' );
 
-  my $score = MIDI::Util::setup_score(); # https://metacpan.org/pod/MIDI::Util
+  my $score = MIDI::Simple->new_score;
 
-  for my $n ( 0 .. @$motif - 1 ) {
-    $score->n( $motif->[$n], $notes->[$n] );
+  for my $n ( 0 .. 31 ) { # 4 loops over the motif
+    $score->n( $motif->[$n % @$motif], $scale[int rand @scale] );
   }
 
   $score->write_score('motif.mid');
 
 =head1 DESCRIPTION
 
-C<Music::Duration::Partition> partitions a musical duration, B<size>,
-into smaller durations drawn from the B<pool> of possible durations.
+C<Music::Duration::Partition> partitions a musical duration, given by
+the B<size>, into smaller durations drawn from the B<pool> of possible
+durations.
 
 =head1 ATTRIBUTES
 
-=head2 names
+=head2 durations
 
-  $names = $mdp->names;
+  $durations = $mdp->durations;
 
 A hash reference of C<%MIDI::Simple::Length> (keyed by duration name).
 
 Default: C<%MIDI::Simple::Length>
-
-=head2 sizes
-
-  $sizes = $mdp->sizes;
-
-A hash reference of C<%MIDI::Simple::Length> (keyed by duration value).
-
-Default: C<reverse %MIDI::Simple::Length>
 
 =head2 size
 
@@ -185,7 +167,7 @@ Default: C<reverse %MIDI::Simple::Length>
 
 The value of the duration to partition.
 
-Default: C<4> (whole note)
+Default: C<4> (4 quarter notes = 1 whole note)
 
 =head2 pool
 
@@ -194,14 +176,15 @@ Default: C<4> (whole note)
 The list of possible note duration names to use in constructing a
 motif.
 
-Default: C<[ keys %MIDI::Simple::Length ]>
+Default: C<[ keys %MIDI::Simple::Length ]> (wn, hn, qn, ...)
 
 =head2 pool_code
 
   $name = $mdp->pool_code->();
   $mdp->pool_code( sub { ... } );
 
-A code reference to select an item from the given duration B<pool>.
+A code reference used to select an item from the given duration
+B<pool>.
 
 Default: Random item of B<pool>
 
@@ -209,7 +192,7 @@ Default: Random item of B<pool>
 
   $min_size = $mdp->min_size;
 
-This is a computed attribute.
+Smallest B<pool> duration.  This is a computed attribute.
 
 =head2 verbose
 
@@ -225,23 +208,13 @@ Show the progress of the B<motif> method.
 
 Create a new C<Music::Duration::Partition> object.
 
-=head2 name
-
-  $name = $mdp->name($duration);
-
-Return the duration name of the given value.
-
-=head2 duration
-
-  $duration = $mdp->duration($name);
-
-Return the duration value of the given name.
-
 =head2 motif
 
   $motif = $mdp->motif;
 
 Generate a rhythmic phrase of the given B<size>.
+
+This method returns a different rhythmic motif each time it is called.
 
 The default B<pool_code> used constructs this by selecting a B<pool>
 duration at random, that fits into the size remaining after each
@@ -263,7 +236,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

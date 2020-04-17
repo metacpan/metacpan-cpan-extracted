@@ -41,7 +41,7 @@
             "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Log::ger" : "0.034",
+            "Log::ger" : "0.037",
             "Log::ger::Output" : "0.005",
             "Test::Exception" : "0",
             "Test::More" : "0.98"
@@ -60,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-Output-File"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

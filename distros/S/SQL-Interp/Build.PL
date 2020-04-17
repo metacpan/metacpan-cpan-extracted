@@ -3,12 +3,10 @@ use Module::Build;
 Module::Build->new(
     module_name => 'SQL::Interp',
     license => 'perl',
-#    'release_status' => 'testing',
     configure_requires => { 'Module::Build' => 0.38 },
     requires => {
         DBI             => 1.00,
         perl            => '5.8.0',
-        'Sub::Exporter' => 0,
     },
     recommends => {
         Scalar::Util   => 0

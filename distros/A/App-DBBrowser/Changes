@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.250    2020-04-15
+        - Filter 'search_and_replace': allow to save groups of 's///;'.
+
 2.249    2020-03-28
         - The sheet name is the default table name if sheet_count > 1.
 

@@ -6,6 +6,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Struct::Dumb',
    test_requires => {
+      'Data::Dump' => 0,
       'Test::Fatal' => 0,
       'Test::More' => '0.88', # done_testing
    },

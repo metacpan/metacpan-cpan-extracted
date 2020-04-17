@@ -5,7 +5,7 @@ use 5.006;
 use warnings;
 
 
-our $VERSION = '0.053.3'; # VERSION
+our $VERSION = '0.055'; # VERSION
 
 use utf8;
 use open ':std', ':utf8';
@@ -142,6 +142,7 @@ sub _manifest_crc32 {
         $data_dir
     );
     close($fh);
+    return;
 }
 
 
@@ -150,7 +151,7 @@ sub _manifest_md5 {
     my($self, $bagit) = @_;
     my $manifest_file = "$bagit/manifest-md5.txt";
     my $data_dir = "$bagit/data";
-    #print "creating manifest: $data_dir\n";
+    print "creating manifest: $data_dir\n";
     # Generate MD5 digests for all of the files under ./data
     open(my $md5_fh, ">:encoding(utf8)",$manifest_file) or die("Cannot create manifest-md5.txt: $!\n");
     find(
@@ -168,6 +169,7 @@ sub _manifest_md5 {
         $data_dir
     );
     close($md5_fh);
+    return;
 }
 
 sub _tagmanifest_md5 {
@@ -199,6 +201,7 @@ sub _tagmanifest_md5 {
   }, $bagit);
 
   close($md5_fh);
+  return;
 }
 
 
@@ -231,7 +234,7 @@ sub verify_bag {
     find(sub{ push(@payload, decode('utf8',$File::Find::name))  }, $payload_dir);
 
     # Evaluate each file against the manifest
-    my $digestobj = new Digest::MD5;
+    my $digestobj = Digest::MD5->new();
     foreach my $file (@payload) {
         next if (-d ($file));
         my $local_name = substr($file, length($bagit) + 1);
@@ -373,6 +376,7 @@ sub tagmanifest_files {
 
 }
 
+
 1; # End of Archive::BagIt
 
 __END__
@@ -387,37 +391,14 @@ Archive::BagIt
 
 =head1 VERSION
 
-version 0.053.3
-
-=head1 SYNOPSIS
-
-This modules will hopefully help with the basic commands needed to create
-and verify a bag. My intention is not to be strict and enforce all of the
-specification. The reference implementation is the java version
-and I will endeavour to maintain compatibility with it.
-
-    use Archive::BagIt;
-
-    #read in an existing bag:
-    my $bag_dir = "/path/to/bag";
-    my $bag = Archive::BagIt->new($bag_dir);
-
-
-    #construct bag in an existing directory
-    my $bag2 = Archive::BagIt->make_bag($bag_dir);
-
-    # Validate a BagIt archive against its manifest
-    my $bag3 = Archive::BagIt->new($bag_dir);
-    my $is_valid = $bag3->verify_bag();
+version 0.055
 
 =head1 WARNING
 
-This is experimental software for the moment and under active development. I
-hope to have a beta version available soon.
+This is experimental software for the moment and under active development.
 
-We use it fairly widely in-house, but it doesn't necessarily implement all of the specs.
-
-Email me with anything you need done urgently.
+Under the hood, the module Archive::BagIt::Base was adapted and extended to
+support BagIt 1.0 according to RFC 8493 ([https://tools.ietf.org/html/rfc8493](https://tools.ietf.org/html/rfc8493)).
 
 Also: Check out Archive::BagIt::Fast if you are willing to add some extra dependencies to get
 better speed by mmap-ing files.
@@ -471,10 +452,32 @@ Return an array with the list of manifest files that exist in the bag
 
 Return an array with the list of tagmanifest files
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Robert Schmidt, E<lt>rjeschmi at gmail.comE<gt>
-William Wueppelmann, E<lt>william at c7a.caE<gt>
+=over
+
+=item Robert Schmidt, E<lt>rjeschmi at gmail.comE<gt>
+
+=item William Wueppelmann, E<lt>william at c7a.caE<gt>
+
+=item Andreas Romeyke, E<lt>pause at andreas minus romeyke.deE<gt>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item Serhiy Bolkun
+
+=back
+
+=head1 SOURCE
+
+The original development version is on github at L<http://github.com/rjeschmi/Archive-BagIt>
+and may be cloned from L<git://github.com/rjeschmi/Archive-BagIt.git>
+
+The actual development version is available at L<https://art1pirat.spdns.org/art1/Archive-BagIt>
 
 =head1 BUGS
 
@@ -519,6 +522,27 @@ Copyright (c) 2012, the above named author(s).
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
+=head1 SYNOPSIS
+
+This modules will hopefully help with the basic commands needed to create
+and verify a bag. My intention is not to be strict and enforce all of the
+specification. The reference implementation is the java version
+and I will endeavour to maintain compatibility with it.
+
+    use Archive::BagIt;
+
+    #read in an existing bag:
+    my $bag_dir = "/path/to/bag";
+    my $bag = Archive::BagIt->new($bag_dir);
+
+
+    #construct bag in an existing directory
+    my $bag2 = Archive::BagIt->make_bag($bag_dir);
+
+    # Validate a BagIt archive against its manifest
+    my $bag3 = Archive::BagIt->new($bag_dir);
+    my $is_valid = $bag3->verify_bag();
+
 =head1 AVAILABILITY
 
 The latest version of this module is available from the Comprehensive Perl
@@ -527,13 +551,13 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/rjeschmi/Archive-BagIt>
-and may be cloned from L<git://github.com/rjeschmi/Archive-BagIt.git>
+The development version is on github at L<https://github.com/Archive-BagIt>
+and may be cloned from L<git://github.com/Archive-BagIt.git>
 
 =head1 BUGS AND LIMITATIONS
 
 You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/rjeschmi/Archive-BagIt/issues>.
+web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
@@ -541,7 +565,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package Main;
-$Main::VERSION = '0.064';
+$Main::VERSION = '0.065';
 # PODNAME: koha-cloud
 # ABSTRACT: Creates HTML keywords clouds from Koha Zebra Indexes
 
@@ -88,7 +88,7 @@ koha-cloud - Creates HTML keywords clouds from Koha Zebra Indexes
 
 =head1 VERSION
 
-version 0.064
+version 0.065
 
 =head1 USAGE
 

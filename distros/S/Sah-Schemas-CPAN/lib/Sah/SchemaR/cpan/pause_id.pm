@@ -1,7 +1,7 @@
 package Sah::SchemaR::cpan::pause_id;
 
 our $DATE = '2020-03-02'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $rschema = ["str",[{examples=>[{data=>"",valid=>0},{data=>"perlancar",res=>"PERLANCAR",valid=>1},{data=>"perlancar2",summary=>"Too long",valid=>0}],match=>qr(\A(?^:[A-Z][A-Z0-9]{1,8})\z),summary=>"PAUSE author ID","x.completion"=>["lcpan_authorid"],"x.perl.coerce_rules"=>["From_str::to_upper"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::cpan::pause_id - PAUSE author ID
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2020-03-02.
+This document describes version 0.007 of Sah::SchemaR::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2020-03-02.
 
 =head1 DESCRIPTION
 

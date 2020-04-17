@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-subst
 
+2.12 2020-04-16T07:01:31Z
+
+    - Change to use Getopt::EX::termcolor.
+
 2.11 2020-04-13T10:06:47Z
 
     - Refine dark-screen color and use -Mautocolor module.

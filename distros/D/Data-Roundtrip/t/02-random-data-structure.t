@@ -1,42 +1,50 @@
-#!perl -T
-use 5.006;
+#!/usr/bin/env perl
+
+##!perl -T
+use 5.008;
 use strict;
 use warnings;
+
+use lib 'blib/lib';
 
 use utf8;
 
 our $VERSION='0.03';
 
-binmode STDERR, ':encoding(UTF-8)';
-binmode STDOUT, ':encoding(UTF-8)';
-binmode STDIN,  ':encoding(UTF-8)';
-# to avoid wide character in TAP output
-# do this before loading Test* modules
-use open ':std', ':encoding(utf8)';
+# NO UTF8 here, we are checking with random
+# data structure which provides no unicode
+# there is a separate file for testing with unicode
 
 #### nothing to change below
 use Test::More;
-#use Test::Deep;
 
 my $num_tests = 0;
 
 use Data::Roundtrip;
+
 use Data::Random::Structure;
-use Data::Dumper qw/Dumper/;
 
 my $randomiser = Data::Random::Structure->new(
-	max_depth => 5,
-	max_elements => 20,
+	max_depth => 50,
+	max_elements => 200,
 );
 ok(defined $randomiser, 'Data::Random::Structure->new()'." called."); $num_tests++;
 my $perl_var = $randomiser->generate();
 ok(defined $perl_var, "generate() called."); $num_tests++;
 
-my %testfuncs = map {
-	my @x = split /2/, $_;
-	join('2',@x) => join('2',reverse @x)
-} grep {/^perl2/} sort keys %Data::Roundtrip::;
-#print join("\n", map { $_ .'=>'. $testfuncs{$_} } keys %testfuncs)."\n";
+my %testfuncs;
+for my $k (sort grep {/^perl2/} keys %Data::Roundtrip::){
+	my @x = split /2/, $k;
+	my $newsub = join('2',reverse @x);
+	next unless Data::Roundtrip->can($newsub);
+	$testfuncs{$k} = $newsub
+}
+ok(0 < scalar keys %testfuncs, "built test-funcs"); $num_tests++;
+ok(1, "checking these functions pairs: ".join(",", map { $_ .'=>'. $testfuncs{$_} } keys %testfuncs)."."); $num_tests++;
+
+# also add these
+$testfuncs{'perl2dump_filtered'} = 'dump2perl';
+$testfuncs{'perl2dump_homebrew'} = 'dump2perl';
 
 my $params = {};
 for my $astestfunc (sort keys %testfuncs){

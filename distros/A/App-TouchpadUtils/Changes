@@ -1,4 +1,11 @@
+0.003   2019-12-16  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Fix script names.
+
+
 0.002   2019-12-16  Released-By: PERLANCAR; Urgency: medium
+
+        - UPDATE: this release is broken (wrong script names).
 
 	- [ux] Add shorter alias commands: disable-touchpad -> tpoff,
 	  enable-touchpad -> tpon.

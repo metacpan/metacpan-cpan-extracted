@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx-NamedParams
 
+v0.0.9 2020-04-15T14:00:11Z
+    - show message binding not array for variable array.
+
 v0.0.8 2019-12-10T13:08:41Z
 
     - introduce $DBIx::NamedParams::KeepBindingIfNoKey flag.

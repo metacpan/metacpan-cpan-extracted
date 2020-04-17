@@ -414,28 +414,29 @@ sub call {
 	: @$list;
 }
 
+sub call_if_defined {
+    my($module, $name, @param) = @_;
+    my $func = "$module\::$name";
+    if (defined &$func) {
+	no strict 'refs';
+	$func->(@param);
+    }
+}
+
 sub run_inits {
     my $obj = shift;
     my $argv = shift;
     my $module = $obj->module;
-    local @ARGV;
+    local @ARGV = ();
 
-    ##
-    ## Call &initialize if defined.
-    ##
-    my $init = "$module\::initialize";
-    if (defined &$init) {
-	no strict 'refs';
-	&$init($obj, $argv);
-    }
+    call_if_defined $module, "initialize" => ($obj, $argv);
 
-    ##
-    ## Call function specified with module.
-    ##
     for my $call ($obj->call) {
 	my $func = $call->can('call') ? $call : parse_func($call);
 	$func->call;
     }
+
+    call_if_defined $module, "finalize" => ($obj, $argv);
 }
 
 1;
@@ -463,6 +464,11 @@ called if it exists in the module.  At this time, container object is
 passed to the function as the first argument and following command
 argument pointer as the second.  So you can use it to directly touch
 the object contents through class interface.
+
+Following C<initialize>, function defined with module option is called.
+
+Finally subroutine C<finalize> is called if defined, to finalize start
+up process of the module.
 
 
 =head1 RC FILE FORMAT

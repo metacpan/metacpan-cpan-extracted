@@ -4,7 +4,7 @@
       "L<TakeAsh|https://github.com/TakeAsh/>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.8",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -65,7 +65,7 @@
    "provides" : {
       "DBIx::NamedParams" : {
          "file" : "lib/DBIx/NamedParams.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.0.9"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/TakeAsh/p-DBIx-NamedParams"
       }
    },
-   "version" : "v0.0.8",
+   "version" : "v0.0.9",
    "x_contributors" : [
       "TakeAsh <take@TakeAsh.net>"
    ],

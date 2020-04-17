@@ -1,9 +1,15 @@
-0.16    2018-02-08 (PERLANCAR)
+0.17    2020-04-16  Released-By: PERLANCAR; Urgency: medium
+
+	- testcomp: Avoid quoting '--foo=bar' so Complete::Bash's breaking
+	  of words per word-breaking characters can still happen.
+
+
+0.16    2018-02-08  Released-By: PERLANCAR
 
 	- testcomp: Update to make log statements shown again.
 
 
-0.15    2017-07-05 (PERLANCAR)
+0.15    2017-07-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -11,14 +17,14 @@
 	  Log::ger::Output::Screen.
 
 
-0.14    2017-07-03 (PERLANCAR)
+0.14    2017-07-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::ger.
 
 
-0.13    2016-11-04 (PERLANCAR)
+0.13    2016-11-04  Released-By: PERLANCAR
 
 	- testcomp: Add options: --shell (-s), --bash, --fish, --tcsh, --zsh to
 	  set shell explicitly.
@@ -27,19 +33,19 @@
           'tcsh'.
 
 
-0.12    2016-10-26 (PERLANCAR)
+0.12    2016-10-26  Released-By: PERLANCAR
 
 	- testcomp: Also set COMMAND_LINE, for tcsh.
 
 	- compwithargs: Forgot to set hint for shcompgen.
 
 
-0.11    2015-10-26 (PERLANCAR)
+0.11    2015-10-26  Released-By: PERLANCAR
 
         - Add utility: compwithargs.
 
 
-0.10    2015-09-17 (PERLANCAR)
+0.10    2015-09-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -47,14 +53,14 @@
 	  complete_program() split to Complete-File & Complete-Program).
 
 
-0.09    2015-09-09 (PERLANCAR)
+0.09    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Remove prereq: Complete because it is not directly used.
 
 
-0.08    2015-08-18 (PERLANCAR)
+0.08    2015-08-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -63,14 +69,14 @@
 	  requirement.
 
 
-0.07    2015-08-17 (PERLANCAR)
+0.07    2015-08-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.06    2015-06-19 (PERLANCAR)
+0.06    2015-06-19  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -78,32 +84,32 @@
 	  Log::Any::Adapter::{ScreenColoredLevel,Screen}.
 
 
-0.05    2014-12-29 (PERLANCAR)
+0.05    2014-12-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [Bugfix] Fix parsing of testcomp arguments.
 
 
-0.04    2014-12-27 (PERLANCAR)
+0.04    2014-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Adjust Abstract (copy-paste mistake).
 
 
-0.03    2014-12-27 (PERLANCAR)
+0.03    2014-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Move items from See Also from App::CompleteUtils to bin/testcomp.
 
 
-0.02    2014-12-27 (PERLANCAR)
+0.02    2014-12-27  Released-By: PERLANCAR
 
 	- Add a (for now) simple completion script for testcomp.
 
 
-0.01    2014-12-26 (PERLANCAR)
+0.01    2014-12-26  Released-By: PERLANCAR
 
         - First release.

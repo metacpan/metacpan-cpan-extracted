@@ -2,9 +2,9 @@ NAME
     Regexp::Pattern::Palindrome - Regexp patterns related to palindrome
 
 VERSION
-    This document describes version 0.001 of Regexp::Pattern::Palindrome
+    This document describes version 0.002 of Regexp::Pattern::Palindrome
     (from Perl distribution Regexp-Pattern-Palindrome), released on
-    2020-02-10.
+    2020-02-11.
 
 SYNOPSIS
      use Regexp::Pattern; # exports re()
@@ -133,7 +133,10 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Regexp::Pattern::Perl
+    Regexp::Pattern
+
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

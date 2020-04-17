@@ -4,15 +4,16 @@
 # Translators:
 # ふうせん Fu-sen. | BALLOON a.k.a. Fu-sen., 2015
 # ふうせん Fu-sen. | BALLOON a.k.a. Fu-sen., 2015
-# Masanori Kakura <kakurasan@gmail.com>, 2018
+# kakurasan <kakurasan@gmail.com>, 2018
+# kakurasan <kakurasan@gmail.com>, 2018
 # Taisuke Yamada <tai@imasy.or.jp>, 1999
 # UTUMI Hirosi <utuhiro@mx12.freecom.ne.jp>, 2003
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2019-06-26 09:37+0300\n"
-"PO-Revision-Date: 2019-06-26 14:18+0000\n"
-"Last-Translator: Masanori Kakura <kakurasan@gmail.com>\n"
+"POT-Creation-Date: 2020-01-18 09:59+0200\n"
+"PO-Revision-Date: 2020-01-21 12:17+0000\n"
+"Last-Translator: kakurasan <kakurasan@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/MageiaLinux/mageia/"
 "language/ja/)\n"
 "Language: ja\n"
@@ -67,8 +68,8 @@ msgid "Cancel"
 msgstr "キャンセル"
 
 #: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
-#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1670
-#: ../urpm/media.pm:1821
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
+#: ../urpm/media.pm:1833
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "...取得に失敗しました: %s"
@@ -1040,19 +1041,19 @@ msgstr ""
 "--synthesis は --media, --excludemedia, --sortmedia, --update, --use-"
 "distrib, --parallel と一緒には使えません"
 
-#: ../urpm/media.pm:792
+#: ../urpm/media.pm:793
 #, c-format
 msgid "ignoring non-free medium `%s'"
 msgstr "non-free なメディア `%s' を無視します"
 
-#: ../urpm/media.pm:802
+#: ../urpm/media.pm:803
 #, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
 msgstr ""
 "非フリーなパッケージがインストール済みのため、non-free メディア `%s' の無視は"
 "行いません"
 
-#: ../urpm/media.pm:806
+#: ../urpm/media.pm:807
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
@@ -1061,8 +1062,12 @@ msgstr ""
 
 #: ../urpm/media.pm:816
 #, c-format
-msgid "un-ignoring 32bit medium `%s' b/c system is 32-bit EFI"
-msgstr "システムが 32-bit EFI のため、32bit メディア `%s' の無視は行いません"
+msgid ""
+"un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
+"32-bit EFI"
+msgstr ""
+"32-bit のパッケージがインストールされているか、またはシステムが 32-bit EFI な"
+"ので、32bit メディア `%s' の無視は行いません"
 
 #: ../urpm/media.pm:844
 #, c-format
@@ -1126,162 +1131,162 @@ msgstr ""
 "ディストリビューションのメディアにアクセスできません (media.cfg ファイルがあ"
 "りません)"
 
-#: ../urpm/media.pm:1172
+#: ../urpm/media.pm:1184
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr "互換性のないメディア `%s' をスキップします (%s のため)"
 
-#: ../urpm/media.pm:1230
+#: ../urpm/media.pm:1242
 #, c-format
 msgid "retrieving media.cfg file..."
 msgstr "media.cfg ファイルを取得しています..."
 
-#: ../urpm/media.pm:1273
+#: ../urpm/media.pm:1285
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "\"%s\" というメディアは存在しません"
 
-#: ../urpm/media.pm:1276
+#: ../urpm/media.pm:1288
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "複数のメディアを選択しています: %s"
 
-#: ../urpm/media.pm:1335
+#: ../urpm/media.pm:1347
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "メディア \"%s\" を削除しています"
 
-#: ../urpm/media.pm:1426
+#: ../urpm/media.pm:1438
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "メディア \"%s\" について urpmi を再設定しています"
 
-#: ../urpm/media.pm:1460
+#: ../urpm/media.pm:1472
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...再設定に失敗しました"
 
-#: ../urpm/media.pm:1466
+#: ../urpm/media.pm:1478
 #, c-format
 msgid "reconfiguration done"
 msgstr "再設定が完了しました"
 
-#: ../urpm/media.pm:1482
+#: ../urpm/media.pm:1494
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr "名前ファイルの生成エラー: 依存 %d が見つかりません"
 
-#: ../urpm/media.pm:1503
+#: ../urpm/media.pm:1515
 #, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr "メディア \"%s\" は最新です"
 
-#: ../urpm/media.pm:1514
+#: ../urpm/media.pm:1526
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "synthesis ファイル [%s] を検査しています"
 
-#: ../urpm/media.pm:1534
+#: ../urpm/media.pm:1546
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "メディア \"%s\" の synthesis ファイルの読み込み中に問題が発生しました"
 
-#: ../urpm/media.pm:1547 ../urpm/media.pm:1642
+#: ../urpm/media.pm:1559 ../urpm/media.pm:1654
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr "メディア \"%2$s\" のために [%1$s] をコピーしています..."
 
-#: ../urpm/media.pm:1549 ../urpm/media.pm:1619 ../urpm/media.pm:1872
+#: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
 msgid "...copying failed"
 msgstr "...コピーに失敗しました"
 
-#: ../urpm/media.pm:1615
+#: ../urpm/media.pm:1627
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "\"%s\" の説明ファイルをコピーしています..."
 
-#: ../urpm/media.pm:1617 ../urpm/media.pm:1646
+#: ../urpm/media.pm:1629 ../urpm/media.pm:1658
 #, c-format
 msgid "...copying done"
 msgstr "...コピーが完了しました"
 
-#: ../urpm/media.pm:1648
+#: ../urpm/media.pm:1660
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "[%s] のコピーに失敗しました (ファイルが異常に小さすぎます)"
 
-#: ../urpm/media.pm:1696
+#: ../urpm/media.pm:1708
 #, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr "取得したソース synthesis の md5sum を計算しています"
 
-#: ../urpm/media.pm:1698 ../urpm/media.pm:2181
+#: ../urpm/media.pm:1710 ../urpm/media.pm:2193
 #, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
 msgstr "[%s] の取得に失敗しました (md5sum が一致しません)"
 
-#: ../urpm/media.pm:1713
+#: ../urpm/media.pm:1725
 #, c-format
 msgid "genhdlist2 failed on %s"
 msgstr "genhdlist2 が %s で失敗しました"
 
-#: ../urpm/media.pm:1723
+#: ../urpm/media.pm:1735
 #, c-format
 msgid "comparing %s and %s"
 msgstr "%s と %s を比較しています"
 
-#: ../urpm/media.pm:1753
+#: ../urpm/media.pm:1765
 #, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr "メディア \"%2$s\" の hdlist ファイル %1$s が無効です"
 
-#: ../urpm/media.pm:1779
+#: ../urpm/media.pm:1791
 #, c-format
 msgid "copying MD5SUM file of \"%s\"..."
 msgstr "\"%s\" の MD5SUM ファイルをコピーしています..."
 
-#: ../urpm/media.pm:1819
+#: ../urpm/media.pm:1831
 #, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
 msgstr "無効な MD5SUM ファイルです (ダウンロード元は %s)"
 
-#: ../urpm/media.pm:1822
+#: ../urpm/media.pm:1834
 #, c-format
 msgid "no metadata found for medium \"%s\""
 msgstr "メディア \"%s\" のメタ データが見つかりません"
 
-#: ../urpm/media.pm:1854
+#: ../urpm/media.pm:1866
 #, c-format
 msgid "retrieving source synthesis of \"%s\"..."
 msgstr "\"%s\" のソース synthesis を取得しています..."
 
-#: ../urpm/media.pm:1920
+#: ../urpm/media.pm:1932
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "\"%s\" の公開鍵ファイルを検査しています..."
 
-#: ../urpm/media.pm:1932
+#: ../urpm/media.pm:1944
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...\"%2$s\" の公開鍵ファイルから鍵 %1$s を取り込みました"
 
-#: ../urpm/media.pm:1936
+#: ../urpm/media.pm:1948
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "\"%s\" の公開鍵ファイルを取り込めません"
 
-#: ../urpm/media.pm:1977
+#: ../urpm/media.pm:1989
 #, c-format
 msgid "no synthesis file found for medium \"%s\""
 msgstr "メディア \"%s\" に synthesis ファイルが見つかりません"
 
-#: ../urpm/media.pm:2010
+#: ../urpm/media.pm:2022
 #, c-format
 msgid "updated medium \"%s\""
 msgstr "メディア \"%s\" を更新しました"
 
-#: ../urpm/media.pm:2175
+#: ../urpm/media.pm:2187
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr "[%s] の取得に失敗しました"

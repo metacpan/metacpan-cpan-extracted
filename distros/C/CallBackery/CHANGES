@@ -1,3 +1,12 @@
+0.31.5 2020-04-15 18:41:27 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix regression with extra q
+
+0.31.4 2020-04-15 17:11:24 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - self regression
+ - allow build with Perl 5.22.0
+
 0.31.3 2020-04-10 08:31:35 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - eval not evan regression

@@ -6,7 +6,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.11
+Version 2.12
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ warned (B<--warn-overlap> by default) and ignored.
 
 =head2 Terminal color
 
-This version uses L<Getopt::EX::autocolor> module.  It sets option
+This version uses L<Getopt::EX::termcolor> module.  It sets option
 B<--light-screen> or B<--dark-screen> depending on the terminal on
 which the command run, or B<BRIGHTNESS> environment variable.
 
@@ -248,7 +248,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::subst;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use v5.14;
 use strict;
@@ -681,7 +681,7 @@ builtin ignore-space!  $opt_ignore_space
 builtin show-comment!  $opt_show_comment
 
 option default \
-	-Mautocolor \
+	-Mtermcolor::set(default=100,light=--subst-color-light,dark=--subst-color-dark) \
 	--prologue subst_initialize \
 	--begin subst_begin \
 	--le &subst_search --no-regioncolor
@@ -695,9 +695,6 @@ option --divert-stdout --prologue __PACKAGE__::divert_stdout \
 		       --epilogue __PACKAGE__::recover_stdout
 option --with-stat     --epilogue subst_show_stat
 option --stat          --divert-stdout --with-stat
-
-option  --light-terminal --subst-color-light
-option  --dark-terminal  --subst-color-dark
 
 option	--subst-color-light \
 	--cm 555D/100,000/433 \

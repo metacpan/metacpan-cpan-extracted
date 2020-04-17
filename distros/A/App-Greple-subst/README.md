@@ -4,7 +4,7 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.11
+Version 2.12
 
 # SYNOPSIS
 
@@ -64,7 +64,7 @@ warned (**--warn-overlap** by default) and ignored.
 
 ## Terminal color
 
-This version uses [Getopt::EX::autocolor](https://metacpan.org/pod/Getopt::EX::autocolor) module.  It sets option
+This version uses [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt::EX::termcolor) module.  It sets option
 **--light-screen** or **--dark-screen** depending on the terminal on
 which the command run, or **BRIGHTNESS** environment variable.
 

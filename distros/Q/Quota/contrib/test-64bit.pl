@@ -1,23 +1,40 @@
 #!/usr/bin/perl
 use blib;
+use warnings;
+use strict;
 use Quota;
 
-$new_bs = 0xA00000000;
-$new_bh = 0xC00000000;
+my $new_bs = 0x15000 * 65536.0;
+my $new_bh = 0x16000 * 65536.0;
 
-# Get uid from username
-$uid=31979;
+my $uid = 32000;
+my $path = ".";
+
 # Get device from filesystem path
-$dev = Quota::getqcarg("/mnt");
-# Get quota for user
-($bc, $bs, $bh,$bt,$ic, $is, $ih, $it)=Quota::query($dev, $uid);
-print "CUR $uid - $dev - $bc - $bs - $bh - $bt\n";
+my $dev = Quota::getqcarg($path);
+die "$path: mount point not found\n" unless $dev;
 
-print "SET $uid - $dev - $new_bs - $new_bh\n";
-($bc, $bs, $bh,$bt,$ic, $is, $ih, $it)=Quota::query($dev, $uid);
-if (Quota::setqlim($dev, $uid, $new_bs, $new_bh, 10,12, 1) != 0) {
-  warn Quota::strerr,"\n";
+# Get quota for user
+my ($bc, $bs, $bh,$bt,$ic, $is, $ih, $it)=Quota::query($dev, $uid);
+if (defined $bc) {
+  print "CUR $uid - $dev - $bc - $bs - $bh - $bt\n";
+}
+else {
+  print "Failed to query current limits: ".Quota::strerr()."\n";
+  $is = $ih = 0;
 }
 
-($bc, $bs, $bh,$bt,$ic, $is, $ih, $it)=Quota::query($dev, $uid);
-print "NEW $uid - $dev - $bc - $bs - $bh - $bt\n";
+print "SET $uid - $dev - $new_bs - $new_bh\n";
+if (Quota::setqlim($dev, $uid, $new_bs, $new_bh, $is,$ih, 1) == 0) {
+  print "SET successfully - now reading back\n";
+  ($bc, $bs, $bh,$bt,$ic, $is, $ih, $it)=Quota::query($dev, $uid);
+  if (defined $bc) {
+    print "NEW $uid - $dev - $bc - $bs - $bh - $bt\n";
+  }
+  else {
+    print "Failed to query new limits: ".Quota::strerr()."\n";
+  }
+}
+else {
+  warn "Failed to set limits: ".Quota::strerr()."\n";
+}

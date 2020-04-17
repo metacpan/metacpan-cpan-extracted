@@ -16,6 +16,7 @@ $modules{$_} = $_ for qw(
   Alien::Build::Plugin::Build::Copy
   ExtUtils::MakeMaker
   FFI::Platypus
+  File::Which
   Path::Tiny
   Test2::V0
   Test::Alien

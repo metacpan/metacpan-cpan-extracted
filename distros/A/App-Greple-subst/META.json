@@ -45,8 +45,8 @@
             "App::Greple" : "8.39",
             "Data::Section" : "0.200007",
             "File::Share" : "0",
-            "Getopt::EX" : "v1.15.6",
-            "Getopt::EX::autocolor" : "0",
+            "Getopt::EX" : "v1.16.0",
+            "Getopt::EX::termcolor" : "1.01",
             "Regexp::Assemble" : "0",
             "Text::VisualPrintf" : "2.03",
             "Text::VisualWidth::PP" : "0.05",
@@ -62,7 +62,7 @@
    "provides" : {
       "App::Greple::subst" : {
          "file" : "lib/App/Greple/subst.pm",
-         "version" : "2.11"
+         "version" : "2.12"
       },
       "App::Greple::subst::Dict" : {
          "file" : "lib/App/Greple/subst/Dict.pm"
@@ -85,7 +85,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-subst"
       }
    },
-   "version" : "2.11",
+   "version" : "2.12",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

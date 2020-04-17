@@ -1,3 +1,11 @@
+0.007   2020-03-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes
+
+        - [build] Render examples in Synopsis, using
+          Pod::Weaver::Plugin::Sah::Schemas 0.060+.
+
+
 0.006   2020-03-02  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix regex: add anchoring.

@@ -3,7 +3,7 @@ package Sah::Schema::hexbuf;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-Binary'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [str => {
     summary => 'Binary data encoded in hexdigits',
@@ -32,7 +32,19 @@ Sah::Schema::hexbuf - Binary data encoded in hexdigits
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2020-03-02.
+This document describes version 0.003 of Sah::Schema::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2020-03-02.
+
+=head1 SYNOPSIS
+
+Sample data:
+
+ ""  # valid
+
+ "f"  # INVALID (Odd number of digits)
+
+ "fafafa"  # valid
+
+ "fafafg"  # INVALID
 
 =head1 HOMEPAGE
 

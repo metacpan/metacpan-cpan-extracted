@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Amon2:
     file: lib/Amon2.pm
-    version: '6.13'
+    version: '6.14'
   Amon2::Config::Simple:
     file: lib/Amon2/Config/Simple.pm
   Amon2::ContextGuard:
@@ -72,13 +72,13 @@ provides:
     file: lib/Amon2/Setup/Flavor.pm
   Amon2::Setup::Flavor::Basic:
     file: lib/Amon2/Setup/Flavor/Basic.pm
-    version: '6.13'
+    version: '6.14'
   Amon2::Setup::Flavor::Large:
     file: lib/Amon2/Setup/Flavor/Large.pm
-    version: '6.13'
+    version: '6.14'
   Amon2::Setup::Flavor::Minimum:
     file: lib/Amon2/Setup/Flavor/Minimum.pm
-    version: '6.13'
+    version: '6.14'
   Amon2::Setup::VC::Git:
     file: lib/Amon2/Setup/VC/Git.pm
   Amon2::Trigger:
@@ -139,42 +139,44 @@ resources:
   bugtracker: https://github.com/tokuhirom/Amon/issues
   homepage: https://github.com/tokuhirom/Amon
   repository: git://github.com/tokuhirom/Amon.git
-version: '6.13'
+version: '6.14'
 x_contributors:
-  - 'noblejasper <nobjas@gmail.com>'
-  - 'noblejasper <jasper@main.noble-jasper.com>'
-  - 'hiratara <hiratara@cpan.org>'
-  - 's-aska <s.aska.org@gmail.com>'
-  - 'Kentaro Kuribayashi <kentarok@gmail.com>'
-  - 'Yuki Ibe <yibe@yibe.org>'
-  - 'mattn <mattn.jp@gmail.com>'
-  - 'Masahiro Nagano <kazeburo@gmail.com>'
-  - 'rightgo09 <skyarrow09@gmail.com>'
-  - 'hatyuki <hatyuki29@gmail.com>'
-  - 'Keiji, Yoshimi <walf443@gmail.com>'
-  - 'Nishibayashi Takuji <takuji31@gmail.com>'
-  - 'dragon3 <ryuzo.yamamoto@gmail.com>'
-  - 'Fuji, Goro <g.psy.va@gmail.com>'
-  - 'issm <issmxx@gmail.com>'
-  - 'hisaichi5518 <hisada.kazuki@gmail.com>'
   - 'Adrian <adrian@investometrica.com>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
   - 'Fuji, Goro <gfuji@cpan.org>'
-  - 'ITO Nobuaki <daydream.trippers@gmail.com>'
-  - 'Geraud CONTINSOUZAS <geraud@hyaku.nijuu.nana>'
   - 'Geraud <geraud@genta.nealab.net>'
-  - 'Katsuhiro Konishi <konishika@gmail.com>'
-  - 'Neil Bowers <neil@bowers.com>'
-  - 'Kazuhiro Osawa <yappo@shibuya.pl>'
-  - 'Takafumi Ono <ono_pm@amber.plala.or.jp>'
-  - 'moznion <moznion@gmail.com>'
-  - 'wata <w.nagasawa@gmail.com>'
-  - 'magnolia <magnolia.k@me.com>'
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
-  - 'Hiroyuki Akabane <hirobanex@gmail.com>'
-  - 'Ichito Nagata <i.nagata110@gmail.com>'
+  - 'Geraud CONTINSOUZAS <geraud@hyaku.nijuu.nana>'
   - 'Geraud CONTINSOUZAS <geraud@scsi.nc>'
-  - 'karupanerura <karupa@cpan.org>'
-  - 'tokubass <tokubass@cpan.org>'
-  - 'clicktx <clicktx@gmail.com>'
+  - 'Hiroyuki Akabane <hirobanex@gmail.com>'
+  - 'ITO Nobuaki <daydream.trippers@gmail.com>'
+  - 'Ichito Nagata <i.nagata110@gmail.com>'
+  - 'Katsuhiro Konishi <konishika@gmail.com>'
+  - 'Kazuhiro Osawa <yappo@shibuya.pl>'
+  - 'Keiji, Yoshimi <walf443@gmail.com>'
+  - 'Kentaro Kuribayashi <kentarok@gmail.com>'
   - 'Koichi SATOH <r.sekia@gmail.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Nishibayashi Takuji <takuji31@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Takafumi Ono <ono_pm@amber.plala.or.jp>'
+  - 'Yuki Ibe <yibe@yibe.org>'
+  - 'Zak B. Elep <zakame@zakame.net>'
+  - 'clicktx <clicktx@gmail.com>'
+  - 'dragon3 <ryuzo.yamamoto@gmail.com>'
+  - 'hatyuki <hatyuki29@gmail.com>'
+  - 'hiratara <hiratara@cpan.org>'
+  - 'hisaichi5518 <hisada.kazuki@gmail.com>'
+  - 'issm <issmxx@gmail.com>'
+  - 'karupanerura <karupa@cpan.org>'
+  - 'magnolia <magnolia.k@me.com>'
+  - 'mattn <mattn.jp@gmail.com>'
+  - 'moznion <moznion@gmail.com>'
+  - 'noblejasper <jasper@main.noble-jasper.com>'
+  - 'noblejasper <nobjas@gmail.com>'
+  - 'rightgo09 <skyarrow09@gmail.com>'
+  - 's-aska <s.aska.org@gmail.com>'
+  - 'tokubass <tokubass@cpan.org>'
+  - 'wata <w.nagasawa@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Dump encoded data with Dumper()",
+   "abstract" : "Concise, encoded data dumping with Dumper(), everywhere",
    "author" : [
       "Nick Tonkin <tonkin@cpan.org>"
    ],
@@ -14,6 +14,11 @@
    },
    "name" : "Data-Dumper-AutoEncode-AsDumper",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Pod::Coverage" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -26,7 +31,6 @@
             "Dist::Zilla::Plugin::CPANFile" : "0",
             "Dist::Zilla::Plugin::CheckChangesHasContent" : "0",
             "Dist::Zilla::Plugin::ConfirmRelease" : "0",
-            "Dist::Zilla::Plugin::FakeRelease" : "0",
             "Dist::Zilla::Plugin::GatherDir" : "0",
             "Dist::Zilla::Plugin::Git::Check" : "0",
             "Dist::Zilla::Plugin::Git::Commit" : "0",
@@ -55,25 +59,25 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Dumper::AutoEncode" : "0.3",
+            "Data::Dumper" : "2.160",
+            "Data::Dumper::AutoEncode" : "1.00",
             "Import::Into" : "1.002005",
-            "perl" : "5.008001"
+            "perl" : "5.008005"
          }
       },
       "test" : {
          "requires" : {
             "Encode" : "0",
-            "Role::Tiny" : "0",
+            "Moo" : "2.004",
             "Test::More" : "0",
-            "Test::More::UTF8" : "0",
-            "Test::Pod::Coverage" : "0"
+            "Test::More::UTF8" : "0"
          }
       }
    },
    "provides" : {
       "Data::Dumper::AutoEncode::AsDumper" : {
          "file" : "lib/Data/Dumper/AutoEncode/AsDumper.pm",
-         "version" : "1.00"
+         "version" : "1.0002"
       }
    },
    "release_status" : "stable",
@@ -87,7 +91,7 @@
          "web" : "https://github.com/1nickt/Data-Dumper-AutoEncode-AsDumper"
       }
    },
-   "version" : "1.00",
+   "version" : "1.0002",
    "x_generated_by_perl" : "v5.30.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.18"
 }

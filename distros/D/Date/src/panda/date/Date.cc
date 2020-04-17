@@ -50,7 +50,6 @@ void Date::set (int32_t year, ptime_t month, ptime_t day, ptime_t hour, ptime_t 
     }
 
     dchg();
-
     if (_range_check) validate_range();
 }
 
@@ -95,7 +94,6 @@ void Date::dsync () const {
 void Date::validate_range () {
     datetime old = _date;
     dsync();
-
     if (old.sec != _date.sec || old.min != _date.min || old.hour != _date.hour || old.mday != _date.mday ||
         old.mon != _date.mon || old.year != _date.year) {
         _error = errc::out_of_range;
@@ -155,6 +153,8 @@ using rfc1123_t      = exp_t<tag_wday_short, tag_char<','>, tag_char<' '>, tag_d
 using rfc850_t       = exp_t<tag_wday_long, tag_char<','>, tag_char<' '>, tag_day, tag_char<'-'>, tag_month_short, tag_char<'-'>, tag_yr, tag_char<' '>, tag_hour, tag_char<':'>, tag_min, tag_char<':'>, tag_sec, tag_char<' '>, tag_tz1123>;
 using ymd_s_t        = exp_t<tag_year,  tag_char<'/'>, tag_month, tag_char<'/'>, tag_day>;
 using dot_t          = exp_t<tag_day,   tag_char<'.'>, tag_month, tag_char<'.'>, tag_year>;
+using clf            = exp_t<tag_day, tag_char<'/'>, tag_month_short, tag_char<'/'>, tag_year, tag_char<':'>, tag_hour, tag_char<':'>, tag_min, tag_char<':'>, tag_sec, tag_char<' '>, tag_tzoff_void>;
+using clfb           = exp_t<tag_char<'['>, tag_day, tag_char<'/'>, tag_month_short, tag_char<'/'>, tag_year, tag_char<':'>, tag_hour, tag_char<':'>, tag_min, tag_char<':'>, tag_sec, tag_char<' '>, tag_tzoff_void, tag_char<']'>>;
 
 #define INPLACE_FORMAT(FMT) do {                    \
     char buf[FMT::length + 1];                      \
@@ -178,6 +178,8 @@ string Date::to_string (Format fmt) const {
         case Format::ymd          : INPLACE_FORMAT(ymd_s_t); break;
         case Format::dot          : INPLACE_FORMAT(dot_t); break;
         case Format::hms          : INPLACE_FORMAT(hms_t); break;
+        case Format::clf          : INPLACE_FORMAT(clf); break;
+        case Format::clfb         : INPLACE_FORMAT(clfb); break;
         default: throw std::invalid_argument("unknown format type for date output");
     }
     return output;

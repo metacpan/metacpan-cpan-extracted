@@ -5,7 +5,7 @@
 
 our $DATE = '2019-12-16'; # DATE
 our $DIST = 'App-TouchpadUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ enable-touchpad - Enable touchpad
 
 =head1 VERSION
 
-This document describes version 0.002 of enable-touchpad (from Perl distribution App-TouchpadUtils), released on 2019-12-16.
+This document describes version 0.003 of enable-touchpad (from Perl distribution App-TouchpadUtils), released on 2019-12-16.
 
 =head1 SYNOPSIS
 

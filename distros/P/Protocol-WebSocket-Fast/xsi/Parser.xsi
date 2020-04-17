@@ -124,7 +124,7 @@ Simple Parser::send_message (...) : ALIAS(send_message_multiframe=1) {
     }
     else { // send_message_multiframe()
         Array payloads(payload_sv);
-        if (!payloads) throw "invalid argument (payload must point to array)";
+        if (!payloads) throw Error("invalid argument (payload must point to array)");
         
         std::vector<std::vector<string>> cont;
         for (const auto& payload : payloads) {

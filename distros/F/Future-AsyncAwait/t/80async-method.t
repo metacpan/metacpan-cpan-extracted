@@ -4,13 +4,14 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Refcount;
 
 BEGIN {
    plan skip_all => "Future is not available"
       unless eval { require Future };
-   plan skip_all => "Future::AsyncAwait >= 0.38 is not available"
+   plan skip_all => "Future::AsyncAwait >= 0.40 is not available"
       unless eval { require Future::AsyncAwait;
-                    Future::AsyncAwait->VERSION( '0.38' ) };
+                    Future::AsyncAwait->VERSION( '0.40' ) };
    plan skip_all => "Object::Pad >= 0.15 is not available"
       unless eval { require Object::Pad;
                     Object::Pad->VERSION( '0.15' ) };
@@ -38,13 +39,18 @@ BEGIN {
    }
 
    my $thunker = Thunker->new;
+   is_oneref( $thunker, 'after ->new' );
 
    my $f1 = Future->new;
    my $fret = $thunker->thunk( $f1 );
+   is_refcount( $thunker, 3, 'during async sub' );
+      # +1 because $self, +1 because of @(Object::Pad/slots) pseudolexical
 
    is( $thunker->count, 0, 'count is 0 before $f1->done' );
 
    $f1->done;
+
+   is_oneref( $thunker, 'after ->done' );
 
    is( $thunker->count, 1, 'count is 1 after $f1->done' );
    is( $fret->get, "result", '$fret for await in async method' );

@@ -122,15 +122,12 @@ bool FrameHeader::parse_close_payload (const string& payload, uint16_t& code, st
     else if (payload.length() < sizeof(code)) {
         code = (uint16_t)CloseCode::UNKNOWN;
         return false;
-    } else {
-        auto ptr = payload.data();
-        code = be2h16(*((uint16_t*)ptr));
-        message = payload.substr(sizeof(code));
-        // check for invalid close codes
-        if (code < CloseCode::DONE || code == 1004 || code == CloseCode::UNKNOWN || code == CloseCode::ABNORMALLY ||
-            (code > CloseCode::INTERNAL_ERROR && code < 3000)) return false;
     }
-    return true;
+    auto ptr = payload.data();
+    code = be2h16(*((uint16_t*)ptr));
+    message = payload.substr(sizeof(code));
+    // check for invalid close codes
+    return !CloseCode::is_sending_forbidden(code);
 }
 
 string FrameHeader::compile_close_payload (uint16_t code, const string& message) {

@@ -2,12 +2,11 @@
 use strict;
 use warnings;
 
-use List::Util qw/ shuffle /;
-use lib '/Users/gene/sandbox/MIDI-Drummer-Tiny/lib';
+# Use local libraries
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw( MIDI-Drummer-Tiny MIDI-Util Music-Duration-Partition );
+
 use MIDI::Drummer::Tiny;
-use lib '/Users/gene/sandbox/MIDI-Util/lib';
 use MIDI::Util;
-use lib '/Users/gene/sandbox/Music-Duration-Partition/lib';
 use Music::Duration::Partition;
 use Music::Scales;
 use Music::VoiceGen;

@@ -43,6 +43,10 @@ subtest basics => sub {
         'float|F=f',
         'str|S=s',
     );
+    my @gospec2 = (
+        'str|S=s',
+        'opt-str|s:s',
+    );
 
     test_complete(
         name        => 'option name',
@@ -296,6 +300,21 @@ subtest basics => sub {
                         }},
         comp_line0  => 'CMD --str ^',
         result      => [qw/20 10/],
+    );
+
+    test_complete(
+        name        => 'not forced expecting a value when not using =',
+        args        => {getopt_spec=>\@gospec2,
+                        completion=>sub { [qw/aa a b c/] }},
+        comp_line0  => 'CMD --opt-str ^',
+        result      => [qw/--str -S aa a b c/],
+    );
+    test_complete(
+        name        => 'force expecting a value due to =',
+        args        => {getopt_spec=>\@gospec2,
+                        completion=>sub { [qw/aa a b c/] }},
+        comp_line0  => 'CMD --opt-str=^',
+        result      => [qw/aa a b c/],
     );
 
     # XXX test option value with completion routine returning hash

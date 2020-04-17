@@ -1,3 +1,16 @@
+Changes in 1.8.0 (April 2020)
+- revised "tirpc" change in 1.7.3: use "-ltirpc" only when SUN-RPC is
+  NOT included in libc; else we may compile against tirpc but linker
+  may resolved against libc; leads to memory corruption in auth_destroy()
+- cntd. attempt at fixing Makefile.PL for build on NetBSD release > 6
+- Backport of minor fixes & enhancements done while porting to Python
+  - extended test scripts (RPC test; read-back&verify limits after setqlim)
+  - RPC result handling: removed forced ESRCH error upon 0 limits
+    so that behavior matches that of local query (at least on Linux)
+  - corrected Quota::strerr() for errors caused in Sun-RPC library funcs
+  - updated include/quotaio_xfs.h to latest version in Linux headers
+    and use newer (~2004) interface Q_XQUOTASYNC for Quota::sync()
+
 Changes in 1.7.4 (March 2020)
 - Build fixes for NetBSD release > 6 and Apple/Darwin
   based on failure reports of automated CPAN testing

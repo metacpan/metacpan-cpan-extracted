@@ -1,3 +1,9 @@
+[Changes for 0.9508 - Thu Apr 16 13:19:55 CST 2020]
+
+* Add callback option.
+
+  Contributed by: Robert Rothenberg
+
 [Changes for 0.9507 - Sat Sep 19 02:29:56 CST 2015]
 
 * Add LICENSE file. (Apache 2.0)

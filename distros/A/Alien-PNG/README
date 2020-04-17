@@ -2,7 +2,7 @@ NAME
     Alien::PNG - building, finding and using PNG binaries
 
 VERSION
-    Version 0.1
+    Version 0.2
 
 SYNOPSIS
     Alien::PNG tries (in given order) during its installation:

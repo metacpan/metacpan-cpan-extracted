@@ -1,9 +1,9 @@
 package Log::ger::Output::LogDispatchOutput;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-09'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Output-LogDispatchOutput'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use warnings;
 use Log::ger::Util;
 
 sub meta { +{
-    v => 1,
+    v => 2,
 } }
 
 sub get_hooks {
@@ -74,7 +74,7 @@ Log::ger::Output::LogDispatchOutput - Send logs to a Log::Dispatch output
 
 =head1 VERSION
 
-This document describes version 0.005 of Log::ger::Output::LogDispatchOutput (from Perl distribution Log-ger-Output-LogDispatchOutput), released on 2020-03-09.
+This document describes version 0.006 of Log::ger::Output::LogDispatchOutput (from Perl distribution Log-ger-Output-LogDispatchOutput), released on 2020-03-11.
 
 =head1 SYNOPSIS
 

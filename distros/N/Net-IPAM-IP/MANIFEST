@@ -13,6 +13,7 @@ t/03-incr.t
 t/04-errors.t
 t/05-inet-x2y-pp.t
 t/06-subclassing.t
+t/07-addrs_and_names.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

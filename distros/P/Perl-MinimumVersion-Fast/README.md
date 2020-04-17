@@ -12,13 +12,13 @@ Perl::MinimumVersion::Fast - Find a minimum required version of perl for Perl co
 # DESCRIPTION
 
 "Perl::MinimumVersion::Fast" takes Perl source code and calculates the minimum
-version of perl required to be able to run it. Because it is based on goccy's [Compiler::Lexer](https://metacpan.org/pod/Compiler::Lexer),
+version of perl required to be able to run it. Because it is based on goccy's [Compiler::Lexer](https://metacpan.org/pod/Compiler%3A%3ALexer),
 it can do this without having to actually load the code.
 
 Perl::MinimumVersion::Fast is an alternative fast & lightweight implementation of Perl::MinimumVersion.
 
 This module supports only Perl 5.8.1+.
-If you want to support **Perl 5.6**, use [Perl::MinimumVersion](https://metacpan.org/pod/Perl::MinimumVersion) instead.
+If you want to support **Perl 5.6**, use [Perl::MinimumVersion](https://metacpan.org/pod/Perl%3A%3AMinimumVersion) instead.
 
 In 2013, you don't need to support Perl 5.6 in most of case.
 
@@ -69,10 +69,10 @@ In 2013, you don't need to support Perl 5.6 in most of case.
 # BENCHMARK
 
 Perl::MinimumVersion::Fast is faster than Perl::MinimumVersion.
-Because Perl::MinimumVersion::Fast uses [Compiler::Lexer](https://metacpan.org/pod/Compiler::Lexer), that is a Perl5 lexer implemented in C++.
+Because Perl::MinimumVersion::Fast uses [Compiler::Lexer](https://metacpan.org/pod/Compiler%3A%3ALexer), that is a Perl5 lexer implemented in C++.
 And Perl::MinimumVersion::Fast omits some features implemented in Perl::MinimumVersion.
 
-But, but, [Perl::MinimumVersion::Fast](https://metacpan.org/pod/Perl::MinimumVersion::Fast) is really fast.
+But, but, [Perl::MinimumVersion::Fast](https://metacpan.org/pod/Perl%3A%3AMinimumVersion%3A%3AFast) is really fast.
 
                                 Rate Perl::MinimumVersion Perl::MinimumVersion::Fast
     Perl::MinimumVersion       5.26/s                   --                       -97%
@@ -87,7 +87,7 @@ it under the same terms as Perl itself.
 
 # THANKS TO
 
-Most of documents are taken from [Perl::MinimumVersion](https://metacpan.org/pod/Perl::MinimumVersion).
+Most of documents are taken from [Perl::MinimumVersion](https://metacpan.org/pod/Perl%3A%3AMinimumVersion).
 
 # AUTHOR
 
@@ -95,6 +95,6 @@ tokuhirom <tokuhirom@gmail.com>
 
 # SEE ALSO
 
-This module using [Compiler::Lexer](https://metacpan.org/pod/Compiler::Lexer) as a lexer for Perl5 code.
+This module using [Compiler::Lexer](https://metacpan.org/pod/Compiler%3A%3ALexer) as a lexer for Perl5 code.
 
-This module is inspired from [Perl::MinimumVersion](https://metacpan.org/pod/Perl::MinimumVersion).
+This module is inspired from [Perl::MinimumVersion](https://metacpan.org/pod/Perl%3A%3AMinimumVersion).

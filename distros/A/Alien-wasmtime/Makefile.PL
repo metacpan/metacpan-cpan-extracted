@@ -64,11 +64,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "FFI::Platypus"     => "1.00",
+    "File::Which"       => 0,
     "Test2::V0"         => "0.000060",
     "Test::Alien"       => "1.90",
     "Test::Alien::Diag" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -80,6 +81,7 @@ my %FallbackPrereqs = (
   "Alien::Build::MM"    => "0.32",
   "ExtUtils::MakeMaker" => "6.52",
   "FFI::Platypus"       => "1.00",
+  "File::Which"         => 0,
   "Test2::V0"           => "0.000060",
   "Test::Alien"         => "1.90",
   "Test::Alien::Diag"   => 0

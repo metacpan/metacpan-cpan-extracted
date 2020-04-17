@@ -1,0 +1,93 @@
+NAME
+    Data::Walk::More - Traverse Perl data structures, with more information
+    during traversing
+
+VERSION
+    This document describes version 0.001 of Data::Walk::More (from Perl
+    distribution Data-Walk-More), released on 2020-04-15.
+
+SYNOPSIS
+     use Data::Walk::More; # exports walk() and walkdepth()
+
+     walk \&wanted, @items_to_walk;
+     walkdepth \&wanted, @items_to_walk;
+
+     # full options
+     walk {
+         wanted => \&wanted,
+         # follow => 0,         # whether to follow circular refs, default is 0.
+         # bydepth => 0,        # whether to descend into subnodes first. default is 0.
+         # sortkeys => 1,       # whether to visit hash values in key order. default is 1.
+         # recurseobjects => 1, # whether to recurse into objects. default is 1.
+     }, @items_to_walk;
+
+DESCRIPTION
+    This module is like Data::Walk, but there are a few differences, a few
+    more options, and the callback gets more information.
+
+VARIABLES
+    The following variables are available for the callback. Unless specified
+    otherwise, do not modify these during traversing.
+
+  $Data::Walk::More::depth
+    Integer, starts at 0.
+
+  @Data::Walk::More::containers
+  $Data::Walk::More::container
+  @Data::Walk::More::indexes
+  $Data::Walk::More::index
+  $Data::Walk::More::prune
+    Can be set to true to prevent Data::Walk::More to descend into hash or
+    array. Ineffective when you use "bydepth" option, since Data::Walk::More
+    will have already descended into hash or array before the callback can
+    prune it.
+
+DIFFERENCES BETWEEN DATA::WALK::MORE (DWM) WITH DATA::WALK (DW)
+    DWM does not pass the node in $_[0] so you need to use $_.
+
+    DWM also provides the full path (containers from the top level, in
+    @containers and <@indexes>) instead of just the immediate container in
+    $container and $index.
+
+    When traversing hash, $index package variable in DWM refers to hash key,
+    not a number, which is more useful in my opinion.
+
+    You can prune (avoid descending) by setting $prune.
+
+FUNCTIONS
+  walk
+    Options:
+
+   wanted
+   bydepth
+   follow
+   sortkeys
+   recurseobjects
+  walkdepth
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Walk-More>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Walk-More>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Walk-More>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Walk
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

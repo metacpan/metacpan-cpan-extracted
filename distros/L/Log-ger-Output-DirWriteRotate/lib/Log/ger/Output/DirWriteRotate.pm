@@ -1,15 +1,15 @@
 package Log::ger::Output::DirWriteRotate;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-09'; # DATE
+our $DATE = '2020-03-11'; # DATE
 our $DIST = 'Log-ger-Output-DirWriteRotate'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
 
 sub meta { +{
-    v => 1,
+    v => 2,
 } }
 
 sub get_hooks {
@@ -49,7 +49,7 @@ Log::ger::Output::DirWriteRotate - Log to Dir::Write::Rotate
 
 =head1 VERSION
 
-This document describes version 0.003 of Log::ger::Output::DirWriteRotate (from Perl distribution Log-ger-Output-DirWriteRotate), released on 2020-03-09.
+This document describes version 0.004 of Log::ger::Output::DirWriteRotate (from Perl distribution Log-ger-Output-DirWriteRotate), released on 2020-03-11.
 
 =head1 SYNOPSIS
 

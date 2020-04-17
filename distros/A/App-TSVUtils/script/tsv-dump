@@ -5,7 +5,7 @@
 
 our $DATE = '2019-12-19'; # DATE
 our $DIST = 'App-TSVUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ tsv-dump - Dump TSV as data structure (array of arrays)
 
 =head1 VERSION
 
-This document describes version 0.003 of tsv-dump (from Perl distribution App-TSVUtils), released on 2019-12-19.
+This document describes version 0.004 of tsv-dump (from Perl distribution App-TSVUtils), released on 2019-12-19.
 
 =head1 SYNOPSIS
 

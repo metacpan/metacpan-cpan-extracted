@@ -445,7 +445,7 @@ sub handleUpload {
     }
     my $name = $self->param('name');
     if (not $name){
-        return self->render(text=>encode_json({exception=>{message=>'Plugin Name missing',code=>3934}}));
+        return $self->render(text=>encode_json({exception=>{message=>'Plugin Name missing',code=>3934}}));
     }
 
     my $upload = $self->req->upload('file');

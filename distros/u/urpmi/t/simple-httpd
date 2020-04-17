@@ -24,7 +24,7 @@ sub configure_hook {
 
   $self->{server}->{port}     = "*:$PORT";   # port and addr to bind
   $self->{server}->{user}     = 'nobody'; # user to run as
-  $self->{server}->{group}    = 'nogroup' if -e '/etc/mageia-release'; # group to run as
+  $self->{server}->{group}    = 'nogroup' is_mageia(); # group to run as
   $self->{server}->{setsid}   = 1;        # daemonize
   $self->{server}->{log_file} = "$root/server.log";
 
@@ -164,6 +164,14 @@ sub content_type {
   my ($self, $type) = @_;
   $self->http_header;
   return "Content-type: $type\r\n";
+}
+
+sub fatal_hook  {
+  my ($self, $msg, $pkg, $file, $number, ) = @_;
+  # error message, the package, file, and line number.
+  print $self->status($number, $msg), "\r\n";
+  warn "Error - msg='$msg', pkg='$pkg', file='$file', nb='$number'\n";
+  return;
 }
 
 sub error{

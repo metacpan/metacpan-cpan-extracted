@@ -3,7 +3,7 @@
 package main;
 # PODNAME: koha-auth
 # ABSTRACT: Generate authorities from bibliographic records
-$main::VERSION = '0.064';
+$main::VERSION = '0.065';
 use 5.010;
 use utf8;
 use strict;
@@ -90,7 +90,7 @@ koha-auth - Generate authorities from bibliographic records
 
 =head1 VERSION
 
-version 0.064
+version 0.065
 
 =head1 DESCRIPTION
 
@@ -134,6 +134,8 @@ Authorities configuration file looks like that:
  authcode: NP
  authletters: abcd
  authtag: 200
+ ind1: null
+ ind2: 3
  bibliotags: 
    - 700
    - 701

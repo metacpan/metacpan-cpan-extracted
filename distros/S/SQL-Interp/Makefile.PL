@@ -6,8 +6,7 @@ WriteMakefile
   'NAME' => 'SQL::Interp',
   'VERSION_FROM' => 'lib/SQL/Interp.pm',
   'PREREQ_PM' => {
-                   'DBI' => '1',
-                   'Sub::Exporter' => 0
+                   'DBI' => '1'
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],

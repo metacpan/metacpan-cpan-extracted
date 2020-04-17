@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent "Archive::BagIt";
 
-our $VERSION = '0.053.3'; # VERSION
+our $VERSION = '0.055'; # VERSION
 
 use IO::AIO;
 use Time::HiRes qw(time);
@@ -28,13 +28,13 @@ sub verify_bag {
     die("$payload_dir is not a directory") unless -d ($payload_dir);
     # Read the manifest file
     #print Dumper($self->{entries});
-    foreach my $entry (keys %{$self->{entries}}) {
+    foreach my $entry (keys( @{$self->{entries}})) {
       $manifest{$entry} = $self->{entries}->{$entry};
     }
     # Compile a list of payload files
     File::Find::find(sub{ push(@payload, $File::Find::name)  }, $payload_dir);
     # Evaluate each file against the manifest
-    my $digestobj = new Digest::MD5;
+    my $digestobj = new Digest::MD5; # FIXME: use plugins instead
     foreach my $file (@payload) {
         next if (-d ($file));
         my $local_name = substr($file, length($bagit) + 1);
@@ -57,7 +57,7 @@ sub verify_bag {
           $digest = $digestobj->add($data)->hexdigest;
         }
         else {
-          $digest = $digestobj->addfile($fh)->hexdigest;
+          $digest = $digestobj->addfile($fh)->hexdigest; # FIXME: use plugins instead
         }
         my $finish_time = time();
         $self->{stats}->{files}->{"$bagit/$local_name"}->{verify_time}= ($finish_time - $start_time);
@@ -100,7 +100,7 @@ Archive::BagIt::Fast
 
 =head1 VERSION
 
-version 0.053.3
+version 0.055
 
 =head1 NAME
 
@@ -114,13 +114,13 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/rjeschmi/Archive-BagIt>
-and may be cloned from L<git://github.com/rjeschmi/Archive-BagIt.git>
+The development version is on github at L<https://github.com/Archive-BagIt>
+and may be cloned from L<git://github.com/Archive-BagIt.git>
 
 =head1 BUGS AND LIMITATIONS
 
 You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/rjeschmi/Archive-BagIt/issues>.
+web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
@@ -128,7 +128,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

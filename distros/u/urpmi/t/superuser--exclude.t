@@ -42,7 +42,7 @@ sub set_install_langs_macro {
     mkdir "$::pwd/root/etc/rpm";
     my $macros_file = "$::pwd/root/etc/rpm/macros";
     system("echo \%_install_langs $langs > $macros_file");
-    ok(-e $macros_file);
+    ok(-e $macros_file, "macros file exists");
 }
 
 sub test_rpm_cmdline {
@@ -58,7 +58,7 @@ sub test_urpmi_cmdline {
     my ($option, $want) = @_;
 
     urpmi("$option $name");
-    check("urpmi $option", $want);
+    check("urpmi $option", $want), "have $want";
     urpme($name);
     check('rpm -e', []);
 }

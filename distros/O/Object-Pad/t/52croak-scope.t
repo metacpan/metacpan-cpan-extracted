@@ -16,6 +16,16 @@ EOPERL
       'message from failure of has' );
 }
 
+# RT132337
+{
+   ok( !eval <<'EOPERL',
+      class AClass { }
+      has $slot;
+EOPERL
+      'has after closed class block fails' );
+   like( $@, qr/^Cannot 'has' outside of 'class' at /);
+}
+
 {
    ok( !eval <<'EOPERL',
       method m() { }

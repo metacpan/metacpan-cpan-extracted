@@ -2,7 +2,7 @@ NAME
     Sah::Schemas::Binary - Sah schemas related to binary data
 
 VERSION
-    This document describes version 0.002 of Sah::Schemas::Binary (from Perl
+    This document describes version 0.003 of Sah::Schemas::Binary (from Perl
     distribution Sah-Schemas-Binary), released on 2020-03-02.
 
 SAH SCHEMAS

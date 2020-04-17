@@ -1,0 +1,37 @@
+---
+abstract: 'dynamic data feeds'
+author:
+  - 'LNATION <email@lnation.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Feed-Data
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::Load: '0.25'
+  Compiled::Params::OO: '0.04'
+  HTML::LinkExtor: '0'
+  HTML::Strip: '2.1'
+  HTTP::Message: '6.22'
+  JSON: '4.02'
+  LWP::Protocol::https: '6.07'
+  LWP::UserAgent: '6.44'
+  Moo: '2.004'
+  MooX::HandlesVia: '0.001008'
+  Type::Tiny: '1.010001'
+  XML::Atom::Feed: '0'
+  XML::RSS::LibXML: '0.3105'
+  perl: '5.006'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

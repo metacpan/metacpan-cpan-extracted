@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.16.0 2020-04-15T07:54:29Z
+
+    - Module now can have &finalize function.
+
 v1.15.6 2020-04-01T03:00:14Z
 
     - Provide colortable() funciton in Colormap.pm.

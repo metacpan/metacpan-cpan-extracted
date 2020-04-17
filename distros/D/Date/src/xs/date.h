@@ -1,5 +1,6 @@
 #pragma once
 #include <xs.h>
+#include <xs/Scope.h>
 #include <panda/date.h>
 #include <panda/time.h>
 
@@ -7,6 +8,10 @@ namespace xs { namespace date {
 
 using namespace panda::date;
 using namespace panda::time;
+
+extern panda::string_view strict_hint_name;
+
+inline bool is_strict_mode () { return Scope::Hints::exists(strict_hint_name); }
 
 Date    sv2date    (const Sv& arg, const Timezone* zone = nullptr, int fmt = Date::InputFormat::all);
 DateRel sv2daterel (const Sv& arg);

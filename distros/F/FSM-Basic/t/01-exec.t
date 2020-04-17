@@ -44,10 +44,10 @@ my $out;
 ($final, $out) = $fsm->run('default');
 ($final, $out) = $fsm->run('ping 127.0.0.1');
 
-ok($out =~ /3 packets transmitted, 3 received/mg);
+ok($out =~ /3 packets transmitted, 3 (.*)received/mg);
 
 ($final, $out) = $fsm->run('test on 127.0.0.1');
-ok($out =~ /3 packets transmitted, 3 received/mg);
+ok($out =~ /3 packets transmitted, 3 (.*)received/mg);
 
 last if $final;
 

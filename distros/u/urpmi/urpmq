@@ -437,6 +437,7 @@ if ($options{list_aliases}) {
 		    }
 		    if ($options{info})  {
 			printf "%-12s: %s\n", "Name", $pkg->name;
+			printf "%-12s: %s\n", "Epoch", $pkg->epoch if $pkg->epoch;
 			printf "%-12s: %s\n", "Version", $pkg->version;
 			printf "%-12s: %s\n", "Release", $pkg->release;
 			printf "%-12s: %s\n", "Group", $pkg->group;

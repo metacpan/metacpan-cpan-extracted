@@ -15,9 +15,9 @@ has 'plugin_name' => (
     default => 'Archive::BagIt::Plugin::Algorithm::MD5',
 );
 
-has 'name' => ( 
-    is => 'ro',
-    isa => 'Str',
+has 'name' => (
+    is      => 'ro',
+    isa     => 'Str',
     default => 'md5',
 );
 
@@ -36,14 +36,24 @@ sub _build_digest_md5 {
 
 sub get_hash_string {
     my ($self, $fh) = @_;
-
-    return $self->_digest_md5->addfile($fh)->hexdigest;
+    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+        $atime,$mtime,$ctime,$blksize,$blocks)
+        = stat $fh;
+    my $buffer;
+    while (read($fh, $buffer, $blksize)) {
+        $self->_digest_md5->add($buffer);
+    }
+    return $self->_digest_md5->hexdigest;
 
 }
 
 sub verify_file {
     my ($self, $filename) = @_;
-
+    open(my $fh, '<', $filename) || die ("Can't open '$filename', $!");
+    binmode($fh);
+    my $digest = $self->get_hash_string($fh);
+    close $fh || die("could not close file '$filename', $!");
+    return $digest;
 }
 __PACKAGE__->meta->make_immutable;
 1;
@@ -60,7 +70,7 @@ Archive::BagIt::Plugin::Algorithm::MD5 - The default MD5 algorithm plugin
 
 =head1 VERSION
 
-version 0.053.3
+version 0.055
 
 =head1 AVAILABILITY
 
@@ -70,13 +80,13 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/rjeschmi/Archive-BagIt>
-and may be cloned from L<git://github.com/rjeschmi/Archive-BagIt.git>
+The development version is on github at L<https://github.com/Archive-BagIt>
+and may be cloned from L<git://github.com/Archive-BagIt.git>
 
 =head1 BUGS AND LIMITATIONS
 
 You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/rjeschmi/Archive-BagIt/issues>.
+web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
@@ -84,7 +94,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

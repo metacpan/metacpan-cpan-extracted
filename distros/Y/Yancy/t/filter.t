@@ -183,36 +183,6 @@ subtest 'run overlay_from_helper filter' => sub {
         'filter on object is run';
 };
 
-subtest 'api runs filters during set' => sub {
-    local $t->app->yancy->config->{schema}{user}{properties}{password}{'x-filter'} = [ 'test.digest' ];
-    local $t->app->yancy->config->{schema}{user}{properties}{password}{'x-digest'} = { type => 'SHA-1' };
-    my $doug = {
-        %{ $backend->get( user => 'doug' ) },
-        password => 'qwe123',
-    };
-    delete $doug->{id}; # because user.id is readOnly
-    $t->put_ok( '/yancy/api/user/doug', json => $doug )
-      ->status_is( 200 );
-    is $backend->get( user => 'doug' )->{password},
-        Digest->new( 'SHA-1' )->add( 'qwe123' )->b64digest,
-        'new password is digested correctly'
-};
-
-subtest 'api runs filters during create' => sub {
-    local $t->app->yancy->config->{schema}{user}{properties}{password}{'x-filter'} = [ 'test.digest' ];
-    local $t->app->yancy->config->{schema}{user}{properties}{password}{'x-digest'} = { type => 'SHA-1' };
-    my $new_user = {
-        username => 'qubert',
-        email => 'qubert@example.com',
-        password => 'stalemate',
-    };
-    $t->post_ok( '/yancy/api/user', json => $new_user )
-      ->status_is( 201 );
-    is $backend->get( user => 'qubert' )->{password},
-        Digest->new( 'SHA-1' )->add( 'stalemate' )->b64digest,
-        'new password is digested correctly'
-};
-
 subtest 'register filters from config' => sub {
     my $t = Test::Mojo->new( 'Yancy', {
         backend => $backend_url,
@@ -242,6 +212,17 @@ subtest 'register filters from config' => sub {
     is $filtered_user->{password},
         Digest->new( 'SHA-1' )->add( 'unfiltered' )->b64digest,
         'filter is executed';
+};
+
+subtest 'run mask filter' => sub {
+    local $t->app->yancy->config->{schema}{people}{properties}{email}{'x-filter'}[0] = [ 'yancy.mask' => '[^@]{2,}(?=[^@]{2,4}@)', '*' ];
+    my $person = {
+        name => 'Doug',
+        email => 'doug@preaction.me',
+    };
+    my $filtered_person = $t->app->yancy->filter->apply( people => $person );
+    is $filtered_person->{email}, '**ug@preaction.me',
+        'filter on object is run';
 };
 
 done_testing;

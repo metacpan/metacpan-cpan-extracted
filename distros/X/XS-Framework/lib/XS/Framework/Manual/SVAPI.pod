@@ -48,6 +48,8 @@ L<XS::Framework::Manual::SVAPI::Glob> object holds a GLOB containing a scalar, a
 
 L<XS::Framework::Manual::SVAPI::Io> object holds IO.
 
+L<XS::Framework::Manual::SVAPI::Scope> contains scope utils.
+
 The rule of thumb for wrappers creation (i.e. constructor, assignment): if
 the incorrect underlying C<SV*> is supplied (e.g. C<SV*> holding a number
 is supplied for C<Object>), then exception is thrown. If C<NULL> / C<nullptr>
@@ -84,6 +86,8 @@ L<XS::Framework::Manual::SVAPI::Simple>
 L<XS::Framework::Manual::SVAPI::Stash>
 
 L<XS::Framework::Manual::SVAPI::Io>
+
+L<XS::Framework::Manual::SVAPI::Scope>
 
 
 =head2 MISCELLANEOUS

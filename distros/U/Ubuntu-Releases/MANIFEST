@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+devscript/update
 dist.ini
 lib/Ubuntu/Releases.pm
 t/00-compile.t

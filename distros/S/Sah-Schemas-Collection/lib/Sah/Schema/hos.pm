@@ -3,7 +3,7 @@ package Sah::Schema::hos;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-03-02'; # DATE
 our $DIST = 'Sah-Schemas-Collection'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $schema = [hash => {
     summary => 'Hash of (defined) strings',
@@ -37,7 +37,25 @@ Sah::Schema::hos - Hash of (defined) strings
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::hos (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+This document describes version 0.004 of Sah::Schema::hos (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+
+=head1 SYNOPSIS
+
+Sample data:
+
+ "a"  # INVALID
+
+ []  # INVALID
+
+ {}  # valid
+
+ {k=>"a"}  # valid
+
+ {k=>undef}  # INVALID
+
+ {k=>"a",k2=>[]}  # INVALID
+
+ {k=>"a",k2=>{}}  # INVALID
 
 =head1 DESCRIPTION
 

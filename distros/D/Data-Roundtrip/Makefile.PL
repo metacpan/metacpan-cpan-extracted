@@ -1,4 +1,4 @@
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Data/Roundtrip.pm',
     ABSTRACT_FROM    => 'lib/Data/Roundtrip.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.008',
     EXE_FILES		=> [qw|
 	script/json2json.pl
 	script/json2yaml.pl
@@ -29,15 +29,19 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+	'Data::Dumper' => '0',
 	'Data::Random::Structure' => '0',
+	'Data::Random::Structure::UTF8' => '0.04',
     },
     PREREQ_PM => {
-	'Encode' => '0',
-	'JSON' => '0',
-	'Unicode::Escape' => '0',
-	'YAML' => '0',
-	'Sub::Override' => '0',
+	'Encode' => '3.0',
+	'JSON' => '4.0',
+	'Unicode::Escape' => '0.02',
+	'YAML' => '1.28',
+	'Sub::Override' => '0.09',
 	'Data::Dumper' => '0',
+	'Data::Dump' => '0',
+	'Data::Dump::Filtered' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Data-Roundtrip-*' },

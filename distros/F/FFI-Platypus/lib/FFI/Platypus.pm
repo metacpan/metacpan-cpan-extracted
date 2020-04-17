@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -172,6 +172,9 @@ sub lang
 
   $self->{lang};
 }
+
+
+sub api { shift->{api} }
 
 
 sub type
@@ -525,7 +528,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 
@@ -766,6 +769,14 @@ If the foreign language plugin supports it, this will also enable
 Platypus to find symbols using the demangled names (for example, if you
 specify L<CPP|FFI::Platypus::Lang::CPP> for C++ you can use method names
 like C<Foo::get_bar()> with L</attach> or L</function>.
+
+=head2 api
+
+[version 1.11]
+
+ my $level = $ffi->api;
+
+Returns the API level of the Platypus instance.
 
 =head1 METHODS
 
@@ -2219,9 +2230,9 @@ recent versions of Perl.
 
 =item L<FFI>
 
-Foreign function interface based on (nomenclature is everything) FSF's
-C<ffcall>. It hasn't worked for quite some time, and C<ffcall> is no
-longer supported or distributed.
+Older, simpler, less featureful FFI.  It used to be implemented
+using FSF's C<ffcall>.  Because C<ffcall> has been unsupported for
+some time, I reimplemented this module using L<FFI::Platypus>.
 
 =item L<C::DynaLib>
 

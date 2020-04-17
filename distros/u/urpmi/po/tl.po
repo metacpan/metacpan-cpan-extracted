@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: urpmi-tl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-26 09:37+0300\n"
+"POT-Creation-Date: 2020-01-18 09:59+0200\n"
 "PO-Revision-Date: 2005-03-08 20:24+0800\n"
 "Last-Translator: Eric Pareja <xenos@upm.edu.ph>\n"
 "Language-Team: Filipino <salinpinoy@comitus.net>\n"
@@ -64,8 +64,8 @@ msgid "Cancel"
 msgstr "I-cancel"
 
 #: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
-#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1670
-#: ../urpm/media.pm:1821
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
+#: ../urpm/media.pm:1833
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "...pagkukuha muli nabigo: %s"
@@ -1053,25 +1053,27 @@ msgstr ""
 "--synthesis ay hindi magagamit kasama ang --media, --excludemedia,--"
 "sortmedia, --update o --parallel"
 
-#: ../urpm/media.pm:792
+#: ../urpm/media.pm:793
 #, fuzzy, c-format
 msgid "ignoring non-free medium `%s'"
 msgstr "Ini-edit ang medium na \"%s\":"
 
-#: ../urpm/media.pm:802
+#: ../urpm/media.pm:803
 #, fuzzy, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
 msgstr "Ini-edit ang medium na \"%s\":"
 
-#: ../urpm/media.pm:806
+#: ../urpm/media.pm:807
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
 
 #: ../urpm/media.pm:816
-#, c-format
-msgid "un-ignoring 32bit medium `%s' b/c system is 32-bit EFI"
-msgstr ""
+#, fuzzy, c-format
+msgid ""
+"un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
+"32-bit EFI"
+msgstr "Ini-edit ang medium na \"%s\":"
 
 #: ../urpm/media.pm:844
 #, fuzzy, c-format
@@ -1133,162 +1135,162 @@ msgstr "hindi mabuksan ang rpmdb"
 msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr "hindi ma-access ang unang installation medium (walang hdlists na file)"
 
-#: ../urpm/media.pm:1172
+#: ../urpm/media.pm:1184
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr ""
 
-#: ../urpm/media.pm:1230
+#: ../urpm/media.pm:1242
 #, fuzzy, c-format
 msgid "retrieving media.cfg file..."
 msgstr "kinukuha muli ang hdlists file..."
 
-#: ../urpm/media.pm:1273
+#: ../urpm/media.pm:1285
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "sinusubukang piliin ang di-mayroong medium na \"%s\""
 
-#: ../urpm/media.pm:1276
+#: ../urpm/media.pm:1288
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "pumipili ng maramihang media: %s"
 
-#: ../urpm/media.pm:1335
+#: ../urpm/media.pm:1347
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "inaalis ang medium na \"%s\""
 
-#: ../urpm/media.pm:1426
+#: ../urpm/media.pm:1438
 #, fuzzy, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "kinukuha muli ang mga rpm file mula sa medium na \"%s\"..."
 
-#: ../urpm/media.pm:1460
+#: ../urpm/media.pm:1472
 #, fuzzy, c-format
 msgid "...reconfiguration failed"
 msgstr "Configuration file"
 
-#: ../urpm/media.pm:1466
+#: ../urpm/media.pm:1478
 #, fuzzy, c-format
 msgid "reconfiguration done"
 msgstr "Pagsasaayos ng Server"
 
-#: ../urpm/media.pm:1482
+#: ../urpm/media.pm:1494
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr ""
 
-#: ../urpm/media.pm:1503
+#: ../urpm/media.pm:1515
 #, fuzzy, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr "medium na \"%s\" ay hindi nakapili"
 
-#: ../urpm/media.pm:1514
+#: ../urpm/media.pm:1526
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "sinusuri ang synthesis file [%s]"
 
-#: ../urpm/media.pm:1534
+#: ../urpm/media.pm:1546
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "problema sa pagbabasa ng synthesis file ng medium na \"%s\""
 
-#: ../urpm/media.pm:1547 ../urpm/media.pm:1642
+#: ../urpm/media.pm:1559 ../urpm/media.pm:1654
 #, fuzzy, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr "isinusulat ang list file para sa medium na \"%s\""
 
-#: ../urpm/media.pm:1549 ../urpm/media.pm:1619 ../urpm/media.pm:1872
+#: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
 msgid "...copying failed"
 msgstr "...pagkokopya nabigo"
 
-#: ../urpm/media.pm:1615
+#: ../urpm/media.pm:1627
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "kinokopya ang paglalarawan na file ng \"%s\"..."
 
-#: ../urpm/media.pm:1617 ../urpm/media.pm:1646
+#: ../urpm/media.pm:1629 ../urpm/media.pm:1658
 #, c-format
 msgid "...copying done"
 msgstr "...pagkokopya natapos"
 
-#: ../urpm/media.pm:1648
+#: ../urpm/media.pm:1660
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "pagkopya ng [%s] nabigo (file ay kahina-hinalang maliit)"
 
-#: ../urpm/media.pm:1696
+#: ../urpm/media.pm:1708
 #, fuzzy, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr "kino-compute ang md5sum ng nakuhang source hdlist (o synthesis)"
 
-#: ../urpm/media.pm:1698 ../urpm/media.pm:2181
+#: ../urpm/media.pm:1710 ../urpm/media.pm:2193
 #, fuzzy, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
 msgstr "pagkopya ng [%s] nabigo (md5sum di-tugma)"
 
-#: ../urpm/media.pm:1713
+#: ../urpm/media.pm:1725
 #, fuzzy, c-format
 msgid "genhdlist2 failed on %s"
 msgstr "sinusuri ang hdlist file [%s]"
 
-#: ../urpm/media.pm:1723
+#: ../urpm/media.pm:1735
 #, fuzzy, c-format
 msgid "comparing %s and %s"
 msgstr "ini-install ang %s"
 
-#: ../urpm/media.pm:1753
+#: ../urpm/media.pm:1765
 #, fuzzy, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr "walang nahanap na hdlist file para sa medium na \"%s\""
 
-#: ../urpm/media.pm:1779
+#: ../urpm/media.pm:1791
 #, fuzzy, c-format
 msgid "copying MD5SUM file of \"%s\"..."
 msgstr "kinokopya ang paglalarawan na file ng \"%s\"..."
 
-#: ../urpm/media.pm:1819
+#: ../urpm/media.pm:1831
 #, fuzzy, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
 msgstr "inbalidong pangalan ng rpm file [%s]"
 
-#: ../urpm/media.pm:1822
+#: ../urpm/media.pm:1834
 #, fuzzy, c-format
 msgid "no metadata found for medium \"%s\""
 msgstr "walang nahanap na hdlist file para sa medium na \"%s\""
 
-#: ../urpm/media.pm:1854
+#: ../urpm/media.pm:1866
 #, fuzzy, c-format
 msgid "retrieving source synthesis of \"%s\"..."
 msgstr "kinukuha muli ang source hdlist (o synthesis) ng \"%s\"..."
 
-#: ../urpm/media.pm:1920
+#: ../urpm/media.pm:1932
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "sinusuri ang pubkey file ng \"%s\"..."
 
-#: ../urpm/media.pm:1932
+#: ../urpm/media.pm:1944
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...in-import ang key na %s mula sa pubkey file ng \"%s\""
 
-#: ../urpm/media.pm:1936
+#: ../urpm/media.pm:1948
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "hindi ma-import ang pubkey file ng \"%s\""
 
-#: ../urpm/media.pm:1977
+#: ../urpm/media.pm:1989
 #, fuzzy, c-format
 msgid "no synthesis file found for medium \"%s\""
 msgstr "walang nahanap na hdlist file para sa medium na \"%s\""
 
-#: ../urpm/media.pm:2010
+#: ../urpm/media.pm:2022
 #, fuzzy, c-format
 msgid "updated medium \"%s\""
 msgstr "idinagdag ang medium na %s"
 
-#: ../urpm/media.pm:2175
+#: ../urpm/media.pm:2187
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr ""

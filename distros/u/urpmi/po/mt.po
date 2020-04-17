@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mt\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-26 09:37+0300\n"
+"POT-Creation-Date: 2020-01-18 09:59+0200\n"
 "PO-Revision-Date: 2004-09-07 05:59+0200\n"
 "Last-Translator: Ramon Casha <ramon.casha@linux.org.mt>\n"
 "Language-Team: Maltese <mt@li.org>\n"
@@ -68,8 +68,8 @@ msgid "Cancel"
 msgstr "Ikkanċella"
 
 #: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
-#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1670
-#: ../urpm/media.pm:1821
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
+#: ../urpm/media.pm:1833
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "...qari falla: %s"
@@ -1040,25 +1040,27 @@ msgstr ""
 "--synthesis ma jistax jintuża ma' --media, --excludemedia, --sortmedia,  --"
 "update jew --parallel"
 
-#: ../urpm/media.pm:792
+#: ../urpm/media.pm:793
 #, fuzzy, c-format
 msgid "ignoring non-free medium `%s'"
 msgstr "Editja s-sors \"%s\":"
 
-#: ../urpm/media.pm:802
+#: ../urpm/media.pm:803
 #, fuzzy, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
 msgstr "Editja s-sors \"%s\":"
 
-#: ../urpm/media.pm:806
+#: ../urpm/media.pm:807
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
 
 #: ../urpm/media.pm:816
-#, c-format
-msgid "un-ignoring 32bit medium `%s' b/c system is 32-bit EFI"
-msgstr ""
+#, fuzzy, c-format
+msgid ""
+"un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
+"32-bit EFI"
+msgstr "Editja s-sors \"%s\":"
 
 #: ../urpm/media.pm:844
 #, fuzzy, c-format
@@ -1122,162 +1124,162 @@ msgstr ""
 "ma nistax naċċessa l-ewwel sors ta' installazzjoni (ma nstabx il-fajl "
 "hdlists)"
 
-#: ../urpm/media.pm:1172
+#: ../urpm/media.pm:1184
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr ""
 
-#: ../urpm/media.pm:1230
+#: ../urpm/media.pm:1242
 #, fuzzy, c-format
 msgid "retrieving media.cfg file..."
 msgstr "qed naqra l-fajl \"hdlists\"..."
 
-#: ../urpm/media.pm:1273
+#: ../urpm/media.pm:1285
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "qed nipprova naċċessa sors ineżistenti \"%s\""
 
-#: ../urpm/media.pm:1276
+#: ../urpm/media.pm:1288
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "qed nagħżel sors multiplu: %s"
 
-#: ../urpm/media.pm:1335
+#: ../urpm/media.pm:1347
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "qed jitneħħa s-sors \"%s\""
 
-#: ../urpm/media.pm:1426
+#: ../urpm/media.pm:1438
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "qed jiġi rikonfigurat urpmi għas-sors \"%s\"..."
 
-#: ../urpm/media.pm:1460
+#: ../urpm/media.pm:1472
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...rikonfigurazzjoni falliet"
 
-#: ../urpm/media.pm:1466
+#: ../urpm/media.pm:1478
 #, c-format
 msgid "reconfiguration done"
 msgstr "rikonfigurazzjoni lesta"
 
-#: ../urpm/media.pm:1482
+#: ../urpm/media.pm:1494
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr ""
 
-#: ../urpm/media.pm:1503
+#: ../urpm/media.pm:1515
 #, fuzzy, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr "sors \"%s\" mhuwiex magħżul"
 
-#: ../urpm/media.pm:1514
+#: ../urpm/media.pm:1526
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "qed jiġi eżaminat il-fajl ta' sinteżi [%s]"
 
-#: ../urpm/media.pm:1534
+#: ../urpm/media.pm:1546
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "problema fil-qari tas-sinteżi għas-sors \"%s\""
 
-#: ../urpm/media.pm:1547 ../urpm/media.pm:1642
+#: ../urpm/media.pm:1559 ../urpm/media.pm:1654
 #, fuzzy, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr "qed jinkiteb il-fajl b'lista għas-sors \"%s\""
 
-#: ../urpm/media.pm:1549 ../urpm/media.pm:1619 ../urpm/media.pm:1872
+#: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
 msgid "...copying failed"
 msgstr "...ikkupjar falla"
 
-#: ../urpm/media.pm:1615
+#: ../urpm/media.pm:1627
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "qed nikkopja l-fajl ta' deskrizzjoni ta' \"%s\""
 
-#: ../urpm/media.pm:1617 ../urpm/media.pm:1646
+#: ../urpm/media.pm:1629 ../urpm/media.pm:1658
 #, c-format
 msgid "...copying done"
 msgstr "...ikkupjar lest"
 
-#: ../urpm/media.pm:1648
+#: ../urpm/media.pm:1660
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "l-ikkuppjar tal-fajl [%s] falla (il-fajl jidher żgħir wisq)"
 
-#: ../urpm/media.pm:1696
+#: ../urpm/media.pm:1708
 #, fuzzy, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr "qed tiġi kalkulata l-md5sum għall-hdlist jew sinteżi tas-sors imniżżel"
 
-#: ../urpm/media.pm:1698 ../urpm/media.pm:2181
+#: ../urpm/media.pm:1710 ../urpm/media.pm:2193
 #, fuzzy, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
 msgstr "l-ikkuppjar tal-fajl [%s] falla (md5sum ma qablitx)"
 
-#: ../urpm/media.pm:1713
+#: ../urpm/media.pm:1725
 #, fuzzy, c-format
 msgid "genhdlist2 failed on %s"
 msgstr "qed jiġi eżaminat il-fajl hdlist [%s]"
 
-#: ../urpm/media.pm:1723
+#: ../urpm/media.pm:1735
 #, fuzzy, c-format
 msgid "comparing %s and %s"
 msgstr "qed jiġi nstallat %s"
 
-#: ../urpm/media.pm:1753
+#: ../urpm/media.pm:1765
 #, fuzzy, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr "ma nstabx fajl hdlists għas-sors \"%s\""
 
-#: ../urpm/media.pm:1779
+#: ../urpm/media.pm:1791
 #, fuzzy, c-format
 msgid "copying MD5SUM file of \"%s\"..."
 msgstr "qed nikkopja l-fajl ta' deskrizzjoni ta' \"%s\""
 
-#: ../urpm/media.pm:1819
+#: ../urpm/media.pm:1831
 #, fuzzy, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
 msgstr "isem tal-fajl rpm [%s] invalidu"
 
-#: ../urpm/media.pm:1822
+#: ../urpm/media.pm:1834
 #, fuzzy, c-format
 msgid "no metadata found for medium \"%s\""
 msgstr "ma nstabx fajl hdlists għas-sors \"%s\""
 
-#: ../urpm/media.pm:1854
+#: ../urpm/media.pm:1866
 #, fuzzy, c-format
 msgid "retrieving source synthesis of \"%s\"..."
 msgstr "qed jinġab l-hdlist jew sinteżi sors għal \"%s\"..."
 
-#: ../urpm/media.pm:1920
+#: ../urpm/media.pm:1932
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "qed jiġi eżaminat fajl pubkey ta' \"%s\"..."
 
-#: ../urpm/media.pm:1932
+#: ../urpm/media.pm:1944
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...ċifrarju %s importat mill-fajl pubkey ta' \"%s\""
 
-#: ../urpm/media.pm:1936
+#: ../urpm/media.pm:1948
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "ma stajtx nimporta fajl pubkey ta' \"%s\""
 
-#: ../urpm/media.pm:1977
+#: ../urpm/media.pm:1989
 #, fuzzy, c-format
 msgid "no synthesis file found for medium \"%s\""
 msgstr "ma nstabx fajl hdlists għas-sors \"%s\""
 
-#: ../urpm/media.pm:2010
+#: ../urpm/media.pm:2022
 #, fuzzy, c-format
 msgid "updated medium \"%s\""
 msgstr "ġie miżjud is-sors %s"
 
-#: ../urpm/media.pm:2175
+#: ../urpm/media.pm:2187
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr ""

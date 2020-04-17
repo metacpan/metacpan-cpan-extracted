@@ -93,6 +93,7 @@
     tzoff      = tzoff_sign tzoff_hour (":" tzoff_min)?;
     tzgmt      = "Z" %tzgmt;
     tzd        = tzoff | tzgmt;
+    tzclf      = tzoff_sign tzoff_hour tzoff_min;
     
     mon_name = "Jan" %{ _date.mon = 0; } |
                "Feb" %{ _date.mon = 1; } |
@@ -156,8 +157,13 @@
     ) %{ format |= InputFormat::ansi_c; };
 
     dot = (day "." month "." year) %{ format |= InputFormat::dot; };
+    
+    clf_raw = day "/" mon_name "/" year ":" hour ":" min ":" sec " " tzclf;
+    clfb = ( "[" clf_raw "]" );
+    clf = (clf_raw | clfb) %{ format |= InputFormat::clf; };
 
-    all := iso | iso8601 | dot | rfc1123 | rfc850 | ansi_c;
+
+    all := iso | iso8601 | dot | rfc1123 | rfc850 | ansi_c | clf;
 }%%
 
 namespace panda { namespace date {

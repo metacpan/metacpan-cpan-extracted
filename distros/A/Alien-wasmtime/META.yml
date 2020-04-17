@@ -7,6 +7,7 @@ build_requires:
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
   FFI::Platypus: '1.00'
+  File::Which: '0'
   Test2::V0: '0.000060'
   Test::Alien: '1.90'
   Test::Alien::Diag: '0'
@@ -32,7 +33,7 @@ resources:
   bugtracker: https://github.com/perlwasm/Alien-wasmtime/issues
   homepage: https://metacpan.org/pod/Alien::wasmtime
   repository: git://github.com/perlwasm/Alien-wasmtime.git
-version: '0.06'
+version: '0.07'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.30'
   requires:

@@ -1,6 +1,6 @@
 package Getopt::EX;
 use 5.014;
-use version; our $VERSION = version->declare("v1.15.6");
+use version; our $VERSION = version->declare("v1.16.0");
 
 
 1;
@@ -12,7 +12,7 @@ Getopt::EX - Getopt Extender
 
 =head1 VERSION
 
-Version v1.15.6
+Version v1.16.0
 
 
 =head1 DESCRIPTION
@@ -189,6 +189,31 @@ or even simpler non-oo interface:
     print colorize("R", "FILE in Red\n");
     print colorize("G", "LINE in Blue\n");
     print colorize("B", "TEXT in Green\n");
+
+=head2 L<Getopt::EX::LabeledParam>
+
+This is super-class of L<Getopt::EX::Colormap>.  L<Getopt::Long>
+support parameter handling within hash,
+
+    my %defines;
+    GetOptions ("define=s" => \%defines);
+
+and the parameter can be given in C<key=value> format.
+
+    --define os=linux --define vendor=redhat
+
+Using L<Getopt::EX::LabeledParam>, this can be written as:
+
+    my @defines;
+    my %defines;
+    GetOptions ("defines=s" => \@defines);
+    Getopt::EX::LabeledParam
+        ->new(HASH => \%defines)
+        ->load_params (@defines);
+
+and the parameter can be given mixed together.
+
+    --define os=linux,vendor=redhat
 
 =head2 L<Getopt::EX::Numbers>
 

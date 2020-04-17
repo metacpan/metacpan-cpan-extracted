@@ -30,6 +30,7 @@ examples/synopsis/externtype.pl
 examples/synopsis/func1.pl
 examples/synopsis/func2.pl
 examples/synopsis/functype.pl
+examples/synopsis/global.pl
 examples/synopsis/globaltype.pl
 examples/synopsis/importtype.pl
 examples/synopsis/instance.pl
@@ -38,6 +39,7 @@ examples/synopsis/memory.pl
 examples/synopsis/memorytype.pl
 examples/synopsis/module.pl
 examples/synopsis/store.pl
+examples/synopsis/table.pl
 examples/synopsis/tabletype.pl
 examples/synopsis/trap.pl
 examples/synopsis/valtype.pl
@@ -56,6 +58,7 @@ lib/Wasm/Wasmtime/ExternType.pm
 lib/Wasm/Wasmtime/FFI.pm
 lib/Wasm/Wasmtime/Func.pm
 lib/Wasm/Wasmtime/FuncType.pm
+lib/Wasm/Wasmtime/Global.pm
 lib/Wasm/Wasmtime/GlobalType.pm
 lib/Wasm/Wasmtime/ImportType.pm
 lib/Wasm/Wasmtime/Instance.pm
@@ -64,6 +67,7 @@ lib/Wasm/Wasmtime/Memory.pm
 lib/Wasm/Wasmtime/MemoryType.pm
 lib/Wasm/Wasmtime/Module.pm
 lib/Wasm/Wasmtime/Store.pm
+lib/Wasm/Wasmtime/Table.pm
 lib/Wasm/Wasmtime/TableType.pm
 lib/Wasm/Wasmtime/Trap.pm
 lib/Wasm/Wasmtime/ValType.pm
@@ -73,7 +77,6 @@ lib/Wasm/Wasmtime/Wat2Wasm.pm
 maint/cip-before-install
 perlcriticrc
 t/00_diag.t
-t/examples.t
 t/lib/Test2/Tools/Wasm.pm
 t/wasm.t
 t/wasm_wasmtime.t
@@ -86,6 +89,7 @@ t/wasm_wasmtime_externtype.t
 t/wasm_wasmtime_ffi.t
 t/wasm_wasmtime_func.t
 t/wasm_wasmtime_functype.t
+t/wasm_wasmtime_global.t
 t/wasm_wasmtime_globaltype.t
 t/wasm_wasmtime_importtype.t
 t/wasm_wasmtime_instance.t
@@ -94,6 +98,7 @@ t/wasm_wasmtime_memory.t
 t/wasm_wasmtime_memorytype.t
 t/wasm_wasmtime_module.t
 t/wasm_wasmtime_store.t
+t/wasm_wasmtime_table.t
 t/wasm_wasmtime_tabletype.t
 t/wasm_wasmtime_trap.t
 t/wasm_wasmtime_valtype.t
@@ -102,6 +107,7 @@ t/wasm_wasmtime_wasiinstance.t
 t/wasm_wasmtime_wat2wasm.t
 xt/author/critic.t
 xt/author/eol.t
+xt/author/examples.t
 xt/author/no_tabs.t
 xt/author/pod.t
 xt/author/pod_coverage.t

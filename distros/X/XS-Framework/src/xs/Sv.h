@@ -158,6 +158,10 @@ struct Sv {
         return tmp;
     }
 
+    SV* detach_mortal () {
+        return sv_2mortal(detach());
+    }
+
     static void __at_perl_destroy ();
 
 protected:

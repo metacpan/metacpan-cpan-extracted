@@ -1,16 +1,19 @@
-Revision history for App-ListDebianReleases
+0.070   2020-02-21  Released-By: PERLANCAR; Urgency: medium
 
-0.06    2015-09-22 (PERLANCAR)
+	- Update backend module name.
+
+
+0.06    2015-09-22  Released-By: PERLANCAR
 
 	- Switch (temporarily?) to PERLANCAR::Debian::Releases.
 
 
-0.05    2015-09-22 (PERLANCAR)
+0.05    2015-09-22  Released-By: PERLANCAR
 
 	- [ux] Add short alias -l for --detail (like in ls).
 
 
-0.04    2015-09-03 (PERLANCAR)
+0.04    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -19,20 +22,20 @@ Revision history for App-ListDebianReleases
 	  requirement.
 
 
-0.03    2014-12-29 (PERLANCAR)
+0.03    2014-12-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Prefer pericmd-lite for CLI.
 
 
-0.02    2014-08-21 (SHARYANTO)
+0.02    2014-08-21  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Fix keys() argument, which doesn't work in older perls [CT].
 
 
-0.01    2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.01    2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
         - First release.

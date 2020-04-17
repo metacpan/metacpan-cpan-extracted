@@ -1,7 +1,7 @@
 package App::TSVUtils;
 
 our $DATE = '2019-12-19'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,6 +25,11 @@ my %arg_filename_0 = (
 my %arg_filename_1 = (
     filename => {
         summary => 'Input TSV file',
+        description => <<'_',
+
+Use `-` to read from stdin.
+
+_
         schema => 'filename*',
         req => 1,
         pos => 1,
@@ -58,9 +63,15 @@ sub tsvutil {
     my $res = "";
     my $i = 0;
 
-    open my($fh), "<:encoding(utf8)", $args{filename} or
-        return [500, "Can't open input filename '$args{filename}': $!"];
-
+    my $fh;
+    if ($args{filename} eq '-') {
+        $fh = *STDIN;
+    } else {
+        open $fh, "<", $args{filename} or
+            return [500, "Can't open input filename '$args{filename}': $!"];
+    }
+    binmode $fh, ":encoding(utf8)";
+        ;
     my $code_getline = sub {
         my $row0 = <$fh>;
         return undef unless defined $row0;
@@ -114,7 +125,7 @@ App::TSVUtils - CLI utilities related to TSV
 
 =head1 VERSION
 
-This document describes version 0.003 of App::TSVUtils (from Perl distribution App-TSVUtils), released on 2019-12-19.
+This document describes version 0.004 of App::TSVUtils (from Perl distribution App-TSVUtils), released on 2019-12-19.
 
 =head1 DESCRIPTION
 

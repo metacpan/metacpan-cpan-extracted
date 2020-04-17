@@ -13,4 +13,4 @@ deps
 \.tmp$
 \.bak$
 \.zip$
-\.gz$
+\.gz$^MYMETA\.json$

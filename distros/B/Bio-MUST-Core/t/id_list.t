@@ -61,6 +61,14 @@ EOT
 }
 
 {
+    my $infile = file('test', 'AhHMA4_5_col_sep.idl');
+    my $list = $class->load($infile, { column => 2, separator => ':' } );
+    isa_ok $list, $class, $infile;
+    is $list->count_ids, 5, 'read expected number of ids';
+    is_deeply $list->ids, \@exp_ids, 'got expected ids from col-sep .idl file';
+}
+
+{
     my $infile = file('test', 'AhHMA4_5.lis');
     my $list = $class->load_lis($infile);
     isa_ok $list, $class, $infile;

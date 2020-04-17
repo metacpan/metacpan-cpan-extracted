@@ -1,3 +1,22 @@
+0.006   2020-03-03  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Fix stupid mistake: used ^ instead of ** for
+	  exponentiation.
+
+	- Rename filesize to datasize, make filesize an alias for datasize.
+
+	- Add schemas: dataspeed, dataquota, bandwidth.
+
+	- [datasize] Recognize zetta and yotta prefixes.
+
+
+0.005   2019-11-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Move tests to examples.
+
+
 0.004   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Add test and explicit dependency to Data::Sah::Coerce 0.034+.

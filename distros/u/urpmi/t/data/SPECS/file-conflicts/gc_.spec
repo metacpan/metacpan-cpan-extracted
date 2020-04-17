@@ -10,7 +10,7 @@ x
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/dir_symlink
+mkdir -p $RPM_BUILD_ROOT/etc/dir_symlink
 echo a > $RPM_BUILD_ROOT/etc/dir_symlink/a
 
 %clean

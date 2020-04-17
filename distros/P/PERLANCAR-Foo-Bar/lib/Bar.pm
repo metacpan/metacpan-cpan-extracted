@@ -2,9 +2,9 @@ package
     Bar;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2020-02-05'; # DATE
 our $DIST = 'PERLANCAR-Foo-Bar'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: A Bar module for testing
@@ -21,7 +21,7 @@ Bar - A Bar module for testing
 
 =head1 VERSION
 
-This document describes version 0.002 of Bar (from Perl distribution PERLANCAR-Foo-Bar), released on 2020-01-03.
+This document describes version 0.003 of Bar (from Perl distribution PERLANCAR-Foo-Bar), released on 2020-02-05.
 
 =head1 DESCRIPTION
 

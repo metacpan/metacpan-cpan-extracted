@@ -29,7 +29,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::ger::Util" : "0.034",
+            "Log::ger::Util" : "0.037",
             "Text::sprintfn" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -40,7 +40,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Log::ger" : "0.034",
+            "Log::ger" : "0.037",
             "Log::ger::Format" : "0.018",
             "Log::ger::Output" : "0.008",
             "Test::More" : "0.98",
@@ -60,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-Format-Sprintfn"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

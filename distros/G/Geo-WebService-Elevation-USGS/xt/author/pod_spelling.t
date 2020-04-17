@@ -43,9 +43,6 @@ WGS
 WSDL
 Wyant
 geo
-getAllElevations
-getElevation
-targetNamespace
 conterminous
 geoid
 gory

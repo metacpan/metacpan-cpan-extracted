@@ -27,7 +27,9 @@ static const unsigned char relchars[256] = {
 static inline Date xs_date_ymd (SV** args, I32 items) {
     ptime_t vals[8] = {1970, 1, 1, 0, 0, 0, 0, -1};
     auto tz = list2vals(args, items, vals);
-    return Date(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7], tz);
+    auto ret = Date(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7], tz);
+    if (ret.error() && is_strict_mode()) throw xs::out(ret.error());
+    return ret;
 }
 
 MODULE = Date::Date                PACKAGE = Date
@@ -49,6 +51,8 @@ BOOT {
         {"FORMAT_YMD",          (int)Date::Format::ymd},
         {"FORMAT_DOT",          (int)Date::Format::dot},
         {"FORMAT_HMS",          (int)Date::Format::hms},
+        {"FORMAT_CLF",          (int)Date::Format::clf},
+        {"FORMAT_CLF_BRACKETS", (int)Date::Format::clfb},
         
         {"INPUT_FORMAT_ALL",     Date::InputFormat::all},
         {"INPUT_FORMAT_ISO",     Date::InputFormat::iso},
@@ -57,11 +61,12 @@ BOOT {
         {"INPUT_FORMAT_RFC850",  Date::InputFormat::rfc850},
         {"INPUT_FORMAT_ANSI_C",  Date::InputFormat::ansi_c},
         {"INPUT_FORMAT_DOT",     Date::InputFormat::dot},
+        {"INPUT_FORMAT_CLF",     Date::InputFormat::clf},
     });
     
     Stash ecstash("Date::Error", GV_ADD);
     xs::exp::create_constants(ecstash, {
-        {"parser_error",  xs::out(make_error_code(errc::parser_error))},
+        {"parser_error", xs::out(make_error_code(errc::parser_error))},
         {"out_of_range", xs::out(make_error_code(errc::out_of_range))},
     });
     
@@ -445,6 +450,12 @@ Date* Date::clone (...) {
         RETVAL = new Date(THIS->clone(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7], tz));
     }
     else RETVAL = new Date(*THIS);
+    
+    if (RETVAL->error() && is_strict_mode()) {
+        auto err = RETVAL->error();
+        delete RETVAL;
+        throw xs::out(err);
+    }
     
     PROTO = Object(ST(0)).stash();
 }

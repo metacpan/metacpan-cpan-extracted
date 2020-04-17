@@ -2,7 +2,7 @@ NAME
     App::TouchpadUtils - CLI utilities related to touchpad
 
 VERSION
-    This document describes version 0.002 of App::TouchpadUtils (from Perl
+    This document describes version 0.003 of App::TouchpadUtils (from Perl
     distribution App-TouchpadUtils), released on 2019-12-16.
 
 DESCRIPTION
@@ -15,11 +15,11 @@ DESCRIPTION
 
     *   has-touchpad
 
-    *   touchoff
-
-    *   touchon
-
     *   touchpad-is-enabled
+
+    *   tpoff
+
+    *   tpon
 
 HOMEPAGE
     Please visit the project's homepage at

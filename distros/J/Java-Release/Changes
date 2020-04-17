@@ -1,0 +1,14 @@
+0.03 2020-04-15T19:18:55+02:00
+ - Add support for arm32-vfp-hflt and arm64-vfp-hflt architectures.
+ - Fix construction of j2se_version.
+ - Fix parsing of release without interim and update versions.
+ - Update example.
+
+0.02 2020-04-15T18:20:25+02:00
+ - Add support for JDK 9 and above.
+ - Add Java::Release::Obj data object.
+ - Change module description.
+ - Fix NAME in doc.
+
+0.01 2020-04-14T19:42:29+02:00
+ - First version.

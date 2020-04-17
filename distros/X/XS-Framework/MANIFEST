@@ -33,6 +33,7 @@ lib/XS/Framework/Manual/SVAPI/Object.pod
 lib/XS/Framework/Manual/SVAPI/perl_destroy.pod
 lib/XS/Framework/Manual/SVAPI/Ref.pod
 lib/XS/Framework/Manual/SVAPI/Scalar.pod
+lib/XS/Framework/Manual/SVAPI/Scope.pod
 lib/XS/Framework/Manual/SVAPI/Simple.pod
 lib/XS/Framework/Manual/SVAPI/Stash.pod
 lib/XS/Framework/Manual/SVAPI/Sub.pod
@@ -78,6 +79,8 @@ src/xs/ppport.h
 src/xs/Ref.h
 src/xs/Scalar.cc
 src/xs/Scalar.h
+src/xs/Scope.cc
+src/xs/Scope.h
 src/xs/Simple.cc
 src/xs/Simple.h
 src/xs/Stash.cc
@@ -143,6 +146,8 @@ t/svapi/ref.cc
 t/svapi/ref.t
 t/svapi/scalar.cc
 t/svapi/scalar.t
+t/svapi/scope.cc
+t/svapi/scope.t
 t/svapi/simple.cc
 t/svapi/simple.t
 t/svapi/stash.cc

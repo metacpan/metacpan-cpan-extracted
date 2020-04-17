@@ -17,14 +17,14 @@ name: SQL-Interp
 provides:
   DBIx::Interp:
     file: lib/DBIx/Interp.pm
-    version: '1.25'
+    version: '1.26'
   DBIx::Interp::STX:
     file: lib/DBIx/Interp.pm
   DBIx::Interp::db:
     file: lib/DBIx/Interp.pm
   SQL::Interp:
     file: lib/SQL/Interp.pm
-    version: '1.25'
+    version: '1.26'
   SQL::Interp::SQL:
     file: lib/SQL/Interp.pm
   SQL::Interp::Variable:
@@ -33,10 +33,9 @@ recommends:
   Scalar::Util: '0'
 requires:
   DBI: '1'
-  Sub::Exporter: '0'
   perl: v5.8.0
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://code.blicky.net/yorhel/SQL-Interp
-version: '1.25'
+version: '1.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,7 +6,7 @@ use Dancer2::Plugin::Passphrase::Core;
 use Dancer2::Plugin::Passphrase::Hashed;
 use Dancer2::Plugin;
 
-our $VERSION = '3.3.3';
+our $VERSION = '3.3.4';
 
 plugin_keywords 'passphrase';
 
@@ -339,9 +339,7 @@ a strong psuedo-random salt.
     plugins:
         Passphrase:
             algorithm: Bcrypt
-
-            Bcrypt:
-                cost: 8
+            cost: 8
 
 
 =head2 Storage in a database
@@ -479,6 +477,10 @@ L<Dancer2>, L<Digest>, L<Crypt::Eksblowfish::Bcrypt>
 =item Nuno Carvalho (GH#12)
 
 =item Tom Adams (fix generate docs)
+
+=item Jeremi M. Gosney (GH #2)
+
+=item Sergiy Borodych (GH #3)
 
 =back
 

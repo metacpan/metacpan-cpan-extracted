@@ -32,6 +32,8 @@ use vars qw(
             $CHECK_EVERY_N_REQUESTS
             $START_TIME
 
+            $CALLBACK
+
             @ISA
             @EXPORT_OK
            );
@@ -49,7 +51,7 @@ use vars qw(
                 $START_TIME
                );
 
-$VERSION = '0.9507';
+$VERSION = '0.9508';
 
 $REQUEST_COUNT          = 1;
 
@@ -77,6 +79,12 @@ sub set_check_interval {
     my $class = shift;
 
     $CHECK_EVERY_N_REQUESTS = shift;
+}
+
+sub set_callback {
+    my $class = shift;
+
+    $CALLBACK = shift;
 }
 
 sub get_check_interval { return $CHECK_EVERY_N_REQUESTS; }
@@ -119,7 +127,11 @@ sub _check_size {
 
     my ($size, $share) = $class->_platform_check_size();
 
-    return ($size, $share, $size - $share);
+    my $unshared = $size - $share;
+
+    $CALLBACK->($size, $share, $unshared) if $CALLBACK;
+
+    return ($size, $share, $unshared);
 }
 
 sub _load {
@@ -337,6 +349,8 @@ Doug Steinwand and Perrin Harkins <perrin@elem.com>: added support for shared me
 Matt Phillips <mphillips@virage.com> and Mohamed Hendawi <mhendawi@virage.com>: Win32 support
 
 Dave Rolsky <autarch@urth.org>, maintenance and fixes outside of mod_perl tree (0.9+).
+
+Robert Rothenberg <rrwo@cpan.org>, added callback.
 
 =head1 LICENSE
 

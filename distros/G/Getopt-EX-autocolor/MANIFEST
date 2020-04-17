@@ -9,5 +9,6 @@ lib/Getopt/EX/autocolor/Apple_Terminal.pm
 lib/Getopt/EX/autocolor/iTerm.pm
 minil.toml
 t/00_compile.t
+t/01_rgb.t
 META.yml
 MANIFEST

@@ -1,4 +1,6 @@
 #include <xs.h>
+#include <xs/date.h>
+#include <xs/Scope.h>
 #include <panda/date.h>
 #include <cstring>
 
@@ -46,6 +48,14 @@ uint64_t bench_strftime (string_view format) {
 uint64_t bench_tzget (string_view tz) {
     RETVAL = 0;
     for (int i = 0; i < 1000; ++i) RETVAL += (uint64_t)panda::time::tzget(tz);
+}
+
+void bench_hints_get () {
+    for (int i = 0; i < 1000; ++i) Scope::Hints::exists(xs::date::strict_hint_name);
+}
+
+bool get_strict_hint () {
+    RETVAL = Scope::Hints::exists(xs::date::strict_hint_name);
 }
 
 time_t systimegm (int64_t sec, int64_t min, int64_t hour, int64_t mday, int64_t mon, int64_t year, int64_t isdst = -1) : ALIAS(systimelocal=1) {

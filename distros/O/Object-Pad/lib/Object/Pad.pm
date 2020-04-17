@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use Carp;
 
@@ -358,6 +358,16 @@ sub import_into
    delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class method has );
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
+}
+
+# Double-experimental MOP-like API
+# Currently entirely undocumented. May eventually become part of an Object::Pad::MOP API
+sub begin_class
+{
+   my $class = shift;
+   my ( $name, %args ) = @_;
+
+   Object::Pad::_begin_class( $name, $args{extends} );
 }
 
 # The universal base-class methods

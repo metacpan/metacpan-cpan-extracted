@@ -1,5 +1,19 @@
 Changes file for Data::Dumper::AutoEncode::AsDumper
 
+1.0002    2020-04-14 12:00:35-04:00 America/New_York
+
+  - Fix minor but annoying pod issue
+  
+1.0001    2020-04-14 11:53:52-04:00 America/New_York
+
+  - Change naming of global var used to turn off export into main
+
+  - Update minimum dependency versions
+
+  - Additional testing
+
+  - Add doc section comparing to Data::Dumper::AutoEncode
+
 1.00      2020-04-11 23:26:26-04:00 America/New_York
 
   - First release on an unsuspecting world

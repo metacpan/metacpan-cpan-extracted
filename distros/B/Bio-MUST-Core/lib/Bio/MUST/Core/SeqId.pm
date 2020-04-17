@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.200510';
+$Bio::MUST::Core::SeqId::VERSION = '0.201060';
 use Moose;
 use namespace::autoclean;
 
@@ -198,9 +198,10 @@ const my @GENERA  => qw(
     229E-related
     4-nitrophenol
     A-2
+    acetamiprid-degrading
     Activation-tagging
-    Adeno-Associated
     Adeno-associated
+    Adeno-Associated
     Aids-associated
     alk-system
     Altai-like
@@ -279,7 +280,6 @@ const my @GENERA  => qw(
     BtMf-AlphaCoV/HuB2013-a
     BtMf-AlphaCoV/JX2012
     BtMr-AlphaCoV/SAX2011
-    BtMs-AlphaCoV/GS2013
     BtNv-AlphaCoV/SC2013
     BtPa-BetaCoV/GD2013
     BtRf-AlphaCoV/HuB2013
@@ -364,8 +364,8 @@ const my @GENERA  => qw(
     Cysteine-free
     Cytophaga-like
     DCM-degrading
-    Deep-sea
     deep-sea
+    Deep-sea
     Deinococcus-like
     Deinococcus-Thermus
     Dendro-hypnum
@@ -516,6 +516,7 @@ const my @GENERA  => qw(
     Maize-associated
     male-killer
     male-killing
+    manganese-oxidation
     manganese-oxidizing
     Marinobacter-like
     Mason-Pfizer
@@ -569,8 +570,8 @@ const my @GENERA  => qw(
     Non-geniculate
     Non-human
     non-mammal
-    Non-primate
     non-primate
+    Non-primate
     Norovirus/GII.4/1993-6/UK
     Norovirus/Hu/GII.2/V1/09/18-Jan-2009/Slovenia
     Norovirus/Hu/GII.4/1732/07/07-Jun-2007/Slovenia
@@ -771,8 +772,8 @@ const my @GENERA  => qw(
     Stripa-derived
     Stx1-converting
     Stx2-converting
-    Sulfate-reducing
     sulfate-reducing
+    Sulfate-reducing
     sulfide-oxidizing
     sulfite-reducing
     sulfo-oxidizing
@@ -821,6 +822,7 @@ const my @GENERA  => qw(
     UAS-less
     UAS-Red
     UAS-Stinger
+    Ui-te-Rangiora
     Van-royena
     VDV-1/DWV
     VESV-like
@@ -1443,6 +1445,7 @@ const my @SPECIES => qw(
     ARS06759_00001
     ARS06980_00002
     ARS07370_00002
+    astrovirus_12
     AstV_Rat1
     AstV_Rat4
     ATA3_5Q_KO9_cl1
@@ -1634,6 +1637,7 @@ const my @SPECIES => qw(
     C100_CLW
     C151_oct11_cons
     C18_CLW
+    C1BS16_pA
     C39_CLW
     C47_CLW
     C49_CLW
@@ -5130,8 +5134,78 @@ const my @SPECIES => qw(
     Pip3_M_FR_2014
     pLC_pBBR1_ori
     PM58B_RA
+    PREDICT_AdV-13
+    PREDICT_AdV-14
+    PREDICT_AdV-15
+    PREDICT_AdV-16
+    PREDICT_AdV-17
+    PREDICT_AdV-18
+    PREDICT_AdV-19
+    PREDICT_AdV-2
+    PREDICT_AdV-20
+    PREDICT_AdV-21
+    PREDICT_AdV-22
+    PREDICT_AdV-23
+    PREDICT_AdV-24
+    PREDICT_AdV-25
+    PREDICT_AdV-26
+    PREDICT_AdV-27
+    PREDICT_AdV-28
+    PREDICT_AdV-29
+    PREDICT_AdV-30
+    PREDICT_AdV-31
+    PREDICT_AdV-32
+    PREDICT_AdV-33
+    PREDICT_AdV-34
+    PREDICT_AdV-35
+    PREDICT_AdV-36
+    PREDICT_AdV-37
+    PREDICT_AdV-38
+    PREDICT_AdV-39
+    PREDICT_AdV-40
+    PREDICT_AdV-41
+    PREDICT_AdV-42
+    PREDICT_AdV-43
+    PREDICT_AdV-44
+    PREDICT_AdV-45
+    PREDICT_AdV-46
+    PREDICT_AdV-47
+    PREDICT_AdV-48
+    PREDICT_AdV-49
+    PREDICT_AdV-50
+    PREDICT_AdV-51
+    PREDICT_AdV-52
+    PREDICT_AdV-53
+    PREDICT_AdV-54
+    PREDICT_AdV-55
+    PREDICT_AdV-56
+    PREDICT_AdV-57
+    PREDICT_AdV-58
+    PREDICT_AdV-59
+    PREDICT_AdV-60
+    PREDICT_AdV-61
+    PREDICT_AdV-62
+    PREDICT_AdV-63
+    PREDICT_AdV-64
+    PREDICT_AdV-65
+    PREDICT_AdV-66
+    PREDICT_AdV-67
+    PREDICT_AdV-68
     PREDICT_AdV-69
+    PREDICT_AdV-70
+    PREDICT_AdV-71
     PREDICT_AdV-72
+    PREDICT_AdV-73
+    PREDICT_AdV-74
+    PREDICT_AdV-75
+    PREDICT_AdV-77
+    PREDICT_AdV-78
+    PREDICT_AdV-79
+    PREDICT_AdV-80
+    PREDICT_AdV-81
+    PREDICT_AdV-87
+    PREDICT_AdV-90
+    PREDICT_AdV-91
     PREDICT_CoV-49
     PREDICT_CoV-50
     PREDICT_Orbi-6
@@ -5325,9 +5399,27 @@ const my @SPECIES => qw(
     PREDICT_PMV-74
     PREDICT_PMV-75
     PREDICT_PMV-76
+    PREDICT_PyV-14
+    PREDICT_PyV-15
+    PREDICT_PyV-22
+    PREDICT_PyV-23
+    PREDICT_PyV-24
+    PREDICT_PyV-25
+    PREDICT_PyV-28
+    PREDICT_PyV-30
     PREDICT_PyV-31
+    PREDICT_PyV-32
+    PREDICT_PyV-34
+    PREDICT_PyV-5
+    PREDICT_PyV-6
+    PREDICT_PyV-7
+    PREDICT_PyV-9
     PREDICT_RbdV-14
     PREDICT_RbdV-15
+    pRS315_AnSuc1:pep1
+    pRS315_Ppdc_xyr1V821F:ace1
+    pRS315_Pxyn1_ReCel3a:slp1
+    pRS315_res1
     pStA0.BBa_J23100
     pStA0.BBa_J23102
     pStA0.BBa_J23107
@@ -6264,7 +6356,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.200510
+version 0.201060
 
 =head1 SYNOPSIS
 

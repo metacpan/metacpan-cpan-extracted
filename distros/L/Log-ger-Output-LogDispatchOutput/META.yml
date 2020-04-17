@@ -6,7 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Log::ger: '0.034'
+  Log::ger: '0.037'
   Log::ger::Output: '0.008'
   Test::More: '0.98'
 configure_requires:
@@ -21,14 +21,14 @@ name: Log-ger-Output-LogDispatchOutput
 requires:
   Log::Dispatch: '0'
   Log::Dispatch::ArrayWithLimits: '0'
-  Log::ger::Util: '0.034'
+  Log::ger::Util: '0.037'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Output-LogDispatchOutput
   homepage: https://metacpan.org/release/Log-ger-Output-LogDispatchOutput
   repository: git://github.com/perlancar/perl-Log-ger-Output-LogDispatchOutput.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

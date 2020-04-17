@@ -1,6 +1,6 @@
 package Data::Dumper::AutoEncode::AsDumper;
 
-our $VERSION = '1.00';
+our $VERSION = '1.0002';
 
 use strict; use warnings; use utf8;
 use Import::Into;
@@ -17,7 +17,8 @@ our @EXPORT = 'Dumper';
 
 sub Dumper { goto &Data::Dumper::AutoEncode::eDumper }
 
-__PACKAGE__->import::into('main');
+__PACKAGE__->import::into('main')
+    unless $Data::Dumper::AutoEncode::AsDumper::NoImportInto;
 
 1; # return true
 
@@ -27,11 +28,13 @@ __END__
 
 =head1 VERSION
 
-version 1.00
+version 1.0002
+
+=encoding utf8
 
 =head1 NAME
 
-Data::Dumper::AutoEncode::AsDumper - Dump encoded data with Dumper()
+Data::Dumper::AutoEncode::AsDumper - Concise, encoded data dumping with Dumper(), everywhere
 
 =head1 SYNOPSIS
 
@@ -44,17 +47,48 @@ Data::Dumper::AutoEncode::AsDumper - Dump encoded data with Dumper()
       Ελληνικά => 'ἓν οἶδα ὅτι οὐδὲν οἶδα',
   };
 
-  say 'proverbs', Dumper $data;
+  say 'proverbs', Dumper $data; # output encode to utf8
 
 =head1 DESCRIPTION
 
-This package implements a wrapper around the excellent module
-L<Data::Dumper::AutoEncode>, which provides a function (C<eDumper>) to
-output encoded data with L<Data::Dumper>. If you use this module
-instead, you can still use C<Dumper $data> in your code, but the output
-will be encoded.
+  L<Data::Dumper> decodes data before dumping it, making it unreadable
+  for humans. This module exports the C<Dumper> function, but the
+  dumped output is encoded.
 
-=head2 CONCISION
+=head1 EXPORTED FUNCTION
+
+=over
+
+=item B<Dumper(LIST)>
+
+This module exports one function, C<Dumper>. It works just like the
+original, except that output is encoded, by default to C<utf8>.
+
+If you want to change the encoding, set the global:
+
+  $Data::Dumper::AutoEncode::ENCODING = 'CP932';
+
+=back
+
+=head1 WHY USE THIS MODULE?
+
+This package implements a thin wrapper around the excellent module
+L<Data::Dumper::AutoEncode>. Reasons to use this instead include:
+
+=over
+
+=item B<Convenience>
+
+If you use this module you can just call C<Dumper> as you normally
+would if you used L<Data::Dumper>, rather than having to call
+L<Data::Dumper::AutoEncode::eDumper|Data::Dumper::AutoEncode/METHOD>.
+Any existing code will continue to work, with better output.
+
+I<(Note: You can now obtain the same behaviour by using an import
+option with L<Data::Dumper::AutoEncode>, but that was not implemented
+when this module was first released.)>
+
+=item B<Concision>
 
 The following C<Data::Dumper> options are set:
 
@@ -64,25 +98,36 @@ The following C<Data::Dumper> options are set:
   $Data::Dumper::Terse         = 1;
   $Data::Dumper::Trailingcomma = 1;
 
-=head1 EXPORTED FUNCTION
+=item B<Exports to main package by default>
 
-B<Dumper(LIST)>
+This module uses the excellent L<Import::Into> so that the C<Dumper>
+function will be imported into the caller's C<main> package, no matter
+where the module is loaded.
 
-This module exports one function, C<Dumper>. It works just like the
-original, except that output is encoded, by default to C<utf8>.
+To turn off this behaviour, set the global in a C<BEGIN> block before
+loading the module:
 
-If you want to change the encoding, set the global:
+  $Data::Dumper::AutoEncode::AsDumper::NoImportInto = 1;
 
-  $Data::Dumper::AutoEncode::ENCODING = 'CP932';
+=back
 
-=head2 EXPORTS TO SUBCLASSES BY DEFAULT
+=head1 ACKNOWLEDGEMENTS
 
-This module uses the excellent L<Import::Into> so that any subclass
-of a class that uses it will import the C<Dumper> function.
+Dai Okabayashi (L<BAYASHI|https://metacpan.org/author/BAYASHI>)
 
-You can turn this behaviour off by setting the global:
+Graham Knop (L<HAARG|https://metacpan.org/author/HAARG>)
 
-  $Data::Dumper::AutoEncode::AsDumper:ImportInto = 0;
+Gurusamy Sarathy (L<GSAR|https://metacpan.org/author/GSAR>) ( and Sawyer X (L<XSAWYERX|https://metacpan.org/author/XSAWYERX>) )
+
+Slaven Rezić (L<SREZIC|https://metacpan.org/author/SREZIC>)
+
+L<CPAN Testers|http://cpantesters.org/>
+
+L<All the dzil contributors|http://dzil.org/>
+
+L<Athanasius|https://perlmonks.org/?node=Athanasius>
+
+I stand on the shoulders of giants ...
 
 =head1 SEE ALSO
 

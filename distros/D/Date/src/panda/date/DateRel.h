@@ -20,14 +20,14 @@ struct DateRel {
     explicit DateRel (ptime_t year, ptime_t mon=0, ptime_t day=0, ptime_t hour=0, ptime_t min=0, ptime_t sec=0)
                      : _sec(sec), _min(min), _hour(hour), _day(day), _month(mon), _year(year) {}
 
-    explicit DateRel (string_view str, int fmt = InputFormat::all) { parse(str, fmt); }
+    explicit DateRel (string_view str, int fmt = InputFormat::all) { _error = parse(str, fmt); }
 
     DateRel (const Date& from, const Date& till) { set(from, till); }
     DateRel (const DateRel& source)              { operator=(source); }
 
     void set (const Date&, const Date&);
 
-    DateRel& operator= (string_view str) { parse(str, InputFormat::all); return *this; }
+    DateRel& operator= (string_view str) { _error = parse(str, InputFormat::all); return *this; }
 
     DateRel& operator= (const DateRel& source) {
         _sec   = source._sec;
@@ -37,8 +37,11 @@ struct DateRel {
         _month = source._month;
         _year  = source._year;
         _from  = source._from;
+        _error = source._error;
         return *this;
     }
+
+    std::error_code error () const { return _error; }
 
     ptime_t sec   () const { return _sec; }
     ptime_t min   () const { return _min; }
@@ -115,14 +118,14 @@ struct DateRel {
     }
 
 private:
-    ptime_t _sec;
-    ptime_t _min;
-    ptime_t _hour;
-    ptime_t _day;
-    ptime_t _month;
-    ptime_t _year;
-
+    ptime_t        _sec;
+    ptime_t        _min;
+    ptime_t        _hour;
+    ptime_t        _day;
+    ptime_t        _month;
+    ptime_t        _year;
     optional<Date> _from;
+    errc           _error = errc::ok;
 
     errc parse (string_view, int);
 

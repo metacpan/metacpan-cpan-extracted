@@ -1,1 +1,3 @@
-use Date; 1;
+package Date::Timezone;
+use Date();
+1;

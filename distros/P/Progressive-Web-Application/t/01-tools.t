@@ -46,7 +46,7 @@ subtest write_file => sub {
 	my $file = 't/resources/test.txt';
 	ok($tool->{write_file}->($file, 'some text'));
 	is(eval{$tool->{write_file}->('t/resources/restricted/thing.txt', 'kaput')}, undef, 'Cannot write file');
-	like($@, qr/Cannot open file for writing No such file or directory/, 'Cannot open file for writing No such file or directory');
+	like($@, qr/Cannot open file for writing/, 'Cannot open file for writing No such file or directory');
 };
 
 subtest read_file => sub {
@@ -55,7 +55,7 @@ subtest read_file => sub {
 	my $text = $tool->{read_file}->($file);
 	is($text, 'some text', 'read_file true');
 	is(eval{$tool->{read_file}->('t/resources/restricted/thing.txt', 'kaput')}, undef, 'Cannot read file');
-	like($@, qr/Cannot open file for reading No such file or directory/, 'Cannot open file for reading No such file or directory');
+	like($@, qr/Cannot open file for reading/, 'Cannot open file for reading No such file or directory');
 };
 
 subtest remove_file => sub {

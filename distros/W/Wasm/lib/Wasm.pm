@@ -6,7 +6,7 @@ use 5.008001;
 use Carp ();
 
 # ABSTRACT: Write Perl extensions using Wasm
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 sub import
@@ -154,7 +154,7 @@ Wasm - Write Perl extensions using Wasm
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -247,6 +247,18 @@ C<lib/Foo/Bar.wasm>.  If both exist, then it will use the newer of the two.
  use Wasm -api => 0, -wat => $wat;
 
 String containing WebAssembly Text (WAT).  Helpful for inline WebAssembly inside your Perl source file.
+
+=head1 CAVEATS
+
+As mentioned before as of this writing this dist is a work in progress.  I won't intentionally break
+stuff if I don't have to, but practicality may demand it in some situations.
+
+This interface is implemented using the bundled L<Wasm::Wasmtime> family of modules, which depends
+on the Wasmtime project.  Because of the way Wasmtime handles out-of-bounds memory errors, large
+C<PROT_NONE> pages are allocated at startup.  While these pages do not consume any actual resources
+(as used by Wasmtime), they can cause out-of-memory errors on Linux systems with virtual memory
+limits (C<ulimit -v>).  Similar techniques are common in modern programming languages, and this
+seems to be more a limitation of the Linux kernel.
 
 =head1 SEE ALSO
 

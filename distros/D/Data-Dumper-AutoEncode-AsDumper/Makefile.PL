@@ -2,32 +2,35 @@
 use strict;
 use warnings;
 
-use 5.008001;
+use 5.008005;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Dump encoded data with Dumper()",
+  "ABSTRACT" => "Concise, encoded data dumping with Dumper(), everywhere",
   "AUTHOR" => "Nick Tonkin <tonkin\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "Test::Pod::Coverage" => 0
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Data-Dumper-AutoEncode-AsDumper",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008001",
+  "MIN_PERL_VERSION" => "5.008005",
   "NAME" => "Data::Dumper::AutoEncode::AsDumper",
   "PREREQ_PM" => {
-    "Data::Dumper::AutoEncode" => "0.3",
+    "Data::Dumper" => "2.160",
+    "Data::Dumper::AutoEncode" => "1.00",
     "Import::Into" => "1.002005"
   },
   "TEST_REQUIRES" => {
     "Encode" => 0,
-    "Role::Tiny" => 0,
+    "Moo" => "2.004",
     "Test::More" => 0,
-    "Test::More::UTF8" => 0,
-    "Test::Pod::Coverage" => 0
+    "Test::More::UTF8" => 0
   },
-  "VERSION" => "1.00",
+  "VERSION" => "1.0002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,10 +38,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Dumper::AutoEncode" => "0.3",
+  "Data::Dumper" => "2.160",
+  "Data::Dumper::AutoEncode" => "1.00",
   "Encode" => 0,
   "Import::Into" => "1.002005",
-  "Role::Tiny" => 0,
+  "Moo" => "2.004",
   "Test::More" => 0,
   "Test::More::UTF8" => 0,
   "Test::Pod::Coverage" => 0

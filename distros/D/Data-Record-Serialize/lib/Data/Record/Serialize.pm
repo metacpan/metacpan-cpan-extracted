@@ -11,7 +11,7 @@ use warnings::register qw( Encode::dbi::queue );
 
 use Data::Record::Serialize::Error -all;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 use Package::Variant
   importing => ['Moo'],
@@ -121,7 +121,7 @@ Data::Record::Serialize - Flexible serialization of a record
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -492,8 +492,6 @@ L</default_type>, please see L<Data::Record::Serialize/Fields and their types>.
 
 =head2 nullify
 
-  $obj->nullify( $array | $code | $bool );
-
 Specify which fields should be set to C<undef> if they are
 empty. Sinks should encode C<undef> as the C<null> value.  By default,
 no fields are nullified.
@@ -528,17 +526,24 @@ is called), so there is no immediate feedback.
 
 =head2 C<format_fields>
 
-A hash mapping the input field names to a C<sprintf> style
-format. This will be applied prior to encoding the record, but only if
-the C<format> attribute is also set.  Formats specified here override
-those specified in C<format_types>.
+A hash mapping the input field names to either a C<sprintf> style
+format or a coderef. This will be applied prior to encoding the
+record, but only if the C<format> attribute is also set.  Formats
+specified here override those specified in C<format_types>.
+
+The coderef will be called with the value to format as its first
+argument, and should return the formatted value.
 
 =head2 C<format_types>
 
 A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
-format.  This will be applied prior to encoding the record, but only
-if the C<format> attribute is also set.  Formats specified here may be
-overridden for specific fields using the C<format_fields> attribute.
+format or a coderef.  This will be applied prior to encoding the
+record, but only if the C<format> attribute is also set.  Formats
+specified here may be overridden for specific fields using the
+C<format_fields> attribute.
+
+The coderef will be called with the value to format as its first
+argument, and should return the formatted value.
 
 =head2 C<rename_fields>
 
@@ -619,10 +624,21 @@ C<format_fields> and/or C<format_types> options.  The default is false.
 
 =for Pod::Coverage BUILD
 
-=head1 BUGS AND LIMITATIONS
+=head1 SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/data-record-serialize
+
+and may be cloned from
+
+  https://gitlab.com/djerius/data-record-serialize.git
 
 =head1 SEE ALSO
 

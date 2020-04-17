@@ -1,0 +1,1005 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" media="screen" href="/~d/styles/atomfull.xsl"?><?xml-stylesheet type="text/css" media="screen" href="http://feeds.feedburner.com/~d/styles/itemcontent.css"?><feed xmlns="http://purl.org/atom/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0" version="0.3">
+
+<title type="text/plain">Just a Theory</title>
+<tagline type="text/plain">Theory waxes practical. By David Wheeler.</tagline>
+<link rel="alternate" type="text/html" href="http://www.justatheory.com" />
+<id>tag:justatheory.com,2010:/</id>
+<generator url="http://www.blosxom.com/" version="2.0">Blosxom</generator>
+
+<link rel="start" type="application/atom+xml" href="http://feeds.feedburner.com/justatheory/atomfull" /><feedburner:info uri="justatheory/atomfull" /><atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="hub" href="http://pubsubhubbub.appspot.com/" /><entry>
+<id>tag:justatheory.com,2010:/computers/programming/perl/serious-dbix-connector-bug-fixed</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/fy0jtyJ9Ef0/serious-dbix-connector-bug-fixed.html" />
+<title type="text/plain">Serious Exception-Handling Bug Fixed in DBIx::Connector 0.42</title>
+<dc:subject>Perl</dc:subject>
+<dc:subject>DBIx::Connector</dc:subject>
+<dc:subject>DBI</dc:subject>
+<dc:subject>exception+handling</dc:subject>
+<dc:subject>bug+fix</dc:subject>
+<issued>2010-12-17T18:52:00Z</issued>
+<modified>2010-12-17T18:52:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="text/html" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="escaped">
+&lt;p&gt;I&amp;rsquo;ve just released
+&lt;a href="http://search.cpan.org/dist/DBIx-Connector" title="DBIx::Connector
+on CPAN"&gt;DBIx::Connector&lt;/a&gt; 0.42 to CPAN. This release fixes a serious bug with &lt;code&gt;catch&lt;/code&gt; blocks.
+In short, if you threw an exception from inside a catch block, it would not be
+detectable from outside. For example, given this code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;eval {
+    $conn-&amp;gt;run(sub { die 'WTF' }, catch =&amp;gt; sub { die 'OMG!' });
+};
+if (my $err = $@) {
+    say "We got an error: $@\n";
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With DBIx::Connector 0.41 and lower, the &lt;code&gt;if&lt;/code&gt; block would never be called,
+because even though the catch block threw an exception, &lt;code&gt;$@&lt;/code&gt; was not set. In
+other words, the exception would not be propagated to its caller. This could
+be terribly annoying, as you can imagine. I was being a bit too clever about
+localizing &lt;code&gt;$@&lt;/code&gt;, with the scope much too broad. 0.42 uses a much tighter scope
+to localize &lt;code&gt;$@&lt;/code&gt;, so now it should propagate properly everywhere.&lt;/p&gt;
+
+&lt;p&gt;So if you&amp;rsquo;re using DBIx::Connector &lt;code&gt;catch&lt;/code&gt; blocks, please upgrade ASAP. Sorry
+for the hassle.&lt;/p&gt;
+&lt;img src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/fy0jtyJ9Ef0" height="1" width="1"/&gt;</content>
+<feedburner:origLink>http://www.justatheory.com/computers/programming/perl/serious-dbix-connector-bug-fixed.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/databases/postgresql/fk-locks-project</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/QqjV_Ciqgvg/fk-locks-project.html" />
+<title type="text/plain">Fixing Foreign Key Deadlocks in PostgreSQL</title>
+<dc:subject>postgresql</dc:subject>
+<dc:subject>foreign+key+constraints</dc:subject>
+<dc:subject>foreign+key</dc:subject>
+<dc:subject>lock</dc:subject>
+<dc:subject>deadlock</dc:subject>
+<dc:subject>fossexperts</dc:subject>
+<dc:subject>pgexperts</dc:subject>
+<dc:subject>commandprompt</dc:subject>
+<dc:subject>glue+finance</dc:subject>
+<dc:subject>ActiveRecord</dc:subject>
+<issued>2010-11-24T22:30:00Z</issued>
+<modified>2010-11-24T22:30:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="text/html" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="escaped">
+&lt;p&gt;&lt;a href="http://pgexperts.com/"&gt;PGX&lt;/a&gt; had &lt;a href="http://gluefinance.com/"&gt;a client&lt;/a&gt; come to us recently with a rather nasty deadlock issue. It took far longer than we would have liked to figure out the issue, and once we did, they were able to clear it up by dropping an unnecessary index. Still, it shouldn&amp;rsquo;t have been happening to begin with. Joel Jacobson admirably &lt;a href="http://www.mail-archive.com/pgsql-hackers@postgresql.org/msg157869.html"&gt;explained the issue&lt;/a&gt; on pgsql-hackers (and don&amp;rsquo;t miss &lt;a href="http://www.screencast.com/users/joeljacobson/folders/Jing/media/42c31028-80fa-45fe-b21f-9039110c3555"&gt;the screencast&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Some might consider it a bug in PostgreSQL, but the truth is that PostgreSQL can obtain stronger than necessary locks. Such locks cause some operations to block unnecessarily and some other operations to deadlock, especially when foreign keys are used in a busy database. And really, who doesn&amp;rsquo;t use FKs in their busy database?&lt;/p&gt;
+
+&lt;p&gt;Fortunately, Simon Riggs &lt;a href="http://www.mail-archive.com/pgsql-hackers@postgresql.org/msg158205.html"&gt;proposed a solution&lt;/a&gt;. And it&amp;rsquo;s a good one. So good that &lt;a href="http://pgexperts.com/"&gt;PGX&lt;/a&gt; is partnering with &lt;a href="http://gluefinance.com/"&gt;Glue Finance&lt;/a&gt; and &lt;a href="http://www.commandprompt.com/"&gt;Command Prompt&lt;/a&gt; as founding sponsors on a new &lt;a href="https://www.fossexperts.com/content/foreign-key-locks"&gt;FOSSExperts project&lt;/a&gt; to actually get it done. &lt;a href="http://www.commandprompt.com/blogs/alvaro_herrera/"&gt;Álvaro Herrera&lt;/a&gt; is doing the actual hacking on the project, and has already blogged about it &lt;a href="http://www.commandprompt.com/blogs/alvaro_herrera/2010/11/fixing_foreign_key_deadlocks/"&gt;here&lt;/a&gt; and &lt;a href="http://www.commandprompt.com/blogs/alvaro_herrera/2010/11/fixing_foreign_key_deadlocks_part_2/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;If you use foreign key constraints (and you should!) and you have a high transaction load on your database (or expect to soon!), this matters to you. In fact, if you use ActiveRecord with Rails, there might even be a special place in your heart for this issue, &lt;a href="http://mina.naguib.ca/blog/2010/11/22/postgresql-foreign-key-deadlocks.html"&gt;says Mina Naguib&lt;/a&gt;. We&amp;rsquo;d &lt;em&gt;really&lt;/em&gt; like to get this done in time for the PostgreSQL 9.1 release. But it will only happen if the project can be funded.&lt;/p&gt;
+
+&lt;p&gt;Yes, that&amp;rsquo;s right, as with &lt;a href="http://pgxn.org/"&gt;PGXN&lt;/a&gt;, this is community project for which we&amp;rsquo;re raising funds from the community to get it done. I think that more and more work could be done this way, as various interested parties contribute small amounts to collectively fund improvements to the benefit of us all. So can you help out? Hit the &lt;a href="https://www.fossexperts.com/content/foreign-key-locks"&gt;FOSSExperts project page&lt;/a&gt; for all the project details, and to &lt;a href="https://www.fossexperts.com/content/foreign-key-locks-0"&gt;make your contribution&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Help us help the community to make PostgreSQL better than ever!&lt;/p&gt;
+&lt;img src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/QqjV_Ciqgvg" height="1" width="1"/&gt;</content>
+<feedburner:origLink>http://www.justatheory.com/computers/databases/postgresql/fk-locks-project.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/programming/cocoa/git-build-number-in-xcode</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/7PvSPn3LD_I/git-build-number-in-xcode.html" />
+<title type="text/plain">Adding a Git SHA1 to your Xcode Project</title>
+<dc:subject>Git</dc:subject>
+<dc:subject>Xcode</dc:subject>
+<dc:subject>Perl</dc:subject>
+<dc:subject>SHA1</dc:subject>
+<dc:subject>plist</dc:subject>
+<issued>2010-11-24T21:33:00Z</issued>
+<modified>2010-11-24T21:33:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="text/html" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="escaped">
+&lt;p&gt;I found a &lt;a href="http://www.cimgf.com/2008/04/13/git-and-xcode-a-git-build-number-script/"&gt;decent Perl script&lt;/a&gt; for adding a Git SHA1 to an Xcode project last week. However, since by day I&amp;rsquo;m actually a &lt;a href="http://search.cpan.org/~dwheeler/"&gt;Perl hacker&lt;/a&gt;, I couldn&amp;rsquo;t help finessing it a bit. Here are the steps to add it to your project:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Open your project settings (Project &amp;ndash;&gt; Edit Project Settings) and in the &amp;ldquo;Build&amp;rdquo; tab, make sure that &amp;ldquo;Info.plist Output Encoding&amp;rdquo; is set to &amp;ldquo;xml&amp;rdquo;. I lost about an hour of fiddling before I realized that my plist file was binary, which of course couldn&amp;rsquo;t really be parsed by the simple Perl script.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Edit your app&amp;rsquo;s Info.plist file. If you want the version to be the SHA1, set &amp;ldquo;Bundle Version&amp;rdquo; to &amp;ldquo;0x000&amp;rdquo;. I personally prefer to have a separate key for the SHA1, so I created the &amp;ldquo;LTGitSHA1&amp;rdquo; key and set its value to &amp;ldquo;0x000&amp;rdquo;. This is the placeholder value that will be replaced when your app runs.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Right-click your target app and select Add &amp;ndash;&gt; New Build Phase &amp;ndash;&gt; New Run Script Build Phase. For the shell command, enter:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/usr/bin/env perl -wpi -0777
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Paste this into the &amp;ldquo;Script&amp;rdquo; field:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env perl -wpi -0777
+# Xcode auto-versioning script for Subversion by Axel Andersson
+# Updated for git by Marcus S. Zarra and Matt Long
+# Refactored by David E. Wheeler.
+
+BEGIN {
+    @ARGV = ("$ENV{BUILT_PRODUCTS_DIR}/$ENV{INFOPLIST_PATH}");
+    ($sha1 = `git rev-parse --short HEAD`) =~ s/\s+$//;
+}
+
+s{0x000}{$sha1};
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Fetch the value in your code from your bundle, something like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;NSLog(
+    @"SHA1: %@",
+    [[[NSBundle mainBundle]infoDictionary]objectForKey:@"LTGitSHA1"]
+);
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+
+&lt;p&gt;That&amp;rsquo;s it. If you want to use a placeholder other than &amp;ldquo;0x0000&amp;rdquo;, just change it on the last line of the script.&lt;/p&gt;
+&lt;img src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/7PvSPn3LD_I" height="1" width="1"/&gt;</content>
+<feedburner:origLink>http://www.justatheory.com/computers/programming/cocoa/git-build-number-in-xcode.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/autobiographical/since-undergrad</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/uc-rio2gYeA/since-undergrad.html" />
+<title type="text/plain">The 411 Since Graduating from College</title>
+<dc:subject>autobiographical</dc:subject>
+<dc:subject>graduate+school</dc:subject>
+<dc:subject>archaeology</dc:subject>
+<dc:subject>programming</dc:subject>
+<dc:subject>history</dc:subject>
+<dc:subject>life</dc:subject>
+<issued>2010-10-18T17:37:00Z</issued>
+<modified>2010-10-18T17:37:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="application/xhtml+xml" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="xml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I recently got back in touch with a friend from college via Facebook. She asked me, “So David give me the 411?  Whats been up with you for oh? 15 years?” Facebook’s Wall doesn’t seem to care much for multi-paragraph posts, but it kind of makes sense to post it in my blog anyway.</p>
+
+<p>Julie and I moved to Florida in January, 1994 for a few months, and to Virginia the following summer. I started in the graduate program in the UVa Department of Anthropology in the fall. I also got on the internet that year and started learning how to program. We got married in May, 1995, in Orange, Virginia.</p>
+
+<p>Two years later, I got my MA. Even though I was at UVa doing Near Eastern archaeology, by masters paper was based on research in the American Southwest. That’s just the way things shook out. The paper was later rejected by an archaeology journal. The peer reviews were really offensive, one in particular; some of the old guard of Southwest archaeology were really threatened by it. Didn’t help that I’d dropped the research part of the article before submitting. I was advised to do so, but it was clearly a mistake. C’et la vie. I mostly found it humorous and typical that academics could be such dicks to a student submitting his first peer-reviewed paper.</p>
+
+<p>I have a PDF of the paper I keep meaning to blog. I should do that one of these days.</p>
+
+<p>I spent a summer on Cyprus excavating a medieval site and the summer of 98 with my advisor for four weeks in southeastern Turkey. Kurdistan, really. My focus was supposedly architecture and urbanization, but in truth I enjoyed creating a database app for the project much more than counting pottery sherds. I went into the Turkey trip thinking it would determine whether or not I stuck to archaeology. I’d by this time had a full-time job for about a year doing systems and integration programming for the UVa medical center. It was fun, engaging work, and although I enjoyed the academic side of graduate schools (seminars and such), the culture of academia held no interest for me at all.</p>
+
+<p>So I quit the program when I got back from Turkey. In 1999 we moved back to SF. I worked for UCSF for 9 months, then went to work for Salon.com. I was there a year, then went on my own, working on an open-source content management system called <a href="http://bricolagecms.org/">Bricolage</a> that I’d developed with my colleagues at Salon. Life was great for us in SF. We moved into a loft in 2002 and really made the best of our time in The City.</p>
+
+<p>In 2003 we were visiting Portland for a weekend just after Christmas and decided to have a real estate agent show us some properties to get a feel for the place. We’d been thinking about moving to Portland since ’96, and were still thinking maybe we’d do it in a couple more years. Julie’s dad had moved to Eugene, 2 hours down the road, so that was also a factor. To our surprise, we found a house we fell in love with. So we bought it, sold the loft, and moved to Portland, arriving in April, 2004. Our daughter, Anna, was born in May 2005.</p>
+
+<p>And the rest is history. I’ve done a bunch of technology-related work over the last 10 years, mostly Perl and PostgreSQL programming. These days, I do PostgreSQL consulting as an associate in <a href="http://www.pgexperts.com/">PostgreSQL Experts</a>, some Bricolage consulting via my company, <a href="http://www.kineticode.com/">Kineticode</a>, and have recently started a new venture with a friend to develop <a href="http://designsceneapp.com/">iPad app</a>.</p>
+
+<p>Portland is a terrific place to live. We <strong>love</strong> it here. Not gritty like SF, but still with the elements of urban living. We have a house close to downtown and I get around mainly by bike. Anna is doing great; she’s so awesome. She’s in a Montessori school that we’ll likely keep her in through 8th grade.</p>
+
+<p>Julie is doing well, too. At UVa she became Art Director for the University’s Capital Campaign, and started a business, <a href="http://strongrrl.com/">Strongrrl</a>, while in San Francisco, mainly focused on graphic design for universities and non-profits. Business has slowed in the last few years, alas, as print has been dying and budgets have become restricted. She still does a bit of work, but also has started sewing and an <a href="http://strongrrl.etsy.com/">Etsy store</a> (kind of empty at the moment, will be stocked in the next couple of weeks) and this year doing deep genealogical research. We both work at home, but she does the lion’s share of the domestic and child-rearing duties. After 18 years together our relationship has deepened tremendously. We’re very happy together.</p>
+
+<p>Anyway, life is good. I suppose if I were to write this again tomorrow I’d focus on a bunch of other things. A lot happens in 17 years, as you no doubt know. This is just a thin slice, with more academic stuff than I usually go into, but the context seemed to warrant it.</p>
+
+<p>So what’s your 411?</p>
+
+
+D
+
+
+
+
+
+
+
+
+
+<xhtml:img xmlns:xhtml="http://www.w3.org/1999/xhtml" src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/uc-rio2gYeA" height="1" width="1" /></div></content>
+<feedburner:origLink>http://www.justatheory.com/autobiographical/since-undergrad.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/databases/postgresql/key-value-pairs</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/npS8T9xoRBQ/key-value-pairs.html" />
+<title type="text/plain">Managing Key/Value Pairs in PostgreSQL</title>
+<dc:subject>PostgreSQL</dc:subject>
+<dc:subject>ordered+pair</dc:subject>
+<dc:subject>array</dc:subject>
+<dc:subject>key/value</dc:subject>
+<dc:subject>nosql</dc:subject>
+<dc:subject>sql</dc:subject>
+<dc:subject>collection</dc:subject>
+<issued>2010-08-09T13:00:00Z</issued>
+<modified>2010-08-09T13:00:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="application/xhtml+xml" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="xml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Let's say that you've been following the <a href="http://it.toolbox.com/blogs/database-soup/runningwithscissorsdb-39879" title="RunningWithScissorsDB">latest research</a> in key/value data storage and are interested in managing such data in a PostgreSQL database. You want to have functions to store and retrieve pairs, but there is no natural way to represent pairs in SQL. Many languages have hashes or or data dictionaries to fulfill this role, and you can pass them to functional interfaces. SQL's got nothin’. In PostgreSQL, have two options: use nested arrays (simple, fast) or use a custom composite data type (sugary, legible).</p>
+
+<p>Let's assume you have this table for storing your pairs:</p>
+
+<pre>
+CREATE TEMPORARY TABLE kvstore (
+    key        TEXT PRIMARY KEY,
+    value      TEXT,
+    expires_at TIMESTAMPTZ DEFAULT NOW() + '12 hours'::interval
+);
+</pre>
+
+<p>To store pairs, you can use nested arrays like so:</p>
+
+<pre>
+SELECT store(ARRAY[ ['foo', 'bar'], ['baz', 'yow'] ]);
+</pre>
+
+<p>Not too bad, and since SQL arrays are a core feature of PostgreSQL, there's nothing special to do. Here's the <code>store()</code> function:</p>
+
+<pre>
+CREATE OR REPLACE FUNCTION store(
+    params text[][]
+) RETURNS VOID LANGUAGE plpgsql AS $$
+BEGIN
+    FOR i IN 1 .. array_upper(params, 1) LOOP
+        UPDATE kvstore
+           SET value      = params[i][2],
+               expires_at = NOW() + '12 hours'::interval
+         WHERE key        = param[i][1];
+        CONTINUE WHEN FOUND;
+        INSERT INTO kvstore (key, value)
+        VALUES (params[i][1], params[i][2]);
+    END LOOP;
+END;
+$$;
+</pre>
+
+<p>I've seen worse. The trick is to iterate over each nested array, try an update for each, and insert when no row is updated. Alas, you have no control over how many elements a user might include in a nested array. One might call it as:</p>
+
+<pre>
+SELECT store(ARRAY[ ['foo', 'bar', 'baz'] ]);
+</pre>
+
+<p>Or:</p>
+
+<pre>
+SELECT store(ARRAY[ ['foo'] ]);
+</pre>
+
+<p>No errors will be thrown in either case. In the first the "baz" will be ignored, and in the second the value will default to <code>NULL</code>. If you really didn't like these behaviors, you could add some code to throw an exception if <code>array_upper(params, 2)</code> returns anything other than 2.</p>
+
+<p>Let's look at fetching values for keys. PostgreSQL 8.4 added variadic function arguments, so it's easy to provide a nice interface for retrieving one or more values. The obvious one fetches a single value:</p>
+
+<pre>
+CREATE OR REPLACE FUNCTION getval(
+    text
+) RETURNS TEXT LANGUAGE SQL AS $$
+    SELECT value FROM kvstore WHERE key = $1;
+$$;
+</pre>
+
+<p>Nice and simple:</p>
+
+<pre>
+SELECT getval('baz');
+
+ getval 
+--------'
+ yow
+</pre>
+
+<p>The variadic version looks like this:</p>
+
+<pre>
+CREATE OR REPLACE FUNCTION getvals(
+    variadic text[]
+) RETURNS SETOF text LANGUAGE SQL AS $$
+    SELECT value
+      FROM kvstore
+      JOIN (SELECT generate_subscripts($1, 1)) AS f(i)
+        ON kvstore.key = $1[i]
+     ORDER BY i;
+$$;
+</pre>
+
+<p>Note the use of <code>ORDER BY i</code> to ensure that the values are returned in the same order as the keys are passed to the function. So if I've got the key/value pairs <code>'foo' =&gt; 'bar'</code> and <code>'baz' =&gt; 'yow'</code>, the output is:</p>
+
+<pre>
+SELECT * FROM getvals('foo', 'baz');
+
+ getvals 
+---------
+ bar
+ yow
+</pre>
+
+<p>If we want to the rows to have the keys and values together, we can return them as arrays, like so:</p>
+
+<pre>
+CREATE OR REPLACE FUNCTION getpairs(
+    variadic text[]
+) RETURNS SETOF text[] LANGUAGE SQL AS $$
+    SELECT ARRAY[key, value]
+      FROM kvstore
+      JOIN unnest($1) AS k ON kvstore.key = k
+$$;
+</pre>
+
+<p>Here I'm assuming that order isn't important, which means we can use <a href="http://www.postgresql.org/docs/current/static/functions-array.html" title="PostgreSQL Documentation: Array Functions and Operators"><code>unnest</code></a> to "flatten" the array, instead of the slightly more baroque <a href="http://www.postgresql.org/docs/current/static/functions-srf.html#FUNCTIONS-SRF-SUBSCRIPTS" title="PostgreSQL Documentation: Set Returning Functions"><code>generate_subscripts()</code></a> with array access. The output:</p>
+
+<pre>
+SELECT * FROM getpairs('foo', 'baz');
+
+  getpairs   
+-------------
+ {baz,yow}
+ {foo,bar}
+</pre>
+
+<p>Now, this is good as far as it goes, but the use of nested arrays to represent key/value pairs is not exactly ideal: just looking at the use of a function, there's nothing to indicate that you're using key/value pairs. What <em>would</em> be ideal is to use <a href="http://www.postgresql.org/docs/current/static/sql-expressions.html#SQL-SYNTAX-ROW-CONSTRUCTORS" title="PostgreSQL Documentation: Row Constructors">row constructors</a> to pass arbitrary pairs:</p>
+
+<pre>
+SELECT store( ROW('foo', 'bar'), ROW('baz', 42) );
+</pre>
+
+<p>Alas, one cannot pass <code>RECORD</code> values (the data type returned by <code>ROW()</code>) to non-C functions in PostgreSQL.<sup id="fnr1-2010-08-09"><a href="#fn1-2010-08-09">1</a></sup> But if you don't mind your keys and values always being <code>TEXT</code>, we can get almost all the way there by creating an "ordered pair" data type as a <a href="http://www.postgresql.org/docs/current/static/sql-createtype.html" title="PostgreSQL Documentation: CREATE TYPE">composite type</a> like so:</p>
+
+<pre>
+CREATE TYPE pair AS ( k text, v text );
+</pre>
+
+<p>Then we can create <code>store()</code> with a signature of <code>VARIADIC pair[]</code> and pass in any number of these suckers:</p>
+
+<pre>
+CREATE OR REPLACE FUNCTION store(
+    params variadic pair[]
+) RETURNS VOID LANGUAGE plpgsql AS $$
+DECLARE
+    param pair;
+BEGIN
+    FOR param IN SELECT * FROM unnest(params) LOOP
+        UPDATE kvstore
+           SET value = param.v,
+               expires_at = NOW() + '12 hours'::interval
+         WHERE key = param.k;
+        CONTINUE WHEN FOUND;
+        INSERT INTO kvstore (key, value) VALUES (param.k, param.v);
+    END LOOP;
+END;
+$$;
+</pre>
+
+<p>Isn't it nice how we can access keys and values as <code>param.k</code> and <code>param.v</code>? Call the function like this:</p>
+
+<pre>
+SELECT store( ROW('foo', 'bar')::pair, ROW('baz', 'yow')::pair );
+</pre>
+
+<p>Of course, that can get a bit old, casting to <code>pair</code> all the time, so let's create some <code>pair</code> constructor functions to simplify things:</p>
+
+<pre>
+CREATE OR REPLACE FUNCTION pair(anyelement, text)
+RETURNS pair LANGUAGE SQL AS 'SELECT ROW($1, $2)::pair';
+
+CREATE OR REPLACE FUNCTION pair(text, anyelement)
+RETURNS pair LANGUAGE SQL AS 'SELECT ROW($1, $2)::pair';
+
+CREATE OR REPLACE FUNCTION pair(anyelement, anyelement)
+RETURNS pair LANGUAGE SQL AS 'SELECT ROW($1, $2)::pair';
+
+CREATE OR REPLACE FUNCTION pair(text, text)
+RETURNS pair LANGUAGE SQL AS 'SELECT ROW($1, $2)::pair;';
+</pre>
+
+<p>I've created four variants here to allow for the most common combinations of types. So any of the following will work:</p>
+
+<pre>
+SELECT pair('foo', 'bar');
+SELECT pair('foo', 1);
+SELECT pair(12.3, 'foo');
+SELECT pair(1, 43);
+</pre>
+
+<p>Alas, you can't mix any other types, so this will fail:</p>
+
+<pre>
+SELECT pair(1, 12.3);
+
+ERROR:  function pair(integer, numeric) does not exist
+LINE 1: SELECT pair(1, 12.3);
+</pre>
+
+<p>We could create a whole slew of additional constructors, but since we're using a key/value store, it's likely that the keys will usually be text anyway. So now we can call <code>store()</code> like so:</p>
+
+<pre>
+SELECT store( pair('foo', 'bar'), pair('baz', 'yow') );
+</pre>
+
+<p>Better, eh? Hell, we can go all the way and create a nice binary operator to make it still more sugary. Just map each of the <code>pair</code> functions to the operator like so:</p>
+
+<pre>
+CREATE OPERATOR -&gt; (
+    LEFTARG   = text,
+    RIGHTARG  = anyelement,
+    PROCEDURE = pair
+);
+
+CREATE OPERATOR -&gt; (
+    LEFTARG   = anyelement,
+    RIGHTARG  = text,
+    PROCEDURE = pair
+);
+
+CREATE OPERATOR -&gt; (
+    LEFTARG   = anyelement,
+    RIGHTARG  = anyelement,
+    PROCEDURE = pair
+);
+
+CREATE OPERATOR -&gt; (
+    LEFTARG   = text,
+    RIGHTARG  = text,
+    PROCEDURE = pair
+);
+</pre>
+
+<p>Looks like a lot of repetition, I know, but checkout the new syntax:</p>
+
+<pre>
+SELECT store( 'foo' -&gt; 'bar', 'baz' -&gt; 1 );
+</pre>
+
+<p>Cute, eh? I chose to use <code>-&gt;</code> because <code>=&gt;</code> is deprecated as an operator in PostgreSQL 9.0: SQL 2011 reserves that operator for named parameter assignment.<sup id="fnr2-2010-08-09"><a href="#fn1-2010-08-09">2</a></sup></p>
+
+<p>As a last twist, let's rewrite <code>getpairs()</code> to return <code>pair</code>s instead of arrays:</p>
+
+<pre>
+CREATE OR REPLACE FUNCTION getpairs(
+    variadic text[]
+) RETURNS SETOF pair LANGUAGE SQL AS $$
+    SELECT key -&gt; value
+      FROM kvstore
+      JOIN unnest($1) AS k ON kvstore.key = k
+$$;
+</pre>
+
+<p>Cute, eh? Its use is just like before, only now the output is more table-like:</p>
+
+<pre>
+SELECT * FROM getpairs('foo', 'baz');
+
+  k  |   v   
+-----+-------
+ baz | yow
+ foo | bar
+</pre>
+
+<p>You can also get them back as composites by omitting <code>* FROM</code>:</p>
+
+<pre>
+SELECT getpairs('foo', 'baz');
+
+  getpairs   
+-------------
+ (foo,bar)
+ (baz,yow)
+</pre>
+
+<p>Anyway, just something to consider the next time you need a function that allows any number of key/value pairs to be passed. It's not perfect, but it's pretty sweet.</p>
+
+<div class="footnotes">
+  <hr />
+  <ol>
+  <li id="fn1-2010-08-09">
+    <p>In the <a href="http://archives.postgresql.org/pgsql-hackers/2010-08/msg00520.php">recent pgsql-hackers discussion</a> that inspired this post, Pavel Stehule suggested adding something like <a href="http://download.oracle.com/docs/cd/B19306_01/appdev.102/b14261/collections.htm">Oracle <code>COLLECTION</code>s</a> to address this shortcoming. I don't know how far this idea will get, but it sure would be nice to be able to pass objects with varying kinds of data, rather than be limited to data all of one type (values in an SQL array must all be of the same type). <a href="#fnr1-2010-08-09" class="footnoteBackLink" title="Jump back to footnote 1 in the text.">↩</a></p>
+  </li>
+  <li id="fn2-2010-08-09">
+     <p>No, you won't be able to use named parameters for this application because named parameters are inherently non-variadic. That is, you can only pre-declare so many named parameters: you can't anticipate every parameter that's likely to be wanted as a key in our key/value store. <a href="#fnr2-2010-08-09" class="footnoteBackLink" title="Jump back to footnote 2 in the text.">↩</a></p>
+  </li>
+  </ol>
+  </div>
+  <xhtml:img xmlns:xhtml="http://www.w3.org/1999/xhtml" src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/npS8T9xoRBQ" height="1" width="1" /></div></content>
+<feedburner:origLink>http://www.justatheory.com/computers/databases/postgresql/key-value-pairs.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/databases/postgresql/pgxn/blog-twitterstream</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/mV4uenqUqRM/blog-twitterstream.html" />
+<title type="text/plain">PGXN Blog and Twitterstream</title>
+<dc:subject>PostgreSQL</dc:subject>
+<dc:subject>PGXN</dc:subject>
+<dc:subject>blog</dc:subject>
+<issued>2010-08-04T16:51:00Z</issued>
+<modified>2010-08-04T16:51:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="application/xhtml+xml" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="xml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I crated the <a href="http://blog.pgxn.org/">PGXN Blog</a> yesterday. Tune in there for news and announcements. I’ll also be posting status reports once development gets underway, so that all you fans out there can follow my progress. Once the site is done (or at 1.0 anyway), the blog will be used for announcements, discussion of support issues, etc. So tune in!</p>
+
+<p>Oh, and I created a <a href="http://twitter.com/pgxn/">PGXN Twitterstream</a>, too. You should follow it! New blog posts will be tweeted, and once the site gets going, new uploads will be tweeted, too. Check it out!</p><xhtml:img xmlns:xhtml="http://www.w3.org/1999/xhtml" src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/mV4uenqUqRM" height="1" width="1" /></div></content>
+<feedburner:origLink>http://www.justatheory.com/computers/databases/postgresql/pgxn/blog-twitterstream.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/databases/mysql/introducing_mysql</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/evz3x5UHsUo/introducing_mysql.html" />
+<title type="text/plain">Introducing MyTAP</title>
+<dc:subject>mytap</dc:subject>
+<dc:subject>pgtap</dc:subject>
+<dc:subject>testing</dc:subject>
+<dc:subject>unit+testing</dc:subject>
+<dc:subject>MySQL</dc:subject>
+<dc:subject>PostgreSQL</dc:subject>
+<dc:subject>database</dc:subject>
+<dc:subject>test+driven+database+development</dc:subject>
+<dc:subject>tddd</dc:subject>
+<issued>2010-07-28T19:38:00Z</issued>
+<modified>2010-07-28T19:38:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="application/xhtml+xml" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="xml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I gave my <a href="http://www.oscon.com/oscon2010/public/schedule/detail/14168" title="Test Driven Database Development">OSCON tutorial</a> (<a href="http://www.slideshare.net/justatheory/test-drivern-database-development" title="slides on SlideShare">slides</a>) last week. It went okay. I spent <em>way</em> too much time helping to get everyone set up with <a href="http://pgtap.org/">pgTAP</a>, and then didn't have time to have the attendees do the exercises, and I had to rush through 2.5 hours of material in 1.5 hours. Yikes! At least the video will be better when it's released (more when that happens).</p>
+
+<p>But as often happens, I was asked whether something like pgTAP exists for <a href="http://www.mysql.com/">MySQL</a>. But this time I was asked by MySQL Community Manager <a href="http://datacharmer.blogspot.com/">Giuseppe Maxia</a>, who also said that he'd tried to create a test framework himself (a fellow Perl hacker!), but that it wasn't as nice as pgTAP. Well, since I was at OSCON and tend to like to hack on side projects while at conferences, and since I hoped that Giuseppe will happily take it over once I've implemented the core, I started hacking on it myself. And today, I'm pleased to announce the release of <a href="http://github.com/theory/mytap/">MyTAP</a> 0.01 (<a href="http://github.com/theory/mytap/downloads">downloads</a>).</p>
+
+<p>Once you've downloaded it, install it against your MySQL server like so:</p>
+
+<pre>mysql -u root &lt; mytap.sql</pre>
+
+<p>Here's a very simple example script:</p>
+
+<pre>-- Start a transaction.
+BEGIN;
+
+-- Plan the tests.
+SELECT tap.plan(1);
+
+-- Run the tests.
+SELECT tap.pass( 'My test passed, w00t!' );
+
+-- Finish the tests and clean up.
+CALL tap.finish();
+ROLLBACK;
+</pre>
+
+<p>You can run this test from a <code>.sql</code> file using the <code>mysql</code>  client like so:</p>
+
+<pre>mysql -u root --disable-pager --batch --raw --skip-column-names --unbuffered --database try --execute 'source test.sql'
+</pre>
+
+<p>But that's a PITA and can only run one test at a time. Instead, put all of your tests into a directory, perhaps named <code>tests</code>, each with the suffix “.my”, and use <a href="http://search.cpan.org/perldoc?my_prove"><code>my_prove</code></a> (install <a href="http://search.cpan.org/dist/TAP-Parser-SourceHandler-MyTAP/">TAP::Parser::SourceHandler::MyTAP</a> from CPAN to get it) instead:</p>
+
+<pre>my_prove -u root --database try tests/</pre>
+
+<p>For MyTAP's own tests, the output looks like this:</p>
+
+<pre>tests/eq.my ........ ok
+tests/hastap.my .... ok
+tests/matching.my .. ok
+tests/moretap.my ... ok
+tests/todotap.my ... ok
+tests/utils.my ..... ok
+All tests successful.
+Files=6, Tests=137,  1 wallclock secs
+(0.06 usr  0.03 sys +  0.01 cusr  0.02 csys =  0.12 CPU)
+Result: PASS
+</pre>
+
+<p>Nice, eh? Of course there are quite a few more assertion functions. See the <a href="http://theory.github.com/mytap/documentation.html">complete documentation</a> for details.</p>
+
+<p>Now, I did my best to keep the interface the same as pgTAP, but there are a few differences:</p>
+
+<ul>
+<li>MySQL temporary tables are <a href="http://dev.mysql.com/doc/refman/5.0/en/temporary-table-problems.html">teh suck</a>, so I had to use permanent tables to track test state. To make this more feasible, MyTAP is always installed in its own database, (named “tap” by default), and you must always schema-qualify your use of the MyTAP functions.</li>
+<li>Another side-effect of permanent tables is that MyTAP must keep track of test outcomes without colliding with the state from tests running in multiple concurrent connections. So MyTAP uses <a href="http://dev.mysql.com/doc/refman/5.0/en/information-functions.html#function_connection-id"><code>connection_id()</code></a> to keep track of state for a single test run. It also deletes the state when tests <code>finish()</code>, but if there's a crash before then, data can be left in those tables. If the connection ID is ever re-used, this can lead to conflicts. This seems mostly avoidable by using <a href="http://dev.mysql.com/doc/refman/5.0/en/innodb.html">InnoDB</a> tables and transactions in the tests.</li>
+<li>The word “is” is strictly reserved by MySQL, so the function that corresponds to pgTAP's <code>is()</code>  is <code>eq()</code> in MyTAP. Similarly, <code>isnt()</code> is called <code>not_eq()</code> in MyTAP.</li>
+<li>There is no way to throw an exception in MySQL functions an procedures, so the code cheats by instead performing an illegal operation: selecting from a non-existent column, where the name of that column is the error message. Hinky, but should get the point across.</li>
+</ul>
+
+<p>Other than these issues, things went fairly smoothly. I finished up the 0.01 version last night and released it today with most of the core functionality in place. And now I want to find others to take over, as I am not a MySQL hacker myself and thus unlikely ever to use it. If you're interested, my recommendations for things to do next are:</p>
+
+<ul>
+<li><p>Move <code>has_table()</code> to its own file, named <code>mytap-schema.sql</code> or similar, and start porting the relevant pgTAP <a href="http://pgtap.org/documentation.html#Table+For+One">table assertion functions</a>, <a href="http://pgtap.org/documentation.html#The+Schema+Things">schema assertion functions</a>, <a href="http://pgtap.org/documentation.html#To+Have+or+Have+Not">have assertion functions</a>, <a href="http://pgtap.org/documentation.html#Feeling+Funky">function and procedure assertion functions</a>, and <a href="http://pgtap.org/documentation.html#Database+Deets">assorted other database object assertion functions</a>.</p></li>
+<li><p>Consider an approach to porting the <a href="http://pgtap.org/documentation.html#Pursuing+Your+Query">pgTAP relation comparison assertion functions</a>, perhaps by requiring that prepared statements be created and their names passed to the functions. The functions can then select from the prepared statements into temporary tables to compare results (as in <code>set_eq()</code> and <code>bag_eq()</code>), or use cursors to iterate over the prepared statements row-by-row (as in <code>results_eq()</code>)</p></li>
+<li><p>Set up a mail list and a permanent home for MyTAP (I've used GitHub pages for the <a href="http://theory.github.com/mytap/">current site</a>, but I don't think it should remain tightly associated with my GitHub identity). I'd like to see some folks from the MySQL community jump on this.</p></li>
+</ul>
+
+<p>So fork on <a href="http://github.com/theory/mytap/" title="MyTAP on GitHub">GitHub</a> or contact me if you'd like to be added as a collaborator (I'm looking at <em>you,</em> <a href="http://datacharmer.blogspot.com/">Giuseppe</a>!).</p>
+
+<p>Hope you find it useful.</p><xhtml:img xmlns:xhtml="http://www.w3.org/1999/xhtml" src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/evz3x5UHsUo" height="1" width="1" /></div></content>
+<feedburner:origLink>http://www.justatheory.com/computers/databases/mysql/introducing_mysql.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/conferences/oscon2010/tddd-flipr-at-oscon</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/stYAdz7NvB0/tddd-flipr-at-oscon.html" />
+<title type="text/plain">Important Announcement at OSCON Next Week</title>
+<dc:subject>tddd</dc:subject>
+<dc:subject>pgtap</dc:subject>
+<dc:subject>oscon</dc:subject>
+<dc:subject>flipr</dc:subject>
+<dc:subject>antisocial+media</dc:subject>
+<issued>2010-07-16T16:49:00Z</issued>
+<modified>2010-07-16T16:49:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="application/xhtml+xml" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="xml"><div xmlns="http://www.w3.org/1999/xhtml"><div class="box">
+<img src="http://farm5.static.flickr.com/4075/4799027539_22c432423f_o.png" alt="Flipr Antisocial Networking" title="Flipr Antisocial Networking" />
+<p class="caption">Logo design by <a href="http://www.strongrrl.com/">Strongrrl</a>.</p>
+</div>
+
+<p>A sneak peak at what I'm working on for my <a href="http://bit.ly/9VYmEZ" title="Test Driven Database Development">tutorial session</a> at <a href="http://www.oscon.com/">OSCON</a>. Be there at 8:30 Monday morning for the important details. You're sure to find my new venture exciting—perhaps the most important social media announcement of 2010. You can't afford to miss that, can you?</p><xhtml:img xmlns:xhtml="http://www.w3.org/1999/xhtml" src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/stYAdz7NvB0" height="1" width="1" /></div></content>
+<feedburner:origLink>http://www.justatheory.com/computers/conferences/oscon2010/tddd-flipr-at-oscon.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/databases/postgresql/pgxn-development-project</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/qcUh2wOIZb4/pgxn-development-project.html" />
+<title type="text/plain">PGXN Development Project</title>
+<dc:subject>PGXN</dc:subject>
+<dc:subject>PGAN</dc:subject>
+<dc:subject>PostgreSQL</dc:subject>
+<dc:subject>CPAN</dc:subject>
+<dc:subject>fundraising</dc:subject>
+<issued>2010-06-15T17:56:00Z</issued>
+<modified>2010-06-15T17:56:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="text/html" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="escaped">
+&lt;p&gt;I'm pleased to announce the launch of the &lt;a href="http://pgxn.org/" title="PostgreSQL Extension Network"&gt;PGXN&lt;/a&gt; development project. I've written a &lt;a href="http://wiki.postgresql.org/wiki/PGXN" title="PGXN Specification"&gt;detailed specification&lt;/a&gt; and pushed it through general approval &lt;a href="http://www.mail-archive.com/pgsql-hackers@postgresql.org/msg143645.html" title="pgsql-hackers archive: RFC: PostgreSQL Add-On Network"&gt;on pgsql-hackers&lt;/a&gt;. I've written up a detailed &lt;a href="http://pgxn.org/status.html" title="PGXN Project Status"&gt;project plan&lt;/a&gt; and estimated things at a highly reduced &lt;a href="http://www.pgexperts.com/"&gt;PostgreSQL Experts&lt;/a&gt; rate to come up with a fundraising goal: $25,000. And now, thanks to &lt;a href="http://pgxn.org/contributors.html" title="PGXN Contributors"&gt;founding contributions&lt;/a&gt; from &lt;a href="http://www.myyearbook.com"&gt;myYearbook.com&lt;/a&gt;, and &lt;a href="http://www.pgexperts.com/"&gt;PostgreSQL Experts&lt;/a&gt;, we have started the fundraising phase of the project.&lt;/p&gt;
+
+&lt;p&gt;So what&amp;rsquo;s this all about? PGXN, the PostgreSQL Extension Network, is modeled on &lt;a href="http://cpan.org"&gt;CPAN&lt;/a&gt;, the Perl community&amp;rsquo;s archive of &amp;ldquo;all things Perl.&amp;rdquo; PGXN will provide four major pieces of infrastructure to the PostgreSQL community:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;An upload and distribution infrastructure for extension developers (models: &lt;a href="http://pause.perl.org"&gt;PAUSE&lt;/a&gt; &amp;amp; &lt;a href="http://cpan.org/"&gt;CPAN&lt;/a&gt;, &lt;a href="http://openjsan.org/jause/"&gt;JAUSE&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;A centralized index and API of distribution metadata (models: &lt;a href="http://cpanmetadb.appspot.com/"&gt;CPAN Meta DB&lt;/a&gt;, &lt;a href="http://cpan.perl.org/modules/02packages.details.txt"&gt;02packages.details.txt&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;A website for searching extensions and perusing their documentation (models: &lt;a href="http://search.cpan.org/"&gt;search.cpan.org&lt;/a&gt;, &lt;a href="http://kobesearch.cpan.org/"&gt;Kobesearch&lt;/a&gt;, &lt;a href="http://openjsan.org/"&gt;JSAN&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;A command-line client for downloading, testing, and installing extensions (models: &lt;a href="http://cpanmin.us/"&gt;cpanminus&lt;/a&gt;, &lt;a href="http://search.cpan.org/perldoc?cpan"&gt;CPAN.pm&lt;/a&gt;, &lt;a href="http://search.cpan.org/perldoc?jsan"&gt;JSAN Shell&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I've been wanting to start this project for a long time, but given my need to pay the bills, it didn&amp;rsquo;t seem like I'd ever be able to find the time for it. Then Josh Berkus suggested that we try to get community interest and raise money for me to have the time to work on it. So I jumped on that, putting in the hours needed to get general approval from the core PostgreSQL developers and to create a reasonable project plan and web site. And thanks to MyYearook&amp;rsquo;s and PGX&amp;rsquo;s backing, I'm really excited about it. I hope to start on it in August.&lt;/p&gt;
+
+&lt;p&gt;If you'd like to contribute, first: &lt;strong&gt;Thank You!&lt;/strong&gt;. The &lt;a href="http://pgxn.org/" title="PGXN"&gt;PGXN site&lt;/a&gt; has a Google Checkout widget that makes it easy to make a donation. If you'd rather pay by some other means (checks are great for us!), &lt;a href="mailto:pgxn@pgexpergts.com"&gt;drop me a line&lt;/a&gt; and we'll work something out. We have a few levels of &lt;a href="http://pgxn.org/contributors.html" title="PGXN Contributors"&gt;contribution&lt;/a&gt; as well, including permanent linkage on the PGXN site for your organization, as well as the usual t-shirts launch party invitations.&lt;/p&gt;
+&lt;img src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/qcUh2wOIZb4" height="1" width="1"/&gt;</content>
+<feedburner:origLink>http://www.justatheory.com/computers/databases/postgresql/pgxn-development-project.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/internet/weblogs/atom-sources</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/Tbuv78hj2YI/atom-sources.html" />
+<title type="text/plain">Atom Sources</title>
+<dc:subject>atom</dc:subject>
+<dc:subject>RSS</dc:subject>
+<dc:subject>RSS2</dc:subject>
+<dc:subject>source</dc:subject>
+<dc:subject>XML</dc:subject>
+<dc:subject>feed</dc:subject>
+<issued>2010-06-06T01:12:00Z</issued>
+<modified>2010-06-06T01:12:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="text/html" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="escaped">
+&lt;p&gt;I'm working on a project where I aggregate entries from a slew of feeds into a single feed. The output feed will be a valid &lt;a href="http://www.atomenabled.org/"&gt;Atom&lt;/a&gt; feed, and of course I want to make sure that I maintain all the appropriate metadata for each entry I collect. The &lt;a href="http://www.atomenabled.org/developers/syndication/#optionalEntryElements"&gt;&lt;code&gt;&amp;lt;source&amp;gt;&lt;/code&gt;&lt;/a&gt; element seems to be exactly what I need:&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;If an entry is copied from one feed into another feed, then the source feed&amp;rsquo;s metadata (all child elements of feed other than the entry elements) should be preserved if the source feed contains any of the child elements author, contributor, rights, or category and those child elements are not present in the source entry.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;source&amp;gt;
+  &amp;lt;id&amp;gt;http://example.org/&amp;lt;/id&amp;gt;
+  &amp;lt;title&amp;gt;Fourty-Two&amp;lt;/title&amp;gt;
+  &amp;lt;updated&amp;gt;2003-12-13T18:30:02Z&amp;lt;/updated&amp;gt;
+  &amp;lt;rights&amp;gt;© 2005 Example, Inc.&amp;lt;/rights&amp;gt;
+&amp;lt;/source&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;That&amp;rsquo;s perfect: It allows me to keep the title, link, rights, and icon of the originating blog associated with each entry.&lt;/p&gt;
+
+&lt;p&gt;Except, maybe it&amp;rsquo;s the &lt;a href="http://www.pgexperts.com/"&gt;database expert&lt;/a&gt; in me, but I'd like to be able to have it be more normalized. My feed might have 1000 entries in it from 100 sources. Why would I want to dupe that information for every single entry from a given source? Is there now better way to do this, say to have the source data once, and to reference the source ID only for each entry? That would make for a much smaller feed, I expect, and a lot less duplication.&lt;/p&gt;
+
+&lt;p&gt;Is there any way to do this in an Atom feed?&lt;/p&gt;
+&lt;img src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/Tbuv78hj2YI" height="1" width="1"/&gt;</content>
+<feedburner:origLink>http://www.justatheory.com/computers/internet/weblogs/atom-sources.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/programming/perl/handling-multiple-exceptions</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/Bw6XErq6xXQ/handling-multiple-exceptions.html" />
+<title type="text/plain">Handling Multiple Exceptions</title>
+<dc:subject>Perl</dc:subject>
+<dc:subject>exception</dc:subject>
+<dc:subject>exception+handling</dc:subject>
+<dc:subject>eval</dc:subject>
+<issued>2010-06-03T05:19:00Z</issued>
+<modified>2010-06-03T05:19:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="text/html" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="escaped">
+&lt;p&gt;I ran into an issue with &lt;a href="http://search.cpan.org/perldoc?DBIx::Connector"&gt;DBIx::Connector&lt;/a&gt; tonight: &lt;a href="http://www.sqlite.org"&gt;SQLite&lt;/a&gt; started throwing an exception from within a call to &lt;code&gt;rollback()&lt;/code&gt;: &amp;ldquo;DBD::SQLite::db rollback failed: cannot rollback transaction &amp;ndash; SQL statements in progress&amp;rdquo;. This is rather annoying, as it ate the underlying exception that led to the rollback.&lt;/p&gt;
+
+&lt;p&gt;So I've added a test to DBIx::Connector that looks like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;my $dmock = Test::MockModule-&amp;gt;new($conn-&amp;gt;driver);
+$dmock-&amp;gt;mock(rollback =&amp;gt; sub { die 'Rollback WTF' });
+
+eval { $conn-&amp;gt;txn(sub {
+    my $sth = shift-&amp;gt;prepare("select * from t");
+    die 'Transaction WTF';
+}) };
+
+ok my $err = $@, 'We should have died';
+like $err, qr/Transaction WTF/, 'Should have the transaction error';
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It fails as expected: the error is &amp;ldquo;Rollback WTF&amp;rdquo;. So far so good. Now the question is, how should I go about fixing it? Ideally I'd be able to access &lt;em&gt;both&lt;/em&gt; exceptions in whatever exception handling I do. How to go about that?&lt;/p&gt;
+
+&lt;p&gt;I see three options. The first is that taken by &lt;a href="http://www.bricolagecms.org/"&gt;Bricolage&lt;/a&gt; and &lt;a href="http://search.cpan.org/perldoc?DBIx::Class"&gt;DBIx::Class&lt;/a&gt;: create a new exception that combines both the transaction exception and the rollback exception into one. DBIx::Class does it like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$self-&amp;gt;throw_exception(
+  "Transaction aborted: ${exception}. "
+  . "Rollback failed: ${rollback_exception}"
+);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;rsquo;s okay as far as it goes. But what if &lt;code&gt;$exception&lt;/code&gt; is an &lt;a href="http://search.cpan.org/perldoc?Exception::Class::DBI"&gt;Exception::Class::DBI&lt;/a&gt; object, or some other exception object? It would get stringified and the exception handler would lose the advantages of the object. But maybe that doesn&amp;rsquo;t matter so much, since the rollback exception is kind of important to address first?&lt;/p&gt;
+
+&lt;p&gt;The second option is to throw a new exception object with the original exceptions as attributes. Something like (pseudo-code):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;DBIx::Connector::RollbackException-&amp;gt;new(
+    txn_exception      =&amp;gt; $exception,
+    rollback_exception =&amp;gt; $rollback_exception,
+);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This has the advantage of keeping the original exception as an object, although the exception handler would have to expect this exception and go digging for it. So far in DBIx::Connector, I've left DBI exception construction up to the DBI and to the consumer, so I'm hesitant to add a one-off special-case exception object like this.&lt;/p&gt;
+
+&lt;p&gt;The third option is to use a special variable, &lt;code&gt;@@&lt;/code&gt;, and put both exceptions into it. Something like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@@ = ($exception, $rollback_exception);
+die $rollback_exception;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This approach doesn&amp;rsquo;t require a dependency like the previous approach, but the user would still have to know to dig into &lt;code&gt;@@&lt;/code&gt; if they caught the rollback exception. But then I might as well have thrown a custom exception object that&amp;rsquo;s easier to interrogate than an exception string. Oh, and is it appropriate to use &lt;code&gt;@@&lt;/code&gt;? I seem to recall seeing some discussion of this variable on the perl5-porters mail list, but it&amp;rsquo;s not documented or supported. Or something. Right?&lt;/p&gt;
+
+&lt;p&gt;What would you do?&lt;/p&gt;
+&lt;img src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/Bw6XErq6xXQ" height="1" width="1"/&gt;</content>
+<feedburner:origLink>http://www.justatheory.com/computers/programming/perl/handling-multiple-exceptions.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/family/anna/anna-turns-five</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/MkxqFKfUhDw/anna-turns-five.html" />
+<title type="text/plain">Anna Turns Five</title>
+<dc:subject>Anna</dc:subject>
+<dc:subject>Birthday</dc:subject>
+<dc:subject>Wizard+of+Oz</dc:subject>
+<issued>2010-06-02T04:11:00Z</issued>
+<modified>2010-06-02T04:11:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="application/xhtml+xml" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="xml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a href="http://www.flickr.com/photos/theory/sets/72157624186238202/"><img src="http://farm2.static.flickr.com/1282/4661840263_019e867a6e.jpg" alt="Blowing out the candles" /></a></p>
+
+<p>Eight little girls gathered in May, 2010, to celebrate the fifth anniversary of Anna’s birth with a “Wizard of Oz”-themed birthday party.</p>
+
+<p>Happy birthday, sweetie!</p><xhtml:img xmlns:xhtml="http://www.w3.org/1999/xhtml" src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/MkxqFKfUhDw" height="1" width="1" /></div></content>
+<feedburner:origLink>http://www.justatheory.com/family/anna/anna-turns-five.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/programming/perl/fuck-typing-lwp</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/eheqY2gz_h4/fuck-typing-lwp.html" />
+<title type="text/plain">Fuck Typing LWP</title>
+<dc:subject>LWP</dc:subject>
+<dc:subject>Perl</dc:subject>
+<dc:subject>fuck+typing</dc:subject>
+<dc:subject>composition</dc:subject>
+<dc:subject>programming</dc:subject>
+<dc:subject>roles</dc:subject>
+<issued>2010-05-27T16:37:00Z</issued>
+<modified>2010-05-27T16:37:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="text/html" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="escaped">
+&lt;p&gt;I'm working on a project that fetches various files from the Internet via LWP. I wanted to make sure that I was a polite user, such that my app would pay attention to &lt;code&gt;Last-Modified/If-Modified-Since&lt;/code&gt; and &lt;code&gt;ETag/If-None-Match&lt;/code&gt; headers. And in most contexts I also want to respect the &lt;code&gt;robots.txt&lt;/code&gt; file on the hosts to which I'm sending requests. So I was very interested to read &lt;a href="http://www.modernperlbooks.com/mt/2010/05/are-objects-black-blocks-or-toolkits.html"&gt;chromatic&amp;rsquo;s hack&lt;/a&gt; for this very issue. I happily implemented two classes for my app, MyApp::UA, which inherits from &lt;a href="http://search.cpan.org/perldoc?LWP::UserAgent::WithCache"&gt;LWP::UserAgent::WithCache&lt;/a&gt;, and MyApp::UA::Robot, which inherits from MyApp::UA but changes LWP::UserAgent::WithCache to inherit from &lt;a href="http://search.cpan.org/perldoc?LWP::RobotUA"&gt;LWP::UARobot&lt;/a&gt;:&lt;/p&gt;
+
+&lt;pre&gt;
+@LWP::UserAgent::WithCache::ISA = (&amp;#x0027;LWP::RobotUA&amp;#x0027;);
+&lt;/pre&gt;
+
+&lt;p&gt;So far so good, right? Well, no. What I didn&amp;rsquo;t think about, stupidly, is that by changing LWP::UserAgent::WithCache&amp;rsquo;s base class, I was doing so globally. So now both MyApp::UA and MyApp::UA::Robot were getting the LWP::RobotUA behavior. Urk.&lt;/p&gt;
+
+&lt;p&gt;So my work around is to use a little &lt;a href="/computers/programming/methodology/fuck-typing.html"&gt;fuck typing&lt;/a&gt; to ensure that MyApp::UA::Robot has the robot behavior but MyApp::UA does not. Here&amp;rsquo;s what it looks like (&lt;strong&gt;BEWARE:&lt;/strong&gt; black magic ahead!):&lt;/p&gt;
+
+&lt;pre&gt;
+package MYApp::UA::Robot;
+
+use 5.12.0;
+use utf8;
+use parent 'MyApp::UA';
+use LWP::RobotUA;
+
+do {
+    # Import the RobotUA interface. This way we get its behavior without
+    # having to change LWP::UserAgent::WithCache&amp;#x0027;s inheritance.
+    no strict &amp;#x0027;refs&amp;#x0027;;
+    while ( my ($k, $v) = each %{&amp;#x0027;LWP::RobotUA::&amp;#x0027;} ) {
+        *{$k} = *{$v}{CODE} if *{$v}{CODE} &amp;amp;&amp;amp; $k ne &amp;#x0027;new&amp;#x0027;;
+    }
+};
+
+sub new {
+    my ($class, $app) = (shift, shift);
+    # Force RobotUA configuration.
+    local @LWP::UserAgent::WithCache::ISA = (&amp;#x0027;LWP::RobotUA&amp;#x0027;);
+    return $class-&amp;gt;SUPER::new(
+        $app,
+        delay =&amp;gt; 1, # be very nice -- max one hit per minute.
+    );
+}
+&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;do&lt;/code&gt; block is where I do the fuck typing. It iterates over all the symbols in LWP::RobotUA, inserts a reference to all subroutines into the current package. Except for &lt;code&gt;new&lt;/code&gt;, which I implement myself. This is so that I can keep my inheritance from MyApp::UA intact. But in order for it to properly configure the LWP::RobotUA interface, &lt;code&gt;new&lt;/code&gt; must temporarily fool Perl into thinking that LWP::UserAgent::WithCache inherits from LWP::RobotUA.&lt;/p&gt;
+
+&lt;p&gt;Pure evil, right? Wait, it gets worse. I've also overridden LWP::RoboUA&amp;rsquo;s &lt;code&gt;host_wait&lt;/code&gt; method, because if it&amp;rsquo;s the second request to a given host, I don&amp;rsquo;t want it to sleep (the first request is for the &lt;code&gt;robots.txt&lt;/code&gt;, and I see no reason to sleep after that). So I had to modify the &lt;code&gt;do&lt;/code&gt; block to skip both &lt;code&gt;new&lt;/code&gt; and &lt;code&gt;host_wait&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;
+    while ( my ($k, $v) = each %{&amp;#x0027;LWP::RobotUA::&amp;#x0027;} ) {
+        *{$k} = *{$v}{CODE} if *{$v}{CODE} &amp;amp;&amp;amp; $k !~ /^(?:new|host_wait)$/;
+    }
+&lt;/pre&gt;
+
+&lt;p&gt;If I &amp;ldquo;override&amp;rdquo; any other LWP::RobotUA methods, I'll need to remember to add them to that regex. Of course, since I'm not actually inheriting from LWP::RobotUA, in order to dispatch to its &lt;code&gt;host_wait&lt;/code&gt; method, I can&amp;rsquo;t use &lt;code&gt;SUPER&lt;/code&gt;, but must dispatch directly:&lt;/p&gt;
+
+&lt;pre&gt;
+sub host_wait {
+    my ($self, $netloc) = @_;
+    # First visit is for robots.txt, so let it be free.
+    return if !$netloc || $self-&amp;gt;no_visits($netloc) &amp;lt; 2;
+    $self-&amp;gt;LWP::RobotUA::host_wait($netloc);
+}
+&lt;/pre&gt;
+
+&lt;p&gt;Ugly, right? Yes, I am an evil bastard. &amp;ldquo;Fuck typing&amp;rdquo; is right, yo! At least it&amp;rsquo;s all encapsulated.&lt;/p&gt;
+
+&lt;p&gt;This just reinforces &lt;a href="http://www.modernperlbooks.com/mt/2010/05/are-objects-black-blocks-or-toolkits.html"&gt;chromatic&amp;rsquo;s message&lt;/a&gt; in my mind. I'd sure love to see LWP reworked to use &lt;a href="http://search.cpan.org/~rgarcia/perl-5.10.0/lib/UNIVERSAL.pm#$obj-%3EDOES(_ROLE_"&gt;roles&lt;/a&gt;!&lt;/p&gt;
+&lt;img src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/eheqY2gz_h4" height="1" width="1"/&gt;</content>
+<feedburner:origLink>http://www.justatheory.com/computers/programming/perl/fuck-typing-lwp.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/databases/postgresql/pgan-bikeshedding</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/6QNh9iLPQPI/pgan-bikeshedding.html" />
+<title type="text/plain">PGAN Bikeshedding</title>
+<dc:subject>PostgreSQL</dc:subject>
+<dc:subject>PGAN</dc:subject>
+<dc:subject>CPAN</dc:subject>
+<dc:subject>extension</dc:subject>
+<dc:subject>distribution</dc:subject>
+<issued>2010-05-24T19:15:00Z</issued>
+<modified>2010-05-24T19:15:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="application/xhtml+xml" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="xml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I’ve put together a <a href="http://wiki.postgresql.org/wiki/PGAN">description of PGAN</a>, the PostgreSQL extension distribution system I plan to develop later this year based on the Comprehensive Archive Perl Network or <a href="http://search.cpan.org/">CPAN</a>. Its primary features will be:</p>
+
+<ul>
+<li>Extension distribution</li>
+<li>Search site with extension documentation</li>
+<li>Client for downloading, building, testing, and installing extensions.</li>
+</ul>
+
+<p>I’ve never been thrilled with the name, though, so I’m asking for suggestions for a better one. I’ve used the term "extension" here because it seems to be the term that the PostgreSQL community has <a href="http://wiki.postgresql.org/wiki/ExtensionPackaging">settled on</a>, but other terms might work, since things other than extensions might be distributed.</p>
+
+<p>What I’ve come up with so far is:</p>
+
+<table>
+  <thead><tr>
+    <th>Name</th>
+    <th>Long Name</th>
+    <th>Pronounciation</th>
+    <th>Advantages</th>
+    <th>Disadvantages</th>
+  </tr></thead>
+  <tr class="odd">
+    <td>PGAN</td>
+    <td>PostgreSQL Add-on Network</td>
+    <td>pee-gan</td>
+    <td>Short, similar to CPAN</td>
+    <td>Ugly</td>
+  </tr>
+  <tr>
+    <td>PGEX</td>
+    <td>PostgreSQL Extensions</td>
+    <td>pee-gee-ex or pee-gex</td>
+    <td>Short, easier to pronounce</td>
+    <td>Too similar to <a href="http://pgexperts.com/">PGX</a>)</td>
+  </tr>
+  <tr class="odd">
+    <td>PGCAN</td>
+    <td>PostgreSQL Comprehensive Archive Network</td>
+    <td>pee-gee-can</td>
+    <td>Similar to CPAN</td>
+    <td>Similar to CPAN</td>
+  </tr>
+  <tr>
+    <td>PGDAN</td>
+    <td>PostgreSQL Distribution Archive Network</td>
+    <td>pee-gee-dan</td>
+    <td>Short, easy to pronounce</td>
+    <td>Who’s “Dan”? Doesn’t distribute PostgreSQL itself.</td>
+  </tr>
+  <tr class="odd">
+    <td>PGEDAN</td>
+    <td>PostgreSQL Extension Distribution Archive Network</td>
+    <td>pee-gee-ee-dan</td>
+    <td>References extensions</td>
+    <td>Long, sounds stupid</td>
+  </tr>
+</table>
+
+<p>Of these, I think I like “PGEX” best, but none are really great. So I’m opening up the <a href="http://en.wikipedia.org/wiki/Parkinson's_Law_of_Triviality">bike shed</a> to all. What’s a better name? Or if you can’t think of one, which of the above do you like best? Just leave a comment on this post. The only requirements for suggestions are that a .org domain be available and that it suck less than the alternatives.</p>
+
+<p>Comments close in 2 weeks. Thanks!</p><xhtml:img xmlns:xhtml="http://www.w3.org/1999/xhtml" src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/6QNh9iLPQPI" height="1" width="1" /></div></content>
+<feedburner:origLink>http://www.justatheory.com/computers/databases/postgresql/pgan-bikeshedding.html</feedburner:origLink></entry>
+
+<entry>
+<id>tag:justatheory.com,2010:/computers/programming/perl/defend-against-mistakes</id>
+<link rel="alternate" type="text/html" href="http://feedproxy.google.com/~r/justatheory/atomfull/~3/7AHGoYkhBGs/defend-against-mistakes.html" />
+<title type="text/plain">Defend Against Programmer Mistakes?</title>
+<dc:subject>Perl</dc:subject>
+<dc:subject>DBIx::Connector</dc:subject>
+<dc:subject>return</dc:subject>
+<dc:subject>programmer+mistakes</dc:subject>
+<issued>2010-05-19T17:45:00Z</issued>
+<modified>2010-05-19T17:45:00Z</modified>
+<author>
+  <name>David E. Wheeler</name>
+</author>
+<content type="application/xhtml+xml" xml:base="http://www.justatheory.com" xml:lang="en-us" xml:space="preserve" mode="xml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I get email:</p>
+
+<blockquote>
+  <p>Hey David,</p>
+  
+  <p>I ran in to an issue earlier today in production that, while it is an error in my code, <a href="http://search.cpan.org/perldoc?DBIx::Connector">DBIx::Connector</a> could easily handle the issue better.  Here's the use case:</p>
+
+<pre>
+package Con;
+use Moose;
+sub txn {
+    my ($self, $code) = @_;
+    my @ret;
+    warn "BEGIN EVAL\n";
+    eval{ @ret = $code-&gt;() };
+    warn "END EVAL\n";
+    die "DIE: $@" if $@;
+    return @ret;
+}
+package main;
+my $c = Con-&gt;new();
+foreach (1..2) {
+    $c-&gt;txn(sub{ next; });
+}
+</pre>
+  
+  <p>The result of this is:</p>
+
+<pre>
+BEGIN EVAL
+Exiting subroutine via next at test.pl line 16.
+Exiting eval via next at test.pl line 16.
+Exiting subroutine via next at test.pl line 16.
+BEGIN EVAL
+Exiting subroutine via next at test.pl line 16.
+Exiting eval via next at test.pl line 16.
+Exiting subroutine via next at test.pl line 16.
+</pre>
+  
+  <p>This means that any code after the eval block is not executed.  And, in the case of DBIx::Connector, means the transaction is not commited or rolled back, and the next call to is <code>txn()</code> mysteriously combined with the previous <code>txn()</code> call.  A quick fix for this is to just add a curly brace in to the eval:</p>
+
+<pre>
+eval{ { @ret = $code-&gt;() } };
+</pre>
+  
+  <p>Then the results are more what we'd expect:</p>
+
+<pre>
+BEGIN EVAL
+Exiting subroutine via next at test.pl line 16.
+END EVAL
+BEGIN EVAL
+Exiting subroutine via next at test.pl line 16.
+END EVAL
+</pre>
+  
+  <p>I've fixed my code to use <code>return;</code> instead of <code>next;</code>, but I think this would be a useful fix for DBIx::Connector so that it doesn't act in such an unexpected fashion when the developer accidentally calls next.</p>
+</blockquote>
+
+<p>The fix here is pretty simple, but I'm not sure I want to get into the business of defending against programmer mistakes like this in <a href="http://search.cpan.org/perldoc?DBIx::Connector">DBIx::Connector</a> or any module.</p>
+
+<p>What do you think?</p><xhtml:img xmlns:xhtml="http://www.w3.org/1999/xhtml" src="http://feeds.feedburner.com/~r/justatheory/atomfull/~4/7AHGoYkhBGs" height="1" width="1" /></div></content>
+<feedburner:origLink>http://www.justatheory.com/computers/programming/perl/defend-against-mistakes.html</feedburner:origLink></entry>
+
+
+</feed>

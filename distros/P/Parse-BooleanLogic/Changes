@@ -1,3 +1,7 @@
+0.10 2020-04-15
+
+    * Add dot to require in test files for modern perls
+
 0.09 2009-03-19
 
     * don't assume that operand is a HASH, it can be any reference

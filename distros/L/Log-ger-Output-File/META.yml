@@ -7,7 +7,7 @@ build_requires:
   File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Log::ger: '0.034'
+  Log::ger: '0.037'
   Log::ger::Output: '0.005'
   Test::Exception: '0'
   Test::More: '0.98'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Output-File
   homepage: https://metacpan.org/release/Log-ger-Output-File
   repository: git://github.com/perlancar/perl-Log-ger-Output-File.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

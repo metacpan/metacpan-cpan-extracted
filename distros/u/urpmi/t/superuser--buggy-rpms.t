@@ -21,5 +21,5 @@ foreach (@pkgs) {
     is($?, 2 << 8, "urpmi $_");
 
     my $verif = URPM::verify_signature($_);
-    ok($verif =~ /NOT OK/);
+    ok($verif =~ /NOT OK/, 'signature is OK');
 }

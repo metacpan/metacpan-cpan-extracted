@@ -15,6 +15,9 @@ my $class = 'Bio::MUST::Core::Ali';
 
 {
     my $infile = file('test', 'AhHMA4.ali');
+    my $seq_n = $class->instant_count($infile);
+    is $seq_n, 250, 'counted expected number of seqs';
+
     my $ali = $class->load($infile);
     isa_ok $ali, $class, $infile;
     is $ali->filename, $infile, 'got expected filename for Ali file';

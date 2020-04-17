@@ -1,4 +1,3 @@
-
 package MathStuff;
 
 use strict;

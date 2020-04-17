@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Data/Sah/Coerce/perl/To_float/From_str/suffix_filesize.pm','lib/Data/Size/Suffix/Filesize.pm','lib/Sah/Schema/filesize.pm','lib/Sah/SchemaR/filesize.pm','lib/Sah/Schemas/DataSizeSpeed.pm'];
+my $filenames = ['lib/Data/Sah/Coerce/perl/To_float/From_str/suffix_datasize.pm','lib/Data/Sah/Coerce/perl/To_float/From_str/suffix_dataspeed.pm','lib/Data/Size/Suffix/Datasize.pm','lib/Data/Size/Suffix/Dataspeed.pm','lib/Sah/Schema/bandwidth.pm','lib/Sah/Schema/dataquota.pm','lib/Sah/Schema/datasize.pm','lib/Sah/Schema/dataspeed.pm','lib/Sah/Schema/filesize.pm','lib/Sah/SchemaR/bandwidth.pm','lib/Sah/SchemaR/dataquota.pm','lib/Sah/SchemaR/datasize.pm','lib/Sah/SchemaR/dataspeed.pm','lib/Sah/SchemaR/filesize.pm','lib/Sah/Schemas/DataSizeSpeed.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

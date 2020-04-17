@@ -1,3 +1,15 @@
+1.26 2020-04-15
+
+  [THINGS THAT MIGHT BREAK YOUR CODE]
+  - The Sub::Exporter dependency has been dropped, meaning that its advanced
+    importing features are not available anymore. '-as' style function renaming
+    still works, so this /should/ not affect your code if you stuck with the
+    documented functionality.
+
+  [BUG FIXES]
+  - Properly handle 'IS (NOT) DISTINCT FROM' comparison operator.
+  - Properly handle quoted identifiers in 'INSERT INTO x' and 'x IN' contexts.
+
 1.25 2019-10-22
 
   [FEATURES]

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-02-08'; # DATE
-our $VERSION = '0.16'; # VERSION
+our $DATE = '2020-04-16'; # DATE
+our $VERSION = '0.17'; # VERSION
 
 BEGIN { $ENV{TRACE} = 1 }
 
@@ -14,7 +14,18 @@ use File::Which qw(which);
 use Getopt::Long;
 use Log::ger::Level::FromEnv;
 use Log::ger::Output qw(Screen);
-use String::ShellQuote;
+
+sub _shell_quote_arg {
+    require String::ShellQuote;
+    # pass some strings unquoted: foo=bar is quoted into 'foo=bar' by
+    # String::ShellQuote; skip quoting it
+    #say "D:<$_[0]>";
+    if ($_[0] =~ /\A[A-Za-z0-9_=^-]+\z/) {
+        return $_[0];
+    } else {
+        return String::ShellQuote::shell_quote($_[0]);
+    }
+}
 
 my %Opts = (
     shell => undef,
@@ -58,7 +69,7 @@ if (@ARGV == 1 && $ARGV[0] =~ /\s/) {
 } else {
     # user types: scriptname 'arg1' 'arg two'. we should re-quote to avoid the
     # space inside arg value to split args.
-    $comp_line .= join(" ", map {shell_quote($_)} @ARGV);
+    $comp_line .= join(" ", map {_shell_quote_arg($_)} @ARGV);
 }
 
 my $comp_point;
@@ -100,7 +111,7 @@ testcomp - Test your tab completion
 
 =head1 VERSION
 
-This document describes version 0.16 of testcomp (from Perl distribution App-CompleteUtils), released on 2018-02-08.
+This document describes version 0.17 of testcomp (from Perl distribution App-CompleteUtils), released on 2020-04-16.
 
 =head1 SYNOPSIS
 
@@ -186,7 +197,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

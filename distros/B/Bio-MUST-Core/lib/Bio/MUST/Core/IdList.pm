@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdList;
 # ABSTRACT: Id list for selecting specific sequences
-$Bio::MUST::Core::IdList::VERSION = '0.200510';
+$Bio::MUST::Core::IdList::VERSION = '0.201060';
 use Moose;
 use namespace::autoclean;
 
@@ -186,6 +186,10 @@ sub _ali_from_list_ {
 sub load {
     my $class  = shift;
     my $infile = shift;
+    my $args   = shift // {};           # HashRef (should not be empty...)
+
+    my $col = $args->{column}    // 0;
+    my $sep = $args->{separator} // qr{\t}xms;
 
     open my $in, '<', $infile;
 
@@ -201,7 +205,8 @@ sub load {
         next LINE if $line =~ $EMPTY_LINE
                   || $list->is_comment($line);
 
-        push @ids, $line;
+        my @fields = split $sep, $line;
+        push @ids, $fields[$col];
     }
 
     $list->_set_ids( \@ids );
@@ -289,7 +294,7 @@ Bio::MUST::Core::IdList - Id list for selecting specific sequences
 
 =head1 VERSION
 
-version 0.200510
+version 0.201060
 
 =head1 SYNOPSIS
 

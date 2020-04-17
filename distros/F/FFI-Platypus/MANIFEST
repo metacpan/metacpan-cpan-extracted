@@ -101,6 +101,7 @@ ffi/memory.c
 ffi/record_meta.c
 inc/Alien/Base/Wrapper.pm
 inc/Alien/FFI/PkgConfigPP.pm
+inc/Alien/FFI/Vcpkg.pm
 inc/Alien/FFI/pkgconfig.pm
 inc/Alien/psapi.pm
 inc/My/BuildConfig.pm

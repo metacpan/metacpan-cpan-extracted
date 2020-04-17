@@ -1,3 +1,14 @@
+0.061   2020-03-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Render example on how to use the Sah::Schema module with
+	  Data::Sah and in Rinci metadata.
+
+
+0.060   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Render schema examples in Synopsis.
+
+
 0.05    2019-12-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Use String::PodQuote to quote summary when added into POD.

@@ -1,7 +1,7 @@
 package App::ListDebianReleases;
 
-our $DATE = '2015-09-22'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2020-02-21'; # DATE
+our $VERSION = '0.070'; # VERSION
 
 1;
 # ABSTRACT: List Debian releases (CLI)
@@ -18,7 +18,7 @@ App::ListDebianReleases - List Debian releases (CLI)
 
 =head1 VERSION
 
-This document describes version 0.06 of App::ListDebianReleases (from Perl distribution App-ListDebianReleases), released on 2015-09-22.
+This document describes version 0.070 of App::ListDebianReleases (from Perl distribution App-ListDebianReleases), released on 2020-02-21.
 
 =head1 DESCRIPTION
 
@@ -46,7 +46,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

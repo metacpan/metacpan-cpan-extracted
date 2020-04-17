@@ -40,7 +40,7 @@ list2mapper.pl - Build final id mapper from id list using the NCBI Taxonomy data
 
 =head1 VERSION
 
-version 0.200510
+version 0.201060
 
 =head1 USAGE
 

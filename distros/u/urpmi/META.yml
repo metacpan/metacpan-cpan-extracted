@@ -6,6 +6,7 @@ build_requires:
   Expect: '0'
   ExtUtils::MakeMaker: '0'
   File::Slurp: '0'
+  HTTP::Server::Simple: '0.5'
   Net::Server: '0'
   Test::More: '1.302'
   Test::Pod: '0'
@@ -30,7 +31,7 @@ provides:
     version: '0'
   urpmi:
     file: urpmi.pm
-    version: v8.120.12
+    version: v8.120.0
 requires:
   Filesys::Df: '0'
   Getopt::Long: '0'
@@ -38,11 +39,11 @@ requires:
   MDV::Distribconf: '4.100'
   Net::LDAP: '0'
   Time::ZoneInfo: '0'
-  URPM: v5.16.0
+  URPM: v5.25.0
   XML::LibXML: '0'
   XML::LibXML::Reader: '0'
   perl: '5.010000'
 resources:
   repository: git://git.mageia.org/software/rpm/urpmi/
-version: v8.120.12
+version: v8.121.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -14,7 +14,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2019-06-26 09:37+0300\n"
+"POT-Creation-Date: 2020-01-18 09:59+0200\n"
 "PO-Revision-Date: 2019-07-03 05:10+0000\n"
 "Last-Translator: Dimitrios Glentadakis <dglent@free.fr>\n"
 "Language-Team: Greek (http://www.transifex.com/MageiaLinux/mageia/language/"
@@ -71,8 +71,8 @@ msgid "Cancel"
 msgstr "Ακύρωση"
 
 #: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
-#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1670
-#: ../urpm/media.pm:1821
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
+#: ../urpm/media.pm:1833
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "... η ανάκτηση απέτυχε: %s"
@@ -1076,19 +1076,19 @@ msgstr ""
 "--synthesis δεν μπορεί να χρησιμοποιηθεί με --media, --excludemedia, --"
 "sortmedia, --update, --use-distrib ή --parallel"
 
-#: ../urpm/media.pm:792
+#: ../urpm/media.pm:793
 #, c-format
 msgid "ignoring non-free medium `%s'"
 msgstr "παράβλεψη του non-free μέσου «%s»"
 
-#: ../urpm/media.pm:802
+#: ../urpm/media.pm:803
 #, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
 msgstr ""
 "συμπερίληψη του μέσου «non-free» `%s' υπάρχουν εγκατεστημένα «b/c non-free» "
 "πακέτα"
 
-#: ../urpm/media.pm:806
+#: ../urpm/media.pm:807
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
@@ -1096,8 +1096,10 @@ msgstr ""
 "πακέτα"
 
 #: ../urpm/media.pm:816
-#, c-format
-msgid "un-ignoring 32bit medium `%s' b/c system is 32-bit EFI"
+#, fuzzy, c-format
+msgid ""
+"un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
+"32-bit EFI"
 msgstr ""
 "αναίρεση αγνόησης του μέσου 32δυφίων '%s' το b/c σύστημα είναι EFI 32δυφίων"
 
@@ -1161,162 +1163,162 @@ msgstr "αδυναμία ανάλυσης του media.cfg"
 msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr "αδυναμία πρόσβασης στο μέσο διανομής (δεν βρέθηκε αρχείο media.cfg)"
 
-#: ../urpm/media.pm:1172
+#: ../urpm/media.pm:1184
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr "παράληψη του μη συμβατού μέσου `%s' (για %s)"
 
-#: ../urpm/media.pm:1230
+#: ../urpm/media.pm:1242
 #, c-format
 msgid "retrieving media.cfg file..."
 msgstr "ανάκτηση του αρχείου media.cfg..."
 
-#: ../urpm/media.pm:1273
+#: ../urpm/media.pm:1285
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "προσπάθεια επιλογής του ανύπαρκτου μέσου «%s»"
 
-#: ../urpm/media.pm:1276
+#: ../urpm/media.pm:1288
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "επιλογή πολλαπλών μέσων: %s"
 
-#: ../urpm/media.pm:1335
+#: ../urpm/media.pm:1347
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "αφαίρεση του μέσου «%s»"
 
-#: ../urpm/media.pm:1426
+#: ../urpm/media.pm:1438
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "επαναρύθμιση της urpmi για το μέσο «%s»"
 
-#: ../urpm/media.pm:1460
+#: ../urpm/media.pm:1472
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...η επαναρρύθμιση απέτυχε"
 
-#: ../urpm/media.pm:1466
+#: ../urpm/media.pm:1478
 #, c-format
 msgid "reconfiguration done"
 msgstr "η επαναρρύθμιση πέτυχε"
 
-#: ../urpm/media.pm:1482
+#: ../urpm/media.pm:1494
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr "Σφάλμα στη δημιουργία του αρχείου ονομάτων: η εξάρτηση %d δεν βρέθηκε"
 
-#: ../urpm/media.pm:1503
+#: ../urpm/media.pm:1515
 #, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr "το μέσο «%s» είναι ενημερωμένο"
 
-#: ../urpm/media.pm:1514
+#: ../urpm/media.pm:1526
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "εξέταση του αρχείου σύνθεσης [%s]"
 
-#: ../urpm/media.pm:1534
+#: ../urpm/media.pm:1546
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "πρόβλημα ανάγνωσης του αρχείου σύνθεσης από το μέσο «%s»"
 
-#: ../urpm/media.pm:1547 ../urpm/media.pm:1642
+#: ../urpm/media.pm:1559 ../urpm/media.pm:1654
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr "αντιγραφή [%s] για το μέσο «%s»..."
 
-#: ../urpm/media.pm:1549 ../urpm/media.pm:1619 ../urpm/media.pm:1872
+#: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
 msgid "...copying failed"
 msgstr "...η αντιγραφή απέτυχε"
 
-#: ../urpm/media.pm:1615
+#: ../urpm/media.pm:1627
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "αντιγραφή του αρχείου περιγραφής του «%s»..."
 
-#: ../urpm/media.pm:1617 ../urpm/media.pm:1646
+#: ../urpm/media.pm:1629 ../urpm/media.pm:1658
 #, c-format
 msgid "...copying done"
 msgstr "...η αντιγραφή ολοκληρώθηκε"
 
-#: ../urpm/media.pm:1648
+#: ../urpm/media.pm:1660
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "η αντιγραφή του [%s] απέτυχε (το αρχείο είναι ύποπτα μικρό)"
 
-#: ../urpm/media.pm:1696
+#: ../urpm/media.pm:1708
 #, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr "υπολογισμός του md5sum του ανακτημένου πηγαίου synthesis"
 
-#: ../urpm/media.pm:1698 ../urpm/media.pm:2181
+#: ../urpm/media.pm:1710 ../urpm/media.pm:2193
 #, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
 msgstr "η ανάκτηση του [%s] απέτυχε (τα md5sum δεν ταιριάζουν)"
 
-#: ../urpm/media.pm:1713
+#: ../urpm/media.pm:1725
 #, c-format
 msgid "genhdlist2 failed on %s"
 msgstr "αποτυχία του genhdlist2 στο %s"
 
-#: ../urpm/media.pm:1723
+#: ../urpm/media.pm:1735
 #, c-format
 msgid "comparing %s and %s"
 msgstr "σύγκριση του %s και του %s"
 
-#: ../urpm/media.pm:1753
+#: ../urpm/media.pm:1765
 #, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr "άκυρο αρχείο hdlist %s για το μέσο «%s»"
 
-#: ../urpm/media.pm:1779
+#: ../urpm/media.pm:1791
 #, c-format
 msgid "copying MD5SUM file of \"%s\"..."
 msgstr "αντιγραφή του αρχείου MD5SUM από το \"%s\"..."
 
-#: ../urpm/media.pm:1819
+#: ../urpm/media.pm:1831
 #, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
 msgstr "μη έγκυρο αρχείο MD5SUM (έγινε λήψη από το %s)"
 
-#: ../urpm/media.pm:1822
+#: ../urpm/media.pm:1834
 #, c-format
 msgid "no metadata found for medium \"%s\""
 msgstr "δεν βρέθηκαν μεταδεδομένα για το μέσο \"%s\""
 
-#: ../urpm/media.pm:1854
+#: ../urpm/media.pm:1866
 #, c-format
 msgid "retrieving source synthesis of \"%s\"..."
 msgstr "ανάκτηση της πηγαίας synthesis από το \"%s\"..."
 
-#: ../urpm/media.pm:1920
+#: ../urpm/media.pm:1932
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "Εξέταση του αρχείου δημοσίου κλειδιού από το \"%s\"..."
 
-#: ../urpm/media.pm:1932
+#: ../urpm/media.pm:1944
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...εισαγωγή του κλειδιού %s από το αρχείο δημοσίου κλειδιού του \"%s\""
 
-#: ../urpm/media.pm:1936
+#: ../urpm/media.pm:1948
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "αδυναμία εισαγωγής του αρχείου δημοσίου κλειδιού του \"%s\""
 
-#: ../urpm/media.pm:1977
+#: ../urpm/media.pm:1989
 #, c-format
 msgid "no synthesis file found for medium \"%s\""
 msgstr "δεν βρέθηκε αρχείο synthesis για το μέσο \"%s\""
 
-#: ../urpm/media.pm:2010
+#: ../urpm/media.pm:2022
 #, c-format
 msgid "updated medium \"%s\""
 msgstr "ενημερώθηκε το μέσο \"%s\""
 
-#: ../urpm/media.pm:2175
+#: ../urpm/media.pm:2187
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr "αποτυχία ανάκτησης του [%s]"

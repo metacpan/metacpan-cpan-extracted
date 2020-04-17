@@ -32,16 +32,17 @@ sub BUILD {
     my ($self) = @_;
     $self->bagit->load_plugins(("Archive::BagIt::Plugin::Algorithm::MD5"));
     $self->algorithm($self->bagit->plugins->{"Archive::BagIt::Plugin::Algorithm::MD5"});
+    return 1;
 }
 
 sub verify_file {
     my ($self, $fh) = @_;
+    return;
 }
 
 sub verify {
     my ($self) =@_;
-
-
+    return;
 }
 
 
@@ -59,7 +60,7 @@ Archive::BagIt::Plugin::Manifest::MD5 - The md5 plugin (default)
 
 =head1 VERSION
 
-version 0.053.3
+version 0.055
 
 =head1 AVAILABILITY
 
@@ -69,13 +70,13 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/rjeschmi/Archive-BagIt>
-and may be cloned from L<git://github.com/rjeschmi/Archive-BagIt.git>
+The development version is on github at L<https://github.com/Archive-BagIt>
+and may be cloned from L<git://github.com/Archive-BagIt.git>
 
 =head1 BUGS AND LIMITATIONS
 
 You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/rjeschmi/Archive-BagIt/issues>.
+web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
@@ -83,7 +84,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

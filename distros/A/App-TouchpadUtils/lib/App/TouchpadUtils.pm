@@ -3,7 +3,7 @@ package App::TouchpadUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2019-12-16'; # DATE
 our $DIST = 'App-TouchpadUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to touchpad
@@ -20,7 +20,7 @@ App::TouchpadUtils - CLI utilities related to touchpad
 
 =head1 VERSION
 
-This document describes version 0.002 of App::TouchpadUtils (from Perl distribution App-TouchpadUtils), released on 2019-12-16.
+This document describes version 0.003 of App::TouchpadUtils (from Perl distribution App-TouchpadUtils), released on 2019-12-16.
 
 =head1 DESCRIPTION
 
@@ -34,11 +34,11 @@ This distribution contains the following CLI utilities related to touchpad:
 
 =item * L<has-touchpad>
 
-=item * L<touchoff>
-
-=item * L<touchon>
-
 =item * L<touchpad-is-enabled>
+
+=item * L<tpoff>
+
+=item * L<tpon>
 
 =back
 

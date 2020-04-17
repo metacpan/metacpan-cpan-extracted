@@ -13,4 +13,6 @@ t/02scope.t
 t/03readonly.t
 t/04named.t
 t/05predicate.t
+t/10data-dump.t
+t/11data-dump-late.t
 t/99pod.t

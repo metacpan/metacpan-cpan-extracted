@@ -1,24 +1,40 @@
 package SQL::Interp;
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 use strict;
 use warnings;
 use Carp;
-use Sub::Exporter -setup => {
-    exports => [ qw{  sql_interp
-                      sql_interp_strict
-                      sql_type
-                      sql } ],
-};
+
+
+# Custom import magic to support Sub::Exporter '-as' style function renaming.
+# (for backwards compatibility with older versions without adding an additional dependency)
+sub import {
+    my $pkg = shift;
+    my $caller = caller;
+    my %export = qw/sql_interp 1 sql_interp_strict 1 sql_type 1 sql 1/;
+    while(my $fn = shift) {
+        if($fn eq ':all') {
+            push @_, keys %export;
+            next;
+        }
+        croak "Symbol '$fn' is not exported by $pkg" if !$export{$fn};
+        my $as = $fn;
+        if(ref $_[0] eq 'HASH') {
+            my $arg = shift;
+            $as = $arg->{'-as'} if defined $arg->{'-as'};
+        }
+        no strict 'refs';
+        *{$caller.'::'.$as} = *{$pkg.'::'.$fn};
+    }
+}
 
 
 # whether TRACE_SQL is enabled
 my $trace_sql_enabled = $ENV{TRACE_SQL} || 0;
 
 # regexes
-my $id_match = qr/[a-zA-Z_][a-zA-Z0-9_\$\.]*/;
-my $table_name_match = $id_match;
+my $id_match = qr/(?:[a-zA-Z_][a-zA-Z0-9_\$\.]*|"[^"]+"|`[^`]+`)/;
 
 
 # next ID to use for table alias
@@ -222,7 +238,7 @@ sub _sql_interp {
                 }
                 else { _error_item($idx, \@items); }
             }
-            elsif ($sql =~ /(?:\bFROM|JOIN)\s*$/si) {
+            elsif ($sql =~ /(?:\bFROM|JOIN)\s*$/si && $sql !~ /DISTINCT\s+FROM\s*$/) {
                 # table reference
 
                 # get alias for table

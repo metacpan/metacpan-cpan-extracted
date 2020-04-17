@@ -15,7 +15,6 @@ perl Build.PL
 
 Requirements:
 
-- Sub::Exporter
 - DBI (optional, needed by DBIx::Interp)
 
 Documentation is provided in the POD and is available online at [Metacpan](https://metacpan.org/pod/SQL::Interp).

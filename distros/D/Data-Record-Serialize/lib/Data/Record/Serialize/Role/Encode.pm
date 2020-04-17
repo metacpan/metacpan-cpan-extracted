@@ -6,7 +6,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 requires 'encode';
 
@@ -32,17 +32,28 @@ Data::Record::Serialize::Role::Encode - Encode Role
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 DESCRIPTION
 
 If a role consumes this, it signals that it provides encoding
 capabilities.
 
-=head1 BUGS AND LIMITATIONS
+=head1 SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/data-record-serialize
+
+and may be cloned from
+
+  https://gitlab.com/djerius/data-record-serialize.git
 
 =head1 SEE ALSO
 

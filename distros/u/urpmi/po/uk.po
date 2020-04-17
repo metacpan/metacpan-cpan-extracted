@@ -6,21 +6,21 @@
 # Dmytro Koval'ov <kov@tokyo.email.ne.jp>, 1999-2000.
 # Taras Boychuk <btr1@ukrpost.net>, 2003-2004, 2005.
 # Taras Boychuk <btr1@mail.ru>, 2006.
-# Yuri Chornoivan <yurchor@ukr.net>, 2008, 2009, 2011, 2012, 2013, 2014, 2019.
+# Yuri Chornoivan <yurchor@ukr.net>, 2008, 2009, 2011, 2012, 2013, 2014, 2019, 2020.
 # Taras Boychuk <btr0001@ukr.net>, 2008, 2009.
 msgid ""
 msgstr ""
 "Project-Id-Version: urpmi\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-26 09:37+0300\n"
-"PO-Revision-Date: 2019-06-26 09:43+0300\n"
+"POT-Creation-Date: 2020-01-18 09:59+0200\n"
+"PO-Revision-Date: 2020-01-18 10:01+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <translation@linux.org.ua>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 19.07.70\n"
+"X-Generator: Lokalize 20.03.70\n"
 "Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
@@ -70,8 +70,8 @@ msgid "Cancel"
 msgstr "Скасувати"
 
 #: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
-#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1670
-#: ../urpm/media.pm:1821
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
+#: ../urpm/media.pm:1833
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "…не вдалося отримати: %s"
@@ -1059,19 +1059,19 @@ msgstr ""
 "--synthesis не може використовуватися з --media, --excludemedia, --"
 "sortmedia, --update, --use-distrib або --parallel"
 
-#: ../urpm/media.pm:792
+#: ../urpm/media.pm:793
 #, c-format
 msgid "ignoring non-free medium `%s'"
 msgstr "пропускаємо носій з невільними програмами «%s»"
 
-#: ../urpm/media.pm:802
+#: ../urpm/media.pm:803
 #, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
 msgstr ""
 "скасовуємо ігнорування невільного джерела пакунків «%s», оскільки "
 "встановлено невільні пакунки"
 
-#: ../urpm/media.pm:806
+#: ../urpm/media.pm:807
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
@@ -1080,10 +1080,13 @@ msgstr ""
 
 #: ../urpm/media.pm:816
 #, c-format
-msgid "un-ignoring 32bit medium `%s' b/c system is 32-bit EFI"
+msgid ""
+"un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
+"32-bit EFI"
 msgstr ""
-"скасовуємо ігнорування 32-бітового джерела пакунків «%s», оскільки система є"
-" 32-бітовою системою EFI"
+"скасовуємо ігнорування 32-бітового джерела пакунків «%s», оскільки"
+" встановлюються 32-бітові пакунки або система є "
+"32-бітовою системою EFI"
 
 #: ../urpm/media.pm:844
 #, c-format
@@ -1146,162 +1149,162 @@ msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr ""
 "немає доступу до першого носія дистрибутива (не знайдено файла media.cfg)"
 
-#: ../urpm/media.pm:1172
+#: ../urpm/media.pm:1184
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr "пропущено несумісний носій «%s» (через %s)"
 
-#: ../urpm/media.pm:1230
+#: ../urpm/media.pm:1242
 #, c-format
 msgid "retrieving media.cfg file..."
 msgstr "отримання файла media.cfg..."
 
-#: ../urpm/media.pm:1273
+#: ../urpm/media.pm:1285
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "спроба вибрати неіснуючого носія \"%s\""
 
-#: ../urpm/media.pm:1276
+#: ../urpm/media.pm:1288
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "вибір багатьох носіїв: %s"
 
-#: ../urpm/media.pm:1335
+#: ../urpm/media.pm:1347
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "вилучається носій \"%s\""
 
-#: ../urpm/media.pm:1426
+#: ../urpm/media.pm:1438
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "переналаштування urpmi з носія \"%s\""
 
-#: ../urpm/media.pm:1460
+#: ../urpm/media.pm:1472
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...переналаштування невдале"
 
-#: ../urpm/media.pm:1466
+#: ../urpm/media.pm:1478
 #, c-format
 msgid "reconfiguration done"
 msgstr "переналаштування виконано"
 
-#: ../urpm/media.pm:1482
+#: ../urpm/media.pm:1494
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr "Помилка при створенні файла назв: залежність %d не знайдено"
 
-#: ../urpm/media.pm:1503
+#: ../urpm/media.pm:1515
 #, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr "носій «%s» є найновішим"
 
-#: ../urpm/media.pm:1514
+#: ../urpm/media.pm:1526
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "перевіряється файл synthesis [%s]"
 
-#: ../urpm/media.pm:1534
+#: ../urpm/media.pm:1546
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "проблема читання файла synthesis для носія \"%s\""
 
-#: ../urpm/media.pm:1547 ../urpm/media.pm:1642
+#: ../urpm/media.pm:1559 ../urpm/media.pm:1654
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr "копіювання [%s] для носія \"%s\"..."
 
-#: ../urpm/media.pm:1549 ../urpm/media.pm:1619 ../urpm/media.pm:1872
+#: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
 msgid "...copying failed"
 msgstr "...копіювання невдале"
 
-#: ../urpm/media.pm:1615
+#: ../urpm/media.pm:1627
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "копіюється файл опису \"%s\"..."
 
-#: ../urpm/media.pm:1617 ../urpm/media.pm:1646
+#: ../urpm/media.pm:1629 ../urpm/media.pm:1658
 #, c-format
 msgid "...copying done"
 msgstr "...копіювання завершено"
 
-#: ../urpm/media.pm:1648
+#: ../urpm/media.pm:1660
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "копіювання [%s] завершилось невдало (файл є підозріло малим)"
 
-#: ../urpm/media.pm:1696
+#: ../urpm/media.pm:1708
 #, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr "обчислення md5sum для отриманого файла synthesis джерела"
 
-#: ../urpm/media.pm:1698 ../urpm/media.pm:2181
+#: ../urpm/media.pm:1710 ../urpm/media.pm:2193
 #, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
 msgstr "спроба отримання [%s] завершилася невдало (не збігається md5sum)"
 
-#: ../urpm/media.pm:1713
+#: ../urpm/media.pm:1725
 #, c-format
 msgid "genhdlist2 failed on %s"
 msgstr "помилка genhdlist2 у %s"
 
-#: ../urpm/media.pm:1723
+#: ../urpm/media.pm:1735
 #, c-format
 msgid "comparing %s and %s"
 msgstr "порівняння %s і %s"
 
-#: ../urpm/media.pm:1753
+#: ../urpm/media.pm:1765
 #, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr "некоректний файл hdlist %s для носія «%s»"
 
-#: ../urpm/media.pm:1779
+#: ../urpm/media.pm:1791
 #, c-format
 msgid "copying MD5SUM file of \"%s\"..."
 msgstr "копіювання файла MD5SUM «%s»..."
 
-#: ../urpm/media.pm:1819
+#: ../urpm/media.pm:1831
 #, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
 msgstr "некоректний файл MD5SUM (отримано з %s)"
 
-#: ../urpm/media.pm:1822
+#: ../urpm/media.pm:1834
 #, c-format
 msgid "no metadata found for medium \"%s\""
 msgstr "для носія «%s» не знайдено метаданих"
 
-#: ../urpm/media.pm:1854
+#: ../urpm/media.pm:1866
 #, c-format
 msgid "retrieving source synthesis of \"%s\"..."
 msgstr "отримання файла synthesis джерела для «%s»..."
 
-#: ../urpm/media.pm:1920
+#: ../urpm/media.pm:1932
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "перевіряється файл ключів з \"%s\"..."
 
-#: ../urpm/media.pm:1932
+#: ../urpm/media.pm:1944
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...імпортовано ключ %s з файла ключів \"%s\""
 
-#: ../urpm/media.pm:1936
+#: ../urpm/media.pm:1948
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "неможливо імпортувати файл ключів з \"%s\""
 
-#: ../urpm/media.pm:1977
+#: ../urpm/media.pm:1989
 #, c-format
 msgid "no synthesis file found for medium \"%s\""
 msgstr "для носія «%s» не знайдено файла synthesis"
 
-#: ../urpm/media.pm:2010
+#: ../urpm/media.pm:2022
 #, c-format
 msgid "updated medium \"%s\""
 msgstr "оновлено носій «%s»"
 
-#: ../urpm/media.pm:2175
+#: ../urpm/media.pm:2187
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr "спроба отримання [%s] завершилася невдало"
@@ -2827,8 +2830,8 @@ msgstr "непотрібні аргументи до --distrib --mirrorlist <а�
 #, c-format
 msgid "bad <url> (for local directory, the path must be absolute)"
 msgstr ""
-"помилкове значення <адреса> (для локального каталогу слід вказати абсолютний"
-" шлях)"
+"помилкове значення <адреса> (для локального каталогу слід вказати абсолютний "
+"шлях)"
 
 #: ../urpmi.addmedia:116
 #, c-format
@@ -3289,4 +3292,3 @@ msgstr "Запуск засобу встановлення пакунків Mage
 msgid "Authentication is required to run Mageia Package Installer"
 msgstr ""
 "Щоб запустити засіб встановлення пакунків Mageia, слід пройти розпізнавання"
-

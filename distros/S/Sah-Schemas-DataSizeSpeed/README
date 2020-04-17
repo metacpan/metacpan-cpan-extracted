@@ -3,14 +3,22 @@ NAME
     (filesize, transfer speed, etc)
 
 VERSION
-    This document describes version 0.004 of Sah::Schemas::DataSizeSpeed
+    This document describes version 0.006 of Sah::Schemas::DataSizeSpeed
     (from Perl distribution Sah-Schemas-DataSizeSpeed), released on
-    2019-11-29.
+    2020-03-03.
 
 SAH SCHEMAS
-    *   filesize
+    *   bandwidth
 
-        File size.
+        Data transfer speed.
+
+    *   dataquota
+
+        Data transfer quota.
+
+    *   datasize
+
+        Data size.
 
         Float, in bytes.
 
@@ -20,6 +28,22 @@ SAH SCHEMAS
          2mb   -> 2097152   (megabyte, 1024-based)
          1.5K  -> 1536      (kilobyte, 1024-based)
          1.6ki -> 1600      (kibibyte, 1000-based)
+
+    *   dataspeed
+
+        Data transfer speed.
+
+        Float, in bytes/second.
+
+        Can be coerced from string that contains units, e.g.:
+
+         1000kbps -> 128000 (kilobits per second, 1024-based)
+         2.5 mbit -> 327680 (megabit per second, 1024-based)
+         128KB/s  -> 131072 (kilobyte per second, 1024-based)
+
+    *   filesize
+
+        File size.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -46,7 +70,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

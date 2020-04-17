@@ -1,10 +1,10 @@
 package Data::Roundtrip;
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Encode qw/encode_utf8 decode_utf8/;
 use JSON qw/decode_json encode_json/;
@@ -12,6 +12,8 @@ use Unicode::Escape qw/escape unescape/;
 use YAML;
 use Sub::Override;
 use Data::Dumper qw/Dumper/;
+use Data::Dump qw/pp/;
+use Data::Dump::Filtered;
 
 use Exporter qw(import);
 use Exporter 'import';
@@ -36,45 +38,35 @@ BEGIN {
         dump => [@dump],
         all  => [@all],
     );
-}
-sub	read_from_file {
-	my $infile = $_[0];
-	my $FH;
-	if( ! open $FH, '<:encoding(UTF-8)', $infile ){
-		warn "failed to open file '$infile' for reading, $!";
-		return undef;
-	}
-	my $contents = read_from_filehandle($FH);
-	close $FH;
-	return $contents
-}
-sub	write_to_file {
-	my $outfile = $_[0];
-	my $contents = $_[1];
-	my $FH;
-	if( ! open $FH, '>:encoding(UTF-8)', $outfile ){
-		warn "failed to open file '$outfile' for writing, $!";
-		return undef
-	}
-	if( ! write_to_filehandle($FH, $contents) ){ warn "error, call to ".'write_to_filehandle()'." has failed"; close $FH; return undef }
-	close $FH;
-	return $contents
-}
-sub	read_from_filehandle {
-	my $FH = $_[0];
-	# you should open INFH as '<:encoding(UTF-8)'
-	# or if it is STDIN, do binmode STDIN , ':encoding(UTF-8)';
-	return do { local $/; <$FH> }
-}
-sub	write_to_filehandle {
-	my $FH = $_[0];
-	my $contents = $_[1];
-	# you should open $OUTFH as >:encoding(UTF-8)'
-	# or if it is STDOUT, do binmode STDOUT , ':encoding(UTF-8)';
-	print $FH $contents;
-	return 1;
-}
-sub	_has_utf8 { return $_[0] =~ /[^\x00-\x7f]/ }
+
+} # end BEGIN
+
+# THESE are taken verbatim from Data::Dumper (Data/Dumper.pm)
+# they are required for _qquote_redefinition_by_Corion()
+# which needed to access them as, e.g.  %Data::Dumper::esc
+# because they are private vars, they are not coming out!
+# and so here they are:
+my $Data_Dumper_IS_ASCII  = ord 'A' ==  65;
+my %Data_Dumper_esc = ( 
+    "\a" => "\\a",
+    "\b" => "\\b",
+    "\t" => "\\t",
+    "\n" => "\\n",
+    "\f" => "\\f",
+    "\r" => "\\r",
+    "\e" => "\\e",
+);
+my $Data_Dumper_low_controls = ($Data_Dumper_IS_ASCII) 
+
+                   # This includes \177, because traditionally it has been
+                   # output as octal, even though it isn't really a "low"
+                   # control
+                   ? qr/[\0-\x1f\177]/
+
+                     # EBCDIC low controls.
+                   : qr/[\0-\x3f]/;
+# END verbatim from Data::Dumper (Data/Dumper.pm)
+
 sub	perl2json {
 	my $pv = $_[0];
 	my $params = defined($_[1]) ? $_[1] : {};
@@ -142,7 +134,6 @@ sub	yaml2perl {
 sub	json2perl {
 	my $json_string = $_[0];
 	#my $params = defined($_[1]) ? $_[1] : {};
-
 	my $pv = JSON::decode_json(Encode::encode_utf8($json_string));
 	if( ! defined $pv ){ warn "json2perl() :  error, call to json2perl() has failed"; return undef }
 	return $pv;
@@ -242,11 +233,41 @@ sub	json2yaml {
 	if( ! defined $yaml_string ){ warn "json2yaml() :  error, call to perl2yaml() has failed"; return undef }
 	return $yaml_string
 }
+sub	dump2perl {
+	my $dump_string = $_[0];
+	#my $params = defined($_[1]) ? $_[1] : {};
+
+	$dump_string =~ s/^\$VAR1\s*=\s*//g;
+	my $pv = eval($dump_string);
+	if( $@ || ! defined $pv ){ warn "error, failed to eval() input string alledgedly a perl variable: $@"; return undef }
+	return $pv
+}
 # this bypasses Data::Dumper's obsession with escaping
-# non-ascii characters by redefining qquote() sub
+# non-ascii characters by redefining the qquote() sub
 # The redefinition code is by [Corion] @ Perlmonks and cpan
 # see https://perlmonks.org/?node_id=11115271
-#
+# So, it still uses Data::Dumper to dump the input perl var
+# but with its qquote() sub redefined. See section CAVEATS
+# for a wee problem that may appear in the future.
+# The default behaviour is NOT to escape unicode
+# (which is the opposite of what Data::Dumper is doing)
+# see options, below, on how to change this.
+# input is the perl variable (as a reference, e.g. scalar, hashref, arrayref)
+# followed by optional hashref of options which can be
+#   terse
+#   indent
+#   dont-bloody-escape-unicode,
+#   escape-unicode,
+#   The last 2 control how unicode is printed, either escaped,
+#   like \x{3b1} or 'a' <<< which is unicoded greek alpha but did not want to pollute with unicode this file
+#   the former behaviour can be with dont-bloody-escape-unicode=>0 or escape-unicode=>1,
+#   the latter behaviour is the default. but setting the opposite of above will set it.
+# NOTE: there are 2 alternatives to this
+# perl2dump_filtered() which uses Data::Dump filters to control unicode escaping but
+# lacks in aesthetics and functionality and handling all the cases Dump and Dumper
+# do quite well.
+# perl2dump_homebrew() uses the same dump-recursively engine but does not involve
+# Data::Dump at all.
 sub	perl2dump {
 	my $pv = $_[0];
 	my $params = defined($_[1]) ? $_[1] : {};
@@ -257,55 +278,205 @@ sub	perl2dump {
 	local $Data::Dumper::Indent = exists($params->{'indent'}) && defined($params->{'indent'})
 		? $params->{'indent'} : 1
 	;
-	my $ret;
-	if( exists($params->{'dont-bloody-escape-unicode'}) && defined($params->{'dont-bloody-escape-unicode'})
-	 && ($params->{'dont-bloody-escape-unicode'}==1) ){
+	if( (
+		exists($params->{'dont-bloody-escape-unicode'}) && defined($params->{'dont-bloody-escape-unicode'})
+		 && ($params->{'dont-bloody-escape-unicode'}==1)
+	    ) || (
+		exists($params->{'escape-unicode'}) && defined($params->{'escape-unicode'})
+		 && ($params->{'escape-unicode'}==0)
+	    )
+	){
 		local $Data::Dumper::Useperl = 1;
 		local $Data::Dumper::Useqq='utf8';
 		my $override = Sub::Override->new(
 			'Data::Dumper::qquote' => \& _qquote_redefinition_by_Corion
 		);
-		$ret = Dumper($pv);
+		my $ret = Data::Dumper::Dumper($pv);
+		# not really...
+		#$ret = Data::Dumper::AutoEncode::eDumper($pv);
 		# restore the overriden sub
 		$override->restore;
-	} else { $ret = Dumper($pv) }
-	return $ret
+		return $ret
+	}
+	return Data::Dumper::Dumper($pv)
 }
-sub	dump2perl {
-	my $dump_string = $_[0];
-	#my $params = defined($_[1]) ? $_[1] : {};
+# This uses Data::Dump's filters
+# The _qquote_redefinition_by_Corion() code is by [Corion] @ Perlmonks and cpan
+# see https://perlmonks.org/?node_id=11115271
+#
+sub	perl2dump_filtered {
+	my $pv = $_[0];
+	my $params = defined($_[1]) ? $_[1] : {};
 
-	$dump_string =~ s/^\$VAR1\s*=\s*//g;
-	my $pv = eval($dump_string);
-	if( $@ || ! defined $pv ){ warn "error, failed to eval() input string alledgedly a perl variable: $@"; return undef }
-	return $pv
+	if( (
+		exists($params->{'dont-bloody-escape-unicode'}) && defined($params->{'dont-bloody-escape-unicode'})
+		 && ($params->{'dont-bloody-escape-unicode'}==1)
+	    ) || (
+		exists($params->{'escape-unicode'}) && defined($params->{'escape-unicode'})
+		 && ($params->{'escape-unicode'}==0)
+	    )
+	){
+		Data::Dump::Filtered::add_dump_filter( \& DataDumpFilterino );
+		my $ret = Data::Dump::pp($pv);
+		Data::Dump::Filtered::remove_dump_filter( \& DataDumpFilterino );
+		return $ret;
+	}
+	return Data::Dump::pp($pv);
 }
+sub	perl2dump_homebrew {
+	my $pv = $_[0];
+	my $params = defined($_[1]) ? $_[1] : {};
+
+	if( (
+		exists($params->{'dont-bloody-escape-unicode'}) && defined($params->{'dont-bloody-escape-unicode'})
+		 && ($params->{'dont-bloody-escape-unicode'}==1)
+	    ) || (
+		exists($params->{'escape-unicode'}) && defined($params->{'escape-unicode'})
+		 && ($params->{'escape-unicode'}==0)
+	    )
+	){
+		return dump_perl_var_recursively($pv);
+	}
+	return Data::Dumper::Dumper($pv);
+}
+# this will take a perl var (as a scalar or an arbitrarily nested data structure)
+# and emulate a very very basic
+# Dump/Dumper but with rendering unicode (for keys or values or array items)
+# it returns a string representation of the input perl var
+# There are 2 obvious limitations:
+# 1) indentation is very basic,
+# 2) it supports only scalars, hashes and arrays,
+#    (which will dive into them no problem)
+# This sub can be used in conjuction with DataDumpFilterino()
+# to create a Data::Dump filter like,
+#    Data::Dump::Filtered::add_dump_filter( \& DataDumpFilterino );
+#    or dumpf($perl_var, \& DataDumpFilterino);
+# the input is a perl-var as a reference, so no %inp but $inp={} or $inp=[]
+# the output is a, possibly multiline, string
+sub dump_perl_var_recursively {
+	my $inp = $_[0];
+	my $depth = defined($_[1]) ? $_[1] : 0;
+	my $aref = ref($inp);
+	if( $aref eq '' ){
+		# scalar
+		return _qquote_redefinition_by_Corion($inp);
+	} elsif( $aref eq 'SCALAR' ){
+		# scalar
+		return _qquote_redefinition_by_Corion($$inp);
+	} elsif( $aref eq 'HASH' ){
+		my $indent1 = ' 'x((2+$depth)*2);
+		my $indent2 = $indent1 x 2;
+		my $retdump= "\n".$indent1.'{'."\n";
+		for my $k (keys %$inp){
+			$retdump .= $indent2
+				. _qquote_redefinition_by_Corion($k)
+			." => "
+				. dump_perl_var_recursively($inp->{$k}, $depth+1)
+			.",\n"
+			;
+		}
+		return $retdump. $indent1 . '}'
+	} elsif( $aref eq 'ARRAY' ){
+		my $indent1 = ' ' x ((1+$depth)*2);
+		my $indent2 = $indent1 x 2;
+		my $retdump= "\n".$indent1.'['."\n";
+		for my $v (@$inp){
+			$retdump .=
+				$indent2
+				. dump_perl_var_recursively($v, $depth+1)
+				.",\n"
+			;
+		}
+		return $retdump. $indent1 . ']'
+	} else {
+		my $indent1 = ' ' x ((1+$depth)*2);
+		return $indent1 . $inp .",\n"
+	}
+}
+sub DataDumpFilterino {
+	my($ctx, $object_ref) = @_;
+	my $aref = ref($object_ref);
+
+	return {
+		'dump' => dump_perl_var_recursively($object_ref, $ctx->depth)
+	}
+}
+# opens file,
+# reads all content of file and returns them on success
+# or returns undef on failure
+# the file is closed in either case
+sub	read_from_file {
+	my $infile = $_[0];
+	my $FH;
+	if( ! open $FH, '<:encoding(UTF-8)', $infile ){
+		warn "failed to open file '$infile' for reading, $!";
+		return undef;
+	}
+	my $contents = read_from_filehandle($FH);
+	close $FH;
+	return $contents
+}
+# writes contents to file and returns 0 on failure, 1 on success
+sub	write_to_file {
+	my $outfile = $_[0];
+	my $contents = $_[1];
+	my $FH;
+	if( ! open $FH, '>:encoding(UTF-8)', $outfile ){
+		warn "failed to open file '$outfile' for writing, $!";
+		return 0
+	}
+	if( ! write_to_filehandle($FH, $contents) ){ warn "error, call to ".'write_to_filehandle()'." has failed"; close $FH; return 0 }
+	close $FH;
+	return 1;
+}
+# reads all content from filehandle and returns them on success
+# or returns undef on failure
+sub	read_from_filehandle {
+	my $FH = $_[0];
+	# you should open INFH as '<:encoding(UTF-8)'
+	# or if it is STDIN, do binmode STDIN , ':encoding(UTF-8)';
+	return do { local $/; <$FH> }
+}
+sub	write_to_filehandle {
+	my $FH = $_[0];
+	my $contents = $_[1];
+	# you should open $OUTFH as >:encoding(UTF-8)'
+	# or if it is STDOUT, do binmode STDOUT , ':encoding(UTF-8)';
+	print $FH $contents;
+	return 1;
+}
+sub	_has_utf8 { return $_[0] =~ /[^\x00-\x7f]/ }
 # Below code is by [Corion] @ Perlmonks and cpan
 # see https://perlmonks.org/?node_id=11115271
 # it's for redefining Data::Dumper::qquote
 # (it must be accompanied by
 #  $Data::Dumper::Useperl = 1;
 #  $Data::Dumper::Useqq='utf8';
+# HOWEVER, I discoverd that a redefined sub can not access packages private vars
 sub	_qquote_redefinition_by_Corion {
   local($_) = shift;
-  s/([\\\"\@\$])/\\$1/g;
 
+  s/([\\\"\@\$])/\\$1/g;
   return qq("$_") unless /[[:^print:]]/;  # fast exit if only printables
 
   # Here, there is at least one non-printable to output.  First, translate the
   # escapes.
-  s/([\a\b\t\n\f\r\e])/$Data::Dumper::esc{$1}/g;
+   s/([\a\b\t\n\f\r\e])/$Data_Dumper_esc{$1}/g;
+  # this is the original but it does not work because it can't find %esc
+  # which is a private var in Data::Dumper, so I copied those vars above
+  # and access them as Data_Dumper_XYZ
+  #s/([\a\b\t\n\f\r\e])/$Data::Dumper::esc{$1}/g;
 
   # no need for 3 digits in escape for octals not followed by a digit.
-  s/($Data::Dumper::low_controls)(?!\d)/'\\'.sprintf('%o',ord($1))/eg;
+  s/($Data_Dumper_low_controls)(?!\d)/'\\'.sprintf('%o',ord($1))/eg;
 
   # But otherwise use 3 digits
-  s/($Data::Dumper::low_controls)/'\\'.sprintf('%03o',ord($1))/eg;
+  s/($Data_Dumper_low_controls)/'\\'.sprintf('%03o',ord($1))/eg;
 
     # all but last branch below not supported --BEHAVIOR SUBJECT TO CHANGE--
   my $high = shift || "";
     if ($high eq "iso8859") {   # Doesn't escape the Latin1 printables
-      if ($Data::Dumper::IS_ASCII) {
+      if ($Data_Dumper_IS_ASCII) {
         s/([\200-\240])/'\\'.sprintf('%o',ord($1))/eg;
       }
       elsif ($] ge 5.007_003) {
@@ -325,7 +496,6 @@ sub	_qquote_redefinition_by_Corion {
     }
     return qq("$_");
 }
-
 # begin pod
 =pod
 
@@ -337,7 +507,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -581,17 +751,190 @@ Given an input C<$perlvar> (which can be a simple scalar or
 a nested data structure, but not an object), it will return
 the equivalent string (via L<Data::Dumper>).
 In C<$optional_paramshashref>
-one can specify whether to NOT escape unicode with
-C<< 'dont-bloody-escape-unicode' => 1 >>,
-and/or use terse output with C<< 'terse' => 1 >> and remove
-all the incessant indentation C<< 'indent' => 1 >>
+one can specify whether to escape unicode with
+C<< 'dont-bloody-escape-unicode' => 0 >>,
+(or C<< 'escape-unicode' => 1 >>). The DEFAULT
+behaviour is to NOT ESCAPE unicode.
+
+Additionally, use terse output with C<< 'terse' => 1 >> and remove
+all the incessant indentation with C<< 'indent' => 1 >>
 which unfortunately goes to the other extreme of
 producing a space-less output, not fit for human consumption.
 The output can fed to L<Data::Roundtrip::dump2perl>
 for getting the Perl variable back.
 
-Returns the string representation of the input perl variable
+It returns the string representation of the input perl variable
 on success or C<undef> on failure.
+
+The output can be fed back to L<dump2perl>.
+
+CAVEAT: when not escaping unicode (which is the default
+behaviour), each call to this sub will override L<Data::Dumper>'s
+C<qquote()> sub (with a call to L<Sub::Override::new>),
+call L<Data::Dumper>'s C<Dumper()> and save its output to
+a temporary variable, restore C<qquote()> sub (with
+a call to L<Sub::Override::restore> and return the
+contents. This exercise is done every time this C<perl2dump()>
+is called. It can be expensive. The alternative is
+to redefine C<qquote()> once, when the module is loaded.
+
+Note that there are two other alternatives to this sub,
+L<perl2dump_filtered> which uses L<Data::Dump>
+filters to control unicode escaping but
+lacks in aesthetics and functionality and handling all the
+cases Dump and Dumper do quite well.
+
+There is also C<< perl2dump_homebrew >> which
+uses the same dump-recursively engine as L<perl2dump_filtered>
+but does not involve Data::Dump at all.
+
+=head2 C<perl2dump_filtered>
+
+  my $ret = perl2dump_filtered($perlvar, $optional_paramshashref)
+
+Arguments:
+
+=over 4
+
+=item * C<$perlvar>
+
+=item * C<$optional_paramshashref>
+
+=back
+
+Return value:
+
+=over 4
+
+=item * C<$ret>
+
+=back
+
+It does the same job as L<perl2dump> which is
+to stringify a perl variable. And takes the same options.
+
+It returns the string representation of the input perl variable
+on success or C<undef> on failure.
+
+It uses L<Data::Dump::Filtered> to add a filter to
+L<Data::Dump>.
+
+=head2 C<perl2dump_homebrew>
+
+  my $ret = perl2dump_homebrew($perlvar, $optional_paramshashref)
+
+Arguments:
+
+=over 4
+
+=item * C<$perlvar>
+
+=item * C<$optional_paramshashref>
+
+=back
+
+Return value:
+
+=over 4
+
+=item * C<$ret>
+
+=back
+
+It does the same job as L<perl2dump> which is
+to stringify a perl variable. And takes the same options.
+
+It returns the string representation of the input perl variable
+on success or C<undef> on failure.
+
+The output can be fed back to L<dump2perl>.
+
+
+It uses its own basic dumper. Which is recursive.
+So, beware of extremely deep nested data structures.
+Deep not long! But it probably is as efficient as
+it can be but definetely lacks in aesthetics
+and functionality compared to Dump and Dumper.
+
+=head2 C<dump_perl_var_recursively>
+
+    my $ret = dump_perl_var_recursively($perl_var)
+
+Arguments:
+
+=over 4
+
+=item * C<$perl_var>, a Perl variable like
+a scalar or an arbitrarily nested data structure.
+For the latter, it requires references, e.g.
+hash-ref or arrayref.
+
+=back
+
+Return value:
+
+=over 4
+
+=item * C<$ret>, the stringified version of the input Perl variable.
+
+=back
+
+This sub will take a Perl var (as a scalar or an arbitrarily nested data structure)
+and emulate a very very basic
+Dump/Dumper but with enforced rendering unicode (for keys or values or array items),
+and not escaping unicode - this is not an option,
+it returns a string representation of the input perl var
+
+There are 2 obvious limitations:
+
+=over 4
+
+=item 1) indentation is very basic,
+
+=item 2) it supports only scalars, hashes and arrays,
+(which will dive into them no problem)
+This sub can be used in conjuction with DataDumpFilterino()
+to create a Data::Dump filter like,
+
+     Data::Dump::Filtered::add_dump_filter( \& DataDumpFilterino );
+or
+     dumpf($perl_var, \& DataDumpFilterino);
+
+the input is a Perl variable as a reference, so no C<< %inp >> but C<< $inp={} >> 
+and C<< $inp=[] >>. 
+
+This function is recursive.
+Beware of extremely deep nested data structures.
+Deep not long! But it probably is as efficient as
+it can be but definetely lacks in aesthetics
+and functionality compared to Dump and Dumper.
+
+The output is a, possibly multiline, string. Which it can
+then be fed back to L<dump2perl>.
+
+=back
+
+=head2 C<dump2perl>
+
+    my $ret = dump2perl($dumpstring)
+
+Arguments:
+
+=over 4
+
+=item * C<$dumpstring>, this comes from the output of L<Data::Dump>,
+L<Data::Dumper> or our own L<perl2dump>, L<perl2dump_filtered>,
+L<perl2dump_homebrew>. Escaped, or unescaped.
+
+=back
+
+Return value:
+
+=over 4
+
+=item * C<$ret>, the Perl data structure on success or C<undef> on failure.
+
+=back
 
 =head2 C<json2perl>
 
@@ -698,6 +1041,110 @@ like above will be accepted.
 
 similar functionality as their counterparts described above.
 
+=head2 C<read_from_file>
+
+  my $contents = read_from_file($filename)
+
+Arguments:
+
+=over 4
+
+=item * C<$filename> : the input filename.
+
+=back
+
+Return value:
+
+=over 4
+
+=item * C<$contents>
+
+=back
+
+Given a filename, it opens it using C<<:encoding(UTF-8)>>, slurps its
+contents and closes it. It's a convenience sub which could have also
+been private. If you want to retain the filehandle, use L<read_from_filehandle >.
+
+Returns the file contents on success or C<undef> on failure.
+
+=head2 C<read_from_filehandle>
+
+  my $contents = read_from_filehandle($filehandle)
+
+Arguments:
+
+=over 4
+
+=item * C<$filehandle> : the handle to an already opened file.
+
+=back
+
+Return value:
+
+=over 4
+
+=item * C<$contents> : the file contents slurped.
+
+=back
+
+It slurps all content from the specified input file handle. Upon return
+the file handle is still open.
+Returns the file contents on success or C<undef> on failure.
+
+=head2 C<write_to_file>
+
+  write_to_file($filename, $contents) or die
+
+Arguments:
+
+=over 4
+
+=item * C<$filename> : the output filename.
+
+=item * C<$contents> : any string to write it to file.
+
+=back
+
+Return value:
+
+=over 4
+
+=item * 1 on success, 0 on failure
+
+=back
+
+Given a filename, it opens it using C<<:encoding(UTF-8)>>,
+writes all specified content and closes the file.
+It's a convenience sub which could have also
+been private. If you want to retain the filehandle, use L<write_to_filehandle >.
+
+Returns 1 on success or 0 on failure.
+
+=head2 C<write_to_filehandle>
+
+  write_to_filehandle($filehandle, $contents) or die
+
+Arguments:
+
+=over 4
+
+=item * C<$filehandle> : the handle to an already opened file (for writing).
+
+=back
+
+Return value:
+
+=over 4
+
+=item * 1 on success or 0 on failure.
+
+=back
+
+It writes content to the specified file handle. Upon return
+the file handle is still open.
+
+Returns 1 on success or 0 on failure.
+
 =head1 SCRIPTS
 
 A few scripts have been put together and offer the functionality of this
@@ -716,10 +1163,6 @@ Andreas Hadjiprocopis, C<< <bliako at cpan.org> / <andreashad2 at gmail.com> >>
 Please report any bugs or feature requests to C<bug-data-roundtrip at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Roundtrip>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-=head1 FUTURE WORK
-
-Replace L<Data::Dumper> with L<Data::Dumper::AutoEncode>
 
 =head1 SEE ALSO
 

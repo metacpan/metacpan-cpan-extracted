@@ -5,14 +5,13 @@ use warnings;
 use 5.008001;
 use Carp ();
 use Text::ParseWords ();
-use List::Util 1.45 ();
 use FFI::Temp;
 use Capture::Tiny ();
 use File::Spec;
 use FFI::Platypus::ShareConfig;
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 
 sub new
@@ -422,7 +421,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 

@@ -53,8 +53,14 @@ sub test_rpm_same_transaction() {
     test_rpm_i_succeeds('fa', 'fb');
     check_installed_and_remove('fa', 'fb');
 
-    test_rpm_i_succeeds('h', 'i');
-    check_installed_and_remove('h', 'i');
+    # Mageia's rpm is patched in order to not conflict for doc files:
+    if (is_mageia()) {
+	test_rpm_i_succeeds('h', 'i');
+	check_installed_and_remove('h', 'i');
+    } else {
+	test_rpm_i_fail('h', 'i');
+	check_nothing_installed();
+    }
 }
 
 sub test_rpm_different_transactions() {
@@ -98,14 +104,20 @@ sub test_rpm_different_transactions() {
     check_installed_and_remove('a', 'ga');
     check_no_etc_files();
 
-    test_rpm_i_succeeds('h');
-    test_rpm_i_succeeds('i');
-    check_installed_and_remove('h', 'i');
+    # Mageia's rpm is patched in order to not conflict for doc files:
+    if (is_mageia()) {
+	test_rpm_i_succeeds('h');
+	test_rpm_i_succeeds('i');
+	check_installed_and_remove('h', 'i');
+    }
 }
 
 sub test_urpmi_same_transaction() {
-    test_urpmi_fail('a b');
-    check_nothing_installed();
+    # Mageia's rpm is patched in order to not conflict for doc files:
+    if (is_mageia()) {
+	test_urpmi_fail('a b');
+	check_nothing_installed();
+    }
 
     urpmi('a c');
     check_installed_and_remove('a', 'c');
@@ -122,8 +134,11 @@ sub test_urpmi_same_transaction() {
     urpmi('fa fb');
     check_installed_and_remove('fa', 'fb');
 
-    urpmi('h i');
-    check_installed_and_remove('h', 'i');
+    # Mageia's rpm is patched in order to not conflict for doc files:
+    if (is_mageia()) {
+	urpmi('h i');
+	check_installed_and_remove('h', 'i');
+    }
 }
 
 sub test_urpmi_different_transactions() {
@@ -168,9 +183,12 @@ sub test_urpmi_different_transactions() {
     check_installed_and_remove('a', 'ga');
     check_no_etc_files();
 
-    urpmi('h');
-    urpmi('i');
-    check_installed_and_remove('h', 'i');
+    # Mageia's rpm is patched in order to not conflict for doc files:
+    if (is_mageia()) {
+	   urpmi('h');
+	   urpmi('i');
+	   check_installed_and_remove('h', 'i');
+    }
 }
 
 sub test_rpm_i_succeeds {

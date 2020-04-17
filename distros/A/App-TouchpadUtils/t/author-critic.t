@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/TouchpadUtils.pm','script/disable-touchpad','script/enable-touchpad','script/has-touchpad','script/touchoff','script/touchon','script/touchpad-is-enabled'];
+my $filenames = ['lib/App/TouchpadUtils.pm','script/disable-touchpad','script/enable-touchpad','script/has-touchpad','script/touchpad-is-enabled','script/tpoff','script/tpon'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

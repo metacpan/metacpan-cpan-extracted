@@ -2,9 +2,9 @@ package Net::IPAM::IP;
 
 use strict;
 use warnings;
-our $VERSION = '1.11';
+our $VERSION = '1.14';
 
-use Socket qw/AF_INET AF_INET6/;
+use Socket qw/:addrinfo AF_INET AF_INET6 AF_UNSPEC SOCK_RAW/;
 
 # On some platforms, inet_pton accepts various forms of invalid input or discards valid input.
 # In this case use a (slower) pure-perl implementation for Socket::inet_pton.
@@ -43,33 +43,36 @@ Net::IPAM::IP - A library for reading, formatting, sorting and converting IP-add
 
 =head1 SYNOPSIS
 
-	use Net::IPAM::IP;
+  use Net::IPAM::IP;
 
-	# parse and normalize
-	$ip1 = Net::IPAM::IP->new('1.2.3.4') // die 'wrong format,';
-	$ip2 = Net::IPAM::IP->new('fe80::1') // die 'wrong format,';
+  # parse and normalize
+  $ip1 = Net::IPAM::IP->new('1.2.3.4') // die 'wrong format,';
+  $ip2 = Net::IPAM::IP->new('fe80::1') // die 'wrong format,';
 
-	$ip3 = $ip2->incr // die 'overflow,';
+  $ip3 = $ip2->incr // die 'overflow,';
 
-	say $ip1;    # 1.2.3.4
-	say $ip2;    # fe80::1
-	say $ip3;    # fe80::2
+  say $ip1;    # 1.2.3.4
+  say $ip2;    # fe80::1
+  say $ip3;    # fe80::2
 
-	say $ip1->cmp($ip2);    # -1
+  say $ip1->cmp($ip2);    # -1
 
-	say $ip2->expand;       # fe80:0000:0000:0000:0000:0000:0000:0001
-	say $ip2->reverse;      # 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f
+  say $ip2->expand;       # fe80:0000:0000:0000:0000:0000:0000:0001
+  say $ip2->reverse;      # 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f
 
-	$ip = Net::IPAM::IP->new_from_bytes(pack('C4', 192, 168, 0, 1));       # 192.168.0.1
-	$ip = Net::IPAM::IP->new_from_bytes(pack('N4', 0x20010db8, 0, 0, 1,)); # 2001:db8::1
+  $ip = Net::IPAM::IP->new_from_bytes(pack('C4', 192, 168, 0, 1));       # 192.168.0.1
+  $ip = Net::IPAM::IP->new_from_bytes(pack('N4', 0x20010db8, 0, 0, 1,)); # 2001:db8::1
+
+  @ips = Net::IPAM::IP->getaddrs('dns.google.');
+  say "@ips";  #  8.8.8.8 8.8.4.4 2001:4860:4860::8844 2001:4860:4860::8888
 
 =cut
 
-=head1 METHODS
-
-L<Net::IPAM::IP> implements the following methods:
+=head1 CONSTRUCTORS
 
 =head2 new
+
+  $ip = Net::IPAM::IP->new("::1");
 
 Parse the input string as IPv4/IPv6 address and returns the IP address object.
 
@@ -83,7 +86,7 @@ Returns undef on illegal input.
 
 sub new {
   croak 'wrong method call' unless defined $_[1];
-  my $self = bless( {}, ref $_[0] || $_[0]);
+  my $self = bless( {}, ref $_[0] || $_[0] );
 
   # IPv4
   if ( index( $_[1], ':' ) < 0 ) {
@@ -155,6 +158,77 @@ sub new_from_bytes {
 
   croak 'illegal input,';
 }
+
+=head2 getaddrs($name, [$error_cb])
+
+Returns a list of ip objects for a given $name or undef if there is no RR record for $name.
+
+  my @ips = Net::IPAM::IP->getaddrs('dns.google.');
+  say "@ips";  #  8.8.8.8 8.8.4.4 2001:4860:4860::8844 2001:4860:4860::8888
+
+L</"getaddrs"> calls the L<Socket> functions C<< getaddrinfo() >> and C<< getnameinfo() >> under the hood.
+
+With no error callback L</getaddrs> just calls C<< warn() >> with underlying Socket errors.
+
+For granular error handling use your own error callback:
+
+  my $my_error_cb = sub {
+    my ( $error, $msg) = @_;
+    # check the $error and do what you want with error and message
+    ...
+  }
+
+  my @ips = Net::IPAM::IP->getaddrs( $name, $my_error_cb );
+
+or shut up the default error handler with:
+
+  my @ips = Net::IPAM::IP->getaddrs( $name, sub { } );
+
+ANNOTATION: This constructor could also be named C<< new_from_name >> but it behaves differently
+because it returns a B<list> of objects and supports an optional argument as error callback,
+reporting underlying Socket errors.
+
+=cut
+
+sub getaddrs {
+  my ( $class, $name, $error_cb ) = @_;
+  $error_cb //= sub { warn "@_" };
+
+  unless ( defined $name ) {
+    $error_cb->( 0, "missing argument" );
+    return;
+  }
+
+  my ( $err, @res ) = getaddrinfo( $name, "", { socktype => SOCK_RAW, family => AF_UNSPEC } );
+
+  if ($err) {
+
+    # no error, just no resolveable name
+    return if $err == EAI_NONAME;
+
+    $error_cb->( $err, "getaddrinfo($name)" );
+    return;
+  }
+
+  my @ips;
+
+  while ( my $ai = shift @res ) {
+    my ( $err, $ip ) = getnameinfo( $ai->{addr}, NI_NUMERICHOST, NIx_NOSERV );
+
+    if ($err) {
+      $error_cb->( $err, "getnameinfo($name)" );
+      return;
+    }
+
+    push @ips, $class->new($ip);
+  }
+
+  return @ips;
+}
+
+=head1 METHODS
+
+L<Net::IPAM::IP> implements the following methods:
 
 =head2 bytes
 
@@ -281,7 +355,7 @@ Returns the next IP address, returns undef on overflow.
 
 sub incr {
   my $n = incr_n( $_[0]->bytes ) // return;
-  return (ref $_[0])->new_from_bytes($n);
+  return ( ref $_[0] )->new_from_bytes($n);
 }
 
 =head2 expand
@@ -347,6 +421,49 @@ sub reverse {
     return $_[0]->{reverse} = join( '.', reverse @octets );
   }
   die 'logic error,';
+}
+
+=head2 getname([$error_cb])
+
+Returns the DNS name for the ip object or undef if there is no PTR RR.
+
+  say Net::IPAM::IP->new('2001:4860:4860::8888')->getname;   # dns.google.
+
+L</"getname"> calls the L<Socket> functions C<< getaddrinfo() >> and C<< getnameinfo() >> under the hood.
+
+With no error callback L</getname> just calls C<< warn() >> with underlying Socket errors.
+
+=head3 LIMITATION:
+
+Returns just one name even if the IP has more than one PTR RR. This is a limitation
+of Socket::getnameinfo. If you need all names for IPs with more than one PTR RR then you should
+use L<Net::DNS> or similar modules.
+
+=cut
+
+sub getname {
+  my $error_cb = $_[1] // sub { warn "@_" };
+
+  my ( $err, @res ) =
+    getaddrinfo( $_[0], '', { socktype => SOCK_RAW, flags => AI_NUMERICHOST, family => AF_UNSPEC } );
+
+  if ($err) {
+    $error_cb->( $err, "getaddrinfo($_[0])" );
+    return;
+  }
+
+  my $name;
+  ( $err, $name ) = getnameinfo( $res[0]->{addr}, NI_NAMEREQD, NIx_NOSERV );
+  if ($err) {
+
+    # no error, just no resolveable name
+    return if $err == EAI_NONAME;
+
+    $error_cb->( $err, "getnameinfo($_[0])" );
+    return;
+  }
+
+  return $name;
 }
 
 =head1 FUNCTIONS
@@ -421,37 +538,17 @@ sub _inet_ntop_v6_pp {
   my $n = shift // return;
   return if length($n) != 16;
 
-  # expand binary to hex, lower case, rule (1)
-  # 2001:0db8:85a3:0000:0000:8a2e:0370:7334
-  my $ip = join( ':', unpack( 'H4' x 8, $n ) );
+  # expand binary to hex, lower case, rule (1), leading zeroes squashed
+  # add : at left and right for symmetric squashing algo, see below
+  # :2001:db8:85a3:0:0:8a2e:370:7334:
+  my $ip = sprintf( ':%x:%x:%x:%x:%x:%x:%x:%x:', unpack( 'n8', $n ) );
 
-  # squash leading zeroes, rule (2)
-  # 2001:db8:85a3:0:0:8a2e:370:7334
-  $ip =~ s/\b 0{1,3}//gx;
+  # rule (3,4) # squash the longest sequence of consecutive all-zero fields
+  # e.g. :0:0: (?!not followed) :0\1
+  $ip =~ s/(:0[:0]+:) (?! .+ :0\1)/::/x;
 
-  # find all consecutive groups containing zeros
-  my $rx     = qr/(?:^|:) [0:]+ /x;
-  my @groups = $ip =~ m/$rx/g;
-
-  # find longest group (count zeros with tr///), rule (3)
-  # count zeros with tr///
-  my $max_str   = '';
-  my $max_zeros = 0;
-
-  foreach my $match (@groups) {
-    my $zeroes = $match =~ tr/0/0/;
-    if ( $zeroes > $max_zeros ) {
-      $max_zeros = $zeroes;
-      $max_str   = $match;
-    }
-  }
-
-  # the substitution may only be applied once in the address, rule (3,4)
-  # "::" is not used to shorten just a single 0 field
-  if ( $max_zeros >= 2 ) {
-    $ip =~ s/$max_str/::/;
-  }
-
+  $ip =~ s/^:// unless $ip =~ /^::/;    # trim additional left
+  $ip =~ s/:$// unless $ip =~ /::$/;    # trim additional right
   return $ip;
 }
 

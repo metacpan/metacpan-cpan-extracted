@@ -1,0 +1,170 @@
+NAME
+    Acme::CPANModules::GetoptModules - Modules that parse command-line
+    options
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::GetoptModules (from Perl distribution
+    Acme-CPANModules-GetoptModules), released on 2020-04-16.
+
+DESCRIPTION
+    Modules that parse command-line options.
+
+INCLUDED MODULES
+    *   Getopt::Std
+
+    *   Getopt::Long
+
+    *   Getopt::Tiny
+
+    *   Getopt::Long::Descriptive
+
+    *   Getopt::Long::More
+
+    *   Getopt::Simple
+
+    *   Getopt::Compact
+
+    *   Opt::Imistic
+
+    *   Getopt::Valid
+
+    *   Getopt::Std::Strict
+
+    *   Getopt::Declare
+
+    *   Getopt::Euclid
+
+    *   Docopt
+
+    *   Getopt::Auto
+
+    *   Getopt::Lucid
+
+    *   Getopt::ArgvFile
+
+    *   App::Options
+
+    *   MooseX::Getopt
+
+    *   MooX::Options
+
+    *   Getopt::Attribute
+
+    *   Getopt::Modular
+
+    *   Smart::Options
+
+    *   Getopt::ArgParse
+
+    *   Getopt::Kingpin
+
+    *   Getopt::Complete
+
+    *   Getopt::Long::Complete
+
+    *   Getopt::Long::Subcommand
+
+    *   Getopt::Long::Less
+
+    *   Getopt::Long::EvenLess
+
+FEATURE COMPARISON MATRIX
+     +---------------------------+---------------+------------------+----------------------+---------------+----------+----------------+
+     | module                    | auto_help *1) | auto_version *2) | uses_getopt_long *3) | uses_spec *4) | file *5) | subcommand *6) |
+     +---------------------------+---------------+------------------+----------------------+---------------+----------+----------------+
+     | Getopt::Std               | no *7)        | no *8)           | no                   | yes           | N/A      | N/A            |
+     | Getopt::Long              | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Tiny              | no            | no               | no                   | yes           | N/A      | N/A            |
+     | Getopt::Long::Descriptive | yes           | no               | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Long::More        | yes           | yes              | yes                  | yes           | no       | no             |
+     | Getopt::Simple            | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Compact           | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Opt::Imistic              | no            | no               | no                   | no            | N/A      | N/A            |
+     | Getopt::Valid             | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Std::Strict       | no            | no               | no                   | yes           | N/A      | N/A            |
+     | Getopt::Declare           | yes           | yes              | no                   | yes           | N/A      | N/A            |
+     | Getopt::Euclid            | yes           | yes              | no                   | yes           | N/A      | N/A            |
+     | Docopt                    | yes           | yes              | no                   | yes           | N/A      | N/A            |
+     | Getopt::Auto              | yes           | yes              | no                   | yes           | N/A      | N/A            |
+     | Getopt::Lucid             | no            | no               | no                   | yes           | N/A      | N/A            |
+     | Getopt::ArgvFile          | yes           | yes              | yes                  | yes           | yes      | N/A            |
+     | App::Options              | yes           | yes              | no                   | yes           | yes      | N/A            |
+     | MooseX::Getopt            | yes           | yes              | yes *9)              | yes           | no *10)  | N/A            |
+     | MooX::Options             | yes           | no               | yes *11)             | yes           | yes      | N/A            |
+     | Getopt::Attribute         | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Modular           | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Smart::Options            | yes           | no               | no                   | yes           | yes      | yes            |
+     | Getopt::ArgParse          | no            | no               | yes                  | yes           | N/A      | yes            |
+     | Getopt::Kingpin           | yes           | yes              | no                   | yes           | N/A      | yes            |
+     | Getopt::Complete          | no            | no               | no                   | yes           | N/A      | N/A            |
+     | Getopt::Long::Complete    | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Long::Subcommand  | yes           | yes              | yes                  | yes           | N/A      | yes            |
+     | Getopt::Long::Less        | no            | no               | no                   | yes           | N/A      | N/A            |
+     | Getopt::Long::EvenLess    | no            | no               | no                   | yes           | N/A      | N/A            |
+     +---------------------------+---------------+------------------+----------------------+---------------+----------+----------------+
+
+    Notes:
+
+    1. auto_help: Whether the module can generate automatic help message
+    (usually from spec) when user specifies something like --help
+    2. auto_version: Whether the module can generate automatic version
+    message when user specifies something like --version
+    3. uses_getopt_long: Whether module uses Getopt::Long (or is
+    Getopt::Long itself)
+    4. uses_spec: Whether user need to specify some sort of "spec" (list of
+    options and potentially more details)
+    5. file: Whether the module supports getting options from a file
+    6. subcommand: Whether the module supports subcommands
+    7. Only calls main::HELP_MESSAGE
+    8. Only calls main::VERSION_MESSAGE
+    9. Uses Getopt::Long::Descriptive
+    10. Needs separate module: MooseX::ConfigFromFile or
+    MooseX::SimpleConfig
+    11. Uses Getopt::Long::Descriptive
+
+FAQ
+  What are ways to use this module?
+    Aside from reading it, you can install all the listed modules using
+    cpanmodules:
+
+        % cpanmodules ls-entries GetoptModules | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=GetoptModules -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    This module also helps lcpan produce a more meaningful result for "lcpan
+    related-mods" when it comes to finding related modules for the modules
+    listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-GetoptModules>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-GetoptModules>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Geto
+    ptModules>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

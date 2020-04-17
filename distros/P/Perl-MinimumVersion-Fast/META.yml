@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.2, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,18 +26,20 @@ no_index:
 provides:
   Perl::MinimumVersion::Fast:
     file: lib/Perl/MinimumVersion/Fast.pm
-    version: '0.18'
+    version: '0.19'
 requires:
-  Compiler::Lexer: '0.17'
+  Compiler::Lexer: '0.23'
   perl: '5.008005'
 resources:
   bugtracker: https://github.com/tokuhirom/Perl-MinimumVersion-Fast/issues
   homepage: https://github.com/tokuhirom/Perl-MinimumVersion-Fast
   repository: git://github.com/tokuhirom/Perl-MinimumVersion-Fast.git
-version: '0.18'
+version: '0.19'
 x_contributors:
-  - 'Karen Etheridge <ether@cpan.org>'
   - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
+  - 'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>'
+  - 'Karen Etheridge <ether@cpan.org>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'
   - 'brian d foy <brian.d.foy@gmail.com>'
-  - 'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

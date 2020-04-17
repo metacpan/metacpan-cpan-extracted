@@ -11,9 +11,9 @@ lib/App/TouchpadUtils.pm
 script/disable-touchpad
 script/enable-touchpad
 script/has-touchpad
-script/touchoff
-script/touchon
 script/touchpad-is-enabled
+script/tpoff
+script/tpon
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

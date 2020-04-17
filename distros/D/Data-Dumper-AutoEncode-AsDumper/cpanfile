@@ -1,13 +1,17 @@
-requires "Data::Dumper::AutoEncode" => "0.3";
+requires "Data::Dumper" => "2.160";
+requires "Data::Dumper::AutoEncode" => "1.00";
 requires "Import::Into" => "1.002005";
-requires "perl" => "5.008001";
+requires "perl" => "5.008005";
+
+on 'build' => sub {
+  requires "Test::Pod::Coverage" => "0";
+};
 
 on 'test' => sub {
   requires "Encode" => "0";
-  requires "Role::Tiny" => "0";
+  requires "Moo" => "2.004";
   requires "Test::More" => "0";
   requires "Test::More::UTF8" => "0";
-  requires "Test::Pod::Coverage" => "0";
 };
 
 on 'configure' => sub {
@@ -20,7 +24,6 @@ on 'develop' => sub {
   requires "Dist::Zilla::Plugin::CPANFile" => "0";
   requires "Dist::Zilla::Plugin::CheckChangesHasContent" => "0";
   requires "Dist::Zilla::Plugin::ConfirmRelease" => "0";
-  requires "Dist::Zilla::Plugin::FakeRelease" => "0";
   requires "Dist::Zilla::Plugin::GatherDir" => "0";
   requires "Dist::Zilla::Plugin::Git::Check" => "0";
   requires "Dist::Zilla::Plugin::Git::Commit" => "0";

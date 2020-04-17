@@ -1,5 +1,10 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
+0.065 2020-04-16
+
+  - koha-auth load_from_file: create indicators different from blank (space)
+    if specified in ind1/ind2 parameters
+
 0.064 2020-03-24
 
   - ElasticSearch

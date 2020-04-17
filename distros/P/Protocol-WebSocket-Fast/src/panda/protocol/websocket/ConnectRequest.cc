@@ -77,13 +77,13 @@ void ConnectRequest::add_deflate(const DeflateExt::Config& cfg) {
 
 string ConnectRequest::to_string() {
     if (!uri || !uri->host()) {
-        throw std::logic_error("HTTPRequest[to_string] uri with net location must be defined");
+        throw Error("HTTPRequest[to_string] uri with net location must be defined");
     }
     if (uri && uri->scheme() && uri->scheme() != "ws" && uri->scheme() != "wss") {
-        throw std::logic_error("ConnectRequest[to_string] uri scheme must be 'ws' or 'wss'");
+        throw Error("ConnectRequest[to_string] uri scheme must be 'ws' or 'wss'");
     }
     if (body.length()) {
-        throw std::logic_error("ConnectRequest[to_string] http body is not allowed for websocket handshake request");
+        throw Error("ConnectRequest[to_string] http body is not allowed for websocket handshake request");
     }
 
     method = Request::Method::GET;

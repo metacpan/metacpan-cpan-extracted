@@ -8,7 +8,7 @@ use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::MemoryType;
 
 # ABSTRACT: Wasmtime memory class
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 $ffi_prefix = 'wasm_memory_';
@@ -24,7 +24,6 @@ $ffi->attach( new => ['wasm_store_t', 'wasm_memorytype_t'] => 'wasm_memory_t' =>
   {
     my($store, $memorytype) = @_;
     $ptr = $xsub->($store->{ptr}, $memorytype->{ptr});
-    $owner = [$store, $memorytype];
   }
   else
   {
@@ -97,7 +96,7 @@ Wasm::Wasmtime::Memory - Wasmtime memory class
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# This code may take most of forever to generate a diagram that is too big. YMMV
+
+# See the eg/analyze program for option documentation.
+
+use File::Find::Rule;
+use Getopt::Long;
+use GraphViz2;
+use Text::TFIDF::Ngram;
+
+my %opts = (
+    dir  => undef,
+    stop => 1,
+    type => 'txt',
+    punc => '[-!"#$%&()*+,.\/\\:;<=>?@\[\]^_`{|}~]',
+    lc   => 0,
+);
+GetOptions(
+    \%opts,
+    'dir=s@',
+    'stop=i',
+    'type=s',
+    'punc=s',
+    'lc',
+) or die "Can't GetOptions";
+
+my @files;
+for my $dir (@{ $opts{dir} }) {
+    push @files, File::Find::Rule->file()->name('*.' . $opts{type})->in($dir);
+}
+
+my $t = Text::TFIDF::Ngram->new(
+    files       => \@files,
+    size        => 2, # This code diagrams bi-grams
+    stopwords   => $opts{stop},
+    punctuation => $opts{punc} ? qr/$opts{punc}/ : '',
+    lowercase   => $opts{lc},
+);
+
+my $by_file = $t->tfidf_by_file;
+
+my $counter = 0;
+
+for my $file (sort keys %$by_file) {
+    printf "%d. %s\n", ++$counter, $file;
+
+    my %score;
+    my %words;
+
+    my $n = 0;
+
+    for my $phrase (sort { $by_file->{$file}{$b} <=> $by_file->{$file}{$a} } keys %{ $by_file->{$file} }) {
+        next if $phrase =~ /[A-Z]/; # Skip proper nouns and friends
+
+        printf "\t%d. %s = %.10f\n", ++$n, $phrase, $by_file->{$file}{$phrase};
+
+        my ($head, $tail) = split / /, $phrase;
+        $score{ $head . ' ' . $tail }++;
+        $words{$head}++;
+        $words{$tail}++;
+    }
+
+    my $gv = GraphViz2->new(
+        global => { directed => 1 },
+        node   => { shape => 'oval' },
+        edge   => { color => 'grey' },
+    );
+
+    my %edges;
+
+    for my $bigram (keys %score) {
+        my ($i, $j) = split / /, $bigram;
+
+        next if $words{$i} < 2 && $words{$j} < 2;
+
+        $gv->add_edge(from => $i, to => $j, label => $score{$bigram})
+            unless $edges{$bigram}++;
+    }
+
+    $gv->run(format => 'png', output_file => "$0-$counter.png");
+}

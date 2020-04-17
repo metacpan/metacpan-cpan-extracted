@@ -17,6 +17,7 @@ meta-spec:
   version: '1.4'
 name: Pod-Weaver-Plugin-Sah-Schemas
 requires:
+  Data::Dmp: '0.21'
   Markdown::To::POD: '0'
   Module::List: '0'
   Moose: '0'
@@ -29,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Sah-Schemas
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Sah-Schemas
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Sah-Schemas.git
-version: '0.05'
+version: '0.061'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -148,11 +149,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -288,7 +289,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.081'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -302,7 +303,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

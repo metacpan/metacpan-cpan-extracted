@@ -1,7 +1,7 @@
 package Sah::SchemaR::homs;
 
 our $DATE = '2020-03-02'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $rschema = ["hash",[{description=>"\n",examples=>[{data=>"a",valid=>0},{data=>[],valid=>0},{data=>{},valid=>1},{data=>{k=>"a"},valid=>1},{data=>{k=>undef},valid=>1},{data=>{k=>"a",k2=>[]},valid=>0},{data=>{k=>"a",k2=>{}},valid=>0}],of=>["str",{},{}],summary=>"Hash of maybe-strings"}],["hash"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::homs - Hash of maybe-strings
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::homs (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
+This document describes version 0.004 of Sah::SchemaR::homs (from Perl distribution Sah-Schemas-Collection), released on 2020-03-02.
 
 =head1 DESCRIPTION
 

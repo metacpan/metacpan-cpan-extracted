@@ -1,32 +1,37 @@
-0.051   2019-02-04 (PERLANCAR)
+0.052   2020-02-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow multiline code with #BEGIN_CODE .. #END_CODE syntax.
+
+
+0.051   2019-02-04  Released-By: PERLANCAR
 
 	- [ux] Log result of code using log_debug() instead of log().
 
 
-0.050   2018-04-06 (PERLANCAR)
+0.050   2018-04-06  Released-By: PERLANCAR
 
 	- Log result of code for debugging.
 
 
-0.04    2015-05-05 (PERLANCAR)
+0.04    2015-05-05  Released-By: PERLANCAR
 
 	- Add make_verbatim option, like in DZP:InsertCommandOutput.
 
 
-0.03    2014-12-01 (PERLANCAR)
+0.03    2014-12-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Derp, forgot to write code in example.
 
 
-0.02    2014-12-01 (PERLANCAR)
+0.02    2014-12-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Forgot to update POD about what happens when eval fails.
 
 
-0.01     2014-12-01 (PERLANCAR)
+0.01     2014-12-01  Released-By: PERLANCAR
 
          - First release.

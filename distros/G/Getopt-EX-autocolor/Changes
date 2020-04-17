@@ -1,5 +1,19 @@
 Revision history for Perl extension Getopt-EX-autocolor
 
+0.04 2020-04-15T10:43:41Z
+
+    - Fix bug in rgb_to_brightness().
+    - Make iTerm.pm to work.
+
+0.03 2020-04-15T09:32:32Z
+
+    - Remove wrong dependency to App::Greple.
+
+0.02 2020-04-15T09:14:13Z
+
+    - Improve customizability.
+    - Require Getopt::EX v1.16.0 to use &finalize function.
+
 0.01 2020-04-13T07:57:22Z
 
     - original version

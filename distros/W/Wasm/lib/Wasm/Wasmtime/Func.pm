@@ -6,7 +6,7 @@ use Ref::Util qw( is_ref is_plain_arrayref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::FuncType;
 use Wasm::Wasmtime::Trap;
-use Convert::Binary::C;
+use Wasm::Wasmtime::CBC qw( perl_to_wasm wasm_allocate wasm_to_perl wasm_type wasm_memcpy );
 use Sub::Install;
 use Carp ();
 use overload
@@ -16,35 +16,14 @@ use overload
   ;
 
 # ABSTRACT: Wasmtime function class
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 $ffi_prefix = 'wasm_func_';
 $ffi->type('opaque' => 'wasm_func_t');
 
-# CBC is probably not how we want to do this long term, but atm
-# Platypus does not support Unions or arrays of records so.
-my $cbc = Convert::Binary::C->new(
-  Alignment => 8,
-  LongSize => 8, # CBC does not apparently use the native alignment by default *sigh*
-);
-$cbc->parse(<<'END');
-typedef struct wasm_val_t {
-  unsigned char kind;
-  union {
-    signed int i32;
-    signed long i64;
-    float f32;
-    double f64;
-    void *anyref;
-    void *funcref;
-  } of;
-} wasm_val_t;
-typedef wasm_val_t wasm_val_vec_t[];
-END
 
-
-$ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', '(opaque,opaque)->opaque'] => 'wasm_func_t' => sub {
+$ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', 'opaque'] => 'wasm_func_t' => sub {
   my $xsub = shift;
   my $class = shift;
   my($ptr, $owner, $wrapper, $store);
@@ -55,18 +34,13 @@ $ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', '(opaque,opaque)->opaqu
        ? (Wasm::Wasmtime::FuncType->new($_[0], $_[1]), $_[2])
        : @_;
 
-    my @param_types = map { $_->kind } $functype->params;
-    my $param_string = "record(@{[ $cbc->sizeof('wasm_val_t') * scalar(@param_types) ]})*";
-    my @result_types = map { [ $_->kind, $_->kind_num ] } $functype->results;
-    my $result_string = "string(@{[ $cbc->sizeof('wasm_val_t') * scalar(@result_types) ]})*";
+    my $param_arity  = scalar $functype->params;
+    my $result_arity = scalar$functype->results;
 
     $wrapper = $ffi->closure(sub {
       my($params, $results) = @_;
 
-      my @args = @param_types > 0 ? (do {
-        my @copy = @param_types;
-        map { $_->{of}->{shift @copy} } @{ $cbc->unpack('wasm_val_vec_t', $ffi->cast('opaque' => $param_string, $params)) };
-      }) : ();
+      my @args = $param_arity ? wasm_to_perl($params) : ();
 
       local $@ = '';
       my @ret = eval {
@@ -79,24 +53,13 @@ $ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', '(opaque,opaque)->opaqu
       }
       else
       {
-        if(@result_types > 0)
-        {
-          my @ret2 = map {
-            {
-              kind => $_->[1],
-              of => {
-                $_->[0] => shift @ret,
-              }
-            }
-          } @result_types;
-          my $packed = $cbc->pack('wasm_val_vec_t', \@ret2);
-          my $ffi = FFI::Platypus->new( api => 1, lib => [undef] );
-          $ffi->function( memcpy => ['opaque','string','size_t'] => 'opaque' )->call($results, $packed, length($packed));
-        }
+        wasm_memcpy($results, perl_to_wasm(\@ret, [$functype->results])) if $result_arity;
         return undef;
       }
     });
-    $ptr = $xsub->($store->{ptr}, $functype->{ptr}, $wrapper);
+    my $wasm_type = wasm_type($param_arity);
+    my $fptr = $ffi->cast("($wasm_type,opaque)->opaque", => 'opaque', $wrapper);
+    $ptr = $xsub->($store->{ptr}, $functype->{ptr}, $fptr);
   }
   else
   {
@@ -114,30 +77,19 @@ $ffi->attach( new => ['wasm_store_t', 'wasm_functype_t', '(opaque,opaque)->opaqu
 $ffi->attach( call => ['wasm_func_t', 'string', 'string'] => 'wasm_trap_t' => sub {
   my $xsub = shift;
   my $self = shift;
-  my @args = @_;
-  my $args = $cbc->pack('wasm_val_vec_t', [map {
-    my $valtype = $_;
-    {
-      kind => $valtype->kind_num,
-      of => {
-        $valtype->kind => shift @args,
-      },
-    }
-  } $self->type->params]);
-  my $results = $cbc->pack('wasm_val_vec_t', [map { { } } $self->type->results]);
+  my $args = perl_to_wasm(\@_, [$self->type->params]);
+  my $results = wasm_allocate( $self->result_arity );
+
   my $trap = $xsub->($self->{ptr}, $args, $results);
+
   if($trap)
   {
     $trap = Wasm::Wasmtime::Trap->new($trap);
     my $message = $trap->message;
     Carp::croak("trap in wasm function call: $message");
   }
-  my @valtypes = $self->type->results;
-  return unless @valtypes;
-  my @results = map {
-    my $valtype = shift @valtypes;
-    $_->{of}->{$valtype->kind};
-  } @{ $cbc->unpack('wasm_val_vec_t', $results) };
+  return unless defined $results;
+  my @results = wasm_to_perl($results);
   wantarray ? @results : $results[0]; ## no critic (Freenode::Wantarray)
 });
 
@@ -201,7 +153,7 @@ Wasm::Wasmtime::Func - Wasmtime function class
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

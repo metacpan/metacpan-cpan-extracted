@@ -1,20 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::SegmentDisplay;
+use 5.026;  # signatures
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use 5.010; # //
-use base qw( Tickit::Widget );
+class Tickit::Widget::SegmentDisplay 0.06
+   extends Tickit::Widget;
+
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE LINE_THICK );
 
 use utf8;
-
-our $VERSION = '0.05';
 
 use Carp;
 
@@ -156,12 +154,19 @@ my %types = (
    symb     => [],
 );
 
-sub new
-{
-   my $class = shift;
-   my %args = @_;
-   my $self = $class->SUPER::new( %args );
+has $_reshape_method;
+has $_render_to_rb;
 
+has $_use_halfline;
+has $_linestyle;
+has $_hthickness;
+has $_vthickness;
+has $_margin;
+
+has $_value;
+
+method BUILD ( %args )
+{
    my $type = $args{type} // "seven";
    my $method;
    foreach my $typename ( keys %types ) {
@@ -170,16 +175,16 @@ sub new
    }
    defined $method or croak "Unrecognised type name '$type'";
 
-   $self->{reshape_method} = $self->can( "reshape_${method}" );
+   $_reshape_method = $self->can( "reshape_${method}" );
 
    my $use_halfline = $args{use_halfline};
-   $self->{use_halfline} = $use_halfline;
+   $_use_halfline = $use_halfline;
 
    my $use_linedraw = $args{use_linedraw};
 
    if( $use_linedraw and my $code = $self->can( "render_${method}_as_linedraw" ) ) {
-      $self->{linestyle} = ( $args{thickness} // 1 ) > 1 ? LINE_THICK : LINE_SINGLE;
-      $self->{render_to_rb} = $code;
+      $_linestyle = ( $args{thickness} // 1 ) > 1 ? LINE_THICK : LINE_SINGLE;
+      $_render_to_rb = $code;
    }
    else {
       my $render = $self->can( "render_${method}" );
@@ -191,7 +196,7 @@ sub new
          $use_unicode  ? "flush_unicode"  :
                          "flush" );
 
-      $self->{render_to_rb} = sub {
+      $_render_to_rb = sub {
          my $self = shift;
          my ( $rb, $rect ) = @_;
          my @buff;
@@ -205,33 +210,31 @@ sub new
       };
    }
 
-   $self->{hthickness} = $args{thickness} // 2;
+   $_hthickness = $args{thickness} // 2;
 
-   $self->{vthickness} = $self->{hthickness};
-   $self->{vthickness} /= 2 unless $self->{use_halfline};
+   $_vthickness = $_hthickness;
+   $_vthickness /= 2 unless $_use_halfline;
 
    if( $use_linedraw ) {
-      $self->{hthickness} = 1;
-      $self->{vthickness} = 1;
+      $_hthickness = 1;
+      $_vthickness = 1;
    }
 
-   $self->{margin} = $use_linedraw ? 0 : 1;
+   $_margin = $use_linedraw ? 0 : 1;
 
-   $self->{value} = $args{value} // "";
+   $_value = $args{value} // "";
 
    $self->on_style_changed_values(
       lit   => [ undef, $self->get_style_values( "lit" ) ],
       unlit => [ undef, $self->get_style_values( "unlit" ) ],
    );
-
-   return $self;
 }
 
 # ADG + atleast 1 line each for FB and EC
-sub lines { 3 + 2 }
+method lines () { 3 + 2 }
 
 # FE, BC + atleast 2 columns for AGD
-sub cols  { 4 + 2 }
+method cols  () { 4 + 2 }
 
 =head1 ACCESSORS
 
@@ -247,36 +250,30 @@ Return or set the character on display
 
 =cut
 
-sub value
-{
-   my $self = shift;
-   return $self->{value};
-}
+method value () { $_value }
 
-sub set_value
+method set_value ( $new_value )
 {
-   my $self = shift;
-   ( $self->{value} ) = @_;
+   $_value = $new_value;
    $self->redraw;
 }
 
-sub on_style_changed_values
-{
-   my $self = shift;
-   my %values = @_;
+has $_lit_pen;
+has $_unlit_pen;
 
-   $self->{lit_pen}   = Tickit::Pen::Immutable->new( fg => $values{lit}[1]   ) if $values{lit};
-   $self->{unlit_pen} = Tickit::Pen::Immutable->new( fg => $values{unlit}[1] ) if $values{unlit};
+method on_style_changed_values ( %values )
+{
+   $_lit_pen   = Tickit::Pen::Immutable->new( fg => $values{lit}[1]   ) if $values{lit};
+   $_unlit_pen = Tickit::Pen::Immutable->new( fg => $values{unlit}[1] ) if $values{unlit};
 }
 
-sub reshape
+method reshape ()
 {
-   my $self = shift;
    my $win = $self->window or return;
 
-   my $linescale = 1 + !!$self->{use_halfline};
+   my $linescale = 1 + !!$_use_halfline;
 
-   $self->{reshape_method}->( $self, $win->lines * $linescale, $win->cols, 0, 0 );
+   $_reshape_method->( $self, $win->lines * $linescale, $win->cols, 0, 0 );
 }
 
 use constant {
@@ -284,19 +281,15 @@ use constant {
    UNLIT => 0x02,
 };
 
-sub render_to_rb
+method render_to_rb ( $rb, $rect )
 {
-   my $self = shift;
-   $self->{render_to_rb}->( $self, @_ );
+   $_render_to_rb->( $self, $rb, $rect );
 }
 
-sub flush
+method flush ( $buff, $rb, $rect )
 {
-   my $self = shift;
-   my ( $buff, $rb, $rect ) = @_;
-
-   my $lit_pen   = Tickit::Pen::Immutable->new( bg => $self->{lit_pen}->getattr( "fg" ) );
-   my $unlit_pen = Tickit::Pen::Immutable->new( bg => $self->{unlit_pen}->getattr( "fg" ) );
+   my $lit_pen   = Tickit::Pen::Immutable->new( bg => $_lit_pen->getattr( "fg" ) );
+   my $unlit_pen = Tickit::Pen::Immutable->new( bg => $_unlit_pen->getattr( "fg" ) );
 
    foreach my $line ( $rect->linerange ) {
       next unless defined( my $cells = $buff->[$line] );
@@ -314,35 +307,23 @@ use constant {
    U_LOWER => 0x2584,
 };
 
-sub flush_unicode
+method flush_unicode ( $buff, $rb, $rect )
 {
-   my $self = shift;
-   my ( $buff, $rb, $rect ) = @_;
-
-   my $lit_pen   = $self->{lit_pen};
-   my $unlit_pen = $self->{unlit_pen};
-
    foreach my $line ( $rect->linerange ) {
       next unless defined( my $cells = $buff->[$line] );
       foreach my $col ( $rect->left .. $rect->right - 1 ) {
          my $val = vec( $cells, $col, 2 ) or next;
-         $rb->setpen( $val == LIT ? $lit_pen : $unlit_pen );
+         $rb->setpen( $val == LIT ? $_lit_pen : $_unlit_pen );
          $rb->char_at( $line, $col, U_FULL );
       }
    }
 }
 
-sub flush_halfline
+method flush_halfline ( $buff, $rb, $rect )
 {
-   my $self = shift;
-   my ( $buff, $rb, $rect ) = @_;
-
-   my $lit_pen   = $self->{lit_pen};
-   my $unlit_pen = $self->{unlit_pen};
-
    my $both_pen = Tickit::Pen::Immutable->new(
-      fg => $lit_pen->getattr( 'fg' ),
-      bg => $unlit_pen->getattr( 'fg' ),
+      fg => $_lit_pen->getattr( 'fg' ),
+      bg => $_unlit_pen->getattr( 'fg' ),
    );
 
    foreach my $phyline ( $rect->linerange ) {
@@ -361,11 +342,11 @@ sub flush_halfline
          $hival or $loval or next;
 
          if( $hival == $loval ) {
-            $rb->setpen( ( $hival || $loval ) == LIT ? $lit_pen : $unlit_pen );
+            $rb->setpen( ( $hival || $loval ) == LIT ? $_lit_pen : $_unlit_pen );
             $rb->char_at( $phyline, $col, U_FULL );
          }
          elsif( !$hival or !$loval ) {
-            $rb->setpen( ( $hival || $loval ) == LIT ? $lit_pen : $unlit_pen );
+            $rb->setpen( ( $hival || $loval ) == LIT ? $_lit_pen : $_unlit_pen );
             $rb->char_at( $phyline, $col, $hival ? U_UPPER : U_LOWER );
          }
          else {
@@ -377,191 +358,149 @@ sub flush_halfline
    }
 }
 
-sub _fill
+method _fill ( $buff, $startline, $endline, $startcol, $endcol, $val = LIT )
 {
-   my $self = shift;
-   my ( $buff, $startline, $endline, $startcol, $endcol, $val ) = @_;
-   $val //= LIT;
+   my @colrange = ( $startcol .. $endcol + $_hthickness - 1 );
 
-   my @colrange = ( $startcol .. $endcol + $self->{hthickness} - 1 );
-
-   my @linerange = ( $startline .. $endline + $self->{vthickness} - 1 );
+   my @linerange = ( $startline .. $endline + $_vthickness - 1 );
 
    foreach my $line ( @linerange ) {
       vec( $buff->[$line], $_, 2 ) = $val for @colrange;
    }
 }
 
-sub _dot
+method _dot ( $buff, $line, $col, $val = LIT )
 {
-   my $self = shift;
-   my ( $buff, $line, $col, $val ) = @_;
    $self->_fill( $buff, $line, $line, $col, $col, $val );
 }
+
+has %_geom;
 
 # 7-Segment
 my %segments = (
    ' ' => "       ",
-   0 => "ABCDEF ",
-   1 => " BC    ",
-   2 => "AB DE G",
-   3 => "ABCD  G",
-   4 => " BC  FG",
-   5 => "A CD FG",
-   6 => "A CDEFG",
-   7 => "ABC    ",
-   8 => "ABCDEFG",
-   9 => "ABCD FG",
+   '-' => "      G",
+   0   => "ABCDEF ",
+   1   => " BC    ",
+   2   => "AB DE G",
+   3   => "ABCD  G",
+   4   => " BC  FG",
+   5   => "A CD FG",
+   6   => "A CDEFG",
+   7   => "ABC    ",
+   8   => "ABCDEFG",
+   9   => "ABCD FG",
 );
 
-sub _val_for_seg
+method _val_for_seg ( $segment )
 {
-   my $self = shift;
-   my ( $segment ) = @_;
-
-   my $segments = $segments{$self->value} or return UNLIT;
+   my $segments = $segments{substr $self->value, 0, 1} or return UNLIT;
 
    my $lit = substr( $segments, ord($segment) - ord("A"), 1 ) ne " ";
    return $lit ? LIT : UNLIT;
 }
 
-sub reshape_seven
+method reshape_seven ( $lines, $cols, $top, $left )
 {
-   my $self = shift;
-   my ( $lines, $cols, $top, $left ) = @_;
+   my $margin = $_margin;
 
-   my $margin = $self->{margin};
-
-   my $hthickness = $self->{hthickness};
+   my $hthickness = $_hthickness;
 
    my $right = $left + $cols - $hthickness;
 
-   $self->{FE_col}       = $left;
-   $self->{AGD_startcol} = $left + $hthickness * $margin;
-   $self->{AGD_endcol}   = $right - $hthickness * $margin;
-   $self->{BC_col}       = $right;
+   $_geom{FE_col}       = $left;
+   $_geom{AGD_startcol} = $left + $hthickness * $margin;
+   $_geom{AGD_endcol}   = $right - $hthickness * $margin;
+   $_geom{BC_col}       = $right;
 
-   my $vthickness = $self->{vthickness};
+   my $vthickness = $_vthickness;
 
    my $bottom = $top + $lines - $vthickness;
    my $mid    = int( ( $top + $bottom ) / 2 );
 
-   $self->{A_line}       = $top;
-   $self->{BF_startline} = $top + $vthickness * $margin;
-   $self->{BF_endline}   = $mid - $vthickness * $margin;
-   $self->{G_line}       = $mid;
-   $self->{CE_startline} = $mid + $vthickness * $margin;
-   $self->{CE_endline}   = $bottom - $vthickness * $margin;
-   $self->{D_line}       = $bottom;
+   $_geom{A_line}       = $top;
+   $_geom{BF_startline} = $top + $vthickness * $margin;
+   $_geom{BF_endline}   = $mid - $vthickness * $margin;
+   $_geom{G_line}       = $mid;
+   $_geom{CE_startline} = $mid + $vthickness * $margin;
+   $_geom{CE_endline}   = $bottom - $vthickness * $margin;
+   $_geom{D_line}       = $bottom;
 }
 
-sub render_seven
+method render_seven ( $buff )
 {
-   my $self = shift;
-   my ( $buff ) = @_;
+   $self->_fill( $buff, ( $_geom{A_line} ) x 2, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $self->_val_for_seg( "A" ) );
+   $self->_fill( $buff, ( $_geom{G_line} ) x 2, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $self->_val_for_seg( "G" ) );
+   $self->_fill( $buff, ( $_geom{D_line} ) x 2, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $self->_val_for_seg( "D" ) );
 
-   $self->_fill( $buff, ( $self->{A_line} ) x 2, $self->{AGD_startcol}, $self->{AGD_endcol}, $self->_val_for_seg( "A" ) );
-   $self->_fill( $buff, ( $self->{G_line} ) x 2, $self->{AGD_startcol}, $self->{AGD_endcol}, $self->_val_for_seg( "G" ) );
-   $self->_fill( $buff, ( $self->{D_line} ) x 2, $self->{AGD_startcol}, $self->{AGD_endcol}, $self->_val_for_seg( "D" ) );
-
-   $self->_fill( $buff, $self->{BF_startline}, $self->{BF_endline}, ( $self->{FE_col} ) x 2, $self->_val_for_seg( "F" ) );
-   $self->_fill( $buff, $self->{BF_startline}, $self->{BF_endline}, ( $self->{BC_col} ) x 2, $self->_val_for_seg( "B" ) );
-   $self->_fill( $buff, $self->{CE_startline}, $self->{CE_endline}, ( $self->{FE_col} ) x 2, $self->_val_for_seg( "E" ) );
-   $self->_fill( $buff, $self->{CE_startline}, $self->{CE_endline}, ( $self->{BC_col} ) x 2, $self->_val_for_seg( "C" ) );
+   $self->_fill( $buff, $_geom{BF_startline}, $_geom{BF_endline}, ( $_geom{FE_col} ) x 2, $self->_val_for_seg( "F" ) );
+   $self->_fill( $buff, $_geom{BF_startline}, $_geom{BF_endline}, ( $_geom{BC_col} ) x 2, $self->_val_for_seg( "B" ) );
+   $self->_fill( $buff, $_geom{CE_startline}, $_geom{CE_endline}, ( $_geom{FE_col} ) x 2, $self->_val_for_seg( "E" ) );
+   $self->_fill( $buff, $_geom{CE_startline}, $_geom{CE_endline}, ( $_geom{BC_col} ) x 2, $self->_val_for_seg( "C" ) );
 }
 
-sub render_seven_as_linedraw
+method render_seven_as_linedraw ( $rb, $rect )
 {
-   my $self = shift;
-   my ( $rb, $rect ) = @_;
-
    $rb->eraserect( $rect );
 
-   $rb->setpen( $self->{lit_pen} );
+   $rb->setpen( $_lit_pen );
 
-   my $linestyle = $self->{linestyle};
+   $rb->hline_at( $_geom{A_line}, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $_linestyle ) if $self->_val_for_seg( "A" ) == LIT;
+   $rb->hline_at( $_geom{G_line}, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $_linestyle ) if $self->_val_for_seg( "G" ) == LIT;
+   $rb->hline_at( $_geom{D_line}, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $_linestyle ) if $self->_val_for_seg( "D" ) == LIT;
 
-   $rb->hline_at( $self->{A_line}, $self->{AGD_startcol}, $self->{AGD_endcol}, $linestyle ) if $self->_val_for_seg( "A" ) == LIT;
-   $rb->hline_at( $self->{G_line}, $self->{AGD_startcol}, $self->{AGD_endcol}, $linestyle ) if $self->_val_for_seg( "G" ) == LIT;
-   $rb->hline_at( $self->{D_line}, $self->{AGD_startcol}, $self->{AGD_endcol}, $linestyle ) if $self->_val_for_seg( "D" ) == LIT;
-
-   $rb->vline_at( $self->{BF_startline}, $self->{BF_endline}, $self->{FE_col}, $linestyle ) if $self->_val_for_seg( "F" ) == LIT;
-   $rb->vline_at( $self->{BF_startline}, $self->{BF_endline}, $self->{BC_col}, $linestyle ) if $self->_val_for_seg( "B" ) == LIT;
-   $rb->vline_at( $self->{CE_startline}, $self->{CE_endline}, $self->{FE_col}, $linestyle ) if $self->_val_for_seg( "E" ) == LIT;
-   $rb->vline_at( $self->{CE_startline}, $self->{CE_endline}, $self->{BC_col}, $linestyle ) if $self->_val_for_seg( "C" ) == LIT;
+   $rb->vline_at( $_geom{BF_startline}, $_geom{BF_endline}, $_geom{FE_col}, $_linestyle ) if $self->_val_for_seg( "F" ) == LIT;
+   $rb->vline_at( $_geom{BF_startline}, $_geom{BF_endline}, $_geom{BC_col}, $_linestyle ) if $self->_val_for_seg( "B" ) == LIT;
+   $rb->vline_at( $_geom{CE_startline}, $_geom{CE_endline}, $_geom{FE_col}, $_linestyle ) if $self->_val_for_seg( "E" ) == LIT;
+   $rb->vline_at( $_geom{CE_startline}, $_geom{CE_endline}, $_geom{BC_col}, $_linestyle ) if $self->_val_for_seg( "C" ) == LIT;
 }
 
 # 7-Segment with DP
-sub reshape_seven_dp
+method reshape_seven_dp ( $lines, $cols, $top, $left )
 {
-   my $self = shift;
-   my ( $lines, $cols, $top, $left ) = @_;
-
    $self->reshape_seven( $lines, $cols - 2, $top, $left );
 
-   $self->{DP_line} = $top  + $lines - 1;
-   $self->{DP_col}  = $left + $cols  - 2;
+   $_geom{DP_line} = $top  + $lines - 1;
+   $_geom{DP_col}  = $left + $cols  - 2;
 }
 
-sub render_seven_dp
+method render_seven_dp ( $buff )
 {
-   my $self = shift;
-   my ( $buff ) = @_;
-
-   my $value = $self->{value};
-   my $dp;
-   local $self->{value};
-
-   if( $value =~ m/^(\d?)(\.?)/ ) {
-      $self->{value} = $1;
-      $dp = length $2;
-   }
-   else {
-      $self->{value} = $value;
-   }
-
    $self->render_seven( $buff );
 
-   $self->_dot( $buff, $self->{DP_line}, $self->{DP_col}, $dp ? LIT : UNLIT );
+   my $dp = $_value =~ m/\.$/;
+   $self->_dot( $buff, $_geom{DP_line}, $_geom{DP_col}, $dp ? LIT : UNLIT );
 }
 
 # Static double-dot colon
-sub reshape_colon
+method reshape_colon ( $lines, $cols, $top, $left )
 {
-   my $self = shift;
-   my ( $lines, $cols, $top, $left ) = @_;
    my $bottom = $top + $lines - 1;
 
-   $self->{colon_col} = 2 + int( ( $cols - 4 ) / 2 );
+   $_geom{colon_col} = 2 + int( ( $cols - 4 ) / 2 );
 
    my $ofs = int( ( $lines - 1 + 0.5 ) / 4 );
 
-   $self->{A_line} = $top    + $ofs;
-   $self->{B_line} = $bottom - $ofs;
+   $_geom{A_line} = $top    + $ofs;
+   $_geom{B_line} = $bottom - $ofs;
 }
 
-sub render_colon
+method render_colon ( $buff )
 {
-   my $self = shift;
-   my ( $buff ) = @_;
-
-   my $col = $self->{colon_col};
-   $self->_dot( $buff, $self->{A_line}, $col );
-   $self->_dot( $buff, $self->{B_line}, $col );
+   my $col = $_geom{colon_col};
+   $self->_dot( $buff, $_geom{A_line}, $col );
+   $self->_dot( $buff, $_geom{B_line}, $col );
 }
 
-sub render_colon_as_linedraw
+method render_colon_as_linedraw ( $rb, $rect )
 {
-   my $self = shift;
-   my ( $rb, $rect ) = @_;
-
    $rb->eraserect( $rect );
 
-   $rb->setpen( $self->{lit_pen} );
+   $rb->setpen( $_lit_pen );
 
    # U+2022 BULLET
-   $rb->char_at( $self->{A_line}, $self->{colon_col}, 0x2022 );
-   $rb->char_at( $self->{B_line}, $self->{colon_col}, 0x2022 );
+   $rb->char_at( $_geom{A_line}, $_geom{colon_col}, 0x2022 );
+   $rb->char_at( $_geom{B_line}, $_geom{colon_col}, 0x2022 );
 }
 
 # Symbol drawing
@@ -595,38 +534,29 @@ my %symbol_strokes = do {
    '%' => [ [qw( 10,10 10,30 30,30 30,10 10,10 )], [qw( 20,100 80,00 )], [qw( 70,70 70,90 90,90 90,70 70,70 )] ],
 };
 
-sub reshape_symb
+method reshape_symb ( $lines, $cols, $top, $left )
 {
-   my $self = shift;
-   my ( $lines, $cols, $top, $left ) = @_;
+   $_geom{mid_line} = int( ( $lines - 1 ) / 2 );
+   $_geom{mid_col}  = int( ( $cols  - 2 ) / 2 );
 
-   $self->{mid_line} = int( ( $lines - 1 ) / 2 );
-   $self->{mid_col}  = int( ( $cols  - 2 ) / 2 );
-
-   $self->{Y_to_line} = ( $lines - 1 ) / 100;
-   $self->{X_to_col}  = ( $cols  - 2 ) / 100;
+   $_geom{Y_to_line} = ( $lines - 1 ) / 100;
+   $_geom{X_to_col}  = ( $cols  - 2 ) / 100;
 }
 
-sub _roundpos
+method _roundpos ( $l, $c )
 {
-   my $self = shift;
-   my ( $l, $c ) = @_;
-
    # Round away from the centre of the widget
    return
-      int($l) + ( $l > int($l) && $l > $self->{mid_line} ),
-      int($c) + ( $c > int($c) && $c > $self->{mid_col}  );
+      int($l) + ( $l > int($l) && $l > $_geom{mid_line} ),
+      int($c) + ( $c > int($c) && $c > $_geom{mid_col}  );
 }
 
-sub render_symb
+method render_symb ( $buff )
 {
-   my $self = shift;
-   my ( $buff ) = @_;
-
    my $strokes = $symbol_strokes{$self->value} or return;
 
-   my $Y_to_line = $self->{Y_to_line};
-   my $X_to_col  = $self->{X_to_col};
+   my $Y_to_line = $_geom{Y_to_line};
+   my $X_to_col  = $_geom{X_to_col};
 
    foreach my $stroke ( @$strokes ) {
       my ( $start, @points ) = @$stroke;

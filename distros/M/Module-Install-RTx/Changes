@@ -1,3 +1,6 @@
+0.41 2020-04-16
+ - Search /opt/rt5 for RT.pm
+
 0.40 2018-03-02
  - Add . to @INC for "make initdb" to help Perl 5.26+ load etc/initialdata
 

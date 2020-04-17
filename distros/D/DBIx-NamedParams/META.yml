@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ no_index:
 provides:
   DBIx::NamedParams:
     file: lib/DBIx/NamedParams.pm
-    version: v0.0.8
+    version: v0.0.9
 requires:
   DBI: '0'
   DBI::Const::GetInfoType: '0'
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://github.com/TakeAsh/p-DBIx-NamedParams/issues
   homepage: https://github.com/TakeAsh/p-DBIx-NamedParams
   repository: git://github.com/TakeAsh/p-DBIx-NamedParams.git
-version: v0.0.8
+version: v0.0.9
 x_contributors:
   - 'TakeAsh <take@TakeAsh.net>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

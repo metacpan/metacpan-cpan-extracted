@@ -1,3 +1,8 @@
+5.1.0    15.04.2020
+           - added Common Log Format as input and output date format (example: [10/Oct/1999:21:15:05 +0500])
+           - added error() getter to Date::Rel
+           - added strict mode feature (Date::strict)
+           - update embedded timezones db
 5.0.4    07.04.2020
            - RT#132310 - fix format constants in docs
 5.0.3    02.04.2020

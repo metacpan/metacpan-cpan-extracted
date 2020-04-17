@@ -2,7 +2,7 @@ NAME
     App::TSVUtils - CLI utilities related to TSV
 
 VERSION
-    This document describes version 0.003 of App::TSVUtils (from Perl
+    This document describes version 0.004 of App::TSVUtils (from Perl
     distribution App-TSVUtils), released on 2019-12-19.
 
 DESCRIPTION

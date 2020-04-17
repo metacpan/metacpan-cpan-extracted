@@ -1,5 +1,10 @@
 package Sah::Schemas::DataSizeSpeed;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-03'; # DATE
+our $DIST = 'Sah-Schemas-DataSizeSpeed'; # DIST
+our $VERSION = '0.006'; # VERSION
+
 1;
 # ABSTRACT: Sah schemas related to data sizes & speeds (filesize, transfer speed, etc)
 
@@ -15,15 +20,23 @@ Sah::Schemas::DataSizeSpeed - Sah schemas related to data sizes & speeds (filesi
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schemas::DataSizeSpeed (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-11-29.
+This document describes version 0.006 of Sah::Schemas::DataSizeSpeed (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-03.
 
 =head1 SAH SCHEMAS
 
 =over
 
-=item * L<filesize|Sah::Schema::filesize>
+=item * L<bandwidth|Sah::Schema::bandwidth>
 
-File size.
+Data transfer speed.
+
+=item * L<dataquota|Sah::Schema::dataquota>
+
+Data transfer quota.
+
+=item * L<datasize|Sah::Schema::datasize>
+
+Data size.
 
 Float, in bytes.
 
@@ -34,6 +47,23 @@ Can be coerced from string that contains units, e.g.:
  1.5K  -> 1536      (kilobyte, 1024-based)
  1.6ki -> 1600      (kibibyte, 1000-based)
 
+
+=item * L<dataspeed|Sah::Schema::dataspeed>
+
+Data transfer speed.
+
+Float, in bytes/second.
+
+Can be coerced from string that contains units, e.g.:
+
+ 1000kbps -> 128000 (kilobits per second, 1024-based)
+ 2.5 mbit -> 327680 (megabit per second, 1024-based)
+ 128KB/s  -> 131072 (kilobyte per second, 1024-based)
+
+
+=item * L<filesize|Sah::Schema::filesize>
+
+File size.
 
 =back
 
@@ -65,7 +95,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

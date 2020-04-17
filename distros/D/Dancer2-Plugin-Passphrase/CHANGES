@@ -1,5 +1,10 @@
 Revision history for Dancer2-Plugin-Passphrase
 
+3.3.4 Mon 11 April 18:55:00 EDT 220
+
+    * Fix example for Bcrypt configuration in POD (Sergiy Borodych)
+    * Set bcrypt cost from YAML config (Jeremi M Gosney)
+
 3.3.3 Mon 22 Oct 15:00:50 CEST 2018
 
     * Fix typos in documentation (Mohammad S Anwar)

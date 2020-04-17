@@ -121,6 +121,12 @@ t/examples/doc-site.t
 t/examples/test-app.t
 t/examples/todo-app.t
 t/filter.t
+t/fixtures/filters/README.me
+t/fixtures/filters/dbic.pl
+t/fixtures/filters/mysql.sql
+t/fixtures/filters/pg.sql
+t/fixtures/filters/schema.json
+t/fixtures/filters/sqlite.sql
 t/fixtures/foreign-key-field/README.md
 t/fixtures/foreign-key-field/dbic.pl
 t/fixtures/foreign-key-field/mysql.sql

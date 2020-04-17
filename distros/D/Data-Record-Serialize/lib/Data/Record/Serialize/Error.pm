@@ -5,7 +5,7 @@ package Data::Record::Serialize::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 use Exporter::Shiny qw( error );
 
@@ -105,7 +105,7 @@ Data::Record::Serialize::Error - Error objects
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -134,7 +134,7 @@ L<failures/Attributes>.
 
 This module organizes L<Data::Record::Serialize> errors based upon
 L<custom::failures>.  It uses L<Exporter::Shiny>. The global option
-nnC<errors> may be used to construct a set of error classes.  C<errors>
+C<errors> may be used to construct a set of error classes.  C<errors>
 is passed an array of error names; if they begin with C<::> they are
 relative to C<Data::Record::Serialize::Error>, otherwise they are
 relative to the C<Error> sub-hierarchy under the calling package.
@@ -196,10 +196,21 @@ name; see L</Error Class Names>.  The remaining parameters are passed
 directly to the L<failures> throw method (see L<failures/Throwing
 failures>).
 
-=head1 BUGS AND LIMITATIONS
+=head1 SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/data-record-serialize
+
+and may be cloned from
+
+  https://gitlab.com/djerius/data-record-serialize.git
 
 =head1 SEE ALSO
 

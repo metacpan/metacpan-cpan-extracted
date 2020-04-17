@@ -1,3 +1,16 @@
+0.20      2020-04-15 11:17:27-04:00 America/New_York
+
+  [BUG FIX]
+
+    * duplicate output fields now cause an exception to be thrown
+
+0.19      2020-04-15 11:17:27-04:00 America/New_York
+
+  [ENHANCEMENTS]
+
+    * formats may now be coderef's as well as sprintf format strings
+
+
 0.18      2018-04-11 15:01:27-04:00 America/New_York
 
   [BUILD FIX]

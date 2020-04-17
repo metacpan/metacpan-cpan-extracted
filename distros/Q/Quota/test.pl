@@ -91,8 +91,11 @@ while(1) {
 ##  Query with one argument (uid defaults to getuid(), "kind" to 0 = user)
 ##
 
-my $uid_val = ($quota_kind ? $) : $>);
-print "\nQuery this fs with default (which is real $n_uid_gid) $>\n";
+my $my_uid = $>;
+(my $my_gid = $)) =~ s/ .*//;  # $) may be a list of GIDs
+
+my $uid_val = ($quota_kind ? $my_gid : $my_uid);
+print "\nQuerying this fs with default (which is real $n_uid_gid) $uid_val\n";
 my ($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = ($quota_kind
                                           ? Quota::query($dev,$uid_val,$quota_kind)
                                           : Quota::query($dev));
@@ -113,7 +116,7 @@ else {
 ##
 
 {
-  print "Enter a $n_uid_gid to get quota for: ";
+  print "Enter a different $n_uid_gid to query quota for: ";
   chomp($uid_val = <STDIN>);
   unless($uid_val =~ /^\d+$/) {
     print "You have to enter a decimal 32-bit value here.\n";
@@ -137,55 +140,53 @@ else {
 ##
 ##  Query quotas via RPC
 ##
+if ($dev =~ m#^([^:]+):(/.*)$#) {
+    # path is already mounted via NFS: get server-side mount point to avoid recursion
+    $path = $2;
+}
+print "Querying your quota from localhost:$path via forced RPC\n";
 
-if($dev =~ m#^/#) {
-  print "Query localhost:$path via RPC.\n";
+($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = ($quota_kind
+                                       ? Quota::rpcquery('localhost', $path, $my_uid, $quota_kind)
+                                       : Quota::rpcquery('localhost', $path));
+if(defined($bc)) {
+  my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($bt);
+  $bt = sprintf("%04d-%02d-%02d/%02d:%02d", $year+1900,$mon+1,$mday,$hour,$min) if $bt;
+  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($ft);
+  $ft = sprintf("%04d-%02d-%02d/%02d:%02d", $year+1900,$mon+1,$mday,$hour,$min) if $ft;
 
-  ($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = ($quota_kind
-                                         ? Quota::rpcquery('localhost', $path, $uid_val, $quota_kind)
-                                         : Quota::rpcquery('localhost', $path));
-  if(defined($bc)) {
-    my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($bt);
-    $bt = sprintf("%04d-%02d-%02d/%02d:%02d", $year+1900,$mon+1,$mday,$hour,$min) if $bt;
-    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($ft);
-    $ft = sprintf("%04d-%02d-%02d/%02d:%02d", $year+1900,$mon+1,$mday,$hour,$min) if $ft;
-
-    print "Your usage and limits are $bc ($bs,$bh,$bt) $fc ($fs,$fh,$ft)\n\n";
-  }
-  else {
-    warn Quota::strerr()."\n\n";
-  }
-  print "Query localhost via RPC for $n_uid_gid $uid_val.\n";
-
-  ($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = Quota::rpcquery('localhost', $path, $uid_val, $quota_kind);
-  if(!defined($bc)) {
-    warn "Failed RPC query: ".Quota::strerr()."\n\n";
-    print "Retrying with fake authentication for $n_uid_gid $uid_val.\n";
-    if ($quota_kind == 1) {
-      Quota::rpcauth(-1, $uid_val);  # GID
-    }
-    else {
-      Quota::rpcauth($uid_val);
-    }
-    ($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = Quota::rpcquery('localhost', $path, $uid_val, $quota_kind);
-    Quota::rpcauth();  # reset to default
-  }
-
-  if(defined($bc)) {
-    my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($bt);
-    $bt = sprintf("%04d-%02d-%02d/%02d:%02d", $year+1900,$mon+1,$mday,$hour,$min) if $bt;
-    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($ft);
-    $ft = sprintf("%04d-%02d-%02d/%02d:%02d", $year+1900,$mon+1,$mday,$hour,$min) if $ft;
-
-    print "Usage and limits for $n_uid_gid $uid_val are $bc ($bs,$bh,$bt) $fc ($fs,$fh,$ft)\n\n";
-  }
-  else {
-    warn "Failed RPC query: ".Quota::strerr()."\n\n";
-  }
-
+  print "Your usage and limits are $bc ($bs,$bh,$bt) $fc ($fs,$fh,$ft)\n\n";
 }
 else {
-  print "Skipping RPC query test - already done above.\n\n";
+  warn "Failed to query localhost: ". Quota::strerr(). "\n\n";
+}
+
+print "Querying $n_uid_gid $uid_val from localhost:$path via RPC\n";
+
+($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = Quota::rpcquery('localhost', $path, $uid_val, $quota_kind);
+if(!defined($bc)) {
+  warn "Failed RPC query: ".Quota::strerr()."\n\n";
+  print "Retrying with fake authentication for $n_uid_gid $uid_val.\n";
+  if ($quota_kind == 1) {
+    Quota::rpcauth(-1, $uid_val);  # GID
+  }
+  else {
+    Quota::rpcauth($uid_val);
+  }
+  ($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = Quota::rpcquery('localhost', $path, $uid_val, $quota_kind);
+  Quota::rpcauth();  # reset to default
+}
+
+if(defined($bc)) {
+  my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($bt);
+  $bt = sprintf("%04d-%02d-%02d/%02d:%02d", $year+1900,$mon+1,$mday,$hour,$min) if $bt;
+  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($ft);
+  $ft = sprintf("%04d-%02d-%02d/%02d:%02d", $year+1900,$mon+1,$mday,$hour,$min) if $ft;
+
+  print "Usage and limits for $n_uid_gid $uid_val are $bc ($bs,$bh,$bt) $fc ($fs,$fh,$ft)\n\n";
+}
+else {
+  warn "Failed RPC query: ".Quota::strerr()."\n\n";
 }
 
 ##
@@ -217,6 +218,21 @@ if($path) {
   if(@lim) {
     unless(Quota::setqlim($dev, $uid_val, @lim, 1, $quota_kind)) {
       print "Quota set successfully for $n_uid_gid $uid_val\n";
+
+      print "Reading back modified limits\n";
+      ($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = Quota::query($dev, $uid_val, $quota_kind);
+      if(defined($bc)) {
+        if (($bs == $lim[0]) && ($bh == $lim[1]) &&
+            ($fs == $lim[2]) && ($fh == $lim[3])) {
+          print "OK: results match\n";
+        }
+        else {
+          print "ERROR: results do not match\n";
+        }
+      }
+      else {
+        warn "Failed to read back changed quota limits:".Quota::strerr()."\n";
+      }
     }
     else {
       warn "Failed to set quota: ".Quota::strerr()."\n";

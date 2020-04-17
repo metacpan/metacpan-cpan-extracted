@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 4;
-BEGIN { require "t/utils.pl" };
+BEGIN { require "./t/utils.pl" };
 
 use_ok 'Parse::BooleanLogic';
 

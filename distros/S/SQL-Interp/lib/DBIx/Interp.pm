@@ -5,17 +5,16 @@ use warnings;
 use Carp;
 use SQL::Interp ':all';
 use base 'DBI';
-use Sub::Exporter -setup => {
-    exports => [
-        qw{attr dbi_interp key_field},
-        qw{  sql_interp
-             sql_interp_strict
-             sql_type
-             sql },
-    ],
-};
+use Exporter 'import';
 
-our $VERSION = '1.25';
+
+our $VERSION = '1.26';
+
+our %EXPORT_TAGS = (all => [qw(
+    attr dbi_interp key_field
+    sql_interp sql_interp_strict sql_type sql
+)]);
+our @EXPORT_OK = @{$EXPORT_TAGS{all}};
 
 our @CARP_NOT =
     qw(DBIx::Interp DBIx::Interp::db DBIx::Interp::STX);

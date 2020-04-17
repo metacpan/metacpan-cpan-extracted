@@ -1,0 +1,73 @@
+{
+   "abstract" : "Get, Build and Use PNG libraries",
+   "author" : [
+      "Tobias Leich <FROGGS@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-PNG",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "Archive::Tar" : "0",
+            "Archive::Zip" : "0",
+            "Digest::SHA" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "File::Fetch" : "0",
+            "File::Find" : "0",
+            "File::Path" : "2.07",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Module::Build" : "0.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "Digest::SHA" : "0",
+            "File::Fetch" : "0",
+            "File::Find" : "0",
+            "File::Path" : "2.07",
+            "File::Spec" : "0",
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "File::ShareDir" : "1.00",
+            "File::Spec" : "0",
+            "File::Temp" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::PNG" : {
+         "file" : "lib/Alien/PNG.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-PNG"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/FROGGS/Alien_PNG"
+      }
+   },
+   "version" : "0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

@@ -1,3 +1,12 @@
+0.201060  2020-04-15 12:27:22+02:00 Europe/Brussels
+    - Additions
+      - binaries: added two options (--column and --separator) and --item-type 'lineage' to fetch-tax.pl
+      - Ali: added method instant_count
+      - Taxonomy: added method get_taxid_from_taxonomy to parse NCBI (or SILVA) lineages
+    - Changes
+      - IdList: improved method load to use any column (from a flat table) as ids
+      - Taxonomy: revamped handling of ambiguous NCBI names (none is overlooked anymore)
+      
 0.200510  2020-02-21 00:18:30+01:00 Europe/Brussels
     - Changes
       - Taxonomy: improved method eq_tax to optionally return both got and exp labels

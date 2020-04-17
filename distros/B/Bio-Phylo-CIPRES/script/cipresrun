@@ -1,16 +1,15 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use strict;
 use warnings;
-use XML::Twig;
+use Pod::Usage;
 use Getopt::Long;
-use Data::Dumper;
-use YAML qw(LoadFile);
+use Bio::Phylo::CIPRES;
 use Bio::Phylo::Util::Logger ':levels';
 
 # process command line arguments
 my $verbosity = INFO;
-my $yml       = $ENV{'DATADIR'} . '/cipres_appinfo.yml';
-my $wd        = $ENV{'DATADIR'};
+my $wd        = $ENV{'DATADIR'} || '.';
+my $yml       = $wd . '/cipres_appinfo.yml';
 my $tool; # MAFFT_XSEDE, IQTREE_XSEDE_1_01_01
 
 # extra parameter switches
@@ -27,185 +26,153 @@ my %param     = ( 'vparam.runtime_' => 7.5 );
 # vparam.specify_numparts_=1 (partitions)
 
 # outfile name(s)
-my @outfile;
-# for MAFFT: output.fasta
+my %outfile;
+# for MAFFT: output.mafft => /path/to/outfile.fasta
 
 # some fasta file in either case
 my $infile;
+
 GetOptions(
 	'infile=s'  => \$infile,
 	'yaml=s'    => \$yml,
 	'verbose+'  => \$verbosity,
-	'outfile=s' => \@outfile,
+	'outfile=s' => \%outfile,
 	'tool=s'    => \$tool,
 	'param=s'   => \%param,
 	'wd=s'      => \$wd,
+	'help'      => sub { pod2usage( '-verbose' => 0 ) },
+	'manpage'   => sub { pod2usage( '-verbose' => 2 ) },
 );
 
 Bio::Phylo::Util::Logger->new( 
-	'-level'  => $verbosity, 
-	'-class'  => 'main' 
+	'-level'    => $verbosity, 
+	'-class'    => [ 'main', 'Bio::Phylo::CIPRES' ],
 );
 
-run( 
-	'infile'  => $infile, 
-	'yml'     => $yml,
-	'tool'    => $tool,
-	'param'   => \%param,
-	'outfile' => \@outfile,	
-	'wd'      => $wd,
+my $cipres = Bio::Phylo::CIPRES->new( 
+	'infile'    => $infile, 
+	'tool'      => $tool,
+	'param'     => \%param,
+	'outfile'   => \%outfile,
+	'yml'       => $yml,	
 );
 
-# given $infile and $yml location, returns aligned FASTA
-sub run {
-	my %args = @_;
-	DEBUG 'args: ' . Dumper(\%args);
-	my $info = LoadFile($args{'yml'});
-	DEBUG 'info: ' . Dumper($info);
-	
-	# launch the job
-	INFO "Going to launch " . $args{'tool'};
-	my $status_url = launch_job( 'info' => $info, %args );
-	
-	# poll results
-	POLL: while ( 1 ) {
-		my $status = check_status( $info, $status_url );
-		DEBUG Dumper( $status );
-		if ( $status->{'completed'} eq 'true' ) {
-			my $outfiles = $status->{'outfiles'};
-			my %results = get_results( 
-				'outfiles' => $outfiles, 
-				'info'     => $info,
-				%args, 
-			);
-			
-			#write results
-			for my $name ( keys %results ) {
-				my $path = $args{'wd'} . '/' . $name;
-				open my $fh, '>', $path or die "Couldn't open $path: $!";
-				print $fh $results{$name};
-				close $fh;
-			}
-			last POLL;
-		}
-		sleep 60;
-	}
-}
+my $url = $cipres->run;
 
-# given $info, $infile, $outfiles, returns FASTA string
-sub get_results {
-	my %args = @_;
-	DEBUG 'args: ' . Dumper(\%args);	
-	my $command = status_command( $args{'info'}, $args{'outfiles'} );
-	my $result = `$command`;
-	my %outfile;
-	for my $name ( @{ $args{'outfile'} } ) {
-		$outfile{ $name } = undef;
-	}
-	my $location;
-	DEBUG $result;
-	XML::Twig->new(
-		'twig_handlers' => {
-			'results/jobfiles/jobfile' => sub {
-				my $node = $_;
-				my $name = $node->findvalue('filename');
-				if ( exists $outfile{ $name } ) {
-					$outfile{ $name } = $node->findvalue('downloadUri/url');
-				}
-				DEBUG $node->toString;
-			}
-		}
-	)->parse($result);
-	for my $name ( keys %outfile ) {
-		my $location = $outfile{$name};
-		my $resultcommand = status_command( $args{'info'}, $location );
-		$outfile{$name} = `$resultcommand`;
-	}
-	return %outfile;
-}
+$cipres->clean_job( $url );
 
-# given $info and $infile, returns $status_url
-sub launch_job {
-	my %args = @_;
-	DEBUG 'args: ' . Dumper(\%args);		
-	my $command = launch_command( %args );
+=pod
 
-	# run submission, parse result
-	my $status_url;	
-	my $result = `$command`;
-	DEBUG $result;
-	XML::Twig->new(
-		'twig_handlers' => {
-			'jobstatus/selfUri/url' => sub { $status_url = $_->text }
-		}
-	)->parse($result);
-	return $status_url;
-}
+=head1 NAME
 
-# given $info and $infile, composes cURL command to launch MUSCLE job
-sub launch_command {
-	my %args = @_;
-	DEBUG 'args: ' . Dumper(\%args);		
-	my $CRA_USER = $args{'info'}->{'CRA_USER'};
-	my $PASSWORD = $args{'info'}->{'PASSWORD'};
-	my $KEY      = $args{'info'}->{'KEY'};
-	my $URL      = $args{'info'}->{'URL'};
-	my $tool     = $args{'tool'};
-	my $infile   = $args{'infile'};
-	my @params;
-	for my $key ( keys %{ $args{'param'} } ) {
-		push @params, '-F', join( '=', $key, $args{'param'}->{$key} );
-	}
-	my $command = <<"CURL_COMMAND";
-curl \\
-	--silent \\
-	-u $CRA_USER:$PASSWORD \\
-	-H cipres-appkey:$KEY \\
-	$URL/job/$CRA_USER \\
-	-F tool=$tool  \\
-	-F input.infile_=\@$infile \\
-	-F metadata.statusEmail=true \\
-	@params
-CURL_COMMAND
-	DEBUG $command;
-	return $command;
-}
+cipresrun - command line interface to the CIPRES analysis portal
 
-# given $info, $infile and $status_url, checks and returns terminalStage
-sub check_status {
-	my ( $info, $infile, $status_url ) = @_;
-	my $command = status_command( $info, $infile, $status_url );
-	
-	# post request, fetch result
-	my ( $status, $outfiles );
-	my $result = `$command`;
-	DEBUG $result;
-	XML::Twig->new(
-		'twig_handlers' => {
-			'jobstatus/resultsUri/url' => sub { $outfiles = $_->text },
-			'jobstatus/terminalStage'  => sub { $status   = $_->text }			
-		}
-	)->parse($result);
-	my $time = localtime();
-	INFO "[$time] completed: $status";
-	return { 'completed' => $status, 'outfiles' => $outfiles };
-}
+=head1 SYNOPSIS
 
-# given $info, $infile and $status_url, composes cURL command to check status
-sub status_command {
-	my ( $info, $status_url ) = @_;
-	DEBUG Dumper(\@_);
-	my $CRA_USER = $info->{'CRA_USER'};
-	my $PASSWORD = $info->{'PASSWORD'};
-	my $KEY      = $info->{'KEY'};
-	my $command = <<"CURL_COMMAND";
-curl \\
-	--silent \\
-	-u $CRA_USER:$PASSWORD \\
-	-H cipres-appkey:$KEY \\
-	$status_url
-CURL_COMMAND
-	DEBUG $command;
-	return $command;
-}
+ cipresrun \
+     -t <tool> \
+     -p <paramname=paramvalue> [-p <paramname=paramvalue>] \     
+     -i <infile> \
+     -y <config.yml> \
+     -o <out.name=/out/path> [-o <out.name=/out/path>] \
+     -w <workdirectory> \
+     [-v] [-h] [--manpage]
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over
+
+=item C<-v> or C<--verbose>
+
+Increases the verbosity of the process. This is useful to see what is being returned by 
+the server, for example to figure out what your tool is producing as output files. A good 
+approach is to first do a small run (e.g. a small data file) under verbose, see what's 
+going on, and then improve your parameter settings for bigger analyses under lower 
+verbosity.
+
+=item C<-h> or C<--help>
+ 
+Prints usage message and quits.
+
+=item C<-m> or C<--manpage>
+
+Prints larger manual page and quits.
+
+=item C<-t toolname> or C<--tool=toolname>
+
+Name of the analysis tool to run, as listed here:
+
+L<https://www.phylo.org/restusers/docs/tools>
+
+For example: C<MAFFT_XSEDE>
+
+=item C<-p key=value> or C<--param key=value>
+
+A key/value pair that configures something about the tool. For example:
+C<-p vparam.runtime_=7.5> to configure the maximum run time. Consult the 
+B<REST Tool Info> page of the CIPRES documentation for the respective tools. This option
+can be used multiple times.
+
+=item C<-i filename> or C<--infile=filename>
+
+Path to an input file to analyze, e.g. an unaligned FASTA file.
+
+=item C<-o key=value> or C<--key=value>
+
+This is the name of a specific output type that CIPRES generates followed by the location
+where to write that output to file on the client side. In other words, this is B<not> a 
+free form name for you to choose. It's one of the multiple outputs that the
+analysis can produce. For example, the alignment produced by MAFFT is called 
+C<output.mafft>. That is the name you need to specify here if you want that output 
+returned, followed by where you want this to be written, e.g. /home/user/result.fasta. 
+You can also fetch things such as C<STDERR>, C<STDOUT>, and so on. Which outputs
+are produced by a specific tool can (to the best of my knowledge) only be figured out by
+running this program with the C<-v> (verbose) flag and then consulting the XML that is
+produced by the final step. I.e. this is not well documented by CIPRES.
+
+=item C<-w dirname> or C<--workdir=dirname>
+
+The name of a directory to which to write the output files.
+
+=item C<-y config.yml> or C<--yaml=config.yml>
+
+The CIPRES portal requires authentication (i.e., a user name and password), as well as an
+application key for your application. These can be obtained by taking the following steps:
+
+=over
+
+=item * B<Register yourself>
+
+This is done by filling out the following web form:
+
+L<https://www.phylo.org/restusers/register.action>
+
+=item * B<Register your application>
+
+Once you are registered as a REST API user and you are logged in, you can fill out the
+following form:
+
+L<https://www.phylo.org/restusers/createApplication!input.action>
+
+=item * B<Creating your config.yml>
+
+The credentials for the user, the application, and the server you will be talking to, need
+to be entered in a YAML file with the following fields:
+
+ ---
+ URL: https://cipresrest.sdsc.edu/cipresrest/v1
+ KEY: <your application key>
+ CRA_USER: <your user name>
+ PASSWORD: <your password>
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+This program is implemented by a package module whose documentation may be instructive as
+well. This can be found at L<Bio::Phylo::CIPRES>.
+
+=cut
 

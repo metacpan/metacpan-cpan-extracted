@@ -1,8 +1,10 @@
 #pragma once
 #include <xs.h>
+#include <xs/Scope.h>
 #include <panda/time.h>
 
 using namespace panda::time;
+using xs::Simple;
 using panda::string;
 using panda::string_view;
 

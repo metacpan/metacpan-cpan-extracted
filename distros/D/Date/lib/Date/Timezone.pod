@@ -77,13 +77,3 @@ Example of data returned:
             ...
         ]
     }
-
-=head1 AUTHOR
-
-Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
-
-=head1 LICENSE
-
-You may distribute this code under the same terms as Perl itself.
-
-=cut

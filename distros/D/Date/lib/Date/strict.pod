@@ -1,0 +1,47 @@
+=head1 NAME
+
+Date::strict - enable/disable date strict mode.
+
+
+=head1 SYNOPSIS
+
+    Date->new("invalid date"); # returns date with error set to Date::Error::parser_error
+    
+    use Date::strict; # lexical scope
+    
+    Date->new("invalid date"); # throws Date::Error::parser_error
+    call_function_using_date(); # code inside function will not be affected by strict mode
+    
+    no Date::strict;
+    
+    Date->new("invalid date"); # returns date with error set to Date::Error::parser_error
+
+    {
+        use Date::strict;
+        DateRel->new("1X"); # throws Date::Error::parser_error
+        $date + "1X"; # throws Date::Error::parser_error
+    }
+
+    DateRel->new("1X"); # returns relative date with error set to Date::Error::parser_error
+    
+    Date->new("2019-01-32"); # ok -> 2019-02-01
+    
+    Date::range_check(1);
+
+    Date->new("2019-01-32"); # returns date with error set to Date::Error::out_of_range
+    
+    use Date::strict;
+
+    Date->new("2019-01-32"); # throws Date::Error::out_of_range
+
+
+
+=head1 DESCRIPTION
+
+By default, when any error occurs in L<Date> framework, it returns an empty object with C<error()> set.
+
+This module allows you to enable date / relative date string mode when instead of setting error, it throws an exception with the same error.
+
+This mode only affects code inside the same lexical scope.
+
+This mode automatically reverts when the scope ends. If you want to disable strict mode in the middle of the scope, use C<no Date::strict>.

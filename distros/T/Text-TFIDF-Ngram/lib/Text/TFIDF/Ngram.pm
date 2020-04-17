@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the TF-IDF measure for ngram phrases
 
-our $VERSION = '0.0502';
+our $VERSION = '0.0505';
 
 use Moo;
 use strictures 2;
@@ -109,35 +109,35 @@ sub _process_ngrams {
 
 
 sub tf {
-    my ( $self, $file, $word ) = @_;
-    return 0 unless exists $self->{counts}{$file} && exists $self->{counts}{$file}{$word};
-    return $self->{counts}{$file}{$word} / sum0( values %{ $self->{counts}{$file} } );
+    my ( $self, $file, $phrase ) = @_;
+    return 0 unless exists $self->counts->{$file} && exists $self->counts->{$file}{$phrase};
+    return $self->counts->{$file}{$phrase} / sum0( values %{ $self->counts->{$file} } );
 }
 
 
 sub idf {
-    my ( $self, $word ) = @_;
+    my ( $self, $phrase ) = @_;
 
     my $count = 0;
 
-    for my $file ( keys %{ $self->{counts} } ) {
-        $count++ if exists $self->{counts}{$file}{$word};
+    for my $file ( keys %{ $self->counts } ) {
+        $count++ if exists $self->counts->{$file}{$phrase};
     }
 
     unless ( $count ) {
-        carp "'$word' is not present in any document";
+        carp "'$phrase' is not present in any document";
         return undef;
     }
 
-    return - log( $count / scalar( keys %{ $self->{counts} } ) ) / log(10) + 0;
+    return - log( $count / keys %{ $self->counts } ) / log(10) + 0;
 }
 
 
 sub tfidf {
-    my ( $self, $file, $word ) = @_;
-    my $idf = $self->idf($word);
+    my ( $self, $file, $phrase ) = @_;
+    my $idf = $self->idf($phrase);
     return undef unless $idf;
-    return $self->tf( $file, $word ) * $idf;
+    return $self->tf( $file, $phrase ) * $idf;
 }
 
 
@@ -146,17 +146,17 @@ sub tfidf_by_file {
 
     my %seen;
 
-    for my $file ( keys %{ $self->{counts} } ) {
-        for my $word ( keys %{ $self->{counts}{$file} } ) {
-            my $tfidf = $self->tfidf( $file, $word );
+    for my $file ( keys %{ $self->counts } ) {
+        for my $phrase ( keys %{ $self->counts->{$file} } ) {
+            my $tfidf = $self->tfidf( $file, $phrase );
 
-            next if $seen{$word}++ || !defined $tfidf;
+            next if $seen{$phrase}++ || !defined $tfidf;
 
-            $self->{file_tfidf}{$file}{$word} = $tfidf;
+            $self->{file_tfidf}{$file}{$phrase} = $tfidf;
         }
     }
 
-    return $self->{file_tfidf};
+    return $self->file_tfidf;
 }
 
 1;
@@ -173,43 +173,51 @@ Text::TFIDF::Ngram - Compute the TF-IDF measure for ngram phrases
 
 =head1 VERSION
 
-version 0.0502
+version 0.0505
 
 =head1 SYNOPSIS
 
   use Text::TFIDF::Ngram;
-  my $obj = Text::TFIDF::Ngram->new(
+
+  my $t = Text::TFIDF::Ngram->new(
     files => [qw( foo.txt bar.txt )],
     size  => 3,
   );
-  my $w = $obj->tf( 'foo.txt', 'foo bar baz' );
-  my $x = $obj->idf('foo bar baz');
-  my $y = $obj->tfidf( 'foo.txt', 'foo bar baz' );
-  printf "TF: %.3f, IDF: %.3f, TFIDF: %.3f\n", $w, $x, $y;
-  my $z = $obj->tfidf_by_file;
+
+  my $w = $t->tf( 'foo.txt', 'foo bar baz' );
+  my $x = $t->idf('foo bar baz');
+  my $y = $t->tfidf( 'foo.txt', 'foo bar baz' );
+  printf "TF: %.3f, IDF: %.3f, TF-IDF: %.3f\n", $w, $x, $y;
+
+  my $z = $t->tfidf_by_file;
   print Dumper $z;
 
 =head1 DESCRIPTION
 
-This module computes the TF-IDF ("term frequency-inverse document frequency")
+This module computes the TF-IDF ("term frequency - inverse document frequency")
 measure for a corpus of text documents.
 
-For a working example program, please see the F<eg/analyze> file in this
-distribution.
+This module will B<only> work when given more than one document.  Because the
+B<idf> method is computed based on all documents, a single document in the given
+corpus will return C<0>.
 
 =head1 ATTRIBUTES
 
 =head2 files
 
-ArrayRef of filenames to use in the ngram processing.
+ArrayRef of filenames.
 
 =head2 size
 
-Integer ngram phrase size.  Default is 1.
+Integer ngram phrase size.
+
+Default: C<1>
 
 =head2 stopwords
 
-Boolean indicating that phrases with stopwords will be ignored.  Default is 1.
+Boolean indicating that phrases with stopwords will be ignored.
+
+Default: C<1>
 
 =head2 punctuation
 
@@ -223,23 +231,27 @@ Note that the default does not exclude the single quote.
 
 =head2 lowercase
 
-Boolean to render the ngrams in lowercase.  Default is 0.
+Boolean to render the ngrams in lowercase.
+
+Default: C<0>
 
 =head2 counts
 
-HashRef of the ngram counts of each processed file.  This is a computed
-attribute - providing it in the constructor will be ignored.
+HashRef of the ngram counts of each processed file.
+
+This is a computed attribute. Providing it to the constructor will be ignored.
 
 =head2 file_tfidf
 
-HashRef of the TF-IDF values in each processed file.  This is a computed
-attribute - providing it in the constructor will be ignored.
+HashRef of the TF-IDF values in each processed file.
+
+This is a computed attribute. Providing it to the constructor will be ignored.
 
 =head1 METHODS
 
 =head2 new
 
-  $obj = Text::TFIDF::Ngram->new(
+  $t = Text::TFIDF::Ngram->new(
     files       => \@files,
     size        => $size,
     stopwords   => $stopwords,
@@ -248,40 +260,41 @@ attribute - providing it in the constructor will be ignored.
   );
 
 Create a new C<Text::TFIDF::Ngram> object.  If the B<files> argument is passed
-in, the ngrams of each file are stored in the B<counts>.
+in, the ngrams of each file are stored in B<counts>.
 
 =for Pod::Coverage BUILD
 
 =head2 tf
 
-  $tf = $obj->tf( $file, $phrase );
+  $tf = $t->tf( $file, $phrase );
 
-Returns the frequency of the given B<phrase> in the document B<file>.  This is
+Return the frequency of the given B<phrase> in the document B<file>.  This is
 not the "raw count" of the phrase, but rather the percentage of times it is
 seen.
 
 =head2 idf
 
-  $idf = $obj->idf($phrase);
+  $idf = $t->idf($phrase);
 
-Returns the inverse document frequency of a B<phrase>.
+Return the inverse document frequency of a B<phrase> across all corpus
+documents.
 
 =head2 tfidf
 
-  $tfidf = $obj->tfidf( $file, $phrase );
+  $tfidf = $t->tfidf( $file, $phrase );
 
-Computes the TF-IDF weight for the given B<file> and B<phrase>.  If the phrase
+Compute the TF-IDF weight for the given B<file> and B<phrase>.  If the phrase
 is not in the corpus, a warning is issued and undef is returned.
 
-=head2 tfidf_by_file()
+=head2 tfidf_by_file
 
-  $tfidf = $obj->tfidf_by_file;
+  $tfidf = $t->tfidf_by_file;
 
 Construct a HashRef of all files with all phrases and their B<tfidf> values.
 
 =head1 SEE ALSO
 
-The F<eg/analyze> file in this distribution
+The F<eg/*> and F<t/01-methods.t> files in this distribution
 
 L<https://en.wikipedia.org/wiki/Tf%E2%80%93idf>
 
@@ -299,7 +312,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

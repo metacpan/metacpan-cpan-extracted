@@ -2,6 +2,10 @@ use alienfile;
 use Path::Tiny qw( path );
 use Config;
 
+configure {
+  requires 'Path::Tiny';
+};
+
 if($^O eq 'linux')
 {
   # archname=x86_64-linux-gnu-thread-multi
@@ -40,8 +44,6 @@ else
   print "https://github.com/perlwasm/Alien-wasmtime/issues/2\n";
   exit;
 }
-
-configure { requires 'Path::Tiny' };
 
 probe sub { 'share' };
 

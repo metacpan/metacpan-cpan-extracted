@@ -1,0 +1,70 @@
+=head1 NAME
+
+XS::Framework::Manual::SVAPI::Scope - XS::Framework scope utils
+
+
+
+=head1 Scope::Hints - compiler scope hints
+
+
+=head2 Overview
+
+This class contains static methods for setting scope hints at compile time and getting it in runtime.
+
+Example:
+
+    use MyModule::strict_mode; # MyModule::strict_mode::import() XS function calls Scope::Hints::set
+    ...
+    MyModule::somefunc($arg); # XS function may use Scope::Hints::get to alter its behaviour
+    ...
+    no MyModule::strict_mode; # MyModule::strict_mode::unimport() XS function calls Scope::Hints::remove
+
+
+=head2 void set (string_view name, const Sv& value)
+
+Set hint C<name> with value C<value>. Must be called at compile time to take effect,
+i.e. from XS C<import()> function or from XS function that is called from C<BEGIN> block.
+
+    Scope::Hints::set("myhint", Simple("myvalue"));
+
+Have the same effect as calling from perl
+    
+    BEGIN { $^H{myhint} = "myvalue" }
+
+
+=head2 void remove (string_view name)
+
+Removes hint C<name> and its associated value. Must be called at compile time to take effect (usually from C<unimport()>).
+
+
+=head2 bool exists (string_view name)
+
+Returns true if hint C<name> exists in current scope. Must be called at runtime.
+
+
+=head2 Scalar get (string_view name)
+
+Returns value associated with hint C<name> or empty scalar if no such hint in scope.  Must be called at runtime.
+
+
+=head2 Hash get ()
+
+Returns all hints and their values in scope as hashref. Must be called at runtime.
+
+
+=head2 Scalar get_ct (string_view name)
+
+Compile-time version of C<get(name)>.
+Returns value associated with hint C<name> or empty scalar if no such hint enabled.  Must be called at compile time.
+
+Have the same effect as calling from perl
+    
+    BEGIN { my $val = $^H{myhint}; }
+
+=head1 SEE ALSO
+
+L<XS::Framework>
+
+L<XS::Framework::Manual::SVAPI>
+
+=cut

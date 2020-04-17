@@ -1,7 +1,9 @@
 package Data::Sah::CoerceBundle::App::cryp;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.007'; # VERSION
+# AUTHOR
+our $DATE = '2019-11-28'; # DATE
+our $DIST = 'Data-Sah-CoerceBundle-App-cryp'; # DIST
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Coercion rules for the 'cryp' app family
@@ -18,7 +20,17 @@ Data::Sah::CoerceBundle::App::cryp - Coercion rules for the 'cryp' app family
 
 =head1 VERSION
 
-This document describes version 0.007 of Data::Sah::CoerceBundle::App::cryp (from Perl distribution Data-Sah-CoerceBundle-App-cryp), released on 2019-07-26.
+This document describes version 0.009 of Data::Sah::CoerceBundle::App::cryp (from Perl distribution Data-Sah-CoerceBundle-App-cryp), released on 2019-11-28.
+
+=head1 DESCRIPTION
+
+This distribution contains the following L<Sah> coerce rule modules:
+
+=over
+
+=item * L<Data::Sah::Coerce::perl::To_str::From_str::normalize_cryptoexchange_account>
+
+=back
 
 =head1 HOMEPAGE
 

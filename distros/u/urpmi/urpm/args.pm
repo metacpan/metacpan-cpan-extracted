@@ -99,6 +99,7 @@ my %options_spec = (
 			 $options{buildrequires} = 1 },
 	'buildrequires' => \$options{buildrequires},
 	'install-src' => \$::install_src,
+	reinstall => sub { $urpm->{options}{reinstall} = 1 },
 	clean => sub { $::clean = 1; $::noclean = 0 },
 	noclean => sub {
 	    $::clean = $urpm->{options}{'pre-clean'} = $urpm->{options}{'post-clean'} = 0;
