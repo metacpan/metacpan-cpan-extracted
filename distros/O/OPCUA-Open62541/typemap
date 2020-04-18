@@ -77,7 +77,7 @@ T_PTROBJ_REFERENCE
 T_PTROBJ_SPECIAL
 	if (SvROK($arg) && sv_derived_from($arg,
 	    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\")) {
-		$var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+		$var = INT2PTR($type, SvIV(SvRV($arg)));
 	} else {
 		CROAK(\"%s: %s is not of type %s\",
 		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},

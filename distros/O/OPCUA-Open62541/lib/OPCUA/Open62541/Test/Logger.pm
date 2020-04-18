@@ -135,7 +135,7 @@ Usually called from test server.
 
 =item $args{logger}
 
-Required logger instance of the server config.
+Required logger instance of the client or server config.
 
 =back
 

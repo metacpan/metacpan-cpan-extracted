@@ -33,11 +33,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 0.97
+Version 0.98
 
 =cut
 
-our $VERSION = '0.97';
+our $VERSION = '0.98';
 
 =head1 SYNOPSIS
 

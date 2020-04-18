@@ -1,0 +1,121 @@
+WARC version 0.0.1
+==================
+
+!!! This release is an "open beta"; see limitations below. !!!
+
+The WARC library provides Perl support for accessing Web ARChive files.
+The WARC format is, as of this writing, the generally accepted standard for
+archiving documents obtained by crawling the World Wide Web.
+
+This distribution focuses on the basic, low-level interfaces for reading
+records from WARC files and building WARC files.
+
+This distribution contains:
+
+    - WARC
+	The convenience loader, Single Point Of Truth for $VERSION, and
+	overview POD for the WARC reader support.
+
+    - WARC::Builder
+	The basic interface for writing WARC files.
+
+    - other modules mentioned in those POD pages
+
+Rationale for Placing WARC at Top-level
+---------------------------------------
+
+I had initially planned to put this library in the Archive::WARC::
+namespace, but eventually decided to move it to top-level because it did
+not seem to fit in the Archive:: namespace.
+
+Other packages in Archive:: generally map string-like file names to archive
+members, with varying levels of functionality associated with those archive
+members.  This model does not fit WARC beyond only the smallest uses, but
+Archive::WARC:: could be a useful future interface for some of these cases.
+
+While Archive::Web:: could be reasonable, considering that the WARC format
+is literally named "Web Archive", people will most likely be searching for
+the keyword "WARC", so the name needs to include it.  I considered
+Archive::Web::WARC:: and Archive::WWW::WARC:: but those violate what I call
+the "namespace branching rule": each label in a hierarchical namespace
+should plausibly have multiple immediate children and the "Web" or "WWW"
+labels are unlikely to have other children than "WARC" and eliminating them
+lands us right back at Archive::WARC::.  The WARC::Alike::* namespace
+envisioned in this package is specifically intended to support other
+similar formats as nearly transparently as possible.
+
+Following the examples of HTTP::* and LWP::*, which are also top-level, I
+have decided to go through with placing WARC::* at top-level.  I hope that
+this library will live up to the promise of broad usefulness that this
+placement implies.
+
+Limitations in this release
+---------------------------
+
+This is an "open beta" release and some features are still incomplete.
+
+Most notably:
+
+    - writing WARC volumes is not yet implemented but some supporting APIs
+      are available and subject to change as needed or convenient
+
+    - HTTP transfer and content decoding is not yet implemented
+
+    - the lack of HTTP transfer decoding means that WARC-Payload-Digests
+      can only be accurately calculated in some cases at this time
+
+      - the WARC::Record::Sponge API will change to accommodate future HTTP
+        decoding support
+
+    - support for SDBM indexes is planned but not yet implemented
+
+The support for reading WARC volumes is mostly complete aside from the
+aforementioned lack of payload decoding.
+
+INSTALLATION
+------------
+
+Even non-wizards should find the following incantation useful:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+------------
+
+The WARC library requires:
+
+    - At least version 5.8.1 of perl, due to bugs in tied file handle
+      support in 5.8.0 that affect IO::Uncompress::Gunzip.  5.8.1 is
+      ancient as of this writing, so no problems are expected from this.
+
+    - Support for "version" objects, either built-in or using the "version"
+      pragmatic module available from CPAN.
+
+    - IO::Uncompress::Gunzip, since most WARC files are written as .warc.gz.
+
+    - IO::Compress::Gzip, for writing WARC files as .warc.gz.  Version
+      2.024 or later is required to ensure that we can record the zlib
+      version in the "warcinfo" record.
+
+    - LWP, for the base classes for the HTTP objects that can be replayed
+      from request and response records.
+
+    - MIME::Base32, for base-32 encodings of WARC record digests.
+
+    - Scalar::Util, specifically the XS version, for Scalar::Util::weaken,
+      used to support caching anonymous tied aggregates for WARC::Fields.
+
+    - Time::Local, for translating string form to epoch time in WARC::Date.
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright (C) 2019, 2020 Jacob Bachmeyer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

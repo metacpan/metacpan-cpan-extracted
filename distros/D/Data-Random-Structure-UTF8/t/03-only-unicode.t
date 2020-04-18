@@ -1,15 +1,11 @@
-#!/usr/bin/env perl
-
-use lib 'blib/lib';
-
-##!perl -T
+#!perl -T
 use 5.8.0;
 use strict;
 use warnings;
 
 use utf8;
 
-our $VERSION='0.04';
+our $VERSION='0.06';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -19,12 +15,8 @@ binmode STDIN,  ':encoding(UTF-8)';
 use open ':std', ':encoding(utf8)';
 
 use Test::More;
-#use Test::Deep;
 
 use Data::Random::Structure::UTF8;
-
-use Data::Dump qw/pp/;
-use Data::Dumper;
 
 # we are dealing with a random generator
 # so give it a change to produce some unicode
@@ -33,8 +25,6 @@ my $MAXTRIALS=100;
 
 ############################
 #### nothing to change below
-srand 42+12;
-
 my $num_tests = 0;
 
 my ($perl_var, $found, $found1, $found2, $trials, $rc, $alength, $randomiser);

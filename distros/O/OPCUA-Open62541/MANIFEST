@@ -30,8 +30,10 @@ t/croak.t
 t/define.t
 t/enum.t
 t/eol.t
+t/logger-client-multi.t
 t/logger-client.t
 t/logger-leak.t
+t/logger-server-multi.t
 t/logger-server.t
 t/logger.t
 t/OPCUA-Open62541.t
@@ -42,6 +44,7 @@ t/server-client-variable.t
 t/server-config-default.t
 t/server-config-minimal.t
 t/server-config.t
+t/server-iterate-singlestep.t
 t/server-iterate.t
 t/server-leak.t
 t/server-running.t

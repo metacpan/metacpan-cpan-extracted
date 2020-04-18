@@ -5,9 +5,9 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
-our @EXPORT = qw(get_iso639_1);
+our @EXPORT = qw(get_iso639_1 get_iso639_1_from_639_2 get_iso639_1_from_name get_iso639_1_from_native_name);
 
 my %codes = (
     "aa"             => {
@@ -1504,6 +1504,16 @@ my %codes = (
     }
 );
 
+my %from_639_2       = ();
+my %from_name        = ();
+my %from_native_name = ();
+for my $key (keys %codes) {
+    $from_639_2{lc($codes{$key}->{'639-2'})}          = $key if $codes{$key}->{'639-2'};
+    $from_639_2{lc($codes{$key}->{'639-2/B'})}        = $key if $codes{$key}->{'639-2/B'};
+    $from_name{lc($codes{$key}->{name})}              = $key if $codes{$key}->{name};
+    $from_native_name{lc($codes{$key}->{nativeName})} = $key if $codes{$key}->{nativeName};
+}
+
 sub get_iso639_1 {
     my $input = lc(shift);
 
@@ -1522,6 +1532,27 @@ sub get_iso639_1 {
             return \%result;
         }
     }
+    return undef;
+}
+
+sub get_iso639_1_from_639_2 {
+    my $input = lc(shift);
+
+    return get_iso639_1($from_639_2{$input}) if defined $from_639_2{$input};
+    return undef;
+}
+
+sub get_iso639_1_from_name {
+    my $input = lc(shift);
+
+    return get_iso639_1($from_name{$input}) if defined $from_name{$input};
+    return undef;
+}
+
+sub get_iso639_1_from_native_name {
+    my $input = lc(shift);
+
+    return get_iso639_1($from_native_name{$input}) if defined $from_native_name{$input};
     return undef;
 }
 
@@ -1547,6 +1578,10 @@ ISO::639_1 - ISO 639-1 Language informations
     print get_iso639_1('fr')->{nativeName};    # Français
     print get_iso639_1('fr-BE')->{nativeName}; # Français (BE)
     print get_iso639_1('ur')->{nativeName};    # اردو
+
+    print get_iso639_1_from_639_2('fra')->{nativeName};     # Français
+    print get_iso639_1_from_name('french')->{nativeName};   # Français
+    print get_iso639_1_from_native_name('français')->{name} # French
 
 =head1 DESCRIPTION
 
@@ -1577,9 +1612,51 @@ ISO::639_1 exports the following methods:
              appended to the name and nativeName informations (like "Français (BE)").
              Localization must be separated from the language code by "-" or "_".
 
+=head2 get_iso639_1_from_639_2
+
+  Usage    : get_iso639_1_from_639_2('fra')
+  Returns  : a hashref providing the informations described below. May return undef if no language is found.
+            {
+                "639-1"      => "zu",          # ISO 639-1 code
+                "639-2"      => "zul",         # ISO 639-2 code
+                "family"     => "Niger–Congo", # family of language
+                "name"       => "Zulu",        # english name of the language
+                "nativeName" => "isiZulu",     # native name of the language
+                "wikiUrl"    => "https://en.wikipedia.org/wiki/Zulu_language" # wikipedia URL about the language
+            }
+  Argument : an ISO639-2 code (case insensitive)
+
+=head2 get_iso639_1_from_name
+
+  Usage    : get_iso639_1_from_name('French')
+  Returns  : a hashref providing the informations described below. May return undef if no language is found.
+            {
+                "639-1"      => "zu",          # ISO 639-1 code
+                "639-2"      => "zul",         # ISO 639-2 code
+                "family"     => "Niger–Congo", # family of language
+                "name"       => "Zulu",        # english name of the language
+                "nativeName" => "isiZulu",     # native name of the language
+                "wikiUrl"    => "https://en.wikipedia.org/wiki/Zulu_language" # wikipedia URL about the language
+            }
+  Argument : the english name of a language (case insensitive)
+
+=head2 get_iso639_1_from_native_name
+
+  Usage    : get_iso639_1_from_native_name('Français')
+  Returns  : a hashref providing the informations described below. May return undef if no language is found.
+            {
+                "639-1"      => "zu",          # ISO 639-1 code
+                "639-2"      => "zul",         # ISO 639-2 code
+                "family"     => "Niger–Congo", # family of language
+                "name"       => "Zulu",        # english name of the language
+                "nativeName" => "isiZulu",     # native name of the language
+                "wikiUrl"    => "https://en.wikipedia.org/wiki/Zulu_language" # wikipedia URL about the language
+            }
+  Argument : the native name of a language (case insensitive)
+
 =head1 INSTALL
 
-After getting the tarball on https://metacpan.org/release/ISO::639_1, untar it, go to the directory and:
+After getting the tarball on L<https://metacpan.org/release/ISO::639_1>, untar it, go to the directory and:
 
     perl Build.PL
     ./Build

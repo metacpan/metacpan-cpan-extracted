@@ -18,6 +18,18 @@ my $builder = Module::Build->new(
     },
     add_to_cleanup => [ 'Pg-Explain-*' ],
     requires       => { 'Clone' => 0, 'YAML' => 0, 'JSON' => 0, 'XML::Simple' => 0, 'Digest::SHA' => 0, 'HOP::Lexer' => 0, 'perl' => '5.010' },
+    meta_merge     => {
+        'meta-spec' => {
+            version => 2,
+        },
+        resources => {
+            repository => {
+                url  => 'https://gitlab.com/depesz/Pg--Explain.git',
+                web  => 'https://gitlab.com/depesz/Pg--Explain',
+                type => 'git',
+            },
+        },
+    },
 );
 
 $builder->create_build_script();

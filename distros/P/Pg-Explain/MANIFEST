@@ -298,6 +298,7 @@ t/50-psql-frames.d/yaml-2-aligned-unicode-single-double-single.plan
 t/50-psql-frames.t
 t/51-all-recursive-subnodes.t
 t/52-all-parents.t
+t/53-mix-tabs-spaces.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

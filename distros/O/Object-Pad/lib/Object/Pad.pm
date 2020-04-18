@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Carp;
 
@@ -71,7 +71,7 @@ with. Each class should perform its required setup behaviour in a method
 called C<BUILD>, but does not need to chain to the C<SUPER> class first;
 this is handled automatically.
 
-   $self->BUILD( @_ )
+   $self->BUILD( @_ )  # for each component class
 
 If the class provides a C<BUILDARGS> class method, that is used to mangle the
 list of arguments before the C<BUILD> methods are called. Note this must be a
@@ -79,23 +79,17 @@ class method not an instance method (and so implemented using C<sub>). It
 should perform any C<SUPER> chaining as may be required.
 
    @args = $class->BUILDARGS( @_ )
-   $self->BUILD( @args )
-
-If the class provides a C<BUILDALL> method, that is used to implement the
-setup behaviour instead. It is passed the entire parameters list from the
-C<new> method. It should perform any C<SUPER> chaining as may be required.
-
-   $self->BUILDALL( @_ )
+   $self->BUILD( @args )  # for each component class
 
 =head1 KEYWORDS
 
 =head2 class
 
-   class Name {
+   class Name :ATTRS... {
       ...
    }
 
-   class Name;
+   class Name :ATTRS...;
 
 Behaves similarly to the C<package> keyword, but provides a package that
 defines a new class. Such a class provides an automatic constructor method
@@ -139,6 +133,50 @@ An optional version check can also be supplied; it performs the equivalent of
 
    BaseClass->VERSION( $ver )
 
+An optional list of attributes may be supplied in similar syntax as for subs
+or lexical variables. (These are annotations about the class itself; the
+concept should not be confused with per-object-instance data, which here is
+called "slots").
+
+The following class attributes are supported:
+
+=head3 repr(TYPE)
+
+Sets the representation type for instances of this class. Must be one of the
+following values:
+
+   :repr(native), :repr(default)
+
+The native representation, currently the default. This is an opaque
+representation type whose contents are not specified.
+
+   :repr(HASH)
+
+The representation will be a blessed hash reference. The instance data will
+be stored in an array referenced by a key called C<Object::Pad/slots>, which
+is fairly unlikely to clash with existing storage on the instance. No other
+keys will be used; they are available for implementions and subclasses to use.
+The exact format of the value stored here is not specified and may change
+between module versions, though it can be relied on to be well-behaved as some
+kind of perl data structure for purposes of modules like L<Data::Dumper> or
+serialisation into things like C<YAML> or C<JSON>.
+
+This representation type may be useful when converting existing classes into
+using C<Object::Pad> where there may be existing subclasses of it that presume
+a blessed hash for their own use.
+
+This type is automatically selected when extending a base class that is not
+itself implemented by C<Object::Pad>.
+
+   :repr(magic)
+
+The representation will use MAGIC to apply the instance data in a way that is
+invisible at the Perl level, and shouldn't get in the way of other things the
+instance is doing even in XS modules.
+
+This representation type is the only one that will work for subclassing
+existing classes that do not use blessed hashes.
+
 =head2 has
 
    has $var;
@@ -159,9 +197,10 @@ to use L</method> to create an accessor.
 
 A scalar slot may provide a expression that gives an initialisation value,
 which will be assigned into the slot of every instance during the constructor
-before C<BUILDALL> is invoked. For ease-of-implementation reasons this
-expression must currently be a compiletime constant, but it is hoped that a
-future version will relax this restriction and allow runtime-computed values.
+before the C<BUILD> methods are invoked. For ease-of-implementation reasons
+this expression must currently be a compiletime constant, but it is hoped that
+a future version will relax this restriction and allow runtime-computed
+values.
 
 =head2 method
 
@@ -173,7 +212,7 @@ future version will relax this restriction and allow runtime-computed values.
       ...
    }
 
-   method NAME :attrs... {
+   method NAME :ATTRS... {
       ...
    }
 
@@ -239,12 +278,8 @@ implemented using C<Object::Pad>.
 
 =head2 Storage of Instance Data
 
-Instances will store their data in a key called C<"Object::Pad/slots">, which
-is fairly unlikely to clash with existing storage on the instance. The exact
-format of the value stored here is not specified and may change between module
-versions, though it can be relied on to be well-behaved as some kind of perl
-data structure for purposes of modules like L<Data::Dumper> or serialisation
-into things like C<YAML> or C<JSON>.
+Instances by default will use the C<:repr(HASH)> storage type, though
+subclasses can elect instead to use C<:repr(magic)> instead.
 
 =head2 Object State During Methods Invoked By Superclass Constructor
 

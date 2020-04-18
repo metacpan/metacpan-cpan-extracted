@@ -36,7 +36,8 @@
             "LWP::UserAgent" : "0",
             "URI" : "0",
             "XML::Twig" : "0",
-            "YAML" : "0"
+            "YAML" : "0",
+            "perl" : "5.0014"
          }
       },
       "test" : {
@@ -56,6 +57,6 @@
          "web" : "https://github.com/naturalis/bio-cipres"
       }
    },
-   "version" : "v0.2.0",
+   "version" : "v0.2.1",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -17,8 +17,11 @@ lib/Feed/Data/Object/Title.pm
 lib/Feed/Data/Parser.pm
 lib/Feed/Data/Parser/Atom.pm
 lib/Feed/Data/Parser/Base.pm
+lib/Feed/Data/Parser/CSV.pm
+lib/Feed/Data/Parser/JSON.pm
 lib/Feed/Data/Parser/Meta.pm
 lib/Feed/Data/Parser/RSS.pm
+lib/Feed/Data/Parser/Text.pm
 lib/Feed/Data/Stream.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -32,6 +35,9 @@ t/05-parse-atom.t
 t/06-parse-html.t
 t/06-parse-meta.t
 t/07-extract-image.t
+t/08-okay.t
+t/09-json.t
+t/10-csv.t
 t/data/atom-10-example.xml
 t/data/atom-full.xml
 t/data/atom.xml
@@ -44,6 +50,9 @@ t/data/rss20-euc.xml
 t/data/rss20-no-summary.xml
 t/data/rss20-utf8.xml
 t/data/rss20.xml
+t/data/test.csv
+t/data/test.json
+t/data/test.txt
 t/data/theory.atom
 t/data/theory.rss
 t/manifest.t

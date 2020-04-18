@@ -2,20 +2,17 @@ use strict;
 use warnings;
 use OPCUA::Open62541;
 
-use Test::More tests => 44;
+use Test::More tests => 46;
 use Test::Exception;
 use Test::LeakTrace;
 use Test::NoWarnings;
 use Test::Warn;
 
-ok(my $logger = OPCUA::Open62541::Logger->new(), "logger new");
-is(ref($logger), "OPCUA::Open62541::Logger", "logger new class");
-no_leaks_ok { OPCUA::Open62541::Logger->new() } "logger new leak";
-
-throws_ok { OPCUA::Open62541::Logger::new("subclass") }
-    (qr/Class 'subclass' is not OPCUA::Open62541::Logger/, "subclass");
-no_leaks_ok { eval { OPCUA::Open62541::Logger::new("subclass") } }
-    "subclass leak";
+ok(my $server = OPCUA::Open62541::Server->new(), "server new");
+ok(my $config = $server->getConfig(), "config get");
+ok(my $logger = $config->getLogger(), "logger get");
+is(ref($logger), "OPCUA::Open62541::Logger", "logger class");
+no_leaks_ok { $config->getLogger() } "logger get leak";
 
 lives_ok { $logger->setCallback(undef, undef, undef) } "setCallback";
 no_leaks_ok { $logger->setCallback(undef, undef, undef) } "setCallback leak";
@@ -30,12 +27,12 @@ throws_ok { $logger->setCallback(undef, undef, "bar") }
 no_leaks_ok { eval { $logger->setCallback(undef, undef, "bar") } }
     "setCallback noref clear leak";
 
-my $calls = 0;
+my $log_calls = 0;
 sub log {
     my ($context, $level, $category, $message) = @_;
-    if ($calls++ == 0) {
-	pass("called once");
-	is($context, "context", "context string");
+    if ($log_calls++ == 0) {
+	is($log_calls, 1, "log once");
+	is($context, "context", "log context string");
     }
     cmp_ok($category, '==', 1, "category warning") if $level == 3;
     cmp_ok($category, '==', 2, "category error") if $level == 4;
@@ -49,7 +46,7 @@ sub log {
 lives_ok { $logger->setCallback(\&log, "context", undef) }
     "setCallback log context";
 no_leaks_ok {
-    OPCUA::Open62541::Logger->new()->setCallback(\&log, "context", undef);
+    $logger->setCallback(\&log, "context", undef);
 } "setCallback log context leak";
 
 lives_ok { $logger->logWarning(1, "message") } "logWarning message";
@@ -118,3 +115,13 @@ $logger->setCallback(\&log_category_name, undef, undef);
 foreach my $category (0..7) {
     $logger->logInfo($category, "category name");
 }
+
+my $clear_calls = 0;
+sub clear {
+    my ($context) = @_;
+    $clear_calls++;
+    is($clear_calls, 1, "clear once");
+    is($context, undef, "clear context string");
+}
+
+$logger->setCallback(undef, undef, \&clear);

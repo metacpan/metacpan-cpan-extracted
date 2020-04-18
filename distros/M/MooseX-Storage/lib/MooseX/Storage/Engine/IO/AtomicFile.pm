@@ -1,7 +1,7 @@
 package MooseX::Storage::Engine::IO::AtomicFile;
 # ABSTRACT: The actual atomic file storage mechanism.
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Moose;
 use IO::AtomicFile;
@@ -36,7 +36,7 @@ MooseX::Storage::Engine::IO::AtomicFile - The actual atomic file storage mechani
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 

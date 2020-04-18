@@ -4,14 +4,15 @@ use Mojo::Base -base;
 use Role::Tiny;
 use Carp qw/croak/;
 
-our $VERSION = '1.002002'; # VERSION
+our $VERSION = '1.002003'; # VERSION
 
 sub click_ok {
     my ( $self, $selector, $extra_params ) = @_;
     $extra_params ||= {};
 
     my $el = $self->tx->res->dom->at($selector)
-        or croak "Did not find element matching selector $selector";
+        or croak 'Test::Mojo::Role::SubmitForm::click_ok()'
+        . " Did not find element matching selector $selector";
     unless ( $el->tag eq 'form' ) {
         if ( $el->{type} eq 'image' ) {
             $extra_params->{ $el->{name} . '.x' } = 1;

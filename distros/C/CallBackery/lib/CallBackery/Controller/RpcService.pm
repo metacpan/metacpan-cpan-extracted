@@ -2,6 +2,8 @@ package CallBackery::Controller::RpcService;
 
 use Mojo::Base qw(Mojolicious::Plugin::Qooxdoo::JsonRpcController);
 use CallBackery::Exception qw(mkerror);
+use CallBackery::Translate qw(trm);
+
 use CallBackery::User;
 # use Data::Dumper;
 use Scalar::Util qw(blessed weaken);
@@ -441,16 +443,19 @@ in the usual way, hence we  have to render our own response!
 sub handleUpload {
     my $self = shift;
     if (not $self->user->isUserAuthenticated){
-        return $self->render(text=>encode_json({exception=>{message=>'Access Denied',code=>4922}}));
+        return $self->render(json => {exception=>{
+            message=>trm('Access Denied'),code=>4922}});
     }
     my $name = $self->param('name');
     if (not $name){
-        return $self->render(text=>encode_json({exception=>{message=>'Plugin Name missing',code=>3934}}));
+        return $self->render(json => {exception=>{
+            message=>trm('Plugin Name missing'),code=>3934}});
     }
 
     my $upload = $self->req->upload('file');
     if (not $upload){
-        return $self->render(text=>encode_json({exception=>{message=>'Upload Missing',code=>9384}}));
+        return $self->render(json => {exception=>{
+            message=>trm('Upload Missing'),code=>9384}});
     }
     my $obj = $self->config->instantiatePlugin($name,$self->user);
 
@@ -458,7 +463,8 @@ sub handleUpload {
     if (my $formData = $self->req->param('formData')){
         $form = eval { decode_json($formData) };
         if ($@){
-           return $self->render(text=>encode_json({exception=>{message=>'Data Decoding Problem '.$@,code=>7932}}));
+           return $self->render(json=>{exception=>{
+               message=>trm('Data Decoding Problem %1',$@),code=>7932}});
         }
     }
     $form->{uploadObj} = $upload;
@@ -472,35 +478,36 @@ sub handleUpload {
     if ($@){
         if (blessed $@){
             if ($@->isa('CallBackery::Exception')){
-                return $self->render(text=>encode_json({exception=>{message=>$@->message,code=>$@->code}}));
+                return $self->render(json=>{exception=>{
+                    message=>$@->message,code=>$@->code}});
             }
             elsif ($@->isa('Mojo::Exception')){
-                return $self->render(text=>encode_json({exception=>{message=>$@->message,code=>9999}}));
+                return $self->render(json=>{exception=>{message=>$@->message,code=>9999}});
             }
         }
-        return $self->render(text=>encode_json({exception=>{message=>$@,code=>9999}}));
+        return $self->render(json=>{exception=>{message=>$@,code=>9999}});
     }
     if (eval { blessed $return and $return->isa('Mojo::Promise')}){
         $return->then(sub {
-            $self->render(text=>encode_json(shift));
+            $self->render(json=>shift);
         },
         sub {
             my $err = shift;
             if (blessed $err){
                 if ($err->isa('CallBackery::Exception')){
-                    return $self->render(text=>encode_json({exception=>{message=>$err->message,code=>$err->code}}));
+                    return $self->render(json=>{exception=>{message=>$err->message,code=>$err->code}});
                 }
                 elsif ($err->isa('Mojo::Exception')){
-                    return $self->render(text=>encode_json({exception=>{message=>$err->message,code=>9999}}));
+                    return $self->render(json=>{exception=>{message=>$err->message,code=>9999}});
                 }
             }
-            return $self->render(text=>encode_json({exception=>{message=>$err,code=>9999}}));
+            return $self->render(json=>{exception=>{message=>$err,code=>9999}});
         });
         $self->render_later;
         return $return;
     }
     #warn Dumper $return;
-    $self->render(text=>encode_json($return));
+    $self->render(json=>$return);
 }
 
 =head2 handleDownload
@@ -532,13 +539,15 @@ sub handleDownload {
     my $self = shift;
 
     if (not $self->user->isUserAuthenticated){
-        return $self->render(text=>encode_json({exception=>{message=>'Access Denied',code=>3928}}));
+        return $self->render(json=>{exception=>{
+            message=>trm('Access Denied'),code=>3928}});
     }
 
     my $name = $self->param('name');
     my $key = $self->param('key');
     if (not $name){
-        return $self->render(text=>encode_json({exception=>{message=>'Plugin Name missing',code=>3923}}));
+        return $self->render(json=>{exception=>{
+            message=>trm('Plugin Name missing'),code=>3923}});
     }
 
     my $obj = $self->config->instantiatePlugin($name,$self->user);
@@ -547,7 +556,8 @@ sub handleDownload {
     if (my $formData = $self->req->param('formData')){
         $form = eval { from_json($formData) };
         if ($@){
-            return $self->render(text=>encode_json({exception=>{message=>'Data Decoding Problem '.$@,code=>3923}}));
+            return $self->render(json=>{exception=>{
+                message=>trm('Data Decoding Problem %1',$@),code=>3923}});
         }
     }
     my $map = eval {
@@ -559,13 +569,15 @@ sub handleDownload {
     if ($@){
         if (blessed $@){
             if ($@->isa('CallBackery::Exception')){
-                return $self->render(text=>encode_json({exception=>{message=>$@->message,code=>$@->code}}));
+                return $self->render(json=>{exception=>{
+                    message=>$@->message,code=>$@->code}});
             }
             elsif ($@->isa('Mojo::Exception')){
-                return $self->render(text=>encode_json({exception=>{message=>$@->message,code=>9999}}));
+                return $self->render(json=>{exception=>{
+                    message=>$@->message,code=>9999}});
             }
         }
-        return $self->render(text=>encode_json({exception=>{message=>$@,code=>9999}}));
+        return $self->render(json=>{exception=>{message=>$@,code=>9999}});
     }
     if (eval { blessed $map and $map->isa('Mojo::Promise')}){
         $map->then(sub {
@@ -579,13 +591,14 @@ sub handleDownload {
             my $err = shift;
             if (blessed $err){
                 if ($err->isa('CallBackery::Exception')){
-                    return $self->render(text=>encode_json({exception=>{message=>$err->message,code=>$err->code}}));
+                    return $self->render(json=>{exception=>{message=>$err->message,code=>$err->code}});
                 }
                 elsif ($err->isa('Mojo::Exception')){
-                    return $self->render(text=>encode_json({exception=>{message=>$err->message,code=>9999}}));
+                    return $self->render(json=>{exception=>{message=>$err->message,code=>9999}});
                 }
             }
-            return $self->render(text=>encode_json({exception=>{message=>$err,code=>9999}}));
+            return $self->render(json=>{exception=>{
+                message=>$err,code=>9999}});
         });
         $self->render_later;
         return $map;

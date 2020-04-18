@@ -1,0 +1,157 @@
+Revision history for Perl module distribution WARC.
+
+0.0.1		2020-04-16
+	- first "open beta" release
+
+0.0.0_12	2020-04-04
+	- initial steps towards support for writing WARC volumes
+	  - WARC::Record can now hold a data block
+	  - WARC::Record::Sponge allows collecting data for a WARC record
+            into a temporary file; permitting records too large for memory
+
+	- WARC::Record now has a convenience getter for the record length
+
+	- the "open_payload" method on WARC records now has an initial
+          implementation with the caveat that transfer and content decoding
+          are not yet implemented
+
+	- inconsistencies fixed:
+	  - the "segments" method now returns 1 when called on a
+            non-segmented record in scalar context
+	  - attempting to load a record at an undefined offset in a volume
+            now raises an error instead of treating the undefined value as
+            zero and returning the first record in the volume
+	  - tied handles for reading record blocks now correctly handle the
+            "readline" operation in list context, even though in practice
+            this could easily cause the program to run out of memory
+
+0.0.0_11	2020-02-22
+	- Index support improvements:
+	  - add support for building CDX indexes
+	  - implement common WARC::Index->build class method
+
+0.0.0_10	2020-02-12
+	- quick release to improve signal-to-noise ratio on test reports
+
+	- add missing dependencies on HTTP::Message, HTTP::Request,
+          HTTP::Response modules used to replay HTTP exchanges
+
+	- no actual code changes
+
+0.0.0_9		2020-02-11
+	- fix bug in WARC::Record::Logical::Heuristics tests that caused
+          spurious failures in some automated test environments
+
+	- add infrastructure for replay of WARC records
+	  - WARC::Record::Replay registry and autoloader
+	  - WARC::Record::FromVolume::replay object method
+	  - implement replay of HTTP messages
+
+	- add in-memory index support as WARC::Index::Volatile
+
+	- coalescing a single index entry now simply returns that entry
+
+	- add union index queries
+	  - implement nested loop join in WARC::Collection
+	  - support multiple values in distance method of WARC::Index::Entry
+
+0.0.0_8		2019-10-22
+	- quick release after previous release had a very high failure rate
+
+	- fix bug in WARC::Record::Logical::Block tests that caused
+          failures on nearly all perls except for my own environment
+
+	- use the "if" pragma to select Carp's verbose mode when the test
+          scripts are running with the environment variable
+          AUTOMATED_TESTING set to a true value
+
+0.0.0_7		2019-10-22
+	- implement reassembly of segmented WARC records
+	  - WARC::Record::Logical
+	  - WARC::Record::Logical::Block
+	  - WARC::Record::Logical::Heuristics
+
+	- records now carry the WARC::Collection that provided them
+	  - allow storing additional parameters in record stubs
+	  - WARC::Collection can now report if any index can search on a key
+
+	- WARC::Record POD now includes a quick reference for which WARC
+          headers are required for the various WARC record types
+
+	- fix incomplete cloning of WARC::Fields objects
+
+	- improve performance of "next" method on compressed records when
+          the "sl" GZIP extended header is used
+
+0.0.0_6		2019-09-14
+	- implement WARC::Collection
+
+	- declare minimum version for dependency on Test::More
+
+	- Index support improvements:
+	  - indexes can now report ability to search on particular keys
+	  - index entries can now be retrieved by position and can report
+            their positions to provide for future metaindex support
+	  - indexes can now search for WARC-Record-ID values
+	  - CDX index files can now be read
+
+0.0.0_5		2019-09-10
+	- quick release after previous release had a very high failure rate
+
+	- fix bug in WARC::Record::FromVolume tests that caused failures on
+          perl 5.18+ due to improved hash randomization
+
+	- kill a bogus inherited constructor in WARC::Record::FromVolume
+
+	- implement WARC::Index::Entry
+	- add WARC::Record::Stub for load-on-demand record objects
+
+	- replace platform-based test with direct feature test in
+          WARC::Volume to determine if inode numbers from stat are valid
+	  - The new test assumes that stat either returns a constant bogus
+            inode number, or that the dev:ino fields are as POSIX requires.
+
+	- declare dependencies on core modules to ensure that the installed
+          version is included in test reports
+
+0.0.0_4		2019-09-08
+	- quick release after previous release had 100% FAIL on CPAN Testers
+
+	- fix bug in WARC::Record tests that was causing random failures
+	- fix missing "use overload fallback => 1" in WARC::Volume
+	  - bizarrely, the tests passed here without it
+
+	- implement WARC::Index index system registration
+
+0.0.0_3		2019-09-07
+	- skip POD verification test if Pod::Checker is too old
+
+	- implement WARC::Date
+	- implement WARC::Volume
+	- implement basic support for reading WARC files
+	  - WARC::Record::Block
+	  - part of WARC::Record
+	  - part of WARC::Record::FromVolume
+
+	- WARC::Fields
+	  - test performance improved
+	  - ->as_block now uses strict UTF-8
+	  - parsing tests now skipped if Perl core lacks in-memory files
+
+	- document 'sl' gzip extension header generated by GNU Wget
+	  - WARC::Builder will also support writing this header
+	  - WARC::Record uses this header if available
+
+0.0.0_2		2019-08-31
+	- skip POD verification test if Pod::Checker is not available
+
+	- improve unit tests
+	  - tests now "use strict" and "use warnings"
+	  - tests now abort if loading target module fails
+
+	- implement WARC::Fields
+	- declare dependency on Scalar::Util for WARC::Fields
+
+0.0.0_1		2019-08-16
+	- original version as POD specification
+

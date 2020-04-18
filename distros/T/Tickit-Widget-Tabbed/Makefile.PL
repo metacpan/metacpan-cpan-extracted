@@ -2,11 +2,7 @@
 use strict;
 use warnings;
 
-
-
 use ExtUtils::MakeMaker 6.30;
-
-
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Basic tabbed window support",
@@ -26,11 +22,14 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Tickit-Widget-Tabbed",
   "EXE_FILES" => [],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.026",
   "NAME" => "Tickit::Widget::Tabbed",
   "PREREQ_PM" => {
+    "Object::Pad" => "0.22",
+
     "List::Util" => "1.26",
     "Scalar::Util" => 0,
+    "Struct::Dumb" => 0,
     "Tickit::ContainerWidget" => "0.44",
     "Tickit::Widget" => "0.36",
     "Tickit::Window" => "0.28",
@@ -42,6 +41,25 @@ my %WriteMakefileArgs = (
   }
 );
 
+if( eval { require Module::Metadata } ) {
+        # EU:MM won't understand the `class` syntax used here. We'll have to
+        # use the locally-patched Module::Metadata at author-time to find it
+        my $provides = Module::Metadata->provides(
+                dir => "lib",
+                version => 2,
+        );
+
+        $WriteMakefileArgs{META_MERGE}{provides} = $provides;
+
+        # Try to get VERSION
+        foreach my $p ( values %$provides ) {
+                next unless $p->{file} eq $WriteMakefileArgs{VERSION_FROM};
+
+                delete $WriteMakefileArgs{VERSION_FROM};
+                $WriteMakefileArgs{VERSION} = $p->{version};
+                last;
+        }
+}
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
   my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};

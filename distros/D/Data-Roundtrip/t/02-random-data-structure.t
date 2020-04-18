@@ -1,11 +1,7 @@
-#!/usr/bin/env perl
-
-##!perl -T
+#!perl -T
 use 5.008;
 use strict;
 use warnings;
-
-use lib 'blib/lib';
 
 use utf8;
 

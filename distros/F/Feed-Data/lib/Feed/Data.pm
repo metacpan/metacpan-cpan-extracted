@@ -10,9 +10,10 @@ use Feed::Data::Object;
 use JSON;
 use Compiled::Params::OO qw/cpo/;
 use XML::RSS::LibXML;
+use Text::CSV_XS qw/csv/;
 
 use 5.006;
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 our $validate;
 BEGIN {
@@ -24,6 +25,7 @@ BEGIN {
 		raw => [Any, Optional->of(Str)],
 		text => [Any, Optional->of(Str)],
 		json => [Any, Optional->of(Str)],
+		csv => [Any, Optional->of(Str)],
 		convert_feed => [Any, Str, Str]
 	);
 }
@@ -153,6 +155,14 @@ sub _json {
 	return $json->pretty->encode( \@render );
 }
 
+sub _csv {
+	my ( $self, $type ) = $validate->json->(@_);
+	my @render = $self->_convert_feed('generate', 'json');
+	my $string;
+	csv (in => \@render, out => \$string);
+	return $string;
+}
+
 sub _convert_feed {
 	my ( $self, $type, $format ) = $validate->convert_feed->(@_);
 	my @render;
@@ -174,7 +184,7 @@ Feed::Data - dynamic data feeds
 
 =head1 VERSION
 
-Version 0.5
+Version 0.04
 
 =head1 SYNOPSIS 
 
@@ -220,7 +230,7 @@ Feed::Data is a frontend for building dynamic data feeds.
 
 Populates the feed Attribute, this is an Array of Feed::Data::Object 's
 
-You can currently build Feeds by parsing xml (RSS, ATOM) and HTML via Meta Tags (twitter, opengraph);
+You can currently build Feeds by parsing xml (RSS, ATOM), JSON, CSV, HTML via Meta Tags (twitter, opengraph) and plain text using key values seperated by a colon.
 
 =cut
 
@@ -233,7 +243,7 @@ You can currently build Feeds by parsing xml (RSS, ATOM) and HTML via Meta Tags 
 
 =item File
 
-	$feed->parse( 'path/to/feed.xml' );
+	$feed->parse( 'path/to/feed.json' );
 
 =item Raw 
 
@@ -305,7 +315,8 @@ render the feed using the passed in format, defaults to text.
 	# text - stripped to plain text
 	# json 
 	# rss
-
+	# csv
+	
 	$feed->render('raw');
 
 =cut

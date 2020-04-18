@@ -44,9 +44,12 @@ $tickit->bind_key(
 
 $tickit->run;
 
-package IndexCard;
-use base qw( Tickit::Widget::Tabbed::Ribbon );
-sub lines { 3 }
+use 5.026;
+use Object::Pad 0.22;
+
+class IndexCard extends Tickit::Widget::Tabbed::Ribbon;
+
+method lines () { 3 }
 
 use Tickit::Style -copy;
 BEGIN {
@@ -56,20 +59,18 @@ BEGIN {
                 tab_b  => 0;
 }
 
-package IndexCard::horizontal;
-use base qw( IndexCard );
+class IndexCard::horizontal extends IndexCard;
+
 use Tickit::RenderBuffer qw(LINE_SINGLE);
 use Tickit::Utils qw( textwidth );
 
-sub lines { 2 }
-sub cols  { 1 }
+method lines () { 2 }
+method cols  () { 1 }
 
-sub render_to_rb {
-        my $self = shift;
-        my ($rb, $rect) = @_;
+method render_to_rb ( $rb, $rect ) {
         my @tabs = $self->tabs;
 
-my $win = $self->window;
+        my $win = $self->window;
         $rb->clip( $rect );
 
         my $pen = $self->get_style_pen( "tab" );
@@ -89,4 +90,4 @@ my $win = $self->window;
         }
 }
 
-sub scroll_to_visible { }
+method scroll_to_visible ($) { }

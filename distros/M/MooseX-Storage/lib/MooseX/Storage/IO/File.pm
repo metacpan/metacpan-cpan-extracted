@@ -1,7 +1,7 @@
 package MooseX::Storage::IO::File;
 # ABSTRACT: A basic File I/O role
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Moose::Role;
 use MooseX::Storage::Engine::IO::File;
@@ -20,8 +20,6 @@ sub store {
     MooseX::Storage::Engine::IO::File->new( file => $filename )->store( $self->freeze(@args) );
 }
 
-no Moose::Role;
-
 1;
 
 __END__
@@ -36,7 +34,7 @@ MooseX::Storage::IO::File - A basic File I/O role
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

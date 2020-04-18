@@ -1,3 +1,19 @@
+0.32.3 2020-04-17 17:34:07 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - include upload button
+
+0.32.2 2020-04-17 17:23:54 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix event name
+
+0.32.1 2020-04-17 17:16:34 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - towards working upload
+
+0.32.0 2020-04-17 15:28:12 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - rewritten upload support
+
 0.31.5 2020-04-15 18:41:27 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix regression with extra q

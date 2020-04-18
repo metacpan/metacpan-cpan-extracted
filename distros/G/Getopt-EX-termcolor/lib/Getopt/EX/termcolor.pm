@@ -10,30 +10,48 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
     my $rcloader = new Getopt::EX::Loader
         BASECLASS => [ 'App::command', 'Getopt::EX' ];
 
-    $ command -Mtermcolor
+    or
+
+    use Getopt::EX::Long qw(:DEFAULT ExConfigure);
+    ExConfigure BASECLASS => [ "App::command", "Getopt::EX" ];
+
+    then
+
+    $ command -Mtermcolor::bg=
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
-This is a common module for command using L<Getopt::EX> to set system
-dependent termcolor option.
+This is a common module for command using L<Getopt::EX> to manipulate
+system dependent terminal color.
 
 Actual action is done by sub-module under L<Getopt::EX::termcolor>,
 such as L<Getopt::EX::termcolor::Apple_Terminal>.
 
-Each sub-module is expected to have C<&brightness> function which
-returns integer value between 0 and 100.  If the sub-module was found
-and C<&brightness> function exists, its result is taken as a
-brightness of the terminal.
+At this point, only terminal background color is supported.  Each
+sub-module is expected to have C<&brightness> function which returns
+integer value between 0 and 100.  If the sub-module was found and
+C<&brightness> function exists, its result is taken as a brightness of
+the terminal.
 
-However, if the environment variable C<BRIGHTNESS> is defined, its
-value is used as a brightness without calling sub-modules.  The value
-of C<BRIGHTNESS> is expected in range of 0 to 100.
+However, if the environment variable C<TERM_BRIGHTNESS> is defined,
+its value is used as a brightness without calling sub-modules.  The
+value of C<TERM_BRIGHTNESS> is expected in range of 0 to 100.
 
-If the brightness can not be taken, nothing happens.  Otherwise, the
+=head1 MODULE FUNCTION
+
+=over 7
+
+=item B<bg>
+
+Call this function with module option:
+
+    $ command -Mtermcolor::bg=
+
+If the terminal brightness is unkown, nothing happens.  Otherwise, the
 module insert B<--light-terminal> or B<--dark-terminal> option
 according to the brightness value.  These options are defined as
 C$<move(0,0)> in this module and do nothing.  They can be overridden
@@ -48,12 +66,14 @@ default values.
     light     : light terminal option    (default "--light-terminal")
     dark      : dark terminal option     (default "--dark-terminal")
 
-For example, use like:
+Use like this:
 
     option default \
-        -Mtermcolor::set(default=100,light=--light,dark=--dark)
+        -Mtermcolor::bg(default=100,light=--light,dark=--dark)
 
-=head1 FUNCTIONS
+=back
+
+=head1 UTILITY FUNCTION
 
 =over 7
 
@@ -100,19 +120,12 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 use Exporter 'import';
 our @EXPORT      = qw();
 our %EXPORT_TAGS = ();
 our @EXPORT_OK   = qw(rgb_to_brightness);
-
-our %param = (
-    light => "--light-terminal",
-    dark  => "--dark-terminal",
-    default => undef,
-    threshold => 50,
-    );
 
 sub rgb_to_brightness {
     my $opt = ref $_[0] ? shift : {};
@@ -121,17 +134,22 @@ sub rgb_to_brightness {
     int(($r * 30 + $g * 59 + $b * 11) / $max); # 0 .. 100
 }
 
-sub call(&@) { $_[0]->(@_[1..$#_]) }
+my $mod;
+my $argv;
 
-sub finalize {
-    my $mod = shift;
+sub initialize {
+    ($mod, $argv) = @_;
+    set_brightness();
+}
 
-    # default to do nothing.
-    $mod->setopt($param{light} => '$<move(0,0)>');
-    $mod->setopt($param{dark}  => '$<move(0,0)>');
-
-    my $brightness = call {
-	my $v = $ENV{BRIGHTNESS};
+sub set_brightness {
+    if (defined $ENV{TERM_BRIGHTNESS}) { return }
+    if (defined $ENV{BRIGHTNESS}) {
+	$ENV{TERM_BRIGHTNESS} = $ENV{BRIGHTNESS};
+	return;
+    }
+    my $brightness = sub {
+	my $v = $ENV{TERM_BRIGHTNESS} // $ENV{BRIGHTNESS};
 	if (defined $v && $v =~ /^\d+$/
 	    && 0 <= $v && $v <= 100
 	    ) {
@@ -150,21 +168,41 @@ sub finalize {
 	    }
 	}
 	undef;
-    };
-
-    $brightness //= $param{default} // return;
-
-    $mod->setopt(default =>
-		 $brightness > $param{threshold}
-		 ? $param{light}
-		 : $param{dark});
+    }->();
+    $ENV{TERM_BRIGHTNESS} = $brightness // return;
 }
 
 use List::Util qw(pairgrep);
 
-sub set {
+#
+# FOR BACKWARD COMPATIBILITY
+# DEPELICATED IN THE FUTURE
+#
+sub set { goto &bg }
+
+my %bg_param = (
+    light => "--light-terminal",
+    dark  => "--dark-terminal",
+    default => undef,
+    threshold => 50,
+    );
+
+sub bg {
     my %arg = @_;
-    %param = (%param, pairgrep { exists $param{$a} } %arg);
+    %bg_param = (%bg_param,
+		 pairgrep { exists $bg_param{$a} } %arg);
+
+    (my $brightness = $ENV{TERM_BRIGHTNESS})
+	//= $bg_param{default} // return;
+
+    # default to do nothing.
+    $mod->setopt($bg_param{light} => '$<move(0,0)>');
+    $mod->setopt($bg_param{dark}  => '$<move(0,0)>');
+
+    $mod->setopt(default =>
+		 $brightness > $bg_param{threshold}
+		 ? $bg_param{light}
+		 : $bg_param{dark});
 }
 
 1;

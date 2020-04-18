@@ -1,17 +1,15 @@
 #  You may distribute under the terms of the Artistic License (the same terms
 #  as Perl itself)
 #
-#  (C) Paul Evans, 2011-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Tabbed::Ribbon;
+use 5.026;
+use Object::Pad 0.22;
 
-use strict;
-use warnings;
+class Tickit::Widget::Tabbed::Ribbon 0.022
+        extends Tickit::Widget;
 
-use base qw( Tickit::Widget );
 Tickit::Window->VERSION( '0.57' );  # ->bind_event
-
-our $VERSION = '0.021';
 
 use Scalar::Util qw( weaken );
 use Tickit::Utils qw( textwidth );
@@ -21,6 +19,9 @@ use Carp;
 # It isn't really; we only use the direct style setting directly from the
 # containing Tickit::Widget::Tabbed
 use constant WIDGET_PEN_FROM_STYLE => 1;
+
+use Struct::Dumb;
+struct MoreMarker => [qw( text width window )];
 
 =head1 NAME
 
@@ -91,74 +92,72 @@ or
 
 =cut
 
-sub new_for_orientation {
-        my $class = shift;
-        my ( $orientation, @args ) = @_;
-
+sub new_for_orientation ( $class, $orientation, @args ) {
         return ${\"${class}::${orientation}"}->new( @args );
 }
 
-sub new {
-        my $class = shift;
-        my %args = @_;
+{
+        my $orig = __PACKAGE__->can( "new" );
+        no warnings 'redefine';
+        *new = sub ( $class, %args ) {
+                foreach my $method (qw( scroll_to_visible on_key on_mouse )) {
+                        $class->can( $method ) or
+                                croak "$class cannot ->$method - do you subclass and implement it?";
+                }
 
-        foreach my $method (qw( scroll_to_visible on_key on_mouse )) {
-                $class->can( $method ) or
-                        croak "$class cannot ->$method - do you subclass and implement it?";
-        }
+                return $class->$orig( %args );
+        };
+}
 
-        my $self = $class->SUPER::new( %args );
+has $_tabbed; method tabbed { $_tabbed }
 
+has $_prev_more; method prev_more { $_prev_more }
+has $_next_more; method next_more { $_next_more }
+
+has $_active_tab_index;
+
+has @_tabs;
+
+method BUILD ( %args ) {
         my ( $prev_more, $next_more ) = $args{tabbed}->get_style_values(qw( more_left more_right ));
-        $self->{prev_more} = [ $prev_more, textwidth $prev_more ];
-        $self->{next_more} = [ $next_more, textwidth $next_more ];
+        $_prev_more = MoreMarker( $prev_more, textwidth( $prev_more ), undef );
+        $_next_more = MoreMarker( $next_more, textwidth( $next_more ), undef );
 
-        $self->{tabs} = [];
-        push @{$self->{tabs}}, @{$args{tabs}} if $args{tabs};
+        push @_tabs, @{$args{tabs}} if $args{tabs};
 
-        $self->{scroll_offset} = 0;
-        $self->{active_tab_index} = $args{active_tab_index} || 0;
+        $_active_tab_index = $args{active_tab_index} || 0;
 
-        weaken( $self->{tabbed} = $args{tabbed} );
+        weaken( $_tabbed = $args{tabbed} );
 
-        $self->scroll_to_visible( $self->{active_tab_index} );
-
-        return $self;
+        $self->scroll_to_visible( $_active_tab_index );
 }
 
-sub active_pen {
-        my $self = shift;
-        return $self->{tabbed}->get_style_pen( "active" );
+method active_pen () {
+        return $_tabbed->get_style_pen( "active" );
 }
 
-=head2 @tabs = $ribbon->tabs
+=head2 tabs
 
-=head2 $count = $ribbon->tabs
+ @tabs = $ribbon->tabs
+
+ $count = $ribbon->tabs
 
 Returns a list of the contained L<Tickit::Widget::Tabbed> tab objects in list
 context, or the count of them in scalar context.
 
 =cut
 
-sub tabs {
-        my $self = shift;
-        return @{$self->{tabs}};
-}
+method tabs () { @_tabs }
 
-sub _tab2index {
-        my $self = shift;
-        my ( $tab_or_index ) = @_;
+method _tab2index ( $tab_or_index ) {
         if( !ref $tab_or_index ) {
-                croak "Invalid tab index" if $tab_or_index < 0 or $tab_or_index >= @{ $self->{tabs} };
+                croak "Invalid tab index" if $tab_or_index < 0 or $tab_or_index >= @_tabs;
                 return $tab_or_index;
         }
-        return ( grep { $tab_or_index == $self->{tabs}[$_] } 0 .. $#{ $self->{tabs} } )[0];
+        return ( grep { $tab_or_index == $_tabs[$_] } 0 .. $#_tabs )[0];
 }
 
-sub _pen_for_tab {
-        my $self = shift;
-        my ( $tab ) = @_;
-
+method _pen_for_tab ( $tab ) {
         if( $tab->_has_pen and $tab->is_active ) {
                 return Tickit::Pen->new($tab->pen->getattrs, $self->active_pen->getattrs);
         }
@@ -173,76 +172,67 @@ sub _pen_for_tab {
         }
 }
 
-=head2 $index = $ribbon->active_tab_index
+=head2 active_tab_index
+
+ $index = $ribbon->active_tab_index
 
 Returns the index of the currently-active tab
 
 =cut
 
-sub active_tab_index {
-        my $self = shift;
-        return $self->{active_tab_index};
-}
+method active_tab_index { $_active_tab_index }
 
-=head2 $tab = $ribbon->active_tab
+=head2 active_tab
+
+ $tab = $ribbon->active_tab
 
 Returns the currently-active tab as a C<Tickit::Widget::Tabbed> tab object.
 
 =cut
 
-sub active_tab {
-        my $self = shift;
-        return $self->{tabs}->[$self->{active_tab_index}];
+method active_tab {
+        return $_tabs[$_active_tab_index];
 }
 
-sub append_tab {
-        my $self = shift;
-        my ( $tab ) = @_;
+method append_tab ( $tab ) {
+        push @_tabs, $tab;
 
-        push @{$self->{tabs}}, $tab;
-
-        $self->{tabbed}->_tabs_changed;
+        $_tabbed->_tabs_changed;
         $self->scroll_to_visible( undef );
 }
 
-sub remove_tab {
-        my $self = shift;
+method remove_tab {
         my $del_index = $self->_tab2index( shift );
 
-        my $tabs = $self->{tabs};
-
-        my ( $tab ) = splice @$tabs, $del_index, 1, ();
+        my ( $tab ) = splice @_tabs, $del_index, 1, ();
         $tab->widget->window->close;
 
-        if( $self->{active_tab_index} > $del_index ) {
-                $self->{active_tab_index}--;
+        if( $_active_tab_index > $del_index ) {
+                $_active_tab_index--;
         }
-        elsif( $self->{active_tab_index} == $del_index ) {
-                $self->{active_tab_index}-- if $del_index == @$tabs;
+        elsif( $_active_tab_index == $del_index ) {
+                $_active_tab_index-- if $del_index == @_tabs;
                 if( $self->active_tab ) {
                         $self->active_tab->_activate;
                 }
                 else {
-                        $self->{tabbed}->window->expose;
+                        $_tabbed->window->expose;
                 }
         }
 
-        $self->{tabbed}->_tabs_changed;
+        $_tabbed->_tabs_changed;
         $self->scroll_to_visible( undef );
 }
 
-sub move_tab {
-        my $self = shift;
+method move_tab {
         my $old_index = $self->_tab2index( shift );
         my $delta = shift;
-
-        my $tabs = $self->{tabs};
 
         if( $delta < 0 ) {
                 $delta = -$old_index if $delta < -$old_index;
         }
         elsif( $delta > 0 ) {
-                my $spare = $#$tabs - $old_index;
+                my $spare = $#_tabs - $old_index;
                 $delta = $spare if $delta > $spare;
         }
         else {
@@ -250,29 +240,28 @@ sub move_tab {
                 return;
         }
 
-        splice @$tabs, $old_index + $delta, 0, ( splice @$tabs, $old_index, 1, () );
+        splice @_tabs, $old_index + $delta, 0, ( splice @_tabs, $old_index, 1, () );
 
         # Adjust the active_tab_index to cope with tab move
-        $self->{active_tab_index} += $delta if $self->{active_tab_index} == $old_index;
-        $self->{active_tab_index}++ if $self->{active_tab_index} < $old_index and $self->{active_tab_index} >= $old_index + $delta;
-        $self->{active_tab_index}-- if $self->{active_tab_index} > $old_index and $self->{active_tab_index} <= $old_index + $delta;
+        $_active_tab_index += $delta if $_active_tab_index == $old_index;
+        $_active_tab_index++ if $_active_tab_index < $old_index and $_active_tab_index >= $old_index + $delta;
+        $_active_tab_index-- if $_active_tab_index > $old_index and $_active_tab_index <= $old_index + $delta;
 
         $self->redraw;
 }
 
-sub activate_tab {
-        my $self = shift;
+method activate_tab {
         my $new_index = $self->_tab2index( shift );
 
-        return if $new_index == $self->{active_tab_index};
+        return if $new_index == $_active_tab_index;
 
         if(my $old_widget = $self->active_tab->widget) {
                 $self->active_tab->_deactivate;
         }
 
-        $self->{active_tab_index} = $new_index;
+        $_active_tab_index = $new_index;
 
-        $self->scroll_to_visible( $self->{active_tab_index} );
+        $self->scroll_to_visible( $_active_tab_index );
 
         $self->redraw;
 
@@ -286,84 +275,74 @@ sub activate_tab {
         return $self;
 }
 
-sub next_tab {
-        my $self = shift;
+method next_tab {
         $self->activate_tab( ( $self->active_tab_index + 1 ) % $self->tabs );
 }
 
-sub prev_tab {
-        my $self = shift;
+method prev_tab {
         $self->activate_tab( ( $self->active_tab_index - 1 ) % $self->tabs );
 }
 
-sub on_pen_changed {
-        my $self = shift;
-        my ( $pen, $id ) = @_;
+method on_pen_changed ( $pen, $id ) {
         $self->redraw;
-        return $self->SUPER::on_pen_changed( @_ );
+        return $self->SUPER::on_pen_changed( $pen, $id );
 }
 
-sub on_key { 0 }
+method on_key { 0 }
 
-sub on_mouse { 0 }
+method on_mouse { 0 }
 
-package Tickit::Widget::Tabbed::Ribbon::horizontal;
-use base qw( Tickit::Widget::Tabbed::Ribbon );
+class # hide from indexer
+    Tickit::Widget::Tabbed::Ribbon::horizontal
+        extends Tickit::Widget::Tabbed::Ribbon;
 use constant orientation => "horizontal";
 
 use List::Util qw( sum0 );
 
-sub new {
-        my $class = shift;
-        my %args = @_;
-        my $self = $class->SUPER::new( %args );
-        $self->{active_marker} = $args{active_marker} || [ "[", "]" ];
-        return $self;
+has $_active_marker;
+has $_scroll_offset = 0;
+
+method BUILD ( %args ) {
+        $_active_marker = $args{active_marker} || [ "[", "]" ];
 }
 
-sub lines { 1 }
-sub cols {
-        my $self = shift;
+method lines { 1 }
+method cols {
         return sum0(map { $_->label_width + 1 } $self->tabs) + 1;
 }
 
-sub reshape {
-        my $self = shift;
-
+method reshape {
         my $win = $self->window or return;
 
         $self->scroll_to_visible( undef );
 
-        my $prev_more = $self->{prev_more};
-        if( $prev_more->[2] ) {
-                $prev_more->[2]->change_geometry(
-                        0, 0, 1, $prev_more->[1],
+        my $prev_more = $self->prev_more;
+        if( $prev_more->window ) {
+                $prev_more->window->change_geometry(
+                        0, 0, 1, $prev_more->width,
                 );
         }
 
-        my $next_more = $self->{next_more};
-        if( $next_more->[2] ) {
-                $next_more->[2]->change_geometry(
-                        0, $win->cols - $next_more->[1], 1, $next_more->[1],
+        my $next_more = $self->next_more;
+        if( $next_more->window ) {
+                $next_more->window->change_geometry(
+                        0, $win->cols - $next_more->width, 1, $next_more->width,
                 );
         }
 }
 
-sub render_to_rb {
-        my $self = shift;
-        my ( $rb, $rect ) = @_;
-
+method render_to_rb ( $rb, $rect ) {
         $rect->top == 0 or return;
         $rect->bottom == 1 or return;
 
-        $rb->goto(0, -$self->{scroll_offset});
+        $rb->goto(0, -$_scroll_offset);
 
         my $prev_active;
         foreach my $tab ($self->tabs) {
                 my $active = $tab->is_active;
 
-                $rb->text($active      ? $self->{active_marker}[0] :
-                          $prev_active ? $self->{active_marker}[1] :
+                $rb->text($active      ? $_active_marker->[0] :
+                          $prev_active ? $_active_marker->[1] :
                                          ' ');
                 $rb->text($tab->label, $self->_pen_for_tab($tab));
 
@@ -371,17 +350,14 @@ sub render_to_rb {
         }
 
         if($prev_active) {
-                $rb->text($self->{active_marker}[1]);
+                $rb->text($_active_marker->[1]);
         }
 
         $rb->erase_to($self->window->cols);
 }
 
-sub _col2tab {
-        my $self = shift;
-        my ( $col ) = @_;
-
-        $col += $self->{scroll_offset};
+method _col2tab ( $col ) {
+        $col += $_scroll_offset;
         $col--;
         return if $col < 0;
 
@@ -397,22 +373,19 @@ sub _col2tab {
         return;
 }
 
-sub scroll_to_visible {
-        my $self = shift;
-        my ( $target_idx ) = @_;
-
+method scroll_to_visible ( $target_idx ) {
         my $win = $self->window or return;
         my $cols = $win->cols;
 
-        my $prev_more = $self->{prev_more} or return;
-        my $next_more = $self->{next_more} or return;
+        my $prev_more = $self->prev_more or return;
+        my $next_more = $self->next_more or return;
 
         my @tabs = $self->tabs;
         my $halfwidth = int( $cols / 2 );
 
-        my $ofs = $self->{scroll_offset};
-        my $want_prev_more = defined $prev_more->[2];
-        my $want_next_more = defined $next_more->[2];
+        my $ofs = $_scroll_offset;
+        my $want_prev_more = defined $prev_more->window;
+        my $want_next_more = defined $next_more->window;
 
         {
                 my $col = -$ofs;
@@ -441,9 +414,9 @@ sub scroll_to_visible {
                 $want_prev_more = ( $ofs > 0 );
                 $want_next_more = ( $col > $cols );
 
-                my $left_margin  = $want_prev_more ? $prev_more->[1]
+                my $left_margin  = $want_prev_more ? $prev_more->width
                                                    : 0;
-                my $right_margin = $want_next_more ? $cols - $next_more->[1]
+                my $right_margin = $want_next_more ? $cols - $next_more->width
                                                    : $cols;
 
                 if( defined $start_of_idx and $start_of_idx < $left_margin ) {
@@ -458,76 +431,65 @@ sub scroll_to_visible {
                 }
         }
 
-        $self->{scroll_offset} = $ofs;
+        $_scroll_offset = $ofs;
 
-        if( $want_prev_more and !$prev_more->[2] ) {
+        if( $want_prev_more and !$prev_more->window ) {
                 my $w = $win->make_float(
-                        0, 0, 1, $prev_more->[1],
+                        0, 0, 1, $prev_more->width,
                 );
-                $prev_more->[2] = $w;
-                $w->set_pen( $self->{tabbed}->get_style_pen( "more" ) );
-                $w->bind_event( expose => sub {
-                        my ( $win, undef, $info ) = @_;
-                        $info->rb->text_at( 0, 0, $prev_more->[0] );
+                $prev_more->window = $w;
+                $w->set_pen( $self->tabbed->get_style_pen( "more" ) );
+                $w->bind_event( expose => sub ( $win, $, $info, $ ) {
+                        $info->rb->text_at( 0, 0, $prev_more->text );
                 });
-                $w->bind_event( mouse => sub {
-                        my ( $win, undef, $info ) = @_;
+                $w->bind_event( mouse => sub ( $win, $, $info, $ ) {
                         $self->_scroll_left if $info->type eq "press" && $info->button == 1;
                         return 1;
                 } );
         }
-        elsif( !$want_prev_more and $prev_more->[2] ) {
-                $prev_more->[2]->hide;
-                undef $prev_more->[2];
+        elsif( !$want_prev_more and $prev_more->window ) {
+                $prev_more->window->hide;
+                undef $prev_more->window;
         }
 
-        if( $want_next_more and !$next_more->[2] ) {
+        if( $want_next_more and !$next_more->window ) {
                 my $w = $win->make_float(
-                        0, $win->cols - $next_more->[1], 1, $next_more->[1],
+                        0, $win->cols - $next_more->width, 1, $next_more->width,
                 );
-                $next_more->[2] = $w;
-                $w->set_pen( $self->{tabbed}->get_style_pen( "more" ) );
-                $w->bind_event( expose => sub {
-                        my ( $win, undef, $info ) = @_;
-                        $info->rb->text_at( 0, 0, $next_more->[0] );
+                $next_more->window = $w;
+                $w->set_pen( $self->tabbed->get_style_pen( "more" ) );
+                $w->bind_event( expose => sub ( $win, $, $info, $ ) {
+                        $info->rb->text_at( 0, 0, $next_more->text );
                 } );
-                $w->bind_event( mouse => sub {
-                        my ( $win, undef, $info ) = @_;
+                $w->bind_event( mouse => sub ( $win, $, $info, $ ) {
                         $self->_scroll_right if $info->type eq "press" && $info->button == 1;
                         return 1;
                 } );
         }
-        elsif( !$want_next_more and $next_more->[2] ) {
-                $next_more->[2]->hide;
-                undef $next_more->[2];
+        elsif( !$want_next_more and $next_more->window ) {
+                $next_more->window->hide;
+                undef $next_more->window;
         }
 }
 
-sub _scroll_left {
-        my $self = shift;
-
+method _scroll_left {
         my $win = $self->window or return;
 
-        $self->{scroll_offset} -= int( $win->cols / 2 );
-        $self->{scroll_offset} = 0 if $self->{scroll_offset} < 0;
+        $_scroll_offset -= int( $win->cols / 2 );
+        $_scroll_offset = 0 if $_scroll_offset < 0;
         $self->scroll_to_visible( undef );
         $self->redraw;
 }
 
-sub _scroll_right {
-        my $self = shift;
-
+method _scroll_right {
         my $win = $self->window or return;
 
-        $self->{scroll_offset} += int( $win->cols / 2 );
+        $_scroll_offset += int( $win->cols / 2 );
         $self->scroll_to_visible( undef );
         $self->redraw;
 }
 
-sub on_key {
-        my $self = shift;
-        my ( $ev ) = @_;
-
+method on_key ( $ev ) {
         return unless $ev->type eq "key";
 
         my $str = $ev->str;
@@ -541,71 +503,59 @@ sub on_key {
         }
 }
 
-sub on_mouse {
-        my $self = shift;
-        my ( $ev ) = @_;
-
+method on_mouse ( $ev ) {
         return 0 unless $ev->line == 0;
         return 0 unless my ( $tab, $tab_col ) = $self->_col2tab( $ev->col );
 
         return $tab->on_mouse( $ev->type, $ev->button, 0, $tab_col );
 }
 
-package Tickit::Widget::Tabbed::Ribbon::vertical;
-use base qw( Tickit::Widget::Tabbed::Ribbon );
+class # hide from indexer
+    Tickit::Widget::Tabbed::Ribbon::vertical
+        extends Tickit::Widget::Tabbed::Ribbon;
 use constant orientation => "vertical";
 
 use List::Util qw( max );
 
-sub new {
-        my $class = shift;
-        my %args = @_;
-        my $self = $class->SUPER::new( %args );
-        $self->{tab_position} = $args{tab_position};
-        return $self;
+has $_tab_position;
+has $_scroll_offset = 0;
+
+method BUILD ( %args ) {
+        $_tab_position = $args{tab_position};
 }
 
-sub lines {
-        my $self = shift;
+method lines {
         return scalar $self->tabs;
 }
-sub cols {
-        my $self = shift;
+method cols {
         return 2 + max(0, map { $_->label_width } $self->tabs);
 }
 
-sub reshape {
-        my $self = shift;
-
+method reshape {
         my $win = $self->window or return;
 
         $self->scroll_to_visible( undef );
 
-        my $prev_more = $self->{prev_more};
-        if( $prev_more->[2] ) {
-                $prev_more->[2]->change_geometry(
+        my $prev_more = $self->prev_more;
+        if( $prev_more->window ) {
+                $prev_more->window->change_geometry(
                         0, 0, 1, $win->cols,
                 );
         }
 
-        my $next_more = $self->{next_more};
-        if( $next_more->[2] ) {
-                $next_more->[2]->change_geometry(
+        my $next_more = $self->next_more;
+        if( $next_more->window ) {
+                $next_more->window->change_geometry(
                         $win->lines - 1, $win->cols, 1, $win->cols,
                 );
         }
 }
 
-sub render_to_rb {
-        my $self = shift;
-        my ( $rb, $rect ) = @_;
-
+method render_to_rb ( $rb, $rect ) {
         my $lines = $self->window->lines;
         my $cols  = $self->window->cols;
 
-        my $pos = $self->{tab_position};
-
-        my $next_line = -$self->{scroll_offset};
+        my $next_line = -$_scroll_offset;
         foreach my $tab ($self->tabs) {
                 my $active = $tab->is_active;
 
@@ -617,10 +567,10 @@ sub render_to_rb {
                 $rb->goto($this_line, 0);
 
                 my $spare = $cols - $tab->label_width;
-                if($pos eq 'left') {
+                if($_tab_position eq 'left') {
                         $rb->text($tab->label, $self->_pen_for_tab($tab));
                         $rb->text($active ? (' ' . ('>' x ($spare - 1))) : (' ' x $spare));
-                } elsif($pos eq 'right') {
+                } elsif($_tab_position eq 'right') {
                         $rb->text($active ? (('<' x ($spare - 1)) . ' ') : (' ' x $spare));
                         $rb->text($tab->label, $self->_pen_for_tab($tab));
                 }
@@ -633,10 +583,7 @@ sub render_to_rb {
         }
 }
 
-sub scroll_to_visible {
-        my $self = shift;
-        my ( $idx ) = @_;
-
+method scroll_to_visible ( $idx ) {
         defined $idx or return;
 
         my $win = $self->window or return;
@@ -644,7 +591,7 @@ sub scroll_to_visible {
 
         my $halfheight = int( $lines / 2 );
 
-        my $ofs = $self->{scroll_offset};
+        my $ofs = $_scroll_offset;
 
         {
                 my $line = -$ofs;
@@ -662,16 +609,13 @@ sub scroll_to_visible {
                 }
         }
 
-        $self->{scroll_offset} = $ofs;
+        $_scroll_offset = $ofs;
 }
 
-sub _showhide_more_markers {
+method _showhide_more_markers {
 }
 
-sub on_key {
-        my $self = shift;
-        my ( $ev ) = @_;
-
+method on_key ( $ev ) {
         return unless $ev->type eq "key";
 
         my $str = $ev->str;
@@ -685,12 +629,9 @@ sub on_key {
         }
 }
 
-sub on_mouse {
-        my $self = shift;
-        my ( $ev ) = @_;
-
+method on_mouse ( $ev ) {
         my $line = $ev->line;
-        $line += $self->{scroll_offset};
+        $line += $_scroll_offset;
 
         my @tabs = $self->tabs;
         return 0 unless $line < @tabs;
@@ -706,22 +647,34 @@ The subclass will need to provide implementations of the following methods.
 
 =cut
 
-=head2 $ribbon->render( %args )
+=head2 render
 
-=head2 $lines = $ribbon->lines
+ $ribbon->render( %args )
 
-=head2 $cols = $ribbon->cols
+=head2 lines
+
+ $lines = $ribbon->lines
+
+=head2 cols
+
+ $cols = $ribbon->cols
 
 As per the L<Tickit::Widget> methods.
 
-=head2 $handled = $ribbon->on_key( $ev )
+=head2 on_key
 
-=head2 $handled = $ribbon->on_mouse( $ev )
+ $handled = $ribbon->on_key( $ev )
+
+=head2 on_mouse
+
+ $handled = $ribbon->on_mouse( $ev )
 
 As per the L<Tickit::Widget> methods. Optional. If not supplied then the
 ribbon will not respond to keyboard or mouse events.
 
-=head2 $ribbon->scroll_to_visible( $index )
+=head2 scroll_to_visible
+
+ $ribbon->scroll_to_visible( $index )
 
 Requests that a scrollable control ribbon scrolls itself so that the given
 C<$index> tab is visible.

@@ -1,5 +1,5 @@
 package App::rshasum;
-$App::rshasum::VERSION = '0.2.0';
+$App::rshasum::VERSION = '0.4.0';
 use strict;
 use warnings;
 
@@ -7,23 +7,35 @@ use File::Find::Object ();
 use Digest             ();
 
 use Getopt::Long qw/ GetOptions /;
+use List::Util 1.33 qw/ any /;
 
 sub _worker
 {
     my ( $self, $args ) = @_;
 
-    my $digest    = $args->{digest};
-    my $output_cb = $args->{output_cb};
+    my $digest     = $args->{digest};
+    my $output_cb  = $args->{output_cb};
+    my @prunes     = @{ $args->{prune_re} || [] };
+    my $start_path = ( $args->{start_path} // "." );
 
     my $t = Digest->new($digest);
 
-    my $ff = File::Find::Object->new( {}, "." );
+    my $ff = File::Find::Object->new( {}, $start_path );
+FILES:
     while ( my $r = $ff->next_obj )
     {
+        my $path = join '/', @{ $r->full_components };
+        if (@prunes)
+        {
+            if ( any { $path =~ $_ } @prunes )
+            {
+                $ff->prune;
+                next FILES;
+            }
+        }
         if ( $r->is_file )
         {
-            my $d    = Digest->new($digest);
-            my $path = join '/', @{ $r->full_components };
+            my $d = Digest->new($digest);
             open my $fh, '<', $r->path;
             binmode $fh;
             $d->addfile($fh);
@@ -42,16 +54,23 @@ sub _worker
 sub run
 {
     my $digest;
-    GetOptions( 'digest=s' => \$digest, )
-        or die "foo $!";
+    my @skips;
+    my $start_path = '.';
+    GetOptions(
+        'digest=s'     => \$digest,
+        'skip=s'       => \@skips,
+        'start-path=s' => \$start_path,
+    ) or die "foo $!";
     if ( not defined($digest) )
     {
         die "Please give a --digest=[digest] argument.";
     }
     return shift()->_worker(
         {
-            digest    => $digest,
-            output_cb => sub { print shift()->{str}; }
+            digest     => $digest,
+            output_cb  => sub { print shift()->{str}; },
+            prune_re   => ( \@skips ),
+            start_path => $start_path,
         }
     );
 }
@@ -66,23 +85,17 @@ __END__
 
 =head1 NAME
 
-App::rshasum
-
-=head1 VERSION
-
-version 0.2.0
-
-=head1 SYNOPSIS
-
-    rshasum --digest=SHA-256
-
-=head1 NAME
-
 App::rshasum - recursive shasum.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
+
+=head1 SYNOPSIS
+
+    rshasum --digest=SHA-256
+    rshasum --digest=SHA-256 --skip='\.sw[a-zA-Z]*\z' --skip='~\z'
+    rshasum --digest=SHA-256 --start-path='/home/random-j-user'
 
 =head1 METHODS
 
@@ -90,7 +103,7 @@ version 0.2.0
 
 Runs the app.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -111,35 +124,11 @@ L<https://metacpan.org/release/App-rshasum>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-rshasum>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-rshasum>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-rshasum>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-rshasum>
 
 =item *
 

@@ -1,13 +1,15 @@
 package App::DumpFirefoxHistory;
 
-our $DATE = '2019-11-23'; # DATE
+our $DATE = '2020-04-18'; # DATE
 our $DIST = 'App-DumpFirefoxHistory'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+use File::chdir;
 
 our %SPEC;
 
@@ -19,15 +21,13 @@ $SPEC{dump_firefox_history} = {
             schema => 'bool*',
             cmdline_aliases => {l=>{}},
         },
-        profile => {
-            summary => 'Select profile to use',
-            schema => 'str*',
-            default => 'default-release',
+        profiles => {
+            summary => 'Select profile(s) to dump',
+            schema => ['array*', of=>'firefox::profile_name*'],
             description => <<'_',
 
-You can either provide a name, e.g. `default-release`, the profile directory of
-which will be then be searched in `~/.mozilla/firefox/*.<name>`. Or you can also
-provide a directory name.
+You can choose to dump history for only some profiles. By default, if this
+option is not specified, history from all profiles will be dumped.
 
 _
         },
@@ -55,78 +55,94 @@ _
 };
 sub dump_firefox_history {
     require DBI;
+    require Firefox::Util::Profile;
+    require List::Util;
 
     my %args = @_;
 
-    my ($profile, $profile_dir);
-    $profile = $args{profile} // 'default-release';
-
-    # XXX read list of profiles from ~/.mozilla/firefox/profiles.ini
-  GET_PROFILE_DIR:
+    # list all available firefox profiles
+    my $available_profiles;
     {
-        if ($profile =~ /\A[\w-]+\z/) {
-            # search profile name in profiles directory
-            my @dirs = glob "$ENV{HOME}/.mozilla/firefox/*.*";
-            return [412, "Can't find any profile directory under ~/.mozilla/firefox"]
-                unless @dirs;
-            for my $dir (@dirs) {
-                if ($dir =~ /\.\Q$profile\E(?:-\d+)?\z/) {
-                    $profile_dir = $dir;
-                    last GET_PROFILE_DIR;
-                }
-            }
-        }
-        if (-d $profile) {
-            $profile_dir = $profile;
-        } else {
-            return [412, "No such profile/profile directory '$profile'"];
-        }
+        my $res = Firefox::Util::Profile::list_firefox_profiles(detail=>1);
+        return $res unless $res->[0] == 200;
+        $available_profiles = $res->[2];
     }
 
-    my $path = "$profile_dir/places.sqlite";
-    return [412, "Can't find $path"] unless -f $path;
+    my $num_profiles_success = 0;
+    my $profiles = $args{profiles} // [map {$_->{name}} @$available_profiles];
 
     my @rows;
     my $resmeta = {};
-    my $num_attempts;
-  SELECT: {
-        $num_attempts++;
-        goto COPY if $num_attempts == 1 && !$args{attempt_orig_first};
 
-        eval {
-            my $dbh = DBI->connect("dbi:SQLite:dbname=$path", "", "", {RaiseError=>1});
-            my $sth = $dbh->prepare("SELECT url,title,last_visit_date,visit_count,frecency FROM moz_places ORDER BY last_visit_date");
-            $sth->execute;
-            while (my $row = $sth->fetchrow_hashref) {
-                if ($args{detail}) {
-                    push @rows, $row;
-                } else {
-                    push @rows, $row->{url};
-                }
-            }
-        };
-        my $err = $@;
-        log_info "Got DBI error: $@" if $err;
-      COPY: {
-            unless (!$args{attempt_orig_first} && $num_attempts == 1 || $err && $err =~ /database is locked/) {
-                last;
-            }
-            my $size = -s $path;
-            unless ($size <= $args{copy_size_limit}) {
-                log_trace "Not copying history database to tempfile, size too large (%.1fMB)", $size/1024/1024;
-            }
-            require File::Copy;
-            require File::Temp;
-            my ($temp_fh, $temp_path) = File::Temp::tempfile();
-            log_trace "Copying $path to $temp_path ...";
-            File::Copy::copy($path, $temp_path) or die $err;
-            $path = $temp_path;
-            redo SELECT;
+  PROFILE:
+    for my $profile (@$profiles) {
+        log_trace "Dumping history for profile %s ...", $profile;
+        my $profile_data = List::Util::first(sub { $_->{name} eq $profile }, @$available_profiles);
+        unless ($profile_data) {
+            log_error "Profile %s is unknown, skipped", $profile;
+            next PROFILE;
         }
-    } # SELECT
+
+        my $profile_dir = $profile_data->{path};
+        unless (-d $profile_dir) {
+            log_error "Cannot find directory '%d' for profile %s, profile skipped", $profile_dir, $profile;
+            next PROFILE;
+        }
+
+        local $CWD = $profile_dir;
+
+        my $history_path = "$profile_dir/places.sqlite";
+        unless (-f $history_path) {
+            log_error "Cannot find history database file '%s' for profile %s, profile skipped", $history_path, $profile;
+            next PROFILE;
+        }
+
+        my $num_attempts;
+      SELECT: {
+            $num_attempts++;
+            goto COPY if $num_attempts == 1 && !$args{attempt_orig_first};
+
+            eval {
+                my $dbh = DBI->connect("dbi:SQLite:dbname=$history_path", "", "", {RaiseError=>1});
+                my $sth = $dbh->prepare("SELECT url,title,last_visit_date,visit_count,frecency FROM moz_places ORDER BY last_visit_date");
+                $sth->execute;
+                while (my $row = $sth->fetchrow_hashref) {
+                    if ($args{detail}) {
+                        push @rows, $row;
+                    } else {
+                        push @rows, $row->{url};
+                    }
+                }
+            };
+            my $err = $@;
+            log_info "Got DBI error: $@" if $err;
+          COPY: {
+                unless (!$args{attempt_orig_first} && $num_attempts == 1 || $err && $err =~ /database is locked/) {
+                    last;
+                }
+                my $size = -s $history_path;
+                unless ($size <= $args{copy_size_limit}) {
+                    log_trace "Not copying history database to tempfile, size too large (%.1fMB)", $size/1024/1024;
+                }
+                require File::Copy;
+                require File::Temp;
+                my ($temp_fh, $temp_path) = File::Temp::tempfile();
+                log_trace "Copying $history_path to $temp_path ...";
+                File::Copy::copy($history_path, $temp_path) or die $err;
+                $history_path = $temp_path;
+                redo SELECT;
+            }
+        } # SELECT
+        $num_profiles_success++;
+    } # for profile
 
     $resmeta->{'table.fields'} = [qw/url title last_visit_date visit_count frecency/]
         if $args{detail};
+
+    unless ($num_profiles_success) {
+        return [500, "There are no profiles that I can successully dump the history of"];
+    }
+
     [200, "OK", \@rows, $resmeta];
 }
 
@@ -145,7 +161,7 @@ App::DumpFirefoxHistory - Dump Firefox history
 
 =head1 VERSION
 
-This document describes version 0.005 of App::DumpFirefoxHistory (from Perl distribution App-DumpFirefoxHistory), released on 2019-11-23.
+This document describes version 0.006 of App::DumpFirefoxHistory (from Perl distribution App-DumpFirefoxHistory), released on 2020-04-18.
 
 =head1 SYNOPSIS
 
@@ -181,13 +197,13 @@ copied database.
 
 =item * B<detail> => I<bool>
 
-=item * B<profile> => I<str> (default: "default-release")
+=item * B<profiles> => I<array[firefox::profile_name]>
 
-Select profile to use.
+Select profile(s) to dump.
 
-You can either provide a name, e.g. C<default-release>, the profile directory of
-which will be then be searched in C<< ~/.mozilla/firefox/*.E<lt>nameE<gt> >>. Or you can also
-provide a directory name.
+You can choose to dump history for only some profiles. By default, if this
+option is not specified, history from all profiles will be dumped.
+
 
 =back
 
@@ -230,7 +246,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

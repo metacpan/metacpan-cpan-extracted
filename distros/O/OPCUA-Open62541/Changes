@@ -1,5 +1,17 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.009 2020-04-17
+    - Embed config and logger struct into client or server.  This
+      avoids malloc() and free() races.  The config and logger may
+      extend the lifetime of client or server.
+    - No stand alone logger is possible anymore.  The Logger->new()
+      method has been removed from the API.
+    - After connect_async() the client needs 100 miliseconds before
+      client run_iterate() may be called.  Add some sleeps to test.
+    - Move C declarations to PREINIT section.
+    - The test server can single step iterations to trigger timing
+      races in client tests.
+
 0.008 2020-04-14
     - Fix double free in set variant.
     - Test cleanup.

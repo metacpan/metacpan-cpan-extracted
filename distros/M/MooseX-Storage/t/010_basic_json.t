@@ -4,11 +4,11 @@ use warnings;
 use Test::More;
 use Test::Deep;
 
-use Test::Requires qw(
+use Test::Needs qw(
     JSON::MaybeXS
     Test::Deep::JSON
 );
-diag 'using JSON backend: ', JSON;
+diag 'using JSON backend: ', JSON::MaybeXS->JSON;
 
 plan tests => 10;
 
@@ -42,7 +42,7 @@ plan tests => 10;
 
     cmp_deeply(
         $json,
-        json({
+        Test::Deep::JSON::json({
             number => 10,
             string => 'foo',
             float => 10.5,

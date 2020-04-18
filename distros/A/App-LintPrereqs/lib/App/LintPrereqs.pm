@@ -1,7 +1,9 @@
 package App::LintPrereqs;
 
-our $DATE = '2019-12-17'; # DATE
-our $VERSION = '0.541'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-18'; # DATE
+our $DIST = 'App-LintPrereqs'; # DIST
+our $VERSION = '0.542'; # VERSION
 
 use 5.010001;
 use strict;
@@ -288,6 +290,8 @@ sub lint_prereqs {
     };
     return [200, "Not run (no-lint-prereqs)"] if $ct =~ /^;!no[_-]lint[_-]prereqs$/m;
 
+    my @errs;
+
     my $ciod = Config::IOD->new(
         ignore_unknown_directive => 1,
     );
@@ -397,16 +401,27 @@ sub lint_prereqs {
     );
     log_trace("mods_from_scanned: %s", \%mods_from_scanned);
 
-    if ($mods_from_scanned{Any}{perl}) {
-        return [500, "Perl version specified by source code ($mods_from_scanned{Any}{perl}) ".
-                    "but not specified in dist.ini"] unless $mods_from_ini{Any}{perl};
-        if (version_ne($mods_from_ini{Any}{perl}, $mods_from_scanned{Any}{perl})) {
-            return [500, "Perl version from dist.ini ($mods_from_ini{Any}{perl}) ".
-                        "and scan_prereqs ($mods_from_scanned{Any}{perl}) mismatch"];
+    my $perlv_ini     = $mods_from_ini{Any}{perl};
+    my $perlv_scanned = $mods_from_scanned{Any}{perl};
+    if ($perlv_scanned) {
+        if (!defined $perlv_ini) {
+            push @errs, {
+                module  => 'perl',
+                req_v   => $perlv_scanned,
+                is_core => 1,
+                error   => "perl version specified in source code but not in dist.ini",
+                remedy  => 'Add to dist.ini',
+                remedy_cmds => [
+                    ["pdrutil", "add-prereq", "perl", $perlv_scanned],
+                ],
+            };
+        } elsif (version_ne($perlv_ini, $perlv_scanned)) {
+            return [500, "Perl version from dist.ini ($perlv_ini) ".
+                        "and scan_prereqs ($perlv_scanned) mismatch"];
         }
     } else {
         return [500, "Perl version not specified by source code but specified in dist.ini ".
-                    "($mods_from_ini{Any}{perl})"] if $mods_from_ini{Any}{perl};
+                    "($perlv_ini)"] if $perlv_ini;
     }
 
     my $versions;
@@ -439,8 +454,6 @@ sub lint_prereqs {
             return [500, "Can't parse \$^V ($^V)"];
         }
     }
-
-    my @errs;
 
     # check modules that are specified in dist.ini but extraneous (unused) or
     # have mismatched version or phase
@@ -681,7 +694,7 @@ App::LintPrereqs - Check extraneous/missing/incorrect prerequisites in dist.ini
 
 =head1 VERSION
 
-This document describes version 0.541 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2019-12-17.
+This document describes version 0.542 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2020-04-18.
 
 =head1 SYNOPSIS
 
@@ -696,7 +709,7 @@ Usage:
 
  lint_prereqs(%args) -> [status, msg, payload, meta]
 
-Check extraneous/missing/incorrect prerequisites in dist.ini.
+Check extraneousE<sol>missingE<sol>incorrect prerequisites in dist.ini.
 
 lint-prereqs can improve your prereqs specification in C<dist.ini> by reporting
 prereqs that are extraneous (specified but unused), missing (used/required but
@@ -776,7 +789,7 @@ created.
 
 =item * B<perl_version> => I<str>
 
-Perl version to use (overrides scan_prereqs/dist.ini).
+Perl version to use (overrides scan_prereqsE<sol>dist.ini).
 
 =item * B<scanner> => I<str> (default: "regular")
 
@@ -791,6 +804,7 @@ given some weird code.
 
 C<nqlite> means L<Perl::PrereqScanner::NotQuiteLite> which is faster than
 C<regular> but not as fast as C<lite>.
+
 
 =back
 
@@ -827,7 +841,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

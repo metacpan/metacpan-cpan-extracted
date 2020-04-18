@@ -1,3 +1,9 @@
+0.542   2020-04-18  Released-By: PERLANCAR; Urgency: medium
+
+	- When perl version is specified in source code but not in
+	  dist.ini, we need not fail but add remedy.
+
+
 0.541   2019-12-17  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Add -F as shortcut alias for --fix.
@@ -275,7 +281,7 @@
 	- Also look at OSPrereqs (and OSPrereqs::*) for prereqs.
 
 
-0.16     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.16     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - [build] CLI scripts are now generated automatically using
            Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
@@ -376,3 +382,4 @@
 0.01    2012-08-08  Released-By: SHARYANTO
 
         - First release.
+

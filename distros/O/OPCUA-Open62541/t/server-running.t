@@ -4,7 +4,7 @@ use OPCUA::Open62541 'STATUSCODE_GOOD';
 use POSIX qw(sigaction SIGALRM);
 
 use OPCUA::Open62541::Test::Server;
-use Test::More tests => OPCUA::Open62541::Test::Server::planning() + 2;
+use Test::More tests => OPCUA::Open62541::Test::Server::planning() + 1;
 use Test::LeakTrace;
 use Test::NoWarnings;
 

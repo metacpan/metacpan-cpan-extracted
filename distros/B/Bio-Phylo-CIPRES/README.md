@@ -1,3 +1,5 @@
+![](https://cpants.cpanauthors.org/release/RVOSA/Bio-Phylo-CIPRES-v0.2.0.svg)
+
 ![](http://www.phylo.org/images/interface/logo_cipres.gif)
 
 # Bio::Phylo::CIPRES

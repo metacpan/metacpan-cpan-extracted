@@ -26,6 +26,8 @@ lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/Footer.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/TabView.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/Auto.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/DateTime.js
+lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/UploadButton.js
+lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/UploadToolbarButton.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/renderer/NoteForm.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/renderer/HBox.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/plugin/Action.js
@@ -54,12 +56,7 @@ lib/CallBackery/qooxdoo/callbackery/source/translation/en.po
 lib/CallBackery/qooxdoo/callbackery/source/translation/readme.txt
 lib/CallBackery/qooxdoo/callbackery/source/translation/fr.po
 lib/CallBackery/qooxdoo/callbackery/source/translation/it.po
-lib/CallBackery/qooxdoo/uploadwidget/source/class/uploadwidget/UploadField.js
-lib/CallBackery/qooxdoo/uploadwidget/source/class/uploadwidget/UploadForm.js
-lib/CallBackery/qooxdoo/uploadwidget/source/class/uploadwidget/UploadButton.js
-lib/CallBackery/qooxdoo/uploadwidget/source/class/uploadwidget/UploadToolbarButton.js
-lib/CallBackery/qooxdoo/uploadwidget/source/translation/readme.txt
-lib/CallBackery/qooxdoo/uploadwidget/source/resource/readme.txt
+lib/CallBackery/qooxdoo/uploadwidget/source/class/uploadwidget/.gitkeep
 lib/CallBackery/qooxdoo/uploadwidget/Manifest.json
 lib/CallBackery/User.pm
 lib/CallBackery/Translate.pm

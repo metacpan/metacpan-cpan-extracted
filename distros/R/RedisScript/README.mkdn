@@ -1,0 +1,61 @@
+# NAME
+
+RedisScript - Perl extension to help load and run Lua script in Redis server.
+
+# VERSION
+
+version 0.02
+
+# DESCRIPTION
+
+The extension serve to help load and run Lua script in Redis servers.
+
+# EXAMPLE
+
+    use RedisScript;
+    use Redis;
+    my $rs_o = RedisScript->new( redis => Redis->new(),
+                                 code => <<EOB,
+      local key1 = KEYS[1]
+      local res = redis.call( 'setex', key1, ARGV[1], ARGV[2] )
+      return 1
+    EOB
+                               );
+    my @res = $rs_o->runit( keys => [ qw/ a / ], args => [ 1, 300 ] );
+    
+
+# INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If possible, use a local Redis instance for testing the module.
+The module have 2 levels of test:
+
+- only add a Lua scrit to the Redis server, to activate it define the environment variable RUN_REDIS_TESTS;
+
+- a second that need to flush all Redis scripts (command: script flush), to enable it define the environment variable RUN_REDIS_FLUSH_TESTS.
+
+# DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Carp
+   Test::More
+
+# AUTHOR
+
+pedro.frazao
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by pedro.frazao.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

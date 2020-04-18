@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use HTTP::Tiny;
 
-our $VERSION = "0.0.14";
+our $VERSION = "0.0.15";
 
 # the context of Lambda Function
 our $context;
@@ -312,10 +312,6 @@ Now, you can use L<Paws> to call AWS API from your Lambda function.
     print $res->AttributeFromResult;
 
 The Layer ARN list is here.
-
-=over
-
-=item Perl 5.30
 
 =over
 

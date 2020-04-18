@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+0.98    2020/04/17
+        - Add links to git repo for cpan tools (by Tom Hukins)
+        - Fix parsing plans with tabs instead of spaces (by Pierre GIRAUD)
+
 0.97    2020/04/03
         - Allow parsing of plans inside psql generated frames
         - Provide a way to easily get all subnodes, including subnodes of subnodes

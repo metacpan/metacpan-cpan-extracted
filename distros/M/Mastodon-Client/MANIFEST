@@ -8,6 +8,7 @@ Makefile.PL
 README.md
 cpanfile
 dist.ini
+examples/listener
 lib/Mastodon/Client.pm
 lib/Mastodon/Entity/Account.pm
 lib/Mastodon/Entity/Application.pm

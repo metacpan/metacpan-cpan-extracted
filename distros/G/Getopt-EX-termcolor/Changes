@@ -1,4 +1,9 @@
-Revision history for Perl extension Getopt-EX-termcolor
+Revision history for Getopt-EX extension Getopt-EX-termcolor
+
+1.02 2020-04-18T02:49:50Z
+
+    - Change the interface to call &bg with module option.
+    - Use TERM_BRIGHTNESS rather than BRIGHTNESS.
 
 1.01 2020-04-16T06:15:00Z
 

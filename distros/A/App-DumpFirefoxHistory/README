@@ -2,8 +2,8 @@ NAME
     App::DumpFirefoxHistory - Dump Firefox history
 
 VERSION
-    This document describes version 0.005 of App::DumpFirefoxHistory (from
-    Perl distribution App-DumpFirefoxHistory), released on 2019-11-23.
+    This document describes version 0.006 of App::DumpFirefoxHistory (from
+    Perl distribution App-DumpFirefoxHistory), released on 2020-04-18.
 
 SYNOPSIS
     See the included script dump-firefox-history.
@@ -34,14 +34,13 @@ FUNCTIONS
 
     *   detail => *bool*
 
-    *   profile => *str* (default: "default-release")
+    *   profiles => *array[firefox::profile_name]*
 
-        Select profile to use.
+        Select profile(s) to dump.
 
-        You can either provide a name, e.g. "default-release", the profile
-        directory of which will be then be searched in
-        "~/.mozilla/firefox/*.<name>". Or you can also provide a directory
-        name.
+        You can choose to dump history for only some profiles. By default,
+        if this option is not specified, history from all profiles will be
+        dumped.
 
     Returns an enveloped result (an array).
 
@@ -79,7 +78,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,9 @@
 Revision history for App-rshasum
 
+0.4.0       2020-04-17
+    - Add the --skip flag
+    - Add the --start-path flag
+
 0.2.0       2019-03-11
     - Avoid emitting a leading "./" prefix for files in the root.
         - Added a test for that under t/run.t .

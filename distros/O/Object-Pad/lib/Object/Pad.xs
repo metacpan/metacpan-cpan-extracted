@@ -130,6 +130,26 @@ static OP *MY_op_convert_list(pTHX_ I32 type, I32 flags, OP *o)
 }
 #endif
 
+/* A handy helper */
+#define save_strndup(s, l)  S_save_strndup(aTHX_ s, l)
+static char *S_save_strndup(pTHX_ char *s, STRLEN l)
+{
+  /* savepvn doesn't put anything on the save stack, despite its name */
+  char *ret = savepvn(s, l);
+  SAVEFREEPV(ret);
+  return ret;
+}
+
+#define sv_setrv(s, r)  S_sv_setrv(aTHX_ s, r)
+static void S_sv_setrv(pTHX_ SV *sv, SV *rv)
+{
+  sv_setiv(sv, (IV)rv);
+#if !HAVE_PERL_VERSION(5, 24, 0)
+  SvIOK_off(sv);
+#endif
+  SvROK_on(sv);
+}
+
 /* A SLOTOFFSET is an offset within the AV of an object instance */
 typedef IV SLOTOFFSET;
 
@@ -146,8 +166,10 @@ typedef struct {
   AV *slots;           /* each AV item is a raw pointer directly to a SlotMeta */
   enum {
     REPR_NATIVE,       /* instances are in native format - blessed AV as slots */
-    REPR_FOREIGN_HASH, /* instances are blessed HASHes; our slots live in $self->{"Object::Pad/slots"} */
+    REPR_HASH,         /* instances are blessed HASHes; our slots live in $self->{"Object::Pad/slots"} */
+    REPR_MAGIC,        /* instances store slot AV via magic; superconstructor must be foreign */
   } repr;
+  CV *foreign_new;     /* superclass is not Object::Pad, here is the constructor */
 
   COP *tmpcop;         /* a COP to use during generated constructor */
   CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
@@ -159,9 +181,12 @@ enum {
   PADIX_SLOTS = 2,
 };
 
-static OP *newPADSVOP(PADOFFSET padix, I32 flags, U32 private)
+/* Empty MGVTBL simply for locating instance slots AV */
+static MGVTBL vtbl_slotsav = {};
+
+static OP *newPADxVOP(I32 type, PADOFFSET padix, I32 flags, U32 private)
 {
-  OP *op = newOP(OP_PADSV, flags);
+  OP *op = newOP(type, flags);
   op->op_targ = padix;
   op->op_private = private;
   return op;
@@ -173,6 +198,7 @@ static OP *pp_methstart(pTHX)
   SV *self = av_shift(GvAV(PL_defgv));
   SV *rv;
   HV *classstash = CvSTASH(find_runcv(0));
+  bool create = PL_op->op_flags & OPf_MOD;
 
   if(!SvROK(self) || !SvOBJECT(rv = SvRV(self)))
     croak("Cannot invoke method on a non-instance");
@@ -193,11 +219,14 @@ static OP *pp_methstart(pTHX)
       slotsav = rv;
       break;
 
-    case REPR_FOREIGN_HASH:
+    case REPR_HASH:
     {
       if(SvTYPE(rv) != SVt_PVHV)
         croak("Not a HASH reference");
-      SV **slotssvp = hv_fetchs((HV *)rv, "Object::Pad/slots", 0);
+      SV **slotssvp = hv_fetchs((HV *)rv, "Object::Pad/slots", create);
+      if(create && !SvOK(*slotssvp))
+        sv_setrv(*slotssvp, (SV *)newAV());
+
       /* A method invoked during a superclass constructor of a classic perl
        * class might encounter $self without slots. If this is the case we'll
        * invoke INITSLOTS now to create it.
@@ -224,6 +253,17 @@ static OP *pp_methstart(pTHX)
       slotsav = SvRV(*slotssvp);
       break;
     }
+
+    case REPR_MAGIC:
+    {
+      MAGIC *mg = mg_findext(rv, PERL_MAGIC_ext, &vtbl_slotsav);
+      if(!mg && create)
+        mg = sv_magicext(rv, (SV *)newAV(), PERL_MAGIC_ext, &vtbl_slotsav, NULL, 0);
+      if(!mg)
+        croak("Expected to find slots AV magic extension");
+      slotsav = mg->mg_obj;
+      break;
+    }
   }
 
   SAVESPTR(PAD_SVl(PADIX_SLOTS));
@@ -233,9 +273,9 @@ static OP *pp_methstart(pTHX)
   return PL_op->op_next;
 }
 
-static OP *newMETHSTARTOP(U8 private)
+static OP *newMETHSTARTOP(I32 flags, U8 private)
 {
-  OP *op = newOP(OP_CUSTOM, 0);
+  OP *op = newOP(OP_CUSTOM, flags);
   op->op_ppaddr = &pp_methstart;
   op->op_private = private;
   return op;
@@ -411,10 +451,13 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta)
   if(padix != PADIX_SELF)
     croak("ARGH: Expected that padix[$self] = 1");
 
+  padix = pad_add_name_pvs("@(Object::Pad/slots)", 0, NULL, NULL);
+  if(padix != PADIX_SLOTS)
+    croak("ARGH: Expected that padix[@slots] = 2");
+
   ops = op_append_list(OP_LINESEQ, ops,
-    /* $self = shift */
-    newBINOP(OP_SASSIGN, 0, newOP(OP_SHIFT, 0),
-      newPADSVOP(PADIX_SELF, OPf_MOD, OPpLVAL_INTRO)));
+    newMETHSTARTOP(OPf_MOD, meta->repr)
+  );
 
   intro_my();
 
@@ -433,7 +476,7 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta)
     /* Build an OP_ENTERSUB for  $self->SUPER::INITSLOTS() */
     OP *op = NULL;
     op = op_append_list(OP_LIST, op,
-      newPADSVOP(PADIX_SELF, 0, 0));
+      newPADxVOP(OP_PADSV, PADIX_SELF, 0, 0));
     op = op_append_list(OP_LIST, op,
       newMETHOD_REDIR_OP(superclass, newSVpvn_share("INITSLOTS", 9, 0), 0));
 
@@ -446,34 +489,20 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta)
    *     croak("ARGH: Expected self to have %d slots by now\n", offset);
    */
 
-  /* To make an OP_PUSH we have to build a generic OP_LIST then call
-   * op_convert_list() on it later
-   */
-  OP *slotsavop;
-  switch(meta->repr) {
-    case REPR_NATIVE:
-      /* $self->@* */
-      slotsavop = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF, newPADSVOP(PADIX_SELF, 0, 0));
-      break;
-    case REPR_FOREIGN_HASH:
-      /* $self->{"Object::Pad/slots"}->@* */
-      slotsavop = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF,
-        newBINOP(OP_HELEM, OPf_MOD,
-          newUNOP(OP_RV2HV, OPf_MOD|OPf_REF, newPADSVOP(PADIX_SELF, 0, 0)),
-          newSVOP(OP_CONST, 0, newSVpvs("Object::Pad/slots"))));
-      break;
-  }
-
   AV *slots = meta->slots;
   I32 nslots = av_count(slots);
 
   {
     CopLINE_set(PL_curcop, __LINE__);
 
+    /* To make an OP_PUSH we have to build a generic OP_LIST then call
+     * op_convert_list() on it later
+     */
     ops = op_append_list(OP_LINESEQ, ops,
       newSTATEOP(0, NULL, NULL));
 
-    OP *itemops = op_append_elem(OP_LIST, NULL, slotsavop);
+    OP *itemops = op_append_elem(OP_LIST, NULL,
+      newPADxVOP(OP_PADAV, PADIX_SLOTS, OPf_MOD|OPf_REF, 0));
 
     for(i = 0; i < nslots; i++) {
       SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
@@ -517,6 +546,10 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta)
 
   SvREFCNT_inc(PL_compcv);
   ops = block_end(save_ix, ops);
+
+  /* newATTRSUB will capture PL_curstash */
+  SAVESPTR(PL_curstash);
+  PL_curstash = meta->stash;
 
   newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, newSVpvf("%" SVf "::INITSLOTS", meta->name)),
     NULL, NULL, ops);
@@ -619,66 +652,93 @@ static XS(injected_constructor)
     LEAVE;
   }
 
-  switch(meta->repr) {
-    case REPR_NATIVE:
-      CopLINE_set(PL_curcop, __LINE__);
-      self = sv_2mortal(newRV_noinc((SV *)newAV()));
-      sv_bless(self, meta->stash);
-      break;
+  if(!meta->foreign_new) {
+    HV *stash = gv_stashsv(class, 0);
+    if(!stash)
+      croak("Unable to find stash for class %" SVf, class);
 
-    case REPR_FOREIGN_HASH: {
-      CopLINE_set(PL_curcop, __LINE__);
+    switch(meta->repr) {
+      case REPR_NATIVE:
+        CopLINE_set(PL_curcop, __LINE__);
+        self = sv_2mortal(newRV_noinc((SV *)newAV()));
+        sv_bless(self, stash);
+        break;
 
-      CV *supernew = fetch_superclass_method_pv(meta->stash, "new", 3, -1);
-      if(!supernew)
-        croak("Unable to find SUPER::new for " SVf, class);
+      case REPR_HASH:
+        CopLINE_set(PL_curcop, __LINE__);
+        self = sv_2mortal(newRV_noinc((SV *)newHV()));
+        sv_bless(self, stash);
+        break;
 
-      {
-        ENTER;
-        SAVETMPS;
+      case REPR_MAGIC:
+        croak("ARGH cannot use :repr(magic) without a foreign superconstructor");
+        break;
+    }
+  }
+  else {
+    CopLINE_set(PL_curcop, __LINE__);
 
-        PUSHMARK(SP);
-        EXTEND(SP, nargs);
+    {
+      ENTER;
+      SAVETMPS;
 
-        SV **args = SP - nargs;
-        SV **argtop = SP;
-        SV **svp;
+      PUSHMARK(SP);
+      EXTEND(SP, nargs);
 
-        mPUSHs(newSVsv(class));
+      SV **args = SP - nargs;
+      SV **argtop = SP;
+      SV **svp;
 
-        /* Push a copy of the args in case the (foreign) constructor mutates
-         * them. We still need them for BUILDALL */
-        for(svp = args + 1; svp <= argtop; svp++)
-          PUSHs(*svp);
-        PUTBACK;
+      mPUSHs(newSVsv(class));
 
-        call_sv((SV *)supernew, G_SCALAR);
-        SPAGAIN;
+      /* Push a copy of the args in case the (foreign) constructor mutates
+       * them. We still need them for BUILDALL */
+      for(svp = args + 1; svp <= argtop; svp++)
+        PUSHs(*svp);
+      PUTBACK;
 
-        self = SvREFCNT_inc(POPs);
+      call_sv((SV *)meta->foreign_new, G_SCALAR);
+      SPAGAIN;
 
-        PUTBACK;
-        FREETMPS;
-        LEAVE;
+      self = SvREFCNT_inc(POPs);
 
-        if(!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV ||
-          !SvOBJECT(SvRV(self))) {
+      PUTBACK;
+      FREETMPS;
+      LEAVE;
+    }
+
+    if(!SvROK(self) || !SvOBJECT(SvRV(self))) {
+      PL_curcop = prevcop;
+      croak("Expected %" SVf "->SUPER::new to return a blessed reference", class);
+    }
+    SV *rv = SvRV(self);
+
+    switch(meta->repr) {
+      case REPR_NATIVE:
+        croak("ARGH shouldn't ever have REPR_NATIVE with foreign_new");
+
+      case REPR_HASH:
+        if(SvTYPE(rv) != SVt_PVHV) {
           PL_curcop = prevcop;
           croak("Expected %" SVf "->SUPER::new to return a blessed HASH reference", class);
         }
+        break;
 
-        sv_2mortal(self);
-      }
-      break;
+      case REPR_MAGIC:
+        /* Anything goes */
+        break;
     }
+
+    sv_2mortal(self);
   }
 
   /* It's possible the superclass constructor invoked a `method` and thus
    * INITSLOTS has already been called
    */
-  if(meta->repr != REPR_FOREIGN_HASH ||
-     !hv_exists(MUTABLE_HV(SvRV(self)), "Object::Pad/slots", 17))
-  {
+  if(!meta->foreign_new ||
+     (meta->repr == REPR_HASH && !hv_exists(MUTABLE_HV(SvRV(self)), "Object::Pad/slots", 17)) ||
+     (meta->repr == REPR_MAGIC && !mg_findext(SvRV(self), PERL_MAGIC_ext, &vtbl_slotsav))
+  ) {
     /* $self->INITSLOTS */
     CopLINE_set(PL_curcop, __LINE__);
 
@@ -737,6 +797,7 @@ static ClassMeta *MY_mop_create_class(pTHX_ SV *name, SV *superclassname)
   meta->offset = 0;
   meta->slots  = newAV();
   meta->repr   = REPR_NATIVE;
+  meta->foreign_new = NULL;
 
   meta->tmpcop = (COP *)newSTATEOP(0, NULL, NULL);
   CopFILE_set(meta->tmpcop, __FILE__);
@@ -767,10 +828,15 @@ static ClassMeta *MY_mop_create_class(pTHX_ SV *name, SV *superclassname)
       /* A subclass of an Object::Pad class */
       meta->offset = supermeta->offset + av_count(supermeta->slots);
       meta->repr = supermeta->repr;
+      meta->foreign_new = supermeta->foreign_new;
     }
     else {
       /* A subclass of a foreign class - presume HASH for now */
-      meta->repr = REPR_FOREIGN_HASH;
+      meta->repr = REPR_HASH;
+      meta->foreign_new = fetch_superclass_method_pv(meta->stash, "new", 3, -1);
+      if(!meta->foreign_new)
+        croak("Unable to find SUPER::new for %" SVf, superclassname);
+
       av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
     }
   }
@@ -798,6 +864,41 @@ static ClassMeta *MY_mop_create_class(pTHX_ SV *name, SV *superclassname)
   }
 
   return meta;
+}
+
+#define apply_class_attribute(meta, attr)  S_apply_class_attribute(aTHX_ meta, attr)
+static void S_apply_class_attribute(pTHX_ ClassMeta *meta, SV *attr)
+{
+  char *name = SvPV_nolen(attr);
+  char *val = strchr(name, '(');
+
+  if(val) {
+    name = save_strndup(name, val - name);
+    val  = save_strndup(val + 1, strlen(val) - 2);
+  }
+
+  /* TODO: Think about how to make this more easily extensible */
+  if(strEQ(name, "repr")) {
+    if(!val)
+      croak(":repr attribute requires a representation type specification");
+
+    if(strEQ(val, "default") || strEQ(val, "native")) {
+      if(meta->foreign_new)
+        croak("Cannot switch a subclass of a foreign superclass type to :repr(native)");
+      meta->repr = REPR_NATIVE;
+    }
+    else if(strEQ(val, "HASH"))
+      meta->repr = REPR_HASH;
+    else if(strEQ(val, "magic")) {
+      if(!meta->foreign_new)
+        croak("Cannot switch to :repr(magic) without a foreign superclass");
+      meta->repr = REPR_MAGIC;
+    }
+    else
+      croak("Unrecognised class representation type %s", val);
+  }
+  else
+    croak("Unrecognised class attribute %" SVf, name);
 }
 
 
@@ -844,6 +945,11 @@ static int keyword_class(pTHX_ OP **op_ptr)
     }
     else
       break;
+  }
+
+  OP *attrs = NULL;
+  if(lex_consume(":")) {
+    attrs = lex_scan_attrs(NULL);
   }
 
   bool is_block;
@@ -893,6 +999,18 @@ static int keyword_class(pTHX_ OP **op_ptr)
     sv_setsv(GvSV(gv_fetchpvs("VERSION", GV_ADDMULTI, SVt_PV)), packagever);
 
     PL_hints = savehints;
+  }
+
+  if(attrs) {
+    /* attrs should be a list of OP_CONST ops whose first child is the
+     *   pushmark, which we skip */
+    OP *op;
+    for(op = OpSIBLING(cLISTOPx(attrs)->op_first); op; op = OpSIBLING(op)) {
+      assert(op->op_type == OP_CONST);
+      SV *attr = cSVOPx(op)->op_sv;
+
+      apply_class_attribute(meta, attr);
+    }
   }
 
   if(is_block) {
@@ -1072,7 +1190,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
   OP *slotops = NULL;
 
   slotops = op_append_list(OP_LINESEQ, slotops,
-    newMETHSTARTOP(compclassmeta->repr)
+    newMETHSTARTOP(0, compclassmeta->repr)
   );
 
   int i;

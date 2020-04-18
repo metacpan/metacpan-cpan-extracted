@@ -1,7 +1,7 @@
 package MooseX::Storage::Format::Storable;
 # ABSTRACT: A Storable serialization role
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Moose::Role;
 use Storable ();
@@ -20,8 +20,6 @@ sub freeze {
     Storable::nfreeze( $self->pack(@args) );
 }
 
-no Moose::Role;
-
 1;
 
 __END__
@@ -36,7 +34,7 @@ MooseX::Storage::Format::Storable - A Storable serialization role
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

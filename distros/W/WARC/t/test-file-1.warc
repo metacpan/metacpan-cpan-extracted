@@ -1,0 +1,46 @@
+WARC/1.0
+WARC-Type: warcinfo
+Content-Type: text/plain
+WARC-Date: 2019-09-02T23:25:55Z
+WARC-Record-ID: <urn:test:file-1:record-0>
+WARC-Filename: test-file-1.warc
+Content-Length: 195
+
+This is an example WARC file written by hand for testing purposes.  It may
+or may not actually conform to any WARC specification, but is "close
+enough" for testing the WARC library read support.
+
+
+WARC/1.0
+WARC-Type: resource
+Content-Type: text/plain
+WARC-Date: 2019-09-02T23:25:56Z
+WARC-Record-ID: <urn:test:file-1:record-1>
+Content-Length: 14
+
+Test item one
+
+
+WARC/1.0
+WARC-Type: resource
+Content-Type: text/plain
+WARC-Date: 2019-09-02T23:25:57Z
+WARC-Record-ID: <urn:test:file-1:record-2>
+Content-Length: 14
+
+Test item two
+
+
+WARC/1.0
+WARC-Type: metadata
+Content-Type: text/plain
+WARC-Date: 2019-09-02T23:25:58Z
+WARC-Record-ID: <urn:test:file-1:record-N>
+Content-Length: 62
+
+Local Variables:
+mode: fundamental
+coding: us-ascii-unix
+End:
+
+

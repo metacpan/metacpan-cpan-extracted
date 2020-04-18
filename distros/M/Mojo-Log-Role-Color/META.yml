@@ -18,13 +18,14 @@ no_index:
     - t
     - inc
 requires:
+  Class::Method::Modifiers: '2.00'
   Mojolicious: '8.00'
   Role::Tiny: '2.000001'
 resources:
   bugtracker: https://github.com/jhthorsen/mojo-log-role-color/issues
   homepage: https://github.com/jhthorsen/mojo-log-role-color
   repository: https://github.com/jhthorsen/mojo-log-role-color.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'Jan Henning Thorsen'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

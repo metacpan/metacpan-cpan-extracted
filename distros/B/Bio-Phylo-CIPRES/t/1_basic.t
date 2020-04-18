@@ -8,7 +8,7 @@ my %args = (
 	'infile'  => $0, 
 	'tool'    => 'MAFFT_XSEDE',
 	'param'   => { 'vparam.anysymbol_' => 1 },
-	'outfile' => [ 'output.mafft' ],
+	'outfile' => { 'output.mafft' => '/path/to/outfile' },
 	'url'     => 'https://cipresrest.sdsc.edu/cipresrest/v1',
 	'user'    => 'rvosa',
 	'pass'    => 'fakePassword',

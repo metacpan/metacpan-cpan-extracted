@@ -1,7 +1,7 @@
 package MooseX::Storage::Traits::OnlyWhenBuilt;
 # ABSTRACT: A custom trait to bypass serialization
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Moose::Role;
 use namespace::autoclean;
@@ -23,8 +23,6 @@ around 'unpack' => sub {
     $self->$orig($data, %args);
 };
 
-no Moose::Role;
-
 1;
 
 __END__
@@ -39,7 +37,7 @@ MooseX::Storage::Traits::OnlyWhenBuilt - A custom trait to bypass serialization
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

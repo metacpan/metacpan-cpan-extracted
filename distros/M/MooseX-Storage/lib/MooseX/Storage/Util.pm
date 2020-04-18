@@ -1,7 +1,7 @@
 package MooseX::Storage::Util;
 # ABSTRACT: A MooseX::Storage Swiss Army chainsaw
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Moose;
 use MooseX::Storage::Engine ();
@@ -63,8 +63,6 @@ sub _inflate_yaml {
     return $data;
 }
 
-no Moose::Role;
-
 1;
 
 __END__
@@ -79,7 +77,7 @@ MooseX::Storage::Util - A MooseX::Storage Swiss Army chainsaw
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 

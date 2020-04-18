@@ -9,7 +9,7 @@ BEGIN {
 my $feed = Feed::Data->new();
 $feed->parse( 't/data/rss20.xml' );
 
-$feed->write('test.xml', 'rss');
+$feed->write('test.csv', 'csv');
 
 subtest 'feed options' => sub {
     plan tests => 13;

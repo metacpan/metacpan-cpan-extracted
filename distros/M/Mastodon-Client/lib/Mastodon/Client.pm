@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use Carp;
 use Mastodon::Types qw( Acct Account DateTime Image URI Instance );

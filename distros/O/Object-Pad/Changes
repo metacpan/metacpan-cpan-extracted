@@ -1,5 +1,10 @@
 Revision history for Object-Pad
 
+0.22    2020-04-17
+        [CHANGES]
+         * Allow classes to request their representation type using new
+           class attribute :repr - choices are native(default), HASH, magic
+
 0.21    2020-04-15
         [CHANGES]
          * Added Object::Pad->begin_class() (undocumented)

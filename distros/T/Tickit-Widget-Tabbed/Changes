@@ -1,5 +1,9 @@
 Revision history for Tickit-Widget-Tabbed
 
+0.022     2020-04-17
+          [CHANGES]
+           * Use Object::Pad
+
 0.021     2017-02-15 15:14:05
           [CHANGES]
            * Use Style-directed keybindings

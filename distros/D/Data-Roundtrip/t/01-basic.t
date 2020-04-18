@@ -1,7 +1,4 @@
-#!/usr/bin/env perl
-use lib 'lib/blib';
-
-##!perl -T
+#!perl -T
 use 5.008;
 use strict;
 use warnings;

@@ -130,12 +130,26 @@ typedef UA_LocalizedText *	OPCUA_Open62541_LocalizedText;
 typedef UA_BrowseResultMask	OPCUA_Open62541_BrowseResultMask;
 typedef UA_Variant *		OPCUA_Open62541_Variant;
 
+/* plugin/log.h */
+typedef struct OPCUA_Open62541_Logger {
+	UA_Logger *		lg_logger;
+	SV *			lg_log;
+	SV *			lg_context;
+	SV *			lg_clear;
+	SV *			lg_storage;
+} * OPCUA_Open62541_Logger;
+
 /* server.h */
-typedef UA_Server *		OPCUA_Open62541_Server;
-typedef struct {
+typedef struct OPCUA_Open62541_ServerConfig {
+	struct OPCUA_Open62541_Logger	svc_logger;
 	UA_ServerConfig *	svc_serverconfig;
-	SV *			svc_server;
-} *				OPCUA_Open62541_ServerConfig;
+	SV *			svc_storage;
+} * OPCUA_Open62541_ServerConfig;
+
+typedef struct {
+	struct OPCUA_Open62541_ServerConfig sv_config;
+	UA_Server *		sv_server;
+} * OPCUA_Open62541_Server;
 
 /* client.h */
 typedef struct ClientCallbackData {
@@ -143,25 +157,19 @@ typedef struct ClientCallbackData {
 	SV *			ccd_client;
 	SV *			ccd_data;
 	struct ClientCallbackData **	ccd_callbackdataref;
-}				ClientCallbackData;
+} * ClientCallbackData;
 
-typedef struct {
-	UA_Client *		cl_client;
-	ClientCallbackData *	cl_callbackdata;
-} *				OPCUA_Open62541_Client;
-typedef struct {
+typedef struct OPCUA_Open62541_ClientConfig {
+	struct OPCUA_Open62541_Logger	clc_logger;
 	UA_ClientConfig *	clc_clientconfig;
-	SV *			clc_client;
-} *				OPCUA_Open62541_ClientConfig;
+	SV *			clc_storage;
+} * OPCUA_Open62541_ClientConfig;
 
-/* plugin/log.h */
 typedef struct {
-	UA_Logger *		lg_logger;
-	SV *			lg_log;
-	SV *			lg_context;
-	SV *			lg_clear;
-	SV *			lg_storage;
-} *				OPCUA_Open62541_Logger;
+	struct OPCUA_Open62541_ClientConfig cl_config;
+	UA_Client *		cl_client;
+	ClientCallbackData	cl_callbackdata;
+} * OPCUA_Open62541_Client;
 
 static void XS_pack_OPCUA_Open62541_DataType(SV *, OPCUA_Open62541_DataType)
     __attribute__((unused));
@@ -1272,11 +1280,11 @@ static MGVTBL server_run_mgvtbl = { 0, server_run_mgset, 0, 0, 0, 0, 0, 0 };
 
 /* Open62541 C callback handling */
 
-static ClientCallbackData *
+static ClientCallbackData
 newClientCallbackData(SV *callback, SV *client, SV *data)
 {
 	dTHX;
-	ClientCallbackData *ccd;
+	ClientCallbackData ccd;
 
 	if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
 		CROAK("Callback '%s' is not a CODE reference",
@@ -1308,7 +1316,7 @@ newClientCallbackData(SV *callback, SV *client, SV *data)
 }
 
 static void
-deleteClientCallbackData(ClientCallbackData *ccd)
+deleteClientCallbackData(ClientCallbackData ccd)
 {
 	dTHX;
 	DPRINTF("ccd %p, ccd_callbackdataref %p",
@@ -1329,7 +1337,7 @@ clientCallbackPerl(UA_Client *client, void *userdata, UA_UInt32 requestId,
     SV *response) {
 	dTHX;
 	dSP;
-	ClientCallbackData *ccd = (ClientCallbackData *)userdata;
+	ClientCallbackData ccd = userdata;
 
 	DPRINTF("client %p, ccd %p", client, ccd);
 
@@ -1467,12 +1475,12 @@ XS_pack_UA_LogCategory(SV *out, UA_LogCategory in)
 }
 
 static void
-loggerLogCallback(void *logContext, UA_LogLevel level, UA_LogCategory category,
+loggerLogCallback(void *context, UA_LogLevel level, UA_LogCategory category,
     const char *msg, va_list args)
 {
 	dTHX;
 	dSP;
-	OPCUA_Open62541_Logger	logger = logContext;
+	OPCUA_Open62541_Logger	logger = context;
 	SV *			levelName;
 	SV *			categoryName;
 	SV *			message;
@@ -1870,10 +1878,16 @@ UA_Server_new(class)
 	if (strcmp(class, "OPCUA::Open62541::Server") != 0)
 		CROAK("Class '%s' is not OPCUA::Open62541::Server", class);
     CODE:
-	RETVAL = UA_Server_new();
+	RETVAL = calloc(1, sizeof(*RETVAL));
 	if (RETVAL == NULL)
+		CROAKE("calloc");
+	RETVAL->sv_server = UA_Server_new();
+	if (RETVAL->sv_server == NULL) {
+		free(RETVAL);
 		CROAKE("UA_Server_new");
-	DPRINTF("class %s, server %p", class, RETVAL);
+	}
+	DPRINTF("class %s, server %p, sv_server %p",
+	    class, RETVAL, RETVAL->sv_server);
     OUTPUT:
 	RETVAL
 
@@ -1885,37 +1899,46 @@ UA_Server_newWithConfig(class, config)
 	if (strcmp(class, "OPCUA::Open62541::Server") != 0)
 		CROAK("Class '%s' is not OPCUA::Open62541::Server", class);
     CODE:
-	RETVAL = UA_Server_newWithConfig(config->svc_serverconfig);
+	RETVAL = calloc(1, sizeof(*RETVAL));
 	if (RETVAL == NULL)
+		CROAKE("calloc");
+	RETVAL->sv_server = UA_Server_newWithConfig(config->svc_serverconfig);
+	if (RETVAL->sv_server == NULL)
 		CROAKE("UA_Server_newWithConfig");
-	DPRINTF("class %s, config %p, svc_serverconfig %p, server %p",
-	    class, config, config->svc_serverconfig, RETVAL);
+	DPRINTF("class %s, config %p, svc_serverconfig %p, "
+	    "server %p, sv_server %p",
+	    class, config, config->svc_serverconfig,
+	    RETVAL, RETVAL->sv_server);
     OUTPUT:
 	RETVAL
 
 void
 UA_Server_DESTROY(server)
 	OPCUA_Open62541_Server		server
+    PREINIT:
+	OPCUA_Open62541_Logger		logger;
     CODE:
-	DPRINTF("server %p", server);
-	UA_Server_delete(server);
+	logger =  &server->sv_config.svc_logger;
+	DPRINTF("server %p, sv_server %p, logger %p",
+	    server, server->sv_server, logger);
+	UA_Server_delete(server->sv_server);
+	/* SvREFCNT_dec checks for NULL pointer. */
+	SvREFCNT_dec(logger->lg_log);
+	SvREFCNT_dec(logger->lg_context);
+	SvREFCNT_dec(logger->lg_clear);
 
 OPCUA_Open62541_ServerConfig
 UA_Server_getConfig(server)
 	OPCUA_Open62541_Server		server
     CODE:
-	RETVAL = malloc(sizeof(*RETVAL));
-	if (RETVAL == NULL)
-		CROAKE("malloc");
-	RETVAL->svc_serverconfig = UA_Server_getConfig(server);
-	DPRINTF("server %p, config %p, svc_serverconfig %p",
-	    server, RETVAL, RETVAL->svc_serverconfig);
-	if (RETVAL->svc_serverconfig == NULL) {
-		free(RETVAL);
+	RETVAL = &server->sv_config;
+	RETVAL->svc_serverconfig = UA_Server_getConfig(server->sv_server);
+	DPRINTF("server %p, sv_server %p, config %p, svc_serverconfig %p",
+	    server, server->sv_server, RETVAL, RETVAL->svc_serverconfig);
+	if (RETVAL->svc_serverconfig == NULL)
 		XSRETURN_UNDEF;
-	}
-	/* When server gets out of scope, config still uses its memory. */
-	RETVAL->svc_server = SvREFCNT_inc(SvRV(ST(0)));
+	/* When server goes out of scope, config still uses its memory. */
+	RETVAL->svc_storage = SvREFCNT_inc(SvRV(ST(0)));
     OUTPUT:
 	RETVAL
 
@@ -1923,14 +1946,15 @@ UA_StatusCode
 UA_Server_run(server, running)
 	OPCUA_Open62541_Server		server
 	UA_Boolean			&running
-    INIT:
+    PREINIT:
 	MAGIC *mg;
     CODE:
 	/* If running is changed, the magic callback will report to server. */
 	mg = sv_magicext(ST(1), NULL, PERL_MAGIC_ext, &server_run_mgvtbl,
 	    (void *)&running, 0);
-	DPRINTF("server %p, &running %p, mg %p", server, &running, mg);
-	RETVAL = UA_Server_run(server, &running);
+	DPRINTF("server %p, sv_server %p, &running %p, mg %p",
+	    server, server->sv_server, &running, mg);
+	RETVAL = UA_Server_run(server->sv_server, &running);
 	sv_unmagicext(ST(1), PERL_MAGIC_ext, &server_run_mgvtbl);
     OUTPUT:
 	RETVAL
@@ -1938,15 +1962,27 @@ UA_Server_run(server, running)
 UA_StatusCode
 UA_Server_run_startup(server)
 	OPCUA_Open62541_Server		server
+    CODE:
+	RETVAL = UA_Server_run_startup(server->sv_server);
+    OUTPUT:
+	RETVAL
 
 UA_UInt16
 UA_Server_run_iterate(server, waitInternal)
 	OPCUA_Open62541_Server		server
 	UA_Boolean			waitInternal
+    CODE:
+	RETVAL = UA_Server_run_iterate(server->sv_server, waitInternal);
+    OUTPUT:
+	RETVAL
 
 UA_StatusCode
 UA_Server_run_shutdown(server)
 	OPCUA_Open62541_Server		server
+    CODE:
+	RETVAL = UA_Server_run_shutdown(server->sv_server);
+    OUTPUT:
+	RETVAL
 
 UA_StatusCode
 UA_Server_addVariableNode(server, requestedNewNodeId, parentNodeId, referenceTypeId, browseName, typeDefinition, attr, nodeContext, outNewNodeId)
@@ -1959,6 +1995,12 @@ UA_Server_addVariableNode(server, requestedNewNodeId, parentNodeId, referenceTyp
 	UA_VariableAttributes		attr
 	void *				nodeContext
 	OPCUA_Open62541_NodeId		outNewNodeId
+    CODE:
+	RETVAL = UA_Server_addVariableNode(server->sv_server,
+	    requestedNewNodeId, parentNodeId, referenceTypeId, browseName,
+	    typeDefinition, attr, nodeContext, outNewNodeId);
+    OUTPUT:
+	RETVAL
 
 #############################################################################
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::ServerConfig	PREFIX = UA_ServerConfig_
@@ -1967,9 +2009,10 @@ void
 UA_ServerConfig_DESTROY(config)
 	OPCUA_Open62541_ServerConfig	config
     CODE:
-	DPRINTF("config %p", config->svc_serverconfig);
-	SvREFCNT_dec(config->svc_server);
-	free(config);
+	DPRINTF("config %p, svc_serverconfig %p, svc_storage %p",
+	    config, config->svc_serverconfig, config->svc_storage);
+	/* Delayed server destroy after server config destroy. */
+	SvREFCNT_dec(config->svc_storage);
 
 UA_StatusCode
 UA_ServerConfig_setDefault(config)
@@ -2003,14 +2046,14 @@ OPCUA_Open62541_Logger
 UA_ServerConfig_getLogger(config)
 	OPCUA_Open62541_ServerConfig	config
     CODE:
-	RETVAL = calloc(1, sizeof(*RETVAL));
-	if (RETVAL == NULL)
-		CROAKE("calloc");
+	RETVAL = &config->svc_logger;
 	RETVAL->lg_logger = &config->svc_serverconfig->logger;
-	DPRINTF("config %p, logger %p, lg_logger %p",
-	    config, RETVAL, RETVAL->lg_logger);
-	/* When config gets out of scope, logger still uses its memory. */
-	RETVAL->lg_storage = SvREFCNT_inc(SvRV(ST(0)));
+	/* When config goes out of scope, logger still uses server memory. */
+	RETVAL->lg_storage = SvREFCNT_inc(config->svc_storage);
+	DPRINTF("config %p, svc_serverconfig %p, logger %p, lg_logger %p, "
+	    "lg_storage %p",
+	    config, config->svc_serverconfig, RETVAL, RETVAL->lg_logger,
+	    RETVAL->lg_storage);
     OUTPUT:
 	RETVAL
 
@@ -2042,10 +2085,17 @@ UA_Client_new(class)
 void
 UA_Client_DESTROY(client)
 	OPCUA_Open62541_Client		client
+    PREINIT:
+	OPCUA_Open62541_Logger		logger;
     CODE:
-	DPRINTF("client %p, cl_client %p, cl_callbackdata %p",
-	    client, client->cl_client, client->cl_callbackdata);
+	logger = &client->cl_config.clc_logger;
+	DPRINTF("client %p, cl_client %p, cl_callbackdata %p, logger %p",
+	    client, client->cl_client, client->cl_callbackdata, logger);
 	UA_Client_delete(client->cl_client);
+	/* SvREFCNT_dec checks for NULL pointer. */
+	SvREFCNT_dec(logger->lg_log);
+	SvREFCNT_dec(logger->lg_context);
+	SvREFCNT_dec(logger->lg_clear);
 	/* The client may still have an uncalled connect callback. */
 	if (client->cl_callbackdata != NULL)
 		deleteClientCallbackData(client->cl_callbackdata);
@@ -2055,18 +2105,14 @@ OPCUA_Open62541_ClientConfig
 UA_Client_getConfig(client)
 	OPCUA_Open62541_Client		client
     CODE:
-	RETVAL = malloc(sizeof(*RETVAL));
-	if (RETVAL == NULL)
-		CROAKE("malloc");
+	RETVAL = &client->cl_config;
 	RETVAL->clc_clientconfig = UA_Client_getConfig(client->cl_client);
 	DPRINTF("client %p, cl_client %p, config %p, clc_clientconfig %p",
 	    client, client->cl_client, RETVAL, RETVAL->clc_clientconfig);
-	if (RETVAL->clc_clientconfig == NULL) {
-		free(RETVAL);
+	if (RETVAL->clc_clientconfig == NULL)
 		XSRETURN_UNDEF;
-	}
-	/* When client gets out of scope, config still uses its memory. */
-	RETVAL->clc_client = SvREFCNT_inc(SvRV(ST(0)));
+	/* When client goes out of scope, config still uses its memory. */
+	RETVAL->clc_storage = SvREFCNT_inc(SvRV(ST(0)));
     OUTPUT:
 	RETVAL
 
@@ -2099,7 +2145,7 @@ UA_Client_connect_async(client, endpointUrl, callback, data)
 		RETVAL = UA_Client_connect_async(client->cl_client,
 		    endpointUrl, NULL, NULL);
 	} else {
-		ClientCallbackData *ccd;
+		ClientCallbackData ccd;
 
 		ccd = newClientCallbackData(callback, ST(0), data);
 		RETVAL = UA_Client_connect_async(client->cl_client,
@@ -2164,9 +2210,9 @@ UA_Client_sendAsyncBrowseRequest(client, request, callback, data, reqId)
 	SV *				callback
 	SV *				data
 	OPCUA_Open62541_UInt32		reqId
+    PREINIT:
+	ClientCallbackData		ccd;
     INIT:
-	ClientCallbackData *		ccd;
-
 	if (SvOK(ST(4)) && !(SvROK(ST(4)) && SvTYPE(SvRV(ST(4))) < SVt_PVAV))
 		CROAK("reqId is not a scalar reference");
     CODE:
@@ -2187,9 +2233,9 @@ UA_Client_readValueAttribute_async(client, nodeId, callback, data, reqId)
 	SV *				callback
 	SV *				data
 	OPCUA_Open62541_UInt32		reqId
+    PREINIT:
+	ClientCallbackData		ccd;
     INIT:
-	ClientCallbackData *		ccd;
-
 	if (SvOK(ST(4)) && !(SvROK(ST(4)) && SvTYPE(SvRV(ST(4))) < SVt_PVAV))
 		CROAK("reqId is not a scalar reference");
     CODE:
@@ -2256,10 +2302,10 @@ UA_Client_readDataTypeAttribute(client, nodeId, outDataType)
 	OPCUA_Open62541_Client		client
 	UA_NodeId			nodeId
 	SV *				outDataType
-    INIT:
+    PREINIT:
 	UA_NodeId			outNodeId;
 	UV				index;
-
+    INIT:
 	if (!SvOK(ST(2)) || !(SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) < SVt_PVAV))
 		CROAK("outDataType is not a scalar reference");
     CODE:
@@ -2286,9 +2332,10 @@ void
 UA_ClientConfig_DESTROY(config)
 	OPCUA_Open62541_ClientConfig	config
     CODE:
-	DPRINTF("config %p", config->clc_clientconfig);
-	SvREFCNT_dec(config->clc_client);
-	free(config);
+	DPRINTF("config %p, clc_clientconfig %p, clc_storage %p",
+	    config, config->clc_clientconfig, config->clc_storage);
+	/* Delayed client destroy after client config destroy. */
+	SvREFCNT_dec(config->clc_storage);
 
 UA_StatusCode
 UA_ClientConfig_setDefault(config)
@@ -2302,14 +2349,14 @@ OPCUA_Open62541_Logger
 UA_ClientConfig_getLogger(config)
 	OPCUA_Open62541_ClientConfig	config
     CODE:
-	RETVAL = calloc(1, sizeof(*RETVAL));
-	if (RETVAL == NULL)
-		CROAKE("calloc");
+	RETVAL = &config->clc_logger;
 	RETVAL->lg_logger = &config->clc_clientconfig->logger;
-	DPRINTF("config %p, logger %p, lg_logger %p",
-	    config, RETVAL, RETVAL->lg_logger);
-	/* When config gets out of scope, logger still uses its memory. */
-	RETVAL->lg_storage = SvREFCNT_inc(SvRV(ST(0)));
+	/* When config goes out of scope, logger still uses client memory. */
+	RETVAL->lg_storage = SvREFCNT_inc(config->clc_storage);
+	DPRINTF("config %p, clc_clientconfig %p, logger %p, lg_logger %p, "
+	    "lg_storage %p",
+	    config, config->clc_clientconfig, RETVAL, RETVAL->lg_logger,
+	    RETVAL->lg_storage);
     OUTPUT:
 	RETVAL
 
@@ -2318,43 +2365,15 @@ MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::Logger	PREFIX = UA_Logger_
 
 # 16.4 Logging Plugin API, plugin/log.h
 
-OPCUA_Open62541_Logger
-UA_Logger_new(class)
-	char *				class
-    INIT:
-	if (strcmp(class, "OPCUA::Open62541::Logger") != 0)
-		CROAK("Class '%s' is not OPCUA::Open62541::Logger", class);
-    CODE:
-	RETVAL = calloc(1, sizeof(*RETVAL));
-	if (RETVAL == NULL)
-		CROAKE("calloc");
-	RETVAL->lg_logger = calloc(1, sizeof(*RETVAL->lg_logger));
-	if (RETVAL->lg_logger == NULL) {
-		free(RETVAL);
-		CROAKE("calloc");
-	}
-	DPRINTF("class %s, logger %p, lg_logger %p",
-	    class, RETVAL, RETVAL->lg_logger);
-    OUTPUT:
-	RETVAL
-
 void
 UA_Logger_DESTROY(logger)
 	OPCUA_Open62541_Logger		logger
     CODE:
-	DPRINTF("logger %p, lg_logger %p", logger, logger->lg_logger);
-	if (logger->lg_logger->clear != NULL)
-		(logger->lg_logger->clear)(logger->lg_logger->context);
-	logger->lg_logger->log = NULL;
-	logger->lg_logger->clear = NULL;
-	SvREFCNT_dec(logger->lg_log);
-	SvREFCNT_dec(logger->lg_context);
-	SvREFCNT_dec(logger->lg_clear);
-	if (logger->lg_storage == NULL)
-		free(logger->lg_logger);
-	else
-		SvREFCNT_dec(logger->lg_storage);
-	free(logger);
+	DPRINTF("logger %p, lg_logger %p, lg_storage %p, context %p",
+	    logger, logger->lg_logger, logger->lg_storage,
+	    logger->lg_logger->context);
+	/* Delayed server or client destroy after logger destroy. */
+	SvREFCNT_dec(logger->lg_storage);
 
 void
 UA_Logger_setCallback(logger, log, context, clear)
@@ -2370,28 +2389,28 @@ UA_Logger_setCallback(logger, log, context, clear)
 		CROAK("Clear '%s' is not a CODE reference",
 		    SvPV_nolen(clear));
     CODE:
-	logger->lg_logger->log = SvOK(log) ? loggerLogCallback : NULL;
 	logger->lg_logger->context = logger;
+	logger->lg_logger->log = SvOK(log) ? loggerLogCallback : NULL;
 	logger->lg_logger->clear = SvOK(clear) ? loggerClearCallback : NULL;
-
 	if (logger->lg_log == NULL)
 		logger->lg_log = newSV(0);
 	SvSetSV_nosteal(logger->lg_log, log);
-
 	if (logger->lg_context == NULL)
 		logger->lg_context = newSV(0);
 	SvSetSV_nosteal(logger->lg_context, context);
-
 	if (logger->lg_clear == NULL)
 		logger->lg_clear = newSV(0);
 	SvSetSV_nosteal(logger->lg_clear, clear);
+	DPRINTF("logger %p, lg_logger %p, lg_storage %p, context %p",
+	    logger, logger->lg_logger, logger->lg_storage,
+	    logger->lg_logger->context);
 
 void
 UA_Logger_logTrace(logger, category, msg, ...)
 	OPCUA_Open62541_Logger		logger
 	UA_LogCategory			category
 	SV *				msg
-    INIT:
+    PREINIT:
 	SV *				message;
     CODE:
 	message = sv_newmortal();
@@ -2404,7 +2423,7 @@ UA_Logger_logDebug(logger, category, msg, ...)
 	OPCUA_Open62541_Logger		logger
 	UA_LogCategory			category
 	SV *				msg
-    INIT:
+    PREINIT:
 	SV *				message;
     CODE:
 	message = sv_newmortal();
@@ -2417,7 +2436,7 @@ UA_Logger_logInfo(logger, category, msg, ...)
 	OPCUA_Open62541_Logger		logger
 	UA_LogCategory			category
 	SV *				msg
-    INIT:
+    PREINIT:
 	SV *				message;
     CODE:
 	message = sv_newmortal();
@@ -2430,7 +2449,7 @@ UA_Logger_logWarning(logger, category, msg, ...)
 	OPCUA_Open62541_Logger		logger
 	UA_LogCategory			category
 	SV *				msg
-    INIT:
+    PREINIT:
 	SV *				message;
     CODE:
 	message = sv_newmortal();
@@ -2443,7 +2462,7 @@ UA_Logger_logError(logger, category, msg, ...)
 	OPCUA_Open62541_Logger		logger
 	UA_LogCategory			category
 	SV *				msg
-    INIT:
+    PREINIT:
 	SV *				message;
     CODE:
 	message = sv_newmortal();
@@ -2456,7 +2475,7 @@ UA_Logger_logFatal(logger, category, msg, ...)
 	OPCUA_Open62541_Logger		logger
 	UA_LogCategory			category
 	SV *				msg
-    INIT:
+    PREINIT:
 	SV *				message;
     CODE:
 	message = sv_newmortal();

@@ -42,47 +42,52 @@
    "provides" : {
       "Pg::Explain" : {
          "file" : "lib/Pg/Explain.pm",
-         "version" : "0.97"
+         "version" : "0.98"
       },
       "Pg::Explain::Analyzer" : {
          "file" : "lib/Pg/Explain/Analyzer.pm",
-         "version" : "0.97"
+         "version" : "0.98"
       },
       "Pg::Explain::From" : {
          "file" : "lib/Pg/Explain/From.pm",
-         "version" : "0.97"
+         "version" : "0.98"
       },
       "Pg::Explain::FromJSON" : {
          "file" : "lib/Pg/Explain/FromJSON.pm",
-         "version" : "0.97"
+         "version" : "0.98"
       },
       "Pg::Explain::FromText" : {
          "file" : "lib/Pg/Explain/FromText.pm",
-         "version" : "0.97"
+         "version" : "0.98"
       },
       "Pg::Explain::FromXML" : {
          "file" : "lib/Pg/Explain/FromXML.pm",
-         "version" : "0.97"
+         "version" : "0.98"
       },
       "Pg::Explain::FromYAML" : {
          "file" : "lib/Pg/Explain/FromYAML.pm",
-         "version" : "0.97"
+         "version" : "0.98"
       },
       "Pg::Explain::Node" : {
          "file" : "lib/Pg/Explain/Node.pm",
-         "version" : "0.97"
+         "version" : "0.98"
       },
       "Pg::Explain::StringAnonymizer" : {
          "file" : "lib/Pg/Explain/StringAnonymizer.pm",
-         "version" : "0.97"
+         "version" : "0.98"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/depesz/Pg--Explain.git",
+         "web" : "https://gitlab.com/depesz/Pg--Explain"
+      }
    },
-   "version" : "0.97",
+   "version" : "0.98",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

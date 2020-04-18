@@ -5,6 +5,9 @@ use Carp qw/croak/;
 use Feed::Data::Parser::RSS;
 use Feed::Data::Parser::Atom;
 use Feed::Data::Parser::Meta;
+use Feed::Data::Parser::Text;
+use Feed::Data::Parser::JSON;
+use Feed::Data::Parser::CSV;
 
 use Types::Standard qw/Object ScalarRef Str/;
 
@@ -25,10 +28,18 @@ has 'parse_tag' => (
 		my $self = shift;
 		my $content = $self->stream;
 		my $tag;
-		while ( $$content =~ /<(\S+)/sg) {
-			(my $t = $1) =~ tr/a-zA-Z0-9:\-\?!//cd;
-			my $first = substr $t, 0, 1;
-			$tag = $t, last unless $first eq '?' || $first eq '!';
+		if ($$content =~ m/^([A-Za-z]+)\s*\:/) {
+			$tag = 'text';
+		} elsif ($$content =~ m/^\s*\[/) {
+			$tag = 'json';
+		} elsif ($$content =~ m/^([A-Za-z]+,)/) {
+			$tag = 'csv';
+		} else {
+			while ( $$content =~ /<(\S+)/sg) {
+				(my $t = $1) =~ tr/a-zA-Z0-9:\-\?!//cd;
+				my $first = substr $t, 0, 1;
+				$tag = $t, last unless $first eq '?' || $first eq '!';
+			}
 		}
 		croak 'Could not find the first XML element' unless $tag;
 		$tag =~ s/^,*://;
@@ -46,6 +57,9 @@ has 'parser_type' => (
 		return 'RSS' if $tag =~ /^(?:rss|rdf)$/i;
 		return 'Atom' if $tag =~ /^feed/i;
 		return 'Meta' if $tag =~ /^html/i;
+		return 'Text' if $tag =~ /^text/;
+		return 'JSON' if $tag =~ /^json/;
+		return 'CSV' if $tag =~ /^csv/;
 		return croak "Could not find a parser";
 	}
 );

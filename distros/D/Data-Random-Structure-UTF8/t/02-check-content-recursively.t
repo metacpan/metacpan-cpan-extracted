@@ -1,15 +1,11 @@
-#!/usr/bin/env perl
-
-use lib 'blib/lib';
-
-##!perl -T
+#!perl -T
 use 5.8.0;
 use strict;
 use warnings;
 
 use utf8;
 
-our $VERSION='0.04';
+our $VERSION='0.06';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -19,12 +15,9 @@ binmode STDIN,  ':encoding(UTF-8)';
 use open ':std', ':encoding(utf8)';
 
 use Test::More;
-#use Test::Deep;
 
 use Data::Random::Structure::UTF8;
 
-use Data::Dump qw/pp/;
-use Data::Dumper;
 use Scalar::Util qw/looks_like_number/;
 
 # we are dealing with a random generator
@@ -34,8 +27,6 @@ my $MAXTRIALS=100;
 
 ############################
 #### nothing to change below
-srand 42+12;
-
 my $num_tests = 0;
 
 my ($perl_var, $found, $found1, $found2, $trials, $rc, $alength, $randomiser);
@@ -202,6 +193,67 @@ ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, {
 	'strings-unicode'=>0,
 	'strings-plain'=>1,
 }) == 1, "check_content_recursively() : non-unicode strings: yes."); $num_tests++;
+
+# check for each type and set the others to zero,
+# it means don't bother checking (and not report if it doesn't exist)
+$perl_var = {
+	'strings-unicode' => 'ναι έχω και από αυτό',
+	'strings-plain' => 'sure I have some',
+	'numbers' => [1,2,3,123],
+};
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, {
+	'numbers'=>1,
+}) == 1, "check_content_recursively() : numbers:  yes."); $num_tests++;
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, {
+	'strings'=>1,
+}) == 1, "check_content_recursively() : strings: yes."); $num_tests++;
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, {
+	'strings-unicode'=>1,
+}) == 1, "check_content_recursively() : unicode strings: yes."); $num_tests++;
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, {
+	'strings-plain'=>1,
+}) == 1, "check_content_recursively() : non-unicode strings: yes."); $num_tests++;
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, {
+	'numbers'=>0, # this means don't look, and not doesn't exist
+	'strings-plain'=>1,
+}) == 1, "check_content_recursively() : numbers:  yes."); $num_tests++;
+
+# check for each type and set the others to zero,
+# it means don't bother checking (and not report if it doesn't exist)
+$perl_var = {
+	# even keys are checked, so use a number for a key too!
+	'123' => [1,2,3,123],
+};
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, {
+	'numbers'=>1,
+}) == 1, "check_content_recursively() : numbers:  yes."); $num_tests++;
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, {
+	'numbers'=>1,
+	'strings'=>0,
+}) == 1, "check_content_recursively() : strings: no."); $num_tests++;
+
+# check some edge cases
+$perl_var = {
+	# even keys are checked, so use a number for a key too!
+	'123' => [1,2,3,123],
+};
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, {
+	'strings'=>0,
+	'numbers'=>0,
+}) == 0, "check_content_recursively() : looked for nothing."); $num_tests++;
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, {
+	'strings'=>1, # looking for strings?
+	'numbers'=>0, # not looking for numbers
+}) == 0, "check_content_recursively() : strings: no, numbers did not check"); $num_tests++;
+# empty params
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, {
+}) == 0, "check_content_recursively() : did not check for anything"); $num_tests++;
+# undef params
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var, undef
+) == 0, "check_content_recursively() : did not check for anything"); $num_tests++;
+# no params
+ok(Data::Random::Structure::UTF8::check_content_recursively($perl_var,
+) == 0, "check_content_recursively() : did not check for anything"); $num_tests++;
 
 #####
 # complex data structures with only unicode

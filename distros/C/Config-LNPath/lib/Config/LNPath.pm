@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use YAML::XS qw/LoadFile/;
 use Data::LNPath qw/lnpath/, {
@@ -40,11 +40,11 @@ __END__
 
 =head1 NAME
 
-Config::LNPath - Currently just a Simple YAML Config Reader.
+Config::LNPath - A Simple YAML Config Reader.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -70,15 +70,19 @@ Version 0.02
 
 =head2 find
 
-find path in config file.
+find path in the config file.
 
 	$conf->find('/path/to/important/thing');
 
 =head2 section_find 
 
+Find a section in the config file.
+
+	$conf->section_find('/path/to/important');
+
 =head1 AUTHOR
 
-Robert Acock, C<< <thisusedtobeanemail at gmail.com> >>
+Robert Acock, C<< <email at lnation.org> >>
 
 =head1 BUGS
 

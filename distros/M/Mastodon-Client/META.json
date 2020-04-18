@@ -45,7 +45,7 @@
             "Type::Params" : "1.000006",
             "Types::Common::String" : "1.000006",
             "Types::Path::Tiny" : "0.005",
-            "Types::Standard" : "1.000006",
+            "Types::Standard" : "1.003003",
             "URI" : "1.71",
             "perl" : "5.010"
          }
@@ -63,79 +63,79 @@
    "provides" : {
       "Mastodon::Client" : {
          "file" : "lib/Mastodon/Client.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Account" : {
          "file" : "lib/Mastodon/Entity/Account.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Application" : {
          "file" : "lib/Mastodon/Entity/Application.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Attachment" : {
          "file" : "lib/Mastodon/Entity/Attachment.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Card" : {
          "file" : "lib/Mastodon/Entity/Card.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Context" : {
          "file" : "lib/Mastodon/Entity/Context.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Error" : {
          "file" : "lib/Mastodon/Entity/Error.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Instance" : {
          "file" : "lib/Mastodon/Entity/Instance.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Mention" : {
          "file" : "lib/Mastodon/Entity/Mention.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Notification" : {
          "file" : "lib/Mastodon/Entity/Notification.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Relationship" : {
          "file" : "lib/Mastodon/Entity/Relationship.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Report" : {
          "file" : "lib/Mastodon/Entity/Report.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Results" : {
          "file" : "lib/Mastodon/Entity/Results.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Status" : {
          "file" : "lib/Mastodon/Entity/Status.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Entity::Tag" : {
          "file" : "lib/Mastodon/Entity/Tag.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Listener" : {
          "file" : "lib/Mastodon/Listener.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Role::Entity" : {
          "file" : "lib/Mastodon/Role/Entity.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Role::UserAgent" : {
          "file" : "lib/Mastodon/Role/UserAgent.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Mastodon::Types" : {
          "file" : "lib/Mastodon/Types.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
@@ -150,14 +150,14 @@
          "web" : "https://gitlab.com/jjatria/Mastodon-Client"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_contributors" : [
       "Al Beano <albino@autistici.org>",
+      "Alexander Zaitsev <shura0@yandex.ru>",
       "Eric Prestemon <ecp@prestemon.com>",
       "Florian Obser <florian+gitlab@narrans.de>",
       "Lance Wicks <lancew@cpan.org>",
-      "Luc Didry <luc@didry.org>",
-      "Shura <shura0@yandex.ru>"
+      "Luc Didry <luc@didry.org>"
    ],
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"

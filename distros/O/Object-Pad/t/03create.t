@@ -5,6 +5,8 @@ use warnings;
 
 use Test::More;
 
+use Scalar::Util qw( reftype );
+
 use Object::Pad;
 
 class Point {
@@ -32,7 +34,7 @@ class WithBuildargs {
       return ( 4, 5, 6 );
    }
 
-   method BUILDALL {
+   method BUILD {
       @buildall = @_;
    }
 }
@@ -41,7 +43,7 @@ class WithBuildargs {
    WithBuildargs->new( 1, 2, 3 );
 
    is_deeply( \@buildargs, [qw( WithBuildargs 1 2 3 )], '@_ to BUILDARGS' );
-   is_deeply( \@buildall,  [qw( 4 5 6 )],               '@_ to BUILDALL' );
+   is_deeply( \@buildall,  [qw( 4 5 6 )],               '@_ to BUILD' );
 }
 
 {
@@ -62,6 +64,18 @@ class WithBuildargs {
 
    is( $newarg_destroyed, 1, 'argument to ->new destroyed' );
    is( $buildargs_result_destroyed, 1, 'result of BUILDARGS destroyed' );
+}
+
+# Create a base class with HASH representation
+{
+   class NativelyHash :repr(HASH) {
+      has $slot = "value";
+      method slot { $slot }
+   }
+
+   my $o = NativelyHash->new;
+   is( reftype $o, "HASH", 'NativelyHash is natively a HASH reference' );
+   is( $o->slot, "value", 'native HASH objects still support slots' );
 }
 
 done_testing;

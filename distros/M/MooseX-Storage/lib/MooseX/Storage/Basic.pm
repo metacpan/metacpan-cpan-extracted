@@ -1,7 +1,7 @@
 package MooseX::Storage::Basic;
 # ABSTRACT: The simplest level of serialization
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Moose::Role;
 use MooseX::Storage::Engine;
@@ -56,8 +56,6 @@ sub _storage_construct_instance {
     $class->new( %$args, %i );
 }
 
-no Moose::Role;
-
 1;
 
 __END__
@@ -72,7 +70,7 @@ MooseX::Storage::Basic - The simplest level of serialization
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

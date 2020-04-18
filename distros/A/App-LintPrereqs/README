@@ -3,8 +3,8 @@ NAME
     dist.ini
 
 VERSION
-    This document describes version 0.541 of App::LintPrereqs (from Perl
-    distribution App-LintPrereqs), released on 2019-12-17.
+    This document describes version 0.542 of App::LintPrereqs (from Perl
+    distribution App-LintPrereqs), released on 2020-04-18.
 
 SYNOPSIS
      # Use via lint-prereqs CLI script
@@ -141,8 +141,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012
-    by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013,
+    2012 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

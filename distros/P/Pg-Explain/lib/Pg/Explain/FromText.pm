@@ -27,11 +27,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 0.97
+Version 0.98
 
 =cut
 
-our $VERSION = '0.97';
+our $VERSION = '0.98';
 
 =head1 SYNOPSIS
 
@@ -140,6 +140,9 @@ sub parse_source {
 
         # There could be stray " at the end. No idea why, but some people paste such explains on explain.depesz.com
         $line =~ s/\s*"\z//;
+
+        # Replace tabs with 4 spaces
+        $line =~ s/\t/    /g;
 
         if (
             ( $line =~ m{\(} )

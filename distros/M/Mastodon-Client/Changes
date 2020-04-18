@@ -1,5 +1,14 @@
 Revision history for Mastodon::Client
 
+0.017     2020-04-17 23:46:11+01:00 Europe/London
+
+  * New:
+    * Added an example script to illustrate the use of Mastodon::Listener.
+  * Fixes:
+    * Stream parser in Mastodon::Listener can now handle long messages
+      that did not fit in a single chunk (thanks Alexander Zaitsev!)
+    * Corrected the minimum required version of Types::Standard
+
 0.016     2019-10-13 12:23:24+01:00 Europe/London
 
   * New:

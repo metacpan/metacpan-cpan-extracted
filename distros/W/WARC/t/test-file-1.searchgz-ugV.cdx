@@ -1,0 +1,5 @@
+ CDX u g V
+<urn:test:file-1:record-0> test-file-1.warc.gz 0
+<urn:test:file-1:record-1> test-file-1.warc.gz 281
+<urn:test:file-1:record-2> test-file-1.warc.gz 438
+<urn:test:file-1:record-N> test-file-1.warc.gz 596

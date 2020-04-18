@@ -1,0 +1,401 @@
+WARC/1.0
+WARC-Type: warcinfo
+Content-Type: text/plain
+WARC-Date: 2019-12-16T23:20:55Z
+WARC-Record-ID: <urn:test:file-2:record-0>
+WARC-Filename: test-file-2.warc
+WARC-Block-Digest: sha1:V7W4MFM7XGLSDYKRMWGC4TN4MW3AGERA
+Content-Length: 195
+
+This is an example WARC file written by hand for testing purposes.  It may
+or may not actually conform to any WARC specification, but is "close
+enough" for testing the WARC library read support.
+
+
+WARC/1.0
+WARC-Type: request
+WARC-Target-URI: http://example.test/
+Content-Type: application/http; msgtype=request
+WARC-Date: 2019-12-16T23:21:07Z
+WARC-Record-ID: <urn:test:file-2:record-1>
+WARC-Block-Digest: sha1:QSE47O3XGW3GKKSHMDHQN2BMBXJ7NKZQ
+Content-Length: 70
+
+GET http://example.test/ HTTP/1.1
+Accept: */*
+Host: example.test
+
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: http://example.test/
+Content-Type: application/http; msgtype=response
+WARC-Date: 2019-12-16T23:21:56Z
+WARC-Record-ID: <urn:test:file-2:record-2>
+WARC-Concurrent-To: <urn:test:file-2:record-1>
+WARC-Block-Digest: sha1:Q6UELNPNPBGVNBYYJLQYTXICGDCGXQ7O
+WARC-Payload-Digest: sha1:A6GZYRC4IMUG3E54G4XCPFTDMOY6HTHN
+Content-Length: 224
+
+HTTP/1.1 200 OK
+Content-Length: 158
+Content-Type: text/plain
+
+"What is the sound of Perl? Is it not the sound of a wall that
+people have stopped banging their heads against?"
+--Larry Wall in <1992Aug26.184221.29627.com>
+
+
+WARC/1.0
+WARC-Type: request
+WARC-Target-URI: *
+Content-Type: application/http; msgtype=request
+WARC-Date: 2019-12-16T23:22:00Z
+WARC-Record-ID: <urn:test:file-2:record-3>
+WARC-Block-Digest: sha1:CCTN35UNUUVXK2UOGGHF5LOZ234WGK66
+Content-Length: 22
+
+OPTIONS * HTTP/1.1
+
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: *
+Content-Type: application/http; msgtype=response
+WARC-Date: 2019-12-16T23:22:01Z
+WARC-Record-ID: <urn:test:file-2:record-4>
+WARC-Concurrent-To: <urn:test:file-2:record-3>
+WARC-Block-Digest: sha1:ZN23VWH4DMOUWLOZUCXRYDIDRF4CZSSZ
+Content-Length: 323
+
+HTTP/1.1 200 OK
+Connection: Keep-Alive
+Content-Language: en
+Content-Length: 0
+Date: Mon, 16 Dec 2019 23:22:00 GMT
+Keep-Alive: timeout=10
+Accept-Encoding: gzip, deflate, identity
+Allow: GET, HEAD, OPTIONS, POST, PUT
+Server: CUPS/2.2 IPP/2.1
+X-Frame-Options: DENY
+Content-Security-Policy: frame-ancestors 'none'
+
+
+
+WARC/1.0
+WARC-Type: request
+WARC-Target-URI: http://example.test/
+Content-Type: application/http; msgtype=request
+WARC-Date: 2019-12-16T23:22:11Z
+WARC-Record-ID: <urn:test:file-2:record-5>
+WARC-Block-Digest: sha1:Q2ON3VFNZWT5J6RWG5PPIO442B7MI4V7
+WARC-Payload-Digest: sha1:IXZT5FI6GGEOAH7FFK6POJOUF256TTCZ
+Content-Length: 301
+
+POST http://example.test/ HTTP/1.1
+Accept: */*
+Host: example.test
+Content-Length: 183
+Content-Type: text/plain
+
+And don't tell me there isn't one bit of difference between null and space,
+because that's exactly how much difference there is. :-)
+--- Larry Wall in <10209@jpl-devvax.JPL.NASA.GOV>
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: http://example.test/
+Content-Type: application/http; msgtype=response
+WARC-Date: 2019-12-16T23:22:11Z
+WARC-Record-ID: <urn:test:file-2:record-6>
+WARC-Concurrent-To: <urn:test:file-2:record-5>
+Content-Length: 27
+
+HTTP/1.1 204 No Content
+
+
+
+WARC/1.0
+WARC-Type: request
+WARC-Target-URI: http://example.test/1
+Content-Type: application/http
+WARC-Date: 2019-12-16T23:22:14Z
+WARC-Record-ID: <urn:test:file-2:record-7>
+Content-Length: 199
+
+GET http://example.test/1 HTTP/1.1
+Accept: */*
+Host: example.test
+X-Long-Header: This is a very long header value, long enough to
+	       reasonably wrap and demonstrate handling a LWS token.
+
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: http://example.test/1
+Content-Type: application/http
+WARC-Date: 2019-12-16T23:22:14Z
+WARC-Record-ID: <urn:test:file-2:record-8>
+WARC-Concurrent-To: <urn:test:file-2:record-7>
+Content-Length: 294
+
+HTTP/1.1 200 OK
+Content-Length: 100
+Content-Type: text/plain
+X-Long-Header: This is a very long header value, long enough to
+	       reasonably wrap and demonstrate handling a LWS token.
+
+Let us be charitable, and call it a misleading feature :-)
+--Larry Wall in <2609@jato.Jpl.Nasa.Gov>
+
+
+WARC/1.0
+WARC-Type: request
+WARC-Target-URI: http://example.test/
+Content-Type: application/http; msgtype=bogus
+WARC-Date: 2019-12-16T23:22:28Z
+WARC-Record-ID: <urn:test:file-2:record-9:bogus>
+Content-Length: 39
+
+This is not actually an HTTP message.
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: http://example.test/
+Content-Type: application/http; msgtype=bogus
+WARC-Date: 2019-12-16T23:22:30Z
+WARC-Record-ID: <urn:test:file-2:record-10:bogus>
+WARC-Concurrent-To: <urn:test:file-2:record-9:bogus>
+Content-Length: 25
+
+Not HTTP at all here...
+
+
+WARC/1.0
+WARC-Type: request
+WARC-Target-URI: http://example.test/r5
+Content-Type: application/http; msgtype=request
+WARC-Date: 2019-12-16T23:22:32Z
+WARC-Record-ID: <urn:test:file-2:record-11>
+Content-Length: 72
+
+GET http://example.test/r5 HTTP/1.1
+Accept: */*
+Host: example.test
+
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: http://example.test/r5
+Content-Type: application/http; msgtype=response
+WARC-Date: 2019-12-16T23:22:33Z
+WARC-Record-ID: <urn:test:file-2:record-12>
+WARC-Concurrent-To: <urn:test:file-2:record-11>
+X-Note: bogus WARC-Concurrent-To follows for code coverage
+WARC-Concurrent-To: <urn:test:file-2:record-14>
+Content-Length: 229
+
+HTTP/1.1 302 Found
+Host: example.test
+Location: http://example.test/r4
+Content-Length: 107
+Content-Type: text/html
+
+<html><head><title>Redirect</title></head><body>Go <a href="http://example.test/r4">here</a>.</body></html>
+
+WARC/1.0
+WARC-Type: request
+WARC-Target-URI: http://example.test/r4
+Content-Type: application/http; msgtype=request
+WARC-Date: 2019-12-16T23:22:33Z
+WARC-Record-ID: <urn:test:file-2:record-13>
+Content-Length: 72
+
+GET http://example.test/r4 HTTP/1.1
+Accept: */*
+Host: example.test
+
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: http://example.test/r4
+Content-Type: application/http; msgtype=response
+WARC-Date: 2019-12-16T23:22:34Z
+WARC-Record-ID: <urn:test:file-2:record-14>
+X-Note: bogus WARC-Concurrent-To follows for code coverage
+WARC-Concurrent-To: <urn:test:file-2:record-11>
+WARC-Concurrent-To: <urn:test:file-2:record-13>
+Content-Length: 229
+
+HTTP/1.1 302 Found
+Host: example.test
+Location: http://example.test/r3
+Content-Length: 107
+Content-Type: text/html
+
+<html><head><title>Redirect</title></head><body>Go <a href="http://example.test/r4">here</a>.</body></html>
+
+WARC/1.0
+WARC-Type: request
+WARC-Target-URI: http://example.test/r3
+Content-Type: application/http; msgtype=request
+WARC-Date: 2019-12-16T23:22:34Z
+WARC-Record-ID: <urn:test:file-2:record-15>
+Content-Length: 72
+
+GET http://example.test/r3 HTTP/1.1
+Accept: */*
+Host: example.test
+
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: http://example.test/r3
+Content-Type: application/http; msgtype=response
+WARC-Date: 2019-12-16T23:22:34Z
+WARC-Record-ID: <urn:test:file-2:record-16>
+WARC-Concurrent-To: <urn:test:file-2:record-15>
+Content-Length: 229
+
+HTTP/1.1 302 Found
+Host: example.test
+Location: http://example.test/r2
+Content-Length: 107
+Content-Type: text/html
+
+<html><head><title>Redirect</title></head><body>Go <a href="http://example.test/r4">here</a>.</body></html>
+
+WARC/1.0
+WARC-Type: request
+WARC-Target-URI: http://example.test/r2
+Content-Type: application/http; msgtype=request
+WARC-Date: 2019-12-16T23:22:34Z
+WARC-Record-ID: <urn:test:file-2:record-17>
+Content-Length: 72
+
+GET http://example.test/r2 HTTP/1.1
+Accept: */*
+Host: example.test
+
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: http://example.test/r2
+Content-Type: application/http; msgtype=response
+WARC-Date: 2019-12-16T23:22:34Z
+WARC-Record-ID: <urn:test:file-2:record-18>
+WARC-Concurrent-To: <urn:test:file-2:record-17>
+Content-Length: 229
+
+HTTP/1.1 302 Found
+Host: example.test
+Location: http://example.test/r1
+Content-Length: 107
+Content-Type: text/html
+
+<html><head><title>Redirect</title></head><body>Go <a href="http://example.test/r4">here</a>.</body></html>
+
+WARC/1.0
+WARC-Type: request
+WARC-Target-URI: http://example.test/r1
+Content-Type: application/http; msgtype=request
+WARC-Date: 2019-12-16T23:22:35Z
+WARC-Record-ID: <urn:test:file-2:record-19>
+Content-Length: 72
+
+GET http://example.test/r1 HTTP/1.1
+Accept: */*
+Host: example.test
+
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: http://example.test/r1
+Content-Type: application/http; msgtype=response
+WARC-Date: 2019-12-16T23:22:35Z
+WARC-Record-ID: <urn:test:file-2:record-20>
+WARC-Concurrent-To: <urn:test:file-2:record-19>
+Content-Length: 225
+
+HTTP/1.1 302 Found
+Host: example.test
+Location: http://example.test/
+Content-Length: 105
+Content-Type: text/html
+
+<html><head><title>Redirect</title></head><body>Go <a href="http://example.test/">here</a>.</body></html>
+
+WARC/1.0
+WARC-Type: request
+WARC-Target-URI: http://example.test/
+Content-Type: application/http; msgtype=request
+WARC-Date: 2019-12-16T23:22:35Z
+WARC-Record-ID: <urn:test:file-2:record-21>
+Content-Length: 70
+
+GET http://example.test/ HTTP/1.1
+Accept: */*
+Host: example.test
+
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: http://example.test/
+Content-Type: application/http; msgtype=response
+WARC-Date: 2019-12-16T23:22:36Z
+WARC-Record-ID: <urn:test:file-2:record-22>
+WARC-Concurrent-To: <urn:test:file-2:record-21>
+Content-Length: 178
+
+HTTP/1.1 200 OK
+Content-Length: 112
+Content-Type: text/plain
+
+Let's say the docs present a simplified view of reality... :-)
+--- Larry Wall in <6940@jpl-devvax.JPL.NASA.GOV>
+
+
+WARC/1.0
+WARC-Type: response
+WARC-Target-URI: http://other.test/
+Content-Type: application/http; msgtype=response
+WARC-Date: 2019-12-16T23:22:36Z
+WARC-Record-ID: <urn:test:file-2:record-23>
+X-Note: bogus WARC-Concurrent-To follows for code coverage
+WARC-Concurrent-To: <urn:test:file-2:record-22>
+X-Note: no request present for this response
+Content-Length: 233
+
+HTTP/1.1 200 OK
+Content-Length: 167
+Content-Type: text/plain
+
+Sorry. My testing organization is either too small, or too large, depending
+on how you look at it. :-)
+--Larry Wall in <1991Apr22.175438.8564@jpl-devvax.jpl.nasa.gov>
+
+
+WARC/1.0
+WARC-Type: metadata
+Content-Type: text/plain
+WARC-Date: 2019-12-16T23:22:54Z
+WARC-Record-ID: <urn:test:file-2:record-N>
+Content-Length: 62
+
+Local Variables:
+mode: fundamental
+coding: us-ascii-unix
+End:
+
+

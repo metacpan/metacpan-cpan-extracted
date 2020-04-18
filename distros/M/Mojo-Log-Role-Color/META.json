@@ -30,6 +30,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Method::Modifiers" : "2.00",
             "Mojolicious" : "8.00",
             "Role::Tiny" : "2.000001"
          }
@@ -52,7 +53,7 @@
          "web" : "https://github.com/jhthorsen/mojo-log-role-color"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Jan Henning Thorsen"
    ],

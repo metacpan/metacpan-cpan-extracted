@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "Getopt::EX::termcolor" : {
          "file" : "lib/Getopt/EX/termcolor.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       },
       "Getopt::EX::termcolor::Apple_Terminal" : {
          "file" : "lib/Getopt/EX/termcolor/Apple_Terminal.pm"
@@ -77,10 +77,11 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX-termcolor"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

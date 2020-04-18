@@ -4,13 +4,13 @@
       "Tom Molesworth <cpan@entitymodel.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tickit-Widget-Tabbed",
    "no_index" : {
@@ -39,16 +39,28 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.26",
+            "Object::Pad" : "0.22",
             "Scalar::Util" : "0",
+            "Struct::Dumb" : "0",
             "Tickit::ContainerWidget" : "0.44",
             "Tickit::Widget" : "0.36",
             "Tickit::Window" : "0.28",
             "parent" : "0",
-            "perl" : "5.010"
+            "perl" : "5.026"
          }
       }
    },
+   "provides" : {
+      "Tickit::Widget::Tabbed" : {
+         "file" : "lib/Tickit/Widget/Tabbed.pm",
+         "version" : "0.022"
+      },
+      "Tickit::Widget::Tabbed::Ribbon" : {
+         "file" : "lib/Tickit/Widget/Tabbed/Ribbon.pm",
+         "version" : "0.022"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.021",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.022",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

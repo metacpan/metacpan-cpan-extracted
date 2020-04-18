@@ -58,5 +58,7 @@ severity = 2
 severity = 2
 [ValuesAndExpressions::RequireUpperCaseHeredocTerminator]
 [Variables::ProhibitConditionalDeclarations]
+[Variables::RequireLocalizedPunctuationVars]
+severity = 2
 
 #[Modules::ProhibitExcessMainComplexity]

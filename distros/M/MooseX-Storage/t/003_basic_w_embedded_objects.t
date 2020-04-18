@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 46;
+use Test::More tests => 5;
 use Test::Deep;
 
 =pod
@@ -67,7 +67,7 @@ ArrayRef and HashRef type handlers.
     );
 }
 
-{
+subtest 'Foo' => sub {
     my $foo = Foo->unpack(
         {
             __CLASS__ => 'Foo',
@@ -83,13 +83,10 @@ ArrayRef and HashRef type handlers.
     );
     isa_ok( $foo, 'Foo' );
 
-    foreach my $i (1 .. scalar @{$foo->bars}) {
-        isa_ok($foo->bars->[$i - 1], 'Bar');
-        is($foo->bars->[$i - 1]->number, $i, "... got the right number ($i) in the Bar in Foo");
-    }
-}
+    subtest 'bars', \&test_bars, @{ $foo->bars };
+};
 
-{
+subtest 'Baz', sub {
     my $baz = Baz->new(
         bars => { map { ($_ => Bar->new(number => $_)) } (1 .. 10) }
     );
@@ -110,9 +107,9 @@ ArrayRef and HashRef type handlers.
         },
         '... got the right frozen class'
     );
-}
+};
 
-{
+subtest 'Baz unpack', sub {
     my $baz = Baz->unpack(
         {
             __CLASS__ => 'Baz',
@@ -128,8 +125,17 @@ ArrayRef and HashRef type handlers.
     );
     isa_ok( $baz, 'Baz' );
 
-    foreach my $k (keys %{$baz->bars}) {
-        isa_ok($baz->bars->{$k}, 'Bar');
-        is($baz->bars->{$k}->number, $k, "... got the right number ($k) in the Bar in Baz");
-    }
+    subtest 'bars' => \&test_bars, map { $baz->bars->{$_ } } 1..10;
+};
+
+sub test_bars {
+    my @bars = @_;
+
+    is scalar @bars => 10, 'we have 10 bars';
+
+    my $i = 0;
+    subtest "bar.".$i, sub {
+        is $_->number => ++$i, 'right value';
+    } for @bars;
 }
+

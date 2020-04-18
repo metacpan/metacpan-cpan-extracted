@@ -1,19 +1,20 @@
 use strict;
 use warnings;
  
-use 5.008;
+use 5.0014;
  
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-    NAME          => 'Bio::Phylo::CIPRES',
-    AUTHOR        => 'Rutger Vos <rutgeraldo@gmail.com>',
-    VERSION_FROM  => 'lib/Bio/Phylo/CIPRES.pm',
-    ABSTRACT_FROM => 'lib/Bio/Phylo/CIPRES.pm',
-    LICENSE       => 'perl',
-    PREREQ_PM     => {
+    NAME             => 'Bio::Phylo::CIPRES',
+    AUTHOR           => 'Rutger Vos <rutgeraldo@gmail.com>',
+    VERSION_FROM     => 'lib/Bio/Phylo/CIPRES.pm',
+    ABSTRACT_FROM    => 'lib/Bio/Phylo/CIPRES.pm',
+    MIN_PERL_VERSION => '5.0014',
+    LICENSE          => 'perl',
+    PREREQ_PM        => {
         'XML::Twig'      => '0',
-		'YAML'           => '0',
+        'YAML'           => '0',
         'Bio::Phylo'     => '0',
         'URI'            => '0',
         'LWP::UserAgent' => '0',	
@@ -24,7 +25,7 @@ WriteMakefile
     EXE_FILES => [
            'script/cipresrun'
     ],
-    META_MERGE    => {
+    META_MERGE => {
         'meta-spec' => { version => 2 },
          resources => {
              repository => {

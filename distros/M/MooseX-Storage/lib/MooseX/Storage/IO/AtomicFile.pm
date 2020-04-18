@@ -1,7 +1,7 @@
 package MooseX::Storage::IO::AtomicFile;
 # ABSTRACT: An Atomic File I/O role
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Moose::Role;
 use MooseX::Storage::Engine::IO::AtomicFile;
@@ -13,8 +13,6 @@ sub store {
     my ( $self, $filename, @args ) = @_;
     MooseX::Storage::Engine::IO::AtomicFile->new( file => $filename )->store( $self->freeze(@args) );
 }
-
-no Moose::Role;
 
 1;
 
@@ -30,7 +28,7 @@ MooseX::Storage::IO::AtomicFile - An Atomic File I/O role
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

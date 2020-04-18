@@ -4,7 +4,7 @@ Data::Random::Structure::UTF8 - Produce nested data structures with unicode keys
 
 # VERSION
 
-Version 0.04
+Version 0.06
 
 # SYNOPSIS
 
@@ -105,9 +105,9 @@ This is an object oriented module which has exactly the same API as
 
 ## `new`
 
-Constructor. In addition to [Data::Random::Structure::new](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3Anew) API, it
-takes parameter `'only-unicode'` with a valid value of 0, 1 or 2.
-Default is 0.
+Constructor. In addition to [Data::Random::Structure](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure) `<new()`>
+API, it takes parameter `'only-unicode'` with
+a valid value of 0, 1 or 2. Default is 0.
 
 - 0 : keys, values, elements of the produced data structure will be
 a mixture of unicode strings, plus [Data::Random::Structure](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure)'s full
@@ -121,24 +121,25 @@ only unicode strings. Nothing of [Data::Random::Structure](https://metacpan.org/
 repertoire applies. Only unicode strings, no integers, no nothing.
 
 Controlling the scalar data types can also be done on the fly, after
-the object has been created using [Data::Random::Structure::UTF8::only\_unicode](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3AUTF8%3A%3Aonly_unicode)
+the object has been created using
+[Data::Random::Structure::UTF8](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3AUTF8) `<only_unicode()`>
 method.
 
-Additionally, [Data::Random::Structure::new](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3Anew)'s API reports that
+Additionally, [Data::Random::Structure](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure) `<new()`>'s API reports that
 the constructor takes 2 optional arguments, `max_depth` and `max_elements`.
-See [Data::Random::Structure::new](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3Anew) for up-to-date, official information.
+See [Data::Random::Structure](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure) `<new()`> for up-to-date, official information.
 
 ## `only_unicode`
 
 Controls what scalar types to be included in the nested
 data structures generated. With no parameters it returns back
 the current setting. Otherwise, valid input parameters and their
-meanings are listed in [Data::Random::Structure::UTF8::new](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3AUTF8%3A%3Anew)
+meanings are listed in [Data::Random::Structure::UTF8](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3AUTF8) `<new()`>
 
 ## `generate`
 
 Generate a nested data structure according to the specification
-set in the constructor. See [Data::Random::Structure::generate](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3Agenerate) for
+set in the constructor. See [Data::Random::Structure](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure) `<generate()`> for
 all options. This method is not overriden by this module.
 
 It returns the Perl data structure as a reference.
@@ -192,9 +193,12 @@ Arguments:
     - `'max'` sets the maximum length of the random sequence to be returned, default is 32
 
 Return a random unicode-only string optionally specifying
-minimum and maximum length. See [Data::Random::Structure::UTF8::random\_chars\_UTF8](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3AUTF8%3A%3Arandom_chars_UTF8)
+minimum and maximum length. See
+[Data::Random::Structure::UTF8](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3AUTF8) `<random_chars_UTF8()`>
 for the range of characters it returns. The returned string
 is unicode and is guaranteed all its characters are valid.
+
+# SUBROUTINES
 
 ## `check_content_recursively`
 
@@ -206,6 +210,9 @@ Arguments:
 - `$paramshashref` : can contain one or more of the following keys:
     - `'numbers'` set it to 1 to look for numbers (possibly among other things).
     If set to 1 and a number `123` or `"123"` is found, this sub returns 1.
+    Set it to 0 to not look for numbers at all (and not report if
+    there are no numbers) - _don't bother checking for numbers_, that's what
+    setting this to zero means.
     - `'strings-unicode'` set it to 1 to look for unicode strings (possibly among other things).
     The definition of "unicode string" is that at least one its characters is unicode.
     If set to 1 and a "unicode string" is found, this sub returns 1.
@@ -216,14 +223,37 @@ Arguments:
     If set to 1 and a "plain string" or "unicode string" is found, this sub returns 1. Basically,
     it returns 1 when a string is found (as opposed to a "number").
 
-Return value: 1 or 0 depending what was looking for was found.
+In general, by setting `<'strings-unicode'=`1>> you are checking whether
+the input Perl variable contains a unicode string in a key, a value,
+an array element, or a scalar reference.
+
+But, setting `<'strings-unicode'=`0>>, it simply means do not look for
+this. It does not mean _report if they are NO unicode strings_.
+
+Return value: 1 or 0 depending whether what
+was looking for, was found.
 
 This is not an object-oriented method. It is called thously:
 
+    # check if ANY scalar (hash key, value, array element or scalar ref)
+    # contains ONLY single number (integer, float)
+    # the decicion is made by Scalar::Util:looks_like_number()
     if( Data::Random::Structure::UTF8::check_content_recursively(
         {'abc'=>123, 'xyz'=>[1,2,3]},
         {
+                # look for numbers, are there any?
                 'numbers' => 1,
+        }
+    ) ){ print "data structure contains numbers\n" }
+
+    # check if it contains no numbers but it does unicode strings
+    if( Data::Random::Structure::UTF8::check_content_recursively(
+        {'abc'=>123, 'xyz'=>[1,2,3]},
+        {
+                # don't look for numbers
+                'numbers' => 0,
+                # look for unicode strings, are there any?
+                'strings-unicode' => 1,
         }
     ) ){ print "data structure contains numbers\n" }
 
@@ -231,14 +261,15 @@ CAVEAT: as its name suggests, this is a recursive function. Beware
 of extremely deep data structures. Deep, not long. If you do get
 `<"Deep recursion..." warnings`>, and you do insist to go ahead,
 this will remove the warnings (but are you sure?):
+
     {
         no warnings 'recursion';
-        if( Data::Random::Structure::UTF8::check\_content\_recursively(
-	    {'abc'=>123, 'xyz'=>\[1,2,3\]},
-	    {
-		'numbers' => 1,
-	    }
-        ) ){ print "data structure contains numbers\\n" }
+        if( Data::Random::Structure::UTF8::check_content_recursively(
+            {'abc'=>123, 'xyz'=>[1,2,3]},
+            {
+                'numbers' => 1,
+            }
+        ) ){ print "data structure contains numbers\n" }
     }
 
 # SEE ALSO
@@ -288,7 +319,7 @@ with the following code
 in order to extract the `type` which can not be handled
 and handle it ourselves. So whenever the parent class ([Data::Random::Structure](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure))
 changes its `croak` song, we will have to adopt this code
-accordingly (in [Data::Random::Structure::UTF8::generate\_scalar](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3AUTF8%3A%3Agenerate_scalar)).
+accordingly (in [Data::Random::Structure::UTF8](https://metacpan.org/pod/Data%3A%3ARandom%3A%3AStructure%3A%3AUTF8) `<generate_scalar()`>).
 For the moment, I have placed a catch-all, fall-back condition
 to handle this but it will be called for all kind of types
 and not only the types we have added.

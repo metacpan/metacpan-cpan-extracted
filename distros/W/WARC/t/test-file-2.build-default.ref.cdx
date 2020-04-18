@@ -1,0 +1,26 @@
+ CDX N b a m s k r M S V g u
+- 20191216232055 - - - - - - - - test-file-2.warc <urn:test:file-2:record-0>
+test,example)/ 20191216232107 http://example.test/ - - - - - - test-file-2.warc <urn:test:file-2:record-1>
+test,example)/ 20191216232156 http://example.test/ text/plain 200 sha1:A6GZYRC4IMUG3E54G4XCPFTDMOY6HTHN - - - test-file-2.warc <urn:test:file-2:record-2>
+- 20191216232200 * - - - - - - test-file-2.warc <urn:test:file-2:record-3>
+- 20191216232201 * - 200 - - - - test-file-2.warc <urn:test:file-2:record-4>
+test,example)/ 20191216232211 http://example.test/ text/plain - sha1:IXZT5FI6GGEOAH7FFK6POJOUF256TTCZ - - - test-file-2.warc <urn:test:file-2:record-5>
+test,example)/ 20191216232211 http://example.test/ - 204 - - - - test-file-2.warc <urn:test:file-2:record-6>
+test,example)/1 20191216232214 http://example.test/1 - - - - - - test-file-2.warc <urn:test:file-2:record-7>
+test,example)/1 20191216232214 http://example.test/1 text/plain 200 - - - - test-file-2.warc <urn:test:file-2:record-8>
+test,example)/ 20191216232228 http://example.test/ - - - - - - - test-file-2.warc <urn:test:file-2:record-9:bogus>
+test,example)/ 20191216232230 http://example.test/ - - - - - - - test-file-2.warc <urn:test:file-2:record-10:bogus>
+test,example)/r5 20191216232232 http://example.test/r5 - - - - - - test-file-2.warc <urn:test:file-2:record-11>
+test,example)/r5 20191216232233 http://example.test/r5 text/html 302 - http://example.test/r4 - - - test-file-2.warc <urn:test:file-2:record-12>
+test,example)/r4 20191216232233 http://example.test/r4 - - - - - - test-file-2.warc <urn:test:file-2:record-13>
+test,example)/r4 20191216232234 http://example.test/r4 text/html 302 - http://example.test/r3 - - - test-file-2.warc <urn:test:file-2:record-14>
+test,example)/r3 20191216232234 http://example.test/r3 - - - - - - test-file-2.warc <urn:test:file-2:record-15>
+test,example)/r3 20191216232234 http://example.test/r3 text/html 302 - http://example.test/r2 - - - test-file-2.warc <urn:test:file-2:record-16>
+test,example)/r2 20191216232234 http://example.test/r2 - - - - - - test-file-2.warc <urn:test:file-2:record-17>
+test,example)/r2 20191216232234 http://example.test/r2 text/html 302 - http://example.test/r1 - - - test-file-2.warc <urn:test:file-2:record-18>
+test,example)/r1 20191216232235 http://example.test/r1 - - - - - - test-file-2.warc <urn:test:file-2:record-19>
+test,example)/r1 20191216232235 http://example.test/r1 text/html 302 - http://example.test/ - - - test-file-2.warc <urn:test:file-2:record-20>
+test,example)/ 20191216232235 http://example.test/ - - - - - - test-file-2.warc <urn:test:file-2:record-21>
+test,example)/ 20191216232236 http://example.test/ text/plain 200 - - - - test-file-2.warc <urn:test:file-2:record-22>
+test,other)/ 20191216232236 http://other.test/ text/plain 200 - - - - test-file-2.warc <urn:test:file-2:record-23>
+- 20191216232254 - - - - - - - - test-file-2.warc <urn:test:file-2:record-N>

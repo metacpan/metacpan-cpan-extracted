@@ -44,6 +44,10 @@ my $data = {
 	five => 0,
 };
 
+sub thing {
+	return $_[0] || 100;
+}
+
 is(lnpath($data, '/three'), 10, 'three');
 is(lnpath($data, 'one/a/1'), 10, 'one->a->1');
 is(lnpath($data, 'one/b/a'), 10, 'one->b->a');
@@ -62,8 +66,5 @@ is_deeply(lnpath($data, 'four/magic(["a","b"])'), [ "a", "b" ], 'array');
 is_deeply(lnpath($data, 'four/magic([crazy_world,&thing])'), [ 100, 100 ], 'array');
 is(lnpath($data, '/five'), 0, 'five');
 
-sub thing {
-	return $_[0] || 100;
-}
 
 done_testing();

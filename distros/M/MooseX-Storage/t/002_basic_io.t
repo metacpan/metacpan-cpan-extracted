@@ -9,8 +9,8 @@ use File::Spec::Functions;
 
 my $dir = tempdir;
 
-use Test::Requires 'JSON::MaybeXS';
-diag 'using JSON backend: ', JSON;
+use Test::Needs 'JSON::MaybeXS';
+diag 'using JSON backend: ', JSON::MaybeXS->JSON;
 
 plan tests => 9;
 

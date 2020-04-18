@@ -8,50 +8,66 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
     my $rcloader = new Getopt::EX::Loader
         BASECLASS => [ 'App::command', 'Getopt::EX' ];
 
-    $ command -Mtermcolor
+    or
+
+    use Getopt::EX::Long qw(:DEFAULT ExConfigure);
+    ExConfigure BASECLASS => [ "App::command", "Getopt::EX" ];
+
+    then
+
+    $ command -Mtermcolor::bg=
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
-This is a common module for command using [Getopt::EX](https://metacpan.org/pod/Getopt::EX) to set system
-dependent termcolor option.
+This is a common module for command using [Getopt::EX](https://metacpan.org/pod/Getopt::EX) to manipulate
+system dependent terminal color.
 
 Actual action is done by sub-module under [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt::EX::termcolor),
 such as [Getopt::EX::termcolor::Apple\_Terminal](https://metacpan.org/pod/Getopt::EX::termcolor::Apple_Terminal).
 
-Each sub-module is expected to have `&brightness` function which
-returns integer value between 0 and 100.  If the sub-module was found
-and `&brightness` function exists, its result is taken as a
-brightness of the terminal.
+At this point, only terminal background color is supported.  Each
+sub-module is expected to have `&brightness` function which returns
+integer value between 0 and 100.  If the sub-module was found and
+`&brightness` function exists, its result is taken as a brightness of
+the terminal.
 
-However, if the environment variable `BRIGHTNESS` is defined, its
-value is used as a brightness without calling sub-modules.  The value
-of `BRIGHTNESS` is expected in range of 0 to 100.
+However, if the environment variable `TERM_BRIGHTNESS` is defined,
+its value is used as a brightness without calling sub-modules.  The
+value of `TERM_BRIGHTNESS` is expected in range of 0 to 100.
 
-If the brightness can not be taken, nothing happens.  Otherwise, the
-module insert **--light-terminal** or **--dark-terminal** option
-according to the brightness value.  These options are defined as
-C$<move(0,0)> in this module and do nothing.  They can be overridden
-by other module or user definition.
+# MODULE FUNCTION
 
-You can change the behavior of this module by calling `&set` function
-with module option.  It takes some parameters and they override
-default values.
+- **bg**
 
-    threshold : threshold of light/dark  (default 50)
-    default   : default brightness value (default none)
-    light     : light terminal option    (default "--light-terminal")
-    dark      : dark terminal option     (default "--dark-terminal")
+    Call this function with module option:
 
-For example, use like:
+        $ command -Mtermcolor::bg=
 
-    option default \
-        -Mtermcolor::set(default=100,light=--light,dark=--dark)
+    If the terminal brightness is unkown, nothing happens.  Otherwise, the
+    module insert **--light-terminal** or **--dark-terminal** option
+    according to the brightness value.  These options are defined as
+    C$<move(0,0)> in this module and do nothing.  They can be overridden
+    by other module or user definition.
 
-# FUNCTIONS
+    You can change the behavior of this module by calling `&set` function
+    with module option.  It takes some parameters and they override
+    default values.
+
+        threshold : threshold of light/dark  (default 50)
+        default   : default brightness value (default none)
+        light     : light terminal option    (default "--light-terminal")
+        dark      : dark terminal option     (default "--dark-terminal")
+
+    Use like this:
+
+        option default \
+            -Mtermcolor::bg(default=100,light=--light,dark=--dark)
+
+# UTILITY FUNCTION
 
 - **rgb\_to\_brightness**
 

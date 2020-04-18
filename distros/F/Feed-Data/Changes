@@ -3,3 +3,9 @@ Revision history for Feed-Data
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.02    2020-04-17
+        - adds two new parsers Feed::Data::Parser::Text and Feed::Data::Parser::JSON
+
+0.04    2020-04-17
+        - adds new parser Feed::Data::Parser::CSV
+	- update Makefile with missing dependency Ref::Util.

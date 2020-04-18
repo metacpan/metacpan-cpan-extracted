@@ -16,7 +16,7 @@ requires 'Try::Tiny',                  '0.28';
 requires 'Type::Params',               '1.000006';
 requires 'Types::Common::String',      '1.000006';
 requires 'Types::Path::Tiny',          '0.005';
-requires 'Types::Standard',            '1.000006';
+requires 'Types::Standard',            '1.003003';
 requires 'URI',                        '1.71';
 
 on test => sub {

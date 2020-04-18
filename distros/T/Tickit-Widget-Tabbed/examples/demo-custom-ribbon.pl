@@ -44,8 +44,10 @@ $tickit->bind_key(
 
 $tickit->run;
 
-package CustomRibbon;
-use base qw( Tickit::Widget::Tabbed::Ribbon );
+use 5.026;
+use Object::Pad 0.22;
+
+class CustomRibbon extends Tickit::Widget::Tabbed::Ribbon;
 
 use Tickit::Style -copy;
 
@@ -54,19 +56,15 @@ BEGIN {
                 current_fg => 8;
 }
 
-package CustomRibbon::horizontal;
-use base qw( CustomRibbon );
+class CustomRibbon::horizontal extends CustomRibbon;
 
 use Tickit::Utils qw( textwidth );
 
-sub lines { 1 }
-sub cols  { 1 }
+method lines () { 1 }
+method cols  () { 1 }
 
-sub render_to_rb
+method render_to_rb ( $rb, $rect )
 {
-        my $self = shift;
-        my ( $rb, $rect ) = @_;
-
         my @tabs = $self->tabs;
 
         $rb->goto( 0, 0 );
@@ -92,4 +90,4 @@ sub render_to_rb
         $rb->erase_to( $self->window->cols );
 }
 
-sub scroll_to_visible { }
+method scroll_to_visible ($) { }

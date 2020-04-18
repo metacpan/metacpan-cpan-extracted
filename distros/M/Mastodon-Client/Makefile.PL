@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Type::Params" => "1.000006",
     "Types::Common::String" => "1.000006",
     "Types::Path::Tiny" => "0.005",
-    "Types::Standard" => "1.000006",
+    "Types::Standard" => "1.003003",
     "URI" => "1.71"
   },
   "TEST_REQUIRES" => {
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.51",
     "Test::TCP" => "2.17"
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.017",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,7 +74,7 @@ my %FallbackPrereqs = (
   "Type::Params" => "1.000006",
   "Types::Common::String" => "1.000006",
   "Types::Path::Tiny" => "0.005",
-  "Types::Standard" => "1.000006",
+  "Types::Standard" => "1.003003",
   "URI" => "1.71"
 );
 

@@ -45,7 +45,7 @@ DESCRIPTION
     a method called BUILD, but does not need to chain to the SUPER class
     first; this is handled automatically.
 
-       $self->BUILD( @_ )
+       $self->BUILD( @_ )  # for each component class
 
     If the class provides a BUILDARGS class method, that is used to mangle
     the list of arguments before the BUILD methods are called. Note this
@@ -53,24 +53,17 @@ DESCRIPTION
     sub). It should perform any SUPER chaining as may be required.
 
        @args = $class->BUILDARGS( @_ )
-       $self->BUILD( @args )
-
-    If the class provides a BUILDALL method, that is used to implement the
-    setup behaviour instead. It is passed the entire parameters list from
-    the new method. It should perform any SUPER chaining as may be
-    required.
-
-       $self->BUILDALL( @_ )
+       $self->BUILD( @args )  # for each component class
 
 KEYWORDS
 
  class
 
-       class Name {
+       class Name :ATTRS... {
           ...
        }
     
-       class Name;
+       class Name :ATTRS...;
 
     Behaves similarly to the package keyword, but provides a package that
     defines a new class. Such a class provides an automatic constructor
@@ -115,6 +108,51 @@ KEYWORDS
 
        BaseClass->VERSION( $ver )
 
+    An optional list of attributes may be supplied in similar syntax as for
+    subs or lexical variables. (These are annotations about the class
+    itself; the concept should not be confused with per-object-instance
+    data, which here is called "slots").
+
+    The following class attributes are supported:
+
+  repr(TYPE)
+
+    Sets the representation type for instances of this class. Must be one
+    of the following values:
+
+       :repr(native), :repr(default)
+
+    The native representation, currently the default. This is an opaque
+    representation type whose contents are not specified.
+
+       :repr(HASH)
+
+    The representation will be a blessed hash reference. The instance data
+    will be stored in an array referenced by a key called
+    Object::Pad/slots, which is fairly unlikely to clash with existing
+    storage on the instance. No other keys will be used; they are available
+    for implementions and subclasses to use. The exact format of the value
+    stored here is not specified and may change between module versions,
+    though it can be relied on to be well-behaved as some kind of perl data
+    structure for purposes of modules like Data::Dumper or serialisation
+    into things like YAML or JSON.
+
+    This representation type may be useful when converting existing classes
+    into using Object::Pad where there may be existing subclasses of it
+    that presume a blessed hash for their own use.
+
+    This type is automatically selected when extending a base class that is
+    not itself implemented by Object::Pad.
+
+       :repr(magic)
+
+    The representation will use MAGIC to apply the instance data in a way
+    that is invisible at the Perl level, and shouldn't get in the way of
+    other things the instance is doing even in XS modules.
+
+    This representation type is the only one that will work for subclassing
+    existing classes that do not use blessed hashes.
+
  has
 
        has $var;
@@ -135,10 +173,10 @@ KEYWORDS
 
     A scalar slot may provide a expression that gives an initialisation
     value, which will be assigned into the slot of every instance during
-    the constructor before BUILDALL is invoked. For ease-of-implementation
-    reasons this expression must currently be a compiletime constant, but
-    it is hoped that a future version will relax this restriction and allow
-    runtime-computed values.
+    the constructor before the BUILD methods are invoked. For
+    ease-of-implementation reasons this expression must currently be a
+    compiletime constant, but it is hoped that a future version will relax
+    this restriction and allow runtime-computed values.
 
  method
 
@@ -150,7 +188,7 @@ KEYWORDS
           ...
        }
     
-       method NAME :attrs... {
+       method NAME :ATTRS... {
           ...
        }
 
@@ -218,13 +256,8 @@ SUBCLASSING CLASSIC PERL CLASSES
 
  Storage of Instance Data
 
-    Instances will store their data in a key called "Object::Pad/slots",
-    which is fairly unlikely to clash with existing storage on the
-    instance. The exact format of the value stored here is not specified
-    and may change between module versions, though it can be relied on to
-    be well-behaved as some kind of perl data structure for purposes of
-    modules like Data::Dumper or serialisation into things like YAML or
-    JSON.
+    Instances by default will use the :repr(HASH) storage type, though
+    subclasses can elect instead to use :repr(magic) instead.
 
  Object State During Methods Invoked By Superclass Constructor
 

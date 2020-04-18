@@ -1,3 +1,9 @@
+0.006   2020-04-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Now by default dump history from all profiles instead of trying
+	  to find the hard-coded 'default-release' profile.
+
+
 0.005   2019-11-23  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

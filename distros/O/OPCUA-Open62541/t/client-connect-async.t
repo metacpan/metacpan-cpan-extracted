@@ -3,6 +3,7 @@ use warnings;
 use OPCUA::Open62541 qw(:STATUSCODE :CLIENTSTATE);
 use IO::Socket::INET;
 use Scalar::Util qw(looks_like_number);
+use Time::HiRes qw(sleep);
 
 use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
@@ -37,6 +38,8 @@ is($client->{client}->connect_async(
     },
     $data
 ), STATUSCODE_GOOD, "connect async");
+# wait an initial 100ms for open62541 to start the timer that creates the socket
+sleep .1;
 $client->iterate(\$connected, "connect");
 is($client->{client}->getState(), CLIENTSTATE_SESSION, "client state");
 is($data->[1], "bar", "callback data out");
@@ -59,6 +62,7 @@ no_leaks_ok {
 	},
 	$data
     );
+    sleep .1;
     $client->iterate(\$connected);
 } "connect async leak";
 
@@ -70,6 +74,7 @@ $client->start();
 
 is($client->{client}->connect_async($client->url(), undef, undef),
     STATUSCODE_GOOD, "connect async undef callback");
+sleep .1;
 $client->iterate(sub {
     return $client->{client}->getState() == CLIENTSTATE_SESSION;
 }, "connect undef callback");
@@ -106,6 +111,7 @@ is($client->{client}->connect_async(
     undef,
 ), STATUSCODE_GOOD, "connect async bad url");
 undef $tcp_server;
+sleep .1;
 $client->iterate(undef, "connect bad url");
 is($client->{client}->getState(), CLIENTSTATE_DISCONNECTED,
     "client bad connection");
@@ -125,6 +131,7 @@ no_leaks_ok {
 	undef,
     );
     undef $tcp_server;
+    sleep .1;
     $client->iterate(undef);
 } "connect async bad url leak";
 

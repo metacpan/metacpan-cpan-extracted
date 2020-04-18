@@ -1,7 +1,7 @@
 {
    "abstract" : "Produce nested data structures with unicode keys, values, elements.",
    "author" : [
-      "Andreas Hadjiprocopis <bliako ta cpan.org / andreashad2 ta gmail.com>"
+      "Andreas Hadjiprocopis <bliako@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
@@ -41,6 +41,7 @@
          "requires" : {
             "Data::Dump" : "0",
             "Data::Dumper" : "0",
+            "Scalar::Util" : "0",
             "Test::More" : "0"
          }
       }
@@ -57,6 +58,6 @@
          "web" : "https://github.com/hadjiprocopis/Data-Random-Structure-UTF8"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

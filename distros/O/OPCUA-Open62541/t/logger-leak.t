@@ -29,7 +29,9 @@ no_leaks_ok {
 } "logger storage leak";
 
 no_leaks_ok {
-    my $logger = OPCUA::Open62541::Logger->new();
+    my $server = OPCUA::Open62541::Server->new();
+    my $config = $server->getConfig();
+    my $logger = $config->getLogger();
     $logger->setCallback(\&nolog, "malloc", \&noclear);
     $logger->logFatal(1, "fatal");
 } "logger malloc leak";

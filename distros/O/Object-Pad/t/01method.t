@@ -40,7 +40,8 @@ class Point {
 }
 
 # nested anon method (RT132321)
-{
+SKIP: {
+   skip "This causes SEGV on perl 5.16 (RT132321)", 1 if $] lt "5.018";
    class RT132321 {
       has $_genvalue;
 

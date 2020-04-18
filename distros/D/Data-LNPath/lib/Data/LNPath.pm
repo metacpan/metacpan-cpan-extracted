@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our (%ERROR, %METH, $caller);
 
@@ -121,13 +121,17 @@ sub lnpath {
 	return $val;
 }
 
+1;
+
+__END__
+
 =head1 NAME
 
 Data::LNPath - lookup on nested data via path
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -150,28 +154,65 @@ Version 0.08
 		},
 		two => [qw/1 2 3/],
 		three => 10,
-		four => Test::Obj->new(),
 	};
 
 	lnpath($data, '/three'); # 10
 	lnpath($data, 'one/a/1'); # 10;
 	lnpath($data, 'one/b/a'); # 10
 	lnpath($data, 'two/2/3/4'); # 2 unless you set the additional error invalid_path (make it die)
-	lnpath($data, 'four/plus(10, 2)');
-	lnpath($data, 'four/minus(200, crazy_world)');
-	lnpath($data, 'four/plus(200, crazy_world(50))');
-	lnpath($data, 'four/plus(200, &other_world(100))');
-	lnpath($data, 'four/magic(200, { okay => 'fine' }, [ 1, 2, 3, should, &work ])');
+	
+	...
+
+	use Data::LNPath qw/lnpath/;
+
+	{
+		package Test::Obj;
+
+		sub new { bless {}, shift };
+		sub plus {
+			return $_[1] + $_[2];
+		}
+
+		sub minus {
+			return $_[1] - $_[2];
+		}
+
+		sub crazy_world {
+			return $_[1] || 100;	
+		}
+		
+		sub magic {
+			my $self = shift;
+			return $_[0];
+		}
+	}
+
+	sub moon {
+		return $_[0] || 100;
+	}
+
+	my $data = {
+		four => Test::Obj->new(),
+	};
+
+	lnpath($data, 'four/plus(10, 2)'); # 12, 'four->plus(10, 2)'
+	lnpath($data, 'four/minus(200, crazy_world)'); # 100, 'four->plus(200, crazy_world)'
+	lnpath($data, 'four/minus(200, crazy_world(50))'); # 150, 'four->plus(200, crazy_world(50))'
+	lnpath($data, 'four/plus(200, &moon)'); # 300, 'four->plus(200, &moon)'
 
 =head1 EXPORT
 
 =head2 lnpath
 
+Lookup data in a struct by path.
+
+	lnpath($data, $path);
+
 =cut
 
 =head1 AUTHOR
 
-Robert Acock, C<< <thisusedtobeanemail at gmail.com> >>
+Robert Acock, C<< <email at lnation.org> >>
 
 =head1 BUGS
 
@@ -252,7 +293,5 @@ CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 =cut
 
-1; # End of Data::LNPath

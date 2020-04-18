@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use open ':std', ':encoding(UTF-8)';
+
+use Mastodon::Listener;
+
+my $access_token = shift
+    or die "You must pass an access token as the first argument\n";
+
+my $listener = Mastodon::Listener->new(
+    url => 'https://botsin.space/api/v1/streaming/public',
+    access_token => $ARGV[0],
+    coerce_entities => 1,
+);
+
+$listener->on( error => sub {
+    my ( undef, undef, $msg ) = @_;
+    warn $msg;
+});
+
+$listener->on( update => sub {
+    my ( undef, $status ) = @_;
+    printf "%s said: %s\n\n",
+        $status->account->display_name,
+        $status->content;
+});
+
+$listener->start;

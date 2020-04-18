@@ -14,6 +14,13 @@ is(get_iso639_1('fr+FR'),               undef,           'Badly formatted locali
 
 is(get_iso639_1('fr')->{nativeName}, 'Français', 'Check that we didn\'t change the codes hash table (ie don\'t use refs)');
 
+is(get_iso639_1_from_639_2('fra')->{nativeName}, 'Français', 'Check get_iso639_1_from_639_2');
+is(get_iso639_1_from_639_2('fre')->{nativeName}, 'Français', 'Check get_iso639_1_from_639_2 with 639-2/B code');
+
+is(get_iso639_1_from_name('French')->{nativeName}, 'Français', 'Check get_iso639_1_from_name');
+
+is(get_iso639_1_from_native_name('Français')->{name}, 'French', 'Check get_iso639_1_from_native_name');
+
 is_deeply(get_iso639_1('zh'), {
         "639-1"      => "zh",
         "639-2"      => "zho",

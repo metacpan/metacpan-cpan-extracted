@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -128,6 +128,9 @@ magically.
 
 =back
 
+There should be an interval of 100ms between the call to connect_async() and
+run_iterate() or open62541 may try to operate on a non existent socket.
+
 =item $status_code = $client->run_iterate($timeout)
 
 =item $status_code = $client->disconnect()
@@ -174,14 +177,13 @@ magically.
 
 =head3 Logger
 
-The Logger can either be a standalone object or use the embedded
-logger of a sever config.  In the latter case the life time is
-entangled with the config.  It contains Perl callbacks to the log
-and clear functions.  The log funtions are exported to Perl.
+The Logger uses the embedded logger of a client or server config.
+The scope of the logger object may extend the lifetime of the client
+or sever object.
+It contains Perl callbacks to the log and clear functions.
+The log functions are exported to Perl.
 
 =over 4
-
-=item $logger = OPCUA::Open62541::Logger->new()
 
 =item $logger->setCallback($log, $context, $clear);
 
@@ -226,7 +228,8 @@ Marvin Knoblauch E<lt>mknob@genua.deE<gt>,
 
 This interface is far from complete.
 
-UA_Int64 and UA_UInt64 are implemented as Perl IV respectively IV.
+The C types UA_Int64 and UA_UInt64 are implemented as Perl integers
+IV and UV respectively.
 This only works for Perl that is compiled on a 64 bit platform.
 32 bit platforms are currently not supported.
 

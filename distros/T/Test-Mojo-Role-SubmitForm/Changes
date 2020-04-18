@@ -1,5 +1,8 @@
 Revision history for Test-Mojo-Role-SubmitForm
 
+1.002003  2020-04-17
+    - Make error message more explanatory
+
 1.002002  2016-05-16
     [Changes by PLICEASE]
         - Allow forms with missing/empty action="";

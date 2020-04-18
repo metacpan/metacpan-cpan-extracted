@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.30'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,13 +23,22 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Tickit::Widget::Tabbed:
+    file: lib/Tickit/Widget/Tabbed.pm
+    version: '0.022'
+  Tickit::Widget::Tabbed::Ribbon:
+    file: lib/Tickit/Widget/Tabbed/Ribbon.pm
+    version: '0.022'
 requires:
   List::Util: '1.26'
+  Object::Pad: '0.22'
   Scalar::Util: '0'
+  Struct::Dumb: '0'
   Tickit::ContainerWidget: '0.44'
   Tickit::Widget: '0.36'
   Tickit::Window: '0.28'
   parent: '0'
-  perl: '5.010'
-version: '0.021'
+  perl: '5.026'
+version: '0.022'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

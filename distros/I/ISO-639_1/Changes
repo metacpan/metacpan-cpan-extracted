@@ -1,6 +1,8 @@
 Revision history for Perl extension ISO::639_1
 
-0.03 2019-06-13T11:35:23Z
+0.04 2020-04-17T15:31:09Z
+
+    - Allow to get infos from 639-2 code, name or native name
 
 0.03 2019-06-13T11:31:10Z
 

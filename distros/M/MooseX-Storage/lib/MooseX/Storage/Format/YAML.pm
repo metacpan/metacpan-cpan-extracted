@@ -1,7 +1,7 @@
 package MooseX::Storage::Format::YAML;
 # ABSTRACT: A YAML serialization role
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Moose::Role;
 
@@ -25,8 +25,6 @@ sub freeze {
     Dump( $self->pack(@args) );
 }
 
-no Moose::Role;
-
 1;
 
 __END__
@@ -41,7 +39,7 @@ MooseX::Storage::Format::YAML - A YAML serialization role
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

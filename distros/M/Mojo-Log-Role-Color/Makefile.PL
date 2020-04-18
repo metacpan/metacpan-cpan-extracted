@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
+  'Class::Method::Modifiers' => '2.00',
   'Mojolicious' => '8.00',
   'Role::Tiny' => '2.000001'
 }

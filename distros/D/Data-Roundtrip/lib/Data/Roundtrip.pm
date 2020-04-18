@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Encode qw/encode_utf8 decode_utf8/;
 use JSON qw/decode_json encode_json/;
@@ -507,7 +507,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -521,9 +521,13 @@ format (not spaces, indendation or line breaks).
 
     use Data::Roundtrip qw/:all/;
 
-    $jsonstr = '{"Songname": "Απόκληρος της κοινωνίας", "Artist": "Καζαντζίδης Στέλιος/Βίρβος Κώστας"}';
+    $jsonstr = '{"Songname": "Απόκληρος της κοινωνίας",'
+	       .'"Artist": "Καζαντζίδης Στέλιος/Βίρβος Κώστας"}'
+    ;
     $yamlstr = json2yaml($jsonstr);
     print $yamlstr;
+    # NOTE: long strings have been broken into multilines
+    # and/or truncated (replaced with ...)
     #---
     #Artist: Καζαντζίδης Στέλιος/Βίρβος Κώστας
     #Songname: Απόκληρος της κοινωνίας
@@ -531,24 +535,29 @@ format (not spaces, indendation or line breaks).
     $yamlstr = json2yaml($jsonstr, {'escape-unicode'=>1});
     print $yamlstr;
     #---
-    #Artist: \u039a\u03b1\u03b6\u03b1\u03bd\u03c4\u03b6\u03af\u03b4\u03b7\u03c2 \u03a3\u03c4\u03ad\u03bb\u03b9\u03bf\u03c2/\u0392\u03af\u03c1\u03b2\u03bf\u03c2 \u039a\u03ce\u03c3\u03c4\u03b1\u03c2
-    #Songname: \u0391\u03c0\u03cc\u03ba\u03bb\u03b7\u03c1\u03bf\u03c2 \u03c4\u03b7\u03c2 \u03ba\u03bf\u03b9\u03bd\u03c9\u03bd\u03af\u03b1\u03c2
+    #Artist: \u039a\u03b1\u03b6\u03b1 ...
+    #Songname: \u0391\u03c0\u03cc\u03ba ...
 
     $backtojson = yaml2json($yamlstr);
-    # $backtojson is a string representation of this JSON structure:
-    # {"Artist":"Καζαντζίδης Στέλιος/Βίρβος Κώστας","Songname":"Απόκληρος της κοινωνίας"}
+    # $backtojson is a string representation
+    # of following JSON structure:
+    # {"Artist":"Καζαντζίδης Στέλιος/Βίρβος Κώστας",
+    #  "Songname":"Απόκληρος της κοινωνίας"}
 
-    # This is useful when sending JSON via a POST request and it needs unicode escaped:
+    # This is useful when sending JSON via
+    # a POST request and it needs unicode escaped:
     $backtojson = yaml2json($yamlstr, {'escape-unicode'=>1});
-    # $backtojson is a string representation of this JSON structure:
+    # $backtojson is a string representation
+    # of following JSON structure:
     # but this time with unicode escaped
-    # {"Artist":"\u039a\u03b1\u03b6\u03b1\u03bd\u03c4\u03b6\u03af\u03b4\u03b7\u03c2 \u03a3\u03c4\u03ad\u03bb\u03b9\u03bf\u03c2/\u0392\u03af\u03c1\u03b2\u03bf\u03c2 \u039a\u03ce\u03c3\u03c4\u03b1\u03c2","Songname":"\u0391\u03c0\u03cc\u03ba\u03bb\u03b7\u03c1\u03bf\u03c2 \u03c4\u03b7\u03c2 \u03ba\u03bf\u03b9\u03bd\u03c9\u03bd\u03af\u03b1\u03c2"}
-
+    # (pod content truncated for readbility)
+    # {"Artist":"\u039a\u03b1\u03b6 ...",
+    #  "Songname":"\u0391\u03c0\u03cc ..."}
     # this is the usual Data::Dumper dump:
     print json2dump($jsonstr);
     #$VAR1 = {
-    #  'Songname' => "\x{391}\x{3c0}\x{3cc}\x{3ba}\x{3bb}\x{3b7}\x{3c1}\x{3bf}\x{3c2} \x{3c4}\x{3b7}\x{3c2} \x{3ba}\x{3bf}\x{3b9}\x{3bd}\x{3c9}\x{3bd}\x{3af}\x{3b1}\x{3c2}",
-    #  'Artist' => "\x{39a}\x{3b1}\x{3b6}\x{3b1}\x{3bd}\x{3c4}\x{3b6}\x{3af}\x{3b4}\x{3b7}\x{3c2} \x{3a3}\x{3c4}\x{3ad}\x{3bb}\x{3b9}\x{3bf}\x{3c2}/\x{392}\x{3af}\x{3c1}\x{3b2}\x{3bf}\x{3c2} \x{39a}\x{3ce}\x{3c3}\x{3c4}\x{3b1}\x{3c2}"
+    #  'Songname' => "\x{391}\x{3c0}\x{3cc} ...",
+    #  'Artist' => "\x{39a}\x{3b1}\x{3b6} ...",
     #};
 
     # and this is a more human-readable version:
@@ -558,20 +567,25 @@ format (not spaces, indendation or line breaks).
     #   "Songname" => "Απόκληρος της κοινωνίας"
     # };
 
-    # pass some parameters to Data::Dumper like to be terse (no $VAR1) and no indentation:
+    # pass some parameters to Data::Dumper
+    # like: be terse (no $VAR1):
     print json2dump($jsonstr,
       {'dont-bloody-escape-unicode'=>0, 'terse'=>1}
+     #{'dont-bloody-escape-unicode'=>0, 'terse'=>1, 'indent'=>0}
     );
     # {
     #  "Artist" => "Καζαντζίδης Στέλιος/Βίρβος Κώστας",
     #  "Songname" => "Απόκληρος της κοινωνίας"
     # }
 
-    # this is how to reformat a JSON string to have its unicode content escaped:
-    my $json_with_unicode_escaped = json2json($jsonstr, {'escape-unicode'=>1});
+    # this is how to reformat a JSON string to
+    # have its unicode content escaped:
+    my $json_with_unicode_escaped =
+          json2json($jsonstr, {'escape-unicode'=>1});
 
     # For some of the above functions there exist command-line scripts:
-    perl2json.pl -i "perl-data-structure.pl" -o "output.json" --escape-unicode --pretty
+    perl2json.pl -i "perl-data-structure.pl" -o "output.json" --pretty
+    json2json.pl -i "with-unicode.json" -o "unicode-escaped.json" --escape-unicode
     # etc.
 
 =head1 EXPORT
@@ -580,31 +594,31 @@ By default no symbols are exported. However, the following export tags are avail
 
 =over 4
 
-=item C<:json> :
+=item * C<:json> :
 C<perl2json()>,
 C<json2perl()>,
 C<json2dump()>,
 C<json2yaml()>,
 C<json2json()>
 
-=item C<:yaml> :
+=item * C<:yaml> :
 C<perl2yaml()>,
 C<yaml2perl()>,
 C<yaml2dump()>,
 C<yaml2yaml()>,
 C<yaml2json()>
 
-=item C<:dump> :
+=item * C<:dump> :
 C<perl2dump()>,
 C<dump2perl()>,
 C<dump2json()>,
 C<dump2yaml()>
 
-=item C<:io> :
+=item * C<:io> :
 C<read_from_file()>, C<write_to_file()>,
 C<read_from_filehandle()>, C<write_to_filehandle()>,
 
-=item C<:all> : everything above
+=item * C<:all> : everything above
 
 =back
 
@@ -638,7 +652,7 @@ the equivalent JSON string. In C<$optional_paramshashref>
 one can specify whether to escape unicode with
 C<< 'escape-unicode' => 1 >>
 and/or prettify the returned result with C<< 'pretty' => 1 >>.
-The output can fed to L<Data::Roundtrip::json2perl>
+The output can be fed back to L<Data::Roundtrip>'s C<< json2perl() >>
 for getting the Perl variable back.
 
 Returns the JSON string on success or C<undef> on failure.
@@ -694,7 +708,7 @@ a nested data structure, but not an object), it will return
 the equivalent YAML string. In C<$optional_paramshashref>
 one can specify whether to escape unicode with
 C<< 'escape-unicode' => 1 >>. Prettify is not supported yet.
-The output can fed to L<Data::Roundtrip::yaml2perl>
+The output can fed to L<Data::Roundtrip>'s C<< yaml2perl() >>
 for getting the Perl variable back.
 
 Returns the YAML string on success or C<undef> on failure.
@@ -760,32 +774,33 @@ Additionally, use terse output with C<< 'terse' => 1 >> and remove
 all the incessant indentation with C<< 'indent' => 1 >>
 which unfortunately goes to the other extreme of
 producing a space-less output, not fit for human consumption.
-The output can fed to L<Data::Roundtrip::dump2perl>
+The output can fed to L<Data::Roundtrip>'s C<< dump2perl() >>
 for getting the Perl variable back.
 
 It returns the string representation of the input perl variable
 on success or C<undef> on failure.
 
-The output can be fed back to L<dump2perl>.
+The output can be fed back to L<Data::Roundtrip>'s C<< dump2perl() >>.
 
 CAVEAT: when not escaping unicode (which is the default
 behaviour), each call to this sub will override L<Data::Dumper>'s
-C<qquote()> sub (with a call to L<Sub::Override::new>),
+C<qquote()> sub (with a call to L<Sub::Override>' C<< new() >>),
 call L<Data::Dumper>'s C<Dumper()> and save its output to
 a temporary variable, restore C<qquote()> sub (with
-a call to L<Sub::Override::restore> and return the
+a call to L<Sub::Override>'s C<< restore() >> and return the
 contents. This exercise is done every time this C<perl2dump()>
 is called. It can be expensive. The alternative is
 to redefine C<qquote()> once, when the module is loaded.
 
 Note that there are two other alternatives to this sub,
-L<perl2dump_filtered> which uses L<Data::Dump>
+L<Data::Roundtrip>'s C<< perl2dump_filtered() >> which uses L<Data::Dump>
 filters to control unicode escaping but
 lacks in aesthetics and functionality and handling all the
 cases Dump and Dumper do quite well.
 
-There is also C<< perl2dump_homebrew >> which
-uses the same dump-recursively engine as L<perl2dump_filtered>
+There is also C<< perl2dump_homebrew() >> which
+uses the same dump-recursively engine as
+L<Data::Roundtrip>'s C<< perl2dump_filtered() >>
 but does not involve Data::Dump at all.
 
 =head2 C<perl2dump_filtered>
@@ -810,7 +825,7 @@ Return value:
 
 =back
 
-It does the same job as L<perl2dump> which is
+It does the same job as L<Data::Roundtrip>'s C<< perl2dump() >> which is
 to stringify a perl variable. And takes the same options.
 
 It returns the string representation of the input perl variable
@@ -841,14 +856,13 @@ Return value:
 
 =back
 
-It does the same job as L<perl2dump> which is
+It does the same job as L<Data::Roundtrip>'s C<< perl2dump() >> which is
 to stringify a perl variable. And takes the same options.
 
 It returns the string representation of the input perl variable
 on success or C<undef> on failure.
 
-The output can be fed back to L<dump2perl>.
-
+The output can be fed back to L<Data::Roundtrip>'s C<< dump2perl() >>.
 
 It uses its own basic dumper. Which is recursive.
 So, beware of extremely deep nested data structures.
@@ -910,7 +924,7 @@ it can be but definetely lacks in aesthetics
 and functionality compared to Dump and Dumper.
 
 The output is a, possibly multiline, string. Which it can
-then be fed back to L<dump2perl>.
+then be fed back to L<Data::Roundtrip>'s C<< dump2perl() >>.
 
 =back
 
@@ -923,8 +937,10 @@ Arguments:
 =over 4
 
 =item * C<$dumpstring>, this comes from the output of L<Data::Dump>,
-L<Data::Dumper> or our own L<perl2dump>, L<perl2dump_filtered>,
-L<perl2dump_homebrew>. Escaped, or unescaped.
+L<Data::Dumper> or our own L<Data::Roundtrip>'s C<< perl2dump() >>,
+L<Data::Roundtrip>'s C<< perl2dump_filtered() >>,
+L<Data::Roundtrip>'s C<< perl2dump_homebrew() >>.
+Escaped, or unescaped.
 
 =back
 
@@ -994,8 +1010,8 @@ Return value:
 Given an input JSON string C<$jsonstring>, it will return
 the equivalent YAML string L<YAML>
 by first converting JSON to a Perl variable and then
-converting that variable to YAML using L<Data::Roundtrip::perl2yaml()>.
-All the parameters supported by L<Data::Roundtrip::perl2yaml()>
+converting that variable to YAML using L<Data::Roundtrip>'s C<< perl2yaml() >>.
+All the parameters supported by L<Data::Roundtrip>'s C<< perl2yaml() >>
 are accepted.
 
 Returns the YAML string on success or C<undef> on failure.
@@ -1025,8 +1041,8 @@ Return value:
 Given an input YAML string C<$yamlstring>, it will return
 the equivalent YAML string L<YAML>
 by first converting YAML to a Perl variable and then
-converting that variable to JSON using L<Data::Roundtrip::perl2json()>.
-All the parameters supported by L<Data::Roundtrip::perl2json()>
+converting that variable to JSON using L<Data::Roundtrip>'s C<< perl2json() >>.
+All the parameters supported by L<Data::Roundtrip>'s C<< perl2json() >>
 are accepted.
 
 Returns the JSON string on success or C<undef> on failure.
@@ -1061,9 +1077,10 @@ Return value:
 
 =back
 
-Given a filename, it opens it using C<<:encoding(UTF-8)>>, slurps its
+Given a filename, it opens it using C<< :encoding(UTF-8) >>, slurps its
 contents and closes it. It's a convenience sub which could have also
-been private. If you want to retain the filehandle, use L<read_from_filehandle >.
+been private. If you want to retain the filehandle, use
+L<Data::Roundtrip>'s C<< read_from_filehandle() >>.
 
 Returns the file contents on success or C<undef> on failure.
 
@@ -1113,10 +1130,11 @@ Return value:
 
 =back
 
-Given a filename, it opens it using C<<:encoding(UTF-8)>>,
+Given a filename, it opens it using C<< :encoding(UTF-8) >>,
 writes all specified content and closes the file.
 It's a convenience sub which could have also
-been private. If you want to retain the filehandle, use L<write_to_filehandle >.
+been private. If you want to retain the filehandle, use
+L<Data::Roundtrip>'s C<< write_to_filehandle() >>.
 
 Returns 1 on success or 0 on failure.
 
@@ -1151,7 +1169,7 @@ A few scripts have been put together and offer the functionality of this
 module to the command line. They are part of this distribution and can
 be found in the C<script> directory.
 
-These files are: C<json2json.pl>,  C<json2yaml.pl>,  C<yaml2json.pl>
+These are: C<json2json.pl>,  C<json2yaml.pl>,  C<yaml2json.pl>,
 C<json2perl.pl>, C<perl2json.pl>, C<yaml2perl.pl>
 
 =head1 AUTHOR
@@ -1213,7 +1231,7 @@ Several Monks at L<PerlMonks.org | https://PerlMonks.org> (in no particular orde
 =item L<haukex|https://perlmonks.org/?node_id=830549>
 
 =item L<Corion|https://perlmonks.org/?node_id=5348> (the
-C< _qquote_redefinition_by_Corion() > which harnesses
+C<< _qquote_redefinition_by_Corion() >> which harnesses
 L<Data::Dumper>'s incessant unicode escaping)
 
 =item L<kcott|https://perlmonks.org/?node_id=861371>

@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME             => 'Config::LNPath',
-    AUTHOR           => q{Robert Acock <thisusedtobeanemail@gmail.com>},
+    AUTHOR           => q{Robert Acock <email@lnation.org>},
     VERSION_FROM     => 'lib/Config/LNPath.pm',
     ABSTRACT_FROM    => 'lib/Config/LNPath.pm',
     LICENSE          => 'artistic_2',

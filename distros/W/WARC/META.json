@@ -1,0 +1,80 @@
+{
+   "abstract" : "Web ARChive support for Perl",
+   "author" : [
+      "Jacob Bachmeyer <jcb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WARC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Encode" : "0",
+            "Errno" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "Fcntl" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Unix" : "0",
+            "File::Temp" : "0",
+            "HTTP::Message" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "IO::Compress::Gzip" : "2.024",
+            "IO::Uncompress::Gunzip" : "2.021",
+            "MIME::Base32" : "1.02",
+            "Math::BigInt" : "0",
+            "Scalar::Util" : "1.14",
+            "Symbol" : "0",
+            "Time::Local" : "1.08",
+            "URI" : "0",
+            "constant" : "0",
+            "overload" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest" : "0",
+            "Digest::SHA" : "5",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "Storable" : "0",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

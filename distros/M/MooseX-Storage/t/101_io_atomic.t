@@ -7,11 +7,11 @@ use File::Temp qw(tempdir);
 use File::Spec::Functions;
 my $dir = tempdir( CLEANUP => 1 );
 
-use Test::Requires qw(
+use Test::Needs qw(
     JSON::MaybeXS
     IO::AtomicFile
 );
-diag 'using JSON backend: ', JSON;
+diag 'using JSON backend: ', JSON::MaybeXS->JSON;
 
 plan tests => 13;
 

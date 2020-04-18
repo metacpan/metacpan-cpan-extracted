@@ -4,8 +4,7 @@ use warnings;
 use Test::More;
 use Test::Deep;
 
-# blech! but Test::Requires does a stringy eval, so this works...
-use Test::Requires { 'MooseX::Types' => '()' };
+use Test::Needs 'MooseX::Types';
 
 {
     package MyTypes;

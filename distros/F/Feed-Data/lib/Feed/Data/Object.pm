@@ -47,10 +47,14 @@ sub render {
 	my ( $self, $format ) = $validate->render->(@_);
 	$format ||= 'text';
 	my @render;
-	foreach my $key (keys %{ $self->object }) {
+	foreach my $key (sort keys %{ $self->object }) {
 		my $field = $self->$key;
 		my $type = $format;
-		push @render, $field->$type;
+		if ($type =~ m/text|raw/) {
+			push @render, sprintf "%s:%s", $key, $field->$type;
+		} else {
+			push @render, $field->$type;
+		}
 	}
 	return join "\n", @render;
 }

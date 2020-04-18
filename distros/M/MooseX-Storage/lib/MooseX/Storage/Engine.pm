@@ -1,7 +1,7 @@
 package MooseX::Storage::Engine;
 # ABSTRACT: The meta-engine to handle collapsing and expanding objects
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Moose;
 use Scalar::Util qw(refaddr blessed);
@@ -347,8 +347,6 @@ sub find_type_handler_for {
     $TYPES{$type_handler_name}
 }
 
-no Moose::Role;
-
 1;
 
 __END__
@@ -363,7 +361,7 @@ MooseX::Storage::Engine - The meta-engine to handle collapsing and expanding obj
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 

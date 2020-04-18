@@ -31,7 +31,9 @@ WriteMakefile(
 	'HTML::LinkExtor' => 0,
 	'HTML::Strip' => 2.10,
 	'XML::Atom::Feed' => 0,
-   	'Class::Load' => 0.25 
+   	'Class::Load' => 0.25, 
+    	'Ref::Util' => 0.204,
+	'Text::CSV_XS' => 1.41,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Feed-Data-*' },

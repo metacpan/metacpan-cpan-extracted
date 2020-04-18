@@ -111,7 +111,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         }, this);
                         break;
                     case 'upload':
-                        button = this._addUploadButton(cfg,btCfg,getFormData);
+                        button = this._makeUploadButton(cfg,btCfg,getFormData);
                         break;
                     case 'separator':
                         this.add(new qx.ui.core.Spacer(10,10));
@@ -207,7 +207,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         case 'popup':
                             var popup = new callbackery.ui.Popup(btCfg,getFormData);
                             popup.addListenerOnce('close',function(){
-                                // wait for stuff to happen befor we rush into
+                                // wait for stuff to happen before we rush into
                                 // disposing the popup
                                 qx.event.Timer.once(function(){
                                     this.getApplicationRoot().remove(popup);
@@ -242,55 +242,78 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 }
             },this);
         },
-        _addUploadButton: function(cfg,btCfg,getFormData){
-            var form = new uploadwidget.UploadForm('uploadFrm','upload');
-            form.setParameter('name',cfg.name);
-            form.setParameter('key',btCfg.key);
-            form.setLayout(new qx.ui.layout.HBox());
-            this.add(form);
-            var file;
+        _makeUploadButton: function(cfg,btCfg,getFormData){
+            var button;
             if (btCfg.btnClass == 'toolbar') {
-                file = new uploadwidget.UploadToolbarButton('file', this.xtr(btCfg.label));
+                button = new callbackery.ui.form.UploadToolbarButton(
+                    this.xtr(btCfg.label));
             }
             else {
-                file = new uploadwidget.UploadButton('file', this.xtr(btCfg.label));
+                button = new callbackery.ui.form.UploadButton(
+                    this.xtr(btCfg.label));
             }
             if (btCfg.key){
-                this._buttonMap[btCfg.key]=file;
+                this._buttonMap[btCfg.key]=button;
             }
             if (btCfg.buttonSet) {
-                file.set(btCfg.buttonSet);
+                button.set(btCfg.buttonSet);
                 if (btCfg.key){
                     this._buttonSetMap[btCfg.key]=btCfg.buttonSet;
                 }
             }
-            form.add(file);
-            file.addListener('execute',function(e){
+            var serverCall = callbackery.data.Server.getInstance();
+            var key = btCfg.key;
+            var name = cfg.name;
+            button.addListener('changeFileSelection',function(e){
+                var fileList = e.getData();
                 var formData = getFormData();
-                if (formData === false){
-                    callbackery.ui.MsgBox.getInstance().error(
-                        this.tr("Validation Error"),
-                        this.tr("The form can only be submitted when all data fields have valid content.")
-                    );
-                }
-            });
-            file.addListener('changeFileName',function(e){
-                var formData = getFormData();
-                if(formData && e.getData() !='') {
-                    form.setParameter('formData',qx.lang.Json.stringify(formData));
-                    // console.log(file.getFileName(),file.getFileSize());
-                    callbackery.data.Server.getInstance().callAsyncSmart(function(cookie){
-                        form.setParameter('xsc',cookie);
-                        form.send();
+                if(formData && fileList) {
+                    var form = new FormData();
+                    form.append('name',name);
+                    form.append('key',key);
+                    form.append('file',fileList[0]);
+                    form.append('formData',qx.lang.Json.stringify(formData));
+                    var that = this;
+                    serverCall.callAsyncSmart(function(cookie){
+                        form.append('xsc',cookie);
+                        that._uploadForm(form);
                     },'getSessionCookie');
+                } else {
+                    callbackery.ui.MsgBox.getInstance().error(
+                        this.tr("Upload Exception"),
+                        this.tr("Make sure to select a file and properly fill the form")
+                    );
                 }
             },this);
 
-            form.addListener('completed',function(e) {
-                form.clear();
+            
+            return button;
+        },
+
+        _uploadForm: function(form){
+            var req = new qx.io.request.Xhr("upload",'POST').set({
+                requestData: form
+            });
+            // formData formats stuff like that so we should set the 
+            // header appropriately
+            req.setRequestHeader('Content-Type','multipart/form-data');
+            req.addListener('success',function(e) {
+                var response = req.getResponse();
+                if (response.exception){
+                    callbackery.ui.MsgBox.getInstance().error(
+                        this.tr("Upload Exception"),
+                        this.xtr(response.exception.message) 
+                            + " ("+ response.exception.code +")"
+                    );
+                } else {
+                    this.fireDataEvent('actionResponse',response);
+                }
+                req.dispose();
+            },this);
+            req.addListener('fail',function(e){
                 var response = {};
                 try {
-                    response = qx.lang.Json.parse(form.getIframeTextContent());
+                    response = req.getResponse();
                 }
                 catch(e){
                     response = {
@@ -300,19 +323,14 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         }
                     };
                 }
-                if (response.exception){
-                    callbackery.ui.MsgBox.getInstance().error(
-                        this.tr("Upload Exception"),
-                        this.xtr(response.exception.message) + " ("+ response.exception.code +")"
-                    );
-                    return;
-                }
-                if (response){
-                    this.fireDataEvent('actionResponse',response || {});
-                }
-            },this);
-            return file;
-
+                callbackery.ui.MsgBox.getInstance().error(
+                    this.tr("Upload Exception"),
+                    this.xtr(response.exception.message) 
+                        + " ("+ response.exception.code +")"
+                );
+                req.dispose();
+            });
+            req.send();
         },
 
         getTableContextMenu: function(){

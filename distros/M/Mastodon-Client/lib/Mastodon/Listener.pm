@@ -3,7 +3,7 @@ package Mastodon::Listener;
 use strict;
 use warnings;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use Moo;
 with 'Role::EventEmitter';
@@ -79,10 +79,6 @@ sub BUILD {
 
 sub start {
   my $self = shift;
-
-  my $current_event;
-  my @buffer;
-
   my $on_error = sub { $self->emit( error => shift, shift, \@_ ) };
 
   $self->_future(
@@ -97,49 +93,58 @@ sub start {
         $on_error->( 1, $response->message, $response )
           unless $response->is_success;
 
+        my $current_event;
+        my $buffer = '';
+
         return sub {
           my $chunk = shift;
-          push @buffer, split /\n/, $chunk;
 
-          while (my $line = shift @buffer) {
-            if ($line =~ /^(:thump|event: (\w+))$/) {
-              my $event = $2;
+          # We do not have enough data yet, add it to the buffer
+          unless ( $chunk =~ /\n$/m ) {
+            $buffer .= $chunk;
+            return;
+          }
 
-              if (!defined $event) {
-                # Heartbeats have no data
-                $self->emit( 'heartbeat' );
-                next;
-              }
-              else {
-                $current_event = $event;
-              }
+          $chunk = $buffer . $chunk;
+
+          if ( $chunk =~ /^(:thump|event: (\w+))$/m ) {
+            my $line  = $1;
+            my $event = $2;
+
+            unless ( defined $event ) {
+              # Heartbeats have no data
+              $self->emit( 'heartbeat' );
+              return;
             }
 
-            return unless $current_event;
-            return unless @buffer;
+            $current_event = $event;
+            $chunk =~ s/$line\n//;
+          }
 
-            my $data = shift @buffer;
-            $data =~ s/^data:\s+//;
+          if ( $chunk =~ /^data:/ ) {
+            $chunk =~ s/^data:\s+//;
 
-            if ($current_event eq 'delete') {
+            if ( $current_event eq 'delete' ) {
               # The payload for delete is a single integer
-              $self->emit( delete => $data );
+              $self->emit( delete => $chunk );
             }
             else {
-              # Other events have JSON arrays or objects
               try {
-                my $payload = decode_json $data;
+                my $payload = decode_json $chunk;
                 $self->emit( $current_event => $payload );
               }
               catch {
                 $self->emit( error => 0,
-                  "Error decoding JSON payload: $_", $data
+                  "Error decoding JSON payload: $_", $chunk
                 );
               };
             }
 
-            $current_event = undef;
+            undef $current_event;
           }
+
+          $buffer = '';
+          return;
         }
       },
     )
@@ -209,8 +214,8 @@ A Mastodon::Listener object is created by calling the B<stream> method from a
 L<Mastodon::Client>, and it exists for the sole purpose of parsing a stream of
 events from a Mastodon server.
 
-Mastodon::Listener objects inherit from L<AnyEvent::Emitter>. Please refer to
-their documentation for details on how to register callbacks for the different
+Mastodon::Listener objects inherit from L<Role::EventEmitter>. Please refer to
+its documentation for details on how to register callbacks for the different
 events.
 
 Once callbacks have been registered, the listener can be set in motion by

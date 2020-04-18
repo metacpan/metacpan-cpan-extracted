@@ -1,8 +1,8 @@
-package MooseX::Storage; # git description: v0.51-5-gd63087b
+package MooseX::Storage; # git description: v0.52-18-g2733271
 # ABSTRACT: A serialization framework for Moose classes
 # KEYWORDS: moose extension serial serialization class object store storage types strings
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Moose 0.99;
 use MooseX::Storage::Meta::Attribute::DoNotSerialize;
@@ -119,7 +119,7 @@ MooseX::Storage - A serialization framework for Moose classes
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 
@@ -397,7 +397,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Tomas Doran Ricardo Signes Chris Prather Jos Boumans Shawn M Moore Jonathan Yu Dagfinn Ilmari Mannsåker Dmitry Latin Cory Watson Robert Boone sillitoe Dan Brook David Golden Steinbrunner Florian Ragwitz Jason Pope Johannes Plunien Rockway
+=for stopwords Karen Etheridge Tomas Doran Ricardo Signes Chris Prather Jos Boumans Shawn M Moore Jonathan Yu Dmitry Latin Robert Boone Dagfinn Ilmari Mannsåker Cory Watson sillitoe Dan Brook David Golden Steinbrunner Florian Ragwitz Graham Knop Jason Pope Johannes Plunien Rockway Yanick Champoux
 
 =over 4
 
@@ -431,19 +431,19 @@ Jonathan Yu <frequency@cpan.org>
 
 =item *
 
-Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
-
-=item *
-
 Dmitry Latin <dim0xff@gmail.com>
 
 =item *
 
-Cory Watson <gphat@Crankwizzah.local>
+Robert Boone <robo4288@gmail.com>
 
 =item *
 
-Robert Boone <robo4288@gmail.com>
+Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+
+=item *
+
+Cory Watson <gphat@Crankwizzah.local>
 
 =item *
 
@@ -467,6 +467,10 @@ Florian Ragwitz <rafl@debian.org>
 
 =item *
 
+Graham Knop <haarg@haarg.org>
+
+=item *
+
 Jason Pope <cowholio4@gmail.com>
 
 =item *
@@ -476,6 +480,10 @@ Johannes Plunien <plu@pqpq.de>
 =item *
 
 Jonathan Rockway <jon@jrock.us>
+
+=item *
+
+Yanick Champoux <yanick@babyl.dyndns.org>
 
 =back
 

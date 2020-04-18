@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-Log-Role-Color
 
+0.03 2020-04-17T19:18:47+0900
+ - Add missing dependency Class::Method::Modifiers
+
 0.02 2020-04-17T08:16:41+0900
  - Add missing dependency Role::Tiny
 

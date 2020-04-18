@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use Test::Deep;
 
-use Test::Requires qw(
+use Test::Needs qw(
     YAML::Any
     YAML::XS
     Test::Without::Module

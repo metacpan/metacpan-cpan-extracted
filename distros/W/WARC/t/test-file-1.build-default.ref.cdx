@@ -1,0 +1,5 @@
+ CDX N b a m s k r M S V g u
+- 20190902232555 - - - - - - - 0 test-file-1.warc.gz <urn:test:file-1:record-0>
+- 20190902232556 - - - - - - - 281 test-file-1.warc.gz <urn:test:file-1:record-1>
+- 20190902232557 - - - - - - - 438 test-file-1.warc.gz <urn:test:file-1:record-2>
+- 20190902232558 - - - - - - - 596 test-file-1.warc.gz <urn:test:file-1:record-N>

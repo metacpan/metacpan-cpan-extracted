@@ -1,7 +1,7 @@
 package MooseX::Storage::Format::JSON;
 # ABSTRACT: A JSON serialization role
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Moose::Role;
 use JSON::MaybeXS 1.001000;
@@ -31,8 +31,6 @@ sub freeze {
     return $json;
 }
 
-no Moose::Role;
-
 1;
 
 __END__
@@ -47,7 +45,7 @@ MooseX::Storage::Format::JSON - A JSON serialization role
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

@@ -24,8 +24,9 @@ requires:
   URI: '0'
   XML::Twig: '0'
   YAML: '0'
+  perl: '5.0014'
 resources:
   bugtracker: https://github.com/naturalis/bio-cipres/issues
   repository: https://github.com/naturalis/bio-cipres.git
-version: v0.2.0
+version: v0.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

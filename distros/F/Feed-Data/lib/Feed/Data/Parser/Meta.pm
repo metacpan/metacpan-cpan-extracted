@@ -2,8 +2,6 @@ package Feed::Data::Parser::Meta;
 
 use Moo;
 extends 'Feed::Data::Parser::Base';
-use XML::RSS::LibXML;
-use Ref::Util ':all';
 use Compiled::Params::OO qw/cpo/;
 use Types::Standard qw/Object HashRef Str/;
 
