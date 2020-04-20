@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 27;
+plan tests => 28;
 
 my @module_files = (
     'Date/Holidays.pm',
@@ -33,6 +33,7 @@ my @module_files = (
     'Date/Holidays/Adapter/PT.pm',
     'Date/Holidays/Adapter/RU.pm',
     'Date/Holidays/Adapter/SK.pm',
+    'Date/Holidays/Adapter/UA.pm',
     'Date/Holidays/Adapter/UK.pm',
     'Date/Holidays/Adapter/US.pm',
     'Date/Holidays/Adapter/USFederal.pm'
@@ -69,7 +70,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

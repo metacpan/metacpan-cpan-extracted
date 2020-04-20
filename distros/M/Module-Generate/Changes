@@ -8,3 +8,6 @@ Revision history for Module-Generate
 
 0.04    2020-04-16
 	- Persistant order for subroutine definitions
+
+0.05    2020-04-18
+	- resolve: Can't locate Foo.pm in @INC

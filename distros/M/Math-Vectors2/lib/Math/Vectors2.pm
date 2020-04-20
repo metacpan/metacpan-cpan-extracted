@@ -6,7 +6,7 @@
 # podDocumentation
 package Math::Vectors2;
 require v5.16;
-our $VERSION = 20200402;
+our $VERSION = 20200419;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -35,7 +35,7 @@ sub new($$)                                                                     
   );
  }
 
-sub zeroAndUnits()                                                              #S Create the useful vectors: o=(0,0), x=(1,0), y=(0,1)
+sub zeroAndUnits()                                                              #S Create the useful vectors: zero=(0,0), x=(1,0), y=(0,1)
  {map {&new(@$_)} ([0, 0], [1, 0], [0, 1])
  }
 
@@ -162,6 +162,13 @@ sub angle($$)                                                                   
   my $s = $o->sine($p);
   my $a = Math::Trig::acos($c);
   $s > 0 ? $a : -$a
+ }
+
+sub smallestAngleToNormalPlane($$)                                              # The smallest angle between the second vector and a plane normal to the first vector.
+ {my ($a, $b) = @_;                                                             # Vector 1, vector 2
+  my $r = abs $a->angle($b);
+  my $p = Math::Trig::pi / 2;
+  $r < $p ? $p - $r : $r - $p
  }
 
 sub r90($)                                                                      # Rotate a vector by 90 degrees anticlockwise.
@@ -988,7 +995,7 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests => 424;
+use Test::More tests => 433;
 
 if (1) {                                                                        #TzeroAndUnits #Tplus #Tminus #Tmultiply #Tdivide #Teq #Tprint
   my ($z, $x, $y) = zeroAndUnits;
@@ -1079,6 +1086,16 @@ if (1) {                                                                        
 
   ok near deg2rad(-60),  $x + $y * sqrt(3)    <    $x;
   ok near deg2rad(+30), ($x + $y * sqrt(3))->angle($y);
+
+  ok near deg2rad(  0), $y->smallestAngleToNormalPlane( $x);                    # First vector is y, second vector is 0 degrees anti-clockwise from x axis
+  ok near deg2rad(+45), $y->smallestAngleToNormalPlane( $x +  $y);              #   +45
+  ok near deg2rad(+90), $y->smallestAngleToNormalPlane(       $y);              #   +90
+  ok near deg2rad(+45), $y->smallestAngleToNormalPlane(-$x + -$y);              #  +135
+  ok near deg2rad(  0), $y->smallestAngleToNormalPlane(-$x);                    #  +180
+  ok near deg2rad(+45), $y->smallestAngleToNormalPlane(-$x + -$y);              #  +225
+  ok near deg2rad(+90), $y->smallestAngleToNormalPlane(      -$y);              #  +270
+  ok near deg2rad(+45), $y->smallestAngleToNormalPlane(-$x + -$y);              #  +315
+  ok near deg2rad(  0), $y->smallestAngleToNormalPlane( $x);                    #  +360
 
   for my $i(-179..179)
    {ok near $x < new(cos(deg2rad($i)), sin(deg2rad($i))), deg2rad($i);

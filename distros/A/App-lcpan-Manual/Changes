@@ -1,3 +1,12 @@
+1.049.000  2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	   - Add first draft of Internals.pod.
+
+	   - Rename Cookbook.pm -> Cookbook.pod.
+
+	   - Cookbook: Add --dont-uniquify option to see broken prereqs.
+
+
 1.047.000  2020-04-11  Released-By: PERLANCAR
 
            - First, early release. Most documentation are still in App-lcpan

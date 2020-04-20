@@ -11,7 +11,9 @@ my $i = 0;
 my $PE = FASTX::PE->new({ filename => "$ARGV[0]", interleaved => $i});
 
 say Dumper $PE;
+my $c = 0;
 while (my $pe = $PE->getReads()) {
-  say Dumper $pe;
-  last;
+  say Dumper $pe if ($c == 0);
+  $c++;
+
 }

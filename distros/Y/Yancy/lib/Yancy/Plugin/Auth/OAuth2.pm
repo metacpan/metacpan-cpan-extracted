@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::OAuth2;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: Authenticate using an OAuth2 provider
 
 #pod =head1 SYNOPSIS
@@ -87,11 +87,26 @@ our $VERSION = '1.053';
 #pod Validate there is a logged-in user and optionally that the user data has
 #pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 #pod
+#pod     # Display the user dashboard, but only to logged-in users
+#pod     my $auth_route = $app->routes->under( '/user', $app->yancy->auth->require_user );
+#pod     $auth_route->get( '' )->to( 'user#dashboard' );
+#pod
 #pod =head2 yancy.auth.login_form
 #pod
 #pod Returns the rendered login button.
 #pod
+#pod     Login with OAuth2:
+#pod     %= $c->yancy->auth->login_form
+#pod
+#pod =head2 yancy.auth.logout
+#pod
+#pod Log out any current account from any auth plugin. Use this in your own
+#pod route handlers to perform a logout.
+#pod
 #pod =head1 TEMPLATES
+#pod
+#pod To override these templates, add your own at the designated path inside
+#pod your app's C<templates/> directory.
 #pod
 #pod =head2 yancy/auth/oauth2/login_form.html.ep
 #pod
@@ -123,6 +138,7 @@ has client_secret =>;
 has authorize_url =>;
 has token_url =>;
 has login_label => 'Login';
+has logout_route =>;
 
 sub register {
     my ( $self, $app, $config ) = @_;
@@ -154,7 +170,11 @@ sub init {
             '/yancy/auth/' . $self->moniker,
         )
     );
-    $self->route->to( cb => currym( $self, '_handle_auth' ) );
+    $self->route->get( '' )->to( cb => currym( $self, '_handle_auth' ) );
+    $self->logout_route(
+        $self->route->get( '/logout' )->to( cb => currym( $self, '_handle_logout' ) )
+            ->name( 'yancy.auth.' . $self->moniker . '.logout' )
+    );
 }
 
 #pod =method current_user
@@ -268,6 +288,17 @@ sub handle_token_p {
     return Mojo::Promise->new->resolve;
 }
 
+sub _handle_logout {
+    my ( $self, $c ) = @_;
+    $self->logout( $c );
+    $c->res->code( 303 );
+    my $redirect_to = $c->param( 'redirect_to' ) // $c->req->headers->referrer // '/';
+    if ( $redirect_to eq $c->req->url->path ) {
+        $redirect_to = '/';
+    }
+    return $c->redirect_to( $redirect_to );
+}
+
 1;
 
 __END__
@@ -280,7 +311,7 @@ Yancy::Plugin::Auth::OAuth2 - Authenticate using an OAuth2 provider
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 
@@ -396,11 +427,26 @@ user was found in the session.
 Validate there is a logged-in user and optionally that the user data has
 certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 
+    # Display the user dashboard, but only to logged-in users
+    my $auth_route = $app->routes->under( '/user', $app->yancy->auth->require_user );
+    $auth_route->get( '' )->to( 'user#dashboard' );
+
 =head2 yancy.auth.login_form
 
 Returns the rendered login button.
 
+    Login with OAuth2:
+    %= $c->yancy->auth->login_form
+
+=head2 yancy.auth.logout
+
+Log out any current account from any auth plugin. Use this in your own
+route handlers to perform a logout.
+
 =head1 TEMPLATES
+
+To override these templates, add your own at the designated path inside
+your app's C<templates/> directory.
 
 =head2 yancy/auth/oauth2/login_form.html.ep
 

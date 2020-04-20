@@ -3,7 +3,7 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =encoding utf-8
 
@@ -12,6 +12,11 @@ our $VERSION = '0.21';
 Promise::ES6 - ES6-style promises in Perl
 
 =head1 SYNOPSIS
+
+    use Promise::ES6;
+
+    # OPTIONAL. And see below for other options.
+    Promise::ES6::use_event('IO::Async', $loop);
 
     my $promise = Promise::ES6->new( sub {
         my ($resolve_cr, $reject_cr) = @_;
@@ -31,6 +36,8 @@ Promise::ES6 - ES6-style promises in Perl
     my $all_promise = Promise::ES6->all( \@promises );
 
     my $race_promise = Promise::ES6->race( \@promises );
+
+    my $allsettled_promise = Promise::ES6->allSettled( \@promises );
 
 =head1 DESCRIPTION
 
@@ -89,7 +96,7 @@ This module’s handling of unhandled rejections has changed over time.
 The current behavior is: if any rejected promise is DESTROYed without first
 having received a catch callback, a warning is thrown.
 
-=head1 SYNCHRONOUS OPERATION
+=head1 SYNCHRONOUS VS. ASYNCHRONOUS OPERATION
 
 In JavaScript, the following …
 
@@ -97,28 +104,77 @@ In JavaScript, the following …
     console.log(2);
 
 … will log C<2> then C<1> because JavaScript’s C<then()> defers execution
-of its callbacks until the end of the current iteration through JavaScript’s
-event loop.
+of its callbacks until between iterations through JavaScript’s event loop.
 
-Perl, of course, has no built-in event loop. This module’s C<then()> method,
-thus, when called on a promise that is already
-“settled” (i.e., not pending), will run the appropriate callback
-I<immediately>. That means that this:
+Perl, of course, has no built-in event loop. This module accommodates that by
+implementing B<synchronous> promises by default rather than asynchronous ones.
+This means that all promise callbacks run I<immediately> rather than between
+iterations of an event loop. As a result, this:
 
     Promise::ES6->resolve(0)->then( sub { print 1 } );
     print 2;
 
 … will print C<12> instead of C<21>.
 
-This is an intentional divergence from
-L<the Promises/A+ specification|https://promisesaplus.com/#point-34>.
-A key advantage of this design is that Promise::ES6 instances can abstract
-over whether a given function works synchronously or asynchronously.
+One effect of this is that Promise::ES6, in its default configuration, is
+agnostic regarding event loop interfaces: no special configuration is needed
+for any specific event loop. In fact, you don’t even I<need> an event loop
+at all, which might be useful for abstracting over whether a given
+function works synchronously or asynchronously.
 
-If you want a Promises/A+-compliant implementation, look at
-L<Promise::ES6::IOAsync>, L<Promise::ES6::Mojo>, or
-L<Promise::ES6::AnyEvent> in this distribution. CPAN provides other
-alternatives.
+The disadvantage of synchronous promises—besides not being I<quite> the same
+promises that we expect from JS—is that recursive promises can exceed
+call stack limits. For example, the following (admittedly contrived) code:
+
+    my @nums = 1 .. 1000;
+
+    sub _remove {
+        if (@nums) {
+            Promise::ES6->resolve(shift @nums)->then(\&_remove);
+        }
+    }
+
+    _remove();
+
+… will eventually fail because it will reach Perl’s call stack size limit.
+
+That problem probably won’t affect most applications. The best way to
+avoid it, though, is to use asynchronous promises, à la JavaScript.
+
+To do that, first choose one of the following event interfaces:
+
+=over
+
+=item * L<IO::Async>
+
+=item * L<AnyEvent>
+
+=item * L<Mojo::IOLoop> (part of L<Mojolicious>)
+
+=back
+
+Then, before you start creating promises, do this:
+
+    Promise::ES6::use_event('AnyEvent');
+
+… or:
+
+    Promise::ES6::use_event('Mojo::IOLoop');
+
+… or:
+
+    Promise::ES6::use_event('IO::Async', $loop);
+
+That’s it! Promise::ES6 instances will now work asynchronously rather than
+synchronously.
+
+Note that this changes Promise::ES6 I<globally>. In IO::Async’s case, it
+won’t increase the passed-in L<IO::Async::Loop> instance’s reference count,
+but if that loop object goes away, Promise::ES6 won’t work until you call
+C<use_event()> again.
+
+B<IMPORTANT:> For the best long-term scalability and flexibility,
+your code should work with either synchronous or asynchronous promises.
 
 =head1 CANCELLATION
 
@@ -143,7 +199,7 @@ to be canceled. See L<Net::Curl::Promiser> for an example of this approach.
 You’ll need to decide if it makes more sense for your application to leave
 a canceled query in the “pending” state or to “settle” (i.e., resolve or
 reject) it. All things being equal, I feel the first approach is the most
-intuitive.
+intuitive, while the latter ends up being “cleaner”.
 
 =head1 MEMORY LEAKS
 
@@ -206,12 +262,13 @@ If you’re not sure of what promises are, there are several good
 introductions to the topic. You might start with
 L<this one|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises>.
 
-L<Promise::XS> is a lot like this library but implemented mostly in XS for
-speed. It derives from L<AnyEvent::XSPromises>.
+L<Promise::XS> is my refactor of L<AnyEvent::XSPromises>. It’s a lot like
+this library but implemented mostly in XS for speed.
 
 L<Promises> is another pure-Perl Promise implementation.
 
-L<Future> fills a role similar to that of promises.
+L<Future> fills a role similar to that of promises. Much of the IO::Async
+ecosystem assumes (or strongly encourages) its use.
 
 CPAN contains a number of other modules that implement promises. I think
 mine are the nicest :), but YMMV. Enjoy!
@@ -227,6 +284,33 @@ This library is licensed under the same terms as Perl itself.
 #----------------------------------------------------------------------
 
 our $DETECT_MEMORY_LEAKS;
+
+sub __default_postpone { die 'NO EVENT' }
+*_postpone = \&__default_postpone;
+
+our $_EVENT;
+
+sub use_event {
+    my ($name, @args) = @_;
+
+    my $modname = $name;
+    $modname =~ tr<:><>d;
+
+    my @saved_errs = ($!, $@);
+
+    require "Promise/ES6/Event/$modname.pm";
+
+    ($!, $@) = @saved_errs;
+
+    $_EVENT = $name;
+
+    # We need to block redefinition and (for AnyEvent)
+    # prototype-mismatch warnings.
+    no warnings 'all';
+    *_postpone = "Promise::ES6::Event::$modname"->can('get_postpone')->(@args);
+
+    return;
+}
 
 sub catch { $_[0]->then( undef, $_[1] ) }
 
@@ -334,6 +418,28 @@ sub race {
     }
 
     return $new;
+}
+
+sub _aS_fulfilled {
+    return { status => 'fulfilled', value => $_[0] };
+}
+
+sub _aS_rejected {
+    return { status => 'rejected', reason => $_[0] };
+}
+
+sub _aS_map {
+    return $_->then( \&_aS_fulfilled, \&_aS_rejected );
+}
+
+sub allSettled {
+    my ( $class, $iterable ) = @_;
+
+    my @promises = map { UNIVERSAL::can( $_, 'then' ) ? $_ : $class->resolve($_) } @$iterable;
+
+    @promises = map( _aS_map, @promises );
+
+    return $class->all( \@promises );
 }
 
 #----------------------------------------------------------------------

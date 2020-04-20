@@ -13,7 +13,7 @@ Log::Log4perl->easy_init($ERROR);
 
 # What instances of Chrome will we try?
 my @instances = t::helper::browser_instances();
-my $testcount = 33;
+my $testcount = 35;
 
 if (my $err = t::helper::default_unavailable) {
     plan skip_all => "Couldn't connect to Chrome: $@";
@@ -100,20 +100,33 @@ t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
     ok $mech->current_form, "We can find a form by its contained select fields";
     $mech->field('quickcomment', 2);
     pass "We survived setting the field 'quickcomment' to 2";
-    my @result = $mech->field('quickcomment');
+    my @result = $mech->value('quickcomment');
     cmp_bag \@result, [2], "->field returned bag 2";
     # diag explain \@result;
 
     $mech->get_local('50-form2.html');
     $mech->form_with_fields('multic');
     ok $mech->current_form, "We can find a form by its contained multi-select fields";
-    @result = $mech->field('multic');
+    @result = $mech->value('multic');
     cmp_bag \@result, [2,2,3], "->field returned bag 2,2,3";
     # diag explain \@result;
 
     $mech->field('multic', [1,2]);
     pass "We survived setting the field 'multic' to 1,2";
-    @result = $mech->field('multic');
+    @result = $mech->value('multic');
     cmp_bag \@result, [1,1,2,2], "->field returned bag 1,1,2,2";
     # diag explain \@result;
+
+    # Check that we can address multiple fields with the same form parameter name
+    $mech->get_local('50-form2.html');
+    $mech->form_with_fields('date');
+    @result = ();
+    my $ok = eval {
+        $mech->set_fields( date => ['2020-04-04',2] );
+        1;
+    };
+    is $ok, 1, "We survived setting the second date field"
+        or diag $@;
+    @result = $mech->value('date',2);
+    is_deeply \@result, ['2020-04-04'], "We set the second date field";
 });

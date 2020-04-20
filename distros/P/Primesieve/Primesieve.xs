@@ -36,6 +36,7 @@ PPCODE:
         } else {
                 AV *av;
                 av = newAV ();
+                sv_2mortal ((SV*) av);
                 av_extend (av, size);
                 XPUSHs (newRV_noinc ((SV*)av));
                 for (i = 0; i < size; i++) {
@@ -66,6 +67,7 @@ PPCODE:
         } else {
                 AV *av;
                 av = newAV ();
+                sv_2mortal ((SV*) av);
                 av_extend (av, n);
                 XPUSHs (newRV_noinc ((SV*)av));
                 for (i = 0; i < n; i++) {
@@ -76,7 +78,7 @@ PPCODE:
 
 
 UV
-nth_prime (n, start)
+nth_prime (n, start=0)
     IV n
     UV start
 CODE:
@@ -102,6 +104,8 @@ CODE:
             case 3: RETVAL = primesieve_count_quadruplets (start, stop); break;
             case 4: RETVAL = primesieve_count_quintuplets (start, stop); break;
             case 5: RETVAL = primesieve_count_sextuplets (start, stop); break;
+            default: /* can't happen, just to stop -Wall  */
+                    RETVAL = 0; break;
         }
 OUTPUT:
         RETVAL

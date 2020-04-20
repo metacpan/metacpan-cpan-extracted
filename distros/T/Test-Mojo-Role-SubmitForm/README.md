@@ -47,6 +47,8 @@ You have all the methods provided by [Test::Mojo](https://metacpan.org/pod/Test:
     $t->click_ok('form');
     $t->click_ok('#button');
 
+    $t->click_ok( $dom->at('form') );
+
     $t->click_ok('#button', {
         input1        => '42',
         select1       => [ 1..3 ],
@@ -54,9 +56,11 @@ You have all the methods provided by [Test::Mojo](https://metacpan.org/pod/Test:
         another_input => sub { shift . 'offix'}
     })
 
-First parameter specifies a CSS selector matching a `<form>` you want to
+First parameter specifies a CSS selector matching or [Mojo::DOM](https://metacpan.org/pod/Mojo::DOM) object
+containing `<form>` you want to
 submit or a particular `<button>`, `<input type="submit">`,
-or `<input type="image">` you want to click.
+or `<input type="image">` (contained in a `<form>`)
+you want to click.
 
 Specifying a second parameter allows you to override the form control values:
 the keys are `name=""`s of controls to override and values can be either

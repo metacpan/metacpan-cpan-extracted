@@ -8,7 +8,7 @@ use Module::Load; # load
 
 use vars qw($VERSION);
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 sub holidays {
     my ($self, %params) = @_;
@@ -84,7 +84,7 @@ Date::Holidays::Adapter::ES - adapter class for Date::Holidays::ES and Date::Hol
 
 =head1 VERSION
 
-This POD describes version 1.18 of Date::Holidays::Adapter::ES
+This POD describes version 1.19 of Date::Holidays::Adapter::ES
 
 =head1 DESCRIPTION
 

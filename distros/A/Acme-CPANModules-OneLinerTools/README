@@ -3,7 +3,7 @@ NAME
     writing perl one-liners
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Acme::CPANModules::OneLinerTools (from Perl distribution
     Acme-CPANModules-OneLinerTools), released on 2020-02-07.
 
@@ -137,9 +137,11 @@ BUGS
 SEE ALSO
     Acme::CPANModules::OneLetter
 
+    Acme::CPANModules::ModuleAutoinstallers
+
     Acme::CPANModules::ModuleAutoloaders
 
-    Acme::CPANModules::DebugDumping
+    Acme::CPANModules::DumpingDataForDebugging
 
     Acme::CPANModules - about the Acme::CPANModules namespace
 

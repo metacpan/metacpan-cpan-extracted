@@ -1,5 +1,5 @@
 package Mojo::Reactor::Epoll;
-use Mojo::Base 'Mojo::Reactor';
+use Mojo::Base 'Mojo::Reactor::Poll';
 
 $ENV{MOJO_REACTOR} ||= 'Mojo::Reactor::Epoll';
 
@@ -12,29 +12,14 @@ use Time::HiRes 'usleep';
 
 use constant DEBUG => $ENV{MOJO_REACTOR_EPOLL_DEBUG} || 0;
 
-our $VERSION = '0.009';
-
-sub again {
-	my ($self, $id) = @_;
-	croak 'Timer not active' unless my $timer = $self->{timers}{$id};
-	$timer->{time} = steady_time + $timer->{after};
-}
+our $VERSION = '0.010';
 
 sub io {
 	my ($self, $handle, $cb) = @_;
-	my $fd = fileno $handle;
+	my $fd = fileno($handle) // croak 'Handle is closed';
 	$self->{io}{$fd}{cb} = $cb;
 	warn "-- Set IO watcher for $fd\n" if DEBUG;
 	return $self->watch($handle, 1, 1);
-}
-
-sub is_running { !!shift->{running} }
-
-sub next_tick {
-	my ($self, $cb) = @_;
-	push @{$self->{next_tick}}, $cb;
-	$self->{next_timer} //= $self->timer(0 => \&_next);
-	return undef;
 }
 
 sub one_tick {
@@ -76,7 +61,7 @@ sub one_tick {
 			next unless $t->{time} <= $now;
 			
 			# Recurring timer
-			if (exists $t->{recurring}) { $t->{time} = $now + $t->{recurring} }
+			if ($t->{recurring}) { $t->{time} = $now + $t->{after} }
 			
 			# Normal timer
 			else { $self->remove($id) }
@@ -91,7 +76,7 @@ sub recurring { shift->_timer(1, @_) }
 sub remove {
 	my ($self, $remove) = @_;
 	if (ref $remove) {
-		my $fd = fileno $remove;
+		my $fd = fileno($remove) // croak 'Handle is closed';
 		if (exists $self->{io}{$fd} and exists $self->{io}{$fd}{epoll_cb}) {
 			$self->{epoll}->delete($remove);
 		}
@@ -105,16 +90,9 @@ sub remove {
 
 sub reset {
 	my $self = shift;
-	delete @{$self}{qw(epoll io next_tick next_timer pending_watch timers)};
+	delete @{$self}{qw(epoll pending_watch)};
+	$self->SUPER::reset;
 }
-
-sub start {
-	my $self = shift;
-	$self->{running}++;
-	$self->one_tick while $self->{running};
-}
-
-sub stop { delete shift->{running} }
 
 sub timer { shift->_timer(0, @_) }
 
@@ -166,23 +144,20 @@ sub _create_epoll {
 sub _id {
 	my $self = shift;
 	my $id;
-	do { $id = md5_sum 't' . steady_time . rand 999 } while $self->{timers}{$id};
+	do { $id = md5_sum 't' . steady_time . rand } while $self->{timers}{$id};
 	return $id;
-}
-
-sub _next {
-	my $self = shift;
-	delete $self->{next_timer};
-	while (my $cb = shift @{$self->{next_tick}}) { $self->$cb }
 }
 
 sub _timer {
 	my ($self, $recurring, $after, $cb) = @_;
 	
 	my $id = $self->_id;
-	my $timer = $self->{timers}{$id}
-		= {cb => $cb, after => $after, time => steady_time + $after};
-	$timer->{recurring} = $after if $recurring;
+	my $timer = $self->{timers}{$id} = {
+		cb        => $cb,
+		after     => $after,
+		recurring => $recurring,
+		time      => steady_time + $after,
+	};
 	
 	if (DEBUG) {
 		my $is_recurring = $recurring ? ' (recurring)' : '';
@@ -255,18 +230,12 @@ environment variable to C<Mojo::Reactor::Epoll>.
 
 =head1 EVENTS
 
-L<Mojo::Reactor::Epoll> inherits all events from L<Mojo::Reactor>.
+L<Mojo::Reactor::Epoll> inherits all events from L<Mojo::Reactor::Poll>.
 
 =head1 METHODS
 
-L<Mojo::Reactor::Epoll> inherits all methods from L<Mojo::Reactor> and
+L<Mojo::Reactor::Epoll> inherits all methods from L<Mojo::Reactor::Poll> and
 implements the following new ones.
-
-=head2 again
-
-  $reactor->again($id);
-
-Restart timer. Note that this method requires an active timer.
 
 =head2 io
 
@@ -280,19 +249,6 @@ readable or writable.
     my ($reactor, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';
   });
-
-=head2 is_running
-
-  my $bool = $reactor->is_running;
-
-Check if reactor is running.
-
-=head2 next_tick
-
-  my $undef = $reactor->next_tick(sub {...});
-
-Invoke callback as soon as possible, but not before returning or other
-callbacks that have been registered with this method, always returns C<undef>.
 
 =head2 one_tick
 
@@ -325,22 +281,6 @@ Remove handle or timer.
   $reactor->reset;
 
 Remove all handles and timers.
-
-=head2 start
-
-  $reactor->start;
-
-Start watching for I/O and timer events, this will block until L</"stop"> is
-called or no events are being watched anymore.
-
-  # Start reactor only if it is not running already
-  $reactor->start unless $reactor->is_running;
-
-=head2 stop
-
-  $reactor->stop;
-
-Stop watching for I/O and timer events.
 
 =head2 timer
 

@@ -21,6 +21,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Clone" : "0.43",
             "Data::Object::Class" : "2.02",
             "Data::Object::ClassHas" : "2.01",
             "Data::Object::Role::Buildable" : "0.03",
@@ -35,6 +36,7 @@
       },
       "test" : {
          "requires" : {
+            "Clone" : "0.43",
             "Data::Object::Class" : "2.02",
             "Data::Object::ClassHas" : "2.01",
             "Data::Object::Role::Buildable" : "0.03",
@@ -61,7 +63,7 @@
          "web" : "https://github.com/iamalnewkirk/test-ability"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",

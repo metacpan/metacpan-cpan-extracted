@@ -13,7 +13,7 @@ use App::WRT;
 use App::WRT::Mock::FileIO;
 use App::WRT::Renderer;
 
-chdir 'example';
+chdir 'example/blog';
 my $config_file = 'wrt.json';
 my $wrt = App::WRT::new_from_file($config_file);
 

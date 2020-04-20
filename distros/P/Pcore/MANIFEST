@@ -42,6 +42,7 @@ lib/Pcore/API/cloudflare.pm
 lib/Pcore/API/dynadot.pm
 lib/Pcore/API/majestic.pm
 lib/Pcore/API/moz.pm
+lib/Pcore/API/namecheap.pm
 lib/Pcore/App.pm
 lib/Pcore/App/API.pm
 lib/Pcore/App/API/Auth.pm

@@ -4,6 +4,9 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.26 2020-04-18
+  - Updated Power/Outlet/Tasmota.pm - For devices with just one relay the JSON key is POWER not POWER1
+
 0.25 2020-04-12
   - Added pod files since meta::cpan does not support indexing pod from .cgi files
     - scripts/power-outlet-json.cgi.pod

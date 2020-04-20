@@ -1,5 +1,13 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+0.20      2020-04-18 20:24:43-05:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed error trying to load database on MySQL 8.0: The lock function
+    did not have the appropriate annotations. Thanks @yahermann for
+    reporting this issue! [Github #27]
+
 0.19      2020-01-30 23:48:41-06:00 America/Chicago
 
   [Fixed]

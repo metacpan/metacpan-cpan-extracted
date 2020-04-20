@@ -725,6 +725,22 @@ sub test_us : Test(6) {
     }
 }
 
+sub test_ua : Test(4) {
+    SKIP: {
+        eval { require Date::Holidays::UA };
+        skip "Date::Holidays::UA not installed", 4 if $@;
+
+        ok(my $dh = Date::Holidays->new( countrycode => 'ua' ),'Testing Date::Holidays::UA');
+
+        dies_ok { $dh->holidays( year => 2020 ) }
+            'Testing holidays for Date::Holidays::UA';
+
+        ok($dh->is_holiday(year => 2020, month => 8, day => 24), 'Checking for Ukrainian independence day');
+
+        can_ok('Date::Holidays::UA', qw(holidays is_holiday));
+    }
+}
+
 sub test_norway_and_denmark_combined : Test(6) {
     SKIP: {
         eval { load Date::Holidays::DK };

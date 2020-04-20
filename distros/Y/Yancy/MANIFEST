@@ -169,6 +169,7 @@ t/share/templates/blog_edit.html.ep
 t/share/templates/blog_list.html.ep
 t/share/templates/blog_list.rss.ep
 t/share/templates/blog_view.html.ep
+t/share/templates/dump_item.html.ep
 t/share/templates/extend/blog_list.html.ep
 t/share/templates/extend/blog_view.html.ep
 t/share/templates/people.html.ep

@@ -1,3 +1,10 @@
+0.007   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add pattern: %_{vmsize}.
+
+	- Fix mentioned module name.
+
+
 0.006   2020-03-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump v to 2 to comply to Log::ger 0.037.

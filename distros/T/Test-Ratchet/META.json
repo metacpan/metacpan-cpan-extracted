@@ -43,6 +43,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "Test::MockModule" : "0",
             "Test::More" : "0"
          }
       }
@@ -50,11 +51,11 @@
    "provides" : {
       "Test::Ratchet" : {
          "file" : "lib/Test/Ratchet.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Test::Ratchet::Clank" : {
          "file" : "lib/Test/Ratchet.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -69,7 +70,7 @@
          "web" : "https://github.com/Altreus/p5-Test-Ratchet"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -258,7 +259,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.004",
+                  "tag" : "0.005",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },

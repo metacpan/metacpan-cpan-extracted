@@ -2,7 +2,7 @@ package App::tmclean;
 use 5.010;
 use warnings;
 
-use version 0.77; our $VERSION = version->declare("v0.0.3");
+use version 0.77; our $VERSION = version->declare("v0.0.4");
 
 use Getopt::Long qw/GetOptions :config posix_default no_ignore_case bundling auto_help/;
 use Pod::Usage qw/pod2usage/;
@@ -66,8 +66,12 @@ sub run {
     my $dev_name = dev_name($targets[0]);
     $self->cmd(qw/hdiutil detach/, $dev_name);
 
-    my $sparsebundle_path = sprintf '%s/%s.sparsebundle', $mount_point, $self->machine_name;
-    $self->cmd(qw/hdiutil compact/, $sparsebundle_path); # need sudo
+    my $backupbundle_path = sprintf '%s/%s.sparsebundle', $mount_point, $self->machine_name;
+    if (! -d $backupbundle_path) {
+        # backupbundle path is changed after Catalina
+        $backupbundle_path =~ s/\.sparsebundle$/.backupbundle/;
+    }
+    $self->cmd(qw/hdiutil compact/, $backupbundle_path); # need sudo
     $self->cmd(qw/tmutil enable/); # need sudo
 }
 

@@ -1,5 +1,17 @@
 Revision history for Perl module Promise::ES6
 
+0.22 Sun 19 Apr 2020
+- BUG FIX: finally() within a callback no longer produces
+  action-at-a-distance bugs from reuse of package variables.
+- BUG FIX: Resolve callbacks now properly defer propagation when an
+  unfulfilled promise is given as the resolution value.
+- Promise::ES6 can now “transparently” work in asynchronous mode via the
+  new use_event() function. The old separate classes will eventually be
+  deprecated.
+- allSettled() method is added.
+- Unhandled rejection warnings now show the stringification of the
+  promise object itself. This can help with debugging.
+
 0.21 Sun 29 Mar 2020
 - BUG FIX: all() and race() now recognize all “then()”-able objects (not
   merely Promise::ES6 instances) as promises.

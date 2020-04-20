@@ -3,6 +3,7 @@ abstract: 'automate the Chrome browser'
 author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
+  Data::Dump: '0'
   Data::Dumper: '0'
   ExtUtils::MakeMaker: 5.52_01
   Image::Info: '0'
@@ -62,6 +63,6 @@ requires:
   perl: '5.010'
 resources:
   repository: git://github.com/Corion/WWW-Mechanize-Chrome.git
-version: '0.47'
+version: '0.48'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

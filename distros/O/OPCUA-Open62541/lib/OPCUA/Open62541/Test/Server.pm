@@ -5,6 +5,7 @@ package OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Logger;
 use OPCUA::Open62541 'STATUSCODE_GOOD';
 use Carp 'croak';
+use Errno 'EINTR';
 use Net::EmptyPort qw(empty_port);
 use POSIX qw(SIGTERM SIGALRM SIGKILL SIGUSR1 SIG_BLOCK);
 
@@ -105,7 +106,10 @@ sub child {
 	# for signal handling we have to return to Perl regulary
 	if ($self->{singlestep}) {
 	    my $sigset= POSIX::SigSet->new();
-	    POSIX::sigsuspend($sigset) or croak("sigsuspend failed: $!");
+	    !POSIX::sigsuspend($sigset) && $!{EINTR}
+		or croak("sigsuspend failed: $!");
+	    $self->{log}->{fh}->print("server: singlestep\n");
+	    $self->{log}->{fh}->flush();
 	}
 	$self->{server}->run_iterate(1);
     }
@@ -129,7 +133,7 @@ sub step {
 
     my $signalled = kill(SIGUSR1, $self->{pid});
     unless ($self->{stepped}) {
-	is($signalled, 1, "server: firststep");
+	is($signalled, 1, "server: first step");
 	$self->{stepped} = 1;
     }
 }

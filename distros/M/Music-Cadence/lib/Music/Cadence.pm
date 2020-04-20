@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical cadence chords
 
-our $VERSION = '0.1401';
+our $VERSION = '0.1404';
 
 use Moo;
 use Music::Chord::Note;
@@ -75,6 +75,7 @@ sub cadence {
         push @$cadence, $chord;
 
         $chord = $self->_generate_chord( $key, $scale, $scale_notes[0], $octave );
+        # Add another top note, but an octave above
         my $top = $chord->[0];
         if ( $self->format eq 'midinum' ) {
             $top += 12;
@@ -181,17 +182,21 @@ sub _invert_chord {
     if ( $self->format eq 'midinum' ) {
         $chord = $mcp->chord_inv( $chord, inv_num => $inversion );
     }
-    else {
-        # Perform gymnastics to convert named notes to inverted named notes
+    else { # Perform these gymnastics to convert named notes to inverted named notes:
+        # Strip the octave if present
         $chord = [ map { s/\d+//; $_ } @$chord ]
             if $octave;
 
+        # Convert the chord into pitch-class representation
         my $pitches = [ map { Music::Note->new( $_ . -1, 'ISO' )->format('midinum') } @$chord ];
 
+        # Do the inversion!
         $pitches = $mcp->chord_inv( $pitches, inv_num => $inversion );
 
+        # Convert the pitch-classes back to named notes
         $chord = [ map { Music::Note->new( $_, 'midinum' )->format('ISO') } @$pitches ];
 
+        # Clean-up the chord
         for ( @$chord ) {
             if ( $octave ) {
                 s/-1/$octave/;
@@ -245,21 +250,25 @@ sub _generate_chord {
 
     my $mcn = Music::Chord::Note->new;
 
+    # Get the notes of the chord (without an octave)
     my @notes = $mcn->chord( $note . $type );
 
     if ( $self->format eq 'midi' ) {
+        # Convert the sharps and flats
         for ( @notes ) {
             s/#/s/;
             s/b/f/;
         }
     }
     elsif ( $self->format eq 'midinum' ) {
+        # Convert the notes to midinum format
         @notes = map { Music::Note->new( $_ . $octave, 'ISO' )->format('midinum') } @notes;
     }
     elsif ( $self->format ne 'isobase' ) {
         die 'unknown format';
     }
 
+    # Append the octave if defined and the format is not midinum
     @notes = map { $_ . $octave } @notes
         if $octave && $self->format ne 'midinum';
 
@@ -280,7 +289,7 @@ Music::Cadence - Generate musical cadence chords
 
 =head1 VERSION
 
-version 0.1401
+version 0.1404
 
 =head1 SYNOPSIS
 
@@ -332,7 +341,7 @@ version 0.1401
   # [67 71 62], [60 64 67 72]
 
   $chords = $mc->cadence( octave => -1 );
-  # [7 11 2], [0 4 7 12]
+  # [7 11 2], [0 4 7 12] <- pitch-classes!
 
   $mc = Music::Cadence->new( seven => 1 );
 
@@ -349,12 +358,14 @@ version 0.1401
 
 C<Music::Cadence> generates a pair of musical cadence chords.
 
-These chords are usually added to the end of a musical phrase, and
-are used to suggest a sense of anticipation, pause, finality, etc.
+These chords are added to the end of a musical phrase, and are used to
+suggest a sense of anticipation, pause, finality, etc.
 
 =head1 ATTRIBUTES
 
 =head2 key
+
+  $key = $mc->key;
 
 The key or tonal center to use, in C<isobase> format.
 
@@ -364,9 +375,11 @@ Examples: C<G#>, C<Eb>
 
 =head2 scale
 
+  $scale = $mc->scale;
+
 The modal scale to use.  Default: C<major>
 
-Supported scales are:
+Supported scales are the diatonic modes:
 
   ionian / major
   dorian
@@ -377,6 +390,8 @@ Supported scales are:
   locrian
 
 =head2 octave
+
+  $octave = $mc->octave;
 
 The octave to either append to named chord notes, or to determine the
 correct C<midinum> note number.
@@ -392,6 +407,8 @@ to C<9> (giving note numbers C<0> to C<127>).
 
 =head2 format
 
+  $format = $mc->format;
+
 The output format to use.
 
 Default: C<isobase> (i.e. "bare note names")
@@ -403,11 +420,15 @@ If C<midinum>, convert notes to their numerical MIDI equivalents.
 
 =head2 seven
 
+  $seven = $mc->seven;
+
 If set, use seventh chords of four notes instead of diatonic triads.
 
 Default: C<0>
 
 =head2 picardy
+
+  $picardy = $mc->picardy;
 
 If set, use the "Picardy third" for the final chord.
 
@@ -449,7 +470,7 @@ Create a new C<Music::Cadence> object.
   );
 
 Return an array reference of the chords of the cadence B<type> based
-on the given B<key> and B<scale> name.
+on the given B<key> and B<scale> name, etc.
 
 Supported cadences are:
 
@@ -490,13 +511,13 @@ set its value to C<0> zero.
 The B<leading> chord is a number (1-7) for the scale chord to use for
 the first C<half> cadence chord.  For the key of C<C major> this is:
 
-  CM: 1
-  Dm: 2
-  Em: 3
-  FM: 4
-  GM: 5
-  Am: 6
-  Bo: 7
+  1: C maj
+  2: D min
+  3: E min
+  4: F maj
+  5: G maj
+  6: A min
+  7: B dim
 
 If an B<inversion> is defined for the C<half> cadence, the chords are
 inverted as described above for the C<imperfect> cadence.
@@ -505,10 +526,37 @@ The C<evaded> cadence applies inversions to seventh chords.  The
 default (with no B<inversion> defined) is to invert the first chord by
 the third inversion and the second by the first inversion.
 
+Here is a summary showing resolutions and options:
+
+ 1. Deceptive -> V-vi or V-IV
+    variation
+        1: final chord = vi
+        2: final chord = IV
+
+ 2. Evaded -> inverted V-I 7th chords
+    inversion
+        1: 1st, 2nd, or 3rd applied to first chord
+        2: "                           second chord
+
+ 3. Half -> <leading>-V and possibly inverted
+    leading: first chord = 1-7
+    inversion
+        as above (3rd inversion only for 7th chords)
+
+ 4. Imperfect -> V-I or vii-I or V-I inverted
+    variation (no inversion)
+        1: first chord = V
+        2: first chord = vii
+    inversion (variation ignored)
+        as above (3rd inversion only for 7th chords)
+
+ 5. Perfect -> V-I + tonic added an octave above
+
+ 6. Plagal -> IV-I
+
 =head1 SEE ALSO
 
-The F<eg/cadence>, F<eg/synopsis>, F<t/01-methods.t> and
-F<t/02-methods.t> files in this distribution.
+The F<eg/*> and F<t/*> programs in this distribution
 
 L<Moo>
 
@@ -532,7 +580,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

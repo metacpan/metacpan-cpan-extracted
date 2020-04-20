@@ -5,9 +5,10 @@
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2017-2020
 #-------------------------------------------------------------------------------
 #podDocumentation
+# add download repo zip file as is done in Dita::Conversion then reply to Ivan and request inclusion of this module on their list
 package GitHub::Crud;
 use v5.16;
-our $VERSION = 20200219;
+our $VERSION = 20200418;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -318,12 +319,27 @@ sub list($)                                                                     
   @{$gitHub->fileList}
  }
 
+sub specialFileData($)                                                          # Do not encode or decode data with a known file signature
+ {my ($d) = @_;                                                                 # String to check
+  my $h = '';
+  if (length($d) > 8)                                                           # Read file magic number
+   {for my $e(0..7)
+     {$h .= sprintf("%x", ord(substr($d, $e, 1)));
+     }
+    return 1 if $h =~ m(\A504b)i;                                               # PK Zip
+    return 1 if $h =~ m(\Ad0cf11e0)i;                                           # OLE files
+    return 1 if $h =~ m(\Affd8ff)i;                                             # Jpg
+    return 1 if $h =~ m(\A89504e470d0a1a0a)i;                                   # Png
+   }
+  0                                                                             # Not a special file
+ }
+
 sub read($;$)                                                                   # Read data from a file on L<GitHub>.\mRequired attributes: L<userid|/userid>, L<repository|/repository>.\mOptional attributes: L<gitFile|/gitFile> = the file to read, L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.\mIf the read operation is successful, L<failed|/failed> is set to false and L<readData|/readData> is set to the data read from the file.\mIf the read operation fails then L<failed|/failed> is set to true and L<readData|/readData> is set to B<undef>.\mReturns the data read or B<undef> if no file was found.
  {my ($gitHub, $File) = @_;                                                     # GitHub, file o read if not specified in gitFile
 
   my $user = qm $gitHub->userid;          $user or confess "userid required";
   my $repo = qm $gitHub->repository;      $repo or confess "repository required";
-  my $file = qm($gitHub->gitFile//$File); $file or confess "gitFile required";
+  my $file = qm($File//$gitHub->gitFile); $file or confess "gitFile required";
   my $bran = qm $gitHub->refOrBranch(1);
   my $pat  = $gitHub->patKey(0);
 
@@ -339,30 +355,20 @@ sub read($;$)                                                                   
    }
   else                                                                          # Decode data
    {my $d = decodeBase64($r->data->content);
-    $gitHub->readData = sub
-     {my $h = '';
-      if (length($d) > 8)                                                       # Read file magic number
-       {for my $e(0..7)
-         {$h .= sprintf("%x", ord(substr($d, $e, 1)));
-         }
-        return $d if $h =~ m(\Affd8ff)i;                                        # Jpg
-        return $d if $h =~ m(\A89504E470D0A1A0A)i;                              # Png
-       }
-      decode "UTF8", $d;                                                        # Utf8
-     }->();
+    $gitHub->readData = specialFileData($d) ? $d : decode "UTF8", $d;           # Convert to utf unless a known file format
    }
 
   $gitHub->readData
  }
 
-sub write($$)                                                                   # Write utf8 data into a L<GitHub> file, creating the file if it is not already present.\mRequired attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, , L<gitFile|/gitFile> = the file to be written to.\mOptional attributes: L<refOrBranch|/refOrBranch>.\mIf the write operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
- {my ($gitHub, $data) = @_;                                                     # GitHub object, data to be written
+sub write($$;$)                                                                 # Write utf8 data into a L<GitHub> file.\mRequired attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. Either specify the target file on:<github> using the L<gitFile|/gitFile> attribute or supply it as the third parameter.  Returns B<true> on success else L<undef>.
+ {my ($gitHub, $data, $File) = @_;                                              # GitHub object, data to be written, optionally the name of the file on github
   defined($data) or confess "data required";
 
   my $pat  = $gitHub->patKey(1);
-  my $user = qm $gitHub->userid;     $user or confess "userid required";
-  my $repo = qm $gitHub->repository; $repo or confess "repository required";
-  my $file = qm $gitHub->gitFile;    $file or confess "gitFile required";
+  my $user = qm $gitHub->userid;          $user or confess "userid required";
+  my $repo = qm $gitHub->repository;      $repo or confess "repository required";
+  my $file = qm($File//$gitHub->gitFile); $file or confess "gitFile required";
   my $bran = qm $gitHub->refOrBranch(0) || '?';
   my $mess = qm $gitHub->message;
 
@@ -376,7 +382,7 @@ sub write($$)                                                                   
       return 1;
      }
    }
-  if (1)                                                                        # Send the data as utf8
+  if (!specialFileData($data))                                                  # Send the data as utf8 unless it is a special file
    {use Encode 'encode';
     $data  = encode('UTF-8', $data);
    }
@@ -499,6 +505,7 @@ sub rename($$)                                                                  
 
 sub delete($)                                                                   # Delete a file from L<GitHub>.\mRequired attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be deleted.\mOptional attributes: L<refOrBranch|/refOrBranch>.\mIf the delete operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the delete was successful else false.
  {my ($gitHub) = @_;                                                            # GitHub object
+
   my $pat  = $gitHub->patKey(1);
   my $user = qm $gitHub->userid;     $user or confess "userid required";
   my $repo = qm $gitHub->repository; $repo or confess "repository required";
@@ -728,13 +735,13 @@ sub createRepository($)                                                         
   $success ? 1 : undef                                                          # Return true on success
  }
 
-sub createRepositoryFromSavedToken($$;$$)                                       # Create a repository on L<GitHub> using an access token saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.\mReturns true if the issue was created successfully else false.
- {my ($userid, $repository, $private, $accessFolder) = @_;                      # Userid on GitHub, the repository name, optionally: make the repository private,  optionally: the name of the folder where personal access tokens are stored if it is not the standard one.
+sub createRepositoryFromSavedToken($$;$$)                                       # Create a repository on L<GitHub> using an access token either as supplied or saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.\mReturns true if the issue was created successfully else false.
+ {my ($userid, $repository, $private, $accessFolderOrToken) = @_;               # Userid on GitHub, the repository name, true if the repo is private, location of access token.
   my $g = GitHub::Crud::new;
   $g->userid                    = $userid;
   $g->repository                = $repository;
   $g->private                   = $private;
-  $g->personalAccessTokenFolder = $accessFolder;
+  $g->personalAccessTokenFolder = $accessFolderOrToken;
   $g->loadPersonalAccessToken;
   $g->confessOnFailure          = 1;
   $g->createRepository;
@@ -763,45 +770,59 @@ sub createIssue($)                                                              
   $success ? 1 : undef                                                          # Return true on success
  }
 
-sub createIssueFromSavedToken($$$$;$)                                           # Create an issue on L<GitHub> using an access token saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.\mReturns true if the issue was created successfully else false.
- {my ($userid, $repository, $title, $body, $accessFolder) = @_;                 # Userid on GitHub, repository name, issue title, issue body, optionally the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+sub createIssueFromSavedToken($$$$;$)                                           # Create an issue on L<GitHub> using an access token as supplied or saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.\mReturns true if the issue was created successfully else false.
+ {my ($userid, $repository, $title, $body, $accessFolderOrToken) = @_;          # Userid on GitHub, repository name, issue title, issue body, location of access token.
   my $g = GitHub::Crud::new;
   $g->userid                    = $userid;
   $g->repository                = $repository;
   $g->title                     = $title;
   $g->body                      = $body;
-  $g->personalAccessTokenFolder = $accessFolder;
+  $g->personalAccessTokenFolder = $accessFolderOrToken;
   $g->loadPersonalAccessToken;
   $g->confessOnFailure          = 1;
   $g->createIssue;
  }
 
-sub writeFileUsingSavedToken($$$$;$)                                            # Write to a file on L<GitHub> using a personal access token saved in a file. Return B<1> on success or confess to any failure.
- {my ($userid, $repository, $file, $content, $accessFolder) = @_;               # Userid on GitHub, repository name, file name on github, file content, optional: the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+sub writeFileUsingSavedToken($$$$;$)                                            # Write to a file on L<GitHub> using a personal access token as supplied or saved in a file. Return B<1> on success or confess to any failure.
+ {my ($userid, $repository, $file, $content, $accessFolderOrToken) = @_;        # Userid on GitHub, repository name, file name on github, file content, location of access token.
   my $g = GitHub::Crud::new;
   $g->userid     = $userid;     $userid     or confess "Userid required";
   $g->repository = $repository; $repository or confess "Repository required";
   $g->gitFile    = $file;       $file       or confess "File required";
-  $g->personalAccessTokenFolder = $accessFolder;
+  $g->personalAccessTokenFolder = $accessFolderOrToken;
   $g->loadPersonalAccessToken;
   $g->write($content);
  }
 
-sub writeFileFromFileUsingSavedToken($$$$;$)                                    # Copy a file to L<github>  using a personal access token saved in a file. Return B<1> on success or confess to any failure.
- {my ($userid, $repository, $file, $localFile, $accessFolder) = @_;             # Userid on GitHub, repository name, file name on github, file content, optional: the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+sub writeFileFromFileUsingSavedToken($$$$;$)                                    # Copy a file to L<github>  using a personal access token as supplied or saved in a file. Return B<1> on success or confess to any failure.
+ {my ($userid, $repository, $file, $localFile, $accessFolderOrToken) = @_;      # Userid on GitHub, repository name, file name on github, file content, location of access token.
   writeFileUsingSavedToken($userid, $repository, $file,
-                           readBinaryFile($localFile), $accessFolder);
+                           readBinaryFile($localFile), $accessFolderOrToken);
  }
 
-sub readFileUsingSavedToken($$$;$)                                              # Read from a file on L<GitHub> using a personal access token saved in a file.  Return the content of the file on success or confess to any failure.
- {my ($userid, $repository, $file, $accessFolder) = @_;                         # Userid on GitHub, repository name, file name on github, optional: the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+sub readFileUsingSavedToken($$$;$)                                              # Read from a file on L<GitHub> using a personal access token as supplied or saved in a file.  Return the content of the file on success or confess to any failure.
+ {my ($userid, $repository, $file, $accessFolderOrToken) = @_;                  # Userid on GitHub, repository name, file name on github, location of access token.
   my $g = GitHub::Crud::new;
   $g->userid                    = $userid;
   $g->repository                = $repository;
   $g->gitFile                   = $file;
-  $g->personalAccessTokenFolder = $accessFolder;
+  $g->personalAccessTokenFolder = $accessFolderOrToken;
   $g->loadPersonalAccessToken;
   $g->read;
+ }
+
+sub writeFolderUsingSavedToken($$$$;$)                                          # Write all the files in a local folder to a target folder on a named L<GitHub> repository using a personal access token as supplied or saved in a file.
+ {my ($userid,$repository,$targetFolder,$localFolder,$accessFolderOrToken) = @_;# Userid on GitHub, repository name, target folder on github, local folder name, location of access token.
+  my $g = GitHub::Crud::new;
+  $g->userid                    = $userid;
+  $g->repository                = $repository;
+  $g->personalAccessTokenFolder = $accessFolderOrToken;
+  $g->loadPersonalAccessToken;
+
+  for my $file(searchDirectoryTreesForMatchingFiles($localFolder))
+   {$g->gitFile = swapFilePrefix($file, $localFolder, $targetFolder);
+    $g->write(readBinaryFile($file));
+   }
  }
 
 #D1 Access tokens                                                               # Load and save access tokens. Some L<github> requets must be signed with an L<OAuth>  access token. These methods allow you to store and reuse such tokens.
@@ -823,6 +844,11 @@ sub savePersonalAccessToken($)                                                  
 sub loadPersonalAccessToken($)                                                  # Load a personal access token by userid from folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
  {my ($gitHub) = @_;                                                            # GitHub object
   my $user = qm $gitHub->userid; $user or confess "userid required";
+
+  if (length($gitHub->personalAccessTokenFolder//accessFolder) == 43)           # Access token supplied directly
+   {return $gitHub->personalAccessToken = $gitHub->personalAccessTokenFolder;
+   }
+
   my $dir  = $gitHub->personalAccessTokenFolder // accessFolder;
   my $file = filePathExt($dir, $user, q(data));
   my $p = retrieveFile $file;                                                   # Load personal access token
@@ -900,7 +926,7 @@ Commit a folder to GitHub then read and check some of the uploaded content:
 
 
 
-Version 20200222.
+Version 20200220.
 
 
 The following sections describe the methods in each functional area of this
@@ -979,6 +1005,13 @@ B<Example:>
   # 𝗹𝗶𝘀𝘁: alpha.data .github/workflows/test.yaml images/aaa.txt images/aaa/bbb.txt
 
 
+=head2 specialFileData($d)
+
+Do not encode or decode data with a known file signature
+
+     Parameter  Description
+  1  $d         String to check
+
 =head2 read($gitHub, $File)
 
 Read data from a file on L<GitHub|https://github.com>.
@@ -1008,21 +1041,16 @@ B<Example:>
     success "Read passed";
 
 
-=head2 write($gitHub, $data)
+=head2 write($gitHub, $data, $File)
 
-Write utf8 data into a L<GitHub|https://github.com> file, creating the file if it is not already present.
+Write utf8 data into a L<GitHub|https://github.com> file.
 
-Required attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, , L<gitFile|/gitFile> = the file to be written to.
-
-Optional attributes: L<refOrBranch|/refOrBranch>.
-
-If the write operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
-
-Returns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
+Required attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. Either specify the target file on:<github> using the L<gitFile|/gitFile> attribute or supply it as the third parameter.  Returns B<true> on success else L<undef|https://perldoc.perl.org/functions/undef.html>.
 
      Parameter  Description
   1  $gitHub    GitHub object
   2  $data      Data to be written
+  3  $File      Optionally the name of the file on github
 
 B<Example:>
 
@@ -1030,7 +1058,7 @@ B<Example:>
     my $g = gitHub;
     $g->gitFile = "zzz.data";
 
-    my $d = dateTimeStamp;
+    my $d = dateTimeStamp.q( 𝝰𝝱𝝲);
 
     if (1)
      {my $t = time();
@@ -1369,17 +1397,17 @@ B<Example:>
     success "Create repository succeeded";
 
 
-=head2 createRepositoryFromSavedToken($userid, $repository, $private, $accessFolder)
+=head2 createRepositoryFromSavedToken($userid, $repository, $private, $accessFolderOrToken)
 
-Create a repository on L<GitHub|https://github.com> using an access token saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
+Create a repository on L<GitHub|https://github.com> using an access token either as supplied or saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
 
 Returns true if the issue was created successfully else false.
 
-     Parameter      Description
-  1  $userid        Userid on GitHub
-  2  $repository    The repository name
-  3  $private       Optionally: make the repository private
-  4  $accessFolder  Optionally: the name of the folder where personal access tokens are stored if it is not the standard one.
+     Parameter             Description
+  1  $userid               Userid on GitHub
+  2  $repository           The repository name
+  3  $private              True if the repo is private
+  4  $accessFolderOrToken  Location of access token.
 
 B<Example:>
 
@@ -1408,18 +1436,18 @@ B<Example:>
     success "Create issue succeeded";
 
 
-=head2 createIssueFromSavedToken($userid, $repository, $title, $body, $accessFolder)
+=head2 createIssueFromSavedToken($userid, $repository, $title, $body, $accessFolderOrToken)
 
-Create an issue on L<GitHub|https://github.com> using an access token saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
+Create an issue on L<GitHub|https://github.com> using an access token as supplied or saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
 
 Returns true if the issue was created successfully else false.
 
-     Parameter      Description
-  1  $userid        Userid on GitHub
-  2  $repository    Repository name
-  3  $title         Issue title
-  4  $body          Issue body
-  5  $accessFolder  Optionally the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+     Parameter             Description
+  1  $userid               Userid on GitHub
+  2  $repository           Repository name
+  3  $title                Issue title
+  4  $body                 Issue body
+  5  $accessFolderOrToken  Location of access token.
 
 B<Example:>
 
@@ -1428,16 +1456,16 @@ B<Example:>
     success "Create issue succeeded";
 
 
-=head2 writeFileUsingSavedToken($userid, $repository, $file, $content, $accessFolder)
+=head2 writeFileUsingSavedToken($userid, $repository, $file, $content, $accessFolderOrToken)
 
-Write to a file on L<GitHub|https://github.com> using a personal access token saved in a file. Return B<1> on success or confess to any failure.
+Write to a file on L<GitHub|https://github.com> using a personal access token as supplied or saved in a file. Return B<1> on success or confess to any failure.
 
-     Parameter      Description
-  1  $userid        Userid on GitHub
-  2  $repository    Repository name
-  3  $file          File name on github
-  4  $content       File content
-  5  $accessFolder  Optional: the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+     Parameter             Description
+  1  $userid               Userid on GitHub
+  2  $repository           Repository name
+  3  $file                 File name on github
+  4  $content              File content
+  5  $accessFolderOrToken  Location of access token.
 
 B<Example:>
 
@@ -1450,16 +1478,16 @@ B<Example:>
     success "Write file using saved token succeeded";
 
 
-=head2 writeFileFromFileUsingSavedToken($userid, $repository, $file, $localFile, $accessFolder)
+=head2 writeFileFromFileUsingSavedToken($userid, $repository, $file, $localFile, $accessFolderOrToken)
 
-Copy a file to L<GitHub|https://github.com>  using a personal access token saved in a file. Return B<1> on success or confess to any failure.
+Copy a file to L<GitHub|https://github.com>  using a personal access token as supplied or saved in a file. Return B<1> on success or confess to any failure.
 
-     Parameter      Description
-  1  $userid        Userid on GitHub
-  2  $repository    Repository name
-  3  $file          File name on github
-  4  $localFile     File content
-  5  $accessFolder  Optional: the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+     Parameter             Description
+  1  $userid               Userid on GitHub
+  2  $repository           Repository name
+  3  $file                 File name on github
+  4  $localFile            File content
+  5  $accessFolderOrToken  Location of access token.
 
 B<Example:>
 
@@ -1472,15 +1500,15 @@ B<Example:>
     success "Write file from file using saved token succeeded"
 
 
-=head2 readFileUsingSavedToken($userid, $repository, $file, $accessFolder)
+=head2 readFileUsingSavedToken($userid, $repository, $file, $accessFolderOrToken)
 
-Read from a file on L<GitHub|https://github.com> using a personal access token saved in a file.  Return the content of the file on success or confess to any failure.
+Read from a file on L<GitHub|https://github.com> using a personal access token as supplied or saved in a file.  Return the content of the file on success or confess to any failure.
 
-     Parameter      Description
-  1  $userid        Userid on GitHub
-  2  $repository    Repository name
-  3  $file          File name on github
-  4  $accessFolder  Optional: the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+     Parameter             Description
+  1  $userid               Userid on GitHub
+  2  $repository           Repository name
+  3  $file                 File name on github
+  4  $accessFolderOrToken  Location of access token.
 
 B<Example:>
 
@@ -1492,6 +1520,17 @@ B<Example:>
     confess "Read file using saved token FAILED" unless $s eq $S;
     success "Read file using saved token succeeded"
 
+
+=head2 writeFolderUsingSavedToken($userid, $repository, $targetFolder, $localFolder, $accessFolderOrToken)
+
+Write all the files in a local folder to a target folder on a named L<GitHub|https://github.com> repository using a personal access token as supplied or saved in a file.
+
+     Parameter             Description
+  1  $userid               Userid on GitHub
+  2  $repository           Repository name
+  3  $targetFolder         Target folder on github
+  4  $localFolder          Local folder name
+  5  $accessFolderOrToken  Location of access token.
 
 =head1 Access tokens
 
@@ -1632,13 +1671,13 @@ B<status> - Our version of Status.
 
 2 L<createIssue|/createIssue> - Create an issue on L<GitHub|https://github.com>.
 
-3 L<createIssueFromSavedToken|/createIssueFromSavedToken> - Create an issue on L<GitHub|https://github.com> using an access token saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
+3 L<createIssueFromSavedToken|/createIssueFromSavedToken> - Create an issue on L<GitHub|https://github.com> using an access token as supplied or saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
 
 4 L<createPushWebHook|/createPushWebHook> - Create a web hook for your L<GitHub|https://github.com> userid.
 
 5 L<createRepository|/createRepository> - Create a repository on L<GitHub|https://github.com>.
 
-6 L<createRepositoryFromSavedToken|/createRepositoryFromSavedToken> - Create a repository on L<GitHub|https://github.com> using an access token saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
+6 L<createRepositoryFromSavedToken|/createRepositoryFromSavedToken> - Create a repository on L<GitHub|https://github.com> using an access token either as supplied or saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
 
 7 L<delete|/delete> - Delete a file from L<GitHub|https://github.com>.
 
@@ -1660,21 +1699,25 @@ B<status> - Our version of Status.
 
 16 L<readBlob|/readBlob> - Read a L<blob|https://en.wikipedia.org/wiki/Binary_large_object> from L<GitHub|https://github.com>.
 
-17 L<readFileUsingSavedToken|/readFileUsingSavedToken> - Read from a file on L<GitHub|https://github.com> using a personal access token saved in a file.
+17 L<readFileUsingSavedToken|/readFileUsingSavedToken> - Read from a file on L<GitHub|https://github.com> using a personal access token as supplied or saved in a file.
 
 18 L<rename|/rename> - Rename a source file on L<GitHub|https://github.com> if the target file name is not already in use.
 
 19 L<savePersonalAccessToken|/savePersonalAccessToken> - Save a L<GitHub|https://github.com> personal access token by userid in folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
 
-20 L<write|/write> - Write utf8 data into a L<GitHub|https://github.com> file, creating the file if it is not already present.
+20 L<specialFileData|/specialFileData> - Do not encode or decode data with a known file signature
 
-21 L<writeBlob|/writeBlob> - Write data into a L<GitHub|https://github.com> as a L<blob|https://en.wikipedia.org/wiki/Binary_large_object> that can be referenced by future commits.
+21 L<write|/write> - Write utf8 data into a L<GitHub|https://github.com> file.
 
-22 L<writeCommit|/writeCommit> - Write all the files in a B<$folder> (or just the the named files) into a L<GitHub|https://github.com> repository in parallel as a commit on the specified branch.
+22 L<writeBlob|/writeBlob> - Write data into a L<GitHub|https://github.com> as a L<blob|https://en.wikipedia.org/wiki/Binary_large_object> that can be referenced by future commits.
 
-23 L<writeFileFromFileUsingSavedToken|/writeFileFromFileUsingSavedToken> - Copy a file to L<GitHub|https://github.com>  using a personal access token saved in a file.
+23 L<writeCommit|/writeCommit> - Write all the files in a B<$folder> (or just the the named files) into a L<GitHub|https://github.com> repository in parallel as a commit on the specified branch.
 
-24 L<writeFileUsingSavedToken|/writeFileUsingSavedToken> - Write to a file on L<GitHub|https://github.com> using a personal access token saved in a file.
+24 L<writeFileFromFileUsingSavedToken|/writeFileFromFileUsingSavedToken> - Copy a file to L<GitHub|https://github.com>  using a personal access token as supplied or saved in a file.
+
+25 L<writeFileUsingSavedToken|/writeFileUsingSavedToken> - Write to a file on L<GitHub|https://github.com> using a personal access token as supplied or saved in a file.
+
+26 L<writeFolderUsingSavedToken|/writeFolderUsingSavedToken> - Write all the files in a local folder to a target folder on a named L<GitHub|https://github.com> repository using a personal access token as supplied or saved in a file.
 
 =head1 Installation
 
@@ -1740,7 +1783,7 @@ if (0) {                                                                        
   my $g = gitHub;
   $g->gitFile = "zzz.data";
 
-  my $d = dateTimeStamp;
+  my $d = dateTimeStamp.q( 𝝰𝝱𝝲);
 
   if (1)
    {my $t = time();
@@ -1757,6 +1800,23 @@ if (0) {                                                                        
    }
   confess "write FAILED" unless $g->exists;
   success "Write passed";
+ }
+
+if (0) {                                                                        # Write and read a zip file
+  my $g = gitHub;
+  my $f = temporaryFolder;
+  writeFile(fpe($f, $_, q(txt)), $_) for 1..3;
+  my $z = fpe($f, qw(z zip));
+  say STDERR qx(cd $f; zip $z *);
+  $g->gitFile = "z.zip";
+  $g->write(readBinaryFile($z), q(z.zip));
+
+  my $F = temporaryFolder;
+  my $Z = fpe($F, qw(z zip));
+  writeBinaryFile($Z, $g->read);
+  my $r = qx(cd $F; unzip $Z);
+     $r =~ m(extracting: 3.txt) or confess "Failed to unzip";
+  success "Wrote/read a zip file";
  }
 
 if (0) {                                                                        #TreadBlob #TwriteBlob # Write image as blob and read it back
@@ -1935,7 +1995,6 @@ if (0) {                                                                        
   confess "Write file using saved token FAILED" unless $s eq $S;
   success "Write file using saved token succeeded";
  }
-
 
 if (0) {                                                                        #TwriteFileFromFileUsingSavedToken
   my $f = writeFile(undef, my $s = "World\n");

@@ -14,11 +14,14 @@ meta-spec:
 name: FASTX-Reader
 provides:
   FASTX::PE:
-    file: lib/FASTX/PE.pm
-    version: '0.87'
+    file: lib/FASTX/ScriptHelper.pm
+    version: '0.88'
   FASTX::Reader:
     file: lib/FASTX/Reader.pm
-    version: '0.87'
+    version: '0.88'
+  FASTX::ScriptHelper:
+    file: lib/FASTX/ScriptHelper.pm
+    version: '0.88'
 recommends:
   File::Which: '0'
 requires:
@@ -28,6 +31,6 @@ requires:
   perl: '5.012'
 resources:
   repository: https://github.com/telatin/FASTQ-Parser
-version: '0.87'
+version: '0.88'
 x_generated_by_perl: v5.22.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

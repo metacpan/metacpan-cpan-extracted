@@ -4,7 +4,7 @@
       "Yaroslav O. Kosmina L<mailto:dart@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Multipart::Encoder" : {
          "file" : "lib/Multipart/Encoder.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.9"
       }
    },
    "release_status" : "stable",
@@ -69,13 +69,13 @@
          "web" : "https://github.com/darviarush/perl-multipart-encoder"
       }
    },
-   "version" : "v0.0.7",
+   "version" : "v0.0.9",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Iaroslav O. Kosmina <darviarush@ya.ru>",
       "Yaroslav O. Kosmina <darviarush@mail.ru>",
       "Yaroslav O. Kosmina <kosmina.yaroslav@220-volt.ru>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

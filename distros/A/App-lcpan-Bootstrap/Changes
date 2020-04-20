@@ -1,8 +1,14 @@
-20190520.0.0  2019-05-20 (PERLANCAR)
+20200419.0.0  2020-04-19  Released-By: PERLANCAR; Urgency: high
+
+	- Update database; the previous bootstrap database misses quite a few
+	  records; we'll see if this one is better, created from scratch.
+
+
+20190520.0.0  2019-05-20  Released-By: PERLANCAR
 
         - Update.
 
 
-20190107.0.0  2019-01-07 (PERLANCAR)
+20190107.0.0  2019-01-07  Released-By: PERLANCAR
 
         - First version.

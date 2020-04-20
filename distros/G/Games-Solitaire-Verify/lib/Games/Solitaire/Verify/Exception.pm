@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Exception;
-$Games::Solitaire::Verify::Exception::VERSION = '0.2300';
+$Games::Solitaire::Verify::Exception::VERSION = '0.2301';
 use strict;
 use warnings;
 
@@ -124,6 +124,15 @@ use Exception::Class (
 
 );
 
+package Games::Solitaire::Verify::Exception;
+
+use overload q#""# => sub {
+    my $self = shift;
+    my $err  = $self->error();
+    $err =~ s/([^\n])\z/$1\n/ms;
+    return $err;
+};
+
 
 
 
@@ -142,7 +151,7 @@ classes for G::S::Verify.
 
 =head1 VERSION
 
-version 0.2300
+version 0.2301
 
 =head1 SYNOPSIS
 

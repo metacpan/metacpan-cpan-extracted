@@ -93,8 +93,12 @@ sub render {
     }
   }
 
-  # Handle the front page and Atom feed:
-  $self->write("${publish_dir}/index.html", $self->{wrt}->display('new'));
+  # Handle the front page.  With no entries given, display() will use the
+  # configured default, which is probably "new" unless the user has changed it.
+  $self->write(
+    "${publish_dir}/index.html",
+    $self->{wrt}->display()
+  );
 
   # Handle feed formats:
   my $feed_alias = $self->{wrt}->{feed_alias};

@@ -1,3 +1,10 @@
+0.006   2020-04-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to newer DBIx::Diff::Schema.
+
+        - Add CLI: dbinfo-sqlite.
+
+
 0.005   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update coerce rule names in Sah schemas (Data::Sah::Coerce

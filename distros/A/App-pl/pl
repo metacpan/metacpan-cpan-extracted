@@ -1,0 +1,992 @@
+#! /usr/bin/perl
+
+# Beware: DON'T PERFORM ANY ACTIONS AT TOP LEVEL: this file runs many times under -n or -p!
+
+use v5.10;
+
+our( $VERSION, $A, @A );
+BEGIN {
+    $VERSION = '0.49.2';
+    *A = *ARGV;
+    return unless @A and $A[0] =~ /^-/s;
+    my $onepl = qr/[oOhv?]/; # simple pl opts
+    my $one = qr/[cftTuUwWXanp]|$onepl/; # simple opts
+    my( $perl, @perl, @pl1, $o, $np );
+    while( @A ) {		# no for, may need to shift
+	$_ = $A[0];
+	last unless /^-/s;
+	shift;
+	last if /^--$/s;
+	if( /^--(?:help|version)$/s ) {
+	    push @pl::opts, $_;
+	    next;
+	}
+	unshift @A, "-$1" if s/^-$one*[0l][0-7]*$onepl+\K(0.*)//; # avoid -l012o0 -> -l0120
+# todo -F => -a => -n
+	if( /^(-$one*(?:[0l][0-7]*$one*)*)(?:([CdDFiImM0beV])(.*))?$/s ) { # Perl does 0 & l inline only with oct arg.
+	    my( $opts, $opt, $arg ) = ($1, $2, $3);
+	    $o ||= $opts =~ /o/i;
+	    push @pl1, $1 while $opts =~ s/($onepl)//;
+	    $np ||= $opts =~ /[anp]/;
+	    if( defined $opt ) {
+		if( ! length $arg and $opt =~ /[beVI]/ ) { # These can have arg glued or separated
+		    $arg = shift;
+		    unless( defined $arg ) {
+			warn "Missing argument to -$opt.\n";
+			exit 29;
+		    }
+		}
+		if( $opt eq 'V' ) {
+		    $perl = "perl$arg";
+		    undef $opt; # treat $opts below
+		} elsif( $opt eq 'I' ) {
+		    push @perl, $opts.'I', $arg; # let perl check for empty arg
+		} elsif( $opt =~ /[be]/ ) {
+		    push @pl::opts, join( '', '-', @pl1, $opt ), $arg;
+		    @pl1 = ();
+		    undef $opt; # treat $opts below
+		} else {
+		    $np ||= $opt eq 'F';
+		    push @perl, $opts.$opt.$arg;
+		}
+	    }
+	    unless( defined $opt ) { # no else, because of -b, -e, -V above
+		push @perl, $opts if 1 < length $opts;
+	    }
+	} else {
+	    s/^-$one*(?:[0l][0-7]*$one*)*(.).*/-$1/;
+	    warn "Unrecognized switch: $_  (-h will show valid options).\n";
+	    exit 29;
+	}
+    };
+    if( $o && $np ) {
+	warn "Can't mix -o with -a, -n, -p or -F.\n";
+	exit 29;
+    }
+    push @pl::opts, join '', '-', @pl1 if @pl1;
+    if( $perl || @perl ) {
+	exec $perl // $^X, @perl, '--', $0, @pl::opts, '--', @A; # reexec, pass perl-opts to perl
+	warn $perl // $^X, ": $!\n";
+	exit 1;
+    }
+}
+
+use 5.10.0;
+use strict;
+
+{
+    package Data::Dumper;
+    our $Deparse = 1;
+    our $Quotekeys = 0;
+    our $Sortkeys = sub { [&pl::sort_keys] };
+    our $Terse = 1;
+}
+
+#use warnings;
+
+use feature ':'.substr $^V, 1; # Enable latest optional features.
+
+use List::Util;
+use List::Util @List::Util::EXPORT_OK;
+
+
+our( %d, %diff,
+     @F, @FIELD,
+     $I, $ARGI,
+     %n, %number,
+     $q, $quote,
+     $Q, $Quote,
+     $r, $result,
+     $H, $sort_hex,
+     $T, $sort_txt,
+     %s, %string,
+     %S, %String );
+
+
+
+# Echo
+sub e(@) { local( $,, $\ )     = (' ', "\n");  print &pl::pretty }
+
+# Echo without newline
+sub E(@) { local( $,, $\, $| ) = (' ', '', 1); print &pl::pretty }
+
+# Format
+sub f($@) {		  printf shift() . "\n", &pl::pretty }
+
+# Format without newline
+sub F($@) { local $| = 1; printf shift,		 &pl::pretty }
+
+
+
+# Benchmark code
+sub b(&@) {
+    my( $code, $name, @args ) = @_;
+    local( $a, $b ) = ($a, $b);
+    $name //= 'anonymous';
+    require Benchmark;
+    local $SIG{__WARN__} = sub { die @_ };
+    if( @args ) {
+	e Benchmark::timestr( Benchmark::countit( 10, $code )), "$name: $_"
+	    for @args;
+    } else {
+	e Benchmark::timestr( Benchmark::countit( 10, $code )), " $name";
+    }
+}
+
+# Do it 100x for very fast test code (to increase weight compared to Benchmark overhead).
+sub B(&@) {
+    my( $code, @rest ) = @_;
+    b { for my $i (0..99) { $code->() }} @rest;
+}
+
+# Config
+sub c(@) {
+    require Config;
+    no warnings;
+    if( @_ ) {
+	#{map { pairgrep { $a =~ /$_/ } %Config::Config } @_}; # n/a in 5.10
+	my %config;
+	for my $re ( @_ ) {
+	    for my $key ( grep /$re/, keys %Config::Config ) {
+		$config{$key} = $Config::Config{$key};
+	    }
+	}
+	\%config;
+    } else {
+	\%Config::Config;
+    }
+}
+
+# Fill diff arrays
+sub d(&) {
+    chomp;
+    my $key = &{$_[0]};
+    $d{$key}[$I] = $_;
+}
+
+# scalar date time
+# todo ISO;  5.10 has Time::HiRes?
+sub D(;$$) {
+    my( $s, $us ) = $_[0];
+    if( ! defined $s || $s < 0 ) {
+	my $o = $s // 0;
+	( $s, $us ) = eval { require Time::HiRes; Time::HiRes::gettimeofday() };
+	$s //= time;
+	$s += $o;
+    } elsif( ref $s ) {
+	( $s, $us ) = @$s;
+    } elsif( $s > 1e14 ) {	# so big it must be us?
+	$us = $s % 1000000;
+	$s = $s / 1000000;
+    } elsif( $s > 1e11 ) {	# so big it must be ms?
+	$us = ($s % 1000) * 1000;
+	$s = $s / 1000;
+    } elsif( $s - int $s ) {	# fractional?
+	$us = ($s - int $s) * 1000000;
+    }
+    $s = $_[1] ? gmtime $s : localtime $s;
+    substr $s, 19, 0, sprintf '.%06d', $us
+	if defined $us;
+    defined wantarray ? $s : e $s;
+}
+
+# turns list of ipv4/6 addresses & hostnames or $_ into /etc/hosts format
+# todo comment not found
+sub h(@) {
+    require Socket;
+    package Socket;
+    my( %res, %name );
+    my $res = sub {
+	my( $v4, $name, $aliases, undef, undef, @addr ) = @_;
+	undef $name{$_} for $name, split ' ', $aliases;
+	for( @addr ) {
+	    $_ = unpack 'H*', $_;
+	    if( $v4 ) { # make sortable by kind
+		s/^(?=7f)/g/ or # loopback
+		  s/^(?=a9fe)/i/ or # link local
+		  s/^(?=0a|ac1|c0a8)/k/ or # private
+		  substr $_, 0, 0, 'm';
+	    } else {
+		s/^(?=0+1$)/h/ or # loopback
+		  s/^(?=fe[89ab])/j/ or # link local
+		  s/^(?=fd)/l/ or # private
+		  substr $_, 0, 0, 'n';
+	    }
+	    @{$res{$_}}{keys %name} = (); # don't just store %name, different names might point to same IP but not vice versa
+	}
+    };
+    my @unpack = (\&unpack_sockaddr_in6, \&unpack_sockaddr_in);
+    for my $name ( @_ ? @_ : $_ ) {
+	if( exists &getaddrinfo ) { # somewhere > v5.16.3
+	    for( getaddrinfo( $name, undef, {socktype => SOCK_STREAM()} )) {
+		next unless ref; # 1st is return code
+		%name = ();
+		undef $name{$_->{canonname}} if defined $_->{canonname};
+		my $v4 = $_->{family} == AF_INET();
+		my $addr = $unpack[$v4]->( $_->{addr} );
+		my @get = gethostbyaddr( $addr, $_->{family} );
+		$res->( $v4, @get ? @get : ($name, (undef)x3, $addr) );
+	    }
+	} else {		# older perl
+	    %name = ();
+	    my $addr;
+	    my $v6 = $name =~ /:/ || exists &inet_pton;
+	    my @get = $v6 ? gethostbyaddr( $addr = inet_pton( AF_INET6(), $name ), AF_INET6()) :
+	      $name =~ /[a-z]/i ? gethostbyname( $name ) :
+	      gethostbyaddr $addr = inet_aton( $name ), AF_INET();
+	    $res->( ! $v6, @get ? @get : ($name, (undef)x3, $addr) );
+	}
+    }
+    for( sort keys %res ) {
+	next if 1 == length;	# IPv6 on old perl
+	my $ip = pack 'H*', substr $_, 1;
+	::e 4 == length $ip ? inet_ntoa( $ip ) : inet_ntop( AF_INET6(), $ip ),
+	  sort grep ! /^[0-9.]+$|^(?=.*:)[0-9a-f:]+$/i, keys %{$res{$_}};
+    }
+}
+
+# trim small values from %n
+sub n(;$) {
+    my $n = $_[0] // 2;
+    $n{$_} < $n and delete $n{$_} for keys %n;
+}
+
+# Pipe command to CODE
+sub p(&$@) {
+    my $code = shift;
+    open my $fd, "-|", @_ or die "$_[0]: $!\n";
+    $code->() while <$fd>;
+}
+
+
+sub help(;$) {
+    if( @_ && ! defined $_[0] ) {
+	print <<\EOF;
+usage: pl [-b PERLCODE] [-e PERLCODE] [-o] [-VVERSION] [-PERLOPT...] [--] [PERLCODE] [ARG ...]
+  -b & -e           wrap begin/end PERLCODE around program in same scope, my-vars work.
+  -o                assume "for(@A) { ... }" loop around program
+  -O                assume "for $A (@A) { ... }" loop around program
+  -VVERSION         rerun with given VERSION, which is just appended to "perl".
+These options are handled by perl:
+EOF
+	p { E if /^\s+-[0acCdDfFiImMnptTuUvwWX]/ } $^X, '-h';
+    }
+    print <<\EOF;
+Predefined functions:
+  b { } NAME, ARG... benchmark slow CODE for 10s, display NAME, looping over ARGs.
+  B { } NAME, ARG... same, but run CODE 100 times in benchmark, to reduce overhead.
+  c RE...           %Config, e.g. c->{sitelib}, optionally only part matching regexps
+  d { }             may modify $_, return key for it.  Store in %d per ARG for diff.
+  D [ARG][, UTC]    date (from ARG [s, us], us, ms, s or -s), UTC if true
+  e ARG...          echo prettified ARGs or $_ with spaces and newline
+  E ARG...          same, but no newline
+  f FMT, ARG...     format prettified ARGs with newline
+  F FMT, ARG...     same, but without newline
+  n [N]             trim %n values less than N (default 2) e.g.; -en or -e 'n 5'
+  p { } CMD, ARG... open pipe from CMD and loop over it.
+Predefined (magic) variables:
+  *A	*ARGV	    $A & @A are aliases to $ARGV & @ARGV
+  $I	0..n	    index of ARG currently being processed in -o, -n or -p
+  $q	'
+  $Q	"
+  %d	()[]	    at end, sort by keys, print diff of $I array elements.  Filled by d {}.
+  %n	()	    at end, sort numerically by values
+  $r	undef	    at end, print it, if defined
+  %s	()	    at end, sort by keys
+  %S	()	    at end, print only values, sorted by keys
+EOF
+}
+
+BEGIN {
+    *ARGI = \$I;
+    *benchmark = \&b;
+    *benchmark100 = \&B;
+    *config = \&c;
+    *date = \&D;
+    *diff = *d;
+    *echo = \&e;
+    *echoN = \&E;
+    *echof = \&f;
+    *echofN = \&F;
+    *FIELD = \@F;
+    *hosts = \&h;
+    *number = *n;
+    *piped = \&p;
+    *quote = \$q;
+    *Quote = \$Q;
+    *result = \$r,
+    *sort_hex = \$H,
+    *sort_txt = \$T,
+    *string = \%s,
+    *String = \%S,
+#    * = \&;
+}
+INIT {
+    ($I, $q, $Q, $H) = (0, "'", '"', 1);
+    $pl::I = 1;
+    unless( @pl::opts || @A ) {
+	*pl::prog = \&pl::shell;
+	return;
+    }
+
+    @pl::bit = ('', 'sub pl::prog {', '', '', '', '}'); # Don't pollute eval with my-var
+    while( @pl::opts ) {		# not for, may need to shift
+	$_ = shift @pl::opts;
+	if( /[?h]/ ) {
+	    help undef;
+	    exit;
+	} elsif( /v/ ) {
+	    e "This is pl $VERSION, with perl $^V
+
+Copyright 1997-2020, Daniel Pfeiffer
+
+Pl may be copied only under the terms of either the Artistic License or the
+GNU General Public License, which may be found in the Perl 5 source kit.";
+	    exit;
+	}
+
+	$pl::I = @pl::bit[2, 5] = (/O/ ? 'for$A(@A){' : 'for(@A){', '}continue{++$I}}')
+	    if /o/i;
+	if( /([be])/ ) {
+	    my $bit = "#line 1 \"-$1\"\n" . shift( @pl::opts ) . "\n;";
+	    if( /b/ ) {
+		$pl::bit[0] = $bit;
+	    } else {
+		$pl::bit[4] = "\n;END{\n$bit}";
+	    }
+	}
+    }
+    $pl::bit[3] = "\n#line 1 \"perlcode\"\n" . shift() . "\n" if @A;
+    undef $_;
+    no warnings;
+    #no warnings 'experimental';	# overridden by -W
+    no strict;
+# e join '', map $_ // '', @pl::bit;
+    eval join '', map $_ // '', @pl::bit;
+    if( $@ ) {
+	warn $@;
+	exit 255;
+    }
+}
+&pl::prog; ++$I if $pl::I && eof; # will be called repeatedly if -n or -p
+
+
+
+# \todo help doc readline test:my
+package pl;
+
+# It's annoyingly hard to figure out if all are unique & lexically compatible numbers, or whether to sort textually.
+sub sort_keys(\%) {
+    my $hash = $_[0];
+    return () unless keys %$hash;
+    goto TXT if $::T;
+    my( $hex, $perl, $no_oct, %seen, @seen_oct ) = $::H;
+    for( keys %$hash ) {
+	goto TXT if /[^0-9a-fx._+-]/i;
+	$hex = 0, last unless /^[0-9a-f](?:_?[0-9a-f]+)*$/i;
+	goto TXT if exists $seen{hex $_};
+	undef $seen{hex $_};
+    }
+    return sort { hex $a <=> hex $b } keys %$hash if $hex;
+
+    %seen = ();
+    for( keys %$hash ) {
+	unless( $no_oct ||= /^[+-]?0(?=.*[89])/ ) {
+	    if( /^[+-]?0(?:b(?:_?[01]+)*|x(?:_?[0-9a-f]+)*)$/i ) {
+		goto TXT if exists $seen{eval $_};
+		undef $seen{eval $_};
+		$perl = 1, next;
+	    }
+	    if( /^[+-]?0(?:_?[0-7]+)*$/ ) {
+		push @seen_oct, $_; # can't decide yet
+		next;
+	    }
+	}
+
+	if( /^[+-]?(?=.)[0-9]*(?:\.[0-9]*)?(?:(?<=.)e[+-]?[0-9]+)?$/i ) {
+	    goto TXT if exists $seen{0 + $_};
+	    undef $seen{0 + $_};
+	    next;
+	}
+
+	goto TXT;
+    }
+    if( $perl ) {
+	goto TXT if $no_oct;
+	for( @seen_oct  ) {
+	    goto TXT if exists $seen{eval $_};
+	    undef $seen{eval $_};
+	}
+	return sort { eval $a <=> eval $b } keys %$hash;
+    } else {
+	for( @seen_oct  ) {
+	    goto TXT if exists $seen{0 + $_};
+	    undef $seen{0 + $_};
+	}
+	return sort { $a <=> $b } keys %$hash;
+    }
+
+  TXT:				# clearest solution here
+    sort keys %$hash;
+}
+
+
+sub difflite() {
+    for my $key ( sort_keys %::d ) {
+	my( $same, $str ) = 1;
+	$#{$::d{$key}} = $I - 1; # lengthen list if needed
+	for( @{$::d{$key}} ) {
+	    $str ||= $_ // '$pl::n_a';
+	    $same = $str eq ($_ // '$pl::n_a');
+	    last unless $same;
+	}
+	next if $same;
+	::e "\e[1m$key\e[m";
+	::e defined() ? "\t$_" : "\t\e[3mn/a\e[m"
+	    for @{$::d{$key}};
+    }
+}
+sub diff() {
+    eval { require Algorithm::Diff } or goto &difflite;
+    for my $key ( sort_keys %::d ) {
+	my( $max, $n, $ref ) = (0, 0);
+	for( @{$::d{$key}} ) {
+	    next unless defined;
+	    $max = length if $max < length;
+	    ++$n;
+	    if( $ref ) {
+		$ref = Algorithm::Diff::LCS( $ref, [split //] );
+	    } else {
+		$ref = [split //];
+	    }
+	}
+	next if $n == $I && @$ref == $max;
+	::e "\e[1m$key\e[m";
+	$#{$::d{$key}} = $I - 1; # lengthen list if needed
+	for( @{$::d{$key}} ) {
+	    if( defined ) {
+		if( ! @$ref ) {
+		    substr $_, 0, 0, "\e[31m";
+		} elsif( @$ref == length ) {
+		    substr $_, 0, 0, "\e[32m";
+		} else {
+		    my( undef, $idx ) = Algorithm::Diff::LCSidx( $ref, [split //] );
+		    for my $i ( reverse @$idx ) {
+			substr $_, $i + 1, 0, "\e[31m";
+			substr $_, $i, 0, "\e[32m";
+		    }
+		    substr $_, 0, 0, "\e[31m";
+		    s/\e\[3.m(?=\e\[3.m|$)//g;
+		    1 while s/(\e\[3.m)[^\e]+\K\1//;
+		}
+	    } else {
+		$_ = "\e[3mn/a";
+	    }
+	    ::e "\t$_\e[m";
+	}
+    }
+}
+
+sub pretty {
+    map {
+	if( ! defined ) {
+	    "\e[3mundef\e[m";
+	} elsif( !ref ) {
+	    $_;
+	} elsif( eval { $_->can( '(""' ) } ) {
+	    "$_";
+	} else {
+	    require Data::Dumper;
+	    my $ret = Data::Dumper::Dumper( $_ );
+	    $ret =~ s/;?\n?$//s;
+	    $ret;
+	}
+    } @_ ? @_ : $_;
+}
+
+sub getline {
+    { local $\ = ''; print STDERR defined() ? '>> ' : '> ' }
+    my $part = <>;
+    if( defined $part ) {
+	if( defined ) {
+	    $_ .= "\n" . $part;
+	} else {
+	    $_ = $part;
+	}
+    } else {
+	say '';
+	exit;
+    }
+}
+sub shell {
+    # No my, as that would inject into eval.
+    our $lp = eval { require Lexical::Persistence; Lexical::Persistence->new() };
+    while( 1 ) {
+	our $lines = undef;
+	for( $lines ) {
+	    &getline;
+	    &getline while s/\\$//s;
+	    if( /\{$/s ) {
+		&getline until /\n\}$/s;
+	    }
+	}
+	{
+	    package main;
+	    $lp ? $lp->do( $lines ) : eval $lines;
+	}
+	warn $@ if $@;
+    }
+}
+
+
+END {
+    ::e $::r if defined $::r;
+    use sort 'stable';
+    # todo lenint.lenfloat %d/f
+    printf "%8d: %s\n", $::n{$_}, $_
+	for sort { $::n{$a} <=> $::n{$b} } sort_keys %::n;
+    printf "%s:  %s\n", $_, pretty $::s{$_}
+	for sort_keys %::s;
+    ::e $::S{$_}
+	for sort_keys %::S;
+    &diff;
+}
+
+sub selftest {
+    eval join '', <DATA>;
+    warn $@ if $@;
+}
+
+__DATA__
+
+# Code for pl::selftest
+
+sub assert($$$) {
+    my( $msg, $exp, $res ) = @_;
+    warn "[[$msg]]\n" if defined $msg;
+    warn pretty "  expected: ", $exp, "  got: ", $res
+	if defined $exp ? (defined $res ? $exp ne $res : 1) : defined $res;
+}
+
+# Emulate -n from in-memory files.
+sub n_loop(&@) {
+    my $code = shift;
+    $::I = 0;
+    for my $arg ( @_ ) {
+	open my $fd, '<', \$arg;
+	$::A = "file$::I";
+	$code->() for <$fd>;
+	++$::I;
+    }
+}
+
+sub stdout(&) {
+    open my $fd, '>', \my $str;
+    my $orig = select $fd;
+    eval { $_[0]->() };
+    warn $@ if $@;
+    select $orig;
+    close $fd;
+    $str;
+}
+
+sub test_sort_keys(&$@) {
+    my( $cmp, $msg ) = splice @_, 0, 2;
+    warn "[[sort_$msg]]\n" if defined $msg;
+    my( %x, $prev, $res );
+    for( 0..9 ) {		# Retry, one sorting bug was key order related.
+	@x{@_} = ();
+	if( defined $prev ) {
+	    $res = join '|', sort_keys %x;
+	    last if $res ne $prev;
+	} else {
+	    $prev = join '|', sort_keys %x;
+	}
+    }
+    assert undef, join( '|', $cmp ? sort $cmp @_ : sort @_ ), $res eq $prev ? $res : "$res\n\tand also: $prev";
+}
+
+warn "Starting tests\n";
+# assert assert_ok1 => undef, undef;
+# assert assert_ok2 => 1, 1;
+# assert assert_ok3 => '', '';
+# assert assert_fail1 => undef, 1;
+# assert assert_fail2 => 1, undef;
+# assert assert_fail3 => 0, 1;
+
+# assert stdout => "$_\n", stdout \&::e for 'foo', 'bar';
+
+# assert n_loop => "file0 a\n\nfile0 b\nfile1 c\n\nfile2 d\n\nfile2 e\n\nfile2 f\n",
+#     stdout { n_loop { ::e $::A, $_ } "a\nb", "c\n", "d\ne\nf" };
+
+assert D_sec => "Fri Feb 13 23:31:30 2009",			::D 1234567890, 1;
+assert D_ms => "Fri Feb 13 23:31:30.123000 2009",		::D 1234567890123, 1;
+assert D_us => "Fri Feb 13 23:31:30.123456 2009",		::D 1234567890123456, 1;
+assert D_float => "Fri Feb 13 23:31:30.123456 2009",		::D 1234567890.123456, 1;
+assert D_array => "Fri Feb 13 23:31:30.123456 2009",		::D[1234567890, 123456], 1;
+assert D_print => "Fri Feb 13 23:31:30.123000 2009\n", stdout { ::D 1234567890123, 1 };
+
+my @l = qw(0 a b c aa bb cc 0b1 0b2 07 08 babe bad be);
+( $H, $T ) = 0;
+test_sort_keys undef, no_hex => @l;
+$H = 1;
+test_sort_keys { hex $a <=> hex $b } hex => @l;
+$T = 1;
+test_sort_keys undef, hex_txt => @l;
+$T = 0;
+test_sort_keys undef, txt => @l, 'z';
+test_sort_keys undef, hex_mix => @l, qw(1.1 +2);
+test_sort_keys undef, hex_dup => @l, 'c_c';
+test_sort_keys undef, dupcasehex => @l, 'CC';
+test_sort_keys { $a <=> $b } num => qw(-1 -.5 0 1 +2 3 04);
+@l = qw(-1 0 1 -1.1 .2 +.3 5. -1e-2 +1e-2 -1.e2 -.1e2 1.E2 -0X2 0x0_2 -0b1_1 0B1_1 04 -04);
+test_sort_keys { eval $a <=> eval $b } pl => @l;
+test_sort_keys undef, no_oct => @l, '08';
+test_sort_keys undef, dupx => @l, '0X2';
+test_sort_keys undef, dupn => @l, 100;
+
+my $stdin = <<\EOF;
+e 1
+e 2\
+, 3
+for( 4, 5 ) {
+    e;
+}
+EOF
+#close STDIN; open STDIN, '<', \$stdin;
+#::e '[[', stdout( \&shell ), ']]';
+warn "Ending tests\n";
+
+
+
+=head1 NAME
+
+pl - Swiss Army Knife of Perl One-Liners
+
+=head1 ABSTRACT
+
+Just one small script extends C<perl -E> with many bells & whistles: Various
+one-letter commands & magic variables (with meaningful aliases too) take Perl
+programming to the command line.  List::Util is fully imported.  Unless you
+pass a program on the command line, starts a simple Perl Shell.
+
+=head1 DESCRIPTION
+
+Pl follows Perl's philosophy for one-liners: the one variable solely used in
+one-liners, C<@F>, is single-lettered.  Because not everyone may like that, Pl
+has it both ways.  Everything is aliased both as a word and as a single
+letter, including Perl's own C<@F> & C<*ARGV>.
+
+-b doesn't do a C<BEGIN> block.  Rather it is in the same scope as your main
+PERLCODE.  So you can use it to initialise C<my> variables.  Whereas, if you
+define a my variable in a B<-n>, B<-p>, B<-o> or B<-O> loop, it's a new
+variable each time.  This echoes "a c" because -e does do an B<END> block,
+which is a closure of the first C<$inner> variable:
+
+    pl -Ob 'my $outer'  -e 'echo $inner, $outer'  'my $inner = $outer = $ARGV' a b c
+    pl -Ob 'my $outer'  -e 'e $inner, $outer'  'my $inner = $outer = $A' a b c
+
+=head2 diff | d { ... }
+
+Multifile diff on unique key fields.  If you have Algorithm::Diff with color highlighting.
+
+=head3 Sorting
+
+Hashes are sorted numerically at the end, if unambiguously possible.  That is
+if either all numbers are unsigned hex (including undescores) or all numbers
+are valid Perl literals or all numbers are decimal as Perl parses them from
+strings (including leading zeroes).  Otherwise, or if several keys have the
+same numeric value (e.g. 8, +8, 8e0, 0b100, 0B1_00, 010, 0x8), sorting is
+textual.
+
+Detecting hex numbers sorts wrongly if you only have words like "babe", "bad"
+& "be".  If you still do other numbers including 0xabc, you can turn it off
+by:
+
+    $sort_hex = 0;
+    $H = 0;
+
+If you want strictly text sorting only:
+
+    $sort_txt = 1;
+    $H = 1;
+
+=head1 EXAMPLES
+
+=head2 Looking at Perl
+
+=over
+
+=item Content of a Package
+
+Pl's C<echo> or C<e> can print any item.  Packages are funny hashes, with two
+colons at the end.  Backslashing the variable passes it as a unit to
+C<Data::Dumper>.  Otherwise all elements would come out just separated by
+spaces:
+
+    pl 'echo \%List::Util::'
+    pl 'e \%List::Util::'
+
+=item Library Loading
+
+Where does perl load from, and what exactly has it loaded?
+
+    pl 'echo \@INC, \%INC'
+    pl 'e \@INC, \%INC'
+
+Same, for a different Perl version, e.g. if you have F<perl5.20.0> in your
+path:
+
+    pl -V5.20.0 'echo \@INC, \%INC'
+    pl -V5.20.0 'e \@INC, \%INC'
+
+=item Configuration
+
+You get C<%Config::Config> loaded on demand and returned by C<config> or C<c>:
+
+    pl 'echo config'
+    pl 'e c'
+
+It returns a hash reference, from which you can lookup an entry:
+
+    pl 'echo config->{sitelib}'
+    pl 'e c->{sitelib}'
+
+You can also return a sub-hash, of only the keys matching any regexps you
+pass:
+
+    pl 'echo config "random", qr/stream/'
+    pl 'e c qr/random/, "stream"'
+
+=back
+
+=head2 File statistics
+
+=over
+
+=item Count files per suffix
+
+Find and pl both use the B<0> option to allow funny filenames, including
+newlines.  Sum up encountered suffixes in sort-value-numerically-at-end hash
+C<%number> or C<%n>:
+
+    find -print0 |
+        pl -0ln '++$number{/(\.[^\/.]+)$/ ? $1 : "none"}'
+    find -print0 |
+        pl -0ln '++$n{/(\.[^\/.]+)$/ ? $1 : "none"}'
+
+=item Count files per directory per suffix
+
+Match to last / & after a dot following something, i.e. not just a dot-file.
+"" is the suffix for suffixless files.  Stores in
+sort-by-key-and-stringify-at-end C<%string> or C<%s>.  So count in a nested
+hash of directory & suffix:
+
+    find -type f -print0 |
+        pl -0ln '/^(.+)\/.+?(?:\.([^.]*))?$/; ++$string{$1}{$2}'
+    find -type f -print0 |
+        pl -0ln '/^(.+)\/.+?(?:\.([^.]*))?$/; ++$s{$1}{$2}'
+
+This is the same, but groups by suffix and counts per directory:
+
+    find -type f -print0 |
+        pl -0ln '/^(.+)\/.+?(?:\.([^.]*))?$/; ++$string{$2}{$1}'
+    find -type f -print0 |
+        pl -0ln '/^(.+)\/.+?(?:\.([^.]*))?$/; ++$s{$2}{$1}'
+
+This is similar, but stores in sort-by-number-at-end C<%n>.  Since this matches
+suffixes optionally, a lone dot indicates no suffix.  The downside is that it
+is neither sorted by directory, nor by suffix:
+
+    find -type f -print0 |
+        pl -0ln '/^(.+)\/.+?(?:\.([^.]*))?$/; ++$n{"$1 .$2"}'
+
+This avoids the lone dot:
+
+    find -type f -print0 |
+        pl -0ln '/^(.+)\/.+?(?:\.([^.]*))?$/; ++$n{length($2) ? "$1 .$2" : "$1 none"}'
+
+=item Sum up file-sizes per suffix.
+
+Find separates output with a dot and -F splits on that.  The C<\\> is to
+escape one backslash from the Shell.  No matter how many dots the filename
+contains, 1st element is the size and last is the suffix.  Sum it in C<%n>,
+which gets sorted numerically at the end:
+
+    find -name '*.*' -type f -printf "%s.%f\0" |
+        pl -0lanF\\. '$n{".$F[-1]"} += $F[0]'
+
+This is similar, but also deals with suffixless files:
+
+    find -type f -printf "%s.%f\0" |
+        pl -0lanF\\. '$n{@F == 2 ? "none" : ".$F[-1]"} += $F[0]'
+
+=item Count files per date
+
+Incredibly, find has no ready-made ISO date, so specify the 3 parts.  If you
+don't want days, just leave out C<-%Td>.  Sum up encountered dates in
+sort-value-numerically-at-end hash C<%number> or C<%n>:
+
+    find -printf '%TY-%Tm-%Td\n' |
+        pl -ln '++$number{$_}'
+    find -printf '%TY-%Tm-%Td\n' |
+        pl -ln '++$n{$_}'
+
+=item Count files per date with rollup
+
+todo
+Rollup means, additionally to the previous case
+The trick here is to count both for the actual year, month and day, as well as
+replacing once only the day, once also the month with "__",and once also the
+year with "____".  This sorts after numbers and gives a sum for all with the
+same leading numbers.
+
+    find -printf '%TY-%Tm-%Td\n' |
+        pl -ln '++$string{$_}; ++$string{$_} while s/[0-9]+(?=[-_]*$)/"_" x length $&/e'
+    find -printf '%TY-%Tm-%Td\n' |
+        pl -ln '++$s{$_}; ++$s{$_} while s/[0-9]+(?=[-_]*$)/"_" x length $&/e'
+
+=back
+
+=head2 Diff several files by a unique key
+
+The function C<diff> or C<d> fills C<%d> keyed by what you return and the arg counter
+C<$I>.  At the end only the rows differing between files are shown.  If you
+have C<Algorithm::Diff> the exact difference gets colour-highlighted.
+
+=over
+
+=item Diff several csv, tsv or passwd files by 1st field
+
+This assumes no comma in key field and no newline in any field.  Else you need
+a csv-parser package:
+
+    pl -anF, 'diff { $FIELD[0] }' *.csv
+    pl -anF, 'd { $F[0] }' *.csv
+
+This is similar, but removes the key from the stored value, so it doesn't get
+repeated for each file:
+
+    pl -n 'diff { s/(.+?),//; $1 }' *.csv
+    pl -n 'd { s/(.+?),//; $1 }' *.csv
+
+A variant of csv is tsv, with tab as separator.  Tab is C<\t>, which must be
+escaped from the Shell as C<\\t>:
+
+    pl -anF\\t 'diff { $FIELD[0] }' *.tsv
+    pl -anF\\t 'd { $F[0] }' *.tsv
+    pl -n 'diff { s/(.+?)\t//; $1 }' *.tsv
+    pl -n 'd { s/(.+?)\t//; $1 }' *.tsv
+
+The same, with a colon as separator, if you want to compare passwd files from
+several hosts:
+
+    pl -anF: 'diff { $FIELD[0] }' /etc/passwd passwd*
+    pl -anF: 'd { $F[0] }' /etc/passwd passwd*
+    pl -n 'diff { s/(.+?)://; $1 }' /etc/passwd passwd*
+    pl -n 'd { s/(.+?)://; $1 }' /etc/passwd passwd*
+
+=item Diff several zip archives by member name
+
+This uses the same mechanism as the csv example.  Addidionally it reads the
+output of C<unzip -vql> for each archive through the C<pipe> or C<p> block.
+That has a fixed format, except for tiny members, which can report -200%,
+screwing the column by one:
+
+    pl -o 'piped { diff { s/^.{56,57}\K  (.+)//; $1 } if / Defl:/ } "unzip", "-vql", $_' *.zip
+    pl -o 'p { d { s/^.{56,57}\K  (.+)//; $1 } if / Defl:/ } "unzip", "-vql", $_' *.zip
+
+If you do a clean build of java, many class files will have the identical crc,
+but still differ by date.  This excludes the date:
+
+    pl -o 'piped { diff { s/^.{31,32}\K.{16} ([\da-f]{8})  (.+)/$1/; $2 } if / Defl:/ } "unzip", "-vql", $_' *.jar
+    pl -o 'p { d { s/^.{31,32}\K.{16} ([\da-f]{8})  (.+)/$1/; $2 } if / Defl:/ } "unzip", "-vql", $_' *.jar
+
+=item Diff several tarballs by member name
+
+This is like the zip example.  But tar gives no checksum, so this is not very
+reliable.  Each time a wider file size was seen columns shift right.  Reformat
+the columns, so this doesn't show up as a differenceq:
+
+    pl -o 'piped { diff { s/^\S+ \K(.+?) +(\d+) (.{16}) (.+)/sprintf "%-20s %10d %s", $1, $2, $3/e; $4 }} "tar", "-tvf", $_' *.tar *.tgz *.txz
+    pl -o 'p { d { s/^\S+ \K(.+?) +(\d+) (.{16}) (.+)/sprintf "%-20s %10d %s", $1, $2, $3/e; $4 }} "tar", "-tvf", $_' *.tar *.tgz *.txz
+
+Again without the date:
+
+    pl -o 'piped { diff { s/^\S+ \K(.+?) +(\d+) .{16} (.+)/sprintf "%-20s %10d", $1, $2/e; $3 }} "tar", "-tvf", $_' *.tar *.tgz *.txz
+    pl -o 'p { d { s/^\S+ \K(.+?) +(\d+) .{16} (.+)/sprintf "%-20s %10d", $1, $2/e; $3 }} "tar", "-tvf", $_' *.tar *.tgz *.txz
+
+=back
+
+=head2 Tables
+
+=over
+
+=item ANSI foreground;background colour table
+
+How to generate a table, hardly a one-liner...  You get numbers to fill into
+C<"\e[FGm">, C<"\e[BGm"> or C<"\e[FG;BGm"> to get a colour and close it with
+C<"\e[m">.  There are twice twice 8 different colors for dim & bright and for
+foreground & background.  Hence the multiplication of escape codes and of
+values to fill them.
+
+This fills C<@A> (alias to C<@ARGV>) in C<-b>, as though it had been given on
+the command line.  It maps it to the 16fold number format to print the header.
+Then the main PERLCODE loops over it with C<$A> (alias to C<$ARGV>), thanks to
+C<-O>, to print the body.  All numbers are duplicated with C<(N)x2>, once to
+go into the escape sequence, once to be displayed:
+
+    pl -Ob '@A = map +($_, $_+8), 1..8; f "co:  fg;bg"."%5d"x16, map $_, @A' \
+        'f "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $A, ($A + ($A > 8 ? 81 : 29))x2, map +(($_)x2, ($_+60)x2), 40..47'
+
+This does the same, but explicitly loops over lists C<@co & @bg>:
+
+    pl '@co = map +($_, $_+8), 1..8; @bg = map +(($_)x2, ($_+60)x2), 40..47;
+        f "co:  fg;bg"."%5d"x16, map $_, @co;
+        f "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $_, ($_ + ($_ > 8 ? 81 : 29))x2, @bg for @co'
+
+=back
+
+=head2 Miscellaneous
+
+=over
+
+=item Split up numbers with commas, dots or underscores
+
+Loop (B<-o>) over remaining args in C<$_>.  After a decimal dot, insert a
+comma before each 4th comma-less digit.  Then do the same backwards from end
+or decimal dot:
+
+    pl -o '1 while s/[,.]\d{3}\K(?=\d)/,/; 1 while s/\d\K(?=\d{3}(?:$|[.,]))/,/; e' 1234567 12345678 123456789 1234567890 1234.5678 3.141 3.14159265358
+
+The same for languages with a decimal comma:
+
+    pl -o '1 while s/[,.]\d{3}\K(?=\d)/./; 1 while s/\d\K(?=\d{3}(?:$|[.,]))/./; e' 1234567 12345678 12345678 1234567890 1234,5678 3,141 3,141592653589
+
+The same for Perl style output:
+
+    pl -o '1 while s/[._]\d{3}\K(?=\d)/_/; 1 while s/\d\K(?=\d{3}(?:$|[._]))/_/; e' 1234567 12345678 123456789 1234567890 1234.5678 3.141 3.14159265358
+
+=item DNS lookup
+
+# todo sub h, IPv6 /:/?
+# sort by raw ip 0(127) 2(169.254) 4(10) 4(172.16 - 172.31) 4(192.168) 6other
+# 1(??) 3(fe80::/10) 5(fd) 7other
+# sorted by type (localhost, link local, private, public), version (v4, v6) and IP
+
+This one is beyond words.  It deals with the nerdy C<gethost...> and outputs
+as a hosts file.  You tack on any number of IP-addresses or hostnames:
+
+    pl 'h qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
+    pl 'h @A' perl.org 127.0.0.1 perldoc.perl.org cpan.org
+
+If you don't want it to be sorted, call C<h> for individual addresses:
+
+    pl 'h for qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
+    pl -o h perl.org 127.0.0.1 perldoc.perl.org cpan.org
+
+=back
+
+=over
+
+=back

@@ -1,5 +1,15 @@
 Revision history for Music-Cadence
 
+0.1404 2020-04-20 00:33:30
+    - Remove the redundant eg/synopsis program.
+    - Simplify the eg/cadence code.
+
+0.1403 2020-04-19 20:20:51
+    - Fix documentation including crucial typo.
+
+0.1402 2020-04-19 15:39:20
+    - Improve documentation.
+
 0.1401 2020-01-29 11:19:49
     - Correctly handle and test supported formats for the picardy cadence.
 

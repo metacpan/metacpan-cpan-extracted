@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.178';
+our $VERSION = '1.179';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -3502,32 +3502,32 @@ Bildung zweier Differenzmengen:
   -- Alle Zeilen in Tabelle 1, die nicht in Tabelle 2 vorkommen
   
   SELECT
-      COLUMNS1
+      <COLUMNS1>
   FROM
-      TABLE1
+      <TABLE1>
   EXCEPT
   SELECT
-      COLUMNS2
+      <COLUMNS2>
   FROM
-      TABLE2
+      <TABLE2>
   ORDER BY
-      COLUMNS1
+      <COLUMNS1>
 
 und
 
   -- Alle Zeilen in Tabelle 2, die nicht in Tabelle 1 vorkommen
   
   SELECT
-      COLUMNS2
+      <COLUMNS2>
   FROM
-      TABLE2
+      <TABLE2>
   EXCEPT
   SELECT
-      COLUMNS1
+      <COLUMNS1>
   FROM
-      TABLE1
+      <TABLE1>
   ORDER BY
-      COLUMNS2
+      <COLUMNS2>
 
 Sind beide Differenzmengen leer, sind die Tabellen identisch.
 
@@ -5240,7 +5240,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.178
+1.179
 
 =head1 AUTHOR
 

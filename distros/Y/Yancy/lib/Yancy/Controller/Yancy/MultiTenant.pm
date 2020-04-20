@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::MultiTenant;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: A controller to show a user only their content
 
 #pod =head1 SYNOPSIS
@@ -116,6 +116,8 @@ use Yancy::Util qw( derp );
 #pod This method is used to list content owned by the given user (specified
 #pod in the C<user_id> stash value).
 #pod
+#pod =head4 Input Stash
+#pod
 #pod This method extends L<Yancy::Controller::Yancy/list> and adds the
 #pod following configuration and stash values:
 #pod
@@ -154,6 +156,8 @@ sub list {
 #pod
 #pod This method is used to show a single item owned by a user (given by the
 #pod C<user_id> stash value).
+#pod
+#pod =head4 Input Stash
 #pod
 #pod This method extends L<Yancy::Controller::Yancy/get> and adds the
 #pod following configuration and stash values:
@@ -206,6 +210,8 @@ sub get {
 #pod This method does not authenticate users. User authentication and
 #pod authorization should be performed by an auth plugin like
 #pod L<Yancy::Plugin::Auth::Basic>.
+#pod
+#pod =head4 Input Stash
 #pod
 #pod This method extends L<Yancy::Controller::Yancy/set> and adds the
 #pod following configuration and stash values:
@@ -266,6 +272,8 @@ sub set {
 #pod This method does not authenticate users. User authentication and
 #pod authorization should be performed by an auth plugin like
 #pod L<Yancy::Plugin::Auth::Basic>.
+#pod
+#pod =head4 Input Stash
 #pod
 #pod This method extends L<Yancy::Controller::Yancy/delete> and adds the
 #pod following configuration and stash values:
@@ -335,7 +343,7 @@ Yancy::Controller::Yancy::MultiTenant - A controller to show a user only their c
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 
@@ -388,6 +396,8 @@ by a user's ID.
 This method is used to list content owned by the given user (specified
 in the C<user_id> stash value).
 
+=head4 Input Stash
+
 This method extends L<Yancy::Controller::Yancy/list> and adds the
 following configuration and stash values:
 
@@ -414,6 +424,8 @@ The field in the item that holds the user ID. Defaults to C<user_id>.
 
 This method is used to show a single item owned by a user (given by the
 C<user_id> stash value).
+
+=head4 Input Stash
 
 This method extends L<Yancy::Controller::Yancy/get> and adds the
 following configuration and stash values:
@@ -459,6 +471,8 @@ This method does not authenticate users. User authentication and
 authorization should be performed by an auth plugin like
 L<Yancy::Plugin::Auth::Basic>.
 
+=head4 Input Stash
+
 This method extends L<Yancy::Controller::Yancy/set> and adds the
 following configuration and stash values:
 
@@ -495,6 +509,8 @@ or the user will be forwarded to another place.
 This method does not authenticate users. User authentication and
 authorization should be performed by an auth plugin like
 L<Yancy::Plugin::Auth::Basic>.
+
+=head4 Input Stash
 
 This method extends L<Yancy::Controller::Yancy/delete> and adds the
 following configuration and stash values:

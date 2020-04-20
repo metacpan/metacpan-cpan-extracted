@@ -3,3 +3,7 @@ Revision history for Colouring-In
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.17    2020-04-20
+	- toTerm method that output colours in the format rNNNgNNNbNNN
+	- toOnTerm method that output colours in the format on_rNNNgNNNbNNN
+

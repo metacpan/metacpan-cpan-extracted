@@ -1,3 +1,19 @@
+2.045002 - 2020-04-19
+
+  [ENHANCEMENTS]
+
+  * allow API to work with non-root hosting (where path is not '/')
+
+  [BUG FIXES]
+
+  * rename ports column in device table to be num_ports
+
+2.045001 - 2020-04-18
+
+  [BUG FIXES]
+
+  * restore ports column in device table to fix discover bug
+
 2.045000 - 2020-04-15
 
   [NEW FEATURES]

@@ -4,38 +4,55 @@
       "Dan Book <dbook@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojo-Reactor-POE",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Zilla::PluginBundle::Author::DBOOK" : "0.003"
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Mojolicious" : "5.70",
+            "Mojolicious" : "7.37",
             "POE" : "1.366",
             "Scalar::Util" : "0",
             "perl" : "5.010001"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "File::Spec" : "0",
             "IO::Socket::INET" : "0",
+            "Module::Metadata" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -43,7 +60,7 @@
    "provides" : {
       "Mojo::Reactor::POE" : {
          "file" : "lib/Mojo/Reactor/POE.pm",
-         "version" : "0.009"
+         "version" : "1.000"
       }
    },
    "release_status" : "stable",
@@ -56,8 +73,16 @@
          "type" : "git",
          "url" : "https://github.com/Grinnz/Mojo-Reactor-POE.git",
          "web" : "https://github.com/Grinnz/Mojo-Reactor-POE"
-      }
+      },
+      "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "0.009"
+   "version" : "1.000",
+   "x_contributors" : [
+      "Dan Book <grinnz@grinnz.com>",
+      "Grinnz <grinnz@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.30.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

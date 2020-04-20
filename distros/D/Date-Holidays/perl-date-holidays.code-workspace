@@ -1,11 +1,27 @@
 {
 	"folders": [
 		{
+			"name": "Everything",
 			"path": "."
+		},
+        {
+            // Source code
+            "name": "Library",
+            "path": "lib"
+        },
+        {
+            // Docs and release notes
+            "name": "Tests",
+            "path": "t"
+        },
+        {
+            // Yeoman extension generator
+            "name": "Scripts",
+            "path": "scripts"
 		}
 	],
 	"settings": {
-		"perlSyntax.perlExecutable": "/Users/jonasbn/perl5/perlbrew/perls/perl-5.22.3/bin/perl",
+		"perlSyntax.perlExecutable": "/Users/jonasbn/perl5/perlbrew/perls/perl-5.28.1/bin/perl",
 		"perlSyntax.includePaths": [
 			"t",
 			"lib",
@@ -13,7 +29,9 @@
 		],
 		"perlcritic.severity": "brutal",
 		"perlcritic.additionalArguments": [
-			"-p t/perlcritic.rc"
-		]
+			"--profile",
+			"t/perlcritic.rc"
+		],
+		"perlcritic.trace.server": "verbose"
 	}
 }

@@ -70,8 +70,10 @@ METHODS
  again
 
       $reactor->again($id);
+      $reactor->again($id, 0.5);
 
-    Restart timer. Note that this method requires an active timer.
+    Restart timer and optionally change the invocation time. Note that this
+    method requires an active timer.
 
  io
 
@@ -148,9 +150,10 @@ METHODS
 CAVEATS
 
     When using Mojo::IOLoop with UV, the event loop must be controlled by
-    Mojo::IOLoop or Mojo::Reactor::UV, such as with the methods "start",
-    "stop", and "one_tick". Starting or stopping the event loop through UV
-    will not provide required functionality to Mojo::IOLoop applications.
+    Mojo::IOLoop or Mojo::Reactor::UV, such as with the methods "start" in
+    Mojo::IOLoop, "stop" in Mojo::IOLoop, and "one_tick". Starting or
+    stopping the event loop through UV will not provide required
+    functionality to Mojo::IOLoop applications.
 
     Care should be taken that file descriptors are not closed while being
     watched by the reactor. They can be safely closed after calling "watch"

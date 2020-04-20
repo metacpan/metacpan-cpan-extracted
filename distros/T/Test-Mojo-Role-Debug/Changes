@@ -1,5 +1,8 @@
 Revision history for Test-Mojo-Role-Debug
 
+1.004001  2020-04-18
+    - Added ability to dump data to file
+
 1.003004  2015-11-16
     - Fix warnings on older perls; for real this time
 

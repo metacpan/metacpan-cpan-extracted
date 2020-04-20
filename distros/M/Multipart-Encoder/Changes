@@ -1,5 +1,9 @@
 Revision history for Perl extension Multipart-Encoder
 
+v0.0.9 2020-04-20T14:26:04Z
+
+    - fix test on application/(x-)?gzip
+
 v0.0.7 2020-04-09T16:35:54Z
 
     - remove non-used condition

@@ -1,4 +1,4 @@
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 
 BEGIN { use_ok( 'WWW::Trello::Lite' ); }
@@ -11,5 +11,6 @@ my $request = WWW::Trello::Lite->new(
 );
 my $response = $request->get( 'lists/invalidlist' );
 
-is( $response->failed, '', 'Verified connection to Trello' );
-is( $response->response->content, "invalid key\n", 'Reported invalid board' );
+ok( defined( $response ), 'Verified connection to Trello' );
+ok( defined( $response->response ), 'Trello return code' );
+like( $response->response->content(), qr/^invalid key\b/i, 'Reported invalid board' );

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION='0.03';
+our $VERSION='0.09';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -67,7 +67,7 @@ for my $astestfunc (sort keys %testfuncs){
 	no strict 'refs';
 	my $astestfuncstr = 'Data::Roundtrip::'.$astestfunc;
 	my $result = $astestfuncstr->($perl_var, $params);
-	ok(defined $result, "$astestfunc() called.") or BAIL_OUT; $num_tests++;
+	ok(defined $result, "$astestfunc() called."); $num_tests++;
 	my $areversefunc = $testfuncs{$astestfunc};
 	my $areversefuncstr = 'Data::Roundtrip::'.$areversefunc;
 	my $back = $areversefuncstr->($result, $params);
@@ -84,7 +84,7 @@ for my $astestfunc (sort keys %testfuncs){
 	no strict 'refs';
 	my $astestfuncstr = 'Data::Roundtrip::'.$astestfunc;
 	my $result = $astestfuncstr->($perl_var, $params);
-	ok(defined $result, "$astestfunc() called.") or BAIL_OUT; $num_tests++;
+	ok(defined $result, "$astestfunc() called."); $num_tests++;
 	my $areversefunc = $testfuncs{$astestfunc};
 	my $areversefuncstr = 'Data::Roundtrip::'.$areversefunc;
 	my $back = $areversefuncstr->($result, $params);

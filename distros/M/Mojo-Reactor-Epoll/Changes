@@ -1,5 +1,9 @@
+0.010     2020-04-19 21:38:53 EDT
+  - Delegate to Mojo::Reactor::Poll again method to support changing invocation
+    time of active timers in Mojolicious 8.37+
+
 0.009     2019-10-02 12:07:34 EDT
-  - Defer creation of the epoll handle until the loop is started to support preforking use cases like Hypnotoad
+  - Defer creation of the epoll handle until the loop is started to support preforking use cases like Hypnotoad (#4, leonerd)
 
 0.008     2018-03-28 15:10:42 EDT
   - Require Linux::Epoll 0.013 to fix compatibility with tied/global handles and recent versions of Net::DNS::Native

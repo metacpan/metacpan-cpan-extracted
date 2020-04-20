@@ -343,6 +343,7 @@ setsockopt (self, option, value)
 			case ZMQ_ROUTER_HANDOVER:
 			case ZMQ_ROUTER_MANDATORY:
 			case ZMQ_ROUTER_RAW:
+			case ZMQ_ROUTER_NOTIFY:
 			case ZMQ_SNDBUF:
 			case ZMQ_SNDHWM:
 			case ZMQ_SNDTIMEO:
@@ -386,7 +387,7 @@ setsockopt (self, option, value)
 
 			// binary
 			case ZMQ_CONNECT_RID:
-			case ZMQ_IDENTITY:
+			case ZMQ_ROUTING_ID:
 			case ZMQ_PLAIN_PASSWORD:
 			case ZMQ_PLAIN_USERNAME:
 			case ZMQ_SOCKS_PROXY:

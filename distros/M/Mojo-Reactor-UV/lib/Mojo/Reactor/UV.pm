@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Reactor::Poll';
 $ENV{MOJO_REACTOR} ||= 'Mojo::Reactor::UV';
 
 use Carp 'croak';
-use Mojo::Util 'md5_sum';
+use Mojo::Util qw(md5_sum steady_time);
 use Scalar::Util 'weaken';
 use UV;
 use UV::Poll;
@@ -13,7 +13,7 @@ use UV::Loop;
 
 use constant DEBUG => $ENV{MOJO_REACTOR_UV_DEBUG} || 0;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 my $UV;
 
@@ -32,14 +32,22 @@ sub new {
 sub DESTROY { undef $UV if shift->{loop_singleton} }
 
 sub again {
-	my $self = shift;
-	croak 'Timer not active' unless my $timer = $self->{timers}{shift()};
-	$self->_error($timer->{watcher}->again);
+	my ($self, $id, $after) = @_;
+	croak 'Timer not active' unless my $timer = $self->{timers}{$id};
+	my $w = $timer->{watcher};
+	if (defined $after) {
+		$after *= 1000; # Intervals in milliseconds
+		# Timer will not repeat with (integer) interval of 0
+		$after = 1 if $after < 1;
+		$self->_error($w->repeat($after));
+	}
+	$self->_error($w->again);
 }
 
 sub io {
 	my ($self, $handle, $cb) = @_;
-	my $fd = fileno $handle;
+	my $fd = fileno($handle) // croak 'Handle is closed';
+	# Must use existing watcher if present
 	$self->{io}{$fd}{cb} = $cb;
 	warn "-- Set IO watcher for $fd\n" if DEBUG;
 	return $self->watch($handle, 1, 1);
@@ -58,7 +66,7 @@ sub remove {
 	my ($self, $remove) = @_;
 	return unless defined $remove;
 	if (ref $remove) {
-		my $fd = fileno $remove;
+		my $fd = fileno($remove) // croak 'Handle is closed';
 		if (exists $self->{io}{$fd}) {
 			warn "-- Removed IO watcher for $fd\n" if DEBUG;
 			my $w = delete $self->{io}{$fd}{watcher};
@@ -78,7 +86,7 @@ sub remove {
 sub reset {
 	my $self = shift;
 	$self->{loop}->walk(sub { $_[0]->close });
-	delete @{$self}{qw(io next_tick next_timer timers)};
+	$self->SUPER::reset;
 }
 
 sub timer { shift->_timer(0, @_) }
@@ -122,7 +130,7 @@ sub _error {
 sub _id {
 	my $self = shift;
 	my $id;
-	do { $id = md5_sum 't' . $self->{loop}->now() . rand 999 } while $self->{timers}{$id};
+	do { $id = md5_sum 't' . steady_time . rand } while $self->{timers}{$id};
 	return $id;
 }
 
@@ -232,8 +240,10 @@ Construct a new L<Mojo::Reactor::UV> object.
 =head2 again
 
   $reactor->again($id);
+  $reactor->again($id, 0.5);
 
-Restart timer. Note that this method requires an active timer.
+Restart timer and optionally change the invocation time. Note that this method
+requires an active timer.
 
 =head2 io
 
@@ -309,9 +319,10 @@ this method requires an active I/O watcher.
 =head1 CAVEATS
 
 When using L<Mojo::IOLoop> with L<UV>, the event loop must be controlled by
-L<Mojo::IOLoop> or L<Mojo::Reactor::UV>, such as with the methods L</"start">,
-L</"stop">, and L</"one_tick">. Starting or stopping the event loop through
-L<UV> will not provide required functionality to L<Mojo::IOLoop> applications.
+L<Mojo::IOLoop> or L<Mojo::Reactor::UV>, such as with the methods
+L<Mojo::IOLoop/"start">, L<Mojo::IOLoop/"stop">, and L</"one_tick">. Starting
+or stopping the event loop through L<UV> will not provide required
+functionality to L<Mojo::IOLoop> applications.
 
 Care should be taken that file descriptors are not closed while being watched
 by the reactor. They can be safely closed after calling L</"watch"> with

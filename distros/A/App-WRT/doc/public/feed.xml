@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>wrt: WRiting Tool::feed</title><subtitle>manual for wrt</subtitle><link href="https://example.com/"/><link href="https://example.com/feed" rel="self"/><icon>https://example.com/favicon.png</icon><author><name>Brennen Bearnes</name></author><id>https://example.com/</id><generator>App::WRT.pm / XML::Atom::SimpleFeed</generator><updated>2020-04-07T23:29:43Z</updated></feed>

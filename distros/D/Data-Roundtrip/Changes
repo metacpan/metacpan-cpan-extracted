@@ -18,3 +18,15 @@ Revision history for Data-Roundtrip
 
 0.05	2020-04-16
 	Makefile.PL minor modification.
+
+0.07	2020-04-20
+	Changed default options for scripts so that they don't do pretty
+	printing by default.
+	Added import parameters 'no-unicode-escape-permanently'
+	and 'unicode-escape-permanently' for efficient use of *2dump*
+	subs.
+	Added benchmarks to time 2dump subs and inserted target in Makefile.
+
+0.08	2020-04-20
+	Removed dependency to Sub::Override, overriding subs is done by us now.
+	Fixed POD mistakes.

@@ -6,7 +6,7 @@ use vars qw($VERSION);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 use constant DEFAULT_STATE => 'VIC';
 
@@ -48,7 +48,7 @@ Date::Holidays::Adapter::AU - an adapter class for Date::Holidays::AU
 
 =head1 VERSION
 
-This POD describes version 1.18 of Date::Holidays::Adapter::AU
+This POD describes version 1.19 of Date::Holidays::Adapter::AU
 
 =head1 DESCRIPTION
 

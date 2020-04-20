@@ -1,7 +1,7 @@
 package App::ListOrgHeadlines;
 
-our $DATE = '2020-04-12'; # DATE
-our $VERSION = '0.474'; # VERSION
+our $DATE = '2020-04-18'; # DATE
+our $VERSION = '0.476'; # VERSION
 
 use 5.010001;
 use strict;
@@ -415,7 +415,7 @@ App::ListOrgHeadlines - List all headlines in all Org files
 
 =head1 VERSION
 
-This document describes version 0.474 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2020-04-12.
+This document describes version 0.476 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2020-04-18.
 
 =head1 SYNOPSIS
 

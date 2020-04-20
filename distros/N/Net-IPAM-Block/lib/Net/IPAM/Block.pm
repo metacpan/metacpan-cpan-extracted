@@ -1,21 +1,23 @@
 package Net::IPAM::Block;
 
+our $VERSION = '1.10';
+
 use 5.10.0;
 use strict;
 use warnings;
-
-our $VERSION = '1.09';
-
-use overload
-  '""'     => sub { shift->to_string },
-  bool     => sub { 1 },
-  fallback => 1;
+use utf8;
 
 use Carp qw(croak);
 use List::Util qw(any all);
 use Scalar::Util qw(blessed);
+###
+use namespace::clean;
 
-use Net::IPAM::IP qw(incr_n);
+use Net::IPAM::IP;
+use overload
+  '""'     => sub { shift->to_string },
+  bool     => sub { 1 },
+  fallback => 1;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(aggregate);
@@ -298,7 +300,7 @@ sub cidrsplit {
   my $last1_n = _make_last_n( $base_n, $next_mask_n );
 
   # make next base by incrementing last
-  my $base2_n = incr_n($last1_n);
+  my $base2_n = Net::IPAM::IP::incr_n($last1_n);
   my $last2_n = _make_last_n( $base2_n, $next_mask_n );
 
   # make new cidr blocks
@@ -392,7 +394,7 @@ sub to_cidrs {
     }
 
     #  move the $cursor one behind last
-    $cursor_n = incr_n($last_n) // die 'OVERFLOW: logic error,';
+    $cursor_n = Net::IPAM::IP::incr_n($last_n) // die 'OVERFLOW: logic error,';
   }
 
   return wantarray ? @result : [@result];

@@ -1,10 +1,21 @@
 package Net::IPAM::IP;
 
+our $VERSION = '1.16';
+
+use 5.10.0;
 use strict;
 use warnings;
-our $VERSION = '1.14';
+use utf8;
 
+use Carp qw/carp croak/;
 use Socket qw/:addrinfo AF_INET AF_INET6 AF_UNSPEC SOCK_RAW/;
+####
+use namespace::clean;
+
+use overload
+  '""'     => sub { shift->to_string },
+  bool     => sub { 1 },
+  fallback => 1;
 
 # On some platforms, inet_pton accepts various forms of invalid input or discards valid input.
 # In this case use a (slower) pure-perl implementation for Socket::inet_pton.
@@ -27,15 +38,6 @@ BEGIN {
     *Socket::inet_ntop = \&_inet_ntop_pp;
   }
 }
-
-use Carp qw/croak/;
-use Exporter 'import';
-our @EXPORT_OK = qw(incr_n);
-
-use overload
-  '""'     => sub { shift->to_string },
-  bool     => sub { 1 },
-  fallback => 1;
 
 =head1 NAME
 
@@ -60,8 +62,8 @@ Net::IPAM::IP - A library for reading, formatting, sorting and converting IP-add
   say $ip2->expand;       # fe80:0000:0000:0000:0000:0000:0000:0001
   say $ip2->reverse;      # 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f
 
-  $ip = Net::IPAM::IP->new_from_bytes(pack('C4', 192, 168, 0, 1));       # 192.168.0.1
-  $ip = Net::IPAM::IP->new_from_bytes(pack('N4', 0x20010db8, 0, 0, 1,)); # 2001:db8::1
+  $ip = Net::IPAM::IP->new_from_bytes( pack( 'C4', 192,    168,   0, 1 ) );                 # 192.168.0.1
+  $ip = Net::IPAM::IP->new_from_bytes( pack( 'n8', 0x2001, 0xdb8, 0, 0, 0, 0, 0, 1, ) );    # 2001:db8::1
 
   @ips = Net::IPAM::IP->getaddrs('dns.google.');
   say "@ips";  #  8.8.8.8 8.8.4.4 2001:4860:4860::8844 2001:4860:4860::8888
@@ -168,7 +170,7 @@ Returns a list of ip objects for a given $name or undef if there is no RR record
 
 L</"getaddrs"> calls the L<Socket> functions C<< getaddrinfo() >> and C<< getnameinfo() >> under the hood.
 
-With no error callback L</getaddrs> just calls C<< warn() >> with underlying Socket errors.
+With no error callback L</getaddrs> just calls C<< carp() >> with underlying Socket errors.
 
 For granular error handling use your own error callback:
 
@@ -192,7 +194,7 @@ reporting underlying Socket errors.
 
 sub getaddrs {
   my ( $class, $name, $error_cb ) = @_;
-  $error_cb //= sub { warn "@_" };
+  $error_cb //= sub { carp "@_" };
 
   unless ( defined $name ) {
     $error_cb->( 0, "missing argument" );
@@ -229,24 +231,6 @@ sub getaddrs {
 =head1 METHODS
 
 L<Net::IPAM::IP> implements the following methods:
-
-=head2 bytes
-
-  $ip = Net::IPAM::IP->new('fe80::');
-  $bytes = $ip->bytes;    # "\xfe\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-
-  $ip    = Net::IPAM::IP->new('10.0.0.1');
-  $bytes = $ip->bytes;    # "\x0a\x00\x00\x01"
-
-Returns the packed IP address as byte-string. It's the opposite to L</"new_from_bytes">
-
-=cut
-
-sub bytes {
-
-  # drop first byte (version) and return the packed IP address,
-  return substr( $_[0]->{binary}, 1 );
-}
 
 =head2 cmp
 
@@ -306,7 +290,7 @@ Returns the input string in canonical form.
 
 Stringification is overloaded with L</"to_string">
 
-  my $ip = Net::IPAM::IP->new('Fe80::0001') // die 'wrong format,';;
+  my $ip = Net::IPAM::IP->new('Fe80::0001') // die 'wrong format';
   say $ip; # fe80::1
 
 =cut
@@ -431,7 +415,7 @@ Returns the DNS name for the ip object or undef if there is no PTR RR.
 
 L</"getname"> calls the L<Socket> functions C<< getaddrinfo() >> and C<< getnameinfo() >> under the hood.
 
-With no error callback L</getname> just calls C<< warn() >> with underlying Socket errors.
+With no error callback L</getname> just calls C<< carp() >> with underlying Socket errors.
 
 =head3 LIMITATION:
 
@@ -442,7 +426,7 @@ use L<Net::DNS> or similar modules.
 =cut
 
 sub getname {
-  my $error_cb = $_[1] // sub { warn "@_" };
+  my $error_cb = $_[1] // sub { carp "@_" };
 
   my ( $err, @res ) =
     getaddrinfo( $_[0], '', { socktype => SOCK_RAW, flags => AI_NUMERICHOST, family => AF_UNSPEC } );
@@ -465,6 +449,40 @@ sub getname {
 
   return $name;
 }
+
+=head2 bytes
+
+  $ip = Net::IPAM::IP->new('fe80::');
+  $bytes = $ip->bytes;    # "\xfe\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+
+  $ip    = Net::IPAM::IP->new('10.0.0.1');
+  $bytes = $ip->bytes;    # "\x0a\x00\x00\x01"
+
+Returns the packed IP address as byte-string. It's the opposite to L</"new_from_bytes">
+
+=cut
+
+sub bytes {
+
+  # drop first byte (version) and return the packed IP address,
+  return substr( $_[0]->{binary}, 1 );
+}
+
+=head1 OPERATORS
+
+L<Net::IPAM::IP> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$ip;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$ip";
+
+Alias for L</"to_string">.
 
 =head1 FUNCTIONS
 
@@ -609,22 +627,6 @@ sub _inet_pton_v6_pp {
   my $n = pack( 'n8', map { hex } @hextets );
   return $n;
 }
-
-=head1 OPERATORS
-
-L<Net::IPAM::IP> overloads the following operators.
-
-=head2 bool
-
-  my $bool = !!$ip;
-
-Always true.
-
-=head2 stringify
-
-  my $str = "$ip";
-
-Alias for L</"to_string">.
 
 =head1 WARNING
 

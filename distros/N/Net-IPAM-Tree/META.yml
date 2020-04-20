@@ -16,14 +16,15 @@ name: Net-IPAM-Tree
 provides:
   Net::IPAM::Tree:
     file: lib/Net/IPAM/Tree.pm
-    version: '1.07'
+    version: '1.09'
   Net::IPAM::Tree::Node:
     file: lib/Net/IPAM/Tree/Node.pm
 requires:
   List::MoreUtils: 0.420_001
-  Net::IPAM::Block: '1.03'
-  Net::IPAM::IP: '1.06'
+  Net::IPAM::Block: '1.10'
+  Net::IPAM::IP: '1.16'
   Scalar::Util: '1.39'
+  namespace::clean: '0'
   perl: v5.10.0
-version: '1.07'
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

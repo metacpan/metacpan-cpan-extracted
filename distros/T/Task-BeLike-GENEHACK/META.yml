@@ -1,60 +1,67 @@
 ---
 abstract: 'individuality via conformity'
 author:
-  - 'John SJ Anderson <genehack@genehack.org>'
+  - 'John SJ Anderson <john@genehack.org>'
 build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0'
-  blib: '1.01'
+  Test::More: '0.94'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Task-BeLike-GENEHACK
 requires:
+  App::Ack: '0'
+  App::BashComplete: '0'
   App::Cmd: '0'
-  App::GitGitr: '0'
-  App::GitGot: '0'
   App::MiseEnPlace: '0'
   App::Nopaste: '0'
-  App::Uni: '0'
   App::cpanminus: '0'
   App::cpanoutdated: '0'
-  App::pmuninstall: '0'
+  App::perlbrew: '0'
   Audio::M4P::QuickTime: '0'
-  Data::Printer: '0'
+  Bash::Completion: '0'
+  Bash::Completion::Plugins::cpanm: '0'
+  Bash::Completion::Plugins::perlbrew: '0'
+  CPAN::Mini: '0'
+  DBD::SQLite: '0'
+  Data::Dump::Streamer: '0'
   DateTime: '0'
   Devel::Cover: '0'
+  Devel::REPL: '0'
   Dist::Zilla::App::Command::cover: '0'
-  Dist::Zilla::Plugin::MakeMaker::Awesome: '0'
-  Dist::Zilla::Plugin::OSPrereqs: '0'
   Dist::Zilla::PluginBundle::GENEHACK: '0'
-  Git::Wrapper: '0'
-  HiD: '0'
-  HiD::Generator::Sass: '0'
+  File::Slurp: '0'
   Imager: '0'
   List::MoreUtils: '0'
+  Modern::Perl: '0'
   Module::CoreList: '0'
   Module::Install: '0'
   Module::Which: '0'
-  Moo: '0'
   Moose: '0'
   MooseX::App::Cmd: '0'
+  MooseX::Declare: '0'
   MooseX::amine: '0'
   Perl::Tidy: '0'
   Pod::Coverage::TrustPod: '0'
-  Pod::Cpandoc: '0'
-  Reply: '0'
-  Template::Plugin::Markdown: '0'
-  Term::ReadLine::Perl: '0'
+  Task::Catalyst: '0'
+  Task::Kensho: '0'
+  Task::Kensho::CLI: '0'
+  Task::Kensho::Config: '0'
+  Task::Kensho::Dates: '0'
+  Task::Kensho::Hackery: '0'
+  Task::Kensho::ModuleDev: '0'
+  Task::Kensho::WebDev: '0'
+  Task::Kensho::XML: '0'
+  Task::KiokuDB: '0'
   Test::Class: '0'
   Test::Exception: '0'
   Test::MockObject::Extends: '0'
@@ -63,6 +70,9 @@ requires:
   Test::Pod::Coverage: '0'
   Text::FindIndent: '0'
   Try::Tiny: '0'
+  XML::LibXML: '0'
+  XML::Simple: '0'
+  XML::Writer: '0'
   YAML: '0'
   autodie: '0'
   local::lib: '0'
@@ -71,14 +81,18 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/genehack/task-belike-genehack/issues
-  homepage: https://github.com/genehack/task-belike-genehack
-  repository: https://github.com/genehack/task-belike-genehack.git
-version: '0.304'
+  bugtracker: https://git.genehack.net/genehack/task-belike-genehack
+  homepage: https://git.genehack.net/genehack/task-belike-genehack
+  repository: https://git.genehack.net/genehack/task-belike-genehack
+version: '0.400'
 x_Dist_Zilla:
   perl:
-    version: '5.027002'
+    version: '5.031010'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -94,58 +108,58 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@GENEHACK/GatherDir'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@GENEHACK/@Filter/PruneCruft'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@GENEHACK/@Filter/ManifestSkip'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@GENEHACK/@Filter/MetaYAML'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::License
       name: '@GENEHACK/@Filter/License'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@GENEHACK/@Filter/ExtraTests'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@GENEHACK/@Filter/ExecDir'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@GENEHACK/@Filter/ShareDir'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@GENEHACK/@Filter/MakeMaker'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@GENEHACK/@Filter/Manifest'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@GENEHACK/@Filter/TestRelease'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@GENEHACK/@Filter/ConfirmRelease'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@GENEHACK/@Filter/UploadToCPAN'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -154,22 +168,22 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.26.1
           repo_root: .
       name: '@GENEHACK/Git::NextVersion'
-      version: '2.042'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@GENEHACK/AutoPrereqs'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@GENEHACK/CheckChangesHasContent'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@GENEHACK/PkgVersion'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@GENEHACK/Authority'
@@ -185,19 +199,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@GENEHACK/MetaConfig'
-      version: '6.010'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@GENEHACK/MetaResources'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@GENEHACK/MetaJSON'
-      version: '6.010'
-    -
-      class: Dist::Zilla::Plugin::GithubMeta
-      name: '@GENEHACK/GithubMeta'
-      version: '0.54'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@GENEHACK/InstallGuide'
-      version: '1.200007'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@GENEHACK/CopyFilesFromBuild'
@@ -205,19 +223,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@GENEHACK/NextRelease'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@GENEHACK/ExtraTests'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@GENEHACK/PodCoverageTests'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@GENEHACK/PodSyntaxTests'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::Test::EOL
       config:
@@ -234,7 +252,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: '1'
           fail_on_warning: author
           fake_home: 0
           filename: t/00-compile.t
@@ -247,14 +265,14 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@GENEHACK/Test::Compile'
-      version: '2.056'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in:
             - releases
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -262,12 +280,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.26.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@GENEHACK/Git::Commit'
-      version: '2.042'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -275,16 +293,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.304
-          tag_format: v%v
-          tag_message: v%v
+          tag: v0.400
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.26.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@GENEHACK/Git::Tag'
-      version: '2.042'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: '@GENEHACK/InstallRelease'
@@ -297,10 +315,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.26.1
           repo_root: .
       name: '@GENEHACK/Git::Push'
-      version: '2.042'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Twitter
       name: '@GENEHACK/Twitter'
@@ -313,9 +331,9 @@ x_Dist_Zilla:
           quiet: 0
           run:
             - 'rm -f Makefile.PL'
-          version: '0.046'
+          version: '0.048'
       name: '@GENEHACK/Run::BeforeBuild'
-      version: '0.046'
+      version: '0.048'
     -
       class: Dist::Zilla::Plugin::Run::AfterBuild
       config:
@@ -325,9 +343,9 @@ x_Dist_Zilla:
           run:
             - 'cp %d/Makefile.PL ./'
             - "git status --porcelain | grep 'M Makefile.PL' && git commit -m 'auto-committed by dist.ini' Makefile.PL || echo Makefile.PL up to date"
-          version: '0.046'
+          version: '0.048'
       name: '@GENEHACK/Run::AfterBuild'
-      version: '0.046'
+      version: '0.048'
     -
       class: Dist::Zilla::Plugin::Run::Release
       config:
@@ -336,53 +354,55 @@ x_Dist_Zilla:
           quiet: 0
           run:
             - 'mv %a ./releases/'
-          version: '0.046'
+          version: '0.048'
       name: '@GENEHACK/Run::Release'
-      version: '0.046'
+      version: '0.048'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.010'
+      version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.010'
+      version: '6.014'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.010'
+    version: '6.014'
 x_authority: cpan:GENEHACK
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.31.10
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

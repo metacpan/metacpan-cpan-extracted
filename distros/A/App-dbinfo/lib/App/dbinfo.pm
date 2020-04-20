@@ -1,9 +1,9 @@
 package App::dbinfo;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2020-04-20'; # DATE
 our $DIST = 'App-dbinfo'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,7 +17,7 @@ $SPEC{':package'} = {
     summary => 'Get/extract information from database',
 };
 
-our %args_common = (
+our %args_common_dbi = (
     dsn => {
         summary => 'DBI data source, '.
             'e.g. "dbi:SQLite:dbname=/path/to/db.db"',
@@ -45,6 +45,14 @@ _
         summary => 'Alternative to specifying dsn/user/password (from Perl)',
         schema => 'obj*',
         tags => ['connection', 'common', 'hidden-cli'],
+    },
+);
+
+our %args_common_sqlite = (
+    dbpath => {
+        schema => 'filename*',
+        tags => ['connection', 'common'],
+        pos => 0,
     },
 );
 
@@ -93,7 +101,8 @@ $SPEC{list_tables} = {
     v => 1.1,
     summary => 'List tables in the database',
     args => {
-        %args_common,
+        %args_common_dbi,
+        # XXX detail
     },
     args_rels => {
         %args_rels_common,
@@ -107,14 +116,32 @@ sub list_tables {
     my $dbh = _connect(\%args);
 
     return [200, "OK", [
-            DBIx::Diff::Schema::_list_tables($dbh)]];
+            DBIx::Diff::Schema::list_tables($dbh)]];
+}
+
+$SPEC{list_sqlite_tables} = {
+    v => 1.1,
+    summary => 'List tables in the SQLite database',
+    args => {
+        %args_common_sqlite,
+    },
+    args_rels => {
+    },
+};
+sub list_sqlite_tables {
+    my %args = @_;
+    my $dsn; $dsn = "dbi:SQLite:dbname=".delete($args{dbpath}) if defined $args{dbpath};
+    list_tables(
+        dsn => $dsn,
+        %args
+    );
 }
 
 $SPEC{list_columns} = {
     v => 1.1,
     summary => 'List columns of a table',
     args => {
-        %args_common,
+        %args_common_dbi,
         %arg_table,
         %arg_detail,
     },
@@ -146,9 +173,36 @@ sub list_columns {
     return [404, "No such table '$args{table}'"]
         unless grep { $args{table} eq $_ } @$tables;
 
-    my @cols = DBIx::Diff::Schema::_list_columns($dbh, $args{table});
+    my @cols = DBIx::Diff::Schema::list_columns($dbh, $args{table});
     @cols = map { $_->{COLUMN_NAME} } @cols unless $args{detail};
     return [200, "OK", \@cols];
+}
+
+$SPEC{list_sqlite_columns} = {
+    v => 1.1,
+    summary => 'List columns of a SQLite database table',
+    args => {
+        %args_common_sqlite,
+        %arg_table,
+        %arg_detail,
+    },
+    args_rels => {
+    },
+    examples => [
+        {
+            args => {dbpath=>'/tmp/test.db', table=>'main.table1'},
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
+};
+sub list_sqlite_columns {
+    my %args = @_;
+    my $dsn; $dsn = "dbi:SQLite:dbname=".delete($args{dbpath}) if defined $args{dbpath};
+    list_columns(
+        dsn => $dsn,
+        %args
+    );
 }
 
 our %args_dump_table = (
@@ -201,7 +255,7 @@ $SPEC{dump_table} = {
     v => 1.1,
     summary => 'Dump table into various formats',
     args => {
-        %args_common,
+        %args_common_dbi,
         %arg_table,
         %args_dump_table,
     },
@@ -290,6 +344,30 @@ sub dump_table {
     [200, "OK", $code_get_row, {stream=>1}];
 }
 
+$SPEC{dump_sqlite_table} = {
+    v => 1.1,
+    summary => 'Dump SQLite table into various formats',
+    args => {
+        %args_common_sqlite,
+        %arg_table,
+        %args_dump_table,
+    },
+    args_rels => {
+    },
+    result => {
+        schema => 'str*',
+    },
+    examples => [
+    ],
+};
+sub dump_sqlite_table {
+    my %args = @_;
+    my $dsn; $dsn = "dbi:SQLite:dbname=".delete($args{dbpath}) if defined $args{dbpath};
+    dump_table(
+        dsn => $dsn,
+        %args
+    );
+}
 
 1;
 # ABSTRACT: Get/extract information from database
@@ -306,13 +384,63 @@ App::dbinfo - Get/extract information from database
 
 =head1 VERSION
 
-This document describes version 0.005 of App::dbinfo (from Perl distribution App-dbinfo), released on 2019-11-29.
+This document describes version 0.006 of App::dbinfo (from Perl distribution App-dbinfo), released on 2020-04-20.
 
 =head1 SYNOPSIS
 
-See included script L<dbinfo>.
+See included scripts L<dbinfo>, L<dbinfo-sqlite>, ...
 
 =head1 FUNCTIONS
+
+
+=head2 dump_sqlite_table
+
+Usage:
+
+ dump_sqlite_table(%args) -> [status, msg, payload, meta]
+
+Dump SQLite table into various formats.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dbpath> => I<filename>
+
+=item * B<exclude_columns> => I<array[str]>
+
+=item * B<include_columns> => I<array[str]>
+
+=item * B<limit_number> => I<uint>
+
+=item * B<limit_offset> => I<uint>
+
+=item * B<row_format> => I<str> (default: "hash")
+
+=item * B<table>* => I<str>
+
+Table name.
+
+=item * B<wheres> => I<array[str]>
+
+Add WHERE clause.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (str)
+
 
 
 =head2 dump_table
@@ -353,11 +481,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<dbh> => I<obj>
 
-Alternative to specifying dsn/user/password (from Perl).
+Alternative to specifying dsnE<sol>userE<sol>password (from Perl).
 
 =item * B<dsn> => I<str>
 
-DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db.db".
+DBI data source, e.g. "dbi:SQLite:dbname=E<sol>pathE<sol>toE<sol>db.db".
 
 =item * B<exclude_columns> => I<array[str]>
 
@@ -383,6 +511,7 @@ Table name.
 =item * B<wheres> => I<array[str]>
 
 Add WHERE clause.
+
 
 =back
 
@@ -425,7 +554,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<dbh> => I<obj>
 
-Alternative to specifying dsn/user/password (from Perl).
+Alternative to specifying dsnE<sol>userE<sol>password (from Perl).
 
 =item * B<detail> => I<bool>
 
@@ -433,7 +562,7 @@ Show detailed information per record.
 
 =item * B<dsn> => I<str>
 
-DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db.db".
+DBI data source, e.g. "dbi:SQLite:dbname=E<sol>pathE<sol>toE<sol>db.db".
 
 =item * B<password> => I<str>
 
@@ -445,6 +574,89 @@ directly as command-line option.
 Table name.
 
 =item * B<user> => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 list_sqlite_columns
+
+Usage:
+
+ list_sqlite_columns(%args) -> [status, msg, payload, meta]
+
+List columns of a SQLite database table.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ list_sqlite_columns(dbpath => "/tmp/test.db", table => "main.table1");
+
+=back
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dbpath> => I<filename>
+
+=item * B<detail> => I<bool>
+
+Show detailed information per record.
+
+=item * B<table>* => I<str>
+
+Table name.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 list_sqlite_tables
+
+Usage:
+
+ list_sqlite_tables(%args) -> [status, msg, payload, meta]
+
+List tables in the SQLite database.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dbpath> => I<filename>
+
 
 =back
 
@@ -477,11 +689,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<dbh> => I<obj>
 
-Alternative to specifying dsn/user/password (from Perl).
+Alternative to specifying dsnE<sol>userE<sol>password (from Perl).
 
 =item * B<dsn> => I<str>
 
-DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db.db".
+DBI data source, e.g. "dbi:SQLite:dbname=E<sol>pathE<sol>toE<sol>db.db".
 
 =item * B<password> => I<str>
 
@@ -489,6 +701,7 @@ You might want to specify this parameter in a configuration file instead of
 directly as command-line option.
 
 =item * B<user> => I<str>
+
 
 =back
 
@@ -523,7 +736,7 @@ feature.
 
 L<DBI>
 
-L<App::diffdb>
+L<diffdb>, L<diffdb-sqlite>, ... (from L<App::diffdb>)
 
 =head1 AUTHOR
 
@@ -531,7 +744,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

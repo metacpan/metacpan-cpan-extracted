@@ -1,5 +1,11 @@
 Revision history for Test-Mojo-Role-ElementCounter
 
+1.001008 2020-04-19
+   - Fix prereqs (#4)
+
+1.001007 2020-04-18
+   - Don't touch others' privates
+
 1.001006 2016-08-11
    - Add workaround for Mojolicious 7.0 Test::Mojo text_is not trimming whitespace
 

@@ -10,14 +10,14 @@ BEGIN {
   use_ok('Net::IPAM::Block') || print "Bail out!\n";
 }
 
+my ( $t, $dup );
 my @blocks = qw(0.0.0.0/0 ::ffff:1.2.3.5 1.2.3.6 1.2.3.7/31 ::/0 fe80::1/10 ::cafe:affe);
 
 my @items;
 foreach my $b (@blocks) {
   push @items, Net::IPAM::Block->new($b);
 }
-my $t = Net::IPAM::Tree->new;
-$t->insert(@items);
+$t = Net::IPAM::Tree->new->insert(@items);
 
 my $str = <<EOT;
 ▼
@@ -32,10 +32,15 @@ EOT
 
 ok( $t->to_string eq $str, 'insert and stringify' );
 
-my $dup = Net::IPAM::Block->new('1.2.3.6');
-{
-  no warnings 'Net::IPAM::Tree';
-  ok( !$t->insert($dup), 'insert dup block' );
-}
+# shut up warnings
+$t   = Net::IPAM::Tree->new( sub { } )->insert(@items);
+$dup = Net::IPAM::Block->new('1.2.3.6');
+ok( !$t->insert($dup), 'insert dup block' );
+
+# die on dups
+$t   = Net::IPAM::Tree->new( sub { die shift } )->insert(@items);
+$dup = Net::IPAM::Block->new('1.2.3.6');
+eval { $t->insert($dup) };
+like( $@, qr/\Q1.2.3.6\E/i, 'dies on dup' );
 
 done_testing();

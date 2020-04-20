@@ -2,8 +2,8 @@ NAME
     DBIx::Diff::Schema - Compare schema of two DBI databases
 
 VERSION
-    This document describes version 0.093 of DBIx::Diff::Schema (from Perl
-    distribution DBIx-Diff-Schema), released on 2018-12-05.
+    This document describes version 0.094 of DBIx::Diff::Schema (from Perl
+    distribution DBIx-Diff-Schema), released on 2020-04-20.
 
 SYNOPSIS
      use DBIx::Diff::Schema qw(diff_db_schema diff_table_schema
@@ -184,6 +184,33 @@ FUNCTIONS
 
     Return value: (any)
 
+  list_table_indexes
+    Usage:
+
+     list_table_indexes($dbh, $table) -> any
+
+    List indexes for a table in a database.
+
+    General notes: information is retrieved from DBI's table_info().
+
+    SQLite notes: autoindex for primary key is also listed as the first
+    index, if it exists. This information is retrieved using "SELECT * FROM
+    sqlite_master". Autoindex is not listed using table_info().
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $table* => *str*
+
+        Table name.
+
+    Return value: (any)
+
   list_tables
     Usage:
 
@@ -262,7 +289,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2015, 2014 by
+    This software is copyright (c) 2020, 2018, 2017, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

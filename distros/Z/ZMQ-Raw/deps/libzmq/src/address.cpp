@@ -68,8 +68,13 @@ zmq::address_t::~address_t ()
     }
 #endif
 
-#if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS                     \
-  && !defined ZMQ_HAVE_VXWORKS
+#ifdef ZMQ_HAVE_WSS
+    else if (protocol == protocol_name::wss) {
+        LIBZMQ_DELETE (resolved.ws_addr);
+    }
+#endif
+
+#if defined ZMQ_HAVE_IPC
     else if (protocol == protocol_name::ipc) {
         LIBZMQ_DELETE (resolved.ipc_addr);
     }
@@ -96,8 +101,11 @@ int zmq::address_t::to_string (std::string &addr_) const
     if (protocol == protocol_name::ws && resolved.ws_addr)
         return resolved.ws_addr->to_string (addr_);
 #endif
-#if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS                     \
-  && !defined ZMQ_HAVE_VXWORKS
+#ifdef ZMQ_HAVE_WSS
+    if (protocol == protocol_name::wss && resolved.ws_addr)
+        return resolved.ws_addr->to_string (addr_);
+#endif
+#if defined ZMQ_HAVE_IPC
     if (protocol == protocol_name::ipc && resolved.ipc_addr)
         return resolved.ipc_addr->to_string (addr_);
 #endif

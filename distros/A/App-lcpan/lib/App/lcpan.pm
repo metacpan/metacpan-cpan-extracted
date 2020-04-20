@@ -1,9 +1,9 @@
 package App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-11'; # DATE
+our $DATE = '2020-04-20'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.049'; # VERSION
+our $VERSION = '1.051'; # VERSION
 
 use 5.010001;
 use strict;
@@ -550,7 +550,7 @@ sub _set_namespace {
 }
 
 our $db_schema_spec = {
-    latest_v => 11,
+    latest_v => 12,
 
     install => [
         'CREATE TABLE author (
@@ -597,6 +597,7 @@ our $db_schema_spec = {
              has_makefilepl INTEGER,
              has_buildpl INTEGER
         )',
+        'CREATE UNIQUE INDEX ix_file__id ON file(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_file__cpanid__name ON file(cpanid,name)',
 
         # files inside the release archive file
@@ -608,6 +609,7 @@ our $db_schema_spec = {
              mtime INT,
              size INT -- uncompressed size
         )',
+        'CREATE UNIQUE INDEX ix_content__id ON content(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_content__file_id__path ON content(file_id, path)',
         'CREATE INDEX ix_content__package ON content(package)',
 
@@ -621,6 +623,7 @@ our $db_schema_spec = {
              content_id INTEGER REFERENCES content(id),
              abstract TEXT
          )',
+        'CREATE UNIQUE INDEX ix_module__id ON module(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_module__name ON module(name)',
         'CREATE INDEX ix_module__file_id ON module(file_id)',
         'CREATE INDEX ix_module__cpanid ON module(cpanid)',
@@ -633,6 +636,7 @@ our $db_schema_spec = {
              content_id INT REFERENCES content(id),
              abstract TEXT
         )',
+        'CREATE UNIQUE INDEX ix_script__id ON script(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_script__file_id__name ON script(file_id, name)',
         'CREATE INDEX ix_script__name ON script(name)',
 
@@ -644,6 +648,7 @@ our $db_schema_spec = {
              module_name TEXT,  -- if mention module and module is unknown (unlisted in module table), only the name will be recorded here
              script_name TEXT   -- if mention script
         )',
+        'CREATE UNIQUE INDEX ix_mention__id ON mention(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_mention__module_id__source_content_id   ON mention(module_id, source_content_id)',
         'CREATE UNIQUE INDEX ix_mention__module_name__source_content_id ON mention(module_name, source_content_id)',
         'CREATE UNIQUE INDEX ix_mention__script_name__source_content_id ON mention(script_name, source_content_id)',
@@ -666,6 +671,7 @@ our $db_schema_spec = {
              version_numified DECIMAL,
              is_latest BOOLEAN -- [cache]
          )',
+        'CREATE UNIQUE INDEX ix_dist__id ON dist(id)', # not created automatically when there is another unique index?
         'CREATE INDEX ix_dist__name ON dist(name)',
         'CREATE UNIQUE INDEX ix_dist__file_id ON dist(file_id)',
         'CREATE INDEX ix_dist__cpanid ON dist(cpanid)',
@@ -698,6 +704,7 @@ our $db_schema_spec = {
              name TEXT NOT NULL,
              linum INTEGER NOT NULL
          )',
+        'CREATE UNIQUE INDEX ix_sub__id ON sub(id)', # not created automatically when there is another unique index?
         'CREATE UNIQUE INDEX ix_sub__name__content_id ON sub(name, content_id)',
 
     ], # install
@@ -895,6 +902,16 @@ our $db_schema_spec = {
         'CREATE INDEX ix_dep__file_id ON dep(file_id)',
         'CREATE INDEX ix_dep__dist_id ON dep(dist_id)',
         'CREATE INDEX ix_dep__module_id ON dep(module_id)',
+    ],
+
+    upgrade_to_v12 => [
+        'CREATE UNIQUE INDEX ix_file__id ON file(id)', # not created automatically when there is another unique index?
+        'CREATE UNIQUE INDEX ix_content__id ON content(id)', # not created automatically when there is another unique index?
+        'CREATE UNIQUE INDEX ix_module__id ON module(id)', # not created automatically when there is another unique index?
+        'CREATE UNIQUE INDEX ix_script__id ON script(id)', # not created automatically when there is another unique index?
+        'CREATE UNIQUE INDEX ix_mention__id ON mention(id)', # not created automatically when there is another unique index?
+        'CREATE UNIQUE INDEX ix_dist__id ON dist(id)', # not created automatically when there is another unique index?
+        'CREATE UNIQUE INDEX ix_sub__id ON sub(id)', # not created automatically when there is another unique index?
     ],
 
     # for testing
@@ -1581,14 +1598,16 @@ sub _update_index {
             }
             next unless $file_id;
 
-            if ($dbh->selectrow_array("SELECT id FROM module WHERE name=?", {}, $pkg)) {
+            my $mod_id;
+            if (($mod_id) = $dbh->selectrow_array("SELECT id FROM module WHERE name=?", {}, $pkg)) {
                 $sth_upd_mod->execute(      $file_id, $author, $ver, _numify_ver($ver), $pkg);
             } else {
                 $sth_ins_mod->execute($pkg, $file_id, $author, $ver, _numify_ver($ver));
+                $mod_id = $dbh->last_insert_id("","","","");
                 _set_namespace($dbh, $pkg);
             }
 
-            log_trace("  New/updated module: %s", $pkg);
+            log_trace("  New/updated module: %s (file ID=%d, module ID=%d)", $pkg, $file_id, $mod_id);
         } # while <fh>
 
         # cleanup: delete file record (as well as dists, modules, and deps
@@ -3575,19 +3594,19 @@ sub _get_prereqs {
     require Module::CoreList::More;
     require Version::Util;
 
-    my ($mods, $dbh, $memory_by_mod_name, $memory_by_dist_id,
+    my ($mods, $dbh, $memory_by_mod_name, $memory_by_dist_name,
         $level, $max_level, $filters, $plver, $flatten, $dont_uniquify, $phase, $rel) = @_;
 
     log_trace("Finding dependencies for module(s) %s (level=%i) ...", $mods, $level);
 
     # first, check that all modules are listed and belong to a dist
-    my @dist_ids;
+    my @dist_names;
     for my $mod0 (@$mods) {
-        my ($mod, $dist_id);
+        my ($mod, $dist_name);
         if (ref($mod0) eq 'HASH') {
             $mod = $mod0->{mod};
-            $dist_id = $mod0->{dist_id};
-            if (!$dist_id) {
+            $dist_name = $mod0->{dist};
+            if (!defined $dist_name) {
                 # some special names need not be warned
                 unless ($mod =~ /\A(perl|Config)\z/) {
                     log_warn("module '$mod' is not indexed (does not have dist ID), skipped");
@@ -3596,17 +3615,17 @@ sub _get_prereqs {
             }
         } else {
             $mod = $mod0;
-            ($dist_id) = $dbh->selectrow_array("SELECT id FROM dist WHERE is_latest AND file_id=(SELECT file_id FROM module WHERE name=?)", {}, $mod)
-                or return [404, "No such module: $mod"];
+            ($dist_name) = $dbh->selectrow_array("SELECT name FROM dist WHERE file_id IN (SELECT file_id FROM module WHERE name=?) ORDER BY id", {}, $mod);
+            defined $dist_name or return [404, "No such module: $mod"];
         }
-        unless ($memory_by_dist_id->{$dist_id} && $dont_uniquify) {
-            push @dist_ids, $dist_id;
-            $memory_by_dist_id->{$dist_id} = $mod;
+        unless ($memory_by_dist_name->{$dist_name} && $dont_uniquify) {
+            push @dist_names, $dist_name;
+            $memory_by_dist_name->{$dist_name} = $mod;
         }
     }
-    return [200, "OK", []] unless @dist_ids;
+    return [200, "OK", []] unless @dist_names;
 
-    my @wheres = ("dp.dist_id IN (".join(",",grep {defined} @dist_ids).")");
+    my @wheres = ("dp.dist_id IN (SELECT id FROM dist WHERE name IN (".join(",",map {$dbh->quote($_)} grep {defined} @dist_names)."))");
     my @binds = ();
 
     if ($filters->{authors}) {
@@ -3622,14 +3641,13 @@ sub _get_prereqs {
 
     # fetch the dependency information
     my $sth = $dbh->prepare("SELECT
-  dp.dist_id dependent_dist_id,
   (SELECT name   FROM dist   WHERE id=dp.dist_id) AS dist,
   CASE
      WHEN module_name IS NOT NULL THEN module_name
      ELSE (SELECT name   FROM module WHERE id=dp.module_id)
   END AS module,
   (SELECT cpanid FROM module WHERE id=dp.module_id) AS author,
-  (SELECT id     FROM dist   WHERE is_latest AND file_id=(SELECT file_id FROM module WHERE id=dp.module_id)) AS module_dist_id,
+  (SELECT name FROM dist WHERE file_id=(SELECT file_id FROM module WHERE id=dp.module_id)) AS module_dist,
   phase,
   rel,
   version
@@ -3652,7 +3670,11 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
             next;
         }
 
-        if ((exists $memory_by_mod_name->{$row->{module}}) && !$dont_uniquify) {
+        if (!$dont_uniquify && (
+            (exists $memory_by_mod_name->{$row->{module}}) ||
+                ($level > 1 && defined $row->{module_dist} && exists $memory_by_dist_name->{$row->{module_dist}})
+            )
+        ) {
             if ($flatten) {
                 $memory_by_mod_name->{$row->{module}} = $row->{version}
                     if version->parse($row->{version}) > version->parse($memory_by_mod_name->{$row->{module}});
@@ -3671,7 +3693,7 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
         next unless defined $row->{module}; # BUG? we can encounter case where module is undef
         if (defined $memory_by_mod_name->{$row->{module}}) {
             if (Version::Util::version_gt($row->{version}, $memory_by_mod_name->{$row->{module}})) {
-                $memory_by_mod_name->{$row->{version}} = $row->{version};
+                $memory_by_mod_name->{$row->{module}} = $row->{version};
             }
             next unless $dont_uniquify;
         }
@@ -3683,9 +3705,9 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
     }
 
     if (@res && ($max_level==-1 || $level < $max_level)) {
-        my $subres = _get_prereqs([map { {mod=>$_->{module}, dist_id=>$_->{module_dist_id}} } @res], $dbh,
+        my $subres = _get_prereqs([map { {mod=>$_->{module}, dist=>$_->{module_dist}} } @res], $dbh,
                                   $memory_by_mod_name,
-                                  $memory_by_dist_id,
+                                  $memory_by_dist_name,
                                   $level+1, $max_level, $filters, $plver, $flatten, $dont_uniquify, $phase, $rel);
         return $subres if $subres->[0] != 200;
         if ($flatten) {
@@ -3701,13 +3723,13 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
             for my $s (@{$subres->[2]}) {
                 for my $i (0..@res-1) {
                     my $r = $res[$i];
-                    if (defined($s->{dependent_dist_id}) && defined($r->{module_dist_id}) &&
-                            $s->{dependent_dist_id} == $r->{module_dist_id}) {
+                    if (defined($s->{dist}) && defined($r->{module_dist}) &&
+                            $s->{dist} eq $r->{module_dist}) {
                         splice @res, $i+1, 0, $s;
                         next SUBRES_TO_INSERT;
                     }
                 }
-                return [500, "Bug? Can't insert subres (module=$s->{module}, dist_id=$s->{module_dist_id})"];
+                return [500, "Bug? Can't insert subres (module=$s->{module}, module_dist=$s->{module_dist})"];
             }
         }
     }
@@ -3716,32 +3738,32 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
 }
 
 sub _get_revdeps {
-    my ($mods, $dbh, $memory_by_dist_name, $memory_by_mod_id,
+    my ($mods, $dbh, $memory_by_dist_name, $memory_by_mod_name,
         $level, $max_level, $filters, $flatten, $dont_uniquify, $phase, $rel) = @_;
 
     log_trace("Finding reverse dependencies for module(s) %s ...", $mods);
 
     # first, check that all modules are listed
-    my @mod_ids;
+    my @mod_names;
     for my $mod0 (@$mods) {
-        my ($mod, $mod_id) = @_;
+        my ($mod);
         if (ref($mod0) eq 'HASH') {
             $mod = $mod0->{mod};
-            $mod_id = $mod0->{mod_id};
         } else {
-            $mod = $mod0;
-            ($mod_id) = $dbh->selectrow_array("SELECT id FROM module WHERE name=?", {}, $mod)
-                or return [404, "No such module: $mod"];
+            ($mod) = $dbh->selectrow_array("SELECT name FROM module WHERE name=?", {}, $mod0)
+                or return [404, "No such module: $mod0"];
         }
-        unless ($memory_by_mod_id->{$mod_id} && $dont_uniquify) {
-            push @mod_ids, $mod_id;
-            $memory_by_mod_id->{$mod_id} = $mod;
+        unless ($memory_by_mod_name->{$mod} && $dont_uniquify) {
+            push @mod_names, $mod;
+            $memory_by_mod_name->{$mod} = $mod;
         }
     }
-    return [200, "OK", []] unless @mod_ids;
+    return [200, "OK", []] unless @mod_names;
 
-    my @wheres = ('module_id IN ('.join(",", @mod_ids).')');
+    my @wheres = ('module IN ('.join(",", map {$dbh->quote($_)} @mod_names).')');
     my @binds  = ();
+
+    push @wheres, "dist IS NOT NULL";
 
     if ($filters->{authors}) {
         push @wheres, '('.join(' OR ', ('author=?') x @{$filters->{authors}}).')';
@@ -3753,17 +3775,17 @@ sub _get_revdeps {
             push @binds, $_;
         }
     }
-    push @wheres, "is_latest";
 
     # get all dists that depend on that module
     my $sth = $dbh->prepare("SELECT
-  dp.dist_id dist_id,
-  (SELECT is_latest FROM dist WHERE id=dp.dist_id) is_latest,
-  (SELECT id FROM dist WHERE is_latest AND file_id=(SELECT file_id FROM module WHERE id=dp.module_id)) module_dist_id,
-  (SELECT name    FROM module WHERE dp.module_id=module.id) AS module,
-  (SELECT name    FROM dist WHERE dp.dist_id=dist.id)       AS dist,
-  (SELECT cpanid  FROM file WHERE dp.file_id=file.id)       AS author,
-  (SELECT version FROM dist WHERE dp.dist_id=dist.id)       AS dist_version,
+  -- dp.dist_id AS _dist_id, -- unused, for debugging only
+  -- dp.dist_id AS _mod_id,  -- unused, for debugging only
+
+  (SELECT name      FROM dist WHERE dp.dist_id=dist.id)       AS dist,
+  (SELECT name      FROM dist WHERE file_id=(SELECT file_id FROM module WHERE id=dp.module_id)) module_dist,
+  (SELECT name      FROM module WHERE dp.module_id=module.id) AS module,
+  (SELECT cpanid    FROM file WHERE dp.file_id=file.id)       AS author,
+  (SELECT version   FROM dist WHERE dp.dist_id=dist.id)       AS dist_version,
   phase,
   rel,
   version req_version
@@ -3784,14 +3806,20 @@ ORDER BY dist".($level > 1 ? " DESC" : ""));
     }
 
     if (@res && ($max_level==-1 || $level < $max_level)) {
-        my $sth = $dbh->prepare("SELECT m.id id, m.name name FROM dist d JOIN module m ON d.file_id=m.file_id WHERE d.is_latest AND d.id IN (".join(", ", map {$_->{dist_id}} @res).")");
+        # find the module of those depending dists
+        my $sth = $dbh->prepare("
+SELECT m.name name
+FROM dist d
+JOIN module m
+ON d.file_id=m.file_id
+WHERE d.name IN (".join(", ", map {$dbh->quote($_->{dist})} @res).")");
         $sth->execute();
         my @mods;
         while (my $row = $sth->fetchrow_hashref) {
-            push @mods, {mod=>$row->{name}, mod_id=>$row->{id}};
+            push @mods, {mod=>$row->{name}};
         }
         my $subres = _get_revdeps(\@mods, $dbh,
-                                  $memory_by_dist_name, $memory_by_mod_id,
+                                  $memory_by_dist_name, $memory_by_mod_name,
                                   $level+1, $max_level, $filters, $flatten, $dont_uniquify, $phase, $rel);
         return $subres if $subres->[0] != 200;
         # insert to res in appropriate places
@@ -3799,12 +3827,12 @@ ORDER BY dist".($level > 1 ? " DESC" : ""));
         for my $s (@{$subres->[2]}) {
             for my $i (reverse 0..@res-1) {
                 my $r = $res[$i];
-                if ($s->{module_dist_id} == $r->{dist_id}) {
+                if ($s->{module_dist} eq $r->{dist}) {
                     splice @res, $i+1, 0, $s;
                     next SUBRES_TO_INSERT;
                 }
             }
-            return [500, "Bug? Can't insert subres (dist=$s->{dist}, dist_id=$s->{dist_id})"];
+            return [500, "Bug? Can't insert subres (dist=$s->{dist}, module_dist=$s->{module_dist})"];
         }
     }
 
@@ -4003,10 +4031,8 @@ sub deps {
         }
         $_->{module} = ("  " x ($_->{level}-1)) . $_->{module}
             unless $args{flatten};
+        delete $_->{dist} unless @$mods > 1 || $_->{level} > 1;
         delete $_->{level};
-        delete $_->{dist} unless @$mods > 1;
-        delete $_->{dependent_dist_id};
-        delete $_->{module_dist_id};
     }
 
     my $resmeta = {};
@@ -4097,15 +4123,12 @@ sub rdeps {
     for (@{$res->[2]}) {
         $_->{dist} = ("  " x ($_->{level}-1)) . $_->{dist}
             unless $args{flatten};
+        delete $_->{module} unless @$mods > 1 || $_->{level} > 1;
         delete $_->{level};
-        delete $_->{dist_id};
-        delete $_->{module_dist_id};
-        delete $_->{module} unless @$mods > 1;
-        delete $_->{is_latest};
     }
 
     my $resmeta = {};
-    $resmeta->{'table.fields'} = [qw/module dist author dist_version req_version/];
+    $resmeta->{'table.fields'} = [qw/dist author dist_version req_version/];
     $res->[3] = $resmeta;
     $res;
 }
@@ -4240,7 +4263,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.049 of App::lcpan (from Perl distribution App-lcpan), released on 2020-04-11.
+This document describes version 1.051 of App::lcpan (from Perl distribution App-lcpan), released on 2020-04-20.
 
 =head1 SYNOPSIS
 

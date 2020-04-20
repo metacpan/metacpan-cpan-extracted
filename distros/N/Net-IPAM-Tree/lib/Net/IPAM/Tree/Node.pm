@@ -4,8 +4,8 @@ use 5.10.0;
 use strict;
 use warnings;
 use List::MoreUtils qw(lower_bound);
-
-=encoding utf8
+###
+use namespace::clean;
 
 =head1 NAME
 
@@ -334,6 +334,8 @@ This software is copyright (c) 2020 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=encoding utf8
 
 
 =cut

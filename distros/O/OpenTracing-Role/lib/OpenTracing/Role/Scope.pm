@@ -18,6 +18,12 @@ OpenTracing::Role::Scope - Role for OpenTracing implementations.
 
 =cut
 
+
+
+our $VERSION = '0.07';
+
+
+
 use Moo::Role;
 
 use Types::Interface qw/ObjectDoesInterface/;

@@ -1,5 +1,8 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.010 2020-04-20
+    - Make single stepping the test server actually work.
+
 0.009 2020-04-17
     - Embed config and logger struct into client or server.  This
       avoids malloc() and free() races.  The config and logger may

@@ -20,6 +20,12 @@ OpenTracing::Role::ScopeManager - Role for OpenTracing implementations.
 
 =cut
 
+
+
+our $VERSION = '0.07';
+
+
+
 use Moo::Role;
 
 

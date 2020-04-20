@@ -23,6 +23,7 @@
          "requires" : {
             "Carp" : "0",
             "Socket" : "2.019",
+            "namespace::clean" : "0",
             "perl" : "v5.10.0"
          }
       },
@@ -35,10 +36,10 @@
    "provides" : {
       "Net::IPAM::IP" : {
          "file" : "lib/Net/IPAM/IP.pm",
-         "version" : "1.14"
+         "version" : "1.16"
       }
    },
    "release_status" : "stable",
-   "version" : "1.14",
+   "version" : "1.16",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

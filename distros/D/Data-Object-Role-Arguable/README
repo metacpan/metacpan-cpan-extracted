@@ -1,0 +1,110 @@
+NAME
+
+    Data::Object::Role::Arguable
+
+ABSTRACT
+
+    Arguable Role for Perl 5 Plugin Classes
+
+SYNOPSIS
+
+      package Example;
+    
+      use Moo;
+    
+      with 'Data::Object::Role::Arguable';
+    
+      has name => (
+        is => 'ro'
+      );
+    
+      has options => (
+        is => 'ro'
+      );
+    
+      sub argslist {
+        ('name', '@options')
+      }
+    
+      package main;
+    
+      my $example = Example->new(['james', 'red', 'white', 'blue']);
+
+DESCRIPTION
+
+    This package provides a mechanism for unpacking an argument list and
+    creating a data structure suitable for passing to the consumer
+    constructor. The argslist routine should return a list of attribute
+    names in the order to be parsed. An attribute name maybe prefixed with
+    "@" to denote that all remaining items should be assigned to an
+    arrayref, e.g. @options, or "%" to denote that all remaining items
+    should be assigned to a hashref, e.g. %options.
+
+LIBRARIES
+
+    This package uses type constraints from:
+
+    Types::Standard
+
+METHODS
+
+    This package implements the following methods:
+
+ packargs
+
+      packargs() : HashRef
+
+    The packargs method uses argslist to return a data structure suitable
+    for passing to the consumer constructor.
+
+    packargs example #1
+
+        package main;
+      
+        my $example = Example->new;
+      
+        my $attributes = $example->packargs('james', 'red', 'white', 'blue');
+
+ unpackargs
+
+      unpackargs(Any @args) : (Any)
+
+    The unpackargs method uses argslist to return a list of arguments from
+    the consumer class instance in the appropriate order.
+
+    unpackargs example #1
+
+        package main;
+      
+        my $example = Example->new(['james', 'red', 'white', 'blue']);
+      
+        my $arguments = [$example->unpackargs];
+
+AUTHOR
+
+    Al Newkirk, awncorp@cpan.org
+
+LICENSE
+
+    Copyright (C) 2011-2019, Al Newkirk, et al.
+
+    This is free software; you can redistribute it and/or modify it under
+    the terms of the The Apache License, Version 2.0, as elucidated in the
+    "license file"
+    <https://github.com/iamalnewkirk/foobar/blob/master/LICENSE>.
+
+PROJECT
+
+    Wiki <https://github.com/iamalnewkirk/foobar/wiki>
+
+    Project <https://github.com/iamalnewkirk/foobar>
+
+    Initiatives <https://github.com/iamalnewkirk/foobar/projects>
+
+    Milestones <https://github.com/iamalnewkirk/foobar/milestones>
+
+    Contributing
+    <https://github.com/iamalnewkirk/foobar/blob/master/CONTRIBUTE.md>
+
+    Issues <https://github.com/iamalnewkirk/foobar/issues>
+

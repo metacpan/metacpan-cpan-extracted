@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Games-Solitaire-Verify",
-  "dist_version" => "0.2300",
+  "dist_version" => "0.2301",
   "license" => "mit",
   "module_name" => "Games::Solitaire::Verify",
   "recursive_test_files" => 1,
@@ -34,6 +34,7 @@ my %module_build_args = (
     "Path::Tiny" => 0,
     "Pod::Usage" => 0,
     "autodie" => 0,
+    "overload" => 0,
     "parent" => 0,
     "perl" => "5.014",
     "strict" => 0,
@@ -49,7 +50,8 @@ my %module_build_args = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::Differences" => 0,
-    "Test::More" => "0.88"
+    "Test::More" => "0.88",
+    "vars" => 0
   }
 );
 
@@ -61,7 +63,8 @@ my %fallback_build_requires = (
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
   "Test::Differences" => 0,
-  "Test::More" => "0.88"
+  "Test::More" => "0.88",
+  "vars" => 0
 );
 
 

@@ -8,7 +8,7 @@ use Data::Dumper;
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 sub holidays {
     croak "holidays is unimplemented for ".__PACKAGE__;
@@ -36,7 +36,7 @@ Date::Holidays::Adapter::US - an adapter class for Date::Holidays::USFederal
 
 =head1 VERSION
 
-This POD describes version 1.18 of Date::Holidays::Adapter::US
+This POD describes version 1.19 of Date::Holidays::Adapter::US
 
 =head1 DESCRIPTION
 

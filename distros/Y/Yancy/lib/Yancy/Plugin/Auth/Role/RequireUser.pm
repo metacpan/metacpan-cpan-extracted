@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Role::RequireUser;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: Add authorization based on user attributes
 
 #pod =head1 SYNOPSIS
@@ -67,7 +67,7 @@ sub require_user {
         $c->stash(
             template => 'yancy/auth/unauthorized',
             status => 401,
-            login_route => $self->route->render,
+            logout_route => $self->logout_route->render,
         );
         $c->respond_to(
             json => {},
@@ -97,7 +97,7 @@ Yancy::Plugin::Auth::Role::RequireUser - Add authorization based on user attribu
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 

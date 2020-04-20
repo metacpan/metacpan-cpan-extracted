@@ -19,13 +19,12 @@ use WWW::Mechanize::Chrome::Node;
 use JSON;
 use MIME::Base64 'decode_base64';
 use Data::Dumper;
-use Time::HiRes qw(usleep);
 use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -1460,23 +1459,18 @@ sub on_dialog( $self, $cb ) {
       $mech->handle_dialog( 1 ); # click "OK" / "yes" instead of "cancel"
   });
 
-Closes the current Javascript dialog. Depending on
+Closes the current Javascript dialog.
 
 =cut
 
 sub handle_dialog( $self, $accept, $prompt = undef ) {
     my $v = $accept ? JSON::true : JSON::false;
     $self->log('debug', sprintf 'Dismissing Javascript dialog with %d', $accept);
-    my $f;
-    $f = $self->target->send_message(
+    $self->target->send_message(
         'Page.handleJavaScriptDialog',
         accept => $v,
         promptText => (defined $prompt ? $prompt : 'generic message'),
-    )->then( sub {
-        # We deliberately ignore the result here
-        # to avoid deadlock of Futures
-        undef $f;
-    });
+    )->retain;
 };
 
 =head2 C<< $mech->js_console_entries() >>
@@ -2821,7 +2815,7 @@ sub infinite_scroll {
         }
 
         # wait 1/10th sec for new elements to load
-        usleep 100000;
+        $self->sleep(0.1);
         $new_height = $self->_get_body_height;
     }
     return 1;
@@ -2839,7 +2833,7 @@ sub _scroll_to_bottom {
 
     # scroll to bottom and wait for some content to load
     $self->eval( 'window.scroll(0,document.body.scrollHeight + 200)' );
-    usleep 100000;
+    $self->sleep(0.1);
 }
 
 =head1 CONTENT METHODS
@@ -3740,12 +3734,16 @@ sub xpath( $self, $query, %options) {
     my $first  = $options{ one };
     my $maybe  = $options{ maybe };
     my $any    = $options{ any };
+    my $index  = $options{ index } || 0;
+    if( $index >= 1 ) {
+        $index--;
+    };
     my $return_first_element = ($single or $first or $maybe or $any );
     $options{ user_info }||= join "|", @$query;
 
     # Construct some helper variables
     my $zero_allowed = not ($single or $first);
-    my $two_allowed  = not( $single or $maybe);
+    my $two_allowed  = (not( $single or $maybe)) || defined $options{ index };
 
     # Sanity check for the common error of
     # my $item = $mech->xpath("//foo");
@@ -3796,7 +3794,7 @@ sub xpath( $self, $query, %options) {
         $self->signal_condition( sprintf "%d elements found for %s", (scalar @res), $options{ user_info } );
     };
 
-    $return_first_element ? $res[0] : @res
+    $return_first_element ? $res[$index] : @res
 }
 
 =head2 C<< $mech->by_id( $id, %options ) >>
@@ -4248,10 +4246,11 @@ sub forms {
                      : \@res
 };
 
-=head2 C<< $mech->field( $selector, $value, [,\@pre_events [,\@post_events]] ) >>
+=head2 C<< $mech->field( $selector, $value, [, $index, \@pre_events [,\@post_events]] ) >>
 
   $mech->field( user => 'joe' );
-  $mech->field( not_empty => '', [], [] ); # bypass JS validation
+  $mech->field( not_empty => '', 0, [], [] ); # bypass JS validation
+  $mech->field( date => '2020-04-01', 2 );    # set second field named "date"
 
 Sets the field with the name given in C<$selector> to the given value.
 Returns the value.
@@ -4274,13 +4273,19 @@ are triggered.
 
 =cut
 
-sub field {
-    my ($self,$name,$value,$pre,$post) = @_;
+sub field($self,$name,$value,$index=undef,$pre=undef,$post=undef) {
+    if( ref $index ) { # old API
+        carp "Old API style for ->field() is deprecated. Please fix the call to pass undef for the third parameter if using pre_events/post_events!";
+        $post  = $pre;
+        $pre   = $index;
+        $index = undef;
+    };
     $self->get_set_value(
         name => $name,
         value => $value,
         pre => $pre,
         post => $post,
+        index => $index,
         node => $self->current_form,
     );
 }
@@ -4365,19 +4370,23 @@ sub upload($self,$name,$value) {
 }
 
 
-=head2 C<< $mech->value( $selector_or_element, [%options] ) >>
+=head2 C<< $mech->value( $selector_or_element, [ $index | %options] ) >>
 
     print $mech->value( 'user' );
 
 Returns the value of the field given by C<$selector_or_name> or of the
 DOM element passed in.
 
+If you have multiple fields with the same name, you can use the index
+to specify the index directly:
+
+    print $mech->value( 'date', 2 ); # get the second field named "date"
+
 The legacy form of
 
     $mech->value( name => value );
 
-is also still supported but will likely be deprecated
-in favour of the C<< ->field >> method.
+is not supported anymore.
 
 For fields that can have multiple values, like a C<select> field,
 the method is context sensitive and returns the first selected
@@ -4390,8 +4399,18 @@ method for that.
 
 sub value {
     if (@_ == 3) {
-        my ($self,$name,$value) = @_;
-        return $self->field($name => $value);
+        my ($self,$name,$index) = @_;
+
+        if( defined $index and $index !~ /^\d+$/ ) {
+            $self->signal_condition("Non-numeric index passed to ->value(). Did you mean to call ->field('$name' => '$index') ?");
+        };
+
+        return $self->get_set_value(
+            node => $self->current_form,
+            index => $index,
+            name => $name,
+        );
+
     } else {
         my ($self,$name,%options) = @_;
         return $self->get_set_value(
@@ -4450,10 +4469,27 @@ sub get_set_value($self,%options) {
     $pre  ||= []; # just to eliminate some checks downwards
     $post ||= []; # just to eliminate some checks downwards
     my $name  = delete $options{ name };
+    my $index = delete $options{ index };
 
+    my $index_name = '';
+    if( defined $index ) {
+        if( $index == 1 or $index =~ /[^1]1$/ ) {
+            $index_name = "${index}st ";
+
+        } elsif( $index == 2 or $index =~ /[^1]2$/ ) {
+            $index_name = "${index}nd ";
+
+        } elsif( $index == 3 or $index =~ /[^1]3$/ ) {
+            $index_name = "${index}rd ";
+
+        } else {
+            $index_name = "${index}th ";
+        }
+    };
     my @fields = $self->_field_by_name(
                      name => $name,
-                     user_info => "input with name '$name'",
+                     user_info => "${index_name}input with name '$name'",
+                     index     => $index,
                      %options );
 
     if (my $obj = $fields[0]) {
@@ -4733,13 +4769,15 @@ sub do_set_fields($self, %options) {
     my $fields = delete $options{ fields };
 
     while (my($n,$v) = each %$fields) {
+        my $index = undef;
         if (ref $v) {
             ($v,my $num) = @$v;
-            warn "Index larger than 1 not supported, ignoring"
-                unless $num == 1;
+            $index = $num;
+            #warn "Index larger than 1 not supported, ignoring"
+            #    unless $num == 1;
         };
 
-        $self->get_set_value( node => $form, name => $n, value => $v, %options );
+        $self->get_set_value( node => $form, name => $n, value => $v, index => $index, %options );
     }
 };
 
@@ -5514,18 +5552,16 @@ sessions, see L<Mojolicious::Plugin::PNGCast>.
 sub _handleScreencastFrame( $self, $frame ) {
     # Meh, this one doesn't get a response I guess. So, not ->send_message, just
     # send a JSON packet to acknowledge the frame
-    my $ack;
     my $s = $self;
     weaken $s;
-    $ack = $self->target->send_message(
+    $self->target->send_message(
         'Page.screencastFrameAck',
         sessionId => 0+$frame->{params}->{sessionId} )->then(sub {
             $s->log('trace', 'Screencast frame acknowledged');
             $frame->{params}->{data} = decode_base64( $frame->{params}->{data} );
             $s->{ screenFrameCallback }->( $s, $frame->{params} );
-            # forget ourselves
-            undef $ack;
-    });
+            Future->done();
+    })->retain;
 }
 
 sub setScreenFrameCallback( $self, $callback=undef, %options ) {

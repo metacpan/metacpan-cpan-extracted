@@ -5,6 +5,7 @@ use inc::Module::Install;
 
 name 'WWW-Trello-Lite';
 license 'perl';
+repository 'https://github.com/rbwohlfarth/WWW-Trello-Lite.git';
 all_from 'lib/WWW/Trello/Lite.pm';
 
 requires 'HTTP::Tiny'                   => '0.022';

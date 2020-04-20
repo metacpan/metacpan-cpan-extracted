@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Test::MockModule: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -26,10 +27,10 @@ no_index:
 provides:
   Test::Ratchet:
     file: lib/Test/Ratchet.pm
-    version: '0.004'
+    version: '0.005'
   Test::Ratchet::Clank:
     file: lib/Test/Ratchet.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Data::Munge: '0'
   Exporter::Easy: '0'
@@ -38,7 +39,7 @@ resources:
   bugtracker: https://github.com/Altreus/p5-Test-Ratchet/issues
   homepage: https://github.com/Altreus/p5-Test-Ratchet
   repository: https://github.com/Altreus/p5-Test-Ratchet.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -184,7 +185,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.004'
+          tag: '0.005'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

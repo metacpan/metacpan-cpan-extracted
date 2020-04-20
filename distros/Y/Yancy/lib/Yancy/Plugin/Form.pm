@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: Generate form HTML using various UI libraries
 
 #pod =head1 SYNOPSIS
@@ -222,6 +222,10 @@ our $VERSION = '1.053';
 #pod will include all the fields, a CSRF token, and a single button to submit
 #pod the form.
 #pod
+#pod B<NOTE>: For CSRF tokens to work, this must be called with the current
+#pod controller, not with C<app>. To disable CSRF (not recommended), pass C<<
+#pod csrf => 0 >> in C<%args>.
+#pod
 #pod C<%args> is a list of name/value pairs with the following keys:
 #pod
 #pod =over
@@ -276,7 +280,7 @@ Yancy::Plugin::Form - Generate form HTML using various UI libraries
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 
@@ -497,6 +501,10 @@ A class to apply to the input element. See L</input>.
 Generate a form to edit an item from the given C<$schema>. The form
 will include all the fields, a CSRF token, and a single button to submit
 the form.
+
+B<NOTE>: For CSRF tokens to work, this must be called with the current
+controller, not with C<app>. To disable CSRF (not recommended), pass C<<
+csrf => 0 >> in C<%args>.
 
 C<%args> is a list of name/value pairs with the following keys:
 

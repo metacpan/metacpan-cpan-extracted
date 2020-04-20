@@ -9,6 +9,6 @@ mise - manage directory and symlink creation, globally and per-project
 # INFO
 
 See
-[https://metacpan.org/pod/App::MiseEnPlace](App::MiseEnPlace)
+[App::MiseEnPlace](https://metacpan.org/pod/App::MiseEnPlace)
 on MetaCPAN.
 

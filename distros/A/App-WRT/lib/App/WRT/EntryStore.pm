@@ -178,17 +178,20 @@ sub all {
 
 =item all_renderable()
 
-Returns a list of all source paths which are considered "renderable".
+Returns a list of all existing source paths which are considered "renderable".
+
+A path should match C<$RENDERABLE_EXPR> and not be an index file.
 
 =cut
 
 sub all_renderable() {
   my ($self) = shift;
   return grep {
-    (index($_, 'index', -5) == -1)
+    (index($_, '/index', -6) == -1)
     &&
     m/$RENDERABLE_EXPR/
-  } @{ $self->{entries} }; }
+  } @{ $self->{entries} };
+}
 
 =item dates_by_depth($depth)
 

@@ -54,18 +54,12 @@ DESCRIPTION
 
 EVENTS
 
-    Mojo::Reactor::Epoll inherits all events from Mojo::Reactor.
+    Mojo::Reactor::Epoll inherits all events from Mojo::Reactor::Poll.
 
 METHODS
 
-    Mojo::Reactor::Epoll inherits all methods from Mojo::Reactor and
+    Mojo::Reactor::Epoll inherits all methods from Mojo::Reactor::Poll and
     implements the following new ones.
-
- again
-
-      $reactor->again($id);
-
-    Restart timer. Note that this method requires an active timer.
 
  io
 
@@ -79,20 +73,6 @@ METHODS
         my ($reactor, $writable) = @_;
         say $writable ? 'Handle is writable' : 'Handle is readable';
       });
-
- is_running
-
-      my $bool = $reactor->is_running;
-
-    Check if reactor is running.
-
- next_tick
-
-      my $undef = $reactor->next_tick(sub {...});
-
-    Invoke callback as soon as possible, but not before returning or other
-    callbacks that have been registered with this method, always returns
-    undef.
 
  one_tick
 
@@ -126,22 +106,6 @@ METHODS
       $reactor->reset;
 
     Remove all handles and timers.
-
- start
-
-      $reactor->start;
-
-    Start watching for I/O and timer events, this will block until "stop"
-    is called or no events are being watched anymore.
-
-      # Start reactor only if it is not running already
-      $reactor->start unless $reactor->is_running;
-
- stop
-
-      $reactor->stop;
-
-    Stop watching for I/O and timer events.
 
  timer
 

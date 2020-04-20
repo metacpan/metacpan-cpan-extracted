@@ -25,7 +25,11 @@ tmclean is command line utility for cleanup TimeMachine.
 
     % cpanm App::tmclean
 
-or you can get single packed executable file.
+## Homebrew
+
+    % brew install Songmu/tap/tmclean
+
+## Single Packed Executable
 
     % curl -L https://raw.githubusercontent.com/Songmu/App-tmclean/master/tmclean > /usr/local/bin/tmclean; chmod +x /usr/local/bin/tmclean
 

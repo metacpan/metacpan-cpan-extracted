@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Auth::Extensible::Test;
 
-our $VERSION = '0.708';
+our $VERSION = '0.709';
 
 =head1 NAME
 
@@ -80,6 +80,8 @@ my %dependencies = (
 
 my ( $test, $trap );
 
+my $EXPECTED_REDIRECT_TARGET;
+
 sub testme {
     BAIL_OUT "Please upgrade your provider to the latest version. Dancer2::Plugin::Auth::Extensible no longer supports the old \"testme\" tests.";
 }
@@ -90,6 +92,7 @@ my @provider_can;
 sub runtests {
     my $app = shift;
 
+    $EXPECTED_REDIRECT_TARGET = $Dancer2::VERSION gt '0.300000' ? '/' : 'http://localhost/';
     $test = Plack::Test->create($app);
     $trap = TestApp->dancer_app->logger_engine->trapper;
 
@@ -801,7 +804,7 @@ sub _login_logout {
 
     $res = post( '/login', [ username => 'dave', password => 'beer' ] );
     ok $res->is_redirect, "POST /login with good username/password is_redirect";
-    is $res->header('location'), 'http://localhost/',
+    is $res->header('location'), $EXPECTED_REDIRECT_TARGET,
       "... and redirect location is correct.";
 
     # check session_data again
@@ -819,7 +822,7 @@ sub _login_logout {
     $res = get('/login');
     ok $res->is_redirect, "GET /login whilst logged in is redirected."
       or diag explain $res;
-    is $res->header('location'), 'http://localhost/',
+    is $res->header('location'), $EXPECTED_REDIRECT_TARGET,
       "... and redirect location is correct.";
 
     # get /login whilst already logged in with return_url set
@@ -840,7 +843,7 @@ sub _login_logout {
 
     $res = get('/logout');
     ok $res->is_redirect, "GET /logout is_redirect" or diag explain $res;
-    is $res->header('location'), 'http://localhost/',
+    is $res->header('location'), $EXPECTED_REDIRECT_TARGET,
       "... and redirect location is correct.";
 
     # check session_data again
@@ -857,7 +860,7 @@ sub _login_logout {
 
     $res = post( '/login', [ username => 'dave', password => 'beer' ] );
     ok $res->is_redirect, "POST /login with good username/password is_redirect";
-    is $res->header('location'), 'http://localhost/',
+    is $res->header('location'), $EXPECTED_REDIRECT_TARGET,
       "... and redirect location is correct.";
 
     # check session_data again
@@ -979,7 +982,7 @@ sub _login_logout {
           or diag explain $trap->read;
 
         is( $res->headers->header('Location'),
-            'http://localhost/',
+            $EXPECTED_REDIRECT_TARGET,
             '/logout redirected to / (exit_page) after logging out' );
     }
 
@@ -1031,7 +1034,7 @@ sub _logged_in_user {
 
     $res = post( '/login', [ username => 'dave', password => 'beer' ] );
     ok $res->is_redirect, "POST /login with good username/password is_redirect";
-    is $res->header('location'), 'http://localhost/',
+    is $res->header('location'), $EXPECTED_REDIRECT_TARGET,
       "... and redirect location is correct.";
 
     # check logged_in_user again
@@ -1054,7 +1057,7 @@ sub _logged_in_user {
 
     $res = get('/logout');
     ok $res->is_redirect, "GET /logout is_redirect" or diag explain $res;
-    is $res->header('location'), 'http://localhost/',
+    is $res->header('location'), $EXPECTED_REDIRECT_TARGET,
       "... and redirect location is correct.";
 
     # check logged_in_user again
@@ -1108,7 +1111,7 @@ sub _logged_in_user_lastlogin {
     $res =
       post( '/login', [ username => 'lastlogin1', password => 'lastlogin2' ] );
     ok $res->is_redirect, "POST /login with with new user is_redirect";
-    is $res->header('location'), 'http://localhost/',
+    is $res->header('location'), $EXPECTED_REDIRECT_TARGET,
       "... and redirect location is correct.";
 
     # check we can reach restricted page
@@ -1143,7 +1146,7 @@ sub _logged_in_user_lastlogin {
     $res =
       post( '/login', [ username => 'lastlogin1', password => 'lastlogin2' ] );
     ok $res->is_redirect, "POST /login with with new user is_redirect";
-    is $res->header('location'), 'http://localhost/',
+    is $res->header('location'), $EXPECTED_REDIRECT_TARGET,
       "... and redirect location is correct.";
 
     # check we can reach restricted page
@@ -1361,7 +1364,7 @@ sub _require_login {
 
     $res = post( '/login', [ username => 'dave', password => 'beer' ] );
     ok $res->is_redirect, "POST /login with good username/password is_redirect";
-    is $res->header('location'), 'http://localhost/',
+    is $res->header('location'), $EXPECTED_REDIRECT_TARGET,
       "... and redirect location is correct.";
 
     # check we can reach restricted page
@@ -1611,7 +1614,7 @@ sub _roles {
           or diag explain $trap->read;
 
         is( $res->headers->header('Location'),
-            'http://localhost/',
+            $EXPECTED_REDIRECT_TARGET,
             '/logout redirected to / (exit_page) after logging out' );
     }
 
@@ -1707,7 +1710,7 @@ sub _roles {
           or diag explain $trap->read;
 
         is( $res->headers->header('Location'),
-            'http://localhost/',
+            $EXPECTED_REDIRECT_TARGET,
             '/logout redirected to / (exit_page) after logging out' );
     }
 

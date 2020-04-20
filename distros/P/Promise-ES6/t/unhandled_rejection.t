@@ -21,6 +21,23 @@ use Promise::ES6;
 
     my @tests = (
         sub {
+            my ($y, $n);
+            my $p1 = Promise::ES6->new( sub { ($y, $n) = @_; } );
+
+            my $p2 = $p1->then(
+                sub {},
+                sub {},
+            );
+
+            $n->('nono');
+
+            cmp_deeply(
+                \@warnings,
+                [ ],
+                'no warn() if a catch happens on a then()',
+            );
+        },
+        sub {
             Promise::ES6->new( sub { die 123 } );
 
             cmp_deeply(

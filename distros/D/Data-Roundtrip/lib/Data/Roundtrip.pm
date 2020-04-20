@@ -4,42 +4,30 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
+
+# import params is just one 'no-unicode-escape-permanently'
+# if set, then unicode escaping will not happen at
+# all, even if 'dont-bloody-escape-unicode' is set.
+# Dump's filter and Dumper's qquote overwrite will be permanent
+# which is more efficient but removes the flexibility
+# of having unicode escaped and rendered at will.
 
 use Encode qw/encode_utf8 decode_utf8/;
 use JSON qw/decode_json encode_json/;
 use Unicode::Escape qw/escape unescape/;
 use YAML;
-use Sub::Override;
 use Data::Dumper qw/Dumper/;
 use Data::Dump qw/pp/;
 use Data::Dump::Filtered;
 
-use Exporter qw(import);
-use Exporter 'import';
+use Exporter; # we have our own import() don't import it
 # the EXPORT_OK and EXPORT_TAGS is code by [kcott] @ Perlmongs.org, thanks!
 # see https://perlmonks.org/?node_id=11115288
 our (@EXPORT_OK, %EXPORT_TAGS);
-BEGIN {
-    my @file = qw{read_from_file write_to_file};
-    my @fh = qw{read_from_filehandle write_to_filehandle};
-    my @io = (@file, @fh);
-    my @json = qw{perl2json json2perl json2dump json2yaml json2json};
-    my @yaml = qw{perl2yaml yaml2perl yaml2json yaml2dump yaml2yaml};
-    my @dump = qw{perl2dump dump2perl dump2json dump2yaml dump2dump};
-    my @all = (@io, @json, @yaml, @dump);
-    @EXPORT_OK = @all;
-    %EXPORT_TAGS = (
-        file => [@file],
-        fh   => [@fh],
-        io   => [@io],
-        json => [@json],
-        yaml => [@yaml],
-        dump => [@dump],
-        all  => [@all],
-    );
 
-} # end BEGIN
+my $_permanent_override = 0;
+my $_permanent_filter = 0;
 
 # THESE are taken verbatim from Data::Dumper (Data/Dumper.pm)
 # they are required for _qquote_redefinition_by_Corion()
@@ -66,6 +54,66 @@ my $Data_Dumper_low_controls = ($Data_Dumper_IS_ASCII)
                      # EBCDIC low controls.
                    : qr/[\0-\x3f]/;
 # END verbatim from Data::Dumper (Data/Dumper.pm)
+
+BEGIN {
+	my @file = qw{read_from_file write_to_file};
+	my @fh = qw{read_from_filehandle write_to_filehandle};
+	my @io = (@file, @fh);
+	my @json = qw{perl2json json2perl json2dump json2yaml json2json};
+	my @yaml = qw{perl2yaml yaml2perl yaml2json yaml2dump yaml2yaml};
+	my @dump = qw{perl2dump perl2dump_filtered perl2dump_homebrew
+		      dump2perl dump2json dump2yaml dump2dump};
+	my @all = (@io, @json, @yaml, @dump);
+	@EXPORT_OK = @all;
+	%EXPORT_TAGS = (
+	    file => [@file],
+	    fh   => [@fh],
+	    io   => [@io],
+	    json => [@json],
+	    yaml => [@yaml],
+	    dump => [@dump],
+	    all  => [@all],
+	);
+} # end BEGIN
+
+sub DESTROY {
+	Data::Dump::Filtered::remove_dump_filter( \& DataDumpFilterino )
+		if $_permanent_filter;
+}
+
+sub import {
+	# what comes here is (package, param1, param2...) = @_
+	# for something like
+	# use Data::Roundtrip qw/param1 params2 .../;
+	# we are looking for a param, eq to 'no-unicode-escape-permanently'
+	# or 'unicode-escape-permanently'
+	# the rest we must pass to the Exporter::import() but in a tricky way
+	# so as it injects all these subs in the proper namespace.
+	# that call is at the end, but with our parameter removed from the list
+	for(my $i=@_;$i-->1;){
+		if( $_[$i] eq 'no-unicode-escape-permanently' ){
+			splice @_, $i, 1; # remove it from the list
+			$Data::Dumper::Useperl = 1;
+			$Data::Dumper::Useqq='utf8';
+			no warnings 'redefine';
+			*Data::Dumper::qquote = \& _qquote_redefinition_by_Corion;
+			$_permanent_override = 1;
+
+			# add a filter to Data::Dump
+			Data::Dump::Filtered::add_dump_filter( \& DataDumpFilterino );
+			$_permanent_filter = 1;
+		} elsif( $_[$i] eq 'unicode-escape-permanently' ){
+			splice @_, $i, 1; # remove it from the list
+			# this is the case which we want to escape unicode permanently
+			# which is the default behaviour for Dump and Dumper
+			$_permanent_override = 2;
+			$_permanent_filter = 2;
+		}
+	}
+	# now let Exporter handle the rest of the params if any
+	# from ikegami at https://www.perlmonks.org/?node_id=1214104
+	goto &Exporter::import;
+}
 
 sub	perl2json {
 	my $pv = $_[0];
@@ -278,43 +326,50 @@ sub	perl2dump {
 	local $Data::Dumper::Indent = exists($params->{'indent'}) && defined($params->{'indent'})
 		? $params->{'indent'} : 1
 	;
-	if( (
+
+	if( ($_permanent_override == 0)
+        && ((
 		exists($params->{'dont-bloody-escape-unicode'}) && defined($params->{'dont-bloody-escape-unicode'})
 		 && ($params->{'dont-bloody-escape-unicode'}==1)
 	    ) || (
 		exists($params->{'escape-unicode'}) && defined($params->{'escape-unicode'})
 		 && ($params->{'escape-unicode'}==0)
 	    )
+	   )
 	){
+		# this is the case where no 'no-unicode-escape-permanently'
+		# was used at loading the module
+		# we have to use the special qquote each time caller
+		# sets 'dont-bloody-escape-unicode'=>1
+		# which will be replaced with the original sub
+		# once we exit this scope.
+		# make benchmarks will compare all cases if you ever
+		# want to get more efficiency out of this
 		local $Data::Dumper::Useperl = 1;
 		local $Data::Dumper::Useqq='utf8';
-		my $override = Sub::Override->new(
-			'Data::Dumper::qquote' => \& _qquote_redefinition_by_Corion
-		);
-		my $ret = Data::Dumper::Dumper($pv);
-		# not really...
-		#$ret = Data::Dumper::AutoEncode::eDumper($pv);
-		# restore the overriden sub
-		$override->restore;
-		return $ret
+		no warnings 'redefine';
+		local *Data::Dumper::qquote = \& _qquote_redefinition_by_Corion;
+		return Data::Dumper::Dumper($pv);
+		# out of scope local's will be restored to original values
 	}
 	return Data::Dumper::Dumper($pv)
 }
 # This uses Data::Dump's filters
 # The _qquote_redefinition_by_Corion() code is by [Corion] @ Perlmonks and cpan
 # see https://perlmonks.org/?node_id=11115271
-#
 sub	perl2dump_filtered {
 	my $pv = $_[0];
 	my $params = defined($_[1]) ? $_[1] : {};
 
-	if( (
+	if( ($_permanent_filter == 0)
+        && ((
 		exists($params->{'dont-bloody-escape-unicode'}) && defined($params->{'dont-bloody-escape-unicode'})
 		 && ($params->{'dont-bloody-escape-unicode'}==1)
 	    ) || (
 		exists($params->{'escape-unicode'}) && defined($params->{'escape-unicode'})
 		 && ($params->{'escape-unicode'}==0)
 	    )
+	   )
 	){
 		Data::Dump::Filtered::add_dump_filter( \& DataDumpFilterino );
 		my $ret = Data::Dump::pp($pv);
@@ -327,7 +382,8 @@ sub	perl2dump_homebrew {
 	my $pv = $_[0];
 	my $params = defined($_[1]) ? $_[1] : {};
 
-	if( (
+	if( ($_permanent_override == 1)
+        || (
 		exists($params->{'dont-bloody-escape-unicode'}) && defined($params->{'dont-bloody-escape-unicode'})
 		 && ($params->{'dont-bloody-escape-unicode'}==1)
 	    ) || (
@@ -445,6 +501,7 @@ sub	write_to_filehandle {
 	print $FH $contents;
 	return 1;
 }
+# todo: change to utf8::is_utf8()
 sub	_has_utf8 { return $_[0] =~ /[^\x00-\x7f]/ }
 # Below code is by [Corion] @ Perlmonks and cpan
 # see https://perlmonks.org/?node_id=11115271
@@ -457,6 +514,7 @@ sub	_qquote_redefinition_by_Corion {
   local($_) = shift;
 
   s/([\\\"\@\$])/\\$1/g;
+
   return qq("$_") unless /[[:^print:]]/;  # fast exit if only printables
 
   # Here, there is at least one non-printable to output.  First, translate the
@@ -472,6 +530,7 @@ sub	_qquote_redefinition_by_Corion {
 
   # But otherwise use 3 digits
   s/($Data_Dumper_low_controls)/'\\'.sprintf('%03o',ord($1))/eg;
+
 
     # all but last branch below not supported --BEHAVIOR SUBJECT TO CHANGE--
   my $high = shift || "";
@@ -507,7 +566,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -518,8 +577,9 @@ the conversions and optionally escaped or un-escaped. Also JSON can
 be presented in a pretty format or in a condensed, machine-readable
 format (not spaces, indendation or line breaks).
 
-
     use Data::Roundtrip qw/:all/;
+    #use Data::Roundtrip qw/json2yaml/;
+    #use Data::Roundtrip qw/:json/; # see EXPORT
 
     $jsonstr = '{"Songname": "Απόκληρος της κοινωνίας",'
 	       .'"Artist": "Καζαντζίδης Στέλιος/Βίρβος Κώστας"}'
@@ -588,6 +648,19 @@ format (not spaces, indendation or line breaks).
     json2json.pl -i "with-unicode.json" -o "unicode-escaped.json" --escape-unicode
     # etc.
 
+    # only for *2dump: perl2dump, json2dump, yaml2dump
+    # and if no escape-unicode is required (i.e.
+    # setting 'dont-bloody-escape-unicode' => 1 permanently)
+    # and if efficiency is important,
+    # meaning that perl2dump is run in a loop thousand of times,
+    # then import the module like this:
+    use Data::Roundtrip qw/:all no-unicode-escape-permanently/;
+    # or like this
+    use Data::Roundtrip qw/:all unicode-escape-permanently/;
+
+    # then perl2dump() is more efficient but unicode characters
+    # will be permanently not-escaped (1st case) or escaped (2nd case).
+
 =head1 EXPORT
 
 By default no symbols are exported. However, the following export tags are available (:all will export all of them):
@@ -610,6 +683,8 @@ C<yaml2json()>
 
 =item * C<:dump> :
 C<perl2dump()>,
+C<perl2dump_filtered()>,
+C<perl2dump_homebrew()>,
 C<dump2perl()>,
 C<dump2json()>,
 C<dump2yaml()>
@@ -620,7 +695,73 @@ C<read_from_filehandle()>, C<write_to_filehandle()>,
 
 =item * C<:all> : everything above
 
+=item * C<no-unicode-escape-permanently> : this is not an
+export keyword/parameter but a parameter which affects
+all the C<< *2dump* >> subs by setting unicode escaping
+permanently to false. See L</EFFICIENCY>.
+
+=item * C<unicode-escape-permanently> : this is not an
+export keyword/parameter but a parameter which affects
+all the C<< *2dump* >> subs by setting unicode escaping
+permanently to true. See L</EFFICIENCY>.
+
 =back
+
+=head1 EFFICIENCY
+
+The export keyword/parameter C<< no-unicode-escape-permanently >>
+affects
+all the C<< *2dump* >> subs by setting unicode escaping
+permanently to false. This improves efficiency, although
+one will ever need to
+use this in extreme situations where a C<< *2dump* >>
+sub is called repeatedly in a loop of
+a few hundreds or thousands of iterations or more.
+
+Each time a C<< *2dump* >> is called, the
+C<< dont-bloody-escape-unicode >> flag is checked
+and if it is set, then  L<Data::Dumper>'s C<< qquote() >>
+is overriden with C<< _qquote_redefinition_by_Corion() >>
+just for that instance and will be restored as soon as
+the dump is finished. Similarly, a filter for
+not escaping unicode is added to L<Data::Dump>
+just for that particular call and is removed immediately
+after. This has some computational cost and can be
+avoided completely by overriding the sub
+and adding the filter once, at loading (in C<< import() >>).
+
+The price to pay for this added efficiency is that
+unicode in any dump will never be escaped (e.g. C<< \x{3b1}) >>,
+but will be rendered (e.g. C<< α >>, a greek alpha). Always.
+The option
+C<< dont-bloody-escape-unicode >> will permanently be set to true.
+
+Similarly, the export keyword/parameter
+C<< unicode-escape-permanently >>
+affects
+all the C<< *2dump* >> subs by setting unicode escaping
+permanently to true. This improves efficiency as well.
+
+See L</BENCHMARKS> on how to find the fastest C<< *2dump* >>
+sub.
+
+=head1 BENCHMARKS
+
+The special Makefile target C<< benchmarks >> will time
+calls to each of the C<< *2dump* >> subs under
+
+    use Data::Roundtrip;
+
+    use Data::Roundtrip qw/no-unicode-escape-permanently/;
+
+    use Data::Roundtrip qw/unicode-escape-permanently/;
+
+and for C<< 'dont-bloody-escape-unicode' => 0 >> and
+C<< 'dont-bloody-escape-unicode' => 1 >>.
+
+In general, L</perl2dump> is faster by 25% when one of the
+permanent import parameters is used
+(either of the last two cases above).
 
 =head1 SUBROUTINES
 
@@ -652,7 +793,7 @@ the equivalent JSON string. In C<$optional_paramshashref>
 one can specify whether to escape unicode with
 C<< 'escape-unicode' => 1 >>
 and/or prettify the returned result with C<< 'pretty' => 1 >>.
-The output can be fed back to L<Data::Roundtrip>'s C<< json2perl() >>
+The output can be fed back to L</json2perl>
 for getting the Perl variable back.
 
 Returns the JSON string on success or C<undef> on failure.
@@ -708,7 +849,7 @@ a nested data structure, but not an object), it will return
 the equivalent YAML string. In C<$optional_paramshashref>
 one can specify whether to escape unicode with
 C<< 'escape-unicode' => 1 >>. Prettify is not supported yet.
-The output can fed to L<Data::Roundtrip>'s C<< yaml2perl() >>
+The output can fed to L</yaml2perl>
 for getting the Perl variable back.
 
 Returns the YAML string on success or C<undef> on failure.
@@ -774,33 +915,36 @@ Additionally, use terse output with C<< 'terse' => 1 >> and remove
 all the incessant indentation with C<< 'indent' => 1 >>
 which unfortunately goes to the other extreme of
 producing a space-less output, not fit for human consumption.
-The output can fed to L<Data::Roundtrip>'s C<< dump2perl() >>
+The output can fed to L</dump2perl>
 for getting the Perl variable back.
 
 It returns the string representation of the input perl variable
 on success or C<undef> on failure.
 
-The output can be fed back to L<Data::Roundtrip>'s C<< dump2perl() >>.
+The output can be fed back to L</dump2perl>.
 
 CAVEAT: when not escaping unicode (which is the default
 behaviour), each call to this sub will override L<Data::Dumper>'s
-C<qquote()> sub (with a call to L<Sub::Override>' C<< new() >>),
+C<qquote()> sub then
 call L<Data::Dumper>'s C<Dumper()> and save its output to
-a temporary variable, restore C<qquote()> sub (with
-a call to L<Sub::Override>'s C<< restore() >> and return the
+a temporary variable, restore C<qquote()> sub to its original
+code ref and return the
 contents. This exercise is done every time this C<perl2dump()>
-is called. It can be expensive. The alternative is
-to redefine C<qquote()> once, when the module is loaded.
+is called. It may be expensive. The alternative is
+to redefine C<qquote()> once, when the module is loaded, with
+all the side-effects this may cause.
 
-Note that there are two other alternatives to this sub,
-L<Data::Roundtrip>'s C<< perl2dump_filtered() >> which uses L<Data::Dump>
-filters to control unicode escaping but
+Note that there are two other alternative subs which offer more-or-less
+the same functionality and their output can be fed back to all the C<< dump2*() >>
+subs. These are
+L</perl2dump_filtered> which uses L<Data::Dump::Filtered>
+to add a filter to control unicode escaping but
 lacks in aesthetics and functionality and handling all the
 cases Dump and Dumper do quite well.
 
 There is also C<< perl2dump_homebrew() >> which
 uses the same dump-recursively engine as
-L<Data::Roundtrip>'s C<< perl2dump_filtered() >>
+L</perl2dump_filtered>
 but does not involve Data::Dump at all.
 
 =head2 C<perl2dump_filtered>
@@ -825,7 +969,7 @@ Return value:
 
 =back
 
-It does the same job as L<Data::Roundtrip>'s C<< perl2dump() >> which is
+It does the same job as L</perl2dump> which is
 to stringify a perl variable. And takes the same options.
 
 It returns the string representation of the input perl variable
@@ -833,6 +977,10 @@ on success or C<undef> on failure.
 
 It uses L<Data::Dump::Filtered> to add a filter to
 L<Data::Dump>.
+
+head3 CAVEAT
+
+In order to xxx
 
 =head2 C<perl2dump_homebrew>
 
@@ -856,13 +1004,13 @@ Return value:
 
 =back
 
-It does the same job as L<Data::Roundtrip>'s C<< perl2dump() >> which is
+It does the same job as L</perl2dump> which is
 to stringify a perl variable. And takes the same options.
 
 It returns the string representation of the input perl variable
 on success or C<undef> on failure.
 
-The output can be fed back to L<Data::Roundtrip>'s C<< dump2perl() >>.
+The output can be fed back to L</dump2perl>.
 
 It uses its own basic dumper. Which is recursive.
 So, beware of extremely deep nested data structures.
@@ -903,9 +1051,9 @@ There are 2 obvious limitations:
 
 =over 4
 
-=item 1) indentation is very basic,
+=item 1. indentation is very basic,
 
-=item 2) it supports only scalars, hashes and arrays,
+=item 2. it supports only scalars, hashes and arrays,
 (which will dive into them no problem)
 This sub can be used in conjuction with DataDumpFilterino()
 to create a Data::Dump filter like,
@@ -924,7 +1072,7 @@ it can be but definetely lacks in aesthetics
 and functionality compared to Dump and Dumper.
 
 The output is a, possibly multiline, string. Which it can
-then be fed back to L<Data::Roundtrip>'s C<< dump2perl() >>.
+then be fed back to L</dump2perl>.
 
 =back
 
@@ -937,9 +1085,9 @@ Arguments:
 =over 4
 
 =item * C<$dumpstring>, this comes from the output of L<Data::Dump>,
-L<Data::Dumper> or our own L<Data::Roundtrip>'s C<< perl2dump() >>,
-L<Data::Roundtrip>'s C<< perl2dump_filtered() >>,
-L<Data::Roundtrip>'s C<< perl2dump_homebrew() >>.
+L<Data::Dumper> or our own L</perl2dump>,
+L</perl2dump_filtered>,
+L</perl2dump_homebrew>.
 Escaped, or unescaped.
 
 =back
@@ -1010,8 +1158,8 @@ Return value:
 Given an input JSON string C<$jsonstring>, it will return
 the equivalent YAML string L<YAML>
 by first converting JSON to a Perl variable and then
-converting that variable to YAML using L<Data::Roundtrip>'s C<< perl2yaml() >>.
-All the parameters supported by L<Data::Roundtrip>'s C<< perl2yaml() >>
+converting that variable to YAML using L</perl2yaml>.
+All the parameters supported by L</perl2yaml>
 are accepted.
 
 Returns the YAML string on success or C<undef> on failure.
@@ -1041,8 +1189,8 @@ Return value:
 Given an input YAML string C<$yamlstring>, it will return
 the equivalent YAML string L<YAML>
 by first converting YAML to a Perl variable and then
-converting that variable to JSON using L<Data::Roundtrip>'s C<< perl2json() >>.
-All the parameters supported by L<Data::Roundtrip>'s C<< perl2json() >>
+converting that variable to JSON using L</perl2json>.
+All the parameters supported by L</perl2json>
 are accepted.
 
 Returns the JSON string on success or C<undef> on failure.
@@ -1080,7 +1228,7 @@ Return value:
 Given a filename, it opens it using C<< :encoding(UTF-8) >>, slurps its
 contents and closes it. It's a convenience sub which could have also
 been private. If you want to retain the filehandle, use
-L<Data::Roundtrip>'s C<< read_from_filehandle() >>.
+L</read_from_filehandle>.
 
 Returns the file contents on success or C<undef> on failure.
 
@@ -1134,7 +1282,7 @@ Given a filename, it opens it using C<< :encoding(UTF-8) >>,
 writes all specified content and closes the file.
 It's a convenience sub which could have also
 been private. If you want to retain the filehandle, use
-L<Data::Roundtrip>'s C<< write_to_filehandle() >>.
+L</write_to_filehandle>.
 
 Returns 1 on success or 0 on failure.
 

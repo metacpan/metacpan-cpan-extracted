@@ -15,7 +15,7 @@
 
 #define MIN_PERL_VERSION_FOR_COW  20
 
-#if PERL_REVISION >= 5 && PERL_VERSION >= MIN_PERL_VERSION_FOR_COW  
+#if defined(SV_COW_REFCNT_MAX)
 #   define B_CAN_COW 1
 #else
 #   define B_CAN_COW 0

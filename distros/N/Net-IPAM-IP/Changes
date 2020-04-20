@@ -1,5 +1,11 @@
 Revision history for Net-IPAM-IP
 
+1.16    Mon, 20 Apr 2020 09:01:32 +0200
+        * use carp as default error_cb
+
+1.15    Sun, 19 Apr 2020 18:58:54 +0200
+        * use namespace::clean
+
 1.14    Thu, 16 Apr 2020 12:17:02 +0200
         * rearrange src and pod, better pod, no new features
 

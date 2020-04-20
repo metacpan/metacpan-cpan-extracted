@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-12'; # DATE
+our $DATE = '2020-04-18'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.474'; # VERSION
+our $VERSION = '0.476'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ reverse-org-headlines - Reverse Org headlines
 
 =head1 VERSION
 
-This document describes version 0.474 of reverse-org-headlines (from Perl distribution App-OrgUtils), released on 2020-04-12.
+This document describes version 0.476 of reverse-org-headlines (from Perl distribution App-OrgUtils), released on 2020-04-18.
 
 =head1 SYNOPSIS
 

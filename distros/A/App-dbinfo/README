@@ -2,13 +2,55 @@ NAME
     App::dbinfo - Get/extract information from database
 
 VERSION
-    This document describes version 0.005 of App::dbinfo (from Perl
-    distribution App-dbinfo), released on 2019-11-29.
+    This document describes version 0.006 of App::dbinfo (from Perl
+    distribution App-dbinfo), released on 2020-04-20.
 
 SYNOPSIS
-    See included script dbinfo.
+    See included scripts dbinfo, dbinfo-sqlite, ...
 
 FUNCTIONS
+  dump_sqlite_table
+    Usage:
+
+     dump_sqlite_table(%args) -> [status, msg, payload, meta]
+
+    Dump SQLite table into various formats.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbpath => *filename*
+
+    *   exclude_columns => *array[str]*
+
+    *   include_columns => *array[str]*
+
+    *   limit_number => *uint*
+
+    *   limit_offset => *uint*
+
+    *   row_format => *str* (default: "hash")
+
+    *   table* => *str*
+
+        Table name.
+
+    *   wheres => *array[str]*
+
+        Add WHERE clause.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (str)
+
   dump_table
     Usage:
 
@@ -133,6 +175,68 @@ FUNCTIONS
 
     Return value: (any)
 
+  list_sqlite_columns
+    Usage:
+
+     list_sqlite_columns(%args) -> [status, msg, payload, meta]
+
+    List columns of a SQLite database table.
+
+    Examples:
+
+    *   Example #1:
+
+         list_sqlite_columns(dbpath => "/tmp/test.db", table => "main.table1");
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbpath => *filename*
+
+    *   detail => *bool*
+
+        Show detailed information per record.
+
+    *   table* => *str*
+
+        Table name.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_sqlite_tables
+    Usage:
+
+     list_sqlite_tables(%args) -> [status, msg, payload, meta]
+
+    List tables in the SQLite database.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbpath => *filename*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   list_tables
     Usage:
 
@@ -187,13 +291,14 @@ BUGS
 SEE ALSO
     DBI
 
-    App::diffdb
+    diffdb, diffdb-sqlite, ... (from App::diffdb)
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2018, 2017 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

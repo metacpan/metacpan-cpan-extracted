@@ -1,26 +1,31 @@
-0.14    2017-01-16 (PERLANCAR)
+0.150   2020-04-19  Released-By: PERLANCAR
+
+        - [build] Rebuild to update Sah coerce rule module names.
+
+
+0.14    2017-01-16  Released-By: PERLANCAR
 
 	- dist-has-deb: Add --use-allpackages option.
 
 
-0.13    2017-01-14 (PERLANCAR)
+0.13    2017-01-14  Released-By: PERLANCAR
 
 	- Add utilities: dist-has-deb, dist2deb.
 
         - Use more specific schemas (dirname & filename instead of str, etc).
 
 
-0.12    2016-06-26 (PERLANCAR)
+0.12    2016-06-26  Released-By: PERLANCAR
 
 	- Add utility: parse-release-file-name.
 
 
-0.11    2016-06-14 (PERLANCAR)
+0.11    2016-06-14  Released-By: PERLANCAR
 
 	- Add missing pwd2mod.
 
 
-0.10    2016-06-14 (PERLANCAR)
+0.10    2016-06-14  Released-By: PERLANCAR
 
 	- Add utilities: dir2dist, dir2mod.
 
@@ -28,12 +33,12 @@
 	  1.1.75.
 
 
-0.09    2016-04-30 (PERLANCAR)
+0.09    2016-04-30  Released-By: PERLANCAR
 
 	- Add utilities: dist2mod, mod2dist, pwd2dist.
 
 
-0.08    2015-09-03 (PERLANCAR)
+0.08    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -42,7 +47,7 @@
 	  requirement.
 
 
-0.07    2015-03-21 (PERLANCAR)
+0.07    2015-03-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -50,19 +55,19 @@
 	  & See Also.
 
 
-0.06    2015-03-20 (PERLANCAR)
+0.06    2015-03-20  Released-By: PERLANCAR
 
         - Add script: dist-dir.
 
 
-0.05    2014-12-29 (PERLANCAR)
+0.05    2014-12-29  Released-By: PERLANCAR
 
 	- Add --force (-f) option to uninstall-dist.
 
 	- [Bugfix] Forgot to require Dist::Util.
 
 
-0.04    2014-12-28 (PERLANCAR)
+0.04    2014-12-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -71,17 +76,17 @@
 	- Replace App::PMUtils with depending on Complete::Module directly.
 
 
-0.03    2014-12-12 (PERLANCAR)
+0.03    2014-12-12  Released-By: PERLANCAR
 
         - Add utility: uninstall-dist.
 
 
-0.02    2014-12-06 (PERLANCAR)
+0.02    2014-12-06  Released-By: PERLANCAR
 
 	- packlist-for: accept Foo-Bar in addition to Foo::Bar, for
 	  convenience.
 
 
-0.01    2014-12-04 (PERLANCAR)
+0.01    2014-12-04  Released-By: PERLANCAR
 
         - First release.

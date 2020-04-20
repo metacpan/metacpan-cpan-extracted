@@ -1,3 +1,18 @@
+1.179 2020-04-19
+================
+
+[Quiq::Cascm]
+* sync() - um Parameter $repoDir erweitert
+
+[Quiq::Database::Connection]
+* Doku bearbeitet
+
+[Quiq::Database::ResultSet]
+* asExcel() hinzugefügt
+
+[Quiq::Html::Component]
+* Doku bearbeitet
+
 1.178 2020-04-05
 ================
 

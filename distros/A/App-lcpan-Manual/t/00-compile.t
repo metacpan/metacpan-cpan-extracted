@@ -6,11 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'App/lcpan/Manual.pm',
-    'App/lcpan/Manual/Cookbook.pm'
+    'App/lcpan/Manual.pm'
 );
 
 

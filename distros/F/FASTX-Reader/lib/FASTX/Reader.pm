@@ -3,7 +3,7 @@ use 5.012;
 use warnings;
 use Carp qw(confess);
 use Data::Dumper;
-$FASTX::Reader::VERSION = '0.87';
+$FASTX::Reader::VERSION = '0.88';
 require Exporter;
 our @ISA = qw(Exporter);
 #ABSTRACT: A lightweight module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.
@@ -68,7 +68,7 @@ sub new {
       $object->{fh} = $fh;
     } else {
       $self->{fh} = \*STDIN;
-      if ($self->{load}) {
+      if ($self->{loadseqs}) {
         confess("Load sequences not supported for STDIN");
       }
     }
@@ -311,17 +311,30 @@ sub getFileFormat {
   my $self   = shift;
   my ($filename) = shift;
   return 0 if (not defined $filename);
-  return $filename if (not -e "$filename");
+  
+  open my $fh, '<', $filename or confess "Unable to read file ", $filename, "\n";
+  read( $fh, my $magic_byte, 4 );
+  close $fh;
 
-  open my $f, '<:encoding(utf8)', "$filename" || confess "Unable to read $filename\n$!\n";
-  my $first = readline($f);
+  if (substr($magic_byte,0,3) eq GZIP_SIGNATURE) {
+   
+    if (! defined $self->{GZIP_BIN}) {
+      require IO::Uncompress::Gunzip;
+      $fh = IO::Uncompress::Gunzip->new($filename, MultiStream => 1);
+    } else {
+	    open  $fh, '-|', "$self->{GZIP_BIN} -dc $filename" or confess "Error opening gzip file ", $filename, ": $!\n";
+    }
+  } else {
+    open  $fh, '<:encoding(utf8)', "$filename" || confess "Unable to read $filename\n$!\n";
+  }
+  my $first = readline($fh);
   if (substr($first, 0,1) eq '>') {
     #should be FASTA
     return 'fasta';
   } elsif (substr($first, 0, 1) eq '@') {
     #should be fastq
-    readline($f);
-    my $sep = readline($f);
+    readline($fh);
+    my $sep = readline($fh);
     if ( substr($sep, 0, 1) eq '+' ) {
       #second check for fastq
       return 'fastq';
@@ -378,7 +391,7 @@ FASTX::Reader - A lightweight module to parse FASTA and FASTQ files, supporting 
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 SYNOPSIS
 

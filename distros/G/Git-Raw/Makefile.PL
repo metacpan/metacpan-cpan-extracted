@@ -39,8 +39,12 @@ my $ccflags = '';
 my %os_specific = (
 	'darwin' => {
 		'ssh2' => {
-			'inc' => ['/opt/local/include'],
-			'lib' => ['/opt/local/lib']
+			'inc' => ['/usr/local/opt/libssh2/include', '/opt/local/include'],
+			'lib' => ['/usr/local/opt/libssh2/lib', '/opt/local/lib']
+		},
+		'ssl' => {
+			'inc' => ['/usr/local/opt/openssl/include'],
+			'lib' => ['/usr/local/opt/openssl/lib']
 		}
 	},
 	'freebsd' => {
@@ -58,10 +62,16 @@ my %os_specific = (
 );
 
 my ($ssh2_libpath, $ssh2_incpath);
+my ($ssl_libpath, $ssl_incpath);
 if (my $os_params = $os_specific{$^O}) {
 	if (my $ssh2 = $os_params -> {'ssh2'}) {
 		$ssh2_libpath = $ssh2 -> {'lib'};
 		$ssh2_incpath = $ssh2 -> {'inc'};
+	}
+
+	if (my $ssl = $os_params -> {'ssl'}) {
+		$ssl_libpath = $ssl -> {'lib'};
+		$ssl_incpath = $ssl -> {'inc'};
 	}
 }
 
@@ -74,13 +84,15 @@ my @library_tests = (
 	},
 	{
 		'lib'     => 'ssl',
+		'libpath' => $ssl_libpath,
+		'incpath' => $ssl_incpath,
 		'header'  => 'openssl/opensslconf.h',
 	},
 );
 
 my %library_opts = (
 	'ssl' => {
-		'defines' => ' -DGIT_OPENSSL -DGIT_SHA1_OPENSSL -DGIT_HTTPS',
+		'defines' => ' -DGIT_OPENSSL -DGIT_HTTPS',
 		'libs'    => ' -lssl -lcrypto',
 	},
 	'ssh2' => {
@@ -171,6 +183,13 @@ if ($is_netbsd) {
 # Nanosecond resolution
 $def .= ' -DGIT_USE_STAT_MTIM_NSEC -DGIT_USE_NEC';
 
+# SHA1DC
+$def .= ' -DGIT_SHA1_COLLISIONDETECT';
+
+# Use the builtin PCRE regex
+$def .= ' -DGIT_REGEX_BUILTIN -DLINK_SIZE=2 -DMAX_NAME_SIZE=32 -DMAX_NAME_COUNT=10000 -DNEWLINE=-2 ';
+$def .= ' -DPARENS_NEST_LIMIT=250 -DMATCH_LIMIT=10000000 -DMATCH_LIMIT_RECURSION=MATCH_LIMIT -DPOSIX_MALLOC_THRESHOLD=10';
+
 if ($is_gcc) {
 	# gcc-like compiler
 	$ccflags .= ' -Wall -Wno-unused-variable -Wno-pedantic -Wno-deprecated-declarations';
@@ -183,7 +202,7 @@ if ($is_gcc) {
 		}
 
 		# Secure transport (HTTPS)
-		$def .= ' -DGIT_SECURE_TRANSPORT -DGIT_HTTPS -DGIT_SHA1_COMMON_CRYPTO';
+		$def .= ' -DGIT_SECURE_TRANSPORT -DGIT_HTTPS';
 		$otherldflags .= ' -framework CoreFoundation -framework Security';
 	}
 
@@ -226,18 +245,9 @@ if ($Config{usethreads} && !$is_sunpro) {
 	print "Thread support disabled (perl wasn't built with thread support)\n"
 }
 
-my @deps = glob 'deps/libgit2/deps/{http-parser,zlib}/*.c';
-my @srcs = glob 'deps/libgit2/src/{*.c,transports/*.c,xdiff/*.c,streams/*.c,allocators/*.c}';
-
-if (!$library_opts{'ssl'}{'use'} && !$is_osx) {
-	push @srcs, 'deps/libgit2/src/hash/hash_generic.c';
-}
-
-# the system regex is broken on Solaris, not available on Windows
-if ($is_windows || $is_solaris) {
-	push @srcs, 'deps/libgit2/deps/regex/regex.c';
-	$inc .= ' -Ideps/libgit2/deps/regex';
-}
+my @deps = glob 'deps/libgit2/deps/{http-parser,zlib,pcre}/*.c';
+my @srcs = glob 'deps/libgit2/src/{*.c,transports/*.c,xdiff/*.c,streams/*.c,allocators/*.c,hash/sha1/collision*.c,hash/sha1/sha1dc/*.c}';
+$inc .= ' -Ideps/libgit2/deps/pcre';
 
 if ($is_windows) {
 	push @srcs, glob 'deps/libgit2/src/{win32,compat}/*.c';
@@ -256,7 +266,7 @@ if ($is_windows) {
 		$def .= ' -D_CRT_SECURE_NO_WARNINGS';
 	} else {
 		# mingw/cygwin
-		$def .= ' -D_WIN32_WINNT=0x0501 -D__USE_MINGW_ANSI_STDIO=1';
+		$def .= ' -D_WIN32_WINNT=0x0600 -D__USE_MINGW_ANSI_STDIO=1';
 	}
 } else {
 	push @srcs, glob 'deps/libgit2/src/unix/*.c'
@@ -353,7 +363,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "Time::Local" => 0
   },
-  "VERSION" => "0.84",
+  "VERSION" => "0.85",
   "test" => {
     "TESTS" => "t/*.t"
   }

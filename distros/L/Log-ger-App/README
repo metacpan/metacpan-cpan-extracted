@@ -2,7 +2,7 @@ NAME
     Log::ger::App - An easy way to use Log::ger in applications
 
 VERSION
-    version 0.013
+    version 0.014
 
 SYNOPSIS
     In your script:
@@ -150,6 +150,10 @@ ENVIRONMENT
     Boolean. Default to false. If set to true, will add timestamps to the
     screen log. Normally, timestamps will only be added to the file log.
 
+  LOG_ADD_MEMORY_INFO
+    Boolean. Default to false. If set to true, will add memory info to log
+    (see "_{vmtime}" in Log::ger::Layout::Pattern).
+
   LOG_LEVEL
     String. Can be set to "off" or numeric/string log level.
 
@@ -250,7 +254,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2018, 2017 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

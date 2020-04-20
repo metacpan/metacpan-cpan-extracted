@@ -1,3 +1,4 @@
+var idCntr=0;
 qx.Class.define("callbackery.ui.form.UploadButton", {
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
     extend : qx.ui.form.Button,
@@ -28,9 +29,10 @@ qx.Class.define("callbackery.ui.form.UploadButton", {
         this.__inputObject.setAttribute(attr,value);
       },
       _createContentElement: function() {
+        var id = 'uploadId_'+(idCntr++);
         var input = this.__inputObject 
-          = new qx.html.Input("file",{display: 'none'},{id: 'hello'});
-        var label = new qx.html.Element("label",{},{for: 'hello'});
+          = new qx.html.Input("file",{display: 'none'},{id: id});
+        var label = new qx.html.Element("label",{},{for: id});
         label.addListenerOnce('appear',function(e){
           label.add(input);
           qx.html.Element.flush();

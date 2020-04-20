@@ -2,7 +2,14 @@ CHANGE LOG
 ==========
 
 
-2020-10-29 - v0.06
+2020-04-20 - v0.07
+------------------
+
+### Fixed
+    - dependency OT::Interface version 0.18 or later
+
+
+2020-01-29 - v0.06
 ------------------
 
 ### Added

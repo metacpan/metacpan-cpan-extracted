@@ -294,9 +294,6 @@ qx.Class.define("callbackery.ui.plugin.Action", {
             var req = new qx.io.request.Xhr("upload",'POST').set({
                 requestData: form
             });
-            // formData formats stuff like that so we should set the 
-            // header appropriately
-            req.setRequestHeader('Content-Type','multipart/form-data');
             req.addListener('success',function(e) {
                 var response = req.getResponse();
                 if (response.exception){

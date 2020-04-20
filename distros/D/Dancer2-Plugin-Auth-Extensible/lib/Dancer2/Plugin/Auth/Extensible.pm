@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Auth::Extensible;
 
-our $VERSION = '0.708';
+our $VERSION = '0.709';
 
 use strict;
 use warnings;
@@ -606,7 +606,7 @@ sub logged_in_user {
         return $user;
     }
     else {
-        return;
+        return undef; # Ensure function doesn't cause problems in list context (GH92)
     }
 }
 
@@ -1479,7 +1479,7 @@ login page URL.  If they are logged in, but do not have any of the specified
 roles, they will be redirected to the access denied URL.
 
 If C<disable_roles> configuration option is set to a true value then using
-L</require_any_roles> will cause the application to croak on load.
+L</require_any_role> will cause the application to croak on load.
 
 =head2 require_all_roles - require the user to have all roles listed
 

@@ -77,7 +77,6 @@ if ($is_windows)
 
 # generate the platform.hpp file
 my @opts = (
-	'ZMQ_HAVE_WS',
 	'ZMQ_HAVE_SO_KEEPALIVE',
 	'ZMQ_HAVE_CURVE',
 	'ZMQ_USE_TWEETNACL',
@@ -129,6 +128,7 @@ else
 if ($is_linux || $is_osx)
 {
 	push @opts,
+		'ZMQ_HAVE_STRLCPY',
 		'ZMQ_HAVE_TCP_KEEPCNT',
 		'ZMQ_HAVE_TCP_KEEPINTVL',
 		'ZMQ_HAVE_TCP_KEEPALIVE';
@@ -235,7 +235,7 @@ close $fh;
 my @cc_srcs = (glob ('deps/libzmqraw/*.cc'));
 my @cc_objs = map { substr ($_, 0, -2) . 'o' } (@cc_srcs);
 
-my @cpp_srcs = (glob ('deps/libzmq/src/*.cpp'));
+my @cpp_srcs = grep { $_ !~ /(ws_|wss_)/ } (glob ('deps/libzmq/src/*.cpp'));
 my @cpp_objs = map { substr ($_, 0, -3) . 'o' } (@cpp_srcs);
 
 my @c_srcs = (glob ('deps/libzmq/src/*.c'), glob ('deps/libzmqraw/*.c'), glob ('deps/libzmq/external/sha1/*.c'));
@@ -357,6 +357,9 @@ my @constants = (qw(
 	ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL
 	ZMQ_EVENT_HANDSHAKE_FAILED_AUTH
 
+	ZMQ_NOTIFY_CONNECT
+	ZMQ_NOTIFY_DISCONNECT
+
 	FEATURE_IPC
 	FEATURE_PGM
 	FEATURE_TIPC
@@ -394,6 +397,7 @@ my @errors = (qw(
 my @socket_options = (qw(
 	ZMQ_AFFINITY
 	ZMQ_IDENTITY
+	ZMQ_ROUTING_ID
 	ZMQ_SUBSCRIBE
 	ZMQ_UNSUBSCRIBE
 	ZMQ_RATE
@@ -438,6 +442,7 @@ my @socket_options = (qw(
 	ZMQ_CONFLATE
 	ZMQ_ZAP_DOMAIN
 	ZMQ_ROUTER_HANDOVER
+	ZMQ_ROUTER_NOTIFY
 	ZMQ_TOS
 	ZMQ_CONNECT_RID
 	ZMQ_GSSAPI_SERVER

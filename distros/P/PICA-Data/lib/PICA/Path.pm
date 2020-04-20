@@ -2,7 +2,7 @@ package PICA::Path;
 use strict;
 use warnings;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);
@@ -104,14 +104,22 @@ sub match_record {
         }
 
     }
+    if (@matches) {
 
-    # return matched fields as array reference or string
-    if ($args{split}) {
-        return $args{force_array} ? [\@matches] : \@matches;
-    } 
-    else {
-        return $args{force_array} ? \@matches : join($args{join}, @matches);
+        # return matched fields as array reference
+        if ( $args{split} ) {
+            return $args{force_array} ? [ \@matches ] : \@matches;
+        }
+
+        # ... or string
+        else {
+            return $args{force_array}
+                ? \@matches
+                : join( $args{join}, @matches );
+        }
     }
+    return;
+
 }
 
 sub match_field {

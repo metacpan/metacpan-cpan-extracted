@@ -168,7 +168,7 @@ move-done-todos - Move done todos from one Org file to another
 
 =head1 VERSION
 
-This document describes version 0.474 of move-done-todos (from Perl distribution App-OrgUtils), released on 2020-04-12.
+This document describes version 0.476 of move-done-todos (from Perl distribution App-OrgUtils), released on 2020-04-18.
 
 =head1 SYNOPSIS
 

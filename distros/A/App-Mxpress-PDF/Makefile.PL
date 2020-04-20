@@ -27,7 +27,11 @@ WriteMakefile(
 	'MetaCPAN::CLient::Pod::PDF' => 0.03,
 	'Type::Tiny' => 0,
 	'Crypt::SaltedHash' => 0,
-	'Data::UUID' => 0
+	'Data::UUID' => 0,
+	'Compiled::Params::OO' => 0,
+	'Future::HTTP' => 0,
+	'HTTP::CookieJar' => 0,
+	'JSON' => 0
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'App-Mxpress-PDF-*' },

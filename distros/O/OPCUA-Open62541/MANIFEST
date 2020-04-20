@@ -44,7 +44,6 @@ t/server-client-variable.t
 t/server-config-default.t
 t/server-config-minimal.t
 t/server-config.t
-t/server-iterate-singlestep.t
 t/server-iterate.t
 t/server-leak.t
 t/server-running.t
@@ -52,6 +51,7 @@ t/server-variable.t
 t/server.t
 t/statuscodes.t
 t/test-client.t
+t/test-server-singlestep.t
 t/test-server.t
 t/types.t
 t/variant-array.t

@@ -32,6 +32,7 @@ BEGIN {
       $response->status($status || 302);
       $response->headers('Location' => $destination);
   };
+
   # neater than using Dancer::Plugin::Res to handle JSON differently
   *Dancer::send_error = sub {
       my ($body, $status) = @_;
@@ -111,29 +112,6 @@ eval {
   setting('session_cookie_key' => $skey->get_column('a_session')) if $skey;
 };
 Dancer::Session::Cookie::init(session);
-
-# setup for swagger API
-my $swagger = Dancer::Plugin::Swagger->instance->doc;
-$swagger->{schemes} = ['http','https'];
-$swagger->{consumes} = 'application/json';
-$swagger->{produces} = 'application/json';
-$swagger->{tags} = [
-  {name => 'General',
-    description => 'Log in and Log out'},
-  {name => 'Search',
-    description => 'Search Operations'},
-  {name => 'Objects',
-    description => 'Retrieve Device, Port, and associated Node Data'},
-  {name => 'Reports',
-    description => 'Canned and Custom Reports'},
-];
-$swagger->{securityDefinitions} = {
-  APIKeyHeader =>
-    { type => 'apiKey', name => 'Authorization', in => 'header' },
-  BasicAuth =>
-    { type => 'basic'  },
-};
-$swagger->{security} = [ { APIKeyHeader => [] } ];
 
 # workaround for https://github.com/PerlDancer/Dancer/issues/935
 hook after_error_render => sub { setting('layout' => 'main') };
@@ -279,7 +257,7 @@ hook before_layout_render => sub {
 hook 'after' => sub {
     my $r = shift; # a Dancer::Response
 
-    if (request->path eq '/swagger.json') {
+    if (request->path eq uri_for('/swagger.json')->path) {
         $r->content( to_json( $r->content ) );
         header('Content-Type' => 'application/json');
     }
@@ -290,6 +268,51 @@ hook 'after' => sub {
         header('Content-Type' => 'application/json');
         $r->content( $r->content || '[]' );
     }
+};
+
+# setup for swagger API
+my $swagger = Dancer::Plugin::Swagger->instance;
+my $swagger_doc = $swagger->doc;
+
+$swagger_doc->{schemes} = ['http','https'];
+$swagger_doc->{consumes} = 'application/json';
+$swagger_doc->{produces} = 'application/json';
+$swagger_doc->{tags} = [
+  {name => 'General',
+    description => 'Log in and Log out'},
+  {name => 'Search',
+    description => 'Search Operations'},
+  {name => 'Objects',
+    description => 'Retrieve Device, Port, and associated Node Data'},
+  {name => 'Reports',
+    description => 'Canned and Custom Reports'},
+];
+$swagger_doc->{securityDefinitions} = {
+  APIKeyHeader =>
+    { type => 'apiKey', name => 'Authorization', in => 'header' },
+  BasicAuth =>
+    { type => 'basic'  },
+};
+$swagger_doc->{security} = [ { APIKeyHeader => [] } ];
+
+# manually install Swagger UI routes because plugin doesn't handle non-root
+# hosting, so we cannot use show_ui(1)
+my $swagger_base = config->{plugins}->{Swagger}->{ui_url};
+
+get $swagger_base => sub {
+    redirect uri_for($swagger_base)->path
+      . '/?url=' . uri_for('/swagger.json')->path;
+};
+
+get $swagger_base.'/' => sub {
+    # user might request /swagger-ui/ initially (Plugin doesn't handle this)
+    params->{url} or redirect uri_for($swagger_base)->path;
+    send_file( 'swagger-ui/index.html' );
+};
+
+# omg the plugin uses system_path and we don't want to go there
+get $swagger_base.'/**' => sub {
+    send_file( join '/', 'swagger-ui', @{ (splat())[0] } );
 };
 
 # remove empty lines from CSV response

@@ -23,8 +23,9 @@
          "requires" : {
             "Carp" : "0",
             "List::Util" : "1.43",
-            "Net::IPAM::IP" : "1.11",
+            "Net::IPAM::IP" : "1.15",
             "Scalar::Util" : "1.39",
+            "namespace::clean" : "0",
             "perl" : "v5.10.0"
          }
       },
@@ -37,10 +38,10 @@
    "provides" : {
       "Net::IPAM::Block" : {
          "file" : "lib/Net/IPAM/Block.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       }
    },
    "release_status" : "stable",
-   "version" : "1.09",
+   "version" : "1.10",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

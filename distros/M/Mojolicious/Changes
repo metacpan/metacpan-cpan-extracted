@@ -1,4 +1,15 @@
 
+8.37  2020-04-19
+  - Added keep_alive_timeout attribute to Mojo::Server::Daemon.
+  - Added -k options to daemon and prefork commands.
+  - Added keep_alive_timeout setting to Hypnotoad.
+  - Increased various default timeouts because keep_alive_timeout takes over
+    some of their previous responsibility.
+  - Improved timeout setting performance significantly in Mojo::IOLoop::Stream.
+  - Improved again method in Mojo::Reactor, Mojo::Reactor::EV and
+    Mojo::Reactor::Poll to allow changing the invocation time of active timers.
+  - Fixed support for 425 status in Mojo::Message::Response.
+
 8.36  2020-03-31
   - Added handler attribute to Test::Mojo.
   - Added test method to Test::Mojo.

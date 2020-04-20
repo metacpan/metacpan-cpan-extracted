@@ -1,5 +1,12 @@
 Revision history for Net-IPAM-Tree
 
+1.09    Mon, 20 Apr 2020 15:49:07 +0200
+        - use carp as default error_cb
+
+1.08    Sun, 19 Apr 2020 21:04:01 +0200
+        - use namespace::clean
+        - support error_cb in constructor
+
 1.07    Sun, 12 Apr 2020 18:01:12 +0200
         - fix utf8 for tree printing chars
 

@@ -11,7 +11,7 @@ has _smtp => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcor
 sub BUILD ( $self, $args ) {
 
     # set settings listener
-    P->bind_events(
+    P->on(
         'app.api.settings.updated',
         sub ($ev) {
             $self->on_settings_update( $ev->{data} );

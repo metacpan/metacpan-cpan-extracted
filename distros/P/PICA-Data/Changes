@@ -1,5 +1,8 @@
 Revision history for PICA::Data
 
+1.06  2020-04-20 11:20:40 CEST
+    - fix return of empty values
+
 1.05  2020-03-23 10:59:47 CET
     - fix version numbers
 

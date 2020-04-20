@@ -68,7 +68,7 @@ SQL
     }
 
     # create event listener
-    P->bind_events(
+    P->on(
         ['log.#'],
         sub ( $ev ) {
             $self->_process_ev($ev);

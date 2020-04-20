@@ -28,6 +28,7 @@ data/test2.fastq
 dist.ini
 lib/FASTX/PE.pm
 lib/FASTX/Reader.pm
+lib/FASTX/ScriptHelper.pm
 meta.yaml
 scripts/Benchmark.pl
 scripts/Counter.pl
@@ -37,6 +38,7 @@ scripts/PE.pl
 scripts/README.md
 scripts/Reader.pl
 scripts/Stdin.pl
+scripts/Utils.pl
 setup.sh
 t/01_basic_test.t
 t/02_parse_fasta.t

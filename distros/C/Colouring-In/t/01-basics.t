@@ -12,7 +12,9 @@ subtest 'basics' => sub {
                 toHEXfull => '#ffffff',
                 toRGB => 'rgb(255,255,255)',
                 toRGBA => 'rgba(255,255,255,1)',
-        );
+       		toTerm => 'r255g255b255',
+       		toOnTerm => 'on_r255g255b255'
+	);
         basic_tests(
                 start => '#000000',
                 toCSS => '#000',
@@ -22,7 +24,9 @@ subtest 'basics' => sub {
                 toHEXfull => '#000000',
                 toRGB => 'rgb(0,0,0)',
                 toRGBA => 'rgba(0,0,0,1)',
-        );
+		toTerm => 'r0g0b0',
+		toOnTerm => 'on_r0g0b0'
+	);
         basic_tests(
                 start => [ '255', '0', '0' ],
                 toCSS => '#f00',
@@ -32,7 +36,9 @@ subtest 'basics' => sub {
                 toHEXfull => '#ff0000',
                 toRGB => 'rgb(255,0,0)',
                 toRGBA => 'rgba(255,0,0,1)',
-        );
+		toTerm => 'r255g0b0',
+		toOnTerm => 'on_r255g0b0'
+	);
 	basic_tests(
                 start => [ '255', '0', '0' ],
                 toCSS => '#f00',
@@ -42,7 +48,9 @@ subtest 'basics' => sub {
                 toHEXfull => '#ff0000',
                 toRGB => 'rgb(255,0,0)',
                 toRGBA => 'rgba(255,0,0,1)',
-        );   
+		toTerm => 'r255g0b0',
+		toOnTerm => 'on_r255g0b0'
+	);   
         basic_tests(
                 start => [ '255', '0', '0' ],
                 toCSS => '#f00',
@@ -52,7 +60,9 @@ subtest 'basics' => sub {
                 toHEXfull => '#ff0000',
                 toRGB => 'rgb(255,0,0)',
                 toRGBA => 'rgba(255,0,0,1)',
-        );
+		toTerm => 'r255g0b0',
+		toOnTerm => 'on_r255g0b0'
+	);
 };       
 
 sub basic_tests {
@@ -70,6 +80,9 @@ sub basic_tests {
 
         is($color->toRGB, $args{toRGB}, "$args{toRGB}");
         is($color->toRGBA(1), $args{toRGBA}, "$args{toRGBA}");
+
+        is($color->toTerm, $args{toTerm}, "$args{toTerm}");
+        is($color->toOnTerm, $args{toOnTerm}, "$args{toTerm}");
 }
 
 my $co = Colouring::In->new('hsla(0, 0%, 100%, 0.3)')->toRGBA;

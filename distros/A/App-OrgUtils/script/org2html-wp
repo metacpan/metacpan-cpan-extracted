@@ -70,7 +70,7 @@ org2html-wp - Convert Org document to HTML
 
 =head1 VERSION
 
-This document describes version 0.474 of org2html-wp (from Perl distribution App-OrgUtils), released on 2020-04-12.
+This document describes version 0.476 of org2html-wp (from Perl distribution App-OrgUtils), released on 2020-04-18.
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,17 @@ C<*> marks required options.
 
 =over
 
-=item B<--browser>
+=item B<--backend>=I<s>, B<-B>
+
+Default value:
+
+ "emacs"
+
+Valid values:
+
+ ["Org::To::HTML","emacs"]
+
+=item B<--browser>, B<-b>
 
 Instead of returning the HTML, show it in browser.
 
@@ -101,14 +111,6 @@ Instead of returning the HTML, show it in browser.
 Default value:
 
  "-"
-
-=item B<--naked>
-
-Don't wrap HTML with HTML/HEAD/BODY elements.
-
-=item B<--title>=I<s>
-
-HTML title.
 
 =back
 
@@ -249,12 +251,11 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ backend (see --backend)
  browser (see --browser)
  format (see --format)
  input_filename (see --input-filename)
- naked (see --naked)
  naked_res (see --naked-res)
- title (see --title)
 
 =head1 ENVIRONMENT
 

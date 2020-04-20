@@ -4,15 +4,17 @@ use Mojo::Base -base;
 use Role::Tiny;
 use Carp qw/croak/;
 
-our $VERSION = '1.002003'; # VERSION
+our $VERSION = '1.003001'; # VERSION
 
 sub click_ok {
-    my ( $self, $selector, $extra_params ) = @_;
+    my ( $self, $selector_or_dom, $extra_params ) = @_;
     $extra_params ||= {};
 
-    my $el = $self->tx->res->dom->at($selector)
-        or croak 'Test::Mojo::Role::SubmitForm::click_ok()'
-        . " Did not find element matching selector $selector";
+    my $el = eval { $selector_or_dom->isa('Mojo::DOM') }
+        ? $selector_or_dom
+        : $self->tx->res->dom->at($selector_or_dom)
+            || croak 'Test::Mojo::Role::SubmitForm::click_ok()'
+                . " Did not find element matching selector $selector_or_dom";
     unless ( $el->tag eq 'form' ) {
         if ( $el->{type} eq 'image' ) {
             $extra_params->{ $el->{name} . '.x' } = 1;
@@ -142,6 +144,8 @@ You have all the methods provided by L<Test::Mojo>, plus these:
     $t->click_ok('form');
     $t->click_ok('#button');
 
+    $t->click_ok( $dom->at('form') );
+
     $t->click_ok('#button', {
         input1        => '42',
         select1       => [ 1..3 ],
@@ -149,9 +153,11 @@ You have all the methods provided by L<Test::Mojo>, plus these:
         another_input => sub { shift . 'offix'}
     })
 
-First parameter specifies a CSS selector matching a C<< <form> >> you want to
+First parameter specifies a CSS selector matching or L<Mojo::DOM> object
+containing C<< <form> >> you want to
 submit or a particular C<< <button> >>, C<< <input type="submit"> >>,
-or C<< <input type="image"> >> you want to click.
+or C<< <input type="image"> >> (contained in a C<< <form> >>)
+you want to click.
 
 Specifying a second parameter allows you to override the form control values:
 the keys are C<name="">s of controls to override and values can be either

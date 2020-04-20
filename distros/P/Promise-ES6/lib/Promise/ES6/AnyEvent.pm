@@ -11,19 +11,17 @@ use parent qw(Promise::ES6::EventLoopBase);
 
 Promise::ES6::AnyEvent - L<Promises/A+-compliant|https://github.com/promises-aplus/promises-spec> promises
 
+=head1 DEPRECATION NOTICE
+
+This module is deprecated and will go away eventually.
+Use C<use_event()> instead, as described in L<Promise::ES6>’s documentation.
+
 =head1 DESCRIPTION
 
 This subclass of L<Promise::ES6> incorporates L<AnyEvent> in order to
 implement full Promises/A+ compliance. Specifically, this class defers
 execution of resolve and reject callbacks to the end of the current event
 loop iteration.
-
-=head1 STATUS
-
-This module is still in the “proof-of-concept” phase. There may be areas
-of Promises/A+ nonconformance that haven’t surfaced yet. Please
-L<file a bug report|https://github.com/FGasper/p5-Promise-ES6/issues>
-if you find any problems.
 
 =head1 SEE ALSO
 

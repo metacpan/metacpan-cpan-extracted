@@ -1,3 +1,16 @@
+0.004   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Like dump-firefox-history, now by default dumps all profiles
+	  instead of the hardcoded 'Default' profile.
+
+
+0.003   2020-04-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Add logging.
+
+
 0.002   2019-08-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Change default of copy_size_limit from 40MB to 100MB.

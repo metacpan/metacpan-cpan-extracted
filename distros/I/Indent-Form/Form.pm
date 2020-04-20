@@ -15,7 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LINE_SIZE => 79;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -368,6 +368,48 @@ __END__
  # |↔| Description: File
  # |↔|      Author: skim.cz
 
+=head1 EXAMPLE5
+
+ use strict;
+ use warnings;
+
+ use Indent::Form;
+ use Term::ANSIColor;
+
+ # Indent object.
+ my $indent = Indent::Form->new(
+     'ansi' => 1,
+ );
+
+ # Input data.
+ my $input_ar = [
+         [
+                 color('cyan').'Filename'.color('reset'),
+                 color('bold cyan').'f'.color('reset').'oo.'.color('bold cyan').'b'.color('reset').'ar',
+         ],
+         [
+                 color('cyan').'Size'.color('reset'),
+                 '1456kB',
+         ],
+         [
+                 color('cyan').'Description'.color('reset'),
+                 color('bold cyan').'F'.color('reset').'ile',
+         ],
+         [
+                 color('cyan').'Author'.color('reset'),
+                 'skim.cz',
+         ],
+ ];
+
+ # Indent.
+ print $indent->indent($input_ar)."\n";
+
+ # Output (with ANSI colors):
+ #    Filename: foo.bar
+ #        Size: 1456kB
+ # Description: File
+ #      Author: skim.cz
+
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
@@ -427,6 +469,6 @@ L<http://skim.cz>
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

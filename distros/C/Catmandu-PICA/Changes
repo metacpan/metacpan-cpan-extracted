@@ -1,5 +1,9 @@
 Changelog for Catmandu-PICA
 
+1.02  2020-04-20 13:42:30 CEST
+ - add test for option pluck on multiple fields
+ - fix undefined keys
+
 1.01  2019-12-18 11:08:24 CET
  - fix test to updated pica_map()
  - requires Catmandu 1.20

@@ -3,11 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration
 
-our $VERSION = '0.0309';
+our $VERSION = '0.0502';
 
 use Moo;
 use strictures 2;
 
+use Math::Random::Discrete;
 use MIDI::Simple;
 use List::Util qw/ min /;
 
@@ -32,32 +33,54 @@ has pool => (
     default => sub { return [ keys %MIDI::Simple::Length ] },
 );
 
-
-has pool_code => (
-    is      => 'rw',
+has _min_size => (
+    is      => 'ro',
     builder => 1,
     lazy    => 1,
 );
 
-sub _build_pool_code {
-    my ($self) = @_;
-    return sub { return $self->pool->[ int rand @{ $self->pool } ] };
-};
-
-
-has min_size => (
-    is       => 'ro',
-    builder  => 1,
-    lazy     => 1,
-    init_arg => undef,
-);
-
-sub _build_min_size {
+sub _build__min_size {
     my ($self) = @_;
 
     my @sizes = map { $self->_duration($_) } @{ $self->pool };
 
     return min(@sizes);
+}
+
+has _mrd => (
+    is      => 'ro',
+    builder => 1,
+    lazy    => 1,
+);
+
+sub _build__mrd {
+    my ($self) = @_;
+    return Math::Random::Discrete->new($self->weights, $self->pool);
+}
+
+
+has pool_select => (
+    is      => 'rw',
+    builder => 1,
+    lazy    => 1,
+);
+
+sub _build_pool_select {
+    my ($self) = @_;
+    return sub { return $self->_mrd->rand };
+};
+
+
+has weights => (
+    is      => 'ro',
+    builder => 1,
+    lazy    => 1,
+);
+
+sub _build_weights {
+    my ($self) = @_;
+    # Equal probability for all pool members
+    return [ (1) x @{ $self->pool } ];
 }
 
 
@@ -77,12 +100,12 @@ sub motif {
     my $sum = 0;
 
     while ( $sum < $self->size ) {
-        my $name = $self->pool_code->();
+        my $name = $self->pool_select->();
         my $size = $self->_duration($name);
         my $diff = $self->size - $sum;
 
         last
-            if sprintf( $format, $diff ) < sprintf( $format, $self->min_size );
+            if sprintf( $format, $diff ) < sprintf( $format, $self->_min_size );
 
         next
             if sprintf( $format, $size ) > sprintf( $format, $diff );
@@ -101,7 +124,17 @@ sub motif {
 
 sub _duration {
     my ( $self, $name ) = @_;
-    return $self->durations->{$name};
+
+    my $dura;
+
+    if ($name =~ /^d(\d+)$/) {
+        $dura = $1;
+    }
+    else {
+        $dura = $self->durations->{$name};
+    }
+
+    return $dura;
 }
 
 1;
@@ -118,7 +151,7 @@ Music::Duration::Partition - Partition a musical duration
 
 =head1 VERSION
 
-version 0.0309
+version 0.0502
 
 =head1 SYNOPSIS
 
@@ -127,11 +160,12 @@ version 0.0309
   use Music::Scales;
 
   my $mdp = Music::Duration::Partition->new(
-    size => 8,
-    pool => [qw/ qn en sn /],
+    size    => 8,
+    pool    => [qw/ qn en sn /],
+    weights => [ 0.2, 0.3, 0.5 ],
   );
 
-  $mdp->pool_code( sub { ... } ); # Optional
+  $mdp->pool_select( sub { ... } ); # Optional
 
   my $motif = $mdp->motif;
 
@@ -144,6 +178,12 @@ version 0.0309
   }
 
   $score->write_score('motif.mid');
+
+  # The pool may also be made of MIDI durations
+  $mdp = Music::Duration::Partition->new(
+    size => 100,
+    pool => [qw/ d50 d25 /],
+  );
 
 =head1 DESCRIPTION
 
@@ -173,26 +213,31 @@ Default: C<4> (4 quarter notes = 1 whole note)
 
   $pool = $mdp->pool;
 
-The list of possible note duration names to use in constructing a
-motif.
+The list of possible note durations to use in constructing a motif.
 
 Default: C<[ keys %MIDI::Simple::Length ]> (wn, hn, qn, ...)
 
-=head2 pool_code
+This can be B<either> a list of duration names, as in the default
+example, or duration values, specified with a preceding 'd'.  A
+mixture of both is not well defined. YMMV
 
-  $name = $mdp->pool_code->();
-  $mdp->pool_code( sub { ... } );
+=head2 pool_select
+
+  $code = $mdp->pool_select->();
+  $mdp->pool_select( sub { ... } );
 
 A code reference used to select an item from the given duration
 B<pool>.
 
-Default: Random item of B<pool>
+Default: Random item from B<pool>
 
-=head2 min_size
+=head2 weights
 
-  $min_size = $mdp->min_size;
+  $weights = $mdp->weights;
 
-Smallest B<pool> duration.  This is a computed attribute.
+Specification of the frequency of pool selection.
+
+Default: Equal probability for each pool entry
 
 =head2 verbose
 
@@ -214,21 +259,24 @@ Create a new C<Music::Duration::Partition> object.
 
 Generate a rhythmic phrase of the given B<size>.
 
-This method returns a different rhythmic motif each time it is called.
+This method returns a possibly different rhythmic motif each time it
+is called.
 
-The default B<pool_code> used constructs this by selecting a B<pool>
+The default B<pool_select> used constructs this by selecting a B<pool>
 duration at random, that fits into the size remaining after each
 application, in a loop until the B<size> is met.
 
 =head1 SEE ALSO
 
-The F<t/01-methods.t> and F<eg/*> code in this distribution.
+The F<eg/*> and F<t/01-methods.t> programs in this distribution.
 
 L<List::Util>
 
-L<Moo>
+L<Math::Random::Discrete>
 
 L<MIDI::Simple>
+
+L<Moo>
 
 =head1 AUTHOR
 

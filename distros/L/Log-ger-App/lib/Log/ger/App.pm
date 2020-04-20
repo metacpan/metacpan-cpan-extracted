@@ -1,7 +1,7 @@
 package Log::ger::App;
 
-our $DATE = '2019-10-06'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2020-04-19'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -120,7 +120,10 @@ sub import {
             val => $level, "general log level",
         );
         last if $olevel eq 'off';
-        my $fmt = ($ENV{LOG_ADD_TIMESTAMP} ? '[%d] ': ''). '%m';
+        my $fmt =
+            ($ENV{LOG_ADD_TIMESTAMP} ? '[%d] ': '').
+            ($ENV{LOG_ADD_MEMORY_INFO} ? '[vmsize %_{vmsize}K] ': '').
+            '%m';
         $conf{outputs}{Screen} = {
             conf   => { formatter => sub { "$progname: $_[0]" } },
             level  => $olevel,
@@ -151,10 +154,14 @@ sub import {
             val => $level, "general log level",
         );
         last if $olevel eq 'off';
+        my $fmt =
+            '[pid %P] [%d] '.
+            ($ENV{LOG_ADD_MEMORY_INFO} ? '[vmsize %_{vmsize}K] ': '').
+            '%m';
         $conf{outputs}{File} = {
             conf   => { path => $file_path },
             level  => $olevel,
-            layout => [Pattern => {format => '[pid %P] [%d] %m'}],
+            layout => [Pattern => {format => $fmt}],
         };
     }
 
@@ -200,7 +207,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -363,6 +370,11 @@ Used to set the default for C<$DEBUG>.
 Boolean. Default to false. If set to true, will add timestamps to the screen
 log. Normally, timestamps will only be added to the file log.
 
+=head2 LOG_ADD_MEMORY_INFO
+
+Boolean. Default to false. If set to true, will add memory info to log (see
+C<_{vmtime}> in L<Log::ger::Layout::Pattern>).
+
 =head2 LOG_LEVEL
 
 String. Can be set to C<off> or numeric/string log level.
@@ -488,7 +500,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

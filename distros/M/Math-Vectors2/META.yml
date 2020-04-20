@@ -15,14 +15,14 @@ name: Math-Vectors2
 provides:
   Math::Vectors2:
     file: lib/Math/Vectors2.pm
-    version: '20200402'
+    version: '20200419'
 requires:
   Carp: '0'
-  Data::Table::Text: '20200221'
+  Data::Table::Text: '20200418'
   Test2::API: '0'
   Test::More: '0'
   perl: v5.26.1
 resources:
   license: http://dev.perl.org/licenses/
-version: '20200402'
+version: '20200419'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

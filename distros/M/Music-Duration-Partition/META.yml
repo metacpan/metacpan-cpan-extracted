@@ -24,6 +24,7 @@ name: Music-Duration-Partition
 requires:
   List::Util: '0'
   MIDI::Simple: '0'
+  Math::Random::Discrete: '0'
   Moo: '2'
   namespace::clean: '0'
   perl: '5.006'
@@ -31,7 +32,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Duration-Partition
   repository: https://github.com/ology/Music-Duration-Partition.git
-version: '0.0309'
+version: '0.0502'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

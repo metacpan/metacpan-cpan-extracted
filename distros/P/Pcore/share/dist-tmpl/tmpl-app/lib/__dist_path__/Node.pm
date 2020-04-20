@@ -9,7 +9,7 @@ has settings => ( required => 1 );
 has util => ( init_arg => undef );    # InstanceOf ['<: $module_name :>::Util']
 
 around BUILD => sub ( $orig, $self, $args ) {
-    P->bind_events(
+    P->on(
         'app.api.settings.updated',
         sub ($ev) {
             $self->_on_settings_update( $ev->{data} );

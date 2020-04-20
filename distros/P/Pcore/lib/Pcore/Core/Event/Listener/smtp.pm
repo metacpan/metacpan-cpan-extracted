@@ -110,7 +110,7 @@ Pcore::Core::Event::Listener::smtp
 
 =head1 SYNOPSIS
 
-    P->bind_events(
+    P->on(
         'log.test.*',
         [   'smtp:',
             host     => 'smtp.gmail.com',

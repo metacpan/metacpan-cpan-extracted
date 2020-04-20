@@ -223,6 +223,6 @@ $chords = $mc->cadence(
     inversion => { 1 => 1, 2 => 1 },
     picardy   => 1,
 );
-is_deeply $chords, [ [qw/ 59 50 115 /], [qw/ 52 56 108/] ], 'C# 4 midinum imperfect inversion 1-1,2-1 picardy';
+is_deeply $chords, [ [qw/ 59 50 115 /], [qw/ 52 56 108/] ], 'C# 3 midinum imperfect inversion 1-1,2-1 picardy';
 
 done_testing();

@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Password;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: A simple password-based auth
 
 #pod =encoding utf8
@@ -256,6 +256,24 @@ our $VERSION = '1.053';
 #pod Validate there is a logged-in user and optionally that the user data has
 #pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 #pod
+#pod     # Display the user dashboard, but only to logged-in users
+#pod     my $auth_route = $app->routes->under( '/user', $app->yancy->auth->require_user );
+#pod     $auth_route->get( '' )->to( 'user#dashboard' );
+#pod
+#pod =head2 yancy.auth.login_form
+#pod
+#pod Return an HTML string containing the rendered login form.
+#pod
+#pod     %# Display a login form to an unauthenticated visitor
+#pod     % if ( !$c->yancy->auth->current_user ) {
+#pod         %= $c->yancy->auth->login_form
+#pod     % }
+#pod
+#pod =head2 yancy.auth.logout
+#pod
+#pod Log out any current account. Use this in your own controller actions to
+#pod perform a logout.
+#pod
 #pod =head1 ROUTES
 #pod
 #pod This plugin creates the following L<named
@@ -267,28 +285,71 @@ our $VERSION = '1.053';
 #pod
 #pod =head2 yancy.auth.password.login_form
 #pod
-#pod Display the login form. See L</TEMPLATES> below.
+#pod Display the login form using the L</yancy/auth/password/login_form.html.ep> template. This route handles C<GET>
+#pod requests and can be used with the L<redirect_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#redirect_to>,
+#pod L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>,
+#pod and L<link_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#link_to> helpers.
+#pod
+#pod     %= link_to Login => 'yancy.auth.password.login_form'
+#pod     <%= link_to 'yancy.auth.password.login_form', begin %>Login<% end %>
+#pod     <p>Login here: <%= url_for 'yancy.auth.password.login_form' %></p>
 #pod
 #pod =head2 yancy.auth.password.login
 #pod
-#pod Handle login by checking the user's username and password.
+#pod Handle login by checking the user's username and password. This route
+#pod handles C<POST> requests and can be used with the
+#pod L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>
+#pod and L<form_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#form_for>
+#pod helpers.
+#pod
+#pod     %= form_for 'yancy.auth.password.login' => begin
+#pod         %= text_field 'username', placeholder => 'Username'
+#pod         %= text_field 'password', placeholder => 'Password'
+#pod         %= submit_button
+#pod     % end
 #pod
 #pod =head2 yancy.auth.password.logout
 #pod
-#pod Clear the current login and allow the user to log in again.
+#pod Clear the current login and allow the user to log in again. This route handles C<GET>
+#pod requests and can be used with the L<redirect_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#redirect_to>,
+#pod L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>,
+#pod and L<link_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#link_to> helpers.
+#pod
+#pod     %= link_to Logout => 'yancy.auth.password.logout'
+#pod     <%= link_to 'yancy.auth.password.logout', begin %>Logout<% end %>
+#pod     <p>Logout here: <%= url_for 'yancy.auth.password.logout' %></p>
 #pod
 #pod =head2 yancy.auth.password.register_form
 #pod
-#pod Display the form to register a new user, if registration is enabled.
+#pod Display the form to register a new user, if registration is enabled. This route handles C<GET>
+#pod requests and can be used with the L<redirect_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#redirect_to>,
+#pod L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>,
+#pod and L<link_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#link_to> helpers.
+#pod
+#pod     %= link_to Register => 'yancy.auth.password.register_form'
+#pod     <%= link_to 'yancy.auth.password.register_form', begin %>Register<% end %>
+#pod     <p>Register here: <%= url_for 'yancy.auth.password.register_form' %></p>
 #pod
 #pod =head2 yancy.auth.password.register
 #pod
-#pod Register a new user, if registration is enabled.
+#pod Register a new user, if registration is enabled. This route
+#pod handles C<POST> requests and can be used with the
+#pod L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>
+#pod and L<form_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#form_for>
+#pod helpers.
+#pod
+#pod     %= form_for 'yancy.auth.password.register' => begin
+#pod         %= text_field 'username', placeholder => 'Username'
+#pod         %= text_field 'password', placeholder => 'Password'
+#pod         %= text_field 'password-verify', placeholder => 'Password (again)'
+#pod         %# ... Display other fields required for registration
+#pod         %= submit_button
+#pod     % end
 #pod
 #pod =head1 TEMPLATES
 #pod
-#pod To override these templates in your application, provide your own
-#pod template with the same name.
+#pod To override these templates, add your own at the designated path inside
+#pod your app's C<templates/> directory.
 #pod
 #pod =head2 yancy/auth/password/login_form.html.ep
 #pod
@@ -342,6 +403,7 @@ has register_fields => sub { [] };
 has moniker => 'password';
 has default_digest =>;
 has route =>;
+has logout_route =>;
 
 # The Auth::Basic digest configuration to migrate from. Auth::Basic did
 # not store the digest information in the password, so we need to fix
@@ -409,12 +471,14 @@ sub init {
     }
 
     my $route = $app->yancy->routify( $config->{route}, '/yancy/auth/' . $self->moniker );
+    $self->route( $route );
     $route->get( 'register' )->to( cb => currym( $self, '_get_register' ) )->name( 'yancy.auth.password.register_form' );
     $route->post( 'register' )->to( cb => currym( $self, '_post_register' ) )->name( 'yancy.auth.password.register' );
-    $route->get( 'logout' )->to( cb => currym( $self, '_get_logout' ) )->name( 'yancy.auth.password.logout' );
+    $self->logout_route(
+        $route->get( 'logout' )->to( cb => currym( $self, '_get_logout' ) )->name( 'yancy.auth.password.logout' )
+    );
     $route->get( '' )->to( cb => currym( $self, '_get_login' ) )->name( 'yancy.auth.password.login_form' );
     $route->post( '' )->to( cb => currym( $self, '_post_login' ) )->name( 'yancy.auth.password.login' );
-    $self->route( $route );
 }
 
 sub _get_user {
@@ -479,10 +543,21 @@ sub current_user {
 
 sub login_form {
     my ( $self, $c ) = @_;
+    my $return_to
+        # If we've specified one, go there directly
+        = $c->req->param( 'return_to' )
+        ? $c->req->param( 'return_to' )
+        # If this is the login page, go back to referer
+        # XXX: What if the referer is a different site?
+        : $c->current_route =~ /^yancy\.auth/
+        ? $c->req->headers->referrer
+        # Otherwise, return the user here
+        : $c->req->url->path || '/'
+        ;
     return $c->render_to_string(
         'yancy/auth/password/login_form',
         plugin => $self,
-        return_to => $c->req->param( 'return_to' ) || $c->req->headers->referrer,
+        return_to => $return_to,
     );
 }
 
@@ -499,7 +574,7 @@ sub _post_login {
     my $pass = $c->param( 'password' );
     if ( $self->_check_pass( $c, $user, $pass ) ) {
         $c->session->{yancy}{auth}{password} = $user;
-        my $to = $c->req->param( 'return_to' ) // '/';
+        my $to = $c->req->param( 'return_to' ) || '/';
         $c->res->headers->location( $to );
         return $c->rendered( 303 );
     }
@@ -663,8 +738,12 @@ sub logout {
 sub _get_logout {
     my ( $self, $c ) = @_;
     $self->logout( $c );
-    $c->flash( info => 'logout' );
-    return $c->redirect_to( 'yancy.auth.password.login_form' );
+    $c->res->code( 303 );
+    my $redirect_to = $c->param( 'redirect_to' ) // $c->req->headers->referrer // '/';
+    if ( $redirect_to eq $c->req->url->path ) {
+        $redirect_to = '/';
+    }
+    return $c->redirect_to( $redirect_to );
 }
 
 1;
@@ -679,7 +758,7 @@ Yancy::Plugin::Auth::Password - A simple password-based auth
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 
@@ -935,6 +1014,24 @@ user was found in the session.
 Validate there is a logged-in user and optionally that the user data has
 certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 
+    # Display the user dashboard, but only to logged-in users
+    my $auth_route = $app->routes->under( '/user', $app->yancy->auth->require_user );
+    $auth_route->get( '' )->to( 'user#dashboard' );
+
+=head2 yancy.auth.login_form
+
+Return an HTML string containing the rendered login form.
+
+    %# Display a login form to an unauthenticated visitor
+    % if ( !$c->yancy->auth->current_user ) {
+        %= $c->yancy->auth->login_form
+    % }
+
+=head2 yancy.auth.logout
+
+Log out any current account. Use this in your own controller actions to
+perform a logout.
+
 =head1 ROUTES
 
 This plugin creates the following L<named
@@ -946,28 +1043,71 @@ L<form_for|Mojolicious::Plugin::TagHelpers/form_for>.
 
 =head2 yancy.auth.password.login_form
 
-Display the login form. See L</TEMPLATES> below.
+Display the login form using the L</yancy/auth/password/login_form.html.ep> template. This route handles C<GET>
+requests and can be used with the L<redirect_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#redirect_to>,
+L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>,
+and L<link_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#link_to> helpers.
+
+    %= link_to Login => 'yancy.auth.password.login_form'
+    <%= link_to 'yancy.auth.password.login_form', begin %>Login<% end %>
+    <p>Login here: <%= url_for 'yancy.auth.password.login_form' %></p>
 
 =head2 yancy.auth.password.login
 
-Handle login by checking the user's username and password.
+Handle login by checking the user's username and password. This route
+handles C<POST> requests and can be used with the
+L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>
+and L<form_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#form_for>
+helpers.
+
+    %= form_for 'yancy.auth.password.login' => begin
+        %= text_field 'username', placeholder => 'Username'
+        %= text_field 'password', placeholder => 'Password'
+        %= submit_button
+    % end
 
 =head2 yancy.auth.password.logout
 
-Clear the current login and allow the user to log in again.
+Clear the current login and allow the user to log in again. This route handles C<GET>
+requests and can be used with the L<redirect_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#redirect_to>,
+L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>,
+and L<link_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#link_to> helpers.
+
+    %= link_to Logout => 'yancy.auth.password.logout'
+    <%= link_to 'yancy.auth.password.logout', begin %>Logout<% end %>
+    <p>Logout here: <%= url_for 'yancy.auth.password.logout' %></p>
 
 =head2 yancy.auth.password.register_form
 
-Display the form to register a new user, if registration is enabled.
+Display the form to register a new user, if registration is enabled. This route handles C<GET>
+requests and can be used with the L<redirect_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#redirect_to>,
+L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>,
+and L<link_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#link_to> helpers.
+
+    %= link_to Register => 'yancy.auth.password.register_form'
+    <%= link_to 'yancy.auth.password.register_form', begin %>Register<% end %>
+    <p>Register here: <%= url_for 'yancy.auth.password.register_form' %></p>
 
 =head2 yancy.auth.password.register
 
-Register a new user, if registration is enabled.
+Register a new user, if registration is enabled. This route
+handles C<POST> requests and can be used with the
+L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>
+and L<form_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#form_for>
+helpers.
+
+    %= form_for 'yancy.auth.password.register' => begin
+        %= text_field 'username', placeholder => 'Username'
+        %= text_field 'password', placeholder => 'Password'
+        %= text_field 'password-verify', placeholder => 'Password (again)'
+        %# ... Display other fields required for registration
+        %= submit_button
+    % end
 
 =head1 TEMPLATES
 
-To override these templates in your application, provide your own
-template with the same name.
+To override these templates, add your own at the designated path inside
+your app's C<templates/> directory.
 
 =head2 yancy/auth/password/login_form.html.ep
 

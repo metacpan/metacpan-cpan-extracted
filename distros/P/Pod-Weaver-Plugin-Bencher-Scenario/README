@@ -3,9 +3,9 @@ NAME
     Bencher::Scenario::* distribution
 
 VERSION
-    This document describes version 0.246 of
+    This document describes version 0.247 of
     Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution
-    Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-12-25.
+    Pod-Weaver-Plugin-Bencher-Scenario), released on 2020-04-19.
 
 SYNOPSIS
     In your weaver.ini:
@@ -59,10 +59,26 @@ DESCRIPTION
 
 CONFIGURATION
   include_module+ => str
-    Filter only certain scenario modules. Can be specified multiple times.
+    Filter only certain scenario modules that get processed. Can be
+    specified multiple times.
 
   exclude_module+ => str
-    Exclude certain scenario modules. Can be specified multiple times.
+    Exclude certain scenario modules from being processed. Can be specified
+    multiple times.
+
+  gen_scenarior_include_module+ => str
+    Filter only certain scenario modules that we create
+    Bencher::ScenarioR::* modules for. Can be specified multiple times.
+
+    Note that modules excluded using "include_module" and/or
+    "exclude_module" are already excluded.
+
+  gen_scenarior_exclude_module+ => str
+    Exclude certain scenario modules from getting their
+    Bencher::ScenarioR::* modules created. Can be specified multiple times.
+
+    Note that modules excluded using "include_module" and/or
+    "exclude_module" are already excluded.
 
   sample_bench+ => hash
     Add a sample benchmark. Value is a hash which can contain these keys:
@@ -128,7 +144,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

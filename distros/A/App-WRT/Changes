@@ -1,5 +1,11 @@
 Revision history for App::WRT
 
+v7.1.0 2020-04-18
+
+  - Add some handling for sites with an index file in the root
+  - wrt-render-all now uses the configured default for root of site instead
+    of "new"
+
 v7.0.0 2020-04-04
 
   - Add a full tagging system

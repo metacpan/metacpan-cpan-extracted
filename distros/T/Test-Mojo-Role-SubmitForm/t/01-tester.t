@@ -90,6 +90,17 @@ my %form_one = (
         })
 }
 
+{ # pass DOM objects
+    $t->get_ok('/samepage');
+    my $dom = $t->tx->res->dom->at('form#one');
+    $t->click_ok($dom)->json_is({ a => 'A' });
+
+    $t->get_ok('/');
+    $dom = $t->tx->res->dom->at('form#two [name=q]');
+    $t->click_ok($dom)->json_is({ q => 'Q' });
+
+}
+
 done_testing();
 
 __END__

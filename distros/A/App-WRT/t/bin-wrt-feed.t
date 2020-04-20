@@ -10,8 +10,8 @@ use lib 'lib';
 use Encode;
 use Test::More tests => 2;
 
-chdir 'example';
-require_ok('../bin/wrt-feed');
+chdir 'example/blog';
+require_ok('../../bin/wrt-feed');
 
 my $output_string;
 my $output = sub {

@@ -459,4 +459,14 @@ note('Field not found');
     is( $match, undef, 'no match found nested_arrays' );
 }
 
+{
+    my $match = pica_match( $record, '004A');
+    isnt( $match, '', 'no match no return of empty field' );
+}
+
+{
+    my $match = pica_match( $record, '004A', split => 1 );
+    isnt( ref($match), ref([]), 'no match empty no return of array ref' );
+}
+
 done_testing();

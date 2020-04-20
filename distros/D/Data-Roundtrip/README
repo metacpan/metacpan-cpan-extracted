@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.06
+    Version 0.09
 
 SYNOPSIS
 
@@ -17,6 +17,8 @@ SYNOPSIS
     format (not spaces, indendation or line breaks).
 
         use Data::Roundtrip qw/:all/;
+        #use Data::Roundtrip qw/json2yaml/;
+        #use Data::Roundtrip qw/:json/; # see EXPORT
     
         $jsonstr = '{"Songname": "Απόκληρος της κοινωνίας",'
                    .'"Artist": "Καζαντζίδης Στέλιος/Βίρβος Κώστας"}'
@@ -84,6 +86,19 @@ SYNOPSIS
         perl2json.pl -i "perl-data-structure.pl" -o "output.json" --pretty
         json2json.pl -i "with-unicode.json" -o "unicode-escaped.json" --escape-unicode
         # etc.
+    
+        # only for *2dump: perl2dump, json2dump, yaml2dump
+        # and if no escape-unicode is required (i.e.
+        # setting 'dont-bloody-escape-unicode' => 1 permanently)
+        # and if efficiency is important,
+        # meaning that perl2dump is run in a loop thousand of times,
+        # then import the module like this:
+        use Data::Roundtrip qw/:all no-unicode-escape-permanently/;
+        # or like this
+        use Data::Roundtrip qw/:all unicode-escape-permanently/;
+    
+        # then perl2dump() is more efficient but unicode characters
+        # will be permanently not-escaped (1st case) or escaped (2nd case).
 
 EXPORT
 
@@ -96,12 +111,66 @@ EXPORT
       * :yaml : perl2yaml(), yaml2perl(), yaml2dump(), yaml2yaml(),
       yaml2json()
 
-      * :dump : perl2dump(), dump2perl(), dump2json(), dump2yaml()
+      * :dump : perl2dump(), perl2dump_filtered(), perl2dump_homebrew(),
+      dump2perl(), dump2json(), dump2yaml()
 
       * :io : read_from_file(), write_to_file(), read_from_filehandle(),
       write_to_filehandle(),
 
       * :all : everything above
+
+      * no-unicode-escape-permanently : this is not an export
+      keyword/parameter but a parameter which affects all the *2dump* subs
+      by setting unicode escaping permanently to false. See "EFFICIENCY".
+
+      * unicode-escape-permanently : this is not an export
+      keyword/parameter but a parameter which affects all the *2dump* subs
+      by setting unicode escaping permanently to true. See "EFFICIENCY".
+
+EFFICIENCY
+
+    The export keyword/parameter no-unicode-escape-permanently affects all
+    the *2dump* subs by setting unicode escaping permanently to false. This
+    improves efficiency, although one will ever need to use this in extreme
+    situations where a *2dump* sub is called repeatedly in a loop of a few
+    hundreds or thousands of iterations or more.
+
+    Each time a *2dump* is called, the dont-bloody-escape-unicode flag is
+    checked and if it is set, then Data::Dumper's qquote() is overriden
+    with _qquote_redefinition_by_Corion() just for that instance and will
+    be restored as soon as the dump is finished. Similarly, a filter for
+    not escaping unicode is added to Data::Dump just for that particular
+    call and is removed immediately after. This has some computational cost
+    and can be avoided completely by overriding the sub and adding the
+    filter once, at loading (in import()).
+
+    The price to pay for this added efficiency is that unicode in any dump
+    will never be escaped (e.g. \x{3b1}), but will be rendered (e.g. α, a
+    greek alpha). Always. The option dont-bloody-escape-unicode will
+    permanently be set to true.
+
+    Similarly, the export keyword/parameter unicode-escape-permanently
+    affects all the *2dump* subs by setting unicode escaping permanently to
+    true. This improves efficiency as well.
+
+    See "BENCHMARKS" on how to find the fastest *2dump* sub.
+
+BENCHMARKS
+
+    The special Makefile target benchmarks will time calls to each of the
+    *2dump* subs under
+
+        use Data::Roundtrip;
+    
+        use Data::Roundtrip qw/no-unicode-escape-permanently/;
+    
+        use Data::Roundtrip qw/unicode-escape-permanently/;
+
+    and for 'dont-bloody-escape-unicode' => 0 and
+    'dont-bloody-escape-unicode' => 1.
+
+    In general, "perl2dump" is faster by 25% when one of the permanent
+    import parameters is used (either of the last two cases above).
 
 SUBROUTINES
 
@@ -123,8 +192,8 @@ SUBROUTINES
     structure, but not an object), it will return the equivalent JSON
     string. In $optional_paramshashref one can specify whether to escape
     unicode with 'escape-unicode' => 1 and/or prettify the returned result
-    with 'pretty' => 1. The output can be fed back to Data::Roundtrip's
-    json2perl() for getting the Perl variable back.
+    with 'pretty' => 1. The output can be fed back to "json2perl" for
+    getting the Perl variable back.
 
     Returns the JSON string on success or undef on failure.
 
@@ -162,8 +231,7 @@ SUBROUTINES
     structure, but not an object), it will return the equivalent YAML
     string. In $optional_paramshashref one can specify whether to escape
     unicode with 'escape-unicode' => 1. Prettify is not supported yet. The
-    output can fed to Data::Roundtrip's yaml2perl() for getting the Perl
-    variable back.
+    output can fed to "yaml2perl" for getting the Perl variable back.
 
     Returns the YAML string on success or undef on failure.
 
@@ -207,30 +275,31 @@ SUBROUTINES
     Additionally, use terse output with 'terse' => 1 and remove all the
     incessant indentation with 'indent' => 1 which unfortunately goes to
     the other extreme of producing a space-less output, not fit for human
-    consumption. The output can fed to Data::Roundtrip's dump2perl() for
-    getting the Perl variable back.
+    consumption. The output can fed to "dump2perl" for getting the Perl
+    variable back.
 
     It returns the string representation of the input perl variable on
     success or undef on failure.
 
-    The output can be fed back to Data::Roundtrip's dump2perl().
+    The output can be fed back to "dump2perl".
 
     CAVEAT: when not escaping unicode (which is the default behaviour),
-    each call to this sub will override Data::Dumper's qquote() sub (with a
-    call to Sub::Override' new()), call Data::Dumper's Dumper() and save
-    its output to a temporary variable, restore qquote() sub (with a call
-    to Sub::Override's restore() and return the contents. This exercise is
-    done every time this perl2dump() is called. It can be expensive. The
-    alternative is to redefine qquote() once, when the module is loaded.
+    each call to this sub will override Data::Dumper's qquote() sub then
+    call Data::Dumper's Dumper() and save its output to a temporary
+    variable, restore qquote() sub to its original code ref and return the
+    contents. This exercise is done every time this perl2dump() is called.
+    It may be expensive. The alternative is to redefine qquote() once, when
+    the module is loaded, with all the side-effects this may cause.
 
-    Note that there are two other alternatives to this sub,
-    Data::Roundtrip's perl2dump_filtered() which uses Data::Dump filters to
-    control unicode escaping but lacks in aesthetics and functionality and
-    handling all the cases Dump and Dumper do quite well.
+    Note that there are two other alternative subs which offer more-or-less
+    the same functionality and their output can be fed back to all the
+    dump2*() subs. These are "perl2dump_filtered" which uses
+    Data::Dump::Filtered to add a filter to control unicode escaping but
+    lacks in aesthetics and functionality and handling all the cases Dump
+    and Dumper do quite well.
 
     There is also perl2dump_homebrew() which uses the same dump-recursively
-    engine as Data::Roundtrip's perl2dump_filtered() but does not involve
-    Data::Dump at all.
+    engine as "perl2dump_filtered" but does not involve Data::Dump at all.
 
  perl2dump_filtered
 
@@ -246,13 +315,17 @@ SUBROUTINES
 
       * $ret
 
-    It does the same job as Data::Roundtrip's perl2dump() which is to
-    stringify a perl variable. And takes the same options.
+    It does the same job as "perl2dump" which is to stringify a perl
+    variable. And takes the same options.
 
     It returns the string representation of the input perl variable on
     success or undef on failure.
 
     It uses Data::Dump::Filtered to add a filter to Data::Dump.
+
+    head3 CAVEAT
+
+    In order to xxx
 
  perl2dump_homebrew
 
@@ -268,13 +341,13 @@ SUBROUTINES
 
       * $ret
 
-    It does the same job as Data::Roundtrip's perl2dump() which is to
-    stringify a perl variable. And takes the same options.
+    It does the same job as "perl2dump" which is to stringify a perl
+    variable. And takes the same options.
 
     It returns the string representation of the input perl variable on
     success or undef on failure.
 
-    The output can be fed back to Data::Roundtrip's dump2perl().
+    The output can be fed back to "dump2perl".
 
     It uses its own basic dumper. Which is recursive. So, beware of
     extremely deep nested data structures. Deep not long! But it probably
@@ -303,9 +376,9 @@ SUBROUTINES
 
     There are 2 obvious limitations:
 
-    1) indentation is very basic,
+    1. indentation is very basic,
 
-    2) it supports only scalars, hashes and arrays, (which will dive into
+    2. it supports only scalars, hashes and arrays, (which will dive into
     them no problem) This sub can be used in conjuction with
     DataDumpFilterino() to create a Data::Dump filter like,
 
@@ -322,7 +395,7 @@ SUBROUTINES
       Dump and Dumper.
 
       The output is a, possibly multiline, string. Which it can then be fed
-      back to Data::Roundtrip's dump2perl().
+      back to "dump2perl".
 
  dump2perl
 
@@ -331,8 +404,7 @@ SUBROUTINES
     Arguments:
 
       * $dumpstring, this comes from the output of Data::Dump, Data::Dumper
-      or our own Data::Roundtrip's perl2dump(), Data::Roundtrip's
-      perl2dump_filtered(), Data::Roundtrip's perl2dump_homebrew().
+      or our own "perl2dump", "perl2dump_filtered", "perl2dump_homebrew".
       Escaped, or unescaped.
 
     Return value:
@@ -379,9 +451,8 @@ SUBROUTINES
 
     Given an input JSON string $jsonstring, it will return the equivalent
     YAML string YAML by first converting JSON to a Perl variable and then
-    converting that variable to YAML using Data::Roundtrip's perl2yaml().
-    All the parameters supported by Data::Roundtrip's perl2yaml() are
-    accepted.
+    converting that variable to YAML using "perl2yaml". All the parameters
+    supported by "perl2yaml" are accepted.
 
     Returns the YAML string on success or undef on failure.
 
@@ -401,9 +472,8 @@ SUBROUTINES
 
     Given an input YAML string $yamlstring, it will return the equivalent
     YAML string YAML by first converting YAML to a Perl variable and then
-    converting that variable to JSON using Data::Roundtrip's perl2json().
-    All the parameters supported by Data::Roundtrip's perl2json() are
-    accepted.
+    converting that variable to JSON using "perl2json". All the parameters
+    supported by "perl2json" are accepted.
 
     Returns the JSON string on success or undef on failure.
 
@@ -432,7 +502,7 @@ SUBROUTINES
     Given a filename, it opens it using :encoding(UTF-8), slurps its
     contents and closes it. It's a convenience sub which could have also
     been private. If you want to retain the filehandle, use
-    Data::Roundtrip's read_from_filehandle().
+    "read_from_filehandle".
 
     Returns the file contents on success or undef on failure.
 
@@ -469,7 +539,7 @@ SUBROUTINES
     Given a filename, it opens it using :encoding(UTF-8), writes all
     specified content and closes the file. It's a convenience sub which
     could have also been private. If you want to retain the filehandle, use
-    Data::Roundtrip's write_to_filehandle().
+    "write_to_filehandle".
 
     Returns 1 on success or 0 on failure.
 

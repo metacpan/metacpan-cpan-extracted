@@ -3,6 +3,7 @@
 use 5.010;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
@@ -11,6 +12,10 @@ our %SPEC;
 $SPEC{app} = {
     v => 1.1,
     summary => 'Convert Org document to HTML',
+    description => <<'_',
+
+
+_
     args => {
         input_filename => {
             schema => 'filename',
@@ -19,57 +24,103 @@ $SPEC{app} = {
             pos => 0,
             cmdline_aliases => {i=>{}},
         },
-        title => {
-            summary => 'HTML title',
-            schema => 'str*',
+        backend => {
+            schema => ['str*', in=>['Org::To::HTML', 'emacs']],
+            default => 'emacs',
+            cmdline_aliases => {B=>{}},
         },
-        naked => {
-            summary => "Don't wrap HTML with HTML/HEAD/BODY elements",
-            schema => ['bool', is=>1],
-        },
+        #title => {
+        #    summary => 'HTML title',
+        #    schema => 'str*',
+        #},
+        #naked => {
+        #    summary => "Don't wrap HTML with HTML/HEAD/BODY elements",
+        #    schema => ['bool', is=>1],
+        #},
         browser => {
             summary => 'Instead of returning the HTML, show it in browser',
             schema => ['bool*', is=>1],
+            cmdline_aliases => {b=>{}},
         },
     },
 };
 sub app {
     my %args = @_;
 
-    my %oth_args; # args to feed to org_to_html function
-    if ($args{input_filename} eq '-') {
-        $oth_args{source_str} = do {
-            local $/;
-            binmode STDIN, ":encoding(utf8)";
-            scalar <STDIN>;
-        };
-    } else {
-        $oth_args{source_file} = $args{input_filename};
-    }
+    my $backend = $args{backend} // 'emacs';
 
-    $oth_args{ignore_unknown_settings} = 1;
-    $oth_args{naked} = $args{naked};
-    $oth_args{html_title} = $args{title} if defined $args{title};
+    if ($backend eq 'emacs') {
 
-    require Org::To::HTML;
-    my $res = Org::To::HTML::org_to_html(%oth_args);
-    return $res unless $res->[0] == 200;
-
-    if ($args{browser}) {
-        require Browser::Open;
+        require File::Slurper;
         require File::Temp;
-        require URI::Escape;
+        require IPC::System::Options;
 
-        my ($fh, $fpath) = File::Temp::tempfile();
-        print $fh $res->[2];
-        close $fh;
+        my ($tempfh, $tempfname) = File::Temp::tempfile(
+            "XXXXXXXX", SUFFIX=>".org", TMPDIR=>1);
+        if ($args{input_filename} eq '-') {
+            binmode STDIN, ":encoding(utf8)";
+            print $tempfh <STDIN>;
+        } else {
+            print $tempfh File::Slurper::read_text($args{input_filename});
+        }
+        (my $temporgfname = $tempfname) =~ s/\.org\z/.html/;
 
-        my $url = "file:" . URI::Escape::uri_escape($fpath);
-        Browser::Open::open_browser($url);
-        [200];
-    } else {
-        return $res;
-    }
+        my $output;
+        IPC::System::Options::system(
+            {die=>1, log=>1, capture_merged=>\$output},
+            "emacs", $tempfname, "--batch", "-f", "org-html-export-to-html", "--kill",
+        );
+
+        if ($args{browser}) {
+            require Browser::Open;
+            require URI::Escape;
+
+            my $url = "file:" . URI::Escape::uri_escape($temporgfname);
+            Browser::Open::open_browser($url);
+            [200];
+        } else {
+            return [200, "OK", File::Slurper::read_text($temporgfname)];
+        }
+
+        # backend emacs
+    } elsif ($backend eq 'Org::To::HTML') {
+
+        my %oth_args; # args to feed to org_to_html function
+        if ($args{input_filename} eq '-') {
+            $oth_args{source_str} = do {
+                local $/;
+                binmode STDIN, ":encoding(utf8)";
+                scalar <STDIN>;
+            };
+        } else {
+            $oth_args{source_file} = $args{input_filename};
+        }
+
+        $oth_args{ignore_unknown_settings} = 1;
+        #$oth_args{naked} = $args{naked};
+        #$oth_args{html_title} = $args{title} if defined $args{title};
+
+        require Org::To::HTML;
+        my $res = Org::To::HTML::org_to_html(%oth_args);
+        return $res unless $res->[0] == 200;
+
+        if ($args{browser}) {
+            require Browser::Open;
+            require File::Temp;
+            require URI::Escape;
+
+            my ($fh, $fpath) = File::Temp::tempfile();
+            print $fh $res->[2];
+            close $fh;
+
+            my $url = "file:" . URI::Escape::uri_escape($fpath);
+            Browser::Open::open_browser($url);
+            return [200];
+        } else {
+            return $res;
+        }
+
+    } # backend Org::To::HTML
 }
 
 Perinci::CmdLine::Any->new(
@@ -91,7 +142,7 @@ org2html - Convert Org document to HTML
 
 =head1 VERSION
 
-This document describes version 0.474 of org2html (from Perl distribution App-OrgUtils), released on 2020-04-12.
+This document describes version 0.476 of org2html (from Perl distribution App-OrgUtils), released on 2020-04-18.
 
 =head1 SYNOPSIS
 
@@ -112,7 +163,17 @@ C<*> marks required options.
 
 =over
 
-=item B<--browser>
+=item B<--backend>=I<s>, B<-B>
+
+Default value:
+
+ "emacs"
+
+Valid values:
+
+ ["Org::To::HTML","emacs"]
+
+=item B<--browser>, B<-b>
 
 Instead of returning the HTML, show it in browser.
 
@@ -121,14 +182,6 @@ Instead of returning the HTML, show it in browser.
 Default value:
 
  "-"
-
-=item B<--naked>
-
-Don't wrap HTML with HTML/HEAD/BODY elements.
-
-=item B<--title>=I<s>
-
-HTML title.
 
 =back
 
@@ -269,12 +322,11 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ backend (see --backend)
  browser (see --browser)
  format (see --format)
  input_filename (see --input-filename)
- naked (see --naked)
  naked_res (see --naked-res)
- title (see --title)
 
 =head1 ENVIRONMENT
 

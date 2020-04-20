@@ -8,3 +8,6 @@ readme_from="script/tmclean"
 
 [FileGatherer]
 exclude_match = ['^author/.*', '^tmclean$']
+
+[release]
+hooks = ['author/pack.sh']

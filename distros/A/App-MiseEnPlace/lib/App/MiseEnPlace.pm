@@ -1,6 +1,6 @@
 package App::MiseEnPlace;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::MiseEnPlace::VERSION = '0.160';
+$App::MiseEnPlace::VERSION = '0.170';
 # ABSTRACT: A place for everything and everything in its place
 
 
@@ -305,7 +305,7 @@ App::MiseEnPlace - A place for everything and everything in its place
 
 =head1 VERSION
 
-version 0.160
+version 0.170
 
 =head1 SYNOPSIS
 
@@ -313,11 +313,11 @@ See 'pod mise' for usage details.
 
 =head1 AUTHOR
 
-John SJ Anderson <genehack@genehack.org>
+John SJ Anderson <john@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by John SJ Anderson.
+This software is copyright (c) 2020 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

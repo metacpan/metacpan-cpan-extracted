@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Github;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: Authenticate using Github's OAuth2 provider
 
 #pod =head1 SYNOPSIS
@@ -62,26 +62,12 @@ our $VERSION = '1.053';
 #pod
 #pod =head1 HELPERS
 #pod
-#pod This plugin has the following helpers.
-#pod
-#pod =head2 yancy.auth.current_user
-#pod
-#pod Get the current user from the session, if any. Returns C<undef> if no
-#pod user was found in the session.
-#pod
-#pod     my $user = $c->yancy->auth->current_user
-#pod         || return $c->render( status => 401, text => 'Unauthorized' );
-#pod
-#pod =head2 yancy.auth.require_user
-#pod
-#pod Validate there is a logged-in user and optionally that the user data has
-#pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
-#pod
-#pod =head2 yancy.auth.login_form
-#pod
-#pod Returns the rendered login button.
+#pod This plugin inherits all helpers from L<Yancy::Plugin::Auth::OAuth2>.
 #pod
 #pod =head1 TEMPLATES
+#pod
+#pod To override these templates, add your own at the designated path inside
+#pod your app's C<templates/> directory.
 #pod
 #pod =head2 yancy/auth/github/login_form.html.ep
 #pod
@@ -243,7 +229,7 @@ Yancy::Plugin::Auth::Github - Authenticate using Github's OAuth2 provider
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 
@@ -315,26 +301,12 @@ default_expiration|https://mojolicious.org/perldoc/Mojolicious/Sessions#default_
 
 =head1 HELPERS
 
-This plugin has the following helpers.
-
-=head2 yancy.auth.current_user
-
-Get the current user from the session, if any. Returns C<undef> if no
-user was found in the session.
-
-    my $user = $c->yancy->auth->current_user
-        || return $c->render( status => 401, text => 'Unauthorized' );
-
-=head2 yancy.auth.require_user
-
-Validate there is a logged-in user and optionally that the user data has
-certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
-
-=head2 yancy.auth.login_form
-
-Returns the rendered login button.
+This plugin inherits all helpers from L<Yancy::Plugin::Auth::OAuth2>.
 
 =head1 TEMPLATES
+
+To override these templates, add your own at the designated path inside
+your app's C<templates/> directory.
 
 =head2 yancy/auth/github/login_form.html.ep
 

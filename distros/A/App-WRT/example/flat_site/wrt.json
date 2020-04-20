@@ -1,0 +1,17 @@
+{
+   "entry_dir": "./pages",
+   "publish_dir": "./public",
+   "title_prefix": "a test wrt site",
+   "template": "default",
+   "description": "a wrt site",
+   "url_root": "https://example.com/",
+   "image_url_root": "https://example.com/",
+   "favicon_url": "https://example.com/favicon.png",
+   "template_dir": "./templates",
+   "stylesheet_url": "https://example.com/css/wrt.css",
+   "author": "Your Name Here",
+   "entry_descriptions": {
+     "new": "newest entries",
+     "all": "all entries"
+   }
+}

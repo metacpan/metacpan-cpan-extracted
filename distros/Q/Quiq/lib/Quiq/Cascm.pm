@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.178';
+our $VERSION = '1.179';
 
 use Quiq::Database::Row::Array;
 use Quiq::AnsiColor;
@@ -2597,31 +2597,50 @@ sub listPackages {
 
 =head2 Workspace
 
-=head3 sync() - Synchronisiere Workspace mit Repository
+=head3 sync() - Synchronisiere Workspace-Verzeichnis mit Repository
 
 =head4 Synopsis
 
   $scm->sync;
+  $scm->sync($repoDir);
+
+=head4 Arguments
+
+=over 4
+
+=item $repoDir (Default: I<Wurzelverzeichns des Workspace>)
+
+Zu synchronisierendes Workspace-Verzeichnis.
+
+=back
 
 =head4 Description
 
-Bringe den Workspace auf den Stand des Repository und liefere
-die Ausgabe des Kommandos zurück.
+Bringe das Workspace-Verzeichnis $repoDir auf den Stand des Repository
+und liefere die Ausgabe des Kommandos zurück. Ist kein Verzeichnis
+angegeben, aktualisiere den gesamten Workspace.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub sync {
-    my $self = shift;
+    my ($self,$repoDir) = @_;
+
+    my $viewPath = $self->viewPath;
+    my $clientPath = $self->workspace;
+    if ($repoDir) {
+        $viewPath .= "/$repoDir";
+        $clientPath .= "/$repoDir";
+    }
 
     my $c = Quiq::CommandLine->new;
     $c->addOption(
         $self->credentialsOptions,
         -b => $self->broker,
         -en => $self->projectContext,
-        -vp => $self->viewPath,
-        -cp => $self->workspace,
+        -vp => $viewPath,
+        -cp => $clientPath,
         -st => $self->states->[0],
     );
 
@@ -2943,7 +2962,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.178
+1.179
 
 =head1 AUTHOR
 

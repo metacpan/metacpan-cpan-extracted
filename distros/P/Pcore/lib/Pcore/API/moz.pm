@@ -30,6 +30,10 @@ sub _build__auth ( $self) {
     return 'Basic ' . to_b64( "$self->{api_user}:$self->{api_key}", $EMPTY );
 }
 
+sub test ($self) {
+    return res $self->get_url_metrics('www.google.com');
+}
+
 # https://moz.com/help/links-api/making-calls/anchor-text-metrics
 # scope: page, subdomain, root_domain
 # limit: 1-50
@@ -103,7 +107,6 @@ sub get_top_pages ($self) {
 # urls - up to 50 urls
 # da = domain_authority - Domain Authority, a normalized 100-point score representing the likelihood of a domain to rank well in search engine results
 # pa = page_authority - Page Authority, a normalized 100-point score representing the likelihood of a page to rank well in search engine results
-# fmrp = fmrp - DEPRECATED
 sub get_url_metrics ( $self, $url, %args ) {
     my $res = $self->_req( 'url_metrics', { targets => is_plain_arrayref $url ? $url : [$url], } );
 
@@ -154,8 +157,8 @@ sub _req ( $self, $endpoint, $params ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 51, 57, 63, 69, 75,  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
-## |      | 81, 87, 93, 99, 116  |                                                                                                                |
+## |    3 | 55, 61, 67, 73, 79,  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |      | 85, 91, 97, 103, 119 |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

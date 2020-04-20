@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -148,10 +148,16 @@ our $VERSION = '1.053';
 #pod
 #pod =head1 TEMPLATES
 #pod
+#pod To override these templates, add your own at the designated path inside
+#pod your app's C<templates/> directory.
+#pod
 #pod =head2 yancy/editor.html.ep
 #pod
-#pod This is the main Yancy web application. You should not override this. If
-#pod you need to, consider filing a bug report or feature request.
+#pod This is the main Yancy web application. You should not override this.
+#pod Instead, use the L</yancy.editor.include> helper to add new components.
+#pod If there is something you can't do using the include helper, consider
+#pod L<asking how on the Github issues board|https://github.com/preaction/Yancy/issues>
+#pod or L<filing a bug report or feature request|https://github.com/preaction/Yancy/issues>.
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -661,7 +667,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 
@@ -808,10 +814,16 @@ interface for this Yancy API.
 
 =head1 TEMPLATES
 
+To override these templates, add your own at the designated path inside
+your app's C<templates/> directory.
+
 =head2 yancy/editor.html.ep
 
-This is the main Yancy web application. You should not override this. If
-you need to, consider filing a bug report or feature request.
+This is the main Yancy web application. You should not override this.
+Instead, use the L</yancy.editor.include> helper to add new components.
+If there is something you can't do using the include helper, consider
+L<asking how on the Github issues board|https://github.com/preaction/Yancy/issues>
+or L<filing a bug report or feature request|https://github.com/preaction/Yancy/issues>.
 
 =head1 SEE ALSO
 

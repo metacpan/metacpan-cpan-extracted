@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -98,7 +98,10 @@ our $VERSION = '1.053';
 #pod
 #pod =head1 TEMPLATES
 #pod
-#pod =head2 yancy/table
+#pod To override these templates, add your own at the designated path inside
+#pod your app's C<templates/> directory.
+#pod
+#pod =head2 yancy/table.html.ep
 #pod
 #pod The default C<list> template. Uses the following additional stash values
 #pod for configuration:
@@ -172,6 +175,8 @@ use POSIX qw( ceil );
 #pod
 #pod This method is used to list content.
 #pod
+#pod =head4 Input Stash
+#pod
 #pod This method uses the following stash values for configuration:
 #pod
 #pod =over
@@ -210,6 +215,8 @@ use POSIX qw( ceil );
 #pod
 #pod =back
 #pod
+#pod =head4 Output Stash
+#pod
 #pod The following stash values are set by this method:
 #pod
 #pod =over
@@ -223,6 +230,8 @@ use POSIX qw( ceil );
 #pod The number of pages of items. Can be used for pagination.
 #pod
 #pod =back
+#pod
+#pod =head4 Query Params
 #pod
 #pod The following URL query parameters are allowed for this method:
 #pod
@@ -246,15 +255,38 @@ use POSIX qw( ceil );
 #pod
 #pod =item $order_by
 #pod
-#pod One or more fields to order by. Must be specified as C<< asc:<name> >>
-#pod to sort in ascending order or C<< desc:<field> >> to sort in descending
-#pod order.
+#pod One or more fields to order by. Can be specified as C<< <name> >> or
+#pod C<< asc:<name> >> to sort in ascending order or C<< desc:<field> >>
+#pod to sort in descending order.
 #pod
 #pod =item Additional Field Filters
 #pod
 #pod Any named query parameter that matches a field in the schema will be
 #pod used to further filter the results. The stash C<filter> will override
 #pod this filter, so that the stash C<filter> can be used for security.
+#pod
+#pod =back
+#pod
+#pod =head4 Content Negotiation
+#pod
+#pod If the C<GET> request accepts content type is C<application/json>, or
+#pod the URL ends in C<.json>, the results page will be returned as a JSON
+#pod object with the following keys:
+#pod
+#pod =over
+#pod
+#pod =item items
+#pod
+#pod The array of items for this page.
+#pod
+#pod =item total
+#pod
+#pod The total number of results for the query.
+#pod
+#pod =item offset
+#pod
+#pod The current offset. Get the next page of results by increasing this
+#pod number and setting the C<$offset> query parameter.
 #pod
 #pod =back
 #pod
@@ -279,7 +311,7 @@ sub list {
 
     if ( my $order_by = $c->param( '$order_by' ) ) {
         $opt->{order_by} = [
-            map +{ "-$_->[0]" => $_->[1] },
+            map +{ "-" . ( $_->[1] ? $_->[0] : 'asc' ) => $_->[1] // $_->[0] },
             map +[ split /:/ ],
             split /,/, $order_by
         ];
@@ -321,6 +353,11 @@ sub list {
         # Stash filter always overrides param filter, for security
         %{ $c->_resolve_filter },
     };
+    if ( $c->param( '$match' ) && $c->param( '$match' ) eq 'any' ) {
+        $filter = [
+            map +{ $_ => $filter->{ $_ } }, keys %$filter
+        ];
+    }
 
     #; use Data::Dumper;
     #; $c->app->log->info( Dumper $filter );
@@ -357,6 +394,8 @@ sub list {
 #pod
 #pod This method is used to show a single item.
 #pod
+#pod =head4 Input Stash
+#pod
 #pod This method uses the following stash values for configuration:
 #pod
 #pod =over
@@ -377,6 +416,8 @@ sub list {
 #pod
 #pod =back
 #pod
+#pod =head4 Output Stash
+#pod
 #pod The following stash values are set by this method:
 #pod
 #pod =over
@@ -386,6 +427,11 @@ sub list {
 #pod The item that is being displayed.
 #pod
 #pod =back
+#pod
+#pod =head4 Content Negotiation
+#pod
+#pod If the C<GET> request accepts content type is C<application/json>, or
+#pod the URL ends in C<.json>, the item will be returned as a JSON object.
 #pod
 #pod =cut
 
@@ -439,9 +485,21 @@ sub get {
 #pod result of the form submission (success or failure) or the user will be
 #pod forwarded to another place.
 #pod
-#pod If the C<POST> or C<PUT> request content type is C<application/json>,
-#pod the request body will be treated as a JSON object to create/set. In this
-#pod case, the form query parameters are not used.
+#pod Displaying a form could be done as a separate route using the C<yancy#get>
+#pod method, but with more code:
+#pod
+#pod     $routes->get( '/:id/edit' )->to(
+#pod         'yancy#get',
+#pod         schema => $schema_name,
+#pod         template => $template_name,
+#pod     );
+#pod     $routes->post( '/:id/edit' )->to(
+#pod         'yancy#set',
+#pod         schema => $schema_name,
+#pod         template => $template_name,
+#pod     );
+#pod
+#pod =head4 Input Stash
 #pod
 #pod This method uses the following stash values for configuration:
 #pod
@@ -493,6 +551,8 @@ sub get {
 #pod
 #pod =back
 #pod
+#pod =head4 Output Stash
+#pod
 #pod The following stash values are set by this method:
 #pod
 #pod =over
@@ -512,12 +572,18 @@ sub get {
 #pod
 #pod =back
 #pod
+#pod =head4 Query Params
+#pod
+#pod This method accepts query parameters named for the fields in the schema.
+#pod
 #pod Each field in the item is also set as a param using
 #pod L<Mojolicious::Controller/param> so that tag helpers like C<text_field>
 #pod will be pre-filled with the values. See
 #pod L<Mojolicious::Plugin::TagHelpers> for more information. This also means
 #pod that fields can be pre-filled with initial data or new data by using GET
 #pod query parameters.
+#pod
+#pod =head4 CSRF Protection
 #pod
 #pod This method is protected by L<Mojolicious's Cross-Site Request Forgery
 #pod (CSRF) protection|Mojolicious::Guides::Rendering/Cross-site request
@@ -527,19 +593,11 @@ sub get {
 #pod your form in order to delete an item successfully. See
 #pod L<Mojolicious::Guides::Rendering/Cross-site request forgery>.
 #pod
-#pod Displaying a form could be done as a separate route using the C<yancy#get>
-#pod method, but with more code:
+#pod =head4 Content Negotiation
 #pod
-#pod     $routes->get( '/:id/edit' )->to(
-#pod         'yancy#get',
-#pod         schema => $schema_name,
-#pod         template => $template_name,
-#pod     );
-#pod     $routes->post( '/:id/edit' )->to(
-#pod         'yancy#set',
-#pod         schema => $schema_name,
-#pod         template => $template_name,
-#pod     );
+#pod If the C<POST> or C<PUT> request content type is C<application/json>,
+#pod the request body will be treated as a JSON object to create/set. In this
+#pod case, the form query parameters are not used.
 #pod
 #pod =cut
 
@@ -696,6 +754,8 @@ sub set {
 #pod form again with the result of the form submission (success or failure)
 #pod or the user will be forwarded to another place.
 #pod
+#pod =head4 Input Stash
+#pod
 #pod This method uses the following stash values for configuration:
 #pod
 #pod =over
@@ -721,6 +781,8 @@ sub set {
 #pod
 #pod =back
 #pod
+#pod =head4 Output Stash
+#pod
 #pod The following stash values are set by this method:
 #pod
 #pod =over
@@ -731,6 +793,8 @@ sub set {
 #pod this will be C<undef>.
 #pod
 #pod =back
+#pod
+#pod =head4 CSRF Protection
 #pod
 #pod This method is protected by L<Mojolicious's Cross-Site Request Forgery
 #pod (CSRF) protection|Mojolicious::Guides::Rendering/Cross-site request
@@ -836,7 +900,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 
@@ -892,6 +956,8 @@ L<Mojolicious::Guides::Rendering/Content negotiation>.
 
 This method is used to list content.
 
+=head4 Input Stash
+
 This method uses the following stash values for configuration:
 
 =over
@@ -930,6 +996,8 @@ C<order_by> structure.
 
 =back
 
+=head4 Output Stash
+
 The following stash values are set by this method:
 
 =over
@@ -943,6 +1011,8 @@ An array reference of items to display.
 The number of pages of items. Can be used for pagination.
 
 =back
+
+=head4 Query Params
 
 The following URL query parameters are allowed for this method:
 
@@ -966,15 +1036,38 @@ query parameter to allow users to specify their own page size.
 
 =item $order_by
 
-One or more fields to order by. Must be specified as C<< asc:<name> >>
-to sort in ascending order or C<< desc:<field> >> to sort in descending
-order.
+One or more fields to order by. Can be specified as C<< <name> >> or
+C<< asc:<name> >> to sort in ascending order or C<< desc:<field> >>
+to sort in descending order.
 
 =item Additional Field Filters
 
 Any named query parameter that matches a field in the schema will be
 used to further filter the results. The stash C<filter> will override
 this filter, so that the stash C<filter> can be used for security.
+
+=back
+
+=head4 Content Negotiation
+
+If the C<GET> request accepts content type is C<application/json>, or
+the URL ends in C<.json>, the results page will be returned as a JSON
+object with the following keys:
+
+=over
+
+=item items
+
+The array of items for this page.
+
+=item total
+
+The total number of results for the query.
+
+=item offset
+
+The current offset. Get the next page of results by increasing this
+number and setting the C<$offset> query parameter.
 
 =back
 
@@ -987,6 +1080,8 @@ this filter, so that the stash C<filter> can be used for security.
     );
 
 This method is used to show a single item.
+
+=head4 Input Stash
 
 This method uses the following stash values for configuration:
 
@@ -1008,6 +1103,8 @@ for how template names are resolved.
 
 =back
 
+=head4 Output Stash
+
 The following stash values are set by this method:
 
 =over
@@ -1017,6 +1114,11 @@ The following stash values are set by this method:
 The item that is being displayed.
 
 =back
+
+=head4 Content Negotiation
+
+If the C<GET> request accepts content type is C<application/json>, or
+the URL ends in C<.json>, the item will be returned as a JSON object.
 
 =head2 set
 
@@ -1042,9 +1144,21 @@ Schema>, and the user will either be shown the form again with the
 result of the form submission (success or failure) or the user will be
 forwarded to another place.
 
-If the C<POST> or C<PUT> request content type is C<application/json>,
-the request body will be treated as a JSON object to create/set. In this
-case, the form query parameters are not used.
+Displaying a form could be done as a separate route using the C<yancy#get>
+method, but with more code:
+
+    $routes->get( '/:id/edit' )->to(
+        'yancy#get',
+        schema => $schema_name,
+        template => $template_name,
+    );
+    $routes->post( '/:id/edit' )->to(
+        'yancy#set',
+        schema => $schema_name,
+        template => $template_name,
+    );
+
+=head4 Input Stash
 
 This method uses the following stash values for configuration:
 
@@ -1096,6 +1210,8 @@ written through this form, you can prevent it by using this.
 
 =back
 
+=head4 Output Stash
+
 The following stash values are set by this method:
 
 =over
@@ -1115,12 +1231,18 @@ and L<JSON::Validator/validate> for more details.
 
 =back
 
+=head4 Query Params
+
+This method accepts query parameters named for the fields in the schema.
+
 Each field in the item is also set as a param using
 L<Mojolicious::Controller/param> so that tag helpers like C<text_field>
 will be pre-filled with the values. See
 L<Mojolicious::Plugin::TagHelpers> for more information. This also means
 that fields can be pre-filled with initial data or new data by using GET
 query parameters.
+
+=head4 CSRF Protection
 
 This method is protected by L<Mojolicious's Cross-Site Request Forgery
 (CSRF) protection|Mojolicious::Guides::Rendering/Cross-site request
@@ -1130,19 +1252,11 @@ editing or deleting content. You must add a C<< <%= csrf_field %> >> to
 your form in order to delete an item successfully. See
 L<Mojolicious::Guides::Rendering/Cross-site request forgery>.
 
-Displaying a form could be done as a separate route using the C<yancy#get>
-method, but with more code:
+=head4 Content Negotiation
 
-    $routes->get( '/:id/edit' )->to(
-        'yancy#get',
-        schema => $schema_name,
-        template => $template_name,
-    );
-    $routes->post( '/:id/edit' )->to(
-        'yancy#set',
-        schema => $schema_name,
-        template => $template_name,
-    );
+If the C<POST> or C<PUT> request content type is C<application/json>,
+the request body will be treated as a JSON object to create/set. In this
+case, the form query parameters are not used.
 
 =head2 delete
 
@@ -1159,6 +1273,8 @@ used to confirm the delete). If the user is making a C<POST> or C<DELETE>
 request, the item will be deleted and the user will either be shown the
 form again with the result of the form submission (success or failure)
 or the user will be forwarded to another place.
+
+=head4 Input Stash
 
 This method uses the following stash values for configuration:
 
@@ -1185,6 +1301,8 @@ Forwarding will not happen for JSON requests.
 
 =back
 
+=head4 Output Stash
+
 The following stash values are set by this method:
 
 =over
@@ -1195,6 +1313,8 @@ The item that will be deleted. If displaying the form again after the item is de
 this will be C<undef>.
 
 =back
+
+=head4 CSRF Protection
 
 This method is protected by L<Mojolicious's Cross-Site Request Forgery
 (CSRF) protection|Mojolicious::Guides::Rendering/Cross-site request
@@ -1258,7 +1378,10 @@ tutorial|Mojolicious::Guides::Tutorial/Mode> for more information.
 
 =head1 TEMPLATES
 
-=head2 yancy/table
+To override these templates, add your own at the designated path inside
+your app's C<templates/> directory.
+
+=head2 yancy/table.html.ep
 
 The default C<list> template. Uses the following additional stash values
 for configuration:

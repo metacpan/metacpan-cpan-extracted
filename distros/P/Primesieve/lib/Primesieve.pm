@@ -37,7 +37,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = @EXPORT_OK;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -115,9 +115,9 @@ In scalar context an array-reference is returned.
 =item generate_n_primes ($n, $start)
 
 Returns a list of the first C<n> primes >= C<start> in list context.
-In scalar context an array-reference is retgurned.
+In scalar context an array-reference is returned.
 
-=item $num = nth_prime ($n, $start)
+=item $num = nth_prime ($n [,$start])
 
 Find the nth prime.
 if C<n> = 0 finds the 1st prime >= C<start>,

@@ -51,6 +51,7 @@ t/base-class.t
 t/card.t
 t/column.t
 t/data/boards/338741497.board
+t/data/sample-solutions/1.fc-wrong.sol.txt
 t/data/sample-solutions/fcs-bakers-game-24.txt
 t/data/sample-solutions/fcs-eight-off-200-l-gi.txt
 t/data/sample-solutions/fcs-eight-off-200.txt
@@ -75,6 +76,7 @@ t/data/texts/texts/5.golf.board
 t/data/texts/texts/5.golf.sol
 t/data/texts/texts/6.black_hole.board
 t/data/texts/texts/6.black_hole.sol
+t/exception-newline.t
 t/expand-solution.t
 t/from-patsolve.t
 t/golf.t

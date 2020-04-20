@@ -1,8 +1,11 @@
 use Mojo::Base -strict;
 
+BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::POE' }
+
 use Test::More;
 use IO::Socket::INET;
 use Mojo::Reactor::POE;
+use Mojo::Util 'steady_time';
 
 # Instantiation
 my $reactor = Mojo::Reactor::POE->new;
@@ -183,6 +186,7 @@ $reactor2->timer(0.025 => sub { shift->stop });
 $reactor2->start;
 ok !$timer, 'timer was not triggered';
 ok $timer2, 'timer was triggered';
+$reactor->reset;
 
 # Restart timer
 my ($single, $pair, $one, $two, $last);
@@ -205,6 +209,28 @@ $reactor->start;
 is $pair, 2, 'timer pair was triggered';
 ok $single, 'single timer was triggered';
 ok $last,   'timers were triggered in the right order';
+
+# Reset timer
+my $before = steady_time;
+my ($after, $again);
+$one = $reactor->timer(300 => sub { $after = steady_time });
+$two = $reactor->recurring(
+  300 => sub {
+    my $reactor = shift;
+    $reactor->remove($two) if ++$again > 3;
+  }
+);
+$reactor->timer(
+  0.025 => sub {
+    my $reactor = shift;
+    $reactor->again($one, 0.025);
+    $reactor->again($two, 0.025);
+  }
+);
+$reactor->start;
+ok $after, 'timer was triggered';
+ok(($after - $before) < 200, 'less than 200 seconds');
+is $again, 4, 'recurring timer triggered four times';
 
 # Restart inactive timer
 $id = $reactor->timer(0 => sub { });
@@ -229,6 +255,12 @@ $reactor->timer(0 => sub { die "works!\n" });
 $reactor->start;
 like $err, qr/works!/, 'right error';
 
+# Reset events
+$reactor->on(error => sub { });
+ok $reactor->has_subscribers('error'), 'has subscribers';
+$reactor->reset;
+ok !$reactor->has_subscribers('error'), 'no subscribers';
+
 # Recursion
 $timer   = undef;
 $reactor = $reactor->new;
@@ -251,7 +283,7 @@ package main;
   is(Mojo::Reactor->detect, 'Mojo::Reactor::Test', 'right class');
 }
 
-# POE in control
+# Reactor in control
 is ref Mojo::IOLoop->singleton->reactor, 'Mojo::Reactor::POE', 'right object';
 ok !Mojo::IOLoop->is_running, 'loop is not running';
 my ($buffer, $server_err, $server_running, $client_err, $client_running);
@@ -273,7 +305,7 @@ Mojo::IOLoop->client(
         my ($stream, $chunk) = @_;
         $buffer .= $chunk;
         return unless $buffer eq 'test321';
-        Mojo::IOLoop->stop;
+        Mojo::IOLoop->singleton->reactor->stop;
       }
     );
     $client_running = Mojo::IOLoop->is_running;
@@ -281,7 +313,7 @@ Mojo::IOLoop->client(
     $client_err = $@;
   }
 );
-Mojo::IOLoop->start;
+Mojo::IOLoop->singleton->reactor->start;
 ok !Mojo::IOLoop->is_running, 'loop is not running';
 like $server_err, qr/^Mojo::IOLoop already running/, 'right error';
 like $client_err, qr/^Mojo::IOLoop already running/, 'right error';

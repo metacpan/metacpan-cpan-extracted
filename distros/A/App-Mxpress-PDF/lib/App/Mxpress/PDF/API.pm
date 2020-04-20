@@ -7,7 +7,7 @@ use Dancer2::Plugin::CSRF::SPA;
 use Mxpress::PDF;
 use MetaCPAN::CLient::Pod::PDF;
 use Type::Params qw/compile_named/;
-use Types::Standard qw/Str StrMatch Enum HashRef/;
+use Types::Standard qw/Undef Str StrMatch Enum HashRef/;
 
 prefix '/api';
 
@@ -69,11 +69,11 @@ get '/session' => sub {
 
 our $generatePOD = compile_named(
 	styles => Str,
-	'pod-type' => Enum[qw/module distribution raw/],
+	type => Enum[qw/module distribution raw/],
 	name => StrMatch[ qr{([a-zA-Z0-9\-\:]+)} ],
-	module => Types::Standard::Optional->of(StrMatch[ qr{([a-zA-Z0-9\-\:]*)} ]),
-	distribution => Types::Standard::Optional->of(StrMatch[ qr{([a-zA-Z0-9\-\:]*)} ],),
-	raw => Types::Standard::Optional->of(Str)
+	module => Types::Standard::Optional->of(StrMatch[ qr{([a-zA-Z0-9\-\:]*)} ]|Undef),
+	distribution => Types::Standard::Optional->of(StrMatch[ qr{([a-zA-Z0-9\-\:]*)} ]|Undef),
+	raw => Types::Standard::Optional->of(Str|Undef)
 );
 
 post '/generate/pod' => sub {
@@ -89,12 +89,15 @@ post '/generate/pod' => sub {
 
 	my $client = MetaCPAN::Client::Pod::PDF->new();
 
-	$client->styles($styles);
+	$client->styles({
+		%{$client->styles},
+		%$styles,
+	});
 	
 	my $string;
-	if ($body->{'pod-type'} eq 'module') {
+	if ($body->{type} eq 'module') {
 		$string = $client->pdf($body->{module}, 1);
-	} elsif ($body->{'pod-type'} eq 'distribution') {
+	} elsif ($body->{type} eq 'distribution') {
 		$string = $client->dist_pdf($body->{distribution}, 1);
 	} else {
 		$string = $client->raw($body->{name}, $body->{raw}, 1);
@@ -119,6 +122,18 @@ post '/generate/pdf' => sub {
 	my $body = $generatePDF->(
 		decode_json(request->body)
 	);
+		
+	if (!$body->{template}) {
+		my $f = sprintf ("%s-%s.txt", $body->{name}, $body->{size});
+		open my $fh, '<', 'filedb/styles/' . $f or die "cannot open file $f";
+		$body->{styles} = do {local $/; <$fh> };
+		close $fh;
+
+		open $fh, '<', 'filedb/templates/' . $f or die "cannot open file $f";
+		$body->{template} = do {local $/; <$fh> };
+		close $fh;
+	}
+
 	my @matches = $body->{template} =~ m/\{([^}]+)\}/xmsg;
 	for my $match (@matches) {
 		(my $param = $match) =~ s/\(.*\)//;

@@ -1,4 +1,4 @@
-package Pcore v0.131.0;
+package Pcore v0.132.1;
 
 use v5.30;
 no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
@@ -337,13 +337,13 @@ sub ev ($self) {
         my $_broker = Pcore::Core::Event->new;
 
         # set default log channels
-        $_broker->bind_events( 'log.EXCEPTION.*', 'stderr:' );
+        $_broker->on( 'log.EXCEPTION.*', 'stderr:' );
 
         # file logs are disabled by default for scripts, that are not part of the distribution
         if ( $ENV->dist ) {
-            $_broker->bind_events( 'log.EXCEPTION.FATAL', 'file:fatal.log' );
-            $_broker->bind_events( 'log.EXCEPTION.ERROR', 'file:error.log' );
-            $_broker->bind_events( 'log.EXCEPTION.WARN',  'file:warn.log' );
+            $_broker->on( 'log.EXCEPTION.FATAL', 'file:fatal.log' );
+            $_broker->on( 'log.EXCEPTION.ERROR', 'file:error.log' );
+            $_broker->on( 'log.EXCEPTION.WARN',  'file:warn.log' );
         }
 
         $_broker;
@@ -356,8 +356,8 @@ sub get_listener ( $self, $id ) {
     return $self->ev->get_listener($id);
 }
 
-sub bind_events ( $self, $bindings, $listener ) {
-    return $self->ev->bind_events( $bindings, $listener );
+sub on ( $self, $bindings, $listener ) {
+    return $self->ev->on( $bindings, $listener );
 }
 
 sub has_bindings ( $self, $key ) {

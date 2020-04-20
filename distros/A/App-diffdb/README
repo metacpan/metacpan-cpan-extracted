@@ -1,0 +1,143 @@
+NAME
+    App::diffdb - Compare two databases, line by line
+
+VERSION
+    This document describes version 0.001 of App::diffdb (from Perl
+    distribution App-diffdb), released on 2020-04-20.
+
+SYNOPSIS
+    See included scripts diffdb, diffdb-sqlite, ...
+
+FUNCTIONS
+  diffdb
+    Usage:
+
+     diffdb(%args) -> [status, msg, payload, meta]
+
+    Compare two databases, line by line.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "diff_db")
+
+    *   dbh1 => *obj*
+
+        Alternative to specifying dsn1/user1/password1.
+
+    *   dbh2 => *obj*
+
+        Alternative to specifying dsn2/user2/password2.
+
+    *   diff_command => *str* (default: "diff")
+
+    *   dsn1 => *str*
+
+        DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db1.db".
+
+    *   dsn2 => *str*
+
+        DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db1.db".
+
+    *   password1 => *str*
+
+        You might want to specify this parameter in a configuration file
+        instead of directly as command-line option.
+
+    *   password2 => *str*
+
+        Will default to "password1" if "password1" is specified.
+
+        You might want to specify this parameter in a configuration file
+        instead of directly as command-line option.
+
+    *   row_as => *str* (default: "json-card")
+
+    *   user1 => *str*
+
+    *   user2 => *str*
+
+        Will default to "user1" if "user1" is specified.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  diffdb_sqlite
+    Usage:
+
+     diffdb_sqlite(%args) -> [status, msg, payload, meta]
+
+    Compare two SQLite databases, line by line.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "diff_db")
+
+    *   dbpath1 => *filename*
+
+        First SQLite database file.
+
+    *   dbpath2 => *filename*
+
+        Second SQLite database file.
+
+    *   diff_command => *str* (default: "diff")
+
+    *   row_as => *str* (default: "json-card")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+ENVIRONMENT
+  DEBUG
+    Bool. If set to true, temporary directory is not cleaned up at the end
+    of runtime.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-diffdb>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-diffdb>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-diffdb>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    diff-db-schema from App::DiffDBSchemaUtils which presents the result
+    structure from DBIx::Diff::Schema directly.
+
+    diff.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

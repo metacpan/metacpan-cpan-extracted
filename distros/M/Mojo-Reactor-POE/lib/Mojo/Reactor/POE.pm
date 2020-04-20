@@ -3,21 +3,23 @@ package Mojo::Reactor::POE;
 use POE; # Loaded early to avoid event loop confusion
 BEGIN { POE::Kernel->run } # silence run() warning
 
-use Mojo::Base 'Mojo::Reactor';
+use Mojo::Base 'Mojo::Reactor::Poll';
 
 $ENV{MOJO_REACTOR} ||= 'Mojo::Reactor::POE';
 
 use Carp 'croak';
-use Mojo::Reactor::Poll;
 use Mojo::Util qw(md5_sum steady_time);
 use Scalar::Util 'weaken';
 
 use constant { POE_IO_READ => 0, POE_IO_WRITE => 1 };
 use constant DEBUG => $ENV{MOJO_REACTOR_POE_DEBUG} || 0;
 
-our $VERSION = '0.009';
+our $VERSION = '1.000';
 
 my $POE;
+
+# We have to fall back to Mojo::Reactor::Poll, since POE::Kernel is unique
+sub new { $POE++ ? Mojo::Reactor::Poll->new : shift->SUPER::new }
 
 sub DESTROY {
 	my $self = shift;
@@ -26,29 +28,12 @@ sub DESTROY {
 }
 
 sub again {
-	my ($self, $id) = @_;
+	my ($self, $id, $after) = @_;
 	croak 'Timer not active' unless my $timer = $self->{timers}{$id};
+	$timer->{after} = $after if defined $after;
 	$timer->{time} = steady_time + $timer->{after};
 	# If session doesn't exist, the time will be set when it starts
 	$self->_session_call(mojo_adjust_timer => $id) if $self->_session_exists;
-}
-
-sub io {
-	my ($self, $handle, $cb) = @_;
-	$self->{io}{fileno $handle} = {cb => $cb};
-	return $self->watch($handle, 1, 1);
-}
-
-sub is_running { !!(shift->{running}) }
-
-# We have to fall back to Mojo::Reactor::Poll, since POE::Kernel is unique
-sub new { $POE++ ? Mojo::Reactor::Poll->new : shift->SUPER::new }
-
-sub next_tick {
-	my ($self, $cb) = @_;
-	push @{$self->{next_tick}}, $cb;
-	$self->{next_timer} //= $self->timer(0 => \&_next);
-	return undef;
 }
 
 sub one_tick {
@@ -70,12 +55,13 @@ sub remove {
 	my ($self, $remove) = @_;
 	return unless defined $remove;
 	if (ref $remove) {
-		if (exists $self->{io}{fileno $remove}) {
-			warn "-- Removed IO watcher for ".fileno($remove)."\n" if DEBUG;
+		my $fileno = fileno($remove) // croak 'Handle is closed';
+		if (exists $self->{io}{$fileno}) {
+			warn "-- Removed IO watcher for $fileno\n" if DEBUG;
 			# If session doesn't exist, the watcher won't be re-added
-			$self->_session_call(mojo_clear_io => fileno $remove) if $self->_session_exists;
+			$self->_session_call(mojo_clear_io => $fileno) if $self->_session_exists;
 		}
-		return !!delete $self->{io}{fileno $remove};
+		return !!delete $self->{io}{$fileno};
 	} else {
 		if (exists $self->{timers}{$remove}) {
 			warn "-- Removed timer $remove\n" if DEBUG;
@@ -93,30 +79,23 @@ sub reset {
 		$self->_session_call('mojo_clear_timers');
 		$self->_session_call(mojo_clear_io => $_) for keys %{$self->{io}};
 	}
-	delete @{$self}{qw(io next_tick next_timer timers)};
+	$self->SUPER::reset;
 }
-
-sub start {
-	my $self = shift;
-	$self->{running}++;
-	$self->one_tick while $self->{running};
-}
-
-sub stop { delete shift->{running} }
 
 sub timer { shift->_timer(0, @_) }
 
 sub watch {
 	my ($self, $handle, $read, $write) = @_;
-	
-	croak 'I/O watcher not active' unless my $io = $self->{io}{fileno $handle};
+
+	my $fileno = fileno $handle;
+	croak 'I/O watcher not active' unless my $io = $self->{io}{$fileno};
 	$io->{handle} = $handle;
 	$io->{read} = $read;
 	$io->{write} = $write;
 	
-	warn "-- Set IO watcher for ".fileno($handle)."\n" if DEBUG;
+	warn "-- Set IO watcher for $fileno\n" if DEBUG;
 	
-	$self->_init_session->_session_call(mojo_set_io => fileno $handle);
+	$self->_init_session->_session_call(mojo_set_io => $fileno);
 	
 	return $self;
 }
@@ -124,23 +103,20 @@ sub watch {
 sub _id {
 	my $self = shift;
 	my $id;
-	do { $id = md5_sum 't' . steady_time . rand 999 } while $self->{timers}{$id};
+	do { $id = md5_sum 't' . steady_time . rand } while $self->{timers}{$id};
 	return $id;
-}
-
-sub _next {
-	my $self = shift;
-	delete $self->{next_timer};
-	while (my $cb = shift @{$self->{next_tick}}) { $self->$cb }
 }
 
 sub _timer {
 	my ($self, $recurring, $after, $cb) = @_;
 	
 	my $id = $self->_id;
-	my $timer = $self->{timers}{$id}
-		= {cb => $cb, after => $after, time => steady_time + $after};
-	$timer->{recurring} = $after if $recurring;
+	my $timer = $self->{timers}{$id} = {
+		cb        => $cb,
+		after     => $after,
+		recurring => $recurring,
+		time      => steady_time + $after,
+	};
 	
 	if (DEBUG) {
 		my $is_recurring = $recurring ? ' (recurring)' : '';
@@ -293,8 +269,8 @@ sub _event_timer {
 	
 	my $timer = $self->{timers}{$id};
 	warn "-- Event fired for timer $id\n" if DEBUG;
-	if (exists $timer->{recurring}) {
-		$timer->{time} = steady_time + $timer->{recurring};
+	if ($timer->{recurring}) {
+		$timer->{time} = steady_time + $timer->{after};
 		$self->_init_session->_session_call(mojo_set_timer => $id);
 	} else {
 		delete $self->{timers}{$id};
@@ -384,37 +360,12 @@ See L<POE::Kernel/"Using POE with Other Event Loops">.
 
 =head1 EVENTS
 
-L<Mojo::Reactor::POE> inherits all events from L<Mojo::Reactor>.
+L<Mojo::Reactor::POE> inherits all events from L<Mojo::Reactor::Poll>.
 
 =head1 METHODS
 
-L<Mojo::Reactor::POE> inherits all methods from L<Mojo::Reactor> and implements
-the following new ones.
-
-=head2 again
-
-  $reactor->again($id);
-
-Restart timer. Note that this method requires an active timer.
-
-=head2 io
-
-  $reactor = $reactor->io($handle => sub {...});
-
-Watch handle for I/O events, invoking the callback whenever handle becomes
-readable or writable.
-
-  # Callback will be invoked twice if handle becomes readable and writable
-  $reactor->io($handle => sub {
-    my ($reactor, $writable) = @_;
-    say $writable ? 'Handle is writable' : 'Handle is readable';
-  });
-
-=head2 is_running
-
-  my $bool = $reactor->is_running;
-
-Check if reactor is running.
+L<Mojo::Reactor::POE> inherits all methods from L<Mojo::Reactor::Poll> and
+implements the following new ones.
 
 =head2 new
 
@@ -422,12 +373,13 @@ Check if reactor is running.
 
 Construct a new L<Mojo::Reactor::POE> object.
 
-=head2 next_tick
+=head2 again
 
-  my $undef = $reactor->next_tick(sub {...});
+  $reactor->again($id);
+  $reactor->again($id, 0.5);
 
-Invoke callback as soon as possible, but not before returning or other
-callbacks that have been registered with this method, always returns C<undef>.
+Restart timer and optionally change the invocation time. Note that this method
+requires an active timer.
 
 =head2 one_tick
 
@@ -461,22 +413,6 @@ Remove handle or timer.
 
 Remove all handles and timers.
 
-=head2 start
-
-  $reactor->start;
-
-Start watching for I/O and timer events, this will block until L</"stop"> is
-called or no events are being watched anymore. See L</"CAVEATS">.
-
-  # Start reactor only if it is not running already
-  $reactor->start unless $reactor->is_running;
-
-=head2 stop
-
-  $reactor->stop;
-
-Stop watching for I/O and timer events.
-
 =head2 timer
 
   my $id = $reactor->timer(0.5 => sub {...});
@@ -506,9 +442,10 @@ this method requires an active I/O watcher.
 =head1 CAVEATS
 
 When using L<Mojo::IOLoop> with L<POE>, the event loop must be controlled by
-L<Mojo::IOLoop> or L<Mojo::Reactor::POE>, such as with the methods L</"start">,
-L</"stop">, and L</"one_tick">. Starting or stopping the event loop through
-L<POE> will not provide required functionality to L<Mojo::IOLoop> applications.
+L<Mojo::IOLoop> or L<Mojo::Reactor::POE>, such as with the methods
+L<Mojo::Reactor::Poll/"start">, L<Mojo::Reactor::Poll/"stop">, and
+L</"one_tick">. Starting or stopping the event loop through L<POE> will not
+provide required functionality to L<Mojo::IOLoop> applications.
 
 Externally-added sessions will not keep the L<Mojo::IOLoop> running if
 L<Mojo::Reactor::POE> has nothing left to watch. This can be worked around by

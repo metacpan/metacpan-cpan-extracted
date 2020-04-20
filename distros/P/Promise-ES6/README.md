@@ -4,6 +4,11 @@ Promise::ES6 - ES6-style promises in Perl
 
 # SYNOPSIS
 
+    use Promise::ES6;
+
+    # OPTIONAL. And see below for other options.
+    Promise::ES6::use_event('IO::Async', $loop);
+
     my $promise = Promise::ES6->new( sub {
         my ($resolve_cr, $reject_cr) = @_;
 
@@ -22,6 +27,8 @@ Promise::ES6 - ES6-style promises in Perl
     my $all_promise = Promise::ES6->all( \@promises );
 
     my $race_promise = Promise::ES6->race( \@promises );
+
+    my $allsettled_promise = Promise::ES6->allSettled( \@promises );
 
 # DESCRIPTION
 
@@ -74,7 +81,7 @@ This module’s handling of unhandled rejections has changed over time.
 The current behavior is: if any rejected promise is DESTROYed without first
 having received a catch callback, a warning is thrown.
 
-# SYNCHRONOUS OPERATION
+# SYNCHRONOUS VS. ASYNCHRONOUS OPERATION
 
 In JavaScript, the following …
 
@@ -82,28 +89,71 @@ In JavaScript, the following …
     console.log(2);
 
 … will log `2` then `1` because JavaScript’s `then()` defers execution
-of its callbacks until the end of the current iteration through JavaScript’s
-event loop.
+of its callbacks until between iterations through JavaScript’s event loop.
 
-Perl, of course, has no built-in event loop. This module’s `then()` method,
-thus, when called on a promise that is already
-“settled” (i.e., not pending), will run the appropriate callback
-_immediately_. That means that this:
+Perl, of course, has no built-in event loop. This module accommodates that by
+implementing **synchronous** promises by default rather than asynchronous ones.
+This means that all promise callbacks run _immediately_ rather than between
+iterations of an event loop. As a result, this:
 
     Promise::ES6->resolve(0)->then( sub { print 1 } );
     print 2;
 
 … will print `12` instead of `21`.
 
-This is an intentional divergence from
-[the Promises/A+ specification](https://promisesaplus.com/#point-34).
-A key advantage of this design is that Promise::ES6 instances can abstract
-over whether a given function works synchronously or asynchronously.
+One effect of this is that Promise::ES6, in its default configuration, is
+agnostic regarding event loop interfaces: no special configuration is needed
+for any specific event loop. In fact, you don’t even _need_ an event loop
+at all, which might be useful for abstracting over whether a given
+function works synchronously or asynchronously.
 
-If you want a Promises/A+-compliant implementation, look at
-[Promise::ES6::IOAsync](https://metacpan.org/pod/Promise::ES6::IOAsync), [Promise::ES6::Mojo](https://metacpan.org/pod/Promise::ES6::Mojo), or
-[Promise::ES6::AnyEvent](https://metacpan.org/pod/Promise::ES6::AnyEvent) in this distribution. CPAN provides other
-alternatives.
+The disadvantage of synchronous promises—besides not being _quite_ the same
+promises that we expect from JS—is that recursive promises can exceed
+call stack limits. For example, the following (admittedly contrived) code:
+
+    my @nums = 1 .. 1000;
+
+    sub _remove {
+        if (@nums) {
+            Promise::ES6->resolve(shift @nums)->then(\&_remove);
+        }
+    }
+
+    _remove();
+
+… will eventually fail because it will reach Perl’s call stack size limit.
+
+That problem probably won’t affect most applications. The best way to
+avoid it, though, is to use asynchronous promises, à la JavaScript.
+
+To do that, first choose one of the following event interfaces:
+
+- [IO::Async](https://metacpan.org/pod/IO::Async)
+- [AnyEvent](https://metacpan.org/pod/AnyEvent)
+- [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop) (part of [Mojolicious](https://metacpan.org/pod/Mojolicious))
+
+Then, before you start creating promises, do this:
+
+    Promise::ES6::use_event('AnyEvent');
+
+… or:
+
+    Promise::ES6::use_event('Mojo::IOLoop');
+
+… or:
+
+    Promise::ES6::use_event('IO::Async', $loop);
+
+That’s it! Promise::ES6 instances will now work asynchronously rather than
+synchronously.
+
+Note that this changes Promise::ES6 _globally_. In IO::Async’s case, it
+won’t increase the passed-in [IO::Async::Loop](https://metacpan.org/pod/IO::Async::Loop) instance’s reference count,
+but if that loop object goes away, Promise::ES6 won’t work until you call
+`use_event()` again.
+
+**IMPORTANT:** For the best long-term scalability and flexibility,
+your code should work with either synchronous or asynchronous promises.
 
 # CANCELLATION
 
@@ -123,7 +173,7 @@ to be canceled. See [Net::Curl::Promiser](https://metacpan.org/pod/Net::Curl::Pr
 You’ll need to decide if it makes more sense for your application to leave
 a canceled query in the “pending” state or to “settle” (i.e., resolve or
 reject) it. All things being equal, I feel the first approach is the most
-intuitive.
+intuitive, while the latter ends up being “cleaner”.
 
 # MEMORY LEAKS
 
@@ -181,12 +231,13 @@ If you’re not sure of what promises are, there are several good
 introductions to the topic. You might start with
 [this one](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
 
-[Promise::XS](https://metacpan.org/pod/Promise::XS) is a lot like this library but implemented mostly in XS for
-speed. It derives from [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises).
+[Promise::XS](https://metacpan.org/pod/Promise::XS) is my refactor of [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises). It’s a lot like
+this library but implemented mostly in XS for speed.
 
 [Promises](https://metacpan.org/pod/Promises) is another pure-Perl Promise implementation.
 
-[Future](https://metacpan.org/pod/Future) fills a role similar to that of promises.
+[Future](https://metacpan.org/pod/Future) fills a role similar to that of promises. Much of the IO::Async
+ecosystem assumes (or strongly encourages) its use.
 
 CPAN contains a number of other modules that implement promises. I think
 mine are the nicest :), but YMMV. Enjoy!

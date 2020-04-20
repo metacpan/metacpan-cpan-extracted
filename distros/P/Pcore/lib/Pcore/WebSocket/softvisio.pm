@@ -226,7 +226,7 @@ sub _on_auth_request ( $self, $tx ) {
         $self->{auth} = $auth;
 
         # subscribe client to the server events from client request
-        $self->_bind_events( $tx->{bindings} ) if defined $tx->{bindings};
+        $self->_on( $tx->{bindings} ) if defined $tx->{bindings};
 
         $self->_send_msg( {
             type     => $TX_TYPE_AUTH,
@@ -258,7 +258,7 @@ sub _on_auth_response ( $self, $tx ) {
     $self->{auth} = bless $tx->{auth}, 'Pcore::Util::Result::Class';
 
     # set events listeners
-    $self->_bind_events( $tx->{bindings} ) if defined $tx->{bindings};
+    $self->_on( $tx->{bindings} ) if defined $tx->{bindings};
 
     # call on_auth
     if ( my $cb = shift $self->{_auth_cb}->@* ) { $cb->( $self->{auth} ) }
@@ -266,7 +266,7 @@ sub _on_auth_response ( $self, $tx ) {
     return;
 }
 
-sub _bind_events ( $self, $bindings ) {
+sub _on ( $self, $bindings ) {
 
     # process bindings if has "on_bind" callback defined
     if ( my $cb = $self->{on_bind} ) {
@@ -320,7 +320,7 @@ sub _send_msg ( $self, $msg ) {
 sub _create_listener ($self) {
     weaken $self;
 
-    $self->{_listener} = P->ev->bind_events(
+    $self->{_listener} = P->on(
         undef,
         sub ($ev) {
             return if !defined $self;

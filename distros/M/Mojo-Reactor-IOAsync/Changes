@@ -1,3 +1,7 @@
+1.001     2020-04-19 21:10:07 EDT
+  - Support changing invocation time of active timers in again method, to
+    support keep_alive_timeout added in Mojolicious 8.37
+
 1.000     2017-08-22 20:11:11 EDT
   - Use IO::Async::Loop->really_new for nested loops instead of instances of Mojo::Reactor::Poll
   - Switch installer to Module::Build::Tiny

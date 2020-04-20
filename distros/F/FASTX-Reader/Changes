@@ -1,6 +1,12 @@
 This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
-Some APIs *can change* with the release of the first stable release (v 1.0). 
+Some APIs *can change* with the release of the first stable release (v 1.0).
 Version 0.61 has been available via BioConda
+
+0.88  2020-04-13
+  * getFileFormat() also supports gzipped files
+  * FASTX::PE strips /1 /2 _1 _2 _R1 _R2 from interleaved read names
+  * Preliminary release of FASTX::ScriptHelper
+  * Bug fixes
 
 0.87  2020-04-05
   * POD fixes

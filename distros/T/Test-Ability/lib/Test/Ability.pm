@@ -12,13 +12,14 @@ use Data::Object::Class;
 use Data::Object::ClassHas;
 use Data::Object::Try;
 
+use Clone ();
 use Data::Random ();
 use Test::More ();
 
 with 'Data::Object::Role::Buildable';
 with 'Data::Object::Role::Stashable';
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 # ATTRIBUTES
 
@@ -260,7 +261,7 @@ method test(Str $name, Int $cycles, ArrayRef[ArrayRef] $spec, CodeRef $callback)
     for my $index (1..$cycles) {
       Test::More::subtest("$name ($index of $cycles)", sub {
         $callback->(Data::Object::Try->new(@defaults),
-          map $self->dispatch($_), @$spec)->result
+          map $self->dispatch($_), map Clone::clone($_), @$spec)->result
       });
     }
   });

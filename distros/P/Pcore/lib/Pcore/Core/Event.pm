@@ -12,7 +12,7 @@ sub get_listener ( $self, $id ) {
     return $self->{_listeners}->{$id};
 }
 
-sub bind_events ( $self, $bindings, $listener ) {
+sub on ( $self, $bindings, $listener ) {
 
     # create listener
     if ( !is_ref $listener) {
@@ -122,7 +122,7 @@ Pcore::Core::Event - Pcore event broker
 
 =head1 SYNOPSIS
 
-    P->bind_events(
+    P->on(
         [ 'test1', 'test2.*.log', 'test3.#' ],                       # bindings
         sub ( $ev ) {                                                # callback
             say dump $ev->{key};
@@ -132,9 +132,9 @@ Pcore::Core::Event - Pcore event broker
         },
     );
 
-    P->bind_events( 'log.test.*', 'stderr:' );                                                   # pipe
-    P->bind_events( 'log.test.*', [ 'stderr:',      tmpl => "<: \$key :>\n<: \$text :>" ] );    # pipe with params
-    P->bind_events( 'log.test.*', [ 'file:123.log', tmpl => "<: \$key :>\n<: \$text :>" ] );    # pipe with params
+    P->on( 'log.test.*', 'stderr:' );                                                   # pipe
+    P->on( 'log.test.*', [ 'stderr:',      tmpl => "<: \$key :>\n<: \$text :>" ] );    # pipe with params
+    P->on( 'log.test.*', [ 'file:123.log', tmpl => "<: \$key :>\n<: \$text :>" ] );    # pipe with params
 
     P->fire_event( 'test.1234.aaa', $data );
 

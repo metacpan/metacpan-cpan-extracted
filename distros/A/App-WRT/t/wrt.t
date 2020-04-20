@@ -15,7 +15,7 @@ use Test::More tests => 19;
 
 require_ok('App::WRT');
 
-chdir 'example';
+chdir 'example/blog';
 
 # configuration
 

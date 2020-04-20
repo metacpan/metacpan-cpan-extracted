@@ -1,5 +1,5 @@
 ---
-abstract: 'Helpers for async method work'
+abstract: 'Namespaced sugar methods for async/await and future/promise based code'
 author:
   - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
 build_requires:
@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   perl: '5.006'
-version: '0.000001'
+version: '0.000002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

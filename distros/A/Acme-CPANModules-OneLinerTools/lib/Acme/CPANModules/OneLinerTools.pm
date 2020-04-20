@@ -3,7 +3,7 @@ package Acme::CPANModules::OneLinerTools;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-02-07'; # DATE
 our $DIST = 'Acme-CPANModules-OneLinerTools'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => 'Modules to make your life easier when writing perl one-liners',
@@ -170,7 +170,7 @@ Acme::CPANModules::OneLinerTools - Modules to make your life easier when writing
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::OneLinerTools (from Perl distribution Acme-CPANModules-OneLinerTools), released on 2020-02-07.
+This document describes version 0.003 of Acme::CPANModules::OneLinerTools (from Perl distribution Acme-CPANModules-OneLinerTools), released on 2020-02-07.
 
 =head1 DESCRIPTION
 
@@ -315,9 +315,11 @@ feature.
 
 L<Acme::CPANModules::OneLetter>
 
+L<Acme::CPANModules::ModuleAutoinstallers>
+
 L<Acme::CPANModules::ModuleAutoloaders>
 
-L<Acme::CPANModules::DebugDumping>
+L<Acme::CPANModules::DumpingDataForDebugging>
 
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 

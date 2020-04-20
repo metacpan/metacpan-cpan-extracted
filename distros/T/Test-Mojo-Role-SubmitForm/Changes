@@ -1,5 +1,8 @@
 Revision history for Test-Mojo-Role-SubmitForm
 
+1.003001  2020-04-19
+    - Allow clicking on forms given by Mojo::DOM objects
+
 1.002003  2020-04-17
     - Make error message more explanatory
 

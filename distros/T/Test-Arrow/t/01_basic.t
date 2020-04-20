@@ -109,4 +109,4 @@ $arr->name('unlike2')
     ->got($got)
     ->unlike;
 
-$arr->done_testing;
+done();

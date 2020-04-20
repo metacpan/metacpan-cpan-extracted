@@ -13,7 +13,7 @@ t/03-to_cidrs.t
 t/04-is_cidr.t
 t/05-cidrsplit.t
 t/06-contains.t
-t/07-aggegate.t
+t/07-aggregate.t
 t/08-findfree.t
 t/09-relations.t
 t/10-errors.t

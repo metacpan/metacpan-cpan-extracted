@@ -43,6 +43,34 @@ sub new {
   bless $self, $class;
 }
 
+
+=item is_dir($path)
+
+=cut
+
+sub is_dir {
+  return -d $_[0];
+}
+
+
+=item is_regular_file($path)
+
+=cut
+
+sub is_regular_file {
+  return -f $_[0];
+}
+
+
+=item exists($path)
+
+=cut
+
+sub exists {
+  return -e $_[0];
+}
+
+
 =item dir_list($dir, $sort_order, $pattern)
 
 Return a $sort_order sorted list of files matching regex $pattern in a

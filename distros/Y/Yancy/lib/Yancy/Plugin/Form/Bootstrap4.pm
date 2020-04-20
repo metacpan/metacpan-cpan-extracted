@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form::Bootstrap4;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: Generate forms using Bootstrap 4
 
 #pod =head1 SYNOPSIS
@@ -31,49 +31,45 @@ our $VERSION = '1.053';
 #pod
 #pod =head1 TEMPLATES
 #pod
-#pod These templates can be overridden by providing your own template with
-#pod the same path.
+#pod To override these templates, add your own at the designated path inside
+#pod your app's C<templates/> directory.
 #pod
-#pod =over
-#pod
-#pod =item yancy/form/bootstrap4/form.html.ep
+#pod =head2 yancy/form/bootstrap4/form.html.ep
 #pod
 #pod This template surrounds the form to create the C<< <form> >> element,
 #pod list all the fields, and add a submit button. Also includes a CSRF token.
 #pod
-#pod =item yancy/form/bootstrap4/field.html.ep
+#pod =head2 yancy/form/bootstrap4/field.html.ep
 #pod
 #pod This template surrounds a single form field to add a C<< <label> >>
 #pod element, the appropriate input element(s), and the optional description.
 #pod
-#pod =item yancy/form/bootstrap4/input.html.ep
+#pod =head2 yancy/form/bootstrap4/input.html.ep
 #pod
 #pod This template is for single C<< <input> >> elements and the attributes
 #pod they need. This is used by field types C<string>, C<number>, C<integer>,
 #pod and string fields with formats C<email> and C<date-time>.
 #pod
-#pod =item yancy/form/bootstrap4/textarea.html.ep
+#pod =head2 yancy/form/bootstrap4/textarea.html.ep
 #pod
 #pod This template is for single C<< <textarea> >> elements and the
 #pod attributes they need. This is used by fields with type C<string> and
 #pod format C<textarea>.
 #pod
-#pod =item yancy/form/bootstrap4/select.html.ep
+#pod =head2 yancy/form/bootstrap4/select.html.ep
 #pod
 #pod This template is for single C<< <select> >> elements and the attributes
 #pod they need. This is used by fields with an C<enum> property.
 #pod
-#pod =item yancy/form/bootstrap4/yesno.html.ep
+#pod =head2 yancy/form/bootstrap4/yesno.html.ep
 #pod
 #pod This template displays a yes/no toggle used for fields of type
 #pod C<boolean>.
 #pod
-#pod =item yancy/form/bootstrap4/readonly.html.ep
+#pod =head2 yancy/form/bootstrap4/readonly.html.ep
 #pod
 #pod This template displays all read-only fields. This template must not include
 #pod any kind of C<< <input> >>, C<< <select> >>, or other form fields.
-#pod
-#pod =back
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -254,11 +250,20 @@ sub form_for {
         push @fields, $self->field_for( $c, $coll, $field, %field_opt );
     }
 
+    if ( !exists $opt{csrf} || $opt{csrf} ) {
+        # Verify that this form is being built with a real request
+        # so the CSRF field can work correctly
+        if ( !$c->tx->remote_address ) {
+            $c->log->warn( 'form_for() called with incomplete request. CSRF token may not validate!');
+        }
+    }
+
     my $path = join '/', qw( yancy form bootstrap4 form);
     my $html = $c->render_to_string(
         template => $path,
         form => {
             method => 'POST',
+            csrf => 1,
             %opt,
             fields => \@fields,
         },
@@ -277,7 +282,7 @@ Yancy::Plugin::Form::Bootstrap4 - Generate forms using Bootstrap 4
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 
@@ -308,49 +313,45 @@ L<Yancy::Plugin::Form>.
 
 =head1 TEMPLATES
 
-These templates can be overridden by providing your own template with
-the same path.
+To override these templates, add your own at the designated path inside
+your app's C<templates/> directory.
 
-=over
-
-=item yancy/form/bootstrap4/form.html.ep
+=head2 yancy/form/bootstrap4/form.html.ep
 
 This template surrounds the form to create the C<< <form> >> element,
 list all the fields, and add a submit button. Also includes a CSRF token.
 
-=item yancy/form/bootstrap4/field.html.ep
+=head2 yancy/form/bootstrap4/field.html.ep
 
 This template surrounds a single form field to add a C<< <label> >>
 element, the appropriate input element(s), and the optional description.
 
-=item yancy/form/bootstrap4/input.html.ep
+=head2 yancy/form/bootstrap4/input.html.ep
 
 This template is for single C<< <input> >> elements and the attributes
 they need. This is used by field types C<string>, C<number>, C<integer>,
 and string fields with formats C<email> and C<date-time>.
 
-=item yancy/form/bootstrap4/textarea.html.ep
+=head2 yancy/form/bootstrap4/textarea.html.ep
 
 This template is for single C<< <textarea> >> elements and the
 attributes they need. This is used by fields with type C<string> and
 format C<textarea>.
 
-=item yancy/form/bootstrap4/select.html.ep
+=head2 yancy/form/bootstrap4/select.html.ep
 
 This template is for single C<< <select> >> elements and the attributes
 they need. This is used by fields with an C<enum> property.
 
-=item yancy/form/bootstrap4/yesno.html.ep
+=head2 yancy/form/bootstrap4/yesno.html.ep
 
 This template displays a yes/no toggle used for fields of type
 C<boolean>.
 
-=item yancy/form/bootstrap4/readonly.html.ep
+=head2 yancy/form/bootstrap4/readonly.html.ep
 
 This template displays all read-only fields. This template must not include
 any kind of C<< <input> >>, C<< <select> >>, or other form fields.
-
-=back
 
 =head1 SEE ALSO
 
@@ -464,7 +465,7 @@ for my $attr ( @found_attrs ) {
 %><form<%
 for my $attr ( grep { defined $form->{ $_ } } @attrs ) {
 %> <%= $attr %>="<%= $form->{$attr} %>" <% } =%>>
-    %= csrf_field
+    <% if ( $form->{csrf} ) { %><%= csrf_field %><% } %>
     <% for my $field ( @{ $form->{fields} } ) { %><%= $field =%><% } =%>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>

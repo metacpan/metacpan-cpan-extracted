@@ -398,6 +398,7 @@
 	});
 
 	App.content.querySelector('#loginForm').addEventListener('submit', function (e) {
+		console.log(e);
 		e.preventDefault();
 		var data = App.formData(e.target);
 		App.postRequest('/api/login', data, function (res) {

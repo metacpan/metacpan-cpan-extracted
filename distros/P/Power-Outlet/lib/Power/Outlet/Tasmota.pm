@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw{Power::Outlet::Common::IP::HTTP::JSON};
 
-our $VERSION='0.24';
+our $VERSION='0.26';
 
 =head1 NAME
 
@@ -242,9 +242,9 @@ sub _call {
   die("Error: Method _call($argument) failed to return expected JSON format") unless ref($hash) eq "HASH";
   my ($key)    = keys %$hash;
   my $value    = $hash->{$key}; #ON|OFF or error
-  if ($key =~ m/\APOWER[1-9]\Z/i) {
+  if ($key =~ m/\APOWER[1-9]?\Z/i) {
     die(qq{Error: Web service error, Value "$value" not ON or OFF}) unless $value =~ m/\A(ON|OFF)\Z/i;
-  } elsif ($key =~ m/\AFriendlyName[1-9]\Z/i) {
+  } elsif ($key =~ m/\AFriendlyName[1-9]?\Z/i) {
     #ok
   } else {
     die(qq{Error: Web service error, $key: "$value"});

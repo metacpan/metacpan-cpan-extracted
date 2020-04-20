@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -19,22 +19,23 @@ my $INPUT_STRING = undef;
 my $INPUT_FILE = undef;
 my $OUTPUT_FILE = undef;
 my %params = (
-	'escape-unicode' => 0
+	'escape-unicode' => 0,
+	'pretty' => 0,
 );
 
 sub usage { return
-	"Usage : $0 [--I 'a-yaml-string' | --i 'afile.yaml'] [--o afile] [--escape-unicode|-e] [--pretty]\n"
+	"Usage : $0 [--I 'a-yaml-string' | --i 'afile.yaml'] [--o afile] [--(no-)escape-unicode|-e] [--(no-)pretty]\n"
 	."\nIt will read a YAML string from command line (-I), or from a file (-i)\n"
-	."\nor from STDIN.\n"
-	."It will print its contents as JSON to STDOUT or to a file (--o).\n"
+	."\nor from STDIN (beware 4K limit on linux terminal, see CAVEATS for workaround).\n"
+	."It will print its contents as YAML to STDOUT or to a file (--o).\n"
 	."It can escape/un-escape unicode characters (--escape-unicode) and/or do pretty-printing (--pretty).\n"
 }
 if( ! Getopt::Long::GetOptions(
   'i=s' => \$INPUT_FILE,
   'I=s' => sub { $INPUT_STRING = Encode::decode_utf8($_[1]) },
   'o=s' => \$OUTPUT_FILE,
-  'pretty|p' => \$params{'pretty'},
-  'escape-unicode|e' => \$params{'escape-unicode'},
+  'pretty|p!' => \$params{'pretty'},
+  'escape-unicode|e!' => \$params{'escape-unicode'},
 ) ){ die usage() }
 
 if( defined $INPUT_FILE ){
@@ -68,11 +69,26 @@ yaml2json.pl : convert YAML to JSON with formatting options
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =head1 SYNOPSIS
 
     yaml2json.pl -i "input.yaml" -o "output.json" --escape-unicode --pretty
+
+    yaml2json.pl -e < "input.yaml" > "output.json"
+
+    # press CTRL-D when done typing YAML to STDIN
+    # input must be less than 4K long!
+    yaml2json.pl
+
+    # Read input from clipboard or write output to clipboard
+    # Only in: Unix / Linux / OSX                
+    # (must have already installed xclip or xsel or pbpaste (on OSX))
+    json2json.pl -e < $(xclip -o)
+    json2json.pl -e < $(pbaste)
+    # write the output to the clipboard for further pasting
+    json2json.pl -i input.json | xclip -i
+    # clicking mouse's middle-button will paste the result
 
 =head1 USAGE
 
@@ -82,19 +98,24 @@ Options:
 
 =over 4
 
-=item C<--i filename> : specify a filename which contains a YAML
+=item *  C<--i filename> : specify a filename which contains a YAML
 data structure.
 
-=item C<--I "string"> : specify a string  which contains a YAML
+=item *  C<--I "string"> : specify a string  which contains a YAML
 data structure.
 
-=item C<--o outputfilename> : specify the output filename to write
+=item *  C<--o outputfilename> : specify the output filename to write
 the result to, which will be JSON.
 
-=item C<--escape-unicode> : it will escape all unicode characters, and
-convert them to something like "\u0386"
+=item * C<--escape-unicode> : it will escape all unicode characters, and
+convert them to something like "\u0386". This is the default option.
 
-=item C<--pretty> : write this JSON pretty, line breaks, indendations, "the full catastrophe"
+=item * C<--no-escape-unicode> : it will NOT escape unicode characters. Output
+will not contain "\u0386" or "\x{386}" but "α" (that's a greek alpha).
+
+=item *  C<--pretty> / C<--no-pretty> : write this JSON pretty, line breaks, indendations, "the full catastrophe".
+The C<--no-pretty> option will produce terse output, no spaces or line breaks for example.
+The second option is the default.
 
 =back
 
@@ -103,6 +124,17 @@ command line (--I) (properly quoted!), from STDIN (which also includes
 a file redirection C<< yaml2json.pl < inputfile.yaml > outputfile.json >>
 
 For more information see L<Data::Roundtrip>.
+
+=head1 CAVEATS
+
+Under Unix/Linux,
+the maximum number of characters that can be read
+on a terminal is 4096. So, in reading-from-STDIN mode
+beware how much you type or how much you copy-paste
+onto the script. If it complains about malformed input
+then this is the case. The workaround is to type/paste
+onto a file and operate on that using C<< --i afile >>
+or redirection C<< < afile >>.
 
 =head1 AUTHOR
 

@@ -8,7 +8,7 @@ use Devel::Peek;
 
 use B::COW qw{:all};
 
-if ( $] >= 5.020 ) {
+if ( can_cow() ) {
     ok can_cow(), "can cow with Perl $]";    
 
     ok !is_cow(undef), "!is_cow(undef)";

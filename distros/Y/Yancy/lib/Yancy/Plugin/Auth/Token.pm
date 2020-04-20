@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Token;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: A simple token-based auth
 
 #pod =head1 SYNOPSIS
@@ -97,6 +97,10 @@ our $VERSION = '1.053';
 #pod
 #pod Validate there is a logged-in user and optionally that the user data has
 #pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
+#pod
+#pod     # Display the user dashboard, but only to logged-in users
+#pod     my $auth_route = $app->routes->under( '/user', $app->yancy->auth->require_user );
+#pod     $auth_route->get( '' )->to( 'user#dashboard' );
 #pod
 #pod =head2 yancy.auth.add_token
 #pod
@@ -301,7 +305,7 @@ Yancy::Plugin::Auth::Token - A simple token-based auth
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 
@@ -417,6 +421,10 @@ user was found in the session.
 
 Validate there is a logged-in user and optionally that the user data has
 certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
+
+    # Display the user dashboard, but only to logged-in users
+    my $auth_route = $app->routes->under( '/user', $app->yancy->auth->require_user );
+    $auth_route->get( '' )->to( 'user#dashboard' );
 
 =head2 yancy.auth.add_token
 

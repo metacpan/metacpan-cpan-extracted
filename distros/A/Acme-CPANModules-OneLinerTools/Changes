@@ -1,3 +1,12 @@
+0.003   2020-02-07  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix mentioned name
+	  Acme::CPANModules::DumpingDataForDebugging, mention
+	  Acme::CPANModules::ModuleAutoinstallers.
+
+
 0.002   2020-02-07  Released-By: PERLANCAR; Urgency: medium
 
 	- Add Carp::Patch::Config.

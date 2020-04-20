@@ -1,7 +1,7 @@
 package App::lcpan::Bootstrap;
 
-our $DATE = '2019-05-20'; # DATE
-our $VERSION = '20190520.0.0'; # VERSION
+our $DATE = '2020-04-19'; # DATE
+our $VERSION = '20200419.0.0'; # VERSION
 
 1;
 # ABSTRACT: Bootstrap database for lcpan
@@ -18,7 +18,7 @@ App::lcpan::Bootstrap - Bootstrap database for lcpan
 
 =head1 VERSION
 
-This document describes version 20190520.0.0 of App::lcpan::Bootstrap (from Perl distribution App-lcpan-Bootstrap), released on 2019-05-20.
+This document describes version 20200419.0.0 of App::lcpan::Bootstrap (from Perl distribution App-lcpan-Bootstrap), released on 2020-04-19.
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -10,7 +10,7 @@ BEGIN {
 	close STDERR; open(STDERR, ">&STDOUT");
 }
 
-use Test::More tests => 30;
+use Test::More tests => 31;
 
 my $_f;
 print "= NAME" . "\n";
@@ -135,7 +135,7 @@ open my $f, ">/tmp/0"; close $f;
 
 ::like( scalar(Multipart::Encoder->new(x=>\"/tmp/0")->as_string), qr{Content-Disposition: form-data; name="x"; filename="0"}, "Multipart::Encoder->new(x=>\\\"/tmp/0\")->as_string    #~ Content-Disposition: form-data; name=\"x\"; filename=\"0\"" );
 
-::like( scalar(Multipart::Encoder->new(x=>\"/tmp/file.gz")->as_string), qr{Content-Type: application/x-gzip; charset=binary}, "Multipart::Encoder->new(x=>\\\"/tmp/file.gz\")->as_string    #~ Content-Type: application/x-gzip; charset=binary" );
+::like( scalar(Multipart::Encoder->new(x=>\"/tmp/file.gz")->as_string), qr{Content-Type: application/(x-)?gzip; charset=binary}, "Multipart::Encoder->new(x=>\\\"/tmp/file.gz\")->as_string    #~ Content-Type: application/(x-)?gzip; charset=binary" );
 
 my $str = Multipart::Encoder->new(
     x => [
@@ -174,8 +174,11 @@ my $str = Multipart::Encoder->new(
 
 ::like( scalar($str), qr{content-disposition: form-data; name="z"; filename="xyz"}, "\$str #~ content-disposition: form-data; name=\"z\"; filename=\"xyz\"" );
 
-open my $f, ">", "/tmp/bigfile"; binmode $f; print $f 0 x 65534; close $f;
-::like( scalar(Multipart::Encoder->new(x=>\"/tmp/bigfile")->as_string), qr{\n0{65534}\r}, "Multipart::Encoder->new(x=>\\\"/tmp/bigfile\")->as_string    #~ \n0{65534}\r" );
+open my $f, ">", "/tmp/bigfile"; binmode $f; print $f 0 x (1024*1024); close $f;
+
+::like( scalar(Multipart::Encoder->new(x=>\"/tmp/bigfile")->as_string), qr{\n0+\r}, "Multipart::Encoder->new(x=>\\\"/tmp/bigfile\")->as_string    #~ \n0+\r" );
+Multipart::Encoder->new(x=>\"/tmp/bigfile")->as_string =~ /\n(0+)\r/;
+::cmp_ok( scalar(length $1), '==', scalar(1024*1024), "length \$1     ##== 1024*1024" );
 
 eval { Multipart::Encoder->new(x=>\"/tmp/NnKkMm346485923")->as_string }; ::like( scalar($@), qr{Not open file `/tmp/NnKkMm346485923`: No such file or directory}, "Multipart::Encoder->new(x=>\\\"/tmp/NnKkMm346485923\")->as_string #\@ ~ Not open file `/tmp/NnKkMm346485923`: No such file or directory" );
 

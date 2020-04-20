@@ -61,36 +61,40 @@
       }
    },
    "provides" : {
+      "OpenTracing::Interface" : {
+         "file" : "lib/OpenTracing/Interface.pm",
+         "version" : "0.18"
+      },
       "OpenTracing::Interface::ContextReference" : {
          "file" : "lib/OpenTracing/Interface/ContextReference.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       },
       "OpenTracing::Interface::Scope" : {
          "file" : "lib/OpenTracing/Interface/Scope.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       },
       "OpenTracing::Interface::ScopeManager" : {
          "file" : "lib/OpenTracing/Interface/ScopeManager.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       },
       "OpenTracing::Interface::Span" : {
          "file" : "lib/OpenTracing/Interface/Span.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       },
       "OpenTracing::Interface::SpanContext" : {
          "file" : "lib/OpenTracing/Interface/SpanContext.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       },
       "OpenTracing::Interface::Tracer" : {
          "file" : "lib/OpenTracing/Interface/Tracer.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       },
       "OpenTracing::Types" : {
          "file" : "lib/OpenTracing/Types.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
-   "version" : "0.16",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

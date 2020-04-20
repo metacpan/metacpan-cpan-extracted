@@ -1,35 +1,41 @@
-0.093   2018-12-05 (PERLANCAR)
+0.094   2020-04-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add function: list_table_indexes (currently only supports
+	  SQLite).
+
+
+0.093   2018-12-05  Released-By: PERLANCAR
 
 	- Make these functions public: list_columns, list_tables,
 	  check_table_exists.
 
 
-0.092   2018-12-03 (PERLANCAR)
+0.092   2018-12-03  Released-By: PERLANCAR
 
 	- Detect change of column AUTO_INCREMENT (mysql) status.
 
 
-0.091   2018-05-10 (PERLANCAR)
+0.091   2018-05-10  Released-By: PERLANCAR
 
 	- Handle mysql driver's table_info() which returns database name as
 	  schema name.
 
 
-0.090   2017-08-13 (PERLANCAR)
+0.090   2017-08-13  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention App::diffdb.
 
 
-0.08    2017-07-10 (PERLANCAR)
+0.08    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.07    2015-09-03 (PERLANCAR)
+0.07    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -38,12 +44,12 @@
 	  requirement.
 
 
-0.06    2015-05-20 (PERLANCAR)
+0.06    2015-05-20  Released-By: PERLANCAR
 
 	- Skip index when listing tables.
 
 
-0.05    2015-04-24 (PERLANCAR)
+0.05    2015-04-24  Released-By: PERLANCAR
 
         - Add functions: db_schema_eq(), table_schema_eq().
 
@@ -55,27 +61,27 @@
         - Replace Log::Any with Log::Any::IfLOG.
 
 
-0.04    2015-01-07 (PERLANCAR)
+0.04    2015-01-07  Released-By: PERLANCAR
 
         - Rename dist/module from DBIx-Diff-Struct to DBIx-Diff-Schema ("schema"
           is the more common term in database parlance). Function name is also
           changed from diff_db_{struct,schema}.
 
 
-0.03    2015-01-03 (PERLANCAR)
+0.03    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.02    2014-09-12 (PERLANCAR)
+0.02    2014-09-12  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Rebuild with updated Dist::Zilla::Plugin::Rinci::Validate.
 
 
-0.01    2014-09-12 (PERLANCAR)
+0.01    2014-09-12  Released-By: PERLANCAR
 
         - First release.

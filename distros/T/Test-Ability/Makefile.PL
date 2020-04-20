@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Test::Ability",
   "PREREQ_PM" => {
+    "Clone" => "0.43",
     "Data::Object::Class" => "2.02",
     "Data::Object::ClassHas" => "2.01",
     "Data::Object::Role::Buildable" => "0.03",
@@ -28,6 +29,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Clone" => "0.43",
     "Data::Object::Class" => "2.02",
     "Data::Object::ClassHas" => "2.01",
     "Data::Object::Role::Buildable" => "0.03",
@@ -39,7 +41,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +49,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Clone" => "0.43",
   "Data::Object::Class" => "2.02",
   "Data::Object::ClassHas" => "2.01",
   "Data::Object::Role::Buildable" => "0.03",

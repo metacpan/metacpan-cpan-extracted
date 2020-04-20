@@ -111,7 +111,7 @@ my %WriteMakefileArgs = (
     "Test::SQL::Schema::Versioned" => "0.15",
     "Test::WithDB::SQLite" => "0.08"
   },
-  "VERSION" => "1.049",
+  "VERSION" => "1.051",
   "test" => {
     "TESTS" => "t/*.t"
   }

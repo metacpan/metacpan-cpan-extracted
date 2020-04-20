@@ -20,6 +20,9 @@ t/10_plan_skip_all_func.t
 t/11_plan_tests.t
 t/12_skip.t
 t/13_wrong_args.t
+t/14_is_deeply.t
+t/15_unexpected_multiple_args.t
+t/16_done.t
 xt/01_perlcritic.t
 xt/02_pod-coverage.t
 xt/03_pod.t

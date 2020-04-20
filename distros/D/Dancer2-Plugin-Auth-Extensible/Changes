@@ -1,5 +1,11 @@
 Revision history for Dancer2-Plugin-Auth-Extensible
 
+0.709 Sun 19 Apr 17:44:00 BST 2020
+
+    [BUG FIXES]
+
+    * Update tests to match RFC 7231 behavior of Dancer2 (thanks Ruth Holloway)
+
 0.708 Fri 26 Apr 09:47:00 GMT 2019
 
     [BUG FIXES]

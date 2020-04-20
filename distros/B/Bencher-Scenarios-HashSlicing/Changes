@@ -1,3 +1,17 @@
+0.005   2020-04-19  Released-By: PERLANCAR; Urgency: high
+
+        - Derp, lib/Bencher/ScenarioR/HashSlicing/slice.pm was still generated
+          because we didn't use the updated Pod::Weaver plugin.
+
+
+0.004   2020-04-19  Released-By: PERLANCAR; Urgency: high
+
+	- [dist] Do not generate
+	  lib/Bencher/ScenarioR/HashSlicing/slice.pm, this is a huge source
+	  code (16M) that requires huge memory when being parsed by
+	  Compiler::Lexer in lcpan (6GB+).
+
+
 0.003   2019-11-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename dist/module: Bencher-Scenarios-Hash{Picking,Slicing}.

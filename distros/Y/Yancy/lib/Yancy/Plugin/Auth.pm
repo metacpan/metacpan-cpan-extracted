@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: Add one or more authentication plugins to your site
 
 #pod =head1 SYNOPSIS
@@ -149,26 +149,60 @@ our $VERSION = '1.053';
 #pod Validate there is a logged-in user and optionally that the user data has
 #pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 #pod
+#pod     # Display the user dashboard, but only to logged-in users
+#pod     my $auth_route = $app->routes->under( '/user', $app->yancy->auth->require_user );
+#pod     $auth_route->get( '' )->to( 'user#dashboard' );
+#pod
 #pod =head2 yancy.auth.login_form
 #pod
 #pod Return an HTML string containing the rendered login forms for all
 #pod configured auth plugins, in order.
 #pod
+#pod     %# Display a login form to an unauthenticated visitor
+#pod     % if ( !$c->yancy->auth->current_user ) {
+#pod         %= $c->yancy->auth->login_form
+#pod     % }
+#pod
 #pod =head2 yancy.auth.logout
 #pod
-#pod Log out any current account from any auth plugin.
+#pod Log out any current account from any auth plugin. Use this in your own
+#pod route handlers to perform a logout.
 #pod
 #pod =head1 ROUTES
 #pod
-#pod =head2 yancy.auth.login
+#pod This plugin creates the following L<named
+#pod routes|https://mojolicious.org/perldoc/Mojolicious/Guides/Routing#Named-routes>.
+#pod Use named routes with helpers like
+#pod L<url_for|Mojolicious::Plugin::DefaultHelpers/url_for>,
+#pod L<link_to|Mojolicious::Plugin::TagHelpers/link_to>, and
+#pod L<form_for|Mojolicious::Plugin::TagHelpers/form_for>.
 #pod
-#pod Display all of the login forms for the configured auth plugins.
+#pod =head2 yancy.auth.login_form
+#pod
+#pod Display all of the login forms for the configured auth plugins. This route handles C<GET>
+#pod requests and can be used with the L<redirect_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#redirect_to>,
+#pod L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>,
+#pod and L<link_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#link_to> helpers.
+#pod
+#pod     %= link_to Login => 'yancy.auth.login_form'
+#pod     <%= link_to 'yancy.auth.login_form', begin %>Login<% end %>
+#pod     <p>Login here: <%= url_for 'yancy.auth.login_form' %></p>
 #pod
 #pod =head2 yancy.auth.logout
 #pod
-#pod Log out of all configured auth plugins.
+#pod Log out of all configured auth plugins. This route handles C<GET>
+#pod requests and can be used with the L<redirect_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#redirect_to>,
+#pod L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>,
+#pod and L<link_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#link_to> helpers.
+#pod
+#pod     %= link_to Logout => 'yancy.auth.logout'
+#pod     <%= link_to 'yancy.auth.logout', begin %>Logout<% end %>
+#pod     <p>Logout here: <%= url_for 'yancy.auth.logout' %></p>
 #pod
 #pod =head1 TEMPLATES
+#pod
+#pod To override these templates, add your own at the designated path inside
+#pod your app's C<templates/> directory.
 #pod
 #pod =head2 yancy/auth/login_form.html.ep
 #pod
@@ -213,6 +247,7 @@ use Yancy::Util qw( currym match );
 
 has _plugins => sub { [] };
 has route =>;
+has logout_route =>;
 
 sub register {
     my ( $self, $app, $config ) = @_;
@@ -274,8 +309,10 @@ sub register {
         $config->{route},
         $app->routes->get( '/yancy/auth' ),
     ) );
-    $self->route->get( '/logout' )->to( cb => currym( $self, '_handle_logout' ) )->name( 'yancy.auth.logout' );
-    $self->route->get( '' )->to( cb => currym( $self, '_login_page' ) )->name( 'yancy.auth.login' );
+    $self->logout_route(
+        $self->route->get( '/logout' )->to( cb => currym( $self, '_handle_logout' ) )->name( 'yancy.auth.logout' )
+    );
+    $self->route->get( '' )->to( cb => currym( $self, '_login_page' ) )->name( 'yancy.auth.login_form' );
 }
 
 #pod =method current_user
@@ -344,7 +381,11 @@ sub _handle_logout {
     my ( $self, $c ) = @_;
     $self->logout( $c );
     $c->res->code( 303 );
-    return $c->redirect_to( 'yancy.auth.login' );
+    my $redirect_to = $c->param( 'redirect_to' ) // $c->req->headers->referrer // '/';
+    if ( $redirect_to eq $c->req->url->path ) {
+        $redirect_to = '/';
+    }
+    return $c->redirect_to( $redirect_to );
 }
 
 1;
@@ -359,7 +400,7 @@ Yancy::Plugin::Auth - Add one or more authentication plugins to your site
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 
@@ -528,26 +569,60 @@ C<undef> if no user was found in the session.
 Validate there is a logged-in user and optionally that the user data has
 certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 
+    # Display the user dashboard, but only to logged-in users
+    my $auth_route = $app->routes->under( '/user', $app->yancy->auth->require_user );
+    $auth_route->get( '' )->to( 'user#dashboard' );
+
 =head2 yancy.auth.login_form
 
 Return an HTML string containing the rendered login forms for all
 configured auth plugins, in order.
 
+    %# Display a login form to an unauthenticated visitor
+    % if ( !$c->yancy->auth->current_user ) {
+        %= $c->yancy->auth->login_form
+    % }
+
 =head2 yancy.auth.logout
 
-Log out any current account from any auth plugin.
+Log out any current account from any auth plugin. Use this in your own
+route handlers to perform a logout.
 
 =head1 ROUTES
 
-=head2 yancy.auth.login
+This plugin creates the following L<named
+routes|https://mojolicious.org/perldoc/Mojolicious/Guides/Routing#Named-routes>.
+Use named routes with helpers like
+L<url_for|Mojolicious::Plugin::DefaultHelpers/url_for>,
+L<link_to|Mojolicious::Plugin::TagHelpers/link_to>, and
+L<form_for|Mojolicious::Plugin::TagHelpers/form_for>.
 
-Display all of the login forms for the configured auth plugins.
+=head2 yancy.auth.login_form
+
+Display all of the login forms for the configured auth plugins. This route handles C<GET>
+requests and can be used with the L<redirect_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#redirect_to>,
+L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>,
+and L<link_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#link_to> helpers.
+
+    %= link_to Login => 'yancy.auth.login_form'
+    <%= link_to 'yancy.auth.login_form', begin %>Login<% end %>
+    <p>Login here: <%= url_for 'yancy.auth.login_form' %></p>
 
 =head2 yancy.auth.logout
 
-Log out of all configured auth plugins.
+Log out of all configured auth plugins. This route handles C<GET>
+requests and can be used with the L<redirect_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#redirect_to>,
+L<url_for|https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#url_for>,
+and L<link_to|https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#link_to> helpers.
+
+    %= link_to Logout => 'yancy.auth.logout'
+    <%= link_to 'yancy.auth.logout', begin %>Logout<% end %>
+    <p>Logout here: <%= url_for 'yancy.auth.logout' %></p>
 
 =head1 TEMPLATES
+
+To override these templates, add your own at the designated path inside
+your app's C<templates/> directory.
 
 =head2 yancy/auth/login_form.html.ep
 

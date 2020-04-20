@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,13 +18,17 @@ no_index:
     - t
     - inc
 requires:
+  Compiled::Params::OO: '0'
   Crypt::SaltedHash: '0'
   Dancer2: '0.300003'
   Data::UUID: '0'
+  Future::HTTP: '0'
+  HTTP::CookieJar: '0'
+  JSON: '0'
   MetaCPAN::CLient::Pod::PDF: '0.03'
   Mxpress::PDF: '0.21'
   Test::More: '0'
   Type::Tiny: '0'
   YAML: '0'
-version: '0.20'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

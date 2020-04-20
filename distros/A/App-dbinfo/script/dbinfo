@@ -32,7 +32,7 @@ dbinfo - Get/extract information from database
 
 =head1 VERSION
 
-This document describes version 0.005 of dbinfo (from Perl distribution App-dbinfo), released on 2019-11-29.
+This document describes version 0.006 of dbinfo (from Perl distribution App-dbinfo), released on 2020-04-20.
 
 =head1 SYNOPSIS
 
@@ -137,6 +137,10 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =item B<--password>=I<s>, B<-p>
 
@@ -358,6 +362,8 @@ feature.
 
 =head1 SEE ALSO
 
+L<dbinfo-sqlite>, ...
+
 L<mysqlinfo> from L<App::mysqlinfo>
 
 =head1 AUTHOR
@@ -366,7 +372,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

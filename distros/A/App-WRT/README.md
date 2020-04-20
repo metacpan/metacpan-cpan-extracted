@@ -14,9 +14,11 @@ wrt can be found at:
   - [metacpan.org as App::WRT](https://metacpan.org/pod/App::WRT) - latest CPAN release
   - https://code.p1k3.com/gitea/brennen/wrt - latest code
 
-I have been using some version of this code to publish
-[p1k3](https://p1k3.com/) since 2001, and have written [various posts about
-it](https://p1k3.com/topics/wrt/) over the years.
+I have been using some version of this code to publish [p1k3][p1k3] since 2001,
+and have written [various posts about it][p1k3-wrt] over the years.
+
+[p1k3]: https://p1k3.com/
+[p1k3-wrt]: https://p1k3.com/topics/wrt/
 
 installation and use
 ====================
@@ -49,7 +51,7 @@ Starting a new site once installed:
 mkdir project && cd project
 wrt init
 
-# Edit an entry for January 1, 2019:
+# Create an entry for January 1, 2019:
 mkdir -p archives/2019/1/
 nano archives/2019/1/1
 
@@ -93,4 +95,3 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see http://www.gnu.org/licenses/
-

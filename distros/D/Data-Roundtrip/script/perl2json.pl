@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -19,12 +19,13 @@ my $INPUT_STRING = undef;
 my $INPUT_FILE = undef;
 my $OUTPUT_FILE = undef;
 my %params = (
-	'dont-bloody-escape-unicode' => 1
+	'dont-bloody-escape-unicode' => 1,
+	'pretty' => 0,
 );
 sub usage { return
-	"Usage : $0 [--I 'a-perl-var-as-string' | --i 'afile.pl'] [--o afile.json] [--escape-unicode|-e] [--pretty]\n"
+	"Usage : $0 [--I 'a-perl-var-as-string' | --i 'afile.pl'] [--o afile.json] [--(no-)escape-unicode|-e] [--(no-)pretty]\n"
 	."\nIt will read a Perl variable as a string from command line (-I), or a file (-i)\n"
-	."\nor from STDIN.\n"
+	."\nor from STDIN (beware 4K limit on linux terminal, see CAVEATS for workaround).\n"
 	."It will print its JSON equivalent to STDOUT or to a file (--o).\n"
 	."It can optionally escape unicode characters (--escape-unicode) and/or do pretty-printing (--pretty).\n"
 }
@@ -32,8 +33,8 @@ if( ! Getopt::Long::GetOptions(
   'i=s' => \$INPUT_FILE,
   'I=s' => sub { $INPUT_STRING = Encode::decode_utf8($_[1]) },
   'o=s' => \$OUTPUT_FILE,
-  'pretty|p' => \$params{'pretty'},
-  'escape-unicode|e' => \$params{'escape-unicode'},
+  'pretty|p!' => \$params{'pretty'},
+  'escape-unicode|e!' => \$params{'escape-unicode'},
 ) ){ die usage() }
 
 if( defined $INPUT_FILE ){
@@ -63,15 +64,30 @@ __END__
 
 =head1 NAME
 
-perl2json.pl : convert a Perl data structure to JSON
+perl2json.pl : convert a Perl data structure dump to JSON
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =head1 SYNOPSIS
 
     perl2json.pl -i "perl-data-structure.pl" -o "output.json" --escape-unicode --pretty
+
+    perl2json.pl -e < "perl-data-structure.pl" > "output.json"
+
+    # press CTRL-D when done typing json to STDIN
+    # input must be less than 4K long!
+    perl2json.pl
+
+    # Read input from clipboard or write output to clipboard
+    # Only in: Unix / Linux / OSX                
+    # (must have already installed xclip or xsel or pbpaste (on OSX))
+    json2json.pl -e < $(xclip -o)
+    json2json.pl -e < $(pbaste)
+    # write the output to the clipboard for further pasting
+    json2json.pl -i input.json | xclip -i
+    # clicking mouse's middle-button will paste the result
 
 =head1 USAGE
 
@@ -81,21 +97,21 @@ Options:
 
 =over 4
 
-=item C<--i filename> : specify a filename which contains a Perl
+=item * C<--i filename> : specify a filename which contains a Perl
 data structure in text representation, not as a (binary) serialised
 object, as one would have used in a Perl script.
 
-=item C<--I "string"> : specify a string  which contains a Perl
+=item * C<--I "string"> : specify a string  which contains a Perl
 data structure in text representation, not as a (binary) serialised
 object. But exactly as one would have used in a Perl script.
 
-=item C<--o outputfilename> : specify the output filename to write
+=item * C<--o outputfilename> : specify the output filename to write
 the result to.
 
-=item C<--escape-unicode> : it will escape all unicode characters, and
+=item * C<--escape-unicode> / C<--no-escape-unicode> : it will escape all unicode characters, and
 convert them to something like "\u0386"
 
-=item C<--pretty> : write this JSON pretty, line breaks, indendations, "the full catastrophe"
+=item * C<--pretty> / C<--no-pretty> : write this JSON pretty, line breaks, indendations, "the full catastrophe"
 
 =back
 
@@ -104,6 +120,17 @@ command line (--I) (properly quoted!), from STDIN (which also includes
 a file redirection C<< json2json.pl < inputfile.json > outputfile.json >>
 
 For more information see L<Data::Roundtrip>.
+
+=head1 CAVEATS
+
+Under Unix/Linux,
+the maximum number of characters that can be read
+on a terminal is 4096. So, in reading-from-STDIN mode
+beware how much you type or how much you copy-paste
+onto the script. If it complains about malformed input
+then this is the case. The workaround is to type/paste
+onto a file and operate on that using C<< --i afile >>
+or redirection C<< < afile >>.
 
 =head1 AUTHOR
 

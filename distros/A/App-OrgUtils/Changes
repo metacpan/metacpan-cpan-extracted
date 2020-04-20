@@ -1,3 +1,15 @@
+0.476   2020-04-18  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] org2html by default now uses the emacs
+	  backend; you have to specify --backend Org::To::HTML to use the
+	  other backend.
+
+
+0.475   2020-04-18  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] org2html: Add -b as shortcut for --browser.
+
+
 0.474   2020-04-12  Released-By: PERLANCAR; Urgency: medium
 
 	- Allow adding a reminded date to silence an anniversary.

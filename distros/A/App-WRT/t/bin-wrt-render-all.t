@@ -11,8 +11,8 @@ use Encode;
 use Test::More tests => 3;
 use App::WRT::Mock::FileIO;
 
-chdir 'example';
-require_ok('../bin/wrt-render-all');
+chdir 'example/blog';
+require_ok('../../bin/wrt-render-all');
 
 my $output_string;
 my $output = sub {

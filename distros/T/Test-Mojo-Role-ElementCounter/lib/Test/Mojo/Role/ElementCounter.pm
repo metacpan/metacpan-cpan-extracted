@@ -5,7 +5,7 @@ use Encode;
 use Carp qw/croak/;
 use Role::Tiny;
 
-our $VERSION = '1.001006'; # VERSION
+our $VERSION = '1.001008'; # VERSION
 
 has _counter_selector_prefix => '';
 
@@ -59,7 +59,7 @@ sub element_count_is {
         : $wanted_count =~ tr/>//d ? '>' : '==';
 
     my $count = $self->tx->res->dom->find($selector)->size;
-    return $self->_test('cmp_ok', $count, $operator, $wanted_count, $desc);
+    return $self->test('cmp_ok', $count, $operator, $wanted_count, $desc);
 }
 
 

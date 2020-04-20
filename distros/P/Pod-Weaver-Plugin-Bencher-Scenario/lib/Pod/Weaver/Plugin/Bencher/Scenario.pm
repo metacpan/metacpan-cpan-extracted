@@ -1,7 +1,9 @@
 package Pod::Weaver::Plugin::Bencher::Scenario;
 
-our $DATE = '2019-12-25'; # DATE
-our $VERSION = '0.246'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-19'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-Bencher-Scenario'; # DIST
+our $VERSION = '0.247'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -10,6 +12,8 @@ with 'Pod::Weaver::Role::Section';
 
 has include_module => (is=>'rw');
 has exclude_module => (is=>'rw');
+has gen_scenarior_include_module => (is=>'rw');
+has gen_scenarior_exclude_module => (is=>'rw');
 has bench => (is=>'rw', default=>sub{1});
 has bench_startup => (is=>'rw', default=>sub{1});
 has sample_bench => (is=>'rw');
@@ -17,7 +21,11 @@ has gen_html_tables => (is=>'rw', default=>sub{0});
 has result_split_fields => (is=>'rw');
 has chart => (is=>'rw', default=>sub{0});
 
-sub mvp_multivalue_args { qw(sample_bench include_module exclude_module) }
+sub mvp_multivalue_args { qw(
+                                sample_bench
+                                include_module exclude_module
+                                gen_scenarior_include_module gen_scenarior_exclude_module
+                        ) }
 
 use Bencher::Backend;
 use Data::Dmp;
@@ -485,6 +493,7 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
     }
 
     # create Bencher::ScenarioR::* modules
+  GEN_SCENARIOR:
     {
         require Dist::Zilla::File::InMemory;
         my ($rname, $rpkg, $nsname);
@@ -497,6 +506,16 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
             $rpkg = "Bencher::ScenarioR::$scenario_name";
             $nsname = "Bencher::ScenarioR::*";
         }
+
+        if ($self->gen_scenarior_include_module && @{ $self->gen_scenarior_include_module }) {
+            #$self->log_debug(["TMP:dist has gen_scenarior_include_module config, rpkg=%s, includes=%s", $rpkg, $self->gen_scenarior_include_module]);
+            last GEN_SCENARIOR unless grep {$_ eq $rpkg || "Acme::CPANModules_ScenarioR::$_" eq $rpkg || "Bencher::ScenarioR::$_" eq $rpkg} @{ $self->gen_scenarior_include_module };
+        }
+        if ($self->gen_scenarior_exclude_module && @{ $self->gen_scenarior_exclude_module }) {
+            #$self->log_debug(["TMP:dist has gen_scenarior_exclude_module config, rpkg=%s, excludes=%s", $rpkg, $self->gen_scenarior_exclude_module]);
+            last GEN_SCENARIOR if grep {$_ eq $rpkg || "Acme::CPANModules_ScenarioR::$_" eq $rpkg || "Bencher::ScenarioR::$_" eq $rpkg} @{ $self->gen_scenarior_exclude_module };
+        }
+
         my $file = Dist::Zilla::File::InMemory->new(
             name => $rname,
             content => join(
@@ -636,7 +655,7 @@ Pod::Weaver::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.246 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-12-25.
+This document describes version 0.247 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2020-04-19.
 
 =head1 SYNOPSIS
 
@@ -696,11 +715,29 @@ For each C<lib/Bencher/Scenarios/*> module file:
 
 =head2 include_module+ => str
 
-Filter only certain scenario modules. Can be specified multiple times.
+Filter only certain scenario modules that get processed. Can be specified
+multiple times.
 
 =head2 exclude_module+ => str
 
-Exclude certain scenario modules. Can be specified multiple times.
+Exclude certain scenario modules from being processed. Can be specified multiple
+times.
+
+=head2 gen_scenarior_include_module+ => str
+
+Filter only certain scenario modules that we create Bencher::ScenarioR::*
+modules for. Can be specified multiple times.
+
+Note that modules excluded using C<include_module> and/or C<exclude_module> are
+already excluded.
+
+=head2 gen_scenarior_exclude_module+ => str
+
+Exclude certain scenario modules from getting their Bencher::ScenarioR::*
+modules created. Can be specified multiple times.
+
+Note that modules excluded using C<include_module> and/or C<exclude_module> are
+already excluded.
 
 =head2 sample_bench+ => hash
 
@@ -775,7 +812,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

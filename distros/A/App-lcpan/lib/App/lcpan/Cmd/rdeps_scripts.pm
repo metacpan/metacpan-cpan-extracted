@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::rdeps_scripts;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-11'; # DATE
+our $DATE = '2020-04-20'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.049'; # VERSION
+our $VERSION = '1.051'; # VERSION
 
 use 5.010;
 use strict;
@@ -97,7 +97,7 @@ App::lcpan::Cmd::rdeps_scripts - List scripts that depend on specified modules
 
 =head1 VERSION
 
-This document describes version 1.049 of App::lcpan::Cmd::rdeps_scripts (from Perl distribution App-lcpan), released on 2020-04-11.
+This document describes version 1.051 of App::lcpan::Cmd::rdeps_scripts (from Perl distribution App-lcpan), released on 2020-04-20.
 
 =head1 FUNCTIONS
 

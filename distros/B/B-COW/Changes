@@ -1,5 +1,9 @@
 Revision history for B-COW
 
+0.003     2020-04-20 09:59:34-06:00 America/Denver
+
+support for Perl compiled without COW
+
 0.002     2020-01-29 12:13:52-07:00 America/Denver
 
 fix unit test error for 'uncow' strings

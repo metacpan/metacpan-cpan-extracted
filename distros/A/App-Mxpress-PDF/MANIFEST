@@ -8,13 +8,13 @@ environments/development.yml
 environments/production.yml
 filedb/styles/demo-A4.txt
 filedb/templates/demo-A4.txt
+lib/App/Mxpress/Client.pm
 lib/App/Mxpress/PDF.pm
 lib/App/Mxpress/PDF/API.pm
 lib/Dancer2/Plugin/CSRF/SPA.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-next.pdf
 public/404.html
 public/500.html
 public/css/error.css

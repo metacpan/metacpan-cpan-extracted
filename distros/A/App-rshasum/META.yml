@@ -22,7 +22,7 @@ name: App-rshasum
 provides:
   App::rshasum:
     file: lib/App/rshasum.pm
-    version: v0.4.0
+    version: v0.6.0
 requires:
   Digest: '0'
   File::Find::Object: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/shlomif/app-rshasum/issues
   homepage: http://metacpan.org/release/App-rshasum
   repository: https://github.com/shlomif/rshasum.git
-version: 0.4.0
+version: 0.6.0
 x_Dist_Zilla:
   perl:
     version: '5.030002'

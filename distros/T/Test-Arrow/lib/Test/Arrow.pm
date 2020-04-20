@@ -5,7 +5,7 @@ use Test::Builder::Module;
 use Test::Name::FromLine;
 use Text::MatchedPosition;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 our @ISA = qw/Test::Builder::Module/;
 
@@ -15,6 +15,12 @@ sub FAIL { 0 }
 sub import {
     my $pkg  = shift;
     my %args = map { $_ => 1 } @_;
+
+    {
+        my $caller = caller;
+        no strict 'refs'; ## no critic
+        *{"${caller}::done"} = \&done;
+    }
 
     $pkg->_import_option_no_strict(\%args);
     $pkg->_import_option_no_warnings(\%args);
@@ -97,12 +103,12 @@ sub plan {
 }
 
 sub _carp {
-    my($file, $line) = ( caller(1) )[ 1, 2 ];
+    my ($file, $line) = ( caller(1) )[ 1, 2 ];
     return warn @_, " at $file line $line\n";
 }
 
 sub skip {
-    my($self, $why, $how_many) = @_;
+    my ($self, $why, $how_many) = @_;
 
     # If the plan is set, and is static, then skip needs a count. If the plan
     # is 'no_plan' we are fine. As well if plan is undefined then we are
@@ -144,6 +150,12 @@ sub name {
 sub expected {
     my ($self, $value) = @_;
 
+    my $arg_count = scalar(@_) - 1;
+
+    if ($arg_count > 1) {
+        die "'expected' method expects just only one arg. You passed $arg_count args.";
+    }
+
     $self->{_expected} = $value;
 
     $self;
@@ -151,6 +163,12 @@ sub expected {
 
 sub got {
     my ($self, $value) = @_;
+
+    my $arg_count = scalar(@_) - 1;
+
+    if ($arg_count > 1) {
+        die "'got' method expects just only one arg. You passed $arg_count args.";
+    }
 
     $self->{_got} = $value;
 
@@ -297,9 +315,13 @@ sub done_testing {
     $self;
 }
 
+sub done {
+    _tb->done_testing(@_);
+}
+
 # Mostly copied from Test::More::can_ok
 sub can_ok {
-    my($self, $proto, @methods) = @_;
+    my ($self, $proto, @methods) = @_;
 
     my $class = ref $proto || $proto;
 
@@ -526,6 +548,284 @@ sub warnings {
     $self;
 }
 
+# The most code around is_depply is copied from Test::More::is_deeply
+our (@Data_Stack, %Refs_Seen);
+
+my $DNE = bless [], 'Does::Not::Exist';
+
+sub _dne {
+    return ref $_[1] eq ref $DNE;
+}
+
+sub is_deeply {
+    my $self = shift;
+
+    my $got = $self->_specific('_got', $_[0]);
+    my $expected = $self->_specific('_expected', $_[1]);
+    my $test_name = $self->_specific('_name', $_[2]);
+
+    _tb->_unoverload_str(\$expected, \$got);
+
+    my $ok;
+
+    if (!ref $got and !ref $expected) {
+        # neither is a reference
+        $ok = _tb->is_eq($got, $expected, $test_name);
+    }
+    elsif (!ref $got xor !ref $expected) {
+        # one's a reference, one isn't
+        $ok = _tb->ok(FAIL, $test_name);
+        _tb->diag( $self->_format_stack({ vals => [$got, $expected] }) );
+    }
+    else {
+        # both references
+        local @Data_Stack = ();
+        $ok = $self->_deep_check($got, $expected);
+        _tb->diag( $self->_format_stack(@Data_Stack) ) unless $ok;
+        _tb->ok($ok, $test_name);
+    }
+
+    $self->_reset;
+
+    $self;
+}
+
+sub __same_ref { !(!ref $_[0] xor !ref $_[1]) }
+sub __not_ref  {  (!ref $_[0] and !ref $_[1]) }
+
+sub _deep_check {
+    my ($self, $e1, $e2) = @_;
+
+    my $ok = FAIL;
+
+    # Effectively turn %Refs_Seen into a stack.  This avoids picking up
+    # the same referenced used twice (such as [\$a, \$a]) to be considered
+    # circular.
+    local %Refs_Seen = %Refs_Seen;
+
+    {
+        _tb->_unoverload_str(\$e1, \$e2);
+
+        # Either they're both references or both not.
+        my $same_ref = __same_ref($e1, $e2);
+        my $not_ref  = __not_ref($e1, $e2);
+
+        if (defined $e1 xor defined $e2) {
+            $ok = FAIL;
+        }
+        elsif (!defined $e1 and !defined $e2) {
+            # Shortcut if they're both undefined.
+            $ok = PASS;
+        }
+        elsif ($self->_dne($e1) xor $self->_dne($e2)) {
+            $ok = FAIL;
+        }
+        elsif ($same_ref and ($e1 eq $e2)) {
+            $ok = PASS;
+        }
+        elsif ($not_ref) {
+            $self->_push_data_stack('', [$e1, $e2]);
+            $ok = FAIL;
+        }
+        else {
+            if ($Refs_Seen{$e1}) {
+                return $Refs_Seen{$e1} eq $e2;
+            }
+            else {
+                $Refs_Seen{$e1} = "$e2";
+            }
+
+            $ok = $self->__deep_check_type($ok, $e1, $e2);
+        }
+    }
+
+    return $ok;
+}
+
+sub __deep_check_type {
+    my ($self, $ok, $e1, $e2) = @_;
+
+    my $type = $self->_type($e1);
+    $type = 'DIFFERENT' unless $self->_type($e2) eq $type;
+
+    if ($type eq 'DIFFERENT') {
+        $self->_push_data_stack($type, [$e1, $e2]);
+        $ok = FAIL;
+    }
+    elsif ($type eq 'ARRAY') {
+        $ok = $self->_eq_array($e1, $e2);
+    }
+    elsif ($type eq 'HASH') {
+        $ok = $self->_eq_hash($e1, $e2);
+    }
+    elsif ($type eq 'REF') {
+        $self->_push_data_stack($type, [$e1, $e2]);
+        $ok = $self->_deep_check($$e1, $$e2);
+        pop @Data_Stack if $ok;
+    }
+    elsif ($type eq 'SCALAR') {
+        $self->_push_data_stack('REF', [$e1, $e2]);
+        $ok = $self->_deep_check($$e1, $$e2);
+        pop @Data_Stack if $ok;
+    }
+    elsif ($type) {
+        $self->_push_data_stack($type, [$e1, $e2]);
+        $ok = FAIL;
+    }
+    else {
+        die <<_WHOA_;
+WHOA!  No type in _deep_check
+This should never happen!  Please contact the author immediately!
+_WHOA_
+    }
+
+    return $ok;
+}
+
+sub _push_data_stack {
+    my ($self, $type, $vals, $idx) = @_;
+
+    my $hash = {};
+
+    $hash->{type} = $type if $type;
+    $hash->{vals} = $vals if $vals;
+    $hash->{idx}  = $idx  if $idx;
+
+    push @Data_Stack, $hash;
+}
+
+sub _eq_array {
+    my ($self, $a1, $a2) = @_;
+
+    if ( grep $self->_type($_) ne 'ARRAY', $a1, $a2 ) {
+        warn "eq_array passed a non-array ref";
+        return FAIL;
+    }
+
+    return PASS if $a1 eq $a2;
+
+    my $ok = PASS;
+    my $max = $#$a1 > $#$a2 ? $#$a1 : $#$a2;
+
+    for (0 .. $max) {
+        my $e1 = $_ > $#$a1 ? $DNE : $a1->[$_];
+        my $e2 = $_ > $#$a2 ? $DNE : $a2->[$_];
+
+        next if $self->_equal_nonrefs($e1, $e2);
+
+        $self->_push_data_stack('ARRAY', [$e1, $e2], $_);
+        $ok = $self->_deep_check($e1, $e2);
+        pop @Data_Stack if $ok;
+
+        last unless $ok;
+    }
+
+    return $ok;
+}
+
+sub _eq_hash {
+    my ($self, $a1, $a2) = @_;
+
+    if ( grep $self->_type($_) ne 'HASH', $a1, $a2 ) {
+        warn "eq_hash passed a non-hash ref";
+        return FAIL;
+    }
+
+    return PASS if $a1 eq $a2;
+
+    my $ok = PASS;
+    my $bigger = keys %$a1 > keys %$a2 ? $a1 : $a2;
+
+    for my $k ( keys %$bigger ) {
+        my $e1 = exists $a1->{$k} ? $a1->{$k} : $DNE;
+        my $e2 = exists $a2->{$k} ? $a2->{$k} : $DNE;
+
+        next if $self->_equal_nonrefs($e1, $e2);
+
+        $self->_push_data_stack('HASH', [$e1, $e2], $k);
+        $ok = $self->_deep_check($e1, $e2);
+        pop @Data_Stack if $ok;
+
+        last unless $ok;
+    }
+
+    return $ok;
+}
+
+sub _equal_nonrefs {
+    my ($self, $e1, $e2) = @_;
+
+    return if ref $e1 or ref $e2;
+
+    if (defined $e1) {
+        return PASS if defined $e2 and $e1 eq $e2;
+    }
+    else {
+        return PASS if !defined $e2;
+    }
+
+    return;
+}
+
+sub _type {
+    my ($self, $thing) = @_;
+
+    return '' if !ref $thing;
+
+    for my $type (qw/Regexp ARRAY HASH REF SCALAR GLOB CODE VSTRING/) {
+        return $type if UNIVERSAL::isa($thing, $type);
+    }
+
+    return '';
+}
+
+sub _format_stack {
+    my ($self, @stack) = @_;
+
+    my $var       = '$FOO';
+    my $did_arrow = 0;
+
+    for my $entry (@stack) {
+        my $type = $entry->{type} || '';
+        my $idx = $entry->{'idx'};
+        if($type eq 'HASH') {
+            $var .= "->" unless $did_arrow++;
+            $var .= "{$idx}";
+        }
+        elsif($type eq 'ARRAY') {
+            $var .= "->" unless $did_arrow++;
+            $var .= "[$idx]";
+        }
+        elsif($type eq 'REF') {
+            $var = "\${$var}";
+        }
+    }
+
+    my @vals = @{ $stack[-1]{vals} }[ 0, 1 ];
+    my @vars = ();
+
+    ( $vars[0] = $var ) =~ s/\$FOO/     \$got/;
+    ( $vars[1] = $var ) =~ s/\$FOO/\$expected/;
+
+    my $out = "Structures begin differing at:\n";
+
+    for my $idx (0 .. $#vals) {
+        my $val = $vals[$idx];
+        $vals[$idx]
+          = !defined $val     ? 'undef'
+          : $self->_dne($val) ? "Does not exist"
+          : ref $val          ? "$val"
+          :                     "'$val'";
+    }
+
+    $out .= "$vars[0] = $vals[0]\n";
+    $out .= "$vars[1] = $vals[1]\n";
+
+    $out =~ s/^/    /msg;
+
+    return $out;
+}
+
 {
     no warnings 'once';
     *expect = *expected;
@@ -534,8 +834,6 @@ sub warnings {
     *warning_ok = *warnings_ok;
 
     *warning = *warnings;
-
-    *done = *done_testing;
 }
 
 1;
@@ -764,6 +1062,14 @@ It works on references, too:
 
     $arr->got($array_ref)->expected('ARRAY')->isa_ok;
 
+=head3 is_deeply
+
+    $arr->got($ref1)->expected($ref2)->is_deeply;
+
+Compare references, it does a deep comparison walking each data structure to see if they are equivalent.
+
+This C<is_deeply> is mostly same as Test::More's one. You can use L<Test::Deep> more in-depth functionality along these lines.
+
 
 =head2 EXCEPTION TEST
 
@@ -877,18 +1183,23 @@ If you call C<x> method, then the current values (name, expected and got) are du
     #   'name' => 'x test'
     # }
 
+=head3 done
+
+Declare of done testing. C<Test::Arrow> exports C<done> into your test script. You can call C<done> as function.
+
+    $arr->ok(1);
+
+    done();
+
 =head3 done_testing
 
-Declare of done testing.
+Same as C<done>. But done_testing is NOT exported. You should call C<done_testing> as class method or instance method.
 
     $arr->done_testing($number_of_tests_run);
     Test::Arrow->done_testing;
 
 B<Note> that you must never put C<done_testing> inside an C<END { ... }> block.
 
-=head3 done
-
-Alias of C<done_testing>
 
 =head2 CONSTANTS
 
@@ -901,7 +1212,7 @@ Alias of C<done_testing>
 
 =begin html
 
-<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.17-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1584195255"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1584195255&branch=master"/></a>
+<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.18-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1587262139"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1587262139&branch=master"/></a>
 
 =end html
 

@@ -16,7 +16,7 @@ package App::WRT;
 # without overthinking a bunch of hair-splitting decisions and categories,
 # but whatever.  I'll try to follow it, roughly.
 
-use version; our $VERSION = version->declare("v7.0.0");
+use version; our $VERSION = version->declare("v7.1.0");
 
 use strict;
 use warnings;
@@ -542,7 +542,7 @@ sub populate_metadata_cache {
 =item display($entry1, $entry2, ...)
 
 Return a string containing the given entries, which are in the form of
-date/entry strings. If no parameters are given, default to default_entry().
+date/entry strings. If no parameters are given, default to C<default_entry>.
 
 display() expands aliases ("new" and "all", for example) as necessary, collects
 entry content and metadata from the pre-rendered HTML caches, and wraps
@@ -561,8 +561,14 @@ sub display {
 
   return $self->{overlay} if defined $self->{overlay};
 
-  # If no entries are defined, fall back to the default:
-  $entries[0] //= $self->{default_entry};
+  # If no entries are defined, either...
+  if ($self->{entries}->is_extant('index')) {
+    # Fall back to the existing index file:
+    $entries[0] = 'index';
+  } else {
+    # Or use the default:
+    $entries[0] //= $self->{default_entry};
+  }
 
   # Title and navigation for template:
   $self->{page_navigation} = '';
@@ -587,6 +593,13 @@ sub display {
     . '</div>'
   } @entries;
 
+  # TODO: There may be an optimization to be had below in only running
+  # line_parse() against the template when the source is stashed.  This would
+  # also lead to confusing weirdness if the template contained any special
+  # markup besides an <include> or relied on any side effects of embedded Perl
+  # code.  For now, I'm leaving it alone.
+
+  # Evaluate the template much like an entry:
   return $self->line_parse(
     $self->eval_perl($self->{template_source}),
     $self->{template_path}
@@ -609,12 +622,13 @@ sub handle {
   my ($self, $entry) = @_;
 
   for ($entry) {
+    if ($_ eq 'index'            ) { return entry(@_);                  }
     if (m'^[\d/]+[[:lower:]_/]+$') { return entry_stamped(@_, 'index'); }
     if (m'^\d+/\d{1,2}/\d{1,2}$' ) { return entry_stamped(@_, 'all');   }
     if (m'^\d+/\d{1,2}$'         ) { return month(@_);                  }
     if (m'^\d+$'                 ) { return year(@_);                   }
     if (m'^[[:lower:]_]'         ) { return entry_stamped(@_, 'index'); }
-   }
+  }
 }
 
 =item expand_alias($option)

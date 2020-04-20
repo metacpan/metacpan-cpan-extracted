@@ -446,7 +446,7 @@ sub handleUpload {
         return $self->render(json => {exception=>{
             message=>trm('Access Denied'),code=>4922}});
     }
-    my $name = $self->param('name');
+    my $name = $self->req->param('name');
     if (not $name){
         return $self->render(json => {exception=>{
             message=>trm('Plugin Name missing'),code=>3934}});

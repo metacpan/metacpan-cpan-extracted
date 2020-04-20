@@ -1,5 +1,8 @@
 Revision history for Net-IPAM-Block
 
+1.10    Sun, 19 Apr 2020 19:23:11 +0200
+        * use namespace::clean
+
 1.09    Mon, 13 Apr 2020 12:00:59 +0200
         * tests for subclassing
 

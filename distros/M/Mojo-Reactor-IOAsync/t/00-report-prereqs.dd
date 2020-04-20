@@ -15,7 +15,7 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'IO::Async' => '0.65',
-                                      'Mojolicious' => '5.70',
+                                      'Mojolicious' => '7.37',
                                       'Scalar::Util' => '0',
                                       'perl' => '5.010001'
                                     }

@@ -1,3 +1,12 @@
+v0.132.1 2020-04-19T19:03:24Z
+ - api nginx controller fixed
+
+v0.132.0 2020-04-18T19:08:48Z
+ - namecheap api
+ - P->bind_events -> P->on
+ - node win mutex
+ - invalid -dist usaage removed
+
 v0.131.0 2020-04-14T05:45:54Z
  - node use individual mutex for each child
  - use mutex under windows to control parent process presence

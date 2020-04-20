@@ -5,7 +5,8 @@ use ExtUtils::MakeMaker;
 
 sub MY::libscan {
     my( $mm, $file ) = @_;
-    return if $file =~  /^push_to_GIT$/; # SKIP
+    return if $file =~  /^push_to_GIT$/; # SKIP the git dir
+    return if $file =~ /\.lock$/; # SKIP editor files
     return $file;
 }
 
@@ -28,23 +29,25 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
+        'Test::Script' => '0',
+        'Test::Pod' => '0',
         'Test::More' => '0',
-	'Data::Dumper' => '0',
+        'Benchmark' => '0',
 	'Data::Random::Structure' => '0',
-	'Data::Random::Structure::UTF8' => '0.04',
+	'Data::Random::Structure::UTF8' => '0.06',
     },
     PREREQ_PM => {
 	'Encode' => '3.0',
 	'JSON' => '4.0',
-	'Unicode::Escape' => '0.02',
+	'Unicode::Escape' => '0.0.2',
 	'YAML' => '1.28',
-	'Sub::Override' => '0.09',
 	'Data::Dumper' => '0',
 	'Data::Dump' => '0',
 	'Data::Dump::Filtered' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Data-Roundtrip-*' },
+    postamble => { BENCHMARK_FILES => 'xt/benchmarks/*.b' },
 	# Thanks to marto @ Perlmonks.org
 	# see https://perlmonks.org/?displaytype=displaycode;node_id=359256;part=1;abspart=1
     META_MERGE => {
@@ -84,3 +87,17 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
+
+sub MY::postamble {
+    my (undef,%h) = @_;
+    require Data::Dumper;
+    #print STDERR Data::Dumper->Dump([\%h], [qw(mm_args{postamble})]);
+    return "BENCHMARK_FILES=$h{BENCHMARK_FILES}\n"
+	. <<'POSTAMBLE';
+TEST_D = $(ABSPERLRUN) -MExtUtils::Command -e test_d --
+
+benchmarks :: $(BENCHMARK_FILES)
+	prove --blib $(INST_LIB) --blib $(INST_ARCHLIB) --verbose $^
+POSTAMBLE
+}
+

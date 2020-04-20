@@ -1,22 +1,19 @@
 package Net::IPAM::Tree;
 
+our $VERSION = '1.09';
+
 use 5.10.0;
 use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.07';
-
-# caller can shut up with: no warnings 'Net::IPAM::Tree'
-use warnings::register;
-
-use Carp qw(croak);
+use Carp qw(carp croak);
 use Scalar::Util qw(blessed);
+###
+use namespace::clean;
 
 use Net::IPAM::Block;
 use Net::IPAM::Tree::Node;
-
-=encoding utf8
 
 =head1 NAME
 
@@ -31,7 +28,7 @@ This isn't possible for general blocks not represented by bitmasks, every tree i
 
 The complexity for tree operations is in worst case O(h * log n) with h <= 128 (IPv6) or h <=32 (IPv4).
 
-=cut
+=encoding utf8
 
 =head1 SYNOPSIS
 
@@ -61,16 +58,22 @@ The complexity for tree operations is in worst case O(h * log n) with h <= 128 (
 
 =head1 METHODS
 
-=head2 new
+=head2 new([$error_cb])
 
 Create Net::IPAM::Tree object.
 
   my $t = Net::IPAM::Tree->new;
 
+The only optional argument is a coderef for an error handler.
+With no error callback L</insert> just calls C<< carp() >> on duplicate items.
+
+The error callback gets the duplicate block as argument.
+
 =cut
 
 sub new {
   my $self = bless {}, $_[0];
+
   $self->{root} = Net::IPAM::Tree::Node->new(
     {
       block  => undef,
@@ -78,6 +81,14 @@ sub new {
       childs => [],
     }
   );
+
+  if ( ref $_[1] eq 'CODE' ) {
+    $self->{error_cb} = $_[1];
+  }
+  else {
+    $self->{error_cb} = sub { carp("duplicate block during insert: $_[0]") };
+  }
+
   return $self;
 }
 
@@ -88,14 +99,13 @@ than inserting unsorted single blocks in a loop.
 
 Returns the tree object on success for method chaining.
 
-  my $t = Net::IPAM::Tree->new->insert(@blocks) // die("one or more blocks are duplicate");;
+  my $t = Net::IPAM::Tree->new->insert(@blocks) // die("one or more blocks are duplicate");
 
-Returns undef on duplicate blocks in the tree and generate warnings (warnings can be disabled).
+Returns undef on duplicate blocks in the tree and generate warnings.
+To shut up the warnings on duplicate items, define your own error callback in the constructor.
 
-  {
-    no warnings 'Net::IPAM::Tree';
-    $t->insert($dup)
-  }
+  my $t = Net::IPAM::Tree->new(sub{});
+  $t->insert(@blocks) // die("one or more blocks are duplicate");
 
 =cut
 
@@ -120,9 +130,7 @@ sub insert {
 
     unless ( defined $self->{root}->_insert_node($node) ) {
       $warnings++;
-
-      # caller can shut up with: no warnings 'Net::IPAM::Tree'
-      warnings::warnif("duplicate $block,");
+      $self->{error_cb}->($block);
     }
   }
 
@@ -135,8 +143,9 @@ sub insert {
 
 =head2 contains($thing)
 
-Returns true if the given $thing (L<Net::IPAM::IP> or L<Net::IPAM::Block>) is contained in any block of the tree.
-Just returns true or false and not the matching prefix, this is much faster than a full L</"lookup"> for the longest-prefix-match.
+Returns true if the given $thing (L<Net::IPAM::IP> or L<Net::IPAM::Block>) is contained
+in any block of the tree. Just returns true or false and not the matching prefix,
+this is much faster than a full L</"lookup"> for the longest-prefix-match.
 
 This can be used for fast ACL lookups.
 
@@ -424,7 +433,6 @@ This software is copyright (c) 2020 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
 
 =cut
 

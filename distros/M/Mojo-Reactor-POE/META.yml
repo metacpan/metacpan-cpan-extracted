@@ -3,29 +3,46 @@ abstract: 'POE backend for Mojo::Reactor'
 author:
   - 'Dan Book <dbook@cpan.org>'
 build_requires:
+  File::Spec: '0'
   IO::Socket::INET: '0'
+  Module::Metadata: '0'
   Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Mojo-Reactor-POE
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
 provides:
   Mojo::Reactor::POE:
     file: lib/Mojo/Reactor/POE.pm
-    version: '0.009'
+    version: '1.000'
 requires:
   Carp: '0'
-  Mojolicious: '5.70'
+  Mojolicious: '7.37'
   POE: '1.366'
   Scalar::Util: '0'
   perl: '5.010001'
 resources:
+  IRC: irc://irc.freenode.net/#mojo
   bugtracker: https://github.com/Grinnz/Mojo-Reactor-POE/issues
   homepage: https://github.com/Grinnz/Mojo-Reactor-POE
   repository: https://github.com/Grinnz/Mojo-Reactor-POE.git
-version: '0.009'
+version: '1.000'
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'
+  - 'Grinnz <grinnz@gmail.com>'
+x_generated_by_perl: v5.30.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

@@ -19,22 +19,17 @@ my $leads  = shift || '1 2 4 7';
 my $quarter = 'qn';
 my $half    = 'hn';
 
-my @scale = get_scale_notes( $note, $type );
-# Transform to MIDI accidentals
-for ( @scale ) {
-    s/#/s/;
-    s/b/f/;
-}
+my @scale = get_scale_MIDI( $note, $octave, $type );
 
 my @leaders = split /\s+/, $leads;
 
-my $score = MIDI::Util::setup_score( bpm => $bpm, octave => $octave );
+my $score = MIDI::Util::setup_score( bpm => $bpm );
 
 my $mc = Music::Cadence->new(
     key    => $note,
     scale  => $type,
     octave => $octave,
-    format => 'midi',
+    format => 'midinum',
 );
 
 for my $i ( 1 .. $max ) {
@@ -54,7 +49,7 @@ for my $i ( 1 .. $max ) {
 
 my $chords = $mc->cadence(
     type      => 'deceptive',
-    variation => int( rand 2 ) + 1,
+    variation => 1 + int rand 2,
 );
 $score->n( $half, @$_ ) for @$chords;
 

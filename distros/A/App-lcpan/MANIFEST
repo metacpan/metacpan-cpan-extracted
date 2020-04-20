@@ -89,7 +89,6 @@ lib/App/lcpan/Cmd/subnames_by_count.pm
 lib/App/lcpan/Cmd/subs.pm
 lib/App/lcpan/Cmd/update.pm
 lib/App/lcpan/Cmd/x_mentions_for_mod.pm
-lib/App/lcpan/Manual/Cookbook.pod
 lib/App/lcpan/PodParser.pm
 lib/End/PrintBytesIn.pm
 lib/LWP/UserAgent/Patch/FilterLcpan.pm

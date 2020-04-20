@@ -19,6 +19,8 @@ Test::Mojo::Role::Debug - Test::Mojo role to make debugging test failures easier
         ->d         # Dump entire DOM on fail
         ->d('#foo') # Dump a specific element on fail
         ->da        # Always dump
+        ->da('#foo') # Always dump a specific element
+        ->da('', 'file.html') # Always dump to a file
     ;
 
     done_testing;
@@ -39,8 +41,11 @@ You have all the methods provided by [Test::Mojo](https://metacpan.org/pod/Test:
 
 ## `d`
 
-    $t->d;         # print entire DOM on failure
-    $t->d('#foo'); # print a specific element on failure
+    # On test failure:
+    $t->d;         # print entire DOM
+    $t->d('#foo'); # print a specific element
+    $t->d('', 'file.html');     # dump entire DOM into a file
+    $t->d('#foo', 'file.html'); # dump specific element into a file
 
 **Returns** its invocant.
 On failure of previous tests (see ["success" in Mojo::DOM](https://metacpan.org/pod/Mojo::DOM#success)),
@@ -48,10 +53,16 @@ dumps the DOM of the current page to the screen. **Takes** an optional
 selector to be passed to ["at" in Mojo::DOM](https://metacpan.org/pod/Mojo::DOM#at), in which case, only
 the markup of that element will be dumped.
 
+A filename can be provided as the second argument to put the contents into
+the file instead. To dump entire DOM, use `undef` or empty string as the
+first argument.
+
 ## `da`
 
     $t->da;
     $t->da('#foo');
+    $t->da('', 'file.html');
+    $t->da('#foo', 'file.html');
 
 Same as ["d"](#d), except it always dumps, regardless of whether the previous
 test failed or not.

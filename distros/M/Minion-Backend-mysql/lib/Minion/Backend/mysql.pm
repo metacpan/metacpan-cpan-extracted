@@ -13,7 +13,7 @@ use Time::Piece ();
 
 has 'mysql';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 sub dequeue {
   my ($self, $worker_id, $wait, $options) = @_;
@@ -1021,7 +1021,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -1551,6 +1551,7 @@ CREATE TABLE IF NOT EXISTS minion_locks (
 );
 DELIMITER //
 CREATE FUNCTION minion_lock( $1 VARCHAR(191), $2 INTEGER, $3 INTEGER) RETURNS BOOL
+  NOT DETERMINISTIC MODIFIES SQL DATA SQL SECURITY INVOKER
 BEGIN
   DECLARE new_expires TIMESTAMP DEFAULT DATE_ADD( NOW(), INTERVAL 1*$2 SECOND );
   DELETE FROM minion_locks WHERE expires < NOW();

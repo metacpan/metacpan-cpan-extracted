@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::script;
 
-our $DATE = '2020-04-11'; # DATE
-our $VERSION = '1.049'; # VERSION
+our $DATE = '2020-04-20'; # DATE
+our $VERSION = '1.051'; # VERSION
 
 use 5.010;
 use strict;
@@ -47,7 +47,7 @@ App::lcpan::Cmd::script - Show a single script
 
 =head1 VERSION
 
-This document describes version 1.049 of App::lcpan::Cmd::script (from Perl distribution App-lcpan), released on 2020-04-11.
+This document describes version 1.051 of App::lcpan::Cmd::script (from Perl distribution App-lcpan), released on 2020-04-20.
 
 =head1 FUNCTIONS
 

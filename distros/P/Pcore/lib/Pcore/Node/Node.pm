@@ -79,7 +79,7 @@ sub run ( $type, $args ) {
 
         $fh->write( unpack( 'H*', $data ) . "\n" );
 
-        if ($MSWIN) {
+        if ( $args->{win32_mutex} ) {
             require Win32::Mutex;
 
             my $mutex = Win32::Mutex->open( $args->{win32_mutex} );
@@ -89,7 +89,7 @@ sub run ( $type, $args ) {
                 # parent process killed if we can get control on mutex
                 $mutex->wait(0) and exit;
 
-                Coro::sleep 5;
+                Coro::sleep 3;
             }
         }
         else {

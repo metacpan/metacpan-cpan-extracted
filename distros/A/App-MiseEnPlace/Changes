@@ -1,5 +1,11 @@
 Changes file for App-MiseEnPlace
 
+0.170     2020-04-18 13:36:18-07:00 America/Los_Angeles
+
+ * Migrated repo from Github to git.genehack.net; updated metadata
+   accordingly.
+ * Updated copyright year and email
+
 0.160     2015-04-14 21:21:17-07:00 America/Los_Angeles
 
  * No changes from last dev release.

@@ -23,6 +23,6 @@ sub _RESOLVE {
     my ($class, $promise) = @_;
 
     my $cv = AnyEvent->condvar();
-    $promise->finally($cv);
+    $promise->catch( sub {} )->finally($cv);
     $cv->recv();
 }

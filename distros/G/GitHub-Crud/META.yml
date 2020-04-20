@@ -15,11 +15,11 @@ name: GitHub-Crud
 provides:
   GitHub::Crud:
     file: lib/GitHub/Crud.pm
-    version: '20200219'
+    version: '20200418'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20200221'
+  Data::Table::Text: '20200418'
   Digest::SHA1: '0'
   Storable: '0'
   Test2::API: '0'
@@ -28,5 +28,5 @@ requires:
   perl: v5.26.1
 resources:
   license: http://dev.perl.org/licenses/
-version: '20200219'
+version: '20200418'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

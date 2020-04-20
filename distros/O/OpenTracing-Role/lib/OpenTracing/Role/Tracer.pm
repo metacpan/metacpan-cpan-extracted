@@ -22,6 +22,12 @@ OpenTracing::Role::Tracer - Role for OpenTracin implementations.
 
 =cut
 
+
+
+our $VERSION = '0.07';
+
+
+
 use Moo::Role;
 
 use Carp;

@@ -18,6 +18,12 @@ OpenTracing::Role::SpanContext - Role for OpenTracing implementations.
 
 =cut
 
+
+
+our $VERSION = '0.07';
+
+
+
 use Moo::Role;
 
 use MooX::HandlesVia;

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use smallnum;
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 our %TOOL;
 
@@ -182,6 +182,14 @@ sub toCSS {
 	return ( $alpha != 1 ) ? $_[0]->toRGBA() : $_[0]->toHEX( $_[2] );
 }
 
+sub toTerm {
+	return sprintf( "r%sg%sb%s", $_[0]->colour );
+}
+
+sub toOnTerm {
+	return sprintf( "on_r%sg%sb%s", $_[0]->colour );
+}
+
 sub toRGB {
 	return $_[0]->toRGBA( $_[1] ) if $TOOL{numIs}( $_[1] ) and $_[1] != 1;
 	return sprintf( 'rgb(%s)', ( $TOOL{joinRgb}( $_[0]->colour ) ) );
@@ -317,7 +325,7 @@ Colouring::In - color or colour.
 
 =head1 VERSION
 
-Version 0.16
+Version 0.18
 
 =cut
 
@@ -333,7 +341,9 @@ Version 0.16
 	$black->toRGBA # rgba(0,0,0,1)
 	$black->toHSL # hsl(0,0%,0%)
 	$black->toHSV # hsv(0,0%,0%)
-
+	$black->toTerm # r0g0b0
+	$black->toOnTerm # on_r0g0b0
+	
 	my $white = $black->lighten('100%');
 	my $black = $white->darken('100%');
 
@@ -487,6 +497,20 @@ Returns an opaque colour string from hue, saturation and value (HSV) values.
 	my $string = $colour->toHSV;
 
 =cut
+
+=head2 toTerm
+
+Returns an opaque colour string from decimal red, green and blue (RGB) values 
+valid for Term::ANSIColor foreground content.
+
+	my $string = $colour->toCSS;
+
+=head2 toOnTerm
+
+Returns an opaque colour string from decimal red, green and blue (RGB) values 
+valid for Term::ANSIColor background content.
+
+	my $string = $colour->toCSS;
 
 =head2 colour
 

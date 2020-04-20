@@ -6,10 +6,10 @@ use warnings;
 use lib 'lib';
 
 use Data::Dumper;
-use Test::More tests => 32;
+use Test::More tests => 34;
 use App::WRT;
 
-chdir 'example';
+chdir 'example/blog';
 
 my $es = App::WRT::EntryStore->new('archives');
 
@@ -27,6 +27,18 @@ my $es = App::WRT::EntryStore->new('archives');
   ok(
     $es->is_extant('2014'),
     '2014 exists'
+  );
+
+# checking entries are renderable or not:
+
+  ok(
+    $es->is_renderable('2014'),
+    '2014 is renderable'
+  );
+
+  ok(
+    $es->is_renderable('i_do_not_exist'),
+    'a nonexistent entry path is theoretically renderable'
   );
 
 # listing entries like 2014/1/1 for an individual day:

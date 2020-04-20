@@ -3,6 +3,7 @@ abstract: 'Property-Based Testing for Perl 5'
 author:
   - 'Al Newkirk <awncorp@cpan.org>'
 build_requires:
+  Clone: '0.43'
   Data::Object::Class: '2.02'
   Data::Object::ClassHas: '2.01'
   Data::Object::Role::Buildable: '0.03'
@@ -24,6 +25,7 @@ meta-spec:
   version: '1.4'
 name: Test-Ability
 requires:
+  Clone: '0.43'
   Data::Object::Class: '2.02'
   Data::Object::ClassHas: '2.01'
   Data::Object::Role::Buildable: '0.03'
@@ -38,7 +40,7 @@ resources:
   bugtracker: https://github.com/iamalnewkirk/test-ability/issues
   homepage: https://metacpan.org/pod/Test::Ability
   repository: git://github.com/iamalnewkirk/test-ability.git
-version: '0.03'
+version: '0.05'
 x_authority: cpan:AWNCORP
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

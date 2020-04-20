@@ -8,8 +8,9 @@ Makefile.PL
 README
 dist.ini
 lib/App/lcpan/Manual.pm
-lib/App/lcpan/Manual/Cookbook.pm
+lib/App/lcpan/Manual/Cookbook.pod
 lib/App/lcpan/Manual/FAQ.pod
+lib/App/lcpan/Manual/Internals.pod
 lib/App/lcpan/Manual/Tutorial.pod
 lib/App/lcpan/Manual/Tutorial/100_WhatIsLcpan.pod
 lib/App/lcpan/Manual/Tutorial/800_WritingASubcommand.pod

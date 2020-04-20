@@ -1,19 +1,21 @@
 package Test::Mojo::Role::Debug;
 
 use Mojo::Base -base;
+use Mojo::File qw/path/;
+use Mojo::Util qw/encode/;
 use Role::Tiny;
 use Carp qw/croak/;
 use Test::More ();
 
-our $VERSION = '1.003004'; # VERSION
+our $VERSION = '1.004001'; # VERSION
 
 sub d {
-    my ( $self, $selector ) = @_;
-    return $self->success ? $self : $self->da( $selector );
+    my ( $self, $selector, $dump_file ) = @_;
+    return $self->success ? $self : $self->da( $selector, $dump_file );
 }
 
 sub da {
-    my ( $self, $selector ) = @_;
+    my ( $self, $selector, $dump_file ) = @_;
     my $markup = length($selector//'')
         ? $self->tx->res->dom->at($selector)
         : $self->tx->res->dom;
@@ -24,7 +26,13 @@ sub da {
         return $self;
     }
 
-    Test::More::diag "\nDEBUG DUMPER:\n$markup\n\n";
+    if (length($dump_file//'')) {
+        Test::More::diag "\nDEBUG DUMPER: dumping data to $dump_file\n\n";
+        path($dump_file)->spurt(encode 'utf-8', $markup);
+    }
+    else {
+        Test::More::diag "\nDEBUG DUMPER:\n$markup\n\n";
+    }
 
     $self;
 }
@@ -60,6 +68,8 @@ Test::Mojo::Role::Debug - Test::Mojo role to make debugging test failures easier
         ->d         # Dump entire DOM on fail
         ->d('#foo') # Dump a specific element on fail
         ->da        # Always dump
+        ->da('#foo') # Always dump a specific element
+        ->da('', 'file.html') # Always dump to a file
     ;
 
     done_testing;
@@ -78,8 +88,11 @@ You have all the methods provided by L<Test::Mojo>, plus these:
 
 =head2 C<d>
 
-    $t->d;         # print entire DOM on failure
-    $t->d('#foo'); # print a specific element on failure
+    # On test failure:
+    $t->d;         # print entire DOM
+    $t->d('#foo'); # print a specific element
+    $t->d('', 'file.html');     # dump entire DOM into a file
+    $t->d('#foo', 'file.html'); # dump specific element into a file
 
 B<Returns> its invocant.
 On failure of previous tests (see L<Mojo::DOM/"success">),
@@ -87,10 +100,16 @@ dumps the DOM of the current page to the screen. B<Takes> an optional
 selector to be passed to L<Mojo::DOM/"at">, in which case, only
 the markup of that element will be dumped.
 
+A filename can be provided as the second argument to put the contents into
+the file instead. To dump entire DOM, use C<undef> or empty string as the
+first argument.
+
 =head2 C<da>
 
     $t->da;
     $t->da('#foo');
+    $t->da('', 'file.html');
+    $t->da('#foo', 'file.html');
 
 Same as L</d>, except it always dumps, regardless of whether the previous
 test failed or not.

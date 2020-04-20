@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>${title_prefix}::${title}</title>
+  <meta name="keywords" content="keywords here" />
+  <meta name="description" content="${description}" /> 
+  <meta name="author" content="${author}" />
+  <link rel="stylesheet" href="${stylesheet_url}" />
+  <link rel="icon" type="image/x-png" href="${favicon_url}" />
+  <link rel=alternate type="application/atom+xml" title="${title_prefix} atom feed" href="${url_root}${feed_alias}" />
+  <link rel=feed type="application/atom+xml" title="${title_prefix} atom feed" href="${url_root}${feed_alias}" />
+  <link rel="alternate" title="${title_prefix} JSON feed" type="application/json" href="${url_root}${feed_alias}.json" />
+</head>
+
+<body>
+
+<perl>
+  return $self->link_bar();
+</perl>
+
+${content}
+
+${page_navigation}
+
+<p><small><em>${license}</em></small></p>
+
+</body>
+</html>

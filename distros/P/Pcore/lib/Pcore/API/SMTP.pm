@@ -1,6 +1,6 @@
 package Pcore::API::SMTP;
 
-use Pcore -dist, -const, -class, -res;
+use Pcore -const, -class, -res;
 use Pcore::Handle qw[:TLS_CTX];
 use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_plain_arrayref];
 use Pcore::Util::Data qw[from_b64 to_b64];

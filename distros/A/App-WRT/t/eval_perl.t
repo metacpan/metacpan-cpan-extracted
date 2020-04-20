@@ -7,7 +7,7 @@ use lib 'lib';
 use Test::Simple tests => 1; # last test to print
 use App::WRT;
 
-chdir 'example';
+chdir 'example/blog';
 my $w = App::WRT::new_from_file('wrt.json');
 
 # 'configuration';

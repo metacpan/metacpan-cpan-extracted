@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.06
+Version 0.09
 
 # SYNOPSIS
 
@@ -16,6 +16,8 @@ be presented in a pretty format or in a condensed, machine-readable
 format (not spaces, indendation or line breaks).
 
     use Data::Roundtrip qw/:all/;
+    #use Data::Roundtrip qw/json2yaml/;
+    #use Data::Roundtrip qw/:json/; # see EXPORT
 
     $jsonstr = '{"Songname": "Απόκληρος της κοινωνίας",'
                .'"Artist": "Καζαντζίδης Στέλιος/Βίρβος Κώστας"}'
@@ -84,6 +86,19 @@ format (not spaces, indendation or line breaks).
     json2json.pl -i "with-unicode.json" -o "unicode-escaped.json" --escape-unicode
     # etc.
 
+    # only for *2dump: perl2dump, json2dump, yaml2dump
+    # and if no escape-unicode is required (i.e.
+    # setting 'dont-bloody-escape-unicode' => 1 permanently)
+    # and if efficiency is important,
+    # meaning that perl2dump is run in a loop thousand of times,
+    # then import the module like this:
+    use Data::Roundtrip qw/:all no-unicode-escape-permanently/;
+    # or like this
+    use Data::Roundtrip qw/:all unicode-escape-permanently/;
+
+    # then perl2dump() is more efficient but unicode characters
+    # will be permanently not-escaped (1st case) or escaped (2nd case).
+
 # EXPORT
 
 By default no symbols are exported. However, the following export tags are available (:all will export all of them):
@@ -102,6 +117,8 @@ By default no symbols are exported. However, the following export tags are avail
 `yaml2json()`
 - `:dump` :
 `perl2dump()`,
+`perl2dump_filtered()`,
+`perl2dump_homebrew()`,
 `dump2perl()`,
 `dump2json()`,
 `dump2yaml()`
@@ -109,6 +126,70 @@ By default no symbols are exported. However, the following export tags are avail
 `read_from_file()`, `write_to_file()`,
 `read_from_filehandle()`, `write_to_filehandle()`,
 - `:all` : everything above
+- `no-unicode-escape-permanently` : this is not an
+export keyword/parameter but a parameter which affects
+all the `*2dump*` subs by setting unicode escaping
+permanently to false. See ["EFFICIENCY"](#efficiency).
+- `unicode-escape-permanently` : this is not an
+export keyword/parameter but a parameter which affects
+all the `*2dump*` subs by setting unicode escaping
+permanently to true. See ["EFFICIENCY"](#efficiency).
+
+# EFFICIENCY
+
+The export keyword/parameter `no-unicode-escape-permanently`
+affects
+all the `*2dump*` subs by setting unicode escaping
+permanently to false. This improves efficiency, although
+one will ever need to
+use this in extreme situations where a `*2dump*`
+sub is called repeatedly in a loop of
+a few hundreds or thousands of iterations or more.
+
+Each time a `*2dump*` is called, the
+`dont-bloody-escape-unicode` flag is checked
+and if it is set, then  [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper)'s `qquote()`
+is overriden with `_qquote_redefinition_by_Corion()`
+just for that instance and will be restored as soon as
+the dump is finished. Similarly, a filter for
+not escaping unicode is added to [Data::Dump](https://metacpan.org/pod/Data%3A%3ADump)
+just for that particular call and is removed immediately
+after. This has some computational cost and can be
+avoided completely by overriding the sub
+and adding the filter once, at loading (in `import()`).
+
+The price to pay for this added efficiency is that
+unicode in any dump will never be escaped (e.g. `\x{3b1})`,
+but will be rendered (e.g. `α`, a greek alpha). Always.
+The option
+`dont-bloody-escape-unicode` will permanently be set to true.
+
+Similarly, the export keyword/parameter
+`unicode-escape-permanently`
+affects
+all the `*2dump*` subs by setting unicode escaping
+permanently to true. This improves efficiency as well.
+
+See ["BENCHMARKS"](#benchmarks) on how to find the fastest `*2dump*`
+sub.
+
+# BENCHMARKS
+
+The special Makefile target `benchmarks` will time
+calls to each of the `*2dump*` subs under
+
+    use Data::Roundtrip;
+
+    use Data::Roundtrip qw/no-unicode-escape-permanently/;
+
+    use Data::Roundtrip qw/unicode-escape-permanently/;
+
+and for `'dont-bloody-escape-unicode' => 0` and
+`'dont-bloody-escape-unicode' => 1`.
+
+In general, ["perl2dump"](#perl2dump) is faster by 25% when one of the
+permanent import parameters is used
+(either of the last two cases above).
 
 # SUBROUTINES
 
@@ -131,7 +212,7 @@ the equivalent JSON string. In `$optional_paramshashref`
 one can specify whether to escape unicode with
 `'escape-unicode' => 1`
 and/or prettify the returned result with `'pretty' => 1`.
-The output can be fed back to [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `json2perl()`
+The output can be fed back to ["json2perl"](#json2perl)
 for getting the Perl variable back.
 
 Returns the JSON string on success or `undef` on failure.
@@ -170,7 +251,7 @@ a nested data structure, but not an object), it will return
 the equivalent YAML string. In `$optional_paramshashref`
 one can specify whether to escape unicode with
 `'escape-unicode' => 1`. Prettify is not supported yet.
-The output can fed to [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `yaml2perl()`
+The output can fed to ["yaml2perl"](#yaml2perl)
 for getting the Perl variable back.
 
 Returns the YAML string on success or `undef` on failure.
@@ -219,33 +300,36 @@ Additionally, use terse output with `'terse' => 1` and remove
 all the incessant indentation with `'indent' => 1`
 which unfortunately goes to the other extreme of
 producing a space-less output, not fit for human consumption.
-The output can fed to [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `dump2perl()`
+The output can fed to ["dump2perl"](#dump2perl)
 for getting the Perl variable back.
 
 It returns the string representation of the input perl variable
 on success or `undef` on failure.
 
-The output can be fed back to [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `dump2perl()`.
+The output can be fed back to ["dump2perl"](#dump2perl).
 
 CAVEAT: when not escaping unicode (which is the default
 behaviour), each call to this sub will override [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper)'s
-`qquote()` sub (with a call to [Sub::Override](https://metacpan.org/pod/Sub%3A%3AOverride)' `new()`),
+`qquote()` sub then
 call [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper)'s `Dumper()` and save its output to
-a temporary variable, restore `qquote()` sub (with
-a call to [Sub::Override](https://metacpan.org/pod/Sub%3A%3AOverride)'s `restore()` and return the
+a temporary variable, restore `qquote()` sub to its original
+code ref and return the
 contents. This exercise is done every time this `perl2dump()`
-is called. It can be expensive. The alternative is
-to redefine `qquote()` once, when the module is loaded.
+is called. It may be expensive. The alternative is
+to redefine `qquote()` once, when the module is loaded, with
+all the side-effects this may cause.
 
-Note that there are two other alternatives to this sub,
-[Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `perl2dump_filtered()` which uses [Data::Dump](https://metacpan.org/pod/Data%3A%3ADump)
-filters to control unicode escaping but
+Note that there are two other alternative subs which offer more-or-less
+the same functionality and their output can be fed back to all the `dump2*()`
+subs. These are
+["perl2dump\_filtered"](#perl2dump_filtered) which uses [Data::Dump::Filtered](https://metacpan.org/pod/Data%3A%3ADump%3A%3AFiltered)
+to add a filter to control unicode escaping but
 lacks in aesthetics and functionality and handling all the
 cases Dump and Dumper do quite well.
 
 There is also `perl2dump_homebrew()` which
 uses the same dump-recursively engine as
-[Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `perl2dump_filtered()`
+["perl2dump\_filtered"](#perl2dump_filtered)
 but does not involve Data::Dump at all.
 
 ## `perl2dump_filtered`
@@ -261,7 +345,7 @@ Return value:
 
 - `$ret`
 
-It does the same job as [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `perl2dump()` which is
+It does the same job as ["perl2dump"](#perl2dump) which is
 to stringify a perl variable. And takes the same options.
 
 It returns the string representation of the input perl variable
@@ -269,6 +353,10 @@ on success or `undef` on failure.
 
 It uses [Data::Dump::Filtered](https://metacpan.org/pod/Data%3A%3ADump%3A%3AFiltered) to add a filter to
 [Data::Dump](https://metacpan.org/pod/Data%3A%3ADump).
+
+head3 CAVEAT
+
+In order to xxx
 
 ## `perl2dump_homebrew`
 
@@ -283,13 +371,13 @@ Return value:
 
 - `$ret`
 
-It does the same job as [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `perl2dump()` which is
+It does the same job as ["perl2dump"](#perl2dump) which is
 to stringify a perl variable. And takes the same options.
 
 It returns the string representation of the input perl variable
 on success or `undef` on failure.
 
-The output can be fed back to [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `dump2perl()`.
+The output can be fed back to ["dump2perl"](#dump2perl).
 
 It uses its own basic dumper. Which is recursive.
 So, beware of extremely deep nested data structures.
@@ -320,8 +408,8 @@ it returns a string representation of the input perl var
 
 There are 2 obvious limitations:
 
-- 1) indentation is very basic,
-- 2) it supports only scalars, hashes and arrays,
+- 1. indentation is very basic,
+- 2. it supports only scalars, hashes and arrays,
 (which will dive into them no problem)
 This sub can be used in conjuction with DataDumpFilterino()
 to create a Data::Dump filter like,
@@ -340,7 +428,7 @@ to create a Data::Dump filter like,
     and functionality compared to Dump and Dumper.
 
     The output is a, possibly multiline, string. Which it can
-    then be fed back to [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `dump2perl()`.
+    then be fed back to ["dump2perl"](#dump2perl).
 
 ## `dump2perl`
 
@@ -349,9 +437,9 @@ to create a Data::Dump filter like,
 Arguments:
 
 - `$dumpstring`, this comes from the output of [Data::Dump](https://metacpan.org/pod/Data%3A%3ADump),
-[Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper) or our own [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `perl2dump()`,
-[Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `perl2dump_filtered()`,
-[Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `perl2dump_homebrew()`.
+[Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper) or our own ["perl2dump"](#perl2dump),
+["perl2dump\_filtered"](#perl2dump_filtered),
+["perl2dump\_homebrew"](#perl2dump_homebrew).
 Escaped, or unescaped.
 
 Return value:
@@ -399,8 +487,8 @@ Return value:
 Given an input JSON string `$jsonstring`, it will return
 the equivalent YAML string [YAML](https://metacpan.org/pod/YAML)
 by first converting JSON to a Perl variable and then
-converting that variable to YAML using [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `perl2yaml()`.
-All the parameters supported by [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `perl2yaml()`
+converting that variable to YAML using ["perl2yaml"](#perl2yaml).
+All the parameters supported by ["perl2yaml"](#perl2yaml)
 are accepted.
 
 Returns the YAML string on success or `undef` on failure.
@@ -421,8 +509,8 @@ Return value:
 Given an input YAML string `$yamlstring`, it will return
 the equivalent YAML string [YAML](https://metacpan.org/pod/YAML)
 by first converting YAML to a Perl variable and then
-converting that variable to JSON using [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `perl2json()`.
-All the parameters supported by [Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `perl2json()`
+converting that variable to JSON using ["perl2json"](#perl2json).
+All the parameters supported by ["perl2json"](#perl2json)
 are accepted.
 
 Returns the JSON string on success or `undef` on failure.
@@ -452,7 +540,7 @@ Return value:
 Given a filename, it opens it using `:encoding(UTF-8)`, slurps its
 contents and closes it. It's a convenience sub which could have also
 been private. If you want to retain the filehandle, use
-[Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `read_from_filehandle()`.
+["read\_from\_filehandle"](#read_from_filehandle).
 
 Returns the file contents on success or `undef` on failure.
 
@@ -489,7 +577,7 @@ Given a filename, it opens it using `:encoding(UTF-8)`,
 writes all specified content and closes the file.
 It's a convenience sub which could have also
 been private. If you want to retain the filehandle, use
-[Data::Roundtrip](https://metacpan.org/pod/Data%3A%3ARoundtrip)'s `write_to_filehandle()`.
+["write\_to\_filehandle"](#write_to_filehandle).
 
 Returns 1 on success or 0 on failure.
 

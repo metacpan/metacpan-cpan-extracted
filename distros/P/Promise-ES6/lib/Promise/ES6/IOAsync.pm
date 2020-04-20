@@ -17,6 +17,11 @@ Promise::ES6::IOAsync - L<Promises/A+-compliant|https://github.com/promises-aplu
 
     # Now use Promise::ES6::IOAsync as you would plain Promise::ES6.
 
+=head1 DEPRECATION NOTICE
+
+This module is deprecated and will go away eventually.
+Use C<use_event()> instead, as described in L<Promise::ES6>’s documentation.
+
 =head1 DESCRIPTION
 
 This module exposes the same functionality as L<Promise::ES6::AnyEvent>

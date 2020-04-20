@@ -1,7 +1,7 @@
 package LWP::UserAgent::Patch::FilterLcpan;
 
-our $DATE = '2020-04-11'; # DATE
-our $VERSION = '1.049'; # VERSION
+our $DATE = '2020-04-20'; # DATE
+our $VERSION = '1.051'; # VERSION
 
 use 5.010001;
 use strict;
@@ -117,7 +117,7 @@ LWP::UserAgent::Patch::FilterLcpan - Filter mirror()
 
 =head1 VERSION
 
-This document describes version 1.049 of LWP::UserAgent::Patch::FilterLcpan (from Perl distribution App-lcpan), released on 2020-04-11.
+This document describes version 1.051 of LWP::UserAgent::Patch::FilterLcpan (from Perl distribution App-lcpan), released on 2020-04-20.
 
 =head1 HOMEPAGE
 

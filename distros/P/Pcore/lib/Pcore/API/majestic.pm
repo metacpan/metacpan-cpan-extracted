@@ -4,19 +4,27 @@ use Pcore -class, -res;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 use Pcore::Util::Data qw[to_uri from_json];
 
-has api_key     => ( required => 1 );
+has api_key              => ();    # direct access to the API, access is restricted by IP address
+has openapp_access_token => ();    # OpenApp access, user key, identify user
+has openapp_private_key  => ();    # OpenApp access, application vendor key, identify application
+
 has max_threads => 3;
 has proxy       => ();
 
 has _semaphore => sub ($self) { Coro::Semaphore->new( $self->{max_threads} ) }, is => 'lazy';
 
+sub test ($self) {
+    return res $self->get_subscription_info;
+}
+
 # https://developer-support.majestic.com/api/commands/get-anchor-text.shtml
+# each request costs 1000 AnalysisResUnits, no matter how much anchors requested, each request costs 0.004$ at 01.04.2020
 sub get_anchor_text ( $self, $domain, %args ) {
     my $params = {
         cmd                  => 'GetAnchorText',
         datasource           => 'fresh',
         item                 => $domain,
-        Count                => $args{num_anchors} || 10,    # Number of results to be returned back. Max. 1_000
+        Count                => $args{num_anchors} || 10,    # Number of results to be returned back. Def. 10, max. 1_000
         TextMode             => 0,
         Mode                 => 0,
         FilterAnchorText     => undef,
@@ -32,6 +40,7 @@ sub get_anchor_text ( $self, $domain, %args ) {
 
 # https://developer-support.majestic.com/api/commands/get-index-item-info.shtml
 # items - up to 100 items
+# each domain in request costs 1 IndexItemInfoResUnits, or 0.0008$ at 01.04.2020
 sub get_index_item_info ( $self, $items, %args ) {
     $items = [$items] if !is_plain_arrayref $items;
 
@@ -72,6 +81,7 @@ sub get_backlink_data ( $self, $item, %args ) {
 }
 
 # https://developer-support.majestic.com/api/commands/get-subscription-info.shtml
+# this request is free
 sub get_subscription_info ( $self, %args ) {
     my $params = {
         cmd => 'GetSubscriptionInfo',
@@ -296,7 +306,16 @@ sub get_subscription_info ( $self, %args ) {
 sub _req ( $self, $params ) {
     my $guard = $self->{max_threads} && $self->_semaphore->guard;
 
-    my $url = "http://api.majestic.com/api/json?app_api_key=$self->{api_key}&" . to_uri $params;
+    my $url = 'https://api.majestic.com/api/json?';
+
+    if ( $self->{api_key} ) {
+        $url .= "app_api_key=$self->{api_key}&";
+    }
+    elsif ( $self->{openapp_private_key} && $self->{openapp_access_token} ) {
+        $url .= "accesstoken=$self->{openapp_access_token}&privatekey=$self->{openapp_private_key}&";
+    }
+
+    $url .= to_uri $params;
 
     my $res = P->http->get( $url, proxy => $self->{proxy} );
 

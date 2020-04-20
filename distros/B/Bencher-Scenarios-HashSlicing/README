@@ -2,9 +2,9 @@ NAME
     Bencher::Scenarios::HashSlicing - Scenarios to benchmark hash slicing
 
 VERSION
-    This document describes version 0.003 of Bencher::Scenarios::HashSlicing
+    This document describes version 0.005 of Bencher::Scenarios::HashSlicing
     (from Perl distribution Bencher-Scenarios-HashSlicing), released on
-    2019-11-20.
+    2020-04-19.
 
 DESCRIPTION
     This distribution contains the following Bencher scenario modules:
@@ -19,7 +19,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-Bencher-Scenarios-HashPicking>.
+    <https://github.com/perlancar/perl-Bencher-Scenarios-HashSlicing>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -33,7 +33,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

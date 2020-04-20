@@ -15,6 +15,7 @@ examples/lib/App/Foo.pm
 examples/lib/App/Foo/interface.pm
 examples/lib/App/Foo/types.pm
 examples/lib/App/Interface.pm
+lib/OpenTracing/Interface.pm
 lib/OpenTracing/Interface.pod
 lib/OpenTracing/Interface/ContextReference.pm
 lib/OpenTracing/Interface/ContextReference.pod
@@ -29,6 +30,8 @@ lib/OpenTracing/Interface/SpanContext.pod
 lib/OpenTracing/Interface/Tracer.pm
 lib/OpenTracing/Interface/Tracer.pod
 lib/OpenTracing/Types.pm
+t/Interface/00_use_ok.t
+t/Interface/01_warnings.t
 t/Interface/ContextReference/00_use_ok.t
 t/Interface/ContextReference/07_pass_on_unmodified.t
 t/Interface/Scope/00_use_ok.t

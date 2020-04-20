@@ -18,7 +18,7 @@ name: Test-Arrow
 provides:
   Test::Arrow:
     file: lib/Test/Arrow.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   Scalar::Util: '0'
   Test::Builder::Module: '0'
@@ -31,5 +31,5 @@ resources:
   bugtracker: http://github.com/bayashi/Test-Arrow/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/bayashi/Test-Arrow
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

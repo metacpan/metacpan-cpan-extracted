@@ -1,6 +1,6 @@
 requires 'perl'        => '5.010001';
 requires 'Carp';
-requires 'Mojolicious' => '6.0';
+requires 'Mojolicious' => '7.37';
 requires 'Scalar::Util';
 requires 'UV'          => '1.000008';
 test_requires 'IO::Socket::INET';

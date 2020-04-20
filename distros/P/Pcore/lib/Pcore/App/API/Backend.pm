@@ -24,7 +24,7 @@ const our $AUTH_CACHE_CLEANUP_TIMEOUT => 60 * 60 * 12;                 # remove 
 around init => sub ( $orig, $self ) {
 
     # setup events listeners
-    P->bind_events(
+    P->on(
         'app.api.auth.invalidate',
         sub ($ev) {
             if ( $ev->{data}->{type} == $INVALIDATE_USER ) {

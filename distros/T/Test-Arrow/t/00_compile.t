@@ -6,4 +6,4 @@ eval {
 Test::Arrow->new->ok(!$@)
     or Test::Arrow->diag($@);
 
-Test::Arrow->done;
+done();

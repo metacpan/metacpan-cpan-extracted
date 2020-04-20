@@ -175,7 +175,8 @@ sub get_nginx_cfg ($self) {
     }
 
     location =<: $location :>/ {
-        return 301 <: $location :>;
+        error_page 418 = @backend;
+        return 418;
     }
 
     location <: $location :>/ {

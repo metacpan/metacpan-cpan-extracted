@@ -6,7 +6,7 @@ use warnings;
 
 use Org::Parser;
 
-our $VERSION = '0.474'; # VERSION
+our $VERSION = '0.476'; # VERSION
 
 my $org = Org::Parser->new;
 my $doc;
@@ -39,7 +39,7 @@ count-org-todos - Count todos in Org document
 
 =head1 VERSION
 
-This document describes version 0.474 of count-org-todos (from Perl distribution App-OrgUtils), released on 2020-04-12.
+This document describes version 0.476 of count-org-todos (from Perl distribution App-OrgUtils), released on 2020-04-18.
 
 =head1 SYNOPSIS
 

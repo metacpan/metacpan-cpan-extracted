@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -203,6 +203,11 @@ sub copy_inline_refs {
 
 sub match {
     my ( $match, $item ) = @_;
+    return undef if !defined $item;
+
+    if ( ref $match eq 'ARRAY' ) {
+        return any { match( $_, $item ) } @$match;
+    }
 
     my %test;
     for my $key ( keys %$match ) {
@@ -466,7 +471,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.053
+version 1.054
 
 =head1 SYNOPSIS
 

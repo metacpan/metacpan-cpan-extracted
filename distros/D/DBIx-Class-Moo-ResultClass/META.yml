@@ -1,0 +1,30 @@
+---
+abstract: 'Moo-ify DBIx::Class Result (row) Classes'
+author:
+  - 'John Napiorkowski <jjn1056@gmail.com>'
+build_requires:
+  DBIx::Class: '0'
+  Moo: '2'
+  Test::DBIx::Class: '0'
+  Test::More: '0.86'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Moo-ResultClass
+requires:
+  Import::Into: '1.002003'
+  Moo: '2'
+  Sub::Defer: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/jjn1056/DBIx-Class-Moo-ResultClass/issues
+  homepage: https://github.com/jjn1056/DBIx-Class-Moo-ResultClass
+  repository: https://github.com/jjn1056/DBIx-Class-Moo-ResultClass.git
+version: '0.001001'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

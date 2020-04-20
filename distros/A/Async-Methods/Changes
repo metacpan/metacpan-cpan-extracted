@@ -1,4 +1,7 @@
 Revision history for Async-Methods
 
+0.000002 - 2020-04-18
+  - Add tests, fix bugs, write docs
+
 0.000001 - 2020-04-08
   - Initial release

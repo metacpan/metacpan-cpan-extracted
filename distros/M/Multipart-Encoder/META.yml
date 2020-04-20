@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Multipart::Encoder:
     file: lib/Multipart/Encoder.pm
-    version: v0.0.7
+    version: v0.0.9
 requires:
   File::LibMagic: '0'
   perl: '5.008001'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-multipart-encoder/issues
   homepage: https://github.com/darviarush/perl-multipart-encoder
   repository: git://github.com/darviarush/perl-multipart-encoder.git
-version: v0.0.7
+version: v0.0.9
 x_authority: cpan:DART
 x_contributors:
   - 'Iaroslav O. Kosmina <darviarush@ya.ru>'

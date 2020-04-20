@@ -141,7 +141,7 @@
          "web" : "https://github.com/perlancar/perl-App-lcpan"
       }
    },
-   "version" : "1.049",
+   "version" : "1.051",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

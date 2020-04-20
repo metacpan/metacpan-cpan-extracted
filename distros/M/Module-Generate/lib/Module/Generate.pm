@@ -10,7 +10,7 @@ use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our %CLASS;
 
 sub dist {
@@ -391,7 +391,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

@@ -1,5 +1,5 @@
 package Git::Raw::Branch;
-$Git::Raw::Branch::VERSION = '0.84';
+$Git::Raw::Branch::VERSION = '0.85';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Branch - Git branch class
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ NAME
     Log::ger::Layout::Pattern - Pattern layout
 
 VERSION
-    version 0.006
+    version 0.007
 
 SYNOPSIS
      use Log::ger::Layout 'Pattern', format => '%d (%F:%L)> %m';
@@ -32,6 +32,9 @@ DESCRIPTION
      %T A stack trace of functions called
      %% A literal percent (%) sign
 
+     %_{vmsize}  Process virtual memory size, in KB.
+        Currently works on Linux only. Value is cached for 1 second.
+
 CONFIGURATION
   format
   packages_to_ignore
@@ -45,7 +48,7 @@ CONFIGURATION
 SEE ALSO
     Log::ger::Layout::Pattern::Multiline
 
-    Modelled after Log::Log4perl::Layout::Pattern but note that full
+    Modelled after Log::Log4perl::Layout::PatternLayout but note that full
     compatibility or feature parity is not a goal. See also
     Log::Log4perl::Tiny.
 

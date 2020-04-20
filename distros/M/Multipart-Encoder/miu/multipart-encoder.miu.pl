@@ -181,7 +181,7 @@ Header **Content-Disposition** added automically.
     
 Header **Content-Type** added automically.
 
-    Multipart::Encoder->new(x=>\"/tmp/file.gz")->as_string    #~ Content-Type: application/x-gzip; charset=binary
+    Multipart::Encoder->new(x=>\"/tmp/file.gz")->as_string    #~ Content-Type: application/(x-)?gzip; charset=binary
     
 But if it is, then used once.
 
@@ -230,8 +230,11 @@ If **Content-Disposition** is, then it use once.
 
 Big file.
 
-    open my $f, ">", "/tmp/bigfile"; binmode $f; print $f 0 x 65534; close $f;
-    Multipart::Encoder->new(x=>\"/tmp/bigfile")->as_string    #~ \n0{65534}\r
+    open my $f, ">", "/tmp/bigfile"; binmode $f; print $f 0 x (1024*1024); close $f;
+
+	Multipart::Encoder->new(x=>\"/tmp/bigfile")->as_string    #~ \n0+\r
+	Multipart::Encoder->new(x=>\"/tmp/bigfile")->as_string =~ /\n(0+)\r/;
+	length $1     ##== 1024*1024 
 
 Raise if not open file.
 

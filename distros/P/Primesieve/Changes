@@ -1,5 +1,14 @@
 Revision history for Perl extension Primesieve.
 
+0.07  Sun Apr 19 02:11:27 2020
+	- fixed memleak on generate_primes/generate_n_primes
+		in scalar context
+
+0.06  Sat Apr 18 18:37:13 2020
+	- second argument to nth_prime is now optional
+	- fixed a "can't happen" -Wall warning
+	- added prev_prime test-case
+
 0.05  Mon Mar 23 13:23:55 2020 
 	- support primesieve versions without
 		primesieve_prev_prime (5.7.3)

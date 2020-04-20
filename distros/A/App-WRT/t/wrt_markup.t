@@ -7,7 +7,7 @@ use lib 'lib';
 use Test::More tests => 2;
 use App::WRT;
 
-chdir 'example';
+chdir 'example/blog';
 
 ok (my $w = App::WRT::new_from_file('wrt.json'), "Got WRT object.");
 

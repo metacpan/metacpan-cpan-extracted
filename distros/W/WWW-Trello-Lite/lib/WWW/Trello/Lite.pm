@@ -54,7 +54,7 @@ use Moose;
 with 'Role::REST::Client';
 
 use 5.008;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use URI::Escape;
 
@@ -179,6 +179,10 @@ get the raw data as decoded from JSON.
 =head1 AUTHOR
 
 Robert Wohlfarth <rbwohlfarth@gmail.com>
+
+=head1 REPOSITORY
+
+L<https://github.com/rbwohlfarth/WWW-Trello-Lite>
 
 =head1 SEE ALSO
 

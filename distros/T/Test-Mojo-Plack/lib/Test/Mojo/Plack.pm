@@ -136,7 +136,7 @@ sub _request_ok {
     Test::More::diag $err->{message}
       if !(my $ok = !$err->{message} || $err->{code}) && $err;
     my $desc = encode 'UTF-8', "@{[uc $tx->req->method]} $url";
-    return $self->_test('ok', $ok, $desc);
+    return $self->can('_test') ? $self->_test('ok', $ok, $desc) : $self->test('ok', $ok, $desc);
 }
 
 =head1 NAME
@@ -149,7 +149,7 @@ Version 0.10
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 

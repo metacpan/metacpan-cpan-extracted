@@ -5,14 +5,13 @@ use warnings;
 use vars qw($VERSION);
 use Locale::Country qw(all_country_codes code2country);
 use Module::Load qw(load);
-use Carp; # croak
 use DateTime;
 use TryCatch;
 use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -25,21 +24,24 @@ sub new {
         ref $class || $class;
 
     if ( $params{'countrycode'} ) {
-        if ( code2country( $params{countrycode} )) {
+        if ( code2country( $params{countrycode} ) ) {
             $self->{'_countrycode'} = uc $params{countrycode};
-        } else {
+        }
+        else {
             $self->{'_countrycode'} = $params{countrycode};
         }
 
         try {
-            $self->{'_inner_class'}
-                = $self->_fetch( { nocheck     => $params{'nocheck'},
-                                   countrycode => $params{'countrycode'},
-                                 } );
+            $self->{'_inner_class'} = $self->_fetch(
+                {   nocheck     => $params{'nocheck'},
+                    countrycode => $params{'countrycode'},
+                }
+            );
         }
 
-    } else {
-        croak 'No country code specified';
+    }
+    else {
+        die "No country code specified\n";
     }
 
     if (   $self
@@ -54,17 +56,20 @@ sub new {
 
             if ($adapter) {
                 $self->{'_inner_object'} = $adapter;
-            } else {
-                warn 'Adapter not defined';
+            }
+            else {
+                warn "Adapter not defined\n";
                 $self = undef;
             }
-        } catch ($error) {
-            warn "Unable to initialize adapter: $error";
+        }
+        catch ($error) {
+            warn "Unable to initialize adapter: $error\n";
             $self = undef;
         }
 
-    } elsif ( !$self->{'_inner_class'} ) {
-        warn 'No inner class instantiated';
+    }
+    elsif ( !$self->{'_inner_class'} ) {
+        warn "No inner class instantiated\n";
         $self = undef;
     }
 
@@ -81,7 +86,7 @@ sub holidays {
     if ( not $params{'countries'} ) {
 
         #No countries - so we create a list
-        my @countries = all_country_codes(); # From Locale::Country
+        my @countries = all_country_codes();    # From Locale::Country
         @countries = sort @countries;
 
         # We stick the complete list of countries to the parameters
@@ -100,21 +105,24 @@ sub is_holiday {
     my $r;
 
     if ( not $params{'countries'} ) {
-        if (blessed $self) {
+        if ( blessed $self) {
             $r = $self->{'_inner_object'}->is_holiday(%params);
-        } else {
-            my @countries = all_country_codes(); # From Locale::Country
+        }
+        else {
+            my @countries = all_country_codes();    # From Locale::Country
             @countries = sort @countries;
             $params{'countries'} = \@countries;
 
             $r = __PACKAGE__->_check_countries(%params);
         }
 
-    } else {
-        if (blessed $self) {
+    }
+    else {
+        if ( blessed $self) {
             $r = $self->_check_countries(%params);
 
-        } else {
+        }
+        else {
             $r = __PACKAGE__->_check_countries(%params);
         }
     }
@@ -130,9 +138,11 @@ sub holidays_dt {
 
     foreach my $h ( keys %{$hashref} ) {
         my ( $month, $day ) = $h =~ m{
-            ^(\d{2}) #2 digits indicating the month
-            (\d{2})$ #2 digits indicating the day
-        }x;
+            \A      # Beginning of string
+            (\d{2}) # 2 digits indicating the month
+            (\d{2}) # 2 digits indicating the day
+            \Z      # End of string
+        }xsm;
         my $dt = DateTime->new(
             year  => $params{'year'},
             month => $month,
@@ -147,26 +157,29 @@ sub holidays_dt {
 sub _check_countries {
     my ( $self, %params ) = @_;
 
-    my $result = {};
-    my $precedent_calendar = '';
+    my $result             = {};
+    my $precedent_calendar = q{''};
 
     foreach my $country ( @{ $params{'countries'} } ) {
 
         #The list of countries is ordered
-        if ($country =~ m/^\+(\w+)/) {
-            $country = $1;
+        if ( $country =~ m/\A[+](\w+)/xism ) {
+            $country            = $1;
             $precedent_calendar = $country;
         }
 
         try {
-            my $dh = $self->new( countrycode => $country, nocheck => $params{nocheck} );
+            my $dh = $self->new(
+                countrycode => $country,
+                nocheck     => $params{nocheck}
+            );
 
             if ( !$dh ) {
                 my $countryname = code2country($country);
                 my $countrycode = $country;
 
-                die 'Unable to initialize Date::Holidays for country: '
-                    . "$countrycode - $countryname\n";
+                die
+                    "Unable to initialize Date::Holidays for country: $countrycode - $countryname\n";
             }
 
             my %prepared_parameters = (
@@ -176,41 +189,41 @@ sub _check_countries {
             );
 
             # did we receive special regions parameter?
-            if ($params{regions}) {
+            if ( $params{regions} ) {
                 $prepared_parameters{regions} = $params{regions};
             }
 
             # did we receive special state parameter?
-            if ($params{state}) {
+            if ( $params{state} ) {
                 $prepared_parameters{state} = $params{state};
             }
 
             my $r = $dh->is_holiday(%prepared_parameters);
 
-            if ($precedent_calendar eq $country) {
+            if ( $precedent_calendar eq $country ) {
                 $self->{precedent_calendar} = $dh;
             }
 
             # handling precedent calendar
-            if ($precedent_calendar and
-                $precedent_calendar ne $country) {
+            if (    $precedent_calendar
+                and $precedent_calendar ne $country )
+            {
 
-                my $holiday = $self->{precedent_calendar}->is_holiday(
-                    %prepared_parameters
-                );
+                my $holiday = $self->{precedent_calendar}
+                    ->is_holiday(%prepared_parameters);
 
                 # our precedent calendar dictates overwrite or nullification
-                if (defined $holiday) {
+                if ( defined $holiday ) {
                     $r = $holiday;
                 }
             }
 
-            if (defined $r) {
+            if ( defined $r ) {
                 $result->{$country} = $r;
             }
         }
         catch ($error) {
-            warn $error;
+            warn "$error\n";
         }
     }
 
@@ -232,7 +245,7 @@ sub _fetch {
 
     # Do we have a country code?
     if ( not $self->{'_countrycode'} and not $params->{countrycode} ) {
-        die 'No country code specified';
+        die "No country code specified\n";
     }
 
     my $countrycode = $params->{countrycode} || $self->{'_countrycode'};
@@ -241,8 +254,10 @@ sub _fetch {
     if ( !$params->{'nocheck'} ) {
 
         # Is our country code valid or local?
-        if ( $countrycode !~ m/local/i and !code2country( $countrycode ) ) {  #from Locale::Country
-            die "$countrycode is not a valid country code";
+        if ( $countrycode !~ m/\Alocal\Z/xism
+            and not code2country($countrycode) )
+        {    #from Locale::Country
+            die "$countrycode is not a valid country code\n";
         }
     }
 
@@ -251,30 +266,34 @@ sub _fetch {
 
     try {
         # We load an adapter implementation
-        if ($countrycode =~ m/local/i) {
+        if ( $countrycode =~ m/\Alocal\Z/xism ) {
             $module = 'Date::Holidays::Adapter::Local';
-        } elsif (code2country( $countrycode )) {
+        }
+        elsif ( code2country($countrycode) ) {
             $module = 'Date::Holidays::Adapter::' . uc $countrycode;
-        } else {
+        }
+        else {
             $module = 'Date::Holidays::Adapter::' . $countrycode;
         }
 
         $module = $self->_load($module);
 
-    } catch ($error) {
-        warn "Unable to load module: $module - $error";
+    }
+    catch ($error) {
+        warn "Unable to load module: $module - $error\n";
 
         try {
 
             # We load an adapter implementation
             $module = 'Date::Holidays::Adapter::' . $countrycode;
 
-            if ($module = $self->_load($module)) {
+            if ( $module = $self->_load($module) ) {
                 warn "we got a module and we return\n";
             }
 
-        } catch ($error) {
-            warn "Unable to load module: $module - $error";
+        }
+        catch ($error) {
+            warn "Unable to load module: $module - $error\n";
 
             $module = 'Date::Holidays::Adapter';
             $module = $self->_load($module);
@@ -313,7 +332,7 @@ Date::Holidays - Date::Holidays::* adapter and aggregator for all your holiday n
 
 =head1 VERSION
 
-The documentation describes version 1.18 of Date::Holidays
+The documentation describes version 1.19 of Date::Holidays
 
 =head1 FEATURES
 
@@ -408,7 +427,7 @@ in the Date::Holidays::* namespace. All of these modules deliver methods and
 information on national calendars, but no standardized API exist.
 
 The distributions more or less follow a I<de> I<facto> standard (see: also the generic
-adapter L<Date::Holidays::Adapter>), but the adapters are implemented to uniform
+adapter L<Date::Holidays::Adapter|https://metacpan.org/pod/Date::Holidays::Adapter>), but the adapters are implemented to uniform
 this and Date::Holidays exposes a more readable API and at the same time it
 provides an OO interface, to these diverse implementations, which primarily
 holds a are produceral.
@@ -420,8 +439,8 @@ available on CPAN.
 
 If you are an module author/CPAN contributor who wants to comply to the suggested,
 either look at some of the other modules in the Date::Holidays::* namespace to get an
-idea of the I<de> I<facto> standard or have a look at L<Date::Holidays::Abstract> and
-L<Date::Holidays::Super> - or write me.
+idea of the I<de> I<facto> standard or have a look at L<Date::Holidays::Abstract|https://metacpan.org/pod/Date::Holidays::Abstract> and
+L<Date::Holidays::Super|https://metacpan.org/pod/Date::Holidays::Super> - or write me.
 
 In addition to the adapter feature, Date::Holidays also do aggregation, so you
 can combine calendars and you can overwrite and redefined existing calendars.
@@ -430,7 +449,7 @@ can combine calendars and you can overwrite and redefined existing calendars.
 
 As mentioned in the FEATURES section it is possible to create your own local calendar.
 
-This can be done using a L<JSON> file with your local definitions:
+This can be done using a L<JSON|https://metacpan.org/pod/JSON> file with your local definitions:
 
     {
         "1501" : "jonasbn's birthday"
@@ -464,13 +483,9 @@ This is the constructor. It takes the following parameters:
 
 =over
 
-=item countrycode (MANDATORY, see below), unique two letter code representing a
-country name.  Please refer to ISO3166 (or L<Locale::Country>)
+=item countrycode (MANDATORY, see below), unique two letter code representing a country name.  Please refer to ISO3166 (or L<Locale::Country|https://metacpan.org/pod/Locale::Country>)
 
-=item nocheck (optional), if set to true the countrycode specified will not be
-validated against a list of known country codes for existance, so you can build
-fake holidays for fake countries, I currently use this for test. This parameter
-might disappear in the future.
+=item nocheck (optional), if set to true the countrycode specified will not be validated against a list of known country codes for existance, so you can build fake holidays for fake countries, I currently use this for test. This parameter might disappear in the future.
 
 =back
 
@@ -527,7 +542,7 @@ Takes 6 optional named arguments:
 
 =item * year, four digit parameter representing year
 
-=item * month, 1.18, representing month
+=item * month, 1-12, representing month
 
 =item * day, 1-31, representing day
 
@@ -588,17 +603,17 @@ If however you country does not seem to be represented in the namespace, you
 are more than welcome to become the author of the module in question.
 
 Please note that the country code is expected to be a two letter code based on
-ISO3166 (or L<Locale::Country>).
+ISO3166 (or L<Locale::Country|https://metacpan.org/pod/Locale::Country>).
 
 As an experiment I have added two modules to the namespace,
-L<Date::Holidays::Abstract> and L<Date::Holidays::Super>, abstract is attempt
+L<Date::Holidays::Abstract|https://metacpan.org/pod/Date::Holidays::Abstract> and L<Date::Holidays::Super|https://metacpan.org/pod/Date::Holidays::Super>, abstract is attempt
 to make sure that the module implements some, by me, expected methods.
 
 So by using abstract your module will not work until it follows the the abstract
 layed out for a Date::Holidays::* module. Unfortunately the module will only
 check for the presence of the methods not their prototypes.
 
-L<Date::Holidays::Super> is for the lazy programmer, it implements the necessary
+L<Date::Holidays::Super|https://metacpan.org/pod/Date::Holidays::Super> is for the lazy programmer, it implements the necessary
 methods as stubs and there for do not have to implement anything, but your
 module will not return anything of value. So the methods need to be overwritten
 in order to comply with the expected output of a Date::Holidays::* method.
@@ -613,7 +628,7 @@ Takes 3 arguments: year, month, day and returns the name of the holiday as a
 scalar in the national language of the module context in question. Returns
 undef if the requested day is not a holiday.
 
-    Modified example taken from: L<Date::Holidays::DK>
+    Modified example taken from: L<Date::Holidays::DK|https://metacpan.org/pod/Date::Holidays::DK>
 
     use Date::Holidays::DK;
     my ($year, $month, $day) = (localtime)[ 5, 4, 3 ];
@@ -640,7 +655,7 @@ question.
 
 The keys are the dates, month + day in two digits each concatenated.
 
-    Modified example taken from: L<Date::Holidays::PT>
+    Modified example taken from: L<Date::Holidays::PT|https://metacpan.org/pod/Date::Holidays::PT>
 
     my $h = holidays($year);
     printf "Jan. 1st is named '%s'\n", $h->{'0101'};
@@ -656,7 +671,7 @@ around).
 =back
 
 B<Only> B<is_holiday> and B<holidays> are implemented in
-L<Date::Holidays::Super> and are required by L<Date::Holidays::Abstract>.
+L<Date::Holidays::Super|https://metacpan.org/pod/Date::Holidays::Super> and are required by L<Date::Holidays::Abstract|https://metacpan.org/pod/Date::Holidays::Abstract>.
 
 =head2 ADDITIONAL PARAMETERS
 
@@ -683,7 +698,31 @@ Date::Holidays::* module should be consulted.
 =head1 DEVELOPING A DATE::HOLIDAYS::ADAPTER CLASS
 
 If you want to contribute with an adapter, please refer to the documentation in
-L<Date::Holidays::Adapter>.
+L<Date::Holidays::Adapter|https://metacpan.org/pod/Date::Holidays::Adapter>.
+
+=head1 DEVELOPING ON DATE::HOLIDAYS
+
+Date::Holidays is distributed and maintained using L<Dist::Zilla|https://metacpan.org/pod/Dist::Zilla>
+
+=head2 RUNNING THE TEST SUITE
+
+The test suite can be executed using
+
+    $ dzil test
+
+The test suite, which attempts lots scenarios does emit a lot of warnings, so it is recommended to suppress C<STDERR> by redirecting it to C</dev/null>
+
+    $ dzil test 2> /dev/null
+
+To enable author tests aimed at asserting distribution and code quality in addition to functionality, use the C<--author> flag
+
+    $ dzil test --author 2> /dev/null
+
+If you are working on a release, use the C<--release> flag
+
+    $ dzil test --release 2> /dev/null
+
+The release flag is implicit for the L<Dist::Zilla|https://metacpan.org/pod/Dist::Zilla> release command.
 
 =head1 DIAGNOSTICS
 
@@ -707,27 +746,27 @@ set the environment variable:
     $HOLIDAYS_FILE
 
 This environment variable should point to a JSON file containing holiday definitions
-to be used by L<Date::Holidays::Adapter::Local>.
+to be used by L<Date::Holidays::Adapter::Local|https://metacpan.org/pod/Date::Holidays::Local>.
 
 =head1 DEPENDENCIES
 
 =over
 
-=item * L<Carp>
+=item * L<Carp|https://metacpan.org/pod/Carp>
 
-=item * L<DateTime>
+=item * L<DateTime|https://metacpan.org/pod/DateTime>
 
-=item * L<Locale::Country>
+=item * L<Locale::Country|https://metacpan.org/pod/Locale::Country>
 
-=item * L<Module::Load>
+=item * L<Module::Load|https://metacpan.org/pod/Module::Load>
 
-=item * L<TryCatch>
+=item * L<TryCatch|https://metacpan.org/pod/TryCatch>
 
-=item * L<Scalar::Util>
+=item * L<Scalar::Util|https://metacpan.org/pod/Scalar::Util>
 
-=item * L<JSON>
+=item * L<JSON|https://metacpan.org/pod/JSON|>
 
-=item * L<File::Slurp>
+=item * L<File::Slurp|https://metacpan.org/pod/File::Slurp>
 
 =back
 
@@ -735,11 +774,11 @@ to be used by L<Date::Holidays::Adapter::Local>.
 
 =over
 
-=item * L<Test::Class>
+=item * L<Test::Class|https://metacpan.org/pod/Test::Class>
 
-=item * L<Test::More>
+=item * L<Test::More|https://metacpan.org/pod/Test::More>
 
-=item * L<FindBin>
+=item * L<FindBin|https://metacpan.org/pod/FindBin>
 
 =back
 
@@ -751,9 +790,9 @@ Currently the following CPAN Date::Holidays distributions are unsupported:
 
 =over
 
-=item * L<Date::Holidays::UK> only supports bank holidays until 2007
+=item * L<Date::Holidays::UK|https://metacpan.org/pod/Date::Holidays::UK> only supports bank holidays until 2007
 
-=item * L<Date::Holidays::UK::EnglandAndWales> only supports bank holidays until 2014
+=item * L<Date::Holidays::UK::EnglandAndWales|https://metacpan.org/pod/Date::Holidays::UK::EnglandAndWales> only supports bank holidays until 2014
 
 =back
 
@@ -761,29 +800,29 @@ Additional issues might be described the specific adapter classes or their respe
 
 =head1 BUGS AND LIMITATIONS
 
-Currently we have an exception for the L<Date::Holidays::AU> module, so the
+Currently we have an exception for the L<Date::Holidays::AU|https://metacpan.org/pod/Date::Holidays::AU> module, so the
 additional parameter of state is defaulting to 'VIC', please refer to the POD
-for L<Date::Holidays::AU> for documentation on this.
+for L<Date::Holidays::AU|https://metacpan.org/pod/Date::Holidays::AU> for documentation on this.
 
-L<Date::Holidays::DE> and L<Date::Holidays::UK> does not implement the
+L<Date::Holidays::DE|https://metacpan.org/pod/Date::Holidays::DE> and L<Date::Holidays::UK|https://metacpan.org/pod/Date::Holidays::UK> does not implement the
 B<holidays> methods
 
-The adaptee module for L<Date::Holidays::Adapter::JP> is named:
-L<Date::Japanese::Holiday>, but the adapter class is following the general
+The adaptee module for L<Date::Holidays::Adapter::JP|https://metacpan.org/pod/Date::Holidays::Adapter::JP> is named:
+L<Date::Japanese::Holiday|https://metacpan.org/pod/Date::Japanese::Holiday>, but the adapter class is following the general
 adapter naming of Date::Holidays::Adapter::<countrycode>.
 
-The adapter for L<Date::Holidays::PT>, L<Date::Holidays::Adapter::PT> does not
+The adapter for L<Date::Holidays::PT|https://metacpan.org/pod/Date::Holidays::PT>, L<Date::Holidays::Adapter::PT|https://metacpan.org/pod/Date::Holidays::Adapter::PT> does not
 implement the B<is_pt_holiday> method. The pattern used is an object adapter
 pattern and inheritance is therefor not used, it is my hope that I can
 make this work with some Perl magic.
 
 =head1 ISSUE REPORTING
 
-Please report any bugs or feature requests using B<Github>.
+Please report any bugs or feature requests using B<GitHub>.
 
 =over
 
-=item * L<Github Issues|https://github.com/jonasbn/perl-date-holidays/issues>
+=item * L<GitHub Issues|https://github.com/jonasbn/perl-date-holidays/issues>
 
 =back
 
@@ -799,98 +838,115 @@ Coverage reports are available via L<Coveralls.io|https://coveralls.io/github/jo
 
 Without the actual holiday implementations installed/available coverage will be very low.
 
-Please see L<Task::Date::Holidays>, which is a distribution, which can help in installing
-all the wrapped (adapted and aggregated) distributions.
+Please see L<Task::Date::Holidays|https://metacpan.org/pod/Task::Date::Holidays>, which is a distribution, which can help in installing all the wrapped (adapted and aggregated) distributions.
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<Date::Holidays::AT>
+=item * L<Date::Holidays::AT|https://metacpan.org/pod/Date::Holidays::AT>
 
-=item * L<Date::Holidays::AU>
+=item * L<Date::Holidays::Adapter::AT|https://metacpan.org/pod/Date::Holidays::Adapter::AT>
 
-=item * L<Date::Holidays::Adapter::AU>
+=item * L<Date::Holidays::AU|https://metacpan.org/pod/Date::Holidays::AU>
 
-=item * L<Date::Holidays::BR>
+=item * L<Date::Holidays::Adapter::AU|https://metacpan.org/pod/Date::Holidays::Adapter::AU>
 
-=item * L<Date::Holidays::Adapter::BR>
+=item * L<Date::Holidays::BR|https://metacpan.org/pod/Date::Holidays::BR>
 
-=item * L<Date::Holidays::BY>
+=item * L<Date::Holidays::Adapter::BR|https://metacpan.org/pod/Date::Holidays::Adapter::BR>
 
-=item * L<Date::Holidays::Adapter::BY>
+=item * L<Date::Holidays::BY|https://metacpan.org/pod/Date::Holidays::BY>
 
-=item * L<Date::Holidays::CA>
+=item * L<Date::Holidays::Adapter::BY|https://metacpan.org/pod/Date::Holidays::Adapter::BY>
 
-=item * L<Date::Holidays::CA_ES>
+=item * L<Date::Holidays::CA|https://metacpan.org/pod/Date::Holidays::CA>
 
-=item * L<Date::Holidays::CN>
+=item * L<Date::Holidays::CA_ES|https://metacpan.org/pod/Date::Holidays::CA_ES>
 
-=item * L<Date::Holidays::Adapter::CN>
+=item * L<Date::Holidays::Adapter::CA_ES|https://metacpan.org/pod/Date::Holidays::Adapter::CA_ES>
 
-=item * L<Date::Holidays::DE>
+=item * L<Date::Holidays::CN|https://metacpan.org/pod/Date::Holidays::CN>
 
-=item * L<Date::Holidays::Adapter::DE>
+=item * L<Date::Holidays::Adapter::CN|https://metacpan.org/pod/Date::Holidays::Adapter::CN>
 
-=item * L<Date::Holidays::DK>
+=item * L<Date::Holidays::CZ|https://metacpan.org/pod/Date::Holidays::CZ>
 
-=item * L<Date::Holidays::Adapter::DK>
+=item * L<Date::Holidays::Adapter::CZ|https://metacpan.org/pod/Date::Holidays::Adapter::CZ>
 
-=item * L<Date::Holidays::ES>
+=item * L<Date::Holidays::DE|https://metacpan.org/pod/Date::Holidays::DE>
 
-=item * L<Date::Holidays::Adapter::ES>
+=item * L<Date::Holidays::Adapter::DE|https://metacpan.org/pod/Date::Holidays::Adapter::DE>
 
-=item * L<Date::Holidays::FR>
+=item * L<Date::Holidays::DK|https://metacpan.org/pod/Date::Holidays::DK>
 
-=item * L<Date::Holidays::Adapter::FR>
+=item * L<Date::Holidays::Adapter::DK|https://metacpan.org/pod/Date::Holidays::Adapter::DK>
 
-=item * L<Date::Holidays::GB>
+=item * L<Date::Holidays::ES|https://metacpan.org/pod/Date::Holidays::ES>
 
-=item * L<Date::Holidays::Adapter::GB>
+=item * L<Date::Holidays::Adapter::ES|https://metacpan.org/pod/Date::Holidays::Adapter::ES>
 
-=item * L<Date::Holidays::KR>
+=item * L<Date::Holidays::FR|https://metacpan.org/pod/Date::Holidays::FR>
 
-=item * L<Date::Holidays::Adapter::KR>
+=item * L<Date::Holidays::Adapter::FR|https://metacpan.org/pod/Date::Holidays::Adapter::FR>
 
-=item * L<Date::Holidays::NO>
+=item * L<Date::Holidays::GB|https://metacpan.org/pod/Date::Holidays::GB>
 
-=item * L<Date::Holidays::Adapter::NO>
+=item * L<Date::Holidays::Adapter::GB|https://metacpan.org/pod/Date::Holidays::Adapter::GB>
 
-=item * L<Date::Holidays::NZ>
+=item * L<Date::Holidays::KR|https://metacpan.org/pod/Date::Holidays::KR>
 
-=item * L<Date::Holidays::Adapter::NZ>
+=item * L<Date::Holidays::Adapter::KR|https://metacpan.org/pod/Date::Holidays::Adapter::KR>
 
-=item * L<Date::Holidays::PL>
+=item * L<Date::Holidays::KZ|https://metacpan.org/pod/Date::Holidays::KZ>
 
-=item * L<Date::Holidays::Adapter::PL>
+=item * L<Date::Holidays::Adapter::KZ|https://metacpan.org/pod/Date::Holidays::Adapter::KZ>
 
-=item * L<Date::Holidays::PT>
+=item * L<Date::Holidays::NO|https://metacpan.org/pod/Date::Holidays::NO>
 
-=item * L<Date::Holidays::Adapter::PT>
+=item * L<Date::Holidays::Adapter::NO|https://metacpan.org/pod/Date::Holidays::Adapter::NO>
 
-=item * L<Date::Holidays::RU>
+=item * L<Date::Holidays::NZ|https://metacpan.org/pod/Date::Holidays::NZ>
 
-=item * L<Date::Holidays::Adapter::RU>
+=item * L<Date::Holidays::Adapter::NZ|https://metacpan.org/pod/Date::Holidays::Adapter::NZ>
 
-=item * L<Date::Holidays::SK>
+=item * L<Date::Holidays::PL|https://metacpan.org/pod/Date::Holidays::PL>
 
-=item * L<Date::Holidays::Adapter::SK>
+=item * L<Date::Holidays::Adapter::PL|https://metacpan.org/pod/Date::Holidays::Adapter::PL>
 
-=item * L<Date::Holidays::UK>
+=item * L<Date::Holidays::PT|https://metacpan.org/pod/Date::Holidays::PT>
 
-=item * L<Date::Holidays::USFederal>
+=item * L<Date::Holidays::Adapter::PT|https://metacpan.org/pod/Date::Holidays::Adapter::PT>
 
-=item * L<Date::Holidays::Adapter::USFederal>
+=item * L<Date::Holidays::RU|https://metacpan.org/pod/Date::Holidays::RU>
 
-=item * L<Date::Japanese::Holiday>
+=item * L<Date::Holidays::Adapter::RU|https://metacpan.org/pod/Date::Holidays::Adapter::RU>
 
-=item * L<Date::Holidays::Adapter::JP>
+=item * L<Date::Holidays::SK|https://metacpan.org/pod/Date::Holidays::SK>
 
-=item * L<Date::Holidays::Adapter>
+=item * L<Date::Holidays::Adapter::SK|https://metacpan.org/pod/Date::Holidays::Adapter::SK>
 
-=item * L<Date::Holidays::Abstract>
+=item * L<Date::Holidays::UK|https://metacpan.org/pod/Date::Holidays::UK>
 
-=item * L<Date::Holidays::Super>
+=item * L<Date::Holidays::Adapter::UK|https://metacpan.org/pod/Date::Holidays::Adapter::UK>
+
+=item * L<Date::Holidays::USFederal|https://metacpan.org/pod/Date::Holidays::USFederal>
+
+=item * L<Date::Holidays::Adapter::USFederal|https://metacpan.org/pod/Date::Holidays::Adapter::USFederal>
+
+=item * L<Date::Japanese::Holiday|https://metacpan.org/pod/Date::Japanese::Holiday>
+
+=item * L<Date::Holidays::Adapter::JP|https://metacpan.org/pod/Date::Holidays::Adapter::JP>
+
+=item * L<Date::Holidays::UA|https://metacpan.org/pod/Date::Holidays::UA>
+
+=item * L<Date::Holidays::Adapter::UA|https://metacpan.org/pod/Date::Holidays::Adapter::UA>
+
+=item * L<Date::Holidays::Adapter|https://metacpan.org/pod/Date::Holidays::Adapter>
+
+=item * L<Date::Holidays::Abstract|https://metacpan.org/pod/Date::Holidays::Abstract>
+
+=item * L<Date::Holidays::Super|https://metacpan.org/pod/Date::Holidays::Super>
 
 =back
 
@@ -898,12 +954,13 @@ all the wrapped (adapted and aggregated) distributions.
 
 =over
 
+=item * Denis Boyun, PR introducing Date::Holidays::UA resulting in 1.19
+
 =item * Mario Minati, for telling me about the states in Date::Holidays::DE resulting in 1.17
 
 =item * Vladimir Varlamov, PR introducing Date::Holidays::KZ resulting in 1.07
 
-=item * CHORNY (Alexandr Ciornii), Github issue #10, letting me know I included local/ by accident,
-resulting in release 1.05
+=item * CHORNY (Alexandr Ciornii), Github issue #10, letting me know I included local/ by accident, resulting in release 1.05
 
 =item * Vladimir Varlamov, PR introducing Date::Holidays::BY resulting in 1.04
 
@@ -913,8 +970,7 @@ resulting in release 1.05
 
 =item * Gabor Szabo, patch assisting META data generation
 
-=item * Florian Merges for feedback and pointing out a bug in Date::Holidays,
-author of Date::Holidays::ES
+=item * Florian Merges for feedback and pointing out a bug in Date::Holidays, author of Date::Holidays::ES
 
 =item * COG (Jose Castro), Date::Holidays::PT author
 
@@ -926,8 +982,7 @@ author of Date::Holidays::ES
 
 =item * LTHEGLER (Lars Thegler), Date::Holidays::DK author
 
-=item * shild on use.perl.org, CPAN tester
-http://use.perl.org/comments.pl?sid=28993&cid=43889
+=item * shild on L<use.perl.org|http://use.perl.org/comments.pl?sid=28993&cid=43889>, CPAN tester
 
 =item * CPAN testers in general, their work is invaluable
 

@@ -1,3 +1,21 @@
+1.051   2020-04-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add unique indexes for PK which apparently are not added for
+	  tables that have other unique indexes.
+
+
+1.050   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- [subcommand deps] Fix query: do not link queries using dist_id +
+	  is_latest because there might be several dists/releases for the same
+	  module; use dist name instead.
+
+	- [subcommand rdeps] Like deps, fix query by linking using module
+	  name instead of module ID.
+
+	- Remove App::lcpan::Manual::Cookbook (now in App-lcpan-Manual).
+
+
 1.049   2020-04-11  Released-By: PERLANCAR; Urgency: high
 
 	- [bugfix] A logic bug in --dont-uniquify option broke deps & rdeps
@@ -164,7 +182,7 @@
 1.031   2019-01-08  Released-By: PERLANCAR
 
 	- Add option --no-use-bootstrap to prevent using bootstrap database
-	  (e.g. when indexing a darkpan).
+	  (e.g. when indexing a darkpan, or when debugging).
 
 
 1.030   2019-01-07  Released-By: PERLANCAR

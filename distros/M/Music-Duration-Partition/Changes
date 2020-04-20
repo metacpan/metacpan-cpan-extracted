@@ -1,5 +1,21 @@
 Revision history for Music-Duration-Partition
 
+0.0502 2020-04-20 09:32:55
+    - Improve coderef method name.
+
+0.0501 2020-04-19 13:33:48
+    - Handle the Math::Random::Discrete object better.
+
+0.0500 2020-04-19 11:53:56
+    - Use Math::Random::Discrete for weighted distributions.
+
+0.0401 2020-04-19 10:38:46
+    - Improve documentation.
+    - Don't document the min_size attribute.
+
+0.0400 2020-04-18 14:02:09
+    - Allow MIDI durations of the form 'd###' to occupy the pool.
+
 0.0309 2020-04-14 21:25:15
     - Fix empty pool error message.
     - Improve the syntax of the eg/* programs.
