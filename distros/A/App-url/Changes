@@ -1,5 +1,8 @@
 # Changes for App::url
 
+1.003 2020-04-21T21:37:46Z
+	* Add port defaults for %p for HTTP and HTTPS
+
 1.002 2020-01-08T04:37:38Z
 	* Require Net::PublicSuffixList
 

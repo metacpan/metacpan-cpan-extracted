@@ -10,65 +10,65 @@ note "dir = $dir";
 
 subtest 'write filename' => sub {
   plan tests => 2;
-  
+
   my $ar = before();
   my $fn = File::Spec->catfile($dir, "libfoo.a");
-  
+
   my $size = $ar->write($fn);
   note "size = $size";
   ok $size, 'write';
-  
+
   undef $ar;
-  
+
   check_content(Archive::Ar::Libarchive->new($fn));
 };
 
 subtest 'write string' => sub {
   plan tests => 2;
-  
+
   my $content = before()->write;
-  
+
   note "size = " . length $content;
   ok defined $content, 'write';
-  
-  
+
+
   my $ar = Archive::Ar::Libarchive->new;
   $ar->read_memory($content);
-  
+
   check_content($ar);
 };
 
 subtest 'write bsd' => sub {
   plan tests => 2;
-  
+
   my $ar = before();
   #$ar->set_output_format_bsd;
   $ar->set_opt(type => BSD);
   my $fn = File::Spec->catfile($dir, "libfoo.a");
-  
+
   my $size = $ar->write($fn);
   note "size = $size";
   ok $size, 'write';
-  
+
   undef $ar;
-  
+
   check_content(Archive::Ar::Libarchive->new($fn));
 };
 
 subtest 'write svr4' => sub {
   plan tests => 2;
-  
+
   my $ar = before();
   #$ar->set_output_format_svr4;
   $ar->set_opt(type => COMMON);
   my $fn = File::Spec->catfile($dir, "libfoo.a");
-  
+
   my $size = $ar->write($fn);
   note "size = $size";
   ok $size, 'write';
-  
+
   undef $ar;
-  
+
   check_content(Archive::Ar::Libarchive->new($fn));
 };
 
@@ -93,7 +93,7 @@ sub before
 sub check_content
 {
   my $ar = shift;
-  
+
   subtest 'content' => sub {
     plan tests => 3;
     is_deeply scalar $ar->list_files, [qw( foo.txt bar.txt )], 'contains files foo and bar';

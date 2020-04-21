@@ -1,5 +1,8 @@
 Revision history for Archive-Ar-Libarchive
 
+2.08      2020-04-20 22:19:30 -0600
+  - Switch to EUMM for installer.
+
 2.07      2017-08-24 08:22:33 -0400
   - Switch to Alien::Libarchive3
 

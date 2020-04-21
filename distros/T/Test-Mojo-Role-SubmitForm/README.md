@@ -35,12 +35,12 @@ Test::Mojo::Role::SubmitForm - Test::Mojo role that allows to submit forms
 
 # DESCRIPTION
 
-A [Test::Mojo](https://metacpan.org/pod/Test::Mojo) role that allows you submit forms, optionally overriding
+A [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo) role that allows you submit forms, optionally overriding
 any of the values already present
 
 # METHODS
 
-You have all the methods provided by [Test::Mojo](https://metacpan.org/pod/Test::Mojo), plus these:
+You have all the methods provided by [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo), plus these:
 
 ## `click_ok`
 
@@ -52,11 +52,12 @@ You have all the methods provided by [Test::Mojo](https://metacpan.org/pod/Test:
     $t->click_ok('#button', {
         input1        => '42',
         select1       => [ 1..3 ],
+        remove_me     => undef,
         other_select  => sub { my $r = shift; [ @$r, 42 ] },
         another_input => sub { shift . 'offix'}
     })
 
-First parameter specifies a CSS selector matching or [Mojo::DOM](https://metacpan.org/pod/Mojo::DOM) object
+First parameter specifies a CSS selector matching or [Mojo::DOM](https://metacpan.org/pod/Mojo%3A%3ADOM) object
 containing `<form>` you want to
 submit or a particular `<button>`, `<input type="submit">`,
 or `<input type="image">` (contained in a `<form>`)
@@ -66,7 +67,7 @@ Specifying a second parameter allows you to override the form control values:
 the keys are `name=""`s of controls to override and values can be either
 plain scalars (use arrayrefs for multiple values) or subrefs. Subrefs
 will be evaluated and their first `@_` element will be the current value
-of the form control.
+of the form control. Use `undef` as value to remove form's parameter.
 
 # DEBUGGING / ENV VARS
 
@@ -105,7 +106,7 @@ for buttons.
 
 # SEE ALSO
 
-[Test::Mojo](https://metacpan.org/pod/Test::Mojo), [Mojo::DOM](https://metacpan.org/pod/Mojo::DOM)
+[Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo), [Mojo::DOM](https://metacpan.org/pod/Mojo%3A%3ADOM)
 
 <div>
     <div style="background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/hr.png);height: 18px;"></div>

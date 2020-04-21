@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Mojo::Loader qw(load_class);
 use Mojo::Server;
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 has [qw/id guard parent_id user/];
 
@@ -28,8 +28,6 @@ has 'error' => 'Failed.';
 has 'failed' => sub { 0 };
 
 has 'finish' => 'Action complete.';
-
-has 'name' => sub { ref(shift) };
 
 has 'options' => sub {
     my $self = shift;
@@ -81,7 +79,7 @@ sub processChain {
 
     my $e = load_class($task);
 
-    $self->app->fatal("Loading '$task' failed: $e") if ($e);
+    $self->app->log->fatal("Loading '$task' failed: $e") if ($e);
 
     $task->new(app => $self->app, args => $self->args, parent_id => $self->id)
         ->withChain(\@children)

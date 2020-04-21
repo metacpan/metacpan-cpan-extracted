@@ -6,7 +6,7 @@ use Moo;
 use HTML::TableContent::Parser;
 use HTML::TableContent::Table;
 
-our $VERSION = '0.18';
+our $VERSION = '1.00';
 
 has parser => (
     is      => 'rw',
@@ -259,7 +259,7 @@ HTML::TableContent - HTML tables.
 
 =head1 VERSION
 
-Version 0.18 
+Version 1.00 
 
 =cut
 
@@ -482,7 +482,7 @@ Text::CSV_XS
 
 =head1 AUTHOR
 
-Robert Acock, C<< <thisusedtobeanemail at gmail.com> >>
+Robert Acock, C<< <email at lnation.org> >>
 
 =head1 DEPENDENCIES
 
@@ -540,7 +540,7 @@ L<http://search.cpan.org/dist/HTML-TableContent/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 LNATION.
+Copyright 2016->2020 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

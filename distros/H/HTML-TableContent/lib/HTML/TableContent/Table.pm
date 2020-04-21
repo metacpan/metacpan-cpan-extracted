@@ -6,7 +6,7 @@ use HTML::TableContent::Table::Caption;
 use HTML::TableContent::Table::Header;
 use HTML::TableContent::Table::Row;
 
-our $VERSION = '0.18';
+our $VERSION = '1.00';
 
 extends 'HTML::TableContent::Element';
 
@@ -427,7 +427,7 @@ HTML::TableContent::Table - Base class for table's
 
 =head1 VERSION
 
-Version 0.18
+Version 1.00
 
 =cut
 
@@ -735,7 +735,7 @@ Magical. just call it if you want the header columns to work.
     
 =head1 AUTHOR
 
-LNATION, C<< <thisusedtobeanemail at gmail.com> >>
+LNATION, C<< <email at lnation.org> >>
 
 =head1 DEPENDENCIES
 
@@ -761,7 +761,7 @@ L<HTML::TableContent::Table::Row::Cell>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 LNATION.
+Copyright 2020->2016 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -3,7 +3,7 @@ use warnings;
 
 use lib "inc";
 use File::Spec::Functions qw(catdir catfile);
-use My::Utility qw(check_config_script check_prebuilt_binaries check_src_build);
+use My::Utility qw(check_config_script check_win32_pkgconfig check_prebuilt_binaries check_src_build);
 
 #### we need the platform-specific module
 my %platforms =(
@@ -92,6 +92,10 @@ if(defined($ENV{PNG_INST_DIR})) {
 if($rv=check_config_script("libpng-config")) {
   push @candidates, $rv;
 };
+
+if ($rv = check_win32_pkgconfig()) {
+  push @candidates, $rv;
+}
 
 if($rv=check_prebuilt_binaries($build->os_type)) {
   push @candidates, @{$rv};

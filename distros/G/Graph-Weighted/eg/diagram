@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Graph::Weighted;
+use GraphViz2;
+
+my $gw = Graph::Weighted->new;
+$gw->populate(
+    {
+        A => { B => 1, C => 7 },
+        B => { C => 5, D => 4, E => 3 },
+        C => { E => 6 },
+        D => { E => 2 },
+        E => { },
+    },
+);
+
+my $gv = GraphViz2->new(
+    global => { directed => 1 },
+    node   => { shape => 'oval' },
+    edge   => { color => 'grey' },
+);
+
+for my $edge ($gw->edges) {
+    $gv->add_edge(from => $edge->[0], to => $edge->[1], label => $gw->get_cost($edge));
+}
+
+$gv->run(format => 'png', output_file => "$0.png");

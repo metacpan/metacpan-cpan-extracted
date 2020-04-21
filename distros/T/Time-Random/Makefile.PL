@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME             => 'Time::Random',
-    AUTHOR           => q{lnation <thisusedtobeanemail@gmail.com>},
+    AUTHOR           => q{lnation <email@lnation.org>},
     VERSION_FROM     => 'lib/Time/Random.pm',
     ABSTRACT_FROM    => 'lib/Time/Random.pm',
     LICENSE          => 'artistic_2',

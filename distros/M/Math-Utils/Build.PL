@@ -7,7 +7,7 @@ my $build = Module::Build->new(
 
 	dist_abstract => 'Useful mathematical functions not in Perl',
 	dist_author => ['John M. Gamble <jgamble@cpan.org>'],
-	dist_version => '1.13',
+	dist_version => '1.14',
 	dist_name => 'Math-Utils',
 
 	requires => {
@@ -30,7 +30,8 @@ my $build = Module::Build->new(
 
 	meta_merge => {
 		keywords => [ qw(math math-utils
-				sign gcd logarithm comparison polymonial) ],
+				sign gcd logarithm scale softmax
+				comparison polymonial) ],
 		resources => {
 			repository => 'git://github.com/jgamble/Math-Utils.git',
 #			repository => {

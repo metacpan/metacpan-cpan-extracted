@@ -9,3 +9,6 @@ Revision history for Feed-Data
 0.04    2020-04-17
         - adds new parser Feed::Data::Parser::CSV
 	- update Makefile with missing dependency Ref::Util.
+
+0.05    2020-04-17
+        - adds new parser Feed::Data::Parser::Table

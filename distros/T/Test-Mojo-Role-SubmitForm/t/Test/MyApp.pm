@@ -34,6 +34,7 @@ __DATA__
   <input type="text" name="a" value="A">
   <input type="checkbox" checked name="b" value="B">
   <input type="checkbox" name="c" value="C">
+  <input type="checkbox" checked name="meows" value="42">
   <input type="radio" name="d" value="D">
   <input type="radio" checked name="e" value="E">
   <input type="radio" name="e" value="Z">

@@ -1,3 +1,8 @@
+0.07	2020-04-21T20:24:57+0800
+	- Add new subroutine: word_iterator
+	- Add new subroutine: presuf_iterator
+	- Change the calling convention of extract_presuf (backward incompatible)
+
 0.06	2019-06-29T00:45:48+0900
 	- Add a new subroutine: sentences_iterator
 

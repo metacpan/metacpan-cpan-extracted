@@ -1,6 +1,11 @@
 Revision history for Term::Choose::Util
 
 
+0.121   2020-04-21
+        - "Term::Choose": minimum version is "1.711".
+        - Option validation: rename ARRAY to Array_Int.
+        - settings_menu: add options cs_begin, cs_separator, cs_end.
+
 0.120   2020-04-01
         - Bugfix in choose_a_number: undefined $digit.
 

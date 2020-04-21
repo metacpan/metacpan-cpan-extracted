@@ -65,6 +65,8 @@ my %WriteMakefile = (
 		},
 
 	'PREREQ_PM' => {
+		'Encode'                => '0',
+		'I18N::Langinfo'        => '0',
 		'String::Sprintf'       => '0',
 		'Net::PublicSuffixList' => '0',
 		'Mojolicious'           => '0',

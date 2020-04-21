@@ -21,6 +21,7 @@ lib/Feed/Data/Parser/CSV.pm
 lib/Feed/Data/Parser/JSON.pm
 lib/Feed/Data/Parser/Meta.pm
 lib/Feed/Data/Parser/RSS.pm
+lib/Feed/Data/Parser/Table.pm
 lib/Feed/Data/Parser/Text.pm
 lib/Feed/Data/Stream.pm
 Makefile.PL
@@ -38,6 +39,7 @@ t/07-extract-image.t
 t/08-okay.t
 t/09-json.t
 t/10-csv.t
+t/11-table.t
 t/data/atom-10-example.xml
 t/data/atom-full.xml
 t/data/atom.xml
@@ -51,6 +53,7 @@ t/data/rss20-no-summary.xml
 t/data/rss20-utf8.xml
 t/data/rss20.xml
 t/data/test.csv
+t/data/test.html
 t/data/test.json
 t/data/test.txt
 t/data/theory.atom

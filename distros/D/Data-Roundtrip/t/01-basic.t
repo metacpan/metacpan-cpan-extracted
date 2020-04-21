@@ -9,7 +9,7 @@ my $verbose = 0;
 use Data::Dump qw/pp/;
 use utf8;
 
-our $VERSION='0.10';
+our $VERSION='0.11';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';

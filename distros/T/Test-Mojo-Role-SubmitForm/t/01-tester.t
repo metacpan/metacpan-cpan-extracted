@@ -17,6 +17,7 @@ my %form_one = (
     m => 'M',
     '$"bar' => 42,
     q{©☺♥} => 24,
+    meows  => 42,
 
     mult_a => [qw/A B/],
     mult_b => [qw/C D E/],
@@ -67,6 +68,8 @@ my %form_one = (
 }
 
 { # Override form data
+    my %form_one_sans_meows = %form_one;
+    delete $form_one_sans_meows{meows};
     $t->get_ok('/')->status_is(200)
         ->click_ok('form#one', {
             a => '42',
@@ -75,10 +78,11 @@ my %form_one = (
             e => sub { shift . 'offix'},
             '$"bar' => sub { 5 },
             '©☺♥' => sub { 55 },
+            meows  => undef,
             mult_m => [qw/FOO BAR/],
             mult_a => sub { my $r = shift; [ 1, 2, 3, @$r ] },
         })->status_is(200)->json_is({
-            %form_one,
+            %form_one_sans_meows,
             a => '42',
             f => [ 1..3 ],
             l => [ 'L', 42],

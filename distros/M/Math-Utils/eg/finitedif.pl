@@ -1,4 +1,4 @@
-#!/bin/perl
+#!/usr/bin/env perl
 
 use Math::Utils qw(:polynomial :utility);
 use Getopt::Long;
@@ -6,7 +6,7 @@ use Getopt::Long;
 use strict;
 use warnings;
 
-my($triangle, $verbose);
+my($triangle, $verbose, $helpme);
 my($power, $startfrom) = (-1, 0);
 my(@yvals);
 
@@ -14,6 +14,7 @@ GetOptions("power=i" => \$power,
 	"start=i" => \$startfrom,
 	"triangle" => \$triangle,
 	"verbose" => \$verbose,
+	"help" => \$helpme,
 );
 
 if ($power >= 0)
@@ -29,7 +30,8 @@ else
 	@yvals = @ARGV;
 }
 
-die "What sequence?" unless @yvals;
+help() if ($helpme or ! scalar @yvals);
+
 my @fc = diff_column(@yvals);
 
 print_diff_triangle(diff_triangle(@yvals)) if ($triangle);
@@ -40,6 +42,45 @@ my($m, $p) = make_poly(@fc);
 print "Polynomial is: [", join(", ", @{$p}), "]/$m\n";
 
 exit (0);
+
+sub help
+{
+	print << 'EOH';
+
+Simple finite difference calculation to find the polynomial that
+generates the sequence that you provide. The numbers that you
+provide are the Y values; the coresponding X values are 0, 1, 2, ... etc.
+
+The polynomial is printed in ascending form. The output of
+finitedif.pl 1 10 27 52, for example, will be [1, 5, 4]/1. Ths
+translates to the polynomial 4*x**2 + 5*x + 1, all over the divisor 1.
+
+useage:
+        finitedif.pl 1 10 27 52
+
+or
+        finitedif.pl --startfrom=1 1 10 27 52
+
+or
+        finitedif.pl --power=2
+
+The flag "startfrom" starts X from a value other than 0. The flag "power"
+creates a power sequence (1, 4, 9, ... for power=2, 1, 8, 27, 64, ... for
+power=3, and so on).
+
+There are flags to display internal calculations:
+
+        finitedif.pl --verbose 1 10 27 52
+
+        finitedif.pl --triangle 1 10 27 52
+
+The flag "verbose" prints out intermediate calculations in addition to
+the polynomial. The flag "triangle" prints out the difference triangle.
+
+EOH
+
+exit(0);
+}
 
 #
 # using the first column of the difference triangle, create the polynomial.

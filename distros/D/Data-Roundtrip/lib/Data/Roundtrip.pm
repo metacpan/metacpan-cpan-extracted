@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -154,29 +154,38 @@ sub	perl2yaml {
 	;
 	my ($yaml_string, $escaped);
 	if( $escape_unicode ){
-		if( $pretty_printing ){
-			$yaml_string = YAML::Dump($pv);
+		#if( $pretty_printing ){
+			# it's here just for historic purposes, this is not supported and a warning is issued
+			#$yaml_string = eval { YAML::Dump($pv) };
+			#if( $@ ){ warn "error, call to ".'YAML::Dump()'." has failed with this exception:\n".$@; return undef }
 			# this does not work :( no pretty printing for yaml
 			#$yaml_string = Data::Format::Pretty::YAML::format_pretty($pv);
-		} else { $yaml_string = YAML::Dump($pv) }
+		#} else {
+			$yaml_string = eval { YAML::Dump($pv) };
+			if( $@ ){ warn "error, call to ".'YAML::Dump()'." has failed with this exception:\n".$@; return undef }
+		#}
+		if( ! $yaml_string ){ warn "perl2yaml() : error, no yaml produced from perl variable"; return undef }
 		if( _has_utf8($yaml_string) ){
 			utf8::encode($yaml_string);
 			$yaml_string = Unicode::Escape::escape($yaml_string, 'utf8');
 		}
 	} else {
-		if( $pretty_printing ){
+		#if( $pretty_printing ){
+			# it's here just for historic purposes, this is not supported and a warning is issued
 			#$yaml_string = Data::Format::Pretty::YAML::format_pretty($pv);
-		} else { $yaml_string = YAML::Dump($pv) }
+		#} else {
+			$yaml_string = YAML::Dump($pv);
+			if( $@ ){ warn "error, call to ".'YAML::Dump()'." has failed with this exception:\n".$@; return undef }
+		#}
+		if( ! $yaml_string ){ warn "perl2yaml() : error, no yaml produced from perl variable"; return undef }
 	}
-	if( ! $yaml_string ){ warn "perl2yaml() : error, no yaml produced from perl variable"; return undef }
-
 	return $yaml_string
 }
 sub	yaml2perl {
 	my $yaml_string = $_[0];
 	#my $params = defined($_[1]) ? $_[1] : {};
-	my $pv = YAML::Load($yaml_string);
-	if( ! $pv ){ warn "yaml2perl() : error, call to YAML::Load() has failed"; return undef }
+	my $pv = eval { YAML::Load($yaml_string) };
+	if( $@ || ! $pv ){ warn "yaml2perl() : error, call to YAML::Load() has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 	return $pv
 }
 sub	json2perl {
@@ -566,7 +575,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 
@@ -1320,6 +1329,33 @@ be found in the C<script> directory.
 These are: C<json2json.pl>,  C<json2yaml.pl>,  C<yaml2json.pl>,
 C<json2perl.pl>, C<perl2json.pl>, C<yaml2perl.pl>
 
+=head1 CAVEATS
+
+A valid Perl variable may kill L<YAML::Load> because
+of escapes and quotes. For example this:
+
+    my $yamlstr = <<'EOS';
+    ---
+    - 682224
+    - "\"w": 1
+    EOS
+    my $pv = eval { YAML::Load($yamlstr) };
+    if( $@ ){ die "failed(1): ". $@ }
+    # it's dead
+
+Strangely, there is no problem for this:
+
+    my $yamlstr = <<'EOS';
+    ---
+    - 682224
+    - "\"w"
+    EOS
+    # this is OK also:
+    # - \"w: 1
+    my $pv = eval { YAML::Load($yamlstr) };
+    if( $@ ){ die "failed(1): ". $@ }
+    # it's OK! still alive.
+
 =head1 AUTHOR
 
 Andreas Hadjiprocopis, C<< <bliako at cpan.org> / <andreashad2 at gmail.com> >>
@@ -1369,7 +1405,6 @@ L<https://metacpan.org/release/Data-Roundtrip>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
 Several Monks at L<PerlMonks.org | https://PerlMonks.org> (in no particular order):
@@ -1392,6 +1427,9 @@ L<Data::Dumper>'s incessant unicode escaping)
 =item L<marto|https://perlmonks.org/?node_id=https://perlmonks.org/?node_id=324763>
 
 =item and an anonymous monk
+
+=item CPAN member Slaven ReziE<263> (SREZIC) for testing
+the code and reporting numerous problems.
 
 =back
 

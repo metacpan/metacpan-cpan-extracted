@@ -115,8 +115,11 @@ subtest ihost => sub {
 
 subtest port => sub {
 	my @tests = (
-		[ qw( http://www.example.com/a/b/c       ) ],
-		[ qw( http://www.example.net:80/a/b/c 80 ) ],
+		[ qw( http://www.example.com/a/b/c          80 ) ],
+		[ qw( http://www.example.net:80/a/b/c       80 ) ],
+		[ qw( http://www.example.net:8080/a/b/c   8080 ) ],
+		[ qw( https://www.example.net/a/b/c        443 ) ],
+		[ qw( https://www.example.net:4443/a/b/c  4443 ) ],
 		);
 
 	run_table( '%p', \@tests )

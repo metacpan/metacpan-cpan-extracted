@@ -1,7 +1,10 @@
 Revision history for Perl module Alien::PNG
 
-0.1  Sun Apr 18 2010
-     - initial release [FROGGS]
+0.4  Tue Apr 21 2020
+     - use pkgconfig on Windows to use installed libpng [FROGGS]
 
 0.2  Wed Apr 15 2020
      - switch to function form of tempfile() [plicease]
+
+0.1  Sun Apr 18 2010
+     - initial release [FROGGS]

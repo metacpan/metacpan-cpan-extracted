@@ -33,7 +33,7 @@ name: Alien-PNG
 provides:
   Alien::PNG:
     file: lib/Alien/PNG.pm
-    version: '0.2'
+    version: '0.4'
 requires:
   ExtUtils::CBuilder: '0'
   File::ShareDir: '1.00'
@@ -43,5 +43,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-PNG
   license: http://dev.perl.org/licenses/
   repository: http://github.com/FROGGS/Alien_PNG
-version: '0.2'
+version: '0.4'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,10 @@
 Revision history for Object-Pad
 
+0.23    2020-04-21
+        [CHANGES]
+         * Add another new :repr type of autoselect, which chooses the most
+           appropriate type for the situation
+
 0.22    2020-04-17
         [CHANGES]
          * Allow classes to request their representation type using new

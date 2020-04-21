@@ -63,6 +63,9 @@ sub ACTION_code {
                                               $self->get_additional_cflags);
       $self->config_data('additional_libs', $self->get_additional_libs);
     }
+    elsif($bp->{buildtype} eq 'use_win32_pkgconfig') {
+      $self->config_data(win32_pkgconfig => $bp->{win32_pkgconfig});
+    }
     elsif($bp->{buildtype} eq 'use_prebuilt_binaries') {
       # all the following functions die on error, no need to test ret values
       $self->fetch_binaries($download);

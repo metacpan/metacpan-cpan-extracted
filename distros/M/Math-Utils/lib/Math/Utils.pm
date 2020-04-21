@@ -13,7 +13,8 @@ our %EXPORT_TAGS = (
 	fortran => [ qw(log10 copysign) ],
 	utility => [ qw(log10 log2 copysign flipsign
 			sign floor ceil fsum
-			gcd hcf lcm moduli) ],
+			gcd hcf lcm moduli softmax
+			uniform_scaling uniform_01scaling) ],
 	polynomial => [ qw(pl_evaluate pl_dxevaluate pl_translate
 			pl_add pl_sub pl_div pl_mult
 			pl_derivative pl_antiderivative) ],
@@ -30,7 +31,7 @@ our @EXPORT_OK = (
 #
 $EXPORT_TAGS{all} = [@EXPORT_OK];
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 =head1 NAME
 
@@ -78,7 +79,7 @@ Math::Utils - Useful mathematical functions not in Perl.
     $numerator = lcm(@multipliers);
 
     #
-    # Safe(r) summation.
+    # Safer summation.
     #
     $tot = fsum(@inputs);
 
@@ -315,6 +316,110 @@ sub fsum
 	return $sum;
 }
 
+=head3 softmax()
+
+Return a list of values as probabilities.
+
+The function takes the list, and creates a new list by raising I<e> to
+each value. The function then returns each value divided by the sum of
+the list. Each value in the new list is now a set of probabilities that
+sum to 1.0.
+
+The summation is performed using I<fsum()> above.
+
+See L<Softmax function|https://en.wikipedia.org/wiki/Softmax_function> at
+Wikipedia.
+
+=cut
+
+sub softmax
+{
+	my @nlist = @_;
+
+	#
+	# There's a nice trick where you find the maximum value in
+	# the list, and subtract it from every number in the list.
+	# This renders everything zero or negative, which makes
+	# exponentation safe from overflow, but doesn't affect
+	# the end result.
+	#
+	# If we weren't using this trick, then we'd start with
+	# the 'my @explist' line, feeding it '@_' instead.
+	#
+	my $listmax = $nlist[0];
+	for (@nlist[1 .. $#nlist])
+	{
+		$listmax = $_ if ($_ > $listmax);
+	}
+	@nlist = map{$_ - $listmax} @nlist if ($listmax > 0);
+
+	my @explist = map{exp($_)} @nlist;
+	my $sum = fsum(@explist);
+	return map{$_/$sum} @explist;
+}
+
+=head3 uniform_scaling
+
+=head3 uniform_01scaling
+
+Uniformly, or linearly, scale a number either from one range to another range
+(C<uniform_scaling()>), or to a default range of [0 .. 1]
+(C<uniform_01scaling()>).
+
+    @v = uniform_scaling(\@original_range, \@new_range, @oldvalues);
+
+For example, these two lines are equivalent, and both return 0:
+
+    $y = uniform_scaling([50, 100], [0, 1], 50);
+
+    $y = uniform_01scaling([50, 100], 50);
+
+They may also be called with a list or array of numbers:
+
+    @cm_measures = uniform_scaling([0, 10000], [0, 25400], @in_measures);
+
+    @melt_centigrade = uniform_scaling([0, 2000], [-273.15, 1726.85], \@melting_points);
+
+A number that is outside the original bounds will be proportionally changed
+to be outside of the new bounds, but then again having a number outside the
+original bounds is probably an error that should be checked before calling
+this function.
+
+L<https://stats.stackexchange.com/q/281164>
+
+=cut
+
+sub uniform_scaling
+{
+	my @fromrange = @{$_[0]};
+	my @torange = @{$_[1]};
+
+	#
+	# The remaining parameters are the numbers to rescale.
+	#
+	# It could happen. Someone might type \$x instead of $x.
+	#
+	my @xvalues = map{(ref $_ eq "ARRAY")? @$_:
+			((ref $_ eq "SCALAR")? $$_: $_)} @_[2 .. $#_];
+
+	return map{($_ - $fromrange[0])/($fromrange[1] - $fromrange[0]) * ($torange[1] - $torange[0]) + $torange[0]} @xvalues;
+}
+
+sub uniform_01scaling
+{
+	my @fromrange = @{$_[0]};
+
+	#
+	# The remaining parameters are the numbers to rescale.
+	#
+	# It could happen. Someone might type \$x instead of $x.
+	#
+	my @xvalues = map{(ref $_ eq "ARRAY")? @$_:
+			((ref $_ eq "SCALAR")? $$_: $_)} @_[1 .. $#_];
+
+	return map{($_ - $fromrange[0]) / ($fromrange[1] - $fromrange[0])} @xvalues;
+}
+
 =head3 gcd
 
 =head3 hcf
@@ -322,8 +427,8 @@ sub fsum
 Return the greatest common divisor (also known as the highest
 common factor) of a list of integers. These are simply synomyms:
 
-    $factor = gcd(@values);
-    $factor = hfc(@numbers);
+    $factor = gcd(@numbers);
+    $factor = hcf(@numbers);
 
 =cut
 
@@ -541,16 +646,18 @@ for more advanced polynonial operations L<Math::Polynomial> is recommended.
 
 =head3 pl_evaluate()
 
-    $y = pl_evaluate(\@coefficients, $x);
-    @yvalues = pl_evaluate(\@coefficients, \@xvalues);
-
-You can also use lists of the X values or X array references:
-
-    @yvalues = pl_evaluate(\@coefficients, \@xvalues, \@primes, $x, @negatives);
-
 Returns either a y-value for a corresponding x-value, or a list of
 y-values on the polynomial for a corresponding list of x-values,
 using Horner's method.
+
+    $y = pl_evaluate(\@coefficients, $x);
+    @yvalues = pl_evaluate(\@coefficients, @xvalues);
+
+    @ctemperatures = pl_evaluate([-160/9, 5/9], @ftemperatures);
+
+The list of X values may also include X array references:
+
+    @yvalues = pl_evaluate(\@coefficients, @xvalues, \@primes, $x, [-1, -10, -100]);
 
 =cut
 
@@ -940,20 +1047,11 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Utils>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/Math-Utils>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Math-Utils>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Math-Utils/>
+L<https://metacpan.org/release/Math-Utils>
 
 =back
-
 
 =head1 ACKNOWLEDGEMENTS
 

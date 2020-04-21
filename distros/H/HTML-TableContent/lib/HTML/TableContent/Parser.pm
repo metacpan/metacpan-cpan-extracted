@@ -2,7 +2,7 @@ package HTML::TableContent::Parser;
 
 use Moo;
 
-our $VERSION = '0.18';
+our $VERSION = '1.00';
 
 extends 'HTML::Parser';
 
@@ -257,7 +257,7 @@ HTML::TableContent::Parser - HTML::Parser subclass.
 
 =head1 VERSION
 
-Version 0.18
+Version 1.00
 
 =cut
 
@@ -312,7 +312,7 @@ Count of the current tables.
 
 =head1 AUTHOR
 
-LNATION, C<< <thisusedtobeanemail at gmail.com> >>
+LNATION, C<< <email at lnation.org> >>
 
 =head1 DEPENDENCIES
 
@@ -339,7 +339,7 @@ L<HTML::TableContent::Table::Row::Cell>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 LNATION.
+Copyright 2016->2020 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -31,6 +31,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Encode" : "0",
+            "I18N::Langinfo" : "0",
             "Mojolicious" : "0",
             "Net::PublicSuffixList" : "0",
             "String::Sprintf" : "0",
@@ -55,6 +57,6 @@
          "web" : "https://github.com/briandfoy/app-url"
       }
    },
-   "version" : "1.002",
+   "version" : "1.003",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

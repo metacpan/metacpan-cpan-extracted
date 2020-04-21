@@ -13,9 +13,9 @@ x
 %install
 rm -rf %buildroot
 # Fix a testsuite warning ("warning: %post(rpm-query-in-scriptlet-1-1.x86_64) scriptlet failed" b/c of: "error: Failed to initialize NSS library")
-%ifos linux
+if [[ -e %{_libdir}/libnss3.so ]]; then
 echo %{_libdir}/libnss3.so > list
-%endif
+fi
 
 # Find out needed deps:
 for i in sh rpm; do

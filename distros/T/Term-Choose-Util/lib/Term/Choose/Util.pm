@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.120';
+our $VERSION = '0.121';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -100,10 +100,10 @@ sub _valid_options {
         alignment           => '[ 0 1 2 ]',
         color               => '[ 0 1 2 ]',
         layout              => '[ 0 1 2 3 ]',
-        mark                => 'ARRAY',
-        solo                => 'ARRAY',     # experimental
-        tabs_info           => 'ARRAY',
-        tabs_prompt         => 'ARRAY',
+        mark                => 'Array_Int',
+        solo                => 'Array_Int',     # experimental
+        tabs_info           => 'Array_Int',
+        tabs_prompt         => 'Array_Int',
         busy_string         => 'Str',
         info                => 'Str',
         init_dir            => 'Str',
@@ -194,7 +194,7 @@ sub _routine_options {
         $options = [ @every, qw( layout order alignment enchanted keep_chosen index prefix all_by_default cs_begin cs_end cs_separator mark busy_string solo ) ];
     }
     elsif ( $caller eq 'settings_menu' ) {
-        $options = [ @every ];
+        $options = [ @every, qw( cs_begin cs_end cs_separator ) ];
     }
     return $options;
 }
@@ -841,7 +841,7 @@ sub settings_menu {
     while ( 1 ) {
         my @tmp;
         if ( defined $self->{cs_label} ) {
-            push @tmp, $self->{cs_label} . '' . join( ', ', map { "$_=$new->{$_}" } keys %$new ) . '';
+            push @tmp, $self->{cs_label} . $self->{cs_begin} . join( $self->{cs_separator}, map { "$_=$new->{$_}" } keys %$new ) . $self->{cs_end};
         }
         if ( defined $self->{prompt} && length $self->{prompt} ) {
             push @tmp, $self->{prompt};
@@ -990,7 +990,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.120
+Version 0.121
 
 =cut
 

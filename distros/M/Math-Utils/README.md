@@ -1,5 +1,5 @@
 # Math-Utils
-## Version 1.13
+## Version 1.14
 
 Contains implementations of commonly used mathematical functions
 and operations that are not part of standard Perl.
@@ -17,6 +17,6 @@ perl Build.PL
 
 ## COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 John M. Gamble. All rights reserved. This program is
+Copyright (C) 2020 John M. Gamble. All rights reserved. This program is
 free software; you can redistribute it and/or modify it under the same
 terms as Perl itself.

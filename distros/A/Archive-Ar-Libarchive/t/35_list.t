@@ -22,7 +22,7 @@ my $filenames = [ qw(foo.txt bar.txt baz.txt) ];
 
 subtest 'filename' => sub {
   plan tests => 3;
-  
+
   my $ar = Archive::Ar::Libarchive->new($fn);
   isa_ok $ar, 'Archive::Ar::Libarchive';
 
@@ -47,7 +47,7 @@ subtest 'memory' => sub {
   open my $fh, '<', $fn;
   my $data = do { local $/ = undef; <$fh> };
   close $fh;
-  
+
   my $ar = Archive::Ar::Libarchive->new;
   isa_ok $ar, 'Archive::Ar::Libarchive';
   is $ar->read_memory($data), 242, "size matches";
@@ -62,7 +62,7 @@ subtest 'rename' => sub {
   open my $fh, '<', $fn;
   my $data = do { local $/ = undef; <$fh> };
   close $fh;
-  
+
   my $ar = Archive::Ar::Libarchive->new;
   isa_ok $ar, 'Archive::Ar::Libarchive';
   is $ar->read_memory($data), 242, "size matches";

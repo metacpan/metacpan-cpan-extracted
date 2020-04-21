@@ -168,6 +168,8 @@ typedef struct {
     REPR_NATIVE,       /* instances are in native format - blessed AV as slots */
     REPR_HASH,         /* instances are blessed HASHes; our slots live in $self->{"Object::Pad/slots"} */
     REPR_MAGIC,        /* instances store slot AV via magic; superconstructor must be foreign */
+
+    REPR_AUTOSELECT,   /* pick one of the above depending on foreign_new and SvTYPE()==SVt_PVHV */
   } repr;
   CV *foreign_new;     /* superclass is not Object::Pad, here is the constructor */
 
@@ -220,6 +222,7 @@ static OP *pp_methstart(pTHX)
       break;
 
     case REPR_HASH:
+    case_REPR_HASH:
     {
       if(SvTYPE(rv) != SVt_PVHV)
         croak("Not a HASH reference");
@@ -255,6 +258,7 @@ static OP *pp_methstart(pTHX)
     }
 
     case REPR_MAGIC:
+    case_REPR_MAGIC:
     {
       MAGIC *mg = mg_findext(rv, PERL_MAGIC_ext, &vtbl_slotsav);
       if(!mg && create)
@@ -264,6 +268,11 @@ static OP *pp_methstart(pTHX)
       slotsav = mg->mg_obj;
       break;
     }
+
+    case REPR_AUTOSELECT:
+      if(SvTYPE(rv) == SVt_PVHV)
+        goto case_REPR_HASH;
+      goto case_REPR_MAGIC;
   }
 
   SAVESPTR(PAD_SVl(PADIX_SLOTS));
@@ -455,8 +464,12 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta)
   if(padix != PADIX_SLOTS)
     croak("ARGH: Expected that padix[@slots] = 2");
 
+  U8 repr = meta->repr;
+  if(repr == REPR_AUTOSELECT && !meta->foreign_new)
+    repr = REPR_NATIVE;
+
   ops = op_append_list(OP_LINESEQ, ops,
-    newMETHSTARTOP(OPf_MOD, meta->repr)
+    newMETHSTARTOP(OPf_MOD, repr)
   );
 
   intro_my();
@@ -652,6 +665,8 @@ static XS(injected_constructor)
     LEAVE;
   }
 
+  bool need_initslots = true;
+
   if(!meta->foreign_new) {
     HV *stash = gv_stashsv(class, 0);
     if(!stash)
@@ -659,6 +674,7 @@ static XS(injected_constructor)
 
     switch(meta->repr) {
       case REPR_NATIVE:
+      case REPR_AUTOSELECT:
         CopLINE_set(PL_curcop, __LINE__);
         self = sv_2mortal(newRV_noinc((SV *)newAV()));
         sv_bless(self, stash);
@@ -713,32 +729,42 @@ static XS(injected_constructor)
     }
     SV *rv = SvRV(self);
 
+    /* It's possible a foreign superclass constructor invoked a `method` and
+     * thus INITSLOTS has already been called. Check here and set
+     * need_initslots false if so.
+     */
+
     switch(meta->repr) {
       case REPR_NATIVE:
         croak("ARGH shouldn't ever have REPR_NATIVE with foreign_new");
 
       case REPR_HASH:
+      case_REPR_HASH:
         if(SvTYPE(rv) != SVt_PVHV) {
           PL_curcop = prevcop;
           croak("Expected %" SVf "->SUPER::new to return a blessed HASH reference", class);
         }
+
+        need_initslots = !hv_exists(MUTABLE_HV(rv), "Object::Pad/slots", 17);
         break;
 
       case REPR_MAGIC:
+      case_REPR_MAGIC:
         /* Anything goes */
+
+        need_initslots = !mg_findext(rv, PERL_MAGIC_ext, &vtbl_slotsav);
         break;
+
+      case REPR_AUTOSELECT:
+        if(SvTYPE(rv) == SVt_PVHV)
+          goto case_REPR_HASH;
+        goto case_REPR_MAGIC;
     }
 
     sv_2mortal(self);
   }
 
-  /* It's possible the superclass constructor invoked a `method` and thus
-   * INITSLOTS has already been called
-   */
-  if(!meta->foreign_new ||
-     (meta->repr == REPR_HASH && !hv_exists(MUTABLE_HV(SvRV(self)), "Object::Pad/slots", 17)) ||
-     (meta->repr == REPR_MAGIC && !mg_findext(SvRV(self), PERL_MAGIC_ext, &vtbl_slotsav))
-  ) {
+  if(need_initslots) {
     /* $self->INITSLOTS */
     CopLINE_set(PL_curcop, __LINE__);
 
@@ -796,7 +822,7 @@ static ClassMeta *MY_mop_create_class(pTHX_ SV *name, SV *superclassname)
 
   meta->offset = 0;
   meta->slots  = newAV();
-  meta->repr   = REPR_NATIVE;
+  meta->repr   = REPR_AUTOSELECT;
   meta->foreign_new = NULL;
 
   meta->tmpcop = (COP *)newSTATEOP(0, NULL, NULL);
@@ -831,8 +857,7 @@ static ClassMeta *MY_mop_create_class(pTHX_ SV *name, SV *superclassname)
       meta->foreign_new = supermeta->foreign_new;
     }
     else {
-      /* A subclass of a foreign class - presume HASH for now */
-      meta->repr = REPR_HASH;
+      /* A subclass of a foreign class */
       meta->foreign_new = fetch_superclass_method_pv(meta->stash, "new", 3, -1);
       if(!meta->foreign_new)
         croak("Unable to find SUPER::new for %" SVf, superclassname);
@@ -882,7 +907,7 @@ static void S_apply_class_attribute(pTHX_ ClassMeta *meta, SV *attr)
     if(!val)
       croak(":repr attribute requires a representation type specification");
 
-    if(strEQ(val, "default") || strEQ(val, "native")) {
+    if(strEQ(val, "native")) {
       if(meta->foreign_new)
         croak("Cannot switch a subclass of a foreign superclass type to :repr(native)");
       meta->repr = REPR_NATIVE;
@@ -894,6 +919,8 @@ static void S_apply_class_attribute(pTHX_ ClassMeta *meta, SV *attr)
         croak("Cannot switch to :repr(magic) without a foreign superclass");
       meta->repr = REPR_MAGIC;
     }
+    else if(strEQ(val, "default") || strEQ(val, "autoselect"))
+      meta->repr = REPR_AUTOSELECT;
     else
       croak("Unrecognised class representation type %s", val);
   }
@@ -1189,8 +1216,12 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
   PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
   OP *slotops = NULL;
 
+  U8 repr = compclassmeta->repr;
+  if(repr == REPR_AUTOSELECT && !compclassmeta->foreign_new)
+    repr = REPR_NATIVE;
+
   slotops = op_append_list(OP_LINESEQ, slotops,
-    newMETHSTARTOP(0, compclassmeta->repr)
+    newMETHSTARTOP(0, repr)
   );
 
   int i;

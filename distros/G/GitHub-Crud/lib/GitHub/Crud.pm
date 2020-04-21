@@ -8,7 +8,7 @@
 # add download repo zip file as is done in Dita::Conversion then reply to Ivan and request inclusion of this module on their list
 package GitHub::Crud;
 use v5.16;
-our $VERSION = 20200418;
+our $VERSION = 20200419;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -322,7 +322,7 @@ sub list($)                                                                     
 sub specialFileData($)                                                          # Do not encode or decode data with a known file signature
  {my ($d) = @_;                                                                 # String to check
   my $h = '';
-  if (length($d) > 8)                                                           # Read file magic number
+  if ($d and length($d) > 8)                                                    # Read file magic number
    {for my $e(0..7)
      {$h .= sprintf("%x", ord(substr($d, $e, 1)));
      }
@@ -363,7 +363,19 @@ sub read($;$)                                                                   
 
 sub write($$;$)                                                                 # Write utf8 data into a L<GitHub> file.\mRequired attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. Either specify the target file on:<github> using the L<gitFile|/gitFile> attribute or supply it as the third parameter.  Returns B<true> on success else L<undef>.
  {my ($gitHub, $data, $File) = @_;                                              # GitHub object, data to be written, optionally the name of the file on github
-  defined($data) or confess "data required";
+
+  unless($data)                                                                 # No data supplied so delete the file
+   {if ($File)
+     {my $file = $gitHub->file;
+      $gitHub->file = $File;
+      $gitHub->delete;
+      $gitHub->file = $file;
+     }
+    else
+     {$gitHub->delete;
+     }
+    return 1;                                                                   # Success
+   }
 
   my $pat  = $gitHub->patKey(1);
   my $user = qm $gitHub->userid;          $user or confess "userid required";
@@ -2004,6 +2016,17 @@ if (0) {                                                                        
   success "Write file from file using saved token succeeded"
  }
 
+if (0) {                                                                        # Write an empty string to a file to delete it
+  my $g = gitHub
+   (userid=>q(philiprbrenan), repository=>q(ddd), gitFile=>q(hello.txt));
+  my $s = "hello";
+  my $f = $g->write($s);
+  my $S = $g->read;
+  confess "Write.read failed" unless $s eq $S;
+  $g->write;
+  $g->exists and confess "File still exists";
+  success "Delete file on empty write succeeded"
+ }
 
 if (0) {                                                                        #TreadFileUsingSavedToken
   my $s = q(Hello to the World);

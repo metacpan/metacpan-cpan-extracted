@@ -55,7 +55,7 @@ print $FH "\n#endif\n";
 close($FH);
 
 my $workaround;
-if (-e '/etc/redhat-release' && $cfg{modversion} =~ /4.11/) {
+if (! -e '/etc/mageia-release' && -e '/etc/redhat-release' && $cfg{modversion} =~ /4.11/) {
    $workaround = '-DPATCHED_RH';
 }
 my $ccflags = join(' ', '-Wall -Wextra -fno-strict-aliasing', $cfg{cflags}, "-DRPM_VERSON=$cfg{modversion}", $workaround);
@@ -72,7 +72,7 @@ WriteMakefile(
 	'MDV::Packdrakeng' => '1.00', # for URPM::Build
     },
     'TEST_REQUIRES' => {
-	'Test::Pod' => '1.00',
+	'Test::Pod' => '1.14',
     },
     META_MERGE => {
 	'meta-spec' => { version => 2 },

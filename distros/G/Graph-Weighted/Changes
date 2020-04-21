@@ -1,5 +1,22 @@
 Revision history for Graph-Weighted:
 
+0.9101 2020-04-21 01:42:56
+    - Use a constant instead of a magic literal in the code.
+    - Add the eg/diagram example program.
+    - Improve documentation a tiny bit.
+
+0.9100 2020-04-20 22:51:10
+    - Add the ->MST_edge_sum method and use it in eg/minimum-spanning-tree.
+
+0.9002 2020-04-20 22:26:10
+    - Improve the eg/shortest-path program.
+    - Improve documentation ever so slightly.
+
+0.9001 2020-04-20 21:58:08
+    - Improve documentation.
+    - Improve the eg/minimum-spanning-tree program.
+    - Use constant, not Readonly.
+
 0.9   2017-03-07
     - Actually allow non-numeric keys and connections!
     - Display the node label, if there is one, in dump().

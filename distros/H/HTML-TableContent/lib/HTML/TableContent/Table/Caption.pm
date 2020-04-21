@@ -2,7 +2,7 @@ package HTML::TableContent::Table::Caption;
 
 use Moo;
 
-our $VERSION = '0.18';
+our $VERSION = '1.00';
 
 extends 'HTML::TableContent::Element';
 
@@ -22,7 +22,7 @@ HTML::TableContent::Table::Caption - base class for table captions.
 
 =head1 VERSION
 
-Version 0.18
+Version 1.00
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ Caption tag id if found.
 
 =head1 AUTHOR
 
-LNATION, C<< <thisusedtobeanemail at gmail.com> >>
+LNATION, C<< <email at lnation.org> >>
 
 =head1 BUGS
 
@@ -114,7 +114,7 @@ L<HTML::TableContent::Table::Row::Cell>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 LNATION.
+Copyright 2016->2020 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

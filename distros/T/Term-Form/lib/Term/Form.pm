@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.527';
+our $VERSION = '0.528';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -65,7 +65,7 @@ sub _valid_options {
             color            => '[ 0 1 2 ]',
             hide_cursor      => '[ 0 1 2 ]',
             no_echo          => '[ 0 1 2 ]',
-            read_only        => 'ARRAY',
+            read_only        => 'Array_Int',
             back             => 'Str',
             confirm          => 'Str',
             default          => 'Str',
@@ -93,7 +93,7 @@ sub _valid_options {
             auto_up          => '[ 0 1 2 ]',
             color            => '[ 0 1 2 ]',
             hide_cursor      => '[ 0 1 2 ]',
-            read_only        => 'ARRAY',
+            read_only        => 'Array_Int',
             back             => 'Str',
             confirm          => 'Str',
             extra            => 'Str', # experimental
@@ -1345,7 +1345,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.527
+Version 0.528
 
 =cut
 

@@ -2,13 +2,8 @@ package Feed::Data::Parser;
 
 use Moo;
 use Carp qw/croak/;
-use Feed::Data::Parser::RSS;
-use Feed::Data::Parser::Atom;
-use Feed::Data::Parser::Meta;
-use Feed::Data::Parser::Text;
-use Feed::Data::Parser::JSON;
-use Feed::Data::Parser::CSV;
 
+use Class::Load qw/load_class/;
 use Types::Standard qw/Object ScalarRef Str/;
 
 
@@ -60,6 +55,7 @@ has 'parser_type' => (
 		return 'Text' if $tag =~ /^text/;
 		return 'JSON' if $tag =~ /^json/;
 		return 'CSV' if $tag =~ /^csv/;
+		return 'Table' if $tag =~ /^table/;
 		return croak "Could not find a parser";
 	}
 );
@@ -72,6 +68,7 @@ has 'parse' => (
 		my $self = shift;
 		my $type = $self->parser_type;
 		my $class = "Feed::Data::Parser::" . $type;
+		load_class($class);
 		return $class->new(content_ref => $self->stream);
 	}
 );

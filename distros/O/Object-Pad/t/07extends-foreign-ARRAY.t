@@ -24,7 +24,7 @@ package Base::Class {
    }
 }
 
-class Derived::Class extends Base::Class :repr(magic) {
+class Derived::Class extends Base::Class {
    has $derived_field = 456;
 
    method BUILD {
@@ -48,7 +48,7 @@ class Derived::Class extends Base::Class :repr(magic) {
 
    is( pp($obj),
       q(bless([123], "Derived::Class")),
-      'pp($obj) of Object::Pad-extended :repr(magic) class' );
+      'pp($obj) of Object::Pad-extended blessed ARRAY class' );
 }
 
 done_testing;

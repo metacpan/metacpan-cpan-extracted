@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.10
+    Version 0.11
 
 SYNOPSIS
 
@@ -569,6 +569,33 @@ SCRIPTS
     These are: json2json.pl, json2yaml.pl, yaml2json.pl, json2perl.pl,
     perl2json.pl, yaml2perl.pl
 
+CAVEATS
+
+    A valid Perl variable may kill YAML::Load because of escapes and
+    quotes. For example this:
+
+        my $yamlstr = <<'EOS';
+        ---
+        - 682224
+        - "\"w": 1
+        EOS
+        my $pv = eval { YAML::Load($yamlstr) };
+        if( $@ ){ die "failed(1): ". $@ }
+        # it's dead
+
+    Strangely, there is no problem for this:
+
+        my $yamlstr = <<'EOS';
+        ---
+        - 682224
+        - "\"w"
+        EOS
+        # this is OK also:
+        # - \"w: 1
+        my $pv = eval { YAML::Load($yamlstr) };
+        if( $@ ){ die "failed(1): ". $@ }
+        # it's OK! still alive.
+
 AUTHOR
 
     Andreas Hadjiprocopis, <bliako at cpan.org> / <andreashad2 at
@@ -635,6 +662,9 @@ ACKNOWLEDGEMENTS
     <https://perlmonks.org/?node_id=https://perlmonks.org/?node_id=324763>
 
     and an anonymous monk
+
+    CPAN member Slaven Rezić (SREZIC) for testing the code and reporting
+    numerous problems.
 
 DEDICATIONS
 

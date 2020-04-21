@@ -1,6 +1,11 @@
 Revision history for Term::Choose
 
 
+1.711   2020-04-21
+    - Update unicode table to unicode 13.0.
+    - Update footer_string format.
+    - Update option validation.
+
 1.710   2020-03-08
     - 'line_fold': new option 'join'.
 

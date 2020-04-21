@@ -1,0 +1,7 @@
+lib/fs/Promises.pm
+lib/fs/Promises/Utils.pm
+Makefile.PL
+t/01-read_file.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

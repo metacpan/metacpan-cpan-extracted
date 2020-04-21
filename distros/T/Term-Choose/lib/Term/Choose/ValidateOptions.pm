@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.710';
+our $VERSION = '1.711';
 
 use Exporter qw( import );
 
@@ -22,9 +22,9 @@ sub validate_options {
             croak "$sub: '$key' is not a valid option name";
         }
         next if ! defined $opt->{$key};
-        if ( $valid->{$key} eq 'ARRAY' ) {
+        if ( $valid->{$key} =~ /^Array/ ) {
             croak "$sub: option '$key' => the passed value has to be an ARRAY reference." if ref $opt->{$key} ne 'ARRAY';
-            {
+            if ( $valid->{$key} eq 'Array_Int' ) {
                 no warnings 'uninitialized';
                 for ( @{$opt->{$key}} ) {
                     /^[0-9]+\z/ or croak "$sub: option '$key' => $_ is an invalid array element";

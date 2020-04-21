@@ -1,5 +1,9 @@
 Revision history for Test-Mojo-Role-SubmitForm
 
+1.004001  2020-04-20
+    - Fix spurious warnings
+    - Add means to remove forms params
+
 1.003001  2020-04-19
     - Allow clicking on forms given by Mojo::DOM objects
 

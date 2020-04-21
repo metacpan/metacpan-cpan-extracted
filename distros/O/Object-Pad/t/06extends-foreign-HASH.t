@@ -119,21 +119,6 @@ class Derived::Class extends Base::Class {
       'slots ARRAY contains correct number of elements' );
 }
 
-# Check we don't segv on other kinds of representation
-{
-   package Base::ARRAY {
-      sub new { bless [], shift }
-   }
-   class Derived::ARRAY extends Base::ARRAY {
-      has $derived_field;
-   }
-
-   my $line = __LINE__+1;
-   like( exception { Derived::ARRAY->new },
-      qr/^Expected Derived::ARRAY->SUPER::new to return a blessed HASH reference at .* line $line\./,
-      'Exception from superconstructor returning non-HASH representation' );
-}
-
 # Check we are not allowed to switch the representation type back to native
 {
    like( exception {

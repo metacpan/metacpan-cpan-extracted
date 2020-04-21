@@ -8,6 +8,7 @@ Release: 1
 License: x
 Provides: /bin/a
 BuildRequires: gcc
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^libc.so
 
 %prep
 %setup -c -T
@@ -23,7 +24,7 @@ int main(int argc, char **argv) {
 EOF
 
 %build
-gcc -Wall -static -o a a.c
+gcc -Wall -o a a.c
 
 %install
 rm -rf $RPM_BUILD_ROOT

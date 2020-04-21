@@ -18,6 +18,8 @@ t/04-fsum.t
 t/05-intfns.t
 t/06-moduli.t
 t/07-gcdlcm.t
+t/08-softmax.t
+t/09-scale.t
 t/10-add.t
 t/11-subtract.t
 t/12-multiply.t
@@ -27,7 +29,7 @@ t/15-objcoeff.t
 t/16-evaluate.t
 t/17-derivative-eval.t
 t/18-translate.t
-t/20-finitedif.t
+t/30-finitedif.t
 t/manifest.t
 t/pod.t
 LICENSE

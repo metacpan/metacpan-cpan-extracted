@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Test-Mojo-Role-SubmitForm",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Test::Mojo::Role::SubmitForm",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.003001",
+  "VERSION" => "1.004001",
   "test" => {
     "TESTS" => "t/*.t"
   }

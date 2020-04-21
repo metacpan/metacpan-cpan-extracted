@@ -11,6 +11,8 @@
       "sign",
       "gcd",
       "logarithm",
+      "scale",
+      "softmax",
       "comparison",
       "polymonial"
    ],
@@ -42,7 +44,7 @@
    "provides" : {
       "Math::Utils" : {
          "file" : "lib/Math/Utils.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       }
    },
    "release_status" : "stable",
@@ -54,6 +56,6 @@
          "url" : "git://github.com/jgamble/Math-Utils.git"
       }
    },
-   "version" : "1.13",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.14",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

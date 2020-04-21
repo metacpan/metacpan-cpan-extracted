@@ -1,5 +1,5 @@
 package Time::Random;
-use 5.006; use strict; use warnings; our $VERSION = '0.06';
+use 5.006; use strict; use warnings; our $VERSION = '0.07';
 use Time::Piece;
 use base 'Import::Export';
 our %EX = (
@@ -30,7 +30,7 @@ Time::Random - Generate a random time in time.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
@@ -119,7 +119,7 @@ If you would like any custom format I would look at passing the strftime param o
 
 =head1 AUTHOR
 
-lnation, C<< <thisusedtobeanemail at gmail.com> >>
+lnation, C<< <email at lnation.org> >>
 
 =head1 BUGS
 

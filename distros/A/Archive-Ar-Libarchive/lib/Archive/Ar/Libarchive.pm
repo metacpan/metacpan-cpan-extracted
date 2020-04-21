@@ -10,7 +10,7 @@ use Carp qw( carp longmess );
 use File::Basename ();
 
 # ABSTRACT: Interface for manipulating ar archives with libarchive
-our $VERSION = '2.07'; # VERSION
+our $VERSION = '2.08'; # VERSION
 
 require XSLoader;
 XSLoader::load('Archive::Ar::Libarchive', $VERSION);
@@ -23,7 +23,7 @@ sub new
   my($class, $filename_or_handle, $debug) = @_;
   my $self = _new();
   $self->DEBUG if $debug;
-  
+
   if($filename_or_handle)
   {
     unless($self->read($filename_or_handle))
@@ -31,7 +31,7 @@ sub new
       return $self->_error("new() failed on filename for filehandle read");
     }
   }
-  
+
   $self;
 }
 
@@ -41,7 +41,7 @@ sub read
   my($self, $filename_or_handle) = @_;
 
   my $ret = 0;
-  
+
   if(ref $filename_or_handle)
   {
     return $self->_error("Not a filehandle") unless eval{*$filename_or_handle{IO}} or $filename_or_handle->isa('IO::Handle');
@@ -64,11 +64,11 @@ sub read
 sub read_memory
 {
   my($self, $data) = @_;
-  
+
   open my $fh, '<', \$data;
   binmode $fh;
   my $ret = $self->read($fh);
-  
+
   $ret;
 }
 
@@ -102,7 +102,7 @@ sub remove
 sub list_files
 {
   my $list = shift->_list_files;
-  wantarray ? @$list : $list;
+  wantarray ? @$list : $list; ## no critic (Freenode::Wantarray)
 }
 
 
@@ -123,7 +123,7 @@ sub add_files
       $self->_error("Could not stat $filename.");
       next;
     }
-    
+
     open(my $fh, '<', $filename) || do {
       $self->_error("Unable to open $filename $!");
       next;
@@ -134,7 +134,7 @@ sub add_files
     # Archive::Ar).
     my $data = do { local $/; <$fh> };
     close $fh;
-    
+
     $self->add_data(File::Basename::basename($filename), $data, {
       date => $props[9],
       uid  => $props[4],
@@ -144,7 +144,7 @@ sub add_files
     });
     $count++;
   }
-  
+
   return unless $count;
   $count;
 }
@@ -154,7 +154,7 @@ sub add_data
 {
   my($self, $filename, $data, $filedata) = @_;
   $filedata ||= {};
-  $self->_add_data($filename, $data, $filedata->{uid} || 0, $filedata->{gid} || 0, $filedata->{date} || time, $filedata->{mode} || 0100644);
+  $self->_add_data($filename, $data, $filedata->{uid} || 0, $filedata->{gid} || 0, $filedata->{date} || time, $filedata->{mode} || oct(100644));
   use bytes;
   length $data;
 }
@@ -166,12 +166,12 @@ sub write
   if(defined $filename)
   {
     my $fh;
-  
+
     if(ref $filename)
     {
       return $self->_error("Not a filehandle") unless eval{*$filename{IO}} or $filename->isa('IO::Handle');
       $fh = $filename;
-      
+
       return $self->_write_to_callback(sub {
         my($archive, $buffer) = @_;
         print $fh $buffer;
@@ -254,7 +254,7 @@ Archive::Ar::Libarchive - Interface for manipulating ar archives with libarchive
 
 =head1 VERSION
 
-version 2.07
+version 2.08
 
 =head1 SYNOPSIS
 
@@ -265,7 +265,7 @@ version 2.07
  $ar->add_data('newfile.txt', 'some contents', { uid => 101, gid => 102 });
  
  $ar->add_files('./bar.tar.gz', 'bat.pl');
-  
+ 
  $ar->remove('file1', 'file2');
  
  my $content = $ar->get_content('file3')->{data};
@@ -278,24 +278,24 @@ version 2.07
 
 =head1 DESCRIPTION
 
-This module is a XS alternative to L<Archive::Ar> that uses libarchive 
+This module is a XS alternative to L<Archive::Ar> that uses libarchive
 to read and write ar BSD, GNU and common ar archives.
 
-There is no standard for the ar format.  Most modern archives are based 
-on a common format with two extension variants, BSD and GNU.  Other 
-esoteric variants (such as AIX (small), AIX (big) and Coherent) vary 
-significantly from the common format and are not supported.  Debian's 
+There is no standard for the ar format.  Most modern archives are based
+on a common format with two extension variants, BSD and GNU.  Other
+esoteric variants (such as AIX (small), AIX (big) and Coherent) vary
+significantly from the common format and are not supported.  Debian's
 package format (.deb files) use the common format.
 
-The interface attempts to be identical (with a couple of minor 
-extensions) to L<Archive::Ar> and the documentation presented here is 
-based on that module. The diagnostic messages issued on error mostly 
-come directly from libarchive, so they will likely not match exactly 
+The interface attempts to be identical (with a couple of minor
+extensions) to L<Archive::Ar> and the documentation presented here is
+based on that module. The diagnostic messages issued on error mostly
+come directly from libarchive, so they will likely not match exactly
 what L<Archive::Ar> would produce, but it should issue a warning under
 similar  circumstances.
 
-The main advantage of L<Archive::Ar> over this module is that it is 
-written in pure perl, and thus does not require a compiler or 
+The main advantage of L<Archive::Ar> over this module is that it is
+written in pure perl, and thus does not require a compiler or
 libarchive.  As an XS module using libarchive it may be faster.
 
 You may notice that the API to L<Archive::Ar::Libarchive> and
@@ -310,9 +310,9 @@ intentionally to keep similarity between the Archive::* modules.
  my $ar = Archive::Ar::Libarchive->new($filename);
  my $ar = Archive::Ar::Libarchive->new($fh);
 
-Returns a new L<Archive::Ar::Libarchive> object.  Without a filename or 
-glob, it returns an empty object.  If passed a filename as a scalar or a 
-GLOB, it will attempt to populate from either of those sources.  If it 
+Returns a new L<Archive::Ar::Libarchive> object.  Without a filename or
+glob, it returns an empty object.  If passed a filename as a scalar or a
+GLOB, it will attempt to populate from either of those sources.  If it
 fails, you will receive C<undef>, instead of an object reference.
 
 =head2 set_opt
@@ -403,10 +403,10 @@ C<undef> on failure.
 
  my $br = $ar->read_memory($data);
 
-This reads information from the first parameter, and attempts to parse 
-and treat it like an ar archive. Like L<Archive::Ar::Libarchive#read>, 
-it will wipe out whatever you have in the object and replace it with the 
-contents of the new archive, even if it fails. Returns the number of 
+This reads information from the first parameter, and attempts to parse
+and treat it like an ar archive. Like L<Archive::Ar::Libarchive#read>,
+it will wipe out whatever you have in the object and replace it with the
+contents of the new archive, even if it fails. Returns the number of
 bytes read (processed) if successful, C<undef> otherwise.
 
 =head2 contains_file
@@ -482,9 +482,9 @@ information is stripped off. Filenames longer than 16 characters are
 truncated when written to disk in the format, so keep that in mind
 when adding files.
 
-Due to the nature of the ar archive format, 
-L<Archive::Ar::Libarchive#add_files> will store the uid, gid, mode, 
-size, and creation date of the file as returned by 
+Due to the nature of the ar archive format,
+L<Archive::Ar::Libarchive#add_files> will store the uid, gid, mode,
+size, and creation date of the file as returned by
 L<stat|perlfunc#stat>.
 
 returns the number of files successfully added, or C<undef> on failure.
@@ -493,9 +493,9 @@ returns the number of files successfully added, or C<undef> on failure.
 
  my $size = $ar->add_data($filename, $data, $filedata);
 
-Takes an filename and a set of data to represent it. Unlike 
-L<Archive::Ar::Libarchive#add_files>, 
-L<Archive::Ar::Libarchive#add_data> is a virtual add, and does not 
+Takes an filename and a set of data to represent it. Unlike
+L<Archive::Ar::Libarchive#add_files>,
+L<Archive::Ar::Libarchive#add_data> is a virtual add, and does not
 require data on disk to be present. The data is a hash that looks like:
 
  $filedata = {
@@ -505,7 +505,7 @@ require data on disk to be present. The data is a hash that looks like:
    mode => $mode,  #defaults to 0100644;
  };
 
-You cannot add_data over another file however.  This returns the file 
+You cannot add_data over another file however.  This returns the file
 length in bytes if it is successful, C<undef> otherwise.
 
 =head2 write
@@ -513,10 +513,10 @@ length in bytes if it is successful, C<undef> otherwise.
  my $content = $ar->write;
  my $size = $ar->write($filename);
 
-This method will return the data as an .ar archive, or will write to the 
-filename present if specified. If given a filename, 
-L<Archive::Ar::Libarchive#write> will return the length of the file 
-written, in bytes, or C<undef> on failure. If the filename already exists, 
+This method will return the data as an .ar archive, or will write to the
+filename present if specified. If given a filename,
+L<Archive::Ar::Libarchive#write> will return the length of the file
+written, in bytes, or C<undef> on failure. If the filename already exists,
 it will overwrite that file.
 
 =head2 get_content

@@ -26,10 +26,10 @@ subtest 'add list' => sub {
   plan tests => 4;
 
   my $ar = Archive::Ar::Libarchive->new;
-  
+
   my $count = $ar->add_files(map { File::Spec->catfile($dir, "$_.txt") } qw( foo bar baz ));
   is $count, 3, 'add_files';
-  
+
   foreach my $name (qw( foo bar baz ))
   {
     is $ar->get_content("$name.txt")->{data}, $data{$name}, "data for $name";
@@ -40,10 +40,10 @@ subtest 'add ref' => sub {
   plan tests => 4;
 
   my $ar = Archive::Ar::Libarchive->new;
-  
+
   my $count = $ar->add_files(map { File::Spec->catfile($dir, "$_.txt") } qw( foo bar baz ));
   is $count, 3, 'add_files';
-  
+
   foreach my $name (qw( foo bar baz ))
   {
     is $ar->get_content("$name.txt")->{data}, $data{$name}, "data for $name";

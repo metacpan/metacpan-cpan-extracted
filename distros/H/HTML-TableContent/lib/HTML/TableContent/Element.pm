@@ -3,7 +3,7 @@ package HTML::TableContent::Element;
 use Moo;
 use HTML::TableContent::Table;
 
-our $VERSION = '0.18';
+our $VERSION = '1.00';
 
 my @ATTRIBUTE =
   qw/class id style colspan rowspan onclick onchange type onkeyup placeholder scope selected value
@@ -343,7 +343,7 @@ HTML::TableContent::Element - attributes, text, data, class, id
 
 =head1 VERSION
 
-Version 0.18
+Version 1.00
 
 =cut
 
@@ -482,7 +482,7 @@ Get Nested table by index.
 
 =head1 AUTHOR
 
-LNATION, C<< <thisusedtobeanemail at gmail.com> >>
+LNATION, C<< <email at lnation.org> >>
 
 =head1 CONFIGURATION AND ENVIRONMENT 
 
@@ -510,7 +510,7 @@ L<HTML::TableContent::Table::Row::Cell>
     
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 LNATION.
+Copyright 2016->2020 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use Carp;
 
@@ -140,15 +140,16 @@ called "slots").
 
 The following class attributes are supported:
 
-=head3 repr(TYPE)
+=head3 :repr(TYPE)
 
 Sets the representation type for instances of this class. Must be one of the
 following values:
 
-   :repr(native), :repr(default)
+   :repr(native)
 
-The native representation, currently the default. This is an opaque
-representation type whose contents are not specified.
+The native representation. This is an opaque representation type whose
+contents are not specified. It only works for classes whose entire inheritence
+hierarchy is built only from classes based on C<Object::Pad>.
 
    :repr(HASH)
 
@@ -165,9 +166,6 @@ This representation type may be useful when converting existing classes into
 using C<Object::Pad> where there may be existing subclasses of it that presume
 a blessed hash for their own use.
 
-This type is automatically selected when extending a base class that is not
-itself implemented by C<Object::Pad>.
-
    :repr(magic)
 
 The representation will use MAGIC to apply the instance data in a way that is
@@ -176,6 +174,20 @@ instance is doing even in XS modules.
 
 This representation type is the only one that will work for subclassing
 existing classes that do not use blessed hashes.
+
+   :repr(autoselect), :repr(default)
+
+I<Since version 0.23.>
+
+This representation will select one of the representations above depending on
+what is best for the situation. Classes not derived from a non-C<Object::Pad>
+base class will pick C<native>, and classes derived from non-C<Object::Pad>
+bases will pick either the C<HASH> or C<magic> forms depending on whether the
+instance is a blessed hash reference or some other kind.
+
+This achieves the best combination of DWIM while still allowing the common
+forms of hash reference to be inspected by C<Data::Dumper>, etc. This is the
+default representation type, and does not have to be specifically requested.
 
 =head2 has
 
@@ -278,8 +290,7 @@ implemented using C<Object::Pad>.
 
 =head2 Storage of Instance Data
 
-Instances by default will use the C<:repr(HASH)> storage type, though
-subclasses can elect instead to use C<:repr(magic)> instead.
+Instances will pick either the C<:repr(HASH)> or C<:repr(magic)> storage type.
 
 =head2 Object State During Methods Invoked By Superclass Constructor
 

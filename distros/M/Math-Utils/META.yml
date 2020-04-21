@@ -14,6 +14,8 @@ keywords:
   - sign
   - gcd
   - logarithm
+  - scale
+  - softmax
   - comparison
   - polymonial
 license: perl
@@ -24,11 +26,11 @@ name: Math-Utils
 provides:
   Math::Utils:
     file: lib/Math/Utils.pm
-    version: '1.13'
+    version: '1.14'
 requires:
   perl: v5.10.1
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/jgamble/Math-Utils.git
-version: '1.13'
+version: '1.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

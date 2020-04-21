@@ -3,7 +3,7 @@ use v5.26;
 
 package App::url;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 use Carp qw(carp);
 use Mojo::Base -strict, -signatures;
@@ -38,7 +38,7 @@ Decompose the URL and reformat it according to
 
 =over 4
 
-=item * C<%a> - the path,
+=item * C<%a> - the path
 
 =item * C<%f> - the fragment
 
@@ -47,6 +47,8 @@ Decompose the URL and reformat it according to
 =item * C<%H> - the hostname without domain info
 
 =item * C<%i> - the hostname in punycode
+
+=item * C<%I> - space-separated list of IP addresses for the host
 
 =item * C<%P> - the password of the userinfo portion
 
@@ -97,15 +99,29 @@ You can use this code under the terms of the Artistic License 2.
 
 =cut
 
-our $VERSION = '1.001_01';
+no warnings 'uninitialized';
 
+# $w - width of field
+# $v - value that corresponds to position in template
+# $V - list of all values
+# $l - letter
 my $formatter = String::Sprintf->formatter(
 	a   => sub ( $w, $v, $V, $l ) { $V->[0]->path      },
 	f   => sub ( $w, $v, $V, $l ) { $V->[0]->fragment  },
 	h   => sub ( $w, $v, $V, $l ) { $V->[0]->host      },
 	H   => sub ( $w, $v, $V, $l ) { ( split /\./, $V->[0]->host )[0] },
 	i   => sub ( $w, $v, $V, $l ) { $V->[0]->ihost     },
-	p   => sub ( $w, $v, $V, $l ) { $V->[0]->port      },
+	I   => sub ( $w, $v, $V, $l ) {
+		state $rc = require Socket;
+		my @addresses = gethostbyname( $V->[0]->host );
+		@addresses = map { Socket::inet_ntoa($_) } @addresses[4..$#addresses];
+		"@addresses";
+		},
+	p   => sub ( $w, $v, $V, $l ) { $V->[0]->port // do {
+			if(    $V->[0]->protocol eq 'http'  ) {  80 }
+			elsif( $V->[0]->protocol eq 'https' ) { 443 }
+			};
+	     },
 	P   => sub ( $w, $v, $V, $l ) { $V->[0]->password  },
 	'q' => sub ( $w, $v, $V, $l ) { $V->[0]->query     },
 	's' => sub ( $w, $v, $V, $l ) { $V->[0]->protocol  },

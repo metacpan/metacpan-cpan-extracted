@@ -10,13 +10,13 @@ build_requires:
   Mojolicious::Lite: '0'
   Test::Mojo::WithRoles: '0.02'
   Test::More: '0'
-  perl: '5.008'
+  perl: '5.010'
   strict: '0'
   utf8: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.010'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -27,7 +27,7 @@ name: Test-Mojo-Role-SubmitForm
 provides:
   Test::Mojo::Role::SubmitForm:
     file: lib/Test/Mojo/Role/SubmitForm.pm
-    version: '1.003001'
+    version: '1.004001'
 requires:
   Carp: '0'
   Mojo::Base: '0'
@@ -35,15 +35,15 @@ requires:
   Mojolicious: '6.39'
   Role::Tiny: '0'
   Test::Mojo::WithRoles: '0.02'
-  perl: '5.008'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/zoffixznet/test-mojo-role-submitform/issues
   homepage: http://metacpan.org/release/Test-Mojo-Role-SubmitForm
   repository: git://github.com/zoffixznet/test-mojo-role-submitform.git
-version: '1.003001'
+version: '1.004001'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.030002'
   plugins:
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
@@ -155,7 +155,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::ZOFFIX/MetaProvides::Package'
       version: '2.004003'
@@ -163,7 +163,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::ZOFFIX/InstallGuide'
       version: '1.200013'
@@ -292,7 +292,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::ZOFFIX/CheckSelfDependency'
       version: '0.011'
@@ -379,7 +379,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.003001
+          tag: v1.004001
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -476,6 +476,6 @@ x_Dist_Zilla:
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Zoffix Znet <zoffixznet@users.noreply.github.com>'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

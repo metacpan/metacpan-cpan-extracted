@@ -34,6 +34,7 @@ WriteMakefile(
    	'Class::Load' => 0.25, 
     	'Ref::Util' => 0.204,
 	'Text::CSV_XS' => 1.41,
+        'HTML::TableContent' => 1.00
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Feed-Data-*' },

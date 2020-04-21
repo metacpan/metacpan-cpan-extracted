@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.07
+    version 2.08
 
 SYNOPSIS
 
@@ -16,7 +16,7 @@ SYNOPSIS
      $ar->add_data('newfile.txt', 'some contents', { uid => 101, gid => 102 });
      
      $ar->add_files('./bar.tar.gz', 'bat.pl');
-      
+     
      $ar->remove('file1', 'file2');
      
      my $content = $ar->get_content('file3')->{data};

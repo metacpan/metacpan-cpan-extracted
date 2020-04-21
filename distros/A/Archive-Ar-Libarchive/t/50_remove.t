@@ -20,10 +20,10 @@ close $fh;
 
 subtest 'remove list' => sub {
   plan tests => 3;
-  
+
   my $ar = Archive::Ar::Libarchive->new($fn);
   isa_ok $ar, 'Archive::Ar::Libarchive';
-  
+
   my $count = eval { $ar->remove('foo.txt', 'baz.txt') };
   is $count, 2, 'count = 2';
   diag $@ if $@;
@@ -33,10 +33,10 @@ subtest 'remove list' => sub {
 
 subtest 'remove ref' => sub {
   plan tests => 3;
-  
+
   my $ar = Archive::Ar::Libarchive->new($fn);
   isa_ok $ar, 'Archive::Ar::Libarchive';
-  
+
   my $count = eval { $ar->remove(['foo.txt', 'baz.txt']) };
   is $count, 2, 'count = 2';
   diag $@ if $@;

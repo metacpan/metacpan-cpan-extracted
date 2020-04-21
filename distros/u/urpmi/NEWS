@@ -1,3 +1,13 @@
+Version 8.122 - 11 April 2020
+
+- cpan_testers:
+  o check & report where genhdlist2 is
+  o check that web server has actually started
+  o describe more tests to help pinpoint regressions
+  o fix test with rpm < 4.13 on CentOS7
+  o perform some file conflict tests only on Mageia
+  o try harder to find genhdlist2 in uninstalled CPAN modules
+
 Version 8.121 - 8 April 2020
 
 - urpmi:

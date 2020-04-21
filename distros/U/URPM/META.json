@@ -40,7 +40,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::Pod" : "1.00"
+            "Test::Pod" : "1.14"
          }
       }
    },
@@ -61,6 +61,6 @@
          "web" : "http://gitweb.mageia.org/software/rpm/perl-URPM/"
       }
    },
-   "version" : "v5.25",
+   "version" : "v5.26",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -53,7 +53,7 @@
    "provides" : {
       "Alien::PNG" : {
          "file" : "lib/Alien/PNG.pm",
-         "version" : "0.2"
+         "version" : "0.4"
       }
    },
    "release_status" : "stable",
@@ -68,6 +68,6 @@
          "url" : "http://github.com/FROGGS/Alien_PNG"
       }
    },
-   "version" : "0.2",
+   "version" : "0.4",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

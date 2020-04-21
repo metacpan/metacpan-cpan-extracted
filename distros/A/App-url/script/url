@@ -20,6 +20,7 @@ url - format a URL according to a sprintf-like template
 	www.example.com
 	www.github.com
 
+	# get the path
 	$ url '%P' http://www.example.com/a/b/c
 	/a/b/c
 
@@ -31,13 +32,19 @@ Decompose the URL and reformat it according to a template.
 
 =over 4
 
-=item * C<%a> - the path,
+=item * C<%a> - the path
+
+=item * C<%A> - the addresses
 
 =item * C<%f> - the fragment
 
-=item * C<%h> - the hostname
+=item * C<%h> - the hostname, with domain info
 
-=item * C<%h> - the hostname in punycode
+=item * C<%H> - the hostname without domain info
+
+=item * C<%i> - the hostname in punycode
+
+=item * C<%I> - space-separated list of IP addresses for the host
 
 =item * C<%P> - the password of the userinfo portion
 
@@ -46,6 +53,8 @@ Decompose the URL and reformat it according to a template.
 =item * C<%q> - the query string
 
 =item * C<%s> - the scheme
+
+=item * C<%S> - the public suffix
 
 =item * C<%u> - the complete URL
 
@@ -63,7 +72,12 @@ You can use this code under the terms of the Artistic License 2.
 
 =cut
 
-use Encode qw(decode_utf8);
-@ARGV = map { decode_utf8($_, 1) } @ARGV;
+use Encode qw(decode);
+use I18N::Langinfo qw(langinfo CODESET);
 
-say join "\n", App::url->run( @ARGV )->@*;
+@ARGV = map { decode( langinfo(CODESET), $_ ) } @ARGV;
+
+my $results = App::url->run( @ARGV );
+exit if $results->@* == 0;
+
+say join "\n", $results->@*;

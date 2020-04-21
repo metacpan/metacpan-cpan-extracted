@@ -15,11 +15,11 @@ Alien::PNG - building, finding and using PNG binaries
 
 =head1 VERSION
 
-Version 0.2
+Version 0.4
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.4';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -169,8 +169,9 @@ sub config
 {
   my $package = shift;
   my @params  = @_;
-  return _png_config_via_script(@params)      if(Alien::PNG::ConfigData->config('script'));
-  return _png_config_via_config_data(@params) if(Alien::PNG::ConfigData->config('config'));
+  return _png_config_via_script(@params)          if Alien::PNG::ConfigData->config('script');
+  return _png_config_via_win32_pkgconfig(@params) if Alien::PNG::ConfigData->config('win32_pkgconfig');
+  return _png_config_via_config_data(@params)     if Alien::PNG::ConfigData->config('config');
 }
 
 ### get version info from given header file
@@ -253,6 +254,32 @@ sub _png_config_via_script
     $val .= ' ' . Alien::PNG::ConfigData->config('additional_libs');
   }
   return $val;
+}
+
+sub _png_config_via_win32_pkgconfig
+{
+  my $param     = shift;
+  my @add_libs  = @_;
+  my $devnull   = File::Spec->devnull();
+  my $pkgconfig = Alien::PNG::ConfigData->config('win32_pkgconfig');
+  return unless ($pkgconfig && ($param =~ /[a-z0-9_]*/i));
+
+  my ($prefix) = grep { /\/perl\/lib$/ } @INC;
+  return unless $prefix;
+  $prefix              =~ s/\/perl\/lib$/\/c/;
+  $pkgconfig->{prefix} = $prefix;
+
+  if (ref $pkgconfig->{$param} eq 'ARRAY') {
+    return map { s/\@PrEfIx\@/$prefix/g; } @{$pkgconfig->{$param}};
+  }
+  elsif (ref $pkgconfig->{$param} eq 'HASH') {
+    map { $pkgconfig->{$param}{$_} =~ s/\@PrEfIx\@/$prefix/g } keys %{$pkgconfig->{$param}};
+  }
+  else {
+    $pkgconfig->{$param} =~ s/\@PrEfIx\@/$prefix/g;
+  }
+
+  $pkgconfig->{$param};
 }
 
 sub _png_config_via_config_data

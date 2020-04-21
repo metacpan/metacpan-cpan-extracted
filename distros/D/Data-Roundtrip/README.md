@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
@@ -607,6 +607,33 @@ be found in the `script` directory.
 These are: `json2json.pl`,  `json2yaml.pl`,  `yaml2json.pl`,
 `json2perl.pl`, `perl2json.pl`, `yaml2perl.pl`
 
+# CAVEATS
+
+A valid Perl variable may kill [YAML::Load](https://metacpan.org/pod/YAML%3A%3ALoad) because
+of escapes and quotes. For example this:
+
+    my $yamlstr = <<'EOS';
+    ---
+    - 682224
+    - "\"w": 1
+    EOS
+    my $pv = eval { YAML::Load($yamlstr) };
+    if( $@ ){ die "failed(1): ". $@ }
+    # it's dead
+
+Strangely, there is no problem for this:
+
+    my $yamlstr = <<'EOS';
+    ---
+    - 682224
+    - "\"w"
+    EOS
+    # this is OK also:
+    # - \"w: 1
+    my $pv = eval { YAML::Load($yamlstr) };
+    if( $@ ){ die "failed(1): ". $@ }
+    # it's OK! still alive.
+
 # AUTHOR
 
 Andreas Hadjiprocopis, `<bliako at cpan.org> / <andreashad2 at gmail.com>`
@@ -660,6 +687,8 @@ Several Monks at [PerlMonks.org ](https://metacpan.org/pod/%20https%3A#PerlMonks
 - [leszekdubiel](https://perlmonks.org/?node_id=1164259)
 - [marto](https://perlmonks.org/?node_id=https://perlmonks.org/?node_id=324763)
 - and an anonymous monk
+- CPAN member Slaven Rezić (SREZIC) for testing
+the code and reporting numerous problems.
 
 # DEDICATIONS
 

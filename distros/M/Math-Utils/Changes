@@ -1,5 +1,14 @@
 Revision history for Math-Utils
 
+1.14
+	10 Apr 2020
+	- Add the function softmax(). Currently in the :utility tag
+	  group, which may be too generic. We'll see what else gets
+	  added later and adjust the tagging then.
+	- New functions uniform_scaling(), and uniform_01scaling(),
+	  contributed by Gene Boggs (GENE).
+	- Typo found by Miguel Prz (NICEPERL) fixed.
+
 1.13
 	30 Oct 2018
 	- Add function pl_translate(), by request.

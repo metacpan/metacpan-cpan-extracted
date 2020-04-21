@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw(Exporter);
 
-our @EXPORT_OK = qw(check_config_script check_prebuilt_binaries check_src_build find_PNG_dir find_file sed_inplace);
+our @EXPORT_OK = qw(check_config_script check_win32_pkgconfig check_prebuilt_binaries check_src_build find_PNG_dir find_file sed_inplace);
 use Config;
 use File::Spec::Functions qw(splitdir catdir splitpath catpath rel2abs);
 use File::Find qw(find);
@@ -67,6 +67,72 @@ sub check_config_script
     buildtype => 'use_config_script',
     script    => $script,
     prefix    => $prefix,
+  };
+}
+
+sub check_win32_pkgconfig
+{
+  return unless $^O eq 'MSWin32';
+
+  my ($prefix) = map { s/\/perl\/lib$/\/c/; $_ } grep { /\/perl\/lib$/ } @INC;
+  return unless $prefix;
+
+  my $pcfiledir = "$prefix/lib/pkgconfig";
+  my $pkgconfig = "$pcfiledir/libpng.pc";
+  return unless -f $pkgconfig;
+
+  print "Gonna check win32 pkgconfig...\n";
+  print "(path=$pkgconfig)\n";
+  my $devnull = File::Spec->devnull();
+  my %pc_var  = (
+    pcfiledir => $pcfiledir,
+  );
+
+  open(DAT, $pkgconfig) || return;
+  my @lines = <DAT>;
+  close(DAT);
+
+  for my $line (@lines) {
+    next unless $line =~ /^([\w\.]+)(=|:\s*)(.+)/;
+
+    my $name       = lc $1;
+    my $value      = $3;
+    $value         =~ s/\$\{([\w\.]+)\}/$pc_var{lc $1} || ''/eg;
+    $pc_var{$name} = $value;
+  }
+
+  for my $name (keys %pc_var) {
+    $pc_var{$name} =~ s/^\Q$prefix\E/\@PrEfIx\@/;
+  }
+
+  return unless $pc_var{version};
+
+  # find and set ld_shared_libs
+  my @shlibs              = find_file("$prefix/bin", qr/libpng(\d.*)\.dll$/);
+  $_                      =~ s/^\Q$prefix\E/\@PrEfIx\@/ foreach @shlibs;
+  $pc_var{ld_shared_libs} = \@shlibs;
+
+  # set ld_paths and ld_shlib_map
+  my %tmp       = ();
+  my %shlib_map = ();
+  foreach my $full (@shlibs) {
+    my ($v, $d, $f) = splitpath($full);
+    $tmp{ catpath($v, $d, '') } = 1;
+    # available shared libs detection
+    if ($f =~ /^(lib)?(png12)/) {
+      $shlib_map{png12} = $full unless $shlib_map{png12};
+    }
+    elsif ($f =~ /^(lib)?(tiff|jpeg|png)[^a-zA-Z]/) {
+      $shlib_map{$2} = $full unless $shlib_map{$2};
+    }
+  };
+  $pc_var{ld_paths}     = [ keys %tmp ];
+  $pc_var{ld_shlib_map} = \%shlib_map;
+
+  return {
+    title           => "Already installed PNG-$pc_var{version} path=$pkgconfig",
+    buildtype       => 'use_win32_pkgconfig',
+    win32_pkgconfig => \%pc_var,
   };
 }
 

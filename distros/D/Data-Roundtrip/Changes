@@ -37,3 +37,7 @@ Revision history for Data-Roundtrip
 0.10	2020-04-20
 	Added minimum version for Test::Script to be 1.09
 	to support script_stderr_is. Thank you Slaven Rezić!)
+
+0.11	2020-04-21
+	Checked failures for test script t/02-random-data-structure.t
+	and provided a fix and added a warning in CAVEATS section.

@@ -159,7 +159,6 @@ WriteMakefile(
     'TEST_REQUIRES' => {
 	'Expect'		=> '0',
 	'File::Slurp'		=> '0',
-	'HTTP::Server::Simple'  => '0.5',
 	'Net::Server'		=> '0',
 	'rpmtools'		=> '7.12',
 	'Test::More'		=> '1.302',

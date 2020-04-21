@@ -97,7 +97,7 @@ for my $opt ( sort keys %$string ) {
 
 
 my $tabs_prompt = {
-    tabs_prompt => 'ARRAY',
+    tabs_prompt => 'Array_Int',
 };
 my @val_tabs_prompt = ( [ 2, 4 ], [ 8 ], [], undef );
 
@@ -109,7 +109,7 @@ for my $opt ( sort keys %$tabs_prompt ) {
 
 
 my $no_spacebar = {
-    no_spacebar => 'ARRAY',
+    no_spacebar => 'Array_Int',
 };
 my @val_no_spacebar = ( [ 0, 1, 2, 100, 999999 ], [ 1 ], undef );
 

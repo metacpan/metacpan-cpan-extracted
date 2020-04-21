@@ -15,8 +15,30 @@ $g->populate(
     },
 );
 
-my @path = $g->MST_Kruskal; # A=B,A=F,C=F
-print 'Kruskal: ', join( '->', @path ), "\n";
+my $tree = $g->MST_Kruskal; # A=B,A=F,C=F
+my $sum = $g->MST_edge_sum($tree);
+print "Kruskal: $tree : $sum\n";
 
-@path = $g->MST_Prim; # same
-print 'Prim: ', join( '->', @path ), "\n";
+$tree = $g->MST_Prim; # same
+$sum = $g->MST_edge_sum($tree);
+print "Prim: $tree : $sum\n";
+
+# https://www.hackerearth.com/practice/algorithms/graphs/minimum-spanning-tree/tutorial/
+$g = Graph::Weighted->new( undirected => 1 );
+$g->populate(
+    {
+        A => { B => 1, C => 7 },
+        B => { A => 1, C => 5, D => 4, E => 3 },
+        C => { A => 7, B => 5, E => 6 },
+        D => { B => 4, E => 2 },
+        E => { B => 3, C => 6 },
+    },
+);
+
+$tree = $g->MST_Kruskal; # A=B,B=C,B=E,D=E
+$sum = $g->MST_edge_sum($tree);
+print "Kruskal: $tree : $sum\n";
+
+$tree = $g->MST_Prim; # same
+$sum = $g->MST_edge_sum($tree);
+print "Prim: $tree : $sum\n";

@@ -7,7 +7,7 @@ use base qw(Date::Holidays::Adapter::ES);
 
 use vars qw($VERSION);
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 1;
 
@@ -21,7 +21,7 @@ Date::Holidays::Adapter::CA_ES - adapter dummy class for Date::Holidays::CA_ES
 
 =head1 VERSION
 
-This POD describes version 1.19 of Date::Holidays::Adapter::CA_ES
+This POD describes version 1.20 of Date::Holidays::Adapter::CA_ES
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 L<Date::Holidays> and related modules are (C) by Jonas B. Nielsen, (jonasbn)
-2004-2019
+2004-2020
 
 Date-Holidays and related modules are released under the Artistic License 2.0
 

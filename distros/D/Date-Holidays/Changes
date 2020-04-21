@@ -1,13 +1,19 @@
 Changes file for Date-Holidays
 
-1.19 2019-01-23 Feature release, update recommended
+1.20 2020-04-21 Bug fix release, update recommended
+
+- A bug was introduced with the release of 1.19, the bug had been lurking since just after the release of 1.18. The bug did not show itself unless adaptees where installed and I tested release 1.19 on a branch new Perlbrew installation, so the bug was not demonstrated.
+
+
+1.19 2020-04-20 Feature release, update recommended
 
 - Added adapter for:
-    Date::Holidays::AU added to the distribution thanks to Denis Boyun
+    Date::Holidays::UA added to the distribution thanks to Denis Boyun
 
     Ref: https://github.com/jonasbn/perl-date-holidays/pull/38
 
     Also fixed a minor bug the documentation, my bumping of the version numbers across the files in the distribution had altered a parameter description. Apparently this had not caught my eye until now.
+
 
 1.18 2019-01-23 Feature release, update recommended
 

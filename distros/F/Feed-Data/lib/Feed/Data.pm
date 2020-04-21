@@ -7,13 +7,14 @@ use Carp qw(carp croak);
 use Feed::Data::Parser;
 use Feed::Data::Stream;
 use Feed::Data::Object;
+use HTML::TableContent;
 use JSON;
 use Compiled::Params::OO qw/cpo/;
 use XML::RSS::LibXML;
 use Text::CSV_XS qw/csv/;
 
 use 5.006;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our $validate;
 BEGIN {
@@ -26,6 +27,7 @@ BEGIN {
 		text => [Any, Optional->of(Str)],
 		json => [Any, Optional->of(Str)],
 		csv => [Any, Optional->of(Str)],
+		table => [Any, Optional->of(Str)],
 		convert_feed => [Any, Str, Str]
 	);
 }
@@ -44,6 +46,7 @@ has 'feed' => (
 		delete => 'delete',
 		insert => 'unshift',
 		is_empty => 'is_empty',
+		clear => 'clear',
 	}
 );
 
@@ -155,6 +158,55 @@ sub _json {
 	return $json->pretty->encode( \@render );
 }
 
+sub _table {
+	my ( $self, $type ) = $validate->table->(@_);
+	my @render = $self->_convert_feed('generate', 'json');
+	my $table = HTML::TableContent->new();
+	$table->create_table({
+		aoh => \@render,
+		order => [
+			qw/author title description category comment content date image link permalink tagline/
+		]
+	})->render;
+}
+
+sub _styled_table {
+	my ( $self, $type ) = $validate->table->(@_);
+	my @render = $self->_convert_feed('generate', 'json');
+	my $table = HTML::TableContent->new();
+	$table->create_table({
+		aoh => \@render,
+		order => [
+			qw/author title description category comment content date image link permalink tagline/
+		]
+	})->render . '<style> 
+		table {
+			font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		td, th {
+			word-break: break-word;
+			min-width: 100px;
+			border: 1px solid #ddd;
+			padding: 8px;
+		}
+
+		tr:nth-child(even){background-color: #f2f2f2;}
+
+		tr:hover {background-color: #ddd;}
+
+		th {
+			padding-top: 12px;
+			padding-bottom: 12px;
+			text-align: left;
+			background-color: #4c65af;
+			color: white;
+		}
+	</style>'
+}
+
 sub _csv {
 	my ( $self, $type ) = $validate->json->(@_);
 	my @render = $self->_convert_feed('generate', 'json');
@@ -184,7 +236,7 @@ Feed::Data - dynamic data feeds
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS 
 
@@ -216,6 +268,20 @@ Version 0.04
 		$entry->title->as_text;
 	}
 
+	...
+
+	use Feed::Data;
+
+	my $feed = Feed::Data->new();
+	
+	$feed->parse( 'https://services.parliament.uk/calendar/commons_main_chamber.rss' );
+
+	my $string = $feed->render('styled_table');
+
+	$feed->clear;
+
+	$feed->parse($string);
+
 =head1 DESCRIPTION
 
 Feed::Data is a frontend for building dynamic data feeds.
@@ -230,7 +296,7 @@ Feed::Data is a frontend for building dynamic data feeds.
 
 Populates the feed Attribute, this is an Array of Feed::Data::Object 's
 
-You can currently build Feeds by parsing xml (RSS, ATOM), JSON, CSV, HTML via Meta Tags (twitter, opengraph) and plain text using key values seperated by a colon.
+You can currently build Feeds by parsing xml (RSS, ATOM), JSON, CSV, plain text using key values seperated by a colon  HTML via Meta Tags (twitter, opengraph) or table markup.
 
 =cut
 
@@ -307,6 +373,51 @@ returns true if Feed::Data is empty.
 	
 =cut
 
+=head2 clear
+
+clear the current feed.
+
+	$feed->clear
+
+=cut
+
+=head2 title
+
+Set the title of the rss feed the default is Feed::Data.
+
+	$feed->title('Custom Title');
+
+=head2 link
+
+Set the link of the rss feed the default is Feed::Data.
+
+	$feed->link('https://custom.link');
+
+=head2 description
+
+Set the description of the rss feed the default is Feed::Data.
+
+	$feed->description('Custom Description');
+
+=head2 rss_channel
+
+Pass additional arguments into the rss feed channel section. See XML::RSS for more information.
+
+	$feed->rss_channel({  
+		dc => {
+			date       => '2000-01-01T07:00+00:00',
+			subject    => "LNATION",
+			creator    => 'email@lnation.org',
+			publisher  => 'email@lnation.org',
+			rights     => 'Copyright 2000, lnation.org',
+		},
+		syn => {
+			updatePeriod     => "hourly",
+			updateFrequency  => "1",
+			updateBase       => "1901-01-01T00:00+00:00",
+		},
+	});
+
 =head2 render
 
 render the feed using the passed in format, defaults to text.
@@ -316,7 +427,9 @@ render the feed using the passed in format, defaults to text.
 	# json 
 	# rss
 	# csv
-	
+	# table
+	# styled_table
+
 	$feed->render('raw');
 
 =cut

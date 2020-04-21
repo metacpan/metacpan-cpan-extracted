@@ -17,7 +17,8 @@ $g->populate(
     },
 );
 my @path = $g->SP_Dijkstra( 'A', 'F' ); # A->C->E->D->F
-print 'Dijkstra: ', join( '->', @path ), "\n";
+my $cost = $g->path_cost(\@path);
+print 'Dijkstra: ', join( '->', @path ), " : $cost\n";
 
 $g = Graph::Weighted->new();
 $g->populate(
@@ -30,7 +31,8 @@ $g->populate(
     },
 );
 @path = $g->SP_Bellman_Ford( 'S', 'T' ); # S->A->C->B->T
-print 'Bellman-Ford: ', join( '->', @path ), "\n";
+$cost = $g->path_cost(\@path);
+print 'Bellman-Ford: ', join( '->', @path ), " : $cost\n";
 
 $g = Graph::Weighted->new();
 $g->populate(
@@ -43,4 +45,5 @@ $g->populate(
 );
 my $apsp = $g->APSP_Floyd_Warshall();
 @path = $apsp->path_vertices( 1, 3 ); # 1->4->2->3
-print 'Floyd-Warshall: ', join( '->', @path ), "\n";
+$cost = $g->path_cost(\@path);
+print 'Floyd-Warshall: ', join( '->', @path ), " : $cost\n";

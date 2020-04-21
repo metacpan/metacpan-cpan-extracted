@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.710';
+our $VERSION = '1.711';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -111,12 +111,12 @@ sub _valid_options {
         max_width           => '[ 1-9 ][ 0-9 ]*',
         default             => '[ 0-9 ]+',
         pad                 => '[ 0-9 ]+',
-        lf                  => 'ARRAY',     # 21.11.2019    # after transition -> remove
-        mark                => 'ARRAY',
-        meta_items          => 'ARRAY',
-        no_spacebar         => 'ARRAY',
-        tabs_info           => 'ARRAY',
-        tabs_prompt         => 'ARRAY',
+        lf                  => 'Array_Int',     # 21.11.2019    # after transition -> remove
+        mark                => 'Array_Int',
+        meta_items          => 'Array_Int',
+        no_spacebar         => 'Array_Int',
+        tabs_info           => 'Array_Int',
+        tabs_prompt         => 'Array_Int',
         empty               => 'Str',
         footer_string       => 'Str',   # experimental
         info                => 'Str',
@@ -692,7 +692,7 @@ sub __prepare_page_number {
         my $pp_total = int( $#{$self->{rc2idx}} / $self->{avail_height} ) + 1;
         my $pp_total_w = length $pp_total;
         if ( defined $self->{footer_string} ) {
-            $self->{footer_fmt} = ' %0' . $pp_total_w . 'd/' . $pp_total . ' ' . $self->{footer_string};
+            $self->{footer_fmt} = '%0' . $pp_total_w . 'd/' . $pp_total . ' ' . $self->{footer_string};
         }
         else {
             $self->{footer_fmt} = '--- Page %0' . $pp_total_w . 'd/' . $pp_total . ' ---';
@@ -1196,7 +1196,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.710
+Version 1.711
 
 =cut
 
@@ -1211,7 +1211,7 @@ Functional interface:
     my $choice = choose( $array_ref );                            # single choice
     print "$choice\n";
 
-    my @choices = choose( [ 1 .. 100 ], { alignment => 1 } );       # multiple choice
+    my @choices = choose( [ 1 .. 100 ], { alignment => 1 } );     # multiple choice
     print "@choices\n";
 
     choose( [ 'Press ENTER to continue' ], { prompt => '' } );    # no choice
